@@ -1,0 +1,12 @@
+{
+  "name": "iris-messenger",
+  "version": "1.0.0",
+  "author": "Martti Malmi <sirius@iki.fi>",
+  "license": "MIT",
+  "dependencies": {
+    "http-server": "^0.12.1"
+  },
+  "scripts": {
+    "start": "http-server src"
+  }
+}

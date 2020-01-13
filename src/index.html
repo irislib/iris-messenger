@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Iris Chat</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+  <link rel="stylesheet" type="text/css" href="./style.css">
+  <link rel="shortcut icon" href="./favicon.ico">
+</head>
+
+<body>
+  <div class="chat">
+    <section class="sidebar hidden-xs">
+      <div class="user-info">
+        <div id="my-identicon"></div>
+        <div class="user-name"></div>
+      </div>
+      <div id="enable-notifications-prompt">
+        <div class="title">Get notified of new messages</div>
+        <div><a>Turn on desktop notifications ></a></div>
+      </div>
+      <div class="chat-list">
+        <div class="chat-item new">
+          Start new chat
+        </div>
+      </div>
+    </section>
+
+    <section class="main">
+      <header>
+        <div id="back-button" class="visible-xs">‹</div>
+        <div id="header-content"></div>
+      </header>
+
+      <!-- Chat view -->
+      <div class="main-view" id="message-list"></div>
+      <div id="not-seen-by-them" style="display: none">
+        <p>The other person hasn't seen this chat yet. Give them <b>your</b> chat link through some other channel:</p>
+        <p><button class="copy-chat-link">Copy your chat link</button></p>
+      </div>
+      <div class="message-form" style="display:none">
+        <form autocomplete="off">
+          <button type="button" id="emoji-picker">
+            <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="smile" class="svg-inline--fa fa-smile fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 448c-110.3 0-200-89.7-200-200S137.7 56 248 56s200 89.7 200 200-89.7 200-200 200zm-80-216c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm4 72.6c-20.8 25-51.5 39.4-84 39.4s-63.2-14.3-84-39.4c-8.5-10.2-23.7-11.5-33.8-3.1-10.2 8.5-11.5 23.6-3.1 33.8 30 36 74.1 56.6 120.9 56.6s90.9-20.6 120.9-56.6c8.5-10.2 7.1-25.3-3.1-33.8-10.1-8.4-25.3-7.1-33.8 3.1z"></path></svg>
+          </button>
+          <input id="new-msg" type="text" placeholder="Type a message">
+          <button type="submit">▶</button>
+        </form>
+      </div>
+
+      <!-- New chat view -->
+      <div class="main-view" id="new-chat">
+        <p><input id="paste-chat-link" type="text" placeholder="Paste someone's chat link"></p>
+        <p><button class="copy-chat-link">Copy your chat link</button></p>
+        <p>Exchange chat links with someone you want to chat with!</p>
+      </div>
+
+      <!-- Settings view -->
+      <div class="main-view" id="settings">
+        <h3>Profile</h3>
+        <p>
+          Your name:
+        </p>
+        <p>
+          <input id="settings-name" placeholder="Your name">
+        </p>
+        <h3>Account</h3>
+        <p>
+          <b>Save a backup of your private key first!</b> Otherwise you can't log in back to this account.
+        </p>
+        <p>
+          <button class="show-logout-confirmation">Log out</button>
+        </p>
+        <p>
+          <button class="show-switch-account">Switch account</button>
+        </p>
+        <h3>Private key</h3>
+        <p>
+          Private key is used to log in to your account. Keep your private key safe!
+        </p>
+        <p>
+          <button id="download-private-key">Download private key</button>
+          <button id="copy-private-key">Copy private key</button>
+        </p>
+        <h3>Peers</h3>
+        <div id="peers"></div>
+      </div>
+
+      <!-- Logout confirmation -->
+      <div class="main-view" id="logout-confirmation">
+        <p>
+          You <b>cannot log in again</b> unless you have saved a copy of your private key.
+        </p>
+        <p>
+          <button class="open-settings-button">Go back</button>
+        </p>
+        <p>
+          <button class="logout-button">Log out</button>
+        </p>
+      </div>
+
+      <!-- Login view -->
+      <div class="main-view" id="switch-account">
+        <input id="paste-privkey" placeholder="Paste a private key">
+      </div>
+
+    </section>
+  </div>
+
+  <script src="./jquery.js"></script>
+  <script src="./gun.js"></script>
+  <script src="./sea.js"></script>
+  <script src="./nts.js"></script>
+  <script src="./irisLib.js"></script>
+  <script src="./emoji-button.js"></script>
+  <script src="./script.js"></script>
+</body>
+
+</html>
