@@ -5,6 +5,7 @@ var urlsToCache = [
   'emoji-button.js',
   'favicon.ico',
   'gun.js',
+  'icon128.png',
   'index.html',
   'irisLib.js',
   'jquery.js',
