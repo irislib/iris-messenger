@@ -5,6 +5,7 @@ var gun = Gun({
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
 var chats = {};
+var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 var activeChat;
 var onlineTimeout;
 var timeOpened = new Date();
@@ -333,7 +334,8 @@ function sortMessagesByTime() {
 }
 
 function addMessage(msg) {
-  var textEl = $('<div class="text"></div>').text(msg.text);
+  var escaped = $('<div>').text(msg.text).html();
+  var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
   var msgContent = $(
     '<div class="msg-content"><div class="time"><span class="seen">✔</span> ' + formatDate(msg.time) + '</div></div>'
   );
