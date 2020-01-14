@@ -1,5 +1,5 @@
 var gun = Gun({
-  peers: [location.origin + '/gun', 'https://gun-us.herokuapp.com/gun', 'https://gunjs.herokuapp.com/gun'],
+  peers: [location.origin + '/gun', 'https://gun-us.herokuapp.com/gun', 'https://gunjs.herokuapp.com/gun']
 });
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
