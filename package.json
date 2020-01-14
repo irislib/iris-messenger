@@ -7,6 +7,6 @@
     "http-server": "^0.12.1"
   },
   "scripts": {
-    "start": "http-server src"
+    "start": "echo 'Iris: http://localhost:8080'; http-server src --silent"
   }
 }
