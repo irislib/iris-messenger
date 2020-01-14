@@ -331,13 +331,41 @@ function sortChatsByLatest() {
 function sortMessagesByTime() {
   var sorted = $(".msg").sort((a, b) => $(a).data('time') - $(b).data('time'));
   $("#message-list").append(sorted);
+  $('.day-separator').remove();
+  var now = new Date();
+  var nowStr = now.toLocaleDateString();
+  var previousDateStr;
+  sorted.each(function() {
+    var date = $(this).data('time');
+    if (!date) { return; }
+    var dateStr = date.toLocaleDateString();
+    if (dateStr !== previousDateStr) {
+      var separatorText = getDaySeparatorText(date, dateStr, now, nowStr);
+      $(this).before($('<div>').text(separatorText).addClass('day-separator'));
+    }
+    previousDateStr = dateStr;
+  });
+}
+
+function getDaySeparatorText(date, dateStr, now, nowStr) {
+  if (dateStr === nowStr) {
+    return 'today';
+  }
+  var dayDifference = Math.round((now - date)/(1000*60*60*24));
+  if (dayDifference === 1) {
+    return 'yesterday';
+  }
+  if (dayDifference <= 5) {
+    return date.toLocaleDateString(undefined, { weekday: 'long' });
+  }
+  return dateStr;
 }
 
 function addMessage(msg) {
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
   var msgContent = $(
-    '<div class="msg-content"><div class="time"><span class="seen">✔</span> ' + formatDate(msg.time) + '</div></div>'
+    '<div class="msg-content"><div class="time"><span class="seen">✔</span> ' + formatTime(msg.time) + '</div></div>'
   );
   msgContent.prepend(textEl);
   if (msg.text.length === 2 && msg.text.match(emojiRegex)) {
@@ -419,6 +447,10 @@ function lastSeenTimeChanged(pub) {
 }
 
 /* Helpers */
+
+function formatTime(date) {
+  return date.toLocaleString(undefined, {timeStyle:"short"});
+}
 
 function formatDate(date) {
   return date.toLocaleString(undefined, {dateStyle:"short", timeStyle:"short"});
