@@ -292,7 +292,10 @@ function showChat(pub) {
     nameEl.text(truncateString(chats[pub].name, 30));
     nameEl.show();
   }
-  $("#header-content").append(chats[pub].identicon.clone());
+  var identicon = chats[pub].identicon.clone().width(40).height(40);
+  var img = identicon.children('img').first();
+  img.attr('height', 40).attr('width', 40);
+  $("#header-content").append(identicon);
   $("#header-content").append(nameEl);
   $("#header-content").append($('<small class="last-seen"></small>'));
   var msgs = Object.values(chats[pub].messages);
@@ -368,7 +371,7 @@ function addChat(pub) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
-  var el = $('<div class="chat-item"><span class="name"></span> <small class="latest"></small></div>');
+  var el = $('<div class="chat-item"><div class="text"><div class="name"></div> <small class="latest"></small></div></div>');
   el.attr('data-pub', pub);
   chats[pub] = new irisLib.Chat({gun, key, participants: pub, onMessage: (msg, info) => {
     msg.selfAuthored = info.selfAuthored;
@@ -380,7 +383,7 @@ function addChat(pub) {
     }
     if (!chats[pub].latest || msg.time > chats[pub].latest.time) {
       chats[pub].latest = msg;
-      var text = truncateString(msg.text, 30);
+      var text = truncateString(msg.text, 100);
       el.find('.latest').text(text);
       el.data('latestTime', msg.time);
       sortChatsByLatest();
@@ -395,7 +398,8 @@ function addChat(pub) {
     notify(msg, info, pub);
   }});
   chats[pub].messages = chats[pub].messages || [];
-  chats[pub].identicon = $(new irisLib.Attribute({type: 'keyID', value: pub}).identicon({width:40, showType: false}));
+  chats[pub].identicon = $(new irisLib.Attribute({type: 'keyID', value: pub}).identicon({width:49, showType: false}));
+  el.prepend($('<div>').addClass('identicon').append(chats[pub].identicon));
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
@@ -405,7 +409,6 @@ function addChat(pub) {
       }
     }
   });
-  el.prepend(chats[pub].identicon);
   el.click(() => showChat(pub));
   $(".chat-list").append(el);
   chats[pub].getTheirMsgsLastSeenTime(time => {

@@ -259,6 +259,21 @@ header #back-button {
   overflow-x: hidden;
   border-bottom: 1px solid #efefef;
   cursor: pointer;
+  display: flex;
+  flex-direction: row;
+}
+
+.chat-item .identicon {
+  flex: none;
+  align-self: center;
+}
+
+.chat-item .text {
+  flex: 1;
+  align-self: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 small {
