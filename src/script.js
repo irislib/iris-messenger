@@ -277,7 +277,7 @@ function showChat(pub) {
   activeChat = pub;
   $('.chat-item[data-pub="' + pub +'"]').toggleClass('active', true);
   $("#message-list").empty();
-  $("#message-list").show();
+  $("#message-view").show();
   $(".message-form").show();
   $(".message-form form").off('submit');
   $(".message-form form").on('submit', event => {
@@ -300,7 +300,7 @@ function showChat(pub) {
   sortMessagesByTime();
   lastSeenTimeChanged(pub);
   chats[pub].setMyMsgsLastSeenTime();
-  $('#message-list').scrollTop($('#message-list')[0].scrollHeight - $('#message-list')[0].clientHeight);
+  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
   chats[pub].setMyMsgsLastSeenTime();
   function setTheirOnlineStatus() {
     var online = chats[pub].online;
@@ -346,7 +346,7 @@ function addMessage(msg) {
   msgEl.toggleClass('our', msg.selfAuthored ? true : false);
   msgEl.toggleClass('their', msg.selfAuthored ? false : true);
   $("#message-list").append(msgEl); // TODO: jquery insertAfter element with smaller timestamp
-  $('#message-list').scrollTop($('#message-list')[0].scrollHeight - $('#message-list')[0].clientHeight);
+  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
 }
 
 function addChat(pub) {

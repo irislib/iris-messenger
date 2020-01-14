@@ -176,6 +176,13 @@ header #back-button {
   display: none;
 }
 
+#message-list {
+  display: flex;
+  max-width: 800px;
+  flex-direction: column;
+  margin: 0 auto 0 auto;
+}
+
 .message-form {
   flex:1;
   flex-direction: row;
