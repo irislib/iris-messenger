@@ -276,6 +276,10 @@ header #back-button {
   overflow: hidden;
 }
 
+.chat-item .latest-time {
+  float: right;
+}
+
 small {
   font-size: 12px;
   color: #777;

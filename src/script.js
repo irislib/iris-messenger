@@ -371,7 +371,7 @@ function addChat(pub) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
-  var el = $('<div class="chat-item"><div class="text"><div class="name"></div> <small class="latest"></small></div></div>');
+  var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="latest"></small></div></div>');
   el.attr('data-pub', pub);
   chats[pub] = new irisLib.Chat({gun, key, participants: pub, onMessage: (msg, info) => {
     msg.selfAuthored = info.selfAuthored;
@@ -384,7 +384,11 @@ function addChat(pub) {
     if (!chats[pub].latest || msg.time > chats[pub].latest.time) {
       chats[pub].latest = msg;
       var text = truncateString(msg.text, 100);
+      var now = new Date();
+      var latestTimeText = getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
+      if (latestTimeText === 'today') { latestTimeText = formatTime(msg.time); }
       el.find('.latest').text(text);
+      el.find('.latest-time').text(latestTimeText);
       el.data('latestTime', msg.time);
       sortChatsByLatest();
     }
@@ -509,6 +513,10 @@ function truncateString(s, length = 30) {
 }
 
 function getDaySeparatorText(date, dateStr, now, nowStr) {
+  if (!now) {
+    now = new Date();
+    nowStr = now.toLocaleDateString({dateStyle:'short'});
+  }
   if (dateStr === nowStr) {
     return 'today';
   }
