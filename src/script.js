@@ -86,7 +86,7 @@ if (!isMobile()) {
   });
 }
 
-$('#paste-chat-link').on('keyup paste', event => {
+$('#paste-chat-link').on('input', event => {
   var val = $(event.target).val();
   if (val.length < 30 || val.indexOf('chatWith') === -1) {
     return;
@@ -101,7 +101,7 @@ $('#paste-chat-link').on('keyup paste', event => {
 
 $('.chat-item.new').click(showNewChat);
 
-$('#settings-name').on('keyup paste', event => {
+$('#settings-name').on('input', event => {
   var name = $(event.target).val().trim();
   gun.user().get('profile').get('name').put(name);
 });
@@ -204,7 +204,7 @@ function showSwitchAccount() {
   $('#switch-account').show();
 }
 
-$('#switch-account input').on('keyup paste', (event) => {
+$('#switch-account input').on('input', (event) => {
   var val = $(event.target).val();
   if (!val.length) { return; }
   try {
