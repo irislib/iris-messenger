@@ -1,6 +1,5 @@
 var gun = Gun({
   peers: [location.origin + '/gun', 'https://gun-us.herokuapp.com/gun', 'https://gunjs.herokuapp.com/gun'],
-  localStorage: false
 });
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
@@ -347,20 +346,6 @@ function sortMessagesByTime() {
   });
 }
 
-function getDaySeparatorText(date, dateStr, now, nowStr) {
-  if (dateStr === nowStr) {
-    return 'today';
-  }
-  var dayDifference = Math.round((now - date)/(1000*60*60*24));
-  if (dayDifference === 1) {
-    return 'yesterday';
-  }
-  if (dayDifference <= 5) {
-    return date.toLocaleDateString(undefined, { weekday: 'long' });
-  }
-  return dateStr;
-}
-
 function addMessage(msg) {
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
@@ -518,4 +503,18 @@ function isMobile() {
 
 function truncateString(s, length = 30) {
   return s.length > length ? s.slice(0, length) + '...' : s;
+}
+
+function getDaySeparatorText(date, dateStr, now, nowStr) {
+  if (dateStr === nowStr) {
+    return 'today';
+  }
+  var dayDifference = Math.round((now - date)/(1000*60*60*24));
+  if (dayDifference === 1) {
+    return 'yesterday';
+  }
+  if (dayDifference <= 5) {
+    return date.toLocaleDateString(undefined, { weekday: 'long' });
+  }
+  return dateStr;
 }
