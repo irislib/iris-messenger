@@ -82,6 +82,21 @@
         <p>
           <input id="settings-name" placeholder="Your name">
         </p>
+        <p>
+          Profile photo:
+        </p>
+        <img id="current-profile-photo">
+        <img id="profile-photo-preview" class="hidden">
+        <p>
+          <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*">
+          <label for="profile-photo-input" class="button" id="profile-photo-input-label">Choose a file</label>
+        </p>
+        <p id="profile-photo-error" class="hidden">Profile photo too big: maximum size is 200KB</p>
+        <p>
+          <button id="cancel-profile-photo" class="hidden">Cancel</button>
+          <button id="use-profile-photo" class="hidden">Use photo</button>
+          <button id="remove-profile-photo" class="hidden">Remove photo</button>
+        </p>
         <h3>Account</h3>
         <p>
           <b>Save a backup of your private key first!</b> Otherwise you can't log in back to this account.

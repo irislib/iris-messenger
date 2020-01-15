@@ -8,7 +8,7 @@ body {
   margin: 0;
 }
 
-input, button {
+input, button, .button {
   padding: 15px;
   outline: none;
   border: 0;
@@ -20,13 +20,17 @@ input {
   margin-right: 7px;
 }
 
-button {
+button, .button {
   background: #ddd;
   cursor: pointer;
 }
 
-button:hover, button:active, button:focus {
+button:hover, button:active, button:focus, .button:hover, .button:active, .button:focus {
   background: #ccc;
+}
+
+.hidden {
+  display: none !important;
 }
 
 @media (max-width: 575px) {
@@ -333,4 +337,9 @@ small {
 
 #enable-notifications-prompt:hover a, #enable-notifications-prompt:focus a {
   text-decoration: underline;
+}
+
+#current-profile-photo, #profile-photo-preview {
+  max-width: 200px;
+  max-height: 200px;
 }

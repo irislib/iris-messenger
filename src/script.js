@@ -50,6 +50,9 @@ function login(k) {
       }
     }
   });
+  gun.user().get('profile').get('photo').on(data => {
+    $('#current-profile-photo').attr('src', data);
+  });
 }
 
 function updatePeerList() {
@@ -268,6 +271,52 @@ function notify(msg, info, pub) {
     };
   }
 }
+
+function renderProfilePhotoSettings() {
+  $('#profile-photo-error').toggleClass('hidden', true);
+  var files = $('#profile-photo-input')[0].files;
+  if (files && files.length) {
+    var file = files[0];
+    if (file.size > 1024 * 200) {
+      $('#profile-photo-error').toggleClass('hidden', false);
+      return console.error('file too big');
+    }
+    // show preview
+    $('#profile-photo-input-label').hide();
+    $('#current-profile-photo').hide();
+    getBase64(file).then(base64 => {
+      $('#profile-photo-preview').attr('src', base64);
+      $('#profile-photo-preview').toggleClass('hidden', false);
+      $('#cancel-profile-photo').toggleClass('hidden', false);
+      $('#use-profile-photo').toggleClass('hidden', false);
+    });
+  } else {
+    // show current profile photo
+    $('#current-profile-photo').show();
+    $('#profile-photo-preview').attr('src', '');
+    $('#profile-photo-input-label').show();
+    $('#cancel-profile-photo').toggleClass('hidden', true);
+    $('#use-profile-photo').toggleClass('hidden', true);
+  }
+}
+$('#profile-photo-input').change(e => {
+  renderProfilePhotoSettings();
+});
+$('#use-profile-photo').click(() => {
+  var src = $('#profile-photo-preview').attr('src');
+  gun.user().get('profile').get('photo').put(src);
+  $('#current-profile-photo').attr('src', src);
+  $('#profile-photo-input').val('');
+  renderProfilePhotoSettings();
+});
+$('#cancel-profile-photo').click(() => {
+  $('#profile-photo-input').val('');
+  renderProfilePhotoSettings();
+});
+$('#remove-profile-photo').click(() => {
+  gun.user().get('profile').get('photo').put(null);
+  renderProfilePhotoSettings();
+});
 
 function showChat(pub) {
   if (!pub || !Object.prototype.hasOwnProperty.call(chats, pub)) {
@@ -521,11 +570,24 @@ function getDaySeparatorText(date, dateStr, now, nowStr) {
     return 'today';
   }
   var dayDifference = Math.round((now - date)/(1000*60*60*24));
-  if (dayDifference === 1) {
+  if (dayDifference <= 1) {
     return 'yesterday';
   }
   if (dayDifference <= 5) {
     return date.toLocaleDateString(undefined, { weekday: 'long' });
   }
   return dateStr;
+}
+
+function getBase64(file) {
+  var reader = new FileReader();
+  reader.readAsDataURL(file);
+  return new Promise((resolve, reject) => {
+    reader.onload = function () {
+      resolve(reader.result);
+    };
+    reader.onerror = function (error) {
+      reject('Error: ' + error);
+    };
+  });
 }
