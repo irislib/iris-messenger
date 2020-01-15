@@ -282,7 +282,6 @@ function renderProfilePhotoSettings() {
       return console.error('file too big');
     }
     // show preview
-    $('#profile-photo-input-label').hide();
     $('#current-profile-photo').hide();
     getBase64(file).then(base64 => {
       $('#profile-photo-preview').attr('src', base64);
@@ -294,11 +293,11 @@ function renderProfilePhotoSettings() {
     // show current profile photo
     $('#current-profile-photo').show();
     $('#profile-photo-preview').attr('src', '');
-    $('#profile-photo-input-label').show();
     $('#cancel-profile-photo').toggleClass('hidden', true);
     $('#use-profile-photo').toggleClass('hidden', true);
   }
 }
+$('#current-profile-photo').click(() => $('#profile-photo-input').click());
 $('#profile-photo-input').change(e => {
   renderProfilePhotoSettings();
 });
@@ -362,7 +361,14 @@ function showChat(pub) {
       if (online.isOnline) {
         $('#header-content .last-seen').text('online');
       } else if (online.lastActive) {
-        $('#header-content .last-seen').text('last seen ' + formatDate(new Date(online.lastActive * 1000)));
+        var d = new Date(online.lastActive * 1000);
+        var lastSeenText = getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'}));
+        if (lastSeenText === 'today') {
+          lastSeenText = formatTime(d);
+        } else {
+          lastSeenText = formatDate(d);
+        }
+        $('#header-content .last-seen').text('last seen ' + lastSeenText);
       }
     }
   }

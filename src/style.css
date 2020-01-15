@@ -347,6 +347,14 @@ small {
   text-decoration: underline;
 }
 
+#current-profile-photo {
+  cursor: pointer;
+}
+
+#current-profile-photo:hover {
+  opacity: 0.8;
+}
+
 #current-profile-photo, #profile-photo-preview {
   max-width: 200px;
   max-height: 200px;
