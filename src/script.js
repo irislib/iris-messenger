@@ -24,7 +24,7 @@ function login(k) {
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
   irisLib.Chat.initUser(gun, key);
-  myIdenticon = $(new irisLib.Attribute({type:'keyID', value: key.pub}).identicon({width:40, showType: false}));
+  myIdenticon = getIdenticon(key.pub, 40);
   $(".chat-item:not(.new)").remove();
   $("#my-identicon").empty();
   $("#my-identicon").append(myIdenticon);
@@ -336,17 +336,19 @@ function showChat(pub) {
     chats[pub].send(text);
     $('#new-msg').val('');
   });
-  var nameEl = $('<span class="name"></span>');
+  var nameEl = $('<div class="name"></div>');
   if (chats[pub].name) {
     nameEl.text(truncateString(chats[pub].name, 30));
     nameEl.show();
   }
-  var identicon = chats[pub].identicon.clone().width(40).height(40);
+  var identicon = getIdenticon(pub, 40);
   var img = identicon.children('img').first();
   img.attr('height', 40).attr('width', 40);
-  $("#header-content").append(identicon);
-  $("#header-content").append(nameEl);
-  $("#header-content").append($('<small class="last-seen"></small>'));
+  $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
+  var textEl = $('<div>').addClass('text');
+  textEl.append(nameEl);
+  textEl.append($('<small class="last-seen"></small>'));
+  $("#header-content").append(textEl);
   var msgs = Object.values(chats[pub].messages);
   msgs.forEach(addMessage);
   sortMessagesByTime();
@@ -372,6 +374,20 @@ function showChat(pub) {
     });
   }
   setTheirOnlineStatus();
+}
+
+function getIdenticon(pub, width) {
+  var el = $('<div>').width(width).height(width).addClass('identicon');
+  var identicon = $(new irisLib.Attribute({type: 'keyID', value: pub}).identicon({width, showType: false}));
+  el.html(identicon);
+  gun.user(pub).get('profile').get('photo').on(data => { // TODO: limit size
+    if (data) {
+      el.html($('<img>').attr('src', data).attr('width', width).attr('height', width).addClass('identicon-image'));
+    } else {
+      el.html(identicon);
+    }
+  });
+  return el;
 }
 
 function sortChatsByLatest() {
@@ -451,8 +467,8 @@ function addChat(pub) {
     notify(msg, info, pub);
   }});
   chats[pub].messages = chats[pub].messages || [];
-  chats[pub].identicon = $(new irisLib.Attribute({type: 'keyID', value: pub}).identicon({width:49, showType: false}));
-  el.prepend($('<div>').addClass('identicon').append(chats[pub].identicon));
+  chats[pub].identicon = getIdenticon(pub, 49);
+  el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;

@@ -48,10 +48,6 @@ button:hover, button:active, button:focus, .button:hover, .button:active, .butto
   }
 }
 
-.iris-identicon {
-  margin-right: 15px !important;
-}
-
 .chat {
   display: flex;
   flex-direction: row;
@@ -96,6 +92,8 @@ header #header-content {
   flex: 1;
   padding: 10px 15px;
   align-self: center;
+  display: flex;
+  flex-direction: row;
 }
 
 header #back-button {
@@ -246,11 +244,20 @@ header #back-button {
 #my-identicon {
   flex: none;
   align-self: center;
+  margin-right: 15px;
 }
 
 .user-name {
   align-self: center;
   flex: 1;
+}
+
+.iris-identicon img {
+  border: none !important;
+}
+
+.identicon-image {
+  border-radius: 50%;
 }
 
 .chat-list{
@@ -267,12 +274,13 @@ header #back-button {
   flex-direction: row;
 }
 
-.chat-item .identicon {
+.chat-item .identicon-container, header .identicon-container {
   flex: none;
   align-self: center;
+  margin-right: 15px !important;
 }
 
-.chat-item .text {
+.chat-item .text, header .text {
   flex: 1;
   align-self: center;
   text-overflow: ellipsis;
