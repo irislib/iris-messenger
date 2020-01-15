@@ -351,6 +351,19 @@ function showChat(pub) {
   var msgs = Object.values(chats[pub].messages);
   msgs.forEach(addMessage);
   sortMessagesByTime();
+  $('#message-view').scroll(() => {
+    var scrollPosition = $('#message-view').scrollTop();
+    var currentDaySeparator = $('.day-separator').last();
+    var pos = currentDaySeparator.position();
+    while (currentDaySeparator && pos && pos.top - 55 > 0) {
+      currentDaySeparator = currentDaySeparator.prevAll('.day-separator').first();
+      pos = currentDaySeparator.position();
+    }
+    var s = currentDaySeparator.clone().css({position: 'fixed', top: 55}).attr('id', 'floating-day-separator');
+    setTimeout(() => s.fadeOut(), 2000);
+    $('#floating-day-separator').remove();
+    $('#message-view').prepend(s);
+  });
   lastSeenTimeChanged(pub);
   chats[pub].setMyMsgsLastSeenTime();
   $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
