@@ -13335,6 +13335,7 @@
 	        }
 	      }
 	    }
+	    this.save();
 	  }
 
 	  Chat.prototype.getSecret = async function getSecret(pub) {

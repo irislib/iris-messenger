@@ -140,7 +140,7 @@ header #back-button {
   align-items: flex-start;
 }
 
-.msg.their + .msg.our .msg-content {
+.msg.their + .msg.our .msg-content. .day-separator + .msg.our .msg-content {
   margin-top: 15px;
   border-radius: 8px 0px 8px 8px;
 }
@@ -153,7 +153,7 @@ header #back-button {
   border-radius: 8px 0px 8px 8px;
 }
 
-.msg.our + .msg.their .msg-content {
+.msg.our + .msg.their .msg-content, .day-separator + .msg.their .msg-content {
   margin-top: 15px;
   border-radius: 0px 8px 8px 8px;
 }
@@ -188,8 +188,14 @@ header #back-button {
   user-select: none;
 }
 
-.striped-table div:nth-child(even) {
-  background-color: rgba(255,255,255,0.05);
+.striped-rows div {
+  padding: 10px;
+  font-size: 12px;
+  overflow-x: wrap;
+}
+
+.striped-rows div:nth-child(odd) {
+  background-color: rgba(255,255,255,0.5);
 }
 
 #emoji-picker {
