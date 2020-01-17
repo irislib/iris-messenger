@@ -188,6 +188,10 @@ header #back-button {
   user-select: none;
 }
 
+.striped-table div:nth-child(even) {
+  background-color: rgba(255,255,255,0.05);
+}
+
 #emoji-picker {
   outline: 1px;
   margin-right: 5px;
@@ -196,7 +200,7 @@ header #back-button {
 
 #message-list {
   display: flex;
-  max-width: 800px;
+  max-width: 700px;
   flex-direction: column;
   margin: 0 auto 0 auto;
 }

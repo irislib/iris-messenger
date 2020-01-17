@@ -1,6 +1,7 @@
 var gun = Gun({
   peers: [location.origin + '/gun', 'https://gun-us.herokuapp.com/gun', 'https://gunjs.herokuapp.com/gun']
 });
+window.gun = gun;
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
 var chats = {};
@@ -24,6 +25,12 @@ function login(k) {
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
   irisLib.Chat.initUser(gun, key);
+  irisLib.Chat.getMyChatLinks(gun, key, undefined, chatLink => {
+    $('#my-chat-links').append($('<li>').text(chatLink));
+  });
+  $('#generate-chat-link').click(() => {
+    irisLib.Chat.createChatLink(gun, key);
+  });
   myIdenticon = getIdenticon(key.pub, 40);
   $(".chat-item:not(.new)").remove();
   $("#my-identicon").empty();
@@ -33,7 +40,7 @@ function login(k) {
   irisLib.Chat.getChats(gun, key, addChat);
   var chatWith = getUrlParameter('chatWith');
   if (chatWith) {
-    addChat(chatWith);
+    addChat(chatWith, window.location.href);
     showChat(chatWith);
     window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
   } else {
@@ -52,6 +59,7 @@ function login(k) {
   });
   gun.user().get('profile').get('photo').on(data => {
     $('#current-profile-photo').attr('src', data);
+    $('#add-profile-photo').toggleClass('hidden', true);
   });
 }
 
@@ -96,10 +104,10 @@ $('#paste-chat-link').on('input', event => {
   }
   var s = val.split('?');
   if (s.length !== 2) { return; }
-  $(event.target).val('');
   var pub = getUrlParameter('chatWith', s[1]);
-  addChat(pub);
+  addChat(pub, val);
   showChat(pub);
+  $(event.target).val('');
 });
 
 $('.chat-item.new').click(showNewChat);
@@ -283,6 +291,7 @@ function renderProfilePhotoSettings() {
     }
     // show preview
     $('#current-profile-photo').hide();
+    $('#add-profile-photo').hide();
     getBase64(file).then(base64 => {
       $('#profile-photo-preview').attr('src', base64);
       $('#profile-photo-preview').toggleClass('hidden', false);
@@ -292,12 +301,15 @@ function renderProfilePhotoSettings() {
   } else {
     // show current profile photo
     $('#current-profile-photo').show();
+    if ($('#current-profile-photo').attr('src')) {
+      $('#add-profile-photo').show();
+    }
     $('#profile-photo-preview').attr('src', '');
     $('#cancel-profile-photo').toggleClass('hidden', true);
     $('#use-profile-photo').toggleClass('hidden', true);
   }
 }
-$('#current-profile-photo').click(() => $('#profile-photo-input').click());
+$('#current-profile-photo, #add-profile-photo').click(() => $('#profile-photo-input').click());
 $('#profile-photo-input').change(e => {
   renderProfilePhotoSettings();
 });
@@ -389,8 +401,10 @@ function showChat(pub) {
   if (!chats[pub].online) {
     chats[pub].online = {};
     irisLib.Chat.getOnline(gun, pub, (online) => {
-      chats[pub].online = online;
-      setTheirOnlineStatus();
+      if (chats[pub]) {
+        chats[pub].online = online;
+        setTheirOnlineStatus();
+      }
     });
   }
   setTheirOnlineStatus();
@@ -449,16 +463,15 @@ function addMessage(msg) {
   msgEl.toggleClass('our', msg.selfAuthored ? true : false);
   msgEl.toggleClass('their', msg.selfAuthored ? false : true);
   $("#message-list").append(msgEl); // TODO: jquery insertAfter element with smaller timestamp
-  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
 }
 
-function addChat(pub) {
+function addChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="latest"></small></div></div>');
   el.attr('data-pub', pub);
-  chats[pub] = new irisLib.Chat({gun, key, participants: pub, onMessage: (msg, info) => {
+  chats[pub] = new irisLib.Chat({gun, key, chatLink: chatLink, participants: pub, onMessage: (msg, info) => {
     msg.selfAuthored = info.selfAuthored;
     chats[pub].messages[msg.time] = msg;
     msg.time = new Date(msg.time);

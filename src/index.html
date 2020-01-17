@@ -71,6 +71,11 @@
         <p><input id="paste-chat-link" type="text" placeholder="Paste someone's chat link"></p>
         <p><button class="copy-chat-link">Copy your chat link</button></p>
         <p>Exchange chat links with someone you want to chat with!</p>
+        <p>Or use 2-way links:</p>
+        <p><button id="generate-chat-link">Generate 2-way chat link</button></p>
+        <p>
+          <ul id="my-chat-links"></ul>
+        </p>
       </div>
 
       <!-- Settings view -->
@@ -86,6 +91,7 @@
           Profile photo:
         </p>
         <img id="current-profile-photo">
+        <button id="add-profile-photo">Add profile photo</button>
         <img id="profile-photo-preview" class="hidden">
         <p>
           <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*">
@@ -115,7 +121,7 @@
           <button id="copy-private-key">Copy private key</button>
         </p>
         <h3>Peers</h3>
-        <div id="peers"></div>
+        <div id="peers" class="striped-table"></div>
 
         <h3>About</h3>
         <p>Iris is like the messaging apps we've used to, but better.</p>
