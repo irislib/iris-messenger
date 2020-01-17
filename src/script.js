@@ -26,9 +26,7 @@ function login(k) {
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
   irisLib.Chat.initUser(gun, key);
   irisLib.Chat.getMyChatLinks(gun, key, undefined, chatLink => {
-    //const btn = $('<button>delete</button>');
-    const link = $('<div>').text(chatLink);
-    $('#my-chat-links').append(link);
+    $('#my-chat-links').append($('<div>').text(chatLink));
   });
   $('#generate-chat-link').click(() => {
     irisLib.Chat.createChatLink(gun, key);
