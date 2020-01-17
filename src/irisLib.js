@@ -13673,15 +13673,17 @@
 	    var user = gun.user();
 	    user.auth(key);
 	    var mySecret = await Gun.SEA.secret(key.epub, key);
-	    user.get('chatLinks').map().once(function (data, linkId) {
-	      if (!data) {
+	    var chatLinks = [];
+	    user.get('chatLinks').map().on(function (data, linkId) {
+	      if (!data || chatLinks.indexOf(linkId) !== -1) {
 	        return;
 	      }
 	      var chats = [];
 	      user.get('chatLinks').get(linkId).get('ownerEncryptedSharedKey').on(async function (enc) {
-	        if (!enc) {
+	        if (!enc || chatLinks.indexOf(linkId) !== -1) {
 	          return;
 	        }
+	        chatLinks.push(linkId);
 	        var sharedKey = await Gun.SEA.decrypt(enc, mySecret);
 	        var sharedSecret = await Gun.SEA.secret(sharedKey.epub, sharedKey);
 	        var chatLink = Chat.formatChatLink(urlRoot, key.pub, sharedSecret, linkId);
@@ -13689,7 +13691,7 @@
 	          callback(chatLink);
 	        }
 	        if (subscribe) {
-	          gun.user(sharedKey.pub).get('chatRequests').map().once(async function (encPub) {
+	          gun.user(sharedKey.pub).get('chatRequests').map().on(async function (encPub) {
 	            var s = _JSON$stringify(encPub);
 	            if (chats.indexOf(s) === -1) {
 	              chats.push(s);
