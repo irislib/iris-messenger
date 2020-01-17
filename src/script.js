@@ -497,6 +497,7 @@ function addChat(pub, chatLink) {
       if (chats[pub].latest.time === msg.time && document.visibilityState === 'visible') {
         chats[pub].setMyMsgsLastSeenTime();
       }
+      $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
     }
     notify(msg, info, pub);
   }});
