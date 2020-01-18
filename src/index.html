@@ -73,7 +73,7 @@
         <p>Exchange chat links with someone you want to chat with!</p>
         <p>Or use 2-way links:</p>
         <p><button id="generate-chat-link">Generate 2-way chat link</button></p>
-        <div id="my-chat-links" class="striped-rows"></div>
+        <table id="my-chat-links" class="striped-rows"></table>
       </div>
 
       <!-- Settings view -->
@@ -119,7 +119,12 @@
           <button id="copy-private-key">Copy private key</button>
         </p>
         <h3>Peers</h3>
-        <div id="peers" class="striped-rows"></div>
+        <table id="peers" class="striped-rows">
+          <tr id="add-peer-row">
+            <td><input id="add-peer-input" placeholder="Peer url"></td>
+            <td><button id="add-peer-btn">Add</button></td>
+          </tr>
+        </table>
 
         <h3>About</h3>
         <p>Iris is like the messaging apps we've used to, but better.</p>

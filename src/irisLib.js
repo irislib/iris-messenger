@@ -13686,9 +13686,9 @@
 	        chatLinks.push(linkId);
 	        var sharedKey = await Gun.SEA.decrypt(enc, mySecret);
 	        var sharedSecret = await Gun.SEA.secret(sharedKey.epub, sharedKey);
-	        var chatLink = Chat.formatChatLink(urlRoot, key.pub, sharedSecret, linkId);
+	        var url = Chat.formatChatLink(urlRoot, key.pub, sharedSecret, linkId);
 	        if (callback) {
-	          callback(chatLink);
+	          callback({ url: url, id: linkId });
 	        }
 	        if (subscribe) {
 	          gun.user(sharedKey.pub).get('chatRequests').map().on(async function (encPub) {

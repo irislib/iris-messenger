@@ -26,7 +26,15 @@ function login(k) {
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
   irisLib.Chat.initUser(gun, key);
   irisLib.Chat.getMyChatLinks(gun, key, undefined, chatLink => {
-    $('#my-chat-links').append($('<div>').text(chatLink));
+    var row = $('<tr>');
+    var text = $('<td>').text(chatLink.url);
+    var btn = $('<button>Remove</button>').click(() => {
+      irisLib.Chat.removeChatLink(gun, key, chatLink.id);
+      row.remove();
+    });
+    row.append(text);
+    row.append($('<td>').append(btn));
+    $('#my-chat-links').append(row);
   });
   $('#generate-chat-link').click(() => {
     irisLib.Chat.createChatLink(gun, key);
@@ -64,22 +72,29 @@ function login(k) {
 }
 
 function updatePeerList() {
-  $('#peers').empty();
-  var o = gun['_'].opt.peers;
-  Object.keys(o).forEach(k => {
-    var text = ' ' + o[k].url;
-    var el = $('<div></div>');
-    if (o[k].wire && o[k].wire.hied) {
-      text = '+' + text;
-    } else {
-      text = '-' + text;
-    }
-    el.text(text);
-    $('#peers').append(el);
+  var o = gun._.opt.peers;
+  var peers = gun.back('opt.peers');
+  $('#peers .peer').remove();
+  Object.values(peers).forEach(peer => {
+    if (!peer.url) { return; }
+    var row = $('<tr>').addClass('peer');
+    var url = $('<td>').text(peer.url);
+    var btn = $('<button>Remove</button>').click(() => {
+      row.remove();
+      gun.on('bye', peer);
+    });
+    row.append(url).append($('<td>').append(btn));
+    $('#peers').prepend(row);
   });
 }
 updatePeerList();
-setInterval(updatePeerList, 5000);
+setInterval(updatePeerList, 2000);
+$('#add-peer-btn').click(() => {
+  var url = $('#add-peer-input').val();
+  gun.opt({peers: [url]});
+  $('#add-peer-input').val('');
+  updatePeerList();
+});
 
 var emojiButton = $('#emoji-picker');
 if (!isMobile()) {

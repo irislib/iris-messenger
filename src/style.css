@@ -188,14 +188,21 @@ header #back-button {
   user-select: none;
 }
 
-.striped-rows div {
-  padding: 10px;
+.striped-rows {
+  border-spacing: 0;
+}
+
+.striped-rows tr {
   font-size: 12px;
   overflow-x: wrap;
 }
 
-.striped-rows div:nth-child(odd) {
+.striped-rows tr:nth-child(odd) {
   background-color: rgba(255,255,255,0.5);
+}
+
+.striped-rows td {
+  padding: 10px;
 }
 
 #emoji-picker {
