@@ -178,7 +178,6 @@ header #back-button {
   background-color: rgba(227, 249, 255, 0.91);
   padding: 6px 10px;
   margin-top: 15px;
-  margin-bottom: 15px;
   margin-left: auto;
   margin-right: auto;
   text-transform: uppercase;
@@ -186,6 +185,10 @@ header #back-button {
   color: rgba(74, 74, 74, 0.88);
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
   user-select: none;
+}
+
+.day-separator:first-of-type {
+  margin-top: 0;
 }
 
 .striped-rows {
