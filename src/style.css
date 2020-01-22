@@ -1,11 +1,15 @@
 * { box-sizing: border-box; }
 
+html { height:100%; overflow:hidden; }
+
 body {
   font-size: 15px;
   color: #262626;
   font-family: "SF Pro Text", "SF Pro Icons", system, -apple-system, system-ui, system-ui, "Helvetica Neue", Helvetica, "Lucida Grande", sans-serif;
   padding: 0;
   margin: 0;
+  height:100%;
+  overflow:hidden;
 }
 
 input, button, .button {
@@ -51,8 +55,14 @@ button:hover, button:active, button:focus, .button:hover, .button:active, .butto
 .chat {
   display: flex;
   flex-direction: row;
-  height: 100vh;
   background-color: white;
+  height: 100%;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .sidebar {
@@ -68,6 +78,8 @@ button:hover, button:active, button:focus, .button:hover, .button:active, .butto
 }
 
 .main {
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   flex: 4 0 10em;
