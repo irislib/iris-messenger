@@ -70,6 +70,7 @@
       <div class="main-view" id="new-chat">
         <p><input id="paste-chat-link" type="text" placeholder="Paste someone's chat link"></p>
         <p><button class="copy-chat-link">Copy your chat link</button></p>
+        <p id="my-qr-code"></p>
         <p>Exchange chat links with someone you want to chat with!</p>
         <p>Or use 2-way links:</p>
         <p><button id="generate-chat-link">Generate 2-way chat link</button></p>
@@ -156,7 +157,13 @@
 
       <!-- Profile view -->
       <div class="main-view" id="profile">
-        
+        <h2 class="name"></h2>
+        <div class="status"></div>
+        <div class="last-active"></div>
+        <div><img class="profile-photo"></div>
+        <div class="profile-link"></div>
+        <div class="profile-link-qr"></div>
+        <div><button>Send message</button></div>
       </div>
 
     </section>
@@ -169,6 +176,7 @@
   <script src="./irisLib.js"></script>
   <script src="./emoji-button.js"></script>
   <script src="./Autolinker.min.js"></script>
+  <script src="./qrcode.min.js"></script>
   <script src="./script.js"></script>
 </body>
 
