@@ -396,12 +396,12 @@ function showChat(pub) {
     var scrollPosition = $('#message-view').scrollTop();
     var currentDaySeparator = $('.day-separator').last();
     var pos = currentDaySeparator.position();
-    while (currentDaySeparator && pos && pos.top - 55 > 0) {
+    while (currentDaySeparator && pos && pos.top - 50 > 0) {
       currentDaySeparator = currentDaySeparator.prevAll('.day-separator').first();
       pos = currentDaySeparator.position();
     }
     var s = currentDaySeparator.clone();
-    var center = $('<div>').css({position: 'fixed', top: 55, 'text-align': 'center'}).attr('id', 'floating-day-separator').width($('#message-view').width()).append(s);
+    var center = $('<div>').css({position: 'fixed', top: 70, 'text-align': 'center'}).attr('id', 'floating-day-separator').width($('#message-view').width()).append(s);
     $('#floating-day-separator').remove();
     setTimeout(() => s.fadeOut(), 2000);
     $('#message-view').prepend(center);
