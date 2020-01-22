@@ -396,7 +396,7 @@ function showChat(pub) {
     var scrollPosition = $('#message-view').scrollTop();
     var currentDaySeparator = $('.day-separator').last();
     var pos = currentDaySeparator.position();
-    while (currentDaySeparator && pos && pos.top - 50 > 0) {
+    while (currentDaySeparator && pos && pos.top - 55 > 0) {
       currentDaySeparator = currentDaySeparator.prevAll('.day-separator').first();
       pos = currentDaySeparator.position();
     }
