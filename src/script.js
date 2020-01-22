@@ -144,7 +144,7 @@ $('#settings-name').on('input', event => {
 
 function setOurOnlineStatus() {
   irisLib.Chat.setOnline(gun, true);
-  document.addEventListener("mousemove", () => {
+  document.addEventListener("mousemove", () => { // TODO: don't spam gun on each mousemove
     irisLib.Chat.setOnline(gun, true);
     clearTimeout(onlineTimeout);
     onlineTimeout = setTimeout(() => irisLib.Chat.setOnline(gun, false), 60000); // TODO: setOnline false not working?

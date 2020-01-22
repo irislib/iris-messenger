@@ -608,7 +608,7 @@
 			if(!cb){ return id }
 			var to = this.on(id, cb, as);
 			to.err = to.err || setTimeout(function(){
-				to.next({});
+				to.next({err: "Error: No ACK received yet.", lack: true});
 				to.off();
 			}, (this.opt||{}).lack || 9000);
 			return id;
@@ -2087,7 +2087,7 @@
 				}
 				mesh.say.c = mesh.say.d = 0;
 			}());
-
+			
 			// for now - find better place later.
 			function send(raw, peer){ try{
 				var wire = peer.wire;
@@ -2169,7 +2169,7 @@
 			});
 
 			root.on('bye', function(peer, tmp){
-				peer = opt.peers[peer.id || peer] || peer;
+				peer = opt.peers[peer.id || peer] || peer; 
 				this.to.next(peer);
 				peer.bye? peer.bye() : (tmp = peer.wire) && tmp.close && tmp.close();
 				Type.obj.del(opt.peers, peer.id);
@@ -2204,7 +2204,7 @@
 		    }
 		    return c; // Math.abs(c);
 		  }
-
+			
 			var $ = JSON.stringify, u;
 
 			Type.obj.hash = function(obj, hash){

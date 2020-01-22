@@ -13594,13 +13594,18 @@
 
 
 	  Chat.setOnline = function setOnline(gun, isOnline) {
-	    clearInterval(gun.setOnlineInterval);
 	    if (isOnline) {
+	      if (gun.setOnlineInterval) {
+	        return;
+	      }
 	      var update = function update() {
 	        gun.user().get('lastActive').put(Math.round(Gun.state() / 1000));
 	      };
 	      update();
 	      gun.setOnlineInterval = setInterval(update, 3000);
+	    } else {
+	      clearInterval(gun.setOnlineInterval);
+	      gun.setOnlineInterval = undefined;
 	    }
 	  };
 
