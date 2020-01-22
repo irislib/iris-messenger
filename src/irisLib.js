@@ -11134,6 +11134,17 @@
 	} catch (e) {
 	}
 
+	function gunOnceDefined(node) {
+	  return new _Promise(function (resolve) {
+	    node.on(function (val, k, a, eve) {
+	      if (val) {
+	        eve.off();
+	        resolve(val);
+	      }
+	    });
+	  });
+	}
+
 	async function loadGunDepth(chain) {
 	  var maxDepth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
 	  var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -11385,6 +11396,8 @@
 
 	var util$1 = {
 	  loadGunDepth: loadGunDepth,
+
+	  gunOnceDefined: gunOnceDefined,
 
 	  GunNets: GunNets,
 
@@ -13340,7 +13353,7 @@
 
 	  Chat.prototype.getSecret = async function getSecret(pub) {
 	    if (!this.secrets[pub]) {
-	      var epub = await this.gun.user(pub).get('epub').once().then();
+	      var epub = await util$1.gunOnceDefined(this.gun.user(pub).get('epub'));
 	      this.secrets[pub] = await Gun.SEA.secret(epub, this.key);
 	    }
 	    return this.secrets[pub];
@@ -13352,7 +13365,7 @@
 
 
 	  Chat.getOurSecretChatId = async function getOurSecretChatId(gun, pub, pair) {
-	    var epub = await gun.user(pub).get('epub').once().then();
+	    var epub = await util$1.gunOnceDefined(gun.user(pub).get('epub'));
 	    var secret = await Gun.SEA.secret(epub, pair);
 	    return Gun.SEA.work(secret + pub, null, null, { name: 'SHA-256' });
 	  };
@@ -13363,7 +13376,7 @@
 
 
 	  Chat.getTheirSecretChatId = async function getTheirSecretChatId(gun, pub, pair) {
-	    var epub = await gun.user(pub).get('epub').once().then();
+	    var epub = await util$1.gunOnceDefined(gun.user(pub).get('epub'));
 	    var secret = await Gun.SEA.secret(epub, pair);
 	    return Gun.SEA.work(secret + pair.pub, null, null, { name: 'SHA-256' });
 	  };
@@ -13382,10 +13395,9 @@
 	    var mySecret = await Gun.SEA.secret(keypair.epub, keypair);
 	    gun.user().get('chats').map().on(async function (value, ourSecretChatId) {
 	      if (value) {
-	        gun.user().get('chats').get(ourSecretChatId).get('pub').once(async function (encryptedPub) {
-	          var pub = await Gun.SEA.decrypt(encryptedPub, mySecret);
-	          callback(pub);
-	        });
+	        var encryptedPub = await util$1.gunOnceDefined(gun.user().get('chats').get(ourSecretChatId).get('pub'));
+	        var pub = await Gun.SEA.decrypt(encryptedPub, mySecret);
+	        callback(pub);
 	      }
 	    });
 	  };
@@ -13582,14 +13594,13 @@
 
 
 	  Chat.setOnline = function setOnline(gun, isOnline) {
+	    clearInterval(gun.setOnlineInterval);
 	    if (isOnline) {
 	      var update = function update() {
 	        gun.user().get('lastActive').put(Math.round(Gun.state() / 1000));
 	      };
 	      update();
 	      gun.setOnlineInterval = setInterval(update, 3000);
-	    } else {
-	      clearInterval(gun.setOnlineInterval);
 	    }
 	  };
 
