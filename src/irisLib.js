@@ -11137,7 +11137,7 @@
 	function gunOnceDefined(node) {
 	  return new _Promise(function (resolve) {
 	    node.on(function (val, k, a, eve) {
-	      if (val) {
+	      if (val !== undefined) {
 	        eve.off();
 	        resolve(val);
 	      }
@@ -13320,19 +13320,21 @@
 	      if (s.length === 2) {
 	        var pub = util$1.getUrlParameter('chatWith', s[1]);
 	        options.participants = pub;
-	        var sharedSecret = util$1.getUrlParameter('s', s[1]);
-	        var linkId = util$1.getUrlParameter('k', s[1]);
-	        if (sharedSecret && linkId) {
-	          this.gun.user(pub).get('chatLinks').get(linkId).get('encryptedSharedKey').on(async function (encrypted) {
-	            var sharedKey = await Gun.SEA.decrypt(encrypted, sharedSecret);
-	            var encryptedChatRequest = await Gun.SEA.encrypt(_this.key.pub, sharedSecret);
-	            var chatRequestId = await Gun.SEA.work(encryptedChatRequest, null, null, { name: 'SHA-256' });
-	            var u = _this.gun.user();
-	            u.auth(sharedKey);
-	            u.get('chatRequests').get(chatRequestId.slice(0, 12)).put(encryptedChatRequest).then(function () {
-	              u.auth(_this.key); // this may be somewhat buggy
+	        if (pub !== this.key.pub) {
+	          var sharedSecret = util$1.getUrlParameter('s', s[1]);
+	          var linkId = util$1.getUrlParameter('k', s[1]);
+	          if (sharedSecret && linkId) {
+	            this.gun.user(pub).get('chatLinks').get(linkId).get('encryptedSharedKey').on(async function (encrypted) {
+	              var sharedKey = await Gun.SEA.decrypt(encrypted, sharedSecret);
+	              var encryptedChatRequest = await Gun.SEA.encrypt(_this.key.pub, sharedSecret);
+	              var chatRequestId = await Gun.SEA.work(encryptedChatRequest, null, null, { name: 'SHA-256' });
+	              var u = _this.gun.user();
+	              u.auth(sharedKey);
+	              u.get('chatRequests').get(chatRequestId.slice(0, 12)).put(encryptedChatRequest).then(function () {
+	                u.auth(_this.key); // this may be somewhat buggy
+	              });
 	            });
-	          });
+	          }
 	        }
 	      }
 	    }
@@ -13537,11 +13539,13 @@
 	    var ourSecretChatId = await this.getOurSecretChatId(pub);
 	    var mySecret = await Gun.SEA.secret(this.key.epub, this.key);
 	    this.gun.user().get('chats').get(ourSecretChatId).get('pub').put((await Gun.SEA.encrypt(pub, mySecret)));
-	    // Subscribe to their messages
-	    var theirSecretChatId = await this.getTheirSecretChatId(pub);
-	    this.gun.user(pub).get('chats').get(theirSecretChatId).get('msgs').map().once(function (data) {
-	      _this5.messageReceived(data, pub);
-	    });
+	    if (pub !== this.key.pub) {
+	      // Subscribe to their messages
+	      var theirSecretChatId = await this.getTheirSecretChatId(pub);
+	      this.gun.user(pub).get('chats').get(theirSecretChatId).get('msgs').map().once(function (data) {
+	        _this5.messageReceived(data, pub);
+	      });
+	    }
 	    // Subscribe to our messages
 	    this.user.get('chats').get(ourSecretChatId).get('msgs').map().once(function (data) {
 	      _this5.messageReceived(data, pub, true);
@@ -13661,7 +13665,7 @@
 
 
 	  Chat.createChatLink = async function createChatLink(gun, key) {
-	    var urlRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'https://chat.iris.to/';
+	    var urlRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'https://iris.to/';
 
 	    var user = gun.user();
 	    user.auth(key);
@@ -13682,7 +13686,7 @@
 	  };
 
 	  Chat.getMyChatLinks = async function getMyChatLinks(gun, key) {
-	    var urlRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'https://chat.iris.to/';
+	    var urlRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'https://iris.to/';
 	    var callback = arguments[3];
 	    var subscribe = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
 
@@ -15108,7 +15112,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$2 = "0.0.132";
+	var version$2 = "0.0.133";
 
 	/*eslint no-useless-escape: "off", camelcase: "off" */
 
