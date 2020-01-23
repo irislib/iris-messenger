@@ -11,6 +11,7 @@ var urlsToCache = [
   'jquery.js',
   'notification.mp3',
   'nts.js',
+  'qrcode.min.js',
   'script.js',
   'sea.js',
   'style.css'

@@ -69,15 +69,19 @@ function login(k) {
     $('#current-profile-photo').attr('src', data);
     $('#add-profile-photo').toggleClass('hidden', true);
   });
+  setChatLinkQrCode();
+}
+
+function setChatLinkQrCode(link) {
   var qrCodeEl = $('#my-qr-code');
   qrCodeEl.empty();
   var qrcode = new QRCode(qrCodeEl[0], {
-  	text: getMyChatLink(),
-  	width: 256,
-  	height: 256,
-  	colorDark : "#000000",
-  	colorLight : "#ffffff",
-  	correctLevel : QRCode.CorrectLevel.H
+    text: link || getMyChatLink(),
+    width: 256,
+    height: 256,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
   });
 }
 
