@@ -17,7 +17,15 @@ var localStorageKey = localStorage.getItem('chatKeyPair');
 if (localStorageKey) {
   login(JSON.parse(localStorageKey));
 } else {
-  Gun.SEA.pair().then(k => login(k));
+  newUserLogin();
+}
+
+function newUserLogin() {
+  Gun.SEA.pair().then(k => {
+    login(k);
+    gun.user().get('profile').get('name').put('anonymous');
+    createChatLink();
+  });
 }
 
 function login(k) {
@@ -35,10 +43,9 @@ function login(k) {
     row.append(text);
     row.append($('<td>').append(btn));
     $('#my-chat-links').append(row);
+    setChatLinkQrCode(chatLink.url);
   });
-  $('#generate-chat-link').click(() => {
-    irisLib.Chat.createChatLink(gun, key);
-  });
+  $('#generate-chat-link').click(createChatLink);
   myIdenticon = getIdenticon(key.pub, 40);
   $(".chat-item:not(.new)").remove();
   $("#my-identicon").empty();
@@ -72,13 +79,18 @@ function login(k) {
   setChatLinkQrCode();
 }
 
+async function createChatLink() {
+  const link = await irisLib.Chat.createChatLink(gun, key);
+  setChatLinkQrCode(link);
+}
+
 function setChatLinkQrCode(link) {
   var qrCodeEl = $('#my-qr-code');
   qrCodeEl.empty();
   var qrcode = new QRCode(qrCodeEl[0], {
     text: link || getMyChatLink(),
-    width: 256,
-    height: 256,
+    width: 320,
+    height: 320,
     colorDark : "#000000",
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H
@@ -203,7 +215,7 @@ function showNewChat() {
 }
 
 function getMyChatLink() {
-  return 'https://chat.iris.to/?chatWith=' + key.pub;
+  return 'https://iris.to/?chatWith=' + key.pub;
 }
 
 $('.copy-chat-link').click(event => {
@@ -260,9 +272,7 @@ $('#switch-account input').on('input', (event) => {
   }
 });
 
-$('.logout-button').click(() => {
-  Gun.SEA.pair().then(key => login(key));
-});
+$('.logout-button').click(newUserLogin);
 
 $('.open-settings-button').click(showSettings);
 

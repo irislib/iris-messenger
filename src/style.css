@@ -33,6 +33,11 @@ button:hover, button:active, button:focus, .button:hover, .button:active, .butto
   background: #ccc;
 }
 
+img {
+  max-width: 90vw;
+  max-height: 80vh;
+}
+
 .hidden {
   display: none !important;
 }
