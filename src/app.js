@@ -1,5 +1,5 @@
 var gun = Gun({
-  peers: [location.origin + '/gun', 'https://gun-us.herokuapp.com/gun', 'https://gunjs.herokuapp.com/gun']
+  peers: ['http://localhost:8765/gun', 'https://gun-us.herokuapp.com/gun', 'https://gunjs.herokuapp.com/gun']
 });
 window.gun = gun;
 var notificationSound = new Audio('./notification.mp3');
@@ -383,6 +383,9 @@ function showChat(pub) {
   $("#message-list").empty();
   $("#message-view").show();
   $(".message-form").show();
+  if (!isMobile()) {
+    $("#new-msg").focus();
+  }
   $(".message-form form").off('submit');
   $(".message-form form").on('submit', event => {
     event.preventDefault();
