@@ -1,10 +1,12 @@
 var CACHE_NAME = 'iris-messenger-cache-v1';
 var urlsToCache = [
   './',
+  'app.js',
   'Autolinker.min.js',
   'emoji-button.js',
   'favicon.ico',
   'gun.js',
+  'helpers.js',
   'icon128.png',
   'index.html',
   'irisLib.js',
@@ -12,7 +14,6 @@ var urlsToCache = [
   'notification.mp3',
   'nts.js',
   'qrcode.min.js',
-  'script.js',
   'sea.js',
   'style.css'
 ];
