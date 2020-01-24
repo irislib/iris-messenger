@@ -131,6 +131,7 @@ header #back-button {
   display: flex;
   flex-direction: column;
   margin-bottom: 2px;
+  overflow-wrap: break-word;
 }
 
 .msg-content {
