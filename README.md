@@ -2,7 +2,7 @@
 
 Decentralized chat! [Iris-lib](https://github.com/irislib/iris-lib) + [gun](https://github.com/amark/gun) + jquery.
 
-Try it out: [chat.iris.to](https://chat.iris.to)
+Try it out: [iris.to](https://iris.to)
 
 ## Develop
 ```

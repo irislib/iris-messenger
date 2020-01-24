@@ -11134,6 +11134,20 @@
 	} catch (e) {
 	}
 
+	function gunAsAnotherUser(gun, key, f) {
+	  // Hacky way to use multiple users with gun
+	  var gun2 = new Gun({ peers: _Object$keys(gun._.opt.peers) });
+	  var user = gun2.user();
+	  user.auth(key);
+	  f(user);
+	  setTimeout(function () {
+	    var peers = _Object$values(gun2.back('opt.peers'));
+	    peers.forEach(function (peer) {
+	      gun2.on('bye', peer);
+	    });
+	  }, 20000);
+	}
+
 	function gunOnceDefined(node) {
 	  return new _Promise(function (resolve) {
 	    node.on(function (val, k, a, eve) {
@@ -11398,6 +11412,8 @@
 	  loadGunDepth: loadGunDepth,
 
 	  gunOnceDefined: gunOnceDefined,
+
+	  gunAsAnotherUser: gunAsAnotherUser,
 
 	  GunNets: GunNets,
 
@@ -13315,6 +13331,7 @@
 	    this.theirSecretChatIds = {}; // maps participant public key to their secret chat id
 	    this.onMessage = options.onMessage;
 
+	    var saved = void 0;
 	    if (options.chatLink) {
 	      var s = options.chatLink.split('?');
 	      if (s.length === 2) {
@@ -13324,14 +13341,14 @@
 	          var sharedSecret = util$1.getUrlParameter('s', s[1]);
 	          var linkId = util$1.getUrlParameter('k', s[1]);
 	          if (sharedSecret && linkId) {
+	            this.save(); // save the chat first so it's there before inviter subscribes to it
+	            saved = true;
 	            this.gun.user(pub).get('chatLinks').get(linkId).get('encryptedSharedKey').on(async function (encrypted) {
 	              var sharedKey = await Gun.SEA.decrypt(encrypted, sharedSecret);
 	              var encryptedChatRequest = await Gun.SEA.encrypt(_this.key.pub, sharedSecret);
 	              var chatRequestId = await Gun.SEA.work(encryptedChatRequest, null, null, { name: 'SHA-256' });
-	              var u = _this.gun.user();
-	              u.auth(sharedKey);
-	              u.get('chatRequests').get(chatRequestId.slice(0, 12)).put(encryptedChatRequest).then(function () {
-	                u.auth(_this.key); // this may be somewhat buggy
+	              util$1.gunAsAnotherUser(_this.gun, sharedKey, function (user) {
+	                user.get('chatRequests').get(chatRequestId.slice(0, 12)).put(encryptedChatRequest);
 	              });
 	            });
 	          }
@@ -13350,7 +13367,9 @@
 	        }
 	      }
 	    }
-	    this.save();
+	    if (!saved) {
+	      this.save();
+	    }
 	  }
 
 	  Chat.prototype.getSecret = async function getSecret(pub) {
@@ -13586,7 +13605,7 @@
 	    var keys = _Object$keys(this.secrets);
 	    for (var i = 0; i < keys.length; i++) {
 	      var ourSecretChatId = await this.getOurSecretChatId(keys[i]);
-	      this.user.get('chats').get(ourSecretChatId).put({ a: 1 });
+	      this.user.get('chats').get(ourSecretChatId).get('msgs').get('a').put(null);
 	    }
 	  };
 
@@ -13678,6 +13697,10 @@
 	    var ownerEncryptedSharedKey = await Gun.SEA.encrypt(sharedKeyString, ownerSecret);
 	    var linkId = await Gun.SEA.work(encryptedSharedKey, undefined, undefined, { name: 'SHA-256' });
 	    linkId = linkId.slice(0, 12);
+
+	    util$1.gunAsAnotherUser(gun, sharedKey, function (user) {
+	      user.get('chatRequests').put({ a: 1 }); // doesn't seem to help
+	    });
 
 	    user.get('chatLinks').get(linkId).get('encryptedSharedKey').put(encryptedSharedKey);
 	    user.get('chatLinks').get(linkId).get('ownerEncryptedSharedKey').put(ownerEncryptedSharedKey);

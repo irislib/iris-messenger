@@ -100,7 +100,6 @@ function setChatLinkQrCode(link) {
 }
 
 function updatePeerList() {
-  var o = gun._.opt.peers;
   var peers = gun.back('opt.peers');
   $('#peers .peer').remove();
   Object.values(peers).forEach(peer => {
