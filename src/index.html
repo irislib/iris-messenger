@@ -8,7 +8,9 @@
   <link rel="stylesheet" type="text/css" href="./style.css">
   <link rel="shortcut icon" href="./favicon.ico">
   <script>
-    if ('serviceWorker' in navigator) {
+    var userAgent = navigator.userAgent.toLowerCase();
+    var isElectron = (userAgent.indexOf(' electron/') > -1);
+    if (!isElectron && ('serviceWorker' in navigator)) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('serviceworker.js')
         .then(function(registration) {
