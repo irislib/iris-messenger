@@ -210,11 +210,16 @@ header #back-button {
 
 .striped-rows {
   border-spacing: 0;
+  table-layout: fixed;
+}
+
+table.striped-rows {
+  table-layout: fixed;
+  width: 100%;
 }
 
 .striped-rows tr {
   font-size: 12px;
-  overflow-x: wrap;
 }
 
 .striped-rows tr:nth-child(odd) {
@@ -223,6 +228,7 @@ header #back-button {
 
 .striped-rows td {
   padding: 10px;
+  overflow-wrap: break-word;
 }
 
 #emoji-picker {

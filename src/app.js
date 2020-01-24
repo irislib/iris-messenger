@@ -36,7 +36,7 @@ function login(k) {
   $('#my-chat-links').empty();
   irisLib.Chat.getMyChatLinks(gun, key, undefined, chatLink => {
     var row = $('<tr>');
-    var text = $('<td>').text(chatLink.url);
+    var text = $('<td colspan="3">').text(chatLink.url);
     var btn = $('<button>Remove</button>').click(() => {
       irisLib.Chat.removeChatLink(gun, key, chatLink.id);
       row.remove();
@@ -105,7 +105,7 @@ function updatePeerList() {
   Object.values(peers).forEach(peer => {
     if (!peer.url) { return; }
     var row = $('<tr>').addClass('peer');
-    var url = $('<td>').text(peer.url);
+    var url = $('<td colspan="3">').text(peer.url);
     var btn = $('<button>Remove</button>').click(() => {
       row.remove();
       gun.on('bye', peer);
