@@ -179,6 +179,8 @@ function setOurOnlineStatus() {
       if (activeChat) {
         chats[activeChat].setMyMsgsLastSeenTime();
       }
+      unseenTotal = 0;
+      setPageTitle();
     } else {
       irisLib.Chat.setOnline(gun, areWeOnline = false);
     }
@@ -544,6 +546,9 @@ function addChat(pub, chatLink) {
         unseenTotal += 1;
         el.find('.unseen').text(chats[pub].unseen).show();
       }
+      if (document.visibilityState !== 'visible') {
+        setPageTitle();
+      }
     }
     if (!chats[pub].latest || msg.time > chats[pub].latest.time) {
       chats[pub].latest = msg;
@@ -606,5 +611,14 @@ function lastSeenTimeChanged(pub) {
     } else {
       $('#not-seen-by-them').show();
     }
+  }
+}
+
+var initialTitle = document.title;
+function setPageTitle() {
+  if (unseenTotal) {
+    document.title = '(' + unseenTotal + ') ' + initialTitle;
+  } else {
+    document.title = initialTitle;
   }
 }
