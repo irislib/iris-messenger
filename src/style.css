@@ -46,13 +46,16 @@ img {
   .hidden-xs {
     display: none !important;
   }
-  .visible-xs {
-    display: initial !important;
+  .visible-xs-block {
+    display: block !important;
+  }
+  .visible-xs-inline-block {
+    display: inline-block !important;
   }
 }
 
 @media (min-width: 576px) {
-  .visible-xs {
+  .visible-xs-block, .visible-xs-inline-block {
     display: none !important;
   }
 }
@@ -309,6 +312,11 @@ table.striped-rows {
 .chat-list{
   flex:1;
   overflow-y: scroll;
+}
+
+#welcome {
+  text-align: center;
+  display: block;
 }
 
 .chat-item {

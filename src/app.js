@@ -66,9 +66,11 @@ function login(k) {
     window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
   } else {
     showNewChat();
+    showMenu();
   }
   $('.user-info .user-name').text('anonymous');
   $('#settings-name').val('');
+  $('#current-profile-photo').attr('src', '');
   gun.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       $('.user-info .user-name').text(truncateString(name, 20));
@@ -531,6 +533,7 @@ function addChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
+  $('#welcome').remove();
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
   chats[pub] = new irisLib.Chat({gun, key, chatLink: chatLink, participants: pub, onMessage: (msg, info) => {
