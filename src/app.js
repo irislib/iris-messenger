@@ -8,10 +8,12 @@ var chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 var activeChat;
 var onlineTimeout;
-var timeOpened = new Date();
+var loginTime;
 var key;
 var latestChatLink;
 var desktopNotificationsEnabled;
+var areWeOnline;
+var unseenTotal;
 
 var localStorageKey = localStorage.getItem('chatKeyPair');
 if (localStorageKey) {
@@ -49,6 +51,8 @@ function login(k) {
   });
   $('#generate-chat-link').click(createChatLink);
   myIdenticon = getIdenticon(key.pub, 40);
+  loginTime = new Date();
+  unseenTotal = 0;
   $(".chat-item:not(.new)").remove();
   $("#my-identicon").empty();
   $("#my-identicon").append(myIdenticon);
@@ -160,20 +164,23 @@ $('#settings-name').on('input', event => {
 });
 
 function setOurOnlineStatus() {
-  irisLib.Chat.setOnline(gun, true);
-  document.addEventListener("mousemove", () => { // TODO: don't spam gun on each mousemove
-    irisLib.Chat.setOnline(gun, true);
+  irisLib.Chat.setOnline(gun, areWeOnline = true);
+  document.addEventListener("mousemove", () => {
+    if (!areWeOnline && activeChat) {
+      chats[activeChat].setMyMsgsLastSeenTime();
+    }
+    irisLib.Chat.setOnline(gun, areWeOnline = true);
     clearTimeout(onlineTimeout);
-    onlineTimeout = setTimeout(() => irisLib.Chat.setOnline(gun, false), 60000); // TODO: setOnline false not working?
+    onlineTimeout = setTimeout(() => irisLib.Chat.setOnline(gun, areWeOnline = false), 60000);
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
-      irisLib.Chat.setOnline(gun, true);
+      irisLib.Chat.setOnline(gun, areWeOnline = true);
       if (activeChat) {
         chats[activeChat].setMyMsgsLastSeenTime();
       }
     } else {
-      irisLib.Chat.setOnline(gun, false);
+      irisLib.Chat.setOnline(gun, areWeOnline = false);
     }
   });
 }
@@ -296,7 +303,7 @@ $('#enable-notifications-prompt').click(enableDesktopNotifications);
 
 function notify(msg, info, pub) {
   function shouldNotify() {
-    if (msg.time < timeOpened) { return false; }
+    if (msg.time < loginTime) { return false; }
     if (info.selfAuthored) { return false; }
     if (document.visibilityState === 'visible') { return false; }
     return true;
@@ -399,6 +406,11 @@ function showChat(pub) {
     nameEl.text(truncateString(chats[pub].name, 30));
     nameEl.show();
   }
+  if (chats[pub].unseen) {
+    unseenTotal -= chats[pub].unseen;
+  }
+  chats[pub].unseen = 0;
+  chats[pub].chatListEl.find('.unseen').empty().hide();
   var identicon = getIdenticon(pub, 40);
   var img = identicon.children('img').first();
   img.attr('height', 40).attr('width', 40);
@@ -516,7 +528,7 @@ function addChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
-  var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="latest"></small></div></div>');
+  var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
   chats[pub] = new irisLib.Chat({gun, key, chatLink: chatLink, participants: pub, onMessage: (msg, info) => {
     msg.selfAuthored = info.selfAuthored;
@@ -525,6 +537,13 @@ function addChat(pub, chatLink) {
     if (!info.selfAuthored && msg.time > chats[pub].theirLastSeenTime) {
       chats[pub].theirLastSeenTime = msg.time;
       lastSeenTimeChanged(pub);
+    }
+    if (!info.selfAuthored && chats[pub].myLastSeenTime && msg.time > chats[pub].myLastSeenTime) {
+      if (activeChat !== pub) {
+        chats[pub].unseen += 1;
+        unseenTotal += 1;
+        el.find('.unseen').text(chats[pub].unseen).show();
+      }
     }
     if (!chats[pub].latest || msg.time > chats[pub].latest.time) {
       chats[pub].latest = msg;
@@ -540,13 +559,15 @@ function addChat(pub, chatLink) {
     if (activeChat === pub) {
       addMessage(msg);
       sortMessagesByTime(); // this is slow if message history is loaded while chat active
-      if (chats[pub].latest.time === msg.time && document.visibilityState === 'visible') {
+      if (chats[pub].latest.time === msg.time && areWeOnline) {
         chats[pub].setMyMsgsLastSeenTime();
       }
       $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
     }
     notify(msg, info, pub);
   }});
+  chats[pub].chatListEl = el;
+  chats[pub].unseen = 0;
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
@@ -564,6 +585,10 @@ function addChat(pub, chatLink) {
   chats[pub].getTheirMsgsLastSeenTime(time => {
     chats[pub].theirLastSeenTime = new Date(time);
     lastSeenTimeChanged(pub);
+  });
+  chats[pub].getMyMsgsLastSeenTime(time => {
+    chats[pub].myLastSeenTime = new Date(time);
+    console.log('myLastSeenTime', time);
   });
 }
 

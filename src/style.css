@@ -338,6 +338,21 @@ table.striped-rows {
   float: right;
 }
 
+.chat-item .unseen {
+  float: right;
+  display: inline-block;
+  border-radius: 1.1em;
+  padding: .3em .4em;
+  min-width: .8em;
+  background-color: #4dd606;
+  color: white;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1em;
+  font-weight: 500;
+  display: none;
+}
+
 small {
   font-size: 12px;
   color: #777;
