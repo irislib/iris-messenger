@@ -291,7 +291,7 @@ $('.open-settings-button').click(showSettings);
 desktopNotificationsEnabled = window.Notification && Notification.permission === 'granted';
 if (window.Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
   setTimeout(() => {
-    $('#enable-notifications-prompt').animate({height: 'show'});
+    $('#enable-notifications-prompt').slideDown();
   }, 5000);
 }
 function enableDesktopNotifications() {
