@@ -388,7 +388,9 @@ function showChat(pub) {
   }
   resetView();
   activeChat = pub;
-  $('.chat-item[data-pub="' + pub +'"]').toggleClass('active', true);
+  var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
+  chatListEl.toggleClass('active', true);
+  chatListEl.find('.unseen').empty().hide();
   $("#message-list").empty();
   $("#message-view").show();
   $(".message-form").show();
@@ -412,7 +414,6 @@ function showChat(pub) {
     unseenTotal -= chats[pub].unseen;
   }
   chats[pub].unseen = 0;
-  chats[pub].chatListEl.find('.unseen').empty().hide();
   var identicon = getIdenticon(pub, 40);
   var img = identicon.children('img').first();
   img.attr('height', 40).attr('width', 40);
@@ -571,7 +572,6 @@ function addChat(pub, chatLink) {
     }
     notify(msg, info, pub);
   }});
-  chats[pub].chatListEl = el;
   chats[pub].unseen = 0;
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
