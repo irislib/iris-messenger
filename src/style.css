@@ -156,9 +156,12 @@ header #back-button {
 }
 
 .msg .seen {
-  color: #4fc3f7;
   display: none;
   user-select: none;
+}
+
+.msg .seen svg {
+  width: 15px;
 }
 
 .msg.their {
