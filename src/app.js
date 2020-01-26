@@ -323,7 +323,7 @@ function notify(msg, info, pub) {
     notificationSound.play();
   }
   if (shouldDesktopNotify()) {
-    var desktopNotification = new Notification(msg.author, {
+    var desktopNotification = new Notification(chats[pub].name, {
       icon: 'icon128.png',
       body: truncateString(msg.text, 50),
       silent: true
