@@ -562,7 +562,9 @@ function addChat(pub, chatLink) {
       var now = new Date();
       var latestTimeText = getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
       if (latestTimeText === 'today') { latestTimeText = formatTime(msg.time); }
-      el.find('.latest').text(text);
+      var latestEl = el.find('.latest');
+      latestEl.text(text);
+      latestEl.html(highlightEmoji(latestEl.html()));
       el.find('.latest-time').text(latestTimeText);
       el.data('latestTime', msg.time);
       sortChatsByLatest();
