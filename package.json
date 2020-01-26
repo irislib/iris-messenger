@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "author": "Martti Malmi <sirius@iki.fi>",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "http-server": "^0.12.1"
   },
   "scripts": {
