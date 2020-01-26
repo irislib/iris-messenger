@@ -146,6 +146,10 @@ header #back-button {
   max-width: 75%;
 }
 
+.emoji {
+  font-size: 1.3em;
+}
+
 .msg .emoji-only {
   font-size: 3em;
   text-align: center;

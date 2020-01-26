@@ -521,6 +521,8 @@ function addMessage(msg) {
   msgContent.prepend(textEl);
   if (msg.text.length === 2 && isEmoji(msg.text)) {
     textEl.toggleClass('emoji-only', true);
+  } else {
+    textEl.html(highlightEmoji(textEl.html()));
   }
   msgEl = $('<div class="msg"></div>').append(msgContent);
   msgEl.data('time', msg.time);
