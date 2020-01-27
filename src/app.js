@@ -395,6 +395,8 @@ function showProfile(pub) {
   }
   resetView();
   $('#profile .profile-photo-container').hide();
+  var qrCodeEl = $('#profile-page-qr');
+  qrCodeEl.empty();
   $('#profile').show();
   addUserToHeader(pub);
   gun.user(pub).get('profile').get('photo').on(photo => {
@@ -402,16 +404,6 @@ function showProfile(pub) {
     $('#profile .profile-photo').attr('src', photo);
   });
   const link = getUserChatLink(pub);
-  var qrCodeEl = $('#profile .profile-link-qr');
-  qrCodeEl.empty();
-  var qrcode = new QRCode(qrCodeEl[0], {
-    text: link,
-    width: 300,
-    height: 300,
-    colorDark : "#000000",
-    colorLight : "#ffffff",
-    correctLevel : QRCode.CorrectLevel.H
-  });
   $('#profile .send-message').click(() => showChat(pub));
   $('#profile .copy-user-link').click(event => {
     copyToClipboard(link);
@@ -425,6 +417,17 @@ function showProfile(pub) {
       t.css('width', '');
     }, 2000);
   });
+  setTimeout(() => { // TODO: this seems to get slower on consecutive profile opens?
+    qrCodeEl.empty();
+    var qrcode = new QRCode(qrCodeEl[0], {
+      text: link,
+      width: 300,
+      height: 300,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.H
+    });
+  }, 100);
 }
 
 function addUserToHeader(pub) {
