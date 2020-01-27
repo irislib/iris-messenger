@@ -141,7 +141,10 @@
           <li><b>Secure</b>: It's open source. Users can validate that big brother doesn't read your messages.</li>
           <li><b>Available</b>: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.</li>
         </ul>
-        <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.
+        <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
+        <h3>Privacy</h3>
+        <p>Messages are end-to-end encrypted, but message timestamps aren't. It is also possible, if not trivial, to find out who are communicating with each other by monitoring data subscriptions on the decentralized database.</p>
+        <p>Profile names and photos are currently public.</p>
       </div>
 
       <!-- Logout confirmation -->
@@ -164,13 +167,23 @@
 
       <!-- Profile view -->
       <div class="main-view" id="profile">
-        <h2 class="name"></h2>
-        <div class="status"></div>
-        <div class="last-active"></div>
-        <div><img class="profile-photo"></div>
-        <div class="profile-link"></div>
-        <div class="profile-link-qr"></div>
-        <div><button>Send message</button></div>
+        <p class="status"></p>
+        <p class="last-active"></p>
+        <p class="profile-photo-container"><img class="profile-photo"></p>
+        <p>
+          <button class="send-message">Send message</button>
+          <button class="copy-user-link">Copy link</button>
+        </p>
+        <p class="profile-link-qr"></p>
+        <!--
+        <p>
+          <button class="add-friend">Add to friends</button>
+        </p>
+        <p>
+          <button class="delete-chat">Delete chat</button>
+          <button class="block-user">Block user</button>
+        </p>
+        -->
       </div>
 
     </section>

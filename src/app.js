@@ -197,6 +197,7 @@ function resetView() {
   $('#not-seen-by-them').hide();
   $(".message-form").hide();
   $("#header-content").empty();
+  $("#header-content").css({cursor: null});
 }
 
 function showMenu(show = true) {
@@ -227,7 +228,11 @@ function showNewChat() {
 }
 
 function getMyChatLink() {
-  return latestChatLink || 'https://iris.to/?chatWith=' + key.pub;
+  return latestChatLink || getUserChatLink(key.pub);
+}
+
+function getUserChatLink(pub) {
+  return 'https://iris.to/?chatWith=' + pub;
 }
 
 $('.copy-chat-link').click(event => {
@@ -384,6 +389,66 @@ $('#remove-profile-photo').click(() => {
   renderProfilePhotoSettings();
 });
 
+function showProfile(pub) {
+  if (!pub) {
+    return;
+  }
+  resetView();
+  $('#profile .profile-photo-container').hide();
+  $('#profile').show();
+  addUserToHeader(pub);
+  gun.user(pub).get('profile').get('photo').on(photo => {
+    $('#profile .profile-photo-container').show();
+    $('#profile .profile-photo').attr('src', photo);
+  });
+  const link = getUserChatLink(pub);
+  var qrCodeEl = $('#profile .profile-link-qr');
+  qrCodeEl.empty();
+  var qrcode = new QRCode(qrCodeEl[0], {
+    text: link,
+    width: 300,
+    height: 300,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+  });
+  $('#profile .send-message').click(() => showChat(pub));
+  $('#profile .copy-user-link').click(event => {
+    copyToClipboard(link);
+    var t = $(event.target);
+    var originalText = t.text();
+    var originalWidth = t.width();
+    t.width(originalWidth);
+    t.text('Copied');
+    setTimeout(() => {
+      t.text(originalText);
+      t.css('width', '');
+    }, 2000);
+  });
+}
+
+function addUserToHeader(pub) {
+  var nameEl = $('<div class="name"></div>');
+  if (chats[pub] && chats[pub].name) {
+    nameEl.text(truncateString(chats[pub].name, 30));
+    nameEl.show();
+  } else {
+    gun.user(pub).get('profile').get('name').on(name => {
+      nameEl.text(truncateString(name, 30));
+    });
+  }
+  var identicon = getIdenticon(pub, 40);
+  var img = identicon.children('img').first();
+  img.attr('height', 40).attr('width', 40);
+  $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
+  var textEl = $('<div>').addClass('text');
+  textEl.append(nameEl);
+  textEl.append($('<small class="last-seen"></small>'));
+  $("#header-content").append(textEl);
+  $("#header-content").click(() => showProfile(pub));
+  $("#header-content").css({cursor: 'pointer'});
+}
+
 function showChat(pub) {
   if (!pub || !Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
@@ -407,23 +472,11 @@ function showChat(pub) {
     chats[pub].send(text);
     $('#new-msg').val('');
   });
-  var nameEl = $('<div class="name"></div>');
-  if (chats[pub].name) {
-    nameEl.text(truncateString(chats[pub].name, 30));
-    nameEl.show();
-  }
   if (chats[pub].unseen) {
     unseenTotal -= chats[pub].unseen;
   }
   chats[pub].unseen = 0;
-  var identicon = getIdenticon(pub, 40);
-  var img = identicon.children('img').first();
-  img.attr('height', 40).attr('width', 40);
-  $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
-  var textEl = $('<div>').addClass('text');
-  textEl.append(nameEl);
-  textEl.append($('<small class="last-seen"></small>'));
-  $("#header-content").append(textEl);
+  addUserToHeader(pub);
   var msgs = Object.values(chats[pub].messages);
   msgs.forEach(addMessage);
   sortMessagesByTime();

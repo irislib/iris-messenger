@@ -439,3 +439,8 @@ small {
   max-width: 200px;
   max-height: 200px;
 }
+
+.profile-photo {
+  border-radius: 50%;
+  max-width: 300px;
+}
