@@ -11,7 +11,7 @@ function highlightEmoji(s) {
 }
 
 function formatTime(date) {
-  return date.toLocaleString(undefined, {timeStyle:"short"});
+  return date.toLocaleTimeString(undefined, {timeStyle:"short"});
 }
 
 function formatDate(date) {
