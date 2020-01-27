@@ -41,7 +41,7 @@ function login(k) {
     var text = $('<td colspan="3">').text(chatLink.url);
     var btn = $('<button>Remove</button>').click(() => {
       irisLib.Chat.removeChatLink(gun, key, chatLink.id);
-      row.remove();
+      hideAndRemove(row);
     });
     row.append(text);
     row.append($('<td>').append(btn));
@@ -49,14 +49,16 @@ function login(k) {
     setChatLinkQrCode(chatLink.url);
     latestChatLink = chatLink.url;
   });
-  $('#generate-chat-link').click(createChatLink);
+  $('#generate-chat-link').off('click');
+  $('#generate-chat-link').on('click', createChatLink);
   myIdenticon = getIdenticon(key.pub, 40);
   loginTime = new Date();
   unseenTotal = 0;
   $(".chat-item:not(.new)").remove();
   $("#my-identicon").empty();
   $("#my-identicon").append(myIdenticon);
-  $(".user-info").click(showSettings);
+  $(".user-info").off('click');
+  $(".user-info").on('click', showSettings);
   setOurOnlineStatus();
   irisLib.Chat.getChats(gun, key, addChat);
   var chatWith = getUrlParameter('chatWith');
@@ -113,7 +115,7 @@ function updatePeerList() {
     var row = $('<tr>').addClass('peer');
     var url = $('<td colspan="3">').text(peer.url);
     var btn = $('<button>Remove</button>').click(() => {
-      row.remove();
+      hideAndRemove(row);
       gun.on('bye', peer);
     });
     row.append(url).append($('<td>').append(btn));
@@ -198,13 +200,15 @@ function resetView() {
   $(".message-form").hide();
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
+  $('#profile-page-qr').empty();
 }
 
 function showMenu(show = true) {
   $('.sidebar').toggleClass('hidden-xs', !show);
   $('.main').toggleClass('hidden-xs', show);
 }
-$('#back-button').click(() => {
+$('#back-button').off('click');
+$('#back-button').on('click', () => {
   resetView();
   showMenu(true);
 });
@@ -303,7 +307,7 @@ function enableDesktopNotifications() {
   if (window.Notification) {
     Notification.requestPermission((status) => {
       if (Notification.permission === 'granted' || Notification.permission === 'denied') {
-        $('#enable-notifications-prompt').hide();
+        $('#enable-notifications-prompt').slideUp();
       }
     });
   }
@@ -404,8 +408,10 @@ function showProfile(pub) {
     $('#profile .profile-photo').attr('src', photo);
   });
   const link = getUserChatLink(pub);
-  $('#profile .send-message').click(() => showChat(pub));
-  $('#profile .copy-user-link').click(event => {
+  $('#profile .send-message').off('click');
+  $('#profile .send-message').on('click', () => showChat(pub));
+  $('#profile .copy-user-link').off('click');
+  $('#profile .copy-user-link').on('click', event => {
     copyToClipboard(link);
     var t = $(event.target);
     var originalText = t.text();
@@ -417,17 +423,15 @@ function showProfile(pub) {
       t.css('width', '');
     }, 2000);
   });
-  setTimeout(() => { // TODO: this seems to get slower on consecutive profile opens?
-    qrCodeEl.empty();
-    var qrcode = new QRCode(qrCodeEl[0], {
-      text: link,
-      width: 300,
-      height: 300,
-      colorDark : "#000000",
-      colorLight : "#ffffff",
-      correctLevel : QRCode.CorrectLevel.H
-    });
-  }, 100);
+  qrCodeEl.empty();
+  var qrcode = new QRCode(qrCodeEl[0], {
+    text: link,
+    width: 300,
+    height: 300,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+  });
 }
 
 function addUserToHeader(pub) {
@@ -448,7 +452,8 @@ function addUserToHeader(pub) {
   textEl.append(nameEl);
   textEl.append($('<small class="last-seen"></small>'));
   $("#header-content").append(textEl);
-  $("#header-content").click(() => showProfile(pub));
+  $("#header-content").off('click');
+  $("#header-content").on('click', () => showProfile(pub));
   $("#header-content").css({cursor: 'pointer'});
 }
 
