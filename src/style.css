@@ -52,6 +52,19 @@ img {
   .visible-xs-inline-block {
     display: inline-block !important;
   }
+  #profile {
+    padding: 0;
+  }
+  #profile .content {
+    padding: 10px 15px;
+  }
+  .profile-photo {
+    border-radius: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
 }
 
 @media (min-width: 576px) {
@@ -148,6 +161,7 @@ header #back-button {
 
 .emoji {
   font-size: 1.3em;
+  line-height: 1em;
 }
 
 .msg .emoji-only {
@@ -443,4 +457,5 @@ small {
 .profile-photo {
   border-radius: 50%;
   max-width: 300px;
+  max-height: 300px;
 }

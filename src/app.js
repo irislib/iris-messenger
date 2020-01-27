@@ -365,7 +365,7 @@ function renderProfilePhotoSettings() {
   } else {
     // show current profile photo
     $('#current-profile-photo').show();
-    if ($('#current-profile-photo').attr('src')) {
+    if (!$('#current-profile-photo').attr('src')) {
       $('#add-profile-photo').show();
     }
     $('#profile-photo-preview').attr('src', '');
@@ -463,11 +463,11 @@ function showChat(pub) {
   if (!pub) {
     return;
   }
+  resetView();
+  activeChat = pub;
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
     addChat(pub);
   }
-  resetView();
-  activeChat = pub;
   var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
   chatListEl.toggleClass('active', true);
   chatListEl.find('.unseen').empty().hide();
