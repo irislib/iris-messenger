@@ -13405,7 +13405,7 @@
 	  /**
 	  * Return a list of public keys that you have initiated a chat with or replied to.
 	  * (Chats that are initiated by others and unreplied by you don't show up, because
-	  * this method doesn't know where to look for them. Use socialNetwork.getChats() to listen to new chats from friends.)
+	  * this method doesn't know where to look for them. Use socialNetwork.getChats() to listen to new chats from friends. Or create chat invite links with Chat.createChatLink(). )
 	  * @param {Object} gun user.authed gun instance
 	  * @param {Object} keypair SEA keypair that the gun instance is authenticated with
 	  * @param callback callback function that is called for each public key you have a chat with
@@ -13734,7 +13734,10 @@
 	          callback({ url: url, id: linkId });
 	        }
 	        if (subscribe) {
-	          gun.user(sharedKey.pub).get('chatRequests').map().on(async function (encPub) {
+	          gun.user(sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId) {
+	            if (!encPub) {
+	              return;
+	            }
 	            var s = _JSON$stringify(encPub);
 	            if (chats.indexOf(s) === -1) {
 	              chats.push(s);
@@ -13742,15 +13745,36 @@
 	              var chat = new Chat({ gun: gun, key: key, participants: pub });
 	              chat.save();
 	            }
+	            util$1.gunAsAnotherUser(gun, sharedKey, function (user) {
+	              // remove the chat request after reading
+	              user.get('chatRequests').get(requestId).put(null);
+	            });
 	          });
 	        }
 	      });
 	    });
 	  };
 
+	  /**
+	  *
+	  */
+
+
 	  Chat.removeChatLink = function removeChatLink(gun, key, linkId) {
 	    gun.user().auth(key);
 	    gun.user().get('chatLinks').get(linkId).put(null);
+	  };
+
+	  /**
+	  *
+	  */
+
+
+	  Chat.deleteChat = async function deleteChat(gun, key, pub) {
+	    gun.user().auth(key);
+	    var chatId = await Chat.getOurSecretChatId(gun, pub, key);
+	    gun.user().get('chats').get(chatId).put(null);
+	    gun.user().get('chats').get(chatId).off();
 	  };
 
 	  return Chat;
@@ -15135,7 +15159,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$2 = "0.0.133";
+	var version$2 = "0.0.134";
 
 	/*eslint no-useless-escape: "off", camelcase: "off" */
 

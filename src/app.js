@@ -408,6 +408,8 @@ function showProfile(pub) {
     $('#profile .profile-photo').attr('src', photo);
   });
   const link = getUserChatLink(pub);
+  $('#profile .delete-chat').off('click');
+  $('#profile .delete-chat').on('click', () => deleteChat(pub));
   $('#profile .send-message').off('click');
   $('#profile .send-message').on('click', () => showChat(pub));
   $('#profile .copy-user-link').off('click');
@@ -458,8 +460,11 @@ function addUserToHeader(pub) {
 }
 
 function showChat(pub) {
-  if (!pub || !Object.prototype.hasOwnProperty.call(chats, pub)) {
+  if (!pub) {
     return;
+  }
+  if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
+    addChat(pub);
   }
   resetView();
   activeChat = pub;
@@ -591,6 +596,16 @@ function addMessage(msg) {
   msgEl.toggleClass('our', msg.selfAuthored ? true : false);
   msgEl.toggleClass('their', msg.selfAuthored ? false : true);
   $("#message-list").append(msgEl); // TODO: jquery insertAfter element with smaller timestamp
+}
+
+function deleteChat(pub) {
+  irisLib.Chat.deleteChat(gun, key, pub);
+  if (activeChat === pub) {
+    showNewChat();
+    showMenu();
+  }
+  delete chats[pub];
+  $('.chat-item[data-pub="' + pub +'"]').remove();
 }
 
 function addChat(pub, chatLink) {
