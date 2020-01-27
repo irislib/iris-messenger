@@ -515,8 +515,9 @@ function sortMessagesByTime() {
 function addMessage(msg) {
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
+  var seenHtml = msg.selfAuthored ? ' <span class="seen"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"/></svg></span>' : '';
   var msgContent = $(
-    '<div class="msg-content"><div class="time"><span class="seen"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40"><polygon fill="#4FC3F7" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"/></svg></span> ' + formatTime(msg.time) + '</div></div>'
+    '<div class="msg-content"><div class="time">' + formatTime(msg.time) + seenHtml + '</div></div>'
   );
   msgContent.prepend(textEl);
   if (msg.text.length === 2 && isEmoji(msg.text)) {
@@ -600,7 +601,6 @@ function addChat(pub, chatLink) {
   });
   chats[pub].getMyMsgsLastSeenTime(time => {
     chats[pub].myLastSeenTime = new Date(time);
-    console.log('myLastSeenTime', time);
   });
 }
 
@@ -611,7 +611,7 @@ function lastSeenTimeChanged(pub) {
       $('.msg.our').each(function() {
         var el = $(this);
         if (el.data('time') <= chats[pub].theirLastSeenTime) {
-          el.find('.seen').show();
+          el.find('.seen').toggleClass('yes', true);
         }
       });
       // set seen msgs
