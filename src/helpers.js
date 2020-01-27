@@ -20,7 +20,12 @@ function formatTime(date) {
 }
 
 function formatDate(date) {
-  return date.toLocaleString(undefined, {dateStyle:"short", timeStyle:"short"});
+  const t = date.toLocaleString(undefined, {dateStyle:"short", timeStyle:"short"});
+  const s = t.split(':');
+  if (s.length === 3) { // safari tries to display seconds
+    return s[0] + ':' + s[1] + s[2].slice(2);
+  }
+  return t;
 }
 
 function copyToClipboard(text) {
