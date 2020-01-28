@@ -1,6 +1,9 @@
-var gun = Gun({
-  peers: ['http://localhost:8765/gun', 'https://gun-us.herokuapp.com/gun', 'https://gunjs.herokuapp.com/gun']
-});
+var isElectron = (userAgent.indexOf(' electron/') > -1);
+var peers = ['https://gun-us.herokuapp.com/gun', 'https://gunjs.herokuapp.com/gun'];
+if (isElectron) {
+  peers.push('http://localhost:8767/gun');
+}
+var gun = Gun({peers});
 window.gun = gun;
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
