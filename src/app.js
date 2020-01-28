@@ -554,10 +554,12 @@ function getIdenticon(pub, width) {
   return el;
 }
 
-function sortChatsByLatest() {
-  var sorted = $(".chat-item").sort((a, b) => $(b).data('latestTime') - $(a).data('latestTime'));
+var sortChatsByLatest = _.throttle(() => {
+  var sorted = $(".chat-item:not(.new)").sort((a, b) => {
+    return ($(b).data('latestTime') || -Infinity) - ($(a).data('latestTime') || -Infinity);
+  });
   $(".chat-list").append(sorted);
-}
+}, 100);
 
 function sortMessagesByTime() {
   var sorted = $(".msg").sort((a, b) => $(a).data('time') - $(b).data('time'));

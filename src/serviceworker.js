@@ -15,7 +15,8 @@ var urlsToCache = [
   'nts.js',
   'qrcode.min.js',
   'sea.js',
-  'style.css'
+  'style.css',
+  'underscore-min.js'
 ];
 
 self.addEventListener('install', function(event) {
