@@ -185,9 +185,8 @@ function setOurOnlineStatus() {
       irisLib.Chat.setOnline(gun, areWeOnline = true);
       if (activeChat) {
         chats[activeChat].setMyMsgsLastSeenTime();
+        changeChatUnseenCount(activeChat, 0);
       }
-      unseenTotal = 0;
-      setPageTitle();
     } else {
       irisLib.Chat.setOnline(gun, areWeOnline = false);
     }
@@ -462,6 +461,25 @@ function addUserToHeader(pub) {
   $("#header-content").css({cursor: 'pointer'});
 }
 
+function changeChatUnseenCount(pub, change) {
+  if (change) {
+    unseenTotal += change;
+    chats[pub].unseen += change;
+  } else {
+    unseenTotal = unseenTotal - (chats[pub].unseen || 0);
+    chats[pub].unseen = 0;
+  }
+  unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
+  var el = $('.chat-item[data-pub="' + pub +'"] .unseen');
+  if (chats[pub].unseen > 0) {
+    el.text(chats[pub].unseen);
+    el.show();
+  } else {
+    el.hide();
+  }
+  setPageTitle();
+}
+
 function showChat(pub) {
   if (!pub) {
     return;
@@ -488,10 +506,7 @@ function showChat(pub) {
     chats[pub].send(text);
     $('#new-msg').val('');
   });
-  if (chats[pub].unseen) {
-    unseenTotal -= chats[pub].unseen;
-  }
-  chats[pub].unseen = 0;
+  changeChatUnseenCount(pub, 0);
   addUserToHeader(pub);
   var msgs = Object.values(chats[pub].messages);
   msgs.forEach(addMessage);
@@ -629,13 +644,8 @@ function addChat(pub, chatLink) {
       lastSeenTimeChanged(pub);
     }
     if (!info.selfAuthored && chats[pub].myLastSeenTime && msg.time > chats[pub].myLastSeenTime) {
-      if (activeChat !== pub) {
-        chats[pub].unseen += 1;
-        unseenTotal += 1;
-        el.find('.unseen').text(chats[pub].unseen).show();
-      }
-      if (document.visibilityState !== 'visible') {
-        setPageTitle();
+      if (activeChat !== pub || document.visibilityState !== 'visible') {
+        changeChatUnseenCount(pub, 1);
       }
     }
     if (!chats[pub].latest || msg.time > chats[pub].latest.time) {
@@ -661,7 +671,7 @@ function addChat(pub, chatLink) {
     }
     notify(msg, info, pub);
   }});
-  chats[pub].unseen = 0;
+  changeChatUnseenCount(pub, 0);
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
