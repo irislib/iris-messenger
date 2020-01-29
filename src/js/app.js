@@ -40,14 +40,14 @@ function login(k) {
   irisLib.Chat.initUser(gun, key);
   $('#my-chat-links').empty();
   irisLib.Chat.getMyChatLinks(gun, key, undefined, chatLink => {
-    var row = $('<tr>');
-    var text = $('<td colspan="3">').text(chatLink.url);
+    var row = $('<div>').addClass('flex-row');
+    var text = $('<div>').addClass('flex-cell').text(chatLink.url);
     var btn = $('<button>Remove</button>').click(() => {
       irisLib.Chat.removeChatLink(gun, key, chatLink.id);
       hideAndRemove(row);
     });
     row.append(text);
-    row.append($('<td>').append(btn));
+    row.append($('<div>').addClass('flex-cell no-flex').append(btn));
     $('#my-chat-links').append(row);
     setChatLinkQrCode(chatLink.url);
     latestChatLink = chatLink.url;
@@ -115,13 +115,13 @@ function updatePeerList() {
   $('#peers .peer').remove();
   Object.values(peers).forEach(peer => {
     if (!peer.url) { return; }
-    var row = $('<tr>').addClass('peer');
-    var url = $('<td colspan="3">').text(peer.url);
+    var row = $('<div>').addClass('flex-row peer');
+    var url = $('<div>').addClass('flex-cell').text(peer.url);
     var btn = $('<button>Remove</button>').click(() => {
       hideAndRemove(row);
       gun.on('bye', peer);
     });
-    row.append(url).append($('<td>').append(btn));
+    row.append(url).append($('<div>').addClass('flex-cell no-flex').append(btn));
     $('#peers').prepend(row);
   });
 }

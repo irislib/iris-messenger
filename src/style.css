@@ -241,27 +241,32 @@ header #back-button {
   margin-top: 0;
 }
 
-.striped-rows {
-  border-spacing: 0;
-  table-layout: fixed;
+.flex-table {
+  display: flex;
+  flex-direction: column;
 }
 
-table.striped-rows {
-  table-layout: fixed;
-  width: 100%;
-}
-
-.striped-rows tr {
+.flex-table .flex-row {
   font-size: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
-.striped-rows tr:nth-child(odd) {
+.flex-table .flex-row:nth-child(odd) {
   background-color: rgba(255,255,255,0.5);
 }
 
-.striped-rows td {
+.flex-table .flex-cell {
   padding: 10px;
   overflow-wrap: break-word;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.flex-table .flex-cell.no-flex {
+  flex: none;
 }
 
 #emoji-picker {
@@ -338,7 +343,7 @@ table.striped-rows {
   border-radius: 50%;
 }
 
-.chat-list{
+.chat-list {
   flex:1;
   overflow-y: scroll;
 }

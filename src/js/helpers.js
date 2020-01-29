@@ -126,8 +126,8 @@ function getBase64(file) {
 
 function hideAndRemove(el) {
   el.fadeTo(1000, 0.01, function() {
-      $(this).slideUp(150, function() {
-          $(this).remove();
-      });
+    $(this).slideUp(150, function() {
+      $(this).remove();
+    });
   });
 }

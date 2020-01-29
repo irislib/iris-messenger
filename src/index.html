@@ -101,7 +101,7 @@
         <p id="my-qr-code"></p>
         <p>Give your chat link to someone you want to chat with!</p>
         <p><button id="generate-chat-link">Create new link</button></p>
-        <table id="my-chat-links" class="striped-rows"></table>
+        <div id="my-chat-links" class="flex-table"></div>
       </div>
 
       <!-- Settings view -->
@@ -147,12 +147,14 @@
           <button id="copy-private-key">Copy private key</button>
         </p>
         <h3>Peers</h3>
-        <table id="peers" class="striped-rows">
-          <tr id="add-peer-row">
-            <td colspan="3"><input id="add-peer-input" placeholder="Peer url"></td>
-            <td><button id="add-peer-btn">Add</button></td>
-          </tr>
-        </table>
+        <div id="peers" class="flex-table">
+          <div class="flex-row" id="add-peer-row">
+            <div class="flex-cell">
+              <input id="add-peer-input" placeholder="Peer url">
+              <button id="add-peer-btn">Add</button>
+            </div>
+          </div>
+        </div>
 
         <h3>About</h3>
         <p>Iris is like the messaging apps we've used to, but better.</p>
