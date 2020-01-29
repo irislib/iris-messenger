@@ -375,8 +375,7 @@ table.striped-rows {
   float: right;
 }
 
-.chat-item .unseen {
-  float: right;
+.unseen {
   display: inline-block;
   border-radius: 1.1em;
   padding: .3em .4em;
@@ -388,6 +387,10 @@ table.striped-rows {
   line-height: 1em;
   font-weight: 500;
   display: none;
+}
+
+.chat-item .unseen {
+  float: right;
 }
 
 small {

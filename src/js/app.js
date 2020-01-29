@@ -477,7 +477,7 @@ function changeChatUnseenCount(pub, change) {
   } else {
     el.hide();
   }
-  setPageTitle();
+  setUnseenTotal();
 }
 
 function showChat(pub) {
@@ -729,10 +729,12 @@ function lastSeenTimeChanged(pub) {
 }
 
 var initialTitle = document.title;
-function setPageTitle() {
+function setUnseenTotal() {
   if (unseenTotal) {
     document.title = '(' + unseenTotal + ') ' + initialTitle;
+    $('.unseen-total').text(unseenTotal).show();
   } else {
     document.title = initialTitle;
+    $('.unseen-total').hide();
   }
 }
