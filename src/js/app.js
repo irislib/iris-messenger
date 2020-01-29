@@ -598,10 +598,12 @@ function sortMessagesByTime() {
   });
 }
 
+var seenIndicatorHtml = '<span class="seen"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"/></svg></span>';
+
 function addMessage(msg) {
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
-  var seenHtml = msg.selfAuthored ? ' <span class="seen"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"/></svg></span>' : '';
+  var seenHtml = msg.selfAuthored ? ' ' + seenIndicatorHtml : '';
   var msgContent = $(
     '<div class="msg-content"><div class="time">' + formatTime(msg.time) + seenHtml + '</div></div>'
   );
@@ -639,14 +641,14 @@ function addChat(pub, chatLink) {
     msg.selfAuthored = info.selfAuthored;
     chats[pub].messages[msg.time] = msg;
     msg.time = new Date(msg.time);
-    if (!info.selfAuthored && msg.time > chats[pub].theirLastSeenTime) {
-      chats[pub].theirLastSeenTime = msg.time;
-      lastSeenTimeChanged(pub);
-    }
     if (!info.selfAuthored && chats[pub].myLastSeenTime && msg.time > chats[pub].myLastSeenTime) {
       if (activeChat !== pub || document.visibilityState !== 'visible') {
         changeChatUnseenCount(pub, 1);
       }
+    }
+    if (!info.selfAuthored && msg.time > chats[pub].theirLastSeenTime) {
+      chats[pub].theirLastSeenTime = msg.time;
+      lastSeenTimeChanged(pub);
     }
     if (!chats[pub].latest || msg.time > chats[pub].latest.time) {
       chats[pub].latest = msg;
@@ -657,6 +659,10 @@ function addChat(pub, chatLink) {
       var latestEl = el.find('.latest');
       latestEl.text(text);
       latestEl.html(highlightEmoji(latestEl.html()));
+      if (info.selfAuthored) {
+        latestEl.prepend($(seenIndicatorHtml));
+        setLatestSeen(pub);
+      }
       el.find('.latest-time').text(latestTimeText);
       el.data('latestTime', msg.time);
       sortChatsByLatest();
@@ -695,7 +701,14 @@ function addChat(pub, chatLink) {
   });
 }
 
+function setLatestSeen(pub) {
+  if (chats[pub].latest && chats[pub].latest.time <= chats[pub].theirLastSeenTime) {
+    $('.chat-item[data-pub="' + pub +'"] .seen').toggleClass('yes', true);
+  }
+}
+
 function lastSeenTimeChanged(pub) {
+  setLatestSeen(pub);
   if (pub === activeChat) {
     if (chats[pub].theirLastSeenTime) {
       $('#not-seen-by-them').hide();

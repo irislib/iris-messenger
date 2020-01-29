@@ -169,16 +169,20 @@ header #back-button {
   text-align: center;
 }
 
-.msg .seen {
+.chat-list .seen {
+  margin-right: 5px;
+}
+
+.seen {
   color: rgba(0, 0, 0, 0.45);
   user-select: none;
 }
 
-.msg .seen.yes {
+.seen.yes {
   color: #4fc3f7;
 }
 
-.msg .seen svg {
+.seen svg {
   width: 15px;
 }
 
