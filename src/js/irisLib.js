@@ -11139,13 +11139,13 @@
 	  var gun2 = new Gun({ peers: _Object$keys(gun._.opt.peers) });
 	  var user = gun2.user();
 	  user.auth(key);
-	  f(user);
 	  setTimeout(function () {
 	    var peers = _Object$values(gun2.back('opt.peers'));
 	    peers.forEach(function (peer) {
 	      gun2.on('bye', peer);
 	    });
 	  }, 20000);
+	  return f(user);
 	}
 
 	function gunOnceDefined(node) {
@@ -13698,12 +13698,12 @@
 	    var linkId = await Gun.SEA.work(encryptedSharedKey, undefined, undefined, { name: 'SHA-256' });
 	    linkId = linkId.slice(0, 12);
 
-	    util$1.gunAsAnotherUser(gun, sharedKey, function (user) {
-	      user.get('chatRequests').put({ a: 1 }); // doesn't seem to help
+	    // User has to exist, in order for .get(chatRequests).on() to be ever triggered
+	    await util$1.gunAsAnotherUser(gun, sharedKey, function (user) {
+	      return user.get('chatRequests').put({ a: 1 }).then();
 	    });
 
-	    user.get('chatLinks').get(linkId).get('encryptedSharedKey').put(encryptedSharedKey);
-	    user.get('chatLinks').get(linkId).get('ownerEncryptedSharedKey').put(ownerEncryptedSharedKey);
+	    user.get('chatLinks').get(linkId).put({ encryptedSharedKey: encryptedSharedKey, ownerEncryptedSharedKey: ownerEncryptedSharedKey });
 
 	    return Chat.formatChatLink(urlRoot, key.pub, sharedSecret, linkId);
 	  };
