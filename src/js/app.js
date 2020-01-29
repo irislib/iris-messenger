@@ -641,7 +641,7 @@ function addChat(pub, chatLink) {
     msg.selfAuthored = info.selfAuthored;
     chats[pub].messages[msg.time] = msg;
     msg.time = new Date(msg.time);
-    if (!info.selfAuthored && chats[pub].myLastSeenTime && msg.time > chats[pub].myLastSeenTime) {
+    if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
       if (activeChat !== pub || document.visibilityState !== 'visible') {
         changeChatUnseenCount(pub, 1);
       }
@@ -698,6 +698,9 @@ function addChat(pub, chatLink) {
   });
   chats[pub].getMyMsgsLastSeenTime(time => {
     chats[pub].myLastSeenTime = new Date(time);
+    if (chats[pub].latest && chats[pub].myLastSeenTime >= chats[pub].latest.time) {
+      changeChatUnseenCount(pub, 0);
+    }
   });
 }
 
