@@ -335,7 +335,7 @@ function notify(msg, info, pub) {
   }
   if (shouldDesktopNotify()) {
     var desktopNotification = new Notification(chats[pub].name, {
-      icon: 'icon128.png',
+      icon: 'img/icon128.png',
       body: truncateString(msg.text, 50),
       silent: true
     });
