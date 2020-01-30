@@ -281,6 +281,10 @@ header #back-button {
   display: none;
 }
 
+.emoji-picker__tab {
+  font-size: 35px !important;
+}
+
 #message-list {
   display: flex;
   max-width: 700px;
