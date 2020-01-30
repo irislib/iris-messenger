@@ -148,6 +148,8 @@ if (!isMobile()) {
   });
 }
 
+$('#desktop-application-about').toggle(!isMobile() && !isElectron);
+
 $('#paste-chat-link').on('input', event => {
   var val = $(event.target).val();
   if (val.length < 30 || val.indexOf('chatWith') === -1) {
