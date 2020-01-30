@@ -366,25 +366,36 @@ function notify(msg, info, pub) {
   }
 }
 
+var cropper;
 function renderProfilePhotoSettings() {
   $('#profile-photo-error').toggleClass('hidden', true);
   var files = $('#profile-photo-input')[0].files;
   if (files && files.length) {
     var file = files[0];
+    /*
     if (file.size > 1024 * 200) {
       $('#profile-photo-error').toggleClass('hidden', false);
       return console.error('file too big');
     }
+    */
     // show preview
     $('#current-profile-photo').hide();
     $('#add-profile-photo').hide();
     getBase64(file).then(base64 => {
-      $('#profile-photo-preview').attr('src', base64);
+      var previewEl = $('#profile-photo-preview');
+      previewEl.attr('src', base64);
       $('#profile-photo-preview').toggleClass('hidden', false);
       $('#cancel-profile-photo').toggleClass('hidden', false);
       $('#use-profile-photo').toggleClass('hidden', false);
+      cropper = new Cropper(previewEl[0], {
+        aspectRatio:1,
+        autoCropArea: 1,
+        viewMode: 2,
+        zoomable: false
+      });
     });
   } else {
+    cropper && cropper.destroy();
     // show current profile photo
     $('#current-profile-photo').show();
     if (!$('#current-profile-photo').attr('src')) {
@@ -400,11 +411,17 @@ $('#profile-photo-input').change(e => {
   renderProfilePhotoSettings();
 });
 $('#use-profile-photo').click(() => {
-  var src = $('#profile-photo-preview').attr('src');
-  gun.user().get('profile').get('photo').put(src);
-  $('#current-profile-photo').attr('src', src);
-  $('#profile-photo-input').val('');
-  renderProfilePhotoSettings();
+  var canvas = cropper.getCroppedCanvas();
+  var resizedCanvas = document.createElement('canvas');
+  resizedCanvas.width = resizedCanvas.height = Math.min(canvas.width, 800);
+  pica().resize(canvas, resizedCanvas).then(result => {
+    var src = resizedCanvas.toDataURL('image/jpeg');
+    // var src = $('#profile-photo-preview').attr('src');
+    gun.user().get('profile').get('photo').put(src);
+    $('#current-profile-photo').attr('src', src);
+    $('#profile-photo-input').val('');
+    renderProfilePhotoSettings();
+  });
 });
 $('#cancel-profile-photo').click(() => {
   $('#profile-photo-input').val('');

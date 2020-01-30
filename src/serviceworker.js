@@ -1,6 +1,8 @@
 var CACHE_NAME = 'iris-messenger-cache-v1';
 var urlsToCache = [
   './',
+  'css/style.css',
+  'css/cropper.min.css',
   'img/android-chrome-192x192.png',
   'img/android-chrome-512x512.png',
   'img/apple-touch-icon.png',
@@ -11,6 +13,7 @@ var urlsToCache = [
   'img/safari-pinned-tab.svg',
   'js/app.js',
   'js/Autolinker.min.js',
+  'js/cropper.min.js',
   'js/emoji-button.js',
   'js/gun.js',
   'js/helpers.js',
@@ -24,8 +27,7 @@ var urlsToCache = [
   'favicon.ico',
   'index.html',
   'notification.mp3',
-  'site.webmanifest',
-  'style.css'
+  'site.webmanifest'
 ];
 
 self.addEventListener('install', function(event) {
