@@ -108,7 +108,7 @@ img {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  flex: 4 0 10em;
+  flex: 3 0 10em;
 }
 
 /*----- Main------- */
