@@ -20,6 +20,7 @@ var urlsToCache = [
   'js/irisLib.js',
   'js/jquery.js',
   'js/nts.js',
+  'js/pica.min.js',
   'js/qrcode.min.js',
   'js/sea.js',
   'js/underscore-min.js',

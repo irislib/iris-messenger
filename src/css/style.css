@@ -65,6 +65,11 @@ img {
     width: 100% !important;
     height: 100% !important;
   }
+  #current-profile-photo {
+    max-width: none !important;
+    max-height: none !important;
+    width: 100%;
+  }
 }
 
 @media (min-width: 576px) {
@@ -141,6 +146,7 @@ header #back-button {
   overflow-y: scroll;
   padding: 10px 15px;
   background-color: #e5ddd5;
+  min-width: 0;
 }
 
 .msg {
@@ -470,9 +476,13 @@ small {
   opacity: 0.8;
 }
 
-#current-profile-photo, #profile-photo-preview {
-  max-width: 200px;
-  max-height: 200px;
+#current-profile-photo {
+  max-width: 400px;
+  max-height: 400px;
+}
+
+#profile-photo-preview-container {
+  max-width: 100%;
 }
 
 #private-key-qr {

@@ -13558,17 +13558,19 @@
 	    var ourSecretChatId = await this.getOurSecretChatId(pub);
 	    var mySecret = await Gun.SEA.secret(this.key.epub, this.key);
 	    this.gun.user().get('chats').get(ourSecretChatId).get('pub').put((await Gun.SEA.encrypt(pub, mySecret)));
-	    if (pub !== this.key.pub) {
-	      // Subscribe to their messages
-	      var theirSecretChatId = await this.getTheirSecretChatId(pub);
-	      this.gun.user(pub).get('chats').get(theirSecretChatId).get('msgs').map().once(function (data) {
-	        _this5.messageReceived(data, pub);
+	    if (this.messageReceived) {
+	      if (pub !== this.key.pub) {
+	        // Subscribe to their messages
+	        var theirSecretChatId = await this.getTheirSecretChatId(pub);
+	        this.gun.user(pub).get('chats').get(theirSecretChatId).get('msgs').map().once(function (data) {
+	          _this5.messageReceived(data, pub);
+	        });
+	      }
+	      // Subscribe to our messages
+	      this.user.get('chats').get(ourSecretChatId).get('msgs').map().once(function (data) {
+	        _this5.messageReceived(data, pub, true);
 	      });
 	    }
-	    // Subscribe to our messages
-	    this.user.get('chats').get(ourSecretChatId).get('msgs').map().once(function (data) {
-	      _this5.messageReceived(data, pub, true);
-	    });
 	  };
 
 	  /**

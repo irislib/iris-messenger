@@ -392,7 +392,8 @@ function renderProfilePhotoSettings() {
       cropper = new Cropper(previewEl[0], {
         aspectRatio:1,
         autoCropArea: 1,
-        viewMode: 2,
+        viewMode: 1,
+        background: false,
         zoomable: false
       });
     });
