@@ -1,10 +1,13 @@
-# iris-messenger
+# Iris Messenger
+Iris Messenger is like the messaging apps we've used to, but better.
+* No phone number or signup required. Just start using it!
+* Secure: It's open source. Users can validate that big brother doesn't read your messages.
+* Available: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.
 
-Decentralized messenger! Just [iris-lib](https://github.com/irislib/iris-lib), [gun](https://github.com/amark/gun), jquery and some helpers.
+## Use
+Browser application: [iris.to](https://iris.to)
 
-Try it out: [iris.to](https://iris.to)
-
-Or get the **desktop version** ([download](https://github.com/irislib/iris-electron/releases), [source code](https://github.com/irislib/iris-electron)):
+Desktop version: ([download](https://github.com/irislib/iris-electron/releases), [source code](https://github.com/irislib/iris-electron)):
 * Communicate and synchronize with local network peers without Internet access
   * When local peers eventually connect to the Internet, your messages are relayed globally
   * Bluetooth support upcoming
@@ -19,8 +22,10 @@ yarn
 yarn start
 ```
 
+The stack is just [iris-lib](https://github.com/irislib/iris-lib), [gun](https://github.com/amark/gun), jquery and some helpers.
+
 ## Privacy
-Messages are end-to-end encrypted, but message timestamps and the number of chats aren't.
+Messages are end-to-end encrypted, but message timestamps and the number of chats aren't. In a decentralized network this information is potentially available to anyone.
 
 By looking at timestamps in chats, it is possible to guess who are chatting with each other. It is also possible, if not trivial, to find out who are communicating with each other by monitoring data subscriptions on the decentralized database.
 
