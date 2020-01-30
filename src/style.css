@@ -354,9 +354,8 @@ header #back-button {
 }
 
 .chat-item {
-  padding: 10px 15px;
+  padding: 0px 10px 0px 15px;
   overflow-x: hidden;
-  border-bottom: 1px solid #efefef;
   cursor: pointer;
   display: flex;
   flex-direction: row;
@@ -366,6 +365,11 @@ header #back-button {
   flex: none;
   align-self: center;
   margin-right: 15px !important;
+}
+
+.chat-item .text {
+  padding: 15px 5px 15px 0px;
+  border-bottom: 1px solid #efefef;
 }
 
 .chat-item .text, header .text {
