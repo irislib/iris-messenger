@@ -10,6 +10,7 @@ var chat = gun.get('converse/' + location.hash.slice(1));
 var chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 var activeChat;
+var activeProfile;
 var onlineTimeout;
 var loginTime;
 var key;
@@ -196,6 +197,7 @@ function setOurOnlineStatus() {
 
 function resetView() {
   activeChat = null;
+  activeProfile = null;
   showMenu(false);
   $('.chat-item').toggleClass('active', false);
   $('.main-view').hide();
@@ -437,11 +439,13 @@ function showProfile(pub) {
     return;
   }
   resetView();
+  activeProfile = pub;
   $('#profile .profile-photo-container').hide();
   var qrCodeEl = $('#profile-page-qr');
   qrCodeEl.empty();
   $('#profile').show();
   addUserToHeader(pub);
+  setTheirOnlineStatus(pub);
   gun.user(pub).get('profile').get('photo').on(photo => {
     $('#profile .profile-photo-container').show();
     $('#profile .profile-photo').attr('src', photo);
@@ -513,6 +517,24 @@ function changeChatUnseenCount(pub, change) {
   setUnseenTotal();
 }
 
+function setTheirOnlineStatus(pub) {
+  var online = chats[pub].online;
+  if (activeChat === pub || activeProfile === pub) {
+    if (online.isOnline) {
+      $('#header-content .last-seen').text('online');
+    } else if (online.lastActive) {
+      var d = new Date(online.lastActive * 1000);
+      var lastSeenText = getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'}));
+      if (lastSeenText === 'today') {
+        lastSeenText = formatTime(d);
+      } else {
+        lastSeenText = formatDate(d);
+      }
+      $('#header-content .last-seen').text('last active ' + lastSeenText);
+    }
+  }
+}
+
 function showChat(pub) {
   if (!pub) {
     return;
@@ -561,33 +583,16 @@ function showChat(pub) {
   chats[pub].setMyMsgsLastSeenTime();
   $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
   chats[pub].setMyMsgsLastSeenTime();
-  function setTheirOnlineStatus() {
-    var online = chats[pub].online;
-    if (activeChat === pub) {
-      if (online.isOnline) {
-        $('#header-content .last-seen').text('online');
-      } else if (online.lastActive) {
-        var d = new Date(online.lastActive * 1000);
-        var lastSeenText = getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'}));
-        if (lastSeenText === 'today') {
-          lastSeenText = formatTime(d);
-        } else {
-          lastSeenText = formatDate(d);
-        }
-        $('#header-content .last-seen').text('last active ' + lastSeenText);
-      }
-    }
-  }
   if (!chats[pub].online) {
     chats[pub].online = {};
     irisLib.Chat.getOnline(gun, pub, (online) => {
       if (chats[pub]) {
         chats[pub].online = online;
-        setTheirOnlineStatus();
+        setTheirOnlineStatus(pub);
       }
     });
   }
-  setTheirOnlineStatus();
+  setTheirOnlineStatus(pub);
 }
 
 function getIdenticon(pub, width) {
