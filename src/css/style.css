@@ -493,6 +493,11 @@ small {
   margin-top: 15px;
 }
 
+/* Places where emojis may appear */
+#new-msg, .user-name, .name {
+  line-height: 1.3em;
+}
+
 .profile-photo {
   border-radius: 50%;
   max-width: 300px;
