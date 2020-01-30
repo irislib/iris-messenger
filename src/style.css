@@ -359,6 +359,9 @@ header #back-button {
   cursor: pointer;
   display: flex;
   flex-direction: row;
+  height: 72px;
+  align-items: stretch;
+  margin-top: -1px;
 }
 
 .chat-item .identicon-container, header .identicon-container {
@@ -368,13 +371,13 @@ header #back-button {
 }
 
 .chat-item .text {
-  padding: 15px 5px 15px 0px;
-  border-bottom: 1px solid #efefef;
+  padding-right: 5px;
+  padding-top: 16px;
+  border-bottom: 1px solid #f3f3f3;
 }
 
 .chat-item .text, header .text {
   flex: 1;
-  align-self: center;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -416,7 +419,7 @@ small {
 }
 
 .chat-item.new {
-  padding: 22px 15px;
+  align-items: center;
 }
 
 #new-chat input {
