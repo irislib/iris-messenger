@@ -475,6 +475,10 @@ small {
   max-height: 200px;
 }
 
+#private-key-qr {
+  margin-top: 15px;
+}
+
 .profile-photo {
   border-radius: 50%;
   max-width: 300px;

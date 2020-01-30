@@ -74,6 +74,7 @@ function login(k) {
   $('.user-info .user-name').text('anonymous');
   $('#settings-name').val('');
   $('#current-profile-photo').attr('src', '');
+  $('#private-key-qr').remove();
   gun.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       $('.user-info .user-name').text(truncateString(name, 20));
@@ -229,7 +230,7 @@ function showNewChat() {
   resetView();
   $('.chat-item.new').toggleClass('active', true);
   $('#new-chat').show();
-  $("#header-content").text('Start new chat');
+  $("#header-content").text('New chat');
 }
 
 function getMyChatLink() {
@@ -267,6 +268,26 @@ $('#copy-private-key').click(event => {
 });
 
 $('#download-private-key').click(downloadKey);
+$('#show-private-key-qr').click(togglePrivateKeyQR);
+
+function togglePrivateKeyQR(e) {
+  var btn = $('#show-private-key-qr');
+  var show = $('#private-key-qr').length === 0;
+  btn.text(show ? 'Hide private key QR code' : 'Show private key QR code');
+  if (show) {
+    var qrCodeEl = $('<div>').attr('id', 'private-key-qr').insertAfter(btn);
+    var qrcode = new QRCode(qrCodeEl[0], {
+      text: JSON.stringify(key),
+      width: 300,
+      height: 300,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.H
+    });
+  } else {
+    $('#private-key-qr').remove();
+  }
+}
 
 $('.show-logout-confirmation').click(showLogoutConfirmation);
 function showLogoutConfirmation() {
@@ -536,7 +557,7 @@ function showChat(pub) {
         } else {
           lastSeenText = formatDate(d);
         }
-        $('#header-content .last-seen').text('last seen ' + lastSeenText);
+        $('#header-content .last-seen').text('last active ' + lastSeenText);
       }
     }
   }

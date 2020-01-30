@@ -60,7 +60,7 @@
           	  viewBox="0 0 510 510" xml:space="preserve">
           	<path fill="#4a4a4a" d="M459,0H51C22.95,0,0,22.95,0,51v459l102-102h357c28.05,0,51-22.95,51-51V51C510,22.95,487.05,0,459,0z M102,178.5h306v51 H102V178.5z M306,306H102v-51h204V306z M408,153H102v-51h306V153z"/>
           </svg>
-          Start new chat
+          New chat
         </div>
         <div id="welcome" class="visible-xs-block">
           <h3>Iris Messenger</h3>
@@ -144,11 +144,14 @@
         </p>
         <h3>Private key</h3>
         <p>
-          <b>DANGER!</b> Private key is used to <b>log in to your account</b>. Keep your private key safe!
+          <b>DANGER!</b> Private key is used to <b>log in to your account</b>. Don't give or show your private key to anyone else!
         </p>
         <p>
           <button id="download-private-key">Download private key</button>
           <button id="copy-private-key">Copy private key</button>
+        </p>
+        <p>
+          <button id="show-private-key-qr">Show private key QR code</button>
         </p>
         <h3>Peers</h3>
         <div id="peers" class="flex-table">
@@ -172,7 +175,12 @@
         <div id="desktop-application-about">
           <h3>Get the desktop application</h3>
           <ul>
-            <li>Communicate with local network peers without Internet access</li>
+            <li>Communicate and synchronize with local network peers without Internet access
+              <ul>
+                <li>When local peers eventually connect to the Internet, your messages are relayed globally</li>
+                <li>Bluetooth support upcoming</li>
+              </ul>
+            </li>
             <li>Opens to background on login: stay online and get message notifications</li>
             <li>More secure and available: no need to open the browser application from a server</li>
           </ul>
@@ -180,7 +188,8 @@
         </div>
 
         <h3>Privacy</h3>
-        <p>Messages are end-to-end encrypted, but message timestamps aren't. By looking at timestamps, it is possible to guess who are chatting with each other. It is also possible, if not trivial, to find out who are communicating with each other by monitoring data subscriptions on the decentralized database.</p>
+        <p>Messages are end-to-end encrypted, but message timestamps and the number of chats aren't.</p>
+        <p>By looking at timestamps in chats, it is possible to guess who are chatting with each other. It is also possible, if not trivial, to find out who are communicating with each other by monitoring data subscriptions on the decentralized database.</p>
         <p>In that regard, Iris prioritizes decentralization and availability over perfect privacy.</p>
         <p>Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.</p>
       </div>
