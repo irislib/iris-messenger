@@ -374,6 +374,7 @@ header #back-button {
   padding-right: 5px;
   padding-top: 16px;
   border-bottom: 1px solid #f3f3f3;
+  line-height: 20px;
 }
 
 .chat-item .text, header .text {
@@ -420,6 +421,7 @@ small {
 
 .chat-item.new {
   align-items: center;
+  border-bottom: 1px solid #f3f3f3;
 }
 
 #new-chat input {

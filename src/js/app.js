@@ -52,16 +52,14 @@ function login(k) {
     setChatLinkQrCode(chatLink.url);
     latestChatLink = chatLink.url;
   });
-  $('#generate-chat-link').off('click');
-  $('#generate-chat-link').on('click', createChatLink);
+  $('#generate-chat-link').off().on('click', createChatLink);
   myIdenticon = getIdenticon(key.pub, 40);
   loginTime = new Date();
   unseenTotal = 0;
   $(".chat-item:not(.new)").remove();
   $("#my-identicon").empty();
   $("#my-identicon").append(myIdenticon);
-  $(".user-info").off('click');
-  $(".user-info").on('click', showSettings);
+  $(".user-info").off().on('click', showSettings);
   setOurOnlineStatus();
   irisLib.Chat.getChats(gun, key, addChat);
   var chatWith = getUrlParameter('chatWith');
@@ -209,8 +207,7 @@ function showMenu(show = true) {
   $('.sidebar').toggleClass('hidden-xs', !show);
   $('.main').toggleClass('hidden-xs', show);
 }
-$('#back-button').off('click');
-$('#back-button').on('click', () => {
+$('#back-button').off().on('click', () => {
   resetView();
   showMenu(true);
 });
@@ -410,12 +407,9 @@ function showProfile(pub) {
     $('#profile .profile-photo').attr('src', photo);
   });
   const link = getUserChatLink(pub);
-  $('#profile .delete-chat').off('click');
-  $('#profile .delete-chat').on('click', () => deleteChat(pub));
-  $('#profile .send-message').off('click');
-  $('#profile .send-message').on('click', () => showChat(pub));
-  $('#profile .copy-user-link').off('click');
-  $('#profile .copy-user-link').on('click', event => {
+  $('#profile .delete-chat').off().on('click', () => deleteChat(pub));
+  $('#profile .send-message').off().on('click', () => showChat(pub));
+  $('#profile .copy-user-link').off().on('click', event => {
     copyToClipboard(link);
     var t = $(event.target);
     var originalText = t.text();
@@ -456,8 +450,7 @@ function addUserToHeader(pub) {
   textEl.append(nameEl);
   textEl.append($('<small class="last-seen"></small>'));
   $("#header-content").append(textEl);
-  $("#header-content").off('click');
-  $("#header-content").on('click', () => showProfile(pub));
+  $("#header-content").off().on('click', () => showProfile(pub));
   $("#header-content").css({cursor: 'pointer'});
 }
 
@@ -498,8 +491,7 @@ function showChat(pub) {
   if (!isMobile()) {
     $("#new-msg").focus();
   }
-  $(".message-form form").off('submit');
-  $(".message-form form").on('submit', event => {
+  $(".message-form form").off().on('submit', event => {
     event.preventDefault();
     var text = $('#new-msg').val();
     if (!text.length) { return; }
