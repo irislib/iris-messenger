@@ -69,8 +69,11 @@ function login(k) {
     showChat(chatWith);
     window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
   } else {
-    showNewChat();
-    showMenu();
+    if (isMobile()) {
+      showMenu();
+    } else {
+      showNewChat();
+    }
   }
   $('.user-info .user-name').text('anonymous');
   $('#settings-name').val('');
