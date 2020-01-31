@@ -196,6 +196,9 @@ function setOurOnlineStatus() {
 }
 
 function resetView() {
+  if (activeChat) {
+    chats[activeChat].setTyping(false);
+  }
   activeChat = null;
   activeProfile = null;
   showMenu(false);
@@ -493,7 +496,8 @@ function addUserToHeader(pub) {
   $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
-  textEl.append($('<small class="last-seen"></small>'));
+  textEl.append($('<small>').addClass('last-seen'));
+  textEl.append($('<small>').addClass('typing-indicator').text('typing...').hide());
   $("#header-content").append(textEl);
   $("#header-content").off().on('click', () => showProfile(pub));
   $("#header-content").css({cursor: 'pointer'});
@@ -554,10 +558,19 @@ function showChat(pub) {
   if (!isMobile()) {
     $("#new-msg").focus();
   }
+  chats[pub].getTyping(isTyping => {
+    $('#header-content .last-seen').toggle(!isTyping);
+    $('#header-content .typing-indicator').toggle(isTyping);
+  });
+  $('#new-msg').off().on('input', () => {
+    console.log('setting isTyping true');
+    chats[pub].setTyping($('#new-msg').val().length > 0);
+  });
   $(".message-form form").off().on('submit', event => {
     event.preventDefault();
     var text = $('#new-msg').val();
     if (!text.length) { return; }
+    chats[pub].setTyping(false);
     chats[pub].send(text);
     $('#new-msg').val('');
   });

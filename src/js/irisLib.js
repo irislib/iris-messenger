@@ -13484,13 +13484,8 @@
 
 
 	  Chat.prototype.setMyMsgsLastSeenTime = async function setMyMsgsLastSeenTime(time) {
-	    var keys = _Object$keys(this.secrets);
 	    time = time || new Date().toISOString();
-	    for (var i = 0; i < keys.length; i++) {
-	      var encrypted = await Gun.SEA.encrypt(time, (await this.getSecret(keys[i])));
-	      var ourSecretChatId = await this.getOurSecretChatId(keys[i]);
-	      this.user.get('chats').get(ourSecretChatId).get('msgsLastSeenTime').put(encrypted);
-	    }
+	    return this.putEncrypted('msgsLastSeenTime', time);
 	  };
 
 	  /**
@@ -13501,21 +13496,12 @@
 	  Chat.prototype.getMyMsgsLastSeenTime = async function getMyMsgsLastSeenTime(callback) {
 	    var _this3 = this;
 
-	    var keys = _Object$keys(this.secrets);
-
-	    var _loop2 = async function _loop2(i) {
-	      var ourSecretChatId = await _this3.getOurSecretChatId(keys[i]);
-	      _this3.gun.user().get('chats').get(ourSecretChatId).get('msgsLastSeenTime').on(async function (data) {
-	        _this3.myMsgsLastSeenTime = await Gun.SEA.decrypt(data, (await _this3.getSecret(keys[i])));
-	        if (callback) {
-	          callback(_this3.myMsgsLastSeenTime);
-	        }
-	      });
-	    };
-
-	    for (var i = 0; i < keys.length; i++) {
-	      await _loop2(i);
-	    }
+	    this.onMyEncrypted('msgsLastSeenTime', function (time) {
+	      _this3.myMsgsLastSeenTime = time;
+	      if (callback) {
+	        callback(_this3.myMsgsLastSeenTime);
+	      }
+	    });
 	  };
 
 	  /**
@@ -13528,7 +13514,7 @@
 
 	    var keys = _Object$keys(this.secrets);
 
-	    var _loop3 = async function _loop3(i) {
+	    var _loop2 = async function _loop2(i) {
 	      var theirSecretChatId = await _this4.getTheirSecretChatId(keys[i]);
 	      _this4.gun.user(keys[i]).get('chats').get(theirSecretChatId).get('msgsLastSeenTime').on(async function (data) {
 	        _this4.theirMsgsLastSeenTime = await Gun.SEA.decrypt(data, (await _this4.getSecret(keys[i])));
@@ -13539,7 +13525,7 @@
 	    };
 
 	    for (var i = 0; i < keys.length; i++) {
-	      await _loop3(i);
+	      await _loop2(i);
 	    }
 	  };
 
@@ -13587,7 +13573,6 @@
 	        text: msg
 	      };
 	    }
-
 	    //this.gun.user().get('message').set(temp);
 	    var keys = _Object$keys(this.secrets);
 	    for (var i = 0; i < keys.length; i++) {
@@ -13609,6 +13594,126 @@
 	      var ourSecretChatId = await this.getOurSecretChatId(keys[i]);
 	      this.user.get('chats').get(ourSecretChatId).get('msgs').get('a').put(null);
 	    }
+	  };
+
+	  /**
+	  * Save a key-value pair, encrypt value
+	  */
+
+
+	  Chat.prototype.putEncrypted = async function putEncrypted(key, value, salt) {
+	    var keys = _Object$keys(this.secrets);
+	    salt = salt || Gun.SEA.random(32).toString();
+	    var obj = { v: value, s: salt };
+	    for (var i = 0; i < keys.length; i++) {
+	      var encrypted = await Gun.SEA.encrypt(_JSON$stringify(obj), (await this.getSecret(keys[i])));
+	      var ourSecretChatId = await this.getOurSecretChatId(keys[i]);
+	      this.user.get('chats').get(ourSecretChatId).get(key).put(encrypted);
+	    }
+	  };
+
+	  /**
+	  * Subscribe to key from us, decrypt value
+	  */
+
+
+	  Chat.prototype.onMyEncrypted = async function onMyEncrypted(key, callback) {
+	    var _this6 = this;
+
+	    if (typeof callback !== 'function') {
+	      throw new Error('onMyEncrypted callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
+	    }
+	    var keys = _Object$keys(this.secrets);
+
+	    var _loop3 = async function _loop3(i) {
+	      var ourSecretChatId = await _this6.getOurSecretChatId(keys[i]);
+	      _this6.gun.user().get('chats').get(ourSecretChatId).get(key).on(async function (data) {
+	        var decrypted = await Gun.SEA.decrypt(data, (await _this6.getSecret(keys[i])));
+	        if (decrypted) {
+	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
+	        }
+	      });
+	      return 'break';
+	    };
+
+	    for (var i = 0; i < keys.length; i++) {
+	      var _ret3 = await _loop3(i);
+
+	      if (_ret3 === 'break') break;
+	    }
+	  };
+
+	  /**
+	  * Subscribe to key from other participants, decrypt value
+	  */
+
+
+	  Chat.prototype.onTheirEncrypted = async function onTheirEncrypted(key, callback) {
+	    var _this7 = this;
+
+	    if (typeof callback !== 'function') {
+	      throw new Error('onTheirEncrypted callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
+	    }
+	    var keys = _Object$keys(this.secrets);
+
+	    var _loop4 = async function _loop4(i) {
+	      var theirSecretChatId = await _this7.getTheirSecretChatId(keys[i]);
+	      _this7.gun.user(keys[i]).get('chats').get(theirSecretChatId).get(key).on(async function (data) {
+	        var decrypted = await Gun.SEA.decrypt(data, (await _this7.getSecret(keys[i])));
+	        if (decrypted) {
+	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
+	        }
+	      });
+	    };
+
+	    for (var i = 0; i < keys.length; i++) {
+	      await _loop4(i);
+	    }
+	  };
+
+	  /**
+	  * Set typing status
+	  */
+
+
+	  Chat.prototype.setTyping = function setTyping(isTyping) {
+	    var _this8 = this;
+
+	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
+
+	    isTyping = typeof isTyping === 'undefined' ? true : isTyping;
+	    timeout = timeout * 1000;
+	    this.putEncrypted('typing', isTyping ? new Date().toISOString() : false);
+	    clearTimeout(this.setTypingTimeout);
+	    this.setTypingTimeout = setTimeout(function () {
+	      return _this8.putEncrypted('isTyping', false);
+	    }, timeout);
+	  };
+
+	  /**
+	  * Get typing status
+	  */
+
+
+	  Chat.prototype.getTyping = function getTyping(callback) {
+	    var _this9 = this;
+
+	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
+
+	    timeout = timeout * 1000;
+	    this.onTheirEncrypted('typing', function (typing, key, pub) {
+	      if (callback) {
+	        var isTyping = typing && new Date() - new Date(typing) <= timeout;
+	        callback(isTyping, pub);
+	        _this9.getTypingTimeouts = _this9.getTypingTimeouts || {};
+	        clearTimeout(_this9.getTypingTimeouts[pub]);
+	        if (isTyping) {
+	          _this9.getTypingTimeouts[pub] = setTimeout(function () {
+	            return callback(false, pub);
+	          }, timeout);
+	        }
+	      }
+	    });
 	  };
 
 	  /**

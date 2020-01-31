@@ -494,7 +494,7 @@ small {
 }
 
 /* Places where emojis may appear */
-#new-msg, .user-name, .name {
+.user-name, .name, input[type=text] {
   line-height: 1.3em;
 }
 
