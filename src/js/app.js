@@ -500,7 +500,7 @@ function addUserToHeader(pub) {
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
   textEl.append($('<small>').addClass('last-seen'));
-  textEl.append($('<small>').addClass('typing-indicator').text('typing...').hide());
+  textEl.append($('<small>').addClass('typing-indicator').text('typing...'));
   $("#header-content").append(textEl);
   $("#header-content").off().on('click', () => showProfile(pub));
   $("#header-content").css({cursor: 'pointer'});
@@ -561,10 +561,6 @@ function showChat(pub) {
   if (!isMobile()) {
     $("#new-msg").focus();
   }
-  chats[pub].getTyping(isTyping => {
-    $('#header-content .last-seen').toggle(!isTyping);
-    $('#header-content .typing-indicator').toggle(isTyping);
-  });
   $('#new-msg').off().on('input', () => {
     console.log('setting isTyping true');
     chats[pub].setTyping($('#new-msg').val().length > 0);
@@ -689,8 +685,10 @@ function addChat(pub, chatLink) {
     return;
   }
   $('#welcome').remove();
-  var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="latest"></small> <span class="unseen"></span></div></div>');
+  var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
+  var latestEl = el.find('.latest');
+  var typingIndicator = el.find('.typing-indicator').text('Typing...');
   chats[pub] = new irisLib.Chat({gun, key, chatLink: chatLink, participants: pub, onMessage: (msg, info) => {
     msg.selfAuthored = info.selfAuthored;
     chats[pub].messages[msg.time] = msg;
@@ -710,7 +708,6 @@ function addChat(pub, chatLink) {
       var now = new Date();
       var latestTimeText = getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
       if (latestTimeText === 'today') { latestTimeText = formatTime(msg.time); }
-      var latestEl = el.find('.latest');
       latestEl.text(text);
       latestEl.html(highlightEmoji(latestEl.html()));
       if (info.selfAuthored) {
@@ -755,6 +752,14 @@ function addChat(pub, chatLink) {
     if (chats[pub].latest && chats[pub].myLastSeenTime >= chats[pub].latest.time) {
       changeChatUnseenCount(pub, 0);
     }
+  });
+  chats[pub].getTyping(isTyping => {
+    if (activeChat === pub) {
+      $('#header-content .last-seen').toggle(!isTyping);
+      $('#header-content .typing-indicator').toggle(isTyping);
+    }
+    typingIndicator.toggle(isTyping);
+    latestEl.toggle(!isTyping);
   });
 }
 

@@ -503,3 +503,12 @@ small {
   max-width: 300px;
   max-height: 300px;
 }
+
+.typing-indicator {
+  display: none;
+}
+
+.chat-item .typing-indicator {
+  color: #05b246;
+  font-weight: bold;
+}
