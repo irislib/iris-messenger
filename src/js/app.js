@@ -484,14 +484,11 @@ function showProfile(pub) {
 }
 
 function addUserToHeader(pub) {
+  $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (chats[pub] && chats[pub].name) {
     nameEl.text(truncateString(chats[pub].name, 30));
     nameEl.show();
-  } else {
-    gun.user(pub).get('profile').get('name').on(name => {
-      nameEl.text(truncateString(name, 30));
-    });
   }
   var identicon = getIdenticon(pub, 40);
   var img = identicon.children('img').first();
@@ -737,7 +734,7 @@ function addChat(pub, chatLink) {
       chats[pub].name = name;
       el.find('.name').text(truncateString(name, 20));
       if (pub === activeChat) {
-        $('#header-content .name').text(truncateString(name, 30));
+        addUserToHeader(pub);
       }
     }
   });
