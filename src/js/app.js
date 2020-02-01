@@ -22,6 +22,7 @@ if (localStorageKey) {
 } else {
   newUserLogin();
 }
+showConsoleWarning();
 
 function getPeers() {
   var p = localStorage.getItem('gunPeers');

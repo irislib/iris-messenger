@@ -131,3 +131,19 @@ function hideAndRemove(el) {
     });
   });
 }
+
+function showConsoleWarning() {
+  var i = "Stop!",
+        j = "This is a browser feature intended for developers. If someone told you to copy-paste something here to enable a feature or \"hack\" someone's account, it is a scam and will give them access to your account.";
+
+  if ((window.chrome || window.safari)) {
+    var l = 'font-family:helvetica; font-size:20px; ';
+    [
+       [i, l + 'font-size:50px; font-weight:bold; ' + 'color:red; -webkit-text-stroke:1px black;'],
+       [j, l],
+       ['', '']
+    ].map(function(r) {
+        setTimeout(console.log.bind(console, '\n%c' + r[0], r[1]));
+    });
+  }
+}
