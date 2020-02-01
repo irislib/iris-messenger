@@ -1,7 +1,7 @@
 var isElectron = (userAgent.indexOf(' electron/') > -1);
 var peers = getPeers();
 Gun.log.off = true;
-var gun = Gun({peers: Object.keys(peers)});
+var gun = Gun({peers: Object.keys(_.pick(peers, p => { return p.connect; }))});
 window.gun = gun;
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
@@ -38,6 +38,7 @@ function getPeers() {
   if (isElectron) {
     p['http://localhost:8767/gun'] = {};
   }
+  Object.keys(p).forEach(k => _.defaults(p[k], {connect: true}));
   return p;
 }
 
@@ -47,6 +48,7 @@ function savePeers() {
 
 function addPeer(url) {
   peers[url] = peers[url] || {};
+  peers[url].connect = true;
   gun.opt({peers: [url]});
   savePeers();
 }
@@ -142,6 +144,7 @@ function updatePeerList() {
   var peersFromGun = gun.back('opt.peers');
   $('#peers .peer').remove();
   Object.keys(peers).forEach(url => {
+    var peer = peers[url];
     var peerFromGun = peersFromGun[url];
     var connected = peerFromGun && peerFromGun.wire && peerFromGun.wire.hied === 'hi';
     var row = $('<div>').addClass('flex-row peer');
@@ -155,13 +158,17 @@ function updatePeerList() {
         peerFromGun.url = '';
       }
     });
-    var connectBtn = $('<button>').text(connected ? 'Disconnect' : 'Connect').click(function() {
-      if (connected) {
+    var connectBtn = $('<button>').text(peer.connect ? 'Don\'t connect' : 'Connect').click(function() {
+      if (peer.connect) {
         gun.on('bye', peerFromGun);
         peerFromGun.url = '';
+        peer.connect = false;
+        $(this).text('Connect');
       } else {
         addPeer(url);
+        $(this).text('Don\'t connect');
       }
+      savePeers();
     });
     row.append(urlEl).append($('<div>').addClass('flex-cell no-flex').append(connectBtn).append(removeBtn));
     if (connected) {
