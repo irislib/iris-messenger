@@ -25,14 +25,13 @@ if (localStorageKey) {
 
 function getPeers() {
   var p = localStorage.getItem('gunPeers');
-  if (p) {
+  if (p && p !== 'undefined') {
     p = JSON.parse(p);
   } else {
     p = {
       'https://gun-us.herokuapp.com/gun': {},
       'https://gunjs.herokuapp.com/gun': {}
     };
-    savePeers();
   }
   if (isElectron) {
     p['http://localhost:8767/gun'] = {};
