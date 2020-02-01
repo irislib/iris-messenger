@@ -585,7 +585,6 @@ function showChat(pub) {
     $("#new-msg").focus();
   }
   $('#new-msg').off().on('input', () => {
-    console.log('setting isTyping true');
     chats[pub].setTyping($('#new-msg').val().length > 0);
   });
   $(".message-form form").off().on('submit', event => {

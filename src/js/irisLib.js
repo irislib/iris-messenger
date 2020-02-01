@@ -13512,21 +13512,12 @@
 	  Chat.prototype.getTheirMsgsLastSeenTime = async function getTheirMsgsLastSeenTime(callback) {
 	    var _this4 = this;
 
-	    var keys = _Object$keys(this.secrets);
-
-	    var _loop2 = async function _loop2(i) {
-	      var theirSecretChatId = await _this4.getTheirSecretChatId(keys[i]);
-	      _this4.gun.user(keys[i]).get('chats').get(theirSecretChatId).get('msgsLastSeenTime').on(async function (data) {
-	        _this4.theirMsgsLastSeenTime = await Gun.SEA.decrypt(data, (await _this4.getSecret(keys[i])));
-	        if (callback) {
-	          callback(_this4.theirMsgsLastSeenTime, keys[i]);
-	        }
-	      });
-	    };
-
-	    for (var i = 0; i < keys.length; i++) {
-	      await _loop2(i);
-	    }
+	    this.onTheirEncrypted('msgsLastSeenTime', function (time) {
+	      _this4.myMsgsLastSeenTime = time;
+	      if (callback) {
+	        callback(_this4.myMsgsLastSeenTime);
+	      }
+	    });
 	  };
 
 	  /**
@@ -13625,7 +13616,7 @@
 	    }
 	    var keys = _Object$keys(this.secrets);
 
-	    var _loop3 = async function _loop3(i) {
+	    var _loop2 = async function _loop2(i) {
 	      var ourSecretChatId = await _this6.getOurSecretChatId(keys[i]);
 	      _this6.gun.user().get('chats').get(ourSecretChatId).get(key).on(async function (data) {
 	        var decrypted = await Gun.SEA.decrypt(data, (await _this6.getSecret(keys[i])));
@@ -13637,9 +13628,9 @@
 	    };
 
 	    for (var i = 0; i < keys.length; i++) {
-	      var _ret3 = await _loop3(i);
+	      var _ret2 = await _loop2(i);
 
-	      if (_ret3 === 'break') break;
+	      if (_ret2 === 'break') break;
 	    }
 	  };
 
@@ -13656,7 +13647,7 @@
 	    }
 	    var keys = _Object$keys(this.secrets);
 
-	    var _loop4 = async function _loop4(i) {
+	    var _loop3 = async function _loop3(i) {
 	      var theirSecretChatId = await _this7.getTheirSecretChatId(keys[i]);
 	      _this7.gun.user(keys[i]).get('chats').get(theirSecretChatId).get(key).on(async function (data) {
 	        var decrypted = await Gun.SEA.decrypt(data, (await _this7.getSecret(keys[i])));
@@ -13667,7 +13658,7 @@
 	    };
 
 	    for (var i = 0; i < keys.length; i++) {
-	      await _loop4(i);
+	      await _loop3(i);
 	    }
 	  };
 
@@ -15266,7 +15257,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$2 = "0.0.134";
+	var version$2 = "0.0.135";
 
 	/*eslint no-useless-escape: "off", camelcase: "off" */
 
