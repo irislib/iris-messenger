@@ -1,5 +1,6 @@
 var isElectron = (userAgent.indexOf(' electron/') > -1);
 var peers = getPeers();
+Gun.log.off = true;
 var gun = Gun({peers: Object.keys(peers)});
 window.gun = gun;
 var notificationSound = new Audio('./notification.mp3');
