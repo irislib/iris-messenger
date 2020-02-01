@@ -821,25 +821,27 @@ function addChat(pub, chatLink) {
       }
     }
   });
-  _.defer(() => {
-    gun.user(pub).get('peers').once().map().on((peer, b, c, eve) => {
-      console.log('got peer', peer, 'from', pub, b);
-      if (peer && peer.url && Object.keys(peers).length < 8) {
-        addPeer({url: peer.url, connect: true, from: pub});
-      }
-    });
-  });
   el.click(() => showChat(pub));
   $(".chat-list").append(el);
   chats[pub].getTheirMsgsLastSeenTime(time => {
     chats[pub].theirLastSeenTime = new Date(time);
     lastSeenTimeChanged(pub);
   });
+  var askForPeers = _.once(() => {
+    _.defer(() => {
+      gun.user(pub).get('peers').once().map().on(peer => {
+        if (peer && peer.url && Object.keys(peers).length < 8) {
+          addPeer({url: peer.url, connect: true, from: pub});
+        }
+      });
+    });
+  });
   chats[pub].getMyMsgsLastSeenTime(time => {
     chats[pub].myLastSeenTime = new Date(time);
     if (chats[pub].latest && chats[pub].myLastSeenTime >= chats[pub].latest.time) {
       changeChatUnseenCount(pub, 0);
     }
+    askForPeers();
   });
   chats[pub].getTyping(isTyping => {
     if (activeChat === pub) {
