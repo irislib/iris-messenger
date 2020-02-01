@@ -46,7 +46,7 @@ function savePeers() {
 }
 
 function addPeer(url) {
-  peers[url] = {};
+  peers[url] = peers[url] || {};
   gun.opt({peers: [url]});
   savePeers();
 }
@@ -141,18 +141,34 @@ function setChatLinkQrCode(link) {
 function updatePeerList() {
   var peersFromGun = gun.back('opt.peers');
   $('#peers .peer').remove();
-  Object.values(peersFromGun).forEach(peer => {
-    if (!peer.url) { return; }
+  Object.keys(peers).forEach(url => {
+    var peerFromGun = peersFromGun[url];
+    var connected = peerFromGun && peerFromGun.wire && peerFromGun.wire.hied === 'hi';
     var row = $('<div>').addClass('flex-row peer');
-    var url = $('<div>').addClass('flex-cell').text(peer.url);
-    var btn = $('<button>Remove</button>').click(() => {
+    var urlEl = $('<div>').addClass('flex-cell').text(url);
+    var removeBtn = $('<button>Remove</button>').click(() => {
       hideAndRemove(row);
-      gun.on('bye', peer);
-      delete peers[peer.url];
+      delete peers[url];
       savePeers();
-      peer.url = '';
+      if (peerFromGun) {
+        gun.on('bye', peerFromGun);
+        peerFromGun.url = '';
+      }
     });
-    row.append(url).append($('<div>').addClass('flex-cell no-flex').append(btn));
+    var connectBtn = $('<button>').text(connected ? 'Disconnect' : 'Connect').click(function() {
+      if (connected) {
+        gun.on('bye', peerFromGun);
+        peerFromGun.url = '';
+      } else {
+        addPeer(url);
+      }
+    });
+    row.append(urlEl).append($('<div>').addClass('flex-cell no-flex').append(connectBtn).append(removeBtn));
+    if (connected) {
+      row.prepend('+ ');
+    } else {
+      row.prepend('- ');
+    }
     $('#peers').prepend(row);
   });
 }

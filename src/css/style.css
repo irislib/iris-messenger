@@ -512,3 +512,7 @@ small {
   color: #05b246;
   font-weight: bold;
 }
+
+.peer button {
+  margin-left: 5px;
+}
