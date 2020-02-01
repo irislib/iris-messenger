@@ -46,11 +46,40 @@ function savePeers() {
   localStorage.setItem('gunPeers', JSON.stringify(peers));
 }
 
-function addPeer(url) {
-  peers[url] = peers[url] || {};
-  peers[url].connect = true;
-  gun.opt({peers: [url]});
+function connectPeer(url) {
+  if (peers[url]) {
+    peers[url].connect = true;
+    gun.opt({peers: [url]});
+    savePeers();
+  } else {
+    addPeer({url});
+  }
+}
+
+function disconnectPeer(url, peerFromGun) {
+  peers[url].connect = false;
+  if (peerFromGun) {
+    gun.on('bye', peerFromGun);
+    peerFromGun.url = '';
+  }
   savePeers();
+}
+
+async function addPeer(peer) {
+  peers[peer.url] = peers[peer.url] || _.omit(peer, 'url');
+  if (peer.visibility === 'public') {
+    console.log('sharing peer publicly');
+    // rolling some crypto operations to obfuscate actual url in case we want to remove it
+    var secret = await Gun.SEA.secret(key.epub, key);
+    var encryptedUrl = await Gun.SEA.encrypt(peer.url, secret);
+    var encryptedUrlHash = await Gun.SEA.work(encryptedUrl, null, null, {name: 'SHA-256'});
+    gun.user().get('peers').get(encryptedUrlHash).put({url: peer.url, lastSeen: new Date().toISOString()});
+  }
+  if (peer.connect !== false) {
+    connectPeer(peer.url);
+  } else {
+    savePeers();
+  }
 }
 
 function newUserLogin() {
@@ -150,7 +179,7 @@ function updatePeerList() {
     var row = $('<div>').addClass('flex-row peer');
     var urlEl = $('<div>').addClass('flex-cell').text(url);
     var removeBtn = $('<button>Remove</button>').click(() => {
-      hideAndRemove(row);
+      hideAndRemove(row); // this may be screwed by setInterval removing before animation finished
       delete peers[url];
       savePeers();
       if (peerFromGun) {
@@ -160,15 +189,11 @@ function updatePeerList() {
     });
     var connectBtn = $('<button>').text(peer.connect ? 'Don\'t connect' : 'Connect').click(function() {
       if (peer.connect) {
-        gun.on('bye', peerFromGun);
-        peerFromGun.url = '';
-        peer.connect = false;
-        $(this).text('Connect');
+        disconnectPeer(url, peerFromGun);
       } else {
-        addPeer(url);
-        $(this).text('Don\'t connect');
+        connectPeer(url);
       }
-      savePeers();
+      updatePeerList();
     });
     row.append(urlEl).append($('<div>').addClass('flex-cell no-flex').append(connectBtn).append(removeBtn));
     if (connected) {
@@ -176,15 +201,23 @@ function updatePeerList() {
     } else {
       row.prepend('- ');
     }
+    if (peer.from) {
+      urlEl.append($('<br>'));
+      urlEl.append(
+        $('<small>').text('from ' + ((chats[peer.from] && chats[peer.from].name) || truncateString(peer.from, 10)))
+        .css({cursor:'pointer'}).click(() => showChat(peer.from))
+      );
+    }
     $('#peers').prepend(row);
   });
 }
 updatePeerList();
 setInterval(updatePeerList, 2000);
 $('#add-peer-btn').click(() => {
-  var url = $('#add-peer-input').val();
-  addPeer(url);
-  $('#add-peer-input').val('');
+  var url = $('#add-peer-url').val();
+  var visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
+  addPeer({url, visibility});
+  $('#add-peer-url').val('');
   updatePeerList();
 });
 
@@ -787,6 +820,14 @@ function addChat(pub, chatLink) {
         addUserToHeader(pub);
       }
     }
+  });
+  _.defer(() => {
+    gun.user(pub).get('peers').once().map().on((peer, b, c, eve) => {
+      console.log('got peer', peer, 'from', pub, b);
+      if (peer && peer.url && Object.keys(peers).length < 8) {
+        addPeer({url: peer.url, connect: true, from: pub});
+      }
+    });
   });
   el.click(() => showChat(pub));
   $(".chat-list").append(el);
