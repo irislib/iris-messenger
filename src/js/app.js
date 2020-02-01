@@ -1,9 +1,6 @@
 var isElectron = (userAgent.indexOf(' electron/') > -1);
-var peers = ['https://gun-us.herokuapp.com/gun', 'https://gunjs.herokuapp.com/gun'];
-if (isElectron) {
-  peers.push('http://localhost:8767/gun');
-}
-var gun = Gun({peers});
+var peers = getPeers();
+var gun = Gun({peers: Object.keys(peers)});
 window.gun = gun;
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
@@ -24,6 +21,33 @@ if (localStorageKey) {
   login(JSON.parse(localStorageKey));
 } else {
   newUserLogin();
+}
+
+function getPeers() {
+  var p = localStorage.getItem('gunPeers');
+  if (p) {
+    p = JSON.parse(p);
+  } else {
+    p = {
+      'https://gun-us.herokuapp.com/gun': {},
+      'https://gunjs.herokuapp.com/gun': {}
+    };
+    savePeers();
+  }
+  if (isElectron) {
+    p['http://localhost:8767/gun'] = {};
+  }
+  return p;
+}
+
+function savePeers() {
+  localStorage.setItem('gunPeers', JSON.stringify(peers));
+}
+
+function addPeer(url) {
+  peers[url] = {};
+  gun.opt({peers: [url]});
+  savePeers();
 }
 
 function newUserLogin() {
@@ -114,15 +138,18 @@ function setChatLinkQrCode(link) {
 }
 
 function updatePeerList() {
-  var peers = gun.back('opt.peers');
+  var peersFromGun = gun.back('opt.peers');
   $('#peers .peer').remove();
-  Object.values(peers).forEach(peer => {
+  Object.values(peersFromGun).forEach(peer => {
     if (!peer.url) { return; }
     var row = $('<div>').addClass('flex-row peer');
     var url = $('<div>').addClass('flex-cell').text(peer.url);
     var btn = $('<button>Remove</button>').click(() => {
       hideAndRemove(row);
       gun.on('bye', peer);
+      delete peers[peer.url];
+      savePeers();
+      peer.url = '';
     });
     row.append(url).append($('<div>').addClass('flex-cell no-flex').append(btn));
     $('#peers').prepend(row);
@@ -132,7 +159,7 @@ updatePeerList();
 setInterval(updatePeerList, 2000);
 $('#add-peer-btn').click(() => {
   var url = $('#add-peer-input').val();
-  gun.opt({peers: [url]});
+  addPeer(url);
   $('#add-peer-input').val('');
   updatePeerList();
 });
