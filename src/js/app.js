@@ -1,7 +1,12 @@
+Gun.log.off = true;
 var isElectron = (userAgent.indexOf(' electron/') > -1);
 var peers = getPeers();
-Gun.log.off = true;
-var gun = Gun({peers: Object.keys(_.pick(peers, p => { return p.connect; }))});
+var randomPeers = _.sample(
+  Object.keys(
+    _.pick(peers, p => { return p.enabled; })
+  ), 3
+);
+var gun = Gun({ peers: randomPeers });
 window.gun = gun;
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
@@ -38,7 +43,7 @@ function getPeers() {
   if (isElectron) {
     p['http://localhost:8767/gun'] = {};
   }
-  Object.keys(p).forEach(k => _.defaults(p[k], {connect: true}));
+  Object.keys(p).forEach(k => _.defaults(p[k], {enabled: true}));
   return p;
 }
 
@@ -48,7 +53,7 @@ function savePeers() {
 
 function connectPeer(url) {
   if (peers[url]) {
-    peers[url].connect = true;
+    peers[url].enabled = true;
     gun.opt({peers: [url]});
     savePeers();
   } else {
@@ -57,7 +62,7 @@ function connectPeer(url) {
 }
 
 function disconnectPeer(url, peerFromGun) {
-  peers[url].connect = false;
+  peers[url].enabled = false;
   if (peerFromGun) {
     gun.on('bye', peerFromGun);
     peerFromGun.url = '';
@@ -75,7 +80,7 @@ async function addPeer(peer) {
     var encryptedUrlHash = await Gun.SEA.work(encryptedUrl, null, null, {name: 'SHA-256'});
     gun.user().get('peers').get(encryptedUrlHash).put({url: peer.url, lastSeen: new Date().toISOString()});
   }
-  if (peer.connect !== false) {
+  if (peer.enabled !== false) {
     connectPeer(peer.url);
   } else {
     savePeers();
@@ -187,8 +192,8 @@ function updatePeerList() {
         peerFromGun.url = '';
       }
     });
-    var connectBtn = $('<button>').text(peer.connect ? 'Don\'t connect' : 'Connect').click(function() {
-      if (peer.connect) {
+    var connectBtn = $('<button>').text(peer.enabled ? 'Disable' : 'Enable').click(function() {
+      if (peer.enabled) {
         disconnectPeer(url, peerFromGun);
       } else {
         connectPeer(url);
