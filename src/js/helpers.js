@@ -2,6 +2,11 @@ var emojiRegex =  /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{
 var userAgent = navigator.userAgent.toLowerCase();
 var isElectron = (userAgent.indexOf(' electron/') > -1);
 
+function isUrl(s) {
+  var matches = Autolinker.parse(s, {urls: true});
+  return matches.length === 1 && matches[0].getUrl() === s;
+}
+
 function isEmoji(s) {
   return s.match(emojiRegex);
 }

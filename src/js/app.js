@@ -1,13 +1,37 @@
 Gun.log.off = true;
 var isElectron = (userAgent.indexOf(' electron/') > -1);
+var MAX_PEER_LIST_SIZE = 8;
+var MAX_CONNECTED_PEERS = isElectron ? 4 : 2;
 var peers = getPeers();
 var randomPeers = _.sample(
   Object.keys(
     _.pick(peers, p => { return p.enabled; })
-  ), 3
+  ), MAX_CONNECTED_PEERS
 );
 var gun = Gun({ peers: randomPeers });
 window.gun = gun;
+
+function checkGunPeerCount() {
+  var peersFromGun = gun.back('opt.peers');
+  var connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
+    return peer && peer.wire && peer.wire.hied === 'hi';
+  });
+  if (connectedPeers.length < MAX_CONNECTED_PEERS) {
+    var unconnectedPeers = _.filter(Object.keys(peers), url => {
+      var addedToGun = _.pluck(Object.values(peersFromGun), 'url').indexOf(url) > -1;
+      var enabled = peers[url].enabled;
+      return enabled && !addedToGun;
+    });
+    if (unconnectedPeers.length) {
+      connectPeer(_.sample(unconnectedPeers));
+    }
+  }
+  if (connectedPeers.length > MAX_CONNECTED_PEERS) {
+    disconnectPeer(_.sample(connectedPeers));
+  }
+}
+setInterval(checkGunPeerCount, 2000);
+
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
 var chats = {};
@@ -37,6 +61,7 @@ function getPeers() {
   } else {
     p = {
       'https://gun-us.herokuapp.com/gun': {},
+      'https://gun-eu.herokuapp.com/gun': {},
       'https://gunjs.herokuapp.com/gun': {}
     };
   }
@@ -45,6 +70,11 @@ function getPeers() {
   }
   Object.keys(p).forEach(k => _.defaults(p[k], {enabled: true}));
   return p;
+}
+
+function resetPeers() {
+  localStorage.setItem('gunPeers', undefined);
+  peers = getPeers();
 }
 
 function savePeers() {
@@ -61,19 +91,25 @@ function connectPeer(url) {
   }
 }
 
-function disconnectPeer(url, peerFromGun) {
+function disablePeer(url, peerFromGun) {
   peers[url].enabled = false;
   if (peerFromGun) {
-    gun.on('bye', peerFromGun);
-    peerFromGun.url = '';
+    disconnectPeer(peerFromGun);
   }
   savePeers();
 }
 
+function disconnectPeer(peerFromGun) {
+  gun.on('bye', peerFromGun);
+  peerFromGun.url = '';
+}
+
 async function addPeer(peer) {
+  if (!isUrl(peer.url)) {
+    throw new Error('Invalid url', peer.url);
+  }
   peers[peer.url] = peers[peer.url] || _.omit(peer, 'url');
   if (peer.visibility === 'public') {
-    console.log('sharing peer publicly');
     // rolling some crypto operations to obfuscate actual url in case we want to remove it
     var secret = await Gun.SEA.secret(key.epub, key);
     var encryptedUrl = await Gun.SEA.encrypt(peer.url, secret);
@@ -177,7 +213,16 @@ function setChatLinkQrCode(link) {
 function updatePeerList() {
   var peersFromGun = gun.back('opt.peers');
   $('#peers .peer').remove();
-  Object.keys(peers).forEach(url => {
+  $('#reset-peers').remove();
+  var urls = Object.keys(peers);
+  if (urls.length === 0) {
+    var resetBtn = $('<button>').attr('id', 'reset-peers').css({'margin-bottom': '15px'}).text('Reset default peers').click(() => {
+      resetPeers();
+      updatePeerList();
+    });
+    $('#peers').prepend(resetBtn);
+  }
+  urls.forEach(url => {
     var peer = peers[url];
     var peerFromGun = peersFromGun[url];
     var connected = peerFromGun && peerFromGun.wire && peerFromGun.wire.hied === 'hi';
@@ -188,13 +233,12 @@ function updatePeerList() {
       delete peers[url];
       savePeers();
       if (peerFromGun) {
-        gun.on('bye', peerFromGun);
-        peerFromGun.url = '';
+        disconnectPeer(peerFromGun);
       }
     });
     var connectBtn = $('<button>').text(peer.enabled ? 'Disable' : 'Enable').click(function() {
       if (peer.enabled) {
-        disconnectPeer(url, peerFromGun);
+        disablePeer(url, peerFromGun);
       } else {
         connectPeer(url);
       }
@@ -835,8 +879,22 @@ function addChat(pub, chatLink) {
   var askForPeers = _.once(() => {
     _.defer(() => {
       gun.user(pub).get('peers').once().map().on(peer => {
-        if (peer && peer.url && Object.keys(peers).length < 8) {
+        if (peer && peer.url) {
+          var peerCountBySource = _.countBy(peers, p => p.from);
+          var peerSourceCount = Object.keys(peerCountBySource).length;
+          if (!peerCountBySource[pub]) {
+            peerSourceCount += 1;
+          }
+          var maxPeersFromSource = MAX_PEER_LIST_SIZE / peerSourceCount;
           addPeer({url: peer.url, connect: true, from: pub});
+          while (Object.keys(peers).length > MAX_PEER_LIST_SIZE) {
+            _.each(Object.keys(peerCountBySource), source => {
+              if (peerCountBySource[source] > maxPeersFromSource) {
+                delete peers[_.sample(Object.keys(peers))];
+                peerCountBySource[source] -= 1;
+              }
+            });
+          }
         }
       });
     });
