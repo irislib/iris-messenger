@@ -1,6 +1,6 @@
 Gun.log.off = true;
 var isElectron = (userAgent.indexOf(' electron/') > -1);
-var MAX_PEER_LIST_SIZE = 8;
+var MAX_PEER_LIST_SIZE = 10;
 var MAX_CONNECTED_PEERS = isElectron ? 4 : 2;
 var peers = getPeers();
 var randomPeers = _.sample(
@@ -158,6 +158,12 @@ function login(k) {
   $("#my-identicon").empty();
   $("#my-identicon").append(myIdenticon);
   $(".user-info").off().on('click', showSettings);
+  $(".profile-link").attr('href', getUserChatLink(key.pub)).off().on('click', e => {
+    e.preventDefault();
+    if (chats[key.pub]) {
+      showProfile(key.pub);      
+    }
+  });
   setOurOnlineStatus();
   irisLib.Chat.getChats(gun, key, addChat);
   var chatWith = getUrlParameter('chatWith');
@@ -657,7 +663,7 @@ function changeChatUnseenCount(pub, change) {
 
 function setTheirOnlineStatus(pub) {
   var online = chats[pub].online;
-  if (activeChat === pub || activeProfile === pub) {
+  if (online && (activeChat === pub || activeProfile === pub)) {
     if (online.isOnline) {
       $('#header-content .last-seen').text('online');
     } else if (online.lastActive) {
