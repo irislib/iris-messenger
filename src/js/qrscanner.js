@@ -4,9 +4,8 @@ window.addEventListener('load', function () {
     console.log('ZXing code reader initialized')
     codeReader.getVideoInputDevices()
         .then((videoInputDevices) => {
-            selectedDeviceId = videoInputDevices[0].deviceId
             document.getElementById('startButton').addEventListener('click', () => {
-                codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+                codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
                     if (result) {
                         console.log(result)
                         var privkey = document.getElementById('paste-privkey')
