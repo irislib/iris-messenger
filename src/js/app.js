@@ -135,13 +135,13 @@ function login(k) {
   chats = {};
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
-  irisLib.Chat.initUser(gun, key);
+  iris.Chat.initUser(gun, key);
   $('#my-chat-links').empty();
-  irisLib.Chat.getMyChatLinks(gun, key, undefined, chatLink => {
+  iris.Chat.getMyChatLinks(gun, key, undefined, chatLink => {
     var row = $('<div>').addClass('flex-row');
     var text = $('<div>').addClass('flex-cell').text(chatLink.url);
     var btn = $('<button>Remove</button>').click(() => {
-      irisLib.Chat.removeChatLink(gun, key, chatLink.id);
+      iris.Chat.removeChatLink(gun, key, chatLink.id);
       hideAndRemove(row);
     });
     row.append(text);
@@ -161,11 +161,11 @@ function login(k) {
   $(".profile-link").attr('href', getUserChatLink(key.pub)).off().on('click', e => {
     e.preventDefault();
     if (chats[key.pub]) {
-      showProfile(key.pub);      
+      showProfile(key.pub);
     }
   });
   setOurOnlineStatus();
-  irisLib.Chat.getChats(gun, key, addChat);
+  iris.Chat.getChats(gun, key, addChat);
   var chatWith = getUrlParameter('chatWith');
   if (chatWith) {
     addChat(chatWith, window.location.href);
@@ -199,7 +199,7 @@ function login(k) {
 }
 
 async function createChatLink() {
-  latestChatLink = await irisLib.Chat.createChatLink(gun, key);
+  latestChatLink = await iris.Chat.createChatLink(gun, key);
   setChatLinkQrCode(latestChatLink);
 }
 
@@ -315,24 +315,24 @@ $('#settings-name').on('input', event => {
 });
 
 function setOurOnlineStatus() {
-  irisLib.Chat.setOnline(gun, areWeOnline = true);
+  iris.Chat.setOnline(gun, areWeOnline = true);
   document.addEventListener("mousemove", () => {
     if (!areWeOnline && activeChat) {
       chats[activeChat].setMyMsgsLastSeenTime();
     }
-    irisLib.Chat.setOnline(gun, areWeOnline = true);
+    iris.Chat.setOnline(gun, areWeOnline = true);
     clearTimeout(onlineTimeout);
-    onlineTimeout = setTimeout(() => irisLib.Chat.setOnline(gun, areWeOnline = false), 60000);
+    onlineTimeout = setTimeout(() => iris.Chat.setOnline(gun, areWeOnline = false), 60000);
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
-      irisLib.Chat.setOnline(gun, areWeOnline = true);
+      iris.Chat.setOnline(gun, areWeOnline = true);
       if (activeChat) {
         chats[activeChat].setMyMsgsLastSeenTime();
         changeChatUnseenCount(activeChat, 0);
       }
     } else {
-      irisLib.Chat.setOnline(gun, areWeOnline = false);
+      iris.Chat.setOnline(gun, areWeOnline = false);
     }
   });
 }
@@ -733,7 +733,7 @@ function showChat(pub) {
   chats[pub].setMyMsgsLastSeenTime();
   if (!chats[pub].online) {
     chats[pub].online = {};
-    irisLib.Chat.getOnline(gun, pub, (online) => {
+    iris.Chat.getOnline(gun, pub, (online) => {
       if (chats[pub]) {
         chats[pub].online = online;
         setTheirOnlineStatus(pub);
@@ -745,7 +745,7 @@ function showChat(pub) {
 
 function getIdenticon(pub, width) {
   var el = $('<div>').width(width).height(width).addClass('identicon');
-  var identicon = $(new irisLib.Attribute({type: 'keyID', value: pub}).identicon({width, showType: false}));
+  var identicon = $(new iris.Attribute({type: 'keyID', value: pub}).identicon({width, showType: false}));
   el.html(identicon);
   gun.user(pub).get('profile').get('photo').on(data => { // TODO: limit size
     if (data) {
@@ -806,7 +806,7 @@ function addMessage(msg) {
 }
 
 function deleteChat(pub) {
-  irisLib.Chat.deleteChat(gun, key, pub);
+  iris.Chat.deleteChat(gun, key, pub);
   if (activeChat === pub) {
     showNewChat();
     showMenu();
@@ -824,7 +824,7 @@ function addChat(pub, chatLink) {
   el.attr('data-pub', pub);
   var latestEl = el.find('.latest');
   var typingIndicator = el.find('.typing-indicator').text('Typing...');
-  chats[pub] = new irisLib.Chat({gun, key, chatLink: chatLink, participants: pub, onMessage: (msg, info) => {
+  chats[pub] = new iris.Chat({gun, key, chatLink: chatLink, participants: pub, onMessage: (msg, info) => {
     msg.selfAuthored = info.selfAuthored;
     chats[pub].messages[msg.time] = msg;
     msg.time = new Date(msg.time);
