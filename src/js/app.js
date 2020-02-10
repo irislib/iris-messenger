@@ -668,11 +668,11 @@ function setTheirOnlineStatus(pub) {
       $('#header-content .last-seen').text('online');
     } else if (online.lastActive) {
       var d = new Date(online.lastActive * 1000);
-      var lastSeenText = getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'}));
+      var lastSeenText = iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'}));
       if (lastSeenText === 'today') {
-        lastSeenText = formatTime(d);
+        lastSeenText = iris.util.formatTime(d);
       } else {
-        lastSeenText = formatDate(d);
+        lastSeenText = iris.util.formatDate(d);
       }
       $('#header-content .last-seen').text('last active ' + lastSeenText);
     }
@@ -776,7 +776,7 @@ function sortMessagesByTime() {
     if (!date) { return; }
     var dateStr = date.toLocaleDateString();
     if (dateStr !== previousDateStr) {
-      var separatorText = getDaySeparatorText(date, dateStr, now, nowStr);
+      var separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
       $(this).before($('<div>').text(separatorText).addClass('day-separator'));
     }
     previousDateStr = dateStr;
@@ -790,7 +790,7 @@ function addMessage(msg) {
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
   var seenHtml = msg.selfAuthored ? ' ' + seenIndicatorHtml : '';
   var msgContent = $(
-    '<div class="msg-content"><div class="time">' + formatTime(msg.time) + seenHtml + '</div></div>'
+    '<div class="msg-content"><div class="time">' + iris.util.formatTime(msg.time) + seenHtml + '</div></div>'
   );
   msgContent.prepend(textEl);
   if (msg.text.length === 2 && isEmoji(msg.text)) {
@@ -841,8 +841,8 @@ function addChat(pub, chatLink) {
       chats[pub].latest = msg;
       var text = truncateString(msg.text, 100);
       var now = new Date();
-      var latestTimeText = getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
-      if (latestTimeText === 'today') { latestTimeText = formatTime(msg.time); }
+      var latestTimeText = iris.util.getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
+      if (latestTimeText === 'today') { latestTimeText = iris.util.formatTime(msg.time); }
       latestEl.text(text);
       latestEl.html(highlightEmoji(latestEl.html()));
       if (info.selfAuthored) {

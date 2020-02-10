@@ -11435,6 +11435,23 @@
 	      }, timeout);
 	    })]);
 	  },
+	  getCaret: function getCaret(el) {
+	    if (el.selectionStart) {
+	      return el.selectionStart;
+	    } else if (document.selection) {
+	      el.focus();
+	      var r = document.selection.createRange();
+	      if (r == null) {
+	        return 0;
+	      }
+	      var re = el.createTextRange(),
+	          rc = re.duplicate();
+	      re.moveToBookmark(r.getBookmark());
+	      rc.setEndPoint('EndToStart', re);
+	      return rc.text.length;
+	    }
+	    return 0;
+	  },
 	  injectCss: function injectCss() {
 	    var elementId = 'irisStyle';
 	    if (document.getElementById(elementId)) {
@@ -11442,8 +11459,8 @@
 	    }
 	    var sheet = document.createElement('style');
 	    sheet.id = elementId;
-	    sheet.innerHTML = '\n      .iris-identicon * {\n        box-sizing: border-box;\n      }\n\n      .iris-identicon {\n        vertical-align: middle;\n        border-radius: 50%;\n        text-align: center;\n        display: inline-block;\n        position: relative;\n        max-width: 100%;\n      }\n\n      .iris-distance {\n        z-index: 2;\n        position: absolute;\n        left:0%;\n        top:2px;\n        width: 100%;\n        text-align: right;\n        color: #fff;\n        text-shadow: 0 0 1px #000;\n        font-size: 75%;\n        line-height: 75%;\n        font-weight: bold;\n      }\n\n      .iris-pie {\n        border-radius: 50%;\n        position: absolute;\n        top: 0;\n        left: 0;\n        box-shadow: 0px 0px 0px 0px #82FF84;\n        padding-bottom: 100%;\n        max-width: 100%;\n        -webkit-transition: all 0.2s ease-in-out;\n        -moz-transition: all 0.2s ease-in-out;\n        transition: all 0.2s ease-in-out;\n      }\n\n      .iris-card {\n        padding: 10px;\n        background-color: #f7f7f7;\n        color: #777;\n        border: 1px solid #ddd;\n        display: flex;\n        flex-direction: row;\n        overflow: hidden;\n      }\n\n      .iris-card a {\n        -webkit-transition: color 150ms;\n        transition: color 150ms;\n        text-decoration: none;\n        color: #337ab7;\n      }\n\n      .iris-card a:hover, .iris-card a:active {\n        text-decoration: underline;\n        color: #23527c;\n      }\n\n      .iris-pos {\n        color: #3c763d;\n      }\n\n      .iris-neg {\n        color: #a94442;\n      }\n\n      .iris-identicon img {\n        position: absolute;\n        top: 0;\n        left: 0;\n        max-width: 100%;\n        border-radius: 50%;\n        border-color: transparent;\n        border-style: solid;\n      }';
-	    document.body.appendChild(sheet);
+	    sheet.innerHTML = '\n      .iris-identicon * {\n        box-sizing: border-box;\n      }\n\n      .iris-identicon {\n        vertical-align: middle;\n        border-radius: 50%;\n        text-align: center;\n        display: inline-block;\n        position: relative;\n        max-width: 100%;\n      }\n\n      .iris-distance {\n        z-index: 2;\n        position: absolute;\n        left:0%;\n        top:2px;\n        width: 100%;\n        text-align: right;\n        color: #fff;\n        text-shadow: 0 0 1px #000;\n        font-size: 75%;\n        line-height: 75%;\n        font-weight: bold;\n      }\n\n      .iris-pie {\n        border-radius: 50%;\n        position: absolute;\n        top: 0;\n        left: 0;\n        box-shadow: 0px 0px 0px 0px #82FF84;\n        padding-bottom: 100%;\n        max-width: 100%;\n        -webkit-transition: all 0.2s ease-in-out;\n        -moz-transition: all 0.2s ease-in-out;\n        transition: all 0.2s ease-in-out;\n      }\n\n      .iris-card {\n        padding: 10px;\n        background-color: #f7f7f7;\n        color: #777;\n        border: 1px solid #ddd;\n        display: flex;\n        flex-direction: row;\n        overflow: hidden;\n      }\n\n      .iris-card a {\n        -webkit-transition: color 150ms;\n        transition: color 150ms;\n        text-decoration: none;\n        color: #337ab7;\n      }\n\n      .iris-card a:hover, .iris-card a:active {\n        text-decoration: underline;\n        color: #23527c;\n      }\n\n      .iris-pos {\n        color: #3c763d;\n      }\n\n      .iris-neg {\n        color: #a94442;\n      }\n\n      .iris-identicon img {\n        position: absolute;\n        top: 0;\n        left: 0;\n        max-width: 100%;\n        border-radius: 50%;\n        border-color: transparent;\n        border-style: solid;\n      }\n\n      .iris-chat-box {\n        position: fixed;\n        bottom: 0.5rem;\n        right: 0.5rem;\n        border-radius: 8px;\n        background-color: #fff;\n        max-height: 25rem;\n        box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);\n        height: calc(100% - 44px);\n        display: flex;\n        flex-direction: column;\n        width: 320px;\n        font-family: system-ui;\n        font-size: 15px;\n        color: rgb(38, 38, 38);\n      }\n\n      .iris-chat-header {\n        background-color: #1e1e1e;\n        height: 44px;\n        color: #fff;\n        border-radius: 8px 8px 0 0;\n        text-align: center;\n        display: flex;\n        justify-content: center;\n        align-items: center;\n        flex: none;\n        white-space: nowrap;\n        text-overflow: ellipsis;\n        overflow: hidden;\n      }\n\n      .iris-chat-messages {\n        flex: 1;\n        padding: 15px;\n        overflow-y: scroll;\n      }\n\n      .iris-chat-input-wrapper {\n        flex: none;\n        padding: 15px;\n        background-color: #efefef;\n      }\n\n      .iris-chat-input-wrapper form {\n        margin: 0;\n      }\n\n      .iris-chat-input-wrapper textarea {\n        padding: 15px 8px;\n        border-radius: 4px;\n        border: 1px solid rgba(0,0,0,0);\n        width: 100%;\n        font-size: 15px;\n        resize: none;\n      }\n\n      .iris-chat-input-wrapper textarea:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-message {\n        display: flex;\n        flex-direction: column;\n        margin-bottom: 2px;\n        overflow-wrap: break-word;\n      }\n\n      .iris-msg-content {\n        background-color: #efefef;\n        padding: 6px 10px;\n        border-radius: 8px;\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        flex: none;\n        max-width: 75%;\n      }\n\n      .emoji {\n        font-size: 1.3em;\n        line-height: 1em;\n      }\n\n      .iris-chat-message .emoji-only {\n        font-size: 3em;\n        text-align: center;\n      }\n\n      .chat-list .seen {\n        margin-right: 5px;\n      }\n\n      .seen {\n        color: rgba(0, 0, 0, 0.45);\n        user-select: none;\n      }\n\n      .seen.yes {\n        color: #4fc3f7;\n      }\n\n      .seen svg {\n        width: 15px;\n      }\n\n      .iris-chat-message.their {\n        align-items: flex-start;\n      }\n\n      .iris-chat-message.their + .iris-chat-message.our .iris-msg-content, .day-separator + .iris-chat-message.our .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.their:first-of-type .iris-msg-content {\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our:first-of-type .iris-msg-content {\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.our + .iris-chat-message.their .iris-msg-content, .day-separator + .iris-chat-message.their .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our {\n        align-items: flex-end;\n      }\n\n      .iris-chat-message.our .iris-msg-content {\n        background-color: #c5ecf7;\n      }\n\n      .iris-chat-message .time {\n        text-align: right;\n        font-size: 12px;\n        color: rgba(0, 0, 0, 0.45);\n      }\n\n      .day-separator {\n        display: inline-block;\n        border-radius: 8px;\n        background-color: rgba(227, 249, 255, 0.91);\n        padding: 6px 10px;\n        margin-top: 15px;\n        margin-left: auto;\n        margin-right: auto;\n        text-transform: uppercase;\n        font-size: 13px;\n        color: rgba(74, 74, 74, 0.88);\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        user-select: none;\n      }\n\n      .day-separator:first-of-type {\n        margin-top: 0;\n      }\n      ';
+	    document.head.prepend(sheet);
 	  },
 	  getUrlParameter: function getUrlParameter(sParam, sParams) {
 	    var sPageURL = sParams || window.location.search.substring(1);
@@ -11457,6 +11474,41 @@
 	        return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
 	      }
 	    }
+	  },
+	  formatTime: function formatTime(date) {
+	    var t = date.toLocaleTimeString(undefined, { timeStyle: 'short' });
+	    var s = t.split(':');
+	    if (s.length === 3) {
+	      // safari tries to display seconds
+	      return s[0] + ':' + s[1] + s[2].slice(2);
+	    }
+	    return t;
+	  },
+	  formatDate: function formatDate(date) {
+	    var t = date.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
+	    var s = t.split(':');
+	    if (s.length === 3) {
+	      // safari tries to display seconds
+	      return s[0] + ':' + s[1] + s[2].slice(2);
+	    }
+	    return t;
+	  },
+	  getDaySeparatorText: function getDaySeparatorText(date, dateStr, now, nowStr) {
+	    if (!now) {
+	      now = new Date();
+	      nowStr = now.toLocaleDateString({ dateStyle: 'short' });
+	    }
+	    if (dateStr === nowStr) {
+	      return 'today';
+	    }
+	    var dayDifference = Math.round((now - date) / (1000 * 60 * 60 * 24));
+	    if (dayDifference <= 1) {
+	      return 'yesterday';
+	    }
+	    if (dayDifference <= 5) {
+	      return date.toLocaleDateString(undefined, { weekday: 'long' });
+	    }
+	    return dateStr;
 	  },
 
 
@@ -13329,7 +13381,10 @@
 	    this.secrets = {}; // maps participant public key to shared secret
 	    this.ourSecretChatIds = {}; // maps participant public key to our secret chat id
 	    this.theirSecretChatIds = {}; // maps participant public key to their secret chat id
-	    this.onMessage = options.onMessage;
+	    this.onMessage = [];
+	    if (options.onMessage) {
+	      this.onMessage.push(options.onMessage);
+	    }
 	    this.messages = {};
 
 	    var saved = void 0;
@@ -13444,7 +13499,7 @@
 	    if (this.messages[key]) {
 	      return;
 	    }
-	    if (this.onMessage) {
+	    if (this.onMessage.length) {
 	      var decrypted = await Gun.SEA.decrypt(data, (await this.getSecret(pub)));
 	      if (typeof decrypted !== 'object') {
 	        // console.log(`chat data received`, decrypted);
@@ -13452,7 +13507,9 @@
 	      }
 	      decrypted._info = { selfAuthored: selfAuthored, pub: pub };
 	      this.messages[key] = decrypted;
-	      this.onMessage(decrypted, decrypted._info);
+	      this.onMessage.forEach(function (f) {
+	        return f(decrypted, decrypted._info);
+	      });
 	    }
 	  };
 
@@ -13711,6 +13768,65 @@
 	        }
 	      }
 	    });
+	  };
+
+	  /**
+	  * Get a chat box element that you can add to your page
+	  */
+
+
+	  Chat.prototype.getChatBox = function getChatBox() {
+	    var _this10 = this;
+
+	    util$1.injectCss();
+	    var chatBox = document.createElement('div');
+	    chatBox.setAttribute('class', 'iris-chat-box');
+	    var header = document.createElement('div');
+	    header.setAttribute('class', 'iris-chat-header');
+	    chatBox.appendChild(header);
+	    var messages = document.createElement('div');
+	    messages.setAttribute('class', 'iris-chat-messages');
+	    chatBox.appendChild(messages);
+	    var inputWrapper = document.createElement('div');
+	    inputWrapper.setAttribute('class', 'iris-chat-input-wrapper');
+	    chatBox.appendChild(inputWrapper);
+	    var textArea = document.createElement('textarea');
+	    textArea.setAttribute('rows', '1');
+	    textArea.setAttribute('placeholder', 'Type a message');
+	    inputWrapper.appendChild(textArea);
+
+	    var participants = _Object$keys(this.secrets);
+	    if (participants.length) {
+	      this.gun.user(participants[0]).get('profile').get('name').on(function (name) {
+	        return header.innerText = name;
+	      });
+	    }
+
+	    this.onMessage.push(function (msg, info) {
+	      var msgContent = $('<div>').addClass('iris-msg-content').text(msg.text);
+	      msgContent.append($('<div>').text(util$1.formatTime(new Date(msg.time))).addClass('time'));
+	      msgContent.html(msgContent.html().replace(/\n/g, '<br>\n'));
+	      var msgEl = $('<div>').toggleClass('our', info.selfAuthored).toggleClass('their', !info.selfAuthored).addClass('iris-chat-message').append(msgContent);
+	      messages.appendChild(msgEl[0]);
+	      messages.scrollTop = messages.scrollHeight;
+	    });
+
+	    textArea.addEventListener('keyup', function (event) {
+	      if (event.keyCode === 13) {
+	        event.preventDefault();
+	        var content = textArea.value;
+	        var caret = util$1.getCaret(textArea);
+	        if (event.shiftKey) {
+	          textArea.value = content.substring(0, caret - 1) + '\n' + content.substring(caret, content.length);
+	        } else {
+	          textArea.value = content.substring(0, caret - 1) + content.substring(caret, content.length);
+	          _this10.send(textArea.value);
+	          textArea.value = '';
+	        }
+	      }
+	    });
+
+	    return chatBox;
 	  };
 
 	  /**
@@ -15263,7 +15379,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$2 = "0.0.136";
+	var version$2 = "0.0.137";
 
 	/*eslint no-useless-escape: "off", camelcase: "off" */
 

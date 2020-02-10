@@ -15,24 +15,6 @@ function highlightEmoji(s) {
   return s.replace(emojiRegex, '<span class="emoji">$&</span>');
 }
 
-function formatTime(date) {
-  const t = date.toLocaleTimeString(undefined, {timeStyle:"short"});
-  const s = t.split(':');
-  if (s.length === 3) { // safari tries to display seconds
-    return s[0] + ':' + s[1] + s[2].slice(2);
-  }
-  return t;
-}
-
-function formatDate(date) {
-  const t = date.toLocaleString(undefined, {dateStyle:"short", timeStyle:"short"});
-  const s = t.split(':');
-  if (s.length === 3) { // safari tries to display seconds
-    return s[0] + ':' + s[1] + s[2].slice(2);
-  }
-  return t;
-}
-
 function copyToClipboard(text) {
     if (window.clipboardData && window.clipboardData.setData) {
         // Internet Explorer-specific code path to prevent textarea being shown while dialog is visible.
@@ -96,24 +78,6 @@ function isMobile() {
 
 function truncateString(s, length = 30) {
   return s.length > length ? s.slice(0, length) + '...' : s;
-}
-
-function getDaySeparatorText(date, dateStr, now, nowStr) {
-  if (!now) {
-    now = new Date();
-    nowStr = now.toLocaleDateString({dateStyle:'short'});
-  }
-  if (dateStr === nowStr) {
-    return 'today';
-  }
-  var dayDifference = Math.round((now - date)/(1000*60*60*24));
-  if (dayDifference <= 1) {
-    return 'yesterday';
-  }
-  if (dayDifference <= 5) {
-    return date.toLocaleDateString(undefined, { weekday: 'long' });
-  }
-  return dateStr;
 }
 
 function getBase64(file) {
