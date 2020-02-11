@@ -1,7 +1,6 @@
 Gun.log.off = true;
-var isElectron = (userAgent.indexOf(' electron/') > -1);
 var MAX_PEER_LIST_SIZE = 10;
-var MAX_CONNECTED_PEERS = isElectron ? 4 : 2;
+var MAX_CONNECTED_PEERS = iris.util.isElectron ? 4 : 2;
 var peers = getPeers();
 var randomPeers = _.sample(
   Object.keys(
@@ -65,7 +64,7 @@ function getPeers() {
       'https://gunjs.herokuapp.com/gun': {}
     };
   }
-  if (isElectron) {
+  if (iris.util.isElectron) {
     p['http://localhost:8767/gun'] = {};
   }
   Object.keys(p).forEach(k => _.defaults(p[k], {enabled: true}));
@@ -172,7 +171,7 @@ function login(k) {
     showChat(chatWith);
     window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
   } else {
-    if (isMobile()) {
+    if (iris.util.isMobile) {
       showMenu();
     } else {
       showNewChat();
@@ -277,7 +276,7 @@ $('#add-peer-btn').click(() => {
 });
 
 var emojiButton = $('#emoji-picker');
-if (!isMobile()) {
+if (!iris.util.isMobile) {
   emojiButton.show();
   var picker = new EmojiButton({position: 'top-start'});
 
@@ -292,7 +291,7 @@ if (!isMobile()) {
   });
 }
 
-$('#desktop-application-about').toggle(!isMobile() && !isElectron);
+$('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
 
 $('#paste-chat-link').on('input', event => {
   var val = $(event.target).val();
@@ -667,7 +666,7 @@ function setTheirOnlineStatus(pub) {
     if (online.isOnline) {
       $('#header-content .last-seen').text('online');
     } else if (online.lastActive) {
-      var d = new Date(online.lastActive * 1000);
+      var d = new Date(online.lastActive);
       var lastSeenText = iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'}));
       if (lastSeenText === 'today') {
         lastSeenText = iris.util.formatTime(d);
@@ -694,7 +693,7 @@ function showChat(pub) {
   $("#message-list").empty();
   $("#message-view").show();
   $(".message-form").show();
-  if (!isMobile()) {
+  if (!iris.util.isMobile) {
     $("#new-msg").focus();
   }
   $('#new-msg').off().on('input', () => {
