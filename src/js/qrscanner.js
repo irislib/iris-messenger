@@ -1,13 +1,11 @@
 window.addEventListener('load', function () {
     let selectedDeviceId;
     const codeReader = new ZXing.BrowserMultiFormatReader()
-    console.log('ZXing code reader initialized')
     codeReader.getVideoInputDevices()
         .then((videoInputDevices) => {
             document.getElementById('startButton').addEventListener('click', () => {
                 codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
                     if (result) {
-                        console.log(result)
                         var privkey = document.getElementById('paste-privkey')
                         privkey.value = result.text
 
@@ -22,7 +20,6 @@ window.addEventListener('load', function () {
                         console.error(err)
                     }
                 })
-                console.log(`Started continous decode from camera with id ${selectedDeviceId}`)
             })
         })
         .catch((err) => {
