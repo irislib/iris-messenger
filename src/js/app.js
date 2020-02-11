@@ -878,8 +878,10 @@ function addChat(pub, chatLink) {
   el.click(() => showChat(pub));
   $(".chat-list").append(el);
   chats[pub].getTheirMsgsLastSeenTime(time => {
-    chats[pub].theirLastSeenTime = new Date(time);
-    lastSeenTimeChanged(pub);
+    if (chats[pub]) {
+      chats[pub].theirLastSeenTime = new Date(time);
+      lastSeenTimeChanged(pub);      
+    }
   });
   var askForPeers = _.once(() => {
     _.defer(() => {
