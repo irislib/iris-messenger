@@ -794,6 +794,8 @@ function addMessage(msg) {
   msgContent.prepend(textEl);
   if (msg.text.length === 2 && isEmoji(msg.text)) {
     textEl.toggleClass('emoji-only', true);
+  } else if(isImageData(msg.text)) {
+    textEl.html('<img src="' + msg.text + '"class="image">')
   } else {
     textEl.html(highlightEmoji(textEl.html()));
   }
@@ -842,7 +844,11 @@ function addChat(pub, chatLink) {
       var now = new Date();
       var latestTimeText = iris.util.getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
       if (latestTimeText === 'today') { latestTimeText = iris.util.formatTime(msg.time); }
-      latestEl.text(text);
+      if(isImageData(text)) {
+        latestEl.html('<img src="' + msg.text + '"class="image">')
+      } else {
+        latestEl.text(text);
+      }
       latestEl.html(highlightEmoji(latestEl.html()));
       if (info.selfAuthored) {
         latestEl.prepend($(seenIndicatorHtml));

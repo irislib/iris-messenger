@@ -175,6 +175,14 @@ header #back-button {
   text-align: center;
 }
 
+.msg .image {
+  max-width: 100%;
+}
+
+.chat-list .image {
+  height: 20px;
+}
+
 .chat-list .seen {
   margin-right: 5px;
 }
