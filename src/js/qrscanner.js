@@ -13,14 +13,15 @@ function startQRScanner() {
             if (err != undefined) {
                 console.error(err)
             }
-            if (codeReader != undefined) {
+            if (codeReader != undefined && codeReader != null) {
                 cleanupScanner()
             }
         });
 }
 
 function cleanupScanner() {
-    if (codeReader != undefined) {
+    if (codeReader != undefined || codeReader != null) {
         codeReader.reset();
+        codeReader = null;
     }
 }
