@@ -343,6 +343,7 @@ function resetView() {
   activeChat = null;
   activeProfile = null;
   showMenu(false);
+  cleanupScanner();
   $('.chat-item').toggleClass('active', false);
   $('.main-view').hide();
   $('#not-seen-by-them').hide();

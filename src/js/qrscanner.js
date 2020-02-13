@@ -1,37 +1,27 @@
-window.addEventListener('load', function () {
-    let selectedDeviceId;
-    let recording = false;
-    const codeReader = new ZXing.BrowserMultiFormatReader()
-    codeReader.getVideoInputDevices()
-        .then((videoInputDevices) => {
-            document.getElementById('startButton').addEventListener('click', () => {
-                if (recording) {
-                  codeReader.reset();
-                  recording = false;
-                  return;
-                }
-                recording = true;
-                codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
-                    if (result) {
-                        var privkey = document.getElementById('paste-privkey')
-                        privkey.value = result.text
+var codeReader;
 
-                        var event = new Event('input', {
-                            bubbles: true,
-                            cancelable: true,
-                        });
+function startQRScanner() {
+    codeReader = new ZXing.BrowserMultiFormatReader();
+    codeReader.decodeFromInputVideoDevice(undefined, 'video')
+        .then(result => {
+            var qr = JSON.parse(result.text);
+            if (qr.priv != undefined) {
+                cleanupScanner()
+                login(qr);
+            }
+        }).catch(err => {
+            if (err != undefined) {
+                console.error(err)
+            }
+            if (codeReader != undefined && codeReader != null) {
+                cleanupScanner()
+            }
+        });
+}
 
-                        privkey.dispatchEvent(event);
-                        codeReader.reset();
-                        recording = false;
-                    }
-                    if (err && !(err instanceof ZXing.NotFoundException)) {
-                        console.error(err)
-                    }
-                })
-            })
-        })
-        .catch((err) => {
-            console.error(err)
-        })
-})
+function cleanupScanner() {
+    if (codeReader != undefined || codeReader != null) {
+        codeReader.reset();
+        codeReader = null;
+    }
+}
