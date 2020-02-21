@@ -123,10 +123,19 @@ async function addPeer(peer) {
 }
 
 function newUserLogin() {
-  Gun.SEA.pair().then(k => {
-    login(k);
-    gun.user().get('profile').get('name').put('anonymous');
-    createChatLink();
+  $('#login').show();
+  $('#login-form-name').focus();
+  $('#login-form').submit(e => {
+    e.preventDefault();
+    var name = $('#login-form-name').val();
+    if (name.length) {
+      $('#login').hide();
+      Gun.SEA.pair().then(k => {
+        login(k);
+        gun.user().get('profile').get('name').put(name);
+        createChatLink();
+      });
+    }
   });
 }
 
@@ -462,7 +471,10 @@ $('#switch-account input').on('input', (event) => {
   }
 });
 
-$('.logout-button').click(newUserLogin);
+$('.logout-button').click(() => {
+  localStorage.removeItem('chatKeyPair');
+  location.reload(); // ensure that everything is reset (especially on the gun side). TODO: without reload
+});
 
 $('.open-settings-button').click(showSettings);
 
@@ -881,7 +893,7 @@ function addChat(pub, chatLink) {
   chats[pub].getTheirMsgsLastSeenTime(time => {
     if (chats[pub]) {
       chats[pub].theirLastSeenTime = new Date(time);
-      lastSeenTimeChanged(pub);      
+      lastSeenTimeChanged(pub);
     }
   });
   var askForPeers = _.once(() => {

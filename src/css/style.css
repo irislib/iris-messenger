@@ -275,6 +275,20 @@ header #back-button {
   flex: none;
 }
 
+#login {
+  color: white;
+  padding-top: 30vh;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: #70d4f2;
+  z-index: 1000;
+  text-align: center;
+  display: none;
+}
+
 #emoji-picker {
   outline: 1px;
   margin-right: 5px;
