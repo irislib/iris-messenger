@@ -175,21 +175,33 @@ header #back-button {
   text-align: center;
 }
 
-.chat-list .seen {
+.chat-list .seen-indicator {
   margin-right: 5px;
 }
 
-.seen {
+.seen { /* omg, this fixes mess-up by iris-lib style */
+  color: inherit;
+}
+
+.seen-indicator {
   color: rgba(0, 0, 0, 0.45);
   user-select: none;
 }
 
-.seen.yes {
+.seen-indicator svg {
+  width: 15px;
+}
+
+.seen .seen-indicator {
   color: #4fc3f7;
 }
 
-.seen svg {
-  width: 15px;
+.iris-delivered-checkmark {
+  display: none;
+}
+
+.seen .iris-delivered-checkmark, .delivered .iris-delivered-checkmark {
+  display: initial;
 }
 
 .msg.their {

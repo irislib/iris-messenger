@@ -750,10 +750,12 @@ function showChat(pub) {
       if (chats[pub]) {
         chats[pub].online = online;
         setTheirOnlineStatus(pub);
+        setDeliveredCheckmarks(pub);
       }
     });
   }
   setTheirOnlineStatus(pub);
+  setDeliveredCheckmarks(pub);
 }
 
 function getIdenticon(pub, width) {
@@ -796,7 +798,7 @@ function sortMessagesByTime() {
   });
 }
 
-var seenIndicatorHtml = '<span class="seen"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"/></svg></span>';
+var seenIndicatorHtml = '<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>';
 
 function addMessage(msg) {
   var escaped = $('<div>').text(msg.text).html();
@@ -861,6 +863,7 @@ function addChat(pub, chatLink) {
       if (info.selfAuthored) {
         latestEl.prepend($(seenIndicatorHtml));
         setLatestSeen(pub);
+        setLatestCheckmark(pub);
       }
       el.find('.latest-time').text(latestTimeText);
       el.data('latestTime', msg.time);
@@ -944,19 +947,44 @@ function addChat(pub, chatLink) {
 
 function setLatestSeen(pub) {
   if (chats[pub].latest && chats[pub].latest.time <= chats[pub].theirLastSeenTime) {
-    $('.chat-item[data-pub="' + pub +'"] .seen').toggleClass('yes', true);
+    $('.chat-item[data-pub="' + pub +'"]').toggleClass('seen', true);
+  }
+}
+
+function setLatestCheckmark(pub) {
+  var latestTime = chats[pub].latest && chats[pub].latest.time;
+  var lastActive = chats[pub].online && chats[pub].online.lastActive && new Date(chats[pub].online.lastActive);
+  if (latestTime && lastActive && latestTime <= lastActive) {
+    $('.chat-item[data-pub="' + pub +'"]').toggleClass('delivered', true);
+  }
+}
+
+function setDeliveredCheckmarks(pub) {
+  var online = chats[pub].online;
+  if (online && online.lastActive) {
+    var lastActive = new Date(online.lastActive);
+    if (activeChat === pub) {
+      $('.msg.our:not(.delivered)').each(function() {
+        var el = $(this);
+        if (el.data('time') <= lastActive) {
+          el.toggleClass('delivered', true);
+        }
+      });
+    }
+    setLatestCheckmark(pub);
   }
 }
 
 function lastSeenTimeChanged(pub) {
   setLatestSeen(pub);
+  setDeliveredCheckmarks(pub);
   if (pub === activeChat) {
     if (chats[pub].theirLastSeenTime) {
       $('#not-seen-by-them').slideUp();
-      $('.msg.our').each(function() {
+      $('.msg.our:not(.seen)').each(function() {
         var el = $(this);
         if (el.data('time') <= chats[pub].theirLastSeenTime) {
-          el.find('.seen').toggleClass('yes', true);
+          el.toggleClass('seen', true);
         }
       });
       // set seen msgs
