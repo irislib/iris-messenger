@@ -946,16 +946,16 @@ function addChat(pub, chatLink) {
 }
 
 function setLatestSeen(pub) {
-  if (chats[pub].latest && chats[pub].latest.time <= chats[pub].theirLastSeenTime) {
-    $('.chat-item[data-pub="' + pub +'"]').toggleClass('seen', true);
+  if (chats[pub].latest) {
+    $('.chat-item[data-pub="' + pub +'"]').toggleClass('seen', chats[pub].latest.time <= chats[pub].theirLastSeenTime);
   }
 }
 
 function setLatestCheckmark(pub) {
   var latestTime = chats[pub].latest && chats[pub].latest.time;
   var lastActive = chats[pub].online && chats[pub].online.lastActive && new Date(chats[pub].online.lastActive);
-  if (latestTime && lastActive && latestTime <= lastActive) {
-    $('.chat-item[data-pub="' + pub +'"]').toggleClass('delivered', true);
+  if (latestTime && lastActive) {
+    $('.chat-item[data-pub="' + pub +'"]').toggleClass('delivered', latestTime <= lastActive);
   }
 }
 
