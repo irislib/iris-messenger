@@ -45,6 +45,10 @@ var desktopNotificationsEnabled;
 var areWeOnline;
 var unseenTotal;
 
+$(window).load(() => {
+  $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
+});
+
 $('#login').hide();
 var localStorageKey = localStorage.getItem('chatKeyPair');
 if (localStorageKey) {

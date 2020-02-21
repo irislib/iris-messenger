@@ -3,6 +3,7 @@
 html { height:100%; overflow:hidden; }
 
 body {
+  opacity: 0;
   font-size: 15px;
   color: #262626;
   font-family: "SF Pro Text", "SF Pro Icons", system, -apple-system, system-ui, system-ui, "Helvetica Neue", Helvetica, "Lucida Grande", sans-serif;
