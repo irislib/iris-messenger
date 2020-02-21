@@ -872,6 +872,11 @@ function addChat(pub, chatLink) {
       if (chats[pub].latest.time === msg.time && areWeOnline) {
         chats[pub].setMyMsgsLastSeenTime();
       }
+      if (chats[pub].theirLastSeenTime) {
+        $('#not-seen-by-them').slideUp();
+      } else {
+        $('#not-seen-by-them').slideDown();
+      }
       $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
     }
     notify(msg, info, pub);
@@ -947,7 +952,7 @@ function lastSeenTimeChanged(pub) {
   setLatestSeen(pub);
   if (pub === activeChat) {
     if (chats[pub].theirLastSeenTime) {
-      $('#not-seen-by-them').hide();
+      $('#not-seen-by-them').slideUp();
       $('.msg.our').each(function() {
         var el = $(this);
         if (el.data('time') <= chats[pub].theirLastSeenTime) {
@@ -956,7 +961,9 @@ function lastSeenTimeChanged(pub) {
       });
       // set seen msgs
     } else {
-      $('#not-seen-by-them').show();
+      if ($('.msg.our').length) {
+        $('#not-seen-by-them').slideDown();
+      }
     }
   }
 }
