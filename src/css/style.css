@@ -276,8 +276,9 @@ header #back-button {
 }
 
 #login {
+  overflow-y: scroll;
   color: white;
-  padding-top: 30vh;
+  padding-top: calc(50vh - 150px);
   position: fixed;
   left: 0;
   right: 0;
