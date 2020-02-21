@@ -45,6 +45,7 @@ var desktopNotificationsEnabled;
 var areWeOnline;
 var unseenTotal;
 
+$('#login').hide();
 var localStorageKey = localStorage.getItem('chatKeyPair');
 if (localStorageKey) {
   login(JSON.parse(localStorageKey));
@@ -123,7 +124,7 @@ async function addPeer(peer) {
 }
 
 function newUserLogin() {
-  $('#login').show();
+  $('#login').css('display', 'flex');
   $('#login-form-name').focus();
   $('#login-form').submit(e => {
     e.preventDefault();
