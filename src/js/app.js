@@ -748,16 +748,6 @@ function showChat(pub) {
   chats[pub].setMyMsgsLastSeenTime();
   $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
   chats[pub].setMyMsgsLastSeenTime();
-  if (!chats[pub].online) {
-    chats[pub].online = {};
-    iris.Chat.getOnline(gun, pub, (online) => {
-      if (chats[pub]) {
-        chats[pub].online = online;
-        setTheirOnlineStatus(pub);
-        setDeliveredCheckmarks(pub);
-      }
-    });
-  }
   setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
 }
@@ -946,6 +936,14 @@ function addChat(pub, chatLink) {
     }
     typingIndicator.toggle(isTyping);
     latestEl.toggle(!isTyping);
+  });
+  chats[pub].online = {};
+  iris.Chat.getOnline(gun, pub, (online) => {
+    if (chats[pub]) {
+      chats[pub].online = online;
+      setTheirOnlineStatus(pub);
+      setDeliveredCheckmarks(pub);
+    }
   });
 }
 
