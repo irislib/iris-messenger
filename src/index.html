@@ -109,10 +109,13 @@
 
       <!-- New chat view -->
       <div class="main-view" id="new-chat">
-        <p><input id="paste-chat-link" type="text" placeholder="Paste someone's chat link"></p>
+        <p>
+          <input id="paste-chat-link" type="text" placeholder="Paste someone's chat link">
+          <button>Scan QR code</button>
+        </p>
+        <p>Or give <b>your</b> chat link to someone:</p>
         <p><button class="copy-chat-link">Copy your chat link</button></p>
         <p id="my-qr-code"></p>
-        <p>Give your chat link to someone you want to chat with!</p>
         <p><small>But beware of sharing it publicly: you might get spammed with message requests. Publicly share your <a class="profile-link">profile link<a> instead.</small></p>
         <p><button id="generate-chat-link">Create new link</button></p>
         <div id="my-chat-links" class="flex-table"></div>
@@ -190,7 +193,7 @@
           <li><b>Available</b>: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.</li>
         </ul>
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-        <p><small>Version 1.1.7</small></p>
+        <p><small>Version 1.1.8</small></p>
 
         <div id="desktop-application-about">
           <h3>Get the desktop application</h3>

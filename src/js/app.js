@@ -209,6 +209,11 @@ function login(k) {
     $('#add-profile-photo').toggleClass('hidden', true);
   });
   setChatLinkQrCode();
+  if (window.Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+    setTimeout(() => {
+      $('#enable-notifications-prompt').slideDown();
+    }, 5000);
+  }
 }
 
 async function createChatLink() {
@@ -484,11 +489,6 @@ $('.logout-button').click(() => {
 $('.open-settings-button').click(showSettings);
 
 desktopNotificationsEnabled = window.Notification && Notification.permission === 'granted';
-if (window.Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-  setTimeout(() => {
-    $('#enable-notifications-prompt').slideDown();
-  }, 5000);
-}
 function enableDesktopNotifications() {
   if (window.Notification) {
     Notification.requestPermission((status) => {
