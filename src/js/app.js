@@ -363,6 +363,7 @@ function resetView() {
   activeProfile = null;
   showMenu(false);
   cleanupScanner();
+  $('#chatlink-qr-video').hide();
   $('.chat-item').toggleClass('active', false);
   $('.main-view').hide();
   $('#not-seen-by-them').hide();
@@ -406,6 +407,16 @@ function getMyChatLink() {
 function getUserChatLink(pub) {
   return 'https://iris.to/?chatWith=' + pub;
 }
+
+$('#scan-chatlink-qr-btn').click(() => {
+  if ($('#chatlink-qr-video:visible').length) {
+    $('#chatlink-qr-video').hide();
+    cleanupScanner();
+  } else {
+    $('#chatlink-qr-video').show();
+    startChatLinkQRScanner();
+  }
+});
 
 $('.copy-chat-link').click(event => {
   copyToClipboard(getMyChatLink());

@@ -1,13 +1,28 @@
 var codeReader;
 
-function startQRScanner() {
+function startPrivKeyQRScanner() {
+  startQRScanner('privkey-qr-video', result => {
+    var qr = JSON.parse(result.text);
+    if (qr.priv !== undefined) {
+      login(qr);
+      return true;
+    }
+  });
+}
+
+function startChatLinkQRScanner() {
+  startQRScanner('chatlink-qr-video', result => {
+    $('#paste-chat-link').val(result.text);
+    $('#paste-chat-link').trigger('input');
+  });
+}
+
+function startQRScanner(videoElementId, callback) {
     codeReader = new ZXing.BrowserMultiFormatReader();
-    codeReader.decodeFromInputVideoDevice(undefined, 'video')
+    codeReader.decodeFromInputVideoDevice(undefined, videoElementId)
         .then(result => {
-            var qr = JSON.parse(result.text);
-            if (qr.priv != undefined) {
-                cleanupScanner()
-                login(qr);
+            if (callback(result)) {
+              cleanupScanner();
             }
         }).catch(err => {
             if (err != undefined) {

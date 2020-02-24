@@ -111,8 +111,9 @@
       <div class="main-view" id="new-chat">
         <p>
           <input id="paste-chat-link" type="text" placeholder="Paste someone's chat link">
-          <button>Scan QR code</button>
+          <button id="scan-chatlink-qr-btn">Scan QR code</button>
         </p>
+        <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
         <p>Or give <b>your</b> chat link to someone:</p>
         <p><button class="copy-chat-link">Copy your chat link</button></p>
         <p id="my-qr-code"></p>
@@ -235,10 +236,10 @@
       <div class="main-view" id="switch-account">
         <input id="paste-privkey" placeholder="Paste a private key">
         <p>
-          <button id="startButton" onclick="startQRScanner()">Scan private key QR code</button>
+          <button id="startButton" onclick="startPrivKeyQRScanner()">Scan private key QR code</button>
         </p>
         </p>
-          <video id="video" width="320" height="320" style="object-fit: cover;"></video>
+          <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;"></video>
         </p>
       </div>
 

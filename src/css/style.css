@@ -523,6 +523,10 @@ small {
   margin-top: 15px;
 }
 
+#chatlink-qr-video {
+  display: none;
+}
+
 /* Places where emojis may appear */
 .user-name, .name, input[type=text] {
   line-height: 1.3em;
