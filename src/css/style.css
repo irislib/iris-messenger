@@ -193,6 +193,10 @@ header #back-button {
   width: 15px;
 }
 
+.chat-list .seen-indicator svg {
+  width: 20px;
+}
+
 .seen .seen-indicator {
   color: #4fc3f7;
 }
