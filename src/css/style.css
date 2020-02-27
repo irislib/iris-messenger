@@ -554,3 +554,11 @@ small {
 .peer button {
   margin-left: 5px;
 }
+
+.add-friend {
+  background-color: hsla(194, 55%, 87%, 1);;
+}
+
+.add-friend:hover, .add-friend:active, .add-friend:focus {
+  background-color: hsla(194, 55%, 80%, 1);;
+}

@@ -625,6 +625,9 @@ function showProfile(pub) {
     $('#profile .profile-photo').attr('src', photo);
   });
   const link = getUserChatLink(pub);
+  $('#profile .add-friend').off().on('click', () => {
+    console.log('add friend');
+  });
   $('#profile .delete-chat').off().on('click', () => deleteChat(pub));
   $('#profile .send-message').off().on('click', () => showChat(pub));
   $('#profile .copy-user-link').off().on('click', event => {
