@@ -23,7 +23,22 @@
   <meta name="theme-color" content="#74d5f1">
 
   <link rel="stylesheet" type="text/css" href="./css/cropper.min.css">
+
+  <script>
+    // If `prefers-color-scheme` is not supported, fall back to light mode.
+    if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
+        document.documentElement.style.display = 'none';
+        document.head.insertAdjacentHTML(
+            'beforeend',
+            '<link rel="stylesheet" href="style/light.css" onload="document.documentElement.style.display = \'\'">'
+        );
+    }
+  </script>
+  <link rel="stylesheet" href="./css/dark.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="./css/light.css" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: light)">
+  <!-- The main stylesheet -->
   <link rel="stylesheet" type="text/css" href="./css/style.css">
+
   <script>
     var userAgent = navigator.userAgent.toLowerCase();
     var isElectron = (userAgent.indexOf(' electron/') > -1);
