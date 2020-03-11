@@ -483,10 +483,12 @@ small {
 
 #not-seen-by-them button {
   background: var(--msg-content-background);
+  color: var(--text-color);
 }
 
 #not-seen-by-them button:hover, #not-seen-by-them button:active, #not-seen-by-them button:focus {
-  background: #eee;
+  background: var(--text-color);
+  color: var(--msg-content-background);
 }
 
 #enable-notifications-prompt {
