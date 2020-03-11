@@ -308,7 +308,7 @@ header #back-button {
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: #70d4f2;
+  background-color: var(--login-background);
   z-index: 1000;
   text-align: center;
 }
