@@ -189,7 +189,7 @@ header #back-button {
 }
 
 .seen-indicator {
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--seen-indicator);
   user-select: none;
 }
 
@@ -456,7 +456,7 @@ header #back-button {
 
 small {
   font-size: 12px;
-  color: var(--text-small);
+  color: #777;
 }
 
 .chat-item.active, .chat-item.active:hover {
