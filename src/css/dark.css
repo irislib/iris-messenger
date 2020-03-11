@@ -1,7 +1,6 @@
 /* dark.css: 👉 light-on-dark */
 :root {
     --text-color: #ffffff;
-    --text-small: #777;
     --text-time: rgba(255, 255, 255, 0.45);
     --main-color: #3b3936;
     --header-color: #292929;
@@ -11,4 +10,5 @@
     --our-msg: #3f4939;
     --notify: #476974;
     --login-background: #154352;
+    --seen-indicator: rgba(255, 255, 255, 0.45);
 }
