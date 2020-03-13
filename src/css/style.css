@@ -17,6 +17,15 @@ body {
   overflow:hidden;
 }
 
+a {
+  color: #00b6ed;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 input, button, .button {
   padding: 15px;
   outline: none;
