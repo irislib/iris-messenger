@@ -23,7 +23,22 @@
   <meta name="theme-color" content="#74d5f1">
 
   <link rel="stylesheet" type="text/css" href="./css/cropper.min.css">
+
+  <script>
+    // If `prefers-color-scheme` is not supported, fall back to light mode.
+    if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
+        document.documentElement.style.display = 'none';
+        document.head.insertAdjacentHTML(
+            'beforeend',
+            '<link rel="stylesheet" href="style/light.css" onload="document.documentElement.style.display = \'\'">'
+        );
+    }
+  </script>
+  <link rel="stylesheet" href="./css/dark.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="./css/light.css" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: light)">
+  <!-- The main stylesheet -->
   <link rel="stylesheet" type="text/css" href="./css/style.css">
+
   <script>
     var userAgent = navigator.userAgent.toLowerCase();
     var isElectron = (userAgent.indexOf(' electron/') > -1);
@@ -117,7 +132,7 @@
         <p>Or give <b>your</b> chat link to someone:</p>
         <p><button class="copy-chat-link">Copy your chat link</button></p>
         <p id="my-qr-code"></p>
-        <p><small>But beware of sharing it publicly: you might get spammed with message requests. Publicly share your <a class="profile-link">profile link<a> instead.</small></p>
+        <p><small>But beware of sharing it publicly: you might get spammed with message requests. Publicly share your <a class="profile-link">profile link</a> instead.</small></p>
         <p><button id="generate-chat-link">Create new link</button></p>
         <div id="my-chat-links" class="flex-table"></div>
       </div>
@@ -148,6 +163,7 @@
           <button id="use-profile-photo" class="hidden">Use photo</button>
           <button id="remove-profile-photo" class="hidden">Remove photo</button>
         </p>
+        <hr/>
         <h3>Account</h3>
         <p>
           <b>Save a backup of your private key first!</b> Otherwise you can't log in back to this account.
@@ -158,7 +174,7 @@
         <p>
           <button class="show-switch-account">Switch account</button>
         </p>
-        <h3>Private key</h3>
+        <h4>Private key</h4>
         <p>
           <b>DANGER!</b> Private key is used to <b>log in to your account</b>. Don't give or show your private key to anyone else!
         </p>
@@ -169,7 +185,7 @@
         <p>
           <button id="show-private-key-qr">Show private key QR code</button>
         </p>
-        <h3>Peers</h3>
+        <h4>Peers</h4>
         <div id="peers" class="flex-table">
           <div class="flex-row" id="add-peer-row">
             <div class="flex-cell">
@@ -185,7 +201,7 @@
             </small>
           </p>
         </div>
-
+        <hr/>
         <h3>About</h3>
         <p>Iris is like the messaging apps we're used to, but better.</p>
         <ul>
@@ -197,7 +213,7 @@
         <p><small>Version 1.1.9</small></p>
 
         <div id="desktop-application-about">
-          <h3>Get the desktop application</h3>
+          <h4>Get the desktop application</h4>
           <ul>
             <li>Communicate and synchronize with local network peers without Internet access
               <ul>
@@ -211,12 +227,15 @@
           <p><a href="https://github.com/irislib/iris-electron/releases">Download</a></p>
         </div>
 
-        <h3>Privacy</h3>
+        <h4>Privacy</h4>
         <p>Messages are end-to-end encrypted, but message timestamps and the number of chats aren't. In a decentralized network this information is potentially available to anyone.</p>
         <p>By looking at timestamps in chats, it is possible to guess who are chatting with each other. There are potential technical solutions to hiding the timestamps, but they are not implemented yet. It is also possible, if not trivial, to find out who are communicating with each other by monitoring data subscriptions on the decentralized database.</p>
         <p>In that regard, Iris prioritizes decentralization and availability over perfect privacy.</p>
         <p>Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.</p>
         <p>The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.</p>
+
+        <h4>Support the cause?</h4>
+        <p><b>Donations</b> help keep the project going and are very much appreciated. You can donate via <a href="https://opencollective.com/iris-social">Open Collective</a> or <b>bitcoin</b>: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST</p>
       </div>
 
       <!-- Logout confirmation -->

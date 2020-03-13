@@ -4,6 +4,8 @@ Iris Messenger is like the messaging apps we're used to, but better.
 * Secure: It's open source. Users can validate that big brother doesn't read your messages.
 * Available: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.
 
+![Screenshot](screenshot.png)
+
 ## Use
 Browser application: [iris.to](https://iris.to)
 
