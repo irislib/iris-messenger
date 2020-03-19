@@ -18,7 +18,6 @@ body {
 }
 
 a {
-  color: #00b6ed;
   text-decoration: none;
 }
 
@@ -168,6 +167,10 @@ header #back-button {
   flex-direction: column;
   margin-bottom: 2px;
   overflow-wrap: break-word;
+}
+
+.msg a {
+  color: #00b6ed;
 }
 
 .msg-content {
