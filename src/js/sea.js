@@ -164,7 +164,7 @@
     var o = {};
 
     if(SEA.window){
-      api.crypto = navigator && navigator.product === 'ReactNative' ? require('isomorphic-webcrypto') : window.crypto || window.msCrypto || require('isomorphic-webcrypto');
+      api.crypto = window.crypto || window.msCrypto
       api.subtle = (api.crypto||o).subtle || (api.crypto||o).webkitSubtle;
       api.TextEncoder = window.TextEncoder;
       api.TextDecoder = window.TextDecoder;
@@ -176,17 +176,20 @@
       api.TextDecoder = TextDecoder;
       api.TextEncoder = TextEncoder;
     }
-    if(!api.crypto){try{
+    if(!api.crypto)
+    {
+      try
+      {
       var crypto = USE('crypto', 1);
       Object.assign(api, {
         crypto,
         random: (len) => Buffer.from(crypto.randomBytes(len))
-      });      
-      const isocrypto = require('isomorphic-webcrypto');
-      api.ossl = api.subtle = isocrypto.subtle;
-    }catch(e){
-      console.log("text-encoding and @peculiar/webcrypto may not be included by default, please add it to your package.json!");
-      TEXT_ENCODING_OR_PECULIAR_WEBCRYPTO_NOT_INSTALLED;
+      });
+      const { Crypto: WebCrypto } = USE('@peculiar/webcrypto', 1);
+      api.ossl = api.subtle = new WebCrypto({directory: 'ossl'}).subtle // ECDH
+    }
+    catch(e){
+      console.log("text-encoding and peculiar/nwebcrypto may not be included by default, please add it to your package.json!");
     }}
 
     module.exports = api
@@ -212,7 +215,7 @@
       if(d){ jwk.d = d }
       return jwk;
     };
-    
+
     s.keyToJwk = function(keyBytes) {
       const keyB64 = keyBytes.toString('base64');
       const k = keyB64.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
@@ -264,7 +267,7 @@
 
     SEA.work = SEA.work || (async (data, pair, cb, opt) => { try { // used to be named `proof`
       var salt = (pair||{}).epub || pair; // epub not recommended, salt should be random!
-      var opt = opt || {};
+      var opt = opt || {name:'SHA-256'};
       if(salt instanceof Function){
         cb = salt;
         salt = u;
@@ -287,7 +290,7 @@
       var r = shim.Buffer.from(work, 'binary').toString(opt.encode || 'base64')
       if(cb){ try{ cb(r) }catch(e){console.log(e)} }
       return r;
-    } catch(e) { 
+    } catch(e) {
       console.log(e);
       SEA.err = e;
       if(SEA.throw){ throw e }
@@ -333,7 +336,7 @@
         // but split on a non-base64 letter.
         return key;
       })
-      
+
       // To include PGPv4 kind of keyId:
       // const pubId = await SEA.keyid(keys.pub)
       // Next: ECDH keys for encryption/decryption...
@@ -505,8 +508,8 @@
       var opt = opt || {};
       const combo = key + (salt || shim.random(8)).toString('utf8'); // new
       const hash = shim.Buffer.from(await sha256hash(combo), 'binary')
-      
-      const jwkKey = S.keyToJwk(hash)      
+
+      const jwkKey = S.keyToJwk(hash)
       return await shim.subtle.importKey('jwk', jwkKey, {name:'AES-GCM'}, false, ['encrypt', 'decrypt'])
     }
     module.exports = importGen;
@@ -541,7 +544,7 @@
 
       if(cb){ try{ cb(r) }catch(e){console.log(e)} }
       return r;
-    } catch(e) { 
+    } catch(e) {
       console.log(e);
       SEA.err = e;
       if(SEA.throw){ throw e }
@@ -583,7 +586,7 @@
       var r = S.parse(new shim.TextDecoder('utf8').decode(ct));
       if(cb){ try{ cb(r) }catch(e){console.log(e)} }
       return r;
-    } catch(e) { 
+    } catch(e) {
       console.log(e);
       SEA.err = e;
       if(SEA.throw){ throw e }
@@ -598,7 +601,7 @@
     var SEA = USE('./root');
     var shim = USE('./shim');
     var S = USE('./settings');
-    // Derive shared secret from other's pub and my epub/epriv 
+    // Derive shared secret from other's pub and my epub/epriv
     SEA.secret = SEA.secret || (async (key, pair, cb, opt) => { try {
       opt = opt || {};
       if(!pair || !pair.epriv || !pair.epub){
@@ -707,9 +710,10 @@
 
   ;USE(function(module){
     var Gun = USE('./sea').Gun;
-    Gun.chain.then = function(cb){
+    Gun.chain.then = function(cb, opt = {}){
+      opt = {wait: 200, ...opt}
       var gun = this, p = (new Promise(function(res, rej){
-        gun.once(res);
+        gun.once(res, opt);
       }));
       return cb? p.then(cb) : p;
     }
@@ -720,7 +724,7 @@
     var Gun = SEA.Gun;
     var then = USE('./then');
 
-    function User(root){ 
+    function User(root){
       this._ = {$: this};
     }
     User.prototype = (function(){ function F(){}; F.prototype = Gun.chain; return new F() }()) // Object.create polyfill
@@ -801,11 +805,11 @@
         act.e();
       }
       act.e = function(){
-        act.data.epub = act.pair.epub; 
+        act.data.epub = act.pair.epub;
         SEA.encrypt({priv: act.pair.priv, epriv: act.pair.epriv}, act.proof, act.f, {raw:1}); // to keep the private key safe, we AES encrypt it with the proof of work!
       }
       act.f = function(auth){
-        act.data.auth = JSON.stringify({ek: auth, s: act.salt}); 
+        act.data.auth = JSON.stringify({ek: auth, s: act.salt});
         act.g(act.data.auth);
       }
       act.g = function(auth){ var tmp;
@@ -847,7 +851,7 @@
         var get = (act.list = (act.list||[]).concat(list||[])).shift();
         if(u === get){
           if(act.name){ return act.err('Your user account is not published for dApps to access, please consider syncing it online, or allowing local access by adding your device as a peer.') }
-          return act.err('Wrong user or password.') 
+          return act.err('Wrong user or password.')
         }
         root.get(get).once(act.a);
       }
@@ -1083,6 +1087,43 @@
       }());
       return gun;
     }
+
+    /**
+     * returns the decrypted value, encrypted by secret
+     * @returns {Promise<any>}
+     */
+    User.prototype.decrypt = function(cb) {
+      let gun = this,
+        path = ''
+      gun.back(function(at) {
+        if (at.is) {
+          return
+        }
+        path += at.get || ''
+      })
+      return gun
+        .then(async data => {
+          if (data == null) {
+            return
+          }
+          const user = gun.back(-1).user()
+          const pair = user.pair()
+          let sec = await user
+            .get('trust')
+            .get(pair.pub)
+            .get(path)
+          sec = await SEA.decrypt(sec, pair)
+          if (!sec) {
+            return data
+          }
+          let decrypted = await SEA.decrypt(data, sec)
+          return decrypted
+        })
+        .then(res => {
+          cb && cb(res)
+          return res
+        })
+    }
     module.exports = User
   })(USE, './create');
 
@@ -1154,14 +1195,14 @@
           put['='] = SEA.opt.unpack(data);
           eve.to.next(msg);
         });
-        return 
+        return
       }
       var no = function(why){ at.on('in', {'@': id, err: why}) };
       //var no = function(why){ msg.ack(why) };
       (msg._||'').DBG && ((msg._||'').DBG.c = +new Date);
       if('#' === soul[0]){ // special case for content addressing immutable hashed data.
         check.hash(eve, msg, val, key, soul, at, no); return;
-      } 
+      }
       if('~@' === soul){  // special case for shared system data, the list of aliases.
         check.alias(eve, msg, val, key, soul, at, no); return;
       }
