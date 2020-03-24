@@ -204,6 +204,12 @@ function login(k) {
       }
     }
   });
+  gun.user().get('profile').get('about').on(about => {
+    var el = $('#settings-about');
+    if (!el.is(':focus')) {
+      $('#settings-about').val(about || '');
+    }
+  });
   gun.user().get('profile').get('photo').on(data => {
     $('#current-profile-photo').attr('src', data);
     $('#add-profile-photo').toggleClass('hidden', true);
@@ -330,6 +336,11 @@ $('.chat-item.new').click(showNewChat);
 $('#settings-name').on('input', event => {
   var name = $(event.target).val().trim();
   gun.user().get('profile').get('name').put(name);
+});
+
+$('#settings-about').on('input', event => {
+  var about = $(event.target).val().trim();
+  gun.user().get('profile').get('about').put(about);
 });
 
 function setOurOnlineStatus() {
@@ -623,6 +634,10 @@ function showProfile(pub) {
   gun.user(pub).get('profile').get('photo').on(photo => {
     $('#profile .profile-photo-container').show();
     $('#profile .profile-photo').attr('src', photo);
+  });
+  gun.user(pub).get('profile').get('about').on(about => {
+    $('#profile .profile-about').toggle(about && about.length > 0);
+    $('#profile .profile-about').text(about);
   });
   const link = getUserChatLink(pub);
   $('#profile .add-friend').off().on('click', () => {
