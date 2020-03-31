@@ -549,6 +549,10 @@ small {
   display: none;
 }
 
+.qr-container img {
+  border: 5px solid white;
+}
+
 /* Places where emojis may appear */
 .user-name, .name, input[type=text] {
   line-height: 1.3em;
