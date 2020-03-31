@@ -385,7 +385,6 @@ function resetView() {
   $("#header-content").css({cursor: null});
   $('#profile-page-qr').empty();
   $('#private-key-qr').remove();
-  clearInterval(hidePrivateKeyInterval);
 }
 
 function showMenu(show = true) {
@@ -465,17 +464,23 @@ $('#show-private-key-qr').click(togglePrivateKeyQR);
 function togglePrivateKeyQR(e) {
   var btn = $('#show-private-key-qr');
   var show = $('#private-key-qr').length === 0;
+  var SHOW_TEXT = 'Show private key QR code';
+  function hideText(s) { return 'Hide private key QR code (' + s ')'; }
   if (show) {
     showPrivateKeySecondsRemaining = 20;
-    btn.text('Hide private key QR code (' + showPrivateKeySecondsRemaining + ')');
+    btn.text(hideText(showPrivateKeySecondsRemaining));
     hidePrivateKeyInterval = setInterval(() => {
+      if ($('#private-key-qr').length === 0) {
+        clearInterval(hidePrivateKeyInterval);
+        btn.text(SHOW_TEXT);
+      }
       showPrivateKeySecondsRemaining -= 1;
       if (showPrivateKeySecondsRemaining === 0) {
        $('#private-key-qr').remove();
-        btn.text('Show private key QR code');
+        btn.text(SHOW_TEXT);
         clearInterval(hidePrivateKeyInterval);
       } else {
-        btn.text('Hide private key QR code (' + showPrivateKeySecondsRemaining + ')');
+        hideText(showPrivateKeySecondsRemaining);
       }
     }, 1000);
     var qrCodeEl = $('<div>').attr('id', 'private-key-qr').insertAfter(btn);
@@ -489,7 +494,7 @@ function togglePrivateKeyQR(e) {
     });
   } else {
     $('#private-key-qr').remove();
-    btn.text('Show private key QR code');
+    btn.text(SHOW_TEXT);
   }
 }
 
