@@ -44,6 +44,8 @@ var latestChatLink;
 var desktopNotificationsEnabled;
 var areWeOnline;
 var unseenTotal;
+var hidePrivateKeyInterval;
+var showPrivateKeySecondsRemaining;
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
@@ -382,6 +384,8 @@ function resetView() {
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
   $('#profile-page-qr').empty();
+  $('#private-key-qr').remove();
+  clearInterval(hidePrivateKeyInterval);
 }
 
 function showMenu(show = true) {
@@ -461,8 +465,18 @@ $('#show-private-key-qr').click(togglePrivateKeyQR);
 function togglePrivateKeyQR(e) {
   var btn = $('#show-private-key-qr');
   var show = $('#private-key-qr').length === 0;
-  btn.text(show ? 'Hide private key QR code' : 'Show private key QR code');
   if (show) {
+    showPrivateKeySecondsRemaining = 20;
+    btn.text('Hide private key QR code (' + showPrivateKeySecondsRemaining + ')');
+    hidePrivateKeyInterval = setInterval(() => {
+      showPrivateKeySecondsRemaining -= 1;
+      if (showPrivateKeySecondsRemaining === 0) {
+       $('#private-key-qr').remove();
+        btn.text('Show private key QR code');
+      } else {
+        btn.text('Hide private key QR code (' + showPrivateKeySecondsRemaining + ')');
+      }
+    }, 1000);
     var qrCodeEl = $('<div>').attr('id', 'private-key-qr').insertAfter(btn);
     var qrcode = new QRCode(qrCodeEl[0], {
       text: JSON.stringify(key),
@@ -474,6 +488,7 @@ function togglePrivateKeyQR(e) {
     });
   } else {
     $('#private-key-qr').remove();
+    btn.text('Show private key QR code');
   }
 }
 
