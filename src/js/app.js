@@ -44,8 +44,6 @@ var latestChatLink;
 var desktopNotificationsEnabled;
 var areWeOnline;
 var unseenTotal;
-var hidePrivateKeyInterval;
-var showPrivateKeySecondsRemaining;
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
@@ -467,9 +465,9 @@ function togglePrivateKeyQR(e) {
   var SHOW_TEXT = 'Show private key QR code';
   function hideText(s) { return 'Hide private key QR code (' + s + ')'; }
   if (show) {
-    showPrivateKeySecondsRemaining = 20;
+    var showPrivateKeySecondsRemaining = 20;
     btn.text(hideText(showPrivateKeySecondsRemaining));
-    hidePrivateKeyInterval = setInterval(() => {
+    var hidePrivateKeyInterval = setInterval(() => {
       if ($('#private-key-qr').length === 0) {
         clearInterval(hidePrivateKeyInterval);
         btn.text(SHOW_TEXT);
