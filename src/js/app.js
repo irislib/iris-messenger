@@ -465,7 +465,7 @@ function togglePrivateKeyQR(e) {
   var btn = $('#show-private-key-qr');
   var show = $('#private-key-qr').length === 0;
   var SHOW_TEXT = 'Show private key QR code';
-  function hideText(s) { return 'Hide private key QR code (' + s ')'; }
+  function hideText(s) { return 'Hide private key QR code (' + s + ')'; }
   if (show) {
     showPrivateKeySecondsRemaining = 20;
     btn.text(hideText(showPrivateKeySecondsRemaining));
