@@ -19,6 +19,7 @@ body {
 
 a {
   text-decoration: none;
+  cursor: pointer;
 }
 
 a:hover {
@@ -160,6 +161,10 @@ header #back-button {
   padding: 10px 15px;
   background-color: var(--main-color);
   min-width: 0;
+}
+
+.start-hidden {
+  display: none;
 }
 
 .msg {

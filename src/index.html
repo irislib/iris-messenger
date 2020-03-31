@@ -63,12 +63,26 @@
     <section id="login">
       <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris">
       <h1>Iris Messenger</h1>
-      <form id="login-form" autocomplete="off">
-        <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="What's your name?">
-        <p><button type="submit">Go</button></p>
-      </form>
+      <div id="login-form" autocomplete="off">
+        <div id="create-account">
+          <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="What's your name?">
+          <p><button id="sign-up" type="input">Sign Up</button></p>
+          <br>
+          <p>Already have an account? <a id="show-switch-account">Log in here!</a></p>
+        </div>
+      </div>
+      <div id="switch-account" class="start-hidden">
+        <p>Don't have an account? <a id="show-create-account">Create account!</a></p>
+        <input id="paste-privkey" placeholder="Paste a private key">
+        <p>
+          <button id="startButton" onclick="startPrivKeyQRScanner()">Scan private key QR code</button>
+        </p>
+        </p>
+          <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;"></video>
+        </p>
+      </div>
     </section>
-
+        
     <section class="sidebar hidden-xs">
       <div class="user-info">
         <div id="my-identicon"></div>
@@ -175,9 +189,6 @@
         <p>
           <button class="show-logout-confirmation">Log out</button>
         </p>
-        <p>
-          <button class="show-switch-account">Switch account</button>
-        </p>
         <h4>Private key</h4>
         <p>
           <b>DANGER!</b> Private key is used to <b>log in to your account</b>. Don't give or show your private key to anyone else!
@@ -255,16 +266,6 @@
         </p>
       </div>
 
-      <!-- Login view -->
-      <div class="main-view" id="switch-account">
-        <input id="paste-privkey" placeholder="Paste a private key">
-        <p>
-          <button id="startButton" onclick="startPrivKeyQRScanner()">Scan private key QR code</button>
-        </p>
-        </p>
-          <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;"></video>
-        </p>
-      </div>
 
       <!-- Profile view -->
       <div class="main-view" id="profile">

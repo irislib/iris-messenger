@@ -130,8 +130,7 @@ async function addPeer(peer) {
 function newUserLogin() {
   $('#login').css('display', 'flex');
   $('#login-form-name').focus();
-  $('#login-form').submit(e => {
-    e.preventDefault();
+  $('#sign-up').click(function() {
     var name = $('#login-form-name').val();
     if (name.length) {
       $('#login').hide();
@@ -382,6 +381,7 @@ function resetView() {
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
   $('#profile-page-qr').empty();
+  $('#switch-account').show();
 }
 
 function showMenu(show = true) {
@@ -484,11 +484,17 @@ function showLogoutConfirmation() {
   $('#logout-confirmation').show();
 }
 
-$('.show-switch-account').click(showSwitchAccount);
+$('#show-switch-account').click(showSwitchAccount);
 function showSwitchAccount() {
   resetView();
-  $('#header-content').text('Switch account');
-  $('#switch-account').show();
+  $('#create-account').hide();
+  $('.start-hidden').show();
+}
+
+$('#show-create-account').click(showCreateAccount);
+function showCreateAccount() {
+  $('#create-account').show();
+  $('#switch-account').hide();
 }
 
 $('#switch-account input').on('input', (event) => {
@@ -500,6 +506,9 @@ $('#switch-account input').on('input', (event) => {
     $(event.target).val('');
   } catch (e) {
     console.error('Login with key', val, 'failed:', e);
+    $('#login').show();
+  } finally {
+    $('#login').hide();
   }
 });
 
