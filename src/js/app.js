@@ -481,7 +481,7 @@ function togglePrivateKeyQR(e) {
         hideText(showPrivateKeySecondsRemaining);
       }
     }, 1000);
-    var qrCodeEl = $('<div>').attr('id', 'private-key-qr').insertAfter(btn);
+    var qrCodeEl = $('<div>').attr('id', 'private-key-qr').addClass('qr-container').insertAfter(btn);
     var qrcode = new QRCode(qrCodeEl[0], {
       text: JSON.stringify(key),
       width: 300,
