@@ -473,6 +473,7 @@ function togglePrivateKeyQR(e) {
       if (showPrivateKeySecondsRemaining === 0) {
        $('#private-key-qr').remove();
         btn.text('Show private key QR code');
+        clearInterval(hidePrivateKeyInterval);
       } else {
         btn.text('Hide private key QR code (' + showPrivateKeySecondsRemaining + ')');
       }
