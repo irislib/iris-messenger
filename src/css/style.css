@@ -552,7 +552,7 @@ small {
   display: none;
 }
 
-.qr-container img {
+.qr-container img, .qr-container canvas {
   border: 5px solid white;
 }
 

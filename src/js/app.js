@@ -489,7 +489,7 @@ function togglePrivateKeyQR(e) {
         btn.text(SHOW_TEXT);
         clearInterval(hidePrivateKeyInterval);
       } else {
-        hideText(showPrivateKeySecondsRemaining);
+        btn.text(hideText(showPrivateKeySecondsRemaining));
       }
     }, 1000);
     var qrCodeEl = $('<div>').attr('id', 'private-key-qr').addClass('qr-container').insertAfter(btn);
