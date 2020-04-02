@@ -128,7 +128,7 @@ async function addPeer(peer) {
 }
 
 function newUserLogin() {
-  $('#login').css('display', 'flex');
+  $('#login').show();
   $('#login-form-name').focus();
   $('#sign-up').click(function() {
     var name = $('#login-form-name').val();
@@ -147,6 +147,7 @@ function login(k) {
   chats = {};
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
+  $('#login').hide();
   iris.Chat.initUser(gun, key);
   $('#my-chat-links').empty();
   iris.Chat.getMyChatLinks(gun, key, undefined, chatLink => {
@@ -381,7 +382,6 @@ function resetView() {
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
   $('#profile-page-qr').empty();
-  $('#switch-account').show();
 }
 
 function showMenu(show = true) {
@@ -418,6 +418,17 @@ function getMyChatLink() {
 function getUserChatLink(pub) {
   return 'https://iris.to/?chatWith=' + pub;
 }
+
+var scanPrivKeyBtn = $('#scan-privkey-btn');
+scanPrivKeyBtn.click(() => {
+  if ($('#privkey-qr-video:visible').length) {
+    $('#privkey-qr-video').hide();
+    cleanupScanner();
+  } else {
+    $('#privkey-qr-video').show();
+    startPrivKeyQRScanner();
+  }
+});
 
 $('#scan-chatlink-qr-btn').click(() => {
   if ($('#chatlink-qr-video:visible').length) {
@@ -484,20 +495,22 @@ function showLogoutConfirmation() {
   $('#logout-confirmation').show();
 }
 
-$('#show-switch-account').click(showSwitchAccount);
+$('#show-existing-account-login').click(showSwitchAccount);
 function showSwitchAccount() {
   resetView();
   $('#create-account').hide();
-  $('.start-hidden').show();
+  $('#existing-account-login').show();
 }
 
 $('#show-create-account').click(showCreateAccount);
 function showCreateAccount() {
+  $('#privkey-qr-video').hide();
   $('#create-account').show();
-  $('#switch-account').hide();
+  $('#existing-account-login').hide();
+  cleanupScanner();
 }
 
-$('#switch-account input').on('input', (event) => {
+$('#existing-account-login input').on('input', (event) => {
   var val = $(event.target).val();
   if (!val.length) { return; }
   try {
@@ -506,9 +519,6 @@ $('#switch-account input').on('input', (event) => {
     $(event.target).val('');
   } catch (e) {
     console.error('Login with key', val, 'failed:', e);
-    $('#login').show();
-  } finally {
-    $('#login').hide();
   }
 });
 

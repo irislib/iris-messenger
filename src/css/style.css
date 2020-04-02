@@ -52,10 +52,6 @@ img {
   max-height: 80vh;
 }
 
-.hidden {
-  display: none !important;
-}
-
 @media (max-width: 575px) {
   .hidden-xs {
     display: none !important;
@@ -90,6 +86,10 @@ img {
   .visible-xs-block, .visible-xs-inline-block {
     display: none !important;
   }
+}
+
+.hidden {
+  display: none;
 }
 
 .chat {
@@ -161,10 +161,6 @@ header #back-button {
   padding: 10px 15px;
   background-color: var(--main-color);
   min-width: 0;
-}
-
-.start-hidden {
-  display: none;
 }
 
 .msg {
@@ -314,10 +310,8 @@ header #back-button {
 }
 
 #login {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  padding: 15px;
+  display: flex;
   overflow-y: scroll;
   color: white;
   position: fixed;
@@ -327,6 +321,10 @@ header #back-button {
   bottom: 0;
   background-color: var(--login-background);
   z-index: 1000;
+}
+
+#login-content {
+  margin: auto;
   text-align: center;
 }
 
