@@ -11,4 +11,13 @@
     --notify: #9ee8ff;
     --login-background: #70d4f2;
     --seen-indicator: rgba(0, 0, 0, 0.45);
+    --input-bg: initial;
+    --input-text: initial;
+    --input-placeholder: initial;
+    --small-text-color: #777;
+    --button-bg: #ddd;
+    --button-color: initial;
+    --button-border: 0;
+    --button-hover-bg: #ccc;
+    --sidebar-border-right: 1px solid #dfdfdf;
 }
