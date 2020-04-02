@@ -128,10 +128,9 @@ async function addPeer(peer) {
 }
 
 function newUserLogin() {
-  $('#login').css('display', 'flex');
+  $('#login').show();
   $('#login-form-name').focus();
-  $('#login-form').submit(e => {
-    e.preventDefault();
+  $('#sign-up').click(function() {
     var name = $('#login-form-name').val();
     if (name.length) {
       $('#login').hide();
@@ -148,6 +147,7 @@ function login(k) {
   chats = {};
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
+  $('#login').hide();
   iris.Chat.initUser(gun, key);
   $('#my-chat-links').empty();
   iris.Chat.getMyChatLinks(gun, key, undefined, chatLink => {
@@ -420,6 +420,17 @@ function getUserChatLink(pub) {
   return 'https://iris.to/?chatWith=' + pub;
 }
 
+var scanPrivKeyBtn = $('#scan-privkey-btn');
+scanPrivKeyBtn.click(() => {
+  if ($('#privkey-qr-video:visible').length) {
+    $('#privkey-qr-video').hide();
+    cleanupScanner();
+  } else {
+    $('#privkey-qr-video').show();
+    startPrivKeyQRScanner();
+  }
+});
+
 $('#scan-chatlink-qr-btn').click(() => {
   if ($('#chatlink-qr-video:visible').length) {
     $('#chatlink-qr-video').hide();
@@ -503,14 +514,22 @@ function showLogoutConfirmation() {
   $('#logout-confirmation').show();
 }
 
-$('.show-switch-account').click(showSwitchAccount);
+$('#show-existing-account-login').click(showSwitchAccount);
 function showSwitchAccount() {
   resetView();
-  $('#header-content').text('Switch account');
-  $('#switch-account').show();
+  $('#create-account').hide();
+  $('#existing-account-login').show();
 }
 
-$('#switch-account input').on('input', (event) => {
+$('#show-create-account').click(showCreateAccount);
+function showCreateAccount() {
+  $('#privkey-qr-video').hide();
+  $('#create-account').show();
+  $('#existing-account-login').hide();
+  cleanupScanner();
+}
+
+$('#existing-account-login input').on('input', (event) => {
   var val = $(event.target).val();
   if (!val.length) { return; }
   try {

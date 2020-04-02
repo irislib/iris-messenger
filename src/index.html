@@ -60,13 +60,29 @@
 
 <body>
   <div class="chat">
-    <section id="login">
-      <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris">
-      <h1>Iris Messenger</h1>
-      <form id="login-form" autocomplete="off">
-        <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="What's your name?">
-        <p><button type="submit">Go</button></p>
-      </form>
+    <section id="login" class="hidden">
+      <div id="login-content">
+        <div id="login-form" autocomplete="off">
+          <div id="create-account">
+            <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris">
+            <h1>Iris Messenger</h1>
+            <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="What's your name?">
+            <p><button id="sign-up" type="input">Go</button></p>
+            <br>
+            <p><a id="show-existing-account-login">Already have an account?</a></p>
+          </div>
+        </div>
+        <div id="existing-account-login" class="hidden">
+          <p><a id="show-create-account">&lt; Back</a></p>
+          <input id="paste-privkey" placeholder="Paste a private key">
+          <p>
+            <button id="scan-privkey-btn">Scan private key QR code</button>
+          </p>
+          </p>
+            <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;" class="hidden"></video>
+          </p>
+        </div>
+      </div>
     </section>
 
     <section class="sidebar hidden-xs">
@@ -175,9 +191,6 @@
         <p>
           <button class="show-logout-confirmation">Log out</button>
         </p>
-        <p>
-          <button class="show-switch-account">Switch account</button>
-        </p>
         <h4>Private key</h4>
         <p>
           <b>DANGER!</b> Private key is used to <b>log in to your account</b>. Don't give or show your private key to anyone else!
@@ -189,7 +202,8 @@
         <p>
           <button id="show-private-key-qr">Show private key QR code</button>
         </p>
-        <h4>Peers</h4>
+        <hr/>
+        <h3>Peers</h3>
         <div id="peers" class="flex-table">
           <div class="flex-row" id="add-peer-row">
             <div class="flex-cell">
@@ -255,16 +269,6 @@
         </p>
       </div>
 
-      <!-- Login view -->
-      <div class="main-view" id="switch-account">
-        <input id="paste-privkey" placeholder="Paste a private key">
-        <p>
-          <button id="startButton" onclick="startPrivKeyQRScanner()">Scan private key QR code</button>
-        </p>
-        </p>
-          <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;"></video>
-        </p>
-      </div>
 
       <!-- Profile view -->
       <div class="main-view" id="profile">
