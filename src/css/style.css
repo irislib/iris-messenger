@@ -18,8 +18,8 @@ body {
 }
 
 a {
-  color: #00b6ed;
   text-decoration: none;
+  cursor: pointer;
 }
 
 a:hover {
@@ -36,24 +36,28 @@ input, button, .button {
 
 input {
   margin-right: 7px;
+  background: var(--input-bg);
+  color: var(--input-text);
+}
+
+::placeholder {
+  color: var(--input-placeholder);
 }
 
 button, .button {
-  background: #ddd;
+  background: var(--button-bg);
+  color: var(--button-color);
+  border: var(--button-border);
   cursor: pointer;
 }
 
 button:hover, button:active, button:focus, .button:hover, .button:active, .button:focus {
-  background: #ccc;
+  background: var(--button-hover-bg);
 }
 
 img {
   max-width: 90vw;
   max-height: 80vh;
-}
-
-.hidden {
-  display: none !important;
 }
 
 @media (max-width: 575px) {
@@ -92,6 +96,10 @@ img {
   }
 }
 
+.hidden {
+  display: none;
+}
+
 .chat {
   display: flex;
   flex-direction: row;
@@ -110,7 +118,7 @@ img {
   display: flex;
   flex-direction: column;
   flex: 1 0 10em;
-  border-right: 1px solid #dfdfdf;
+  border-right: var(--sidebar-border-right);
 }
 
 .sidebar * {
@@ -168,6 +176,10 @@ header #back-button {
   flex-direction: column;
   margin-bottom: 2px;
   overflow-wrap: break-word;
+}
+
+.msg a {
+  color: #00b6ed;
 }
 
 .msg-content {
@@ -291,7 +303,7 @@ header #back-button {
 }
 
 .flex-table .flex-row:nth-child(odd) {
-  background-color: rgba(255,255,255,0.5);
+  background-color: var(--zebra-stripe-bg);
 }
 
 .flex-table .flex-cell {
@@ -306,10 +318,8 @@ header #back-button {
 }
 
 #login {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  padding: 15px;
+  display: flex;
   overflow-y: scroll;
   color: white;
   position: fixed;
@@ -319,6 +329,10 @@ header #back-button {
   bottom: 0;
   background-color: var(--login-background);
   z-index: 1000;
+}
+
+#login-content {
+  margin: auto;
   text-align: center;
 }
 
@@ -362,6 +376,7 @@ header #back-button {
   background-color: transparent;
   font-size: 30px;
   padding: 5px;
+  border: 0;
 }
 
 /*----- Sidebar------- */
@@ -465,7 +480,7 @@ header #back-button {
 
 small {
   font-size: 12px;
-  color: #777;
+  color: var(--small-text-color);
 }
 
 .chat-item.active, .chat-item.active:hover {
@@ -479,6 +494,10 @@ small {
 .chat-item.new {
   align-items: center;
   border-bottom: 1px solid var(--chat-hover);
+}
+
+.chat-item.new svg {
+  color: var(--small-text-color);
 }
 
 #new-chat input {
@@ -544,6 +563,10 @@ small {
 
 #chatlink-qr-video {
   display: none;
+}
+
+.qr-container img, .qr-container canvas {
+  border: 5px solid white;
 }
 
 /* Places where emojis may appear */
