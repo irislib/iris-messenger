@@ -15,9 +15,10 @@
     --input-text: #ffffff;
     --input-placeholder: #ccc;
     --small-text-color: #bbb;
-    --button-bg: rgb(22, 23, 44);
+    --button-bg: rgba(0,0,0,0);
     --button-color: #1DC0F2;
     --button-border: 2px solid #1DC0F2;
-    --button-hover-bg: #101126;
+    --button-hover-bg: rgba(107,115,255,0.1);
     --sidebar-border-right: 1px solid #3D3E66;
+    --zebra-stripe-bg: #22244C;
 }

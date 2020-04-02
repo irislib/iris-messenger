@@ -303,7 +303,7 @@ header #back-button {
 }
 
 .flex-table .flex-row:nth-child(odd) {
-  background-color: rgba(255,255,255,0.5);
+  background-color: var(--zebra-stripe-bg);
 }
 
 .flex-table .flex-cell {
@@ -494,6 +494,10 @@ small {
 .chat-item.new {
   align-items: center;
   border-bottom: 1px solid var(--chat-hover);
+}
+
+.chat-item.new svg {
+  color: var(--small-text-color);
 }
 
 #new-chat input {
