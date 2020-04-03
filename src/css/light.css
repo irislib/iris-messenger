@@ -16,6 +16,7 @@
     --input-text: #262626;
     --input-placeholder: #a9a9a9;
     --small-text-color: #777;
+    --msg-form-button-color: #999;
     --button-bg: #ddd;
     --button-color: initial;
     --button-border: 0;
@@ -23,4 +24,6 @@
     --sidebar-border-right: 1px solid #dfdfdf;
     --zebra-stripe-bg: rgba(255,255,255,0.5);
     --link-color: initial;
+    --day-separator-bg: rgba(227, 249, 255, 0.91);
+    --day-separator-color: rgba(74, 74, 74, 0.88);
 }
