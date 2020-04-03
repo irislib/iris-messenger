@@ -15,11 +15,13 @@ body {
   margin: 0;
   height:100%;
   overflow:hidden;
+  background-color: var(--body-bg);
 }
 
 a {
   text-decoration: none;
   cursor: pointer;
+  color: var(--link-color);
 }
 
 a:hover, a:focus {
@@ -104,7 +106,6 @@ img {
 .chat {
   display: flex;
   flex-direction: row;
-  background-color: var(--msg-content-background);
   height: 100%;
   overflow: hidden;
   position: fixed;
@@ -349,6 +350,10 @@ header #back-button {
   outline: 1px;
   margin-right: 5px;
   display: none;
+}
+
+.emoji-picker {
+  background: var(--emoji-picker-bg);
 }
 
 .emoji-picker__tab {

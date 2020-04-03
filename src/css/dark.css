@@ -1,5 +1,6 @@
 /* dark.css: 👉 light-on-dark */
 :root {
+    --body-bg: #101126;
     --text-color: #ffffff;
     --text-time: rgba(255, 255, 255, 0.45);
     --main-color: rgb(22, 23, 44);
@@ -21,4 +22,6 @@
     --button-hover-bg: rgba(107,115,255,0.1);
     --sidebar-border-right: 1px solid #3D3E66;
     --zebra-stripe-bg: #22244C;
+    --emoji-picker-bg: #22244C;
+    --link-color: #1DC0F2;
 }
