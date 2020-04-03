@@ -515,14 +515,16 @@ function showLogoutConfirmation() {
 }
 
 $('#show-existing-account-login').click(showSwitchAccount);
-function showSwitchAccount() {
+function showSwitchAccount(e) {
+  e.preventDefault();
   resetView();
   $('#create-account').hide();
   $('#existing-account-login').show();
 }
 
 $('#show-create-account').click(showCreateAccount);
-function showCreateAccount() {
+function showCreateAccount(e) {
+  e.preventDefault();
   $('#privkey-qr-video').hide();
   $('#create-account').show();
   $('#existing-account-login').hide();

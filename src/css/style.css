@@ -22,8 +22,9 @@ a {
   cursor: pointer;
 }
 
-a:hover {
+a:hover, a:focus {
   text-decoration: underline;
+  outline: none;
 }
 
 input, button, .button {
@@ -329,6 +330,14 @@ header #back-button {
   bottom: 0;
   background-color: var(--login-background);
   z-index: 1000;
+}
+
+#login a {
+  color: white;
+}
+
+#login a:hover {
+  color: white;
 }
 
 #login-content {
