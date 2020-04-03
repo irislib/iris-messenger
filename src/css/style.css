@@ -120,6 +120,7 @@ img {
   display: flex;
   flex-direction: column;
   flex: 1 0 10em;
+  background: var(--sidebar-bg);
   border-right: var(--sidebar-border-right);
 }
 
@@ -530,13 +531,12 @@ small {
 }
 
 #not-seen-by-them button {
-  background: var(--msg-content-background);
-  color: var(--text-color);
+  background: white;
+  color: #262626;
 }
 
 #not-seen-by-them button:hover, #not-seen-by-them button:active, #not-seen-by-them button:focus {
-  background: var(--text-color);
-  color: var(--msg-content-background);
+  background: #ccc;
 }
 
 #enable-notifications-prompt {

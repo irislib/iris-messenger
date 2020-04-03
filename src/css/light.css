@@ -21,8 +21,12 @@
     --button-color: initial;
     --button-border: 0;
     --button-hover-bg: #ccc;
+    --sidebar-bg: #fff;
     --sidebar-border-right: 1px solid #dfdfdf;
     --zebra-stripe-bg: rgba(255,255,255,0.5);
+    --emoji-picker-bg: #FFFFFF;
+    --emoji-picker-color: #777;
+    --emoji-picker-border-color: #CCCCCC;
     --link-color: initial;
     --day-separator-bg: rgba(227, 249, 255, 0.91);
     --day-separator-color: rgba(74, 74, 74, 0.88);
