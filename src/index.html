@@ -92,7 +92,7 @@
       </div>
       <div id="enable-notifications-prompt">
         <div class="title">Get notified of new messages</div>
-        <div><a>Turn on desktop notifications ></a></div>
+        <div><a>Turn on desktop notifications</a></div>
       </div>
       <div class="chat-list">
         <div class="chat-item new">
@@ -142,12 +142,12 @@
       <div class="main-view" id="new-chat">
         <h3>Have someone's chat link?</h3>
         <input id="paste-chat-link" type="text" placeholder="Paste someone's chat link">
-        <h4>or...</h4>
+        <p>or...</p>
         <button id="scan-chatlink-qr-btn">Scan their QR code</button>
         <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
         <h3>Give your chat link:</h3>
         <button class="copy-chat-link">Copy your chat link</button>
-        <h4>or...</h4>
+        <p>or...</p>
         <p>Show them your QR code:</p><p id="my-qr-code" class="qr-container"></p>
         <p><small>Beware of sharing your chat link publicly: you might get spammed with message requests. Publicly share your <a class="profile-link">profile link</a> instead.</small></p>
         <hr/>
@@ -275,19 +275,13 @@
 
       <!-- Profile view -->
       <div class="main-view" id="profile">
-        <h3>Profile</h3>
         <div class="profile-photo-container"><img class="profile-photo"></div>
         <div class="content">
           <div class="profile-about" style="display:none">
-            <h4>About me:</h4>
             <p class="profile-about-content"></p>
           </div>
           <p class="status"></p>
           <p class="last-active"></p>
-          <h4>Add nickname:</h4>
-          <p>
-            <input id="profile-nickname" style="width:100%" placeholder="Stinky Pete">
-          </p>
           <!--
           <p>
             <button class="add-friend">Add friend</button>
@@ -296,8 +290,6 @@
             <small>Friends can optionally direct connect to each other and store each others' encrypted data.</small>
           </p>
         -->
-          <hr/>
-          <h3>Account</h3>
           <p>
             <button class="send-message">Send message</button>
             <button class="copy-user-link">Copy link</button>
@@ -308,6 +300,17 @@
             <button class="add-friend">Add to friends</button>
           </p>
           -->
+          <hr/>
+          <h3>Chat Settings</h3>
+          <h4>Nicknames:</h4>
+          <div class="profile-nicknames">
+            <p>
+              <span id="their-public-name"></span><input id="profile-nickname-their">
+            </p>
+            <p>
+              <span id="my-public-name"></span><input id="profile-nickname-my">
+            </p>
+          </div>
           <hr/>
           <p>
             <button class="delete-chat">Delete chat</button>

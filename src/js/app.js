@@ -40,6 +40,7 @@ var activeProfile;
 var onlineTimeout;
 var loginTime;
 var key;
+var myName;
 var latestChatLink;
 var desktopNotificationsEnabled;
 var areWeOnline;
@@ -197,6 +198,7 @@ function login(k) {
   $('#private-key-qr').remove();
   gun.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
+      myName = name;
       $('.user-info .user-name').text(truncateString(name, 20));
       var el = $('#settings-name');
       if (!el.is(':focus')) {
@@ -382,7 +384,12 @@ function resetView() {
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
   $('#profile-page-qr').empty();
-  $('#profile-nickname').val('')
+  $('#their-public-name').empty();
+  $('#my-public-name').empty();
+  $('#profile-nickname-their').val('');
+  $('#profile-nickname-my').val('');
+  $('#profile-nickname-their').removeAttr('placeholder');
+  $('#profile-nickname-my').removeAttr('placeholder');
   $('#profile .profile-about-content').empty();
   $('#private-key-qr').remove();
 }
@@ -697,9 +704,19 @@ function showProfile(pub) {
       t.css('width', '');
     }, 2000);
   });
-  $('#profile-nickname').off().on('change', event => {
-    var nickname = event.target.value;
-    chats[pub].putEncrypted('nickname', nickname);
+  $('#their-public-name').text(chats[pub].name + ": ");
+  $('#my-public-name').text(myName + ": ");
+  $('#profile-nickname-their').attr('placeholder',chats[pub].theirNickname);
+  $('#profile-nickname-my').attr('placeholder',chats[pub].myNickname);
+  $('#profile-nickname-their').off().on('change', event => {
+    var nick = event.target.value;
+    $('#profile-nickname-their').attr('placeholder',nick);
+    chats[pub].putEncrypted('theirNickname', nick);
+  });
+  $('#profile-nickname-my').off().on('change', event => {
+    var nick = event.target.value;
+    $('#profile-nickname-my').attr('placeholder',nick);
+    chats[pub].putEncrypted('myNickname', nick);
   });
   qrCodeEl.empty();
   var qrcode = new QRCode(qrCodeEl[0], {
@@ -716,8 +733,8 @@ function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (chats[pub]) {
-    if (chats[pub].nickname) {
-      nameEl.text(truncateString(chats[pub].nickname + " (" + chats[pub].name + ")", 30) );
+    if (chats[pub].theirNickname) {
+      nameEl.text(truncateString(chats[pub].theirNickname, 30) );
     } else if (chats[pub].name) {
       nameEl.text(truncateString(chats[pub].name, 30));
     }
@@ -959,20 +976,39 @@ function addChat(pub, chatLink) {
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
-  chats[pub].onMyEncrypted('nickname', (nick) => {
-    chats[pub].nickname = nick;
-    if (chats[pub].nickname) {
-      el.find('.name').text(truncateString(chats[pub].nickname + " (" + chats[pub].name + ")", 20));
+  chats[pub].onTheirEncrypted('theirNickname', (nick) => {
+    //console.log(chats[pub].name,' gave you the nickname ',nick);
+    chats[pub].myNickname = nick;
+  });
+  chats[pub].onTheirEncrypted('myNickname', (nick) => {
+    //console.log(chats[pub].name,' gave themselves the nickname ',nick);
+    chats[pub].theirNickname = nick;
+    if (chats[pub].theirNickname) {
+      el.find('.name').text(truncateString(chats[pub].theirNickname, 20));
       if (pub === activeProfile) {
         addUserToHeader(pub);
       }
     }
   });
+  chats[pub].onMyEncrypted('theirNickname', (nick) => {
+    //console.log('You gave ',chats[pub].name,' the nickname ',nick);
+    chats[pub].theirNickname = nick;
+    if (chats[pub].theirNickname) {
+      el.find('.name').text(truncateString(chats[pub].theirNickname, 20));
+      if (pub === activeProfile) {
+        addUserToHeader(pub);
+      }
+    }
+  });
+  chats[pub].onMyEncrypted('myNickname', (nick) => {
+    //console.log('You gave yourself the nickname ',nick);
+    chats[pub].myNickname = nick;
+  });
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
-      if (chats[pub].nickname) {
-        el.find('.name').text(truncateString(chats[pub].nickname + " (" + name + ")", 20));
+      if (chats[pub].theirNickname) {
+        el.find('.name').text(truncateString(chats[pub].theirNickname, 20));
       } else {
         el.find('.name').text(truncateString(name, 20));
       }
