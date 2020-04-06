@@ -716,7 +716,7 @@ function showProfile(pub) {
   $('#profile-nickname-their').off().on('change', event => {
     var nick = event.target.value;
     
-    chats[pub].putEncrypted('nickname', nick);
+    chats[pub].put('nickname', nick);
   });
   qrCodeEl.empty();
   var qrcode = new QRCode(qrCodeEl[0], {
@@ -976,11 +976,11 @@ function addChat(pub, chatLink) {
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
-  chats[pub].onTheirEncrypted('nickname', (nick) => {
+  chats[pub].on('nickname', (nick) => {
     //console.log(chats[pub].name,' gave you the nickname ',nick);
     chats[pub].myNickname = nick;
-  });
-  chats[pub].onMyEncrypted('nickname', (nick) => {
+  },"them");
+  chats[pub].on('nickname', (nick) => {
     //console.log('You gave ',chats[pub].name,' the nickname ',nick);
     chats[pub].theirNickname = nick;
     if (chats[pub].theirNickname) {
@@ -989,7 +989,7 @@ function addChat(pub, chatLink) {
         addUserToHeader(pub);
       }
     }
-  });
+  },"me");
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
