@@ -15,15 +15,18 @@ body {
   margin: 0;
   height:100%;
   overflow:hidden;
+  background-color: var(--body-bg);
 }
 
 a {
   text-decoration: none;
   cursor: pointer;
+  color: var(--link-color);
 }
 
-a:hover {
+a:hover, a:focus {
   text-decoration: underline;
+  outline: none;
 }
 
 input, button, .button {
@@ -103,7 +106,6 @@ img {
 .chat {
   display: flex;
   flex-direction: row;
-  background-color: var(--msg-content-background);
   height: 100%;
   overflow: hidden;
   position: fixed;
@@ -118,6 +120,7 @@ img {
   display: flex;
   flex-direction: column;
   flex: 1 0 10em;
+  background: var(--sidebar-bg);
   border-right: var(--sidebar-border-right);
 }
 
@@ -273,14 +276,14 @@ header #back-button {
 .day-separator {
   display: inline-block;
   border-radius: 8px;
-  background-color: rgba(227, 249, 255, 0.91);
+  background-color: var(--day-separator-bg);
   padding: 6px 10px;
   margin-top: 15px;
   margin-left: auto;
   margin-right: auto;
   text-transform: uppercase;
   font-size: 13px;
-  color: rgba(74, 74, 74, 0.88);
+  color: var(--day-separator-color);
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
   user-select: none;
 }
@@ -331,6 +334,14 @@ header #back-button {
   z-index: 1000;
 }
 
+#login a {
+  color: white;
+}
+
+#login a:hover {
+  color: white;
+}
+
 #login-content {
   margin: auto;
   text-align: center;
@@ -340,6 +351,16 @@ header #back-button {
   outline: 1px;
   margin-right: 5px;
   display: none;
+}
+
+.emoji-picker {
+  background: var(--emoji-picker-bg) !important;
+  border-color: var(--emoji-picker-border-color) !important;
+}
+
+.emoji-picker * {
+  color: var(--emoji-picker-color) !important;
+  border-color: var(--emoji-picker-border-color) !important;
 }
 
 .emoji-picker__tab {
@@ -372,7 +393,7 @@ header #back-button {
 
 .message-form button, .message-form button:hover, .message-form button:active, .message-form button:focus {
   flex: none;
-  color: #999;
+  color: var(--msg-form-button-color);
   background-color: transparent;
   font-size: 30px;
   padding: 5px;
@@ -510,13 +531,12 @@ small {
 }
 
 #not-seen-by-them button {
-  background: var(--msg-content-background);
-  color: var(--text-color);
+  background: white;
+  color: #262626;
 }
 
 #not-seen-by-them button:hover, #not-seen-by-them button:active, #not-seen-by-them button:focus {
-  background: var(--text-color);
-  color: var(--msg-content-background);
+  background: #ccc;
 }
 
 #enable-notifications-prompt {
