@@ -712,9 +712,15 @@ function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (chats[pub] && chats[pub].name) {
-    nameEl.text(truncateString(chats[pub].name, 30));
+    if (pub == key.pub) {
+      nameEl.text(truncateString("📝Note to Self", 30)); 
+      // disable nicknames in note to self too
+    } else {
+      nameEl.text(truncateString(chats[pub].name, 30));
+    }
     nameEl.show();
   }
+
   var identicon = getIdenticon(pub, 40);
   var img = identicon.children('img').first();
   img.attr('height', 40).attr('width', 40);
@@ -951,6 +957,9 @@ function addChat(pub, chatLink) {
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
+  if (pub == key.pub) {
+    el.find('.name').text(truncateString("📝Note to Self", 20));
+  }
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
