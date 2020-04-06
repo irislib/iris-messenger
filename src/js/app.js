@@ -784,9 +784,9 @@ function showChat(pub) {
   if (!iris.util.isMobile) {
     $("#new-msg").focus();
   }
-  $('#new-msg').off().on('input', () => {
+  $('#new-msg').off().on('input', _.throttle(() => {
     chats[pub].setTyping($('#new-msg').val().length > 0);
-  });
+  }, 1000));
   $(".message-form form").off().on('submit', event => {
     event.preventDefault();
     var text = $('#new-msg').val();

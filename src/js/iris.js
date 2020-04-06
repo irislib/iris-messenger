@@ -7155,7 +7155,7 @@
 	    if (options.channelLink) {
 	      var s = options.channelLink.split('?');
 	      if (s.length === 2) {
-	        var pub = util.getUrlParameter('channelWith', s[1]);
+	        var pub = util.getUrlParameter('chatWith', s[1]);
 	        options.participants = pub;
 	        if (pub !== this.key.pub) {
 	          var sharedSecret = util.getUrlParameter('s', s[1]);
@@ -7844,7 +7844,7 @@
 	  };
 
 	  Channel.formatChannelLink = function formatChannelLink(urlRoot, pub, sharedSecret, linkId) {
-	    return urlRoot + '?channelWith=' + encodeURIComponent(pub) + '&s=' + encodeURIComponent(sharedSecret) + '&k=' + encodeURIComponent(linkId);
+	    return urlRoot + '?chatWith=' + encodeURIComponent(pub) + '&s=' + encodeURIComponent(sharedSecret) + '&k=' + encodeURIComponent(linkId);
 	  };
 
 	  /**
