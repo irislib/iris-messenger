@@ -130,7 +130,8 @@ async function addPeer(peer) {
 function newUserLogin() {
   $('#login').show();
   $('#login-form-name').focus();
-  $('#sign-up').click(function() {
+  $('#login-form').submit(function(e) {
+    e.preventDefault();
     var name = $('#login-form-name').val();
     if (name.length) {
       $('#login').hide();
@@ -148,13 +149,13 @@ function login(k) {
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
   $('#login').hide();
-  iris.Chat.initUser(gun, key);
+  iris.Channel.initUser(gun, key);
   $('#my-chat-links').empty();
-  iris.Chat.getMyChatLinks(gun, key, undefined, chatLink => {
+  iris.Channel.getMyChannelLinks(gun, key, undefined, chatLink => {
     var row = $('<div>').addClass('flex-row');
     var text = $('<div>').addClass('flex-cell').text(chatLink.url);
     var btn = $('<button>Remove</button>').click(() => {
-      iris.Chat.removeChatLink(gun, key, chatLink.id);
+      iris.Channel.removeChannelLink(gun, key, chatLink.id);
       hideAndRemove(row);
     });
     row.append(text);
@@ -178,7 +179,7 @@ function login(k) {
     }
   });
   setOurOnlineStatus();
-  iris.Chat.getChats(gun, key, addChat);
+  iris.Channel.getChannels(gun, key, addChat);
   var chatWith = getUrlParameter('chatWith');
   if (chatWith) {
     addChat(chatWith, window.location.href);
@@ -223,7 +224,7 @@ function login(k) {
 }
 
 async function createChatLink() {
-  latestChatLink = await iris.Chat.createChatLink(gun, key);
+  latestChatLink = await iris.Channel.createChannelLink(gun, key);
   setChatLinkQrCode(latestChatLink);
 }
 
@@ -344,24 +345,24 @@ $('#settings-about').on('input', event => {
 });
 
 function setOurOnlineStatus() {
-  iris.Chat.setOnline(gun, areWeOnline = true);
+  iris.Channel.setOnline(gun, areWeOnline = true);
   document.addEventListener("mousemove", () => {
     if (!areWeOnline && activeChat) {
       chats[activeChat].setMyMsgsLastSeenTime();
     }
-    iris.Chat.setOnline(gun, areWeOnline = true);
+    iris.Channel.setOnline(gun, areWeOnline = true);
     clearTimeout(onlineTimeout);
-    onlineTimeout = setTimeout(() => iris.Chat.setOnline(gun, areWeOnline = false), 60000);
+    onlineTimeout = setTimeout(() => iris.Channel.setOnline(gun, areWeOnline = false), 60000);
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
-      iris.Chat.setOnline(gun, areWeOnline = true);
+      iris.Channel.setOnline(gun, areWeOnline = true);
       if (activeChat) {
         chats[activeChat].setMyMsgsLastSeenTime();
         changeChatUnseenCount(activeChat, 0);
       }
     } else {
-      iris.Chat.setOnline(gun, areWeOnline = false);
+      iris.Channel.setOnline(gun, areWeOnline = false);
     }
   });
 }
@@ -884,7 +885,7 @@ function addMessage(msg) {
 }
 
 function deleteChat(pub) {
-  iris.Chat.deleteChat(gun, key, pub);
+  iris.Channel.deleteChannel(gun, key, pub);
   if (activeChat === pub) {
     showNewChat();
     showMenu();
@@ -902,7 +903,7 @@ function addChat(pub, chatLink) {
   el.attr('data-pub', pub);
   var latestEl = el.find('.latest');
   var typingIndicator = el.find('.typing-indicator').text('Typing...');
-  chats[pub] = new iris.Chat({gun, key, chatLink: chatLink, participants: pub, onMessage: (msg, info) => {
+  chats[pub] = new iris.Channel({gun, key, chatLink: chatLink, participants: pub, onMessage: (msg, info) => {
     msg.selfAuthored = info.selfAuthored;
     chats[pub].messages[msg.time] = msg;
     msg.time = new Date(msg.time);
@@ -1007,7 +1008,7 @@ function addChat(pub, chatLink) {
     latestEl.toggle(!isTyping);
   });
   chats[pub].online = {};
-  iris.Chat.getOnline(gun, pub, (online) => {
+  iris.Channel.getOnline(gun, pub, (online) => {
     if (chats[pub]) {
       chats[pub].online = online;
       setTheirOnlineStatus(pub);

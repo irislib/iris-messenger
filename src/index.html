@@ -62,16 +62,16 @@
   <div class="chat">
     <section id="login" class="hidden">
       <div id="login-content">
-        <div id="login-form" autocomplete="off">
+        <form id="login-form" autocomplete="off">
           <div id="create-account">
             <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris">
             <h1>Iris Messenger</h1>
             <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="What's your name?">
-            <p><button id="sign-up" type="input">Go</button></p>
+            <p><button id="sign-up" type="submit">Go</button></p>
             <br>
             <p><a href="#" id="show-existing-account-login">Already have an account?</a></p>
           </div>
-        </div>
+        </form>
         <div id="existing-account-login" class="hidden">
           <p><a href="#" id="show-create-account">&lt; Back</a></p>
           <input id="paste-privkey" placeholder="Paste a private key">

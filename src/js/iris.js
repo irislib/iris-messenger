@@ -5801,7 +5801,7 @@
 	  /**
 	  * Get a keypair from a JSON string.
 	  * @param {String} str key JSON
-	  * @returns {Object} Gun.Gun.SEA keypair object
+	  * @returns {Object} Gun.SEA keypair object
 	  */
 
 
@@ -5811,12 +5811,12 @@
 
 	  /**
 	  * Generate a new keypair
-	  * @returns {Promise<Object>} Gun.Gun.SEA keypair object
+	  * @returns {Promise<Object>} Gun.SEA keypair object
 	  */
 
 
 	  Key.generate = function generate() {
-	    return Gun.Gun.SEA.pair();
+	    return Gun.SEA.pair();
 	  };
 
 	  /**
@@ -5828,7 +5828,7 @@
 
 
 	  Key.sign = async function sign(msg, pair) {
-	    var sig = await Gun.Gun.SEA.sign(msg, pair);
+	    var sig = await Gun.SEA.sign(msg, pair);
 	    return 'a' + sig;
 	  };
 
@@ -5841,7 +5841,7 @@
 
 
 	  Key.verify = function verify(msg, pubKey) {
-	    return Gun.Gun.SEA.verify(msg.slice(1), pubKey);
+	    return Gun.SEA.verify(msg.slice(1), pubKey);
 	  };
 
 	  return Key;
@@ -5862,7 +5862,7 @@
 	}(Error);
 
 	/**
-	* Signed message object.
+	* Signed message object. Your friends can index and relay your messages, while others can still verify that they were signed by you.
 	*
 	* Fields: signedData, signer (public key) and signature.
 	*
@@ -5880,7 +5880,7 @@
 	* @param obj
 	*
 	* @example
-	* https://github.com/irislib/iris-lib/blob/master/__tests__/message.js
+	* https://github.com/irislib/iris-lib/blob/master/__tests__/SignedMessage.js
 	*
 	* Rating message:
 	* {
@@ -5914,9 +5914,9 @@
 	*/
 
 
-	var Message = function () {
-	  function Message(obj) {
-	    _classCallCheck(this, Message);
+	var SignedMessage = function () {
+	  function SignedMessage(obj) {
+	    _classCallCheck(this, SignedMessage);
 
 	    if (obj.signedData) {
 	      this.signedData = obj.signedData;
@@ -5929,7 +5929,7 @@
 	    }
 	    if (obj.sig) {
 	      if (typeof obj.sig !== 'string') {
-	        throw new ValidationError('Message signature must be a string');
+	        throw new ValidationError('SignedMessage signature must be a string');
 	      }
 	      this.sig = obj.sig;
 	      this.getHash();
@@ -5937,7 +5937,7 @@
 	    this._validate();
 	  }
 
-	  Message._getArray = function _getArray(authorOrRecipient) {
+	  SignedMessage._getArray = function _getArray(authorOrRecipient) {
 	    var arr = [];
 	    var keys = _Object$keys(authorOrRecipient);
 	    for (var i = 0; i < keys.length; i++) {
@@ -5956,7 +5956,7 @@
 	    return arr;
 	  };
 
-	  Message._getIterable = function _getIterable(authorOrRecipient) {
+	  SignedMessage._getIterable = function _getIterable(authorOrRecipient) {
 	    var _ref;
 
 	    return _ref = {}, _ref[_Symbol$iterator] = /*#__PURE__*/regenerator.mark(function _callee() {
@@ -6026,8 +6026,8 @@
 	  */
 
 
-	  Message.prototype.getAuthorIterable = function getAuthorIterable() {
-	    return Message._getIterable(this.signedData.author);
+	  SignedMessage.prototype.getAuthorIterable = function getAuthorIterable() {
+	    return SignedMessage._getIterable(this.signedData.author);
 	  };
 
 	  /**
@@ -6035,8 +6035,8 @@
 	  */
 
 
-	  Message.prototype.getRecipientIterable = function getRecipientIterable() {
-	    return Message._getIterable(this.signedData.recipient);
+	  SignedMessage.prototype.getRecipientIterable = function getRecipientIterable() {
+	    return SignedMessage._getIterable(this.signedData.recipient);
 	  };
 
 	  /**
@@ -6044,8 +6044,8 @@
 	  */
 
 
-	  Message.prototype.getAuthorArray = function getAuthorArray() {
-	    return Message._getArray(this.signedData.author);
+	  SignedMessage.prototype.getAuthorArray = function getAuthorArray() {
+	    return SignedMessage._getArray(this.signedData.author);
 	  };
 
 	  /**
@@ -6053,21 +6053,21 @@
 	  */
 
 
-	  Message.prototype.getRecipientArray = function getRecipientArray() {
-	    return this.signedData.recipient ? Message._getArray(this.signedData.recipient) : [];
+	  SignedMessage.prototype.getRecipientArray = function getRecipientArray() {
+	    return this.signedData.recipient ? SignedMessage._getArray(this.signedData.recipient) : [];
 	  };
 
 	  /**
-	  * @returns {string} Message signer keyID, i.e. base64 hash of public key
+	  * @returns {string} SignedMessage signer keyID, i.e. base64 hash of public key
 	  */
 
 
-	  Message.prototype.getSignerKeyID = function getSignerKeyID() {
+	  SignedMessage.prototype.getSignerKeyID = function getSignerKeyID() {
 	    return this.pubKey; // hack until gun supports keyID lookups
 	    //return util.getHash(this.pubKey);
 	  };
 
-	  Message.prototype._validate = function _validate() {
+	  SignedMessage.prototype._validate = function _validate() {
 	    if (!this.signedData) {
 	      throw new ValidationError(errorMsg + ' Missing signedData');
 	    }
@@ -6190,7 +6190,7 @@
 	  */
 
 
-	  Message.prototype.isPositive = function isPositive() {
+	  SignedMessage.prototype.isPositive = function isPositive() {
 	    return this.signedData.type === 'rating' && this.signedData.rating > (this.signedData.maxRating + this.signedData.minRating) / 2;
 	  };
 
@@ -6199,7 +6199,7 @@
 	  */
 
 
-	  Message.prototype.isNegative = function isNegative() {
+	  SignedMessage.prototype.isNegative = function isNegative() {
 	    return this.signedData.type === 'rating' && this.signedData.rating < (this.signedData.maxRating + this.signedData.minRating) / 2;
 	  };
 
@@ -6208,16 +6208,16 @@
 	  */
 
 
-	  Message.prototype.isNeutral = function isNeutral() {
+	  SignedMessage.prototype.isNeutral = function isNeutral() {
 	    return this.signedData.type === 'rating' && this.signedData.rating === (this.signedData.maxRating + this.signedData.minRating) / 2;
 	  };
 
 	  /**
-	  * @param {Object} key Gun.Gun.SEA keypair to sign the message with
+	  * @param {Object} key Gun.SEA keypair to sign the message with
 	  */
 
 
-	  Message.prototype.sign = async function sign(key) {
+	  SignedMessage.prototype.sign = async function sign(key) {
 	    this.sig = await Key.sign(this.signedData, key);
 	    this.pubKey = key.pub;
 	    await this.getHash();
@@ -6225,19 +6225,19 @@
 	  };
 
 	  /**
-	  * Create an iris message. Message time is automatically set. If signingKey is specified and author omitted, signingKey will be used as author.
+	  * Create an iris message. SignedMessage time is automatically set. If signingKey is specified and author omitted, signingKey will be used as author.
 	  * @param {Object} signedData message data object including author, recipient and other possible attributes
 	  * @param {Object} signingKey optionally, you can set the key to sign the message with
-	  * @returns {Promise<Message>}  message
+	  * @returns {Promise<SignedMessage>}  message
 	  */
 
 
-	  Message.create = async function create(signedData, signingKey) {
+	  SignedMessage.create = async function create(signedData, signingKey) {
 	    if (!signedData.author && signingKey) {
 	      signedData.author = { keyID: Key.getId(signingKey) };
 	    }
 	    signedData.time = signedData.time || new Date().toISOString();
-	    var m = new Message({ signedData: signedData });
+	    var m = new SignedMessage({ signedData: signedData });
 	    if (signingKey) {
 	      await m.sign(signingKey);
 	    }
@@ -6245,28 +6245,28 @@
 	  };
 
 	  /**
-	  * Create an  verification message. Message signedData's type and time are automatically set. Recipient must be set. If signingKey is specified and author omitted, signingKey will be used as author.
+	  * Create an  verification message. SignedMessage signedData's type and time are automatically set. Recipient must be set. If signingKey is specified and author omitted, signingKey will be used as author.
 	  * @returns {Promise<Object>} message object promise
 	  */
 
 
-	  Message.createVerification = function createVerification(signedData, signingKey) {
+	  SignedMessage.createVerification = function createVerification(signedData, signingKey) {
 	    signedData.type = 'verification';
-	    return Message.create(signedData, signingKey);
+	    return SignedMessage.create(signedData, signingKey);
 	  };
 
 	  /**
-	  * Create an  rating message. Message signedData's type, maxRating, minRating, time and context are set automatically. Recipient and rating must be set. If signingKey is specified and author omitted, signingKey will be used as author.
+	  * Create an  rating message. SignedMessage signedData's type, maxRating, minRating, time and context are set automatically. Recipient and rating must be set. If signingKey is specified and author omitted, signingKey will be used as author.
 	  * @returns {Promise<Object>} message object promise
 	  */
 
 
-	  Message.createRating = function createRating(signedData, signingKey) {
+	  SignedMessage.createRating = function createRating(signedData, signingKey) {
 	    signedData.type = 'rating';
 	    signedData.context = signedData.context || 'iris';
 	    signedData.maxRating = signedData.maxRating || 10;
 	    signedData.minRating = signedData.minRating || -10;
-	    return Message.create(signedData, signingKey);
+	    return SignedMessage.create(signedData, signingKey);
 	  };
 
 	  /**
@@ -6275,7 +6275,7 @@
 	  */
 
 
-	  Message.prototype.getAuthor = function getAuthor(index) {
+	  SignedMessage.prototype.getAuthor = function getAuthor(index) {
 	    for (var _iterator = this.getAuthorIterable(), _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _getIterator(_iterator);;) {
 	      var _ref2;
 
@@ -6302,7 +6302,7 @@
 	  */
 
 
-	  Message.prototype.getRecipient = function getRecipient(index) {
+	  SignedMessage.prototype.getRecipient = function getRecipient(index) {
 	    if (!this.signedData.recipient) {
 	      return undefined;
 	    }
@@ -6331,18 +6331,18 @@
 	  */
 
 
-	  Message.prototype.getHash = async function getHash() {
+	  SignedMessage.prototype.getHash = async function getHash() {
 	    if (this.sig && !this.hash) {
 	      this.hash = await util.getHash(this.sig);
 	    }
 	    return this.hash;
 	  };
 
-	  Message.prototype.getId = function getId() {
+	  SignedMessage.prototype.getId = function getId() {
 	    return this.getHash();
 	  };
 
-	  Message.fromSig = async function fromSig(obj) {
+	  SignedMessage.fromSig = async function fromSig(obj) {
 	    if (!obj.sig) {
 	      throw new Error('Missing signature in object:', obj);
 	    }
@@ -6351,7 +6351,7 @@
 	    }
 	    var signedData = await Key.verify(obj.sig, obj.pubKey);
 	    var o = { signedData: signedData, sig: obj.sig, pubKey: obj.pubKey };
-	    return new Message(o);
+	    return new SignedMessage(o);
 	  };
 
 	  /**
@@ -6359,12 +6359,12 @@
 	  */
 
 
-	  Message.prototype.verify = async function verify() {
+	  SignedMessage.prototype.verify = async function verify() {
 	    if (!this.pubKey) {
-	      throw new ValidationError(errorMsg + ' Message has no .pubKey');
+	      throw new ValidationError(errorMsg + ' SignedMessage has no .pubKey');
 	    }
 	    if (!this.sig) {
-	      throw new ValidationError(errorMsg + ' Message has no .sig');
+	      throw new ValidationError(errorMsg + ' SignedMessage has no .sig');
 	    }
 	    this.signedData = await Key.verify(this.sig, this.pubKey);
 	    if (!this.signedData) {
@@ -6385,7 +6385,7 @@
 	  */
 
 
-	  Message.prototype.saveToIpfs = async function saveToIpfs(ipfs) {
+	  SignedMessage.prototype.saveToIpfs = async function saveToIpfs(ipfs) {
 	    var s = this.toString();
 	    var r = await ipfs.add(ipfs.types.Buffer.from(s));
 	    if (r.length) {
@@ -6399,11 +6399,11 @@
 	  */
 
 
-	  Message.loadFromIpfs = async function loadFromIpfs(ipfs, uri) {
+	  SignedMessage.loadFromIpfs = async function loadFromIpfs(ipfs, uri) {
 	    var f = await ipfs.cat(uri);
 	    var s = ipfs.types.Buffer.from(f).toString('utf8');
 	    try {
-	      return Message.fromString(s);
+	      return SignedMessage.fromString(s);
 	    } catch (e) {
 	      console.log('loading message from ipfs failed');
 	      return _Promise.reject();
@@ -6415,25 +6415,25 @@
 	  */
 
 
-	  Message.prototype.serialize = function serialize() {
+	  SignedMessage.prototype.serialize = function serialize() {
 	    return { sig: this.sig, pubKey: this.pubKey };
 	  };
 
-	  Message.prototype.toString = function toString() {
+	  SignedMessage.prototype.toString = function toString() {
 	    return _JSON$stringify(this.serialize());
 	  };
 
 	  /**
-	  * @returns {Promise<Message>} message from JSON string produced by toString
+	  * @returns {Promise<SignedMessage>} message from JSON string produced by toString
 	  */
 
 
-	  Message.deserialize = async function deserialize(s) {
-	    return Message.fromSig(s);
+	  SignedMessage.deserialize = async function deserialize(s) {
+	    return SignedMessage.fromSig(s);
 	  };
 
-	  Message.fromString = async function fromString(s) {
-	    return Message.fromSig(JSON.parse(s));
+	  SignedMessage.fromString = async function fromString(s) {
+	    return SignedMessage.fromSig(JSON.parse(s));
 	  };
 
 	  /**
@@ -6441,7 +6441,7 @@
 	  */
 
 
-	  Message.setReaction = async function setReaction(gun, msg, reaction) {
+	  SignedMessage.setReaction = async function setReaction(gun, msg, reaction) {
 	    var hash = await msg.getHash();
 	    gun.get('reactions').get(hash).put(reaction);
 	    gun.get('reactions').get(hash).put(reaction);
@@ -6449,7 +6449,7 @@
 	    gun.get('messagesByHash').get(hash).get('reactions').get(this.rootContact.value).put(reaction);
 	  };
 
-	  return Message;
+	  return SignedMessage;
 	}();
 
 	/**
@@ -7117,24 +7117,25 @@
 	var _Number$parseInt = unwrapExports(_parseInt$2);
 
 	/**
-	* Private communication channel between two or more participants. Can be used
-	* independently of other Iris stuff.
+	* Private communication channel between two participants. (You can specify more than two participants, but it causes unscalable data replication - better implementation to be done.) Can be used independently of other Iris stuff.
 	*
-	* Messages are encrypted and chat ids obfuscated, but it is possible to guess
+	* You can use **1)** channel.send() and channel.getMessages() for timestamp-indexed chat-style messaging or **2)** channel.put(key, value) and the corresponding channel.on(key, callback) methods to write key-value pairs where values are encrypted.
+	*
+	* Channel ids and data values are obfuscated, but it is possible to guess
 	* who are communicating with each other by looking at Gun timestamps and subscriptions.
 	*
 	* options.onMessage callback is not guaranteed to receive messages ordered by timestamp.
 	* You should sort them in the presentation layer.
 	*
-	* @param {Object} options {key, gun, chatLink, onMessage, participants}
-	* @example https://github.com/irislib/iris-lib/blob/master/__tests__/chat.js
+	* @param {Object} options {key, gun, channelLink, onMessage, participants}
+	* @example https://github.com/irislib/iris-lib/blob/master/__tests__/channel.js
 	*/
 
-	var Chat = function () {
-	  function Chat(options) {
+	var Channel = function () {
+	  function Channel(options) {
 	    var _this = this;
 
-	    _classCallCheck(this, Chat);
+	    _classCallCheck(this, Channel);
 
 	    this.key = options.key;
 	    this.gun = options.gun;
@@ -7142,8 +7143,8 @@
 	    this.user.auth(this.key);
 	    this.user.put({ epub: this.key.epub });
 	    this.secrets = {}; // maps participant public key to shared secret
-	    this.ourSecretChatIds = {}; // maps participant public key to our secret chat id
-	    this.theirSecretChatIds = {}; // maps participant public key to their secret chat id
+	    this.ourSecretChannelIds = {}; // maps participant public key to our secret channel id
+	    this.theirSecretChannelIds = {}; // maps participant public key to their secret channel id
 	    this.onMessage = [];
 	    if (options.onMessage) {
 	      this.onMessage.push(options.onMessage);
@@ -7151,23 +7152,23 @@
 	    this.messages = {};
 
 	    var saved = void 0;
-	    if (options.chatLink) {
-	      var s = options.chatLink.split('?');
+	    if (options.channelLink) {
+	      var s = options.channelLink.split('?');
 	      if (s.length === 2) {
-	        var pub = util.getUrlParameter('chatWith', s[1]);
+	        var pub = util.getUrlParameter('channelWith', s[1]);
 	        options.participants = pub;
 	        if (pub !== this.key.pub) {
 	          var sharedSecret = util.getUrlParameter('s', s[1]);
 	          var linkId = util.getUrlParameter('k', s[1]);
 	          if (sharedSecret && linkId) {
-	            this.save(); // save the chat first so it's there before inviter subscribes to it
+	            this.save(); // save the channel first so it's there before inviter subscribes to it
 	            saved = true;
-	            this.gun.user(pub).get('chatLinks').get(linkId).get('encryptedSharedKey').on(async function (encrypted) {
+	            this.gun.user(pub).get('channelLinks').get(linkId).get('encryptedSharedKey').on(async function (encrypted) {
 	              var sharedKey = await Gun.SEA.decrypt(encrypted, sharedSecret);
-	              var encryptedChatRequest = await Gun.SEA.encrypt(_this.key.pub, sharedSecret);
-	              var chatRequestId = await util.getHash(encryptedChatRequest);
+	              var encryptedChannelRequest = await Gun.SEA.encrypt(_this.key.pub, sharedSecret);
+	              var channelRequestId = await util.getHash(encryptedChannelRequest);
 	              util.gunAsAnotherUser(_this.gun, sharedKey, function (user) {
-	                user.get('chatRequests').get(chatRequestId.slice(0, 12)).put(encryptedChatRequest);
+	                user.get('channelRequests').get(channelRequestId.slice(0, 12)).put(encryptedChannelRequest);
 	              });
 	            });
 	          }
@@ -7186,12 +7187,21 @@
 	        }
 	      }
 	    }
-	    if (!saved) {
+	    if (!saved && (options.save === undefined || options.save === false)) {
 	      this.save();
 	    }
 	  }
 
-	  Chat.prototype.getSecret = async function getSecret(pub) {
+	  /**
+	  * List participants of the channel (other than you)
+	  */
+
+
+	  Channel.prototype.getParticipants = function getParticipants() {
+	    return _Object$keys(this.secrets);
+	  };
+
+	  Channel.prototype.getSecret = async function getSecret(pub) {
 	    if (!this.secrets[pub]) {
 	      var epub = await util.gunOnceDefined(this.gun.user(pub).get('epub'));
 	      this.secrets[pub] = await Gun.SEA.secret(epub, this.key);
@@ -7204,7 +7214,7 @@
 	  */
 
 
-	  Chat.getOurSecretChatId = async function getOurSecretChatId(gun, pub, pair) {
+	  Channel.getOurSecretChannelId = async function getOurSecretChannelId(gun, pub, pair) {
 	    var epub = await util.gunOnceDefined(gun.user(pub).get('epub'));
 	    var secret = await Gun.SEA.secret(epub, pair);
 	    return util.getHash(secret + pub);
@@ -7215,81 +7225,86 @@
 	  */
 
 
-	  Chat.getTheirSecretChatId = async function getTheirSecretChatId(gun, pub, pair) {
+	  Channel.getTheirSecretChannelId = async function getTheirSecretChannelId(gun, pub, pair) {
 	    var epub = await util.gunOnceDefined(gun.user(pub).get('epub'));
 	    var secret = await Gun.SEA.secret(epub, pair);
 	    return util.getHash(secret + pair.pub);
 	  };
 
 	  /**
-	  * Return a list of public keys that you have initiated a chat with or replied to.
-	  * (Chats that are initiated by others and unreplied by you don't show up, because
-	  * this method doesn't know where to look for them. Use socialNetwork.getChats() to listen to new chats from friends. Or create chat invite links with Chat.createChatLink(). )
+	  * Return a list of public keys that you have initiated a channel with or replied to.
+	  * (Channels that are initiated by others and unreplied by you don't show up, because
+	  * this method doesn't know where to look for them. Use socialNetwork.getChannels() to listen to new channels from friends. Or create channel invite links with Channel.createChannelLink(). )
 	  * @param {Object} gun user.authed gun instance
 	  * @param {Object} keypair Gun.SEA keypair that the gun instance is authenticated with
-	  * @param callback callback function that is called for each public key you have a chat with
+	  * @param callback callback function that is called for each public key you have a channel with
 	  */
 
 
-	  Chat.getChats = async function getChats(gun, keypair, callback) {
+	  Channel.getChannels = async function getChannels(gun, keypair, callback) {
 	    var mySecret = await Gun.SEA.secret(keypair.epub, keypair);
-	    gun.user().get('chats').map().on(async function (value, ourSecretChatId) {
+	    gun.user().get('chats').map().on(async function (value, ourSecretChannelId) {
 	      if (value) {
-	        if (ourSecretChatId.length > 44) {
-	          gun.user().get('chats').get(ourSecretChatId).put(null);
+	        if (ourSecretChannelId.length > 44) {
+	          gun.user().get('chats').get(ourSecretChannelId).put(null);
 	          return;
 	        }
-	        var encryptedPub = await util.gunOnceDefined(gun.user().get('chats').get(ourSecretChatId).get('pub'));
+	        var encryptedPub = await util.gunOnceDefined(gun.user().get('chats').get(ourSecretChannelId).get('pub'));
 	        var pub = await Gun.SEA.decrypt(encryptedPub, mySecret);
 	        callback(pub);
 	      }
 	    });
 	  };
 
-	  Chat.prototype.getOurSecretChatId = async function getOurSecretChatId(pub) {
-	    if (!this.ourSecretChatIds[pub]) {
+	  Channel.prototype.getOurSecretChannelId = async function getOurSecretChannelId(pub) {
+	    if (!this.ourSecretChannelIds[pub]) {
 	      var secret = await this.getSecret(pub);
-	      this.ourSecretChatIds[pub] = await util.getHash(secret + pub);
+	      this.ourSecretChannelIds[pub] = await util.getHash(secret + pub);
 	    }
-	    return this.ourSecretChatIds[pub];
+	    return this.ourSecretChannelIds[pub];
 	  };
 
-	  Chat.prototype.getTheirSecretChatId = async function getTheirSecretChatId(pub) {
-	    if (!this.theirSecretChatIds[pub]) {
+	  Channel.prototype.getTheirSecretChannelId = async function getTheirSecretChannelId(pub) {
+	    if (!this.theirSecretChannelIds[pub]) {
 	      var secret = await this.getSecret(pub);
-	      this.theirSecretChatIds[pub] = await util.getHash(secret + this.key.pub);
+	      this.theirSecretChannelIds[pub] = await util.getHash(secret + this.key.pub);
 	    }
-	    return this.theirSecretChatIds[pub];
+	    return this.theirSecretChannelIds[pub];
 	  };
 
-	  Chat.prototype.getMessages = async function getMessages(callback) {
+	  /**
+	  * Get messages from the channel
+	  */
+
+
+	  Channel.prototype.getMessages = async function getMessages(callback) {
 	    var _this2 = this;
 
 	    this.onMessage.push(callback);
-	    _Object$keys(this.secrets).forEach(async function (pub) {
+	    this.getParticipants().forEach(async function (pub) {
 	      if (pub !== _this2.key.pub) {
 	        // Subscribe to their messages
-	        var theirSecretChatId = await _this2.getTheirSecretChatId(pub);
-	        _this2.gun.user(pub).get('chats').get(theirSecretChatId).get('msgs').map().once(function (data, key) {
+	        var theirSecretChannelId = await _this2.getTheirSecretChannelId(pub);
+	        _this2.gun.user(pub).get('chats').get(theirSecretChannelId).get('msgs').map().once(function (data, key) {
 	          _this2.messageReceived(data, pub, false, key);
 	        });
 	      }
 	      // Subscribe to our messages
-	      var ourSecretChatId = await _this2.getOurSecretChatId(pub);
-	      _this2.user.get('chats').get(ourSecretChatId).get('msgs').map().once(function (data, key) {
+	      var ourSecretChannelId = await _this2.getOurSecretChannelId(pub);
+	      _this2.user.get('chats').get(ourSecretChannelId).get('msgs').map().once(function (data, key) {
 	        _this2.messageReceived(data, pub, true, key);
 	      });
 	    });
 	  };
 
-	  Chat.prototype.messageReceived = async function messageReceived(data, pub, selfAuthored, key) {
+	  Channel.prototype.messageReceived = async function messageReceived(data, pub, selfAuthored, key) {
 	    if (this.messages[key]) {
 	      return;
 	    }
 	    if (this.onMessage.length) {
 	      var decrypted = await Gun.SEA.decrypt(data, (await this.getSecret(pub)));
 	      if (typeof decrypted !== 'object') {
-	        // console.log(`chat data received`, decrypted);
+	        // console.log(`channel data received`, decrypted);
 	        return;
 	      }
 	      decrypted._info = { selfAuthored: selfAuthored, pub: pub };
@@ -7301,11 +7316,11 @@
 	  };
 
 	  /**
-	  * Get latest message in this chat. Useful for chat listing.
+	  * Get latest message in this channel. Useful for channel listing.
 	  */
 
 
-	  Chat.prototype.getLatestMsg = async function getLatestMsg(callback) {
+	  Channel.prototype.getLatestMsg = async function getLatestMsg(callback) {
 	    var _this3 = this;
 
 	    var callbackIfLatest = async function callbackIfLatest(msg, info) {
@@ -7319,10 +7334,10 @@
 	        }
 	      }
 	    };
-	    this.onMyEncrypted('latestMsg', function (msg) {
+	    this.onMy('latestMsg', function (msg) {
 	      return callbackIfLatest(msg, { selfAuthored: true });
 	    });
-	    this.onTheirEncrypted('latestMsg', function (msg) {
+	    this.onTheir('latestMsg', function (msg) {
 	      return callbackIfLatest(msg, { selfAuthored: false });
 	    });
 	  };
@@ -7333,9 +7348,9 @@
 	  */
 
 
-	  Chat.prototype.setMyMsgsLastSeenTime = async function setMyMsgsLastSeenTime(time) {
+	  Channel.prototype.setMyMsgsLastSeenTime = async function setMyMsgsLastSeenTime(time) {
 	    time = time || new Date().toISOString();
-	    return this.putEncrypted('msgsLastSeenTime', time);
+	    return this.put('msgsLastSeenTime', time);
 	  };
 
 	  /**
@@ -7343,10 +7358,10 @@
 	  */
 
 
-	  Chat.prototype.getMyMsgsLastSeenTime = async function getMyMsgsLastSeenTime(callback) {
+	  Channel.prototype.getMyMsgsLastSeenTime = async function getMyMsgsLastSeenTime(callback) {
 	    var _this4 = this;
 
-	    this.onMyEncrypted('msgsLastSeenTime', function (time) {
+	    this.onMy('msgsLastSeenTime', function (time) {
 	      _this4.myMsgsLastSeenTime = time;
 	      if (callback) {
 	        callback(_this4.myMsgsLastSeenTime);
@@ -7359,10 +7374,10 @@
 	  */
 
 
-	  Chat.prototype.getTheirMsgsLastSeenTime = async function getTheirMsgsLastSeenTime(callback) {
+	  Channel.prototype.getTheirMsgsLastSeenTime = async function getTheirMsgsLastSeenTime(callback) {
 	    var _this5 = this;
 
-	    this.onTheirEncrypted('msgsLastSeenTime', function (time) {
+	    this.onTheir('msgsLastSeenTime', function (time) {
 	      _this5.theirMsgsLastSeenTime = time;
 	      if (callback) {
 	        callback(_this5.theirMsgsLastSeenTime);
@@ -7371,40 +7386,40 @@
 	  };
 
 	  /**
-	  * Add a public key to the chat
+	  * Add a public key to the channel
 	  * @param {string} pub
 	  */
 
 
-	  Chat.prototype.addPub = async function addPub(pub) {
+	  Channel.prototype.addPub = async function addPub(pub) {
 	    var _this6 = this;
 
 	    this.secrets[pub] = null;
 	    this.getSecret(pub);
-	    // Save their public key in encrypted format, so in chat listing we know who we are chatting with
-	    var ourSecretChatId = await this.getOurSecretChatId(pub);
+	    // Save their public key in encrypted format, so in channel listing we know who we are channelting with
+	    var ourSecretChannelId = await this.getOurSecretChannelId(pub);
 	    var mySecret = await Gun.SEA.secret(this.key.epub, this.key);
-	    this.gun.user().get('chats').get(ourSecretChatId).get('pub').put((await Gun.SEA.encrypt(pub, mySecret)));
+	    this.gun.user().get('chats').get(ourSecretChannelId).get('pub').put((await Gun.SEA.encrypt(pub, mySecret)));
 	    if (pub !== this.key.pub) {
 	      // Subscribe to their messages
-	      var theirSecretChatId = await this.getTheirSecretChatId(pub);
-	      this.gun.user(pub).get('chats').get(theirSecretChatId).get('msgs').map().once(function (data, key) {
+	      var theirSecretChannelId = await this.getTheirSecretChannelId(pub);
+	      this.gun.user(pub).get('chats').get(theirSecretChannelId).get('msgs').map().once(function (data, key) {
 	        _this6.messageReceived(data, pub, false, key);
 	      });
 	    }
 	    // Subscribe to our messages
-	    this.user.get('chats').get(ourSecretChatId).get('msgs').map().once(function (data, key) {
+	    this.user.get('chats').get(ourSecretChannelId).get('msgs').map().once(function (data, key) {
 	      _this6.messageReceived(data, pub, true, key);
 	    });
 	  };
 
 	  /**
-	  * Send a message to the chat
-	  * @param msg string or {time, author, text} object
+	  * Send a message to the channel
+	  * @param msg string or {time, text, ...} object
 	  */
 
 
-	  Chat.prototype.send = async function send(msg) {
+	  Channel.prototype.send = async function send(msg) {
 	    if (typeof msg === 'string') {
 	      msg = msg.trim();
 	      if (msg.length === 0) {
@@ -7412,65 +7427,90 @@
 	      }
 	      msg = {
 	        time: new Date().toISOString(),
-	        author: 'anonymous',
 	        text: msg
 	      };
+	    } else if (typeof msg === 'object') {
+	      msg.time = msg.time || new Date().toISOString();
+	    } else {
+	      throw new Error('msg param must be a string or an object');
 	    }
 	    //this.gun.user().get('message').set(temp);
-	    var keys = _Object$keys(this.secrets);
+	    var keys = this.getParticipants();
 	    for (var i = 0; i < keys.length; i++) {
 	      var encrypted = await Gun.SEA.encrypt(_JSON$stringify(msg), (await this.getSecret(keys[i])));
-	      var ourSecretChatId = await this.getOurSecretChatId(keys[i]);
-	      this.user.get('chats').get(ourSecretChatId).get('msgs').get('' + msg.time).put(encrypted);
-	      this.user.get('chats').get(ourSecretChatId).get('latestMsg').put(encrypted);
+	      var ourSecretChannelId = await this.getOurSecretChannelId(keys[i]);
+	      this.user.get('chats').get(ourSecretChannelId).get('msgs').get('' + msg.time).put(encrypted);
+	      this.user.get('chats').get(ourSecretChannelId).get('latestMsg').put(encrypted);
 	    }
 	  };
 
 	  /**
-	  * Save the chat to our chats list without sending a message
+	  * Save the channel to our channels list without sending a message
 	  */
 
 
-	  Chat.prototype.save = async function save() {
-	    var keys = _Object$keys(this.secrets);
+	  Channel.prototype.save = async function save() {
+	    var keys = this.getParticipants();
 	    for (var i = 0; i < keys.length; i++) {
-	      var ourSecretChatId = await this.getOurSecretChatId(keys[i]);
-	      this.user.get('chats').get(ourSecretChatId).get('msgs').get('a').put(null);
+	      var ourSecretChannelId = await this.getOurSecretChannelId(keys[i]);
+	      this.user.get('chats').get(ourSecretChannelId).get('msgs').get('a').put(null);
 	    }
 	  };
 
 	  /**
-	  * Save a key-value pair, encrypt value
+	  * Save a key-value pair, encrypt value. Each participant in the Channel writes to their own version of the key-value pair — they don't overwrite the same one.
+	  * @param {string} key
+	  * @param {string} value
+	  * @param {string} salt (optional) custom salt for encrypting the value
 	  */
 
 
-	  Chat.prototype.putEncrypted = async function putEncrypted(key, value, salt) {
-	    var keys = _Object$keys(this.secrets);
+	  Channel.prototype.put = async function put(key, value, salt) {
+	    if (key === 'msgs') {
+	      throw new Error('Sorry, you can\'t overwrite the msgs field which is used for .send()');
+	    }
+	    var keys = this.getParticipants();
 	    salt = salt || Gun.SEA.random(32).toString();
 	    var obj = { v: value, s: salt };
 	    for (var i = 0; i < keys.length; i++) {
 	      var encrypted = await Gun.SEA.encrypt(_JSON$stringify(obj), (await this.getSecret(keys[i])));
-	      var ourSecretChatId = await this.getOurSecretChatId(keys[i]);
-	      this.user.get('chats').get(ourSecretChatId).get(key).put(encrypted);
+	      var ourSecretChannelId = await this.getOurSecretChannelId(keys[i]);
+	      this.user.get('chats').get(ourSecretChannelId).get(key).put(encrypted);
 	    }
 	  };
 
 	  /**
-	  * Subscribe to key from us, decrypt value
+	  * Subscribe to a key-value pair. Callback returns every participant's value unless you limit it with *from* param.
+	  * @param {string} key
+	  * @param {function} callback
+	  * @param {string} from public key whose value you want, or *"me"* for your value only, or *"them"* for the value of others only
 	  */
 
 
-	  Chat.prototype.onMyEncrypted = async function onMyEncrypted(key, callback) {
+	  Channel.prototype.on = async function on(key, callback, from) {
+	    if (!from || from === 'me' || from === this.key.pub) {
+	      this.onMy(key, function (val) {
+	        return callback(val, from);
+	      });
+	    }
+	    if (!from || from !== 'me' && from !== this.key.pub) {
+	      this.onTheir(key, function (val) {
+	        return callback(val, from);
+	      });
+	    }
+	  };
+
+	  Channel.prototype.onMy = async function onMy(key, callback) {
 	    var _this7 = this;
 
 	    if (typeof callback !== 'function') {
-	      throw new Error('onMyEncrypted callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
+	      throw new Error('onMy callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
 	    }
-	    var keys = _Object$keys(this.secrets);
+	    var keys = this.getParticipants();
 
 	    var _loop = async function _loop(i) {
-	      var ourSecretChatId = await _this7.getOurSecretChatId(keys[i]);
-	      _this7.gun.user().get('chats').get(ourSecretChatId).get(key).on(async function (data) {
+	      var ourSecretChannelId = await _this7.getOurSecretChannelId(keys[i]);
+	      _this7.gun.user().get('chats').get(ourSecretChannelId).get(key).on(async function (data) {
 	        var decrypted = await Gun.SEA.decrypt(data, (await _this7.getSecret(keys[i])));
 	        if (decrypted) {
 	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
@@ -7486,22 +7526,17 @@
 	    }
 	  };
 
-	  /**
-	  * Subscribe to key from other participants, decrypt value
-	  */
-
-
-	  Chat.prototype.onTheirEncrypted = async function onTheirEncrypted(key, callback) {
+	  Channel.prototype.onTheir = async function onTheir(key, callback) {
 	    var _this8 = this;
 
 	    if (typeof callback !== 'function') {
-	      throw new Error('onTheirEncrypted callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
+	      throw new Error('onTheir callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
 	    }
-	    var keys = _Object$keys(this.secrets);
+	    var keys = this.getParticipants();
 
 	    var _loop2 = async function _loop2(i) {
-	      var theirSecretChatId = await _this8.getTheirSecretChatId(keys[i]);
-	      _this8.gun.user(keys[i]).get('chats').get(theirSecretChatId).get(key).on(async function (data) {
+	      var theirSecretChannelId = await _this8.getTheirSecretChannelId(keys[i]);
+	      _this8.gun.user(keys[i]).get('chats').get(theirSecretChannelId).get(key).on(async function (data) {
 	        var decrypted = await Gun.SEA.decrypt(data, (await _this8.getSecret(keys[i])));
 	        if (decrypted) {
 	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
@@ -7519,17 +7554,17 @@
 	  */
 
 
-	  Chat.prototype.setTyping = function setTyping(isTyping) {
+	  Channel.prototype.setTyping = function setTyping(isTyping) {
 	    var _this9 = this;
 
 	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
 
 	    isTyping = typeof isTyping === 'undefined' ? true : isTyping;
 	    timeout = timeout * 1000;
-	    this.putEncrypted('typing', isTyping ? new Date().toISOString() : false);
+	    this.put('typing', isTyping ? new Date().toISOString() : false);
 	    clearTimeout(this.setTypingTimeout);
 	    this.setTypingTimeout = setTimeout(function () {
-	      return _this9.putEncrypted('isTyping', false);
+	      return _this9.put('isTyping', false);
 	    }, timeout);
 	  };
 
@@ -7538,13 +7573,13 @@
 	  */
 
 
-	  Chat.prototype.getTyping = function getTyping(callback) {
+	  Channel.prototype.getTyping = function getTyping(callback) {
 	    var _this10 = this;
 
 	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
 
 	    timeout = timeout * 1000;
-	    this.onTheirEncrypted('typing', function (typing, key, pub) {
+	    this.onTheir('typing', function (typing, key, pub) {
 	      if (callback) {
 	        var isTyping = typing && new Date() - new Date(typing) <= timeout;
 	        callback(isTyping, pub);
@@ -7561,28 +7596,28 @@
 
 	  /**
 	  * Add a chat button to page
-	  * @param options {label, chatOptions}
+	  * @param options {label, channelOptions}
 	  */
 
 
-	  Chat.addChatButton = function addChatButton() {
+	  Channel.addChatButton = function addChatButton() {
 	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 	    options = _Object$assign({ label: 'Chat' }, options);
-	    if (!options.chatOptions) {
-	      throw new Error('addChatButton missing options.chatOptions param');
+	    if (!options.channelOptions) {
+	      throw new Error('addChatButton missing options.channelOptions param');
 	    }
 	    util.injectCss();
-	    var chat = void 0,
+	    var channel = void 0,
 	        box = void 0;
 	    var btn = util.createElement('div', 'iris-chat-open-button', document.body);
 	    btn.setAttribute('id', 'iris-chat-open-button');
 	    btn.innerHTML = '<svg style="margin-right:7px;margin-bottom: -0.2em" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 510 510" xml:space="preserve"><path fill="currentColor" d="M459,0H51C22.95,0,0,22.95,0,51v459l102-102h357c28.05,0,51-22.95,51-51V51C510,22.95,487.05,0,459,0z M102,178.5h306v51 H102V178.5z M306,306H102v-51h204V306z M408,153H102v-51h306V153z"></path></svg> ' + options.label;
 	    btn.addEventListener('click', function () {
 	      btn.setAttribute('style', 'display: none');
-	      if (!chat) {
-	        chat = new Chat(options.chatOptions);
-	        box = chat.getChatBox();
+	      if (!channel) {
+	        channel = new Channel(options.channelOptions);
+	        box = channel.getChatBox();
 	        document.body.appendChild(box);
 	      } else {
 	        box.setAttribute('style', ''); // show
@@ -7591,11 +7626,11 @@
 	  };
 
 	  /**
-	  * Get a chat box element that you can add to your page
+	  * Get a channel box element that you can add to your page
 	  */
 
 
-	  Chat.prototype.getChatBox = function getChatBox() {
+	  Channel.prototype.getChatBox = function getChatBox() {
 	    var _this11 = this;
 
 	    util.injectCss();
@@ -7652,13 +7687,13 @@
 	      });
 	    }
 
-	    var participants = _Object$keys(this.secrets);
+	    var participants = this.getParticipants();
 	    if (participants.length) {
 	      var pub = participants[0];
 	      this.gun.user(pub).get('profile').get('name').on(function (name) {
 	        return nameEl.innerText = name;
 	      });
-	      Chat.getOnline(this.gun, pub, function (status) {
+	      Channel.getOnline(this.gun, pub, function (status) {
 	        var cls = 'iris-online-indicator' + (status.isOnline ? ' yes' : '');
 	        onlineIndicator.setAttribute('class', cls);
 	        var undelivered = messages.querySelectorAll('.iris-chat-message:not(.delivered)');
@@ -7715,7 +7750,7 @@
 	    });
 
 	    textArea.addEventListener('keyup', function (event) {
-	      Chat.setOnline(_this11.gun, true); // TODO
+	      Channel.setOnline(_this11.gun, true); // TODO
 	      _this11.setMyMsgsLastSeenTime(); // TODO
 	      if (event.keyCode === 13) {
 	        event.preventDefault();
@@ -7744,7 +7779,7 @@
 	  */
 
 
-	  Chat.setOnline = function setOnline(gun, isOnline) {
+	  Channel.setOnline = function setOnline(gun, isOnline) {
 	    if (isOnline) {
 	      if (gun.setOnlineInterval) {
 	        return;
@@ -7769,7 +7804,7 @@
 	  */
 
 
-	  Chat.getOnline = function getOnline(gun, pubKey, callback) {
+	  Channel.getOnline = function getOnline(gun, pubKey, callback) {
 	    var timeout = void 0;
 	    gun.user(pubKey).get('lastActive').on(function (lastActive) {
 	      clearTimeout(timeout);
@@ -7792,32 +7827,32 @@
 
 	  /**
 	  * In order to receive messages from others, this method must be called for newly created
-	  * users that have not started a chat with an existing user yet.
+	  * users that have not started a channel with an existing user yet.
 	  *
 	  * It saves the user's key.epub (public key for encryption) into their gun user space,
 	  * so others can find it and write encrypted messages to them.
 	  *
-	  * If you start a chat with an existing user, key.epub is saved automatically and you don't need
+	  * If you start a channel with an existing user, key.epub is saved automatically and you don't need
 	  * to call this method.
 	  */
 
 
-	  Chat.initUser = function initUser(gun, key) {
+	  Channel.initUser = function initUser(gun, key) {
 	    var user = gun.user();
 	    user.auth(key);
 	    user.put({ epub: key.epub });
 	  };
 
-	  Chat.formatChatLink = function formatChatLink(urlRoot, pub, sharedSecret, linkId) {
-	    return urlRoot + '?chatWith=' + encodeURIComponent(pub) + '&s=' + encodeURIComponent(sharedSecret) + '&k=' + encodeURIComponent(linkId);
+	  Channel.formatChannelLink = function formatChannelLink(urlRoot, pub, sharedSecret, linkId) {
+	    return urlRoot + '?channelWith=' + encodeURIComponent(pub) + '&s=' + encodeURIComponent(sharedSecret) + '&k=' + encodeURIComponent(linkId);
 	  };
 
 	  /**
-	  * Creates a chat link that can be used for two-way communication, i.e. only one link needs to be exchanged.
+	  * Creates a channel link that can be used for two-way communication, i.e. only one link needs to be exchanged.
 	  */
 
 
-	  Chat.createChatLink = async function createChatLink(gun, key) {
+	  Channel.createChannelLink = async function createChannelLink(gun, key) {
 	    var urlRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'https://iris.to/';
 
 	    var user = gun.user();
@@ -7832,14 +7867,14 @@
 	    var linkId = await util.getHash(encryptedSharedKey);
 	    linkId = linkId.slice(0, 12);
 
-	    // User has to exist, in order for .get(chatRequests).on() to be ever triggered
+	    // User has to exist, in order for .get(channelRequests).on() to be ever triggered
 	    await util.gunAsAnotherUser(gun, sharedKey, function (user) {
-	      return user.get('chatRequests').put({ a: 1 }).then();
+	      return user.get('channelRequests').put({ a: 1 }).then();
 	    });
 
-	    user.get('chatLinks').get(linkId).put({ encryptedSharedKey: encryptedSharedKey, ownerEncryptedSharedKey: ownerEncryptedSharedKey });
+	    user.get('channelLinks').get(linkId).put({ encryptedSharedKey: encryptedSharedKey, ownerEncryptedSharedKey: ownerEncryptedSharedKey });
 
-	    return Chat.formatChatLink(urlRoot, key.pub, sharedSecret, linkId);
+	    return Channel.formatChannelLink(urlRoot, key.pub, sharedSecret, linkId);
 	  };
 
 	  /**
@@ -7847,7 +7882,7 @@
 	  */
 
 
-	  Chat.getMyChatLinks = async function getMyChatLinks(gun, key) {
+	  Channel.getMyChannelLinks = async function getMyChannelLinks(gun, key) {
 	    var urlRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'https://iris.to/';
 	    var callback = arguments[3];
 	    var subscribe = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
@@ -7855,38 +7890,38 @@
 	    var user = gun.user();
 	    user.auth(key);
 	    var mySecret = await Gun.SEA.secret(key.epub, key);
-	    var chatLinks = [];
-	    user.get('chatLinks').map().on(function (data, linkId) {
-	      if (!data || chatLinks.indexOf(linkId) !== -1) {
+	    var channelLinks = [];
+	    user.get('channelLinks').map().on(function (data, linkId) {
+	      if (!data || channelLinks.indexOf(linkId) !== -1) {
 	        return;
 	      }
-	      var chats = [];
-	      user.get('chatLinks').get(linkId).get('ownerEncryptedSharedKey').on(async function (enc) {
-	        if (!enc || chatLinks.indexOf(linkId) !== -1) {
+	      var channels = [];
+	      user.get('channelLinks').get(linkId).get('ownerEncryptedSharedKey').on(async function (enc) {
+	        if (!enc || channelLinks.indexOf(linkId) !== -1) {
 	          return;
 	        }
-	        chatLinks.push(linkId);
+	        channelLinks.push(linkId);
 	        var sharedKey = await Gun.SEA.decrypt(enc, mySecret);
 	        var sharedSecret = await Gun.SEA.secret(sharedKey.epub, sharedKey);
-	        var url = Chat.formatChatLink(urlRoot, key.pub, sharedSecret, linkId);
+	        var url = Channel.formatChannelLink(urlRoot, key.pub, sharedSecret, linkId);
 	        if (callback) {
 	          callback({ url: url, id: linkId });
 	        }
 	        if (subscribe) {
-	          gun.user(sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId) {
+	          gun.user(sharedKey.pub).get('channelRequests').map().on(async function (encPub, requestId) {
 	            if (!encPub) {
 	              return;
 	            }
 	            var s = _JSON$stringify(encPub);
-	            if (chats.indexOf(s) === -1) {
-	              chats.push(s);
+	            if (channels.indexOf(s) === -1) {
+	              channels.push(s);
 	              var pub = await Gun.SEA.decrypt(encPub, sharedSecret);
-	              var chat = new Chat({ gun: gun, key: key, participants: pub });
-	              chat.save();
+	              var channel = new Channel({ gun: gun, key: key, participants: pub });
+	              channel.save();
 	            }
 	            util.gunAsAnotherUser(gun, sharedKey, function (user) {
-	              // remove the chat request after reading
-	              user.get('chatRequests').get(requestId).put(null);
+	              // remove the channel request after reading
+	              user.get('channelRequests').get(requestId).put(null);
 	            });
 	          });
 	        }
@@ -7899,9 +7934,9 @@
 	  */
 
 
-	  Chat.removeChatLink = function removeChatLink(gun, key, linkId) {
+	  Channel.removeChannelLink = function removeChannelLink(gun, key, linkId) {
 	    gun.user().auth(key);
-	    gun.user().get('chatLinks').get(linkId).put(null);
+	    gun.user().get('channelLinks').get(linkId).put(null);
 	  };
 
 	  /**
@@ -7909,14 +7944,209 @@
 	  */
 
 
-	  Chat.deleteChat = async function deleteChat(gun, key, pub) {
+	  Channel.deleteChannel = async function deleteChannel(gun, key, pub) {
 	    gun.user().auth(key);
-	    var chatId = await Chat.getOurSecretChatId(gun, pub, key);
-	    gun.user().get('chats').get(chatId).put(null);
-	    gun.user().get('chats').get(chatId).off();
+	    var channelId = await Channel.getOurSecretChannelId(gun, pub, key);
+	    gun.user().get('channels').get(channelId).put(null);
+	    gun.user().get('channels').get(channelId).off();
 	  };
 
-	  return Chat;
+	  return Channel;
+	}();
+
+	// eslint-disable-line no-unused-vars
+
+	/**
+	* Gun object collection that provides tools for indexing and search. Decentralize everything!
+	*
+	* If opt.class is passed, object.serialize() and opt.class.deserialize() must be defined.
+	*
+	* Supports search from multiple indexes.
+	* For example, retrieve message feed from your own index and your friends' indexes.
+	*
+	* TODO: aggregation
+	* TODO: example
+	* TODO: scrollable and stretchable "search result window"
+	* @param {Object} opt {gun, class, indexes = [], askPeers = true, name = class.name}
+	*/
+
+	var Collection$2 = function () {
+	  function Collection() {
+	    var opt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+	    _classCallCheck(this, Collection);
+
+	    if (!opt.gun) {
+	      throw new Error('Missing opt.gun');
+	    }
+	    if (!(opt.class || opt.name)) {
+	      throw new Error('You must supply either opt.name or opt.class');
+	    }
+	    this.class = opt.class;
+	    this.serializer = opt.serializer;
+	    if (this.class && !this.class.deserialize && !this.serializer) {
+	      throw new Error('opt.class must have deserialize() method or opt.serializer must be defined');
+	    }
+	    this.name = opt.name || opt.class.name;
+	    this.gun = opt.gun;
+	    this.indexes = opt.indexes || [];
+	    this.indexer = opt.indexer;
+	    this.askPeers = typeof opt.askPeers === 'undefined' ? true : opt.askPeers;
+	  }
+
+	  /**
+	  * @return {String} id of added object, which can be used for collection.get(id)
+	  */
+
+
+	  Collection.prototype.put = function put(object) {
+	    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+	    var data = object;
+	    if (this.serializer) {
+	      data = this.serializer.serialize(object);
+	    }if (this.class) {
+	      data = object.serialize();
+	    }
+	    // TODO: optionally use gun hash table
+	    var node = void 0;
+	    if (opt.id || data.id) {
+	      node = this.gun.get(this.name).get('id').get(opt.id || data.id).put(data); // TODO: use .top()
+	    } else if (object.getId) {
+	      node = this.gun.get(this.name).get('id').get(object.getId()).put(data);
+	    } else {
+	      node = this.gun.get(this.name).get('id').set(data);
+	    }
+	    this._addToIndexes(data, node);
+	    return data.id || Gun.node.soul(node) || node._.link;
+	  };
+
+	  Collection.prototype._addToIndexes = async function _addToIndexes(serializedObject, node) {
+	    var _this = this;
+
+	    if (Gun.node.is(serializedObject)) {
+	      serializedObject = await serializedObject.open();
+	    }
+	    var addToIndex = function addToIndex(indexName, indexKey) {
+	      _this.gun.get(_this.name).get(indexName).get(indexKey).put(node);
+	    };
+	    if (this.indexer) {
+	      var customIndexes = await this.indexer(serializedObject);
+	      var customIndexKeys = _Object$keys(customIndexes);
+	      for (var i = 0; i < customIndexKeys; i++) {
+	        var key = customIndexKeys[i];
+	        addToIndex(key, customIndexes[key]);
+	      }
+	    }
+	    for (var _i = 0; _i < this.indexes.length; _i++) {
+	      var indexName = this.indexes[_i];
+	      if (Object.prototype.hasOwnProperty.call(serializedObject, indexName)) {
+	        addToIndex(indexName, serializedObject[indexName]);
+	      }
+	    }
+	  };
+
+	  // TODO: method for terminating the query
+	  // TODO: query ttl. https://mongodb.github.io/node-mongodb-native/2.0/api/Collection.html
+	  /**
+	  * @param {Object} opt {callback, id, selector, limit, orderBy}
+	  */
+
+
+	  Collection.prototype.get = function get() {
+	    var _this2 = this;
+
+	    var opt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+	    if (!opt.callback) {
+	      return;
+	    }
+	    var results = 0;
+	    var matcher = function matcher(data, id, node) {
+	      if (!data) {
+	        return;
+	      }
+	      if (opt.limit && results++ >= opt.limit) {
+	        return; // TODO: terminate query
+	      }
+	      if (opt.selector) {
+	        // TODO: deep compare selector object?
+	        var keys = _Object$keys(opt.selector);
+	        for (var i = 0; i < keys.length; i++) {
+	          var key = keys[i];
+	          if (!Object.prototype.hasOwnProperty.call(data, key)) {
+	            return;
+	          }
+	          var v1 = void 0,
+	              v2 = void 0;
+	          if (opt.caseSensitive === false) {
+	            v1 = data[key].toLowerCase();
+	            v2 = opt.selector[key].toLowerCase();
+	          } else {
+	            v1 = data[key];
+	            v2 = opt.selector[key];
+	          }
+	          if (v1 !== v2) {
+	            return;
+	          }
+	        }
+	      }
+	      if (opt.query) {
+	        // TODO: use gun.get() lt / gt operators
+	        var _keys = _Object$keys(opt.query);
+	        for (var _i2 = 0; _i2 < _keys.length; _i2++) {
+	          var _key = _keys[_i2];
+	          if (!Object.prototype.hasOwnProperty.call(data, _key)) {
+	            return;
+	          }
+	          var _v = void 0,
+	              _v2 = void 0;
+	          if (opt.caseSensitive === false) {
+	            _v = data[_key].toLowerCase();
+	            _v2 = opt.query[_key].toLowerCase();
+	          } else {
+	            _v = data[_key];
+	            _v2 = opt.query[_key];
+	          }
+	          if (_v.indexOf(_v2) !== 0) {
+	            return;
+	          }
+	        }
+	      }
+	      if (_this2.serializer) {
+	        opt.callback(_this2.serializer.deserialize(data, { id: id, gun: node.$ }));
+	      } else if (_this2.class) {
+	        opt.callback(_this2.class.deserialize(data, { id: id, gun: node.$ }));
+	      } else {
+	        opt.callback(data);
+	      }
+	    };
+
+	    if (opt.id) {
+	      opt.limit = 1;
+	      this.gun.get(this.name).get('id').get(opt.id).on(matcher);
+	      return;
+	    }
+
+	    var indexName = 'id';
+	    if (opt.orderBy && this.indexes.indexOf(opt.orderBy) > -1) {
+	      indexName = opt.orderBy;
+	    }
+
+	    // TODO: query from indexes
+	    this.gun.get(this.name).get(indexName).map().on(matcher); // TODO: limit .open recursion
+	    if (this.askPeers) {
+	      this.gun.get('trustedIndexes').on(function (val, key) {
+	        _this2.gun.user(key).get(_this2.name).get(indexName).map().on(matcher);
+	      });
+	    }
+	  };
+
+	  Collection.prototype.delete = function _delete() {
+	    // gun.unset()
+	  };
+
+	  return Collection;
 	}();
 
 	if (Gun && Gun.User) {
@@ -7959,7 +8189,7 @@
 
 	// TODO: flush onto IPFS
 	/**
-	* The essence of Iris: A database of Contacts and Messages within your web of trust.
+	* The essence of Iris: A database of Contacts and SignedMessages within your web of trust.
 	*
 	* NOTE: these docs reflect the latest commit at https://github.com/irislib/iris-lib
 	*
@@ -7967,7 +8197,7 @@
 	*
 	* To use your own index: set options.keypair or omit it to use Key.getDefaultKey().
 	*
-	* Each added Message updates the Message and Contacts indexes and web of trust accordingly.
+	* Each added SignedMessage updates the SignedMessage and Contacts indexes and web of trust accordingly.
 	*
 	* You can pass options.gun to use custom gun storages and networking settings.
 	*
@@ -8082,8 +8312,8 @@
 	    this.gun.get('messagesByHash').put(user.top('messagesByHash'));
 	    this.gun.get('messagesByDistance').put(user.top('messagesByDistance'));
 
-	    this.messages = new Collection({ gun: this.gun, class: Message, indexes: ['time', 'trustDistance'] });
-	    this.contacts = new Collection({ gun: this.gun, class: Contact });
+	    this.messages = new Collection$2({ gun: this.gun, class: SignedMessage, indexes: ['time', 'trustDistance'] });
+	    this.contacts = new Collection$2({ gun: this.gun, class: Contact });
 
 	    var uri = this.rootContact.uri();
 	    var g = user.top(uri);
@@ -8101,7 +8331,7 @@
 	    await this._addContactToIndexes(id.gun);
 	    if (this.options.self) {
 	      var recipient = _Object$assign(this.options.self, { keyID: this.rootContact.value });
-	      Message.createVerification({ recipient: recipient }, keypair).then(function (msg) {
+	      SignedMessage.createVerification({ recipient: recipient }, keypair).then(function (msg) {
 	        _this2.addMessage(msg);
 	      });
 	    }
@@ -8118,7 +8348,7 @@
 	            _this3.gun.user(uri).get('iris').get('messagesByDistance').map(function (val, key) {
 	              var d = _Number$parseInt(key.split(':')[0]);
 	              if (!isNaN(d) && d <= _this3.options.indexSync.subscribe.maxMsgDistance) {
-	                Message.fromSig(val).then(function (msg) {
+	                SignedMessage.fromSig(val).then(function (msg) {
 	                  if (_this3.options.indexSync.msgTypes.all || Object.prototype.hasOwnProperty.call(_this3.options.indexSync.msgTypes, msg.signedData.type)) {
 	                    _this3.addMessage(msg, { checkIfExists: true });
 	                  }
@@ -8299,9 +8529,9 @@
 	    // TODO: add uuid to attributes
 	    var msg = void 0;
 	    if (follow) {
-	      msg = await Message.createRating({ recipient: attributes, rating: 1 });
+	      msg = await SignedMessage.createRating({ recipient: attributes, rating: 1 });
 	    } else {
-	      msg = await Message.createVerification({ recipient: attributes });
+	      msg = await SignedMessage.createVerification({ recipient: attributes });
 	    }
 	    return this.addMessage(msg);
 	  };
@@ -8356,7 +8586,7 @@
 	      var node = this.gun.get('identities').set(o);
 	      var updateContactByLinkedAttribute = function updateContactByLinkedAttribute(attribute) {
 	        _this4.gun.get('verificationsByRecipient').get(attribute.uri()).map().once(function (val) {
-	          var m = Message.fromSig(val);
+	          var m = SignedMessage.fromSig(val);
 	          var recipients = m.getRecipientArray();
 	          for (var i = 0; i < recipients.length; i++) {
 	            var a2 = recipients[i];
@@ -8364,7 +8594,7 @@
 	              // TODO remove attribute from contact if not enough verifications / too many unverifications
 	              o.attributes[a2.uri()] = a2;
 	              _this4.gun.get('messagesByRecipient').get(a2.uri()).map().once(async function (val) {
-	                var m2 = Message.fromSig(val);
+	                var m2 = SignedMessage.fromSig(val);
 	                var m2hash = await m2.getHash();
 	                if (!Object.prototype.hasOwnProperty.call(o.received.hasOwnProperty, m2hash)) {
 	                  o.received[m2hash] = m2;
@@ -8387,7 +8617,7 @@
 	                }
 	              });
 	              _this4.gun.get('messagesByAuthor').get(a2.uri()).map().once(async function (val) {
-	                var m2 = Message.fromSig(val);
+	                var m2 = SignedMessage.fromSig(val);
 	                var m2hash = await m2.getHash();
 	                if (!Object.prototype.hasOwnProperty.call(o.sent, m2hash)) {
 	                  o.sent[m2hash] = m2;
@@ -8500,18 +8730,18 @@
 
 	  /**
 	  * Return existing chats and listen to new chats initiated by friends.
-	  * Like Chat.getChats(), but also listens to chats initiated by friends.
+	  * Like Channel.getChannels(), but also listens to chats initiated by friends.
 	  */
 
 
-	  SocialNetwork.prototype.getChats = async function getChats(callback) {
+	  SocialNetwork.prototype.getChannels = async function getChannels(callback) {
 	    var _this6 = this;
 
-	    Chat.getChats(this.gun, this.options.keypair, callback);
+	    Channel.getChannels(this.gun, this.options.keypair, callback);
 	    this.gun.get('trustedIndexes').map().on(async function (value, pub) {
 	      if (value && pub) {
-	        var theirSecretChatId = await Chat.getTheirSecretChatId(_this6.gun, pub, _this6.options.keypair);
-	        _this6.gun.user(pub).get('chats').get(theirSecretChatId).on(function (v) {
+	        var theirSecretChannelId = await Channel.getTheirSecretChannelId(_this6.gun, pub, _this6.options.keypair);
+	        _this6.gun.user(pub).get('chats').get(theirSecretChannelId).on(function (v) {
 	          if (v) {
 	            callback(pub);
 	          }
@@ -8526,7 +8756,7 @@
 	      if (results >= limit) {
 	        return;
 	      }
-	      var msg = await Message.fromSig(result.value);
+	      var msg = await SignedMessage.fromSig(result.value);
 	      if (filter && !filter(msg)) {
 	        return;
 	      }
@@ -8851,7 +9081,7 @@
 	            resolve();
 	          }
 	        };
-	        var messages = new Collection({ gun: gun, class: Message, indexes: ['trustDistance'] });
+	        var messages = new Collection$2({ gun: gun, class: SignedMessage, indexes: ['trustDistance'] });
 	        messages.get({ callback: callback, orderBy: 'trustDistance', desc: false });
 	      }), 10000);
 	      this.debug('adding', msgs.length, 'msgs');
@@ -8976,7 +9206,7 @@
 	  /**
 	  * Add a message to messagesByTimestamp and other relevant indexes. Update identities in the web of trust according to message data.
 	  *
-	  * @param msg Message (or an array of messages) to add to the index
+	  * @param msg SignedMessage (or an array of messages) to add to the index
 	  */
 
 
@@ -8990,8 +9220,8 @@
 	      return this.addMessages(msg, options);
 	    }
 	    var start = void 0;
-	    if (msg.constructor.name !== 'Message') {
-	      throw new Error('addMessage failed: param must be a Message, received ' + msg.constructor.name);
+	    if (msg.constructor.name !== 'SignedMessage') {
+	      throw new Error('addMessage failed: param must be a SignedMessage, received ' + msg.constructor.name);
 	    }
 	    var hash = await msg.getHash();
 	    if (true === options.checkIfExists) {
@@ -9194,7 +9424,7 @@
 	    return new _Promise(function (resolve) {
 	      var resolveIfHashMatches = async function resolveIfHashMatches(d, fromIpfs) {
 	        var obj = typeof d === 'object' ? d : JSON.parse(d);
-	        var m = await Message.fromSig(obj);
+	        var m = await SignedMessage.fromSig(obj);
 	        var h = void 0;
 	        var republished = false;
 	        if (fromIpfs) {
@@ -9304,19 +9534,19 @@
 	  return SocialNetwork;
 	}();
 
-	var version$1 = "0.0.139";
+	var version$1 = "0.0.140";
 
 	/*eslint no-useless-escape: "off", camelcase: "off" */
 
 	var index = {
 	  VERSION: version$1,
 	  Collection: Collection,
-	  Message: Message,
+	  SignedMessage: SignedMessage,
 	  Contact: Contact,
 	  Attribute: Attribute,
 	  SocialNetwork: SocialNetwork,
 	  Key: Key,
-	  Chat: Chat,
+	  Channel: Channel,
 	  util: util
 	};
 
