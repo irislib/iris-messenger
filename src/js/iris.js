@@ -7117,7 +7117,7 @@
 	var _Number$parseInt = unwrapExports(_parseInt$2);
 
 	/**
-	* Private communication channel between two participants. (You can specify more than two participants, but it causes unscalable data replication - better implementation to be done.) Can be used independently of other Iris stuff.
+	* Private communication channel between two participants (gun public keys). (You can specify more than two participants, but it causes unscalable data replication - better implementation to be done.) Can be used independently of other Iris stuff.
 	*
 	* You can use **1)** channel.send() and channel.getMessages() for timestamp-indexed chat-style messaging or **2)** channel.put(key, value) and the corresponding channel.on(key, callback) methods to write key-value pairs where values are encrypted.
 	*
@@ -7127,7 +7127,7 @@
 	* options.onMessage callback is not guaranteed to receive messages ordered by timestamp.
 	* You should sort them in the presentation layer.
 	*
-	* @param {Object} options {key, gun, channelLink, onMessage, participants}
+	* @param {Object} options {key, gun, chatLink, onMessage, participants} **key**: your keypair, **gun**: gun instance, **chatLink**: (optional) chat link instead of participants list, **participants**: (optional) string or string array of participant public keys
 	* @example https://github.com/irislib/iris-lib/blob/master/__tests__/channel.js
 	*/
 
@@ -7152,8 +7152,8 @@
 	    this.messages = {};
 
 	    var saved = void 0;
-	    if (options.channelLink) {
-	      var s = options.channelLink.split('?');
+	    if (options.chatLink) {
+	      var s = options.chatLink.split('?');
 	      if (s.length === 2) {
 	        var pub = util.getUrlParameter('chatWith', s[1]);
 	        options.participants = pub;
@@ -7163,12 +7163,12 @@
 	          if (sharedSecret && linkId) {
 	            this.save(); // save the channel first so it's there before inviter subscribes to it
 	            saved = true;
-	            this.gun.user(pub).get('channelLinks').get(linkId).get('encryptedSharedKey').on(async function (encrypted) {
+	            this.gun.user(pub).get('chatLinks').get(linkId).get('encryptedSharedKey').on(async function (encrypted) {
 	              var sharedKey = await Gun.SEA.decrypt(encrypted, sharedSecret);
-	              var encryptedChannelRequest = await Gun.SEA.encrypt(_this.key.pub, sharedSecret);
-	              var channelRequestId = await util.getHash(encryptedChannelRequest);
+	              var encryptedChatRequest = await Gun.SEA.encrypt(_this.key.pub, sharedSecret);
+	              var channelRequestId = await util.getHash(encryptedChatRequest);
 	              util.gunAsAnotherUser(_this.gun, sharedKey, function (user) {
-	                user.get('channelRequests').get(channelRequestId.slice(0, 12)).put(encryptedChannelRequest);
+	                user.get('chatRequests').get(channelRequestId.slice(0, 12)).put(encryptedChatRequest);
 	              });
 	            });
 	          }
@@ -7234,7 +7234,7 @@
 	  /**
 	  * Return a list of public keys that you have initiated a channel with or replied to.
 	  * (Channels that are initiated by others and unreplied by you don't show up, because
-	  * this method doesn't know where to look for them. Use socialNetwork.getChannels() to listen to new channels from friends. Or create channel invite links with Channel.createChannelLink(). )
+	  * this method doesn't know where to look for them. Use socialNetwork.getChannels() to listen to new channels from friends. Or create channel invite links with Channel.createChatLink(). )
 	  * @param {Object} gun user.authed gun instance
 	  * @param {Object} keypair Gun.SEA keypair that the gun instance is authenticated with
 	  * @param callback callback function that is called for each public key you have a channel with
@@ -7843,7 +7843,7 @@
 	    user.put({ epub: key.epub });
 	  };
 
-	  Channel.formatChannelLink = function formatChannelLink(urlRoot, pub, sharedSecret, linkId) {
+	  Channel.formatChatLink = function formatChatLink(urlRoot, pub, sharedSecret, linkId) {
 	    return urlRoot + '?chatWith=' + encodeURIComponent(pub) + '&s=' + encodeURIComponent(sharedSecret) + '&k=' + encodeURIComponent(linkId);
 	  };
 
@@ -7852,7 +7852,7 @@
 	  */
 
 
-	  Channel.createChannelLink = async function createChannelLink(gun, key) {
+	  Channel.createChatLink = async function createChatLink(gun, key) {
 	    var urlRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'https://iris.to/';
 
 	    var user = gun.user();
@@ -7867,14 +7867,14 @@
 	    var linkId = await util.getHash(encryptedSharedKey);
 	    linkId = linkId.slice(0, 12);
 
-	    // User has to exist, in order for .get(channelRequests).on() to be ever triggered
+	    // User has to exist, in order for .get(chatRequests).on() to be ever triggered
 	    await util.gunAsAnotherUser(gun, sharedKey, function (user) {
-	      return user.get('channelRequests').put({ a: 1 }).then();
+	      return user.get('chatRequests').put({ a: 1 }).then();
 	    });
 
-	    user.get('channelLinks').get(linkId).put({ encryptedSharedKey: encryptedSharedKey, ownerEncryptedSharedKey: ownerEncryptedSharedKey });
+	    user.get('chatLinks').get(linkId).put({ encryptedSharedKey: encryptedSharedKey, ownerEncryptedSharedKey: ownerEncryptedSharedKey });
 
-	    return Channel.formatChannelLink(urlRoot, key.pub, sharedSecret, linkId);
+	    return Channel.formatChatLink(urlRoot, key.pub, sharedSecret, linkId);
 	  };
 
 	  /**
@@ -7882,7 +7882,7 @@
 	  */
 
 
-	  Channel.getMyChannelLinks = async function getMyChannelLinks(gun, key) {
+	  Channel.getMyChatLinks = async function getMyChatLinks(gun, key) {
 	    var urlRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'https://iris.to/';
 	    var callback = arguments[3];
 	    var subscribe = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
@@ -7890,25 +7890,25 @@
 	    var user = gun.user();
 	    user.auth(key);
 	    var mySecret = await Gun.SEA.secret(key.epub, key);
-	    var channelLinks = [];
-	    user.get('channelLinks').map().on(function (data, linkId) {
-	      if (!data || channelLinks.indexOf(linkId) !== -1) {
+	    var chatLinks = [];
+	    user.get('chatLinks').map().on(function (data, linkId) {
+	      if (!data || chatLinks.indexOf(linkId) !== -1) {
 	        return;
 	      }
 	      var channels = [];
-	      user.get('channelLinks').get(linkId).get('ownerEncryptedSharedKey').on(async function (enc) {
-	        if (!enc || channelLinks.indexOf(linkId) !== -1) {
+	      user.get('chatLinks').get(linkId).get('ownerEncryptedSharedKey').on(async function (enc) {
+	        if (!enc || chatLinks.indexOf(linkId) !== -1) {
 	          return;
 	        }
-	        channelLinks.push(linkId);
+	        chatLinks.push(linkId);
 	        var sharedKey = await Gun.SEA.decrypt(enc, mySecret);
 	        var sharedSecret = await Gun.SEA.secret(sharedKey.epub, sharedKey);
-	        var url = Channel.formatChannelLink(urlRoot, key.pub, sharedSecret, linkId);
+	        var url = Channel.formatChatLink(urlRoot, key.pub, sharedSecret, linkId);
 	        if (callback) {
 	          callback({ url: url, id: linkId });
 	        }
 	        if (subscribe) {
-	          gun.user(sharedKey.pub).get('channelRequests').map().on(async function (encPub, requestId) {
+	          gun.user(sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId) {
 	            if (!encPub) {
 	              return;
 	            }
@@ -7921,7 +7921,7 @@
 	            }
 	            util.gunAsAnotherUser(gun, sharedKey, function (user) {
 	              // remove the channel request after reading
-	              user.get('channelRequests').get(requestId).put(null);
+	              user.get('chatRequests').get(requestId).put(null);
 	            });
 	          });
 	        }
@@ -7934,9 +7934,9 @@
 	  */
 
 
-	  Channel.removeChannelLink = function removeChannelLink(gun, key, linkId) {
+	  Channel.removeChatLink = function removeChatLink(gun, key, linkId) {
 	    gun.user().auth(key);
-	    gun.user().get('channelLinks').get(linkId).put(null);
+	    gun.user().get('chatLinks').get(linkId).put(null);
 	  };
 
 	  /**

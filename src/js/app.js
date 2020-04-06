@@ -151,11 +151,11 @@ function login(k) {
   $('#login').hide();
   iris.Channel.initUser(gun, key);
   $('#my-chat-links').empty();
-  iris.Channel.getMyChannelLinks(gun, key, undefined, chatLink => {
+  iris.Channel.getMyChatLinks(gun, key, undefined, chatLink => {
     var row = $('<div>').addClass('flex-row');
     var text = $('<div>').addClass('flex-cell').text(chatLink.url);
     var btn = $('<button>Remove</button>').click(() => {
-      iris.Channel.removeChannelLink(gun, key, chatLink.id);
+      iris.Channel.removeChatLink(gun, key, chatLink.id);
       hideAndRemove(row);
     });
     row.append(text);
@@ -224,7 +224,7 @@ function login(k) {
 }
 
 async function createChatLink() {
-  latestChatLink = await iris.Channel.createChannelLink(gun, key);
+  latestChatLink = await iris.Channel.createChatLink(gun, key);
   setChatLinkQrCode(latestChatLink);
 }
 
