@@ -229,6 +229,23 @@ header #back-button {
   color: #4fc3f7;
 }
 
+.chat-list .pinned-indicator {
+  margin-right: 5px;
+}
+
+.pinned-indicator {
+  color: var(--seen-indicator);
+  user-select: none;
+}
+
+.pinned-indicator svg {
+  width: 15px;
+}
+
+.chat-list .pinned-indicator svg {
+  width: 20px;
+}
+
 .iris-delivered-checkmark {
   display: none;
 }
