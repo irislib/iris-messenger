@@ -714,7 +714,7 @@ function addUserToHeader(pub) {
   if (chats[pub] && chats[pub].name) {
     if (pub == key.pub) {
       nameEl.text("📝Note to Self"); 
-      // disable nicknames in note to self too
+      // need to disable nicknames in note to self profile
     } else {
       nameEl.text(truncateString(chats[pub].name, 30));
     }
@@ -957,16 +957,18 @@ function addChat(pub, chatLink) {
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
-  if (pub == key.pub) {
-    el.find('.name').text("📝Note to Self");
-  }
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
+    }
+    if (pub == key.pub) {
+      console.log(pub +" equals "+key.pub);
+      el.find('.name').text("📝Note to Self");
+    } else {
       el.find('.name').text(truncateString(name, 20));
-      if (pub === activeChat) {
-        addUserToHeader(pub);
-      }
+    }
+    if (pub === activeChat) {
+      addUserToHeader(pub);
     }
   });
   el.click(() => showChat(pub));
