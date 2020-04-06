@@ -141,14 +141,13 @@
       <!-- New chat view -->
       <div class="main-view" id="new-chat">
         <h3>Have someone's chat link?</h3>
-        <input id="paste-chat-link" type="text" placeholder="Paste someone's chat link">
-        <p>or...</p>
-        <button id="scan-chatlink-qr-btn">Scan their QR code</button>
+        <input id="paste-chat-link" type="text" placeholder="Paste their chat link">
+        <button id="scan-chatlink-qr-btn">Or scan their QR code</button>
         <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
         <h3>Give your chat link:</h3>
         <button class="copy-chat-link">Copy your chat link</button>
-        <p>or...</p>
-        <p>Show them your QR code:</p><p id="my-qr-code" class="qr-container"></p>
+        <button id="show-my-qr-btn">Or show your QR code</button>
+        <p id="my-qr-code" class="qr-container" style="display:none"></p>
         <p><small>Beware of sharing your chat link publicly: you might get spammed with message requests. Publicly share your <a class="profile-link">profile link</a> instead.</small></p>
         <hr/>
         <h3>Your Chat Links</h3>
@@ -308,7 +307,7 @@
               <span id="their-public-name"></span><input id="profile-nickname-their">
             </p>
             <p>
-              <span id="my-public-name"></span><input id="profile-nickname-my">
+              <span id="my-public-name"></span><span id="profile-nickname-my"></span>
             </p>
           </div>
           <hr/>

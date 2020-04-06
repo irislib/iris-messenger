@@ -387,9 +387,8 @@ function resetView() {
   $('#their-public-name').empty();
   $('#my-public-name').empty();
   $('#profile-nickname-their').val('');
-  $('#profile-nickname-my').val('');
   $('#profile-nickname-their').removeAttr('placeholder');
-  $('#profile-nickname-my').removeAttr('placeholder');
+  $('#profile-nickname-my').empty();
   $('#profile .profile-about-content').empty();
   $('#private-key-qr').remove();
 }
@@ -419,6 +418,9 @@ function showNewChat() {
   $('.chat-item.new').toggleClass('active', true);
   $('#new-chat').show();
   $("#header-content").text('New chat');
+  $('#show-my-qr-btn').off().click(() => {
+    $('#my-qr-code').toggle()
+  })
 }
 
 function getMyChatLink() {
@@ -707,16 +709,11 @@ function showProfile(pub) {
   $('#their-public-name').text(chats[pub].name + ": ");
   $('#my-public-name').text(myName + ": ");
   $('#profile-nickname-their').attr('placeholder',chats[pub].theirNickname);
-  $('#profile-nickname-my').attr('placeholder',chats[pub].myNickname);
+  $('#profile-nickname-my').text(chats[pub].myNickname);
   $('#profile-nickname-their').off().on('change', event => {
     var nick = event.target.value;
-    $('#profile-nickname-their').attr('placeholder',nick);
-    chats[pub].putEncrypted('theirNickname', nick);
-  });
-  $('#profile-nickname-my').off().on('change', event => {
-    var nick = event.target.value;
-    $('#profile-nickname-my').attr('placeholder',nick);
-    chats[pub].putEncrypted('myNickname', nick);
+    
+    chats[pub].putEncrypted('nickname', nick);
   });
   qrCodeEl.empty();
   var qrcode = new QRCode(qrCodeEl[0], {
@@ -976,21 +973,11 @@ function addChat(pub, chatLink) {
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
-  chats[pub].onTheirEncrypted('theirNickname', (nick) => {
+  chats[pub].onTheirEncrypted('nickname', (nick) => {
     //console.log(chats[pub].name,' gave you the nickname ',nick);
     chats[pub].myNickname = nick;
   });
-  chats[pub].onTheirEncrypted('myNickname', (nick) => {
-    //console.log(chats[pub].name,' gave themselves the nickname ',nick);
-    chats[pub].theirNickname = nick;
-    if (chats[pub].theirNickname) {
-      el.find('.name').text(truncateString(chats[pub].theirNickname, 20));
-      if (pub === activeProfile) {
-        addUserToHeader(pub);
-      }
-    }
-  });
-  chats[pub].onMyEncrypted('theirNickname', (nick) => {
+  chats[pub].onMyEncrypted('nickname', (nick) => {
     //console.log('You gave ',chats[pub].name,' the nickname ',nick);
     chats[pub].theirNickname = nick;
     if (chats[pub].theirNickname) {
@@ -999,10 +986,6 @@ function addChat(pub, chatLink) {
         addUserToHeader(pub);
       }
     }
-  });
-  chats[pub].onMyEncrypted('myNickname', (nick) => {
-    //console.log('You gave yourself the nickname ',nick);
-    chats[pub].myNickname = nick;
   });
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
