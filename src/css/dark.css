@@ -28,6 +28,6 @@
     --emoji-picker-color: #fff;
     --emoji-picker-border-color: #3D3E66;
     --link-color: #1DC0F2;
-    --day-separator-bg: rgba(29, 192, 242, 0.91);
+    --day-separator-bg: rgba(0,0,0,0.85);
     --day-separator-color: rgba(255, 255, 255, 0.88);
 }
