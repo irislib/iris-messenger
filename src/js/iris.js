@@ -7125,6 +7125,42 @@
 	* who are communicating with each other by looking at Gun timestamps and subscriptions.
 	*
 	* @param {Object} options {key, gun, chatLink, participants} **key**: your keypair, **gun**: gun instance, **chatLink**: (optional) chat link instead of participants list, **participants**: (optional) string or string array of participant public keys
+	* @example
+	* // Copy & paste this to console at https://iris.to or other page that has gun and iris-lib
+	* // Due to an unsolved bug, someoneElse's messages only start showing up after a reload
+	*
+	* var gun1 = new Gun('https://gun-us.herokuapp.com/gun');
+	* var gun2 = new Gun('https://gun-us.herokuapp.com/gun');
+	* var myKey = await iris.Key.getDefault();
+	* var someoneElse = localStorage.getItem('someoneElsesKey');
+	* if (someoneElse) {
+	*  someoneElse = JSON.parse(someoneElse);
+	* } else {
+	*  someoneElse = await iris.Key.generate();
+	*  localStorage.setItem('someoneElsesKey', JSON.stringify(someoneElse));
+	* }
+	*
+	* var ourChannel = new iris.Channel({key: myKey, gun: gun1, participants: someoneElse.pub});
+	* var theirChannel = new iris.Channel({key: someoneElse, gun: gun2, participants: myKey.pub});
+	*
+	* var myChannels = {}; // you can list them in a user interface
+	* function printMessage(msg, info) {
+	*  console.log(`[${new Date(msg.time).toLocaleString()}] ${info.from.slice(0,8)}: ${msg.text}`)
+	* }
+	* iris.Channel.getChannels(gun1, myKey, channel => {
+	*  var pub = channel.getParticipants()[0];
+	*  gun1.user(pub).get('profile').get('name').on(name => channel.name = name);
+	*  myChannels[pub] = channel;
+	*  channel.getMessages(printMessage);
+	*  channel.on('mood', (mood, from) => console.log(from.slice(0,8) + ' is feeling ' + mood));
+	* });
+	*
+	* // you can play with these in the console:
+	* ourChannel.send('message from myKey');
+	* theirChannel.send('message from someoneElse');
+	* ourChannel.put('mood', 'blessed');
+	* theirChannel.put('mood', 'happy');
+	*
 	* @example https://github.com/irislib/iris-lib/blob/master/__tests__/Channel.js
 	*/
 
@@ -7472,20 +7508,22 @@
 
 
 	  Channel.prototype.on = async function on(key, callback, from) {
+	    var _this6 = this;
+
 	    if (!from || from === 'me' || from === this.key.pub) {
 	      this.onMy(key, function (val) {
-	        return callback(val, from);
+	        return callback(val, _this6.key.pub);
 	      });
 	    }
 	    if (!from || from !== 'me' && from !== this.key.pub) {
-	      this.onTheir(key, function (val) {
-	        return callback(val, from);
+	      this.onTheir(key, function (val, k, pub) {
+	        return callback(val, pub);
 	      });
 	    }
 	  };
 
 	  Channel.prototype.onMy = async function onMy(key, callback) {
-	    var _this6 = this;
+	    var _this7 = this;
 
 	    if (typeof callback !== 'function') {
 	      throw new Error('onMy callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
@@ -7493,9 +7531,9 @@
 	    var keys = this.getParticipants();
 
 	    var _loop = async function _loop(i) {
-	      var ourSecretChannelId = await _this6.getOurSecretChannelId(keys[i]);
-	      _this6.gun.user().get('chats').get(ourSecretChannelId).get(key).on(async function (data) {
-	        var decrypted = await Gun.SEA.decrypt(data, (await _this6.getSecret(keys[i])));
+	      var ourSecretChannelId = await _this7.getOurSecretChannelId(keys[i]);
+	      _this7.gun.user().get('chats').get(ourSecretChannelId).get(key).on(async function (data) {
+	        var decrypted = await Gun.SEA.decrypt(data, (await _this7.getSecret(keys[i])));
 	        if (decrypted) {
 	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
 	        }
@@ -7511,7 +7549,7 @@
 	  };
 
 	  Channel.prototype.onTheir = async function onTheir(key, callback) {
-	    var _this7 = this;
+	    var _this8 = this;
 
 	    if (typeof callback !== 'function') {
 	      throw new Error('onTheir callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
@@ -7519,11 +7557,11 @@
 	    var keys = this.getParticipants();
 
 	    var _loop2 = async function _loop2(i) {
-	      var theirSecretChannelId = await _this7.getTheirSecretChannelId(keys[i]);
-	      _this7.gun.user(keys[i]).get('chats').get(theirSecretChannelId).get(key).on(async function (data) {
-	        var decrypted = await Gun.SEA.decrypt(data, (await _this7.getSecret(keys[i])));
+	      var theirSecretChannelId = await _this8.getTheirSecretChannelId(keys[i]);
+	      _this8.gun.user(keys[i]).get('chats').get(theirSecretChannelId).get(key).on(async function (data) {
+	        var decrypted = await Gun.SEA.decrypt(data, (await _this8.getSecret(keys[i])));
 	        if (decrypted) {
-	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
+	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key, keys[i]);
 	        }
 	      });
 	    };
@@ -7539,7 +7577,7 @@
 
 
 	  Channel.prototype.setTyping = function setTyping(isTyping) {
-	    var _this8 = this;
+	    var _this9 = this;
 
 	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
 
@@ -7548,7 +7586,7 @@
 	    this.put('typing', isTyping ? new Date().toISOString() : false);
 	    clearTimeout(this.setTypingTimeout);
 	    this.setTypingTimeout = setTimeout(function () {
-	      return _this8.put('isTyping', false);
+	      return _this9.put('isTyping', false);
 	    }, timeout);
 	  };
 
@@ -7558,7 +7596,7 @@
 
 
 	  Channel.prototype.getTyping = function getTyping(callback) {
-	    var _this9 = this;
+	    var _this10 = this;
 
 	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
 
@@ -7567,10 +7605,10 @@
 	      if (callback) {
 	        var isTyping = typing && new Date() - new Date(typing) <= timeout;
 	        callback(isTyping, pub);
-	        _this9.getTypingTimeouts = _this9.getTypingTimeouts || {};
-	        clearTimeout(_this9.getTypingTimeouts[pub]);
+	        _this10.getTypingTimeouts = _this10.getTypingTimeouts || {};
+	        clearTimeout(_this10.getTypingTimeouts[pub]);
 	        if (isTyping) {
-	          _this9.getTypingTimeouts[pub] = setTimeout(function () {
+	          _this10.getTypingTimeouts[pub] = setTimeout(function () {
 	            return callback(false, pub);
 	          }, timeout);
 	        }
@@ -7615,7 +7653,7 @@
 
 
 	  Channel.prototype.getChatBox = function getChatBox() {
-	    var _this10 = this;
+	    var _this11 = this;
 
 	    util.injectCss();
 	    var minimized = false;
@@ -7665,9 +7703,9 @@
 	      var sendBtn = util.createElement('button', undefined, inputWrapper);
 	      sendBtn.innerHTML = '\n        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;" xml:space="preserve" width="100px" height="100px" fill="#000000" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>\n      ';
 	      sendBtn.addEventListener('click', function () {
-	        _this10.send(textArea.value);
+	        _this11.send(textArea.value);
 	        textArea.value = '';
-	        _this10.setTyping(false);
+	        _this11.setTyping(false);
 	      });
 	    }
 
@@ -7710,7 +7748,7 @@
 	      var time = util.createElement('div', 'time', msgContent);
 	      time.innerText = util.formatTime(new Date(msg.time));
 	      if (info.selfAuthored) {
-	        var cls = _this10.theirMsgsLastSeenTime >= msg.time ? 'seen yes' : 'seen';
+	        var cls = _this11.theirMsgsLastSeenTime >= msg.time ? 'seen yes' : 'seen';
 	        var seenIndicator = util.createElement('span', cls, time);
 	        seenIndicator.innerHTML = ' <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg>';
 	      }
@@ -7734,8 +7772,8 @@
 	    });
 
 	    textArea.addEventListener('keyup', function (event) {
-	      Channel.setOnline(_this10.gun, true); // TODO
-	      _this10.setMyMsgsLastSeenTime(); // TODO
+	      Channel.setOnline(_this11.gun, true); // TODO
+	      _this11.setMyMsgsLastSeenTime(); // TODO
 	      if (event.keyCode === 13) {
 	        event.preventDefault();
 	        var content = textArea.value;
@@ -7744,12 +7782,12 @@
 	          textArea.value = content.substring(0, caret - 1) + '\n' + content.substring(caret, content.length);
 	        } else {
 	          textArea.value = content.substring(0, caret - 1) + content.substring(caret, content.length);
-	          _this10.send(textArea.value);
+	          _this11.send(textArea.value);
 	          textArea.value = '';
-	          _this10.setTyping(false);
+	          _this11.setTyping(false);
 	        }
 	      } else {
-	        _this10.setTyping(!!textArea.value.length);
+	        _this11.setTyping(!!textArea.value.length);
 	      }
 	    });
 
