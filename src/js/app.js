@@ -182,7 +182,7 @@ function login(k) {
   iris.Channel.getChannels(gun, key, addChat);
   var chatWith = getUrlParameter('chatWith');
   if (chatWith) {
-    addChat(chatWith, window.location.href);
+    newChat(chatWith, window.location.href);
     showChat(chatWith);
     window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
   } else {
@@ -327,7 +327,7 @@ $('#paste-chat-link').on('input', event => {
   var s = val.split('?');
   if (s.length !== 2) { return; }
   var pub = getUrlParameter('chatWith', s[1]);
-  addChat(pub, val);
+  newChat(pub, val);
   showChat(pub);
   $(event.target).val('');
 });
@@ -773,7 +773,7 @@ function showChat(pub) {
   resetView();
   activeChat = pub;
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
-    addChat(pub);
+    newChat(pub);
   }
   var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
   chatListEl.toggleClass('active', true);
@@ -894,18 +894,54 @@ function deleteChat(pub) {
   $('.chat-item[data-pub="' + pub +'"]').remove();
 }
 
-function addChat(pub, chatLink) {
+function newChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
+  const channel = new iris.Channel({gun, key, chatLink: chatLink, participants: pub});
+  addChat(channel);
+}
+
+var askForPeers = _.once(pub => {
+  _.defer(() => {
+    gun.user(pub).get('peers').once().map().on(peer => {
+      if (peer && peer.url) {
+        var peerCountBySource = _.countBy(peers, p => p.from);
+        var peerSourceCount = Object.keys(peerCountBySource).length;
+        if (!peerCountBySource[pub]) {
+          peerSourceCount += 1;
+        }
+        var maxPeersFromSource = MAX_PEER_LIST_SIZE / peerSourceCount;
+        addPeer({url: peer.url, connect: true, from: pub});
+        while (Object.keys(peers).length > MAX_PEER_LIST_SIZE) {
+          _.each(Object.keys(peerCountBySource), source => {
+            if (peerCountBySource[source] > maxPeersFromSource) {
+              delete peers[_.sample(Object.keys(peers))];
+              peerCountBySource[source] -= 1;
+            }
+          });
+        }
+      }
+    });
+  });
+});
+
+function addChat(channel) {
+  var participants = channel.getParticipants();
+  if (participants.length > 1) {
+    return; // group chats not supported yet
+  }
+  var pub = participants[0];
+  if (chats[pub]) { return; }
+  chats[pub] = channel;
   $('#welcome').remove();
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
   var latestEl = el.find('.latest');
   var typingIndicator = el.find('.typing-indicator').text('Typing...');
-  chats[pub] = new iris.Channel({gun, key, chatLink: chatLink, participants: pub, onMessage: (msg, info) => {
-    msg.selfAuthored = info.selfAuthored;
+  chats[pub].getMessages((msg, info) => {
     chats[pub].messages[msg.time] = msg;
+    msg.selfAuthored = info.selfAuthored;
     msg.time = new Date(msg.time);
     if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
       if (activeChat !== pub || document.visibilityState !== 'visible') {
@@ -947,7 +983,7 @@ function addChat(pub, chatLink) {
       $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
     }
     notify(msg, info, pub);
-  }});
+  });
   changeChatUnseenCount(pub, 0);
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
@@ -969,35 +1005,12 @@ function addChat(pub, chatLink) {
       lastSeenTimeChanged(pub);
     }
   });
-  var askForPeers = _.once(() => {
-    _.defer(() => {
-      gun.user(pub).get('peers').once().map().on(peer => {
-        if (peer && peer.url) {
-          var peerCountBySource = _.countBy(peers, p => p.from);
-          var peerSourceCount = Object.keys(peerCountBySource).length;
-          if (!peerCountBySource[pub]) {
-            peerSourceCount += 1;
-          }
-          var maxPeersFromSource = MAX_PEER_LIST_SIZE / peerSourceCount;
-          addPeer({url: peer.url, connect: true, from: pub});
-          while (Object.keys(peers).length > MAX_PEER_LIST_SIZE) {
-            _.each(Object.keys(peerCountBySource), source => {
-              if (peerCountBySource[source] > maxPeersFromSource) {
-                delete peers[_.sample(Object.keys(peers))];
-                peerCountBySource[source] -= 1;
-              }
-            });
-          }
-        }
-      });
-    });
-  });
   chats[pub].getMyMsgsLastSeenTime(time => {
     chats[pub].myLastSeenTime = new Date(time);
     if (chats[pub].latest && chats[pub].myLastSeenTime >= chats[pub].latest.time) {
       changeChatUnseenCount(pub, 0);
     }
-    askForPeers();
+    askForPeers(pub); // TODO: this should be done only if we have a chat history or friendship with them
   });
   chats[pub].getTyping(isTyping => {
     if (activeChat === pub) {

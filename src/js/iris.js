@@ -7117,18 +7117,15 @@
 	var _Number$parseInt = unwrapExports(_parseInt$2);
 
 	/**
-	* Private communication channel between two participants (gun public keys). (You can specify more than two participants, but it causes unscalable data replication - better implementation to be done.) Can be used independently of other Iris stuff.
+	* Private communication channel between two participants (gun public keys). (You can specify more than two participants, but it causes unscalable data replication - better group channel implementation to be done.) Can be used independently of other Iris stuff.
 	*
 	* You can use **1)** channel.send() and channel.getMessages() for timestamp-indexed chat-style messaging or **2)** channel.put(key, value) and the corresponding channel.on(key, callback) methods to write key-value pairs where values are encrypted.
 	*
 	* Channel ids and data values are obfuscated, but it is possible to guess
 	* who are communicating with each other by looking at Gun timestamps and subscriptions.
 	*
-	* options.onMessage callback is not guaranteed to receive messages ordered by timestamp.
-	* You should sort them in the presentation layer.
-	*
-	* @param {Object} options {key, gun, chatLink, onMessage, participants} **key**: your keypair, **gun**: gun instance, **chatLink**: (optional) chat link instead of participants list, **participants**: (optional) string or string array of participant public keys
-	* @example https://github.com/irislib/iris-lib/blob/master/__tests__/channel.js
+	* @param {Object} options {key, gun, chatLink, participants} **key**: your keypair, **gun**: gun instance, **chatLink**: (optional) chat link instead of participants list, **participants**: (optional) string or string array of participant public keys
+	* @example https://github.com/irislib/iris-lib/blob/master/__tests__/Channel.js
 	*/
 
 	var Channel = function () {
@@ -7145,10 +7142,6 @@
 	    this.secrets = {}; // maps participant public key to shared secret
 	    this.ourSecretChannelIds = {}; // maps participant public key to our secret channel id
 	    this.theirSecretChannelIds = {}; // maps participant public key to their secret channel id
-	    this.onMessage = [];
-	    if (options.onMessage) {
-	      this.onMessage.push(options.onMessage);
-	    }
 	    this.messages = {};
 
 	    var saved = void 0;
@@ -7177,17 +7170,17 @@
 	    }
 
 	    if (typeof options.participants === 'string') {
-	      this.addPub(options.participants);
+	      this.addPub(options.participants, options.save);
 	    } else if (Array.isArray(options.participants)) {
 	      for (var i = 0; i < options.participants.length; i++) {
 	        if (typeof options.participants[i] === 'string') {
-	          this.addPub(options.participants[i]);
+	          this.addPub(options.participants[i], options.save);
 	        } else {
 	          console.log('participant public key must be string, got', _typeof(options.participants[i]), options.participants[i]);
 	        }
 	      }
 	    }
-	    if (!saved && (options.save === undefined || options.save === false)) {
+	    if (!saved && (options.save === undefined || options.save === true)) {
 	      this.save();
 	    }
 	  }
@@ -7232,9 +7225,7 @@
 	  };
 
 	  /**
-	  * Return a list of public keys that you have initiated a channel with or replied to.
-	  * (Channels that are initiated by others and unreplied by you don't show up, because
-	  * this method doesn't know where to look for them. Use socialNetwork.getChannels() to listen to new channels from friends. Or create channel invite links with Channel.createChatLink(). )
+	  * Calls back with Channels that you have initiated or written to.
 	  * @param {Object} gun user.authed gun instance
 	  * @param {Object} keypair Gun.SEA keypair that the gun instance is authenticated with
 	  * @param callback callback function that is called for each public key you have a channel with
@@ -7242,16 +7233,23 @@
 
 
 	  Channel.getChannels = async function getChannels(gun, keypair, callback) {
+	    var listenToChatLinks = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+
 	    var mySecret = await Gun.SEA.secret(keypair.epub, keypair);
+	    if (listenToChatLinks) {
+	      Channel.getMyChatLinks(gun, keypair, undefined, undefined, true);
+	    }
+	    var seen = {};
 	    gun.user().get('chats').map().on(async function (value, ourSecretChannelId) {
-	      if (value) {
+	      if (value && !seen[ourSecretChannelId]) {
+	        seen[ourSecretChannelId] = true;
 	        if (ourSecretChannelId.length > 44) {
 	          gun.user().get('chats').get(ourSecretChannelId).put(null);
 	          return;
 	        }
 	        var encryptedPub = await util.gunOnceDefined(gun.user().get('chats').get(ourSecretChannelId).get('pub'));
 	        var pub = await Gun.SEA.decrypt(encryptedPub, mySecret);
-	        callback(pub);
+	        callback(new Channel({ key: keypair, gun: gun, participants: pub, save: false }));
 	      }
 	    });
 	  };
@@ -7280,39 +7278,34 @@
 	  Channel.prototype.getMessages = async function getMessages(callback) {
 	    var _this2 = this;
 
-	    this.onMessage.push(callback);
+	    // TODO: save callback and apply it when new participants are added to channel
 	    this.getParticipants().forEach(async function (pub) {
 	      if (pub !== _this2.key.pub) {
 	        // Subscribe to their messages
 	        var theirSecretChannelId = await _this2.getTheirSecretChannelId(pub);
 	        _this2.gun.user(pub).get('chats').get(theirSecretChannelId).get('msgs').map().once(function (data, key) {
-	          _this2.messageReceived(data, pub, false, key);
+	          _this2.messageReceived(callback, data, pub, false, key, pub);
 	        });
 	      }
 	      // Subscribe to our messages
 	      var ourSecretChannelId = await _this2.getOurSecretChannelId(pub);
 	      _this2.user.get('chats').get(ourSecretChannelId).get('msgs').map().once(function (data, key) {
-	        _this2.messageReceived(data, pub, true, key);
+	        _this2.messageReceived(callback, data, pub, true, key, _this2.key.pub);
 	      });
 	    });
 	  };
 
-	  Channel.prototype.messageReceived = async function messageReceived(data, pub, selfAuthored, key) {
+	  Channel.prototype.messageReceived = async function messageReceived(callback, data, pub, selfAuthored, key, from) {
 	    if (this.messages[key]) {
 	      return;
 	    }
-	    if (this.onMessage.length) {
-	      var decrypted = await Gun.SEA.decrypt(data, (await this.getSecret(pub)));
-	      if (typeof decrypted !== 'object') {
-	        // console.log(`channel data received`, decrypted);
-	        return;
-	      }
-	      decrypted._info = { selfAuthored: selfAuthored, pub: pub };
-	      this.messages[key] = decrypted;
-	      this.onMessage.forEach(function (f) {
-	        return f(decrypted, decrypted._info);
-	      });
+	    var decrypted = await Gun.SEA.decrypt(data, (await this.getSecret(pub)));
+	    if (typeof decrypted !== 'object') {
+	      return;
 	    }
+	    var info = { selfAuthored: selfAuthored, pub: pub, from: from };
+	    this.messages[key] = decrypted;
+	    callback(decrypted, info);
 	  };
 
 	  /**
@@ -7392,25 +7385,16 @@
 
 
 	  Channel.prototype.addPub = async function addPub(pub) {
-	    var _this6 = this;
+	    var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
 	    this.secrets[pub] = null;
 	    this.getSecret(pub);
-	    // Save their public key in encrypted format, so in channel listing we know who we are channelting with
 	    var ourSecretChannelId = await this.getOurSecretChannelId(pub);
-	    var mySecret = await Gun.SEA.secret(this.key.epub, this.key);
-	    this.gun.user().get('chats').get(ourSecretChannelId).get('pub').put((await Gun.SEA.encrypt(pub, mySecret)));
-	    if (pub !== this.key.pub) {
-	      // Subscribe to their messages
-	      var theirSecretChannelId = await this.getTheirSecretChannelId(pub);
-	      this.gun.user(pub).get('chats').get(theirSecretChannelId).get('msgs').map().once(function (data, key) {
-	        _this6.messageReceived(data, pub, false, key);
-	      });
+	    if (save) {
+	      // Save their public key in encrypted format, so in channel listing we know who we are channelting with
+	      var mySecret = await Gun.SEA.secret(this.key.epub, this.key);
+	      this.gun.user().get('chats').get(ourSecretChannelId).get('pub').put((await Gun.SEA.encrypt(pub, mySecret)));
 	    }
-	    // Subscribe to our messages
-	    this.user.get('chats').get(ourSecretChannelId).get('msgs').map().once(function (data, key) {
-	      _this6.messageReceived(data, pub, true, key);
-	    });
 	  };
 
 	  /**
@@ -7501,7 +7485,7 @@
 	  };
 
 	  Channel.prototype.onMy = async function onMy(key, callback) {
-	    var _this7 = this;
+	    var _this6 = this;
 
 	    if (typeof callback !== 'function') {
 	      throw new Error('onMy callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
@@ -7509,9 +7493,9 @@
 	    var keys = this.getParticipants();
 
 	    var _loop = async function _loop(i) {
-	      var ourSecretChannelId = await _this7.getOurSecretChannelId(keys[i]);
-	      _this7.gun.user().get('chats').get(ourSecretChannelId).get(key).on(async function (data) {
-	        var decrypted = await Gun.SEA.decrypt(data, (await _this7.getSecret(keys[i])));
+	      var ourSecretChannelId = await _this6.getOurSecretChannelId(keys[i]);
+	      _this6.gun.user().get('chats').get(ourSecretChannelId).get(key).on(async function (data) {
+	        var decrypted = await Gun.SEA.decrypt(data, (await _this6.getSecret(keys[i])));
 	        if (decrypted) {
 	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
 	        }
@@ -7527,7 +7511,7 @@
 	  };
 
 	  Channel.prototype.onTheir = async function onTheir(key, callback) {
-	    var _this8 = this;
+	    var _this7 = this;
 
 	    if (typeof callback !== 'function') {
 	      throw new Error('onTheir callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
@@ -7535,9 +7519,9 @@
 	    var keys = this.getParticipants();
 
 	    var _loop2 = async function _loop2(i) {
-	      var theirSecretChannelId = await _this8.getTheirSecretChannelId(keys[i]);
-	      _this8.gun.user(keys[i]).get('chats').get(theirSecretChannelId).get(key).on(async function (data) {
-	        var decrypted = await Gun.SEA.decrypt(data, (await _this8.getSecret(keys[i])));
+	      var theirSecretChannelId = await _this7.getTheirSecretChannelId(keys[i]);
+	      _this7.gun.user(keys[i]).get('chats').get(theirSecretChannelId).get(key).on(async function (data) {
+	        var decrypted = await Gun.SEA.decrypt(data, (await _this7.getSecret(keys[i])));
 	        if (decrypted) {
 	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
 	        }
@@ -7555,7 +7539,7 @@
 
 
 	  Channel.prototype.setTyping = function setTyping(isTyping) {
-	    var _this9 = this;
+	    var _this8 = this;
 
 	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
 
@@ -7564,7 +7548,7 @@
 	    this.put('typing', isTyping ? new Date().toISOString() : false);
 	    clearTimeout(this.setTypingTimeout);
 	    this.setTypingTimeout = setTimeout(function () {
-	      return _this9.put('isTyping', false);
+	      return _this8.put('isTyping', false);
 	    }, timeout);
 	  };
 
@@ -7574,7 +7558,7 @@
 
 
 	  Channel.prototype.getTyping = function getTyping(callback) {
-	    var _this10 = this;
+	    var _this9 = this;
 
 	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
 
@@ -7583,10 +7567,10 @@
 	      if (callback) {
 	        var isTyping = typing && new Date() - new Date(typing) <= timeout;
 	        callback(isTyping, pub);
-	        _this10.getTypingTimeouts = _this10.getTypingTimeouts || {};
-	        clearTimeout(_this10.getTypingTimeouts[pub]);
+	        _this9.getTypingTimeouts = _this9.getTypingTimeouts || {};
+	        clearTimeout(_this9.getTypingTimeouts[pub]);
 	        if (isTyping) {
-	          _this10.getTypingTimeouts[pub] = setTimeout(function () {
+	          _this9.getTypingTimeouts[pub] = setTimeout(function () {
 	            return callback(false, pub);
 	          }, timeout);
 	        }
@@ -7631,7 +7615,7 @@
 
 
 	  Channel.prototype.getChatBox = function getChatBox() {
-	    var _this11 = this;
+	    var _this10 = this;
 
 	    util.injectCss();
 	    var minimized = false;
@@ -7681,9 +7665,9 @@
 	      var sendBtn = util.createElement('button', undefined, inputWrapper);
 	      sendBtn.innerHTML = '\n        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;" xml:space="preserve" width="100px" height="100px" fill="#000000" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>\n      ';
 	      sendBtn.addEventListener('click', function () {
-	        _this11.send(textArea.value);
+	        _this10.send(textArea.value);
 	        textArea.value = '';
-	        _this11.setTyping(false);
+	        _this10.setTyping(false);
 	      });
 	    }
 
@@ -7720,13 +7704,13 @@
 	      });
 	    });
 
-	    this.onMessage.push(function (msg, info) {
+	    this.getMessages(function (msg, info) {
 	      var msgContent = util.createElement('div', 'iris-msg-content');
 	      msgContent.innerText = msg.text;
 	      var time = util.createElement('div', 'time', msgContent);
 	      time.innerText = util.formatTime(new Date(msg.time));
 	      if (info.selfAuthored) {
-	        var cls = _this11.theirMsgsLastSeenTime >= msg.time ? 'seen yes' : 'seen';
+	        var cls = _this10.theirMsgsLastSeenTime >= msg.time ? 'seen yes' : 'seen';
 	        var seenIndicator = util.createElement('span', cls, time);
 	        seenIndicator.innerHTML = ' <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg>';
 	      }
@@ -7750,8 +7734,8 @@
 	    });
 
 	    textArea.addEventListener('keyup', function (event) {
-	      Channel.setOnline(_this11.gun, true); // TODO
-	      _this11.setMyMsgsLastSeenTime(); // TODO
+	      Channel.setOnline(_this10.gun, true); // TODO
+	      _this10.setMyMsgsLastSeenTime(); // TODO
 	      if (event.keyCode === 13) {
 	        event.preventDefault();
 	        var content = textArea.value;
@@ -7760,12 +7744,12 @@
 	          textArea.value = content.substring(0, caret - 1) + '\n' + content.substring(caret, content.length);
 	        } else {
 	          textArea.value = content.substring(0, caret - 1) + content.substring(caret, content.length);
-	          _this11.send(textArea.value);
+	          _this10.send(textArea.value);
 	          textArea.value = '';
-	          _this11.setTyping(false);
+	          _this10.setTyping(false);
 	        }
 	      } else {
-	        _this11.setTyping(!!textArea.value.length);
+	        _this10.setTyping(!!textArea.value.length);
 	      }
 	    });
 
@@ -7885,7 +7869,7 @@
 	  Channel.getMyChatLinks = async function getMyChatLinks(gun, key) {
 	    var urlRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'https://iris.to/';
 	    var callback = arguments[3];
-	    var subscribe = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+	    var subscribe = arguments[4];
 
 	    var user = gun.user();
 	    user.auth(key);
@@ -8206,7 +8190,7 @@
 	* Wait for index.ready promise to resolve before calling instance methods.
 	* @param {Object} options see default options in example
 	* @example
-	* https://github.com/irislib/iris-lib/blob/master/__tests__/socialNetwork.js
+	* https://github.com/irislib/iris-lib/blob/master/__tests__/SocialNetwork.js
 	*
 	* Default options:
 	*{
@@ -9534,7 +9518,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$1 = "0.0.140";
+	var version$1 = "0.0.142";
 
 	/*eslint no-useless-escape: "off", camelcase: "off" */
 
