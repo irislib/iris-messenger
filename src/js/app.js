@@ -713,8 +713,13 @@ function addUserToHeader(pub) {
   var nameEl = $('<div class="name"></div>');
   if (chats[pub] && chats[pub].name) {
     if (pub == key.pub) {
-      nameEl.text("📝Note to Self"); 
-      // need to disable nicknames in note to self profile
+      if (activeProfile !== pub) {
+        // if not looking at your own profile
+        nameEl.html("📝<i><b>Note to Self</b></i>"); 
+        // need to disable nicknames in note to self profile
+      } else {
+        nameEl.text(truncateString(chats[pub].name, 30));
+      }
     } else {
       nameEl.text(truncateString(chats[pub].name, 30));
     }
@@ -963,7 +968,7 @@ function addChat(pub, chatLink) {
     }
     if (pub == key.pub) {
       console.log(pub +" equals "+key.pub);
-      el.find('.name').text("📝Note to Self");
+      el.find('.name').html("📝<i><b>Note to Self</b></i>");
     } else {
       el.find('.name').text(truncateString(name, 20));
     }
