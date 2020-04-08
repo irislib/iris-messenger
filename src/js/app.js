@@ -727,7 +727,7 @@ function onCallMessage(pub, call) {
         activeCall = pub;
         var incomingCallEl = $('<div>')
           .attr('id', 'incoming-call')
-          .text('Incoming call from ' + chats[pub].name)
+          .text(`Incoming call from ${chats[pub].name}`)
           .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15});
         var answer = $('<button>').text('answer').css({display:'block',margin: '15px auto'});
         var reject = $('<button>').text('reject').css({display:'block',margin: '15px auto'});
@@ -745,11 +745,14 @@ function onCallMessage(pub, call) {
         callSound.pause();
       }, 5000);
     } else if (call.answer) {
+      stopCalling(pub);
       chats[pub].pc.setRemoteDescription({type: "answer", sdp: call.answer});
       console.log('call answered by', pub, '! you now have an open data channel', chats[pub].dc);
+      window.dc = chats[pub].dc; // for testing in console
+      createCallElement(pub);
     }
   } else {
-    // TODO: handle rejected call too
+    //stopCalling(pub);
     activeCall = null;
     callSound.pause();
     clearTimeout(callTimeout);
@@ -758,7 +761,7 @@ function onCallMessage(pub, call) {
 }
 
 async function callUser(pub, video = true) {
-  clearInterval(callingInterval);
+  if (callingInterval) { return; }
 
   var config = {iceServers: [{urls: "stun:stun.1.google.com:19302"}]};
   var pc = chats[pub].pc = new RTCPeerConnection(config);
@@ -778,12 +781,19 @@ async function callUser(pub, video = true) {
         offer: pc.localDescription.sdp,
       });
       call();
-      callingInterval = setInterval(call, 1000)
+      callingInterval = setInterval(call, 1000);
+      var activeCallEl = $('<div>')
+        .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
+        .text(`calling ${chats[pub].name}`)
+        .attr('id', 'outgoing-call');
+      $('body').append(activeCallEl);
     }
   };
 }
 
 function stopCalling(pub) {
+  $('#outgoing-call').remove();
+  $('#start-video-call').text('video');
   clearInterval(callingInterval);
   callingInterval = null;
   chats[pub].put('call', null);
@@ -791,6 +801,14 @@ function stopCalling(pub) {
 
 function rejectCall(pub) {
   callSound.pause();
+}
+
+function createCallElement(pub) {
+  var activeCallEl = $('<div>')
+    .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
+    .text(`on call with ${chats[pub].name}`)
+    .attr('id', 'active-call');
+  $('body').append(activeCallEl);
 }
 
 async function answerCall(pub, call) {
@@ -811,6 +829,8 @@ async function answerCall(pub, call) {
       answer: pc.localDescription.sdp,
     });
     console.log('answered call from', pub, 'with', pc.localDescription.sdp, 'dc', dc);
+    window.dc = chats[pub].dc;
+    createCallElement(pub);
   };
 }
 
@@ -831,16 +851,8 @@ function addUserToHeader(pub) {
   textEl.append($('<small>').addClass('typing-indicator').text('typing...'));
   $("#header-content").append(textEl);
   textEl.on('click', () => showProfile(pub));
-  var videoCallBtn = $('<button>video</button>');
-  videoCallBtn.click(() => {
-    if (!callingInterval) {
-      callUser(pub);
-      videoCallBtn.text('cancel');
-    } else {
-      stopCalling(pub);
-      videoCallBtn.text('video');
-    }
-  });
+  var videoCallBtn = $('<button>video</button>').attr('id', 'start-video-call');
+  videoCallBtn.click(() => callingInterval ? stopCalling(pub) : callUser(pub));
   var voiceCallBtn = $('<button>voice</button>');
   voiceCallBtn.click(() => callUser(pub, false));
   $("#header-content").append(voiceCallBtn);
