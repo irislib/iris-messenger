@@ -967,7 +967,6 @@ function addChat(pub, chatLink) {
       chats[pub].name = name;
     }
     if (pub == key.pub) {
-      console.log(pub +" equals "+key.pub);
       el.find('.name').html("📝<i><b>Note to Self</b></i>");
     } else {
       el.find('.name').text(truncateString(name, 20));
