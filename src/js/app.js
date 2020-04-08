@@ -49,6 +49,8 @@ var unseenTotal;
 var activeCall;
 var callTimeout;
 var callingInterval;
+var userMediaStream;
+var localVideo, remoteVideo;
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
@@ -747,8 +749,7 @@ function onCallMessage(pub, call) {
     } else if (call.answer) {
       stopCalling(pub);
       chats[pub].pc.setRemoteDescription({type: "answer", sdp: call.answer});
-      console.log('call answered by', pub, '! you now have an open data channel', chats[pub].dc);
-      window.dc = chats[pub].dc; // for testing in console
+      console.log('call answered by', pub);
       createCallElement(pub);
     }
   } else {
@@ -760,17 +761,29 @@ function onCallMessage(pub, call) {
   }
 }
 
+async function addStreamToPeerConnection(pc) {
+  var constraints = {
+    audio: true,
+    video: true
+  };
+  userMediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+  userMediaStream.getTracks().forEach(track => {
+    pc.addTrack(track, userMediaStream);
+  });
+}
+
 async function callUser(pub, video = true) {
   if (callingInterval) { return; }
 
   var config = {iceServers: [{urls: "stun:stun.1.google.com:19302"}]};
   var pc = chats[pub].pc = new RTCPeerConnection(config);
-  var dc = chats[pub].dc = pc.createDataChannel("chat", {negotiated: true, id: 0});
-  dc.onopen = () => console.log('dc.onopen');
-  dc.onmessage = e => console.log(`> ${e.data}`);
   pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
 
-  await pc.setLocalDescription(await pc.createOffer());
+  await addStreamToPeerConnection(pc);
+  await pc.setLocalDescription(await pc.createOffer({
+    offerToReceiveAudio: 1,
+    offerToReceiveVideo: 1
+  }));
   pc.onicecandidate = ({candidate}) => {
     if (candidate) return;
     if (!callingInterval) {
@@ -804,39 +817,35 @@ function stopCalling(pub) {
   chats[pub].put('call', null);
 }
 
+function endCall(pub) {
+  chats[pub].pc.close();
+  userMediaStream.getTracks().forEach(track => track.stop());
+  $('#active-call').remove();
+  chats[pub].put('call', null);
+}
+
 function rejectCall(pub) {
   callSound.pause();
 }
 
 async function createCallElement(pub) {
   var activeCallEl = $('<div>')
-    .css({position:'fixed', right:0, bottom: 0, height:200, width: 400, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
+    .css({position:'fixed', right:0, bottom: 0, height:300, width: 400, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
     .attr('id', 'active-call');
   $('body').append(activeCallEl);
   activeCallEl.append($('<div>').text(`on call with ${chats[pub].name}`).css({'margin-bottom': 5}));
+  activeCallEl.append($('<button>').text('end call').click(() => endCall(pub)).css({display:'block', margin: '15px auto'}));
   var ourVideoEl = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%'});
   var theirVideoEl = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%'});
   try {
-    var constraints = {
-      audio: true,
-      video: true
-    };
-    var stream = await navigator.mediaDevices.getUserMedia(constraints);
+    var stream = userMediaStream;
     var video = ourVideoEl[0];
     var videoTracks = stream.getVideoTracks();
-    console.log('Got stream with constraints:', constraints);
-    console.log(`Using video device: ${videoTracks[0].label}`);
-    console.log('element', video);
-    console.log('stream', stream);
     video.srcObject = stream;
     video.onloadedmetadata = function(e) {
       video.play();
     };
     ourVideoEl.attr('disabled', true);
-    stream.getTracks().forEach(track => {
-      console.log('adding track', track);
-      chats[pub].pc.addTrack(track, stream);
-    });
 
     chats[pub].pc.ontrack = (event) => {
       console.log('ontrack', event);
@@ -844,6 +853,7 @@ async function createCallElement(pub) {
       if (theirVideo.srcObject !== event.streams[0]) {
         theirVideo.srcObject = event.streams[0];
         theirVideo.onloadedmetadata = function(e) {
+          console.log('theirVideo.onloadedmetadata');
           theirVideo.play();
         };
         console.log('received remote stream', event);
@@ -860,21 +870,24 @@ async function answerCall(pub, call) {
   callSound.pause();
   var config = {iceServers: [{urls: "stun:stun.1.google.com:19302"}]};
   var pc = chats[pub].pc = new RTCPeerConnection(config);
-  var dc = chats[pub].dc = pc.createDataChannel("chat", {negotiated: true, id: 0});
-  dc.onopen = () => console.log('dc.onopen');
-  dc.onmessage = e => console.log(`> ${e.data}`);
+  await addStreamToPeerConnection(pc);
+  pc.ontrack = (event) => {
+    console.log('ontrack', event);
+  };
   pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
 
   await pc.setRemoteDescription({type: "offer", sdp: call.offer});
-  await pc.setLocalDescription(await pc.createAnswer());
+  await pc.setLocalDescription(await pc.createAnswer({
+    offerToReceiveAudio: 1,
+    offerToReceiveVideo: 1
+  }));
   pc.onicecandidate = ({candidate}) => {
     if (candidate) return;
     chats[pub].put('call', {
       time: new Date().toISOString(),
       answer: pc.localDescription.sdp,
     });
-    console.log('answered call from', pub, 'with', pc.localDescription.sdp, 'dc', dc);
-    window.dc = chats[pub].dc;
+    console.log('answered call from', pub, 'with', pc.localDescription.sdp);
     createCallElement(pub);
   };
 }
