@@ -32,6 +32,8 @@ function checkGunPeerCount() {
 setInterval(checkGunPeerCount, 2000);
 
 var notificationSound = new Audio('./notification.mp3');
+var callSound = new Audio('./ring.mp3');
+callSound.loop = true;
 var chat = gun.get('converse/' + location.hash.slice(1));
 var chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
@@ -44,6 +46,9 @@ var latestChatLink;
 var desktopNotificationsEnabled;
 var areWeOnline;
 var unseenTotal;
+var activeCall;
+var callTimeout;
+var callingInterval;
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
@@ -709,6 +714,106 @@ function showProfile(pub) {
   });
 }
 
+function onCallMessage(pub, call) {
+  if (call && call.time) {
+    var d = new Date(call.time);
+    if (new Date() - d > 5000) {
+      console.log('ignoring old call from', pub);
+      return;
+    }
+    if (call.offer) {
+      console.log('incoming call from', pub, call);
+      if (!activeCall && $('#incoming-call').length === 0) {
+        activeCall = pub;
+        var incomingCallEl = $('<div>')
+          .attr('id', 'incoming-call')
+          .text('Incoming call from ' + chats[pub].name)
+          .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15});
+        var answer = $('<button>').text('answer').css({display:'block',margin: '15px auto'});
+        var reject = $('<button>').text('reject').css({display:'block',margin: '15px auto'});
+        answer.click(() => answerCall(pub, call));
+        reject.click(() => rejectCall(pub, call));
+        incomingCallEl.append(answer);
+        incomingCallEl.append(reject);
+        $('body').append(incomingCallEl)
+        callSound.play();
+      }
+      clearTimeout(callTimeout);
+      callTimeout = setTimeout(() => {
+        $('#incoming-call').remove();
+        activeCall = null;
+        callSound.pause();
+      }, 5000);
+    } else if (call.answer) {
+      chats[pub].pc.setRemoteDescription({type: "answer", sdp: call.answer});
+      console.log('call answered by', pub, '! you now have an open data channel', chats[pub].dc);
+    }
+  } else {
+    // TODO: handle rejected call too
+    activeCall = null;
+    callSound.pause();
+    clearTimeout(callTimeout);
+    $('#incoming-call').remove();
+  }
+}
+
+async function callUser(pub, video = true) {
+  clearInterval(callingInterval);
+
+  var config = {iceServers: [{urls: "stun:stun.1.google.com:19302"}]};
+  var pc = chats[pub].pc = new RTCPeerConnection(config);
+  var dc = chats[pub].dc = pc.createDataChannel("chat", {negotiated: true, id: 0});
+  dc.onopen = () => console.log('dc.onopen');
+  dc.onmessage = e => console.log(`> ${e.data}`);
+  pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
+
+  await pc.setLocalDescription(await pc.createOffer());
+  pc.onicecandidate = ({candidate}) => {
+    if (candidate) return;
+    if (!callingInterval) {
+      console.log('calling', pub);
+      var call = () => chats[pub].put('call', {
+        time: new Date().toISOString(),
+        type: video ? 'video' : 'voice',
+        offer: pc.localDescription.sdp,
+      });
+      call();
+      callingInterval = setInterval(call, 1000)
+    }
+  };
+}
+
+function stopCalling(pub) {
+  clearInterval(callingInterval);
+  callingInterval = null;
+  chats[pub].put('call', null);
+}
+
+function rejectCall(pub) {
+  callSound.pause();
+}
+
+async function answerCall(pub, call) {
+  callSound.pause();
+  var config = {iceServers: [{urls: "stun:stun.1.google.com:19302"}]};
+  var pc = chats[pub].pc = new RTCPeerConnection(config);
+  var dc = chats[pub].dc = pc.createDataChannel("chat", {negotiated: true, id: 0});
+  dc.onopen = () => console.log('dc.onopen');
+  dc.onmessage = e => console.log(`> ${e.data}`);
+  pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
+
+  await pc.setRemoteDescription({type: "offer", sdp: call.offer});
+  await pc.setLocalDescription(await pc.createAnswer());
+  pc.onicecandidate = ({candidate}) => {
+    if (candidate) return;
+    chats[pub].put('call', {
+      time: new Date().toISOString(),
+      answer: pc.localDescription.sdp,
+    });
+    console.log('answered call from', pub, 'with', pc.localDescription.sdp, 'dc', dc);
+  };
+}
+
 function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
@@ -725,7 +830,21 @@ function addUserToHeader(pub) {
   textEl.append($('<small>').addClass('last-seen'));
   textEl.append($('<small>').addClass('typing-indicator').text('typing...'));
   $("#header-content").append(textEl);
-  $("#header-content").off().on('click', () => showProfile(pub));
+  textEl.on('click', () => showProfile(pub));
+  var videoCallBtn = $('<button>video</button>');
+  videoCallBtn.click(() => {
+    if (!callingInterval) {
+      callUser(pub);
+      videoCallBtn.text('cancel');
+    } else {
+      stopCalling(pub);
+      videoCallBtn.text('video');
+    }
+  });
+  var voiceCallBtn = $('<button>voice</button>');
+  voiceCallBtn.click(() => callUser(pub, false));
+  $("#header-content").append(voiceCallBtn);
+  $("#header-content").append(videoCallBtn);
   $("#header-content").css({cursor: 'pointer'});
 }
 
@@ -1028,6 +1147,7 @@ function addChat(channel) {
       setDeliveredCheckmarks(pub);
     }
   });
+  chats[pub].onTheir('call', call => onCallMessage(pub, call));
 }
 
 function setLatestSeen(pub) {
