@@ -786,6 +786,11 @@ async function callUser(pub, video = true) {
         .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
         .text(`calling ${chats[pub].name}`)
         .attr('id', 'outgoing-call');
+      var cancelButton = $('<button>')
+        .css({display:'block', margin: '15px auto'})
+        .text('cancel')
+        .click(() => stopCalling(pub));
+      activeCallEl.append(cancelButton);
       $('body').append(activeCallEl);
     }
   };
@@ -803,12 +808,52 @@ function rejectCall(pub) {
   callSound.pause();
 }
 
-function createCallElement(pub) {
+async function createCallElement(pub) {
   var activeCallEl = $('<div>')
-    .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
-    .text(`on call with ${chats[pub].name}`)
+    .css({position:'fixed', right:0, bottom: 0, height:200, width: 400, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
     .attr('id', 'active-call');
   $('body').append(activeCallEl);
+  activeCallEl.append($('<div>').text(`on call with ${chats[pub].name}`).css({'margin-bottom': 5}));
+  var ourVideoEl = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%'});
+  var theirVideoEl = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%'});
+  try {
+    var constraints = {
+      audio: true,
+      video: true
+    };
+    var stream = await navigator.mediaDevices.getUserMedia(constraints);
+    var video = ourVideoEl[0];
+    var videoTracks = stream.getVideoTracks();
+    console.log('Got stream with constraints:', constraints);
+    console.log(`Using video device: ${videoTracks[0].label}`);
+    console.log('element', video);
+    console.log('stream', stream);
+    video.srcObject = stream;
+    video.onloadedmetadata = function(e) {
+      video.play();
+    };
+    ourVideoEl.attr('disabled', true);
+    stream.getTracks().forEach(track => {
+      console.log('adding track', track);
+      chats[pub].pc.addTrack(track, stream);
+    });
+
+    chats[pub].pc.ontrack = (event) => {
+      console.log('ontrack', event);
+      var theirVideo = theirVideoEl[0];
+      if (theirVideo.srcObject !== event.streams[0]) {
+        theirVideo.srcObject = event.streams[0];
+        theirVideo.onloadedmetadata = function(e) {
+          theirVideo.play();
+        };
+        console.log('received remote stream', event);
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  $(activeCallEl).append(ourVideoEl);
+  $(activeCallEl).append(theirVideoEl);
 }
 
 async function answerCall(pub, call) {
