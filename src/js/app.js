@@ -917,7 +917,7 @@ function addUserToHeader(pub) {
   videoCallBtn.click(() => callingInterval ? stopCalling(pub) : callUser(pub));
   var voiceCallBtn = $('<button>voice</button>');
   voiceCallBtn.click(() => callUser(pub, false));
-  $("#header-content").append(voiceCallBtn);
+  //$("#header-content").append(voiceCallBtn);
   $("#header-content").append(videoCallBtn);
   $("#header-content").css({cursor: 'pointer'});
 }
