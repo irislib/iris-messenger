@@ -5,6 +5,7 @@ var activeCall;
 var callTimeout;
 var callSoundTimeout;
 var callingInterval;
+var incomingCallNotification;
 var userMediaStream;
 var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
@@ -32,6 +33,18 @@ function onCallMessage(pub, call) {
         incomingCallEl.append(reject);
         $('body').append(incomingCallEl)
         ringSound.play();
+        if (document.visibilityState !== 'visible') {
+          incomingCallNotification = new Notification(chats[pub].name, {
+            icon: 'img/icon128.png',
+            body: 'Incoming call',
+            requireInteraction: true,
+            silent: true
+          });
+          incomingCallNotification.onclick = function() {
+            showChat(pub);
+            window.focus();
+          };
+        }
       }
       clearTimeout(callTimeout);
       callTimeout = setTimeout(() => {
@@ -57,10 +70,7 @@ function onCallMessage(pub, call) {
     }
   } else {
     //stopCalling(pub);
-    activeCall = null;
-    ringSound.pause();
-    clearTimeout(callTimeout);
-    $('#incoming-call').remove();
+    rejectCall(pub);
   }
 }
 
@@ -152,8 +162,14 @@ function endCall(pub) {
 }
 
 function rejectCall(pub) {
+  activeCall = null;
   ringSound.pause();
   ringSound.currentTime = 0;
+  clearTimeout(callTimeout);
+  $('#incoming-call').remove();
+  if (incomingCallNotification) {
+    incomingCallNotification.close();
+  }
 }
 
 async function createCallElement(pub) {
