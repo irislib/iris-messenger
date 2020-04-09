@@ -24,7 +24,7 @@ function onCallMessage(pub, call) {
         var incomingCallEl = $('<div>')
           .attr('id', 'incoming-call')
           .text(`Incoming call from ${chats[pub].name}`)
-          .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15});
+          .css({position:'fixed', right:0, bottom: 0, height:300, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: '15px 0'});
         var answer = $('<button>').text('answer').css({display:'block',margin: '15px auto'});
         var reject = $('<button>').text('reject').css({display:'block',margin: '15px auto'});
         answer.click(() => answerCall(pub, call));
@@ -148,7 +148,7 @@ function stopCalling(pub) {
   clearTimeout(callSoundTimeout);
   callSound.currentTime = 0;
   $('#outgoing-call').remove();
-  $('#start-video-call').text('video');
+  $('#start-video-call').attr('disabled', false);
   clearInterval(callingInterval);
   callingInterval = null;
   chats[pub].put('call', null);

@@ -622,3 +622,50 @@ small {
 .add-friend:hover, .add-friend:active, .add-friend:focus {
   background-color: hsla(194, 55%, 80%, 1);;
 }
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: var(--day-separator-bg);
+  color: var(--day-separator-color);
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  left: -125%;
+  top: 100%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+/*
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgb(25,25,25) transparent transparent transparent;
+}*/
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
