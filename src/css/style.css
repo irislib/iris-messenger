@@ -642,7 +642,7 @@ small {
   /* Position the tooltip text */
   position: absolute;
   z-index: 1;
-  left: -125%;
+  right: 0;
   top: 100%;
   margin-left: -60px;
 

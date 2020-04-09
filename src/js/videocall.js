@@ -92,7 +92,7 @@ async function addStreamToPeerConnection(pc) {
 }
 
 function timeoutPlayCallSound() {
-  callSoundTimeout = setTimeout(() => callSound.play(), 3000);
+  callSoundTimeout = setTimeout(() => callSound.play(), 3500);
 }
 
 async function callUser(pub, video = true) {
