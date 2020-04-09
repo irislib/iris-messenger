@@ -157,6 +157,7 @@ header #header-content {
   align-self: center;
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 header #back-button {
