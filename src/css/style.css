@@ -554,6 +554,7 @@ small {
 }
 
 #enable-notifications-prompt a {
+  color: var(--text);
   text-decoration: none;
 }
 
