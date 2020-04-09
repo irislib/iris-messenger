@@ -1,8 +1,12 @@
+var ringSound = new Audio('./ring.mp3');
+ringSound.loop = true;
+var callSound = new Audio('./call.mp3');
 var activeCall;
 var callTimeout;
+var callSoundTimeout;
 var callingInterval;
 var userMediaStream;
-var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).attr('muted', true).css({width:'50%', 'max-height': '60%'});
+var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 
 function onCallMessage(pub, call) {
@@ -27,13 +31,13 @@ function onCallMessage(pub, call) {
         incomingCallEl.append(answer);
         incomingCallEl.append(reject);
         $('body').append(incomingCallEl)
-        callSound.play();
+        ringSound.play();
       }
       clearTimeout(callTimeout);
       callTimeout = setTimeout(() => {
         $('#incoming-call').remove();
         activeCall = null;
-        callSound.pause();
+        ringSound.pause();
       }, 5000);
     } else if (call.answer) {
       stopCalling(pub);
@@ -54,7 +58,7 @@ function onCallMessage(pub, call) {
   } else {
     //stopCalling(pub);
     activeCall = null;
-    callSound.pause();
+    ringSound.pause();
     clearTimeout(callTimeout);
     $('#incoming-call').remove();
   }
@@ -71,9 +75,14 @@ async function addStreamToPeerConnection(pc) {
   });
   localVideo[0].srcObject = userMediaStream;
   localVideo[0].onloadedmetadata = function(e) {
+    localVideo[0].muted = true;
     localVideo[0].play();
   };
   localVideo.attr('disabled', true);
+}
+
+function timeoutPlayCallSound() {
+  callSoundTimeout = setTimeout(() => callSound.play(), 3000);
 }
 
 async function callUser(pub, video = true) {
@@ -99,6 +108,8 @@ async function callUser(pub, video = true) {
         offer: pc.localDescription.sdp,
       });
       call();
+      callSound.addEventListener('ended', timeoutPlayCallSound);
+      callSound.play();
       callingInterval = setInterval(call, 1000);
       var activeCallEl = $('<div>')
         .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
@@ -122,6 +133,10 @@ function cancelCall(pub) {
 }
 
 function stopCalling(pub) {
+  callSound.pause();
+  callSound.removeEventListener('ended', timeoutPlayCallSound);
+  clearTimeout(callSoundTimeout);
+  callSound.currentTime = 0;
   $('#outgoing-call').remove();
   $('#start-video-call').text('video');
   clearInterval(callingInterval);
@@ -137,7 +152,8 @@ function endCall(pub) {
 }
 
 function rejectCall(pub) {
-  callSound.pause();
+  ringSound.pause();
+  ringSound.currentTime = 0;
 }
 
 async function createCallElement(pub) {
@@ -152,7 +168,7 @@ async function createCallElement(pub) {
 }
 
 async function answerCall(pub, call) {
-  callSound.pause();
+  ringSound.pause();
   var config = {iceServers: [{urls: "stun:stun.1.google.com:19302"}]};
   var pc = chats[pub].pc = new RTCPeerConnection(config);
   await addStreamToPeerConnection(pc);

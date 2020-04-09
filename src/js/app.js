@@ -36,8 +36,6 @@ function checkGunPeerCount() {
 setInterval(checkGunPeerCount, 2000);
 
 var notificationSound = new Audio('./notification.mp3');
-var callSound = new Audio('./ring.mp3');
-callSound.loop = true;
 var chat = gun.get('converse/' + location.hash.slice(1));
 var chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
