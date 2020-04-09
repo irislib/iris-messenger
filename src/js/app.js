@@ -50,8 +50,8 @@ var activeCall;
 var callTimeout;
 var callingInterval;
 var userMediaStream;
-var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).attr('muted', true).css({width:'50%'});
-var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%'});
+var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).attr('muted', true).css({width:'50%', 'max-height': '60%'});
+var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
