@@ -50,7 +50,8 @@ var activeCall;
 var callTimeout;
 var callingInterval;
 var userMediaStream;
-var localVideo, remoteVideo;
+var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).attr('muted', true).css({width:'50%'});
+var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%'});
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
@@ -770,6 +771,11 @@ async function addStreamToPeerConnection(pc) {
   userMediaStream.getTracks().forEach(track => {
     pc.addTrack(track, userMediaStream);
   });
+  localVideo[0].srcObject = userMediaStream;
+  localVideo[0].onloadedmetadata = function(e) {
+    localVideo[0].play();
+  };
+  localVideo.attr('disabled', true);
 }
 
 async function callUser(pub, video = true) {
@@ -780,6 +786,7 @@ async function callUser(pub, video = true) {
   pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
 
   await addStreamToPeerConnection(pc);
+
   await pc.setLocalDescription(await pc.createOffer({
     offerToReceiveAudio: 1,
     offerToReceiveVideo: 1
@@ -802,11 +809,18 @@ async function callUser(pub, video = true) {
       var cancelButton = $('<button>')
         .css({display:'block', margin: '15px auto'})
         .text('cancel')
-        .click(() => stopCalling(pub));
+        .click(() => cancelCall(pub));
       activeCallEl.append(cancelButton);
+      activeCallEl.append(localVideo);
+      activeCallEl.append(remoteVideo);
       $('body').append(activeCallEl);
     }
   };
+}
+
+function cancelCall(pub) {
+  userMediaStream.getTracks().forEach(track => track.stop());
+  stopCalling(pub);
 }
 
 function stopCalling(pub) {
@@ -835,35 +849,18 @@ async function createCallElement(pub) {
   $('body').append(activeCallEl);
   activeCallEl.append($('<div>').text(`on call with ${chats[pub].name}`).css({'margin-bottom': 5}));
   activeCallEl.append($('<button>').text('end call').click(() => endCall(pub)).css({display:'block', margin: '15px auto'}));
-  var ourVideoEl = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%'});
-  var theirVideoEl = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%'});
-  try {
-    var stream = userMediaStream;
-    var video = ourVideoEl[0];
-    var videoTracks = stream.getVideoTracks();
-    video.srcObject = stream;
-    video.onloadedmetadata = function(e) {
-      video.play();
-    };
-    ourVideoEl.attr('disabled', true);
-
-    chats[pub].pc.ontrack = (event) => {
-      console.log('ontrack', event);
-      var theirVideo = theirVideoEl[0];
-      if (theirVideo.srcObject !== event.streams[0]) {
-        theirVideo.srcObject = event.streams[0];
-        theirVideo.onloadedmetadata = function(e) {
-          console.log('theirVideo.onloadedmetadata');
-          theirVideo.play();
-        };
-        console.log('received remote stream', event);
-      }
+  chats[pub].pc.ontrack = (event) => {
+    console.log('ontrack', event);
+    if (remoteVideo[0].srcObject !== event.streams[0]) {
+      remoteVideo[0].srcObject = event.streams[0];
+      remoteVideo[0].onloadedmetadata = function(e) {
+        remoteVideo[0].play();
+      };
+      console.log('received remote stream', event);
     }
-  } catch (e) {
-    console.error(e);
   }
-  $(activeCallEl).append(ourVideoEl);
-  $(activeCallEl).append(theirVideoEl);
+  $(activeCallEl).append(localVideo);
+  $(activeCallEl).append(remoteVideo);
 }
 
 async function answerCall(pub, call) {
@@ -871,9 +868,6 @@ async function answerCall(pub, call) {
   var config = {iceServers: [{urls: "stun:stun.1.google.com:19302"}]};
   var pc = chats[pub].pc = new RTCPeerConnection(config);
   await addStreamToPeerConnection(pc);
-  pc.ontrack = (event) => {
-    console.log('ontrack', event);
-  };
   pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
 
   await pc.setRemoteDescription({type: "offer", sdp: call.offer});
