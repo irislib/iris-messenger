@@ -752,6 +752,16 @@ function onCallMessage(pub, call) {
       chats[pub].pc.setRemoteDescription({type: "answer", sdp: call.answer});
       console.log('call answered by', pub);
       createCallElement(pub);
+      chats[pub].pc.ontrack = (event) => {
+        console.log('ontrack', event);
+        if (remoteVideo[0].srcObject !== event.streams[0]) {
+          remoteVideo[0].srcObject = event.streams[0];
+          remoteVideo[0].onloadedmetadata = function(e) {
+            remoteVideo[0].play();
+          };
+          console.log('received remote stream', event);
+        }
+      };
     }
   } else {
     //stopCalling(pub);
@@ -844,21 +854,11 @@ function rejectCall(pub) {
 
 async function createCallElement(pub) {
   var activeCallEl = $('<div>')
-    .css({position:'fixed', right:0, bottom: 0, height:300, width: 400, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
+    .css({position:'fixed', right:0, bottom: 0, height:300, width: 400, 'max-width': '100%', 'text-align': 'center', background: '#000', color: '#fff', padding: '15px 0'})
     .attr('id', 'active-call');
   $('body').append(activeCallEl);
   activeCallEl.append($('<div>').text(`on call with ${chats[pub].name}`).css({'margin-bottom': 5}));
   activeCallEl.append($('<button>').text('end call').click(() => endCall(pub)).css({display:'block', margin: '15px auto'}));
-  chats[pub].pc.ontrack = (event) => {
-    console.log('ontrack', event);
-    if (remoteVideo[0].srcObject !== event.streams[0]) {
-      remoteVideo[0].srcObject = event.streams[0];
-      remoteVideo[0].onloadedmetadata = function(e) {
-        remoteVideo[0].play();
-      };
-      console.log('received remote stream', event);
-    }
-  }
   $(activeCallEl).append(localVideo);
   $(activeCallEl).append(remoteVideo);
 }
@@ -869,6 +869,16 @@ async function answerCall(pub, call) {
   var pc = chats[pub].pc = new RTCPeerConnection(config);
   await addStreamToPeerConnection(pc);
   pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
+  pc.ontrack = (event) => {
+    console.log('ontrack', event);
+    if (remoteVideo[0].srcObject !== event.streams[0]) {
+      remoteVideo[0].srcObject = event.streams[0];
+      remoteVideo[0].onloadedmetadata = function(e) {
+        remoteVideo[0].play();
+      };
+      console.log('received remote stream', event);
+    }
+  };
 
   await pc.setRemoteDescription({type: "offer", sdp: call.offer});
   await pc.setLocalDescription(await pc.createAnswer({
