@@ -18,6 +18,10 @@ function onCallMessage(pub, call) {
       return;
     }
     if (call.offer) {
+      if (chats[pub].rejectedTime && (new Date() - chats[pub].rejectedTime < 5000)) {
+        rejectCall(pub);
+        return;
+      }
       console.log('incoming call from', pub, call);
       if (!activeCall && $('#incoming-call').length === 0) {
         activeCall = pub;
@@ -28,7 +32,7 @@ function onCallMessage(pub, call) {
         var answer = $('<button>').text('answer').css({display:'block',margin: '15px auto'});
         var reject = $('<button>').text('reject').css({display:'block',margin: '15px auto'});
         answer.click(() => answerCall(pub, call));
-        reject.click(() => rejectCall(pub, call));
+        reject.click(() => rejectCall(pub));
         incomingCallEl.append(answer);
         incomingCallEl.append(reject);
         $('body').append(incomingCallEl)
@@ -54,6 +58,11 @@ function onCallMessage(pub, call) {
       }, 5000);
     } else if (call.answer) {
       stopCalling(pub);
+      $('#outgoing-call').remove();
+      chats[pub].put('call', {
+        time: new Date().toISOString(),
+        started: true,
+      });
       chats[pub].pc.setRemoteDescription({type: "answer", sdp: call.answer});
       console.log('call answered by', pub);
       createCallElement(pub);
@@ -69,8 +78,21 @@ function onCallMessage(pub, call) {
       };
     }
   } else {
-    //stopCalling(pub);
-    rejectCall(pub);
+    if ($('#outgoing-call').length) {
+      stopCalling(pub);
+      stopUserMedia(pub);
+      $('#outgoing-call video').remove();
+      $('#outgoing-call button').remove();
+      $('#outgoing-call').append($('<div>').text('Call rejected'));
+      $('#outgoing-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#outgoing-call').remove()));
+    } else if ($('#active-call').length) {
+      stopUserMedia(pub);
+      chats[pub].put('call', null);
+      $('#active-call video').remove();
+      $('#active-call button').remove();
+      $('#active-call').append($('<div>').text('Call ended'));
+      $('#active-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#active-call').remove()));
+    }
   }
 }
 
@@ -138,8 +160,14 @@ async function callUser(pub, video = true) {
 }
 
 function cancelCall(pub) {
-  userMediaStream.getTracks().forEach(track => track.stop());
   stopCalling(pub);
+  stopUserMedia(pub);
+  $('#outgoing-call').remove();
+  chats[pub].put('call', null);
+}
+
+function stopUserMedia(pub) {
+  userMediaStream.getTracks().forEach(track => track.stop());
 }
 
 function stopCalling(pub) {
@@ -147,29 +175,28 @@ function stopCalling(pub) {
   callSound.removeEventListener('ended', timeoutPlayCallSound);
   clearTimeout(callSoundTimeout);
   callSound.currentTime = 0;
-  $('#outgoing-call').remove();
-  $('#start-video-call').attr('disabled', false);
   clearInterval(callingInterval);
   callingInterval = null;
-  chats[pub].put('call', null);
 }
 
 function endCall(pub) {
   chats[pub].pc.close();
-  userMediaStream.getTracks().forEach(track => track.stop());
+  stopUserMedia(pub);
   $('#active-call').remove();
   chats[pub].put('call', null);
 }
 
 function rejectCall(pub) {
+  chats[pub].rejectedTime = new Date();
+  $('#incoming-call').remove();
   activeCall = null;
+  clearTimeout(callTimeout);
   ringSound.pause();
   ringSound.currentTime = 0;
-  clearTimeout(callTimeout);
-  $('#incoming-call').remove();
   if (incomingCallNotification) {
     incomingCallNotification.close();
   }
+  chats[pub].put('call', null);
 }
 
 async function createCallElement(pub) {
@@ -184,6 +211,7 @@ async function createCallElement(pub) {
 }
 
 async function answerCall(pub, call) {
+  $('#incoming-call').remove();
   ringSound.pause();
   var config = {iceServers: [{   urls: [ "stun:eu-turn4.xirsys.com" ], }, {urls: "stun:stun.1.google.com:19302"}, {   username: "ml0jh0qMKZKd9P_9C0UIBY2G0nSQMCFBUXGlk6IXDJf8G2uiCymg9WwbEJTMwVeiAAAAAF2__hNSaW5vbGVl",   credential: "4dd454a6-feee-11e9-b185-6adcafebbb45",   urls: [       "turn:eu-turn4.xirsys.com:80?transport=udp",       "turn:eu-turn4.xirsys.com:3478?transport=udp",       "turn:eu-turn4.xirsys.com:80?transport=tcp",       "turn:eu-turn4.xirsys.com:3478?transport=tcp",       "turns:eu-turn4.xirsys.com:443?transport=tcp",       "turns:eu-turn4.xirsys.com:5349?transport=tcp"   ]}]};;
   var pc = chats[pub].pc = new RTCPeerConnection(config);
