@@ -10,6 +10,21 @@ var userMediaStream;
 var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 
+function notifyIfNotVisible(pub, text) {
+   if (document.visibilityState !== 'visible') {
+    incomingCallNotification = new Notification(chats[pub].name, {
+      icon: 'img/icon128.png',
+      body: text,
+      requireInteraction: true,
+      silent: true
+    });
+    incomingCallNotification.onclick = function() {
+      showChat(pub);
+      window.focus();
+    };
+  } 
+}
+
 function onCallMessage(pub, call) {
   if (call && call.time) {
     var d = new Date(call.time);
@@ -37,18 +52,7 @@ function onCallMessage(pub, call) {
         incomingCallEl.append(reject);
         $('body').append(incomingCallEl)
         ringSound.play();
-        if (document.visibilityState !== 'visible') {
-          incomingCallNotification = new Notification(chats[pub].name, {
-            icon: 'img/icon128.png',
-            body: 'Incoming call',
-            requireInteraction: true,
-            silent: true
-          });
-          incomingCallNotification.onclick = function() {
-            showChat(pub);
-            window.focus();
-          };
-        }
+        notifyIfNotVisible(pub, 'Incoming call');
       }
       clearTimeout(callTimeout);
       callTimeout = setTimeout(() => {
@@ -84,12 +88,14 @@ function onCallMessage(pub, call) {
       $('#outgoing-call').empty();
       $('#outgoing-call').append($('<div>').text(`Call rejected by ${chats[pub].name}`));
       $('#outgoing-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#outgoing-call').remove()));
+      notifyIfNotVisible('Call rejected');
     } else if ($('#active-call').length) {
       stopUserMedia(pub);
       chats[pub].put('call', null);
       $('#active-call').empty();
       $('#active-call').append($('<div>').text(`Call with ${chats[pub].name} ended`));
       $('#active-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#active-call').remove()));
+      notifyIfNotVisible('Call ended');
     }
   }
 }
