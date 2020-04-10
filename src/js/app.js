@@ -712,7 +712,7 @@ function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (chats[pub] && chats[pub].name) {
-    if (pub == key.pub) {
+    if (pub === key.pub) {
       if (activeProfile !== pub) {
         // if not looking at your own profile
         nameEl.html("📝<i><b>Note to Self</b></i>"); 
@@ -966,7 +966,7 @@ function addChat(pub, chatLink) {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
     }
-    if (pub == key.pub) {
+    if (pub === key.pub) {
       el.find('.name').html("📝<i><b>Note to Self</b></i>");
     } else {
       el.find('.name').text(truncateString(name, 20));
