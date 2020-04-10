@@ -81,16 +81,14 @@ function onCallMessage(pub, call) {
     if ($('#outgoing-call').length) {
       stopCalling(pub);
       stopUserMedia(pub);
-      $('#outgoing-call video').remove();
-      $('#outgoing-call button').remove();
-      $('#outgoing-call').append($('<div>').text('Call rejected'));
+      $('#outgoing-call').empty();
+      $('#outgoing-call').append($('<div>').text(`Call rejected by ${chats[pub].name}`));
       $('#outgoing-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#outgoing-call').remove()));
     } else if ($('#active-call').length) {
       stopUserMedia(pub);
       chats[pub].put('call', null);
-      $('#active-call video').remove();
-      $('#active-call button').remove();
-      $('#active-call').append($('<div>').text('Call ended'));
+      $('#active-call').empty();
+      $('#active-call').append($('<div>').text(`Call with ${chats[pub].name} ended`));
       $('#active-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#active-call').remove()));
     }
   }
@@ -193,9 +191,7 @@ function rejectCall(pub) {
   clearTimeout(callTimeout);
   ringSound.pause();
   ringSound.currentTime = 0;
-  if (incomingCallNotification) {
-    incomingCallNotification.close();
-  }
+  incomingCallNotification && incomingCallNotification.close();
   chats[pub].put('call', null);
 }
 
@@ -213,6 +209,7 @@ async function createCallElement(pub) {
 async function answerCall(pub, call) {
   $('#incoming-call').remove();
   ringSound.pause();
+  incomingCallNotification && incomingCallNotification.close();
   var config = {iceServers: [{   urls: [ "stun:eu-turn4.xirsys.com" ], }, {urls: "stun:stun.1.google.com:19302"}, {   username: "ml0jh0qMKZKd9P_9C0UIBY2G0nSQMCFBUXGlk6IXDJf8G2uiCymg9WwbEJTMwVeiAAAAAF2__hNSaW5vbGVl",   credential: "4dd454a6-feee-11e9-b185-6adcafebbb45",   urls: [       "turn:eu-turn4.xirsys.com:80?transport=udp",       "turn:eu-turn4.xirsys.com:3478?transport=udp",       "turn:eu-turn4.xirsys.com:80?transport=tcp",       "turn:eu-turn4.xirsys.com:3478?transport=tcp",       "turns:eu-turn4.xirsys.com:443?transport=tcp",       "turns:eu-turn4.xirsys.com:5349?transport=tcp"   ]}]};;
   var pc = chats[pub].pc = new RTCPeerConnection(config);
   await addStreamToPeerConnection(pc);
