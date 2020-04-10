@@ -794,11 +794,17 @@ function showChat(pub) {
   if (!iris.util.isMobile) {
     $("#new-msg").focus();
   }
-  $('#new-msg').off().on('input', _.throttle(() => {
+  var setTypingThrottled = _.throttle(() => {
     chats[pub].setTyping($('#new-msg').val().length > 0);
-  }, 1000));
+  }, 1000);
+  $('#new-msg').val(chats[pub].msgDraft);
+  $('#new-msg').off().on('input', () => {
+    setTypingThrottled();
+    chats[pub].msgDraft = $('#new-msg').val();
+  });
   $(".message-form form").off().on('submit', event => {
     event.preventDefault();
+    chats[pub].msgDraft = null;
     var text = $('#new-msg').val();
     if (!text.length) { return; }
     chats[pub].setTyping(false);
