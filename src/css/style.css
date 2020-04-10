@@ -556,6 +556,7 @@ small {
 #enable-notifications-prompt a {
   color: var(--text);
   text-decoration: none;
+  color: var(--text-color);
 }
 
 #enable-notifications-prompt:hover a, #enable-notifications-prompt:focus a {

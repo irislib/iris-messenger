@@ -717,9 +717,20 @@ function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (chats[pub] && chats[pub].name) {
-    nameEl.text(truncateString(chats[pub].name, 30));
+    if (pub === key.pub) {
+      if (activeProfile !== pub) {
+        // if not looking at your own profile
+        nameEl.html("📝<b>Note to Self</b>"); 
+        // need to disable nicknames in note to self profile
+      } else {
+        nameEl.text(truncateString(chats[pub].name, 30));
+      }
+    } else {
+      nameEl.text(truncateString(chats[pub].name, 30));
+    }
     nameEl.show();
   }
+
   var identicon = getIdenticon(pub, 40);
   var img = identicon.children('img').first();
   img.attr('height', 40).attr('width', 40);
@@ -1007,10 +1018,14 @@ function addChat(channel) {
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
+    }
+    if (pub === key.pub) {
+      el.find('.name').html("📝<b>Note to Self</b>");
+    } else {
       el.find('.name').text(truncateString(name, 20));
-      if (pub === activeChat) {
-        addUserToHeader(pub);
-      }
+    }
+    if (pub === activeChat) {
+      addUserToHeader(pub);
     }
   });
   el.click(() => showChat(pub));
