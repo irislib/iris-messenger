@@ -715,7 +715,7 @@ function addUserToHeader(pub) {
     if (pub === key.pub) {
       if (activeProfile !== pub) {
         // if not looking at your own profile
-        nameEl.html("📝<i><b>Note to Self</b></i>"); 
+        nameEl.html("📝<b>Note to Self</b>"); 
         // need to disable nicknames in note to self profile
       } else {
         nameEl.text(truncateString(chats[pub].name, 30));
@@ -967,7 +967,7 @@ function addChat(pub, chatLink) {
       chats[pub].name = name;
     }
     if (pub === key.pub) {
-      el.find('.name').html("📝<i><b>Note to Self</b></i>");
+      el.find('.name').html("📝<b>Note to Self</b>");
     } else {
       el.find('.name').text(truncateString(name, 20));
     }
