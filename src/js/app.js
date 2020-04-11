@@ -680,7 +680,7 @@ function showProfile(pub) {
     $('#profile .profile-photo-container').show();
     $('#profile .profile-photo').attr('src', photo);
   });
-  $('#profile-about').empty();
+  $('#profile .profile-about').empty();
   gun.user(pub).get('profile').get('about').on(about => {
     $('#profile .profile-about').toggle(about && about.length > 0);
     $('#profile .profile-about').text(about);
