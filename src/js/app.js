@@ -201,17 +201,11 @@ function login(k) {
     if (name && typeof name === 'string') {
       myName = name;
       $('.user-info .user-name').text(truncateString(name, 20));
-      var el = $('#settings-name');
-      if (!el.is(':focus')) {
-        $('#settings-name').val(name);
-      }
+      $('#settings-name').not(':focus').val(name);
     }
   });
   gun.user().get('profile').get('about').on(about => {
-    var el = $('#settings-about');
-    if (!el.is(':focus')) {
-      $('#settings-about').val(about || '');
-    }
+    $('#settings-about').not(':focus').val(about || '');
   });
   gun.user().get('profile').get('photo').on(data => {
     $('#current-profile-photo').attr('src', data);
@@ -711,11 +705,10 @@ function showProfile(pub) {
   });
   $('#their-public-name').text(chats[pub].name + ": ");
   $('#my-public-name').text(myName + ": ");
-  $('#profile-nickname-their').attr('placeholder',chats[pub].theirNickname);
+  $('#profile-nickname-their').not(':focus').val(chats[pub].theirNickname);
   $('#profile-nickname-my').text(chats[pub].myNickname);
-  $('#profile-nickname-their').off().on('change', event => {
+  $('#profile-nickname-their').off().on('input', event => {
     var nick = event.target.value;
-    
     chats[pub].put('nickname', nick);
   });
   qrCodeEl.empty();
@@ -733,7 +726,7 @@ function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (chats[pub]) {
-    if (chats[pub].theirNickname) {
+    if (chats[pub].theirNickname && chats[pub].theirNickname.length) {
       nameEl.text(truncateString(chats[pub].theirNickname, 30) );
     } else if (chats[pub].name) {
       nameEl.text(truncateString(chats[pub].name, 30));
@@ -976,11 +969,12 @@ function addChat(pub, chatLink) {
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
-  chats[pub].on('nickname', (nick) => {
+  chats[pub].onTheir('nickname', (nick) => {
     //console.log(chats[pub].name,' gave you the nickname ',nick);
     chats[pub].myNickname = nick;
-  },"them");
-  chats[pub].on('nickname', (nick) => {
+    $('#profile-nickname-my').text(nick);
+  });
+  chats[pub].onMy('nickname', (nick) => {
     //console.log('You gave ',chats[pub].name,' the nickname ',nick);
     chats[pub].theirNickname = nick;
     if (chats[pub].theirNickname) {
@@ -989,7 +983,7 @@ function addChat(pub, chatLink) {
         addUserToHeader(pub);
       }
     }
-  },"me");
+  });
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
