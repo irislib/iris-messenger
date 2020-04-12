@@ -2999,7 +2999,7 @@
 	    }
 	    var sheet = document.createElement('style');
 	    sheet.id = elementId;
-	    sheet.innerHTML = '\n      .iris-identicon * {\n        box-sizing: border-box;\n      }\n\n      .iris-identicon {\n        vertical-align: middle;\n        border-radius: 50%;\n        text-align: center;\n        display: inline-block;\n        position: relative;\n        max-width: 100%;\n      }\n\n      .iris-distance {\n        z-index: 2;\n        position: absolute;\n        left:0%;\n        top:2px;\n        width: 100%;\n        text-align: right;\n        color: #fff;\n        text-shadow: 0 0 1px #000;\n        font-size: 75%;\n        line-height: 75%;\n        font-weight: bold;\n      }\n\n      .iris-pie {\n        border-radius: 50%;\n        position: absolute;\n        top: 0;\n        left: 0;\n        box-shadow: 0px 0px 0px 0px #82FF84;\n        padding-bottom: 100%;\n        max-width: 100%;\n        -webkit-transition: all 0.2s ease-in-out;\n        -moz-transition: all 0.2s ease-in-out;\n        transition: all 0.2s ease-in-out;\n      }\n\n      .iris-card {\n        padding: 10px;\n        background-color: #f7f7f7;\n        color: #777;\n        border: 1px solid #ddd;\n        display: flex;\n        flex-direction: row;\n        overflow: hidden;\n      }\n\n      .iris-card a {\n        -webkit-transition: color 150ms;\n        transition: color 150ms;\n        text-decoration: none;\n        color: #337ab7;\n      }\n\n      .iris-card a:hover, .iris-card a:active {\n        text-decoration: underline;\n        color: #23527c;\n      }\n\n      .iris-pos {\n        color: #3c763d;\n      }\n\n      .iris-neg {\n        color: #a94442;\n      }\n\n      .iris-identicon img {\n        position: absolute;\n        top: 0;\n        left: 0;\n        max-width: 100%;\n        border-radius: 50%;\n        border-color: transparent;\n        border-style: solid;\n      }\n\n      .iris-chat-open-button {\n        background-color: #1e1e1e;\n        color: #fff;\n        padding: 15px;\n        cursor: pointer;\n        user-select: none;\n      }\n\n      .iris-chat-open-button svg {\n        width: 1em;\n      }\n\n      .iris-chat-open-button, .iris-chat-box {\n        position: fixed;\n        bottom: 0.5rem;\n        right: 0.5rem;\n        border-radius: 8px;\n        font-family: system-ui;\n        font-size: 15px;\n      }\n\n      .iris-chat-box {\n        background-color: #fff;\n        max-height: 25rem;\n        box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);\n        height: calc(100% - 44px);\n        display: flex;\n        flex-direction: column;\n        width: 320px;\n        color: rgb(38, 38, 38);\n      }\n\n      .iris-chat-box.minimized {\n        height: auto;\n      }\n\n      .iris-chat-box.minimized .iris-chat-header {\n        border-radius: 8px;\n        cursor: pointer;\n      }\n\n      .iris-chat-box.minimized .iris-chat-messages, .iris-chat-box.minimized .iris-typing-indicator, .iris-chat-box.minimized .iris-chat-input-wrapper, .iris-chat-box.minimized .iris-chat-minimize, .iris-chat-box.minimized .iris-chat-close {\n        display: none;\n      }\n\n      .iris-chat-header {\n        background-color: #1e1e1e;\n        height: 44px;\n        color: #fff;\n        border-radius: 8px 8px 0 0;\n        text-align: center;\n        display: flex;\n        flex-direction: row;\n        justify-content: center;\n        align-items: center;\n        flex: none;\n        white-space: nowrap;\n        text-overflow: ellipsis;\n        overflow: hidden;\n      }\n\n      .iris-chat-header-text {\n        flex: 1;\n      }\n\n      .iris-online-indicator {\n        color: #bfbfbf;\n        margin-right: 5px;\n        font-size: 12px;\n        user-select: none;\n        flex: none;\n      }\n\n      .iris-online-indicator.yes {\n        color: #80bf5f;\n      }\n\n      .iris-typing-indicator {\n        display: none;\n        background-color: rgba(255, 255, 255, 0.5);\n        font-size: 12px;\n        padding: 2px;\n        color: #777;\n      }\n\n      .iris-typing-indicator.yes {\n        display: block;\n      }\n\n      .iris-chat-messages {\n        flex: 1;\n        padding: 15px;\n        overflow-y: scroll;\n      }\n\n      .iris-chat-input-wrapper {\n        flex: none;\n        padding: 15px;\n        background-color: #efefef;\n        display: flex;\n        flex-direction: row;\n        border-radius: 0 0 8px 8px;\n      }\n\n      .iris-chat-input-wrapper textarea {\n        padding: 15px 8px;\n        border-radius: 4px;\n        border: 1px solid rgba(0,0,0,0);\n        width: auto;\n        font-size: 15px;\n        resize: none;\n        flex: 1;\n      }\n\n      .iris-chat-input-wrapper textarea:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-input-wrapper button svg {\n        display: inline-block;\n        font-size: inherit;\n        height: 1em;\n        width: 1em;\n        overflow: visible;\n        vertical-align: -0.125em;\n      }\n\n      .iris-chat-input-wrapper button, .iris-chat-input-wrapper button:hover, .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        flex: none;\n        color: #999;\n        background-color: transparent;\n        font-size: 30px;\n        padding: 5px;\n        border: 1px solid rgba(0,0,0,0);\n        border-radius: 4px;\n        margin-left: 5px;\n      }\n\n      .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-message {\n        display: flex;\n        flex-direction: column;\n        margin-bottom: 2px;\n        overflow-wrap: break-word;\n      }\n\n      .iris-msg-content {\n        background-color: #efefef;\n        padding: 6px 10px;\n        border-radius: 8px;\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        flex: none;\n        max-width: 75%;\n      }\n\n      .emoji {\n        font-size: 1.3em;\n        line-height: 1em;\n      }\n\n      .iris-chat-message .emoji-only {\n        font-size: 3em;\n        text-align: center;\n      }\n\n      .seen {\n        color: rgba(0, 0, 0, 0.45);\n        user-select: none;\n      }\n\n      .seen.yes {\n        color: #4fc3f7;\n      }\n\n      .seen svg {\n        width: 18px;\n      }\n\n      .iris-delivered-checkmark {\n        display: none;\n      }\n\n      .delivered .iris-delivered-checkmark {\n        display: initial;\n      }\n\n      .iris-chat-minimize, .iris-chat-close {\n        user-select: none;\n        cursor: pointer;\n        width: 45px;\n        line-height: 44px;\n      }\n\n      .iris-chat-message.their {\n        align-items: flex-start;\n      }\n\n      .iris-chat-message.their + .iris-chat-message.our .iris-msg-content, .day-separator + .iris-chat-message.our .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.their:first-of-type .iris-msg-content {\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our:first-of-type .iris-msg-content {\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.our + .iris-chat-message.their .iris-msg-content, .day-separator + .iris-chat-message.their .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our {\n        align-items: flex-end;\n      }\n\n      .iris-chat-message.our .iris-msg-content {\n        background-color: #c5ecf7;\n      }\n\n      .iris-chat-message .time {\n        text-align: right;\n        font-size: 12px;\n        color: rgba(0, 0, 0, 0.45);\n      }\n\n      .day-separator {\n        display: inline-block;\n        border-radius: 8px;\n        background-color: rgba(227, 249, 255, 0.91);\n        padding: 6px 10px;\n        margin-top: 15px;\n        margin-left: auto;\n        margin-right: auto;\n        text-transform: uppercase;\n        font-size: 13px;\n        color: rgba(74, 74, 74, 0.88);\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        user-select: none;\n      }\n\n      .day-separator:first-of-type {\n        margin-top: 0;\n      }\n      ';
+	    sheet.innerHTML = '\n      .iris-identicon * {\n        box-sizing: border-box;\n      }\n\n      .iris-identicon {\n        vertical-align: middle;\n        border-radius: 50%;\n        text-align: center;\n        display: inline-block;\n        position: relative;\n        max-width: 100%;\n      }\n\n      .iris-distance {\n        z-index: 2;\n        position: absolute;\n        left:0%;\n        top:2px;\n        width: 100%;\n        text-align: right;\n        color: #fff;\n        text-shadow: 0 0 1px #000;\n        font-size: 75%;\n        line-height: 75%;\n        font-weight: bold;\n      }\n\n      .iris-pie {\n        border-radius: 50%;\n        position: absolute;\n        top: 0;\n        left: 0;\n        box-shadow: 0px 0px 0px 0px #82FF84;\n        padding-bottom: 100%;\n        max-width: 100%;\n        -webkit-transition: all 0.2s ease-in-out;\n        -moz-transition: all 0.2s ease-in-out;\n        transition: all 0.2s ease-in-out;\n      }\n\n      .iris-card {\n        padding: 10px;\n        background-color: #f7f7f7;\n        color: #777;\n        border: 1px solid #ddd;\n        display: flex;\n        flex-direction: row;\n        overflow: hidden;\n      }\n\n      .iris-card a {\n        -webkit-transition: color 150ms;\n        transition: color 150ms;\n        text-decoration: none;\n        color: #337ab7;\n      }\n\n      .iris-card a:hover, .iris-card a:active {\n        text-decoration: underline;\n        color: #23527c;\n      }\n\n      .iris-pos {\n        color: #3c763d;\n      }\n\n      .iris-neg {\n        color: #a94442;\n      }\n\n      .iris-identicon img {\n        position: absolute;\n        top: 0;\n        left: 0;\n        max-width: 100%;\n        border-radius: 50%;\n        border-color: transparent;\n        border-style: solid;\n      }\n\n      .iris-chat-open-button {\n        background-color: #1e1e1e;\n        color: #fff;\n        padding: 15px;\n        cursor: pointer;\n        user-select: none;\n      }\n\n      .iris-chat-open-button svg {\n        width: 1em;\n      }\n\n      .iris-chat-open-button, .iris-chat-box {\n        position: fixed;\n        bottom: 0.5rem;\n        right: 0.5rem;\n        border-radius: 8px;\n        font-family: system-ui;\n        font-size: 15px;\n      }\n\n      .iris-chat-box {\n        background-color: #fff;\n        max-height: 25rem;\n        box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);\n        height: calc(100% - 44px);\n        display: flex;\n        flex-direction: column;\n        width: 320px;\n        color: rgb(38, 38, 38);\n      }\n\n      .iris-chat-box.minimized {\n        height: auto;\n      }\n\n      .iris-chat-box.minimized .iris-chat-header {\n        border-radius: 8px;\n        cursor: pointer;\n      }\n\n      .iris-chat-box.minimized .iris-chat-messages, .iris-chat-box.minimized .iris-typing-indicator, .iris-chat-box.minimized .iris-chat-input-wrapper, .iris-chat-box.minimized .iris-chat-minimize, .iris-chat-box.minimized .iris-chat-close {\n        display: none;\n      }\n\n      .iris-chat-header {\n        background-color: #1e1e1e;\n        height: 44px;\n        color: #fff;\n        border-radius: 8px 8px 0 0;\n        text-align: center;\n        display: flex;\n        flex-direction: row;\n        justify-content: center;\n        align-items: center;\n        flex: none;\n        white-space: nowrap;\n        text-overflow: ellipsis;\n        overflow: hidden;\n      }\n\n      .iris-chat-header-text {\n        flex: 1;\n      }\n\n      .iris-online-indicator {\n        color: #bfbfbf;\n        margin-right: 5px;\n        font-size: 12px;\n        user-select: none;\n        flex: none;\n      }\n\n      .iris-online-indicator.yes {\n        color: #80bf5f;\n      }\n\n      .iris-typing-indicator {\n        display: none;\n        background-color: rgba(255, 255, 255, 0.5);\n        font-size: 12px;\n        padding: 2px;\n        color: #777;\n      }\n\n      .iris-typing-indicator.yes {\n        display: block;\n      }\n\n      .iris-chat-messages {\n        flex: 1;\n        padding: 15px;\n        overflow-y: scroll;\n      }\n\n      .iris-chat-input-wrapper {\n        flex: none;\n        padding: 15px;\n        background-color: #efefef;\n        display: flex;\n        flex-direction: row;\n        border-radius: 0 0 8px 8px;\n      }\n\n      .iris-chat-input-wrapper textarea {\n        padding: 15px 8px;\n        border-radius: 4px;\n        border: 1px solid rgba(0,0,0,0);\n        width: auto;\n        font-size: 15px;\n        resize: none;\n        flex: 1;\n      }\n\n      .iris-chat-input-wrapper textarea:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-input-wrapper button svg {\n        display: inline-block;\n        font-size: inherit;\n        height: 1em;\n        width: 1em;\n        overflow: visible;\n        vertical-align: -0.125em;\n      }\n\n      .iris-chat-input-wrapper button, .iris-chat-input-wrapper button:hover, .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        flex: none;\n        color: #999;\n        background-color: transparent;\n        font-size: 30px;\n        padding: 5px;\n        border: 1px solid rgba(0,0,0,0);\n        border-radius: 4px;\n        margin-left: 5px;\n      }\n\n      .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-message {\n        display: flex;\n        flex-direction: column;\n        margin-bottom: 2px;\n        overflow-wrap: break-word;\n      }\n\n      .iris-msg-content {\n        background-color: #efefef;\n        padding: 6px 10px;\n        border-radius: 8px;\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        flex: none;\n        max-width: 75%;\n      }\n\n      .emoji {\n        font-size: 1.3em;\n        line-height: 1em;\n      }\n\n      .iris-chat-message .emoji-only {\n        font-size: 3em;\n        text-align: center;\n      }\n\n      .iris-seen {\n        color: rgba(0, 0, 0, 0.45);\n        user-select: none;\n      }\n\n      .iris-seen.yes {\n        color: #4fc3f7;\n      }\n\n      .iris-seen svg {\n        width: 18px;\n      }\n\n      .iris-delivered-checkmark {\n        display: none;\n      }\n\n      .delivered .iris-delivered-checkmark {\n        display: initial;\n      }\n\n      .iris-chat-minimize, .iris-chat-close {\n        user-select: none;\n        cursor: pointer;\n        width: 45px;\n        line-height: 44px;\n      }\n\n      .iris-chat-message.their {\n        align-items: flex-start;\n      }\n\n      .iris-chat-message.their + .iris-chat-message.our .iris-msg-content, .day-separator + .iris-chat-message.our .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.their:first-of-type .iris-msg-content {\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our:first-of-type .iris-msg-content {\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.our + .iris-chat-message.their .iris-msg-content, .day-separator + .iris-chat-message.their .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our {\n        align-items: flex-end;\n      }\n\n      .iris-chat-message.our .iris-msg-content {\n        background-color: #c5ecf7;\n      }\n\n      .iris-chat-message .time {\n        text-align: right;\n        font-size: 12px;\n        color: rgba(0, 0, 0, 0.45);\n      }\n\n      .day-separator {\n        display: inline-block;\n        border-radius: 8px;\n        background-color: rgba(227, 249, 255, 0.91);\n        padding: 6px 10px;\n        margin-top: 15px;\n        margin-left: auto;\n        margin-right: auto;\n        text-transform: uppercase;\n        font-size: 13px;\n        color: rgba(74, 74, 74, 0.88);\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        user-select: none;\n      }\n\n      .day-separator:first-of-type {\n        margin-top: 0;\n      }\n      ';
 	    document.head.prepend(sheet);
 	  },
 	  getUrlParameter: function getUrlParameter(sParam, sParams) {
@@ -7117,18 +7117,74 @@
 	var _Number$parseInt = unwrapExports(_parseInt$2);
 
 	/**
-	* Private communication channel between two participants (gun public keys). (You can specify more than two participants, but it causes unscalable data replication - better implementation to be done.) Can be used independently of other Iris stuff.
+	* Private communication channel between two participants ([Gun](https://github.com/amark/gun) public keys). Can be used independently of other Iris stuff.
 	*
-	* You can use **1)** channel.send() and channel.getMessages() for timestamp-indexed chat-style messaging or **2)** channel.put(key, value) and the corresponding channel.on(key, callback) methods to write key-value pairs where values are encrypted.
+	* ---
 	*
-	* Channel ids and data values are obfuscated, but it is possible to guess
-	* who are communicating with each other by looking at Gun timestamps and subscriptions.
+	* #### Key-value API
+	* `channel.put(key, value)` and `channel.on(key, callback)`.
 	*
-	* options.onMessage callback is not guaranteed to receive messages ordered by timestamp.
-	* You should sort them in the presentation layer.
+	* Note that each participant has their own versions of each key-value — they don't overwrite each other. `channel.on()` callback returns them all by default and has a parameter that indicates whose value you got.
 	*
-	* @param {Object} options {key, gun, chatLink, onMessage, participants} **key**: your keypair, **gun**: gun instance, **chatLink**: (optional) chat link instead of participants list, **participants**: (optional) string or string array of participant public keys
-	* @example https://github.com/irislib/iris-lib/blob/master/__tests__/channel.js
+	* While values are encrypted, encryption of keys is not implemented yet.
+	*
+	* #### Message API
+	* `channel.send()` and `channel.getMessages()` for timestamp-indexed chat-style messaging.
+	*
+	* Message data is encrypted, but timestamps are public so that peers can return your messages in a sequential order.
+	*
+	* ---
+	*
+	* You can open a channel with yourself for a private key-value space or a "note to self" type chat with yourself.
+	*
+	* You can specify more than one participant key (your own key is included by default), but it's not guaranteed to work and causes unscalable data replication - better group channel implementation to be done.
+	*
+	* **Note!** As of April 2020 Gun.SEA hashing function [is broken on Safari](https://github.com/amark/gun/issues/892). Channels don't work on Safari unless you patch sea.js by adding [this line](https://github.com/irislib/iris-messenger/blob/1e012581793485e6b8b5ed3c2ad0629716709366/src/js/sea.js#L270).
+	*
+	* **Privacy disclaimer:** Channel ids, data values and messages are encrypted, but message timestamps are unencrypted so that peers can return them to you in a sequential order. By looking at the unencrypted timestamps (or Gun subscriptions), it is possible to guess who are communicating with each other. This could be improved by indexing messages by *day* only, so making the guess would be more difficult, while you could still return them in a semi-sequential order.
+	*
+	* @param {Object} options {key, gun, chatLink, participants} **key**: your keypair, **gun**: gun instance, **chatLink**: (optional) chat link instead of participants list, **participants**: (optional) string or string array of participant public keys (your own key is included by default)
+	* @example
+	* // Copy & paste this to console at https://iris.to or other page that has gun, sea and iris-lib
+	* // Due to an unsolved bug, someoneElse's messages only start showing up after a reload
+	*
+	* var gun1 = new Gun('https://gun-us.herokuapp.com/gun');
+	* var gun2 = new Gun('https://gun-us.herokuapp.com/gun');
+	* var myKey = await iris.Key.getDefault();
+	* var someoneElse = localStorage.getItem('someoneElsesKey');
+	* if (someoneElse) {
+	*  someoneElse = JSON.parse(someoneElse);
+	* } else {
+	*  someoneElse = await iris.Key.generate();
+	*  localStorage.setItem('someoneElsesKey', JSON.stringify(someoneElse));
+	* }
+	*
+	* iris.Channel.initUser(gun1, myKey); // saves myKey.epub to gun.user().get('epub')
+	* iris.Channel.initUser(gun2, someoneElse);
+	*
+	* var ourChannel = new iris.Channel({key: myKey, gun: gun1, participants: someoneElse.pub});
+	* var theirChannel = new iris.Channel({key: someoneElse, gun: gun2, participants: myKey.pub});
+	*
+	* var myChannels = {}; // you can list them in a user interface
+	* function printMessage(msg, info) {
+	*  console.log(`[${new Date(msg.time).toLocaleString()}] ${info.from.slice(0,8)}: ${msg.text}`)
+	* }
+	* iris.Channel.getChannels(gun1, myKey, channel => {
+	*  var pub = channel.getParticipants()[0];
+	*  gun1.user(pub).get('profile').get('name').on(name => channel.name = name);
+	*  myChannels[pub] = channel;
+	*  channel.getMessages(printMessage);
+	*  channel.on('mood', (mood, from) => console.log(from.slice(0,8) + ' is feeling ' + mood));
+	* });
+	*
+	* // you can play with these in the console:
+	* ourChannel.send('message from myKey');
+	* theirChannel.send('message from someoneElse');
+	*
+	* ourChannel.put('mood', 'blessed');
+	* theirChannel.put('mood', 'happy');
+	*
+	* @example https://github.com/irislib/iris-lib/blob/master/__tests__/Channel.js
 	*/
 
 	var Channel = function () {
@@ -7145,10 +7201,6 @@
 	    this.secrets = {}; // maps participant public key to shared secret
 	    this.ourSecretChannelIds = {}; // maps participant public key to our secret channel id
 	    this.theirSecretChannelIds = {}; // maps participant public key to their secret channel id
-	    this.onMessage = [];
-	    if (options.onMessage) {
-	      this.onMessage.push(options.onMessage);
-	    }
 	    this.messages = {};
 
 	    var saved = void 0;
@@ -7177,17 +7229,17 @@
 	    }
 
 	    if (typeof options.participants === 'string') {
-	      this.addPub(options.participants);
+	      this.addPub(options.participants, options.save);
 	    } else if (Array.isArray(options.participants)) {
 	      for (var i = 0; i < options.participants.length; i++) {
 	        if (typeof options.participants[i] === 'string') {
-	          this.addPub(options.participants[i]);
+	          this.addPub(options.participants[i], options.save);
 	        } else {
 	          console.log('participant public key must be string, got', _typeof(options.participants[i]), options.participants[i]);
 	        }
 	      }
 	    }
-	    if (!saved && (options.save === undefined || options.save === false)) {
+	    if (!saved && (options.save === undefined || options.save === true)) {
 	      this.save();
 	    }
 	  }
@@ -7232,9 +7284,7 @@
 	  };
 
 	  /**
-	  * Return a list of public keys that you have initiated a channel with or replied to.
-	  * (Channels that are initiated by others and unreplied by you don't show up, because
-	  * this method doesn't know where to look for them. Use socialNetwork.getChannels() to listen to new channels from friends. Or create channel invite links with Channel.createChatLink(). )
+	  * Calls back with Channels that you have initiated or written to.
 	  * @param {Object} gun user.authed gun instance
 	  * @param {Object} keypair Gun.SEA keypair that the gun instance is authenticated with
 	  * @param callback callback function that is called for each public key you have a channel with
@@ -7242,16 +7292,23 @@
 
 
 	  Channel.getChannels = async function getChannels(gun, keypair, callback) {
+	    var listenToChatLinks = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+
 	    var mySecret = await Gun.SEA.secret(keypair.epub, keypair);
+	    if (listenToChatLinks) {
+	      Channel.getMyChatLinks(gun, keypair, undefined, undefined, true);
+	    }
+	    var seen = {};
 	    gun.user().get('chats').map().on(async function (value, ourSecretChannelId) {
-	      if (value) {
+	      if (value && !seen[ourSecretChannelId]) {
+	        seen[ourSecretChannelId] = true;
 	        if (ourSecretChannelId.length > 44) {
 	          gun.user().get('chats').get(ourSecretChannelId).put(null);
 	          return;
 	        }
 	        var encryptedPub = await util.gunOnceDefined(gun.user().get('chats').get(ourSecretChannelId).get('pub'));
 	        var pub = await Gun.SEA.decrypt(encryptedPub, mySecret);
-	        callback(pub);
+	        callback(new Channel({ key: keypair, gun: gun, participants: pub, save: false }));
 	      }
 	    });
 	  };
@@ -7280,39 +7337,34 @@
 	  Channel.prototype.getMessages = async function getMessages(callback) {
 	    var _this2 = this;
 
-	    this.onMessage.push(callback);
+	    // TODO: save callback and apply it when new participants are added to channel
 	    this.getParticipants().forEach(async function (pub) {
 	      if (pub !== _this2.key.pub) {
 	        // Subscribe to their messages
 	        var theirSecretChannelId = await _this2.getTheirSecretChannelId(pub);
 	        _this2.gun.user(pub).get('chats').get(theirSecretChannelId).get('msgs').map().once(function (data, key) {
-	          _this2.messageReceived(data, pub, false, key);
+	          _this2.messageReceived(callback, data, pub, false, key, pub);
 	        });
 	      }
 	      // Subscribe to our messages
 	      var ourSecretChannelId = await _this2.getOurSecretChannelId(pub);
 	      _this2.user.get('chats').get(ourSecretChannelId).get('msgs').map().once(function (data, key) {
-	        _this2.messageReceived(data, pub, true, key);
+	        _this2.messageReceived(callback, data, pub, true, key, _this2.key.pub);
 	      });
 	    });
 	  };
 
-	  Channel.prototype.messageReceived = async function messageReceived(data, pub, selfAuthored, key) {
+	  Channel.prototype.messageReceived = async function messageReceived(callback, data, pub, selfAuthored, key, from) {
 	    if (this.messages[key]) {
 	      return;
 	    }
-	    if (this.onMessage.length) {
-	      var decrypted = await Gun.SEA.decrypt(data, (await this.getSecret(pub)));
-	      if (typeof decrypted !== 'object') {
-	        // console.log(`channel data received`, decrypted);
-	        return;
-	      }
-	      decrypted._info = { selfAuthored: selfAuthored, pub: pub };
-	      this.messages[key] = decrypted;
-	      this.onMessage.forEach(function (f) {
-	        return f(decrypted, decrypted._info);
-	      });
+	    var decrypted = await Gun.SEA.decrypt(data, (await this.getSecret(pub)));
+	    if (typeof decrypted !== 'object') {
+	      return;
 	    }
+	    var info = { selfAuthored: selfAuthored, pub: pub, from: from };
+	    this.messages[key] = decrypted;
+	    callback(decrypted, info);
 	  };
 
 	  /**
@@ -7392,25 +7444,16 @@
 
 
 	  Channel.prototype.addPub = async function addPub(pub) {
-	    var _this6 = this;
+	    var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
 	    this.secrets[pub] = null;
 	    this.getSecret(pub);
-	    // Save their public key in encrypted format, so in channel listing we know who we are channelting with
 	    var ourSecretChannelId = await this.getOurSecretChannelId(pub);
-	    var mySecret = await Gun.SEA.secret(this.key.epub, this.key);
-	    this.gun.user().get('chats').get(ourSecretChannelId).get('pub').put((await Gun.SEA.encrypt(pub, mySecret)));
-	    if (pub !== this.key.pub) {
-	      // Subscribe to their messages
-	      var theirSecretChannelId = await this.getTheirSecretChannelId(pub);
-	      this.gun.user(pub).get('chats').get(theirSecretChannelId).get('msgs').map().once(function (data, key) {
-	        _this6.messageReceived(data, pub, false, key);
-	      });
+	    if (save) {
+	      // Save their public key in encrypted format, so in channel listing we know who we are channelting with
+	      var mySecret = await Gun.SEA.secret(this.key.epub, this.key);
+	      this.gun.user().get('chats').get(ourSecretChannelId).get('pub').put((await Gun.SEA.encrypt(pub, mySecret)));
 	    }
-	    // Subscribe to our messages
-	    this.user.get('chats').get(ourSecretChannelId).get('msgs').map().once(function (data, key) {
-	      _this6.messageReceived(data, pub, true, key);
-	    });
 	  };
 
 	  /**
@@ -7460,7 +7503,7 @@
 	  /**
 	  * Save a key-value pair, encrypt value. Each participant in the Channel writes to their own version of the key-value pair — they don't overwrite the same one.
 	  * @param {string} key
-	  * @param {string} value
+	  * @param value
 	  * @param {string} salt (optional) custom salt for encrypting the value
 	  */
 
@@ -7488,14 +7531,16 @@
 
 
 	  Channel.prototype.on = async function on(key, callback, from) {
+	    var _this6 = this;
+
 	    if (!from || from === 'me' || from === this.key.pub) {
 	      this.onMy(key, function (val) {
-	        return callback(val, from);
+	        return callback(val, _this6.key.pub);
 	      });
 	    }
 	    if (!from || from !== 'me' && from !== this.key.pub) {
-	      this.onTheir(key, function (val) {
-	        return callback(val, from);
+	      this.onTheir(key, function (val, k, pub) {
+	        return callback(val, pub);
 	      });
 	    }
 	  };
@@ -7539,7 +7584,7 @@
 	      _this8.gun.user(keys[i]).get('chats').get(theirSecretChannelId).get(key).on(async function (data) {
 	        var decrypted = await Gun.SEA.decrypt(data, (await _this8.getSecret(keys[i])));
 	        if (decrypted) {
-	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
+	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key, keys[i]);
 	        }
 	      });
 	    };
@@ -7707,7 +7752,7 @@
 	    }
 
 	    this.getTheirMsgsLastSeenTime(function (time) {
-	      var unseen = messages.querySelectorAll('.seen:not(.yes)');
+	      var unseen = messages.querySelectorAll('.iris-seen:not(.yes)');
 	      unseen.forEach(function (indicator) {
 	        var msgEl = indicator.parentElement.parentElement.parentElement;
 	        if (msgEl.getAttribute('data-time') <= time) {
@@ -7715,18 +7760,18 @@
 	          if (msgClass.indexOf('delivered') === -1) {
 	            msgEl.setAttribute('class', msgClass + ' delivered');
 	          }
-	          indicator.setAttribute('class', 'seen yes');
+	          indicator.setAttribute('class', 'iris-seen yes');
 	        }
 	      });
 	    });
 
-	    this.onMessage.push(function (msg, info) {
+	    this.getMessages(function (msg, info) {
 	      var msgContent = util.createElement('div', 'iris-msg-content');
 	      msgContent.innerText = msg.text;
 	      var time = util.createElement('div', 'time', msgContent);
 	      time.innerText = util.formatTime(new Date(msg.time));
 	      if (info.selfAuthored) {
-	        var cls = _this11.theirMsgsLastSeenTime >= msg.time ? 'seen yes' : 'seen';
+	        var cls = _this11.theirMsgsLastSeenTime >= msg.time ? 'iris-seen yes' : 'iris-seen';
 	        var seenIndicator = util.createElement('span', cls, time);
 	        seenIndicator.innerHTML = ' <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg>';
 	      }
@@ -7885,7 +7930,7 @@
 	  Channel.getMyChatLinks = async function getMyChatLinks(gun, key) {
 	    var urlRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'https://iris.to/';
 	    var callback = arguments[3];
-	    var subscribe = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+	    var subscribe = arguments[4];
 
 	    var user = gun.user();
 	    user.auth(key);
@@ -8189,6 +8234,8 @@
 
 	// TODO: flush onto IPFS
 	/**
+	* **Experimental.** Unlike Channel, this is probably not the most useful class yet.
+	*
 	* The essence of Iris: A database of Contacts and SignedMessages within your web of trust.
 	*
 	* NOTE: these docs reflect the latest commit at https://github.com/irislib/iris-lib
@@ -8206,7 +8253,7 @@
 	* Wait for index.ready promise to resolve before calling instance methods.
 	* @param {Object} options see default options in example
 	* @example
-	* https://github.com/irislib/iris-lib/blob/master/__tests__/socialNetwork.js
+	* https://github.com/irislib/iris-lib/blob/master/__tests__/SocialNetwork.js
 	*
 	* Default options:
 	*{
@@ -9534,7 +9581,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$1 = "0.0.140";
+	var version$1 = "0.0.143";
 
 	/*eslint no-useless-escape: "off", camelcase: "off" */
 

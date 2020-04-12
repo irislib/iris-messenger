@@ -7,7 +7,11 @@ var randomPeers = _.sample(
     _.pick(peers, p => { return p.enabled; })
   ), MAX_CONNECTED_PEERS
 );
-var gun = Gun({ peers: randomPeers });
+var gunOpts = { peers: randomPeers, localStorage: false };
+if (!iris.util.isElectron) {
+  gunOpts.store = RindexedDB(gunOpts);
+}
+var gun = Gun(gunOpts);
 window.gun = gun;
 
 function checkGunPeerCount() {
@@ -183,7 +187,7 @@ function login(k) {
   iris.Channel.getChannels(gun, key, addChat);
   var chatWith = getUrlParameter('chatWith');
   if (chatWith) {
-    addChat(chatWith, window.location.href);
+    newChat(chatWith, window.location.href);
     showChat(chatWith);
     window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
   } else {
@@ -323,7 +327,7 @@ $('#paste-chat-link').on('input', event => {
   var s = val.split('?');
   if (s.length !== 2) { return; }
   var pub = getUrlParameter('chatWith', s[1]);
-  addChat(pub, val);
+  newChat(pub, val);
   showChat(pub);
   $(event.target).val('');
 });
@@ -676,6 +680,7 @@ function showProfile(pub) {
     $('#profile .profile-photo-container').show();
     $('#profile .profile-photo').attr('src', photo);
   });
+  $('#profile .profile-about').empty();
   gun.user(pub).get('profile').get('about').on(about => {
     $('#profile .profile-about').toggle(about && about.length > 0);
     $('#profile .profile-about-content').text(about);
@@ -718,10 +723,13 @@ function showProfile(pub) {
 function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
-  if (chats[pub]) {
-    nameEl.text(getDisplayName(pub));
+  if (pub === key.pub && activeProfile !== pub) {
+    nameEl.html("📝<b>Note to Self</b>");
+  } else if (chats[pub]) {
+    nameEl.text(truncateString(getDisplayName(pub), 30));
     nameEl.show();
   }
+
   var identicon = getIdenticon(pub, 40);
   var img = identicon.children('img').first();
   img.attr('height', 40).attr('width', 40);
@@ -731,7 +739,13 @@ function addUserToHeader(pub) {
   textEl.append($('<small>').addClass('last-seen'));
   textEl.append($('<small>').addClass('typing-indicator').text('typing...'));
   $("#header-content").append(textEl);
-  $("#header-content").off().on('click', () => showProfile(pub));
+  textEl.on('click', () => showProfile(pub));
+  var videoCallBtn = $(`<a class="tooltip"><span class="tooltiptext">Video call</span><svg enable-background="new 0 0 50 50" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" style="height:24px;width:24px"/><polygon fill="none" points="49,14 36,21 36,29   49,36 " stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/><path d="M36,36c0,2.209-1.791,4-4,4  H5c-2.209,0-4-1.791-4-4V14c0-2.209,1.791-4,4-4h27c2.209,0,4,1.791,4,4V36z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/></svg></a>`).attr('id', 'start-video-call').css({width:24, height:24, color: 'var(--msg-form-button-color)'});
+  videoCallBtn.click(() => callingInterval ? null : callUser(pub));
+  var voiceCallBtn = $('<a><svg enable-background="new 0 0 50 50" style="height:20px;width:20px" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" height="50" width="50"/><path d="M30.217,35.252c0,0,4.049-2.318,5.109-2.875  c1.057-0.559,2.152-0.7,2.817-0.294c1.007,0.616,9.463,6.241,10.175,6.739c0.712,0.499,1.055,1.924,0.076,3.32  c-0.975,1.396-5.473,6.916-7.379,6.857c-1.909-0.062-9.846-0.236-24.813-15.207C1.238,18.826,1.061,10.887,1,8.978  C0.939,7.07,6.459,2.571,7.855,1.595c1.398-0.975,2.825-0.608,3.321,0.078c0.564,0.781,6.124,9.21,6.736,10.176  c0.419,0.66,0.265,1.761-0.294,2.819c-0.556,1.06-2.874,5.109-2.874,5.109s1.634,2.787,7.16,8.312  C27.431,33.615,30.217,35.252,30.217,35.252z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="4"/></svg></a>').css({width:20, height:20, 'margin-right': 20});
+  voiceCallBtn.click(() => callingInterval ? stopCalling(pub) : callUser(pub));
+  //$("#header-content").append(voiceCallBtn);
+  $("#header-content").append(videoCallBtn);
   $("#header-content").css({cursor: 'pointer'});
 }
 
@@ -779,7 +793,7 @@ function showChat(pub) {
   resetView();
   activeChat = pub;
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
-    addChat(pub);
+    newChat(pub);
   }
   var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
   chatListEl.toggleClass('active', true);
@@ -790,11 +804,17 @@ function showChat(pub) {
   if (!iris.util.isMobile) {
     $("#new-msg").focus();
   }
-  $('#new-msg').off().on('input', _.throttle(() => {
+  var setTypingThrottled = _.throttle(() => {
     chats[pub].setTyping($('#new-msg').val().length > 0);
-  }, 1000));
+  }, 1000);
+  $('#new-msg').val(chats[pub].msgDraft);
+  $('#new-msg').off().on('input', () => {
+    setTypingThrottled();
+    chats[pub].msgDraft = $('#new-msg').val();
+  });
   $(".message-form form").off().on('submit', event => {
     event.preventDefault();
+    chats[pub].msgDraft = null;
     var text = $('#new-msg').val();
     if (!text.length) { return; }
     chats[pub].setTyping(false);
@@ -913,18 +933,54 @@ function getDisplayName(pub) {
   return displayName;
 }
 
-function addChat(pub, chatLink) {
+function newChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
+  const channel = new iris.Channel({gun, key, chatLink: chatLink, participants: pub});
+  addChat(channel);
+}
+
+var askForPeers = _.once(pub => {
+  _.defer(() => {
+    gun.user(pub).get('peers').once().map().on(peer => {
+      if (peer && peer.url) {
+        var peerCountBySource = _.countBy(peers, p => p.from);
+        var peerSourceCount = Object.keys(peerCountBySource).length;
+        if (!peerCountBySource[pub]) {
+          peerSourceCount += 1;
+        }
+        var maxPeersFromSource = MAX_PEER_LIST_SIZE / peerSourceCount;
+        addPeer({url: peer.url, connect: true, from: pub});
+        while (Object.keys(peers).length > MAX_PEER_LIST_SIZE) {
+          _.each(Object.keys(peerCountBySource), source => {
+            if (peerCountBySource[source] > maxPeersFromSource) {
+              delete peers[_.sample(Object.keys(peers))];
+              peerCountBySource[source] -= 1;
+            }
+          });
+        }
+      }
+    });
+  });
+});
+
+function addChat(channel) {
+  var participants = channel.getParticipants();
+  if (participants.length > 1) {
+    return; // group chats not supported yet
+  }
+  var pub = participants[0];
+  if (chats[pub]) { return; }
+  chats[pub] = channel;
   $('#welcome').remove();
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
   var latestEl = el.find('.latest');
   var typingIndicator = el.find('.typing-indicator').text('Typing...');
-  chats[pub] = new iris.Channel({gun, key, chatLink: chatLink, participants: pub, onMessage: (msg, info) => {
-    msg.selfAuthored = info.selfAuthored;
+  chats[pub].getMessages((msg, info) => {
     chats[pub].messages[msg.time] = msg;
+    msg.selfAuthored = info.selfAuthored;
     msg.time = new Date(msg.time);
     if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
       if (activeChat !== pub || document.visibilityState !== 'visible') {
@@ -966,7 +1022,7 @@ function addChat(pub, chatLink) {
       $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
     }
     notify(msg, info, pub);
-  }});
+  });
   changeChatUnseenCount(pub, 0);
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
@@ -986,10 +1042,14 @@ function addChat(pub, chatLink) {
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
+    }
+    if (pub === key.pub) {
+      el.find('.name').html("📝<b>Note to Self</b>");
+    } else {
       el.find('.name').text(truncateString(getDisplayName(pub), 20));
-      if (pub === activeChat || pub === activeProfile) {
-        addUserToHeader(pub);
-      }
+    }
+    if (pub === activeChat) {
+      addUserToHeader(pub);
     }
   });
   el.click(() => showChat(pub));
@@ -1000,35 +1060,12 @@ function addChat(pub, chatLink) {
       lastSeenTimeChanged(pub);
     }
   });
-  var askForPeers = _.once(() => {
-    _.defer(() => {
-      gun.user(pub).get('peers').once().map().on(peer => {
-        if (peer && peer.url) {
-          var peerCountBySource = _.countBy(peers, p => p.from);
-          var peerSourceCount = Object.keys(peerCountBySource).length;
-          if (!peerCountBySource[pub]) {
-            peerSourceCount += 1;
-          }
-          var maxPeersFromSource = MAX_PEER_LIST_SIZE / peerSourceCount;
-          addPeer({url: peer.url, connect: true, from: pub});
-          while (Object.keys(peers).length > MAX_PEER_LIST_SIZE) {
-            _.each(Object.keys(peerCountBySource), source => {
-              if (peerCountBySource[source] > maxPeersFromSource) {
-                delete peers[_.sample(Object.keys(peers))];
-                peerCountBySource[source] -= 1;
-              }
-            });
-          }
-        }
-      });
-    });
-  });
   chats[pub].getMyMsgsLastSeenTime(time => {
     chats[pub].myLastSeenTime = new Date(time);
     if (chats[pub].latest && chats[pub].myLastSeenTime >= chats[pub].latest.time) {
       changeChatUnseenCount(pub, 0);
     }
-    askForPeers();
+    askForPeers(pub); // TODO: this should be done only if we have a chat history or friendship with them
   });
   chats[pub].getTyping(isTyping => {
     if (activeChat === pub) {
@@ -1046,6 +1083,7 @@ function addChat(pub, chatLink) {
       setDeliveredCheckmarks(pub);
     }
   });
+  chats[pub].onTheir('call', call => onCallMessage(pub, call));
 }
 
 function setLatestSeen(pub) {
