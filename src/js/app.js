@@ -727,8 +727,8 @@ function addUserToHeader(pub) {
     nameEl.html("📝<b>Note to Self</b>");
   } else if (chats[pub]) {
     nameEl.text(truncateString(getDisplayName(pub), 30));
-    nameEl.show();
   }
+  nameEl.show();
 
   var identicon = getIdenticon(pub, 40);
   var img = identicon.children('img').first();
