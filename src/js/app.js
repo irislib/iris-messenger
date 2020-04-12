@@ -280,7 +280,7 @@ function updatePeerList() {
     if (peer.from) {
       urlEl.append($('<br>'));
       urlEl.append(
-        $('<small>').text('from ' + ((chats[peer.from] && chats[peer.from].name) || truncateString(peer.from, 10)))
+        $('<small>').text('from ' + ((chats[peer.from] && getDisplayName(peer.from) || truncateString(peer.from, 10)))
         .css({cursor:'pointer'}).click(() => showChat(peer.from))
       );
     }
@@ -579,7 +579,7 @@ function notify(msg, info, pub) {
     notificationSound.play();
   }
   if (shouldDesktopNotify()) {
-    var desktopNotification = new Notification(chats[pub].name, {
+    var desktopNotification = new Notification(getDisplayName(pub), {
       icon: 'img/icon128.png',
       body: truncateString(msg.text, 50),
       silent: true
@@ -720,11 +720,7 @@ function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (chats[pub]) {
-    if (chats[pub].theirNickname && chats[pub].theirNickname.length) {
-      nameEl.text(truncateString(chats[pub].theirNickname, 30) );
-    } else if (chats[pub].name) {
-      nameEl.text(truncateString(chats[pub].name, 30));
-    }
+    nameEl.text(getDisplayName(pub));
     nameEl.show();
   }
   var identicon = getIdenticon(pub, 40);
@@ -977,13 +973,11 @@ function addChat(pub, chatLink) {
   chats[pub].identicon = getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
   chats[pub].onTheir('nickname', (nick) => {
-    //console.log(chats[pub].name,' gave you the nickname ',nick);
     chats[pub].myNickname = nick;
     $('#profile-nickname-my').text(nick);
     $('#profile-nickname-my-container').toggle(!!(nick && nick.length));
   });
   chats[pub].onMy('nickname', (nick) => {
-    //console.log('You gave ',chats[pub].name,' the nickname ',nick);
     chats[pub].theirNickname = nick;
     el.find('.name').text(truncateString(getDisplayName(pub), 20));
     if (pub === activeChat || pub === activeProfile) {
