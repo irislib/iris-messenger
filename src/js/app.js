@@ -681,10 +681,8 @@ function showProfile(pub) {
     $('#profile .profile-photo').attr('src', photo);
   });
   $('#profile .profile-about').empty();
-  gun.user(pub).get('profile').get('about').on(about => {
-    $('#profile .profile-about').toggle(about && about.length > 0);
-    $('#profile .profile-about-content').text(about);
-  });
+  $('#profile .profile-about').toggle(chats[pub].about && chats[pub].about.length > 0);
+  $('#profile .profile-about-content').text(chats[pub].about);
   const link = getUserChatLink(pub);
   $('#profile .add-friend').off().on('click', () => {
     console.log('add friend');
@@ -1083,6 +1081,13 @@ function addChat(channel) {
       chats[pub].online = online;
       setTheirOnlineStatus(pub);
       setDeliveredCheckmarks(pub);
+    }
+  });
+  gun.user(pub).get('profile').get('about').on(about => {
+    chats[pub].about = about;
+    if (activeProfile === pub) {
+      $('#profile .profile-about').toggle(about && about.length > 0);
+      $('#profile .profile-about-content').text(about);
     }
   });
   chats[pub].onTheir('call', call => onCallMessage(pub, call));
