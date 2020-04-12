@@ -1034,7 +1034,9 @@ function addChat(channel) {
   });
   chats[pub].onMy('nickname', (nick) => {
     chats[pub].theirNickname = nick;
-    el.find('.name').text(truncateString(getDisplayName(pub), 20));
+    if (pub !== key.pub) {
+      el.find('.name').text(truncateString(getDisplayName(pub), 20));
+    }
     if (pub === activeChat || pub === activeProfile) {
       addUserToHeader(pub);
     }
