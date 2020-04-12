@@ -672,7 +672,6 @@ function showProfile(pub) {
   var qrCodeEl = $('#profile-page-qr');
   qrCodeEl.empty();
   $('#profile-nickname-their').val('');
-  $('#profile .profile-about-content').empty();
   $('#profile').show();
   addUserToHeader(pub);
   setTheirOnlineStatus(pub);
@@ -680,11 +679,9 @@ function showProfile(pub) {
     $('#profile .profile-photo-container').show();
     $('#profile .profile-photo').attr('src', photo);
   });
-  $('#profile .profile-about').empty();
-  gun.user(pub).get('profile').get('about').on(about => {
-    $('#profile .profile-about').toggle(about && about.length > 0);
-    $('#profile .profile-about-content').text(about);
-  });
+  $('#profile .profile-about').toggle(chats[pub].about && chats[pub].about.length > 0);
+  $('#profile .profile-about-content').empty();
+  $('#profile .profile-about-content').text(chats[pub].about);
   const link = getUserChatLink(pub);
   $('#profile .add-friend').off().on('click', () => {
     console.log('add friend');
@@ -923,9 +920,9 @@ function deleteChat(pub) {
 function getDisplayName(pub) {
   var displayName;
   if (chats[pub].theirNickname && chats[pub].theirNickname.length) {
-    displayName = chats[pub].theirNickname; 
+    displayName = chats[pub].theirNickname;
     if (chats[pub].name && chats[pub].name.length) {
-      displayName = displayName + ' (' + chats[pub].name + ')'; 
+      displayName = displayName + ' (' + chats[pub].name + ')';
     }
   } else {
     displayName = chats[pub].name;
@@ -1083,6 +1080,13 @@ function addChat(channel) {
       chats[pub].online = online;
       setTheirOnlineStatus(pub);
       setDeliveredCheckmarks(pub);
+    }
+  });
+  gun.user(pub).get('profile').get('about').on(about => {
+    chats[pub].about = about;
+    if (activeProfile === pub) {
+      $('#profile .profile-about').toggle(about && about.length > 0);
+      $('#profile .profile-about-content').text(about);
     }
   });
   chats[pub].onTheir('call', call => onCallMessage(pub, call));
