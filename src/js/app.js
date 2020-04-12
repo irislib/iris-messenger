@@ -699,7 +699,7 @@ function showProfile(pub) {
     }, 2000);
   });
   $('#profile-nickname-their').not(':focus').val(chats[pub].theirNickname);
-  $('#profile-nickname-my').text(chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '-');
+  $('#profile-nickname-my').text(chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
   $('#profile-nickname-their').off().on('input', event => {
     var nick = event.target.value;
     chats[pub].put('nickname', nick);
@@ -973,7 +973,7 @@ function addChat(pub, chatLink) {
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
   chats[pub].onTheir('nickname', (nick) => {
     chats[pub].myNickname = nick;
-    $('#profile-nickname-my').text(nick && nick.length ? nick : '-');
+    $('#profile-nickname-my').text(nick && nick.length ? nick : '');
     $('#profile-nickname-my-container').toggle(!!(nick && nick.length));
   });
   chats[pub].onMy('nickname', (nick) => {
