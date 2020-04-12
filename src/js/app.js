@@ -968,6 +968,7 @@ function addChat(pub, chatLink) {
     //console.log(chats[pub].name,' gave you the nickname ',nick);
     chats[pub].myNickname = nick;
     $('#profile-nickname-my').text(nick);
+    $('#profile-nickname-my-container').toggle(nick && nick.length);
   });
   chats[pub].onMy('nickname', (nick) => {
     //console.log('You gave ',chats[pub].name,' the nickname ',nick);
