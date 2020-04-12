@@ -378,13 +378,6 @@ function resetView() {
   $(".message-form").hide();
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
-  $('#profile-page-qr').empty();
-  $('#their-public-name').empty();
-  $('#my-public-name').empty();
-  $('#profile-nickname-their').val('');
-  $('#profile-nickname-their').removeAttr('placeholder');
-  $('#profile-nickname-my').empty();
-  $('#profile .profile-about-content').empty();
   $('#private-key-qr').remove();
 }
 
@@ -674,6 +667,9 @@ function showProfile(pub) {
   $('#profile .profile-photo-container').hide();
   var qrCodeEl = $('#profile-page-qr');
   qrCodeEl.empty();
+  $('#profile-nickname-their').val('');
+  $('#profile-nickname-my-container').hide();
+  $('#profile .profile-about-content').empty();
   $('#profile').show();
   addUserToHeader(pub);
   setTheirOnlineStatus(pub);
@@ -703,10 +699,9 @@ function showProfile(pub) {
       t.css('width', '');
     }, 2000);
   });
-  $('#their-public-name').text(chats[pub].name + ": ");
-  $('#my-public-name').text(myName + ": ");
   $('#profile-nickname-their').not(':focus').val(chats[pub].theirNickname);
   $('#profile-nickname-my').text(chats[pub].myNickname);
+  $('#profile-nickname-my-container).toggle(chats[pub].myNickname && chats[pub].myNickname.length);
   $('#profile-nickname-their').off().on('input', event => {
     var nick = event.target.value;
     chats[pub].put('nickname', nick);
