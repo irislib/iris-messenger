@@ -44,6 +44,7 @@ var activeProfile;
 var onlineTimeout;
 var loginTime;
 var key;
+var myName;
 var latestChatLink;
 var desktopNotificationsEnabled;
 var areWeOnline;
@@ -202,18 +203,13 @@ function login(k) {
   $('#private-key-qr').remove();
   gun.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
+      myName = name;
       $('.user-info .user-name').text(truncateString(name, 20));
-      var el = $('#settings-name');
-      if (!el.is(':focus')) {
-        $('#settings-name').val(name);
-      }
+      $('#settings-name').not(':focus').val(name);
     }
   });
   gun.user().get('profile').get('about').on(about => {
-    var el = $('#settings-about');
-    if (!el.is(':focus')) {
-      $('#settings-about').val(about || '');
-    }
+    $('#settings-about').not(':focus').val(about || '');
   });
   gun.user().get('profile').get('photo').on(data => {
     $('#current-profile-photo').attr('src', data);
@@ -288,7 +284,7 @@ function updatePeerList() {
     if (peer.from) {
       urlEl.append($('<br>'));
       urlEl.append(
-        $('<small>').text('from ' + ((chats[peer.from] && chats[peer.from].name) || truncateString(peer.from, 10)))
+        $('<small>').text('from ' + ((chats[peer.from] && getDisplayName(peer.from)) || truncateString(peer.from, 10)))
         .css({cursor:'pointer'}).click(() => showChat(peer.from))
       );
     }
@@ -386,7 +382,6 @@ function resetView() {
   $(".message-form").hide();
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
-  $('#profile-page-qr').empty();
   $('#private-key-qr').remove();
 }
 
@@ -415,6 +410,9 @@ function showNewChat() {
   $('.chat-item.new').toggleClass('active', true);
   $('#new-chat').show();
   $("#header-content").text('New chat');
+  $('#show-my-qr-btn').off().click(() => {
+    $('#my-qr-code').toggle()
+  })
 }
 
 function getMyChatLink() {
@@ -585,7 +583,7 @@ function notify(msg, info, pub) {
     notificationSound.play();
   }
   if (shouldDesktopNotify()) {
-    var desktopNotification = new Notification(chats[pub].name, {
+    var desktopNotification = new Notification(getDisplayName(pub), {
       icon: 'img/icon128.png',
       body: truncateString(msg.text, 50),
       silent: true
@@ -673,6 +671,8 @@ function showProfile(pub) {
   $('#profile .profile-photo-container').hide();
   var qrCodeEl = $('#profile-page-qr');
   qrCodeEl.empty();
+  $('#profile-nickname-their').val('');
+  $('#profile .profile-about-content').empty();
   $('#profile').show();
   addUserToHeader(pub);
   setTheirOnlineStatus(pub);
@@ -683,7 +683,7 @@ function showProfile(pub) {
   $('#profile .profile-about').empty();
   gun.user(pub).get('profile').get('about').on(about => {
     $('#profile .profile-about').toggle(about && about.length > 0);
-    $('#profile .profile-about').text(about);
+    $('#profile .profile-about-content').text(about);
   });
   const link = getUserChatLink(pub);
   $('#profile .add-friend').off().on('click', () => {
@@ -703,6 +703,12 @@ function showProfile(pub) {
       t.css('width', '');
     }, 2000);
   });
+  $('#profile-nickname-their').not(':focus').val(chats[pub].theirNickname);
+  $('#profile-nickname-my').text(chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
+  $('#profile-nickname-their').off().on('input', event => {
+    var nick = event.target.value;
+    chats[pub].put('nickname', nick);
+  });
   qrCodeEl.empty();
   var qrcode = new QRCode(qrCodeEl[0], {
     text: link,
@@ -717,20 +723,12 @@ function showProfile(pub) {
 function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
-  if (chats[pub] && chats[pub].name) {
-    if (pub === key.pub) {
-      if (activeProfile !== pub) {
-        // if not looking at your own profile
-        nameEl.html("📝<b>Note to Self</b>"); 
-        // need to disable nicknames in note to self profile
-      } else {
-        nameEl.text(truncateString(chats[pub].name, 30));
-      }
-    } else {
-      nameEl.text(truncateString(chats[pub].name, 30));
-    }
-    nameEl.show();
+  if (pub === key.pub && activeProfile !== pub) {
+    nameEl.html("📝<b>Note to Self</b>");
+  } else if (chats[pub]) {
+    nameEl.text(truncateString(getDisplayName(pub), 30));
   }
+  nameEl.show();
 
   var identicon = getIdenticon(pub, 40);
   var img = identicon.children('img').first();
@@ -922,6 +920,19 @@ function deleteChat(pub) {
   $('.chat-item[data-pub="' + pub +'"]').remove();
 }
 
+function getDisplayName(pub) {
+  var displayName;
+  if (chats[pub].theirNickname && chats[pub].theirNickname.length) {
+    displayName = chats[pub].theirNickname; 
+    if (chats[pub].name && chats[pub].name.length) {
+      displayName = displayName + ' (' + chats[pub].name + ')'; 
+    }
+  } else {
+    displayName = chats[pub].name;
+  }
+  return displayName;
+}
+
 function newChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
@@ -1016,6 +1027,20 @@ function addChat(channel) {
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
+  chats[pub].onTheir('nickname', (nick) => {
+    chats[pub].myNickname = nick;
+    $('#profile-nickname-my').text(nick && nick.length ? nick : '');
+    $('#profile-nickname-my-container').toggle(!!(nick && nick.length));
+  });
+  chats[pub].onMy('nickname', (nick) => {
+    chats[pub].theirNickname = nick;
+    if (pub !== key.pub) {
+      el.find('.name').text(truncateString(getDisplayName(pub), 20));
+    }
+    if (pub === activeChat || pub === activeProfile) {
+      addUserToHeader(pub);
+    }
+  });
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
@@ -1023,7 +1048,7 @@ function addChat(channel) {
     if (pub === key.pub) {
       el.find('.name').html("📝<b>Note to Self</b>");
     } else {
-      el.find('.name').text(truncateString(name, 20));
+      el.find('.name').text(truncateString(getDisplayName(pub), 20));
     }
     if (pub === activeChat) {
       addUserToHeader(pub);
