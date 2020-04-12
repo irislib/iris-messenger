@@ -280,7 +280,7 @@ function updatePeerList() {
     if (peer.from) {
       urlEl.append($('<br>'));
       urlEl.append(
-        $('<small>').text('from ' + ((chats[peer.from] && getDisplayName(peer.from) || truncateString(peer.from, 10)))
+        $('<small>').text('from ' + ((chats[peer.from] && getDisplayName(peer.from)) || truncateString(peer.from, 10)))
         .css({cursor:'pointer'}).click(() => showChat(peer.from))
       );
     }
