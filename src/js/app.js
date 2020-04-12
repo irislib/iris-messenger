@@ -906,6 +906,19 @@ function deleteChat(pub) {
   $('.chat-item[data-pub="' + pub +'"]').remove();
 }
 
+function getDisplayName(pub) {
+  var displayName;
+  if (chats[pub].theirNickname && chats[pub].theirNickname.length) {
+    displayName = chats[pub].theirNickname; 
+    if (chats[pub].name && chats[pub].name.length) {
+      displayName = displayName + '(' + chats[pub].name + ')'; 
+    }
+  } else {
+    displayName = chats[pub].name;
+  }
+  return displayName;
+}
+
 function addChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
@@ -973,22 +986,16 @@ function addChat(pub, chatLink) {
   chats[pub].onMy('nickname', (nick) => {
     //console.log('You gave ',chats[pub].name,' the nickname ',nick);
     chats[pub].theirNickname = nick;
-    if (chats[pub].theirNickname) {
-      el.find('.name').text(truncateString(chats[pub].theirNickname, 20));
-      if (pub === activeProfile) {
-        addUserToHeader(pub);
-      }
+    el.find('.name').text(truncateString(getDisplayName(pub), 20));
+    if (pub === activeChat || pub === activeProfile) {
+      addUserToHeader(pub);
     }
   });
   gun.user(pub).get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
-      if (chats[pub].theirNickname) {
-        el.find('.name').text(truncateString(chats[pub].theirNickname, 20));
-      } else {
-        el.find('.name').text(truncateString(name, 20));
-      }
-      if (pub === activeChat) {
+      el.find('.name').text(truncateString(getDisplayName(pub), 20));
+      if (pub === activeChat || pub === activeProfile) {
         addUserToHeader(pub);
       }
     }
