@@ -701,7 +701,7 @@ function showProfile(pub) {
   });
   $('#profile-nickname-their').not(':focus').val(chats[pub].theirNickname);
   $('#profile-nickname-my').text(chats[pub].myNickname);
-  $('#profile-nickname-my-container).toggle(chats[pub].myNickname && chats[pub].myNickname.length);
+  $('#profile-nickname-my-container').toggle(chats[pub].myNickname && chats[pub].myNickname.length);
   $('#profile-nickname-their').off().on('input', event => {
     var nick = event.target.value;
     chats[pub].put('nickname', nick);
