@@ -668,7 +668,6 @@ function showProfile(pub) {
   var qrCodeEl = $('#profile-page-qr');
   qrCodeEl.empty();
   $('#profile-nickname-their').val('');
-  $('#profile-nickname-my-container').hide();
   $('#profile .profile-about-content').empty();
   $('#profile').show();
   addUserToHeader(pub);
@@ -701,7 +700,7 @@ function showProfile(pub) {
   });
   $('#profile-nickname-their').not(':focus').val(chats[pub].theirNickname);
   $('#profile-nickname-my').text(chats[pub].myNickname);
-  $('#profile-nickname-my-container').toggle(chats[pub].myNickname && chats[pub].myNickname.length);
+  $('#profile-nickname-my-container').toggle(!!(chats[pub].myNickname && chats[pub].myNickname.length));
   $('#profile-nickname-their').off().on('input', event => {
     var nick = event.target.value;
     chats[pub].put('nickname', nick);
@@ -911,7 +910,7 @@ function getDisplayName(pub) {
   if (chats[pub].theirNickname && chats[pub].theirNickname.length) {
     displayName = chats[pub].theirNickname; 
     if (chats[pub].name && chats[pub].name.length) {
-      displayName = displayName + '(' + chats[pub].name + ')'; 
+      displayName = displayName + ' (' + chats[pub].name + ')'; 
     }
   } else {
     displayName = chats[pub].name;
@@ -981,7 +980,7 @@ function addChat(pub, chatLink) {
     //console.log(chats[pub].name,' gave you the nickname ',nick);
     chats[pub].myNickname = nick;
     $('#profile-nickname-my').text(nick);
-    $('#profile-nickname-my-container').toggle(nick && nick.length);
+    $('#profile-nickname-my-container').toggle(!!(nick && nick.length));
   });
   chats[pub].onMy('nickname', (nick) => {
     //console.log('You gave ',chats[pub].name,' the nickname ',nick);
