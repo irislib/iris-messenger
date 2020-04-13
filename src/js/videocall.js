@@ -22,7 +22,7 @@ function notifyIfNotVisible(pub, text) {
       showChat(pub);
       window.focus();
     };
-  } 
+  }
 }
 
 function onCallMessage(pub, call) {
@@ -37,6 +37,12 @@ function onCallMessage(pub, call) {
         rejectCall(pub);
         return;
       }
+      chats[pub].onTheir('icecandidate', candidate => {
+        console.log('received remote ice candidate', candidate);
+        if (chats[pub].pc) {
+          chats[pub].pc.addIceCandidate(candidate);
+        }
+      })
       console.log('incoming call from', pub, call);
       if (!activeCall && $('#incoming-call').length === 0) {
         activeCall = pub;
@@ -132,34 +138,35 @@ async function callUser(pub, video = true) {
 
   await pc.setLocalDescription(await pc.createOffer({
     offerToReceiveAudio: 1,
-    offerToReceiveVideo: 1
+    offerToReceiveVideo: video ? 1 : 0
   }));
   pc.onicecandidate = ({candidate}) => {
-    if (candidate) return;
-    if (!callingInterval) {
-      console.log('calling', pub);
-      var call = () => chats[pub].put('call', {
-        time: new Date().toISOString(),
-        type: video ? 'video' : 'voice',
-        offer: pc.localDescription.sdp,
-      });
-      call();
-      callSound.addEventListener('ended', timeoutPlayCallSound);
-      callSound.play();
-      callingInterval = setInterval(call, 1000);
-      var activeCallEl = $('<div>')
-        .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
-        .text(`calling ${chats[pub].name}`)
-        .attr('id', 'outgoing-call');
-      var cancelButton = $('<button>')
-        .css({display:'block', margin: '15px auto'})
-        .text('cancel')
-        .click(() => cancelCall(pub));
-      activeCallEl.append(cancelButton);
-      activeCallEl.append(localVideo);
-      activeCallEl.append(remoteVideo);
-      $('body').append(activeCallEl);
-    }
+    if (!candidate) return;
+    console.log('sending our ice candidate', candidate);
+    chats[pub].put('icecandidate', candidate);
+    if (callingInterval) return;
+    console.log('calling', pub);
+    var call = () => chats[pub].put('call', {
+      time: new Date().toISOString(),
+      type: video ? 'video' : 'voice',
+      offer: pc.localDescription.sdp,
+    });
+    callingInterval = setInterval(call, 1000);
+    call();
+    callSound.addEventListener('ended', timeoutPlayCallSound);
+    callSound.play();
+    var activeCallEl = $('<div>')
+      .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
+      .text(`calling ${chats[pub].name}`)
+      .attr('id', 'outgoing-call');
+    var cancelButton = $('<button>')
+      .css({display:'block', margin: '15px auto'})
+      .text('cancel')
+      .click(() => cancelCall(pub));
+    activeCallEl.append(cancelButton);
+    activeCallEl.append(localVideo);
+    activeCallEl.append(remoteVideo);
+    $('body').append(activeCallEl);
   };
 }
 
