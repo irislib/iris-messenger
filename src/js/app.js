@@ -927,7 +927,7 @@ function getDisplayName(pub) {
   } else {
     displayName = chats[pub].name;
   }
-  return displayName;
+  return displayName || '';
 }
 
 function newChat(pub, chatLink) {
