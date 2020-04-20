@@ -1153,3 +1153,10 @@ function setUnseenTotal() {
     $('.unseen-total').hide();
   }
 }
+
+function refreshUnlessActive() { // hacky way to make sure that gun resyncs on network changes
+  if (!areWeOnline) { // if you haven't been active in the window in the last 60 seconds
+    location.reload();
+  }
+}
+window.addEventListener('online',  refreshUnlessActive);
