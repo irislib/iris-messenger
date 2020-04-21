@@ -321,14 +321,16 @@ $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElect
 
 $('#paste-chat-link').on('input', event => {
   var val = $(event.target).val();
-  if (val.length < 30 || val.indexOf('chatWith') === -1) {
+  if (val.length < 30) {
     return;
   }
   var s = val.split('?');
   if (s.length !== 2) { return; }
-  var pub = getUrlParameter('chatWith', s[1]);
-  newChat(pub, val);
-  showChat(pub);
+  var chatId = getUrlParameter('chatWith', s[1]) || getUrlParameter('channelId', s[1]);
+  if (chatId) {
+    newChat(chatId, val);
+    showChat(chatId);
+  }
   $(event.target).val('');
 });
 
@@ -342,6 +344,8 @@ function createGroup(e) {
       participants: [],
     });
     c.put('name', $('#new-group-name').val());
+    addChat(c);
+    showChat(c.uuid);
   }
 }
 
@@ -856,6 +860,12 @@ function showChat(pub) {
   chats[pub].setMyMsgsLastSeenTime();
   setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
+  if (chats[pub].uuid) {
+
+    var chatLink =`https://iris.to/?channelId=${chats[pub].uuid}&inviter=${key.pub}`;
+    var chatLinkEl = $('<small>').css({'margin-bottom':10}).html(`Chat link: <a href="${chatLink}">${chatLink}</a>`).click(e => e.preventDefault());
+    $('#message-list').prepend(chatLinkEl);
+  }
 }
 
 function getIdenticon(pub, width) {
