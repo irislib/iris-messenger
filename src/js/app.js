@@ -344,7 +344,18 @@ $('#new-group-participant').on('input', event => {
   if (s.length !== 2) { return; }
   var pub = getUrlParameter('chatWith', s[1]);
   if (pub) {
-    var el = $('<p>').text(pub);
+    if (newGroupParticipants.indexOf(pub) >= 0) { $('#new-group-participant').val(''); return; }
+    var identicon = getIdenticon(pub, 40).css({'margin-right':15});
+    var nameEl = $('<span>');
+    gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
+    var el = $('<p>').css({display:'flex', 'align-items': 'center'});
+    var removeBtn = $('<button>').css({'margin-right': 15}).text('Remove').click(() => {
+      el.remove();
+      newGroupParticipants.forEach((p, i) => {if (p===pub) { newGroupParticipants.splice(i, 1); }})
+    });
+    el.append(removeBtn);
+    el.append(identicon);
+    el.append(nameEl);
     $('#new-group-participants').append(el);
     newGroupParticipants.push(pub);
   }
@@ -361,8 +372,9 @@ function createGroup(e) {
       participants: newGroupParticipants,
     });
     newGroupParticipants = [];
-    $('#new-group-participants').empty();
     c.put('name', $('#new-group-name').val());
+    $('#new-group-participants').empty();
+    $('#new-group-name').val('');
     addChat(c);
     showChat(c.uuid);
   }
@@ -769,6 +781,9 @@ function addUserToHeader(pub) {
   $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
+  if (chats[pub].uuid) {
+      textEl.append($('<small>').addClass('participants').text(chats[pub].getParticipants().map(v => v.slice(0,6)).join(', ')));
+  }
   textEl.append($('<small>').addClass('last-seen'));
   textEl.append($('<small>').addClass('typing-indicator').text('typing...'));
   $("#header-content").append(textEl);
@@ -881,7 +896,7 @@ function showChat(pub) {
   setDeliveredCheckmarks(pub);
   if (chats[pub].uuid) {
     var chatLink =`https://iris.to/?channelId=${chats[pub].uuid}&inviter=${key.pub}`;
-    var chatLinkEl = $('<small>').css({'margin-bottom':10}).html(`Chat link: <a href="${chatLink}">${chatLink}</a>`).click(e => e.preventDefault());
+    var chatLinkEl = $('<small>').css({'margin-bottom':15}).html(`Chat link: <a href="${chatLink}">${chatLink}</a>`).click(e => e.preventDefault());
     $('#message-list').prepend(chatLinkEl);
   }
 }
@@ -1054,7 +1069,7 @@ function addChat(channel) {
       }
       if (chats[pub].theirLastSeenTime) {
         $('#not-seen-by-them').slideUp();
-      } else {
+      } else if (!chats[pub].uuid) {
         $('#not-seen-by-them').slideDown();
       }
       $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
