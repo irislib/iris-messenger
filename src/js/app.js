@@ -332,6 +332,19 @@ $('#paste-chat-link').on('input', event => {
   $(event.target).val('');
 });
 
+$('#new-group-create').click(createGroup);
+function createGroup(e) {
+  e.preventDefault();
+  if ($('#new-group-name').val().length) {
+    var c = new iris.Channel({
+      gun,
+      key,
+      participants: [],
+    });
+    c.put('name', $('#new-group-name').val());
+  }
+}
+
 $('.chat-item.new').click(showNewChat);
 
 $('#settings-name').on('input', event => {
@@ -967,7 +980,7 @@ function addChat(channel) {
   if (participants.length > 1) {
     return; // group chats not supported yet
   }
-  var pub = participants[0];
+  var pub = channel.getId();
   if (chats[pub]) { return; }
   chats[pub] = channel;
   $('#welcome').remove();
@@ -1038,19 +1051,6 @@ function addChat(channel) {
       addUserToHeader(pub);
     }
   });
-  gun.user(pub).get('profile').get('name').on(name => {
-    if (name && typeof name === 'string') {
-      chats[pub].name = name;
-    }
-    if (pub === key.pub) {
-      el.find('.name').html("📝<b>Note to Self</b>");
-    } else {
-      el.find('.name').text(truncateString(getDisplayName(pub), 20));
-    }
-    if (pub === activeChat) {
-      addUserToHeader(pub);
-    }
-  });
   el.click(() => showChat(pub));
   $(".chat-list").append(el);
   chats[pub].getTheirMsgsLastSeenTime(time => {
@@ -1082,13 +1082,33 @@ function addChat(channel) {
       setDeliveredCheckmarks(pub);
     }
   });
-  gun.user(pub).get('profile').get('about').on(about => {
+  function setName(name) {
+    if (name && typeof name === 'string') {
+      chats[pub].name = name;
+    }
+    if (pub === key.pub) {
+      el.find('.name').html("📝<b>Note to Self</b>");
+    } else {
+      el.find('.name').text(truncateString(getDisplayName(pub), 20));
+    }
+    if (pub === activeChat) {
+      addUserToHeader(pub);
+    }
+  }
+  function setAbout(about) {
     chats[pub].about = about;
     if (activeProfile === pub) {
       $('#profile .profile-about').toggle(about && about.length > 0);
       $('#profile .profile-about-content').text(about);
     }
-  });
+  }
+  if (chats[pub].uuid) {
+    chats[pub].on('name', setName);
+    chats[pub].on('about', setAbout);
+  } else {
+    gun.user(pub).get('profile').get('name').on(setName);
+    gun.user(pub).get('profile').get('about').on(setAbout);
+  }
   chats[pub].onTheir('call', call => onCallMessage(pub, call));
 }
 
@@ -1136,7 +1156,7 @@ function lastSeenTimeChanged(pub) {
       });
       // set seen msgs
     } else {
-      if ($('.msg.our').length) {
+      if (!chats[pub].uuid && $('.msg.our').length) {
         $('#not-seen-by-them').slideDown();
       }
     }
