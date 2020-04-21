@@ -334,6 +334,23 @@ $('#paste-chat-link').on('input', event => {
   $(event.target).val('');
 });
 
+var newGroupParticipants = [];
+$('#new-group-participant').on('input', event => {
+  var val = $(event.target).val();
+  if (val.length < 30) {
+    return;
+  }
+  var s = val.split('?');
+  if (s.length !== 2) { return; }
+  var pub = getUrlParameter('chatWith', s[1]);
+  if (pub) {
+    var el = $('<p>').text(pub);
+    $('#new-group-participants').append(el);
+    newGroupParticipants.push(pub);
+  }
+  $(event.target).val('');
+});
+
 $('#new-group-create').click(createGroup);
 function createGroup(e) {
   e.preventDefault();
@@ -341,8 +358,10 @@ function createGroup(e) {
     var c = new iris.Channel({
       gun,
       key,
-      participants: [],
+      participants: newGroupParticipants,
     });
+    newGroupParticipants = [];
+    $('#new-group-participants').empty();
     c.put('name', $('#new-group-name').val());
     addChat(c);
     showChat(c.uuid);
@@ -861,7 +880,6 @@ function showChat(pub) {
   setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
   if (chats[pub].uuid) {
-
     var chatLink =`https://iris.to/?channelId=${chats[pub].uuid}&inviter=${key.pub}`;
     var chatLinkEl = $('<small>').css({'margin-bottom':10}).html(`Chat link: <a href="${chatLink}">${chatLink}</a>`).click(e => e.preventDefault());
     $('#message-list').prepend(chatLinkEl);
