@@ -873,7 +873,7 @@ function showChat(pub) {
   changeChatUnseenCount(pub, 0);
   addUserToHeader(pub);
   var msgs = Object.values(chats[pub].messages);
-  msgs.forEach(addMessage);
+  msgs.forEach(msg => addMessage(msg, pub));
   sortMessagesByTime();
   $('#message-view').scroll(() => {
     var scrollPosition = $('#message-view').scrollTop();
@@ -944,7 +944,7 @@ function sortMessagesByTime() {
 
 var seenIndicatorHtml = '<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>';
 
-function addMessage(msg) {
+function addMessage(msg, chatId) {
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
   var seenHtml = msg.selfAuthored ? ' ' + seenIndicatorHtml : '';
@@ -952,6 +952,12 @@ function addMessage(msg) {
     '<div class="msg-content"><div class="time">' + iris.util.formatTime(msg.time) + seenHtml + '</div></div>'
   );
   msgContent.prepend(textEl);
+  if (chats[chatId].uuid && !msg.info.selfAuthored) {
+    var name = chats[chatId].participantProfiles[msg.info.from] && chats[chatId].participantProfiles[msg.info.from].name;
+    if (name) {
+      msgContent.prepend($('<small>').text(name).css({'margin-bottom':2,display:'block','font-weight':'bold'}));
+    }
+  }
   if (msg.text.length === 2 && isEmoji(msg.text)) {
     textEl.toggleClass('emoji-only', true);
   } else {
@@ -1031,6 +1037,7 @@ function addChat(channel) {
   var typingIndicator = el.find('.typing-indicator').text('Typing...');
   chats[pub].getMessages((msg, info) => {
     chats[pub].messages[msg.time] = msg;
+    msg.info = info;
     msg.selfAuthored = info.selfAuthored;
     msg.time = new Date(msg.time);
     if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
@@ -1060,7 +1067,7 @@ function addChat(channel) {
       sortChatsByLatest();
     }
     if (activeChat === pub) {
-      addMessage(msg);
+      addMessage(msg, pub);
       sortMessagesByTime(); // this is slow if message history is loaded while chat active
       if (chats[pub].latest.time === msg.time && areWeOnline) {
         chats[pub].setMyMsgsLastSeenTime();
@@ -1153,7 +1160,6 @@ function addChat(channel) {
       chats[pub].participantProfiles[p] = {};
       gun.user(p).get('profile').get('name').on(name => {
         chats[pub].participantProfiles[p].name = name;
-        addUserToHeader(pub);
       });
     });
   } else {
