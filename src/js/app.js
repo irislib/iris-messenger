@@ -1150,11 +1150,13 @@ function addChat(channel) {
     chats[pub].on('name', setName);
     chats[pub].on('about', setAbout);
     chats[pub].participantProfiles = {};
-    var participants = chats[pub].getParticipants()
+    chats[pub].participantProfiles[key.pub] = {name:'You'};
+    var participants = chats[pub].getParticipants();
     participants.forEach(p => {
       chats[pub].participantProfiles[p] = {};
       gun.user(p).get('profile').get('name').on(name => {
-        chats[pub].participantProfiles[p].name = name
+        chats[pub].participantProfiles[p].name = name;
+        addUserToHeader(pub);
       });
     });
   } else {
