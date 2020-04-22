@@ -953,9 +953,11 @@ function addMessage(msg, chatId) {
   );
   msgContent.prepend(textEl);
   if (chats[chatId].uuid && !msg.info.selfAuthored) {
-    var name = chats[chatId].participantProfiles[msg.info.from] && chats[chatId].participantProfiles[msg.info.from].name;
+    var profile = chats[chatId].participantProfiles[msg.info.from];
+    var name = profile && profile.name;
     if (name) {
-      msgContent.prepend($('<small>').text(name).css({'margin-bottom':2,display:'block','font-weight':'bold'}));
+      var nameEl = $('<small>').text(name).css({color: profile.color, 'margin-bottom':2,display:'block','font-weight':'bold'});
+      msgContent.prepend(nameEl);
     }
   }
   if (msg.text.length === 2 && isEmoji(msg.text)) {
@@ -1026,7 +1028,6 @@ var askForPeers = _.once(pub => {
 });
 
 function addChat(channel) {
-  var participants = channel.getParticipants();
   var pub = channel.getId();
   if (chats[pub]) { return; }
   chats[pub] = channel;
@@ -1156,8 +1157,10 @@ function addChat(channel) {
     chats[pub].participantProfiles = {};
     chats[pub].participantProfiles[key.pub] = {name:'You'};
     var participants = chats[pub].getParticipants();
-    participants.forEach(p => {
-      chats[pub].participantProfiles[p] = {};
+    var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    participants.forEach((p, i) => {
+      var hue = 360 / Math.max(participants.length - 1, 2) * i;
+      chats[pub].participantProfiles[p] = {color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
       gun.user(p).get('profile').get('name').on(name => {
         chats[pub].participantProfiles[p].name = name;
       });
