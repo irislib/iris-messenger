@@ -7478,7 +7478,6 @@
 	      if (!options.uuid) {
 	        options.uuid = Attribute$1.getUuid().value;
 	        this.uuid = options.uuid;
-	        this.changeMyGroupSecret();
 	      }
 	    }
 	    if (options.uuid) {
@@ -7491,6 +7490,11 @@
 	      // generate channel-specific secret and share it with other participants
 	      // put() keys should be encrypted first? so you could do put(uuid, secret)
 	      // what if you join the channel with 2 unconnected devices? on reconnect, the older secret would be overwritten and messages unreadable. maybe participants should store each others' old keys? or maybe you should store them and re-encrypt old stuff when key changes? return them with map() instead?
+	      if (this.myGroupSecret) {
+	        this.putDirect('S' + this.uuid, this.myGroupSecret);
+	      } else {
+	        this.getMyGroupSecret();
+	      }
 	      this.getMySecretUuid().then(function (s) {
 	        _this.putDirect(_this.uuid, s); // TODO: encrypt keys in put()
 	        console.log(_this.key.pub.slice(0, 4), 'set secret uuid:', s);
@@ -8072,7 +8076,7 @@
 	      }
 	      var theirSecretUuid = await _this12.getTheirSecretUuid(pub);
 	      _this12.gun.user(pub).get('chats').get(theirSecretUuid).get(key).on(async function (data) {
-	        var decrypted = await Gun.SEA.decrypt(data, (await _this12.getSecret(pub)));
+	        var decrypted = await Gun.SEA.decrypt(data, (await _this12.getTheirGroupSecret(pub)));
 	        if (decrypted) {
 	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key, pub);
 	        }

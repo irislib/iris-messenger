@@ -897,7 +897,7 @@ function showChat(pub) {
   setDeliveredCheckmarks(pub);
   if (chats[pub].uuid) {
     var chatLink =`https://iris.to/?channelId=${chats[pub].uuid}&inviter=${key.pub}`;
-    var chatLinkEl = $('<small>').css({'margin-bottom':15}).html(`Chat link: <a href="${chatLink}">${chatLink}</a>`).click(e => e.preventDefault());
+    var chatLinkEl = $('<small>').css({'margin-bottom':15}).html(`Chat link (only works for already added participants atm): <a href="${chatLink}">${chatLink}</a>`).click(e => e.preventDefault());
     $('#message-list').prepend(chatLinkEl);
   }
 }
