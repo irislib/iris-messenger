@@ -782,7 +782,8 @@ function addUserToHeader(pub) {
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
   if (chats[pub].uuid) {
-      textEl.append($('<small>').addClass('participants').text(chats[pub].getParticipants().map(v => v.slice(0,6)).join(', ')));
+      var namesEl = $('<small>').addClass('participants').text(Object.keys(chats[pub].participantProfiles).map(p => chats[pub].participantProfiles[p].name).join(', '));
+      textEl.append(namesEl);
   }
   textEl.append($('<small>').addClass('last-seen'));
   textEl.append($('<small>').addClass('typing-indicator').text('typing...'));
@@ -1148,6 +1149,14 @@ function addChat(channel) {
   if (chats[pub].uuid) {
     chats[pub].on('name', setName);
     chats[pub].on('about', setAbout);
+    chats[pub].participantProfiles = {};
+    var participants = chats[pub].getParticipants()
+    participants.forEach(p => {
+      chats[pub].participantProfiles[p] = {};
+      gun.user(p).get('profile').get('name').on(name => {
+        chats[pub].participantProfiles[p].name = name
+      });
+    });
   } else {
     gun.user(pub).get('profile').get('name').on(setName);
     gun.user(pub).get('profile').get('about').on(setAbout);
