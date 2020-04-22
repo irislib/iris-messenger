@@ -1021,9 +1021,6 @@ var askForPeers = _.once(pub => {
 
 function addChat(channel) {
   var participants = channel.getParticipants();
-  if (participants.length > 1) {
-    return; // group chats not supported yet
-  }
   var pub = channel.getId();
   if (chats[pub]) { return; }
   chats[pub] = channel;
