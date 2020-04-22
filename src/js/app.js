@@ -1159,7 +1159,7 @@ function addChat(channel) {
     var participants = chats[pub].getParticipants();
     var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     participants.forEach((p, i) => {
-      var hue = 360 / Math.max(participants.length - 1, 2) * i;
+      var hue = 360 / Math.max(participants.length - 1, 2) * i + 90 % 360; // TODO use css filter brightness
       chats[pub].participantProfiles[p] = {color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
       gun.user(p).get('profile').get('name').on(name => {
         chats[pub].participantProfiles[p].name = name;
