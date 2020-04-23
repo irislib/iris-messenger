@@ -37,7 +37,7 @@ setInterval(checkGunPeerCount, 2000);
 
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
-var chats = {};
+var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 var activeChat;
 var activeProfile;
@@ -723,6 +723,7 @@ function showProfile(pub) {
   $('#profile').show();
   addUserToHeader(pub);
   setTheirOnlineStatus(pub);
+  renderGroupParticipants(pub);
   gun.user(pub).get('profile').get('photo').on(photo => {
     $('#profile .profile-photo-container').show();
     $('#profile .profile-photo').attr('src', photo);
@@ -762,6 +763,31 @@ function showProfile(pub) {
     colorDark : "#000000",
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H
+  });
+}
+
+function renderGroupParticipants(pub) {
+  $('#profile-group-participants').empty();
+  var keys = Object.keys(chats[pub].participantProfiles);
+  keys.forEach(k => {
+    var profile = chats[pub].participantProfiles[k];
+    console.log('profile', profile);
+    var identicon = getIdenticon(k, 40).css({'margin-right':15});
+    var nameEl = $('<span>');
+    gun.user(k).get('profile').get('name').on(name => nameEl.text(name));
+    var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
+    var removeBtn = $('<button>').css({'margin-right': 15}).text('Remove').click(() => {
+      el.remove();
+      // TODO remove group participant
+    });
+    //el.append(removeBtn);
+    el.append(identicon);
+    el.append(nameEl);
+    if (profile.permissions && profile.permissions.admin) {
+      el.append($('<small>').text('admin').css({'margin-left': 5}));
+    }
+    el.click(() => showProfile(k));
+    $('#profile-group-participants').append(el);
   });
 }
 
@@ -897,7 +923,7 @@ function showChat(pub) {
   setDeliveredCheckmarks(pub);
   if (chats[pub].uuid) {
     var chatLink =`https://iris.to/?channelId=${chats[pub].uuid}&inviter=${key.pub}`;
-    var chatLinkEl = $('<small>').css({'margin-bottom':15}).html(`Chat link (only works for already added participants atm): <a href="${chatLink}">${chatLink}</a>`).click(e => e.preventDefault());
+    var chatLinkEl = $('<small>').css({'margin-bottom':15, 'overflow-wrap': 'break-word'}).html(`Chat link (only works for already added participants atm): <a href="${chatLink}">${chatLink}</a>`).click(e => e.preventDefault());
     $('#message-list').prepend(chatLinkEl);
   }
 }
@@ -1155,16 +1181,27 @@ function addChat(channel) {
     chats[pub].on('name', setName);
     chats[pub].on('about', setAbout);
     chats[pub].participantProfiles = {};
-    chats[pub].participantProfiles[key.pub] = {name:'You'};
     var participants = chats[pub].getParticipants();
-    var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    participants.forEach((p, i) => {
-      var hue = 360 / Math.max(participants.length - 1, 2) * i + 90 % 360; // TODO use css filter brightness
-      chats[pub].participantProfiles[p] = {color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
-      gun.user(p).get('profile').get('name').on(name => {
-        chats[pub].participantProfiles[p].name = name;
-      });
+    chats[pub].onMy('participants', participants => {
+      if (typeof participants === 'object') {
+        var keys = Object.keys(participants);
+        keys.forEach((k, i) => {
+          if (chats[pub].participantProfiles[k]) { return; }
+          var hue = 360 / Math.max(keys.length - 1, 2) * i + 90 % 360; // TODO use css filter brightness
+          chats[pub].participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
+          gun.user(k).get('profile').get('name').on(name => {
+            chats[pub].participantProfiles[k].name = name;
+          });
+        });
+      }
+      if (activeProfile === pub) {
+        renderGroupParticipants(pub);
+      }
+      if (activeChat === pub) {
+        addUserToHeader(pub);
+      }
     });
+    var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   } else {
     gun.user(pub).get('profile').get('name').on(setName);
     gun.user(pub).get('profile').get('about').on(setAbout);
