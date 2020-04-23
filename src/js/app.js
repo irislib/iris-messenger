@@ -37,7 +37,7 @@ setInterval(checkGunPeerCount, 2000);
 
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
-var chats = {};
+var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 var activeChat;
 var activeProfile;
@@ -321,16 +321,64 @@ $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElect
 
 $('#paste-chat-link').on('input', event => {
   var val = $(event.target).val();
-  if (val.length < 30 || val.indexOf('chatWith') === -1) {
+  if (val.length < 30) {
+    return;
+  }
+  var s = val.split('?');
+  if (s.length !== 2) { return; }
+  var chatId = getUrlParameter('chatWith', s[1]) || getUrlParameter('channelId', s[1]);
+  if (chatId) {
+    newChat(chatId, val);
+    showChat(chatId);
+  }
+  $(event.target).val('');
+});
+
+var newGroupParticipants = [];
+$('#new-group-participant').on('input', event => {
+  var val = $(event.target).val();
+  if (val.length < 30) {
     return;
   }
   var s = val.split('?');
   if (s.length !== 2) { return; }
   var pub = getUrlParameter('chatWith', s[1]);
-  newChat(pub, val);
-  showChat(pub);
+  if (pub) {
+    if (newGroupParticipants.indexOf(pub) >= 0) { $('#new-group-participant').val(''); return; }
+    var identicon = getIdenticon(pub, 40).css({'margin-right':15});
+    var nameEl = $('<span>');
+    gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
+    var el = $('<p>').css({display:'flex', 'align-items': 'center'});
+    var removeBtn = $('<button>').css({'margin-right': 15}).text('Remove').click(() => {
+      el.remove();
+      newGroupParticipants.forEach((p, i) => {if (p===pub) { newGroupParticipants.splice(i, 1); }})
+    });
+    el.append(removeBtn);
+    el.append(identicon);
+    el.append(nameEl);
+    $('#new-group-participants').append(el);
+    newGroupParticipants.push(pub);
+  }
   $(event.target).val('');
 });
+
+$('#new-group-create').click(createGroup);
+function createGroup(e) {
+  e.preventDefault();
+  if ($('#new-group-name').val().length) {
+    var c = new iris.Channel({
+      gun,
+      key,
+      participants: newGroupParticipants,
+    });
+    newGroupParticipants = [];
+    c.put('name', $('#new-group-name').val());
+    $('#new-group-participants').empty();
+    $('#new-group-name').val('');
+    addChat(c);
+    showChat(c.uuid);
+  }
+}
 
 $('.chat-item.new').click(showNewChat);
 
@@ -583,9 +631,11 @@ function notify(msg, info, pub) {
     notificationSound.play();
   }
   if (shouldDesktopNotify()) {
+    var body = chats[pub].uuid ? `${chats[pub].participantProfiles[info.from].name}: ${msg.text}` : msg.text;
+    body = truncateString(body, 50);
     var desktopNotification = new Notification(getDisplayName(pub), {
       icon: 'img/icon128.png',
-      body: truncateString(msg.text, 50),
+      body,
       silent: true
     });
     desktopNotification.onclick = function() {
@@ -675,6 +725,7 @@ function showProfile(pub) {
   $('#profile').show();
   addUserToHeader(pub);
   setTheirOnlineStatus(pub);
+  renderGroupParticipants(pub);
   gun.user(pub).get('profile').get('photo').on(photo => {
     $('#profile .profile-photo-container').show();
     $('#profile .profile-photo').attr('src', photo);
@@ -715,6 +766,77 @@ function showProfile(pub) {
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H
   });
+  $('#profile-group-settings').toggle(!!chats[pub].uuid);
+}
+
+var newGroupParticipant;
+$('#profile-add-participant').on('input', event => {
+  var val = $(event.target).val();
+  if (val.length < 30) {
+    return;
+  }
+  var s = val.split('?');
+  if (s.length !== 2) { return; }
+  var pub = getUrlParameter('chatWith', s[1]);
+  if (pub) {
+    $('#profile-add-participant-candidate').remove();
+    var identicon = getIdenticon(pub, 40).css({'margin-right':15});
+    var nameEl = $('<span>');
+    gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
+    var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
+    var removeBtn = $('<button>').css({'margin-right': 15}).text('Cancel').click(() => {
+      el.remove();
+      newGroupParticipant = null;
+    });
+    el.append(removeBtn);
+    el.append(identicon);
+    el.append(nameEl);
+    newGroupParticipant = pub;
+    $('#profile-add-participant-input').after(el);
+  }
+  $(event.target).val('');
+});
+$('#profile-add-participant-button').click(() => {
+  if (newGroupParticipant) {
+    chats[activeProfile].addParticipant(newGroupParticipant);
+    newGroupParticipant = null;
+    $('#profile-add-participant-input').val('');
+    $('#profile-add-participant-candidate').remove();
+  }
+});
+
+function renderGroupParticipants(pub) {
+  if (!chats[pub].uuid) {
+    $('#profile-group-settings').hide();
+    return;
+  } else {
+    $('#profile-group-settings').show();
+  }
+  $('#profile-group-participants').empty();
+  var keys = Object.keys(chats[pub].participantProfiles);
+  var me = chats[pub].participantProfiles[key.pub];
+  if (me && me.permissions) {
+    $('#profile-add-participant').toggle(me.permissions.admin);
+  }
+  keys.forEach(k => {
+    var profile = chats[pub].participantProfiles[k];
+    var identicon = getIdenticon(k, 40).css({'margin-right':15});
+    var nameEl = $('<span>');
+    gun.user(k).get('profile').get('name').on(name => nameEl.text(name));
+    var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
+    var removeBtn = $('<button>').css({'margin-right': 15}).text('Remove').click(() => {
+      el.remove();
+      // TODO remove group participant
+    });
+    //el.append(removeBtn);
+    el.append(identicon);
+    el.append(nameEl);
+    if (profile.permissions && profile.permissions.admin) {
+      el.append($('<small>').text('admin').css({'margin-left': 5}));
+    }
+    el.click(() => showProfile(k));
+    $('#profile-group-participants').append(el);
+  });
 }
 
 function addUserToHeader(pub) {
@@ -733,6 +855,10 @@ function addUserToHeader(pub) {
   $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
+  if (chats[pub].uuid) {
+      var namesEl = $('<small>').addClass('participants').text(Object.keys(chats[pub].participantProfiles).map(p => chats[pub].participantProfiles[p].name).join(', '));
+      textEl.append(namesEl);
+  }
   textEl.append($('<small>').addClass('last-seen'));
   textEl.append($('<small>').addClass('typing-indicator').text('typing...'));
   $("#header-content").append(textEl);
@@ -821,7 +947,7 @@ function showChat(pub) {
   changeChatUnseenCount(pub, 0);
   addUserToHeader(pub);
   var msgs = Object.values(chats[pub].messages);
-  msgs.forEach(addMessage);
+  msgs.forEach(msg => addMessage(msg, pub));
   sortMessagesByTime();
   $('#message-view').scroll(() => {
     var scrollPosition = $('#message-view').scrollTop();
@@ -843,6 +969,11 @@ function showChat(pub) {
   chats[pub].setMyMsgsLastSeenTime();
   setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
+  if (chats[pub].uuid) {
+    var chatLink =`https://iris.to/?channelId=${chats[pub].uuid}&inviter=${key.pub}`;
+    var chatLinkEl = $('<small>').css({'margin-bottom':15, 'overflow-wrap': 'break-word'}).html(`Chat link (only works for already added participants atm): <a href="${chatLink}">${chatLink}</a>. If participants or messages do not automatically update, refresh does wonders. Under construction!`).click(e => e.preventDefault());
+    $('#message-list').prepend(chatLinkEl);
+  }
 }
 
 function getIdenticon(pub, width) {
@@ -887,7 +1018,7 @@ function sortMessagesByTime() {
 
 var seenIndicatorHtml = '<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>';
 
-function addMessage(msg) {
+function addMessage(msg, chatId) {
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
   var seenHtml = msg.selfAuthored ? ' ' + seenIndicatorHtml : '';
@@ -895,6 +1026,14 @@ function addMessage(msg) {
     '<div class="msg-content"><div class="time">' + iris.util.formatTime(msg.time) + seenHtml + '</div></div>'
   );
   msgContent.prepend(textEl);
+  if (chats[chatId].uuid && !msg.info.selfAuthored) {
+    var profile = chats[chatId].participantProfiles[msg.info.from];
+    var name = profile && profile.name;
+    if (name) {
+      var nameEl = $('<small>').text(name).css({color: profile.color, 'margin-bottom':2,display:'block','font-weight':'bold'});
+      msgContent.prepend(nameEl);
+    }
+  }
   if (msg.text.length === 2 && isEmoji(msg.text)) {
     textEl.toggleClass('emoji-only', true);
   } else {
@@ -963,11 +1102,7 @@ var askForPeers = _.once(pub => {
 });
 
 function addChat(channel) {
-  var participants = channel.getParticipants();
-  if (participants.length > 1) {
-    return; // group chats not supported yet
-  }
-  var pub = participants[0];
+  var pub = channel.getId();
   if (chats[pub]) { return; }
   chats[pub] = channel;
   $('#welcome').remove();
@@ -977,6 +1112,7 @@ function addChat(channel) {
   var typingIndicator = el.find('.typing-indicator').text('Typing...');
   chats[pub].getMessages((msg, info) => {
     chats[pub].messages[msg.time] = msg;
+    msg.info = info;
     msg.selfAuthored = info.selfAuthored;
     msg.time = new Date(msg.time);
     if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
@@ -1006,14 +1142,14 @@ function addChat(channel) {
       sortChatsByLatest();
     }
     if (activeChat === pub) {
-      addMessage(msg);
+      addMessage(msg, pub);
       sortMessagesByTime(); // this is slow if message history is loaded while chat active
       if (chats[pub].latest.time === msg.time && areWeOnline) {
         chats[pub].setMyMsgsLastSeenTime();
       }
       if (chats[pub].theirLastSeenTime) {
         $('#not-seen-by-them').slideUp();
-      } else {
+      } else if (!chats[pub].uuid) {
         $('#not-seen-by-them').slideDown();
       }
       $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
@@ -1035,19 +1171,6 @@ function addChat(channel) {
       el.find('.name').text(truncateString(getDisplayName(pub), 20));
     }
     if (pub === activeChat || pub === activeProfile) {
-      addUserToHeader(pub);
-    }
-  });
-  gun.user(pub).get('profile').get('name').on(name => {
-    if (name && typeof name === 'string') {
-      chats[pub].name = name;
-    }
-    if (pub === key.pub) {
-      el.find('.name').html("📝<b>Note to Self</b>");
-    } else {
-      el.find('.name').text(truncateString(getDisplayName(pub), 20));
-    }
-    if (pub === activeChat) {
       addUserToHeader(pub);
     }
   });
@@ -1082,13 +1205,55 @@ function addChat(channel) {
       setDeliveredCheckmarks(pub);
     }
   });
-  gun.user(pub).get('profile').get('about').on(about => {
+  function setName(name) {
+    if (name && typeof name === 'string') {
+      chats[pub].name = name;
+    }
+    if (pub === key.pub) {
+      el.find('.name').html("📝<b>Note to Self</b>");
+    } else {
+      el.find('.name').text(truncateString(getDisplayName(pub), 20));
+    }
+    if (pub === activeChat) {
+      addUserToHeader(pub);
+    }
+  }
+  function setAbout(about) {
     chats[pub].about = about;
     if (activeProfile === pub) {
       $('#profile .profile-about').toggle(about && about.length > 0);
       $('#profile .profile-about-content').text(about);
     }
-  });
+  }
+  if (chats[pub].uuid) {
+    chats[pub].on('name', setName);
+    chats[pub].on('about', setAbout);
+    chats[pub].participantProfiles = {};
+    var participants = chats[pub].getParticipants();
+    chats[pub].onMy('participants', participants => {
+      if (typeof participants === 'object') {
+        var keys = Object.keys(participants);
+        keys.forEach((k, i) => {
+          if (chats[pub].participantProfiles[k]) { return; }
+          var hue = 360 / Math.max(keys.length - 1, 2) * i + 90 % 360; // TODO use css filter brightness
+          chats[pub].participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
+          gun.user(k).get('profile').get('name').on(name => {
+            chats[pub].participantProfiles[k].name = name;
+          });
+        });
+      }
+      if (activeProfile === pub) {
+        renderGroupParticipants(pub);
+      }
+      if (activeChat === pub) {
+        addUserToHeader(pub);
+      }
+    });
+    var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  } else {
+    gun.user(pub).get('profile').get('name').on(setName);
+    gun.user(pub).get('profile').get('about').on(setAbout);
+  }
   chats[pub].onTheir('call', call => onCallMessage(pub, call));
 }
 
@@ -1136,7 +1301,7 @@ function lastSeenTimeChanged(pub) {
       });
       // set seen msgs
     } else {
-      if ($('.msg.our').length) {
+      if (!chats[pub].uuid && $('.msg.our').length) {
         $('#not-seen-by-them').slideDown();
       }
     }
