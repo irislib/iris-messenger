@@ -7417,6 +7417,7 @@
 
 	    _classCallCheck(this, Channel);
 
+	    this.DEFAULT_PERMISSIONS = { read: true, write: true };
 	    this.key = options.key;
 	    this.gun = options.gun;
 	    this.myGroupSecret = options.myGroupSecret;
@@ -7456,18 +7457,17 @@
 	        } else if (channelId && inviter) {
 	          options.uuid = channelId;
 	          options.participants = {};
-	          options.participants[inviter] = _Object$assign({ inviter: true }, DEFAULT_PERMISSIONS);
+	          options.participants[inviter] = _Object$assign({ inviter: true }, this.DEFAULT_PERMISSIONS);
 	        }
 	      }
 	    }
 
-	    var DEFAULT_PERMISSIONS = { read: true, write: true };
 	    if (typeof options.participants === 'string') {
 	      this.addParticipant(options.participants, options.save);
 	    } else if (Array.isArray(options.participants)) {
 	      var o = {};
 	      options.participants.forEach(function (p) {
-	        return o[p] = _Object$assign({}, DEFAULT_PERMISSIONS);
+	        return o[p] = _Object$assign({}, _this.DEFAULT_PERMISSIONS);
 	      });
 	      options.participants = o;
 	    }
@@ -7476,10 +7476,10 @@
 	      var keys = _Object$keys(options.participants);
 	      keys.forEach(function (k) {
 	        if (k !== _this.key.pub) {
-	          _this.addParticipant(k, options.save, _Object$assign({}, DEFAULT_PERMISSIONS, options.participants[k]));
+	          _this.addParticipant(k, options.save, _Object$assign({}, _this.DEFAULT_PERMISSIONS, options.participants[k]));
 	        }
 	      });
-	      options.participants[this.key.pub] = options.participants[this.key.pub] || _Object$assign({}, DEFAULT_PERMISSIONS);
+	      options.participants[this.key.pub] = options.participants[this.key.pub] || _Object$assign({}, this.DEFAULT_PERMISSIONS);
 	      if (!options.uuid) {
 	        options.uuid = Attribute$1.getUuid().value;
 	        this.uuid = options.uuid;
@@ -7874,11 +7874,18 @@
 
 	  Channel.prototype.addParticipant = async function addParticipant(pub) {
 	    var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+	    var permissions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.DEFAULT_PERMISSIONS;
 
 	    this.secrets[pub] = null;
+	    if (this.uuid) {
+	      this.participants[pub] = permissions;
+	      if (save) {
+	        this.save();
+	      }
+	    }
 	    this.getSecret(pub);
 	    var ourSecretChannelId = await this.getOurSecretChannelId(pub);
-	    if (save) {
+	    if (!this.uuid && save) {
 	      // Save their public key in encrypted format, so in channel listing we know who we are channeling with
 	      var mySecret = await Gun.SEA.secret(this.key.epub, this.key);
 	      this.gun.user().get('chats').get(ourSecretChannelId).get('pub').put((await Gun.SEA.encrypt({ pub: pub }, mySecret)));

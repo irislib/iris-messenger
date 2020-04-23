@@ -631,9 +631,11 @@ function notify(msg, info, pub) {
     notificationSound.play();
   }
   if (shouldDesktopNotify()) {
+    var body = chats[pub].uuid ? `${chats[pub].participantProfiles[info.from].name}: ${msg.text}` : msg.text;
+    body = truncateString(body, 50);
     var desktopNotification = new Notification(getDisplayName(pub), {
       icon: 'img/icon128.png',
-      body: truncateString(msg.text, 50),
+      body,
       silent: true
     });
     desktopNotification.onclick = function() {
@@ -764,14 +766,60 @@ function showProfile(pub) {
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H
   });
+  $('#profile-group-settings').toggle(!!chats[pub].uuid);
 }
 
+var newGroupParticipant;
+$('#profile-add-participant').on('input', event => {
+  var val = $(event.target).val();
+  if (val.length < 30) {
+    return;
+  }
+  var s = val.split('?');
+  if (s.length !== 2) { return; }
+  var pub = getUrlParameter('chatWith', s[1]);
+  if (pub) {
+    $('#profile-add-participant-candidate').remove();
+    var identicon = getIdenticon(pub, 40).css({'margin-right':15});
+    var nameEl = $('<span>');
+    gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
+    var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
+    var removeBtn = $('<button>').css({'margin-right': 15}).text('Cancel').click(() => {
+      el.remove();
+      newGroupParticipant = null;
+    });
+    el.append(removeBtn);
+    el.append(identicon);
+    el.append(nameEl);
+    newGroupParticipant = pub;
+    $('#profile-add-participant-input').after(el);
+  }
+  $(event.target).val('');
+});
+$('#profile-add-participant-button').click(() => {
+  if (newGroupParticipant) {
+    chats[activeProfile].addParticipant(newGroupParticipant);
+    newGroupParticipant = null;
+    $('#profile-add-participant-input').val('');
+    $('#profile-add-participant-candidate').remove();
+  }
+});
+
 function renderGroupParticipants(pub) {
+  if (!chats[pub].uuid) {
+    $('#profile-group-settings').hide();
+    return;
+  } else {
+    $('#profile-group-settings').show();
+  }
   $('#profile-group-participants').empty();
   var keys = Object.keys(chats[pub].participantProfiles);
+  var me = chats[pub].participantProfiles[key.pub];
+  if (me && me.permissions) {
+    $('#profile-add-participant').toggle(me.permissions.admin);
+  }
   keys.forEach(k => {
     var profile = chats[pub].participantProfiles[k];
-    console.log('profile', profile);
     var identicon = getIdenticon(k, 40).css({'margin-right':15});
     var nameEl = $('<span>');
     gun.user(k).get('profile').get('name').on(name => nameEl.text(name));
@@ -923,7 +971,7 @@ function showChat(pub) {
   setDeliveredCheckmarks(pub);
   if (chats[pub].uuid) {
     var chatLink =`https://iris.to/?channelId=${chats[pub].uuid}&inviter=${key.pub}`;
-    var chatLinkEl = $('<small>').css({'margin-bottom':15, 'overflow-wrap': 'break-word'}).html(`Chat link (only works for already added participants atm): <a href="${chatLink}">${chatLink}</a>`).click(e => e.preventDefault());
+    var chatLinkEl = $('<small>').css({'margin-bottom':15, 'overflow-wrap': 'break-word'}).html(`Chat link (only works for already added participants atm): <a href="${chatLink}">${chatLink}</a>. If participants or messages do not automatically update, refresh does wonders. Under construction!`).click(e => e.preventDefault());
     $('#message-list').prepend(chatLinkEl);
   }
 }
@@ -1186,9 +1234,6 @@ function addChat(channel) {
       if (typeof participants === 'object') {
         var keys = Object.keys(participants);
         keys.forEach((k, i) => {
-          if (k === key.pub) {
-            $('#profile-add-participant').toggle(participants[k].admin);
-          }
           if (chats[pub].participantProfiles[k]) { return; }
           var hue = 360 / Math.max(keys.length - 1, 2) * i + 90 % 360; // TODO use css filter brightness
           chats[pub].participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
