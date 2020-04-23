@@ -1186,6 +1186,9 @@ function addChat(channel) {
       if (typeof participants === 'object') {
         var keys = Object.keys(participants);
         keys.forEach((k, i) => {
+          if (k === key.pub) {
+            $('#profile-add-participant').toggle(participants[k].admin);
+          }
           if (chats[pub].participantProfiles[k]) { return; }
           var hue = 360 / Math.max(keys.length - 1, 2) * i + 90 % 360; // TODO use css filter brightness
           chats[pub].participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
