@@ -7535,6 +7535,11 @@
 	          if (_JSON$stringify(_this.participants) === before) {
 	            return;
 	          }
+	          _Object$keys(participants).forEach(function (k) {
+	            if (k !== _this.key.pub) {
+	              _this.addParticipant(k, false, _Object$assign({}, _this.DEFAULT_PERMISSIONS, participants[k]));
+	            }
+	          });
 	          _this.save(); // forever loop?
 	          saved = true;
 	        }
@@ -7875,6 +7880,9 @@
 	    var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 	    var permissions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.DEFAULT_PERMISSIONS;
 
+	    if (this.secrets[pub]) {
+	      return;
+	    }
 	    this.secrets[pub] = null;
 	    if (this.uuid) {
 	      this.participants[pub] = permissions;
