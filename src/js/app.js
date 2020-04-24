@@ -185,11 +185,21 @@ function login(k) {
   });
   setOurOnlineStatus();
   iris.Channel.getChannels(gun, key, addChat);
-  var chatWith = getUrlParameter('chatWith');
-  if (chatWith) {
-    newChat(chatWith, window.location.href);
-    showChat(chatWith);
-    window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
+  var chatId = getUrlParameter('chatWith') || getUrlParameter('channelId');
+  var inviter = getUrlParameter('inviter');
+  if (chatId) {
+    function go() {
+      if (inviter !== key.pub) {
+        newChat(chatId, window.location.href);
+      }
+      showChat(chatId);
+      window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
+    }
+    if (inviter) {
+      setTimeout(go, 2000); // wait a sec to not re-create the same chat
+    } else {
+      go();
+    }
   } else {
     if (iris.util.isMobile) {
       showMenu();
@@ -733,7 +743,7 @@ function showProfile(pub) {
   $('#profile .profile-about').toggle(chats[pub].about && chats[pub].about.length > 0);
   $('#profile .profile-about-content').empty();
   $('#profile .profile-about-content').text(chats[pub].about);
-  const link = getUserChatLink(pub);
+  const link = chats[pub].getSimpleLink();
   $('#profile .add-friend').off().on('click', () => {
     console.log('add friend');
   });
@@ -750,6 +760,11 @@ function showProfile(pub) {
       t.text(originalText);
       t.css('width', '');
     }, 2000);
+  });
+  $('#profile-group-name').not(':focus').val(chats[pub].name);
+  $('#profile-group-name').off().on('input', event => {
+    var name = event.target.value;
+    chats[pub].put('name', name);
   });
   $('#profile-nickname-their').not(':focus').val(chats[pub].theirNickname);
   $('#profile-nickname-my').text(chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
@@ -969,11 +984,6 @@ function showChat(pub) {
   chats[pub].setMyMsgsLastSeenTime();
   setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
-  if (chats[pub].uuid) {
-    var chatLink =`https://iris.to/?channelId=${chats[pub].uuid}&inviter=${key.pub}`;
-    var chatLinkEl = $('<small>').css({'margin-bottom':15, 'overflow-wrap': 'break-word'}).html(`Chat link (only works for already added participants atm): <a href="${chatLink}">${chatLink}</a>. If participants or messages do not automatically update, refresh does wonders. Under construction!`).click(e => e.preventDefault());
-    $('#message-list').prepend(chatLinkEl);
-  }
 }
 
 function getIdenticon(pub, width) {
@@ -1214,8 +1224,11 @@ function addChat(channel) {
     } else {
       el.find('.name').text(truncateString(getDisplayName(pub), 20));
     }
-    if (pub === activeChat) {
+    if (pub === activeChat || pub === activeProfile) {
       addUserToHeader(pub);
+    }
+    if (pub === activeProfile) {
+      $('#profile-group-name').not(':focus').val(name);
     }
   }
   function setAbout(about) {
