@@ -740,10 +740,10 @@ function showProfile(pub) {
     $('#profile .profile-photo-container').show();
     $('#profile .profile-photo').attr('src', photo);
   });
-  $('#profile .profile-about').toggle(chats[pub].about && chats[pub].about.length > 0);
+  $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
   $('#profile .profile-about-content').empty();
-  $('#profile .profile-about-content').text(chats[pub].about);
-  const link = chats[pub].getSimpleLink();
+  $('#profile .profile-about-content').text(chats[pub] && chats[pub].about);
+  const link = chats[pub] && chats[pub].getSimpleLink();
   $('#profile .add-friend').off().on('click', () => {
     console.log('add friend');
   });
@@ -761,13 +761,13 @@ function showProfile(pub) {
       t.css('width', '');
     }, 2000);
   });
-  $('#profile-group-name').not(':focus').val(chats[pub].name);
+  $('#profile-group-name').not(':focus').val(chats[pub] && chats[pub].name);
   $('#profile-group-name').off().on('input', event => {
     var name = event.target.value;
     chats[pub].put('name', name);
   });
-  $('#profile-nickname-their').not(':focus').val(chats[pub].theirNickname);
-  $('#profile-nickname-my').text(chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
+  $('#profile-nickname-their').not(':focus').val(chats[pub] && chats[pub].theirNickname);
+  $('#profile-nickname-my').text(chats[pub] && chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
   $('#profile-nickname-their').off().on('input', event => {
     var nick = event.target.value;
     chats[pub].put('nickname', nick);
@@ -781,7 +781,7 @@ function showProfile(pub) {
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H
   });
-  $('#profile-group-settings').toggle(!!chats[pub].uuid);
+  $('#profile-group-settings').toggle(!!(chats[pub] && chats[pub].uuid));
 }
 
 var newGroupParticipant;
@@ -821,7 +821,7 @@ $('#profile-add-participant-button').click(() => {
 });
 
 function renderGroupParticipants(pub) {
-  if (!chats[pub].uuid) {
+  if (!(chats[pub] && chats[pub].uuid)) {
     $('#profile-group-settings').hide();
     return;
   } else {
@@ -832,6 +832,7 @@ function renderGroupParticipants(pub) {
   var me = chats[pub].participantProfiles[key.pub];
   if (me && me.permissions) {
     $('#profile-add-participant').toggle(me.permissions.admin);
+    $('#profile-group-name-container').toggle(me.permissions.admin);
   }
   keys.forEach(k => {
     var profile = chats[pub].participantProfiles[k];
@@ -870,7 +871,7 @@ function addUserToHeader(pub) {
   $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
-  if (chats[pub].uuid) {
+  if (chats[pub] && chats[pub].uuid) {
       var namesEl = $('<small>').addClass('participants').text(Object.keys(chats[pub].participantProfiles).map(p => chats[pub].participantProfiles[p].name).join(', '));
       textEl.append(namesEl);
   }
@@ -907,6 +908,7 @@ function changeChatUnseenCount(pub, change) {
 }
 
 function setTheirOnlineStatus(pub) {
+  if (!chats[pub]) return;
   var online = chats[pub].online;
   if (online && (activeChat === pub || activeProfile === pub)) {
     if (online.isOnline) {
@@ -1215,7 +1217,13 @@ function addChat(channel) {
       setDeliveredCheckmarks(pub);
     }
   });
-  function setName(name) {
+  function setName(name, from) {
+    if (chats[pub].uuid) {
+      var profile = chats[pub].participantProfiles[from];
+      if (profile && !(profile.permissions && profile.permissions.admin)) {
+        return;
+      }
+    }
     if (name && typeof name === 'string') {
       chats[pub].name = name;
     }
