@@ -7333,7 +7333,7 @@
 	}();
 
 	/**
-	* Private communication channel between two participants ([Gun](https://github.com/amark/gun) public keys). Can be used independently of other Iris stuff.
+	* Private communication channel between two or more participants ([Gun](https://github.com/amark/gun) public keys). Can be used independently of other Iris stuff.
 	*
 	* Used as a core element of [iris-messenger](https://github.com/irislib/iris-messenger).
 	*
@@ -7355,8 +7355,6 @@
 	*
 	* You can open a channel with yourself for a private key-value space or a "note to self" type chat with yourself.
 	*
-	* You can specify more than one participant key (your own key is included by default), but it's not guaranteed to work and causes unscalable data replication - better group channel implementation to be done.
-	*
 	* **Note!** As of April 2020 Gun.SEA hashing function [is broken on Safari](https://github.com/amark/gun/issues/892). Channels don't work on Safari unless you patch sea.js by adding [this line](https://github.com/irislib/iris-messenger/blob/1e012581793485e6b8b5ed3c2ad0629716709366/src/js/sea.js#L270).
 	*
 	* **Privacy disclaimer:** Channel ids, data values and messages are encrypted, but message timestamps are unencrypted so that peers can return them to you in a sequential order. By looking at the unencrypted timestamps (or Gun subscriptions), it is possible to guess who are communicating with each other. This could be improved by indexing messages by *day* only, so making the guess would be more difficult, while you could still return them in a semi-sequential order.
@@ -7364,7 +7362,7 @@
 	* @param {Object} options
 	* @param {string} options.key your keypair
 	* @param {Object} options.gun [gun](https://github.com/amark/gun) instance
-	* @param options.participants (optional) string or string array of participant public keys (your own key is included by default)
+	* @param options.participants (optional) string or string array or permissions object ({'pub1':{read:true,write:true,admin:false},'pub2'...}) of participant public keys (your own key is included by default)
 	* @param {string} options.chatLink (optional) chat link instead of participants list
 	* @param {string} options.uuid (group channels only) unique channel identifier. Leave out for new channel.
 	* @param {string} options.name (group channels only) channel name
@@ -7455,6 +7453,7 @@
 	            }
 	          }
 	        } else if (channelId && inviter) {
+	          // TODO! initializing it twice breaks things - new secret is generated
 	          options.uuid = channelId;
 	          options.participants = {};
 	          options.participants[inviter] = _Object$assign({ inviter: true }, this.DEFAULT_PERMISSIONS);
@@ -8210,7 +8209,7 @@
 	    if (this.uuid) {
 	      return urlRoot + '?channelId=' + this.uuid + '&inviter=' + this.key.pub;
 	    } else {
-	      return urlRoot + '?chatWith=' + this.key.pub;
+	      return urlRoot + '?chatWith=' + this.getParticipants()[0];
 	    }
 	  };
 
@@ -10125,7 +10124,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$1 = "0.0.143";
+	var version$1 = "0.0.144";
 
 	/*eslint no-useless-escape: "off", camelcase: "off" */
 
