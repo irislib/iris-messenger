@@ -861,7 +861,7 @@ function addUserToHeader(pub) {
   if (pub === key.pub && activeProfile !== pub) {
     nameEl.html("📝<b>Note to Self</b>");
   } else if (chats[pub]) {
-    nameEl.text(truncateString(getDisplayName(pub), 30));
+    nameEl.text(getDisplayName(pub));
   }
   nameEl.show();
 
@@ -872,8 +872,9 @@ function addUserToHeader(pub) {
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
   if (chats[pub] && chats[pub].uuid) {
-      var namesEl = $('<small>').addClass('participants').text(Object.keys(chats[pub].participantProfiles).map(p => chats[pub].participantProfiles[p].name).join(', '));
-      textEl.append(namesEl);
+    var t = Object.keys(chats[pub].participantProfiles).map(p => chats[pub].participantProfiles[p].name).join(', ');
+    var namesEl = $('<small>').addClass('participants').text(t);
+    textEl.append(namesEl);
   }
   textEl.append($('<small>').addClass('last-seen'));
   textEl.append($('<small>').addClass('typing-indicator').text('typing...'));
