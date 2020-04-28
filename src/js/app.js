@@ -945,12 +945,18 @@ function showChat(pub) {
   if (!iris.util.isMobile) {
     $("#new-msg").focus();
   }
-  var setTypingThrottled = _.throttle(() => {
-    chats[pub].setTyping($('#new-msg').val().length > 0);
-  }, 1000);
+  var isTyping = false;
+  var getIsTyping = () => $('#new-msg').val().length > 0;
+  var setTyping = () => chats[pub].setTyping(getIsTyping());
+  var setTypingThrottled = _.throttle(setTyping, 1000);
   $('#new-msg').val(chats[pub].msgDraft);
   $('#new-msg').off().on('input', () => {
-    setTypingThrottled();
+    if (isTyping === getIsTyping()) {
+      setTypingThrottled();
+    } else {
+      setTyping();
+    }
+    isTyping = getIsTyping();
     chats[pub].msgDraft = $('#new-msg').val();
   });
   $(".message-form form").off().on('submit', event => {

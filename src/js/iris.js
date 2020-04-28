@@ -7537,10 +7537,9 @@
 	          }
 	          _Object$keys(participants).forEach(function (k) {
 	            if (k !== _this.key.pub) {
-	              _this.addParticipant(k, false, _Object$assign({}, _this.DEFAULT_PERMISSIONS, participants[k]));
+	              _this.addParticipant(k, true, _Object$assign({}, _this.DEFAULT_PERMISSIONS, participants[k]));
 	            }
 	          });
-	          _this.save(); // forever loop?
 	          saved = true;
 	        }
 	      }
@@ -7892,7 +7891,7 @@
 	    }
 	    this.getSecret(pub);
 	    var ourSecretChannelId = await this.getOurSecretChannelId(pub);
-	    if (!this.uuid && save) {
+	    if (save) {
 	      // Save their public key in encrypted format, so in channel listing we know who we are channeling with
 	      var mySecret = await Gun.SEA.secret(this.key.epub, this.key);
 	      this.gun.user().get('chats').get(ourSecretChannelId).get('pub').put((await Gun.SEA.encrypt({ pub: pub }, mySecret)));
@@ -8141,7 +8140,7 @@
 	    this.put('typing', isTyping ? new Date().toISOString() : false);
 	    clearTimeout(this.setTypingTimeout);
 	    this.setTypingTimeout = setTimeout(function () {
-	      return _this13.put('isTyping', false);
+	      return _this13.put('typing', false);
 	    }, timeout);
 	  };
 
@@ -8154,7 +8153,7 @@
 	    var _this14 = this;
 
 	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
-
+	    // TODO callback not called on setTyping(false), at least for self chat
 	    timeout = timeout * 1000;
 	    this.onTheir('typing', function (typing, key, pub) {
 	      if (callback) {
@@ -10132,7 +10131,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$1 = "0.0.144";
+	var version$1 = "0.0.145";
 
 	/*eslint no-useless-escape: "off", camelcase: "off" */
 
