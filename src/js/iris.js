@@ -7512,7 +7512,6 @@
 	      // need to make put(), on(), send() and getMessages() behave differently when it's a group and retain the old versions for mutual signaling
 	    }
 	    this.onTheir('participants', function (participants, k, from) {
-	      console.log(_this.key.pub.slice(0, 4), 'got participants', participants);
 	      var hasAdmin = false;
 	      var keys = _Object$keys(_this.participants);
 	      for (var i = 0; i < keys.length; i++) {
@@ -7889,8 +7888,9 @@
 
 	    permissions = permissions || this.DEFAULT_PERMISSIONS;
 	    if (this.secrets[pub] && _JSON$stringify(this.secrets[pub]) === _JSON$stringify(permissions)) {
+	      // TODO: should be this.participants[pub]
 	      return;
-	    } // TODO: handle changed permissions
+	    }
 	    this.secrets[pub] = null;
 	    this.getSecret(pub);
 	    var ourSecretChannelId = await this.getOurSecretChannelId(pub);

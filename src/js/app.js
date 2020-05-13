@@ -1263,7 +1263,7 @@ function addChat(channel) {
         var keys = Object.keys(participants);
         keys.forEach((k, i) => {
           if (chats[pub].participantProfiles[k]) { return; }
-          var hue = 360 / Math.max(keys.length - 1, 2) * i + 90 % 360; // TODO use css filter brightness
+          var hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
           chats[pub].participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
           gun.user(k).get('profile').get('name').on(name => {
             chats[pub].participantProfiles[k].name = name;
