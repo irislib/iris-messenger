@@ -7454,7 +7454,7 @@
 	              });
 	            }
 	          }
-	        } else if (channelId && inviter) {
+	        } else if (channelId && inviter && inviter !== this.key.pub) {
 	          // TODO! initializing it twice breaks things - new secret is generated
 	          options.uuid = channelId;
 	          options.participants = {};
