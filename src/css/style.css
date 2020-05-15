@@ -204,6 +204,7 @@ header #back-button {
 
 .msg-content img {
   border-radius: 3px;
+  max-height: 200px;
 }
 
 .emoji {
