@@ -202,6 +202,10 @@ header #back-button {
   max-width: 75%;
 }
 
+.msg-content img {
+  border-radius: 3px;
+}
+
 .emoji {
   font-size: 1.3em;
   line-height: 1em;
@@ -373,6 +377,16 @@ header #back-button {
 
 .emoji-picker__tab {
   font-size: 35px !important;
+}
+
+#attachment-preview {
+  display: none;
+  text-align: center;
+  overflow: hidden;
+}
+
+#attachment-preview img {
+  max-height: 60vh;
 }
 
 #message-list {

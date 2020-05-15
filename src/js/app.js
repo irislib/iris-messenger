@@ -327,6 +327,28 @@ if (!iris.util.isMobile) {
   });
 }
 
+
+$('#attach-file').click(event => {
+  event.preventDefault();
+  $('#attachment-input').click();
+})
+$('#attachment-input').change(e => {
+  $('#attachment-preview').empty();
+  var files = $('#attachment-input')[0].files;
+  if (files) {
+    $('#attachment-preview').show();
+    $('#message-list').hide();
+    for (var i = 0;i < files.length;i++) {
+      getBase64(files[i]).then(base64 => {
+        chats[activeChat].attachments = chats[activeChat].attachments || [];
+        chats[activeChat].attachments.push({type: 'image', data: base64});
+        var preview = $('<img>').attr('src', base64);
+        $('#attachment-preview').append(preview);
+      });
+    }
+  }
+});
+
 $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
 
 $('#paste-chat-link').on('input', event => {
@@ -963,9 +985,16 @@ function showChat(pub) {
     event.preventDefault();
     chats[pub].msgDraft = null;
     var text = $('#new-msg').val();
-    if (!text.length) { return; }
+    if (!text.length && !chats[pub].attachments) { return; }
     chats[pub].setTyping(false);
-    chats[pub].send(text);
+    var msg = {text};
+    if (chats[pub].attachments) {
+      msg.attachments = chats[pub].attachments;
+    }
+    chats[pub].send(msg);
+    chats[pub].attachments = null;
+    $('#attachment-preview').hide();
+    $('#message-list').show();
     $('#new-msg').val('');
   });
   changeChatUnseenCount(pub, 0);
@@ -1045,6 +1074,14 @@ function addMessage(msg, chatId) {
     '<div class="msg-content"><div class="time">' + iris.util.formatTime(msg.time) + seenHtml + '</div></div>'
   );
   msgContent.prepend(textEl);
+  if (msg.attachments) {
+    msg.attachments.forEach(a => {
+      if (a.type.indexOf('image') === 0 && a.data) {
+        var img = $('<img>').attr('src', a.data);
+        msgContent.prepend(img);
+      }
+    })
+  }
   if (chats[chatId].uuid && !msg.info.selfAuthored) {
     var profile = chats[chatId].participantProfiles[msg.info.from];
     var name = profile && profile.name;
