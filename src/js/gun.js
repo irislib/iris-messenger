@@ -50,17 +50,6 @@
 			if(u !== o['<'] && t <= o['<']){ return true }
 			return false;
 		}
-		Type.text.hash = function(s, c){ // via SO
-			if(typeof s !== 'string'){ return }
-	    c = c || 0;
-	    if(!s.length){ return c }
-	    for(var i=0,l=s.length,n; i<l; ++i){
-	      n = s.charCodeAt(i);
-	      c = ((c<<5)-c)+n;
-	      c |= 0;
-	    }
-	    return c;
-	  }
 		Type.list = {is: function(l){ return (l instanceof Array) }}
 		Type.list.slit = Array.prototype.slice;
 		Type.list.sort = function(k){ // creates a new sort function based off some key
@@ -738,7 +727,7 @@
 				var ctx = msg._||'', root = ctx.root = ((msg.$||'')._||'').root;
 				var put = msg.put, id = msg['#'], err, tmp;
 				var DBG = ctx.DBG = msg.DBG;
-				if(put['#'] && put['.']){ root.on('put', msg); return }
+				if(put['#']){ root.on('put', msg); return }
 				/*root.on(id, function(m){
 					console.log('ack:', m);
 				});*/
@@ -795,7 +784,7 @@
 				if((tmp = ctx.out) && (tmp = tmp.put)){
 					tmp[soul] = state_ify(tmp[soul], key, state, val, soul); // TODO: Hacky, fix & come back later, for actual pushing messages.
 				}
-				if(!(--ctx.lot.more)){ fire(ctx) } // TODO: 'forget' feature in SEA tied to this, bad approach, but hacked in for now. Any changes here must update there.
+				if(!(--ctx.lot.more)){ fire(ctx) }
 				eve.to.next(msg);
 			}
 			function chain(ctx, soul, key,val, state){
@@ -967,7 +956,7 @@
 					obj_map(v, each, this[k]);
 				}, at.opt);
 				Gun.on('opt', at);
-				//at.opt.uuid = at.opt.uuid || function(){ return state_lex() + text_rand(12) }
+				at.opt.uuid = at.opt.uuid || function(){ return state_lex() + text_rand(12) }
 				Gun.obj.native();
 				return gun;
 			}
@@ -987,7 +976,7 @@
 		if(typeof window !== "undefined"){ (window.GUN = window.Gun = Gun).window = window }
 		try{ if(typeof MODULE !== "undefined"){ MODULE.exports = Gun } }catch(e){}
 		module.exports = Gun;
-
+		
 		(Gun.window||'').console = (Gun.window||'').console || {log: function(){}};
 		(C = console).only = function(i, s){ return (C.only.i && i === C.only.i && C.only.i++) && (C.log.apply(C, arguments) || s) };
 
@@ -1413,7 +1402,7 @@
 			if(cat.jam){ return cat.jam.push([cb, as]) }
 			cat.jam = [[cb,as]];
 			gun.get(function go(msg, eve){
-				if(u === msg.put && (tmp = Object.keys(cat.root.opt.peers).length) && ++acks <= tmp){
+				if(u === msg.put && (tmp = Object.keys(cat.root.opt.peers).length) && ++acks < tmp){
 					return;
 				}
 				eve.rid(msg);
@@ -1500,7 +1489,6 @@
 					return gun;
 				}
 				as.soul = as.soul || (as.not = Gun.node.soul(as.data) || (as.via.back('opt.uuid') || Gun.text.random)());
-				as.via._.stun = {};
 				if(!as.soul){ // polyfill async uuid for SEA
 					as.via.back('opt.uuid')(function(err, soul){ // TODO: improve perf without anonymous callback
 						if(err){ return Gun.log(err) } // TODO: Handle error!
@@ -1513,11 +1501,9 @@
 				ify(as);
 				return gun;
 			}
-			as.via._.stun = {};
 			if(Gun.is(data)){
 				data.get(function(soul, o, msg){
 					if(!soul){
-						delete as.via._.stun;
 						return Gun.log("The reference you are saving is a", typeof msg.put, '"'+ msg.put +'", not a node (object)!');
 					}
 					gun.put(Gun.val.link.ify(soul), cb, as);
@@ -1581,7 +1567,6 @@
 			if(!as.graph || !obj_empty(as.stun)){ return }
 			as.res = as.res || function(cb){ if(cb){ cb() } };
 			as.res(function(){
-				delete as.via._.stun;
 				var cat = (as.$.back(-1)._), ask = cat.ask(function(ack){
 					cat.root.on('ack', ack);
 					if(ack.err){ Gun.log(ack) }
@@ -1602,7 +1587,6 @@
 				});
 				cat.root.mum = mum? obj.to(mum, cat.root.mum) : mum;
 				cat.root.now = tmp;
-				as.via._.on('res', {}); delete as.via._.tag.res; // emitting causes mem leak?
 			}, as);
 			if(as.res){ as.res() }
 		} function no(v,k){ if(v){ return true } }
@@ -1625,19 +1609,15 @@
 					return;
 				}
 				(as.stun = as.stun || {})[path] = 1;
-				ref.get(soul, true, {as: {at: at, as: as, p:path, ref: ref}});
+				ref.get(soul, true, {as: {at: at, as: as, p:path}});
 			}, {as: as, at: at});
 			//if(is){ return {} }
 		}
-		var G = String.fromCharCode(31);
+
 		function soul(id, as, msg, eve){
-			var as = as.as, path = as.p, ref = as.ref, cat = as.at; as = as.as;
-			var sat = ref.back(function(at){ return sat = at.soul || at.link || at.dub });
-			var pat = [sat || as.soul].concat(ref._.has || ref._.get || path)
+			var as = as.as, cat = as.at; as = as.as;
 			var at = ((msg || {}).$ || {})._ || {};
-			id = at.dub = at.dub || id || Gun.node.soul(cat.obj) || Gun.node.soul(msg.put || at.put) || Gun.val.link.is(msg.put || at.put) || pat.join('/') /* || (function(){
-				return (as.soul+'.')+Gun.text.hash(path.join(G)).toString(32);
-			})(); // TODO: BUG!? Do we really want the soul of the object given to us? Could that be dangerous? What about copy operations? */
+			id = at.dub = at.dub || id || Gun.node.soul(cat.obj) || Gun.node.soul(msg.put || at.put) || Gun.val.link.is(msg.put || at.put) || (as.via.back('opt.uuid') || Gun.text.random)(); // TODO: BUG!? Do we really want the soul of the object given to us? Could that be dangerous?
 			if(eve){ eve.stun = true }
 			if(!id){ // polyfill async uuid for SEA
 				as.via.back('opt.uuid')(function(err, id){ // TODO: improve perf without anonymous callback
@@ -1669,7 +1649,6 @@
 			if(as.ref !== as.$){
 				tmp = (as.$._).get || at.get;
 				if(!tmp){ // TODO: Handle
-					delete as.via._.stun;
 					Gun.log("Please report this as an issue! Put.no.get"); // TODO: BUG!??
 					return;
 				}
@@ -1677,7 +1656,7 @@
 				tmp = null;
 			}
 			if(u === data){
-				if(!at.get){ delete as.via._.stun; return } // TODO: Handle
+				if(!at.get){ return } // TODO: Handle
 				if(!soul){
 					tmp = at.$.back(function(at){
 						if(at.link || at.soul){ return at.link || at.soul }
@@ -1702,7 +1681,7 @@
 				}
 				if(!as.soul){ // polyfill async uuid for SEA
 					as.via.back('opt.uuid')(function(err, soul){ // TODO: improve perf without anonymous callback
-						if(err){ delete as.via._.stun; return Gun.log(err) } // Handle error.
+						if(err){ return Gun.log(err) } // Handle error.
 						as.ref.put(as.data, as.soul = soul, as);
 					});
 					return;
@@ -1911,20 +1890,17 @@
 			opt = opt || {}; opt.item = opt.item || item;
 			if(soul = Gun.node.soul(item)){ item = Gun.obj.put({}, soul, Gun.val.link.ify(soul)) }
 			if(!Gun.is(item)){
-				if(Gun.obj.is(item)){
-					//item = gun.back(-1).get(soul = soul || Gun.node.soul(item) || (gun.back('opt.uuid') || uuid)()).put(item);
-					soul = soul || Gun.node.soul(item) || uuid(); // this just key now, not a soul.
+				if(Gun.obj.is(item)){;
+					item = gun.back(-1).get(soul = soul || Gun.node.soul(item) || gun.back('opt.uuid')()).put(item);
 				}
-				return gun.get(soul || uuid()).put(item, cb, opt);
+				return gun.get(soul || (Gun.state.lex() + Gun.text.random(7))).put(item, cb, opt);
 			}
 			item.get(function(soul, o, msg){
-				if(!soul && item._.stun){ item._.on('res', function(){ this.off(); gun.set(item, cb, opt) }); return }
 				if(!soul){ return cb.call(gun, {err: Gun.log('Only a node can be linked! Not "' + msg.put + '"!')}) }
 				gun.put(Gun.obj.put({}, soul, Gun.val.link.ify(soul)), cb, opt);
 			},true);
 			return item;
 		}
-		function uuid(){ return Gun.state.lex() + Gun.text.random(7) }
 	})(USE, './set');
 
 	;USE(function(module){
@@ -2158,7 +2134,7 @@
 				var message, loop;
 				function each(peer){ mesh.say(message, peer) }
 				var say = mesh.say = function(msg, peer){
-					if(this && this.to){ this.to.next(msg) } // compatible with middleware adapters.
+					if(this.to){ this.to.next(msg) } // compatible with middleware adapters.
 					if(!msg){ return false }
 					var id, hash, tmp, raw;
 					var DBG = msg.DBG, S; if(!peer){ S = +new Date ; DBG && (DBG.y = S) }
@@ -2324,7 +2300,7 @@
 			});
 
 			root.on('bye', function(peer, tmp){
-				peer = opt.peers[peer.id || peer] || peer;
+				peer = opt.peers[peer.id || peer] || peer; 
 				this.to.next(peer);
 				peer.bye? peer.bye() : (tmp = peer.wire) && tmp.close && tmp.close();
 				Type.obj.del(opt.peers, peer.id);
@@ -2349,6 +2325,18 @@
 		}
 
 		;(function(){
+			Type.text.hash = function(s){ // via SO
+				if(typeof s !== 'string'){ return {err: 1} }
+		    var c = 0;
+		    if(!s.length){ return c }
+		    for(var i=0,l=s.length,n; i<l; ++i){
+		      n = s.charCodeAt(i);
+		      c = ((c<<5)-c)+n;
+		      c |= 0;
+		    }
+		    return c; // Math.abs(c);
+		  }
+			
 			var $ = JSON.stringify, u;
 
 			Type.obj.hash = function(obj, hash){
