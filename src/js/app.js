@@ -1104,8 +1104,9 @@ function sortMessagesByTime() {
     var from = $(this).data('from');
     if (previousFrom && (from !== previousFrom)) {
       $(this).before($('<div>').addClass('from-separator'));
+      $(this).find('small').show();
     } else {
-      // $(this).find('small').remove();
+      $(this).find('small').hide();
     }
     previousFrom = from;
   });
