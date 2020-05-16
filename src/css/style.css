@@ -203,7 +203,7 @@ header #back-button {
 }
 
 .msg-content img {
-  border-radius: 3px;
+  border-radius: 6px;
   max-height: 250px;
   max-width: 100%;
   cursor: pointer;
