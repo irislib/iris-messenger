@@ -164,7 +164,7 @@
     var o = {};
 
     if(SEA.window){
-      api.crypto = window.crypto || window.msCrypto
+      api.crypto = navigator && navigator.product === 'ReactNative' ? require('isomorphic-webcrypto') : window.crypto || window.msCrypto || require('isomorphic-webcrypto');
       api.subtle = (api.crypto||o).subtle || (api.crypto||o).webkitSubtle;
       api.TextEncoder = window.TextEncoder;
       api.TextDecoder = window.TextDecoder;
@@ -176,20 +176,17 @@
       api.TextDecoder = TextDecoder;
       api.TextEncoder = TextEncoder;
     }
-    if(!api.crypto)
-    {
-      try
-      {
+    if(!api.crypto){try{
       var crypto = USE('crypto', 1);
       Object.assign(api, {
         crypto,
         random: (len) => Buffer.from(crypto.randomBytes(len))
       });
-      const { Crypto: WebCrypto } = USE('@peculiar/webcrypto', 1);
-      api.ossl = api.subtle = new WebCrypto({directory: 'ossl'}).subtle // ECDH
-    }
-    catch(e){
-      console.log("text-encoding and peculiar/nwebcrypto may not be included by default, please add it to your package.json!");
+      const isocrypto = require('isomorphic-webcrypto');
+      api.ossl = api.subtle = isocrypto.subtle;
+    }catch(e){
+      console.log("text-encoding and @peculiar/webcrypto may not be included by default, please add it to your package.json!");
+      TEXT_ENCODING_OR_PECULIAR_WEBCRYPTO_NOT_INSTALLED;
     }}
 
     module.exports = api
@@ -710,10 +707,9 @@
 
   ;USE(function(module){
     var Gun = USE('./sea').Gun;
-    Gun.chain.then = function(cb, opt = {}){
-      opt = {wait: 200, ...opt}
+    Gun.chain.then = function(cb){
       var gun = this, p = (new Promise(function(res, rej){
-        gun.once(res, opt);
+        gun.once(res);
       }));
       return cb? p.then(cb) : p;
     }
@@ -741,7 +737,7 @@
       at.opt.uuid = function(cb){
         var id = uuid(), pub = root.user;
         if(!pub || !(pub = pub.is) || !(pub = pub.pub)){ return id }
-        id = id + '~' + pub + '.';
+        id = id + '~' + pub + '/';
         if(cb && cb.call){ cb(null, id) }
         return id;
       }
@@ -1087,43 +1083,6 @@
       }());
       return gun;
     }
-
-    /**
-     * returns the decrypted value, encrypted by secret
-     * @returns {Promise<any>}
-     */
-    User.prototype.decrypt = function(cb) {
-      let gun = this,
-        path = ''
-      gun.back(function(at) {
-        if (at.is) {
-          return
-        }
-        path += at.get || ''
-      })
-      return gun
-        .then(async data => {
-          if (data == null) {
-            return
-          }
-          const user = gun.back(-1).user()
-          const pair = user.pair()
-          let sec = await user
-            .get('trust')
-            .get(pair.pub)
-            .get(path)
-          sec = await SEA.decrypt(sec, pair)
-          if (!sec) {
-            return data
-          }
-          let decrypted = await SEA.decrypt(data, sec)
-          return decrypted
-        })
-        .then(res => {
-          cb && cb(res)
-          return res
-        })
-    }
     module.exports = User
   })(USE, './create');
 
@@ -1190,6 +1149,7 @@
     var u;
     function check(msg){ // REVISE / IMPROVE, NO NEED TO PASS MSG/EVE EACH SUB?
       var eve = this, at = eve.as, put = msg.put, soul = put['#'], key = put['.'], val = put[':'], state = put['>'], id = msg['#'], tmp;
+      if(!soul || !key){ return }
       if((msg._||'').faith && (at.opt||'').faith && 'function' == typeof msg._){
         SEA.verify(SEA.opt.pack(put), false, function(data){ // this is synchronous if false
           put['='] = SEA.opt.unpack(data);
@@ -1200,8 +1160,13 @@
       var no = function(why){ at.on('in', {'@': id, err: why}) };
       //var no = function(why){ msg.ack(why) };
       (msg._||'').DBG && ((msg._||'').DBG.c = +new Date);
-      if('#' === soul[0]){ // special case for content addressing immutable hashed data.
-        check.hash(eve, msg, val, key, soul, at, no); return;
+      if(0 <= soul.indexOf('<?')){ // special case for "do not sync data X old"
+        // 'a~pub.key/b<?9'
+        tmp = parseFloat(soul.split('<?')[1]||'');
+        if(tmp && (state < (Gun.state() - (tmp * 1000)))){ // sec to ms
+          (tmp = msg._) && (tmp = tmp.lot) && (tmp.more--); // THIS IS BAD CODE! It assumes GUN internals do something that will probably change in future, but hacking in now.
+          return; // omit!
+        }
       }
       if('~@' === soul){  // special case for shared system data, the list of aliases.
         check.alias(eve, msg, val, key, soul, at, no); return;
@@ -1212,6 +1177,9 @@
       //if('~' === soul.slice(0,1) && 2 === (tmp = soul.slice(1)).split('.').length){ // special case, account data for a public key.
       if(tmp = SEA.opt.pub(soul)){ // special case, account data for a public key.
         check.pub(eve, msg, val, key, soul, at, no, at.user||'', tmp); return;
+      }
+      if(0 <= soul.indexOf('#')){ // special case for content addressing immutable hashed data.
+        check.hash(eve, msg, val, key, soul, at, no); return;
       }
       check.any(eve, msg, val, key, soul, at, no, at.user||''); return;
       eve.to.next(msg); // not handled
@@ -1420,13 +1388,14 @@
       }
       to.next(msg); // pass forward any data we do not know how to handle or process (this allows custom security protocols).
     }
+    var pubcut = /[^\w_-]/; // anything not alphanumeric or _ -
     SEA.opt.pub = function(s){
       if(!s){ return }
       s = s.split('~');
       if(!s || !(s = s[1])){ return }
-      s = s.split('.');
-      if(!s || 2 > s.length){ return }
-      if('@' === (s[0]||'')[0]){ return } // TODO: Should check ~X.Y. are alphanumeric, not just not @.
+      s = s.split(pubcut).slice(0,2);
+      if(!s || 2 != s.length){ return }
+      if('@' === (s[0]||'')[0]){ return }
       s = s.slice(0,2).join('.');
       return s;
     }
