@@ -206,6 +206,7 @@ header #back-button {
   border-radius: 3px;
   max-height: 250px;
   max-width: 100%;
+  cursor: pointer;
 }
 
 .emoji {

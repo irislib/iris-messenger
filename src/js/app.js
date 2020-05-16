@@ -354,6 +354,24 @@ function openAttachmentsPreview() {
   }
 }
 
+function openAttachmentsGallery(msg) {
+  var attachmentsPreview = $('#attachment-preview');
+  attachmentsPreview.empty();
+  var closeBtn = $('<button>').text('Close').click(closeAttachmentsPreview);
+  attachmentsPreview.append(closeBtn);
+  attachmentsPreview.show();
+  $('#message-list').hide();
+
+  if (msg.attachments) {
+    msg.attachments.forEach(a => {
+      if (a.type.indexOf('image') === 0 && a.data) {
+        var img = $('<img>').attr('src', a.data);
+        attachmentsPreview.append(img);
+      }
+    })
+  }
+}
+
 function closeAttachmentsPreview() {
   $('#attachment-preview').hide();
   $('#message-list').show();
@@ -1096,7 +1114,7 @@ function addMessage(msg, chatId) {
   if (msg.attachments) {
     msg.attachments.forEach(a => {
       if (a.type.indexOf('image') === 0 && a.data) {
-        var img = $('<img>').attr('src', a.data);
+        var img = $('<img>').attr('src', a.data).click(() => { openAttachmentsGallery(msg); });
         msgContent.prepend(img);
       }
     })
