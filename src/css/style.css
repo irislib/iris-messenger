@@ -391,6 +391,11 @@ header #back-button {
   max-height: 60vh;
 }
 
+#attachment-preview button {
+  display: block;
+  margin-bottom: 10px;
+}
+
 #message-list {
   display: flex;
   max-width: 700px;

@@ -327,27 +327,47 @@ if (!iris.util.isMobile) {
   });
 }
 
+$(document).keyup(function(e) {
+  if (e.key === "Escape") { // escape key maps to keycode `27`
+    closeAttachmentsPreview();
+  }
+});
 
-$('#attach-file').click(event => {
-  event.preventDefault();
-  $('#attachment-input').click();
-})
-$('#attachment-input').change(e => {
-  $('#attachment-preview').empty();
+function openAttachmentsPreview() {
+  var attachmentsPreview = $('#attachment-preview');
+  attachmentsPreview.empty();
+  var closeBtn = $('<button>').text('Cancel').click(closeAttachmentsPreview);
+  attachmentsPreview.append(closeBtn);
+
   var files = $('#attachment-input')[0].files;
   if (files) {
-    $('#attachment-preview').show();
+    attachmentsPreview.show();
     $('#message-list').hide();
     for (var i = 0;i < files.length;i++) {
       getBase64(files[i]).then(base64 => {
         chats[activeChat].attachments = chats[activeChat].attachments || [];
         chats[activeChat].attachments.push({type: 'image', data: base64});
         var preview = $('<img>').attr('src', base64);
-        $('#attachment-preview').append(preview);
+        attachmentsPreview.append(preview);
       });
     }
   }
-});
+}
+
+function closeAttachmentsPreview() {
+  $('#attachment-preview').hide();
+  $('#message-list').show();
+  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+  if (activeChat) {
+    chats[activeChat].attachments = null;
+  }
+}
+
+$('#attach-file').click(event => {
+  event.preventDefault();
+  $('#attachment-input').click();
+})
+$('#attachment-input').change(openAttachmentsPreview);
 
 $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
 
@@ -463,6 +483,7 @@ function resetView() {
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
   $('#private-key-qr').remove();
+  closeAttachmentsPreview();
 }
 
 function showMenu(show = true) {
@@ -992,9 +1013,7 @@ function showChat(pub) {
       msg.attachments = chats[pub].attachments;
     }
     chats[pub].send(msg);
-    chats[pub].attachments = null;
-    $('#attachment-preview').hide();
-    $('#message-list').show();
+    closeAttachmentsPreview();
     $('#new-msg').val('');
   });
   changeChatUnseenCount(pub, 0);
