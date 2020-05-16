@@ -394,6 +394,7 @@ header #back-button {
 
 #attachment-preview img {
   max-height: 60vh;
+  max-width: 100%;
 }
 
 #attachment-preview button {
