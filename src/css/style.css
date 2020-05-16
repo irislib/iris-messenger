@@ -409,6 +409,12 @@ header #back-button {
   margin: 0 auto 0 auto;
 }
 
+@media (min-width: 1268px) {
+  #message-list {
+    max-width: 80%;
+  }
+}
+
 .message-form {
   flex:1;
   flex-direction: row;
