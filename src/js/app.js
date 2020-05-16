@@ -1086,9 +1086,11 @@ function sortMessagesByTime() {
   var sorted = $(".msg").sort((a, b) => $(a).data('time') - $(b).data('time'));
   $("#message-list").append(sorted);
   $('.day-separator').remove();
+  $('.from-separator').remove();
   var now = new Date();
   var nowStr = now.toLocaleDateString();
   var previousDateStr;
+  var previousFrom;
   sorted.each(function() {
     var date = $(this).data('time');
     if (!date) { return; }
@@ -1098,6 +1100,14 @@ function sortMessagesByTime() {
       $(this).before($('<div>').text(separatorText).addClass('day-separator'));
     }
     previousDateStr = dateStr;
+
+    var from = $(this).data('from');
+    if (previousFrom && (from !== previousFrom)) {
+      $(this).before($('<div>').addClass('from-separator'));
+    } else {
+      // $(this).find('small').remove();
+    }
+    previousFrom = from;
   });
 }
 
@@ -1134,6 +1144,7 @@ function addMessage(msg, chatId) {
   }
   msgEl = $('<div class="msg"></div>').append(msgContent);
   msgEl.data('time', msg.time);
+  msgEl.data('from', msg.info.from);
   msgEl.toggleClass('our', msg.selfAuthored ? true : false);
   msgEl.toggleClass('their', msg.selfAuthored ? false : true);
   $("#message-list").append(msgEl); // TODO: jquery insertAfter element with smaller timestamp

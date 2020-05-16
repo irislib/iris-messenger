@@ -256,7 +256,7 @@ header #back-button {
   align-items: flex-start;
 }
 
-.msg.their + .msg.our .msg-content, .day-separator + .msg.our .msg-content {
+.msg.their + .msg.our .msg-content, .day-separator + .msg.our .msg-content, .from-separator + .msg.our .msg-content {
   margin-top: 15px;
   border-radius: 8px 0px 8px 8px;
 }
@@ -269,7 +269,11 @@ header #back-button {
   border-radius: 8px 0px 8px 8px;
 }
 
-.msg.our + .msg.their .msg-content, .day-separator + .msg.their .msg-content {
+.from-separator {
+  display: none;
+}
+
+.msg.our + .msg.their .msg-content, .day-separator + .msg.their .msg-content, .from-separator + .msg.their .msg-content {
   margin-top: 15px;
   border-radius: 0px 8px 8px 8px;
 }
