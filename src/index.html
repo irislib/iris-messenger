@@ -329,12 +329,23 @@
           <hr/>
           <h3>Chat Settings</h3>
           <div class="profile-nicknames">
+            <h4>Nicknames</h4>
             <p>
               Nickname: <input id="profile-nickname-their">
             </p>
             <p>
               Their nickname for you: <span id="profile-nickname-my"></span>
             </p>
+          </div>
+          <div class="notification-settings">
+            <h4>Notifications</h4>
+            <p>
+              Select notification preference: 
+            </p>
+            <input type="radio" id="notifyAlways" name="notificationPreference" value="notifyAlways">
+            <label for="notifyAlways">Always</label><br>
+            <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="notifyMentionsOnly">
+            <label for="notifyMentionsOnly">Mentions only</label><br>
           </div>
           <hr/>
           <p>

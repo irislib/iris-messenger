@@ -688,7 +688,9 @@ function notify(msg, info, pub) {
   function shouldNotify() {
     if (msg.time < loginTime) { return false; }
     if (info.selfAuthored) { return false; }
-    if (document.visibilityState === 'visible') { return false; }
+    //if (document.visibilityState === 'visible') { return false; }
+    if (activeChat == Object.keys(chats[pub].secrets)[0]) { return false; } // already looking at chat
+    if (chats[pub].notificationSetting == 'notifyMentionsOnly' && !msg.text.includes(myName)) { return false; }
     return true;
   }
   function shouldDesktopNotify() {
@@ -809,6 +811,10 @@ function showProfile(pub) {
     console.log('add friend');
   });
   $('#profile .delete-chat').off().on('click', () => deleteChat(pub));
+  $('input:radio[name=notificationPreference]').off().on('change', (event) => {
+    console.log(`notifications changed to ${event.target.value}`)
+    chats[pub].put('notificationSetting', event.target.value);
+  });
   $('#profile .send-message').off().on('click', () => showChat(pub));
   $('#profile .copy-user-link').off().on('click', event => {
     copyToClipboard(link);
@@ -1278,6 +1284,10 @@ function addChat(channel) {
     if (pub === activeChat || pub === activeProfile) {
       addUserToHeader(pub);
     }
+  });
+  chats[pub].onMy('notificationSetting', (notifSetting) => {
+    chats[pub].notificationSetting = notifSetting;
+    $(`#${notifSetting}`).prop("checked", true);
   });
   el.click(() => showChat(pub));
   $(".chat-list").append(el);
