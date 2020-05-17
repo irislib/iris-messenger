@@ -1140,7 +1140,7 @@ function addMessage(msg, chatId) {
     var profile = chats[chatId].participantProfiles[msg.info.from];
     var name = profile && profile.name;
     if (name) {
-      var nameEl = $('<small>').text(name).css({color: profile.color, 'margin-bottom':2,display:'block','font-weight':'bold'});
+      var nameEl = $('<small onclick="addMention(this)">').text(name).css({color: profile.color, 'margin-bottom':2,display:'block','font-weight':'bold'}).addClass('msgSenderName');
       msgContent.prepend(nameEl);
     }
   }
@@ -1165,6 +1165,12 @@ function deleteChat(pub) {
   }
   delete chats[pub];
   $('.chat-item[data-pub="' + pub +'"]').remove();
+}
+
+function addMention(element) {
+  console.log($('#new-msg').val() + `@${element.innerText} `)
+  $('#new-msg').val($('#new-msg').val() + `@${element.innerText} `);
+  $('#new-msg').focus();
 }
 
 function getDisplayName(pub) {

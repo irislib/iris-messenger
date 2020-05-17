@@ -269,6 +269,10 @@ header #back-button {
   border-radius: 8px 0px 8px 8px;
 }
 
+.msgSenderName {
+  cursor: pointer;
+}
+
 .from-separator {
   display: none;
 }
