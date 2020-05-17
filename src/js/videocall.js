@@ -1,7 +1,6 @@
 var ringSound = new Audio('./ring.mp3');
 ringSound.loop = true;
 var callSound = new Audio('./call.mp3');
-var activeCall;
 var callTimeout;
 var callSoundTimeout;
 var callingInterval;
@@ -22,7 +21,27 @@ function notifyIfNotVisible(pub, text) {
       showChat(pub);
       window.focus();
     };
-  } 
+  }
+}
+
+function showIncomingCall(pub) {
+  if ($('#active-call').length === 0 && $('#incoming-call').length === 0) {
+    var incomingCallEl = $('<div>')
+      .attr('id', 'incoming-call')
+      .text(`Incoming call from ${chats[pub].name}`)
+      .css({position:'fixed', right:0, bottom: 0, height:300, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: '15px 0'});
+    var answer = $('<button>').text('answer').css({display:'block',margin: '15px auto'});
+    var reject = $('<button>').text('reject').css({display:'block',margin: '15px auto'});
+    answer.click(() => answerCall(pub));
+    reject.click(() => rejectCall(pub));
+    incomingCallEl.append(answer);
+    incomingCallEl.append(reject);
+    $('body').append(incomingCallEl)
+    ringSound.play();
+    notifyIfNotVisible(pub, 'Incoming call');
+  }
+  clearTimeout(callTimeout);
+  callTimeout = setTimeout(closeIncomingCall, 5000);
 }
 
 function onCallMessage(pub, call) {
@@ -38,65 +57,28 @@ function onCallMessage(pub, call) {
         return;
       }
       console.log('incoming call from', pub, call);
-      if (!activeCall && $('#incoming-call').length === 0) {
-        activeCall = pub;
-        var incomingCallEl = $('<div>')
-          .attr('id', 'incoming-call')
-          .text(`Incoming call from ${chats[pub].name}`)
-          .css({position:'fixed', right:0, bottom: 0, height:300, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: '15px 0'});
-        var answer = $('<button>').text('answer').css({display:'block',margin: '15px auto'});
-        var reject = $('<button>').text('reject').css({display:'block',margin: '15px auto'});
-        answer.click(() => answerCall(pub, call));
-        reject.click(() => rejectCall(pub));
-        incomingCallEl.append(answer);
-        incomingCallEl.append(reject);
-        $('body').append(incomingCallEl)
-        ringSound.play();
-        notifyIfNotVisible(pub, 'Incoming call');
-      }
-      clearTimeout(callTimeout);
-      callTimeout = setTimeout(() => {
-        $('#incoming-call').remove();
-        activeCall = null;
-        ringSound.pause();
-      }, 5000);
-    } else if (call.answer) {
-      stopCalling(pub);
-      $('#outgoing-call').remove();
-      chats[pub].put('call', {
-        time: new Date().toISOString(),
-        started: true,
-      });
-      chats[pub].pc.setRemoteDescription({type: "answer", sdp: call.answer});
-      console.log('call answered by', pub);
-      createCallElement(pub);
-      chats[pub].pc.ontrack = (event) => {
-        console.log('ontrack', event);
-        if (remoteVideo[0].srcObject !== event.streams[0]) {
-          remoteVideo[0].srcObject = event.streams[0];
-          remoteVideo[0].onloadedmetadata = function(e) {
-            remoteVideo[0].play();
-          };
-          console.log('received remote stream', event);
-        }
-      };
+      showIncomingCall(pub);
     }
   } else {
-    if ($('#outgoing-call').length) {
-      stopCalling(pub);
-      stopUserMedia(pub);
-      $('#outgoing-call').empty();
-      $('#outgoing-call').append($('<div>').text(`Call rejected by ${chats[pub].name}`));
-      $('#outgoing-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#outgoing-call').remove()));
-      notifyIfNotVisible('Call rejected');
-    } else if ($('#active-call').length) {
-      stopUserMedia(pub);
-      chats[pub].put('call', null);
-      $('#active-call').empty();
-      $('#active-call').append($('<div>').text(`Call with ${chats[pub].name} ended`));
-      $('#active-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#active-call').remove()));
-      notifyIfNotVisible('Call ended');
-    }
+    callClosed(pub);
+  }
+}
+
+function callClosed(pub) {
+  if ($('#outgoing-call').length) {
+    stopCalling(pub);
+    stopUserMedia(pub);
+    $('#outgoing-call').empty();
+    $('#outgoing-call').append($('<div>').text(`Call rejected by ${chats[pub].name}`));
+    $('#outgoing-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#outgoing-call').remove()));
+    notifyIfNotVisible('Call rejected');
+  } else if ($('#active-call').length) {
+    stopUserMedia(pub);
+    chats[pub].put('call', null);
+    $('#active-call').empty();
+    $('#active-call').append($('<div>').text(`Call with ${chats[pub].name} ended`));
+    $('#active-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#active-call').remove()));
+    notifyIfNotVisible('Call ended');
   }
 }
 
@@ -124,43 +106,29 @@ function timeoutPlayCallSound() {
 async function callUser(pub, video = true) {
   if (callingInterval) { return; }
 
-  var config = {iceServers: [{urls: "stun:stun.1.google.com:19302"}]};
-  var pc = chats[pub].pc = new RTCPeerConnection(config);
-  pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
-
-  await addStreamToPeerConnection(pc);
-
-  await pc.setLocalDescription(await pc.createOffer({
-    offerToReceiveAudio: 1,
-    offerToReceiveVideo: 1
-  }));
-  pc.onicecandidate = ({candidate}) => {
-    if (candidate) return;
-    if (!callingInterval) {
-      console.log('calling', pub);
-      var call = () => chats[pub].put('call', {
-        time: new Date().toISOString(),
-        type: video ? 'video' : 'voice',
-        offer: pc.localDescription.sdp,
-      });
-      call();
-      callSound.addEventListener('ended', timeoutPlayCallSound);
-      callSound.play();
-      callingInterval = setInterval(call, 1000);
-      var activeCallEl = $('<div>')
-        .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
-        .text(`calling ${chats[pub].name}`)
-        .attr('id', 'outgoing-call');
-      var cancelButton = $('<button>')
-        .css({display:'block', margin: '15px auto'})
-        .text('cancel')
-        .click(() => cancelCall(pub));
-      activeCallEl.append(cancelButton);
-      activeCallEl.append(localVideo);
-      activeCallEl.append(remoteVideo);
-      $('body').append(activeCallEl);
-    }
-  };
+  await initConnection(true, pub);
+  console.log('calling', pub);
+  var call = () => chats[pub].put('call', {
+    time: new Date().toISOString(),
+    type: video ? 'video' : 'voice',
+    offer: true,
+  });
+  callingInterval = setInterval(call, 1000);
+  call();
+  callSound.addEventListener('ended', timeoutPlayCallSound);
+  callSound.play();
+  var activeCallEl = $('<div>')
+    .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
+    .text(`calling ${chats[pub].name}`)
+    .attr('id', 'outgoing-call');
+  var cancelButton = $('<button>')
+    .css({display:'block', margin: '15px auto'})
+    .text('cancel')
+    .click(() => cancelCall(pub));
+  activeCallEl.append(cancelButton);
+  activeCallEl.append(localVideo);
+  activeCallEl.append(remoteVideo);
+  $('body').append(activeCallEl);
 }
 
 function cancelCall(pub) {
@@ -190,14 +158,17 @@ function endCall(pub) {
   chats[pub].put('call', null);
 }
 
-function rejectCall(pub) {
-  chats[pub].rejectedTime = new Date();
+function closeIncomingCall() {
   $('#incoming-call').remove();
-  activeCall = null;
   clearTimeout(callTimeout);
   ringSound.pause();
   ringSound.currentTime = 0;
   incomingCallNotification && incomingCallNotification.close();
+}
+
+function rejectCall(pub) {
+  chats[pub].rejectedTime = new Date();
+  closeIncomingCall();
   chats[pub].put('call', null);
 }
 
@@ -212,37 +183,108 @@ async function createCallElement(pub) {
   $(activeCallEl).append(remoteVideo);
 }
 
-async function answerCall(pub, call) {
-  $('#incoming-call').remove();
-  ringSound.pause();
-  incomingCallNotification && incomingCallNotification.close();
+async function initConnection(createOffer, pub) {
   var config = {iceServers: [{   urls: [ "stun:eu-turn4.xirsys.com" ], }, {urls: "stun:stun.1.google.com:19302"}, {   username: "ml0jh0qMKZKd9P_9C0UIBY2G0nSQMCFBUXGlk6IXDJf8G2uiCymg9WwbEJTMwVeiAAAAAF2__hNSaW5vbGVl",   credential: "4dd454a6-feee-11e9-b185-6adcafebbb45",   urls: [       "turn:eu-turn4.xirsys.com:80?transport=udp",       "turn:eu-turn4.xirsys.com:3478?transport=udp",       "turn:eu-turn4.xirsys.com:80?transport=tcp",       "turn:eu-turn4.xirsys.com:3478?transport=tcp",       "turns:eu-turn4.xirsys.com:443?transport=tcp",       "turns:eu-turn4.xirsys.com:5349?transport=tcp"   ]}]};;
-  var pc = chats[pub].pc = new RTCPeerConnection(config);
+  chats[pub].pc = new RTCPeerConnection(config);
+  var pc = chats[pub].pc;
   await addStreamToPeerConnection(pc);
-  pc.oniceconnectionstatechange = e => console.log(pc.iceConnectionState);
+  async function createOfferFn() {
+    try {
+      if (chats[pub].isNegotiating) { return; }
+      chats[pub].isNegotiating = true;
+      var offer = await pc.createOffer();
+      pc.setLocalDescription(offer);
+      chats[pub].put('sdp', {time: new Date().toISOString(), data: offer});
+    } finally {
+      chats[pub].isNegotiating = false;
+    }
+  }
+  if (createOffer) {
+    await createOfferFn();
+  }
+  chats[pub].onTheir('sdp', async sdp => {
+    if (sdp.data && sdp.time && new Date(sdp.time) < (new Date() - 5000)) { return; }
+    stopCalling();
+    console.log('got their sdp', sdp);
+    pc.setRemoteDescription(new RTCSessionDescription(sdp.data));
+  });
+  chats[pub].onTheir('icecandidate', c => {
+    if (c.data && c.time && new Date(c.time) < (new Date() - 5000)) { return; }
+    console.log('got their icecandidate', c);
+    pc.addIceCandidate(new RTCIceCandidate(c.data)).then(console.log, console.error);;
+  });
+  pc.onicecandidate = pc.onicecandidate || (({candidate}) => {
+    if (!candidate) return;
+    console.log('sending our ice candidate');
+    chats[pub].put('icecandidate', {time: new Date().toISOString(), data: candidate});
+  });
+  if (createOffer) {
+    pc.onnegotiationneeded = async () => {
+      createOfferFn();
+    };
+  };
+  pc.onsignalingstatechange = async d => {
+    console.log(
+      "Signaling State Change:" + pc,
+      pc.signalingState
+    );
+    switch (pc.signalingState) {
+      case "have-remote-offer":
+        var answer = await pc.createAnswer({
+          offerToReceiveAudio: 1,
+          offerToReceiveVideo: 1
+        });
+        pc.setLocalDescription(answer);
+        chats[pub].put('sdp', {time: new Date().toISOString(), data: answer});
+        break;
+      case "stable":
+        stopCalling(pub);
+        $('#outgoing-call').remove();
+        console.log('call answered by', pub);
+        createCallElement(pub);
+        break;
+      case "closed":
+        console.log("Signalling state is 'closed'");
+        callClosed(pub);
+        break;
+    }
+  };
+  pc.onconnectionstatechange = e => {
+    console.log('iceConnectionState changed', pc.iceConnectionState);
+    switch (pc.iceConnectionState) {
+      case "connected":
+        break;
+      case "disconnected":
+        callClosed(pub);
+        break;
+      case "new":
+        //callClosed(pub);
+        break;
+      case "failed":
+        callClosed(pub);
+        break;
+      case "closed":
+        callClosed(pub);
+        break;
+      default:
+        console.log("Change of state", pc.iceConnectionState);
+        break;
+    }
+  };
   pc.ontrack = (event) => {
     console.log('ontrack', event);
     if (remoteVideo[0].srcObject !== event.streams[0]) {
       remoteVideo[0].srcObject = event.streams[0];
       remoteVideo[0].onloadedmetadata = function(e) {
+        console.log('metadata loaded');
         remoteVideo[0].play();
       };
       console.log('received remote stream', event);
     }
   };
+}
 
-  await pc.setRemoteDescription({type: "offer", sdp: call.offer});
-  await pc.setLocalDescription(await pc.createAnswer({
-    offerToReceiveAudio: 1,
-    offerToReceiveVideo: 1
-  }));
-  pc.onicecandidate = ({candidate}) => {
-    if (candidate) return;
-    chats[pub].put('call', {
-      time: new Date().toISOString(),
-      answer: pc.localDescription.sdp,
-    });
-    console.log('answered call from', pub, 'with', pc.localDescription.sdp);
-    createCallElement(pub);
-  };
+async function answerCall(pub) {
+  closeIncomingCall();
+  await initConnection(false, pub);
 }

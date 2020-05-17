@@ -37,7 +37,7 @@ setInterval(checkGunPeerCount, 2000);
 
 var notificationSound = new Audio('./notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
-var chats = {};
+var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 var activeChat;
 var activeProfile;
@@ -185,11 +185,21 @@ function login(k) {
   });
   setOurOnlineStatus();
   iris.Channel.getChannels(gun, key, addChat);
-  var chatWith = getUrlParameter('chatWith');
-  if (chatWith) {
-    newChat(chatWith, window.location.href);
-    showChat(chatWith);
-    window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
+  var chatId = getUrlParameter('chatWith') || getUrlParameter('channelId');
+  var inviter = getUrlParameter('inviter');
+  if (chatId) {
+    function go() {
+      if (inviter !== key.pub) {
+        newChat(chatId, window.location.href);
+      }
+      showChat(chatId);
+      window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
+    }
+    if (inviter) {
+      setTimeout(go, 2000); // wait a sec to not re-create the same chat
+    } else {
+      go();
+    }
   } else {
     if (iris.util.isMobile) {
       showMenu();
@@ -317,20 +327,128 @@ if (!iris.util.isMobile) {
   });
 }
 
+$(document).keyup(function(e) {
+  if (e.key === "Escape") { // escape key maps to keycode `27`
+    closeAttachmentsPreview();
+  }
+});
+
+function openAttachmentsPreview() {
+  var attachmentsPreview = $('#attachment-preview');
+  attachmentsPreview.empty();
+  var closeBtn = $('<button>').text('Cancel').click(closeAttachmentsPreview);
+  attachmentsPreview.append(closeBtn);
+
+  var files = $('#attachment-input')[0].files;
+  if (files) {
+    attachmentsPreview.show();
+    $('#message-list').hide();
+    for (var i = 0;i < files.length;i++) {
+      getBase64(files[i]).then(base64 => {
+        chats[activeChat].attachments = chats[activeChat].attachments || [];
+        chats[activeChat].attachments.push({type: 'image', data: base64});
+        var preview = $('<img>').attr('src', base64);
+        attachmentsPreview.append(preview);
+      });
+    }
+  }
+}
+
+function openAttachmentsGallery(msg) {
+  var attachmentsPreview = $('#attachment-preview');
+  attachmentsPreview.empty();
+  var closeBtn = $('<button>').text('Close').click(closeAttachmentsPreview);
+  attachmentsPreview.append(closeBtn);
+  attachmentsPreview.show();
+  $('#message-list').hide();
+
+  if (msg.attachments) {
+    msg.attachments.forEach(a => {
+      if (a.type.indexOf('image') === 0 && a.data) {
+        var img = $('<img>').attr('src', a.data);
+        attachmentsPreview.append(img);
+      }
+    })
+  }
+}
+
+function closeAttachmentsPreview() {
+  $('#attachment-preview').hide();
+  $('#message-list').show();
+  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+  if (activeChat) {
+    chats[activeChat].attachments = null;
+  }
+}
+
+$('#attach-file').click(event => {
+  event.preventDefault();
+  $('#attachment-input').click();
+})
+$('#attachment-input').change(openAttachmentsPreview);
+
 $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
 
 $('#paste-chat-link').on('input', event => {
   var val = $(event.target).val();
-  if (val.length < 30 || val.indexOf('chatWith') === -1) {
+  if (val.length < 30) {
+    return;
+  }
+  var s = val.split('?');
+  if (s.length !== 2) { return; }
+  var chatId = getUrlParameter('chatWith', s[1]) || getUrlParameter('channelId', s[1]);
+  if (chatId) {
+    newChat(chatId, val);
+    showChat(chatId);
+  }
+  $(event.target).val('');
+});
+
+var newGroupParticipants = [];
+$('#new-group-participant').on('input', event => {
+  var val = $(event.target).val();
+  if (val.length < 30) {
     return;
   }
   var s = val.split('?');
   if (s.length !== 2) { return; }
   var pub = getUrlParameter('chatWith', s[1]);
-  newChat(pub, val);
-  showChat(pub);
+  if (pub) {
+    if (newGroupParticipants.indexOf(pub) >= 0) { $('#new-group-participant').val(''); return; }
+    var identicon = getIdenticon(pub, 40).css({'margin-right':15});
+    var nameEl = $('<span>');
+    gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
+    var el = $('<p>').css({display:'flex', 'align-items': 'center'});
+    var removeBtn = $('<button>').css({'margin-right': 15}).text('Remove').click(() => {
+      el.remove();
+      newGroupParticipants.forEach((p, i) => {if (p===pub) { newGroupParticipants.splice(i, 1); }})
+    });
+    el.append(removeBtn);
+    el.append(identicon);
+    el.append(nameEl);
+    $('#new-group-participants').append(el);
+    newGroupParticipants.push(pub);
+  }
   $(event.target).val('');
 });
+
+$('#new-group-create').click(createGroup);
+function createGroup(e) {
+  e.preventDefault();
+  if ($('#new-group-name').val().length) {
+    var c = new iris.Channel({
+      gun,
+      key,
+      participants: newGroupParticipants,
+    });
+    newGroupParticipants = [];
+    c.put('name', $('#new-group-name').val());
+    $('#new-group-participants').empty();
+    $('#new-group-name').val('');
+    addChat(c);
+    showChat(c.uuid);
+  }
+}
 
 $('.chat-item.new').click(showNewChat);
 
@@ -383,6 +501,7 @@ function resetView() {
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
   $('#private-key-qr').remove();
+  closeAttachmentsPreview();
 }
 
 function showMenu(show = true) {
@@ -583,9 +702,11 @@ function notify(msg, info, pub) {
     notificationSound.play();
   }
   if (shouldDesktopNotify()) {
+    var body = chats[pub].uuid ? `${chats[pub].participantProfiles[info.from].name}: ${msg.text}` : msg.text;
+    body = truncateString(body, 50);
     var desktopNotification = new Notification(getDisplayName(pub), {
       icon: 'img/icon128.png',
-      body: truncateString(msg.text, 50),
+      body,
       silent: true
     });
     desktopNotification.onclick = function() {
@@ -675,14 +796,15 @@ function showProfile(pub) {
   $('#profile').show();
   addUserToHeader(pub);
   setTheirOnlineStatus(pub);
+  renderGroupParticipants(pub);
   gun.user(pub).get('profile').get('photo').on(photo => {
     $('#profile .profile-photo-container').show();
     $('#profile .profile-photo').attr('src', photo);
   });
-  $('#profile .profile-about').toggle(chats[pub].about && chats[pub].about.length > 0);
+  $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
   $('#profile .profile-about-content').empty();
-  $('#profile .profile-about-content').text(chats[pub].about);
-  const link = getUserChatLink(pub);
+  $('#profile .profile-about-content').text(chats[pub] && chats[pub].about);
+  const link = chats[pub] && chats[pub].getSimpleLink();
   $('#profile .add-friend').off().on('click', () => {
     console.log('add friend');
   });
@@ -700,8 +822,13 @@ function showProfile(pub) {
       t.css('width', '');
     }, 2000);
   });
-  $('#profile-nickname-their').not(':focus').val(chats[pub].theirNickname);
-  $('#profile-nickname-my').text(chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
+  $('#profile-group-name').not(':focus').val(chats[pub] && chats[pub].name);
+  $('#profile-group-name').off().on('input', event => {
+    var name = event.target.value;
+    chats[pub].put('name', name);
+  });
+  $('#profile-nickname-their').not(':focus').val(chats[pub] && chats[pub].theirNickname);
+  $('#profile-nickname-my').text(chats[pub] && chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
   $('#profile-nickname-their').off().on('input', event => {
     var nick = event.target.value;
     chats[pub].put('nickname', nick);
@@ -715,6 +842,78 @@ function showProfile(pub) {
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H
   });
+  $('#profile-group-settings').toggle(!!(chats[pub] && chats[pub].uuid));
+}
+
+var newGroupParticipant;
+$('#profile-add-participant').on('input', event => {
+  var val = $(event.target).val();
+  if (val.length < 30) {
+    return;
+  }
+  var s = val.split('?');
+  if (s.length !== 2) { return; }
+  var pub = getUrlParameter('chatWith', s[1]);
+  if (pub) {
+    $('#profile-add-participant-candidate').remove();
+    var identicon = getIdenticon(pub, 40).css({'margin-right':15});
+    var nameEl = $('<span>');
+    gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
+    var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
+    var removeBtn = $('<button>').css({'margin-right': 15}).text('Cancel').click(() => {
+      el.remove();
+      newGroupParticipant = null;
+    });
+    el.append(removeBtn);
+    el.append(identicon);
+    el.append(nameEl);
+    newGroupParticipant = pub;
+    $('#profile-add-participant-input').after(el);
+  }
+  $(event.target).val('');
+});
+$('#profile-add-participant-button').click(() => {
+  if (newGroupParticipant) {
+    chats[activeProfile].addParticipant(newGroupParticipant);
+    newGroupParticipant = null;
+    $('#profile-add-participant-input').val('');
+    $('#profile-add-participant-candidate').remove();
+  }
+});
+
+function renderGroupParticipants(pub) {
+  if (!(chats[pub] && chats[pub].uuid)) {
+    $('#profile-group-settings').hide();
+    return;
+  } else {
+    $('#profile-group-settings').show();
+  }
+  $('#profile-group-participants').empty();
+  var keys = Object.keys(chats[pub].participantProfiles);
+  var me = chats[pub].participantProfiles[key.pub];
+  if (me && me.permissions) {
+    $('#profile-add-participant').toggle(me.permissions.admin);
+    $('#profile-group-name-container').toggle(me.permissions.admin);
+  }
+  keys.forEach(k => {
+    var profile = chats[pub].participantProfiles[k];
+    var identicon = getIdenticon(k, 40).css({'margin-right':15});
+    var nameEl = $('<span>');
+    gun.user(k).get('profile').get('name').on(name => nameEl.text(name));
+    var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
+    var removeBtn = $('<button>').css({'margin-right': 15}).text('Remove').click(() => {
+      el.remove();
+      // TODO remove group participant
+    });
+    //el.append(removeBtn);
+    el.append(identicon);
+    el.append(nameEl);
+    if (profile.permissions && profile.permissions.admin) {
+      el.append($('<small>').text('admin').css({'margin-left': 5}));
+    }
+    el.click(() => showProfile(k));
+    $('#profile-group-participants').append(el);
+  });
 }
 
 function addUserToHeader(pub) {
@@ -723,7 +922,7 @@ function addUserToHeader(pub) {
   if (pub === key.pub && activeProfile !== pub) {
     nameEl.html("📝<b>Note to Self</b>");
   } else if (chats[pub]) {
-    nameEl.text(truncateString(getDisplayName(pub), 30));
+    nameEl.text(getDisplayName(pub));
   }
   nameEl.show();
 
@@ -733,6 +932,11 @@ function addUserToHeader(pub) {
   $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
+  if (chats[pub] && chats[pub].uuid) {
+    var t = Object.keys(chats[pub].participantProfiles).map(p => chats[pub].participantProfiles[p].name).join(', ');
+    var namesEl = $('<small>').addClass('participants').text(t);
+    textEl.append(namesEl);
+  }
   textEl.append($('<small>').addClass('last-seen'));
   textEl.append($('<small>').addClass('typing-indicator').text('typing...'));
   $("#header-content").append(textEl);
@@ -766,6 +970,7 @@ function changeChatUnseenCount(pub, change) {
 }
 
 function setTheirOnlineStatus(pub) {
+  if (!chats[pub]) return;
   var online = chats[pub].online;
   if (online && (activeChat === pub || activeProfile === pub)) {
     if (online.isOnline) {
@@ -801,27 +1006,38 @@ function showChat(pub) {
   if (!iris.util.isMobile) {
     $("#new-msg").focus();
   }
-  var setTypingThrottled = _.throttle(() => {
-    chats[pub].setTyping($('#new-msg').val().length > 0);
-  }, 1000);
+  var isTyping = false;
+  var getIsTyping = () => $('#new-msg').val().length > 0;
+  var setTyping = () => chats[pub].setTyping(getIsTyping());
+  var setTypingThrottled = _.throttle(setTyping, 1000);
   $('#new-msg').val(chats[pub].msgDraft);
   $('#new-msg').off().on('input', () => {
-    setTypingThrottled();
+    if (isTyping === getIsTyping()) {
+      setTypingThrottled();
+    } else {
+      setTyping();
+    }
+    isTyping = getIsTyping();
     chats[pub].msgDraft = $('#new-msg').val();
   });
   $(".message-form form").off().on('submit', event => {
     event.preventDefault();
     chats[pub].msgDraft = null;
     var text = $('#new-msg').val();
-    if (!text.length) { return; }
+    if (!text.length && !chats[pub].attachments) { return; }
     chats[pub].setTyping(false);
-    chats[pub].send(text);
+    var msg = {text};
+    if (chats[pub].attachments) {
+      msg.attachments = chats[pub].attachments;
+    }
+    chats[pub].send(msg);
+    closeAttachmentsPreview();
     $('#new-msg').val('');
   });
   changeChatUnseenCount(pub, 0);
   addUserToHeader(pub);
   var msgs = Object.values(chats[pub].messages);
-  msgs.forEach(addMessage);
+  msgs.forEach(msg => addMessage(msg, pub));
   sortMessagesByTime();
   $('#message-view').scroll(() => {
     var scrollPosition = $('#message-view').scrollTop();
@@ -870,9 +1086,11 @@ function sortMessagesByTime() {
   var sorted = $(".msg").sort((a, b) => $(a).data('time') - $(b).data('time'));
   $("#message-list").append(sorted);
   $('.day-separator').remove();
+  $('.from-separator').remove();
   var now = new Date();
   var nowStr = now.toLocaleDateString();
   var previousDateStr;
+  var previousFrom;
   sorted.each(function() {
     var date = $(this).data('time');
     if (!date) { return; }
@@ -882,12 +1100,21 @@ function sortMessagesByTime() {
       $(this).before($('<div>').text(separatorText).addClass('day-separator'));
     }
     previousDateStr = dateStr;
+
+    var from = $(this).data('from');
+    if (previousFrom && (from !== previousFrom)) {
+      $(this).before($('<div>').addClass('from-separator'));
+      $(this).find('small').show();
+    } else {
+      $(this).find('small').hide();
+    }
+    previousFrom = from;
   });
 }
 
 var seenIndicatorHtml = '<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>';
 
-function addMessage(msg) {
+function addMessage(msg, chatId) {
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
   var seenHtml = msg.selfAuthored ? ' ' + seenIndicatorHtml : '';
@@ -895,6 +1122,22 @@ function addMessage(msg) {
     '<div class="msg-content"><div class="time">' + iris.util.formatTime(msg.time) + seenHtml + '</div></div>'
   );
   msgContent.prepend(textEl);
+  if (msg.attachments) {
+    msg.attachments.forEach(a => {
+      if (a.type.indexOf('image') === 0 && a.data) {
+        var img = $('<img>').attr('src', a.data).click(() => { openAttachmentsGallery(msg); });
+        msgContent.prepend(img);
+      }
+    })
+  }
+  if (chats[chatId].uuid && !msg.info.selfAuthored) {
+    var profile = chats[chatId].participantProfiles[msg.info.from];
+    var name = profile && profile.name;
+    if (name) {
+      var nameEl = $('<small>').text(name).css({color: profile.color, 'margin-bottom':2,display:'block','font-weight':'bold'});
+      msgContent.prepend(nameEl);
+    }
+  }
   if (msg.text.length === 2 && isEmoji(msg.text)) {
     textEl.toggleClass('emoji-only', true);
   } else {
@@ -902,6 +1145,7 @@ function addMessage(msg) {
   }
   msgEl = $('<div class="msg"></div>').append(msgContent);
   msgEl.data('time', msg.time);
+  msgEl.data('from', msg.info.from);
   msgEl.toggleClass('our', msg.selfAuthored ? true : false);
   msgEl.toggleClass('their', msg.selfAuthored ? false : true);
   $("#message-list").append(msgEl); // TODO: jquery insertAfter element with smaller timestamp
@@ -927,7 +1171,7 @@ function getDisplayName(pub) {
   } else {
     displayName = chats[pub].name;
   }
-  return displayName;
+  return displayName || '';
 }
 
 function newChat(pub, chatLink) {
@@ -963,11 +1207,7 @@ var askForPeers = _.once(pub => {
 });
 
 function addChat(channel) {
-  var participants = channel.getParticipants();
-  if (participants.length > 1) {
-    return; // group chats not supported yet
-  }
-  var pub = participants[0];
+  var pub = channel.getId();
   if (chats[pub]) { return; }
   chats[pub] = channel;
   $('#welcome').remove();
@@ -977,6 +1217,7 @@ function addChat(channel) {
   var typingIndicator = el.find('.typing-indicator').text('Typing...');
   chats[pub].getMessages((msg, info) => {
     chats[pub].messages[msg.time] = msg;
+    msg.info = info;
     msg.selfAuthored = info.selfAuthored;
     msg.time = new Date(msg.time);
     if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
@@ -1006,14 +1247,14 @@ function addChat(channel) {
       sortChatsByLatest();
     }
     if (activeChat === pub) {
-      addMessage(msg);
+      addMessage(msg, pub);
       sortMessagesByTime(); // this is slow if message history is loaded while chat active
       if (chats[pub].latest.time === msg.time && areWeOnline) {
         chats[pub].setMyMsgsLastSeenTime();
       }
       if (chats[pub].theirLastSeenTime) {
         $('#not-seen-by-them').slideUp();
-      } else {
+      } else if (!chats[pub].uuid) {
         $('#not-seen-by-them').slideDown();
       }
       $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
@@ -1035,19 +1276,6 @@ function addChat(channel) {
       el.find('.name').text(truncateString(getDisplayName(pub), 20));
     }
     if (pub === activeChat || pub === activeProfile) {
-      addUserToHeader(pub);
-    }
-  });
-  gun.user(pub).get('profile').get('name').on(name => {
-    if (name && typeof name === 'string') {
-      chats[pub].name = name;
-    }
-    if (pub === key.pub) {
-      el.find('.name').html("📝<b>Note to Self</b>");
-    } else {
-      el.find('.name').text(truncateString(getDisplayName(pub), 20));
-    }
-    if (pub === activeChat) {
       addUserToHeader(pub);
     }
   });
@@ -1082,13 +1310,64 @@ function addChat(channel) {
       setDeliveredCheckmarks(pub);
     }
   });
-  gun.user(pub).get('profile').get('about').on(about => {
+  function setName(name, from) {
+    if (chats[pub].uuid) {
+      var profile = chats[pub].participantProfiles[from];
+      if (profile && !(profile.permissions && profile.permissions.admin)) {
+        return;
+      }
+    }
+    if (name && typeof name === 'string') {
+      chats[pub].name = name;
+    }
+    if (pub === key.pub) {
+      el.find('.name').html("📝<b>Note to Self</b>");
+    } else {
+      el.find('.name').text(truncateString(getDisplayName(pub), 20));
+    }
+    if (pub === activeChat || pub === activeProfile) {
+      addUserToHeader(pub);
+    }
+    if (pub === activeProfile) {
+      $('#profile-group-name').not(':focus').val(name);
+    }
+  }
+  function setAbout(about) {
     chats[pub].about = about;
     if (activeProfile === pub) {
       $('#profile .profile-about').toggle(about && about.length > 0);
       $('#profile .profile-about-content').text(about);
     }
-  });
+  }
+  if (chats[pub].uuid) {
+    chats[pub].on('name', setName);
+    chats[pub].on('about', setAbout);
+    chats[pub].participantProfiles = {};
+    var participants = chats[pub].getParticipants();
+    chats[pub].onMy('participants', participants => {
+      if (typeof participants === 'object') {
+        var keys = Object.keys(participants);
+        keys.forEach((k, i) => {
+          if (chats[pub].participantProfiles[k]) { return; }
+          var hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
+          chats[pub].participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
+          gun.user(k).get('profile').get('name').on(name => {
+            chats[pub].participantProfiles[k].name = name;
+          });
+        });
+      }
+      if (activeProfile === pub) {
+        renderGroupParticipants(pub);
+      }
+      if (activeChat === pub) {
+        addUserToHeader(pub);
+      }
+    });
+    var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  } else {
+    gun.user(pub).get('profile').get('name').on(setName);
+    gun.user(pub).get('profile').get('about').on(setAbout);
+  }
   chats[pub].onTheir('call', call => onCallMessage(pub, call));
 }
 
@@ -1136,7 +1415,7 @@ function lastSeenTimeChanged(pub) {
       });
       // set seen msgs
     } else {
-      if ($('.msg.our').length) {
+      if (!chats[pub].uuid && $('.msg.our').length) {
         $('#not-seen-by-them').slideDown();
       }
     }
@@ -1153,3 +1432,10 @@ function setUnseenTotal() {
     $('.unseen-total').hide();
   }
 }
+
+function refreshUnlessActive() { // hacky way to make sure that gun resyncs on network changes
+  if (!areWeOnline) { // if you haven't been active in the window in the last 60 seconds
+    location.reload();
+  }
+}
+window.addEventListener('online',  refreshUnlessActive);

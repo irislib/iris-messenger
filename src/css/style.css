@@ -158,6 +158,13 @@ header #header-content {
   display: flex;
   flex-direction: row;
   align-items: center;
+  max-width: 100%;
+}
+
+@media (max-width: 575px) {
+  header #header-content {
+    max-width: calc(100% - 35px);
+  }
 }
 
 header #back-button {
@@ -193,6 +200,13 @@ header #back-button {
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
   flex: none;
   max-width: 75%;
+}
+
+.msg-content img {
+  border-radius: 6px;
+  max-height: 250px;
+  max-width: 100%;
+  cursor: pointer;
 }
 
 .emoji {
@@ -242,7 +256,7 @@ header #back-button {
   align-items: flex-start;
 }
 
-.msg.their + .msg.our .msg-content, .day-separator + .msg.our .msg-content {
+.msg.their + .msg.our .msg-content, .day-separator + .msg.our .msg-content, .from-separator + .msg.our .msg-content {
   margin-top: 15px;
   border-radius: 8px 0px 8px 8px;
 }
@@ -255,7 +269,11 @@ header #back-button {
   border-radius: 8px 0px 8px 8px;
 }
 
-.msg.our + .msg.their .msg-content, .day-separator + .msg.their .msg-content {
+.from-separator {
+  display: none;
+}
+
+.msg.our + .msg.their .msg-content, .day-separator + .msg.their .msg-content, .from-separator + .msg.their .msg-content {
   margin-top: 15px;
   border-radius: 0px 8px 8px 8px;
 }
@@ -368,11 +386,33 @@ header #back-button {
   font-size: 35px !important;
 }
 
+#attachment-preview {
+  display: none;
+  text-align: center;
+  overflow: hidden;
+}
+
+#attachment-preview img {
+  max-height: 60vh;
+  max-width: 100%;
+}
+
+#attachment-preview button {
+  display: block;
+  margin-bottom: 10px;
+}
+
 #message-list {
   display: flex;
   max-width: 700px;
   flex-direction: column;
   margin: 0 auto 0 auto;
+}
+
+@media (min-width: 1268px) {
+  #message-list {
+    max-width: 80%;
+  }
 }
 
 .message-form {

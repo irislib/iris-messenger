@@ -46,7 +46,6 @@
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('serviceworker.js')
         .then(function(registration) {
-          // Registration was successful
           // console.log('ServiceWorker registration successful with scope: ', registration.scope);
         })
         .catch(function(err) {
@@ -121,6 +120,7 @@
       <!-- Chat view -->
       <div class="main-view" id="message-view">
         <div id="message-list"></div>
+        <div id="attachment-preview"></div>
       </div>
       <div id="not-seen-by-them" style="display: none">
         <p>If the other person doesn't see your message, you can give them <b>your</b> chat link through some other channel:</p>
@@ -128,6 +128,10 @@
       </div>
       <div class="message-form" style="display:none">
         <form autocomplete="off">
+          <input name="attachment-input" type="file" class="hidden" id="attachment-input" accept="image/*" multiple>
+          <button type="button" id="attach-file">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21.586 10.461l-10.05 10.075c-1.95 1.949-5.122 1.949-7.071 0s-1.95-5.122 0-7.072l10.628-10.585c1.17-1.17 3.073-1.17 4.243 0 1.169 1.17 1.17 3.072 0 4.242l-8.507 8.464c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414l7.093-7.05-1.415-1.414-7.093 7.049c-1.172 1.172-1.171 3.073 0 4.244s3.071 1.171 4.242 0l8.507-8.464c.977-.977 1.464-2.256 1.464-3.536 0-2.769-2.246-4.999-5-4.999-1.28 0-2.559.488-3.536 1.465l-10.627 10.583c-1.366 1.368-2.05 3.159-2.05 4.951 0 3.863 3.13 7 7 7 1.792 0 3.583-.684 4.95-2.05l10.05-10.075-1.414-1.414z"/></svg>
+          </button>
           <button type="button" id="emoji-picker">
             <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="smile" class="svg-inline--fa fa-smile fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 448c-110.3 0-200-89.7-200-200S137.7 56 248 56s200 89.7 200 200-89.7 200-200 200zm-80-216c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm4 72.6c-20.8 25-51.5 39.4-84 39.4s-63.2-14.3-84-39.4c-8.5-10.2-23.7-11.5-33.8-3.1-10.2 8.5-11.5 23.6-3.1 33.8 30 36 74.1 56.6 120.9 56.6s90.9-20.6 120.9-56.6c8.5-10.2 7.1-25.3-3.1-33.8-10.1-8.4-25.3-7.1-33.8 3.1z"></path></svg>
           </button>
@@ -149,6 +153,12 @@
         <button id="show-my-qr-btn">Or show your QR code</button>
         <p id="my-qr-code" class="qr-container" style="display:none"></p>
         <p><small>Beware of sharing your chat link publicly: you might get spammed with message requests. Publicly share your <a class="profile-link">profile link</a> instead.</small></p>
+        <h3>New group</h3>
+        <p><small>Group chats are under development: data loss may occur.</small></p>
+        <p><input id="new-group-participant" type="text" placeholder="Participant chat link"></p>
+        <div id="new-group-participants"></div>
+        <p><input id="new-group-name" type="text" placeholder="Group name"></p>
+        <p><button id="new-group-create">Create</button></p>
         <hr/>
         <h3>Your Chat Links</h3>
         <p><button id="generate-chat-link">Create new chat link</button></p>
@@ -204,6 +214,7 @@
         <p>
           <button id="show-private-key-qr">Show private key QR code</button>
         </p>
+        <p><small>The safest place to store your private key is a <b>password manager</b>.</small></p>
         <hr/>
         <h3>Peers</h3>
         <div id="peers" class="flex-table">
@@ -220,6 +231,11 @@
               <i>Public</i> peers are automatically discoverable by people you chat with (and others).
             </small>
           </p>
+          <p>
+            <small>
+              Peers are GunDB nodes that you can easily <a href="https://github.com/amark/gun#deploy">spin up</a>. Upcoming: direct connection with friends over WebRTC.
+            </small>
+          </p>
         </div>
         <hr/>
         <h3>About</h3>
@@ -230,7 +246,7 @@
           <li><b>Available</b>: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.</li>
         </ul>
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-        <p><small>Version 1.2.2</small></p>
+        <p><small>Version 1.2.6</small></p>
 
         <div id="desktop-application-about">
           <h4>Get the desktop application</h4>
@@ -276,6 +292,17 @@
       <div class="main-view" id="profile">
         <div class="profile-photo-container"><img class="profile-photo"></div>
         <div class="content">
+          <div id="profile-group-settings">
+            <div id="profile-group-name-container">Group name: <input id="profile-group-name" placeholder="Group name"></div>
+            <p>Participants:</p>
+            <div id="profile-group-participants"></div>
+            <div id="profile-add-participant" style="display:none;">
+              <p>Add participant</p>
+              <p><input id="profile-add-participant-input" type="text" placeholder="Participant chat link"></p>
+              <p><button id="profile-add-participant-button">Add participant</button></p>
+            </div>
+            <hr>
+          </div>
           <div class="profile-about" style="display:none">
             <p class="profile-about-content"></p>
           </div>
@@ -327,6 +354,9 @@
   <script src="./js/gun.js"></script>
   <script src="./js/sea.js"></script>
   <script src="./js/nts.js"></script>
+  <script src="./js/radix.js"></script>
+  <script src="./js/radisk.js"></script>
+  <script src="./js/store.js"></script>
   <script src="./js/rindexed.js"></script>
   <script src="./js/iris.js"></script>
   <script src="./js/emoji-button.js"></script>
