@@ -377,7 +377,7 @@ function openAttachmentsGallery(msg) {
 function closeAttachmentsPreview() {
   $('#attachment-preview').hide();
   $('#message-list').show();
-  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+  scrollToMessageListBottom();
   if (activeChat) {
     chats[activeChat].attachments = null;
   }
@@ -1061,11 +1061,7 @@ function showChat(pub) {
   });
   lastSeenTimeChanged(pub);
   chats[pub].setMyMsgsLastSeenTime();
-  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
-  $('#message-view img').on('load', () => {
-    $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
-  });
-  setTimeout(() => $('#message-view img').off('load'), 500);
+  scrollToMessageListBottom();
   chats[pub].setMyMsgsLastSeenTime();
   setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
@@ -1137,6 +1133,7 @@ function addMessage(msg, chatId) {
       if (a.type.indexOf('image') === 0 && a.data) {
         var img = $('<img>').attr('src', a.data).click(() => { openAttachmentsGallery(msg); });
         msgContent.prepend(img);
+        img.one('load', scrollToMessageListBottom);
       }
     })
   }
@@ -1216,6 +1213,10 @@ var askForPeers = _.once(pub => {
   });
 });
 
+function scrollToMessageListBottom() {
+  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+}
+
 function addChat(channel) {
   var pub = channel.getId();
   if (chats[pub]) { return; }
@@ -1243,7 +1244,7 @@ function addChat(channel) {
       chats[pub].latest = msg;
       var text = msg.text || '';
       if (msg.attachments) {
-        text = '[attachment]: ' + text;
+        text = '[attachment]' + (text.length ? ': ' + text : '');
       } else {
         text = msg.text;
       }
@@ -1275,7 +1276,7 @@ function addChat(channel) {
       } else if (!chats[pub].uuid) {
         $('#not-seen-by-them').slideDown();
       }
-      $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+      scrollToMessageListBottom();
     }
     notify(msg, info, pub);
   });
