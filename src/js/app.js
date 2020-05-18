@@ -1167,9 +1167,8 @@ function deleteChat(pub) {
   $('.chat-item[data-pub="' + pub +'"]').remove();
 }
 
-function addMention(element) {
-  console.log($('#new-msg').val() + `@${element.innerText} `)
-  $('#new-msg').val($('#new-msg').val() + `@${element.innerText} `);
+function addMention(name) {
+  $('#new-msg').val($('#new-msg').val().trim() + ` @${name} `);
   $('#new-msg').focus();
 }
 
