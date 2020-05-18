@@ -690,7 +690,7 @@ function notify(msg, info, pub) {
     if (info.selfAuthored) { return false; }
     //if (document.visibilityState === 'visible') { return false; }
     if (activeChat == Object.keys(chats[pub].secrets)[0]) { return false; } // already looking at chat
-    if (chats[pub].notificationSetting == 'notifyMentionsOnly' && !msg.text.includes(myName)) { return false; }
+    if (chats[pub].notificationSetting === 'mentionsOnly' && !msg.text.includes(myName)) { return false; }
     return true;
   }
   function shouldDesktopNotify() {
