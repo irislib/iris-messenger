@@ -504,6 +504,10 @@ header #back-button {
   margin-right: 15px !important;
 }
 
+.chat-item.has-unseen .text, .chat-item.has-unseen .name {
+  font-weight: bold;
+}
+
 .chat-item .text {
   padding-right: 5px;
   padding-top: 16px;

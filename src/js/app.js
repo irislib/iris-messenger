@@ -961,12 +961,15 @@ function changeChatUnseenCount(pub, change) {
     chats[pub].unseen = 0;
   }
   unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
-  var el = $('.chat-item[data-pub="' + pub +'"] .unseen');
+  var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
+  var unseenCountEl = chatListEl.find('.unseen');
   if (chats[pub].unseen > 0) {
-    el.text(chats[pub].unseen);
-    el.show();
+    chatListEl.addClass('has-unseen');
+    unseenCountEl.text(chats[pub].unseen);
+    unseenCountEl.show();
   } else {
-    el.hide();
+    chatListEl.removeClass('has-unseen');
+    unseenCountEl.hide();
   }
   setUnseenTotal();
 }
