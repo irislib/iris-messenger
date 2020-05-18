@@ -387,17 +387,15 @@ header #back-button {
 }
 
 #attachment-preview {
-  display: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   overflow: hidden;
 }
 
 #attachment-preview.gallery {
   overflow-y: scroll;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   position: fixed;
   left: 0;
   right: 0;
@@ -405,12 +403,13 @@ header #back-button {
   bottom: 0;
   padding: 30px;
   background-color: var(--gallery-background);
-
 }
 
 #attachment-preview img {
-  max-height: 60vh;
+  max-height: 90vh;
   max-width: 100%;
+  display: block;
+  margin-bottom: 15px;
 }
 
 #attachment-preview button {
