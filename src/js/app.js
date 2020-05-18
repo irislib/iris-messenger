@@ -1232,6 +1232,9 @@ function addChat(channel) {
     if (!chats[pub].latest || msg.time > chats[pub].latest.time) {
       chats[pub].latest = msg;
       var text = truncateString(msg.text, 100);
+      if (chats[pub].uuid && !msg.selfAuthored && msg.info.from && chats[pub].participantProfiles[msg.info.from].name) {
+        text = chats[pub].participantProfiles[msg.info.from].name + ': ' + text;
+      }
       var now = new Date();
       var latestTimeText = iris.util.getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
       if (latestTimeText === 'today') { latestTimeText = iris.util.formatTime(msg.time); }
