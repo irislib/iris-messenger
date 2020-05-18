@@ -1140,7 +1140,7 @@ function addMessage(msg, chatId) {
     var profile = chats[chatId].participantProfiles[msg.info.from];
     var name = profile && profile.name;
     if (name) {
-      var nameEl = $('<small onclick="addMention(this)">').text(name).css({color: profile.color, 'margin-bottom':2,display:'block','font-weight':'bold'}).addClass('msgSenderName');
+      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color: profile.color}).addClass('msgSenderName');
       msgContent.prepend(nameEl);
     }
   }
