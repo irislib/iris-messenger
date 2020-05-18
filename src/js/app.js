@@ -352,17 +352,17 @@ function openAttachmentsPreview() {
         attachmentsPreview.append(preview);
       });
     }
+    $('#new-msg').focus();
   }
 }
 
 function openAttachmentsGallery(msg) {
   $('#floating-day-separator').remove();
   var attachmentsPreview = $('#attachment-preview');
+  attachmentsPreview.addClass('gallery');
   attachmentsPreview.empty();
-  var closeBtn = $('<button>').text('Close').click(closeAttachmentsPreview);
-  attachmentsPreview.append(closeBtn);
+  $('#attachment-preview').one('click', closeAttachmentsPreview);
   attachmentsPreview.show();
-  $('#message-list').hide();
 
   if (msg.attachments) {
     msg.attachments.forEach(a => {
@@ -376,8 +376,8 @@ function openAttachmentsGallery(msg) {
 
 function closeAttachmentsPreview() {
   $('#attachment-preview').hide();
+  $('#attachment-preview').removeClass('gallery');
   $('#message-list').show();
-  scrollToMessageListBottom();
   if (activeChat) {
     chats[activeChat].attachments = null;
   }
@@ -1213,9 +1213,9 @@ var askForPeers = _.once(pub => {
   });
 });
 
-function scrollToMessageListBottom() {
+var scrollToMessageListBottom = _.throttle(() => {
   $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
-}
+}, 100, true);
 
 function addChat(channel) {
   var pub = channel.getId();

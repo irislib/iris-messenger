@@ -392,6 +392,22 @@ header #back-button {
   overflow: hidden;
 }
 
+#attachment-preview.gallery {
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 30px;
+  background-color: var(--gallery-background);
+
+}
+
 #attachment-preview img {
   max-height: 60vh;
   max-width: 100%;
