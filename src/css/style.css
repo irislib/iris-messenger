@@ -271,6 +271,9 @@ header #back-button {
 
 .msgSenderName {
   cursor: pointer;
+  margin-bottom: 2px;
+  display: block;
+  font-weight: bold;
 }
 
 .from-separator {
