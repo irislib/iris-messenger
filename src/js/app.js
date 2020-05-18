@@ -406,34 +406,6 @@ $('#paste-chat-link').on('input', event => {
   $(event.target).val('');
 });
 
-var newGroupParticipants = [];
-$('#new-group-participant').on('input', event => {
-  var val = $(event.target).val();
-  if (val.length < 30) {
-    return;
-  }
-  var s = val.split('?');
-  if (s.length !== 2) { return; }
-  var pub = getUrlParameter('chatWith', s[1]);
-  if (pub) {
-    if (newGroupParticipants.indexOf(pub) >= 0) { $('#new-group-participant').val(''); return; }
-    var identicon = getIdenticon(pub, 40).css({'margin-right':15});
-    var nameEl = $('<span>');
-    gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
-    var el = $('<p>').css({display:'flex', 'align-items': 'center'});
-    var removeBtn = $('<button>').css({'margin-right': 15}).text('Remove').click(() => {
-      el.remove();
-      newGroupParticipants.forEach((p, i) => {if (p===pub) { newGroupParticipants.splice(i, 1); }})
-    });
-    el.append(removeBtn);
-    el.append(identicon);
-    el.append(nameEl);
-    $('#new-group-participants').append(el);
-    newGroupParticipants.push(pub);
-  }
-  $(event.target).val('');
-});
-
 $('#new-group-create').click(createGroup);
 function createGroup(e) {
   e.preventDefault();
@@ -441,14 +413,12 @@ function createGroup(e) {
     var c = new iris.Channel({
       gun,
       key,
-      participants: newGroupParticipants,
+      participants: [],
     });
-    newGroupParticipants = [];
     c.put('name', $('#new-group-name').val());
-    $('#new-group-participants').empty();
     $('#new-group-name').val('');
     addChat(c);
-    showChat(c.uuid);
+    showProfile(c.uuid);
   }
 }
 
@@ -856,31 +826,34 @@ $('#profile-add-participant').on('input', event => {
   var s = val.split('?');
   if (s.length !== 2) { return; }
   var pub = getUrlParameter('chatWith', s[1]);
+  $('#profile-add-participant-input').hide();
   if (pub) {
     $('#profile-add-participant-candidate').remove();
     var identicon = getIdenticon(pub, 40).css({'margin-right':15});
     var nameEl = $('<span>');
     gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
     var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
-    var removeBtn = $('<button>').css({'margin-right': 15}).text('Cancel').click(() => {
+    var addBtn = $('<button>').css({'margin-left': 15}).text('Add').click(() => {
+      if (newGroupParticipant) {
+        chats[activeProfile].addParticipant(newGroupParticipant);
+        newGroupParticipant = null;
+        $('#profile-add-participant-input').val('').show();
+        $('#profile-add-participant-candidate').remove();
+      }
+    });
+    var removeBtn = $('<button>').css({'margin-left': 15}).text('Cancel').click(() => {
       el.remove();
+      $('#profile-add-participant-input').val('').show();
       newGroupParticipant = null;
     });
-    el.append(removeBtn);
     el.append(identicon);
     el.append(nameEl);
+    el.append(addBtn);
+    el.append(removeBtn);
     newGroupParticipant = pub;
     $('#profile-add-participant-input').after(el);
   }
   $(event.target).val('');
-});
-$('#profile-add-participant-button').click(() => {
-  if (newGroupParticipant) {
-    chats[activeProfile].addParticipant(newGroupParticipant);
-    newGroupParticipant = null;
-    $('#profile-add-participant-input').val('');
-    $('#profile-add-participant-candidate').remove();
-  }
 });
 
 function renderGroupParticipants(pub) {
