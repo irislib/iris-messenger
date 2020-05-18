@@ -688,8 +688,7 @@ function notify(msg, info, pub) {
   function shouldNotify() {
     if (msg.time < loginTime) { return false; }
     if (info.selfAuthored) { return false; }
-    //if (document.visibilityState === 'visible') { return false; }
-    if (activeChat == Object.keys(chats[pub].secrets)[0]) { return false; } // already looking at chat
+    if (document.visibilityState === 'visible') { return false; }
     if (chats[pub].notificationSetting === 'mentionsOnly' && !msg.text.includes(myName)) { return false; }
     return true;
   }
@@ -812,7 +811,6 @@ function showProfile(pub) {
   });
   $('#profile .delete-chat').off().on('click', () => deleteChat(pub));
   $('input:radio[name=notificationPreference]').off().on('change', (event) => {
-    console.log(`notifications changed to ${event.target.value}`)
     chats[pub].put('notificationSetting', event.target.value);
   });
   $('#profile .send-message').off().on('click', () => showChat(pub));
