@@ -334,6 +334,7 @@ $(document).keyup(function(e) {
 });
 
 function openAttachmentsPreview() {
+  $('#floating-day-separator').remove();
   var attachmentsPreview = $('#attachment-preview');
   attachmentsPreview.empty();
   var closeBtn = $('<button>').text('Cancel').click(closeAttachmentsPreview);
@@ -355,6 +356,7 @@ function openAttachmentsPreview() {
 }
 
 function openAttachmentsGallery(msg) {
+  $('#floating-day-separator').remove();
   var attachmentsPreview = $('#attachment-preview');
   attachmentsPreview.empty();
   var closeBtn = $('<button>').text('Close').click(closeAttachmentsPreview);
@@ -1040,6 +1042,7 @@ function showChat(pub) {
   msgs.forEach(msg => addMessage(msg, pub));
   sortMessagesByTime();
   $('#message-view').scroll(() => {
+    if ($('#attachment-preview:visible').length) { return; }
     var scrollPosition = $('#message-view').scrollTop();
     var currentDaySeparator = $('.day-separator').last();
     var pos = currentDaySeparator.position();
