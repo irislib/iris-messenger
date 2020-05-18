@@ -1062,6 +1062,10 @@ function showChat(pub) {
   lastSeenTimeChanged(pub);
   chats[pub].setMyMsgsLastSeenTime();
   $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+  $('#message-view img').on('load', () => {
+    $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+  });
+  setTimeout(() => $('#message-view img').off('load'), 500);
   chats[pub].setMyMsgsLastSeenTime();
   setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
