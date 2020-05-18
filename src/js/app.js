@@ -1231,7 +1231,12 @@ function addChat(channel) {
     }
     if (!chats[pub].latest || msg.time > chats[pub].latest.time) {
       chats[pub].latest = msg;
-      var text = truncateString(msg.text, 100);
+      var text = msg.text || '';
+      if (msg.attachments) {
+        text = '[attachment]: ' + text;
+      } else {
+        text = msg.text;
+      }
       if (chats[pub].uuid && !msg.selfAuthored && msg.info.from && chats[pub].participantProfiles[msg.info.from].name) {
         text = chats[pub].participantProfiles[msg.info.from].name + ': ' + text;
       }
