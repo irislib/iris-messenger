@@ -799,6 +799,8 @@ function showProfile(pub) {
     var name = event.target.value;
     chats[pub].put('name', name);
   });
+  $('.profile-nicknames').toggle(pub !== key.pub);
+  $('#profile-nickname-my-container').toggle(!chats[pub].uuid);
   $('#profile-nickname-their').not(':focus').val(chats[pub] && chats[pub].theirNickname);
   $('#profile-nickname-my').text(chats[pub] && chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
   $('#profile-nickname-their').off().on('input', event => {
