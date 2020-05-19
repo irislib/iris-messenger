@@ -811,6 +811,7 @@ function showProfile(pub) {
     console.log('add friend');
   });
   $('#profile .delete-chat').off().on('click', () => deleteChat(pub));
+  $("input[name=notificationPreference][value=" + chats[pub].notificationSetting + "]").attr('checked', 'checked');
   $('input:radio[name=notificationPreference]').off().on('change', (event) => {
     chats[pub].put('notificationSetting', event.target.value);
   });
@@ -1291,7 +1292,9 @@ function addChat(channel) {
   });
   chats[pub].onMy('notificationSetting', (val) => {
     chats[pub].notificationSetting = val;
-    $("input[name=notificationPreference][value=" + val + "]").attr('checked', 'checked');
+    if (pub === activeProfile) {
+      $("input[name=notificationPreference][value=" + val + "]").attr('checked', 'checked');
+    }
   });
   el.click(() => showChat(pub));
   $(".chat-list").append(el);
