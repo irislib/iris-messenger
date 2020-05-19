@@ -1,6 +1,7 @@
 Gun.log.off = true;
 var MAX_PEER_LIST_SIZE = 10;
 var MAX_CONNECTED_PEERS = iris.util.isElectron ? 4 : 2;
+var GALLERY_ANIMATE_DURATION = 150;
 var peers = getPeers();
 var randomPeers = _.sample(
   Object.keys(
@@ -379,7 +380,7 @@ function openAttachmentsGallery(msg, event) {
   var attachmentsPreview = $('#attachment-preview');
   attachmentsPreview.addClass('gallery');
   attachmentsPreview.empty();
-  attachmentsPreview.fadeIn(100);
+  attachmentsPreview.fadeIn(GALLERY_ANIMATE_DURATION);
   var left, top, width, img;
 
   if (msg.attachments) {
@@ -392,15 +393,15 @@ function openAttachmentsGallery(msg, event) {
           left = original.offset().left;
           top = original.offset().top - $(window).scrollTop();
           width = original.width();
-          var transitionImg = img.clone();
+          var transitionImg = img.clone().attr('id', 'transition-img').data('originalDimensions', {left,top,width});
           transitionImg.css({position: 'fixed', left, top, width, 'max-width': 'none', 'max-height': 'none'});
           img.css({visibility: 'hidden', 'align-self': 'center'});
           attachmentsPreview.append(img);
           $('body').append(transitionImg);
           var o = img.offset();
-          transitionImg.animate({width: img.width(), left: o.left, top: o.top}, {duration: 300, complete: () => {
+          transitionImg.animate({width: img.width(), left: o.left, top: o.top}, {duration: GALLERY_ANIMATE_DURATION, complete: () => {
             img.css({visibility: 'visible'});
-            transitionImg.remove();
+            transitionImg.hide();
           }});
         } else {
           attachmentsPreview.css({'justify-content': ''});
@@ -425,7 +426,16 @@ function closeAttachmentsPreview() {
 }
 
 function closeAttachmentsGallery() {
-  $('#attachment-preview').fadeOut(300);
+  var transitionImg = $('#transition-img');
+  if (transitionImg.length) {
+    var originalDimensions = transitionImg.data('originalDimensions');
+    transitionImg.show();
+    $('#attachment-preview img').remove();
+    transitionImg.animate(originalDimensions, {duration: GALLERY_ANIMATE_DURATION, complete: () => {
+      transitionImg.remove();
+    }});
+  }
+  $('#attachment-preview').fadeOut(GALLERY_ANIMATE_DURATION);
   if (activeChat) {
     chats[activeChat].attachments = null;
   }

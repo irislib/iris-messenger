@@ -410,6 +410,7 @@ header #back-button {
   max-width: 100%;
   display: block;
   margin-bottom: 15px;
+  user-select: none;
 }
 
 #attachment-preview button {
