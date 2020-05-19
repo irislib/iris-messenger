@@ -1,7 +1,7 @@
 Gun.log.off = true;
 var MAX_PEER_LIST_SIZE = 10;
 var MAX_CONNECTED_PEERS = iris.util.isElectron ? 4 : 2;
-var GALLERY_ANIMATE_DURATION = 150;
+var GALLERY_ANIMATE_DURATION = 300;
 var peers = getPeers();
 var randomPeers = _.sample(
   Object.keys(
