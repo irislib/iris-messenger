@@ -1290,7 +1290,7 @@ function addChat(channel) {
       addUserToHeader(pub);
     }
   });
-  chats[pub].notificationSetting = 'always';
+  chats[pub].notificationSetting = 'all';
   chats[pub].onMy('notificationSetting', (val) => {
     chats[pub].notificationSetting = val;
     if (pub === activeProfile) {
