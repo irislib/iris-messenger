@@ -173,23 +173,25 @@
         <p>
           <input id="settings-name" placeholder="Your name">
         </p>
-        <p>
+        <p id="profile-photo-chapter">
           Profile photo:
         </p>
-        <img id="current-profile-photo">
-        <button id="add-profile-photo">Add profile photo</button>
-        <div id="profile-photo-preview-container">
-          <img id="profile-photo-preview" class="hidden">
+        <div id="profile-photo-settings">
+          <img id="current-profile-photo">
+          <button id="add-profile-photo">Add profile photo</button>
+          <div id="profile-photo-preview-container">
+            <img id="profile-photo-preview" class="hidden">
+          </div>
+          <p>
+            <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*">
+          </p>
+          <p id="profile-photo-error" class="hidden">Profile photo too big: maximum size is 200KB</p>
+          <p>
+            <button id="cancel-profile-photo" class="hidden">Cancel</button>
+            <button id="use-profile-photo" class="hidden">Use photo</button>
+            <button id="remove-profile-photo" class="hidden">Remove photo</button>
+          </p>
         </div>
-        <p>
-          <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*">
-        </p>
-        <p id="profile-photo-error" class="hidden">Profile photo too big: maximum size is 200KB</p>
-        <p>
-          <button id="cancel-profile-photo" class="hidden">Cancel</button>
-          <button id="use-profile-photo" class="hidden">Use photo</button>
-          <button id="remove-profile-photo" class="hidden">Remove photo</button>
-        </p>
         <p>About text:</p>
         <p>
           <input id="settings-about" style="width:100%" placeholder="About text">
