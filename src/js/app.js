@@ -63,6 +63,10 @@ $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
 });
 
+var scrollToMessageListBottom = _.throttle(() => {
+  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+}, 100, true);
+
 $('#login').hide();
 var localStorageKey = localStorage.getItem('chatKeyPair');
 if (localStorageKey) {
@@ -417,6 +421,7 @@ function closeAttachmentsPreview() {
   if (activeChat) {
     chats[activeChat].attachments = null;
   }
+  scrollToMessageListBottom();
 }
 
 function closeAttachmentsGallery() {
@@ -1232,10 +1237,6 @@ var askForPeers = _.once(pub => {
     });
   });
 });
-
-var scrollToMessageListBottom = _.throttle(() => {
-  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
-}, 100, true);
 
 function addChat(channel) {
   var pub = channel.getId();
