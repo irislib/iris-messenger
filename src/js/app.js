@@ -689,7 +689,8 @@ function notify(msg, info, pub) {
     if (msg.time < loginTime) { return false; }
     if (info.selfAuthored) { return false; }
     if (document.visibilityState === 'visible') { return false; }
-    if (chats[pub].notificationSetting === 'mentionsOnly' && !msg.text.includes(myName)) { return false; }
+    if (chats[pub].notificationSetting === 'nothing') { return false; }
+    if (chats[pub].notificationSetting === 'mentions' && !msg.text.includes(myName)) { return false; }
     return true;
   }
   function shouldDesktopNotify() {
@@ -1288,9 +1289,9 @@ function addChat(channel) {
       addUserToHeader(pub);
     }
   });
-  chats[pub].onMy('notificationSetting', (notifSetting) => {
-    chats[pub].notificationSetting = notifSetting;
-    $(`#${notifSetting}`).prop("checked", true);
+  chats[pub].onMy('notificationSetting', (val) => {
+    chats[pub].notificationSetting = val;
+    $("input[name=notificationPreference][value=" + val + "]").attr('checked', 'checked');
   });
   el.click(() => showChat(pub));
   $(".chat-list").append(el);
