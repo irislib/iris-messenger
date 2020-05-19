@@ -50,6 +50,15 @@ var desktopNotificationsEnabled;
 var areWeOnline;
 var unseenTotal;
 
+if (iris.util.isElectron) {
+  function refreshUnlessActive() { // hacky way to make sure that gun resubscribes multicast on network changes
+    if (!areWeOnline) { // if you haven't been active in the window in the last 60 seconds
+      location.reload();
+    }
+  }
+  window.addEventListener('online',  refreshUnlessActive);
+}
+
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
 });
@@ -1428,10 +1437,3 @@ function setUnseenTotal() {
     $('.unseen-total').hide();
   }
 }
-
-function refreshUnlessActive() { // hacky way to make sure that gun resyncs on network changes
-  if (!areWeOnline) { // if you haven't been active in the window in the last 60 seconds
-    location.reload();
-  }
-}
-window.addEventListener('online',  refreshUnlessActive);
