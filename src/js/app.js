@@ -730,6 +730,8 @@ function notify(msg, info, pub) {
     if (msg.time < loginTime) { return false; }
     if (info.selfAuthored) { return false; }
     if (document.visibilityState === 'visible') { return false; }
+    if (chats[pub].notificationSetting === 'nothing') { return false; }
+    if (chats[pub].notificationSetting === 'mentions' && !msg.text.includes(myName)) { return false; }
     return true;
   }
   function shouldDesktopNotify() {
@@ -874,6 +876,10 @@ function showProfile(pub) {
     console.log('add friend');
   });
   $('#profile .delete-chat').off().on('click', () => deleteChat(pub));
+  $("input[name=notificationPreference][value=" + chats[pub].notificationSetting + "]").attr('checked', 'checked');
+  $('input:radio[name=notificationPreference]').off().on('change', (event) => {
+    chats[pub].put('notificationSetting', event.target.value);
+  });
   $('#profile .send-message').off().on('click', () => showChat(pub));
   $('#profile .copy-user-link').off().on('click', event => {
     copyToClipboard(link);
@@ -1217,7 +1223,7 @@ function addMessage(msg, chatId) {
     var profile = chats[chatId].participantProfiles[msg.info.from];
     var name = profile && profile.name;
     if (name) {
-      var nameEl = $('<small>').text(name).css({color: profile.color, 'margin-bottom':2,display:'block','font-weight':'bold'});
+      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color: profile.color}).addClass('msgSenderName');
       msgContent.prepend(nameEl);
     }
   }
@@ -1242,6 +1248,11 @@ function deleteChat(pub) {
   }
   delete chats[pub];
   $('.chat-item[data-pub="' + pub +'"]').remove();
+}
+
+function addMention(name) {
+  $('#new-msg').val($('#new-msg').val().trim() + ` @${name} `);
+  $('#new-msg').focus();
 }
 
 function getDisplayName(pub) {
@@ -1368,6 +1379,13 @@ function addChat(channel) {
     }
     if (pub === activeChat || pub === activeProfile) {
       addUserToHeader(pub);
+    }
+  });
+  chats[pub].notificationSetting = 'all';
+  chats[pub].onMy('notificationSetting', (val) => {
+    chats[pub].notificationSetting = val;
+    if (pub === activeProfile) {
+      $("input[name=notificationPreference][value=" + val + "]").attr('checked', 'checked');
     }
   });
   el.click(() => showChat(pub));
