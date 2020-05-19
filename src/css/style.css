@@ -59,7 +59,7 @@ button:hover, button:active, button:focus, .button:hover, .button:active, .butto
 }
 
 img {
-  max-width: 90vw;
+  max-width: 100%;
   max-height: 80vh;
 }
 
@@ -632,7 +632,6 @@ small {
 }
 
 #current-profile-photo {
-  max-width: 400px;
   max-height: 400px;
 }
 

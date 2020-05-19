@@ -761,6 +761,8 @@ function renderGroupPhotoSettings(uuid) {
   var me = chats[uuid].participantProfiles[key.pub];
   var isAdmin = !!(me && me.permissions && me.permissions.admin);
   $('#profile-group-settings').toggle(isAdmin);
+  $('#current-profile-photo').toggle(!!chats[uuid].photo);
+  $('#profile .profile-photo').toggle(!!chats[uuid].photo);
   if (isAdmin) {
     $('#current-profile-photo').attr('src', chats[uuid].photo);
     $('#profile .profile-photo').hide();
@@ -803,7 +805,6 @@ function renderProfilePhotoSettings() {
   } else {
     cropper && cropper.destroy();
     // show current profile photo
-    $('#current-profile-photo').show();
     if (!$('#current-profile-photo').attr('src')) {
       $('#add-profile-photo').show();
     }
@@ -1445,6 +1446,7 @@ function addChat(channel) {
       $('#current-profile-photo').attr('src', photo);
       $('#profile .profile-photo').attr('src', photo);
     }
+    $('#current-profile-photo').toggle(!!photo);
   }
   if (chats[pub].uuid) {
     chats[pub].on('name', setName);
