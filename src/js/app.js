@@ -614,6 +614,7 @@ function showSwitchAccount(e) {
   resetView();
   $('#create-account').hide();
   $('#existing-account-login').show();
+  $('#paste-privkey').focus();
 }
 
 $('#show-create-account').click(showCreateAccount);
@@ -623,6 +624,7 @@ function showCreateAccount(e) {
   $('#create-account').show();
   $('#existing-account-login').hide();
   cleanupScanner();
+  $('#login-form-name').focus();
 }
 
 $('#existing-account-login input').on('input', (event) => {
