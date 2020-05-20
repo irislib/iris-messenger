@@ -25,7 +25,7 @@ function notifyIfNotVisible(pub, text) {
 }
 
 function showIncomingCall(pub) {
-  if ($('#active-call').length === 0 && $('#incoming-call').length === 0) {
+  if (!chats[pub].pc && $('#active-call').length === 0 && $('#incoming-call').length === 0) {
     var incomingCallEl = $('<div>')
       .attr('id', 'incoming-call')
       .text(`Incoming call from ${chats[pub].name}`)
@@ -80,6 +80,8 @@ function callClosed(pub) {
     $('#active-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#active-call').remove()));
     notifyIfNotVisible('Call ended');
   }
+  chats[pub].pc && chats[pub].pc.close();
+  chats[pub].pc = null;
 }
 
 async function addStreamToPeerConnection(pc) {
@@ -136,6 +138,8 @@ function cancelCall(pub) {
   stopUserMedia(pub);
   $('#outgoing-call').remove();
   chats[pub].put('call', null);
+  chats[pub].pc && chats[pub].pc.close();
+  chats[pub].pc = null;
 }
 
 function stopUserMedia(pub) {
@@ -156,6 +160,7 @@ function endCall(pub) {
   stopUserMedia(pub);
   $('#active-call').remove();
   chats[pub].put('call', null);
+  chats[pub].pc = null;
 }
 
 function closeIncomingCall() {
@@ -184,7 +189,7 @@ async function createCallElement(pub) {
 }
 
 async function initConnection(createOffer, pub) {
-  var config = {iceServers: [{   urls: [ "stun:eu-turn4.xirsys.com" ], }, {urls: "stun:stun.1.google.com:19302"}, {   username: "ml0jh0qMKZKd9P_9C0UIBY2G0nSQMCFBUXGlk6IXDJf8G2uiCymg9WwbEJTMwVeiAAAAAF2__hNSaW5vbGVl",   credential: "4dd454a6-feee-11e9-b185-6adcafebbb45",   urls: [       "turn:eu-turn4.xirsys.com:80?transport=udp",       "turn:eu-turn4.xirsys.com:3478?transport=udp",       "turn:eu-turn4.xirsys.com:80?transport=tcp",       "turn:eu-turn4.xirsys.com:3478?transport=tcp",       "turns:eu-turn4.xirsys.com:443?transport=tcp",       "turns:eu-turn4.xirsys.com:5349?transport=tcp"   ]}]};;
+  var config = {iceServers: [ { urls: ["stun:turn.hepic.tel"] }, { urls: ["stun:stun.l.google.com:19302"] } ]};
   chats[pub].pc = new RTCPeerConnection(config);
   var pc = chats[pub].pc;
   await addStreamToPeerConnection(pc);

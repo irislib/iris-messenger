@@ -472,7 +472,7 @@ header #back-button {
   display: flex;
   flex-direction: row;
   align-self: center;
-  align-items: left;
+  align-items: flex-start;
   max-height:60px;
   overflow-y: hidden;
   overflow-x: hidden;
