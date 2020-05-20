@@ -29,6 +29,11 @@ a:hover, a:focus {
   outline: none;
 }
 
+textarea {
+  width: 100%;
+  outline: none;
+}
+
 input, button, .button {
   padding: 15px;
   outline: none;

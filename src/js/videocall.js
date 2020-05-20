@@ -9,6 +9,21 @@ var userMediaStream;
 var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 
+var localStorageIce = localStorage.getItem('rtcConfig');
+var DEFAULT_RTC_CONFIG = {iceServers: [ { urls: ["stun:turn.hepic.tel"] }, { urls: ["stun:stun.l.google.com:19302"] } ]};
+var RTC_CONFIG = localStorageIce ? JSON.parse(localStorageIce) : DEFAULT_RTC_CONFIG;
+$('#rtc-config').val(JSON.stringify(RTC_CONFIG));
+$('#rtc-config').change(() => {
+  try {
+    RTC_CONFIG = JSON.parse($('#rtc-config').val());
+    localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
+  } catch (e) {}
+});
+$('#restore-default-rtc-config').click(() => {
+  RTC_CONFIG = DEFAULT_RTC_CONFIG;
+  $('#rtc-config').val(JSON.stringify(RTC_CONFIG));
+})
+
 function notifyIfNotVisible(pub, text) {
    if (document.visibilityState !== 'visible') {
     incomingCallNotification = new Notification(chats[pub].name, {
@@ -189,8 +204,7 @@ async function createCallElement(pub) {
 }
 
 async function initConnection(createOffer, pub) {
-  var config = {iceServers: [ { urls: ["stun:turn.hepic.tel"] }, { urls: ["stun:stun.l.google.com:19302"] } ]};
-  chats[pub].pc = new RTCPeerConnection(config);
+  chats[pub].pc = new RTCPeerConnection(RTC_CONFIG);
   var pc = chats[pub].pc;
   await addStreamToPeerConnection(pc);
   async function createOfferFn() {
