@@ -156,7 +156,7 @@ function stopCalling(pub) {
 }
 
 function endCall(pub) {
-  chats[pub].pc.close();
+  chats[pub].pc && chats[pub].pc.close();
   stopUserMedia(pub);
   $('#active-call').remove();
   chats[pub].put('call', null);
