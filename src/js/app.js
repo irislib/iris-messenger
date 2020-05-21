@@ -8,7 +8,7 @@ var randomPeers = _.sample(
     _.pick(peers, p => { return p.enabled; })
   ), MAX_CONNECTED_PEERS
 );
-var gunOpts = { peers: randomPeers, localStorage: false };
+var gunOpts = { peers: randomPeers, localStorage: false, retry:Infinity };
 if (!iris.util.isElectron) {
   gunOpts.store = RindexedDB(gunOpts);
 }
