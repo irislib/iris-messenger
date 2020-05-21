@@ -207,16 +207,16 @@ async function createCallElement(pub) {
 }
 
 async function initConnection(createOffer, pub) {
-  iceCandidates = {};
+  ourIceCandidates = {};
+  theirIceCandidateKeys = [];
   chats[pub].pc = new RTCPeerConnection(RTC_CONFIG);
-  var pc = chats[pub].pc;
-  await addStreamToPeerConnection(pc);
+  await addStreamToPeerConnection(chats[pub].pc);
   async function createOfferFn() {
     try {
       if (chats[pub].isNegotiating) { return; }
       chats[pub].isNegotiating = true;
-      var offer = await pc.createOffer();
-      pc.setLocalDescription(offer);
+      var offer = await chats[pub].pc.createOffer();
+      chats[pub].pc.setLocalDescription(offer);
       chats[pub].put('sdp', {time: new Date().toISOString(), data: offer});
     } finally {
       chats[pub].isNegotiating = false;
@@ -225,25 +225,25 @@ async function initConnection(createOffer, pub) {
   if (createOffer) {
     await createOfferFn();
   }
-  ourIceCandidates = {};
-  theirIceCandidateKeys = [];
   chats[pub].onTheir('sdp', async sdp => {
+    if (!chats[pub].pc) { return; }
     if (sdp.data && sdp.time && new Date(sdp.time) < (new Date() - 5000)) { return; }
     stopCalling();
     console.log('got their sdp', sdp);
-    pc.setRemoteDescription(new RTCSessionDescription(sdp.data));
+    chats[pub].pc.setRemoteDescription(new RTCSessionDescription(sdp.data));
   });
   chats[pub].onTheir('icecandidates', c => {
+    if (!chats[pub].pc || chats[pub].pc.signalingState === 'closed') { return; }
     if (c.data && c.time && new Date(c.time) < (new Date() - 5000)) { return; }
     console.log('got their icecandidates', c);
     Object.keys(c.data).forEach(k => {
       if (theirIceCandidateKeys.indexOf(k) === -1) {
         theirIceCandidateKeys.push(k);
-        pc.addIceCandidate(new RTCIceCandidate(c.data[k])).then(console.log, console.error);;
+        chats[pub].pc.addIceCandidate(new RTCIceCandidate(c.data[k])).then(console.log, console.error);;
       }
     });
   });
-  pc.onicecandidate = pc.onicecandidate || (({candidate}) => {
+  chats[pub].pc.onicecandidate = chats[pub].pc.onicecandidate || (({candidate}) => {
     if (!candidate) return;
     console.log('sending our ice candidate');
     var i = Gun.SEA.random(12).toString('base64');
@@ -251,22 +251,23 @@ async function initConnection(createOffer, pub) {
     chats[pub].put('icecandidates', {time: new Date().toISOString(), data: ourIceCandidates});
   });
   if (createOffer) {
-    pc.onnegotiationneeded = async () => {
+    chats[pub].pc.onnegotiationneeded = async () => {
       createOfferFn();
     };
   };
-  pc.onsignalingstatechange = async d => {
+  chats[pub].pc.onsignalingstatechange = async d => {
+    if (!chats[pub].pc) { return; }
     console.log(
-      "Signaling State Change:" + pc,
-      pc.signalingState
+      "Signaling State Change:" + chats[pub].pc,
+      chats[pub].pc.signalingState
     );
-    switch (pc.signalingState) {
+    switch (chats[pub].pc.signalingState) {
       case "have-remote-offer":
-        var answer = await pc.createAnswer({
+        var answer = await chats[pub].pc.createAnswer({
           offerToReceiveAudio: 1,
           offerToReceiveVideo: 1
         });
-        pc.setLocalDescription(answer);
+        chats[pub].pc.setLocalDescription(answer);
         chats[pub].put('sdp', {time: new Date().toISOString(), data: answer});
         break;
       case "stable":
@@ -281,9 +282,9 @@ async function initConnection(createOffer, pub) {
         break;
     }
   };
-  pc.onconnectionstatechange = e => {
-    console.log('iceConnectionState changed', pc.iceConnectionState);
-    switch (pc.iceConnectionState) {
+  chats[pub].pc.onconnectionstatechange = e => {
+    console.log('iceConnectionState changed', chats[pub].pc.iceConnectionState);
+    switch (chats[pub].pc.iceConnectionState) {
       case "connected":
         break;
       case "disconnected":
@@ -299,11 +300,11 @@ async function initConnection(createOffer, pub) {
         callClosed(pub);
         break;
       default:
-        console.log("Change of state", pc.iceConnectionState);
+        console.log("Change of state", chats[pub].pc.iceConnectionState);
         break;
     }
   };
-  pc.ontrack = (event) => {
+  chats[pub].pc.ontrack = (event) => {
     console.log('ontrack', event);
     if (remoteVideo[0].srcObject !== event.streams[0]) {
       remoteVideo[0].srcObject = event.streams[0];
