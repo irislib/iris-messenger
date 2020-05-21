@@ -6,6 +6,8 @@ var callSoundTimeout;
 var callingInterval;
 var incomingCallNotification;
 var userMediaStream;
+var ourIceCandidates;
+var theirIceCandidates;
 var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 
@@ -205,6 +207,7 @@ async function createCallElement(pub) {
 }
 
 async function initConnection(createOffer, pub) {
+  iceCandidates = {};
   chats[pub].pc = new RTCPeerConnection(RTC_CONFIG);
   var pc = chats[pub].pc;
   await addStreamToPeerConnection(pc);
@@ -222,21 +225,30 @@ async function initConnection(createOffer, pub) {
   if (createOffer) {
     await createOfferFn();
   }
+  ourIceCandidates = {};
+  theirIceCandidateKeys = [];
   chats[pub].onTheir('sdp', async sdp => {
     if (sdp.data && sdp.time && new Date(sdp.time) < (new Date() - 5000)) { return; }
     stopCalling();
     console.log('got their sdp', sdp);
     pc.setRemoteDescription(new RTCSessionDescription(sdp.data));
   });
-  chats[pub].onTheir('icecandidate', c => {
+  chats[pub].onTheir('icecandidates', c => {
     if (c.data && c.time && new Date(c.time) < (new Date() - 5000)) { return; }
-    console.log('got their icecandidate', c);
-    pc.addIceCandidate(new RTCIceCandidate(c.data)).then(console.log, console.error);;
+    console.log('got their icecandidates', c);
+    Object.keys(c.data).forEach(k => {
+      if (theirIceCandidateKeys.indexOf(k) === -1) {
+        theirIceCandidateKeys.push(k);
+        pc.addIceCandidate(new RTCIceCandidate(c.data[k])).then(console.log, console.error);;
+      }
+    });
   });
   pc.onicecandidate = pc.onicecandidate || (({candidate}) => {
     if (!candidate) return;
     console.log('sending our ice candidate');
-    chats[pub].put('icecandidate', {time: new Date().toISOString(), data: candidate});
+    var i = Gun.SEA.random(12).toString('base64');
+    ourIceCandidates[i] = candidate;
+    chats[pub].put('icecandidates', {time: new Date().toISOString(), data: ourIceCandidates});
   });
   if (createOffer) {
     pc.onnegotiationneeded = async () => {
