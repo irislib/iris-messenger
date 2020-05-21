@@ -15,6 +15,13 @@ if (!iris.util.isElectron) {
 var gun = Gun(gunOpts);
 window.gun = gun;
 
+function setImgSrc(el, src) {
+  if (src && src.indexOf('data:image') === 0) {
+    el.attr('src', src);
+  }
+  return el;
+}
+
 function checkGunPeerCount() {
   var peersFromGun = gun.back('opt.peers');
   var connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
@@ -224,7 +231,7 @@ function login(k) {
   }
   $('.user-info .user-name').text('anonymous');
   $('#settings-name').val('');
-  $('#current-profile-photo').attr('src', '');
+  setImgSrc($('#current-profile-photo'), '');
   $('#private-key-qr').remove();
   gun.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
@@ -239,7 +246,7 @@ function login(k) {
   gun.user().get('profile').get('photo').on(data => {
     myProfilePhoto = data;
     if (!activeProfile) {
-      $('#current-profile-photo').attr('src', data);
+      setImgSrc($('#current-profile-photo'), data);
       $('#add-profile-photo').toggleClass('hidden', true);
     }
   });
@@ -371,7 +378,7 @@ function openAttachmentsPreview() {
       getBase64(files[i]).then(base64 => {
         chats[activeChat].attachments = chats[activeChat].attachments || [];
         chats[activeChat].attachments.push({type: 'image', data: base64});
-        var preview = $('<img>').attr('src', base64);
+        var preview = setImgSrc($('<img>'), base64);
         attachmentsPreview.append(preview);
       });
     }
@@ -390,7 +397,7 @@ function openAttachmentsGallery(msg, event) {
   if (msg.attachments) {
     msg.attachments.forEach(a => {
       if (a.type.indexOf('image') === 0 && a.data) {
-        img = $('<img>').attr('src', a.data);
+        img = setImgSrc($('<img>'), a.data);
         if (msg.attachments.length === 1) {
           attachmentsPreview.css({'justify-content': 'center'});
           var original = $(event.target);
@@ -559,7 +566,7 @@ function showSettings() {
   var el = $('#profile-photo-settings');
   $('#profile-photo-chapter').after(el);
   $('#current-profile-photo').toggle(!!myProfilePhoto);
-  $('#current-profile-photo').attr('src', myProfilePhoto);
+  setImgSrc($('#current-profile-photo'), myProfilePhoto);
   $('#add-profile-photo').toggle(!myProfilePhoto);
 }
 
@@ -766,7 +773,7 @@ function renderGroupPhotoSettings(uuid) {
   $('#current-profile-photo').toggle(!!chats[uuid].photo);
   $('#profile .profile-photo').toggle(!!chats[uuid].photo);
   if (isAdmin) {
-    $('#current-profile-photo').attr('src', chats[uuid].photo);
+    setImgSrc($('#current-profile-photo'), chats[uuid].photo);
     $('#profile .profile-photo').hide();
     renderProfilePhotoSettings();
     var el = $('#profile-photo-settings');
@@ -792,7 +799,7 @@ function renderProfilePhotoSettings() {
     $('#add-profile-photo').hide();
     getBase64(file).then(base64 => {
       var previewEl = $('#profile-photo-preview');
-      previewEl.attr('src', base64);
+      setImgSrc(previewEl, base64);
       $('#profile-photo-preview').toggleClass('hidden', false);
       $('#cancel-profile-photo').toggleClass('hidden', false);
       $('#use-profile-photo').toggleClass('hidden', false);
@@ -810,7 +817,7 @@ function renderProfilePhotoSettings() {
     if (!$('#current-profile-photo').attr('src')) {
       $('#add-profile-photo').show();
     }
-    $('#profile-photo-preview').attr('src', '');
+    setImgSrc($('#profile-photo-preview'), '');
     $('#cancel-profile-photo').toggleClass('hidden', true);
     $('#use-profile-photo').toggleClass('hidden', true);
   }
@@ -831,7 +838,7 @@ $('#use-profile-photo').click(() => {
     } else {
       gun.user().get('profile').get('photo').put(src);
     }
-    $('#current-profile-photo').attr('src', src);
+    setImgSrc($('#current-profile-photo'), src);
     $('#profile-photo-input').val('');
     renderProfilePhotoSettings();
   });
@@ -866,7 +873,7 @@ function showProfile(pub) {
   $('#profile .profile-photo').show();
   gun.user(pub).get('profile').get('photo').on(photo => {
     $('#profile .profile-photo-container').show();
-    $('#profile .profile-photo').attr('src', photo);
+    setImgSrc($('#profile .profile-photo'), photo);
   });
   $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
   $('#profile .profile-about-content').empty();
@@ -918,7 +925,7 @@ function showProfile(pub) {
   if (chats[pub] && chats[pub].uuid) {
     renderGroupPhotoSettings(chats[pub].uuid);
     $('#profile .profile-photo-container').show();
-    $('#profile .profile-photo').attr('src', chats[pub].photo);
+    setImgSrc($('#profile .profile-photo'), chats[pub].photo);
   }
 }
 
@@ -1018,7 +1025,8 @@ function addUserToHeader(pub) {
     textEl.append(namesEl);
     if (chats[pub].photo) {
       identicon.hide();
-      $('#header-content .identicon-container').append($('<img>').attr('src', chats[pub].photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'}));
+      var photo = setImgSrc($('<img>'), chats[pub].photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
+      $('#header-content .identicon-container').append(photo);
     }
   }
   textEl.append($('<small>').addClass('last-seen'));
@@ -1155,7 +1163,7 @@ function getIdenticon(pub, width) {
   el.html(identicon);
   gun.user(pub).get('profile').get('photo').on(data => { // TODO: limit size
     if (data) {
-      el.html($('<img>').attr('src', data).attr('width', width).attr('height', width).addClass('identicon-image'));
+      el.html(setImgSrc($('<img>'), data).attr('width', width).attr('height', width).addClass('identicon-image'));
     } else {
       el.html(identicon);
     }
@@ -1213,7 +1221,7 @@ function addMessage(msg, chatId) {
   if (msg.attachments) {
     msg.attachments.forEach(a => {
       if (a.type.indexOf('image') === 0 && a.data) {
-        var img = $('<img>').attr('src', a.data).click(e => { openAttachmentsGallery(msg, e); });
+        var img = setImgSrc($('<img>'), a.data).click(e => { openAttachmentsGallery(msg, e); });
         msgContent.prepend(img);
         img.one('load', scrollToMessageListBottom);
       }
@@ -1455,14 +1463,14 @@ function addChat(channel) {
     }
     chats[pub].photo = photo;
     el.find('.identicon-container').empty();
-    var img = $('<img>').attr('src', photo).attr('height', 49).attr('width', 49).css({'border-radius': '50%'});
+    var img = setImgSrc($('<img>'), photo).attr('height', 49).attr('width', 49).css({'border-radius': '50%'});
     el.find('.identicon-container').append(photo ? img : chats[pub].identicon);
     if (pub === activeChat || pub === activeProfile) {
       addUserToHeader(pub);
     }
     if (pub === activeProfile) {
-      $('#current-profile-photo').attr('src', photo);
-      $('#profile .profile-photo').attr('src', photo);
+      setImgSrc($('#current-profile-photo'), photo);
+      setImgSrc($('#profile .profile-photo'), photo);
     }
     $('#current-profile-photo').toggle(!!photo);
   }
