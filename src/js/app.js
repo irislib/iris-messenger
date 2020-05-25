@@ -71,6 +71,11 @@ if (iris.util.isElectron) {
 var AVAILABLE_LANGUAGES = Object.keys(IRIS_TRANSLATIONS);
 var language = localStorage.getItem('language') || (navigator.language && navigator.language.slice(0,2)) || 'en';
 language = AVAILABLE_LANGUAGES.indexOf(language) >= 0 ? language : 'en';
+var languageObj = IRIS_TRANSLATIONS[language];
+if (language !== 'en') {
+  var en = IRIS_TRANSLATIONS['en'];
+  Object.keys(en).forEach(k => languageObj[k] = languageObj[k] || en[k]);
+}
 var main_content_temp = _.template($('#main-content-template').html());
 $('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(IRIS_TRANSLATIONS[language])));
 AVAILABLE_LANGUAGES.forEach(l => {
@@ -592,7 +597,7 @@ function showNewChat() {
   resetView();
   $('.chat-item.new').toggleClass('active', true);
   $('#new-chat').show();
-  $("#header-content").text('New chat');
+  $("#header-content").text(languageObj.new_chat);
   $('#show-my-qr-btn').off().click(() => {
     $('#my-qr-code').toggle()
   })

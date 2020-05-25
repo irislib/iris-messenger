@@ -73,10 +73,10 @@
           </div>
         </form>
         <div id="existing-account-login" class="hidden">
-          <p><a href="#" id="show-create-account">&lt; Back</a></p>
-          <input id="paste-privkey" placeholder="Paste a private key">
+          <p><a href="#" id="show-create-account">&lt; <%= back %></a></p>
+          <input id="paste-privkey" placeholder="<%= paste_private_key %>">
           <p>
-            <button id="scan-privkey-btn">Scan private key QR code</button>
+            <button id="scan-privkey-btn"><%= scan_private_key_qr_code %></button>
           </p>
           </p>
             <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;" class="hidden"></video>
@@ -91,8 +91,8 @@
         <div class="user-name"></div>
       </div>
       <div id="enable-notifications-prompt">
-        <div class="title">Get notified of new messages</div>
-        <div><a>Turn on desktop notifications</a></div>
+        <div class="title"><%= get_notified_new_messages %></div>
+        <div><a><%= turn_on_desktop_notifications %></a></div>
       </div>
       <div class="chat-list">
         <div class="chat-item new">
@@ -100,7 +100,7 @@
           	  viewBox="0 0 510 510" xml:space="preserve">
           	<path fill="currentColor" d="M459,0H51C22.95,0,0,22.95,0,51v459l102-102h357c28.05,0,51-22.95,51-51V51C510,22.95,487.05,0,459,0z M102,178.5h306v51 H102V178.5z M306,306H102v-51h204V306z M408,153H102v-51h306V153z"/>
           </svg>
-          New chat
+          <%= new_chat %>
         </div>
         <div id="welcome" class="visible-xs-block">
           <h3>Iris Messenger</h3>
@@ -125,7 +125,7 @@
       </div>
       <div id="not-seen-by-them" style="display: none">
         <p>If the other person doesn't see your message, you can give them <b>your</b> chat link through some other channel:</p>
-        <p><button class="copy-chat-link">Copy your chat link</button></p>
+        <p><button class="copy-chat-link"><%= copy_your_chat_link %></button></p>
       </div>
       <div class="message-form" style="display:none">
         <form autocomplete="off">
@@ -145,19 +145,19 @@
 
       <!-- New chat view -->
       <div class="main-view" id="new-chat">
-        <h3>Have someone's chat link?</h3>
-        <input id="paste-chat-link" type="text" placeholder="Paste their chat link">
-        <button id="scan-chatlink-qr-btn">Or scan their QR code</button>
+        <h3><%= have_someones_chat_link %></h3>
+        <input id="paste-chat-link" type="text" placeholder="<%= paste_their_chat_link %>">
+        <button id="scan-chatlink-qr-btn"><%= or_scan_qr_code %></button>
         <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
-        <h3>Give your chat link:</h3>
-        <button class="copy-chat-link">Copy your chat link</button>
-        <button id="show-my-qr-btn">Or show your QR code</button>
+        <h3><%= give_your_chat_link %></h3>
+        <button class="copy-chat-link"><%= copy_your_chat_link %></button>
+        <button id="show-my-qr-btn"><%= or_show_qr_code %></button>
         <p id="my-qr-code" class="qr-container" style="display:none"></p>
         <p><small>Beware of sharing your chat link publicly: you might get spammed with message requests. Publicly share your <a class="profile-link">profile link</a> instead.</small></p>
-        <h3>New group</h3>
+        <h3><%= new_group %></h3>
         <p>
-          <input id="new-group-name" type="text" placeholder="Group name">
-          <button id="new-group-create">Create</button>
+          <input id="new-group-name" type="text" placeholder="<%= group_name %>">
+          <button id="new-group-create"><%= create %></button>
         </p>
         <hr/>
         <h3>Your Chat Links</h3>
