@@ -69,6 +69,7 @@ if (iris.util.isElectron) {
 }
 
 var language = navigator.language.slice(0,2) || 'en';
+language = Object.keys(IRIS_TRANSLATIONS).indexOf(language) >= 0 ? language : 'en';
 var main_content_temp = _.template($('#main-content-template').html());
 $('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(IRIS_TRANSLATIONS[language])));
 
