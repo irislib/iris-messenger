@@ -69,6 +69,7 @@
             <p><button id="sign-up" type="submit"><%= new_user_go %></button></p>
             <br>
             <p><a href="#" id="show-existing-account-login"><%= already_have_an_account %></a></p>
+            <p><select class="language-selector"></select></p>
           </div>
         </form>
         <div id="existing-account-login" class="hidden">
@@ -216,6 +217,10 @@
           <button id="show-private-key-qr">Show private key QR code</button>
         </p>
         <p><small>The safest place to store your private key is a <b>password manager</b>.</small></p>
+        <hr/>
+        <h3>Language</h3>
+        <p><select class="language-selector"></select></p>
+        <p><small>Translations are still incomplete.</small></p>
         <hr/>
         <h3>Peers</h3>
         <div id="peers" class="flex-table">
