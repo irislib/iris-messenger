@@ -68,6 +68,10 @@ if (iris.util.isElectron) {
   window.addEventListener('online',  refreshUnlessActive);
 }
 
+var language = navigator.language.slice(0,2) || 'en';
+var main_content_temp = _.template($('#main-content-template').html());
+$('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(IRIS_TRANSLATIONS[language])));
+
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
 });

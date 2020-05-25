@@ -58,17 +58,17 @@
 </head>
 
 <body>
-  <div class="chat">
+  <script type="text/template" id="main-content-template">
     <section id="login" class="hidden">
       <div id="login-content">
         <form id="login-form" autocomplete="off">
           <div id="create-account">
             <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris">
-            <h1>Iris Messenger</h1>
-            <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="What's your name?">
-            <p><button id="sign-up" type="submit">Go</button></p>
+            <h1><%= iris_messenger %></h1>
+            <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="<%= whats_your_name %>">
+            <p><button id="sign-up" type="submit"><%= new_user_go %></button></p>
             <br>
-            <p><a href="#" id="show-existing-account-login">Already have an account?</a></p>
+            <p><a href="#" id="show-existing-account-login"><%= already_have_an_account %></a></p>
           </div>
         </form>
         <div id="existing-account-login" class="hidden">
@@ -361,9 +361,10 @@
       </div>
 
     </section>
-  </div>
+  </script>
 
   <script src="./js/jquery.js"></script>
+  <script src="./js/translations.js"></script>
   <script src="./js/cropper.min.js"></script>
   <script src="./js/pica.min.js"></script>
   <script src="./js/underscore-min.js"></script>
