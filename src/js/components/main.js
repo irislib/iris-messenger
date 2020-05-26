@@ -1,5 +1,6 @@
-import Translations from '../translations.js';
-import Helpers from '../helpers.js';
+import Translations from '../Translations.js';
+import Helpers from '../Helpers.js';
+import VideoCall from './VideoCall.js';
 
 Gun.log.off = true;
 var MAX_PEER_LIST_SIZE = 10;
@@ -17,7 +18,6 @@ if (!iris.util.isElectron) {
 }
 var gun = Gun(gunOpts);
 window.gun = gun;
-
 function setImgSrc(el, src) {
   if (src && src.indexOf('data:image') === 0) {
     el.attr('src', src);
@@ -46,7 +46,7 @@ function checkGunPeerCount() {
 }
 setInterval(checkGunPeerCount, 2000);
 
-var notificationSound = new Audio('./notification.mp3');
+var notificationSound = new Audio('../../audio/notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
 var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
@@ -218,12 +218,11 @@ function login(k) {
     latestChatLink = chatLink.url;
   });
   $('#generate-chat-link').off().on('click', createChatLink);
-  myIdenticon = getIdenticon(key.pub, 40);
   loginTime = new Date();
   unseenTotal = 0;
   $(".chat-item:not(.new)").remove();
   $("#my-identicon").empty();
-  $("#my-identicon").append(myIdenticon);
+  $("#my-identicon").append(getIdenticon(key.pub, 40));
   $(".user-info").off().on('click', showSettings);
   $(".profile-link").attr('href', getUserChatLink(key.pub)).off().on('click', e => {
     e.preventDefault();
@@ -1266,7 +1265,7 @@ function addMessage(msg, chatId) {
   } else {
     textEl.html(Helpers.highlightEmoji(textEl.html()));
   }
-  msgEl = $('<div class="msg"></div>').append(msgContent);
+  const msgEl = $('<div class="msg"></div>').append(msgContent);
   msgEl.data('time', msg.time);
   msgEl.data('from', msg.info.from);
   msgEl.toggleClass('our', msg.selfAuthored ? true : false);
@@ -1530,7 +1529,7 @@ function addChat(channel) {
     gun.user(pub).get('profile').get('name').on(setName);
     gun.user(pub).get('profile').get('about').on(setAbout);
   }
-  chats[pub].onTheir('call', call => onCallMessage(pub, call));
+  chats[pub].onTheir('call', call => VideoCall.onCallMessage(pub, call));
 }
 
 function setLatestSeen(pub) {
@@ -1594,3 +1593,5 @@ function setUnseenTotal() {
     $('.unseen-total').hide();
   }
 }
+
+export default {gun, chats};

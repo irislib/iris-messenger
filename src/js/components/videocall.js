@@ -1,6 +1,6 @@
-var ringSound = new Audio('./ring.mp3');
+var ringSound = new Audio('../../audio/ring.mp3');
 ringSound.loop = true;
-var callSound = new Audio('./call.mp3');
+var callSound = new Audio('../../audio/call.mp3');
 var callTimeout;
 var callSoundTimeout;
 var callingInterval;
@@ -321,3 +321,7 @@ async function answerCall(pub) {
   closeIncomingCall();
   await initConnection(false, pub);
 }
+
+export default {
+  onCallMessage
+};
