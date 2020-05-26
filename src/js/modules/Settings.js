@@ -1,5 +1,5 @@
 import {gun, resetView} from './Main.js';
-import Session from '../services/Session.js';
+import Session from './Session.js';
 import Helpers from '../Helpers.js';
 
 function render() {

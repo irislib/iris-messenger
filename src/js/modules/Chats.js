@@ -1,11 +1,11 @@
-import {resetView, activeChat, setActiveChat, activeProfile} from '../components/Main.js';
-import Translation, { translate as t } from '../services/Translation.js';
+import {resetView, activeChat, setActiveChat, activeProfile} from './Main.js';
+import Translation, { translate as t } from './Translation.js';
 import Helpers from '../Helpers.js';
 import Notifications from './Notifications.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
-import Gallery from '../components/Gallery.js';
-import Profile from '../components/Profile.js';
+import Gallery from './Gallery.js';
+import Profile from './Profile.js';
 
 var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});

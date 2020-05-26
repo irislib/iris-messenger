@@ -1,13 +1,13 @@
 import MainTemplate from './MainTemplate.js';
-import Translation, { translate as t } from '../services/Translation.js';
+import Translation, { translate as t } from './Translation.js';
 import Helpers from '../Helpers.js';
-import PeerManager from '../services/PeerManager.js';
-import Notifications from '../services/Notifications.js';
+import PeerManager from './PeerManager.js';
+import Notifications from './Notifications.js';
 import VideoCall from './VideoCall.js';
 import Gallery from './Gallery.js';
-import Session from '../services/Session.js';
+import Session from './Session.js';
 import Settings from './Settings.js';
-import Chats, {chats} from '../services/Chats.js';
+import Chats, {chats} from './Chats.js';
 
 Gun.log.off = true;
 var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity };

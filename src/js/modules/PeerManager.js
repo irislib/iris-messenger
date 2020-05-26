@@ -1,4 +1,4 @@
-import {gun} from '../components/Main.js';
+import {gun} from './Main.js';
 import Helpers from '../Helpers.js';
 
 var MAX_PEER_LIST_SIZE = 10;

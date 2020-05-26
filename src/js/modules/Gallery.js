@@ -1,5 +1,5 @@
 import Helpers from '../Helpers.js';
-import {chats} from '../services/Chats.js';
+import {chats} from './Chats.js';
 import {activeChat} from './Main.js';
 
 var ANIMATE_DURATION = 200;

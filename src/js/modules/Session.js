@@ -1,8 +1,8 @@
-import {gun, activeChat, activeProfile, resetView} from '../components/Main.js';
+import {gun, activeChat, activeProfile, resetView} from './Main.js';
 import {chats, addChat, showNewChat} from './Chats.js';
 import Notifications from './Notifications.js';
 import Helpers from '../Helpers.js';
-import Profile from '../components/Profile.js';
+import Profile from './Profile.js';
 
 var key;
 var myName;

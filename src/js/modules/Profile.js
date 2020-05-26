@@ -1,6 +1,6 @@
 import {resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
-import {chats} from '../services/Chats.js';
-import Session from '../services/Session.js';
+import {chats} from './Chats.js';
+import Session from './Session.js';
 import Helpers from '../Helpers.js';
 
 function renderGroupParticipants(pub) {

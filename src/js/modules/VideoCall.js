@@ -1,4 +1,4 @@
-import {chats} from '../services/Chats.js';
+import {chats} from './Chats.js';
 
 var ringSound = new Audio('../../audio/ring.mp3');
 ringSound.loop = true;

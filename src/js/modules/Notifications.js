@@ -1,5 +1,5 @@
 import Helpers from '../Helpers.js';
-import Profile from '../components/Profile.js';
+import Profile from './Profile.js';
 import {chats} from './Chats.js';
 
 var notificationSound = new Audio('../../audio/notification.mp3');
