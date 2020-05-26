@@ -1,3 +1,5 @@
+import {chats} from './Main.js';
+
 var ringSound = new Audio('../../audio/ring.mp3');
 ringSound.loop = true;
 var callSound = new Audio('../../audio/call.mp3');
@@ -208,7 +210,7 @@ async function createCallElement(pub) {
 
 async function initConnection(createOffer, pub) {
   ourIceCandidates = {};
-  theirIceCandidateKeys = [];
+  const theirIceCandidateKeys = [];
   chats[pub].pc = new RTCPeerConnection(RTC_CONFIG);
   await addStreamToPeerConnection(chats[pub].pc);
   async function createOfferFn() {
@@ -227,6 +229,7 @@ async function initConnection(createOffer, pub) {
   }
   chats[pub].onTheir('sdp', async sdp => {
     if (!chats[pub].pc) { return; }
+    if (chats[pub].pc.signalingState === 'stable') { return; }
     if (sdp.data && sdp.time && new Date(sdp.time) < (new Date() - 5000)) { return; }
     stopCalling();
     console.log('got their sdp', sdp);
@@ -323,5 +326,8 @@ async function answerCall(pub) {
 }
 
 export default {
-  onCallMessage
+  onCallMessage,
+  callUser,
+  stopCalling,
+  callingInterval
 };
