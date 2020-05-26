@@ -73,6 +73,13 @@ $('.language-selector').change(e => {
 PeerManager.updatePeerList();
 setInterval(PeerManager.updatePeerList, 2000);
 setInterval(PeerManager.checkGunPeerCount, 2000);
+$('#add-peer-btn').click(() => {
+  var url = $('#add-peer-url').val();
+  var visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
+  PeerManager.addPeer({url, visibility});
+  $('#add-peer-url').val('');
+  PeerManager.updatePeerList();
+});
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
