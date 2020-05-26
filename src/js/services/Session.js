@@ -1,4 +1,4 @@
-import {gun, addChat, showNewChat, activeChat, activeProfile} from '../components/Main.js';
+import {gun, chats, addChat, showNewChat, activeChat, activeProfile} from '../components/Main.js';
 import Notifications from './Notifications.js';
 import Helpers from '../Helpers.js';
 
@@ -50,7 +50,6 @@ function setOurOnlineStatus() {
 }
 
 function login(k) {
-  chats = {};
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
   $('#login').hide();
