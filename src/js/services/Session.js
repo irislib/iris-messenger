@@ -1,6 +1,8 @@
-import {gun, chats, addChat, showNewChat, activeChat, activeProfile} from '../components/Main.js';
+import {gun, activeChat, activeProfile, resetView} from '../components/Main.js';
+import {chats, addChat, showNewChat} from './Chats.js';
 import Notifications from './Notifications.js';
 import Helpers from '../Helpers.js';
+import Profile from '../components/Profile.js';
 
 var key;
 var myName;
@@ -75,7 +77,7 @@ function login(k) {
   $(".profile-link").attr('href', Helpers.getUserChatLink(key.pub)).off().on('click', e => {
     e.preventDefault();
     if (chats[key.pub]) {
-      showProfile(key.pub);
+      Profile.showProfile(key.pub);
     }
   });
   setOurOnlineStatus();

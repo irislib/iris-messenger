@@ -1,5 +1,6 @@
 import Helpers from '../Helpers.js';
-import {chats} from '../components/Main.js';
+import Profile from '../components/Profile.js';
+import {chats} from './Chats.js';
 
 var notificationSound = new Audio('../../audio/notification.mp3');
 var loginTime;
@@ -42,7 +43,7 @@ function notifyMsg(msg, info, pub) {
   if (shouldDesktopNotify()) {
     var body = chats[pub].uuid ? `${chats[pub].participantProfiles[info.from].name}: ${msg.text}` : msg.text;
     body = Helpers.truncateString(body, 50);
-    var desktopNotification = new Notification(getDisplayName(pub), {
+    var desktopNotification = new Notification(Profile.getDisplayName(pub), {
       icon: 'img/icon128.png',
       body,
       silent: true
