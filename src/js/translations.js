@@ -1,4 +1,4 @@
-var IRIS_TRANSLATIONS = {
+export default {
   "en": {
     language_name: "English",
     iris_messenger: "Iris Messenger",

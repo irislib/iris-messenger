@@ -1,3 +1,6 @@
+import Translations from '../translations.js';
+import Helpers from '../helpers.js';
+
 Gun.log.off = true;
 var MAX_PEER_LIST_SIZE = 10;
 var MAX_CONNECTED_PEERS = iris.util.isElectron ? 4 : 2;
@@ -68,18 +71,18 @@ if (iris.util.isElectron) {
   window.addEventListener('online',  refreshUnlessActive);
 }
 
-var AVAILABLE_LANGUAGES = Object.keys(IRIS_TRANSLATIONS);
+var AVAILABLE_LANGUAGES = Object.keys(Translations);
 var language = localStorage.getItem('language') || (navigator.language && navigator.language.slice(0,2)) || 'en';
 language = AVAILABLE_LANGUAGES.indexOf(language) >= 0 ? language : 'en';
-var languageObj = IRIS_TRANSLATIONS[language];
+var languageObj = Translations[language];
 if (language !== 'en') {
-  var en = IRIS_TRANSLATIONS['en'];
+  var en = Translations['en'];
   Object.keys(en).forEach(k => languageObj[k] = languageObj[k] || en[k]);
 }
 var main_content_temp = _.template($('#main-content-template').html());
-$('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(IRIS_TRANSLATIONS[language])));
+$('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(Translations[language])));
 AVAILABLE_LANGUAGES.forEach(l => {
-  var el = $('<option>').attr('value', l).text(IRIS_TRANSLATIONS[l].language_name);
+  var el = $('<option>').attr('value', l).text(Translations[l].language_name);
   $('.language-selector').append(el.clone());
 });
 $('.language-selector').val(language);
@@ -106,7 +109,7 @@ if (localStorageKey) {
 } else {
   newUserLogin();
 }
-showConsoleWarning();
+Helpers.showConsoleWarning();
 
 function getPeers() {
   var p = localStorage.getItem('gunPeers');
@@ -159,7 +162,7 @@ function disconnectPeer(peerFromGun) {
 }
 
 async function addPeer(peer) {
-  if (!isUrl(peer.url)) {
+  if (!Helpers.isUrl(peer.url)) {
     throw new Error('Invalid url', peer.url);
   }
   peers[peer.url] = peers[peer.url] || _.omit(peer, 'url');
@@ -206,7 +209,7 @@ function login(k) {
     var text = $('<div>').addClass('flex-cell').text(chatLink.url);
     var btn = $('<button>Remove</button>').click(() => {
       iris.Channel.removeChatLink(gun, key, chatLink.id);
-      hideAndRemove(row);
+      Helpers.hideAndRemove(row);
     });
     row.append(text);
     row.append($('<div>').addClass('flex-cell no-flex').append(btn));
@@ -230,8 +233,8 @@ function login(k) {
   });
   setOurOnlineStatus();
   iris.Channel.getChannels(gun, key, addChat);
-  var chatId = getUrlParameter('chatWith') || getUrlParameter('channelId');
-  var inviter = getUrlParameter('inviter');
+  var chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
+  var inviter = Helpers.getUrlParameter('inviter');
   if (chatId) {
     function go() {
       if (inviter !== key.pub) {
@@ -259,7 +262,7 @@ function login(k) {
   gun.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       myName = name;
-      $('.user-info .user-name').text(truncateString(name, 20));
+      $('.user-info .user-name').text(Helpers.truncateString(name, 20));
       $('#settings-name').not(':focus').val(name);
     }
   });
@@ -318,7 +321,7 @@ function updatePeerList() {
     var row = $('<div>').addClass('flex-row peer');
     var urlEl = $('<div>').addClass('flex-cell').text(url);
     var removeBtn = $('<button>Remove</button>').click(() => {
-      hideAndRemove(row); // this may be screwed by setInterval removing before animation finished
+      Helpers.hideAndRemove(row); // this may be screwed by setInterval removing before animation finished
       delete peers[url];
       savePeers();
       if (peerFromGun) {
@@ -342,7 +345,7 @@ function updatePeerList() {
     if (peer.from) {
       urlEl.append($('<br>'));
       urlEl.append(
-        $('<small>').text('from ' + ((chats[peer.from] && getDisplayName(peer.from)) || truncateString(peer.from, 10)))
+        $('<small>').text('from ' + ((chats[peer.from] && getDisplayName(peer.from)) || Helpers.truncateString(peer.from, 10)))
         .css({cursor:'pointer'}).click(() => showChat(peer.from))
       );
     }
@@ -398,7 +401,7 @@ function openAttachmentsPreview() {
     attachmentsPreview.show();
     $('#message-list').hide();
     for (var i = 0;i < files.length;i++) {
-      getBase64(files[i]).then(base64 => {
+      Helpers.getBase64(files[i]).then(base64 => {
         chats[activeChat].attachments = chats[activeChat].attachments || [];
         chats[activeChat].attachments.push({type: 'image', data: base64});
         var preview = setImgSrc($('<img>'), base64);
@@ -490,7 +493,7 @@ $('#paste-chat-link').on('input', event => {
   }
   var s = val.split('?');
   if (s.length !== 2) { return; }
-  var chatId = getUrlParameter('chatWith', s[1]) || getUrlParameter('channelId', s[1]);
+  var chatId = Helpers.getUrlParameter('chatWith', s[1]) || Helpers.getUrlParameter('channelId', s[1]);
   if (chatId) {
     newChat(chatId, val);
     showChat(chatId);
@@ -633,7 +636,7 @@ $('#scan-chatlink-qr-btn').click(() => {
 });
 
 $('.copy-chat-link').click(event => {
-  copyToClipboard(getMyChatLink());
+  Helpers.copyToClipboard(getMyChatLink());
   var t = $(event.target);
   var originalText = t.text();
   var originalWidth = t.width();
@@ -646,7 +649,7 @@ $('.copy-chat-link').click(event => {
 });
 
 $('#copy-private-key').click(event => {
-  copyToClipboard(JSON.stringify(key));
+  Helpers.copyToClipboard(JSON.stringify(key));
   var t = $(event.target);
   var originalText = t.text();
   var originalWidth = t.width();
@@ -658,7 +661,7 @@ $('#copy-private-key').click(event => {
   }, 2000);
 });
 
-$('#download-private-key').click(downloadKey);
+$('#download-private-key').click(Helpers.downloadKey);
 $('#show-private-key-qr').click(togglePrivateKeyQR);
 
 function togglePrivateKeyQR(e) {
@@ -776,7 +779,7 @@ function notify(msg, info, pub) {
   }
   if (shouldDesktopNotify()) {
     var body = chats[pub].uuid ? `${chats[pub].participantProfiles[info.from].name}: ${msg.text}` : msg.text;
-    body = truncateString(body, 50);
+    body = Helpers.truncateString(body, 50);
     var desktopNotification = new Notification(getDisplayName(pub), {
       icon: 'img/icon128.png',
       body,
@@ -820,7 +823,7 @@ function renderProfilePhotoSettings() {
     // show preview
     $('#current-profile-photo').hide();
     $('#add-profile-photo').hide();
-    getBase64(file).then(base64 => {
+    Helpers.getBase64(file).then(base64 => {
       var previewEl = $('#profile-photo-preview');
       setImgSrc(previewEl, base64);
       $('#profile-photo-preview').toggleClass('hidden', false);
@@ -912,7 +915,7 @@ function showProfile(pub) {
   });
   $('#profile .send-message').off().on('click', () => showChat(pub));
   $('#profile .copy-user-link').off().on('click', event => {
-    copyToClipboard(link);
+    Helpers.copyToClipboard(link);
     var t = $(event.target);
     var originalText = t.text();
     var originalWidth = t.width();
@@ -960,7 +963,7 @@ $('#profile-add-participant').on('input', event => {
   }
   var s = val.split('?');
   if (s.length !== 2) { return; }
-  var pub = getUrlParameter('chatWith', s[1]);
+  var pub = Helpers.getUrlParameter('chatWith', s[1]);
   $('#profile-add-participant-input').hide();
   if (pub) {
     $('#profile-add-participant-candidate').remove();
@@ -1258,10 +1261,10 @@ function addMessage(msg, chatId) {
       msgContent.prepend(nameEl);
     }
   }
-  if (msg.text.length === 2 && isEmoji(msg.text)) {
+  if (msg.text.length === 2 && Helpers.isEmoji(msg.text)) {
     textEl.toggleClass('emoji-only', true);
   } else {
-    textEl.html(highlightEmoji(textEl.html()));
+    textEl.html(Helpers.highlightEmoji(textEl.html()));
   }
   msgEl = $('<div class="msg"></div>').append(msgContent);
   msgEl.data('time', msg.time);
@@ -1369,7 +1372,7 @@ function addChat(channel) {
       var latestTimeText = iris.util.getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
       if (latestTimeText === 'today') { latestTimeText = iris.util.formatTime(msg.time); }
       latestEl.text(text);
-      latestEl.html(highlightEmoji(latestEl.html()));
+      latestEl.html(Helpers.highlightEmoji(latestEl.html()));
       if (info.selfAuthored) {
         latestEl.prepend($(seenIndicatorHtml));
         setLatestSeen(pub);
@@ -1406,7 +1409,7 @@ function addChat(channel) {
   chats[pub].onMy('nickname', (nick) => {
     chats[pub].theirNickname = nick;
     if (pub !== key.pub) {
-      el.find('.name').text(truncateString(getDisplayName(pub), 20));
+      el.find('.name').text(Helpers.truncateString(getDisplayName(pub), 20));
     }
     if (pub === activeChat || pub === activeProfile) {
       addUserToHeader(pub);
@@ -1463,7 +1466,7 @@ function addChat(channel) {
     if (pub === key.pub) {
       el.find('.name').html("📝<b>Note to Self</b>");
     } else {
-      el.find('.name').text(truncateString(getDisplayName(pub), 20));
+      el.find('.name').text(Helpers.truncateString(getDisplayName(pub), 20));
     }
     if (pub === activeChat || pub === activeProfile) {
       addUserToHeader(pub);
