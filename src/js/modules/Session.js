@@ -151,6 +151,33 @@ function getMyChatLink() {
   return latestChatLink || Helpers.getUserChatLink(key.pub);
 };
 
+function showSwitchAccount(e) {
+  e.preventDefault();
+  resetView();
+  $('#create-account').hide();
+  $('#existing-account-login').show();
+  $('#paste-privkey').focus();
+}
+
+function showCreateAccount(e) {
+  e.preventDefault();
+  $('#privkey-qr-video').hide();
+  $('#create-account').show();
+  $('#existing-account-login').hide();
+  cleanupScanner();
+  $('#login-form-name').focus();
+}
+
+function showScanPrivKey() {
+  if ($('#privkey-qr-video:visible').length) {
+    $('#privkey-qr-video').hide();
+    cleanupScanner();
+  } else {
+    $('#privkey-qr-video').show();
+    startPrivKeyQRScanner();
+  }
+}
+
 function init() {
   $('#login').hide();
   var localStorageKey = localStorage.getItem('chatKeyPair');
@@ -176,25 +203,9 @@ function init() {
     localStorage.removeItem('chatKeyPair');
     location.reload(); // ensure that everything is reset (especially on the gun side). TODO: without reload
   });
-
   $('#show-existing-account-login').click(showSwitchAccount);
-  function showSwitchAccount(e) {
-    e.preventDefault();
-    resetView();
-    $('#create-account').hide();
-    $('#existing-account-login').show();
-    $('#paste-privkey').focus();
-  }
-
   $('#show-create-account').click(showCreateAccount);
-  function showCreateAccount(e) {
-    e.preventDefault();
-    $('#privkey-qr-video').hide();
-    $('#create-account').show();
-    $('#existing-account-login').hide();
-    cleanupScanner();
-    $('#login-form-name').focus();
-  }
+  $('#scan-privkey-btn').click(showScanPrivKey);
 }
 
 export default {init, key, myName, myProfilePhoto, getMyChatLink, areWeOnline};

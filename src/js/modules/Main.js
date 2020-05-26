@@ -8,6 +8,7 @@ import Gallery from './Gallery.js';
 import Session from './Session.js';
 import Settings from './Settings.js';
 import Chats, {chats} from './Chats.js';
+import Profile from './Profile.js';
 
 Gun.log.off = true;
 var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity };
@@ -39,6 +40,7 @@ Gallery.init();
 Settings.init();
 Chats.init();
 Translation.init();
+Profile.init();
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
@@ -90,27 +92,6 @@ function showMenu(show = true) {
 $('#back-button').off().on('click', () => {
   resetView();
   showMenu(true);
-});
-
-var scanPrivKeyBtn = $('#scan-privkey-btn');
-scanPrivKeyBtn.click(() => {
-  if ($('#privkey-qr-video:visible').length) {
-    $('#privkey-qr-video').hide();
-    cleanupScanner();
-  } else {
-    $('#privkey-qr-video').show();
-    startPrivKeyQRScanner();
-  }
-});
-
-$('#scan-chatlink-qr-btn').click(() => {
-  if ($('#chatlink-qr-video:visible').length) {
-    $('#chatlink-qr-video').hide();
-    cleanupScanner();
-  } else {
-    $('#chatlink-qr-video').show();
-    startChatLinkQRScanner();
-  }
 });
 
 function renderGroupPhotoSettings(uuid) {

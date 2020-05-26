@@ -459,45 +459,6 @@ function createGroupClicked(e) {
   }
 }
 
-var newGroupParticipant;
-function onProfileAddParticipantInput(event) {
-  var val = $(event.target).val();
-  if (val.length < 30) {
-    return;
-  }
-  var s = val.split('?');
-  if (s.length !== 2) { return; }
-  var pub = Helpers.getUrlParameter('chatWith', s[1]);
-  $('#profile-add-participant-input').hide();
-  if (pub) {
-    $('#profile-add-participant-candidate').remove();
-    var identicon = Helpers.getIdenticon(pub, 40).css({'margin-right':15});
-    var nameEl = $('<span>');
-    gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
-    var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
-    var addBtn = $('<button>').css({'margin-left': 15}).text('Add').click(() => {
-      if (newGroupParticipant) {
-        chats[activeProfile].addParticipant(newGroupParticipant);
-        newGroupParticipant = null;
-        $('#profile-add-participant-input').val('').show();
-        $('#profile-add-participant-candidate').remove();
-      }
-    });
-    var removeBtn = $('<button>').css({'margin-left': 15}).text('Cancel').click(() => {
-      el.remove();
-      $('#profile-add-participant-input').val('').show();
-      newGroupParticipant = null;
-    });
-    el.append(identicon);
-    el.append(nameEl);
-    el.append(addBtn);
-    el.append(removeBtn);
-    newGroupParticipant = pub;
-    $('#profile-add-participant-input').after(el);
-  }
-  $(event.target).val('');
-}
-
 function onPasteChatLink(event) {
   var val = $(event.target).val();
   if (val.length < 30) {
@@ -519,12 +480,22 @@ function onWindowResize() { // if resizing up from mobile size menu view
   }
 }
 
+function scanChatLinkQr() {
+  if ($('#chatlink-qr-video:visible').length) {
+    $('#chatlink-qr-video').hide();
+    cleanupScanner();
+  } else {
+    $('#chatlink-qr-video').show();
+    startChatLinkQRScanner();
+  }
+}
+
 function init() {
   $(window).resize(onWindowResize);
   $('.chat-item.new').click(showNewChat);
-  $('#profile-add-participant').on('input', onProfileAddParticipantInput);
   $('#paste-chat-link').on('input', onPasteChatLink);
   $('#new-group-create').click(createGroupClicked);
+  $('#scan-chatlink-qr-btn').click(scanChatLinkQr);
 }
 
 export {init, activeChat, chats, addChat, deleteChat, showNewChat};
