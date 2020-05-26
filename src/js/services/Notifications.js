@@ -3,6 +3,7 @@ import {chats} from '../components/Main.js';
 
 var notificationSound = new Audio('../../audio/notification.mp3');
 var loginTime;
+var unseenTotal;
 
 function desktopNotificationsEnabled() {
   return window.Notification && Notification.permission === 'granted';
@@ -53,8 +54,42 @@ function notifyMsg(msg, info, pub) {
   }
 }
 
+var initialTitle = document.title;
+function setUnseenTotal() {
+  if (unseenTotal) {
+    document.title = '(' + unseenTotal + ') ' + initialTitle;
+    $('.unseen-total').text(unseenTotal).show();
+  } else {
+    document.title = initialTitle;
+    $('.unseen-total').hide();
+  }
+}
+
+function changeChatUnseenCount(pub, change) {
+  if (change) {
+    unseenTotal += change;
+    chats[pub].unseen += change;
+  } else {
+    unseenTotal = unseenTotal - (chats[pub].unseen || 0);
+    chats[pub].unseen = 0;
+  }
+  unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
+  var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
+  var unseenCountEl = chatListEl.find('.unseen');
+  if (chats[pub].unseen > 0) {
+    chatListEl.addClass('has-unseen');
+    unseenCountEl.text(chats[pub].unseen);
+    unseenCountEl.show();
+  } else {
+    chatListEl.removeClass('has-unseen');
+    unseenCountEl.hide();
+  }
+  setUnseenTotal();
+}
+
 function init() {
   loginTime = new Date();
+  unseenTotal = 0;
   if (window.Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
     setTimeout(() => {
       $('#enable-notifications-prompt').slideDown();
@@ -62,4 +97,4 @@ function init() {
   }
 }
 
-export default {init, notifyMsg};
+export default {init, notifyMsg, changeChatUnseenCount};

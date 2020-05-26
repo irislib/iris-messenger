@@ -5,6 +5,8 @@ import PeerManager from '../services/PeerManager.js';
 import Notifications from '../services/Notifications.js';
 import VideoCall from './VideoCall.js';
 import Gallery from './Gallery.js';
+import Session from '../services/Session.js';
+import Settings from './Settings.js';
 
 Gun.log.off = true;
 var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity };
@@ -16,22 +18,14 @@ window.gun = gun;
 
 Helpers.checkColorScheme();
 
-var chat = gun.get('converse/' + location.hash.slice(1));
 var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 var activeChat;
 var activeProfile;
-var onlineTimeout;
-var key;
-var myName;
-var myProfilePhoto;
-var latestChatLink;
-var areWeOnline;
-var unseenTotal;
 
 if (iris.util.isElectron) {
   function refreshUnlessActive() { // hacky way to make sure that gun resubscribes multicast on network changes
-    if (!areWeOnline) { // if you haven't been active in the window in the last 60 seconds
+    if (!Session.areWeOnline) { // if you haven't been active in the window in the last 60 seconds
       location.reload();
     }
   }
@@ -40,138 +34,17 @@ if (iris.util.isElectron) {
 
 var main_content_temp = _.template(MainTemplate);
 $('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(Translation.translation)));
+Session.init();
 Translation.init();
 PeerManager.init();
 Gallery.init();
+Settings.init();
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
 });
 
-$('#login').hide();
-var localStorageKey = localStorage.getItem('chatKeyPair');
-if (localStorageKey) {
-  login(JSON.parse(localStorageKey));
-} else {
-  newUserLogin();
-}
 Helpers.showConsoleWarning();
-
-function newUserLogin() {
-  $('#login').show();
-  $('#login-form-name').focus();
-  $('#login-form').submit(function(e) {
-    e.preventDefault();
-    var name = $('#login-form-name').val();
-    if (name.length) {
-      $('#login').hide();
-      Gun.SEA.pair().then(k => {
-        login(k);
-        gun.user().get('profile').get('name').put(name);
-        createChatLink();
-      });
-    }
-  });
-}
-
-function login(k) {
-  chats = {};
-  key = k;
-  localStorage.setItem('chatKeyPair', JSON.stringify(k));
-  $('#login').hide();
-  iris.Channel.initUser(gun, key);
-  $('#my-chat-links').empty();
-  iris.Channel.getMyChatLinks(gun, key, undefined, chatLink => {
-    var row = $('<div>').addClass('flex-row');
-    var text = $('<div>').addClass('flex-cell').text(chatLink.url);
-    var btn = $('<button>Remove</button>').click(() => {
-      iris.Channel.removeChatLink(gun, key, chatLink.id);
-      Helpers.hideAndRemove(row);
-    });
-    row.append(text);
-    row.append($('<div>').addClass('flex-cell no-flex').append(btn));
-    $('#my-chat-links').append(row);
-    setChatLinkQrCode(chatLink.url);
-    latestChatLink = chatLink.url;
-  });
-  $('#generate-chat-link').off().on('click', createChatLink);
-  unseenTotal = 0;
-  $(".chat-item:not(.new)").remove();
-  $("#my-identicon").empty();
-  $("#my-identicon").append(getIdenticon(key.pub, 40));
-  $(".user-info").off().on('click', showSettings);
-  $(".profile-link").attr('href', getUserChatLink(key.pub)).off().on('click', e => {
-    e.preventDefault();
-    if (chats[key.pub]) {
-      showProfile(key.pub);
-    }
-  });
-  setOurOnlineStatus();
-  iris.Channel.getChannels(gun, key, addChat);
-  var chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
-  var inviter = Helpers.getUrlParameter('inviter');
-  if (chatId) {
-    function go() {
-      if (inviter !== key.pub) {
-        newChat(chatId, window.location.href);
-      }
-      showChat(chatId);
-      window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
-    }
-    if (inviter) {
-      setTimeout(go, 2000); // wait a sec to not re-create the same chat
-    } else {
-      go();
-    }
-  } else {
-    if (iris.util.isMobile) {
-      showMenu();
-    } else {
-      showNewChat();
-    }
-  }
-  $('.user-info .user-name').text('anonymous');
-  $('#settings-name').val('');
-  Helpers.setImgSrc($('#current-profile-photo'), '');
-  $('#private-key-qr').remove();
-  gun.user().get('profile').get('name').on(name => {
-    if (name && typeof name === 'string') {
-      myName = name;
-      $('.user-info .user-name').text(Helpers.truncateString(name, 20));
-      $('#settings-name').not(':focus').val(name);
-    }
-  });
-  gun.user().get('profile').get('about').on(about => {
-    $('#settings-about').not(':focus').val(about || '');
-  });
-  gun.user().get('profile').get('photo').on(data => {
-    myProfilePhoto = data;
-    if (!activeProfile) {
-      Helpers.setImgSrc($('#current-profile-photo'), data);
-      $('#add-profile-photo').toggleClass('hidden', true);
-    }
-  });
-  setChatLinkQrCode();
-  Notifications.init();
-}
-
-async function createChatLink() {
-  latestChatLink = await iris.Channel.createChatLink(gun, key);
-  setChatLinkQrCode(latestChatLink);
-}
-
-function setChatLinkQrCode(link) {
-  var qrCodeEl = $('#my-qr-code');
-  qrCodeEl.empty();
-  var qrcode = new QRCode(qrCodeEl[0], {
-    text: link || getMyChatLink(),
-    width: 320,
-    height: 320,
-    colorDark : "#000000",
-    colorLight : "#ffffff",
-    correctLevel : QRCode.CorrectLevel.H
-  });
-}
 
 var emojiButton = $('#emoji-picker');
 if (!iris.util.isMobile) {
@@ -212,7 +85,7 @@ function createGroup(e) {
   if ($('#new-group-name').val().length) {
     var c = new iris.Channel({
       gun,
-      key,
+      key: Session.key,
       participants: [],
     });
     c.put('name', $('#new-group-name').val());
@@ -223,39 +96,6 @@ function createGroup(e) {
 }
 
 $('.chat-item.new').click(showNewChat);
-
-$('#settings-name').on('input', event => {
-  var name = $(event.target).val().trim();
-  gun.user().get('profile').get('name').put(name);
-});
-
-$('#settings-about').on('input', event => {
-  var about = $(event.target).val().trim();
-  gun.user().get('profile').get('about').put(about);
-});
-
-function setOurOnlineStatus() {
-  iris.Channel.setOnline(gun, areWeOnline = true);
-  document.addEventListener("mousemove", () => {
-    if (!areWeOnline && activeChat) {
-      chats[activeChat].setMyMsgsLastSeenTime();
-    }
-    iris.Channel.setOnline(gun, areWeOnline = true);
-    clearTimeout(onlineTimeout);
-    onlineTimeout = setTimeout(() => iris.Channel.setOnline(gun, areWeOnline = false), 60000);
-  });
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === 'visible') {
-      iris.Channel.setOnline(gun, areWeOnline = true);
-      if (activeChat) {
-        chats[activeChat].setMyMsgsLastSeenTime();
-        changeChatUnseenCount(activeChat, 0);
-      }
-    } else {
-      iris.Channel.setOnline(gun, areWeOnline = false);
-    }
-  });
-}
 
 function resetView() {
   if (activeChat) {
@@ -290,17 +130,6 @@ $(window).resize(() => { // if resizing up from mobile size menu view
   }
 });
 
-function showSettings() {
-  resetView();
-  $('#header-content').text('Settings');
-  $('#settings').show();
-  var el = $('#profile-photo-settings');
-  $('#profile-photo-chapter').after(el);
-  $('#current-profile-photo').toggle(!!myProfilePhoto);
-  Helpers.setImgSrc($('#current-profile-photo'), myProfilePhoto);
-  $('#add-profile-photo').toggle(!myProfilePhoto);
-}
-
 function showNewChat() {
   resetView();
   $('.chat-item.new').toggleClass('active', true);
@@ -309,14 +138,6 @@ function showNewChat() {
   $('#show-my-qr-btn').off().click(() => {
     $('#my-qr-code').toggle()
   })
-}
-
-function getMyChatLink() {
-  return latestChatLink || getUserChatLink(key.pub);
-}
-
-function getUserChatLink(pub) {
-  return 'https://iris.to/?chatWith=' + pub;
 }
 
 var scanPrivKeyBtn = $('#scan-privkey-btn');
@@ -339,117 +160,6 @@ $('#scan-chatlink-qr-btn').click(() => {
     startChatLinkQRScanner();
   }
 });
-
-$('.copy-chat-link').click(event => {
-  Helpers.copyToClipboard(getMyChatLink());
-  var t = $(event.target);
-  var originalText = t.text();
-  var originalWidth = t.width();
-  t.width(originalWidth);
-  t.text('Copied');
-  setTimeout(() => {
-    t.text(originalText);
-    t.css('width', '');
-  }, 2000);
-});
-
-$('#copy-private-key').click(event => {
-  Helpers.copyToClipboard(JSON.stringify(key));
-  var t = $(event.target);
-  var originalText = t.text();
-  var originalWidth = t.width();
-  t.width(originalWidth);
-  t.text('Copied');
-  setTimeout(() => {
-    t.text(originalText);
-    t.css('width', '');
-  }, 2000);
-});
-
-$('#download-private-key').click(Helpers.downloadKey);
-$('#show-private-key-qr').click(togglePrivateKeyQR);
-
-function togglePrivateKeyQR(e) {
-  var btn = $('#show-private-key-qr');
-  var show = $('#private-key-qr').length === 0;
-  var SHOW_TEXT = 'Show private key QR code';
-  function hideText(s) { return 'Hide private key QR code (' + s + ')'; }
-  if (show) {
-    var showPrivateKeySecondsRemaining = 20;
-    btn.text(hideText(showPrivateKeySecondsRemaining));
-    var hidePrivateKeyInterval = setInterval(() => {
-      if ($('#private-key-qr').length === 0) {
-        clearInterval(hidePrivateKeyInterval);
-        btn.text(SHOW_TEXT);
-      }
-      showPrivateKeySecondsRemaining -= 1;
-      if (showPrivateKeySecondsRemaining === 0) {
-       $('#private-key-qr').remove();
-        btn.text(SHOW_TEXT);
-        clearInterval(hidePrivateKeyInterval);
-      } else {
-        btn.text(hideText(showPrivateKeySecondsRemaining));
-      }
-    }, 1000);
-    var qrCodeEl = $('<div>').attr('id', 'private-key-qr').addClass('qr-container').insertAfter(btn);
-    var qrcode = new QRCode(qrCodeEl[0], {
-      text: JSON.stringify(key),
-      width: 300,
-      height: 300,
-      colorDark : "#000000",
-      colorLight : "#ffffff",
-      correctLevel : QRCode.CorrectLevel.H
-    });
-  } else {
-    $('#private-key-qr').remove();
-    btn.text(SHOW_TEXT);
-  }
-}
-
-$('.show-logout-confirmation').click(showLogoutConfirmation);
-function showLogoutConfirmation() {
-  resetView();
-  $('#header-content').text('Log out?');
-  $('#logout-confirmation').show();
-}
-
-$('#show-existing-account-login').click(showSwitchAccount);
-function showSwitchAccount(e) {
-  e.preventDefault();
-  resetView();
-  $('#create-account').hide();
-  $('#existing-account-login').show();
-  $('#paste-privkey').focus();
-}
-
-$('#show-create-account').click(showCreateAccount);
-function showCreateAccount(e) {
-  e.preventDefault();
-  $('#privkey-qr-video').hide();
-  $('#create-account').show();
-  $('#existing-account-login').hide();
-  cleanupScanner();
-  $('#login-form-name').focus();
-}
-
-$('#existing-account-login input').on('input', (event) => {
-  var val = $(event.target).val();
-  if (!val.length) { return; }
-  try {
-    var key = JSON.parse(val);
-    login(key);
-    $(event.target).val('');
-  } catch (e) {
-    console.error('Login with key', val, 'failed:', e);
-  }
-});
-
-$('.logout-button').click(() => {
-  localStorage.removeItem('chatKeyPair');
-  location.reload(); // ensure that everything is reset (especially on the gun side). TODO: without reload
-});
-
-$('.open-settings-button').click(showSettings);
 
 function renderGroupPhotoSettings(uuid) {
   var me = chats[uuid].participantProfiles[key.pub];
@@ -590,7 +300,7 @@ function showProfile(pub) {
     var name = event.target.value;
     chats[pub].put('name', name);
   });
-  $('.profile-nicknames').toggle(pub !== key.pub);
+  $('.profile-nicknames').toggle(pub !== (Session.key && Session.key.pub));
   $('#profile-nickname-my-container').toggle(!chats[pub].uuid);
   $('#profile-nickname-their').not(':focus').val(chats[pub] && chats[pub].theirNickname);
   $('#profile-nickname-my').text(chats[pub] && chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
@@ -626,7 +336,7 @@ $('#profile-add-participant').on('input', event => {
   $('#profile-add-participant-input').hide();
   if (pub) {
     $('#profile-add-participant-candidate').remove();
-    var identicon = getIdenticon(pub, 40).css({'margin-right':15});
+    var identicon = Helpers.getIdenticon(pub, 40).css({'margin-right':15});
     var nameEl = $('<span>');
     gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
     var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
@@ -669,7 +379,7 @@ function renderGroupParticipants(pub) {
   }
   keys.forEach(k => {
     var profile = chats[pub].participantProfiles[k];
-    var identicon = getIdenticon(k, 40).css({'margin-right':15});
+    var identicon = Helpers.getIdenticon(k, 40).css({'margin-right':15});
     var nameEl = $('<span>');
     gun.user(k).get('profile').get('name').on(name => nameEl.text(name));
     var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
@@ -691,14 +401,14 @@ function renderGroupParticipants(pub) {
 function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
-  if (pub === key.pub && activeProfile !== pub) {
+  if (pub === (Session.key && Session.key.pub) && activeProfile !== pub) {
     nameEl.html("📝<b>Note to Self</b>");
   } else if (chats[pub]) {
     nameEl.text(getDisplayName(pub));
   }
   nameEl.show();
 
-  var identicon = getIdenticon(pub, 40);
+  var identicon = Helpers.getIdenticon(pub, 40);
   var img = identicon.children('img').first();
   img.attr('height', 40).attr('width', 40);
   $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
@@ -725,28 +435,6 @@ function addUserToHeader(pub) {
   //$("#header-content").append(voiceCallBtn);
   $("#header-content").append(videoCallBtn);
   $("#header-content").css({cursor: 'pointer'});
-}
-
-function changeChatUnseenCount(pub, change) {
-  if (change) {
-    unseenTotal += change;
-    chats[pub].unseen += change;
-  } else {
-    unseenTotal = unseenTotal - (chats[pub].unseen || 0);
-    chats[pub].unseen = 0;
-  }
-  unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
-  var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
-  var unseenCountEl = chatListEl.find('.unseen');
-  if (chats[pub].unseen > 0) {
-    chatListEl.addClass('has-unseen');
-    unseenCountEl.text(chats[pub].unseen);
-    unseenCountEl.show();
-  } else {
-    chatListEl.removeClass('has-unseen');
-    unseenCountEl.hide();
-  }
-  setUnseenTotal();
 }
 
 function setTheirOnlineStatus(pub) {
@@ -814,7 +502,7 @@ function showChat(pub) {
     Gallery.closeAttachmentsPreview();
     $('#new-msg').val('');
   });
-  changeChatUnseenCount(pub, 0);
+  Notifications.changeChatUnseenCount(pub, 0);
   addUserToHeader(pub);
   var msgs = Object.values(chats[pub].messages);
   msgs.forEach(msg => addMessage(msg, pub));
@@ -840,20 +528,6 @@ function showChat(pub) {
   chats[pub].setMyMsgsLastSeenTime();
   setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
-}
-
-function getIdenticon(pub, width) {
-  var el = $('<div>').width(width).height(width).addClass('identicon');
-  var identicon = $(new iris.Attribute({type: 'keyID', value: pub}).identicon({width, showType: false}));
-  el.html(identicon);
-  gun.user(pub).get('profile').get('photo').on(data => { // TODO: limit size
-    if (data) {
-      el.html(Helpers.setImgSrc($('<img>'), data).attr('width', width).attr('height', width).addClass('identicon-image'));
-    } else {
-      el.html(identicon);
-    }
-  });
-  return el;
 }
 
 var sortChatsByLatest = _.throttle(() => {
@@ -934,7 +608,7 @@ function addMessage(msg, chatId) {
 }
 
 function deleteChat(pub) {
-  iris.Channel.deleteChannel(gun, key, pub);
+  iris.Channel.deleteChannel(gun, Session.key, pub);
   if (activeChat === pub) {
     showNewChat();
     showMenu();
@@ -965,7 +639,7 @@ function newChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
-  const channel = new iris.Channel({gun, key, chatLink: chatLink, participants: pub});
+  const channel = new iris.Channel({gun, key: Session.key, chatLink: chatLink, participants: pub});
   addChat(channel);
 }
 
@@ -985,7 +659,7 @@ function addChat(channel) {
     msg.time = new Date(msg.time);
     if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
       if (activeChat !== pub || document.visibilityState !== 'visible') {
-        changeChatUnseenCount(pub, 1);
+        Notifications.changeChatUnseenCount(pub, 1);
       }
     }
     if (!info.selfAuthored && msg.time > chats[pub].theirLastSeenTime) {
@@ -1020,7 +694,7 @@ function addChat(channel) {
     if (activeChat === pub) {
       addMessage(msg, pub);
       sortMessagesByTime(); // this is slow if message history is loaded while chat active
-      if (chats[pub].latest.time === msg.time && areWeOnline) {
+      if (chats[pub].latest.time === msg.time && Session.areWeOnline) {
         chats[pub].setMyMsgsLastSeenTime();
       }
       if (chats[pub].theirLastSeenTime) {
@@ -1032,9 +706,9 @@ function addChat(channel) {
     }
     Notifications.notifyMsg(msg, info, pub);
   });
-  changeChatUnseenCount(pub, 0);
+  Notifications.changeChatUnseenCount(pub, 0);
   chats[pub].messages = chats[pub].messages || [];
-  chats[pub].identicon = getIdenticon(pub, 49);
+  chats[pub].identicon = Helpers.getIdenticon(pub, 49);
   el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
   chats[pub].onTheir('nickname', (nick) => {
     chats[pub].myNickname = nick;
@@ -1043,7 +717,7 @@ function addChat(channel) {
   });
   chats[pub].onMy('nickname', (nick) => {
     chats[pub].theirNickname = nick;
-    if (pub !== key.pub) {
+    if (pub !== Session.key.pub) {
       el.find('.name').text(Helpers.truncateString(getDisplayName(pub), 20));
     }
     if (pub === activeChat || pub === activeProfile) {
@@ -1068,7 +742,7 @@ function addChat(channel) {
   chats[pub].getMyMsgsLastSeenTime(time => {
     chats[pub].myLastSeenTime = new Date(time);
     if (chats[pub].latest && chats[pub].myLastSeenTime >= chats[pub].latest.time) {
-      changeChatUnseenCount(pub, 0);
+      Notifications.changeChatUnseenCount(pub, 0);
     }
     PeerManager.askForPeers(pub); // TODO: this should be done only if we have a chat history or friendship with them
   });
@@ -1098,7 +772,7 @@ function addChat(channel) {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
     }
-    if (pub === key.pub) {
+    if (pub === (Session.key && Session.key.pub)) {
       el.find('.name').html("📝<b>Note to Self</b>");
     } else {
       el.find('.name').text(Helpers.truncateString(getDisplayName(pub), 20));
@@ -1219,15 +893,4 @@ function lastSeenTimeChanged(pub) {
   }
 }
 
-var initialTitle = document.title;
-function setUnseenTotal() {
-  if (unseenTotal) {
-    document.title = '(' + unseenTotal + ') ' + initialTitle;
-    $('.unseen-total').text(unseenTotal).show();
-  } else {
-    document.title = initialTitle;
-    $('.unseen-total').hide();
-  }
-}
-
-export {gun, chats, activeChat, activeProfile};
+export {gun, chats, activeChat, activeProfile, resetView, addChat, showNewChat};
