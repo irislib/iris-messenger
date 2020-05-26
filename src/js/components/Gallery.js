@@ -1,17 +1,7 @@
-import Helpers from '../Helpers/Helpers.js';
+import Helpers from '../Helpers.js';
 import {chats, activeChat} from './Main.js';
 
 var ANIMATE_DURATION = 200;
-
-$(document).keyup(function(e) {
-  if (e.key === "Escape") { // escape key maps to keycode `27`
-  if ($('#attachment-preview.gallery:visible').length) {
-    closeAttachmentsGallery();
-  } else {
-    closeAttachmentsPreview();
-  }
-  }
-});
 
 function openAttachmentsPreview() {
   $('#floating-day-separator').remove();
@@ -109,6 +99,15 @@ function init() {
     $('#attachment-input').click();
   })
   $('#attachment-input').change(openAttachmentsPreview);
+  $(document).keyup(function(e) {
+    if (e.key === "Escape") { // escape key maps to keycode `27`
+      if ($('#attachment-preview.gallery:visible').length) {
+        closeAttachmentsGallery();
+      } else {
+        closeAttachmentsPreview();
+      }
+    }
+  });
 }
 
 function reset() {

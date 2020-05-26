@@ -1,5 +1,5 @@
 import {gun} from '../components/Main.js';
-import Helpers from './Helpers.js';
+import Helpers from '../Helpers.js';
 
 var MAX_PEER_LIST_SIZE = 10;
 var MAX_CONNECTED_PEERS = iris.util.isElectron ? 4 : 2;

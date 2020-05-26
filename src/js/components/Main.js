@@ -1,7 +1,8 @@
 import MainTemplate from './MainTemplate.js';
-import TranslationService, { translate as t } from '../Helpers/TranslationService.js';
-import Helpers from '../Helpers/Helpers.js';
-import PeerManager from '../Helpers/PeerManager.js';
+import Translation, { translate as t } from '../services/Translation.js';
+import Helpers from '../Helpers.js';
+import PeerManager from '../services/PeerManager.js';
+import Notifications from '../services/Notifications.js';
 import VideoCall from './VideoCall.js';
 import Gallery from './Gallery.js';
 
@@ -15,19 +16,16 @@ window.gun = gun;
 
 Helpers.checkColorScheme();
 
-var notificationSound = new Audio('../../audio/notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
 var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 var activeChat;
 var activeProfile;
 var onlineTimeout;
-var loginTime;
 var key;
 var myName;
 var myProfilePhoto;
 var latestChatLink;
-var desktopNotificationsEnabled;
 var areWeOnline;
 var unseenTotal;
 
@@ -41,8 +39,8 @@ if (iris.util.isElectron) {
 }
 
 var main_content_temp = _.template(MainTemplate);
-$('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(TranslationService.translation)));
-TranslationService.init();
+$('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(Translation.translation)));
+Translation.init();
 PeerManager.init();
 Gallery.init();
 
@@ -97,7 +95,6 @@ function login(k) {
     latestChatLink = chatLink.url;
   });
   $('#generate-chat-link').off().on('click', createChatLink);
-  loginTime = new Date();
   unseenTotal = 0;
   $(".chat-item:not(.new)").remove();
   $("#my-identicon").empty();
@@ -155,11 +152,7 @@ function login(k) {
     }
   });
   setChatLinkQrCode();
-  if (window.Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-    setTimeout(() => {
-      $('#enable-notifications-prompt').slideDown();
-    }, 5000);
-  }
+  Notifications.init();
 }
 
 async function createChatLink() {
@@ -457,52 +450,6 @@ $('.logout-button').click(() => {
 });
 
 $('.open-settings-button').click(showSettings);
-
-desktopNotificationsEnabled = window.Notification && Notification.permission === 'granted';
-function enableDesktopNotifications() {
-  if (window.Notification) {
-    Notification.requestPermission((status) => {
-      if (Notification.permission === 'granted' || Notification.permission === 'denied') {
-        $('#enable-notifications-prompt').slideUp();
-      }
-    });
-  }
-}
-$('#enable-notifications-prompt').click(enableDesktopNotifications);
-
-function notify(msg, info, pub) {
-  function shouldNotify() {
-    if (msg.time < loginTime) { return false; }
-    if (info.selfAuthored) { return false; }
-    if (document.visibilityState === 'visible') { return false; }
-    if (chats[pub].notificationSetting === 'nothing') { return false; }
-    if (chats[pub].notificationSetting === 'mentions' && !msg.text.includes(myName)) { return false; }
-    return true;
-  }
-  function shouldDesktopNotify() {
-    if (!desktopNotificationsEnabled) { return false; }
-    return shouldNotify();
-  }
-  function shouldAudioNotify() {
-    return shouldNotify();
-  }
-  if (shouldAudioNotify()) {
-    notificationSound.play();
-  }
-  if (shouldDesktopNotify()) {
-    var body = chats[pub].uuid ? `${chats[pub].participantProfiles[info.from].name}: ${msg.text}` : msg.text;
-    body = Helpers.truncateString(body, 50);
-    var desktopNotification = new Notification(getDisplayName(pub), {
-      icon: 'img/icon128.png',
-      body,
-      silent: true
-    });
-    desktopNotification.onclick = function() {
-      showChat(pub);
-      window.focus();
-    };
-  }
-}
 
 function renderGroupPhotoSettings(uuid) {
   var me = chats[uuid].participantProfiles[key.pub];
@@ -1083,7 +1030,7 @@ function addChat(channel) {
       }
       Helpers.scrollToMessageListBottom();
     }
-    notify(msg, info, pub);
+    Notifications.notifyMsg(msg, info, pub);
   });
   changeChatUnseenCount(pub, 0);
   chats[pub].messages = chats[pub].messages || [];
