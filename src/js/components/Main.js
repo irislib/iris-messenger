@@ -1,5 +1,5 @@
 import MainTemplate from './MainTemplate.js';
-import Translations from '../Translations.js';
+import TranslationService, { translate as t } from '../Helpers/TranslationService.js';
 import Helpers from '../Helpers/Helpers.js';
 import PeerManager from '../Helpers/PeerManager.js';
 import VideoCall from './VideoCall.js';
@@ -47,39 +47,10 @@ if (iris.util.isElectron) {
   window.addEventListener('online',  refreshUnlessActive);
 }
 
-var AVAILABLE_LANGUAGES = Object.keys(Translations);
-var language = localStorage.getItem('language') || (navigator.language && navigator.language.slice(0,2)) || 'en';
-language = AVAILABLE_LANGUAGES.indexOf(language) >= 0 ? language : 'en';
-var languageObj = Translations[language];
-if (language !== 'en') {
-  var en = Translations['en'];
-  Object.keys(en).forEach(k => languageObj[k] = languageObj[k] || en[k]);
-}
 var main_content_temp = _.template(MainTemplate);
-$('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(Translations[language])));
-AVAILABLE_LANGUAGES.forEach(l => {
-  var el = $('<option>').attr('value', l).text(Translations[l].language_name);
-  $('.language-selector').append(el.clone());
-});
-$('.language-selector').val(language);
-$('.language-selector').change(e => {
-  var l = $(e.target).val();
-  if (AVAILABLE_LANGUAGES.indexOf(l) >= 0) {
-    localStorage.setItem('language', l);
-    location.reload();
-  }
-});
-
-PeerManager.updatePeerList();
-setInterval(PeerManager.updatePeerList, 2000);
-setInterval(PeerManager.checkGunPeerCount, 2000);
-$('#add-peer-btn').click(() => {
-  var url = $('#add-peer-url').val();
-  var visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
-  PeerManager.addPeer({url, visibility});
-  $('#add-peer-url').val('');
-  PeerManager.updatePeerList();
-});
+$('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(TranslationService.translation)));
+TranslationService.renderLanguageSelector();
+PeerManager.init();
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
@@ -457,7 +428,7 @@ function showNewChat() {
   resetView();
   $('.chat-item.new').toggleClass('active', true);
   $('#new-chat').show();
-  $("#header-content").text(languageObj.new_chat);
+  $("#header-content").text(t('new_chat'));
   $('#show-my-qr-btn').off().click(() => {
     $('#my-qr-code').toggle()
   })

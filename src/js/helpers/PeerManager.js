@@ -181,7 +181,21 @@ function updatePeerList() {
   });
 }
 
+function init() {
+  updatePeerList();
+  setInterval(updatePeerList, 2000);
+  setInterval(checkGunPeerCount, 2000);
+  $('#add-peer-btn').click(() => {
+    var url = $('#add-peer-url').val();
+    var visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
+    addPeer({url, visibility});
+    $('#add-peer-url').val('');
+    updatePeerList();
+  });
+}
+
 export default {
+  init,
   peers,
   getRandomPeers,
   getPeers,
