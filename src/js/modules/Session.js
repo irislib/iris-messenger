@@ -3,6 +3,7 @@ import {chats, addChat, showNewChat} from './Chats.js';
 import Notifications from './Notifications.js';
 import Helpers from '../Helpers.js';
 import Profile from './Profile.js';
+import QRScanner from './QRScanner.js';
 
 var key;
 var myName;
@@ -149,7 +150,7 @@ function setChatLinkQrCode(link) {
 
 function getMyChatLink() {
   return latestChatLink || Helpers.getUserChatLink(key.pub);
-};
+}
 
 function showSwitchAccount(e) {
   e.preventDefault();
@@ -164,14 +165,14 @@ function showCreateAccount(e) {
   $('#privkey-qr-video').hide();
   $('#create-account').show();
   $('#existing-account-login').hide();
-  cleanupScanner();
+  QRScanner.cleanupScanner();
   $('#login-form-name').focus();
 }
 
 function showScanPrivKey() {
   if ($('#privkey-qr-video:visible').length) {
     $('#privkey-qr-video').hide();
-    cleanupScanner();
+    QRScanner.cleanupScanner();
   } else {
     $('#privkey-qr-video').show();
     startPrivKeyQRScanner();

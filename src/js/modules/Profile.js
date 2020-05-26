@@ -2,6 +2,7 @@ import {resetView, activeChat, activeProfile, setActiveProfile} from './Main.js'
 import {chats} from './Chats.js';
 import Session from './Session.js';
 import Helpers from '../Helpers.js';
+import VideoCall from './VideoCall.js';
 
 function renderGroupParticipants(pub) {
   if (!(chats[pub] && chats[pub].uuid)) {

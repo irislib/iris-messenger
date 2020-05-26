@@ -1,4 +1,4 @@
-import {chats} from './Chats.js';
+import {chats, showChat} from './Chats.js';
 
 var ringSound = new Audio('../../audio/ring.mp3');
 ringSound.loop = true;
@@ -9,7 +9,6 @@ var callingInterval;
 var incomingCallNotification;
 var userMediaStream;
 var ourIceCandidates;
-var theirIceCandidates;
 var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 
@@ -114,7 +113,7 @@ async function addStreamToPeerConnection(pc) {
     pc.addTrack(track, userMediaStream);
   });
   localVideo[0].srcObject = userMediaStream;
-  localVideo[0].onloadedmetadata = function(e) {
+  localVideo[0].onloadedmetadata = function() {
     localVideo[0].muted = true;
     localVideo[0].play();
   };
@@ -162,11 +161,11 @@ function cancelCall(pub) {
   chats[pub].pc = null;
 }
 
-function stopUserMedia(pub) {
+function stopUserMedia() {
   userMediaStream.getTracks().forEach(track => track.stop());
 }
 
-function stopCalling(pub) {
+function stopCalling() {
   callSound.pause();
   callSound.removeEventListener('ended', timeoutPlayCallSound);
   clearTimeout(callSoundTimeout);
@@ -242,7 +241,7 @@ async function initConnection(createOffer, pub) {
     Object.keys(c.data).forEach(k => {
       if (theirIceCandidateKeys.indexOf(k) === -1) {
         theirIceCandidateKeys.push(k);
-        chats[pub].pc.addIceCandidate(new RTCIceCandidate(c.data[k])).then(console.log, console.error);;
+        chats[pub].pc.addIceCandidate(new RTCIceCandidate(c.data[k])).then(console.log, console.error);
       }
     });
   });
@@ -257,8 +256,8 @@ async function initConnection(createOffer, pub) {
     chats[pub].pc.onnegotiationneeded = async () => {
       createOfferFn();
     };
-  };
-  chats[pub].pc.onsignalingstatechange = async d => {
+  }
+  chats[pub].pc.onsignalingstatechange = async () => {
     if (!chats[pub].pc) { return; }
     console.log(
       "Signaling State Change:" + chats[pub].pc,
@@ -285,7 +284,7 @@ async function initConnection(createOffer, pub) {
         break;
     }
   };
-  chats[pub].pc.onconnectionstatechange = e => {
+  chats[pub].pc.onconnectionstatechange = () => {
     console.log('iceConnectionState changed', chats[pub].pc.iceConnectionState);
     switch (chats[pub].pc.iceConnectionState) {
       case "connected":
@@ -311,7 +310,7 @@ async function initConnection(createOffer, pub) {
     console.log('ontrack', event);
     if (remoteVideo[0].srcObject !== event.streams[0]) {
       remoteVideo[0].srcObject = event.streams[0];
-      remoteVideo[0].onloadedmetadata = function(e) {
+      remoteVideo[0].onloadedmetadata = function() {
         console.log('metadata loaded');
         remoteVideo[0].play();
       };

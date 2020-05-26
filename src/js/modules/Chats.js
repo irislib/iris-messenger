@@ -1,11 +1,13 @@
-import {resetView, activeChat, setActiveChat, activeProfile} from './Main.js';
-import Translation, { translate as t } from './Translation.js';
+import {gun, showMenu, resetView, activeChat, setActiveChat, activeProfile} from './Main.js';
+import { translate as t } from './Translation.js';
 import Helpers from '../Helpers.js';
 import Notifications from './Notifications.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 import Gallery from './Gallery.js';
 import Profile from './Profile.js';
+import QRScanner from './QRScanner.js';
+import VideoCall from './VideoCall.js';
 
 var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
@@ -483,7 +485,7 @@ function onWindowResize() { // if resizing up from mobile size menu view
 function scanChatLinkQr() {
   if ($('#chatlink-qr-video:visible').length) {
     $('#chatlink-qr-video').hide();
-    cleanupScanner();
+    QRScanner.cleanupScanner();
   } else {
     $('#chatlink-qr-video').show();
     startChatLinkQRScanner();
@@ -498,5 +500,5 @@ function init() {
   $('#scan-chatlink-qr-btn').click(scanChatLinkQr);
 }
 
-export {init, activeChat, chats, addChat, deleteChat, showNewChat};
-export default {init, activeChat, chats, addChat, deleteChat, showNewChat};
+export {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat};
+export default {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat};

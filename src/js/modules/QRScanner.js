@@ -40,3 +40,5 @@ function cleanupScanner() {
         codeReader = null;
     }
 }
+
+export default {cleanupScanner, startQRScanner, startChatLinkQRScanner, startPrivKeyQRScanner};

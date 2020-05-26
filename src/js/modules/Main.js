@@ -1,14 +1,13 @@
 import MainTemplate from './MainTemplate.js';
-import Translation, { translate as t } from './Translation.js';
+import Translation from './Translation.js';
 import Helpers from '../Helpers.js';
 import PeerManager from './PeerManager.js';
-import Notifications from './Notifications.js';
-import VideoCall from './VideoCall.js';
 import Gallery from './Gallery.js';
 import Session from './Session.js';
 import Settings from './Settings.js';
 import Chats, {chats} from './Chats.js';
 import Profile from './Profile.js';
+import QRScanner from './QRScanner.js';
 
 Gun.log.off = true;
 var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity };
@@ -73,7 +72,7 @@ function resetView() {
   activeChat = null;
   activeProfile = null;
   showMenu(false);
-  cleanupScanner();
+  QRScanner.cleanupScanner();
   $('#chatlink-qr-video').hide();
   $('.chat-item').toggleClass('active', false);
   $('.main-view').hide();
@@ -192,4 +191,4 @@ function setActiveProfile(pub) {
   activeProfile = pub;
 }
 
-export {gun, setActiveChat, activeChat, setActiveProfile, activeProfile, resetView};
+export {gun, showMenu, setActiveChat, activeChat, setActiveProfile, activeProfile, resetView};

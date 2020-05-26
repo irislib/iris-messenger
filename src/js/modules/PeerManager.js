@@ -9,7 +9,7 @@ async function addPeer(peer) {
   if (!Helpers.isUrl(peer.url)) {
     throw new Error('Invalid url', peer.url);
   }
-  peers[peer.url] = peers[peer.url] || _.omit(peer, 'url');
+  peers[peer.url] = peers[peer.url] || _.omit(peer, 'url');
   if (peer.visibility === 'public') {
     // rolling some crypto operations to obfuscate actual url in case we want to remove it
     var secret = await Gun.SEA.secret(key.epub, key);
@@ -85,7 +85,7 @@ function getRandomPeers() {
       _.pick(peers, p => { return p.enabled; })
     ), MAX_CONNECTED_PEERS
   );
-};
+}
 
 var askForPeers = _.once(pub => {
   _.defer(() => {
