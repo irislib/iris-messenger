@@ -9,7 +9,11 @@ if (language !== 'en') {
   Object.keys(en).forEach(k => translation[k] = translation[k] || en[k]);
 }
 
-function renderLanguageSelector() {
+function translate(k) {
+  return translation[k] || k;
+}
+
+function init() {
   AVAILABLE_LANGUAGES.forEach(l => {
     var el = $('<option>').attr('value', l).text(Translations[l].language_name);
     $('.language-selector').append(el.clone());
@@ -24,9 +28,5 @@ function renderLanguageSelector() {
   });
 }
 
-function translate(k) {
-  return translation[k] || k;
-}
-
 export {translate};
-export default {translate, translation, AVAILABLE_LANGUAGES, renderLanguageSelector};
+export default {translate, translation, AVAILABLE_LANGUAGES, init};

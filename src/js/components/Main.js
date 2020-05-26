@@ -3,9 +3,9 @@ import TranslationService, { translate as t } from '../Helpers/TranslationServic
 import Helpers from '../Helpers/Helpers.js';
 import PeerManager from '../Helpers/PeerManager.js';
 import VideoCall from './VideoCall.js';
+import Gallery from './Gallery.js';
 
 Gun.log.off = true;
-var GALLERY_ANIMATE_DURATION = 200;
 var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity };
 if (!iris.util.isElectron) {
   gunOpts.store = RindexedDB(gunOpts);
@@ -14,13 +14,6 @@ var gun = Gun(gunOpts);
 window.gun = gun;
 
 Helpers.checkColorScheme();
-
-function setImgSrc(el, src) {
-  if (src && src.indexOf('data:image') === 0) {
-    el.attr('src', src);
-  }
-  return el;
-}
 
 var notificationSound = new Audio('../../audio/notification.mp3');
 var chat = gun.get('converse/' + location.hash.slice(1));
@@ -49,16 +42,13 @@ if (iris.util.isElectron) {
 
 var main_content_temp = _.template(MainTemplate);
 $('body').prepend($('<div>').attr('id', 'main-content').html(main_content_temp(TranslationService.translation)));
-TranslationService.renderLanguageSelector();
+TranslationService.init();
 PeerManager.init();
+Gallery.init();
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
 });
-
-var scrollToMessageListBottom = _.throttle(() => {
-  $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
-}, 100, true);
 
 $('#login').hide();
 var localStorageKey = localStorage.getItem('chatKeyPair');
@@ -145,7 +135,7 @@ function login(k) {
   }
   $('.user-info .user-name').text('anonymous');
   $('#settings-name').val('');
-  setImgSrc($('#current-profile-photo'), '');
+  Helpers.setImgSrc($('#current-profile-photo'), '');
   $('#private-key-qr').remove();
   gun.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
@@ -160,7 +150,7 @@ function login(k) {
   gun.user().get('profile').get('photo').on(data => {
     myProfilePhoto = data;
     if (!activeProfile) {
-      setImgSrc($('#current-profile-photo'), data);
+      Helpers.setImgSrc($('#current-profile-photo'), data);
       $('#add-profile-photo').toggleClass('hidden', true);
     }
   });
@@ -205,112 +195,6 @@ if (!iris.util.isMobile) {
     picker.pickerVisible ? picker.hidePicker() : picker.showPicker(emojiButton);
   });
 }
-
-$(document).keyup(function(e) {
-  if (e.key === "Escape") { // escape key maps to keycode `27`
-  if ($('#attachment-preview.gallery:visible').length) {
-    closeAttachmentsGallery();
-  } else {
-    closeAttachmentsPreview();
-  }
-  }
-});
-
-function openAttachmentsPreview() {
-  $('#floating-day-separator').remove();
-  var attachmentsPreview = $('#attachment-preview');
-  attachmentsPreview.removeClass('gallery');
-  attachmentsPreview.empty();
-  var closeBtn = $('<button>').text('Cancel').click(closeAttachmentsPreview);
-  attachmentsPreview.append(closeBtn);
-
-  var files = $('#attachment-input')[0].files;
-  if (files) {
-    attachmentsPreview.show();
-    $('#message-list').hide();
-    for (var i = 0;i < files.length;i++) {
-      Helpers.getBase64(files[i]).then(base64 => {
-        chats[activeChat].attachments = chats[activeChat].attachments || [];
-        chats[activeChat].attachments.push({type: 'image', data: base64});
-        var preview = setImgSrc($('<img>'), base64);
-        attachmentsPreview.append(preview);
-      });
-    }
-    $('#new-msg').focus();
-  }
-}
-
-function openAttachmentsGallery(msg, event) {
-  $('#floating-day-separator').remove();
-  var attachmentsPreview = $('#attachment-preview');
-  attachmentsPreview.addClass('gallery');
-  attachmentsPreview.empty();
-  attachmentsPreview.fadeIn(GALLERY_ANIMATE_DURATION);
-  var left, top, width, img;
-
-  if (msg.attachments) {
-    msg.attachments.forEach(a => {
-      if (a.type.indexOf('image') === 0 && a.data) {
-        img = setImgSrc($('<img>'), a.data);
-        if (msg.attachments.length === 1) {
-          attachmentsPreview.css({'justify-content': 'center'});
-          var original = $(event.target);
-          left = original.offset().left;
-          top = original.offset().top - $(window).scrollTop();
-          width = original.width();
-          var transitionImg = img.clone().attr('id', 'transition-img').data('originalDimensions', {left,top,width});
-          transitionImg.css({position: 'fixed', left, top, width, 'max-width': 'none', 'max-height': 'none'});
-          img.css({visibility: 'hidden', 'align-self': 'center'});
-          attachmentsPreview.append(img);
-          $('body').append(transitionImg);
-          var o = img.offset();
-          transitionImg.animate({width: img.width(), left: o.left, top: o.top}, {duration: GALLERY_ANIMATE_DURATION, complete: () => {
-            img.css({visibility: 'visible'});
-            transitionImg.hide();
-          }});
-        } else {
-          attachmentsPreview.css({'justify-content': ''});
-          attachmentsPreview.append(img);
-        }
-      }
-    })
-  }
-  $('#attachment-preview').one('click', () => {
-    closeAttachmentsGallery();
-  });
-}
-
-function closeAttachmentsPreview() {
-  $('#attachment-preview').hide();
-  $('#attachment-preview').removeClass('gallery');
-  $('#message-list').show();
-  if (activeChat) {
-    chats[activeChat].attachments = null;
-  }
-  scrollToMessageListBottom();
-}
-
-function closeAttachmentsGallery() {
-  var transitionImg = $('#transition-img');
-  if (transitionImg.length) {
-    var originalDimensions = transitionImg.data('originalDimensions');
-    transitionImg.show();
-    $('#attachment-preview img').remove();
-    transitionImg.animate(originalDimensions, {duration: GALLERY_ANIMATE_DURATION, complete: () => {
-      transitionImg.remove();
-    }});
-  }
-  $('#attachment-preview').fadeOut(GALLERY_ANIMATE_DURATION);
-  if (activeChat) {
-    chats[activeChat].attachments = null;
-  }
-}
-
-$('#attach-file').click(event => {
-  event.preventDefault();
-  $('#attachment-input').click();
-})
-$('#attachment-input').change(openAttachmentsPreview);
 
 $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
 
@@ -396,7 +280,7 @@ function resetView() {
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
   $('#private-key-qr').remove();
-  closeAttachmentsPreview();
+  Gallery.reset();
 }
 
 function showMenu(show = true) {
@@ -420,7 +304,7 @@ function showSettings() {
   var el = $('#profile-photo-settings');
   $('#profile-photo-chapter').after(el);
   $('#current-profile-photo').toggle(!!myProfilePhoto);
-  setImgSrc($('#current-profile-photo'), myProfilePhoto);
+  Helpers.setImgSrc($('#current-profile-photo'), myProfilePhoto);
   $('#add-profile-photo').toggle(!myProfilePhoto);
 }
 
@@ -627,7 +511,7 @@ function renderGroupPhotoSettings(uuid) {
   $('#current-profile-photo').toggle(!!chats[uuid].photo);
   $('#profile .profile-photo').toggle(!!chats[uuid].photo);
   if (isAdmin) {
-    setImgSrc($('#current-profile-photo'), chats[uuid].photo);
+    Helpers.setImgSrc($('#current-profile-photo'), chats[uuid].photo);
     $('#profile .profile-photo').hide();
     renderProfilePhotoSettings();
     var el = $('#profile-photo-settings');
@@ -653,7 +537,7 @@ function renderProfilePhotoSettings() {
     $('#add-profile-photo').hide();
     Helpers.getBase64(file).then(base64 => {
       var previewEl = $('#profile-photo-preview');
-      setImgSrc(previewEl, base64);
+      Helpers.setImgSrc(previewEl, base64);
       $('#profile-photo-preview').toggleClass('hidden', false);
       $('#cancel-profile-photo').toggleClass('hidden', false);
       $('#use-profile-photo').toggleClass('hidden', false);
@@ -671,7 +555,7 @@ function renderProfilePhotoSettings() {
     if (!$('#current-profile-photo').attr('src')) {
       $('#add-profile-photo').show();
     }
-    setImgSrc($('#profile-photo-preview'), '');
+    Helpers.setImgSrc($('#profile-photo-preview'), '');
     $('#cancel-profile-photo').toggleClass('hidden', true);
     $('#use-profile-photo').toggleClass('hidden', true);
   }
@@ -692,7 +576,7 @@ $('#use-profile-photo').click(() => {
     } else {
       gun.user().get('profile').get('photo').put(src);
     }
-    setImgSrc($('#current-profile-photo'), src);
+    Helpers.setImgSrc($('#current-profile-photo'), src);
     $('#profile-photo-input').val('');
     renderProfilePhotoSettings();
   });
@@ -727,7 +611,7 @@ function showProfile(pub) {
   $('#profile .profile-photo').show();
   gun.user(pub).get('profile').get('photo').on(photo => {
     $('#profile .profile-photo-container').show();
-    setImgSrc($('#profile .profile-photo'), photo);
+    Helpers.setImgSrc($('#profile .profile-photo'), photo);
   });
   $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
   $('#profile .profile-about-content').empty();
@@ -779,7 +663,7 @@ function showProfile(pub) {
   if (chats[pub] && chats[pub].uuid) {
     renderGroupPhotoSettings(chats[pub].uuid);
     $('#profile .profile-photo-container').show();
-    setImgSrc($('#profile .profile-photo'), chats[pub].photo);
+    Helpers.setImgSrc($('#profile .profile-photo'), chats[pub].photo);
   }
 }
 
@@ -879,7 +763,7 @@ function addUserToHeader(pub) {
     textEl.append(namesEl);
     if (chats[pub].photo) {
       identicon.hide();
-      var photo = setImgSrc($('<img>'), chats[pub].photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
+      var photo = Helpers.setImgSrc($('<img>'), chats[pub].photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
       $('#header-content .identicon-container').append(photo);
     }
   }
@@ -980,7 +864,7 @@ function showChat(pub) {
       msg.attachments = chats[pub].attachments;
     }
     chats[pub].send(msg);
-    closeAttachmentsPreview();
+    Gallery.closeAttachmentsPreview();
     $('#new-msg').val('');
   });
   changeChatUnseenCount(pub, 0);
@@ -1005,7 +889,7 @@ function showChat(pub) {
   });
   lastSeenTimeChanged(pub);
   chats[pub].setMyMsgsLastSeenTime();
-  scrollToMessageListBottom();
+  Helpers.scrollToMessageListBottom();
   chats[pub].setMyMsgsLastSeenTime();
   setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
@@ -1017,7 +901,7 @@ function getIdenticon(pub, width) {
   el.html(identicon);
   gun.user(pub).get('profile').get('photo').on(data => { // TODO: limit size
     if (data) {
-      el.html(setImgSrc($('<img>'), data).attr('width', width).attr('height', width).addClass('identicon-image'));
+      el.html(Helpers.setImgSrc($('<img>'), data).attr('width', width).attr('height', width).addClass('identicon-image'));
     } else {
       el.html(identicon);
     }
@@ -1075,9 +959,9 @@ function addMessage(msg, chatId) {
   if (msg.attachments) {
     msg.attachments.forEach(a => {
       if (a.type.indexOf('image') === 0 && a.data) {
-        var img = setImgSrc($('<img>'), a.data).click(e => { openAttachmentsGallery(msg, e); });
+        var img = Helpers.setImgSrc($('<img>'), a.data).click(e => { Gallery.openAttachmentsGallery(msg, e); });
         msgContent.prepend(img);
-        img.one('load', scrollToMessageListBottom);
+        img.one('load', Helpers.scrollToMessageListBottom);
       }
     })
   }
@@ -1197,7 +1081,7 @@ function addChat(channel) {
       } else if (!chats[pub].uuid) {
         $('#not-seen-by-them').slideDown();
       }
-      scrollToMessageListBottom();
+      Helpers.scrollToMessageListBottom();
     }
     notify(msg, info, pub);
   });
@@ -1293,14 +1177,14 @@ function addChat(channel) {
     }
     chats[pub].photo = photo;
     el.find('.identicon-container').empty();
-    var img = setImgSrc($('<img>'), photo).attr('height', 49).attr('width', 49).css({'border-radius': '50%'});
+    var img = Helpers.setImgSrc($('<img>'), photo).attr('height', 49).attr('width', 49).css({'border-radius': '50%'});
     el.find('.identicon-container').append(photo ? img : chats[pub].identicon);
     if (pub === activeChat || pub === activeProfile) {
       addUserToHeader(pub);
     }
     if (pub === activeProfile) {
-      setImgSrc($('#current-profile-photo'), photo);
-      setImgSrc($('#profile .profile-photo'), photo);
+      Helpers.setImgSrc($('#current-profile-photo'), photo);
+      Helpers.setImgSrc($('#profile .profile-photo'), photo);
     }
     $('#current-profile-photo').toggle(!!photo);
   }
@@ -1399,4 +1283,4 @@ function setUnseenTotal() {
   }
 }
 
-export {gun, chats};
+export {gun, chats, activeChat, activeProfile};

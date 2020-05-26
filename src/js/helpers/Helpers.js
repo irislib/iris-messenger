@@ -118,5 +118,16 @@ export default {
             '<link rel="stylesheet" href="./css/light.css" onload="document.documentElement.style.display = \'\'">'
         );
     }
+  },
+
+  scrollToMessageListBottom: _.throttle(() => {
+    $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+  }, 100, true),
+
+  setImgSrc: (el, src) => {
+    if (src && src.indexOf('data:image') === 0) {
+      el.attr('src', src);
+    }
+    return el;
   }
 };
