@@ -163,7 +163,7 @@ function addMessage(msg, chatId) {
 }
 
 function deleteChat(pub) {
-  iris.Channel.deleteChannel(gun, Session.key, pub);
+  iris.Channel.deleteChannel(gun, Session.getKey(), pub);
   if (activeChat === pub) {
     showNewChat();
     showMenu();
@@ -181,7 +181,7 @@ function newChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
-  const channel = new iris.Channel({gun, key: Session.key, chatLink: chatLink, participants: pub});
+  const channel = new iris.Channel({gun, key: Session.getKey(), chatLink: chatLink, participants: pub});
   addChat(channel);
 }
 
@@ -258,7 +258,7 @@ function addChat(channel) {
   });
   chats[pub].onMy('nickname', (nick) => {
     chats[pub].theirNickname = nick;
-    if (pub !== Session.key.pub) {
+    if (pub !== Session.getKey().pub) {
       el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
     }
     if (pub === activeChat || pub === activeProfile) {
@@ -313,7 +313,7 @@ function addChat(channel) {
     if (name && typeof name === 'string') {
       chats[pub].name = name;
     }
-    if (pub === (Session.key && Session.key.pub)) {
+    if (pub === Session.getKey().pub) {
       el.find('.name').html("📝<b>Note to Self</b>");
     } else {
       el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
@@ -448,7 +448,7 @@ function createGroupClicked(e) {
   if ($('#new-group-name').val().length) {
     var c = new iris.Channel({
       gun,
-      key: Session.key,
+      key: Session.getKey(),
       participants: [],
     });
     c.put('name', $('#new-group-name').val());

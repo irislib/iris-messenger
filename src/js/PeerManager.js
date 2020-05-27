@@ -15,7 +15,7 @@ async function addPeer(peer) {
   peers[peer.url] = peers[peer.url] || _.omit(peer, 'url');
   if (peer.visibility === 'public') {
     // rolling some crypto operations to obfuscate actual url in case we want to remove it
-    var secret = await Gun.SEA.secret(Session.key.epub, Session.key);
+    var secret = await Gun.SEA.secret(Session.getKey().epub, Session.getKey());
     var encryptedUrl = await Gun.SEA.encrypt(peer.url, secret);
     var encryptedUrlHash = await Gun.SEA.work(encryptedUrl, null, null, {name: 'SHA-256'});
     gun.user().get('peers').get(encryptedUrlHash).put({url: peer.url, lastSeen: new Date().toISOString()});

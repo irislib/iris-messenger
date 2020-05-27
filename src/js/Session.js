@@ -179,6 +179,10 @@ function showScanPrivKey() {
   }
 }
 
+function getKey() {
+  return key;
+}
+
 function init() {
   $('#login').hide();
   var localStorageKey = localStorage.getItem('chatKeyPair');
@@ -209,4 +213,4 @@ function init() {
   $('#scan-privkey-btn').click(showScanPrivKey);
 }
 
-export default {init, key, myName, myProfilePhoto, getMyChatLink, areWeOnline};
+export default {init, getKey, myName, myProfilePhoto, getMyChatLink, areWeOnline};

@@ -13,7 +13,7 @@ function renderGroupParticipants(pub) {
   }
   $('#profile-group-participants').empty();
   var keys = Object.keys(chats[pub].participantProfiles);
-  var me = chats[pub].participantProfiles[Session.key.pub];
+  var me = chats[pub].participantProfiles[Session.getKey().pub];
   if (me && me.permissions) {
     $('#profile-add-participant').toggle(me.permissions.admin);
     $('#profile-group-name-container').toggle(me.permissions.admin);
@@ -55,7 +55,7 @@ function getDisplayName(pub) {
 function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
-  if (pub === (Session.key && Session.key.pub) && activeProfile !== pub) {
+  if (pub === Session.getKey().pub && activeProfile !== pub) {
     nameEl.html("📝<b>Note to Self</b>");
   } else if (chats[pub]) {
     nameEl.text(getDisplayName(pub));
@@ -159,7 +159,7 @@ function showProfile(pub) {
     var name = event.target.value;
     chats[pub].put('name', name);
   });
-  $('.profile-nicknames').toggle(pub !== (Session.key && Session.key.pub));
+  $('.profile-nicknames').toggle(pub !== Session.getKey().pub);
   $('#profile-nickname-my-container').toggle(!chats[pub].uuid);
   $('#profile-nickname-their').not(':focus').val(chats[pub] && chats[pub].theirNickname);
   $('#profile-nickname-my').text(chats[pub] && chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
@@ -223,7 +223,7 @@ function onProfileAddParticipantInput(event) {
 }
 
 function renderGroupPhotoSettings(uuid) {
-  var me = chats[uuid].participantProfiles[Session.key.pub];
+  var me = chats[uuid].participantProfiles[Session.getKey().pub];
   var isAdmin = !!(me && me.permissions && me.permissions.admin);
   $('#profile-group-settings').toggle(isAdmin);
   $('#current-profile-photo').toggle(!!chats[uuid].photo);
