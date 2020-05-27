@@ -20,7 +20,6 @@ function enableDesktopNotifications() {
     });
   }
 }
-$('#enable-notifications-prompt').click(enableDesktopNotifications);
 
 function notifyMsg(msg, info, pub) {
   function shouldNotify() {
@@ -97,6 +96,7 @@ function init() {
       $('#enable-notifications-prompt').slideDown();
     }, 5000);
   }
+  $('#enable-notifications-prompt').click(enableDesktopNotifications);
 }
 
 export default {init, notifyMsg, changeChatUnseenCount};
