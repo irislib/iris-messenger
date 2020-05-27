@@ -8,6 +8,7 @@ import Settings from './Settings.js';
 import Chats, {chats} from './Chats.js';
 import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
+import VideoCall from './VideoCall.js';
 
 Gun.log.off = true;
 var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity };
@@ -31,6 +32,7 @@ Settings.init();
 Chats.init();
 Translation.init();
 Profile.init();
+VideoCall.init();
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails

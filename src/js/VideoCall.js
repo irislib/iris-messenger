@@ -229,7 +229,6 @@ async function initConnection(createOffer, pub) {
     Object.keys(c.data).forEach(k => {
       if (theirIceCandidateKeys.indexOf(k) === -1) {
         theirIceCandidateKeys.push(k);
-        console.log(12, c.data[k]);
         chats[pub].pc.addIceCandidate(new RTCIceCandidate(c.data[k])).then(console.log, console.error);
       }
     });
@@ -335,6 +334,7 @@ function init() {
 }
 
 export default {
+  init,
   onCallMessage,
   callUser,
   stopCalling,
