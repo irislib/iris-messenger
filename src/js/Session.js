@@ -179,9 +179,9 @@ function showScanPrivKey() {
   }
 }
 
-function getKey() {
-  return key;
-}
+function getKey() { return key; }
+function getMyName() { return myName; }
+function getMyProfilePhoto() { return myProfilePhoto; }
 
 function init() {
   $('#login').hide();
@@ -213,4 +213,4 @@ function init() {
   $('#scan-privkey-btn').click(showScanPrivKey);
 }
 
-export default {init, getKey, myName, myProfilePhoto, getMyChatLink, areWeOnline};
+export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, areWeOnline};

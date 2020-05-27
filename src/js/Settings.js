@@ -8,9 +8,9 @@ function render() {
   $('#settings').show();
   var el = $('#profile-photo-settings');
   $('#profile-photo-chapter').after(el);
-  $('#current-profile-photo').toggle(!!Session.myProfilePhoto);
-  Helpers.setImgSrc($('#current-profile-photo'), Session.myProfilePhoto);
-  $('#add-profile-photo').toggle(!Session.myProfilePhoto);
+  $('#current-profile-photo').toggle(!!Session.getMyProfilePhoto());
+  Helpers.setImgSrc($('#current-profile-photo'), Session.getMyProfilePhoto());
+  $('#add-profile-photo').toggle(!Session.getMyProfilePhoto());
 }
 
 function togglePrivateKeyQR() {

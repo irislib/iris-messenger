@@ -28,7 +28,7 @@ function notifyMsg(msg, info, pub) {
     if (info.selfAuthored) { return false; }
     if (document.visibilityState === 'visible') { return false; }
     if (chats[pub].notificationSetting === 'nothing') { return false; }
-    if (chats[pub].notificationSetting === 'mentions' && !msg.text.includes(Session.myName)) { return false; }
+    if (chats[pub].notificationSetting === 'mentions' && !msg.text.includes(Session.getMyName())) { return false; }
     return true;
   }
   function shouldDesktopNotify() {
