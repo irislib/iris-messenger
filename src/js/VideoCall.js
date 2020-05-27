@@ -15,20 +15,6 @@ var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).
 var localStorageIce = localStorage.getItem('rtcConfig');
 var DEFAULT_RTC_CONFIG = {iceServers: [ { urls: ["stun:turn.hepic.tel"] }, { urls: ["stun:stun.l.google.com:19302"] } ]};
 var RTC_CONFIG = localStorageIce ? JSON.parse(localStorageIce) : DEFAULT_RTC_CONFIG;
-$('#rtc-config').val(JSON.stringify(RTC_CONFIG));
-$('#rtc-config').change(() => {
-  try {
-    RTC_CONFIG = JSON.parse($('#rtc-config').val());
-    localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
-  } catch (e) {
-    // empty
-  }
-});
-$('#restore-default-rtc-config').click(() => {
-  RTC_CONFIG = DEFAULT_RTC_CONFIG;
-  localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
-  $('#rtc-config').val(JSON.stringify(RTC_CONFIG));
-})
 
 function notifyIfNotVisible(pub, text) {
    if (document.visibilityState !== 'visible') {
@@ -243,6 +229,7 @@ async function initConnection(createOffer, pub) {
     Object.keys(c.data).forEach(k => {
       if (theirIceCandidateKeys.indexOf(k) === -1) {
         theirIceCandidateKeys.push(k);
+        console.log(12, c.data[k]);
         chats[pub].pc.addIceCandidate(new RTCIceCandidate(c.data[k])).then(console.log, console.error);
       }
     });
@@ -326,9 +313,30 @@ async function answerCall(pub) {
   await initConnection(false, pub);
 }
 
+function isCalling() {
+  return !!callingInterval;
+}
+
+function init() {
+  $('#rtc-config').val(JSON.stringify(RTC_CONFIG));
+  $('#rtc-config').change(() => {
+    try {
+      RTC_CONFIG = JSON.parse($('#rtc-config').val());
+      localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
+    } catch (e) {
+      // empty
+    }
+  });
+  $('#restore-default-rtc-config').click(() => {
+    RTC_CONFIG = DEFAULT_RTC_CONFIG;
+    localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
+    $('#rtc-config').val(JSON.stringify(RTC_CONFIG));
+  });
+}
+
 export default {
   onCallMessage,
   callUser,
   stopCalling,
-  callingInterval
+  isCalling,
 };
