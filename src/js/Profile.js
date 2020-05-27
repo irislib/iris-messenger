@@ -124,11 +124,13 @@ function showProfile(pub) {
   addUserToHeader(pub);
   setTheirOnlineStatus(pub);
   renderGroupParticipants(pub);
-  $('#profile .profile-photo').show();
-  gun.user(pub).get('profile').get('photo').on(photo => {
-    $('#profile .profile-photo-container').show();
-    Helpers.setImgSrc($('#profile .profile-photo'), photo);
-  });
+  if (chats[pub] && !chats[pub].uuid) {
+    $('#profile .profile-photo').show();
+    gun.user(pub).get('profile').get('photo').on(photo => {
+      $('#profile .profile-photo-container').show();
+      Helpers.setImgSrc($('#profile .profile-photo'), photo);
+    });
+  }
   $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
   $('#profile .profile-about-content').empty();
   $('#profile .profile-about-content').text(chats[pub] && chats[pub].about);
@@ -274,6 +276,7 @@ function renderProfilePhotoSettings() {
       $('#add-profile-photo').show();
     }
     Helpers.setImgSrc($('#profile-photo-preview'), '');
+    $('#profile-photo-preview').toggleClass('hidden', true);
     $('#cancel-profile-photo').toggleClass('hidden', true);
     $('#use-profile-photo').toggleClass('hidden', true);
   }
@@ -292,7 +295,8 @@ function useProfilePhotoClicked() {
       gun.user().get('profile').get('photo').put(src);
     }
     Helpers.setImgSrc($('#current-profile-photo'), src);
-    $('#profile-photo-input').val('');
+    $('#profile-photo-input').val(null);
+
     renderProfilePhotoSettings();
   });
 }
@@ -312,7 +316,7 @@ function init() {
   $('#profile-photo-input').change(renderProfilePhotoSettings);
   $('#use-profile-photo').click(useProfilePhotoClicked);
   $('#cancel-profile-photo').click(() => {
-    $('#profile-photo-input').val('');
+    $('#profile-photo-input').val(null);
     renderProfilePhotoSettings();
   });
   $('#remove-profile-photo').click(removeProfilePhotoClicked);
