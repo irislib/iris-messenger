@@ -1,6 +1,6 @@
 import {gun, resetView} from './Main.js';
 import Session from './Session.js';
-import Helpers from '../Helpers.js';
+import Helpers from './Helpers.js';
 
 function render() {
   resetView();
@@ -13,7 +13,7 @@ function render() {
   $('#add-profile-photo').toggle(!Session.myProfilePhoto);
 }
 
-function togglePrivateKeyQR(e) {
+function togglePrivateKeyQR() {
   var btn = $('#show-private-key-qr');
   var show = $('#private-key-qr').length === 0;
   var SHOW_TEXT = 'Show private key QR code';
@@ -36,7 +36,7 @@ function togglePrivateKeyQR(e) {
       }
     }, 1000);
     var qrCodeEl = $('<div>').attr('id', 'private-key-qr').addClass('qr-container').insertAfter(btn);
-    var qrcode = new QRCode(qrCodeEl[0], {
+    new QRCode(qrCodeEl[0], {
       text: JSON.stringify(Session.key),
       width: 300,
       height: 300,
@@ -56,8 +56,12 @@ function showLogoutConfirmation() {
   $('#logout-confirmation').show();
 }
 
+function downloadKey() {
+  return Helpers.download('iris_private_key.txt', JSON.stringify(Session.key), 'text/csv', 'utf-8');  
+}
+
 function init() {
-  $('#download-private-key').click(Helpers.downloadKey);
+  $('#download-private-key').click(downloadKey);
   $('#show-private-key-qr').click(togglePrivateKeyQR);
   $('.open-settings-button').click(render);
   $(".user-info").off().on('click', render);
@@ -87,7 +91,7 @@ function init() {
   });
 
   $('#copy-private-key').click(event => {
-    Helpers.copyToClipboard(JSON.stringify(key));
+    Helpers.copyToClipboard(JSON.stringify(Session.key));
     var t = $(event.target);
     var originalText = t.text();
     var originalWidth = t.width();

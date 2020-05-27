@@ -20,7 +20,9 @@ $('#rtc-config').change(() => {
   try {
     RTC_CONFIG = JSON.parse($('#rtc-config').val());
     localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
-  } catch (e) {}
+  } catch (e) {
+    // empty
+  }
 });
 $('#restore-default-rtc-config').click(() => {
   RTC_CONFIG = DEFAULT_RTC_CONFIG;

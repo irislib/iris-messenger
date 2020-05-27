@@ -1,7 +1,7 @@
-import {gun, activeChat, activeProfile, resetView} from './Main.js';
-import {chats, addChat, showNewChat} from './Chats.js';
+import {gun, activeChat, activeProfile, resetView, showMenu} from './Main.js';
+import {chats, addChat, showNewChat, newChat, showChat} from './Chats.js';
 import Notifications from './Notifications.js';
-import Helpers from '../Helpers.js';
+import Helpers from './Helpers.js';
 import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
 
@@ -85,14 +85,14 @@ function login(k) {
   iris.Channel.getChannels(gun, key, addChat);
   var chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
   var inviter = Helpers.getUrlParameter('inviter');
-  if (chatId) {
-    function go() {
-      if (inviter !== key.pub) {
-        newChat(chatId, window.location.href);
-      }
-      showChat(chatId);
-      window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
+  function go() {
+    if (inviter !== key.pub) {
+      newChat(chatId, window.location.href);
     }
+    showChat(chatId);
+    window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
+  }
+  if (chatId) {
     if (inviter) {
       setTimeout(go, 2000); // wait a sec to not re-create the same chat
     } else {
@@ -138,7 +138,7 @@ async function createChatLink() {
 function setChatLinkQrCode(link) {
   var qrCodeEl = $('#my-qr-code');
   qrCodeEl.empty();
-  var qrcode = new QRCode(qrCodeEl[0], {
+  new QRCode(qrCodeEl[0], {
     text: link || getMyChatLink(),
     width: 320,
     height: 320,
@@ -175,7 +175,7 @@ function showScanPrivKey() {
     QRScanner.cleanupScanner();
   } else {
     $('#privkey-qr-video').show();
-    startPrivKeyQRScanner();
+    QRScanner.startPrivKeyQRScanner().then(login);
   }
 }
 

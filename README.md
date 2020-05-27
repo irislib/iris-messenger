@@ -24,6 +24,8 @@ yarn
 yarn start
 ```
 
+Eslint: `yarn eslint src/js/*.js`
+
 The stack is just [iris-lib](https://github.com/irislib/iris-lib), [gun](https://github.com/amark/gun), jquery and some helpers.
 
 ## Privacy

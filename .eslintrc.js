@@ -11,6 +11,13 @@ module.exports = {
         "iris": "readonly",
         "Gun": "readonly",
         "_": "readonly",
+        "QRCode": "readonly",
+        "ZXing": "readonly",
+        "RindexedDB": "readonly",
+        "Cropper": "readonly",
+        "pica": "readonly",
+        "EmojiButton": "readonly",
+        "Autolinker": "readonly",
     },
     "parserOptions": {
         "ecmaVersion": 11,

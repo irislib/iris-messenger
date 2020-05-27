@@ -1,5 +1,8 @@
 import {gun} from './Main.js';
-import Helpers from '../Helpers.js';
+import {chats, showChat} from './Chats.js';
+import Helpers from './Helpers.js';
+import Session from './Session.js';
+import Profile from './Profile.js';
 
 var MAX_PEER_LIST_SIZE = 10;
 var MAX_CONNECTED_PEERS = iris.util.isElectron ? 4 : 2;
@@ -12,7 +15,7 @@ async function addPeer(peer) {
   peers[peer.url] = peers[peer.url] || _.omit(peer, 'url');
   if (peer.visibility === 'public') {
     // rolling some crypto operations to obfuscate actual url in case we want to remove it
-    var secret = await Gun.SEA.secret(key.epub, key);
+    var secret = await Gun.SEA.secret(Session.key.epub, Session.key);
     var encryptedUrl = await Gun.SEA.encrypt(peer.url, secret);
     var encryptedUrlHash = await Gun.SEA.work(encryptedUrl, null, null, {name: 'SHA-256'});
     gun.user().get('peers').get(encryptedUrlHash).put({url: peer.url, lastSeen: new Date().toISOString()});
@@ -173,7 +176,7 @@ function updatePeerList() {
     if (peer.from) {
       urlEl.append($('<br>'));
       urlEl.append(
-        $('<small>').text('from ' + ((chats[peer.from] && getDisplayName(peer.from)) || Helpers.truncateString(peer.from, 10)))
+        $('<small>').text('from ' + ((chats[peer.from] && Profile.getDisplayName(peer.from)) || Helpers.truncateString(peer.from, 10)))
         .css({cursor:'pointer'}).click(() => showChat(peer.from))
       );
     }

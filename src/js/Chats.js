@@ -1,6 +1,6 @@
 import {gun, showMenu, resetView, activeChat, setActiveChat, activeProfile} from './Main.js';
 import { translate as t } from './Translation.js';
-import Helpers from '../Helpers.js';
+import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
@@ -65,7 +65,6 @@ function showChat(pub) {
   sortMessagesByTime();
   $('#message-view').scroll(() => {
     if ($('#attachment-preview:visible').length) { return; }
-    var scrollPosition = $('#message-view').scrollTop();
     var currentDaySeparator = $('.day-separator').last();
     var pos = currentDaySeparator.position();
     while (currentDaySeparator && pos && pos.top - 55 > 0) {
@@ -220,7 +219,6 @@ function addChat(channel) {
       if (chats[pub].uuid && !msg.selfAuthored && msg.info.from && chats[pub].participantProfiles[msg.info.from].name) {
         text = chats[pub].participantProfiles[msg.info.from].name + ': ' + text;
       }
-      var now = new Date();
       var latestTimeText = iris.util.getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
       if (latestTimeText === 'today') { latestTimeText = iris.util.formatTime(msg.time); }
       latestEl.text(text);
@@ -357,7 +355,6 @@ function addChat(channel) {
     chats[pub].on('about', setAbout);
     chats[pub].on('photo', setGroupPhoto);
     chats[pub].participantProfiles = {};
-    var participants = chats[pub].getParticipants();
     chats[pub].onMy('participants', participants => {
       if (typeof participants === 'object') {
         var keys = Object.keys(participants);
@@ -488,7 +485,7 @@ function scanChatLinkQr() {
     QRScanner.cleanupScanner();
   } else {
     $('#chatlink-qr-video').show();
-    startChatLinkQRScanner();
+    QRScanner.startChatLinkQRScanner();
   }
 }
 
@@ -500,5 +497,5 @@ function init() {
   $('#scan-chatlink-qr-btn').click(scanChatLinkQr);
 }
 
-export {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat};
-export default {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat};
+export {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat};
+export default {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat};

@@ -1,7 +1,7 @@
-import {resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
-import {chats} from './Chats.js';
+import {gun, resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
+import {chats, deleteChat, showChat} from './Chats.js';
 import Session from './Session.js';
-import Helpers from '../Helpers.js';
+import Helpers from './Helpers.js';
 import VideoCall from './VideoCall.js';
 
 function renderGroupParticipants(pub) {
@@ -13,7 +13,7 @@ function renderGroupParticipants(pub) {
   }
   $('#profile-group-participants').empty();
   var keys = Object.keys(chats[pub].participantProfiles);
-  var me = chats[pub].participantProfiles[key.pub];
+  var me = chats[pub].participantProfiles[Session.key.pub];
   if (me && me.permissions) {
     $('#profile-add-participant').toggle(me.permissions.admin);
     $('#profile-group-name-container').toggle(me.permissions.admin);
@@ -24,7 +24,7 @@ function renderGroupParticipants(pub) {
     var nameEl = $('<span>');
     gun.user(k).get('profile').get('name').on(name => nameEl.text(name));
     var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
-    var removeBtn = $('<button>').css({'margin-right': 15}).text('Remove').click(() => {
+    $('<button>').css({'margin-right': 15}).text('Remove').click(() => {
       el.remove();
       // TODO remove group participant
     });
@@ -34,7 +34,7 @@ function renderGroupParticipants(pub) {
     if (profile.permissions && profile.permissions.admin) {
       el.append($('<small>').text('admin').css({'margin-left': 5}));
     }
-    el.click(() => Profile.showProfile(k));
+    el.click(() => showProfile(k));
     $('#profile-group-participants').append(el);
   });
 }
@@ -168,7 +168,7 @@ function showProfile(pub) {
     chats[pub].put('nickname', nick);
   });
   qrCodeEl.empty();
-  var qrcode = new QRCode(qrCodeEl[0], {
+  new QRCode(qrCodeEl[0], {
     text: link,
     width: 300,
     height: 300,
@@ -222,8 +222,100 @@ function onProfileAddParticipantInput(event) {
   $(event.target).val('');
 }
 
+function renderGroupPhotoSettings(uuid) {
+  var me = chats[uuid].participantProfiles[Session.key.pub];
+  var isAdmin = !!(me && me.permissions && me.permissions.admin);
+  $('#profile-group-settings').toggle(isAdmin);
+  $('#current-profile-photo').toggle(!!chats[uuid].photo);
+  $('#profile .profile-photo').toggle(!!chats[uuid].photo);
+  if (isAdmin) {
+    Helpers.setImgSrc($('#current-profile-photo'), chats[uuid].photo);
+    $('#profile .profile-photo').hide();
+    renderProfilePhotoSettings();
+    var el = $('#profile-photo-settings');
+    $('#profile-group-settings').prepend(el);
+    $('#add-profile-photo').toggle(!chats[uuid].photo);
+  }
+}
+
+var cropper;
+function renderProfilePhotoSettings() {
+  $('#profile-photo-error').toggleClass('hidden', true);
+  var files = $('#profile-photo-input')[0].files;
+  if (files && files.length) {
+    var file = files[0];
+    /*
+    if (file.size > 1024 * 200) {
+      $('#profile-photo-error').toggleClass('hidden', false);
+      return console.error('file too big');
+    }
+    */
+    // show preview
+    $('#current-profile-photo').hide();
+    $('#add-profile-photo').hide();
+    Helpers.getBase64(file).then(base64 => {
+      var previewEl = $('#profile-photo-preview');
+      Helpers.setImgSrc(previewEl, base64);
+      $('#profile-photo-preview').toggleClass('hidden', false);
+      $('#cancel-profile-photo').toggleClass('hidden', false);
+      $('#use-profile-photo').toggleClass('hidden', false);
+      cropper = new Cropper(previewEl[0], {
+        aspectRatio:1,
+        autoCropArea: 1,
+        viewMode: 1,
+        background: false,
+        zoomable: false
+      });
+    });
+  } else {
+    cropper && cropper.destroy();
+    // show current profile photo
+    if (!$('#current-profile-photo').attr('src')) {
+      $('#add-profile-photo').show();
+    }
+    Helpers.setImgSrc($('#profile-photo-preview'), '');
+    $('#cancel-profile-photo').toggleClass('hidden', true);
+    $('#use-profile-photo').toggleClass('hidden', true);
+  }
+}
+
+function useProfilePhotoClicked() {
+  var canvas = cropper.getCroppedCanvas();
+  var resizedCanvas = document.createElement('canvas');
+  resizedCanvas.width = resizedCanvas.height = Math.min(canvas.width, 800);
+  pica().resize(canvas, resizedCanvas).then(() => {
+    var src = resizedCanvas.toDataURL('image/jpeg');
+    // var src = $('#profile-photo-preview').attr('src');
+    if (activeProfile) {
+      chats[activeProfile].put('photo', src);
+    } else {
+      gun.user().get('profile').get('photo').put(src);
+    }
+    Helpers.setImgSrc($('#current-profile-photo'), src);
+    $('#profile-photo-input').val('');
+    renderProfilePhotoSettings();
+  });
+}
+
+function removeProfilePhotoClicked() {
+  if (activeProfile) {
+    chats[activeProfile].put('photo', null);
+  } else {
+    gun.user().get('profile').get('photo').put(null);
+  }
+  renderProfilePhotoSettings();
+}
+
 function init() {
   $('#profile-add-participant').on('input', onProfileAddParticipantInput);
+  $('#current-profile-photo, #add-profile-photo').click(() => $('#profile-photo-input').click());
+  $('#profile-photo-input').change(renderProfilePhotoSettings);
+  $('#use-profile-photo').click(useProfilePhotoClicked);
+  $('#cancel-profile-photo').click(() => {
+    $('#profile-photo-input').val('');
+    renderProfilePhotoSettings();
+  });
+  $('#remove-profile-photo').click(removeProfilePhotoClicked);
 }
 
 export default {init, showProfile, setTheirOnlineStatus, addUserToHeader, getDisplayName, renderGroupParticipants};

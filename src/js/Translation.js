@@ -1,4 +1,4 @@
-import Translations from '../Translations.js';
+import Translations from './Translations.js';
 
 var AVAILABLE_LANGUAGES = Object.keys(Translations);
 var language = localStorage.getItem('language') || (navigator.language && navigator.language.slice(0,2)) || 'en';

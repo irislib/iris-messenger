@@ -1,4 +1,4 @@
-import Helpers from '../Helpers.js';
+import Helpers from './Helpers.js';
 import {chats} from './Chats.js';
 import {activeChat} from './Main.js';
 

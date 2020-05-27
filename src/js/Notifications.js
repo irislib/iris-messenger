@@ -1,6 +1,7 @@
-import Helpers from '../Helpers.js';
+import Helpers from './Helpers.js';
 import Profile from './Profile.js';
-import {chats} from './Chats.js';
+import Session from './Session.js';
+import {chats, showChat} from './Chats.js';
 
 var notificationSound = new Audio('../../audio/notification.mp3');
 var loginTime;
@@ -12,7 +13,7 @@ function desktopNotificationsEnabled() {
 
 function enableDesktopNotifications() {
   if (window.Notification) {
-    Notification.requestPermission((status) => {
+    Notification.requestPermission(() => {
       if (Notification.permission === 'granted' || Notification.permission === 'denied') {
         $('#enable-notifications-prompt').slideUp();
       }
@@ -27,7 +28,7 @@ function notifyMsg(msg, info, pub) {
     if (info.selfAuthored) { return false; }
     if (document.visibilityState === 'visible') { return false; }
     if (chats[pub].notificationSetting === 'nothing') { return false; }
-    if (chats[pub].notificationSetting === 'mentions' && !msg.text.includes(myName)) { return false; }
+    if (chats[pub].notificationSetting === 'mentions' && !msg.text.includes(Session.myName)) { return false; }
     return true;
   }
   function shouldDesktopNotify() {
