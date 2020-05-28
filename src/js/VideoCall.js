@@ -1,31 +1,21 @@
-var ringSound = new Audio('./ring.mp3');
+import {chats, showChat} from './Chats.js';
+import {translate as t} from './Translation.js';
+
+var ringSound = new Audio('../../audio/ring.mp3');
 ringSound.loop = true;
-var callSound = new Audio('./call.mp3');
+var callSound = new Audio('../../audio/call.mp3');
 var callTimeout;
 var callSoundTimeout;
 var callingInterval;
 var incomingCallNotification;
 var userMediaStream;
 var ourIceCandidates;
-var theirIceCandidates;
 var localVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 var remoteVideo = $('<video>').attr('autoplay', true).attr('playsinline', true).css({width:'50%', 'max-height': '60%'});
 
 var localStorageIce = localStorage.getItem('rtcConfig');
 var DEFAULT_RTC_CONFIG = {iceServers: [ { urls: ["stun:turn.hepic.tel"] }, { urls: ["stun:stun.l.google.com:19302"] } ]};
 var RTC_CONFIG = localStorageIce ? JSON.parse(localStorageIce) : DEFAULT_RTC_CONFIG;
-$('#rtc-config').val(JSON.stringify(RTC_CONFIG));
-$('#rtc-config').change(() => {
-  try {
-    RTC_CONFIG = JSON.parse($('#rtc-config').val());
-    localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
-  } catch (e) {}
-});
-$('#restore-default-rtc-config').click(() => {
-  RTC_CONFIG = DEFAULT_RTC_CONFIG;
-  localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
-  $('#rtc-config').val(JSON.stringify(RTC_CONFIG));
-})
 
 function notifyIfNotVisible(pub, text) {
    if (document.visibilityState !== 'visible') {
@@ -48,15 +38,15 @@ function showIncomingCall(pub) {
       .attr('id', 'incoming-call')
       .text(`Incoming call from ${chats[pub].name}`)
       .css({position:'fixed', right:0, bottom: 0, height:300, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: '15px 0'});
-    var answer = $('<button>').text('answer').css({display:'block',margin: '15px auto'});
-    var reject = $('<button>').text('reject').css({display:'block',margin: '15px auto'});
+    var answer = $('<button>').text(t('answer')).css({display:'block',margin: '15px auto'});
+    var reject = $('<button>').text(t('reject')).css({display:'block',margin: '15px auto'});
     answer.click(() => answerCall(pub));
     reject.click(() => rejectCall(pub));
     incomingCallEl.append(answer);
     incomingCallEl.append(reject);
     $('body').append(incomingCallEl)
     ringSound.play();
-    notifyIfNotVisible(pub, 'Incoming call');
+    notifyIfNotVisible(pub, t('incoming_call'));
   }
   clearTimeout(callTimeout);
   callTimeout = setTimeout(closeIncomingCall, 5000);
@@ -87,16 +77,16 @@ function callClosed(pub) {
     stopCalling(pub);
     stopUserMedia(pub);
     $('#outgoing-call').empty();
-    $('#outgoing-call').append($('<div>').text(`Call rejected by ${chats[pub].name}`));
-    $('#outgoing-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#outgoing-call').remove()));
-    notifyIfNotVisible('Call rejected');
+    $('#outgoing-call').append($('<div>').text(`${t('call_rejected')} ${chats[pub].name}`));
+    $('#outgoing-call').append($('<button>').text(t('close')).css({display:'block', margin: '15px auto'}).click(() => $('#outgoing-call').remove()));
+    notifyIfNotVisible(t('call_rejected'));
   } else if ($('#active-call').length) {
     stopUserMedia(pub);
     chats[pub].put('call', null);
     $('#active-call').empty();
-    $('#active-call').append($('<div>').text(`Call with ${chats[pub].name} ended`));
+    $('#active-call').append($('<div>').text(t('call_ended')));
     $('#active-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#active-call').remove()));
-    notifyIfNotVisible('Call ended');
+    notifyIfNotVisible(t('call_ended'));
   }
   chats[pub].pc && chats[pub].pc.close();
   chats[pub].pc = null;
@@ -112,7 +102,7 @@ async function addStreamToPeerConnection(pc) {
     pc.addTrack(track, userMediaStream);
   });
   localVideo[0].srcObject = userMediaStream;
-  localVideo[0].onloadedmetadata = function(e) {
+  localVideo[0].onloadedmetadata = function() {
     localVideo[0].muted = true;
     localVideo[0].play();
   };
@@ -139,11 +129,11 @@ async function callUser(pub, video = true) {
   callSound.play();
   var activeCallEl = $('<div>')
     .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
-    .text(`calling ${chats[pub].name}`)
+    .text(`${t('calling')} ${chats[pub].name}`)
     .attr('id', 'outgoing-call');
   var cancelButton = $('<button>')
     .css({display:'block', margin: '15px auto'})
-    .text('cancel')
+    .text(t('cancel'))
     .click(() => cancelCall(pub));
   activeCallEl.append(cancelButton);
   activeCallEl.append(localVideo);
@@ -160,11 +150,11 @@ function cancelCall(pub) {
   chats[pub].pc = null;
 }
 
-function stopUserMedia(pub) {
+function stopUserMedia() {
   userMediaStream.getTracks().forEach(track => track.stop());
 }
 
-function stopCalling(pub) {
+function stopCalling() {
   callSound.pause();
   callSound.removeEventListener('ended', timeoutPlayCallSound);
   clearTimeout(callSoundTimeout);
@@ -200,7 +190,7 @@ async function createCallElement(pub) {
     .css({position:'fixed', right:0, bottom: 0, height:300, width: 400, 'max-width': '100%', 'text-align': 'center', background: '#000', color: '#fff', padding: '15px 0'})
     .attr('id', 'active-call');
   $('body').append(activeCallEl);
-  activeCallEl.append($('<div>').text(`on call with ${chats[pub].name}`).css({'margin-bottom': 5}));
+  activeCallEl.append($('<div>').text(`${t('on_call_with')} ${chats[pub].name}`).css({'margin-bottom': 5}));
   activeCallEl.append($('<button>').text('end call').click(() => endCall(pub)).css({display:'block', margin: '15px auto'}));
   $(activeCallEl).append(localVideo);
   $(activeCallEl).append(remoteVideo);
@@ -208,7 +198,7 @@ async function createCallElement(pub) {
 
 async function initConnection(createOffer, pub) {
   ourIceCandidates = {};
-  theirIceCandidateKeys = [];
+  const theirIceCandidateKeys = [];
   chats[pub].pc = new RTCPeerConnection(RTC_CONFIG);
   await addStreamToPeerConnection(chats[pub].pc);
   async function createOfferFn() {
@@ -227,6 +217,7 @@ async function initConnection(createOffer, pub) {
   }
   chats[pub].onTheir('sdp', async sdp => {
     if (!chats[pub].pc) { return; }
+    if (chats[pub].pc.signalingState === 'stable') { return; }
     if (sdp.data && sdp.time && new Date(sdp.time) < (new Date() - 5000)) { return; }
     stopCalling();
     console.log('got their sdp', sdp);
@@ -239,7 +230,7 @@ async function initConnection(createOffer, pub) {
     Object.keys(c.data).forEach(k => {
       if (theirIceCandidateKeys.indexOf(k) === -1) {
         theirIceCandidateKeys.push(k);
-        chats[pub].pc.addIceCandidate(new RTCIceCandidate(c.data[k])).then(console.log, console.error);;
+        chats[pub].pc.addIceCandidate(new RTCIceCandidate(c.data[k])).then(console.log, console.error);
       }
     });
   });
@@ -254,8 +245,8 @@ async function initConnection(createOffer, pub) {
     chats[pub].pc.onnegotiationneeded = async () => {
       createOfferFn();
     };
-  };
-  chats[pub].pc.onsignalingstatechange = async d => {
+  }
+  chats[pub].pc.onsignalingstatechange = async () => {
     if (!chats[pub].pc) { return; }
     console.log(
       "Signaling State Change:" + chats[pub].pc,
@@ -282,7 +273,7 @@ async function initConnection(createOffer, pub) {
         break;
     }
   };
-  chats[pub].pc.onconnectionstatechange = e => {
+  chats[pub].pc.onconnectionstatechange = () => {
     console.log('iceConnectionState changed', chats[pub].pc.iceConnectionState);
     switch (chats[pub].pc.iceConnectionState) {
       case "connected":
@@ -308,7 +299,7 @@ async function initConnection(createOffer, pub) {
     console.log('ontrack', event);
     if (remoteVideo[0].srcObject !== event.streams[0]) {
       remoteVideo[0].srcObject = event.streams[0];
-      remoteVideo[0].onloadedmetadata = function(e) {
+      remoteVideo[0].onloadedmetadata = function() {
         console.log('metadata loaded');
         remoteVideo[0].play();
       };
@@ -321,3 +312,32 @@ async function answerCall(pub) {
   closeIncomingCall();
   await initConnection(false, pub);
 }
+
+function isCalling() {
+  return !!callingInterval;
+}
+
+function init() {
+  $('#rtc-config').val(JSON.stringify(RTC_CONFIG));
+  $('#rtc-config').change(() => {
+    try {
+      RTC_CONFIG = JSON.parse($('#rtc-config').val());
+      localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
+    } catch (e) {
+      // empty
+    }
+  });
+  $('#restore-default-rtc-config').click(() => {
+    RTC_CONFIG = DEFAULT_RTC_CONFIG;
+    localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
+    $('#rtc-config').val(JSON.stringify(RTC_CONFIG));
+  });
+}
+
+export default {
+  init,
+  onCallMessage,
+  callUser,
+  stopCalling,
+  isCalling,
+};

@@ -1,12 +1,14 @@
 var codeReader;
 
 function startPrivKeyQRScanner() {
-  startQRScanner('privkey-qr-video', result => {
-    var qr = JSON.parse(result.text);
-    if (qr.priv !== undefined) {
-      login(qr);
-      return true;
-    }
+  return new Promise(resolve => {
+    startQRScanner('privkey-qr-video', result => {
+      var qr = JSON.parse(result.text);
+      if (qr.priv !== undefined) {
+        resolve(qr);
+        return true;
+      }
+    });
   });
 }
 
@@ -40,3 +42,5 @@ function cleanupScanner() {
         codeReader = null;
     }
 }
+
+export default {cleanupScanner, startQRScanner, startChatLinkQRScanner, startPrivKeyQRScanner};
