@@ -1,6 +1,7 @@
 import Helpers from './Helpers.js';
 import {chats} from './Chats.js';
 import {activeChat} from './Main.js';
+import {translate as t} from './Translation.js';
 
 var ANIMATE_DURATION = 200;
 
@@ -9,7 +10,7 @@ function openAttachmentsPreview() {
   var attachmentsPreview = $('#attachment-preview');
   attachmentsPreview.removeClass('gallery');
   attachmentsPreview.empty();
-  var closeBtn = $('<button>').text('Cancel').click(closeAttachmentsPreview);
+  var closeBtn = $('<button>').text(t('cancel')).click(closeAttachmentsPreview);
   attachmentsPreview.append(closeBtn);
 
   var files = $('#attachment-input')[0].files;

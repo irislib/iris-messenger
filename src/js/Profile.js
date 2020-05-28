@@ -1,3 +1,4 @@
+import {translate} from './Translation.js';
 import {gun, resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
 import {chats, deleteChat, showChat} from './Chats.js';
 import Session from './Session.js';
@@ -24,7 +25,7 @@ function renderGroupParticipants(pub) {
     var nameEl = $('<span>');
     gun.user(k).get('profile').get('name').on(name => nameEl.text(name));
     var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
-    $('<button>').css({'margin-right': 15}).text('Remove').click(() => {
+    $('<button>').css({'margin-right': 15}).text(translate('remove')).click(() => {
       el.remove();
       // TODO remove group participant
     });
@@ -32,7 +33,7 @@ function renderGroupParticipants(pub) {
     el.append(identicon);
     el.append(nameEl);
     if (profile.permissions && profile.permissions.admin) {
-      el.append($('<small>').text('admin').css({'margin-left': 5}));
+      el.append($('<small>').text(translate('admin')).css({'margin-left': 5}));
     }
     el.click(() => showProfile(k));
     $('#profile-group-participants').append(el);
@@ -56,7 +57,7 @@ function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (pub === Session.getKey().pub && activeProfile !== pub) {
-    nameEl.html("📝<b>Note to Self</b>");
+    nameEl.html("📝<b>" + translate('note_to_self') + "</b>");
   } else if (chats[pub]) {
     nameEl.text(getDisplayName(pub));
   }
@@ -79,7 +80,7 @@ function addUserToHeader(pub) {
     }
   }
   textEl.append($('<small>').addClass('last-seen'));
-  textEl.append($('<small>').addClass('typing-indicator').text('typing...'));
+  textEl.append($('<small>').addClass('typing-indicator').text(translate('typing')));
   $("#header-content").append(textEl);
   textEl.on('click', () => showProfile(pub));
   var videoCallBtn = $(`<a class="tooltip"><span class="tooltiptext">Video call</span><svg enable-background="new 0 0 50 50" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" style="height:24px;width:24px"/><polygon fill="none" points="49,14 36,21 36,29   49,36 " stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/><path d="M36,36c0,2.209-1.791,4-4,4  H5c-2.209,0-4-1.791-4-4V14c0-2.209,1.791-4,4-4h27c2.209,0,4,1.791,4,4V36z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/></svg></a>`).attr('id', 'start-video-call').css({width:24, height:24, color: 'var(--msg-form-button-color)'});
@@ -96,16 +97,16 @@ function setTheirOnlineStatus(pub) {
   var online = chats[pub].online;
   if (online && (activeChat === pub || activeProfile === pub)) {
     if (online.isOnline) {
-      $('#header-content .last-seen').text('online');
+      $('#header-content .last-seen').text(translate('online'));
     } else if (online.lastActive) {
       var d = new Date(online.lastActive);
-      var lastSeenText = iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'}));
-      if (lastSeenText === 'today') {
+      var lastSeenText = translate(iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
+      if (lastSeenText === translate('today')) {
         lastSeenText = iris.util.formatTime(d);
       } else {
         lastSeenText = iris.util.formatDate(d);
       }
-      $('#header-content .last-seen').text('last active ' + lastSeenText);
+      $('#header-content .last-seen').text(translate('last_active') + ' ' + lastSeenText);
     }
   }
 }
@@ -150,7 +151,7 @@ function showProfile(pub) {
     var originalText = t.text();
     var originalWidth = t.width();
     t.width(originalWidth);
-    t.text('Copied');
+    t.text(translate('copied'));
     setTimeout(() => {
       t.text(originalText);
       t.css('width', '');
@@ -201,7 +202,7 @@ function onProfileAddParticipantInput(event) {
     var nameEl = $('<span>');
     gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
     var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
-    var addBtn = $('<button>').css({'margin-left': 15}).text('Add').click(() => {
+    var addBtn = $('<button>').css({'margin-left': 15}).text(translate('add')).click(() => {
       if (newGroupParticipant) {
         chats[activeProfile].addParticipant(newGroupParticipant);
         newGroupParticipant = null;
@@ -209,7 +210,7 @@ function onProfileAddParticipantInput(event) {
         $('#profile-add-participant-candidate').remove();
       }
     });
-    var removeBtn = $('<button>').css({'margin-left': 15}).text('Cancel').click(() => {
+    var removeBtn = $('<button>').css({'margin-left': 15}).text(translate('cancel')).click(() => {
       el.remove();
       $('#profile-add-participant-input').val('').show();
       newGroupParticipant = null;

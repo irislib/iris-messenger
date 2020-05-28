@@ -3,6 +3,7 @@ import {chats, showChat} from './Chats.js';
 import Helpers from './Helpers.js';
 import Session from './Session.js';
 import Profile from './Profile.js';
+import {translate as t} from './Translation.js';
 
 var MAX_PEER_LIST_SIZE = 10;
 var MAX_CONNECTED_PEERS = iris.util.isElectron ? 4 : 2;
@@ -140,7 +141,7 @@ function updatePeerList() {
   $('#reset-peers').remove();
   var urls = Object.keys(peers);
   if (urls.length === 0) {
-    var resetBtn = $('<button>').attr('id', 'reset-peers').css({'margin-bottom': '15px'}).text('Reset default peers').click(() => {
+    var resetBtn = $('<button>').attr('id', 'reset-peers').css({'margin-bottom': '15px'}).text(t('restore_defaults')).click(() => {
       resetPeers();
       updatePeerList();
     });
@@ -152,14 +153,14 @@ function updatePeerList() {
     var connected = peerFromGun && peerFromGun.wire && peerFromGun.wire.hied === 'hi';
     var row = $('<div>').addClass('flex-row peer');
     var urlEl = $('<div>').addClass('flex-cell').text(url);
-    var removeBtn = $('<button>Remove</button>').click(() => {
+    var removeBtn = $('<button>').text(t('remove')).click(() => {
       Helpers.hideAndRemove(row); // this may be screwed by setInterval removing before animation finished
       removePeer(url);
       if (peerFromGun) {
         disconnectPeer(peerFromGun);
       }
     });
-    var connectBtn = $('<button>').text(peer.enabled ? 'Disable' : 'Enable').click(function() {
+    var connectBtn = $('<button>').text(peer.enabled ? t('disable') : t('enable')).click(function() {
       if (peer.enabled) {
         disablePeer(url, peerFromGun);
       } else {
@@ -176,7 +177,7 @@ function updatePeerList() {
     if (peer.from) {
       urlEl.append($('<br>'));
       urlEl.append(
-        $('<small>').text('from ' + ((chats[peer.from] && Profile.getDisplayName(peer.from)) || Helpers.truncateString(peer.from, 10)))
+        $('<small>').text(t('from') + ' ' + ((chats[peer.from] && Profile.getDisplayName(peer.from)) || Helpers.truncateString(peer.from, 10)))
         .css({cursor:'pointer'}).click(() => showChat(peer.from))
       );
     }

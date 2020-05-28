@@ -107,7 +107,7 @@ function sortMessagesByTime() {
     var dateStr = date.toLocaleDateString();
     if (dateStr !== previousDateStr) {
       var separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
-      $(this).before($('<div>').text(separatorText).addClass('day-separator'));
+      $(this).before($('<div>').text(t(separatorText)).addClass('day-separator'));
     }
     previousDateStr = dateStr;
 
@@ -193,7 +193,7 @@ function addChat(channel) {
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
   var latestEl = el.find('.latest');
-  var typingIndicator = el.find('.typing-indicator').text('Typing...');
+  var typingIndicator = el.find('.typing-indicator').text(t('typing'));
   chats[pub].getMessages((msg, info) => {
     chats[pub].messages[msg.time] = msg;
     msg.info = info;
@@ -212,7 +212,7 @@ function addChat(channel) {
       chats[pub].latest = msg;
       var text = msg.text || '';
       if (msg.attachments) {
-        text = '[attachment]' + (text.length ? ': ' + text : '');
+        text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
       } else {
         text = msg.text;
       }
@@ -220,7 +220,8 @@ function addChat(channel) {
         text = chats[pub].participantProfiles[msg.info.from].name + ': ' + text;
       }
       var latestTimeText = iris.util.getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
-      if (latestTimeText === 'today') { latestTimeText = iris.util.formatTime(msg.time); }
+      latestTimeText = t(latestTimeText);
+      if (latestTimeText === t('today')) { latestTimeText = iris.util.formatTime(msg.time); }
       latestEl.text(text);
       latestEl.html(Helpers.highlightEmoji(latestEl.html()));
       if (info.selfAuthored) {
@@ -314,7 +315,7 @@ function addChat(channel) {
       chats[pub].name = name;
     }
     if (pub === Session.getKey().pub) {
-      el.find('.name').html("📝<b>Note to Self</b>");
+      el.find('.name').html("📝<b>" + t('note_to_self') + "</b>");
     } else {
       el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
     }

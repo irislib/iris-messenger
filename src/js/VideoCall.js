@@ -1,4 +1,5 @@
 import {chats, showChat} from './Chats.js';
+import {translate as t} from './Translation.js';
 
 var ringSound = new Audio('../../audio/ring.mp3');
 ringSound.loop = true;
@@ -37,15 +38,15 @@ function showIncomingCall(pub) {
       .attr('id', 'incoming-call')
       .text(`Incoming call from ${chats[pub].name}`)
       .css({position:'fixed', right:0, bottom: 0, height:300, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: '15px 0'});
-    var answer = $('<button>').text('answer').css({display:'block',margin: '15px auto'});
-    var reject = $('<button>').text('reject').css({display:'block',margin: '15px auto'});
+    var answer = $('<button>').text(t('answer')).css({display:'block',margin: '15px auto'});
+    var reject = $('<button>').text(t('reject')).css({display:'block',margin: '15px auto'});
     answer.click(() => answerCall(pub));
     reject.click(() => rejectCall(pub));
     incomingCallEl.append(answer);
     incomingCallEl.append(reject);
     $('body').append(incomingCallEl)
     ringSound.play();
-    notifyIfNotVisible(pub, 'Incoming call');
+    notifyIfNotVisible(pub, t('incoming_call'));
   }
   clearTimeout(callTimeout);
   callTimeout = setTimeout(closeIncomingCall, 5000);
@@ -76,16 +77,16 @@ function callClosed(pub) {
     stopCalling(pub);
     stopUserMedia(pub);
     $('#outgoing-call').empty();
-    $('#outgoing-call').append($('<div>').text(`Call rejected by ${chats[pub].name}`));
-    $('#outgoing-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#outgoing-call').remove()));
-    notifyIfNotVisible('Call rejected');
+    $('#outgoing-call').append($('<div>').text(`${t('call_rejected')} ${chats[pub].name}`));
+    $('#outgoing-call').append($('<button>').text(t('close')).css({display:'block', margin: '15px auto'}).click(() => $('#outgoing-call').remove()));
+    notifyIfNotVisible(t('call_rejected'));
   } else if ($('#active-call').length) {
     stopUserMedia(pub);
     chats[pub].put('call', null);
     $('#active-call').empty();
-    $('#active-call').append($('<div>').text(`Call with ${chats[pub].name} ended`));
+    $('#active-call').append($('<div>').text(t('call_ended')));
     $('#active-call').append($('<button>').text('Close').css({display:'block', margin: '15px auto'}).click(() => $('#active-call').remove()));
-    notifyIfNotVisible('Call ended');
+    notifyIfNotVisible(t('call_ended'));
   }
   chats[pub].pc && chats[pub].pc.close();
   chats[pub].pc = null;
@@ -128,11 +129,11 @@ async function callUser(pub, video = true) {
   callSound.play();
   var activeCallEl = $('<div>')
     .css({position:'fixed', right:0, bottom: 0, height:200, width: 200, 'text-align': 'center', background: '#000', color: '#fff', padding: 15})
-    .text(`calling ${chats[pub].name}`)
+    .text(`${t('calling')} ${chats[pub].name}`)
     .attr('id', 'outgoing-call');
   var cancelButton = $('<button>')
     .css({display:'block', margin: '15px auto'})
-    .text('cancel')
+    .text(t('cancel'))
     .click(() => cancelCall(pub));
   activeCallEl.append(cancelButton);
   activeCallEl.append(localVideo);
@@ -189,7 +190,7 @@ async function createCallElement(pub) {
     .css({position:'fixed', right:0, bottom: 0, height:300, width: 400, 'max-width': '100%', 'text-align': 'center', background: '#000', color: '#fff', padding: '15px 0'})
     .attr('id', 'active-call');
   $('body').append(activeCallEl);
-  activeCallEl.append($('<div>').text(`on call with ${chats[pub].name}`).css({'margin-bottom': 5}));
+  activeCallEl.append($('<div>').text(`${t('on_call_with')} ${chats[pub].name}`).css({'margin-bottom': 5}));
   activeCallEl.append($('<button>').text('end call').click(() => endCall(pub)).css({display:'block', margin: '15px auto'}));
   $(activeCallEl).append(localVideo);
   $(activeCallEl).append(remoteVideo);

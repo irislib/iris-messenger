@@ -1,6 +1,7 @@
 import {gun, resetView} from './Main.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
+import {translate as t} from './Translation.js';
 
 function render() {
   resetView();
@@ -16,8 +17,8 @@ function render() {
 function togglePrivateKeyQR() {
   var btn = $('#show-private-key-qr');
   var show = $('#private-key-qr').length === 0;
-  var SHOW_TEXT = 'Show private key QR code';
-  function hideText(s) { return 'Hide private key QR code (' + s + ')'; }
+  var SHOW_TEXT = t('show_privkey_qr');
+  function hideText(s) { return t('hide_privkey_qr') + ' (' + s + ')'; }
   if (show) {
     var showPrivateKeySecondsRemaining = 20;
     btn.text(hideText(showPrivateKeySecondsRemaining));
@@ -52,7 +53,7 @@ function togglePrivateKeyQR() {
 
 function showLogoutConfirmation() {
   resetView();
-  $('#header-content').text('Log out?');
+  $('#header-content').text(t('log_out') + '?');
   $('#logout-confirmation').show();
 }
 
@@ -79,27 +80,27 @@ function init() {
 
   $('.copy-chat-link').click(event => {
     Helpers.copyToClipboard(Session.getMyChatLink());
-    var t = $(event.target);
-    var originalText = t.text();
-    var originalWidth = t.width();
-    t.width(originalWidth);
-    t.text('Copied');
+    var te = $(event.target);
+    var originalText = te.text();
+    var originalWidth = te.width();
+    te.width(originalWidth);
+    te.text(t('copied'));
     setTimeout(() => {
-      t.text(originalText);
-      t.css('width', '');
+      te.text(originalText);
+      te.css('width', '');
     }, 2000);
   });
 
   $('#copy-private-key').click(event => {
     Helpers.copyToClipboard(JSON.stringify(Session.getKey()));
-    var t = $(event.target);
-    var originalText = t.text();
-    var originalWidth = t.width();
-    t.width(originalWidth);
-    t.text('Copied');
+    var te = $(event.target);
+    var originalText = te.text();
+    var originalWidth = te.width();
+    te.width(originalWidth);
+    te.text(t('copied'));
     setTimeout(() => {
-      t.text(originalText);
-      t.css('width', '');
+      te.text(originalText);
+      te.css('width', '');
     }, 2000);
   });
 }
