@@ -135,7 +135,7 @@ export default `
       </div>
       <p><%= about_text %>:</p>
       <p>
-        <input id="settings-about" style="width:100%" placeholder="About text">
+        <input id="settings-about" style="width:100%" placeholder="<%= about_text %>">
       </p>
       <hr/>
       <h3><%= account %></h3>
@@ -272,29 +272,29 @@ export default `
         </p>
         <p id="profile-page-qr" class="qr-container"></p>
         <hr/>
-        <h3>Chat Settings</h3>
+        <h3><%= chat_settings %></h3>
         <div class="profile-nicknames">
-          <h4>Nicknames</h4>
+          <h4><%= nicknames %></h4>
           <p>
-            Nickname: <input id="profile-nickname-their">
+            <%= nickname %>: <input id="profile-nickname-their">
           </p>
           <p id="profile-nickname-my-container">
-            Their nickname for you: <span id="profile-nickname-my"></span>
+            <%= their_nickname_for_you %>: <span id="profile-nickname-my"></span>
           </p>
         </div>
         <div class="notification-settings">
-          <h4>Notifications</h4>
+          <h4><%= notifications %></h4>
           <input type="radio" id="notifyAll" name="notificationPreference" value="all">
-          <label for="notifyAll">All messages</label><br>
+          <label for="notifyAll"><%= all_messages %></label><br>
           <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions">
-          <label for="notifyMentionsOnly">Mentions only</label><br>
+          <label for="notifyMentionsOnly"><%= mentions_only %></label><br>
           <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing">
-          <label for="notifyNothing">Nothing</label><br>
+          <label for="notifyNothing"><%= nothing %></label><br>
         </div>
         <hr/>
         <p>
-          <button class="delete-chat">Delete chat</button>
-          <!-- <button class="block-user">Block user</button> -->
+          <button class="delete-chat"><%= delete_chat %></button>
+          <!-- <button class="block-user"><%= block_user %></button> -->
         </p>
       </div>
     </div>
