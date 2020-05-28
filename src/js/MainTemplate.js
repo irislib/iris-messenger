@@ -64,7 +64,7 @@ export default `
       <div id="attachment-preview" class="hidden"></div>
     </div>
     <div id="not-seen-by-them" style="display: none">
-      <p>If the other person doesn't see your message, you can give them <b>your</b> chat link through some other channel:</p>
+      <p><%= if_other_person_doesnt_see_message %></p>
       <p><button class="copy-chat-link"><%= copy_your_chat_link %></button></p>
     </div>
     <div class="message-form" style="display:none">
@@ -76,7 +76,7 @@ export default `
         <button type="button" id="emoji-picker">
           <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="smile" class="svg-inline--fa fa-smile fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 448c-110.3 0-200-89.7-200-200S137.7 56 248 56s200 89.7 200 200-89.7 200-200 200zm-80-216c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm4 72.6c-20.8 25-51.5 39.4-84 39.4s-63.2-14.3-84-39.4c-8.5-10.2-23.7-11.5-33.8-3.1-10.2 8.5-11.5 23.6-3.1 33.8 30 36 74.1 56.6 120.9 56.6s90.9-20.6 120.9-56.6c8.5-10.2 7.1-25.3-3.1-33.8-10.1-8.4-25.3-7.1-33.8 3.1z"></path></svg>
         </button>
-        <input id="new-msg" type="text" placeholder="Type a message" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off">
+        <input id="new-msg" type="text" placeholder="<%= type_a_message %>" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off">
         <button type="submit">
           <svg class="svg-inline--fa fa-w-16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;" xml:space="preserve" width="100px" height="100px" fill="#000000" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>
         </button>
@@ -93,103 +93,102 @@ export default `
       <button class="copy-chat-link"><%= copy_your_chat_link %></button>
       <button id="show-my-qr-btn"><%= or_show_qr_code %></button>
       <p id="my-qr-code" class="qr-container" style="display:none"></p>
-      <p><small>Beware of sharing your chat link publicly: you might get spammed with message requests. Publicly share your <a class="profile-link">profile link</a> instead.</small></p>
+      <p><small><%= beware_of_sharing_chat_link_publicly %></small></p>
       <h3><%= new_group %></h3>
       <p>
         <input id="new-group-name" type="text" placeholder="<%= group_name %>">
         <button id="new-group-create"><%= create %></button>
       </p>
       <hr/>
-      <h3>Your Chat Links</h3>
-      <p><button id="generate-chat-link">Create new chat link</button></p>
+      <h3><%= your_chat_links %></h3>
+      <p><button id="generate-chat-link"><%= create_new_chat_link %></button></p>
       <div id="my-chat-links" class="flex-table"></div>
     </div>
 
     <!-- Settings view -->
     <div class="main-view" id="settings">
-      <h3>Profile</h3>
+      <h3><%= profile %></h3>
       <p>
-        Your name:
+        <%= your_name %>:
       </p>
       <p>
-        <input id="settings-name" placeholder="Your name">
+        <input id="settings-name" placeholder="<%= your_name %>">
       </p>
       <p id="profile-photo-chapter">
-        Profile photo:
+        <%= profile_photo %>:
       </p>
       <div id="profile-photo-settings">
         <img id="current-profile-photo">
-        <button id="add-profile-photo">Add profile photo</button>
+        <button id="add-profile-photo"><%= add_profile_photo %></button>
         <div id="profile-photo-preview-container">
           <img id="profile-photo-preview" class="hidden">
         </div>
         <p>
           <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*">
         </p>
-        <p id="profile-photo-error" class="hidden">Profile photo too big: maximum size is 200KB</p>
+        <p id="profile-photo-error" class="hidden"><%= profile_photo_too_big %></p>
         <p>
-          <button id="cancel-profile-photo" class="hidden">Cancel</button>
-          <button id="use-profile-photo" class="hidden">Use photo</button>
-          <button id="remove-profile-photo" class="hidden">Remove photo</button>
+          <button id="cancel-profile-photo" class="hidden"><%= cancel %></button>
+          <button id="use-profile-photo" class="hidden"><%= use_photo %></button>
+          <button id="remove-profile-photo" class="hidden"><%= remove_photo %></button>
         </p>
       </div>
-      <p>About text:</p>
+      <p><%= about_text %>:</p>
       <p>
         <input id="settings-about" style="width:100%" placeholder="About text">
       </p>
       <hr/>
-      <h3>Account</h3>
+      <h3><%= account %></h3>
       <p>
-        <b>Save a backup of your private key first!</b> Otherwise you can't log in back to this account.
+        <b><%= save_backup_of_privkey_first %></b> <%= otherwise_cant_log_in_again %>
       </p>
       <p>
-        <button class="show-logout-confirmation">Log out</button>
+        <button class="show-logout-confirmation"><%= log_out %></button>
       </p>
-      <h4>Private key</h4>
+      <h4><%= private_key %></h4>
       <p>
-        <b>DANGER!</b> Private key is used to <b>log in to your account</b>. Don't give or show your private key to anyone else!
-      </p>
-      <p>
-        <button id="download-private-key">Download private key</button>
-        <button id="copy-private-key">Copy private key</button>
+        <%= private_key_warning %>
       </p>
       <p>
-        <button id="show-private-key-qr">Show private key QR code</button>
+        <button id="download-private-key"><%= download_private_key %></button>
+        <button id="copy-private-key"><%= copy_private_key %></button>
       </p>
-      <p><small>The safest place to store your private key is a <b>password manager</b>.</small></p>
+      <p>
+        <button id="show-private-key-qr"><%= show_privkey_qr %></button>
+      </p>
+      <p><small><%= privkey_storage_recommendation %></small></p>
       <hr/>
-      <h3>Language</h3>
+      <h3><%= language %></h3>
       <p><select class="language-selector"></select></p>
-      <p><small>Translations are still incomplete.</small></p>
       <hr/>
-      <h3>Peers</h3>
+      <h3><%= peers %></h3>
       <div id="peers" class="flex-table">
         <div class="flex-row" id="add-peer-row">
           <div class="flex-cell">
-            <input type="url" id="add-peer-url" placeholder="Peer url">
+            <input type="url" id="add-peer-url" placeholder="<%= peer_url %>">
             <input type="checkbox" id="add-peer-public">
-            <label for="add-peer-public">Public</label>
-            <button id="add-peer-btn">Add</button>
+            <label for="add-peer-public"><%= public %></label>
+            <button id="add-peer-btn"><%= add %></button>
           </div>
         </div>
         <p>
           <small>
-            <i>Public</i> peers are automatically discoverable by people you chat with (and others).
+            <%= public_peer_info %>
           </small>
         </p>
         <p>
           <small>
-            Peers are GunDB nodes that you can easily <a href="https://github.com/amark/gun#deploy">spin up</a>. Upcoming: direct connection with friends over WebRTC.
+            <%= peers_info %>
           </small>
         </p>
       </div>
       <hr/>
-      <h3>WebRTC connection options</h3>
-      <p><small>WebRTC is used for video calls. If you're behind a NAT, you might need to specify a TURN server here, which will relay your video traffic. Bandwidth is not free, so there are no free TURN servers around.</small></p>
-      <p><textarea rows="4" id="rtc-config" placeholder="RTC config"></textarea></p>
-      <button id="restore-default-rtc-config">Restore defaults</button>
+      <h3><%= webrtc_connection_options %></h3>
+      <p><small><%= webrtc_info %></small></p>
+      <p><textarea rows="4" id="rtc-config" placeholder="<%= webrtc_connection_options %>"></textarea></p>
+      <button id="restore-default-rtc-config"><%= restore_defaults %></button>
       <hr/>
-      <h3>About</h3>
+      <h3><%= about %></h3>
       <p>Iris is like the messaging apps we're used to, but better.</p>
       <ul>
         <li><b>No phone number or signup required.</b> Just start using it!</li>
@@ -219,22 +218,22 @@ export default `
       <p>By looking at timestamps in chats, it is possible to guess who are chatting with each other. There are potential technical solutions to hiding the timestamps, but they are not implemented yet. It is also possible, if not trivial, to find out who are communicating with each other by monitoring data subscriptions on the decentralized database.</p>
       <p>In that regard, Iris prioritizes decentralization and availability over perfect privacy.</p>
       <p>Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.</p>
-      <p>The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.</p>
+      <p><%= application_security_warning %></p>
 
-      <h4>Support the cause?</h4>
-      <p><b>Donations</b> help keep the project going and are very much appreciated. You can donate via <a href="https://opencollective.com/iris-social">Open Collective</a> or <b>bitcoin</b>: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST</p>
+      <h4>Donate</h4>
+      <p><%= donate_info %>: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST</p>
     </div>
 
     <!-- Logout confirmation -->
     <div class="main-view" id="logout-confirmation">
       <p>
-        You <b>cannot log in again</b> unless you have saved a copy of your private key.
+        <%= logout_confirmation_info %>
       </p>
       <p>
-        <button class="open-settings-button">Go back</button>
+        <button class="open-settings-button"><%= back %></button>
       </p>
       <p>
-        <button class="logout-button">Log out</button>
+        <button class="logout-button"><%= log_out %></button>
       </p>
     </div>
 
@@ -244,12 +243,12 @@ export default `
       <div class="profile-photo-container"><img class="profile-photo"></div>
       <div class="content">
         <div id="profile-group-settings">
-          <div id="profile-group-name-container">Group name: <input id="profile-group-name" placeholder="Group name"></div>
-          <p>Members:</p>
+          <div id="profile-group-name-container"><%= group_name %>: <input id="profile-group-name" placeholder="<%= group_name %>"></div>
+          <p><%= participants %>:</p>
           <div id="profile-group-participants"></div>
           <div id="profile-add-participant" style="display:none;">
-            <p>Add member:</p>
-            <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="New member's chat link"></p>
+            <p><%= add_participant %>:</p>
+            <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="<%= new_participants_chat_link %>"></p>
             <p><small>Currently you need to add each member here. After that, they can join using the group link ("copy link" below). "Join links" upcoming!</small></p>
           </div>
           <hr>
@@ -261,22 +260,17 @@ export default `
         <p class="last-active"></p>
         <!--
         <p>
-          <button class="add-friend">Add friend</button>
+          <button class="add-friend"><%= add_friend %></button>
         </p>
         <p>
           <small>Friends can optionally direct connect to each other and store each others' encrypted data.</small>
         </p>
       -->
         <p>
-          <button class="send-message">Send message</button>
-          <button class="copy-user-link">Copy link</button>
+          <button class="send-message"><%= send_message %></button>
+          <button class="copy-user-link"><%= copy_link %></button>
         </p>
         <p id="profile-page-qr" class="qr-container"></p>
-        <!--
-        <p>
-          <button class="add-friend">Add to friends</button>
-        </p>
-        -->
         <hr/>
         <h3>Chat Settings</h3>
         <div class="profile-nicknames">
