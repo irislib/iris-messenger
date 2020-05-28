@@ -74,6 +74,7 @@ export default {
     chat_settings: "Chat Settings",
     nicknames: "Nicknames",
     nickname: "Nickname",
+    video_call: "Video call",
     online: "online",
     last_active: "last active",
     their_nickname_for_you: "Their nickname for you",
