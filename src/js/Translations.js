@@ -100,7 +100,7 @@ export default {
     on_call_with: "On call with",
   },
    "es": {
-    language_name: "Spanish",
+    language_name: "Español",
     iris_messenger: "Iris Messenger",
     whats_your_name: "¿Cuál es tu nombre?",
     new_user_go: "Ir",
