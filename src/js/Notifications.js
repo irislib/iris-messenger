@@ -1,7 +1,7 @@
 import Helpers from './Helpers.js';
 import Profile from './Profile.js';
 import Session from './Session.js';
-import {chats, showChat} from './Chats.js';
+import {chats, showChat} from './Chat.js';
 
 var notificationSound = new Audio('../../audio/notification.mp3');
 var loginTime;

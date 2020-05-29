@@ -1,6 +1,6 @@
 import {translate} from './Translation.js';
 import {gun, resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
-import {chats, deleteChat, showChat} from './Chats.js';
+import {chats, deleteChat, showChat} from './Chat.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
 import VideoCall from './VideoCall.js';

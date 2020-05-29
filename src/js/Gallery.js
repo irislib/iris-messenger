@@ -1,5 +1,5 @@
 import Helpers from './Helpers.js';
-import {chats} from './Chats.js';
+import {chats} from './Chat.js';
 import {activeChat} from './Main.js';
 import {translate as t} from './Translation.js';
 

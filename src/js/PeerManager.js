@@ -1,5 +1,5 @@
 import {gun} from './Main.js';
-import {chats, showChat} from './Chats.js';
+import {chats, showChat} from './Chat.js';
 import Helpers from './Helpers.js';
 import Session from './Session.js';
 import Profile from './Profile.js';

@@ -1,5 +1,5 @@
 import {gun, activeChat, activeProfile, resetView, showMenu} from './Main.js';
-import {chats, addChat, showNewChat, newChat, showChat} from './Chats.js';
+import {chats, addChat, showNewChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import Profile from './Profile.js';
