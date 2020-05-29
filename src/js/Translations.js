@@ -199,7 +199,7 @@ export default {
     calling: "Llamando",
     on_call_with: "En comunicación con",
   },
-  "pt-br": {
+  "pt-BR": {
     language_name: "Português Brasil",
     iris_messenger: "Iris Messenger",
     whats_your_name: "Qual o seu nome?",
