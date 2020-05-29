@@ -1,5 +1,5 @@
 import { html, render } from './lib/htm.preact.js';
-import Translation, {translate as t} from './Translation.js';
+import Translation from './Translation.js';
 import Helpers from './Helpers.js';
 import PeerManager from './PeerManager.js';
 import Gallery from './Gallery.js';

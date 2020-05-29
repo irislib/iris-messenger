@@ -2,7 +2,7 @@ import {gun, resetView} from './Main.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
 import {translate as t} from './Translation.js';
-import { html, render as r2 } from './lib/htm.preact.js';
+import { html } from './lib/htm.preact.js';
 
 const Settings = () => html`
   <div class="main-view" id="settings">
