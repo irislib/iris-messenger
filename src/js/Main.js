@@ -1,11 +1,10 @@
-import { h, Component, render } from './lib/preact.module.js';
-import htm from './lib/htm.module.js';
+import { html, render } from './lib/htm.preact.js';
 import Translation, {translate as t} from './Translation.js';
 import Helpers from './Helpers.js';
 import PeerManager from './PeerManager.js';
 import Gallery from './Gallery.js';
 import Session from './Session.js';
-import Settings from './Settings.js';
+import Settings, {init as initSettings} from './Settings.js';
 import Chats, {chats} from './Chats.js';
 import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
@@ -24,8 +23,7 @@ Helpers.checkColorScheme();
 var activeChat;
 var activeProfile;
 
-const html = htm.bind(h);
-const app = html`
+const Main = html`
   <div id="main-content">
     <section id="login" class="hidden">
       <div id="login-content">
@@ -137,123 +135,7 @@ const app = html`
       </div>
 
       <!-- Settings view -->
-      <div class="main-view" id="settings">
-        <h3>${t('profile')}</h3>
-        <p>
-          ${t('your_name')}:
-        </p>
-        <p>
-          <input id="settings-name" placeholder="${t('your_name')}"/>
-        </p>
-        <p id="profile-photo-chapter">
-          ${t('profile_photo')}:
-        </p>
-        <div id="profile-photo-settings">
-          <img id="current-profile-photo"/>
-          <button id="add-profile-photo">${t('add_profile_photo')}</button>
-          <div id="profile-photo-preview-container">
-            <img id="profile-photo-preview" class="hidden"/>
-          </div>
-          <p>
-            <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*"/>
-          </p>
-          <p id="profile-photo-error" class="hidden">${t('profile_photo_too_big')}</p>
-          <p>
-            <button id="cancel-profile-photo" class="hidden">${t('cancel')}</button>
-            <button id="use-profile-photo" class="hidden">${t('use_photo')}</button>
-            <button id="remove-profile-photo" class="hidden">${t('remove_photo')}</button>
-          </p>
-        </div>
-        <p>${t('about_text')}:</p>
-        <p>
-          <input id="settings-about" style="width:100%" placeholder="${t('about_text')}"/>
-        </p>
-        <hr/>
-        <h3>${t('account')}</h3>
-        <p>
-          <b>${t('save_backup_of_privkey_first')}</b> ${t('otherwise_cant_log_in_again')}
-        </p>
-        <p>
-          <button class="show-logout-confirmation">${t('log_out')}</button>
-        </p>
-        <h4>${t('private_key')}</h4>
-        <p>
-          ${t('private_key_warning')}
-        </p>
-        <p>
-          <button id="download-private-key">${t('download_private_key')}</button>
-          <button id="copy-private-key">${t('copy_private_key')}</button>
-        </p>
-        <p>
-          <button id="show-private-key-qr">${t('show_privkey_qr')}</button>
-        </p>
-        <p><small>${t('privkey_storage_recommendation')}</small></p>
-        <hr/>
-        <h3>${t('language')}</h3>
-        <p><select class="language-selector"></select></p>
-        <hr/>
-        <h3>${t('peers')}</h3>
-        <div id="peers" class="flex-table">
-          <div class="flex-row" id="add-peer-row">
-            <div class="flex-cell">
-              <input type="url" id="add-peer-url" placeholder="${t('peer_url')}"/>
-              <input type="checkbox" id="add-peer-public"/>
-              <label for="add-peer-public">${t('public')}</label>
-              <button id="add-peer-btn">${t('add')}</button>
-            </div>
-          </div>
-          <p>
-            <small>
-              ${t('public_peer_info')}
-            </small>
-          </p>
-          <p>
-            <small>
-              ${t('peers_info')}
-            </small>
-          </p>
-        </div>
-        <hr/>
-        <h3>${t('webrtc_connection_options')}</h3>
-        <p><small>${t('webrtc_info')}</small></p>
-        <p><textarea rows="4" id="rtc-config" placeholder="${t('webrtc_connection_options')}"></textarea></p>
-        <button id="restore-default-rtc-config">${t('restore_defaults')}</button>
-        <hr/>
-        <h3>${t('about')}</h3>
-        <p>Iris is like the messaging apps we're used to, but better.</p>
-        <ul>
-          <li><b>No phone number or signup required.</b> Just start using it!</li>
-          <li><b>Secure</b>: It's open source. Users can validate that big brother doesn't read your messages.</li>
-          <li><b>Available</b>: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.</li>
-        </ul>
-        <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-        <p><small>Version 1.2.9</small></p>
-
-        <div id="desktop-application-about">
-          <h4>Get the desktop application</h4>
-          <ul>
-            <li>Communicate and synchronize with local network peers without Internet access
-              <ul>
-                <li>When local peers eventually connect to the Internet, your messages are relayed globally</li>
-                <li>Bluetooth support upcoming</li>
-              </ul>
-            </li>
-            <li>Opens to background on login: stay online and get message notifications</li>
-            <li>More secure and available: no need to open the browser application from a server</li>
-          </ul>
-          <p><a href="https://github.com/irislib/iris-electron/releases">Download</a></p>
-        </div>
-
-        <h4>Privacy</h4>
-        <p>Messages are end-to-end encrypted, but message timestamps and the number of chats aren't. In a decentralized network this information is potentially available to anyone.</p>
-        <p>By looking at timestamps in chats, it is possible to guess who are chatting with each other. There are potential technical solutions to hiding the timestamps, but they are not implemented yet. It is also possible, if not trivial, to find out who are communicating with each other by monitoring data subscriptions on the decentralized database.</p>
-        <p>In that regard, Iris prioritizes decentralization and availability over perfect privacy.</p>
-        <p>Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.</p>
-        <p>${t('application_security_warning')}</p>
-
-        <h4>Donate</h4>
-        <p>${t('donate_info')}: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST</p>
-      </div>
+      <${Settings}/>
 
       <!-- Logout confirmation -->
       <div class="main-view" id="logout-confirmation">
@@ -334,12 +216,12 @@ const app = html`
   </div>
 `;
 
-render(app, document.body);
+render(Main, document.body);
 
 Session.init();
 PeerManager.init();
 Gallery.init();
-Settings.init();
+initSettings();
 Chats.init();
 Translation.init();
 Profile.init();
