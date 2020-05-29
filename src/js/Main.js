@@ -283,7 +283,7 @@ const app = html`
               <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_chat_link')}"/></p>
               <p><small>Currently you need to add each member here. After that, they can join using the group link ("copy link" below). "Join links" upcoming!</small></p>
             </div>
-            <hr>
+            <hr/>
           </div>
           <div class="profile-about" style="display:none">
             <p class="profile-about-content"></p>
@@ -330,7 +330,6 @@ const app = html`
           </p>
         </div>
       </div>
-
     </section>
   </div>
 `;
