@@ -38,6 +38,27 @@ const Chat = () => html`
     </form>
   </div>`;
 
+const NewChat = () => html`<div class="main-view" id="new-chat">
+  <h3>${t('have_someones_chat_link')}</h3>
+  <input id="paste-chat-link" type="text" placeholder="${t('paste_their_chat_link')}"/>
+  <button id="scan-chatlink-qr-btn">${t('or_scan_qr_code')}</button>
+  <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
+  <h3>${t('give_your_chat_link')}</h3>
+  <button class="copy-chat-link">${t('copy_your_chat_link')}</button>
+  <button id="show-my-qr-btn">${t('or_show_qr_code')}</button>
+  <p id="my-qr-code" class="qr-container" style="display:none"></p>
+  <p><small>${t('beware_of_sharing_chat_link_publicly')}</small></p>
+  <h3>${t('new_group')}</h3>
+  <p>
+    <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
+    <button id="new-group-create">${t('create')}</button>
+  </p>
+  <hr/>
+  <h3>${t('your_chat_links')}</h3>
+  <p><button id="generate-chat-link">${t('create_new_chat_link')}</button></p>
+  <div id="my-chat-links" class="flex-table"></div>
+</div>`;
+
 function showChat(pub) {
   if (!pub) {
     return;
@@ -524,5 +545,5 @@ function init() {
   $('#scan-chatlink-qr-btn').click(scanChatLinkQr);
 }
 
-export {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat};
+export {NewChat, init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat};
 export default Chat;

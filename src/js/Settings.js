@@ -123,6 +123,18 @@ const Settings = () => html`
     <p>${t('donate_info')}: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST</p>
   </div>`;
 
+const LogoutConfirmation = () => html`<div class="main-view" id="logout-confirmation">
+  <p>
+    ${t('logout_confirmation_info')}
+  </p>
+  <p>
+    <button class="open-settings-button">${t('back')}</button>
+  </p>
+  <p>
+    <button class="logout-button">${t('log_out')}</button>
+  </p>
+</div>`;
+
 function render() {
   resetView();
   $('#header-content').text('Settings');
@@ -225,5 +237,5 @@ function init() {
   });
 }
 
-export {init};
+export {init, LogoutConfirmation};
 export default Settings;
