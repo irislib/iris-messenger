@@ -620,4 +620,5 @@ export default {
     call_ended: "Chiamata conclusa",
     calling: "Chiamata in corso",
     on_call_with: "In chiamata con",
+  },
 };
