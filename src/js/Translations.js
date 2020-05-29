@@ -429,7 +429,7 @@ export default {
     already_have_an_account: "Onko sinulla jo tili?",
     back: "Takaisin",
     scan_private_key_qr_code: "Skannaa salaisen avaimen QR-koodi",
-    paste_private_key: "Liitä yksityinen avain",
+    paste_private_key: "Liitä salainen avain",
     get_notified_new_messages: "Tilaa ilmoitukset uusista viesteistä",
     turn_on_desktop_notifications: "Ota käyttöön työpöytäilmoitukset",
     new_chat: "Uusi keskustelu",
