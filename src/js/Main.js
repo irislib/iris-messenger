@@ -31,9 +31,9 @@ const app = html`
       <div id="login-content">
         <form id="login-form" autocomplete="off">
           <div id="create-account">
-            <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris">
+            <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris"/>
             <h1>${t('iris_messenger')}</h1>
-            <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}">
+            <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
             <p><button id="sign-up" type="submit">${t('new_user_go')}</button></p>
             <br>
             <p><a href="#" id="show-existing-account-login">${t('already_have_an_account')}</a></p>
@@ -75,7 +75,7 @@ const app = html`
         </div>
         <div id="welcome" class="visible-xs-block">
           <h3>Iris Messenger</h3>
-          <img src="img/icon128.png" width="64" height="64" alt="iris it is">
+          <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
         </div>
       </div>
     </section>
@@ -100,14 +100,14 @@ const app = html`
       </div>
       <div class="message-form" style="display:none">
         <form autocomplete="off">
-          <input name="attachment-input" type="file" class="hidden" id="attachment-input" accept="image/*" multiple>
+          <input name="attachment-input" type="file" class="hidden" id="attachment-input" accept="image/*" multiple/>
           <button type="button" id="attach-file">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21.586 10.461l-10.05 10.075c-1.95 1.949-5.122 1.949-7.071 0s-1.95-5.122 0-7.072l10.628-10.585c1.17-1.17 3.073-1.17 4.243 0 1.169 1.17 1.17 3.072 0 4.242l-8.507 8.464c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414l7.093-7.05-1.415-1.414-7.093 7.049c-1.172 1.172-1.171 3.073 0 4.244s3.071 1.171 4.242 0l8.507-8.464c.977-.977 1.464-2.256 1.464-3.536 0-2.769-2.246-4.999-5-4.999-1.28 0-2.559.488-3.536 1.465l-10.627 10.583c-1.366 1.368-2.05 3.159-2.05 4.951 0 3.863 3.13 7 7 7 1.792 0 3.583-.684 4.95-2.05l10.05-10.075-1.414-1.414z"/></svg>
           </button>
           <button type="button" id="emoji-picker">
             <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="smile" class="svg-inline--fa fa-smile fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 448c-110.3 0-200-89.7-200-200S137.7 56 248 56s200 89.7 200 200-89.7 200-200 200zm-80-216c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm4 72.6c-20.8 25-51.5 39.4-84 39.4s-63.2-14.3-84-39.4c-8.5-10.2-23.7-11.5-33.8-3.1-10.2 8.5-11.5 23.6-3.1 33.8 30 36 74.1 56.6 120.9 56.6s90.9-20.6 120.9-56.6c8.5-10.2 7.1-25.3-3.1-33.8-10.1-8.4-25.3-7.1-33.8 3.1z"></path></svg>
           </button>
-          <input id="new-msg" type="text" placeholder="${t('type_a_message')}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off">
+          <input id="new-msg" type="text" placeholder="${t('type_a_message')}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>
           <button type="submit">
             <svg class="svg-inline--fa fa-w-16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;" xml:space="preserve" width="100px" height="100px" fill="#000000" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>
           </button>
@@ -117,7 +117,7 @@ const app = html`
       <!-- New chat view -->
       <div class="main-view" id="new-chat">
         <h3>${t('have_someones_chat_link')}</h3>
-        <input id="paste-chat-link" type="text" placeholder="${t('paste_their_chat_link')}">
+        <input id="paste-chat-link" type="text" placeholder="${t('paste_their_chat_link')}"/>
         <button id="scan-chatlink-qr-btn">${t('or_scan_qr_code')}</button>
         <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
         <h3>${t('give_your_chat_link')}</h3>
@@ -127,7 +127,7 @@ const app = html`
         <p><small>${t('beware_of_sharing_chat_link_publicly')}</small></p>
         <h3>${t('new_group')}</h3>
         <p>
-          <input id="new-group-name" type="text" placeholder="${t('group_name')}">
+          <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
           <button id="new-group-create">${t('create')}</button>
         </p>
         <hr/>
@@ -143,19 +143,19 @@ const app = html`
           ${t('your_name')}:
         </p>
         <p>
-          <input id="settings-name" placeholder="${t('your_name')}">
+          <input id="settings-name" placeholder="${t('your_name')}"/>
         </p>
         <p id="profile-photo-chapter">
           ${t('profile_photo')}:
         </p>
         <div id="profile-photo-settings">
-          <img id="current-profile-photo">
+          <img id="current-profile-photo"/>
           <button id="add-profile-photo">${t('add_profile_photo')}</button>
           <div id="profile-photo-preview-container">
-            <img id="profile-photo-preview" class="hidden">
+            <img id="profile-photo-preview" class="hidden"/>
           </div>
           <p>
-            <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*">
+            <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*"/>
           </p>
           <p id="profile-photo-error" class="hidden">${t('profile_photo_too_big')}</p>
           <p>
@@ -166,7 +166,7 @@ const app = html`
         </div>
         <p>${t('about_text')}:</p>
         <p>
-          <input id="settings-about" style="width:100%" placeholder="${t('about_text')}">
+          <input id="settings-about" style="width:100%" placeholder="${t('about_text')}"/>
         </p>
         <hr/>
         <h3>${t('account')}</h3>
@@ -196,8 +196,8 @@ const app = html`
         <div id="peers" class="flex-table">
           <div class="flex-row" id="add-peer-row">
             <div class="flex-cell">
-              <input type="url" id="add-peer-url" placeholder="${t('peer_url')}">
-              <input type="checkbox" id="add-peer-public">
+              <input type="url" id="add-peer-url" placeholder="${t('peer_url')}"/>
+              <input type="checkbox" id="add-peer-public"/>
               <label for="add-peer-public">${t('public')}</label>
               <button id="add-peer-btn">${t('add')}</button>
             </div>
@@ -271,15 +271,16 @@ const app = html`
 
       <!-- Profile view -->
       <div class="main-view" id="profile">
-        <div class="profile-photo-container"><img class="profile-photo"></div>
+        <div class="profile-photo-container">
+        <img class="profile-photo"/></div>
         <div class="content">
           <div id="profile-group-settings">
-            <div id="profile-group-name-container">${t('group_name')}: <input id="profile-group-name" placeholder="${t('group_name')}"></div>
+            <div id="profile-group-name-container">${t('group_name')}: <input id="profile-group-name" placeholder="${t('group_name')}"/></div>
             <p>${t('participants')}:</p>
             <div id="profile-group-participants"></div>
             <div id="profile-add-participant" style="display:none;">
               <p>${t('add_participant')}:</p>
-              <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_chat_link')}"></p>
+              <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_chat_link')}"/></p>
               <p><small>Currently you need to add each member here. After that, they can join using the group link ("copy link" below). "Join links" upcoming!</small></p>
             </div>
             <hr>
@@ -307,7 +308,7 @@ const app = html`
           <div class="profile-nicknames">
             <h4>${t('nicknames')}</h4>
             <p>
-              ${t('nickname')}: <input id="profile-nickname-their">
+              ${t('nickname')}: <input id="profile-nickname-their"/>
             </p>
             <p id="profile-nickname-my-container">
               ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
@@ -315,11 +316,11 @@ const app = html`
           </div>
           <div class="notification-settings">
             <h4>${t('notifications')}</h4>
-            <input type="radio" id="notifyAll" name="notificationPreference" value="all">
+            <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
             <label for="notifyAll">${t('all_messages')}</label><br>
-            <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions">
+            <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
             <label for="notifyMentionsOnly">${t('mentions_only')}</label><br>
-            <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing">
+            <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
             <label for="notifyNothing">${t('nothing')}</label><br>
           </div>
           <hr/>
