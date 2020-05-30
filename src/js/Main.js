@@ -5,8 +5,8 @@ import PeerManager from './PeerManager.js';
 import Gallery from './Gallery.js';
 import Session from './Session.js';
 import Settings, {LogoutConfirmation, init as initSettings} from './Settings.js';
-import Chat, {NewChat, chats, init as initChat} from './Chat.js';
-import Profile, {init as initProfile} from './Profile.js';
+import ChatView, {NewChat, chats, init as initChat} from './Chat.js';
+import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
 
@@ -37,11 +37,11 @@ const Main = html`
         <div id="header-content"></div>
       </header>
 
-      <${Chat}/>
+      <${ChatView}/>
       <${NewChat}/>
       <${Settings}/>
       <${LogoutConfirmation}/>
-      <${Profile}/>
+      <${Profile.Profile}/>
     </section>
   </div>
 `;
@@ -54,7 +54,7 @@ Gallery.init();
 initSettings();
 initChat();
 Translation.init();
-initProfile();
+Profile.init();
 VideoCall.init();
 
 $(window).load(() => {

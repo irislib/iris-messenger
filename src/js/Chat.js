@@ -1,4 +1,4 @@
-import { html } from './lib/htm.preact.js';
+import { html, render } from './lib/htm.preact.js';
 import {gun, showMenu, resetView, activeChat, setActiveChat, activeProfile} from './Main.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
@@ -169,12 +169,30 @@ function sortMessagesByTime() {
   });
 }
 
-var seenIndicatorHtml = '<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>';
+const SeenIndicator = () => html`<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
+
+const Message = (props) => {
+  const emojiOnly = props.text.length === 2 && Helpers.isEmoji(props.text);
+  const text = emojiOnly ? props.text : Helpers.highlightEmoji(props.text); // escape
+  return html`
+  <div class="msg ${props.selfAuthored ? 'our' : 'their'}">
+    <div class="msg-content">
+      ${props.attachments && props.attachments.map(a => html`<img src=${a.data}/>`)}
+      <div class="text ${emojiOnly && 'emoji-only'}">
+        ${autolinker.link(text)}
+      </div>
+      <div class="time">
+        ${iris.util.formatTime(props.time)}
+        ${props.selfAuthored && SeenIndicator()}
+      </div>
+    </div>
+  </div>`;
+};
 
 function addMessage(msg, chatId) {
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
-  var seenHtml = msg.selfAuthored ? ' ' + seenIndicatorHtml : '';
+  var seenHtml = msg.selfAuthored;
   var msgContent = $(
     '<div class="msg-content"><div class="time">' + iris.util.formatTime(msg.time) + seenHtml + '</div></div>'
   );
@@ -199,14 +217,15 @@ function addMessage(msg, chatId) {
   if (msg.text.length === 2 && Helpers.isEmoji(msg.text)) {
     textEl.toggleClass('emoji-only', true);
   } else {
-    textEl.html(Helpers.highlightEmoji(textEl.html()));
+    textEl.html();
   }
-  const msgEl = $('<div class="msg"></div>').append(msgContent);
-  msgEl.data('time', msg.time);
-  msgEl.data('from', msg.info.from);
-  msgEl.toggleClass('our', msg.selfAuthored ? true : false);
-  msgEl.toggleClass('their', msg.selfAuthored ? false : true);
-  $("#message-list").append(msgEl); // TODO: jquery insertAfter element with smaller timestamp
+
+  //msgEl.data('time', msg.time);
+  //msgEl.data('from', msg.info.from);
+
+  const container = $('<div>');
+  $("#message-list").append(container); // TODO: render the whole message array somewhere else
+  render(html`<${Message} ...${msg}/>`, container[0]);
 }
 
 function deleteChat(pub) {
@@ -272,7 +291,7 @@ function addChat(channel) {
       latestEl.text(text);
       latestEl.html(Helpers.highlightEmoji(latestEl.html()));
       if (info.selfAuthored) {
-        latestEl.prepend($(seenIndicatorHtml));
+        //latestEl.prepend($(seenIndicatorHtml));
         setLatestSeen(pub);
         setLatestCheckmark(pub);
       }
