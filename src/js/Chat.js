@@ -172,12 +172,24 @@ function sortMessagesByTime() {
 const SeenIndicator = () => html`<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
 
 const Message = (props) => {
+  let name;
+  if (chats[props.chatId].uuid && !props.info.selfAuthored) {
+    const profile = chats[props.chatId].participantProfiles[props.info.from];
+    name = profile && profile.name;
+    /*if (name) {
+      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color: profile.color}).addClass('msgSenderName');
+      msgContent.prepend(nameEl);
+    }*/
+  }
   const emojiOnly = props.text.length === 2 && Helpers.isEmoji(props.text);
   const text = emojiOnly ? props.text : Helpers.highlightEmoji(props.text); // escape
   return html`
   <div class="msg ${props.selfAuthored ? 'our' : 'their'}">
     <div class="msg-content">
-      ${props.attachments && props.attachments.map(a => html`<img src=${a.data}/>`)}
+      ${name && html`<small onclick=${() => addMention(name)}>${name}</small>`}
+      ${props.attachments && props.attachments.map(a =>
+        html`<img src=${a.data} onclick=${e => { Gallery.openAttachmentsGallery(props, e); }}/>` // escape a.data
+      )}
       <div class="text ${emojiOnly && 'emoji-only'}">
         ${autolinker.link(text)}
       </div>
@@ -190,42 +202,10 @@ const Message = (props) => {
 };
 
 function addMessage(msg, chatId) {
-  var escaped = $('<div>').text(msg.text).html();
-  var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
-  var seenHtml = msg.selfAuthored;
-  var msgContent = $(
-    '<div class="msg-content"><div class="time">' + iris.util.formatTime(msg.time) + seenHtml + '</div></div>'
-  );
-  msgContent.prepend(textEl);
-  if (msg.attachments) {
-    msg.attachments.forEach(a => {
-      if (a.type.indexOf('image') === 0 && a.data) {
-        var img = Helpers.setImgSrc($('<img>'), a.data).click(e => { Gallery.openAttachmentsGallery(msg, e); });
-        msgContent.prepend(img);
-        img.one('load', Helpers.scrollToMessageListBottom);
-      }
-    })
-  }
-  if (chats[chatId].uuid && !msg.info.selfAuthored) {
-    var profile = chats[chatId].participantProfiles[msg.info.from];
-    var name = profile && profile.name;
-    if (name) {
-      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color: profile.color}).addClass('msgSenderName');
-      msgContent.prepend(nameEl);
-    }
-  }
-  if (msg.text.length === 2 && Helpers.isEmoji(msg.text)) {
-    textEl.toggleClass('emoji-only', true);
-  } else {
-    textEl.html();
-  }
-
-  //msgEl.data('time', msg.time);
-  //msgEl.data('from', msg.info.from);
-
   const container = $('<div>');
   $("#message-list").append(container); // TODO: render the whole message array somewhere else
-  render(html`<${Message} ...${msg}/>`, container[0]);
+  render(html`<${Message} ...${msg} chatId=${chatId}/>`, container[0]);
+  container.find('img').one('load', Helpers.scrollToMessageListBottom);
 }
 
 function deleteChat(pub) {
