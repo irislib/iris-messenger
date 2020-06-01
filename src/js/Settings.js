@@ -45,9 +45,7 @@ const Settings = () => html`
       <button class="show-logout-confirmation">${t('log_out')}</button>
     </p>
     <h4>${t('private_key')}</h4>
-    <p>
-      ${t('private_key_warning')}
-    </p>
+    <p dangerouslySetInnerHTML=${{ __html: t('private_key_warning') }} ></p>
     <p>
       <button id="download-private-key">${t('download_private_key')}</button>
       <button id="copy-private-key">${t('copy_private_key')}</button>
@@ -55,7 +53,7 @@ const Settings = () => html`
     <p>
       <button id="show-private-key-qr">${t('show_privkey_qr')}</button>
     </p>
-    <p><small>${t('privkey_storage_recommendation')}</small></p>
+    <p><small dangerouslySetInnerHTML=${{ __html: t('privkey_storage_recommendation')}}></small></p>
     <hr/>
     <h3>${t('language')}</h3>
     <p><select class="language-selector"></select></p>
@@ -71,14 +69,10 @@ const Settings = () => html`
         </div>
       </div>
       <p>
-        <small>
-          ${t('public_peer_info')}
-        </small>
+        <small dangerouslySetInnerHTML=${{ __html:t('public_peer_info') }}></small>
       </p>
       <p>
-        <small>
-          ${t('peers_info')}
-        </small>
+        <small dangerouslySetInnerHTML=${{ __html: t('peers_info')}}></small>
       </p>
     </div>
     <hr/>
@@ -120,13 +114,11 @@ const Settings = () => html`
     <p>${t('application_security_warning')}</p>
 
     <h4>Donate</h4>
-    <p>${t('donate_info')}: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST</p>
+    <p dangerouslySetInnerHTML=${{ __html:t('donate_info') + ': 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST' }}></p>
   </div>`;
 
 const LogoutConfirmation = () => html`<div class="main-view" id="logout-confirmation">
-  <p>
-    ${t('logout_confirmation_info')}
-  </p>
+  <p dangerouslySetInnerHTML=${{ __html: t('logout_confirmation_info')}}></p>
   <p>
     <button class="open-settings-button">${t('back')}</button>
   </p>

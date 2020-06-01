@@ -126,7 +126,9 @@ export default {
   },
 
   scrollToMessageListBottom: _.throttle(() => {
-    $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+    if ($('#message-view')[0]) {
+      $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
+    }
   }, 100, true),
 
   setImgSrc,
