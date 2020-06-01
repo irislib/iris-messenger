@@ -47,7 +47,7 @@ const NewChat = () => html`<div class="main-view" id="new-chat">
   <button class="copy-chat-link">${t('copy_your_chat_link')}</button>
   <button id="show-my-qr-btn">${t('or_show_qr_code')}</button>
   <p id="my-qr-code" class="qr-container" style="display:none"></p>
-  <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_chat_link_publicly') }}></span></p>
+  <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_chat_link_publicly') }}></small></p>
   <h3>${t('new_group')}</h3>
   <p>
     <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
