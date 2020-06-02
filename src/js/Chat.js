@@ -189,7 +189,7 @@ const Message = (props) => {
     // We use useEffect because we're acting outside of Preact
     // and working with the DOM
     // We clean up the text, making sure to prevent XSS attacks,
-    // this is key since we're implicitly using innerHTML later 
+    // this is key since we're implicitly using innerHTML later
     // on, when we call dangerouslySetInnerHTML
     const p = document.createElement('p');
     p.innerText = text;
@@ -218,9 +218,12 @@ const Message = (props) => {
 
 function addMessage(msg, chatId) {
   const container = $('<div>');
-  $("#message-list").append(container); // TODO: render the whole message array somewhere else
   render(html`<${Message} ...${msg} chatId=${chatId}/>`, container[0]);
-  container.find('img').one('load', Helpers.scrollToMessageListBottom);
+  const msgEl = container.children().first();
+  msgEl.find('img').one('load', Helpers.scrollToMessageListBottom);
+  msgEl.data('time', msg.time);
+  msgEl.data('from', msg.info.from);
+  $("#message-list").append(msgEl);
 }
 
 function deleteChat(pub) {
