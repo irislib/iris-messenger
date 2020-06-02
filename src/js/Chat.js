@@ -1,4 +1,4 @@
-import { html, render, useEffect, useState } from './lib/htm.preact.js';
+import { html, render } from './lib/htm.preact.js';
 import {gun, showMenu, resetView, activeChat, setActiveChat, activeProfile} from './Main.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
@@ -15,11 +15,13 @@ var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false}
 
 const Chat = () => html`
   <div class="main-view" id="message-view">
-    <div id="message-list"></div>
+    <div id="message-list">
+      ${activeChat && chats[activeChat].messages.map(m => Message(m))} <!-- sort -->
+    </div>
     <div id="attachment-preview" class="hidden"></div>
   </div>
   <div id="not-seen-by-them" style="display: none">
-    <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
+    <p>${t('if_other_person_doesnt_see_message')}</p>
     <p><button class="copy-chat-link">${t('copy_your_chat_link')}</button></p>
   </div>
   <div class="message-form" style="display:none">
@@ -47,7 +49,7 @@ const NewChat = () => html`<div class="main-view" id="new-chat">
   <button class="copy-chat-link">${t('copy_your_chat_link')}</button>
   <button id="show-my-qr-btn">${t('or_show_qr_code')}</button>
   <p id="my-qr-code" class="qr-container" style="display:none"></p>
-  <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_chat_link_publicly') }}></small></p>
+  <p><small>${t('beware_of_sharing_chat_link_publicly')}</small></p>
   <h3>${t('new_group')}</h3>
   <p>
     <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
@@ -172,7 +174,6 @@ function sortMessagesByTime() {
 const SeenIndicator = () => html`<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
 
 const Message = (props) => {
-  const [innerText, setInnerText] = useState('');
   let name;
   if (chats[props.chatId].uuid && !props.info.selfAuthored) {
     const profile = chats[props.chatId].participantProfiles[props.info.from];
@@ -184,43 +185,32 @@ const Message = (props) => {
   }
   const emojiOnly = props.text.length === 2 && Helpers.isEmoji(props.text);
   const text = emojiOnly ? props.text : Helpers.highlightEmoji(props.text); // escape
-  useEffect(() => {
-    // This code will only execute once per message
-    // We use useEffect because we're acting outside of Preact
-    // and working with the DOM
-    // We clean up the text, making sure to prevent XSS attacks,
-    // this is key since we're implicitly using innerHTML later 
-    // on, when we call dangerouslySetInnerHTML
-    const p = document.createElement('p');
-    p.innerText = text;
-    // We set innerText to the result of autolinker
-    setInnerText(autolinker.link(p.innerHTML));
-  }, []);
-
-  // If innerText is empty, we (implicitly) return null
-  // This guarantees we only show the message once it's ready
-  return innerText && html`
-    <div class="msg ${props.selfAuthored ? 'our' : 'their'}">
-      <div class="msg-content">
-        ${name && html`<small onclick=${() => addMention(name)}>${name}</small>`}
-        ${props.attachments && props.attachments.map(a =>
-          html`<img src=${a.data} onclick=${e => { Gallery.openAttachmentsGallery(props, e); }}/>` // escape a.data
-        )}
-        <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerText }}>
-        </div>
-        <div class="time">
-          ${iris.util.formatTime(props.time)}
-          ${props.selfAuthored && SeenIndicator()}
-        </div>
+  return html`
+  <div class="msg ${props.selfAuthored ? 'our' : 'their'}">
+    <div class="msg-content">
+      ${name && html`<small onclick=${() => addMention(name)}>${name}</small>`}
+      ${props.attachments && props.attachments.map(a =>
+        html`<img src=${a.data} onclick=${e => { Gallery.openAttachmentsGallery(props, e); }}/>` // escape a.data
+      )}
+      <div class="text ${emojiOnly && 'emoji-only'}">
+        ${autolinker.link(text)}
       </div>
-    </div>`;
+      <div class="time">
+        ${iris.util.formatTime(props.time)}
+        ${props.selfAuthored && SeenIndicator()}
+      </div>
+    </div>
+  </div>`;
 };
 
 function addMessage(msg, chatId) {
   const container = $('<div>');
-  $("#message-list").append(container); // TODO: render the whole message array somewhere else
   render(html`<${Message} ...${msg} chatId=${chatId}/>`, container[0]);
-  container.find('img').one('load', Helpers.scrollToMessageListBottom);
+  const msgEl = container.children().first();
+  msgEl.find('img').one('load', Helpers.scrollToMessageListBottom);
+  msgEl.data('time', msg.time);
+  msgEl.data('from', msg.info.from);
+  $("#message-list").append(msgEl);
 }
 
 function deleteChat(pub) {
