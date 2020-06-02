@@ -31,7 +31,7 @@ const Login = () => html`<section id="login" class="hidden">
       </div>
     </form>
     <div id="existing-account-login" class="hidden">
-      <p><a href="#" id="show-create-account">&lt; ${t('back')}</a></p>
+      <p><a href="#" id="show-create-account">> ${t('back')}</a></p>
       <input id="paste-privkey" placeholder="${t('paste_private_key')}"/>
       <p>
         <button id="scan-privkey-btn">${t('scan_private_key_qr_code')}</button>
