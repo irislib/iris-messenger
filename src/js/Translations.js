@@ -723,7 +723,7 @@ export default {
     or_scan_qr_code: "或扫描他们的二维码",
     or_show_qr_code: "或你的二维码",
     new_group: "新的聊天群组",
-    group_name: "群组名称"",
+    group_name: "群组名称",
     create: "创建",
     profile: "个人资料",
     your_name: "你的名字",
