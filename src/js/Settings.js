@@ -5,7 +5,7 @@ import {translate as t} from './Translation.js';
 
 function render() {
   resetView();
-  $('#header-content').text('Settings');
+  $('#header-content').text(t('settings'));
   $('#settings').show();
   var el = $('#profile-photo-settings');
   $('#profile-photo-chapter').after(el);
