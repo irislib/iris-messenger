@@ -214,6 +214,20 @@ header #back-button {
   cursor: pointer;
 }
 
+.public-messages-view .msg.our {
+  align-items: flex-start;
+}
+
+.public-messages-view .msg.our .msg-content .seen-indicator {
+  display: none;
+}
+
+.public-messages-view .msg.our .msg-content {
+  max-width: none;
+  border-radius: 8px !important;
+  width: 100%;
+}
+
 .emoji {
   font-size: 1.3em;
   line-height: 1em;
@@ -589,9 +603,15 @@ small {
   background: var(--chat-hover);
 }
 
-.chat-item.new {
+.chat-item.new, .chat-item.public-messages {
   align-items: center;
+}
+
+.chat-item.new {
   border-bottom: 1px solid var(--chat-hover);
+}
+
+.chat-item.public-messages {
 }
 
 .chat-item.new svg {

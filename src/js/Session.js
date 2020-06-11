@@ -72,7 +72,7 @@ function login(k) {
     latestChatLink = chatLink.url;
   });
   $('#generate-chat-link').off().on('click', createChatLink);
-  $(".chat-item:not(.new)").remove();
+  $(".chat-item:not(.new):not(.public-messages)").remove();
   $("#my-identicon").empty();
   $("#my-identicon").append(Helpers.getIdenticon(key.pub, 40));
   $(".profile-link").attr('href', Helpers.getUserChatLink(key.pub)).off().on('click', e => {

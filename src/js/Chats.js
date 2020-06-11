@@ -25,6 +25,7 @@ function showChat(pub) {
   chatListEl.toggleClass('active', true);
   chatListEl.find('.unseen').empty().hide();
   $("#message-list").empty();
+  $("#message-view").toggleClass('public-messages-view', pub === 'public');
   $("#message-view").show();
   $(".message-form").show();
   if (!iris.util.isMobile) {
@@ -86,7 +87,7 @@ function showChat(pub) {
 }
 
 var sortChatsByLatest = _.throttle(() => {
-  var sorted = $(".chat-item:not(.new)").sort((a, b) => {
+  var sorted = $(".chat-item:not(.new):not(.public-messages)").sort((a, b) => {
     return ($(b).data('latestTime') || -Infinity) - ($(a).data('latestTime') || -Infinity);
   });
   $(".chat-list").append(sorted);
@@ -111,25 +112,30 @@ function sortMessagesByTime() {
     }
     previousDateStr = dateStr;
 
-    var from = $(this).data('from');
-    if (previousFrom && (from !== previousFrom)) {
-      $(this).before($('<div>').addClass('from-separator'));
-      $(this).find('small').show();
-    } else {
-      $(this).find('small').hide();
+    if (activeChat !== 'public') {
+      var from = $(this).data('from');
+      if (previousFrom && (from !== previousFrom)) {
+        $(this).before($('<div>').addClass('from-separator'));
+        $(this).find('small').show();
+      } else {
+        $(this).find('small').hide();
+      }
+      previousFrom = from;
     }
-    previousFrom = from;
   });
 }
 
 var seenIndicatorHtml = '<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>';
 
-function addMessage(msg, chatId) {
+function getMsgElement(msg, chatId, isPublic) {
+  if (typeof isPublic === 'undefined') { chatId === 'public'; }
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
   var seenHtml = msg.selfAuthored ? ' ' + seenIndicatorHtml : '';
+  var time = typeof msg.time === 'object' ? iris.util.formatTime(msg.time) : msg.time;
+  var date = typeof msg.time === 'object' ? msg.time : new Date(msg.time);
   var msgContent = $(
-    '<div class="msg-content"><div class="time">' + iris.util.formatTime(msg.time) + seenHtml + '</div></div>'
+    '<div class="msg-content"><div class="time">' + time + seenHtml + '</div></div>'
   );
   msgContent.prepend(textEl);
   if (msg.attachments) {
@@ -141,11 +147,17 @@ function addMessage(msg, chatId) {
       }
     })
   }
-  if (chats[chatId].uuid && !msg.info.selfAuthored) {
-    var profile = chats[chatId].participantProfiles[msg.info.from];
-    var name = profile && profile.name;
+  if (isPublic || (chats[chatId].uuid && !msg.info.selfAuthored)) {
+    var color;
+    var name;
+    if (isPublic) {
+      name = Session.getMyName();
+    } else {
+      var profile = chats[chatId].participantProfiles[msg.info.from];
+      name = profile && profile.name;
+    }
     if (name) {
-      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color: profile.color}).addClass('msgSenderName');
+      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color}).addClass('msgSenderName');
       msgContent.prepend(nameEl);
     }
   }
@@ -155,10 +167,15 @@ function addMessage(msg, chatId) {
     textEl.html(Helpers.highlightEmoji(textEl.html()));
   }
   const msgEl = $('<div class="msg"></div>').append(msgContent);
-  msgEl.data('time', msg.time);
+  msgEl.data('time', date);
   msgEl.data('from', msg.info.from);
   msgEl.toggleClass('our', msg.selfAuthored ? true : false);
   msgEl.toggleClass('their', msg.selfAuthored ? false : true);
+  return msgEl;
+}
+
+function addMessage(msg, chatId) {
+  const msgEl = getMsgElement(msg, chatId);
   $("#message-list").append(msgEl); // TODO: jquery insertAfter element with smaller timestamp
 }
 
@@ -239,10 +256,12 @@ function addChat(channel) {
       if (chats[pub].latest.time === msg.time && Session.areWeOnline) {
         chats[pub].setMyMsgsLastSeenTime();
       }
-      if (chats[pub].theirLastSeenTime) {
-        $('#not-seen-by-them').slideUp();
-      } else if (!chats[pub].uuid) {
-        $('#not-seen-by-them').slideDown();
+      if (pub !== 'public') {
+        if (chats[pub].theirLastSeenTime) {
+          $('#not-seen-by-them').slideUp();
+        } else if (!chats[pub].uuid) {
+          $('#not-seen-by-them').slideDown();
+        }
       }
       Helpers.scrollToMessageListBottom();
     }
@@ -274,7 +293,9 @@ function addChat(channel) {
     }
   });
   el.click(() => showChat(pub));
-  $(".chat-list").append(el);
+  if (pub !== 'public') {
+    $(".chat-list").append(el);
+  }
   chats[pub].getTheirMsgsLastSeenTime(time => {
     if (chats[pub]) {
       chats[pub].theirLastSeenTime = new Date(time);
@@ -426,7 +447,7 @@ function showNewChat() {
 function lastSeenTimeChanged(pub) {
   setLatestSeen(pub);
   setDeliveredCheckmarks(pub);
-  if (pub === activeChat) {
+  if (pub !== 'public' && pub === activeChat) {
     if (chats[pub].theirLastSeenTime) {
       $('#not-seen-by-them').slideUp();
       $('.msg.our:not(.seen)').each(function() {
@@ -498,5 +519,5 @@ function init() {
   $('#scan-chatlink-qr-btn').click(scanChatLinkQr);
 }
 
-export {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat};
-export default {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat};
+export {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat, getMsgElement};
+export default {init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat, getMsgElement};

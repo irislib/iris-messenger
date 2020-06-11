@@ -6,6 +6,7 @@ import Gallery from './Gallery.js';
 import Session from './Session.js';
 import Settings from './Settings.js';
 import Chats, {chats} from './Chats.js';
+import PublicMessages from './PublicMessages.js';
 import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
@@ -33,6 +34,7 @@ Chats.init();
 Translation.init();
 Profile.init();
 VideoCall.init();
+PublicMessages.init();
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails

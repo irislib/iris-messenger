@@ -1,8 +1,9 @@
 import {translate} from './Translation.js';
 import {gun, resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
-import {chats, deleteChat, showChat} from './Chats.js';
+import {chats, deleteChat, showChat, getMsgElement} from './Chats.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
+import PublicMessages from './PublicMessages.js';
 //import VideoCall from './VideoCall.js';
 
 function renderGroupParticipants(pub) {
@@ -63,12 +64,16 @@ function addUserToHeader(pub) {
   }
   nameEl.show();
 
-  var identicon = Helpers.getIdenticon(pub, 40);
-  var img = identicon.children('img').first();
-  img.attr('height', 40).attr('width', 40);
-  $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
+  if (pub !== 'public') {
+    var identicon = Helpers.getIdenticon(pub, 40);
+    var img = identicon.children('img').first();
+    img.attr('height', 40).attr('width', 40);
+    $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
+  }
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
+  textEl.append($('<small>').addClass('last-seen'));
+  textEl.append($('<small>').addClass('typing-indicator').text(translate('typing')));
   if (chats[pub] && chats[pub].uuid) {
     var t = Object.keys(chats[pub].participantProfiles).map(p => chats[pub].participantProfiles[p].name).join(', ');
     var namesEl = $('<small>').addClass('participants').text(t);
@@ -79,10 +84,11 @@ function addUserToHeader(pub) {
       $('#header-content .identicon-container').append(photo);
     }
   }
-  textEl.append($('<small>').addClass('last-seen'));
-  textEl.append($('<small>').addClass('typing-indicator').text(translate('typing')));
   $("#header-content").append(textEl);
-  textEl.on('click', () => showProfile(pub));
+  if (pub !== 'public') {
+    textEl.on('click', () => showProfile(pub));
+    $("#header-content").css({cursor: 'pointer'});
+  }
   /*
   if (!chats[pub].uuid) { // disabled for now because videochat is broken
     var videoCallBtn = $(`<a class="tooltip"><span class="tooltiptext">${translate('video_call')}</span><svg enable-background="new 0 0 50 50" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" style="height:24px;width:24px"/><polygon fill="none" points="49,14 36,21 36,29   49,36 " stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/><path d="M36,36c0,2.209-1.791,4-4,4  H5c-2.209,0-4-1.791-4-4V14c0-2.209,1.791-4,4-4h27c2.209,0,4,1.791,4,4V36z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/></svg></a>`).attr('id', 'start-video-call').css({width:24, height:24, color: 'var(--msg-form-button-color)'});
@@ -92,7 +98,6 @@ function addUserToHeader(pub) {
     //$("#header-content").append(voiceCallBtn);
     $("#header-content").append(videoCallBtn);
   }*/
-  $("#header-content").css({cursor: 'pointer'});
 }
 
 function setTheirOnlineStatus(pub) {
@@ -114,6 +119,12 @@ function setTheirOnlineStatus(pub) {
   }
 }
 
+function onPublicMessage(msg, info) {
+  if (activeProfile !== info.from) { return; }
+  const msgEl = getMsgElement(msg, info.from, true);
+  $('#profile-public-message-list').prepend(msgEl);
+}
+
 function showProfile(pub) {
   if (!pub) {
     return;
@@ -129,11 +140,16 @@ function showProfile(pub) {
   setTheirOnlineStatus(pub);
   renderGroupParticipants(pub);
   if (chats[pub] && !chats[pub].uuid) {
+    $('#profile-public-message-list').empty();
+    $('#profile-public-messages').show();
     $('#profile .profile-photo').show();
     gun.user(pub).get('profile').get('photo').on(photo => {
       $('#profile .profile-photo-container').show();
       Helpers.setImgSrc($('#profile .profile-photo'), photo);
     });
+    PublicMessages.getMessages(onPublicMessage, pub);
+  } else {
+    $('#profile-public-messages').hide();
   }
   $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
   $('#profile .profile-about-content').empty();
