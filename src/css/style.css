@@ -608,11 +608,10 @@ small {
 }
 
 .chat-item.new {
-
+  border-bottom: 1px solid var(--chat-hover);
 }
 
 .chat-item.public-messages {
-  border-bottom: 1px solid var(--chat-hover);
 }
 
 .chat-item.new svg {

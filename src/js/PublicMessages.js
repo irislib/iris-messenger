@@ -1,22 +1,28 @@
 import {addChat, showChat} from './Chats.js';
+import { translate as t } from './Translation.js';
+import {gun} from './Main.js';
 
 let pub;
 let callback;
 
 function sendPublicMsg(msg) {
-  msg.time = msg.time || new Date();
-  pub.messages[msg.time] = msg;
-  callback && callback(msg, {selfAuthored: true});
+  msg.time = new Date().toISOString();
+  gun.user().get('msgs').get(msg.time).put(msg);
 }
 
 function getMessages(cb) {
   callback = cb;
+  gun.user().get('msgs').map().on(msg => {
+    if (typeof msg !== 'object' || !msg.time || pub.messages[msg.time]) { return; }
+    pub.messages[msg.time] = msg;
+    cb(msg, {selfAuthored: true});
+  });
 }
 
 function init() {
   const u = () => {};
   pub = {
-    name: 'Public messages',
+    name: t('public_messages'),
     messages: {},
     getId: () => 'public',
     send: sendPublicMsg,
