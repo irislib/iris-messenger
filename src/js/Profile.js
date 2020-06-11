@@ -120,9 +120,8 @@ function setTheirOnlineStatus(pub) {
 }
 
 function onPublicMessage(msg, info) {
-  console.log(msg, info, activeProfile, info.from === activeProfile);
   if (activeProfile !== info.from) { return; }
-  const msgEl = getMsgElement(msg, info.from);
+  const msgEl = getMsgElement(msg, info.from, true);
   $('#profile-public-message-list').prepend(msgEl);
 }
 
