@@ -316,9 +316,12 @@ export default `
           <button class="delete-chat"><%= delete_chat %></button>
           <!-- <button class="block-user"><%= block_user %></button> -->
         </p>
+        <div id="profile-public-messages">
+          <hr/>
+          <h3><%= public_messages %></h3>
+          <div id="profile-public-message-list"></div>
+        </div>
       </div>
-      <hr/>
-      <div id="profile-public-messages"></div>
     </div>
 
   </section>

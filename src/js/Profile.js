@@ -3,6 +3,7 @@ import {gun, resetView, activeChat, activeProfile, setActiveProfile} from './Mai
 import {chats, deleteChat, showChat} from './Chats.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
+import PublicMessages from './PublicMessages.js';
 //import VideoCall from './VideoCall.js';
 
 function renderGroupParticipants(pub) {
@@ -118,6 +119,13 @@ function setTheirOnlineStatus(pub) {
   }
 }
 
+function onPublicMessage(msg, info) {
+  console.log(msg, info, activeProfile, info.from === activeProfile);
+  if (activeProfile !== info.from) { return; }
+  $('#profile-public-message-list').append($('<div>').text('jau'));
+  console.log(1);
+}
+
 function showProfile(pub) {
   if (!pub) {
     return;
@@ -133,11 +141,16 @@ function showProfile(pub) {
   setTheirOnlineStatus(pub);
   renderGroupParticipants(pub);
   if (chats[pub] && !chats[pub].uuid) {
+    $('#profile-public-message-list').empty();
+    $('#profile-public-messages').show();
     $('#profile .profile-photo').show();
     gun.user(pub).get('profile').get('photo').on(photo => {
       $('#profile .profile-photo-container').show();
       Helpers.setImgSrc($('#profile .profile-photo'), photo);
     });
+    PublicMessages.getMessages(onPublicMessage, pub);
+  } else {
+    $('#profile-public-messages').hide();
   }
   $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
   $('#profile .profile-about-content').empty();

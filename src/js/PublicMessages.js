@@ -1,20 +1,21 @@
 import {addChat, showChat} from './Chats.js';
 import { translate as t } from './Translation.js';
 import {gun} from './Main.js';
+import Session from './Session.js';
 
 let pub;
-const seen = [];
 
 function sendPublicMsg(msg) {
   msg.time = new Date().toISOString();
   gun.user().get('msgs').get(msg.time).put(msg);
 }
 
-function getMessages(cb) {
-  gun.user().get('msgs').map().on((msg, time) => {
+function getMessages(cb, pub) {
+  const seen = [];
+  gun.user(pub).get('msgs').map().on((msg, time) => {
     if (typeof msg !== 'object' || seen.indexOf(time) !== -1) { return; }
     seen.push(time);
-    cb(msg, {selfAuthored: true});
+    cb(msg, {selfAuthored: true, from: pub});
   });
 }
 
@@ -38,4 +39,4 @@ function init() {
   $('.public-messages').click(() => showChat('public'));
 }
 
-export default {init};
+export default {init, getMessages};

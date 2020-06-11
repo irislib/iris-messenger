@@ -120,7 +120,7 @@ function sortMessagesByTime() {
       } else {
         $(this).find('small').hide();
       }
-      previousFrom = from;  
+      previousFrom = from;
     }
   });
 }
@@ -131,8 +131,10 @@ function addMessage(msg, chatId) {
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
   var seenHtml = msg.selfAuthored ? ' ' + seenIndicatorHtml : '';
+  var time = typeof msg.time === 'object' ? iris.util.formatTime(msg.time) : msg.time;
+  var date = typeof msg.time === 'object' ? msg.time : new Date(msg.time);
   var msgContent = $(
-    '<div class="msg-content"><div class="time">' + iris.util.formatTime(msg.time) + seenHtml + '</div></div>'
+    '<div class="msg-content"><div class="time">' + time + seenHtml + '</div></div>'
   );
   msgContent.prepend(textEl);
   if (msg.attachments) {
@@ -164,7 +166,7 @@ function addMessage(msg, chatId) {
     textEl.html(Helpers.highlightEmoji(textEl.html()));
   }
   const msgEl = $('<div class="msg"></div>').append(msgContent);
-  msgEl.data('time', msg.time);
+  msgEl.data('time', date);
   msgEl.data('from', msg.info.from);
   msgEl.toggleClass('our', msg.selfAuthored ? true : false);
   msgEl.toggleClass('their', msg.selfAuthored ? false : true);
