@@ -3,7 +3,7 @@ import { translate as t } from './Translation.js';
 import {gun} from './Main.js';
 
 let pub;
-let callback;
+const seen = [];
 
 function sendPublicMsg(msg) {
   msg.time = new Date().toISOString();
@@ -11,10 +11,9 @@ function sendPublicMsg(msg) {
 }
 
 function getMessages(cb) {
-  callback = cb;
-  gun.user().get('msgs').map().on(msg => {
-    if (typeof msg !== 'object' || !msg.time || pub.messages[msg.time]) { return; }
-    pub.messages[msg.time] = msg;
+  gun.user().get('msgs').map().on((msg, time) => {
+    if (typeof msg !== 'object' || seen.indexOf(time) !== -1) { return; }
+    seen.push(time);
     cb(msg, {selfAuthored: true});
   });
 }

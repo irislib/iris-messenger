@@ -317,6 +317,8 @@ export default `
           <!-- <button class="block-user"><%= block_user %></button> -->
         </p>
       </div>
+      <hr/>
+      <div id="profile-public-messages"></div>
     </div>
 
   </section>
