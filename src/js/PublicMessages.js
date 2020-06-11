@@ -1,7 +1,6 @@
 import {addChat, showChat} from './Chats.js';
 import { translate as t } from './Translation.js';
 import {gun} from './Main.js';
-import Session from './Session.js';
 
 let pub;
 
