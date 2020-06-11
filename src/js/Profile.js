@@ -1,6 +1,6 @@
 import {translate} from './Translation.js';
 import {gun, resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
-import {chats, deleteChat, showChat} from './Chats.js';
+import {chats, deleteChat, showChat, getMsgElement} from './Chats.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
 import PublicMessages from './PublicMessages.js';
@@ -122,8 +122,8 @@ function setTheirOnlineStatus(pub) {
 function onPublicMessage(msg, info) {
   console.log(msg, info, activeProfile, info.from === activeProfile);
   if (activeProfile !== info.from) { return; }
-  $('#profile-public-message-list').append($('<div>').text('jau'));
-  console.log(1);
+  const msgEl = getMsgElement(msg, info.from);
+  $('#profile-public-message-list').prepend(msgEl);
 }
 
 function showProfile(pub) {

@@ -319,7 +319,7 @@ export default `
         <div id="profile-public-messages">
           <hr/>
           <h3><%= public_messages %></h3>
-          <div id="profile-public-message-list"></div>
+          <div id="profile-public-message-list" class="public-messages-view"></div>
         </div>
       </div>
     </div>
