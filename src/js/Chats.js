@@ -25,6 +25,7 @@ function showChat(pub) {
   chatListEl.toggleClass('active', true);
   chatListEl.find('.unseen').empty().hide();
   $("#message-list").empty();
+  $("#message-view").toggleClass('public-messages-view', pub === 'public');
   $("#message-view").show();
   $(".message-form").show();
   if (!iris.util.isMobile) {
@@ -111,14 +112,16 @@ function sortMessagesByTime() {
     }
     previousDateStr = dateStr;
 
-    var from = $(this).data('from');
-    if (previousFrom && (from !== previousFrom)) {
-      $(this).before($('<div>').addClass('from-separator'));
-      $(this).find('small').show();
-    } else {
-      $(this).find('small').hide();
+    if (activeChat !== 'public') {
+      var from = $(this).data('from');
+      if (previousFrom && (from !== previousFrom)) {
+        $(this).before($('<div>').addClass('from-separator'));
+        $(this).find('small').show();
+      } else {
+        $(this).find('small').hide();
+      }
+      previousFrom = from;  
     }
-    previousFrom = from;
   });
 }
 
@@ -141,11 +144,17 @@ function addMessage(msg, chatId) {
       }
     })
   }
-  if (chats[chatId].uuid && !msg.info.selfAuthored) {
-    var profile = chats[chatId].participantProfiles[msg.info.from];
-    var name = profile && profile.name;
+  if (chatId === 'public' || (chats[chatId].uuid && !msg.info.selfAuthored)) {
+    var color;
+    var name;
+    if (chatId === 'public') {
+      name = Session.getMyName();
+    } else {
+      profile = chats[chatId].participantProfiles[msg.info.from];
+      name = profile && profile.name;
+    }
     if (name) {
-      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color: profile.color}).addClass('msgSenderName');
+      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color}).addClass('msgSenderName');
       msgContent.prepend(nameEl);
     }
   }
@@ -239,10 +248,12 @@ function addChat(channel) {
       if (chats[pub].latest.time === msg.time && Session.areWeOnline) {
         chats[pub].setMyMsgsLastSeenTime();
       }
-      if (chats[pub].theirLastSeenTime) {
-        $('#not-seen-by-them').slideUp();
-      } else if (!chats[pub].uuid) {
-        $('#not-seen-by-them').slideDown();
+      if (pub !== 'public') {
+        if (chats[pub].theirLastSeenTime) {
+          $('#not-seen-by-them').slideUp();
+        } else if (!chats[pub].uuid) {
+          $('#not-seen-by-them').slideDown();
+        }
       }
       Helpers.scrollToMessageListBottom();
     }
@@ -428,7 +439,7 @@ function showNewChat() {
 function lastSeenTimeChanged(pub) {
   setLatestSeen(pub);
   setDeliveredCheckmarks(pub);
-  if (pub === activeChat) {
+  if (pub !== 'public' && pub === activeChat) {
     if (chats[pub].theirLastSeenTime) {
       $('#not-seen-by-them').slideUp();
       $('.msg.our:not(.seen)').each(function() {

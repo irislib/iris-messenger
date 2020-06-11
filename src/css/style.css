@@ -214,6 +214,20 @@ header #back-button {
   cursor: pointer;
 }
 
+.public-messages-view .msg.our {
+  align-items: flex-start;
+}
+
+.public-messages-view .msg.our .msg-content .seen-indicator {
+  display: none;
+}
+
+.public-messages-view .msg.our .msg-content {
+  max-width: none;
+  border-radius: 8px !important;
+  width: 100%;
+}
+
 .emoji {
   font-size: 1.3em;
   line-height: 1em;
