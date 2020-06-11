@@ -168,7 +168,7 @@ function getMsgElement(msg, chatId, isPublic) {
   }
   const msgEl = $('<div class="msg"></div>').append(msgContent);
   msgEl.data('time', date);
-  msgEl.data('from', msg.info.from);
+  msgEl.data('from', (msg.info && msg.info.from) || chatId);
   msgEl.toggleClass('our', msg.selfAuthored ? true : false);
   msgEl.toggleClass('their', msg.selfAuthored ? false : true);
   return msgEl;
