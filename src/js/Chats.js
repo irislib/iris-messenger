@@ -86,7 +86,7 @@ function showChat(pub) {
 }
 
 var sortChatsByLatest = _.throttle(() => {
-  var sorted = $(".chat-item:not(.new)").sort((a, b) => {
+  var sorted = $(".chat-item:not(.new):not(.public-messages)").sort((a, b) => {
     return ($(b).data('latestTime') || -Infinity) - ($(a).data('latestTime') || -Infinity);
   });
   $(".chat-list").append(sorted);
@@ -274,7 +274,9 @@ function addChat(channel) {
     }
   });
   el.click(() => showChat(pub));
-  $(".chat-list").append(el);
+  if (pub !== 'public') {
+    $(".chat-list").append(el);
+  }
   chats[pub].getTheirMsgsLastSeenTime(time => {
     if (chats[pub]) {
       chats[pub].theirLastSeenTime = new Date(time);

@@ -589,8 +589,15 @@ small {
   background: var(--chat-hover);
 }
 
-.chat-item.new {
+.chat-item.new, .chat-item.public-messages {
   align-items: center;
+}
+
+.chat-item.new {
+
+}
+
+.chat-item.public-messages {
   border-bottom: 1px solid var(--chat-hover);
 }
 

@@ -11,6 +11,7 @@ export default {
     get_notified_new_messages: "Get notified of new messages",
     turn_on_desktop_notifications: "Turn on desktop notifications",
     new_chat: "New chat",
+    public_messages: "Public messages",
     if_other_person_doesnt_see_message: "If the other person doesn't see your message, you can give them <b>your</b> chat link through some other channel:",
     type_a_message: "Type a message",
     beware_of_sharing_chat_link_publicly: "Beware of sharing your chat link publicly: you might get spammed with message requests. Publicly share your <a class=\"profile-link\">profile link</a> instead.",
