@@ -4,7 +4,7 @@ export default `
       <form id="login-form" autocomplete="off">
         <div id="create-account">
           <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris">
-          <h1><%= iris_messenger %></h1>
+          <h1>Iris</h1>
           <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="<%= whats_your_name %>">
           <p><button id="sign-up" type="submit"><%= new_user_go %></button></p>
           <br>
@@ -63,7 +63,7 @@ export default `
         <%= new_chat %>
       </div>
       <div id="welcome" class="visible-xs-block">
-        <h3>Iris Messenger</h3>
+        <h3>Iris</h3>
         <img src="img/icon128.png" width="64" height="64" alt="iris it is">
       </div>
     </div>

@@ -132,8 +132,8 @@ function getMsgElement(msg, chatId, isPublic) {
   var escaped = $('<div>').text(msg.text).html();
   var textEl = $('<div class="text"></div>').html(autolinker.link(escaped));
   var seenHtml = msg.selfAuthored ? ' ' + seenIndicatorHtml : '';
-  var time = typeof msg.time === 'object' ? iris.util.formatTime(msg.time) : msg.time;
-  var date = typeof msg.time === 'object' ? msg.time : new Date(msg.time);
+  var date = new Date(msg.time);
+  var time = iris.util.formatTime(date);
   var msgContent = $(
     '<div class="msg-content"><div class="time">' + time + seenHtml + '</div></div>'
   );

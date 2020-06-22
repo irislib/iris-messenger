@@ -1,7 +1,6 @@
 export default {
   "en": {
     language_name: "English",
-    iris_messenger: "Iris Messenger",
     whats_your_name: "What's your name?",
     new_user_go: "Go",
     already_have_an_account: "Already have an account?",
@@ -103,7 +102,6 @@ export default {
   },
    "es": {
     language_name: "Español",
-    iris_messenger: "Iris Messenger",
     whats_your_name: "¿Cuál es tu nombre?",
     new_user_go: "Ir",
     already_have_an_account: "¿Ya tienes una cuenta?",
@@ -204,7 +202,6 @@ export default {
   },
   "pt-BR": {
     language_name: "Português Brasil",
-    iris_messenger: "Iris Messenger",
     whats_your_name: "Qual o seu nome?",
     new_user_go: "Vai",
     already_have_an_account: "Já tem uma conta?",
@@ -305,7 +302,6 @@ export default {
   },
 "ru": {
     language_name: "Русский",
-    iris_messenger: "Iris Messenger",
     whats_your_name: "Как вас зовут?",
     new_user_go: "Поехали!",
     already_have_an_account: "Уже есть аккаунт?",
@@ -406,7 +402,6 @@ export default {
   },
   "de": {
     language_name: "Deutsch",
-    iris_messenger: "Iris Messenger",
     whats_your_name: "Was ist Ihr Name?",
     new_user_go: "Auf Gehts",
     already_have_an_account: "Haben sie schon ein Konto eingerichtet?",
@@ -507,7 +502,6 @@ export default {
   },
   "fi": {
     language_name: "Suomi",
-    iris_messenger: "Iris Messenger",
     whats_your_name: "Mikä on nimesi?",
     new_user_go: "Aloita",
     already_have_an_account: "Onko sinulla jo tili?",
@@ -608,7 +602,6 @@ export default {
   },
   "it": {
     language_name: "Italian",
-    iris_messenger: "Iris Messenger",
     whats_your_name: "Quale è il tuo nome??",
     new_user_go: "Inizia",
     already_have_an_account: "Hai già un account?",
@@ -709,7 +702,6 @@ export default {
   },
   "zh-cn":{
     language_name: "中文",
-    iris_messenger: "Iris Messenger",
     whats_your_name: "你叫什么名字？",
     new_user_go: "开始",
     already_have_an_account: "已有账户？",
