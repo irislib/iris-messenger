@@ -139,6 +139,7 @@ function showProfile(pub) {
   addUserToHeader(pub);
   setTheirOnlineStatus(pub);
   renderGroupParticipants(pub);
+  renderInviteLinks(pub);
   if (chats[pub] && !chats[pub].uuid) {
     $('#profile-public-message-list').empty();
     $('#profile-public-messages').show();
@@ -330,7 +331,27 @@ function removeProfilePhotoClicked() {
   renderProfilePhotoSettings();
 }
 
+function renderInviteLinks(pub) {
+  if (!chats[pub] && chats[pub].inviteLinks) { return; }
+  $('#profile-invite-links').empty();
+  Object.values(chats[pub].inviteLinks).forEach(url => {
+    const row = $('<div>').addClass('flex-row');
+    const small = $('<small>').text(url);
+    row.append($('<div>').addClass('flex-cell').append(small));
+    const btn = $('<button>').text(translate('remove'));
+    row.append($('<div>').addClass('flex-cell no-flex').append(btn));
+    $('#profile-invite-links').append(row);
+  });
+}
+
+function onCreateInviteLink() {
+  console.log(4);
+  if (!chats[activeProfile]) { return; }
+  chats[activeProfile].createChatLink();
+}
+
 function init() {
+  $('#profile-create-invite-link').click(onCreateInviteLink);
   $('#profile-add-participant').on('input', onProfileAddParticipantInput);
   $('#current-profile-photo, #add-profile-photo').click(() => $('#profile-photo-input').click());
   $('#profile-photo-input').change(renderProfilePhotoSettings);
@@ -342,4 +363,4 @@ function init() {
   $('#remove-profile-photo').click(removeProfilePhotoClicked);
 }
 
-export default {init, showProfile, setTheirOnlineStatus, addUserToHeader, getDisplayName, renderGroupParticipants};
+export default {init, showProfile, setTheirOnlineStatus, addUserToHeader, getDisplayName, renderGroupParticipants, renderInviteLinks};

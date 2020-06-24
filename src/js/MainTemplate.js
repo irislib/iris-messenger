@@ -272,6 +272,10 @@ export default `
             <p><small>Currently you need to add each member here. After that, they can join using the group link ("copy link" below). "Join links" upcoming!</small></p>
           </div>
           <hr>
+          <p><%= invite_links %></p>
+          <div id="profile-invite-links" class="flex-table"></div>
+          <p><button id="profile-create-invite-link">Create new invite link</button></p>
+          <hr>
         </div>
         <div class="profile-about" style="display:none">
           <p class="profile-about-content"></p>
