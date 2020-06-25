@@ -336,10 +336,23 @@ function renderInviteLinks(pub) {
   $('#profile-invite-links').empty();
   Object.values(chats[pub].inviteLinks).forEach(url => {
     const row = $('<div>').addClass('flex-row');
-    const small = $('<small>').text(url);
-    row.append($('<div>').addClass('flex-cell').append(small));
-    const btn = $('<button>').text(translate('remove'));
-    row.append($('<div>').addClass('flex-cell no-flex').append(btn));
+    const copyBtn = $('<button>').text(translate('copy')).width(100);
+    copyBtn.on('click', event => {
+      Helpers.copyToClipboard(url);
+      var t = $(event.target);
+      var originalText = t.text();
+      t.text(translate('copied'));
+      setTimeout(() => {
+        t.text(originalText);
+      }, 2000);
+    });
+    const copyDiv = $('<div>').addClass('flex-cell no-flex').append(copyBtn);
+    row.append(copyDiv);
+    const input = $('<input>').attr('type', 'text').val(url);
+    input.on('click', () => input.select());
+    row.append($('<div>').addClass('flex-cell').append(input));
+    const removeBtn = $('<button>').text(translate('remove'));
+    row.append($('<div>').addClass('flex-cell no-flex').append(removeBtn));
     $('#profile-invite-links').append(row);
   });
 }
