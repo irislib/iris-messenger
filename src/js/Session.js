@@ -1,5 +1,6 @@
 import {gun, activeChat, activeProfile, resetView, showMenu} from './Main.js';
 import {chats, addChat, showNewChat, newChat, showChat} from './Chats.js';
+import {translate} from './Translation.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import Profile from './Profile.js';
@@ -59,14 +60,24 @@ function login(k) {
   iris.Channel.initUser(gun, key);
   $('#my-chat-links').empty();
   iris.Channel.getMyChatLinks(gun, key, undefined, chatLink => {
-    var row = $('<div>').addClass('flex-row');
-    var text = $('<div>').addClass('flex-cell').text(chatLink.url);
-    var btn = $('<button>Remove</button>').click(() => {
-      iris.Channel.removeChatLink(gun, key, chatLink.id);
-      Helpers.hideAndRemove(row);
+    const row = $('<div>').addClass('flex-row');
+    const copyBtn = $('<button>').text(translate('copy')).width(100);
+    copyBtn.on('click', event => {
+      Helpers.copyToClipboard(chatLink.url);
+      var t = $(event.target);
+      var originalText = t.text();
+      t.text(translate('copied'));
+      setTimeout(() => {
+        t.text(originalText);
+      }, 2000);
     });
-    row.append(text);
-    row.append($('<div>').addClass('flex-cell no-flex').append(btn));
+    const copyDiv = $('<div>').addClass('flex-cell no-flex').append(copyBtn);
+    row.append(copyDiv);
+    const input = $('<input>').attr('type', 'text').val(chatLink.url);
+    input.on('click', () => input.select());
+    row.append($('<div>').addClass('flex-cell').append(input));
+    const removeBtn = $('<button>').text(translate('remove'));
+    row.append($('<div>').addClass('flex-cell no-flex').append(removeBtn));
     $('#my-chat-links').append(row);
     setChatLinkQrCode(chatLink.url);
     latestChatLink = chatLink.url;

@@ -166,9 +166,41 @@ header #header-content {
   max-width: 100%;
 }
 
+.flex-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-table .flex-row {
+  font-size: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.flex-table .flex-row:nth-child(odd) {
+  background-color: var(--zebra-stripe-bg);
+}
+
+.flex-table .flex-cell {
+  padding: 10px;
+  overflow-wrap: break-word;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.flex-table .flex-cell.no-flex {
+  flex: none;
+}
+
 @media (max-width: 575px) {
   header #header-content {
     max-width: calc(100% - 35px);
+  }
+
+  .flex-table .flex-row {
+    flex-direction: column;
   }
 }
 
@@ -335,34 +367,6 @@ header #back-button {
 
 .day-separator:first-of-type {
   margin-top: 0;
-}
-
-.flex-table {
-  display: flex;
-  flex-direction: column;
-}
-
-.flex-table .flex-row {
-  font-size: 12px;
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.flex-table .flex-row:nth-child(odd) {
-  background-color: var(--zebra-stripe-bg);
-}
-
-.flex-table .flex-cell {
-  padding: 10px;
-  overflow-wrap: break-word;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.flex-table .flex-cell.no-flex {
-  flex: none;
 }
 
 #login {

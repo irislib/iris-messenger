@@ -69,6 +69,7 @@ export default {
     admin: "admin",
     add_participant: "Add participant",
     new_participants_chat_link: "New participant's chat link",
+    copy: "Copy",
     add_friend: "Add friend",
     send_message: "Send message",
     copy_link: "Copy link",
