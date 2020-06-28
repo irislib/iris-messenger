@@ -13,9 +13,13 @@ import VideoCall from './VideoCall.js';
 var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
-const Chat = () => html`
-  <div class="main-view" id="message-view">
-    <div id="message-list"></div>
+const ChatView = (props) => {
+  return html`<div class="main-view" id="message-view">
+    <div id="message-list">
+      ${props.chatId && chats[props.chatId].messages && props.messages.map(msg =>
+        html`<${Message} ...${msg} chatId=${props.chatId}/>`
+      )}
+    </div>
     <div id="attachment-preview" class="hidden"></div>
   </div>
   <div id="not-seen-by-them" style="display: none">
@@ -37,6 +41,7 @@ const Chat = () => html`
       </button>
     </form>
   </div>`;
+};
 
 const NewChat = () => html`<div class="main-view" id="new-chat">
   <h3>${t('have_someones_chat_link')}</h3>
@@ -563,4 +568,4 @@ function init() {
 }
 
 export {NewChat, init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat};
-export default Chat;
+export default ChatView;

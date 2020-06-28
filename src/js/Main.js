@@ -37,7 +37,7 @@ const Main = html`
         <div id="header-content"></div>
       </header>
 
-      <${ChatView}/>
+      <${ChatView} chatId=${activeChat}/>
       <${NewChat}/>
       <${Settings}/>
       <${LogoutConfirmation}/>
