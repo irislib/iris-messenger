@@ -18,7 +18,7 @@ const ChatView = () => {
   localState.get('activeChat').on(a => setActiveChatId(a));
   return html`<div class="main-view" id="message-view">
     <div id="message-list">
-      ${activeChatId && chats[activeChatId].messages && Object.values(chats[activeChatId].messages).map(msg =>
+      ${activeChatId && chats[activeChatId].messages && Object.values(chats[activeChatId].messages).sort((a, b) => a.time - b.time).map(msg =>
         html`<${Message} ...${msg} chatId=${activeChatId}/>`
       )}
     </div>
@@ -114,7 +114,6 @@ function showChat(pub) {
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
   var msgs = Object.values(chats[pub].messages);
-  msgs.forEach(msg => addMessage(msg, pub));
   sortMessagesByTime();
   $('#message-view').scroll(() => {
     if ($('#attachment-preview:visible').length) { return; }
