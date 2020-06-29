@@ -63,7 +63,9 @@ const ChatListItem = (props) => {
   const [name, setName] = useState('');
   const chat = chats[props.chatId];
   console.log(props.chatId, chat, chats);
-  if (chat && chat.uuid) {
+  if (key && key.pub === props.chatId) {
+    setName(t('note_to_self'));
+  } else if (chat && chat.uuid) {
     chat.on('name', n => setName(n));
   } else {
     publicState.user(props.chatId).get('profile').get('name').on(n => setName(n));

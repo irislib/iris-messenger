@@ -320,7 +320,6 @@ function addChat(channel) {
   Notifications.changeChatUnseenCount(pub, 0);
   chats[pub].messages = chats[pub].messages || [];
   chats[pub].identicon = Helpers.getIdenticon(pub, 49);
-  el.prepend($('<div>').addClass('identicon-container').append(chats[pub].identicon));
   chats[pub].onTheir('nickname', (nick) => {
     chats[pub].myNickname = nick;
     $('#profile-nickname-my').text(nick && nick.length ? nick : '');
@@ -342,7 +341,6 @@ function addChat(channel) {
       $("input[name=notificationPreference][value=" + val + "]").attr('checked', 'checked');
     }
   });
-  el.click(() => showChat(pub));
   //$(".chat-list").append(el);
   chats[pub].getTheirMsgsLastSeenTime(time => {
     if (chats[pub]) {
