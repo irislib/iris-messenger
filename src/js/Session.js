@@ -1,4 +1,4 @@
-import { html, useState } from './lib/htm.preact.js';
+import { html, useState, Component } from './lib/htm.preact.js';
 import {localState, publicState, activeChat, activeProfile, resetView, showMenu} from './Main.js';
 import {chats, addChat, showNewChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
@@ -43,6 +43,22 @@ const Login = () => html`<section id="login" class="hidden">
   </div>
 </section>`;
 
+class Identicon extends Component {
+  shouldComponentUpdate() {
+    return false;
+  }
+
+  componentDidMount() {
+    const i = Helpers.getIdenticon(this.props.str, this.props.width)[0];
+    console.log(111, i);
+    this.base.appendChild(i);
+  }
+
+  render() {
+    return html`<div class="identicon-container"/>`;
+  }
+}
+
 const ChatListItem = (props) => {
   const [name, setName] = useState('');
   const chat = chats[props.chatId];
@@ -54,6 +70,7 @@ const ChatListItem = (props) => {
   }
   return html`
   <div class="chat-item" onClick=${() => showChat(props.chatId)}>
+    <${Identicon} str=${props.chatId} width=49/>
     <div class="text">
       <div>
         <span class="name">${name}</span><small class="latest-time"></small>

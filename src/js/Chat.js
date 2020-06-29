@@ -258,7 +258,6 @@ function addChat(channel) {
   var pub = channel.getId();
   if (chats[pub]) { return; }
   chats[pub] = channel;
-  localState.get('chats').get(pub).put(true);
   $('#welcome').remove();
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
@@ -451,6 +450,7 @@ function addChat(channel) {
     publicState.user(pub).get('profile').get('about').on(setAbout);
   }
   chats[pub].onTheir('call', call => VideoCall.onCallMessage(pub, call));
+  localState.get('chats').get(pub).put(true);
 }
 
 function setLatestSeen(pub) {
