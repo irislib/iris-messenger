@@ -1,5 +1,5 @@
 import { html } from './lib/htm.preact.js';
-import {gun, activeChat, activeProfile, resetView, showMenu} from './Main.js';
+import {publicState, activeChat, activeProfile, resetView, showMenu} from './Main.js';
 import {chats, addChat, showNewChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
@@ -77,7 +77,7 @@ function newUserLogin() {
       $('#login').hide();
       Gun.SEA.pair().then(k => {
         login(k);
-        gun.user().get('profile').get('name').put(name);
+        publicState.user().get('profile').get('name').put(name);
         createChatLink();
       });
     }
@@ -85,24 +85,24 @@ function newUserLogin() {
 }
 
 function setOurOnlineStatus() {
-  iris.Channel.setOnline(gun, areWeOnline = true);
+  iris.Channel.setOnline(publicState, areWeOnline = true);
   document.addEventListener("mousemove", () => {
     if (!areWeOnline && activeChat) {
       chats[activeChat].setMyMsgsLastSeenTime();
     }
-    iris.Channel.setOnline(gun, areWeOnline = true);
+    iris.Channel.setOnline(publicState, areWeOnline = true);
     clearTimeout(onlineTimeout);
-    onlineTimeout = setTimeout(() => iris.Channel.setOnline(gun, areWeOnline = false), 60000);
+    onlineTimeout = setTimeout(() => iris.Channel.setOnline(publicState, areWeOnline = false), 60000);
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
-      iris.Channel.setOnline(gun, areWeOnline = true);
+      iris.Channel.setOnline(publicState, areWeOnline = true);
       if (activeChat) {
         chats[activeChat].setMyMsgsLastSeenTime();
         Notifications.changeChatUnseenCount(activeChat, 0);
       }
     } else {
-      iris.Channel.setOnline(gun, areWeOnline = false);
+      iris.Channel.setOnline(publicState, areWeOnline = false);
     }
   });
 }
@@ -111,13 +111,13 @@ function login(k) {
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
   $('#login').hide();
-  iris.Channel.initUser(gun, key);
+  iris.Channel.initUser(publicState, key);
   $('#my-chat-links').empty();
-  iris.Channel.getMyChatLinks(gun, key, undefined, chatLink => {
+  iris.Channel.getMyChatLinks(publicState, key, undefined, chatLink => {
     var row = $('<div>').addClass('flex-row');
     var text = $('<div>').addClass('flex-cell').text(chatLink.url);
     var btn = $('<button>Remove</button>').click(() => {
-      iris.Channel.removeChatLink(gun, key, chatLink.id);
+      iris.Channel.removeChatLink(publicState, key, chatLink.id);
       Helpers.hideAndRemove(row);
     });
     row.append(text);
@@ -137,7 +137,7 @@ function login(k) {
     }
   });
   setOurOnlineStatus();
-  iris.Channel.getChannels(gun, key, addChat);
+  iris.Channel.getChannels(publicState, key, addChat);
   var chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
   var inviter = Helpers.getUrlParameter('inviter');
   function go() {
@@ -164,17 +164,17 @@ function login(k) {
   $('#settings-name').val('');
   Helpers.setImgSrc($('#current-profile-photo'), '');
   $('#private-key-qr').remove();
-  gun.user().get('profile').get('name').on(name => {
+  publicState.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       myName = name;
       $('.user-info .user-name').text(Helpers.truncateString(name, 20));
       $('#settings-name').not(':focus').val(name);
     }
   });
-  gun.user().get('profile').get('about').on(about => {
+  publicState.user().get('profile').get('about').on(about => {
     $('#settings-about').not(':focus').val(about || '');
   });
-  gun.user().get('profile').get('photo').on(data => {
+  publicState.user().get('profile').get('photo').on(data => {
     myProfilePhoto = data;
     if (!activeProfile) {
       Helpers.setImgSrc($('#current-profile-photo'), data);
@@ -186,7 +186,7 @@ function login(k) {
 }
 
 async function createChatLink() {
-  latestChatLink = await iris.Channel.createChatLink(gun, key);
+  latestChatLink = await iris.Channel.createChatLink(publicState, key);
   setChatLinkQrCode(latestChatLink);
 }
 

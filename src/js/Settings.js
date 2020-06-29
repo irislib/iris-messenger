@@ -1,4 +1,4 @@
-import {gun, resetView} from './Main.js';
+import {publicState, resetView} from './Main.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
 import {translate as t} from './Translation.js';
@@ -192,12 +192,12 @@ function init() {
   $(".user-info").off().on('click', render);
   $('#settings-name').on('input', event => {
     var name = $(event.target).val().trim();
-    gun.user().get('profile').get('name').put(name);
+    publicState.user().get('profile').get('name').put(name);
   });
 
   $('#settings-about').on('input', event => {
     var about = $(event.target).val().trim();
-    gun.user().get('profile').get('about').put(about);
+    publicState.user().get('profile').get('about').put(about);
   });
 
   $('.show-logout-confirmation').click(showLogoutConfirmation);

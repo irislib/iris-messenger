@@ -15,8 +15,10 @@ var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:
 if (!iris.util.isElectron) {
   gunOpts.store = RindexedDB(gunOpts);
 }
-var gun = Gun(gunOpts);
-window.gun = gun;
+var publicState = Gun(gunOpts);
+var localState = Gun({multicast:false}).get('state');
+localState.get('activeChat').put(null);
+window.gun = publicState;
 
 Helpers.checkColorScheme();
 
@@ -37,7 +39,7 @@ const Main = html`
         <div id="header-content"></div>
       </header>
 
-      <${ChatView} chatId=${activeChat}/>
+      <${ChatView}/>
       <${NewChat}/>
       <${Settings}/>
       <${LogoutConfirmation}/>
@@ -117,4 +119,4 @@ function setActiveProfile(pub) {
   activeProfile = pub;
 }
 
-export {gun, showMenu, setActiveChat, activeChat, setActiveProfile, activeProfile, resetView};
+export {publicState, localState, showMenu, setActiveChat, activeChat, setActiveProfile, activeProfile, resetView};

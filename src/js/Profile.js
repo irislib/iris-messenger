@@ -1,6 +1,6 @@
 import { html } from './lib/htm.preact.js';
 import {translate as t} from './Translation.js';
-import {gun, resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
+import {publicState, resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
 import {chats, deleteChat, showChat} from './Chat.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
@@ -85,7 +85,7 @@ function renderGroupParticipants(pub) {
     var profile = chats[pub].participantProfiles[k];
     var identicon = Helpers.getIdenticon(k, 40).css({'margin-right':15});
     var nameEl = $('<span>');
-    gun.user(k).get('profile').get('name').on(name => nameEl.text(name));
+    publicState.user(k).get('profile').get('name').on(name => nameEl.text(name));
     var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
     $('<button>').css({'margin-right': 15}).text(t('remove')).click(() => {
       el.remove();
@@ -192,7 +192,7 @@ function showProfile(pub) {
   renderGroupParticipants(pub);
   if (chats[pub] && !chats[pub].uuid) {
     $('#profile .profile-photo').show();
-    gun.user(pub).get('profile').get('photo').on(photo => {
+    publicState.user(pub).get('profile').get('photo').on(photo => {
       $('#profile .profile-photo-container').show();
       Helpers.setImgSrc($('#profile .profile-photo'), photo);
     });
@@ -265,7 +265,7 @@ function onProfileAddParticipantInput(event) {
     $('#profile-add-participant-candidate').remove();
     var identicon = Helpers.getIdenticon(pub, 40).css({'margin-right':15});
     var nameEl = $('<span>');
-    gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
+    publicState.user(pub).get('profile').get('name').on(name => nameEl.text(name));
     var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
     var addBtn = $('<button>').css({'margin-left': 15}).text(t('add')).click(() => {
       if (newGroupParticipant) {
@@ -358,7 +358,7 @@ function useProfilePhotoClicked() {
     if (activeProfile) {
       chats[activeProfile].put('photo', src);
     } else {
-      gun.user().get('profile').get('photo').put(src);
+      publicState.user().get('profile').get('photo').put(src);
     }
     Helpers.setImgSrc($('#current-profile-photo'), src);
     $('#profile-photo-input').val(null);
@@ -371,7 +371,7 @@ function removeProfilePhotoClicked() {
   if (activeProfile) {
     chats[activeProfile].put('photo', null);
   } else {
-    gun.user().get('profile').get('photo').put(null);
+    publicState.user().get('profile').get('photo').put(null);
   }
   renderProfilePhotoSettings();
 }

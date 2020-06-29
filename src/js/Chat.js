@@ -1,5 +1,5 @@
 import { html, render, useEffect, useState } from './lib/htm.preact.js';
-import {gun, showMenu, resetView, activeChat, setActiveChat, activeProfile} from './Main.js';
+import {publicState, localState, showMenu, resetView, activeChat, activeProfile} from './Main.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
@@ -13,11 +13,13 @@ import VideoCall from './VideoCall.js';
 var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
-const ChatView = (props) => {
+const ChatView = () => {
+  const [activeChat, setActiveChat] = useState();
+  localState.get('activeChat').on(a => setActiveChat(a));
   return html`<div class="main-view" id="message-view">
     <div id="message-list">
-      ${props.chatId && chats[props.chatId].messages && props.messages.map(msg =>
-        html`<${Message} ...${msg} chatId=${props.chatId}/>`
+      ${activeChat && chats[activeChat].messages && Object.values(chats[activeChat].messages).map(msg =>
+        html`<${Message} ...${msg} chatId=${activeChat}/>`
       )}
     </div>
     <div id="attachment-preview" class="hidden"></div>
@@ -69,7 +71,7 @@ function showChat(pub) {
     return;
   }
   resetView();
-  setActiveChat(pub);
+  localState.get('activeChat').put(pub);
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
     newChat(pub);
   }
@@ -232,7 +234,7 @@ function addMessage(msg, chatId) {
 }
 
 function deleteChat(pub) {
-  iris.Channel.deleteChannel(gun, Session.getKey(), pub);
+  iris.Channel.deleteChannel(publicState, Session.getKey(), pub);
   if (activeChat === pub) {
     showNewChat();
     showMenu();
@@ -250,7 +252,7 @@ function newChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
-  const channel = new iris.Channel({gun, key: Session.getKey(), chatLink: chatLink, participants: pub});
+  const channel = new iris.Channel({publicState, key: Session.getKey(), chatLink: chatLink, participants: pub});
   addChat(channel);
 }
 
@@ -366,7 +368,7 @@ function addChat(channel) {
     latestEl.toggle(!isTyping);
   });
   chats[pub].online = {};
-  iris.Channel.getOnline(gun, pub, (online) => {
+  iris.Channel.getOnline(publicState, pub, (online) => {
     if (chats[pub]) {
       chats[pub].online = online;
       Profile.setTheirOnlineStatus(pub);
@@ -432,7 +434,7 @@ function addChat(channel) {
           if (chats[pub].participantProfiles[k]) { return; }
           var hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
           chats[pub].participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
-          gun.user(k).get('profile').get('name').on(name => {
+          publicState.user(k).get('profile').get('name').on(name => {
             chats[pub].participantProfiles[k].name = name;
           });
         });
@@ -446,8 +448,8 @@ function addChat(channel) {
     });
     var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   } else {
-    gun.user(pub).get('profile').get('name').on(setName);
-    gun.user(pub).get('profile').get('about').on(setAbout);
+    publicState.user(pub).get('profile').get('name').on(setName);
+    publicState.user(pub).get('profile').get('about').on(setAbout);
   }
   chats[pub].onTheir('call', call => VideoCall.onCallMessage(pub, call));
 }
@@ -517,7 +519,7 @@ function createGroupClicked(e) {
   e.preventDefault();
   if ($('#new-group-name').val().length) {
     var c = new iris.Channel({
-      gun,
+      publicState,
       key: Session.getKey(),
       participants: [],
     });
