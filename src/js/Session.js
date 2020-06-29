@@ -50,7 +50,6 @@ class Identicon extends Component {
 
   componentDidMount() {
     const i = Helpers.getIdenticon(this.props.str, this.props.width)[0];
-    console.log(111, i);
     this.base.appendChild(i);
   }
 
@@ -60,8 +59,10 @@ class Identicon extends Component {
 }
 
 const ChatListItem = (props) => {
-  const [name, setName] = useState('');
   const chat = chats[props.chatId];
+  const [name, setName] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  chat && chat.getTyping(t => setIsTyping(t));
   console.log(props.chatId, chat, chats);
   if (key && key.pub === props.chatId) {
     setName(t('note_to_self'));
@@ -77,7 +78,7 @@ const ChatListItem = (props) => {
       <div>
         <span class="name">${name}</span><small class="latest-time"></small>
       </div>
-      <small class="typing-indicator"></small> <small class="latest"></small>
+      ${isTyping && html`<small class="typing-indicator">${t('typing')}</small>`} <small class="latest"></small>
       <span class="unseen"></span>
     </div>
   </div>
@@ -87,11 +88,9 @@ const ChatListItem = (props) => {
 const SideBar = () => {
   const [chatIds, setChatIds] = useState([]);
   localState.get('chats').map().on((v, id) => {
-    console.log(id);
     if (chatIds.indexOf(id) === -1) {
       chatIds.push(id);
       setChatIds(chatIds);
-      console.log(chatIds);
     }
   });
   return html`<section class="sidebar hidden-xs">

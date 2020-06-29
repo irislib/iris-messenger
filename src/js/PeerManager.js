@@ -39,14 +39,14 @@ function disconnectPeer(peerFromGun) {
 }
 
 function getPeers() {
-  var p = localStorage.getItem('publicStatePeers');
+  var p = localStorage.getItem('gunPeers');
   if (p && p !== 'undefined') {
     p = JSON.parse(p);
   } else {
     p = {
-      'https://publicState-us.herokuapp.com/publicState': {},
-      'https://publicState-eu.herokuapp.com/publicState': {},
-      'https://publicStatejs.herokuapp.com/publicState': {}
+      'https://gun-us.herokuapp.com/gun': {},
+      'https://gun-eu.herokuapp.com/gun': {},
+      'https://gunjs.herokuapp.com/gun': {}
     };
   }
   if (iris.util.isElectron) {
@@ -57,12 +57,12 @@ function getPeers() {
 }
 
 function resetPeers() {
-  localStorage.setItem('publicStatePeers', undefined);
+  localStorage.setItem('gunPeers', undefined);
   peers = getPeers();
 }
 
 function savePeers() {
-  localStorage.setItem('publicStatePeers', JSON.stringify(peers));
+  localStorage.setItem('gunPeers', JSON.stringify(peers));
 }
 
 function connectPeer(url) {

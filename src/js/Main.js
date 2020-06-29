@@ -12,9 +12,7 @@ import VideoCall from './VideoCall.js';
 
 Gun.log.off = true;
 var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity };
-if (!iris.util.isElectron) {
-  gunOpts.store = RindexedDB(gunOpts);
-}
+gunOpts.store = RindexedDB(gunOpts);
 var publicState = Gun(gunOpts);
 var localState = Gun({multicast:false}).get('state').put({activeChat:null});
 window.gun = publicState;
