@@ -1,5 +1,5 @@
-import { html } from './lib/htm.preact.js';
-import {publicState, activeChat, activeProfile, resetView, showMenu} from './Main.js';
+import { html, useState } from './lib/htm.preact.js';
+import {localState, publicState, activeChat, activeProfile, resetView, showMenu} from './Main.js';
 import {chats, addChat, showNewChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
@@ -43,29 +43,63 @@ const Login = () => html`<section id="login" class="hidden">
   </div>
 </section>`;
 
-const SideBar = () => html`<section class="sidebar hidden-xs">
-  <div class="user-info">
-    <div id="my-identicon"></div>
-    <div class="user-name"></div>
-  </div>
-  <div id="enable-notifications-prompt">
-    <div class="title">${t('get_notified_new_messages')}</div>
-    <div><a>${t('turn_on_desktop_notifications')}</a></div>
-  </div>
-  <div class="chat-list">
-    <div class="chat-item new">
-      <svg class="svg-inline--fa fa-smile fa-w-16" style="margin-right:10px;margin-top:3px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-          viewBox="0 0 510 510" xml:space="preserve">
-        <path fill="currentColor" d="M459,0H51C22.95,0,0,22.95,0,51v459l102-102h357c28.05,0,51-22.95,51-51V51C510,22.95,487.05,0,459,0z M102,178.5h306v51 H102V178.5z M306,306H102v-51h204V306z M408,153H102v-51h306V153z"/>
-      </svg>
-      ${t('new_chat')}
-    </div>
-    <div id="welcome" class="visible-xs-block">
-      <h3>Iris Messenger</h3>
-      <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
+const ChatListItem = (props) => {
+  const [name, setName] = useState('');
+  const chat = chats[props.chatId];
+  console.log(props.chatId, chat, chats);
+  if (chat && chat.uuid) {
+    chat.on('name', n => setName(n));
+  } else {
+    publicState.user(props.chatId).get('profile').get('name').on(n => setName(n));
+  }
+  return html`
+  <div class="chat-item" onClick=${() => showChat(props.chatId)}>
+    <div class="text">
+      <div>
+        <span class="name">${name}</span><small class="latest-time"></small>
+      </div>
+      <small class="typing-indicator"></small> <small class="latest"></small>
+      <span class="unseen"></span>
     </div>
   </div>
-</section>`;
+  `;
+};
+
+const SideBar = () => {
+  const [chatIds, setChatIds] = useState([]);
+  localState.get('chats').map().on((v, id) => {
+    console.log(id);
+    if (chatIds.indexOf(id) === -1) {
+      chatIds.push(id);
+      setChatIds(chatIds);
+      console.log(chatIds);
+    }
+  });
+  return html`<section class="sidebar hidden-xs">
+    <div class="user-info">
+      <div id="my-identicon"></div>
+      <div class="user-name"></div>
+    </div>
+    <div id="enable-notifications-prompt">
+      <div class="title">${t('get_notified_new_messages')}</div>
+      <div><a>${t('turn_on_desktop_notifications')}</a></div>
+    </div>
+    <div class="chat-list">
+      <div class="chat-item new">
+        <svg class="svg-inline--fa fa-smile fa-w-16" style="margin-right:10px;margin-top:3px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+            viewBox="0 0 510 510" xml:space="preserve">
+          <path fill="currentColor" d="M459,0H51C22.95,0,0,22.95,0,51v459l102-102h357c28.05,0,51-22.95,51-51V51C510,22.95,487.05,0,459,0z M102,178.5h306v51 H102V178.5z M306,306H102v-51h204V306z M408,153H102v-51h306V153z"/>
+        </svg>
+        ${t('new_chat')}
+      </div>
+      ${chatIds.map(id => html`<${ChatListItem} chatId=${id}/>`)}
+      <div id="welcome" class="visible-xs-block">
+        <h3>Iris Messenger</h3>
+        <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
+      </div>
+    </div>
+  </section>`
+};
 
 function newUserLogin() {
   $('#login').show();
@@ -127,7 +161,6 @@ function login(k) {
     latestChatLink = chatLink.url;
   });
   $('#generate-chat-link').off().on('click', createChatLink);
-  $(".chat-item:not(.new)").remove();
   $("#my-identicon").empty();
   $("#my-identicon").append(Helpers.getIdenticon(key.pub, 40));
   $(".profile-link").attr('href', Helpers.getUserChatLink(key.pub)).off().on('click', e => {

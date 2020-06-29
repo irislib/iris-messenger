@@ -90,6 +90,8 @@ function resetView() {
   }
   activeChat = null;
   activeProfile = null;
+  localState.get('activeChat').put(null);
+  localState.get('activeProfile').put(null);
   showMenu(false);
   QRScanner.cleanupScanner();
   $('#chatlink-qr-video').hide();
