@@ -31,13 +31,39 @@ const emojiPickerButton = html`
 const ChatView = () => {
   const [activeChatId, setActiveChatId] = useState();
   localState.get('activeChat').on(a => setActiveChatId(a));
+
+  const now = new Date();
+  const nowStr = now.toLocaleDateString();
+  let previousDateStr;
+  let previousFrom;
+  const msgListContent = [];
+  if (activeChatId && chats[activeChatId].messages) {
+    Object.values(chats[activeChatId].messages).sort((a, b) => a.time - b.time).forEach(msg => {
+      const date = msg.time;
+      if (date) {
+        const dateStr = date.toLocaleDateString();
+        if (dateStr !== previousDateStr) {
+          var separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
+          msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
+        }
+        previousDateStr = dateStr;
+      }
+      msgListContent.push(html`<${Message} ...${msg} chatId=${activeChatId}/>`);
+
+      const from = msg.info.from;
+      if (previousFrom && (from !== previousFrom)) {
+        msgListContent.push(html`<div class="from-separator"/>`);
+        $(this).find('small').show();
+      } else {
+        $(this).find('small').hide();
+      }
+      previousFrom = from;
+    });
+  }
+
   return html`
     <div class="main-view" id="message-view">
-      <div id="message-list">
-        ${activeChatId && chats[activeChatId].messages && Object.values(chats[activeChatId].messages).sort((a, b) => a.time - b.time).map(msg =>
-          html`<${Message} ...${msg} chatId=${activeChatId}/>`
-        )}
-      </div>
+      <div id="message-list">${msgListContent}</div>
       <div id="attachment-preview" class="hidden"></div>
     </div>
     <div id="not-seen-by-them" style="display: none">
@@ -160,35 +186,13 @@ function sortMessagesByTime() {
   $("#message-list").append(sorted);
   $('.day-separator').remove();
   $('.from-separator').remove();
-  var now = new Date();
-  var nowStr = now.toLocaleDateString();
-  var previousDateStr;
-  var previousFrom;
-  sorted.each(function() {
-    var date = $(this).data('time');
-    if (!date) { return; }
-    var dateStr = date.toLocaleDateString();
-    if (dateStr !== previousDateStr) {
-      var separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
-      $(this).before($('<div>').text(t(separatorText)).addClass('day-separator'));
-    }
-    previousDateStr = dateStr;
 
-    var from = $(this).data('from');
-    if (previousFrom && (from !== previousFrom)) {
-      $(this).before($('<div>').addClass('from-separator'));
-      $(this).find('small').show();
-    } else {
-      $(this).find('small').hide();
-    }
-    previousFrom = from;
-  });
 }
 
 const seenIndicator = html`<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
 
 const Message = (props) => {
-  const [innerText, setInnerText] = useState('');
+  const [innerHTML, setInnerHTML] = useState('');
   let name;
   if (chats[props.chatId].uuid && !props.info.selfAuthored) {
     const profile = chats[props.chatId].participantProfiles[props.info.from];
@@ -199,7 +203,6 @@ const Message = (props) => {
     }*/
   }
   const emojiOnly = props.text.length === 2 && Helpers.isEmoji(props.text);
-  const text = emojiOnly ? props.text : Helpers.highlightEmoji(props.text); // escape
   useEffect(() => {
     // This code will only execute once per message
     // We use useEffect because we're acting outside of Preact
@@ -208,21 +211,22 @@ const Message = (props) => {
     // this is key since we're implicitly using innerHTML later
     // on, when we call dangerouslySetInnerHTML
     const p = document.createElement('p');
-    p.innerText = text;
+    p.innerText = props.text;
+    const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
     // We set innerText to the result of autolinker
-    setInnerText(autolinker.link(p.innerHTML));
+    setInnerHTML(autolinker.link(h));
   }, []);
 
   // If innerText is empty, we (implicitly) return null
   // This guarantees we only show the message once it's ready
-  return innerText && html`
+  return innerHTML && html`
     <div class="msg ${props.selfAuthored ? 'our' : 'their'}">
       <div class="msg-content">
         ${name && html`<small onclick=${() => addMention(name)}>${name}</small>`}
         ${props.attachments && props.attachments.map(a =>
           html`<img src=${a.data} onclick=${e => { Gallery.openAttachmentsGallery(props, e); }}/>` // escape a.data
         )}
-        <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerText }}>
+        <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }}>
         </div>
         <div class="time">
           ${iris.util.formatTime(props.time)}
