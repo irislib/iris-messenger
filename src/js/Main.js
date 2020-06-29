@@ -16,14 +16,15 @@ if (!iris.util.isElectron) {
   gunOpts.store = RindexedDB(gunOpts);
 }
 var publicState = Gun(gunOpts);
-var localState = Gun({multicast:false}).get('state');
-localState.get('activeChat').put(null);
+var localState = Gun({multicast:false}).get('state').put({activeChat:null});
 window.gun = publicState;
 
 Helpers.checkColorScheme();
 
-var activeChat;
-var activeProfile;
+let activeChat;
+let activeProfile;
+localState.get('activeChat').on(a => activeChat = a);
+localState.get('activeProfile').on(a => activeProfile = a);
 
 const Main = html`
   <div id="main-content">
@@ -111,12 +112,4 @@ $('#back-button').off().on('click', () => {
   showMenu(true);
 });
 
-function setActiveChat(pub) {
-  activeChat = pub;
-}
-
-function setActiveProfile(pub) {
-  activeProfile = pub;
-}
-
-export {publicState, localState, showMenu, setActiveChat, activeChat, setActiveProfile, activeProfile, resetView};
+export {publicState, localState, showMenu, activeChat, activeProfile, resetView};

@@ -14,12 +14,12 @@ var chats = window.chats = {};
 var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
 const ChatView = () => {
-  const [activeChat, setActiveChat] = useState();
-  localState.get('activeChat').on(a => setActiveChat(a));
+  const [activeChatId, setActiveChatId] = useState();
+  localState.get('activeChat').on(a => setActiveChatId(a));
   return html`<div class="main-view" id="message-view">
     <div id="message-list">
-      ${activeChat && chats[activeChat].messages && Object.values(chats[activeChat].messages).map(msg =>
-        html`<${Message} ...${msg} chatId=${activeChat}/>`
+      ${activeChatId && chats[activeChatId].messages && Object.values(chats[activeChatId].messages).map(msg =>
+        html`<${Message} ...${msg} chatId=${activeChatId}/>`
       )}
     </div>
     <div id="attachment-preview" class="hidden"></div>
@@ -78,7 +78,6 @@ function showChat(pub) {
   var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
   chatListEl.toggleClass('active', true);
   chatListEl.find('.unseen').empty().hide();
-  $("#message-list").empty();
   $("#message-view").show();
   $(".message-form").show();
   if (!iris.util.isMobile) {
@@ -252,7 +251,7 @@ function newChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
-  const channel = new iris.Channel({publicState, key: Session.getKey(), chatLink: chatLink, participants: pub});
+  const channel = new iris.Channel({gun: publicState, key: Session.getKey(), chatLink: chatLink, participants: pub});
   addChat(channel);
 }
 
@@ -519,7 +518,7 @@ function createGroupClicked(e) {
   e.preventDefault();
   if ($('#new-group-name').val().length) {
     var c = new iris.Channel({
-      publicState,
+      gun: publicState,
       key: Session.getKey(),
       participants: [],
     });

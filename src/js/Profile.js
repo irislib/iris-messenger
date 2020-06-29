@@ -1,6 +1,6 @@
 import { html } from './lib/htm.preact.js';
 import {translate as t} from './Translation.js';
-import {publicState, resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
+import {localState, publicState, resetView, activeChat, activeProfile} from './Main.js';
 import {chats, deleteChat, showChat} from './Chat.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
@@ -181,7 +181,7 @@ function showProfile(pub) {
     return;
   }
   resetView();
-  setActiveProfile(pub);
+  localState.get('activeProfile').put(pub);
   $('#profile .profile-photo-container').hide();
   var qrCodeEl = $('#profile-page-qr');
   qrCodeEl.empty();
