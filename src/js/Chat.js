@@ -273,6 +273,7 @@ function addChat(channel) {
   var pub = channel.getId();
   if (chats[pub]) { return; }
   chats[pub] = channel;
+  const chatNode = localState.get('chats').get(pub);
   $('#welcome').remove();
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
@@ -293,6 +294,8 @@ function addChat(channel) {
       lastSeenTimeChanged(pub);
     }
     if (!chats[pub].latest || msg.time > chats[pub].latest.time) {
+      chatNode.get('latest').get('time').put(msg.time.toISOString());
+      chatNode.get('latest').get('text').put(msg.text);
       chats[pub].latest = msg;
       var text = msg.text || '';
       if (msg.attachments) {
@@ -395,6 +398,7 @@ function addChat(channel) {
     }
     if (name && typeof name === 'string') {
       chats[pub].name = name;
+      chatNode.get('name').put(name);
     }
     if (pub === Session.getKey().pub) {
       el.find('.name').html("📝<b>" + t('note_to_self') + "</b>");
@@ -463,7 +467,7 @@ function addChat(channel) {
     publicState.user(pub).get('profile').get('about').on(setAbout);
   }
   chats[pub].onTheir('call', call => VideoCall.onCallMessage(pub, call));
-  localState.get('chats').get(pub).put(true);
+  localState.get('chats').get(pub).put({enabled:true});
 }
 
 function setLatestSeen(pub) {

@@ -59,26 +59,22 @@ class Identicon extends Component {
 }
 
 const ChatListItem = (props) => {
-  const chat = chats[props.chatId];
   const [name, setName] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  chat && chat.getTyping(t => setIsTyping(t));
-  console.log(props.chatId, chat, chats);
-  if (key && key.pub === props.chatId) {
-    setName(t('note_to_self'));
-  } else if (chat && chat.uuid) {
-    chat.on('name', n => setName(n));
-  } else {
-    publicState.user(props.chatId).get('profile').get('name').on(n => setName(n));
-  }
+  localState.get('chats').get(props.chatId).get('name').on(n => setName(n));
+  const [latestText, setLatestText] = useState('');
+  localState.get('chats').get(props.chatId).get('latest').get('text').on(l => setLatestText(l));
+  const [latestTime, setLatestTime] = useState('');
+  localState.get('chats').get(props.chatId).get('latest').get('time').on(t => setLatestTime(t));
   return html`
   <div class="chat-item" onClick=${() => showChat(props.chatId)}>
     <${Identicon} str=${props.chatId} width=49/>
     <div class="text">
       <div>
-        <span class="name">${name}</span><small class="latest-time"></small>
+        <span class="name">${name}</span>
+        <small class="latest-time">${latestTime}</small>
       </div>
-      ${isTyping && html`<small class="typing-indicator">${t('typing')}</small>`} <small class="latest"></small>
+      <small class="typing-indicator">${t('typing')}</small>
+      <small class="latest">${latestText}</small>
       <span class="unseen"></span>
     </div>
   </div>

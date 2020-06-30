@@ -16,6 +16,7 @@ gunOpts.store = RindexedDB(gunOpts);
 var publicState = Gun(gunOpts);
 var localState = Gun({multicast:false}).get('state').put({activeChat:null});
 window.gun = publicState;
+window.localState = localState;
 
 Helpers.checkColorScheme();
 
