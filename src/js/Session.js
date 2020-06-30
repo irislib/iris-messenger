@@ -85,8 +85,9 @@ const SideBar = () => {
   const [chatIds, setChatIds] = useState([]);
   localState.get('chats').map().on((v, id) => {
     if (chatIds.indexOf(id) === -1) {
-      chatIds.push(id);
-      setChatIds(chatIds);
+      const a = [].concat(chatIds);
+      a.push(id);
+      setChatIds(a);
     }
   });
   return html`<section class="sidebar hidden-xs">
