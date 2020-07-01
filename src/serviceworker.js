@@ -16,3 +16,12 @@ if (self.location.host.indexOf('localhost') !== 0) {
     );
   });
 }
+
+self.addEventListener('push', ev => {
+  const data = ev.data.json();
+  console.log('Got push', data);
+  self.registration.showNotification(data.title || 'Hello, World!', {
+    body: data.body || 'Hello, World!',
+    icon: './img/icon128.png'
+  });
+});
