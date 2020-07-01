@@ -9,8 +9,9 @@ import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
 
-var chats = window.chats = {};
-var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
+const chats = window.chats = {};
+const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
+const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/subscribe';
 
 function showChat(pub) {
   if (!pub) {
@@ -54,6 +55,17 @@ function showChat(pub) {
     var msg = {text};
     if (chats[pub].attachments) {
       msg.attachments = chats[pub].attachments;
+    }
+    if (chats[pub].webPushSubscriptions) {
+      chats[pub].webPushSubscriptions.forEach(subscription => {
+        fetch(notificationServiceUrl, {
+          method: 'POST',
+          body: JSON.stringify({subscription, payload: {title:'Message', body: text}}),
+          headers: {
+            'content-type': 'application/json'
+          }
+        });
+      });
     }
     chats[pub].send(msg);
     Gallery.closeAttachmentsPreview();
@@ -400,6 +412,10 @@ function addChat(channel) {
   } else {
     gun.user(pub).get('profile').get('name').on(setName);
     gun.user(pub).get('profile').get('about').on(setAbout);
+    if (chats[pub].put) {
+      chats[pub].onTheir('webPushSubscriptions', s => chats[pub].webPushSubscriptions = s);
+      setTimeout(() => chats[pub].put('webPushSubscriptions', window.webPushSubscriptions || []), 1000);
+    }
   }
   chats[pub].onTheir('call', call => VideoCall.onCallMessage(pub, call));
 }

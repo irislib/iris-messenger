@@ -31,7 +31,6 @@
 
   <script>
     const publicVapidKey = 'BMqSvZArOIdn7vGkYplSpkZ70-Qt8nhYbey26WVa3LF3SwzblSzm3n3HHycpNkAKVq7MCkrzFuTFs_en7Y_J2MI';
-    const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/subscribe';
 
     function urlBase64ToUint8Array(base64String) {
       const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -48,18 +47,12 @@
       return outputArray;
     }
 
-    function subscribe(reg) {
-      const subscription = reg.pushManager.subscribe({
+    async function subscribe(reg) {
+      const subscription = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
       });
-      fetch(notificationServiceUrl, {
-        method: 'POST',
-        body: JSON.stringify({subscription, payload: {title:'test'}}),
-        headers: {
-          'content-type': 'application/json'
-        }
-      });
+      window.webPushSubscriptions = [subscription];
     }
 
     function subscribeToNotifications(reg) {
@@ -73,28 +66,23 @@
       }
 
       if (serviceWorker) {
-        console.log("sw current state", serviceWorker.state);
+        //console.log("sw current state", serviceWorker.state);
         if (serviceWorker.state == "activated") {
-          console.log("sw already activated");
+          //console.log("sw already activated");
           reg.pushManager.getSubscription().then(function(subscription) {
             if (subscription === null) {
-              console.log('no push subscription yet, subscribing');
+              //console.log('no push subscription yet, subscribing');
               subscribe(reg);
+            } else {
+              window.webPushSubscriptions = [subscription];
             }
-            fetch(notificationServiceUrl, {
-              method: 'POST',
-              body: JSON.stringify({subscription, payload: {title:'test'}}),
-              headers: {
-                'content-type': 'application/json'
-              }
-            });
           });
         }
         serviceWorker.addEventListener("statechange", function(e) {
-          console.log("sw statechange : ", e.target.state);
+          //console.log("sw statechange : ", e.target.state);
           if (e.target.state == "activated") {
             // use pushManger for subscribing here.
-            console.log("Just now activated. now we can subscribe for push notification")
+            //console.log("Just now activated. now we can subscribe for push notification")
             subscribe(reg);
           }
         });
