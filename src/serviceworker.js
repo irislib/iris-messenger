@@ -17,11 +17,32 @@ if (self.location.host.indexOf('localhost') !== 0) {
   });
 }
 
+function isClientFocused() {
+  return clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true
+  }).then((windowClients) => {
+    let clientIsFocused = false;
+
+    for (let i = 0; i < windowClients.length; i++) {
+      const windowClient = windowClients[i];
+      if (windowClient.focused) {
+        clientIsFocused = true;
+        break;
+      }
+    }
+
+    return clientIsFocused;
+  });
+}
+
 self.addEventListener('push', ev => {
   const data = ev.data.json();
   console.log('Got push', data);
-  self.registration.showNotification(data.title || 'Hello, World!', {
-    body: data.body || 'Hello, World!',
-    icon: './img/icon128.png'
-  });
+  if (!isClientFocused()) {
+    self.registration.showNotification(data.title || 'Hello, World!', {
+      body: data.body || 'Hello, World!',
+      icon: './img/icon128.png'
+    });  
+  }
 });
