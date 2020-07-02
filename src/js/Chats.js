@@ -46,31 +46,7 @@ function showChat(pub) {
     isTyping = getIsTyping();
     chats[pub].msgDraft = $('#new-msg').val();
   });
-  $(".message-form form").off().on('submit', event => {
-    event.preventDefault();
-    chats[pub].msgDraft = null;
-    var text = $('#new-msg').val();
-    if (!text.length && !chats[pub].attachments) { return; }
-    chats[pub].setTyping(false);
-    var msg = {text};
-    if (chats[pub].attachments) {
-      msg.attachments = chats[pub].attachments;
-    }
-    if (chats[pub].webPushSubscriptions) {
-      chats[pub].webPushSubscriptions.slice(0,8).forEach(subscription => {
-        fetch(notificationServiceUrl, {
-          method: 'POST',
-          body: JSON.stringify({subscription, payload: {title:'Message', body: text}}),
-          headers: {
-            'content-type': 'application/json'
-          }
-        });
-      });
-    }
-    chats[pub].send(msg);
-    Gallery.closeAttachmentsPreview();
-    $('#new-msg').val('');
-  });
+  $(".message-form form").off().on('submit', e => onMsgFormSubmit(e, pub));
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
   var msgs = Object.values(chats[pub].messages);
@@ -96,6 +72,34 @@ function showChat(pub) {
   chats[pub].setMyMsgsLastSeenTime();
   Profile.setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
+}
+
+function onMsgFormSubmit(event, pub) {
+  event.preventDefault();
+  chats[pub].msgDraft = null;
+  var text = $('#new-msg').val();
+  if (!text.length && !chats[pub].attachments) { return; }
+  chats[pub].setTyping(false);
+  var msg = {text};
+  if (chats[pub].attachments) {
+    msg.attachments = chats[pub].attachments;
+  }
+  const shouldWebPush = (pub === Session.getKey().pub) || !(chats[pub].online && chats[pub].online.isOnline);
+  console.log('shouldWebPush', shouldWebPush);
+  if (shouldWebPush && chats[pub].webPushSubscriptions) {
+    chats[pub].webPushSubscriptions.slice(0,8).forEach(subscription => {
+      fetch(notificationServiceUrl, {
+        method: 'POST',
+        body: JSON.stringify({subscription, payload: {title:'Message', body: text}}),
+        headers: {
+          'content-type': 'application/json'
+        }
+      });
+    });
+  }
+  chats[pub].send(msg);
+  Gallery.closeAttachmentsPreview();
+  $('#new-msg').val('');
 }
 
 var sortChatsByLatest = _.throttle(() => {
