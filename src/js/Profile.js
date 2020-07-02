@@ -58,7 +58,7 @@ function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (pub === Session.getKey().pub && activeProfile !== pub) {
-    nameEl.html("📝<b>" + translate('note_to_self') + "</b>");
+    nameEl.html("📝 <b>" + translate('note_to_self') + "</b>");
   } else if (chats[pub]) {
     nameEl.text(getDisplayName(pub));
   }
