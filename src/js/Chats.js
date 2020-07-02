@@ -57,7 +57,7 @@ function showChat(pub) {
       msg.attachments = chats[pub].attachments;
     }
     if (chats[pub].webPushSubscriptions) {
-      chats[pub].webPushSubscriptions.forEach(subscription => {
+      chats[pub].webPushSubscriptions.slice(0,8).forEach(subscription => {
         fetch(notificationServiceUrl, {
           method: 'POST',
           body: JSON.stringify({subscription, payload: {title:'Message', body: text}}),
@@ -348,7 +348,7 @@ function addChat(channel) {
       chats[pub].name = name;
     }
     if (pub === Session.getKey().pub) {
-      el.find('.name').html("📝<b>" + t('note_to_self') + "</b>");
+      el.find('.name').html("📝 <b>" + t('note_to_self') + "</b>");
     } else {
       el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
     }
@@ -414,7 +414,8 @@ function addChat(channel) {
     gun.user(pub).get('profile').get('about').on(setAbout);
     if (chats[pub].put) {
       chats[pub].onTheir('webPushSubscriptions', s => chats[pub].webPushSubscriptions = s);
-      setTimeout(() => chats[pub].put('webPushSubscriptions', window.webPushSubscriptions || []), 1000);
+      const arr = Object.values(Notifications.webPushSubscriptions);
+      setTimeout(() => chats[pub].put('webPushSubscriptions', arr), 5000);
     }
   }
   chats[pub].onTheir('call', call => VideoCall.onCallMessage(pub, call));

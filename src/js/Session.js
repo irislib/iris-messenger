@@ -6,12 +6,12 @@ import Helpers from './Helpers.js';
 import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
 
-var key;
-var myName;
-var myProfilePhoto;
-var latestChatLink;
-var onlineTimeout;
-var areWeOnline;
+let key;
+let myName;
+let myProfilePhoto;
+let latestChatLink;
+let onlineTimeout;
+let areWeOnline;
 
 function newUserLogin() {
   $('#login').show();
@@ -58,6 +58,8 @@ function login(k) {
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
   $('#login').hide();
   iris.Channel.initUser(gun, key);
+  Notifications.subscribeToWebPush();
+  Notifications.getWebPushSubscriptions();
   $('#my-chat-links').empty();
   iris.Channel.getMyChatLinks(gun, key, undefined, chatLink => {
     const row = $('<div>').addClass('flex-row');
