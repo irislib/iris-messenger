@@ -1,3 +1,5 @@
+const window = self;
+self.importScripts('js/lib/gun.js', 'js/lib/sea.js');
 var CACHE_NAME = 'iris-messenger-cache-v1';
 
 // stale-while-revalidate
@@ -17,11 +19,22 @@ if (self.location.host.indexOf('localhost') !== 0) {
   });
 }
 
-self.addEventListener('push', ev => {
+self.onmessage = function(msg) {
+  if (msg.data.key) {
+    self.irisKey = msg.data.key;
+  }
+}
+
+self.addEventListener('push', async ev => {
   const data = ev.data.json();
-  console.log('Got push', data);
-  self.registration.showNotification(data.title || 'Hello, World!', {
-    body: data.body || 'Hello, World!',
+  console.log('got push', data);
+  if (self.irisKey && data.from && data.from.epub) {
+    const secret = await Gun.SEA.secret(data.from.epub, self.irisKey);
+    data.title = await Gun.SEA.decrypt(data.title, secret);
+    data.body = await Gun.SEA.decrypt(data.body, secret);
+  }
+  self.registration.showNotification(data.title || 'No title', {
+    body: data.body || 'No text',
     icon: './img/icon128.png'
   });
 });

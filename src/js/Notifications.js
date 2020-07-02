@@ -121,6 +121,7 @@ async function subscribeToWebPush() {
   if (!desktopNotificationsEnabled()) { return false; }
   await navigator.serviceWorker.ready;
   const reg = await navigator.serviceWorker.getRegistration();
+  reg.active.postMessage({key: Session.getKey()});
   const sub = await reg.pushManager.getSubscription();
   sub ? addWebPushSubscription(sub) : subscribe(reg);
 }
@@ -142,7 +143,6 @@ async function getWebPushSubscriptions() {
   const mySecret = await Gun.SEA.secret(myKey.epub, myKey);
   gun.user().get('webPushSubscriptions').map().on(async enc => {
     const s = await Gun.SEA.decrypt(enc, mySecret);
-    console.log('got s', s);
     addWebPushSubscription(s, false);
   });
 }

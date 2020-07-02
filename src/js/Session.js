@@ -218,6 +218,7 @@ function init() {
   });
 
   $('.logout-button').click(() => {
+    // reg.active.postMessage({key: Session.getKey()}); TODO
     localStorage.removeItem('chatKeyPair');
     location.reload(); // ensure that everything is reset (especially on the gun side). TODO: without reload
   });

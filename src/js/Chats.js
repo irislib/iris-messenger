@@ -74,7 +74,7 @@ function showChat(pub) {
   setDeliveredCheckmarks(pub);
 }
 
-function onMsgFormSubmit(event, pub) {
+async function onMsgFormSubmit(event, pub) {
   event.preventDefault();
   chats[pub].msgDraft = null;
   var text = $('#new-msg').val();
@@ -84,13 +84,17 @@ function onMsgFormSubmit(event, pub) {
   if (chats[pub].attachments) {
     msg.attachments = chats[pub].attachments;
   }
-  const shouldWebPush = (pub === Session.getKey().pub) || !(chats[pub].online && chats[pub].online.isOnline);
-  console.log('shouldWebPush', shouldWebPush);
+  const myKey = Session.getKey();
+  const shouldWebPush = (pub === myKey.pub) || !(chats[pub].online && chats[pub].online.isOnline);
   if (shouldWebPush && chats[pub].webPushSubscriptions) {
+    const secret = await chats[pub].getSecret(pub);
+    const title = await Gun.SEA.encrypt(Session.getMyName() || 'Message', secret);
+    const body = await Gun.SEA.encrypt(text, secret);
+    const from = {pub: myKey.pub, epub: myKey.epub};
     chats[pub].webPushSubscriptions.slice(0,8).forEach(subscription => {
       fetch(notificationServiceUrl, {
         method: 'POST',
-        body: JSON.stringify({subscription, payload: {title:'Message', body: text}}),
+        body: JSON.stringify({subscription, payload: {title, body, from}}),
         headers: {
           'content-type': 'application/json'
         }
