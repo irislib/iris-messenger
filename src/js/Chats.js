@@ -91,7 +91,7 @@ async function onMsgFormSubmit(event, pub) {
     const title = await Gun.SEA.encrypt(Session.getMyName() || 'Message', secret);
     const body = await Gun.SEA.encrypt(text, secret);
     const from = {pub: myKey.pub, epub: myKey.epub};
-    chats[pub].webPushSubscriptions.slice(0,8).forEach(subscription => {
+    _.sample(chats[pub].webPushSubscriptions, 8).forEach(subscription => {
       fetch(notificationServiceUrl, {
         method: 'POST',
         body: JSON.stringify({subscription, payload: {title, body, from}}),

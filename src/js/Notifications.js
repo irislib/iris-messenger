@@ -2,6 +2,7 @@ import Helpers from './Helpers.js';
 import Profile from './Profile.js';
 import Session from './Session.js';
 import {chats, showChat} from './Chats.js';
+import {gun} from './Main.js';
 
 var notificationSound = new Audio('../../audio/notification.mp3');
 var loginTime;
@@ -126,6 +127,15 @@ async function subscribeToWebPush() {
   sub ? addWebPushSubscription(sub) : subscribe(reg);
 }
 
+const addWebPushSubscriptionsToChats = _.debounce(() => {
+  const arr = Object.values(webPushSubscriptions);
+  Object.values(chats).forEach(chat => {
+    if (chat.put) {
+      chat.put('webPushSubscriptions', arr);
+    }
+  });
+}, 5000);
+
 async function addWebPushSubscription(s, saveToGun = true) {
   const myKey = Session.getKey();
   const mySecret = await Gun.SEA.secret(myKey.epub, myKey);
@@ -135,7 +145,7 @@ async function addWebPushSubscription(s, saveToGun = true) {
     gun.user().get('webPushSubscriptions').get(hash).put(enc);
   }
   webPushSubscriptions[hash] = s;
-  console.log('webPushSubscriptions', webPushSubscriptions);
+  addWebPushSubscriptionsToChats();
 }
 
 async function getWebPushSubscriptions() {

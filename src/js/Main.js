@@ -10,7 +10,6 @@ import PublicMessages from './PublicMessages.js';
 import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
-import Notifications from './Notifications.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
