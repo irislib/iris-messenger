@@ -87,19 +87,26 @@ async function onMsgFormSubmit(event, pub) {
   const myKey = Session.getKey();
   const shouldWebPush = (pub === myKey.pub) || !(chats[pub].online && chats[pub].online.isOnline);
   if (shouldWebPush && chats[pub].webPushSubscriptions) {
-    const secret = await chats[pub].getSecret(pub);
-    const title = await Gun.SEA.encrypt(Session.getMyName() || 'Message', secret);
-    const body = await Gun.SEA.encrypt(text, secret);
-    const from = {pub: myKey.pub, epub: myKey.epub};
-    _.sample(chats[pub].webPushSubscriptions, 8).forEach(subscription => {
-      fetch(notificationServiceUrl, {
-        method: 'POST',
-        body: JSON.stringify({subscription, payload: {title, body, from}}),
-        headers: {
-          'content-type': 'application/json'
-        }
+    const participants = Object.keys(chats[pub].webPushSubscriptions);
+    for (let i = 0; i < participants.length; i++) {
+      const participant = participants[i];
+      const secret = await chats[pub].getSecret(participant);
+      const myName = Session.getMyName();
+      const titleText = chats[pub].uuid ? chats[pub].name : myName;
+      const bodyText = chats[pub].uuid ? `${myName}: ${text}` : text;
+      const title = await Gun.SEA.encrypt(titleText, secret);
+      const body = await Gun.SEA.encrypt(bodyText, secret);
+      const from = {pub: myKey.pub, epub: myKey.epub};
+      _.sample(chats[pub].webPushSubscriptions[participant], 4).forEach(subscription => {
+        fetch(notificationServiceUrl, {
+          method: 'POST',
+          body: JSON.stringify({subscription, payload: {title, body, from}}),
+          headers: {
+            'content-type': 'application/json'
+          }
+        });
       });
-    });
+    }
   }
   chats[pub].send(msg);
   Gallery.closeAttachmentsPreview();
@@ -420,11 +427,15 @@ function addChat(channel) {
   } else {
     gun.user(pub).get('profile').get('name').on(setName);
     gun.user(pub).get('profile').get('about').on(setAbout);
-    if (chats[pub].put) {
-      chats[pub].onTheir('webPushSubscriptions', s => chats[pub].webPushSubscriptions = s);
-      const arr = Object.values(Notifications.webPushSubscriptions);
-      setTimeout(() => chats[pub].put('webPushSubscriptions', arr), 5000);
-    }
+  }
+  if (chats[pub].put) {
+    chats[pub].onTheir('webPushSubscriptions', (s, k, from) => {
+      if (!Array.isArray(s)) { return; }
+      chats[pub].webPushSubscriptions = chats[pub].webPushSubscriptions || {};
+      chats[pub].webPushSubscriptions[from || pub] = s;
+    });
+    const arr = Object.values(Notifications.webPushSubscriptions);
+    setTimeout(() => chats[pub].put('webPushSubscriptions', arr), 5000);
   }
   chats[pub].onTheir('call', call => VideoCall.onCallMessage(pub, call));
 }
