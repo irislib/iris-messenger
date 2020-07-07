@@ -218,7 +218,7 @@ function init() {
   });
 
   $('.logout-button').click(() => {
-    // reg.active.postMessage({key: Session.getKey()}); TODO
+    // reg.active.postMessage({key: null}); TODO - also remove subscription from your chats
     localStorage.removeItem('chatKeyPair');
     location.reload(); // ensure that everything is reset (especially on the gun side). TODO: without reload
   });
