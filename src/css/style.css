@@ -188,6 +188,7 @@ header #header-content {
   overflow-wrap: break-word;
   flex: 1 1 auto;
   min-width: 0;
+  word-break: break-all;
 }
 
 .flex-table .flex-cell.no-flex {
