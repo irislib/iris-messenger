@@ -11,7 +11,7 @@ import VideoCall from './VideoCall.js';
 
 const chats = window.chats = {};
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
-const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/subscribe';
+const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
 
 function showChat(pub) {
   if (!pub) {
@@ -94,17 +94,18 @@ async function onMsgFormSubmit(event, pub) {
       const myName = Session.getMyName();
       const titleText = chats[pub].uuid ? chats[pub].name : myName;
       const bodyText = chats[pub].uuid ? `${myName}: ${text}` : text;
-      const title = await Gun.SEA.encrypt(titleText, secret);
-      const body = await Gun.SEA.encrypt(bodyText, secret);
-      const from = {pub: myKey.pub, epub: myKey.epub};
-      _.sample(chats[pub].webPushSubscriptions[participant], 4).forEach(subscription => {
-        fetch(notificationServiceUrl, {
-          method: 'POST',
-          body: JSON.stringify({subscription, payload: {title, body, from}}),
-          headers: {
-            'content-type': 'application/json'
-          }
-        });
+      const payload = {
+        title: await Gun.SEA.encrypt(titleText, secret),
+        body: await Gun.SEA.encrypt(bodyText, secret),
+        from:{pub: myKey.pub, epub: myKey.epub}
+      };
+      const subscriptions = chats[pub].webPushSubscriptions[participant].map(s => {return {subscription: s, payload}});
+      fetch(notificationServiceUrl, {
+        method: 'POST',
+        body: JSON.stringify({subscriptions}),
+        headers: {
+          'content-type': 'application/json'
+        }
       });
     }
   }
