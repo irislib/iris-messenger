@@ -87,6 +87,7 @@ async function onMsgFormSubmit(event, pub) {
   const myKey = Session.getKey();
   const shouldWebPush = (pub === myKey.pub) || !(chats[pub].online && chats[pub].online.isOnline);
   if (shouldWebPush && chats[pub].webPushSubscriptions) {
+    const subscriptions = [];
     const participants = Object.keys(chats[pub].webPushSubscriptions);
     for (let i = 0; i < participants.length; i++) {
       const participant = participants[i];
@@ -99,15 +100,15 @@ async function onMsgFormSubmit(event, pub) {
         body: await Gun.SEA.encrypt(bodyText, secret),
         from:{pub: myKey.pub, epub: myKey.epub}
       };
-      const subscriptions = chats[pub].webPushSubscriptions[participant].map(s => {return {subscription: s, payload}});
-      fetch(notificationServiceUrl, {
-        method: 'POST',
-        body: JSON.stringify({subscriptions}),
-        headers: {
-          'content-type': 'application/json'
-        }
-      });
+      chats[pub].webPushSubscriptions[participant].forEach(s => subscriptions.push({subscription: s, payload}));
     }
+    fetch(notificationServiceUrl, {
+      method: 'POST',
+      body: JSON.stringify({subscriptions}),
+      headers: {
+        'content-type': 'application/json'
+      }
+    });
   }
   chats[pub].send(msg);
   Gallery.closeAttachmentsPreview();
