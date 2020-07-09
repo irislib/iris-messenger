@@ -223,8 +223,12 @@ function init() {
     const reg = await navigator.serviceWorker.getRegistration();
     if (reg) {
       reg.active.postMessage({key: null});
+      const sub = await reg.pushManager.getSubscription();
+      const hash = await iris.util.getHash(JSON.stringify(sub));
+      Notifications.removeSubscription(hash);
+      sub.unsubscribe && sub.unsubscribe();
     }
-    location.reload(); // ensure that everything is reset (especially on the gun side). TODO: without reload
+    _.defer(() => location.reload());
   });
   $('#show-existing-account-login').click(showSwitchAccount);
   $('#show-create-account').click(showCreateAccount);

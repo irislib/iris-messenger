@@ -128,10 +128,6 @@ async function subscribeToWebPush() {
   sub ? addWebPushSubscription(sub) : subscribe(reg);
 }
 
-async function unsubscribeWebPush() {
-
-}
-
 const addWebPushSubscriptionsToChats = _.debounce(() => {
   const arr = Object.values(webPushSubscriptions);
   Object.values(chats).forEach(chat => {
@@ -200,4 +196,4 @@ function init() {
   $('#enable-notifications-prompt').click(enableDesktopNotifications);
 }
 
-export default {init, notifyMsg, changeChatUnseenCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions};
+export default {init, notifyMsg, changeChatUnseenCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};
