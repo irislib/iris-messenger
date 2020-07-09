@@ -217,9 +217,13 @@ function init() {
     }
   });
 
-  $('.logout-button').click(() => {
+  $('.logout-button').click(async () => {
     // reg.active.postMessage({key: null}); TODO - also remove subscription from your chats
     localStorage.removeItem('chatKeyPair');
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (reg) {
+      reg.active.postMessage({key: null});
+    }
     location.reload(); // ensure that everything is reset (especially on the gun side). TODO: without reload
   });
   $('#show-existing-account-login').click(showSwitchAccount);

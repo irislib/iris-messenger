@@ -1,6 +1,10 @@
 const window = self;
-self.importScripts('js/lib/gun.js', 'js/lib/sea.js');
+self.importScripts('js/lib/gun.js', 'js/lib/sea.js', 'js/lib/localforage.min.js');
 var CACHE_NAME = 'iris-messenger-cache-v1';
+
+localforage.getItem('swIrisKey', (err, val) => {
+  self.irisKey = (self.irisKey || JSON.parse(val));
+});
 
 // stale-while-revalidate
 if (self.location.host.indexOf('localhost') !== 0) {
@@ -21,20 +25,18 @@ if (self.location.host.indexOf('localhost') !== 0) {
 }
 
 self.onmessage = function(msg) {
-  if (msg.data.key) {
+  if (msg.data.hasOwnProperty('key')) {
     self.irisKey = msg.data.key;
+    localforage.setItem('swIrisKey', JSON.stringify(self.irisKey));
   }
 }
 
 self.addEventListener('push', async ev => {
   const data = ev.data.json();
-  console.log('got push', data);
   if (self.irisKey && data.from && data.from.epub) {
     const secret = await Gun.SEA.secret(data.from.epub, self.irisKey);
     data.title = await Gun.SEA.decrypt(data.title, secret);
     data.body = await Gun.SEA.decrypt(data.body, secret);
-  } else {
-    console.log('self.irisKey', !!self.irisKey, 'data.from', !!data.from, 'data.from.epub', !!data.from.epub);
   }
   if (data.title.indexOf('SEA{') === 0) {
     data.title = '';
