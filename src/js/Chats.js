@@ -184,6 +184,7 @@ function getMsgElement(msg, chatId, isPublic) {
     } else {
       var profile = chats[chatId].participantProfiles[msg.info.from];
       name = profile && profile.name;
+      color = profile && profile.color;
     }
     if (name) {
       var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color}).addClass('msgSenderName');
