@@ -2,9 +2,14 @@ const window = self;
 self.importScripts('js/lib/gun.js', 'js/lib/sea.js', 'js/lib/localforage.min.js');
 var CACHE_NAME = 'iris-messenger-cache-v1';
 
-localforage.getItem('swIrisKey', (err, val) => {
-  self.irisKey = (self.irisKey || JSON.parse(val));
-});
+async function getSavedKey() {
+  try {
+    self.irisKey = await localforage.getItem('swIrisKey');
+  } catch (err) {
+    console.error('error loading iris key', err);
+  }
+  return self.irisKey;
+}
 
 // stale-while-revalidate
 if (self.location.host.indexOf('localhost') !== 0) {
@@ -27,11 +32,14 @@ if (self.location.host.indexOf('localhost') !== 0) {
 self.onmessage = function(msg) {
   if (msg.data.hasOwnProperty('key')) {
     self.irisKey = msg.data.key;
-    localforage.setItem('swIrisKey', JSON.stringify(self.irisKey));
+    localforage.setItem('swIrisKey', self.irisKey);
   }
 }
 
 self.addEventListener('push', async ev => {
+  if (!self.irisKey) {
+    await getSavedKey();
+  }
   const data = ev.data.json();
   if (self.irisKey && data.from && data.from.epub) {
     const secret = await Gun.SEA.secret(data.from.epub, self.irisKey);

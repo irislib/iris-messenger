@@ -218,7 +218,7 @@ function init() {
   });
 
   $('.logout-button').click(async () => {
-    // reg.active.postMessage({key: null}); TODO - also remove subscription from your chats
+    // TODO: remove subscription from your chats
     localStorage.removeItem('chatKeyPair');
     const reg = await navigator.serviceWorker.getRegistration();
     if (reg) {

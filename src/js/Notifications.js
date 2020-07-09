@@ -127,6 +127,10 @@ async function subscribeToWebPush() {
   sub ? addWebPushSubscription(sub) : subscribe(reg);
 }
 
+async function unsubscribeWebPush() {
+
+}
+
 const addWebPushSubscriptionsToChats = _.debounce(() => {
   const arr = Object.values(webPushSubscriptions);
   Object.values(chats).forEach(chat => {
@@ -135,6 +139,17 @@ const addWebPushSubscriptionsToChats = _.debounce(() => {
     }
   });
 }, 5000);
+
+const addWebPushSubscriptionsToSettings = _.debounce(() => {
+  const el = $('#web-push-subscriptions');
+  el.empty();
+  const arr = Object.keys(webPushSubscriptions);
+  arr.forEach(k => {
+    const row = $('<div>').addClass('flex-row');
+    row.append($('<div>').addClass('flex-cell').text(k));
+    el.append(row);
+  });
+}, 1000);
 
 async function addWebPushSubscription(s, saveToGun = true) {
   const myKey = Session.getKey();
@@ -146,6 +161,7 @@ async function addWebPushSubscription(s, saveToGun = true) {
   }
   webPushSubscriptions[hash] = s;
   addWebPushSubscriptionsToChats();
+  addWebPushSubscriptionsToSettings();
 }
 
 async function getWebPushSubscriptions() {

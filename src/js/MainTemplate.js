@@ -181,6 +181,11 @@ export default `
       <h3><%= language %></h3>
       <p><select class="language-selector"></select></p>
       <hr/>
+      <h3>Notifications</h3>
+      <p>Web push subscriptions</p>
+      <div id="web-push-subscriptions" class="flex-table"></div>
+
+      <hr/>
       <h3><%= peers %></h3>
       <div id="peers" class="flex-table">
         <div class="flex-row" id="add-peer-row">
