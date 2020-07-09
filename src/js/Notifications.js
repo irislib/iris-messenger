@@ -2,6 +2,7 @@ import Helpers from './Helpers.js';
 import Profile from './Profile.js';
 import Session from './Session.js';
 import {chats, showChat} from './Chats.js';
+import { translate as t } from './Translation.js';
 import {gun} from './Main.js';
 
 var notificationSound = new Audio('../../audio/notification.mp3');
@@ -140,16 +141,30 @@ const addWebPushSubscriptionsToChats = _.debounce(() => {
   });
 }, 5000);
 
-const addWebPushSubscriptionsToSettings = _.debounce(() => {
+function addWebPushSubscriptionsToSettings() {
   const el = $('#web-push-subscriptions');
   el.empty();
   const arr = Object.keys(webPushSubscriptions);
   arr.forEach(k => {
+    const v = webPushSubscriptions[k];
     const row = $('<div>').addClass('flex-row');
-    row.append($('<div>').addClass('flex-cell').text(k));
+    row.append($('<div>').addClass('flex-cell').text(v.endpoint));
+    const btnContainer = $('<div>').addClass('flex-cell no-flex');
+    const removeBtn = $('<button>').text(t('remove')).click(() => removeSubscription(k));
+    btnContainer.append(removeBtn);
+    row.append(btnContainer);
     el.append(row);
   });
-}, 1000);
+}
+
+const addWebPushSubscriptionsToSettingsDebounced = _.debounce(addWebPushSubscriptionsToSettings, 1000);
+
+function removeSubscription(hash) {
+  delete webPushSubscriptions[hash];
+  gun.user().get('webPushSubscriptions').get(hash).put(null);
+  addWebPushSubscriptionsToSettings();
+  addWebPushSubscriptionsToChats();
+}
 
 async function addWebPushSubscription(s, saveToGun = true) {
   const myKey = Session.getKey();
@@ -161,13 +176,14 @@ async function addWebPushSubscription(s, saveToGun = true) {
   }
   webPushSubscriptions[hash] = s;
   addWebPushSubscriptionsToChats();
-  addWebPushSubscriptionsToSettings();
+  addWebPushSubscriptionsToSettingsDebounced();
 }
 
 async function getWebPushSubscriptions() {
   const myKey = Session.getKey();
   const mySecret = await Gun.SEA.secret(myKey.epub, myKey);
   gun.user().get('webPushSubscriptions').map().on(async enc => {
+    if (!enc) { return; }
     const s = await Gun.SEA.decrypt(enc, mySecret);
     addWebPushSubscription(s, false);
   });
