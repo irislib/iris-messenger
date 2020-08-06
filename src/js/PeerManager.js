@@ -46,7 +46,7 @@ function getPeers() {
     p = {
       'https://gun-us.herokuapp.com/gun': {},
       'https://gun-eu.herokuapp.com/gun': {},
-      'https://gunjs.herokuapp.com/gun': {}
+      'https://dletta.rig.airfaas.com/gun': {}
     };
   }
   if (iris.util.isElectron) {

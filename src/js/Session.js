@@ -6,12 +6,12 @@ import Helpers from './Helpers.js';
 import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
 
-var key;
-var myName;
-var myProfilePhoto;
-var latestChatLink;
-var onlineTimeout;
-var areWeOnline;
+let key;
+let myName;
+let myProfilePhoto;
+let latestChatLink;
+let onlineTimeout;
+let areWeOnline;
 
 function newUserLogin() {
   $('#login').show();
@@ -58,6 +58,8 @@ function login(k) {
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
   $('#login').hide();
   iris.Channel.initUser(gun, key);
+  Notifications.subscribeToWebPush();
+  Notifications.getWebPushSubscriptions();
   $('#my-chat-links').empty();
   iris.Channel.getMyChatLinks(gun, key, undefined, chatLink => {
     const row = $('<div>').addClass('flex-row');
@@ -215,9 +217,18 @@ function init() {
     }
   });
 
-  $('.logout-button').click(() => {
+  $('.logout-button').click(async () => {
+    // TODO: remove subscription from your chats
     localStorage.removeItem('chatKeyPair');
-    location.reload(); // ensure that everything is reset (especially on the gun side). TODO: without reload
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (reg) {
+      reg.active.postMessage({key: null});
+      const sub = await reg.pushManager.getSubscription();
+      const hash = await iris.util.getHash(JSON.stringify(sub));
+      Notifications.removeSubscription(hash);
+      sub.unsubscribe && sub.unsubscribe();
+    }
+    _.defer(() => location.reload());
   });
   $('#show-existing-account-login').click(showSwitchAccount);
   $('#show-create-account').click(showCreateAccount);

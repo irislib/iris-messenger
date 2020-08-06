@@ -9,8 +9,9 @@ import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
 
-var chats = window.chats = {};
-var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
+const chats = window.chats = {};
+const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
+const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
 
 function showChat(pub) {
   if (!pub) {
@@ -45,20 +46,7 @@ function showChat(pub) {
     isTyping = getIsTyping();
     chats[pub].msgDraft = $('#new-msg').val();
   });
-  $(".message-form form").off().on('submit', event => {
-    event.preventDefault();
-    chats[pub].msgDraft = null;
-    var text = $('#new-msg').val();
-    if (!text.length && !chats[pub].attachments) { return; }
-    chats[pub].setTyping(false);
-    var msg = {text};
-    if (chats[pub].attachments) {
-      msg.attachments = chats[pub].attachments;
-    }
-    chats[pub].send(msg);
-    Gallery.closeAttachmentsPreview();
-    $('#new-msg').val('');
-  });
+  $(".message-form form").off().on('submit', e => onMsgFormSubmit(e, pub));
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
   var msgs = Object.values(chats[pub].messages);
@@ -84,6 +72,47 @@ function showChat(pub) {
   chats[pub].setMyMsgsLastSeenTime();
   Profile.setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
+}
+
+async function onMsgFormSubmit(event, pub) {
+  event.preventDefault();
+  chats[pub].msgDraft = null;
+  var text = $('#new-msg').val();
+  if (!text.length && !chats[pub].attachments) { return; }
+  chats[pub].setTyping(false);
+  var msg = {text};
+  if (chats[pub].attachments) {
+    msg.attachments = chats[pub].attachments;
+  }
+  const myKey = Session.getKey();
+  const shouldWebPush = (pub === myKey.pub) || !(chats[pub].online && chats[pub].online.isOnline);
+  if (shouldWebPush && chats[pub].webPushSubscriptions) {
+    const subscriptions = [];
+    const participants = Object.keys(chats[pub].webPushSubscriptions);
+    for (let i = 0; i < participants.length; i++) {
+      const participant = participants[i];
+      const secret = await chats[pub].getSecret(participant);
+      const myName = Session.getMyName();
+      const titleText = chats[pub].uuid ? chats[pub].name : myName;
+      const bodyText = chats[pub].uuid ? `${myName}: ${text}` : text;
+      const payload = {
+        title: await Gun.SEA.encrypt(titleText, secret),
+        body: await Gun.SEA.encrypt(bodyText, secret),
+        from:{pub: myKey.pub, epub: myKey.epub}
+      };
+      chats[pub].webPushSubscriptions[participant].forEach(s => subscriptions.push({subscription: s, payload}));
+    }
+    fetch(notificationServiceUrl, {
+      method: 'POST',
+      body: JSON.stringify({subscriptions}),
+      headers: {
+        'content-type': 'application/json'
+      }
+    });
+  }
+  chats[pub].send(msg);
+  Gallery.closeAttachmentsPreview();
+  $('#new-msg').val('');
 }
 
 var sortChatsByLatest = _.throttle(() => {
@@ -155,6 +184,7 @@ function getMsgElement(msg, chatId, isPublic) {
     } else {
       var profile = chats[chatId].participantProfiles[msg.info.from];
       name = profile && profile.name;
+      color = profile && profile.color;
     }
     if (name) {
       var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color}).addClass('msgSenderName');
@@ -336,7 +366,7 @@ function addChat(channel) {
       chats[pub].name = name;
     }
     if (pub === Session.getKey().pub) {
-      el.find('.name').html("📝<b>" + t('note_to_self') + "</b>");
+      el.find('.name').html("📝 <b>" + t('note_to_self') + "</b>");
     } else {
       el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
     }
@@ -408,6 +438,15 @@ function addChat(channel) {
   } else {
     gun.user(pub).get('profile').get('name').on(setName);
     gun.user(pub).get('profile').get('about').on(setAbout);
+  }
+  if (chats[pub].put) {
+    chats[pub].onTheir('webPushSubscriptions', (s, k, from) => {
+      if (!Array.isArray(s)) { return; }
+      chats[pub].webPushSubscriptions = chats[pub].webPushSubscriptions || {};
+      chats[pub].webPushSubscriptions[from || pub] = s;
+    });
+    const arr = Object.values(Notifications.webPushSubscriptions);
+    setTimeout(() => chats[pub].put('webPushSubscriptions', arr), 5000);
   }
   chats[pub].onTheir('call', call => VideoCall.onCallMessage(pub, call));
 }

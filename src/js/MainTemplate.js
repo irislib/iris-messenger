@@ -181,6 +181,11 @@ export default `
       <h3><%= language %></h3>
       <p><select class="language-selector"></select></p>
       <hr/>
+      <h3>Notifications</h3>
+      <p>Web push subscriptions</p>
+      <div id="web-push-subscriptions" class="flex-table"></div>
+
+      <hr/>
       <h3><%= peers %></h3>
       <div id="peers" class="flex-table">
         <div class="flex-row" id="add-peer-row">
@@ -216,7 +221,7 @@ export default `
         <li><b>Available</b>: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.</li>
       </ul>
       <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-      <p><small>Version 1.3.1</small></p>
+      <p><small>Version 1.3.2</small></p>
 
       <div id="desktop-application-about">
         <h4>Get the desktop application</h4>
