@@ -332,7 +332,7 @@ function removeProfilePhotoClicked() {
 }
 
 function renderInviteLinks(pub) {
-  if (!chats[pub] && chats[pub].inviteLinks) { return; }
+  if (!(chats[pub] && chats[pub].inviteLinks)) { return; }
   $('#profile-invite-links').empty();
   Object.values(chats[pub].inviteLinks).forEach(url => {
     const row = $('<div>').addClass('flex-row');

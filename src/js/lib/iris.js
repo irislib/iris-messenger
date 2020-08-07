@@ -8283,7 +8283,7 @@
 	        }
 	        if (subscribe) {
 	          _this17.gun.user(link.sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId) {
-	            if (!encPub) {
+	            if (!encPub || typeof encPub !== 'string' || encPub.length < 10) {
 	              return;
 	            }
 	            var s = _JSON$stringify(encPub);
