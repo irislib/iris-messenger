@@ -274,7 +274,6 @@ export default `
           <div id="profile-add-participant" style="display:none;">
             <p><%= add_participant %>:</p>
             <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="<%= new_participants_chat_link %>"></p>
-            <p><small>Currently you need to add each member here. After that, they can join using the group link ("copy link" below). "Join links" upcoming!</small></p>
           </div>
           <hr>
           <p><%= invite_links %></p>
