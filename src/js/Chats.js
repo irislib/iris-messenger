@@ -512,7 +512,7 @@ function lastSeenTimeChanged(pub) {
   }
 }
 
-function createGroupClicked(e) {
+function createGroupSubmit(e) {
   e.preventDefault();
   if ($('#new-group-name').val().length) {
     var c = new iris.Channel({
@@ -562,7 +562,7 @@ function init() {
   $(window).resize(onWindowResize);
   $('.chat-item.new').click(showNewChat);
   $('#paste-chat-link').on('input', onPasteChatLink);
-  $('#new-group-create').click(createGroupClicked);
+  $('#new-group-form').submit(createGroupSubmit);
   $('#scan-chatlink-qr-btn').click(scanChatLinkQr);
 }
 

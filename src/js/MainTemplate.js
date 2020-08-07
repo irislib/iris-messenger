@@ -116,8 +116,10 @@ export default `
       <p><small><%= beware_of_sharing_chat_link_publicly %></small></p>
       <h3><%= new_group %></h3>
       <p>
-        <input id="new-group-name" type="text" placeholder="<%= group_name %>">
-        <button id="new-group-create"><%= create %></button>
+        <form id="new-group-form">
+          <input id="new-group-name" type="text" placeholder="<%= group_name %>">
+          <button type="submit"><%= create %></button>
+        </form>
       </p>
       <hr/>
       <h3><%= your_chat_links %></h3>
