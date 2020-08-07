@@ -58,6 +58,10 @@ const Settings = () => html`
     <h3>${t('language')}</h3>
     <p><select class="language-selector"></select></p>
     <hr/>
+    <h3>Notifications</h3>
+    <p>Web push subscriptions</p>
+    <div id="web-push-subscriptions" class="flex-table"></div>
+    <hr/>
     <h3>${t('peers')}</h3>
     <div id="peers" class="flex-table">
       <div class="flex-row" id="add-peer-row">
@@ -89,7 +93,7 @@ const Settings = () => html`
       <li><b>Available</b>: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.</li>
     </ul>
     <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-    <p><small>Version 1.2.9</small></p>
+    <p><small>Version 1.3.2</small></p>
 
     <div id="desktop-application-about">
       <h4>Get the desktop application</h4>
@@ -129,7 +133,7 @@ const LogoutConfirmation = () => html`<div class="main-view" id="logout-confirma
 
 function render() {
   resetView();
-  $('#header-content').text('Settings');
+  $('#header-content').text(t('settings'));
   $('#settings').show();
   var el = $('#profile-photo-settings');
   $('#profile-photo-chapter').after(el);

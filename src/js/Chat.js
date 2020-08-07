@@ -10,8 +10,9 @@ import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
 
-var chats = window.chats = {};
-var autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
+const chats = window.chats = {};
+const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
+const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
 
 const submitButton = html`
   <button type="submit">
@@ -94,8 +95,10 @@ const NewChat = () => html`
     <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_chat_link_publicly') }}></small></p>
     <h3>${t('new_group')}</h3>
     <p>
-      <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
-      <button id="new-group-create">${t('create')}</button>
+      <form id="new-group-form">
+        <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
+        <button type="submit">${t('create')}</button>
+      </form>
     </p>
     <hr/>
     <h3>${t('your_chat_links')}</h3>
@@ -115,6 +118,8 @@ function showChat(pub) {
   var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
   chatListEl.toggleClass('active', true);
   chatListEl.find('.unseen').empty().hide();
+  $("#message-list").empty();
+  $("#message-view").toggleClass('public-messages-view', pub === 'public');
   $("#message-view").show();
   $(".message-form").show();
   if (!iris.util.isMobile) {
@@ -134,20 +139,7 @@ function showChat(pub) {
     isTyping = getIsTyping();
     chats[pub].msgDraft = $('#new-msg').val();
   });
-  $(".message-form form").off().on('submit', event => {
-    event.preventDefault();
-    chats[pub].msgDraft = null;
-    var text = $('#new-msg').val();
-    if (!text.length && !chats[pub].attachments) { return; }
-    chats[pub].setTyping(false);
-    var msg = {text};
-    if (chats[pub].attachments) {
-      msg.attachments = chats[pub].attachments;
-    }
-    chats[pub].send(msg);
-    Gallery.closeAttachmentsPreview();
-    $('#new-msg').val('');
-  });
+  $(".message-form form").off().on('submit', e => onMsgFormSubmit(e, pub));
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
   var msgs = Object.values(chats[pub].messages);
@@ -174,8 +166,49 @@ function showChat(pub) {
   setDeliveredCheckmarks(pub);
 }
 
+async function onMsgFormSubmit(event, pub) {
+  event.preventDefault();
+  chats[pub].msgDraft = null;
+  var text = $('#new-msg').val();
+  if (!text.length && !chats[pub].attachments) { return; }
+  chats[pub].setTyping(false);
+  var msg = {text};
+  if (chats[pub].attachments) {
+    msg.attachments = chats[pub].attachments;
+  }
+  const myKey = Session.getKey();
+  const shouldWebPush = (pub === myKey.pub) || !(chats[pub].online && chats[pub].online.isOnline);
+  if (shouldWebPush && chats[pub].webPushSubscriptions) {
+    const subscriptions = [];
+    const participants = Object.keys(chats[pub].webPushSubscriptions);
+    for (let i = 0; i < participants.length; i++) {
+      const participant = participants[i];
+      const secret = await chats[pub].getSecret(participant);
+      const myName = Session.getMyName();
+      const titleText = chats[pub].uuid ? chats[pub].name : myName;
+      const bodyText = chats[pub].uuid ? `${myName}: ${text}` : text;
+      const payload = {
+        title: await Gun.SEA.encrypt(titleText, secret),
+        body: await Gun.SEA.encrypt(bodyText, secret),
+        from:{pub: myKey.pub, epub: myKey.epub}
+      };
+      chats[pub].webPushSubscriptions[participant].forEach(s => subscriptions.push({subscription: s, payload}));
+    }
+    fetch(notificationServiceUrl, {
+      method: 'POST',
+      body: JSON.stringify({subscriptions}),
+      headers: {
+        'content-type': 'application/json'
+      }
+    });
+  }
+  chats[pub].send(msg);
+  Gallery.closeAttachmentsPreview();
+  $('#new-msg').val('');
+}
+
 var sortChatsByLatest = _.throttle(() => {
-  var sorted = $(".chat-item:not(.new)").sort((a, b) => {
+  var sorted = $(".chat-item:not(.new):not(.public-messages)").sort((a, b) => {
     return ($(b).data('latestTime') || -Infinity) - ($(a).data('latestTime') || -Infinity);
   });
   $(".chat-list").append(sorted);
@@ -186,21 +219,21 @@ function sortMessagesByTime() {
   $("#message-list").append(sorted);
   $('.day-separator').remove();
   $('.from-separator').remove();
-
 }
 
 const seenIndicator = html`<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
 
 const Message = (props) => {
   const [innerHTML, setInnerHTML] = useState('');
-  let name;
+  let name, color;
+  // TODO: public messages
   if (chats[props.chatId].uuid && !props.info.selfAuthored) {
     const profile = chats[props.chatId].participantProfiles[props.info.from];
     name = profile && profile.name;
-    /*if (name) {
-      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color: profile.color}).addClass('msgSenderName');
-      msgContent.prepend(nameEl);
-    }*/
+    color = profile && profile.color;
+    if (name) {
+      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color}).addClass('msgSenderName');
+    }
   }
   const emojiOnly = props.text.length === 2 && Helpers.isEmoji(props.text);
   useEffect(() => {
@@ -222,7 +255,7 @@ const Message = (props) => {
   return innerHTML && html`
     <div class="msg ${props.selfAuthored ? 'our' : 'their'}">
       <div class="msg-content">
-        ${name && html`<small onclick=${() => addMention(name)}>${name}</small>`}
+        ${name && html`<small onclick=${() => addMention(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
         ${props.attachments && props.attachments.map(a =>
           html`<img src=${a.data} onclick=${e => { Gallery.openAttachmentsGallery(props, e); }}/>` // escape a.data
         )}
@@ -241,8 +274,10 @@ function addMessage(msg, chatId) {
   render(html`<${Message} ...${msg} chatId=${chatId}/>`, container[0]);
   const msgEl = container.children().first();
   msgEl.find('img').one('load', Helpers.scrollToMessageListBottom);
-  msgEl.data('time', msg.time);
-  msgEl.data('from', msg.info.from);
+  //msgEl.data('time', date);
+  msgEl.data('from', (msg.info && msg.info.from) || chatId);
+  msgEl.toggleClass('our', msg.selfAuthored ? true : false);
+  msgEl.toggleClass('their', msg.selfAuthored ? false : true);
   $("#message-list").append(msgEl);
 }
 
@@ -326,10 +361,12 @@ function addChat(channel) {
       if (chats[pub].latest.time === msg.time && Session.areWeOnline) {
         chats[pub].setMyMsgsLastSeenTime();
       }
-      if (chats[pub].theirLastSeenTime) {
-        $('#not-seen-by-them').slideUp();
-      } else if (!chats[pub].uuid) {
-        $('#not-seen-by-them').slideDown();
+      if (pub !== 'public') {
+        if (chats[pub].theirLastSeenTime) {
+          $('#not-seen-by-them').slideUp();
+        } else if (!chats[pub].uuid) {
+          $('#not-seen-by-them').slideDown();
+        }
       }
       Helpers.scrollToMessageListBottom();
     }
@@ -401,7 +438,7 @@ function addChat(channel) {
       chatNode.get('name').put(name);
     }
     if (pub === Session.getKey().pub) {
-      el.find('.name').html("📝<b>" + t('note_to_self') + "</b>");
+      el.find('.name').html("📝 <b>" + t('note_to_self') + "</b>");
     } else {
       el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
     }
@@ -462,9 +499,26 @@ function addChat(channel) {
       }
     });
     var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    chats[pub].inviteLinks = {};
+    chats[pub].getChatLinks({callback: ({url, id}) => {
+      console.log('received chat link', id, url);
+      chats[pub].inviteLinks[id] = url;
+      if (pub === activeProfile) {
+        Profile.renderInviteLinks(pub);
+      }
+    }});
   } else {
     publicState.user(pub).get('profile').get('name').on(setName);
     publicState.user(pub).get('profile').get('about').on(setAbout);
+  }
+  if (chats[pub].put) {
+    chats[pub].onTheir('webPushSubscriptions', (s, k, from) => {
+      if (!Array.isArray(s)) { return; }
+      chats[pub].webPushSubscriptions = chats[pub].webPushSubscriptions || {};
+      chats[pub].webPushSubscriptions[from || pub] = s;
+    });
+    const arr = Object.values(Notifications.webPushSubscriptions);
+    setTimeout(() => chats[pub].put('webPushSubscriptions', arr), 5000);
   }
   chats[pub].onTheir('call', call => VideoCall.onCallMessage(pub, call));
   localState.get('chats').get(pub).put({enabled:true});
@@ -513,7 +567,7 @@ function showNewChat() {
 function lastSeenTimeChanged(pub) {
   setLatestSeen(pub);
   setDeliveredCheckmarks(pub);
-  if (pub === activeChat) {
+  if (pub !== 'public' && pub === activeChat) {
     if (chats[pub].theirLastSeenTime) {
       $('#not-seen-by-them').slideUp();
       $('.msg.our:not(.seen)').each(function() {
@@ -531,7 +585,7 @@ function lastSeenTimeChanged(pub) {
   }
 }
 
-function createGroupClicked(e) {
+function createGroupSubmit(e) {
   e.preventDefault();
   if ($('#new-group-name').val().length) {
     var c = new iris.Channel({
@@ -581,7 +635,7 @@ function init() {
   $(window).resize(onWindowResize);
   $('.chat-item.new').click(showNewChat);
   $('#paste-chat-link').on('input', onPasteChatLink);
-  $('#new-group-create').click(createGroupClicked);
+  $('#new-group-form').submit(createGroupSubmit);
   $('#scan-chatlink-qr-btn').click(scanChatLinkQr);
 }
 

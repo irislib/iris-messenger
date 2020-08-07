@@ -166,9 +166,42 @@ header #header-content {
   max-width: 100%;
 }
 
+.flex-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-table .flex-row {
+  font-size: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.flex-table .flex-row:nth-child(odd) {
+  background-color: var(--zebra-stripe-bg);
+}
+
+.flex-table .flex-cell {
+  padding: 10px;
+  overflow-wrap: break-word;
+  flex: 1 1 auto;
+  min-width: 0;
+  word-break: break-all;
+}
+
+.flex-table .flex-cell.no-flex {
+  flex: none;
+}
+
 @media (max-width: 575px) {
   header #header-content {
     max-width: calc(100% - 35px);
+  }
+
+  .flex-table .flex-row {
+    flex-direction: column;
   }
 }
 
@@ -212,6 +245,20 @@ header #back-button {
   max-height: 250px;
   max-width: 100%;
   cursor: pointer;
+}
+
+.public-messages-view .msg.our {
+  align-items: flex-start;
+}
+
+.public-messages-view .msg.our .msg-content .seen-indicator {
+  display: none;
+}
+
+.public-messages-view .msg.our .msg-content {
+  max-width: none;
+  border-radius: 8px !important;
+  width: 100%;
 }
 
 .emoji {
@@ -323,34 +370,6 @@ header #back-button {
   margin-top: 0;
 }
 
-.flex-table {
-  display: flex;
-  flex-direction: column;
-}
-
-.flex-table .flex-row {
-  font-size: 12px;
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.flex-table .flex-row:nth-child(odd) {
-  background-color: var(--zebra-stripe-bg);
-}
-
-.flex-table .flex-cell {
-  padding: 10px;
-  overflow-wrap: break-word;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.flex-table .flex-cell.no-flex {
-  flex: none;
-}
-
 #login {
   padding: 15px;
   display: flex;
@@ -370,10 +389,6 @@ header #back-button {
 }
 
 #login a:hover {
-  color: white;
-}
-
-#login select {
   color: white;
 }
 
@@ -589,9 +604,15 @@ small {
   background: var(--chat-hover);
 }
 
-.chat-item.new {
+.chat-item.new, .chat-item.public-messages {
   align-items: center;
+}
+
+.chat-item.new {
   border-bottom: 1px solid var(--chat-hover);
+}
+
+.chat-item.public-messages {
 }
 
 .chat-item.new svg {

@@ -2,11 +2,11 @@
 <html>
 
 <head>
-  <title>Iris Messenger</title>
+  <title>Iris</title>
   <meta charset="utf-8">
   <meta name="description" content="Social Networking Freedom">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta property="og:title" content="Iris Messenger" />
+  <meta property="og:title" content="Iris" />
   <meta property="og:description" content="Encrypted P2P Messaging" />
   <meta property="og:url" content="https://iris.to" />
   <meta property="og:image" content="https://iris.to/img/cover.jpg" />
@@ -28,23 +28,6 @@
   <link rel="stylesheet" href="./css/light.css" media="(prefers-color-scheme: no-preference), (prefers-color-scheme: light)">
   <!-- The main stylesheet -->
   <link rel="stylesheet" type="text/css" href="./css/style.css">
-
-  <script>
-    var userAgent = navigator.userAgent.toLowerCase();
-    var isElectron = (userAgent.indexOf(' electron/') > -1);
-    if (!isElectron && ('serviceWorker' in navigator)) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('serviceworker.js')
-        .then(function(registration) {
-          // console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        })
-        .catch(function(err) {
-          // registration failed :(
-          console.log('ServiceWorker registration failed: ', err);
-        });
-      });
-    }
-  </script>
 </head>
 
 <body>

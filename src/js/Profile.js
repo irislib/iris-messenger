@@ -4,6 +4,7 @@ import {localState, publicState, resetView, activeChat, activeProfile} from './M
 import {chats, deleteChat, showChat} from './Chat.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
+import PublicMessages from './PublicMessages.js';
 //import VideoCall from './VideoCall.js';
 
 const Profile = () => html`<div class="main-view" id="profile">
@@ -17,8 +18,11 @@ const Profile = () => html`<div class="main-view" id="profile">
       <div id="profile-add-participant" style="display:none;">
         <p>${t('add_participant')}:</p>
         <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_chat_link')}"/></p>
-        <p><small>Currently you need to add each member here. After that, they can join using the group link ("copy link" below). "Join links" upcoming!</small></p>
       </div>
+      <hr/>
+      <p>${t('invite_links')}</p>
+      <div id="profile-invite-links" class="flex-table"></div>
+      <p><button id="profile-create-invite-link">Create new invite link</button></p>
       <hr/>
     </div>
     <div class="profile-about" style="display:none">
@@ -64,6 +68,11 @@ const Profile = () => html`<div class="main-view" id="profile">
       <button class="delete-chat">${t('delete_chat')}</button>
       <!-- <button class="block-user">${t('block_user')}</button> -->
     </p>
+    <div id="profile-public-messages">
+      <hr/>
+      <h3>${t('public_messages')}</h3>
+      <div id="profile-public-message-list" class="public-messages-view"></div>
+    </div>
   </div>
 </div>`;
 
@@ -74,7 +83,7 @@ function renderGroupParticipants(pub) {
   } else {
     $('#profile-group-settings').show();
   }
-  $('#profile-group-participants').empty();
+  $('#profile-group-participants').empty().show();
   var keys = Object.keys(chats[pub].participantProfiles);
   var me = chats[pub].participantProfiles[Session.getKey().pub];
   if (me && me.permissions) {
@@ -97,7 +106,9 @@ function renderGroupParticipants(pub) {
     if (profile.permissions && profile.permissions.admin) {
       el.append($('<small>').text(t('admin')).css({'margin-left': 5}));
     }
-    el.click(() => showProfile(k));
+    el.click(() => {
+      k === Session.getKey().pub ? $(".user-info").click() : showProfile(k);
+    });
     $('#profile-group-participants').append(el);
   });
 }
@@ -119,18 +130,22 @@ function addUserToHeader(pub) {
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (pub === Session.getKey().pub && activeProfile !== pub) {
-    nameEl.html("📝<b>" + t('note_to_self') + "</b>");
+    nameEl.html("📝 <b>" + t('note_to_self') + "</b>");
   } else if (chats[pub]) {
     nameEl.text(getDisplayName(pub));
   }
   nameEl.show();
 
-  var identicon = Helpers.getIdenticon(pub, 40);
-  var img = identicon.children('img').first();
-  img.attr('height', 40).attr('width', 40);
-  $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
+  if (pub !== 'public') {
+    var identicon = Helpers.getIdenticon(pub, 40);
+    var img = identicon.children('img').first();
+    img.attr('height', 40).attr('width', 40);
+    $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
+  }
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
+  textEl.append($('<small>').addClass('last-seen'));
+  textEl.append($('<small>').addClass('typing-indicator').text(t('typing')));
   if (chats[pub] && chats[pub].uuid) {
     var text = Object.keys(chats[pub].participantProfiles).map(p => chats[pub].participantProfiles[p].name).join(', ');
     var namesEl = $('<small>').addClass('participants').text(text);
@@ -176,6 +191,12 @@ function setTheirOnlineStatus(pub) {
   }
 }
 
+function onPublicMessage(msg, info) {
+  if (activeProfile !== info.from) { return; }
+  const msgEl = getMsgElement(msg, info.from, true);
+  $('#profile-public-message-list').prepend(msgEl);
+}
+
 function showProfile(pub) {
   if (!pub) {
     return;
@@ -190,12 +211,18 @@ function showProfile(pub) {
   addUserToHeader(pub);
   setTheirOnlineStatus(pub);
   renderGroupParticipants(pub);
+  renderInviteLinks(pub);
   if (chats[pub] && !chats[pub].uuid) {
+    $('#profile-public-message-list').empty();
+    $('#profile-public-messages').show();
     $('#profile .profile-photo').show();
     publicState.user(pub).get('profile').get('photo').on(photo => {
       $('#profile .profile-photo-container').show();
       Helpers.setImgSrc($('#profile .profile-photo'), photo);
     });
+    PublicMessages.getMessages(onPublicMessage, pub);
+  } else {
+    $('#profile-public-messages').hide();
   }
   $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
   $('#profile .profile-about-content').empty();
@@ -291,9 +318,12 @@ function onProfileAddParticipantInput(event) {
 }
 
 function renderGroupPhotoSettings(uuid) {
-  var me = chats[uuid].participantProfiles[Session.getKey().pub];
-  var isAdmin = !!(me && me.permissions && me.permissions.admin);
-  $('#profile-group-settings').toggle(isAdmin);
+  const me = chats[uuid].participantProfiles[Session.getKey().pub];
+  const isAdmin = !!(me && me.permissions && me.permissions.admin);
+  if (me && me.permissions) {
+    $('#profile-add-participant').toggle(isAdmin);
+    $('#profile-group-name-container').toggle(isAdmin);
+  }
   $('#current-profile-photo').toggle(!!chats[uuid].photo);
   $('#profile .profile-photo').toggle(!!chats[uuid].photo);
   if (isAdmin) {
@@ -376,7 +406,49 @@ function removeProfilePhotoClicked() {
   renderProfilePhotoSettings();
 }
 
+function areWeAdmin(uuid) {
+  const me = chats[uuid].participantProfiles[Session.getKey().pub];
+  return !!(me && me.permissions && me.permissions.admin);
+}
+
+function renderInviteLinks(pub) {
+  if (!(chats[pub] && chats[pub].inviteLinks)) { return; }
+  const isAdmin = areWeAdmin(pub);
+  $('#profile-create-invite-link').toggle(isAdmin);
+  $('#profile-invite-links').empty();
+  Object.values(chats[pub].inviteLinks).forEach(url => {
+    const row = $('<div>').addClass('flex-row');
+    const copyBtn = $('<button>').text(t('copy')).width(100);
+    copyBtn.on('click', event => {
+      Helpers.copyToClipboard(url);
+      var target = $(event.target);
+      var originalText = target.text();
+      target.text(t('copied'));
+      setTimeout(() => {
+        t.text(originalText);
+      }, 2000);
+    });
+    const copyDiv = $('<div>').addClass('flex-cell no-flex').append(copyBtn);
+    row.append(copyDiv);
+    const input = $('<input>').attr('type', 'text').val(url);
+    input.on('click', () => input.select());
+    row.append($('<div>').addClass('flex-cell').append(input));
+    if (isAdmin) {
+      const removeBtn = $('<button>').text(t('remove'));
+      row.append($('<div>').addClass('flex-cell no-flex').append(removeBtn));
+    }
+    $('#profile-invite-links').append(row);
+  });
+}
+
+function onCreateInviteLink() {
+  console.log(4);
+  if (!chats[activeProfile]) { return; }
+  chats[activeProfile].createChatLink();
+}
+
 function init() {
+  $('#profile-create-invite-link').click(onCreateInviteLink);
   $('#profile-add-participant').on('input', onProfileAddParticipantInput);
   $('#current-profile-photo, #add-profile-photo').click(() => $('#profile-photo-input').click());
   $('#profile-photo-input').change(renderProfilePhotoSettings);
@@ -388,4 +460,4 @@ function init() {
   $('#remove-profile-photo').click(removeProfilePhotoClicked);
 }
 
-export default {Profile, init, showProfile, setTheirOnlineStatus, addUserToHeader, getDisplayName, renderGroupParticipants};
+export default {Profile, init, showProfile, setTheirOnlineStatus, addUserToHeader, getDisplayName, renderGroupParticipants, renderInviteLinks};

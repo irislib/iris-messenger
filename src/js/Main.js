@@ -6,9 +6,22 @@ import Gallery from './Gallery.js';
 import Session from './Session.js';
 import Settings, {LogoutConfirmation, init as initSettings} from './Settings.js';
 import ChatView, {NewChat, chats, init as initChat} from './Chat.js';
+import PublicMessages from './PublicMessages.js';
 import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
+
+const userAgent = navigator.userAgent.toLowerCase();
+const isElectron = (userAgent.indexOf(' electron/') > -1);
+if (!isElectron && ('serviceWorker' in navigator)) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('serviceworker.js')
+    .catch(function(err) {
+      // registration failed :(
+      console.log('ServiceWorker registration failed: ', err);
+    });
+  });
+}
 
 Gun.log.off = true;
 var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity };
@@ -58,6 +71,7 @@ initChat();
 Translation.init();
 Profile.init();
 VideoCall.init();
+PublicMessages.init();
 
 $(window).load(() => {
   $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
