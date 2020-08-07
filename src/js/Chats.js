@@ -430,7 +430,7 @@ function addChat(channel) {
     chats[pub].inviteLinks = {};
     chats[pub].getChatLinks({callback: ({url, id}) => {
       console.log('received chat link', id, url);
-      chats[pub].inviteLinks[id] = url;
+      chats[pub].inviteLinks[id] = url;
       if (pub === activeProfile) {
         Profile.renderInviteLinks(pub);
       }

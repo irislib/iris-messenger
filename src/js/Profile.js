@@ -36,7 +36,9 @@ function renderGroupParticipants(pub) {
     if (profile.permissions && profile.permissions.admin) {
       el.append($('<small>').text(translate('admin')).css({'margin-left': 5}));
     }
-    el.click(() => showProfile(k));
+    el.click(() => {
+      k === Session.getKey().pub ? $(".user-info").click() : showProfile(k);
+    });
     $('#profile-group-participants').append(el);
   });
 }
