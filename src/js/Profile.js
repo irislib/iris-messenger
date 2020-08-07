@@ -296,6 +296,7 @@ function renderProfilePhotoSettings() {
     if (!$('#current-profile-photo').attr('src')) {
       $('#add-profile-photo').show();
     }
+    $('#current-profile-photo').show();
     Helpers.setImgSrc($('#profile-photo-preview'), '');
     $('#profile-photo-preview').toggleClass('hidden', true);
     $('#cancel-profile-photo').toggleClass('hidden', true);
