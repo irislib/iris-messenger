@@ -7546,7 +7546,6 @@
 	            var encryptedChatRequest = await Gun.SEA.encrypt(_this2.key.pub, sharedSecret); // TODO encrypt is not deterministic, it uses salt
 	            var channelRequestId = await util.getHash(encryptedChatRequest);
 	            util.gunAsAnotherUser(_this2.gun, sharedKey, function (user) {
-	              console.log(9090, 'adding chatRequest');
 	              user.get('chatRequests').get(channelRequestId.slice(0, 12)).put(encryptedChatRequest);
 	            });
 	          });
@@ -8266,15 +8265,12 @@
 	      throw new Error('Only group channels may have chat links');
 	    }
 	    var chatLinks = [];
-	    console.log(111, 'subscribe', subscribe);
 	    this.on('chatLinks', function (links, from) {
-	      console.log(222, links);
 	      // TODO: check admin permissions
 	      if (!links || (typeof links === 'undefined' ? 'undefined' : _typeof(links)) !== 'object') {
 	        return;
 	      }
 	      _Object$keys(links).forEach(function (linkId) {
-	        console.log(333, linkId);
 	        var link = links[linkId];
 	        if (chatLinks.indexOf(linkId) !== -1) {
 	          return;
@@ -8286,16 +8282,12 @@
 	          callback({ url: url, id: linkId });
 	        }
 	        if (subscribe) {
-	          console.log('subscribing to link', link);
 	          _this17.gun.user(link.sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId) {
-	            console.log(555, 'got join request');
-	            console.log('encpub', encPub);
 	            if (!encPub) {
 	              return;
 	            }
 	            var s = _JSON$stringify(encPub);
 	            if (channels.indexOf(s) === -1) {
-	              console.log(666);
 	              channels.push(s);
 	              var pub = await Gun.SEA.decrypt(encPub, link.sharedSecret);
 	              _this17.addParticipant(pub);
