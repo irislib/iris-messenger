@@ -13,7 +13,7 @@ function renderGroupParticipants(pub) {
   } else {
     $('#profile-group-settings').show();
   }
-  $('#profile-group-participants').empty();
+  $('#profile-group-participants').empty().show();
   var keys = Object.keys(chats[pub].participantProfiles);
   var me = chats[pub].participantProfiles[Session.getKey().pub];
   if (me && me.permissions) {
@@ -248,9 +248,12 @@ function onProfileAddParticipantInput(event) {
 }
 
 function renderGroupPhotoSettings(uuid) {
-  var me = chats[uuid].participantProfiles[Session.getKey().pub];
-  var isAdmin = !!(me && me.permissions && me.permissions.admin);
-  $('#profile-group-settings').toggle(isAdmin);
+  const me = chats[uuid].participantProfiles[Session.getKey().pub];
+  const isAdmin = !!(me && me.permissions && me.permissions.admin);
+  if (me && me.permissions) {
+    $('#profile-add-participant').toggle(isAdmin);
+    $('#profile-group-name-container').toggle(isAdmin);
+  }
   $('#current-profile-photo').toggle(!!chats[uuid].photo);
   $('#profile .profile-photo').toggle(!!chats[uuid].photo);
   if (isAdmin) {
@@ -334,8 +337,15 @@ function removeProfilePhotoClicked() {
   renderProfilePhotoSettings();
 }
 
+function areWeAdmin(uuid) {
+  const me = chats[uuid].participantProfiles[Session.getKey().pub];
+  return !!(me && me.permissions && me.permissions.admin);
+}
+
 function renderInviteLinks(pub) {
   if (!(chats[pub] && chats[pub].inviteLinks)) { return; }
+  const isAdmin = areWeAdmin(pub);
+  $('#profile-create-invite-link').toggle(isAdmin);
   $('#profile-invite-links').empty();
   Object.values(chats[pub].inviteLinks).forEach(url => {
     const row = $('<div>').addClass('flex-row');
@@ -354,8 +364,10 @@ function renderInviteLinks(pub) {
     const input = $('<input>').attr('type', 'text').val(url);
     input.on('click', () => input.select());
     row.append($('<div>').addClass('flex-cell').append(input));
-    const removeBtn = $('<button>').text(translate('remove'));
-    row.append($('<div>').addClass('flex-cell no-flex').append(removeBtn));
+    if (isAdmin) {
+      const removeBtn = $('<button>').text(translate('remove'));
+      row.append($('<div>').addClass('flex-cell no-flex').append(removeBtn));
+    }
     $('#profile-invite-links').append(row);
   });
 }

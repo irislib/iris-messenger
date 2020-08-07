@@ -65,7 +65,7 @@ export default {
     donate: "Donate",
     donate_info: "<b>Donations</b> help keep the project going and are very much appreciated. You can donate via <a href=\"https://opencollective.com/iris-social\">Open Collective</a> or <b>bitcoin</b>",
     logout_confirmation_info: "You <b>cannot log in again</b> unless you have saved a copy of your private key.",
-    participants: "participants",
+    participants: "Participants",
     admin: "admin",
     add_participant: "Add participant",
     new_participants_chat_link: "New participant's chat link",
