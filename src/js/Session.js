@@ -224,9 +224,11 @@ function init() {
     if (reg) {
       reg.active.postMessage({key: null});
       const sub = await reg.pushManager.getSubscription();
-      const hash = await iris.util.getHash(JSON.stringify(sub));
-      Notifications.removeSubscription(hash);
-      sub.unsubscribe && sub.unsubscribe();
+      if (sub) {
+        const hash = await iris.util.getHash(JSON.stringify(sub));
+        Notifications.removeSubscription(hash);
+        sub.unsubscribe && sub.unsubscribe();        
+      }
     }
     _.defer(() => location.reload());
   });
