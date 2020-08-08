@@ -8165,7 +8165,7 @@
 
 	    isTyping = typeof isTyping === 'undefined' ? true : isTyping;
 	    timeout = timeout * 1000;
-	    this.put('typing', isTyping ? new Date().toISOString() : false);
+	    this.put('typing', isTyping ? new Date().toISOString() : new Date(0).toISOString());
 	    clearTimeout(this.setTypingTimeout);
 	    this.setTypingTimeout = setTimeout(function () {
 	      return _this15.put('typing', false);
