@@ -19,7 +19,7 @@ const Login = () => html`<section id="login" class="hidden">
     <form id="login-form" autocomplete="off">
       <div id="create-account">
         <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris"/>
-        <h1>${tr('iris_messenger')}</h1>
+        <h1>Iris</h1>
         <input autofocus autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${tr('whats_your_name')}"/>
         <p><button id="sign-up" type="submit">${tr('new_user_go')}</button></p>
         <br/>
