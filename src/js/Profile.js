@@ -458,4 +458,4 @@ function init() {
   $('#remove-profile-photo').click(removeProfilePhotoClicked);
 }
 
-export default {Profile, init, showProfile, setTheirOnlineStatus, addUserToHeader, getDisplayName, renderGroupParticipants, renderInviteLinks};
+export default {Profile, init, showProfile, setTheirOnlineStatus, addUserToHeader, getDisplayName, renderGroupParticipants, renderInviteLinks, renderGroupPhotoSettings};
