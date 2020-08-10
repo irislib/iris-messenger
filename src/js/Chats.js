@@ -421,6 +421,8 @@ function addChat(channel) {
       }
       if (activeProfile === pub) {
         Profile.renderGroupParticipants(pub);
+        Profile.renderGroupPhotoSettings(pub);
+        Profile.renderInviteLinks(pub);
       }
       if (activeChat === pub) {
         Profile.addUserToHeader(pub);
