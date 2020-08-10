@@ -156,8 +156,6 @@ function addUserToHeader(pub) {
       $('#header-content .identicon-container').append(photo);
     }
   }
-  textEl.append($('<small>').addClass('last-seen'));
-  textEl.append($('<small>').addClass('typing-indicator').text(t('typing')));
   $("#header-content").append(textEl);
   textEl.on('click', () => showProfile(pub));
   /* disabled for now because videochat is broken
