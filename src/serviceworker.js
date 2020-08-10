@@ -56,6 +56,8 @@ function getOpenClient(event) {
 }
 
 self.addEventListener('push', async ev => {
+  const client = await getOpenClient(ev);
+  if (client && client.visibilityState === 'visible') return;
   if (!self.irisKey) {
     await getSavedKey();
   }
