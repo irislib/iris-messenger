@@ -338,7 +338,9 @@ function init() {
 
   $('.logout-button').click(async () => {
     // TODO: remove subscription from your chats
-    localStorage.removeItem('chatKeyPair');
+    localStorage.clear();
+    const dbs = await window.indexedDB.databases();
+    dbs.forEach(db => { window.indexedDB.deleteDatabase(db.name) });
     const reg = await navigator.serviceWorker.getRegistration();
     if (reg) {
       reg.active.postMessage({key: null});
