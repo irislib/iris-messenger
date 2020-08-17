@@ -106,10 +106,69 @@ const NewChat = () => html`
     <div id="my-chat-links" class="flex-table"></div>
   </div>`;
 
+const subscribedToMsgs = {};
+
 function showChat(pub) {
   if (!pub) {
     return;
   }
+
+  if (!subscribedToMsgs[pub]) {
+    subscribedToMsgs[pub] = true;
+    chats[pub].getMessages((msg, info) => {
+      console.log('got msg ', msg);
+      console.log('latest', chats[pub].latest);
+      chats[pub].messages[msg.time] = msg;
+      msg.info = info;
+      msg.selfAuthored = info.selfAuthored;
+      msg.time = new Date(msg.time);
+      if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
+        if (activeChat !== pub || document.visibilityState !== 'visible') {
+          Notifications.changeChatUnseenCount(pub, 1);
+        }
+      }
+      if (!info.selfAuthored && msg.time > chats[pub].theirLastSeenTime) {
+        chats[pub].theirLastSeenTime = msg.time;
+        lastSeenTimeChanged(pub);
+      }
+      if (!chats[pub].localLatest || msg.time > chats[pub].localLatest.time) {
+        localState.get('chats').get(pub).get('latest').get('time').put(msg.time);
+        localState.get('chats').get(pub).get('latest').get('text').put(msg.text);
+        chats[pub].localLatest = msg;
+        var text = msg.text || '';
+        if (msg.attachments) {
+          text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
+        } else {
+          text = msg.text;
+        }
+        if (chats[pub].uuid && !msg.selfAuthored && msg.info.from && chats[pub].participantProfiles[msg.info.from].name) {
+          text = chats[pub].participantProfiles[msg.info.from].name + ': ' + text;
+        }
+        if (info.selfAuthored) {
+          //latestEl.prepend($(seenIndicatorHtml));
+          setLatestSeen(pub);
+          setLatestCheckmark(pub);
+        }
+      }
+      if (activeChat === pub) {
+        addMessage(msg, pub);
+        sortMessagesByTime(); // this is slow if message history is loaded while chat active
+        if (chats[pub].latest.time === msg.time && Session.areWeOnline) {
+          chats[pub].setMyMsgsLastSeenTime();
+        }
+        if (pub !== 'public') {
+          if (chats[pub].theirLastSeenTime) {
+            $('#not-seen-by-them').slideUp();
+          } else if (!chats[pub].uuid) {
+            $('#not-seen-by-them').slideDown();
+          }
+        }
+        Helpers.scrollToMessageListBottom();
+      }
+      Notifications.notifyMsg(msg, info, pub);
+    });
+  }
+
   resetView();
   localState.get('activeChat').put(pub);
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
@@ -314,63 +373,11 @@ function addChat(channel) {
   el.attr('data-pub', pub);
   var latestEl = el.find('.latest');
   var typingIndicator = el.find('.typing-indicator').text(t('typing'));
-  chats[pub].getMessages((msg, info) => {
-    chats[pub].messages[msg.time] = msg;
-    msg.info = info;
-    msg.selfAuthored = info.selfAuthored;
-    msg.time = new Date(msg.time);
-    if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
-      if (activeChat !== pub || document.visibilityState !== 'visible') {
-        Notifications.changeChatUnseenCount(pub, 1);
-      }
+  chats[pub].getLatestMsg && chats[pub].getLatestMsg(latest => {
+    if (latest.time && latest.text) {
+      localState.get('chats').get(pub).get('latestTime').put(latest.time);
+      localState.get('chats').get(pub).get('latestText').put(latest.text);
     }
-    if (!info.selfAuthored && msg.time > chats[pub].theirLastSeenTime) {
-      chats[pub].theirLastSeenTime = msg.time;
-      lastSeenTimeChanged(pub);
-    }
-    if (!chats[pub].latest || msg.time > chats[pub].latest.time) {
-      chatNode.get('latest').get('time').put(msg.time.toISOString());
-      chatNode.get('latest').get('text').put(msg.text);
-      chats[pub].latest = msg;
-      var text = msg.text || '';
-      if (msg.attachments) {
-        text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
-      } else {
-        text = msg.text;
-      }
-      if (chats[pub].uuid && !msg.selfAuthored && msg.info.from && chats[pub].participantProfiles[msg.info.from].name) {
-        text = chats[pub].participantProfiles[msg.info.from].name + ': ' + text;
-      }
-      var latestTimeText = iris.util.getDaySeparatorText(msg.time, msg.time.toLocaleDateString({dateStyle:'short'}));
-      latestTimeText = t(latestTimeText);
-      if (latestTimeText === t('today')) { latestTimeText = iris.util.formatTime(msg.time); }
-      latestEl.text(text);
-      latestEl.html(Helpers.highlightEmoji(latestEl.html()));
-      if (info.selfAuthored) {
-        //latestEl.prepend($(seenIndicatorHtml));
-        setLatestSeen(pub);
-        setLatestCheckmark(pub);
-      }
-      el.find('.latest-time').text(latestTimeText);
-      el.data('latestTime', msg.time);
-      sortChatsByLatest();
-    }
-    if (activeChat === pub) {
-      addMessage(msg, pub);
-      sortMessagesByTime(); // this is slow if message history is loaded while chat active
-      if (chats[pub].latest.time === msg.time && Session.areWeOnline) {
-        chats[pub].setMyMsgsLastSeenTime();
-      }
-      if (pub !== 'public') {
-        if (chats[pub].theirLastSeenTime) {
-          $('#not-seen-by-them').slideUp();
-        } else if (!chats[pub].uuid) {
-          $('#not-seen-by-them').slideDown();
-        }
-      }
-      Helpers.scrollToMessageListBottom();
-    }
-    Notifications.notifyMsg(msg, info, pub);
   });
   Notifications.changeChatUnseenCount(pub, 0);
   chats[pub].messages = chats[pub].messages || [];
