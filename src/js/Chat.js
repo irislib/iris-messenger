@@ -38,16 +38,17 @@ class ChatView extends Component {
   }
 
   componentDidMount() {
-    localState.get('activeChat').on(activeChat => {
+    localState.get('activeChat').on(activeChatId => {
       this.setState({});
-      if (activeChat && !subscribedToMsgs[activeChat]) {
+      if (activeChatId && !subscribedToMsgs[activeChatId]) {
         const iv = setInterval(() => {
-          if (chats[activeChat]) {
+          if (chats[activeChatId]) {
             clearInterval(iv);
-            this.subscribeToMsgs(activeChat);
+            this.subscribeToMsgs(activeChatId);
+            this.setState({});
           }
         }, 1000);
-        subscribedToMsgs[activeChat] = true;
+        subscribedToMsgs[activeChatId] = true;
       }
     });
   }
@@ -58,10 +59,11 @@ class ChatView extends Component {
       console.log('got msg ', msg);
       console.log('latest', chats[pub].latest);
       if (chats[pub].messageIds[msg.time + info.from]) return;
-      chats[pub].messageIds[msg.time + info.from] = msg;
       msg.info = info;
       msg.selfAuthored = info.selfAuthored;
+      msg.timeStr = msg.time;
       msg.time = new Date(msg.time);
+      chats[pub].messageIds[msg.time + info.from] = msg;
       chats[pub].sortedMessages.push(msg);
       chats[pub].sortedMessages = chats[pub].sortedMessages.sort((a, b) => a.time - b.time);
       if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
@@ -73,8 +75,8 @@ class ChatView extends Component {
         chats[pub].theirLastSeenTime = msg.time;
         lastSeenTimeChanged(pub);
       }
-      if (!chats[pub].localLatest || msg.time > chats[pub].localLatest.time) {
-        localState.get('chats').get(pub).get('latest').get('time').put(msg.time);
+      if (!chats[pub].localLatest || msg.timeStr > chats[pub].localLatest.timeStr) {
+        localState.get('chats').get(pub).get('latest').get('time').put(msg.timeStr);
         localState.get('chats').get(pub).get('latest').get('text').put(msg.text);
         chats[pub].localLatest = msg;
         var text = msg.text || '';
@@ -280,20 +282,6 @@ async function onMsgFormSubmit(event, pub) {
   chats[pub].send(msg);
   Gallery.closeAttachmentsPreview();
   $('#new-msg').val('');
-}
-
-var sortChatsByLatest = _.throttle(() => {
-  var sorted = $(".chat-item:not(.new):not(.public-messages)").sort((a, b) => {
-    return ($(b).data('latestTime') || -Infinity) - ($(a).data('latestTime') || -Infinity);
-  });
-  $(".chat-list").append(sorted);
-}, 100);
-
-function sortMessagesByTime() {
-  var sorted = $(".msg").sort((a, b) => $(a).data('time') - $(b).data('time'));
-  $("#message-list").append(sorted);
-  $('.day-separator').remove();
-  $('.from-separator').remove();
 }
 
 const seenIndicator = html`<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
