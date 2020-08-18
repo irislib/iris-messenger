@@ -125,16 +125,15 @@ class ChatView extends Component {
           }
           previousDateStr = dateStr;
         }
-        msgListContent.push(html`<${Message} ...${msg} chatId=${activeChat}/>`);
 
         const from = msg.info.from;
+        let showName = false;
         if (previousFrom && (from !== previousFrom)) {
           msgListContent.push(html`<div class="from-separator"/>`);
-          $(this).find('small').show();
-        } else {
-          $(this).find('small').hide();
+          showName = true;
         }
         previousFrom = from;
+        msgListContent.push(html`<${Message} ...${msg} showName=${showName} chatId=${activeChat}/>`);
       });
     }
 
@@ -313,7 +312,7 @@ class Message extends Component {
     return html`
       <div class="msg ${this.props.selfAuthored ? 'our' : 'their'}">
         <div class="msg-content">
-          ${name && html`<small onclick=${() => addMention(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
+          ${name && this.props.showName && html`<small onclick=${() => addMention(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
           ${this.props.attachments && this.props.attachments.map(a =>
             html`<img src=${a.data} onclick=${e => { Gallery.openAttachmentsGallery(this.props, e); }}/>` // escape a.data
           )}
