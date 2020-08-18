@@ -1,4 +1,4 @@
-import { html, render, useEffect, useState } from './lib/htm.preact.js';
+import { html, render, useEffect, useState, Component } from './lib/htm.preact.js';
 import {publicState, localState, showMenu, resetView, activeChat, activeProfile} from './Main.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
@@ -29,99 +29,41 @@ const emojiPickerButton = html`
     <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="smile" class="svg-inline--fa fa-smile fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 448c-110.3 0-200-89.7-200-200S137.7 56 248 56s200 89.7 200 200-89.7 200-200 200zm-80-216c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm4 72.6c-20.8 25-51.5 39.4-84 39.4s-63.2-14.3-84-39.4c-8.5-10.2-23.7-11.5-33.8-3.1-10.2 8.5-11.5 23.6-3.1 33.8 30 36 74.1 56.6 120.9 56.6s90.9-20.6 120.9-56.6c8.5-10.2 7.1-25.3-3.1-33.8-10.1-8.4-25.3-7.1-33.8 3.1z"></path></svg>
   </button>`;
 
-const ChatView = () => {
-  const [activeChatId, setActiveChatId] = useState();
-  localState.get('activeChat').on(a => setActiveChatId(a));
+const subscribedToMsgs = {};
 
-  const now = new Date();
-  const nowStr = now.toLocaleDateString();
-  let previousDateStr;
-  let previousFrom;
-  const msgListContent = [];
-  if (activeChatId && chats[activeChatId].messages) {
-    Object.values(chats[activeChatId].messages).sort((a, b) => a.time - b.time).forEach(msg => {
-      const date = msg.time;
-      if (date) {
-        const dateStr = date.toLocaleDateString();
-        if (dateStr !== previousDateStr) {
-          var separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
-          msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
-        }
-        previousDateStr = dateStr;
-      }
-      msgListContent.push(html`<${Message} ...${msg} chatId=${activeChatId}/>`);
+class ChatView extends Component {
+  constructor() {
+    super();
+    this.state = {msgListContent: []};
+  }
 
-      const from = msg.info.from;
-      if (previousFrom && (from !== previousFrom)) {
-        msgListContent.push(html`<div class="from-separator"/>`);
-        $(this).find('small').show();
-      } else {
-        $(this).find('small').hide();
+  componentDidMount() {
+    localState.get('activeChat').on(activeChat => {
+      this.setState({});
+      if (activeChat && !subscribedToMsgs[activeChat]) {
+        const iv = setInterval(() => {
+          if (chats[activeChat]) {
+            clearInterval(iv);
+            this.subscribeToMsgs(activeChat);
+          }
+        }, 1000);
+        subscribedToMsgs[activeChat] = true;
       }
-      previousFrom = from;
     });
   }
 
-  return html`
-    <div class="main-view" id="message-view">
-      <div id="message-list">${msgListContent}</div>
-      <div id="attachment-preview" class="hidden"></div>
-    </div>
-    <div id="not-seen-by-them" style="display: none">
-      <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
-      <p><button class="copy-chat-link">${t('copy_your_chat_link')}</button></p>
-    </div>
-    <div class="message-form" style="display:none">
-      <form autocomplete="off">
-        <input name="attachment-input" type="file" class="hidden" id="attachment-input" accept="image/*" multiple/>
-        ${attachFileButton}
-        ${emojiPickerButton}
-        <input id="new-msg" type="text" placeholder="${t('type_a_message')}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>
-        ${submitButton}
-      </form>
-    </div>`;
-  };
-
-const NewChat = () => html`
-  <div class="main-view" id="new-chat">
-    <h3>${t('have_someones_chat_link')}</h3>
-    <input id="paste-chat-link" type="text" placeholder="${t('paste_their_chat_link')}"/>
-    <button id="scan-chatlink-qr-btn">${t('or_scan_qr_code')}</button>
-    <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
-    <h3>${t('give_your_chat_link')}</h3>
-    <button class="copy-chat-link">${t('copy_your_chat_link')}</button>
-    <button id="show-my-qr-btn">${t('or_show_qr_code')}</button>
-    <p id="my-qr-code" class="qr-container" style="display:none"></p>
-    <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_chat_link_publicly') }}></small></p>
-    <h3>${t('new_group')}</h3>
-    <p>
-      <form id="new-group-form">
-        <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
-        <button type="submit">${t('create')}</button>
-      </form>
-    </p>
-    <hr/>
-    <h3>${t('your_chat_links')}</h3>
-    <p><button id="generate-chat-link">${t('create_new_chat_link')}</button></p>
-    <div id="my-chat-links" class="flex-table"></div>
-  </div>`;
-
-const subscribedToMsgs = {};
-
-function showChat(pub) {
-  if (!pub) {
-    return;
-  }
-
-  if (!subscribedToMsgs[pub]) {
+  subscribeToMsgs(pub) {
     subscribedToMsgs[pub] = true;
     chats[pub].getMessages((msg, info) => {
       console.log('got msg ', msg);
       console.log('latest', chats[pub].latest);
-      chats[pub].messages[msg.time] = msg;
+      if (chats[pub].messageIds[msg.time + info.from]) return;
+      chats[pub].messageIds[msg.time + info.from] = msg;
       msg.info = info;
       msg.selfAuthored = info.selfAuthored;
       msg.time = new Date(msg.time);
+      chats[pub].sortedMessages.push(msg);
+      chats[pub].sortedMessages = chats[pub].sortedMessages.sort((a, b) => a.time - b.time);
       if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
         if (activeChat !== pub || document.visibilityState !== 'visible') {
           Notifications.changeChatUnseenCount(pub, 1);
@@ -150,24 +92,101 @@ function showChat(pub) {
           setLatestCheckmark(pub);
         }
       }
-      if (activeChat === pub) {
-        addMessage(msg, pub);
-        sortMessagesByTime(); // this is slow if message history is loaded while chat active
-        if (chats[pub].latest.time === msg.time && Session.areWeOnline) {
-          chats[pub].setMyMsgsLastSeenTime();
-        }
-        if (pub !== 'public') {
-          if (chats[pub].theirLastSeenTime) {
-            $('#not-seen-by-them').slideUp();
-          } else if (!chats[pub].uuid) {
-            $('#not-seen-by-them').slideDown();
-          }
-        }
-        Helpers.scrollToMessageListBottom();
-      }
       Notifications.notifyMsg(msg, info, pub);
+      if (activeChat === pub) {
+        this.setState({});
+      }
     });
   }
+
+  componentDidUpdate() {
+    _.defer(() => Helpers.scrollToMessageListBottom());
+  }
+
+  render() {
+    if (!activeChat) {
+      return;
+    }
+
+    const now = new Date();
+    const nowStr = now.toLocaleDateString();
+    let previousDateStr;
+    let previousFrom;
+    const msgListContent = [];
+    if (chats[activeChat].sortedMessages) {
+      Object.values(chats[activeChat].sortedMessages).forEach(msg => {
+        const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
+        if (date) {
+          const dateStr = date.toLocaleDateString();
+          if (dateStr !== previousDateStr) {
+            var separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
+            msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
+          }
+          previousDateStr = dateStr;
+        }
+        msgListContent.push(html`<${Message} ...${msg} chatId=${activeChat}/>`);
+
+        const from = msg.info.from;
+        if (previousFrom && (from !== previousFrom)) {
+          msgListContent.push(html`<div class="from-separator"/>`);
+          $(this).find('small').show();
+        } else {
+          $(this).find('small').hide();
+        }
+        previousFrom = from;
+      });
+    }
+
+    return html`
+      <div class="main-view" id="message-view">
+        <div id="message-list">${msgListContent}</div>
+        <div id="attachment-preview" class="hidden"></div>
+      </div>
+      <div id="not-seen-by-them" style="display: none">
+        <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
+        <p><button class="copy-chat-link">${t('copy_your_chat_link')}</button></p>
+      </div>
+      <div class="message-form" style="display:none">
+        <form autocomplete="off">
+          <input name="attachment-input" type="file" class="hidden" id="attachment-input" accept="image/*" multiple/>
+          ${attachFileButton}
+          ${emojiPickerButton}
+          <input id="new-msg" type="text" placeholder="${t('type_a_message')}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>
+          ${submitButton}
+        </form>
+      </div>`;
+    }
+}
+
+const NewChat = () => html`
+  <div class="main-view" id="new-chat">
+    <h3>${t('have_someones_chat_link')}</h3>
+    <input id="paste-chat-link" type="text" placeholder="${t('paste_their_chat_link')}"/>
+    <button id="scan-chatlink-qr-btn">${t('or_scan_qr_code')}</button>
+    <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
+    <h3>${t('give_your_chat_link')}</h3>
+    <button class="copy-chat-link">${t('copy_your_chat_link')}</button>
+    <button id="show-my-qr-btn">${t('or_show_qr_code')}</button>
+    <p id="my-qr-code" class="qr-container" style="display:none"></p>
+    <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_chat_link_publicly') }}></small></p>
+    <h3>${t('new_group')}</h3>
+    <p>
+      <form id="new-group-form">
+        <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
+        <button type="submit">${t('create')}</button>
+      </form>
+    </p>
+    <hr/>
+    <h3>${t('your_chat_links')}</h3>
+    <p><button id="generate-chat-link">${t('create_new_chat_link')}</button></p>
+    <div id="my-chat-links" class="flex-table"></div>
+  </div>`;
+
+function showChat(pub) {
+  if (!pub) {
+    return;
+  }
+
 
   resetView();
   localState.get('activeChat').put(pub);
@@ -177,7 +196,6 @@ function showChat(pub) {
   var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
   chatListEl.toggleClass('active', true);
   chatListEl.find('.unseen').empty().hide();
-  $("#message-list").empty();
   $("#message-view").toggleClass('public-messages-view', pub === 'public');
   $("#message-view").show();
   $(".message-form").show();
@@ -201,8 +219,6 @@ function showChat(pub) {
   $(".message-form form").off().on('submit', e => onMsgFormSubmit(e, pub));
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
-  var msgs = Object.values(chats[pub].messages);
-  sortMessagesByTime();
   $('#message-view').scroll(() => {
     if ($('#attachment-preview:visible').length) { return; }
     var currentDaySeparator = $('.day-separator').last();
@@ -328,18 +344,6 @@ const Message = (props) => {
     </div>`;
 };
 
-function addMessage(msg, chatId) {
-  const container = $('<div>');
-  render(html`<${Message} ...${msg} chatId=${chatId}/>`, container[0]);
-  const msgEl = container.children().first();
-  msgEl.find('img').one('load', Helpers.scrollToMessageListBottom);
-  //msgEl.data('time', date);
-  msgEl.data('from', (msg.info && msg.info.from) || chatId);
-  msgEl.toggleClass('our', msg.selfAuthored ? true : false);
-  msgEl.toggleClass('their', msg.selfAuthored ? false : true);
-  $("#message-list").append(msgEl);
-}
-
 function deleteChat(pub) {
   iris.Channel.deleteChannel(publicState, Session.getKey(), pub);
   if (activeChat === pub) {
@@ -380,7 +384,8 @@ function addChat(channel) {
     }
   });
   Notifications.changeChatUnseenCount(pub, 0);
-  chats[pub].messages = chats[pub].messages || [];
+  chats[pub].messageIds = chats[pub].messageIds || {};
+  chats[pub].sortedMessages = chats[pub].sortedMessages || [];
   chats[pub].identicon = Helpers.getIdenticon(pub, 49);
   chats[pub].onTheir('nickname', (nick) => {
     chats[pub].myNickname = nick;
