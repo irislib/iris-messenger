@@ -100,12 +100,12 @@ class ChatView extends Component {
   }
 
   componentDidUpdate() {
-    _.defer(() => Helpers.scrollToMessageListBottom());
+    Helpers.scrollToMessageListBottom();
   }
 
   render() {
-    if (!activeChat) {
-      return;
+    if (!activeChat || !chats[activeChat].sortedMessages) {
+      return html``;
     }
 
     const now = new Date();
@@ -219,7 +219,7 @@ function showChat(pub) {
   $(".message-form form").off().on('submit', e => onMsgFormSubmit(e, pub));
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
-  $('#message-view').scroll(() => {
+  $('#message-view').scroll(_.throttle(() => {
     if ($('#attachment-preview:visible').length) { return; }
     var currentDaySeparator = $('.day-separator').last();
     var pos = currentDaySeparator.position();
@@ -232,7 +232,7 @@ function showChat(pub) {
     $('#floating-day-separator').remove();
     setTimeout(() => s.fadeOut(), 2000);
     $('#message-view').prepend(center);
-  });
+  }, 200));
   lastSeenTimeChanged(pub);
   chats[pub].setMyMsgsLastSeenTime();
   Helpers.scrollToMessageListBottom();
