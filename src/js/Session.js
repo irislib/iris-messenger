@@ -76,7 +76,7 @@ class ChatListItem extends Component {
       this.eventListeners.push(event);
     });
     localState.get('chats').get(chatId).get('latest').get('time').on((latestTime, a, b, event) => {
-      this.setState({latestTime});
+      this.setState({latestTime: iris.util.formatDate(new Date(latestTime))});
       this.eventListeners.push(event);
     });
   }

@@ -76,6 +76,7 @@ class ChatView extends Component {
         lastSeenTimeChanged(pub);
       }
       if (!chats[pub].localLatest || msg.timeStr > chats[pub].localLatest.timeStr) {
+        localState.get('chats').get(pub).get('latestTime').put(msg.timeStr);
         localState.get('chats').get(pub).get('latest').get('time').put(msg.timeStr);
         localState.get('chats').get(pub).get('latest').get('text').put(msg.text);
         chats[pub].localLatest = msg;
