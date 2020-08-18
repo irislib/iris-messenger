@@ -56,8 +56,6 @@ class ChatView extends Component {
   subscribeToMsgs(pub) {
     subscribedToMsgs[pub] = true;
     chats[pub].getMessages((msg, info) => {
-      console.log('got msg ', msg);
-      console.log('latest', chats[pub].latest);
       if (chats[pub].messageIds[msg.time + info.from]) return;
       msg.info = info;
       msg.selfAuthored = info.selfAuthored;
@@ -287,51 +285,48 @@ async function onMsgFormSubmit(event, pub) {
 
 const seenIndicator = html`<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
 
-const Message = (props) => {
-  const [innerHTML, setInnerHTML] = useState('');
-  let name, color;
-  // TODO: public messages
-  if (chats[props.chatId].uuid && !props.info.selfAuthored) {
-    const profile = chats[props.chatId].participantProfiles[props.info.from];
-    name = profile && profile.name;
-    color = profile && profile.color;
-    if (name) {
-      var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color}).addClass('msgSenderName');
-    }
+class Message extends Component {
+  constructor() {
+    super();
+    this.i = 0;
   }
-  const emojiOnly = props.text.length === 2 && Helpers.isEmoji(props.text);
-  useEffect(() => {
-    // This code will only execute once per message
-    // We use useEffect because we're acting outside of Preact
-    // and working with the DOM
-    // We clean up the text, making sure to prevent XSS attacks,
-    // this is key since we're implicitly using innerHTML later
-    // on, when we call dangerouslySetInnerHTML
-    const p = document.createElement('p');
-    p.innerText = props.text;
-    const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
-    // We set innerText to the result of autolinker
-    setInnerHTML(autolinker.link(h));
-  }, []);
 
-  // If innerText is empty, we (implicitly) return null
-  // This guarantees we only show the message once it's ready
-  return innerHTML && html`
-    <div class="msg ${props.selfAuthored ? 'our' : 'their'}">
-      <div class="msg-content">
-        ${name && html`<small onclick=${() => addMention(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
-        ${props.attachments && props.attachments.map(a =>
-          html`<img src=${a.data} onclick=${e => { Gallery.openAttachmentsGallery(props, e); }}/>` // escape a.data
-        )}
-        <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }}>
+  render() {
+    if (++this.i > 1) console.log(this.i);
+    let name, color;
+    // TODO: public messages
+    if (chats[this.props.chatId].uuid && !this.props.info.selfAuthored) {
+      const profile = chats[this.props.chatId].participantProfiles[this.props.info.from];
+      name = profile && profile.name;
+      color = profile && profile.color;
+      if (name) {
+        var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color}).addClass('msgSenderName');
+      }
+    }
+    const emojiOnly = this.props.text.length === 2 && Helpers.isEmoji(this.props.text);
+
+    const p = document.createElement('p');
+    p.innerText = this.props.text;
+    const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
+    const innerHTML = autolinker.link(h);
+
+    return html`
+      <div class="msg ${this.props.selfAuthored ? 'our' : 'their'}">
+        <div class="msg-content">
+          ${name && html`<small onclick=${() => addMention(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
+          ${this.props.attachments && this.props.attachments.map(a =>
+            html`<img src=${a.data} onclick=${e => { Gallery.openAttachmentsGallery(this.props, e); }}/>` // escape a.data
+          )}
+          <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }}>
+          </div>
+          <div class="time">
+            ${iris.util.formatTime(this.props.time)}
+            ${this.props.selfAuthored && seenIndicator}
+          </div>
         </div>
-        <div class="time">
-          ${iris.util.formatTime(props.time)}
-          ${props.selfAuthored && seenIndicator}
-        </div>
-      </div>
-    </div>`;
-};
+      </div>`;
+  }
+}
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(publicState, Session.getKey(), pub);
