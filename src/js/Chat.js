@@ -63,7 +63,7 @@ class ChatView extends Component {
       msg.selfAuthored = info.selfAuthored;
       msg.timeStr = msg.time;
       msg.time = new Date(msg.time);
-      chats[pub].messageIds[msg.time + info.from] = msg;
+      chats[pub].messageIds[msg.time + info.from] = true;
       chats[pub].sortedMessages.push(msg);
       chats[pub].sortedMessages = chats[pub].sortedMessages.sort((a, b) => a.time - b.time);
       if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {

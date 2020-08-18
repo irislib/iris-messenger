@@ -66,15 +66,16 @@ class ChatListItem extends Component {
   }
 
   componentDidMount() {
-    localState.get('chats').get(this.props.chatId).get('name').on((name, a, b, event) => {
+    const chatId = this.props.chatId;
+    localState.get('chats').get(chatId).get('name').on((name, a, b, event) => {
       this.setState({name});
       this.eventListeners.push(event);
     });
-    localState.get('chats').get(this.props.chatId).get('latest').get('text').on((latestText, a, b, event) => {
+    localState.get('chats').get(chatId).get('latest').get('text').on((latestText, a, b, event) => {
       this.setState({latestText});
       this.eventListeners.push(event);
     });
-    localState.get('chats').get(this.props.chatId).get('latest').get('time').on((latestTime, a, b, event) => {
+    localState.get('chats').get(chatId).get('latest').get('time').on((latestTime, a, b, event) => {
       this.setState({latestTime});
       this.eventListeners.push(event);
     });
@@ -85,9 +86,14 @@ class ChatListItem extends Component {
     this.eventListeners.forEach(e => e.off());
   }
 
+  onClick() {
+    showChat(this.props.chatId);
+    this.setState();
+  }
+
   render() {
     return html`
-    <div class="chat-item" onClick=${() => showChat(this.props.chatId)}>
+    <div class="chat-item ${activeChat === this.props.chatId ? "active" : ""}" onClick=${() => this.onClick()}>
       <${Identicon} str=${this.props.chatId} width=49/>
       <div class="text">
         <div>
