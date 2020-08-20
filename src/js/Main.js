@@ -8,6 +8,8 @@ import Settings, {LogoutConfirmation, init as initSettings} from './Components/S
 import {chats, init as initChat} from './Chat.js';
 import NewChat from './components/NewChat.js';
 import ChatView from './components/ChatView.js';
+import Login from './components/Login.js';
+import SideBar from './components/SideBar.js';
 import PublicMessages from './PublicMessages.js';
 import Profile from './Profile.js';
 import QRScanner from './QRScanner.js';
@@ -42,8 +44,8 @@ localState.get('activeProfile').on(a => activeProfile = a);
 
 const Main = html`
   <div id="main-content">
-    <${Session.Login}/>
-    <${Session.SideBar}/>
+    <${Login}/>
+    <${SideBar}/>
 
     <section class="main">
       <header>

@@ -36,6 +36,7 @@ class Message extends Component {
     p.innerText = this.props.text;
     const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
     const innerHTML = autolinker.link(h);
+    const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
 
     return html`
       <div class="msg ${this.props.selfAuthored ? 'our' : 'their'}">
@@ -47,7 +48,7 @@ class Message extends Component {
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }}>
           </div>
           <div class="time">
-            ${iris.util.formatTime(this.props.time)}
+            ${iris.util.formatTime(time)}
             ${this.props.selfAuthored && seenIndicator}
           </div>
         </div>

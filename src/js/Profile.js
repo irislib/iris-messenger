@@ -1,10 +1,11 @@
-import { html } from './lib/htm.preact.js';
+import { html, render } from './lib/htm.preact.js';
 import {translate as t} from './Translation.js';
 import {localState, publicState, resetView, activeChat, activeProfile} from './Main.js';
 import {chats, deleteChat, showChat} from './Chat.js';
 import Session from './Session.js';
 import Helpers from './Helpers.js';
 import PublicMessages from './PublicMessages.js';
+import Message from './Components/Message.js';
 //import VideoCall from './VideoCall.js';
 
 const Profile = () => html`<div class="main-view" id="profile">
@@ -191,8 +192,9 @@ function setTheirOnlineStatus(pub) {
 
 function onPublicMessage(msg, info) {
   if (activeProfile !== info.from) { return; }
-  const msgEl = getMsgElement(msg, info.from, true);
-  $('#profile-public-message-list').prepend(msgEl);
+  const container = $('<div>');
+  render(html`<${Message} ...${msg} showName=${true} chatId=${info.from}/>`, container[0]);
+  $('#profile-public-message-list').prepend(container.children()[0]);
 }
 
 function showProfile(pub) {

@@ -132,6 +132,7 @@ function newChat(pub, chatLink) {
 }
 
 function addChat(channel) {
+  console.log('addChat', channel);
   var pub = channel.getId();
   if (chats[pub]) { return; }
   chats[pub] = channel;
