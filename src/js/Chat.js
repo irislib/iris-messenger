@@ -317,15 +317,6 @@ function setLatestCheckmark(pub) {
 function setDeliveredCheckmarks(pub) {
   var online = chats[pub].online;
   if (online && online.lastActive) {
-    var lastActive = new Date(online.lastActive);
-    if (activeChat === pub) {
-      $('.msg.our:not(.delivered)').each(function() {
-        var el = $(this);
-        if (el.data('time') <= lastActive) {
-          el.toggleClass('delivered', true);
-        }
-      });
-    }
     setLatestCheckmark(pub);
   }
 }
