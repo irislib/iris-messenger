@@ -26,7 +26,6 @@ const subscribedToMsgs = {};
 class ChatView extends Component {
   constructor() {
     super();
-    this.state = {msgListContent: []};
   }
 
   componentDidMount() {

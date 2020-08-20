@@ -21,9 +21,9 @@ class Message extends Component {
   render() {
     if (++this.i > 1) console.log(this.i);
     let name, color;
-    // TODO: public messages
-    if (chats[this.props.chatId].uuid && !this.props.info.selfAuthored) {
-      const profile = chats[this.props.chatId].participantProfiles[this.props.info.from];
+    const chatId = this.props.chatId;
+    if (chats[chatId].uuid && !this.props.info.selfAuthored) {
+      const profile = chats[chatId].participantProfiles[this.props.info.from];
       name = profile && profile.name;
       color = profile && profile.color;
     }
@@ -35,8 +35,13 @@ class Message extends Component {
     const innerHTML = autolinker.link(h);
     const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
 
+    const chat = chats[chatId];
+    const seen = chat.theirLastSeenTime >= time ? 'seen' : '';
+    const delivered = chat.online && chat.online.lastActive && new Date(chat.online.lastActive) >= time ? 'delivered' : '';
+    const whose = this.props.selfAuthored ? 'our' : 'their';
+
     return html`
-      <div class="msg ${this.props.selfAuthored ? 'our' : 'their'}">
+      <div class="msg ${whose} ${seen} ${delivered}">
         <div class="msg-content">
           ${name && this.props.showName && html`<small onclick=${() => addMention(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
           ${this.props.attachments && this.props.attachments.map(a =>
