@@ -139,10 +139,9 @@ function addChat(channel) {
   el.attr('data-pub', pub);
   var latestEl = el.find('.latest');
   var typingIndicator = el.find('.typing-indicator').text(t('typing'));
-  chats[pub].getLatestMsg && chats[pub].getLatestMsg(latest => {
+  chats[pub].getLatestMsg && chats[pub].getLatestMsg((latest, info) => {
     if (latest.time && latest.text) {
-      localState.get('chats').get(pub).get('latestTime').put(latest.time);
-      localState.get('chats').get(pub).get('latestText').put(latest.text);
+      localState.get('chats').get(pub).get('latest').put({text: latest.text, time: latest.time, selfAuthored: info.selfAuthored});
     }
   });
   Notifications.changeChatUnseenCount(pub, 0);
