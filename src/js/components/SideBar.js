@@ -11,6 +11,7 @@ class SideBar extends Component {
 
   componentDidMount() {
     const chats = {};
+    localState.get('activeChat').on(activeChat => this.setState({activeChat}));
     localState.get('chats').map().on((chat, id) => {
       chat.id = id;
       const shouldUpdate = !chats[id] || chats[id].latestTime !== chat.latestTime;
@@ -62,7 +63,7 @@ class SideBar extends Component {
           </svg>
           ${t('new_chat')}
         </div>
-        ${this.state.chatIds.filter(id => id !== 'public').map(id => html`<${ChatListItem} key=${id} chatId=${id}/>`)}
+        ${this.state.chatIds.filter(id => id !== 'public').map(id => html`<${ChatListItem} active=${id === this.state.activeChat} key=${id} chatId=${id}/>`)}
         <div id="welcome" class="visible-xs-block">
           <h3>Iris Messenger</h3>
           <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>

@@ -49,7 +49,7 @@ class ChatListItem extends Component {
 
   render() {
     return html`
-    <div class="chat-item ${activeChat === this.props.chatId ? "active" : ""}" onClick=${() => this.onClick()}>
+    <div class="chat-item ${this.props.active ? "active" : ""}" onClick=${() => this.onClick()}>
       <${Identicon} str=${this.props.chatId} width=49/>
       <div class="text">
         <div>
