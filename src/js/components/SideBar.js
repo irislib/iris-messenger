@@ -1,5 +1,6 @@
 import { html, Component } from '../lib/htm.preact.js';
 import { translate as t } from '../Translation.js';
+import {localState} from '../Main.js';
 import ChatListItem from './ChatListItem.js';
 
 class SideBar extends Component {
@@ -12,7 +13,7 @@ class SideBar extends Component {
     const chats = {};
     localState.get('chats').map().on((chat, id) => {
       chat.id = id;
-      const shouldUpdate = !chats[id] || chats[id].latestTime !== chat.latestTime;
+      const shouldUpdate = !chats[id] || chats[id].latestTime !== chat.latestTime;
       chats[id] = chat;
       if (shouldUpdate) {
         const chatIds = Object.values(chats)

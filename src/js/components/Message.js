@@ -26,9 +26,6 @@ class Message extends Component {
       const profile = chats[this.props.chatId].participantProfiles[this.props.info.from];
       name = profile && profile.name;
       color = profile && profile.color;
-      if (name) {
-        var nameEl = $('<small>').click(() => addMention(name)).text(name).css({color}).addClass('msgSenderName');
-      }
     }
     const emojiOnly = this.props.text.length === 2 && Helpers.isEmoji(this.props.text);
 

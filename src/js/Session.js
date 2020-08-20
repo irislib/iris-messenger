@@ -1,5 +1,4 @@
-import { html, useState, Component } from './lib/htm.preact.js';
-import {localState, publicState, activeChat, activeProfile, resetView, showMenu} from './Main.js';
+import {publicState, activeChat, activeProfile, resetView, showMenu} from './Main.js';
 import {chats, addChat, showNewChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';

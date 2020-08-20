@@ -1,6 +1,7 @@
 import { html, Component } from '../lib/htm.preact.js';
 import {activeChat, showChat} from '../Chat.js';
 import { translate as t } from '../Translation.js';
+import {localState} from '../Main.js';
 import Identicon from './Identicon.js';
 
 class ChatListItem extends Component {
@@ -51,7 +52,7 @@ class ChatListItem extends Component {
       </div>
     </div>
     `;
-  };
+  }
 }
 
 export default ChatListItem;

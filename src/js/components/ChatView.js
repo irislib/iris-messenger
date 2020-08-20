@@ -1,5 +1,6 @@
 import { html, Component } from '../lib/htm.preact.js';
 import { translate as t } from '../Translation.js';
+import {localState} from '../Main.js';
 import Message from './Message.js';
 import {activeChat, chats, lastSeenTimeChanged, setLatestSeen, setLatestCheckmark} from '../Chat.js';
 import Helpers from '../Helpers.js';
@@ -69,15 +70,6 @@ class ChatView extends Component {
         localState.get('chats').get(pub).get('latest').get('time').put(msg.timeStr);
         localState.get('chats').get(pub).get('latest').get('text').put(msg.text);
         chats[pub].localLatest = msg;
-        var text = msg.text || '';
-        if (msg.attachments) {
-          text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
-        } else {
-          text = msg.text;
-        }
-        if (chats[pub].uuid && !msg.selfAuthored && msg.info.from && chats[pub].participantProfiles[msg.info.from].name) {
-          text = chats[pub].participantProfiles[msg.info.from].name + ': ' + text;
-        }
         if (info.selfAuthored) {
           //latestEl.prepend($(seenIndicatorHtml));
           setLatestSeen(pub);
