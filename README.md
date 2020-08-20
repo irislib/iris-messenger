@@ -26,7 +26,7 @@ yarn start
 
 Eslint: `yarn eslint src/js/*.js`
 
-The application was originally built in plain jQuery without a framework. While we now use [preact](https://preactjs.com/), some of the jquery logic still remains.
+The application was originally built in plain jQuery without a framework. While we now use [preact](https://preactjs.com/), there's still some jquery logic that should be ported.
 
 ## Privacy
 Messages are end-to-end encrypted, but message timestamps and the number of chats aren't. In a decentralized network this information is potentially available to anyone.

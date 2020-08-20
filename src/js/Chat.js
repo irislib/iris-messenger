@@ -17,14 +17,12 @@ function showChat(pub) {
     return;
   }
 
-
   resetView();
   localState.get('activeChat').put(pub);
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
     newChat(pub);
   }
   var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
-  chatListEl.toggleClass('active', true);
   chatListEl.find('.unseen').empty().hide();
   $("#message-view").toggleClass('public-messages-view', pub === 'public');
   $("#message-view").show();
