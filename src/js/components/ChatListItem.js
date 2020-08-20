@@ -18,6 +18,16 @@ class ChatListItem extends Component {
       this.eventListeners.push(event);
     });
     localState.get('chats').get(chatId).get('latest').get('text').on((latestText, a, b, event) => {
+      /*
+      if (msg.attachments) {
+        text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
+      } else {
+        text = msg.text;
+      }
+      if (chats[chatId] && chats[chatId].uuid && !msg.selfAuthored && msg.info.from && chats[chatId].participantProfiles[msg.info.from].name) {
+        text = chats[chatId].participantProfiles[msg.info.from].name + ': ' + text;
+      }
+      */
       this.setState({latestText});
       this.eventListeners.push(event);
     });
