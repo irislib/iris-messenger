@@ -140,8 +140,14 @@ function addChat(channel) {
   var latestEl = el.find('.latest');
   var typingIndicator = el.find('.typing-indicator').text(t('typing'));
   chats[pub].getLatestMsg && chats[pub].getLatestMsg((latest, info) => {
-    if (latest.time && latest.text) {
-      localState.get('chats').get(pub).get('latest').put({text: latest.text, time: latest.time, selfAuthored: info.selfAuthored});
+    if (latest.time && latest.time > chats[pub].latestTime && latest.text) {
+      console.log('latest.time', latest.time, 'latestTime', chats[pub].latestTime);
+      chats[pub].latestTime = latest.time;
+      localState.get('chats').get(pub).put({text: latest.text, time: latest.time, selfAuthored: info.selfAuthored});
+      localState.get('chats').get(pub).put({
+        latestTime: msg.timeStr,
+        latest: {time: msg.timeStr, text: msg.text, selfAuthored: info.selfAuthored}
+      });
     }
   });
   Notifications.changeChatUnseenCount(pub, 0);
@@ -331,7 +337,6 @@ function showNewChat() {
 }
 
 function lastSeenTimeChanged(pub) {
-  console.log('lastSeenTimeChanged', pub, chats[pub].theirLastSeenTime);
   setLatestSeen(pub);
   setDeliveredCheckmarks(pub);
   if (pub !== 'public' && pub === activeChat) {

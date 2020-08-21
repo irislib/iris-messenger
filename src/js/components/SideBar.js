@@ -6,7 +6,7 @@ import ChatListItem from './ChatListItem.js';
 class SideBar extends Component {
   constructor() {
     super();
-    this.state = {chatIds: []};
+    this.state = {chats: []};
   }
 
   componentDidMount() {
@@ -14,17 +14,13 @@ class SideBar extends Component {
     localState.get('activeChat').on(activeChat => this.setState({activeChat}));
     localState.get('chats').map().on((chat, id) => {
       chat.id = id;
-      const shouldUpdate = !chats[id] || chats[id].latestTime !== chat.latestTime;
       chats[id] = chat;
-      if (shouldUpdate) {
-        const chatIds = Object.values(chats)
-          .sort((a, b) => {
-            if (b.latestTime === undefined || a.latestTime > b.latestTime) return -1;
-            return 1;
-          })
-          .map(c => c.id);
-        this.setState({chatIds});
-      }
+      const sortedChats = Object.values(chats)
+        .sort((a, b) => {
+          if (b.latestTime === undefined || a.latestTime > b.latestTime) return -1;
+          return 1;
+        });
+      this.setState({chats:sortedChats});
     });
   }
 
@@ -63,7 +59,7 @@ class SideBar extends Component {
           </svg>
           ${t('new_chat')}
         </div>
-        ${this.state.chatIds.filter(id => id !== 'public').map(id => html`<${ChatListItem} active=${id === this.state.activeChat} key=${id} chatId=${id}/>`)}
+        ${this.state.chats.filter(chat => chat.id !== 'public').map(chat => html`<${ChatListItem} active=${chat.id === this.state.activeChat} key=${chat.id} chat=${chat}/>`)}
         <div id="welcome" class="visible-xs-block">
           <h3>Iris Messenger</h3>
           <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>

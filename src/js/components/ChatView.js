@@ -64,11 +64,12 @@ class ChatView extends Component {
         chats[pub].theirLastSeenTime = msg.time;
         lastSeenTimeChanged(pub);
       }
-      if (!chats[pub].localLatest || msg.timeStr > chats[pub].localLatest.timeStr) {
-        localState.get('chats').get(pub).get('latestTime').put(msg.timeStr);
-        localState.get('chats').get(pub).get('latest').get('time').put(msg.timeStr);
-        localState.get('chats').get(pub).get('latest').get('text').put(msg.text);
-        chats[pub].localLatest = msg;
+      if (!chats[pub].latestTime || (msg.timeStr > chats[pub].latestTime)) {
+        localState.get('chats').get(pub).put({
+          latestTime: msg.timeStr,
+          latest: {time: msg.timeStr, text: msg.text, selfAuthored: info.selfAuthored}
+        });
+        chats[pub].latestTime = msg.timeStr;
         if (info.selfAuthored) {
           //latestEl.prepend($(seenIndicatorHtml));
           setLatestSeen(pub);
@@ -115,7 +116,7 @@ class ChatView extends Component {
           showName = true;
         }
         previousFrom = from;
-        msgListContent.push(html`<${Message} ...${msg} showName=${showName} chatId=${activeChat}/>`);
+        msgListContent.push(html`<${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${activeChat}/>`);
       });
     }
 

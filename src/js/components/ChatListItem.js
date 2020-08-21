@@ -9,29 +9,28 @@ const seenIndicator = html`<span class="seen-indicator"><svg version="1" xmlns="
 class ChatListItem extends Component {
   constructor() {
     super();
-    this.state = {latest: {}, name: ''};
+    this.state = {latest: {}, chat: {}};
     this.eventListeners = [];
   }
 
   componentDidMount() {
-    const chatId = this.props.chatId;
-    localState.get('chats').get(chatId).get('name').on((name, a, b, event) => {
-      this.setState({name});
-      this.eventListeners.push(event);
-    });
-    localState.get('chats').get(chatId).get('latest').on((latest, a, b, event) => {
+    const chat = this.props.chat;
+    const latestTime = chat.latestTime && iris.util.formatDate(new Date(chat.latestTime));
+    this.setState({chat, latestTime});
+    localState.get('chats').get(chat.id).get('latest').on((latest, a, b, event) => {
       /*
       if (msg.attachments) {
         text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
       } else {
         text = msg.text;
       }
-      if (chats[chatId] && chats[chatId].uuid && !msg.selfAuthored && msg.info.from && chats[chatId].participantProfiles[msg.info.from].name) {
-        text = chats[chatId].participantProfiles[msg.info.from].name + ': ' + text;
+      if (chats[chat.id] && chats[chat.id].uuid && !msg.selfAuthored && msg.info.from && chats[chat.id].participantProfiles[msg.info.from].name) {
+        text = chats[chat.id].participantProfiles[msg.info.from].name + ': ' + text;
       }
       */
+      if (latest.time < chat.latestTime) { return; }
+      console.log('latest.time', latest.time, 'chat.latestTime', chat.latestTime);
       latest.time = latest.time && new Date(latest.time);
-      console.log('latest', latest);
       this.setState({latest});
       this.eventListeners.push(event);
     });
@@ -43,22 +42,22 @@ class ChatListItem extends Component {
   }
 
   onClick() {
-    showChat(this.props.chatId);
+    showChat(this.props.chat.id);
     this.setState();
   }
 
   render() {
-    const chat = chats[this.props.chatId];
+    const chat = chats[this.props.chat.id];
     const active = this.props.active ? "active" : "";
     const seen = this.props.active ? "seen" : "";
     const delivered = this.props.active ? "delivered" : "";
     return html`
     <div class="chat-item ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
-      <${Identicon} str=${this.props.chatId} width=49/>
+      <${Identicon} str=${this.props.chat.id} width=49/>
       <div class="text">
         <div>
-          <span class="name">${this.state.name}</span>
-          <small class="latest-time">${this.state.latest.time}</small>
+          <span class="name">${this.state.chat.name}</span>
+          <small class="latest-time">${this.state.latestTime}</small>
         </div>
         <small class="typing-indicator">${t('typing')}</small>
         <small class="latest">
