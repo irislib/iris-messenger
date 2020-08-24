@@ -2,7 +2,7 @@ import {publicState, activeChat, activeProfile, resetView, showMenu} from './Mai
 import {chats, addChat, showNewChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
-import Profile from './Profile.js';
+import Profile from './components/Profile.js';
 import QRScanner from './QRScanner.js';
 import { translate as tr } from './Translation.js';
 

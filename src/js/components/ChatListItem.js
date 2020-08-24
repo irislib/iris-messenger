@@ -1,5 +1,5 @@
 import { html, Component } from '../lib/htm.preact.js';
-import {activeChat, showChat} from '../Chat.js';
+import {showChat} from '../Chat.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Identicon from './Identicon.js';
@@ -15,8 +15,11 @@ class ChatListItem extends Component {
 
   componentDidMount() {
     const chat = this.props.chat;
-    const latestTime = chat.latestTime && iris.util.formatDate(new Date(chat.latestTime));
-    this.setState({chat, latestTime});
+    const time = chat.latestTime && new Date(chat.latestTime);
+    let latestTimeText = time && iris.util.getDaySeparatorText(time, time.toLocaleDateString({dateStyle:'short'}));
+    latestTimeText = t(latestTimeText);
+    if (latestTimeText === t('today')) { latestTimeText = iris.util.formatTime(time); }
+    this.setState({chat, latestTimeText});
     localState.get('chats').get(chat.id).get('latest').on((latest, a, b, event) => {
       /*
       if (msg.attachments) {
@@ -47,7 +50,6 @@ class ChatListItem extends Component {
   }
 
   render() {
-    const chat = chats[this.props.chat.id];
     const active = this.props.active ? "active" : "";
     const seen = this.props.active ? "seen" : "";
     const delivered = this.props.active ? "delivered" : "";
@@ -57,7 +59,7 @@ class ChatListItem extends Component {
       <div class="text">
         <div>
           <span class="name">${this.state.chat.name}</span>
-          <small class="latest-time">${this.state.latestTime}</small>
+          <small class="latest-time">${this.state.latestTimeText}</small>
         </div>
         <small class="typing-indicator">${t('typing')}</small>
         <small class="latest">

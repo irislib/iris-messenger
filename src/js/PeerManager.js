@@ -2,7 +2,7 @@ import {publicState} from './Main.js';
 import {chats, showChat} from './Chat.js';
 import Helpers from './Helpers.js';
 import Session from './Session.js';
-import Profile from './Profile.js';
+import Profile from './components/Profile.js';
 import {translate as t} from './Translation.js';
 
 var MAX_PEER_LIST_SIZE = 10;

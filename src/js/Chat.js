@@ -5,7 +5,7 @@ import Notifications from './Notifications.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 import Gallery from './Gallery.js';
-import Profile from './Profile.js';
+import Profile from './components/Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
 

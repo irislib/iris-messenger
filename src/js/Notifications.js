@@ -1,5 +1,5 @@
 import Helpers from './Helpers.js';
-import Profile from './Profile.js';
+import Profile from './components/Profile.js';
 import Session from './Session.js';
 import {chats, showChat} from './Chat.js';
 import {publicState} from './Main.js';

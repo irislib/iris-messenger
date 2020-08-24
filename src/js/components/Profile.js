@@ -1,11 +1,11 @@
-import { html, render } from './lib/htm.preact.js';
-import {translate as t} from './Translation.js';
-import {localState, publicState, resetView, activeChat, activeProfile} from './Main.js';
-import {chats, deleteChat, showChat} from './Chat.js';
-import Session from './Session.js';
-import Helpers from './Helpers.js';
-import PublicMessages from './PublicMessages.js';
-import Message from './Components/Message.js';
+import { html, render } from '../lib/htm.preact.js';
+import {translate as t} from '../Translation.js';
+import {localState, publicState, resetView, activeChat, activeProfile} from '../Main.js';
+import {chats, deleteChat, showChat} from '../Chat.js';
+import Session from '../Session.js';
+import Helpers from '../Helpers.js';
+import PublicMessages from '../PublicMessages.js';
+import Message from './Message.js';
 //import VideoCall from './VideoCall.js';
 
 const Profile = () => html`<div class="main-view" id="profile">

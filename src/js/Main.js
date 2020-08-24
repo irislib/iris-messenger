@@ -11,7 +11,7 @@ import ChatView from './components/ChatView.js';
 import Login from './components/Login.js';
 import SideBar from './components/SideBar.js';
 import PublicMessages from './PublicMessages.js';
-import Profile from './Profile.js';
+import Profile from './components/Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
 
