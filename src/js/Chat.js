@@ -145,8 +145,8 @@ function addChat(channel) {
       chats[pub].latestTime = latest.time;
       localState.get('chats').get(pub).put({text: latest.text, time: latest.time, selfAuthored: info.selfAuthored});
       localState.get('chats').get(pub).put({
-        latestTime: msg.timeStr,
-        latest: {time: msg.timeStr, text: msg.text, selfAuthored: info.selfAuthored}
+        latestTime: latest.timeStr,
+        latest: {time: latest.timeStr, text: latest.text, selfAuthored: info.selfAuthored}
       });
     }
   });
