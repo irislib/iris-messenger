@@ -28,7 +28,6 @@ class ChatView extends Component {
 
   componentDidMount() {
     localState.get('activeChat').on(activeChatId => {
-      Helpers.closeAttachmentsGallery();
       this.setState({});
       if (activeChatId && !subscribedToMsgs[activeChatId]) {
         const iv = setInterval(() => {
@@ -39,15 +38,6 @@ class ChatView extends Component {
           }
         }, 1000);
         subscribedToMsgs[activeChatId] = true;
-      }
-    });
-    $(document).off('keyup').on('keyup', e => {
-      if (e.key === "Escape") { // escape key maps to keycode `27`
-        if ($('#attachment-preview.gallery:visible').length) {
-          Helpers.closeAttachmentsGallery();
-        } else {
-          this.closeAttachmentsPreview();
-        }
       }
     });
   }
