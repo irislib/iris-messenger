@@ -4,13 +4,11 @@ import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
-import Gallery from './Gallery.js';
 import Profile from './components/Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
 
 const chats = window.chats = {};
-const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
 
 function showChat(pub) {
   if (!pub) {
@@ -44,7 +42,6 @@ function showChat(pub) {
     isTyping = getIsTyping();
     chats[pub].msgDraft = $('#new-msg').val();
   });
-  $(".message-form form").off().on('submit', e => onMsgFormSubmit(e, pub));
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
   $('#message-view').scroll(_.throttle(() => {
@@ -67,47 +64,6 @@ function showChat(pub) {
   chats[pub].setMyMsgsLastSeenTime();
   Profile.setTheirOnlineStatus(pub);
   setDeliveredCheckmarks(pub);
-}
-
-async function onMsgFormSubmit(event, pub) {
-  event.preventDefault();
-  chats[pub].msgDraft = null;
-  var text = $('#new-msg').val();
-  if (!text.length && !chats[pub].attachments) { return; }
-  chats[pub].setTyping(false);
-  var msg = {text};
-  if (chats[pub].attachments) {
-    msg.attachments = chats[pub].attachments;
-  }
-  const myKey = Session.getKey();
-  const shouldWebPush = (pub === myKey.pub) || !(chats[pub].online && chats[pub].online.isOnline);
-  if (shouldWebPush && chats[pub].webPushSubscriptions) {
-    const subscriptions = [];
-    const participants = Object.keys(chats[pub].webPushSubscriptions);
-    for (let i = 0; i < participants.length; i++) {
-      const participant = participants[i];
-      const secret = await chats[pub].getSecret(participant);
-      const myName = Session.getMyName();
-      const titleText = chats[pub].uuid ? chats[pub].name : myName;
-      const bodyText = chats[pub].uuid ? `${myName}: ${text}` : text;
-      const payload = {
-        title: await Gun.SEA.encrypt(titleText, secret),
-        body: await Gun.SEA.encrypt(bodyText, secret),
-        from:{pub: myKey.pub, epub: myKey.epub}
-      };
-      chats[pub].webPushSubscriptions[participant].forEach(s => subscriptions.push({subscription: s, payload}));
-    }
-    fetch(notificationServiceUrl, {
-      method: 'POST',
-      body: JSON.stringify({subscriptions}),
-      headers: {
-        'content-type': 'application/json'
-      }
-    });
-  }
-  chats[pub].send(msg);
-  Gallery.closeAttachmentsPreview();
-  $('#new-msg').val('');
 }
 
 function deleteChat(pub) {

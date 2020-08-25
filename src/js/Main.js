@@ -2,7 +2,6 @@ import { html, render } from './lib/htm.preact.js';
 import Translation from './Translation.js';
 import Helpers from './Helpers.js';
 import PeerManager from './PeerManager.js';
-import Gallery from './Gallery.js';
 import Session from './Session.js';
 import Settings, {LogoutConfirmation, init as initSettings} from './Components/Settings.js';
 import {chats, init as initChat} from './Chat.js';
@@ -69,7 +68,6 @@ render(Main, document.body);
 
 Session.init();
 PeerManager.init();
-Gallery.init();
 initSettings();
 initChat();
 Translation.init();
@@ -117,7 +115,6 @@ function resetView() {
   $("#header-content").empty();
   $("#header-content").css({cursor: null});
   $('#private-key-qr').remove();
-  Gallery.reset();
 }
 
 function showMenu(show = true) {
