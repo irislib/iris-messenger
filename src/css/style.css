@@ -720,6 +720,10 @@ small {
   background-color: hsla(194, 55%, 80%, 1);;
 }
 
+.round-borders {
+  border-radius: 50%;
+}
+
 /* Tooltip container */
 .tooltip {
   position: relative;

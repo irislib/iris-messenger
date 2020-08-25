@@ -53,9 +53,17 @@ class ChatListItem extends Component {
     const active = this.props.active ? "active" : "";
     const seen = this.props.active ? "seen" : "";
     const delivered = this.props.active ? "delivered" : "";
+
+    const photo = this.props.photo;
+    let iconEl;
+    if (photo) {
+      iconEl = html`<div class="identicon-container"><img src="${this.props.photo}" class="round-borders" height=49 width=49 alt=""/></div>`;
+    } else {
+      iconEl = html`<${Identicon} str=${this.props.chat.id} width=49/>`;
+    }
     return html`
     <div class="chat-item ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
-      <${Identicon} str=${this.props.chat.id} width=49/>
+      ${iconEl}
       <div class="text">
         <div>
           <span class="name">${this.state.chat.name}</span>

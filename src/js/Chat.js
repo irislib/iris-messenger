@@ -240,6 +240,8 @@ function addChat(channel) {
     if (profile && !(profile.permissions && profile.permissions.admin)) {
       return;
     }
+    if (photo && photo.indexOf('data:image') !== 0) { return; }
+    localState.get('chats').get(pub).get('photo').put(photo);
     chats[pub].photo = photo;
     el.find('.identicon-container').empty();
     var img = Helpers.setImgSrc($('<img>'), photo).attr('height', 49).attr('width', 49).css({'border-radius': '50%'});
