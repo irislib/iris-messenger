@@ -212,7 +212,6 @@ header #back-button {
 }
 
 .main-view {
-  display: none;
   flex:1;
   overflow-y: scroll;
   padding: 10px 15px;

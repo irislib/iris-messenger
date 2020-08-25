@@ -202,7 +202,7 @@ class ChatView extends Component {
     }
 
     return html`
-      <div class="main-view" id="message-view">
+      <div class="main-view ${activeChat === 'public' ? 'public-messages-view' : ''}" id="message-view">
         <div id="message-list">${msgListContent}</div>
         <div id="attachment-preview" class="hidden"></div>
       </div>
@@ -210,7 +210,7 @@ class ChatView extends Component {
         <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
         <p><button class="copy-chat-link">${t('copy_your_chat_link')}</button></p>
       </div>
-      <div class="message-form" style="display:none">
+      <div class="message-form">
         <form autocomplete="off" onSubmit=${e => this.onMsgFormSubmit(e)}>
           <input name="attachment-input" type="file" class="hidden" id="attachment-input" accept="image/*" multiple onChange=${() => this.openAttachmentsPreview()}/>
           <button type="button" id="attach-file" onClick=${this.attachFileClicked}>

@@ -20,8 +20,6 @@ function showChat(pub) {
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
     newChat(pub);
   }
-  var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
-  chatListEl.find('.unseen').empty().hide();
   $("#message-view").toggleClass('public-messages-view', pub === 'public');
   $("#message-view").show();
   $(".message-form").show();

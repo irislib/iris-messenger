@@ -45,6 +45,7 @@ class ChatListItem extends Component {
   }
 
   onClick() {
+    // chatListEl.find('.unseen').empty().hide();
     showChat(this.props.chat.id);
     this.setState();
   }
