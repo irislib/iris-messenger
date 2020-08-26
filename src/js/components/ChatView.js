@@ -141,8 +141,8 @@ class ChatView extends Component {
           Notifications.changeChatUnseenCount(pub, 1);
         }
       }
-      if (!info.selfAuthored && msg.time > chats[pub].theirLastSeenTime) {
-        chats[pub].theirLastSeenTime = msg.time;
+      if (!info.selfAuthored && msg.time > chats[pub].theirMsgsLastSeenDate) {
+        chats[pub].theirMsgsLastSeenDate = msg.time;
         lastSeenTimeChanged(pub);
       }
       if (!chats[pub].latestTime || (msg.timeStr > chats[pub].latestTime)) {

@@ -101,7 +101,7 @@ class Message extends Component {
     const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
 
     const chat = chats[chatId];
-    const seen = chat.theirLastSeenTime >= time ? 'seen' : '';
+    const seen = chat.theirMsgsLastSeenDate >= time ? 'seen' : '';
     const delivered = chat.online && chat.online.lastActive && new Date(chat.online.lastActive) >= time ? 'delivered' : '';
     const whose = this.props.selfAuthored ? 'our' : 'their';
 

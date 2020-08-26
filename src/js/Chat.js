@@ -83,7 +83,6 @@ function newChat(pub, chatLink) {
 }
 
 function addChat(channel) {
-  console.log('addChat', channel);
   var pub = channel.getId();
   if (chats[pub]) { return; }
   chats[pub] = channel;
@@ -93,6 +92,13 @@ function addChat(channel) {
       chats[pub].latestTime = t;
     } else {
       chatNode.get('latestTime').put(chats[pub].latestTime);
+    }
+  });
+  chatNode.get('theirMsgsLastSeenTime').on(t => {
+    if (!t) { return; }
+    const d = new Date(t);
+    if (!chats[pub].theirMsgsLastSeenDate || chats[pub].theirMsgsLastSeenDate < d) {
+      chats[pub].theirMsgsLastSeenDate = d;
     }
   });
   $('#welcome').remove();
@@ -136,8 +142,8 @@ function addChat(channel) {
   });
   //$(".chat-list").append(el);
   chats[pub].getTheirMsgsLastSeenTime(time => {
-    if (chats[pub]) {
-      chats[pub].theirLastSeenTime = new Date(time);
+    if (chats[pub] && time) {
+      chatNode.get('theirMsgsLastSeenTime').put(time);
       lastSeenTimeChanged(pub);
     }
   });
@@ -159,6 +165,7 @@ function addChat(channel) {
   chats[pub].online = {};
   iris.Channel.getOnline(publicState, pub, (online) => {
     if (chats[pub]) {
+      chatNode.get('theirLastActiveTime').put(online && online.lastActive);
       chats[pub].online = online;
       Profile.setTheirOnlineStatus(pub);
       setDeliveredCheckmarks(pub);
@@ -268,7 +275,7 @@ function addChat(channel) {
 
 function setLatestSeen(pub) {
   if (chats[pub].latest) {
-    $('.chat-item[data-pub="' + pub +'"]').toggleClass('seen', chats[pub].latest.time <= chats[pub].theirLastSeenTime);
+    $('.chat-item[data-pub="' + pub +'"]').toggleClass('seen', chats[pub].latest.time <= chats[pub].theirMsgsLastSeenDate);
   }
 }
 
@@ -301,11 +308,11 @@ function lastSeenTimeChanged(pub) {
   setLatestSeen(pub);
   setDeliveredCheckmarks(pub);
   if (pub !== 'public' && pub === activeChat) {
-    if (chats[pub].theirLastSeenTime) {
+    if (chats[pub].theirMsgsLastSeenDate) {
       $('#not-seen-by-them').slideUp();
       $('.msg.our:not(.seen)').each(function() {
         var el = $(this);
-        if (el.data('time') <= chats[pub].theirLastSeenTime) {
+        if (el.data('time') <= chats[pub].theirMsgsLastSeenDate) {
           el.toggleClass('seen', true);
         }
       });

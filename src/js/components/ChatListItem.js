@@ -32,7 +32,6 @@ class ChatListItem extends Component {
       }
       */
       if (latest.time < chat.latestTime) { return; }
-      console.log('latest.time', latest.time, 'chat.latestTime', chat.latestTime);
       latest.time = latest.time && new Date(latest.time);
       this.setState({latest});
       this.eventListeners.push(event);
@@ -53,8 +52,8 @@ class ChatListItem extends Component {
   render() {
     const chat = this.props.chat;
     const active = this.props.active ? "active" : "";
-    const seen = chat.theirLastSeenTime >= this.state.latest.time ? "seen" : "";
-    const delivered = chat.online && chat.online.lastActive >= this.state.latest.time ? "delivered" : "";
+    const seen = chat.theirMsgsLastSeenTime >= chat.latestTime ? "seen" : "";
+    const delivered = chat.theirLastActiveTime >= chat.latestTime ? "delivered" : "";
 
     const photo = this.props.photo;
     let iconEl;

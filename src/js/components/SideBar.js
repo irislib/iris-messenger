@@ -59,7 +59,14 @@ class SideBar extends Component {
           </svg>
           ${t('new_chat')}
         </div>
-        ${this.state.chats.filter(chat => chat.id !== 'public').map(chat => html`<${ChatListItem} photo=${chat.photo} active=${chat.id === this.state.activeChat} key=${chat.id} chat=${chat}/>`)}
+        ${this.state.chats.filter(chat => chat.id !== 'public').map(chat =>
+          html`<${ChatListItem}
+            photo=${chat.photo}
+            active=${chat.id === this.state.activeChat}
+            key=${chat.id}
+            chat=${chat}/>`
+          )
+        }
         <div id="welcome" class="visible-xs-block">
           <h3>Iris Messenger</h3>
           <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
