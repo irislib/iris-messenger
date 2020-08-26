@@ -168,6 +168,7 @@ class ChatView extends Component {
 
   componentDidUpdate() {
     Helpers.scrollToMessageListBottom();
+    $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
   }
 
   render() {
