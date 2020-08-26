@@ -81,22 +81,6 @@ $(window).load(() => {
 
 Helpers.showConsoleWarning();
 
-var emojiButton = $('#emoji-picker');
-if (!iris.util.isMobile) {
-  emojiButton.show();
-  var picker = new EmojiButton({position: 'top-start'});
-
-  picker.on('emoji', emoji => {
-    $('#new-msg').val($('#new-msg').val() + emoji);
-    $('#new-msg').focus();
-  });
-
-  emojiButton.click(event => {
-    event.preventDefault();
-    picker.pickerVisible ? picker.hidePicker() : picker.showPicker(emojiButton);
-  });
-}
-
 $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
 
 function resetView() {

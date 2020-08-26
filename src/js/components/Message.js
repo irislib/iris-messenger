@@ -52,6 +52,7 @@ function openAttachmentsGallery(msg, event) {
   });
   $(document).off('keyup').on('keyup', e => {
     if (e.key === "Escape") { // escape key maps to keycode `27`
+      $(document).off('keyup');
       if ($('#attachment-preview.gallery:visible').length) {
         closeAttachmentsGallery();
       } else {
