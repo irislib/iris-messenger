@@ -55,6 +55,8 @@ class ChatListItem extends Component {
     const active = this.props.active ? "active" : "";
     const seen = chat.theirMsgsLastSeenTime >= chat.latestTime ? "seen" : "";
     const delivered = chat.theirLastActiveTime >= chat.latestTime ? "delivered" : "";
+    const hasUnseen = chat.unseen ? 'has-unseen' : '';
+    const unseenEl = chat.unseen ? html`<span class="unseen">${chat.unseen}</span>` : '';
 
     let name = chat.name;
     if (chat.id === Session.getKey().pub) {
@@ -69,7 +71,7 @@ class ChatListItem extends Component {
       iconEl = html`<${Identicon} str=${chat.id} width=49/>`;
     }
     return html`
-    <div class="chat-item ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
+    <div class="chat-item ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
       ${iconEl}
       <div class="text">
         <div>
@@ -81,7 +83,7 @@ class ChatListItem extends Component {
           ${this.state.latest.selfAuthored && seenIndicator}
           ${this.state.latest.text}
         </small>
-        <span class="unseen"></span>
+        ${unseenEl}
       </div>
     </div>
     `;

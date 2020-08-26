@@ -2,7 +2,7 @@ import Helpers from './Helpers.js';
 import Profile from './components/Profile.js';
 import Session from './Session.js';
 import {chats, showChat} from './Chat.js';
-import {publicState} from './Main.js';
+import {publicState, localState} from './Main.js';
 import { translate as t } from './Translation.js';
 
 var notificationSound = new Audio('../../audio/notification.mp3');
@@ -73,6 +73,7 @@ function setUnseenTotal() {
 }
 
 function changeChatUnseenCount(pub, change) {
+  const chatNode = localState.get('chats').get(pub);
   if (change) {
     unseenTotal += change;
     chats[pub].unseen += change;
@@ -80,17 +81,8 @@ function changeChatUnseenCount(pub, change) {
     unseenTotal = unseenTotal - (chats[pub].unseen || 0);
     chats[pub].unseen = 0;
   }
+  chatNode.get('unseen').put(chats[pub].unseen);
   unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
-  var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
-  var unseenCountEl = chatListEl.find('.unseen');
-  if (chats[pub].unseen > 0) {
-    chatListEl.addClass('has-unseen');
-    unseenCountEl.text(chats[pub].unseen);
-    unseenCountEl.show();
-  } else {
-    chatListEl.removeClass('has-unseen');
-    unseenCountEl.hide();
-  }
   setUnseenTotal();
 }
 

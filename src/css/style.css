@@ -582,7 +582,6 @@ header #back-button {
   font-size: 12px;
   line-height: 1em;
   font-weight: 500;
-  display: none;
 }
 
 .chat-item .unseen {
