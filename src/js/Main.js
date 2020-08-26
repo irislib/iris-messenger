@@ -75,9 +75,7 @@ Profile.init();
 VideoCall.init();
 PublicMessages.init();
 
-$(window).load(() => {
-  $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
-});
+$('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
 
 Helpers.showConsoleWarning();
 
