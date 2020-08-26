@@ -88,6 +88,13 @@ function addChat(channel) {
   if (chats[pub]) { return; }
   chats[pub] = channel;
   const chatNode = localState.get('chats').get(pub);
+  chatNode.get('latestTime').on(t => {
+    if (t && (!chats[pub].latestTime || t > chats[pub].latestTime)) {
+      chats[pub].latestTime = t;
+    } else {
+      chatNode.get('latestTime').put(chats[pub].latestTime);
+    }
+  });
   $('#welcome').remove();
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
@@ -96,8 +103,6 @@ function addChat(channel) {
   chats[pub].getLatestMsg && chats[pub].getLatestMsg((latest, info) => {
     if (latest.time && latest.time > chats[pub].latestTime && latest.text) {
       console.log('latest.time', latest.time, 'latestTime', chats[pub].latestTime);
-      chats[pub].latestTime = latest.time;
-      localState.get('chats').get(pub).put({text: latest.text, time: latest.time, selfAuthored: info.selfAuthored});
       localState.get('chats').get(pub).put({
         latestTime: latest.timeStr,
         latest: {time: latest.timeStr, text: latest.text, selfAuthored: info.selfAuthored}

@@ -51,16 +51,17 @@ class ChatListItem extends Component {
   }
 
   render() {
+    const chat = this.props.chat;
     const active = this.props.active ? "active" : "";
-    const seen = this.props.active ? "seen" : "";
-    const delivered = this.props.active ? "delivered" : "";
+    const seen = chat.theirLastSeenTime >= this.state.latest.time ? "seen" : "";
+    const delivered = chat.online && chat.online.lastActive >= this.state.latest.time ? "delivered" : "";
 
     const photo = this.props.photo;
     let iconEl;
     if (photo) {
       iconEl = html`<div class="identicon-container"><img src="${this.props.photo}" class="round-borders" height=49 width=49 alt=""/></div>`;
     } else {
-      iconEl = html`<${Identicon} str=${this.props.chat.id} width=49/>`;
+      iconEl = html`<${Identicon} str=${chat.id} width=49/>`;
     }
     return html`
     <div class="chat-item ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>

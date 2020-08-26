@@ -150,7 +150,6 @@ class ChatView extends Component {
           latestTime: msg.timeStr,
           latest: {time: msg.timeStr, text: msg.text, selfAuthored: info.selfAuthored}
         });
-        chats[pub].latestTime = msg.timeStr;
         if (info.selfAuthored) {
           //latestEl.prepend($(seenIndicatorHtml));
           setLatestSeen(pub);
