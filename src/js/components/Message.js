@@ -84,6 +84,10 @@ class Message extends Component {
     this.i = 0;
   }
 
+  shouldComponentUpdate() {
+    return false;
+  }
+
   render() {
     if (++this.i > 1) console.log(this.i);
     let name, color;
