@@ -11,16 +11,19 @@ class SideBar extends Component {
 
   componentDidMount() {
     const chats = {};
-    localState.get('activeChat').on(activeChat => this.setState({activeChat}));
-    localState.get('chats').map().on((chat, id) => {
-      chat.id = id;
-      chats[id] = chat;
+    const debouncedUpdate = _.debounce(() => {
       const sortedChats = Object.values(chats)
         .sort((a, b) => {
           if (b.latestTime === undefined || a.latestTime > b.latestTime) return -1;
           return 1;
         });
-      this.setState({chats:sortedChats});
+      this.setState({chats: sortedChats});
+    }, 200);
+    localState.get('activeChat').on(activeChat => this.setState({activeChat}));
+    localState.get('chats').map().on((chat, id) => {
+      chat.id = id;
+      chats[id] = chat;
+      debouncedUpdate();
     });
   }
 

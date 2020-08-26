@@ -132,7 +132,10 @@ class ChatView extends Component {
 
   subscribeToMsgs(pub) {
     subscribedToMsgs[pub] = true;
-    const debouncedUpdate = _.debounce(() => this.setState({}), 200);
+    const debouncedUpdate = _.debounce(() => {
+      chats[pub].sortedMessages = chats[pub].sortedMessages.sort((a, b) => a.time - b.time);
+      this.setState({});
+    }, 200);
     chats[pub].getMessages((msg, info) => {
       if (chats[pub].messageIds[msg.time + info.from]) return;
       msg.info = info;
@@ -141,7 +144,6 @@ class ChatView extends Component {
       msg.time = new Date(msg.time);
       chats[pub].messageIds[msg.time + info.from] = true;
       chats[pub].sortedMessages.push(msg);
-      chats[pub].sortedMessages = chats[pub].sortedMessages.sort((a, b) => a.time - b.time);
       if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
         if (activeChat !== pub || document.visibilityState !== 'visible') {
           Notifications.changeChatUnseenCount(pub, 1);

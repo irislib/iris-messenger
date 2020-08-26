@@ -225,7 +225,6 @@ function init() {
   $('.logout-button').click(async () => {
     // TODO: remove subscription from your chats
     localStorage.clear();
-    await clearIndexedDB();
     const reg = await navigator.serviceWorker.getRegistration();
     if (reg) {
       reg.active.postMessage({key: null});
@@ -236,11 +235,12 @@ function init() {
         sub.unsubscribe && sub.unsubscribe();
       }
     }
-    _.defer(() => location.reload());
+    await clearIndexedDB();
+    location.reload();
   });
   $('#show-existing-account-login').click(showSwitchAccount);
   $('#show-create-account').click(showCreateAccount);
   $('#scan-privkey-btn').click(showScanPrivKey);
 }
 
-export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, areWeOnline};
+export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, areWeOnline };
