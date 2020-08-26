@@ -132,6 +132,7 @@ class ChatView extends Component {
 
   subscribeToMsgs(pub) {
     subscribedToMsgs[pub] = true;
+    const debouncedUpdate = _.debounce(() => this.setState({}), 200);
     chats[pub].getMessages((msg, info) => {
       if (chats[pub].messageIds[msg.time + info.from]) return;
       msg.info = info;
@@ -158,7 +159,7 @@ class ChatView extends Component {
       }
       Notifications.notifyMsg(msg, info, pub);
       if (activeChat === pub) {
-        this.setState({});
+        debouncedUpdate();
       }
     });
   }
