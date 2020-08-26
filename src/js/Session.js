@@ -160,6 +160,11 @@ function setChatLinkQrCode(link) {
   });
 }
 
+async function clearIndexedDB() {
+  const dbs = await window.indexedDB.databases();
+  dbs.forEach(db => { window.indexedDB.deleteDatabase(db.name) });
+}
+
 function getMyChatLink() {
   return latestChatLink || Helpers.getUserChatLink(key.pub);
 }
@@ -201,6 +206,7 @@ function init() {
   if (localStorageKey) {
     login(JSON.parse(localStorageKey));
   } else {
+    clearIndexedDB();
     newUserLogin();
   }
 
@@ -219,8 +225,7 @@ function init() {
   $('.logout-button').click(async () => {
     // TODO: remove subscription from your chats
     localStorage.clear();
-    const dbs = await window.indexedDB.databases();
-    dbs.forEach(db => { window.indexedDB.deleteDatabase(db.name) });
+    await clearIndexedDB();
     const reg = await navigator.serviceWorker.getRegistration();
     if (reg) {
       reg.active.postMessage({key: null});

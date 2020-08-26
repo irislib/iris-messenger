@@ -61,7 +61,6 @@ function showChat(pub) {
   Helpers.scrollToMessageListBottom();
   chats[pub].setMyMsgsLastSeenTime();
   Profile.setTheirOnlineStatus(pub);
-  setDeliveredCheckmarks(pub);
 }
 
 function deleteChat(pub) {
@@ -168,7 +167,6 @@ function addChat(channel) {
       chatNode.get('theirLastActiveTime').put(online && online.lastActive);
       chats[pub].online = online;
       Profile.setTheirOnlineStatus(pub);
-      setDeliveredCheckmarks(pub);
     }
   });
   function setName(name, from) {
@@ -273,27 +271,6 @@ function addChat(channel) {
   localState.get('chats').get(pub).put({enabled:true});
 }
 
-function setLatestSeen(pub) {
-  if (chats[pub].latest) {
-    $('.chat-item[data-pub="' + pub +'"]').toggleClass('seen', chats[pub].latest.time <= chats[pub].theirMsgsLastSeenDate);
-  }
-}
-
-function setLatestCheckmark(pub) {
-  var latestTime = chats[pub].latest && chats[pub].latest.time;
-  var lastActive = chats[pub].online && chats[pub].online.lastActive && new Date(chats[pub].online.lastActive);
-  if (latestTime && lastActive) {
-    $('.chat-item[data-pub="' + pub +'"]').toggleClass('delivered', latestTime <= lastActive);
-  }
-}
-
-function setDeliveredCheckmarks(pub) {
-  var online = chats[pub].online;
-  if (online && online.lastActive) {
-    setLatestCheckmark(pub);
-  }
-}
-
 function showNewChat() {
   resetView();
   $('.chat-item.new').toggleClass('active', true);
@@ -305,8 +282,6 @@ function showNewChat() {
 }
 
 function lastSeenTimeChanged(pub) {
-  setLatestSeen(pub);
-  setDeliveredCheckmarks(pub);
   if (pub !== 'public' && pub === activeChat) {
     if (chats[pub].theirMsgsLastSeenDate) {
       $('#not-seen-by-them').slideUp();
@@ -379,4 +354,4 @@ function init() {
   $('#scan-chatlink-qr-btn').click(scanChatLinkQr);
 }
 
-export { init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat, lastSeenTimeChanged, setLatestSeen, setLatestCheckmark};
+export { init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat, lastSeenTimeChanged };

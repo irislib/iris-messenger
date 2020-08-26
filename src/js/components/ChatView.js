@@ -2,7 +2,7 @@ import { html, Component } from '../lib/htm.preact.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Message from './Message.js';
-import {activeChat, chats, lastSeenTimeChanged, setLatestSeen, setLatestCheckmark} from '../Chat.js';
+import {activeChat, chats, lastSeenTimeChanged} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Notifications from '../Notifications.js';
 import Session from '../Session.js';
@@ -155,11 +155,6 @@ class ChatView extends Component {
           latestTime: msg.timeStr,
           latest: {time: msg.timeStr, text: msg.text, selfAuthored: info.selfAuthored}
         });
-        if (info.selfAuthored) {
-          //latestEl.prepend($(seenIndicatorHtml));
-          setLatestSeen(pub);
-          setLatestCheckmark(pub);
-        }
       }
       Notifications.notifyMsg(msg, info, pub);
       if (activeChat === pub) {
