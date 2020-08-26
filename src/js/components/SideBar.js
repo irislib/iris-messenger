@@ -25,6 +25,10 @@ class SideBar extends Component {
   }
 
   render() {
+    const welcomeToIris = this.state.chats.length > 1 ? '' : html`<div id="welcome" class="visible-xs-block">
+      <h3>Iris Messenger</h3>
+      <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
+    </div>`;
     return html`<section class="sidebar hidden-xs">
       <div class="user-info">
         <div id="my-identicon"></div>
@@ -67,10 +71,7 @@ class SideBar extends Component {
             chat=${chat}/>`
           )
         }
-        <div id="welcome" class="visible-xs-block">
-          <h3>Iris Messenger</h3>
-          <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
-        </div>
+        ${welcomeToIris}
       </div>
     </section>`
   }
