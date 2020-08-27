@@ -72,7 +72,7 @@ class ChatListItem extends Component {
     const unseenEl = chat.unseen ? html`<span class="unseen">${chat.unseen}</span>` : '';
 
     let name = chat.name;
-    if (chat.id === Session.getKey().pub) {
+    if (chat.id === (Session.getKey() || {}).pub) {
       name = html`📝 <b>${t('note_to_self')}</b>`;
     }
 

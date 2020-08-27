@@ -5,7 +5,6 @@ import Notifications from './Notifications.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 import Profile from './components/Profile.js';
-import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
 
 const chats = window.chats = {};
@@ -20,13 +19,11 @@ function showChat(pub) {
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
     newChat(pub);
   }
-  $("#message-view").toggleClass('public-messages-view', pub === 'public');
   $("#message-view").show();
   $(".message-form").show();
   if (!iris.util.isMobile) {
     $("#new-msg").focus();
   }
-  $('#new-msg').val(chats[pub].msgDraft);
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
   lastSeenTimeChanged(pub);
@@ -272,58 +269,4 @@ function lastSeenTimeChanged(pub) {
   }
 }
 
-function createGroupSubmit(e) {
-  e.preventDefault();
-  if ($('#new-group-name').val().length) {
-    var c = new iris.Channel({
-      gun: publicState,
-      key: Session.getKey(),
-      participants: [],
-    });
-    c.put('name', $('#new-group-name').val());
-    $('#new-group-name').val('');
-    addChat(c);
-    Profile.showProfile(c.uuid);
-  }
-}
-
-function onPasteChatLink(event) {
-  var val = $(event.target).val();
-  if (val.length < 30) {
-    return;
-  }
-  var s = val.split('?');
-  if (s.length !== 2) { return; }
-  var chatId = Helpers.getUrlParameter('chatWith', s[1]) || Helpers.getUrlParameter('channelId', s[1]);
-  if (chatId) {
-    newChat(chatId, val);
-    showChat(chatId);
-  }
-  $(event.target).val('');
-}
-
-function onWindowResize() { // if resizing up from mobile size menu view
-  if ($(window).width() > 565 && $('.main-view:visible').length === 0) {
-    showNewChat();
-  }
-}
-
-function scanChatLinkQr() {
-  if ($('#chatlink-qr-video:visible').length) {
-    $('#chatlink-qr-video').hide();
-    QRScanner.cleanupScanner();
-  } else {
-    $('#chatlink-qr-video').show();
-    QRScanner.startChatLinkQRScanner();
-  }
-}
-
-function init() {
-  $(window).resize(onWindowResize);
-  $('.chat-item.new').click(showNewChat);
-  $('#paste-chat-link').on('input', onPasteChatLink);
-  $('#new-group-form').submit(createGroupSubmit);
-  $('#scan-chatlink-qr-btn').click(scanChatLinkQr);
-}
-
-export { init, showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat, lastSeenTimeChanged };
+export { showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat, lastSeenTimeChanged };

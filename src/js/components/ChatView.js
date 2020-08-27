@@ -171,7 +171,7 @@ class ChatView extends Component {
     });
   }
 
-  onMessageViewScroll(event) {
+  onMessageViewScroll() {
     this.messageViewScrollHandler = this.messageViewScrollHandler || _.throttle(event => {
       if ($('#attachment-preview:visible').length) { return; }
       var currentDaySeparator = $('.day-separator').last();
@@ -206,6 +206,7 @@ class ChatView extends Component {
   componentDidUpdate() {
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
+    $('#new-msg').val(chats[activeChat] && chats[activeChat].msgDraft);
   }
 
   render() {

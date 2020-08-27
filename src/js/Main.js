@@ -4,7 +4,7 @@ import Helpers from './Helpers.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 import Settings, {LogoutConfirmation, init as initSettings} from './Components/Settings.js';
-import {chats, init as initChat} from './Chat.js';
+import {chats, showNewChat} from './Chat.js';
 import NewChat from './components/NewChat.js';
 import ChatView from './components/ChatView.js';
 import Login from './components/Login.js';
@@ -69,7 +69,6 @@ render(Main, document.body);
 Session.init();
 PeerManager.init();
 initSettings();
-initChat();
 Translation.init();
 Profile.init();
 VideoCall.init();
@@ -80,6 +79,13 @@ $('body').css('opacity', 1); // use opacity because setting focus on display: no
 Helpers.showConsoleWarning();
 
 $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
+
+$(window).resize(() => { // if resizing up from mobile size menu view
+  if ($(window).width() > 565 && $('.main-view:visible').length === 0) {
+    showNewChat();
+  }
+});
+
 
 function resetView() {
   if (activeChat && chats[activeChat]) {
