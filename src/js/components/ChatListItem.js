@@ -51,6 +51,7 @@ class ChatListItem extends Component {
     if (nS.latest.time !== s.latest.time) return true;
     if (nP.active !== p.active) return true;
     if (nP.photo !== p.photo) return true;
+    if (nP.chat.isTyping !== p.chat.isTyping) return true;
     if (nP.chat.name !== p.chat.name) return true;
     if (nP.chat.theirMsgsLastSeenTime !== p.chat.theirMsgsLastSeenTime) return true;
     if (nP.chat.latestTime !== p.chat.latestTime) return true;
@@ -83,6 +84,14 @@ class ChatListItem extends Component {
     } else {
       iconEl = html`<${Identicon} str=${chat.id} width=49/>`;
     }
+
+    const latestEl = chat.isTyping ? '' : html`<small class="latest">
+      ${this.state.latest.selfAuthored && seenIndicator}
+      ${this.state.latest.text}
+    </small>`;
+
+    const typingIndicator = chat.isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : '';
+
     return html`
     <div class="chat-item ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
       ${iconEl}
@@ -91,11 +100,8 @@ class ChatListItem extends Component {
           <span class="name">${name}</span>
           <small class="latest-time">${this.state.latestTimeText}</small>
         </div>
-        <small class="typing-indicator">${t('typing')}</small>
-        <small class="latest">
-          ${this.state.latest.selfAuthored && seenIndicator}
-          ${this.state.latest.text}
-        </small>
+        ${typingIndicator}
+        ${latestEl}
         ${unseenEl}
       </div>
     </div>

@@ -2,7 +2,7 @@ import { html, Component } from '../lib/htm.preact.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Message from './Message.js';
-import {activeChat, chats, lastSeenTimeChanged} from '../Chat.js';
+import {activeChat, chats, lastSeenTimeChanged, processMessage} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Notifications from '../Notifications.js';
 import Session from '../Session.js';
@@ -142,29 +142,7 @@ class ChatView extends Component {
       this.setState({});
     }, 200);
     chats[pub].getMessages((msg, info) => {
-      if (chats[pub].messageIds[msg.time + info.from]) return;
-      msg.info = info;
-      msg.selfAuthored = info.selfAuthored;
-      msg.timeStr = msg.time;
-      msg.time = new Date(msg.time);
-      chats[pub].messageIds[msg.time + info.from] = true;
-      chats[pub].sortedMessages.push(msg);
-      if (!info.selfAuthored && msg.time > (chats[pub].myLastSeenTime || -Infinity)) {
-        if (activeChat !== pub || document.visibilityState !== 'visible') {
-          Notifications.changeChatUnseenCount(pub, 1);
-        }
-      }
-      if (!info.selfAuthored && msg.time > chats[pub].theirMsgsLastSeenDate) {
-        chats[pub].theirMsgsLastSeenDate = msg.time;
-        lastSeenTimeChanged(pub);
-      }
-      if (!chats[pub].latestTime || (msg.timeStr > chats[pub].latestTime)) {
-        localState.get('chats').get(pub).put({
-          latestTime: msg.timeStr,
-          latest: {time: msg.timeStr, text: msg.text, selfAuthored: info.selfAuthored}
-        });
-      }
-      Notifications.notifyMsg(msg, info, pub);
+      processMessage(pub, msg, info);
       if (activeChat === pub) {
         debouncedUpdate();
       }

@@ -128,11 +128,12 @@ function getDisplayName(pub) {
 }
 
 function addUserToHeader(pub) {
+  const chat = chats[pub];
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (pub === Session.getKey().pub && activeProfile !== pub) {
     nameEl.html("📝 <b>" + t('note_to_self') + "</b>");
-  } else if (chats[pub]) {
+  } else if (chat) {
     nameEl.text(getDisplayName(pub));
   }
   nameEl.show();
@@ -145,15 +146,16 @@ function addUserToHeader(pub) {
   }
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
-  textEl.append($('<small>').addClass('last-seen'));
-  textEl.append($('<small>').addClass('typing-indicator').text(t('typing')));
-  if (chats[pub] && chats[pub].uuid) {
-    var text = Object.keys(chats[pub].participantProfiles).map(p => chats[pub].participantProfiles[p].name).join(', ');
-    var namesEl = $('<small>').addClass('participants').text(text);
+  const isTyping = chat && chat.isTyping;
+  textEl.append($('<small>').addClass('last-seen').toggle(!isTyping));
+  textEl.append($('<small>').addClass('typing-indicator').text(t('typing')).toggle(isTyping));
+  if (chat && chat.uuid) {
+    var text = Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
+    var namesEl = $('<small>').addClass('participants').text(text).toggle(!isTyping);
     textEl.append(namesEl);
-    if (chats[pub].photo) {
+    if (chat.photo) {
       identicon.hide();
-      var photo = Helpers.setImgSrc($('<img>'), chats[pub].photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
+      var photo = Helpers.setImgSrc($('<img>'), chat.photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
       $('#header-content .identicon-container').append(photo);
     }
   }

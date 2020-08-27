@@ -73,16 +73,9 @@ function addChat(channel) {
   $('#welcome').remove();
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
-  var latestEl = el.find('.latest');
-  var typingIndicator = el.find('.typing-indicator').text(t('typing'));
   chats[pub].getLatestMsg && chats[pub].getLatestMsg((latest, info) => {
-    if (latest.time && latest.time > chats[pub].latestTime && latest.text) {
-      console.log('latest.time', latest.time, 'latestTime', chats[pub].latestTime);
-      localState.get('chats').get(pub).put({
-        latestTime: latest.timeStr,
-        latest: {time: latest.timeStr, text: latest.text, selfAuthored: info.selfAuthored}
-      });
-    }
+    //console.log('gotLatestMsg', latest);
+    processMessage(pub, latest, info);
   });
   Notifications.changeChatUnseenCount(pub, 0);
   chats[pub].messageIds = chats[pub].messageIds || {};
@@ -123,13 +116,15 @@ function addChat(channel) {
     }
     PeerManager.askForPeers(pub); // TODO: this should be done only if we have a chat history or friendship with them
   });
+  chats[pub].isTyping = false;
   chats[pub].getTyping(isTyping => {
+    chats[pub].isTyping = isTyping;
+    localState.get('chats').get(pub).get('isTyping').put(isTyping);
     if (activeChat === pub) {
       $('#header-content .last-seen').toggle(!isTyping);
       $('#header-content .typing-indicator').toggle(isTyping);
+      $('#header-content .participants').toggle(!isTyping);
     }
-    typingIndicator.toggle(isTyping);
-    latestEl.toggle(!isTyping);
   });
   chats[pub].online = {};
   iris.Channel.getOnline(publicState, pub, (online) => {
@@ -241,6 +236,34 @@ function addChat(channel) {
   localState.get('chats').get(pub).put({enabled:true});
 }
 
+function processMessage(chatId, msg, info) {
+  //console.log('info', info);
+  const chat = chats[chatId];
+  if (chat.messageIds[msg.time + info.from]) return;
+  msg.info = info;
+  msg.selfAuthored = info.selfAuthored;
+  msg.timeStr = msg.time;
+  msg.time = new Date(msg.time);
+  chat.messageIds[msg.time + info.from] = true;
+  chat.sortedMessages.push(msg);
+  if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
+    if (activeChat !== chatId || document.visibilityState !== 'visible') {
+      Notifications.changeChatUnseenCount(chatId, 1);
+    }
+  }
+  if (!info.selfAuthored && msg.time > chat.theirMsgsLastSeenDate) {
+    chat.theirMsgsLastSeenDate = msg.time;
+    lastSeenTimeChanged(chatId);
+  }
+  if (!chat.latestTime || (msg.timeStr > chat.latestTime)) {
+    localState.get('chats').get(chatId).put({
+      latestTime: msg.timeStr,
+      latest: {time: msg.timeStr, text: msg.text, selfAuthored: info.selfAuthored}
+    });
+  }
+  Notifications.notifyMsg(msg, info, chatId);
+}
+
 function showNewChat() {
   resetView();
   $('#new-chat').show();
@@ -269,4 +292,4 @@ function lastSeenTimeChanged(pub) {
   }
 }
 
-export { showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat, lastSeenTimeChanged };
+export { showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat, lastSeenTimeChanged, processMessage };
