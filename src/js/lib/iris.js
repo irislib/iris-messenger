@@ -7822,7 +7822,7 @@
 	    var callbackIfLatest = async function callbackIfLatest(msg, info) {
 	      if (!_this6.latest) {
 	        _this6.latest = msg;
-					callback(msg, info);
+	        callback(msg, info);
 	      } else {
 	        var t = typeof _this6.latest.time === 'string' ? _this6.latest.time : _this6.latest.time.toISOString();
 	        if (t < msg.time) {
@@ -7832,10 +7832,10 @@
 	      }
 	    };
 	    this.onMy('latestMsg', function (msg, from) {
-	      return callbackIfLatest(msg, { selfAuthored: true, from });
+	      return callbackIfLatest(msg, { selfAuthored: true, from: from });
 	    });
 	    this.onTheir('latestMsg', function (msg, from) {
-	      return callbackIfLatest(msg, { selfAuthored: false, from });
+	      return callbackIfLatest(msg, { selfAuthored: false, from: from });
 	    });
 	  };
 
