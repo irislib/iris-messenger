@@ -48,34 +48,25 @@ class ChatView extends Component {
     this.picker.pickerVisible ? this.picker.hidePicker() : this.picker.showPicker(event.target);
   }
 
-  async onMsgFormSubmit(event) {
-    const pub = activeChat;
-    event.preventDefault();
-    chats[pub].msgDraft = null;
-    var text = $('#new-msg').val();
-    if (!text.length && !chats[pub].attachments) { return; }
-    chats[pub].setTyping(false);
-    var msg = {text};
-    if (chats[pub].attachments) {
-      msg.attachments = chats[pub].attachments;
-    }
+  async webPush(msg) {
+    const chat = chats[activeChat];
     const myKey = Session.getKey();
-    const shouldWebPush = (pub === myKey.pub) || !(chats[pub].online && chats[pub].online.isOnline);
-    if (shouldWebPush && chats[pub].webPushSubscriptions) {
+    const shouldWebPush = (activeChat === myKey.pub) || !(chat.online && chat.online.isOnline);
+    if (shouldWebPush && chat.webPushSubscriptions) {
       const subscriptions = [];
-      const participants = Object.keys(chats[pub].webPushSubscriptions);
+      const participants = Object.keys(chat.webPushSubscriptions);
       for (let i = 0; i < participants.length; i++) {
         const participant = participants[i];
-        const secret = await chats[pub].getSecret(participant);
+        const secret = await chat.getSecret(participant);
         const myName = Session.getMyName();
-        const titleText = chats[pub].uuid ? chats[pub].name : myName;
-        const bodyText = chats[pub].uuid ? `${myName}: ${text}` : text;
+        const titleText = chat.uuid ? chat.name : myName;
+        const bodyText = chat.uuid ? `${myName}: ${msg.text}` : msg.text;
         const payload = {
           title: await Gun.SEA.encrypt(titleText, secret),
           body: await Gun.SEA.encrypt(bodyText, secret),
           from:{pub: myKey.pub, epub: myKey.epub}
         };
-        chats[pub].webPushSubscriptions[participant].forEach(s => subscriptions.push({subscription: s, payload}));
+        chat.webPushSubscriptions[participant].forEach(s => subscriptions.push({subscription: s, payload}));
       }
       fetch(notificationServiceUrl, {
         method: 'POST',
@@ -83,11 +74,25 @@ class ChatView extends Component {
         headers: {
           'content-type': 'application/json'
         }
-      });
+      }).catch(() => {});
     }
-    chats[pub].send(msg);
+  }
+
+  async onMsgFormSubmit(event) {
+    const chat = chats[activeChat];
+    event.preventDefault();
+    chat.msgDraft = null;
+    const text = $('#new-msg').val();
+    if (!text.length && !chat.attachments) { return; }
+    chat.setTyping(false);
+    const msg = {text};
+    if (chat.attachments) {
+      msg.attachments = chat.attachments;
+    }
+    chat.send(msg);
     this.closeAttachmentsPreview();
     $('#new-msg').val('');
+    this.webPush(msg);
   }
 
   attachFileClicked(event) {
