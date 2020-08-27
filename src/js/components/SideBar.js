@@ -12,7 +12,7 @@ class SideBar extends Component {
 
   componentDidMount() {
     const chats = {};
-    const debouncedUpdate = _.debounce(() => {
+    const limitedUpdate = _.throttle(() => {
       const sortedChats = Object.values(chats)
         .sort((a, b) => {
           if (b.latestTime === undefined || a.latestTime > b.latestTime) return -1;
@@ -24,7 +24,7 @@ class SideBar extends Component {
     localState.get('chats').map().on((chat, id) => {
       chat.id = id;
       chats[id] = chat;
-      debouncedUpdate();
+      limitedUpdate();
     });
   }
 
