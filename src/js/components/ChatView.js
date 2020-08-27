@@ -171,7 +171,7 @@ class ChatView extends Component {
     });
   }
 
-  onMessageViewScroll() {
+  onMessageViewScroll(event) {
     this.messageViewScrollHandler = this.messageViewScrollHandler || _.throttle(event => {
       if ($('#attachment-preview:visible').length) { return; }
       var currentDaySeparator = $('.day-separator').last();
@@ -184,7 +184,7 @@ class ChatView extends Component {
       var center = $('<div>').css({position: 'fixed', top: 70, 'text-align': 'center'}).attr('id', 'floating-day-separator').width($('#message-view').width()).append(s);
       $('#floating-day-separator').remove();
       setTimeout(() => s.fadeOut(), 2000);
-      $('#message-view').prepend(center);
+      $(event.target).prepend(center);
     }, 200);
     this.messageViewScrollHandler(event);
   }
@@ -243,7 +243,7 @@ class ChatView extends Component {
     }
 
     return html`
-      <div class="main-view ${activeChat === 'public' ? 'public-messages-view' : ''}" id="message-view" onScroll=${() => this.onMessageViewScroll()}>
+      <div class="main-view ${activeChat === 'public' ? 'public-messages-view' : ''}" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
         <div id="message-list">${msgListContent}</div>
         <div id="attachment-preview" style="display:none"></div>
       </div>
