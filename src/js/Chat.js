@@ -273,7 +273,6 @@ function addChat(channel) {
 
 function showNewChat() {
   resetView();
-  $('.chat-item.new').toggleClass('active', true);
   $('#new-chat').show();
   $("#header-content").text(t('new_chat'));
   $('#show-my-qr-btn').off().click(() => {

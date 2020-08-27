@@ -31,7 +31,7 @@ var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:
 gunOpts.store = RindexedDB(gunOpts);
 var publicState = Gun(gunOpts);
 window.publicState = publicState;
-var localState = Gun({peers: [], file: 'localState', multicast:false}).get('state').put({activeChat:null});
+var localState = Gun({peers: [], file: 'localState', multicast:false}).get('state');
 window.localState = localState;
 
 Helpers.checkColorScheme();
@@ -82,7 +82,7 @@ Helpers.showConsoleWarning();
 $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
 
 function resetView() {
-  if (activeChat) {
+  if (activeChat && chats[activeChat]) {
     chats[activeChat].setTyping(false);
   }
   activeChat = null;
@@ -90,7 +90,6 @@ function resetView() {
   showMenu(false);
   QRScanner.cleanupScanner();
   $('#chatlink-qr-video').hide();
-  $('.chat-item').toggleClass('active', false);
   $('.main-view').hide();
   $('#not-seen-by-them').hide();
   $(".message-form").hide();

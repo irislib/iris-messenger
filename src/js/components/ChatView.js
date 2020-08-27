@@ -172,7 +172,7 @@ class ChatView extends Component {
   }
 
   render() {
-    if (!activeChat || !chats[activeChat].sortedMessages) {
+    if (!activeChat || !chats[activeChat] || !chats[activeChat].sortedMessages) {
       return html``;
     }
 
