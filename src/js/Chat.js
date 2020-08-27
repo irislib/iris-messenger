@@ -42,20 +42,6 @@ function showChat(pub) {
   });
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
-  $('#message-view').scroll(_.throttle(() => {
-    if ($('#attachment-preview:visible').length) { return; }
-    var currentDaySeparator = $('.day-separator').last();
-    var pos = currentDaySeparator.position();
-    while (currentDaySeparator && pos && pos.top - 55 > 0) {
-      currentDaySeparator = currentDaySeparator.prevAll('.day-separator').first();
-      pos = currentDaySeparator.position();
-    }
-    var s = currentDaySeparator.clone();
-    var center = $('<div>').css({position: 'fixed', top: 70, 'text-align': 'center'}).attr('id', 'floating-day-separator').width($('#message-view').width()).append(s);
-    $('#floating-day-separator').remove();
-    setTimeout(() => s.fadeOut(), 2000);
-    $('#message-view').prepend(center);
-  }, 200));
   lastSeenTimeChanged(pub);
   chats[pub].setMyMsgsLastSeenTime();
   Helpers.scrollToMessageListBottom();

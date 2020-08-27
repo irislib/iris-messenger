@@ -166,6 +166,24 @@ class ChatView extends Component {
     });
   }
 
+  onMessageViewScroll(event) {
+    this.messageViewScrollHandler = this.messageViewScrollHandler || _.throttle(event => {
+      if ($('#attachment-preview:visible').length) { return; }
+      var currentDaySeparator = $('.day-separator').last();
+      var pos = currentDaySeparator.position();
+      while (currentDaySeparator && pos && pos.top - 55 > 0) {
+        currentDaySeparator = currentDaySeparator.prevAll('.day-separator').first();
+        pos = currentDaySeparator.position();
+      }
+      var s = currentDaySeparator.clone();
+      var center = $('<div>').css({position: 'fixed', top: 70, 'text-align': 'center'}).attr('id', 'floating-day-separator').width($('#message-view').width()).append(s);
+      $('#floating-day-separator').remove();
+      setTimeout(() => s.fadeOut(), 2000);
+      $('#message-view').prepend(center);
+    }, 200);
+    this.messageViewScrollHandler(event);
+  }
+
   componentDidUpdate() {
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
@@ -205,9 +223,9 @@ class ChatView extends Component {
     }
 
     return html`
-      <div class="main-view ${activeChat === 'public' ? 'public-messages-view' : ''}" id="message-view">
+      <div class="main-view ${activeChat === 'public' ? 'public-messages-view' : ''}" id="message-view" onScroll=${() => this.onMessageViewScroll()}>
         <div id="message-list">${msgListContent}</div>
-        <div id="attachment-preview" class="hidden"></div>
+        <div id="attachment-preview" style="display:none"></div>
       </div>
       <div id="not-seen-by-them" style="display: none">
         <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
