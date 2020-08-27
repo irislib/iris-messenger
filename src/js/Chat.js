@@ -26,20 +26,7 @@ function showChat(pub) {
   if (!iris.util.isMobile) {
     $("#new-msg").focus();
   }
-  var isTyping = false;
-  var getIsTyping = () => $('#new-msg').val().length > 0;
-  var setTyping = () => chats[pub].setTyping(getIsTyping());
-  var setTypingThrottled = _.throttle(setTyping, 1000);
   $('#new-msg').val(chats[pub].msgDraft);
-  $('#new-msg').off().on('input', () => {
-    if (isTyping === getIsTyping()) {
-      setTypingThrottled();
-    } else {
-      setTyping();
-    }
-    isTyping = getIsTyping();
-    chats[pub].msgDraft = $('#new-msg').val();
-  });
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
   lastSeenTimeChanged(pub);
