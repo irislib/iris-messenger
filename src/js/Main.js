@@ -31,7 +31,7 @@ var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:
 gunOpts.store = RindexedDB(gunOpts);
 var publicState = Gun(gunOpts);
 window.publicState = publicState;
-var localState = Gun({peers: [], file: 'localState', multicast:false}).get('state');
+var localState = Gun({peers: [], file: 'localState', multicast:false}).get('state').put({activeChat:'new'});
 window.localState = localState;
 
 Helpers.checkColorScheme();
