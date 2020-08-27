@@ -74,7 +74,6 @@ function addChat(channel) {
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
   chats[pub].getLatestMsg && chats[pub].getLatestMsg((latest, info) => {
-    //console.log('gotLatestMsg', latest);
     processMessage(pub, latest, info);
   });
   Notifications.changeChatUnseenCount(pub, 0);
@@ -237,14 +236,13 @@ function addChat(channel) {
 }
 
 function processMessage(chatId, msg, info) {
-  //console.log('info', info);
   const chat = chats[chatId];
   if (chat.messageIds[msg.time + info.from]) return;
+  chat.messageIds[msg.time + info.from] = true;
   msg.info = info;
   msg.selfAuthored = info.selfAuthored;
   msg.timeStr = msg.time;
   msg.time = new Date(msg.time);
-  chat.messageIds[msg.time + info.from] = true;
   chat.sortedMessages.push(msg);
   if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
     if (activeChat !== chatId || document.visibilityState !== 'visible') {

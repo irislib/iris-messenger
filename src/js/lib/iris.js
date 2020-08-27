@@ -7831,10 +7831,10 @@
 	        }
 	      }
 	    };
-	    this.onMy('latestMsg', function (msg, from) {
-	      return callbackIfLatest(msg, { selfAuthored: true, from: from });
+	    this.onMy('latestMsg', function (msg) {
+	      return callbackIfLatest(msg, { selfAuthored: true, from: _this6.key.pub });
 	    });
-	    this.onTheir('latestMsg', function (msg, from) {
+	    this.onTheir('latestMsg', function (msg, k, from) {
 	      return callbackIfLatest(msg, { selfAuthored: false, from: from });
 	    });
 	  };
