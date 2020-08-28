@@ -43,7 +43,7 @@ function setOurOnlineStatus() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
       iris.Channel.setOnline(publicState, areWeOnline = true);
-      if (activeChat) {
+      if (activeChat && chats[activeChat]) {
         chats[activeChat].setMyMsgsLastSeenTime();
         Notifications.changeChatUnseenCount(activeChat, 0);
       }
