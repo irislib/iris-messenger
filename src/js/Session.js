@@ -186,6 +186,19 @@ function showCreateAccount(e) {
   $('#login-form-name').focus();
 }
 
+function copyMyChatLinkClicked(e) {
+  Helpers.copyToClipboard(getMyChatLink());
+  var te = $(e.target);
+  var originalText = te.text();
+  var originalWidth = te.width();
+  te.width(originalWidth);
+  te.text(tr('copied'));
+  setTimeout(() => {
+    te.text(originalText);
+    te.css('width', '');
+  }, 2000);
+}
+
 function showScanPrivKey() {
   if ($('#privkey-qr-video:visible').length) {
     $('#privkey-qr-video').hide();
@@ -243,4 +256,4 @@ function init() {
   $('#scan-privkey-btn').click(showScanPrivKey);
 }
 
-export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, areWeOnline };
+export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, areWeOnline, copyMyChatLinkClicked };

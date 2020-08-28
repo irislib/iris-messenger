@@ -206,19 +206,6 @@ function init() {
 
   $('.show-logout-confirmation').click(showLogoutConfirmation);
 
-  $('.copy-chat-link').click(event => {
-    Helpers.copyToClipboard(Session.getMyChatLink());
-    var te = $(event.target);
-    var originalText = te.text();
-    var originalWidth = te.width();
-    te.width(originalWidth);
-    te.text(t('copied'));
-    setTimeout(() => {
-      te.text(originalText);
-      te.css('width', '');
-    }, 2000);
-  });
-
   $('#copy-private-key').click(event => {
     Helpers.copyToClipboard(JSON.stringify(Session.getKey()));
     var te = $(event.target);
