@@ -127,7 +127,7 @@ const LogoutConfirmation = () => html`<div class="main-view" id="logout-confirma
     <button class="open-settings-button">${t('back')}</button>
   </p>
   <p>
-    <button class="logout-button">${t('log_out')}</button>
+    <button class="logout-button" onClick=${() => Session.logOut()}>${t('log_out')}</button>
   </p>
 </div>`;
 

@@ -162,7 +162,11 @@ function setChatLinkQrCode(link) {
 
 async function clearIndexedDB() {
   const dbs = await window.indexedDB.databases();
-  dbs.forEach(db => { window.indexedDB.deleteDatabase(db.name) });
+  dbs.forEach(db => {
+    if (db.name === 'localState' || db.name === 'radata') {
+      window.indexedDB.deleteDatabase(db.name);
+    }
+  });
 }
 
 function getMyChatLink() {
@@ -213,6 +217,23 @@ function getKey() { return key; }
 function getMyName() { return myName; }
 function getMyProfilePhoto() { return myProfilePhoto; }
 
+async function logOut() {
+  // TODO: remove subscription from your chats
+  localStorage.clear();
+  const reg = await navigator.serviceWorker.getRegistration();
+  if (reg) {
+    reg.active.postMessage({key: null});
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      const hash = await iris.util.getHash(JSON.stringify(sub));
+      Notifications.removeSubscription(hash);
+      sub.unsubscribe && sub.unsubscribe();
+    }
+  }
+  await clearIndexedDB();
+  location.reload();
+}
+
 function init() {
   $('#login').hide();
   var localStorageKey = localStorage.getItem('chatKeyPair');
@@ -235,25 +256,9 @@ function init() {
     }
   });
 
-  $('.logout-button').click(async () => {
-    // TODO: remove subscription from your chats
-    localStorage.clear();
-    const reg = await navigator.serviceWorker.getRegistration();
-    if (reg) {
-      reg.active.postMessage({key: null});
-      const sub = await reg.pushManager.getSubscription();
-      if (sub) {
-        const hash = await iris.util.getHash(JSON.stringify(sub));
-        Notifications.removeSubscription(hash);
-        sub.unsubscribe && sub.unsubscribe();
-      }
-    }
-    await clearIndexedDB();
-    location.reload();
-  });
   $('#show-existing-account-login').click(showSwitchAccount);
   $('#show-create-account').click(showCreateAccount);
   $('#scan-privkey-btn').click(showScanPrivKey);
 }
 
-export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, areWeOnline, copyMyChatLinkClicked };
+export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, areWeOnline, copyMyChatLinkClicked, logOut };

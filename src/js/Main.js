@@ -27,11 +27,9 @@ if (!isElectron && ('serviceWorker' in navigator)) {
 }
 
 Gun.log.off = true;
-var gunOpts = { peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity };
-gunOpts.store = RindexedDB(gunOpts);
-var publicState = Gun(gunOpts);
+var publicState = Gun({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity });
 window.publicState = publicState;
-var localState = Gun({peers: [], file: 'localState', multicast:false}).get('state').put({activeChat:'new'});
+var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state').put({activeChat:'new'});
 window.localState = localState;
 
 Helpers.checkColorScheme();
