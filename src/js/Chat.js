@@ -26,7 +26,6 @@ function showChat(pub) {
   }
   Notifications.changeChatUnseenCount(pub, 0);
   Profile.addUserToHeader(pub);
-  lastSeenTimeChanged(pub);
   chats[pub].setMyMsgsLastSeenTime();
   Helpers.scrollToMessageListBottom();
   chats[pub].setMyMsgsLastSeenTime();
@@ -272,18 +271,19 @@ function showNewChat() {
 }
 
 function lastSeenTimeChanged(pub) {
-  if (pub !== 'public' && pub === activeChat) {
-    if (chats[pub].theirMsgsLastSeenDate) {
+  const chat = chats[pub];
+  if (chat && pub !== 'public' && pub !== 'new' && pub === activeChat) {
+    if (chat.theirMsgsLastSeenDate) {
       $('#not-seen-by-them').slideUp();
       $('.msg.our:not(.seen)').each(function() {
         var el = $(this);
-        if (el.data('time') <= chats[pub].theirMsgsLastSeenDate) {
+        if (el.data('time') <= chat.theirMsgsLastSeenDate) {
           el.toggleClass('seen', true);
         }
       });
       // set seen msgs
     } else {
-      if (!chats[pub].uuid && $('.msg.our').length) {
+      if (!chat.uuid && $('.msg.our').length) {
         $('#not-seen-by-them').slideDown();
       }
     }

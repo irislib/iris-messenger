@@ -2,7 +2,7 @@ import { html, Component } from '../lib/htm.preact.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Message from './Message.js';
-import {activeChat, chats, processMessage} from '../Chat.js';
+import {activeChat, chats, processMessage, lastSeenTimeChanged} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 
@@ -187,6 +187,7 @@ class ChatView extends Component {
     if (!iris.util.isMobile) {
       $("#new-msg").focus();
     }
+    lastSeenTimeChanged(activeChat);
   }
 
   render() {
