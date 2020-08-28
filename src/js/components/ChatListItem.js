@@ -16,11 +16,6 @@ class ChatListItem extends Component {
 
   componentDidMount() {
     const chat = this.props.chat;
-    const time = chat.latestTime && new Date(chat.latestTime);
-    let latestTimeText = time && iris.util.getDaySeparatorText(time, time.toLocaleDateString({dateStyle:'short'}));
-    latestTimeText = t(latestTimeText);
-    if (latestTimeText === t('today')) { latestTimeText = iris.util.formatTime(time); }
-    this.setState({chat, latestTimeText});
     localState.get('chats').get(chat.id).get('latest').on((latest, a, b, event) => {
       /*
       if (msg.attachments) {
@@ -28,8 +23,8 @@ class ChatListItem extends Component {
       } else {
         text = msg.text;
       }
-      if (chats[chat.id] && chats[chat.id].uuid && !msg.selfAuthored && msg.info.from && chats[chat.id].participantProfiles[msg.info.from].name) {
-        text = chats[chat.id].participantProfiles[msg.info.from].name + ': ' + text;
+      if (chat && chat.uuid && !msg.selfAuthored && msg.info.from && chat.participantProfiles[msg.info.from].name) {
+        text = chat.participantProfiles[msg.info.from].name + ': ' + text;
       }
       */
       if (latest.time < chat.latestTime) { return; }
@@ -57,6 +52,11 @@ class ChatListItem extends Component {
     const hasUnseen = chat.unseen ? 'has-unseen' : '';
     const unseenEl = chat.unseen ? html`<span class="unseen">${chat.unseen}</span>` : '';
 
+    const time = chat.latestTime && new Date(chat.latestTime);
+    let latestTimeText = time && iris.util.getDaySeparatorText(time, time.toLocaleDateString({dateStyle:'short'}));
+    latestTimeText = t(latestTimeText);
+    if (latestTimeText === t('today')) { latestTimeText = iris.util.formatTime(time); }
+
     let name = chat.name;
     if (chat.id === (Session.getKey() || {}).pub) {
       name = html`📝 <b>${t('note_to_self')}</b>`;
@@ -83,7 +83,7 @@ class ChatListItem extends Component {
       <div class="text">
         <div>
           <span class="name">${name}</span>
-          <small class="latest-time">${this.state.latestTimeText}</small>
+          <small class="latest-time">${latestTimeText}</small>
         </div>
         ${typingIndicator}
         ${latestEl}
