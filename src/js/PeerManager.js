@@ -50,7 +50,7 @@ function getPeers() {
     };
   }
   if (iris.util.isElectron) {
-    p['http://localhost:8767/publicState'] = {};
+    p['http://localhost:8767/gun'] = {};
   }
   Object.keys(p).forEach(k => _.defaults(p[k], {enabled: true}));
   return p;
