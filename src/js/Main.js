@@ -48,7 +48,7 @@ const Main = html`
 
     <section class="main">
       <header>
-        <div id="back-button" class="visible-xs-inline-block">
+        <div id="back-button" class="visible-xs-inline-block" onClick=${() => backButtonClicked()}>
           ‹
           <span class="unseen unseen-total"></span>
         </div>
@@ -83,9 +83,14 @@ $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElect
 $(window).resize(() => { // if resizing up from mobile size menu view
   if ($(window).width() > 565 && $('.main-view:visible').length === 0) {
     showNewChat();
+    localState.get('activeChat').put('new');
   }
 });
 
+function backButtonClicked() {
+  resetView();
+  showMenu(true);
+}
 
 function resetView() {
   if (activeChat && chats[activeChat]) {
@@ -107,10 +112,7 @@ function resetView() {
 function showMenu(show = true) {
   $('.sidebar').toggleClass('hidden-xs', !show);
   $('.main').toggleClass('hidden-xs', show);
+  localState.get('activeChat').put(null);
 }
-$('#back-button').off().on('click', () => {
-  resetView();
-  showMenu(true);
-});
 
 export {publicState, localState, showMenu, activeChat, activeProfile, resetView};
