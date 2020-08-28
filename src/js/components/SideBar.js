@@ -19,7 +19,7 @@ class SideBar extends Component {
           return 1;
         });
       this.setState({chats: sortedChats});
-    }, 1000);
+    }, 2000);
     localState.get('activeChat').on(activeChat => this.setState({activeChat}));
     localState.get('chats').map().on((chat, id) => {
       chat.id = id;

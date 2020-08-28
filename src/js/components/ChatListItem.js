@@ -44,21 +44,6 @@ class ChatListItem extends Component {
     this.eventListeners.forEach(e => e.off());
   }
 
-  shouldComponentUpdate(nP, nS) {
-    const p = this.props;
-    const s = this.state;
-    if (nS.latestTimeText !== s.latestTimeText) return true;
-    if (nS.latest.time !== s.latest.time) return true;
-    if (nP.active !== p.active) return true;
-    if (nP.photo !== p.photo) return true;
-    if (nP.chat.isTyping !== p.chat.isTyping) return true;
-    if (nP.chat.name !== p.chat.name) return true;
-    if (nP.chat.theirMsgsLastSeenTime !== p.chat.theirMsgsLastSeenTime) return true;
-    if (nP.chat.latestTime !== p.chat.latestTime) return true;
-    if (nP.chat.unseen !== p.chat.unseen) return true;
-    return false;
-  }
-
   onClick() {
     // chatListEl.find('.unseen').empty().hide();
     showChat(this.props.chat.id);
