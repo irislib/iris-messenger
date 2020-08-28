@@ -1,17 +1,17 @@
-import {addChat, showChat} from './Chats.js';
+import {addChat, showChat} from './Chat.js';
 import { translate as t } from './Translation.js';
-import {gun} from './Main.js';
+import {publicState} from './Main.js';
 
 let pub;
 
 function sendPublicMsg(msg) {
   msg.time = new Date().toISOString();
-  gun.user().get('msgs').get(msg.time).put(msg);
+  publicState.user().get('msgs').get(msg.time).put(msg);
 }
 
 function getMessages(cb, pub) {
   const seen = [];
-  gun.user(pub).get('msgs').map().on((msg, time) => {
+  publicState.user(pub).get('msgs').map().on((msg, time) => {
     if (typeof msg !== 'object' || seen.indexOf(time) !== -1) { return; }
     seen.push(time);
     cb(msg, {selfAuthored: true, from: pub});

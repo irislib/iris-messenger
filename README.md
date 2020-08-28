@@ -26,7 +26,7 @@ yarn start
 
 Eslint: `yarn eslint src/js/*.js`
 
-The stack is just [iris-lib](https://github.com/irislib/iris-lib), [gun](https://github.com/amark/gun), jquery and some helpers.
+The application was originally built in plain jQuery without a framework. While we now use [preact](https://preactjs.com/), there's still some jquery logic that should be ported.
 
 ## Privacy
 Messages are end-to-end encrypted, but message timestamps and the number of chats aren't. In a decentralized network this information is potentially available to anyone.

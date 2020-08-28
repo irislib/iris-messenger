@@ -1,10 +1,81 @@
-import {translate} from './Translation.js';
-import {gun, resetView, activeChat, activeProfile, setActiveProfile} from './Main.js';
-import {chats, deleteChat, showChat, getMsgElement} from './Chats.js';
-import Session from './Session.js';
-import Helpers from './Helpers.js';
-import PublicMessages from './PublicMessages.js';
+import { html, render } from '../lib/htm.preact.js';
+import {translate as t} from '../Translation.js';
+import {localState, publicState, resetView, activeChat, activeProfile} from '../Main.js';
+import {chats, deleteChat, showChat} from '../Chat.js';
+import Session from '../Session.js';
+import Helpers from '../Helpers.js';
+import PublicMessages from '../PublicMessages.js';
+import Message from './Message.js';
 //import VideoCall from './VideoCall.js';
+
+const Profile = () => html`<div class="main-view" id="profile">
+  <div class="profile-photo-container">
+  <img class="profile-photo"/></div>
+  <div class="content">
+    <div id="profile-group-settings">
+      <div id="profile-group-name-container">${t('group_name')}: <input id="profile-group-name" placeholder="${t('group_name')}"/></div>
+      <p>${t('participants')}:</p>
+      <div id="profile-group-participants"></div>
+      <div id="profile-add-participant" style="display:none;">
+        <p>${t('add_participant')}:</p>
+        <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_chat_link')}"/></p>
+      </div>
+      <hr/>
+      <p>${t('invite_links')}</p>
+      <div id="profile-invite-links" class="flex-table"></div>
+      <p><button id="profile-create-invite-link">Create new invite link</button></p>
+      <hr/>
+    </div>
+    <div class="profile-about" style="display:none">
+      <p class="profile-about-content"></p>
+    </div>
+    <p class="status"></p>
+    <p class="last-active"></p>
+    <!--
+    <p>
+      <button class="add-friend">${t('add_friend')}</button>
+    </p>
+    <p>
+      <small>Friends can optionally direct connect to each other and store each others' encrypted data.</small>
+    </p>
+  -->
+    <p>
+      <button class="send-message">${t('send_message')}</button>
+      <button class="copy-user-link">${t('copy_link')}</button>
+    </p>
+    <p id="profile-page-qr" class="qr-container"></p>
+    <hr/>
+    <h3>${t('chat_settings')}</h3>
+    <div class="profile-nicknames">
+      <h4>${t('nicknames')}</h4>
+      <p>
+        ${t('nickname')}: <input id="profile-nickname-their"/>
+      </p>
+      <p id="profile-nickname-my-container">
+        ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
+      </p>
+    </div>
+    <div class="notification-settings">
+      <h4>${t('notifications')}</h4>
+      <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
+      <label for="notifyAll">${t('all_messages')}</label><br/>
+      <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
+      <label for="notifyMentionsOnly">${t('mentions_only')}</label><br/>
+      <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
+      <label for="notifyNothing">${t('nothing')}</label><br/>
+    </div>
+    <hr/>
+    <p>
+      <button class="delete-chat">${t('delete_chat')}</button>
+      <!-- <button class="block-user">${t('block_user')}</button> -->
+    </p>
+    <div id="profile-public-messages">
+      <hr/>
+      <h3>${t('public_messages')}</h3>
+      <div id="profile-public-message-list" class="public-messages-view"></div>
+    </div>
+  </div>
+</div>`;
 
 function renderGroupParticipants(pub) {
   if (!(chats[pub] && chats[pub].uuid)) {
@@ -24,9 +95,9 @@ function renderGroupParticipants(pub) {
     var profile = chats[pub].participantProfiles[k];
     var identicon = Helpers.getIdenticon(k, 40).css({'margin-right':15});
     var nameEl = $('<span>');
-    gun.user(k).get('profile').get('name').on(name => nameEl.text(name));
+    publicState.user(k).get('profile').get('name').on(name => nameEl.text(name));
     var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
-    $('<button>').css({'margin-right': 15}).text(translate('remove')).click(() => {
+    $('<button>').css({'margin-right': 15}).text(t('remove')).click(() => {
       el.remove();
       // TODO remove group participant
     });
@@ -34,7 +105,7 @@ function renderGroupParticipants(pub) {
     el.append(identicon);
     el.append(nameEl);
     if (profile.permissions && profile.permissions.admin) {
-      el.append($('<small>').text(translate('admin')).css({'margin-left': 5}));
+      el.append($('<small>').text(t('admin')).css({'margin-left': 5}));
     }
     el.click(() => {
       k === Session.getKey().pub ? $(".user-info").click() : showProfile(k);
@@ -57,11 +128,12 @@ function getDisplayName(pub) {
 }
 
 function addUserToHeader(pub) {
+  const chat = chats[pub];
   $('#header-content').empty();
   var nameEl = $('<div class="name"></div>');
   if (pub === Session.getKey().pub && activeProfile !== pub) {
-    nameEl.html("📝 <b>" + translate('note_to_self') + "</b>");
-  } else if (chats[pub]) {
+    nameEl.html("📝 <b>" + t('note_to_self') + "</b>");
+  } else if (chat) {
     nameEl.text(getDisplayName(pub));
   }
   nameEl.show();
@@ -74,32 +146,31 @@ function addUserToHeader(pub) {
   }
   var textEl = $('<div>').addClass('text');
   textEl.append(nameEl);
-  textEl.append($('<small>').addClass('last-seen'));
-  textEl.append($('<small>').addClass('typing-indicator').text(translate('typing')));
-  if (chats[pub] && chats[pub].uuid) {
-    var t = Object.keys(chats[pub].participantProfiles).map(p => chats[pub].participantProfiles[p].name).join(', ');
-    var namesEl = $('<small>').addClass('participants').text(t);
+  const isTyping = chat && chat.isTyping;
+  textEl.append($('<small>').addClass('last-seen').toggle(!isTyping));
+  textEl.append($('<small>').addClass('typing-indicator').text(t('typing')).toggle(isTyping));
+  if (chat && chat.uuid) {
+    var text = Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
+    var namesEl = $('<small>').addClass('participants').text(text).toggle(!isTyping);
     textEl.append(namesEl);
-    if (chats[pub].photo) {
+    if (chat.photo) {
       identicon.hide();
-      var photo = Helpers.setImgSrc($('<img>'), chats[pub].photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
+      var photo = Helpers.setImgSrc($('<img>'), chat.photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
       $('#header-content .identicon-container').append(photo);
     }
   }
   $("#header-content").append(textEl);
-  if (pub !== 'public') {
-    textEl.on('click', () => showProfile(pub));
-    $("#header-content").css({cursor: 'pointer'});
-  }
-  /*
-  if (!chats[pub].uuid) { // disabled for now because videochat is broken
-    var videoCallBtn = $(`<a class="tooltip"><span class="tooltiptext">${translate('video_call')}</span><svg enable-background="new 0 0 50 50" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" style="height:24px;width:24px"/><polygon fill="none" points="49,14 36,21 36,29   49,36 " stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/><path d="M36,36c0,2.209-1.791,4-4,4  H5c-2.209,0-4-1.791-4-4V14c0-2.209,1.791-4,4-4h27c2.209,0,4,1.791,4,4V36z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/></svg></a>`).attr('id', 'start-video-call').css({width:24, height:24, color: 'var(--msg-form-button-color)'});
+  textEl.on('click', () => showProfile(pub));
+  /* disabled for now because videochat is broken
+  if (!chats[pub].uuid) {
+    var videoCallBtn = $(`<a class="tooltip"><span class="tooltiptext">${t('video_call')}</span><svg enable-background="new 0 0 50 50" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" style="height:24px;width:24px"/><polygon fill="none" points="49,14 36,21 36,29   49,36 " stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/><path d="M36,36c0,2.209-1.791,4-4,4  H5c-2.209,0-4-1.791-4-4V14c0-2.209,1.791-4,4-4h27c2.209,0,4,1.791,4,4V36z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/></svg></a>`).attr('id', 'start-video-call').css({width:24, height:24, color: 'var(--msg-form-button-color)'});
     videoCallBtn.click(() => VideoCall.isCalling() ? null : VideoCall.callUser(pub));
     var voiceCallBtn = $('<a><svg enable-background="new 0 0 50 50" style="height:20px;width:20px" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" height="50" width="50"/><path d="M30.217,35.252c0,0,4.049-2.318,5.109-2.875  c1.057-0.559,2.152-0.7,2.817-0.294c1.007,0.616,9.463,6.241,10.175,6.739c0.712,0.499,1.055,1.924,0.076,3.32  c-0.975,1.396-5.473,6.916-7.379,6.857c-1.909-0.062-9.846-0.236-24.813-15.207C1.238,18.826,1.061,10.887,1,8.978  C0.939,7.07,6.459,2.571,7.855,1.595c1.398-0.975,2.825-0.608,3.321,0.078c0.564,0.781,6.124,9.21,6.736,10.176  c0.419,0.66,0.265,1.761-0.294,2.819c-0.556,1.06-2.874,5.109-2.874,5.109s1.634,2.787,7.16,8.312  C27.431,33.615,30.217,35.252,30.217,35.252z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="4"/></svg></a>').css({width:20, height:20, 'margin-right': 20});
     voiceCallBtn.click(() => VideoCall.isCalling() ? VideoCall.stopCalling(pub) : VideoCall.callUser(pub));
     //$("#header-content").append(voiceCallBtn);
     $("#header-content").append(videoCallBtn);
   }*/
+  $("#header-content").css({cursor: 'pointer'});
 }
 
 function setTheirOnlineStatus(pub) {
@@ -107,24 +178,25 @@ function setTheirOnlineStatus(pub) {
   var online = chats[pub].online;
   if (online && (activeChat === pub || activeProfile === pub)) {
     if (online.isOnline) {
-      $('#header-content .last-seen').text(translate('online'));
+      $('#header-content .last-seen').text(t('online'));
     } else if (online.lastActive) {
       var d = new Date(online.lastActive);
-      var lastSeenText = translate(iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
-      if (lastSeenText === translate('today')) {
+      var lastSeenText = t(iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
+      if (lastSeenText === t('today')) {
         lastSeenText = iris.util.formatTime(d);
       } else {
         lastSeenText = iris.util.formatDate(d);
       }
-      $('#header-content .last-seen').text(translate('last_active') + ' ' + lastSeenText);
+      $('#header-content .last-seen').text(t('last_active') + ' ' + lastSeenText);
     }
   }
 }
 
 function onPublicMessage(msg, info) {
   if (activeProfile !== info.from) { return; }
-  const msgEl = getMsgElement(msg, info.from, true);
-  $('#profile-public-message-list').prepend(msgEl);
+  const container = $('<div>');
+  render(html`<${Message} ...${msg} showName=${true} chatId=${info.from}/>`, container[0]);
+  $('#profile-public-message-list').prepend(container.children()[0]);
 }
 
 function showProfile(pub) {
@@ -132,7 +204,7 @@ function showProfile(pub) {
     return;
   }
   resetView();
-  setActiveProfile(pub);
+  localState.get('activeProfile').put(pub);
   $('#profile .profile-photo-container').hide();
   var qrCodeEl = $('#profile-page-qr');
   qrCodeEl.empty();
@@ -146,7 +218,7 @@ function showProfile(pub) {
     $('#profile-public-message-list').empty();
     $('#profile-public-messages').show();
     $('#profile .profile-photo').show();
-    gun.user(pub).get('profile').get('photo').on(photo => {
+    publicState.user(pub).get('profile').get('photo').on(photo => {
       $('#profile .profile-photo-container').show();
       Helpers.setImgSrc($('#profile .profile-photo'), photo);
     });
@@ -169,11 +241,11 @@ function showProfile(pub) {
   $('#profile .send-message').off().on('click', () => showChat(pub));
   $('#profile .copy-user-link').off().on('click', event => {
     Helpers.copyToClipboard(link);
-    var t = $(event.target);
-    var originalText = t.text();
-    var originalWidth = t.width();
+    var tgt = $(event.target);
+    var originalText = tgt.text();
+    var originalWidth = tgt.width();
     t.width(originalWidth);
-    t.text(translate('copied'));
+    t.text(t('copied'));
     setTimeout(() => {
       t.text(originalText);
       t.css('width', '');
@@ -222,9 +294,9 @@ function onProfileAddParticipantInput(event) {
     $('#profile-add-participant-candidate').remove();
     var identicon = Helpers.getIdenticon(pub, 40).css({'margin-right':15});
     var nameEl = $('<span>');
-    gun.user(pub).get('profile').get('name').on(name => nameEl.text(name));
+    publicState.user(pub).get('profile').get('name').on(name => nameEl.text(name));
     var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
-    var addBtn = $('<button>').css({'margin-left': 15}).text(translate('add')).click(() => {
+    var addBtn = $('<button>').css({'margin-left': 15}).text(t('add')).click(() => {
       if (newGroupParticipant) {
         chats[activeProfile].addParticipant(newGroupParticipant);
         newGroupParticipant = null;
@@ -232,7 +304,7 @@ function onProfileAddParticipantInput(event) {
         $('#profile-add-participant-candidate').remove();
       }
     });
-    var removeBtn = $('<button>').css({'margin-left': 15}).text(translate('cancel')).click(() => {
+    var removeBtn = $('<button>').css({'margin-left': 15}).text(t('cancel')).click(() => {
       el.remove();
       $('#profile-add-participant-input').val('').show();
       newGroupParticipant = null;
@@ -318,7 +390,7 @@ function useProfilePhotoClicked() {
     if (activeProfile) {
       chats[activeProfile].put('photo', src);
     } else {
-      gun.user().get('profile').get('photo').put(src);
+      publicState.user().get('profile').get('photo').put(src);
     }
     Helpers.setImgSrc($('#current-profile-photo'), src);
     $('#profile-photo-input').val(null);
@@ -331,7 +403,7 @@ function removeProfilePhotoClicked() {
   if (activeProfile) {
     chats[activeProfile].put('photo', null);
   } else {
-    gun.user().get('profile').get('photo').put(null);
+    publicState.user().get('profile').get('photo').put(null);
   }
   renderProfilePhotoSettings();
 }
@@ -348,12 +420,12 @@ function renderInviteLinks(pub) {
   $('#profile-invite-links').empty();
   Object.values(chats[pub].inviteLinks).forEach(url => {
     const row = $('<div>').addClass('flex-row');
-    const copyBtn = $('<button>').text(translate('copy')).width(100);
+    const copyBtn = $('<button>').text(t('copy')).width(100);
     copyBtn.on('click', event => {
       Helpers.copyToClipboard(url);
-      var t = $(event.target);
-      var originalText = t.text();
-      t.text(translate('copied'));
+      var target = $(event.target);
+      var originalText = target.text();
+      target.text(t('copied'));
       setTimeout(() => {
         t.text(originalText);
       }, 2000);
@@ -364,7 +436,7 @@ function renderInviteLinks(pub) {
     input.on('click', () => input.select());
     row.append($('<div>').addClass('flex-cell').append(input));
     if (isAdmin) {
-      const removeBtn = $('<button>').text(translate('remove'));
+      const removeBtn = $('<button>').text(t('remove'));
       row.append($('<div>').addClass('flex-cell no-flex').append(removeBtn));
     }
     $('#profile-invite-links').append(row);
@@ -390,4 +462,4 @@ function init() {
   $('#remove-profile-photo').click(removeProfilePhotoClicked);
 }
 
-export default {init, showProfile, setTheirOnlineStatus, addUserToHeader, getDisplayName, renderGroupParticipants, renderInviteLinks, renderGroupPhotoSettings};
+export default {Profile, init, showProfile, setTheirOnlineStatus, addUserToHeader, getDisplayName, renderGroupParticipants, renderInviteLinks, renderGroupPhotoSettings};

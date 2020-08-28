@@ -1,4 +1,4 @@
-import {chats, showChat} from './Chats.js';
+import {chats, showChat} from './Chat.js';
 import {translate as t} from './Translation.js';
 
 var ringSound = new Audio('../../audio/ring.mp3');

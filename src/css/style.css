@@ -212,7 +212,6 @@ header #back-button {
 }
 
 .main-view {
-  display: none;
   flex:1;
   overflow-y: scroll;
   padding: 10px 15px;
@@ -400,7 +399,6 @@ header #back-button {
 #emoji-picker {
   outline: 1px;
   margin-right: 5px;
-  display: none;
 }
 
 .emoji-picker {
@@ -584,7 +582,6 @@ header #back-button {
   font-size: 12px;
   line-height: 1em;
   font-weight: 500;
-  display: none;
 }
 
 .chat-item .unseen {
@@ -699,10 +696,6 @@ small {
   max-height: 300px;
 }
 
-.typing-indicator {
-  display: none;
-}
-
 .chat-item .typing-indicator {
   color: #05b246;
   font-weight: bold;
@@ -718,6 +711,10 @@ small {
 
 .add-friend:hover, .add-friend:active, .add-friend:focus {
   background-color: hsla(194, 55%, 80%, 1);;
+}
+
+.round-borders {
+  border-radius: 50%;
 }
 
 /* Tooltip container */

@@ -1,9 +1,9 @@
 import Helpers from './Helpers.js';
-import Profile from './Profile.js';
+import Profile from './components/Profile.js';
 import Session from './Session.js';
-import {chats, showChat} from './Chats.js';
+import {chats, showChat} from './Chat.js';
+import {publicState, localState} from './Main.js';
 import { translate as t } from './Translation.js';
-import {gun} from './Main.js';
 
 var notificationSound = new Audio('../../audio/notification.mp3');
 var loginTime;
@@ -73,6 +73,7 @@ function setUnseenTotal() {
 }
 
 function changeChatUnseenCount(pub, change) {
+  const chatNode = localState.get('chats').get(pub);
   if (change) {
     unseenTotal += change;
     chats[pub].unseen += change;
@@ -80,17 +81,8 @@ function changeChatUnseenCount(pub, change) {
     unseenTotal = unseenTotal - (chats[pub].unseen || 0);
     chats[pub].unseen = 0;
   }
+  chatNode.get('unseen').put(chats[pub].unseen);
   unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
-  var chatListEl = $('.chat-item[data-pub="' + pub +'"]');
-  var unseenCountEl = chatListEl.find('.unseen');
-  if (chats[pub].unseen > 0) {
-    chatListEl.addClass('has-unseen');
-    unseenCountEl.text(chats[pub].unseen);
-    unseenCountEl.show();
-  } else {
-    chatListEl.removeClass('has-unseen');
-    unseenCountEl.hide();
-  }
   setUnseenTotal();
 }
 
@@ -157,7 +149,7 @@ const addWebPushSubscriptionsToSettingsDebounced = _.debounce(addWebPushSubscrip
 
 function removeSubscription(hash) {
   delete webPushSubscriptions[hash];
-  gun.user().get('webPushSubscriptions').get(hash).put(null);
+  publicState.user().get('webPushSubscriptions').get(hash).put(null);
   addWebPushSubscriptionsToSettings();
   addWebPushSubscriptionsToChats();
 }
@@ -168,7 +160,7 @@ async function addWebPushSubscription(s, saveToGun = true) {
   const enc = await Gun.SEA.encrypt(s, mySecret);
   const hash = await iris.util.getHash(JSON.stringify(s));
   if (saveToGun) {
-    gun.user().get('webPushSubscriptions').get(hash).put(enc);
+    publicState.user().get('webPushSubscriptions').get(hash).put(enc);
   }
   webPushSubscriptions[hash] = s;
   addWebPushSubscriptionsToChats();
@@ -178,7 +170,7 @@ async function addWebPushSubscription(s, saveToGun = true) {
 async function getWebPushSubscriptions() {
   const myKey = Session.getKey();
   const mySecret = await Gun.SEA.secret(myKey.epub, myKey);
-  gun.user().get('webPushSubscriptions').map().on(async enc => {
+  publicState.user().get('webPushSubscriptions').map().on(async enc => {
     if (!enc) { return; }
     const s = await Gun.SEA.decrypt(enc, mySecret);
     addWebPushSubscription(s, false);
