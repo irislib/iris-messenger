@@ -184,6 +184,9 @@ class ChatView extends Component {
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
     $('#new-msg').val(chats[activeChat] && chats[activeChat].msgDraft);
+    if (!iris.util.isMobile) {
+      $("#new-msg").focus();
+    }
   }
 
   render() {
