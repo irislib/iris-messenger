@@ -112,7 +112,7 @@ async function subscribe(reg) {
 }
 
 async function subscribeToWebPush() {
-  if (!desktopNotificationsEnabled()) { return false; }
+  if (!desktopNotificationsEnabled() || !navigator.serviceWorker) { return false; }
   await navigator.serviceWorker.ready;
   const reg = await navigator.serviceWorker.getRegistration();
   reg.active.postMessage({key: Session.getKey()});

@@ -215,15 +215,17 @@ function getMyProfilePhoto() { return myProfilePhoto; }
 
 async function logOut() {
   // TODO: remove subscription from your chats
-  const reg = await navigator.serviceWorker.getRegistration();
-  if (reg) {
-    reg.active.postMessage({key: null});
-    const sub = await reg.pushManager.getSubscription();
-    if (sub) {
-      const hash = await iris.util.getHash(JSON.stringify(sub));
-      Notifications.removeSubscription(hash);
-      sub.unsubscribe && sub.unsubscribe();
-    }
+  if (navigator.serviceWorker) {
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (reg) {
+      reg.active.postMessage({key: null});
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) {
+        const hash = await iris.util.getHash(JSON.stringify(sub));
+        Notifications.removeSubscription(hash);
+        sub.unsubscribe && sub.unsubscribe();
+      }
+    }    
   }
   await clearIndexedDB();
   localStorage.clear();
