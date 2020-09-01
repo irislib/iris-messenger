@@ -160,13 +160,9 @@ function setChatLinkQrCode(link) {
   });
 }
 
-async function clearIndexedDB() {
-  const dbs = await window.indexedDB.databases();
-  dbs.forEach(db => {
-    if (db.name === 'localState' || db.name === 'radata') {
-      window.indexedDB.deleteDatabase(db.name);
-    }
-  });
+function clearIndexedDB() {
+  window.indexedDB.deleteDatabase('localState');
+  window.indexedDB.deleteDatabase('radata');
 }
 
 function getMyChatLink() {
