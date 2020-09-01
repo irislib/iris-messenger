@@ -215,7 +215,6 @@ function getMyProfilePhoto() { return myProfilePhoto; }
 
 async function logOut() {
   // TODO: remove subscription from your chats
-  localStorage.clear();
   const reg = await navigator.serviceWorker.getRegistration();
   if (reg) {
     reg.active.postMessage({key: null});
@@ -227,6 +226,7 @@ async function logOut() {
     }
   }
   await clearIndexedDB();
+  localStorage.clear();
   location.reload();
 }
 
@@ -236,7 +236,6 @@ function init() {
   if (localStorageKey) {
     login(JSON.parse(localStorageKey));
   } else {
-    clearIndexedDB();
     newUserLogin();
   }
 
