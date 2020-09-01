@@ -1,6 +1,6 @@
 import { html, Component } from '../lib/htm.preact.js';
 import Helpers from '../Helpers.js';
-import {chats, activeChat} from '../Chat.js';
+import {chats, activeRoute} from '../Chat.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
@@ -73,8 +73,8 @@ function closeAttachmentsGallery() {
     }});
   }
   $('#attachment-preview').fadeOut(ANIMATE_DURATION);
-  if (activeChat && chats[activeChat]) {
-    chats[activeChat].attachments = null;
+  if (activeRoute && chats[activeRoute]) {
+    chats[activeRoute].attachments = null;
   }
 }
 

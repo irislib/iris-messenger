@@ -1,4 +1,4 @@
-import {publicState, localState, showMenu, resetView, activeChat, activeProfile} from './Main.js';
+import {publicState, localState, showMenu, resetView, activeRoute, activeProfile} from './Main.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
@@ -15,7 +15,7 @@ function showChat(pub) {
   }
 
   resetView();
-  localState.get('activeChat').put(pub);
+  localState.get('activeRoute').put(pub);
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
     newChat(pub);
   }
@@ -25,16 +25,14 @@ function showChat(pub) {
     $("#new-msg").focus();
   }
   Notifications.changeChatUnseenCount(pub, 0);
-  Profile.addUserToHeader(pub);
   chats[pub].setMyMsgsLastSeenTime();
   Helpers.scrollToMessageListBottom();
   chats[pub].setMyMsgsLastSeenTime();
-  Profile.setTheirOnlineStatus(pub);
 }
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(publicState, Session.getKey(), pub);
-  if (activeChat === pub) {
+  if (activeRoute === pub) {
     showNewChat();
     showMenu();
   }
@@ -89,9 +87,6 @@ function addChat(channel) {
     if (pub !== Session.getKey().pub) {
       el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
     }
-    if (pub === activeChat || pub === activeProfile) {
-      Profile.addUserToHeader(pub);
-    }
   });
   chats[pub].notificationSetting = 'all';
   chats[pub].onMy('notificationSetting', (val) => {
@@ -101,8 +96,10 @@ function addChat(channel) {
     }
   });
   //$(".chat-list").append(el);
+  chats[pub].theirMsgsLastSeenTime = '';
   chats[pub].getTheirMsgsLastSeenTime(time => {
-    if (chats[pub] && time) {
+    if (chats[pub] && time && time > chats[pub].theirMsgsLastSeenTime) {
+      chats[pub].theirMsgsLastSeenTime = time;
       chatNode.get('theirMsgsLastSeenTime').put(time);
       lastSeenTimeChanged(pub);
     }
@@ -118,18 +115,12 @@ function addChat(channel) {
   chats[pub].getTyping(isTyping => {
     chats[pub].isTyping = isTyping;
     localState.get('chats').get(pub).get('isTyping').put(isTyping);
-    if (activeChat === pub) {
-      $('#header-content .last-seen').toggle(!isTyping);
-      $('#header-content .typing-indicator').toggle(isTyping);
-      $('#header-content .participants').toggle(!isTyping);
-    }
   });
   chats[pub].online = {};
   iris.Channel.getOnline(publicState, pub, (online) => {
     if (chats[pub]) {
       chatNode.get('theirLastActiveTime').put(online && online.lastActive);
       chats[pub].online = online;
-      Profile.setTheirOnlineStatus(pub);
     }
   });
   function setName(name, from) {
@@ -147,9 +138,6 @@ function addChat(channel) {
       el.find('.name').html("📝 <b>" + t('note_to_self') + "</b>");
     } else {
       el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
-    }
-    if (pub === activeChat || pub === activeProfile) {
-      Profile.addUserToHeader(pub);
     }
     if (pub === activeProfile) {
       $('#profile-group-name').not(':focus').val(name);
@@ -173,9 +161,6 @@ function addChat(channel) {
     el.find('.identicon-container').empty();
     var img = Helpers.setImgSrc($('<img>'), photo).attr('height', 49).attr('width', 49).css({'border-radius': '50%'});
     el.find('.identicon-container').append(photo ? img : chats[pub].identicon);
-    if (pub === activeChat || pub === activeProfile) {
-      Profile.addUserToHeader(pub);
-    }
     if (pub === activeProfile) {
       Helpers.setImgSrc($('#current-profile-photo'), photo);
       Helpers.setImgSrc($('#profile .profile-photo'), photo);
@@ -203,9 +188,6 @@ function addChat(channel) {
         Profile.renderGroupParticipants(pub);
         Profile.renderGroupPhotoSettings(pub);
         Profile.renderInviteLinks(pub);
-      }
-      if (activeChat === pub) {
-        Profile.addUserToHeader(pub);
       }
     });
     var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -244,12 +226,12 @@ function processMessage(chatId, msg, info) {
   msg.time = new Date(msg.time);
   chat.sortedMessages.push(msg);
   if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
-    if (activeChat !== chatId || document.visibilityState !== 'visible') {
+    if (activeRoute !== chatId || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chatId, 1);
     }
   }
-  if (!info.selfAuthored && msg.time > chat.theirMsgsLastSeenDate) {
-    chat.theirMsgsLastSeenDate = msg.time;
+  if (!info.selfAuthored && msg.timeStr > chat.theirMsgsLastSeenTime) {
+    localState.get('chats').get(chatId).get('theirMsgsLastSeenTime').put(msg.timeStr);
     lastSeenTimeChanged(chatId);
   }
   if (!chat.latestTime || (msg.timeStr > chat.latestTime)) {
@@ -264,7 +246,6 @@ function processMessage(chatId, msg, info) {
 function showNewChat() {
   resetView();
   $('#new-chat').show();
-  $("#header-content").text(t('new_chat'));
   $('#show-my-qr-btn').off().click(() => {
     $('#my-qr-code').toggle()
   })
@@ -272,7 +253,7 @@ function showNewChat() {
 
 function lastSeenTimeChanged(pub) {
   const chat = chats[pub];
-  if (chat && pub !== 'public' && pub !== 'new' && pub === activeChat) {
+  if (chat && pub !== 'public' && pub !== 'new' && pub === activeRoute) {
     if (chat.theirMsgsLastSeenDate) {
       $('#not-seen-by-them').slideUp();
       $('.msg.our:not(.seen)').each(function() {
@@ -290,4 +271,4 @@ function lastSeenTimeChanged(pub) {
   }
 }
 
-export { showChat, activeChat, chats, addChat, deleteChat, showNewChat, newChat, lastSeenTimeChanged, processMessage };
+export { showChat, activeRoute, chats, addChat, deleteChat, showNewChat, newChat, lastSeenTimeChanged, processMessage };

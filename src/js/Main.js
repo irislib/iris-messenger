@@ -13,6 +13,7 @@ import PublicMessages from './PublicMessages.js';
 import Profile from './components/Profile.js';
 import QRScanner from './QRScanner.js';
 import VideoCall from './VideoCall.js';
+import Header from './components/Header.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
@@ -29,30 +30,22 @@ if (!isElectron && ('serviceWorker' in navigator)) {
 Gun.log.off = true;
 var publicState = Gun({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity });
 window.publicState = publicState;
-var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state').put({activeChat:'new'});
+var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state').put({activeRoute:'new'});
 window.localState = localState;
 
 Helpers.checkColorScheme();
 
-let activeChat;
+let activeRoute;
 let activeProfile;
-localState.get('activeChat').on(a => activeChat = a);
+localState.get('activeRoute').on(a => activeRoute = a);
 localState.get('activeProfile').on(a => activeProfile = a);
 
 const Main = html`
   <div id="main-content">
     <${Login}/>
     <${SideBar}/>
-
     <section class="main">
-      <header>
-        <div id="back-button" class="visible-xs-inline-block" onClick=${() => backButtonClicked()}>
-          ‹
-          <span class="unseen unseen-total"></span>
-        </div>
-        <div id="header-content"></div>
-      </header>
-
+      <${Header}/>
       <${ChatView}/>
       <${NewChat}/>
       <${Settings}/>
@@ -81,7 +74,7 @@ $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElect
 $(window).resize(() => { // if resizing up from mobile size menu view
   if ($(window).width() > 565 && $('.main-view:visible').length === 0) {
     showNewChat();
-    localState.get('activeChat').put('new');
+    localState.get('activeRoute').put('new');
   }
 });
 
@@ -91,26 +84,23 @@ function backButtonClicked() {
 }
 
 function resetView() {
-  if (activeChat && chats[activeChat]) {
-    chats[activeChat].setTyping(false);
-  }
-  activeChat = null;
   activeProfile = null;
+  if (activeRoute && chats[activeRoute]) {
+    chats[activeRoute].setTyping(false);
+  }
   showMenu(false);
   QRScanner.cleanupScanner();
   $('#chatlink-qr-video').hide();
   $('.main-view').hide();
   $('#not-seen-by-them').hide();
   $(".message-form").hide();
-  $("#header-content").empty();
-  $("#header-content").css({cursor: null});
   $('#private-key-qr').remove();
 }
 
 function showMenu(show = true) {
   $('.sidebar').toggleClass('hidden-xs', !show);
   $('.main').toggleClass('hidden-xs', show);
-  localState.get('activeChat').put(null);
+  localState.get('activeRoute').put(null);
 }
 
-export {publicState, localState, showMenu, activeChat, activeProfile, resetView};
+export {publicState, localState, showMenu, activeRoute, activeProfile, resetView};

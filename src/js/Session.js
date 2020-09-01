@@ -1,4 +1,4 @@
-import {publicState, activeChat, activeProfile, resetView, showMenu} from './Main.js';
+import {publicState, activeRoute, activeProfile, resetView, showMenu} from './Main.js';
 import {chats, addChat, showNewChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
@@ -33,8 +33,8 @@ function newUserLogin() {
 function setOurOnlineStatus() {
   iris.Channel.setOnline(publicState, areWeOnline = true);
   document.addEventListener("mousemove", () => {
-    if (!areWeOnline && activeChat) {
-      chats[activeChat].setMyMsgsLastSeenTime();
+    if (!areWeOnline && activeRoute) {
+      chats[activeRoute].setMyMsgsLastSeenTime();
     }
     iris.Channel.setOnline(publicState, areWeOnline = true);
     clearTimeout(onlineTimeout);
@@ -43,9 +43,9 @@ function setOurOnlineStatus() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
       iris.Channel.setOnline(publicState, areWeOnline = true);
-      if (activeChat && chats[activeChat]) {
-        chats[activeChat].setMyMsgsLastSeenTime();
-        Notifications.changeChatUnseenCount(activeChat, 0);
+      if (activeRoute && chats[activeRoute]) {
+        chats[activeRoute].setMyMsgsLastSeenTime();
+        Notifications.changeChatUnseenCount(activeRoute, 0);
       }
     } else {
       iris.Channel.setOnline(publicState, areWeOnline = false);
@@ -225,7 +225,7 @@ async function logOut() {
         Notifications.removeSubscription(hash);
         sub.unsubscribe && sub.unsubscribe();
       }
-    }    
+    }
   }
   await clearIndexedDB();
   localStorage.clear();

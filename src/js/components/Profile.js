@@ -1,6 +1,6 @@
 import { html, render } from '../lib/htm.preact.js';
 import {translate as t} from '../Translation.js';
-import {localState, publicState, resetView, activeChat, activeProfile} from '../Main.js';
+import {localState, publicState, resetView, activeRoute, activeProfile} from '../Main.js';
 import {chats, deleteChat, showChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
@@ -127,71 +127,6 @@ function getDisplayName(pub) {
   return displayName || '';
 }
 
-function addUserToHeader(pub) {
-  const chat = chats[pub];
-  $('#header-content').empty();
-  var nameEl = $('<div class="name"></div>');
-  if (pub === Session.getKey().pub && activeProfile !== pub) {
-    nameEl.html("📝 <b>" + t('note_to_self') + "</b>");
-  } else if (chat) {
-    nameEl.text(getDisplayName(pub));
-  }
-  nameEl.show();
-
-  if (pub !== 'public') {
-    var identicon = Helpers.getIdenticon(pub, 40);
-    var img = identicon.children('img').first();
-    img.attr('height', 40).attr('width', 40);
-    $("#header-content").append($('<div>').addClass('identicon-container').append(identicon));
-  }
-  var textEl = $('<div>').addClass('text');
-  textEl.append(nameEl);
-  const isTyping = chat && chat.isTyping;
-  textEl.append($('<small>').addClass('last-seen').toggle(!isTyping));
-  textEl.append($('<small>').addClass('typing-indicator').text(t('typing')).toggle(isTyping));
-  if (chat && chat.uuid) {
-    var text = Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
-    var namesEl = $('<small>').addClass('participants').text(text).toggle(!isTyping);
-    textEl.append(namesEl);
-    if (chat.photo) {
-      identicon.hide();
-      var photo = Helpers.setImgSrc($('<img>'), chat.photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
-      $('#header-content .identicon-container').append(photo);
-    }
-  }
-  $("#header-content").append(textEl);
-  textEl.on('click', () => showProfile(pub));
-  /* disabled for now because videochat is broken
-  if (!chats[pub].uuid) {
-    var videoCallBtn = $(`<a class="tooltip"><span class="tooltiptext">${t('video_call')}</span><svg enable-background="new 0 0 50 50" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" style="height:24px;width:24px"/><polygon fill="none" points="49,14 36,21 36,29   49,36 " stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/><path d="M36,36c0,2.209-1.791,4-4,4  H5c-2.209,0-4-1.791-4-4V14c0-2.209,1.791-4,4-4h27c2.209,0,4,1.791,4,4V36z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/></svg></a>`).attr('id', 'start-video-call').css({width:24, height:24, color: 'var(--msg-form-button-color)'});
-    videoCallBtn.click(() => VideoCall.isCalling() ? null : VideoCall.callUser(pub));
-    var voiceCallBtn = $('<a><svg enable-background="new 0 0 50 50" style="height:20px;width:20px" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" height="50" width="50"/><path d="M30.217,35.252c0,0,4.049-2.318,5.109-2.875  c1.057-0.559,2.152-0.7,2.817-0.294c1.007,0.616,9.463,6.241,10.175,6.739c0.712,0.499,1.055,1.924,0.076,3.32  c-0.975,1.396-5.473,6.916-7.379,6.857c-1.909-0.062-9.846-0.236-24.813-15.207C1.238,18.826,1.061,10.887,1,8.978  C0.939,7.07,6.459,2.571,7.855,1.595c1.398-0.975,2.825-0.608,3.321,0.078c0.564,0.781,6.124,9.21,6.736,10.176  c0.419,0.66,0.265,1.761-0.294,2.819c-0.556,1.06-2.874,5.109-2.874,5.109s1.634,2.787,7.16,8.312  C27.431,33.615,30.217,35.252,30.217,35.252z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="4"/></svg></a>').css({width:20, height:20, 'margin-right': 20});
-    voiceCallBtn.click(() => VideoCall.isCalling() ? VideoCall.stopCalling(pub) : VideoCall.callUser(pub));
-    //$("#header-content").append(voiceCallBtn);
-    $("#header-content").append(videoCallBtn);
-  }*/
-  $("#header-content").css({cursor: 'pointer'});
-}
-
-function setTheirOnlineStatus(pub) {
-  if (!chats[pub]) return;
-  var online = chats[pub].online;
-  if (online && (activeChat === pub || activeProfile === pub)) {
-    if (online.isOnline) {
-      $('#header-content .last-seen').text(t('online'));
-    } else if (online.lastActive) {
-      var d = new Date(online.lastActive);
-      var lastSeenText = t(iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
-      if (lastSeenText === t('today')) {
-        lastSeenText = iris.util.formatTime(d);
-      } else {
-        lastSeenText = iris.util.formatDate(d);
-      }
-      $('#header-content .last-seen').text(t('last_active') + ' ' + lastSeenText);
-    }
-  }
-}
-
 function onPublicMessage(msg, info) {
   if (activeProfile !== info.from) { return; }
   const container = $('<div>');
@@ -204,14 +139,13 @@ function showProfile(pub) {
     return;
   }
   resetView();
+  localState.get('activeRoute').put('profile/' + pub);
   localState.get('activeProfile').put(pub);
   $('#profile .profile-photo-container').hide();
   var qrCodeEl = $('#profile-page-qr');
   qrCodeEl.empty();
   $('#profile-nickname-their').val('');
   $('#profile').show();
-  addUserToHeader(pub);
-  setTheirOnlineStatus(pub);
   renderGroupParticipants(pub);
   renderInviteLinks(pub);
   if (chats[pub] && !chats[pub].uuid) {
@@ -462,4 +396,4 @@ function init() {
   $('#remove-profile-photo').click(removeProfilePhotoClicked);
 }
 
-export default {Profile, init, showProfile, setTheirOnlineStatus, addUserToHeader, getDisplayName, renderGroupParticipants, renderInviteLinks, renderGroupPhotoSettings};
+export default {Profile, init, showProfile, getDisplayName, renderGroupParticipants, renderInviteLinks, renderGroupPhotoSettings};

@@ -1,0 +1,135 @@
+import { html, Component } from '../lib/htm.preact.js';
+import {showChat, chats, activeRoute} from '../Chat.js';
+import { translate as t } from '../Translation.js';
+import {localState} from '../Main.js';
+import Session from '../Session.js';
+import Identicon from './Identicon.js';
+import Profile from './Profile.js';
+import Helpers from '../Helpers.js';
+
+class Header extends Component {
+  constructor() {
+    super();
+    this.state = {latest: {}};
+    this.eventListeners = [];
+  }
+
+  addUserToHeader(pub) {
+    const isTyping = chat && chat.isTyping;
+    textEl.append($('<small>').addClass('typing-indicator').text(t('typing')).toggle(isTyping));
+    if (chat && chat.uuid) {
+      var namesEl = $('<small>').addClass('participants').text(text).toggle(!isTyping);
+      textEl.append(namesEl);
+    }
+    /* disabled for now because videochat is broken
+    if (!chats[pub].uuid) {
+      var videoCallBtn = $(`<a class="tooltip"><span class="tooltiptext">${t('video_call')}</span><svg enable-background="new 0 0 50 50" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" style="height:24px;width:24px"/><polygon fill="none" points="49,14 36,21 36,29   49,36 " stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/><path d="M36,36c0,2.209-1.791,4-4,4  H5c-2.209,0-4-1.791-4-4V14c0-2.209,1.791-4,4-4h27c2.209,0,4,1.791,4,4V36z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/></svg></a>`).attr('id', 'start-video-call').css({width:24, height:24, color: 'var(--msg-form-button-color)'});
+      videoCallBtn.click(() => VideoCall.isCalling() ? null : VideoCall.callUser(pub));
+      var voiceCallBtn = $('<a><svg enable-background="new 0 0 50 50" style="height:20px;width:20px" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" height="50" width="50"/><path d="M30.217,35.252c0,0,4.049-2.318,5.109-2.875  c1.057-0.559,2.152-0.7,2.817-0.294c1.007,0.616,9.463,6.241,10.175,6.739c0.712,0.499,1.055,1.924,0.076,3.32  c-0.975,1.396-5.473,6.916-7.379,6.857c-1.909-0.062-9.846-0.236-24.813-15.207C1.238,18.826,1.061,10.887,1,8.978  C0.939,7.07,6.459,2.571,7.855,1.595c1.398-0.975,2.825-0.608,3.321,0.078c0.564,0.781,6.124,9.21,6.736,10.176  c0.419,0.66,0.265,1.761-0.294,2.819c-0.556,1.06-2.874,5.109-2.874,5.109s1.634,2.787,7.16,8.312  C27.431,33.615,30.217,35.252,30.217,35.252z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="4"/></svg></a>').css({width:20, height:20, 'margin-right': 20});
+      voiceCallBtn.click(() => VideoCall.isCalling() ? VideoCall.stopCalling(pub) : VideoCall.callUser(pub));
+      //$("#header-content").append(voiceCallBtn);
+      $("#header-content").append(videoCallBtn);
+    }*/
+  }
+
+  getOnlineStatusText() {
+    const chat = chats[activeRoute];
+    const online = chat && chat.online;
+    if (online) {
+      if (online.isOnline) {
+        return(t('online'));
+      } else if (online.lastActive) {
+        const d = new Date(online.lastActive);
+        let lastSeenText = t(iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
+        if (lastSeenText === t('today')) {
+          lastSeenText = iris.util.formatTime(d);
+        } else {
+          lastSeenText = iris.util.formatDate(d);
+        }
+        return (t('last_active') + ' ' + lastSeenText);
+      }
+    }
+  }
+
+  onClick() {
+    if (activeRoute && activeRoute.length > 20 && activeRoute.indexOf('profile') !== 0) {
+      Profile.showProfile(activeRoute);
+    };
+  }
+
+  componentDidUpdate() {
+    $('#header-content .identicon-container').remove();
+    const chat = chats[activeRoute];
+    if (chat) {
+      if (chat.photo) {
+        const photo = Helpers.setImgSrc($('<img>'), chat.photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
+        $('#header-content').prepend($('<div class="identicon-container">').append(photo));
+      } else if (activeRoute !== 'public' && chat.identicon) {
+        const el = chat.identicon.clone(); // TODO use actual identicon element to update in real-time. but unsubscribe on unmount.
+        el.css({width:40, height:40});
+        el.find('img').attr({width:40, height:40});
+        $('#header-content').prepend($('<div class="identicon-container">').append(el));
+      }
+    }
+    $(this.base).css({cursor: chat ? 'pointer' : ''});
+  }
+
+  componentDidMount() {
+    localState.get('activeRoute').on(chatId => {
+      this.eventListeners.forEach(e => e.off());
+      this.eventListeners = [];
+      this.setState({});
+      if (chatId) {
+        localState.get('chats').get(chatId).get('isTyping').on((isTyping, a, b, event) => {
+          this.eventListeners.push(event);
+          this.setState({});
+        });
+        localState.get('chats').get(chatId).get('theirLastActiveTime').on((t, a, b, event) => {
+          this.eventListeners.push(event);
+          this.setState({});
+        });
+      }
+    });
+  }
+
+  render() {
+    const chat = chats[activeRoute];
+    const isTyping = chat && chat.isTyping;
+    const participants = chat && chat.uuid && Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
+    const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
+    let title;
+    if (activeRoute === null || activeRoute === 'new') {
+      title = t('new_chat');
+    } else if (activeRoute === 'public') {
+      title = t('public_messages');
+    } else if (activeRoute === 'settings') {
+      title = t('settings');
+    } else if (activeRoute.length > 20) {
+      if (activeRoute === Session.getKey().pub) {
+        title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
+      } else {
+        title = Profile.getDisplayName(activeRoute.replace('profile/', ''));
+      }
+    }
+
+    return html`
+    <header>
+      <div id="back-button" class="visible-xs-inline-block" onClick=${() => backButtonClicked()}>
+        ‹
+        <span class="unseen unseen-total"></span>
+      </div>
+      <div id="header-content" onClick="${e => this.onClick(e)}">
+        <div class="text">
+          <div class="name">
+            ${title}
+          </div>
+          ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
+          ${participants ? html`<small class="participants">${participants}</small>` : ''}
+          ${onlineStatus ? html`<small class="last-seen">${onlineStatus}</small>` : ''}
+        </div>
+      </div>
+    </header>`;
+  }
+}
+
+export default Header;

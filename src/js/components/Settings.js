@@ -1,4 +1,4 @@
-import {publicState, resetView} from '../Main.js';
+import {publicState, localState, resetView} from '../Main.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import {translate as t} from '../Translation.js';
@@ -133,7 +133,7 @@ const LogoutConfirmation = () => html`<div class="main-view" id="logout-confirma
 
 function render() {
   resetView();
-  $('#header-content').text(t('settings'));
+  localState.get('activeRoute').put('settings');
   $('#settings').show();
   var el = $('#profile-photo-settings');
   $('#profile-photo-chapter').after(el);

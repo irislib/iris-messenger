@@ -2,7 +2,7 @@ import { html, Component } from '../lib/htm.preact.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Message from './Message.js';
-import {activeChat, chats, processMessage, lastSeenTimeChanged} from '../Chat.js';
+import {activeRoute, chats, processMessage, lastSeenTimeChanged} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 
@@ -21,17 +21,17 @@ class ChatView extends Component {
   }
 
   componentDidMount() {
-    localState.get('activeChat').on(activeChatId => {
+    localState.get('activeRoute').on(activeRouteId => {
       this.setState({});
-      if (activeChatId && !subscribedToMsgs[activeChatId]) {
+      if (activeRouteId && activeRouteId.length > 20 && !subscribedToMsgs[activeRouteId]) {
         const iv = setInterval(() => {
-          if (chats[activeChatId]) {
+          if (chats[activeRouteId]) {
             clearInterval(iv);
-            this.subscribeToMsgs(activeChatId);
+            this.subscribeToMsgs(activeRouteId);
             this.setState({});
           }
         }, 1000);
-        subscribedToMsgs[activeChatId] = true;
+        subscribedToMsgs[activeRouteId] = true;
       }
     });
 
@@ -48,9 +48,9 @@ class ChatView extends Component {
   }
 
   async webPush(msg) {
-    const chat = chats[activeChat];
+    const chat = chats[activeRoute];
     const myKey = Session.getKey();
-    const shouldWebPush = (activeChat === myKey.pub) || !(chat.online && chat.online.isOnline);
+    const shouldWebPush = (activeRoute === myKey.pub) || !(chat.online && chat.online.isOnline);
     if (shouldWebPush && chat.webPushSubscriptions) {
       const subscriptions = [];
       const participants = Object.keys(chat.webPushSubscriptions);
@@ -78,7 +78,7 @@ class ChatView extends Component {
   }
 
   async onMsgFormSubmit(event) {
-    const chat = chats[activeChat];
+    const chat = chats[activeRoute];
     event.preventDefault();
     chat.msgDraft = null;
     const text = $('#new-msg').val();
@@ -113,8 +113,8 @@ class ChatView extends Component {
       $('#message-list').hide();
       for (var i = 0;i < files.length;i++) {
         Helpers.getBase64(files[i]).then(base64 => {
-          chats[activeChat].attachments = chats[activeChat].attachments || [];
-          chats[activeChat].attachments.push({type: 'image', data: base64});
+          chats[activeRoute].attachments = chats[activeRoute].attachments || [];
+          chats[activeRoute].attachments.push({type: 'image', data: base64});
           var preview = Helpers.setImgSrc($('<img>'), base64);
           attachmentsPreview.append(preview);
         });
@@ -128,8 +128,8 @@ class ChatView extends Component {
     $('#attachment-preview').hide();
     $('#attachment-preview').removeClass('gallery');
     $('#message-list').show();
-    if (activeChat) {
-      chats[activeChat].attachments = null;
+    if (activeRoute) {
+      chats[activeRoute].attachments = null;
     }
     Helpers.scrollToMessageListBottom();
   }
@@ -142,7 +142,7 @@ class ChatView extends Component {
     }, 200);
     chats[pub].getMessages((msg, info) => {
       processMessage(pub, msg, info);
-      if (activeChat === pub) {
+      if (activeRoute === pub) {
         debouncedUpdate();
       }
     });
@@ -169,7 +169,7 @@ class ChatView extends Component {
   onMsgTextInput(event) {
     this.isTyping = this.isTyping !== undefined ? this.isTyping : false;
     const getIsTyping = () => $('#new-msg').val().length > 0;
-    const setTyping = () => chats[activeChat].setTyping(getIsTyping());
+    const setTyping = () => chats[activeRoute].setTyping(getIsTyping());
     const setTypingThrottled = _.throttle(setTyping, 1000);
     if (this.isTyping === getIsTyping()) {
       setTypingThrottled();
@@ -177,21 +177,21 @@ class ChatView extends Component {
       setTyping();
     }
     this.isTyping = getIsTyping();
-    chats[activeChat].msgDraft = $(event.target).val();
+    chats[activeRoute].msgDraft = $(event.target).val();
   }
 
   componentDidUpdate() {
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
-    $('#new-msg').val(chats[activeChat] && chats[activeChat].msgDraft);
+    $('#new-msg').val(chats[activeRoute] && chats[activeRoute].msgDraft);
     if (!iris.util.isMobile) {
       $("#new-msg").focus();
     }
-    lastSeenTimeChanged(activeChat);
+    lastSeenTimeChanged(activeRoute);
   }
 
   render() {
-    if (!activeChat || !chats[activeChat] || !chats[activeChat].sortedMessages) {
+    if (!activeRoute || !chats[activeRoute] || !chats[activeRoute].sortedMessages) {
       return html``;
     }
 
@@ -200,8 +200,8 @@ class ChatView extends Component {
     let previousDateStr;
     let previousFrom;
     const msgListContent = [];
-    if (chats[activeChat].sortedMessages) {
-      Object.values(chats[activeChat].sortedMessages).forEach(msg => {
+    if (chats[activeRoute].sortedMessages) {
+      Object.values(chats[activeRoute].sortedMessages).forEach(msg => {
         const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
         if (date) {
           const dateStr = date.toLocaleDateString();
@@ -219,12 +219,12 @@ class ChatView extends Component {
           showName = true;
         }
         previousFrom = from;
-        msgListContent.push(html`<${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${activeChat}/>`);
+        msgListContent.push(html`<${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${activeRoute}/>`);
       });
     }
 
     return html`
-      <div class="main-view ${activeChat === 'public' ? 'public-messages-view' : ''}" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
+      <div class="main-view ${activeRoute === 'public' ? 'public-messages-view' : ''}" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
         <div id="message-list">${msgListContent}</div>
         <div id="attachment-preview" style="display:none"></div>
       </div>
