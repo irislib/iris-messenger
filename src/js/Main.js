@@ -92,8 +92,6 @@ function resetView() {
   QRScanner.cleanupScanner();
   $('#chatlink-qr-video').hide();
   $('.main-view').hide();
-  $('#not-seen-by-them').hide();
-  $(".message-form").hide();
   $('#private-key-qr').remove();
 }
 

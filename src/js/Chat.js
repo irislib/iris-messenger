@@ -20,7 +20,6 @@ function showChat(pub) {
     newChat(pub);
   }
   $("#message-view").show();
-  $(".message-form").show();
   if (!iris.util.isMobile) {
     $("#new-msg").focus();
   }
@@ -101,7 +100,6 @@ function addChat(channel) {
     if (chats[pub] && time && time > chats[pub].theirMsgsLastSeenTime) {
       chats[pub].theirMsgsLastSeenTime = time;
       chatNode.get('theirMsgsLastSeenTime').put(time);
-      lastSeenTimeChanged(pub);
     }
   });
   chats[pub].getMyMsgsLastSeenTime(time => {
@@ -232,7 +230,6 @@ function processMessage(chatId, msg, info) {
   }
   if (!info.selfAuthored && msg.timeStr > chat.theirMsgsLastSeenTime) {
     localState.get('chats').get(chatId).get('theirMsgsLastSeenTime').put(msg.timeStr);
-    lastSeenTimeChanged(chatId);
   }
   if (!chat.latestTime || (msg.timeStr > chat.latestTime)) {
     localState.get('chats').get(chatId).put({
@@ -251,24 +248,4 @@ function showNewChat() {
   })
 }
 
-function lastSeenTimeChanged(pub) {
-  const chat = chats[pub];
-  if (chat && pub !== 'public' && pub !== 'new' && pub === activeRoute) {
-    if (chat.theirMsgsLastSeenDate) {
-      $('#not-seen-by-them').slideUp();
-      $('.msg.our:not(.seen)').each(function() {
-        var el = $(this);
-        if (el.data('time') <= chat.theirMsgsLastSeenDate) {
-          el.toggleClass('seen', true);
-        }
-      });
-      // set seen msgs
-    } else {
-      if (!chat.uuid && $('.msg.our').length) {
-        $('#not-seen-by-them').slideDown();
-      }
-    }
-  }
-}
-
-export { showChat, activeRoute, chats, addChat, deleteChat, showNewChat, newChat, lastSeenTimeChanged, processMessage };
+export { showChat, activeRoute, chats, addChat, deleteChat, showNewChat, newChat, processMessage };

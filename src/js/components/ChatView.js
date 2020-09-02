@@ -2,7 +2,7 @@ import { html, Component } from '../lib/htm.preact.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Message from './Message.js';
-import {activeRoute, chats, processMessage, lastSeenTimeChanged} from '../Chat.js';
+import {activeRoute, chats, processMessage} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 
@@ -181,13 +181,20 @@ class ChatView extends Component {
   }
 
   componentDidUpdate() {
+    const chat = chats[activeRoute];
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
-    $('#new-msg').val(chats[activeRoute] && chats[activeRoute].msgDraft);
+    $('#new-msg').val(chat && chat.msgDraft);
     if (!iris.util.isMobile) {
       $("#new-msg").focus();
     }
-    lastSeenTimeChanged(activeRoute);
+    if (chat) {
+      if (chat.theirMsgsLastSeenTime) {
+        $('#not-seen-by-them').slideUp();
+      } else if (!chat.uuid && $('.msg.our').length) {
+        $('#not-seen-by-them').slideDown();
+      }
+    }
   }
 
   render() {
