@@ -1,6 +1,6 @@
 import { html, render } from '../lib/htm.preact.js';
 import {translate as t} from '../Translation.js';
-import {localState, publicState, resetView, activeRoute, activeProfile} from '../Main.js';
+import {localState, publicState, resetView, activeProfile} from '../Main.js';
 import {chats, deleteChat, showChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';

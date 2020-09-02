@@ -78,11 +78,6 @@ $(window).resize(() => { // if resizing up from mobile size menu view
   }
 });
 
-function backButtonClicked() {
-  resetView();
-  showMenu(true);
-}
-
 function resetView() {
   activeProfile = null;
   if (activeRoute && chats[activeRoute]) {

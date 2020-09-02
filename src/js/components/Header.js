@@ -1,9 +1,8 @@
 import { html, Component } from '../lib/htm.preact.js';
-import {showChat, chats, activeRoute} from '../Chat.js';
+import {chats, activeRoute} from '../Chat.js';
 import { translate as t } from '../Translation.js';
-import {localState} from '../Main.js';
+import {localState, resetView, showMenu} from '../Main.js';
 import Session from '../Session.js';
-import Identicon from './Identicon.js';
 import Profile from './Profile.js';
 import Helpers from '../Helpers.js';
 
@@ -14,14 +13,8 @@ class Header extends Component {
     this.eventListeners = [];
   }
 
-  addUserToHeader(pub) {
-    const isTyping = chat && chat.isTyping;
-    textEl.append($('<small>').addClass('typing-indicator').text(t('typing')).toggle(isTyping));
-    if (chat && chat.uuid) {
-      var namesEl = $('<small>').addClass('participants').text(text).toggle(!isTyping);
-      textEl.append(namesEl);
-    }
     /* disabled for now because videochat is broken
+    addUserToHeader() {
     if (!chats[pub].uuid) {
       var videoCallBtn = $(`<a class="tooltip"><span class="tooltiptext">${t('video_call')}</span><svg enable-background="new 0 0 50 50" id="Layer_1" version="1.1" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><rect fill="none" style="height:24px;width:24px"/><polygon fill="none" points="49,14 36,21 36,29   49,36 " stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/><path d="M36,36c0,2.209-1.791,4-4,4  H5c-2.209,0-4-1.791-4-4V14c0-2.209,1.791-4,4-4h27c2.209,0,4,1.791,4,4V36z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="4"/></svg></a>`).attr('id', 'start-video-call').css({width:24, height:24, color: 'var(--msg-form-button-color)'});
       videoCallBtn.click(() => VideoCall.isCalling() ? null : VideoCall.callUser(pub));
@@ -29,8 +22,8 @@ class Header extends Component {
       voiceCallBtn.click(() => VideoCall.isCalling() ? VideoCall.stopCalling(pub) : VideoCall.callUser(pub));
       //$("#header-content").append(voiceCallBtn);
       $("#header-content").append(videoCallBtn);
+      }
     }*/
-  }
 
   getOnlineStatusText() {
     const chat = chats[activeRoute];
@@ -49,6 +42,11 @@ class Header extends Component {
         return (t('last_active') + ' ' + lastSeenText);
       }
     }
+  }
+
+  backButtonClicked() {
+    resetView();
+    showMenu(true);
   }
 
   onClick() {
@@ -114,7 +112,7 @@ class Header extends Component {
 
     return html`
     <header>
-      <div id="back-button" class="visible-xs-inline-block" onClick=${() => backButtonClicked()}>
+      <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
         ‹
         <span class="unseen unseen-total"></span>
       </div>
