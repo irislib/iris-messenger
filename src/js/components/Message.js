@@ -55,8 +55,6 @@ function openAttachmentsGallery(msg, event) {
       $(document).off('keyup');
       if ($('#attachment-preview.gallery:visible').length) {
         closeAttachmentsGallery();
-      } else {
-        this.closeAttachmentsPreview();
       }
     }
   });

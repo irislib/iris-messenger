@@ -134,6 +134,15 @@ class ChatView extends Component {
       $('#attachment-input').val(null)
       $('#new-msg').focus();
     }
+
+    $(document).off('keyup').on('keyup', e => {
+      if (e.key === "Escape") { // escape key maps to keycode `27`
+        $(document).off('keyup');
+        if ($('#attachment-preview:visible').length) {
+          this.closeAttachmentsPreview();
+        }
+      }
+    });
   }
 
   closeAttachmentsPreview() {
