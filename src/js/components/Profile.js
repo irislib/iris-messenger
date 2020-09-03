@@ -9,9 +9,25 @@ import Message from './Message.js';
 //import VideoCall from './VideoCall.js';
 
 const Profile = () => html`<div class="main-view" id="profile">
-  <div class="profile-photo-container">
-  <img class="profile-photo"/></div>
   <div class="content">
+    <div class="profile-header">
+      <div class="profile-photo-container">
+        <img class="profile-photo"/>
+      </div>
+      <div class="profile-header-stuff">
+        <div class="profile-actions">
+          <button class="send-message">${t('send_message')}</button>
+          <button class="copy-user-link">${t('copy_link')}</button>
+          <button class="show-qr-code">${t('show_qr_code')}</button>
+          <button class="show-settings">${t('settings')}</button>
+          <!-- <button class="add-friend">${t('follow')}</button> -->
+        </div>
+        <div class="profile-about" style="display:none">
+          <p class="profile-about-content"></p>
+        </div>
+      </div>
+    </div>
+
     <div id="profile-group-settings">
       <div id="profile-group-name-container">${t('group_name')}: <input id="profile-group-name" placeholder="${t('group_name')}"/></div>
       <p>${t('participants')}:</p>
@@ -26,23 +42,7 @@ const Profile = () => html`<div class="main-view" id="profile">
       <p><button id="profile-create-invite-link">Create new invite link</button></p>
       <hr/>
     </div>
-    <div class="profile-about" style="display:none">
-      <p class="profile-about-content"></p>
-    </div>
-    <!--
-    <p>
-      <button class="add-friend">${t('add_friend')}</button>
-    </p>
-    <p>
-      <small>Friends can optionally direct connect to each other and store each others' encrypted data.</small>
-    </p>
-  -->
-    <div class="profile-actions">
-      <button class="send-message">${t('send_message')}</button>
-      <button class="copy-user-link">${t('copy_link')}</button>
-      <button class="show-qr-code">${t('show_qr_code')}</button>
-      <button class="show-settings">${t('settings')}</button>
-    </div>
+
     <p id="profile-page-qr" style="display:none" class="qr-container"></p>
     <div id="chat-settings" style="display:none">
       <hr/>

@@ -84,13 +84,6 @@ img {
   #profile .content {
     padding: 10px 15px;
   }
-  .profile-photo {
-    border-radius: 0 !important;
-    max-width: none !important;
-    max-height: none !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
   #current-profile-photo {
     max-width: none !important;
     max-height: none !important;
@@ -704,7 +697,20 @@ small {
   display: none;
 }
 
-.profile-about, .profile-actions {
+.profile-header {
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+}
+
+.profile-actions button {
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.profile-header-stuff {
+  padding-left: 15px;
+  flex: 2;
   width: 50%;
   display: inline-block;
 }
@@ -716,6 +722,10 @@ small {
 /* Places where emojis may appear */
 .user-name, .name, input[type=text] {
   line-height: 1.3em;
+}
+
+.profile-photo-container {
+  flex: 1;
 }
 
 .profile-photo {

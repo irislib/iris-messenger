@@ -74,6 +74,7 @@ export default {
     add_friend: "Add friend",
     send_message: "Send message",
     copy_link: "Copy link",
+    show_qr_code: "Show QR code",
     chat_settings: "Chat Settings",
     nicknames: "Nicknames",
     nickname: "Nickname",
