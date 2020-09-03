@@ -29,8 +29,6 @@ const Profile = () => html`<div class="main-view" id="profile">
     <div class="profile-about" style="display:none">
       <p class="profile-about-content"></p>
     </div>
-    <p class="status"></p>
-    <p class="last-active"></p>
     <!--
     <p>
       <button class="add-friend">${t('add_friend')}</button>
@@ -39,39 +37,43 @@ const Profile = () => html`<div class="main-view" id="profile">
       <small>Friends can optionally direct connect to each other and store each others' encrypted data.</small>
     </p>
   -->
-    <p>
+    <div class="profile-actions">
       <button class="send-message">${t('send_message')}</button>
       <button class="copy-user-link">${t('copy_link')}</button>
-    </p>
-    <p id="profile-page-qr" class="qr-container"></p>
-    <hr/>
-    <h3>${t('chat_settings')}</h3>
-    <div class="profile-nicknames">
-      <h4>${t('nicknames')}</h4>
-      <p>
-        ${t('nickname')}: <input id="profile-nickname-their"/>
-      </p>
-      <p id="profile-nickname-my-container">
-        ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
-      </p>
+      <button class="show-qr-code">${t('show_qr_code')}</button>
+      <button class="show-settings">${t('settings')}</button>
     </div>
-    <div class="notification-settings">
-      <h4>${t('notifications')}</h4>
-      <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
-      <label for="notifyAll">${t('all_messages')}</label><br/>
-      <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
-      <label for="notifyMentionsOnly">${t('mentions_only')}</label><br/>
-      <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
-      <label for="notifyNothing">${t('nothing')}</label><br/>
-    </div>
-    <hr/>
-    <p>
-      <button class="delete-chat">${t('delete_chat')}</button>
-      <!-- <button class="block-user">${t('block_user')}</button> -->
-    </p>
-    <div id="profile-public-messages">
+    <p id="profile-page-qr" style="display:none" class="qr-container"></p>
+    <div id="chat-settings" style="display:none">
       <hr/>
-      <h3>${t('public_messages')}</h3>
+      <h3>${t('chat_settings')}</h3>
+      <div class="profile-nicknames">
+        <h4>${t('nicknames')}</h4>
+        <p>
+          ${t('nickname')}: <input id="profile-nickname-their"/>
+        </p>
+        <p id="profile-nickname-my-container">
+          ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
+        </p>
+      </div>
+      <div class="notification-settings">
+        <h4>${t('notifications')}</h4>
+        <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
+        <label for="notifyAll">${t('all_messages')}</label><br/>
+        <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
+        <label for="notifyMentionsOnly">${t('mentions_only')}</label><br/>
+        <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
+        <label for="notifyNothing">${t('nothing')}</label><br/>
+      </div>
+      <hr/>
+      <p>
+        <button class="delete-chat">${t('delete_chat')}</button>
+        <!-- <button class="block-user">${t('block_user')}</button> -->
+      </p>
+      <hr/>
+    </div>
+    <div id="profile-public-messages">
+      <br/>
       <div id="profile-public-message-list" class="public-messages-view"></div>
     </div>
   </div>
@@ -172,6 +174,8 @@ function showProfile(pub) {
   $('input:radio[name=notificationPreference]').off().on('change', (event) => {
     chats[pub].put('notificationSetting', event.target.value);
   });
+  $('#profile .show-settings').off().on('click', () => $('#chat-settings').toggle());
+  $('#profile .show-qr-code').off().on('click', () => $('#profile-page-qr').toggle());
   $('#profile .send-message').off().on('click', () => showChat(pub));
   $('#profile .copy-user-link').off().on('click', event => {
     Helpers.copyToClipboard(link);

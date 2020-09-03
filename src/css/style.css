@@ -704,6 +704,11 @@ small {
   display: none;
 }
 
+.profile-about, .profile-actions {
+  width: 50%;
+  display: inline-block;
+}
+
 .qr-container img, .qr-container canvas {
   border: 5px solid white;
 }
