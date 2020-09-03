@@ -10,8 +10,20 @@ const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify'
 
 const submitButton = html`
   <button type="submit">
-    <svg class="svg-inline--fa fa-w-16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;" xml:space="preserve" width="100px" height="100px" fill="#000000" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>
+    <svg class="svg-inline--fa fa-w-16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;" xml:space="preserve" width="100px" height="100px" fill="currentColor" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>
   </button>`;
+
+const caretDownSvg = html`
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="451.847px" height="451.847px" viewBox="0 0 451.847 451.847" style="enable-background:new 0 0 451.847 451.847;"
+	 xml:space="preserve">
+<g>
+	<path fill="currentColor" d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751
+		c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0
+		c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"/>
+</g>
+</svg>
+`;
 
 const subscribedToMsgs = {};
 
@@ -149,8 +161,7 @@ class ChatView extends Component {
   }
 
   onMessageViewScroll(event) {
-    this.messageViewScrollHandler = this.messageViewScrollHandler || _.throttle(event => {
-      if ($('#attachment-preview:visible').length) { return; }
+    function addFloatingDaySeparator() {
       var currentDaySeparator = $('.day-separator').last();
       var pos = currentDaySeparator.position();
       while (currentDaySeparator && pos && pos.top - 55 > 0) {
@@ -162,6 +173,17 @@ class ChatView extends Component {
       $('#floating-day-separator').remove();
       setTimeout(() => s.fadeOut(), 2000);
       $(event.target).prepend(center);
+    }
+    function toggleScrollDownBtn() {
+      const el = $(event.target);
+      const scrolledToBottom = el[0].scrollHeight - el.scrollTop() === el.outerHeight();
+      $('#scroll-down-btn').toggle(!scrolledToBottom);
+    }
+
+    this.messageViewScrollHandler = this.messageViewScrollHandler || _.throttle(event => {
+      if ($('#attachment-preview:visible').length) { return; }
+      addFloatingDaySeparator();
+      toggleScrollDownBtn();
     }, 200);
     this.messageViewScrollHandler(event);
   }
@@ -239,6 +261,7 @@ class ChatView extends Component {
         <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
         <p><button onClick=${e => Session.copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
       </div>
+      <div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
       <div class="message-form">
         <form autocomplete="off" onSubmit=${e => this.onMsgFormSubmit(e)}>
           <input name="attachment-input" type="file" class="hidden" id="attachment-input" accept="image/*" multiple onChange=${() => this.openAttachmentsPreview()}/>

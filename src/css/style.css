@@ -619,6 +619,29 @@ small {
   width: 200px;
 }
 
+#scroll-down-btn {
+  cursor: pointer;
+  color: var(--small-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 15px;
+  width: 50px;
+  height: 50px;
+  bottom: 85px;
+  opacity: 0.9;
+  border-radius: 50%;
+  background-color: var(--sidebar-bg);
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+#scroll-down-btn svg {
+  width: 33%;
+  height: 33%;
+  margin-top: 3px;
+}
+
 #not-seen-by-them {
   padding: 10px 15px;
   background-color: var(--notify);
