@@ -245,15 +245,16 @@ header #back-button {
   cursor: pointer;
 }
 
-.public-messages-view .msg.our {
+.public-messages-view .msg {
   align-items: flex-start;
+  margin-bottom: 15px;
 }
 
-.public-messages-view .msg.our .msg-content .seen-indicator {
+.public-messages-view .msg .msg-content .seen-indicator {
   display: none;
 }
 
-.public-messages-view .msg.our .msg-content {
+.public-messages-view .msg .msg-content {
   max-width: none;
   border-radius: 8px !important;
   width: 100%;
