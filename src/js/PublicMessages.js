@@ -35,7 +35,6 @@ function init() {
     setTyping: u,
   };
   addChat(pub);
-  $('.public-messages').click(() => showChat('public'));
 }
 
 export default {init, getMessages};

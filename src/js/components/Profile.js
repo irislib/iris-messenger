@@ -378,7 +378,6 @@ function renderInviteLinks(pub) {
 }
 
 function onCreateInviteLink() {
-  console.log(4);
   if (!chats[activeProfile]) { return; }
   chats[activeProfile].createChatLink();
 }

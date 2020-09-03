@@ -23,7 +23,7 @@ class ChatView extends Component {
   componentDidMount() {
     localState.get('activeRoute').on(activeRouteId => {
       this.setState({});
-      if (activeRouteId && activeRouteId.length > 20 && !subscribedToMsgs[activeRouteId]) {
+      if (activeRouteId && (activeRouteId === 'public' || activeRouteId.length > 20) && !subscribedToMsgs[activeRouteId]) {
         const iv = setInterval(() => {
           if (chats[activeRouteId]) {
             clearInterval(iv);
@@ -188,7 +188,7 @@ class ChatView extends Component {
     if (!iris.util.isMobile) {
       $("#new-msg").focus();
     }
-    if (chat) {
+    if (chat && chat.id !== 'public') {
       if (chat.theirMsgsLastSeenTime) {
         $('#not-seen-by-them').slideUp();
       } else if (!chat.uuid && $('.msg.our').length) {
