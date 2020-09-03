@@ -1,4 +1,4 @@
-import {addChat, showChat} from './Chat.js';
+import {addChat} from './Chat.js';
 import { translate as t } from './Translation.js';
 import {publicState} from './Main.js';
 

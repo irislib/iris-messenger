@@ -160,32 +160,37 @@ class ChatView extends Component {
     });
   }
 
-  onMessageViewScroll(event) {
-    function addFloatingDaySeparator() {
-      var currentDaySeparator = $('.day-separator').last();
-      var pos = currentDaySeparator.position();
-      while (currentDaySeparator && pos && pos.top - 55 > 0) {
-        currentDaySeparator = currentDaySeparator.prevAll('.day-separator').first();
-        pos = currentDaySeparator.position();
-      }
-      var s = currentDaySeparator.clone();
-      var center = $('<div>').css({position: 'fixed', top: 70, 'text-align': 'center'}).attr('id', 'floating-day-separator').width($('#message-view').width()).append(s);
-      $('#floating-day-separator').remove();
-      setTimeout(() => s.fadeOut(), 2000);
-      $(event.target).prepend(center);
+  addFloatingDaySeparator() {
+    var currentDaySeparator = $('.day-separator').last();
+    var pos = currentDaySeparator.position();
+    while (currentDaySeparator && pos && pos.top - 55 > 0) {
+      currentDaySeparator = currentDaySeparator.prevAll('.day-separator').first();
+      pos = currentDaySeparator.position();
     }
-    function toggleScrollDownBtn() {
-      const el = $(event.target);
-      const scrolledToBottom = el[0].scrollHeight - el.scrollTop() === el.outerHeight();
-      $('#scroll-down-btn').toggle(!scrolledToBottom);
-    }
+    var s = currentDaySeparator.clone();
+    var center = $('<div>').css({position: 'fixed', top: 70, 'text-align': 'center'}).attr('id', 'floating-day-separator').width($('#message-view').width()).append(s);
+    $('#floating-day-separator').remove();
+    setTimeout(() => s.fadeOut(), 2000);
+    $('#message-view').prepend(center);
+  }
 
-    this.messageViewScrollHandler = this.messageViewScrollHandler || _.throttle(event => {
+  toggleScrollDownBtn() {
+    const el = $('#message-view');
+    const scrolledToBottom = el[0].scrollHeight - el.scrollTop() <= el.outerHeight() + 200;
+    if (scrolledToBottom) {
+      $('#scroll-down-btn:visible').fadeOut(150);
+    } else {
+      $('#scroll-down-btn:not(:visible)').fadeIn(150);
+    }
+  }
+
+  onMessageViewScroll() {
+    this.messageViewScrollHandler = this.messageViewScrollHandler || _.throttle(() => {
       if ($('#attachment-preview:visible').length) { return; }
-      addFloatingDaySeparator();
-      toggleScrollDownBtn();
+      this.addFloatingDaySeparator();
+      this.toggleScrollDownBtn();
     }, 200);
-    this.messageViewScrollHandler(event);
+    this.messageViewScrollHandler();
   }
 
   onMsgTextInput(event) {
