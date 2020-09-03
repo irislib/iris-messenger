@@ -224,9 +224,9 @@ class ChatView extends Component {
     if (!iris.util.isMobile) {
       $("#new-msg").focus();
     }
-    if (chat && chat.id !== 'public') {
-      if (chat.theirMsgsLastSeenTime) {
-        $('#not-seen-by-them').slideUp();
+    if (chat) {
+      if (activeRoute === 'public' || chat.theirMsgsLastSeenTime) {
+        $('#not-seen-by-them:visible').slideUp();
       } else if (!chat.uuid && $('.msg.our').length) {
         $('#not-seen-by-them').slideDown();
       }
