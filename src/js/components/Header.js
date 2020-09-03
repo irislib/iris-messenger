@@ -52,7 +52,7 @@ class Header extends Component {
   onClick() {
     if (activeRoute && activeRoute.length > 20 && activeRoute.indexOf('profile') !== 0) {
       Profile.showProfile(activeRoute);
-    }
+    };
   }
 
   componentDidUpdate() {
@@ -102,6 +102,8 @@ class Header extends Component {
       title = t('public_messages');
     } else if (activeRoute === 'settings') {
       title = t('settings');
+    } else if (activeRoute === 'logout') {
+      title = t('log_out') + '?';
     } else if (activeRoute.length > 20) {
       if (activeRoute === Session.getKey().pub) {
         title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;

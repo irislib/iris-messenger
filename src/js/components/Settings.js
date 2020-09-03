@@ -181,7 +181,7 @@ function togglePrivateKeyQR() {
 
 function showLogoutConfirmation() {
   resetView();
-  $('#header-content').text(t('log_out') + '?');
+  localState.get('activeRoute').put('logout');
   $('#logout-confirmation').show();
 }
 

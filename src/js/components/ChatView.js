@@ -100,7 +100,6 @@ class ChatView extends Component {
     if (chat.attachments) {
       msg.attachments = chat.attachments;
     }
-    console.log('sending', msg);
     chat.send(msg);
     this.closeAttachmentsPreview();
     $('#new-msg').val('');
@@ -128,7 +127,6 @@ class ChatView extends Component {
         Helpers.getBase64(files[i]).then(base64 => {
           chats[activeRoute].attachments = chats[activeRoute].attachments || [];
           chats[activeRoute].attachments.push({type: 'image', data: base64});
-          console.log(1, activeRoute, chats[activeRoute].attachments);
           var preview = Helpers.setImgSrc($('<img>'), base64);
           attachmentsPreview.append(preview);
         });
@@ -164,7 +162,6 @@ class ChatView extends Component {
       this.setState({});
     }, 200);
     chats[pub].getMessages((msg, info) => {
-      console.log('got msg', JSON.stringify(msg));
       processMessage(pub, msg, info);
       if (activeRoute === pub) {
         debouncedUpdate();
