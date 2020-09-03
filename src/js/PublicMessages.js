@@ -6,13 +6,17 @@ let pub;
 
 function sendPublicMsg(msg) {
   msg.time = new Date().toISOString();
-  publicState.user().get('msgs').get(msg.time).put(msg);
+  publicState.user().get('msgs').get(msg.time).put(JSON.stringify(msg));
 }
 
 function getMessages(cb, pub) {
   const seen = [];
   publicState.user(pub).get('msgs').map().on((msg, time) => {
+    if (typeof msg === 'string') {
+      msg = JSON.parse(msg);
+    }
     if (typeof msg !== 'object' || seen.indexOf(time) !== -1) { return; }
+    console.log(msg);
     seen.push(time);
     cb(msg, {selfAuthored: true, from: pub});
   });

@@ -730,7 +730,7 @@ small {
 
 .profile-photo {
   border-radius: 50%;
-  max-width: 300px;
+  max-width: min(100%, 300px);
   max-height: 300px;
 }
 
