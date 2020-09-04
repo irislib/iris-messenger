@@ -1,6 +1,9 @@
-import { html, render } from './lib/htm.preact.js';
+import { render } from './lib/preact.js';
+import Router from './lib/preact-router.es.js';
+import { createHashHistory } from './lib/history.production.min.js';
 import Translation from './Translation.js';
 import Helpers from './Helpers.js';
+import { html } from './Helpers.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 import Settings, {LogoutConfirmation, init as initSettings} from './components/Settings.js';
@@ -46,11 +49,13 @@ const Main = html`
     <${SideBar}/>
     <section class="main">
       <${Header}/>
-      <${ChatView}/>
-      <${NewChat}/>
-      <${Settings}/>
-      <${LogoutConfirmation}/>
-      <${Profile.Profile}/>
+      <${Router} history=${createHashHistory()}>
+        <${ChatView} path="/chat"/>
+        <${NewChat} path="/"/>
+        <${Settings} path="/settings"/>
+        <${LogoutConfirmation} path="/logout"/>
+        <${Profile.Profile} path="/profile"/>
+      </${Router}>
     </section>
   </div>
 `;

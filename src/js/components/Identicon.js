@@ -1,4 +1,4 @@
-import { html, Component } from '../lib/htm.preact.js';
+import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 
 class Identicon extends Component {

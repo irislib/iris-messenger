@@ -1,4 +1,4 @@
-import { html } from '../lib/htm.preact.js';
+import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import { newChat, showChat, addChat } from '../Chat.js';
 import { publicState } from '../Main.js';

@@ -1,4 +1,4 @@
-import { html, Component } from '../lib/htm.preact.js';
+import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import {chats, activeRoute} from '../Chat.js';
 import { translate as t } from '../Translation.js';
 import {localState, resetView, showMenu} from '../Main.js';

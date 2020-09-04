@@ -1,4 +1,5 @@
-import { html, render } from '../lib/htm.preact.js';
+import { render } from '../lib/preact.js';
+import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import {localState, publicState, resetView, activeProfile} from '../Main.js';
 import {chats, deleteChat, showChat} from '../Chat.js';

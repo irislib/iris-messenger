@@ -1,11 +1,11 @@
-import { html, Component } from '../lib/htm.preact.js';
+import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import {chats, activeRoute} from '../Chat.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
 
-const seenIndicator = html`<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
+const seenIndicator = html`<span class="seen-indicator"><svg viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
 
 function addMention(name) {
   $('#new-msg').val($('#new-msg').val().trim() + ` @${name} `);
