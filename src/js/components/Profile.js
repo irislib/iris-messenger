@@ -132,11 +132,19 @@ function getDisplayName(pub) {
   return displayName || '';
 }
 
+let sortedPublicMessages;
+
 function onPublicMessage(msg, info) {
   if (activeProfile !== info.from) { return; }
-  const container = $('<div>');
-  render(html`<${Message} ...${msg} showName=${true} chatId=${info.from}/>`, container[0]);
-  $('#profile-public-message-list').prepend(container.children()[0]);
+  msg.info = info;
+  sortedPublicMessages.push(msg);
+  sortedPublicMessages.sort((a, b) => return a.time > b.time ? 1 : -1);
+  $('#profile-public-message-list').empty();
+  sortedPublicMessages.forEach(msg => {
+    const container = $('<div>');
+    render(html`<${Message} ...${msg} key=${msg.time} showName=${true} chatId=${info.from}/>`, container[0]);
+    $('#profile-public-message-list').prepend(container.children()[0]);
+  });
 }
 
 function showProfile(pub) {
@@ -144,6 +152,7 @@ function showProfile(pub) {
     return;
   }
   resetView();
+  sortedPublicMessages = [];
   localState.get('activeRoute').put('profile/' + pub);
   localState.get('activeProfile').put(pub);
   $('#profile .profile-photo-container').hide();
