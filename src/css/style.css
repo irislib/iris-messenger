@@ -78,6 +78,9 @@ img {
   .visible-xs-inline-block {
     display: inline-block !important;
   }
+  .visible-xs-flex {
+    display: flex;
+  }
   #profile {
     padding: 0;
   }
@@ -92,7 +95,7 @@ img {
 }
 
 @media (min-width: 576px) {
-  .visible-xs-block, .visible-xs-inline-block {
+  .visible-xs-block, .visible-xs-inline-block, .visible-xs-flex {
     display: none !important;
   }
 }
@@ -711,8 +714,6 @@ small {
 .profile-header-stuff {
   padding-left: 15px;
   flex: 2;
-  width: 50%;
-  display: inline-block;
 }
 
 .qr-container img, .qr-container canvas {
@@ -725,13 +726,15 @@ small {
 }
 
 .profile-photo-container {
+  display: flex;
+  align-items: center;
   flex: 1;
 }
 
 .profile-photo {
   border-radius: 50%;
   max-width: min(100%, 300px);
-  max-height: 300px;
+  max-height: min(30vw, 300px);
 }
 
 .chat-item .typing-indicator {

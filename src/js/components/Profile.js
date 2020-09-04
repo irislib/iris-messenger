@@ -22,10 +22,13 @@ const Profile = () => html`<div class="main-view" id="profile">
           <button class="show-settings">${t('settings')}</button>
           <!-- <button class="add-friend">${t('follow')}</button> -->
         </div>
-        <div class="profile-about" style="display:none">
+        <div class="profile-about hidden-xs" style="display:none">
           <p class="profile-about-content"></p>
         </div>
       </div>
+    </div>
+    <div class="profile-about visible-xs-flex" style="display:none">
+      <p class="profile-about-content"></p>
     </div>
 
     <div id="profile-group-settings">
