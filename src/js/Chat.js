@@ -117,7 +117,7 @@ function addChat(channel) {
   chats[pub].online = {};
   iris.Channel.getOnline(publicState, pub, (online) => {
     if (chats[pub]) {
-      chatNode.get('theirLastActiveTime').put(online && online.lastActive);
+      chatNode.put({theirLastActiveTime: online && online.lastActive, isOnline: online && online.isOnline});
       chats[pub].online = online;
     }
   });

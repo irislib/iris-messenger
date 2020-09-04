@@ -52,6 +52,7 @@ class ChatListItem extends Component {
     const delivered = chat.theirLastActiveTime >= chat.latestTime ? "delivered" : "";
     const hasUnseen = chat.unseen ? 'has-unseen' : '';
     const unseenEl = chat.unseen ? html`<span class="unseen">${chat.unseen}</span>` : '';
+    const online = chat.isOnline ? 'online' : '';
 
     const time = chat.latestTime && new Date(chat.latestTime);
     let latestTimeText = Helpers.getRelativeTimeText(time);
@@ -77,8 +78,9 @@ class ChatListItem extends Component {
     const typingIndicator = chat.isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : '';
 
     return html`
-    <div class="chat-item ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
+    <div class="chat-item ${online} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
       ${iconEl}
+      <div class="online-indicator"></div>
       <div class="text">
         <div>
           <span class="name">${name}</span>

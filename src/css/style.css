@@ -537,6 +537,7 @@ header #back-button {
   height: 72px;
   align-items: stretch;
   margin-top: -1px;
+  position: relative;
 }
 
 .chat-item .identicon-container, header .identicon-container {
@@ -735,6 +736,22 @@ small {
   border-radius: 50%;
   max-width: min(100%, 300px);
   max-height: min(30vw, 300px);
+}
+
+.chat-item .online-indicator {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #80bf5f;
+  position: absolute;
+  bottom: 10px;
+  left: 50px;
+  border: 3px solid var(--sidebar-bg);
+}
+
+.chat-item.online .online-indicator {
+  display: inline-block;
 }
 
 .chat-item .typing-indicator {
