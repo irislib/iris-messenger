@@ -50,8 +50,8 @@ const Main = html`
     <section class="main">
       <${Header}/>
       <${Router} history=${createHashHistory()}>
-        <${ChatView} path="/chat"/>
         <${NewChat} path="/"/>
+        <${ChatView} path="/chat"/>
         <${Settings} path="/settings"/>
         <${LogoutConfirmation} path="/logout"/>
         <${Profile.Profile} path="/profile"/>
@@ -91,7 +91,6 @@ function resetView() {
   showMenu(false);
   QRScanner.cleanupScanner();
   $('#chatlink-qr-video').hide();
-  $('.main-view').hide();
   $('#private-key-qr').remove();
 }
 
