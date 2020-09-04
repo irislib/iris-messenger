@@ -138,11 +138,11 @@ function onPublicMessage(msg, info) {
   if (activeProfile !== info.from) { return; }
   msg.info = info;
   sortedPublicMessages.push(msg);
-  sortedPublicMessages.sort((a, b) => return a.time > b.time ? 1 : -1);
+  sortedPublicMessages.sort((a, b) => a.time > b.time ? 1 : -1);
   $('#profile-public-message-list').empty();
   sortedPublicMessages.forEach(msg => {
     const container = $('<div>');
-    render(html`<${Message} ...${msg} key=${msg.time} showName=${true} chatId=${info.from}/>`, container[0]);
+    render(html`<${Message} ...${msg} public=${true} key=${msg.time} showName=${true} chatId=${info.from}/>`, container[0]);
     $('#profile-public-message-list').prepend(container.children()[0]);
   });
 }

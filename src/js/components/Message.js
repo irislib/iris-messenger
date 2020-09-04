@@ -118,7 +118,7 @@ class Message extends Component {
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }}>
           </div>
           <div class="time">
-            ${iris.util.formatTime(time)}
+            ${this.props.public ? Helpers.getRelativeTimeText(time) : iris.util.formatTime(time)}
             ${this.props.selfAuthored && seenIndicator}
           </div>
         </div>
