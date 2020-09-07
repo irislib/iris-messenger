@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {publicState, localState, resetView} from '../Main.js';
+import {publicState, localState} from '../Main.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import {translate as t} from '../Translation.js';
@@ -14,7 +14,7 @@ class Settings extends Component {
           ${t('your_name')}:
         </p>
         <p>
-          <input id="settings-name" placeholder="${t('your_name')}"/>
+          <input onInput=${e => onNameChange(e)} placeholder="${t('your_name')}"/>
         </p>
         <p id="profile-photo-chapter">
           ${t('profile_photo')}:
@@ -37,7 +37,7 @@ class Settings extends Component {
         </div>
         <p>${t('about_text')}:</p>
         <p>
-          <input id="settings-about" style="width:100%" placeholder="${t('about_text')}"/>
+          <input onInput=${e => onAboutTextChange(e)} style="width:100%" placeholder="${t('about_text')}"/>
         </p>
         <hr/>
         <h3>${t('account')}</h3>
@@ -45,7 +45,7 @@ class Settings extends Component {
           <b>${t('save_backup_of_privkey_first')}</b> ${t('otherwise_cant_log_in_again')}
         </p>
         <p>
-          <button class="show-logout-confirmation">${t('log_out')}</button>
+          <button onClick=${() => localState.get('activeRoute').put('logout')}>${t('log_out')}</button>
         </p>
         <h4>${t('private_key')}</h4>
         <p dangerouslySetInnerHTML=${{ __html: t('private_key_warning') }} ></p>
@@ -132,30 +132,18 @@ class Settings extends Component {
     Helpers.setImgSrc($('#current-profile-photo'), Session.getMyProfilePhoto());
     $('#add-profile-photo').toggle(!Session.getMyProfilePhoto());
     $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
-
-    $('#settings-name').on('input', event => {
-      var name = $(event.target).val().trim();
-      publicState.user().get('profile').get('name').put(name);
-    });
-
-    $('#settings-about').on('input', event => {
-      var about = $(event.target).val().trim();
-      publicState.user().get('profile').get('about').put(about);
-    });
-
-    $('.show-logout-confirmation').click(showLogoutConfirmation);
   }
 }
 
-const LogoutConfirmation = () => html`<div class="main-view" id="logout-confirmation">
-  <p dangerouslySetInnerHTML=${{ __html: t('logout_confirmation_info')}}></p>
-  <p>
-    <button onClick=${() => localState.get('activeRoute').put('settings')}>${t('back')}</button>
-  </p>
-  <p>
-    <button class="logout-button" onClick=${() => Session.logOut()}>${t('log_out')}</button>
-  </p>
-</div>`;
+function onNameChange(event) {
+  var name = $(event.target).val().trim();
+  publicState.user().get('profile').get('name').put(name);
+}
+
+function onAboutTextChange(event) {
+  var about = $(event.target).val().trim();
+  publicState.user().get('profile').get('about').put(about);
+}
 
 function copyPrivateKey(event) {
   Helpers.copyToClipboard(JSON.stringify(Session.getKey()));
@@ -207,15 +195,8 @@ function togglePrivateKeyQR() {
   }
 }
 
-function showLogoutConfirmation() {
-  resetView();
-  localState.get('activeRoute').put('logout');
-  $('#logout-confirmation').show();
-}
-
 function downloadKey() {
   return Helpers.download('iris_private_key.txt', JSON.stringify(Session.getKey()), 'text/csv', 'utf-8');
 }
 
-export {LogoutConfirmation};
 export default Settings;
