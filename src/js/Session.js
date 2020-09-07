@@ -47,7 +47,7 @@ function setOurOnlineStatus() {
       const chat = activeRoute && chats[activeRoute.replace('profile/','').replace('chat/','')];
       if (chat) {
         chat.setMyMsgsLastSeenTime();
-        Notifications.changeChatUnseenCount(activeRoute, 0);
+        Notifications.changeChatUnseenCount(chat, 0);
       }
     } else {
       iris.Channel.setOnline(publicState, areWeOnline = false);

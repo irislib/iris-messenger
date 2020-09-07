@@ -23,10 +23,11 @@ function showChat(pub) {
   if (!iris.util.isMobile) {
     $("#new-msg").focus();
   }
-  Notifications.changeChatUnseenCount(pub, 0);
-  chats[pub].setMyMsgsLastSeenTime();
+  const chat = chats[pub];
+  Notifications.changeChatUnseenCount(chat, 0);
+  chat.setMyMsgsLastSeenTime();
   Helpers.scrollToMessageListBottom();
-  chats[pub].setMyMsgsLastSeenTime();
+  chat.setMyMsgsLastSeenTime();
 }
 
 function deleteChat(pub) {
@@ -43,93 +44,93 @@ function newChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
-  const channel = new iris.Channel({gun: publicState, key: Session.getKey(), chatLink: chatLink, participants: pub});
-  addChat(channel);
+  const chat = new iris.Channel({gun: publicState, key: Session.getKey(), chatLink: chatLink, participants: pub});
+  addChat(chat);
 }
 
-function addChat(channel) {
-  var pub = channel.getId();
+function addChat(chat) {
+  var pub = chat.getId();
   if (chats[pub]) { return; }
-  chats[pub] = channel;
+  chats[pub] = chat;
   const chatNode = localState.get('chats').get(pub);
   chatNode.get('latestTime').on(t => {
-    if (t && (!chats[pub].latestTime || t > chats[pub].latestTime)) {
-      chats[pub].latestTime = t;
+    if (t && (!chat.latestTime || t > chat.latestTime)) {
+      chat.latestTime = t;
     } else {
-      chatNode.get('latestTime').put(chats[pub].latestTime);
+      chatNode.get('latestTime').put(chat.latestTime);
     }
   });
   chatNode.get('theirMsgsLastSeenTime').on(t => {
     if (!t) { return; }
     const d = new Date(t);
-    if (!chats[pub].theirMsgsLastSeenDate || chats[pub].theirMsgsLastSeenDate < d) {
-      chats[pub].theirMsgsLastSeenDate = d;
+    if (!chat.theirMsgsLastSeenDate || chat.theirMsgsLastSeenDate < d) {
+      chat.theirMsgsLastSeenDate = d;
     }
   });
   $('#welcome').remove();
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
-  chats[pub].getLatestMsg && chats[pub].getLatestMsg((latest, info) => {
+  chat.messageIds = chat.messageIds || {};
+  chat.getLatestMsg && chat.getLatestMsg((latest, info) => {
     processMessage(pub, latest, info);
   });
-  Notifications.changeChatUnseenCount(pub, 0);
-  chats[pub].messageIds = chats[pub].messageIds || {};
-  chats[pub].sortedMessages = chats[pub].sortedMessages || [];
-  chats[pub].identicon = Helpers.getIdenticon(pub, 49);
-  chats[pub].onTheir('nickname', (nick) => {
-    chats[pub].myNickname = nick;
+  Notifications.changeChatUnseenCount(chat, 0);
+  chat.sortedMessages = chat.sortedMessages || [];
+  chat.identicon = Helpers.getIdenticon(pub, 49);
+  chat.onTheir('nickname', (nick) => {
+    chat.myNickname = nick;
     $('#profile-nickname-my').text(nick && nick.length ? nick : '');
     $('#profile-nickname-my-container').toggle(!!(nick && nick.length));
   });
-  chats[pub].onMy('nickname', (nick) => {
-    chats[pub].theirNickname = nick;
+  chat.onMy('nickname', (nick) => {
+    chat.theirNickname = nick;
     if (pub !== Session.getKey().pub) {
       el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
     }
   });
-  chats[pub].notificationSetting = 'all';
-  chats[pub].onMy('notificationSetting', (val) => {
-    chats[pub].notificationSetting = val;
+  chat.notificationSetting = 'all';
+  chat.onMy('notificationSetting', (val) => {
+    chat.notificationSetting = val;
     if (pub === activeProfile) {
       $("input[name=notificationPreference][value=" + val + "]").attr('checked', 'checked');
     }
   });
   //$(".chat-list").append(el);
-  chats[pub].theirMsgsLastSeenTime = '';
-  chats[pub].getTheirMsgsLastSeenTime(time => {
-    if (chats[pub] && time && time > chats[pub].theirMsgsLastSeenTime) {
-      chats[pub].theirMsgsLastSeenTime = time;
+  chat.theirMsgsLastSeenTime = '';
+  chat.getTheirMsgsLastSeenTime(time => {
+    if (chat && time && time > chat.theirMsgsLastSeenTime) {
+      chat.theirMsgsLastSeenTime = time;
       chatNode.get('theirMsgsLastSeenTime').put(time);
     }
   });
-  chats[pub].getMyMsgsLastSeenTime(time => {
-    chats[pub].myLastSeenTime = new Date(time);
-    if (chats[pub].latest && chats[pub].myLastSeenTime >= chats[pub].latest.time) {
-      Notifications.changeChatUnseenCount(pub, 0);
+  chat.getMyMsgsLastSeenTime(time => {
+    chat.myLastSeenTime = new Date(time);
+    if (chat.latest && chat.myLastSeenTime >= chat.latest.time) {
+      Notifications.changeChatUnseenCount(chat, 0);
     }
     PeerManager.askForPeers(pub); // TODO: this should be done only if we have a chat history or friendship with them
   });
-  chats[pub].isTyping = false;
-  chats[pub].getTyping(isTyping => {
-    chats[pub].isTyping = isTyping;
+  chat.isTyping = false;
+  chat.getTyping(isTyping => {
+    chat.isTyping = isTyping;
     localState.get('chats').get(pub).get('isTyping').put(isTyping);
   });
-  chats[pub].online = {};
+  chat.online = {};
   iris.Channel.getOnline(publicState, pub, (online) => {
-    if (chats[pub]) {
+    if (chat) {
       chatNode.put({theirLastActiveTime: online && online.lastActive, isOnline: online && online.isOnline});
-      chats[pub].online = online;
+      chat.online = online;
     }
   });
   function setName(name, from) {
-    if (chats[pub].uuid) {
-      var profile = chats[pub].participantProfiles[from];
+    if (chat.uuid) {
+      var profile = chat.participantProfiles[from];
       if (profile && !(profile.permissions && profile.permissions.admin)) {
         return;
       }
     }
     if (name && typeof name === 'string') {
-      chats[pub].name = name;
+      chat.name = name;
       chatNode.get('name').put(name);
     }
     if (pub === Session.getKey().pub) {
@@ -142,43 +143,43 @@ function addChat(channel) {
     }
   }
   function setAbout(about) {
-    chats[pub].about = about;
+    chat.about = about;
     if (activeProfile === pub) {
       $('#profile .profile-about').toggle(about && about.length > 0);
       $('#profile .profile-about-content').text(about);
     }
   }
   function setGroupPhoto(photo, from) {
-    var profile = chats[pub].participantProfiles[from];
+    var profile = chat.participantProfiles[from];
     if (profile && !(profile.permissions && profile.permissions.admin)) {
       return;
     }
     if (photo && photo.indexOf('data:image') !== 0) { return; }
     localState.get('chats').get(pub).get('photo').put(photo);
-    chats[pub].photo = photo;
+    chat.photo = photo;
     el.find('.identicon-container').empty();
     var img = Helpers.setImgSrc($('<img>'), photo).attr('height', 49).attr('width', 49).css({'border-radius': '50%'});
-    el.find('.identicon-container').append(photo ? img : chats[pub].identicon);
+    el.find('.identicon-container').append(photo ? img : chat.identicon);
     if (pub === activeProfile) {
       Helpers.setImgSrc($('#current-profile-photo'), photo);
       Helpers.setImgSrc($('#profile .profile-photo'), photo);
     }
     $('#current-profile-photo').toggle(!!photo);
   }
-  if (chats[pub].uuid) {
-    chats[pub].on('name', setName);
-    chats[pub].on('about', setAbout);
-    chats[pub].on('photo', setGroupPhoto);
-    chats[pub].participantProfiles = {};
-    chats[pub].onMy('participants', participants => {
+  if (chat.uuid) {
+    chat.on('name', setName);
+    chat.on('about', setAbout);
+    chat.on('photo', setGroupPhoto);
+    chat.participantProfiles = {};
+    chat.onMy('participants', participants => {
       if (typeof participants === 'object') {
         var keys = Object.keys(participants);
         keys.forEach((k, i) => {
-          if (chats[pub].participantProfiles[k]) { return; }
+          if (chat.participantProfiles[k]) { return; }
           var hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
-          chats[pub].participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
+          chat.participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
           publicState.user(k).get('profile').get('name').on(name => {
-            chats[pub].participantProfiles[k].name = name;
+            chat.participantProfiles[k].name = name;
           });
         });
       }
@@ -189,10 +190,10 @@ function addChat(channel) {
       }
     });
     var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    chats[pub].inviteLinks = {};
-    chats[pub].getChatLinks({callback: ({url, id}) => {
+    chat.inviteLinks = {};
+    chat.getChatLinks({callback: ({url, id}) => {
       console.log('received chat link', id, url);
-      chats[pub].inviteLinks[id] = url;
+      chat.inviteLinks[id] = url;
       if (pub === activeProfile) {
         Profile.renderInviteLinks(pub);
       }
@@ -201,16 +202,16 @@ function addChat(channel) {
     publicState.user(pub).get('profile').get('name').on(setName);
     publicState.user(pub).get('profile').get('about').on(setAbout);
   }
-  if (chats[pub].put) {
-    chats[pub].onTheir('webPushSubscriptions', (s, k, from) => {
+  if (chat.put) {
+    chat.onTheir('webPushSubscriptions', (s, k, from) => {
       if (!Array.isArray(s)) { return; }
-      chats[pub].webPushSubscriptions = chats[pub].webPushSubscriptions || {};
-      chats[pub].webPushSubscriptions[from || pub] = s;
+      chat.webPushSubscriptions = chat.webPushSubscriptions || {};
+      chat.webPushSubscriptions[from || pub] = s;
     });
     const arr = Object.values(Notifications.webPushSubscriptions);
-    setTimeout(() => chats[pub].put('webPushSubscriptions', arr), 5000);
+    setTimeout(() => chat.put('webPushSubscriptions', arr), 5000);
   }
-  chats[pub].onTheir('call', call => VideoCall.onCallMessage(pub, call));
+  chat.onTheir('call', call => VideoCall.onCallMessage(pub, call));
   localState.get('chats').get(pub).put({enabled:true});
 }
 

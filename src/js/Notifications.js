@@ -72,16 +72,16 @@ function setUnseenTotal() {
   }
 }
 
-function changeChatUnseenCount(pub, change) {
-  const chatNode = localState.get('chats').get(pub);
+function changeChatUnseenCount(chat, change) {
+  const chatNode = localState.get('chats').get(chat.id);
   if (change) {
     unseenTotal += change;
-    chats[pub].unseen += change;
+    chat.unseen += change;
   } else {
-    unseenTotal = unseenTotal - (chats[pub].unseen || 0);
-    chats[pub].unseen = 0;
+    unseenTotal = unseenTotal - (chat.unseen || 0);
+    chat.unseen = 0;
   }
-  chatNode.get('unseen').put(chats[pub].unseen);
+  chatNode.get('unseen').put(chat.unseen);
   unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
   setUnseenTotal();
 }
