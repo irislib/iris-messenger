@@ -1,22 +1,24 @@
 import { render } from './lib/preact.js';
 import { Router, route } from './lib/preact-router.es.js';
 import { createHashHistory } from './lib/history.production.min.js';
-import Translation from './Translation.js';
+
 import Helpers from './Helpers.js';
 import { html } from './Helpers.js';
+import Translation from './Translation.js';
+import QRScanner from './QRScanner.js';
+import VideoCall from './VideoCall.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
+import {chats, showNewChat} from './Chat.js';
+import PublicMessages from './PublicMessages.js';
+
 import Settings from './components/Settings.js';
 import LogoutConfirmation from './components/LogoutConfirmation.js';
-import {chats, showNewChat} from './Chat.js';
 import NewChat from './components/NewChat.js';
 import ChatView from './components/ChatView.js';
 import Login from './components/Login.js';
 import SideBar from './components/SideBar.js';
-import PublicMessages from './PublicMessages.js';
 import Profile from './components/Profile.js';
-import QRScanner from './QRScanner.js';
-import VideoCall from './VideoCall.js';
 import Header from './components/Header.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
