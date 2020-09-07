@@ -55,7 +55,7 @@ class SideBar extends Component {
       <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
     </div>`;
     return html`<section class="sidebar hidden-xs">
-      <div class="user-info">
+      <div class="user-info" onClick=${() => localState.get('activeRoute').put('settings')}>
         <div id="my-identicon"></div>
         <div class="user-name"></div>
       </div>

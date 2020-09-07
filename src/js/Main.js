@@ -6,7 +6,7 @@ import Helpers from './Helpers.js';
 import { html } from './Helpers.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
-import Settings, {LogoutConfirmation, init as initSettings} from './components/Settings.js';
+import Settings, {LogoutConfirmation} from './components/Settings.js';
 import {chats, showNewChat} from './Chat.js';
 import NewChat from './components/NewChat.js';
 import ChatView from './components/ChatView.js';
@@ -67,7 +67,6 @@ render(Main, document.body);
 
 Session.init();
 PeerManager.init();
-initSettings();
 Translation.init();
 Profile.init();
 VideoCall.init();

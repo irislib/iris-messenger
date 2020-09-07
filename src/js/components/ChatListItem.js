@@ -1,4 +1,5 @@
-import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
+import { Component } from '../lib/preact.js';
+import { html } from '../Helpers.js';
 import {showChat} from '../Chat.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
