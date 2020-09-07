@@ -1,5 +1,5 @@
 import { html } from '../Helpers.js';
-import {publicState, localState} from '../Main.js';
+import {localState} from '../Main.js';
 import Session from '../Session.js';
 import {translate as t} from '../Translation.js';
 
