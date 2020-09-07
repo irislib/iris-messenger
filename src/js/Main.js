@@ -1,5 +1,5 @@
 import { render } from './lib/preact.js';
-import Router from './lib/preact-router.es.js';
+import { Router, route } from './lib/preact-router.es.js';
 import { createHashHistory } from './lib/history.production.min.js';
 import Translation from './Translation.js';
 import Helpers from './Helpers.js';
@@ -33,14 +33,17 @@ if (!isElectron && ('serviceWorker' in navigator)) {
 Gun.log.off = true;
 var publicState = Gun({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity });
 window.publicState = publicState;
-var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state').put({activeRoute:'new'});
+var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state').put({activeRoute:null});
 window.localState = localState;
 
 Helpers.checkColorScheme();
 
 let activeRoute;
 let activeProfile;
-localState.get('activeRoute').on(a => activeRoute = a);
+localState.get('activeRoute').on(a => {
+  activeRoute = a;
+  route(`/${a ? a : ''}`);
+});
 localState.get('activeProfile').on(a => activeProfile = a);
 
 const Main = html`
@@ -51,10 +54,10 @@ const Main = html`
       <${Header}/>
       <${Router} history=${createHashHistory()}>
         <${NewChat} path="/"/>
-        <${ChatView} path="/chat"/>
+        <${ChatView} path="/chat/:id"/>
         <${Settings} path="/settings"/>
         <${LogoutConfirmation} path="/logout"/>
-        <${Profile.Profile} path="/profile"/>
+        <${Profile.Profile} path="/profile/:id"/>
       </${Router}>
     </section>
   </div>
@@ -79,7 +82,7 @@ $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElect
 $(window).resize(() => { // if resizing up from mobile size menu view
   if ($(window).width() > 565 && $('.main-view:visible').length === 0) {
     showNewChat();
-    localState.get('activeRoute').put('new');
+    localState.get('activeRoute').put(null);
   }
 });
 

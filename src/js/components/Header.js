@@ -11,6 +11,7 @@ class Header extends Component {
     super();
     this.state = {latest: {}};
     this.eventListeners = [];
+    this.chatId = null;
   }
 
     /* disabled for now because videochat is broken
@@ -26,7 +27,7 @@ class Header extends Component {
     }*/
 
   getOnlineStatusText() {
-    const chat = chats[activeRoute];
+    const chat = chats[this.chatId];
     const online = chat && chat.online;
     if (online) {
       if (online.isOnline) {
@@ -57,7 +58,7 @@ class Header extends Component {
 
   componentDidUpdate() {
     $('#header-content .identicon-container').remove();
-    const chat = chats[activeRoute];
+    const chat = chats[this.chatId];
     if (chat) {
       if (chat.photo) {
         const photo = Helpers.setImgSrc($('<img>'), chat.photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
@@ -77,12 +78,13 @@ class Header extends Component {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
       this.setState({});
-      if (chatId) {
-        localState.get('chats').get(chatId).get('isTyping').on((isTyping, a, b, event) => {
+      this.chatId = chatId && chatId.indexOf('chat/') === 0 ? chatId.replace('chat/', '') : null;
+      if (this.chatId) {
+        localState.get('chats').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
           this.eventListeners.push(event);
           this.setState({});
         });
-        localState.get('chats').get(chatId).get('theirLastActiveTime').on((t, a, b, event) => {
+        localState.get('chats').get(this.chatId).get('theirLastActiveTime').on((t, a, b, event) => {
           this.eventListeners.push(event);
           this.setState({});
         });
@@ -91,12 +93,12 @@ class Header extends Component {
   }
 
   render() {
-    const chat = chats[activeRoute];
+    const chat = chats[this.chatId];
     const isTyping = chat && chat.isTyping;
     const participants = chat && chat.uuid && Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
     let title;
-    if (activeRoute === null || activeRoute === 'new') {
+    if (activeRoute === null) {
       title = t('new_chat');
     } else if (activeRoute === 'public') {
       title = t('public_messages');

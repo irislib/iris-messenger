@@ -15,7 +15,7 @@ function showChat(pub) {
   }
 
   resetView();
-  localState.get('activeRoute').put(pub);
+  localState.get('activeRoute').put(`chat/${pub}`);
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
     newChat(pub);
   }
