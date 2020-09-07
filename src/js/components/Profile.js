@@ -122,13 +122,14 @@ function renderGroupParticipants(pub) {
 
 function getDisplayName(pub) {
   var displayName;
-  if (chats[pub].theirNickname && chats[pub].theirNickname.length) {
-    displayName = chats[pub].theirNickname;
-    if (chats[pub].name && chats[pub].name.length) {
-      displayName = displayName + ' (' + chats[pub].name + ')';
+  const chat = chats[pub];
+  if (chat && chat.theirNickname && chat.theirNickname.length) {
+    displayName = chat.theirNickname;
+    if (chat.name && chat.name.length) {
+      displayName = displayName + ' (' + chat.name + ')';
     }
   } else {
-    displayName = chats[pub].name;
+    displayName = chat.name;
   }
   return displayName || '';
 }

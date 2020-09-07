@@ -98,7 +98,7 @@ class Header extends Component {
     const participants = chat && chat.uuid && Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
     let title;
-    if (activeRoute === null) {
+    if (!activeRoute) {
       title = t('new_chat');
     } else if (activeRoute === 'public') {
       title = t('public_messages');
@@ -110,7 +110,7 @@ class Header extends Component {
       if (activeRoute === Session.getKey().pub) {
         title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
       } else {
-        title = Profile.getDisplayName(activeRoute.replace('profile/', ''));
+        title = Profile.getDisplayName(activeRoute.replace('profile/', '').replace('chat/', ''));
       }
     }
 
