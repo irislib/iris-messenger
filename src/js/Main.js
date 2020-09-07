@@ -77,8 +77,6 @@ $('body').css('opacity', 1); // use opacity because setting focus on display: no
 
 Helpers.showConsoleWarning();
 
-$('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
-
 $(window).resize(() => { // if resizing up from mobile size menu view
   if ($(window).width() > 565 && $('.main-view:visible').length === 0) {
     showNewChat();

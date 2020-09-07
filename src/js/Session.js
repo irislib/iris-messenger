@@ -33,8 +33,9 @@ function newUserLogin() {
 function setOurOnlineStatus() {
   iris.Channel.setOnline(publicState, areWeOnline = true);
   document.addEventListener("mousemove", () => {
-    if (!areWeOnline && activeRoute) {
-      chats[activeRoute].setMyMsgsLastSeenTime();
+    const chat = activeRoute && chats[activeRoute.replace('profile/','').replace('chat/','')];
+    if (chat && !areWeOnline) {
+      chat.setMyMsgsLastSeenTime();
     }
     iris.Channel.setOnline(publicState, areWeOnline = true);
     clearTimeout(onlineTimeout);
@@ -43,8 +44,9 @@ function setOurOnlineStatus() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
       iris.Channel.setOnline(publicState, areWeOnline = true);
-      if (activeRoute && chats[activeRoute]) {
-        chats[activeRoute].setMyMsgsLastSeenTime();
+      const chat = activeRoute && chats[activeRoute.replace('profile/','').replace('chat/','')];
+      if (chat) {
+        chat.setMyMsgsLastSeenTime();
         Notifications.changeChatUnseenCount(activeRoute, 0);
       }
     } else {

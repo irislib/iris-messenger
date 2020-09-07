@@ -140,6 +140,7 @@ function render() {
   $('#current-profile-photo').toggle(!!Session.getMyProfilePhoto());
   Helpers.setImgSrc($('#current-profile-photo'), Session.getMyProfilePhoto());
   $('#add-profile-photo').toggle(!Session.getMyProfilePhoto());
+  $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
 }
 
 function togglePrivateKeyQR() {
