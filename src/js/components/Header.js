@@ -1,5 +1,6 @@
 import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
-import {chats, activeRoute} from '../Chat.js';
+import {chats, getDisplayName} from '../Chat.js';
+import {activeRoute} from '../Session.js';
 import { translate as t } from '../Translation.js';
 import {localState, resetView, showMenu} from '../Main.js';
 import Session from '../Session.js';
@@ -110,7 +111,7 @@ class Header extends Component {
       if (activeRoute === Session.getKey().pub) {
         title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
       } else {
-        title = Profile.getDisplayName(activeRoute.replace('profile/', '').replace('chat/', ''));
+        title = getDisplayName(activeRoute.replace('profile/', '').replace('chat/', ''));
       }
     }
 

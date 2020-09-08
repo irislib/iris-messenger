@@ -1,15 +1,17 @@
 import { render } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {localState, publicState, resetView, activeProfile} from '../Main.js';
+import {localState, publicState, resetView} from '../Main.js';
 import {chats, deleteChat, showChat} from '../Chat.js';
 import Session from '../Session.js';
+import {activeProfile} from '../Session.js';
 import Helpers from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
 import Message from './Message.js';
 //import VideoCall from './VideoCall.js';
 
-const Profile = () => html`<div class="main-view" id="profile">
+const Profile = () => html`
+<div class="main-view" id="profile">
   <div class="content">
     <div class="profile-header">
       <div class="profile-photo-container">
@@ -118,20 +120,6 @@ function renderGroupParticipants(pub) {
     });
     $('#profile-group-participants').append(el);
   });
-}
-
-function getDisplayName(pub) {
-  var displayName;
-  const chat = chats[pub];
-  if (chat && chat.theirNickname && chat.theirNickname.length) {
-    displayName = chat.theirNickname;
-    if (chat.name && chat.name.length) {
-      displayName = displayName + ' (' + chat.name + ')';
-    }
-  } else {
-    displayName = chat.name;
-  }
-  return displayName || '';
 }
 
 let sortedPublicMessages;
@@ -284,80 +272,8 @@ function renderGroupPhotoSettings(uuid) {
     Helpers.setImgSrc($('#current-profile-photo'), chats[uuid].photo);
     $('#profile .profile-photo').hide();
     renderProfilePhotoSettings();
-    var el = $('#profile-photo-settings');
-    $('#profile-group-settings').prepend(el);
     $('#add-profile-photo').toggle(!chats[uuid].photo);
   }
-}
-
-var cropper;
-function renderProfilePhotoSettings() {
-  $('#profile-photo-error').toggleClass('hidden', true);
-  var files = $('#profile-photo-input')[0].files;
-  if (files && files.length) {
-    var file = files[0];
-    /*
-    if (file.size > 1024 * 200) {
-      $('#profile-photo-error').toggleClass('hidden', false);
-      return console.error('file too big');
-    }
-    */
-    // show preview
-    $('#current-profile-photo').hide();
-    $('#add-profile-photo').hide();
-    Helpers.getBase64(file).then(base64 => {
-      var previewEl = $('#profile-photo-preview');
-      Helpers.setImgSrc(previewEl, base64);
-      $('#profile-photo-preview').toggleClass('hidden', false);
-      $('#cancel-profile-photo').toggleClass('hidden', false);
-      $('#use-profile-photo').toggleClass('hidden', false);
-      cropper = new Cropper(previewEl[0], {
-        aspectRatio:1,
-        autoCropArea: 1,
-        viewMode: 1,
-        background: false,
-        zoomable: false
-      });
-    });
-  } else {
-    cropper && cropper.destroy();
-    // show current profile photo
-    if (!$('#current-profile-photo').attr('src')) {
-      $('#add-profile-photo').show();
-    }
-    Helpers.setImgSrc($('#profile-photo-preview'), '');
-    $('#profile-photo-preview').toggleClass('hidden', true);
-    $('#cancel-profile-photo').toggleClass('hidden', true);
-    $('#use-profile-photo').toggleClass('hidden', true);
-  }
-}
-
-function useProfilePhotoClicked() {
-  var canvas = cropper.getCroppedCanvas();
-  var resizedCanvas = document.createElement('canvas');
-  resizedCanvas.width = resizedCanvas.height = Math.min(canvas.width, 800);
-  pica().resize(canvas, resizedCanvas).then(() => {
-    var src = resizedCanvas.toDataURL('image/jpeg');
-    // var src = $('#profile-photo-preview').attr('src');
-    if (activeProfile) {
-      chats[activeProfile].put('photo', src);
-    } else {
-      publicState.user().get('profile').get('photo').put(src);
-    }
-    Helpers.setImgSrc($('#current-profile-photo'), src);
-    $('#profile-photo-input').val(null);
-
-    renderProfilePhotoSettings();
-  });
-}
-
-function removeProfilePhotoClicked() {
-  if (activeProfile) {
-    chats[activeProfile].put('photo', null);
-  } else {
-    publicState.user().get('profile').get('photo').put(null);
-  }
-  renderProfilePhotoSettings();
 }
 
 function areWeAdmin(uuid) {
@@ -403,14 +319,6 @@ function onCreateInviteLink() {
 function init() {
   $('#profile-create-invite-link').click(onCreateInviteLink);
   $('#profile-add-participant').on('input', onProfileAddParticipantInput);
-  $('#current-profile-photo, #add-profile-photo').click(() => $('#profile-photo-input').click());
-  $('#profile-photo-input').change(renderProfilePhotoSettings);
-  $('#use-profile-photo').click(useProfilePhotoClicked);
-  $('#cancel-profile-photo').click(() => {
-    $('#profile-photo-input').val(null);
-    renderProfilePhotoSettings();
-  });
-  $('#remove-profile-photo').click(removeProfilePhotoClicked);
 }
 
-export default {Profile, init, showProfile, getDisplayName, renderGroupParticipants, renderInviteLinks, renderGroupPhotoSettings};
+export default {Profile, init, showProfile, renderGroupParticipants, renderInviteLinks};

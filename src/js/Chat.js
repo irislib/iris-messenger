@@ -1,9 +1,10 @@
-import {publicState, localState, showMenu, resetView, activeRoute, activeProfile} from './Main.js';
+import {publicState, localState, showMenu, resetView} from './Main.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
+import {activeRoute, activeProfile} from './Session.js';
 import Profile from './components/Profile.js';
 import VideoCall from './VideoCall.js';
 
@@ -85,7 +86,7 @@ function addChat(chat) {
   chat.onMy('nickname', (nick) => {
     chat.theirNickname = nick;
     if (pub !== Session.getKey().pub) {
-      el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
+      el.find('.name').text(Helpers.truncateString(getDisplayName(pub), 20));
     }
   });
   chat.notificationSetting = 'all';
@@ -136,7 +137,7 @@ function addChat(chat) {
     if (pub === Session.getKey().pub) {
       el.find('.name').html("📝 <b>" + t('note_to_self') + "</b>");
     } else {
-      el.find('.name').text(Helpers.truncateString(Profile.getDisplayName(pub), 20));
+      el.find('.name').text(Helpers.truncateString(getDisplayName(pub), 20));
     }
     if (pub === activeProfile) {
       $('#profile-group-name').not(':focus').val(name);
@@ -215,6 +216,20 @@ function addChat(chat) {
   localState.get('chats').get(pub).put({enabled:true});
 }
 
+function getDisplayName(pub) {
+  var displayName;
+  const chat = chats[pub];
+  if (chat && chat.theirNickname && chat.theirNickname.length) {
+    displayName = chat.theirNickname;
+    if (chat.name && chat.name.length) {
+      displayName = displayName + ' (' + chat.name + ')';
+    }
+  } else {
+    displayName = chat.name;
+  }
+  return displayName || '';
+}
+
 function processMessage(chatId, msg, info) {
   const chat = chats[chatId];
   if (chat.messageIds[msg.time + info.from]) return;
@@ -249,4 +264,4 @@ function showNewChat() {
   })
 }
 
-export { showChat, activeRoute, chats, addChat, deleteChat, showNewChat, newChat, processMessage };
+export { showChat, chats, addChat, deleteChat, showNewChat, newChat, processMessage, getDisplayName };

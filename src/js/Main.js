@@ -1,5 +1,5 @@
 import { render } from './lib/preact.js';
-import { Router, route } from './lib/preact-router.es.js';
+import { Router } from './lib/preact-router.es.js';
 import { createHashHistory } from './lib/history.production.min.js';
 
 import Helpers from './Helpers.js';
@@ -7,6 +7,7 @@ import { html } from './Helpers.js';
 import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
+import {activeRoute} from './Session.js';
 import {chats, showNewChat} from './Chat.js';
 import PublicMessages from './PublicMessages.js';
 
@@ -38,14 +39,6 @@ var localState = Gun({peers: [], file: 'localState', multicast:false, localStora
 window.localState = localState;
 
 Helpers.checkColorScheme();
-
-let activeRoute;
-let activeProfile;
-localState.get('activeRoute').on(a => {
-  activeRoute = a;
-  route(`/${a ? a : ''}`);
-});
-localState.get('activeProfile').on(a => activeProfile = a);
 
 const Main = html`
   <div id="main-content">
@@ -83,7 +76,7 @@ $(window).resize(() => { // if resizing up from mobile size menu view
 });
 
 function resetView() {
-  activeProfile = null;
+  localState.get('activeProfile').put(null);
   if (activeRoute && chats[activeRoute]) {
     chats[activeRoute].setTyping(false);
   }
@@ -99,4 +92,4 @@ function showMenu(show = true) {
   localState.get('activeRoute').put(null);
 }
 
-export {publicState, localState, showMenu, activeRoute, activeProfile, resetView};
+export {publicState, localState, showMenu, resetView};

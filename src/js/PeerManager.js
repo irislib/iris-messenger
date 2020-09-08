@@ -1,8 +1,7 @@
 import {publicState} from './Main.js';
-import {chats, showChat} from './Chat.js';
+import {chats, showChat, getDisplayName} from './Chat.js';
 import Helpers from './Helpers.js';
 import Session from './Session.js';
-import Profile from './components/Profile.js';
 import {translate as t} from './Translation.js';
 
 var MAX_PEER_LIST_SIZE = 10;
@@ -177,7 +176,7 @@ function updatePeerList() {
     if (peer.from) {
       urlEl.append($('<br>'));
       urlEl.append(
-        $('<small>').text(t('from') + ' ' + ((chats[peer.from] && Profile.getDisplayName(peer.from)) || Helpers.truncateString(peer.from, 10)))
+        $('<small>').text(t('from') + ' ' + ((chats[peer.from] && getDisplayName(peer.from)) || Helpers.truncateString(peer.from, 10)))
         .css({cursor:'pointer'}).click(() => showChat(peer.from))
       );
     }

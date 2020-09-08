@@ -2,9 +2,10 @@ import { Component } from '../lib/preact.js';import { html } from '../Helpers.js
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Message from './Message.js';
-import {activeRoute, chats, processMessage} from '../Chat.js';
+import {chats, processMessage} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
+import {activeRoute} from '../Session.js';
 
 const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
 

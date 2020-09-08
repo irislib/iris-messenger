@@ -7,6 +7,7 @@ import LanguageSelector from './LanguageSelector.js';
 import {translate as t} from '../Translation.js';
 import PeerManager from '../PeerManager.js';
 import VideoCall from '../VideoCall.js';
+import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 
 class Settings extends Component {
   constructor() {
@@ -28,20 +29,7 @@ class Settings extends Component {
           ${t('profile_photo')}:
         </p>
         <div id="profile-photo-settings">
-          <img id="current-profile-photo"/>
-          <button id="add-profile-photo">${t('add_profile_photo')}</button>
-          <div id="profile-photo-preview-container">
-            <img id="profile-photo-preview" class="hidden"/>
-          </div>
-          <p>
-            <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*"/>
-          </p>
-          <p id="profile-photo-error" class="hidden">${t('profile_photo_too_big')}</p>
-          <p>
-            <button id="cancel-profile-photo" class="hidden">${t('cancel')}</button>
-            <button id="use-profile-photo" class="hidden">${t('use_photo')}</button>
-            <button id="remove-profile-photo" class="hidden">${t('remove_photo')}</button>
-          </p>
+          <${ProfilePhotoPicker}/>
         </div>
         <p>${t('about_text')}:</p>
         <p>
@@ -135,11 +123,6 @@ class Settings extends Component {
   }
 
   componentDidMount() {
-    var el = $('#profile-photo-settings');
-    $('#profile-photo-chapter').after(el);
-    $('#current-profile-photo').toggle(!!Session.getMyProfilePhoto());
-    Helpers.setImgSrc($('#current-profile-photo'), Session.getMyProfilePhoto());
-    $('#add-profile-photo').toggle(!Session.getMyProfilePhoto());
     $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
 
     $('#add-peer-btn').click(() => {
@@ -159,13 +142,16 @@ class Settings extends Component {
       $('#rtc-config').val(JSON.stringify(VideoCall.getRTCConfig()));
     });
 
-    publicState.user().get('profile').get('name').on((name, a, b, event) => {
-      $('#settings-name').not(':focus').val(name);
-      this.eventListeners.push(event);
-    });
-    publicState.user().get('profile').get('about').on((about, a, b, event) => {
-      $('#settings-about').not(':focus').val(about);
-      this.eventListeners.push(event);
+    _.defer(() => {
+      publicState.user().get('profile').get('name').on((name, a, b, event) => {
+        $('#settings-name').not(':focus').val(name);
+        this.eventListeners.push(event);
+      });
+      publicState.user().get('profile').get('about').on((about, a, b, event) => {
+        $('#settings-about').not(':focus').val(about);
+        this.eventListeners.push(event);
+      });
+      
     });
   }
 
@@ -180,7 +166,7 @@ function onNameInput(event) {
 }
 
 function onAboutTextInput(event) {
-  var about = $(event.target).val().trim();
+  const about = $(event.target).val().trim();
   publicState.user().get('profile').get('about').put(about);
 }
 
