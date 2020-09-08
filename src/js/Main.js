@@ -34,7 +34,7 @@ if (!isElectron && ('serviceWorker' in navigator)) {
 Gun.log.off = true;
 var publicState = Gun({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity });
 window.publicState = publicState;
-var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state').put({activeRoute:null});
+var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state');
 window.localState = localState;
 
 Helpers.checkColorScheme();

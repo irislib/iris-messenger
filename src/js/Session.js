@@ -114,8 +114,6 @@ function login(k) {
   } else {
     if (iris.util.isMobile) {
       showMenu();
-    } else {
-      showNewChat();
     }
   }
   $('.user-info .user-name').text('anonymous');
@@ -128,9 +126,6 @@ function login(k) {
       $('.user-info .user-name').text(Helpers.truncateString(name, 20));
       $('#settings-name').not(':focus').val(name);
     }
-  });
-  publicState.user().get('profile').get('about').on(about => {
-    $('#settings-about').not(':focus').val(about || '');
   });
   publicState.user().get('profile').get('photo').on(data => {
     myProfilePhoto = data;
