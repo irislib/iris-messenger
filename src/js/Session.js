@@ -151,6 +151,7 @@ async function createChatLink() {
 
 function setChatLinkQrCode(link) {
   var qrCodeEl = $('#my-qr-code');
+  if (qrCodeEl.length === 0) { return; }
   qrCodeEl.empty();
   new QRCode(qrCodeEl[0], {
     text: link || getMyChatLink(),
