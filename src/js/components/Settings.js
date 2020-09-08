@@ -60,8 +60,9 @@ class Settings extends Component {
           <button onClick=${e => copyPrivateKey(e)}>${t('copy_private_key')}</button>
         </p>
         <p>
-          <button onClick=${() => togglePrivateKeyQR()}>${t('show_privkey_qr')}</button>
+          <button onClick=${e => togglePrivateKeyQR(e)}>${t('show_privkey_qr')}</button>
         </p>
+        <div id="private-key-qr" class="qr-container"></div>
         <p><small dangerouslySetInnerHTML=${{ __html: t('privkey_storage_recommendation')}}></small></p>
         <hr/>
         <h3>${t('language')}</h3>
@@ -177,29 +178,32 @@ function copyPrivateKey(event) {
   }, 2000);
 }
 
-function togglePrivateKeyQR() {
-  var btn = $('#show-private-key-qr');
-  var show = $('#private-key-qr').length === 0;
+function togglePrivateKeyQR(e) {
+  var btn = $(e.target);
+  var show = $('#private-key-qr img').length === 0;
   var SHOW_TEXT = t('show_privkey_qr');
+  let hidePrivateKeyInterval;
+  function reset() {
+    clearInterval(hidePrivateKeyInterval);
+    $('#private-key-qr').empty();
+    btn.text(SHOW_TEXT);
+  }
   function hideText(s) { return t('hide_privkey_qr') + ' (' + s + ')'; }
   if (show) {
     var showPrivateKeySecondsRemaining = 20;
     btn.text(hideText(showPrivateKeySecondsRemaining));
-    var hidePrivateKeyInterval = setInterval(() => {
-      if ($('#private-key-qr').length === 0) {
-        clearInterval(hidePrivateKeyInterval);
-        btn.text(SHOW_TEXT);
+    hidePrivateKeyInterval = setInterval(() => {
+      if ($('#private-key-qr img').length === 0) {
+        clearInterval(hidePrivateKeyInterval);return;
       }
       showPrivateKeySecondsRemaining -= 1;
       if (showPrivateKeySecondsRemaining === 0) {
-       $('#private-key-qr').remove();
-        btn.text(SHOW_TEXT);
-        clearInterval(hidePrivateKeyInterval);
+        reset();
       } else {
         btn.text(hideText(showPrivateKeySecondsRemaining));
       }
     }, 1000);
-    var qrCodeEl = $('<div>').attr('id', 'private-key-qr').addClass('qr-container').insertAfter(btn);
+    var qrCodeEl = $('#private-key-qr');
     new QRCode(qrCodeEl[0], {
       text: JSON.stringify(Session.getKey()),
       width: 300,
@@ -209,8 +213,7 @@ function togglePrivateKeyQR() {
       correctLevel : QRCode.CorrectLevel.H
     });
   } else {
-    $('#private-key-qr').remove();
-    btn.text(SHOW_TEXT);
+    reset();
   }
 }
 
