@@ -8,7 +8,6 @@ import Helpers from '../Helpers.js';
 
 var cropper;
 function renderProfilePhotoSettings() {
-  $('#profile-photo-error').toggleClass('hidden', true);
   var files = $('#profile-photo-input')[0].files;
   if (files && files.length) {
     var file = files[0];
@@ -89,7 +88,7 @@ class ProfilePhotoPicker extends Component {
       <p>
         <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*"/>
       </p>
-      <p id="profile-photo-error" class="hidden">${t('profile_photo_too_big')}</p>
+      <p id="profile-photo-error" class="${this.state.hasError ? '' : 'hidden'}">${t('profile_photo_too_big')}</p>
       <p>
         <button id="cancel-profile-photo" class="hidden">${t('cancel')}</button>
         <button id="use-profile-photo" class="hidden">${t('use_photo')}</button>

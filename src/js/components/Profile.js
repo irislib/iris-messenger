@@ -271,7 +271,6 @@ function renderGroupPhotoSettings(uuid) {
   if (isAdmin) {
     Helpers.setImgSrc($('#current-profile-photo'), chats[uuid].photo);
     $('#profile .profile-photo').hide();
-    renderProfilePhotoSettings();
     $('#add-profile-photo').toggle(!chats[uuid].photo);
   }
 }
