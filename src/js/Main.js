@@ -61,7 +61,6 @@ render(Main, document.body);
 
 Session.init();
 PeerManager.init();
-Profile.init();
 PublicMessages.init();
 
 $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails

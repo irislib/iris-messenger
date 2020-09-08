@@ -172,6 +172,8 @@ class Profile extends Component {
       $('#profile .profile-photo-container').show();
       Helpers.setImgSrc($('#profile .profile-photo'), chats[pub].photo);
     }
+    $('#profile-create-invite-link').click(onCreateInviteLink);
+    $('#profile-add-participant').on('input', onProfileAddParticipantInput);
   }
 }
 
@@ -322,9 +324,4 @@ function onCreateInviteLink() {
   chats[activeProfile].createChatLink();
 }
 
-function init() {
-  $('#profile-create-invite-link').click(onCreateInviteLink);
-  $('#profile-add-participant').on('input', onProfileAddParticipantInput);
-}
-
-export default {Profile, init, renderGroupParticipants, renderInviteLinks};
+export default {Profile, renderGroupParticipants, renderInviteLinks};
