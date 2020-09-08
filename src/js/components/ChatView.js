@@ -30,10 +30,12 @@ const subscribedToMsgs = {};
 class ChatView extends Component {
   constructor() {
     super();
+    this.activeChat = null;
   }
 
   componentDidMount() {
     localState.get('activeRoute').on(activeRouteId => {
+      this.activeChat = activeRouteId && activeRouteId.replace('chat/', '');
       this.setState({});
       if (activeRouteId && (activeRouteId === 'public' || activeRouteId.length > 20) && !subscribedToMsgs[activeRouteId]) {
         const iv = setInterval(() => {
@@ -60,7 +62,7 @@ class ChatView extends Component {
   }
 
   async webPush(msg) {
-    const chat = chats[activeRoute];
+    const chat = chats[this.activeChat];
     const myKey = Session.getKey();
     const shouldWebPush = (activeRoute === myKey.pub) || !(chat.online && chat.online.isOnline);
     if (shouldWebPush && chat.webPushSubscriptions) {
@@ -90,7 +92,7 @@ class ChatView extends Component {
   }
 
   async onMsgFormSubmit(event) {
-    const chat = chats[activeRoute];
+    const chat = chats[this.activeChat];
     event.preventDefault();
     chat.msgDraft = null;
     const text = $('#new-msg').val();
@@ -125,8 +127,8 @@ class ChatView extends Component {
       $('#message-list').hide();
       for (var i = 0;i < files.length;i++) {
         Helpers.getBase64(files[i]).then(base64 => {
-          chats[activeRoute].attachments = chats[activeRoute].attachments || [];
-          chats[activeRoute].attachments.push({type: 'image', data: base64});
+          chats[this.activeChat].attachments = chats[this.activeChat].attachments || [];
+          chats[this.activeChat].attachments.push({type: 'image', data: base64});
           var preview = Helpers.setImgSrc($('<img>'), base64);
           attachmentsPreview.append(preview);
         });
@@ -150,7 +152,7 @@ class ChatView extends Component {
     $('#attachment-preview').removeClass('gallery');
     $('#message-list').show();
     if (activeRoute) {
-      chats[activeRoute].attachments = null;
+      chats[this.activeChat].attachments = null;
     }
     Helpers.scrollToMessageListBottom();
   }
@@ -205,7 +207,7 @@ class ChatView extends Component {
   onMsgTextInput(event) {
     this.isTyping = this.isTyping !== undefined ? this.isTyping : false;
     const getIsTyping = () => $('#new-msg').val().length > 0;
-    const setTyping = () => chats[activeRoute].setTyping(getIsTyping());
+    const setTyping = () => chats[this.activeChat].setTyping(getIsTyping());
     const setTypingThrottled = _.throttle(setTyping, 1000);
     if (this.isTyping === getIsTyping()) {
       setTypingThrottled();
@@ -213,11 +215,11 @@ class ChatView extends Component {
       setTyping();
     }
     this.isTyping = getIsTyping();
-    chats[activeRoute].msgDraft = $(event.target).val();
+    chats[this.activeChat].msgDraft = $(event.target).val();
   }
 
   componentDidUpdate() {
-    const chat = chats[activeRoute];
+    const chat = chats[this.activeChat];
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
     $('#new-msg').val(chat && chat.msgDraft);
@@ -234,7 +236,8 @@ class ChatView extends Component {
   }
 
   render() {
-    if (!activeRoute || !chats[activeRoute] || !chats[activeRoute].sortedMessages) {
+    const activeChat = activeRoute && activeRoute.replace('chat/', '');
+    if (!activeRoute || !chats[this.activeChat] || !chats[this.activeChat].sortedMessages) {
       return html``;
     }
 
@@ -243,8 +246,8 @@ class ChatView extends Component {
     let previousDateStr;
     let previousFrom;
     const msgListContent = [];
-    if (chats[activeRoute].sortedMessages) {
-      Object.values(chats[activeRoute].sortedMessages).forEach(msg => {
+    if (chats[this.activeChat].sortedMessages) {
+      Object.values(chats[this.activeChat].sortedMessages).forEach(msg => {
         const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
         if (date) {
           const dateStr = date.toLocaleDateString();
@@ -262,7 +265,7 @@ class ChatView extends Component {
           showName = true;
         }
         previousFrom = from;
-        msgListContent.push(html`<${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${activeRoute}/>`);
+        msgListContent.push(html`<${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${this.activeChat}/>`);
       });
     }
 
