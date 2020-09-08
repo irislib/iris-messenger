@@ -53,7 +53,7 @@ class Header extends Component {
 
   onClick() {
     if (activeRoute && activeRoute.length > 20 && activeRoute.indexOf('profile') !== 0) {
-      Profile.showProfile(activeRoute.replace('chat/', ''));
+      localState.get('activeRoute').put('profile/' + activeRoute.replace('chat/', ''));
     }
   }
 

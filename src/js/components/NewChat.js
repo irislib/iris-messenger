@@ -18,7 +18,7 @@ function createGroupSubmit(e) {
     c.put('name', $('#new-group-name').val());
     $('#new-group-name').val('');
     addChat(c);
-    Profile.showProfile(c.uuid);
+    localState.get('activeRoute').put('profile/' + c.uuid);
   }
 }
 

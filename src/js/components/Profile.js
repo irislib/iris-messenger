@@ -1,3 +1,4 @@
+import { Component } from '../lib/preact.js';
 import { render } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
@@ -10,80 +11,168 @@ import PublicMessages from '../PublicMessages.js';
 import Message from './Message.js';
 //import VideoCall from './VideoCall.js';
 
-const Profile = () => html`
-<div class="main-view" id="profile">
-  <div class="content">
-    <div class="profile-header">
-      <div class="profile-photo-container">
-        <img class="profile-photo"/>
-      </div>
-      <div class="profile-header-stuff">
-        <div class="profile-actions">
-          <button class="send-message">${t('send_message')}</button>
-          <button class="copy-user-link">${t('copy_link')}</button>
-          <button class="show-qr-code">${t('show_qr_code')}</button>
-          <button class="show-settings">${t('settings')}</button>
-          <!-- <button class="add-friend">${t('follow')}</button> -->
+class Profile extends Component {
+  render() {
+    return html`
+    <div class="main-view" id="profile">
+      <div class="content">
+        <div class="profile-header">
+          <div class="profile-photo-container">
+            <img class="profile-photo"/>
+          </div>
+          <div class="profile-header-stuff">
+            <div class="profile-actions">
+              <button class="send-message">${t('send_message')}</button>
+              <button class="copy-user-link">${t('copy_link')}</button>
+              <button class="show-qr-code">${t('show_qr_code')}</button>
+              <button class="show-settings">${t('settings')}</button>
+              <!-- <button class="add-friend">${t('follow')}</button> -->
+            </div>
+            <div class="profile-about hidden-xs" style="display:none">
+              <p class="profile-about-content"></p>
+            </div>
+          </div>
         </div>
-        <div class="profile-about hidden-xs" style="display:none">
+        <div class="profile-about visible-xs-flex" style="display:none">
           <p class="profile-about-content"></p>
         </div>
-      </div>
-    </div>
-    <div class="profile-about visible-xs-flex" style="display:none">
-      <p class="profile-about-content"></p>
-    </div>
 
-    <div id="profile-group-settings">
-      <div id="profile-group-name-container">${t('group_name')}: <input id="profile-group-name" placeholder="${t('group_name')}"/></div>
-      <p>${t('participants')}:</p>
-      <div id="profile-group-participants"></div>
-      <div id="profile-add-participant" style="display:none;">
-        <p>${t('add_participant')}:</p>
-        <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_chat_link')}"/></p>
-      </div>
-      <hr/>
-      <p>${t('invite_links')}</p>
-      <div id="profile-invite-links" class="flex-table"></div>
-      <p><button id="profile-create-invite-link">Create new invite link</button></p>
-      <hr/>
-    </div>
+        <div id="profile-group-settings">
+          <div id="profile-group-name-container">${t('group_name')}: <input id="profile-group-name" placeholder="${t('group_name')}"/></div>
+          <p>${t('participants')}:</p>
+          <div id="profile-group-participants"></div>
+          <div id="profile-add-participant" style="display:none;">
+            <p>${t('add_participant')}:</p>
+            <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_chat_link')}"/></p>
+          </div>
+          <hr/>
+          <p>${t('invite_links')}</p>
+          <div id="profile-invite-links" class="flex-table"></div>
+          <p><button id="profile-create-invite-link">Create new invite link</button></p>
+          <hr/>
+        </div>
 
-    <p id="profile-page-qr" style="display:none" class="qr-container"></p>
-    <div id="chat-settings" style="display:none">
-      <hr/>
-      <h3>${t('chat_settings')}</h3>
-      <div class="profile-nicknames">
-        <h4>${t('nicknames')}</h4>
-        <p>
-          ${t('nickname')}: <input id="profile-nickname-their"/>
-        </p>
-        <p id="profile-nickname-my-container">
-          ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
-        </p>
+        <p id="profile-page-qr" style="display:none" class="qr-container"></p>
+        <div id="chat-settings" style="display:none">
+          <hr/>
+          <h3>${t('chat_settings')}</h3>
+          <div class="profile-nicknames">
+            <h4>${t('nicknames')}</h4>
+            <p>
+              ${t('nickname')}: <input id="profile-nickname-their"/>
+            </p>
+            <p id="profile-nickname-my-container">
+              ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
+            </p>
+          </div>
+          <div class="notification-settings">
+            <h4>${t('notifications')}</h4>
+            <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
+            <label for="notifyAll">${t('all_messages')}</label><br/>
+            <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
+            <label for="notifyMentionsOnly">${t('mentions_only')}</label><br/>
+            <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
+            <label for="notifyNothing">${t('nothing')}</label><br/>
+          </div>
+          <hr/>
+          <p>
+            <button class="delete-chat">${t('delete_chat')}</button>
+            <!-- <button class="block-user">${t('block_user')}</button> -->
+          </p>
+          <hr/>
+        </div>
+        <div id="profile-public-messages">
+          <br/>
+          <div id="profile-public-message-list" class="public-messages-view"></div>
+        </div>
       </div>
-      <div class="notification-settings">
-        <h4>${t('notifications')}</h4>
-        <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
-        <label for="notifyAll">${t('all_messages')}</label><br/>
-        <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
-        <label for="notifyMentionsOnly">${t('mentions_only')}</label><br/>
-        <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
-        <label for="notifyNothing">${t('nothing')}</label><br/>
-      </div>
-      <hr/>
-      <p>
-        <button class="delete-chat">${t('delete_chat')}</button>
-        <!-- <button class="block-user">${t('block_user')}</button> -->
-      </p>
-      <hr/>
-    </div>
-    <div id="profile-public-messages">
-      <br/>
-      <div id="profile-public-message-list" class="public-messages-view"></div>
-    </div>
-  </div>
-</div>`;
+    </div>`;
+  }
+
+  componentDidMount() {
+    const pub = this.props.id;
+    if (!pub) {
+      return;
+    }
+    resetView();
+    sortedPublicMessages = [];
+    localState.get('activeRoute').put('profile/' + pub);
+    localState.get('activeProfile').put(pub);
+    $('#profile .profile-photo-container').hide();
+    var qrCodeEl = $('#profile-page-qr');
+    qrCodeEl.empty();
+    $('#profile-nickname-their').val('');
+    $('#profile').show();
+    renderGroupParticipants(pub);
+    renderInviteLinks(pub);
+    if (chats[pub] && !chats[pub].uuid) {
+      $('#profile-public-message-list').empty();
+      $('#profile-public-messages').show();
+      $('#profile .profile-photo').show();
+      publicState.user(pub).get('profile').get('photo').on(photo => {
+        $('#profile .profile-photo-container').show();
+        Helpers.setImgSrc($('#profile .profile-photo'), photo);
+      });
+      PublicMessages.getMessages(onPublicMessage, pub);
+    } else {
+      $('#profile-public-messages').hide();
+    }
+    $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
+    $('#profile .profile-about-content').empty();
+    $('#profile .profile-about-content').text(chats[pub] && chats[pub].about);
+    const link = chats[pub] && chats[pub].getSimpleLink();
+    $('#profile .add-friend').off().on('click', () => {
+      console.log('add friend');
+    });
+    $('#profile .delete-chat').off().on('click', () => deleteChat(pub));
+    $("input[name=notificationPreference][value=" + chats[pub].notificationSetting + "]").attr('checked', 'checked');
+    $('input:radio[name=notificationPreference]').off().on('change', (event) => {
+      chats[pub].put('notificationSetting', event.target.value);
+    });
+    $('#profile .show-settings').off().on('click', () => $('#chat-settings').toggle());
+    $('#profile .show-qr-code').off().on('click', () => $('#profile-page-qr').toggle());
+    $('#profile .send-message').off().on('click', () => showChat(pub));
+    $('#profile .copy-user-link').off().on('click', event => {
+      Helpers.copyToClipboard(link);
+      var tgt = $(event.target);
+      var originalText = tgt.text();
+      var originalWidth = tgt.width();
+      t.width(originalWidth);
+      t.text(t('copied'));
+      setTimeout(() => {
+        t.text(originalText);
+        t.css('width', '');
+      }, 2000);
+    });
+    $('#profile-group-name').not(':focus').val(chats[pub] && chats[pub].name);
+    $('#profile-group-name').off().on('input', event => {
+      var name = event.target.value;
+      chats[pub].put('name', name);
+    });
+    $('.profile-nicknames').toggle(pub !== Session.getKey().pub);
+    $('#profile-nickname-my-container').toggle(!chats[pub].uuid);
+    $('#profile-nickname-their').not(':focus').val(chats[pub] && chats[pub].theirNickname);
+    $('#profile-nickname-my').text(chats[pub] && chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
+    $('#profile-nickname-their').off().on('input', event => {
+      var nick = event.target.value;
+      chats[pub].put('nickname', nick);
+    });
+    qrCodeEl.empty();
+    new QRCode(qrCodeEl[0], {
+      text: link,
+      width: 300,
+      height: 300,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.H
+    });
+    if (chats[pub] && chats[pub].uuid) {
+      renderGroupPhotoSettings(chats[pub].uuid);
+      $('#profile .profile-photo-container').show();
+      Helpers.setImgSrc($('#profile .profile-photo'), chats[pub].photo);
+    }
+  }
+}
 
 function renderGroupParticipants(pub) {
   if (!(chats[pub] && chats[pub].uuid)) {
@@ -116,7 +205,7 @@ function renderGroupParticipants(pub) {
       el.append($('<small>').text(t('admin')).css({'margin-left': 5}));
     }
     el.click(() => {
-      k === Session.getKey().pub ? $(".user-info").click() : showProfile(k);
+      k === Session.getKey().pub ? $(".user-info").click() : localState.get('activeRoute').put('profile/' + k);
     });
     $('#profile-group-participants').append(el);
   });
@@ -135,89 +224,6 @@ function onPublicMessage(msg, info) {
     render(html`<${Message} ...${msg} public=${true} key=${msg.time} showName=${true} chatId=${info.from}/>`, container[0]);
     $('#profile-public-message-list').prepend(container.children()[0]);
   });
-}
-
-function showProfile(pub) {
-  if (!pub) {
-    return;
-  }
-  resetView();
-  sortedPublicMessages = [];
-  localState.get('activeRoute').put('profile/' + pub);
-  localState.get('activeProfile').put(pub);
-  $('#profile .profile-photo-container').hide();
-  var qrCodeEl = $('#profile-page-qr');
-  qrCodeEl.empty();
-  $('#profile-nickname-their').val('');
-  $('#profile').show();
-  renderGroupParticipants(pub);
-  renderInviteLinks(pub);
-  if (chats[pub] && !chats[pub].uuid) {
-    $('#profile-public-message-list').empty();
-    $('#profile-public-messages').show();
-    $('#profile .profile-photo').show();
-    publicState.user(pub).get('profile').get('photo').on(photo => {
-      $('#profile .profile-photo-container').show();
-      Helpers.setImgSrc($('#profile .profile-photo'), photo);
-    });
-    PublicMessages.getMessages(onPublicMessage, pub);
-  } else {
-    $('#profile-public-messages').hide();
-  }
-  $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
-  $('#profile .profile-about-content').empty();
-  $('#profile .profile-about-content').text(chats[pub] && chats[pub].about);
-  const link = chats[pub] && chats[pub].getSimpleLink();
-  $('#profile .add-friend').off().on('click', () => {
-    console.log('add friend');
-  });
-  $('#profile .delete-chat').off().on('click', () => deleteChat(pub));
-  $("input[name=notificationPreference][value=" + chats[pub].notificationSetting + "]").attr('checked', 'checked');
-  $('input:radio[name=notificationPreference]').off().on('change', (event) => {
-    chats[pub].put('notificationSetting', event.target.value);
-  });
-  $('#profile .show-settings').off().on('click', () => $('#chat-settings').toggle());
-  $('#profile .show-qr-code').off().on('click', () => $('#profile-page-qr').toggle());
-  $('#profile .send-message').off().on('click', () => showChat(pub));
-  $('#profile .copy-user-link').off().on('click', event => {
-    Helpers.copyToClipboard(link);
-    var tgt = $(event.target);
-    var originalText = tgt.text();
-    var originalWidth = tgt.width();
-    t.width(originalWidth);
-    t.text(t('copied'));
-    setTimeout(() => {
-      t.text(originalText);
-      t.css('width', '');
-    }, 2000);
-  });
-  $('#profile-group-name').not(':focus').val(chats[pub] && chats[pub].name);
-  $('#profile-group-name').off().on('input', event => {
-    var name = event.target.value;
-    chats[pub].put('name', name);
-  });
-  $('.profile-nicknames').toggle(pub !== Session.getKey().pub);
-  $('#profile-nickname-my-container').toggle(!chats[pub].uuid);
-  $('#profile-nickname-their').not(':focus').val(chats[pub] && chats[pub].theirNickname);
-  $('#profile-nickname-my').text(chats[pub] && chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
-  $('#profile-nickname-their').off().on('input', event => {
-    var nick = event.target.value;
-    chats[pub].put('nickname', nick);
-  });
-  qrCodeEl.empty();
-  new QRCode(qrCodeEl[0], {
-    text: link,
-    width: 300,
-    height: 300,
-    colorDark : "#000000",
-    colorLight : "#ffffff",
-    correctLevel : QRCode.CorrectLevel.H
-  });
-  if (chats[pub] && chats[pub].uuid) {
-    renderGroupPhotoSettings(chats[pub].uuid);
-    $('#profile .profile-photo-container').show();
-    Helpers.setImgSrc($('#profile .profile-photo'), chats[pub].photo);
-  }
 }
 
 var newGroupParticipant;
@@ -320,4 +326,4 @@ function init() {
   $('#profile-add-participant').on('input', onProfileAddParticipantInput);
 }
 
-export default {Profile, init, showProfile, renderGroupParticipants, renderInviteLinks};
+export default {Profile, init, renderGroupParticipants, renderInviteLinks};

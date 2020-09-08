@@ -94,7 +94,7 @@ function login(k) {
   $(".profile-link").attr('href', Helpers.getUserChatLink(key.pub)).off().on('click', e => {
     e.preventDefault();
     if (chats[key.pub]) {
-      Profile.showProfile(key.pub);
+      localState.get('activeRoute').put('profile/' + key.pub);
     }
   });
   setOurOnlineStatus();
