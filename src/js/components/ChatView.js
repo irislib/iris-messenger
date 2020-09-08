@@ -37,15 +37,15 @@ class ChatView extends Component {
     localState.get('activeRoute').on(activeRouteId => {
       this.activeChat = activeRouteId && activeRouteId.replace('chat/', '');
       this.setState({});
-      if (activeRouteId && (activeRouteId === 'public' || activeRouteId.length > 20) && !subscribedToMsgs[activeRouteId]) {
+      if (this.activeChat && (this.activeChat === 'public' || this.activeChat.length > 20) && !subscribedToMsgs[this.activeChat]) {
         const iv = setInterval(() => {
-          if (chats[activeRouteId]) {
+          if (chats[this.activeChat]) {
             clearInterval(iv);
-            this.subscribeToMsgs(activeRouteId);
+            this.subscribeToMsgs(this.activeChat);
             this.setState({});
           }
         }, 1000);
-        subscribedToMsgs[activeRouteId] = true;
+        subscribedToMsgs[this.activeChat] = true;
       }
     });
 
@@ -227,7 +227,7 @@ class ChatView extends Component {
       $("#new-msg").focus();
     }
     if (chat) {
-      if (activeRoute === 'public' || chat.theirMsgsLastSeenTime) {
+      if (activeRoute === 'chat/public' || chat.theirMsgsLastSeenTime) {
         $('#not-seen-by-them:visible').slideUp();
       } else if (!chat.uuid && $('.msg.our').length) {
         $('#not-seen-by-them').slideDown();

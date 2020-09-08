@@ -16,7 +16,6 @@ function getMessages(cb, pub) {
       msg = JSON.parse(msg);
     }
     if (typeof msg !== 'object' || seen.indexOf(time) !== -1) { return; }
-    console.log(msg);
     seen.push(time);
     cb(msg, {selfAuthored: true, from: pub});
   });
