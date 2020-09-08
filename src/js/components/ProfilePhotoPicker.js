@@ -7,8 +7,8 @@ import Session, {activeProfile} from '../Session.js';
 import Helpers from '../Helpers.js';
 
 var cropper;
-function renderProfilePhotoSettings() {
-  var files = $('#profile-photo-input')[0].files;
+function onProfilePhotoInputChange(e) {
+  var files = e.target.files;
   if (files && files.length) {
     var file = files[0];
     /*
@@ -47,6 +47,10 @@ function renderProfilePhotoSettings() {
   }
 }
 
+function cancelProfilePhotoClicked() {
+  $('#profile-photo-input').val(null);
+}
+
 function useProfilePhotoClicked() {
   var canvas = cropper.getCroppedCanvas();
   var resizedCanvas = document.createElement('canvas');
@@ -61,9 +65,11 @@ function useProfilePhotoClicked() {
     }
     Helpers.setImgSrc($('#current-profile-photo'), src);
     $('#profile-photo-input').val(null);
-
-    renderProfilePhotoSettings();
   });
+}
+
+function clickProfilePhotoInput() {
+  $('#profile-photo-input').click();
 }
 
 function removeProfilePhotoClicked() {
@@ -72,44 +78,43 @@ function removeProfilePhotoClicked() {
   } else {
     publicState.user().get('profile').get('photo').put(null);
   }
-  renderProfilePhotoSettings();
+  $('#profile-photo-input').val(null);
 }
-
-
 
 class ProfilePhotoPicker extends Component {
   render() {
-    return html`
-      <img id="current-profile-photo"/>
-      <button id="add-profile-photo">${t('add_profile_photo')}</button>
-      <div id="profile-photo-preview-container">
-        <img id="profile-photo-preview" class="hidden"/>
-      </div>
-      <p>
-        <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" accept="image/*"/>
-      </p>
-      <p id="profile-photo-error" class="${this.state.hasError ? '' : 'hidden'}">${t('profile_photo_too_big')}</p>
-      <p>
-        <button id="cancel-profile-photo" class="hidden">${t('cancel')}</button>
-        <button id="use-profile-photo" class="hidden">${t('use_photo')}</button>
-        <button id="remove-profile-photo" class="hidden">${t('remove_photo')}</button>
-      </p>
-    `;
+    const photo = Session.getMyProfilePhoto();
+    if (photo) {
+      return html`
+        <img id="current-profile-photo" onClick=${() => clickProfilePhotoInput()}/>
+        <p>
+          <button id="remove-profile-photo" onClick=${() => removeProfilePhotoClicked()} class="hidden">${t('remove_photo')}</button>
+          <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" onChange=${e => onProfilePhotoInputChange(e)} accept="image/*"/>
+        </p>
+        <div id="profile-photo-preview-container">
+          <img id="profile-photo-preview" class="hidden"/>
+        </div>
+      `;
+    } else {
+      return html`
+        <button id="add-profile-photo" onClick=${() => clickProfilePhotoInput()}>${t('add_profile_photo')}</button>
+        <div id="profile-photo-preview-container">
+          <img id="profile-photo-preview" class="hidden"/>
+        </div>
+        <p>
+          <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" onChange=${e => onProfilePhotoInputChange(e)} accept="image/*"/>
+        </p>
+        <p id="profile-photo-error" class="${this.state.hasError ? '' : 'hidden'}">${t('profile_photo_too_big')}</p>
+        <p>
+          <button id="cancel-profile-photo" onClick=${() => cancelProfilePhotoClicked()} class="hidden">${t('cancel')}</button>
+          <button id="use-profile-photo" onClick=${() => useProfilePhotoClicked()} class="hidden">${t('use_photo')}</button>
+        </p>
+      `;
+    }
   }
 
   componentDidMount() {
-    $('#current-profile-photo').toggle(!!Session.getMyProfilePhoto());
     Helpers.setImgSrc($('#current-profile-photo'), Session.getMyProfilePhoto());
-    $('#add-profile-photo').toggle(!Session.getMyProfilePhoto());
-    $('#remove-profile-photo').click(removeProfilePhotoClicked);
-
-    $('#current-profile-photo, #add-profile-photo').click(() => $('#profile-photo-input').click());
-    $('#profile-photo-input').change(renderProfilePhotoSettings);
-    $('#use-profile-photo').click(useProfilePhotoClicked);
-    $('#cancel-profile-photo').click(() => {
-      $('#profile-photo-input').val(null);
-      renderProfilePhotoSettings();
-    });
   }
 }
 
