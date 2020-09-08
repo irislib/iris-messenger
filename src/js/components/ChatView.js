@@ -236,7 +236,6 @@ class ChatView extends Component {
   }
 
   render() {
-    const activeChat = activeRoute && activeRoute.replace('chat/', '');
     if (!activeRoute || !chats[this.activeChat] || !chats[this.activeChat].sortedMessages) {
       return html``;
     }

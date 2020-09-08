@@ -2,7 +2,6 @@ import {localState, publicState, showMenu} from './Main.js';
 import {chats, addChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
-import Profile from './components/Profile.js';
 import { translate as tr } from './Translation.js';
 import { route } from './lib/preact-router.es.js';
 
@@ -119,8 +118,6 @@ function login(k) {
       showMenu();
     }
   }
-  $('.user-info .user-name').text('anonymous');
-  $('#settings-name').val('');
   Helpers.setImgSrc($('#current-profile-photo'), '');
   $('#private-key-qr').empty();
   publicState.user().get('profile').get('name').on(name => {

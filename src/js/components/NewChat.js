@@ -1,10 +1,9 @@
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import { newChat, showChat, addChat } from '../Chat.js';
-import { publicState } from '../Main.js';
+import { localState, publicState } from '../Main.js';
 import Helpers from '../Helpers.js';
 import QRScanner from '../QRScanner.js';
-import Profile from './Profile.js';
 import Session from '../Session.js';
 
 function createGroupSubmit(e) {

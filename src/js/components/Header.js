@@ -4,7 +4,6 @@ import {activeRoute} from '../Session.js';
 import { translate as t } from '../Translation.js';
 import {localState, resetView, showMenu} from '../Main.js';
 import Session from '../Session.js';
-import Profile from './Profile.js';
 import Helpers from '../Helpers.js';
 
 class Header extends Component {
@@ -64,7 +63,7 @@ class Header extends Component {
       if (chat.photo) {
         const photo = Helpers.setImgSrc($('<img>'), chat.photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
         $('#header-content').prepend($('<div class="identicon-container">').append(photo));
-      } else if (activeRoute !== 'public' && chat.identicon) {
+      } else if (activeRoute !== 'chat/public' && chat.identicon) {
         const el = chat.identicon.clone(); // TODO use actual identicon element to update in real-time. but unsubscribe on unmount.
         el.css({width:40, height:40});
         el.find('img').attr({width:40, height:40});
@@ -101,7 +100,7 @@ class Header extends Component {
     let title;
     if (!activeRoute) {
       title = t('new_chat');
-    } else if (activeRoute === 'public') {
+    } else if (activeRoute === 'chat/public') {
       title = t('public_messages');
     } else if (activeRoute === 'settings') {
       title = t('settings');
