@@ -138,11 +138,11 @@ class Profile extends Component {
       var tgt = $(event.target);
       var originalText = tgt.text();
       var originalWidth = tgt.width();
-      t.width(originalWidth);
-      t.text(t('copied'));
+      tgt.width(originalWidth);
+      tgt.text(t('copied'));
       setTimeout(() => {
-        t.text(originalText);
-        t.css('width', '');
+        tgt.text(originalText);
+        tgt.css('width', '');
       }, 2000);
     });
     $('#profile-group-name').not(':focus').val(chats[pub] && chats[pub].name);
