@@ -122,7 +122,7 @@ function login(k) {
   $('.user-info .user-name').text('anonymous');
   $('#settings-name').val('');
   Helpers.setImgSrc($('#current-profile-photo'), '');
-  $('#private-key-qr').remove();
+  $('#private-key-qr').empty();
   publicState.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       myName = name;

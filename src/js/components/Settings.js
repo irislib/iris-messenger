@@ -5,6 +5,8 @@ import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import LanguageSelector from './LanguageSelector.js';
 import {translate as t} from '../Translation.js';
+import PeerManager from '../PeerManager.js';
+import VideoCall from '../VideoCall.js';
 
 class Settings extends Component {
   constructor() {
@@ -139,6 +141,23 @@ class Settings extends Component {
     Helpers.setImgSrc($('#current-profile-photo'), Session.getMyProfilePhoto());
     $('#add-profile-photo').toggle(!Session.getMyProfilePhoto());
     $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
+
+    $('#add-peer-btn').click(() => {
+      var url = $('#add-peer-url').val();
+      var visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
+      PeerManager.addPeer({url, visibility});
+      $('#add-peer-url').val('');
+      PeerManager.updatePeerList();
+    });
+
+    $('#rtc-config').val(JSON.stringify(VideoCall.getRTCConfig()));
+    $('#rtc-config').change(() => {
+      VideoCall.setRTCConfig(JSON.parse($('#rtc-config').val()));
+    });
+    $('#restore-default-rtc-config').click(() => {
+      VideoCall.setRTCConfig(VideoCall.DEFAULT_RTC_CONFIG);
+      $('#rtc-config').val(JSON.stringify(VideoCall.getRTCConfig()));
+    });
 
     publicState.user().get('profile').get('name').on((name, a, b, event) => {
       $('#settings-name').not(':focus').val(name);

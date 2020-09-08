@@ -70,7 +70,6 @@ render(Main, document.body);
 Session.init();
 PeerManager.init();
 Profile.init();
-VideoCall.init();
 PublicMessages.init();
 
 $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
@@ -92,7 +91,7 @@ function resetView() {
   showMenu(false);
   QRScanner.cleanupScanner();
   $('#chatlink-qr-video').hide();
-  $('#private-key-qr').remove();
+  $('#private-key-qr').empty();
 }
 
 function showMenu(show = true) {
