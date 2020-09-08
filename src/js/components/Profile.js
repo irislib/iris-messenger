@@ -82,6 +82,7 @@ class Profile extends Component {
           <hr/>
         </div>
         <div id="profile-public-messages">
+          <div id="attachment-preview" style="display:none"></div>
           <br/>
           <div id="profile-public-message-list" class="public-messages-view"></div>
         </div>
