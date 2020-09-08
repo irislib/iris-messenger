@@ -3,9 +3,15 @@ import { html } from '../Helpers.js';
 import {publicState, localState} from '../Main.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
+import LanguageSelector from './LanguageSelector.js';
 import {translate as t} from '../Translation.js';
 
 class Settings extends Component {
+  constructor() {
+    super();
+    this.eventListeners = [];
+  }
+
   render() {
     return html`
       <div class="main-view" id="settings">
@@ -14,7 +20,7 @@ class Settings extends Component {
           ${t('your_name')}:
         </p>
         <p>
-          <input onInput=${e => onNameChange(e)} placeholder="${t('your_name')}"/>
+          <input id="settings-name" onInput=${e => onNameInput(e)} placeholder="${t('your_name')}"/>
         </p>
         <p id="profile-photo-chapter">
           ${t('profile_photo')}:
@@ -37,7 +43,7 @@ class Settings extends Component {
         </div>
         <p>${t('about_text')}:</p>
         <p>
-          <input onInput=${e => onAboutTextChange(e)} style="width:100%" placeholder="${t('about_text')}"/>
+          <input id="settings-about" onInput=${e => onAboutTextInput(e)} style="width:100%" placeholder="${t('about_text')}"/>
         </p>
         <hr/>
         <h3>${t('account')}</h3>
@@ -59,7 +65,7 @@ class Settings extends Component {
         <p><small dangerouslySetInnerHTML=${{ __html: t('privkey_storage_recommendation')}}></small></p>
         <hr/>
         <h3>${t('language')}</h3>
-        <p><select class="language-selector"></select></p>
+        <p><${LanguageSelector}/></p>
         <hr/>
         <h3>Notifications</h3>
         <p>Web push subscriptions</p>
@@ -132,15 +138,28 @@ class Settings extends Component {
     Helpers.setImgSrc($('#current-profile-photo'), Session.getMyProfilePhoto());
     $('#add-profile-photo').toggle(!Session.getMyProfilePhoto());
     $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
+
+    publicState.user().get('profile').get('name').on((name, a, b, event) => {
+      $('#settings-name').not(':focus').val(name);
+      this.eventListeners.push(event);
+    });
+    publicState.user().get('profile').get('about').on((about, a, b, event) => {
+      $('#settings-about').not(':focus').val(about);
+      this.eventListeners.push(event);
+    });
+  }
+
+  componentWillUnmount() {
+    this.eventListeners.forEach(e => e.off());
   }
 }
 
-function onNameChange(event) {
+function onNameInput(event) {
   var name = $(event.target).val().trim();
   publicState.user().get('profile').get('name').put(name);
 }
 
-function onAboutTextChange(event) {
+function onAboutTextInput(event) {
   var about = $(event.target).val().trim();
   publicState.user().get('profile').get('about').put(about);
 }

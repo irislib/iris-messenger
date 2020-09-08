@@ -70,7 +70,6 @@ render(Main, document.body);
 
 Session.init();
 PeerManager.init();
-Translation.init();
 Profile.init();
 VideoCall.init();
 PublicMessages.init();
