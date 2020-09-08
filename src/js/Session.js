@@ -1,9 +1,8 @@
-import {publicState, activeRoute, activeProfile, resetView, showMenu} from './Main.js';
+import {publicState, activeRoute, activeProfile, showMenu} from './Main.js';
 import {chats, addChat, showNewChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import Profile from './components/Profile.js';
-import QRScanner from './QRScanner.js';
 import { translate as tr } from './Translation.js';
 
 let key;
@@ -144,11 +143,6 @@ function login(k) {
   Notifications.init();
 }
 
-async function createChatLink() {
-  latestChatLink = await iris.Channel.createChatLink(publicState, key);
-  setChatLinkQrCode(latestChatLink);
-}
-
 function setChatLinkQrCode(link) {
   var qrCodeEl = $('#my-qr-code');
   if (qrCodeEl.length === 0) { return; }
@@ -163,6 +157,11 @@ function setChatLinkQrCode(link) {
   });
 }
 
+async function createChatLink() {
+  latestChatLink = await iris.Channel.createChatLink(publicState, key);
+  setChatLinkQrCode(latestChatLink);
+}
+
 function clearIndexedDB() {
   window.indexedDB.deleteDatabase('localState');
   window.indexedDB.deleteDatabase('radata');
@@ -170,46 +169,6 @@ function clearIndexedDB() {
 
 function getMyChatLink() {
   return latestChatLink || Helpers.getUserChatLink(key.pub);
-}
-
-function showSwitchAccount(e) {
-  e.preventDefault();
-  resetView();
-  $('#create-account').hide();
-  $('#existing-account-login').show();
-  $('#paste-privkey').focus();
-}
-
-function showCreateAccount(e) {
-  e.preventDefault();
-  $('#privkey-qr-video').hide();
-  $('#create-account').show();
-  $('#existing-account-login').hide();
-  QRScanner.cleanupScanner();
-  $('#login-form-name').focus();
-}
-
-function copyMyChatLinkClicked(e) {
-  Helpers.copyToClipboard(getMyChatLink());
-  var te = $(e.target);
-  var originalText = te.text();
-  var originalWidth = te.width();
-  te.width(originalWidth);
-  te.text(tr('copied'));
-  setTimeout(() => {
-    te.text(originalText);
-    te.css('width', '');
-  }, 2000);
-}
-
-function showScanPrivKey() {
-  if ($('#privkey-qr-video:visible').length) {
-    $('#privkey-qr-video').hide();
-    QRScanner.cleanupScanner();
-  } else {
-    $('#privkey-qr-video').show();
-    QRScanner.startPrivKeyQRScanner().then(login);
-  }
 }
 
 function getKey() { return key; }
@@ -236,29 +195,12 @@ async function logOut() {
 }
 
 function init() {
-  $('#login').hide();
   var localStorageKey = localStorage.getItem('chatKeyPair');
   if (localStorageKey) {
     login(JSON.parse(localStorageKey));
   } else {
     newUserLogin();
   }
-
-  $('#existing-account-login input').on('input', (event) => {
-    var val = $(event.target).val();
-    if (!val.length) { return; }
-    try {
-      var k = JSON.parse(val);
-      login(k);
-      $(event.target).val('');
-    } catch (e) {
-      console.error('Login with key', val, 'failed:', e);
-    }
-  });
-
-  $('#show-existing-account-login').click(showSwitchAccount);
-  $('#show-create-account').click(showCreateAccount);
-  $('#scan-privkey-btn').click(showScanPrivKey);
 }
 
-export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, areWeOnline, copyMyChatLinkClicked, logOut };
+export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, areWeOnline, login, logOut };

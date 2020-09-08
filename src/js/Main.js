@@ -5,7 +5,6 @@ import { createHashHistory } from './lib/history.production.min.js';
 import Helpers from './Helpers.js';
 import { html } from './Helpers.js';
 import QRScanner from './QRScanner.js';
-import VideoCall from './VideoCall.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 import {chats, showNewChat} from './Chat.js';

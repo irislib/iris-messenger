@@ -47,6 +47,19 @@ function onPasteChatLink(event) {
   $(event.target).val('');
 }
 
+function copyMyChatLinkClicked(e) {
+  Helpers.copyToClipboard(Session.getMyChatLink());
+  var te = $(e.target);
+  var originalText = te.text();
+  var originalWidth = te.width();
+  te.width(originalWidth);
+  te.text(t('copied'));
+  setTimeout(() => {
+    te.text(originalText);
+    te.css('width', '');
+  }, 2000);
+}
+
 const NewChat = () => html`
   <div class="main-view" id="new-chat">
     <h3>${t('have_someones_chat_link')}</h3>
@@ -54,7 +67,7 @@ const NewChat = () => html`
     <button id="scan-chatlink-qr-btn" onClick=${scanChatLinkQr}>${t('or_scan_qr_code')}</button>
     <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
     <h3>${t('give_your_chat_link')}</h3>
-    <button onClick=${e => Session.copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button>
+    <button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button>
     <button id="show-my-qr-btn">${t('or_show_qr_code')}</button>
     <p id="my-qr-code" class="qr-container" style="display:none"></p>
     <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_chat_link_publicly') }}></small></p>
