@@ -111,7 +111,13 @@ class NewChat extends Component {
 
     $('#show-my-qr-btn').off().click(() => {
       $('#my-qr-code').toggle()
-    })
+    });
+
+    $('#generate-chat-link').off().on('click', Session.createChatLink);
+    $(".profile-link").attr('href', Helpers.getUserChatLink(Session.getKey().pub)).off().on('click', e => {
+      e.preventDefault();
+      localState.get('activeRoute').put('profile/' + Session.getKey().pub);
+    });
   }
 
   render() {

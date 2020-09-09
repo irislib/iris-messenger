@@ -9,9 +9,14 @@ import {activeProfile} from '../Session.js';
 import Helpers from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
 import Message from './Message.js';
+import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 //import VideoCall from './VideoCall.js';
 
 class Profile extends Component {
+  onProfilePhotoSet(src) {
+    chats[activeProfile].put('photo', src);
+  }
+
   render() {
     return html`
     <div class="main-view" id="profile">
@@ -19,6 +24,7 @@ class Profile extends Component {
         <div class="profile-header">
           <div class="profile-photo-container">
             <img class="profile-photo"/>
+            <${ProfilePhotoPicker} callback=${src => this.onProfilePhotoSet(src)}/>
           </div>
           <div class="profile-header-stuff">
             <div class="profile-actions">

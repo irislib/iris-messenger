@@ -51,23 +51,6 @@ function cancelProfilePhotoClicked() {
   $('#profile-photo-input').val(null);
 }
 
-function useProfilePhotoClicked() {
-  var canvas = cropper.getCroppedCanvas();
-  var resizedCanvas = document.createElement('canvas');
-  resizedCanvas.width = resizedCanvas.height = Math.min(canvas.width, 800);
-  pica().resize(canvas, resizedCanvas).then(() => {
-    var src = resizedCanvas.toDataURL('image/jpeg');
-    // var src = $('#profile-photo-preview').attr('src');
-    if (activeProfile) {
-      chats[activeProfile].put('photo', src);
-    } else {
-      publicState.user().get('profile').get('photo').put(src);
-    }
-    Helpers.setImgSrc($('#current-profile-photo'), src);
-    $('#profile-photo-input').val(null);
-  });
-}
-
 function clickProfilePhotoInput() {
   $('#profile-photo-input').click();
 }
@@ -82,6 +65,20 @@ function removeProfilePhotoClicked() {
 }
 
 class ProfilePhotoPicker extends Component {
+  useProfilePhotoClicked() {
+    var canvas = cropper.getCroppedCanvas();
+    var resizedCanvas = document.createElement('canvas');
+    resizedCanvas.width = resizedCanvas.height = Math.min(canvas.width, 800);
+    pica().resize(canvas, resizedCanvas).then(() => {
+      var src = resizedCanvas.toDataURL('image/jpeg');
+      // var src = $('#profile-photo-preview').attr('src');
+      if (this.props.callback) {
+        this.props.callback(src);
+      }
+      $('#profile-photo-input').val(null);
+    });
+  }
+
   render() {
     const photo = Session.getMyProfilePhoto();
     if (photo) {
@@ -107,7 +104,7 @@ class ProfilePhotoPicker extends Component {
         <p id="profile-photo-error" class="${this.state.hasError ? '' : 'hidden'}">${t('profile_photo_too_big')}</p>
         <p>
           <button id="cancel-profile-photo" onClick=${() => cancelProfilePhotoClicked()} class="hidden">${t('cancel')}</button>
-          <button id="use-profile-photo" onClick=${() => useProfilePhotoClicked()} class="hidden">${t('use_photo')}</button>
+          <button id="use-profile-photo" onClick=${() => this.useProfilePhotoClicked()} class="hidden">${t('use_photo')}</button>
         </p>
       `;
     }

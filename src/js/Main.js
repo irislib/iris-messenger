@@ -37,7 +37,10 @@ var publicState = Gun({ peers: PeerManager.getRandomPeers(), localStorage: false
 window.publicState = publicState;
 var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state');
 window.localState = localState;
+
 Session.init();
+PeerManager.init();
+PublicMessages.init();
 
 Helpers.checkColorScheme();
 
@@ -60,9 +63,6 @@ const Main = html`
 
 render(Main, document.body);
 
-PeerManager.init();
-PublicMessages.init();
-
 $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
 
 Helpers.showConsoleWarning();
@@ -80,8 +80,6 @@ function resetView() {
   }
   showMenu(false);
   QRScanner.cleanupScanner();
-  $('#chatlink-qr-video').hide();
-  $('#private-key-qr').empty();
 }
 
 function showMenu(show = true) {

@@ -48,13 +48,6 @@ function login(k) {
     localState.get('chatLinks').get(key).put(chatLink);
     latestChatLink = chatLink.url;
   });
-  $('#generate-chat-link').off().on('click', createChatLink);
-  $(".profile-link").attr('href', Helpers.getUserChatLink(key.pub)).off().on('click', e => {
-    e.preventDefault();
-    if (chats[key.pub]) {
-      localState.get('activeRoute').put('profile/' + key.pub);
-    }
-  });
   setOurOnlineStatus();
   iris.Channel.getChannels(publicState, key, addChat);
   var chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
@@ -77,8 +70,6 @@ function login(k) {
       showMenu();
     }
   }
-  Helpers.setImgSrc($('#current-profile-photo'), '');
-  $('#private-key-qr').empty();
   publicState.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       myName = name;
@@ -141,4 +132,4 @@ function init() {
 
 
 export {activeRoute, activeProfile};
-export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, areWeOnline, login, logOut };
+export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, areWeOnline, login, logOut };

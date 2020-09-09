@@ -34,7 +34,6 @@ function showChat(pub) {
 function deleteChat(pub) {
   iris.Channel.deleteChannel(publicState, Session.getKey(), pub);
   if (activeRoute === pub) {
-    showNewChat();
     showMenu();
   }
   delete chats[pub];
@@ -255,8 +254,4 @@ function processMessage(chatId, msg, info) {
   Notifications.notifyMsg(msg, info, chatId);
 }
 
-function showNewChat() {
-  resetView();
-}
-
-export { showChat, chats, addChat, deleteChat, showNewChat, newChat, processMessage, getDisplayName };
+export { showChat, chats, addChat, deleteChat, newChat, processMessage, getDisplayName };

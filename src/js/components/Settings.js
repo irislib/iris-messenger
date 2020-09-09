@@ -15,6 +15,11 @@ class Settings extends Component {
     this.eventListeners = [];
   }
 
+  onProfilePhotoSet(src) {
+    console.log('helo');
+    publicState.user().get('profile').get('photo').put(src);
+  }
+
   render() {
     return html`
       <div class="main-view" id="settings">
@@ -29,7 +34,7 @@ class Settings extends Component {
           ${t('profile_photo')}:
         </p>
         <div id="profile-photo-settings">
-          <${ProfilePhotoPicker}/>
+          <${ProfilePhotoPicker} callback=${src => this.onProfilePhotoSet(src)}/>
         </div>
         <p>${t('about_text')}:</p>
         <p>
@@ -151,7 +156,7 @@ class Settings extends Component {
         $('#settings-about').not(':focus').val(about);
         this.eventListeners.push(event);
       });
-      
+
     });
   }
 
