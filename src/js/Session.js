@@ -82,15 +82,10 @@ function login(k) {
   publicState.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       myName = name;
-      $('.user-info .user-name').text(Helpers.truncateString(name, 20));
     }
   });
   publicState.user().get('profile').get('photo').on(data => {
     myProfilePhoto = data;
-    if (!activeProfile) {
-      Helpers.setImgSrc($('#current-profile-photo'), data);
-      $('#add-profile-photo').toggleClass('hidden', true);
-    }
   });
   Notifications.init();
 

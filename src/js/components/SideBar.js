@@ -44,6 +44,11 @@ class SideBar extends Component {
       chats[id] = chat;
       limitedUpdate();
     });
+    publicState.user().get('profile').get('name').on(name => {
+      if (name && typeof name === 'string') {
+        $('.user-info .user-name').text(name);
+      }
+    });
     $("#my-identicon").append(Helpers.getIdenticon(Session.getKey().pub, 40));
   }
 
