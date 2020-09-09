@@ -8,7 +8,7 @@ import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 import {activeRoute} from './Session.js';
-import {chats, showNewChat} from './Chat.js';
+import {chats} from './Chat.js';
 import PublicMessages from './PublicMessages.js';
 
 import Settings from './components/Settings.js';
@@ -37,6 +37,7 @@ var publicState = Gun({ peers: PeerManager.getRandomPeers(), localStorage: false
 window.publicState = publicState;
 var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state');
 window.localState = localState;
+Session.init();
 
 Helpers.checkColorScheme();
 
@@ -59,7 +60,6 @@ const Main = html`
 
 render(Main, document.body);
 
-Session.init();
 PeerManager.init();
 PublicMessages.init();
 
@@ -69,7 +69,6 @@ Helpers.showConsoleWarning();
 
 $(window).resize(() => { // if resizing up from mobile size menu view
   if ($(window).width() > 565 && $('.main-view:visible').length === 0) {
-    showNewChat();
     localState.get('activeRoute').put(null);
   }
 });

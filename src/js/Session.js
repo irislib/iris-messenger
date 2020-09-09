@@ -2,7 +2,6 @@ import {localState, publicState, showMenu} from './Main.js';
 import {chats, addChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
-import { translate as tr } from './Translation.js';
 import { route } from './lib/preact-router.es.js';
 
 let key;
@@ -13,23 +12,6 @@ let onlineTimeout;
 let areWeOnline;
 let activeRoute;
 let activeProfile;
-
-function newUserLogin() {
-  $('#login').show();
-  $('#login-form-name').focus();
-  $('#login-form').submit(function(e) {
-    e.preventDefault();
-    var name = $('#login-form-name').val();
-    if (name.length) {
-      $('#login').hide();
-      Gun.SEA.pair().then(k => {
-        login(k);
-        publicState.user().get('profile').get('name').put(name);
-        createChatLink();
-      });
-    }
-  });
-}
 
 function setOurOnlineStatus() {
   iris.Channel.setOnline(publicState, areWeOnline = true);
@@ -59,37 +41,14 @@ function setOurOnlineStatus() {
 function login(k) {
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
-  $('#login').hide();
   iris.Channel.initUser(publicState, key);
   Notifications.subscribeToWebPush();
   Notifications.getWebPushSubscriptions();
-  $('#my-chat-links').empty();
   iris.Channel.getMyChatLinks(publicState, key, undefined, chatLink => {
-    const row = $('<div>').addClass('flex-row');
-    const copyBtn = $('<button>').text(tr('copy')).width(100);
-    copyBtn.on('click', event => {
-      Helpers.copyToClipboard(chatLink.url);
-      var t = $(event.target);
-      var originalText = t.text();
-      t.text(tr('copied'));
-      setTimeout(() => {
-        t.text(originalText);
-      }, 2000);
-    });
-    const copyDiv = $('<div>').addClass('flex-cell no-flex').append(copyBtn);
-    row.append(copyDiv);
-    const input = $('<input>').attr('type', 'text').val(chatLink.url);
-    input.on('click', () => input.select());
-    row.append($('<div>').addClass('flex-cell').append(input));
-    const removeBtn = $('<button>').text(tr('remove'));
-    row.append($('<div>').addClass('flex-cell no-flex').append(removeBtn));
-    $('#my-chat-links').append(row);
-    setChatLinkQrCode(chatLink.url);
+    localState.get('chatLinks').get(key).put(chatLink);
     latestChatLink = chatLink.url;
   });
   $('#generate-chat-link').off().on('click', createChatLink);
-  $("#my-identicon").empty();
-  $("#my-identicon").append(Helpers.getIdenticon(key.pub, 40));
   $(".profile-link").attr('href', Helpers.getUserChatLink(key.pub)).off().on('click', e => {
     e.preventDefault();
     if (chats[key.pub]) {
@@ -133,7 +92,6 @@ function login(k) {
       $('#add-profile-photo').toggleClass('hidden', true);
     }
   });
-  setChatLinkQrCode();
   Notifications.init();
 
   localState.get('activeRoute').on(a => {
@@ -143,23 +101,8 @@ function login(k) {
   localState.get('activeProfile').on(a => activeProfile = a);
 }
 
-function setChatLinkQrCode(link) {
-  var qrCodeEl = $('#my-qr-code');
-  if (qrCodeEl.length === 0) { return; }
-  qrCodeEl.empty();
-  new QRCode(qrCodeEl[0], {
-    text: link || getMyChatLink(),
-    width: 320,
-    height: 320,
-    colorDark : "#000000",
-    colorLight : "#ffffff",
-    correctLevel : QRCode.CorrectLevel.H
-  });
-}
-
 async function createChatLink() {
   latestChatLink = await iris.Channel.createChatLink(publicState, key);
-  setChatLinkQrCode(latestChatLink);
 }
 
 function clearIndexedDB() {
@@ -198,8 +141,6 @@ function init() {
   var localStorageKey = localStorage.getItem('chatKeyPair');
   if (localStorageKey) {
     login(JSON.parse(localStorageKey));
-  } else {
-    newUserLogin();
   }
 }
 

@@ -1,8 +1,10 @@
 import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
-import {showNewChat, showChat} from '../Chat.js';
+import {showChat} from '../Chat.js';
 import ChatListItem from './ChatListItem.js';
+import Helpers from '../Helpers.js';
+import Session from '../Session.js';
 
 const pubMsgIcon = html`
 <svg
@@ -42,10 +44,10 @@ class SideBar extends Component {
       chats[id] = chat;
       limitedUpdate();
     });
+    $("#my-identicon").append(Helpers.getIdenticon(Session.getKey().pub, 40));
   }
 
   onNewChatClick() {
-    showNewChat();
     localState.get('activeRoute').put(null);
   }
 

@@ -37,7 +37,6 @@ class ChatListItem extends Component {
   }
 
   componentWillUnmount() {
-    console.log('chatlistitem unmount');
     this.eventListeners.forEach(e => e.off());
   }
 

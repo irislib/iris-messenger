@@ -95,6 +95,7 @@ class Profile extends Component {
     if (!pub) {
       return;
     }
+    const chat = chats[pub];
     resetView();
     sortedPublicMessages = [];
     localState.get('activeRoute').put('profile/' + pub);
@@ -106,7 +107,7 @@ class Profile extends Component {
     $('#profile').show();
     renderGroupParticipants(pub);
     renderInviteLinks(pub);
-    if (chats[pub] && !chats[pub].uuid) {
+    if (!(chat && chat.uuid)) {
       $('#profile-public-message-list').empty();
       $('#profile-public-messages').show();
       $('#profile .profile-photo').show();
@@ -118,18 +119,20 @@ class Profile extends Component {
     } else {
       $('#profile-public-messages').hide();
     }
-    $('#profile .profile-about').toggle(chats[pub] && chats[pub].about && chats[pub].about.length > 0);
+    $('#profile .profile-about').toggle(chat && chat.about && chat.about.length > 0);
     $('#profile .profile-about-content').empty();
-    $('#profile .profile-about-content').text(chats[pub] && chats[pub].about);
-    const link = chats[pub] && chats[pub].getSimpleLink();
+    $('#profile .profile-about-content').text(chat && chat.about);
+    const link = chat && chat.getSimpleLink();
     $('#profile .add-friend').off().on('click', () => {
       console.log('add friend');
     });
     $('#profile .delete-chat').off().on('click', () => deleteChat(pub));
-    $("input[name=notificationPreference][value=" + chats[pub].notificationSetting + "]").attr('checked', 'checked');
-    $('input:radio[name=notificationPreference]').off().on('change', (event) => {
-      chats[pub].put('notificationSetting', event.target.value);
-    });
+    if (chat) {
+      $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
+      $('input:radio[name=notificationPreference]').off().on('change', (event) => {
+        chat.put('notificationSetting', event.target.value);
+      });
+    }
     $('#profile .show-settings').off().on('click', () => $('#chat-settings').toggle());
     $('#profile .show-qr-code').off().on('click', () => $('#profile-page-qr').toggle());
     $('#profile .send-message').off().on('click', () => showChat(pub));
@@ -145,18 +148,18 @@ class Profile extends Component {
         tgt.css('width', '');
       }, 2000);
     });
-    $('#profile-group-name').not(':focus').val(chats[pub] && chats[pub].name);
+    $('#profile-group-name').not(':focus').val(chat && chat.name);
     $('#profile-group-name').off().on('input', event => {
       var name = event.target.value;
-      chats[pub].put('name', name);
+      chat.put('name', name);
     });
     $('.profile-nicknames').toggle(pub !== Session.getKey().pub);
-    $('#profile-nickname-my-container').toggle(!chats[pub].uuid);
-    $('#profile-nickname-their').not(':focus').val(chats[pub] && chats[pub].theirNickname);
-    $('#profile-nickname-my').text(chats[pub] && chats[pub].myNickname && chats[pub].myNickname.length ? chats[pub].myNickname : '');
+    $('#profile-nickname-my-container').toggle(!(chat && chat.uuid));
+    $('#profile-nickname-their').not(':focus').val(chat && chat.theirNickname);
+    $('#profile-nickname-my').text(chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : '');
     $('#profile-nickname-their').off().on('input', event => {
       var nick = event.target.value;
-      chats[pub].put('nickname', nick);
+      chat.put('nickname', nick);
     });
     qrCodeEl.empty();
     new QRCode(qrCodeEl[0], {
@@ -167,10 +170,10 @@ class Profile extends Component {
       colorLight : "#ffffff",
       correctLevel : QRCode.CorrectLevel.H
     });
-    if (chats[pub] && chats[pub].uuid) {
-      renderGroupPhotoSettings(chats[pub].uuid);
+    if (chat && chat.uuid) {
+      renderGroupPhotoSettings(chat.uuid);
       $('#profile .profile-photo-container').show();
-      Helpers.setImgSrc($('#profile .profile-photo'), chats[pub].photo);
+      Helpers.setImgSrc($('#profile .profile-photo'), chat.photo);
     }
     $('#profile-create-invite-link').click(onCreateInviteLink);
     $('#profile-add-participant').on('input', onProfileAddParticipantInput);

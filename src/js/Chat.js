@@ -80,13 +80,12 @@ function addChat(chat) {
   chat.identicon = Helpers.getIdenticon(pub, 49);
   chat.onTheir('nickname', (nick) => {
     chat.myNickname = nick;
-    $('#profile-nickname-my').text(nick && nick.length ? nick : '');
-    $('#profile-nickname-my-container').toggle(!!(nick && nick.length));
+    localState.get('chats').get(pub).get('myNickname').put(nick);
   });
   chat.onMy('nickname', (nick) => {
     chat.theirNickname = nick;
     if (pub !== Session.getKey().pub) {
-      el.find('.name').text(Helpers.truncateString(getDisplayName(pub), 20));
+      localState.get('chats').get(pub).get('theirNickname').put(nick);
     }
   });
   chat.notificationSetting = 'all';
@@ -225,7 +224,7 @@ function getDisplayName(pub) {
       displayName = displayName + ' (' + chat.name + ')';
     }
   } else {
-    displayName = chat.name;
+    displayName = chat ? chat.name : '';
   }
   return displayName || '';
 }
@@ -258,10 +257,6 @@ function processMessage(chatId, msg, info) {
 
 function showNewChat() {
   resetView();
-  $('#new-chat').show();
-  $('#show-my-qr-btn').off().click(() => {
-    $('#my-qr-code').toggle()
-  })
 }
 
 export { showChat, chats, addChat, deleteChat, showNewChat, newChat, processMessage, getDisplayName };
