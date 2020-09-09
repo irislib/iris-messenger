@@ -677,15 +677,15 @@ small {
   text-decoration: underline;
 }
 
-#current-profile-photo {
+.picker.profile-photo {
   cursor: pointer;
 }
 
-#current-profile-photo:hover {
+.picker.profile-photo:hover {
   opacity: 0.8;
 }
 
-#current-profile-photo {
+.picker.profile-photo {
   max-height: 400px;
 }
 

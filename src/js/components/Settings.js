@@ -34,7 +34,7 @@ class Settings extends Component {
           ${t('profile_photo')}:
         </p>
         <div id="profile-photo-settings">
-          <${ProfilePhotoPicker} callback=${src => this.onProfilePhotoSet(src)}/>
+          <${ProfilePhotoPicker} currentPhoto=${Session.getMyProfilePhoto()} callback=${src => this.onProfilePhotoSet(src)}/>
         </div>
         <p>${t('about_text')}:</p>
         <p>

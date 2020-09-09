@@ -80,10 +80,10 @@ class ProfilePhotoPicker extends Component {
   }
 
   render() {
-    const photo = Session.getMyProfilePhoto();
-    if (photo) {
+    const photo = this.props.currentPhoto;
+    if (photo && photo.indexOf('data:image') === 0) {
       return html`
-        <img id="current-profile-photo" onClick=${() => clickProfilePhotoInput()}/>
+        <img class="picker profile-photo" src=${photo} onClick=${() => clickProfilePhotoInput()}/>
         <p>
           <button id="remove-profile-photo" onClick=${() => removeProfilePhotoClicked()} class="hidden">${t('remove_photo')}</button>
           <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" onChange=${e => onProfilePhotoInputChange(e)} accept="image/*"/>
@@ -108,10 +108,6 @@ class ProfilePhotoPicker extends Component {
         </p>
       `;
     }
-  }
-
-  componentDidMount() {
-    Helpers.setImgSrc($('#current-profile-photo'), Session.getMyProfilePhoto());
   }
 }
 

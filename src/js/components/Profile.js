@@ -23,8 +23,9 @@ class Profile extends Component {
       <div class="content">
         <div class="profile-header">
           <div class="profile-photo-container">
-            <img class="profile-photo"/>
-            <${ProfilePhotoPicker} callback=${src => this.onProfilePhotoSet(src)}/>
+            ${this.props.id === Session.getKey().pub ?
+              html`<${ProfilePhotoPicker} currentPhoto=${Session.getMyProfilePhoto()} callback=${src => this.onProfilePhotoSet(src)}/>` :
+              html`<img class="profile-photo"/>`}
           </div>
           <div class="profile-header-stuff">
             <div class="profile-actions">
