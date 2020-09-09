@@ -94,7 +94,7 @@ class ChatView extends Component {
   async onMsgFormSubmit(event) {
     const chat = chats[this.activeChat];
     event.preventDefault();
-    chat.msgDraft = null;
+    localState.get('chats').get(this.activeChat).get('msgDraft').put(null);
     const text = $('#new-msg').val();
     if (!text.length && !chat.attachments) { return; }
     chat.setTyping(false);
@@ -165,7 +165,7 @@ class ChatView extends Component {
     }, 200);
     chats[pub].getMessages((msg, info) => {
       processMessage(pub, msg, info);
-      if (activeRoute === pub) {
+      if (activeRoute.replace('chat/', '') === pub) {
         debouncedUpdate();
       }
     });
@@ -215,14 +215,13 @@ class ChatView extends Component {
       setTyping();
     }
     this.isTyping = getIsTyping();
-    chats[this.activeChat].msgDraft = $(event.target).val();
+    localState.get('chats').get(this.activeChat).get('msgDraft').put($(event.target).val());
   }
 
   componentDidUpdate() {
     const chat = chats[this.activeChat];
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
-    $('#new-msg').val(chat && chat.msgDraft);
     if (!iris.util.isMobile) {
       $("#new-msg").focus();
     }
@@ -233,6 +232,7 @@ class ChatView extends Component {
         $('#not-seen-by-them').slideDown();
       }
     }
+    localState.get('chats').get(this.activeChat).get('msgDraft').once(m => $('#new-msg').val(m));
   }
 
   render() {
