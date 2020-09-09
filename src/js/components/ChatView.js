@@ -25,6 +25,19 @@ const caretDownSvg = html`
 </svg>
 `;
 
+function copyMyChatLinkClicked(e) {
+  Helpers.copyToClipboard(Session.getMyChatLink());
+  var te = $(e.target);
+  var originalText = te.text();
+  var originalWidth = te.width();
+  te.width(originalWidth);
+  te.text(t('copied'));
+  setTimeout(() => {
+    te.text(originalText);
+    te.css('width', '');
+  }, 2000);
+}
+
 const subscribedToMsgs = {};
 
 class ChatView extends Component {
@@ -275,7 +288,7 @@ class ChatView extends Component {
       </div>
       <div id="not-seen-by-them" style="display: none">
         <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
-        <p><button onClick=${e => Session.copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
+        <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
       </div>
       <div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
       <div class="message-form">

@@ -239,7 +239,7 @@ function processMessage(chatId, msg, info) {
   chat.sortedMessages.push(msg);
   if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
     if (activeRoute !== chatId || document.visibilityState !== 'visible') {
-      Notifications.changeChatUnseenCount(chatId, 1);
+      Notifications.changeChatUnseenCount(chat, 1);
     }
   }
   if (!info.selfAuthored && msg.timeStr > chat.theirMsgsLastSeenTime) {

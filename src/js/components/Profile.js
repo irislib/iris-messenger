@@ -23,7 +23,7 @@ class Profile extends Component {
       <div class="content">
         <div class="profile-header">
           <div class="profile-photo-container">
-            ${this.props.id === Session.getKey().pub ?
+            ${this.props.id === (Session.getKey() && Session.getKey().pub) ?
               html`<${ProfilePhotoPicker} currentPhoto=${Session.getMyProfilePhoto()} callback=${src => this.onProfilePhotoSet(src)}/>` :
               html`<img class="profile-photo"/>`}
           </div>
@@ -160,7 +160,7 @@ class Profile extends Component {
       var name = event.target.value;
       chat.put('name', name);
     });
-    $('.profile-nicknames').toggle(pub !== Session.getKey().pub);
+    $('.profile-nicknames').toggle(pub !== (Session.getKey() && Session.getKey().pub));
     $('#profile-nickname-my-container').toggle(!(chat && chat.uuid));
     $('#profile-nickname-their').not(':focus').val(chat && chat.theirNickname);
     $('#profile-nickname-my').text(chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : '');

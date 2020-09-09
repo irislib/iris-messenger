@@ -30,14 +30,14 @@ class SideBar extends Component {
 
   componentDidMount() {
     const chats = {};
-    const limitedUpdate = _.throttle(() => {
+    const limitedUpdate = _.debounce(() => {
       const sortedChats = Object.values(chats)
         .sort((a, b) => {
           if (b.latestTime === undefined || a.latestTime > b.latestTime) return -1;
           return 1;
         });
       this.setState({chats: sortedChats});
-    }, 2000);
+    }, 500);
     localState.get('activeRoute').on(activeRoute => this.setState({activeRoute}));
     localState.get('chats').map().on((chat, id) => {
       chat.id = id;
@@ -49,7 +49,9 @@ class SideBar extends Component {
         $('.user-info .user-name').text(name);
       }
     });
-    $("#my-identicon").append(Helpers.getIdenticon(Session.getKey().pub, 40));
+    if (Session.getKey()) {
+      $("#my-identicon").append(Helpers.getIdenticon(Session.getKey().pub, 40));
+    }
   }
 
   onNewChatClick() {

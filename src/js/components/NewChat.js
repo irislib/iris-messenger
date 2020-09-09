@@ -47,19 +47,6 @@ function onPasteChatLink(event) {
   $(event.target).val('');
 }
 
-function copyMyChatLinkClicked(e) {
-  Helpers.copyToClipboard(Session.getMyChatLink());
-  var te = $(e.target);
-  var originalText = te.text();
-  var originalWidth = te.width();
-  te.width(originalWidth);
-  te.text(t('copied'));
-  setTimeout(() => {
-    te.text(originalText);
-    te.css('width', '');
-  }, 2000);
-}
-
 function setChatLinkQrCode(link) {
   var qrCodeEl = $('#my-qr-code');
   if (qrCodeEl.length === 0) { return; }
@@ -72,6 +59,19 @@ function setChatLinkQrCode(link) {
     colorLight : "#ffffff",
     correctLevel : QRCode.CorrectLevel.H
   });
+}
+
+function copyMyChatLinkClicked(e) {
+  Helpers.copyToClipboard(Session.getMyChatLink());
+  var te = $(e.target);
+  var originalText = te.text();
+  var originalWidth = te.width();
+  te.width(originalWidth);
+  te.text(t('copied'));
+  setTimeout(() => {
+    te.text(originalText);
+    te.css('width', '');
+  }, 2000);
 }
 
 class NewChat extends Component {

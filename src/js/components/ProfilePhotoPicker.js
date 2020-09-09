@@ -3,7 +3,7 @@ import {html} from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import {chats} from '../Chat.js';
 import {publicState} from '../Main.js';
-import Session, {activeProfile} from '../Session.js';
+import {activeProfile} from '../Session.js';
 import Helpers from '../Helpers.js';
 
 var cropper;
