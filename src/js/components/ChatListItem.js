@@ -53,8 +53,6 @@ class ChatListItem extends Component {
     const hasUnseen = chat.unseen ? 'has-unseen' : '';
     const unseenEl = chat.unseen ? html`<span class="unseen">${chat.unseen}</span>` : '';
     const activity = ['online', 'active'].indexOf(chat.activity) > -1 ? chat.activity : '';
-    console.log(activity, chat.activity);
-
     const time = chat.latestTime && new Date(chat.latestTime);
     let latestTimeText = Helpers.getRelativeTimeText(time);
 

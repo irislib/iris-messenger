@@ -8478,6 +8478,10 @@
 
 
 	  Channel.setActivity = function setActivity(gun, activity) {
+	    if (gun.irisActivityStatus === activity) {
+	      return;
+	    }
+	    gun.irisActivityStatus = activity;
 	    clearInterval(gun.setActivityInterval);
 	    var update = function update() {
 	      gun.user().get('activity').put({ status: activity, time: new Date(Gun.state()).toISOString() });
@@ -8506,7 +8510,7 @@
 	      clearTimeout(timeout);
 	      var now = new Date(Gun.state());
 	      var activityDate = new Date(activity.time);
-	      var isActive = activityDate > now - 10 * 1000 && activityDate < now + 30 * 1000;
+	      var isActive = activityDate > new Date(now.getTime() - 10 * 1000) && activityDate < new Date(now.getTime() + 30 * 1000);
 	      callback({ isActive: isActive, lastActive: activity.time, status: activity.status });
 	      if (isActive) {
 	        timeout = setTimeout(function () {

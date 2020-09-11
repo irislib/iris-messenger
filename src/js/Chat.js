@@ -116,7 +116,6 @@ function addChat(chat) {
   });
   chat.online = {};
   iris.Channel.getActivity(publicState, pub, (activity) => {
-    console.log('got activity', activity);
     if (chat) {
       chatNode.put({theirLastActiveTime: activity && activity.lastActive, activity: activity && activity.isActive && activity.status});
       chat.activity = activity;
