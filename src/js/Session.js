@@ -36,6 +36,9 @@ function setOurOnlineStatus() {
       iris.Channel.setActivity(publicState, ourActivity = 'online');
     }
   });
+  window.addEventListener("beforeunload", () => {
+    iris.Channel.setActivity(publicState, ourActivity = null);
+  });
 }
 
 function login(k) {
