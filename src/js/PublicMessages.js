@@ -31,7 +31,7 @@ function getMessages(cb, pub) {
     if (typeof hash === 'string' && seen.indexOf(time) === -1) {
       seen.push(time);
       const msg = await getMessageByHash(hash);
-      cb(msg.signedData, {selfAuthored: pub === Session.getKey().pub, from: msg.signerKeyHash});
+      cb(msg.signedData, {hash, selfAuthored: pub === Session.getKey().pub, from: msg.signerKeyHash});
     }
   });
 }
@@ -55,4 +55,4 @@ function init() {
   addChat(pub);
 }
 
-export default {init, getMessages};
+export default {init, getMessages, getMessageByHash};

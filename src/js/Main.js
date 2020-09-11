@@ -19,6 +19,7 @@ import Login from './components/Login.js';
 import SideBar from './components/SideBar.js';
 import Profile from './components/Profile.js';
 import Header from './components/Header.js';
+import MessageView from './components/MessageView.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
@@ -53,6 +54,7 @@ const Main = html`
       <${Router} history=${createHashHistory()}>
         <${NewChat} path="/"/>
         <${ChatView} path="/chat/:id"/>
+        <${MessageView} path="/message/:hash"/>
         <${Settings} path="/settings"/>
         <${LogoutConfirmation} path="/logout"/>
         <${Profile.Profile} path="/profile/:id"/>

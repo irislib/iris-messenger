@@ -92,8 +92,9 @@ class Message extends Component {
     if (++this.i > 1) console.log(this.i);
     let name, color;
     const chatId = this.props.chatId;
-    if (chats[chatId].uuid && !this.props.info.selfAuthored) {
-      const profile = chats[chatId].participantProfiles[this.props.info.from];
+    const chat = chats[chatId];
+    if (chat && chat.uuid && !this.props.info.selfAuthored) {
+      const profile = chat.participantProfiles[this.props.info.from];
       name = profile && profile.name;
       color = profile && profile.color;
     }
@@ -105,9 +106,8 @@ class Message extends Component {
     const innerHTML = autolinker.link(h);
     const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
 
-    const chat = chats[chatId];
-    const seen = chat.theirMsgsLastSeenDate >= time ? 'seen' : '';
-    const delivered = chat.online && chat.online.lastActive && new Date(chat.online.lastActive) >= time ? 'delivered' : '';
+    const seen = chat && chat.theirMsgsLastSeenDate >= time ? 'seen' : '';
+    const delivered = chat && chat.online && chat.online.lastActive && new Date(chat.online.lastActive) >= time ? 'delivered' : '';
     const whose = this.props.selfAuthored ? 'our' : 'their';
 
     return html`
@@ -120,7 +120,7 @@ class Message extends Component {
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }}>
           </div>
           <div class="time">
-            ${this.props.public ? Helpers.getRelativeTimeText(time) : iris.util.formatTime(time)}
+            ${this.props.info && this.props.info.hash ? html`<a href="/message/${encodeURIComponent(this.props.info.hash)}">${Helpers.getRelativeTimeText(time)}</a>` : iris.util.formatTime(time)}
             ${this.props.selfAuthored && seenIndicator}
           </div>
         </div>
