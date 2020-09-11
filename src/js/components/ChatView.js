@@ -77,7 +77,7 @@ class ChatView extends Component {
   async webPush(msg) {
     const chat = chats[this.activeChat];
     const myKey = Session.getKey();
-    const shouldWebPush = (activeRoute === myKey.pub) || !(chat.online && chat.online.isOnline);
+    const shouldWebPush = (activeRoute === myKey.pub) || !(chat.activity);
     if (shouldWebPush && chat.webPushSubscriptions) {
       const subscriptions = [];
       const participants = Object.keys(chat.webPushSubscriptions);

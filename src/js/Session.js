@@ -9,31 +9,31 @@ let myName;
 let myProfilePhoto;
 let latestChatLink;
 let onlineTimeout;
-let areWeOnline;
+let ourActivity;
 let activeRoute;
 let activeProfile;
 
 function setOurOnlineStatus() {
-  iris.Channel.setOnline(publicState, areWeOnline = true);
+  iris.Channel.setActivity(publicState, ourActivity = 'active');
   document.addEventListener("mousemove", () => {
     const chat = activeRoute && chats[activeRoute.replace('profile/','').replace('chat/','')];
-    if (chat && !areWeOnline) {
+    if (chat && !ourActivity) {
       chat.setMyMsgsLastSeenTime();
     }
-    iris.Channel.setOnline(publicState, areWeOnline = true);
+    iris.Channel.setActivity(publicState, ourActivity = 'active');
     clearTimeout(onlineTimeout);
-    onlineTimeout = setTimeout(() => iris.Channel.setOnline(publicState, areWeOnline = false), 60000);
+    onlineTimeout = setTimeout(() => iris.Channel.setActivity(publicState, ourActivity = 'online'), 60000);
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
-      iris.Channel.setOnline(publicState, areWeOnline = true);
+      iris.Channel.setActivity(publicState, ourActivity = 'active');
       const chat = activeRoute && chats[activeRoute.replace('profile/','').replace('chat/','')];
       if (chat) {
         chat.setMyMsgsLastSeenTime();
         Notifications.changeChatUnseenCount(chat, 0);
       }
     } else {
-      iris.Channel.setOnline(publicState, areWeOnline = false);
+      iris.Channel.setActivity(publicState, ourActivity = 'online');
     }
   });
 }
@@ -132,4 +132,4 @@ function init() {
 
 
 export {activeRoute, activeProfile};
-export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, areWeOnline, login, logOut };
+export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut };

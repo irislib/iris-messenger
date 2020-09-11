@@ -28,12 +28,12 @@ class Header extends Component {
 
   getOnlineStatusText() {
     const chat = chats[this.chatId];
-    const online = chat && chat.online;
-    if (online) {
-      if (online.isOnline) {
+    const activity = chat && chat.activity;
+    if (activity) {
+      if (activity.isActive) {
         return(t('online'));
-      } else if (online.lastActive) {
-        const d = new Date(online.lastActive);
+      } else if (activity.lastActive) {
+        const d = new Date(activity.lastActive);
         let lastSeenText = t(iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
         if (lastSeenText === t('today')) {
           lastSeenText = iris.util.formatTime(d);

@@ -87,7 +87,7 @@ class SideBar extends Component {
         ${this.state.chats.filter(chat => chat.id !== 'public').map(chat =>
           html`<${ChatListItem}
             photo=${chat.photo}
-            active=${chat.id === this.state.activeRoute}
+            active=${chat.id === this.state.activeRoute.replace('chat/', '')}
             key=${chat.id}
             chat=${chat}/>`
           )

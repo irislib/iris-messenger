@@ -115,10 +115,11 @@ function addChat(chat) {
     localState.get('chats').get(pub).get('isTyping').put(isTyping);
   });
   chat.online = {};
-  iris.Channel.getOnline(publicState, pub, (online) => {
+  iris.Channel.getActivity(publicState, pub, (activity) => {
+    console.log('got activity', activity);
     if (chat) {
-      chatNode.put({theirLastActiveTime: online && online.lastActive, isOnline: online && online.isOnline});
-      chat.online = online;
+      chatNode.put({theirLastActiveTime: activity && activity.lastActive, activity: activity && activity.isActive && activity.status});
+      chat.activity = activity;
     }
   });
   function setName(name, from) {
