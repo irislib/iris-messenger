@@ -47,7 +47,7 @@ class ChatListItem extends Component {
 
   render() {
     const chat = this.props.chat;
-    const active = this.props.active ? "active" : "";
+    const active = this.props.active ? "active-item" : "";
     const seen = chat.theirMsgsLastSeenTime >= chat.latestTime ? "seen" : "";
     const delivered = chat.theirLastActiveTime >= chat.latestTime ? "delivered" : "";
     const hasUnseen = chat.unseen ? 'has-unseen' : '';

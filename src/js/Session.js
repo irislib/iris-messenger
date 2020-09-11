@@ -22,7 +22,7 @@ function setOurOnlineStatus() {
     }
     iris.Channel.setActivity(publicState, ourActivity = 'active');
     clearTimeout(onlineTimeout);
-    onlineTimeout = setTimeout(() => iris.Channel.setActivity(publicState, ourActivity = 'online'), 10000);
+    onlineTimeout = setTimeout(() => iris.Channel.setActivity(publicState, ourActivity = 'online'), 30000);
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {

@@ -590,7 +590,7 @@ small {
   color: var(--small-text-color);
 }
 
-.chat-item.active, .chat-item.active:hover {
+.chat-item.active-item, .chat-item.active-item:hover {
   background: var(--chat-active);
 }
 
@@ -739,7 +739,7 @@ small {
 }
 
 .chat-item .online-indicator {
-  display: none;
+  display: inline-block;
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -747,15 +747,14 @@ small {
   bottom: 10px;
   left: 50px;
   border: 3px solid var(--sidebar-bg);
+  background-color: #999999;
 }
 
 .chat-item.online .online-indicator, .chat-item.active .online-indicator {
-  display: inline-block;
-  background-color: yellow;
+  background-color: #f6a539;
 }
 
 .chat-item.active .online-indicator {
-  display: inline-block;
   background-color: #80bf5f;
 }
 
