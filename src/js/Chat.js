@@ -16,25 +16,12 @@ function showChat(pub) {
   }
 
   route('/chat/' + pub);
-
   resetView();
-  if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
-    newChat(pub);
-  }
-  $("#message-view").show();
-  if (!iris.util.isMobile) {
-    $("#new-msg").focus();
-  }
-  const chat = chats[pub];
-  Notifications.changeChatUnseenCount(chat, 0);
-  chat.setMyMsgsLastSeenTime();
-  Helpers.scrollToMessageListBottom();
-  chat.setMyMsgsLastSeenTime();
 }
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(publicState, Session.getKey(), pub);
-  if (activeRoute === pub) {
+  if (activeRoute === '/chat/' + pub) {
     showMenu();
   }
   delete chats[pub];
@@ -239,7 +226,7 @@ function processMessage(chatId, msg, info) {
   msg.time = new Date(msg.time);
   chat.sortedMessages.push(msg);
   if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
-    if (activeRoute !== chatId || document.visibilityState !== 'visible') {
+    if (activeRoute !== '/chat/' + chatId || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chat, 1);
     }
   }

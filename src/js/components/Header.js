@@ -107,7 +107,7 @@ class Header extends Component {
     } else if (activeRoute === '/logout') {
       title = t('log_out') + '?';
     } else if (activeRoute.length > 20) {
-      if (activeRoute === Session.getKey().pub) {
+      if (activeRoute === '/chat/' + Session.getKey().pub) {
         title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
       } else {
         title = getDisplayName(activeRoute.replace('/profile/', '').replace('/chat/', ''));

@@ -33,6 +33,7 @@ class SideBar extends Component {
     const chats = {};
     const limitedUpdate = _.throttle(() => {
       const sortedChats = Object.values(chats)
+        .filter(chat => !!chat)
         .sort((a, b) => {
           if (b.latestTime === undefined || a.latestTime > b.latestTime) return -1;
           return 1;

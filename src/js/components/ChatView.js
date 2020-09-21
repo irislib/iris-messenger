@@ -3,9 +3,10 @@ import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Message from './Message.js';
-import {chats, processMessage} from '../Chat.js';
+import {chats, processMessage, newChat} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
+import Notifications from '../Notifications.js';
 import {activeRoute} from '../Main.js';
 
 const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
@@ -45,22 +46,41 @@ class ChatView extends Component {
   constructor() {
     super();
     this.activeChat = null;
+    this.eventListeners = [];
   }
 
   componentDidMount() {
-    localState.get('activeRoute').on(activeRouteId => {
+    localState.get('activeRoute').on((activeRouteId, a, b, eve) => {
+      this.eventListeners.push(eve);
+      if (activeRouteId.indexOf('/chat/') !== 0 || !Session.getKey()) return;
       this.activeChat && chats[this.activeChat] && chats[this.activeChat].setTyping(false);
       this.activeChat = activeRouteId && activeRouteId.replace('/chat/', '');
       this.setState({});
+
+      const update = () => {
+        const chat = chats[this.activeChat];
+        if (!chat) return;
+        Notifications.changeChatUnseenCount(chat, 0);
+        chat.setMyMsgsLastSeenTime();
+        Helpers.scrollToMessageListBottom();
+        chat.setMyMsgsLastSeenTime();
+      }
+
       if (this.activeChat && (this.activeChat === 'public' || this.activeChat.length > 20) && !subscribedToMsgs[this.activeChat]) {
         const iv = setInterval(() => {
           if (chats[this.activeChat]) {
             clearInterval(iv);
             this.subscribeToMsgs(this.activeChat);
             this.setState({});
+          } else {
+            if (this.activeChat.length > 40) { // exclude UUIDs
+              newChat(this.activeChat);
+            }
           }
+          update();
         }, 1000);
         subscribedToMsgs[this.activeChat] = true;
+        update();
       }
     });
 
@@ -69,6 +89,14 @@ class ChatView extends Component {
       $('#new-msg').val($('#new-msg').val() + emoji);
       $('#new-msg').focus();
     });
+
+    if (!iris.util.isMobile) {
+      $("#new-msg").focus();
+    }
+  }
+
+  componentWillUnmount() {
+    this.eventListeners.forEach(e => e.off());
   }
 
   onEmojiButtonClick(event) {
@@ -79,7 +107,7 @@ class ChatView extends Component {
   async webPush(msg) {
     const chat = chats[this.activeChat];
     const myKey = Session.getKey();
-    const shouldWebPush = (activeRoute === myKey.pub) || !(chat.activity);
+    const shouldWebPush = (activeRoute === '/chat/' + myKey.pub) || !(chat.activity);
     if (shouldWebPush && chat.webPushSubscriptions) {
       const subscriptions = [];
       const participants = Object.keys(chat.webPushSubscriptions);
@@ -180,7 +208,7 @@ class ChatView extends Component {
     }, 200);
     chats[pub].getMessages((msg, info) => {
       processMessage(pub, msg, info);
-      if (activeRoute.replace('chat/', '') === pub) {
+      if (activeRoute.replace('/chat/', '') === pub) {
         debouncedUpdate();
       }
     });
@@ -241,7 +269,7 @@ class ChatView extends Component {
       $("#new-msg").focus();
     }
     if (chat) {
-      if (activeRoute === 'chat/public' || chat.theirMsgsLastSeenTime) {
+      if (activeRoute === '/chat/public' || chat.theirMsgsLastSeenTime) {
         $('#not-seen-by-them:visible').slideUp();
       } else if (!chat.uuid && $('.msg.our').length) {
         $('#not-seen-by-them').slideDown();
@@ -284,7 +312,7 @@ class ChatView extends Component {
     }
 
     return html`
-      <div class="main-view ${activeRoute === 'public' ? 'public-messages-view' : ''}" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
+      <div class="main-view ${activeRoute === '/chat/public' ? 'public-messages-view' : ''}" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
         <div id="message-list">${msgListContent}</div>
         <div id="attachment-preview" style="display:none"></div>
       </div>
