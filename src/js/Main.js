@@ -8,7 +8,6 @@ import { html } from './Helpers.js';
 import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
-import {chats} from './Chat.js';
 import PublicMessages from './PublicMessages.js';
 
 import Settings from './components/Settings.js';
@@ -54,7 +53,6 @@ function handleRoute(e) {
 
 class Main extends Component {
   componentDidMount() {
-    console.log(1);
     localState.get('loggedIn').on(loggedIn => this.setState({loggedIn}));
   }
 

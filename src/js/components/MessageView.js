@@ -2,6 +2,8 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import Message from './Message.js';
 import PublicMessages from '../PublicMessages.js';
+import {localState} from '../Main.js';
+
 
 class MessageView extends Component {
   constructor() {

@@ -20,7 +20,7 @@ function setOurOnlineStatus() {
     iris.Channel.setActivity(publicState, ourActivity = 'active'); // TODO: also on keypress
     clearTimeout(onlineTimeout);
     onlineTimeout = setTimeout(() => iris.Channel.setActivity(publicState, ourActivity = 'online'), 30000);
-  };
+  }
   document.addEventListener("mousemove", setActive);
   document.addEventListener("keypress", setActive);
   document.addEventListener("visibilitychange", () => {
