@@ -8482,13 +8482,18 @@
 	      return;
 	    }
 	    gun.irisActivityStatus = activity;
-	    clearInterval(gun.setActivityInterval);
+	    clearTimeout(gun.setActivityTimeout);
 	    var update = function update() {
 	      gun.user().get('activity').put({ status: activity, time: new Date(Gun.state()).toISOString() });
 	    };
 	    update();
 	    if (activity) {
-	      gun.setActivityInterval = setInterval(update, 3000);
+	      var _timerUpdate = function _timerUpdate() {
+	        update();
+	        gun.setActivityTimeout = setTimeout(_timerUpdate, 3000);
+	      };
+
+	      _timerUpdate();
 	    }
 	  };
 
