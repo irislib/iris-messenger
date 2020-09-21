@@ -1,6 +1,7 @@
 import { render } from './lib/preact.js';
 import { Router, route } from './lib/preact-router.es.js';
 import { createHashHistory } from './lib/history.production.min.js';
+import { Component } from './lib/preact.js';
 
 import Helpers from './Helpers.js';
 import { html } from './Helpers.js';
@@ -51,25 +52,36 @@ function handleRoute(e) {
   localState.get('activeRoute').put(activeRoute);
 }
 
-const Main = html`
-  <div id="main-content">
-    <${Login}/>
-    <${SideBar}/>
-    <section class="main">
-      <${Header}/>
-      <${Router} history=${createHashHistory()} onChange=${e => handleRoute(e)}>
-        <${NewChat} path="/"/>
-        <${ChatView} path="/chat/:id"/>
-        <${MessageView} path="/message/:hash"/>
-        <${Settings} path="/settings"/>
-        <${LogoutConfirmation} path="/logout"/>
-        <${Profile.Profile} path="/profile/:id"/>
-      </${Router}>
-    </section>
-  </div>
-`;
+class Main extends Component {
+  componentDidMount() {
+    console.log(1);
+    localState.get('loggedIn').on(loggedIn => this.setState({loggedIn}));
+  }
 
-render(Main, document.body);
+  render() {
+    const content = this.state.loggedIn ? html`
+      <${SideBar}/>
+      <section class="main">
+        <${Header}/>
+        <${Router} history=${createHashHistory()} onChange=${e => handleRoute(e)}>
+          <${NewChat} path="/"/>
+          <${ChatView} path="/chat/:id"/>
+          <${MessageView} path="/message/:hash"/>
+          <${Settings} path="/settings"/>
+          <${LogoutConfirmation} path="/logout"/>
+          <${Profile.Profile} path="/profile/:id"/>
+        </${Router}>
+      </section>
+    ` : html`<${Login}/>`;
+    return html`
+      <div id="main-content">
+        ${content}
+      </div>
+    `;
+  }
+}
+
+render(html`<${Main}/>`, document.body);
 
 $('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
 

@@ -81,6 +81,7 @@ function login(k) {
     myProfilePhoto = data;
   });
   Notifications.init();
+  localState.get('loggedIn').put(true);
 }
 
 async function createChatLink() {
