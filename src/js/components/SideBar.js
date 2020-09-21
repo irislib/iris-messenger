@@ -31,7 +31,7 @@ class SideBar extends Component {
 
   componentDidMount() {
     const chats = {};
-    const limitedUpdate = _.throttle(() => {
+    const limitedUpdate = _.debounce(() => {
       const sortedChats = Object.values(chats)
         .filter(chat => !!chat)
         .sort((a, b) => {
@@ -39,7 +39,7 @@ class SideBar extends Component {
           return 1;
         });
       this.setState({chats: sortedChats});
-    }, 2000);
+    }, 200);
     localState.get('activeRoute').on(activeRoute => this.setState({activeRoute}));
     localState.get('chats').map().on((chat, id) => {
       chat.id = id;

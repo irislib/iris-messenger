@@ -4,14 +4,27 @@ import Message from './Message.js';
 import PublicMessages from '../PublicMessages.js';
 
 class MessageView extends Component {
+  constructor() {
+    super();
+    this.eventListeners = [];
+  }
+
   componentDidMount() {
     if (this.props.hash) {
+      localState.get('msgFrom').put(null);
       PublicMessages.getMessageByHash(this.props.hash).then(msg => {
         const v = msg.signedData;
         v.info = {hash: this.props.hash};
         this.setState({msg: v});
+        if (v.author && v.author.keyID) {
+          localState.get('msgFrom').put(v.author.keyID);
+        }
       });
     }
+  }
+
+  componentWillUnmount() {
+    this.eventListeners.forEach(e => e.off());
   }
 
   render() {

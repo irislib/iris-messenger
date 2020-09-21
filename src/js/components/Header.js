@@ -51,8 +51,8 @@ class Header extends Component {
   }
 
   onClick() {
-    if (activeRoute && activeRoute.length > 20 && activeRoute.indexOf('/profile') !== 0) {
-      route('/profile/' + activeRoute.replace('/chat/', ''));
+    if (this.chatId) {
+      route('/profile/' + this.chatId);
     }
   }
 
@@ -70,7 +70,7 @@ class Header extends Component {
         $('#header-content').prepend($('<div class="identicon-container">').append(el));
       }
     }
-    $(this.base).css({cursor: chat ? 'pointer' : ''});
+    $(this.base).css({cursor: this.chatId ? 'pointer' : ''});
   }
 
   componentDidMount() {
@@ -78,7 +78,8 @@ class Header extends Component {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
       this.setState({});
-      this.chatId = activeRoute && activeRoute.indexOf('/chat/') === 0 ? activeRoute.replace('/chat/', '') : null;
+      const replaced = activeRoute.replace('/chat/', '').replace('/profile/', '');
+      this.chatId = replaced.length < activeRoute.length ? replaced : null;
       if (this.chatId) {
         localState.get('chats').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
           this.eventListeners.push(event);
@@ -89,6 +90,41 @@ class Header extends Component {
           this.setState({});
         });
       }
+
+      let title = '';
+      if (!activeRoute) {
+        title = t('new_chat');
+      } else if (activeRoute === '/chat/public') {
+        title = t('public_messages');
+      } else if (activeRoute === '/settings') {
+        title = t('settings');
+      } else if (activeRoute === '/logout') {
+        title = t('log_out') + '?';
+      } else if (activeRoute.indexOf('/chat/') === 0 || activeRoute.indexOf('/profile/') === 0) {
+        if (Session.getKey() && this.chatId === Session.getKey().pub) {
+          title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
+        } else {
+          title = getDisplayName(this.chatId);
+          if (!title && this.chatId.length > 40) {
+            publicState.user(this.chatId).get('profile').get('name').on((name, a, b, eve) => {
+              this.eventListeners.push(eve);
+              this.setState({title: name});
+            });
+          }
+        }
+      } else if (activeRoute.indexOf('/message/') === 0) {
+        localState.get('msgFrom').on((from, a, b, eve) => {
+          this.eventListeners.push(eve);
+          if (!from) return;
+          this.chatId = from;
+          console.log('from', from);
+          publicState.user(from).get('profile').get('name').on((name, a, b, eve) => {
+            this.eventListeners.push(eve);
+            this.setState({title: name});
+          });
+        })
+      }
+      this.setState({title});
     });
   }
 
@@ -97,22 +133,6 @@ class Header extends Component {
     const isTyping = chat && chat.isTyping;
     const participants = chat && chat.uuid && Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
-    let title;
-    if (!activeRoute) {
-      title = t('new_chat');
-    } else if (activeRoute === '/chat/public') {
-      title = t('public_messages');
-    } else if (activeRoute === '/settings') {
-      title = t('settings');
-    } else if (activeRoute === '/logout') {
-      title = t('log_out') + '?';
-    } else if (activeRoute.length > 20) {
-      if (activeRoute === '/chat/' + Session.getKey().pub) {
-        title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
-      } else {
-        title = getDisplayName(activeRoute.replace('/profile/', '').replace('/chat/', ''));
-      }
-    }
 
     return html`
     <header>
@@ -123,7 +143,7 @@ class Header extends Component {
       <div id="header-content" onClick="${e => this.onClick(e)}">
         <div class="text">
           <div class="name">
-            ${title}
+            ${this.state.title}
           </div>
           ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
           ${participants ? html`<small class="participants">${participants}</small>` : ''}
