@@ -2,8 +2,7 @@ import { Component } from '../lib/preact.js';
 import {html} from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import {chats} from '../Chat.js';
-import {publicState} from '../Main.js';
-import {activeProfile} from '../Session.js';
+import {publicState, activeProfile} from '../Main.js';
 import Helpers from '../Helpers.js';
 
 var cropper;

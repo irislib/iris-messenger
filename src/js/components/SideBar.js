@@ -5,6 +5,7 @@ import {showChat} from '../Chat.js';
 import ChatListItem from './ChatListItem.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
+import { route } from '../lib/preact-router.es.js';
 
 const pubMsgIcon = html`
 <svg
@@ -55,7 +56,7 @@ class SideBar extends Component {
   }
 
   onNewChatClick() {
-    localState.get('activeRoute').put(null);
+    route('/');
   }
 
   render() {
@@ -64,7 +65,7 @@ class SideBar extends Component {
       <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
     </div>`;
     return html`<section class="sidebar hidden-xs">
-      <div class="user-info" onClick=${() => localState.get('activeRoute').put('settings')}>
+      <div class="user-info" onClick=${() => route('/settings')}>
         <div id="my-identicon"></div>
         <div class="user-name"></div>
       </div>
@@ -73,11 +74,11 @@ class SideBar extends Component {
         <div><a>${t('turn_on_desktop_notifications')}</a></div>
       </div>
       <div class="chat-list">
-        <div class="chat-item public-messages ${this.state.activeRoute === 'chat/public' ? 'active-item' : ''}" onClick=${() => showChat('public')}>
+        <div class="chat-item public-messages ${this.state.activeRoute === '/chat/public' ? 'active-item' : ''}" onClick=${() => showChat('public')}>
           ${pubMsgIcon}
           ${t('public_messages')}
         </div>
-        <div class="chat-item new ${this.state.activeRoute === null ? 'active-item' : ''}" onClick=${() => this.onNewChatClick()}>
+        <div class="chat-item new ${this.state.activeRoute === '/' ? 'active-item' : ''}" onClick=${() => this.onNewChatClick()}>
           <svg class="svg-inline--fa fa-smile fa-w-16" style="margin-right:10px;margin-top:3px" x="0px" y="0px"
               viewBox="0 0 510 510">
             <path fill="currentColor" d="M459,0H51C22.95,0,0,22.95,0,51v459l102-102h357c28.05,0,51-22.95,51-51V51C510,22.95,487.05,0,459,0z M102,178.5h306v51 H102V178.5z M306,306H102v-51h204V306z M408,153H102v-51h306V153z"/>
@@ -87,7 +88,7 @@ class SideBar extends Component {
         ${this.state.chats.filter(chat => chat.id !== 'public').map(chat =>
           html`<${ChatListItem}
             photo=${chat.photo}
-            active=${chat.id === (this.state.activeRoute && this.state.activeRoute.replace('chat/', ''))}
+            active=${chat.id === (this.state.activeRoute && this.state.activeRoute.replace('/chat/', ''))}
             key=${chat.id}
             chat=${chat}/>`
           )

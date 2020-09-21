@@ -1,12 +1,12 @@
-import {publicState, localState, showMenu, resetView} from './Main.js';
+import {publicState, localState, showMenu, resetView, activeRoute, activeProfile} from './Main.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
-import {activeRoute, activeProfile} from './Session.js';
 import Profile from './components/Profile.js';
 import VideoCall from './VideoCall.js';
+import { route } from './lib/preact-router.es.js';
 
 const chats = window.chats = {};
 
@@ -15,8 +15,9 @@ function showChat(pub) {
     return;
   }
 
+  route('/chat/' + pub);
+
   resetView();
-  localState.get('activeRoute').put(`chat/${pub}`);
   if (!Object.prototype.hasOwnProperty.call(chats, pub)) {
     newChat(pub);
   }

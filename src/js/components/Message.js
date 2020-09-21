@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import {chats} from '../Chat.js';
-import {activeRoute} from '../Session.js';
+import {activeRoute} from '../Main.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;

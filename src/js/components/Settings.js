@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {publicState, localState} from '../Main.js';
+import {publicState} from '../Main.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import LanguageSelector from './LanguageSelector.js';
@@ -8,6 +8,7 @@ import {translate as t} from '../Translation.js';
 import PeerManager from '../PeerManager.js';
 import VideoCall from '../VideoCall.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
+import { route } from '../lib/preact-router.es.js';
 
 class Settings extends Component {
   constructor() {
@@ -46,7 +47,7 @@ class Settings extends Component {
           <b>${t('save_backup_of_privkey_first')}</b> ${t('otherwise_cant_log_in_again')}
         </p>
         <p>
-          <button onClick=${() => localState.get('activeRoute').put('logout')}>${t('log_out')}</button>
+          <button onClick=${() => route('/logout')}>${t('log_out')}</button>
         </p>
         <h4>${t('private_key')}</h4>
         <p dangerouslySetInnerHTML=${{ __html: t('private_key_warning') }} ></p>

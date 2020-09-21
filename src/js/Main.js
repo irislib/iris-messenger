@@ -1,5 +1,5 @@
 import { render } from './lib/preact.js';
-import { Router } from './lib/preact-router.es.js';
+import { Router, route } from './lib/preact-router.es.js';
 import { createHashHistory } from './lib/history.production.min.js';
 
 import Helpers from './Helpers.js';
@@ -7,7 +7,6 @@ import { html } from './Helpers.js';
 import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
-import {activeRoute} from './Session.js';
 import {chats} from './Chat.js';
 import PublicMessages from './PublicMessages.js';
 
@@ -32,6 +31,7 @@ if (!isElectron && ('serviceWorker' in navigator)) {
     });
   });
 }
+let activeRoute, activeProfile;
 
 Gun.log.off = true;
 var publicState = Gun({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity });
@@ -45,13 +45,19 @@ PublicMessages.init();
 
 Helpers.checkColorScheme();
 
+function handleRoute(e) {
+  activeRoute = e.url;
+  activeProfile = activeRoute.indexOf('/profile') === 0 ? activeRoute.replace('/profile/', '') : null;
+  localState.get('activeRoute').put(activeRoute);
+}
+
 const Main = html`
   <div id="main-content">
     <${Login}/>
     <${SideBar}/>
     <section class="main">
       <${Header}/>
-      <${Router} history=${createHashHistory()}>
+      <${Router} history=${createHashHistory()} onChange=${e => handleRoute(e)}>
         <${NewChat} path="/"/>
         <${ChatView} path="/chat/:id"/>
         <${MessageView} path="/message/:hash"/>
@@ -71,15 +77,11 @@ Helpers.showConsoleWarning();
 
 $(window).resize(() => { // if resizing up from mobile size menu view
   if ($(window).width() > 565 && $('.main-view:visible').length === 0) {
-    localState.get('activeRoute').put(null);
+    route('/');
   }
 });
 
 function resetView() {
-  localState.get('activeProfile').put(null);
-  if (activeRoute && chats[activeRoute]) {
-    chats[activeRoute].setTyping(false);
-  }
   showMenu(false);
   QRScanner.cleanupScanner();
 }
@@ -87,7 +89,6 @@ function resetView() {
 function showMenu(show = true) {
   $('.sidebar').toggleClass('hidden-xs', !show);
   $('.main').toggleClass('hidden-xs', show);
-  localState.get('activeRoute').put(null);
 }
 
-export {publicState, localState, showMenu, resetView};
+export {publicState, localState, showMenu, resetView, activeRoute, activeProfile};

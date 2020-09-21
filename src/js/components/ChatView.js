@@ -1,11 +1,12 @@
-import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
+import { Component } from '../lib/preact.js';
+import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Message from './Message.js';
 import {chats, processMessage} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
-import {activeRoute} from '../Session.js';
+import {activeRoute} from '../Main.js';
 
 const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
 
@@ -48,7 +49,8 @@ class ChatView extends Component {
 
   componentDidMount() {
     localState.get('activeRoute').on(activeRouteId => {
-      this.activeChat = activeRouteId && activeRouteId.replace('chat/', '');
+      this.activeChat && chats[this.activeChat] && chats[this.activeChat].setTyping(false);
+      this.activeChat = activeRouteId && activeRouteId.replace('/chat/', '');
       this.setState({});
       if (this.activeChat && (this.activeChat === 'public' || this.activeChat.length > 20) && !subscribedToMsgs[this.activeChat]) {
         const iv = setInterval(() => {

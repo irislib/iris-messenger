@@ -1,10 +1,10 @@
 import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import {chats, getDisplayName} from '../Chat.js';
-import {activeRoute} from '../Session.js';
 import { translate as t } from '../Translation.js';
-import {localState, resetView, showMenu} from '../Main.js';
+import {localState, resetView, showMenu, activeRoute} from '../Main.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
+import { route } from '../lib/preact-router.es.js';
 
 class Header extends Component {
   constructor() {
@@ -51,8 +51,8 @@ class Header extends Component {
   }
 
   onClick() {
-    if (activeRoute && activeRoute.length > 20 && activeRoute.indexOf('profile') !== 0) {
-      localState.get('activeRoute').put('profile/' + activeRoute.replace('chat/', ''));
+    if (activeRoute && activeRoute.length > 20 && activeRoute.indexOf('/profile') !== 0) {
+      route('/profile/' + activeRoute.replace('/chat/', ''));
     }
   }
 
@@ -63,7 +63,7 @@ class Header extends Component {
       if (chat.photo) {
         const photo = Helpers.setImgSrc($('<img>'), chat.photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
         $('#header-content').prepend($('<div class="identicon-container">').append(photo));
-      } else if (activeRoute !== 'chat/public' && chat.identicon) {
+      } else if (activeRoute !== '/chat/public' && chat.identicon) {
         const el = chat.identicon.clone(); // TODO use actual identicon element to update in real-time. but unsubscribe on unmount.
         el.css({width:40, height:40});
         el.find('img').attr({width:40, height:40});
@@ -74,11 +74,11 @@ class Header extends Component {
   }
 
   componentDidMount() {
-    localState.get('activeRoute').on(chatId => {
+    localState.get('activeRoute').on(activeRoute => {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
       this.setState({});
-      this.chatId = chatId && chatId.indexOf('chat/') === 0 ? chatId.replace('chat/', '') : null;
+      this.chatId = activeRoute && activeRoute.indexOf('/chat/') === 0 ? activeRoute.replace('/chat/', '') : null;
       if (this.chatId) {
         localState.get('chats').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
           this.eventListeners.push(event);
@@ -100,17 +100,17 @@ class Header extends Component {
     let title;
     if (!activeRoute) {
       title = t('new_chat');
-    } else if (activeRoute === 'chat/public') {
+    } else if (activeRoute === '/chat/public') {
       title = t('public_messages');
-    } else if (activeRoute === 'settings') {
+    } else if (activeRoute === '/settings') {
       title = t('settings');
-    } else if (activeRoute === 'logout') {
+    } else if (activeRoute === '/logout') {
       title = t('log_out') + '?';
     } else if (activeRoute.length > 20) {
       if (activeRoute === Session.getKey().pub) {
         title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
       } else {
-        title = getDisplayName(activeRoute.replace('profile/', '').replace('chat/', ''));
+        title = getDisplayName(activeRoute.replace('/profile/', '').replace('/chat/', ''));
       }
     }
 

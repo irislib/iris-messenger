@@ -1,8 +1,7 @@
-import {localState, publicState, showMenu} from './Main.js';
+import {localState, publicState, showMenu, activeRoute} from './Main.js';
 import {chats, addChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
-import { route } from './lib/preact-router.es.js';
 
 let key;
 let myName;
@@ -10,8 +9,6 @@ let myProfilePhoto;
 let latestChatLink;
 let onlineTimeout;
 let ourActivity;
-let activeRoute;
-let activeProfile;
 
 function setOurOnlineStatus() {
   iris.Channel.setActivity(publicState, ourActivity = 'active');
@@ -82,12 +79,6 @@ function login(k) {
     myProfilePhoto = data;
   });
   Notifications.init();
-
-  localState.get('activeRoute').on(a => {
-    activeRoute = a;
-    route(`/${a ? a : ''}`);
-  });
-  localState.get('activeProfile').on(a => activeProfile = a);
 }
 
 async function createChatLink() {
@@ -133,6 +124,4 @@ function init() {
   }
 }
 
-
-export {activeRoute, activeProfile};
 export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut };

@@ -6,6 +6,7 @@ import Helpers from '../Helpers.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
 import { Component } from '../lib/preact.js';
+import { route } from '../lib/preact-router.es.js';
 
 function createGroupSubmit(e) {
   e.preventDefault();
@@ -18,7 +19,7 @@ function createGroupSubmit(e) {
     c.put('name', $('#new-group-name').val());
     $('#new-group-name').val('');
     addChat(c);
-    localState.get('activeRoute').put('profile/' + c.uuid);
+    route('/profile/' + c.uuid);
   }
 }
 
@@ -116,7 +117,7 @@ class NewChat extends Component {
     $('#generate-chat-link').off().on('click', Session.createChatLink);
     $(".profile-link").attr('href', Helpers.getUserChatLink(Session.getKey() && Session.getKey().pub)).off().on('click', e => {
       e.preventDefault();
-      localState.get('activeRoute').put('profile/' + Session.getKey().pub);
+      route('/profile/' + Session.getKey().pub);
     });
   }
 

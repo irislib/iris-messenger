@@ -2,15 +2,15 @@ import { Component } from '../lib/preact.js';
 import { render } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {localState, publicState, resetView} from '../Main.js';
+import {localState, publicState, resetView, activeProfile} from '../Main.js';
 import {chats, deleteChat, showChat} from '../Chat.js';
 import Session from '../Session.js';
-import {activeProfile} from '../Session.js';
 import Helpers from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
 import Message from './Message.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 //import VideoCall from './VideoCall.js';
+import { route } from '../lib/preact-router.es.js';
 
 class Profile extends Component {
   onProfilePhotoSet(src) {
@@ -105,7 +105,6 @@ class Profile extends Component {
     const chat = chats[pub];
     resetView();
     sortedPublicMessages = [];
-    localState.get('activeRoute').put('profile/' + pub);
     localState.get('activeProfile').put(pub);
     $('#profile .profile-photo-container').hide();
     var qrCodeEl = $('#profile-page-qr');
@@ -218,7 +217,7 @@ function renderGroupParticipants(pub) {
       el.append($('<small>').text(t('admin')).css({'margin-left': 5}));
     }
     el.click(() => {
-      k === Session.getKey().pub ? $(".user-info").click() : localState.get('activeRoute').put('profile/' + k);
+      route('/profile/' + k);
     });
     $('#profile-group-participants').append(el);
   });
