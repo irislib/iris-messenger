@@ -1,7 +1,6 @@
 import Helpers from './Helpers.js';
-import Profile from './components/Profile.js';
 import Session from './Session.js';
-import {chats, showChat} from './Chat.js';
+import {chats, showChat, getDisplayName} from './Chat.js';
 import {publicState, localState} from './Main.js';
 import { translate as t } from './Translation.js';
 
@@ -49,7 +48,7 @@ function notifyMsg(msg, info, pub) {
   if (shouldDesktopNotify()) {
     var body = chats[pub].uuid ? `${chats[pub].participantProfiles[info.from].name}: ${msg.text}` : msg.text;
     body = Helpers.truncateString(body, 50);
-    var desktopNotification = new Notification(Profile.getDisplayName(pub), {
+    var desktopNotification = new Notification(getDisplayName(pub), {
       icon: 'img/icon128.png',
       body,
       silent: true
@@ -72,16 +71,16 @@ function setUnseenTotal() {
   }
 }
 
-function changeChatUnseenCount(pub, change) {
-  const chatNode = localState.get('chats').get(pub);
+function changeChatUnseenCount(chat, change) {
+  const chatNode = localState.get('chats').get(chat.id);
   if (change) {
     unseenTotal += change;
-    chats[pub].unseen += change;
+    chat.unseen += change;
   } else {
-    unseenTotal = unseenTotal - (chats[pub].unseen || 0);
-    chats[pub].unseen = 0;
+    unseenTotal = unseenTotal - (chat.unseen || 0);
+    chat.unseen = 0;
   }
-  chatNode.get('unseen').put(chats[pub].unseen);
+  chatNode.get('unseen').put(chat.unseen);
   unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
   setUnseenTotal();
 }

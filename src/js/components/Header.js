@@ -1,16 +1,17 @@
-import { html, Component } from '../lib/htm.preact.js';
-import {chats, activeRoute} from '../Chat.js';
+import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
+import {chats, getDisplayName} from '../Chat.js';
 import { translate as t } from '../Translation.js';
-import {localState, resetView, showMenu} from '../Main.js';
+import {localState, resetView, showMenu, activeRoute, publicState} from '../Main.js';
 import Session from '../Session.js';
-import Profile from './Profile.js';
 import Helpers from '../Helpers.js';
+import { route } from '../lib/preact-router.es.js';
 
 class Header extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
     this.eventListeners = [];
+    this.chatId = null;
   }
 
     /* disabled for now because videochat is broken
@@ -26,13 +27,13 @@ class Header extends Component {
     }*/
 
   getOnlineStatusText() {
-    const chat = chats[activeRoute];
-    const online = chat && chat.online;
-    if (online) {
-      if (online.isOnline) {
+    const chat = chats[this.chatId];
+    const activity = chat && chat.activity;
+    if (activity) {
+      if (activity.isActive) {
         return(t('online'));
-      } else if (online.lastActive) {
-        const d = new Date(online.lastActive);
+      } else if (activity.lastActive) {
+        const d = new Date(activity.lastActive);
         let lastSeenText = t(iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
         if (lastSeenText === t('today')) {
           lastSeenText = iris.util.formatTime(d);
@@ -50,67 +51,88 @@ class Header extends Component {
   }
 
   onClick() {
-    if (activeRoute && activeRoute.length > 20 && activeRoute.indexOf('profile') !== 0) {
-      Profile.showProfile(activeRoute);
+    if (this.chatId) {
+      route('/profile/' + this.chatId);
     }
   }
 
   componentDidUpdate() {
     $('#header-content .identicon-container').remove();
-    const chat = chats[activeRoute];
+    const chat = chats[this.chatId];
     if (chat) {
       if (chat.photo) {
         const photo = Helpers.setImgSrc($('<img>'), chat.photo).attr('height', 40).attr('width', 40).css({'border-radius': '50%'});
         $('#header-content').prepend($('<div class="identicon-container">').append(photo));
-      } else if (activeRoute !== 'public' && chat.identicon) {
+      } else if (activeRoute !== '/chat/public' && chat.identicon) {
         const el = chat.identicon.clone(); // TODO use actual identicon element to update in real-time. but unsubscribe on unmount.
         el.css({width:40, height:40});
         el.find('img').attr({width:40, height:40});
         $('#header-content').prepend($('<div class="identicon-container">').append(el));
       }
     }
-    $(this.base).css({cursor: chat ? 'pointer' : ''});
+    $(this.base).css({cursor: this.chatId ? 'pointer' : ''});
   }
 
   componentDidMount() {
-    localState.get('activeRoute').on(chatId => {
+    localState.get('activeRoute').on(activeRoute => {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
       this.setState({});
-      if (chatId) {
-        localState.get('chats').get(chatId).get('isTyping').on((isTyping, a, b, event) => {
+      const replaced = activeRoute.replace('/chat/', '').replace('/profile/', '');
+      this.chatId = replaced.length < activeRoute.length ? replaced : null;
+      if (this.chatId) {
+        localState.get('chats').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
           this.eventListeners.push(event);
           this.setState({});
         });
-        localState.get('chats').get(chatId).get('theirLastActiveTime').on((t, a, b, event) => {
+        localState.get('chats').get(this.chatId).get('theirLastActiveTime').on((t, a, b, event) => {
           this.eventListeners.push(event);
           this.setState({});
         });
       }
+
+      let title = '';
+      if (!activeRoute) {
+        title = t('new_chat');
+      } else if (activeRoute === '/chat/public') {
+        title = t('public_messages');
+      } else if (activeRoute === '/settings') {
+        title = t('settings');
+      } else if (activeRoute === '/logout') {
+        title = t('log_out') + '?';
+      } else if (activeRoute.indexOf('/chat/') === 0 || activeRoute.indexOf('/profile/') === 0) {
+        if (Session.getKey() && this.chatId === Session.getKey().pub) {
+          title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
+        } else {
+          title = getDisplayName(this.chatId);
+          if (!title && this.chatId.length > 40) {
+            publicState.user(this.chatId).get('profile').get('name').on((name, a, b, eve) => {
+              this.eventListeners.push(eve);
+              this.setState({title: name});
+            });
+          }
+        }
+      } else if (activeRoute.indexOf('/message/') === 0) {
+        localState.get('msgFrom').on((from, a, b, eve) => {
+          this.eventListeners.push(eve);
+          if (!from) return;
+          this.chatId = from;
+          console.log('from', from);
+          publicState.user(from).get('profile').get('name').on((name, a, b, eve) => {
+            this.eventListeners.push(eve);
+            this.setState({title: name});
+          });
+        })
+      }
+      this.setState({title});
     });
   }
 
   render() {
-    const chat = chats[activeRoute];
+    const chat = chats[this.chatId];
     const isTyping = chat && chat.isTyping;
     const participants = chat && chat.uuid && Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
-    let title;
-    if (activeRoute === null || activeRoute === 'new') {
-      title = t('new_chat');
-    } else if (activeRoute === 'public') {
-      title = t('public_messages');
-    } else if (activeRoute === 'settings') {
-      title = t('settings');
-    } else if (activeRoute === 'logout') {
-      title = t('log_out') + '?';
-    } else if (activeRoute.length > 20) {
-      if (activeRoute === Session.getKey().pub) {
-        title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
-      } else {
-        title = Profile.getDisplayName(activeRoute.replace('profile/', ''));
-      }
-    }
 
     return html`
     <header>
@@ -121,7 +143,7 @@ class Header extends Component {
       <div id="header-content" onClick="${e => this.onClick(e)}">
         <div class="text">
           <div class="name">
-            ${title}
+            ${this.state.title}
           </div>
           ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
           ${participants ? html`<small class="participants">${participants}</small>` : ''}

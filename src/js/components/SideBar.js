@@ -1,8 +1,11 @@
-import { html, Component } from '../lib/htm.preact.js';
+import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
-import {localState} from '../Main.js';
-import {showNewChat, showChat} from '../Chat.js';
+import {localState, publicState} from '../Main.js';
+import {showChat} from '../Chat.js';
 import ChatListItem from './ChatListItem.js';
+import Helpers from '../Helpers.js';
+import Session from '../Session.js';
+import { route } from '../lib/preact-router.es.js';
 
 const pubMsgIcon = html`
 <svg
@@ -28,25 +31,33 @@ class SideBar extends Component {
 
   componentDidMount() {
     const chats = {};
-    const limitedUpdate = _.throttle(() => {
+    const limitedUpdate = _.debounce(() => {
       const sortedChats = Object.values(chats)
+        .filter(chat => !!chat)
         .sort((a, b) => {
           if (b.latestTime === undefined || a.latestTime > b.latestTime) return -1;
           return 1;
         });
       this.setState({chats: sortedChats});
-    }, 2000);
+    }, 200);
     localState.get('activeRoute').on(activeRoute => this.setState({activeRoute}));
     localState.get('chats').map().on((chat, id) => {
       chat.id = id;
       chats[id] = chat;
       limitedUpdate();
     });
+    publicState.user().get('profile').get('name').on(name => {
+      if (name && typeof name === 'string') {
+        $('.user-info .user-name').text(name);
+      }
+    });
+    if (Session.getKey()) {
+      $("#my-identicon").append(Helpers.getIdenticon(Session.getKey().pub, 40));
+    }
   }
 
   onNewChatClick() {
-    showNewChat();
-    localState.get('activeRoute').put('new');
+    route('/');
   }
 
   render() {
@@ -55,7 +66,7 @@ class SideBar extends Component {
       <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
     </div>`;
     return html`<section class="sidebar hidden-xs">
-      <div class="user-info">
+      <div class="user-info" onClick=${() => route('/settings')}>
         <div id="my-identicon"></div>
         <div class="user-name"></div>
       </div>
@@ -64,13 +75,13 @@ class SideBar extends Component {
         <div><a>${t('turn_on_desktop_notifications')}</a></div>
       </div>
       <div class="chat-list">
-        <div class="chat-item public-messages ${this.state.activeRoute === 'public' ? 'active' : ''}" onClick=${() => showChat('public')}>
+        <div class="chat-item public-messages ${this.state.activeRoute === '/chat/public' ? 'active-item' : ''}" onClick=${() => showChat('public')}>
           ${pubMsgIcon}
           ${t('public_messages')}
         </div>
-        <div class="chat-item new ${this.state.activeRoute === 'new' ? 'active' : ''}" onClick=${() => this.onNewChatClick()}>
-          <svg class="svg-inline--fa fa-smile fa-w-16" style="margin-right:10px;margin-top:3px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-              viewBox="0 0 510 510" xml:space="preserve">
+        <div class="chat-item new ${this.state.activeRoute === '/' ? 'active-item' : ''}" onClick=${() => this.onNewChatClick()}>
+          <svg class="svg-inline--fa fa-smile fa-w-16" style="margin-right:10px;margin-top:3px" x="0px" y="0px"
+              viewBox="0 0 510 510">
             <path fill="currentColor" d="M459,0H51C22.95,0,0,22.95,0,51v459l102-102h357c28.05,0,51-22.95,51-51V51C510,22.95,487.05,0,459,0z M102,178.5h306v51 H102V178.5z M306,306H102v-51h204V306z M408,153H102v-51h306V153z"/>
           </svg>
           ${t('new_chat')}
@@ -78,7 +89,7 @@ class SideBar extends Component {
         ${this.state.chats.filter(chat => chat.id !== 'public').map(chat =>
           html`<${ChatListItem}
             photo=${chat.photo}
-            active=${chat.id === this.state.activeRoute}
+            active=${chat.id === (this.state.activeRoute && this.state.activeRoute.replace('/chat/', ''))}
             key=${chat.id}
             chat=${chat}/>`
           )

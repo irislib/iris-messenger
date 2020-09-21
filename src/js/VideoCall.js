@@ -317,27 +317,26 @@ function isCalling() {
   return !!callingInterval;
 }
 
-function init() {
-  $('#rtc-config').val(JSON.stringify(RTC_CONFIG));
-  $('#rtc-config').change(() => {
-    try {
-      RTC_CONFIG = JSON.parse($('#rtc-config').val());
-      localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
-    } catch (e) {
-      // empty
-    }
-  });
-  $('#restore-default-rtc-config').click(() => {
-    RTC_CONFIG = DEFAULT_RTC_CONFIG;
+function getRTCConfig() {
+  return RTC_CONFIG;
+}
+
+function setRTCConfig(c) {
+  RTC_CONFIG = c;
+  try {
     localStorage.setItem('rtcConfig', JSON.stringify(RTC_CONFIG));
-    $('#rtc-config').val(JSON.stringify(RTC_CONFIG));
-  });
+  } catch (e) {
+    // empty
+  }
 }
 
 export default {
-  init,
   onCallMessage,
   callUser,
   stopCalling,
   isCalling,
+  RTC_CONFIG,
+  DEFAULT_RTC_CONFIG,
+  setRTCConfig,
+  getRTCConfig
 };

@@ -1,24 +1,38 @@
 import {addChat} from './Chat.js';
 import { translate as t } from './Translation.js';
 import {publicState} from './Main.js';
+import Session from './Session.js';
 
 let pub;
 
-function sendPublicMsg(msg) {
+async function sendPublicMsg(msg) {
   msg.time = new Date().toISOString();
-  publicState.user().get('msgs').get(msg.time).put(JSON.stringify(msg));
+  msg.type = 'post';
+  const signedMsg = await iris.SignedMessage.create(msg, Session.getKey());
+  const serialized = signedMsg.toString();
+  const hash = await iris.util.getHash(serialized);
+  publicState.get('#').get(hash).put(serialized);
+  publicState.user().get('msgs').get(msg.time).put(hash);
+}
+
+function getMessageByHash(hash) {
+  return new Promise(resolve => {
+    publicState.get('#').get(hash).on(async (serialized, a, b, event) => {
+      event.off();
+      const msg = await iris.SignedMessage.fromString(serialized);
+      resolve(msg);
+    });
+  });
 }
 
 function getMessages(cb, pub) {
   const seen = [];
-  publicState.user(pub).get('msgs').map().on((msg, time) => {
-    if (typeof msg === 'string') {
-      msg = JSON.parse(msg);
+  publicState.user(pub).get('msgs').map().on(async (hash, time) => {
+    if (typeof hash === 'string' && seen.indexOf(time) === -1) {
+      seen.push(time);
+      const msg = await getMessageByHash(hash);
+      cb(msg.signedData, {hash, selfAuthored: pub === Session.getKey().pub, from: msg.signerKeyHash});
     }
-    if (typeof msg !== 'object' || seen.indexOf(time) !== -1) { return; }
-    console.log(msg);
-    seen.push(time);
-    cb(msg, {selfAuthored: true, from: pub});
   });
 }
 
@@ -41,4 +55,4 @@ function init() {
   addChat(pub);
 }
 
-export default {init, getMessages};
+export default {init, getMessages, getMessageByHash};

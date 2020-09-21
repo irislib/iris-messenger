@@ -590,7 +590,7 @@ small {
   color: var(--small-text-color);
 }
 
-.chat-item.active, .chat-item.active:hover {
+.chat-item.active-item, .chat-item.active-item:hover {
   background: var(--chat-active);
 }
 
@@ -677,15 +677,15 @@ small {
   text-decoration: underline;
 }
 
-#current-profile-photo {
+.picker.profile-photo {
   cursor: pointer;
 }
 
-#current-profile-photo:hover {
+.picker.profile-photo:hover {
   opacity: 0.8;
 }
 
-#current-profile-photo {
+.picker.profile-photo {
   max-height: 400px;
 }
 
@@ -739,19 +739,23 @@ small {
 }
 
 .chat-item .online-indicator {
-  display: none;
+  display: inline-block;
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: #80bf5f;
   position: absolute;
   bottom: 10px;
   left: 50px;
   border: 3px solid var(--sidebar-bg);
+  background-color: #999999;
 }
 
-.chat-item.online .online-indicator {
-  display: inline-block;
+.chat-item.online .online-indicator, .chat-item.active .online-indicator {
+  background-color: #f6a539;
+}
+
+.chat-item.active .online-indicator {
+  background-color: #80bf5f;
 }
 
 .chat-item .typing-indicator {

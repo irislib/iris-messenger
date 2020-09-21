@@ -1,4 +1,5 @@
-import { html, Component } from '../lib/htm.preact.js';
+import { Component } from '../lib/preact.js';
+import { html } from '../Helpers.js';
 import {showChat} from '../Chat.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
@@ -6,7 +7,7 @@ import Session from '../Session.js';
 import Identicon from './Identicon.js';
 import Helpers from '../Helpers.js';
 
-const seenIndicator = html`<span class="seen-indicator"><svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
+const seenIndicator = html`<span class="seen-indicator"><svg viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
 
 class ChatListItem extends Component {
   constructor() {
@@ -36,7 +37,6 @@ class ChatListItem extends Component {
   }
 
   componentWillUnmount() {
-    console.log('chatlistitem unmount');
     this.eventListeners.forEach(e => e.off());
   }
 
@@ -47,13 +47,12 @@ class ChatListItem extends Component {
 
   render() {
     const chat = this.props.chat;
-    const active = this.props.active ? "active" : "";
+    const active = this.props.active ? "active-item" : "";
     const seen = chat.theirMsgsLastSeenTime >= chat.latestTime ? "seen" : "";
     const delivered = chat.theirLastActiveTime >= chat.latestTime ? "delivered" : "";
     const hasUnseen = chat.unseen ? 'has-unseen' : '';
     const unseenEl = chat.unseen ? html`<span class="unseen">${chat.unseen}</span>` : '';
-    const online = chat.isOnline ? 'online' : '';
-
+    const activity = ['online', 'active'].indexOf(chat.activity) > -1 ? chat.activity : '';
     const time = chat.latestTime && new Date(chat.latestTime);
     let latestTimeText = Helpers.getRelativeTimeText(time);
 
@@ -77,10 +76,12 @@ class ChatListItem extends Component {
 
     const typingIndicator = chat.isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : '';
 
+    const onlineIndicator = chat.id.length > 36 ? html`<div class="online-indicator"></div>` : '';
+
     return html`
-    <div class="chat-item ${online} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
+    <div class="chat-item ${activity} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
       ${iconEl}
-      <div class="online-indicator"></div>
+      ${onlineIndicator}
       <div class="text">
         <div>
           <span class="name">${name}</span>

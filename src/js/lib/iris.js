@@ -6411,7 +6411,7 @@
 	  };
 
 	  /**
-	  * @returns {string} JSON string of signature and public key
+	  * @returns {string}
 	  */
 
 
@@ -6424,7 +6424,7 @@
 	  };
 
 	  /**
-	  * @returns {Promise<SignedMessage>} message from JSON string produced by toString
+	  * @returns {Promise<SignedMessage>}
 	  */
 
 
@@ -8391,8 +8391,8 @@
 	      this.gun.user(pub).get('profile').get('name').on(function (name) {
 	        return nameEl.innerText = name;
 	      });
-	      Channel.getOnline(this.gun, pub, function (status) {
-	        var cls = 'iris-online-indicator' + (status.isOnline ? ' yes' : '');
+	      Channel.getActivity(this.gun, pub, function (status) {
+	        var cls = 'iris-online-indicator' + (status.isActive ? ' yes' : '');
 	        onlineIndicator.setAttribute('class', cls);
 	        var undelivered = messages.querySelectorAll('.iris-chat-message:not(.delivered)');
 	        undelivered.forEach(function (msg) {
@@ -8448,7 +8448,7 @@
 	    });
 
 	    textArea.addEventListener('keyup', function (event) {
-	      Channel.setOnline(_this18.gun, true); // TODO
+	      Channel.setActivity(_this18.gun, true); // TODO
 	      _this18.setMyMsgsLastSeenTime(); // TODO
 	      if (event.keyCode === 13) {
 	        event.preventDefault();
@@ -8471,25 +8471,24 @@
 	  };
 
 	  /**
-	  * Set the user's online status
+	  * Set the user's online/active status
 	  * @param {object} gun
-	  * @param {boolean} isOnline true: update the user's lastActive time every 3 seconds, false: stop updating
+	  * @param {string} activity string: set the activity status every 3 seconds, null/false: stop updating
 	  */
 
 
-	  Channel.setOnline = function setOnline(gun, isOnline) {
-	    if (isOnline) {
-	      if (gun.setOnlineInterval) {
-	        return;
-	      }
-	      var update = function update() {
-	        gun.user().get('lastActive').put(new Date(Gun.state()).toISOString());
-	      };
-	      update();
-	      gun.setOnlineInterval = setInterval(update, 3000);
-	    } else {
-	      clearInterval(gun.setOnlineInterval);
-	      gun.setOnlineInterval = undefined;
+	  Channel.setActivity = function setActivity(gun, activity) {
+	    if (gun.irisActivityStatus === activity) {
+	      return;
+	    }
+	    gun.irisActivityStatus = activity;
+	    clearInterval(gun.setActivityInterval);
+	    var update = function update() {
+	      gun.user().get('activity').put({ status: activity, time: new Date(Gun.state()).toISOString() });
+	    };
+	    update();
+	    if (activity) {
+	      gun.setActivityInterval = setInterval(update, 3000);
 	    }
 	  };
 
@@ -8502,22 +8501,20 @@
 	  */
 
 
-	  Channel.getOnline = function getOnline(gun, pubKey, callback) {
+	  Channel.getActivity = function getActivity(gun, pubKey, callback) {
 	    var timeout = void 0;
-	    gun.user(pubKey).get('lastActive').on(function (lastActive) {
+	    gun.user(pubKey).get('activity').on(function (activity) {
+	      if (!activity || !(activity.time && activity.status)) {
+	        return;
+	      }
 	      clearTimeout(timeout);
 	      var now = new Date(Gun.state());
-	      var lastActiveDate = new Date(lastActive);
-	      if (lastActiveDate.getFullYear() === 1970) {
-	        // lol, format changed from seconds to iso string
-	        lastActiveDate = new Date(lastActiveDate.getTime() * 1000);
-	        lastActive = lastActiveDate.toISOString();
-	      }
-	      var isOnline = lastActiveDate > now - 10 * 1000 && lastActive < now + 30 * 1000;
-	      callback({ isOnline: isOnline, lastActive: lastActive });
-	      if (isOnline) {
+	      var activityDate = new Date(activity.time);
+	      var isActive = activityDate > new Date(now.getTime() - 10 * 1000) && activityDate < new Date(now.getTime() + 30 * 1000);
+	      callback({ isActive: isActive, lastActive: activity.time, status: activity.status });
+	      if (isActive) {
 	        timeout = setTimeout(function () {
-	          return callback({ isOnline: false, lastActive: lastActive });
+	          return callback({ isOnline: false, lastActive: activity.time });
 	        }, 10000);
 	      }
 	    });
