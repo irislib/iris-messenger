@@ -12,15 +12,17 @@ let ourActivity;
 
 function setOurOnlineStatus() {
   iris.Channel.setActivity(publicState, ourActivity = 'active');
-  document.addEventListener("mousemove", () => {
+  function setActive() {
     const chat = activeRoute && chats[activeRoute.replace('profile/','').replace('chat/','')];
     if (chat && !ourActivity) {
       chat.setMyMsgsLastSeenTime();
     }
-    iris.Channel.setActivity(publicState, ourActivity = 'active');
+    iris.Channel.setActivity(publicState, ourActivity = 'active'); // TODO: also on keypress
     clearTimeout(onlineTimeout);
     onlineTimeout = setTimeout(() => iris.Channel.setActivity(publicState, ourActivity = 'online'), 30000);
-  });
+  };
+  document.addEventListener("mousemove", setActive);
+  document.addEventListener("keypress", setActive);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
       iris.Channel.setActivity(publicState, ourActivity = 'active');
