@@ -47,6 +47,9 @@ Helpers.checkColorScheme();
 
 function handleRoute(e) {
   activeRoute = e.url;
+  if (!activeRoute && window.location.hash) {
+    return route(window.location.hash.replace('#', '')); // bubblegum fix back navigation
+  }
   activeProfile = activeRoute.indexOf('/profile') === 0 ? activeRoute.replace('/profile/', '') : null;
   localState.get('activeRoute').put(activeRoute);
   showMenu(false);

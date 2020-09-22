@@ -15,6 +15,10 @@ async function sendPublicMsg(msg) {
   publicState.user().get('msgs').get(msg.time).put(hash);
 }
 
+function deletePublicMsg(timeStr) {
+  publicState.user().get('msgs').get(timeStr).put(null);
+}
+
 function getMessageByHash(hash) {
   return new Promise(resolve => {
     publicState.get('#').get(hash).on(async (serialized, a, b, event) => {
@@ -43,6 +47,7 @@ function init() {
     messages: {},
     getId: () => 'public',
     send: sendPublicMsg,
+    delete: deletePublicMsg,
     getMessages,
     onTheir: u,
     onMy: u,

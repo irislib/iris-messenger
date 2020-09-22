@@ -102,6 +102,8 @@ export default {
     call_ended: "Call ended",
     calling: "Calling",
     on_call_with: "On call with",
+    delete: 'Delete',
+    confirm_delete_msg: 'Delete message?'
   },
    "es": {
     language_name: "Español",

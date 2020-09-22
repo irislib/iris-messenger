@@ -2,6 +2,7 @@ import {localState, publicState, showMenu, activeRoute} from './Main.js';
 import {chats, addChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
+import { route } from './lib/preact-router.es.js';
 
 let key;
 let myName;
@@ -117,6 +118,7 @@ async function logOut() {
   }
   await clearIndexedDB();
   localStorage.clear();
+  route('/');
   location.reload();
 }
 
