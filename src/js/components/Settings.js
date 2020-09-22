@@ -17,7 +17,6 @@ class Settings extends Component {
   }
 
   onProfilePhotoSet(src) {
-    console.log('helo');
     publicState.user().get('profile').get('photo').put(src);
   }
 
