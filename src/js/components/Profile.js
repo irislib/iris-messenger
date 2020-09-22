@@ -97,6 +97,10 @@ class Profile extends Component {
     </div>`;
   }
 
+  componentDidUpdate() {
+    this.componentDidMount();
+  }
+
   componentDidMount() {
     const pub = this.props.id;
     if (!pub) {

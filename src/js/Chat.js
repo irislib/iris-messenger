@@ -171,7 +171,6 @@ function addChat(chat) {
       }
       if (activeProfile === pub) {
         Profile.renderGroupParticipants(pub);
-        Profile.renderGroupPhotoSettings(pub);
         Profile.renderInviteLinks(pub);
       }
     });
