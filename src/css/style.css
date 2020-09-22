@@ -241,6 +241,10 @@ header #back-button {
   cursor: pointer;
 }
 
+.public-messages-view .msg-content img {
+  max-height: 80vh;
+}
+
 .public-messages-view .msg {
   align-items: flex-start;
   margin-bottom: 15px;
