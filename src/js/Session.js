@@ -69,7 +69,7 @@ function login(k) {
     }
   } else {
     if (iris.util.isMobile) {
-      showMenu();
+      setTimeout(showMenu, 0); // too hacky?
     }
   }
   publicState.user().get('profile').get('name').on(name => {
