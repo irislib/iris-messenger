@@ -71,6 +71,7 @@ class ChatView extends Component {
           if (chats[this.activeChat]) {
             clearInterval(iv);
             this.subscribeToMsgs(this.activeChat);
+            chats[this.activeChat].sortedMessages.sort((a, b) => a.time - b.time);
             this.setState({});
           } else {
             if (this.activeChat.length > 40) { // exclude UUIDs
@@ -203,7 +204,7 @@ class ChatView extends Component {
   subscribeToMsgs(pub) {
     subscribedToMsgs[pub] = true;
     const debouncedUpdate = _.debounce(() => {
-      chats[pub].sortedMessages = chats[pub].sortedMessages.sort((a, b) => a.time - b.time);
+      chats[pub].sortedMessages.sort((a, b) => a.time - b.time);
       this.setState({});
     }, 200);
     chats[pub].getMessages((msg, info) => {
