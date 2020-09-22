@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import { render } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {localState, publicState, resetView, activeProfile} from '../Main.js';
+import {localState, publicState, activeProfile} from '../Main.js';
 import {chats, deleteChat, showChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
@@ -103,7 +103,6 @@ class Profile extends Component {
       return;
     }
     const chat = chats[pub];
-    resetView();
     sortedPublicMessages = [];
     localState.get('activeProfile').put(pub);
     $('#profile .profile-photo-container').hide();

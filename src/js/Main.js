@@ -49,6 +49,8 @@ function handleRoute(e) {
   activeRoute = e.url;
   activeProfile = activeRoute.indexOf('/profile') === 0 ? activeRoute.replace('/profile/', '') : null;
   localState.get('activeRoute').put(activeRoute);
+  showMenu(false);
+  QRScanner.cleanupScanner();
 }
 
 class Main extends Component {
@@ -91,14 +93,9 @@ $(window).resize(() => { // if resizing up from mobile size menu view
   }
 });
 
-function resetView() {
-  showMenu(false);
-  QRScanner.cleanupScanner();
-}
-
 function showMenu(show = true) {
   $('.sidebar').toggleClass('hidden-xs', !show);
   $('.main').toggleClass('hidden-xs', show);
 }
 
-export {publicState, localState, showMenu, resetView, activeRoute, activeProfile};
+export {publicState, localState, showMenu, activeRoute, activeProfile};

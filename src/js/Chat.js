@@ -1,4 +1,4 @@
-import {publicState, localState, showMenu, resetView, activeRoute, activeProfile} from './Main.js';
+import {publicState, localState, showMenu, activeRoute, activeProfile} from './Main.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
@@ -16,7 +16,6 @@ function showChat(pub) {
   }
 
   route('/chat/' + pub);
-  resetView();
 }
 
 function deleteChat(pub) {

@@ -1,5 +1,5 @@
 import { html } from '../Helpers.js';
-import { resetView, publicState } from '../Main.js';
+import { publicState } from '../Main.js';
 import { translate as t } from '../Translation.js';
 import LanguageSelector from './LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
@@ -20,7 +20,6 @@ function onPastePrivKey(event) {
 
 function showSwitchAccount(e) {
   e.preventDefault();
-  resetView();
   $('#create-account').hide();
   $('#existing-account-login').show();
   $('#paste-privkey').focus();
