@@ -39,6 +39,7 @@ textarea {
   border-radius: 6px;
   margin: 15px 0;
   background-color: var(--msg-content-background);
+  color: var(--text-color);
 }
 
 input, button, .button {
