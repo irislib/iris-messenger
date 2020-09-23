@@ -850,10 +850,10 @@ small {
   #profile {
     padding: 0;
   }
-  #profile .content, #message-view {
+  #profile .content, .public-messages-view#message-view {
     padding: 0;
   }
-  .public-messages-view .msg .msg-content {
+  .public-messages-view .msg .msg-content, textarea {
     border-radius: 0 !important;
   }
   #current-profile-photo {
