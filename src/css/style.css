@@ -68,38 +68,6 @@ img {
   max-height: 80vh;
 }
 
-@media (max-width: 575px) {
-  .hidden-xs {
-    display: none !important;
-  }
-  .visible-xs-block {
-    display: block !important;
-  }
-  .visible-xs-inline-block {
-    display: inline-block !important;
-  }
-  .visible-xs-flex {
-    display: flex;
-  }
-  #profile {
-    padding: 0;
-  }
-  #profile .content {
-    padding: 10px 15px;
-  }
-  #current-profile-photo {
-    max-width: none !important;
-    max-height: none !important;
-    width: 100%;
-  }
-}
-
-@media (min-width: 576px) {
-  .visible-xs-block, .visible-xs-inline-block, .visible-xs-flex {
-    display: none !important;
-  }
-}
-
 .hidden {
   display: none;
 }
@@ -239,6 +207,7 @@ header #back-button {
   max-height: 250px;
   max-width: 100%;
   cursor: pointer;
+
 }
 
 #profile {
@@ -853,5 +822,43 @@ small {
   .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+  }
+}
+
+@media (max-width: 575px) {
+  .hidden-xs {
+    display: none !important;
+  }
+  .visible-xs-block {
+    display: block !important;
+  }
+  .visible-xs-inline-block {
+    display: inline-block !important;
+  }
+  .visible-xs-flex {
+    display: flex;
+  }
+  #profile {
+    padding: 0;
+  }
+  #profile .content {
+    padding: 0;
+  }
+  .public-messages-view .msg .msg-content {
+    border-radius: 0 !important;
+  }
+  #current-profile-photo {
+    max-width: none !important;
+    max-height: none !important;
+    width: 100%;
+  }
+  .profile-top {
+    padding: 10px 15px;
+  }
+}
+
+@media (min-width: 576px) {
+  .visible-xs-block, .visible-xs-inline-block, .visible-xs-flex {
+    display: none !important;
   }
 }

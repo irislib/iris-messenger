@@ -25,72 +25,74 @@ class Profile extends Component {
     return html`
     <div class="main-view" id="profile">
       <div class="content">
-        <div class="profile-header">
-          <div class="profile-photo-container">
-            ${this.props.id === (Session.getKey() && Session.getKey().pub) ?
-              html`<${ProfilePhotoPicker} currentPhoto=${Session.getMyProfilePhoto()} callback=${src => this.onProfilePhotoSet(src)}/>` :
-              html`<img class="profile-photo"/>`}
-          </div>
-          <div class="profile-header-stuff">
-            <div class="profile-actions">
-              <button class="send-message">${t('send_message')}</button>
-              <button class="copy-user-link">${t('copy_link')}</button>
-              <button class="show-qr-code">${t('show_qr_code')}</button>
-              <button class="show-settings">${t('settings')}</button>
-              <!-- <button class="add-friend">${t('follow')}</button> -->
+        <div class="profile-top">
+          <div class="profile-header">
+            <div class="profile-photo-container">
+              ${this.props.id === (Session.getKey() && Session.getKey().pub) ?
+                html`<${ProfilePhotoPicker} currentPhoto=${Session.getMyProfilePhoto()} callback=${src => this.onProfilePhotoSet(src)}/>` :
+                html`<img class="profile-photo"/>`}
             </div>
-            <div class="profile-about hidden-xs" style="display:none">
-              <p class="profile-about-content"></p>
+            <div class="profile-header-stuff">
+              <div class="profile-actions">
+                <button class="send-message">${t('send_message')}</button>
+                <button class="copy-user-link">${t('copy_link')}</button>
+                <button class="show-qr-code">${t('show_qr_code')}</button>
+                <button class="show-settings">${t('settings')}</button>
+                <!-- <button class="add-friend">${t('follow')}</button> -->
+              </div>
+              <div class="profile-about hidden-xs" style="display:none">
+                <p class="profile-about-content"></p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="profile-about visible-xs-flex" style="display:none">
-          <p class="profile-about-content"></p>
-        </div>
-
-        <div id="profile-group-settings">
-          <div id="profile-group-name-container">${t('group_name')}: <input id="profile-group-name" placeholder="${t('group_name')}"/></div>
-          <p>${t('participants')}:</p>
-          <div id="profile-group-participants"></div>
-          <div id="profile-add-participant" style="display:none;">
-            <p>${t('add_participant')}:</p>
-            <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_chat_link')}"/></p>
+          <div class="profile-about visible-xs-flex" style="display:none">
+            <p class="profile-about-content"></p>
           </div>
-          <hr/>
-          <p>${t('invite_links')}</p>
-          <div id="profile-invite-links" class="flex-table"></div>
-          <p><button id="profile-create-invite-link">Create new invite link</button></p>
-          <hr/>
-        </div>
 
-        <p id="profile-page-qr" style="display:none" class="qr-container"></p>
-        <div id="chat-settings" style="display:none">
-          <hr/>
-          <h3>${t('chat_settings')}</h3>
-          <div class="profile-nicknames">
-            <h4>${t('nicknames')}</h4>
+          <div id="profile-group-settings">
+            <div id="profile-group-name-container">${t('group_name')}: <input id="profile-group-name" placeholder="${t('group_name')}"/></div>
+            <p>${t('participants')}:</p>
+            <div id="profile-group-participants"></div>
+            <div id="profile-add-participant" style="display:none;">
+              <p>${t('add_participant')}:</p>
+              <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_chat_link')}"/></p>
+            </div>
+            <hr/>
+            <p>${t('invite_links')}</p>
+            <div id="profile-invite-links" class="flex-table"></div>
+            <p><button id="profile-create-invite-link">Create new invite link</button></p>
+            <hr/>
+          </div>
+
+          <p id="profile-page-qr" style="display:none" class="qr-container"></p>
+          <div id="chat-settings" style="display:none">
+            <hr/>
+            <h3>${t('chat_settings')}</h3>
+            <div class="profile-nicknames">
+              <h4>${t('nicknames')}</h4>
+              <p>
+                ${t('nickname')}: <input id="profile-nickname-their"/>
+              </p>
+              <p id="profile-nickname-my-container">
+                ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
+              </p>
+            </div>
+            <div class="notification-settings">
+              <h4>${t('notifications')}</h4>
+              <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
+              <label for="notifyAll">${t('all_messages')}</label><br/>
+              <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
+              <label for="notifyMentionsOnly">${t('mentions_only')}</label><br/>
+              <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
+              <label for="notifyNothing">${t('nothing')}</label><br/>
+            </div>
+            <hr/>
             <p>
-              ${t('nickname')}: <input id="profile-nickname-their"/>
+              <button class="delete-chat">${t('delete_chat')}</button>
+              <!-- <button class="block-user">${t('block_user')}</button> -->
             </p>
-            <p id="profile-nickname-my-container">
-              ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
-            </p>
+            <hr/>
           </div>
-          <div class="notification-settings">
-            <h4>${t('notifications')}</h4>
-            <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
-            <label for="notifyAll">${t('all_messages')}</label><br/>
-            <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
-            <label for="notifyMentionsOnly">${t('mentions_only')}</label><br/>
-            <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
-            <label for="notifyNothing">${t('nothing')}</label><br/>
-          </div>
-          <hr/>
-          <p>
-            <button class="delete-chat">${t('delete_chat')}</button>
-            <!-- <button class="block-user">${t('block_user')}</button> -->
-          </p>
-          <hr/>
         </div>
         <div id="profile-public-messages">
           ${messageForm}
