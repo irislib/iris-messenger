@@ -18,6 +18,10 @@ class Profile extends Component {
     chats[activeProfile].put('photo', src);
   }
 
+  onAboutInput(e) {
+    publicState.user().get('profile').get('about').put($(e.target).text());
+  }
+
   render() {
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === this.props.id;
@@ -28,7 +32,7 @@ class Profile extends Component {
         <div class="profile-top">
           <div class="profile-header">
             <div class="profile-photo-container">
-              ${this.props.id === (Session.getKey() && Session.getKey().pub) ?
+              ${this.isMyProfile ?
                 html`<${ProfilePhotoPicker} currentPhoto=${Session.getMyProfilePhoto()} callback=${src => this.onProfilePhotoSet(src)}/>` :
                 html`<img class="profile-photo"/>`}
             </div>
@@ -41,12 +45,12 @@ class Profile extends Component {
                 <!-- <button class="add-friend">${t('follow')}</button> -->
               </div>
               <div class="profile-about hidden-xs" style="display:none">
-                <p class="profile-about-content"></p>
+                <p class="profile-about-content" contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}></p>
               </div>
             </div>
           </div>
           <div class="profile-about visible-xs-flex" style="display:none">
-            <p class="profile-about-content"></p>
+            <p class="profile-about-content" contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}></p>
           </div>
 
           <div id="profile-group-settings">

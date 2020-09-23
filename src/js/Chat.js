@@ -132,8 +132,7 @@ function addChat(chat) {
   function setAbout(about) {
     chat.about = about;
     if (activeProfile === pub) {
-      $('#profile .profile-about').toggle(about && about.length > 0);
-      $('#profile .profile-about-content').text(about);
+      $('#profile .profile-about-content:not(:focus)').text(about);
     }
   }
   function setGroupPhoto(photo, from) {
