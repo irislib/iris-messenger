@@ -841,7 +841,7 @@ small {
   #profile {
     padding: 0;
   }
-  #profile .content {
+  #profile .content, #message-view {
     padding: 0;
   }
   .public-messages-view .msg .msg-content {
