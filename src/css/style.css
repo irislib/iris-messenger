@@ -33,6 +33,7 @@ textarea {
   width: 100%;
   outline: none;
   font-family: inherit;
+  font-size: inherit;
   padding: 10px;
   border: 0;
   border-radius: 6px;

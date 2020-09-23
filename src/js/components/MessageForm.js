@@ -37,6 +37,8 @@ class MessageForm extends Component {
     chat.send(msg);
     this.closeAttachmentsPreview();
     $('#new-msg').val('');
+    const textarea = $('textarea#new-msg');
+    textarea && textarea.height("");
     this.webPush(msg);
   }
 
@@ -45,7 +47,15 @@ class MessageForm extends Component {
     this.picker.pickerVisible ? this.picker.hidePicker() : this.picker.showPicker(event.target);
   }
 
+  setTextareaHeight(textarea) {
+    textarea.style.height = "";
+    textarea.style.height = event.target.scrollHeight + "px";
+  }
+
   onMsgTextInput(event) {
+    if (event.target.type === 'textarea') {
+      this.setTextareaHeight(event.target);
+    }
     this.isTyping = this.isTyping !== undefined ? this.isTyping : false;
     const getIsTyping = () => $('#new-msg').val().length > 0;
     const setTyping = () => chats[this.props.activeChat].setTyping(getIsTyping());
