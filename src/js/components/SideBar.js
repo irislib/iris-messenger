@@ -61,13 +61,18 @@ class SideBar extends Component {
     showMenu(false);
   }
 
+  onUserInfoClick() {
+    route('/settings');
+    showMenu(false);
+  }
+
   render() {
     const welcomeToIris = this.state.chats.length > 1 ? '' : html`<div id="welcome" class="visible-xs-block">
       <h3>Iris Messenger</h3>
       <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
     </div>`;
     return html`<section class="sidebar hidden-xs">
-      <div class="user-info" onClick=${() => route('/settings')}>
+      <div class="user-info" onClick=${() => this.onUserInfoClick()}>
         <div id="my-identicon"></div>
         <div class="user-name"></div>
       </div>

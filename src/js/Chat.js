@@ -16,6 +16,7 @@ function showChat(pub) {
   }
 
   route('/chat/' + pub);
+  showMenu(false);
 }
 
 function deleteChat(pub) {
