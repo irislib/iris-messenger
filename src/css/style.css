@@ -32,6 +32,11 @@ a:hover, a:focus {
 textarea {
   width: 100%;
   outline: none;
+  font-family: inherit;
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  margin: 15px 0;
 }
 
 input, button, .button {

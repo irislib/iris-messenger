@@ -100,7 +100,7 @@ class Header extends Component {
       } else if (activeRoute === '/logout') {
         title = t('log_out') + '?';
       } else if (activeRoute.indexOf('/chat/') === 0 || activeRoute.indexOf('/profile/') === 0) {
-        if (Session.getKey() && this.chatId === Session.getKey().pub) {
+        if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
           title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
         } else {
           title = getDisplayName(this.chatId);
