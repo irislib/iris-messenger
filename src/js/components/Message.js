@@ -88,6 +88,16 @@ class Message extends Component {
     return false;
   }
 
+  componentDidMount() {
+    $(this.base).find('a').click(e => {
+      const href = $(e.target).attr('href');
+      if (href.indexOf('https://iris.to/') === 0) {
+        e.preventDefault();
+        window.location = href.replace('https://iris.to/', '');
+      }
+    });
+  }
+
   render() {
     if (++this.i > 1) console.log(this.i);
     let name, color;
