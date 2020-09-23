@@ -62,7 +62,7 @@ class SideBar extends Component {
   }
 
   onUserInfoClick() {
-    route('/settings');
+    route('/profile/' + Session.getKey().pub);
     showMenu(false);
   }
 

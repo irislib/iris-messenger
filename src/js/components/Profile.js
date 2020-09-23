@@ -7,6 +7,7 @@ import {chats, deleteChat, showChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
+import MessageForm from './MessageForm.js';
 import Message from './Message.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 //import VideoCall from './VideoCall.js';
@@ -18,6 +19,9 @@ class Profile extends Component {
   }
 
   render() {
+    const key = Session.getKey();
+    this.isMyProfile = (key && key.pub) === this.props.id;
+    const messageForm = this.isMyProfile ? html`<${MessageForm} activeChat="public"/>` : '';
     return html`
     <div class="main-view" id="profile">
       <div class="content">
@@ -89,6 +93,7 @@ class Profile extends Component {
           <hr/>
         </div>
         <div id="profile-public-messages">
+          ${messageForm}
           <div id="attachment-preview" style="display:none"></div>
           <br/>
           <div id="profile-public-message-list" class="public-messages-view"></div>
@@ -106,6 +111,8 @@ class Profile extends Component {
     if (!pub) {
       return;
     }
+    const key = Session.getKey();
+    this.isMyProfile = (key && key.pub) === pub;
     const chat = chats[pub];
     sortedPublicMessages = [];
     localState.get('activeProfile').put(pub);
@@ -142,7 +149,9 @@ class Profile extends Component {
         chat.put('notificationSetting', event.target.value);
       });
     }
-    $('#profile .show-settings').off().on('click', () => $('#chat-settings').toggle());
+    $('#profile .show-settings').off().on('click', () => {
+      this.isMyProfile ? route('/settings') : $('#chat-settings').toggle();
+    });
     $('#profile .show-qr-code').off().on('click', () => $('#profile-page-qr').toggle());
     $('#profile .send-message').off().on('click', () => showChat(pub));
     $('#profile .copy-user-link').off().on('click', event => {
@@ -162,7 +171,7 @@ class Profile extends Component {
       var name = event.target.value;
       chat.put('name', name);
     });
-    $('.profile-nicknames').toggle(pub !== (Session.getKey() && Session.getKey().pub));
+    $('.profile-nicknames').toggle(!this.isMyProfile);
     $('#profile-nickname-my-container').toggle(!(chat && chat.uuid));
     $('#profile-nickname-their').not(':focus').val(chat && chat.theirNickname);
     $('#profile-nickname-my').text(chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : '');
