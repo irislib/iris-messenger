@@ -22,6 +22,7 @@ function setOurOnlineStatus() {
     clearTimeout(onlineTimeout);
     onlineTimeout = setTimeout(() => iris.Channel.setActivity(publicState, ourActivity = 'online'), 30000);
   }, 1000);
+  document.addEventListener("touchmove", setActive);
   document.addEventListener("mousemove", setActive);
   document.addEventListener("keypress", setActive);
   document.addEventListener("visibilitychange", () => {
@@ -36,6 +37,7 @@ function setOurOnlineStatus() {
       iris.Channel.setActivity(publicState, ourActivity = 'online');
     }
   });
+  setActive();
   window.addEventListener("beforeunload", () => {
     iris.Channel.setActivity(publicState, ourActivity = null);
   });
