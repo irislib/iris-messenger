@@ -196,6 +196,7 @@ header #back-button {
   flex-direction: column;
   margin-bottom: 2px;
   overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .msg a {
