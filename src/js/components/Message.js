@@ -115,7 +115,7 @@ class Message extends Component {
         <div class="msg-content">
           ${name && this.props.showName && html`<small onclick=${() => addMention(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
           ${this.props.attachments && this.props.attachments.map(a =>
-            html`<img src=${a.data} onclick=${e => { openAttachmentsGallery(this.props, e); }}/>` // escape a.data
+            html`<div class="img-container"><img src=${a.data} onclick=${e => { openAttachmentsGallery(this.props, e); }}/></div>` // TODO: escape a.data
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }}>
           </div>
