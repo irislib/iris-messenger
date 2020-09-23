@@ -225,7 +225,7 @@ header #back-button {
 }
 
 #profile .content {
-  width: 800px;
+  width: max(80%, 800px);
   max-width: 100%;
 }
 
