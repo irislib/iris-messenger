@@ -37,7 +37,7 @@ class MessageView extends Component {
     console.log(this.state.msg);
     chats['public'].delete(this.state.msg.time);
     chats['public'].sortedMessages = chats['public'].sortedMessages.filter(m => m.time === this.state.msg.time);
-    route('/chat/public');
+    route('/');
   }
 
   render() {
