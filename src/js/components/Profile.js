@@ -37,6 +37,10 @@ class Profile extends Component {
     this.isMyProfile ? route('/settings') : $('#chat-settings').toggle();
   }
 
+  onNameInput(e) {
+    publicState.user().get('profile').get('name').put($(e.target).text());
+  }
+
   render() {
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === this.props.id;
@@ -52,6 +56,7 @@ class Profile extends Component {
                 html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`}
             </div>
             <div class="profile-header-stuff">
+              <h3 class="profile-name" contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
               <div class="profile-actions">
                 <button class="send-message">${t('send_message')}</button>
                 <${CopyButton} text=${t('copy_link')} copyStr=${'https://iris.to/' + window.location.hash}/>
@@ -148,6 +153,12 @@ class Profile extends Component {
     renderGroupParticipants(pub);
     renderInviteLinks(pub);
     if (!(chat && chat.uuid)) {
+      publicState.user(pub).get('profile').get('name').on((name,a,b,e) => {
+        this.eventListeners.push(e);
+        if (!$('#profile .profile-name:focus').length) {
+          this.setState({name});
+        }
+      });
       publicState.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
         this.eventListeners.push(e);
         this.setState({photo});

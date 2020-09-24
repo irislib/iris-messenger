@@ -24,24 +24,6 @@ class Settings extends Component {
   render() {
     return html`
       <div class="main-view" id="settings">
-        <h3>${t('profile')}</h3>
-        <p>
-          ${t('your_name')}:
-        </p>
-        <p>
-          <input id="settings-name" onInput=${e => onNameInput(e)} placeholder="${t('your_name')}"/>
-        </p>
-        <p id="profile-photo-chapter">
-          ${t('profile_photo')}:
-        </p>
-        <div id="profile-photo-settings">
-          <${ProfilePhotoPicker} currentPhoto=${this.state.photo} callback=${src => this.onProfilePhotoSet(src)}/>
-        </div>
-        <p>${t('about_text')}:</p>
-        <p>
-          <input id="settings-about" onInput=${e => onAboutTextInput(e)} style="width:100%" placeholder="${t('about_text')}"/>
-        </p>
-        <hr/>
         <h3>${t('account')}</h3>
         <p>
           <b>${t('save_backup_of_privkey_first')}</b> ${t('otherwise_cant_log_in_again')}
