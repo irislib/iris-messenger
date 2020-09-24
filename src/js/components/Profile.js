@@ -54,13 +54,13 @@ class Profile extends Component {
                 <button class="show-settings">${t('settings')}</button>
                 <!-- <button class="add-friend">${t('follow')}</button> -->
               </div>
-              <div class="profile-about hidden-xs" style="display:none">
-                <p class="profile-about-content" contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}></p>
+              <div class="profile-about hidden-xs">
+                <p class="profile-about-content" contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}>${this.state.about}</p>
               </div>
             </div>
           </div>
-          <div class="profile-about visible-xs-flex" style="display:none">
-            <p class="profile-about-content" contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}></p>
+          <div class="profile-about visible-xs-flex">
+            <p class="profile-about-content" contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}>${this.state.about}</p>
           </div>
 
           <div id="profile-group-settings">
@@ -148,11 +148,14 @@ class Profile extends Component {
         this.eventListeners.push(e);
         this.setState({photo});
       });
+      publicState.user(pub).get('profile').get('about').on((about,a,b,e) => {
+        this.eventListeners.push(e);
+        if (!$('#profile .profile-about-content:focus').length) {
+          this.setState({about});
+        }
+      });
       PublicMessages.getMessages(onPublicMessage, pub);
     }
-    $('#profile .profile-about').toggle(chat && chat.about && chat.about.length > 0);
-    $('#profile .profile-about-content').empty();
-    $('#profile .profile-about-content').text(chat && chat.about);
     const link = chat && chat.getSimpleLink();
     $('#profile .add-friend').off().on('click', () => {
       console.log('add friend');

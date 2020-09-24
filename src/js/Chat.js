@@ -131,9 +131,6 @@ function addChat(chat) {
   }
   function setAbout(about) {
     chat.about = about;
-    if (activeProfile === pub) {
-      $('#profile .profile-about-content:not(:focus)').text(about);
-    }
   }
   function setGroupPhoto(photo, from) {
     var profile = chat.participantProfiles[from];
@@ -185,7 +182,6 @@ function addChat(chat) {
     }});
   } else {
     publicState.user(pub).get('profile').get('name').on(setName);
-    publicState.user(pub).get('profile').get('about').on(setAbout);
   }
   if (chat.put) {
     chat.onTheir('webPushSubscriptions', (s, k, from) => {
