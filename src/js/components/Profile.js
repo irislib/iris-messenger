@@ -13,6 +13,7 @@ import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 //import VideoCall from './VideoCall.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from './SafeImg.js';
+import CopyButton from './CopyButton.js';
 
 class Profile extends Component {
   constructor() {
@@ -32,6 +33,10 @@ class Profile extends Component {
     publicState.user().get('profile').get('about').put($(e.target).text());
   }
 
+  onClickSettings() {
+    this.isMyProfile ? route('/settings') : $('#chat-settings').toggle();
+  }
+
   render() {
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === this.props.id;
@@ -49,9 +54,9 @@ class Profile extends Component {
             <div class="profile-header-stuff">
               <div class="profile-actions">
                 <button class="send-message">${t('send_message')}</button>
-                <button class="copy-user-link">${t('copy_link')}</button>
+                <${CopyButton} text=${t('copy_link')} copyStr=${'https://iris.to/' + window.location.hash}/>
                 <button class="show-qr-code">${t('show_qr_code')}</button>
-                <button class="show-settings">${t('settings')}</button>
+                <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
                 <!-- <button class="add-friend">${t('follow')}</button> -->
               </div>
               <div class="profile-about hidden-xs">
@@ -140,7 +145,6 @@ class Profile extends Component {
     localState.get('activeProfile').put(pub);
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
-    $('#profile-nickname-their').val('');
     renderGroupParticipants(pub);
     renderInviteLinks(pub);
     if (!(chat && chat.uuid)) {
@@ -156,7 +160,6 @@ class Profile extends Component {
       });
       PublicMessages.getMessages(onPublicMessage, pub);
     }
-    const link = chat && chat.getSimpleLink();
     $('#profile .add-friend').off().on('click', () => {
       console.log('add friend');
     });
@@ -167,29 +170,13 @@ class Profile extends Component {
         chat.put('notificationSetting', event.target.value);
       });
     }
-    $('#profile .show-settings').off().on('click', () => {
-      this.isMyProfile ? route('/settings') : $('#chat-settings').toggle();
-    });
     $('#profile .show-qr-code').off().on('click', () => $('#profile-page-qr').toggle());
     $('#profile .send-message').off().on('click', () => showChat(pub));
-    $('#profile .copy-user-link').off().on('click', event => {
-      Helpers.copyToClipboard(link);
-      var tgt = $(event.target);
-      var originalText = tgt.text();
-      var originalWidth = tgt.width();
-      tgt.width(originalWidth);
-      tgt.text(t('copied'));
-      setTimeout(() => {
-        tgt.text(originalText);
-        tgt.css('width', '');
-      }, 2000);
-    });
     $('#profile-group-name').not(':focus').val(chat && chat.name);
     $('#profile-group-name').off().on('input', event => {
       var name = event.target.value;
       chat.put('name', name);
     });
-    $('.profile-nicknames').toggle(!this.isMyProfile);
     $('#profile-nickname-my-container').toggle(!(chat && chat.uuid));
     $('#profile-nickname-their').not(':focus').val(chat && chat.theirNickname);
     $('#profile-nickname-my').text(chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : '');
@@ -199,7 +186,7 @@ class Profile extends Component {
     });
     qrCodeEl.empty();
     new QRCode(qrCodeEl[0], {
-      text: link,
+      text: 'https://iris.to/' + window.location.hash,
       width: 300,
       height: 300,
       colorDark : "#000000",

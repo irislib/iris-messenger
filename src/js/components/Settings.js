@@ -8,6 +8,7 @@ import {translate as t} from '../Translation.js';
 import PeerManager from '../PeerManager.js';
 import VideoCall from '../VideoCall.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
+import CopyButton from './CopyButton.js';
 import { route } from '../lib/preact-router.es.js';
 
 class Settings extends Component {
@@ -34,7 +35,7 @@ class Settings extends Component {
           ${t('profile_photo')}:
         </p>
         <div id="profile-photo-settings">
-          <${ProfilePhotoPicker} currentPhoto=${Session.getMyProfilePhoto()} callback=${src => this.onProfilePhotoSet(src)}/>
+          <${ProfilePhotoPicker} currentPhoto=${this.state.photo} callback=${src => this.onProfilePhotoSet(src)}/>
         </div>
         <p>${t('about_text')}:</p>
         <p>
@@ -52,7 +53,7 @@ class Settings extends Component {
         <p dangerouslySetInnerHTML=${{ __html: t('private_key_warning') }} ></p>
         <p>
           <button onClick=${() => downloadKey()}>${t('download_private_key')}</button>
-          <button onClick=${e => copyPrivateKey(e)}>${t('copy_private_key')}</button>
+          <${CopyButton} text=${t('copy_private_key')} copyStr=${JSON.stringify(Session.getKey())}/>
         </p>
         <p>
           <button onClick=${e => togglePrivateKeyQR(e)}>${t('show_privkey_qr')}</button>
@@ -156,7 +157,10 @@ class Settings extends Component {
         $('#settings-about').not(':focus').val(about);
         this.eventListeners.push(event);
       });
-
+      publicState.user().get('profile').get('photo').on((photo, a, b, event) => {
+        this.setState({photo});
+        this.eventListeners.push(event);
+      });
     });
   }
 
@@ -173,19 +177,6 @@ function onNameInput(event) {
 function onAboutTextInput(event) {
   const about = $(event.target).val().trim();
   publicState.user().get('profile').get('about').put(about);
-}
-
-function copyPrivateKey(event) {
-  Helpers.copyToClipboard(JSON.stringify(Session.getKey()));
-  var te = $(event.target);
-  var originalText = te.text();
-  var originalWidth = te.width();
-  te.width(originalWidth);
-  te.text(t('copied'));
-  setTimeout(() => {
-    te.text(originalText);
-    te.css('width', '');
-  }, 2000);
 }
 
 function togglePrivateKeyQR(e) {
