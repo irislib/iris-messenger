@@ -29,6 +29,10 @@ a:hover, a:focus {
   outline: none;
 }
 
+*[contenteditable="true"]:not(:focus) {
+  cursor: pointer;
+}
+
 textarea {
   width: 100%;
   outline: none;
