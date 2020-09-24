@@ -161,6 +161,6 @@ export default {
   },
 
   getUserChatLink: (pub) => {
-    return 'https://iris.to/?chatWith=' + pub;
+    return 'https://iris.to/#/profile/' + encodeURIComponent(pub);
   },
 };

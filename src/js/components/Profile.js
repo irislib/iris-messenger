@@ -107,7 +107,7 @@ class Profile extends Component {
             </div>
             <hr/>
             <p>
-              <button class="delete-chat">${t('delete_chat')}</button>
+              <button class="delete-chat" onClick=${() => deleteChat(pub)}>${t('delete_chat')}</button>
               <!-- <button class="block-user">${t('block_user')}</button> -->
             </p>
             <hr/>
@@ -160,10 +160,6 @@ class Profile extends Component {
       });
       PublicMessages.getMessages(onPublicMessage, pub);
     }
-    $('#profile .add-friend').off().on('click', () => {
-      console.log('add friend');
-    });
-    $('#profile .delete-chat').off().on('click', () => deleteChat(pub));
     if (chat) {
       $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
       $('input:radio[name=notificationPreference]').off().on('change', (event) => {
