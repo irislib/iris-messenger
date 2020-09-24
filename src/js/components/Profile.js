@@ -79,7 +79,7 @@ class Profile extends Component {
               </div>
               <div class="profile-actions">
                 ${this.state.followsYou ? html`
-                  <p><small>Follows you</small></p>
+                  <p><small>${t('follows_you')}</small></p>
                 `: ''}
                 ${this.isMyProfile ? '' : html`
                   <button class="follow ${this.state.youFollow ? 'following' : ''}" onClick=${() => this.onFollowClick()}>
@@ -206,6 +206,7 @@ class Profile extends Component {
     }
     this.eventListeners.forEach(e => e.off());
     this.id = pub;
+    this.setState({followsYou:false, youFollow: false});
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === pub;
     const chat = chats[pub];

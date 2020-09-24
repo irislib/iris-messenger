@@ -71,6 +71,7 @@ export default {
     new_participants_chat_link: "New participant's chat link",
     invite_links: "Invite links",
     copy: "Copy",
+    follows_you: "Follows you",
     follow: "Follow",
     unfollow: "Unfollow",
     following: "Following",

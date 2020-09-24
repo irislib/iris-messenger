@@ -22,6 +22,7 @@
     --button-bg: #ddd;
     --button-color: #262626;
     --button-border: 0;
+    --button-border-size: 0;
     --button-hover-bg: #ccc;
     --sidebar-bg: #fff;
     --sidebar-border-right: 1px solid #dfdfdf;
