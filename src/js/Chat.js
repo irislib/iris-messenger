@@ -166,10 +166,7 @@ function addChat(chat) {
           });
         });
       }
-      if (activeProfile === pub) {
-        Profile.renderGroupParticipants(pub);
-        Profile.renderInviteLinks(pub);
-      }
+      localState.get('chats').get(chat.uuid).get('participants').put(participants);
     });
     var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     chat.inviteLinks = {};

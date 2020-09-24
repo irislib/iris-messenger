@@ -30,7 +30,12 @@ class Profile extends Component {
   }
 
   onAboutInput(e) {
-    publicState.user().get('profile').get('about').put($(e.target).text().trim());
+    const about = $(e.target).text().trim();
+    if (this.isMyProfile) {
+      publicState.user().get('profile').get('about').put(about);
+    } else {
+      chats[this.props.id].put('about', about);
+    }
   }
 
   onClickSettings() {
@@ -40,7 +45,11 @@ class Profile extends Component {
   onNameInput(e) {
     const name = $(e.target).text().trim();
     if (name.length) {
-      publicState.user().get('profile').get('name').put(name);
+      if (this.isMyProfile) {
+        publicState.user().get('profile').get('name').put(name);
+      } else {
+        chats[this.props.id].put('name', name);
+      }
     }
   }
 
@@ -48,20 +57,21 @@ class Profile extends Component {
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === this.props.id;
     const messageForm = this.isMyProfile ? html`<${MessageForm} activeChat="public"/>` : '';
+    const editable = !!(this.isMyProfile || this.state.isAdmin);
     return html`
     <div class="main-view" id="profile">
       <div class="content">
         <div class="profile-top">
           <div class="profile-header">
             <div class="profile-photo-container">
-              ${this.isMyProfile ?
+              ${editable ?
                 html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} callback=${src => this.onProfilePhotoSet(src)}/>` :
                 html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`}
             </div>
             <div class="profile-header-stuff">
-              <h3 class="profile-name" placeholder=${this.isMyProfile ? t('name') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
+              <h3 class="profile-name" placeholder=${editable ? t('name') : ''} contenteditable=${editable} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
               <div class="profile-about hidden-xs">
-                <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}>${this.state.about}</p>
+                <p class="profile-about-content" placeholder=${editable ? t('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
               </div>
               <div class="profile-actions">
                 <button class="send-message">${t('send_message')}</button>
@@ -73,11 +83,10 @@ class Profile extends Component {
             </div>
           </div>
           <div class="profile-about visible-xs-flex">
-            <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}>${this.state.about}</p>
+            <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
 
           <div id="profile-group-settings">
-            <div id="profile-group-name-container">${t('group_name')}: <input id="profile-group-name" placeholder="${t('group_name')}"/></div>
             <p>${t('participants')}:</p>
             <div id="profile-group-participants"></div>
             <div id="profile-add-participant" style="display:none;">
@@ -131,6 +140,43 @@ class Profile extends Component {
     </div>`;
   }
 
+  renderGroupParticipants() {
+    const pub = this.props.id;
+    if (!(chats[pub] && chats[pub].uuid)) {
+      $('#profile-group-settings').hide();
+      return;
+    } else {
+      $('#profile-group-settings').show();
+    }
+    $('#profile-group-participants').empty().show();
+    var keys = Object.keys(chats[pub].participantProfiles);
+    const isAdmin = areWeAdmin(pub);
+    $('#profile-add-participant').toggle(isAdmin);
+    $('#profile-group-name-container').toggle(isAdmin);
+    this.setState({isAdmin});
+    keys.forEach(k => {
+      var profile = chats[pub].participantProfiles[k];
+      var identicon = Helpers.getIdenticon(k, 40).css({'margin-right':15});
+      var nameEl = $('<span>');
+      publicState.user(k).get('profile').get('name').on(name => nameEl.text(name));
+      var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
+      $('<button>').css({'margin-right': 15}).text(t('remove')).click(() => {
+        el.remove();
+        // TODO remove group participant
+      });
+      //el.append(removeBtn);
+      el.append(identicon);
+      el.append(nameEl);
+      if (profile.permissions && profile.permissions.admin) {
+        el.append($('<small>').text(t('admin')).css({'margin-left': 5}));
+      }
+      el.click(() => {
+        route('/profile/' + k);
+      });
+      $('#profile-group-participants').append(el);
+    });
+  }
+
   componentWillUnmount() {
     this.eventListeners.forEach(e => e.off());
   }
@@ -153,8 +199,11 @@ class Profile extends Component {
     localState.get('activeProfile').put(pub);
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
-    renderGroupParticipants(pub);
-    renderInviteLinks(pub);
+    this.renderGroupParticipants();
+    localState.get('chats').get(this.props.id).get('participants').on(() => {
+      this.renderGroupParticipants();
+      renderInviteLinks(pub);
+    });
     if (!(chat && chat.uuid)) {
       publicState.user(pub).get('profile').get('name').on((name,a,b,e) => {
         this.eventListeners.push(e);
@@ -175,6 +224,20 @@ class Profile extends Component {
         }
       });
       PublicMessages.getMessages(onPublicMessage, pub);
+    } else {
+      chat.on('name', name => {
+        if (!$('#profile .profile-name:focus').length) {
+          this.setState({name});
+        }
+      });
+      chat.on('photo', photo => this.setState({photo}));
+      chat.on('about', about => {
+        if (!$('#profile .profile-about-content:focus').length) {
+          this.setState({about});
+        } else {
+          $('#profile .profile-about-content:not(:focus)').text(about);
+        }
+      });
     }
     if (chat) {
       $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
@@ -213,43 +276,6 @@ class Profile extends Component {
     $('#profile-create-invite-link').click(onCreateInviteLink);
     $('#profile-add-participant').on('input', onProfileAddParticipantInput);
   }
-}
-
-function renderGroupParticipants(pub) {
-  if (!(chats[pub] && chats[pub].uuid)) {
-    $('#profile-group-settings').hide();
-    return;
-  } else {
-    $('#profile-group-settings').show();
-  }
-  $('#profile-group-participants').empty().show();
-  var keys = Object.keys(chats[pub].participantProfiles);
-  var me = chats[pub].participantProfiles[Session.getKey().pub];
-  if (me && me.permissions) {
-    $('#profile-add-participant').toggle(me.permissions.admin);
-    $('#profile-group-name-container').toggle(me.permissions.admin);
-  }
-  keys.forEach(k => {
-    var profile = chats[pub].participantProfiles[k];
-    var identicon = Helpers.getIdenticon(k, 40).css({'margin-right':15});
-    var nameEl = $('<span>');
-    publicState.user(k).get('profile').get('name').on(name => nameEl.text(name));
-    var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
-    $('<button>').css({'margin-right': 15}).text(t('remove')).click(() => {
-      el.remove();
-      // TODO remove group participant
-    });
-    //el.append(removeBtn);
-    el.append(identicon);
-    el.append(nameEl);
-    if (profile.permissions && profile.permissions.admin) {
-      el.append($('<small>').text(t('admin')).css({'margin-left': 5}));
-    }
-    el.click(() => {
-      route('/profile/' + k);
-    });
-    $('#profile-group-participants').append(el);
-  });
 }
 
 let sortedPublicMessages;
@@ -361,4 +387,4 @@ function onCreateInviteLink() {
   chats[activeProfile].createChatLink();
 }
 
-export default {Profile, renderGroupParticipants, renderInviteLinks};
+export default {Profile, renderInviteLinks};
