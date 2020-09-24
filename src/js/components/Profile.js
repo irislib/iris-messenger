@@ -64,7 +64,7 @@ class Profile extends Component {
                 <button class="send-message">${t('send_message')}</button>
                 <${CopyButton} text=${t('copy_link')} copyStr=${'https://iris.to/' + window.location.hash}/>
                 <button class="show-qr-code">${t('show_qr_code')}</button>
-                <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
+                ${this.isMyProfile ? '' : html`<button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>`}
                 <!-- <button class="add-friend">${t('follow')}</button> -->
               </div>
               <div class="profile-about hidden-xs">
