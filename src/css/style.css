@@ -766,6 +766,33 @@ small {
   flex: 2;
 }
 
+.follow {
+  min-width: 110px;
+}
+
+.follow.following {
+  background-color: var(--notify);
+  color: var(--text-color);
+  border: var(--button-border-size) solid var(--notify);
+}
+
+.follow.following:hover {
+  background-color: var(--warning-background);
+  border-color: var(--warning-background);
+}
+
+.follow .hover {
+  display: none;
+}
+
+.follow.following:hover .hover {
+  display: inline;
+}
+
+.follow.following:hover .nonhover {
+  display: none;
+}
+
 .qr-container img, .qr-container canvas {
   border: 5px solid white;
 }

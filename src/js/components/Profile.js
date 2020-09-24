@@ -53,6 +53,10 @@ class Profile extends Component {
     }
   }
 
+  onFollowClick() {
+    publicState.user().get('follow').get(this.props.id).put(!this.state.youFollow);
+  }
+
   render() {
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === this.props.id;
@@ -74,11 +78,21 @@ class Profile extends Component {
                 <p class="profile-about-content" placeholder=${editable ? t('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
               </div>
               <div class="profile-actions">
+                ${this.state.followsYou ? html`
+                  <p><small>Follows you</small></p>
+                `: ''}
+                ${this.isMyProfile ? '' : html`
+                  <button class="follow ${this.state.youFollow ? 'following' : ''}" onClick=${() => this.onFollowClick()}>
+                    <span class="nonhover">${this.state.youFollow ? t('following') : t('follow')}</span>
+                    <span class="hover">${t('unfollow')}</span>
+                  </button>
+                `}
                 <button class="send-message">${t('send_message')}</button>
                 <${CopyButton} text=${t('copy_link')} copyStr=${'https://iris.to/' + window.location.hash}/>
                 <button class="show-qr-code">${t('show_qr_code')}</button>
-                ${this.isMyProfile ? '' : html`<button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>`}
-                <!-- <button class="add-friend">${t('follow')}</button> -->
+                ${this.isMyProfile ? '' : html`
+                  <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
+                `}
               </div>
             </div>
           </div>
@@ -205,6 +219,14 @@ class Profile extends Component {
       renderInviteLinks(pub);
     });
     if (!(chat && chat.uuid)) {
+      publicState.user().get('follow').get(this.props.id).on((youFollow, a, b, e) => {
+        this.setState({youFollow});
+        this.eventListeners.push(e);
+      });
+      publicState.user(pub).get('follow').get(Session.getKey().pub).on((followsYou, a, b, e) => {
+        this.setState({followsYou});
+        this.eventListeners.push(e);
+      });
       publicState.user(pub).get('profile').get('name').on((name,a,b,e) => {
         this.eventListeners.push(e);
         if (!$('#profile .profile-name:focus').length) {
