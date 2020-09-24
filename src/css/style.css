@@ -734,6 +734,17 @@ small {
   justify-items: center;
 }
 
+#profile-public-messages form button {
+  height: 47px;
+  width: 47px;
+  margin-right: 5px;
+}
+
+#profile-public-messages form button svg {
+  width: 1em;
+  height: 1em;
+}
+
 .profile-actions button {
   margin-right: 5px;
   margin-bottom: 5px;
