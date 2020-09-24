@@ -62,6 +62,7 @@ class Profile extends Component {
     this.isMyProfile = (key && key.pub) === this.props.id;
     const messageForm = this.isMyProfile ? html`<${MessageForm} activeChat="public"/>` : '';
     const editable = !!(this.isMyProfile || this.state.isAdmin);
+    const followable = !(this.isMyProfile || this.props.length < 40)
     return html`
     <div class="main-view" id="profile">
       <div class="content">
@@ -81,12 +82,12 @@ class Profile extends Component {
                 ${this.state.followsYou ? html`
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
-                ${this.isMyProfile ? '' : html`
+                ${followable ? html`
                   <button class="follow ${this.state.youFollow ? 'following' : ''}" onClick=${() => this.onFollowClick()}>
                     <span class="nonhover">${this.state.youFollow ? t('following') : t('follow')}</span>
                     <span class="hover">${t('unfollow')}</span>
                   </button>
-                `}
+                ` : ''}
                 <button class="send-message">${t('send_message')}</button>
                 <${CopyButton} text=${t('copy_link')} copyStr=${'https://iris.to/' + window.location.hash}/>
                 <button class="show-qr-code">${t('show_qr_code')}</button>
