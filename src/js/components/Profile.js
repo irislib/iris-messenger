@@ -30,7 +30,7 @@ class Profile extends Component {
   }
 
   onAboutInput(e) {
-    publicState.user().get('profile').get('about').put($(e.target).text());
+    publicState.user().get('profile').get('about').put($(e.target).text().trim());
   }
 
   onClickSettings() {
@@ -38,7 +38,7 @@ class Profile extends Component {
   }
 
   onNameInput(e) {
-    const name = $(e.target).text();
+    const name = $(e.target).text().trim();
     if (name.length) {
       publicState.user().get('profile').get('name').put(name);
     }
@@ -60,15 +60,15 @@ class Profile extends Component {
             </div>
             <div class="profile-header-stuff">
               <h3 class="profile-name" placeholder=${this.isMyProfile ? t('name') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
+              <div class="profile-about hidden-xs">
+                <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}>${this.state.about}</p>
+              </div>
               <div class="profile-actions">
                 <button class="send-message">${t('send_message')}</button>
                 <${CopyButton} text=${t('copy_link')} copyStr=${'https://iris.to/' + window.location.hash}/>
                 <button class="show-qr-code">${t('show_qr_code')}</button>
                 ${this.isMyProfile ? '' : html`<button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>`}
                 <!-- <button class="add-friend">${t('follow')}</button> -->
-              </div>
-              <div class="profile-about hidden-xs">
-                <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}>${this.state.about}</p>
               </div>
             </div>
           </div>

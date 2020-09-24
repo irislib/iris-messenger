@@ -745,6 +745,16 @@ small {
   height: 1em;
 }
 
+.profile-header-stuff {
+  display:flex;
+  flex-direction:column;
+}
+
+.profile-header-stuff .profile-about {
+  margin-bottom: 15px;
+  flex:1;
+}
+
 .profile-actions button {
   margin-right: 5px;
   margin-bottom: 5px;

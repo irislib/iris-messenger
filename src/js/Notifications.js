@@ -71,8 +71,10 @@ function setUnseenTotal() {
   }
 }
 
-function changeChatUnseenCount(chat, change) {
-  const chatNode = localState.get('chats').get(chat.id);
+function changeChatUnseenCount(chatId, change) {
+  const chat = chats[chatId];
+  if (!chat) return;
+  const chatNode = localState.get('chats').get(chatId);
   if (change) {
     unseenTotal += change;
     chat.unseen += change;

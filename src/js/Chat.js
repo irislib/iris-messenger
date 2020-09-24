@@ -62,7 +62,7 @@ function addChat(chat) {
   chat.getLatestMsg && chat.getLatestMsg((latest, info) => {
     processMessage(pub, latest, info);
   });
-  Notifications.changeChatUnseenCount(chat, 0);
+  Notifications.changeChatUnseenCount(pub, 0);
   chat.sortedMessages = chat.sortedMessages || [];
   chat.identicon = Helpers.getIdenticon(pub, 49);
   chat.onTheir('nickname', (nick) => {
@@ -93,7 +93,7 @@ function addChat(chat) {
   chat.getMyMsgsLastSeenTime(time => {
     chat.myLastSeenTime = new Date(time);
     if (chat.latest && chat.myLastSeenTime >= chat.latest.time) {
-      Notifications.changeChatUnseenCount(chat, 0);
+      Notifications.changeChatUnseenCount(pub, 0);
     }
     PeerManager.askForPeers(pub); // TODO: this should be done only if we have a chat history or friendship with them
   });
@@ -221,7 +221,7 @@ function processMessage(chatId, msg, info) {
   chat.sortedMessages.push(msg);
   if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
     if (activeRoute !== '/chat/' + chatId || document.visibilityState !== 'visible') {
-      Notifications.changeChatUnseenCount(chat, 1);
+      Notifications.changeChatUnseenCount(chatId, 1);
     }
   }
   if (!info.selfAuthored && msg.timeStr > chat.theirMsgsLastSeenTime) {

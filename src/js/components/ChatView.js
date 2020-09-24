@@ -54,7 +54,7 @@ class ChatView extends Component {
       const update = () => {
         const chat = chats[this.activeChat];
         if (!chat) return;
-        Notifications.changeChatUnseenCount(chat, 0);
+        Notifications.changeChatUnseenCount(this.activeChat, 0);
         chat.setMyMsgsLastSeenTime();
         Helpers.scrollToMessageListBottom();
         chat.setMyMsgsLastSeenTime();

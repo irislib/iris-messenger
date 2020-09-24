@@ -28,10 +28,11 @@ function setOurOnlineStatus() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
       iris.Channel.setActivity(publicState, ourActivity = 'active');
-      const chat = activeRoute && chats[activeRoute.replace('/profile/','').replace('/chat/','')];
+      const chatId = activeRoute.replace('/profile/','').replace('/chat/','');
+      const chat = activeRoute && chats[chatId];
       if (chat) {
         chat.setMyMsgsLastSeenTime();
-        Notifications.changeChatUnseenCount(chat, 0);
+        Notifications.changeChatUnseenCount(chatId, 0);
       }
     } else {
       iris.Channel.setActivity(publicState, ourActivity = 'online');
