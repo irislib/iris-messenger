@@ -33,6 +33,15 @@ a:hover, a:focus {
   cursor: pointer;
 }
 
+[placeholder]:empty::before {
+  content: attr(placeholder);
+  color: var(--text-time);
+}
+
+[placeholder]:empty:focus::before {
+    content: "";
+}
+
 textarea {
   width: 100%;
   outline: none;

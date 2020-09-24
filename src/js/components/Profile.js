@@ -38,7 +38,10 @@ class Profile extends Component {
   }
 
   onNameInput(e) {
-    publicState.user().get('profile').get('name').put($(e.target).text());
+    const name = $(e.target).text();
+    if (name.length) {
+      publicState.user().get('profile').get('name').put(name);
+    }
   }
 
   render() {
@@ -56,7 +59,7 @@ class Profile extends Component {
                 html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`}
             </div>
             <div class="profile-header-stuff">
-              <h3 class="profile-name" contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
+              <h3 class="profile-name" placeholder=${this.isMyProfile ? t('name') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
               <div class="profile-actions">
                 <button class="send-message">${t('send_message')}</button>
                 <${CopyButton} text=${t('copy_link')} copyStr=${'https://iris.to/' + window.location.hash}/>
@@ -65,12 +68,12 @@ class Profile extends Component {
                 <!-- <button class="add-friend">${t('follow')}</button> -->
               </div>
               <div class="profile-about hidden-xs">
-                <p class="profile-about-content" contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}>${this.state.about}</p>
+                <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}>${this.state.about}</p>
               </div>
             </div>
           </div>
           <div class="profile-about visible-xs-flex">
-            <p class="profile-about-content" contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}>${this.state.about}</p>
+            <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${this.onAboutInput}>${this.state.about}</p>
           </div>
 
           <div id="profile-group-settings">
@@ -167,6 +170,8 @@ class Profile extends Component {
         this.eventListeners.push(e);
         if (!$('#profile .profile-about-content:focus').length) {
           this.setState({about});
+        } else {
+          $('#profile .profile-about-content:not(:focus)').text(about);
         }
       });
       PublicMessages.getMessages(onPublicMessage, pub);
