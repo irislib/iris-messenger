@@ -12,10 +12,20 @@ import Message from './Message.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 //import VideoCall from './VideoCall.js';
 import { route } from '../lib/preact-router.es.js';
+import SafeImg from './SafeImg.js';
 
 class Profile extends Component {
+  constructor() {
+    super();
+    this.eventListeners = [];
+  }
+
   onProfilePhotoSet(src) {
-    chats[activeProfile].put('photo', src);
+    if (this.isMyProfile) {
+      publicState.user().get('profile').get('photo').put(src);
+    } else {
+      chats[this.props.id].put('photo', src);
+    }
   }
 
   onAboutInput(e) {
@@ -33,8 +43,8 @@ class Profile extends Component {
           <div class="profile-header">
             <div class="profile-photo-container">
               ${this.isMyProfile ?
-                html`<${ProfilePhotoPicker} currentPhoto=${Session.getMyProfilePhoto()} callback=${src => this.onProfilePhotoSet(src)}/>` :
-                html`<img class="profile-photo"/>`}
+                html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} callback=${src => this.onProfilePhotoSet(src)}/>` :
+                html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`}
             </div>
             <div class="profile-header-stuff">
               <div class="profile-actions">
@@ -108,38 +118,37 @@ class Profile extends Component {
     </div>`;
   }
 
+  componentWillUnmount() {
+    this.eventListeners.forEach(e => e.off());
+  }
+
   componentDidUpdate() {
     this.componentDidMount();
   }
 
   componentDidMount() {
     const pub = this.props.id;
-    if (!pub) {
+    if (!pub || (pub === this.id)) {
       return;
     }
+    this.eventListeners.forEach(e => e.off());
+    this.id = pub;
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === pub;
     const chat = chats[pub];
     sortedPublicMessages = [];
     localState.get('activeProfile').put(pub);
-    $('#profile .profile-photo-container').hide();
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
     $('#profile-nickname-their').val('');
-    $('#profile').show();
     renderGroupParticipants(pub);
     renderInviteLinks(pub);
     if (!(chat && chat.uuid)) {
-      $('#profile-public-message-list').empty();
-      $('#profile-public-messages').show();
-      $('#profile .profile-photo').show();
-      publicState.user(pub).get('profile').get('photo').on(photo => {
-        $('#profile .profile-photo-container').show();
-        Helpers.setImgSrc($('#profile .profile-photo'), photo);
+      publicState.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
+        this.eventListeners.push(e);
+        this.setState({photo});
       });
       PublicMessages.getMessages(onPublicMessage, pub);
-    } else {
-      $('#profile-public-messages').hide();
     }
     $('#profile .profile-about').toggle(chat && chat.about && chat.about.length > 0);
     $('#profile .profile-about-content').empty();
@@ -307,7 +316,6 @@ function renderGroupPhotoSettings(uuid) {
   if (isAdmin) {
     Helpers.setImgSrc($('#current-profile-photo'), chats[uuid].photo);
     $('#profile .profile-photo').hide();
-    $('#add-profile-photo').toggle(!chats[uuid].photo);
   }
 }
 
