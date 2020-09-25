@@ -102,6 +102,7 @@ class Settings extends Component {
         <p>By looking at timestamps in chats, it is possible to guess who are chatting with each other. There are potential technical solutions to hiding the timestamps, but they are not implemented yet. It is also possible, if not trivial, to find out who are communicating with each other by monitoring data subscriptions on the decentralized database.</p>
         <p>In that regard, Iris prioritizes decentralization and availability over perfect privacy.</p>
         <p>Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.</p>
+        <p>Iris makes no guarantees of data persistence.</p>
         <p>${t('application_security_warning')}</p>
 
         <h4>Donate</h4>

@@ -85,7 +85,7 @@ class Message extends Component {
     this.i = 0;
   }
 
-  shouldComponentUpdate(oldProps, newProps) {
+  shouldComponentUpdate() {
     return false;
   }
 
