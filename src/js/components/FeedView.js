@@ -35,7 +35,6 @@ class FeedView extends Component {
     this.follow(Session.getKey().pub);
     publicState.user().get('follow').map().on((follows, pub, b, e) => {
       this.eventListeners['follow'] = e;
-      console.log('yo', pub, follows);
       if (follows) {
         this.follow(pub);
       } else {
