@@ -3,6 +3,7 @@ import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import {chats} from '../Chat.js';
 import {activeRoute} from '../Main.js';
+import { route } from '../lib/preact-router.es.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
@@ -98,6 +99,14 @@ class Message extends Component {
     });
   }
 
+  onClick(name) {
+    if (this.props.public) {
+      route('/profile/' + this.props.info.from);
+    } else {
+      addMention(name);
+    }
+  }
+
   render() {
     if (++this.i > 1) console.log(this.i);
     let name = this.props.name;
@@ -124,7 +133,7 @@ class Message extends Component {
     return html`
       <div class="msg ${whose} ${seen} ${delivered}">
         <div class="msg-content">
-          ${name && this.props.showName && html`<small onclick=${() => addMention(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
+          ${name && this.props.showName && html`<small onclick=${() => this.onClick(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
           ${this.props.attachments && this.props.attachments.map(a =>
             html`<div class="img-container"><img src=${a.data} onclick=${e => { openAttachmentsGallery(this.props, e); }}/></div>` // TODO: escape a.data
           )}

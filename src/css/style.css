@@ -255,7 +255,7 @@ header #back-button {
 }
 
 .public-messages-view .msgSenderName {
-  margin: 6px;
+  margin: 10px 0 15px 10px;
 }
 
 .public-messages-view .msg .msg-content .seen-indicator {

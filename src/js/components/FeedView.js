@@ -55,7 +55,7 @@ class FeedView extends Component {
       <div class="main-view public-messages-view" id="message-view">
         <div id="message-list">
           ${this.sortedMessages.map(m =>
-            html`<${Message} ...${m} showName=${true} name=${this.names[m.info.from]}/>`
+            html`<${Message} ...${m} public=${true} showName=${true} name=${this.names[m.info.from]}/>`
           )}
         </div>
         <div id="attachment-preview" style="display:none"></div>
