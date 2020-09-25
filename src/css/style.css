@@ -225,12 +225,11 @@ header #back-button {
   max-width: 75%;
 }
 
-.msg-content img {
+.img-container img {
   border-radius: 6px;
   max-height: 250px;
   max-width: 100%;
   cursor: pointer;
-
 }
 
 #profile {
@@ -244,7 +243,7 @@ header #back-button {
   max-width: 100%;
 }
 
-.public-messages-view .msg-content img {
+.public-messages-view .img-container img {
   max-height: 80vh;
   border-radius: 0;
 }
@@ -254,8 +253,14 @@ header #back-button {
   margin-bottom: 15px;
 }
 
+.public-messages-view .msg-sender {
+  margin: 1px 10px 5px 10px;
+  display:flex;
+  align-items: center;
+}
+
 .public-messages-view .msgSenderName {
-  margin: 10px 0 15px 10px;
+  margin-left: 10px;
 }
 
 .public-messages-view .msg .msg-content .seen-indicator {
@@ -343,7 +348,7 @@ header #back-button {
 .msgSenderName {
   cursor: pointer;
   margin-bottom: 2px;
-  display: block;
+  display: inline-block;
   font-weight: bold;
 }
 
@@ -569,6 +574,10 @@ header #back-button {
   align-items: stretch;
   margin-top: -1px;
   position: relative;
+}
+
+.identicon-container {
+  display: inline-block;
 }
 
 .chat-item .identicon-container, header .identicon-container {
@@ -818,7 +827,6 @@ small {
 }
 
 #follows-list .identicon-container {
-  display: inline-block;
   margin-right: 15px;
 }
 

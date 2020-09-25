@@ -2,6 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import {chats} from '../Chat.js';
+import Identicon from './Identicon.js';
 import {activeRoute} from '../Main.js';
 import { route } from '../lib/preact-router.es.js';
 
@@ -133,7 +134,10 @@ class Message extends Component {
     return html`
       <div class="msg ${whose} ${seen} ${delivered}">
         <div class="msg-content">
-          ${name && this.props.showName && html`<small onclick=${() => this.onClick(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
+          <div class="msg-sender">
+            ${this.props.public ? html`<${Identicon} str=${this.props.info.from} width=40/>` : ''}
+            ${name && this.props.showName && html`<small onclick=${() => this.onClick(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
+          </div>
           ${this.props.attachments && this.props.attachments.map(a =>
             html`<div class="img-container"><img src=${a.data} onclick=${e => { openAttachmentsGallery(this.props, e); }}/></div>` // TODO: escape a.data
           )}
