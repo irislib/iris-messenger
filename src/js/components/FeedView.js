@@ -9,7 +9,6 @@ class FeedView extends Component {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = { sortedMessages: [] };
     this.following = {};
     this.sortedMessages = [];
     this.names = {};
@@ -27,7 +26,7 @@ class FeedView extends Component {
     PublicMessages.getMessages(pub, (msg, info) => {
       msg.info = info;
       this.sortedMessages.push(msg);
-      this.sortedMessages = this.sortedMessages.sort((a,b) => a.time < b.time ? 1 : -1);
+      this.sortedMessages.sort((a,b) => a.time < b.time ? 1 : -1);
       this.setState({});
     });
   }

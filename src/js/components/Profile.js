@@ -1,5 +1,4 @@
 import { Component } from '../lib/preact.js';
-import { render } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import {localState, publicState, activeProfile} from '../Main.js';
@@ -19,6 +18,7 @@ class Profile extends Component {
   constructor() {
     super();
     this.eventListeners = [];
+    this.sortedMessages = [];
   }
 
   onProfilePhotoSet(src) {
@@ -62,7 +62,7 @@ class Profile extends Component {
     this.isMyProfile = (key && key.pub) === this.props.id;
     const messageForm = this.isMyProfile ? html`<${MessageForm} activeChat="public"/>` : '';
     const editable = !!(this.isMyProfile || this.state.isAdmin);
-    const followable = !(this.isMyProfile || this.props.length < 40)
+    const followable = !(this.isMyProfile || this.props.length < 40);
     return html`
     <div class="main-view" id="profile">
       <div class="content">
@@ -154,7 +154,11 @@ class Profile extends Component {
           ${messageForm}
           <div id="attachment-preview" style="display:none"></div>
           <br/>
-          <div id="profile-public-message-list" class="public-messages-view"></div>
+          <div class="public-messages-view">
+            ${this.sortedMessages.map(msg =>
+              html`<${Message} ...${msg} public=${true} key=${msg.time} showName=${true} name=${this.state.name}/>`
+            )}
+          </div>
         </div>
       </div>
     </div>`;
@@ -212,12 +216,12 @@ class Profile extends Component {
     }
     this.eventListeners.forEach(e => e.off());
     this.id = pub;
+    this.sortedMessages = [];
     this.setState({followsYou:false, youFollow: false, followedUserCount: 0});
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === pub;
     this.followedUsers = new Set();
     const chat = chats[pub];
-    sortedPublicMessages = [];
     localState.get('activeProfile').put(pub);
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
@@ -262,7 +266,12 @@ class Profile extends Component {
           $('#profile .profile-about-content:not(:focus)').text(about);
         }
       });
-      PublicMessages.getMessages(pub, onPublicMessage);
+      PublicMessages.getMessages(pub, (msg, info) => {
+        msg.info = info;
+        this.sortedMessages.push(msg);
+        this.sortedMessages.sort((a,b) => a.time < b.time ? 1 : -1);
+        this.setState({});
+      });
     } else {
       chat.on('name', name => {
         if (!$('#profile .profile-name:focus').length) {
@@ -315,21 +324,6 @@ class Profile extends Component {
     $('#profile-create-invite-link').click(onCreateInviteLink);
     $('#profile-add-participant').on('input', onProfileAddParticipantInput);
   }
-}
-
-let sortedPublicMessages;
-
-function onPublicMessage(msg, info) {
-  if (activeProfile !== info.from) { return; }
-  msg.info = info;
-  sortedPublicMessages.push(msg);
-  sortedPublicMessages.sort((a, b) => a.time > b.time ? 1 : -1);
-  $('#profile-public-message-list').empty();
-  sortedPublicMessages.forEach(msg => {
-    const container = $('<div>');
-    render(html`<${Message} ...${msg} public=${true} key=${msg.time} showName=${true} chatId=${info.from}/>`, container[0]);
-    $('#profile-public-message-list').prepend(container.children()[0]);
-  });
 }
 
 var newGroupParticipant;
