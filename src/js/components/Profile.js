@@ -79,7 +79,7 @@ class Profile extends Component {
                 <p class="profile-about-content" placeholder=${editable ? t('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
               </div>
               <div class="profile-actions">
-                <p><a href="/follows/${this.props.id}">${t('follows')}</a></p>
+                <p><a href="/follows/${this.props.id}">${t('follows')} ${this.state.followedUserCount}</a></p>
                 ${this.state.followsYou ? html`
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
@@ -208,9 +208,10 @@ class Profile extends Component {
     }
     this.eventListeners.forEach(e => e.off());
     this.id = pub;
-    this.setState({followsYou:false, youFollow: false});
+    this.setState({followsYou:false, youFollow: false, followedUserCount: 0});
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === pub;
+    this.followedUsers = new Set();
     const chat = chats[pub];
     sortedPublicMessages = [];
     localState.get('activeProfile').put(pub);
@@ -229,6 +230,15 @@ class Profile extends Component {
       publicState.user(pub).get('follow').get(Session.getKey().pub).on((followsYou, a, b, e) => {
         this.setState({followsYou});
         this.eventListeners.push(e);
+      });
+      publicState.user(pub).get('follow').map().on((following,key,c,e) => {
+        this.eventListeners.push(e);
+        if (following) {
+          this.followedUsers.add(key);
+        } else {
+          this.followedUsers.delete(key);
+        }
+        this.setState({followedUserCount: this.followedUsers.size});
       });
       publicState.user(pub).get('profile').get('name').on((name,a,b,e) => {
         this.eventListeners.push(e);
