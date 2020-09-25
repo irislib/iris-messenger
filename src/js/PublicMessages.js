@@ -29,7 +29,7 @@ function getMessageByHash(hash) {
   });
 }
 
-function getMessages(cb, pub) {
+function getMessages(pub, cb) {
   const seen = [];
   publicState.user(pub).get('msgs').map().on(async (hash, time) => {
     if (typeof hash === 'string' && seen.indexOf(time) === -1) {

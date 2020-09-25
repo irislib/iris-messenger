@@ -20,6 +20,7 @@ import Profile from './components/Profile.js';
 import Header from './components/Header.js';
 import MessageView from './components/MessageView.js';
 import FollowsView from './components/FollowsView.js';
+import FeedView from './components/FeedView.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
@@ -69,6 +70,7 @@ class Main extends Component {
         <${Header}/>
         <${Router} history=${createHashHistory()} onChange=${e => handleRoute(e)}>
           <${NewChat} path="/"/>
+          <${FeedView} path="/feed"/>
           <${ChatView} path="/chat/:id"/>
           <${MessageView} path="/message/:hash"/>
           <${Settings} path="/settings"/>

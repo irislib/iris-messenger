@@ -262,7 +262,7 @@ class Profile extends Component {
           $('#profile .profile-about-content:not(:focus)').text(about);
         }
       });
-      PublicMessages.getMessages(onPublicMessage, pub);
+      PublicMessages.getMessages(pub, onPublicMessage);
     } else {
       chat.on('name', name => {
         if (!$('#profile .profile-name:focus').length) {

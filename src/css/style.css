@@ -768,7 +768,7 @@ small {
 
 .follow-count a {
   display: inline-block;
-  padding: 15px;
+  margin-bottom: 15px;
   text-align: center;
 }
 
