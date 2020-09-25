@@ -8,6 +8,7 @@ import {chats} from '../Chat.js';
 import { route } from '../lib/preact-router.es.js';
 import {translate as t} from '../Translation.js';
 
+let sortedMessages = [];
 
 class FeedView extends Component {
   constructor() {
@@ -15,16 +16,18 @@ class FeedView extends Component {
     this.eventListeners = {};
     this.state = { sortedMessages: [] };
     this.following = {};
+    this.sortedMessages = [];
   }
 
   follow(pub) {
     if (this.following[pub]) return;
     this.following[pub] = {};
     PublicMessages.getMessages(pub, (msg, info) => {
+      console.log('got msg ',msg);
       msg.info = info;
-      this.state.sortedMessages.push(msg);
-      this.state.sortedMessages.sort((a,b) => a.time > b.time ? -1 : 1);
-      this.setState({sortedMessages: this.state.sortedMessages});
+      this.sortedMessages.push(msg);
+      this.sortedMessages = this.sortedMessages.sort();
+      this.setState({});
     });
   }
 
@@ -53,7 +56,7 @@ class FeedView extends Component {
     return html`
       <div class="main-view public-messages-view" id="message-view">
         <div id="message-list">
-          ${this.state.sortedMessages.map(m =>
+          ${this.sortedMessages.map(m =>
             html`<${Message} ...${m} showName=${true} chatId=${m.info.from}/>`
           )}
         </div>
