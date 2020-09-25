@@ -79,7 +79,11 @@ class Profile extends Component {
                 <p class="profile-about-content" placeholder=${editable ? t('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
               </div>
               <div class="profile-actions">
-                <p><a href="/follows/${this.props.id}">${t('follows')} ${this.state.followedUserCount}</a></p>
+                <div class="follow-count">
+                  <a href="/follows/${this.props.id}">
+                    <span>${this.state.followedUserCount}</span> ${t('following')}
+                  </a>
+                </div>
                 ${this.state.followsYou ? html`
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}

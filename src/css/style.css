@@ -766,6 +766,17 @@ small {
   flex: 2;
 }
 
+.follow-count a {
+  display: inline-block;
+  padding: 15px;
+  text-align: center;
+}
+
+.follow-count span {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
 .follow {
   min-width: 110px;
 }
