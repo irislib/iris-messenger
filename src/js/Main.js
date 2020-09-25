@@ -19,6 +19,7 @@ import SideBar from './components/SideBar.js';
 import Profile from './components/Profile.js';
 import Header from './components/Header.js';
 import MessageView from './components/MessageView.js';
+import FollowsView from './components/FollowsView.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
@@ -73,6 +74,7 @@ class Main extends Component {
           <${Settings} path="/settings"/>
           <${LogoutConfirmation} path="/logout"/>
           <${Profile.Profile} path="/profile/:id"/>
+          <${FollowsView} path="/follows/:id"/>
         </${Router}>
       </section>
     ` : html`<${Login}/>`;

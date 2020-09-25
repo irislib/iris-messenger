@@ -79,6 +79,7 @@ class Profile extends Component {
                 <p class="profile-about-content" placeholder=${editable ? t('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
               </div>
               <div class="profile-actions">
+                <p><a href="/follows/${this.props.id}">${t('follows')}</a></p>
                 ${this.state.followsYou ? html`
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
@@ -139,7 +140,7 @@ class Profile extends Component {
             </div>
             <hr/>
             <p>
-              <button class="delete-chat" onClick=${() => deleteChat(pub)}>${t('delete_chat')}</button>
+              <button class="delete-chat" onClick=${() => deleteChat(this.props.id)}>${t('delete_chat')}</button>
               <!-- <button class="block-user">${t('block_user')}</button> -->
             </p>
             <hr/>

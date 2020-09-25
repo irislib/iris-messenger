@@ -793,6 +793,20 @@ small {
   display: none;
 }
 
+#follows-list > div {
+  margin-bottom: 15px;
+}
+
+#follows-list a {
+  display: flex;
+  align-items: center;
+}
+
+#follows-list .identicon-container {
+  display: inline-block;
+  margin-right: 15px;
+}
+
 .qr-container img, .qr-container canvas {
   border: 5px solid white;
 }

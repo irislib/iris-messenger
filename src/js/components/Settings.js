@@ -7,7 +7,6 @@ import LanguageSelector from './LanguageSelector.js';
 import {translate as t} from '../Translation.js';
 import PeerManager from '../PeerManager.js';
 import VideoCall from '../VideoCall.js';
-import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 import CopyButton from './CopyButton.js';
 import { route } from '../lib/preact-router.es.js';
 
@@ -149,16 +148,6 @@ class Settings extends Component {
   componentWillUnmount() {
     this.eventListeners.forEach(e => e.off());
   }
-}
-
-function onNameInput(event) {
-  var name = $(event.target).val().trim();
-  publicState.user().get('profile').get('name').put(name);
-}
-
-function onAboutTextInput(event) {
-  const about = $(event.target).val().trim();
-  publicState.user().get('profile').get('about').put(about);
 }
 
 function togglePrivateKeyQR(e) {
