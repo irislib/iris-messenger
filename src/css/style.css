@@ -96,7 +96,7 @@ img {
 
 #main-content {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   height: 100%;
   overflow: hidden;
   position: fixed;
@@ -293,6 +293,12 @@ header #back-button {
 .msg .emoji-only {
   font-size: 3em;
   text-align: center;
+}
+
+#chat-view {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
 }
 
 .chat-list .seen-indicator {

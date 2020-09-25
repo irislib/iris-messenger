@@ -12,10 +12,8 @@ import PublicMessages from './PublicMessages.js';
 
 import Settings from './components/Settings.js';
 import LogoutConfirmation from './components/LogoutConfirmation.js';
-import NewChat from './components/NewChat.js';
 import ChatView from './components/ChatView.js';
 import Login from './components/Login.js';
-import SideBar from './components/SideBar.js';
 import Profile from './components/Profile.js';
 import Header from './components/Header.js';
 import MessageView from './components/MessageView.js';
@@ -65,13 +63,11 @@ class Main extends Component {
 
   render() {
     const content = this.state.loggedIn ? html`
-      <${SideBar}/>
+      <${Header}/>
       <section class="main">
-        <${Header}/>
         <${Router} history=${createHashHistory()} onChange=${e => handleRoute(e)}>
-          <${NewChat} path="/"/>
-          <${FeedView} path="/feed"/>
-          <${ChatView} path="/chat/:id"/>
+          <${FeedView} path="/"/>
+          <${ChatView} path="/chat/:id?"/>
           <${MessageView} path="/message/:hash"/>
           <${Settings} path="/settings"/>
           <${LogoutConfirmation} path="/logout"/>
