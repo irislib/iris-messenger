@@ -12,13 +12,19 @@ class FeedView extends Component {
     this.state = { sortedMessages: [] };
     this.following = {};
     this.sortedMessages = [];
+    this.names = {};
   }
 
   follow(pub) {
     if (this.following[pub]) return;
     this.following[pub] = {};
+    publicState.user(pub).get('profile').get('name').on((name, a, b, e) => {
+      this.eventListeners[pub + 'name'] = e;
+      this.names[pub] = name;
+
+      this.setState({});
+    })
     PublicMessages.getMessages(pub, (msg, info) => {
-      console.log('got msg ',msg);
       msg.info = info;
       this.sortedMessages.push(msg);
       this.sortedMessages = this.sortedMessages.sort();
@@ -49,7 +55,7 @@ class FeedView extends Component {
       <div class="main-view public-messages-view" id="message-view">
         <div id="message-list">
           ${this.sortedMessages.map(m =>
-            html`<${Message} ...${m} showName=${true} chatId=${m.info.from}/>`
+            html`<${Message} ...${m} showName=${true} name=${this.names[m.info.from]}/>`
           )}
         </div>
         <div id="attachment-preview" style="display:none"></div>

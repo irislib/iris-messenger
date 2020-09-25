@@ -84,7 +84,7 @@ class Message extends Component {
     this.i = 0;
   }
 
-  shouldComponentUpdate() {
+  shouldComponentUpdate(oldProps, newProps) {
     return false;
   }
 
@@ -100,7 +100,8 @@ class Message extends Component {
 
   render() {
     if (++this.i > 1) console.log(this.i);
-    let name, color;
+    let name = this.props.name;
+    let color;
     const chatId = this.props.chatId;
     const chat = chats[chatId];
     if (chat && chat.uuid && !this.props.info.selfAuthored) {

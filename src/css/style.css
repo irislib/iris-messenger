@@ -254,6 +254,10 @@ header #back-button {
   margin-bottom: 15px;
 }
 
+.public-messages-view .msgSenderName {
+  margin: 6px;
+}
+
 .public-messages-view .msg .msg-content .seen-indicator {
   display: none;
 }
