@@ -31,7 +31,7 @@ function getMessageByHash(hash) {
 
 function getMessages(pub, cb) {
   const seen = new Set();
-  publicState.user(pub).get('msgs').map().on(async (hash, time) => {
+  publicState.user(pub).get('msgs').map().on(async hash => {
     if (typeof hash === 'string' && !seen.has(hash)) {
       seen.add(hash);
       const msg = await getMessageByHash(hash);

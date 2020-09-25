@@ -2,13 +2,8 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import Message from './Message.js';
 import PublicMessages from '../PublicMessages.js';
-import {localState} from '../Main.js';
+import {publicState} from '../Main.js';
 import Session from '../Session.js';
-import {chats} from '../Chat.js';
-import { route } from '../lib/preact-router.es.js';
-import {translate as t} from '../Translation.js';
-
-let sortedMessages = [];
 
 class FeedView extends Component {
   constructor() {
@@ -50,9 +45,6 @@ class FeedView extends Component {
   }
 
   render() {
-    const k = Session.getKey() || {};
-    const author = this.state.msg && this.state.msg.author && this.state.msg.author.keyID;
-    const actions = author && author === k.pub ? html`<button onClick=${() => this.setState({deleting:true})}>${t('delete')}</button>` : '';
     return html`
       <div class="main-view public-messages-view" id="message-view">
         <div id="message-list">
