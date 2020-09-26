@@ -4,6 +4,7 @@ import Message from './Message.js';
 import PublicMessages from '../PublicMessages.js';
 import {publicState} from '../Main.js';
 import Session from '../Session.js';
+import MessageForm from './MessageForm.js';
 
 class FeedView extends Component {
   constructor() {
@@ -52,6 +53,7 @@ class FeedView extends Component {
     return html`
       <div class="main-view public-messages-view" id="message-view">
         <div id="message-list">
+          <${MessageForm} activeChat="public"/>
           ${this.sortedMessages.map(m =>
             html`<${Message} ...${m} public=${true} key=${m.time} showName=${true} name=${this.names[m.info.from]}/>`
           )}
