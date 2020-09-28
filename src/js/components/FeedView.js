@@ -52,7 +52,7 @@ class FeedView extends Component {
   render() {
     return html`
       <div class="main-view public-messages-view" id="message-view">
-        <div id="message-list">
+        <div id="message-list" class="centered-container">
           <${MessageForm} activeChat="public"/>
           ${this.sortedMessages.map(m =>
             html`<${Message} ...${m} public=${true} key=${m.time} showName=${true} name=${this.names[m.info.from]}/>`

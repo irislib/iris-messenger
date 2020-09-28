@@ -195,7 +195,7 @@ class ChatView extends Component {
         <${ChatList}/>
         <div id="chat-main">
 					${this.props.id ? html`<div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
-            <div id="message-list">${msgListContent}</div>
+            <div id="message-list" class="centered-container">${msgListContent}</div>
             <div id="attachment-preview" style="display:none"></div>
           </div>` : html`<${NewChat}/>`}
           <div id="not-seen-by-them" style="display: none">

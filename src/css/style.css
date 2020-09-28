@@ -317,6 +317,11 @@ header #back-button {
   text-align: center;
 }
 
+.settings {
+  width: 800px;
+  align-self: center;
+}
+
 #chat-view {
   display: flex;
   flex-direction: row;
@@ -504,7 +509,15 @@ header #back-button {
   margin-bottom: 10px;
 }
 
-#message-list {
+#settings .centered-container {
+  padding: 15px;
+}
+
+hr {
+  width: 100%;
+}
+
+.centered-container {
   display: flex;
   max-width: 800px;
   flex-direction: column;
