@@ -3,7 +3,6 @@ import {chats, getDisplayName} from '../Chat.js';
 import { translate as t } from '../Translation.js';
 import {localState, activeRoute, publicState} from '../Main.js';
 import Session from '../Session.js';
-import Helpers from '../Helpers.js';
 import { route } from '../lib/preact-router.es.js';
 import Identicon from './Identicon.js';
 
