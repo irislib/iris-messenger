@@ -270,6 +270,10 @@ header #back-button {
   border-radius: 0;
 }
 
+.public-messages-view .img-container {
+  margin-bottom: 15px;
+}
+
 .public-messages-view .msg {
   align-items: flex-start;
   margin-bottom: 15px;
@@ -1005,6 +1009,10 @@ small {
   }
   .public-messages-view .msg .msg-content, textarea {
     border-radius: 0 !important;
+  }
+  .public-messages-view .img-container {
+    margin-left: -15px;
+    margin-right: -15px;
   }
   #current-profile-photo {
     max-width: none !important;
