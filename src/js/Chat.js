@@ -1,4 +1,4 @@
-import {publicState, localState, showMenu, activeRoute, activeProfile} from './Main.js';
+import {publicState, localState, activeRoute, activeProfile} from './Main.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
@@ -16,14 +16,10 @@ function showChat(pub) {
   }
 
   route('/chat/' + pub);
-  showMenu(false);
 }
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(publicState, Session.getKey(), pub);
-  if (activeRoute === '/chat/' + pub) {
-    showMenu();
-  }
   delete chats[pub];
   $('.chat-item[data-pub="' + pub +'"]').remove();
 }

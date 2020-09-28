@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import {chats, getDisplayName} from '../Chat.js';
 import { translate as t } from '../Translation.js';
-import {localState, showMenu, activeRoute, publicState} from '../Main.js';
+import {localState, activeRoute, publicState} from '../Main.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import { route } from '../lib/preact-router.es.js';
@@ -52,7 +52,7 @@ class Header extends Component {
   }
 
   backButtonClicked() {
-    showMenu(true);
+    route('/chat');
   }
 
   onClick() {

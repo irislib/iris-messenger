@@ -323,6 +323,10 @@ header #back-button {
   height: 100%;
 }
 
+#chat-main {
+  display:flex;flex-direction:column;flex:3;
+}
+
 .chat-list .seen-indicator {
   margin-right: 5px;
 }

@@ -52,7 +52,6 @@ function handleRoute(e) {
   }
   activeProfile = activeRoute.indexOf('/profile') === 0 ? activeRoute.replace('/profile/', '') : null;
   localState.get('activeRoute').put(activeRoute);
-  showMenu(false);
   QRScanner.cleanupScanner();
 }
 
@@ -96,9 +95,4 @@ $(window).resize(() => { // if resizing up from mobile size menu view
   }
 });
 
-function showMenu(show = true) {
-  $('.sidebar').toggleClass('hidden-xs', !show);
-  $('.main').toggleClass('hidden-xs', show);
-}
-
-export {publicState, localState, showMenu, activeRoute, activeProfile};
+export {publicState, localState, activeRoute, activeProfile};

@@ -36,6 +36,11 @@ function copyMyChatLinkClicked(e) {
   }, 2000);
 }
 
+function showChatList(show = true) {
+  $('.sidebar').toggleClass('hidden-xs', !show);
+  $('#chat-main').toggleClass('hidden-xs', show);
+}
+
 const subscribedToMsgs = {};
 
 class ChatView extends Component {
@@ -81,9 +86,11 @@ class ChatView extends Component {
       }
     });
 
-    if (!iris.util.isMobile) {
-      $("#new-msg").focus();
-    }
+    if (iris.util.isMobile) {
+			showChatList(true);
+    } else {
+			$("#new-msg").focus();
+		}
   }
 
   componentWillUnmount() {
@@ -186,7 +193,7 @@ class ChatView extends Component {
     return html`
       <div id="chat-view">
         <${ChatList}/>
-        <div style="display:flex;flex-direction:column;flex:3;">
+        <div id="chat-main">
 					${this.props.id ? html`<div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
             <div id="message-list">${msgListContent}</div>
             <div id="attachment-preview" style="display:none"></div>

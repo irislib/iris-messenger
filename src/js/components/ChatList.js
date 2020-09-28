@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
-import {localState, publicState, showMenu} from '../Main.js';
+import {localState, publicState} from '../Main.js';
 import ChatListItem from './ChatListItem.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
@@ -60,7 +60,6 @@ class ChatList extends Component {
 
   onNewChatClick() {
     route('/chat');
-    showMenu(false);
   }
 
   render() {
