@@ -792,6 +792,7 @@ small {
   display: flex;
   flex-direction: row;
   justify-items: center;
+  margin-bottom: 30px;
 }
 
 #profile-public-messages form button {
