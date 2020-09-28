@@ -94,6 +94,28 @@ img {
   display: none;
 }
 
+header a:not(:last-child) {
+  margin-right: 15px;
+}
+
+header .identicon img {
+  padding: 3px;
+}
+
+header .active .identicon img {
+  border: 1px solid var(--text-color);
+}
+
+header .btn {
+  font-size: 2em;
+  color: var(--text-color);
+  opacity: 0.5;
+}
+
+header .btn.active {
+  opacity: 1;
+}
+
 #main-content {
   display: flex;
   flex-direction: column;
@@ -239,7 +261,7 @@ header #back-button {
 }
 
 #profile .content {
-  width: max(80%, 800px);
+  width: 800px;
   max-width: 100%;
 }
 
@@ -480,15 +502,9 @@ header #back-button {
 
 #message-list {
   display: flex;
-  max-width: 700px;
+  max-width: 800px;
   flex-direction: column;
   margin: 0 auto 0 auto;
-}
-
-@media (min-width: 1268px) {
-  #message-list {
-    max-width: 80%;
-  }
 }
 
 .message-form {
@@ -586,7 +602,7 @@ header #back-button {
   display: inline-block;
 }
 
-.chat-item .identicon-container, header .identicon-container {
+.chat-item .identicon-container {
   flex: none;
   align-self: center;
   margin-right: 15px !important;
