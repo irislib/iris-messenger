@@ -276,13 +276,17 @@ header #back-button {
 }
 
 .public-messages-view .msg-sender {
-  margin: 1px 10px 5px 10px;
+  margin-bottom: 15px;
   display:flex;
   align-items: center;
 }
 
 .public-messages-view .msgSenderName {
-  margin-left: 10px;
+  margin-left: 15px;
+}
+
+.public-messages-view .msg:first-of-type {
+  margin-top: 15px;
 }
 
 .public-messages-view .msg .msg-content .seen-indicator {
@@ -297,14 +301,14 @@ header #back-button {
 }
 
 .public-messages-view .msg .text, .public-messages-view .msg .time {
-  margin: 6px 10px 0 10px;
+  margin-bottom: 5px;
 }
 
 .public-messages-view .msg .msg-content {
   max-width: none;
   border-radius: 8px !important;
   width: 100%;
-  padding: 6px 0;
+  padding: 15px;
 }
 
 .emoji {
