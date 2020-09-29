@@ -83,10 +83,6 @@ class Header extends Component {
         title = t('new_chat');
       } else if (activeRoute === '/chat/public') {
         title = t('public_messages');
-      } else if (activeRoute === '/settings') {
-        title = t('settings');
-      } else if (activeRoute === '/logout') {
-        title = t('log_out') + '?';
       } else if (activeRoute.indexOf('/chat/') === 0) {
         if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
           title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;

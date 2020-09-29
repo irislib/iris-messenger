@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import {localState, publicState, activeProfile} from '../Main.js';
-import {chats, deleteChat, showChat} from '../Chat.js';
+import {chats, deleteChat, showChat, newChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
@@ -54,7 +54,11 @@ class Profile extends Component {
   }
 
   onFollowClick() {
-    publicState.user().get('follow').get(this.props.id).put(!this.state.youFollow);
+    const follow = !this.state.youFollow;
+    publicState.user().get('follow').get(this.props.id).put(follow);
+    if (follow) {
+      newChat(this.props.id);
+    }
   }
 
   render() {
