@@ -116,7 +116,7 @@ class MessageForm extends Component {
       chats[this.props.activeChat].attachments = null;
     }
     if (this.props.activeChat !== 'public') {
-      Helpers.scrollToMessageListBottom();      
+      Helpers.scrollToMessageListBottom();
     }
   }
 

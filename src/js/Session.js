@@ -1,4 +1,4 @@
-import {localState, publicState, showMenu, activeRoute} from './Main.js';
+import {localState, publicState, activeRoute} from './Main.js';
 import {chats, addChat, newChat, showChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
@@ -70,10 +70,6 @@ function login(k) {
       setTimeout(go, 2000); // wait a sec to not re-create the same chat
     } else {
       go();
-    }
-  } else {
-    if (iris.util.isMobile) {
-      setTimeout(showMenu, 0); // too hacky?
     }
   }
   publicState.user().get('profile').get('name').on(name => {

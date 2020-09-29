@@ -45,15 +45,17 @@ class FollowsView extends Component {
     const keys = Object.keys(this.follows);
     return html`
       <div class="main-view public-messages-view" id="follows-view">
-        <h3><a href="/profile/${this.props.id}">${this.state.name || '—'}</a> ${t('following')}</h3>
-        <div id="follows-list">
-          ${keys.map(k => {
-            return html`
-            <div>
-              <a href="/profile/${k}"><${Identicon} str=${k} width=49/> ${this.follows[k].name || ''}</a>
-            </div>`;
-          })}
-          ${keys.length === 0 ? '—' : ''}
+        <div class="centered-container">
+          <h3><a href="/profile/${this.props.id}">${this.state.name || '—'}</a> ${t('following')}</h3>
+          <div id="follows-list">
+            ${keys.map(k => {
+              return html`
+              <div>
+                <a href="/profile/${k}"><${Identicon} str=${k} width=49/> ${this.follows[k].name || ''}</a>
+              </div>`;
+            })}
+            ${keys.length === 0 ? '—' : ''}
+          </div>
         </div>
       </div>
     `;

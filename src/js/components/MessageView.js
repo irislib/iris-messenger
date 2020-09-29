@@ -46,7 +46,7 @@ class MessageView extends Component {
     const actions = author && author === k.pub ? html`<button onClick=${() => this.setState({deleting:true})}>${t('delete')}</button>` : '';
     return this.state.msg ? html`
       <div class="main-view public-messages-view" id="message-view">
-        <div id="message-list">
+        <div id="message-list" class="centered-container">
           <${Message} ...${this.state.msg} showName=${true} chatId=${this.state.msg.info.from}/>
         </div>
         ${this.state.deleting ? html`

@@ -8,6 +8,8 @@ import {chats, processMessage, newChat} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Notifications from '../Notifications.js';
+import ChatList from './ChatList.js';
+import NewChat from './NewChat.js';
 import {activeRoute} from '../Main.js';
 
 const caretDownSvg = html`
@@ -48,7 +50,7 @@ class ChatView extends Component {
       this.eventListeners.push(eve);
       if (activeRouteId.indexOf('/chat/') !== 0 || !Session.getKey()) return;
       this.activeChat && chats[this.activeChat] && chats[this.activeChat].setTyping(false);
-      this.activeChat = activeRouteId && activeRouteId.replace('/chat/', '');
+      this.activeChat = activeRouteId && activeRouteId.replace('/chat/new', '').replace('/chat/', '');
       this.setState({});
 
       const update = () => {
@@ -80,8 +82,8 @@ class ChatView extends Component {
     });
 
     if (!iris.util.isMobile) {
-      $("#new-msg").focus();
-    }
+			$("#new-msg").focus();
+		}
   }
 
   componentWillUnmount() {
@@ -140,29 +142,25 @@ class ChatView extends Component {
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
     if (!iris.util.isMobile) {
-      $("#new-msg").focus();
-    }
-    if (chat) {
-      if (activeRoute === '/chat/public' || chat.theirMsgsLastSeenTime) {
-        $('#not-seen-by-them:visible').slideUp();
-      } else if (!chat.uuid && $('.msg.our').length) {
+			$("#new-msg").focus();
+		}
+    if (chat && !chat.uuid) {
+      if ($('.msg.our').length && !$('.msg.their').length && !chat.theirMsgsLastSeenTime) {
         $('#not-seen-by-them').slideDown();
-      }
+      } else {
+				$('#not-seen-by-them').slideUp();
+			}
     }
     localState.get('chats').get(this.activeChat).get('msgDraft').once(m => $('#new-msg').val(m));
   }
 
   render() {
-    if (!activeRoute || !chats[this.activeChat] || !chats[this.activeChat].sortedMessages) {
-      return html``;
-    }
-
     const now = new Date();
     const nowStr = now.toLocaleDateString();
     let previousDateStr;
     let previousFrom;
     const msgListContent = [];
-    if (chats[this.activeChat].sortedMessages) {
+    if (chats[this.activeChat] && chats[this.activeChat].sortedMessages) {
       Object.values(chats[this.activeChat].sortedMessages).forEach(msg => {
         const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
         if (date) {
@@ -186,16 +184,23 @@ class ChatView extends Component {
     }
 
     return html`
-      <div class="main-view ${activeRoute === '/chat/public' ? 'public-messages-view' : ''}" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
-        <div id="message-list">${msgListContent}</div>
-        <div id="attachment-preview" style="display:none"></div>
-      </div>
-      <div id="not-seen-by-them" style="display: none">
-        <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
-        <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
-      </div>
-      <div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
-      <div class="message-form"><${MessageForm} activeChat=${this.activeChat}/></div>`;
+      <div id="chat-view">
+        <${ChatList} class=${this.props.id ? 'hidden-xs' : ''}/>
+        <div id="chat-main" class=${this.props.id ? '' : 'hidden-xs'}>
+					${this.props.id && this.props.id.length > 20 ? html`<div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
+            <div id="message-list">${msgListContent}</div>
+            <div id="attachment-preview" style="display:none"></div>
+          </div>` : html`<${NewChat}/>`}
+          ${this.activeChat ? html`
+						<div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
+						<div id="not-seen-by-them" style="display: none">
+							<p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
+							<p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
+						</div>
+						<div class="message-form"><${MessageForm} activeChat=${this.activeChat}/></div>
+						`: ''}
+        </div>
+      </div>`;
     }
 }
 

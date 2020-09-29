@@ -94,9 +94,40 @@ img {
   display: none;
 }
 
+header a.logo {
+  display: flex;
+  align-items: center;
+}
+
+header a.logo img:first-child {
+  margin-right: 10px;
+}
+
+header a:not(:last-child) {
+  margin-right: 15px;
+}
+
+header .identicon img {
+  padding: 3px;
+}
+
+header .active .identicon img {
+  border: 1px solid var(--text-color);
+}
+
+header .btn {
+  font-size: 2em;
+  color: var(--text-color);
+  opacity: 0.5;
+}
+
+header .btn.active {
+  opacity: 1;
+}
+
 #main-content {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   height: 100%;
   overflow: hidden;
   position: fixed;
@@ -138,7 +169,12 @@ header {
 }
 
 header .name {
-  margin-right: 15px;
+  min-height: 1.3em;
+}
+
+header small {
+  display: inline-block;
+  min-height:1em;
 }
 
 header #header-content {
@@ -181,10 +217,6 @@ header #header-content {
 }
 
 @media (max-width: 575px) {
-  header #header-content {
-    max-width: calc(100% - 35px);
-  }
-
   .flex-table .flex-row {
     flex-direction: column;
   }
@@ -192,7 +224,7 @@ header #header-content {
 
 header #back-button {
   align-self: center;
-  padding: 10px 15px;
+  padding: 10px 15px 10px 0;
   cursor: pointer;
 }
 
@@ -239,7 +271,7 @@ header #back-button {
 }
 
 #profile .content {
-  width: max(80%, 800px);
+  width: 800px;
   max-width: 100%;
 }
 
@@ -248,19 +280,27 @@ header #back-button {
   border-radius: 0;
 }
 
+.public-messages-view .img-container {
+  margin-bottom: 15px;
+}
+
 .public-messages-view .msg {
   align-items: flex-start;
   margin-bottom: 15px;
 }
 
 .public-messages-view .msg-sender {
-  margin: 1px 10px 5px 10px;
+  margin-bottom: 15px;
   display:flex;
   align-items: center;
 }
 
 .public-messages-view .msgSenderName {
-  margin-left: 10px;
+  margin-left: 15px;
+}
+
+.public-messages-view .msg:first-of-type {
+  margin-top: 15px;
 }
 
 .public-messages-view .msg .msg-content .seen-indicator {
@@ -275,14 +315,14 @@ header #back-button {
 }
 
 .public-messages-view .msg .text, .public-messages-view .msg .time {
-  margin: 6px 10px 0 10px;
+  margin-bottom: 5px;
 }
 
 .public-messages-view .msg .msg-content {
   max-width: none;
   border-radius: 8px !important;
   width: 100%;
-  padding: 6px 0;
+  padding: 15px;
 }
 
 .emoji {
@@ -293,6 +333,32 @@ header #back-button {
 .msg .emoji-only {
   font-size: 3em;
   text-align: center;
+}
+
+.settings {
+  width: 800px;
+  align-self: center;
+}
+
+#chat-view {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+#chat-view #message-list {
+  max-width: 100%;
+  width: max(80%, 800px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+#chat-main {
+  display:flex;
+  flex-direction:column;
+  flex:3;
+  max-width:100%;
 }
 
 .chat-list .seen-indicator {
@@ -472,17 +538,19 @@ header #back-button {
   margin-bottom: 10px;
 }
 
-#message-list {
-  display: flex;
-  max-width: 700px;
-  flex-direction: column;
-  margin: 0 auto 0 auto;
+#settings .centered-container {
+  padding: 15px;
 }
 
-@media (min-width: 1268px) {
-  #message-list {
-    max-width: 80%;
-  }
+hr {
+  width: 100%;
+}
+
+.centered-container {
+  display: flex;
+  max-width: 800px;
+  flex-direction: column;
+  margin: 0 auto 0 auto;
 }
 
 .message-form {
@@ -580,7 +648,7 @@ header #back-button {
   display: inline-block;
 }
 
-.chat-item .identicon-container, header .identicon-container {
+.chat-item .identicon-container {
   flex: none;
   align-self: center;
   margin-right: 15px !important;
@@ -602,6 +670,10 @@ header #back-button {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+
+header .text {
+  text-align: center;
 }
 
 .chat-item .latest-time {
@@ -745,6 +817,7 @@ small {
   display: flex;
   flex-direction: row;
   justify-items: center;
+  margin-bottom: 30px;
 }
 
 #profile-public-messages form button {
@@ -843,6 +916,7 @@ small {
   display: flex;
   align-items: center;
   flex: 1;
+  padding: 15px;
 }
 
 .profile-photo {
@@ -954,6 +1028,9 @@ small {
   .visible-xs-flex {
     display: flex;
   }
+  #settings .centered-container {
+    padding: 0;
+  }
   #profile {
     padding: 0;
   }
@@ -962,6 +1039,10 @@ small {
   }
   .public-messages-view .msg .msg-content, textarea {
     border-radius: 0 !important;
+  }
+  .public-messages-view .img-container {
+    margin-left: -15px;
+    margin-right: -15px;
   }
   #current-profile-photo {
     max-width: none !important;

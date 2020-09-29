@@ -1,4 +1,4 @@
-import {publicState, localState, showMenu, activeRoute, activeProfile} from './Main.js';
+import {publicState, localState, activeRoute, activeProfile} from './Main.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
@@ -16,14 +16,10 @@ function showChat(pub) {
   }
 
   route('/chat/' + pub);
-  showMenu(false);
 }
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(publicState, Session.getKey(), pub);
-  if (activeRoute === '/chat/' + pub) {
-    showMenu();
-  }
   delete chats[pub];
   $('.chat-item[data-pub="' + pub +'"]').remove();
 }
@@ -55,7 +51,6 @@ function addChat(chat) {
       chat.theirMsgsLastSeenDate = d;
     }
   });
-  $('#welcome').remove();
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
   chat.messageIds = chat.messageIds || {};

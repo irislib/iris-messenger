@@ -12,7 +12,7 @@ class Identicon extends Component {
   }
 
   render() {
-    return html`<div class="identicon-container"/>`;
+    return html`<div onClick=${this.props.onClick} class="identicon-container"/>`;
   }
 }
 
