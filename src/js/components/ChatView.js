@@ -144,10 +144,12 @@ class ChatView extends Component {
     if (!iris.util.isMobile) {
 			$("#new-msg").focus();
 		}
-    if (chat) {
-      if (!chat.uuid && $('.msg.our').length) {
+    if (chat && !chat.uuid) {
+      if ($('.msg.our').length && !$('.msg.their').length && !chat.theirMsgsLastSeenTime) {
         $('#not-seen-by-them').slideDown();
-      }
+      } else {
+				$('#not-seen-by-them').slideUp();
+			}
     }
     localState.get('chats').get(this.activeChat).get('msgDraft').once(m => $('#new-msg').val(m));
   }
