@@ -40,11 +40,15 @@ function onPasteChatLink(event) {
     return;
   }
   var s = val.split('?');
-  if (s.length !== 2) { return; }
-  var chatId = Helpers.getUrlParameter('chatWith', s[1]) || Helpers.getUrlParameter('channelId', s[1]);
+  let chatId;
+  if (s.length === 2) {
+    chatId = Helpers.getUrlParameter('chatWith', s[1]) || Helpers.getUrlParameter('channelId', s[1]);
+  }
   if (chatId) {
     newChat(chatId, val);
     showChat(chatId);
+  } else if (val.indexOf('https://iris.to/#/') === 0) {
+    route(val.replace('https://iris.to/#', ''));
   }
   $(event.target).val('');
 }
