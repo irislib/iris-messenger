@@ -108,7 +108,7 @@ header a.logo img:last-child {
 }
 
 header a:not(:last-child) {
-  margin-right: 15px;
+  margin-right: 22px;
 }
 
 header .identicon img {

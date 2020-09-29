@@ -76,7 +76,7 @@ class Settings extends Component {
           <h3>${t('about')}</h3>
           <p>Iris is like the messaging apps we're used to, but better.</p>
           <ul>
-            <li><b>No phone number or signup required.</b> Just start using it!</li>
+            <li><b>No phone number or signup required.</b> Just type in your name or alias and go!</li>
             <li><b>Secure</b>: It's open source. Users can validate that big brother doesn't read your messages.</li>
             <li><b>Available</b>: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.</li>
           </ul>
