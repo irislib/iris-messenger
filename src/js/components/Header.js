@@ -65,7 +65,7 @@ class Header extends Component {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
       this.setState({});
-      const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '').replace('/profile/', '');
+      const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
       this.chatId = replaced.length < activeRoute.length ? replaced : null;
       if (this.chatId) {
         localState.get('chats').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
@@ -87,7 +87,7 @@ class Header extends Component {
         title = t('settings');
       } else if (activeRoute === '/logout') {
         title = t('log_out') + '?';
-      } else if (activeRoute.indexOf('/chat/') === 0 || activeRoute.indexOf('/profile/') === 0) {
+      } else if (activeRoute.indexOf('/chat/') === 0) {
         if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
           title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
         } else {

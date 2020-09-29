@@ -824,15 +824,24 @@ small {
   margin-bottom: 30px;
 }
 
-#profile-public-messages form button {
+form.public button {
   height: 47px;
   width: 47px;
   margin-right: 5px;
 }
 
-#profile-public-messages form button svg {
+form.public button svg {
   width: 1em;
   height: 1em;
+}
+
+form.public div {
+  position: relative;
+}
+
+form.public button[type="submit"] {
+  position: absolute;
+  right: 0;
 }
 
 .profile-header-stuff {
