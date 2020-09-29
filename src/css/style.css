@@ -94,6 +94,15 @@ img {
   display: none;
 }
 
+header a.logo {
+  display: flex;
+  align-items: center;
+}
+
+header a.logo img:first-child {
+  margin-right: 10px;
+}
+
 header a:not(:last-child) {
   margin-right: 15px;
 }
