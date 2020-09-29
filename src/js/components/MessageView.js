@@ -45,18 +45,20 @@ class MessageView extends Component {
     const author = this.state.msg && this.state.msg.author && this.state.msg.author.keyID;
     const actions = author && author === k.pub ? html`<button onClick=${() => this.setState({deleting:true})}>${t('delete')}</button>` : '';
     return this.state.msg ? html`
-      <div class="main-view public-messages-view" id="message-view">
+      <div class="main-view public-messages-view">
         <div id="message-list" class="centered-container">
           <${Message} ...${this.state.msg} showName=${true} chatId=${this.state.msg.info.from}/>
+          <div>
+            ${this.state.deleting ? html`
+              <p>${t('confirm_delete_msg')}</p>
+              <p>
+                <button onClick=${() => this.setState({deleting:false})}>${t('cancel')}</button>
+                <button onClick=${() => this.deleteMsg()}>${t('delete')}</button>
+              </p>
+              `: actions}
+            <div id="attachment-preview" style="display:none"></div>
+          </div>
         </div>
-        ${this.state.deleting ? html`
-          <p>${t('confirm_delete_msg')}</p>
-          <p>
-            <button onClick=${() => this.setState({deleting:false})}>${t('cancel')}</button>
-            <button onClick=${() => this.deleteMsg()}>${t('delete')}</button>
-          </p>
-          `: actions}
-        <div id="attachment-preview" style="display:none"></div>
       </div>
     ` : '';
   }

@@ -303,10 +303,6 @@ header #back-button {
   margin-left: 15px;
 }
 
-.public-messages-view .msg:first-of-type {
-  margin-top: 15px;
-}
-
 .public-messages-view .msg .msg-content .seen-indicator {
   display: none;
 }
@@ -846,6 +842,10 @@ form.public div {
 form.public button[type="submit"] {
   position: absolute;
   right: 0;
+}
+
+form.public {
+  margin-bottom: 15px;
 }
 
 .profile-header-stuff {
