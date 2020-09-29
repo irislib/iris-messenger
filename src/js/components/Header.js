@@ -65,7 +65,7 @@ class Header extends Component {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
       this.setState({});
-      const replaced = activeRoute.replace('/chat/', '').replace('/profile/', '');
+      const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '').replace('/profile/', '');
       this.chatId = replaced.length < activeRoute.length ? replaced : null;
       if (this.chatId) {
         localState.get('chats').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
@@ -124,16 +124,14 @@ class Header extends Component {
 
     return html`
     <header>
-      ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
-      <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
-        ‹
-        <span class="unseen unseen-total"></span>
-      </div>
-      ` : ''}
       <div id="header-content">
-        ${activeRoute && activeRoute.indexOf('/chat/') !== 0 ? html`
-          <a href="/"><img src="img/icon128.png" width="40" height="40"/></a>
+        ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
+        <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
+          ‹
+          <span class="unseen unseen-total"></span>
+        </div>
         ` : ''}
+        <a href="/" class=${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' }><img src="img/icon128.png" width="40" height="40"/></a>
         <div class="text">
           <!--<div class="name">
             ${this.state.title}

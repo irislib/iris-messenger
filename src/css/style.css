@@ -658,6 +658,10 @@ hr {
   overflow: hidden;
 }
 
+header .text {
+  text-align: center;
+}
+
 .chat-item .latest-time {
   float: right;
 }
