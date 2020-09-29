@@ -51,7 +51,6 @@ function addChat(chat) {
       chat.theirMsgsLastSeenDate = d;
     }
   });
-  $('#welcome').remove();
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
   chat.messageIds = chat.messageIds || {};

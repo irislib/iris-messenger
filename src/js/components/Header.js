@@ -133,9 +133,9 @@ class Header extends Component {
         ` : ''}
         <a href="/" class=${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' }><img src="img/icon128.png" width="40" height="40"/></a>
         <div class="text">
-          <!--<div class="name">
+          <div class="name">
             ${this.state.title}
-          </div>-->
+          </div>
           ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
           ${participants ? html`<small class="participants">${participants}</small>` : ''}
           ${onlineStatus ? html`<small class="last-seen">${onlineStatus}</small>` : ''}

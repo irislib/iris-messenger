@@ -210,7 +210,7 @@ header #header-content {
 
 header #back-button {
   align-self: center;
-  padding: 10px 15px;
+  padding: 10px 15px 10px 0;
   cursor: pointer;
 }
 
