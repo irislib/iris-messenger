@@ -79,7 +79,7 @@ class Header extends Component {
       }
 
       let title = '';
-      if (!activeRoute || activeRoute === '/') {
+      if (!activeRoute || activeRoute === '/chat/new') {
         title = t('new_chat');
       } else if (activeRoute === '/chat/public') {
         title = t('public_messages');
@@ -115,6 +115,10 @@ class Header extends Component {
     });
   }
 
+  onTitleClicked() {
+    this.chatId && route('/profile/' + this.chatId);
+  }
+
   render() {
     const chat = chats[this.chatId];
     const isTyping = chat && chat.isTyping;
@@ -132,13 +136,13 @@ class Header extends Component {
         </div>
         ` : ''}
         <a href="/" class=${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' }><img src="img/icon128.png" width="40" height="40"/></a>
-        <div class="text">
+        <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
           <div class="name">
-            ${this.state.title}
+            ${this.state.title || ''}
           </div>
           ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
           ${participants ? html`<small class="participants">${participants}</small>` : ''}
-          ${onlineStatus ? html`<small class="last-seen">${onlineStatus}</small>` : ''}
+          ${this.chatId ? html`<small class="last-seen">${onlineStatus || ''}</small>` : ''}
         </div>
         <a href="/" class="btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
         <a href="/chat" class="btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">

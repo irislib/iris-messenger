@@ -160,7 +160,12 @@ header {
 }
 
 header .name {
-  margin-right: 15px;
+  min-height: 1.3em;
+}
+
+header small {
+  display: inline-block;
+  min-height:1em;
 }
 
 header #header-content {
