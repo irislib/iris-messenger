@@ -39,22 +39,18 @@ class ChatList extends Component {
     }
   }
 
-  onNewChatClick() {
-    route('/chat');
-  }
-
   render() {
     const welcomeToIris = this.state.chats.length > 1 ? '' : html`<div id="welcome" class="visible-xs-block">
       <h3>Iris Messenger</h3>
       <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
     </div>`;
-    return html`<section class="sidebar hidden-xs">
+    return html`<section class="sidebar ${this.props.class || ''}">
       <div id="enable-notifications-prompt">
         <div class="title">${t('get_notified_new_messages')}</div>
         <div><a>${t('turn_on_desktop_notifications')}</a></div>
       </div>
       <div class="chat-list">
-        <div class="chat-item new ${this.state.activeRoute === '/chat' ? 'active-item' : ''}" onClick=${() => this.onNewChatClick()}>
+        <div class="chat-item new ${['/chat', '/chat/new'].indexOf(this.state.activeRoute) > -1  ? 'active-item' : ''}" onClick=${() => route('/chat/new')}>
           <svg class="svg-inline--fa fa-smile fa-w-16" style="margin-right:10px;margin-top:3px" x="0px" y="0px"
               viewBox="0 0 510 510">
             <path fill="currentColor" d="M459,0H51C22.95,0,0,22.95,0,51v459l102-102h357c28.05,0,51-22.95,51-51V51C510,22.95,487.05,0,459,0z M102,178.5h306v51 H102V178.5z M306,306H102v-51h204V306z M408,153H102v-51h306V153z"/>

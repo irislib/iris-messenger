@@ -124,12 +124,16 @@ class Header extends Component {
 
     return html`
     <header>
+      ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
       <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
         ‹
         <span class="unseen unseen-total"></span>
       </div>
+      ` : ''}
       <div id="header-content">
-        <a href="/"><img src="img/icon128.png" width="40" height="40"/></a>
+        ${activeRoute && activeRoute.indexOf('/chat/') !== 0 ? html`
+          <a href="/"><img src="img/icon128.png" width="40" height="40"/></a>
+        ` : ''}
         <div class="text">
           <!--<div class="name">
             ${this.state.title}

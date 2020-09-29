@@ -36,11 +36,6 @@ function copyMyChatLinkClicked(e) {
   }, 2000);
 }
 
-function showChatList(show = true) {
-  $('.sidebar').toggleClass('hidden-xs', !show);
-  $('#chat-main').toggleClass('hidden-xs', show);
-}
-
 const subscribedToMsgs = {};
 
 class ChatView extends Component {
@@ -55,7 +50,7 @@ class ChatView extends Component {
       this.eventListeners.push(eve);
       if (activeRouteId.indexOf('/chat/') !== 0 || !Session.getKey()) return;
       this.activeChat && chats[this.activeChat] && chats[this.activeChat].setTyping(false);
-      this.activeChat = activeRouteId && activeRouteId.replace('/chat/', '');
+      this.activeChat = activeRouteId && activeRouteId.replace('/chat/new', '').replace('/chat/', '');
       this.setState({});
 
       const update = () => {
@@ -86,9 +81,7 @@ class ChatView extends Component {
       }
     });
 
-    if (iris.util.isMobile) {
-			showChatList(true);
-    } else {
+    if (!iris.util.isMobile) {
 			$("#new-msg").focus();
 		}
   }
@@ -149,12 +142,10 @@ class ChatView extends Component {
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
     if (!iris.util.isMobile) {
-      $("#new-msg").focus();
-    }
+			$("#new-msg").focus();
+		}
     if (chat) {
-      if (activeRoute === '/chat/public' || chat.theirMsgsLastSeenTime) {
-        $('#not-seen-by-them:visible').slideUp();
-      } else if (!chat.uuid && $('.msg.our').length) {
+      if (!chat.uuid && $('.msg.our').length) {
         $('#not-seen-by-them').slideDown();
       }
     }
@@ -192,18 +183,20 @@ class ChatView extends Component {
 
     return html`
       <div id="chat-view">
-        <${ChatList}/>
-        <div id="chat-main">
-					${this.props.id ? html`<div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
-            <div id="message-list" class="centered-container">${msgListContent}</div>
+        <${ChatList} class=${this.props.id ? 'hidden-xs' : ''}/>
+        <div id="chat-main" class=${this.props.id ? '' : 'hidden-xs'}>
+					${this.props.id && this.props.id.length > 20 ? html`<div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
+            <div id="message-list">${msgListContent}</div>
             <div id="attachment-preview" style="display:none"></div>
           </div>` : html`<${NewChat}/>`}
-          <div id="not-seen-by-them" style="display: none">
-            <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
-            <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
-          </div>
-          <div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
-          <div class="message-form"><${MessageForm} activeChat=${this.activeChat}/></div>
+          ${this.activeChat ? html`
+						<div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
+						<div id="not-seen-by-them" style="display: none">
+							<p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
+							<p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
+						</div>
+						<div class="message-form"><${MessageForm} activeChat=${this.activeChat}/></div>
+						`: ''}
         </div>
       </div>`;
     }
