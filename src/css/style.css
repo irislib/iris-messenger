@@ -830,6 +830,10 @@ form.public button {
   margin-right: 5px;
 }
 
+form.public button:last-of-type {
+  margin-right: 0;
+}
+
 form.public button svg {
   width: 1em;
   height: 1em;
@@ -1064,6 +1068,9 @@ form.public button[type="submit"] {
   }
   .profile-top {
     padding: 10px 15px;
+  }
+  form.public div {
+    margin: 0 15px;
   }
 }
 
