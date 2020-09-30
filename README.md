@@ -24,7 +24,9 @@ yarn
 yarn start
 ```
 
-Eslint: `yarn eslint src/js/*.js`
+No build tools! It just serves the `src` directory at http://localhost:8000
+
+Eslint: `yarn eslint src/js/*.js --fix;yarn eslint src/js/components/*.js --fix`
 
 The application was originally built in plain jQuery without a framework. While we now use [preact](https://preactjs.com/), there's still some jquery logic that should be ported.
 
