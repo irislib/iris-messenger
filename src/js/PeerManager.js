@@ -43,8 +43,9 @@ function getPeers() {
     p = JSON.parse(p);
   } else {
     p = {
-      'https://gun-us.herokuapp.com/gun': {},
-      'https://gun-eu.herokuapp.com/gun': {}
+      'https://gunmeetingserver.herokuapp.com/gun': {}
+      //'https://gun-us.herokuapp.com/gun': {},
+      //'https://gun-eu.herokuapp.com/gun': {}
     };
   }
   if (iris.util.isElectron) {
