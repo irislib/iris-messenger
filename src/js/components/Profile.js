@@ -214,13 +214,13 @@ class Profile extends Component {
 
   componentDidMount() {
     const pub = this.props.id;
-    if (!pub || (pub === this.id)) {
+    if (pub === this.id) {
       return;
     }
     this.eventListeners.forEach(e => e.off());
     this.id = pub;
     this.sortedMessages = [];
-    this.setState({followsYou:false, youFollow: false, followedUserCount: 0});
+    this.setState({followsYou:false, youFollow: false, followedUserCount: 0, name: '', photo: '', about: ''});
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === pub;
     this.followedUsers = new Set();
