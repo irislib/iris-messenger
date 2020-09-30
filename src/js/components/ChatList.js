@@ -5,6 +5,7 @@ import ChatListItem from './ChatListItem.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import { route } from '../lib/preact-router.es.js';
+import Notifications from '../Notifications.js';
 
 class ChatList extends Component {
   constructor() {
@@ -37,6 +38,12 @@ class ChatList extends Component {
     if (Session.getKey()) {
       $("#my-identicon").append(Helpers.getIdenticon(Session.getKey().pub, 40));
     }
+
+    if (window.Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+      setTimeout(() => {
+        $('#enable-notifications-prompt').slideDown();
+      }, 5000);
+    }
   }
 
   render() {
@@ -45,7 +52,7 @@ class ChatList extends Component {
       <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
     </div>`;
     return html`<section class="sidebar ${this.props.class || ''}">
-      <div id="enable-notifications-prompt">
+      <div id="enable-notifications-prompt" onClick=${() => Notifications.enableDesktopNotifications()}>
         <div class="title">${t('get_notified_new_messages')}</div>
         <div><a>${t('turn_on_desktop_notifications')}</a></div>
       </div>

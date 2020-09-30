@@ -181,12 +181,6 @@ async function getWebPushSubscriptions() {
 function init() {
   loginTime = new Date();
   unseenTotal = 0;
-  if (window.Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-    setTimeout(() => {
-      $('#enable-notifications-prompt').slideDown();
-    }, 5000);
-  }
-  $('#enable-notifications-prompt').click(enableDesktopNotifications);
 }
 
-export default {init, notifyMsg, changeChatUnseenCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};
+export default {init, notifyMsg, enableDesktopNotifications, changeChatUnseenCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};
