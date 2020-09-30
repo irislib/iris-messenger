@@ -38,3 +38,6 @@ In that regard, Iris prioritizes decentralization and availability over perfect 
 Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.
 
 The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.
+
+## Contact
+Join our [Discord](https://discord.gg/4Dgf54k) or send me a message on [Iris](https://iris.to/?chatWith=hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU&s=HlzYzNrhUsrn2PLi4yuRt6DiFUNM3hOmN8nFpgw6T-g&k=zvDfsInsMOI1).
