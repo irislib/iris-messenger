@@ -1,6 +1,6 @@
 # Iris
 Iris is like the social networking apps we're used to, but better.
-* No phone number or signup required. Just start using it!
+* No phone number or signup required. Just type in your name or alias and go!
 * Secure: It's open source. Users can validate that big brother doesn't read your private messages.
 * Available: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.
 
