@@ -20,7 +20,6 @@ class FollowsView extends Component {
 
       publicState.user(this.props.id).get('follow').map().on((follows, pub, b, e) => {
         this.eventListeners['follow'] = e;
-        console.log('yo', pub, follows);
         if (follows) {
           this.follows[pub] = {};
           publicState.user(pub).get('profile').get('name').on((name, a, b, e) => {

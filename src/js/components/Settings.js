@@ -193,7 +193,9 @@ function togglePrivateKeyQR(e) {
 }
 
 function downloadKey() {
-  return Helpers.download('iris_private_key.txt', JSON.stringify(Session.getKey()), 'text/csv', 'utf-8');
+  const key = Session.getKey();
+  delete key['#'];
+  return Helpers.download('iris_private_key.txt', JSON.stringify(key), 'text/plain', 'utf-8');
 }
 
 export default Settings;
