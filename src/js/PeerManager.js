@@ -186,7 +186,7 @@ function updatePeerList() {
 function init() {
   updatePeerList();
   setInterval(updatePeerList, 2000);
-  setInterval(checkGunPeerCount, 2000);
+  setInterval(checkGunPeerCount, 60000);
 }
 
 export default {
