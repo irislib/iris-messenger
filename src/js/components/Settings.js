@@ -6,7 +6,7 @@ import Helpers from '../Helpers.js';
 import LanguageSelector from './LanguageSelector.js';
 import {translate as t} from '../Translation.js';
 import PeerManager from '../PeerManager.js';
-import VideoCall from '../VideoCall.js';
+import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from './VideoCall.js';
 import CopyButton from './CopyButton.js';
 import { route } from '../lib/preact-router.es.js';
 
@@ -123,13 +123,13 @@ class Settings extends Component {
       PeerManager.updatePeerList();
     });
 
-    $('#rtc-config').val(JSON.stringify(VideoCall.getRTCConfig()));
+    $('#rtc-config').val(JSON.stringify(getRTCConfig()));
     $('#rtc-config').change(() => {
-      VideoCall.setRTCConfig(JSON.parse($('#rtc-config').val()));
+      setRTCConfig(JSON.parse($('#rtc-config').val()));
     });
     $('#restore-default-rtc-config').click(() => {
-      VideoCall.setRTCConfig(VideoCall.DEFAULT_RTC_CONFIG);
-      $('#rtc-config').val(JSON.stringify(VideoCall.getRTCConfig()));
+      setRTCConfig(DEFAULT_RTC_CONFIG);
+      $('#rtc-config').val(JSON.stringify(getRTCConfig()));
     });
 
     _.defer(() => {

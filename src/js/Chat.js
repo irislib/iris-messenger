@@ -5,7 +5,6 @@ import Notifications from './Notifications.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 import Profile from './components/Profile.js';
-import VideoCall from './VideoCall.js';
 import { route } from './lib/preact-router.es.js';
 
 const chats = window.chats = {};
@@ -185,7 +184,9 @@ function addChat(chat) {
     const arr = Object.values(Notifications.webPushSubscriptions);
     setTimeout(() => chat.put('webPushSubscriptions', arr), 5000);
   }
-  chat.onTheir('call', call => VideoCall.onCallMessage(pub, call));
+  chat.onTheir('call', call => {
+    localState.get('call').put({pub, call});
+  });
   localState.get('chats').get(pub).put({enabled:true});
 }
 
