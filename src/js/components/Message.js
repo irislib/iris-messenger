@@ -5,6 +5,7 @@ import {chats} from '../Chat.js';
 import Identicon from './Identicon.js';
 import {activeRoute, publicState} from '../Main.js';
 import { route } from '../lib/preact-router.es.js';
+import Session from '../Session.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
@@ -103,7 +104,7 @@ class Message extends Component {
     if (this.props.public && this.props.info && this.props.info.hash) {
       publicState.user().get('likes').get(this.props.info.hash).on((liked, a, b, e) => {
         this.eventListeners['likes'] = e;
-        liked ? this.likedBy.add('self') : this.likedBy.delete('self');
+        liked ? this.likedBy.add(Session.getKey().pub) : this.likedBy.delete(Session.getKey().pub);
         this.setState({liked, likes: this.likedBy.size});
       });
       publicState.user().get('follow').once().map().once((isFollowing, key) => {
@@ -192,7 +193,7 @@ class Message extends Component {
           ${this.state.showLikes ? html`
             <div class="likes">
               ${Array.from(this.likedBy).map(key => {
-                return html`<a href="/profile/${key}">${key.slice(0,6)}</a>, `;
+                return html`<a href="/profile/${key}"><${Identicon} str=${key} width=32/></a> `;
               })}
             </div>
           `: ''}
