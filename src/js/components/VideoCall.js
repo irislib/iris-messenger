@@ -35,6 +35,9 @@ function setRTCConfig(c) {
 
 class VideoCall extends Component {
   componentDidMount() {
+    localState.get('activeCall').put(null);
+    localState.get('outgoingCall').put(null);
+    localState.get('incomingCall').put(null);
     localState.get('call').open(call => {
       this.onCallMessage(call.pub, call.call);
     });
@@ -337,8 +340,8 @@ class VideoCall extends Component {
       </div>`;
     } else if (this.state.incomingCall) {
       return html`
-        <div id="incoming-call" style="position:fixed; right:0; bottom: 0; height:300; width: 200; text-align: center; background: #000; color: #fff; padding: 15px 0">
-          Incoming call from ${this.state.incomingCall}
+        <div id="incoming-call" style="position:fixed; right:0; bottom: 0; height:300px; width: 200px; text-align: center; background: #000; color: #fff; padding: 15px 0">
+          Incoming call from ${chats[this.state.incomingCall] && chats[this.state.incomingCall].name}
           <button style="display:block; margin: 15px auto" onClick=${() => this.answerCall(this.state.incomingCall)}>${t('answer')}</button>
           <button style="display:block; margin: 15px auto" onClick=${() => this.rejectCall(this.state.incomingCall)}>${t('reject')}</button>
         </div>
