@@ -446,6 +446,7 @@ header #back-button {
 
 .msg .like-btn {
   margin-top: 15px;
+  margin-right: 5px;
   color: var(--text-time);
 }
 

@@ -89,6 +89,7 @@ class Message extends Component {
     super();
     this.i = 0;
     this.eventListeners = {};
+    this.state = {likes: 0};
   }
 
   componentDidMount() {
@@ -101,7 +102,17 @@ class Message extends Component {
     });
     publicState.user().get('likes').get(this.props.info.hash).on((liked, a, b, e) => {
       this.eventListeners['likes'] = e;
+      if (liked && !this.state.liked) {
+        this.setState({likes: this.state.likes + 1});
+      } else if (!liked && this.state.liked) {
+        this.setState({likes: this.state.likes - 1});
+      }
       this.setState({liked});
+    });
+    publicState.user().get('follows').map().once(pub => {
+      publicState.user(pub).get('likes').get(this.props.info.hash).once(liked => {
+        this.setState({likes: this.state.likes + 1});
+      });
     });
   }
 
@@ -109,8 +120,9 @@ class Message extends Component {
     Object.values(this.eventListeners).forEach(e => e.off());
   }
 
-  shouldComponentUpdate(oldProps, newProps) {
-    if (oldProps.liked !== newProps.liked) return true;
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.liked !== nextState.liked) return true;
+    if (this.state.likes !== nextState.likes) return true;
     return false;
   }
 
@@ -167,6 +179,7 @@ class Message extends Component {
               <a class="like-btn ${this.state.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
                 ${this.state.liked ? heartFull : heartEmpty}
               </a>
+              ${this.state.likes || ''}
             `: ''}
             <div class="time">
               ${this.props.info && this.props.info.hash ? html`<a href="/message/${encodeURIComponent(this.props.info.hash)}">${Helpers.getRelativeTimeText(time)}</a>` : iris.util.formatTime(time)}
