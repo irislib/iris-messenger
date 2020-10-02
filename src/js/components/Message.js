@@ -89,7 +89,7 @@ class Message extends Component {
     super();
     this.i = 0;
     this.eventListeners = {};
-    this.state = {likes: 0};
+    this.likedBy = new Set();
   }
 
   componentDidMount() {
@@ -103,20 +103,16 @@ class Message extends Component {
     if (this.props.public && this.props.info && this.props.info.hash) {
       publicState.user().get('likes').get(this.props.info.hash).on((liked, a, b, e) => {
         this.eventListeners['likes'] = e;
-        if (liked && !this.state.liked) {
-          this.setState({likes: this.state.likes + 1});
-        } else if (!liked && this.state.liked) {
-          this.setState({likes: this.state.likes - 1});
-        }
-        this.setState({liked});
+        liked ? this.likedBy.add('self') : this.likedBy.delete('self');
+        this.setState({liked, likes: this.likedBy.size});
       });
       publicState.user().get('follow').once().map().once((isFollowing, key) => {
         if (!isFollowing) return;
-        publicState.user(key).get('likes').get(this.props.info.hash).once(liked => {
-          if (!liked) return;
-          this.setState({likes: this.state.likes + 1});
+        publicState.user(key).get('likes').get(this.props.info.hash).on(liked => {
+          liked ? this.likedBy.add(key) : this.likedBy.delete(key);
+          this.setState({likes: this.likedBy.size});
         });
-      });  
+      });
     }
   }
 
