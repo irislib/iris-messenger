@@ -160,7 +160,7 @@ class Message extends Component {
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           <div class="below-text">
             ${this.props.public ? html`
-              <a class="like-btn" onClick=${e => this.likeBtnClicked(e)}>
+              <a class="like-btn ${this.state.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
                 ${this.state.liked ? heartFull : heartEmpty}
               </a>
             `: ''}

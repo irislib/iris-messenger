@@ -446,11 +446,20 @@ header #back-button {
 
 .msg .like-btn {
   margin-top: 15px;
+  color: var(--text-time);
+}
+
+.msg .like-btn.liked {
+  color: var(--warning-background);
 }
 
 .msg .time {
   flex: 1;
   align-text: right;
+}
+
+.msg .time a {
+  color: var(--text-time);
 }
 
 .day-separator {
