@@ -109,8 +109,11 @@ class Message extends Component {
       }
       this.setState({liked});
     });
-    publicState.user().get('follows').map().once(pub => {
-      publicState.user(pub).get('likes').get(this.props.info.hash).once(liked => {
+    publicState.user().get('follow').once().map().once((isFollowing, key) => {
+      console.log(key, 'isFollowing', isFollowing);
+      if (!isFollowing) return;
+      publicState.user(key).get('likes').get(this.props.info.hash).once(liked => {
+        if (!liked) return;
         this.setState({likes: this.state.likes + 1});
       });
     });
