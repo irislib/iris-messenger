@@ -9,7 +9,6 @@ import PublicMessages from '../PublicMessages.js';
 import MessageForm from './MessageForm.js';
 import Message from './Message.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
-//import VideoCall from './VideoCall.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from './SafeImg.js';
 import CopyButton from './CopyButton.js';

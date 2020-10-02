@@ -43,6 +43,7 @@ class FeedView extends Component {
         this.eventListeners[pub] && this.eventListeners[pub].off();
       }
     });
+    this.setState({followsSubscribed:true});
   }
 
   componentWillUnmount() {
@@ -53,6 +54,9 @@ class FeedView extends Component {
     return html`
       <div class="main-view public-messages-view" id="message-view">
         <div class="centered-container">
+          ${this.state.followsSubscribed && Object.keys(this.following).length === 0 ? html`
+
+          ` : ''}
           <${MessageForm} activeChat="public"/>
           <div id="attachment-preview" style="display:none"></div>
           ${this.sortedMessages.map(m =>

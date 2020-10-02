@@ -19,6 +19,7 @@ import Header from './components/Header.js';
 import MessageView from './components/MessageView.js';
 import FollowsView from './components/FollowsView.js';
 import FeedView from './components/FeedView.js';
+import VideoCall from './components/VideoCall.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
@@ -74,6 +75,7 @@ class Main extends Component {
           <${FollowsView} path="/follows/:id"/>
         </${Router}>
       </section>
+      <${VideoCall}/>
     ` : html`<${Login}/>`;
     return html`
       <div id="main-content">
