@@ -450,6 +450,11 @@ header #back-button {
   color: var(--text-time);
 }
 
+.msg .like-count {
+  padding: 5px;
+  cursor: pointer;
+}
+
 .msg .like-btn.liked {
   color: var(--warning-background);
 }

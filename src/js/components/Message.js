@@ -123,6 +123,7 @@ class Message extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     if (this.state.liked !== nextState.liked) return true;
     if (this.state.likes !== nextState.likes) return true;
+    if (this.state.showLikes !== nextState.showLikes) return true;
     return false;
   }
 
@@ -179,13 +180,22 @@ class Message extends Component {
               <a class="like-btn ${this.state.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
                 ${this.state.liked ? heartFull : heartEmpty}
               </a>
-              ${this.state.likes || ''}
+              <span class="like-count" onClick=${() => this.setState({showLikes: !this.state.showLikes})}>
+                ${this.state.likes || ''}
+              </span>
             `: ''}
             <div class="time">
               ${this.props.info && this.props.info.hash ? html`<a href="/message/${encodeURIComponent(this.props.info.hash)}">${Helpers.getRelativeTimeText(time)}</a>` : iris.util.formatTime(time)}
               ${this.props.selfAuthored && seenIndicator}
             </div>
           </div>
+          ${this.state.showLikes ? html`
+            <div class="likes">
+              ${Array.from(this.likedBy).map(key => {
+                return html`<a href="/profile/${key}">${key.slice(0,6)}</a>, `;
+              })}
+            </div>
+          `: ''}
         </div>
       </div>`;
   }
