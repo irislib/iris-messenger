@@ -124,7 +124,6 @@ class Message extends Component {
   likeBtnClicked(e) {
     e.preventDefault();
     const liked = !this.state.liked;
-    this.setState({liked});
     publicState.user().get('likes').get(this.props.info.hash).put(liked);
   }
 
