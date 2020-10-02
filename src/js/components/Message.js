@@ -193,7 +193,7 @@ class Message extends Component {
           ${this.state.showLikes ? html`
             <div class="likes">
               ${Array.from(this.likedBy).map(key => {
-                return html`<a href="/profile/${key}"><${Identicon} str=${key} width=32/></a> `;
+                return html`<${Identicon} onClick=${() => route('/profile/' + key)} str=${key} width=32/>`;
               })}
             </div>
           `: ''}

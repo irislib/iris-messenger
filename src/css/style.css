@@ -450,6 +450,11 @@ header #back-button {
   color: var(--text-time);
 }
 
+.msg .likes .identicon-container {
+  margin-right: 5px;
+  margin-top: 5px;
+}
+
 .msg .like-count {
   padding: 5px;
   cursor: pointer;
