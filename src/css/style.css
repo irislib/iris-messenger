@@ -453,6 +453,7 @@ header #back-button {
 .msg .likes .identicon-container {
   margin-right: 5px;
   margin-top: 5px;
+  float: left;
 }
 
 .msg .like-count {
