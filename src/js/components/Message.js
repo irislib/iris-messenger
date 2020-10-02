@@ -110,7 +110,8 @@ class Message extends Component {
   }
 
   shouldComponentUpdate(oldProps, newProps) {
-    return (oldProps.liked !== newProps.liked);
+    if (oldProps.liked !== newProps.liked) return true;
+    return false;
   }
 
   onClick(name) {
@@ -154,7 +155,7 @@ class Message extends Component {
       <div class="msg ${whose} ${seen} ${delivered}">
         <div class="msg-content">
           <div class="msg-sender">
-            ${this.props.public ? html`<${Identicon} str=${this.props.info.from} width=40/>` : ''}
+            ${this.props.public && this.props.info.from ? html`<${Identicon} str=${this.props.info.from} width=40/>` : ''}
             ${name && this.props.showName && html`<small onclick=${() => this.onClick(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
           </div>
           ${this.props.attachments && this.props.attachments.map(a =>

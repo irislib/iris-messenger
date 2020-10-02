@@ -47,7 +47,7 @@ class MessageView extends Component {
     return this.state.msg ? html`
       <div class="main-view public-messages-view">
         <div id="message-list" class="centered-container">
-          <${Message} ...${this.state.msg} showName=${true} chatId=${this.state.msg.info.from}/>
+          <${Message} ...${this.state.msg} public=${true} showName=${true} chatId=${this.state.msg.info.from}/>
           <div>
             ${this.state.deleting ? html`
               <p>${t('confirm_delete_msg')}</p>
