@@ -54,7 +54,10 @@ class VideoCall extends Component {
       }
       this.setState({incomingCall});
     });
-    localState.get('activeCall').on(activeCall => this.setState({activeCall}));
+    localState.get('activeCall').on(activeCall => {
+      this.setState({activeCall})
+      this.stopCalling();
+    });
     localState.get('outgoingCall').on(outgoingCall => {
       outgoingCall && this.onCallUser(outgoingCall);
       this.setState({outgoingCall});
@@ -178,6 +181,7 @@ class VideoCall extends Component {
   }
 
   stopCalling() {
+    localState.get('outgoingCall').put(null);
     callSound.pause();
     callSound.removeEventListener('ended', () => this.timeoutPlayCallSound());
     clearTimeout(callSoundTimeout);
@@ -318,19 +322,26 @@ class VideoCall extends Component {
   }
 
   render() {
+    const resizeButton = html`<span style="cursor:pointer;margin-left:15px;font-size:2em;position:absolute;left:0;top:0" onClick=${() => this.setState({maximized: !this.state.maximized})}>${this.state.maximized ? '-' : '+'}</span>`;
+    const width = this.state.maximized ? '100%' : '400px';
+    const height = this.state.maximized ? '100%' : '400px';
+    const bottom = this.state.maximized ? '0' : '70px';
     const localVideo = html`<video id="localvideo" autoplay="true" playsinline="true" style="width:50%;max-height:60%" />`;
     const remoteVideo = html`<video id="remotevideo" autoplay="true" playsinline="true" style="width:50%;max-height:60%" />`;
 
     if (this.state.activeCall) {
       return html`
-      <div id="active-call" style="position: fixed; right:0; bottom: 0; height:300px; width: 400px; max-width: 100%; text-align: center; background: #000; color: #fff; padding: 15px 0">
-        <div style="margin-bottom:5px">${t('on_call_with')} ${chats[this.state.activeCall] && chats[this.state.activeCall].name}</div>
-        <button style="display:block;margin:15px auto" onClick=${() => this.endCall(this.state.activeCall)}>End call</button>
+      <div id="active-call" style="position: fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; max-width: 100%; text-align: center; background: #000; color: #fff; padding: 15px 0">
+        <div style="margin-bottom:5px;position:relative;height:50px;">
+          ${resizeButton}
+          ${t('on_call_with')} ${chats[this.state.activeCall] && chats[this.state.activeCall].name}
+        </div>
         ${localVideo}
         ${remoteVideo}
+        <button style="display:block;margin:15px auto" onClick=${() => this.endCall(this.state.activeCall)}>End call</button>
       </div>`;
     } else if (this.state.outgoingCall) {
-      return html`<div id="outgoing-call" style="position:fixed; right:0; bottom: 0; height:200px; width: 200px; text-align: center; background: #000; color: #fff; padding: 15px">
+      return html`<div id="outgoing-call" style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px">
         ${t('calling')} ${chats[this.state.outgoingCall] && chats[this.state.outgoingCall].name}
         <button onClick=${() => this.cancelCall(this.state.outgoingCall)} style="display:block; margin: 15px auto">
           ${t('cancel')}
@@ -340,7 +351,7 @@ class VideoCall extends Component {
       </div>`;
     } else if (this.state.incomingCall) {
       return html`
-        <div id="incoming-call" style="position:fixed; right:0; bottom: 0; height:300px; width: 200px; text-align: center; background: #000; color: #fff; padding: 15px 0">
+        <div id="incoming-call" style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px 0">
           Incoming call from ${chats[this.state.incomingCall] && chats[this.state.incomingCall].name}
           <button style="display:block; margin: 15px auto" onClick=${() => this.answerCall(this.state.incomingCall)}>${t('answer')}</button>
           <button style="display:block; margin: 15px auto" onClick=${() => this.rejectCall(this.state.incomingCall)}>${t('reject')}</button>
