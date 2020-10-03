@@ -65,7 +65,7 @@ class Profile extends Component {
     this.isMyProfile = (key && key.pub) === this.props.id;
     const messageForm = this.isMyProfile ? html`<${MessageForm} activeChat="public"/>` : '';
     const editable = !!(this.isMyProfile || this.state.isAdmin);
-    const followable = !(this.isMyProfile || this.props.length < 40);
+    const followable = !(this.isMyProfile || this.props.id.length < 40);
     return html`
     <div class="main-view" id="profile">
       <div class="content">
