@@ -122,16 +122,18 @@ header .active .identicon img {
 header .btn {
   font-size: 2em;
   color: var(--text-color);
-  opacity: 0.5;
   position: relative;
+}
+
+header .btn svg {
+  opacity: 0.5;
 }
 
 header .btn .unseen-total {
   position: absolute;
-  opacity: 1;
 }
 
-header .btn.active {
+header .btn.active svg {
   opacity: 1;
 }
 
