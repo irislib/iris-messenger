@@ -64,10 +64,8 @@ var initialTitle = document.title;
 function setUnseenTotal() {
   if (unseenTotal) {
     document.title = '(' + unseenTotal + ') ' + initialTitle;
-    $('.unseen-total').text(unseenTotal).show();
   } else {
     document.title = initialTitle;
-    $('.unseen-total').hide();
   }
 }
 
@@ -84,6 +82,7 @@ function changeChatUnseenCount(chatId, change) {
   }
   chatNode.get('unseen').put(chat.unseen);
   unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
+  localState.get('unseenTotal').put(unseenTotal);
   setUnseenTotal();
 }
 

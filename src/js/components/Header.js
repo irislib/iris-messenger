@@ -56,6 +56,9 @@ class Header extends Component {
   }
 
   componentDidMount() {
+    localState.get('unseenTotal').on(unseenTotal => {
+      this.setState({unseenTotal});
+    });
     localState.get('activeRoute').on(activeRoute => {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
@@ -123,7 +126,6 @@ class Header extends Component {
         ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
         <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
           ‹
-          <span class="unseen unseen-total"></span>
         </div>
         ` : ''}
         <a href="/" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
@@ -151,6 +153,7 @@ class Header extends Component {
 
         <a href="/" class="btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
         <a href="/chat" class="btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
+          ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
           ${chatIcon}
         </a>
         <a href="/settings" class="btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${settingsIcon}</a>

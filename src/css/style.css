@@ -123,6 +123,12 @@ header .btn {
   font-size: 2em;
   color: var(--text-color);
   opacity: 0.5;
+  position: relative;
+}
+
+header .btn .unseen-total {
+  position: absolute;
+  opacity: 1;
 }
 
 header .btn.active {
