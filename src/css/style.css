@@ -908,6 +908,10 @@ form.public {
   text-align: center;
 }
 
+.follow-count a:not(:last-child) {
+  margin-right: 15px;
+}
+
 .follow-count span {
   font-size: 1.2em;
   font-weight: bold;

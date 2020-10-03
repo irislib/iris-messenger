@@ -75,6 +75,7 @@ export default {
     follow: "Follow",
     unfollow: "Unfollow",
     following: "Following",
+    known_followers: "Known followers",
     add_friend: "Add friend",
     send_message: "Send message",
     copy_link: "Copy link",

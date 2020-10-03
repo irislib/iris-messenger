@@ -86,6 +86,9 @@ class Profile extends Component {
                   <a href="/follows/${this.props.id}">
                     <span>${this.state.followedUserCount}</span> ${t('following')}
                   </a>
+                  <a href="/followers/${this.props.id}">
+                    <span>${this.state.followerCount}</span> ${t('known_followers')}
+                  </a>
                 </div>
                 ${this.state.followsYou ? html`
                   <p><small>${t('follows_you')}</small></p>
@@ -219,10 +222,11 @@ class Profile extends Component {
     this.eventListeners.forEach(e => e.off());
     this.id = pub;
     this.sortedMessages = [];
-    this.setState({followsYou:false, youFollow: false, followedUserCount: 0, name: '', photo: '', about: ''});
+    this.setState({followsYou:false, youFollow: false, followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === pub;
     this.followedUsers = new Set();
+    this.followers = new Set();
     const chat = chats[pub];
     localState.get('activeProfile').put(pub);
     var qrCodeEl = $('#profile-page-qr');
@@ -249,6 +253,16 @@ class Profile extends Component {
           this.followedUsers.delete(key);
         }
         this.setState({followedUserCount: this.followedUsers.size});
+      });
+      publicState.user().get('follow').map().once((following,key) => {
+        if (following) {
+          publicState.user(key).get('follow').get(pub).once(following => {
+            if (following) {
+              this.followers.add(key);
+              this.setState({followerCount: this.followers.size});
+            }
+          });
+        }
       });
       publicState.user(pub).get('profile').get('name').on((name,a,b,e) => {
         this.eventListeners.push(e);
