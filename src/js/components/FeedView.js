@@ -10,14 +10,14 @@ class FeedView extends Component {
   constructor() {
     super();
     this.eventListeners = {};
-    this.following = {};
+    this.following = new Set();
     this.sortedMessages = [];
     this.names = {};
   }
 
   follow(pub) {
-    if (this.following[pub]) return;
-    this.following[pub] = {};
+    if (this.following.has(pub)) return;
+    this.following.add(pub);
     publicState.user(pub).get('profile').get('name').on((name, a, b, e) => {
       this.eventListeners[pub + 'name'] = e;
       this.names[pub] = name;
@@ -34,16 +34,19 @@ class FeedView extends Component {
 
   componentDidMount() {
     this.follow(Session.getKey().pub);
+    const followSomeonePromptTimeout = setTimeout(() => {
+      this.setState({showFollowSomeonePrompt: true});
+    }, 2000);
     publicState.user().get('follow').map().on((follows, pub, b, e) => {
       this.eventListeners['follow'] = e;
       if (follows) {
+        clearTimeout(followSomeonePromptTimeout);
         this.follow(pub);
       } else {
-        delete this.following[pub];
+        this.following.delete(pub);
         this.eventListeners[pub] && this.eventListeners[pub].off();
       }
     });
-    this.setState({followsSubscribed:true});
   }
 
   componentWillUnmount() {
@@ -54,14 +57,19 @@ class FeedView extends Component {
     return html`
       <div class="main-view public-messages-view" id="message-view">
         <div class="centered-container">
-          ${this.state.followsSubscribed && Object.keys(this.following).length === 0 ? html`
-
-          ` : ''}
           <${MessageForm} activeChat="public"/>
           <div id="attachment-preview" style="display:none"></div>
           ${this.sortedMessages.map(m =>
             html`<${Message} ...${m} public=${true} key=${m.time} showName=${true} name=${this.names[m.info.from]}/>`
           )}
+          ${this.state.showFollowSomeonePrompt ? html`
+            <div class="msg">
+              <div class="msg-content">
+                <p>Follow someone to see their posts here!</p>
+                <p>Suggestion: <a href="/profile/hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU">Creator of this Iris distribution</a></p>
+              </div>
+            </div>
+          ` : ''}
         </div>
       </div>
     `;
