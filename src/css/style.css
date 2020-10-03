@@ -131,6 +131,7 @@ header .btn svg {
 
 header .btn .unseen-total {
   position: absolute;
+  z-index: 1;
 }
 
 header .btn.active svg {
