@@ -73,6 +73,7 @@ class Main extends Component {
           <${LogoutConfirmation} path="/logout"/>
           <${Profile.Profile} path="/profile/:id"/>
           <${FollowsView} path="/follows/:id"/>
+          <${FollowsView} followers=${true} path="/followers/:id"/>
         </${Router}>
       </section>
       <${VideoCall}/>

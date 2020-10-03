@@ -11,28 +11,46 @@ class FollowsView extends Component {
     this.follows = {};
   }
 
+  getFollows() {
+    publicState.user(this.props.id).get('follow').map().on((follows, pub, b, e) => {
+      this.eventListeners['follow'] = e;
+      if (follows) {
+        this.follows[pub] = {};
+        publicState.user(pub).get('profile').get('name').on((name, a, b, e) => {
+          this.eventListeners[pub] = e;
+          this.follows[pub].name = name;
+          this.setState({});
+        });
+      } else {
+        delete this.follows[pub];
+        this.eventListeners[pub] && this.eventListeners[pub].off();
+      }
+      this.setState({});
+    });
+  }
+
+  getFollowers() {
+    publicState.user().get('follow').map().once((follows, pub, b, e) => {
+      if (follows) {
+        publicState.user(pub).get('follow').get(this.props.id).once(follows => {
+          this.follows[pub] = {};
+          publicState.user(pub).get('profile').get('name').once(name => {
+            this.follows[pub].name = name;
+            this.setState({});
+          });
+          this.setState({});
+        })
+      }
+    });
+  }
+
   componentDidMount() {
     if (this.props.id) {
       publicState.user(this.props.id).get('profile').get('name').on((name, a, b, e) => {
         this.eventListeners['name'] = e;
         this.setState({name});
       })
-
-      publicState.user(this.props.id).get('follow').map().on((follows, pub, b, e) => {
-        this.eventListeners['follow'] = e;
-        if (follows) {
-          this.follows[pub] = {};
-          publicState.user(pub).get('profile').get('name').on((name, a, b, e) => {
-            this.eventListeners[pub] = e;
-            this.follows[pub].name = name;
-            this.setState({});
-          });
-        } else {
-          delete this.follows[pub];
-          this.eventListeners[pub] && this.eventListeners[pub].off();
-        }
-        this.setState({});
-      });
+      this.props.followers ? this.getFollowers() : this.getFollows();
     }
   }
 
@@ -45,7 +63,8 @@ class FollowsView extends Component {
     return html`
       <div class="main-view public-messages-view" id="follows-view">
         <div class="centered-container">
-          <h3><a href="/profile/${this.props.id}">${this.state.name || '—'}</a> ${t('following')}</h3>
+          <h3><a href="/profile/${this.props.id}">${this.state.name || '—'}</a>:<i> </i>
+          ${this.props.followers ? t('known_followers') : t('following')}</h3>
           <div id="follows-list">
             ${keys.map(k => {
               return html`
