@@ -100,6 +100,12 @@ class Message extends Component {
   }
 
   componentDidMount() {
+    if (this.props.public && this.props.showName && !name) {
+      publicState.user(this.props.info.from).get('profile').get('name').on((name, a,b, e) => {
+        this.eventListeners['name'] = e;
+        this.setState({name});
+      });
+    }
     $(this.base).find('a').click(e => {
       const href = $(e.target).attr('href');
       if (href && href.indexOf('https://iris.to/') === 0) {
@@ -157,6 +163,7 @@ class Message extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     if (this.state.liked !== nextState.liked) return true;
     if (this.state.likes !== nextState.likes) return true;
+    if (this.state.name !== nextState.name) return true;
     if (this.state.replies !== nextState.replies) return true;
     if (this.state.sortedReplies !== nextState.sortedReplies) return true;
     if (this.state.showLikes !== nextState.showLikes) return true;
@@ -180,7 +187,7 @@ class Message extends Component {
 
   render() {
     if (++this.i > 1) console.log(this.i);
-    let name = this.props.name;
+    let name = this.props.name || this.state.name;
     let color;
     const chatId = this.props.chatId;
     const chat = chats[chatId];
