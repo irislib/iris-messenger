@@ -138,6 +138,43 @@ header .btn.active svg {
   opacity: 1;
 }
 
+header .search-box input {
+  padding: 8px 15px;
+  width: 200px;
+}
+
+header .search-box-results {
+  position: fixed;
+  top: 50px;
+  left: calc(50% - 134px);
+}
+
+header .search-box a {
+  width: 200px;
+  padding: 5px;
+  background-color: var(--input-bg);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+}
+
+header .search-box .identicon-container {
+  margin-right: 5px;
+}
+
+header .search-box a:first-of-type {
+  border-radius: 8px 8px 0 0;
+}
+
+header .search-box a:last-of-type {
+  border-radius: 0 0 8px 8px;
+}
+
+header .search-box a:only-of-type {
+  border-radius: 8px;
+}
+
 #main-content {
   display: flex;
   flex-direction: column;

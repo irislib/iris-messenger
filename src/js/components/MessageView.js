@@ -17,14 +17,10 @@ class MessageView extends Component {
 
   componentDidMount() {
     if (this.props.hash) {
-      localState.get('msgFrom').put(null);
       PublicMessages.getMessageByHash(this.props.hash).then(msg => {
         const v = msg.signedData;
         v.info = {hash: this.props.hash, from: msg.signerKeyHash};
         this.setState({msg: v});
-        if (v.author && v.author.keyID) {
-          localState.get('msgFrom').put(v.author.keyID);
-        }
       });
     }
   }
