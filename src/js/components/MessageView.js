@@ -16,6 +16,7 @@ class MessageView extends Component {
   }
 
   componentDidMount() {
+    this.setState({msg:null});
     if (this.props.hash) {
       localState.get('msgFrom').put(null);
       PublicMessages.getMessageByHash(this.props.hash).then(msg => {
@@ -47,7 +48,7 @@ class MessageView extends Component {
     return this.state.msg ? html`
       <div class="main-view public-messages-view">
         <div id="message-list" class="centered-container">
-          <${Message} ...${this.state.msg} public=${true} showName=${true} chatId=${this.state.msg.info.from}/>
+          <${Message} ...${this.state.msg} public=${true} showName=${true} showReplies=${true} chatId=${this.state.msg.info.from}/>
           <div>
             ${this.state.deleting ? html`
               <p>${t('confirm_delete_msg')}</p>

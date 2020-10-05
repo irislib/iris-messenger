@@ -1,6 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
+import PublicMessages from '../PublicMessages.js';
 import {chats} from '../Chat.js';
 import Identicon from './Identicon.js';
 import MessageForm from './MessageForm.js';
@@ -95,6 +96,7 @@ class Message extends Component {
     this.eventListeners = {};
     this.likedBy = new Set();
     this.replies = new Set();
+    this.sortedReplies = [];
   }
 
   componentDidMount() {
@@ -111,11 +113,18 @@ class Message extends Component {
         liked ? this.likedBy.add(Session.getKey().pub) : this.likedBy.delete(Session.getKey().pub);
         this.setState({liked, likes: this.likedBy.size});
       });
-      publicState.user().get('replies').get(this.props.info.hash).map().on((hash,a,b,e) => {
+      publicState.user().get('replies').get(this.props.info.hash).map().on(async (hash,a,b,e) => {
         this.eventListeners['myReplies'] = e;
-        console.log('i replied to', this.props.info.hash);
         hash ? this.replies.add(hash) : this.replies.delete(hash);
         this.setState({replies: this.replies.size});
+        if (this.props.showReplies) {
+          const r = await PublicMessages.getMessageByHash(hash);
+          const msg = r.signedData;
+          msg.info = {from: r.signerKeyHash, hash};
+          this.sortedReplies.push(msg);
+          this.sortedReplies.sort((a,b) => a.time < b.time ? 1 : -1);
+          this.setState({sortedReplies:this.sortedReplies});
+        }
       });
       publicState.user().get('follow').once().map().once((isFollowing, key) => {
         if (!isFollowing) return;
@@ -124,11 +133,18 @@ class Message extends Component {
           liked ? this.likedBy.add(key) : this.likedBy.delete(key);
           this.setState({likes: this.likedBy.size});
         });
-        publicState.user(key).get('replies').get(this.props.info.hash).map().on((hash,a,b,e) => {
-          console.log(key.slice(0,6), 'replied to', this.props.info.hash);
+        publicState.user(key).get('replies').get(this.props.info.hash).map().on(async (hash,a,b,e) => {
           this.eventListeners[key+'replies'] = e;
           hash ? this.replies.add(hash) : this.replies.delete(hash);
           this.setState({replies: this.replies.size});
+          if (this.props.showReplies) {
+            const msg = await PublicMessages.getMessageByHash(hash);
+            msg.info = msg.info || {};
+            msg.info.from = msg.signerKeyHash;
+            this.sortedReplies.push(msg);
+            this.sortedReplies.sort((a,b) => a.time < b.time ? 1 : -1);
+            this.setState({sortedReplies:this.sortedReplies});
+          }
         });
       });
     }
@@ -142,6 +158,7 @@ class Message extends Component {
     if (this.state.liked !== nextState.liked) return true;
     if (this.state.likes !== nextState.likes) return true;
     if (this.state.replies !== nextState.replies) return true;
+    if (this.state.sortedReplies !== nextState.sortedReplies) return true;
     if (this.state.showLikes !== nextState.showLikes) return true;
     if (this.state.showReplyForm !== nextState.showReplyForm) return true;
     return false;
@@ -172,7 +189,7 @@ class Message extends Component {
       name = profile && profile.name;
       color = profile && profile.color;
     }
-    const emojiOnly = this.props.text.length === 2 && Helpers.isEmoji(this.props.text);
+    const emojiOnly = this.props.text && this.props.text.length === 2 && Helpers.isEmoji(this.props.text);
 
     const p = document.createElement('p');
     p.innerText = this.props.text;
@@ -195,6 +212,9 @@ class Message extends Component {
             html`<div class="img-container"><img src=${a.data} onclick=${e => { openAttachmentsGallery(this.props, e); }}/></div>` // TODO: escape a.data
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
+          ${this.props.replyingTo ? html`
+            <div><a href="/message/${this.props.replyingTo}">Show thread</a></div>
+          ` : ''}
           <div class="below-text">
             ${this.props.public ? html`
               <a class="msg-btn reply-btn" onClick=${() => this.setState({showReplyForm: !this.state.showReplyForm})}>
@@ -226,7 +246,11 @@ class Message extends Component {
             <${MessageForm} activeChat="public" replyingTo=${this.props.info.hash} onSubmit=${() => this.setState({showReplyForm:false})}/>
           ` : ''}
         </div>
-      </div>`;
+      </div>
+      ${this.state.sortedReplies && this.state.sortedReplies.length ? this.state.sortedReplies.map(msg =>
+        html`<${Message} ...${msg} public=${true} showName=${true} showReplies=${true} chatId=${msg.info.from}/>`
+      ) : ''}
+      `;
   }
 }
 
