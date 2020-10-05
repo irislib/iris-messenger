@@ -88,7 +88,7 @@ class ChatView extends Component {
 
   subscribeToMsgs(pub) {
     subscribedToMsgs[pub] = true;
-    const limitedUpdate = _.throttle(() => {
+    const limitedUpdate = _.debounce(() => {
       chats[pub].sortedMessages.sort((a, b) => a.time - b.time);
       this.setState({sortedMessages: chats[pub].sortedMessages});
     }, 200);
