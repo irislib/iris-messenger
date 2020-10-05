@@ -12,20 +12,25 @@ class SearchBox extends Component {
     this.eventListeners = {};
     this.follows = {};
     this.state = {results:[]};
+    this.debouncedSearch = _.debounce(() => this.search(), 200);
+  }
+
+  addEntry(key) {
+    if (this.follows[key]) return;
+    this.follows[key] = {key};
+    publicState.user(key).get('profile').get('name').on((name, a, b, e) => {
+      this.eventListeners[key] = e;
+      this.follows[key].name = name;
+      this.debouncedSearch();
+    });
   }
 
   getFollows() {
-    const debouncedSearch = _.debounce(() => this.search(), 200);
+    this.addEntry(Session.getKey().pub);
     publicState.user(Session.getKey().pub).get('follow').map().on((follows, key, b, e) => {
       this.eventListeners['follow'] = e;
       if (follows) {
-        if (this.follows[key]) return;
-        this.follows[key] = {key};
-        publicState.user(key).get('profile').get('name').on((name, a, b, e) => {
-          this.eventListeners[key] = e;
-          this.follows[key].name = name;
-          debouncedSearch();
-        });
+        this.addEntry(key);
       } else {
         delete this.follows[key];
         this.eventListeners[key] && this.eventListeners[key].off();
