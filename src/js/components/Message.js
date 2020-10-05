@@ -144,9 +144,9 @@ class Message extends Component {
           hash ? this.replies.add(hash) : this.replies.delete(hash);
           this.setState({replies: this.replies.size});
           if (this.props.showReplies) {
-            const msg = await PublicMessages.getMessageByHash(hash);
-            msg.info = msg.info || {};
-            msg.info.from = msg.signerKeyHash;
+            const r = await PublicMessages.getMessageByHash(hash);
+            const msg = r.signedData;
+            msg.info = {from: r.signerKeyHash, hash};
             this.sortedReplies.push(msg);
             this.sortedReplies.sort((a,b) => a.time < b.time ? 1 : -1);
             this.setState({sortedReplies:this.sortedReplies});
