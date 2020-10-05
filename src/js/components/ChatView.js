@@ -51,7 +51,7 @@ class ChatView extends Component {
       if (activeRouteId.indexOf('/chat/') !== 0 || !Session.getKey()) return;
       this.activeChat && chats[this.activeChat] && chats[this.activeChat].setTyping(false);
       this.activeChat = activeRouteId && activeRouteId.replace('/chat/new', '').replace('/chat/', '');
-      this.setState({});
+      this.setState({sortedMessages: chats[this.activeChat] && chats[this.activeChat].sortedMessages || []});
 
       const update = () => {
         const chat = chats[this.activeChat];
@@ -68,7 +68,7 @@ class ChatView extends Component {
             clearInterval(iv);
             this.subscribeToMsgs(this.activeChat);
             chats[this.activeChat].sortedMessages.sort((a, b) => a.time - b.time);
-            this.setState({});
+            this.setState({sortedMessages: chats[this.activeChat].sortedMessages});
           } else {
             if (this.activeChat.length > 40) { // exclude UUIDs
               newChat(this.activeChat);
@@ -88,14 +88,14 @@ class ChatView extends Component {
 
   subscribeToMsgs(pub) {
     subscribedToMsgs[pub] = true;
-    const debouncedUpdate = _.debounce(() => {
+    const limitedUpdate = _.throttle(() => {
       chats[pub].sortedMessages.sort((a, b) => a.time - b.time);
-      this.setState({});
+      this.setState({sortedMessages: chats[pub].sortedMessages});
     }, 200);
     chats[pub].getMessages((msg, info) => {
       processMessage(pub, msg, info);
       if (activeRoute.replace('/chat/', '') === pub) {
-        debouncedUpdate();
+        limitedUpdate();
       }
     });
   }
@@ -153,7 +153,7 @@ class ChatView extends Component {
     let previousDateStr;
     let previousFrom;
     const msgListContent = [];
-    if (chats[this.activeChat] && chats[this.activeChat].sortedMessages) {
+    if (chats[this.activeChat] && this.state.sortedMessages) {
       Object.values(chats[this.activeChat].sortedMessages).forEach(msg => {
         const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
         if (date) {
