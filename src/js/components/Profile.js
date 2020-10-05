@@ -283,9 +283,13 @@ class Profile extends Component {
         }
       });
       PublicMessages.getMessages(pub, (msg, info) => {
-        msg.info = info;
-        this.sortedMessages.push(msg);
-        this.sortedMessages.sort((a,b) => a.time < b.time ? 1 : -1);
+        if (msg === null) {
+          this.sortedMessages = this.sortedMessages.filter(m => !(m.time === info.time && m.info.from === info.from));
+        } else {
+          msg.info = info;
+          this.sortedMessages.push(msg);
+          this.sortedMessages.sort((a,b) => a.time < b.time ? 1 : -1);
+        }
         this.setState({});
       });
     } else {
