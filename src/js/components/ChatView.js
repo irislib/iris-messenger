@@ -80,10 +80,6 @@ class ChatView extends Component {
         update();
       }
     });
-
-    if (!iris.util.isMobile) {
-			$("#new-msg").focus();
-		}
   }
 
   componentWillUnmount() {

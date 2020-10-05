@@ -3,6 +3,7 @@ import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import {chats} from '../Chat.js';
 import Identicon from './Identicon.js';
+import MessageForm from './MessageForm.js';
 import {activeRoute, publicState} from '../Main.js';
 import { route } from '../lib/preact-router.es.js';
 import Session from '../Session.js';
@@ -16,9 +17,12 @@ const heartEmpty = html`<svg width="24" viewBox="0 -28 512.001 512"><path fill="
 
 const heartFull = html`<svg width="24" viewBox="0 -28 512.00002 512"><path fill="currentColor" d="m471.382812 44.578125c-26.503906-28.746094-62.871093-44.578125-102.410156-44.578125-29.554687 0-56.621094 9.34375-80.449218 27.769531-12.023438 9.300781-22.917969 20.679688-32.523438 33.960938-9.601562-13.277344-20.5-24.660157-32.527344-33.960938-23.824218-18.425781-50.890625-27.769531-80.445312-27.769531-39.539063 0-75.910156 15.832031-102.414063 44.578125-26.1875 28.410156-40.613281 67.222656-40.613281 109.292969 0 43.300781 16.136719 82.9375 50.78125 124.742187 30.992188 37.394531 75.535156 75.355469 127.117188 119.3125 17.613281 15.011719 37.578124 32.027344 58.308593 50.152344 5.476563 4.796875 12.503907 7.4375 19.792969 7.4375 7.285156 0 14.316406-2.640625 19.785156-7.429687 20.730469-18.128907 40.707032-35.152344 58.328125-50.171876 51.574219-43.949218 96.117188-81.90625 127.109375-119.304687 34.644532-41.800781 50.777344-81.4375 50.777344-124.742187 0-42.066407-14.425781-80.878907-40.617188-109.289063zm0 0"/></svg>`;
 
+const replyIcon = html`<svg width="24" version="1.1" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;"><path fill="currentColor" d="M256,21.952c-141.163,0-256,95.424-256,212.715c0,60.267,30.805,117.269,84.885,157.717l-41.109,82.219 c-2.176,4.331-1.131,9.579,2.496,12.779c2.005,1.771,4.501,2.667,7.04,2.667c2.069,0,4.139-0.597,5.952-1.813l89.963-60.395
+c33.877,12.971,69.781,19.541,106.752,19.541C397.141,447.381,512,351.957,512,234.667S397.163,21.952,256,21.952z M255.979,426.048c-36.16,0-71.168-6.741-104.043-20.032c-3.264-1.323-6.997-0.96-9.941,1.024l-61.056,40.981l27.093-54.187 c2.368-4.757,0.896-10.517-3.477-13.547c-52.907-36.629-83.243-89.707-83.243-145.6c0-105.536,105.28-191.381,234.667-191.381 s234.667,85.824,234.667,191.36S385.365,426.048,255.979,426.048z"/></svg>`;
+
 function addMention(name) {
-  $('#new-msg').val($('#new-msg').val().trim() + ` @${name} `);
-  $('#new-msg').focus();
+  $('.new-msg').val($('.new-msg').val().trim() + ` @${name} `);
+  $('.new-msg').focus();
 }
 
 function openAttachmentsGallery(msg, event) {
@@ -91,6 +95,7 @@ class Message extends Component {
     this.i = 0;
     this.eventListeners = {};
     this.likedBy = new Set();
+    this.replies = new Set();
   }
 
   componentDidMount() {
@@ -103,15 +108,28 @@ class Message extends Component {
     });
     if (this.props.public && this.props.info && this.props.info.hash) {
       publicState.user().get('likes').get(this.props.info.hash).on((liked, a, b, e) => {
-        this.eventListeners['likes'] = e;
+        this.eventListeners['myLike'] = e;
         liked ? this.likedBy.add(Session.getKey().pub) : this.likedBy.delete(Session.getKey().pub);
         this.setState({liked, likes: this.likedBy.size});
       });
+      publicState.user().get('replies').get(this.props.info.hash).map().on((hash,a,b,e) => {
+        this.eventListeners['myReplies'] = e;
+        console.log('i replied to', this.props.info.hash);
+        hash ? this.replies.add(hash) : this.replies.delete(hash);
+        this.setState({replies: this.replies.size});
+      });
       publicState.user().get('follow').once().map().once((isFollowing, key) => {
         if (!isFollowing) return;
-        publicState.user(key).get('likes').get(this.props.info.hash).on(liked => {
+        publicState.user(key).get('likes').get(this.props.info.hash).on((liked,a,b,e) => {
+          this.eventListeners[key+'likes'] = e;
           liked ? this.likedBy.add(key) : this.likedBy.delete(key);
           this.setState({likes: this.likedBy.size});
+        });
+        publicState.user(key).get('replies').get(this.props.info.hash).map().on((hash,a,b,e) => {
+          console.log(key.slice(0,6), 'replied to', this.props.info.hash);
+          this.eventListeners[key+'replies'] = e;
+          hash ? this.replies.add(hash) : this.replies.delete(hash);
+          this.setState({replies: this.replies.size});
         });
       });
     }
@@ -124,7 +142,9 @@ class Message extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     if (this.state.liked !== nextState.liked) return true;
     if (this.state.likes !== nextState.likes) return true;
+    if (this.state.replies !== nextState.replies) return true;
     if (this.state.showLikes !== nextState.showLikes) return true;
+    if (this.state.showReplyForm !== nextState.showReplyForm) return true;
     return false;
   }
 
@@ -178,10 +198,16 @@ class Message extends Component {
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           <div class="below-text">
             ${this.props.public ? html`
-              <a class="like-btn ${this.state.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
+              <a class="msg-btn reply-btn" onClick=${() => this.setState({showReplyForm: !this.state.showReplyForm})}>
+                ${replyIcon}
+              </a>
+              <span class="count">
+                ${this.state.replies || ''}
+              </span>
+              <a class="msg-btn like-btn ${this.state.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
                 ${this.state.liked ? heartFull : heartEmpty}
               </a>
-              <span class="like-count" onClick=${() => this.setState({showLikes: !this.state.showLikes})}>
+              <span class="count" onClick=${() => this.setState({showLikes: !this.state.showLikes})}>
                 ${this.state.likes || ''}
               </span>
             `: ''}
@@ -197,6 +223,9 @@ class Message extends Component {
               })}
             </div>
           `: ''}
+          ${this.state.showReplyForm ? html`
+            <${MessageForm} activeChat="public" replyingTo=${this.props.info.hash} onSubmit=${() => this.setState({showReplyForm:false})}/>
+          ` : ''}
         </div>
       </div>`;
   }

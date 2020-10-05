@@ -453,7 +453,7 @@ header #back-button {
   color: var(--text-time);
 }
 
-.msg .like-btn {
+.msg .msg-btn {
   margin-top: 15px;
   margin-right: 5px;
   color: var(--text-time);
@@ -465,9 +465,13 @@ header #back-button {
   float: left;
 }
 
-.msg .like-count {
+.msg .count {
   padding: 5px;
   cursor: pointer;
+}
+
+.msg .count:not(:last-of-type) {
+  margin-right: 45px;
 }
 
 .msg .like-btn.liked {
@@ -529,7 +533,7 @@ header #back-button {
   text-align: center;
 }
 
-#emoji-picker {
+.emoji-picker-btn {
   outline: 1px;
   margin-right: 5px;
 }

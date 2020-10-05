@@ -6,6 +6,7 @@ import Session from './Session.js';
 let pub;
 
 async function sendPublicMsg(msg) {
+  console.log('sendPublicMsg', msg);
   msg.time = new Date().toISOString();
   msg.type = 'post';
   const signedMsg = await iris.SignedMessage.create(msg, Session.getKey());
@@ -13,6 +14,10 @@ async function sendPublicMsg(msg) {
   const hash = await iris.util.getHash(serialized);
   publicState.get('#').get(hash).put(serialized);
   publicState.user().get('msgs').get(msg.time).put(hash);
+  if (msg.replyingTo) {
+    console.log(true, msg.replyingTo);
+    publicState.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash);
+  }
 }
 
 function deletePublicMsg(timeStr) {
