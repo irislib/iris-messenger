@@ -21,10 +21,11 @@ class FeedView extends Component {
     publicState.user(pub).get('profile').get('name').on((name, a, b, e) => {
       this.eventListeners[pub + 'name'] = e;
       this.names[pub] = name;
-
       this.setState({});
     })
     PublicMessages.getMessages(pub, (msg, info) => {
+      clearTimeout(this.noMessagesTimeout);
+      if (this.state.noMessages) { this.setState({noMessages:false}); }
       msg.info = info;
       this.sortedMessages.push(msg);
       this.sortedMessages.sort((a,b) => a.time < b.time ? 1 : -1);
@@ -34,13 +35,17 @@ class FeedView extends Component {
 
   componentDidMount() {
     this.follow(Session.getKey().pub);
-    const followSomeonePromptTimeout = setTimeout(() => {
-      this.setState({showFollowSomeonePrompt: true});
+    const followingNobodyTimeout = setTimeout(() => {
+      this.setState({followingNobody: true});
+    }, 2000);
+    this.noMessagesTimeout = setTimeout(() => {
+      this.setState({noMessages: true});
     }, 2000);
     publicState.user().get('follow').map().on((follows, pub, b, e) => {
       this.eventListeners['follow'] = e;
       if (follows) {
-        clearTimeout(followSomeonePromptTimeout);
+        clearTimeout(followingNobodyTimeout);
+        if (this.state.followingNobody) { this.setState({followingNobody: false}); }
         this.follow(pub);
       } else {
         this.following.delete(pub);
@@ -62,7 +67,7 @@ class FeedView extends Component {
           ${this.sortedMessages.map(m =>
             html`<${Message} ...${m} public=${true} key=${m.time} showName=${true} name=${this.names[m.info.from]}/>`
           )}
-          ${this.state.showFollowSomeonePrompt ? html`
+          ${this.state.followingNobody || this.state.noMessages ? html`
             <div class="msg">
               <div class="msg-content">
                 <p>Follow someone to see their posts here!</p>

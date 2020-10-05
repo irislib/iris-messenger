@@ -137,17 +137,14 @@ class ChatView extends Component {
     const chat = chats[this.activeChat];
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
-    if (!iris.util.isMobile) {
-			$("#new-msg").focus();
-		}
     if (chat && !chat.uuid) {
       if ($('.msg.our').length && !$('.msg.their').length && !chat.theirMsgsLastSeenTime) {
         $('#not-seen-by-them').slideDown();
       } else {
-				$('#not-seen-by-them').slideUp();
-			}
+        $('#not-seen-by-them').slideUp();
+      }
     }
-    localState.get('chats').get(this.activeChat).get('msgDraft').once(m => $('#new-msg').val(m));
+    localState.get('chats').get(this.activeChat).get('msgDraft').once(m => $('.new-msg').val(m));
   }
 
   render() {

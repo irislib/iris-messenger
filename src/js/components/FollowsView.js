@@ -30,9 +30,10 @@ class FollowsView extends Component {
   }
 
   getFollowers() {
-    publicState.user().get('follow').map().once((follows, pub, b, e) => {
+    publicState.user().get('follow').map().once((follows, pub) => {
       if (follows) {
         publicState.user(pub).get('follow').get(this.props.id).once(follows => {
+          if (!follows) return;
           this.follows[pub] = {};
           publicState.user(pub).get('profile').get('name').once(name => {
             this.follows[pub].name = name;

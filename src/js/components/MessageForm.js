@@ -27,6 +27,12 @@ class MessageForm extends Component {
     }
   }
 
+  componentDidUpdate() {
+    if (!iris.util.isMobile && this.props.autofocus !== false) {
+      $(this.base).find(".new-msg").focus();
+    }
+  }
+
   async onMsgFormSubmit(event) {
     const chat = chats[this.props.activeChat];
     event.preventDefault();
