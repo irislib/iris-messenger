@@ -213,14 +213,14 @@ class Message extends Component {
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           ${this.props.replyingTo ? html`
-            <div><a href="/message/${this.props.replyingTo}">Show thread</a></div>
+            <div><a href="/message/${encodeURIComponent(this.props.replyingTo)}">Show replied message</a></div>
           ` : ''}
           <div class="below-text">
             ${this.props.public ? html`
               <a class="msg-btn reply-btn" onClick=${() => this.setState({showReplyForm: !this.state.showReplyForm})}>
                 ${replyIcon}
               </a>
-              <span class="count">
+              <span class="count" onClick=${() => route('/message/' + this.props.info.hash)}>
                 ${this.state.replies || ''}
               </span>
               <a class="msg-btn like-btn ${this.state.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
