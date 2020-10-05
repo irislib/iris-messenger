@@ -4,6 +4,7 @@
   "author": "Martti Malmi <sirius@iki.fi>",
   "license": "MIT",
   "devDependencies": {
+    "eslint": "^7.4.0",
     "http-server": "^0.12.1"
   },
   "scripts": {
