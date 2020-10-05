@@ -56,7 +56,6 @@ class MessageView extends Component {
                 <button onClick=${() => this.deleteMsg()}>${t('delete')}</button>
               </p>
               `: actions}
-            <div id="attachment-preview" style="display:none"></div>
           </div>
         </div>
       </div>

@@ -158,7 +158,6 @@ class Profile extends Component {
         </div>
         <div id="profile-public-messages">
           ${messageForm}
-          <div id="attachment-preview" style="display:none"></div>
           <div class="public-messages-view">
             ${this.sortedMessages.map(msg =>
               html`<${Message} ...${msg} public=${true} key=${msg.time} showName=${true} name=${this.state.name}/>`

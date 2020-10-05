@@ -67,7 +67,6 @@ class FeedView extends Component {
       <div class="main-view public-messages-view" id="message-view">
         <div class="centered-container">
           <${MessageForm} activeChat="public" autofocus=${false}/>
-          <div id="attachment-preview" style="display:none"></div>
           ${this.sortedMessages.map(m =>
             html`<${Message} ...${m} public=${true} key=${m.time} showName=${true} name=${this.names[m.info.from]}/>`
           )}

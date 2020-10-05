@@ -182,7 +182,7 @@ class ChatView extends Component {
         <div id="chat-main" class=${this.props.id ? '' : 'hidden-xs'}>
 					${this.props.id && this.props.id.length > 20 ? html`<div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
             <div id="message-list">${msgListContent}</div>
-            <div id="attachment-preview" style="display:none"></div>
+            <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
           </div>` : html`<${NewChat}/>`}
           ${this.activeChat ? html`
 						<div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>

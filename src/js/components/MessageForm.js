@@ -92,7 +92,7 @@ class MessageForm extends Component {
 
   openAttachmentsPreview() {
     $('#floating-day-separator').remove();
-    var attachmentsPreview = $('#attachment-preview');
+    const attachmentsPreview = this.props.activeChat === 'public' ? $(this.base).find('.attachment-preview') : $('#attachment-preview');
     attachmentsPreview.removeClass('gallery');
     attachmentsPreview.empty();
     var closeBtn = $('<button>').text(t('cancel')).click(() => this.closeAttachmentsPreview());
@@ -125,8 +125,9 @@ class MessageForm extends Component {
   }
 
   closeAttachmentsPreview() {
-    $('#attachment-preview').hide();
-    $('#attachment-preview').removeClass('gallery');
+    const attachmentsPreview = this.props.activeChat === 'public' ? $(this.base).find('.attachment-preview') : $('#attachment-preview');
+    attachmentsPreview.hide();
+    attachmentsPreview.removeClass('gallery');
     $('#message-list').show();
     if (chats[this.props.activeChat]) {
       chats[this.props.activeChat].attachments = null;
@@ -169,7 +170,7 @@ class MessageForm extends Component {
   render() {
     const isPublic = this.props.activeChat === 'public';
     const contentBtns = html`
-      <button type="button" onClick=${this.attachFileClicked}>
+      <button type="button" onClick=${e => this.attachFileClicked(e)}>
         <svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21.586 10.461l-10.05 10.075c-1.95 1.949-5.122 1.949-7.071 0s-1.95-5.122 0-7.072l10.628-10.585c1.17-1.17 3.073-1.17 4.243 0 1.169 1.17 1.17 3.072 0 4.242l-8.507 8.464c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414l7.093-7.05-1.415-1.414-7.093 7.049c-1.172 1.172-1.171 3.073 0 4.244s3.071 1.171 4.242 0l8.507-8.464c.977-.977 1.464-2.256 1.464-3.536 0-2.769-2.246-4.999-5-4.999-1.28 0-2.559.488-3.536 1.465l-10.627 10.583c-1.366 1.368-2.05 3.159-2.05 4.951 0 3.863 3.13 7 7 7 1.792 0 3.583-.684 4.95-2.05l10.05-10.075-1.414-1.414z"/></svg>
       </button>
       <button class="emoji-picker-btn ${iris.util.isMobile ? 'hidden' : ''}" type="button" onClick=${e => this.onEmojiButtonClick(e)}>
@@ -184,6 +185,7 @@ class MessageForm extends Component {
         ${isPublic ? contentBtns : ''}
         ${submitButton}
       </div>
+      ${isPublic ? html`<div class="attachment-preview" style="display:none"></div>` : ''}
     </form>`;
   }
 

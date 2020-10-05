@@ -27,9 +27,8 @@ function addMention(name) {
 
 function openAttachmentsGallery(msg, event) {
   $('#floating-day-separator').remove();
-  var attachmentsPreview = $('#attachment-preview');
-  attachmentsPreview.addClass('gallery');
-  attachmentsPreview.empty();
+  const attachmentsPreview = $('<div>').attr('id', 'attachment-gallery').addClass('gallery').addClass('attachment-preview');
+  $('body').append(attachmentsPreview);
   attachmentsPreview.fadeIn(ANIMATE_DURATION);
   var left, top, width, img;
 
@@ -60,13 +59,13 @@ function openAttachmentsGallery(msg, event) {
       }
     })
   }
-  $('#attachment-preview').one('click', () => {
+  attachmentsPreview.one('click', () => {
     closeAttachmentsGallery();
   });
   $(document).off('keyup').on('keyup', e => {
     if (e.key === "Escape") { // escape key maps to keycode `27`
       $(document).off('keyup');
-      if ($('#attachment-preview.gallery:visible').length) {
+      if ($('#attachment-gallery:visible').length) {
         closeAttachmentsGallery();
       }
     }
@@ -78,12 +77,12 @@ function closeAttachmentsGallery() {
   if (transitionImg.length) {
     var originalDimensions = transitionImg.data('originalDimensions');
     transitionImg.show();
-    $('#attachment-preview img').remove();
+    $('#attachment-gallery img').remove();
     transitionImg.animate(originalDimensions, {duration: ANIMATE_DURATION, complete: () => {
       transitionImg.remove();
     }});
   }
-  $('#attachment-preview').fadeOut(ANIMATE_DURATION);
+  $('#attachment-gallery').fadeOut({duration: ANIMATE_DURATION, complete: () => $('#attachment-gallery').remove()});
   if (activeRoute && chats[activeRoute]) {
     chats[activeRoute].attachments = null;
   }

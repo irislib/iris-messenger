@@ -552,7 +552,7 @@ header #back-button {
   font-size: 35px !important;
 }
 
-#attachment-preview {
+.attachment-preview {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -560,7 +560,7 @@ header #back-button {
   overflow: hidden;
 }
 
-#attachment-preview.gallery {
+.attachment-preview.gallery {
   overflow-y: scroll;
   position: fixed;
   left: 0;
@@ -571,7 +571,7 @@ header #back-button {
   background-color: var(--gallery-background);
 }
 
-#attachment-preview img {
+.attachment-preview img {
   max-height: 90vh;
   max-width: 100%;
   display: block;
@@ -579,7 +579,7 @@ header #back-button {
   user-select: none;
 }
 
-#attachment-preview button {
+.attachment-preview button {
   display: block;
   margin-bottom: 10px;
 }
