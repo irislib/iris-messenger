@@ -63,7 +63,6 @@ class SearchBox extends Component {
     localState.get('activeRoute').on((a,b,c,e) => {
       this.eventListeners['activeRoute'] = e;
       $(this.base).find('input').val('');
-      this.query = '';
       this.setState({results:[]});
     });
     this.adjustResultsPosition();
@@ -82,12 +81,28 @@ class SearchBox extends Component {
     Object.values(this.eventListeners).forEach(e => e.off());
   }
 
+  onSubmit(e) {
+    e.preventDefault();
+    const links = $(this.base).find('a');
+    links.length && links[0].click();
+  }
+
   search() {
-    const query = $(this.base).find('input').val();
+    const input = $(this.base).find('input');
+    const query = input.val();
     if (query) {
       const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
       const fuse = new Fuse(Object.values(this.follows), options);
       const results = fuse.search(query).slice(0,5);
+      if (results.length) {
+        $(document).off('keyup').on('keyup', e => {
+          if (e.key === "Escape") { // escape key maps to keycode `27`
+            $(document).off('keyup');
+            input.val('');
+            this.setState({results:[]});
+          }
+        });
+      }
       this.setState({results});
     } else {
       this.setState({results:[]});
@@ -97,7 +112,7 @@ class SearchBox extends Component {
   render() {
     return html`
       <div class="search-box hidden-xs">
-        <input type="text" placeholder="Search" onInput=${e => this.onInput(e)}/>
+        <form onSubmit=${e => this.onSubmit(e)}><input type="text" placeholder="Search" onInput=${e => this.onInput(e)}/></form>
         <div class="search-box-results" style="left: ${this.offsetLeft || ''}">
           ${this.state.results.map(r => {
             const i = r.item;

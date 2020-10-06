@@ -141,12 +141,13 @@ header .btn.active svg {
 header .search-box input {
   padding: 8px 15px;
   width: 200px;
+  margin: 0;
 }
 
 header .search-box-results {
   position: fixed;
   top: 50px;
-  left: calc(50% - 134px);
+  left: calc(50% - 131px);
 }
 
 header .search-box a {
