@@ -3,6 +3,7 @@ import { html } from '../Helpers.js';
 import {publicState} from '../Main.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
+import FollowButton from './FollowButton.js';
 
 class FollowsView extends Component {
   constructor() {
@@ -70,7 +71,12 @@ class FollowsView extends Component {
             ${keys.map(k => {
               return html`
               <div>
-                <a href="/profile/${k}"><${Identicon} str=${k} width=49/> ${this.follows[k].name || ''}</a>
+                <a href="/profile/${k}">
+                  <${Identicon} str=${k} width=49/> ${this.follows[k].name || ''}
+                </a>
+                <div>
+                  <${FollowButton} id=${k}/>
+                </div>
               </div>`;
             })}
             ${keys.length === 0 ? '—' : ''}

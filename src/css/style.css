@@ -1015,6 +1015,8 @@ form.public {
 
 .follow {
   min-width: 110px;
+  transition: background-color 0.1s ease;
+  padding: 5px 20px;
 }
 
 .follow.following {
@@ -1042,10 +1044,12 @@ form.public {
 
 #follows-list > div {
   margin-bottom: 15px;
+  display: flex;
 }
 
 #follows-list a {
   display: flex;
+  flex: 1;
   align-items: center;
 }
 

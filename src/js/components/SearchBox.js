@@ -5,7 +5,6 @@ import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
 import Fuse from '../lib/fuse.basic.esm.min.js';
-import { route } from '../lib/preact-router.es.js';
 import { followChatLink } from '../Chat.js';
 
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
