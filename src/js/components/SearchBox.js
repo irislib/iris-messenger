@@ -6,6 +6,8 @@ import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
 import Fuse from '../lib/fuse.basic.esm.min.js';
 
+const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
+
 class SearchBox extends Component {
   constructor() {
     super();
@@ -22,6 +24,7 @@ class SearchBox extends Component {
   addEntry(key) {
     if (this.follows[key]) return;
     this.follows[key] = {key};
+    this.hasFollows = this.hasFollows || Object.keys(this.follows).length > 1;
     publicState.user(key).get('profile').get('name').on((name, a, b, e) => {
       this.eventListeners[key] = e;
       this.follows[key].name = name;
@@ -51,7 +54,7 @@ class SearchBox extends Component {
     localState.get('activeRoute').on((a,b,c,e) => {
       this.eventListeners['activeRoute'] = e;
       $(this.base).find('input').val('');
-      this.setState({results:[]});
+      this.setState({results:[], query: ''});
     });
     this.adjustResultsPosition();
   }
@@ -71,7 +74,7 @@ class SearchBox extends Component {
 
   onSubmit(e) {
     e.preventDefault();
-    const links = $(this.base).find('a');
+    const links = $(this.base).find('a:not(.follow-someone)');
     links.length && links[0].click();
     $(this.base).find('input').blur();
   }
@@ -86,13 +89,13 @@ class SearchBox extends Component {
           if (e.key === "Escape") { // escape key maps to keycode `27`
             $(document).off('keyup');
             input.val('');
-            this.setState({results:[]});
+            this.setState({results:[], query: ''});
           }
         });
       }
-      this.setState({results});
+      this.setState({results, query});
     } else {
-      this.setState({results:[]});
+      this.setState({results:[], query});
     }
   }
 
@@ -107,6 +110,13 @@ class SearchBox extends Component {
               <a href="/profile/${i.key}"><${Identicon} str=${i.key} width=40/> ${i.name || ''}</a>
             `;
           })}
+          ${this.state.query && !this.hasFollows ? html`
+            <a class="follow-someone">Follow someone to see more search results!</a>
+            <a href="/profile/${suggestedFollow}" class="suggested">
+              <${Identicon} str=${suggestedFollow} width=40/>
+              <i>Suggested</i>
+            </a>
+          ` : ''}
         </div>
       </div>
     `;

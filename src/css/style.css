@@ -99,6 +99,10 @@ header a.logo {
   align-items: center;
 }
 
+header a.logo:focus {
+  opacity: 0.75;
+}
+
 header a.logo img:first-child {
   margin-right: 10px;
 }
@@ -156,6 +160,15 @@ header .search-box input {
   margin: 0;
 }
 
+header .search-box .follow-someone {
+  color: var(--text-color);
+  text-align: center;
+}
+
+header .search-box .suggested {
+  color: var(--text-time);
+}
+
 header .search-box-results {
   position: fixed;
   top: 50px;
@@ -170,6 +183,8 @@ header .search-box a {
   display: flex;
   align-items: center;
   margin: 0 auto;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 header .search-box .identicon-container {
