@@ -97,6 +97,7 @@ img {
 header a.logo {
   display: flex;
   align-items: center;
+  transition: opacity 0.1s ease;
 }
 
 header a.logo:focus {
