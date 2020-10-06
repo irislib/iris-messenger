@@ -33,15 +33,14 @@ class SearchBox extends Component {
     });
   }
 
-  getFollows() {
-    this.addEntry(Session.getKey().pub);
-    publicState.user(Session.getKey().pub).get('follow').map().on((follows, key, b, e) => {
-      this.eventListeners['follow'] = e;
+  getFollows(k, maxDepth = 2, currentDepth = 1) {
+    this.addEntry(k);
+    publicState.user(k).get('follow').map().once((follows, key) => {
       if (follows) {
         this.addEntry(key);
-      } else {
-        delete this.follows[key];
-        this.eventListeners[key] && this.eventListeners[key].off();
+        if (currentDepth < maxDepth) {
+          this.getFollows(key, maxDepth, currentDepth + 1);
+        }
       }
     });
   }
@@ -51,7 +50,7 @@ class SearchBox extends Component {
   }
 
   componentDidMount() {
-    this.getFollows();
+    this.getFollows(Session.getKey().pub);
     localState.get('activeRoute').on((a,b,c,e) => {
       this.eventListeners['activeRoute'] = e;
       $(this.base).find('input').val('');
