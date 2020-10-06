@@ -1045,6 +1045,7 @@ form.public {
 #follows-list > div {
   margin-bottom: 15px;
   display: flex;
+  align-items: center;
 }
 
 #follows-list a {

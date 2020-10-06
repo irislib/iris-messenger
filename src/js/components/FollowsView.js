@@ -74,9 +74,7 @@ class FollowsView extends Component {
                 <a href="/profile/${k}">
                   <${Identicon} str=${k} width=49/> ${this.follows[k].name || ''}
                 </a>
-                <div>
-                  <${FollowButton} id=${k}/>
-                </div>
+                <${FollowButton} id=${k}/>
               </div>`;
             })}
             ${keys.length === 0 ? '—' : ''}
