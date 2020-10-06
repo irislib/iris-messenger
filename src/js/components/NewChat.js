@@ -1,6 +1,6 @@
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
-import { newChat, showChat, addChat } from '../Chat.js';
+import { newChat, showChat, addChat, followChatLink } from '../Chat.js';
 import { localState, publicState } from '../Main.js';
 import Helpers from '../Helpers.js';
 import QRScanner from '../QRScanner.js';
@@ -36,20 +36,7 @@ function scanChatLinkQr() {
 
 function onPasteChatLink(event) {
   var val = $(event.target).val();
-  if (val.length < 30) {
-    return;
-  }
-  var s = val.split('?');
-  let chatId;
-  if (s.length === 2) {
-    chatId = Helpers.getUrlParameter('chatWith', s[1]) || Helpers.getUrlParameter('channelId', s[1]);
-  }
-  if (chatId) {
-    newChat(chatId, val);
-    showChat(chatId);
-  } else if (val.indexOf('https://iris.to/#/') === 0) {
-    route(val.replace('https://iris.to/#', ''));
-  }
+  followChatLink(val);
   $(event.target).val('');
 }
 

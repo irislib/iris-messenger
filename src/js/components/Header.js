@@ -105,7 +105,7 @@ class Header extends Component {
     const participants = chat && chat.uuid && Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
     const key = Session.getKey().pub;
-    const searchBox = ((activeRoute && activeRoute.indexOf('/chat') === 0) || iris.util.isMobile) ? '' : html`<${SearchBox}/>`;
+    const searchBox = (this.chatId || iris.util.isMobile) ? '' : html`<${SearchBox}/>`;
 
     return html`
     <header>

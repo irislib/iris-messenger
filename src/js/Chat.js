@@ -32,6 +32,26 @@ function newChat(pub, chatLink) {
   publicState.user().get('follow').get(pub).put(true);
 }
 
+function followChatLink(str) {
+  if (str && str.indexOf('http') === 0) {
+    if (str.indexOf('https://iris.to/#/') === 0) {
+      route(str.replace('https://iris.to/#', ''));
+      return true;
+    } else if (str.length > 30) {
+      const s = str.split('?');
+      let chatId;
+      if (s.length === 2) {
+        chatId = Helpers.getUrlParameter('chatWith', s[1]) || Helpers.getUrlParameter('channelId', s[1]);
+      }
+      if (chatId) {
+        newChat(chatId, str);
+        showChat(chatId);
+        return true;
+      }
+    }
+  }
+}
+
 function addChat(chat) {
   var pub = chat.getId();
   if (chats[pub]) { return; }
@@ -230,4 +250,4 @@ function processMessage(chatId, msg, info) {
   Notifications.notifyMsg(msg, info, chatId);
 }
 
-export { showChat, chats, addChat, deleteChat, newChat, processMessage, getDisplayName };
+export { showChat, chats, addChat, deleteChat, newChat, processMessage, getDisplayName, followChatLink };
