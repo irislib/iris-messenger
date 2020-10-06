@@ -109,7 +109,9 @@ class SearchBox extends Component {
     return html`
       <div class="search-box hidden-xs">
         <form onSubmit=${e => this.onSubmit(e)}>
-          <input type="text" placeholder=${t('search')} onInput=${() => this.onInput()}/>
+          <label>
+            <input type="text" placeholder=${t('search')} onInput=${() => this.onInput()}/>
+          </label>
         </form>
         <div class="search-box-results" style="left: ${this.offsetLeft || ''}">
           ${this.state.results.map(r => {
