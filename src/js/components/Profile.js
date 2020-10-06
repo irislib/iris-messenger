@@ -63,7 +63,7 @@ class Profile extends Component {
   render() {
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === this.props.id;
-    const messageForm = this.isMyProfile ? html`<${MessageForm} activeChat="public"/>` : '';
+    const messageForm = this.isMyProfile ? html`<${MessageForm} autofocus=${false} activeChat="public"/>` : '';
     const editable = !!(this.isMyProfile || this.state.isAdmin);
     const followable = !(this.isMyProfile || this.props.id.length < 40);
     return html`
