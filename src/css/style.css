@@ -160,6 +160,10 @@ header .search-box input {
   margin: 0;
 }
 
+header .search-box input:placeholder-shown:not(:focus) {
+  text-align: center;
+}
+
 header .search-box .follow-someone {
   color: var(--text-color);
   text-align: center;

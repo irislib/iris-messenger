@@ -5,6 +5,7 @@ import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
 import Fuse from '../lib/fuse.basic.esm.min.js';
+import { route } from '../lib/preact-router.es.js';
 
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
@@ -82,6 +83,11 @@ class SearchBox extends Component {
   search() {
     const input = $(this.base).find('input');
     const query = input.val();
+
+    if (query.indexOf('https://iris.to/#/') === 0) {
+      return route(query.replace('https://iris.to/#', ''));
+    }
+
     if (query && this.fuse) {
       const results = this.fuse.search(query).slice(0,5);
       if (results.length) {
