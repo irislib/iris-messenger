@@ -115,8 +115,16 @@ header .identicon img {
   padding: 3px;
 }
 
+header .identicon img {
+  border: 1px solid rgba(0,0,0,0);
+}
+
 header .active .identicon img {
   border: 1px solid var(--text-color);
+}
+
+header a.my-profile:focus .identicon img {
+  border: 1px solid var(--button-hover-bg);
 }
 
 header .btn {
@@ -127,6 +135,10 @@ header .btn {
 
 header .btn svg {
   opacity: 0.5;
+}
+
+header .btn:focus svg {
+  opacity: 0.75;
 }
 
 header .btn .unseen-total {

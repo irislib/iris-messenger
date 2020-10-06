@@ -147,8 +147,8 @@ class Header extends Component {
           ${chatIcon}
         </a>
         <a href="/settings" class="btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${settingsIcon}</a>
-        <a href="/profile/${key}" class="${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''}">
-          <${Identicon} str=${key} width=32 />
+        <a href="/profile/${key}" class="${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
+          <${Identicon} str=${key} width=34 />
         </a>
       </div>
     </header>`;

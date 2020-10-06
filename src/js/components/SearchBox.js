@@ -12,7 +12,11 @@ class SearchBox extends Component {
     this.eventListeners = {};
     this.follows = {};
     this.state = {results:[]};
-    this.debouncedSearch = _.debounce(() => this.search(), 200);
+    this.debouncedIndexAndSearch = _.debounce(() => {
+      const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
+      this.fuse = new Fuse(Object.values(this.follows), options);
+      this.search();
+    }, 200);
   }
 
   addEntry(key) {
@@ -21,7 +25,7 @@ class SearchBox extends Component {
     publicState.user(key).get('profile').get('name').on((name, a, b, e) => {
       this.eventListeners[key] = e;
       this.follows[key].name = name;
-      this.debouncedSearch();
+      this.debouncedIndexAndSearch();
     });
   }
 
@@ -34,22 +38,6 @@ class SearchBox extends Component {
       } else {
         delete this.follows[key];
         this.eventListeners[key] && this.eventListeners[key].off();
-      }
-    });
-  }
-
-  getFollowers() {
-    publicState.user().get('follow').map().once((follows, key) => {
-      if (follows) {
-        publicState.user(key).get('follow').get(this.props.id).once(follows => {
-          if (!follows) return;
-          this.follows[key] = {};
-          publicState.user(key).get('profile').get('name').once(name => {
-            this.follows[key].name = name.toLowerCase();
-            this.setState({});
-          });
-          this.setState({});
-        })
       }
     });
   }
@@ -85,15 +73,14 @@ class SearchBox extends Component {
     e.preventDefault();
     const links = $(this.base).find('a');
     links.length && links[0].click();
+    $(this.base).find('input').blur();
   }
 
   search() {
     const input = $(this.base).find('input');
     const query = input.val();
-    if (query) {
-      const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
-      const fuse = new Fuse(Object.values(this.follows), options);
-      const results = fuse.search(query).slice(0,5);
+    if (query && this.fuse) {
+      const results = this.fuse.search(query).slice(0,5);
       if (results.length) {
         $(document).off('keyup').on('keyup', e => {
           if (e.key === "Escape") { // escape key maps to keycode `27`
