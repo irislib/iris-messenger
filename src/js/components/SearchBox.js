@@ -124,7 +124,11 @@ class SearchBox extends Component {
               followText = 'Following';
             }
             if (i.followDistance === 2) {
-              followText = 'Followed by ' + i.followers.size + ' users you follow';
+              if (i.followers.size === 1 && this.follows[[...i.followers][0]].name) {
+                followText = 'Followed by ' + this.follows[[...i.followers][0]].name;
+              } else {
+                followText = 'Followed by ' + i.followers.size + ' users you follow';
+              }
             }
             return html`
               <a href="/profile/${i.key}">
