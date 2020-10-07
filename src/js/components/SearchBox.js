@@ -22,9 +22,15 @@ class SearchBox extends Component {
     }, 200);
   }
 
-  addEntry(key) {
-    if (this.follows[key]) return;
-    this.follows[key] = {key};
+  addEntry(key, followDistance, follower) {
+    if (this.follows[key]) {
+      if (this.follows[key].followDistance > followDistance) {
+        this.follows[key].followDistance = followDistance;
+      }
+      this.follows[key].followers.add(follower);
+      return;
+    }
+    this.follows[key] = {key, followDistance, followers: new Set([follower])};
     this.hasFollows = this.hasFollows || Object.keys(this.follows).length > 1;
     publicState.user(key).get('profile').get('name').on((name, a, b, e) => {
       this.eventListeners[key] = e;
@@ -34,10 +40,10 @@ class SearchBox extends Component {
   }
 
   getFollows(k, maxDepth = 2, currentDepth = 1) {
-    this.addEntry(k);
+    this.addEntry(k, currentDepth - 1);
     publicState.user(k).get('follow').map().once((follows, key) => {
       if (follows) {
-        this.addEntry(key);
+        this.addEntry(key, currentDepth, k);
         if (currentDepth < maxDepth) {
           this.getFollows(key, maxDepth, currentDepth + 1);
         }
@@ -113,8 +119,23 @@ class SearchBox extends Component {
         <div class="search-box-results" style="left: ${this.offsetLeft || ''}">
           ${this.state.results.map(r => {
             const i = r.item;
+            let followText = '';
+            if (i.followDistance === 1) {
+              followText = 'Following';
+            }
+            if (i.followDistance === 2) {
+              followText = 'Followed by ' + i.followers.size + ' users you follow';
+            }
             return html`
-              <a href="/profile/${i.key}"><${Identicon} str=${i.key} width=40/> ${i.name || ''}</a>
+              <a href="/profile/${i.key}">
+                <${Identicon} str=${i.key} width=40/>
+                <div>
+                  ${i.name || ''}<br/>
+                  <small>
+                    ${followText}
+                  </small>
+                </div>
+              </a>
             `;
           })}
           ${this.state.query && !this.hasFollows ? html`
