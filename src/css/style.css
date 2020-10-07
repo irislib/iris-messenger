@@ -109,7 +109,7 @@ header a.logo:focus {
 }
 
 header a.logo img:first-child {
-  margin-right: 7px;
+  margin-right: 9px;
 }
 
 header a.logo img:last-child {
@@ -280,7 +280,7 @@ header small {
 
 header #header-content {
   flex: 1;
-  padding: 10px 15px;
+  padding: 7px 15px;
   align-self: center;
   display: flex;
   flex-direction: row;
