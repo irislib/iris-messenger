@@ -94,6 +94,10 @@ img {
   display: none;
 }
 
+header a {
+  user-select: none;
+}
+
 header a.logo {
   display: flex;
   align-items: center;
