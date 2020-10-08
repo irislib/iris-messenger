@@ -360,6 +360,7 @@ header #back-button {
 
 .reply .msg-content {
   box-shadow: none;
+  padding-right: 0 !important;
 }
 
 .img-container img {
