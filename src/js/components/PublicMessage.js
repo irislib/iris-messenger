@@ -62,7 +62,7 @@ class PublicMessage extends Message {
           this.setState({sortedReplies:this.sortedReplies});
         }
       });
-      publicState.user().get('follow').once().map().once((isFollowing, key) => {
+      publicState.user().get('follow').map().once((isFollowing, key) => {
         if (!isFollowing) return;
         publicState.user(key).get('likes').get(this.props.info.hash).on((liked,a,b,e) => {
           this.eventListeners[key+'likes'] = e;
@@ -70,8 +70,9 @@ class PublicMessage extends Message {
           this.setState({likes: this.likedBy.size});
         });
         publicState.user(key).get('replies').get(this.props.info.hash).map().on(async (hash,a,b,e) => {
+          if (this.replies.has(hash)) return;
           this.eventListeners[key+'replies'] = e;
-          hash ? this.replies.add(hash) : this.replies.delete(hash);
+          console.log('hasReply', hash);
           this.setState({replies: this.replies.size});
           if (this.props.showReplies) {
             const r = await PublicMessages.getMessageByHash(hash);
@@ -116,7 +117,7 @@ class PublicMessage extends Message {
     let name = this.props.name || this.state.name;
     let color;
     const emojiOnly = this.props.text && this.props.text.length === 2 && Helpers.isEmoji(this.props.text);
-
+    console.log('asdf', this.state.sortedReplies && this.state.sortedReplies.length);
     const p = document.createElement('p');
     p.innerText = this.props.text;
     const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
@@ -124,7 +125,7 @@ class PublicMessage extends Message {
     const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
 
     return html`
-      <div class="msg">
+      <div class="msg ${this.props.asReply ? 'reply' : ''}">
         <div class="msg-content">
           <div class="msg-sender">
             ${this.props.info.from ? html`<${Identicon} str=${this.props.info.from} width=40/>` : ''}
@@ -134,14 +135,14 @@ class PublicMessage extends Message {
             html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>` // TODO: escape a.data
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
-          ${this.props.replyingTo ? html`
+          ${this.props.replyingTo && !this.props.asReply ? html`
             <div><a href="/message/${encodeURIComponent(this.props.replyingTo)}">Show replied message</a></div>
           ` : ''}
           <div class="below-text">
             <a class="msg-btn reply-btn" onClick=${() => this.setState({showReplyForm: !this.state.showReplyForm})}>
               ${replyIcon}
             </a>
-            <span class="count" onClick=${() => route('/message/' + this.props.info.hash)}>
+            <span class="count" onClick=${() => route('/message/' + encodeURIComponent(this.props.info.hash))}>
               ${this.state.replies || ''}
             </span>
             <a class="msg-btn like-btn ${this.state.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
@@ -165,11 +166,11 @@ class PublicMessage extends Message {
           ${this.state.showReplyForm ? html`
             <${MessageForm} activeChat="public" replyingTo=${this.props.info.hash} onSubmit=${() => this.setState({showReplyForm:false})}/>
           ` : ''}
+          ${this.state.sortedReplies && this.state.sortedReplies.length ? this.state.sortedReplies.map(msg =>
+            html`<${PublicMessage} ...${msg} asReply=${true} showName=${true} showReplies=${true} />`
+          ) : ''}
         </div>
       </div>
-      ${this.state.sortedReplies && this.state.sortedReplies.length ? this.state.sortedReplies.map(msg =>
-        html`<${PublicMessage} ...${msg} showName=${true} showReplies=${true} />`
-      ) : ''}
       `;
   }
 }

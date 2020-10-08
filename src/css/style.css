@@ -358,6 +358,10 @@ header #back-button {
   max-width: 75%;
 }
 
+.reply .msg-content {
+  box-shadow: none;
+}
+
 .img-container img {
   border-radius: 6px;
   max-height: 250px;
