@@ -3,10 +3,10 @@ import Helpers from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
 import Identicon from './Identicon.js';
 import MessageForm from './MessageForm.js';
-import {publicState} from '../Main.js';
+import {localState, publicState} from '../Main.js';
 import { route } from '../lib/preact-router.es.js';
-import Session from '../Session.js';
 import Message from './Message.js';
+import Session from '../Session.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
@@ -44,35 +44,19 @@ class PublicMessage extends Message {
       }
     });
     if (this.props.info && this.props.info.hash) {
-      publicState.user().get('likes').get(this.props.info.hash).on((liked, a, b, e) => {
-        this.eventListeners['myLike'] = e;
-        liked ? this.likedBy.add(Session.getKey().pub) : this.likedBy.delete(Session.getKey().pub);
-        this.setState({liked, likes: this.likedBy.size});
-      });
-      publicState.user().get('replies').get(this.props.info.hash).map().on(async (hash,a,b,e) => {
-        this.eventListeners['myReplies'] = e;
-        hash ? this.replies.add(hash) : this.replies.delete(hash);
-        this.setState({replies: this.replies.size});
-        if (this.props.showReplies) {
-          const r = await PublicMessages.getMessageByHash(hash);
-          const msg = r.signedData;
-          msg.info = {from: r.signerKeyHash, hash};
-          this.sortedReplies.push(msg);
-          this.sortedReplies.sort((a,b) => a.time < b.time ? 1 : -1);
-          this.setState({sortedReplies:this.sortedReplies});
-        }
-      });
-      publicState.user().get('follow').map().once((isFollowing, key) => {
-        if (!isFollowing) return;
+      localState.get('follows').map().on((v, key, a, e) => {
+        this.eventListeners[key] = e;
         publicState.user(key).get('likes').get(this.props.info.hash).on((liked,a,b,e) => {
           this.eventListeners[key+'likes'] = e;
           liked ? this.likedBy.add(key) : this.likedBy.delete(key);
-          this.setState({likes: this.likedBy.size});
+          const s = {likes: this.likedBy.size};
+          if (liked && key === Session.getPubKey()) s['liked'] = true;
+          this.setState(s);
         });
         publicState.user(key).get('replies').get(this.props.info.hash).map().on(async (hash,a,b,e) => {
-          if (this.replies.has(hash)) return;
+          if (!hash || this.replies.has(hash)) return;
+          this.replies.add(hash);
           this.eventListeners[key+'replies'] = e;
-          console.log('hasReply', hash);
           this.setState({replies: this.replies.size});
           if (this.props.showReplies) {
             const r = await PublicMessages.getMessageByHash(hash);
@@ -80,7 +64,7 @@ class PublicMessage extends Message {
             msg.info = {from: r.signerKeyHash, hash};
             this.sortedReplies.push(msg);
             this.sortedReplies.sort((a,b) => a.time < b.time ? 1 : -1);
-            this.setState({sortedReplies:this.sortedReplies});
+            this.setState({sortedReplies:[].concat(this.sortedReplies)});
           }
         });
       });
@@ -91,15 +75,8 @@ class PublicMessage extends Message {
     Object.values(this.eventListeners).forEach(e => e.off());
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.liked !== nextState.liked) return true;
-    if (this.state.likes !== nextState.likes) return true;
-    if (this.state.name !== nextState.name) return true;
-    if (this.state.replies !== nextState.replies) return true;
-    if (this.state.sortedReplies !== nextState.sortedReplies) return true;
-    if (this.state.showLikes !== nextState.showLikes) return true;
-    if (this.state.showReplyForm !== nextState.showReplyForm) return true;
-    return false;
+  shouldComponentUpdate() {
+    return true;
   }
 
   onClickName() {
@@ -113,11 +90,10 @@ class PublicMessage extends Message {
   }
 
   render() {
-    if (++this.i > 1) console.log(this.i);
+    //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name;
     let color;
     const emojiOnly = this.props.text && this.props.text.length === 2 && Helpers.isEmoji(this.props.text);
-    console.log('asdf', this.state.sortedReplies && this.state.sortedReplies.length);
     const p = document.createElement('p');
     p.innerText = this.props.text;
     const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);

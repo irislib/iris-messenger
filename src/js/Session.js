@@ -10,6 +10,37 @@ let myProfilePhoto;
 let latestChatLink;
 let onlineTimeout;
 let ourActivity;
+let follows = {};
+
+function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
+  const follows = {};
+  k = k || key.pub;
+
+  function addFollow(k, followDistance, follower) {
+    if (follows[k]) {
+      if (follows[k].followDistance > followDistance) {
+        follows[k].followDistance = followDistance;
+      }
+      follows[k].followers.add(follower);
+    } else {
+      follows[k] = {key: k, followDistance, followers: new Set([follower])};
+    }
+    callback(k, follows[k]);
+  }
+
+  addFollow(k, currentDepth - 1);
+
+  publicState.user(k).get('follow').map().once((isFollowing, followedKey) => { // TODO: .on for unfollow
+    if (isFollowing) {
+      addFollow(followedKey, currentDepth, k);
+      if (currentDepth < maxDepth) {
+        getFollowsFn(callback, followedKey, maxDepth, currentDepth + 1);
+      }
+    }
+  });
+
+  return follows;
+}
 
 function setOurOnlineStatus() {
   iris.Channel.setActivity(publicState, ourActivity = 'active');
@@ -82,6 +113,9 @@ function login(k) {
   });
   Notifications.init();
   localState.get('loggedIn').put(true);
+  follows = getFollowsFn(k => {
+    localState.get('follows').get(k).put(true);
+  });
 }
 
 async function createChatLink() {
@@ -121,6 +155,10 @@ async function logOut() {
   location.reload();
 }
 
+function getPubKey() {
+  return key && key.pub;
+}
+
 function init() {
   var localStorageKey = localStorage.getItem('chatKeyPair');
   if (localStorageKey) {
@@ -128,4 +166,8 @@ function init() {
   }
 }
 
-export default {init, getKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut };
+function getFollows() {
+  return follows;
+}
+
+export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows };
