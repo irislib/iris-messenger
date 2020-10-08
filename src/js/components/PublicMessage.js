@@ -59,7 +59,7 @@ class PublicMessage extends Message {
           this.replies.add(hash);
           this.eventListeners[key+'replies'] = e;
           this.setState({replies: this.replies.size});
-          if (this.props.showReplies) {
+          if (this.props.showReplies || this.state.showReplyForm) {
             this.getReply(hash);
           }
         });
@@ -74,7 +74,7 @@ class PublicMessage extends Message {
     const msg = r.signedData;
     msg.info = {from: r.signerKeyHash, hash};
     this.sortedReplies.push(msg);
-    this.sortedReplies.sort((a,b) => a.time < b.time ? 1 : -1);
+    this.sortedReplies.sort((a,b) => a.time > b.time ? 1 : -1);
     this.setState({sortedReplies:[].concat(this.sortedReplies)});
   }
 
@@ -156,12 +156,12 @@ class PublicMessage extends Message {
               })}
             </div>
           `: ''}
-          ${this.state.showReplyForm ? html`
-            <${MessageForm} activeChat="public" replyingTo=${this.props.info.hash} onSubmit=${() => this.setState({showReplyForm:false})}/>
-          ` : ''}
           ${(this.props.showReplies || this.state.showReplyForm) && this.state.sortedReplies && this.state.sortedReplies.length ? this.state.sortedReplies.map(msg =>
             html`<${PublicMessage} ...${msg} asReply=${true} showName=${true} showReplies=${true} />`
           ) : ''}
+          ${this.state.showReplyForm ? html`
+            <${MessageForm} activeChat="public" replyingTo=${this.props.info.hash} />
+          ` : ''}
         </div>
       </div>
       `;
