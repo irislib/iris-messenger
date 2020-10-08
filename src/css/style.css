@@ -687,7 +687,7 @@ hr {
   margin: 0 auto 0 auto;
 }
 
-.message-form {
+.chat-message-form {
   flex:1;
   flex-direction: row;
   max-height:70px;
@@ -695,11 +695,11 @@ hr {
   padding: 10px 15px;
 }
 
-.message-form form {
+.chat-message-form form {
   display: flex;
 }
 
-.message-form input {
+.chat-message-form input {
   flex: 1;
   width: auto;
 }
@@ -967,6 +967,10 @@ form.public button:last-of-type {
 form.public button svg {
   width: 1em;
   height: 1em;
+}
+
+form.public button.attach-file-btn svg {
+  height: 0.9em;
 }
 
 form.public div {

@@ -131,7 +131,7 @@ class PublicMessage extends Message {
             ${name && this.props.showName && html`<small onclick=${() => this.onClickName()} class="msgSenderName" style="color: ${color}">${name}</small>`}
           </div>
           ${this.props.attachments && this.props.attachments.map(a =>
-            html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(this.props, e); }}/></div>` // TODO: escape a.data
+            html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>` // TODO: escape a.data
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           ${this.props.replyingTo ? html`

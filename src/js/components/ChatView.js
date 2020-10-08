@@ -190,7 +190,7 @@ class ChatView extends Component {
 							<p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
 							<p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
 						</div>
-						<div class="message-form"><${MessageForm} activeChat=${this.activeChat}/></div>
+						<div class="chat-message-form"><${MessageForm} activeChat=${this.activeChat}/></div>
 						`: ''}
         </div>
       </div>`;
