@@ -1,6 +1,6 @@
 import {addChat} from './Chat.js';
 import { translate as t } from './Translation.js';
-import {publicState} from './Main.js';
+import {publicState, localState} from './Main.js';
 import Session from './Session.js';
 
 let pub;
@@ -26,10 +26,16 @@ function deletePublicMsg(timeStr) {
 
 function getMessageByHash(hash) {
   return new Promise(resolve => {
-    publicState.get('#').get(hash).on(async (serialized, a, b, event) => {
-      event.off();
-      const msg = await iris.SignedMessage.fromString(serialized);
-      resolve(msg);
+    localState.get('msgsByHash').get(hash).once(msg => {
+      if (msg) {
+        return resolve(JSON.parse(msg));
+      }
+      publicState.get('#').get(hash).on(async (serialized, a, b, event) => {
+        event.off();
+        const msg = await iris.SignedMessage.fromString(serialized);
+        resolve(msg);
+        localState.get('msgsByHash').get(hash).put(JSON.stringify(msg));
+      });
     });
   });
 }
