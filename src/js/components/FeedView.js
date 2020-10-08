@@ -27,6 +27,7 @@ class FeedView extends Component {
       if (msg === null) {
         this.sortedMessages = this.sortedMessages.filter(m => !(m.time === info.time && m.info.from === info.from));
       } else {
+        if (msg.replyingTo) return; // filter out reply messages for now
         clearTimeout(this.noMessagesTimeout);
         if (this.state.noMessages) { this.setState({noMessages:false}); }
         msg.info = info;

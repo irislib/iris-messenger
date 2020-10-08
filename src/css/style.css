@@ -545,6 +545,10 @@ header #back-button {
   color: var(--text-time);
 }
 
+.btn, .msg-btn, .identicon-container {
+  user-select: none;
+}
+
 .msg .msg-btn {
   margin-top: 15px;
   margin-right: 5px;
