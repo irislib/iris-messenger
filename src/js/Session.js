@@ -116,6 +116,8 @@ function login(k) {
   follows = getFollowsFn(k => {
     localState.get('follows').get(k).put(true);
   });
+  publicState.user().get('msgs').put({a:null});
+  publicState.user().get('replies').put({a:null});
 }
 
 async function createChatLink() {
