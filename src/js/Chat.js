@@ -29,7 +29,6 @@ function newChat(pub, chatLink) {
   }
   const chat = new iris.Channel({gun: publicState, key: Session.getKey(), chatLink: chatLink, participants: pub});
   addChat(chat);
-  publicState.user().get('follow').get(pub).put(true);
 }
 
 function followChatLink(str) {
