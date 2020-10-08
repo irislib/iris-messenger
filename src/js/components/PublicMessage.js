@@ -26,6 +26,7 @@ class PublicMessage extends Message {
     this.eventListeners = {};
     this.likedBy = new Set();
     this.replies = new Set();
+    this.subscribedReplies = new Set();
     this.sortedReplies = [];
   }
 
@@ -53,22 +54,38 @@ class PublicMessage extends Message {
           if (liked && key === Session.getPubKey()) s['liked'] = true;
           this.setState(s);
         });
-        publicState.user(key).get('replies').get(this.props.info.hash).map().on(async (hash,a,b,e) => {
+        publicState.user(key).get('replies').get(this.props.info.hash).map().on((hash,a,b,e) => {
           if (!hash || this.replies.has(hash)) return;
           this.replies.add(hash);
           this.eventListeners[key+'replies'] = e;
           this.setState({replies: this.replies.size});
           if (this.props.showReplies) {
-            const r = await PublicMessages.getMessageByHash(hash);
-            const msg = r.signedData;
-            msg.info = {from: r.signerKeyHash, hash};
-            this.sortedReplies.push(msg);
-            this.sortedReplies.sort((a,b) => a.time < b.time ? 1 : -1);
-            this.setState({sortedReplies:[].concat(this.sortedReplies)});
+            this.getReply(hash);
           }
         });
       });
     }
+  }
+
+  async getReply(hash) {
+    if (this.subscribedReplies.has(hash)) return;
+    this.subscribedReplies.add(hash);
+    const r = await PublicMessages.getMessageByHash(hash);
+    const msg = r.signedData;
+    msg.info = {from: r.signerKeyHash, hash};
+    this.sortedReplies.push(msg);
+    this.sortedReplies.sort((a,b) => a.time < b.time ? 1 : -1);
+    this.setState({sortedReplies:[].concat(this.sortedReplies)});
+  }
+
+  toggleReplies() {
+    const showReplyForm = !this.state.showReplyForm;
+    if (showReplyForm) {
+      for (let hash of this.replies) {
+        this.getReply(hash);
+      }
+    }
+    this.setState({showReplyForm});
   }
 
   componentWillUnmount() {
@@ -115,10 +132,10 @@ class PublicMessage extends Message {
             <div><a href="/message/${encodeURIComponent(this.props.replyingTo)}">Show replied message</a></div>
           ` : ''}
           <div class="below-text">
-            <a class="msg-btn reply-btn" onClick=${() => this.setState({showReplyForm: !this.state.showReplyForm})}>
+            <a class="msg-btn reply-btn" onClick=${() => this.toggleReplies()}>
               ${replyIcon}
             </a>
-            <span class="count" onClick=${() => route('/message/' + encodeURIComponent(this.props.info.hash))}>
+            <span class="count" onClick=${() => this.toggleReplies()}>
               ${this.state.replies || ''}
             </span>
             <a class="msg-btn like-btn ${this.state.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
@@ -142,7 +159,7 @@ class PublicMessage extends Message {
           ${this.state.showReplyForm ? html`
             <${MessageForm} activeChat="public" replyingTo=${this.props.info.hash} onSubmit=${() => this.setState({showReplyForm:false})}/>
           ` : ''}
-          ${this.state.sortedReplies && this.state.sortedReplies.length ? this.state.sortedReplies.map(msg =>
+          ${(this.props.showReplies || this.state.showReplyForm) && this.state.sortedReplies && this.state.sortedReplies.length ? this.state.sortedReplies.map(msg =>
             html`<${PublicMessage} ...${msg} asReply=${true} showName=${true} showReplies=${true} />`
           ) : ''}
         </div>

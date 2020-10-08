@@ -564,6 +564,8 @@ header #back-button {
 .msg .count {
   padding: 5px;
   cursor: pointer;
+  min-width: 2em;
+  text-align: left;
 }
 
 .msg .count:not(:last-of-type) {
