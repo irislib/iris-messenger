@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import Message from './Message.js';
+import PublicMessage from './PublicMessage.js';
 import PublicMessages from '../PublicMessages.js';
 import {publicState} from '../Main.js';
 import Session from '../Session.js';
@@ -68,7 +68,7 @@ class FeedView extends Component {
         <div class="centered-container">
           <${MessageForm} activeChat="public" autofocus=${false}/>
           ${this.sortedMessages.map(m =>
-            html`<${Message} ...${m} public=${true} key=${m.time} showName=${true} name=${this.names[m.info.from]}/>`
+            html`<${PublicMessage} ...${m} key=${m.time} showName=${true} name=${this.names[m.info.from]}/>`
           )}
           ${this.state.followingNobody || this.state.noMessages ? html`
             <div class="msg">

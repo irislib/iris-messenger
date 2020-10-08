@@ -7,7 +7,7 @@ import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
 import MessageForm from './MessageForm.js';
-import Message from './Message.js';
+import PublicMessage from './PublicMessage.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from './SafeImg.js';
@@ -156,7 +156,7 @@ class Profile extends Component {
           ${messageForm}
           <div class="public-messages-view">
             ${this.sortedMessages.map(msg =>
-              html`<${Message} ...${msg} public=${true} key=${msg.time} showName=${true} name=${this.state.name}/>`
+              html`<${PublicMessage} ...${msg} key=${msg.time} showName=${true} name=${this.state.name}/>`
             )}
           </div>
         </div>

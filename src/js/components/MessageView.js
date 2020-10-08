@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import Message from './Message.js';
+import PublicMessage from './PublicMessage.js';
 import PublicMessages from '../PublicMessages.js';
 import Session from '../Session.js';
 import {chats} from '../Chat.js';
@@ -42,7 +42,7 @@ class MessageView extends Component {
     return this.state.msg ? html`
       <div class="main-view public-messages-view">
         <div id="message-list" class="centered-container">
-          <${Message} ...${this.state.msg} public=${true} showName=${true} showReplies=${true} chatId=${this.state.msg.info.from}/>
+          <${PublicMessage} ...${this.state.msg} showName=${true} showReplies=${true} chatId=${this.state.msg.info.from}/>
           <div>
             ${this.state.deleting ? html`
               <p>${t('confirm_delete_msg')}</p>
