@@ -29,8 +29,7 @@ class MessageView extends Component {
   }
 
   deleteMsg() {
-    console.log(this.state.msg);
-    chats['public'].delete(this.state.msg.time);
+    chats['public'].delete(this.state.msg.time, this.state.msg.replyingTo);
     chats['public'].sortedMessages = chats['public'].sortedMessages.filter(m => m.time === this.state.msg.time);
     route('/');
   }
