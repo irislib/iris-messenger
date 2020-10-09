@@ -70,8 +70,8 @@ class FollowsView extends Component {
           <div id="follows-list">
             ${keys.map(k => {
               return html`
-              <div>
-                <a href="/profile/${k}">
+              <div class="profile-link-container">
+                <a href="/profile/${k}" class="profile-link">
                   <${Identicon} str=${k} width=49/> ${this.follows[k].name || ''}
                 </a>
                 <${FollowButton} id=${k}/>

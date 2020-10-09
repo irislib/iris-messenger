@@ -1062,19 +1062,19 @@ form.public {
   display: none;
 }
 
-#follows-list > div {
+.profile-link-container {
   margin-bottom: 15px;
   display: flex;
   align-items: center;
 }
 
-#follows-list a {
+.profile-link {
   display: flex;
   flex: 1;
   align-items: center;
 }
 
-#follows-list .identicon-container {
+.profile-link .identicon-container {
   margin-right: 15px;
 }
 
@@ -1141,6 +1141,10 @@ form.public {
   border-radius: 50%;
 }
 
+.feed-settings {
+  margin: 0 0 15px 0;
+}
+
 /* Tooltip container */
 .tooltip {
   position: relative;
@@ -1202,6 +1206,14 @@ form.public {
   }
   .visible-xs-flex {
     display: flex;
+  }
+  .feed-settings {
+    margin: 0 15px 15px 15px;
+    display: flex;
+  }
+  .feed-settings button {
+    flex: 1;
+    text-align: center;
   }
   #settings .centered-container {
     padding: 0;
