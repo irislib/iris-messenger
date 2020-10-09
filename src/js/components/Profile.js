@@ -245,7 +245,7 @@ class Profile extends Component {
         }
         this.setState({followedUserCount: this.followedUsers.size});
       });
-      publicState.user().get('follow').map().once((following,key) => {
+      localState.get('follows').map().once((following,key) => {
         if (following) {
           publicState.user(key).get('follow').get(pub).once(following => {
             if (following) {

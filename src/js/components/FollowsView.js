@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {publicState} from '../Main.js';
+import {localState, publicState} from '../Main.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import FollowButton from './FollowButton.js';
@@ -31,9 +31,9 @@ class FollowsView extends Component {
   }
 
   getFollowers() {
-    publicState.user().get('follow').map().once((follows, pub) => {
+    localState.get('follows').map().once((follows, pub) => {
       if (follows) {
-        publicState.user(pub).get('follow').get(this.props.id).once(follows => {
+        publicState.user(pub).get('follow').get(this.props.id).on(follows => {
           if (!follows) return;
           this.follows[pub] = {};
           publicState.user(pub).get('profile').get('name').once(name => {
