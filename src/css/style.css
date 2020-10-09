@@ -1209,7 +1209,7 @@ form.public {
   #profile {
     padding: 0;
   }
-  #profile .content, .public-messages-view#message-view {
+  #profile .content, .public-messages-view {
     padding: 0;
   }
   .public-messages-view .msg .msg-content, textarea {

@@ -63,7 +63,7 @@ class FollowsView extends Component {
   render() {
     const keys = Object.keys(this.follows);
     return html`
-      <div class="main-view public-messages-view" id="follows-view">
+      <div class="main-view" id="follows-view">
         <div class="centered-container">
           <h3><a href="/profile/${this.props.id}">${this.state.name || '—'}</a>:<i> </i>
           ${this.props.followers ? t('known_followers') : t('following')}</h3>
