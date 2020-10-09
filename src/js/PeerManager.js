@@ -7,8 +7,8 @@ import {translate as t} from './Translation.js';
 var MAX_PEER_LIST_SIZE = 10;
 var MAX_CONNECTED_PEERS = iris.util.isElectron ? 4 : 2;
 const DEFAULT_PEERS = {
-  'https://europeangunnode.herokuapp.com/gun': {},
-  'https://americangunnode.herokuapp.com/gun': {}
+  'https://gun-eu.herokuapp.com/gun': {},
+  'https://gun-us.herokuapp.com/gun': {}
 };
 var peers = getPeers();
 
@@ -45,7 +45,7 @@ function getPeers() {
   var p = localStorage.getItem('gunPeers');
   if (p && p !== 'undefined') {
     p = JSON.parse(p);
-    p = Object.assign(DEFAULT_PEERS, p);
+    p = Object.assign({}, DEFAULT_PEERS, p);
   } else {
     p = DEFAULT_PEERS;
   }
