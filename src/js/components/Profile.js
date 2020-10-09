@@ -53,14 +53,6 @@ class Profile extends Component {
     }
   }
 
-  onFollowClick() {
-    const follow = !this.state.youFollow;
-    publicState.user().get('follow').get(this.props.id).put(follow);
-    if (follow) {
-      newChat(this.props.id);
-    }
-  }
-
   render() {
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === this.props.id;

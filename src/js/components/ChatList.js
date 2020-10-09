@@ -47,10 +47,6 @@ class ChatList extends Component {
   }
 
   render() {
-    const welcomeToIris = this.state.chats.length > 1 ? '' : html`<div id="welcome" class="visible-xs-block">
-      <h3>Iris Messenger</h3>
-      <img src="img/icon128.png" width="64" height="64" alt="iris it is"/>
-    </div>`;
     return html`<section class="sidebar ${this.props.class || ''}">
       <div id="enable-notifications-prompt" onClick=${() => Notifications.enableDesktopNotifications()}>
         <div class="title">${t('get_notified_new_messages')}</div>
@@ -72,7 +68,6 @@ class ChatList extends Component {
             chat=${chat}/>`
           )
         }
-        ${welcomeToIris}
       </div>
     </section>`
   }

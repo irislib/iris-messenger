@@ -11,7 +11,6 @@ function twice(f) {
 }
 
 async function sendPublicMsg(msg) {
-  console.log('sendPublicMsg', msg);
   msg.time = new Date().toISOString();
   msg.type = 'post';
   const signedMsg = await iris.SignedMessage.create(msg, Session.getKey());

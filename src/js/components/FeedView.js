@@ -26,7 +26,6 @@ class FeedView extends Component {
     publicState.user(pub).get('profile').get('name').on((name, a, b, e) => {
       this.eventListeners[pub + 'name'] = e;
       this.names[pub] = name;
-      this.setState({});
     });
     PublicMessages.getMessages(pub, (msg, info) => {
       if (msg === null) {
@@ -58,7 +57,6 @@ class FeedView extends Component {
   }
 
   componentDidMount() {
-    this.follow(Session.getKey().pub);
     this.followingNobodyTimeout = setTimeout(() => {
       this.setState({followingNobody: true});
     }, 2000);
@@ -92,7 +90,7 @@ class FeedView extends Component {
           </div>
 
           ${this.state.sortedMessages
-            .filter(m => (this.state.show2ndDegreeFollows || f[m.info.from] && f[m.info.from].followDistance <= 1))
+            .filter(m => this.state.show2ndDegreeFollows || (f[m.info.from] && f[m.info.from].followDistance <= 1))
             .map(m =>
               html`<${PublicMessage} ...${m} key=${m.time} showName=${true} name=${this.names[m.info.from]}/>`
             )}
