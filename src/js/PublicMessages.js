@@ -14,6 +14,9 @@ async function sendPublicMsg(msg) {
   const hash = await iris.util.getHash(serialized);
   publicState.get('#').get(hash).put(serialized);
   if (msg.replyingTo) {
+    publicState.user().get('replies').get(msg.replyingTo).put({a:null}); // write many times and maybe it goes through :D
+    publicState.user().get('replies').get(msg.replyingTo).put({a:null});
+    publicState.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash);
     publicState.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash);
   } else {
     publicState.user().get('msgs').get(msg.time).put(hash);
