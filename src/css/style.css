@@ -1007,7 +1007,7 @@ form.public {
   flex:1;
 }
 
-.profile-actions button, .feed-container button {
+.profile-actions button, .feed-container > button {
   margin-right: 5px;
   margin-bottom: 5px;
   padding: 5px 20px;
