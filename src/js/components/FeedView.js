@@ -19,7 +19,8 @@ class FeedView extends Component {
   }
 
   getMessages(show2ndDegreeFollows) {
-    const followsList = show2ndDegreeFollows ? localState.get('follows') : publicState.user().get('follow');
+    //const followsList = show2ndDegreeFollows ? localState.get('follows') : publicState.user().get('follow');
+    const followsList = localState.get('follows');
     followsList.map().once((follows, pub) => {
       if (follows) {
         clearTimeout(this.followingNobodyTimeout);
@@ -68,13 +69,13 @@ class FeedView extends Component {
         <div class="centered-container">
           <${MessageForm} activeChat="public" autofocus=${false}/>
 
-          <div class="feed-settings">
+          <!--<div class="feed-settings">
             <button onClick="${() => {
                 localState.get('show2ndDegreeFollows').put(!this.state.show2ndDegreeFollows);
               }}">
               ${this.state.show2ndDegreeFollows ? 'Hide' : 'Show'} messages from 2nd degree follows
             </button>
-          </div>
+          </div>-->
 
           <${MessageFeed} node=${localState.get('feed')} />
           ${this.state.followingNobody || this.state.noMessages ? html`
