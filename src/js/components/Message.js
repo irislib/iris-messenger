@@ -36,7 +36,7 @@ class Message extends Component {
   }
 
   openAttachmentsGallery(event) {
-    const msg = this.props;
+    const msg = this.state.msg || this.props;
     $('#floating-day-separator').remove();
     const attachmentsPreview = $('<div>').attr('id', 'attachment-gallery').addClass('gallery').addClass('attachment-preview');
     $('body').append(attachmentsPreview);

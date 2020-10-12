@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import PublicMessages from '../PublicMessages.js';
-import {publicState} from '../Main.js';
+import {publicState, localState} from '../Main.js';
 import Session from '../Session.js';
 import MessageForm from './MessageForm.js';
 import Identicon from './Identicon.js';
@@ -15,31 +15,8 @@ class FeedView extends Component {
     super();
     this.eventListeners = {};
     this.following = new Set();
-    this.sortedMessages = [];
-    this.names = {};
     this.state = {sortedMessages: []};
-  }
-
-  follow(pub) {
-    if (this.following.has(pub)) return;
-    this.following.add(pub);
-    publicState.user(pub).get('profile').get('name').on((name, a, b, e) => {
-      this.eventListeners[pub + 'name'] = e;
-      this.names[pub] = name;
-    });
-    PublicMessages.getMessages(pub, (msg, info) => {
-      if (msg === null) {
-        this.sortedMessages = this.sortedMessages.filter(m => !(m.time === info.time && m.info.from === info.from));
-      } else {
-        if (msg.replyingTo) return; // filter out reply messages for now
-        clearTimeout(this.noMessagesTimeout);
-        if (this.state.noMessages) { this.setState({noMessages:false}); }
-        msg.info = info;
-        this.sortedMessages.push(msg);
-        this.sortedMessages.sort((a,b) => a.time < b.time ? 1 : -1);
-      }
-      this.setState({sortedMessages: [].concat(this.sortedMessages)});
-    });
+    this.messages = {};
   }
 
   getMessages(show2ndDegreeFollows) {
@@ -47,8 +24,21 @@ class FeedView extends Component {
     followsList.map().once((follows, pub) => {
       if (follows) {
         clearTimeout(this.followingNobodyTimeout);
-        if (this.state.followingNobody) { this.setState({followingNobody: false}); }
-        this.follow(pub);
+        this.state.followingNobody && this.setState({followingNobody: false});
+        if (this.following.has(pub)) return;
+        this.following.add(pub);
+        PublicMessages.getMessages(pub, (hash, time) => {
+          clearTimeout(this.noMessagesTimeout);
+          this.state.noMessages && this.setState({noMessages: false});
+          const id = time + pub.slice(0,20);
+          if (hash) {
+            this.messages[id] = {hash, time, from: pub};
+          } else {
+            delete this.messages[id];
+          }
+          const sortedMessages = Object.values(this.messages).sort((a,b) => a.time < b.time ? 1 : -1);
+          this.setState({sortedMessages: sortedMessages});
+        });
       } else {
         this.following.delete(pub);
         this.eventListeners[pub] && this.eventListeners[pub].off();
@@ -75,6 +65,7 @@ class FeedView extends Component {
   }
 
   render() {
+    console.log(1);
     const f = Session.getFollows();
     return html`
       <div class="main-view public-messages-view" id="message-view">
@@ -90,9 +81,8 @@ class FeedView extends Component {
           </div>
 
           ${this.state.sortedMessages
-            .filter(m => this.state.show2ndDegreeFollows || (f[m.info.from] && f[m.info.from].followDistance <= 1))
             .map(m =>
-              html`<${PublicMessage} ...${m} key=${m.time} showName=${true} name=${this.names[m.info.from]}/>`
+              html`<${PublicMessage}  hash=${m.hash} key=${m.time} showName=${true} />`
             )}
           ${this.state.followingNobody || this.state.noMessages ? html`
             <div class="msg">

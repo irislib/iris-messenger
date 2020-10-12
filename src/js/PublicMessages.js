@@ -51,10 +51,9 @@ function getMessages(pub, cb) {
   publicState.user(pub).get('msgs').map().on(async (hash, time) => {
     if (typeof hash === 'string' && !seen.has(hash)) {
       seen.add(hash);
-      const msg = await getMessageByHash(hash);
-      cb(msg.signedData, {hash, selfAuthored: pub === Session.getKey().pub, from: msg.signerKeyHash});
+      cb(hash, time);
     } else if (hash === null) {
-      cb(null, {from: pub, time});
+      cb(null, time);
     }
   });
 }

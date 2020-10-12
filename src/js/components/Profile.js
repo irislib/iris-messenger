@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import {localState, publicState, activeProfile} from '../Main.js';
-import {chats, deleteChat, showChat, newChat} from '../Chat.js';
+import {chats, deleteChat, showChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
@@ -18,7 +18,8 @@ class Profile extends Component {
   constructor() {
     super();
     this.eventListeners = [];
-    this.sortedMessages = [];
+    this.messages = {};
+    this.state = {sortedMessages:[]};
   }
 
   onProfilePhotoSet(src) {
@@ -147,7 +148,7 @@ class Profile extends Component {
         <div id="profile-public-messages">
           ${messageForm}
           <div class="public-messages-view">
-            ${this.sortedMessages.map(msg =>
+            ${this.state.sortedMessages.map(msg =>
               html`<${PublicMessage} ...${msg} key=${msg.time} showName=${true} name=${this.state.name}/>`
             )}
           </div>
@@ -197,18 +198,17 @@ class Profile extends Component {
     this.eventListeners.forEach(e => e.off());
   }
 
-  componentDidUpdate() {
-    this.componentDidMount();
+  componentDidUpdate(prevProps) {
+    if (prevProps.id !== this.props.id) {
+      this.messages = {};
+      this.setState({sortedMessages: []});
+      this.componentDidMount();
+    }
   }
 
   componentDidMount() {
     const pub = this.props.id;
-    if (pub === this.id) {
-      return;
-    }
     this.eventListeners.forEach(e => e.off());
-    this.id = pub;
-    this.sortedMessages = [];
     this.setState({followsYou:false, youFollow: false, followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     const key = Session.getKey();
     this.isMyProfile = (key && key.pub) === pub;
@@ -265,15 +265,14 @@ class Profile extends Component {
           $('#profile .profile-about-content:not(:focus)').text(about);
         }
       });
-      PublicMessages.getMessages(pub, (msg, info) => {
-        if (msg === null) {
-          this.sortedMessages = this.sortedMessages.filter(m => !(m.time === info.time && m.info.from === info.from));
+      PublicMessages.getMessages(pub, (hash, time) => {
+        if (hash) {
+          this.messages[hash] = {hash, time, from: pub};
         } else {
-          msg.info = info;
-          this.sortedMessages.push(msg);
-          this.sortedMessages.sort((a,b) => a.time < b.time ? 1 : -1);
+          delete this.messages[hash];
         }
-        this.setState({});
+        const sortedMessages = Object.values(this.messages).sort((a,b) => a.time < b.time ? 1 : -1);
+        this.setState({sortedMessages: sortedMessages});
       });
     } else {
       chat.on('name', name => {
