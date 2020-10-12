@@ -159,7 +159,7 @@ class PublicMessage extends Message {
             html`<${PublicMessage} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
           ) : ''}
           ${this.state.showReplyForm ? html`
-            <${MessageForm} activeChat="public" replyingTo=${this.state.msg.info.hash} />
+            <${MessageForm} activeChat="public" replyingTo=${this.props.hash} />
           ` : ''}
         </div>
       </div>
