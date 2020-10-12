@@ -6,6 +6,7 @@ import MessageForm from './MessageForm.js';
 import Identicon from './Identicon.js';
 import FollowButton from './FollowButton.js';
 import MessageFeed from './MessageFeed.js';
+import Session from '../Session.js';
 
 const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
@@ -23,13 +24,17 @@ class FeedView extends Component {
     const followsList = localState.get('follows');
     followsList.map().once((follows, pub) => {
       if (follows) {
-        clearTimeout(this.followingNobodyTimeout);
-        this.state.followingNobody && this.setState({followingNobody: false});
+        if (Session.getPubKey() !== pub) {
+          clearTimeout(this.followingNobodyTimeout);
+          this.state.followingNobody && this.setState({followingNobody: false});
+        }
         if (this.following.has(pub)) return;
         this.following.add(pub);
         PublicMessages.getMessages(pub, (hash, time) => {
-          clearTimeout(this.noMessagesTimeout);
-          this.state.noMessages && this.setState({noMessages: false});
+          if (Session.getPubKey() !== pub) {
+            clearTimeout(this.noMessagesTimeout);
+            this.state.noMessages && this.setState({noMessages: false});
+          }
           const id = time + pub.slice(0,20);
           if (hash) {
             localState.get('feed').get(id).put(hash);
@@ -54,8 +59,9 @@ class FeedView extends Component {
     localState.get('show2ndDegreeFollows').on(show => {
       if (show === this.state.show2ndDegreeFollows) return;
       this.setState({show2ndDegreeFollows: show});
-      this.getMessages(show);
+      //this.getMessages(show);
     });
+    this.getMessages();
   }
 
   componentWillUnmount() {
