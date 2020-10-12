@@ -1,12 +1,11 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import PublicMessage from './PublicMessage.js';
 import PublicMessages from '../PublicMessages.js';
 import {publicState, localState} from '../Main.js';
-import Session from '../Session.js';
 import MessageForm from './MessageForm.js';
 import Identicon from './Identicon.js';
 import FollowButton from './FollowButton.js';
+import MessageFeed from './MessageFeed.js';
 
 const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
@@ -32,12 +31,10 @@ class FeedView extends Component {
           this.state.noMessages && this.setState({noMessages: false});
           const id = time + pub.slice(0,20);
           if (hash) {
-            this.messages[id] = {hash, time, from: pub};
+            localState.get('feed').get(id).put(hash);
           } else {
-            delete this.messages[id];
+            localState.get('feed').get(id).put(null);
           }
-          const sortedMessages = Object.values(this.messages).sort((a,b) => a.time < b.time ? 1 : -1);
-          this.setState({sortedMessages: sortedMessages});
         });
       } else {
         this.following.delete(pub);
@@ -66,7 +63,6 @@ class FeedView extends Component {
 
   render() {
     console.log(1);
-    const f = Session.getFollows();
     return html`
       <div class="main-view public-messages-view" id="message-view">
         <div class="centered-container">
@@ -80,10 +76,7 @@ class FeedView extends Component {
             </button>
           </div>
 
-          ${this.state.sortedMessages
-            .map(m =>
-              html`<${PublicMessage}  hash=${m.hash} key=${m.time} showName=${true} />`
-            )}
+          <${MessageFeed} node=${localState.get('feed')} />
           ${this.state.followingNobody || this.state.noMessages ? html`
             <div class="msg">
               <div class="msg-content">

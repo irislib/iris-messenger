@@ -31,17 +31,28 @@ function deletePublicMsg(timeStr, replyingTo) {
 }
 
 function getMessageByHash(hash) {
-  return new Promise(resolve => {
+  if (typeof hash !== 'string') throw new Error('hash must be a string, got ' + typeof hash + ' ' +  JSON.stringify(hash));
+  return new Promise((resolve, reject) => {
     localState.get('msgsByHash').get(hash).once(msg => {
-      if (msg) {
-        return resolve(JSON.parse(msg));
+      if (typeof msg === 'string') {
+        try {
+          resolve(JSON.parse(msg));
+        } catch (e) {
+          console.error('message parsing failed', msg, e);
+        }
       }
-      publicState.get('#').get(hash).on(async (serialized, a, b, event) => {
-        event.off();
-        const msg = await iris.SignedMessage.fromString(serialized);
+    });
+    publicState.get('#').get(hash).on(async (serialized, a, b, event) => {
+      if (typeof serialized !== 'string') {
+        console.error('message parsing failed', hash, serialized);
+        return;
+      }
+      event.off();
+      const msg = await iris.SignedMessage.fromString(serialized);
+      if (msg) {
         resolve(msg);
         localState.get('msgsByHash').get(hash).put(JSON.stringify(msg));
-      });
+      }
     });
   });
 }

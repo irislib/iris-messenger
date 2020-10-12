@@ -5,21 +5,18 @@ import {localState, publicState, activeProfile} from '../Main.js';
 import {chats, deleteChat, showChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
-import PublicMessages from '../PublicMessages.js';
 import MessageForm from './MessageForm.js';
-import PublicMessage from './PublicMessage.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from './SafeImg.js';
 import CopyButton from './CopyButton.js';
 import FollowButton from './FollowButton.js';
+import MessageFeed from './MessageFeed.js';
 
 class Profile extends Component {
   constructor() {
     super();
     this.eventListeners = [];
-    this.messages = {};
-    this.state = {sortedMessages:[]};
   }
 
   onProfilePhotoSet(src) {
@@ -148,9 +145,7 @@ class Profile extends Component {
         <div id="profile-public-messages">
           ${messageForm}
           <div class="public-messages-view">
-            ${this.state.sortedMessages.map(msg =>
-              html`<${PublicMessage} ...${msg} key=${msg.time} showName=${true} name=${this.state.name}/>`
-            )}
+            <${MessageFeed} node=${publicState.user(this.props.id).get('msgs')} />
           </div>
         </div>
       </div>
@@ -200,8 +195,6 @@ class Profile extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
-      this.messages = {};
-      this.setState({sortedMessages: []});
       this.componentDidMount();
     }
   }
@@ -264,15 +257,6 @@ class Profile extends Component {
         } else {
           $('#profile .profile-about-content:not(:focus)').text(about);
         }
-      });
-      PublicMessages.getMessages(pub, (hash, time) => {
-        if (hash) {
-          this.messages[hash] = {hash, time, from: pub};
-        } else {
-          delete this.messages[hash];
-        }
-        const sortedMessages = Object.values(this.messages).sort((a,b) => a.time < b.time ? 1 : -1);
-        this.setState({sortedMessages: sortedMessages});
       });
     } else {
       chat.on('name', name => {
