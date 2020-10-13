@@ -3,7 +3,7 @@ import { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import ScrollWindow from '../lib/ScrollWindow.js';
 
-const size = 16;
+const size = 20;
 
 const getNumFromStyle = numStr => Number(numStr.substring(0, numStr.length - 2));
 
@@ -27,6 +27,13 @@ class MessageFeed extends Component {
     }});
     this.scroller.top();
     this.initIntersectionObserver();
+    localState.get('activeRoute').on(() => {
+      this.scroller.top();
+    });
+    const scrollHandler = _.debounce(e => {
+      
+    }, 100);
+    $('.main-view').off().on('scroll', e => scrollHandler(e));
   }
 
   componentDidUpdate(newProps) {
@@ -39,14 +46,14 @@ class MessageFeed extends Component {
     this.scroller.top();
     const container = $(this.base);
     container.css({'padding-top': 0, 'padding-bottom': 0});
-    $(document.body).animate({ scrollTop: 0 }, 500);
+    $('.main-view').animate({ scrollTop: 0 }, 500);
   }
 
   bottomClicked() {
     this.scroller.bottom();
     const container = $(this.base);
     container.css({'padding-top': 0, 'padding-bottom': 0});
-    $(document.body).animate({ scrollTop: container.height() }, 500);
+    $('.main-view').animate({ scrollTop: container.height() }, 500);
   }
 
   render() {
@@ -75,7 +82,7 @@ class MessageFeed extends Component {
     } else {
       container.style.paddingBottom = currentPaddingBottom + remPaddingsVal + "px";
       if (currentPaddingTop === 0) {
-        $(window).scrollTop($('.item0').offset().top + remPaddingsVal);
+        $('.main-view').scrollTop($('.item0').offset().top + remPaddingsVal);
       } else {
         container.style.paddingTop = currentPaddingTop - remPaddingsVal + "px";
       }
