@@ -3,35 +3,48 @@ import { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import ScrollWindow from '../lib/ScrollWindow.js';
 
-const size = 10;
+const size = 16;
+
+const getNumFromStyle = numStr => Number(numStr.substring(0, numStr.length - 2));
 
 class MessageFeed extends Component {
   constructor() {
     super();
     this.state = {sortedMessages:[]};
+    this.topSentinelPreviousY = 0;
+    this.topSentinelPreviousRatio = 0;
+    this.bottomSentinelPreviousY = 0;
+    this.bottomSentinelPreviousRatio = 0;
+    this.previousUpIndex = this.previousDownIndex = -1;
+    this.deb = _.debounce(s => this.setState(s), 20);
   }
 
   componentDidMount() {
-    this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => this.setState({sortedMessages: sortedMessages.reverse()})});
-    //this.initIntersectionObserver();
+    this.setState({sortedMessages:[]});
+    this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => {
+      //this.setState({sortedMessages: sortedMessages.reverse()})
+      this.deb({sortedMessages: sortedMessages.reverse()});
+    }});
+    this.scroller.top();
+    this.initIntersectionObserver();
   }
 
   componentDidUpdate(newProps) {
-    if (newProps.node !== this.props.node) {
+    if (newProps.node._.link !== this.props.node._.link) {
       this.componentDidMount();
     }
   }
 
   topClicked() {
     this.scroller.top();
-    const container = $(this.base).find('.feed-container');
+    const container = $(this.base);
     container.css({'padding-top': 0, 'padding-bottom': 0});
     $(document.body).animate({ scrollTop: 0 }, 500);
   }
 
   bottomClicked() {
     this.scroller.bottom();
-    const container = $(this.base).find('.feed-container');
+    const container = $(this.base);
     container.css({'padding-top': 0, 'padding-bottom': 0});
     $(document.body).animate({ scrollTop: container.height() }, 500);
   }
@@ -40,37 +53,29 @@ class MessageFeed extends Component {
     const showButtons = this.scroller && this.scroller.elements.size >= size;
     return html`
       <div class="feed-container">
-        ${showButtons ? html`
-          <p>
-            <button onClick=${() => this.scroller.up()}>Up</button>
-            <button onClick=${() => this.topClicked()}>Top</button>
-          </p>
-        `: ''}
-        ${this.state.sortedMessages
-          .map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')
-        }
-        ${showButtons ? html`
-          <p>
-            <button onClick=${() => this.scroller.down()}>Down</button>
-            <button onClick=${() => this.bottomClicked()}>Bottom</button>
-          </p>
-        `: ''}
+        ${[...Array(size).keys()].map(n => {
+          const hash = this.state.sortedMessages[n];
+          return html`
+          <div class="item${n}">
+            ${typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : ''}
+          </div>
+        `})}
       </div>
     `;
   }
 
   adjustPaddings(isScrollDown) {
-    const container = document.getElementById("container");
+    const container = this.base;
     const currentPaddingTop = getNumFromStyle(container.style.paddingTop);
     const currentPaddingBottom = getNumFromStyle(container.style.paddingBottom);
-    const remPaddingsVal = 198 * (size / 2); // TODO: calculate actual element heights
+    const remPaddingsVal = 183 * (size / 2); // TODO: calculate actual element heights
     if (isScrollDown) {
       container.style.paddingTop = currentPaddingTop + remPaddingsVal + "px";
       container.style.paddingBottom = currentPaddingBottom === 0 ? "0px" : currentPaddingBottom - remPaddingsVal + "px";
     } else {
       container.style.paddingBottom = currentPaddingBottom + remPaddingsVal + "px";
       if (currentPaddingTop === 0) {
-        $(window).scrollTop($('#post0').offset().top + remPaddingsVal);
+        $(window).scrollTop($('.item0').offset().top + remPaddingsVal);
       } else {
         container.style.paddingTop = currentPaddingTop - remPaddingsVal + "px";
       }
@@ -78,26 +83,24 @@ class MessageFeed extends Component {
   }
 
   topSentCallback(entry) {
-    const container = document.getElementById("container");
-
     const currentY = entry.boundingClientRect.top;
     const currentRatio = entry.intersectionRatio;
     const isIntersecting = entry.isIntersecting;
 
     // conditional check for Scrolling up
     if (
-      currentY > topSentinelPreviousY &&
+      currentY > this.topSentinelPreviousY &&
       isIntersecting &&
-      currentRatio >= topSentinelPreviousRatio &&
-      scroller.center !== previousUpIndex && // stop if no new results were received
-      scroller.opts.stickTo !== 'top'
+      currentRatio >= this.topSentinelPreviousRatio &&
+      this.scroller.center !== this.previousUpIndex && // stop if no new results were received
+      this.scroller.opts.stickTo !== 'top'
     ) {
-      previousUpIndex = scroller.center;
-      adjustPaddings(false);
-      scroller.up(size / 2);
+      this.previousUpIndex = this.scroller.center;
+      this.adjustPaddings(false);
+      this.scroller.up(size / 2);
     }
-    topSentinelPreviousY = currentY;
-    topSentinelPreviousRatio = currentRatio;
+    this.topSentinelPreviousY = currentY;
+    this.topSentinelPreviousRatio = currentRatio;
   }
 
   botSentCallback(entry) {
@@ -107,38 +110,40 @@ class MessageFeed extends Component {
 
     // conditional check for Scrolling down
     if (
-      currentY < bottomSentinelPreviousY &&
-      currentRatio > bottomSentinelPreviousRatio &&
+      currentY < this.bottomSentinelPreviousY &&
+      currentRatio > this.bottomSentinelPreviousRatio &&
       isIntersecting &&
-      scroller.center !== previousDownIndex &&  // stop if no new results were received
-      scroller.opts.stickTo !== 'bottom'
+      this.scroller.center !== this.previousDownIndex &&  // stop if no new results were received
+      this.scroller.opts.stickTo !== 'bottom'
     ) {
-      previousDownIndex = scroller.center;
-      adjustPaddings(true);
-      scroller.down(size / 2);
+      this.previousDownIndex = this.scroller.center;
+      this.adjustPaddings(true);
+      this.scroller.down(size / 2);
     }
-    bottomSentinelPreviousY = currentY;
-    bottomSentinelPreviousRatio = currentRatio;
+    this.bottomSentinelPreviousY = currentY;
+    this.bottomSentinelPreviousRatio = currentRatio;
   }
 
   initIntersectionObserver() {
     const options = {
-      //rootMargin: '190px',
+      root: document.querySelector('.main-view'),
+      rootMargin: '400px'
     }
 
     const callback = entries => {
+      if (this.scroller.elements.size < size) return;
       entries.forEach(entry => {
-        if (entry.target.id === 'post0') {
-          topSentCallback(entry);
-        } else if (entry.target.id === `post${size - 1}`) {
-          botSentCallback(entry);
+        if (entry.target.className === 'item0') {
+          this.topSentCallback(entry);
+        } else if (entry.target.className === `item${size - 1}`) {
+          this.botSentCallback(entry);
         }
       });
     }
 
     var observer = new IntersectionObserver(callback, options); // TODO: It's possible to quickly scroll past the sentinels without them firing. Top and bottom sentinels should extend to page top & bottom?
-    observer.observe(document.querySelector("#post0"));
-    observer.observe(document.querySelector(`#post${size - 1}`));
+    observer.observe($(this.base).find('.item0')[0]);
+    observer.observe($(this.base).find(`.item${size - 1}`)[0]);
   }
 }
 
