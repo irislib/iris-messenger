@@ -5,6 +5,7 @@ import LanguageSelector from './LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
 import { Component } from '../lib/preact.js';
+import Helpers from '../Helpers.js';
 
 function onPastePrivKey(event) {
   const val = $(event.target).val();
@@ -27,15 +28,13 @@ function showSwitchAccount(e) {
 
 function onLoginFormSubmit(e) {
   e.preventDefault();
-  var name = $('#login-form-name').val();
-  if (name.length) {
-    $('#login').hide();
-    Gun.SEA.pair().then(k => {
-      Session.login(k);
-      publicState.user().get('profile').get('name').put(name);
-      Session.createChatLink();
-    });
-  }
+  var name = $('#login-form-name').val() || Helpers.generateName();
+  $('#login').hide();
+  Gun.SEA.pair().then(k => {
+    Session.login(k);
+    publicState.user().get('profile').get('name').put(name);
+    Session.createChatLink();
+  });
 }
 
 function showCreateAccount(e) {

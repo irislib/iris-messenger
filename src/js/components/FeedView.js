@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
-import {publicState, localState} from '../Main.js';
+import {localState} from '../Main.js';
 import MessageForm from './MessageForm.js';
 import Identicon from './Identicon.js';
 import FollowButton from './FollowButton.js';
