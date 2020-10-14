@@ -110,7 +110,7 @@ class SearchBox extends Component {
 
   render() {
     return html`
-      <div class="search-box hidden-xs">
+      <div class="search-box">
         <form onSubmit=${e => this.onSubmit(e)}>
           <label>
             <input type="text" placeholder=${t('search')} onInput=${() => this.onInput()}/>

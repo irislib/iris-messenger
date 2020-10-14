@@ -12,6 +12,7 @@ import SafeImg from './SafeImg.js';
 import CopyButton from './CopyButton.js';
 import FollowButton from './FollowButton.js';
 import MessageFeed from './MessageFeed.js';
+import Identicon from './Identicon.js';
 
 class Profile extends Component {
   constructor() {
@@ -57,15 +58,23 @@ class Profile extends Component {
     const messageForm = this.isMyProfile ? html`<${MessageForm} autofocus=${false} activeChat="public"/>` : '';
     const editable = !!(this.isMyProfile || this.state.isAdmin);
     const followable = !(this.isMyProfile || this.props.id.length < 40);
+    let profilePhoto;
+    if (editable) {
+      profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
+    } else {
+      if (this.state.photo) {
+        profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
+      } else {
+        profilePhoto = html`<${Identicon} str=${this.props.id} width=250/>`
+      }
+    }
     return html`
     <div class="main-view" id="profile">
       <div class="content">
         <div class="profile-top">
           <div class="profile-header">
             <div class="profile-photo-container">
-              ${editable ?
-                html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} callback=${src => this.onProfilePhotoSet(src)}/>` :
-                html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`}
+              ${profilePhoto}
             </div>
             <div class="profile-header-stuff">
               <h3 class="profile-name" placeholder=${editable ? t('name') : ''} contenteditable=${editable} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>

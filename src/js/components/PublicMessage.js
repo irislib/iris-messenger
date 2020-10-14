@@ -151,7 +151,7 @@ class PublicMessage extends Message {
           ${this.state.showLikes ? html`
             <div class="likes">
               ${Array.from(this.likedBy).map(key => {
-                return html`<${Identicon} onClick=${() => route('/profile/' + key)} str=${key} width=32/>`;
+                return html`<${Identicon} showTooltip=${true} onClick=${() => route('/profile/' + key)} str=${key} width=32/>`;
               })}
             </div>
           `: ''}

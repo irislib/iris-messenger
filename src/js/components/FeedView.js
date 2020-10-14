@@ -69,7 +69,6 @@ class FeedView extends Component {
   }
 
   render() {
-    console.log(1);
     return html`
       <div class="main-view public-messages-view" id="message-view">
         <div class="centered-container">

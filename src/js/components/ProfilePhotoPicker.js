@@ -5,6 +5,7 @@ import {chats} from '../Chat.js';
 import {publicState, activeProfile} from '../Main.js';
 import Helpers from '../Helpers.js';
 import SafeImg from './SafeImg.js';
+import Identicon from './Identicon.js';
 
 class ProfilePhotoPicker extends Component {
   useProfilePhotoClicked() {
@@ -69,10 +70,9 @@ class ProfilePhotoPicker extends Component {
   }
 
   render() {
-    const currentPhoto = this.props.currentPhoto;
-    const currentPhotoEl = this.state.preview ?  '' : html`<${SafeImg} class="picker profile-photo" src=${currentPhoto} onClick=${() => this.clickProfilePhotoInput()}/>`;
+    const currentPhotoEl = this.state.preview ?  '' : html`<${SafeImg} class="picker profile-photo" src=${this.props.currentPhoto} onClick=${() => this.clickProfilePhotoInput()}/>`;
     const previewPhotoEl = this.state.preview ? html`<img id="profile-photo-preview" src=${this.state.preview}/>` : '';
-    const addProfilePhotoBtn = (currentPhoto || this.state.preview) ? '' : html`<button id="add-profile-photo" onClick=${() => this.clickProfilePhotoInput()}>${t('add_profile_photo')}</button>`;
+    const addProfilePhotoBtn = (this.props.currentPhoto || this.state.preview) ? '' : html`<div class="picker profile-photo"><${Identicon} str=${this.props.placeholder} width=250 onClick=${() => this.clickProfilePhotoInput()}/></div>`;
     return html`
       ${currentPhotoEl}
       ${addProfilePhotoBtn}
