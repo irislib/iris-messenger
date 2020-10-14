@@ -30,10 +30,6 @@ class MessageFeed extends Component {
     localState.get('activeRoute').on(() => {
       this.scroller.top();
     });
-    const scrollHandler = _.debounce(e => {
-      
-    }, 100);
-    $('.main-view').off().on('scroll', e => scrollHandler(e));
   }
 
   componentDidUpdate(newProps) {
@@ -75,11 +71,18 @@ class MessageFeed extends Component {
     const container = this.base;
     const currentPaddingTop = getNumFromStyle(container.style.paddingTop);
     const currentPaddingBottom = getNumFromStyle(container.style.paddingBottom);
-    const remPaddingsVal = 183 * (size / 2); // TODO: calculate actual element heights
+    let remPaddingsVal = 0;
     if (isScrollDown) {
+      $(this.base).children().each(function(i) {
+        if (i >= size / 2) return false;
+        remPaddingsVal += $(this).outerHeight(true);
+      });
       container.style.paddingTop = currentPaddingTop + remPaddingsVal + "px";
       container.style.paddingBottom = currentPaddingBottom === 0 ? "0px" : currentPaddingBottom - remPaddingsVal + "px";
     } else {
+      $(this.base).children().each(function(i) {
+        if (i >= size / 2) remPaddingsVal += $(this).outerHeight(true);
+      });
       container.style.paddingBottom = currentPaddingBottom + remPaddingsVal + "px";
       if (currentPaddingTop === 0) {
         $('.main-view').scrollTop($('.item0').offset().top + remPaddingsVal);
