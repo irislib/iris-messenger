@@ -4,7 +4,11 @@
 
 * { box-sizing: border-box; }
 
-html { height:100%; overflow:hidden; }
+html {
+  height:100%;
+  overflow:hidden;
+  -webkit-text-size-adjust: 100%;
+}
 
 body {
   opacity: 0;
