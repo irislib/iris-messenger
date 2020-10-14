@@ -88,7 +88,6 @@ class Footer extends Component {
   }
 
   render() {
-    const chat = chats[this.chatId];
     const key = Session.getKey().pub;
 
     if (this.chatId) {
