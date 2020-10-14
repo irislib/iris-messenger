@@ -23,6 +23,10 @@ class MessageFeed extends Component {
     this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => this.setState({sortedMessages: sortedMessages.reverse()})});
     this.initIntersectionObserver();
     localState.get('scrollUp').on(() => this.topClicked());
+    $('.main-view').off().on('scroll', _.debounce(e => {
+      const el = $(e.target);
+      if (el.scrollTop() === 0) this.topClicked();
+    }, 100));
   }
 
   componentDidUpdate(newProps) {
