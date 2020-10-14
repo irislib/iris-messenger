@@ -198,6 +198,7 @@ header .search-box .suggested {
 }
 
 header .search-box-results {
+  z-index: 100;
   position: fixed;
   top: 50px;
   left: calc(50% - 131px);
