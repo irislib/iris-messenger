@@ -34,7 +34,6 @@ class MessageFeed extends Component {
     this.scroller.bottom();
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
-    $('.main-view').animate({ scrollTop: container.height() }, 500);
   }
 
   render() {
