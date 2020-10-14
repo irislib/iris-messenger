@@ -1095,6 +1095,7 @@ form.public {
   align-items: center;
   flex: 1;
   padding: 15px;
+  overflow: hidden;
 }
 
 .profile-photo {
@@ -1248,6 +1249,7 @@ form.public {
   header {
     max-height: 50px;
   }
+  .profile-photo-container .identicon-container * { max-width: 80px; max-height: 80px; text-align: center;}
 }
 
 @media (min-width: 576px) {
