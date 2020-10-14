@@ -94,6 +94,10 @@ img {
   display: none;
 }
 
+header.footer {
+  max-height: 45px;
+}
+
 .footer a {
   flex: 1;
   text-align: center;
