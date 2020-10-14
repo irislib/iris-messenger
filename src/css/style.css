@@ -121,7 +121,7 @@ header a.logo img:last-child {
   filter: var(--logotype-filter);
 }
 
-header a:not(:last-child) {
+header:not(.footer) a:not(:last-child) {
   margin-right: 22px;
 }
 
