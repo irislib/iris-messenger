@@ -108,6 +108,10 @@ class Footer extends Component {
     const key = Session.getKey().pub;
     const searchBox = (this.chatId || iris.util.isMobile) ? '' : html`<${SearchBox}/>`;
 
+    if (activeRoute && activeRoute.indexOf('/chat/') === 0 && activeRoute !== '/chat/new') {
+      return html``;
+    }
+
     return html`
     <header class="visible-xs-flex footer">
       <div id="header-content">
