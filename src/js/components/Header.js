@@ -116,7 +116,7 @@ class Header extends Component {
           ‹
         </div>
         ` : ''}
-        <a href="/" onClick=${() => $('a.logo').blur()} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
+        <a href="/" onClick=${() => {$('a.logo').blur();localState.get('scrollUp').put(true)}} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
           <img src="img/icon128.png" width=40 height=40/>
           <img src="img/iris_logotype.png" height=23 width=41 />
         </a>
@@ -142,13 +142,13 @@ class Header extends Component {
             </a> -->
         `: ''}
 
-        <a href="/" class="hidden-xs btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
-        <a href="/chat" class="hidden-xs btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
+        <a href="/" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
+        <a href="/chat" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
           ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
           ${chatIcon}
         </a>
-        <a href="/settings" class="hidden-xs btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${settingsIcon}</a>
-        <a href="/profile/${key}" class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
+        <a href="/settings" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${settingsIcon}</a>
+        <a href="/profile/${key}" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>
       </div>

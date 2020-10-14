@@ -14,6 +14,7 @@ class MessageFeed extends Component {
   componentDidMount() {
     this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => this.setState({sortedMessages: sortedMessages.reverse()})});
     //this.initIntersectionObserver();
+    localState.get('scrollUp').on(() => this.topClicked());
   }
 
   componentDidUpdate(newProps) {
@@ -26,14 +27,14 @@ class MessageFeed extends Component {
     this.scroller.top();
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
-    $(document.body).animate({ scrollTop: 0 }, 500);
+    $('.main-view').animate({ scrollTop: 0 }, 500);
   }
 
   bottomClicked() {
     this.scroller.bottom();
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
-    $(document.body).animate({ scrollTop: container.height() }, 500);
+    $('.main-view').animate({ scrollTop: container.height() }, 500);
   }
 
   render() {

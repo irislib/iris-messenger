@@ -82,11 +82,6 @@ class Footer extends Component {
     });
   }
 
-  onTitleClicked() {
-    this.chatId && route('/profile/' + this.chatId);
-
-  }
-
   render() {
     const key = Session.getKey().pub;
 
@@ -96,7 +91,7 @@ class Footer extends Component {
 
     return html`
     <header class="visible-xs-flex footer">
-      <div class="header-content">
+      <div class="header-content" onClick=${() => localState.get('scrollUp').put(true)}>
         <a href="/" class="btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
         <a href="/chat" class="btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
           ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
