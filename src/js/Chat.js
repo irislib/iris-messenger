@@ -8,6 +8,7 @@ import Profile from './components/Profile.js';
 import { route } from './lib/preact-router.es.js';
 
 const chats = window.chats = {};
+const subscribedChats = new Set();
 
 function showChat(pub) {
   if (!pub) {
@@ -24,11 +25,21 @@ function deleteChat(pub) {
 }
 
 function newChat(pub, chatLink) {
-  if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
+  if (!pub || chats[pub]) {
     return;
   }
   const chat = new iris.Channel({gun: publicState, key: Session.getKey(), chatLink: chatLink, participants: pub});
   addChat(chat);
+}
+
+function subscribeToMessages(chatId) {
+  if (subscribedChats.has(chatId)) return;
+  subscribedChats.add(chatId);
+  console.log('subscribeToMessages', chatId);
+  chats[chatId].getMessages((msg, info) => {
+    processMessage(chatId, msg, info);
+    localState.get('privmsgs').get(chatId).get(msg.time + info.from.slice(0,20)).put(JSON.stringify(msg));
+  });
 }
 
 function followChatLink(str) {
@@ -72,7 +83,6 @@ function addChat(chat) {
   });
   var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
   el.attr('data-pub', pub);
-  chat.messageIds = chat.messageIds || {};
   chat.getLatestMsg && chat.getLatestMsg((latest, info) => {
     processMessage(pub, latest, info);
   });
@@ -225,13 +235,10 @@ function getDisplayName(pub) {
 
 function processMessage(chatId, msg, info) {
   const chat = chats[chatId];
-  if (chat.messageIds[msg.time + info.from]) return;
-  chat.messageIds[msg.time + info.from] = true;
   msg.info = info;
   msg.selfAuthored = info.selfAuthored;
   msg.timeStr = msg.time;
   msg.time = new Date(msg.time);
-  chat.sortedMessages.push(msg);
   if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
     if (activeRoute !== '/chat/' + chatId || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chatId, 1);
@@ -249,4 +256,4 @@ function processMessage(chatId, msg, info) {
   Notifications.notifyMsg(msg, info, chatId);
 }
 
-export { showChat, chats, addChat, deleteChat, newChat, processMessage, getDisplayName, followChatLink };
+export { showChat, chats, addChat, deleteChat, newChat, processMessage, getDisplayName, followChatLink, subscribeToMessages };

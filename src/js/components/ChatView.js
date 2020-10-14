@@ -4,21 +4,20 @@ import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Message from './Message.js';
 import MessageForm from './MessageForm.js';
-import {chats, processMessage, newChat} from '../Chat.js';
+import {chats, newChat, subscribeToMessages} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Notifications from '../Notifications.js';
 import ChatList from './ChatList.js';
 import NewChat from './NewChat.js';
-import {activeRoute} from '../Main.js';
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
-	 width="451.847px" height="451.847px" viewBox="0 0 451.847 451.847" style="enable-background:new 0 0 451.847 451.847;">
+   width="451.847px" height="451.847px" viewBox="0 0 451.847 451.847" style="enable-background:new 0 0 451.847 451.847;">
 <g>
-	<path fill="currentColor" d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751
-		c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0
-		c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"/>
+  <path fill="currentColor" d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751
+  c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0
+  c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"/>
 </g>
 </svg>
 `;
@@ -36,68 +35,16 @@ function copyMyChatLinkClicked(e) {
   }, 2000);
 }
 
-const subscribedToMsgs = {};
-
 class ChatView extends Component {
   constructor() {
     super();
-    this.activeChat = null;
     this.eventListeners = [];
-  }
-
-  componentDidMount() {
-    localState.get('activeRoute').on((activeRouteId, a, b, eve) => {
-      this.eventListeners.push(eve);
-      if (activeRouteId.indexOf('/chat/') !== 0 || !Session.getKey()) return;
-      this.activeChat && chats[this.activeChat] && chats[this.activeChat].setTyping(false);
-      this.activeChat = activeRouteId && activeRouteId.replace('/chat/new', '').replace('/chat/', '');
-      this.setState({sortedMessages: chats[this.activeChat] && chats[this.activeChat].sortedMessages || []});
-
-      const update = () => {
-        const chat = chats[this.activeChat];
-        if (!chat) return;
-        Notifications.changeChatUnseenCount(this.activeChat, 0);
-        chat.setMyMsgsLastSeenTime();
-        Helpers.scrollToMessageListBottom();
-        chat.setMyMsgsLastSeenTime();
-      }
-
-      if (this.activeChat && (this.activeChat === 'public' || this.activeChat.length > 20) && !subscribedToMsgs[this.activeChat]) {
-        const iv = setInterval(() => {
-          if (chats[this.activeChat]) {
-            clearInterval(iv);
-            this.subscribeToMsgs(this.activeChat);
-            chats[this.activeChat].sortedMessages.sort((a, b) => a.time - b.time);
-            this.setState({sortedMessages: chats[this.activeChat].sortedMessages});
-          } else {
-            if (this.activeChat.length > 40) { // exclude UUIDs
-              newChat(this.activeChat);
-            }
-          }
-          update();
-        }, 1000);
-        subscribedToMsgs[this.activeChat] = true;
-        update();
-      }
-    });
+    this.sortedMessages = [];
+    this.state = {sortedMessages: []};
   }
 
   componentWillUnmount() {
     this.eventListeners.forEach(e => e.off());
-  }
-
-  subscribeToMsgs(pub) {
-    subscribedToMsgs[pub] = true;
-    const limitedUpdate = _.debounce(() => {
-      chats[pub].sortedMessages.sort((a, b) => a.time - b.time);
-      this.setState({sortedMessages: chats[pub].sortedMessages});
-    }, 200);
-    chats[pub].getMessages((msg, info) => {
-      processMessage(pub, msg, info);
-      if (activeRoute.replace('/chat/', '') === pub) {
-        limitedUpdate();
-      }
-    });
   }
 
   addFloatingDaySeparator() {
@@ -133,8 +80,57 @@ class ChatView extends Component {
     this.messageViewScrollHandler();
   }
 
-  componentDidUpdate() {
-    const chat = chats[this.activeChat];
+  componentDidMount() {
+    this.update();
+  }
+
+  update() {
+    $('.new-msg').focus();
+    this.sortedMessages = [];
+    this.setState({sortedMessages: this.sortedMessages});
+    this.props.id && chats[this.props.id] && chats[this.props.id].setTyping(false);
+
+    const update = () => {
+      const chat = chats[this.props.id];
+      if (!chat) return;
+      Notifications.changeChatUnseenCount(this.props.id, 0);
+      chat.setMyMsgsLastSeenTime();
+      Helpers.scrollToMessageListBottom();
+      chat.setMyMsgsLastSeenTime();
+    }
+
+    console.log(this.props.id, this.props.id.length > 20);
+    if (this.props.id && this.props.id.length > 20) {
+      const limitedUpdate = _.debounce((id) => {
+        if (id !== this.props.id) return;
+        this.sortedMessages.sort((a, b) => a.timeStr > b.timeStr ? 1 : -1);
+        this.setState({sortedMessages: this.sortedMessages});
+      }, 200);
+      localState.get('privmsgs').get(this.props.id).map().once(s => {
+        const msg = JSON.parse(s);
+        this.sortedMessages.push(msg);
+        limitedUpdate(this.props.id);
+      });
+      const iv = setInterval(() => {
+        if (chats[this.props.id]) {
+          clearInterval(iv);
+          subscribeToMessages(this.props.id);
+        } else {
+          if (this.props.id.length > 40) { // exclude UUIDs
+            newChat(this.props.id);
+          }
+        }
+        update();
+      }, 1000);
+      update();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.id !== this.props.id) {
+      this.update();
+    }
+    const chat = chats[this.props.id];
     Helpers.scrollToMessageListBottom();
     $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
     if (chat && !chat.uuid) {
@@ -144,7 +140,7 @@ class ChatView extends Component {
         $('#not-seen-by-them').slideUp();
       }
     }
-    localState.get('chats').get(this.activeChat).get('msgDraft').once(m => $('.new-msg').val(m));
+    localState.get('chats').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
   }
 
   render() {
@@ -153,9 +149,11 @@ class ChatView extends Component {
     let previousDateStr;
     let previousFrom;
     const msgListContent = [];
-    if (chats[this.activeChat] && this.state.sortedMessages) {
-      Object.values(chats[this.activeChat].sortedMessages).forEach(msg => {
-        const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
+    console.log('render it', this.state.sortedMessages.length);
+    if (chats[this.props.id] && this.state.sortedMessages) {
+      this.state.sortedMessages.forEach(msg => {
+        if (!(msg && msg.info)) return;
+        const date = typeof msg.time === 'string' ? new Date(msg.timeStr) : msg.time;
         if (date) {
           const dateStr = date.toLocaleDateString();
           if (dateStr !== previousDateStr) {
@@ -165,14 +163,14 @@ class ChatView extends Component {
           previousDateStr = dateStr;
         }
 
-        const from = msg.info.from;
+        const from = msg.info && msg.info.from;
         let showName = false;
         if (previousFrom && (from !== previousFrom)) {
           msgListContent.push(html`<div class="from-separator"/>`);
           showName = true;
         }
         previousFrom = from;
-        msgListContent.push(html`<${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${this.activeChat}/>`);
+        msgListContent.push(html`<${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${this.props.id}/>`);
       });
     }
 
@@ -180,18 +178,18 @@ class ChatView extends Component {
       <div id="chat-view">
         <${ChatList} class=${this.props.id ? 'hidden-xs' : ''}/>
         <div id="chat-main" class=${this.props.id ? '' : 'hidden-xs'}>
-					${this.props.id && this.props.id.length > 20 ? html`<div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
+  ${this.props.id && this.props.id.length > 20 ? html`<div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
             <div id="message-list">${msgListContent}</div>
             <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
           </div>` : html`<${NewChat}/>`}
-          ${this.activeChat ? html`
-						<div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
-						<div id="not-seen-by-them" style="display: none">
-							<p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
-							<p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
-						</div>
-						<div class="chat-message-form"><${MessageForm} activeChat=${this.activeChat}/></div>
-						`: ''}
+          ${this.props.id ? html`
+  <div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
+  <div id="not-seen-by-them" style="display: none">
+  <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
+  <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
+  </div>
+  <div class="chat-message-form"><${MessageForm} activeChat=${this.props.id}/></div>
+  `: ''}
         </div>
       </div>`;
     }
