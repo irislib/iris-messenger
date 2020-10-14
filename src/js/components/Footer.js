@@ -97,7 +97,7 @@ class Footer extends Component {
 
     return html`
     <header class="visible-xs-flex footer">
-      <div id="header-content">
+      <div class="header-content">
         <a href="/" class="btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
         <a href="/chat" class="btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
           ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}

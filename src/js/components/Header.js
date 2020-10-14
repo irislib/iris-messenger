@@ -110,7 +110,7 @@ class Header extends Component {
 
     return html`
     <header>
-      <div id="header-content">
+      <div class="header-content">
         ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
         <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
           ‹

@@ -121,7 +121,7 @@ header a.logo img:last-child {
   filter: var(--logotype-filter);
 }
 
-header:not(.footer) a:not(:last-child) {
+header:not(.footer) .header-content > a:not(:last-child) {
   margin-right: 22px;
 }
 
@@ -283,7 +283,7 @@ header small {
   min-height:1em;
 }
 
-header #header-content {
+header .header-content {
   flex: 1;
   padding: 7px 15px;
   align-self: center;
