@@ -405,10 +405,6 @@ header #back-button {
   margin-left: 15px;
 }
 
-.public-messages-view .msg .msg-content .seen-indicator {
-  display: none;
-}
-
 .public-messages-view .img-container {
   display: flex;
   align-items: center;
@@ -425,6 +421,8 @@ header #back-button {
   border-radius: 8px !important;
   width: 100%;
   padding: 15px;
+  flex-direction: column;
+  display: flex;
 }
 
 .emoji {
