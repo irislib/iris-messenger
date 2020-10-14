@@ -94,6 +94,11 @@ img {
   display: none;
 }
 
+.footer a {
+  flex: 1;
+  text-align: center;
+}
+
 header a {
   user-select: none;
 }

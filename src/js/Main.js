@@ -16,6 +16,7 @@ import ChatView from './components/ChatView.js';
 import Login from './components/Login.js';
 import Profile from './components/Profile.js';
 import Header from './components/Header.js';
+import Footer from './components/Footer.js';
 import MessageView from './components/MessageView.js';
 import FollowsView from './components/FollowsView.js';
 import FeedView from './components/FeedView.js';
@@ -76,6 +77,7 @@ class Main extends Component {
           <${FollowsView} followers=${true} path="/followers/:id"/>
         </${Router}>
       </section>
+      <${Footer}/>
       <${VideoCall}/>
     ` : html`<${Login}/>`;
     return html`

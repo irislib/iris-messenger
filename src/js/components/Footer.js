@@ -19,7 +19,7 @@ const videoCallIcon = html`<svg enable-background="new 0 0 50 50" id="Layer_1" v
 
 const chatIcon = html`<svg class="svg-inline--fa fa-w-16" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;width: 1em;" width="100px" height="100px" fill="currentColor" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>`;
 
-class Header extends Component {
+class Footer extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
@@ -109,46 +109,15 @@ class Header extends Component {
     const searchBox = (this.chatId || iris.util.isMobile) ? '' : html`<${SearchBox}/>`;
 
     return html`
-    <header>
+    <header class="visible-xs-flex footer">
       <div id="header-content">
-        ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
-        <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
-          ‹
-        </div>
-        ` : ''}
-        <a href="/" onClick=${() => $('a.logo').blur()} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
-          <img src="img/icon128.png" width=40 height=40/>
-          <img src="img/iris_logotype.png" height=23 width=41 />
-        </a>
-        <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
-          ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
-            <div class="name">
-              ${this.state.title}
-            </div>
-          `: ''}
-          ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
-          ${participants ? html`<small class="participants">${participants}</small>` : ''}
-          ${this.chatId ? html`<small class="last-seen">${onlineStatus || ''}</small>` : ''}
-          ${searchBox}
-        </div>
-
-        ${chat && this.chatId !== key && !chat.uuid ? html`
-          <a class="tooltip" style="width:24px; height:24px; color: var(--msg-form-button-color)" id="start-video-call" onClick=${() => localState.get('outgoingCall').put(this.chatId)}>
-            <span class="tooltiptext">${t('video_call')}</span>
-            ${videoCallIcon}
-          </a>
-          <!-- <a id="start-voice-call" style="width:20px; height:20px; margin-right: 20px">
-            voiceCallIcon
-            </a> -->
-        `: ''}
-
-        <a href="/" class="hidden-xs btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
-        <a href="/chat" class="hidden-xs btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
+        <a href="/" class="btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
+        <a href="/chat" class="btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
           ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
           ${chatIcon}
         </a>
-        <a href="/settings" class="hidden-xs btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${settingsIcon}</a>
-        <a href="/profile/${key}" class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
+        <a href="/settings" class="btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${settingsIcon}</a>
+        <a href="/profile/${key}" class="${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>
       </div>
@@ -156,4 +125,4 @@ class Header extends Component {
   }
 }
 
-export default Header;
+export default Footer;
