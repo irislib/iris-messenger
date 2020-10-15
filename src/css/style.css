@@ -298,6 +298,10 @@ header .header-content {
   max-width: 100%;
 }
 
+header.footer .header-content {
+  padding: 0;
+}
+
 .flex-table {
   display: flex;
   flex-direction: column;

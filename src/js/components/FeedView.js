@@ -72,7 +72,7 @@ class FeedView extends Component {
     return html`
       <div class="main-view public-messages-view" id="message-view">
         <div class="centered-container">
-          <${MessageForm} activeChat="public" autofocus=${false}/>
+          <${MessageForm} activeChat="public" class="hidden-xs" autofocus=${false}/>
 
           <!--<div class="feed-settings">
             <button onClick="${() => {
