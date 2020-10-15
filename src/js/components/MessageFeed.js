@@ -28,10 +28,17 @@ class MessageFeed extends Component {
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
     const mainView = $('.main-view');
-    mainView.scrollTop(0);
     mainView.css({'overflow':'hidden'});
     setTimeout(() => {
       mainView.css({'overflow':''});
+      mainView.on("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart", e => {
+        if (e.which > 0 || e.type === "mousedown" || e.type === "mousewheel" || e.type === 'touchstart') {
+          mainView.stop(true);
+        }
+      });
+      mainView.animate({ scrollTop: 0 }, 500, () => {
+        mainView.off("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart");
+      });
     }, 10);
   }
 
