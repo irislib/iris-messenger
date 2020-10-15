@@ -725,7 +725,10 @@ hr {
 .chat-message-form input {
   flex: 1;
   width: auto;
+  margin: 0;
 }
+
+
 
 .message-form button, .message-form button:hover, .message-form button:active, .message-form button:focus {
   flex: none;
@@ -734,6 +737,12 @@ hr {
   font-size: 30px;
   padding: 5px;
   border: 0;
+}
+
+.chat-message-form button {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px !important;
 }
 
 /*----- Sidebar------- */
@@ -1257,6 +1266,21 @@ form.public {
   }
   header {
     max-height: 50px;
+  }
+  .chat-message-form {
+    max-height: 50px;
+    padding: 0;
+  }
+  .chat-message-form form {
+    align-items: center;
+    height: 50px;
+  }
+  .chat-message-form input {
+    padding: 8px 15px;
+    height: 35px;
+  }
+  .chat-message-form button {
+    padding: 5px 10px;
   }
   .profile-photo-container .identicon-container * { max-width: 80px; max-height: 80px; text-align: center;}
 }
