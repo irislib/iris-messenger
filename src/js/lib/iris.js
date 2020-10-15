@@ -7363,7 +7363,7 @@
 	* @param {string} options.key your keypair
 	* @param {Object} options.gun [gun](https://github.com/amark/gun) instance
 	* @param options.participants (optional) string or string array or permissions object ({'pub1':{read:true,write:true,admin:false},'pub2'...}) of participant public keys (your own key is included by default)
-	* @param {string} options.chatLink (optional) chat link instead of participants list
+	* @param {string} options.chatLink (optional) invite link instead of participants list
 	* @param {string} options.uuid (group channels only) unique channel identifier. Leave out for new channel.
 	* @param {string} options.name (group channels only) channel name
 	* @example
@@ -8263,7 +8263,7 @@
 
 	    urlRoot = urlRoot || 'https://iris.to/';
 	    if (!this.uuid) {
-	      throw new Error('Only group channels may have chat links');
+	      throw new Error('Only group channels may have invite links');
 	    }
 	    var chatLinks = [];
 	    this.on('chatLinks', function (links, from) {
