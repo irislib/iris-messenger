@@ -112,7 +112,7 @@ class Profile extends Component {
             <div id="profile-group-participants"></div>
             <div id="profile-add-participant" style="display:none;">
               <p>${t('add_participant')}:</p>
-              <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_chat_link')}"/></p>
+              <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_invite_link')}"/></p>
             </div>
             <hr/>
             <p>${t('invite_links')}</p>

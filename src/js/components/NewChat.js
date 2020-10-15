@@ -103,15 +103,15 @@ class NewChat extends Component {
   render() {
     return html`
       <div class="main-view" id="new-chat">
-        <h3>${t('have_someones_chat_link')}</h3>
-        <input id="paste-chat-link" onInput=${e => onPasteChatLink(e)} type="text" placeholder="${t('paste_their_chat_link')}"/>
+        <h3>${t('have_someones_invite_link')}</h3>
+        <input id="paste-chat-link" onInput=${e => onPasteChatLink(e)} type="text" placeholder="${t('paste_their_invite_link')}"/>
         <button id="scan-chatlink-qr-btn" onClick=${scanChatLinkQr}>${t('or_scan_qr_code')}</button>
         <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
-        <h3>${t('give_your_chat_link')}</h3>
-        <${CopyButton} text=${t('copy_your_chat_link')} copyStr=${Session.getMyChatLink}/>
+        <h3>${t('give_your_invite_link')}</h3>
+        <${CopyButton} text=${t('copy_your_invite_link')} copyStr=${Session.getMyChatLink}/>
         <button id="show-my-qr-btn">${t('or_show_qr_code')}</button>
         <p id="my-qr-code" class="qr-container" style="display:none"></p>
-        <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_chat_link_publicly') }}></small></p>
+        <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_invite_link_publicly') }}></small></p>
         <h3>${t('new_group')}</h3>
         <p>
           <form id="new-group-form" onSubmit=${e => createGroupSubmit(e)}>
@@ -120,8 +120,8 @@ class NewChat extends Component {
           </form>
         </p>
         <hr/>
-        <h3>${t('your_chat_links')}</h3>
-        <p><button id="generate-chat-link">${t('create_new_chat_link')}</button></p>
+        <h3>${t('your_invite_links')}</h3>
+        <p><button id="generate-chat-link">${t('create_new_invite_link')}</button></p>
         <div id="my-chat-links" class="flex-table"></div>
       </div>`;
   }
