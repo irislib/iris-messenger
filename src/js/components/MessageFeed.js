@@ -27,7 +27,12 @@ class MessageFeed extends Component {
     this.scroller.top();
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
-    $('.main-view').animate({ scrollTop: 0 }, 500);
+    const mainView = $('.main-view');
+    mainView.scrollTop(0);
+    mainView.css({'overflow':'hidden'});
+    setTimeout(() => {
+      mainView.css({'overflow':''});
+    }, 10);
   }
 
   bottomClicked() {
