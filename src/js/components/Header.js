@@ -110,12 +110,12 @@ class Header extends Component {
 
     return html`
     <header>
+      ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
+      <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
+        ‹
+      </div>
+      ` : ''}
       <div class="header-content">
-        ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
-        <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
-          ‹
-        </div>
-        ` : ''}
         <a href="/" onClick=${() => {$('a.logo').blur();localState.get('scrollUp').put(true)}} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
           <img src="img/icon128.png" width=40 height=40/>
           <img src="img/iris_logotype.png" height=23 width=41 />
