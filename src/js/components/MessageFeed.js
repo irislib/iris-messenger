@@ -36,9 +36,9 @@ class MessageFeed extends Component {
           mainView.stop(true);
         }
       });
-      mainView.animate({ scrollTop: 0 }, 500, () => {
+      mainView.stop().animate({ scrollTop: 0 }, {duration: 400, queue: false, always: () => {
         mainView.off("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart");
-      });
+      }});
     }, 10);
   }
 
