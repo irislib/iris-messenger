@@ -1,5 +1,5 @@
 import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
+import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import ScrollWindow from '../lib/ScrollWindow.js';
 
@@ -27,19 +27,7 @@ class MessageFeed extends Component {
     this.scroller.top();
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
-    const mainView = $('.main-view');
-    mainView.css({'overflow':'hidden'});
-    setTimeout(() => {
-      mainView.css({'overflow':''});
-      mainView.on("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart", e => {
-        if (e.which > 0 || e.type === "mousedown" || e.type === "mousewheel" || e.type === 'touchstart') {
-          mainView.stop(true);
-        }
-      });
-      mainView.stop().animate({ scrollTop: 0 }, {duration: 400, queue: false, always: () => {
-        mainView.off("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart");
-      }});
-    }, 10);
+    Helpers.animateScrollTop('.main-view');
   }
 
   bottomClicked() {
