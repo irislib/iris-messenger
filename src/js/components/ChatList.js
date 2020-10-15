@@ -30,6 +30,7 @@ class ChatList extends Component {
       chats[id] = chat;
       limitedUpdate();
     });
+    localState.get('scrollUp').on(() => $('.chat-list').animate({scrollTop: 0}));
     publicState.user().get('profile').get('name').on(name => {
       if (name && typeof name === 'string') {
         $('.user-info .user-name').text(name);
