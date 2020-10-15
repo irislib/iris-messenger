@@ -1076,7 +1076,7 @@ form.public {
   align-items: center;
 }
 
-.profile-link {
+.profile-link-container .profile-link {
   display: flex;
   flex: 1;
   align-items: center;
