@@ -260,6 +260,7 @@ class Profile extends Component {
         }
       });
       publicState.user(pub).get('profile').get('name').on((name,a,b,e) => {
+        document.title = name || 'Iris';
         this.eventListeners.push(e);
         if (!$('#profile .profile-name:focus').length) {
           this.setState({name});
