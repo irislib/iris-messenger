@@ -7,15 +7,20 @@ class CopyButton extends Component {
   onClick(e) {
     e.preventDefault();
     const copyStr = typeof this.props.copyStr === 'function' ? this.props.copyStr() : this.props.copyStr;
-    Helpers.copyToClipboard(copyStr);
 
-    const tgt = $(e.target);
-    this.originalWidth = this.originalWidth || tgt.width();
-    tgt.width(this.originalWidth);
+    if (navigator.share && iris.util.isMobile && !this.props.notShareable) {
+      navigator.share({url: copyStr});
+    } else {
+      Helpers.copyToClipboard(copyStr);
 
-    this.setState({copied:true});
-    clearTimeout(this.timeout);
-    this.timeout = setTimeout(() => this.setState({copied:false}), 2000);
+      const tgt = $(e.target);
+      this.originalWidth = this.originalWidth || tgt.width() + 1;
+      tgt.width(this.originalWidth);
+
+      this.setState({copied:true});
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => this.setState({copied:false}), 2000);
+    }
   }
 
   render() {

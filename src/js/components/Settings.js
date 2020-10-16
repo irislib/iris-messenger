@@ -35,7 +35,7 @@ class Settings extends Component {
           <p dangerouslySetInnerHTML=${{ __html: t('private_key_warning') }} ></p>
           <p>
             <button onClick=${() => downloadKey()}>${t('download_private_key')}</button>
-            <${CopyButton} text=${t('copy_private_key')} copyStr=${JSON.stringify(Session.getKey())}/>
+            <${CopyButton} notShareable=${true} text=${t('copy_private_key')} copyStr=${JSON.stringify(Session.getKey())}/>
           </p>
           <p>
             <button onClick=${e => togglePrivateKeyQR(e)}>${t('show_privkey_qr')}</button>
