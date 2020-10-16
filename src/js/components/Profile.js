@@ -18,6 +18,8 @@ class Profile extends Component {
   constructor() {
     super();
     this.eventListeners = [];
+    this.followedUsers = new Set();
+    this.followers = new Set();
   }
 
   onProfilePhotoSet(src) {
@@ -52,9 +54,22 @@ class Profile extends Component {
     }
   }
 
+  getNotification() {
+    if (this.state.noFollowers && this.followers.has(Session.getPubKey())) {
+      return html`
+        <div class="msg">
+          <div class="msg-content">
+            <p>Share your profile link so ${this.state.name || 'this user'} can follow you:</p>
+            <p><${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(Session.getPubKey())}/></p>
+            <small>Your posts, replies and likes are only shown to your followers and their network.</small>
+          </div>
+        </div>
+      `;
+    }
+  }
+
   render() {
-    const key = Session.getKey();
-    this.isMyProfile = (key && key.pub) === this.props.id;
+    this.isMyProfile = Session.getPubKey() === this.props.id;
     const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
     const editable = !!(this.isMyProfile || this.state.isAdmin);
     const followable = !(this.isMyProfile || this.props.id.length < 40);
@@ -90,7 +105,7 @@ class Profile extends Component {
                     <span>${this.state.followerCount}</span> ${t('known_followers')}
                   </a>
                 </div>
-                ${this.state.followsYou ? html`
+                ${this.followedUsers.has(Session.getPubKey()) ? html`
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
                 ${followable ? html`<${FollowButton} id=${this.props.id}/>` : ''}
@@ -154,6 +169,7 @@ class Profile extends Component {
         <div id="profile-public-messages">
           ${messageForm}
           <div class="public-messages-view">
+            ${this.getNotification()}
             <${MessageFeed} node=${publicState.user(this.props.id).get('msgs')} />
           </div>
         </div>
@@ -211,25 +227,19 @@ class Profile extends Component {
   componentDidMount() {
     const pub = this.props.id;
     this.eventListeners.forEach(e => e.off());
-    this.setState({followsYou:false, youFollow: false, followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
-    const key = Session.getKey();
-    this.isMyProfile = (key && key.pub) === pub;
-    this.followedUsers = new Set();
-    this.followers = new Set();
+    this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
+    this.isMyProfile = Session.getPubKey() === pub;
     const chat = chats[pub];
     localState.get('activeProfile').put(pub);
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
     this.renderGroupParticipants();
+    localState.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
     localState.get('chats').get(this.props.id).get('participants').on(() => {
       this.renderGroupParticipants();
       renderInviteLinks(pub);
     });
     if (!(chat && chat.uuid)) {
-      publicState.user(pub).get('follow').get(Session.getKey().pub).on((followsYou, a, b, e) => {
-        this.setState({followsYou});
-        this.eventListeners.push(e);
-      });
       publicState.user(pub).get('follow').map().on((following,key,c,e) => {
         this.eventListeners.push(e);
         if (following) {

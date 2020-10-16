@@ -112,6 +112,8 @@ function login(k) {
   publicState.user().get('profile').get('photo').on(data => {
     myProfilePhoto = data;
   });
+  publicState.get('follow').put({a:null});
+  localState.get('follows').put({a:null});
   Notifications.init();
   localState.get('loggedIn').put(true);
   follows = getFollowsFn((k, info) => {

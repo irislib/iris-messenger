@@ -70,7 +70,7 @@ class FeedView extends Component {
       return html`
         <div class="msg">
           <div class="msg-content">
-            <p>Follow someone to see posts from their network! Suggestion:</p>
+            <p>Follow someone to see content from their network! Suggestion:</p>
             <div class="profile-link-container">
               <a href="/profile/${SUGGESTED_FOLLOW}" class="profile-link">
                 <${Identicon} str=${SUGGESTED_FOLLOW} width=40 />
@@ -91,7 +91,7 @@ class FeedView extends Component {
             <small>Your posts, replies and likes are only shown to your followers and their network.</small>
           </div>
         </div>
-      `
+      `;
     }
     return '';
   }
