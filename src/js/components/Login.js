@@ -41,6 +41,8 @@ function onLoginFormSubmit(e) {
     Session.login(k);
     publicState.user().get('profile').get('name').put(name);
     Session.createChatLink();
+    localState.get('noFollows').put(true);
+    localState.get('noFollowers').put(true);
   });
 }
 

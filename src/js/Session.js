@@ -11,6 +11,7 @@ let latestChatLink;
 let onlineTimeout;
 let ourActivity;
 let follows = {};
+let hasFollowers;
 
 function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
   const follows = {};
@@ -113,8 +114,11 @@ function login(k) {
   });
   Notifications.init();
   localState.get('loggedIn').put(true);
-  follows = getFollowsFn(k => {
+  follows = getFollowsFn((k, info) => {
     localState.get('follows').get(k).put(true);
+    if (!hasFollowers && k === getPubKey() && info.followers.size) {
+      localState.get('noFollowers').put(false);
+    }
   });
   publicState.user().get('msgs').put({a:null});
   publicState.user().get('replies').put({a:null});
@@ -130,7 +134,7 @@ function clearIndexedDB() {
 }
 
 function getMyChatLink() {
-  return latestChatLink || Helpers.getUserChatLink(key.pub);
+  return latestChatLink || Helpers.getProfileLink(key.pub);
 }
 
 function getKey() { return key; }

@@ -175,7 +175,7 @@ class MessageForm extends Component {
       ${isPublic ? '' : contentBtns}
       <input name="attachment-input" type="file" class="hidden attachment-input" accept="image/*" multiple onChange=${() => this.openAttachmentsPreview()}/>
       <${isPublic ? 'textarea' : 'input'} onInput=${e => this.onMsgTextInput(e)} class="new-msg" type="text" placeholder="${t('type_a_message')}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>
-      ${isPublic ? html`<div>${contentBtns}</div>` : submitButton}
+      ${isPublic ? html`<div>${contentBtns} ${submitButton}</div>` : submitButton}
       ${isPublic ? html`<div class="attachment-preview" style="display:none"></div>` : ''}
     </form>`;
   }

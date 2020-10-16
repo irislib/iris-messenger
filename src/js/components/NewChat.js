@@ -94,7 +94,7 @@ class NewChat extends Component {
     });
 
     $('#generate-chat-link').off().on('click', Session.createChatLink);
-    $(".profile-link").attr('href', Helpers.getUserChatLink(Session.getKey() && Session.getKey().pub)).off().on('click', e => {
+    $(".profile-link").attr('href', Helpers.getProfileLink(Session.getKey() && Session.getKey().pub)).off().on('click', e => {
       e.preventDefault();
       route('/profile/' + Session.getKey().pub);
     });

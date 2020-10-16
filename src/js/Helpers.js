@@ -1999,7 +1999,7 @@ export default {
     return el;
   },
 
-  getUserChatLink(pub) {
+  getProfileLink(pub) {
     return 'https://iris.to/#/profile/' + encodeURIComponent(pub);
   },
 };
