@@ -121,7 +121,7 @@ class Header extends Component {
           <img src="img/iris_logotype.png" height=23 width=41 />
         </a>
         <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
-          ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
+          ${this.state.title && activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
             <div class="name">
               ${this.state.title}
             </div>
