@@ -2,6 +2,7 @@ import { Component } from '../lib/preact.js';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import ScrollWindow from '../lib/ScrollWindow.js';
+import { localState } from '../Main.js';
 
 const size = 10;
 

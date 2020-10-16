@@ -57,7 +57,7 @@ class FeedView extends Component {
     });
     localState.get('noFollows').on(noFollows => this.setState({noFollows}));
     localState.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
-    localState.get('noMessages').on(noFollows => this.setState({noMessages}));
+    localState.get('noMessages').on(noMessages => this.setState({noMessages}));
     this.getMessages();
   }
 

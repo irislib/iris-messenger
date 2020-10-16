@@ -1,5 +1,5 @@
 import { html } from '../Helpers.js';
-import { publicState } from '../Main.js';
+import { publicState, localState } from '../Main.js';
 import { translate as t } from '../Translation.js';
 import LanguageSelector from './LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
