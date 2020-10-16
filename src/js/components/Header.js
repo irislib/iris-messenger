@@ -109,7 +109,7 @@ class Header extends Component {
     const searchBox = this.chatId ? '' : html`<${SearchBox}/>`;
 
     return html`
-    <header>
+    <header class="nav header">
       ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
       <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
         ‹
