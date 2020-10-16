@@ -60,7 +60,7 @@ class Profile extends Component {
         <div class="msg">
           <div class="msg-content">
             <p>Share your profile link so ${this.state.name || 'this user'} can follow you:</p>
-            <p><${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(Session.getPubKey())}/></p>
+            <p><${CopyButton} text=${t('copy_link')} title=${Session.getMyName()} copyStr=${Helpers.getProfileLink(Session.getPubKey())}/></p>
             <small>Your posts, replies and likes are only shown to your followers and their network.</small>
           </div>
         </div>
@@ -110,7 +110,7 @@ class Profile extends Component {
                 `: ''}
                 ${followable ? html`<${FollowButton} id=${this.props.id}/>` : ''}
                 <button class="send-message">${t('send_message')}</button>
-                <${CopyButton} text=${t('copy_link')} copyStr=${'https://iris.to/' + window.location.hash}/>
+                <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
                 <button class="show-qr-code">${t('show_qr_code')}</button>
                 ${this.isMyProfile ? '' : html`
                   <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
