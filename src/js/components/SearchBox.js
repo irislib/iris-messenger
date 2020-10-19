@@ -1,5 +1,5 @@
 import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
+import Helpers, { html } from '../Helpers.js';
 import {publicState, localState} from '../Main.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
@@ -90,9 +90,18 @@ class SearchBox extends Component {
   }
 
   search() {
-    const input = $(this.base).find('input');
-    const query = input.val();
+    const query = $(this.base).find('input').val();
 
+    if (this.props.onSelect) {
+      const s = query.split('https://iris.to/#/profile/');
+      if (s.length > 1) {
+        return this.props.onSelect({key: s[1]});
+      }
+      const key = Helpers.getUrlParameter('chatWith', s[1]);
+      if (key) {
+        return this.props.onSelect({key});
+      }
+    }
     if (followChatLink(query)) return;
 
     if (query && this.fuse) {
@@ -101,8 +110,7 @@ class SearchBox extends Component {
         $(document).off('keyup').on('keyup', e => {
           if (e.key === "Escape") { // escape key maps to keycode `27`
             $(document).off('keyup');
-            input.val('');
-            this.setState({results:[], query: ''});
+            this.close();
           }
         });
       }
