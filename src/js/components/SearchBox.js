@@ -55,12 +55,16 @@ class SearchBox extends Component {
     this.search();
   }
 
+  close() {
+    $(this.base).find('input').val('');
+    this.setState({results:[], query: ''});
+  }
+
   componentDidMount() {
     this.getFollows(Session.getKey().pub);
     localState.get('activeRoute').on((a,b,c,e) => {
       this.eventListeners['activeRoute'] = e;
-      $(this.base).find('input').val('');
-      this.setState({results:[], query: ''});
+      this.close();
     });
     this.adjustResultsPosition();
   }
@@ -108,6 +112,15 @@ class SearchBox extends Component {
     }
   }
 
+  onClick(e, item) {
+    if (this.props.onSelect) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.props.onSelect(item);
+    }
+    this.close();
+  }
+
   render() {
     return html`
       <div class="search-box">
@@ -131,7 +144,7 @@ class SearchBox extends Component {
               }
             }
             return html`
-              <a href="/profile/${i.key}">
+              <a href="/profile/${i.key}" onClick=${e => this.onClick(e, i)}>
                 <${Identicon} str=${i.key} width=40/>
                 <div>
                   ${i.name || ''}<br/>

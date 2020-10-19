@@ -14,6 +14,7 @@ import FollowButton from './FollowButton.js';
 import MessageFeed from './MessageFeed.js';
 import Identicon from './Identicon.js';
 import Name from './Name.js';
+import SearchBox from './SearchBox.js';
 
 class Profile extends Component {
   constructor() {
@@ -69,6 +70,43 @@ class Profile extends Component {
     }
   }
 
+  onSelectCandidate(pub) {
+    console.log('onSelectCandidate', pub);
+    $('#profile-add-participant-input').hide();
+    if (pub) {
+      $('#profile-add-participant-candidate').remove();
+      var identicon = Helpers.getIdenticon(pub, 40).css({'margin-right':15});
+      var nameEl = $('<span>');
+      publicState.user(pub).get('profile').get('name').on(name => nameEl.text(name));
+      var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
+      var addBtn = $('<button>').css({'margin-left': 15}).text(t('add')).click(() => {
+        if (newGroupParticipant) {
+          chats[this.props.id].addParticipant(newGroupParticipant);
+          newGroupParticipant = null;
+          $('#profile-add-participant-input').val('').show();
+          $('#profile-add-participant-candidate').remove();
+        }
+      });
+      var removeBtn = $('<button>').css({'margin-left': 15}).text(t('cancel')).click(() => {
+        el.remove();
+        $('#profile-add-participant-input').val('').show();
+        newGroupParticipant = null;
+      });
+      el.append(identicon);
+      el.append(nameEl);
+      el.append(addBtn);
+      el.append(removeBtn);
+      newGroupParticipant = pub;
+      $('#profile-add-participant-input').after(el);
+    }
+    $(event.target).val('');
+  }
+
+  onAddParticipant(add = true) {
+    add && chats[this.props.id].addParticipant(this.state.memberCandidate);
+    this.setState({memberCandidate:null});
+  }
+
   renderGroupSettings() {
     const chat = chats[this.props.id];
     if (chat && chat.uuid) {
@@ -82,7 +120,7 @@ class Profile extends Component {
                 return html`
                   <div class="profile-link-container">
                     <a class="profile-link" onClick=${() => route('/profile/' + k)}>
-                      <${Identicon} str=${k} width=40 showTooltip=${true}/>
+                      <${Identicon} str=${k} width=40/>
                       <${Name} pub=${k}/>
                       ${profile.permissions && profile.permissions.admin ? html`
                         <small style="margin-left:5px">${t('admin')}</small>
@@ -96,7 +134,19 @@ class Profile extends Component {
           ${this.state.isAdmin ? html`
             <div>
               <p>${t('add_participant')}:</p>
-              <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_profile_link')}"/></p>
+              <p>
+              ${this.state.memberCandidate ? html`
+                <div class="profile-link-container"><div class="profile-link">
+                  <${Identicon} str=${this.state.memberCandidate} width=40/>
+                  <${Name} pub=${this.state.memberCandidate}/>
+                </div>
+                <button onClick=${() => this.onAddParticipant()}>Add</button>
+                <button onClick=${() => this.onAddParticipant(false)}>Cancel</button>
+                </div>
+              `: html`
+                <${SearchBox} onSelect=${item => this.setState({memberCandidate: item.key})}/>
+              `}
+              </p>
             </div>
           `: ''}
           ${chat && chat.inviteLinks && Object.keys(chat.inviteLinks).length ? html`
@@ -244,7 +294,7 @@ class Profile extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
-      this.setState({isAdmin:false,uuid:null});
+      this.setState({isAdmin:false,uuid:null, memberCandidate:null});
       this.componentDidMount();
     }
   }
@@ -355,48 +405,10 @@ class Profile extends Component {
       colorLight : "#ffffff",
       correctLevel : QRCode.CorrectLevel.H
     });
-    $('#profile-add-participant').on('input', onProfileAddParticipantInput);
   }
 }
 
 var newGroupParticipant;
-function onProfileAddParticipantInput(event) {
-  var val = $(event.target).val();
-  if (val.length < 30) {
-    return;
-  }
-  var s = val.split('?');
-  if (s.length !== 2) { return; }
-  var pub = Helpers.getUrlParameter('chatWith', s[1]);
-  $('#profile-add-participant-input').hide();
-  if (pub) {
-    $('#profile-add-participant-candidate').remove();
-    var identicon = Helpers.getIdenticon(pub, 40).css({'margin-right':15});
-    var nameEl = $('<span>');
-    publicState.user(pub).get('profile').get('name').on(name => nameEl.text(name));
-    var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
-    var addBtn = $('<button>').css({'margin-left': 15}).text(t('add')).click(() => {
-      if (newGroupParticipant) {
-        chats[this.props.id].addParticipant(newGroupParticipant);
-        newGroupParticipant = null;
-        $('#profile-add-participant-input').val('').show();
-        $('#profile-add-participant-candidate').remove();
-      }
-    });
-    var removeBtn = $('<button>').css({'margin-left': 15}).text(t('cancel')).click(() => {
-      el.remove();
-      $('#profile-add-participant-input').val('').show();
-      newGroupParticipant = null;
-    });
-    el.append(identicon);
-    el.append(nameEl);
-    el.append(addBtn);
-    el.append(removeBtn);
-    newGroupParticipant = pub;
-    $('#profile-add-participant-input').after(el);
-  }
-  $(event.target).val('');
-}
 
 function renderGroupPhotoSettings(uuid) {
   const me = chats[uuid].participantProfiles[Session.getKey().pub];
