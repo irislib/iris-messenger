@@ -185,6 +185,7 @@ class Profile extends Component {
   render() {
     this.isMyProfile = Session.getPubKey() === this.props.id;
     const chat = chats[this.props.id];
+    const uuid = chat && chat.uuid;
     const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
     const editable = !!(this.isMyProfile || this.state.isAdmin);
     const followable = !(this.isMyProfile || this.props.id.length < 40);
@@ -212,20 +213,24 @@ class Profile extends Component {
                 <p class="profile-about-content" placeholder=${editable ? t('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
               </div>
               <div class="profile-actions">
-                <div class="follow-count">
-                  <a href="/follows/${this.props.id}">
-                    <span>${this.state.followedUserCount}</span> ${t('following')}
-                  </a>
-                  <a href="/followers/${this.props.id}">
-                    <span>${this.state.followerCount}</span> ${t('known_followers')}
-                  </a>
-                </div>
+                ${uuid ? '' : html`
+                  <div class="follow-count">
+                    <a href="/follows/${this.props.id}">
+                      <span>${this.state.followedUserCount}</span> ${t('following')}
+                    </a>
+                    <a href="/followers/${this.props.id}">
+                      <span>${this.state.followerCount}</span> ${t('known_followers')}
+                    </a>
+                  </div>
+                `}
                 ${this.followedUsers.has(Session.getPubKey()) ? html`
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
                 ${followable ? html`<${FollowButton} id=${this.props.id}/>` : ''}
                 <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
-                <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+                ${uuid ? '' : html`
+                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+                `}
                 <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
                 ${this.isMyProfile ? '' : html`
                   <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
@@ -249,7 +254,7 @@ class Profile extends Component {
                 ${t('nickname')}:
                 <input value=${chat && chat.theirNickname} onInput=${e => chat && chat.put('nickname', e.target.value)}/>
               </p>
-              ${chat && chat.uuid ? '' : html`
+              ${uuid ? '' : html`
                 <p>
                   ${t('their_nickname_for_you')}:
                   <span>
@@ -275,7 +280,7 @@ class Profile extends Component {
             <hr/>
           </div>
         </div>
-        ${chat && chat.uuid ? '' : html`
+        ${uuid ? '' : html`
           <div>
             ${messageForm}
             <div class="public-messages-view">
