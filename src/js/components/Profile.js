@@ -80,13 +80,15 @@ class Profile extends Component {
               chat ? Object.keys(chat.participantProfiles).map(k => {
                 const profile = chat.participantProfiles[k];
                 return html`
-                  <p onClick=${() => route('/profile/' + k)} style="display:flex;align-items:center;cursor:pointer">
-                    <${Identicon} str=${k} width=40 showTooltip=${true}/>
-                    <${Name} pub=${k}/>
-                    ${profile.permissions && profile.permissions.admin ? html`
-                      <small style="margin-left:5px">${t('admin')}</small>
-                    `: ''}
-                  </p>
+                  <div class="profile-link-container">
+                    <a class="profile-link" onClick=${() => route('/profile/' + k)}>
+                      <${Identicon} str=${k} width=40 showTooltip=${true}/>
+                      <${Name} pub=${k}/>
+                      ${profile.permissions && profile.permissions.admin ? html`
+                        <small style="margin-left:5px">${t('admin')}</small>
+                      `: ''}
+                    </a>
+                  </div>
                 `;
               }) : ''
             }
