@@ -71,11 +71,9 @@ class NewChat extends Component {
       this.eventListeners['chatLinks'] = e;
       if (url) {
         if (typeof url !== 'string' || url.indexOf('http') !== 0) return;
-        console.log('got chat clink', url);
         this.chatLinks[id] = url;
         setChatLinkQrCode(url);
       } else {
-        console.log('removed chat link', id);
         delete this.chatLinks[id];
       }
       this.setState({chatLinks: this.chatLinks});

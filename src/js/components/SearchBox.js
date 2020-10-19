@@ -82,6 +82,7 @@ class SearchBox extends Component {
     e.preventDefault();
     const links = $(this.base).find('a:not(.follow-someone)');
     links.length && links[0].click();
+    const input = $(this.base).find('input');
     $(this.base).find('input').blur();
   }
 
