@@ -9,21 +9,6 @@ import CopyButton from './CopyButton.js';
 import { Component } from '../lib/preact.js';
 import { route } from '../lib/preact-router.es.js';
 
-function createGroupSubmit(e) {
-  e.preventDefault();
-  if ($('#new-group-name').val().length) {
-    var c = new iris.Channel({
-      gun: publicState,
-      key: Session.getKey(),
-      participants: [],
-    });
-    c.put('name', $('#new-group-name').val());
-    $('#new-group-name').val('');
-    addChat(c);
-    route('/profile/' + c.uuid);
-  }
-}
-
 function scanChatLinkQr() {
   if ($('#chatlink-qr-video:visible').length) {
     $('#chatlink-qr-video').hide();
@@ -32,12 +17,6 @@ function scanChatLinkQr() {
     $('#chatlink-qr-video').show();
     QRScanner.startChatLinkQRScanner();
   }
-}
-
-function onPasteChatLink(event) {
-  var val = $(event.target).val();
-  followChatLink(val);
-  $(event.target).val('');
 }
 
 function setChatLinkQrCode(link) {
@@ -57,43 +36,45 @@ function setChatLinkQrCode(link) {
 class NewChat extends Component {
   constructor() {
     super();
-    this.eventListeners = [];
+    this.eventListeners = {};
+    this.chatLinks = {};
+    this.state = {chatLinks: {}};
   }
 
   componentDidUnmount() {
     this.eventListeners.forEach(e => e.off());
   }
 
-  componentDidMount() {
-    localState.get('chatLinks').on((chatLink, a, b, e) => {
-      this.eventListeners.push(e);
-      const row = $('<div>').addClass('flex-row');
-      const copyBtn = $('<button>').text(t('copy')).width(100);
-      copyBtn.on('click', event => {
-        Helpers.copyToClipboard(chatLink.url);
-        var te = $(event.target);
-        var originalText = te.text();
-        te.text(t('copied'));
-        setTimeout(() => {
-          te.text(originalText);
-        }, 2000);
+  onPasteChatLink(e) {
+    const val = $(e.target).val();
+    followChatLink(val);
+    $(e.target).val('');
+  }
+
+  onCreateGroupSubmit(e) {
+    e.preventDefault();
+    if ($('#new-group-name').val().length) {
+      var c = new iris.Channel({
+        gun: publicState,
+        key: Session.getKey(),
+        participants: [],
       });
-      const copyDiv = $('<div>').addClass('flex-cell no-flex').append(copyBtn);
-      row.append(copyDiv);
-      const input = $('<input>').attr('type', 'text').val(chatLink.url);
-      input.on('click', () => input.select());
-      row.append($('<div>').addClass('flex-cell').append(input));
-      const removeBtn = $('<button>').text(t('remove'));
-      row.append($('<div>').addClass('flex-cell no-flex').append(removeBtn));
-      $('#my-chat-links').append(row);
-      setChatLinkQrCode(chatLink.url);
+      c.put('name', $('#new-group-name').val());
+      $('#new-group-name').val('');
+      addChat(c);
+      route('/profile/' + c.uuid);
+    }
+  }
+
+  componentDidMount() {
+    localState.get('chatLinks').on((v, k, b, e) => {
+      console.log('got chat clink', v);
+      this.eventListeners['chatLinks'] = e;
+      this.chatLinks[v.id] = v.url;
+      this.setState({chatLinks: this.chatLinks});
+      setChatLinkQrCode(v.url);
     });
 
-    $('#show-my-qr-btn').off().click(() => {
-      $('#my-qr-code').toggle()
-    });
-
-    $('#generate-chat-link').off().on('click', Session.createChatLink);
     $(".profile-link").attr('href', Helpers.getProfileLink(Session.getKey() && Session.getKey().pub)).off().on('click', e => {
       e.preventDefault();
       route('/profile/' + Session.getKey().pub);
@@ -104,25 +85,43 @@ class NewChat extends Component {
     return html`
       <div class="main-view" id="new-chat">
         <h3>${t('have_someones_invite_link')}</h3>
-        <input id="paste-chat-link" onInput=${e => onPasteChatLink(e)} type="text" placeholder="${t('paste_their_invite_link')}"/>
+        <input id="paste-chat-link" onInput=${e => this.onPasteChatLink(e)} type="text" placeholder="${t('paste_their_invite_link')}"/>
         <button id="scan-chatlink-qr-btn" onClick=${scanChatLinkQr}>${t('or_scan_qr_code')}</button>
         <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
         <h3>${t('give_your_invite_link')}</h3>
         <${CopyButton} text=${t('copy_your_invite_link')} copyStr=${Session.getMyChatLink}/>
-        <button id="show-my-qr-btn">${t('or_show_qr_code')}</button>
+        <button onClick=${() => $('#my-qr-code').toggle()}>${t('or_show_qr_code')}</button>
         <p id="my-qr-code" class="qr-container" style="display:none"></p>
         <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_invite_link_publicly') }}></small></p>
         <h3>${t('new_group')}</h3>
         <p>
-          <form id="new-group-form" onSubmit=${e => createGroupSubmit(e)}>
+          <form id="new-group-form" onSubmit=${e => this.onCreateGroupSubmit(e)}>
             <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
             <button type="submit">${t('create')}</button>
           </form>
         </p>
         <hr/>
         <h3>${t('your_invite_links')}</h3>
-        <p><button id="generate-chat-link">${t('create_new_invite_link')}</button></p>
-        <div id="my-chat-links" class="flex-table"></div>
+        <p><button onClick=${() => Session.createChatLink()}>${t('create_new_invite_link')}</button></p>
+        <div id="my-chat-links" class="flex-table">
+          ${Object.keys(this.state.chatLinks).map(k => {
+            const chatLink = this.state.chatLinks[k];
+            console.log(chatLink);
+            return html`
+              <div class="flex-row">
+                <div class="flex-cell no-flex">
+                  <${CopyButton} copyStr=${chatLink}/>
+                </div>
+                <div class="flex-cell">
+                  <input type="text" value=${chatLink} onClick=${e => $(e.target).select()}/>
+                </div>
+                <div class="flex-cell no-flex">
+                  <button>${t('remove')}</button>
+                </div>
+              </div>
+            `;
+          })}
+        </div>
       </div>`;
   }
 }
