@@ -176,7 +176,6 @@ function addChat(chat) {
     var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     chat.inviteLinks = {};
     chat.getChatLinks({callback: ({url, id}) => {
-      console.log('received invite link', id, url);
       chat.inviteLinks[id] = url;
       if (pub === activeProfile) {
         localState.get('inviteLinksChanged').put(true);

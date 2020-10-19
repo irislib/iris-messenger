@@ -13,6 +13,7 @@ import CopyButton from './CopyButton.js';
 import FollowButton from './FollowButton.js';
 import MessageFeed from './MessageFeed.js';
 import Identicon from './Identicon.js';
+import Name from './Name.js';
 
 class Profile extends Component {
   constructor() {
@@ -81,6 +82,7 @@ class Profile extends Component {
                 return html`
                   <p onClick=${() => route('/profile/' + k)} style="display:flex;align-items:center;cursor:pointer">
                     <${Identicon} str=${k} width=40 showTooltip=${true}/>
+                    <${Name} pub=${k}/>
                     ${profile.permissions && profile.permissions.admin ? html`
                       <small style="margin-left:5px">${t('admin')}</small>
                     `: ''}

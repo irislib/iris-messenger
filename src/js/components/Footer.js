@@ -26,35 +26,6 @@ class Footer extends Component {
     this.chatId = null;
   }
 
-  getOnlineStatusText() {
-    const chat = chats[this.chatId];
-    const activity = chat && chat.activity;
-    if (activity) {
-      if (activity.isActive) {
-        return(t('online'));
-      } else if (activity.lastActive) {
-        const d = new Date(activity.lastActive);
-        let lastSeenText = t(iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
-        if (lastSeenText === t('today')) {
-          lastSeenText = iris.util.formatTime(d);
-        } else {
-          lastSeenText = iris.util.formatDate(d);
-        }
-        return (t('last_active') + ' ' + lastSeenText);
-      }
-    }
-  }
-
-  backButtonClicked() {
-    route('/chat');
-  }
-
-  onClick() {
-    if (this.chatId) {
-      route('/profile/' + this.chatId);
-    }
-  }
-
   componentDidMount() {
     localState.get('unseenTotal').on(unseenTotal => {
       this.setState({unseenTotal});
@@ -65,22 +36,6 @@ class Footer extends Component {
       this.setState({});
       const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
       this.chatId = replaced.length < activeRoute.length ? replaced : null;
-
-      let title = '';
-      if (activeRoute.indexOf('/chat/') === 0) {
-        if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
-          title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
-        } else {
-          title = getDisplayName(this.chatId);
-          if (!title && this.chatId.length > 40) {
-            publicState.user(this.chatId).get('profile').get('name').on((name, a, b, eve) => {
-              this.eventListeners.push(eve);
-              this.setState({title: name});
-            });
-          }
-        }
-      }
-      this.setState({title});
     });
   }
 
@@ -92,7 +47,7 @@ class Footer extends Component {
     }
 
     return html`
-    <header class="visible-xs-flex nav footer">
+    <footer class="visible-xs-flex nav footer">
       <div class="header-content" onClick=${() => localState.get('scrollUp').put(true)}>
         <a href="/" class="btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
         <a href="/chat" class="btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
@@ -105,7 +60,7 @@ class Footer extends Component {
           <${Identicon} str=${key} width=34 />
         </a>
       </div>
-    </header>`;
+    </footer>`;
   }
 }
 

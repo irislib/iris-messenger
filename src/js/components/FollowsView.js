@@ -4,6 +4,7 @@ import {localState, publicState} from '../Main.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import FollowButton from './FollowButton.js';
+import Name from './Name.js';
 
 class FollowsView extends Component {
   constructor() {
@@ -17,11 +18,7 @@ class FollowsView extends Component {
       this.eventListeners['follow'] = e;
       if (follows) {
         this.follows[pub] = {};
-        publicState.user(pub).get('profile').get('name').on((name, a, b, e) => {
-          this.eventListeners[pub] = e;
-          this.follows[pub].name = name;
-          this.setState({});
-        });
+        this.setState({});
       } else {
         delete this.follows[pub];
         this.eventListeners[pub] && this.eventListeners[pub].off();
@@ -36,10 +33,6 @@ class FollowsView extends Component {
         publicState.user(pub).get('follow').get(this.props.id).on(follows => {
           if (!follows) return;
           this.follows[pub] = {};
-          publicState.user(pub).get('profile').get('name').once(name => {
-            this.follows[pub].name = name;
-            this.setState({});
-          });
           this.setState({});
         })
       }
@@ -48,10 +41,6 @@ class FollowsView extends Component {
 
   componentDidMount() {
     if (this.props.id) {
-      publicState.user(this.props.id).get('profile').get('name').on((name, a, b, e) => {
-        this.eventListeners['name'] = e;
-        this.setState({name});
-      })
       this.props.followers ? this.getFollowers() : this.getFollows();
     }
   }
@@ -65,14 +54,15 @@ class FollowsView extends Component {
     return html`
       <div class="main-view" id="follows-view">
         <div class="centered-container">
-          <h3><a href="/profile/${this.props.id}">${this.state.name || '—'}</a>:<i> </i>
+          <h3><a href="/profile/${this.props.id}"><${Name} pub=${this.props.id} placeholder="—" /></a>:<i> </i>
           ${this.props.followers ? t('known_followers') : t('following')}</h3>
           <div id="follows-list">
             ${keys.map(k => {
               return html`
               <div class="profile-link-container">
                 <a href="/profile/${k}" class="profile-link">
-                  <${Identicon} str=${k} width=49/> ${this.follows[k].name || ''}
+                  <${Identicon} str=${k} width=49/>
+                  <${Name} pub=${k}/>
                 </a>
                 <${FollowButton} id=${k}/>
               </div>`;

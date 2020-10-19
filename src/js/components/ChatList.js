@@ -31,11 +31,6 @@ class ChatList extends Component {
       limitedUpdate();
     });
     localState.get('scrollUp').on(() => Helpers.animateScrollTop('.chat-list'));
-    publicState.user().get('profile').get('name').on(name => {
-      if (name && typeof name === 'string') {
-        $('.user-info .user-name').text(name);
-      }
-    });
     if (Session.getKey()) {
       $("#my-identicon").append(Helpers.getIdenticon(Session.getKey().pub, 40));
     }
