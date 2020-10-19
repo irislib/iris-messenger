@@ -109,9 +109,9 @@ class Profile extends Component {
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
                 ${followable ? html`<${FollowButton} id=${this.props.id}/>` : ''}
-                <button class="send-message">${t('send_message')}</button>
+                <button onClick=${() => showChat(this.props.id)}>${t('send_message')}</button>
                 <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
-                <button class="show-qr-code">${t('show_qr_code')}</button>
+                <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
                 ${this.isMyProfile ? '' : html`
                   <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
                 `}
@@ -132,7 +132,7 @@ class Profile extends Component {
             <hr/>
             <p>${t('invite_links')}</p>
             <div id="profile-invite-links" class="flex-table"></div>
-            <p><button id="profile-create-invite-link">Create new invite link</button></p>
+            <p><button id="profile-create-invite-link" onClick=${() => this.onCreateInviteLink()}>Create new invite link</button></p>
             <hr/>
           </div>
 
@@ -177,6 +177,10 @@ class Profile extends Component {
     </div>`;
   }
 
+  onCreateInviteLink() {
+    chats[this.props.id].createChatLink();
+  }
+
   renderGroupParticipants() {
     const pub = this.props.id;
     if (!(chats[pub] && chats[pub].uuid)) {
@@ -189,7 +193,6 @@ class Profile extends Component {
     var keys = Object.keys(chats[pub].participantProfiles);
     const isAdmin = areWeAdmin(pub);
     $('#profile-add-participant').toggle(isAdmin);
-    $('#profile-group-name-container').toggle(isAdmin);
     this.setState({isAdmin});
     keys.forEach(k => {
       var profile = chats[pub].participantProfiles[k];
@@ -224,6 +227,68 @@ class Profile extends Component {
     }
   }
 
+  userDidMount() {
+    const pub = this.props.id;
+    publicState.user(pub).get('follow').map().on((following,key,c,e) => {
+      this.eventListeners.push(e);
+      if (following) {
+        this.followedUsers.add(key);
+      } else {
+        this.followedUsers.delete(key);
+      }
+      this.setState({followedUserCount: this.followedUsers.size});
+    });
+    localState.get('follows').map().once((following,key) => {
+      if (following) {
+        publicState.user(key).get('follow').get(pub).once(following => {
+          if (following) {
+            this.followers.add(key);
+            this.setState({followerCount: this.followers.size});
+          }
+        });
+      }
+    });
+    publicState.user(pub).get('profile').get('name').on((name,a,b,e) => {
+      document.title = name || 'Iris';
+      this.eventListeners.push(e);
+      if (!$('#profile .profile-name:focus').length) {
+        this.setState({name});
+      }
+    });
+    publicState.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
+      this.eventListeners.push(e);
+      this.setState({photo});
+    });
+    publicState.user(pub).get('profile').get('about').on((about,a,b,e) => {
+      this.eventListeners.push(e);
+      if (!$('#profile .profile-about-content:focus').length) {
+        this.setState({about});
+      } else {
+        $('#profile .profile-about-content:not(:focus)').text(about);
+      }
+    });
+  }
+
+  groupDidMount() {
+    const chat = chats[this.props.id];
+    chat.on('name', name => {
+      if (!$('#profile .profile-name:focus').length) {
+        this.setState({name});
+      }
+    });
+    chat.on('photo', photo => this.setState({photo}));
+    chat.on('about', about => {
+      if (!$('#profile .profile-about-content:focus').length) {
+        this.setState({about});
+      } else {
+        $('#profile .profile-about-content:not(:focus)').text(about);
+      }
+    });
+    renderGroupPhotoSettings(chat.uuid);
+    $('#profile .profile-photo-container').show();
+    Helpers.setImgSrc($('#profile .profile-photo'), chat.photo);
+  }
+
   componentDidMount() {
     const pub = this.props.id;
     this.eventListeners.forEach(e => e.off());
@@ -238,59 +303,10 @@ class Profile extends Component {
       this.renderGroupParticipants();
       renderInviteLinks(pub);
     });
-    if (!(chat && chat.uuid)) {
-      publicState.user(pub).get('follow').map().on((following,key,c,e) => {
-        this.eventListeners.push(e);
-        if (following) {
-          this.followedUsers.add(key);
-        } else {
-          this.followedUsers.delete(key);
-        }
-        this.setState({followedUserCount: this.followedUsers.size});
-      });
-      localState.get('follows').map().once((following,key) => {
-        if (following) {
-          publicState.user(key).get('follow').get(pub).once(following => {
-            if (following) {
-              this.followers.add(key);
-              this.setState({followerCount: this.followers.size});
-            }
-          });
-        }
-      });
-      publicState.user(pub).get('profile').get('name').on((name,a,b,e) => {
-        document.title = name || 'Iris';
-        this.eventListeners.push(e);
-        if (!$('#profile .profile-name:focus').length) {
-          this.setState({name});
-        }
-      });
-      publicState.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
-        this.eventListeners.push(e);
-        this.setState({photo});
-      });
-      publicState.user(pub).get('profile').get('about').on((about,a,b,e) => {
-        this.eventListeners.push(e);
-        if (!$('#profile .profile-about-content:focus').length) {
-          this.setState({about});
-        } else {
-          $('#profile .profile-about-content:not(:focus)').text(about);
-        }
-      });
+    if (chat && chat.uuid) {
+      this.groupDidMount();
     } else {
-      chat.on('name', name => {
-        if (!$('#profile .profile-name:focus').length) {
-          this.setState({name});
-        }
-      });
-      chat.on('photo', photo => this.setState({photo}));
-      chat.on('about', about => {
-        if (!$('#profile .profile-about-content:focus').length) {
-          this.setState({about});
-        } else {
-          $('#profile .profile-about-content:not(:focus)').text(about);
-        }
-      });
+      this.userDidMount();
     }
     if (chat) {
       $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
@@ -298,13 +314,6 @@ class Profile extends Component {
         chat.put('notificationSetting', event.target.value);
       });
     }
-    $('#profile .show-qr-code').off().on('click', () => $('#profile-page-qr').toggle());
-    $('#profile .send-message').off().on('click', () => showChat(pub));
-    $('#profile-group-name').not(':focus').val(chat && chat.name);
-    $('#profile-group-name').off().on('input', event => {
-      var name = event.target.value;
-      chat.put('name', name);
-    });
     $('#profile-nickname-my-container').toggle(!(chat && chat.uuid));
     $('#profile-nickname-their').not(':focus').val(chat && chat.theirNickname);
     $('#profile-nickname-my').text(chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : '');
@@ -321,12 +330,6 @@ class Profile extends Component {
       colorLight : "#ffffff",
       correctLevel : QRCode.CorrectLevel.H
     });
-    if (chat && chat.uuid) {
-      renderGroupPhotoSettings(chat.uuid);
-      $('#profile .profile-photo-container').show();
-      Helpers.setImgSrc($('#profile .profile-photo'), chat.photo);
-    }
-    $('#profile-create-invite-link').click(onCreateInviteLink);
     $('#profile-add-participant').on('input', onProfileAddParticipantInput);
   }
 }
@@ -375,7 +378,6 @@ function renderGroupPhotoSettings(uuid) {
   const isAdmin = !!(me && me.permissions && me.permissions.admin);
   if (me && me.permissions) {
     $('#profile-add-participant').toggle(isAdmin);
-    $('#profile-group-name-container').toggle(isAdmin);
   }
   $('#current-profile-photo').toggle(!!chats[uuid].photo);
   $('#profile .profile-photo').toggle(!!chats[uuid].photo);
@@ -418,10 +420,6 @@ function renderInviteLinks(pub) {
     }
     $('#profile-invite-links').append(row);
   });
-}
-
-function onCreateInviteLink() {
-  chats[this.props.id].createChatLink();
 }
 
 export default {Profile, renderInviteLinks};
