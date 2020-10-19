@@ -21,7 +21,7 @@ class FeedView extends Component {
     this.messages = {};
   }
 
-  getMessages(show2ndDegreeFollows) {
+  getMessages(/*show2ndDegreeFollows*/) {
     //const followsList = show2ndDegreeFollows ? localState.get('follows') : publicState.user().get('follow');
     const followsList = localState.get('follows');
     followsList.map().once((follows, pub) => {
@@ -50,11 +50,12 @@ class FeedView extends Component {
   }
 
   componentDidMount() {
+    /*
     localState.get('show2ndDegreeFollows').on(show => {
       if (show === this.state.show2ndDegreeFollows) return;
       this.setState({show2ndDegreeFollows: show});
       //this.getMessages(show);
-    });
+    }); */
     localState.get('noFollows').on(noFollows => this.setState({noFollows}));
     localState.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
     localState.get('noMessages').on(noMessages => this.setState({noMessages}));

@@ -32,7 +32,7 @@ function deletePublicMsg(timeStr, replyingTo) {
 
 function getMessageByHash(hash) {
   if (typeof hash !== 'string') throw new Error('hash must be a string, got ' + typeof hash + ' ' +  JSON.stringify(hash));
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     localState.get('msgsByHash').get(hash).once(msg => {
       if (typeof msg === 'string') {
         try {
