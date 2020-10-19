@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {localState, publicState, activeProfile} from '../Main.js';
+import {localState, publicState} from '../Main.js';
 import {chats, deleteChat, showChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
@@ -230,7 +230,6 @@ class Profile extends Component {
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     this.isMyProfile = Session.getPubKey() === pub;
     const chat = chats[pub];
-    localState.get('activeProfile').put(pub);
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
     this.renderGroupParticipants();
@@ -350,7 +349,7 @@ function onProfileAddParticipantInput(event) {
     var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
     var addBtn = $('<button>').css({'margin-left': 15}).text(t('add')).click(() => {
       if (newGroupParticipant) {
-        chats[activeProfile].addParticipant(newGroupParticipant);
+        chats[this.props.id].addParticipant(newGroupParticipant);
         newGroupParticipant = null;
         $('#profile-add-participant-input').val('').show();
         $('#profile-add-participant-candidate').remove();
@@ -422,8 +421,7 @@ function renderInviteLinks(pub) {
 }
 
 function onCreateInviteLink() {
-  if (!chats[activeProfile]) { return; }
-  chats[activeProfile].createChatLink();
+  chats[this.props.id].createChatLink();
 }
 
 export default {Profile, renderInviteLinks};
