@@ -32,7 +32,7 @@ class CopyButton extends Component {
 
   render() {
     const text = this.state.copied ? t('copied') : (this.props.text || t('copy'));
-    return html`<button onClick=${e => this.onClick(e)}>${text}</button>`;
+    return html`<button class="copy-button" onClick=${e => this.onClick(e)}>${text}</button>`;
   }
 }
 

@@ -1147,6 +1147,10 @@ form.public {
   font-weight: bold;
 }
 
+.copy-button {
+  min-width: 82px;
+}
+
 .peer button {
   margin-left: 5px;
 }
