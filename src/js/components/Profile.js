@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import {localState, publicState} from '../Main.js';
-import {chats, deleteChat, showChat} from '../Chat.js';
+import {chats, deleteChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import MessageForm from './MessageForm.js';
@@ -68,8 +68,69 @@ class Profile extends Component {
     }
   }
 
+  renderGroupSettings() {
+    const chat = chats[this.props.id];
+    if (chat && chat.uuid) {
+      return html`
+        <div>
+          <p>${t('participants')}:</p>
+          <div>
+            ${
+              chat ? Object.keys(chat.participantProfiles).map(k => {
+                const profile = chat.participantProfiles[k];
+                return html`
+                  <p onClick=${() => route('/profile/' + k)} style="display:flex;align-items:center;cursor:pointer">
+                    <${Identicon} str=${k} width=40 showTooltip=${true}/>
+                    ${profile.permissions && profile.permissions.admin ? html`
+                      <small style="margin-left:5px">${t('admin')}</small>
+                    `: ''}
+                  </p>
+                `;
+              }) : ''
+            }
+          </div>
+          ${this.state.isAdmin ? html`
+            <div>
+              <p>${t('add_participant')}:</p>
+              <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_profile_link')}"/></p>
+            </div>
+          `: ''}
+          ${chat && chat.inviteLinks && Object.keys(chat.inviteLinks).length ? html`
+            <hr/>
+            <p>${t('invite_links')}</p>
+            <div class="flex-table">
+              ${Object.keys(chat.inviteLinks).map(id => {
+                const url = chat.inviteLinks[id];
+                return html`
+                  <div class="flex-row">
+                    <div class="flex-cell no-flex">
+                      <${CopyButton} copyStr=${url}/>
+                    </div>
+                    <div class="flex-cell">
+                      <input type="text" value=${url} onClick=${e => $(e.target).select()}/>
+                    </div>
+                    ${this.state.isAdmin ? html`
+                      <div class="flex-cell no-flex">
+                        <button onClick=${() => Session.removeChatLink(id)}>${t('remove')}</button>
+                      </div>
+                    `: ''}
+                  </div>
+                `;
+              })}
+            </div>
+          `: ''}
+          ${this.state.isAdmin ? html`
+            <p><button onClick=${() => chat.createChatLink()}>Create new invite link</button></p><hr/>
+          `: ''}
+        </div>
+      `;
+    }
+    return '';
+  }
+
   render() {
     this.isMyProfile = Session.getPubKey() === this.props.id;
+    const chat = chats[this.props.id];
     const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
     const editable = !!(this.isMyProfile || this.state.isAdmin);
     const followable = !(this.isMyProfile || this.props.id.length < 40);
@@ -109,7 +170,7 @@ class Profile extends Component {
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
                 ${followable ? html`<${FollowButton} id=${this.props.id}/>` : ''}
-                <button onClick=${() => showChat(this.props.id)}>${t('send_message')}</button>
+                <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
                 <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
                 <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
                 ${this.isMyProfile ? '' : html`
@@ -122,19 +183,7 @@ class Profile extends Component {
             <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
 
-          <div id="profile-group-settings">
-            <p>${t('participants')}:</p>
-            <div id="profile-group-participants"></div>
-            <div id="profile-add-participant" style="display:none;">
-              <p>${t('add_participant')}:</p>
-              <p><input id="profile-add-participant-input" type="text" style="width: 220px" placeholder="${t('new_participants_profile_link')}"/></p>
-            </div>
-            <hr/>
-            <p>${t('invite_links')}</p>
-            <div id="profile-invite-links" class="flex-table"></div>
-            <p><button id="profile-create-invite-link" onClick=${() => this.onCreateInviteLink()}>Create new invite link</button></p>
-            <hr/>
-          </div>
+          ${this.renderGroupSettings()}
 
           <p id="profile-page-qr" style="display:none" class="qr-container"></p>
           <div id="chat-settings" style="display:none">
@@ -143,11 +192,15 @@ class Profile extends Component {
             <div class="profile-nicknames">
               <h4>${t('nicknames')}</h4>
               <p>
-                ${t('nickname')}: <input id="profile-nickname-their"/>
+                ${t('nickname')}:
+                <input value=${chat && chat.theirNickname} onInput=${e => chat && chat.put('nickname', e.target.value)}/>
               </p>
-              ${this.state.uuid ? '' : html`
+              ${chat && chat.uuid ? '' : html`
                 <p>
-                  ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
+                  ${t('their_nickname_for_you')}:
+                  <span>
+                    ${chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : ''}
+                  </span>
                 </p>
               `}
             </div>
@@ -168,55 +221,17 @@ class Profile extends Component {
             <hr/>
           </div>
         </div>
-        <div id="profile-public-messages">
-          ${messageForm}
-          <div class="public-messages-view">
-            ${this.getNotification()}
-            <${MessageFeed} node=${publicState.user(this.props.id).get('msgs')} />
+        ${chat && chat.uuid ? '' : html`
+          <div>
+            ${messageForm}
+            <div class="public-messages-view">
+              ${this.getNotification()}
+              <${MessageFeed} node=${publicState.user(this.props.id).get('msgs')} />
+            </div>
           </div>
-        </div>
+        `}
       </div>
     </div>`;
-  }
-
-  onCreateInviteLink() {
-    chats[this.props.id].createChatLink();
-  }
-
-  renderGroupParticipants() {
-    const pub = this.props.id;
-    if (!(chats[pub] && chats[pub].uuid)) {
-      $('#profile-group-settings').hide();
-      return;
-    } else {
-      $('#profile-group-settings').show();
-    }
-    $('#profile-group-participants').empty().show();
-    var keys = Object.keys(chats[pub].participantProfiles);
-    const isAdmin = areWeAdmin(pub);
-    $('#profile-add-participant').toggle(isAdmin);
-    this.setState({isAdmin});
-    keys.forEach(k => {
-      var profile = chats[pub].participantProfiles[k];
-      var identicon = Helpers.getIdenticon(k, 40).css({'margin-right':15});
-      var nameEl = $('<span>');
-      publicState.user(k).get('profile').get('name').on(name => nameEl.text(name));
-      var el = $('<p>').css({display:'flex', 'align-items': 'center', 'cursor':'pointer'});
-      $('<button>').css({'margin-right': 15}).text(t('remove')).click(() => {
-        el.remove();
-        // TODO remove group participant
-      });
-      //el.append(removeBtn);
-      el.append(identicon);
-      el.append(nameEl);
-      if (profile.permissions && profile.permissions.admin) {
-        el.append($('<small>').text(t('admin')).css({'margin-left': 5}));
-      }
-      el.click(() => {
-        route('/profile/' + k);
-      });
-      $('#profile-group-participants').append(el);
-    });
   }
 
   componentWillUnmount() {
@@ -225,6 +240,7 @@ class Profile extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
+      this.setState({isAdmin:false,uuid:null});
       this.componentDidMount();
     }
   }
@@ -298,9 +314,7 @@ class Profile extends Component {
     this.isMyProfile = Session.getPubKey() === pub;
     const chat = chats[pub];
     if (pub.length < 40) {
-      this.setState({uuid:pub});
       if (!chat) {
-        console.log('jee');
         const interval = setInterval(() => {
           if (chats[pub]) {
             clearInterval(interval);
@@ -311,11 +325,11 @@ class Profile extends Component {
     }
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
-    this.renderGroupParticipants();
     localState.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
+    localState.get('inviteLinksChanged').on(() => this.setState({}));
     localState.get('chats').get(this.props.id).get('participants').on(() => {
-      this.renderGroupParticipants();
-      renderInviteLinks(pub);
+      const isAdmin = areWeAdmin(pub);
+      this.setState({isAdmin});
     });
     if (chat && chat.uuid) {
       this.groupDidMount();
@@ -328,12 +342,6 @@ class Profile extends Component {
         chat.put('notificationSetting', event.target.value);
       });
     }
-    $('#profile-nickname-their').not(':focus').val(chat && chat.theirNickname);
-    $('#profile-nickname-my').text(chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : '');
-    $('#profile-nickname-their').off().on('input', event => {
-      var nick = event.target.value;
-      chat.put('nickname', nick);
-    });
     qrCodeEl.empty();
     new QRCode(qrCodeEl[0], {
       text: 'https://iris.to/' + window.location.hash,
@@ -389,9 +397,6 @@ function onProfileAddParticipantInput(event) {
 function renderGroupPhotoSettings(uuid) {
   const me = chats[uuid].participantProfiles[Session.getKey().pub];
   const isAdmin = !!(me && me.permissions && me.permissions.admin);
-  if (me && me.permissions) {
-    $('#profile-add-participant').toggle(isAdmin);
-  }
   $('#current-profile-photo').toggle(!!chats[uuid].photo);
   $('#profile .profile-photo').toggle(!!chats[uuid].photo);
   if (isAdmin) {
@@ -405,34 +410,4 @@ function areWeAdmin(uuid) {
   return !!(me && me.permissions && me.permissions.admin);
 }
 
-function renderInviteLinks(pub) {
-  if (!(chats[pub] && chats[pub].inviteLinks)) { return; }
-  const isAdmin = areWeAdmin(pub);
-  $('#profile-create-invite-link').toggle(isAdmin);
-  $('#profile-invite-links').empty();
-  Object.values(chats[pub].inviteLinks).forEach(url => {
-    const row = $('<div>').addClass('flex-row');
-    const copyBtn = $('<button>').text(t('copy')).width(100);
-    copyBtn.on('click', event => {
-      Helpers.copyToClipboard(url);
-      var target = $(event.target);
-      var originalText = target.text();
-      target.text(t('copied'));
-      setTimeout(() => {
-        t.text(originalText);
-      }, 2000);
-    });
-    const copyDiv = $('<div>').addClass('flex-cell no-flex').append(copyBtn);
-    row.append(copyDiv);
-    const input = $('<input>').attr('type', 'text').val(url);
-    input.on('click', () => input.select());
-    row.append($('<div>').addClass('flex-cell').append(input));
-    if (isAdmin) {
-      const removeBtn = $('<button>').text(t('remove'));
-      row.append($('<div>').addClass('flex-cell no-flex').append(removeBtn));
-    }
-    $('#profile-invite-links').append(row);
-  });
-}
-
-export default {Profile, renderInviteLinks};
+export default {Profile};

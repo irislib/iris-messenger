@@ -1,5 +1,6 @@
 import {publicState} from './Main.js';
-import {chats, showChat, getDisplayName} from './Chat.js';
+import {chats, getDisplayName} from './Chat.js';
+import { route } from './lib/preact-router.es.js';
 import Helpers from './Helpers.js';
 import Session from './Session.js';
 import {translate as t} from './Translation.js';
@@ -177,7 +178,7 @@ function updatePeerList() {
       urlEl.append($('<br>'));
       urlEl.append(
         $('<small>').text(t('from') + ' ' + ((chats[peer.from] && getDisplayName(peer.from)) || Helpers.truncateString(peer.from, 10)))
-        .css({cursor:'pointer'}).click(() => showChat(peer.from))
+        .css({cursor:'pointer'}).click(() => route('/chat/' + peer.from))
       );
     }
     $('#peers').prepend(row);

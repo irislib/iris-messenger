@@ -1,5 +1,5 @@
 import {localState, publicState, activeRoute} from './Main.js';
-import {chats, addChat, newChat, showChat} from './Chat.js';
+import {chats, addChat, newChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import { route } from './lib/preact-router.es.js';
@@ -94,7 +94,7 @@ function login(k) {
     if (inviter !== key.pub) {
       newChat(chatId, window.location.href);
     }
-    showChat(chatId);
+    route('/chat/' + chatId);
     window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
   }
   if (chatId) {

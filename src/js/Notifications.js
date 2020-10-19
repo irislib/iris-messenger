@@ -1,6 +1,7 @@
 import Helpers from './Helpers.js';
 import Session from './Session.js';
-import {chats, showChat, getDisplayName} from './Chat.js';
+import {chats, getDisplayName} from './Chat.js';
+import { route } from './lib/preact-router.es.js';
 import {publicState, localState} from './Main.js';
 import { translate as t } from './Translation.js';
 
@@ -54,7 +55,7 @@ function notifyMsg(msg, info, pub) {
       silent: true
     });
     desktopNotification.onclick = function() {
-      showChat(pub);
+      route('/chat/' + pub);
       window.focus();
     };
   }
