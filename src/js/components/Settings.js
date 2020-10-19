@@ -131,21 +131,6 @@ class Settings extends Component {
       setRTCConfig(DEFAULT_RTC_CONFIG);
       $('#rtc-config').val(JSON.stringify(getRTCConfig()));
     });
-
-    _.defer(() => {
-      publicState.user().get('profile').get('name').on((name, a, b, event) => {
-        $('#settings-name').not(':focus').val(name);
-        this.eventListeners.push(event);
-      });
-      publicState.user().get('profile').get('about').on((about, a, b, event) => {
-        $('#settings-about').not(':focus').val(about);
-        this.eventListeners.push(event);
-      });
-      publicState.user().get('profile').get('photo').on((photo, a, b, event) => {
-        this.setState({photo});
-        this.eventListeners.push(event);
-      });
-    });
   }
 
   componentWillUnmount() {

@@ -1,10 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {chats, getDisplayName} from '../Chat.js';
-import { translate as t } from '../Translation.js';
-import {localState, activeRoute, publicState} from '../Main.js';
+import {localState, activeRoute} from '../Main.js';
 import Session from '../Session.js';
-import { route } from '../lib/preact-router.es.js';
 import Identicon from './Identicon.js';
 
 const plusIcon = html`<svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z"/></svg>`;

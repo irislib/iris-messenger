@@ -1,5 +1,4 @@
 import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
 import {publicState} from '../Main.js';
 
 class Name extends Component {
