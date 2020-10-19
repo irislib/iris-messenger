@@ -70,7 +70,7 @@ class NewChat extends Component {
     localState.get('chatLinks').map().on((url, id, b, e) => {
       this.eventListeners['chatLinks'] = e;
       if (url) {
-        if (typeof url !== 'string') return;
+        if (typeof url !== 'string' || url.indexOf('http') !== 0) return;
         console.log('got chat clink', url);
         this.chatLinks[id] = url;
         setChatLinkQrCode(url);
