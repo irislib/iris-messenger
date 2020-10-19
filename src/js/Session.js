@@ -83,7 +83,7 @@ function login(k) {
   Notifications.subscribeToWebPush();
   Notifications.getWebPushSubscriptions();
   iris.Channel.getMyChatLinks(publicState, key, undefined, chatLink => {
-    localState.get('chatLinks').get(key).put(chatLink);
+    localState.get('chatLinks').get(chatLink.id).put(chatLink.url);
     latestChatLink = chatLink.url;
   });
   setOurOnlineStatus();
@@ -139,6 +139,12 @@ function getMyChatLink() {
   return latestChatLink || Helpers.getProfileLink(key.pub);
 }
 
+function removeChatLink(id) {
+  console.log('removeChatLink', id);
+  localState.get('chatLinks').get(id).put(null);
+  return iris.Channel.removeChatLink(publicState, key, id);
+}
+
 function getKey() { return key; }
 function getMyName() { return myName; }
 function getMyProfilePhoto() { return myProfilePhoto; }
@@ -178,4 +184,4 @@ function getFollows() {
   return follows;
 }
 
-export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows };
+export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, removeChatLink, ourActivity, login, logOut, getFollows };

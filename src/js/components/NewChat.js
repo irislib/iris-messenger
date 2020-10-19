@@ -67,12 +67,17 @@ class NewChat extends Component {
   }
 
   componentDidMount() {
-    localState.get('chatLinks').on((v, k, b, e) => {
-      console.log('got chat clink', v);
+    localState.get('chatLinks').map().on((url, id, b, e) => {
       this.eventListeners['chatLinks'] = e;
-      this.chatLinks[v.id] = v.url;
+      if (url) {
+        console.log('got chat clink', url);
+        this.chatLinks[id] = url;
+        setChatLinkQrCode(url);
+      } else {
+        console.log('removed chat link', id);
+        delete this.chatLinks[id];
+      }
       this.setState({chatLinks: this.chatLinks});
-      setChatLinkQrCode(v.url);
     });
 
     $(".profile-link").attr('href', Helpers.getProfileLink(Session.getKey() && Session.getKey().pub)).off().on('click', e => {
@@ -104,19 +109,18 @@ class NewChat extends Component {
         <h3>${t('your_invite_links')}</h3>
         <p><button onClick=${() => Session.createChatLink()}>${t('create_new_invite_link')}</button></p>
         <div id="my-chat-links" class="flex-table">
-          ${Object.keys(this.state.chatLinks).map(k => {
-            const chatLink = this.state.chatLinks[k];
-            console.log(chatLink);
+          ${Object.keys(this.state.chatLinks).map(id => {
+            const url = this.state.chatLinks[id];
             return html`
               <div class="flex-row">
                 <div class="flex-cell no-flex">
-                  <${CopyButton} copyStr=${chatLink}/>
+                  <${CopyButton} copyStr=${url}/>
                 </div>
                 <div class="flex-cell">
-                  <input type="text" value=${chatLink} onClick=${e => $(e.target).select()}/>
+                  <input type="text" value=${url} onClick=${e => $(e.target).select()}/>
                 </div>
                 <div class="flex-cell no-flex">
-                  <button>${t('remove')}</button>
+                  <button onClick=${() => Session.removeChatLink(id)}>${t('remove')}</button>
                 </div>
               </div>
             `;
