@@ -145,9 +145,11 @@ class Profile extends Component {
               <p>
                 ${t('nickname')}: <input id="profile-nickname-their"/>
               </p>
-              <p id="profile-nickname-my-container">
-                ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
-              </p>
+              ${this.state.uuid ? '' : html`
+                <p>
+                  ${t('their_nickname_for_you')}: <span id="profile-nickname-my"></span>
+                </p>
+              `}
             </div>
             <div class="notification-settings">
               <h4>${t('notifications')}</h4>
@@ -295,6 +297,18 @@ class Profile extends Component {
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     this.isMyProfile = Session.getPubKey() === pub;
     const chat = chats[pub];
+    if (pub.length < 40) {
+      this.setState({uuid:pub});
+      if (!chat) {
+        console.log('jee');
+        const interval = setInterval(() => {
+          if (chats[pub]) {
+            clearInterval(interval);
+            this.componentDidMount();
+          }
+        }, 1000);
+      }
+    }
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
     this.renderGroupParticipants();
@@ -314,7 +328,6 @@ class Profile extends Component {
         chat.put('notificationSetting', event.target.value);
       });
     }
-    $('#profile-nickname-my-container').toggle(!(chat && chat.uuid));
     $('#profile-nickname-their').not(':focus').val(chat && chat.theirNickname);
     $('#profile-nickname-my').text(chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : '');
     $('#profile-nickname-their').off().on('input', event => {
