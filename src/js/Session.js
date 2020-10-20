@@ -24,7 +24,7 @@ function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
       follows[k].followers.add(follower);
     } else {
       follows[k] = {key: k, followDistance, followers: new Set([follower])};
-      publicState.user(k).get('profile').get('name').on((name, a, b, e) => {
+      publicState.user(k).get('profile').get('name').on(name => {
         follows[k].name = name;
         callback(k, follows[k]);
       });
