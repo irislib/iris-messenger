@@ -5,6 +5,7 @@ import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import FollowButton from './FollowButton.js';
 import Name from './Name.js';
+import Session from '../Session.js';
 
 class FollowsView extends Component {
   constructor() {
@@ -14,10 +15,11 @@ class FollowsView extends Component {
   }
 
   getFollows() {
+    const f = Session.getFollows();
     publicState.user(this.props.id).get('follow').map().on((follows, pub, b, e) => {
       this.eventListeners['follow'] = e;
       if (follows) {
-        this.follows[pub] = {};
+        this.follows[pub] = f[pub] || {};
         this.setState({});
       } else {
         delete this.follows[pub];
@@ -28,11 +30,12 @@ class FollowsView extends Component {
   }
 
   getFollowers() {
+    const f = Session.getFollows();
     localState.get('follows').map().once((follows, pub) => {
       if (follows) {
         publicState.user(pub).get('follow').get(this.props.id).on(follows => {
           if (!follows) return;
-          this.follows[pub] = {};
+          this.follows[pub] = f[pub] || {};
           this.setState({});
         })
       }
@@ -51,6 +54,11 @@ class FollowsView extends Component {
 
   render() {
     const keys = Object.keys(this.follows);
+    keys.sort((a,b) => {
+      const aF = this.follows[a].followers && this.follows[a].followers.size || 0;
+      const bF = this.follows[b].followers && this.follows[b].followers.size || 0;
+      return bF - aF;
+    });
     return html`
       <div class="main-view" id="follows-view">
         <div class="centered-container">
@@ -62,9 +70,12 @@ class FollowsView extends Component {
               <div class="profile-link-container">
                 <a href="/profile/${k}" class="profile-link">
                   <${Identicon} str=${k} width=49/>
-                  <${Name} pub=${k}/>
+                  <div>
+                    <${Name} pub=${k}/><br/>
+                    <small class="follower-count">${this.follows[k].followers && this.follows[k].followers.size - 1 || '0'} followers that you know</small>
+                  </div>
                 </a>
-                <${FollowButton} id=${k}/>
+                ${k !== Session.getPubKey() ? html`<${FollowButton} id=${k}/>` : ''}
               </div>`;
             })}
             ${keys.length === 0 ? '—' : ''}
