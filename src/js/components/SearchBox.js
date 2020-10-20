@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import Helpers, { html } from '../Helpers.js';
-import {publicState, localState} from '../Main.js';
+import {localState} from '../Main.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
@@ -13,42 +13,12 @@ class SearchBox extends Component {
   constructor() {
     super();
     this.eventListeners = {};
-    this.follows = {};
     this.state = {results:[]};
     this.debouncedIndexAndSearch = _.debounce(() => {
       const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
-      this.fuse = new Fuse(Object.values(this.follows), options);
+      this.fuse = new Fuse(Object.values(Session.getFollows()), options);
       this.search();
     }, 200);
-  }
-
-  addEntry(key, followDistance, follower) {
-    if (this.follows[key]) {
-      if (this.follows[key].followDistance > followDistance) {
-        this.follows[key].followDistance = followDistance;
-      }
-      this.follows[key].followers.add(follower);
-      return;
-    }
-    this.follows[key] = {key, followDistance, followers: new Set([follower])};
-    this.hasFollows = this.hasFollows || Object.keys(this.follows).length > 1;
-    publicState.user(key).get('profile').get('name').on((name, a, b, e) => {
-      this.eventListeners[key] = e;
-      this.follows[key].name = name;
-      this.debouncedIndexAndSearch();
-    });
-  }
-
-  getFollows(k, maxDepth = 2, currentDepth = 1) {
-    this.addEntry(k, currentDepth - 1);
-    publicState.user(k).get('follow').map().once((follows, key) => {
-      if (follows) {
-        this.addEntry(key, currentDepth, k);
-        if (currentDepth < maxDepth) {
-          this.getFollows(key, maxDepth, currentDepth + 1);
-        }
-      }
-    });
   }
 
   onInput() {
@@ -61,7 +31,10 @@ class SearchBox extends Component {
   }
 
   componentDidMount() {
-    this.getFollows(Session.getKey().pub);
+    localState.get('follows').map().on(follows => {
+      this.hasFollows = this.hasFollows || Object.keys(Session.getFollows()).length > 1;
+      follows && this.debouncedIndexAndSearch();
+    });
     localState.get('activeRoute').on((a,b,c,e) => {
       this.eventListeners['activeRoute'] = e;
       this.close();
@@ -145,8 +118,8 @@ class SearchBox extends Component {
               followText = 'Following';
             }
             if (i.followDistance === 2) {
-              if (i.followers.size === 1 && this.follows[[...i.followers][0]].name) {
-                followText = 'Followed by ' + this.follows[[...i.followers][0]].name;
+              if (i.followers.size === 1 && Session.getFollows()[[...i.followers][0]].name) {
+                followText = 'Followed by ' + Session.getFollows()[[...i.followers][0]].name;
               } else {
                 followText = 'Followed by ' + i.followers.size + ' users you follow';
               }

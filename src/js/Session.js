@@ -10,11 +10,10 @@ let myProfilePhoto;
 let latestChatLink;
 let onlineTimeout;
 let ourActivity;
-let follows = {};
 let hasFollowers;
+const follows = {};
 
 function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
-  const follows = {};
   k = k || key.pub;
 
   function addFollow(k, followDistance, follower) {
@@ -25,6 +24,10 @@ function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
       follows[k].followers.add(follower);
     } else {
       follows[k] = {key: k, followDistance, followers: new Set([follower])};
+      publicState.user(k).get('profile').get('name').on((name, a, b, e) => {
+        follows[k].name = name;
+        callback(k, follows[k]);
+      });
     }
     callback(k, follows[k]);
   }
@@ -116,7 +119,7 @@ function login(k) {
   localState.get('follows').put({a:null});
   Notifications.init();
   localState.get('loggedIn').put(true);
-  follows = getFollowsFn((k, info) => {
+  getFollowsFn((k, info) => {
     localState.get('follows').get(k).put(true);
     if (!hasFollowers && k === getPubKey() && info.followers.size) {
       localState.get('noFollowers').put(false);
