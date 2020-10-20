@@ -304,6 +304,7 @@ img {
   flex-direction: row;
   align-items: center;
   max-width: 100%;
+  overflow: hidden;
 }
 
 header.footer .header-content {
