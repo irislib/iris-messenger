@@ -94,7 +94,7 @@ function login(k) {
     if (inviter !== key.pub) {
       newChat(chatId, window.location.href);
     }
-    route('/chat/' + chatId);
+    _.defer(() => route('/chat/' + chatId));
     window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
   }
   if (chatId) {
