@@ -105,6 +105,14 @@ class PublicMessage extends Message {
     publicState.user().get('likes').get(this.props.hash).put(liked);
   }
 
+  onDelete(e) {
+    e.preventDefault();
+    const msg = this.state.msg;
+    console.log(msg);
+    publicState.user().get('msgs').get(msg.time).put(null);
+    msg.replyingTo && publicState.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
+  }
+
   render() {
     if (!this.state.msg) { return html``; }
     //if (++this.i > 1) console.log(this.i);
@@ -120,10 +128,20 @@ class PublicMessage extends Message {
       <div class="msg ${this.props.asReply ? 'reply' : ''}">
         <div class="msg-content">
           <div class="msg-sender">
-            <div onclick=${() => this.onClickName()}>
+            <div class="msg-sender-link" onclick=${() => this.onClickName()}>
               ${this.state.msg.info.from ? html`<${Identicon} str=${this.state.msg.info.from} width=40/>` : ''}
               ${name && this.props.showName && html`<small class="msgSenderName">${name}</small>`}
             </div>
+            ${this.state.msg.info.from === Session.getPubKey() ? html`
+              <div class="msg-menu-btn">
+                <div class="dropdown">
+                  <div class="dropbtn">\u2026</div>
+                  <div class="dropdown-content">
+                    <a href="#" onClick=${e => this.onDelete(e)}>Delete</a>
+                  </div>
+                </div>
+              </div>
+            `: ''}
           </div>
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
             html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>` // TODO: escape a.data

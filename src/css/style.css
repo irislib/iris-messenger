@@ -423,10 +423,16 @@ header.footer .header-content {
   align-items: center;
 }
 
-.public-messages-view .msg-sender > div {
+.public-messages-view .msg-sender .msg-sender-link {
   cursor: pointer;
   display: flex;
   align-items: center;
+}
+
+.public-messages-view .msg-sender .msg-menu-btn {
+  text-align: right;
+  flex: 1;
+  user-select: none;
 }
 
 .public-messages-view .msgSenderName {
@@ -451,6 +457,57 @@ header.footer .header-content {
   padding: 15px;
   flex-direction: column;
   display: flex;
+}
+
+.dropbtn {
+  padding: 5px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: var(--text-color);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:first-of-type {
+  border-radius: 5px 5px 0 0;
+}
+
+.dropdown-content a:last-of-type {
+  border-radius: 0 0 5px 5px;
+}
+
+.dropdown-content a:only-of-type {
+  border-radius: 5px;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: var(--header-color)}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 .emoji {
