@@ -423,6 +423,12 @@ header.footer .header-content {
   align-items: center;
 }
 
+.public-messages-view .msg-sender > div {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
 .public-messages-view .msgSenderName {
   margin-left: 15px;
 }

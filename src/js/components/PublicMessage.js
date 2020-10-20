@@ -109,7 +109,6 @@ class PublicMessage extends Message {
     if (!this.state.msg) { return html``; }
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name;
-    let color;
     const emojiOnly = this.state.msg.text && this.state.msg.text.length === 2 && Helpers.isEmoji(this.state.msg.text);
     const p = document.createElement('p');
     p.innerText = this.state.msg.text;
@@ -121,8 +120,10 @@ class PublicMessage extends Message {
       <div class="msg ${this.props.asReply ? 'reply' : ''}">
         <div class="msg-content">
           <div class="msg-sender">
-            ${this.state.msg.info.from ? html`<${Identicon} str=${this.state.msg.info.from} width=40/>` : ''}
-            ${name && this.props.showName && html`<small onclick=${() => this.onClickName()} class="msgSenderName" style="color: ${color}">${name}</small>`}
+            <div onclick=${() => this.onClickName()}>
+              ${this.state.msg.info.from ? html`<${Identicon} str=${this.state.msg.info.from} width=40/>` : ''}
+              ${name && this.props.showName && html`<small class="msgSenderName">${name}</small>`}
+            </div>
           </div>
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
             html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>` // TODO: escape a.data
