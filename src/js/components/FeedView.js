@@ -79,7 +79,7 @@ class FeedView extends Component {
               </a>
               <${FollowButton} id=${SUGGESTED_FOLLOW} />
             </div>
-            <p>Alternatively, <a href="/chat/new">start a chat with someone</a>.</p>
+            <p>Alternatively, <a href="/profile/${Session.getPubKey()}">give your profile link to someone</a>.</p>
           </div>
         </div>
       `
