@@ -71,15 +71,15 @@ class FeedView extends Component {
       return html`
         <div class="msg">
           <div class="msg-content">
-            <p>Follow someone to see content from their network! Suggestion:</p>
+            <p>${t('follow_someone_info')}</p>
             <div class="profile-link-container">
               <a href="/profile/${SUGGESTED_FOLLOW}" class="profile-link">
                 <${Identicon} str=${SUGGESTED_FOLLOW} width=40 />
-                Creator of this Iris distribution
+                ${t('creator_of_this_distribution')}
               </a>
               <${FollowButton} id=${SUGGESTED_FOLLOW} />
             </div>
-            <p>Alternatively, <a href="/profile/${Session.getPubKey()}">give your profile link to someone</a>.</p>
+            <p>${t('alternatively')} <a href="/profile/${Session.getPubKey()}">${t('give_your_profile_link_to_someone')}</a>.</p>
           </div>
         </div>
       `
@@ -88,9 +88,9 @@ class FeedView extends Component {
       return html`
         <div class="msg">
           <div class="msg-content">
-            <p>You have no followers yet. Share your profile link so others can follow you:</p>
+            <p>${t('no_followers_yet')}</p>
             <p><${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(Session.getPubKey())}/></p>
-            <small>Your posts, replies and likes are only shown to your followers and their network.</small>
+            <small>${t('no_followers_yet_info')}</small>
           </div>
         </div>
       `;
