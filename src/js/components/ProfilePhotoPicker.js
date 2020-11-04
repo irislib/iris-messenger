@@ -1,8 +1,6 @@
 import { Component } from '../lib/preact.js';
 import {html} from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {chats} from '../Chat.js';
-import {publicState, activeProfile} from '../Main.js';
 import Helpers from '../Helpers.js';
 import SafeImg from './SafeImg.js';
 import Identicon from './Identicon.js';
@@ -20,14 +18,6 @@ class ProfilePhotoPicker extends Component {
       }
       this.setState({preview: null});
     });
-  }
-
-  removeProfilePhotoClicked() {
-    if (activeProfile) {
-      chats[activeProfile].put('photo', null);
-    } else {
-      publicState.user().get('profile').get('photo').put(null);
-    }
   }
 
   cancelProfilePhotoClicked() {
@@ -80,7 +70,6 @@ class ProfilePhotoPicker extends Component {
         ${previewPhotoEl}
       </div>
       <p>
-        <button id="remove-profile-photo" onClick=${() => this.removeProfilePhotoClicked()} class="hidden">${t('remove_photo')}</button>
         <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" onChange=${e => this.onProfilePhotoInputChange(e)} accept="image/*"/>
       </p>
       <p id="profile-photo-error" class="${this.state.hasError ? '' : 'hidden'}">${t('profile_photo_too_big')}</p>

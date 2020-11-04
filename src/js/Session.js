@@ -1,5 +1,5 @@
 import {localState, publicState, activeRoute} from './Main.js';
-import {chats, addChat, newChat, showChat} from './Chat.js';
+import {chats, addChat, newChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import { route } from './lib/preact-router.es.js';
@@ -10,10 +10,10 @@ let myProfilePhoto;
 let latestChatLink;
 let onlineTimeout;
 let ourActivity;
-let follows = {};
+let hasFollowers;
+const follows = {};
 
 function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
-  const follows = {};
   k = k || key.pub;
 
   function addFollow(k, followDistance, follower) {
@@ -23,7 +23,11 @@ function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
       }
       follows[k].followers.add(follower);
     } else {
-      follows[k] = {key: k, followDistance, followers: new Set([follower])};
+      follows[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
+      publicState.user(k).get('profile').get('name').on(name => {
+        follows[k].name = name;
+        callback(k, follows[k]);
+      });
     }
     callback(k, follows[k]);
   }
@@ -82,7 +86,7 @@ function login(k) {
   Notifications.subscribeToWebPush();
   Notifications.getWebPushSubscriptions();
   iris.Channel.getMyChatLinks(publicState, key, undefined, chatLink => {
-    localState.get('chatLinks').get(key).put(chatLink);
+    localState.get('chatLinks').get(chatLink.id).put(chatLink.url);
     latestChatLink = chatLink.url;
   });
   setOurOnlineStatus();
@@ -93,7 +97,7 @@ function login(k) {
     if (inviter !== key.pub) {
       newChat(chatId, window.location.href);
     }
-    showChat(chatId);
+    _.defer(() => route('/chat/' + chatId)); // defer because router is only initialised after login
     window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
   }
   if (chatId) {
@@ -111,10 +115,15 @@ function login(k) {
   publicState.user().get('profile').get('photo').on(data => {
     myProfilePhoto = data;
   });
+  publicState.get('follow').put({a:null});
+  localState.get('follows').put({a:null});
   Notifications.init();
   localState.get('loggedIn').put(true);
-  follows = getFollowsFn(k => {
+  getFollowsFn((k, info) => {
     localState.get('follows').get(k).put(true);
+    if (!hasFollowers && k === getPubKey() && info.followers.size) {
+      localState.get('noFollowers').put(false);
+    }
   });
   publicState.user().get('msgs').put({a:null});
   publicState.user().get('replies').put({a:null});
@@ -130,7 +139,13 @@ function clearIndexedDB() {
 }
 
 function getMyChatLink() {
-  return latestChatLink || Helpers.getUserChatLink(key.pub);
+  return latestChatLink || Helpers.getProfileLink(key.pub);
+}
+
+function removeChatLink(id) {
+  console.log('removeChatLink', id);
+  localState.get('chatLinks').get(id).put(null);
+  return iris.Channel.removeChatLink(publicState, key, id);
 }
 
 function getKey() { return key; }
@@ -172,4 +187,4 @@ function getFollows() {
   return follows;
 }
 
-export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows };
+export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, removeChatLink, ourActivity, login, logOut, getFollows };

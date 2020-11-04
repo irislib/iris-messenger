@@ -109,19 +109,19 @@ class Header extends Component {
     const searchBox = this.chatId ? '' : html`<${SearchBox}/>`;
 
     return html`
-    <header>
+    <header class="nav header">
+      ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
+      <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
+        ‹
+      </div>
+      ` : ''}
       <div class="header-content">
-        ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
-        <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
-          ‹
-        </div>
-        ` : ''}
         <a href="/" onClick=${() => {$('a.logo').blur();localState.get('scrollUp').put(true)}} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
           <img src="img/icon128.png" width=40 height=40/>
           <img src="img/iris_logotype.png" height=23 width=41 />
         </a>
         <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
-          ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
+          ${this.state.title && activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
             <div class="name">
               ${this.state.title}
             </div>
