@@ -63,7 +63,7 @@ class MessageFeed extends Component {
       </div>
     `;
   }
-  /*
+
   adjustPaddings(isScrollDown) {
     const container = this.base;
     const currentPaddingTop = getNumFromStyle(container.style.paddingTop);
@@ -149,9 +149,9 @@ class MessageFeed extends Component {
     }
 
     var observer = new IntersectionObserver(callback, options); // TODO: It's possible to quickly scroll past the sentinels without them firing. Top and bottom sentinels should extend to page top & bottom?
-    observer.observe(document.querySelector("#post0"));
-    observer.observe(document.querySelector(`#post${size - 1}`));
-  } */
+    observer.observe(document.querySelector(".item0"));
+    observer.observe(document.querySelector(`.item${size - 1}`));
+  }
 }
 
 export default MessageFeed;
