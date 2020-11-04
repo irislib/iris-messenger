@@ -72,7 +72,7 @@ class FollowsView extends Component {
                   <${Identicon} str=${k} width=49/>
                   <div>
                     <${Name} pub=${k}/><br/>
-                    <small class="follower-count">${this.follows[k].followers && this.follows[k].followers.size - 1 || '0'} followers that you know</small>
+                    <small class="follower-count">${this.follows[k].followers && this.follows[k].followers.size || '0'} followers that you know</small>
                   </div>
                 </a>
                 ${k !== Session.getPubKey() ? html`<${FollowButton} id=${k}/>` : ''}
