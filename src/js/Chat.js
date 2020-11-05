@@ -4,19 +4,10 @@ import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
-import Profile from './components/Profile.js';
 import { route } from './lib/preact-router.es.js';
 
 const chats = window.chats = {};
 const subscribedChats = new Set();
-
-function showChat(pub) {
-  if (!pub) {
-    return;
-  }
-
-  route('/chat/' + pub);
-}
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(publicState, Session.getKey(), pub);
@@ -55,7 +46,7 @@ function followChatLink(str) {
       }
       if (chatId) {
         newChat(chatId, str);
-        showChat(chatId);
+        route('/chat/' + chatId);
         return true;
       }
     }
@@ -195,10 +186,9 @@ function addChat(chat) {
     var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     chat.inviteLinks = {};
     chat.getChatLinks({callback: ({url, id}) => {
-      console.log('received chat link', id, url);
       chat.inviteLinks[id] = url;
       if (pub === activeProfile) {
-        Profile.renderInviteLinks(pub);
+        localState.get('inviteLinksChanged').put(true);
       }
     }});
   } else {
@@ -256,4 +246,4 @@ function processMessage(chatId, msg, info) {
   Notifications.notifyMsg(msg, info, chatId);
 }
 
-export { showChat, chats, addChat, deleteChat, newChat, processMessage, getDisplayName, followChatLink, subscribeToMessages };
+export { chats, addChat, deleteChat, newChat, processMessage, getDisplayName, followChatLink, subscribeToMessages };

@@ -1,7 +1,8 @@
 import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
+import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import ScrollWindow from '../lib/ScrollWindow.js';
+import { localState } from '../Main.js';
 
 const size = 10;
 
@@ -14,6 +15,7 @@ class MessageFeed extends Component {
   componentDidMount() {
     this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => this.setState({sortedMessages: sortedMessages.reverse()})});
     //this.initIntersectionObserver();
+    localState.get('scrollUp').on(() => this.topClicked());
   }
 
   componentDidUpdate(newProps) {
@@ -26,14 +28,13 @@ class MessageFeed extends Component {
     this.scroller.top();
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
-    $(document.body).animate({ scrollTop: 0 }, 500);
+    Helpers.animateScrollTop('.main-view');
   }
 
   bottomClicked() {
     this.scroller.bottom();
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
-    $(document.body).animate({ scrollTop: container.height() }, 500);
   }
 
   render() {
@@ -58,7 +59,7 @@ class MessageFeed extends Component {
       </div>
     `;
   }
-
+  /*
   adjustPaddings(isScrollDown) {
     const container = document.getElementById("container");
     const currentPaddingTop = getNumFromStyle(container.style.paddingTop);
@@ -139,7 +140,7 @@ class MessageFeed extends Component {
     var observer = new IntersectionObserver(callback, options); // TODO: It's possible to quickly scroll past the sentinels without them firing. Top and bottom sentinels should extend to page top & bottom?
     observer.observe(document.querySelector("#post0"));
     observer.observe(document.querySelector(`#post${size - 1}`));
-  }
+  } */
 }
 
 export default MessageFeed;

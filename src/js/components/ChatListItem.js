@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {showChat} from '../Chat.js';
+import { route } from '../lib/preact-router.es.js';
 import { translate as t } from '../Translation.js';
 import {localState} from '../Main.js';
 import Session from '../Session.js';
@@ -40,11 +40,6 @@ class ChatListItem extends Component {
     this.eventListeners.forEach(e => e.off());
   }
 
-  onClick() {
-    // chatListEl.find('.unseen').empty().hide();
-    showChat(this.props.chat.id);
-  }
-
   render() {
     const chat = this.props.chat;
     const active = this.props.active ? "active-item" : "";
@@ -79,7 +74,7 @@ class ChatListItem extends Component {
     const onlineIndicator = chat.id.length > 36 ? html`<div class="online-indicator"></div>` : '';
 
     return html`
-    <div class="chat-item ${activity} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
+    <div class="chat-item ${activity} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => route('/chat/' + this.props.chat.id)}>
       ${iconEl}
       ${onlineIndicator}
       <div class="text">

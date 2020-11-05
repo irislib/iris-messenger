@@ -1,5 +1,5 @@
 import { html } from '../Helpers.js';
-import { publicState } from '../Main.js';
+import { publicState, localState } from '../Main.js';
 import { translate as t } from '../Translation.js';
 import LanguageSelector from './LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
@@ -19,6 +19,13 @@ function onPastePrivKey(event) {
   }
 }
 
+function onNameChange(event) {
+  if ($(event.target).val().indexOf('"priv"') !== -1) {
+    onPastePrivKey(event);
+    $(event.target).val('');
+  }
+}
+
 function showSwitchAccount(e) {
   e.preventDefault();
   $('#create-account').hide();
@@ -34,6 +41,8 @@ function onLoginFormSubmit(e) {
     Session.login(k);
     publicState.user().get('profile').get('name').put(name);
     Session.createChatLink();
+    localState.get('noFollows').put(true);
+    localState.get('noFollowers').put(true);
   });
 }
 
@@ -60,7 +69,6 @@ class Login extends Component {
   componentDidMount() {
     $('#login-form-name').focus();
   }
-
   render() {
     return Session.getKey() ? '' : html`<section id="login">
       <div id="login-content">
@@ -68,7 +76,7 @@ class Login extends Component {
           <div id="create-account">
             <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris"/>
             <h1>Iris</h1>
-            <input autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
+            <input onInput=${e => onNameChange(e)} autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
             <p><button id="sign-up" type="submit">${t('new_user_go')}</button></p>
             <br/>
             <p><a href="#" id="show-existing-account-login" onClick=${e => showSwitchAccount(e)}>${t('already_have_an_account')}</a></p>

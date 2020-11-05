@@ -106,22 +106,22 @@ class Header extends Component {
     const participants = chat && chat.uuid && Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
     const key = Session.getKey().pub;
-    const searchBox = (this.chatId || iris.util.isMobile) ? '' : html`<${SearchBox}/>`;
+    const searchBox = this.chatId ? '' : html`<${SearchBox}/>`;
 
     return html`
-    <header>
-      <div id="header-content">
-        ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
-        <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
-          ‹
-        </div>
-        ` : ''}
-        <a href="/" onClick=${() => $('a.logo').blur()} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
+    <header class="nav header">
+      ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
+      <div id="back-button" class="visible-xs-inline-block" onClick=${() => this.backButtonClicked()}>
+        ‹
+      </div>
+      ` : ''}
+      <div class="header-content">
+        <a href="/" onClick=${() => {$('a.logo').blur();localState.get('scrollUp').put(true)}} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
           <img src="img/icon128.png" width=40 height=40/>
           <img src="img/iris_logotype.png" height=23 width=41 />
         </a>
         <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
-          ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
+          ${this.state.title && activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
             <div class="name">
               ${this.state.title}
             </div>
@@ -142,13 +142,13 @@ class Header extends Component {
             </a> -->
         `: ''}
 
-        <a href="/" class="btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
-        <a href="/chat" class="btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
+        <a href="/" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
+        <a href="/chat" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
           ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
           ${chatIcon}
         </a>
-        <a href="/settings" class="btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${settingsIcon}</a>
-        <a href="/profile/${key}" class="${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
+        <a href="/settings" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${settingsIcon}</a>
+        <a href="/profile/${key}" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>
       </div>

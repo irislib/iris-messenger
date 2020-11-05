@@ -183,13 +183,13 @@ class ChatView extends Component {
             <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
           </div>` : html`<${NewChat}/>`}
           ${this.props.id ? html`
-  <div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
-  <div id="not-seen-by-them" style="display: none">
-  <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
-  <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_chat_link')}</button></p>
-  </div>
-  <div class="chat-message-form"><${MessageForm} activeChat=${this.props.id}/></div>
-  `: ''}
+            <div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
+            <div id="not-seen-by-them" style="display: none">
+            <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
+            <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_invite_link')}</button></p>
+            </div>
+            <div class="chat-message-form"><${MessageForm} activeChat=${this.props.id}/></div>
+          `: ''}
         </div>
       </div>`;
     }

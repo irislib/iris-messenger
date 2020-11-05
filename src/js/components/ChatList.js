@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
-import {localState, publicState} from '../Main.js';
+import {localState} from '../Main.js';
 import ChatListItem from './ChatListItem.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
@@ -30,11 +30,7 @@ class ChatList extends Component {
       chats[id] = chat;
       limitedUpdate();
     });
-    publicState.user().get('profile').get('name').on(name => {
-      if (name && typeof name === 'string') {
-        $('.user-info .user-name').text(name);
-      }
-    });
+    localState.get('scrollUp').on(() => Helpers.animateScrollTop('.chat-list'));
     if (Session.getKey()) {
       $("#my-identicon").append(Helpers.getIdenticon(Session.getKey().pub, 40));
     }

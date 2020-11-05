@@ -35,7 +35,7 @@ class Settings extends Component {
           <p dangerouslySetInnerHTML=${{ __html: t('private_key_warning') }} ></p>
           <p>
             <button onClick=${() => downloadKey()}>${t('download_private_key')}</button>
-            <${CopyButton} text=${t('copy_private_key')} copyStr=${JSON.stringify(Session.getKey())}/>
+            <${CopyButton} notShareable=${true} text=${t('copy_private_key')} copyStr=${JSON.stringify(Session.getKey())}/>
           </p>
           <p>
             <button onClick=${e => togglePrivateKeyQR(e)}>${t('show_privkey_qr')}</button>
@@ -130,21 +130,6 @@ class Settings extends Component {
     $('#restore-default-rtc-config').click(() => {
       setRTCConfig(DEFAULT_RTC_CONFIG);
       $('#rtc-config').val(JSON.stringify(getRTCConfig()));
-    });
-
-    _.defer(() => {
-      publicState.user().get('profile').get('name').on((name, a, b, event) => {
-        $('#settings-name').not(':focus').val(name);
-        this.eventListeners.push(event);
-      });
-      publicState.user().get('profile').get('about').on((about, a, b, event) => {
-        $('#settings-about').not(':focus').val(about);
-        this.eventListeners.push(event);
-      });
-      publicState.user().get('profile').get('photo').on((photo, a, b, event) => {
-        this.setState({photo});
-        this.eventListeners.push(event);
-      });
     });
   }
 

@@ -12,11 +12,8 @@ function startPrivKeyQRScanner() {
   });
 }
 
-function startChatLinkQRScanner() {
-  startQRScanner('chatlink-qr-video', result => {
-    $('#paste-chat-link').val(result.text);
-    $('#paste-chat-link').trigger('input');
-  });
+function startChatLinkQRScanner(callback) {
+  startQRScanner('chatlink-qr-video', callback);
 }
 
 function startQRScanner(videoElementId, callback) {

@@ -4,7 +4,11 @@
 
 * { box-sizing: border-box; }
 
-html { height:100%; overflow:hidden; }
+html {
+  height:100%;
+  overflow:hidden;
+  -webkit-text-size-adjust: 100%;
+}
 
 body {
   opacity: 0;
@@ -94,82 +98,87 @@ img {
   display: none;
 }
 
-header a {
+.footer a {
+  flex: 1;
+  text-align: center;
+}
+
+.nav a {
   user-select: none;
 }
 
-header a.logo {
+.nav a.logo {
   display: flex;
   align-items: center;
   transition: opacity 0.1s ease;
 }
 
-header a.logo:focus {
+.nav a.logo:focus {
   opacity: 0.75;
 }
 
-header a.logo img:first-child {
+.nav a.logo img:first-child {
   margin-right: 9px;
 }
 
-header a.logo img:last-child {
+.nav a.logo img:last-child {
   filter: var(--logotype-filter);
 }
 
-header a:not(:last-child) {
+.header .header-content > a:not(:last-child) {
   margin-right: 22px;
 }
 
-header .identicon img {
+.nav .identicon img {
   padding: 3px;
 }
 
-header .identicon img {
+.nav .identicon img {
   border: 1px solid rgba(0,0,0,0);
 }
 
-header .active .identicon img {
+.nav .active .identicon img {
   border: 1px solid var(--text-color);
 }
 
-header a.my-profile:focus .identicon img {
+.nav a.my-profile:focus .identicon img {
   border: 1px solid var(--button-hover-bg);
 }
 
-header .btn {
+.nav .btn {
   font-size: 2em;
   color: var(--text-color);
   position: relative;
 }
 
-header .btn svg {
+.nav .btn svg {
   opacity: 0.5;
 }
 
-header .btn:focus svg {
+.nav .btn:focus svg {
   opacity: 0.75;
 }
 
-header .btn .unseen-total {
+.nav .btn .unseen-total {
   position: absolute;
   z-index: 1;
 }
 
-header .btn.active svg {
+.nav .btn.active svg {
   opacity: 1;
 }
 
-header .search-box input {
+.search-box input {
   padding: 8px 35px;
   width: 200px;
   margin: 0;
 }
 
-header .search-box label {
+.search-box label {
   position: relative;
 }
 
-header .search-box label:before {
+.search-box label:before {
   content: "";
   position: absolute;
   left: 10px;
@@ -179,50 +188,59 @@ header .search-box label:before {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' width='28.931px' height='28.932px' viewBox='0 0 28.931 28.932' style='enable-background:new 0 0 28.931 28.932;' xml:space='preserve'%3E%3Cpath fill='%23ccc' d='M28.344,25.518l-6.114-6.115c1.486-2.067,2.303-4.537,2.303-7.137c0-3.275-1.275-6.355-3.594-8.672 C18.625,1.278,15.543,0,12.266,0C8.99,0,5.909,1.275,3.593,3.594C1.277,5.909,0.001,8.99,0.001,12.266 c0,3.276,1.275,6.356,3.592,8.674c2.316,2.316,5.396,3.594,8.673,3.594c2.599,0,5.067-0.813,7.136-2.303l6.114,6.115 c0.392,0.391,0.902,0.586,1.414,0.586c0.513,0,1.024-0.195,1.414-0.586C29.125,27.564,29.125,26.299,28.344,25.518z M6.422,18.111 c-1.562-1.562-2.421-3.639-2.421-5.846S4.86,7.983,6.422,6.421c1.561-1.562,3.636-2.422,5.844-2.422s4.284,0.86,5.845,2.422 c1.562,1.562,2.422,3.638,2.422,5.845s-0.859,4.283-2.422,5.846c-1.562,1.562-3.636,2.42-5.845,2.42S7.981,19.672,6.422,18.111z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
-header .search-box input:placeholder-shown:not(:focus) {
+.search-box input:placeholder-shown:not(:focus) {
   text-align: center;
 }
 
-header .search-box .follow-someone {
+.search-box .follow-someone {
   color: var(--text-color);
   text-align: center;
 }
 
-header .search-box .suggested {
+.search-box .suggested {
   color: var(--text-time);
 }
 
-header .search-box-results {
+.nav .search-box-results {
+  z-index: 100;
   position: fixed;
   top: 50px;
   left: calc(50% - 131px);
+  margin-top: 0;
 }
 
-header .search-box a {
+.search-box-results {
+  margin-top: 5px;
+}
+
+.search-box a {
   width: 200px;
   padding: 5px;
   background-color: var(--input-bg);
   text-align: left;
   display: flex;
   align-items: center;
-  margin: 0 auto;
   overflow-wrap: break-word;
   white-space: pre-wrap;
 }
 
-header .search-box .identicon-container {
+.nav .search-box a {
+  margin: 0 auto;
+}
+
+.search-box .identicon-container {
   margin-right: 5px;
 }
 
-header .search-box a:first-of-type {
+.search-box a:first-of-type {
   border-radius: 8px 8px 0 0;
 }
 
-header .search-box a:last-of-type {
+.search-box a:last-of-type {
   border-radius: 0 0 8px 8px;
 }
 
-header .search-box a:only-of-type {
+.search-box a:only-of-type {
   border-radius: 8px;
 }
 
@@ -261,7 +279,7 @@ header .search-box a:only-of-type {
 
 /*----- Main------- */
 
-header {
+.nav {
   display: flex;
   flex:1;
   background-color: var(--header-color);
@@ -269,16 +287,16 @@ header {
   border-bottom: 1px solid rgba(0,0,0,.08);
 }
 
-header .name {
+.nav .name {
   min-height: 1.3em;
 }
 
-header small {
+.nav small {
   display: inline-block;
   min-height:1em;
 }
 
-header #header-content {
+.nav .header-content {
   flex: 1;
   padding: 7px 15px;
   align-self: center;
@@ -286,6 +304,11 @@ header #header-content {
   flex-direction: row;
   align-items: center;
   max-width: 100%;
+  overflow: hidden;
+}
+
+header.footer .header-content {
+  padding: 0;
 }
 
 .flex-table {
@@ -323,9 +346,9 @@ header #header-content {
   }
 }
 
-header #back-button {
+.nav #back-button {
   align-self: center;
-  padding: 10px 15px 10px 0;
+  padding: 15px 20px;
   cursor: pointer;
 }
 
@@ -401,12 +424,20 @@ header #back-button {
   align-items: center;
 }
 
-.public-messages-view .msgSenderName {
-  margin-left: 15px;
+.public-messages-view .msg-sender .msg-sender-link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
-.public-messages-view .msg .msg-content .seen-indicator {
-  display: none;
+.public-messages-view .msg-sender .msg-menu-btn {
+  text-align: right;
+  flex: 1;
+  user-select: none;
+}
+
+.public-messages-view .msgSenderName {
+  margin-left: 15px;
 }
 
 .public-messages-view .img-container {
@@ -425,6 +456,60 @@ header #back-button {
   border-radius: 8px !important;
   width: 100%;
   padding: 15px;
+  flex-direction: column;
+  display: flex;
+}
+
+.dropbtn {
+  padding: 5px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: var(--text-color);
+  background-color: var(--msg-content-background);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:first-of-type {
+  border-radius: 5px 5px 0 0;
+}
+
+.dropdown-content a:last-of-type {
+  border-radius: 0 0 5px 5px;
+}
+
+.dropdown-content a:only-of-type {
+  border-radius: 5px;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: var(--header-color)}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 .emoji {
@@ -713,7 +798,10 @@ hr {
 .chat-message-form input {
   flex: 1;
   width: auto;
+  margin: 0;
 }
+
+
 
 .message-form button, .message-form button:hover, .message-form button:active, .message-form button:focus {
   flex: none;
@@ -722,6 +810,12 @@ hr {
   font-size: 30px;
   padding: 5px;
   border: 0;
+}
+
+.chat-message-form button {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px !important;
 }
 
 /*----- Sidebar------- */
@@ -810,14 +904,14 @@ hr {
   line-height: 20px;
 }
 
-.chat-item .text, header .text {
+.chat-item .text, .nav .text {
   flex: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
 }
 
-header .text {
+.nav .text {
   text-align: center;
 }
 
@@ -1068,7 +1162,7 @@ form.public {
   align-items: center;
 }
 
-.profile-link {
+.profile-link-container .profile-link {
   display: flex;
   flex: 1;
   align-items: center;
@@ -1092,6 +1186,7 @@ form.public {
   align-items: center;
   flex: 1;
   padding: 15px;
+  overflow: hidden;
 }
 
 .profile-photo {
@@ -1123,6 +1218,10 @@ form.public {
 .chat-item .typing-indicator {
   color: #05b246;
   font-weight: bold;
+}
+
+.copy-button {
+  min-width: 82px;
 }
 
 .peer button {
@@ -1242,6 +1341,25 @@ form.public {
   form.public div {
     margin: 0 15px;
   }
+  .nav {
+    max-height: 50px;
+  }
+  .chat-message-form {
+    max-height: 50px;
+    padding: 0;
+  }
+  .chat-message-form form {
+    align-items: center;
+    height: 50px;
+  }
+  .chat-message-form input {
+    padding: 8px 15px;
+    height: 35px;
+  }
+  .chat-message-form button {
+    padding: 5px 10px;
+  }
+  .profile-photo-container .identicon-container * { max-width: 80px; max-height: 80px; text-align: center;}
 }
 
 @media (min-width: 576px) {

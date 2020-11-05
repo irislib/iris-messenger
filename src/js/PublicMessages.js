@@ -27,12 +27,12 @@ async function sendPublicMsg(msg) {
 
 function deletePublicMsg(timeStr, replyingTo) {
   publicState.user().get('msgs').get(timeStr).put(null);
-  publicState.user().get('replies').get(replyingTo).get(timeStr).put(null);
+  replyingTo && publicState.user().get('replies').get(replyingTo).get(timeStr).put(null);
 }
 
 function getMessageByHash(hash) {
   if (typeof hash !== 'string') throw new Error('hash must be a string, got ' + typeof hash + ' ' +  JSON.stringify(hash));
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     localState.get('msgsByHash').get(hash).once(msg => {
       if (typeof msg === 'string') {
         try {
