@@ -35,6 +35,11 @@ class ScrollWindow {
     }
   }
 
+  off() {
+    this.upSubscription && this.upSubscription.off();
+    this.downSubscription && this.downSubscription.off();
+  }
+
   _getSortedKeys() {
     this.sortedKeys = this.sortedKeys || [...this.elements.keys()].sort();
     return this.sortedKeys;

@@ -10,6 +10,7 @@ import Session from '../Session.js';
 import Notifications from '../Notifications.js';
 import ChatList from './ChatList.js';
 import NewChat from './NewChat.js';
+import ScrollWindow from '../lib/ScrollWindow.js';
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
@@ -39,7 +40,6 @@ class ChatView extends Component {
   constructor() {
     super();
     this.eventListeners = [];
-    this.sortedMessages = [];
     this.state = {sortedMessages: []};
   }
 
@@ -85,9 +85,12 @@ class ChatView extends Component {
   }
 
   update() {
+    this.setState({sortedMessages: []});
+    this.scroller && this.scroller.off();
+    this.scroller = new ScrollWindow(localState.get('privmsgs').get(this.props.id), {size: 40, onChange: sortedMessages => {
+      this.setState({sortedMessages});
+    }});
     $('.new-msg').focus();
-    this.sortedMessages = [];
-    this.setState({sortedMessages: this.sortedMessages});
     this.props.id && chats[this.props.id] && chats[this.props.id].setTyping(false);
 
     const update = () => {
@@ -101,16 +104,6 @@ class ChatView extends Component {
 
     console.log(this.props.id, this.props.id.length > 20);
     if (this.props.id && this.props.id.length > 20) {
-      const limitedUpdate = _.debounce((id) => {
-        if (id !== this.props.id) return;
-        this.sortedMessages.sort((a, b) => a.timeStr > b.timeStr ? 1 : -1);
-        this.setState({sortedMessages: this.sortedMessages});
-      }, 200);
-      localState.get('privmsgs').get(this.props.id).map().once(s => {
-        const msg = JSON.parse(s);
-        this.sortedMessages.push(msg);
-        limitedUpdate(this.props.id);
-      });
       const iv = setInterval(() => {
         if (chats[this.props.id]) {
           clearInterval(iv);
@@ -152,6 +145,7 @@ class ChatView extends Component {
     console.log('render it', this.state.sortedMessages.length);
     if (chats[this.props.id] && this.state.sortedMessages) {
       this.state.sortedMessages.forEach(msg => {
+        msg = JSON.parse(msg);
         if (!(msg && msg.info)) return;
         const date = typeof msg.time === 'string' ? new Date(msg.timeStr) : msg.time;
         if (date) {
