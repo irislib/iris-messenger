@@ -29,7 +29,7 @@ function subscribeToMessages(chatId) {
   console.log('subscribeToMessages', chatId);
   chats[chatId].getMessages((msg, info) => {
     processMessage(chatId, msg, info);
-    localState.get('privmsgs').get(chatId).get(msg.time + info.from.slice(0,20)).put(JSON.stringify(msg));
+    localState.get('privmsgs').get(chatId).get(msg.timeStr + info.from.slice(0,12)).put(JSON.stringify(msg));
   });
 }
 
