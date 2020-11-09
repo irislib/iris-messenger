@@ -184,7 +184,7 @@
       Object.assign(api, {
         crypto,
         random: (len) => Buffer.from(crypto.randomBytes(len))
-      });
+      });      
       const { Crypto: WebCrypto } = USE('@peculiar/webcrypto', 1);
       api.ossl = api.subtle = new WebCrypto({directory: 'ossl'}).subtle // ECDH
     }
@@ -215,7 +215,7 @@
       if(d){ jwk.d = d }
       return jwk;
     };
-
+    
     s.keyToJwk = function(keyBytes) {
       const keyB64 = keyBytes.toString('base64');
       const k = keyB64.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
@@ -267,7 +267,7 @@
 
     SEA.work = SEA.work || (async (data, pair, cb, opt) => { try { // used to be named `proof`
       var salt = (pair||{}).epub || pair; // epub not recommended, salt should be random!
-      var opt = opt || {name:'SHA-256'};
+      var opt = opt || {};
       if(salt instanceof Function){
         cb = salt;
         salt = u;
@@ -290,7 +290,7 @@
       var r = shim.Buffer.from(work, 'binary').toString(opt.encode || 'base64')
       if(cb){ try{ cb(r) }catch(e){console.log(e)} }
       return r;
-    } catch(e) {
+    } catch(e) { 
       console.log(e);
       SEA.err = e;
       if(SEA.throw){ throw e }
@@ -336,7 +336,7 @@
         // but split on a non-base64 letter.
         return key;
       })
-
+      
       // To include PGPv4 kind of keyId:
       // const pubId = await SEA.keyid(keys.pub)
       // Next: ECDH keys for encryption/decryption...
@@ -508,8 +508,8 @@
       var opt = opt || {};
       const combo = key + (salt || shim.random(8)).toString('utf8'); // new
       const hash = shim.Buffer.from(await sha256hash(combo), 'binary')
-
-      const jwkKey = S.keyToJwk(hash)
+      
+      const jwkKey = S.keyToJwk(hash)      
       return await shim.subtle.importKey('jwk', jwkKey, {name:'AES-GCM'}, false, ['encrypt', 'decrypt'])
     }
     module.exports = importGen;
@@ -544,7 +544,7 @@
 
       if(cb){ try{ cb(r) }catch(e){console.log(e)} }
       return r;
-    } catch(e) {
+    } catch(e) { 
       console.log(e);
       SEA.err = e;
       if(SEA.throw){ throw e }
@@ -586,7 +586,7 @@
       var r = S.parse(new shim.TextDecoder('utf8').decode(ct));
       if(cb){ try{ cb(r) }catch(e){console.log(e)} }
       return r;
-    } catch(e) {
+    } catch(e) { 
       console.log(e);
       SEA.err = e;
       if(SEA.throw){ throw e }
@@ -601,7 +601,7 @@
     var SEA = USE('./root');
     var shim = USE('./shim');
     var S = USE('./settings');
-    // Derive shared secret from other's pub and my epub/epriv
+    // Derive shared secret from other's pub and my epub/epriv 
     SEA.secret = SEA.secret || (async (key, pair, cb, opt) => { try {
       opt = opt || {};
       if(!pair || !pair.epriv || !pair.epub){
@@ -651,6 +651,67 @@
   })(USE, './secret');
 
   ;USE(function(module){
+    var SEA = USE('./root');
+    
+    // This is to certify that a group of "certificants" can "put" anything at a group of matched "paths" to the certificate issuer's graph
+    SEA.certify = SEA.certify || (async (certificants, patterns, issuer, cb, opt = {}) => { try {
+      /*
+      IMPORTANT: A Certificate is like a Signature. No one knows who (issuer) created/signed a cert until you put it into their graph.
+      "certificants": A string (~Bobpub) || a pair || an array of pubs/pairs. These people will have the rights.
+      "patterns": A string (^inbox.*), or an array of strings [^inbox.*, ^secret\-group.*]. These patterns will be used to check against soul+'/'+key
+      "issuer": Key pair or priv of the certificate issuer
+      "cb": A callback function after all things are done
+      "opt": If opt.expiry (a timestamp) is set, SEA won't sync data after opt.expiry
+      */
+
+      // We need some logic here to verify that all params are valid
+      
+      console.log('SEA.certify() is an early experimental community supported method that may change API behavior without warning in any future version.')
+
+      certificants = (() => {
+        var data = []
+        if (certificants) {
+          if (typeof certificants === 'string') {
+            data.push(certificants)
+          }
+
+          if (Array.isArray(certificants)) {
+            certificants.map(person => {
+              if (typeof person ==='string') data.push(person)
+              else if (typeof person === 'object' && person.pub) data.push(person.pub)
+            })
+          }
+
+          if (typeof certificants === 'object' && certificants.pub) data.push(certificants.pub)
+        }
+        return data
+      })()
+
+      patterns = patterns ? typeof patterns === 'string' ? [patterns] : Array.isArray(patterns) ? patterns : null : null
+
+      const data = JSON.stringify({
+        c: certificants,
+        p: patterns,
+        ...(opt.expiry && typeof opt.expiry === 'number' ? {e: opt.expiry} : {}) // inject expiry if possible
+      })
+
+      const certificate = await SEA.sign(data, issuer, null, {raw:1})
+
+      var r = certificate
+      if(!opt.raw){ r = 'SEA'+JSON.stringify(r) }
+      if(cb){ try{ cb(r) }catch(e){console.log(e)} }
+      return r;
+    } catch(e) {
+      SEA.err = e;
+      if(SEA.throw){ throw e }
+      if(cb){ cb() }
+      return;
+    }});
+
+    module.exports = SEA.certify;
+  })(USE, './certify');
+
+  ;USE(function(module){
     var shim = USE('./shim');
     // Practical examples about usage found in tests.
     var SEA = USE('./root');
@@ -659,6 +720,7 @@
     SEA.verify = USE('./verify');
     SEA.encrypt = USE('./encrypt');
     SEA.decrypt = USE('./decrypt');
+    SEA.certify = USE('./certify');
     //SEA.opt.aeskey = USE('./aeskey'); // not official! // this causes problems in latest WebCrypto.
 
     SEA.random = SEA.random || shim.random;
@@ -723,7 +785,7 @@
     var Gun = SEA.Gun;
     var then = USE('./then');
 
-    function User(root){
+    function User(root){ 
       this._ = {$: this};
     }
     User.prototype = (function(){ function F(){}; F.prototype = Gun.chain; return new F() }()) // Object.create polyfill
@@ -768,9 +830,9 @@
       const pass = pair && (pair.pub || pair.epub) ? pair : alias && typeof args[1] === 'string' ? args[1] : null;
       const cb = args.filter(arg => typeof arg === 'function')[0] || null; // cb now can stand anywhere, after alias/pass or pair
       const opt = args && args.length > 1 && typeof args[args.length-1] === 'object' ? args[args.length-1] : {}; // opt is always the last parameter which typeof === 'object' and stands after cb
-
+      
       var gun = this, cat = (gun._), root = gun.back(-1);
-
+      
       if(cat.ing){
         (cb || noop)({err: Gun.log("User is already being created or authenticated!"), wait: true});
         return gun;
@@ -810,11 +872,11 @@
         act.e();
       }
       act.e = function(){
-        act.data.epub = act.pair.epub;
+        act.data.epub = act.pair.epub; 
         SEA.encrypt({priv: act.pair.priv, epriv: act.pair.epriv}, act.proof, act.f, {raw:1}); // to keep the private key safe, we AES encrypt it with the proof of work!
       }
       act.f = function(auth){
-        act.data.auth = JSON.stringify({ek: auth, s: act.salt});
+        act.data.auth = JSON.stringify({ek: auth, s: act.salt}); 
         act.g(act.data.auth);
       }
       act.g = function(auth){ var tmp;
@@ -837,15 +899,15 @@
       const pass = alias && typeof args[1] === 'string' ? args[1] : null;
       const cb = args.filter(arg => typeof arg === 'function')[0] || null; // cb now can stand anywhere, after alias/pass or pair
       const opt = args && args.length > 1 && typeof args[args.length-1] === 'object' ? args[args.length-1] : {}; // opt is always the last parameter which typeof === 'object' and stands after cb
-
+      
       var gun = this, cat = (gun._), root = gun.back(-1);
-
+      
       if(cat.ing){
         (cb || noop)({err: Gun.log("User is already being created or authenticated!"), wait: true});
         return gun;
       }
       cat.ing = true;
-
+      
       var act = {}, u;
       act.a = function(data){
         if(!data){ return act.b() }
@@ -861,7 +923,7 @@
         var get = (act.list = (act.list||[]).concat(list||[])).shift();
         if(u === get){
           if(act.name){ return act.err('Your user account is not published for dApps to access, please consider syncing it online, or allowing local access by adding your device as a peer.') }
-          return act.err('Wrong user or password.')
+          return act.err('Wrong user or password.') 
         }
         root.get(get).once(act.a);
       }
@@ -1137,6 +1199,7 @@
 
   ;USE(function(module){
     var SEA = USE('./sea')
+    var S = USE('./settings')
     var Gun = SEA.Gun;
     // After we have a GUN extension to make user registration/login easy, we then need to handle everything else.
 
@@ -1204,7 +1267,7 @@
           put['='] = SEA.opt.unpack(data);
           eve.to.next(msg);
         });
-        return
+        return 
       }
       var no = function(why){ at.on('in', {'@': id, err: why}) };
       //var no = function(why){ msg.ack(why) };
@@ -1217,6 +1280,7 @@
           return; // omit!
         }
       }
+      
       if('~@' === soul){  // special case for shared system data, the list of aliases.
         check.alias(eve, msg, val, key, soul, at, no); return;
       }
@@ -1229,7 +1293,7 @@
       }
       if(0 <= soul.indexOf('#')){ // special case for content addressing immutable hashed data.
         check.hash(eve, msg, val, key, soul, at, no); return;
-      }
+      } 
       check.any(eve, msg, val, key, soul, at, no, at.user||''); return;
       eve.to.next(msg); // not handled
     }
@@ -1249,27 +1313,83 @@
       if(key === link_is(val)){ return eve.to.next(msg) } // and the ID must be EXACTLY equal to its property
       no("Alias not same!"); // that way nobody can tamper with the list of public keys.
     };
-    check.pub = function(eve, msg, val, key, soul, at, no, user, pub){ var tmp; // Example: {_:#~asdf, hello:'world'~fdsa}}
-      if('pub' === key && '~'+pub === soul){
-        if(val === pub){ return eve.to.next(msg) } // the account MUST match `pub` property that equals the ID of the public key.
-        return no("Account not same!");
+    check.pub = function(eve, msg, val, key, soul, at, no, user, pub){ var tmp // Example: {_:#~asdf, hello:'world'~fdsa}}
+      const raw = S.parse(val) || {}
+      
+      const verify = (certificate, certificant, cb) => {
+        if (certificate['m'] && certificate['s'] && certificant && pub) {
+          // now verify certificate
+          return SEA.verify(certificate, pub, data => { // check if "pub" (of the graph owner) really issued this cert
+            if (u !== data && u !== data.e && msg.put['>'] && msg.put['>'] > parseFloat(data.e)) return no("Certificate expired.")
+            // "data.c" = a list of certificants/certified users, "data.p" = a list of allowed patterns
+            if (u !== data && data.c && data.p && (data.c.indexOf('*') || data.c.indexOf(certificant))) {
+              // ok, now "certificant" is in the "certificants" list, but is "path" allowed? Check path
+              let path = soul + '/' + key
+              path = path.replace(path.substring(0, path.indexOf('/') + 1), '')
+              for (p of data.p) {
+                if (new RegExp(p).test(path)) {
+                  return cb(data)
+                }
+              }
+              return no("Certificate verification fail.")
+            }
+          })
+        }
+        return
       }
-      if((tmp = user.is) && pub === tmp.pub){
-        SEA.sign(SEA.opt.pack(msg.put), (user._).sea, function(data){
+      
+      if ('pub' === key && '~'+pub === soul) {
+        if(val === pub){ return eve.to.next(msg) } // the account MUST match `pub` property that equals the ID of the public key.
+        return no("Account not same!")
+      }
+
+      if ((tmp = user.is) && tmp.pub && !raw['*'] && !raw['+']){
+        SEA.sign(SEA.opt.pack(msg.put), (user._).sea, function(data){ // needs to be refactored
           if(u === data){ return no(SEA.err || 'Signature fail.') }
-          if(tmp = link_is(val)){ (at.sea.own[tmp] = at.sea.own[tmp] || {})[pub] = 1 }
-          msg.put[':'] = JSON.stringify({':': tmp = SEA.opt.unpack(data.m), '~': data.s});
-          msg.put['='] = tmp;
-          eve.to.next(msg);
-        }, {raw: 1});
+          msg.put[':'] = {':': tmp = SEA.opt.unpack(data.m), '~': data.s}
+          msg.put['='] = tmp
+
+          // if writing to own graph, just allow it
+          if (pub === user.is.pub) {
+            if (tmp = link_is(val)) { (at.sea.own[tmp] = at.sea.own[tmp] || {})[pub] = 1 }
+            msg.put[':'] = JSON.stringify(msg.put[':'])
+            return eve.to.next(msg)
+          }
+
+          // if writing to other's graph, check if cert exists then try to inject cert into put, also inject self pub so that everyone can verify the put
+          if (pub !== user.is.pub && ((msg._.out || {}).opt || {}).cert) {
+            const cert = S.parse(msg._.out.opt.cert)
+            // even if cert exists, we must verify it
+            if (cert && cert.m && cert.s) {
+              verify(cert, user.is.pub, _ => {
+                msg.put[':']['+'] = cert // '+' is a certificate
+                msg.put[':']['*'] = user.is.pub // '*' is pub of the user who puts
+                msg.put[':'] = JSON.stringify(msg.put[':'])
+                return eve.to.next(msg)
+              })
+            }
+          }
+        }, {raw: 1})
         return;
       }
-      SEA.verify(SEA.opt.pack(msg.put), pub, function(data){ var tmp;
+
+      SEA.verify(SEA.opt.pack(msg.put), raw['*'] || pub, function(data){ var tmp;
         data = SEA.opt.unpack(data);
         if(u === data){ return no("Unverified data.") } // make sure the signature matches the account it claims to be on. // reject any updates that are signed with a mismatched account.
         if((tmp = link_is(data)) && pub === SEA.opt.pub(tmp)){ (at.sea.own[tmp] = at.sea.own[tmp] || {})[pub] = 1 }
-        msg.put['='] = data;
-        eve.to.next(msg);
+        
+        // check if cert ('+') and putter's pub ('*') exist
+        if (raw['+'] && raw['+']['m'] && raw['+']['s'] && raw['*']) {
+          // now verify certificate
+          verify(raw['+'], raw['*'], _ => {
+            msg.put['='] = data;
+            return eve.to.next(msg);
+          })
+        }
+        else {
+          msg.put['='] = data;
+          return eve.to.next(msg);
+        }
       });
     };
     check.any = function(eve, msg, val, key, soul, at, no, user){ var tmp, pub;
