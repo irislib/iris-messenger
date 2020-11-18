@@ -75,7 +75,7 @@ class FeedView extends Component {
             <div class="profile-link-container">
               <a href="/profile/${SUGGESTED_FOLLOW}" class="profile-link">
                 <${Identicon} str=${SUGGESTED_FOLLOW} width=40 />
-                ${t('creator_of_this_distribution')}
+                <iris-profile-attribute pub=${SUGGESTED_FOLLOW}/>
               </a>
               <${FollowButton} id=${SUGGESTED_FOLLOW} />
             </div>

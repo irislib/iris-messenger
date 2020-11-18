@@ -40,6 +40,7 @@ var publicState = Gun({ peers: PeerManager.getRandomPeers(), localStorage: false
 window.publicState = publicState;
 var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state');
 window.localState = localState;
+window.iris.util.setPublicState && window.iris.util.setPublicState(publicState);
 
 Session.init();
 PeerManager.init();
