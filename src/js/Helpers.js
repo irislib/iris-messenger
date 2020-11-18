@@ -1985,6 +1985,13 @@ export default {
     }, 10);
   },
 
+  getWebTorrentClient() {
+    if (!this.wtClient) {
+      this.wtClient = new WebTorrent();
+    }
+    return this.wtClient;
+  },
+
   getIdenticon(pub, width) {
     var el = $('<div>').width(width).height(width).addClass('identicon');
     var identicon = $(new iris.Attribute({type: 'keyID', value: pub}).identicon({width, showType: false}));
