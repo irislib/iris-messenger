@@ -98,7 +98,7 @@ class PublicMessage extends Message {
           return file.name.endsWith('.mp4')
         })
         // Stream the file in the browser
-        setTimeout(() => file.appendTo('#' + this.getWebtorrentElementId(), {autoplay: true, muted: true}), 0);
+        setTimeout(() => file.appendTo('#' + this.getWebtorrentElementId(), {autoplay: false}), 0);
       }
       torrent.ready ? onTorrentReady() : torrent.on('ready', onTorrentReady);
     }

@@ -94,7 +94,7 @@ img, video {
   max-height: 80vh;
 }
 
-.msg video, .message-form video {
+.msg-content video, .message-form video {
   width: 100%;
   outline: none;
 }
