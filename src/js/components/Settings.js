@@ -108,6 +108,7 @@ class Settings extends Component {
 
           <h4>Donate</h4>
           <p dangerouslySetInnerHTML=${{ __html:t('donate_info') + ': 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST' }}></p>
+          <p>Dogecoin: DEsgP4H1Sjp4461PugHDNnoGd6S8pTvrm1</p>
         </div>
       </div>`;
   }
