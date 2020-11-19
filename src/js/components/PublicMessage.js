@@ -86,7 +86,7 @@ class PublicMessage extends Message {
   }
 
   getWebtorrentElementId() {
-    return 'w' + this.props.hash.replaceAll(/[\+\=\/]/g, '').slice(0,12);
+    return 'w' + this.props.hash.replace(/[\+\=\/]/g, '').slice(0,12);
   }
 
   downloadWebtorrent(torrentId) {
