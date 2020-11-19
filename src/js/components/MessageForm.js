@@ -75,15 +75,21 @@ class MessageForm extends Component {
 
   downloadWebtorrent(torrentId) {
     console.log('trying to open webtorrent', torrentId);
-    const client = Helpers.getWebTorrentClient();
-    client.add(torrentId, function (torrent) {
+    function onTorrent(torrent) {
       // Torrents can contain many files. Let's use the .mp4 file
       var file = torrent.files.find(function (file) {
         return file.name.endsWith('.mp4')
       })
       // Stream the file in the browser
       file.appendTo('#webtorrent', {autoplay: true, muted: true})
-    })
+    }
+    const client = Helpers.getWebTorrentClient();
+    const existing = client.get(torrentId);
+    if (existing) {
+      onTorrent(existing);
+    } else {
+      client.add(torrentId, onTorrent);
+    }
   }
 
   onMsgTextPaste(event) {

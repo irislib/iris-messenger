@@ -70,6 +70,7 @@ class PublicMessage extends Message {
       this.replies = new Set();
       this.subscribedReplies = new Set();
       this.linksDone = false;
+      this.wtId = null;
       this.setState({replies:0, likes: 0, sortedReplies:[]});
       this.componentDidMount();
     }
@@ -85,17 +86,32 @@ class PublicMessage extends Message {
     }
   }
 
+  getWebtorrentElementId() {
+    this.wtId = this.wtId || 'wt' + Math.floor(Math.random() * 1000000000);
+    return this.wtId;
+  }
+
   downloadWebtorrent(torrentId) {
     console.log('trying to open webtorrent', torrentId);
+    const onTorrent = (torrent) => {
+      const onTorrentReady = () => {
+        // Torrents can contain many files. Let's use the .mp4 file
+        var file = torrent.files.find(function (file) {
+          return file.name.endsWith('.mp4')
+        })
+        // Stream the file in the browser
+        console.log($('#' + this.getWebtorrentElementId()));
+        file.appendTo('#' + this.getWebtorrentElementId(), {autoplay: true, muted: true})
+      }
+      torrent.ready ? onTorrentReady() : torrent.on('ready', onTorrentReady);
+    }
     const client = Helpers.getWebTorrentClient();
-    client.add(torrentId, function (torrent) {
-      // Torrents can contain many files. Let's use the .mp4 file
-      var file = torrent.files.find(function (file) {
-        return file.name.endsWith('.mp4')
-      })
-      // Stream the file in the browser
-      file.appendTo('#torrentti', {autoplay: true, muted: true})
-    })
+    const existing = client.get(torrentId);
+    if (existing) {
+      onTorrent(existing);
+    } else {
+      client.add(torrentId, onTorrent);
+    }
   }
 
   toggleReplies() {
@@ -159,7 +175,7 @@ class PublicMessage extends Message {
               </div>
             `: ''}
           </div>
-          ${this.state.msg.torrentId && html`<div id="torrentti"></div>`}
+          <div id=${this.getWebtorrentElementId()}/>
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
             html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>` // TODO: escape a.data
           )}
