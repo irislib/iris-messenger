@@ -13,7 +13,7 @@ export default {
     public_messages: "Public messages",
     follow_someone_info: "Follow someone to see content from their network! Suggestion:",
     creator_of_this_distribution: "Creator of this Iris distribution",
-    no_followers_yet: "You have no followers yet. Share your profile link so others can follow you:",
+    no_followers_yet: "Share your profile link so others can follow you:",
     no_followers_yet_info: "Your posts, replies and likes are only shown to your followers and their network.",
     alternatively: "Alternatively,",
     give_your_profile_link_to_someone: "give your profile link to someone",
