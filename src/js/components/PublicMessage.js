@@ -70,7 +70,6 @@ class PublicMessage extends Message {
       this.replies = new Set();
       this.subscribedReplies = new Set();
       this.linksDone = false;
-      this.wtId = null;
       this.setState({replies:0, likes: 0, sortedReplies:[]});
       this.componentDidMount();
     }
@@ -87,8 +86,7 @@ class PublicMessage extends Message {
   }
 
   getWebtorrentElementId() {
-    this.wtId = this.wtId || 'wt' + Math.floor(Math.random() * 1000000000);
-    return this.wtId;
+    return 'w' + this.props.hash.replaceAll(/[\+\=\/]/g, '').slice(0,12);
   }
 
   downloadWebtorrent(torrentId) {
@@ -100,8 +98,7 @@ class PublicMessage extends Message {
           return file.name.endsWith('.mp4')
         })
         // Stream the file in the browser
-        console.log($('#' + this.getWebtorrentElementId()));
-        file.appendTo('#' + this.getWebtorrentElementId(), {autoplay: true, muted: true})
+        setTimeout(() => file.appendTo('#' + this.getWebtorrentElementId(), {autoplay: true, muted: true}), 0);
       }
       torrent.ready ? onTorrentReady() : torrent.on('ready', onTorrentReady);
     }
