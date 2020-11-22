@@ -1250,6 +1250,46 @@ form.public {
   margin: 0 0 15px 0;
 }
 
+.store-item {
+  display: inline-flex;
+  flex-direction: column;
+  width: calc(33.33% - 5px);
+  height: calc(33.33% - 5px);
+  background-color: rgba(255,255,255,0.1);
+  padding: 15px;
+  margin-right: 5px;
+  margin-bottom: 5px
+}
+
+.price-cell {
+  text-align: right;
+}
+
+.price-cell input {
+  border-radius: 5px;
+  margin: 0 5px;
+  width: 3em;
+  padding: 9px 0;
+  text-align: center;
+}
+
+.price-cell button {
+  border: 0;
+  padding: 10px 15px;
+  background-color: var(--input-bg);
+  border-radius: 5px;
+}
+
+.unit-price {
+  margin-right: 15px;
+}
+
+.price {
+  flex-grow: 1;
+  font-size: 1.25em;
+  font-weight: bold;
+}
+
 /* Tooltip container */
 .tooltip {
   position: relative;
