@@ -14,7 +14,6 @@ import Settings from './components/Settings.js';
 import LogoutConfirmation from './components/LogoutConfirmation.js';
 import ChatView from './components/ChatView.js';
 import StoreView from './components/StoreView.js';
-import CartView from './components/CartView.js';
 import CheckoutView from './components/CheckoutView.js';
 import ProductView from './components/ProductView.js';
 import Login from './components/Login.js';
@@ -80,7 +79,6 @@ class Main extends Component {
           <${LogoutConfirmation} path="/logout"/>
           <${Profile.Profile} path="/profile/:id"/>
           <${StoreView} path="/store/:id"/>
-          <${CartView} path="/cart/:id"/>
           <${CheckoutView} path="/checkout/:id"/>
           <${ProductView} path="/product/:id/:store"/>
           <${FollowsView} path="/follows/:id"/>

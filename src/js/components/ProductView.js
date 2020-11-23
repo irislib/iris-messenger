@@ -22,6 +22,7 @@ class ProductView extends Component {
     this.eventListeners = [];
     this.followedUsers = new Set();
     this.followers = new Set();
+    this.cart = {};
     this.state = {
       items: {
         aa: {name: 'Doge T-shirt', description: 'Amazing t shirt with doge', price: '100€'},
@@ -33,17 +34,31 @@ class ProductView extends Component {
     };
   }
 
+  addToCart() {
+    const count = (this.cart[this.props.id] || 0) + 1;
+    localState.get('cart').get(this.props.store).get(this.props.id).put(count);
+  }
+
   showProduct() {
+    const cartTotalItems = Object.values(this.cart).reduce((sum, current) => sum + current, 0);
     const i = this.state.items[this.props.id];
     return html`
     <div class="main-view" id="profile">
       <div class="content">
         <a href="/store/${this.props.store}"><iris-profile-attribute pub=${this.props.store}/></a>
+        ${cartTotalItems ? html`
+          <p>
+            <button onClick=${() => route('/checkout/' + this.props.store)}>Shopping cart (${cartTotalItems})</button>
+          </p>
+        ` : ''}
         <h3>${i.name}</h3>
         <${SafeImg} src=${i.thumbnail}/>
         <p class="description">${i.description}</p>
         <p class="price">${i.price}</p>
-        <button class="add">Add to cart</button>
+        <button class="add" onClick=${() => this.addToCart()}>
+          Add to cart
+          ${this.cart[this.props.id] ? ` (${this.cart[this.props.id]})` : ''}
+        </button>
       </div>
     </div>`;
   }
@@ -89,6 +104,11 @@ class ProductView extends Component {
     this.eventListeners.forEach(e => e.off());
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     this.isMyProfile = Session.getPubKey() === pub;
+    this.cart = {};
+    localState.get('cart').get(this.props.store).map().on((v, k) => {
+      this.cart[k] = v;
+      this.setState({cart: this.cart})
+    });
   }
 }
 

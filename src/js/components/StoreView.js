@@ -34,14 +34,14 @@ class StoreView extends Component {
     };
   }
 
-  addToCart(k) {
+  addToCart(k, e) {
+    e.stopPropagation();
     const count = (this.cart[k] || 0) + 1;
     localState.get('cart').get(this.props.id).get(k).put(count);
   }
 
   render() {
-    const reducer = (accumulator, currentValue) => accumulator + currentValue;
-    const cartTotalItems = Object.values(this.cart).reduce(reducer, 0);
+    const cartTotalItems = Object.values(this.cart).reduce((sum, current) => sum + current, 0);
     this.isMyProfile = Session.getPubKey() === this.props.id;
     const chat = chats[this.props.id];
     const uuid = chat && chat.uuid;
@@ -106,18 +106,23 @@ class StoreView extends Component {
         <h3>Store</h3>
         ${cartTotalItems ? html`
           <p>
-            <button onClick=${() => route('/cart/' + this.props.id)}>Shopping cart (${cartTotalItems})</button>
+            <button onClick=${() => route('/checkout/' + this.props.id)}>Shopping cart (${cartTotalItems})</button>
           </p>
+        ` : ''}
+        ${this.isMyProfile ? html`
+          <div class="store-item" onClick=${() => route(`/product//${this.props.id}`)}>
+            <a href="/product/new/${this.props.id}" class="name">Add item</a>
+          </div>
         ` : ''}
         ${Object.keys(this.state.items).map(k => {
           const i = this.state.items[k];
           return html`
-            <div class="store-item">
+            <div class="store-item" onClick=${() => route(`/product/${k}/${this.props.id}`)}>
               <${SafeImg} src=${i.thumbnail}/>
               <a href="/product/${k}/${this.props.id}" class="name">${i.name}</a>
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>
-              <button class="add" onClick=${() => this.addToCart(k)}>
+              <button class="add" onClick=${e => this.addToCart(k, e)}>
                 Add to cart
                 ${this.cart[k] ? ` (${this.cart[k]})` : ''}
               </button>

@@ -1253,12 +1253,19 @@ form.public {
 .store-item {
   display: inline-flex;
   flex-direction: column;
-  width: calc(33.33% - 5px);
-  height: calc(33.33% - 5px);
-  background-color: rgba(255,255,255,0.1);
+  width: calc(33.33% - 8px);
+  height: calc(33.33% - 8px);
+  background-color: var(--chat-hover);
   padding: 15px;
-  margin-right: 5px;
-  margin-bottom: 5px
+  margin-right: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 125ms;
+  border-radius: 8px;
+}
+
+.store-item:hover {
+  background-color: var(--chat-active);
 }
 
 .price-cell {
@@ -1288,6 +1295,22 @@ form.public {
   flex-grow: 1;
   font-size: 1.25em;
   font-weight: bold;
+}
+
+#store-steps {
+  display: flex;
+  flex-direction: row;
+}
+
+#store-steps div {
+  flex-basis: 25%;
+  padding: 30px 5px;
+  text-align: center;
+  cursor: pointer;
+}
+
+#store-steps div.active {
+  background-color: var(--chat-hover);
 }
 
 /* Tooltip container */
@@ -1406,6 +1429,9 @@ form.public {
     padding: 5px 10px;
   }
   .profile-photo-container .identicon-container * { max-width: 80px; max-height: 80px; text-align: center;}
+  .side-padding-xs {
+    padding: 5px 0 0 5px;
+  }
 }
 
 @media (min-width: 576px) {
