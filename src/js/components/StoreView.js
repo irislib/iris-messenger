@@ -23,38 +23,31 @@ class StoreView extends Component {
     this.followedUsers = new Set();
     this.followers = new Set();
     this.cart = {};
-    this.state = {
-      items: {
-        aa: {name: 'Doge T-shirt', description: 'Amazing t shirt with doge', price: '100€'},
-        bb: {name: 'Doge Mug', description: 'Wonderful mug with doge', price: '200€'},
-        cc: {name: 'Iris Sticker', description: 'Very sticky stickers', price: '10€'},
-        dd: {name: 'Iris virtual badge', description: 'Incredible profile badge', price: '5€'},
-        ee: {name: 'Gun hosting', description: 'Top gun hosting', price: '10€ / month'}
-      }
-    };
+    this.state = {items:{}};
+    this.items = {};
   }
 
   addToCart(k, e) {
     e.stopPropagation();
     const count = (this.cart[k] || 0) + 1;
-    localState.get('cart').get(this.props.id).get(k).put(count);
+    localState.get('cart').get(this.props.store).get(k).put(count);
   }
 
   render() {
     const cartTotalItems = Object.values(this.cart).reduce((sum, current) => sum + current, 0);
-    this.isMyProfile = Session.getPubKey() === this.props.id;
-    const chat = chats[this.props.id];
+    this.isMyProfile = Session.getPubKey() === this.props.store;
+    const chat = chats[this.props.store];
     const uuid = chat && chat.uuid;
     const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
-    const followable = !(this.isMyProfile || this.props.id.length < 40);
+    const followable = !(this.isMyProfile || this.props.store.length < 40);
     let profilePhoto;
     if (this.isMyProfile) {
-      profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
+      profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.store} callback=${src => this.onProfilePhotoSet(src)}/>`;
     } else {
       if (this.state.photo) {
         profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
       } else {
-        profilePhoto = html`<${Identicon} str=${this.props.id} width=250/>`
+        profilePhoto = html`<${Identicon} str=${this.props.store} width=250/>`
       }
     }
     return html`
@@ -66,30 +59,29 @@ class StoreView extends Component {
               ${profilePhoto}
             </div>
             <div class="profile-header-stuff">
-              <h3 class="profile-name"><iris-profile-attribute placeholder="Name" contenteditable=${this.isMyProfile} pub=${this.props.id}/></h3>
+              <h3 class="profile-name"><iris-profile-attribute placeholder="Name" contenteditable=${this.isMyProfile} pub=${this.props.store}/></h3>
               <div class="profile-about hidden-xs">
                 <p class="profile-about-content">
-                  <iris-profile-attribute placeholder="About" contenteditable=${this.isMyProfile} attr="about" pub=${this.props.id}/>
+                  <iris-profile-attribute placeholder="About" contenteditable=${this.isMyProfile} attr="about" pub=${this.props.store}/>
                 </p>
               </div>
               <div class="profile-actions">
                 <div class="follow-count">
-                  <a href="/follows/${this.props.id}">
+                  <a href="/follows/${this.props.store}">
                     <span>${this.state.followedUserCount}</span> ${t('following')}
                   </a>
-                  <a href="/followers/${this.props.id}">
+                  <a href="/followers/${this.props.store}">
                     <span>${this.state.followerCount}</span> ${t('known_followers')}
                   </a>
                 </div>
                 ${this.followedUsers.has(Session.getPubKey()) ? html`
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
-                ${followable ? html`<${FollowButton} id=${this.props.id}/>` : ''}
-                <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
+                ${followable ? html`<${FollowButton} id=${this.props.store}/>` : ''}
+                <button onClick=${() => route('/chat/' + this.props.store)}>${t('send_message')}</button>
                 ${uuid ? '' : html`
                   <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
                 `}
-                <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
                 ${this.isMyProfile ? '' : html`
                   <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
                 `}
@@ -99,27 +91,25 @@ class StoreView extends Component {
           <div class="profile-about visible-xs-flex">
             <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
-
-          <p id="profile-page-qr" style="display:none" class="qr-container"></p>
         </div>
 
         <h3>Store</h3>
         ${cartTotalItems ? html`
           <p>
-            <button onClick=${() => route('/checkout/' + this.props.id)}>Shopping cart (${cartTotalItems})</button>
+            <button onClick=${() => route('/checkout/' + this.props.store)}>Shopping cart (${cartTotalItems})</button>
           </p>
         ` : ''}
         ${this.isMyProfile ? html`
-          <div class="store-item" onClick=${() => route(`/product//${this.props.id}`)}>
-            <a href="/product/new/${this.props.id}" class="name">Add item</a>
+          <div class="store-item" onClick=${() => route(`/product/new`)}>
+            <a href="/product/new" class="name">Add item</a>
           </div>
         ` : ''}
         ${Object.keys(this.state.items).map(k => {
           const i = this.state.items[k];
           return html`
-            <div class="store-item" onClick=${() => route(`/product/${k}/${this.props.id}`)}>
+            <div class="store-item" onClick=${() => route(`/product/${k}/${this.props.store}`)}>
               <${SafeImg} src=${i.thumbnail}/>
-              <a href="/product/${k}/${this.props.id}" class="name">${i.name}</a>
+              <a href="/product/${k}/${this.props.store}" class="name">${i.name}</a>
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>
               <button class="add" onClick=${e => this.addToCart(k, e)}>
@@ -139,34 +129,44 @@ class StoreView extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.id !== this.props.id) {
+    if (prevProps.store !== this.props.store) {
       this.componentDidMount();
     }
   }
 
+  updateTotalPrice() {
+    const totalPrice = Object.keys(this.cart).reduce((sum, currentKey) => {
+      const item = this.items[currentKey];
+      const price = item && parseInt(item.price) || 0;
+      return sum + price * this.cart[currentKey];
+    }, 0);
+    this.setState({totalPrice});
+  }
+
   componentDidMount() {
-    const pub = this.props.id;
+    const pub = this.props.store;
     this.eventListeners.forEach(e => e.off());
-    this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
+    this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', totalPrice: 0});
     this.isMyProfile = Session.getPubKey() === pub;
     this.cart = {};
 
-    var qrCodeEl = $('#profile-page-qr');
-    qrCodeEl.empty();
-    localState.get('cart').get(this.props.id).map().on((v, k) => {
+    localState.get('cart').get(this.props.store).map().on((v, k) => {
       this.cart[k] = v;
       this.setState({cart: this.cart})
+      this.updateTotalPrice();
     });
 
-    qrCodeEl.empty();
-    new QRCode(qrCodeEl[0], {
-      text: 'https://iris.to/' + window.location.hash,
-      width: 300,
-      height: 300,
-      colorDark : "#000000",
-      colorLight : "#ffffff",
-      correctLevel : QRCode.CorrectLevel.H
-    });
+    if (pub) {
+      publicState.user(pub).get('store').get('products').map().on((p, id) => {
+        if (p) {
+          const o = {};
+          o[id] = p;
+          Object.assign(this.items, o);
+          this.setState({items: this.items});
+          this.updateTotalPrice();
+        }
+      });
+    }
   }
 }
 

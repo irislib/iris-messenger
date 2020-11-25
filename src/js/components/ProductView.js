@@ -15,33 +15,47 @@ import MessageFeed from './MessageFeed.js';
 import Identicon from './Identicon.js';
 import Name from './Name.js';
 import SearchBox from './SearchBox.js';
+import StoreView from './StoreView.js';
 
-class ProductView extends Component {
+class ProductView extends StoreView {
   constructor() {
     super();
     this.eventListeners = [];
     this.followedUsers = new Set();
     this.followers = new Set();
-    this.cart = {};
-    this.state = {
-      items: {
-        aa: {name: 'Doge T-shirt', description: 'Amazing t shirt with doge', price: '100€'},
-        bb: {name: 'Doge Mug', description: 'Wonderful mug with doge', price: '200€'},
-        cc: {name: 'Iris Sticker', description: 'Very sticky stickers', price: '10€'},
-        dd: {name: 'Iris virtual badge', description: 'Incredible profile badge', price: '5€'},
-        ee: {name: 'Gun hosting', description: 'Top gun hosting', price: '10€ / month'}
-      }
-    };
   }
 
   addToCart() {
-    const count = (this.cart[this.props.id] || 0) + 1;
-    localState.get('cart').get(this.props.store).get(this.props.id).put(count);
+    const count = (this.cart[this.props.product] || 0) + 1;
+    localState.get('cart').get(this.props.store).get(this.props.product).put(count);
   }
 
-  showProduct() {
+  newProduct() {
+    return html`
+      <div class="main-view" id="profile">
+        <div class="content">
+          <a href="/store/${Session.getPubKey()}"><iris-profile-attribute pub=${Session.getPubKey()} /></a>
+          <h3>Add item</h3>
+          <h2 contenteditable placeholder="Item name" onInput=${e => this.newProductName = e.target.innerText} />
+          <textarea placeholder="Item description" onInput=${e => this.newProductDescription = e.target.value} style="resize: vertical"/>
+          <input type="number" placeholder="Price" onInput=${e => this.newProductPrice = parseInt(e.target.value)}/>
+          <hr/>
+          <p>
+            Item ID:
+          </p>
+          <p>
+            <input placeholder="Item ID" onInput=${e => this.newProductId = e.target.value} />
+          </p>
+          <button onClick=${e => this.addItemClicked(e)}>Add item</button>
+        </div>
+      </div>
+    `;
+  }
+
+  render() {
     const cartTotalItems = Object.values(this.cart).reduce((sum, current) => sum + current, 0);
-    const i = this.state.items[this.props.id];
+    const i = this.state.product;
+    if (!i) return html``;
     return html`
     <div class="main-view" id="profile">
       <div class="content">
@@ -51,42 +65,20 @@ class ProductView extends Component {
             <button onClick=${() => route('/checkout/' + this.props.store)}>Shopping cart (${cartTotalItems})</button>
           </p>
         ` : ''}
-        <h3>${i.name}</h3>
-        <${SafeImg} src=${i.thumbnail}/>
-        <p class="description">${i.description}</p>
-        <p class="price">${i.price}</p>
-        <button class="add" onClick=${() => this.addToCart()}>
-          Add to cart
-          ${this.cart[this.props.id] ? ` (${this.cart[this.props.id]})` : ''}
-        </button>
+        ${this.state.product ? html`
+          <h3>${i.name}</h3>
+          <${SafeImg} src=${i.thumbnail}/>
+          <p class="description">${i.description}</p>
+          <p class="price">${i.price}</p>
+          <button class="add" onClick=${() => this.addToCart()}>
+            Add to cart
+            ${this.cart[this.props.product] ? ` (${this.cart[this.props.product]})` : ''}
+          </button>
+        ` : ''}
+
+        ${this.props.store && this.props.product ? '' : this.newProduct()}
       </div>
     </div>`;
-  }
-
-  newProduct() {
-    return html`<div class="main-view">add product</div>`
-  }
-
-  render() {
-    this.isMyProfile = Session.getPubKey() === this.props.id;
-    const chat = chats[this.props.id];
-    const uuid = chat && chat.uuid;
-    const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
-    const followable = !(this.isMyProfile || this.props.id.length < 40);
-    let profilePhoto;
-    if (this.isMyProfile) {
-      profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
-    } else {
-      if (this.state.photo) {
-        profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
-      } else {
-        profilePhoto = html`<${Identicon} str=${this.props.id} width=250/>`
-      }
-    }
-    if (this.props.id && this.props.store) {
-      return this.showProduct();
-    }
-    return this.newProduct();
   }
 
   componentWillUnmount() {
@@ -94,21 +86,31 @@ class ProductView extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.id !== this.props.id) {
+    if (prevProps.product !== this.props.product) {
       this.componentDidMount();
     }
   }
 
+  addItemClicked(e) {
+    const product = {
+      name: this.newProductName,
+      description: this.newProductDescription,
+      price: this.newProductPrice
+    };
+    console.log(product);
+    publicState.user().get('store').get('products').get(this.newProductId).put(product);
+    route(`/store/${Session.getPubKey()}`)
+  }
+
   componentDidMount() {
-    const pub = this.props.id;
+    StoreView.prototype.componentDidMount.call(this);
+    const pub = this.props.store;
     this.eventListeners.forEach(e => e.off());
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     this.isMyProfile = Session.getPubKey() === pub;
-    this.cart = {};
-    localState.get('cart').get(this.props.store).map().on((v, k) => {
-      this.cart[k] = v;
-      this.setState({cart: this.cart})
-    });
+    if (this.props.product && pub) {
+      publicState.user(pub).get('store').get('products').get(this.props.product).on(product => this.setState({product}));
+    }
   }
 }
 

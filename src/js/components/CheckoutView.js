@@ -15,33 +15,24 @@ import MessageFeed from './MessageFeed.js';
 import Identicon from './Identicon.js';
 import Name from './Name.js';
 import SearchBox from './SearchBox.js';
+import StoreView from './StoreView.js';
 
-class CheckoutView extends Component {
+class CheckoutView extends StoreView {
   constructor() {
     super();
     this.eventListeners = [];
     this.followedUsers = new Set();
     this.followers = new Set();
-    this.cart = {};
-    this.state = {
-      paymentMethod: 'bitcoin',
-      items: {
-        aa: {name: 'Doge T-shirt', description: 'Amazing t shirt with doge', price: '100€'},
-        bb: {name: 'Doge Mug', description: 'Wonderful mug with doge', price: '200€'},
-        cc: {name: 'Iris Sticker', description: 'Very sticky stickers', price: '10€'},
-        dd: {name: 'Iris virtual badge', description: 'Incredible profile badge', price: '5€'},
-        ee: {name: 'Gun hosting', description: 'Top gun hosting', price: '10€ / month'}
-      }
-    };
+    this.state.paymentMethod = 'bitcoin';
   }
 
   changeItemCount(k, v, e) {
     this.cart[k] = Math.max(this.cart[k] + v, 0);
-    localState.get('cart').get(this.props.id).get(k).put(this.cart[k]);
+    localState.get('cart').get(this.props.store).get(k).put(this.cart[k]);
   }
 
   confirm() {
-    const pub = this.props.id;
+    const pub = this.props.store;
     localState.get('cart').get(pub).map().once((v, k) => {
       !!v && localState.get('cart').get(pub).get(k).put(null);
     });
@@ -51,19 +42,18 @@ class CheckoutView extends Component {
   }
 
   renderCart() {
-    const total = Object.keys(this.cart).reduce((sum, currentKey) => {
-      return sum + parseInt(this.state.items[currentKey].price) * this.cart[currentKey];
-    }, 0);
     return html`
       <h3 class="side-padding-xs">Shopping cart</h3>
       <div class="flex-table">
-        ${Object.keys(this.cart).filter(k => !!this.cart[k]).map(k => {
+        ${Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.state.items[k]).map(k => {
           const i = this.state.items[k];
           return html`
             <div class="flex-row">
               <div class="flex-cell">
-                <${SafeImg} src=${i.thumbnail}/>
-                ${i.name}
+                <a href=${'/product/' + k + '/' + this.props.store}>
+                  <${SafeImg} src=${i.thumbnail}/>
+                  ${i.name || 'item'}
+                </a>
               </div>
               <div class="flex-cell no-flex price-cell">
                 <p>
@@ -79,7 +69,7 @@ class CheckoutView extends Component {
         })}
         <div class="flex-row">
           <div class="flex-cell"></div>
-          <div class="flex-cell no-flex"><b>Total ${total} €</b></div>
+          <div class="flex-cell no-flex"><b>Total ${this.state.totalPrice} €</b></div>
         </div>
       </div>
       <p class="side-padding-xs">
@@ -133,9 +123,6 @@ class CheckoutView extends Component {
   }
 
   renderConfirmation() {
-    const total = Object.keys(this.cart).reduce((sum, currentKey) => {
-      return sum + parseInt(this.state.items[currentKey].price) * this.cart[currentKey];
-    }, 0);
     return html`
       <h3 class="side-padding-xs">Confirmation</h3>
       <div class="flex-table">
@@ -145,7 +132,7 @@ class CheckoutView extends Component {
             <div class="flex-row">
               <div class="flex-cell">
                 <${SafeImg} src=${i.thumbnail}/>
-                ${i.name}
+                ${i.name || 'item'}
               </div>
               <div class="flex-cell no-flex price-cell">
                 <p>
@@ -158,7 +145,7 @@ class CheckoutView extends Component {
         })}
         <div class="flex-row">
           <div class="flex-cell"></div>
-          <div class="flex-cell no-flex"><b>Total ${total} €</b></div>
+          <div class="flex-cell no-flex"><b>Total ${this.state.totalPrice} €</b></div>
         </div>
       </div>
       <p>
@@ -188,7 +175,7 @@ class CheckoutView extends Component {
     <div class="main-view" id="profile">
       <div class="content">
         <p>
-          <a href="/store/${this.props.id}"><iris-profile-attribute pub=${this.props.id}/></a>
+          <a href="/store/${this.props.store}"><iris-profile-attribute pub=${this.props.store}/></a>
         </p>
         <div id="store-steps">
           <div class=${p === 'cart' ? 'active' : ''} onClick=${() => this.setState({page:'cart'})}>Cart</div>
@@ -206,19 +193,19 @@ class CheckoutView extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.id !== this.props.id) {
+    if (prevProps.store !== this.props.store) {
       this.componentDidMount();
     }
   }
 
   componentDidMount() {
-    const pub = this.props.id;
+    StoreView.prototype.componentDidMount.call(this);
+    const pub = this.props.store;
     this.setState({page:'cart'})
     this.eventListeners.forEach(e => e.off());
-    this.cart = {};
     localState.get('cart').get(pub).map().on((v, k) => {
       this.cart[k] = v;
-      this.setState({cart: this.cart})
+      this.setState({cart: this.cart});
     });
     localState.get('paymentMethod').on(paymentMethod => this.setState({paymentMethod}));
     localState.get('delivery').open(delivery => this.setState({delivery}));

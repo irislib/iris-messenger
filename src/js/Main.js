@@ -78,9 +78,10 @@ class Main extends Component {
           <${Settings} path="/settings"/>
           <${LogoutConfirmation} path="/logout"/>
           <${Profile.Profile} path="/profile/:id"/>
-          <${StoreView} path="/store/:id"/>
-          <${CheckoutView} path="/checkout/:id"/>
-          <${ProductView} path="/product/:id/:store"/>
+          <${StoreView} path="/store/:store"/>
+          <${CheckoutView} path="/checkout/:store"/>
+          <${ProductView} path="/product/:product/:store"/>
+          <${ProductView} path="/product/new"/>
           <${FollowsView} path="/follows/:id"/>
           <${FollowsView} followers=${true} path="/followers/:id"/>
         </${Router}>
