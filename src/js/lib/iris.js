@@ -2999,7 +2999,7 @@
 	    }
 	    var sheet = document.createElement('style');
 	    sheet.id = elementId;
-	    sheet.innerHTML = '\n      .iris-follow-button .hover {\n        display: none;\n      }\n\n      .iris-follow-button.following:hover .hover {\n        display: inline;\n      }\n\n      .iris-follow-button.following:hover .nonhover {\n        display: none;\n      }\n\n      .iris-identicon * {\n        box-sizing: border-box;\n      }\n\n      .iris-identicon {\n        vertical-align: middle;\n        border-radius: 50%;\n        text-align: center;\n        display: inline-block;\n        position: relative;\n        max-width: 100%;\n      }\n\n      .iris-distance {\n        z-index: 2;\n        position: absolute;\n        left:0%;\n        top:2px;\n        width: 100%;\n        text-align: right;\n        color: #fff;\n        text-shadow: 0 0 1px #000;\n        font-size: 75%;\n        line-height: 75%;\n        font-weight: bold;\n      }\n\n      .iris-pie {\n        border-radius: 50%;\n        position: absolute;\n        top: 0;\n        left: 0;\n        box-shadow: 0px 0px 0px 0px #82FF84;\n        padding-bottom: 100%;\n        max-width: 100%;\n        -webkit-transition: all 0.2s ease-in-out;\n        -moz-transition: all 0.2s ease-in-out;\n        transition: all 0.2s ease-in-out;\n      }\n\n      .iris-card {\n        padding: 10px;\n        background-color: #f7f7f7;\n        color: #777;\n        border: 1px solid #ddd;\n        display: flex;\n        flex-direction: row;\n        overflow: hidden;\n      }\n\n      .iris-card a {\n        -webkit-transition: color 150ms;\n        transition: color 150ms;\n        text-decoration: none;\n        color: #337ab7;\n      }\n\n      .iris-card a:hover, .iris-card a:active {\n        text-decoration: underline;\n        color: #23527c;\n      }\n\n      .iris-pos {\n        color: #3c763d;\n      }\n\n      .iris-neg {\n        color: #a94442;\n      }\n\n      .iris-identicon img {\n        position: absolute;\n        top: 0;\n        left: 0;\n        max-width: 100%;\n        border-radius: 50%;\n        border-color: transparent;\n        border-style: solid;\n      }\n\n      .iris-chat-open-button {\n        background-color: #1e1e1e;\n        color: #fff;\n        padding: 15px;\n        cursor: pointer;\n        user-select: none;\n      }\n\n      .iris-chat-open-button svg {\n        width: 1em;\n      }\n\n      .iris-chat-open-button, .iris-chat-box {\n        position: fixed;\n        bottom: 0.5rem;\n        right: 0.5rem;\n        border-radius: 8px;\n        font-family: system-ui;\n        font-size: 15px;\n      }\n\n      .iris-chat-box {\n        background-color: #fff;\n        max-height: 25rem;\n        box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);\n        height: calc(100% - 44px);\n        display: flex;\n        flex-direction: column;\n        width: 320px;\n        color: rgb(38, 38, 38);\n      }\n\n      .iris-chat-box.minimized {\n        height: auto;\n      }\n\n      .iris-chat-box.minimized .iris-chat-header {\n        border-radius: 8px;\n        cursor: pointer;\n      }\n\n      .iris-chat-box.minimized .iris-chat-messages, .iris-chat-box.minimized .iris-typing-indicator, .iris-chat-box.minimized .iris-chat-input-wrapper, .iris-chat-box.minimized .iris-chat-minimize, .iris-chat-box.minimized .iris-chat-close {\n        display: none;\n      }\n\n      .iris-chat-header {\n        background-color: #1e1e1e;\n        height: 44px;\n        color: #fff;\n        border-radius: 8px 8px 0 0;\n        text-align: center;\n        display: flex;\n        flex-direction: row;\n        justify-content: center;\n        align-items: center;\n        flex: none;\n        white-space: nowrap;\n        text-overflow: ellipsis;\n        overflow: hidden;\n      }\n\n      .iris-chat-header-text {\n        flex: 1;\n      }\n\n      .iris-online-indicator {\n        color: #bfbfbf;\n        margin-right: 5px;\n        font-size: 12px;\n        user-select: none;\n        flex: none;\n      }\n\n      .iris-online-indicator.yes {\n        color: #80bf5f;\n      }\n\n      .iris-typing-indicator {\n        display: none;\n        background-color: rgba(255, 255, 255, 0.5);\n        font-size: 12px;\n        padding: 2px;\n        color: #777;\n      }\n\n      .iris-typing-indicator.yes {\n        display: block;\n      }\n\n      .iris-chat-messages {\n        flex: 1;\n        padding: 15px;\n        overflow-y: scroll;\n      }\n\n      .iris-chat-input-wrapper {\n        flex: none;\n        padding: 15px;\n        background-color: #efefef;\n        display: flex;\n        flex-direction: row;\n        border-radius: 0 0 8px 8px;\n      }\n\n      .iris-chat-input-wrapper textarea {\n        padding: 15px 8px;\n        border-radius: 4px;\n        border: 1px solid rgba(0,0,0,0);\n        width: auto;\n        font-size: 15px;\n        resize: none;\n        flex: 1;\n      }\n\n      .iris-chat-input-wrapper textarea:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-input-wrapper button svg {\n        display: inline-block;\n        font-size: inherit;\n        height: 1em;\n        width: 1em;\n        overflow: visible;\n        vertical-align: -0.125em;\n      }\n\n      .iris-chat-input-wrapper button, .iris-chat-input-wrapper button:hover, .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        flex: none;\n        color: #999;\n        background-color: transparent;\n        font-size: 30px;\n        padding: 5px;\n        border: 1px solid rgba(0,0,0,0);\n        border-radius: 4px;\n        margin-left: 5px;\n      }\n\n      .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-message {\n        display: flex;\n        flex-direction: column;\n        margin-bottom: 2px;\n        overflow-wrap: break-word;\n      }\n\n      .iris-msg-content {\n        background-color: #efefef;\n        padding: 6px 10px;\n        border-radius: 8px;\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        flex: none;\n        max-width: 75%;\n      }\n\n      .emoji {\n        font-size: 1.3em;\n        line-height: 1em;\n      }\n\n      .iris-chat-message .emoji-only {\n        font-size: 3em;\n        text-align: center;\n      }\n\n      .iris-seen {\n        color: rgba(0, 0, 0, 0.45);\n        user-select: none;\n      }\n\n      .iris-seen.yes {\n        color: #4fc3f7;\n      }\n\n      .iris-seen svg {\n        width: 18px;\n      }\n\n      .iris-delivered-checkmark {\n        display: none;\n      }\n\n      .delivered .iris-delivered-checkmark {\n        display: initial;\n      }\n\n      .iris-chat-minimize, .iris-chat-close {\n        user-select: none;\n        cursor: pointer;\n        width: 45px;\n        line-height: 44px;\n      }\n\n      .iris-chat-message.their {\n        align-items: flex-start;\n      }\n\n      .iris-chat-message.their + .iris-chat-message.our .iris-msg-content, .day-separator + .iris-chat-message.our .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.their:first-of-type .iris-msg-content {\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our:first-of-type .iris-msg-content {\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.our + .iris-chat-message.their .iris-msg-content, .day-separator + .iris-chat-message.their .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our {\n        align-items: flex-end;\n      }\n\n      .iris-chat-message.our .iris-msg-content {\n        background-color: #c5ecf7;\n      }\n\n      .iris-chat-message .time {\n        text-align: right;\n        font-size: 12px;\n        color: rgba(0, 0, 0, 0.45);\n      }\n\n      .day-separator {\n        display: inline-block;\n        border-radius: 8px;\n        background-color: rgba(227, 249, 255, 0.91);\n        padding: 6px 10px;\n        margin-top: 15px;\n        margin-left: auto;\n        margin-right: auto;\n        text-transform: uppercase;\n        font-size: 13px;\n        color: rgba(74, 74, 74, 0.88);\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        user-select: none;\n      }\n\n      .day-separator:first-of-type {\n        margin-top: 0;\n      }\n\n      *[contenteditable="true"]:not(:focus) {\n        cursor: pointer;\n      }\n\n      *[contenteditable="true"] {\n        outline: none;\n      }\n\n      [placeholder]:empty::before {\n        content: attr(placeholder);\n        color: #999;\n      }\n\n      [placeholder]:empty:focus::before {\n          content: "\\200b";\n      }\n      ';
+	    sheet.innerHTML = '\n      .iris-follow-button .hover {\n        display: none;\n      }\n\n      .iris-follow-button.following:hover .hover {\n        display: inline;\n      }\n\n      .iris-follow-button.following:hover .nonhover {\n        display: none;\n      }\n\n      .iris-identicon * {\n        box-sizing: border-box;\n      }\n\n      .iris-identicon {\n        vertical-align: middle;\n        border-radius: 50%;\n        text-align: center;\n        display: inline-block;\n        position: relative;\n        max-width: 100%;\n      }\n\n      .iris-distance {\n        z-index: 2;\n        position: absolute;\n        left:0%;\n        top:2px;\n        width: 100%;\n        text-align: right;\n        color: #fff;\n        text-shadow: 0 0 1px #000;\n        font-size: 75%;\n        line-height: 75%;\n        font-weight: bold;\n      }\n\n      .iris-pie {\n        border-radius: 50%;\n        position: absolute;\n        top: 0;\n        left: 0;\n        box-shadow: 0px 0px 0px 0px #82FF84;\n        padding-bottom: 100%;\n        max-width: 100%;\n        -webkit-transition: all 0.2s ease-in-out;\n        -moz-transition: all 0.2s ease-in-out;\n        transition: all 0.2s ease-in-out;\n      }\n\n      .iris-card {\n        padding: 10px;\n        background-color: #f7f7f7;\n        color: #777;\n        border: 1px solid #ddd;\n        display: flex;\n        flex-direction: row;\n        overflow: hidden;\n      }\n\n      .iris-card a {\n        -webkit-transition: color 150ms;\n        transition: color 150ms;\n        text-decoration: none;\n        color: #337ab7;\n      }\n\n      .iris-card a:hover, .iris-card a:active {\n        text-decoration: underline;\n        color: #23527c;\n      }\n\n      .iris-pos {\n        color: #3c763d;\n      }\n\n      .iris-neg {\n        color: #a94442;\n      }\n\n      .iris-identicon img {\n        position: absolute;\n        top: 0;\n        left: 0;\n        max-width: 100%;\n        border-radius: 50%;\n        border-color: transparent;\n        border-style: solid;\n      }\n\n      .iris-chat-open-button {\n        background-color: #1e1e1e;\n        color: #fff;\n        padding: 15px;\n        cursor: pointer;\n        user-select: none;\n      }\n\n      .iris-chat-open-button svg {\n        width: 1em;\n      }\n\n      .iris-chat-open-button, .iris-chat-box {\n        position: fixed;\n        bottom: 0.5rem;\n        right: 0.5rem;\n        border-radius: 8px;\n        font-family: system-ui;\n        font-size: 15px;\n      }\n\n      .iris-chat-box {\n        background-color: #fff;\n        max-height: 25rem;\n        box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);\n        height: calc(100% - 44px);\n        display: flex;\n        flex-direction: column;\n        width: 320px;\n        color: rgb(38, 38, 38);\n      }\n\n      .iris-chat-box.minimized {\n        height: auto;\n      }\n\n      .iris-chat-box.minimized .iris-chat-header {\n        border-radius: 8px;\n        cursor: pointer;\n      }\n\n      .iris-chat-box.minimized .iris-chat-messages, .iris-chat-box.minimized .iris-typing-indicator, .iris-chat-box.minimized .iris-chat-input-wrapper, .iris-chat-box.minimized .iris-chat-minimize, .iris-chat-box.minimized .iris-chat-close {\n        display: none;\n      }\n\n      .iris-chat-header {\n        background-color: #1e1e1e;\n        height: 44px;\n        color: #fff;\n        border-radius: 8px 8px 0 0;\n        text-align: center;\n        display: flex;\n        flex-direction: row;\n        justify-content: center;\n        align-items: center;\n        flex: none;\n        white-space: nowrap;\n        text-overflow: ellipsis;\n        overflow: hidden;\n      }\n\n      .iris-chat-header-text {\n        flex: 1;\n      }\n\n      .iris-online-indicator {\n        color: #bfbfbf;\n        margin-right: 5px;\n        font-size: 12px;\n        user-select: none;\n        flex: none;\n      }\n\n      .iris-online-indicator.yes {\n        color: #80bf5f;\n      }\n\n      .iris-typing-indicator {\n        display: none;\n        background-color: rgba(255, 255, 255, 0.5);\n        font-size: 12px;\n        padding: 2px;\n        color: #777;\n      }\n\n      .iris-typing-indicator.yes {\n        display: block;\n      }\n\n      .iris-chat-messages {\n        flex: 1;\n        padding: 15px;\n        overflow-y: scroll;\n      }\n\n      .iris-chat-input-wrapper {\n        flex: none;\n        padding: 15px;\n        background-color: #efefef;\n        display: flex;\n        flex-direction: row;\n        border-radius: 0 0 8px 8px;\n      }\n\n      .iris-chat-input-wrapper textarea {\n        padding: 15px 8px;\n        border-radius: 4px;\n        border: 1px solid rgba(0,0,0,0);\n        width: auto;\n        font-size: 15px;\n        resize: none;\n        flex: 1;\n      }\n\n      .iris-chat-input-wrapper textarea:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-input-wrapper button svg {\n        display: inline-block;\n        font-size: inherit;\n        height: 1em;\n        width: 1em;\n        overflow: visible;\n        vertical-align: -0.125em;\n      }\n\n      .iris-chat-input-wrapper button, .iris-chat-input-wrapper button:hover, .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        flex: none;\n        color: #999;\n        background-color: transparent;\n        font-size: 30px;\n        padding: 5px;\n        border: 1px solid rgba(0,0,0,0);\n        border-radius: 4px;\n        margin-left: 5px;\n      }\n\n      .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-message {\n        display: flex;\n        flex-direction: column;\n        margin-bottom: 2px;\n        overflow-wrap: break-word;\n      }\n\n      .iris-msg-content {\n        background-color: #efefef;\n        padding: 6px 10px;\n        border-radius: 8px;\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        flex: none;\n        max-width: 75%;\n      }\n\n      .emoji {\n        font-size: 1.3em;\n        line-height: 1em;\n      }\n\n      .iris-chat-message .emoji-only {\n        font-size: 3em;\n        text-align: center;\n      }\n\n      .iris-seen {\n        color: rgba(0, 0, 0, 0.45);\n        user-select: none;\n      }\n\n      .iris-seen.yes {\n        color: #4fc3f7;\n      }\n\n      .iris-seen svg {\n        width: 18px;\n      }\n\n      .iris-delivered-checkmark {\n        display: none;\n      }\n\n      .delivered .iris-delivered-checkmark {\n        display: initial;\n      }\n\n      .iris-chat-minimize, .iris-chat-close {\n        user-select: none;\n        cursor: pointer;\n        width: 45px;\n        line-height: 44px;\n      }\n\n      .iris-chat-message.their {\n        align-items: flex-start;\n      }\n\n      .iris-chat-message.their + .iris-chat-message.our .iris-msg-content, .day-separator + .iris-chat-message.our .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.their:first-of-type .iris-msg-content {\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our:first-of-type .iris-msg-content {\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.our + .iris-chat-message.their .iris-msg-content, .day-separator + .iris-chat-message.their .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our {\n        align-items: flex-end;\n      }\n\n      .iris-chat-message.our .iris-msg-content {\n        background-color: #c5ecf7;\n      }\n\n      .iris-chat-message .time {\n        text-align: right;\n        font-size: 12px;\n        color: rgba(0, 0, 0, 0.45);\n      }\n\n      .day-separator {\n        display: inline-block;\n        border-radius: 8px;\n        background-color: rgba(227, 249, 255, 0.91);\n        padding: 6px 10px;\n        margin-top: 15px;\n        margin-left: auto;\n        margin-right: auto;\n        text-transform: uppercase;\n        font-size: 13px;\n        color: rgba(74, 74, 74, 0.88);\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        user-select: none;\n      }\n\n      .day-separator:first-of-type {\n        margin-top: 0;\n      }\n\n      *[contenteditable="true"]:not(:focus) {\n        cursor: pointer;\n      }\n\n      *[contenteditable="true"] {\n        outline: none;\n      }\n\n      [placeholder]:empty:before {\n        content: attr(placeholder);\n        color: #999;\n      }\n\n      [placeholder]:empty:focus {\n        cursor: text;\n      }\n      ';
 	    document.head.prepend(sheet);
 	  },
 	  getUrlParameter: function getUrlParameter(sParam, sParams) {
@@ -11146,14 +11146,14 @@
 	  return Key;
 	}();
 
-	var _templateObject$1 = _taggedTemplateLiteralLoose(['\n      <span ref=', ' contenteditable placeholder=', ' onInput=', '>\n        ', '\n      </span>'], ['\n      <span ref=', ' contenteditable placeholder=', ' onInput=', '>\n        ', '\n      </span>']),
-	    _templateObject2$1 = _taggedTemplateLiteralLoose(['', ''], ['', '']);
+	var _templateObject$1 = _taggedTemplateLiteralLoose(['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        onInput=', '\n        disabled=', ' />\n    '], ['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        onInput=', '\n        disabled=', ' />\n    ']),
+	    _templateObject2$1 = _taggedTemplateLiteralLoose(['\n      <', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    '], ['\n      <', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    ']);
 
-	var ProfileAttribute = function (_Component) {
-	  _inherits(ProfileAttribute, _Component);
+	var TextNode = function (_Component) {
+	  _inherits(TextNode, _Component);
 
-	  function ProfileAttribute() {
-	    _classCallCheck(this, ProfileAttribute);
+	  function TextNode() {
+	    _classCallCheck(this, TextNode);
 
 	    var _this = _possibleConstructorReturn(this, _Component.call(this));
 
@@ -11163,65 +11163,188 @@
 	    return _this;
 	  }
 
-	  ProfileAttribute.prototype.componentDidUpdate = function componentDidUpdate(prevProps) {
-	    if (prevProps.pub !== this.props.pub || prevProps.attr !== this.props.attr) {
+	  TextNode.prototype.componentDidUpdate = function componentDidUpdate(prevProps) {
+	    if (prevProps.pub !== this.props.pub || prevProps.path !== this.props.path) {
 	      this.componentDidMount();
 	    }
 	  };
 
-	  ProfileAttribute.prototype.componentDidMount = function componentDidMount() {
+	  TextNode.prototype.componentDidMount = function componentDidMount() {
 	    var _this2 = this;
 
 	    util.injectCss();
-	    this.attr = this.props.attr || 'name';
-	    this.props.pub && this.getAttr(this.props.pub);
+	    this.path = this.props.path || 'profile/name';
+	    this.props.pub && this.getValue(this.props.pub);
 	    Key$1.getDefault().then(function (key) {
 	      key && _this2.setState({ myPub: key.pub });
 	      if (!_this2.props.pub) {
-	        _this2.getAttr(key.pub);
+	        _this2.getValue(key.pub);
 	      }
 	    });
 	  };
 
-	  ProfileAttribute.prototype.getAttr = function getAttr(pub) {
+	  TextNode.prototype.getNode = function getNode(pub) {
+	    var base = util.getPublicState().user(pub);
+	    var path = this.path.split('/');
+	    return path.reduce(function (sum, current) {
+	      return sum.get(current);
+	    }, base);
+	  };
+
+	  TextNode.prototype.getValue = function getValue(pub) {
 	    var _this3 = this;
 
-	    util.getPublicState().user(pub).get('profile').get(this.attr).on(function (value, a, b$$1, e) {
-	      _this3.eventListeners[_this3.attr] = e;
+	    this.getNode(pub).on(function (value, a, b$$1, e) {
+	      _this3.eventListeners[_this3.path] = e;
 	      if (!(_this3.ref.current && _this3.ref.current === document.activeElement)) {
 	        _this3.setState({ value: value });
 	      }
 	    });
 	  };
 
-	  ProfileAttribute.prototype.componentWillUnmount = function componentWillUnmount() {
+	  TextNode.prototype.componentWillUnmount = function componentWillUnmount() {
 	    _Object$values(this.eventListeners).forEach(function (e) {
 	      return e.off();
 	    });
 	    this.eventListeners = {};
 	  };
 
-	  ProfileAttribute.prototype.onInput = function onInput(e) {
-	    util.getPublicState().user().get('profile').get(this.attr).put(e.target.innerText);
+	  TextNode.prototype.onInput = function onInput(e) {
+	    var text = e.target.value || e.target.innerText;
+	    this.getNode().put(text);
 	  };
 
-	  ProfileAttribute.prototype.render = function render() {
+	  TextNode.prototype.isEditable = function isEditable() {
+	    return (!this.props.pub || this.props.pub === this.state.myPub) && String(this.props.editable) !== 'false';
+	  };
+
+	  TextNode.prototype.renderInput = function renderInput() {
 	    var _this4 = this;
 
-	    if (this.props.pub === this.state.pub && String(this.props.editable) !== 'false') {
-	      return m$1(_templateObject$1, this.ref, this.props.placeholder || this.attr, function (e) {
-	        return _this4.onInput(e);
-	      }, this.state.value);
-	    }
-	    return m$1(_templateObject2$1, this.state.value);
+	    return m$1(_templateObject$1, this.state.value, this.props.placeholder || this.path, function (e) {
+	      return _this4.onInput(e);
+	    }, !this.isEditable());
 	  };
 
-	  return ProfileAttribute;
+	  TextNode.prototype.renderTag = function renderTag() {
+	    var _this5 = this;
+
+	    var placeholder = this.props.placeholder || this.props.path;
+	    var tag = this.props.tag || 'span';
+	    return m$1(_templateObject2$1, tag, this.ref, this.isEditable(), placeholder, function (e) {
+	      return _this5.onInput(e);
+	    }, this.state.value, tag);
+	  };
+
+	  TextNode.prototype.render = function render() {
+	    return this.props.tag === 'input' ? this.renderInput() : this.renderTag();
+	  };
+
+	  return TextNode;
 	}(d);
 
-	register(ProfileAttribute, 'iris-profile-attribute', ['attr', 'pub', 'placeholder', 'editable']);
+	register(TextNode, 'iris-text', ['path', 'pub', 'placeholder', 'editable', 'tag']);
 
-	var _templateObject$2 = _taggedTemplateLiteralLoose(['<button class=', ' onClick=', '>', '</button>'], ['<button class=', ' onClick=', '>', '</button>']);
+	var _templateObject$2 = _taggedTemplateLiteralLoose(['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        onInput=', '\n        disabled=', ' />\n    '], ['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        onInput=', '\n        disabled=', ' />\n    ']),
+	    _templateObject2$2 = _taggedTemplateLiteralLoose(['\n      <', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    '], ['\n      <', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    ']),
+	    _templateObject3 = _taggedTemplateLiteralLoose(['<img style=', ' onClick=', ' src=', ' ...', '/>'], ['<img style=', ' onClick=', ' src=', ' ...', '/>']),
+	    _templateObject4 = _taggedTemplateLiteralLoose(['<button class=', ' onClick=', '>Add image</button>'], ['<button class=', ' onClick=', '>Add image</button>']),
+	    _templateObject5 = _taggedTemplateLiteralLoose(['\n      <span>\n        <input name="profile-photo-input" type="file" style="display:none;" onChange=', ' accept="image/*"/>\n        ', '\n      </span>\n    '], ['\n      <span>\n        <input name="profile-photo-input" type="file" style="display:none;" onChange=', ' accept="image/*"/>\n        ', '\n      </span>\n    ']);
+
+	var toBase64 = function toBase64(file) {
+	  return new _Promise(function (resolve, reject) {
+	    var reader = new FileReader();
+	    reader.readAsDataURL(file);
+	    reader.onload = function () {
+	      return resolve(reader.result);
+	    };
+	    reader.onerror = function (error) {
+	      return reject(error);
+	    };
+	  });
+	};
+
+	var ImageNode = function (_TextNode) {
+	  _inherits(ImageNode, _TextNode);
+
+	  function ImageNode() {
+	    _classCallCheck(this, ImageNode);
+
+	    return _possibleConstructorReturn(this, _TextNode.apply(this, arguments));
+	  }
+
+	  ImageNode.prototype.getValue = function getValue(pub) {
+	    var _this2 = this;
+
+	    this.getNode(pub).on(function (value, a, b$$1, e) {
+	      _this2.eventListeners[_this2.path] = e;
+	      _this2.setState({ value: value });
+	    });
+	  };
+
+	  ImageNode.prototype.onChange = async function onChange(e) {
+	    var file = e.target.files[0];
+	    var data = await toBase64(file);
+	    this.getNode().put(data);
+	  };
+
+	  ImageNode.prototype.renderInput = function renderInput() {
+	    var _this3 = this;
+
+	    return m$1(_templateObject$2, this.state.value, this.props.placeholder || this.path, function (e) {
+	      return _this3.onInput(e);
+	    }, !this.isEditable());
+	  };
+
+	  ImageNode.prototype.renderTag = function renderTag() {
+	    var _this4 = this;
+
+	    var placeholder = this.props.placeholder || this.props.path;
+	    var tag = this.props.tag || 'span';
+	    return m$1(_templateObject2$2, tag, this.ref, this.isEditable(), placeholder, function (e) {
+	      return _this4.onInput(e);
+	    }, this.state.value, tag);
+	  };
+
+	  ImageNode.prototype.onClick = function onClick(e) {
+	    if (this.isEditable()) {
+	      this.base.firstChild.click();
+	    }
+	  };
+
+	  ImageNode.prototype.render = function render() {
+	    var _this5 = this;
+
+	    var editable = this.isEditable();
+	    var val = this.state.value;
+	    var src = val && val.indexOf('data:image') === 0 ? val : this.props.placeholder;
+	    var _props = this.props,
+	        alt = _props.alt,
+	        width = _props.width,
+	        height = _props.height;
+
+	    var el = void 0;
+	    if (src) {
+	      var style = editable ? 'cursor: pointer;' : '';
+	      el = m$1(_templateObject3, style, function (e) {
+	        return _this5.onClick(e);
+	      }, val, { alt: alt, width: width, height: height });
+	    } else if (editable) {
+	      el = m$1(_templateObject4, this.props['btn-class'], function (e) {
+	        return _this5.onClick(e);
+	      });
+	    }
+	    return m$1(_templateObject5, function (e) {
+	      return _this5.onChange(e);
+	    }, el);
+	  };
+
+	  return ImageNode;
+	}(TextNode);
+
+	register(ImageNode, 'iris-img', ['path', 'pub', 'placeholder', 'editable', 'alt', 'width', 'height']);
+
+	var _templateObject$3 = _taggedTemplateLiteralLoose(['<button class=', ' onClick=', '>', '</button>'], ['<button class=', ' onClick=', '>', '</button>']);
 
 	var CopyButton = function (_Component) {
 	  _inherits(CopyButton, _Component);
@@ -11289,7 +11412,7 @@
 	    var _this4 = this;
 
 	    var text = this.state.copied ? this.props['copied-text'] || 'Copied' : this.props.text || 'Copy';
-	    return m$1(_templateObject$2, this.props['inner-class'] || 'copy-button', function (e) {
+	    return m$1(_templateObject$3, this.props['inner-class'] || 'copy-button', function (e) {
 	      return _this4.onClick(e);
 	    }, text);
 	  };
@@ -11299,7 +11422,7 @@
 
 	register(CopyButton, 'iris-copy-button', ['str', 'not-shareable', 'text', 'copied-text', 'title', 'inner-class']);
 
-	var _templateObject$3 = _taggedTemplateLiteralLoose(['\n      <button class="iris-follow-button ', ' ', '" onClick=', '>\n        <span class="nonhover">', '</span>\n        <span class="hover">Unfollow</span>\n      </button>\n    '], ['\n      <button class="iris-follow-button ', ' ', '" onClick=', '>\n        <span class="nonhover">', '</span>\n        <span class="hover">Unfollow</span>\n      </button>\n    ']);
+	var _templateObject$4 = _taggedTemplateLiteralLoose(['\n      <button class="iris-follow-button ', ' ', '" onClick=', '>\n        <span class="nonhover">', '</span>\n        <span class="hover">Unfollow</span>\n      </button>\n    '], ['\n      <button class="iris-follow-button ', ' ', '" onClick=', '>\n        <span class="nonhover">', '</span>\n        <span class="hover">Unfollow</span>\n      </button>\n    ']);
 
 	var FollowButton = function (_Component) {
 	  _inherits(FollowButton, _Component);
@@ -11341,7 +11464,7 @@
 	  FollowButton.prototype.render = function render() {
 	    var _this3 = this;
 
-	    return m$1(_templateObject$3, this.state.following ? 'following' : '', this.props['inner-class'] || '', function (e) {
+	    return m$1(_templateObject$4, this.state.following ? 'following' : '', this.props['inner-class'] || '', function (e) {
 	      return _this3.onClick(e);
 	    }, this.state.following ? 'Following' : 'Follow');
 	  };
@@ -13473,9 +13596,9 @@
 	  register$1(ExtendedSearch);
 	}
 
-	var _templateObject$4 = _taggedTemplateLiteralLoose(['\n      <div class="iris-search-box" style="position: relative;">\n        <form onSubmit=', '>\n          <label>\n            <input class="', '" type="text" placeholder="Search" onInput=', '/>\n          </label>\n        </form>\n        <', ' class="search-box-results" style="position: absolute; background-color: white; border: 1px solid #eee; border-radius: 8px; left: ', '">\n          ', '\n          ', '\n        <//>\n      </div>\n    '], ['\n      <div class="iris-search-box" style="position: relative;">\n        <form onSubmit=', '>\n          <label>\n            <input class="', '" type="text" placeholder="Search" onInput=', '/>\n          </label>\n        </form>\n        <', ' class="search-box-results" style="position: absolute; background-color: white; border: 1px solid #eee; border-radius: 8px; left: ', '">\n          ', '\n          ', '\n        <//>\n      </div>\n    ']),
-	    _templateObject2$2 = _taggedTemplateLiteralLoose(['\n              <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" href="https://iris.to/#/profile/', '" onClick=', '>\n                <', ' pub=', ' width=40/>\n                <', ' marginLeft="5px">\n                  ', '<br/>\n                  <small>\n                    ', '\n                  </small>\n                <//>\n              <//>\n            '], ['\n              <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" href="https://iris.to/#/profile/', '" onClick=', '>\n                <', ' pub=', ' width=40/>\n                <', ' marginLeft="5px">\n                  ', '<br/>\n                  <small>\n                    ', '\n                  </small>\n                <//>\n              <//>\n            ']),
-	    _templateObject3 = _taggedTemplateLiteralLoose(['\n            <a class="follow-someone" style="padding:5px;">Follow someone to see more search results</a>\n            <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" onClick=', ' href="https://iris.to/#/profile/', '" class="suggested">\n              <', ' pub=', ' width=40/>\n              <', ' alignItems="center" marginLeft="5px"><i>Suggested</i><//>\n            </a>\n          '], ['\n            <a class="follow-someone" style="padding:5px;">Follow someone to see more search results</a>\n            <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" onClick=', ' href="https://iris.to/#/profile/', '" class="suggested">\n              <', ' pub=', ' width=40/>\n              <', ' alignItems="center" marginLeft="5px"><i>Suggested</i><//>\n            </a>\n          ']);
+	var _templateObject$5 = _taggedTemplateLiteralLoose(['\n      <div class="iris-search-box" style="position: relative;">\n        <form onSubmit=', '>\n          <label>\n            <input class="', '" type="text" placeholder="Search" onInput=', '/>\n          </label>\n        </form>\n        <', ' class="search-box-results" style="position: absolute; background-color: white; border: 1px solid #eee; border-radius: 8px; left: ', '">\n          ', '\n          ', '\n        <//>\n      </div>\n    '], ['\n      <div class="iris-search-box" style="position: relative;">\n        <form onSubmit=', '>\n          <label>\n            <input class="', '" type="text" placeholder="Search" onInput=', '/>\n          </label>\n        </form>\n        <', ' class="search-box-results" style="position: absolute; background-color: white; border: 1px solid #eee; border-radius: 8px; left: ', '">\n          ', '\n          ', '\n        <//>\n      </div>\n    ']),
+	    _templateObject2$3 = _taggedTemplateLiteralLoose(['\n              <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" href="https://iris.to/#/profile/', '" onClick=', '>\n                <', ' pub=', ' width=40/>\n                <', ' marginLeft="5px">\n                  ', '<br/>\n                  <small>\n                    ', '\n                  </small>\n                <//>\n              <//>\n            '], ['\n              <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" href="https://iris.to/#/profile/', '" onClick=', '>\n                <', ' pub=', ' width=40/>\n                <', ' marginLeft="5px">\n                  ', '<br/>\n                  <small>\n                    ', '\n                  </small>\n                <//>\n              <//>\n            ']),
+	    _templateObject3$1 = _taggedTemplateLiteralLoose(['\n            <a class="follow-someone" style="padding:5px;">Follow someone to see more search results</a>\n            <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" onClick=', ' href="https://iris.to/#/profile/', '" class="suggested">\n              <', ' pub=', ' width=40/>\n              <', ' alignItems="center" marginLeft="5px"><i>Suggested</i><//>\n            </a>\n          '], ['\n            <a class="follow-someone" style="padding:5px;">Follow someone to see more search results</a>\n            <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" onClick=', ' href="https://iris.to/#/profile/', '" class="suggested">\n              <', ' pub=', ' width=40/>\n              <', ' alignItems="center" marginLeft="5px"><i>Suggested</i><//>\n            </a>\n          ']);
 
 	var suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
@@ -13625,7 +13748,7 @@
 	  Search.prototype.render = function render() {
 	    var _this4 = this;
 
-	    return m$1(_templateObject$4, function (e) {
+	    return m$1(_templateObject$5, function (e) {
 	      return _this4.onSubmit(e);
 	    }, this.props['inner-class'] || '', function () {
 	      return _this4.onInput();
@@ -13642,10 +13765,10 @@
 	          followText = 'Followed by ' + i.followers.size + ' users you follow';
 	        }
 	      }
-	      return m$1(_templateObject2$2, i.key, function (e) {
+	      return m$1(_templateObject2$3, i.key, function (e) {
 	        return _this4.onClick(e, i);
 	      }, Identicon, i.key, Col, i.name || '', followText);
-	    }), this.state.query && !this.hasFollows ? m$1(_templateObject3, function (e) {
+	    }), this.state.query && !this.hasFollows ? m$1(_templateObject3$1, function (e) {
 	      return _this4.onClick(e, { key: suggestedFollow });
 	    }, suggestedFollow, Identicon, suggestedFollow, Row) : '');
 	  };
@@ -13669,7 +13792,7 @@
 	  util: util,
 	  components: {
 	    Identicon: Identicon,
-	    ProfileAttribute: ProfileAttribute,
+	    TextNode: TextNode,
 	    CopyButton: CopyButton,
 	    FollowButton: FollowButton,
 	    Search: Search

@@ -59,10 +59,10 @@ class StoreView extends Component {
               ${profilePhoto}
             </div>
             <div class="profile-header-stuff">
-              <h3 class="profile-name"><iris-profile-attribute placeholder="Name" contenteditable=${this.isMyProfile} pub=${this.props.store}/></h3>
+              <h3 class="profile-name"><iris-text path="profile/name" placeholder="Name" contenteditable=${this.isMyProfile} pub=${this.props.store}/></h3>
               <div class="profile-about hidden-xs">
                 <p class="profile-about-content">
-                  <iris-profile-attribute placeholder="About" contenteditable=${this.isMyProfile} attr="about" pub=${this.props.store}/>
+                  <iris-text path="profile/name" placeholder="About" contenteditable=${this.isMyProfile} attr="about" pub=${this.props.store}/>
                 </p>
               </div>
               <div class="profile-actions">
@@ -108,7 +108,7 @@ class StoreView extends Component {
           const i = this.state.items[k];
           return html`
             <div class="store-item" onClick=${() => route(`/product/${k}/${this.props.store}`)}>
-              <${SafeImg} src=${i.thumbnail}/>
+              <${SafeImg} src=${i.photo}/>
               <a href="/product/${k}/${this.props.store}" class="name">${i.name}</a>
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>

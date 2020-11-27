@@ -35,7 +35,7 @@ class ProductView extends StoreView {
     return html`
       <div class="main-view" id="profile">
         <div class="content">
-          <a href="/store/${Session.getPubKey()}"><iris-profile-attribute pub=${Session.getPubKey()} /></a>
+          <a href="/store/${Session.getPubKey()}"><iris-text path="profile/name" pub=${Session.getPubKey()} /></a>
           <h3>Add item</h3>
           <h2 contenteditable placeholder="Item name" onInput=${e => this.newProductName = e.target.innerText} />
           <textarea placeholder="Item description" onInput=${e => this.newProductDescription = e.target.value} style="resize: vertical"/>
@@ -60,7 +60,7 @@ class ProductView extends StoreView {
     return html`
     <div class="main-view" id="profile">
       <div class="content">
-        <a href="/store/${this.props.store}"><iris-profile-attribute pub=${this.props.store}/></a>
+        <a href="/store/${this.props.store}"><iris-text path="profile/name" pub=${this.props.store}/></a>
         ${cartTotalItems ? html`
           <p>
             <button onClick=${() => route('/checkout/' + this.props.store)}>Shopping cart (${cartTotalItems})</button>
@@ -69,6 +69,7 @@ class ProductView extends StoreView {
         ${this.state.product ? html`
           <h3>${i.name}</h3>
           <${SafeImg} src=${i.thumbnail}/>
+          <iris-img btn-class="btn btn-primary" path="store/products/${this.props.product}/photo"/>
           <p class="description">${i.description}</p>
           <p class="price">${i.price}</p>
           <button class="add" onClick=${() => this.addToCart()}>
@@ -101,7 +102,7 @@ class ProductView extends StoreView {
       price: this.newProductPrice
     };
     console.log(product);
-    publicState.user().get('store').get('products').get(this.newProductId).put(product);
+    publicState.user().get('store').get('products').get(this.newProductId || this.newProductName).put(product);
     route(`/store/${Session.getPubKey()}`)
   }
 
