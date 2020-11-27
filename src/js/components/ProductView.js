@@ -31,6 +31,7 @@ class ProductView extends StoreView {
   }
 
   newProduct() {
+    console.log('new');
     return html`
       <div class="main-view" id="profile">
         <div class="content">
@@ -52,7 +53,7 @@ class ProductView extends StoreView {
     `;
   }
 
-  render() {
+  showProduct() {
     const cartTotalItems = Object.values(this.cart).reduce((sum, current) => sum + current, 0);
     const i = this.state.product;
     if (!i) return html``;
@@ -75,10 +76,12 @@ class ProductView extends StoreView {
             ${this.cart[this.props.product] ? ` (${this.cart[this.props.product]})` : ''}
           </button>
         ` : ''}
-
-        ${this.props.store && this.props.product ? '' : this.newProduct()}
       </div>
     </div>`;
+  }
+
+  render() {
+    return (this.props.store && this.props.product ? this.showProduct() : this.newProduct());
   }
 
   componentWillUnmount() {
