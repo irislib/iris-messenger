@@ -73,7 +73,7 @@ class ProductView extends StoreView {
             <iris-text pub=${this.props.store} path="store/products/${this.props.product}/description"/>
           </p>
           <p class="price">
-            <iris-text pub=${this.props.store} path="store/products/${this.props.product}/price"/>
+            <iris-text placeholder="Price" pub=${this.props.store} path="store/products/${this.props.product}/price"/>
           </p>
           <button class="add" onClick=${() => this.addToCart()}>
             Add to cart
