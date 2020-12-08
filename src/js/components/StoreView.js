@@ -108,7 +108,7 @@ class StoreView extends Component {
           const i = this.state.items[k];
           return html`
             <div class="store-item" onClick=${() => route(`/product/${k}/${this.props.store}`)}>
-              <iris-img path="store/products/${k}/photo" pub=${this.props.store}/>
+              <${SafeImg} src=${i.photo}/>
               <a href="/product/${k}/${this.props.store}" class="name">${i.name}</a>
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>
