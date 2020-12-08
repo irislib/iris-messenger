@@ -59,10 +59,10 @@ class StoreView extends Component {
               ${profilePhoto}
             </div>
             <div class="profile-header-stuff">
-              <h3 class="profile-name"><iris-text path="profile/name" placeholder="Name" contenteditable=${this.isMyProfile} pub=${this.props.store}/></h3>
+              <h3 class="profile-name"><iris-text path="profile/name" placeholder="Name" pub=${this.props.store}/></h3>
               <div class="profile-about hidden-xs">
                 <p class="profile-about-content">
-                  <iris-text path="profile/name" placeholder="About" contenteditable=${this.isMyProfile} attr="about" pub=${this.props.store}/>
+                  <iris-text path="profile/about" placeholder="About" attr="about" pub=${this.props.store}/>
                 </p>
               </div>
               <div class="profile-actions">
