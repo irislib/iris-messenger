@@ -60,7 +60,7 @@ class ProductView extends StoreView {
     return html`
     <div class="main-view" id="profile">
       <div class="content">
-        <a href="/store/${this.props.store}"><iris-text path="profile/name" pub=${this.props.store}/></a>
+        <a href="/store/${this.props.store}"><iris-text editable="false" path="profile/name" pub=${this.props.store}/></a>
         ${cartTotalItems ? html`
           <p>
             <button onClick=${() => route('/checkout/' + this.props.store)}>Shopping cart (${cartTotalItems})</button>

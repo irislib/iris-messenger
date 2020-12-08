@@ -11175,12 +11175,19 @@
 	    util.injectCss();
 	    this.path = this.props.path || 'profile/name';
 	    this.props.pub && this.getValue(this.props.pub);
-	    Key$1.getDefault().then(function (key) {
-	      key && _this2.setState({ myPub: key.pub });
-	      if (!_this2.props.pub) {
-	        _this2.getValue(key.pub);
-	      }
-	    });
+	    var ps = util.getPublicState();
+	    var myPub = ps._.user && ps._.user.is.pub;
+	    var setMyPub = function setMyPub(myPub) {
+	      _this2.setState({ myPub: myPub });
+	      !_this2.props.pub && _this2.getValue(myPub);
+	    };
+	    if (myPub) {
+	      setMyPub(myPub);
+	    } else {
+	      Key$1.getDefault().then(function (key) {
+	        setMyPub(key.pub);
+	      });
+	    }
 	  };
 
 	  TextNode.prototype.getNode = function getNode(pub) {
