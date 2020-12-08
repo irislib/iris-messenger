@@ -67,11 +67,14 @@ class ProductView extends StoreView {
           </p>
         ` : ''}
         ${this.state.product ? html`
-          <h3>${i.name}</h3>
-          <${SafeImg} src=${i.thumbnail}/>
-          <iris-img btn-class="btn btn-primary" path="store/products/${this.props.product}/photo"/>
-          <p class="description">${i.description}</p>
-          <p class="price">${i.price}</p>
+          <iris-text tag="h3" pub=${this.props.store} path="store/products/${this.props.product}/name"/>
+          <iris-img btn-class="btn btn-primary" pub=${this.props.store} path="store/products/${this.props.product}/photo"/>
+          <p class="description">
+            <iris-text pub=${this.props.store} path="store/products/${this.props.product}/description"/>
+          </p>
+          <p class="price">
+            <iris-text pub=${this.props.store} path="store/products/${this.props.product}/price"/>
+          </p>
           <button class="add" onClick=${() => this.addToCart()}>
             Add to cart
             ${this.cart[this.props.product] ? ` (${this.cart[this.props.product]})` : ''}
