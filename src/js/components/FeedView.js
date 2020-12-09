@@ -75,7 +75,7 @@ class FeedView extends Component {
             <div class="profile-link-container">
               <a href="/profile/${SUGGESTED_FOLLOW}" class="profile-link">
                 <${Identicon} str=${SUGGESTED_FOLLOW} width=40 />
-                <iris-text path="profile/name" pub=${SUGGESTED_FOLLOW}/>
+                <iris-text path="profile/name" user=${SUGGESTED_FOLLOW}/>
               </a>
               <${FollowButton} id=${SUGGESTED_FOLLOW} />
             </div>

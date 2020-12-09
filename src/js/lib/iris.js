@@ -10308,7 +10308,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$1 = "0.0.149";
+	var version$1 = "0.0.150";
 
 	var taggedTemplateLiteralLoose = createCommonjsModule(function (module, exports) {
 
@@ -10930,7 +10930,7 @@
 	  }
 
 	  Identicon.prototype.componentDidUpdate = function componentDidUpdate(prevProps) {
-	    if (prevProps.pub !== this.props.pub) {
+	    if (prevProps.user !== this.props.user) {
 	      this.resetEventListeners();
 	      this.setState({ name: '', photo: '' });
 	      this.componentDidMount();
@@ -10940,17 +10940,17 @@
 	  Identicon.prototype.componentDidMount = function componentDidMount() {
 	    var _this2 = this;
 
-	    if (!this.props.pub) return;
-	    new Attribute$1({ type: 'keyID', value: this.props.pub }).identiconSrc({ width: this.props.width, showType: false }).then(function (identicon) {
+	    if (!this.props.user) return;
+	    new Attribute$1({ type: 'keyID', value: this.props.user }).identiconSrc({ width: this.props.width, showType: false }).then(function (identicon) {
 	      _this2.setState({ identicon: identicon });
 	    });
-	    util.getPublicState().user(this.props.pub).get('profile').get('photo').on(function (photo) {
+	    util.getPublicState().user(this.props.user).get('profile').get('photo').on(function (photo) {
 	      if (typeof photo === 'string' && photo.indexOf('data:image') === 0) {
 	        _this2.setState({ photo: photo });
 	      }
 	    });
 	    if (this.props.showTooltip) {
-	      util.getPublicState().user(this.props.pub).get('profile').get('name').on(function (name, a, b$$1, e) {
+	      util.getPublicState().user(this.props.user).get('profile').get('name').on(function (name, a, b$$1, e) {
 	        _this2.eventListeners['name'] = e;
 	        _this2.setState({ name: name });
 	      });
@@ -10975,7 +10975,7 @@
 	  return Identicon;
 	}(d);
 
-	register(Identicon, 'iris-identicon', ['pub', 'onClick', 'width', 'showTooltip']);
+	register(Identicon, 'iris-identicon', ['user', 'onClick', 'width', 'showTooltip']);
 
 	// eslint-disable-line no-unused-vars
 
@@ -11164,7 +11164,7 @@
 	  }
 
 	  TextNode.prototype.componentDidUpdate = function componentDidUpdate(prevProps) {
-	    if (prevProps.pub !== this.props.pub || prevProps.path !== this.props.path) {
+	    if (prevProps.user !== this.props.user || prevProps.path !== this.props.path) {
 	      this.componentDidMount();
 	    }
 	  };
@@ -11174,12 +11174,12 @@
 
 	    util.injectCss();
 	    this.path = this.props.path || 'profile/name';
-	    this.props.pub && this.getValue(this.props.pub);
+	    this.props.user && this.getValue(this.props.user);
 	    var ps = util.getPublicState();
 	    var myPub = ps._.user && ps._.user.is.pub;
 	    var setMyPub = function setMyPub(myPub) {
 	      _this2.setState({ myPub: myPub });
-	      !_this2.props.pub && _this2.getValue(myPub);
+	      !_this2.props.user && _this2.getValue(myPub);
 	    };
 	    if (myPub) {
 	      setMyPub(myPub);
@@ -11190,18 +11190,18 @@
 	    }
 	  };
 
-	  TextNode.prototype.getNode = function getNode(pub) {
-	    var base = util.getPublicState().user(pub);
+	  TextNode.prototype.getNode = function getNode(user) {
+	    var base = util.getPublicState().user(user);
 	    var path = this.path.split('/');
 	    return path.reduce(function (sum, current) {
 	      return sum.get(current);
 	    }, base);
 	  };
 
-	  TextNode.prototype.getValue = function getValue(pub) {
+	  TextNode.prototype.getValue = function getValue(user) {
 	    var _this3 = this;
 
-	    this.getNode(pub).on(function (value, a, b$$1, e) {
+	    this.getNode(user).on(function (value, a, b$$1, e) {
 	      _this3.eventListeners[_this3.path] = e;
 	      if (!(_this3.ref.current && _this3.ref.current === document.activeElement)) {
 	        _this3.setState({ value: value });
@@ -11222,7 +11222,7 @@
 	  };
 
 	  TextNode.prototype.isEditable = function isEditable() {
-	    return (!this.props.pub || this.props.pub === this.state.myPub) && String(this.props.editable) !== 'false';
+	    return (!this.props.user || this.props.user === this.state.myPub) && String(this.props.editable) !== 'false';
 	  };
 
 	  TextNode.prototype.renderInput = function renderInput() {
@@ -11250,7 +11250,7 @@
 	  return TextNode;
 	}(d);
 
-	register(TextNode, 'iris-text', ['path', 'pub', 'placeholder', 'editable', 'tag']);
+	register(TextNode, 'iris-text', ['path', 'user', 'placeholder', 'editable', 'tag']);
 
 	var _templateObject$2 = _taggedTemplateLiteralLoose(['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        onInput=', '\n        disabled=', ' />\n    '], ['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        onInput=', '\n        disabled=', ' />\n    ']),
 	    _templateObject2$2 = _taggedTemplateLiteralLoose(['\n      <', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    '], ['\n      <', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    ']),
@@ -11280,10 +11280,10 @@
 	    return _possibleConstructorReturn(this, _TextNode.apply(this, arguments));
 	  }
 
-	  ImageNode.prototype.getValue = function getValue(pub) {
+	  ImageNode.prototype.getValue = function getValue(user) {
 	    var _this2 = this;
 
-	    this.getNode(pub).on(function (value, a, b$$1, e) {
+	    this.getNode(user).on(function (value, a, b$$1, e) {
 	      _this2.eventListeners[_this2.path] = e;
 	      _this2.setState({ value: value });
 	    });
@@ -11349,7 +11349,7 @@
 	  return ImageNode;
 	}(TextNode);
 
-	register(ImageNode, 'iris-img', ['path', 'pub', 'placeholder', 'editable', 'alt', 'width', 'height']);
+	register(ImageNode, 'iris-img', ['path', 'user', 'placeholder', 'editable', 'alt', 'width', 'height']);
 
 	var _templateObject$3 = _taggedTemplateLiteralLoose(['<button class=', ' onClick=', '>', '</button>'], ['<button class=', ' onClick=', '>', '</button>']);
 
@@ -11446,7 +11446,7 @@
 	  FollowButton.prototype.onClick = function onClick(e) {
 	    e.preventDefault();
 	    var follow = !this.state.following;
-	    util.getPublicState().user().get('follow').get(this.props.pub).put(follow);
+	    util.getPublicState().user().get('follow').get(this.props.user).put(follow);
 	  };
 
 	  FollowButton.prototype.componentDidMount = function componentDidMount() {
@@ -11455,7 +11455,7 @@
 	    util.injectCss();
 	    Key$1.getDefault().then(function (key) {
 	      util.getPublicState().user().auth(key);
-	      util.getPublicState().user().get('follow').get(_this2.props.pub).on(function (following, a, b$$1, e) {
+	      util.getPublicState().user().get('follow').get(_this2.props.user).on(function (following, a, b$$1, e) {
 	        _this2.setState({ following: following });
 	        _this2.eventListeners['follow'] = e;
 	      });
@@ -11479,7 +11479,7 @@
 	  return FollowButton;
 	}(d);
 
-	register(FollowButton, 'iris-follow-button', ['pub']);
+	register(FollowButton, 'iris-follow-button', ['user']);
 
 	var _validateCollection = function (it, TYPE) {
 	  if (!_isObject(it) || it._t !== TYPE) throw TypeError('Incompatible receiver, ' + TYPE + ' required!');
@@ -13604,8 +13604,8 @@
 	}
 
 	var _templateObject$5 = _taggedTemplateLiteralLoose(['\n      <div class="iris-search-box" style="position: relative;">\n        <form onSubmit=', '>\n          <label>\n            <input class="', '" type="text" placeholder="Search" onInput=', '/>\n          </label>\n        </form>\n        <', ' class="search-box-results" style="position: absolute; background-color: white; border: 1px solid #eee; border-radius: 8px; left: ', '">\n          ', '\n          ', '\n        <//>\n      </div>\n    '], ['\n      <div class="iris-search-box" style="position: relative;">\n        <form onSubmit=', '>\n          <label>\n            <input class="', '" type="text" placeholder="Search" onInput=', '/>\n          </label>\n        </form>\n        <', ' class="search-box-results" style="position: absolute; background-color: white; border: 1px solid #eee; border-radius: 8px; left: ', '">\n          ', '\n          ', '\n        <//>\n      </div>\n    ']),
-	    _templateObject2$3 = _taggedTemplateLiteralLoose(['\n              <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" href="https://iris.to/#/profile/', '" onClick=', '>\n                <', ' pub=', ' width=40/>\n                <', ' marginLeft="5px">\n                  ', '<br/>\n                  <small>\n                    ', '\n                  </small>\n                <//>\n              <//>\n            '], ['\n              <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" href="https://iris.to/#/profile/', '" onClick=', '>\n                <', ' pub=', ' width=40/>\n                <', ' marginLeft="5px">\n                  ', '<br/>\n                  <small>\n                    ', '\n                  </small>\n                <//>\n              <//>\n            ']),
-	    _templateObject3$1 = _taggedTemplateLiteralLoose(['\n            <a class="follow-someone" style="padding:5px;">Follow someone to see more search results</a>\n            <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" onClick=', ' href="https://iris.to/#/profile/', '" class="suggested">\n              <', ' pub=', ' width=40/>\n              <', ' alignItems="center" marginLeft="5px"><i>Suggested</i><//>\n            </a>\n          '], ['\n            <a class="follow-someone" style="padding:5px;">Follow someone to see more search results</a>\n            <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" onClick=', ' href="https://iris.to/#/profile/', '" class="suggested">\n              <', ' pub=', ' width=40/>\n              <', ' alignItems="center" marginLeft="5px"><i>Suggested</i><//>\n            </a>\n          ']);
+	    _templateObject2$3 = _taggedTemplateLiteralLoose(['\n              <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" href="https://iris.to/#/profile/', '" onClick=', '>\n                <', ' user=', ' width=40/>\n                <', ' marginLeft="5px">\n                  ', '<br/>\n                  <small>\n                    ', '\n                  </small>\n                <//>\n              <//>\n            '], ['\n              <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" href="https://iris.to/#/profile/', '" onClick=', '>\n                <', ' user=', ' width=40/>\n                <', ' marginLeft="5px">\n                  ', '<br/>\n                  <small>\n                    ', '\n                  </small>\n                <//>\n              <//>\n            ']),
+	    _templateObject3$1 = _taggedTemplateLiteralLoose(['\n            <a class="follow-someone" style="padding:5px;">Follow someone to see more search results</a>\n            <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" onClick=', ' href="https://iris.to/#/profile/', '" class="suggested">\n              <', ' user=', ' width=40/>\n              <', ' alignItems="center" marginLeft="5px"><i>Suggested</i><//>\n            </a>\n          '], ['\n            <a class="follow-someone" style="padding:5px;">Follow someone to see more search results</a>\n            <a style="width: 300px; display: flex; padding: 5px; flex-direction: row" onClick=', ' href="https://iris.to/#/profile/', '" class="suggested">\n              <', ' user=', ' width=40/>\n              <', ' alignItems="center" marginLeft="5px"><i>Suggested</i><//>\n            </a>\n          ']);
 
 	var suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 

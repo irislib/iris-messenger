@@ -35,7 +35,7 @@ class ProductView extends StoreView {
     return html`
       <div class="main-view" id="profile">
         <div class="content">
-          <a href="/store/${Session.getPubKey()}"><iris-text path="profile/name" pub=${Session.getPubKey()} /></a>
+          <a href="/store/${Session.getPubKey()}"><iris-text path="profile/name" user=${Session.getPubKey()} /></a>
           <h3>Add item</h3>
           <h2 contenteditable placeholder="Item name" onInput=${e => this.newProductName = e.target.innerText} />
           <textarea placeholder="Item description" onInput=${e => this.newProductDescription = e.target.value} style="resize: vertical"/>
@@ -60,20 +60,20 @@ class ProductView extends StoreView {
     return html`
     <div class="main-view" id="profile">
       <div class="content">
-        <a href="/store/${this.props.store}"><iris-text editable="false" path="profile/name" pub=${this.props.store}/></a>
+        <a href="/store/${this.props.store}"><iris-text editable="false" path="profile/name" user=${this.props.store}/></a>
         ${cartTotalItems ? html`
           <p>
             <button onClick=${() => route('/checkout/' + this.props.store)}>Shopping cart (${cartTotalItems})</button>
           </p>
         ` : ''}
         ${this.state.product ? html`
-          <iris-text tag="h3" pub=${this.props.store} path="store/products/${this.props.product}/name"/>
-          <iris-img btn-class="btn btn-primary" pub=${this.props.store} path="store/products/${this.props.product}/photo"/>
+          <iris-text tag="h3" user=${this.props.store} path="store/products/${this.props.product}/name"/>
+          <iris-img btn-class="btn btn-primary" user=${this.props.store} path="store/products/${this.props.product}/photo"/>
           <p class="description">
-            <iris-text pub=${this.props.store} path="store/products/${this.props.product}/description"/>
+            <iris-text user=${this.props.store} path="store/products/${this.props.product}/description"/>
           </p>
           <p class="price">
-            <iris-text placeholder="Price" pub=${this.props.store} path="store/products/${this.props.product}/price"/>
+            <iris-text placeholder="Price" user=${this.props.store} path="store/products/${this.props.product}/price"/>
           </p>
           <button class="add" onClick=${() => this.addToCart()}>
             Add to cart

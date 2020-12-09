@@ -175,7 +175,7 @@ class CheckoutView extends StoreView {
     <div class="main-view" id="profile">
       <div class="content">
         <p>
-          <a href="/store/${this.props.store}"><iris-text path="profile/name" pub=${this.props.store}/></a>
+          <a href="/store/${this.props.store}"><iris-text path="profile/name" user=${this.props.store}/></a>
         </p>
         <div id="store-steps">
           <div class=${p === 'cart' ? 'active' : ''} onClick=${() => this.setState({page:'cart'})}>Cart</div>
