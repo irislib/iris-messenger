@@ -99,27 +99,28 @@ class StoreView extends Component {
             <button onClick=${() => route('/checkout/' + this.props.store)}>Shopping cart (${cartTotalItems})</button>
           </p>
         ` : ''}
-        ${this.isMyProfile ? html`
-          <div class="store-item" onClick=${() => route(`/product/new`)}>
-            <a href="/product/new" class="name">Add item</a>
-          </div>
-        ` : ''}
-        ${Object.keys(this.state.items).map(k => {
-          const i = this.state.items[k];
-          return html`
-            <div class="store-item" onClick=${() => route(`/product/${k}/${this.props.store}`)}>
-              <${SafeImg} src=${i.photo}/>
-              <a href="/product/${k}/${this.props.store}" class="name">${i.name}</a>
-              <p class="description">${i.description}</p>
-              <p class="price">${i.price}</p>
-              <button class="add" onClick=${e => this.addToCart(k, e)}>
-                Add to cart
-                ${this.cart[k] ? ` (${this.cart[k]})` : ''}
-              </button>
+        <div class="store-items">
+          ${this.isMyProfile ? html`
+            <div class="store-item" onClick=${() => route(`/product/new`)}>
+              <a href="/product/new" class="name">Add item</a>
             </div>
-          `
-        })}
-
+          ` : ''}
+          ${Object.keys(this.state.items).map(k => {
+            const i = this.state.items[k];
+            return html`
+              <div class="store-item" onClick=${() => route(`/product/${k}/${this.props.store}`)}>
+                <${SafeImg} src=${i.photo}/>
+                <a href="/product/${k}/${this.props.store}" class="name">${i.name}</a>
+                <p class="description">${i.description}</p>
+                <p class="price">${i.price}</p>
+                <button class="add" onClick=${e => this.addToCart(k, e)}>
+                  Add to cart
+                  ${this.cart[k] ? ` (${this.cart[k]})` : ''}
+                </button>
+              </div>
+            `
+          })}
+        </div>
       </div>
     </div>`;
   }
