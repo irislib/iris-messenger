@@ -34,7 +34,7 @@ class StoreView extends Component {
   }
 
   render() {
-    const cartTotalItems = Object.values(this.cart).reduce((sum, current) => sum + current, 0);
+    const cartTotalItems = Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.items[k]).reduce((sum, k) => sum + this.cart[k], 0);
     this.isMyProfile = Session.getPubKey() === this.props.store;
     const chat = chats[this.props.store];
     const uuid = chat && chat.uuid;
