@@ -1256,6 +1256,8 @@ form.public {
 }
 
 .store-item {
+  display: flex;
+  flex-direction: column;
   width: calc(33.33% - 8px);
   background-color: var(--chat-hover);
   padding: 15px;
