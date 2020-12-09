@@ -24,7 +24,7 @@ yarn
 yarn start
 ```
 
-No build tools! It just serves the `src` directory at http://localhost:8000
+No build tools! It just serves the `src` directory at http://localhost:8080
 
 Eslint: `yarn eslint src/js/*.js --fix;yarn eslint src/js/components/*.js --fix`
 
