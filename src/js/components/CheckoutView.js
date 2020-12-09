@@ -126,7 +126,7 @@ class CheckoutView extends StoreView {
     return html`
       <h3 class="side-padding-xs">Confirmation</h3>
       <div class="flex-table">
-        ${Object.keys(this.cart).filter(k => !!this.cart[k]).map(k => {
+        ${Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.state.items[k]).map(k => {
           const i = this.state.items[k];
           return html`
             <div class="flex-row">

@@ -82,9 +82,6 @@ class StoreView extends Component {
                 ${uuid ? '' : html`
                   <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
                 `}
-                ${this.isMyProfile ? '' : html`
-                  <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
-                `}
               </div>
             </div>
           </div>

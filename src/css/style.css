@@ -1268,6 +1268,14 @@ form.public {
   border-radius: 8px;
 }
 
+.store-item a {
+  font-weight: bold;
+}
+
+.store-item img {
+  margin-bottom: 5px;
+}
+
 .store-item:hover {
   background-color: var(--chat-active);
 }
