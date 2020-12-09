@@ -160,9 +160,11 @@ class StoreView extends Component {
           const o = {};
           o[id] = p;
           Object.assign(this.items, o);
-          this.setState({items: this.items});
           this.updateTotalPrice();
+        } else {
+          delete this.items[id];
         }
+        this.setState({items: this.items});
       });
     }
   }

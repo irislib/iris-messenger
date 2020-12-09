@@ -53,6 +53,13 @@ class ProductView extends StoreView {
     `;
   }
 
+  onClickDelete() {
+    if (confirm('Delete product? This cannot be undone.')) {
+      publicState.user().get('store').get('products').get(this.props.product).put(null);
+      route('/store/' + this.props.store);
+    }
+  }
+
   showProduct() {
     const cartTotalItems = Object.values(this.cart).reduce((sum, current) => sum + current, 0);
     const i = this.state.product;
@@ -79,6 +86,9 @@ class ProductView extends StoreView {
             Add to cart
             ${this.cart[this.props.product] ? ` (${this.cart[this.props.product]})` : ''}
           </button>
+          ${this.isMyProfile ? html`
+            <p><button onClick=${e => this.onClickDelete(e)}>Delete item</button></p>
+          ` : ''}
         ` : ''}
       </div>
     </div>`;
