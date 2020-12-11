@@ -18,7 +18,7 @@ Desktop version: ([download](https://github.com/irislib/iris-electron/releases),
 
 ## Develop
 ```
-git clone git@github.com:irislib/iris-messenger.git
+git clone https://github.com/irislib/iris-messenger.git
 cd iris-messenger
 yarn
 yarn start
