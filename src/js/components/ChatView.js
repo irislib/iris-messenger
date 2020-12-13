@@ -144,7 +144,7 @@ class ChatView extends Component {
         $('#not-seen-by-them').slideUp();
       }
     }
-    localState.get('chats').get(this.activeChat).get('msgDraft').once(m => $('.new-msg').val(m));
+    this.activeChat && localState.get('chats').get(this.activeChat).get('msgDraft').once(m => $('.new-msg').val(m));
   }
 
   render() {
