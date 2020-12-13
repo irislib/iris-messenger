@@ -23,6 +23,7 @@ import Footer from './components/Footer.js';
 import MessageView from './components/MessageView.js';
 import FollowsView from './components/FollowsView.js';
 import FeedView from './components/FeedView.js';
+import ExplorerView from './components/ExplorerView.js';
 import VideoCall from './components/VideoCall.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
@@ -82,6 +83,8 @@ class Main extends Component {
           <${CheckoutView} path="/checkout/:store"/>
           <${ProductView} path="/product/:product/:store"/>
           <${ProductView} path="/product/new"/>
+          <${ExplorerView} path="/explorer"/>
+          <${ExplorerView} path="/explorer/:user"/>
           <${FollowsView} path="/follows/:id"/>
           <${FollowsView} followers=${true} path="/followers/:id"/>
         </${Router}>

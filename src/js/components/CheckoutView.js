@@ -24,6 +24,7 @@ class CheckoutView extends StoreView {
     this.followedUsers = new Set();
     this.followers = new Set();
     this.state.paymentMethod = 'bitcoin';
+    this.state.delivery = {};
   }
 
   changeItemCount(k, v, e) {
@@ -37,7 +38,10 @@ class CheckoutView extends StoreView {
       !!v && localState.get('cart').get(pub).get(k).put(null);
     });
     newChat(pub);
-    chats[pub].send('New order: ' + JSON.stringify(this.cart) + ', delivery: ' + JSON.stringify(this.state.delivery) + ', payment: ' + this.state.paymentMethod);
+    chats[pub].send({
+      text: 'New order: ' + JSON.stringify(this.cart) + ', delivery: ' + JSON.stringify(this.state.delivery) + ', payment: ' + this.state.paymentMethod,
+      order: true
+    });
     route('/chat/' + pub);
   }
 
