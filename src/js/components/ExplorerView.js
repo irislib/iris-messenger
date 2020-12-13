@@ -2,12 +2,14 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import { route } from '../lib/preact-router.es.js';
 import {publicState} from '../Main.js';
+import Session from '../Session.js';
 
 class ExplorerView extends Component {
   render() {
     return html`
       <div class="main-view public-messages-view">
         <div class="centered-container">
+          User space of ${this.props.user || Session.getPubKey()}:
           <${ExplorerNode} user=${this.props.user} path=''/>
         </div>
       </div>
@@ -19,8 +21,9 @@ class ExplorerNode extends Component {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = {children: {}};
+    this.state = {children: {}, isChildOpen: {}};
     this.children = {};
+    this.isChildOpen = {};
   }
 
   getNode() {
@@ -43,23 +46,44 @@ class ExplorerNode extends Component {
     });
   }
 
+  onChildObjectClick(e, k) {
+    e.preventDefault();
+    this.isChildOpen[k] = !this.isChildOpen[k];
+    this.setState({isChildOpen: this.isChildOpen});
+  }
+
+  renderChildObject(k, v) {
+    const path = v['_']['#'];
+    return html`
+      <li>
+        <a href="#" onClick=${e => this.onChildObjectClick(e, k)}><b>${k}</b></a>
+        ${this.state.isChildOpen[k] ? html`<${ExplorerNode} path=${path}/>` : ''}
+      </li>
+    `;
+  }
+
+  renderChild(k, v) {
+    let s = JSON.stringify(v);
+    if (s.length > 255) {
+      s = s.slice(0,255) + '...';
+    }
+    return html`
+      <li>
+        <b>${k}</b>: ${s}
+      </li>
+    `;
+  }
+
   render() {
     return html`
       <ul>
         ${Object.keys(this.state.children).map(k => {
           const v = this.state.children[k];
-          let s = v;
-          if (v && v['_'] && typeof v === 'object') {
-            const path = v['_']['#'];
-            s = html`<${ExplorerNode} path=${path}/>`;
+          if (typeof v === 'object' && v && v['_']) {
+            return this.renderChildObject(k, v);
           } else {
-            s = JSON.stringify(s);
+            return this.renderChild(k, v);
           }
-          return html`
-            <li>
-              <b>${k}</b>: ${s}
-            </li>
-            `;
         })}
       </ul>
     `;
