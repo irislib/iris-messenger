@@ -63,10 +63,7 @@ class ExplorerNode extends Component {
   }
 
   renderChild(k, v) {
-    let s = JSON.stringify(v);
-    if (s.length > 255) {
-      s = s.slice(0,255) + '...';
-    }
+    const s = JSON.stringify(v);
     return html`
       <li>
         <b>${k}</b>: ${s}
