@@ -74,7 +74,7 @@ class ExplorerNode extends Component {
   render() {
     return html`
       <ul>
-        ${Object.keys(this.state.children).map(k => {
+        ${Object.keys(this.state.children).sort().map(k => {
           const v = this.state.children[k];
           if (typeof v === 'object' && v && v['_']) {
             return this.renderChildObject(k, v);
