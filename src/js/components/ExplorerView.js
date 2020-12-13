@@ -8,7 +8,7 @@ class ExplorerView extends Component {
     return html`
       <div class="main-view public-messages-view">
         <div class="centered-container">
-          <${ExplorerNode} path=''/>
+          <${ExplorerNode} user=${this.props.user} path=''/>
         </div>
       </div>
     `;
@@ -26,7 +26,7 @@ class ExplorerNode extends Component {
   getNode() {
     if (this.props.path) {
       const path = this.props.path.split('/');
-      return path.reduce((sum, current) => sum.get(current), publicState);
+      return path.reduce((sum, current) => (current && sum.get(current)) || sum, publicState);
     }
     return publicState.user(this.props.user);
   }
@@ -49,10 +49,11 @@ class ExplorerNode extends Component {
         ${Object.keys(this.state.children).map(k => {
           const v = this.state.children[k];
           let s = v;
-          if (v && typeof v === 'object') {
-            console.log(v);
+          if (v && v['_'] && typeof v === 'object') {
             const path = v['_']['#'];
             s = html`<${ExplorerNode} path=${path}/>`;
+          } else {
+            s = JSON.stringify(s);
           }
           return html`
             <li>
