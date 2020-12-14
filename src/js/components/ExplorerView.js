@@ -28,7 +28,7 @@ class ExplorerView extends Component {
           <a href="#/explorer">Public</a> ${this.props.node ? pathString : ''}
         </p>
         ${this.props.node ? html`
-          <${ExplorerNode} showExpandAll=${true} path=${this.props.node}/>
+          <${ExplorerNode} showTools=${true} path=${this.props.node}/>
         ` : html`
           <div class="explorer-dir">
             ${chevronDown} Users
@@ -117,10 +117,36 @@ class ExplorerNode extends Component {
     this.setState({expandAll, isChildOpen: this.isChildOpen});
   }
 
+  onNewItemSubmit(e) {
+    if (this.state.newItemName) {
+      this.getNode().get(this.state.newItemName.trim()).put(this.state.showNewItem === 'object' ? {a:null} : '');
+      this.setState({showNewItem: false, newItemName: ''});
+    }
+  }
+
+  onNewItemNameInput(e) {
+    this.setState({newItemName: e.target.value.trimStart().replace('  ', ' ')});
+  }
+
   render() {
     return html`
       <div class="explorer-dir">
-        ${this.props.showExpandAll ? html`<p><a onClick=${() => this.onExpandClicked()}>${this.state.expandAll ? 'Close all' : 'Expand all'}</a></p>`: ''}
+        ${this.props.showTools ? html`
+          <p class="explorer-tools">
+            <a onClick=${() => this.onExpandClicked()}>${this.state.expandAll ? 'Close all' : 'Expand all'}</a>
+            <a onClick=${() => this.setState({showNewItem:'object'})}>New object</a>
+            <a onClick=${() => this.setState({showNewItem:'value'})}>New value</a>
+          </p>
+        `: ''}
+        ${this.state.showNewItem ? html`
+          <p>
+            <form onSubmit=${e => this.onNewItemSubmit()}>
+              <input type="text" onInput=${e => this.onNewItemNameInput(e)} value=${this.state.newItemName} placeholder="New ${this.state.showNewItem} name"/>
+              <button type="submit">Create</button>
+              <button onClick=${() => this.setState({showNewItem: false})}>Cancel</button>
+            </form>
+          </p>
+        ` : ''}
         ${Object.keys(this.state.children).sort().map(k => {
           const v = this.state.children[k];
           if (typeof v === 'object' && v && v['_']) {

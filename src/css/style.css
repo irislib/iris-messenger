@@ -1335,6 +1335,11 @@ form.public {
   cursor: pointer;
 }
 
+.explorer-tools a {
+  margin-right: 30px;
+}
+
+
 /* Tooltip container */
 .tooltip {
   position: relative;
