@@ -1325,6 +1325,15 @@ form.public {
   background-color: var(--chat-hover);
 }
 
+.explorer-dir {
+  padding-left: 1em;
+}
+
+.explorer-dir svg {
+  margin-right: 5px;
+  margin-left: -17px;
+}
+
 /* Tooltip container */
 .tooltip {
   position: relative;

@@ -4,14 +4,24 @@ import { route } from '../lib/preact-router.es.js';
 import {publicState} from '../Main.js';
 import Session from '../Session.js';
 
+const chevronDown = html`
+<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+</svg>
+`;
+
+const chevronRight = html`
+<svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+</svg>
+`;
+
 class ExplorerView extends Component {
   render() {
     return html`
-      <div class="main-view public-messages-view">
-        <div class="centered-container">
-          User space of ${this.props.user || Session.getPubKey()}:
-          <${ExplorerNode} user=${this.props.user} path=''/>
-        </div>
+      <div class="main-view">
+        <p>Users ${chevronRight} ${this.props.user || Session.getPubKey()}</p>
+        <${ExplorerNode} user=${this.props.user} path=''/>
       </div>
     `;
   }
@@ -55,25 +65,26 @@ class ExplorerNode extends Component {
   renderChildObject(k, v) {
     const path = v['_']['#'];
     return html`
-      <li>
+      <div class="explorer-dir">
+        ${this.state.isChildOpen[k] ? chevronDown : chevronRight}
         <a href="#" onClick=${e => this.onChildObjectClick(e, k)}><b>${k}</b></a>
         ${this.state.isChildOpen[k] ? html`<${ExplorerNode} path=${path}/>` : ''}
-      </li>
+      </div>
     `;
   }
 
   renderChild(k, v) {
     const s = JSON.stringify(v);
     return html`
-      <li>
+      <div class="explorer-dir">
         <b>${k}</b>: ${s}
-      </li>
+      </div>
     `;
   }
 
   render() {
     return html`
-      <ul>
+      <div class="explorer-dir">
         ${Object.keys(this.state.children).sort().map(k => {
           const v = this.state.children[k];
           if (typeof v === 'object' && v && v['_']) {
@@ -82,7 +93,7 @@ class ExplorerNode extends Component {
             return this.renderChild(k, v);
           }
         })}
-      </ul>
+      </div>
     `;
   }
 }
