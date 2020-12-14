@@ -70,12 +70,13 @@ class ExplorerNode extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.node !== this.props.node) {
+    if (prevProps.path !== this.props.path) {
       this.componentWillUnmount();
     }
   }
 
   componentDidMount() {
+    this.isMine = this.props.path.indexOf('~' + Session.getPubKey()) === 0;
     this.getNode().map().on((v, k, c, e) => {
       this.eventListeners['n'] = e;
       this.children[k] = v;
