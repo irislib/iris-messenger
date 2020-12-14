@@ -128,20 +128,25 @@ class ExplorerNode extends Component {
     this.setState({newItemName: e.target.value.trimStart().replace('  ', ' ')});
   }
 
+  showNewItemClicked(type) {
+    this.setState({showNewItem:type});
+    setTimeout(() => document.querySelector('#newItemNameInput').focus(), 0);
+  }
+
   render() {
     return html`
       <div class="explorer-dir">
         ${this.props.showTools ? html`
           <p class="explorer-tools">
             <a onClick=${() => this.onExpandClicked()}>${this.state.expandAll ? 'Close all' : 'Expand all'}</a>
-            <a onClick=${() => this.setState({showNewItem:'object'})}>New object</a>
-            <a onClick=${() => this.setState({showNewItem:'value'})}>New value</a>
+            <a onClick=${() => this.showNewItemClicked('object')}>New object</a>
+            <a onClick=${() => this.showNewItemClicked('value')}>New value</a>
           </p>
         `: ''}
         ${this.state.showNewItem ? html`
           <p>
             <form onSubmit=${e => this.onNewItemSubmit()}>
-              <input type="text" onInput=${e => this.onNewItemNameInput(e)} value=${this.state.newItemName} placeholder="New ${this.state.showNewItem} name"/>
+              <input id="newItemNameInput" type="text" onInput=${e => this.onNewItemNameInput(e)} value=${this.state.newItemName} placeholder="New ${this.state.showNewItem} name"/>
               <button type="submit">Create</button>
               <button onClick=${() => this.setState({showNewItem: false})}>Cancel</button>
             </form>
