@@ -83,7 +83,7 @@ class Main extends Component {
           <${CheckoutView} path="/checkout/:store"/>
           <${ProductView} path="/product/:product/:store"/>
           <${ProductView} path="/product/new"/>
-          <${ExplorerView} path="/explorer/:user"/>
+          <${ExplorerView} path="/explorer/:node"/>
           <${ExplorerView} path="/explorer"/>
           <${FollowsView} path="/follows/:id"/>
           <${FollowsView} followers=${true} path="/followers/:id"/>

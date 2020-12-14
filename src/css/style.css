@@ -1332,6 +1332,7 @@ form.public {
 .explorer-dir svg {
   margin-right: 5px;
   margin-left: -17px;
+  cursor: pointer;
 }
 
 /* Tooltip container */

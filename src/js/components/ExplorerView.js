@@ -18,10 +18,30 @@ const chevronRight = html`
 
 class ExplorerView extends Component {
   render() {
+    const split = (this.props.node || '').split('/');
+    const pathString = split.map((k, i) => html`
+      ${chevronRight} <a href="#/explorer/${encodeURIComponent(split.slice(0,i+1).join('/'))}">${k}</a>
+    `);
     return html`
       <div class="main-view">
-        <p>Users ${chevronRight} ${this.props.user || Session.getPubKey()}</p>
-        <${ExplorerNode} user=${this.props.user} path=''/>
+        <p>
+          <a href="#/explorer">Public</a> ${this.props.node ? pathString : ''}
+        </p>
+        ${this.props.node ? html`
+          <${ExplorerNode} showExpandAll=${true} path=${this.props.node}/>
+        ` : html`
+          <div class="explorer-dir">
+            ${chevronDown} Users
+            <div class="explorer-dir">
+              ${chevronDown} <a href="#/explorer/~${Session.getPubKey()}">${Session.getPubKey()}</a>
+              <${ExplorerNode} path='~${Session.getPubKey()}'/>
+            </div>
+          </div>
+          <div class="explorer-dir">
+            ${chevronRight} <a href="#/explorer/%23">#</a>
+          </div>
+        `}
+
       </div>
     `;
   }
@@ -41,7 +61,7 @@ class ExplorerNode extends Component {
       const path = this.props.path.split('/');
       return path.reduce((sum, current) => (current && sum.get(current)) || sum, publicState);
     }
-    return publicState.user(this.props.user);
+    return publicState;
   }
 
   componentWillUnmount() {
@@ -49,8 +69,15 @@ class ExplorerNode extends Component {
     this.eventListeners = {};
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.node !== this.props.node) {
+      this.componentWillUnmount();
+    }
+  }
+
   componentDidMount() {
-    this.getNode().map().on((v, k) => {
+    this.getNode().map().on((v, k, c, e) => {
+      this.eventListeners['n'] = e;
       this.children[k] = v;
       this.setState({children: this.children});
     });
@@ -66,14 +93,14 @@ class ExplorerNode extends Component {
     const path = v['_']['#'];
     return html`
       <div class="explorer-dir">
-        ${this.state.isChildOpen[k] ? chevronDown : chevronRight}
-        <a href="#" onClick=${e => this.onChildObjectClick(e, k)}><b>${k}</b></a>
+        <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.isChildOpen[k] ? chevronDown : chevronRight}</span>
+        <a href="#/explorer/${encodeURIComponent(path)}"><b>${k}</b></a>
         ${this.state.isChildOpen[k] ? html`<${ExplorerNode} path=${path}/>` : ''}
       </div>
     `;
   }
 
-  renderChild(k, v) {
+  renderChildValue(k, v) {
     const s = JSON.stringify(v);
     return html`
       <div class="explorer-dir">
@@ -82,15 +109,24 @@ class ExplorerNode extends Component {
     `;
   }
 
+  onExpandClicked() {
+    const expandAll = !this.state.expandAll;
+    Object.keys(this.children).forEach(k => {
+      this.isChildOpen[k] = expandAll;
+    });
+    this.setState({expandAll, isChildOpen: this.isChildOpen});
+  }
+
   render() {
     return html`
       <div class="explorer-dir">
+        ${this.props.showExpandAll ? html`<p><a onClick=${() => this.onExpandClicked()}>${this.state.expandAll ? 'Close all' : 'Expand all'}</a></p>`: ''}
         ${Object.keys(this.state.children).sort().map(k => {
           const v = this.state.children[k];
           if (typeof v === 'object' && v && v['_']) {
             return this.renderChildObject(k, v);
           } else {
-            return this.renderChild(k, v);
+            return this.renderChildValue(k, v);
           }
         })}
       </div>
