@@ -20,7 +20,7 @@ class ExplorerView extends Component {
   render() {
     const split = (this.props.node || '').split('/');
     const pathString = split.map((k, i) => html`
-      ${chevronRight} <a href="#/explorer/${encodeURIComponent(split.slice(0,i+1).join('/'))}">${k}</a>
+      ${chevronRight} <a href="#/explorer/${encodeURIComponent(split.slice(0,i+1).join('/'))}">${decodeURIComponent(k)}</a>
     `);
     return html`
       <div class="main-view">
@@ -33,7 +33,7 @@ class ExplorerView extends Component {
           <div class="explorer-dir">
             ${chevronDown} Users
             <div class="explorer-dir">
-              ${chevronDown} <a href="#/explorer/~${Session.getPubKey()}">${Session.getPubKey()}</a>
+              ${chevronDown} <a href="#/explorer/~${encodeURIComponent(Session.getPubKey())}">${Session.getPubKey()}</a>
               <${ExplorerNode} path='~${Session.getPubKey()}'/>
             </div>
           </div>
@@ -58,7 +58,7 @@ class ExplorerNode extends Component {
   getNode() {
     if (this.props.path) {
       const path = this.props.path.split('/');
-      return path.reduce((sum, current) => (current && sum.get(current)) || sum, publicState);
+      return path.reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, publicState);
     }
     return publicState;
   }
@@ -80,7 +80,14 @@ class ExplorerNode extends Component {
       let decrypted;
       if (typeof v === 'string' && v.indexOf('SEA{') === 0) {
         try {
-          const dec = await Gun.SEA.decrypt(v, Session.getKey());
+          const myKey = Session.getKey();
+          let dec = await Gun.SEA.decrypt(v, myKey);
+          if (dec === undefined) {
+            if (!this.mySecret) {
+              this.mySecret = await Gun.SEA.secret(myKey.epub, myKey);
+              dec = await Gun.SEA.decrypt(v, this.mySecret);
+            }
+          }
           if (dec !== undefined) {
             v = dec;
             decrypted = true;
@@ -102,7 +109,7 @@ class ExplorerNode extends Component {
   }
 
   renderChildObject(k, v) {
-    const path = v['_']['#'];
+    const path = this.props.path + '/' + encodeURIComponent(k);
     return html`
       <div class="explorer-dir">
         <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.children[k].open ? chevronDown : chevronRight}</span>
