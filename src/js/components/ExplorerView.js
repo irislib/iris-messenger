@@ -120,7 +120,12 @@ class ExplorerNode extends Component {
   }
 
   renderChildValue(k, v) {
-    const s = JSON.stringify(v);
+    let s;
+    if (typeof v === 'string' && v.indexOf('data:image') === 0) {
+      s = html`<img src=${v}/>`;
+    } else {
+      s = JSON.stringify(v);
+    }
     return html`
       <div class="explorer-dir">
         <b>${k}</b>: ${this.children[k].decrypted ? html`<span class="tooltip"><span class="tooltiptext">Encrypted value</span>🔒</span> ` : ''} ${s}
