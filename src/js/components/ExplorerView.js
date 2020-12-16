@@ -51,9 +51,8 @@ class ExplorerNode extends Component {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = {children: {}, isChildOpen: {}};
+    this.state = {children: {}};
     this.children = {};
-    this.isChildOpen = {};
   }
 
   getNode() {
@@ -77,26 +76,38 @@ class ExplorerNode extends Component {
 
   componentDidMount() {
     this.isMine = this.props.path.indexOf('~' + Session.getPubKey()) === 0;
-    this.getNode().map().on((v, k, c, e) => {
+    this.getNode().map().on(async (v, k, c, e) => {
+      let decrypted;
+      if (typeof v === 'string' && v.indexOf('SEA{') === 0) {
+        try {
+          const dec = await Gun.SEA.decrypt(v, Session.getKey());
+          if (dec !== undefined) {
+            v = dec;
+            decrypted = true;
+          }
+        } catch(e) {
+
+        }
+      }
       this.eventListeners['n'] = e;
-      this.children[k] = v;
+      this.children[k] = { value: v, decrypted };
       this.setState({children: this.children});
     });
   }
 
   onChildObjectClick(e, k) {
     e.preventDefault();
-    this.isChildOpen[k] = !this.isChildOpen[k];
-    this.setState({isChildOpen: this.isChildOpen});
+    this.children[k].open = !this.children[k].open;
+    this.setState({children: this.children});
   }
 
   renderChildObject(k, v) {
     const path = v['_']['#'];
     return html`
       <div class="explorer-dir">
-        <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.isChildOpen[k] ? chevronDown : chevronRight}</span>
+        <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.children[k].open ? chevronDown : chevronRight}</span>
         <a href="#/explorer/${encodeURIComponent(path)}"><b>${k}</b></a>
-        ${this.state.isChildOpen[k] ? html`<${ExplorerNode} path=${path}/>` : ''}
+        ${this.state.children[k].open ? html`<${ExplorerNode} path=${path}/>` : ''}
       </div>
     `;
   }
@@ -105,7 +116,7 @@ class ExplorerNode extends Component {
     const s = JSON.stringify(v);
     return html`
       <div class="explorer-dir">
-        <b>${k}</b>: ${s}
+        <b>${k}</b>: ${this.children[k].decrypted ? html`<span class="tooltip"><span class="tooltiptext">Encrypted value</span>🔒</span> ` : ''} ${s}
       </div>
     `;
   }
@@ -113,9 +124,9 @@ class ExplorerNode extends Component {
   onExpandClicked() {
     const expandAll = !this.state.expandAll;
     Object.keys(this.children).forEach(k => {
-      this.isChildOpen[k] = expandAll;
+      this.children[k].open = expandAll;
     });
-    this.setState({expandAll, isChildOpen: this.isChildOpen});
+    this.setState({expandAll, children: this.children});
   }
 
   onNewItemSubmit(e) {
@@ -154,7 +165,7 @@ class ExplorerNode extends Component {
           </p>
         ` : ''}
         ${Object.keys(this.state.children).sort().map(k => {
-          const v = this.state.children[k];
+          const v = this.state.children[k].value;
           if (typeof v === 'object' && v && v['_']) {
             return this.renderChildObject(k, v);
           } else {
