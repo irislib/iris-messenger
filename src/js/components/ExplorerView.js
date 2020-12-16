@@ -97,7 +97,8 @@ class ExplorerNode extends Component {
         }
       }
       this.eventListeners['n'] = e;
-      this.children[k] = { value: v, decrypted };
+      const prev = this.children[k] || {};
+      this.children[k] = Object.assign(prev, { value: v, decrypted });
       this.setState({children: this.children});
     });
   }
