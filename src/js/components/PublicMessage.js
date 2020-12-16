@@ -57,7 +57,7 @@ class PublicMessage extends Message {
         });
       });
       if (msg.torrentId) {
-        this.downloadWebtorrent(msg.torrentId);
+        !iris.util.isMobile && this.downloadWebtorrent(msg.torrentId);
       }
     });
   }
