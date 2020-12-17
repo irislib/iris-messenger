@@ -77,7 +77,7 @@ class ExplorerNode extends Component {
   componentDidMount() {
     this.isMine = this.props.path.indexOf('~' + Session.getPubKey()) === 0;
     this.getNode().map().on(async (v, k, c, e) => {
-      let decrypted;
+      let encryption;
       if (typeof v === 'string' && v.indexOf('SEA{') === 0) {
         try {
           const myKey = Session.getKey();
@@ -90,7 +90,9 @@ class ExplorerNode extends Component {
           }
           if (dec !== undefined) {
             v = dec;
-            decrypted = true;
+            encryption = 'Decrypted';
+          } else {
+            encryption = 'Encrypted';
           }
         } catch(e) {
 
@@ -98,7 +100,7 @@ class ExplorerNode extends Component {
       }
       this.eventListeners['n'] = e;
       const prev = this.children[k] || {};
-      this.children[k] = Object.assign(prev, { value: v, decrypted });
+      this.children[k] = Object.assign(prev, { value: v, encryption });
       this.setState({children: this.children});
     });
   }
@@ -127,9 +129,16 @@ class ExplorerNode extends Component {
     } else {
       s = JSON.stringify(v);
     }
+    const d = this.children[k].encryption;
+    const e = d === 'Encrypted';
     return html`
       <div class="explorer-dir">
-        <b>${k}</b>: ${this.children[k].decrypted ? html`<span class="tooltip"><span class="tooltiptext">Encrypted value</span>🔒</span> ` : ''} ${s}
+        <b>${k}</b>:
+        ${d ? html`
+          <span class="tooltip"><span class="tooltiptext">${d} value</span>
+            ${e ? '' : '🔓'}
+          </span>
+        ` : ''} ${e ? html`<i>Encrypted value</i>` : s}
       </div>
     `;
   }
