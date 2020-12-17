@@ -124,21 +124,31 @@ class ExplorerNode extends Component {
 
   renderChildValue(k, v) {
     let s;
-    if (typeof v === 'string' && v.indexOf('data:image') === 0) {
-      s = html`<img src=${v}/>`;
+    const encryption = this.children[k].encryption;
+    const decrypted = encryption === 'Decrypted';
+    if (encryption) {
+      if (!decrypted) {
+        s = html`<i>Encrypted value</i>`;
+      }
     } else {
-      s = JSON.stringify(v);
+      const pub = Session.getPubKey();
+      const isMine = this.props.path.indexOf('~' + pub) === 0;
+      const path = isMine && (this.props.path + '/' + k).replace('~' + pub + '/', '');
+      console.log(pub, '~' + pub + '/', path);
+      if (typeof v === 'string' && v.indexOf('data:image') === 0) {
+        s = isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
+      } else {
+        s = isMine ? html`<iris-text placeholder="empty" user=${pub} path=${path}/>` : JSON.stringify(v);
+      }
     }
-    const d = this.children[k].encryption;
-    const e = d === 'Encrypted';
     return html`
       <div class="explorer-dir">
         <b>${k}</b>:
-        ${d ? html`
-          <span class="tooltip"><span class="tooltiptext">${d} value</span>
-            ${e ? '' : '🔓'}
+        ${encryption ? html`
+          <span class="tooltip"><span class="tooltiptext">${encryption} value</span>
+            ${decrypted ? '🔓' : ''}
           </span>
-        ` : ''} ${e ? html`<i>Encrypted value</i>` : s}
+        ` : ''} ${s}
       </div>
     `;
   }
