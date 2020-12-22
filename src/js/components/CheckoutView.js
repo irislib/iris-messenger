@@ -34,13 +34,18 @@ class CheckoutView extends StoreView {
 
   confirm() {
     const pub = this.props.store;
+    newChat(pub);
+    const cart = {};
+    Object.keys(this.cart).forEach(k => {
+      const v = this.cart[k];
+      v && (cart[k] = v);
+    });
+    chats[pub].send({
+      text: 'New order: ' + JSON.stringify(cart) + ', delivery: ' + JSON.stringify(this.state.delivery) + ', payment: ' + this.state.paymentMethod,
+      order: true
+    });
     localState.get('cart').get(pub).map().once((v, k) => {
       !!v && localState.get('cart').get(pub).get(k).put(null);
-    });
-    newChat(pub);
-    chats[pub].send({
-      text: 'New order: ' + JSON.stringify(this.cart) + ', delivery: ' + JSON.stringify(this.state.delivery) + ', payment: ' + this.state.paymentMethod,
-      order: true
     });
     route('/chat/' + pub);
   }
