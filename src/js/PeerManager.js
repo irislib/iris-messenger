@@ -6,7 +6,7 @@ import Session from './Session.js';
 import {translate as t} from './Translation.js';
 
 var MAX_PEER_LIST_SIZE = 10;
-var MAX_CONNECTED_PEERS = iris.util.isElectron ? 2 : 1;
+var MAX_CONNECTED_PEERS = 2;
 const DEFAULT_PEERS = {
   'https://gun-us.herokuapp.com/gun': {}
 };

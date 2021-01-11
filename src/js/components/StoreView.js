@@ -73,7 +73,7 @@ class StoreView extends Component {
               <h3 class="profile-name"><iris-text path="profile/name" placeholder="Name" user=${this.props.store}/></h3>
               <div class="profile-about hidden-xs">
                 <p class="profile-about-content">
-                  <iris-text path="profile/about" placeholder="About" attr="about" user=${this.props.store}/>
+                  <iris-text path="store/about" placeholder="Store description" attr="about" user=${this.props.store}/>
                 </p>
               </div>
               <div class="profile-actions">
