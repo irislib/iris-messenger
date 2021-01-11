@@ -10,7 +10,6 @@ import Session from '../Session.js';
 import Notifications from '../Notifications.js';
 import ChatList from './ChatList.js';
 import NewChat from './NewChat.js';
-import {activeRoute} from '../Main.js';
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
@@ -94,7 +93,7 @@ class ChatView extends Component {
     }, 200);
     chats[pub].getMessages((msg, info) => {
       processMessage(pub, msg, info);
-      if (activeRoute.replace('/chat/', '') === pub) {
+      if (window.location.hash.replace('#/chat/', '') === pub) {
         limitedUpdate();
       }
     });

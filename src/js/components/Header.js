@@ -2,7 +2,6 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {chats, getDisplayName} from '../Chat.js';
 import { translate as t } from '../Translation.js';
-import {activeRoute} from '../Main.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import { route } from '../lib/preact-router.es.js';
@@ -64,7 +63,7 @@ class Header extends Component {
     State.local.get('activeRoute').on(activeRoute => {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
-      this.setState({});
+      this.setState({activeRoute});
       const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
       this.chatId = replaced.length < activeRoute.length ? replaced : null;
       if (this.chatId) {
@@ -102,6 +101,7 @@ class Header extends Component {
   }
 
   render() {
+    const activeRoute = this.state.activeRoute;
     const chat = chats[this.chatId];
     const isTyping = chat && chat.isTyping;
     const participants = chat && chat.uuid && Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');

@@ -1,4 +1,3 @@
-import {activeRoute} from './Main.js';
 import State from './State.js';
 import {chats, addChat, newChat} from './Chat.js';
 import Notifications from './Notifications.js';
@@ -48,9 +47,10 @@ function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
 }
 
 function setOurOnlineStatus() {
+  const activeRoute = window.location.hash;
   iris.Channel.setActivity(State.public, ourActivity = 'active');
   const setActive = _.debounce(() => {
-    const chat = activeRoute && chats[activeRoute.replace('/profile/','').replace('/chat/','')];
+    const chat = activeRoute && chats[activeRoute.replace('#/profile/','').replace('#/chat/','')];
     if (chat && !ourActivity) {
       chat.setMyMsgsLastSeenTime();
     }
@@ -64,7 +64,7 @@ function setOurOnlineStatus() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
       iris.Channel.setActivity(State.public, ourActivity = 'active');
-      const chatId = activeRoute.replace('/profile/','').replace('/chat/','');
+      const chatId = activeRoute.replace('#/profile/','').replace('#/chat/','');
       const chat = activeRoute && chats[chatId];
       if (chat) {
         chat.setMyMsgsLastSeenTime();

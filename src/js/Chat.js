@@ -1,4 +1,3 @@
-import {activeRoute} from './Main.js';
 import State from './State.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
@@ -10,7 +9,7 @@ import { route } from './lib/preact-router.es.js';
 const chats = window.chats = {};
 
 function getActiveProfile() {
-  return activeRoute.indexOf('/profile') === 0 ? activeRoute.replace('/profile/', '') : null;
+  return window.location.hash.indexOf('#/profile') === 0 ? window.location.hash.replace('#/profile/', '') : null;
 }
 
 function deleteChat(pub) {
@@ -228,7 +227,7 @@ function processMessage(chatId, msg, info) {
   msg.time = new Date(msg.time);
   chat.sortedMessages.push(msg);
   if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
-    if (activeRoute !== '/chat/' + chatId || document.visibilityState !== 'visible') {
+    if (window.location.hash !== '#/chat/' + chatId || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chatId, 1);
     }
   }

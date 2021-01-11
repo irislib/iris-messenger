@@ -4,7 +4,6 @@ import { translate as t } from '../Translation.js';
 import {chats} from '../Chat.js';
 import State from '../State.js';
 import Helpers from '../Helpers.js';
-import {activeRoute} from '../Main.js';
 import Session from '../Session.js';
 
 const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
@@ -174,7 +173,7 @@ class MessageForm extends Component {
   async webPush(msg) {
     const chat = chats[this.props.activeChat];
     const myKey = Session.getKey();
-    const shouldWebPush = (activeRoute === '/chat/' + myKey.pub) || !(chat.activity);
+    const shouldWebPush = (window.location.hash === '#/chat/' + myKey.pub) || !(chat.activity);
     if (shouldWebPush && chat.webPushSubscriptions) {
       const subscriptions = [];
       const participants = Object.keys(chat.webPushSubscriptions);

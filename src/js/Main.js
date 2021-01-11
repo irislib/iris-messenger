@@ -38,7 +38,6 @@ if (!isElectron && ('serviceWorker' in navigator)) {
     });
   });
 }
-let activeRoute;
 
 State.init();
 Session.init();
@@ -49,7 +48,7 @@ Helpers.checkColorScheme();
 
 function handleRoute(e) {
   document.title = 'Iris';
-  activeRoute = e.url;
+  let activeRoute = e.url;
   if (!activeRoute && window.location.hash) {
     return route(window.location.hash.replace('#', '')); // bubblegum fix back navigation
   }
@@ -105,5 +104,3 @@ $(window).resize(() => { // if resizing up from mobile size menu view
     route('/');
   }
 });
-
-export {activeRoute};

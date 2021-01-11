@@ -2,7 +2,6 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import {chats} from '../Chat.js';
-import {activeRoute} from '../Main.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
@@ -94,8 +93,9 @@ class Message extends Component {
       }});
     }
     $('#attachment-gallery').fadeOut({duration: ANIMATE_DURATION, complete: () => $('#attachment-gallery').remove()});
-    if (activeRoute && chats[activeRoute]) {
-      chats[activeRoute].attachments = null;
+    const activeChat = window.location.hash.replace('#/profile/','').replace('#/chat/','');
+    if (activeChat && chats[activeChat]) {
+      chats[activeChat].attachments = null;
     }
   }
 

@@ -1,6 +1,5 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {activeRoute} from '../Main.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import Identicon from './Identicon.js';
@@ -31,7 +30,7 @@ class Footer extends Component {
     State.local.get('activeRoute').on(activeRoute => {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
-      this.setState({});
+      this.setState({activeRoute});
       const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
       this.chatId = replaced.length < activeRoute.length ? replaced : null;
     });
@@ -39,6 +38,7 @@ class Footer extends Component {
 
   render() {
     const key = Session.getKey().pub;
+    const activeRoute = this.state.activeRoute;
 
     if (this.chatId) {
       return html``;
