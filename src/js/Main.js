@@ -75,7 +75,7 @@ class Main extends Component {
           <${StoreView} path="/store/:store"/>
           <${CheckoutView} path="/checkout/:store"/>
           <${ProductView} path="/product/:product/:store"/>
-          <${ProductView} path="/product/new"/>
+          <${ProductView} path="/product/new" store=Session.getPubKey()/>
           <${ExplorerView} path="/explorer/:node"/>
           <${ExplorerView} path="/explorer"/>
           <${FollowsView} path="/follows/:id"/>
