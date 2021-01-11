@@ -410,6 +410,26 @@ header.footer .header-content {
   max-width: 100%;
 }
 
+.application-list a {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  height: 55px;
+}
+
+.application-list .icon {
+  padding: 15px;
+  min-width: 55px;
+  text-align: center;
+}
+
+.application-list .text {
+  border-bottom: 1px solid var(--zebra-stripe-bg);
+  flex: 1;
+  padding: 15px;
+  padding-left: 0;
+}
+
 .public-messages-view .img-container img {
   max-height: 80vh;
   border-radius: 0;
