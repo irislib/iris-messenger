@@ -177,10 +177,23 @@ function getPubKey() {
   return key && key.pub;
 }
 
-function init() {
+function loginAsNewUser(name) {
+  return Gun.SEA.pair().then(k => {
+    login(k);
+    name && State.public.user().get('profile').get('name').put(name);
+    createChatLink();
+    localState.get('noFollows').put(true);
+    localState.get('noFollowers').put(true);
+  });
+}
+
+function init(options = {}) {
   var localStorageKey = localStorage.getItem('chatKeyPair');
   if (localStorageKey) {
     login(JSON.parse(localStorageKey));
+  } else if (options.autologin) {
+    const name = Helpers.generateName();
+    loginAsNewUser(name);
   }
 }
 
