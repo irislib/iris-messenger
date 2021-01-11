@@ -1,4 +1,4 @@
-import {activeRoute, activeProfile} from './Main.js';
+import {activeRoute} from './Main.js';
 import State from './State.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
@@ -8,6 +8,10 @@ import Session from './Session.js';
 import { route } from './lib/preact-router.es.js';
 
 const chats = window.chats = {};
+
+function getActiveProfile() {
+  return activeRoute.indexOf('/profile') === 0 ? activeRoute.replace('/profile/', '') : null;
+}
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
@@ -84,7 +88,7 @@ function addChat(chat) {
   chat.notificationSetting = 'all';
   chat.onMy('notificationSetting', (val) => {
     chat.notificationSetting = val;
-    if (pub === activeProfile) {
+    if (pub === getActiveProfile()) {
       $("input[name=notificationPreference][value=" + val + "]").attr('checked', 'checked');
     }
   });
@@ -131,7 +135,7 @@ function addChat(chat) {
     } else {
       el.find('.name').text(Helpers.truncateString(getDisplayName(pub), 20));
     }
-    if (pub === activeProfile) {
+    if (pub === getActiveProfile()) {
       $('#profile-group-name').not(':focus').val(name);
     }
   }
@@ -149,7 +153,7 @@ function addChat(chat) {
     el.find('.identicon-container').empty();
     var img = Helpers.setImgSrc($('<img>'), photo).attr('height', 49).attr('width', 49).css({'border-radius': '50%'});
     el.find('.identicon-container').append(photo ? img : chat.identicon);
-    if (pub === activeProfile) {
+    if (pub === getActiveProfile()) {
       Helpers.setImgSrc($('#current-profile-photo'), photo);
       Helpers.setImgSrc($('#profile .profile-photo'), photo);
     }
@@ -178,7 +182,7 @@ function addChat(chat) {
     chat.inviteLinks = {};
     chat.getChatLinks({callback: ({url, id}) => {
       chat.inviteLinks[id] = url;
-      if (pub === activeProfile) {
+      if (pub === getActiveProfile()) {
         State.local.get('inviteLinksChanged').put(true);
       }
     }});

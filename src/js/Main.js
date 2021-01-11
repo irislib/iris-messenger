@@ -38,7 +38,7 @@ if (!isElectron && ('serviceWorker' in navigator)) {
     });
   });
 }
-let activeRoute, activeProfile;
+let activeRoute;
 
 State.init();
 Session.init();
@@ -53,7 +53,6 @@ function handleRoute(e) {
   if (!activeRoute && window.location.hash) {
     return route(window.location.hash.replace('#', '')); // bubblegum fix back navigation
   }
-  activeProfile = activeRoute.indexOf('/profile') === 0 ? activeRoute.replace('/profile/', '') : null;
   State.local.get('activeRoute').put(activeRoute);
   QRScanner.cleanupScanner();
 }
@@ -107,4 +106,4 @@ $(window).resize(() => { // if resizing up from mobile size menu view
   }
 });
 
-export {activeRoute, activeProfile};
+export {activeRoute};
