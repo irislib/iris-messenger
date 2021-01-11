@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {localState, publicState} from '../Main.js';
+import State from '../State.js';
 import {chats, deleteChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
@@ -26,7 +26,7 @@ class Profile extends Component {
 
   onProfilePhotoSet(src) {
     if (this.isMyProfile) {
-      publicState.user().get('profile').get('photo').put(src);
+      State.public.user().get('profile').get('photo').put(src);
     } else {
       chats[this.props.id].put('photo', src);
     }
@@ -35,7 +35,7 @@ class Profile extends Component {
   onAboutInput(e) {
     const about = $(e.target).text().trim();
     if (this.isMyProfile) {
-      publicState.user().get('profile').get('about').put(about);
+      State.public.user().get('profile').get('about').put(about);
     } else {
       chats[this.props.id].put('about', about);
     }
@@ -49,7 +49,7 @@ class Profile extends Component {
     const name = $(e.target).text().trim();
     if (name.length) {
       if (this.isMyProfile) {
-        publicState.user().get('profile').get('name').put(name);
+        State.public.user().get('profile').get('name').put(name);
       } else {
         chats[this.props.id].put('name', name);
       }
@@ -77,7 +77,7 @@ class Profile extends Component {
       $('#profile-add-participant-candidate').remove();
       var identicon = Helpers.getIdenticon(pub, 40).css({'margin-right':15});
       var nameEl = $('<span>');
-      publicState.user(pub).get('profile').get('name').on(name => nameEl.text(name));
+      State.public.user(pub).get('profile').get('name').on(name => nameEl.text(name));
       var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
       var addBtn = $('<button>').css({'margin-left': 15}).text(t('add')).click(() => {
         if (newGroupParticipant) {
@@ -285,7 +285,7 @@ class Profile extends Component {
             ${messageForm}
             <div class="public-messages-view">
               ${this.getNotification()}
-              <${MessageFeed} node=${publicState.user(this.props.id).get('msgs')} />
+              <${MessageFeed} node=${State.public.user(this.props.id).get('msgs')} />
             </div>
           </div>
         `}
@@ -306,7 +306,7 @@ class Profile extends Component {
 
   userDidMount() {
     const pub = this.props.id;
-    publicState.user(pub).get('follow').map().on((following,key,c,e) => {
+    State.public.user(pub).get('follow').map().on((following,key,c,e) => {
       this.eventListeners.push(e);
       if (following) {
         this.followedUsers.add(key);
@@ -315,9 +315,9 @@ class Profile extends Component {
       }
       this.setState({followedUserCount: this.followedUsers.size});
     });
-    localState.get('follows').map().once((following,key) => {
+    State.local.get('follows').map().once((following,key) => {
       if (following) {
-        publicState.user(key).get('follow').get(pub).once(following => {
+        State.public.user(key).get('follow').get(pub).once(following => {
           if (following) {
             this.followers.add(key);
             this.setState({followerCount: this.followers.size});
@@ -325,18 +325,18 @@ class Profile extends Component {
         });
       }
     });
-    publicState.user(pub).get('profile').get('name').on((name,a,b,e) => {
+    State.public.user(pub).get('profile').get('name').on((name,a,b,e) => {
       document.title = name || 'Iris';
       this.eventListeners.push(e);
       if (!$('#profile .profile-name:focus').length) {
         this.setState({name});
       }
     });
-    publicState.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
+    State.public.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
       this.eventListeners.push(e);
       this.setState({photo});
     });
-    publicState.user(pub).get('profile').get('about').on((about,a,b,e) => {
+    State.public.user(pub).get('profile').get('about').on((about,a,b,e) => {
       this.eventListeners.push(e);
       if (!$('#profile .profile-about-content:focus').length) {
         this.setState({about});
@@ -384,9 +384,9 @@ class Profile extends Component {
     }
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
-    localState.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
-    localState.get('inviteLinksChanged').on(() => this.setState({}));
-    localState.get('chats').get(this.props.id).get('participants').on(() => {
+    State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
+    State.local.get('inviteLinksChanged').on(() => this.setState({}));
+    State.local.get('chats').get(this.props.id).get('participants').on(() => {
       const isAdmin = areWeAdmin(pub);
       this.setState({isAdmin});
     });

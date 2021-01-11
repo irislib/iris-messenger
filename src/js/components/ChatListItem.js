@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import { route } from '../lib/preact-router.es.js';
 import { translate as t } from '../Translation.js';
-import {localState} from '../Main.js';
+import State from '../State.js';
 import Session from '../Session.js';
 import Identicon from './Identicon.js';
 import Helpers from '../Helpers.js';
@@ -18,7 +18,7 @@ class ChatListItem extends Component {
 
   componentDidMount() {
     const chat = this.props.chat;
-    localState.get('chats').get(chat.id).get('latest').on((latest, a, b, event) => {
+    State.local.get('chats').get(chat.id).get('latest').on((latest, a, b, event) => {
       /*
       if (msg.attachments) {
         text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');

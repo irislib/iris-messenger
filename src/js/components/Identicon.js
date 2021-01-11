@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
-import {publicState} from '../Main.js';
+import State from '../State.js';
 
 class Identicon extends Component {
   constructor() {
@@ -24,7 +24,7 @@ class Identicon extends Component {
   componentDidMount() {
     const i = Helpers.getIdenticon(this.props.str, this.props.width)[0];
     if (this.props.showTooltip) {
-      publicState.user(this.props.str).get('profile').get('name').on((name,a,b,e) => {
+      State.public.user(this.props.str).get('profile').get('name').on((name,a,b,e) => {
         this.eventListeners['name'] = e;
         this.setState({name})
       });

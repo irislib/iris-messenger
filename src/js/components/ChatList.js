@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
-import {localState} from '../Main.js';
+import State from '../State.js';
 import ChatListItem from './ChatListItem.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
@@ -24,13 +24,13 @@ class ChatList extends Component {
         });
       this.setState({chats: sortedChats});
     }, 200);
-    localState.get('activeRoute').on(activeRoute => this.setState({activeRoute}));
-    localState.get('chats').map().on((chat, id) => {
+    State.local.get('activeRoute').on(activeRoute => this.setState({activeRoute}));
+    State.local.get('chats').map().on((chat, id) => {
       chat.id = id;
       chats[id] = chat;
       limitedUpdate();
     });
-    localState.get('scrollUp').on(() => Helpers.animateScrollTop('.chat-list'));
+    State.local.get('scrollUp').on(() => Helpers.animateScrollTop('.chat-list'));
     if (Session.getKey()) {
       $("#my-identicon").append(Helpers.getIdenticon(Session.getKey().pub, 40));
     }

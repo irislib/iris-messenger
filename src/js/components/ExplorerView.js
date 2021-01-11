@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import { route } from '../lib/preact-router.es.js';
-import {publicState} from '../Main.js';
+import State from '../State.js';
 import Session from '../Session.js';
 
 const chevronDown = html`
@@ -58,9 +58,9 @@ class ExplorerNode extends Component {
   getNode() {
     if (this.props.path) {
       const path = this.props.path.split('/');
-      return path.reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, publicState);
+      return path.reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, State.public);
     }
-    return publicState;
+    return State.public;
   }
 
   componentWillUnmount() {
@@ -138,7 +138,7 @@ class ExplorerNode extends Component {
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
         s = isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
       } else {
-        s = isMine ? html`<iris-text placeholder="empty" user=${pub} path=${path}/>` : JSON.stringify(v);
+        s = isMine && false ? html`<iris-text placeholder="empty" user=${pub} path=${path}/>` : JSON.stringify(v);
       }
     }
     return html`

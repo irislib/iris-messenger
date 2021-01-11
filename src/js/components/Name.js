@@ -1,5 +1,5 @@
 import { Component } from '../lib/preact.js';
-import {publicState} from '../Main.js';
+import State from '../State.js';
 
 class Name extends Component {
   constructor() {
@@ -8,7 +8,7 @@ class Name extends Component {
   }
 
   componentDidMount() {
-    publicState.user(this.props.pub).get('profile').get('name').on((name, a,b, e) => {
+    State.public.user(this.props.pub).get('profile').get('name').on((name, a,b, e) => {
       this.eventListeners['name'] = e;
       this.setState({name});
     });

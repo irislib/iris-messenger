@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import {html} from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import {newChat} from '../Chat.js';
-import {publicState} from '../Main.js';
+import State from '../State.js';
 
 class FollowButton extends Component {
   constructor() {
@@ -13,14 +13,14 @@ class FollowButton extends Component {
   onClick(e) {
     e.preventDefault();
     const follow = !this.state.following;
-    publicState.user().get('follow').get(this.props.id).put(follow);
+    State.public.user().get('follow').get(this.props.id).put(follow);
     if (follow) {
       newChat(this.props.id);
     }
   }
 
   componentDidMount() {
-    publicState.user().get('follow').get(this.props.id).on((following, a, b, e) => {
+    State.public.user().get('follow').get(this.props.id).on((following, a, b, e) => {
       this.setState({following});
       this.eventListeners['follow'] = e;
     });

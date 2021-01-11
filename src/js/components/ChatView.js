@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
-import {localState} from '../Main.js';
+import State from '../State.js';
 import Message from './Message.js';
 import MessageForm from './MessageForm.js';
 import {chats, processMessage, newChat} from '../Chat.js';
@@ -46,7 +46,7 @@ class ChatView extends Component {
   }
 
   componentDidMount() {
-    localState.get('activeRoute').on((activeRouteId, a, b, eve) => {
+    State.local.get('activeRoute').on((activeRouteId, a, b, eve) => {
       this.eventListeners.push(eve);
       if (activeRouteId.indexOf('/chat/') !== 0 || !Session.getKey()) return;
       this.activeChat && chats[this.activeChat] && chats[this.activeChat].setTyping(false);
@@ -144,7 +144,7 @@ class ChatView extends Component {
         $('#not-seen-by-them').slideUp();
       }
     }
-    this.activeChat && localState.get('chats').get(this.activeChat).get('msgDraft').once(m => $('.new-msg').val(m));
+    this.activeChat && State.local.get('chats').get(this.activeChat).get('msgDraft').once(m => $('.new-msg').val(m));
   }
 
   render() {

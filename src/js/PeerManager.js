@@ -1,4 +1,4 @@
-import {publicState} from './Main.js';
+import State from './State.js';
 import {chats, getDisplayName} from './Chat.js';
 import { route } from './lib/preact-router.es.js';
 import Helpers from './Helpers.js';
@@ -22,7 +22,7 @@ async function addPeer(peer) {
     var secret = await Gun.SEA.secret(Session.getKey().epub, Session.getKey());
     var encryptedUrl = await Gun.SEA.encrypt(peer.url, secret);
     var encryptedUrlHash = await Gun.SEA.work(encryptedUrl, null, null, {name: 'SHA-256'});
-    publicState.user().get('peers').get(encryptedUrlHash).put({url: peer.url, lastSeen: new Date().toISOString()});
+    State.public.user().get('peers').get(encryptedUrlHash).put({url: peer.url, lastSeen: new Date().toISOString()});
   }
   if (peer.enabled !== false) {
     connectPeer(peer.url);
@@ -37,7 +37,7 @@ function removePeer(url) {
 }
 
 function disconnectPeer(peerFromGun) {
-  publicState.on('bye', peerFromGun);
+  State.public.on('bye', peerFromGun);
   peerFromGun.url = '';
 }
 
@@ -68,7 +68,7 @@ function savePeers() {
 function connectPeer(url) {
   if (peers[url]) {
     peers[url].enabled = true;
-    publicState.opt({peers: [url]});
+    State.public.opt({peers: [url]});
     savePeers();
   } else {
     addPeer({url});
@@ -93,7 +93,7 @@ function getRandomPeers() {
 
 var askForPeers = _.once(pub => {
   _.defer(() => {
-    publicState.user(pub).get('peers').once().map().on(peer => {
+    State.public.user(pub).get('peers').once().map().on(peer => {
       if (peer && peer.url) {
         var peerCountBySource = _.countBy(peers, p => p.from);
         var peerSourceCount = Object.keys(peerCountBySource).length;
@@ -116,7 +116,7 @@ var askForPeers = _.once(pub => {
 });
 
 function checkGunPeerCount() {
-  var peersFromGun = publicState.back('opt.peers');
+  var peersFromGun = State.public.back('opt.peers');
   var connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
     return peer && peer.wire && peer.wire.hied === 'hi';
   });
@@ -136,7 +136,7 @@ function checkGunPeerCount() {
 }
 
 function updatePeerList() {
-  var peersFromGun = publicState.back('opt.peers');
+  var peersFromGun = State.public.back('opt.peers');
   $('#peers .peer').remove();
   $('#reset-peers').remove();
   var urls = Object.keys(peers);

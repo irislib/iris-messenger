@@ -25,6 +25,7 @@ import FollowsView from './components/FollowsView.js';
 import FeedView from './components/FeedView.js';
 import ExplorerView from './components/ExplorerView.js';
 import VideoCall from './components/VideoCall.js';
+import State from './State.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
@@ -39,13 +40,7 @@ if (!isElectron && ('serviceWorker' in navigator)) {
 }
 let activeRoute, activeProfile;
 
-Gun.log.off = true;
-var publicState = Gun({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity });
-window.publicState = publicState;
-var localState = Gun({peers: [], file: 'localState', multicast:false, localStorage: false}).get('state');
-window.localState = localState;
-window.iris.util.setPublicState && window.iris.util.setPublicState(publicState);
-
+State.init();
 Session.init();
 PeerManager.init();
 PublicMessages.init();
@@ -59,13 +54,13 @@ function handleRoute(e) {
     return route(window.location.hash.replace('#', '')); // bubblegum fix back navigation
   }
   activeProfile = activeRoute.indexOf('/profile') === 0 ? activeRoute.replace('/profile/', '') : null;
-  localState.get('activeRoute').put(activeRoute);
+  State.local.get('activeRoute').put(activeRoute);
   QRScanner.cleanupScanner();
 }
 
 class Main extends Component {
   componentDidMount() {
-    localState.get('loggedIn').on(loggedIn => this.setState({loggedIn}));
+    State.local.get('loggedIn').on(loggedIn => this.setState({loggedIn}));
   }
 
   render() {
@@ -112,4 +107,4 @@ $(window).resize(() => { // if resizing up from mobile size menu view
   }
 });
 
-export {publicState, localState, activeRoute, activeProfile};
+export {activeRoute, activeProfile};

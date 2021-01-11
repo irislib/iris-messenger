@@ -1,6 +1,6 @@
 import {addChat} from './Chat.js';
 import { translate as t } from './Translation.js';
-import {publicState, localState} from './Main.js';
+import State from './State.js';
 import Session from './Session.js';
 
 let pub;
@@ -16,24 +16,24 @@ async function sendPublicMsg(msg) {
   const signedMsg = await iris.SignedMessage.create(msg, Session.getKey());
   const serialized = signedMsg.toString();
   const hash = await iris.util.getHash(serialized);
-  publicState.get('#').get(hash).put(serialized);
+  State.public.get('#').get(hash).put(serialized);
   if (msg.replyingTo) {
-    twice(() => publicState.user().get('replies').get(msg.replyingTo).put({a:null}));
-    twice(() => publicState.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
+    twice(() => State.public.user().get('replies').get(msg.replyingTo).put({a:null}));
+    twice(() => State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
   } else {
-    publicState.user().get('msgs').get(msg.time).put(hash);
+    State.public.user().get('msgs').get(msg.time).put(hash);
   }
 }
 
 function deletePublicMsg(timeStr, replyingTo) {
-  publicState.user().get('msgs').get(timeStr).put(null);
-  replyingTo && publicState.user().get('replies').get(replyingTo).get(timeStr).put(null);
+  State.public.user().get('msgs').get(timeStr).put(null);
+  replyingTo && State.public.user().get('replies').get(replyingTo).get(timeStr).put(null);
 }
 
 function getMessageByHash(hash) {
   if (typeof hash !== 'string') throw new Error('hash must be a string, got ' + typeof hash + ' ' +  JSON.stringify(hash));
   return new Promise(resolve => {
-    localState.get('msgsByHash').get(hash).once(msg => {
+    State.local.get('msgsByHash').get(hash).once(msg => {
       if (typeof msg === 'string') {
         try {
           resolve(JSON.parse(msg));
@@ -42,7 +42,7 @@ function getMessageByHash(hash) {
         }
       }
     });
-    publicState.get('#').get(hash).on(async (serialized, a, b, event) => {
+    State.public.get('#').get(hash).on(async (serialized, a, b, event) => {
       if (typeof serialized !== 'string') {
         console.error('message parsing failed', hash, serialized);
         return;
@@ -51,7 +51,7 @@ function getMessageByHash(hash) {
       const msg = await iris.SignedMessage.fromString(serialized);
       if (msg) {
         resolve(msg);
-        localState.get('msgsByHash').get(hash).put(JSON.stringify(msg));
+        State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
       }
     });
   });
@@ -59,7 +59,7 @@ function getMessageByHash(hash) {
 
 function getMessages(pub, cb) {
   const seen = new Set();
-  publicState.user(pub).get('msgs').map().on(async (hash, time) => {
+  State.public.user(pub).get('msgs').map().on(async (hash, time) => {
     if (typeof hash === 'string' && !seen.has(hash)) {
       seen.add(hash);
       cb(hash, time);

@@ -1,6 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {localState, activeRoute} from '../Main.js';
+import {activeRoute} from '../Main.js';
+import State from '../State.js';
 import Session from '../Session.js';
 import Identicon from './Identicon.js';
 
@@ -24,10 +25,10 @@ class Footer extends Component {
   }
 
   componentDidMount() {
-    localState.get('unseenTotal').on(unseenTotal => {
+    State.local.get('unseenTotal').on(unseenTotal => {
       this.setState({unseenTotal});
     });
-    localState.get('activeRoute').on(activeRoute => {
+    State.local.get('activeRoute').on(activeRoute => {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
       this.setState({});
@@ -45,7 +46,7 @@ class Footer extends Component {
 
     return html`
     <footer class="visible-xs-flex nav footer">
-      <div class="header-content" onClick=${() => localState.get('scrollUp').put(true)}>
+      <div class="header-content" onClick=${() => State.local.get('scrollUp').put(true)}>
         <a href="/" class="btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
         <a href="/chat" class="btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
           ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}

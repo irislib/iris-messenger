@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
-import {localState} from '../Main.js';
+import State from '../State.js';
 import MessageForm from './MessageForm.js';
 import Identicon from './Identicon.js';
 import FollowButton from './FollowButton.js';
@@ -22,24 +22,24 @@ class FeedView extends Component {
   }
 
   getMessages(/*show2ndDegreeFollows*/) {
-    //const followsList = show2ndDegreeFollows ? localState.get('follows') : publicState.user().get('follow');
-    const followsList = localState.get('follows');
+    //const followsList = show2ndDegreeFollows ? State.local.get('follows') : State.public.user().get('follow');
+    const followsList = State.local.get('follows');
     followsList.map().once((follows, pub) => {
       if (follows) {
         if (this.following.has(pub)) return;
         if (Session.getPubKey() !== pub) {
-          this.state.noFollows && localState.get('noFollows').put(false);
+          this.state.noFollows && State.local.get('noFollows').put(false);
         }
         this.following.add(pub);
         PublicMessages.getMessages(pub, (hash, time) => {
           if (Session.getPubKey() !== pub) {
-            this.state.noMessages && localState.get('noMessages').put(false);
+            this.state.noMessages && State.local.get('noMessages').put(false);
           }
           const id = time + pub.slice(0,20);
           if (hash) {
-            localState.get('feed').get(id).put(hash);
+            State.local.get('feed').get(id).put(hash);
           } else {
-            localState.get('feed').get(id).put(null);
+            State.local.get('feed').get(id).put(null);
           }
         });
       } else {
@@ -51,14 +51,14 @@ class FeedView extends Component {
 
   componentDidMount() {
     /*
-    localState.get('show2ndDegreeFollows').on(show => {
+    State.local.get('show2ndDegreeFollows').on(show => {
       if (show === this.state.show2ndDegreeFollows) return;
       this.setState({show2ndDegreeFollows: show});
       //this.getMessages(show);
     }); */
-    localState.get('noFollows').on(noFollows => this.setState({noFollows}));
-    localState.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
-    localState.get('noMessages').on(noMessages => this.setState({noMessages}));
+    State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
+    State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
+    State.local.get('noMessages').on(noMessages => this.setState({noMessages}));
     this.getMessages();
   }
 
@@ -106,13 +106,13 @@ class FeedView extends Component {
 
           <!--<div class="feed-settings">
             <button onClick="${() => {
-                localState.get('show2ndDegreeFollows').put(!this.state.show2ndDegreeFollows);
+                State.local.get('show2ndDegreeFollows').put(!this.state.show2ndDegreeFollows);
               }}">
               ${this.state.show2ndDegreeFollows ? 'Hide' : 'Show'} messages from 2nd degree follows
             </button>
           </div>-->
           ${this.getNotification()}
-          <${MessageFeed} node=${localState.get('feed')} />
+          <${MessageFeed} node=${State.local.get('feed')} />
         </div>
       </div>
     `;

@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {localState, publicState} from '../Main.js';
+import State from '../State.js';
 import {chats, deleteChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
@@ -27,7 +27,7 @@ class ProductView extends StoreView {
 
   addToCart() {
     const count = (this.cart[this.props.product] || 0) + 1;
-    localState.get('cart').get(this.props.store).get(this.props.product).put(count);
+    State.local.get('cart').get(this.props.store).get(this.props.product).put(count);
   }
 
   newProduct() {
@@ -55,7 +55,7 @@ class ProductView extends StoreView {
 
   onClickDelete() {
     if (confirm('Delete product? This cannot be undone.')) {
-      publicState.user().get('store').get('products').get(this.props.product).put(null);
+      State.public.user().get('store').get('products').get(this.props.product).put(null);
       route('/store/' + this.props.store);
     }
   }
@@ -115,7 +115,7 @@ class ProductView extends StoreView {
       price: this.newProductPrice
     };
     console.log(product);
-    publicState.user().get('store').get('products').get(this.newProductId || this.newProductName).put(product);
+    State.public.user().get('store').get('products').get(this.newProductId || this.newProductName).put(product);
     route(`/store/${Session.getPubKey()}`)
   }
 
@@ -126,7 +126,7 @@ class ProductView extends StoreView {
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     this.isMyProfile = Session.getPubKey() === pub;
     if (this.props.product && pub) {
-      publicState.user(pub).get('store').get('products').get(this.props.product).on(product => this.setState({product}));
+      State.public.user(pub).get('store').get('products').get(this.props.product).on(product => this.setState({product}));
     }
   }
 }

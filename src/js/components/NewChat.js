@@ -1,7 +1,7 @@
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import { addChat, followChatLink } from '../Chat.js';
-import { localState, publicState } from '../Main.js';
+import State from '../State.js';
 import Helpers from '../Helpers.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
@@ -55,7 +55,7 @@ class NewChat extends Component {
     e.preventDefault();
     if ($('#new-group-name').val().length) {
       var c = new iris.Channel({
-        gun: publicState,
+        gun: State.public,
         key: Session.getKey(),
         participants: [],
       });
@@ -67,7 +67,7 @@ class NewChat extends Component {
   }
 
   componentDidMount() {
-    localState.get('chatLinks').map().on((url, id, b, e) => {
+    State.local.get('chatLinks').map().on((url, id, b, e) => {
       this.eventListeners['chatLinks'] = e;
       if (url) {
         if (typeof url !== 'string' || url.indexOf('http') !== 0) return;

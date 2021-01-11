@@ -5,7 +5,7 @@ import { route } from '../lib/preact-router.es.js';
 import {chats} from '../Chat.js';
 import {translate as t} from '../Translation.js';
 
-import {localState} from '../Main.js';
+import State from '../State.js';
 
 var ringSound = new Audio('../../audio/ring.mp3');
 ringSound.loop = true;
@@ -36,13 +36,13 @@ function setRTCConfig(c) {
 
 class VideoCall extends Component {
   componentDidMount() {
-    localState.get('activeCall').put(null);
-    localState.get('outgoingCall').put(null);
-    localState.get('incomingCall').put(null);
-    localState.get('call').open(call => {
+    State.local.get('activeCall').put(null);
+    State.local.get('outgoingCall').put(null);
+    State.local.get('incomingCall').put(null);
+    State.local.get('call').open(call => {
       this.onCallMessage(call.pub, call.call);
     });
-    localState.get('incomingCall').on(incomingCall => {
+    State.local.get('incomingCall').on(incomingCall => {
       if (!incomingCall) {
         clearTimeout(callTimeout);
         ringSound.pause();
@@ -55,19 +55,19 @@ class VideoCall extends Component {
       }
       this.setState({incomingCall});
     });
-    localState.get('activeCall').on(activeCall => {
+    State.local.get('activeCall').on(activeCall => {
       this.setState({activeCall})
       this.stopCalling();
     });
-    localState.get('outgoingCall').on(outgoingCall => {
+    State.local.get('outgoingCall').on(outgoingCall => {
       outgoingCall && this.onCallUser(outgoingCall);
       this.setState({outgoingCall});
     });
   }
 
   async answerCall(pub) {
-    localState.get('incomingCall').put(null);
-    localState.get('activeCall').put(pub);
+    State.local.get('incomingCall').put(null);
+    State.local.get('activeCall').put(pub);
     await this.initConnection(false, pub);
   }
 
@@ -84,9 +84,9 @@ class VideoCall extends Component {
           this.rejectCall(pub);
           return;
         }
-        localState.get('incomingCall').put(pub);
+        State.local.get('incomingCall').put(pub);
         clearTimeout(callTimeout);
-        callTimeout = setTimeout(() => localState.get('incomingCall').put(null), 5000);
+        callTimeout = setTimeout(() => State.local.get('incomingCall').put(null), 5000);
       }
     } else {
       this.callClosed(pub);
@@ -109,9 +109,9 @@ class VideoCall extends Component {
   }
 
   resetCalls() {
-    localState.get('outgoingCall').put(null);
-    localState.get('activeCall').put(null);
-    localState.get('incomingCall').put(null);
+    State.local.get('outgoingCall').put(null);
+    State.local.get('activeCall').put(null);
+    State.local.get('incomingCall').put(null);
   }
 
   callClosed(pub) {
@@ -165,11 +165,11 @@ class VideoCall extends Component {
     call();
     callSound.addEventListener('ended', () => this.timeoutPlayCallSound());
     callSound.play();
-    localState.get('outgoingCall').put(pub);
+    State.local.get('outgoingCall').put(pub);
   }
 
   cancelCall(pub) {
-    localState.get('outgoingCall').put(null);
+    State.local.get('outgoingCall').put(null);
     this.stopCalling();
     this.stopUserMedia(pub);
     chats[pub].put('call', 'null');
@@ -182,7 +182,7 @@ class VideoCall extends Component {
   }
 
   stopCalling() {
-    localState.get('outgoingCall').put(null);
+    State.local.get('outgoingCall').put(null);
     callSound.pause();
     callSound.removeEventListener('ended', () => this.timeoutPlayCallSound());
     clearTimeout(callSoundTimeout);
@@ -196,12 +196,12 @@ class VideoCall extends Component {
     this.stopUserMedia(pub);
     chats[pub].put('call', 'null');
     chats[pub].pc = null;
-    localState.get('activeCall').put(null);
+    State.local.get('activeCall').put(null);
   }
 
   rejectCall(pub) {
     chats[pub].rejectedTime = new Date();
-    localState.get('incomingCall').put(null);
+    State.local.get('incomingCall').put(null);
     console.log('rejectCall', pub, chats[pub]);
     chats[pub].put('call', 'null');
   }
@@ -278,7 +278,7 @@ class VideoCall extends Component {
         case "stable":
           this.stopCalling();
           console.log('call answered by', pub);
-          localState.get('activeCall').put(pub);
+          State.local.get('activeCall').put(pub);
           break;
         case "closed":
           console.log("Signalling state is 'closed'");

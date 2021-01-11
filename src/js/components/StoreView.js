@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {localState, publicState} from '../Main.js';
+import State from '../State.js';
 import {chats, deleteChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
@@ -30,7 +30,7 @@ class StoreView extends Component {
   addToCart(k, e) {
     e.stopPropagation();
     const count = (this.cart[k] || 0) + 1;
-    localState.get('cart').get(this.props.store).get(k).put(count);
+    State.local.get('cart').get(this.props.store).get(k).put(count);
   }
 
   render() {
@@ -148,14 +148,14 @@ class StoreView extends Component {
     this.isMyProfile = Session.getPubKey() === pub;
     this.cart = {};
 
-    localState.get('cart').get(this.props.store).map().on((v, k) => {
+    State.local.get('cart').get(this.props.store).map().on((v, k) => {
       this.cart[k] = v;
       this.setState({cart: this.cart})
       this.updateTotalPrice();
     });
 
     if (pub) {
-      publicState.user(pub).get('store').get('products').map().on((p, id) => {
+      State.public.user(pub).get('store').get('products').map().on((p, id) => {
         if (p) {
           const o = {};
           o[id] = p;

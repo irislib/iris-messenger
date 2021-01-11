@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import Helpers, { html } from '../Helpers.js';
-import {localState} from '../Main.js';
+import State from '../State.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
@@ -31,11 +31,11 @@ class SearchBox extends Component {
   }
 
   componentDidMount() {
-    localState.get('follows').map().on(follows => {
+    State.local.get('follows').map().on(follows => {
       this.hasFollows = this.hasFollows || Object.keys(Session.getFollows()).length > 1;
       follows && this.debouncedIndexAndSearch();
     });
-    localState.get('activeRoute').on((a,b,c,e) => {
+    State.local.get('activeRoute').on((a,b,c,e) => {
       this.eventListeners['activeRoute'] = e;
       this.close();
     });

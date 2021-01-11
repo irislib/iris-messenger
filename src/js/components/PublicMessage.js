@@ -3,7 +3,7 @@ import Helpers from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
 import Identicon from './Identicon.js';
 import MessageForm from './MessageForm.js';
-import {localState, publicState} from '../Main.js';
+import State from '../State.js';
 import { route } from '../lib/preact-router.es.js';
 import Message from './Message.js';
 import Session from '../Session.js';
@@ -34,21 +34,21 @@ class PublicMessage extends Message {
       msg.info = {from: r.signerKeyHash};
       this.setState({msg});
       if (this.props.showName && !this.props.name) {
-        publicState.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
+        State.public.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
           this.eventListeners['name'] = e;
           this.setState({name});
         });
       }
-      localState.get('follows').map().on((v, key, a, e) => {
+      State.local.get('follows').map().on((v, key, a, e) => {
         this.eventListeners[key] = e;
-        publicState.user(key).get('likes').get(this.props.hash).on((liked,a,b,e) => {
+        State.public.user(key).get('likes').get(this.props.hash).on((liked,a,b,e) => {
           this.eventListeners[key+'likes'] = e;
           liked ? this.likedBy.add(key) : this.likedBy.delete(key);
           const s = {likes: this.likedBy.size};
           if (key === Session.getPubKey()) s['liked'] = liked;
           this.setState(s);
         });
-        publicState.user(key).get('replies').get(this.props.hash).map().on((hash,time,b,e) => {
+        State.public.user(key).get('replies').get(this.props.hash).map().on((hash,time,b,e) => {
           if (!hash || this.replies[hash]) return;
           this.replies[hash] = {hash, time};
           this.eventListeners[key+'replies'] = e;
@@ -135,15 +135,15 @@ class PublicMessage extends Message {
   likeBtnClicked(e) {
     e.preventDefault();
     const liked = !this.state.liked;
-    publicState.user().get('likes').get(this.props.hash).put(liked);
+    State.public.user().get('likes').get(this.props.hash).put(liked);
   }
 
   onDelete(e) {
     e.preventDefault();
     const msg = this.state.msg;
     console.log(msg);
-    publicState.user().get('msgs').get(msg.time).put(null);
-    msg.replyingTo && publicState.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
+    State.public.user().get('msgs').get(msg.time).put(null);
+    msg.replyingTo && State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
   }
 
   render() {

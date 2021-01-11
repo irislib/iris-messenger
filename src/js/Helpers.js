@@ -1,4 +1,4 @@
-import {publicState} from './Main.js';
+import State from './State.js';
 import {translate as t} from './Translation.js';
 import {createElement} from './lib/preact.js';
 import htm from './lib/htm.module.js';
@@ -1996,7 +1996,7 @@ export default {
     var el = $('<div>').width(width).height(width).addClass('identicon');
     var identicon = $(new iris.Attribute({type: 'keyID', value: pub}).identicon({width, showType: false}));
     el.html(identicon);
-    publicState.user(pub).get('profile').get('photo').on(data => { // TODO: limit size
+    State.public.user(pub).get('profile').get('photo').on(data => { // TODO: limit size
       if (data) {
         el.html(setImgSrc($('<img>'), data).attr('width', width).attr('height', width).addClass('identicon-image'));
       } else {

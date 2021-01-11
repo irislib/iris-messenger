@@ -1,4 +1,5 @@
-import {publicState, localState, activeRoute, activeProfile} from './Main.js';
+import {activeRoute, activeProfile} from './Main.js';
+import State from './State.js';
 import { translate as t } from './Translation.js';
 import Helpers from './Helpers.js';
 import Notifications from './Notifications.js';
@@ -9,7 +10,7 @@ import { route } from './lib/preact-router.es.js';
 const chats = window.chats = {};
 
 function deleteChat(pub) {
-  iris.Channel.deleteChannel(publicState, Session.getKey(), pub);
+  iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
   delete chats[pub];
   $('.chat-item[data-pub="' + pub +'"]').remove();
 }
@@ -18,7 +19,7 @@ function newChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
   }
-  const chat = new iris.Channel({gun: publicState, key: Session.getKey(), chatLink: chatLink, participants: pub});
+  const chat = new iris.Channel({gun: State.public, key: Session.getKey(), chatLink: chatLink, participants: pub});
   addChat(chat);
 }
 
@@ -46,7 +47,7 @@ function addChat(chat) {
   var pub = chat.getId();
   if (chats[pub]) { return; }
   chats[pub] = chat;
-  const chatNode = localState.get('chats').get(pub);
+  const chatNode = State.local.get('chats').get(pub);
   chatNode.get('latestTime').on(t => {
     if (t && (!chat.latestTime || t > chat.latestTime)) {
       chat.latestTime = t;
@@ -72,12 +73,12 @@ function addChat(chat) {
   chat.identicon = Helpers.getIdenticon(pub, 49);
   chat.onTheir('nickname', (nick) => {
     chat.myNickname = nick;
-    localState.get('chats').get(pub).get('myNickname').put(nick);
+    State.local.get('chats').get(pub).get('myNickname').put(nick);
   });
   chat.onMy('nickname', (nick) => {
     chat.theirNickname = nick;
     if (pub !== Session.getKey().pub) {
-      localState.get('chats').get(pub).get('theirNickname').put(nick);
+      State.local.get('chats').get(pub).get('theirNickname').put(nick);
     }
   });
   chat.notificationSetting = 'all';
@@ -105,10 +106,10 @@ function addChat(chat) {
   chat.isTyping = false;
   chat.getTyping(isTyping => {
     chat.isTyping = isTyping;
-    localState.get('chats').get(pub).get('isTyping').put(isTyping);
+    State.local.get('chats').get(pub).get('isTyping').put(isTyping);
   });
   chat.online = {};
-  iris.Channel.getActivity(publicState, pub, (activity) => {
+  iris.Channel.getActivity(State.public, pub, (activity) => {
     if (chat) {
       chatNode.put({theirLastActiveTime: activity && activity.lastActive, activity: activity && activity.isActive && activity.status});
       chat.activity = activity;
@@ -143,7 +144,7 @@ function addChat(chat) {
       return;
     }
     if (photo && photo.indexOf('data:image') !== 0) { return; }
-    localState.get('chats').get(pub).get('photo').put(photo);
+    State.local.get('chats').get(pub).get('photo').put(photo);
     chat.photo = photo;
     el.find('.identicon-container').empty();
     var img = Helpers.setImgSrc($('<img>'), photo).attr('height', 49).attr('width', 49).css({'border-radius': '50%'});
@@ -166,23 +167,23 @@ function addChat(chat) {
           if (chat.participantProfiles[k]) { return; }
           var hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
           chat.participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
-          publicState.user(k).get('profile').get('name').on(name => {
+          State.public.user(k).get('profile').get('name').on(name => {
             chat.participantProfiles[k].name = name;
           });
         });
       }
-      localState.get('chats').get(chat.uuid).get('participants').put(participants);
+      State.local.get('chats').get(chat.uuid).get('participants').put(participants);
     });
     var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     chat.inviteLinks = {};
     chat.getChatLinks({callback: ({url, id}) => {
       chat.inviteLinks[id] = url;
       if (pub === activeProfile) {
-        localState.get('inviteLinksChanged').put(true);
+        State.local.get('inviteLinksChanged').put(true);
       }
     }});
   } else {
-    publicState.user(pub).get('profile').get('name').on(setName);
+    State.public.user(pub).get('profile').get('name').on(setName);
   }
   if (chat.put) {
     chat.onTheir('webPushSubscriptions', (s, k, from) => {
@@ -194,9 +195,9 @@ function addChat(chat) {
     setTimeout(() => chat.put('webPushSubscriptions', arr), 5000);
   }
   chat.onTheir('call', call => {
-    localState.get('call').put({pub, call});
+    State.local.get('call').put({pub, call});
   });
-  localState.get('chats').get(pub).put({enabled:true});
+  State.local.get('chats').get(pub).put({enabled:true});
 }
 
 function getDisplayName(pub) {
@@ -228,10 +229,10 @@ function processMessage(chatId, msg, info) {
     }
   }
   if (!info.selfAuthored && msg.timeStr > chat.theirMsgsLastSeenTime) {
-    localState.get('chats').get(chatId).get('theirMsgsLastSeenTime').put(msg.timeStr);
+    State.local.get('chats').get(chatId).get('theirMsgsLastSeenTime').put(msg.timeStr);
   }
   if (!chat.latestTime || (msg.timeStr > chat.latestTime)) {
-    localState.get('chats').get(chatId).put({
+    State.local.get('chats').get(chatId).put({
       latestTime: msg.timeStr,
       latest: {time: msg.timeStr, text: msg.text, selfAuthored: info.selfAuthored}
     });

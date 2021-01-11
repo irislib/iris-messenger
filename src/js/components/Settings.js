@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {publicState} from '../Main.js';
+import State from '../State.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import LanguageSelector from './LanguageSelector.js';
@@ -17,7 +17,7 @@ class Settings extends Component {
   }
 
   onProfilePhotoSet(src) {
-    publicState.user().get('profile').get('photo').put(src);
+    State.public.user().get('profile').get('photo').put(src);
   }
 
   render() {

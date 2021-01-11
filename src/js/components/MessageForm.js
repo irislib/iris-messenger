@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import {chats} from '../Chat.js';
-import {localState} from '../Main.js';
+import State from '../State.js';
 import Helpers from '../Helpers.js';
 import {activeRoute} from '../Main.js';
 import Session from '../Session.js';
@@ -39,7 +39,7 @@ class MessageForm extends Component {
   async onMsgFormSubmit(event) {
     const chat = chats[this.props.activeChat];
     event.preventDefault();
-    localState.get('chats').get(this.props.activeChat).get('msgDraft').put(null);
+    State.local.get('chats').get(this.props.activeChat).get('msgDraft').put(null);
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length && !chat.attachments) { return; }
@@ -116,7 +116,7 @@ class MessageForm extends Component {
       setTyping();
     }
     this.isTyping = getIsTyping();
-    localState.get('chats').get(this.props.activeChat).get('msgDraft').put($(event.target).val());
+    State.local.get('chats').get(this.props.activeChat).get('msgDraft').put($(event.target).val());
   }
 
   attachFileClicked(event) {

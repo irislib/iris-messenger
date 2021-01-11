@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import ScrollWindow from '../lib/ScrollWindow.js';
-import { localState } from '../Main.js';
+import State from '../State.js';
 
 const size = 10;
 
@@ -15,7 +15,7 @@ class MessageFeed extends Component {
   componentDidMount() {
     this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => this.setState({sortedMessages: sortedMessages.reverse()})});
     //this.initIntersectionObserver();
-    localState.get('scrollUp').on(() => this.topClicked());
+    State.local.get('scrollUp').on(() => this.topClicked());
   }
 
   componentDidUpdate(newProps) {

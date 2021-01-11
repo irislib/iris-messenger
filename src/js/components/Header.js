@@ -2,7 +2,8 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {chats, getDisplayName} from '../Chat.js';
 import { translate as t } from '../Translation.js';
-import {localState, activeRoute, publicState} from '../Main.js';
+import {activeRoute} from '../Main.js';
+import State from '../State.js';
 import Session from '../Session.js';
 import { route } from '../lib/preact-router.es.js';
 import Identicon from './Identicon.js';
@@ -57,21 +58,21 @@ class Header extends Component {
   }
 
   componentDidMount() {
-    localState.get('unseenTotal').on(unseenTotal => {
+    State.local.get('unseenTotal').on(unseenTotal => {
       this.setState({unseenTotal});
     });
-    localState.get('activeRoute').on(activeRoute => {
+    State.local.get('activeRoute').on(activeRoute => {
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
       this.setState({});
       const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
       this.chatId = replaced.length < activeRoute.length ? replaced : null;
       if (this.chatId) {
-        localState.get('chats').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
+        State.local.get('chats').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
           this.eventListeners.push(event);
           this.setState({});
         });
-        localState.get('chats').get(this.chatId).get('theirLastActiveTime').on((t, a, b, event) => {
+        State.local.get('chats').get(this.chatId).get('theirLastActiveTime').on((t, a, b, event) => {
           this.eventListeners.push(event);
           this.setState({});
         });
@@ -84,7 +85,7 @@ class Header extends Component {
         } else {
           title = getDisplayName(this.chatId);
           if (!title && this.chatId.length > 40) {
-            publicState.user(this.chatId).get('profile').get('name').on((name, a, b, eve) => {
+            State.public.user(this.chatId).get('profile').get('name').on((name, a, b, eve) => {
               this.eventListeners.push(eve);
               this.setState({title: name});
             });
@@ -116,7 +117,7 @@ class Header extends Component {
       </div>
       ` : ''}
       <div class="header-content">
-        <a href="/" onClick=${() => {$('a.logo').blur();localState.get('scrollUp').put(true)}} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
+        <a href="/" onClick=${() => {$('a.logo').blur();State.local.get('scrollUp').put(true)}} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
           <img src="img/icon128.png" width=40 height=40/>
           <img src="img/iris_logotype.png" height=23 width=41 />
         </a>
@@ -133,7 +134,7 @@ class Header extends Component {
         </div>
 
         ${chat && this.chatId !== key && !chat.uuid ? html`
-          <a class="tooltip" style="width:24px; height:24px; color: var(--msg-form-button-color)" id="start-video-call" onClick=${() => localState.get('outgoingCall').put(this.chatId)}>
+          <a class="tooltip" style="width:24px; height:24px; color: var(--msg-form-button-color)" id="start-video-call" onClick=${() => State.local.get('outgoingCall').put(this.chatId)}>
             <span class="tooltiptext">${t('video_call')}</span>
             ${videoCallIcon}
           </a>
@@ -142,13 +143,13 @@ class Header extends Component {
             </a> -->
         `: ''}
 
-        <a href="/" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
-        <a href="/chat" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
+        <a href="/" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${homeIcon}</a>
+        <a href="/chat" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
           ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
           ${chatIcon}
         </a>
-        <a href="/settings" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${settingsIcon}</a>
-        <a href="/profile/${key}" onClick=${() => localState.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
+        <a href="/settings" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${settingsIcon}</a>
+        <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>
       </div>

@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {localState, publicState} from '../Main.js';
+import State from '../State.js';
 import {chats, deleteChat, newChat} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
@@ -29,7 +29,7 @@ class CheckoutView extends StoreView {
 
   changeItemCount(k, v, e) {
     this.cart[k] = Math.max(this.cart[k] + v, 0);
-    localState.get('cart').get(this.props.store).get(k).put(this.cart[k]);
+    State.local.get('cart').get(this.props.store).get(k).put(this.cart[k]);
   }
 
   confirm() {
@@ -44,8 +44,8 @@ class CheckoutView extends StoreView {
       text: 'New order: ' + JSON.stringify(cart) + ', delivery: ' + JSON.stringify(this.state.delivery) + ', payment: ' + this.state.paymentMethod,
       order: true
     });
-    localState.get('cart').get(pub).map().once((v, k) => {
-      !!v && localState.get('cart').get(pub).get(k).put(null);
+    State.local.get('cart').get(pub).map().once((v, k) => {
+      !!v && State.local.get('cart').get(pub).get(k).put(null);
     });
     route('/chat/' + pub);
   }
@@ -92,13 +92,13 @@ class CheckoutView extends StoreView {
       <div class="side-padding-xs">
         <h3>Delivery</h3>
         <p>
-          <input type="text" placeholder="Name" value=${this.state.delivery.name} onInput=${e => localState.get('delivery').get('name').put(e.target.value)}/>
+          <input type="text" placeholder="Name" value=${this.state.delivery.name} onInput=${e => State.local.get('delivery').get('name').put(e.target.value)}/>
         </p>
         <p>
-          <input type="text" placeholder="Address" value=${this.state.delivery.address} onInput=${e => localState.get('delivery').get('address').put(e.target.value)}/>
+          <input type="text" placeholder="Address" value=${this.state.delivery.address} onInput=${e => State.local.get('delivery').get('address').put(e.target.value)}/>
         </p>
         <p>
-          <input type="text" placeholder="Email (optional)" value=${this.state.delivery.email} onInput=${e => localState.get('delivery').get('email').put(e.target.value)}/>
+          <input type="text" placeholder="Email (optional)" value=${this.state.delivery.email} onInput=${e => State.local.get('delivery').get('email').put(e.target.value)}/>
         </p>
         <button onClick=${() => this.setState({page:'payment'})}>Next</button>
       </div>
@@ -107,7 +107,7 @@ class CheckoutView extends StoreView {
 
   paymentMethodChanged(e) {
     const val = e.target.firstChild && e.target.firstChild.value;
-    val && localState.get('paymentMethod').put(val);
+    val && State.local.get('paymentMethod').put(val);
   }
 
   renderPayment() {
@@ -212,12 +212,12 @@ class CheckoutView extends StoreView {
     const pub = this.props.store;
     this.setState({page:'cart'})
     this.eventListeners.forEach(e => e.off());
-    localState.get('cart').get(pub).map().on((v, k) => {
+    State.local.get('cart').get(pub).map().on((v, k) => {
       this.cart[k] = v;
       this.setState({cart: this.cart});
     });
-    localState.get('paymentMethod').on(paymentMethod => this.setState({paymentMethod}));
-    localState.get('delivery').open(delivery => this.setState({delivery}));
+    State.local.get('paymentMethod').on(paymentMethod => this.setState({paymentMethod}));
+    State.local.get('delivery').open(delivery => this.setState({delivery}));
   }
 }
 

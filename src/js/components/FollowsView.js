@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {localState, publicState} from '../Main.js';
+import State from '../State.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import FollowButton from './FollowButton.js';
@@ -16,7 +16,7 @@ class FollowsView extends Component {
 
   getFollows() {
     const f = Session.getFollows();
-    publicState.user(this.props.id).get('follow').map().on((follows, pub, b, e) => {
+    State.public.user(this.props.id).get('follow').map().on((follows, pub, b, e) => {
       this.eventListeners['follow'] = e;
       if (follows) {
         this.follows[pub] = f[pub] || {};
@@ -31,9 +31,9 @@ class FollowsView extends Component {
 
   getFollowers() {
     const f = Session.getFollows();
-    localState.get('follows').map().once((follows, pub) => {
+    State.local.get('follows').map().once((follows, pub) => {
       if (follows) {
-        publicState.user(pub).get('follow').get(this.props.id).on(follows => {
+        State.public.user(pub).get('follow').get(this.props.id).on(follows => {
           if (!follows) return;
           this.follows[pub] = f[pub] || {};
           this.setState({});

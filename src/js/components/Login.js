@@ -1,5 +1,5 @@
 import { html } from '../Helpers.js';
-import { publicState, localState } from '../Main.js';
+import State from '../State.js';
 import { translate as t } from '../Translation.js';
 import LanguageSelector from './LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
@@ -39,10 +39,10 @@ function onLoginFormSubmit(e) {
   $('#login').hide();
   Gun.SEA.pair().then(k => {
     Session.login(k);
-    publicState.user().get('profile').get('name').put(name);
+    State.public.user().get('profile').get('name').put(name);
     Session.createChatLink();
-    localState.get('noFollows').put(true);
-    localState.get('noFollowers').put(true);
+    State.local.get('noFollows').put(true);
+    State.local.get('noFollowers').put(true);
   });
 }
 

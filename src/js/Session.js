@@ -1,4 +1,5 @@
-import {localState, publicState, activeRoute} from './Main.js';
+import {activeRoute} from './Main.js';
+import State from './State.js';
 import {chats, addChat, newChat} from './Chat.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
@@ -24,7 +25,7 @@ function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
       follows[k].followers.add(follower);
     } else {
       follows[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
-      publicState.user(k).get('profile').get('name').on(name => {
+      State.public.user(k).get('profile').get('name').on(name => {
         follows[k].name = name;
         callback(k, follows[k]);
       });
@@ -34,7 +35,7 @@ function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
 
   addFollow(k, currentDepth - 1);
 
-  publicState.user(k).get('follow').map().once((isFollowing, followedKey) => { // TODO: .on for unfollow
+  State.public.user(k).get('follow').map().once((isFollowing, followedKey) => { // TODO: .on for unfollow
     if (isFollowing) {
       addFollow(followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
@@ -47,22 +48,22 @@ function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
 }
 
 function setOurOnlineStatus() {
-  iris.Channel.setActivity(publicState, ourActivity = 'active');
+  iris.Channel.setActivity(State.public, ourActivity = 'active');
   const setActive = _.debounce(() => {
     const chat = activeRoute && chats[activeRoute.replace('/profile/','').replace('/chat/','')];
     if (chat && !ourActivity) {
       chat.setMyMsgsLastSeenTime();
     }
-    iris.Channel.setActivity(publicState, ourActivity = 'active'); // TODO: also on keypress
+    iris.Channel.setActivity(State.public, ourActivity = 'active'); // TODO: also on keypress
     clearTimeout(onlineTimeout);
-    onlineTimeout = setTimeout(() => iris.Channel.setActivity(publicState, ourActivity = 'online'), 30000);
+    onlineTimeout = setTimeout(() => iris.Channel.setActivity(State.public, ourActivity = 'online'), 30000);
   }, 1000);
   document.addEventListener("touchmove", setActive);
   document.addEventListener("mousemove", setActive);
   document.addEventListener("keypress", setActive);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
-      iris.Channel.setActivity(publicState, ourActivity = 'active');
+      iris.Channel.setActivity(State.public, ourActivity = 'active');
       const chatId = activeRoute.replace('/profile/','').replace('/chat/','');
       const chat = activeRoute && chats[chatId];
       if (chat) {
@@ -70,27 +71,27 @@ function setOurOnlineStatus() {
         Notifications.changeChatUnseenCount(chatId, 0);
       }
     } else {
-      iris.Channel.setActivity(publicState, ourActivity = 'online');
+      iris.Channel.setActivity(State.public, ourActivity = 'online');
     }
   });
   setActive();
   window.addEventListener("beforeunload", () => {
-    iris.Channel.setActivity(publicState, ourActivity = null);
+    iris.Channel.setActivity(State.public, ourActivity = null);
   });
 }
 
 function login(k) {
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
-  iris.Channel.initUser(publicState, key);
+  iris.Channel.initUser(State.public, key);
   Notifications.subscribeToWebPush();
   Notifications.getWebPushSubscriptions();
-  iris.Channel.getMyChatLinks(publicState, key, undefined, chatLink => {
-    localState.get('chatLinks').get(chatLink.id).put(chatLink.url);
+  iris.Channel.getMyChatLinks(State.public, key, undefined, chatLink => {
+    State.local.get('chatLinks').get(chatLink.id).put(chatLink.url);
     latestChatLink = chatLink.url;
   });
   setOurOnlineStatus();
-  iris.Channel.getChannels(publicState, key, addChat);
+  iris.Channel.getChannels(State.public, key, addChat);
   var chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
   var inviter = Helpers.getUrlParameter('inviter');
   function go() {
@@ -107,34 +108,34 @@ function login(k) {
       go();
     }
   }
-  publicState.user().get('profile').get('name').on(name => {
+  State.public.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       myName = name;
     }
   });
-  publicState.user().get('profile').get('photo').on(data => {
+  State.public.user().get('profile').get('photo').on(data => {
     myProfilePhoto = data;
   });
-  publicState.get('follow').put({a:null});
-  localState.get('follows').put({a:null});
+  State.public.get('follow').put({a:null});
+  State.local.get('follows').put({a:null});
   Notifications.init();
-  localState.get('loggedIn').put(true);
+  State.local.get('loggedIn').put(true);
   getFollowsFn((k, info) => {
-    localState.get('follows').get(k).put(true);
+    State.local.get('follows').get(k).put(true);
     if (!hasFollowers && k === getPubKey() && info.followers.size) {
-      localState.get('noFollowers').put(false);
+      State.local.get('noFollowers').put(false);
     }
   });
-  publicState.user().get('msgs').put({a:null});
-  publicState.user().get('replies').put({a:null});
+  State.public.user().get('msgs').put({a:null});
+  State.public.user().get('replies').put({a:null});
 }
 
 async function createChatLink() {
-  latestChatLink = await iris.Channel.createChatLink(publicState, key);
+  latestChatLink = await iris.Channel.createChatLink(State.public, key);
 }
 
 function clearIndexedDB() {
-  window.indexedDB.deleteDatabase('localState');
+  window.indexedDB.deleteDatabase('State.local');
   window.indexedDB.deleteDatabase('radata');
 }
 
@@ -144,8 +145,8 @@ function getMyChatLink() {
 
 function removeChatLink(id) {
   console.log('removeChatLink', id);
-  localState.get('chatLinks').get(id).put(null);
-  return iris.Channel.removeChatLink(publicState, key, id);
+  State.local.get('chatLinks').get(id).put(null);
+  return iris.Channel.removeChatLink(State.public, key, id);
 }
 
 function getKey() { return key; }
