@@ -72,7 +72,7 @@ class Main extends Component {
           <${Settings} path="/settings"/>
           <${LogoutConfirmation} path="/logout"/>
           <${Profile.Profile} path="/profile/:id"/>
-          <${StoreView} path="/store/:store"/>
+          <${StoreView} path="/store/:store?"/>
           <${CheckoutView} path="/checkout/:store"/>
           <${ProductView} path="/product/:product/:store"/>
           <${ProductView} path="/product/new" store=Session.getPubKey()/>
