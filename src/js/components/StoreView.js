@@ -33,7 +33,18 @@ class StoreView extends Component {
     State.local.get('cart').get(this.props.store).get(k).put(count);
   }
 
+  shouldRedirect() {
+    if (!this.props.store) {
+      route('/store/' + Session.getPubKey());
+      return true;
+    }
+  }
+
   render() {
+    if (this.shouldRedirect()) {
+      return '';
+    }
+    const store = this.props.store || Session.getPubKey();
     const cartTotalItems = Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.items[k]).reduce((sum, k) => sum + this.cart[k], 0);
     this.isMyProfile = Session.getPubKey() === this.props.store;
     const chat = chats[this.props.store];
@@ -142,6 +153,9 @@ class StoreView extends Component {
   }
 
   componentDidMount() {
+    if (this.shouldRedirect()) {
+      return;
+    }
     const pub = this.props.store;
     this.eventListeners.forEach(e => e.off());
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', totalPrice: 0});
