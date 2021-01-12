@@ -421,11 +421,10 @@ header.footer .header-content {
   display: flex;
   align-items: center;
   flex-direction: row;
-  height: 55px;
 }
 
 .application-list .icon {
-  padding: 15px;
+  padding: 7px;
   min-width: 55px;
   text-align: center;
 }
