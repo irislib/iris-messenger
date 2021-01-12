@@ -410,6 +410,12 @@ header.footer .header-content {
   max-width: 100%;
 }
 
+.application-list {
+  padding: 15px;
+  background: var(--sidebar-bg);
+  border-right: var(--sidebar-border-right)
+}
+
 .application-list a {
   display: flex;
   align-items: center;
