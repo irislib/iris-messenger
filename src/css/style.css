@@ -569,6 +569,7 @@ header.footer .header-content {
   display: flex;
   flex-direction: row;
   height: 100%;
+  flex: 1;
 }
 
 #chat-view #message-list {
@@ -697,7 +698,7 @@ header.footer .header-content {
 }
 
 .msg .like-btn.liked {
-  color: var(--warning-background);
+  color: var(--heart-color);
 }
 
 .msg .time {
