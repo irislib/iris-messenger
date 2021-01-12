@@ -431,6 +431,7 @@ header.footer .header-content {
   display: flex;
   align-items: center;
   flex-direction: row;
+  color: var(--text-color);
 }
 
 .application-list .icon {

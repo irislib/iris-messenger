@@ -1,20 +1,8 @@
-import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {translate as t} from '../Translation.js';
 import State from '../State.js';
-import {chats, deleteChat, newChat} from '../Chat.js';
-import Session from '../Session.js';
-import Helpers from '../Helpers.js';
-import MessageForm from './MessageForm.js';
-import ProfilePhotoPicker from './ProfilePhotoPicker.js';
+import {chats, newChat} from '../Chat.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from './SafeImg.js';
-import CopyButton from './CopyButton.js';
-import FollowButton from './FollowButton.js';
-import MessageFeed from './MessageFeed.js';
-import Identicon from './Identicon.js';
-import Name from './Name.js';
-import SearchBox from './SearchBox.js';
 import StoreView from './StoreView.js';
 
 class CheckoutView extends StoreView {
@@ -27,7 +15,7 @@ class CheckoutView extends StoreView {
     this.state.delivery = {};
   }
 
-  changeItemCount(k, v, e) {
+  changeItemCount(k, v) {
     this.cart[k] = Math.max(this.cart[k] + v, 0);
     State.local.get('cart').get(this.props.store).get(k).put(this.cart[k]);
   }
@@ -68,7 +56,7 @@ class CheckoutView extends StoreView {
                 <p>
                   <span class="unit-price">${parseInt(i.price)} €</span>
                   <button onClick=${() => this.changeItemCount(k, -1)}>-</button>
-                  <input type="text" value=${this.cart[k]} onInput=${e => this.changeItemCount(k, null, e)}/>
+                  <input type="text" value=${this.cart[k]} onInput=${() => this.changeItemCount(k, null)}/>
                   <button onClick=${() => this.changeItemCount(k, 1)}>+</button>
                 </p>
                 <span class="price">${parseInt(i.price) * this.cart[k]} €</span>

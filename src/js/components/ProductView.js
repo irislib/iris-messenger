@@ -1,20 +1,7 @@
-import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {translate as t} from '../Translation.js';
 import State from '../State.js';
-import {chats, deleteChat} from '../Chat.js';
 import Session from '../Session.js';
-import Helpers from '../Helpers.js';
-import MessageForm from './MessageForm.js';
-import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
-import SafeImg from './SafeImg.js';
-import CopyButton from './CopyButton.js';
-import FollowButton from './FollowButton.js';
-import MessageFeed from './MessageFeed.js';
-import Identicon from './Identicon.js';
-import Name from './Name.js';
-import SearchBox from './SearchBox.js';
 import StoreView from './StoreView.js';
 
 class ProductView extends StoreView {
@@ -108,7 +95,7 @@ class ProductView extends StoreView {
     }
   }
 
-  addItemClicked(e) {
+  addItemClicked() {
     const product = {
       name: this.newProductName,
       description: this.newProductDescription,

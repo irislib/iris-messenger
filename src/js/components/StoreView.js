@@ -2,19 +2,14 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
-import {chats, deleteChat} from '../Chat.js';
+import {chats} from '../Chat.js';
 import Session from '../Session.js';
-import Helpers from '../Helpers.js';
-import MessageForm from './MessageForm.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from './SafeImg.js';
 import CopyButton from './CopyButton.js';
 import FollowButton from './FollowButton.js';
-import MessageFeed from './MessageFeed.js';
 import Identicon from './Identicon.js';
-import Name from './Name.js';
-import SearchBox from './SearchBox.js';
 
 class StoreView extends Component {
   constructor() {
@@ -44,12 +39,10 @@ class StoreView extends Component {
     if (this.shouldRedirect()) {
       return '';
     }
-    const store = this.props.store || Session.getPubKey();
     const cartTotalItems = Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.items[k]).reduce((sum, k) => sum + this.cart[k], 0);
     this.isMyProfile = Session.getPubKey() === this.props.store;
     const chat = chats[this.props.store];
     const uuid = chat && chat.uuid;
-    const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
     const followable = !(this.isMyProfile || this.props.store.length < 40);
     let profilePhoto;
     if (this.isMyProfile) {

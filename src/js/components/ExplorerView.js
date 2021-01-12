@@ -1,6 +1,5 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import { route } from '../lib/preact-router.es.js';
 import State from '../State.js';
 import Session from '../Session.js';
 
@@ -95,7 +94,7 @@ class ExplorerNode extends Component {
             encryption = 'Encrypted';
           }
         } catch(e) {
-
+          null;
         }
       }
       this.eventListeners['n'] = e;
@@ -111,7 +110,7 @@ class ExplorerNode extends Component {
     this.setState({children: this.children});
   }
 
-  renderChildObject(k, v) {
+  renderChildObject(k) {
     const path = this.props.path + '/' + encodeURIComponent(k);
     return html`
       <div class="explorer-dir">
@@ -161,7 +160,7 @@ class ExplorerNode extends Component {
     this.setState({expandAll, children: this.children});
   }
 
-  onNewItemSubmit(e) {
+  onNewItemSubmit() {
     if (this.state.newItemName) {
       this.getNode().get(this.state.newItemName.trim()).put(this.state.showNewItem === 'object' ? {a:null} : '');
       this.setState({showNewItem: false, newItemName: ''});
@@ -189,7 +188,7 @@ class ExplorerNode extends Component {
         `: ''}
         ${this.state.showNewItem ? html`
           <p>
-            <form onSubmit=${e => this.onNewItemSubmit()}>
+            <form onSubmit=${() => this.onNewItemSubmit()}>
               <input id="newItemNameInput" type="text" onInput=${e => this.onNewItemNameInput(e)} value=${this.state.newItemName} placeholder="New ${this.state.showNewItem} name"/>
               <button type="submit">Create</button>
               <button onClick=${() => this.setState({showNewItem: false})}>Cancel</button>

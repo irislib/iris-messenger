@@ -182,8 +182,8 @@ function loginAsNewUser(name) {
     login(k);
     name && State.public.user().get('profile').get('name').put(name);
     createChatLink();
-    localState.get('noFollows').put(true);
-    localState.get('noFollowers').put(true);
+    State.local.get('noFollows').put(true);
+    State.local.get('noFollowers').put(true);
   });
 }
 
