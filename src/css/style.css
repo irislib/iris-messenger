@@ -422,16 +422,25 @@ header.footer .header-content {
 }
 
 .application-list {
-  padding: 15px;
+  padding-top: 15px;
   background: var(--sidebar-bg);
   border-right: var(--sidebar-border-right)
 }
 
 .application-list a {
+  padding: 0 15px;
   display: flex;
   align-items: center;
   flex-direction: row;
   color: var(--text-color);
+}
+
+.application-list a:hover, .application-list a:focus, .application-list a:active {
+  text-decoration: none;
+}
+
+.application-list a:hover {
+  background: var(--chat-hover);
 }
 
 .application-list .icon {
