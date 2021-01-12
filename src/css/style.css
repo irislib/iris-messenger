@@ -456,6 +456,10 @@ header.footer .header-content {
   padding-left: 0;
 }
 
+a.msg {
+  color: var(--text-color);
+}
+
 .public-messages-view .img-container img {
   max-height: 80vh;
   border-radius: 0;
@@ -495,7 +499,7 @@ header.footer .header-content {
 .public-messages-view .img-container {
   display: flex;
   align-items: center;
-  background-color: var(--header-color);
+  background-color: var(--main-color);
   flex-direction: column;
 }
 
