@@ -677,6 +677,7 @@ header.footer .header-content {
 
 .msg.our .msg-content {
   background-color: var(--our-msg);
+  border: 0;
 }
 
 .msg .below-text {
