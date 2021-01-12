@@ -70,8 +70,11 @@ input, button, .button {
   margin-right: 7px;
 }
 
-input {
+input, label {
   margin-right: 7px;
+}
+
+input {
   background: var(--input-bg);
   color: var(--input-text);
 }
@@ -188,6 +191,7 @@ img, video {
 
 .search-box label {
   position: relative;
+  margin-right: 0;
 }
 
 .search-box label:before {
@@ -487,6 +491,10 @@ header.footer .header-content {
 
 .public-messages-view .msg .text, .public-messages-view .msg .time {
   margin-bottom: 5px;
+}
+
+.msg-content .msg-content {
+  border: 0;
 }
 
 .public-messages-view .msg .msg-content {
