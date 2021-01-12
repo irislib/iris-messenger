@@ -3,12 +3,13 @@
     --body-bg: #fff;
     --text-color: #262626;
     --text-time: rgba(0, 0, 0, 0.45);
-    --main-color: #fff;
+    --main-color: #fcfcfc;
     --gallery-background: rgba(255, 255, 255, 0.90);
     --header-color: #fff;
     --chat-active: #ececec;
     --chat-hover: #f3f3f3;
-    --msg-content-background: #f3f3f3;
+    --msg-border: 1px solid #dfdfdf;
+    --msg-content-background: #fff;
     --our-msg: #9ee8ff;
     --notify: #9ee8ff;
     --warning-background: #ffa09e;
@@ -17,7 +18,7 @@
     --input-bg: #f3f3f3;
     --input-text: #262626;
     --input-placeholder: #a9a9a9;
-    --small-text-color: #777;
+    --small-text-color: #262626;
     --msg-form-button-color: #999;
     --button-bg: #1dc0f2;
     --button-color: #fff;

@@ -54,6 +54,7 @@ textarea {
   padding: 10px;
   border: 0;
   border-radius: 6px;
+  border: var(--msg-border);
   margin: 15px 0;
   background-color: var(--msg-content-background);
   color: var(--text-color);
@@ -383,6 +384,7 @@ header.footer .header-content {
   background-color: var(--msg-content-background);
   padding: 6px 10px;
   border-radius: 8px;
+  border: var(--msg-border);
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
   flex: none;
   max-width: 75%;
