@@ -293,6 +293,10 @@ img, video {
   flex: 3 0 10em;
 }
 
+.main > div {
+  overflow-y: scroll;
+}
+
 /*----- Main------- */
 
 .nav {
