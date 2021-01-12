@@ -66,6 +66,7 @@ input, button, .button {
   border: 0;
   font-size: 15px;
   border-radius: 50px;
+  margin-right: 7px;
 }
 
 input {
