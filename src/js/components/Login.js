@@ -65,12 +65,22 @@ function showScanPrivKey() {
   }
 }
 
+const ExistingAccountLogin = html`
+  <input id="paste-privkey" onInput=${e => onPastePrivKey(e)} placeholder="${t('paste_private_key')}"/>
+  <p>
+    <button id="scan-privkey-btn" onClick=${e => showScanPrivKey(e)}>${t('scan_private_key_qr_code')}</button>
+  </p>
+  <p>
+    <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;" class="hidden"></video>
+  </p>
+`;
+
 class Login extends Component {
   componentDidMount() {
     $('#login-form-name').focus();
   }
   render() {
-    return Session.getKey() ? '' : html`<section id="login">
+    return html`<section id="login">
       <div id="login-content">
         <form id="login-form" autocomplete="off" onSubmit=${e => onLoginFormSubmit(e)}>
           <div id="create-account">
@@ -88,17 +98,12 @@ class Login extends Component {
         </form>
         <div id="existing-account-login" class="hidden">
           <p><a href="#" id="show-create-account" onClick=${e => showCreateAccount(e)}>> ${t('back')}</a></p>
-          <input id="paste-privkey" onInput=${e => onPastePrivKey(e)} placeholder="${t('paste_private_key')}"/>
-          <p>
-            <button id="scan-privkey-btn" onClick=${e => showScanPrivKey(e)}>${t('scan_private_key_qr_code')}</button>
-          </p>
-          <p>
-            <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;" class="hidden"></video>
-          </p>
+          ${ExistingAccountLogin}
         </div>
       </div>
     </section>`;
   }
 }
 
+export {ExistingAccountLogin};
 export default Login;

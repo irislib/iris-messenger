@@ -9,6 +9,7 @@ import PeerManager from '../PeerManager.js';
 import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from './VideoCall.js';
 import CopyButton from './CopyButton.js';
 import { route } from '../lib/preact-router.es.js';
+import {ExistingAccountLogin} from './Login.js';
 
 class Settings extends Component {
   constructor() {
@@ -31,6 +32,12 @@ class Settings extends Component {
           <p>
             <button onClick=${() => route('/logout')}>${t('log_out')}</button>
           </p>
+          ${this.props.showSwitchAccount ? html`
+            <p>
+              <button onClick=${() => this.setState({showSwitchAccount: !this.state.showSwitchAccount})}>${t('switch_account')}</button>
+            </p>
+            ${this.state.showSwitchAccount ? ExistingAccountLogin : ''}
+          `: ''}
           <h4>${t('private_key')}</h4>
           <p dangerouslySetInnerHTML=${{ __html: t('private_key_warning') }} ></p>
           <p>

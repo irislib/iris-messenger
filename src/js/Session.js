@@ -81,6 +81,7 @@ function setOurOnlineStatus() {
 }
 
 function login(k) {
+  const shouldRefresh = !!key;
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
   iris.Channel.initUser(State.public, key);
@@ -128,6 +129,9 @@ function login(k) {
   });
   State.public.user().get('msgs').put({a:null});
   State.public.user().get('replies').put({a:null});
+  if (shouldRefresh) {
+    location.reload();
+  }
 }
 
 async function createChatLink() {
