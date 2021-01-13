@@ -23,6 +23,7 @@ import Footer from './components/Footer.js';
 import MessageView from './components/MessageView.js';
 import FollowsView from './components/FollowsView.js';
 import FeedView from './components/FeedView.js';
+import AboutView from './components/AboutView.js';
 import ExplorerView from './components/ExplorerView.js';
 import VideoCall from './components/VideoCall.js';
 import State from './State.js';
@@ -67,6 +68,7 @@ class Main extends Component {
       <section class="main">
         <${Router} history=${createHashHistory()} onChange=${e => handleRoute(e)}>
           <${FeedView} path="/"/>
+          <${AboutView} path="/about"/>
           <${ChatView} path="/chat/:id?"/>
           <${MessageView} path="/message/:hash"/>
           <${Settings} path="/settings"/>
