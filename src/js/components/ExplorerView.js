@@ -123,11 +123,14 @@ class ExplorerNode extends Component {
 
   renderChildValue(k, v) {
     let s;
+    console.log(k, v);
     const encryption = this.children[k].encryption;
     const decrypted = encryption === 'Decrypted';
     if (encryption) {
       if (!decrypted) {
         s = html`<i>Encrypted value</i>`;
+      } else {
+        s = JSON.stringify(v);
       }
     } else {
       const pub = Session.getPubKey();
