@@ -79,6 +79,10 @@ class Settings extends Component {
           <p><small>${t('webrtc_info')}</small></p>
           <p><textarea rows="4" id="rtc-config" placeholder="${t('webrtc_connection_options')}"></textarea></p>
           <button id="restore-default-rtc-config">${t('restore_defaults')}</button>
+          ${this.props.showAbout ? html`
+            <hr/>
+            <a href="/about">About</a>
+          `: ''}
         </div>
       </div>`;
   }

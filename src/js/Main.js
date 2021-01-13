@@ -71,7 +71,7 @@ class Main extends Component {
           <${AboutView} path="/about"/>
           <${ChatView} path="/chat/:id?"/>
           <${MessageView} path="/message/:hash"/>
-          <${Settings} path="/settings"/>
+          <${Settings} path="/settings" showAbout=${true}/>
           <${LogoutConfirmation} path="/logout"/>
           <${Profile.Profile} path="/profile/:id"/>
           <${StoreView} path="/store/:store?"/>
