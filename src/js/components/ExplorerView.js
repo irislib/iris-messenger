@@ -123,7 +123,6 @@ class ExplorerNode extends Component {
 
   renderChildValue(k, v) {
     let s;
-    console.log(k, v);
     const encryption = this.children[k].encryption;
     const decrypted = encryption === 'Decrypted';
     if (encryption) {
