@@ -137,7 +137,8 @@ class ExplorerNode extends Component {
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
         s = isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
       } else {
-        s = isMine && false ? html`<iris-text placeholder="empty" user=${pub} path=${path}/>` : JSON.stringify(v);
+        //s = isMine && false ? html`<iris-text placeholder="empty" user=${pub} path=${path}/>` : JSON.stringify(v);
+        s = JSON.stringify(v);
       }
     }
     return html`

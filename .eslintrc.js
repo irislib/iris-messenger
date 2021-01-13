@@ -18,11 +18,13 @@ module.exports = {
         "pica": "readonly",
         "EmojiButton": "readonly",
         "Autolinker": "readonly",
+        "WebTorrent": "readonly"
     },
     "parserOptions": {
         "ecmaVersion": 11,
         "sourceType": "module"
     },
     "rules": {
+      "no-useless-escape": 0
     }
 };
