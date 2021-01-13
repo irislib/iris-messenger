@@ -163,7 +163,8 @@ class ExplorerNode extends Component {
     this.setState({expandAll, children: this.children});
   }
 
-  onNewItemSubmit() {
+  onNewItemSubmit(e) {
+    e.preventDefault();
     if (this.state.newItemName) {
       this.getNode().get(this.state.newItemName.trim()).put(this.state.showNewItem === 'object' ? {a:null} : '');
       this.setState({showNewItem: false, newItemName: ''});
@@ -191,7 +192,7 @@ class ExplorerNode extends Component {
         `: ''}
         ${this.state.showNewItem ? html`
           <p>
-            <form onSubmit=${() => this.onNewItemSubmit()}>
+            <form onSubmit=${(e) => this.onNewItemSubmit(e)}>
               <input id="newItemNameInput" type="text" onInput=${e => this.onNewItemNameInput(e)} value=${this.state.newItemName} placeholder="New ${this.state.showNewItem} name"/>
               <button type="submit">Create</button>
               <button onClick=${() => this.setState({showNewItem: false})}>Cancel</button>
