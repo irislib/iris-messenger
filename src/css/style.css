@@ -426,9 +426,21 @@ header.footer .header-content {
 }
 
 .application-list {
+  width: 250px;
+  transition: all 0.5s ease;
   padding-top: 15px;
   background: var(--sidebar-bg);
   border-right: var(--sidebar-border-right)
+}
+
+@media (max-width:567px) {
+  .application-list {
+    width: 0px;
+  }
+
+  .application-list.menu-visible-xs {
+    width: 250px;
+  }
 }
 
 .application-list a {
