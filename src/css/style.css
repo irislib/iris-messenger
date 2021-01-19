@@ -459,6 +459,10 @@ header.footer .header-content {
   background: var(--chat-hover);
 }
 
+.application-list a.active {
+  background: var(--chat-active);
+}
+
 .application-list .icon {
   padding: 7px;
   min-width: 55px;

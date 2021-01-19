@@ -2,6 +2,7 @@ import { render } from './lib/preact.js';
 import { Router, route } from './lib/preact-router.es.js';
 import { createHashHistory } from './lib/history.production.min.js';
 import { Component } from './lib/preact.js';
+import Match from './lib/preact.match.js';
 
 import Helpers from './Helpers.js';
 import { html } from './Helpers.js';
