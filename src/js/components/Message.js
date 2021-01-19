@@ -133,11 +133,11 @@ class Message extends Component {
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           ${this.props.replyingTo ? html`
-            <div><a href="/message/${encodeURIComponent(this.props.replyingTo)}">Show replied message</a></div>
+            <div><a href="/post/${encodeURIComponent(this.props.replyingTo)}">Show replied message</a></div>
           ` : ''}
           <div class="below-text">
             <div class="time">
-              ${this.props.info && this.props.info.hash ? html`<a href="/message/${encodeURIComponent(this.props.info.hash)}">${Helpers.getRelativeTimeText(time)}</a>` : iris.util.formatTime(time)}
+              ${this.props.info && this.props.info.hash ? html`<a href="/post/${encodeURIComponent(this.props.info.hash)}">${Helpers.getRelativeTimeText(time)}</a>` : iris.util.formatTime(time)}
               ${this.props.selfAuthored && seenIndicator}
             </div>
           </div>

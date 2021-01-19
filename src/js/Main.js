@@ -70,7 +70,7 @@ class Main extends Component {
           <${FeedView} path="/"/>
           <${AboutView} path="/about"/>
           <${ChatView} path="/chat/:id?"/>
-          <${MessageView} path="/message/:hash"/>
+          <${MessageView} path="/post/:hash"/>
           <${Settings} path="/settings" showAbout=${true}/>
           <${LogoutConfirmation} path="/logout"/>
           <${Profile.Profile} path="/profile/:id"/>

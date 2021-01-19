@@ -182,7 +182,7 @@ class PublicMessage extends Message {
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           ${this.state.msg.replyingTo && !this.props.asReply ? html`
-            <div><a href="/message/${encodeURIComponent(this.state.msg.replyingTo)}">Show replied message</a></div>
+            <div><a href="/post/${encodeURIComponent(this.state.msg.replyingTo)}">Show replied message</a></div>
           ` : ''}
           <div class="below-text">
             <a class="msg-btn reply-btn" onClick=${() => this.toggleReplies()}>
@@ -198,7 +198,7 @@ class PublicMessage extends Message {
               ${this.state.likes || ''}
             </span>
             <div class="time">
-              <a href="/message/${encodeURIComponent(this.props.hash)}">${Helpers.getRelativeTimeText(time)}</a>
+              <a href="/post/${encodeURIComponent(this.props.hash)}">${Helpers.getRelativeTimeText(time)}</a>
             </div>
           </div>
           ${this.state.showLikes ? html`
