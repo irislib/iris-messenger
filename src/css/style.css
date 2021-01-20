@@ -425,7 +425,12 @@ header.footer .header-content {
   max-width: 100%;
 }
 
+.view-area {
+  flex: 1;
+}
+
 .application-list {
+  z-index: 1;
   width: 250px;
   transition: all 0.5s ease;
   padding-top: 15px;
@@ -433,13 +438,22 @@ header.footer .header-content {
   border-right: var(--sidebar-border-right)
 }
 
-@media (max-width:567px) {
+@media (max-width:575px) {
   .application-list {
-    width: 0px;
+    width: 250px;
+    margin-left: -250px;
+    position: fixed;
+    top: 41px;
+    left:0;
+    bottom: 0;
   }
 
-  .application-list.menu-visible-xs {
-    width: 250px;
+  .menu-visible-xs .application-list {
+    margin-left: 0;
+  }
+
+  .menu-visible-xs .view-area {
+    opacity: 0.25;
   }
 }
 
@@ -1481,7 +1495,7 @@ form.public {
   .feed-settings {
     margin: 0 15px 15px 15px;
     display: flex;
-  }
+  }fma
   .feed-settings button {
     flex: 1;
     text-align: center;
