@@ -90,6 +90,14 @@ class Header extends Component {
 
   }
 
+  onLogoClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $('a.logo').blur();
+    State.local.get('scrollUp').put(true);
+    this.props.toggleMenu();
+  }
+
   render() {
     const activeRoute = this.state.activeRoute;
     const chat = chats[this.chatId];
@@ -107,7 +115,7 @@ class Header extends Component {
       </div>
       ` : ''}
       <div class="header-content">
-        <a href="/" onClick=${() => {$('a.logo').blur();State.local.get('scrollUp').put(true);this.props.toggleMenu()}} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
+        <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
           <img src="img/icon128.png" width=40 height=40/>
           <img src="img/iris_logotype.png" height=23 width=41 />
         </a>
