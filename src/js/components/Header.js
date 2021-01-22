@@ -94,7 +94,6 @@ class Header extends Component {
     e.preventDefault();
     e.stopPropagation();
     $('a.logo').blur();
-    State.local.get('scrollUp').put(true);
     this.props.toggleMenu();
   }
 
