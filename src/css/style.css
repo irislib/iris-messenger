@@ -295,6 +295,8 @@ img, video {
 
 .main > div {
   overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
 }
 
 /*----- Main------- */
@@ -378,7 +380,6 @@ header.footer .header-content {
   padding: 10px 15px;
   background-color: var(--main-color);
   min-width: 0;
-  min-height: 100%;
 }
 
 .msg {
