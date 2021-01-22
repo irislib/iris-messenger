@@ -63,11 +63,13 @@ const MenuView = () => {
   const pub = Session.getPubKey();
   return html`
     <div class="application-list">
-      <${Link} activeClassName="active" href="/profile/${pub}">
-        <span class="icon"><${Identicon} str=${pub} width=40/></span>
-        <span class="text" style="font-size: 1.2em;border:0;margin-left: 7px;"><iris-text user="${pub}" path="profile/name" editable="false"/></span>
-      <//>
-      <br/><br/>
+      <div class="visible-xs-block">
+        <${Link} activeClassName="active" href="/profile/${pub}">
+          <span class="icon"><${Identicon} str=${pub} width=40/></span>
+          <span class="text" style="font-size: 1.2em;border:0;margin-left: 7px;"><iris-text user="${pub}" path="profile/name" editable="false"/></span>
+        <//>
+        <br/><br/>
+      </div>
       ${APPLICATIONS.map(a => {
         if (a.url) {
           return html`
