@@ -59,12 +59,12 @@ const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
   {url: '/about', text: t('about')},
 ];
 
-const MenuView = () => {
+const MenuView = props => {
   const pub = Session.getPubKey();
   return html`
     <div class="application-list">
       <div class="visible-xs-block">
-        <${Link} activeClassName="active" href="/profile/${pub}">
+        <${Link} onClick=${() => props.toggleMenu(false)} activeClassName="active" href="/profile/${pub}">
           <span class="icon"><${Identicon} str=${pub} width=40/></span>
           <span class="text" style="font-size: 1.2em;border:0;margin-left: 7px;"><iris-text user="${pub}" path="profile/name" editable="false"/></span>
         <//>
@@ -73,7 +73,7 @@ const MenuView = () => {
       ${APPLICATIONS.map(a => {
         if (a.url) {
           return html`
-            <${a.native ? 'a' : Link} activeClassName="active" href=${a.url}>
+            <${a.native ? 'a' : Link} onClick=${() => props.toggleMenu(false)} activeClassName="active" href=${a.url}>
               <span class="icon">${a.icon || Icons.circle}</span>
               <span class="text">${a.text}</span>
             <//>`;
@@ -91,7 +91,6 @@ class Main extends Component {
   }
 
   handleRoute(e) {
-    this.setState({showMenu: false});
     document.title = 'Iris';
     let activeRoute = e.url;
     if (!activeRoute && window.location.hash) {
@@ -115,7 +114,7 @@ class Main extends Component {
     const content = this.state.loggedIn ? html`
       <${Header} toggleMenu=${show => this.toggleMenu(show)}/>
       <section class="main ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
-        <${MenuView}/>
+        <${MenuView} toggleMenu=${show => this.toggleMenu(show)}/>
         <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
         <div class="view-area">
           <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
