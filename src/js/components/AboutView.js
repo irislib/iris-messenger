@@ -32,7 +32,7 @@ export default () => {
 
         <h4>Run your own node</h4>
         <p><a href="https://heroku.com/deploy?template=https://github.com/amark/gun">
-           <img src="/img/herokubutton.svg" alt="Deploy">
+           <img src="/img/herokubutton.svg" alt="Deploy"/>
         </a></p>
         <p>Or <a href="https://github.com/amark/gun#docker">Docker</a></p>
 
