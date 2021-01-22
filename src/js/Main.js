@@ -121,6 +121,7 @@ class Main extends Component {
           <div class="view-area">
             <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
               <${FeedView} path="/"/>
+              <${FeedView} path="/feed"/>
               <${Login} path="/login"/>
               <${ChatView} path="/chat/:id?"/>
               <${MessageView} path="/post/:hash"/>
