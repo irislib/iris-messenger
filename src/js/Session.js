@@ -182,6 +182,7 @@ function getPubKey() {
 }
 
 function loginAsNewUser(name) {
+  name = name || Helpers.generateName();
   return Gun.SEA.pair().then(k => {
     login(k);
     name && State.public.user().get('profile').get('name').put(name);
@@ -196,7 +197,6 @@ function init(options = {}) {
   if (localStorageKey) {
     login(JSON.parse(localStorageKey));
   } else if (options.autologin) {
-    const name = Helpers.generateName();
     loginAsNewUser(name);
   }
 }
@@ -205,4 +205,4 @@ function getFollows() {
   return follows;
 }
 
-export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, removeChatLink, ourActivity, login, logOut, getFollows };
+export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, removeChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser };

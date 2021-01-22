@@ -45,7 +45,7 @@ if (!isElectron && ('serviceWorker' in navigator)) {
 }
 
 State.init();
-Session.init();
+Session.init({autologin: window.location.hash.length > 2});
 PeerManager.init();
 PublicMessages.init();
 
@@ -111,35 +111,38 @@ class Main extends Component {
   }
 
   render() {
-    const content = this.state.loggedIn ? html`
-      <${Header} toggleMenu=${show => this.toggleMenu(show)}/>
-      <section class="main ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
-        <${MenuView} toggleMenu=${show => this.toggleMenu(show)}/>
-        <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
-        <div class="view-area">
-          <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
-            <${FeedView} path="/"/>
-            <${Login} path="/login"/>
-            <${ChatView} path="/chat/:id?"/>
-            <${MessageView} path="/post/:hash"/>
-            <${AboutView} path="/about"/>
-            <${Settings} path="/settings" showSwitchAccount=${true}/>
-            <${LogoutConfirmation} path="/logout"/>
-            <${Profile.Profile} path="/profile/:id?"/>
-            <${StoreView} path="/store/:store?"/>
-            <${CheckoutView} path="/checkout/:store"/>
-            <${ProductView} path="/product/:product/:store"/>
-            <${ProductView} path="/product/new" store=Session.getPubKey()/>
-            <${ExplorerView} path="/explorer/:node"/>
-            <${ExplorerView} path="/explorer"/>
-            <${FollowsView} path="/follows/:id"/>
-            <${FollowsView} followers=${true} path="/followers/:id"/>
-          </${Router}>
-        </div>
-      </section>
-      <${Footer}/>
-      <${VideoCall}/>
-    ` : html`<${Login}/>`;
+    let content = '';
+    if (this.state.loggedIn || window.location.hash.length <= 2) {
+      content = this.state.loggedIn ? html`
+        <${Header} toggleMenu=${show => this.toggleMenu(show)}/>
+        <section class="main ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
+          <${MenuView} toggleMenu=${show => this.toggleMenu(show)}/>
+          <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
+          <div class="view-area">
+            <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
+              <${FeedView} path="/"/>
+              <${Login} path="/login"/>
+              <${ChatView} path="/chat/:id?"/>
+              <${MessageView} path="/post/:hash"/>
+              <${AboutView} path="/about"/>
+              <${Settings} path="/settings" showSwitchAccount=${true}/>
+              <${LogoutConfirmation} path="/logout"/>
+              <${Profile.Profile} path="/profile/:id?"/>
+              <${StoreView} path="/store/:store?"/>
+              <${CheckoutView} path="/checkout/:store"/>
+              <${ProductView} path="/product/:product/:store"/>
+              <${ProductView} path="/product/new" store=Session.getPubKey()/>
+              <${ExplorerView} path="/explorer/:node"/>
+              <${ExplorerView} path="/explorer"/>
+              <${FollowsView} path="/follows/:id"/>
+              <${FollowsView} followers=${true} path="/followers/:id"/>
+            </${Router}>
+          </div>
+        </section>
+        <${Footer}/>
+        <${VideoCall}/>
+      ` : html`<${Login}/>`;
+    }
     return html`
       <div id="main-content">
         ${content}
