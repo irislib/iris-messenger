@@ -94,6 +94,7 @@ class Header extends Component {
     e.preventDefault();
     e.stopPropagation();
     $('a.logo').blur();
+    ($(window).width() > 575) && route('/');
     this.props.toggleMenu();
   }
 
