@@ -74,6 +74,11 @@ class Settings extends Component {
               <small dangerouslySetInnerHTML=${{ __html: t('peers_info')}}></small>
             </p>
           </div>
+          <h4>Spin up your own peer</h4>
+          <p><a href="https://heroku.com/deploy?template=https://github.com/amark/gun">
+             <img src="/img/herokubutton.svg" alt="Deploy"/>
+          </a></p>
+          <p>Or <a href="https://github.com/amark/gun#docker">Docker</a></p>
           <hr/>
           <h3>${t('webrtc_connection_options')}</h3>
           <p><small>${t('webrtc_info')}</small></p>
