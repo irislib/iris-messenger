@@ -25,10 +25,11 @@ class MessageFeed extends Component {
   }
 
   topClicked() {
+    console.log('topClicked')
     this.scroller.top();
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
-    Helpers.animateScrollTop('.view-area');
+    Helpers.animateScrollTop('.main-view');
   }
 
   bottomClicked() {
