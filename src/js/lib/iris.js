@@ -579,25 +579,13 @@
 
 	var _JSON$stringify = unwrapExports(stringify$1);
 
-	// true  -> String#at
-	// false -> String#codePointAt
-	var _stringAt = function (TO_STRING) {
-	  return function (that, pos) {
-	    var s = String(_defined(that));
-	    var i = _toInteger(pos);
-	    var l = s.length;
-	    var a, b;
-	    if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
-	    a = s.charCodeAt(i);
-	    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
-	      ? TO_STRING ? s.charAt(i) : a
-	      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-	  };
+	var _iterStep = function (done, value) {
+	  return { value: value, done: !!done };
 	};
 
-	var _redefine = _hide;
-
 	var _iterators = {};
+
+	var _redefine = _hide;
 
 	var _objectDps = _descriptors ? Object.defineProperties : function defineProperties(O, Properties) {
 	  _anObject(O);
@@ -761,27 +749,6 @@
 	  return methods;
 	};
 
-	var $at = _stringAt(true);
-
-	// 21.1.3.27 String.prototype[@@iterator]()
-	_iterDefine(String, 'String', function (iterated) {
-	  this._t = String(iterated); // target
-	  this._i = 0;                // next index
-	// 21.1.5.2.1 %StringIteratorPrototype%.next()
-	}, function () {
-	  var O = this._t;
-	  var index = this._i;
-	  var point;
-	  if (index >= O.length) return { value: undefined, done: true };
-	  point = $at(O, index);
-	  this._i += point.length;
-	  return { value: point, done: false };
-	});
-
-	var _iterStep = function (done, value) {
-	  return { value: value, done: !!done };
-	};
-
 	// 22.1.3.4 Array.prototype.entries()
 	// 22.1.3.13 Array.prototype.keys()
 	// 22.1.3.29 Array.prototype.values()
@@ -823,6 +790,39 @@
 	  _iterators[NAME] = _iterators.Array;
 	}
 
+	// true  -> String#at
+	// false -> String#codePointAt
+	var _stringAt = function (TO_STRING) {
+	  return function (that, pos) {
+	    var s = String(_defined(that));
+	    var i = _toInteger(pos);
+	    var l = s.length;
+	    var a, b;
+	    if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
+	    a = s.charCodeAt(i);
+	    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
+	      ? TO_STRING ? s.charAt(i) : a
+	      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+	  };
+	};
+
+	var $at = _stringAt(true);
+
+	// 21.1.3.27 String.prototype[@@iterator]()
+	_iterDefine(String, 'String', function (iterated) {
+	  this._t = String(iterated); // target
+	  this._i = 0;                // next index
+	// 21.1.5.2.1 %StringIteratorPrototype%.next()
+	}, function () {
+	  var O = this._t;
+	  var index = this._i;
+	  var point;
+	  if (index >= O.length) return { value: undefined, done: true };
+	  point = $at(O, index);
+	  this._i += point.length;
+	  return { value: point, done: false };
+	});
+
 	// getting tag from 19.1.3.6 Object.prototype.toString()
 
 	var TAG$1 = _wks('toStringTag');
@@ -847,629 +847,13 @@
 	    : (B = _cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
 	};
 
-	var _anInstance = function (it, Constructor, name, forbiddenField) {
-	  if (!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)) {
-	    throw TypeError(name + ': incorrect invocation!');
-	  } return it;
-	};
-
-	// call something on iterator step with safe closing on error
-
-	var _iterCall = function (iterator, fn, value, entries) {
-	  try {
-	    return entries ? fn(_anObject(value)[0], value[1]) : fn(value);
-	  // 7.4.6 IteratorClose(iterator, completion)
-	  } catch (e) {
-	    var ret = iterator['return'];
-	    if (ret !== undefined) _anObject(ret.call(iterator));
-	    throw e;
-	  }
-	};
-
-	// check on default Array iterator
-
 	var ITERATOR$1 = _wks('iterator');
-	var ArrayProto = Array.prototype;
-
-	var _isArrayIter = function (it) {
-	  return it !== undefined && (_iterators.Array === it || ArrayProto[ITERATOR$1] === it);
-	};
-
-	var ITERATOR$2 = _wks('iterator');
 
 	var core_getIteratorMethod = _core.getIteratorMethod = function (it) {
-	  if (it != undefined) return it[ITERATOR$2]
+	  if (it != undefined) return it[ITERATOR$1]
 	    || it['@@iterator']
 	    || _iterators[_classof(it)];
 	};
-
-	var _forOf = createCommonjsModule(function (module) {
-	var BREAK = {};
-	var RETURN = {};
-	var exports = module.exports = function (iterable, entries, fn, that, ITERATOR) {
-	  var iterFn = ITERATOR ? function () { return iterable; } : core_getIteratorMethod(iterable);
-	  var f = _ctx(fn, that, entries ? 2 : 1);
-	  var index = 0;
-	  var length, step, iterator, result;
-	  if (typeof iterFn != 'function') throw TypeError(iterable + ' is not iterable!');
-	  // fast case for arrays with default iterator
-	  if (_isArrayIter(iterFn)) for (length = _toLength(iterable.length); length > index; index++) {
-	    result = entries ? f(_anObject(step = iterable[index])[0], step[1]) : f(iterable[index]);
-	    if (result === BREAK || result === RETURN) return result;
-	  } else for (iterator = iterFn.call(iterable); !(step = iterator.next()).done;) {
-	    result = _iterCall(iterator, f, step.value, entries);
-	    if (result === BREAK || result === RETURN) return result;
-	  }
-	};
-	exports.BREAK = BREAK;
-	exports.RETURN = RETURN;
-	});
-
-	// 7.3.20 SpeciesConstructor(O, defaultConstructor)
-
-
-	var SPECIES = _wks('species');
-	var _speciesConstructor = function (O, D) {
-	  var C = _anObject(O).constructor;
-	  var S;
-	  return C === undefined || (S = _anObject(C)[SPECIES]) == undefined ? D : _aFunction(S);
-	};
-
-	// fast apply, http://jsperf.lnkit.com/fast-apply/5
-	var _invoke = function (fn, args, that) {
-	  var un = that === undefined;
-	  switch (args.length) {
-	    case 0: return un ? fn()
-	                      : fn.call(that);
-	    case 1: return un ? fn(args[0])
-	                      : fn.call(that, args[0]);
-	    case 2: return un ? fn(args[0], args[1])
-	                      : fn.call(that, args[0], args[1]);
-	    case 3: return un ? fn(args[0], args[1], args[2])
-	                      : fn.call(that, args[0], args[1], args[2]);
-	    case 4: return un ? fn(args[0], args[1], args[2], args[3])
-	                      : fn.call(that, args[0], args[1], args[2], args[3]);
-	  } return fn.apply(that, args);
-	};
-
-	var process = _global.process;
-	var setTask = _global.setImmediate;
-	var clearTask = _global.clearImmediate;
-	var MessageChannel = _global.MessageChannel;
-	var Dispatch = _global.Dispatch;
-	var counter = 0;
-	var queue = {};
-	var ONREADYSTATECHANGE = 'onreadystatechange';
-	var defer, channel, port;
-	var run = function () {
-	  var id = +this;
-	  // eslint-disable-next-line no-prototype-builtins
-	  if (queue.hasOwnProperty(id)) {
-	    var fn = queue[id];
-	    delete queue[id];
-	    fn();
-	  }
-	};
-	var listener = function (event) {
-	  run.call(event.data);
-	};
-	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
-	if (!setTask || !clearTask) {
-	  setTask = function setImmediate(fn) {
-	    var args = [];
-	    var i = 1;
-	    while (arguments.length > i) args.push(arguments[i++]);
-	    queue[++counter] = function () {
-	      // eslint-disable-next-line no-new-func
-	      _invoke(typeof fn == 'function' ? fn : Function(fn), args);
-	    };
-	    defer(counter);
-	    return counter;
-	  };
-	  clearTask = function clearImmediate(id) {
-	    delete queue[id];
-	  };
-	  // Node.js 0.8-
-	  if (_cof(process) == 'process') {
-	    defer = function (id) {
-	      process.nextTick(_ctx(run, id, 1));
-	    };
-	  // Sphere (JS game engine) Dispatch API
-	  } else if (Dispatch && Dispatch.now) {
-	    defer = function (id) {
-	      Dispatch.now(_ctx(run, id, 1));
-	    };
-	  // Browsers with MessageChannel, includes WebWorkers
-	  } else if (MessageChannel) {
-	    channel = new MessageChannel();
-	    port = channel.port2;
-	    channel.port1.onmessage = listener;
-	    defer = _ctx(port.postMessage, port, 1);
-	  // Browsers with postMessage, skip WebWorkers
-	  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
-	  } else if (_global.addEventListener && typeof postMessage == 'function' && !_global.importScripts) {
-	    defer = function (id) {
-	      _global.postMessage(id + '', '*');
-	    };
-	    _global.addEventListener('message', listener, false);
-	  // IE8-
-	  } else if (ONREADYSTATECHANGE in _domCreate('script')) {
-	    defer = function (id) {
-	      _html.appendChild(_domCreate('script'))[ONREADYSTATECHANGE] = function () {
-	        _html.removeChild(this);
-	        run.call(id);
-	      };
-	    };
-	  // Rest old browsers
-	  } else {
-	    defer = function (id) {
-	      setTimeout(_ctx(run, id, 1), 0);
-	    };
-	  }
-	}
-	var _task = {
-	  set: setTask,
-	  clear: clearTask
-	};
-
-	var macrotask = _task.set;
-	var Observer = _global.MutationObserver || _global.WebKitMutationObserver;
-	var process$1 = _global.process;
-	var Promise$1 = _global.Promise;
-	var isNode = _cof(process$1) == 'process';
-
-	var _microtask = function () {
-	  var head, last, notify;
-
-	  var flush = function () {
-	    var parent, fn;
-	    if (isNode && (parent = process$1.domain)) parent.exit();
-	    while (head) {
-	      fn = head.fn;
-	      head = head.next;
-	      try {
-	        fn();
-	      } catch (e) {
-	        if (head) notify();
-	        else last = undefined;
-	        throw e;
-	      }
-	    } last = undefined;
-	    if (parent) parent.enter();
-	  };
-
-	  // Node.js
-	  if (isNode) {
-	    notify = function () {
-	      process$1.nextTick(flush);
-	    };
-	  // browsers with MutationObserver, except iOS Safari - https://github.com/zloirock/core-js/issues/339
-	  } else if (Observer && !(_global.navigator && _global.navigator.standalone)) {
-	    var toggle = true;
-	    var node = document.createTextNode('');
-	    new Observer(flush).observe(node, { characterData: true }); // eslint-disable-line no-new
-	    notify = function () {
-	      node.data = toggle = !toggle;
-	    };
-	  // environments with maybe non-completely correct, but existent Promise
-	  } else if (Promise$1 && Promise$1.resolve) {
-	    // Promise.resolve without an argument throws an error in LG WebOS 2
-	    var promise = Promise$1.resolve(undefined);
-	    notify = function () {
-	      promise.then(flush);
-	    };
-	  // for other environments - macrotask based on:
-	  // - setImmediate
-	  // - MessageChannel
-	  // - window.postMessag
-	  // - onreadystatechange
-	  // - setTimeout
-	  } else {
-	    notify = function () {
-	      // strange IE + webpack dev server bug - use .call(global)
-	      macrotask.call(_global, flush);
-	    };
-	  }
-
-	  return function (fn) {
-	    var task = { fn: fn, next: undefined };
-	    if (last) last.next = task;
-	    if (!head) {
-	      head = task;
-	      notify();
-	    } last = task;
-	  };
-	};
-
-	// 25.4.1.5 NewPromiseCapability(C)
-
-
-	function PromiseCapability(C) {
-	  var resolve, reject;
-	  this.promise = new C(function ($$resolve, $$reject) {
-	    if (resolve !== undefined || reject !== undefined) throw TypeError('Bad Promise constructor');
-	    resolve = $$resolve;
-	    reject = $$reject;
-	  });
-	  this.resolve = _aFunction(resolve);
-	  this.reject = _aFunction(reject);
-	}
-
-	var f$1 = function (C) {
-	  return new PromiseCapability(C);
-	};
-
-	var _newPromiseCapability = {
-		f: f$1
-	};
-
-	var _perform = function (exec) {
-	  try {
-	    return { e: false, v: exec() };
-	  } catch (e) {
-	    return { e: true, v: e };
-	  }
-	};
-
-	var navigator$1 = _global.navigator;
-
-	var _userAgent = navigator$1 && navigator$1.userAgent || '';
-
-	var _promiseResolve = function (C, x) {
-	  _anObject(C);
-	  if (_isObject(x) && x.constructor === C) return x;
-	  var promiseCapability = _newPromiseCapability.f(C);
-	  var resolve = promiseCapability.resolve;
-	  resolve(x);
-	  return promiseCapability.promise;
-	};
-
-	var _redefineAll = function (target, src, safe) {
-	  for (var key in src) {
-	    if (safe && target[key]) target[key] = src[key];
-	    else _hide(target, key, src[key]);
-	  } return target;
-	};
-
-	var SPECIES$1 = _wks('species');
-
-	var _setSpecies = function (KEY) {
-	  var C = typeof _core[KEY] == 'function' ? _core[KEY] : _global[KEY];
-	  if (_descriptors && C && !C[SPECIES$1]) _objectDp.f(C, SPECIES$1, {
-	    configurable: true,
-	    get: function () { return this; }
-	  });
-	};
-
-	var ITERATOR$3 = _wks('iterator');
-	var SAFE_CLOSING = false;
-
-	try {
-	  var riter = [7][ITERATOR$3]();
-	  riter['return'] = function () { SAFE_CLOSING = true; };
-	} catch (e) { /* empty */ }
-
-	var _iterDetect = function (exec, skipClosing) {
-	  if (!skipClosing && !SAFE_CLOSING) return false;
-	  var safe = false;
-	  try {
-	    var arr = [7];
-	    var iter = arr[ITERATOR$3]();
-	    iter.next = function () { return { done: safe = true }; };
-	    arr[ITERATOR$3] = function () { return iter; };
-	    exec(arr);
-	  } catch (e) { /* empty */ }
-	  return safe;
-	};
-
-	var task = _task.set;
-	var microtask = _microtask();
-
-
-
-
-	var PROMISE = 'Promise';
-	var TypeError$1 = _global.TypeError;
-	var process$2 = _global.process;
-	var versions = process$2 && process$2.versions;
-	var v8 = versions && versions.v8 || '';
-	var $Promise = _global[PROMISE];
-	var isNode$1 = _classof(process$2) == 'process';
-	var empty = function () { /* empty */ };
-	var Internal, newGenericPromiseCapability, OwnPromiseCapability, Wrapper;
-	var newPromiseCapability = newGenericPromiseCapability = _newPromiseCapability.f;
-
-	var USE_NATIVE = !!function () {
-	  try {
-	    // correct subclassing with @@species support
-	    var promise = $Promise.resolve(1);
-	    var FakePromise = (promise.constructor = {})[_wks('species')] = function (exec) {
-	      exec(empty, empty);
-	    };
-	    // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-	    return (isNode$1 || typeof PromiseRejectionEvent == 'function')
-	      && promise.then(empty) instanceof FakePromise
-	      // v8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
-	      // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
-	      // we can't detect it synchronously, so just check versions
-	      && v8.indexOf('6.6') !== 0
-	      && _userAgent.indexOf('Chrome/66') === -1;
-	  } catch (e) { /* empty */ }
-	}();
-
-	// helpers
-	var isThenable = function (it) {
-	  var then;
-	  return _isObject(it) && typeof (then = it.then) == 'function' ? then : false;
-	};
-	var notify = function (promise, isReject) {
-	  if (promise._n) return;
-	  promise._n = true;
-	  var chain = promise._c;
-	  microtask(function () {
-	    var value = promise._v;
-	    var ok = promise._s == 1;
-	    var i = 0;
-	    var run = function (reaction) {
-	      var handler = ok ? reaction.ok : reaction.fail;
-	      var resolve = reaction.resolve;
-	      var reject = reaction.reject;
-	      var domain = reaction.domain;
-	      var result, then, exited;
-	      try {
-	        if (handler) {
-	          if (!ok) {
-	            if (promise._h == 2) onHandleUnhandled(promise);
-	            promise._h = 1;
-	          }
-	          if (handler === true) result = value;
-	          else {
-	            if (domain) domain.enter();
-	            result = handler(value); // may throw
-	            if (domain) {
-	              domain.exit();
-	              exited = true;
-	            }
-	          }
-	          if (result === reaction.promise) {
-	            reject(TypeError$1('Promise-chain cycle'));
-	          } else if (then = isThenable(result)) {
-	            then.call(result, resolve, reject);
-	          } else resolve(result);
-	        } else reject(value);
-	      } catch (e) {
-	        if (domain && !exited) domain.exit();
-	        reject(e);
-	      }
-	    };
-	    while (chain.length > i) run(chain[i++]); // variable length - can't use forEach
-	    promise._c = [];
-	    promise._n = false;
-	    if (isReject && !promise._h) onUnhandled(promise);
-	  });
-	};
-	var onUnhandled = function (promise) {
-	  task.call(_global, function () {
-	    var value = promise._v;
-	    var unhandled = isUnhandled(promise);
-	    var result, handler, console;
-	    if (unhandled) {
-	      result = _perform(function () {
-	        if (isNode$1) {
-	          process$2.emit('unhandledRejection', value, promise);
-	        } else if (handler = _global.onunhandledrejection) {
-	          handler({ promise: promise, reason: value });
-	        } else if ((console = _global.console) && console.error) {
-	          console.error('Unhandled promise rejection', value);
-	        }
-	      });
-	      // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
-	      promise._h = isNode$1 || isUnhandled(promise) ? 2 : 1;
-	    } promise._a = undefined;
-	    if (unhandled && result.e) throw result.v;
-	  });
-	};
-	var isUnhandled = function (promise) {
-	  return promise._h !== 1 && (promise._a || promise._c).length === 0;
-	};
-	var onHandleUnhandled = function (promise) {
-	  task.call(_global, function () {
-	    var handler;
-	    if (isNode$1) {
-	      process$2.emit('rejectionHandled', promise);
-	    } else if (handler = _global.onrejectionhandled) {
-	      handler({ promise: promise, reason: promise._v });
-	    }
-	  });
-	};
-	var $reject = function (value) {
-	  var promise = this;
-	  if (promise._d) return;
-	  promise._d = true;
-	  promise = promise._w || promise; // unwrap
-	  promise._v = value;
-	  promise._s = 2;
-	  if (!promise._a) promise._a = promise._c.slice();
-	  notify(promise, true);
-	};
-	var $resolve = function (value) {
-	  var promise = this;
-	  var then;
-	  if (promise._d) return;
-	  promise._d = true;
-	  promise = promise._w || promise; // unwrap
-	  try {
-	    if (promise === value) throw TypeError$1("Promise can't be resolved itself");
-	    if (then = isThenable(value)) {
-	      microtask(function () {
-	        var wrapper = { _w: promise, _d: false }; // wrap
-	        try {
-	          then.call(value, _ctx($resolve, wrapper, 1), _ctx($reject, wrapper, 1));
-	        } catch (e) {
-	          $reject.call(wrapper, e);
-	        }
-	      });
-	    } else {
-	      promise._v = value;
-	      promise._s = 1;
-	      notify(promise, false);
-	    }
-	  } catch (e) {
-	    $reject.call({ _w: promise, _d: false }, e); // wrap
-	  }
-	};
-
-	// constructor polyfill
-	if (!USE_NATIVE) {
-	  // 25.4.3.1 Promise(executor)
-	  $Promise = function Promise(executor) {
-	    _anInstance(this, $Promise, PROMISE, '_h');
-	    _aFunction(executor);
-	    Internal.call(this);
-	    try {
-	      executor(_ctx($resolve, this, 1), _ctx($reject, this, 1));
-	    } catch (err) {
-	      $reject.call(this, err);
-	    }
-	  };
-	  // eslint-disable-next-line no-unused-vars
-	  Internal = function Promise(executor) {
-	    this._c = [];             // <- awaiting reactions
-	    this._a = undefined;      // <- checked in isUnhandled reactions
-	    this._s = 0;              // <- state
-	    this._d = false;          // <- done
-	    this._v = undefined;      // <- value
-	    this._h = 0;              // <- rejection state, 0 - default, 1 - handled, 2 - unhandled
-	    this._n = false;          // <- notify
-	  };
-	  Internal.prototype = _redefineAll($Promise.prototype, {
-	    // 25.4.5.3 Promise.prototype.then(onFulfilled, onRejected)
-	    then: function then(onFulfilled, onRejected) {
-	      var reaction = newPromiseCapability(_speciesConstructor(this, $Promise));
-	      reaction.ok = typeof onFulfilled == 'function' ? onFulfilled : true;
-	      reaction.fail = typeof onRejected == 'function' && onRejected;
-	      reaction.domain = isNode$1 ? process$2.domain : undefined;
-	      this._c.push(reaction);
-	      if (this._a) this._a.push(reaction);
-	      if (this._s) notify(this, false);
-	      return reaction.promise;
-	    },
-	    // 25.4.5.1 Promise.prototype.catch(onRejected)
-	    'catch': function (onRejected) {
-	      return this.then(undefined, onRejected);
-	    }
-	  });
-	  OwnPromiseCapability = function () {
-	    var promise = new Internal();
-	    this.promise = promise;
-	    this.resolve = _ctx($resolve, promise, 1);
-	    this.reject = _ctx($reject, promise, 1);
-	  };
-	  _newPromiseCapability.f = newPromiseCapability = function (C) {
-	    return C === $Promise || C === Wrapper
-	      ? new OwnPromiseCapability(C)
-	      : newGenericPromiseCapability(C);
-	  };
-	}
-
-	_export(_export.G + _export.W + _export.F * !USE_NATIVE, { Promise: $Promise });
-	_setToStringTag($Promise, PROMISE);
-	_setSpecies(PROMISE);
-	Wrapper = _core[PROMISE];
-
-	// statics
-	_export(_export.S + _export.F * !USE_NATIVE, PROMISE, {
-	  // 25.4.4.5 Promise.reject(r)
-	  reject: function reject(r) {
-	    var capability = newPromiseCapability(this);
-	    var $$reject = capability.reject;
-	    $$reject(r);
-	    return capability.promise;
-	  }
-	});
-	_export(_export.S + _export.F * (_library || !USE_NATIVE), PROMISE, {
-	  // 25.4.4.6 Promise.resolve(x)
-	  resolve: function resolve(x) {
-	    return _promiseResolve(_library && this === Wrapper ? $Promise : this, x);
-	  }
-	});
-	_export(_export.S + _export.F * !(USE_NATIVE && _iterDetect(function (iter) {
-	  $Promise.all(iter)['catch'](empty);
-	})), PROMISE, {
-	  // 25.4.4.1 Promise.all(iterable)
-	  all: function all(iterable) {
-	    var C = this;
-	    var capability = newPromiseCapability(C);
-	    var resolve = capability.resolve;
-	    var reject = capability.reject;
-	    var result = _perform(function () {
-	      var values = [];
-	      var index = 0;
-	      var remaining = 1;
-	      _forOf(iterable, false, function (promise) {
-	        var $index = index++;
-	        var alreadyCalled = false;
-	        values.push(undefined);
-	        remaining++;
-	        C.resolve(promise).then(function (value) {
-	          if (alreadyCalled) return;
-	          alreadyCalled = true;
-	          values[$index] = value;
-	          --remaining || resolve(values);
-	        }, reject);
-	      });
-	      --remaining || resolve(values);
-	    });
-	    if (result.e) reject(result.v);
-	    return capability.promise;
-	  },
-	  // 25.4.4.4 Promise.race(iterable)
-	  race: function race(iterable) {
-	    var C = this;
-	    var capability = newPromiseCapability(C);
-	    var reject = capability.reject;
-	    var result = _perform(function () {
-	      _forOf(iterable, false, function (promise) {
-	        C.resolve(promise).then(capability.resolve, reject);
-	      });
-	    });
-	    if (result.e) reject(result.v);
-	    return capability.promise;
-	  }
-	});
-
-	_export(_export.P + _export.R, 'Promise', { 'finally': function (onFinally) {
-	  var C = _speciesConstructor(this, _core.Promise || _global.Promise);
-	  var isFunction = typeof onFinally == 'function';
-	  return this.then(
-	    isFunction ? function (x) {
-	      return _promiseResolve(C, onFinally()).then(function () { return x; });
-	    } : onFinally,
-	    isFunction ? function (e) {
-	      return _promiseResolve(C, onFinally()).then(function () { throw e; });
-	    } : onFinally
-	  );
-	} });
-
-	// https://github.com/tc39/proposal-promise-try
-
-
-
-
-	_export(_export.S, 'Promise', { 'try': function (callbackfn) {
-	  var promiseCapability = _newPromiseCapability.f(this);
-	  var result = _perform(callbackfn);
-	  (result.e ? promiseCapability.reject : promiseCapability.resolve)(result.v);
-	  return promiseCapability.promise;
-	} });
-
-	var promise = _core.Promise;
-
-	var promise$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": promise, __esModule: true };
-	});
-
-	var _Promise = unwrapExports(promise$1);
 
 	var core_getIterator = _core.getIterator = function (it) {
 	  var iterFn = core_getIteratorMethod(it);
@@ -1485,10 +869,10 @@
 
 	var _getIterator = unwrapExports(getIterator$1);
 
-	var f$2 = _wks;
+	var f$1 = _wks;
 
 	var _wksExt = {
-		f: f$2
+		f: f$1
 	};
 
 	var iterator = _wksExt.f('iterator');
@@ -1566,16 +950,16 @@
 	  if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: _wksExt.f(name) });
 	};
 
-	var f$3 = Object.getOwnPropertySymbols;
+	var f$2 = Object.getOwnPropertySymbols;
 
 	var _objectGops = {
-		f: f$3
+		f: f$2
 	};
 
-	var f$4 = {}.propertyIsEnumerable;
+	var f$3 = {}.propertyIsEnumerable;
 
 	var _objectPie = {
-		f: f$4
+		f: f$3
 	};
 
 	// all enumerable object keys, includes symbols
@@ -1604,12 +988,12 @@
 
 	var hiddenKeys = _enumBugKeys.concat('length', 'prototype');
 
-	var f$5 = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
+	var f$4 = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
 	  return _objectKeysInternal(O, hiddenKeys);
 	};
 
 	var _objectGopn = {
-		f: f$5
+		f: f$4
 	};
 
 	// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
@@ -1628,17 +1012,17 @@
 	  }
 	};
 
-	var f$6 = function getOwnPropertyNames(it) {
+	var f$5 = function getOwnPropertyNames(it) {
 	  return windowNames && toString$1.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(_toIobject(it));
 	};
 
 	var _objectGopnExt = {
-		f: f$6
+		f: f$5
 	};
 
 	var gOPD = Object.getOwnPropertyDescriptor;
 
-	var f$7 = _descriptors ? gOPD : function getOwnPropertyDescriptor(O, P) {
+	var f$6 = _descriptors ? gOPD : function getOwnPropertyDescriptor(O, P) {
 	  O = _toIobject(O);
 	  P = _toPrimitive(P, true);
 	  if (_ie8DomDefine) try {
@@ -1648,7 +1032,7 @@
 	};
 
 	var _objectGopd = {
-		f: f$7
+		f: f$6
 	};
 
 	// ECMAScript 6 symbols shim
@@ -1693,7 +1077,7 @@
 	var AllSymbols = _shared('symbols');
 	var OPSymbols = _shared('op-symbols');
 	var ObjectProto$1 = Object[PROTOTYPE$2];
-	var USE_NATIVE$1 = typeof $Symbol == 'function' && !!_objectGops.f;
+	var USE_NATIVE = typeof $Symbol == 'function' && !!_objectGops.f;
 	var QObject = _global.QObject;
 	// Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
 	var setter = !QObject || !QObject[PROTOTYPE$2] || !QObject[PROTOTYPE$2].findChild;
@@ -1716,7 +1100,7 @@
 	  return sym;
 	};
 
-	var isSymbol = USE_NATIVE$1 && typeof $Symbol.iterator == 'symbol' ? function (it) {
+	var isSymbol = USE_NATIVE && typeof $Symbol.iterator == 'symbol' ? function (it) {
 	  return typeof it == 'symbol';
 	} : function (it) {
 	  return it instanceof $Symbol;
@@ -1783,7 +1167,7 @@
 	};
 
 	// 19.4.1.1 Symbol([description])
-	if (!USE_NATIVE$1) {
+	if (!USE_NATIVE) {
 	  $Symbol = function Symbol() {
 	    if (this instanceof $Symbol) throw TypeError('Symbol is not a constructor!');
 	    var tag = _uid(arguments.length > 0 ? arguments[0] : undefined);
@@ -1814,7 +1198,7 @@
 	  };
 	}
 
-	_export(_export.G + _export.W + _export.F * !USE_NATIVE$1, { Symbol: $Symbol });
+	_export(_export.G + _export.W + _export.F * !USE_NATIVE, { Symbol: $Symbol });
 
 	for (var es6Symbols = (
 	  // 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
@@ -1823,7 +1207,7 @@
 
 	for (var wellKnownSymbols = _objectKeys(_wks.store), k = 0; wellKnownSymbols.length > k;) _wksDefine(wellKnownSymbols[k++]);
 
-	_export(_export.S + _export.F * !USE_NATIVE$1, 'Symbol', {
+	_export(_export.S + _export.F * !USE_NATIVE, 'Symbol', {
 	  // 19.4.2.1 Symbol.for(key)
 	  'for': function (key) {
 	    return _has(SymbolRegistry, key += '')
@@ -1839,7 +1223,7 @@
 	  useSimple: function () { setter = false; }
 	});
 
-	_export(_export.S + _export.F * !USE_NATIVE$1, 'Object', {
+	_export(_export.S + _export.F * !USE_NATIVE, 'Object', {
 	  // 19.1.2.2 Object.create(O [, Properties])
 	  create: $create,
 	  // 19.1.2.4 Object.defineProperty(O, P, Attributes)
@@ -1865,7 +1249,7 @@
 	});
 
 	// 24.3.2 JSON.stringify(value [, replacer [, space]])
-	$JSON$1 && _export(_export.S + _export.F * (!USE_NATIVE$1 || _fails(function () {
+	$JSON$1 && _export(_export.S + _export.F * (!USE_NATIVE || _fails(function () {
 	  var S = $Symbol();
 	  // MS Edge converts symbol values to JSON as {}
 	  // WebKit converts symbol values to JSON as null
@@ -2813,6 +2197,622 @@
 	            typeof self !== "undefined" ? self :
 	            typeof window !== "undefined" ? window : {});
 
+	var _anInstance = function (it, Constructor, name, forbiddenField) {
+	  if (!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)) {
+	    throw TypeError(name + ': incorrect invocation!');
+	  } return it;
+	};
+
+	// call something on iterator step with safe closing on error
+
+	var _iterCall = function (iterator, fn, value, entries) {
+	  try {
+	    return entries ? fn(_anObject(value)[0], value[1]) : fn(value);
+	  // 7.4.6 IteratorClose(iterator, completion)
+	  } catch (e) {
+	    var ret = iterator['return'];
+	    if (ret !== undefined) _anObject(ret.call(iterator));
+	    throw e;
+	  }
+	};
+
+	// check on default Array iterator
+
+	var ITERATOR$2 = _wks('iterator');
+	var ArrayProto = Array.prototype;
+
+	var _isArrayIter = function (it) {
+	  return it !== undefined && (_iterators.Array === it || ArrayProto[ITERATOR$2] === it);
+	};
+
+	var _forOf = createCommonjsModule(function (module) {
+	var BREAK = {};
+	var RETURN = {};
+	var exports = module.exports = function (iterable, entries, fn, that, ITERATOR) {
+	  var iterFn = ITERATOR ? function () { return iterable; } : core_getIteratorMethod(iterable);
+	  var f = _ctx(fn, that, entries ? 2 : 1);
+	  var index = 0;
+	  var length, step, iterator, result;
+	  if (typeof iterFn != 'function') throw TypeError(iterable + ' is not iterable!');
+	  // fast case for arrays with default iterator
+	  if (_isArrayIter(iterFn)) for (length = _toLength(iterable.length); length > index; index++) {
+	    result = entries ? f(_anObject(step = iterable[index])[0], step[1]) : f(iterable[index]);
+	    if (result === BREAK || result === RETURN) return result;
+	  } else for (iterator = iterFn.call(iterable); !(step = iterator.next()).done;) {
+	    result = _iterCall(iterator, f, step.value, entries);
+	    if (result === BREAK || result === RETURN) return result;
+	  }
+	};
+	exports.BREAK = BREAK;
+	exports.RETURN = RETURN;
+	});
+
+	// 7.3.20 SpeciesConstructor(O, defaultConstructor)
+
+
+	var SPECIES = _wks('species');
+	var _speciesConstructor = function (O, D) {
+	  var C = _anObject(O).constructor;
+	  var S;
+	  return C === undefined || (S = _anObject(C)[SPECIES]) == undefined ? D : _aFunction(S);
+	};
+
+	// fast apply, http://jsperf.lnkit.com/fast-apply/5
+	var _invoke = function (fn, args, that) {
+	  var un = that === undefined;
+	  switch (args.length) {
+	    case 0: return un ? fn()
+	                      : fn.call(that);
+	    case 1: return un ? fn(args[0])
+	                      : fn.call(that, args[0]);
+	    case 2: return un ? fn(args[0], args[1])
+	                      : fn.call(that, args[0], args[1]);
+	    case 3: return un ? fn(args[0], args[1], args[2])
+	                      : fn.call(that, args[0], args[1], args[2]);
+	    case 4: return un ? fn(args[0], args[1], args[2], args[3])
+	                      : fn.call(that, args[0], args[1], args[2], args[3]);
+	  } return fn.apply(that, args);
+	};
+
+	var process = _global.process;
+	var setTask = _global.setImmediate;
+	var clearTask = _global.clearImmediate;
+	var MessageChannel = _global.MessageChannel;
+	var Dispatch = _global.Dispatch;
+	var counter = 0;
+	var queue = {};
+	var ONREADYSTATECHANGE = 'onreadystatechange';
+	var defer, channel, port;
+	var run = function () {
+	  var id = +this;
+	  // eslint-disable-next-line no-prototype-builtins
+	  if (queue.hasOwnProperty(id)) {
+	    var fn = queue[id];
+	    delete queue[id];
+	    fn();
+	  }
+	};
+	var listener = function (event) {
+	  run.call(event.data);
+	};
+	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
+	if (!setTask || !clearTask) {
+	  setTask = function setImmediate(fn) {
+	    var args = [];
+	    var i = 1;
+	    while (arguments.length > i) args.push(arguments[i++]);
+	    queue[++counter] = function () {
+	      // eslint-disable-next-line no-new-func
+	      _invoke(typeof fn == 'function' ? fn : Function(fn), args);
+	    };
+	    defer(counter);
+	    return counter;
+	  };
+	  clearTask = function clearImmediate(id) {
+	    delete queue[id];
+	  };
+	  // Node.js 0.8-
+	  if (_cof(process) == 'process') {
+	    defer = function (id) {
+	      process.nextTick(_ctx(run, id, 1));
+	    };
+	  // Sphere (JS game engine) Dispatch API
+	  } else if (Dispatch && Dispatch.now) {
+	    defer = function (id) {
+	      Dispatch.now(_ctx(run, id, 1));
+	    };
+	  // Browsers with MessageChannel, includes WebWorkers
+	  } else if (MessageChannel) {
+	    channel = new MessageChannel();
+	    port = channel.port2;
+	    channel.port1.onmessage = listener;
+	    defer = _ctx(port.postMessage, port, 1);
+	  // Browsers with postMessage, skip WebWorkers
+	  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
+	  } else if (_global.addEventListener && typeof postMessage == 'function' && !_global.importScripts) {
+	    defer = function (id) {
+	      _global.postMessage(id + '', '*');
+	    };
+	    _global.addEventListener('message', listener, false);
+	  // IE8-
+	  } else if (ONREADYSTATECHANGE in _domCreate('script')) {
+	    defer = function (id) {
+	      _html.appendChild(_domCreate('script'))[ONREADYSTATECHANGE] = function () {
+	        _html.removeChild(this);
+	        run.call(id);
+	      };
+	    };
+	  // Rest old browsers
+	  } else {
+	    defer = function (id) {
+	      setTimeout(_ctx(run, id, 1), 0);
+	    };
+	  }
+	}
+	var _task = {
+	  set: setTask,
+	  clear: clearTask
+	};
+
+	var macrotask = _task.set;
+	var Observer = _global.MutationObserver || _global.WebKitMutationObserver;
+	var process$1 = _global.process;
+	var Promise$1 = _global.Promise;
+	var isNode = _cof(process$1) == 'process';
+
+	var _microtask = function () {
+	  var head, last, notify;
+
+	  var flush = function () {
+	    var parent, fn;
+	    if (isNode && (parent = process$1.domain)) parent.exit();
+	    while (head) {
+	      fn = head.fn;
+	      head = head.next;
+	      try {
+	        fn();
+	      } catch (e) {
+	        if (head) notify();
+	        else last = undefined;
+	        throw e;
+	      }
+	    } last = undefined;
+	    if (parent) parent.enter();
+	  };
+
+	  // Node.js
+	  if (isNode) {
+	    notify = function () {
+	      process$1.nextTick(flush);
+	    };
+	  // browsers with MutationObserver, except iOS Safari - https://github.com/zloirock/core-js/issues/339
+	  } else if (Observer && !(_global.navigator && _global.navigator.standalone)) {
+	    var toggle = true;
+	    var node = document.createTextNode('');
+	    new Observer(flush).observe(node, { characterData: true }); // eslint-disable-line no-new
+	    notify = function () {
+	      node.data = toggle = !toggle;
+	    };
+	  // environments with maybe non-completely correct, but existent Promise
+	  } else if (Promise$1 && Promise$1.resolve) {
+	    // Promise.resolve without an argument throws an error in LG WebOS 2
+	    var promise = Promise$1.resolve(undefined);
+	    notify = function () {
+	      promise.then(flush);
+	    };
+	  // for other environments - macrotask based on:
+	  // - setImmediate
+	  // - MessageChannel
+	  // - window.postMessag
+	  // - onreadystatechange
+	  // - setTimeout
+	  } else {
+	    notify = function () {
+	      // strange IE + webpack dev server bug - use .call(global)
+	      macrotask.call(_global, flush);
+	    };
+	  }
+
+	  return function (fn) {
+	    var task = { fn: fn, next: undefined };
+	    if (last) last.next = task;
+	    if (!head) {
+	      head = task;
+	      notify();
+	    } last = task;
+	  };
+	};
+
+	// 25.4.1.5 NewPromiseCapability(C)
+
+
+	function PromiseCapability(C) {
+	  var resolve, reject;
+	  this.promise = new C(function ($$resolve, $$reject) {
+	    if (resolve !== undefined || reject !== undefined) throw TypeError('Bad Promise constructor');
+	    resolve = $$resolve;
+	    reject = $$reject;
+	  });
+	  this.resolve = _aFunction(resolve);
+	  this.reject = _aFunction(reject);
+	}
+
+	var f$7 = function (C) {
+	  return new PromiseCapability(C);
+	};
+
+	var _newPromiseCapability = {
+		f: f$7
+	};
+
+	var _perform = function (exec) {
+	  try {
+	    return { e: false, v: exec() };
+	  } catch (e) {
+	    return { e: true, v: e };
+	  }
+	};
+
+	var navigator$1 = _global.navigator;
+
+	var _userAgent = navigator$1 && navigator$1.userAgent || '';
+
+	var _promiseResolve = function (C, x) {
+	  _anObject(C);
+	  if (_isObject(x) && x.constructor === C) return x;
+	  var promiseCapability = _newPromiseCapability.f(C);
+	  var resolve = promiseCapability.resolve;
+	  resolve(x);
+	  return promiseCapability.promise;
+	};
+
+	var _redefineAll = function (target, src, safe) {
+	  for (var key in src) {
+	    if (safe && target[key]) target[key] = src[key];
+	    else _hide(target, key, src[key]);
+	  } return target;
+	};
+
+	var SPECIES$1 = _wks('species');
+
+	var _setSpecies = function (KEY) {
+	  var C = typeof _core[KEY] == 'function' ? _core[KEY] : _global[KEY];
+	  if (_descriptors && C && !C[SPECIES$1]) _objectDp.f(C, SPECIES$1, {
+	    configurable: true,
+	    get: function () { return this; }
+	  });
+	};
+
+	var ITERATOR$3 = _wks('iterator');
+	var SAFE_CLOSING = false;
+
+	try {
+	  var riter = [7][ITERATOR$3]();
+	  riter['return'] = function () { SAFE_CLOSING = true; };
+	} catch (e) { /* empty */ }
+
+	var _iterDetect = function (exec, skipClosing) {
+	  if (!skipClosing && !SAFE_CLOSING) return false;
+	  var safe = false;
+	  try {
+	    var arr = [7];
+	    var iter = arr[ITERATOR$3]();
+	    iter.next = function () { return { done: safe = true }; };
+	    arr[ITERATOR$3] = function () { return iter; };
+	    exec(arr);
+	  } catch (e) { /* empty */ }
+	  return safe;
+	};
+
+	var task = _task.set;
+	var microtask = _microtask();
+
+
+
+
+	var PROMISE = 'Promise';
+	var TypeError$1 = _global.TypeError;
+	var process$2 = _global.process;
+	var versions = process$2 && process$2.versions;
+	var v8 = versions && versions.v8 || '';
+	var $Promise = _global[PROMISE];
+	var isNode$1 = _classof(process$2) == 'process';
+	var empty = function () { /* empty */ };
+	var Internal, newGenericPromiseCapability, OwnPromiseCapability, Wrapper;
+	var newPromiseCapability = newGenericPromiseCapability = _newPromiseCapability.f;
+
+	var USE_NATIVE$1 = !!function () {
+	  try {
+	    // correct subclassing with @@species support
+	    var promise = $Promise.resolve(1);
+	    var FakePromise = (promise.constructor = {})[_wks('species')] = function (exec) {
+	      exec(empty, empty);
+	    };
+	    // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
+	    return (isNode$1 || typeof PromiseRejectionEvent == 'function')
+	      && promise.then(empty) instanceof FakePromise
+	      // v8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
+	      // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
+	      // we can't detect it synchronously, so just check versions
+	      && v8.indexOf('6.6') !== 0
+	      && _userAgent.indexOf('Chrome/66') === -1;
+	  } catch (e) { /* empty */ }
+	}();
+
+	// helpers
+	var isThenable = function (it) {
+	  var then;
+	  return _isObject(it) && typeof (then = it.then) == 'function' ? then : false;
+	};
+	var notify = function (promise, isReject) {
+	  if (promise._n) return;
+	  promise._n = true;
+	  var chain = promise._c;
+	  microtask(function () {
+	    var value = promise._v;
+	    var ok = promise._s == 1;
+	    var i = 0;
+	    var run = function (reaction) {
+	      var handler = ok ? reaction.ok : reaction.fail;
+	      var resolve = reaction.resolve;
+	      var reject = reaction.reject;
+	      var domain = reaction.domain;
+	      var result, then, exited;
+	      try {
+	        if (handler) {
+	          if (!ok) {
+	            if (promise._h == 2) onHandleUnhandled(promise);
+	            promise._h = 1;
+	          }
+	          if (handler === true) result = value;
+	          else {
+	            if (domain) domain.enter();
+	            result = handler(value); // may throw
+	            if (domain) {
+	              domain.exit();
+	              exited = true;
+	            }
+	          }
+	          if (result === reaction.promise) {
+	            reject(TypeError$1('Promise-chain cycle'));
+	          } else if (then = isThenable(result)) {
+	            then.call(result, resolve, reject);
+	          } else resolve(result);
+	        } else reject(value);
+	      } catch (e) {
+	        if (domain && !exited) domain.exit();
+	        reject(e);
+	      }
+	    };
+	    while (chain.length > i) run(chain[i++]); // variable length - can't use forEach
+	    promise._c = [];
+	    promise._n = false;
+	    if (isReject && !promise._h) onUnhandled(promise);
+	  });
+	};
+	var onUnhandled = function (promise) {
+	  task.call(_global, function () {
+	    var value = promise._v;
+	    var unhandled = isUnhandled(promise);
+	    var result, handler, console;
+	    if (unhandled) {
+	      result = _perform(function () {
+	        if (isNode$1) {
+	          process$2.emit('unhandledRejection', value, promise);
+	        } else if (handler = _global.onunhandledrejection) {
+	          handler({ promise: promise, reason: value });
+	        } else if ((console = _global.console) && console.error) {
+	          console.error('Unhandled promise rejection', value);
+	        }
+	      });
+	      // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
+	      promise._h = isNode$1 || isUnhandled(promise) ? 2 : 1;
+	    } promise._a = undefined;
+	    if (unhandled && result.e) throw result.v;
+	  });
+	};
+	var isUnhandled = function (promise) {
+	  return promise._h !== 1 && (promise._a || promise._c).length === 0;
+	};
+	var onHandleUnhandled = function (promise) {
+	  task.call(_global, function () {
+	    var handler;
+	    if (isNode$1) {
+	      process$2.emit('rejectionHandled', promise);
+	    } else if (handler = _global.onrejectionhandled) {
+	      handler({ promise: promise, reason: promise._v });
+	    }
+	  });
+	};
+	var $reject = function (value) {
+	  var promise = this;
+	  if (promise._d) return;
+	  promise._d = true;
+	  promise = promise._w || promise; // unwrap
+	  promise._v = value;
+	  promise._s = 2;
+	  if (!promise._a) promise._a = promise._c.slice();
+	  notify(promise, true);
+	};
+	var $resolve = function (value) {
+	  var promise = this;
+	  var then;
+	  if (promise._d) return;
+	  promise._d = true;
+	  promise = promise._w || promise; // unwrap
+	  try {
+	    if (promise === value) throw TypeError$1("Promise can't be resolved itself");
+	    if (then = isThenable(value)) {
+	      microtask(function () {
+	        var wrapper = { _w: promise, _d: false }; // wrap
+	        try {
+	          then.call(value, _ctx($resolve, wrapper, 1), _ctx($reject, wrapper, 1));
+	        } catch (e) {
+	          $reject.call(wrapper, e);
+	        }
+	      });
+	    } else {
+	      promise._v = value;
+	      promise._s = 1;
+	      notify(promise, false);
+	    }
+	  } catch (e) {
+	    $reject.call({ _w: promise, _d: false }, e); // wrap
+	  }
+	};
+
+	// constructor polyfill
+	if (!USE_NATIVE$1) {
+	  // 25.4.3.1 Promise(executor)
+	  $Promise = function Promise(executor) {
+	    _anInstance(this, $Promise, PROMISE, '_h');
+	    _aFunction(executor);
+	    Internal.call(this);
+	    try {
+	      executor(_ctx($resolve, this, 1), _ctx($reject, this, 1));
+	    } catch (err) {
+	      $reject.call(this, err);
+	    }
+	  };
+	  // eslint-disable-next-line no-unused-vars
+	  Internal = function Promise(executor) {
+	    this._c = [];             // <- awaiting reactions
+	    this._a = undefined;      // <- checked in isUnhandled reactions
+	    this._s = 0;              // <- state
+	    this._d = false;          // <- done
+	    this._v = undefined;      // <- value
+	    this._h = 0;              // <- rejection state, 0 - default, 1 - handled, 2 - unhandled
+	    this._n = false;          // <- notify
+	  };
+	  Internal.prototype = _redefineAll($Promise.prototype, {
+	    // 25.4.5.3 Promise.prototype.then(onFulfilled, onRejected)
+	    then: function then(onFulfilled, onRejected) {
+	      var reaction = newPromiseCapability(_speciesConstructor(this, $Promise));
+	      reaction.ok = typeof onFulfilled == 'function' ? onFulfilled : true;
+	      reaction.fail = typeof onRejected == 'function' && onRejected;
+	      reaction.domain = isNode$1 ? process$2.domain : undefined;
+	      this._c.push(reaction);
+	      if (this._a) this._a.push(reaction);
+	      if (this._s) notify(this, false);
+	      return reaction.promise;
+	    },
+	    // 25.4.5.1 Promise.prototype.catch(onRejected)
+	    'catch': function (onRejected) {
+	      return this.then(undefined, onRejected);
+	    }
+	  });
+	  OwnPromiseCapability = function () {
+	    var promise = new Internal();
+	    this.promise = promise;
+	    this.resolve = _ctx($resolve, promise, 1);
+	    this.reject = _ctx($reject, promise, 1);
+	  };
+	  _newPromiseCapability.f = newPromiseCapability = function (C) {
+	    return C === $Promise || C === Wrapper
+	      ? new OwnPromiseCapability(C)
+	      : newGenericPromiseCapability(C);
+	  };
+	}
+
+	_export(_export.G + _export.W + _export.F * !USE_NATIVE$1, { Promise: $Promise });
+	_setToStringTag($Promise, PROMISE);
+	_setSpecies(PROMISE);
+	Wrapper = _core[PROMISE];
+
+	// statics
+	_export(_export.S + _export.F * !USE_NATIVE$1, PROMISE, {
+	  // 25.4.4.5 Promise.reject(r)
+	  reject: function reject(r) {
+	    var capability = newPromiseCapability(this);
+	    var $$reject = capability.reject;
+	    $$reject(r);
+	    return capability.promise;
+	  }
+	});
+	_export(_export.S + _export.F * (_library || !USE_NATIVE$1), PROMISE, {
+	  // 25.4.4.6 Promise.resolve(x)
+	  resolve: function resolve(x) {
+	    return _promiseResolve(_library && this === Wrapper ? $Promise : this, x);
+	  }
+	});
+	_export(_export.S + _export.F * !(USE_NATIVE$1 && _iterDetect(function (iter) {
+	  $Promise.all(iter)['catch'](empty);
+	})), PROMISE, {
+	  // 25.4.4.1 Promise.all(iterable)
+	  all: function all(iterable) {
+	    var C = this;
+	    var capability = newPromiseCapability(C);
+	    var resolve = capability.resolve;
+	    var reject = capability.reject;
+	    var result = _perform(function () {
+	      var values = [];
+	      var index = 0;
+	      var remaining = 1;
+	      _forOf(iterable, false, function (promise) {
+	        var $index = index++;
+	        var alreadyCalled = false;
+	        values.push(undefined);
+	        remaining++;
+	        C.resolve(promise).then(function (value) {
+	          if (alreadyCalled) return;
+	          alreadyCalled = true;
+	          values[$index] = value;
+	          --remaining || resolve(values);
+	        }, reject);
+	      });
+	      --remaining || resolve(values);
+	    });
+	    if (result.e) reject(result.v);
+	    return capability.promise;
+	  },
+	  // 25.4.4.4 Promise.race(iterable)
+	  race: function race(iterable) {
+	    var C = this;
+	    var capability = newPromiseCapability(C);
+	    var reject = capability.reject;
+	    var result = _perform(function () {
+	      _forOf(iterable, false, function (promise) {
+	        C.resolve(promise).then(capability.resolve, reject);
+	      });
+	    });
+	    if (result.e) reject(result.v);
+	    return capability.promise;
+	  }
+	});
+
+	_export(_export.P + _export.R, 'Promise', { 'finally': function (onFinally) {
+	  var C = _speciesConstructor(this, _core.Promise || _global.Promise);
+	  var isFunction = typeof onFinally == 'function';
+	  return this.then(
+	    isFunction ? function (x) {
+	      return _promiseResolve(C, onFinally()).then(function () { return x; });
+	    } : onFinally,
+	    isFunction ? function (e) {
+	      return _promiseResolve(C, onFinally()).then(function () { throw e; });
+	    } : onFinally
+	  );
+	} });
+
+	// https://github.com/tc39/proposal-promise-try
+
+
+
+
+	_export(_export.S, 'Promise', { 'try': function (callbackfn) {
+	  var promiseCapability = _newPromiseCapability.f(this);
+	  var result = _perform(callbackfn);
+	  (result.e ? promiseCapability.reject : promiseCapability.resolve)(result.v);
+	  return promiseCapability.promise;
+	} });
+
+	var promise = _core.Promise;
+
+	var promise$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": promise, __esModule: true };
+	});
+
+	var _Promise = unwrapExports(promise$1);
+
 	var isEnum$1 = _objectPie.f;
 	var _objectToArray = function (isEntries) {
 	  return function (it) {
@@ -2999,7 +2999,7 @@
 	    }
 	    var sheet = document.createElement('style');
 	    sheet.id = elementId;
-	    sheet.innerHTML = '\n      .iris-follow-button .hover {\n        display: none;\n      }\n\n      .iris-follow-button.following:hover .hover {\n        display: inline;\n      }\n\n      .iris-follow-button.following:hover .nonhover {\n        display: none;\n      }\n\n      .iris-identicon * {\n        box-sizing: border-box;\n      }\n\n      .iris-identicon {\n        vertical-align: middle;\n        border-radius: 50%;\n        text-align: center;\n        display: inline-block;\n        position: relative;\n        max-width: 100%;\n      }\n\n      .iris-distance {\n        z-index: 2;\n        position: absolute;\n        left:0%;\n        top:2px;\n        width: 100%;\n        text-align: right;\n        color: #fff;\n        text-shadow: 0 0 1px #000;\n        font-size: 75%;\n        line-height: 75%;\n        font-weight: bold;\n      }\n\n      .iris-pie {\n        border-radius: 50%;\n        position: absolute;\n        top: 0;\n        left: 0;\n        box-shadow: 0px 0px 0px 0px #82FF84;\n        padding-bottom: 100%;\n        max-width: 100%;\n        -webkit-transition: all 0.2s ease-in-out;\n        -moz-transition: all 0.2s ease-in-out;\n        transition: all 0.2s ease-in-out;\n      }\n\n      .iris-card {\n        padding: 10px;\n        background-color: #f7f7f7;\n        color: #777;\n        border: 1px solid #ddd;\n        display: flex;\n        flex-direction: row;\n        overflow: hidden;\n      }\n\n      .iris-card a {\n        -webkit-transition: color 150ms;\n        transition: color 150ms;\n        text-decoration: none;\n        color: #337ab7;\n      }\n\n      .iris-card a:hover, .iris-card a:active {\n        text-decoration: underline;\n        color: #23527c;\n      }\n\n      .iris-pos {\n        color: #3c763d;\n      }\n\n      .iris-neg {\n        color: #a94442;\n      }\n\n      .iris-identicon img {\n        position: absolute;\n        top: 0;\n        left: 0;\n        max-width: 100%;\n        border-radius: 50%;\n        border-color: transparent;\n        border-style: solid;\n      }\n\n      .iris-chat-open-button {\n        background-color: #1e1e1e;\n        color: #fff;\n        padding: 15px;\n        cursor: pointer;\n        user-select: none;\n      }\n\n      .iris-chat-open-button svg {\n        width: 1em;\n      }\n\n      .iris-chat-open-button, .iris-chat-box {\n        position: fixed;\n        bottom: 0.5rem;\n        right: 0.5rem;\n        border-radius: 8px;\n        font-family: system-ui;\n        font-size: 15px;\n      }\n\n      .iris-chat-box {\n        background-color: #fff;\n        max-height: 25rem;\n        box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);\n        height: calc(100% - 44px);\n        display: flex;\n        flex-direction: column;\n        width: 320px;\n        color: rgb(38, 38, 38);\n      }\n\n      .iris-chat-box.minimized {\n        height: auto;\n      }\n\n      .iris-chat-box.minimized .iris-chat-header {\n        border-radius: 8px;\n        cursor: pointer;\n      }\n\n      .iris-chat-box.minimized .iris-chat-messages, .iris-chat-box.minimized .iris-typing-indicator, .iris-chat-box.minimized .iris-chat-input-wrapper, .iris-chat-box.minimized .iris-chat-minimize, .iris-chat-box.minimized .iris-chat-close {\n        display: none;\n      }\n\n      .iris-chat-header {\n        background-color: #1e1e1e;\n        height: 44px;\n        color: #fff;\n        border-radius: 8px 8px 0 0;\n        text-align: center;\n        display: flex;\n        flex-direction: row;\n        justify-content: center;\n        align-items: center;\n        flex: none;\n        white-space: nowrap;\n        text-overflow: ellipsis;\n        overflow: hidden;\n      }\n\n      .iris-chat-header-text {\n        flex: 1;\n      }\n\n      .iris-online-indicator {\n        color: #bfbfbf;\n        margin-right: 5px;\n        font-size: 12px;\n        user-select: none;\n        flex: none;\n      }\n\n      .iris-online-indicator.yes {\n        color: #80bf5f;\n      }\n\n      .iris-typing-indicator {\n        display: none;\n        background-color: rgba(255, 255, 255, 0.5);\n        font-size: 12px;\n        padding: 2px;\n        color: #777;\n      }\n\n      .iris-typing-indicator.yes {\n        display: block;\n      }\n\n      .iris-chat-messages {\n        flex: 1;\n        padding: 15px;\n        overflow-y: scroll;\n      }\n\n      .iris-chat-input-wrapper {\n        flex: none;\n        padding: 15px;\n        background-color: #efefef;\n        display: flex;\n        flex-direction: row;\n        border-radius: 0 0 8px 8px;\n      }\n\n      .iris-chat-input-wrapper textarea {\n        padding: 15px 8px;\n        border-radius: 4px;\n        border: 1px solid rgba(0,0,0,0);\n        width: auto;\n        font-size: 15px;\n        resize: none;\n        flex: 1;\n      }\n\n      .iris-chat-input-wrapper textarea:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-input-wrapper button svg {\n        display: inline-block;\n        font-size: inherit;\n        height: 1em;\n        width: 1em;\n        overflow: visible;\n        vertical-align: -0.125em;\n      }\n\n      .iris-chat-input-wrapper button, .iris-chat-input-wrapper button:hover, .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        flex: none;\n        color: #999;\n        background-color: transparent;\n        font-size: 30px;\n        padding: 5px;\n        border: 1px solid rgba(0,0,0,0);\n        border-radius: 4px;\n        margin-left: 5px;\n      }\n\n      .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-message {\n        display: flex;\n        flex-direction: column;\n        margin-bottom: 2px;\n        overflow-wrap: break-word;\n      }\n\n      .iris-msg-content {\n        background-color: #efefef;\n        padding: 6px 10px;\n        border-radius: 8px;\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        flex: none;\n        max-width: 75%;\n      }\n\n      .emoji {\n        font-size: 1.3em;\n        line-height: 1em;\n      }\n\n      .iris-chat-message .emoji-only {\n        font-size: 3em;\n        text-align: center;\n      }\n\n      .iris-seen {\n        color: rgba(0, 0, 0, 0.45);\n        user-select: none;\n      }\n\n      .iris-seen.yes {\n        color: #4fc3f7;\n      }\n\n      .iris-seen svg {\n        width: 18px;\n      }\n\n      .iris-delivered-checkmark {\n        display: none;\n      }\n\n      .delivered .iris-delivered-checkmark {\n        display: initial;\n      }\n\n      .iris-chat-minimize, .iris-chat-close {\n        user-select: none;\n        cursor: pointer;\n        width: 45px;\n        line-height: 44px;\n      }\n\n      .iris-chat-message.their {\n        align-items: flex-start;\n      }\n\n      .iris-chat-message.their + .iris-chat-message.our .iris-msg-content, .day-separator + .iris-chat-message.our .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.their:first-of-type .iris-msg-content {\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our:first-of-type .iris-msg-content {\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.our + .iris-chat-message.their .iris-msg-content, .day-separator + .iris-chat-message.their .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our {\n        align-items: flex-end;\n      }\n\n      .iris-chat-message.our .iris-msg-content {\n        background-color: #c5ecf7;\n      }\n\n      .iris-chat-message .time {\n        text-align: right;\n        font-size: 12px;\n        color: rgba(0, 0, 0, 0.45);\n      }\n\n      .day-separator {\n        display: inline-block;\n        border-radius: 8px;\n        background-color: rgba(227, 249, 255, 0.91);\n        padding: 6px 10px;\n        margin-top: 15px;\n        margin-left: auto;\n        margin-right: auto;\n        text-transform: uppercase;\n        font-size: 13px;\n        color: rgba(74, 74, 74, 0.88);\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        user-select: none;\n      }\n\n      .day-separator:first-of-type {\n        margin-top: 0;\n      }\n\n      *[contenteditable="true"]:not(:focus) {\n        cursor: pointer;\n      }\n\n      *[contenteditable="true"] {\n        outline: none;\n      }\n\n      [placeholder]:empty:before {\n        content: attr(placeholder);\n        color: #999;\n      }\n\n      [placeholder]:empty:focus {\n        cursor: text;\n      }\n      ';
+	    sheet.innerHTML = '\n      .iris-follow-button .hover {\n        display: none;\n      }\n\n      .iris-follow-button.following:hover .hover {\n        display: inline;\n      }\n\n      .iris-follow-button.following:hover .nonhover {\n        display: none;\n      }\n\n      .iris-identicon * {\n        box-sizing: border-box;\n      }\n\n      .iris-identicon {\n        vertical-align: middle;\n        border-radius: 50%;\n        text-align: center;\n        display: inline-block;\n        position: relative;\n        max-width: 100%;\n      }\n\n      .iris-distance {\n        z-index: 2;\n        position: absolute;\n        left:0%;\n        top:2px;\n        width: 100%;\n        text-align: right;\n        color: #fff;\n        text-shadow: 0 0 1px #000;\n        font-size: 75%;\n        line-height: 75%;\n        font-weight: bold;\n      }\n\n      .iris-pie {\n        border-radius: 50%;\n        position: absolute;\n        top: 0;\n        left: 0;\n        box-shadow: 0px 0px 0px 0px #82FF84;\n        padding-bottom: 100%;\n        max-width: 100%;\n        -webkit-transition: all 0.2s ease-in-out;\n        -moz-transition: all 0.2s ease-in-out;\n        transition: all 0.2s ease-in-out;\n      }\n\n      .iris-card {\n        padding: 10px;\n        background-color: #f7f7f7;\n        color: #777;\n        border: 1px solid #ddd;\n        display: flex;\n        flex-direction: row;\n        overflow: hidden;\n      }\n\n      .iris-card a {\n        -webkit-transition: color 150ms;\n        transition: color 150ms;\n        text-decoration: none;\n        color: #337ab7;\n      }\n\n      .iris-card a:hover, .iris-card a:active {\n        text-decoration: underline;\n        color: #23527c;\n      }\n\n      .iris-pos {\n        color: #3c763d;\n      }\n\n      .iris-neg {\n        color: #a94442;\n      }\n\n      .iris-identicon img {\n        position: absolute;\n        top: 0;\n        left: 0;\n        max-width: 100%;\n        border-radius: 50%;\n        border-color: transparent;\n        border-style: solid;\n      }\n\n      .iris-chat-open-button {\n        background-color: #1e1e1e;\n        color: #fff;\n        padding: 15px;\n        cursor: pointer;\n        user-select: none;\n      }\n\n      .iris-chat-open-button svg {\n        width: 1em;\n      }\n\n      .iris-chat-open-button, .iris-chat-box {\n        position: fixed;\n        bottom: 0.5rem;\n        right: 0.5rem;\n        border-radius: 8px;\n        font-family: system-ui;\n        font-size: 15px;\n      }\n\n      .iris-chat-box {\n        background-color: #fff;\n        max-height: 25rem;\n        box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);\n        height: calc(100% - 44px);\n        display: flex;\n        flex-direction: column;\n        width: 320px;\n        color: rgb(38, 38, 38);\n      }\n\n      .iris-chat-box.minimized {\n        height: auto;\n      }\n\n      .iris-chat-box.minimized .iris-chat-header {\n        border-radius: 8px;\n        cursor: pointer;\n      }\n\n      .iris-chat-box.minimized .iris-chat-messages, .iris-chat-box.minimized .iris-typing-indicator, .iris-chat-box.minimized .iris-chat-input-wrapper, .iris-chat-box.minimized .iris-chat-minimize, .iris-chat-box.minimized .iris-chat-close {\n        display: none;\n      }\n\n      .iris-chat-header {\n        background-color: #1e1e1e;\n        height: 44px;\n        color: #fff;\n        border-radius: 8px 8px 0 0;\n        text-align: center;\n        display: flex;\n        flex-direction: row;\n        justify-content: center;\n        align-items: center;\n        flex: none;\n        white-space: nowrap;\n        text-overflow: ellipsis;\n        overflow: hidden;\n      }\n\n      .iris-chat-header-text {\n        flex: 1;\n      }\n\n      .iris-online-indicator {\n        color: #bfbfbf;\n        margin-right: 5px;\n        font-size: 12px;\n        user-select: none;\n        flex: none;\n      }\n\n      .iris-online-indicator.yes {\n        color: #80bf5f;\n      }\n\n      .iris-typing-indicator {\n        display: none;\n        background-color: rgba(255, 255, 255, 0.5);\n        font-size: 12px;\n        padding: 2px;\n        color: #777;\n      }\n\n      .iris-typing-indicator.yes {\n        display: block;\n      }\n\n      .iris-chat-messages {\n        flex: 1;\n        padding: 15px;\n        overflow-y: scroll;\n      }\n\n      .iris-chat-input-wrapper {\n        flex: none;\n        padding: 15px;\n        background-color: #efefef;\n        display: flex;\n        flex-direction: row;\n        border-radius: 0 0 8px 8px;\n      }\n\n      .iris-chat-input-wrapper textarea {\n        padding: 15px 8px;\n        border-radius: 4px;\n        border: 1px solid rgba(0,0,0,0);\n        width: auto;\n        font-size: 15px;\n        resize: none;\n        flex: 1;\n      }\n\n      .iris-chat-input-wrapper textarea:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-input-wrapper button svg {\n        display: inline-block;\n        font-size: inherit;\n        height: 1em;\n        width: 1em;\n        overflow: visible;\n        vertical-align: -0.125em;\n      }\n\n      .iris-chat-input-wrapper button, .iris-chat-input-wrapper button:hover, .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        flex: none;\n        color: #999;\n        background-color: transparent;\n        font-size: 30px;\n        padding: 5px;\n        border: 1px solid rgba(0,0,0,0);\n        border-radius: 4px;\n        margin-left: 5px;\n      }\n\n      .iris-chat-input-wrapper button:active, .iris-chat-input-wrapper button:focus {\n        outline: none;\n        border: 1px solid #6dd0ed;\n      }\n\n      .iris-chat-message {\n        display: flex;\n        flex-direction: column;\n        margin-bottom: 2px;\n        overflow-wrap: break-word;\n      }\n\n      .iris-msg-content {\n        background-color: #efefef;\n        padding: 6px 10px;\n        border-radius: 8px;\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        flex: none;\n        max-width: 75%;\n      }\n\n      .emoji {\n        font-size: 1.3em;\n        line-height: 1em;\n      }\n\n      .iris-chat-message .emoji-only {\n        font-size: 3em;\n        text-align: center;\n      }\n\n      .iris-seen {\n        color: rgba(0, 0, 0, 0.45);\n        user-select: none;\n      }\n\n      .iris-seen.yes {\n        color: #4fc3f7;\n      }\n\n      .iris-seen svg {\n        width: 18px;\n      }\n\n      .iris-delivered-checkmark {\n        display: none;\n      }\n\n      .delivered .iris-delivered-checkmark {\n        display: initial;\n      }\n\n      .iris-chat-minimize, .iris-chat-close {\n        user-select: none;\n        cursor: pointer;\n        width: 45px;\n        line-height: 44px;\n      }\n\n      .iris-chat-message.their {\n        align-items: flex-start;\n      }\n\n      .iris-chat-message.their + .iris-chat-message.our .iris-msg-content, .day-separator + .iris-chat-message.our .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.their:first-of-type .iris-msg-content {\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our:first-of-type .iris-msg-content {\n        border-radius: 8px 0px 8px 8px;\n      }\n\n      .iris-chat-message.our + .iris-chat-message.their .iris-msg-content, .day-separator + .iris-chat-message.their .iris-msg-content {\n        margin-top: 15px;\n        border-radius: 0px 8px 8px 8px;\n      }\n\n      .iris-chat-message.our {\n        align-items: flex-end;\n      }\n\n      .iris-chat-message.our .iris-msg-content {\n        background-color: #c5ecf7;\n      }\n\n      .iris-chat-message .time {\n        text-align: right;\n        font-size: 12px;\n        color: rgba(0, 0, 0, 0.45);\n      }\n\n      .iris-non-string {\n        color: blue;\n      }\n\n      .day-separator {\n        display: inline-block;\n        border-radius: 8px;\n        background-color: rgba(227, 249, 255, 0.91);\n        padding: 6px 10px;\n        margin-top: 15px;\n        margin-left: auto;\n        margin-right: auto;\n        text-transform: uppercase;\n        font-size: 13px;\n        color: rgba(74, 74, 74, 0.88);\n        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);\n        user-select: none;\n      }\n\n      .day-separator:first-of-type {\n        margin-top: 0;\n      }\n\n      *[contenteditable="true"]:not(:focus) {\n        cursor: pointer;\n      }\n\n      *[contenteditable="true"] {\n        outline: none;\n      }\n\n      [placeholder]:empty:before {\n        content: attr(placeholder);\n        color: #999;\n      }\n\n      [placeholder]:empty:focus {\n        cursor: text;\n      }\n      ';
 	    document.head.prepend(sheet);
 	  },
 	  getUrlParameter: function getUrlParameter(sParam, sParams) {
@@ -3034,7 +3034,7 @@
 	    return t;
 	  },
 	  debounce: function debounce(func, wait, immediate) {
-	    var timeout;
+	    var timeout = void 0;
 	    return function () {
 	      var context = this,
 	          args = arguments;
@@ -5984,9 +5984,6 @@
 	    if (obj.pubKey) {
 	      this.pubKey = obj.pubKey;
 	    }
-	    if (obj.ipfsUri) {
-	      this.ipfsUri = obj.ipfsUri;
-	    }
 	    if (obj.sig) {
 	      if (typeof obj.sig !== 'string') {
 	        throw new ValidationError('SignedMessage signature must be a string');
@@ -6441,36 +6438,6 @@
 	  };
 
 	  /**
-	  *
-	  */
-
-
-	  SignedMessage.prototype.saveToIpfs = async function saveToIpfs(ipfs) {
-	    var s = this.toString();
-	    var r = await ipfs.add(ipfs.types.Buffer.from(s));
-	    if (r.length) {
-	      this.ipfsUri = r[0].hash;
-	    }
-	    return this.ipfsUri;
-	  };
-
-	  /**
-	  *
-	  */
-
-
-	  SignedMessage.loadFromIpfs = async function loadFromIpfs(ipfs, uri) {
-	    var f = await ipfs.cat(uri);
-	    var s = ipfs.types.Buffer.from(f).toString('utf8');
-	    try {
-	      return SignedMessage.fromString(s);
-	    } catch (e) {
-	      console.log('loading message from ipfs failed');
-	      return _Promise.reject();
-	    }
-	  };
-
-	  /**
 	  * @returns {string}
 	  */
 
@@ -6633,18 +6600,17 @@
 	  };
 
 	  /**
-	  * @param {Object} ipfs (optional) an IPFS instance that is used to fetch images
 	  * @returns {HTMLElement} profile card html element describing the identity
 	  */
 
 
-	  Contact.prototype.profileCard = function profileCard(ipfs) {
+	  Contact.prototype.profileCard = function profileCard() {
 	    var _this = this;
 
 	    var card = document.createElement('div');
 	    card.className = 'iris-card';
 
-	    var identicon$$1 = this.identicon({ width: 60, ipfs: ipfs });
+	    var identicon$$1 = this.identicon({ width: 60 });
 	    identicon$$1.style.order = 1;
 	    identicon$$1.style.flexShrink = 0;
 	    identicon$$1.style.marginRight = '15px';
@@ -6760,7 +6726,7 @@
 	  };
 
 	  /**
-	  * @param {Object} options {width: 50, border: 4, showDistance: true, ipfs: null, outerGlow: false}
+	  * @param {Object} options {width: 50, border: 4, showDistance: true, outerGlow: false}
 	  * @returns {HTMLElement} identicon element that can be appended to DOM
 	  */
 
@@ -6772,8 +6738,7 @@
 	      width: 50,
 	      border: 4,
 	      showDistance: true,
-	      outerGlow: false,
-	      ipfs: null
+	      outerGlow: false
 	    }, options);
 	    util.injectCss(); // some other way that is not called on each identicon generation?
 	    var identicon$$1 = document.createElement('div');
@@ -6854,21 +6819,6 @@
 	    }
 
 	    this.gun.on(setPie);
-
-	    if (options.ipfs) {
-	      Contact.getAttrs(this.gun).then(function (attrs) {
-	        var mva = Contact.getMostVerifiedAttributes(attrs);
-	        if (mva.profilePhoto) {
-	          var go = function go() {
-	            options.ipfs.cat(mva.profilePhoto.attribute.value).then(function (file) {
-	              var f = options.ipfs.types.Buffer.from(file).toString('base64');
-	              img.src = 'data:image;base64,' + f;
-	            });
-	          };
-	          options.ipfs.isOnline() ? go() : options.ipfs.on('ready', go);
-	        }
-	      });
-	    }
 
 	    return identicon$$1;
 	  };
@@ -8547,13 +8497,12 @@
 	      gun.user().get('activity').put({ status: activity, time: new Date(Gun.state()).toISOString() });
 	    };
 	    update();
+	    function timerUpdate() {
+	      update();
+	      gun.setActivityTimeout = setTimeout(timerUpdate, 3000);
+	    }
 	    if (activity) {
-	      var _timerUpdate = function _timerUpdate() {
-	        update();
-	        gun.setActivityTimeout = setTimeout(_timerUpdate, 3000);
-	      };
-
-	      _timerUpdate();
+	      timerUpdate();
 	    }
 	  };
 
@@ -8959,7 +8908,6 @@
 	  });
 	}
 
-	// TODO: flush onto IPFS
 	/**
 	* **Experimental.** Unlike Channel, this is probably not the most useful class yet.
 	*
@@ -8975,8 +8923,6 @@
 	*
 	* You can pass options.gun to use custom gun storages and networking settings.
 	*
-	* If you want messages saved to IPFS, pass options.ipfs = instance.
-	*
 	* Wait for index.ready promise to resolve before calling instance methods.
 	* @param {Object} options see default options in example
 	* @example
@@ -8984,7 +8930,6 @@
 	*
 	* Default options:
 	*{
-	*  ipfs: undefined,
 	*  keypair: undefined,
 	*  pubKey: undefined,
 	*  gun: undefined,
@@ -9021,7 +8966,6 @@
 	    _classCallCheck(this, SocialNetwork);
 
 	    this.options = _Object$assign({
-	      ipfs: undefined,
 	      keypair: undefined,
 	      pubKey: undefined,
 	      self: undefined,
@@ -9150,7 +9094,7 @@
 	    var distance = parseInt(msg.distance);
 	    distance = _Number$isNaN(distance) ? 99 : distance;
 	    distance = ('00' + distance).substring(distance.toString().length); // pad with zeros
-	    var key = distance + ':' + Math.floor(Date.parse(msg.signedData.time || msg.signedData.timestamp)) + ':' + (msg.ipfs_hash || msg.hash).substr(0, 9);
+	    var key = distance + ':' + Math.floor(Date.parse(msg.signedData.time || msg.signedData.timestamp)) + ':' + msg.hash.substr(0, 9);
 	    return key;
 	  };
 
@@ -9536,9 +9480,6 @@
 	      }
 	      results++;
 	      msg.cursor = result.key;
-	      if (result.value && result.value.ipfsUri) {
-	        msg.ipfsUri = result.value.ipfsUri;
-	      }
 	      msg.gun = msgIndex.get(result.key);
 	      callback(msg);
 	    }
@@ -9759,9 +9700,6 @@
 	      }
 	    }
 	    var obj = { sig: msg.sig, pubKey: msg.pubKey };
-	    if (msg.ipfsUri) {
-	      obj.ipfsUri = msg.ipfsUri;
-	    }
 
 	    recipient.get('received').get(msgIndexKey).put(obj);
 	    recipient.get('received').get(msgIndexKey).put(obj);
@@ -9797,9 +9735,6 @@
 	      author.get('sentNeutral').put(id.sentNeutral);
 	    }
 	    var obj = { sig: msg.sig, pubKey: msg.pubKey };
-	    if (msg.ipfsUri) {
-	      obj.ipfsUri = msg.ipfsUri;
-	    }
 	    author.get('sent').get(msgIndexKey).put(obj); // for some reason, doesn't work unless I do it twice
 	    author.get('sent').get(msgIndexKey).put(obj);
 	    return;
@@ -10046,16 +9981,6 @@
 	      }
 	    }
 
-	    if (this.options.ipfs) {
-	      try {
-	        var ipfsUri = await msg.saveToIpfs(this.options.ipfs);
-	        this.gun.get('messagesByHash').get(ipfsUri).put(node);
-	        this.gun.get('messagesByHash').get(ipfsUri).put(node);
-	        this.gun.get('messagesByHash').get(ipfsUri).put({ ipfsUri: ipfsUri });
-	      } catch (e) {
-	        console.error('adding msg ' + msg + ' to ipfs failed: ' + e);
-	      }
-	    }
 	    if (msg.signedData.type !== 'chat') {
 	      start = new Date();
 	      await this._updateContactIndexesByMsg(msg);
@@ -10194,42 +10119,17 @@
 	  SocialNetwork.prototype.getMessageByHash = function getMessageByHash(hash) {
 	    var _this12 = this;
 
-	    var isIpfsUri = hash.indexOf('Qm') === 0;
 	    return new _Promise(function (resolve) {
-	      var resolveIfHashMatches = async function resolveIfHashMatches(d, fromIpfs) {
+	      var resolveIfHashMatches = async function resolveIfHashMatches(d) {
 	        var obj = typeof d === 'object' ? d : JSON.parse(d);
 	        var m = await SignedMessage.fromSig(obj);
-	        var h = void 0;
-	        var republished = false;
-	        if (fromIpfs) {
-	          return resolve(m);
-	        } else if (isIpfsUri && _this12.options.ipfs) {
-	          h = await m.saveToIpfs(_this12.options.ipfs);
-	          republished = true;
-	        } else {
-	          h = await m.getHash();
-	        }
-	        if (h === hash || isIpfsUri && !_this12.options.ipfs) {
-	          // does not check hash validity if it's an ipfs uri and we don't have ipfs
-	          if (!fromIpfs && _this12.options.ipfs && _this12.writable && !republished) {
-	            m.saveToIpfs(_this12.options.ipfs).then(function (ipfsUri) {
-	              obj.ipfsUri = ipfsUri;
-	              _this12.gun.get('messagesByHash').get(hash).put(obj);
-	              _this12.gun.get('messagesByHash').get(ipfsUri).put(obj);
-	            });
-	          }
+	        var h = await m.getHash();
+	        if (h === hash) {
 	          resolve(m);
 	        } else {
 	          console.error('queried index for message ' + hash + ' but received ' + h);
 	        }
 	      };
-	      if (isIpfsUri && _this12.options.ipfs) {
-	        _this12.options.ipfs.cat(hash).then(function (file) {
-	          var s = _this12.options.ipfs.types.Buffer.from(file).toString('utf8');
-	          _this12.debug('got msg ' + hash + ' from ipfs');
-	          resolveIfHashMatches(s, true);
-	        });
-	      }
 	      _this12.gun.get('messagesByHash').get(hash).on(function (d) {
 	        _this12.debug('got msg ' + hash + ' from own gun index');
 	        resolveIfHashMatches(d);
@@ -10308,7 +10208,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$1 = "0.0.150";
+	var version$1 = "0.0.152";
 
 	var taggedTemplateLiteralLoose = createCommonjsModule(function (module, exports) {
 
@@ -10975,7 +10875,7 @@
 	  return Identicon;
 	}(d);
 
-	register(Identicon, 'iris-identicon', ['user', 'onClick', 'width', 'showTooltip']);
+	!util.isNode && register(Identicon, 'iris-identicon', ['user', 'onClick', 'width', 'showTooltip']);
 
 	// eslint-disable-line no-unused-vars
 
@@ -11146,8 +11046,8 @@
 	  return Key;
 	}();
 
-	var _templateObject$1 = _taggedTemplateLiteralLoose(['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        onInput=', '\n        disabled=', ' />\n    '], ['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        onInput=', '\n        disabled=', ' />\n    ']),
-	    _templateObject2$1 = _taggedTemplateLiteralLoose(['\n      <', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    '], ['\n      <', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    ']);
+	var _templateObject$1 = _taggedTemplateLiteralLoose(['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        class=', '\n        onInput=', '\n        disabled=', ' />\n    '], ['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        class=', '\n        onInput=', '\n        disabled=', ' />\n    ']),
+	    _templateObject2$1 = _taggedTemplateLiteralLoose(['\n      <', ' class=', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    '], ['\n      <', ' class=', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    ']);
 
 	var TextNode = function (_Component) {
 	  _inherits(TextNode, _Component);
@@ -11165,6 +11065,8 @@
 
 	  TextNode.prototype.componentDidUpdate = function componentDidUpdate(prevProps) {
 	    if (prevProps.user !== this.props.user || prevProps.path !== this.props.path) {
+	      this.setState({ value: '' });
+	      this.eventListenersOff();
 	      this.componentDidMount();
 	    }
 	  };
@@ -11172,14 +11074,21 @@
 	  TextNode.prototype.componentDidMount = function componentDidMount() {
 	    var _this2 = this;
 
+	    if (!this.props.path || this.props.user === undefined) {
+	      return;
+	    }
 	    util.injectCss();
-	    this.path = this.props.path || 'profile/name';
-	    this.props.user && this.getValue(this.props.user);
+	    this.path = this.props.path;
+	    this.user = this.props.user;
+	    this.props.user && this.path && this.getValue(this.props.user);
 	    var ps = util.getPublicState();
 	    var myPub = ps._.user && ps._.user.is.pub;
 	    var setMyPub = function setMyPub(myPub) {
 	      _this2.setState({ myPub: myPub });
-	      !_this2.props.user && _this2.getValue(myPub);
+	      if (!_this2.props.user) {
+	        _this2.user = myPub;
+	        _this2.getValue(myPub);
+	      }
 	    };
 	    if (myPub) {
 	      setMyPub(myPub);
@@ -11204,21 +11113,36 @@
 	    this.getNode(user).on(function (value, a, b$$1, e) {
 	      _this3.eventListeners[_this3.path] = e;
 	      if (!(_this3.ref.current && _this3.ref.current === document.activeElement)) {
-	        _this3.setState({ value: value });
+	        console.log(value, typeof value === 'undefined' ? 'undefined' : _typeof(value));
+	        _this3.setState({ value: value, class: typeof value === 'string' ? '' : 'iris-non-string' });
 	      }
 	    });
 	  };
 
-	  TextNode.prototype.componentWillUnmount = function componentWillUnmount() {
+	  TextNode.prototype.eventListenersOff = function eventListenersOff() {
 	    _Object$values(this.eventListeners).forEach(function (e) {
 	      return e.off();
 	    });
 	    this.eventListeners = {};
 	  };
 
+	  TextNode.prototype.componentWillUnmount = function componentWillUnmount() {
+	    this.eventListenersOff();
+	  };
+
+	  TextNode.prototype.getParsedValue = function getParsedValue(s) {
+	    if (this.props.json) {
+	      try {
+	        s = JSON.parse(s);
+	      } catch (e) {}
+	    }
+	    return s;
+	  };
+
 	  TextNode.prototype.onInput = function onInput(e) {
-	    var text = e.target.value || e.target.innerText;
-	    this.getNode().put(text);
+	    var val = this.getParsedValue(e.target.value || e.target.innerText);
+	    this.getNode().put(val);
+	    this.setState({ class: typeof val === 'string' ? '' : 'iris-non-string' });
 	  };
 
 	  TextNode.prototype.isEditable = function isEditable() {
@@ -11228,7 +11152,7 @@
 	  TextNode.prototype.renderInput = function renderInput() {
 	    var _this4 = this;
 
-	    return m$1(_templateObject$1, this.state.value, this.props.placeholder || this.path, function (e) {
+	    return m$1(_templateObject$1, this.state.value, this.props.placeholder || this.path, this.getClass(), function (e) {
 	      return _this4.onInput(e);
 	    }, !this.isEditable());
 	  };
@@ -11238,9 +11162,9 @@
 
 	    var placeholder = this.props.placeholder || this.props.path;
 	    var tag = this.props.tag || 'span';
-	    return m$1(_templateObject2$1, tag, this.ref, this.isEditable(), placeholder, function (e) {
+	    return m$1(_templateObject2$1, tag, this.state.class, this.ref, this.isEditable(), placeholder, function (e) {
 	      return _this5.onInput(e);
-	    }, this.state.value, tag);
+	    }, this.props.json ? _JSON$stringify(this.state.value) : this.state.value, tag);
 	  };
 
 	  TextNode.prototype.render = function render() {
@@ -11250,7 +11174,7 @@
 	  return TextNode;
 	}(d);
 
-	register(TextNode, 'iris-text', ['path', 'user', 'placeholder', 'editable', 'tag']);
+	!util.isNode && register(TextNode, 'iris-text', ['path', 'user', 'placeholder', 'editable', 'tag']);
 
 	var _templateObject$2 = _taggedTemplateLiteralLoose(['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        onInput=', '\n        disabled=', ' />\n    '], ['\n      <input\n        type="text"\n        value=', '\n        placeholder=', '\n        onInput=', '\n        disabled=', ' />\n    ']),
 	    _templateObject2$2 = _taggedTemplateLiteralLoose(['\n      <', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    '], ['\n      <', ' ref=', ' contenteditable=', ' placeholder=', ' onInput=', '>\n        ', '\n      </', '>\n    ']),
@@ -11349,7 +11273,7 @@
 	  return ImageNode;
 	}(TextNode);
 
-	register(ImageNode, 'iris-img', ['path', 'user', 'placeholder', 'editable', 'alt', 'width', 'height']);
+	!util.isNode && register(ImageNode, 'iris-img', ['path', 'user', 'placeholder', 'editable', 'alt', 'width', 'height']);
 
 	var _templateObject$3 = _taggedTemplateLiteralLoose(['<button class=', ' onClick=', '>', '</button>'], ['<button class=', ' onClick=', '>', '</button>']);
 
@@ -11365,17 +11289,17 @@
 	  CopyButton.prototype.copyToClipboard = function copyToClipboard(text) {
 	    if (window.clipboardData && window.clipboardData.setData) {
 	      // Internet Explorer-specific code path to prevent textarea being shown while dialog is visible.
-	      return window.clipboardData.setData("Text", text);
-	    } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
-	      var textarea = document.createElement("textarea");
+	      return window.clipboardData.setData('Text', text);
+	    } else if (document.queryCommandSupported && document.queryCommandSupported('copy')) {
+	      var textarea = document.createElement('textarea');
 	      textarea.textContent = text;
-	      textarea.style.position = "fixed"; // Prevent scrolling to bottom of page in Microsoft Edge.
+	      textarea.style.position = 'fixed'; // Prevent scrolling to bottom of page in Microsoft Edge.
 	      document.body.appendChild(textarea);
 	      textarea.select();
 	      try {
-	        return document.execCommand("copy"); // Security exception may be thrown by some browsers.
+	        return document.execCommand('copy'); // Security exception may be thrown by some browsers.
 	      } catch (ex) {
-	        console.warn("Copy to clipboard failed.", ex);
+	        console.warn('Copy to clipboard failed.', ex);
 	        return false;
 	      } finally {
 	        document.body.removeChild(textarea);
@@ -11427,7 +11351,7 @@
 	  return CopyButton;
 	}(d);
 
-	register(CopyButton, 'iris-copy-button', ['str', 'not-shareable', 'text', 'copied-text', 'title', 'inner-class']);
+	!util.isNode && register(CopyButton, 'iris-copy-button', ['str', 'not-shareable', 'text', 'copied-text', 'title', 'inner-class']);
 
 	var _templateObject$4 = _taggedTemplateLiteralLoose(['\n      <button class="iris-follow-button ', ' ', '" onClick=', '>\n        <span class="nonhover">', '</span>\n        <span class="hover">Unfollow</span>\n      </button>\n    '], ['\n      <button class="iris-follow-button ', ' ', '" onClick=', '>\n        <span class="nonhover">', '</span>\n        <span class="hover">Unfollow</span>\n      </button>\n    ']);
 
@@ -11479,7 +11403,7 @@
 	  return FollowButton;
 	}(d);
 
-	register(FollowButton, 'iris-follow-button', ['user']);
+	!util.isNode && register(FollowButton, 'iris-follow-button', ['user']);
 
 	var _validateCollection = function (it, TYPE) {
 	  if (!_isObject(it) || it._t !== TYPE) throw TypeError('Incompatible receiver, ' + TYPE + ' required!');
@@ -13727,7 +13651,7 @@
 	      var results = this.fuse.search(query).slice(0, 5);
 	      if (results.length) {
 	        var onKeyUp = function onKeyUp(e) {
-	          if (e.key === "Escape") {
+	          if (e.key === 'Escape') {
 	            // escape key maps to keycode `27`
 	            document.removeEventListener('keyup', onKeyUp);
 	            _this3.close();
@@ -13783,7 +13707,7 @@
 	  return Search;
 	}(d);
 
-	register(Search, 'iris-search', ['on-select', 'inner-class']);
+	!util.isNode && register(Search, 'iris-search', ['on-select', 'inner-class']);
 
 	/*eslint no-useless-escape: "off", camelcase: "off" */
 
@@ -13800,6 +13724,7 @@
 	  components: {
 	    Identicon: Identicon,
 	    TextNode: TextNode,
+	    ImageNode: ImageNode,
 	    CopyButton: CopyButton,
 	    FollowButton: FollowButton,
 	    Search: Search
