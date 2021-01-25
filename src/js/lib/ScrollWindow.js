@@ -12,9 +12,13 @@ class ScrollWindow {
     this.updateSubscriptions();
   }
 
-  updateSubscriptions() {
+  unsubscribe() {
     this.upSubscription && this.upSubscription.off();
     this.downSubscription && this.downSubscription.off();
+  }
+
+  updateSubscriptions() {
+    this.unsubscribe();
 
     const subscribe = params => {
       this.node.get({ '.': params}).map().on((val, key, a, eve) => {

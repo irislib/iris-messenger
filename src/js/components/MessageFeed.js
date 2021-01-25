@@ -18,10 +18,8 @@ class MessageFeed extends Component {
     State.local.get('scrollUp').on(() => this.topClicked());
   }
 
-  componentDidUpdate(newProps) {
-    if (newProps.node !== this.props.node) {
-      this.componentDidMount();
-    }
+  componentWillUnmount() {
+    this.scroller && this.scroller.unsubscribe();
   }
 
   topClicked() {
