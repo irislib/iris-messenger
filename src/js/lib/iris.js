@@ -11110,10 +11110,10 @@
 	  TextNode.prototype.getValue = function getValue(user) {
 	    var _this3 = this;
 
+	    this.getNode(user).once();
 	    this.getNode(user).on(function (value, a, b$$1, e) {
 	      _this3.eventListeners[_this3.path] = e;
 	      if (!(_this3.ref.current && _this3.ref.current === document.activeElement)) {
-	        console.log(value, typeof value === 'undefined' ? 'undefined' : _typeof(value));
 	        _this3.setState({ value: value, class: typeof value === 'string' ? '' : 'iris-non-string' });
 	      }
 	    });
