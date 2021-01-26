@@ -13,9 +13,21 @@ class MessageFeed extends Component {
   }
 
   componentDidMount() {
-    this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => this.setState({sortedMessages: sortedMessages.reverse()})});
     //this.initIntersectionObserver();
+    this.setUpScroller();
     State.local.get('scrollUp').on(() => this.topClicked());
+  }
+
+  setUpScroller() {
+    this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => this.setState({sortedMessages: sortedMessages.reverse()})});
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.node._.id !== prevProps.node._.id) {
+      this.scroller && this.scroller.unsubscribe();
+      this.setUpScroller();
+      this.setState({sortedMessages: []});
+    }
   }
 
   componentWillUnmount() {
