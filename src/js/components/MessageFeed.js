@@ -1,37 +1,66 @@
 import { Component } from '../lib/preact.js';
+import { createRef } from '../lib/preact.js';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import ScrollWindow from '../lib/ScrollWindow.js';
 import State from '../State.js';
 
-const size = 10;
-
 class MessageFeed extends Component {
+  loadingRef = createRef();
   constructor() {
     super();
-    this.state = {sortedMessages:[]};
+    this.state = {
+      sortedMessages:[],
+      loading: false,
+      page: 0,
+      prevY: 0,
+      size: 5,
+      sizeIncrement: 5,
+    };
   }
-
+  
   componentDidMount() {
-    //this.initIntersectionObserver();
-    this.setUpScroller();
-    State.local.get('scrollUp').on(() => this.topClicked());
+    this.scroller = new ScrollWindow(this.props.node, {size: this.state.size, onChange: sortedMessages => {
+      return this.setState({sortedMessages: sortedMessages.reverse()})
+    }})
+
+    var options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0
+    };
+    
+    this.observer = new IntersectionObserver(
+      this.handleObserver.bind(this),
+      options
+    );
+    this.observer.observe(this.loadingRef.current);
   }
 
-  setUpScroller() {
-    this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => this.setState({sortedMessages: sortedMessages.reverse()})});
+  handleObserver(entities, observer) {
+    const y = entities[0].boundingClientRect.y;
+    if (this.state.prevY > y) {
+      const curPage = this.state.size + this.state.sizeIncrement;
+      this.getSortedMessages(curPage);
+      this.setState({ size: curPage });
+    }
+    this.setState({ prevY: y });
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.node._.id !== prevProps.node._.id) {
-      this.scroller && this.scroller.unsubscribe();
-      this.setUpScroller();
-      this.setState({sortedMessages: []});
+  componentDidUpdate(newProps) {
+    if (newProps.node !== this.props.node) {
+      this.componentDidMount();
     }
   }
 
-  componentWillUnmount() {
-    this.scroller && this.scroller.unsubscribe();
+  getSortedMessages(size) {
+    this.setState({ loading: true });
+    setTimeout(() => {
+      this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => {
+      this.setState({ loading: false });
+        return this.setState({sortedMessages: sortedMessages.reverse()})
+      }})
+    }, 1000);
   }
 
   topClicked() {
@@ -48,24 +77,26 @@ class MessageFeed extends Component {
   }
 
   render() {
-    const showButtons = this.scroller && this.scroller.elements.size >= size;
+    const loadingCSS = {
+      height: "10px",
+      margin: "30px"
+    };
+
+    const loadingTextCSS = { display: this.state.loading ? "block" : "none" };
     return html`
       <div class="feed-container">
-        ${showButtons ? html`
-          <p>
-            <button onClick=${() => this.scroller.up()}>Up</button>
-            <button onClick=${() => this.topClicked()}>Top</button>
-          </p>
-        `: ''}
-        ${this.state.sortedMessages
-          .map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')
+        ${
+          this.state.sortedMessages
+          .map(hash => {
+            return typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : ''})
         }
-        ${showButtons ? html`
-          <p>
-            <button onClick=${() => this.scroller.down()}>Down</button>
-            <button onClick=${() => this.bottomClicked()}>Bottom</button>
-          </p>
-        `: ''}
+        <div
+          ref=${this.loadingRef}
+          style=${loadingCSS}
+        >
+          <div style=${loadingTextCSS} class="loading-ring"><div></div><div></div><div></div><div></div></div>
+          <div style=${loadingTextCSS} class="loading-ring__helper"></div>
+        </div>
       </div>
     `;
   }
