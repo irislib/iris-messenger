@@ -3,10 +3,9 @@ import { createRef } from '../lib/preact.js';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import ScrollWindow from '../lib/ScrollWindow.js';
-import State from '../State.js';
+// import State from '../State.js';
 
 class MessageFeed extends Component {
-  loadingRef = createRef();
   constructor() {
     super();
     this.state = {
@@ -17,6 +16,7 @@ class MessageFeed extends Component {
       size: 5,
       sizeIncrement: 5,
     };
+    this.loadingRef = createRef();
   }
   
   componentDidMount() {
@@ -37,7 +37,7 @@ class MessageFeed extends Component {
     this.observer.observe(this.loadingRef.current);
   }
 
-  handleObserver(entities, observer) {
+  handleObserver(entities) {
     const y = entities[0].boundingClientRect.y;
     if (this.state.prevY > y) {
       const curPage = this.state.size + this.state.sizeIncrement;
