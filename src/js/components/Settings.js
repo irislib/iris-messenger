@@ -15,6 +15,7 @@ class Settings extends Component {
   constructor() {
     super();
     this.eventListeners = [];
+    this.state = { settings: {}};
   }
 
   onProfilePhotoSet(src) {
@@ -84,9 +85,11 @@ class Settings extends Component {
           <p><small>${t('webrtc_info')}</small></p>
           <p><textarea rows="4" id="rtc-config" placeholder="${t('webrtc_connection_options')}"></textarea></p>
           <button id="restore-default-rtc-config">${t('restore_defaults')}</button>
-          ${this.props.showAbout ? html`
+          ${iris.util.isElectron ? html`
             <hr/>
-            <a href="/about">About</a>
+            <h3>Desktop</h3>
+            <p><input type="checkbox" checked=${this.state.settings.openAtLogin} onChange=${e => State.electron.get('settings').get('openAtLogin').put(!this.state.settings.openAtLogin)} id="openAtLogin"/><label for="openAtLogin">Open at login</label></p>
+            <p><input type="checkbox" checked=${this.state.settings.minimizeOnClose} onChange=${e => State.electron.get('settings').get('minimizeOnClose').put(!this.state.settings.minimizeOnClose)} id="minimizeOnClose"/><label for="minimizeOnClose">Minimize on close</label></p>
           `: ''}
         </div>
       </div>`;
@@ -111,6 +114,8 @@ class Settings extends Component {
       setRTCConfig(DEFAULT_RTC_CONFIG);
       $('#rtc-config').val(JSON.stringify(getRTCConfig()));
     });
+
+    State.electron.get('settings').on(settings => this.setState({settings}));
   }
 
   componentWillUnmount() {

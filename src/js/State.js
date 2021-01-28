@@ -11,7 +11,7 @@ const State = {
     window.publicState = this.public;
     this.local = Gun({peers: [], file: 'State.local', multicast:false, localStorage: false}).get('state');
     if (iris.util.isElectron) {
-      this.electron = Gun({peers: ['http://localhost:8768'], file: 'State.local', multicast:false, localStorage: false}).get('state');
+      this.electron = Gun({peers: ['http://localhost:8768/gun'], file: 'State.local', multicast:false, localStorage: false}).get('state');
       window.electronState = this.electron;
     }
     window.localState = this.local;
