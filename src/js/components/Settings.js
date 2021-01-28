@@ -115,7 +115,7 @@ class Settings extends Component {
       $('#rtc-config').val(JSON.stringify(getRTCConfig()));
     });
 
-    State.electron.get('settings').on(settings => this.setState({settings}));
+    State.electron && State.electron.get('settings').on(settings => this.setState({settings}));
   }
 
   componentWillUnmount() {

@@ -23,22 +23,25 @@ class ExplorerView extends Component {
     `);
     return html`
       <div class="main-view">
+        ${this.props.node ? '' : html `<p>Useful debug data for nerds.</p>`}
         <p>
           <a href="#/explorer">Public</a> ${this.props.node ? pathString : ''}
         </p>
         ${this.props.node ? html`
-          <${ExplorerNode} showTools=${true} path=${this.props.node}/>
+          <${ExplorerNode} showTools=${true} gun=${State.public} path=${this.props.node}/>
         ` : html`
           <div class="explorer-dir">
             ${chevronDown} Users
             <div class="explorer-dir">
               ${chevronDown} <a href="#/explorer/~${encodeURIComponent(Session.getPubKey())}">${Session.getPubKey()}</a>
-              <${ExplorerNode} path='~${Session.getPubKey()}'/>
+              <${ExplorerNode} gun=${State.public} path='~${Session.getPubKey()}'/>
             </div>
           </div>
           <div class="explorer-dir">
             ${chevronRight} <a href="#/explorer/%23">#</a>
           </div>
+          <p>Local (only stored on your device)</p>
+          <${ExplorerNode} gun=${State.local} path=''/>
         `}
 
       </div>
@@ -57,9 +60,9 @@ class ExplorerNode extends Component {
   getNode() {
     if (this.props.path) {
       const path = this.props.path.split('/');
-      return path.reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, State.public);
+      return path.reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, this.props.gun);
     }
-    return State.public;
+    return this.props.gun;
   }
 
   componentWillUnmount() {
@@ -116,7 +119,7 @@ class ExplorerNode extends Component {
       <div class="explorer-dir">
         <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.children[k].open ? chevronDown : chevronRight}</span>
         <a href="#/explorer/${encodeURIComponent(path)}"><b>${k}</b></a>
-        ${this.state.children[k].open ? html`<${ExplorerNode} path=${path}/>` : ''}
+        ${this.state.children[k].open ? html`<${ExplorerNode} gun=${this.props.gun} path=${path}/>` : ''}
       </div>
     `;
   }
