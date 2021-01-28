@@ -76,7 +76,7 @@ class Settings extends Component {
             <small dangerouslySetInnerHTML=${{ __html: t('peers_info')}}></small>
           </p>
           <p><a href="https://heroku.com/deploy?template=https://github.com/amark/gun">
-             <img src="/img/herokubutton.svg" alt="Deploy"/>
+             <img src="./img/herokubutton.svg" alt="Deploy"/>
           </a></p>
           <p>Or <a href="https://github.com/amark/gun#docker">Docker</a>, or <a href="https://github.com/irislib/iris-electron">Iris-electron</a>.</p>
           <hr/>
