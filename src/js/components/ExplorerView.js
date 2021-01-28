@@ -18,30 +18,38 @@ const chevronRight = html`
 class ExplorerView extends Component {
   render() {
     const split = (this.props.node || '').split('/');
+    const gun = (split.length && split[0]) === 'local' ? State.local : State.public;
+    const path = split.slice(1).join('/');
     const pathString = split.map((k, i) => html`
       ${chevronRight} <a href="#/explorer/${encodeURIComponent(split.slice(0,i+1).join('/'))}">${decodeURIComponent(k)}</a>
     `);
     return html`
       <div class="main-view">
-        ${this.props.node ? '' : html `<p>Useful debug data for nerds.</p>`}
+        ${path ? '' : html `<p>Useful debug data for nerds.</p>`}
         <p>
-          <a href="#/explorer">Public</a> ${this.props.node ? pathString : ''}
+          <a href="#/explorer">All</a> ${path ? pathString : ''}
         </p>
-        ${this.props.node ? html`
-          <${ExplorerNode} showTools=${true} gun=${State.public} path=${this.props.node}/>
+        ${path ? html`
+          <${ExplorerNode} showTools=${true} gun=${gun} path=${this.props.node}/>
         ` : html`
           <div class="explorer-dir">
-            ${chevronDown} Users
+            ${chevronDown} Public
             <div class="explorer-dir">
-              ${chevronDown} <a href="#/explorer/~${encodeURIComponent(Session.getPubKey())}">${Session.getPubKey()}</a>
-              <${ExplorerNode} gun=${State.public} path='~${Session.getPubKey()}'/>
+              ${chevronDown} Users
+              <div class="explorer-dir">
+                ${chevronDown} <a href="#/explorer/public%2F~${encodeURIComponent(Session.getPubKey())}">${Session.getPubKey()}</a>
+                <${ExplorerNode} gun=${State.public} path='public/~${Session.getPubKey()}'/>
+              </div>
+            </div>
+            <div class="explorer-dir">
+              ${chevronRight} <a href="#/explorer/%23">#</a>
             </div>
           </div>
+          <br/><br/>
           <div class="explorer-dir">
-            ${chevronRight} <a href="#/explorer/%23">#</a>
+            ${chevronDown} Local (only stored on your device)
+            <${ExplorerNode} gun=${State.local} path='local'/>
           </div>
-          <p>Local (only stored on your device)</p>
-          <${ExplorerNode} gun=${State.local} path=''/>
         `}
 
       </div>
@@ -58,9 +66,9 @@ class ExplorerNode extends Component {
   }
 
   getNode() {
-    if (this.props.path) {
+    if (this.props.path.length > 1) {
       const path = this.props.path.split('/');
-      return path.reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, this.props.gun);
+      return path.slice(1).reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, this.props.gun);
     }
     return this.props.gun;
   }
@@ -77,7 +85,7 @@ class ExplorerNode extends Component {
   }
 
   componentDidMount() {
-    this.isMine = this.props.path.indexOf('~' + Session.getPubKey()) === 0;
+    this.isMine = this.props.path.indexOf('public/~' + Session.getPubKey()) === 0;
     this.getNode().map().on(async (v, k, c, e) => {
       let encryption;
       if (typeof v === 'string' && v.indexOf('SEA{') === 0) {
@@ -136,8 +144,8 @@ class ExplorerNode extends Component {
       }
     } else {
       const pub = Session.getPubKey();
-      const isMine = this.props.path.indexOf('~' + pub) === 0;
-      const path = isMine && (this.props.path + '/' + k).replace('~' + pub + '/', '');
+      const isMine = this.props.path.indexOf('public/~' + pub) === 0;
+      const path = isMine && (this.props.path + '/' + k).replace('public/~' + pub + '/', '');
       console.log(pub, '~' + pub + '/', path);
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
         s = isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
