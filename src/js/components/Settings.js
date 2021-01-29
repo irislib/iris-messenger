@@ -15,7 +15,7 @@ class Settings extends Component {
   constructor() {
     super();
     this.eventListeners = [];
-    this.state = { settings: {}};
+    this.state = { settings: {}, maxConnectedPeers: iris.util.isElectron ? 2 : 1};
   }
 
   onProfilePhotoSet(src) {
@@ -72,6 +72,13 @@ class Settings extends Component {
               <small dangerouslySetInnerHTML=${{ __html:t('public_peer_info') }}></small>
             </p>
           </div>
+          <h4>${t('maximum_number_of_peer_connections')}</h4>
+          <p>
+            <small>There's a bug that may cause high CPU and bandwidth usage when connecting to more than 1 peer. Working on it!</small>
+          </p>
+          <p>
+            <input type="number" value=${this.state.maxConnectedPeers} onChange=${e => State.local.get('settings').get('maxConnectedPeers').put(e.target.value || 0)}/>
+          </p>
           <h4>Set up your own peer</h4>
           <p>
             <small dangerouslySetInnerHTML=${{ __html: t('peers_info')}}></small>
@@ -80,17 +87,17 @@ class Settings extends Component {
              <img src="./img/herokubutton.svg" alt="Deploy"/>
           </a></p>
           <p>Or <a href="https://github.com/amark/gun#docker">Docker</a>, or <a href="https://github.com/irislib/iris-electron">Iris-electron</a>.</p>
-          <hr/>
-          <h3>${t('webrtc_connection_options')}</h3>
-          <p><small>${t('webrtc_info')}</small></p>
-          <p><textarea rows="4" id="rtc-config" placeholder="${t('webrtc_connection_options')}"></textarea></p>
-          <button id="restore-default-rtc-config">${t('restore_defaults')}</button>
           ${iris.util.isElectron ? html`
             <hr/>
             <h3>Desktop</h3>
             <p><input type="checkbox" checked=${this.state.settings.openAtLogin} onChange=${e => State.electron.get('settings').get('openAtLogin').put(!this.state.settings.openAtLogin)} id="openAtLogin"/><label for="openAtLogin">Open at login</label></p>
             <p><input type="checkbox" checked=${this.state.settings.minimizeOnClose} onChange=${e => State.electron.get('settings').get('minimizeOnClose').put(!this.state.settings.minimizeOnClose)} id="minimizeOnClose"/><label for="minimizeOnClose">Minimize on close</label></p>
           `: ''}
+          <hr/>
+          <h3>${t('webrtc_connection_options')}</h3>
+          <p><small>${t('webrtc_info')}</small></p>
+          <p><textarea rows="4" id="rtc-config" placeholder="${t('webrtc_connection_options')}"></textarea></p>
+          <button id="restore-default-rtc-config">${t('restore_defaults')}</button>
         </div>
       </div>`;
   }
@@ -116,6 +123,7 @@ class Settings extends Component {
     });
 
     State.electron && State.electron.get('settings').on(settings => this.setState({settings}));
+    State.local.get('settings').get('maxConnectedPeers').on(maxConnectedPeers => this.setState({maxConnectedPeers}));
   }
 
   componentWillUnmount() {

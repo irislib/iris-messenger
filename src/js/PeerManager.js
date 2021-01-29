@@ -6,7 +6,7 @@ import Session from './Session.js';
 import {translate as t} from './Translation.js';
 
 var MAX_PEER_LIST_SIZE = 10;
-var MAX_CONNECTED_PEERS = iris.util.isElectron ? 2 : 1;
+var maxConnectedPeers = iris.util.isElectron ? 2 : 1;
 const DEFAULT_PEERS = {
   'https://gun-us.herokuapp.com/gun': {}
 };
@@ -87,7 +87,7 @@ function getRandomPeers() {
   return _.sample(
     Object.keys(
       _.pick(peers, p => { return p.enabled; })
-    ), MAX_CONNECTED_PEERS
+    ), maxConnectedPeers
   );
 }
 
@@ -120,7 +120,7 @@ function checkGunPeerCount() {
   var connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
     return peer && peer.wire && peer.wire.hied === 'hi';
   });
-  if (connectedPeers.length < MAX_CONNECTED_PEERS) {
+  if (connectedPeers.length < maxConnectedPeers) {
     var unconnectedPeers = _.filter(Object.keys(peers), url => {
       var addedToGun = _.pluck(Object.values(peersFromGun), 'url').indexOf(url) > -1;
       var enabled = peers[url].enabled;
@@ -130,7 +130,7 @@ function checkGunPeerCount() {
       connectPeer(_.sample(unconnectedPeers));
     }
   }
-  if (connectedPeers.length > MAX_CONNECTED_PEERS) {
+  if (connectedPeers.length > maxConnectedPeers) {
     disconnectPeer(_.sample(connectedPeers));
   }
 }
@@ -186,6 +186,9 @@ function updatePeerList() {
 }
 
 function init() {
+  State.local.get('settings').get('maxConnectedPeers').on(n => {
+    if (n !== undefined) maxConnectedPeers = n;
+  });
   updatePeerList();
   setInterval(updatePeerList, 2000);
   setInterval(checkGunPeerCount, 10000);

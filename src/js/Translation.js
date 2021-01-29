@@ -24,7 +24,7 @@ function capitalize(s) {
 }
 
 function translate(k) {
-  return k && (translation[k] || capitalize(k.replace('_', ' ')));
+  return k && (translation[k] || capitalize(k.replaceAll('_', ' ')));
 }
 
 export {translate, AVAILABLE_LANGUAGES, language};
