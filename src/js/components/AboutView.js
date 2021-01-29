@@ -15,20 +15,22 @@ export default () => {
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
         <p><small>Version 1.5.6</small></p>
 
-        <div id="desktop-application-about">
-          <h4>Get the desktop application</h4>
-          <ul>
-            <li>Communicate and synchronize with local network peers without Internet access
-              <ul>
-                <li>When local peers eventually connect to the Internet, your messages are relayed globally</li>
-                <li>Bluetooth support upcoming</li>
-              </ul>
-            </li>
-            <li>Opens to background on login: stay online and get message notifications</li>
-            <li>More secure and available: no need to open the browser application from a server</li>
-          </ul>
-          <p><a href="https://github.com/irislib/iris-electron/releases">Download</a></p>
-        </div>
+        ${iris.util.isElectron ? '' : html`
+          <div id="desktop-application-about">
+            <h4>Get the desktop application</h4>
+            <ul>
+              <li>Communicate and synchronize with local network peers without Internet access
+                <ul>
+                  <li>When local peers eventually connect to the Internet, your messages are relayed globally</li>
+                  <li>Bluetooth support upcoming</li>
+                </ul>
+              </li>
+              <li>Opens to background on login: stay online and get message notifications</li>
+              <li>More secure and available: no need to open the browser application from a server</li>
+            </ul>
+            <p><a href="https://github.com/irislib/iris-electron/releases">Download</a></p>
+          </div>
+        `}
 
         <h4>Privacy</h4>
         <p>Private messages are end-to-end encrypted, but message timestamps and the number of chats aren't. In a decentralized network this information is potentially available to anyone.</p>
