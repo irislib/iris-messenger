@@ -33,7 +33,7 @@ class ExplorerView extends Component {
           <${ExplorerNode} showTools=${true} gun=${gun} path=${this.props.node}/>
         ` : html`
           <div class="explorer-dir">
-            ${chevronDown} Public
+            ${chevronDown} Public (synced with peers)
             <div class="explorer-dir">
               ${chevronDown} Users
               <div class="explorer-dir">

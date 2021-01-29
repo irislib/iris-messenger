@@ -38,7 +38,7 @@ export default () => {
         <p>In that regard, Iris prioritizes decentralization and availability over perfect privacy.</p>
         <p>Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.</p>
         <p>Iris makes no guarantees of data persistence.</p>
-        <p>You can check your saved data <a href="#/explorer">here</a>.</p>
+        <p>You can check your saved data in the <a href="#/explorer">Explorer</a>.</p>
         <p>${t('application_security_warning')}</p>
 
         <h4>Donate</h4>
