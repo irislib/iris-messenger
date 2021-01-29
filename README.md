@@ -8,8 +8,10 @@ Iris is like the social networking apps we're used to, but better.
 
 ## Use
 Browser application: [iris.to](https://iris.to)
+* No installation required!
+* Progressive web app: Can be saved to home screen or desktop
 
-Desktop version: ([download](https://github.com/irislib/iris-electron/releases), [source code](https://github.com/irislib/iris-electron)):
+Desktop application: ([download](https://github.com/irislib/iris-electron/releases), [source code](https://github.com/irislib/iris-electron)):
 * Communicate and synchronize with local network peers without Internet access
   * When local peers eventually connect to the Internet, your messages are relayed globally
   * Bluetooth support upcoming
