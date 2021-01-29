@@ -9,7 +9,9 @@ Iris is like the social networking apps we're used to, but better.
 ## Use
 Browser application: [iris.to](https://iris.to)
 * No installation required
-* Progressive web app: can be saved to home screen or desktop
+* Progressive web app
+  * Use offline
+  * Save as an app to home screen or desktop
 
 Desktop application: ([download](https://github.com/irislib/iris-electron/releases), [source code](https://github.com/irislib/iris-electron)):
 * Communicate and synchronize with local network peers without Internet access
