@@ -8,8 +8,8 @@ Iris is like the social networking apps we're used to, but better.
 
 ## Use
 Browser application: [iris.to](https://iris.to)
-* No installation required!
-* Progressive web app: Can be saved to home screen or desktop
+* No installation required
+* Progressive web app: can be saved to home screen or desktop
 
 Desktop application: ([download](https://github.com/irislib/iris-electron/releases), [source code](https://github.com/irislib/iris-electron)):
 * Communicate and synchronize with local network peers without Internet access
@@ -51,4 +51,3 @@ Join our [Discord](https://discord.gg/4Dgf54k) or send me a message on [Iris](ht
 <a href="https://opencollective.com/iris-social/donate" target="_blank"><img src="https://opencollective.com/iris-social/donate/button@2x.png?color=blue" width=200 /></a>
 
 <p><sub>BTC donations: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST</sub></p>
-
