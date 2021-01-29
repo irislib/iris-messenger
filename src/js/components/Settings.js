@@ -79,6 +79,10 @@ class Settings extends Component {
           <p>
             <input type="number" value=${this.state.maxConnectedPeers} onChange=${e => State.local.get('settings').get('maxConnectedPeers').put(e.target.value || 0)}/>
           </p>
+          ${iris.util.isElectron ? html`
+            <h4>${t('your_public_address')}</h4>
+            <p>http://${this.state.settings.publicIp || '-'}:8767/gun</p>
+          `: ''}
           <h4>Set up your own peer</h4>
           <p>
             <small dangerouslySetInnerHTML=${{ __html: t('peers_info')}}></small>
