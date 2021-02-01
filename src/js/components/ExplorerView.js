@@ -42,8 +42,8 @@ class ExplorerView extends Component {
             ${chevronDown} <a href="#/explorer/public%2F~${encodeURIComponent(Session.getPubKey())}">${Session.getPubKey()}</a>
           </div>
           <${ExplorerNode} indent=${3} gun=${State.public} path='public/~${Session.getPubKey()}'/>
-          <div class="explorer-row">
-            ${chevronRight} <a href="#/explorer/%23">#</a>
+          <div class="explorer-row" style="padding-left: 1em">
+            ${chevronRight} <a href="#/explorer/public%2F%23">#</a> (content-addressed values, such as public posts)
           </div>
           <br/><br/>
           <div class="explorer-row">
@@ -122,6 +122,12 @@ class ExplorerNode extends Component {
     this.setState({children: this.children});
   }
 
+  onShowMoreClick(e, k) {
+    e.preventDefault();
+    this.children[k].showMore = !this.children[k].showMore;
+    this.setState({children: this.children});
+  }
+
   renderChildObject(k) {
     const path = this.props.path + '/' + encodeURIComponent(k);
     return html`
@@ -150,8 +156,22 @@ class ExplorerNode extends Component {
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
         s = isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
       } else {
-        s = isMine ? html`<iris-text placeholder="empty" user=${pub} path=${path} editable=${true} json=${true}/>` :
-          html`<span class=${typeof v === 'string' ? '' : 'iris-non-string'}>${JSON.stringify(v)}</span>`;
+        let stringified = JSON.stringify(v);
+        let showToggle;
+        if (stringified.length > 100) {
+          showToggle = true;
+          if (!this.state.children[k].showMore) {
+            stringified = stringified.slice(0, 100);
+          }
+        }
+        s = isMine ? html`
+          <iris-text placeholder="empty" user=${pub} path=${path} editable=${true} json=${true}/>
+        ` :
+        html`
+          <span class=${typeof v === 'string' ? '' : 'iris-non-string'}>${stringified} ${showToggle ? html`
+            <a onClick=${e => this.onShowMoreClick(e, k)} href="">${this.state.children[k].showMore ? 'less' : 'more'}</a>
+          ` : ''}</span>
+        `;
       }
     }
     return html`
@@ -192,7 +212,6 @@ class ExplorerNode extends Component {
   }
 
   render() {
-    console.log(this.props.path);
     return html`
       ${this.props.indent === 0 ? html`
         <div class="explorer-row" style="padding-left: ${this.props.indent}em">

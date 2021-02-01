@@ -1433,6 +1433,7 @@ form.public {
 .explorer-row {
   border-radius: 3px;
   padding: 3px;
+  overflow-wrap: anywhere;
 }
 
 .explorer-row:nth-child(odd) {
