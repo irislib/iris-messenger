@@ -35,4 +35,5 @@
     --link-color: #00a0d1;
     --day-separator-bg: rgba(227, 249, 255, 0.91);
     --day-separator-color: rgba(74, 74, 74, 0.88);
+    --non-string-value-color: blue;
 }

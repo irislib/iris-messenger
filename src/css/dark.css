@@ -35,4 +35,5 @@
     --day-separator-bg: rgba(0,0,0,0.85);
     --day-separator-color: rgba(255, 255, 255, 0.88);
     --logotype-filter: contrast(0) brightness(2);
+    --non-string-value-color: red;
 }

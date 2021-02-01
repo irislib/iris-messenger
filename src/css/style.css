@@ -683,6 +683,10 @@ a.msg {
   color: #4fc3f7;
 }
 
+.iris-non-string {
+  color: var(--non-string-value-color) !important;
+}
+
 .iris-delivered-checkmark {
   display: none;
 }
