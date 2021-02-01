@@ -1430,14 +1430,22 @@ form.public {
   background-color: var(--chat-hover);
 }
 
-.explorer-dir {
-  padding-left: 1em;
+.explorer-row {
+  border-radius: 3px;
+  padding: 3px;
 }
 
-.explorer-dir svg {
+.explorer-row:nth-child(odd) {
+  background-color: var(--zebra-stripe-bg);
+}
+
+.explorer-row svg {
   margin-right: 5px;
-  margin-left: -17px;
   cursor: pointer;
+}
+
+.explorer-row .val {
+  padding-left: 17px;
 }
 
 .explorer-tools a {
