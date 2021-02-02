@@ -3,8 +3,8 @@ import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
 
-const hashRegex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
-const pubKeyRegex = /^[A-Za-z0-9\-\_]+\.[A-Za-z0-9\_\-]+$/;
+const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
+const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
 
 const chevronDown = html`
 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
@@ -146,6 +146,11 @@ class ExplorerNode extends Component {
     let s;
     const encryption = this.children[k].encryption;
     const decrypted = encryption === 'Decrypted';
+    const lnk = (href, text) => html`<a class="mar-left5" href=${href}>${text}</a>`;
+    const keyLinks = html`
+      ${typeof k === 'string' && k.match(hashRegex) ? lnk(`#/post/${encodeURIComponent(k)}`, '#') : ''}
+      ${typeof k === 'string' && k.match(pubKeyRegex) ? lnk(`#/explorer/public%2F~${encodeURIComponent(encodeURIComponent(k))}`, html`<iris-text user=${k} path="profile/name"/>`) : ''}
+    `;
     if (encryption) {
       if (!decrypted) {
         s = html`<i>Encrypted value</i>`;
@@ -167,13 +172,15 @@ class ExplorerNode extends Component {
             stringified = stringified.slice(0, 100);
           }
         }
-        const isHash = typeof v === 'string' && v.length > 40 && v.length < 50 && !!v.match(hashRegex);
-        const isPubKey = typeof k === 'string' && k.length > 80 && k.length < 100 && !!k.match(pubKeyRegex);
+
+        const valueLinks = html`
+          ${typeof v === 'string' && v.match(hashRegex) ? lnk(`#/post/${encodeURIComponent(v)}`, '#') : ''}
+          ${typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`#/explorer/public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<iris-text user=${v} path="profile/name"/>`) : ''}
+        `;
 
         s = isMine ? html`
           <iris-text placeholder="empty" user=${pub} path=${path} editable=${true} json=${true}/>
-          ${isHash ? html`<a class="mar-left5" href="#/post/${encodeURIComponent(v)}">#</a>`: ''}
-          ${isPubKey ? html`<a class="mar-left5" href="#/explorer/public%2F~${encodeURIComponent(encodeURIComponent(k))}"><iris-text user=${k} path="profile/name"/></a>`: ''}
+          ${valueLinks}
         ` :
         html`
           <span class=${typeof v === 'string' ? '' : 'iris-non-string'}>
@@ -181,15 +188,14 @@ class ExplorerNode extends Component {
             ${showToggle ? html`
               <a onClick=${e => this.onShowMoreClick(e, k)} href="">${this.state.children[k].showMore ? 'less' : 'more'}</a>
             ` : ''}
-            ${isHash ? html`<a class="mar-left5" href="#/post/${encodeURIComponent(v)}">#</a>`: ''}
-            ${isPubKey ? html`<a class="mar-left5" href="#/explorer/public%2F~${encodeURIComponent(encodeURIComponent(k))}"><iris-text user=${k} path="profile/name"/></a>`: ''}
+            ${valueLinks}
           </span>
         `;
       }
     }
     return html`
       <div class="explorer-row" style="padding-left: ${this.props.indent}em">
-        <b class="val">${k}</b>:
+        <b class="val">${k} ${keyLinks}</b>:
         ${encryption ? html`
           <span class="tooltip"><span class="tooltiptext">${encryption} value</span>
             ${decrypted ? '🔓' : ''}
