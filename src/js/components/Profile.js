@@ -326,7 +326,7 @@ class Profile extends Component {
       }
     });
     State.public.user(pub).get('profile').get('name').on((name,a,b,e) => {
-      document.title = name || 'Iris';
+      document.title = name || document.title;
       this.eventListeners.push(e);
       if (!$('#profile .profile-name:focus').length) {
         this.setState({name});

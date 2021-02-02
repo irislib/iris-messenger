@@ -91,11 +91,12 @@ class Main extends Component {
   }
 
   handleRoute(e) {
-    document.title = 'Iris';
     let activeRoute = e.url;
     if (!activeRoute && window.location.hash) {
       return route(window.location.hash.replace('#', '')); // bubblegum fix back navigation
     }
+    document.title = 'Iris';
+    if (activeRoute && activeRoute.length > 1) { document.title += ' - ' + Helpers.capitalize(activeRoute.replace('/', '')); }
     State.local.get('activeRoute').put(activeRoute);
     QRScanner.cleanupScanner();
   }
