@@ -99,6 +99,10 @@ img, video {
   max-height: 80vh;
 }
 
+.mar-left5 {
+  margin-left: 5px;
+}
+
 .msg-content video, .message-form video {
   width: 100%;
   outline: none;

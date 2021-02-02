@@ -3,6 +3,9 @@ import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
 
+const hashRegex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+const pubKeyRegex = /^[A-Za-z0-9\-\_]+\.[A-Za-z0-9\_\-]+$/;
+
 const chevronDown = html`
 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
   <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
@@ -164,13 +167,23 @@ class ExplorerNode extends Component {
             stringified = stringified.slice(0, 100);
           }
         }
+        const isHash = typeof v === 'string' && v.length > 40 && v.length < 50 && !!v.match(hashRegex);
+        const isPubKey = typeof k === 'string' && k.length > 80 && k.length < 100 && !!k.match(pubKeyRegex);
+
         s = isMine ? html`
           <iris-text placeholder="empty" user=${pub} path=${path} editable=${true} json=${true}/>
+          ${isHash ? html`<a class="mar-left5" href="#/post/${encodeURIComponent(v)}">#</a>`: ''}
+          ${isPubKey ? html`<a class="mar-left5" href="#/explorer/public%2F~${encodeURIComponent(encodeURIComponent(k))}"><iris-text user=${k} path="profile/name"/></a>`: ''}
         ` :
         html`
-          <span class=${typeof v === 'string' ? '' : 'iris-non-string'}>${stringified} ${showToggle ? html`
-            <a onClick=${e => this.onShowMoreClick(e, k)} href="">${this.state.children[k].showMore ? 'less' : 'more'}</a>
-          ` : ''}</span>
+          <span class=${typeof v === 'string' ? '' : 'iris-non-string'}>
+            ${stringified}
+            ${showToggle ? html`
+              <a onClick=${e => this.onShowMoreClick(e, k)} href="">${this.state.children[k].showMore ? 'less' : 'more'}</a>
+            ` : ''}
+            ${isHash ? html`<a class="mar-left5" href="#/post/${encodeURIComponent(v)}">#</a>`: ''}
+            ${isPubKey ? html`<a class="mar-left5" href="#/explorer/public%2F~${encodeURIComponent(encodeURIComponent(k))}"><iris-text user=${k} path="profile/name"/></a>`: ''}
+          </span>
         `;
       }
     }
