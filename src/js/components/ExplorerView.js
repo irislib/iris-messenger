@@ -160,7 +160,7 @@ class ExplorerNode extends Component {
     } else {
       const pub = Session.getPubKey();
       const isMine = this.props.path.indexOf('public/~' + pub) === 0;
-      const path = isMine && (this.props.path + '/' + k).replace('public/~' + pub + '/', '');
+      const path = isMine && (this.props.path + '/' + encodeURIComponent(k)).replace('public/~' + pub + '/', '');
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
         s = isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
       } else {
