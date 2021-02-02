@@ -11103,7 +11103,7 @@
 	    var base = util.getPublicState().user(user);
 	    var path = this.path.split('/');
 	    return path.reduce(function (sum, current) {
-	      return sum.get(current);
+	      return sum.get(decodeURIComponent(current));
 	    }, base);
 	  };
 
