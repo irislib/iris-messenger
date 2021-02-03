@@ -72,7 +72,7 @@ class Settings extends Component {
               <small dangerouslySetInnerHTML=${{ __html:t('public_peer_info') }}></small>
             </p>
           </div>
-          <p><input type="checkbox" checked=${this.state.local.enablePublicPeerDiscovery} onChange=${e => State.local.get('settings').get('enablePublicPeerDiscovery').put(!this.state.local.enablePublicPeerDiscovery)} id="enablePublicPeerDiscovery"/><label for="enablePublicPeerDiscovery">Enable public peer discovery</label></p>
+          <p><input type="checkbox" checked=${this.state.local.enablePublicPeerDiscovery} onChange=${() => State.local.get('settings').get('enablePublicPeerDiscovery').put(!this.state.local.enablePublicPeerDiscovery)} id="enablePublicPeerDiscovery"/><label for="enablePublicPeerDiscovery">Enable public peer discovery</label></p>
           <h4>${t('maximum_number_of_peer_connections')}</h4>
           <p>
             <small>There's a bug that may cause high CPU and bandwidth usage when connecting to more than 1 peer. Working on it!</small>
@@ -95,13 +95,13 @@ class Settings extends Component {
           ${iris.util.isElectron ? html`
             <hr/>
             <h3>Desktop</h3>
-            <p><input type="checkbox" checked=${this.state.electron.openAtLogin} onChange=${e => State.electron.get('settings').get('openAtLogin').put(!this.state.electron.openAtLogin)} id="openAtLogin"/><label for="openAtLogin">Open at login</label></p>
-            <p><input type="checkbox" checked=${this.state.electron.minimizeOnClose} onChange=${e => State.electron.get('settings').get('minimizeOnClose').put(!this.state.electron.minimizeOnClose)} id="minimizeOnClose"/><label for="minimizeOnClose">Minimize on close</label></p>
+            <p><input type="checkbox" checked=${this.state.electron.openAtLogin} onChange=${() => State.electron.get('settings').get('openAtLogin').put(!this.state.electron.openAtLogin)} id="openAtLogin"/><label for="openAtLogin">Open at login</label></p>
+            <p><input type="checkbox" checked=${this.state.electron.minimizeOnClose} onChange=${() => State.electron.get('settings').get('minimizeOnClose').put(!this.state.electron.minimizeOnClose)} id="minimizeOnClose"/><label for="minimizeOnClose">Minimize on close</label></p>
           `: ''}
           <hr/>
           <h3>${t('webtorrent')}</h3>
-          <p><input type="checkbox" checked=${this.state.local.enableWebtorrent} onChange=${e => State.local.get('settings').get('enableWebtorrent').put(!this.state.local.enableWebtorrent)} id="enableWebtorrent"/><label for="enableWebtorrent">Enable webtorrent videos</label></p>
-          <p><input type="checkbox" checked=${this.state.local.autoplayWebtorrent} onChange=${e => State.local.get('settings').get('autoplayWebtorrent').put(!this.state.local.autoplayWebtorrent)} id="autoplayWebtorrent"/><label for="autoplayWebtorrent">Autoplay webtorrent videos</label></p>
+          <p><input type="checkbox" checked=${this.state.local.enableWebtorrent} onChange=${() => State.local.get('settings').get('enableWebtorrent').put(!this.state.local.enableWebtorrent)} id="enableWebtorrent"/><label for="enableWebtorrent">Enable webtorrent videos</label></p>
+          <p><input type="checkbox" checked=${this.state.local.autoplayWebtorrent} onChange=${() => State.local.get('settings').get('autoplayWebtorrent').put(!this.state.local.autoplayWebtorrent)} id="autoplayWebtorrent"/><label for="autoplayWebtorrent">Autoplay webtorrent videos</label></p>
           <hr/>
           <h3>${t('webrtc_connection_options')}</h3>
           <p><small>${t('webrtc_info')}</small></p>

@@ -101,7 +101,7 @@ class Main extends Component {
     QRScanner.cleanupScanner();
   }
 
-  onClickOverlay(e) {
+  onClickOverlay() {
     if (this.state.showMenu) {
       this.setState({showMenu: false});
     }
