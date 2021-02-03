@@ -13,6 +13,21 @@ let ourActivity;
 let hasFollowers;
 const follows = {};
 
+const DEFAULT_SETTINGS = {
+  electron: {
+    openAtLogin: true,
+    minimizeOnClose: true
+  },
+  local: {
+    enableWebtorrent: !iris.util.isMobile,
+    enablePublicPeerDiscovery: true,
+    autoplayWebtorrent: true,
+    maxConnectedPeers: iris.util.isElectron ? 2 : 1
+  }
+}
+
+const settings = DEFAULT_SETTINGS;
+
 function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
   k = k || key.pub;
 
@@ -133,6 +148,12 @@ function login(k) {
   if (shouldRefresh) {
     location.reload();
   }
+  State.electron && State.electron.get('settings').on(electron => {
+    settings.electron = electron;
+  });
+  State.local.get('settings').on(local => {
+    settings.local = local;
+  });
 }
 
 async function createChatLink() {
@@ -206,4 +227,4 @@ function getFollows() {
   return follows;
 }
 
-export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, removeChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser };
+export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, removeChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings };

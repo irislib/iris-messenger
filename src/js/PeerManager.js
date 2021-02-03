@@ -92,6 +92,7 @@ function getRandomPeers() {
 }
 
 var askForPeers = _.once(pub => {
+  if (!Session.settings.local.enablePublicPeerDiscovery) { return; }
   _.defer(() => {
     State.public.user(pub).get('peers').once().map().on(peer => {
       if (peer && peer.url) {

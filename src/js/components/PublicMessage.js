@@ -56,8 +56,8 @@ class PublicMessage extends Message {
           this.setState({replies: Object.keys(this.replies).length, sortedReplies });
         });
       });
-      if (msg.torrentId) {
-        !iris.util.isMobile && this.downloadWebtorrent(msg.torrentId);
+      if (msg.torrentId && Session.settings.local.enableWebtorrent) {
+        this.downloadWebtorrent(msg.torrentId);
       }
     });
   }
@@ -100,7 +100,8 @@ class PublicMessage extends Message {
         // Stream the file in the browser
         setTimeout(() => {
           const id = '#' + this.getWebtorrentElementId();
-          file.appendTo(id, {autoplay: true, muted: true});
+          const autoplay = Session.settings.autoplayWebtorrent;
+          file.appendTo(id, {autoplay, muted: !autoplay});
           $(id + ' video').attr('loop', true);
         }, 0);
       }
