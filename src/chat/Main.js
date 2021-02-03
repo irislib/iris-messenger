@@ -56,6 +56,7 @@ class Main extends Component {
             <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
               <${ChatView} path="/"/>
               <${ChatView} path="/:id?"/>
+              <${ChatView} path="/chat/:id?"/>
             </${Router}>
           </div>
         </section>
