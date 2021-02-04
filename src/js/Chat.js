@@ -6,6 +6,8 @@ import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 import { route } from './lib/preact-router.es.js';
 
+// this file sucks, try to remove it
+
 const chats = window.chats = {};
 
 function getActiveProfile() {
