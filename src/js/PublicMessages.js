@@ -1,33 +1,9 @@
-import {addChat} from './Chat.js';
-import { translate as t } from './Translation.js';
 import State from './State.js';
 import Session from './Session.js';
-
-let pub;
 
 function twice(f) {
   f();
   setTimeout(f, 100); // write many times and maybe it goes through :D
-}
-
-async function sendPublicMsg(msg) {
-  msg.time = new Date().toISOString();
-  msg.type = 'post';
-  const signedMsg = await iris.SignedMessage.create(msg, Session.getKey());
-  const serialized = signedMsg.toString();
-  const hash = await iris.util.getHash(serialized);
-  State.public.get('#').get(hash).put(serialized);
-  if (msg.replyingTo) {
-    twice(() => State.public.user().get('replies').get(msg.replyingTo).put({a:null}));
-    twice(() => State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
-  } else {
-    State.public.user().get('msgs').get(msg.time).put(hash);
-  }
-}
-
-function deletePublicMsg(timeStr, replyingTo) {
-  State.public.user().get('msgs').get(timeStr).put(null);
-  replyingTo && State.public.user().get('replies').get(replyingTo).get(timeStr).put(null);
 }
 
 function getMessageByHash(hash) {

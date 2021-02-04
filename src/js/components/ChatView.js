@@ -67,9 +67,8 @@ class ChatView extends Component {
 
     State.local.get('chats').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
     const node = State.local.get('chats').get(this.props.id).get('msgs');
-    this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: sortedMessages => {
-      this.setState({sortedMessages})}
-    });
+    const limitedUpdate = _.throttle(sortedMessages => this.setState({sortedMessages}), 500); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?
+    this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: limitedUpdate});
   }
 
   componentDidUpdate(prevProps) {
