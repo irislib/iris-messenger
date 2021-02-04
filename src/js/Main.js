@@ -9,7 +9,6 @@ import { html } from './Helpers.js';
 import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
-import PublicMessages from './PublicMessages.js';
 import { translate as t } from './Translation.js';
 
 import Settings from './components/Settings.js';
@@ -47,7 +46,6 @@ if (!isElectron && ('serviceWorker' in navigator)) {
 State.init();
 Session.init({autologin: window.location.hash.length > 2});
 PeerManager.init();
-PublicMessages.init();
 
 Helpers.checkColorScheme();
 

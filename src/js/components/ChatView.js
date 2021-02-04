@@ -22,7 +22,7 @@ c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,35
 </g>
 </svg>
 `;
-const size = 50;
+const scrollerSize = 50;
 
 function copyMyChatLinkClicked(e) {
   Helpers.copyToClipboard(Session.getMyChatLink());
@@ -67,7 +67,7 @@ class ChatView extends Component {
 
     State.local.get('chats').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
     const node = State.local.get('chats').get(this.props.id).get('msgs');
-    this.scroller = new ScrollWindow(node, {size, onChange: sortedMessages => {
+    this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: sortedMessages => {
       this.setState({sortedMessages})}
     });
   }

@@ -73,7 +73,6 @@ function addChat(chat) {
   });
   Notifications.changeChatUnseenCount(pub, 0);
   chat.sortedMessages = chat.sortedMessages || [];
-  chat.identicon = Helpers.getIdenticon(pub, 49);
   chat.onTheir('nickname', (nick) => {
     chat.myNickname = nick;
     State.local.get('chats').get(pub).get('myNickname').put(nick);
@@ -147,11 +146,6 @@ function addChat(chat) {
       return;
     }
     if (photo && photo.indexOf('data:image') !== 0) { return; }
-    State.local.get('chats').get(pub).get('photo').put(photo);
-    chat.photo = photo;
-    el.find('.identicon-container').empty();
-    var img = Helpers.setImgSrc($('<img>'), photo).attr('height', 49).attr('width', 49).css({'border-radius': '50%'});
-    el.find('.identicon-container').append(photo ? img : chat.identicon);
     if (pub === getActiveProfile()) {
       Helpers.setImgSrc($('#current-profile-photo'), photo);
       Helpers.setImgSrc($('#profile .profile-photo'), photo);

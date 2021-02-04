@@ -69,24 +69,4 @@ function getMessages(pub, cb) {
   });
 }
 
-function init() {
-  const u = () => {};
-  pub = {
-    name: t('public_messages'),
-    messages: {},
-    getId: () => 'public',
-    send: sendPublicMsg,
-    delete: deletePublicMsg,
-    getMessages,
-    onTheir: u,
-    onMy: u,
-    getTheirMsgsLastSeenTime: u,
-    getMyMsgsLastSeenTime: u,
-    getTyping: u,
-    setMyMsgsLastSeenTime: u,
-    setTyping: u,
-  };
-  addChat(pub);
-}
-
-export default {init, getMessages, getMessageByHash};
+export default {getMessages, getMessageByHash};
