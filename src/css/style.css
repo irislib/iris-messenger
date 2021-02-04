@@ -490,6 +490,10 @@ header.footer .header-content {
     bottom: 0;
   }
 
+  .application-list a {
+    padding: 0;
+  }
+
   .application-list .text {
     display: flex;
   }
