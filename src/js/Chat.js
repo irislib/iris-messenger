@@ -224,8 +224,9 @@ function processMessage(chatId, msg, info) {
   msg.info = info;
   msg.selfAuthored = info.selfAuthored;
   msg.timeStr = msg.time;
-  msg.time = new Date(msg.time);
   chat.sortedMessages.push(msg);
+  State.local.get('chats').get(chatId).get('msgs').get(msg.timeStr).put(msg);
+  msg.time = new Date(msg.time);
   if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
     if (window.location.hash !== '#/chat/' + chatId || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chatId, 1);
