@@ -2,7 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
-import {chats, deleteChat} from '../Chat.js';
+import {chats} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import MessageForm from './MessageForm.js';
@@ -15,6 +15,12 @@ import MessageFeed from './MessageFeed.js';
 import Identicon from './Identicon.js';
 import Name from './Name.js';
 import SearchBox from './SearchBox.js';
+
+function deleteChat(pub) {
+  iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
+  delete chats[pub];
+  State.local.get('chats').get(pub).put(null);
+}
 
 class Profile extends Component {
   constructor() {

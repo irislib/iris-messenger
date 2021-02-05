@@ -14,12 +14,6 @@ function getActiveProfile() {
   return window.location.hash.indexOf('#/profile') === 0 ? window.location.hash.replace('#/profile/', '') : null;
 }
 
-function deleteChat(pub) {
-  iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
-  delete chats[pub];
-  $('.chat-item[data-pub="' + pub +'"]').remove();
-}
-
 function newChat(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(chats, pub)) {
     return;
@@ -67,24 +61,11 @@ function addChat(chat) {
       chat.theirMsgsLastSeenDate = d;
     }
   });
-  var el = $('<div class="chat-item"><div class="text"><div><span class="name"></span><small class="latest-time"></small></div> <small class="typing-indicator"></small> <small class="latest"></small> <span class="unseen"></span></div></div>');
-  el.attr('data-pub', pub);
   chat.messageIds = chat.messageIds || {};
   chat.getLatestMsg && chat.getLatestMsg((latest, info) => {
     processMessage(pub, latest, info);
   });
   Notifications.changeChatUnseenCount(pub, 0);
-  chat.sortedMessages = chat.sortedMessages || [];
-  chat.onTheir('nickname', (nick) => {
-    chat.myNickname = nick;
-    State.local.get('chats').get(pub).get('myNickname').put(nick);
-  });
-  chat.onMy('nickname', (nick) => {
-    chat.theirNickname = nick;
-    if (pub !== Session.getKey().pub) {
-      State.local.get('chats').get(pub).get('theirNickname').put(nick);
-    }
-  });
   chat.notificationSetting = 'all';
   chat.onMy('notificationSetting', (val) => {
     chat.notificationSetting = val;
@@ -119,45 +100,7 @@ function addChat(chat) {
       chat.activity = activity;
     }
   });
-  function setName(name, from) {
-    if (chat.uuid) {
-      var profile = chat.participantProfiles[from];
-      if (profile && !(profile.permissions && profile.permissions.admin)) {
-        return;
-      }
-    }
-    if (name && typeof name === 'string') {
-      chat.name = name;
-      chatNode.get('name').put(name);
-    }
-    if (pub === Session.getKey().pub) {
-      el.find('.name').html("📝 <b>" + t('note_to_self') + "</b>");
-    } else {
-      el.find('.name').text(Helpers.truncateString(getDisplayName(pub), 20));
-    }
-    if (pub === getActiveProfile()) {
-      $('#profile-group-name').not(':focus').val(name);
-    }
-  }
-  function setAbout(about) {
-    chat.about = about;
-  }
-  function setGroupPhoto(photo, from) {
-    var profile = chat.participantProfiles[from];
-    if (profile && !(profile.permissions && profile.permissions.admin)) {
-      return;
-    }
-    if (photo && photo.indexOf('data:image') !== 0) { return; }
-    if (pub === getActiveProfile()) {
-      Helpers.setImgSrc($('#current-profile-photo'), photo);
-      Helpers.setImgSrc($('#profile .profile-photo'), photo);
-    }
-    $('#current-profile-photo').toggle(!!photo);
-  }
   if (chat.uuid) {
-    chat.on('name', setName);
-    chat.on('about', setAbout);
-    chat.on('photo', setGroupPhoto);
     chat.participantProfiles = {};
     chat.onMy('participants', participants => {
       if (typeof participants === 'object') {
@@ -181,8 +124,6 @@ function addChat(chat) {
         State.local.get('inviteLinksChanged').put(true);
       }
     }});
-  } else {
-    State.public.user(pub).get('profile').get('name').on(setName);
   }
   if (chat.put) {
     chat.onTheir('webPushSubscriptions', (s, k, from) => {
@@ -199,20 +140,6 @@ function addChat(chat) {
   State.local.get('chats').get(pub).put({enabled:true});
 }
 
-function getDisplayName(pub) {
-  var displayName;
-  const chat = chats[pub];
-  if (chat && chat.theirNickname && chat.theirNickname.length) {
-    displayName = chat.theirNickname;
-    if (chat.name && chat.name.length) {
-      displayName = displayName + ' (' + chat.name + ')';
-    }
-  } else {
-    displayName = chat ? chat.name : '';
-  }
-  return displayName || '';
-}
-
 function processMessage(chatId, msg, info) {
   const chat = chats[chatId];
   if (chat.messageIds[msg.time + info.from]) return;
@@ -222,7 +149,6 @@ function processMessage(chatId, msg, info) {
   }
   msg.selfAuthored = info.selfAuthored;
   msg.timeStr = msg.time;
-  chat.sortedMessages.push(msg);
   State.local.get('chats').get(chatId).get('msgs').get(msg.timeStr).put(msg);
   msg.time = new Date(msg.time);
   if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
@@ -242,4 +168,4 @@ function processMessage(chatId, msg, info) {
   Notifications.notifyMsg(msg, info, chatId);
 }
 
-export { chats, addChat, deleteChat, newChat, processMessage, getDisplayName, followChatLink };
+export { chats, addChat, newChat, processMessage, followChatLink };

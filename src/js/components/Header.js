@@ -1,6 +1,6 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {chats, getDisplayName} from '../Chat.js';
+import {chats} from '../Chat.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
@@ -72,8 +72,11 @@ class Header extends Component {
         if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
           title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
         } else {
-          title = getDisplayName(this.chatId);
-          if (!title && this.chatId.length > 40) {
+          const chat = chats[this.chatId];
+          if (!chat) return;
+          if (chat.uuid) {
+            chat.on('name', name => this.setState({title: name})); // TODO check that set by admin
+          } else {
             State.public.user(this.chatId).get('profile').get('name').on((name, a, b, eve) => {
               this.eventListeners.push(eve);
               this.setState({title: name});

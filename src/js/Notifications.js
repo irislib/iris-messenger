@@ -1,6 +1,6 @@
 import Helpers from './Helpers.js';
 import Session from './Session.js';
-import {chats, getDisplayName} from './Chat.js';
+import {chats} from './Chat.js';
 import { route } from './lib/preact-router.es.js';
 import State from './State.js';
 import { translate as t } from './Translation.js';
@@ -47,9 +47,16 @@ function notifyMsg(msg, info, pub) {
     notificationSound.play();
   }
   if (shouldDesktopNotify()) {
-    var body = chats[pub].uuid ? `${chats[pub].participantProfiles[info.from].name}: ${msg.text}` : msg.text;
+    var body, title;
+    if (chats[pub].uuid) {
+      title = chats[pub].participantProfiles[info.from].name;
+      body = `${name}: ${msg.text}`;
+    } else {
+      title = 'Message'
+      body = msg.text;
+    }
     body = Helpers.truncateString(body, 50);
-    var desktopNotification = new Notification(getDisplayName(pub), {
+    var desktopNotification = new Notification(title, { // TODO: replace with actual name
       icon: 'img/icon128.png',
       body,
       silent: true

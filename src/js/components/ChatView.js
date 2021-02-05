@@ -74,6 +74,7 @@ class ChatView extends Component {
   componentDidUpdate(prevProps) {
     const chat = chats[this.props.id];
     if (prevProps.id !== this.props.id) {
+      $('#not-seen-by-them').hide();
       this.componentDidMount();
     } else {
       Helpers.scrollToMessageListBottom();
