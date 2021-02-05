@@ -24,7 +24,7 @@ class ChatList extends Component {
         });
       this.setState({chats: sortedChats});
     }, 200);
-    State.local.get('chats').map().on((chat, id) => {
+    State.local.get('channels').map().on((chat, id) => {
       chat.id = id;
       chats[id] = chat;
       limitedUpdate();

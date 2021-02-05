@@ -13,12 +13,20 @@ class ChatListItem extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
-    this.eventListeners = [];
+    this.eventListeners = {};
   }
 
   componentDidMount() {
     const chat = this.props.chat;
-    State.local.get('chats').get(chat.id).get('latest').on((latest, a, b, event) => {
+    if (chat.uuid) {
+      chat.on('name', name => this.setState({name}));
+    } else {
+      State.public.user(chat.id).get('profile').get('name').on((name, a, b, e) => {
+        this.eventListeners['name'] = e;
+        this.setState({name});
+      });
+    }
+    State.local.get('channels').get(chat.id).get('latest').on((latest, a, b, event) => {
       /*
       if (msg.attachments) {
         text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
@@ -32,12 +40,12 @@ class ChatListItem extends Component {
       if (latest.time < chat.latestTime) { return; }
       latest.time = latest.time && new Date(latest.time);
       this.setState({latest});
-      this.eventListeners.push(event);
+      this.eventListeners['latest'] = event;
     });
   }
 
   componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
+    Object.values(this.eventListeners).forEach(e => e.off());
   }
 
   render() {
@@ -51,7 +59,7 @@ class ChatListItem extends Component {
     const time = chat.latestTime && new Date(chat.latestTime);
     let latestTimeText = Helpers.getRelativeTimeText(time);
 
-    let name = chat.name;
+    let name = this.state.name;
     if (chat.id === (Session.getKey() || {}).pub) {
       name = html`📝 <b>${t('note_to_self')}</b>`;
     }

@@ -353,7 +353,7 @@ class Profile extends Component {
 
   groupDidMount() {
     const chat = Session.channels[this.props.id];
-    chat.on('name', name => {
+    chat.on('name', name => { // TODO: this really needs unsubscribe
       if (!$('#profile .profile-name:focus').length) {
         this.setState({name});
       }
