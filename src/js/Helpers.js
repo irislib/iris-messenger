@@ -1,7 +1,10 @@
 import State from './State.js';
+import Session from './Session.js';
 import {translate as t} from './Translation.js';
 import {createElement} from './lib/preact.js';
 import htm from './lib/htm.module.js';
+import { route } from './lib/preact-router.es.js';
+
 
 var emojiRegex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]+/ug;
 
@@ -2009,4 +2012,24 @@ export default {
   getProfileLink(pub) {
     return 'https://iris.to/#/profile/' + encodeURIComponent(pub);
   },
+
+  followChatLink(str) {
+    if (str && str.indexOf('http') === 0) {
+      if (str.indexOf('https://iris.to/#/') === 0) {
+        route(str.replace('https://iris.to/#', ''));
+        return true;
+      } else if (str.length > 30) {
+        const s = str.split('?');
+        let chatId;
+        if (s.length === 2) {
+          chatId = this.getUrlParameter('chatWith', s[1]) || this.getUrlParameter('channelId', s[1]);
+        }
+        if (chatId) {
+          Session.newChannel(chatId, str);
+          route('/chat/' + chatId);
+          return true;
+        }
+      }
+    }
+  }
 };

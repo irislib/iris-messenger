@@ -1,6 +1,5 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {chats} from '../Chat.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
@@ -18,7 +17,7 @@ class Header extends Component {
   }
 
   getOnlineStatusText() {
-    const chat = chats[this.chatId];
+    const chat = Session.channels[this.chatId];
     const activity = chat && chat.activity;
     if (activity) {
       if (activity.isActive) {
@@ -57,11 +56,11 @@ class Header extends Component {
       const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
       this.chatId = replaced.length < activeRoute.length ? replaced : null;
       if (this.chatId) {
-        State.local.get('chats').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
+        State.local.get('channels').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
           this.eventListeners.push(event);
           this.setState({});
         });
-        State.local.get('chats').get(this.chatId).get('theirLastActiveTime').on((t, a, b, event) => {
+        State.local.get('channels').get(this.chatId).get('theirLastActiveTime').on((t, a, b, event) => {
           this.eventListeners.push(event);
           this.setState({});
         });
@@ -72,7 +71,7 @@ class Header extends Component {
         if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
           title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
         } else {
-          const chat = chats[this.chatId];
+          const chat = Session.channels[this.chatId];
           if (!chat) return;
           if (chat.uuid) {
             chat.on('name', name => this.setState({title: name})); // TODO check that set by admin
@@ -103,7 +102,7 @@ class Header extends Component {
 
   render() {
     const activeRoute = this.state.activeRoute;
-    const chat = chats[this.chatId];
+    const chat = Session.channels[this.chatId];
     const isTyping = chat && chat.isTyping;
     const participants = chat && chat.uuid && Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();

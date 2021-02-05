@@ -1,6 +1,5 @@
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
-import { addChat, followChatLink } from '../Chat.js';
 import State from '../State.js';
 import Helpers from '../Helpers.js';
 import QRScanner from '../QRScanner.js';
@@ -41,13 +40,13 @@ class NewChat extends Component {
       QRScanner.cleanupScanner();
     } else {
       $('#chatlink-qr-video').show();
-      QRScanner.startChatLinkQRScanner(result => result.text && followChatLink(result.text));
+      QRScanner.startChatLinkQRScanner(result => result.text && Helpers.followChatLink(result.text));
     }
   }
 
   onPasteChatLink(e) {
     const val = $(e.target).val();
-    followChatLink(val);
+    Helpers.followChatLink(val);
     $(e.target).val('');
   }
 
@@ -61,7 +60,7 @@ class NewChat extends Component {
       });
       c.put('name', $('#new-group-name').val());
       $('#new-group-name').val('');
-      addChat(c);
+      Session.addChannel(c);
       route('/profile/' + c.uuid);
     }
   }

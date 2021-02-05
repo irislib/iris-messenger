@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import {html} from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {newChat} from '../Chat.js';
+import Session from '../Session.js';
 import State from '../State.js';
 
 class FollowButton extends Component {
@@ -15,7 +15,7 @@ class FollowButton extends Component {
     const follow = !this.state.following;
     State.public.user().get('follow').get(this.props.id).put(follow);
     if (follow) {
-      newChat(this.props.id);
+      Session.newChannel(this.props.id);
     }
   }
 

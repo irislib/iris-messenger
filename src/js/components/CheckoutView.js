@@ -1,6 +1,6 @@
 import { html } from '../Helpers.js';
 import State from '../State.js';
-import {chats, newChat} from '../Chat.js';
+import Session from '../Session.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from './SafeImg.js';
 import StoreView from './StoreView.js';
@@ -22,13 +22,13 @@ class CheckoutView extends StoreView {
 
   confirm() {
     const pub = this.props.store;
-    newChat(pub);
+    Session.newChannel(pub);
     const cart = {};
     Object.keys(this.cart).forEach(k => {
       const v = this.cart[k];
       v && (cart[k] = v);
     });
-    chats[pub].send({
+    Session.channels[pub].send({
       text: 'New order: ' + JSON.stringify(cart) + ', delivery: ' + JSON.stringify(this.state.delivery) + ', payment: ' + this.state.paymentMethod,
       order: true
     });

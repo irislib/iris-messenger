@@ -2,7 +2,6 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
-import {chats} from '../Chat.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import MessageForm from './MessageForm.js';
@@ -18,8 +17,8 @@ import SearchBox from './SearchBox.js';
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
-  delete chats[pub];
-  State.local.get('chats').get(pub).put(null);
+  delete Session.channels[pub];
+  State.local.get('channels').get(pub).put(null);
 }
 
 class Profile extends Component {
@@ -34,7 +33,7 @@ class Profile extends Component {
     if (this.isMyProfile) {
       State.public.user().get('profile').get('photo').put(src);
     } else {
-      chats[this.props.id].put('photo', src);
+      Session.channels[this.props.id].put('photo', src);
     }
   }
 
@@ -43,7 +42,7 @@ class Profile extends Component {
     if (this.isMyProfile) {
       State.public.user().get('profile').get('about').put(about);
     } else {
-      chats[this.props.id].put('about', about);
+      Session.channels[this.props.id].put('about', about);
     }
   }
 
@@ -57,7 +56,7 @@ class Profile extends Component {
       if (this.isMyProfile) {
         State.public.user().get('profile').get('name').put(name);
       } else {
-        chats[this.props.id].put('name', name);
+        Session.channels[this.props.id].put('name', name);
       }
     }
   }
@@ -87,7 +86,7 @@ class Profile extends Component {
       var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
       var addBtn = $('<button>').css({'margin-left': 15}).text(t('add')).click(() => {
         if (newGroupParticipant) {
-          chats[this.props.id].addParticipant(newGroupParticipant);
+          Session.channels[this.props.id].addParticipant(newGroupParticipant);
           newGroupParticipant = null;
           $('#profile-add-participant-input').val('').show();
           $('#profile-add-participant-candidate').remove();
@@ -109,12 +108,12 @@ class Profile extends Component {
   }
 
   onAddParticipant(add = true) {
-    add && chats[this.props.id].addParticipant(this.state.memberCandidate);
+    add && Session.channels[this.props.id].addParticipant(this.state.memberCandidate);
     this.setState({memberCandidate:null});
   }
 
   renderGroupSettings() {
-    const chat = chats[this.props.id];
+    const chat = Session.channels[this.props.id];
     if (chat && chat.uuid) {
       return html`
         <div>
@@ -190,7 +189,7 @@ class Profile extends Component {
 
   render() {
     this.isMyProfile = Session.getPubKey() === this.props.id;
-    const chat = chats[this.props.id];
+    const chat = Session.channels[this.props.id];
     const uuid = chat && chat.uuid;
     const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
     const editable = !!(this.isMyProfile || this.state.isAdmin);
@@ -353,7 +352,7 @@ class Profile extends Component {
   }
 
   groupDidMount() {
-    const chat = chats[this.props.id];
+    const chat = Session.channels[this.props.id];
     chat.on('name', name => {
       if (!$('#profile .profile-name:focus').length) {
         this.setState({name});
@@ -377,11 +376,11 @@ class Profile extends Component {
     this.eventListeners.forEach(e => e.off());
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     this.isMyProfile = Session.getPubKey() === pub;
-    const chat = chats[pub];
+    const chat = Session.channels[pub];
     if (pub.length < 40) {
       if (!chat) {
         const interval = setInterval(() => {
-          if (chats[pub]) {
+          if (Session.channels[pub]) {
             clearInterval(interval);
             this.componentDidMount();
           }
@@ -392,7 +391,7 @@ class Profile extends Component {
     qrCodeEl.empty();
     State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
     State.local.get('inviteLinksChanged').on(() => this.setState({}));
-    State.local.get('chats').get(this.props.id).get('participants').on(() => {
+    State.local.get('channels').get(this.props.id).get('participants').on(() => {
       const isAdmin = areWeAdmin(pub);
       this.setState({isAdmin});
     });
@@ -422,18 +421,18 @@ class Profile extends Component {
 var newGroupParticipant;
 
 function renderGroupPhotoSettings(uuid) {
-  const me = chats[uuid].participantProfiles[Session.getKey().pub];
+  const me = Session.channels[uuid].participantProfiles[Session.getKey().pub];
   const isAdmin = !!(me && me.permissions && me.permissions.admin);
-  $('#current-profile-photo').toggle(!!chats[uuid].photo);
-  $('#profile .profile-photo').toggle(!!chats[uuid].photo);
+  $('#current-profile-photo').toggle(!!Session.channels[uuid].photo);
+  $('#profile .profile-photo').toggle(!!Session.channels[uuid].photo);
   if (isAdmin) {
-    Helpers.setImgSrc($('#current-profile-photo'), chats[uuid].photo);
+    Helpers.setImgSrc($('#current-profile-photo'), Session.channels[uuid].photo);
     $('#profile .profile-photo').hide();
   }
 }
 
 function areWeAdmin(uuid) {
-  const me = chats[uuid].participantProfiles[Session.getKey().pub];
+  const me = Session.channels[uuid].participantProfiles[Session.getKey().pub];
   return !!(me && me.permissions && me.permissions.admin);
 }
 

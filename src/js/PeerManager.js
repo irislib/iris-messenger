@@ -1,5 +1,4 @@
 import State from './State.js';
-import {chats} from './Chat.js';
 import { route } from './lib/preact-router.es.js';
 import Helpers from './Helpers.js';
 import Session from './Session.js';

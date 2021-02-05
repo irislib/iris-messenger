@@ -4,7 +4,6 @@ import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Message from './Message.js';
 import MessageForm from './MessageForm.js';
-import {chats, processMessage, newChat} from '../Chat.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Notifications from '../Notifications.js';
@@ -37,8 +36,6 @@ function copyMyChatLinkClicked(e) {
   }, 2000);
 }
 
-const subscribedToMsgs = {};
-
 class ChatView extends Component {
   constructor() {
     super();
@@ -50,29 +47,34 @@ class ChatView extends Component {
     this.unsubscribe();
     this.sortedMessages = [];
     this.setState({sortedMessages: this.sortedMessages});
-
     this.iv = null;
     const go = () => {
-      const chat = chats[this.props.id];
+      const chat = Session.channels[this.props.id];
       if (chat) {
         clearInterval(this.iv)
-        this.subscribeToMsgs(this.props.id);
+        Session.subscribeToMsgs(this.props.id);
         Notifications.changeChatUnseenCount(this.props.id, 0);
         chat.setMyMsgsLastSeenTime();
         Helpers.scrollToMessageListBottom();
         chat.setMyMsgsLastSeenTime();
+        if (chat.uuid) {
+          chat.inviteLinks = {};
+          chat.getChatLinks({callback: ({url, id}) => {
+            chat.inviteLinks[id] = url; // TODO state
+          }});          
+        }
       }
     }
     this.iv = setInterval(go, 3000);
 
-    State.local.get('chats').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
-    const node = State.local.get('chats').get(this.props.id).get('msgs');
+    State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
+    const node = State.local.get('channels').get(this.props.id).get('msgs');
     const limitedUpdate = _.throttle(sortedMessages => this.setState({sortedMessages}), 500); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?
     this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: limitedUpdate});
   }
 
   componentDidUpdate(prevProps) {
-    const chat = chats[this.props.id];
+    const chat = Session.channels[this.props.id];
     if (prevProps.id !== this.props.id) {
       $('#not-seen-by-them').hide();
       this.componentDidMount();
@@ -98,13 +100,6 @@ class ChatView extends Component {
 
   componentWillUnmount() {
     this.unsubscribe();
-  }
-
-  subscribeToMsgs(pub) {
-    subscribedToMsgs[pub] = true;
-    chats[pub].getMessages((msg, info) => {
-      processMessage(pub, msg, info);
-    });
   }
 
   addFloatingDaySeparator() {

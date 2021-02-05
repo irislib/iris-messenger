@@ -1,7 +1,6 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
-import {chats} from '../Chat.js';
 import State from '../State.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
@@ -36,9 +35,9 @@ class MessageForm extends Component {
   }
 
   async onMsgFormSubmit(event) {
-    const chat = chats[this.props.activeChat];
+    const chat = Session.channels[this.props.activeChat];
     event.preventDefault();
-    State.local.get('chats').get(this.props.activeChat).get('msgDraft').put(null);
+    State.local.get('channels').get(this.props.activeChat).get('msgDraft').put(null);
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length && !chat.attachments) { return; }
@@ -107,7 +106,7 @@ class MessageForm extends Component {
     }
     this.isTyping = this.isTyping !== undefined ? this.isTyping : false;
     const getIsTyping = () => val.length > 0;
-    const setTyping = () => chats[this.props.activeChat].setTyping(getIsTyping());
+    const setTyping = () => Session.channels[this.props.activeChat].setTyping(getIsTyping());
     const setTypingThrottled = _.throttle(setTyping, 1000);
     if (this.isTyping === getIsTyping()) {
       setTypingThrottled();
@@ -115,7 +114,7 @@ class MessageForm extends Component {
       setTyping();
     }
     this.isTyping = getIsTyping();
-    State.local.get('chats').get(this.props.activeChat).get('msgDraft').put($(event.target).val());
+    State.local.get('channels').get(this.props.activeChat).get('msgDraft').put($(event.target).val());
   }
 
   attachFileClicked(event) {
@@ -137,8 +136,8 @@ class MessageForm extends Component {
       $('#message-list').hide();
       for (var i = 0;i < files.length;i++) {
         Helpers.getBase64(files[i]).then(base64 => {
-          chats[this.props.activeChat].attachments = chats[this.props.activeChat].attachments || [];
-          chats[this.props.activeChat].attachments.push({type: 'image', data: base64});
+          Session.channels[this.props.activeChat].attachments = Session.channels[this.props.activeChat].attachments || [];
+          Session.channels[this.props.activeChat].attachments.push({type: 'image', data: base64});
           var preview = Helpers.setImgSrc($('<img>'), base64);
           attachmentsPreview.append(preview);
         });
@@ -162,8 +161,8 @@ class MessageForm extends Component {
     attachmentsPreview.hide();
     attachmentsPreview.removeClass('gallery');
     $('#message-list').show();
-    if (chats[this.props.activeChat]) {
-      chats[this.props.activeChat].attachments = null;
+    if (Session.channels[this.props.activeChat]) {
+      Session.channels[this.props.activeChat].attachments = null;
     }
     if (this.props.activeChat !== 'public') {
       Helpers.scrollToMessageListBottom();
@@ -171,7 +170,7 @@ class MessageForm extends Component {
   }
 
   async webPush(msg) {
-    const chat = chats[this.props.activeChat];
+    const chat = Session.channels[this.props.activeChat];
     const myKey = Session.getKey();
     const shouldWebPush = (window.location.hash === '#/chat/' + myKey.pub) || !(chat.activity);
     if (shouldWebPush && chat.webPushSubscriptions) {

@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
-import {chats} from '../Chat.js';
+import Session from '../Session.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
@@ -94,8 +94,8 @@ class Message extends Component {
     }
     $('#attachment-gallery').fadeOut({duration: ANIMATE_DURATION, complete: () => $('#attachment-gallery').remove()});
     const activeChat = window.location.hash.replace('#/profile/','').replace('#/chat/','');
-    if (activeChat && chats[activeChat]) {
-      chats[activeChat].attachments = null;
+    if (activeChat && Session.channels[activeChat]) {
+      Session.channels[activeChat].attachments = null;
     }
   }
 
@@ -104,7 +104,7 @@ class Message extends Component {
     let name = this.props.name || this.state.name;
     let color;
     const chatId = this.props.chatId;
-    const chat = chats[chatId];
+    const chat = Session.channels[chatId];
     if (chat && chat.uuid && !this.props.selfAuthored) {
       const profile = chat.participantProfiles[this.props.from];
       name = profile && profile.name;

@@ -1,6 +1,5 @@
 import Helpers from './Helpers.js';
 import Session from './Session.js';
-import {chats} from './Chat.js';
 import { route } from './lib/preact-router.es.js';
 import State from './State.js';
 import { translate as t } from './Translation.js';
@@ -32,8 +31,8 @@ function notifyMsg(msg, info, pub) {
     if (msg.time < loginTime) { return false; }
     if (info.selfAuthored) { return false; }
     if (document.visibilityState === 'visible') { return false; }
-    if (chats[pub].notificationSetting === 'nothing') { return false; }
-    if (chats[pub].notificationSetting === 'mentions' && !msg.text.includes(Session.getMyName())) { return false; }
+    if (Session.channels[pub].notificationSetting === 'nothing') { return false; }
+    if (Session.channels[pub].notificationSetting === 'mentions' && !msg.text.includes(Session.getMyName())) { return false; }
     return true;
   }
   function shouldDesktopNotify() {
@@ -48,8 +47,8 @@ function notifyMsg(msg, info, pub) {
   }
   if (shouldDesktopNotify()) {
     var body, title;
-    if (chats[pub].uuid) {
-      title = chats[pub].participantProfiles[info.from].name;
+    if (Session.channels[pub].uuid) {
+      title = Session.channels[pub].participantProfiles[info.from].name;
       body = `${name}: ${msg.text}`;
     } else {
       title = 'Message'
@@ -78,9 +77,9 @@ function setUnseenTotal() {
 }
 
 function changeChatUnseenCount(chatId, change) {
-  const chat = chats[chatId];
+  const chat = Session.channels[chatId];
   if (!chat) return;
-  const chatNode = State.local.get('chats').get(chatId);
+  const chatNode = State.local.get('channels').get(chatId);
   if (change) {
     unseenTotal += change;
     chat.unseen += change;
@@ -130,9 +129,9 @@ async function subscribeToWebPush() {
 
 const addWebPushSubscriptionsToChats = _.debounce(() => {
   const arr = Object.values(webPushSubscriptions);
-  Object.values(chats).forEach(chat => {
-    if (chat.put) {
-      chat.put('webPushSubscriptions', arr);
+  Object.values(Session.channels).forEach(channel => {
+    if (channel.put) {
+      channel.put('webPushSubscriptions', arr);
     }
   });
 }, 5000);

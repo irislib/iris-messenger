@@ -5,7 +5,6 @@ import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
 import Fuse from '../lib/fuse.basic.esm.min.js';
-import { followChatLink } from '../Chat.js';
 
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
@@ -75,7 +74,7 @@ class SearchBox extends Component {
         return this.props.onSelect({key});
       }
     }
-    if (followChatLink(query)) return;
+    if (Helpers.followChatLink(query)) return;
 
     if (query && this.fuse) {
       const results = this.fuse.search(query).slice(0,5);

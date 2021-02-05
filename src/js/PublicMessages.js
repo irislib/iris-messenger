@@ -1,10 +1,4 @@
 import State from './State.js';
-import Session from './Session.js';
-
-function twice(f) {
-  f();
-  setTimeout(f, 100); // write many times and maybe it goes through :D
-}
 
 function getMessageByHash(hash) {
   if (typeof hash !== 'string') throw new Error('hash must be a string, got ' + typeof hash + ' ' +  JSON.stringify(hash));

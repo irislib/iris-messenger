@@ -2,7 +2,6 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
-import {chats} from '../Chat.js';
 import Session from '../Session.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
@@ -41,7 +40,7 @@ class StoreView extends Component {
     }
     const cartTotalItems = Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.items[k]).reduce((sum, k) => sum + this.cart[k], 0);
     this.isMyProfile = Session.getPubKey() === this.props.store;
-    const chat = chats[this.props.store];
+    const chat = Session.channels[this.props.store];
     const uuid = chat && chat.uuid;
     const followable = !(this.isMyProfile || this.props.store.length < 40);
     let profilePhoto;
