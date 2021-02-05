@@ -30,6 +30,7 @@ import VideoCall from './components/VideoCall.js';
 import Identicon from './components/Identicon.js';
 import State from './State.js';
 import Icons from './Icons.js';
+import PublicMessages from './PublicMessages.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
@@ -46,6 +47,7 @@ if (!isElectron && ('serviceWorker' in navigator)) {
 State.init();
 Session.init({autologin: window.location.hash.length > 2});
 PeerManager.init();
+PublicMessages.init();
 
 Helpers.checkColorScheme();
 
