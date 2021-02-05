@@ -105,8 +105,8 @@ class Message extends Component {
     let color;
     const chatId = this.props.chatId;
     const chat = chats[chatId];
-    if (chat && chat.uuid && !this.props.info.selfAuthored) {
-      const profile = chat.participantProfiles[this.props.info.from];
+    if (chat && chat.uuid && !this.props.selfAuthored) {
+      const profile = chat.participantProfiles[this.props.from];
       name = profile && profile.name;
       color = profile && profile.color;
     }
@@ -137,7 +137,7 @@ class Message extends Component {
           ` : ''}
           <div class="below-text">
             <div class="time">
-              ${this.props.info && this.props.info.hash ? html`<a href="/post/${encodeURIComponent(this.props.info.hash)}">${Helpers.getRelativeTimeText(time)}</a>` : iris.util.formatTime(time)}
+              ${this.props.hash ? html`<a href="/post/${encodeURIComponent(this.props.hash)}">${Helpers.getRelativeTimeText(time)}</a>` : iris.util.formatTime(time)}
               ${this.props.selfAuthored && seenIndicator}
             </div>
           </div>

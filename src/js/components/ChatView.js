@@ -156,13 +156,12 @@ class ChatView extends Component {
         previousDateStr = dateStr;
       }
 
-      const from = msg.info && msg.info.from;
       let showName = false;
-      if (previousFrom && (from !== previousFrom)) {
+      if (previousFrom && (msg.from !== previousFrom)) {
         msgListContent.push(html`<div class="from-separator"/>`);
         showName = true;
       }
-      previousFrom = from;
+      previousFrom = msg.from;
       msgListContent.push(html`
         <${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${this.props.id}/>
       `);

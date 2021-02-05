@@ -217,7 +217,9 @@ function processMessage(chatId, msg, info) {
   const chat = chats[chatId];
   if (chat.messageIds[msg.time + info.from]) return;
   chat.messageIds[msg.time + info.from] = true;
-  msg.info = info;
+  if (info) {
+    msg = Object.assign(msg, info);
+  }
   msg.selfAuthored = info.selfAuthored;
   msg.timeStr = msg.time;
   chat.sortedMessages.push(msg);
