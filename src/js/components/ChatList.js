@@ -6,6 +6,7 @@ import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import { route } from '../lib/preact-router.es.js';
 import Notifications from '../Notifications.js';
+import ScrollViewport from '../lib/preact-scroll-viewport.js';
 
 class ChatList extends Component {
   constructor() {
@@ -56,14 +57,16 @@ class ChatList extends Component {
           </svg>
           ${t('new_chat')}
         </div>
-        ${this.state.chats.map(chat =>
-          html`<${ChatListItem}
-            photo=${chat.photo}
-            active=${chat.id === activeChat}
-            key=${chat.id}
-            chat=${chat}/>`
-          )
-        }
+        <${ScrollViewport}>
+          ${this.state.chats.map(chat =>
+            html`<${ChatListItem}
+              photo=${chat.photo}
+              active=${chat.id === activeChat}
+              key=${chat.id}
+              chat=${chat}/>`
+            )
+          }
+        </${ScrollViewport}>
       </div>
     </section>`
   }
