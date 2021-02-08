@@ -18,14 +18,6 @@ class ChatListItem extends Component {
 
   componentDidMount() {
     const chat = this.props.chat;
-    if (chat.uuid) {
-      chat.on('name', name => this.setState({name}));
-    } else {
-      State.public.user(chat.id).get('profile').get('name').on((name, a, b, e) => {
-        this.eventListeners['name'] = e;
-        this.setState({name});
-      });
-    }
     State.local.get('channels').get(chat.id).get('latest').on((latest, a, b, event) => {
       /*
       if (msg.attachments) {
@@ -59,18 +51,14 @@ class ChatListItem extends Component {
     const time = chat.latestTime && new Date(chat.latestTime);
     let latestTimeText = Helpers.getRelativeTimeText(time);
 
-    let name = this.state.name;
+    let name = chat.name;
     if (chat.id === (Session.getKey() || {}).pub) {
       name = html`📝 <b>${t('note_to_self')}</b>`;
     }
 
-    const photo = this.props.photo;
-    let iconEl;
-    if (photo) {
-      iconEl = html`<div class="identicon-container"><img src="${this.props.photo}" class="round-borders" height=49 width=49 alt=""/></div>`;
-    } else {
-      iconEl = html`<${Identicon} str=${chat.id} width=49/>`;
-    }
+    let iconEl = chat.photo ?
+      html`<div class="identicon-container"><img src="${chat.photo}" class="round-borders" height=49 width=49 alt=""/></div>` :
+      html`<${Identicon} str=${chat.id} width=49/>`;
 
     const latestEl = chat.isTyping ? '' : html`<small class="latest">
       ${this.state.latest.selfAuthored && seenIndicator}

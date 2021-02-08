@@ -293,6 +293,8 @@ function addChannel(chat) {
   });
   if (chat.uuid) {
     chat.participantProfiles = {};
+    chat.on('name', v => State.local.get('channels').get(chat.uuid).get('name').put(v));
+    chat.on('photo', v => State.local.get('channels').get(chat.uuid).get('photo').put(v));
     chat.onMy('participants', participants => {
       if (typeof participants === 'object') {
         var keys = Object.keys(participants);
@@ -308,6 +310,8 @@ function addChannel(chat) {
       State.local.get('channels').get(chat.uuid).get('participants').put(participants);
     });
     var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  } else {
+    State.public.user(pub).get('profile').get('name').on(v => State.local.get('channels').get(pub).get('name').put(v))
   }
   if (chat.put) {
     chat.onTheir('webPushSubscriptions', (s, k, from) => {
