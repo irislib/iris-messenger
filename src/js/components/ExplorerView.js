@@ -2,6 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
+import ScrollViewport from '../lib/preact-scroll-viewport.js';
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
@@ -252,15 +253,16 @@ class ExplorerNode extends Component {
           ` : ''}
         </div>
       `: ''}
-      ${Object.keys(this.state.children).sort().map(k => {
-
-        const v = this.state.children[k].value;
-        if (typeof v === 'object' && v && v['_']) {
-          return this.renderChildObject(k, v);
-        } else {
-          return this.renderChildValue(k, v);
-        }
-      })}
+      <${ScrollViewport}>
+        ${Object.keys(this.state.children).sort().map(k => {
+          const v = this.state.children[k].value;
+          if (typeof v === 'object' && v && v['_']) {
+            return this.renderChildObject(k, v);
+          } else {
+            return this.renderChildValue(k, v);
+          }
+        })}
+      </${ScrollViewport}>
     `;
   }
 }
