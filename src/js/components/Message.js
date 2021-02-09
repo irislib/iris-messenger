@@ -123,7 +123,7 @@ class Message extends Component {
     const whose = this.props.selfAuthored ? 'our' : 'their';
 
     return html`
-      <div class="msg ${whose} ${seen} ${delivered}" id=${this.props.id || ''}>
+      <div class="msg ${whose} ${seen} ${delivered}">
         <div class="msg-content">
           <div class="msg-sender">
             ${name && this.props.showName && html`<small onclick=${() => this.onNameClick(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
