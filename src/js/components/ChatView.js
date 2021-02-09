@@ -72,7 +72,7 @@ class ChatView extends Component {
     State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
     const node = State.local.get('channels').get(this.props.id).get('msgs');
     const limitedUpdate = _.throttle(sortedMessages => this.setState({sortedMessages}), 500); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?
-    this.scrollState = {};
+    this.scrollState = {previousDownIndex: -1, previousUpIndex: -1};
     const container = document.getElementById("message-list");
     container.style.paddingBottom = 0;
     container.style.paddingTop = 0;
@@ -230,7 +230,7 @@ class ChatView extends Component {
       currentY > this.scrollState.topSentinelPreviousY &&
       isIntersecting &&
       currentRatio >= this.scrollState.topSentinelPreviousRatio &&
-      //this.scroller.center !== this.scrollState.previousUpIndex && // stop if no new results were received
+      this.scroller.center !== this.scrollState.previousUpIndex && // stop if no new results were received
       this.scroller.opts.stickTo !== 'bottom'
     ) {
       this.scrollState.previousUpIndex = this.scroller.center;
