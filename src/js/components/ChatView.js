@@ -21,7 +21,7 @@ c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,35
 </g>
 </svg>
 `;
-const scrollerSize = 50;
+const scrollerSize = 25;
 
 function copyMyChatLinkClicked(e) {
   Helpers.copyToClipboard(Session.getMyChatLink());
@@ -35,6 +35,8 @@ function copyMyChatLinkClicked(e) {
     te.css('width', '');
   }, 2000);
 }
+
+const getNumFromStyle = numStr => Number(numStr.substring(0, numStr.length - 2));
 
 class ChatView extends Component {
   constructor() {
@@ -61,7 +63,7 @@ class ChatView extends Component {
           chat.inviteLinks = {};
           chat.getChatLinks({callback: ({url, id}) => {
             chat.inviteLinks[id] = url; // TODO state
-          }});          
+          }});
         }
       }
     }
@@ -70,7 +72,12 @@ class ChatView extends Component {
     State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
     const node = State.local.get('channels').get(this.props.id).get('msgs');
     const limitedUpdate = _.throttle(sortedMessages => this.setState({sortedMessages}), 500); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?
+    this.scrollState = {};
+    const container = document.getElementById("message-list");
+    container.style.paddingBottom = 0;
+    container.style.paddingTop = 0;
     this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: limitedUpdate});
+    this.initIntersectionObserver();
   }
 
   componentDidUpdate(prevProps) {
@@ -79,7 +86,7 @@ class ChatView extends Component {
       $('#not-seen-by-them').hide();
       this.componentDidMount();
     } else {
-      Helpers.scrollToMessageListBottom();
+      if (this.scroller.opts.stickTo === 'top') { Helpers.scrollToMessageListBottom(); }
       $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
       if (chat && !chat.uuid) {
         if ($('.msg.our').length && !$('.msg.their').length && !chat.theirMsgsLastSeenTime) {
@@ -141,7 +148,7 @@ class ChatView extends Component {
     let previousDateStr;
     let previousFrom;
     const msgListContent = [];
-    this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach(msg => {
+    this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach((msg, i) => {
       const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
       if (date) {
         const dateStr = date.toLocaleDateString();
@@ -159,7 +166,7 @@ class ChatView extends Component {
       }
       previousFrom = msg.from;
       msgListContent.push(html`
-        <${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${this.props.id}/>
+        <${Message} ...${msg} showName=${showName} id="post${i}" key=${msg.time} chatId=${this.props.id}/>
       `);
     });
 
@@ -169,12 +176,20 @@ class ChatView extends Component {
     <div id="chat-main" class=${this.props.id ? '' : 'hidden-xs'}>
     ${this.props.id && this.props.id.length > 20 ? html`
       <div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
-      <div id="message-list">${msgListContent}</div>
-      <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
+        <div id="message-list">
+          <div id="topsentinel"></div>
+          ${msgListContent}
+          <div id="bottomsentinel"></div>
+        </div>
+        <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
       </div>` : html`<${NewChat}/>`
     }
     ${this.props.id ? html`
-      <div id="scroll-down-btn" style="display:none;" onClick=${() => Helpers.scrollToMessageListBottom()}>${caretDownSvg}</div>
+      <div id="scroll-down-btn" style="display:none;" onClick=${() => {
+        Helpers.scrollToMessageListBottom();
+        this.scroller.top();
+        document.getElementById("message-list").style.paddingBottom = 0;
+      }}>${caretDownSvg}</div>
       <div id="not-seen-by-them" style="display: none">
       <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
       <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_invite_link')}</button></p>
@@ -183,6 +198,88 @@ class ChatView extends Component {
       `: ''}
       </div>
       </div>`;
+  }
+
+  adjustPaddings(isScrollDown) {
+    const container = document.getElementById("message-list");
+    const currentPaddingTop = getNumFromStyle(container.style.paddingTop);
+    const currentPaddingBottom = getNumFromStyle(container.style.paddingBottom);
+    const remPaddingsVal = 62 * (scrollerSize / 2); // TODO: calculate actual element heights
+    if (isScrollDown) {
+      container.style.paddingTop = currentPaddingTop + remPaddingsVal + "px";
+      container.style.paddingBottom = currentPaddingBottom === 0 ? "0px" : currentPaddingBottom - remPaddingsVal + "px";
+    } else {
+      container.style.paddingBottom = currentPaddingBottom + remPaddingsVal + "px";
+      if (currentPaddingTop === 0) {
+        $('#message-view').scrollTop($('#topsentinel').offset().top + remPaddingsVal);
+      } else {
+        container.style.paddingTop = currentPaddingTop - remPaddingsVal + "px";
+      }
+    }
+  }
+
+  topSentCallback(entry) {
+    const container = document.getElementById("message-list");
+
+    const currentY = entry.boundingClientRect.top;
+    const currentRatio = entry.intersectionRatio;
+    const isIntersecting = entry.isIntersecting;
+
+    // conditional check for Scrolling up
+    if (
+      currentY > this.scrollState.topSentinelPreviousY &&
+      isIntersecting &&
+      currentRatio >= this.scrollState.topSentinelPreviousRatio &&
+      //this.scroller.center !== this.scrollState.previousUpIndex && // stop if no new results were received
+      this.scroller.opts.stickTo !== 'bottom'
+    ) {
+      this.scrollState.previousUpIndex = this.scroller.center;
+      this.adjustPaddings(false);
+      this.scroller.down(scrollerSize / 2);
+    }
+    this.scrollState.topSentinelPreviousY = currentY;
+    this.scrollState.topSentinelPreviousRatio = currentRatio;
+  }
+
+  botSentCallback(entry) {
+    const currentY = entry.boundingClientRect.top;
+    const currentRatio = entry.intersectionRatio;
+    const isIntersecting = entry.isIntersecting;
+
+    // conditional check for Scrolling down
+    if (
+      currentY < this.scrollState.bottomSentinelPreviousY &&
+      currentRatio > this.scrollState.bottomSentinelPreviousRatio &&
+      isIntersecting &&
+      this.scroller.center !== this.scrollState.previousDownIndex &&  // stop if no new results were received
+      this.scroller.opts.stickTo !== 'top'
+    ) {
+      this.scrollState.previousDownIndex = this.scroller.center;
+      this.adjustPaddings(true);
+      this.scroller.up(scrollerSize / 2);
+    }
+    this.scrollState.bottomSentinelPreviousY = currentY;
+    this.scrollState.bottomSentinelPreviousRatio = currentRatio;
+  }
+
+  initIntersectionObserver() {
+    const options = {
+      rootMargin: '500px',
+    }
+
+    const callback = entries => {
+      entries.forEach(entry => {
+        if (entry.target.id === 'topsentinel') {
+          this.topSentCallback(entry);
+        } else if (entry.target.id === `bottomsentinel`) {
+          this.botSentCallback(entry);
+        }
+      });
+    }
+
+    var observer = new IntersectionObserver(callback, options); // TODO: It's possible to quickly scroll past the sentinels without them firing. Top and bottom sentinels should extend to page top & bottom?
+    observer.observe(document.querySelector("#topsentinel"));
+    observer.observe(document.querySelector(`#bottomsentinel`));
   }
 }
 

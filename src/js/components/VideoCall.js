@@ -125,8 +125,10 @@ class VideoCall extends Component {
       Session.channels[pub].put('call', 'null');
       this.notifyIfNotVisible(t('call_ended'));
     }
-    Session.channels[pub].pc && Session.channels[pub].pc.close();
-    Session.channels[pub].pc = null;
+    if (Session.channels[pub]) {
+      Session.channels[pub].pc && Session.channels[pub].pc.close();
+      Session.channels[pub].pc = null;      
+    }
   }
 
   async addStreamToPeerConnection(pc) {
