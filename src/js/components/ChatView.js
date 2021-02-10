@@ -21,7 +21,7 @@ c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,35
 </g>
 </svg>
 `;
-const scrollerSize = 25;
+const scrollerSize = 26;
 
 function copyMyChatLinkClicked(e) {
   Helpers.copyToClipboard(Session.getMyChatLink());
@@ -142,6 +142,12 @@ class ChatView extends Component {
     this.messageViewScrollHandler();
   }
 
+  scrollDown() {
+    Helpers.scrollToMessageListBottom();
+    this.scroller.top();
+    document.getElementById("message-list").style.paddingBottom = 0;
+  }
+
   render() {
     const now = new Date();
     const nowStr = now.toLocaleDateString();
@@ -186,16 +192,12 @@ class ChatView extends Component {
       </div>` : html`<${NewChat}/>`
     }
     ${this.props.id ? html`
-      <div id="scroll-down-btn" style="display:none;" onClick=${() => {
-        Helpers.scrollToMessageListBottom();
-        this.scroller.top();
-        document.getElementById("message-list").style.paddingBottom = 0;
-      }}>${caretDownSvg}</div>
+      <div id="scroll-down-btn" style="display:none;" onClick=${() => this.scrollDown()}>${caretDownSvg}</div>
       <div id="not-seen-by-them" style="display: none">
       <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
       <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_invite_link')}</button></p>
       </div>
-      <div class="chat-message-form"><${MessageForm} activeChat=${this.props.id}/></div>
+      <div class="chat-message-form"><${MessageForm} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/></div>
       `: ''}
       </div>
       </div>`;
@@ -265,7 +267,8 @@ class ChatView extends Component {
 
   initIntersectionObserver() {
     const options = {
-      rootMargin: '500px',
+      //root: document.getElementById('message-view'),
+      //rootMargin: '500px',
     }
 
     const callback = entries => {
