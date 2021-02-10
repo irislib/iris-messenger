@@ -336,21 +336,20 @@ function processMessage(chatId, msg, info) {
     msg = Object.assign(msg, info);
   }
   msg.selfAuthored = info.selfAuthored;
-  msg.timeStr = msg.time;
-  State.local.get('channels').get(chatId).get('msgs').get(msg.timeStr).put(msg);
-  msg.time = new Date(msg.time);
-  if (!info.selfAuthored && msg.time > (chat.myLastSeenTime || -Infinity)) {
+  State.local.get('channels').get(chatId).get('msgs').get(msg.time).put(msg);
+  msg.timeObj = new Date(msg.time);
+  if (!info.selfAuthored && msg.timeObj > (chat.myLastSeenTime || -Infinity)) {
     if (window.location.hash !== '#/chat/' + chatId || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chatId, 1);
     }
   }
-  if (!info.selfAuthored && msg.timeStr > chat.theirMsgsLastSeenTime) {
-    State.local.get('channels').get(chatId).get('theirMsgsLastSeenTime').put(msg.timeStr);
+  if (!info.selfAuthored && msg.time > chat.theirMsgsLastSeenTime) {
+    State.local.get('channels').get(chatId).get('theirMsgsLastSeenTime').put(msg.time);
   }
-  if (!chat.latestTime || (msg.timeStr > chat.latestTime)) {
+  if (!chat.latestTime || (msg.time > chat.latestTime)) {
     State.local.get('channels').get(chatId).put({
-      latestTime: msg.timeStr,
-      latest: {time: msg.timeStr, text: msg.text, selfAuthored: info.selfAuthored}
+      latestTime: msg.time,
+      latest: {time: msg.time, text: msg.text, selfAuthored: info.selfAuthored}
     });
   }
   Notifications.notifyMsg(msg, info, chatId);

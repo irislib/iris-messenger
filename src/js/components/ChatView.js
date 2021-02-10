@@ -71,11 +71,12 @@ class ChatView extends Component {
 
     State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
     const node = State.local.get('channels').get(this.props.id).get('msgs');
+    const limitedUpdate = _.throttle(sortedMessages => this.setState({sortedMessages}), 100); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?
     this.scrollState = {previousDownIndex: -1, previousUpIndex: -1};
     const container = document.getElementById("message-list");
     container.style.paddingBottom = 0;
     container.style.paddingTop = 0;
-    this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: sortedMessages => this.setState({sortedMessages})});
+    this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: limitedUpdate});
     this.initIntersectionObserver();
   }
 
@@ -85,7 +86,7 @@ class ChatView extends Component {
       $('#not-seen-by-them').hide();
       this.componentDidMount();
     } else {
-      if (this.scroller.opts.stickTo === 'top') { Helpers.scrollToMessageListBottom(); }
+      if (this.scroller && this.scroller.opts.stickTo === 'top') { Helpers.scrollToMessageListBottom(); }
       $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
       if (chat && !chat.uuid) {
         if ($('.msg.our').length && !$('.msg.their').length && !chat.theirMsgsLastSeenTime) {
@@ -148,6 +149,7 @@ class ChatView extends Component {
     let previousFrom;
     const msgListContent = [];
     this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach((msg, i) => {
+      if (typeof msg !== 'object') { return; }
       const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
       if (date) {
         const dateStr = date.toLocaleDateString();

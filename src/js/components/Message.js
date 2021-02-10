@@ -24,11 +24,6 @@ class Message extends Component {
     });
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.name !== nextState.name) return true;
-    return false;
-  }
-
   onNameClick(name) {
     $('.new-msg').val($('.new-msg').val().trim() + ` @${name} `);
     $('.new-msg').focus();
@@ -100,7 +95,7 @@ class Message extends Component {
   }
 
   render() {
-    if (++this.i > 1) console.log(this.i);
+    // if (++this.i > 1) console.log(this.i); // count component updates
     let name = this.props.name || this.state.name;
     let color;
     const chatId = this.props.chatId;

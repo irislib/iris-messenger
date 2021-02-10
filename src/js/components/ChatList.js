@@ -18,6 +18,7 @@ class ChatList extends Component {
     const chats = {};
     const limitedUpdate = _.debounce(() => {
       const sortedChats = Object.values(chats)
+        .filter(chat => chat.id !== 'public')
         .filter(chat => !!chat)
         .sort((a, b) => {
           if (b.latestTime === undefined || a.latestTime > b.latestTime) return -1;

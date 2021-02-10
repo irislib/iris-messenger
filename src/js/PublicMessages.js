@@ -22,9 +22,9 @@ async function sendPublicMsg(msg) {
   }
 }
 
-function deletePublicMsg(timeStr, replyingTo) {
-  State.public.user().get('msgs').get(timeStr).put(null);
-  replyingTo && State.public.user().get('replies').get(replyingTo).get(timeStr).put(null);
+function deletePublicMsg(time, replyingTo) {
+  State.public.user().get('msgs').get(time).put(null);
+  replyingTo && State.public.user().get('replies').get(replyingTo).get(time).put(null);
 }
 
 function getMessageByHash(hash) {
