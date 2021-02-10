@@ -28,7 +28,7 @@ function enableDesktopNotifications() {
 
 function notifyMsg(msg, info, pub) {
   function shouldNotify() {
-    if (msg.time < loginTime) { return false; }
+    if (msg.timeObj < loginTime) { return false; }
     if (info.selfAuthored) { return false; }
     if (document.visibilityState === 'visible') { return false; }
     if (Session.channels[pub].notificationSetting === 'nothing') { return false; }
