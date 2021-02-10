@@ -55,7 +55,6 @@ class Header extends Component {
       this.setState({activeRoute});
       const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
       this.chatId = replaced.length < activeRoute.length ? replaced : null;
-      console.log('replace', replaced, this.chatId);
       if (this.chatId) {
         State.local.get('channels').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
           this.eventListeners.push(event);
@@ -73,13 +72,12 @@ class Header extends Component {
           title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
         } else {
           State.local.get('channels').get(this.chatId).get('name').on((name, a, b, eve) => {
-            console.log('name', name);
             this.eventListeners.push(eve);
             this.setState({title: name});
           });
         }
       } else {
-        this.setState({title});        
+        this.setState({title});
       }
     });
   }

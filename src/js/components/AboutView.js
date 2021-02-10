@@ -13,7 +13,7 @@ export default () => {
           <li><b>Available</b>: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.</li>
         </ul>
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-        <p><small>Version 1.5.6</small></p>
+        <p><small>Version 1.5.7</small></p>
 
         ${iris.util.isElectron ? '' : html`
           <div id="desktop-application-about">
