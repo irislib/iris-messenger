@@ -437,7 +437,7 @@ header.footer .header-content {
 
 .application-list {
   z-index: 2;
-  width: 250px;
+  width: 220px;
   transition: all 0.25s ease;
   padding-top: 15px;
   background: var(--sidebar-bg);
