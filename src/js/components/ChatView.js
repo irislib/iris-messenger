@@ -210,7 +210,7 @@ class ChatView extends Component {
       <div class="chat-message-form"><${MessageForm} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/></div>
       `: ''}
       </div>
-      ${this.props.id.length < 40 ? html`
+      ${this.props.id && this.props.id.length < 40 ? html`
         <div class="participant-list">
           ${this.state.participants ? Object.keys(this.state.participants).map(k =>
             html`
