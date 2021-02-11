@@ -157,9 +157,11 @@ class ChatView extends Component {
     this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach((msg, i) => {
       if (typeof msg !== 'object') { return; }
       const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
+      let isDifferentDay;
       if (date) {
         const dateStr = date.toLocaleDateString();
         if (dateStr !== previousDateStr) {
+          isDifferentDay = true;
           var separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
           msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
         }
@@ -167,7 +169,7 @@ class ChatView extends Component {
       }
 
       let showName = false;
-      if (previousFrom && (msg.from !== previousFrom)) {
+      if (isDifferentDay || (previousFrom && (msg.from !== previousFrom))) {
         msgListContent.push(html`<div class="from-separator"/>`);
         showName = true;
       }
