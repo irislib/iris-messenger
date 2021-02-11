@@ -2,6 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
+import Identicon from './Identicon.js';
 import Message from './Message.js';
 import MessageForm from './MessageForm.js';
 import Helpers from '../Helpers.js';
@@ -48,27 +49,35 @@ class ChatView extends Component {
     if (!(this.props.id && this.props.id.length > 20)) return;
     this.unsubscribe();
     this.sortedMessages = [];
-    this.setState({sortedMessages: this.sortedMessages});
+    this.participants = {};
+    this.setState({sortedMessages: this.sortedMessages, participants: this.participants});
     this.iv = null;
+    this.chat = null;
     const go = () => {
-      const chat = Session.channels[this.props.id];
-      if (chat) {
+      this.chat = Session.channels[this.props.id];
+      if (this.chat) {
         clearInterval(this.iv)
         Session.subscribeToMsgs(this.props.id);
         Notifications.changeChatUnseenCount(this.props.id, 0);
-        chat.setMyMsgsLastSeenTime();
+        this.chat.setMyMsgsLastSeenTime();
         Helpers.scrollToMessageListBottom();
-        chat.setMyMsgsLastSeenTime();
-        if (chat.uuid) {
-          chat.inviteLinks = {};
-          chat.getChatLinks({callback: ({url, id}) => {
-            chat.inviteLinks[id] = url; // TODO state
+        this.chat.setMyMsgsLastSeenTime();
+        if (this.chat.uuid) {
+          this.chat.inviteLinks = {};
+          this.chat.getChatLinks({callback: ({url, id}) => {
+            this.chat.inviteLinks[id] = url; // TODO state
           }});
         }
       }
     }
     this.iv = setInterval(go, 3000);
 
+    State.local.get('channels').get(this.props.id).get('participants').map().on((v, k, b, e) => {
+      console.log(3, k);
+      this.eventListeners['participants'] = e;
+      this.participants[k] = true;
+      this.setState({participants: this.participants});
+    });
     State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
     const node = State.local.get('channels').get(this.props.id).get('msgs');
     const limitedUpdate = _.throttle(sortedMessages => this.setState({sortedMessages}), 100); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?
@@ -81,15 +90,14 @@ class ChatView extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const chat = Session.channels[this.props.id];
     if (prevProps.id !== this.props.id) {
       $('#not-seen-by-them').hide();
       this.componentDidMount();
     } else {
       if (this.scroller && this.scroller.opts.stickTo === 'top') { Helpers.scrollToMessageListBottom(); }
       $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
-      if (chat && !chat.uuid) {
-        if ($('.msg.our').length && !$('.msg.their').length && !chat.theirMsgsLastSeenTime) {
+      if (this.chat && !this.chat.uuid) {
+        if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
           $('#not-seen-by-them').slideDown();
         } else {
           $('#not-seen-by-them').slideUp();
@@ -202,6 +210,18 @@ class ChatView extends Component {
       <div class="chat-message-form"><${MessageForm} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/></div>
       `: ''}
       </div>
+      ${this.props.id.length < 40 ? html`
+        <div class="participant-list">
+          ${this.state.participants ? Object.keys(this.state.participants).map(k =>
+            html`
+              <div class="text">
+                <${Identicon} str=${k} width=30/>
+                <iris-text user=${k} path="profile/name" placeholder=" "/>
+              </div>
+            `
+          ) : ''}
+        </div>
+      `: ''}
       </div>`;
   }
 

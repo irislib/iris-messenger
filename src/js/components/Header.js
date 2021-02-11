@@ -99,7 +99,7 @@ class Header extends Component {
     const activeRoute = this.state.activeRoute;
     const chat = Session.channels[this.chatId];
     const isTyping = chat && chat.isTyping;
-    const participants = chat && chat.uuid && Object.keys(chat.participantProfiles).map(p => chat.participantProfiles[p].name).join(', ');
+    const about = chat && chat.about;
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
     const key = Session.getKey().pub;
     const searchBox = this.chatId ? '' : html`<${SearchBox}/>`;
@@ -123,7 +123,7 @@ class Header extends Component {
             </div>
           `: ''}
           ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
-          ${participants ? html`<small class="participants">${participants}</small>` : ''}
+          ${about ? html`<small class="participants">${about}</small>` : ''}
           ${this.chatId ? html`<small class="last-seen">${onlineStatus || ''}</small>` : ''}
           ${searchBox}
         </div>

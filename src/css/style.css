@@ -435,9 +435,30 @@ header.footer .header-content {
   flex: 1;
 }
 
+.participant-list {
+  width: 220px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  border-left: var(--sidebar-border-right);
+  background: var(--sidebar-bg);
+  transition: all 0.25s ease;
+}
+
+.participant-list .text {
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  color: var(--text-color);
+}
+
+.participant-list .identicon-container {
+  margin-right: 7px;
+}
+
 .application-list {
   z-index: 2;
-  width: 220px;
+  width: 180px;
   transition: all 0.25s ease;
   padding-top: 15px;
   background: var(--sidebar-bg);
@@ -487,6 +508,15 @@ header.footer .header-content {
     position: fixed;
     top: 0;
     left:0;
+    bottom: 0;
+  }
+
+  .participant-list {
+    width: 250px;
+    margin-right: -250px;
+    position: fixed;
+    top: 0;
+    right:0;
     bottom: 0;
   }
 
