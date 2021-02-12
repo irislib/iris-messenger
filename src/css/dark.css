@@ -34,7 +34,7 @@
     --emoji-picker-color: #fff;
     --emoji-picker-border-color: #3D3E66;
     --link-color: #00bbf4;
-    --day-separator-bg: rgba(0,0,0,0.85);
+    --day-separator-bg: rgba(30,32,37,0.85);
     --day-separator-color: rgba(255, 255, 255, 0.88);
     --logotype-filter: contrast(0) brightness(2);
     --non-string-value-color: red;
