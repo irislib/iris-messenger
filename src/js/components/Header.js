@@ -112,10 +112,12 @@ class Header extends Component {
       </div>
       ` : ''}
       <div class="header-content">
-        <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
-          <img src="img/icon128.png" width=40 height=40/>
-          <img src="img/iris_logotype.png" height=23 width=41 />
-        </a>
+        ${iris.util.isElectron ? '' : html`
+          <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
+            <img src="img/icon128.png" width=40 height=40/>
+            <img src="img/iris_logotype.png" height=23 width=41 />
+          </a>
+        `}
         <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
           ${this.state.title && activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
             <div class="name">
@@ -137,13 +139,6 @@ class Header extends Component {
             Icons.voiceCall
             </a> -->
         `: ''}
-
-        <a href="/" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${Icons.home}</a>
-        <a href="/chat" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
-          ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
-          ${Icons.chat}
-        </a>
-        <a href="/settings" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${Icons.settings}</a>
         <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>
