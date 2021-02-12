@@ -50,6 +50,7 @@ class Header extends Component {
       this.setState({unseenTotal});
     });
     State.local.get('activeRoute').on(activeRoute => {
+      this.setState({about:null});
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
       this.setState({activeRoute});
@@ -75,6 +76,10 @@ class Header extends Component {
             this.eventListeners.push(eve);
             this.setState({title: name});
           });
+          State.local.get('channels').get(this.chatId).get('about').on((about, a, b, eve) => {
+            this.eventListeners.push(eve);
+            this.setState({about});
+          });
         }
       } else {
         this.setState({title});
@@ -99,7 +104,6 @@ class Header extends Component {
     const activeRoute = this.state.activeRoute;
     const chat = Session.channels[this.chatId];
     const isTyping = chat && chat.isTyping;
-    const about = chat && chat.about;
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
     const key = Session.getKey().pub;
     const searchBox = this.chatId ? '' : html`<${SearchBox}/>`;
@@ -125,7 +129,7 @@ class Header extends Component {
             </div>
           `: ''}
           ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
-          ${about ? html`<small class="participants">${about}</small>` : ''}
+          ${this.state.about ? html`<small class="participants">${this.state.about}</small>` : ''}
           ${this.chatId ? html`<small class="last-seen">${onlineStatus || ''}</small>` : ''}
           ${searchBox}
         </div>

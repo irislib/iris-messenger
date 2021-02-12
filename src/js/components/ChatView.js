@@ -73,7 +73,6 @@ class ChatView extends Component {
     this.iv = setInterval(go, 3000);
 
     State.local.get('channels').get(this.props.id).get('participants').map().on((v, k, b, e) => {
-      console.log(3, k);
       this.eventListeners['participants'] = e;
       this.participants[k] = true;
       this.setState({participants: this.participants});

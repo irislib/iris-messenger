@@ -295,6 +295,7 @@ function addChannel(chat) {
     chat.participantProfiles = {};
     chat.on('name', v => State.local.get('channels').get(chat.uuid).get('name').put(v));
     chat.on('photo', v => State.local.get('channels').get(chat.uuid).get('photo').put(v));
+    chat.on('about', v => State.local.get('channels').get(chat.uuid).get('about').put(v));
     chat.onMy('participants', participants => {
       if (typeof participants === 'object') {
         var keys = Object.keys(participants);
