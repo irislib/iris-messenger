@@ -144,6 +144,10 @@ img, video {
   filter: var(--logotype-filter);
 }
 
+.header {
+  -webkit-app-region: drag;
+}
+
 .header .header-content > a:not(:last-child) {
   margin-right: 22px;
 }
@@ -436,16 +440,17 @@ header.footer .header-content {
 }
 
 .participant-list {
-  width: 180px;
+  width: 190px;
   overflow-x: hidden;
   overflow-y: auto;
   border-left: var(--sidebar-border-right);
   background: var(--sidebar-bg);
   transition: all 0.25s ease;
+  padding-top: 15px;
 }
 
 .participant-list .text {
-  padding: 7px;
+  padding: 7px 15px;
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -453,7 +458,7 @@ header.footer .header-content {
 }
 
 .participant-list .identicon-container {
-  margin-right: 7px;
+  margin-right: 15px;
 }
 
 .application-list {
@@ -461,8 +466,9 @@ header.footer .header-content {
   width: 220px;
   transition: all 0.25s ease;
   padding-top: 15px;
-  background: var(--sidebar-bg);
+  background: var(--menu-bg);
   border-right: var(--sidebar-border-right)
+  color: var(--sidebar-color);
 }
 
 .overlay {
