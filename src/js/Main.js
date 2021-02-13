@@ -19,7 +19,6 @@ import CheckoutView from './components/CheckoutView.js';
 import ProductView from './components/ProductView.js';
 import Login from './components/Login.js';
 import Profile from './components/Profile.js';
-import Header from './components/Header.js';
 import Footer from './components/Footer.js';
 import MessageView from './components/MessageView.js';
 import FollowsView from './components/FollowsView.js';
@@ -63,6 +62,12 @@ const MenuView = props => {
   const pub = Session.getPubKey();
   return html`
     <div class="application-list">
+      ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
+        <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="logo">
+          <img src="img/icon128.png" width=40 height=40/>
+          <img src="img/iris_logotype.png" height=23 width=41 />
+        </a>
+      `}
       <div class="visible-xs-block">
         <${Link} onClick=${() => props.toggleMenu(false)} activeClassName="active" href="/profile/${pub}">
           <span class="icon"><${Identicon} str=${pub} width=40/></span>
@@ -115,7 +120,6 @@ class Main extends Component {
     let content = '';
     if (this.state.loggedIn || window.location.hash.length <= 2) {
       content = this.state.loggedIn ? html`
-        <${Header} toggleMenu=${show => this.toggleMenu(show)}/>
         <section class="main ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
           <${MenuView} toggleMenu=${show => this.toggleMenu(show)}/>
           <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>

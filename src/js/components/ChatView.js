@@ -2,6 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
+import Header from './Header.js';
 import Identicon from './Identicon.js';
 import Message from './Message.js';
 import MessageForm from './MessageForm.js';
@@ -187,7 +188,8 @@ class ChatView extends Component {
     });
 
     return html`
-    <div id="chat-view">
+    <${Header} toggleMenu=${show => this.toggleMenu(show)}/>
+    <div id="chat-view" class="main-view">
     <${ChatList} class=${this.props.id ? 'hidden-xs' : ''}/>
     <div id="chat-main" class=${this.props.id ? '' : 'hidden-xs'}>
     ${this.props.id && this.props.id.length > 20 ? html`

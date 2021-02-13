@@ -13,7 +13,7 @@
     --notify: #7074da;
     --warning-background: #d87470;
     --heart-color: #f2231d;
-    --login-background: #2d2e36;
+    --login-background: #1f2125;
     --seen-indicator: rgba(255, 255, 255, 0.45);
     --input-bg: #1f2125;
     --input-text: #dbdcde;
@@ -38,4 +38,6 @@
     --day-separator-color: rgba(255, 255, 255, 0.88);
     --logotype-filter: contrast(0) brightness(2);
     --non-string-value-color: #8286ff;
+    --nav-border-bottom: 1px solid #222526;
+    --nav-shadow: 0 1px 3px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.8);
 }

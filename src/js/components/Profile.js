@@ -4,6 +4,7 @@ import {translate as t} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
+import Header from './Header.js';
 import MessageForm from './MessageForm.js';
 import ProfilePhotoPicker from './ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
@@ -205,6 +206,7 @@ class Profile extends Component {
       }
     }
     return html`
+    <${Header} toggleMenu=${show => this.toggleMenu(show)}/>
     <div class="main-view" id="profile">
       <div class="content">
         <div class="profile-top">

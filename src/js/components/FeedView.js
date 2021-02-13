@@ -2,6 +2,7 @@ import { Component } from '../lib/preact.js';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
 import State from '../State.js';
+import Header from './Header.js';
 import MessageForm from './MessageForm.js';
 import Identicon from './Identicon.js';
 import FollowButton from './FollowButton.js';
@@ -100,6 +101,7 @@ class FeedView extends Component {
 
   render() {
     return html`
+      <${Header} toggleMenu=${show => this.toggleMenu(show)}/>
       <div class="main-view public-messages-view" id="message-view">
         <div class="centered-container">
           <${MessageForm} activeChat="public" class="hidden-xs" autofocus=${false}/>

@@ -68,7 +68,7 @@ class Header extends Component {
       }
 
       let title = '';
-      if (activeRoute.indexOf('/chat/') === 0) {
+      if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
         if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
           title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
         } else {
@@ -116,12 +116,6 @@ class Header extends Component {
       </div>
       ` : ''}
       <div class="header-content">
-        ${iris.util.isElectron ? '' : html`
-          <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="${activeRoute && activeRoute.indexOf('/chat/') === 0 ? 'hidden-xs' :'' } logo">
-            <img src="img/icon128.png" width=40 height=40/>
-            <img src="img/iris_logotype.png" height=23 width=41 />
-          </a>
-        `}
         <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
           ${this.state.title && activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
             <div class="name">
