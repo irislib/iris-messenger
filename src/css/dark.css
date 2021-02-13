@@ -4,12 +4,12 @@
     --text-color: #dbdcde;
     --text-time: rgba(255, 255, 255, 0.45);
     --main-color: #35383f;
-    --gallery-background: rgba(22, 23, 44, 0.90);
+    --gallery-background: rgba(0, 0, 0, 0.80);
     --header-color: #2e3036;
     --chat-active: #393b43;
     --chat-hover: #33363c;
     --msg-content-background: #2e3036;
-    --our-msg: #7189da;
+    --our-msg: #7074da;
     --notify: #7074da;
     --warning-background: #d87470;
     --heart-color: #f2231d;
@@ -37,5 +37,5 @@
     --day-separator-bg: rgba(30,32,37,0.85);
     --day-separator-color: rgba(255, 255, 255, 0.88);
     --logotype-filter: contrast(0) brightness(2);
-    --non-string-value-color: red;
+    --non-string-value-color: #8286ff;
 }
