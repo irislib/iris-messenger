@@ -163,7 +163,14 @@ class ChatView extends Component {
     let previousFrom;
     const msgListContent = [];
     this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach((msg, i) => {
-      if (typeof msg !== 'object') { return; }
+      if (typeof msg !== 'object') {
+        try {
+          msg = JSON.parse(msg);
+        } catch (e) {
+          console.error('JSON.parse(msg) failed', e);
+          return;
+        }
+      }
       const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
       let isDifferentDay;
       if (date) {

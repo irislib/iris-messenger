@@ -337,7 +337,7 @@ function processMessage(chatId, msg, info) {
     msg = Object.assign(msg, info);
   }
   msg.selfAuthored = info.selfAuthored;
-  State.local.get('channels').get(chatId).get('msgs').get(msg.time).put(msg);
+  State.local.get('channels').get(chatId).get('msgs').get(msg.time + (msg.from && msg.from.slice(0, 10))).put(JSON.stringify(msg));
   msg.timeObj = new Date(msg.time);
   if (!info.selfAuthored && msg.timeObj > (chat.myLastSeenTime || -Infinity)) {
     if (window.location.hash !== '#/chat/' + chatId || document.visibilityState !== 'visible') {
