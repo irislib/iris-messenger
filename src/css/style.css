@@ -527,6 +527,16 @@ header.footer .header-content {
     padding: 15px;
   }
   
+  .application-list a.logo {
+   padding: 0; 
+  }
+  
+  .application-list a.logo img:first-child {
+    margin-right: 0;
+    width: 30px;
+    height: 30px;
+  }
+  
   .application-list a.logo img:last-child {
     display: none;
   }
