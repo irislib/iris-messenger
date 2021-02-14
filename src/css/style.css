@@ -526,6 +526,10 @@ header.footer .header-content {
     justify-content: center;
     padding: 15px;
   }
+  
+  .application-list a.logo img:last-child {
+    display: none;
+  }
 
   .application-list .text {
     display: none;
