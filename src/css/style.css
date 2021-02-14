@@ -528,7 +528,7 @@ header.footer .header-content {
   }
   
   .application-list a.logo {
-   padding: 0; 
+   padding: 15px;
   }
   
   .application-list a.logo img:first-child {
