@@ -516,7 +516,7 @@ header.footer .header-content {
   color: var(--text-color);
 }
 
-@media (max-width:1100px) {
+@media (max-width:1268px) {
   .application-list {
     width: 78px;
     margin-left: 0;
@@ -526,17 +526,17 @@ header.footer .header-content {
     justify-content: center;
     padding: 15px;
   }
-  
+
   .application-list a.logo {
    padding: 15px;
   }
-  
+
   .application-list a.logo img:first-child {
     margin-right: 0;
     width: 30px;
     height: 30px;
   }
-  
+
   .application-list a.logo img:last-child {
     display: none;
   }
