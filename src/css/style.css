@@ -167,6 +167,10 @@ img, video {
   -webkit-app-region: drag;
 }
 
+.header a, .header input {
+  -webkit-app-region: no-drag;
+}
+
 .header .header-content > a:not(:last-child) {
   margin-right: 22px;
 }
@@ -519,7 +523,6 @@ header.footer .header-content {
 }
 
 .application-list {
-  -webkit-app-region: drag;
   z-index: 2;
   width: 220px;
   transition: all 0.25s ease;
