@@ -1421,23 +1421,32 @@ form.public {
   max-height: min(30vw, 300px);
 }
 
-.chat-item .online-indicator {
+.online-indicator {
   display: inline-block;
   width: 16px;
   height: 16px;
   border-radius: 50%;
   position: absolute;
   bottom: 10px;
-  left: 50px;
   border: 3px solid var(--sidebar-bg);
   background-color: #999999;
 }
 
-.chat-item.online .online-indicator, .chat-item.active .online-indicator {
+.chat-item .online-indicator {
+  left: 50px;
+}
+
+.participant-list .online-indicator {
+  right: -3px;
+  bottom: -3px;
+  z-index: 1;
+}
+
+.online > .online-indicator, .active > .online-indicator {
   background-color: #f6a539;
 }
 
-.chat-item.active .online-indicator {
+.active > .online-indicator {
   background-color: #80bf5f;
 }
 

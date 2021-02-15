@@ -11,6 +11,7 @@ class Identicon extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.str !== this.props.str) return true;
     if (nextState.name !== this.state.name) return true;
+    if (nextState.activity !== this.state.activity) return true;
     return false;
   }
 
@@ -22,6 +23,7 @@ class Identicon extends Component {
   }
 
   componentDidMount() {
+    this.setState({activity: null});
     const i = Helpers.getIdenticon(this.props.str, this.props.width)[0];
     if (this.props.showTooltip) {
       State.public.user(this.props.str).get('profile').get('name').on((name,a,b,e) => {
@@ -30,6 +32,18 @@ class Identicon extends Component {
       });
     }
     this.base.appendChild(i);
+    if (this.props.activity) {
+      State.public.user(this.props.str).get('activity').on((activity, a, b, e) => {
+        this.eventListeners['activity'] = e;
+        if (activity) {
+          if (activity.time && (new Date() - new Date(activity.time) < 15000)) {
+            this.setState({activity: activity.status});
+          }
+        } else {
+          this.setState({activity: null});
+        }
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -38,10 +52,13 @@ class Identicon extends Component {
   }
 
   render() {
+    const activity = ['online', 'active'].indexOf(this.state.activity) > -1 ? this.state.activity : '';
     return html`
-    <div onClick=${this.props.onClick} style=${this.props.onClick ? 'cursor: pointer;' : ''} class="identicon-container ${this.props.showTooltip ? 'tooltip' : ''}">
+    <div onClick=${this.props.onClick} style="${this.props.onClick ? 'cursor: pointer;' : ''} position: relative;" class="identicon-container ${this.props.showTooltip ? 'tooltip' : ''} ${activity}">
       ${this.props.showTooltip && this.state.name ? html`<span class="tooltiptext">${this.state.name}</span>` : ''}
-    </div>`;
+      ${this.props.activity ? html`<div class="online-indicator"/>` : ''}
+    </div>
+    `;
   }
 }
 

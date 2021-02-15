@@ -225,7 +225,7 @@ class ChatView extends Component {
             html`
               <a href="/profile/${k}">
                 <span class="text">
-                  <${Identicon} str=${k} width=30/>
+                  <${Identicon} str=${k} width=30 activity=${true}/>
                   <iris-text user=${k} path="profile/name" placeholder=" "/>
                 </span>
               </a>
