@@ -222,10 +222,12 @@ class ChatView extends Component {
         <div class="participant-list">
           ${this.state.participants ? Object.keys(this.state.participants).map(k =>
             html`
-              <div class="text">
-                <${Identicon} str=${k} width=30/>
-                <iris-text user=${k} path="profile/name" placeholder=" "/>
-              </div>
+              <a href="/profile/${k}">
+                <span class="text">
+                  <${Identicon} str=${k} width=30/>
+                  <iris-text user=${k} path="profile/name" placeholder=" "/>
+                </span>
+              </a>
             `
           ) : ''}
         </div>
