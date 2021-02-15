@@ -93,6 +93,7 @@ const MenuView = props => {
 class Main extends Component {
   componentDidMount() {
     State.local.get('loggedIn').on(loggedIn => this.setState({loggedIn}));
+    State.electron && State.electron.get('platform').on(platform => this.setState({platform}));
   }
 
   handleRoute(e) {
@@ -116,10 +117,24 @@ class Main extends Component {
     this.setState({showMenu: typeof show === 'undefined' ? !this.state.showMenu : show});
   }
 
+  electronCmd(name) {
+    State.electron.get('cmd').put({name, time: new Date().toISOString()});
+  }
+
   render() {
     let content = '';
     if (this.state.loggedIn || window.location.hash.length <= 2) {
       content = this.state.loggedIn ? html`
+        ${this.state.platform && this.state.platform !== 'darwin' ? html`
+          <div class="windows-titlebar">
+               <div class="title">Iris</div>
+               <div class="title-bar-btns">
+                    <button class="min-btn" onClick=${() => this.electronCmd('minimize')}>-</button>
+                    <button class="max-btn" onClick=${() => this.electronCmd('maximize')}>+</button>
+                    <button class="close-btn" onClick=${() => this.electronCmd('close')}>x</button>
+               </div>
+          </div>
+        ` : ''}
         <section class="main ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
           <${MenuView} toggleMenu=${show => this.toggleMenu(show)}/>
           <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>

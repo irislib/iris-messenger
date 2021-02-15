@@ -36,7 +36,9 @@ class Identicon extends Component {
       State.public.user(this.props.str).get('activity').on((activity, a, b, e) => {
         this.eventListeners['activity'] = e;
         if (activity) {
-          if (activity.time && (new Date() - new Date(activity.time) < 15000)) {
+          if (activity.time && (new Date() - new Date(activity.time) < 30000)) {
+            clearTimeout(this.activityTimeout);
+            this.activityTimeout = setTimeout(() => this.setState({activity:null}), 30000);
             this.setState({activity: activity.status});
           }
         } else {

@@ -482,6 +482,42 @@ header.footer .header-content {
   margin-right: 15px;
 }
 
+.windows-titlebar {
+ -webkit-app-region: drag;
+ height: 24px;
+ background-color: var(--menu-bg);
+ padding: none;
+ margin: 0px;
+}
+
+.windows-titlebar .title {
+ position: fixed;
+ top: 0px;
+ left: 6px;
+}
+
+.windows-titlebar .title-bar-btns {
+ -webkit-app-region: no-drag;
+ position: fixed;
+ top: 0px;
+ right: 6px;
+}
+
+.title-bar-btns button {
+  padding: 0;
+  background: var(--menu-bg);
+  border-radius: 0;
+  margin-right: 0;
+  height: 24px;
+  width: 24px;
+  color: var(--msg-form-button-color);
+}
+
+.title-bar-btns button:hover {
+  padding: 0;
+  background: var(--chat-hover);
+}
+
 .application-list {
   -webkit-app-region: drag;
   z-index: 2;
