@@ -72,6 +72,7 @@ class ChatView extends Component {
       }
     }
     this.iv = setInterval(go, 3000);
+    go();
 
     State.local.get('channels').get(this.props.id).get('participants').map().on((v, k, b, e) => {
       this.eventListeners['participants'] = e;
@@ -85,7 +86,7 @@ class ChatView extends Component {
     const container = document.getElementById("message-list");
     container.style.paddingBottom = 0;
     container.style.paddingTop = 0;
-    this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: limitedUpdate});
+    this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: limitedUpdate, stickTo: 'top'});
     this.initIntersectionObserver();
   }
 
