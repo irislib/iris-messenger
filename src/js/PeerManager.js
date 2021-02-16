@@ -7,6 +7,7 @@ import {translate as t} from './Translation.js';
 var MAX_PEER_LIST_SIZE = 10;
 var maxConnectedPeers = iris.util.isElectron ? 2 : 1;
 const DEFAULT_PEERS = {
+  'https://iris.cx/gun': {},
   'https://gun-us.herokuapp.com/gun': {}
 };
 var peers = getPeers();
