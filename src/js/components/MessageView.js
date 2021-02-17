@@ -1,11 +1,16 @@
-import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import MessageForm from './MessageForm.js';
 import { route } from '../lib/preact-router.es.js';
+import IrisView from './IrisView.js';
 
-class MessageView extends Component {
-  render() {
+class MessageView extends IrisView {
+  constructor() {
+    super();
+    this.class = "public-messages-view";
+  }
+
+  renderView() {
     let content;
     if (this.props.hash === 'new') {
       content = html`
@@ -17,10 +22,8 @@ class MessageView extends Component {
       `;
     }
     return html`
-      <div class="main-view public-messages-view">
-        <div id="message-list" class="centered-container">
-          ${content}
-        </div>
+      <div id="message-list" class="centered-container">
+        ${content}
       </div>
     `;
   }

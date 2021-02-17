@@ -206,7 +206,7 @@ class Profile extends Component {
       }
     }
     return html`
-    <${Header} toggleMenu=${show => this.toggleMenu(show)}/>
+    <${Header}/>
     <div class="main-view" id="profile">
       <div class="content">
         <div class="profile-top">

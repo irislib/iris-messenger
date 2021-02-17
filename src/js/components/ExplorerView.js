@@ -1,8 +1,9 @@
-import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
+import { Component } from '../lib/preact.js';
 import ScrollViewport from '../lib/preact-scroll-viewport.js';
+import IrisView from './IrisView.js';
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
@@ -19,8 +20,8 @@ const chevronRight = html`
 </svg>
 `;
 
-class ExplorerView extends Component {
-  render() {
+class ExplorerView extends IrisView {
+  renderView() {
     const split = (this.props.node || '').split('/');
     const gun = (split.length && split[0]) === 'local' ? State.local : State.public;
     const path = split.slice(1).join('/');
@@ -28,35 +29,32 @@ class ExplorerView extends Component {
       ${chevronRight} <a href="#/explorer/${encodeURIComponent(split.slice(0,i+1).join('/'))}">${decodeURIComponent(k)}</a>
     `);
     return html`
-      <div class="main-view">
-        ${path ? '' : html `<p>Useful debug data for nerds.</p>`}
-        <p>
-          <a href="#/explorer">All</a> ${path ? pathString : ''}
-        </p>
-        ${path ? html`
-          <${ExplorerNode} indent=${0} showTools=${true} gun=${gun} path=${this.props.node}/>
-        ` : html`
-          <div class="explorer-row">
-            ${chevronDown} Public (synced with peers)
-          </div>
-          <div class="explorer-row" style="padding-left: 1em">
-            ${chevronDown} Users
-          </div>
-          <div class="explorer-row" style="padding-left: 2em">
-            ${chevronDown} <a href="#/explorer/public%2F~${encodeURIComponent(Session.getPubKey())}">${Session.getPubKey()}</a>
-          </div>
-          <${ExplorerNode} indent=${3} gun=${State.public} path='public/~${Session.getPubKey()}'/>
-          <div class="explorer-row" style="padding-left: 1em">
-            ${chevronRight} <a href="#/explorer/public%2F%23">#</a> (content-addressed values, such as public posts)
-          </div>
-          <br/><br/>
-          <div class="explorer-row">
-            ${chevronDown} Local (only stored on your device)
-          </div>
-          <${ExplorerNode} indent=${1} gun=${State.local} path='local'/>
-        `}
-
-      </div>
+      ${path ? '' : html `<p>Useful debug data for nerds.</p>`}
+      <p>
+        <a href="#/explorer">All</a> ${path ? pathString : ''}
+      </p>
+      ${path ? html`
+        <${ExplorerNode} indent=${0} showTools=${true} gun=${gun} path=${this.props.node}/>
+      ` : html`
+        <div class="explorer-row">
+          ${chevronDown} Public (synced with peers)
+        </div>
+        <div class="explorer-row" style="padding-left: 1em">
+          ${chevronDown} Users
+        </div>
+        <div class="explorer-row" style="padding-left: 2em">
+          ${chevronDown} <a href="#/explorer/public%2F~${encodeURIComponent(Session.getPubKey())}">${Session.getPubKey()}</a>
+        </div>
+        <${ExplorerNode} indent=${3} gun=${State.public} path='public/~${Session.getPubKey()}'/>
+        <div class="explorer-row" style="padding-left: 1em">
+          ${chevronRight} <a href="#/explorer/public%2F%23">#</a> (content-addressed values, such as public posts)
+        </div>
+        <br/><br/>
+        <div class="explorer-row">
+          ${chevronDown} Local (only stored on your device)
+        </div>
+        <${ExplorerNode} indent=${1} gun=${State.local} path='local'/>
+      `}
     `;
   }
 }

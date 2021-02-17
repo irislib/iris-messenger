@@ -1,25 +1,26 @@
-import { Component } from '../lib/preact.js';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
 import State from '../State.js';
-import Header from './Header.js';
 import MessageForm from './MessageForm.js';
 import Identicon from './Identicon.js';
 import FollowButton from './FollowButton.js';
 import CopyButton from './CopyButton.js';
 import MessageFeed from './MessageFeed.js';
 import Session from '../Session.js';
+import IrisView from './IrisView.js';
 import {translate as t} from '../Translation.js';
 
 const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
-class FeedView extends Component {
+class FeedView extends IrisView {
   constructor() {
     super();
     this.eventListeners = {};
     this.following = new Set();
     this.state = {sortedMessages: []};
     this.messages = {};
+    this.id = 'message-view';
+    this.class = 'public-messages-view';
   }
 
   getMessages(/*show2ndDegreeFollows*/) {
@@ -99,23 +100,19 @@ class FeedView extends Component {
     return '';
   }
 
-  render() {
+  renderView() {
     return html`
-      <${Header} toggleMenu=${show => this.toggleMenu(show)}/>
-      <div class="main-view public-messages-view" id="message-view">
-        <div class="centered-container">
-          <${MessageForm} activeChat="public" class="hidden-xs" autofocus=${false}/>
-
-          <!--<div class="feed-settings">
-            <button onClick="${() => {
-                State.local.get('show2ndDegreeFollows').put(!this.state.show2ndDegreeFollows);
-              }}">
-              ${this.state.show2ndDegreeFollows ? 'Hide' : 'Show'} messages from 2nd degree follows
-            </button>
-          </div>-->
-          ${this.getNotification()}
-          <${MessageFeed} node=${State.local.get('feed')} />
-        </div>
+      <div class="centered-container">
+        <${MessageForm} activeChat="public" class="hidden-xs" autofocus=${false}/>
+        <!--<div class="feed-settings">
+          <button onClick="${() => {
+              State.local.get('show2ndDegreeFollows').put(!this.state.show2ndDegreeFollows);
+            }}">
+            ${this.state.show2ndDegreeFollows ? 'Hide' : 'Show'} messages from 2nd degree follows
+          </button>
+        </div>-->
+        ${this.getNotification()}
+        <${MessageFeed} node=${State.local.get('feed')} />
       </div>
     `;
   }

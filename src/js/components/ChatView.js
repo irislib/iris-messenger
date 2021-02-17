@@ -1,6 +1,6 @@
-import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
+import IrisView from './IrisView.js';
 import State from '../State.js';
 import Header from './Header.js';
 import Identicon from './Identicon.js';
@@ -40,10 +40,11 @@ function copyMyChatLinkClicked(e) {
 
 const getNumFromStyle = numStr => Number(numStr.substring(0, numStr.length - 2));
 
-class ChatView extends Component {
+class ChatView extends IrisView {
   constructor() {
     super();
     this.eventListeners = {};
+    this.id = "chat-view";
   }
 
   componentDidMount() {
@@ -157,7 +158,7 @@ class ChatView extends Component {
     document.getElementById("message-list").style.paddingBottom = 0;
   }
 
-  render() {
+  renderView() {
     const now = new Date();
     const nowStr = now.toLocaleDateString();
     let previousDateStr;
@@ -196,8 +197,6 @@ class ChatView extends Component {
     });
 
     return html`
-    <${Header} toggleMenu=${show => this.toggleMenu(show)}/>
-    <div id="chat-view" class="main-view">
     <${ChatList} class=${this.props.id ? 'hidden-xs' : ''}/>
     <div id="chat-main" class=${this.props.id ? '' : 'hidden-xs'}>
     ${this.props.id && this.props.id.length > 20 ? html`
@@ -233,7 +232,7 @@ class ChatView extends Component {
           ) : ''}
         </div>
       `: ''}
-      </div>`;
+      `;
   }
 
   adjustPaddings(isScrollDown) {

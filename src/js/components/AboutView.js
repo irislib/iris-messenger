@@ -1,8 +1,10 @@
 import {translate as t} from '../Translation.js';
 import { html } from '../Helpers.js';
+import Header from './Header.js';
 
 export default () => {
   return html`
+    <${Header}/>
     <div class="main-view" id="settings">
       <div class="centered-container">
         <h3>${t('about')}</h3>

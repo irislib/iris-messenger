@@ -1,4 +1,3 @@
-import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
@@ -9,8 +8,9 @@ import SafeImg from './SafeImg.js';
 import CopyButton from './CopyButton.js';
 import FollowButton from './FollowButton.js';
 import Identicon from './Identicon.js';
+import IrisView from './IrisView.js';
 
-class StoreView extends Component {
+class StoreView extends IrisView {
   constructor() {
     super();
     this.eventListeners = [];
@@ -19,6 +19,7 @@ class StoreView extends Component {
     this.cart = {};
     this.state = {items:{}};
     this.items = {};
+    this.id = 'profile';
   }
 
   addToCart(k, e) {
@@ -34,7 +35,7 @@ class StoreView extends Component {
     }
   }
 
-  render() {
+  renderView() {
     if (this.shouldRedirect()) {
       return '';
     }
@@ -54,7 +55,6 @@ class StoreView extends Component {
       }
     }
     return html`
-    <div class="main-view" id="profile">
       <div class="content">
         <div class="profile-top">
           <div class="profile-header">
@@ -122,7 +122,7 @@ class StoreView extends Component {
           })}
         </div>
       </div>
-    </div>`;
+    `;
   }
 
   componentWillUnmount() {

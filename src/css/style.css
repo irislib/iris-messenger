@@ -479,6 +479,7 @@ header.footer .header-content {
   background: var(--sidebar-bg);
   transition: all 0.25s ease;
   padding-top: 15px;
+  user-select: none;
 }
 
 .participant-list .text {
