@@ -145,21 +145,24 @@ img, video {
 }
 
 .application-list a.logo {
-  display: flex;
-  align-items: center;
-  transition: opacity 0.1s ease;
   padding: 15px 30px;
 }
 
-.application-list a.logo:focus {
+a.logo {
+  display: flex;
+  align-items: center;
+  transition: opacity 0.1s ease;
+}
+
+a.logo:focus {
   opacity: 0.75;
 }
 
-.application-list a.logo img:first-child {
+a.logo img:first-child {
   margin-right: 9px;
 }
 
-.application-list a.logo img:last-child {
+a.logo img:last-child {
   filter: var(--logotype-filter);
 }
 
