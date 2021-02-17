@@ -647,6 +647,13 @@ header.footer .header-content {
   padding: 7px;
   min-width: 55px;
   text-align: center;
+  position: relative;
+}
+
+.application-list .icon .unseen {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
 }
 
 .application-list .text {

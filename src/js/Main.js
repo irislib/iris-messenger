@@ -59,36 +59,47 @@ const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
   {url: '/about', text: t('about')},
 ];
 
-const Menu = () => {
-  const pub = Session.getPubKey();
-  return html`
-    <div class="application-list">
-      ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
-        <a href="/" class="hidden-xs" tabindex="0" class="logo">
-          <img class="hidden-xs" src="img/icon128.png" width=40 height=40/>
-          <img src="img/iris_logotype.png" height=23 width=41 />
-        </a>
-      `}
-      <div class="visible-xs-block">
-        <${Link} onClick=${() => State.local.get('toggleMenu').put(false)} activeClassName="active" href="/profile/${pub}">
-          <span class="icon"><${Identicon} str=${pub} width=40/></span>
-          <span class="text" style="font-size: 1.2em;border:0;margin-left: 7px;"><iris-text user="${pub}" path="profile/name" editable="false"/></span>
-        <//>
-        <br/><br/>
+class Menu extends Component {
+  componentDidMount() {
+    State.local.get('unseenTotal').on(unseenTotal => {
+      this.setState({unseenTotal});
+    });
+  }
+
+  render() {
+    const pub = Session.getPubKey();
+    return html`
+      <div class="application-list">
+        ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
+          <a href="/" class="hidden-xs" tabindex="0" class="logo">
+            <img class="hidden-xs" src="img/icon128.png" width=40 height=40/>
+            <img src="img/iris_logotype.png" height=23 width=41 />
+          </a>
+        `}
+        <div class="visible-xs-block">
+          <${Link} onClick=${() => State.local.get('toggleMenu').put(false)} activeClassName="active" href="/profile/${pub}">
+            <span class="icon"><${Identicon} str=${pub} width=40/></span>
+            <span class="text" style="font-size: 1.2em;border:0;margin-left: 7px;"><iris-text user="${pub}" path="profile/name" editable="false"/></span>
+          <//>
+          <br/><br/>
+        </div>
+        ${APPLICATIONS.map(a => {
+          if (a.url) {
+            return html`
+              <${a.native ? 'a' : Link} onClick=${() => State.local.get('toggleMenu').put(false)} activeClassName="active" href=${a.url}>
+                <span class="icon">
+                  ${a.text === t('messages') && this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
+                  ${a.icon || Icons.circle}
+                </span>
+                <span class="text">${a.text}</span>
+              <//>`;
+          } else {
+            return html`<br/><br/>`;
+          }
+        })}
       </div>
-      ${APPLICATIONS.map(a => {
-        if (a.url) {
-          return html`
-            <${a.native ? 'a' : Link} onClick=${() => State.local.get('toggleMenu').put(false)} activeClassName="active" href=${a.url}>
-              <span class="icon">${a.icon || Icons.circle}</span>
-              <span class="text">${a.text}</span>
-            <//>`;
-        } else {
-          return html`<br/><br/>`;
-        }
-      })}
-    </div>
-  `;
+    `;
+  }
 };
 
 class Main extends Component {
