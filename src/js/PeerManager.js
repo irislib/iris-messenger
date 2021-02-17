@@ -5,6 +5,7 @@ import Session from './Session.js';
 import {translate as t} from './Translation.js';
 
 var MAX_PEER_LIST_SIZE = 10;
+const ELECTRON_GUN_URL = 'http://localhost:8767/gun';
 var maxConnectedPeers = iris.util.isElectron ? 2 : 1;
 const DEFAULT_PEERS = {
   'https://iris.cx/gun': {},
@@ -50,7 +51,7 @@ function getPeers() {
     p = DEFAULT_PEERS;
   }
   if (iris.util.isElectron) {
-    p['http://localhost:8767/gun'] = {};
+    p[ELECTRON_GUN_URL] = {};
   }
   Object.keys(p).forEach(k => _.defaults(p[k], {enabled: true}));
   return p;
@@ -84,11 +85,18 @@ function disablePeer(url, peerFromGun) {
 }
 
 function getRandomPeers() {
-  return _.sample(
+  const connectToLocalElectron = iris.util.isElectron && peers[ELECTRON_GUN_URL] && peers[ELECTRON_GUN_URL].enabled !== false;
+  const sampleSize = connectToLocalElectron ? Math.max(maxConnectedPeers - 1, 1) : maxConnectedPeers;
+  const sample = _.sample(
     Object.keys(
-      _.pick(peers, p => { return p.enabled; })
-    ), maxConnectedPeers
+      _.pick(peers, (p, url) => { return p.enabled && !(iris.util.isElectron && url === ELECTRON_GUN_URL); })
+    ), sampleSize
   );
+  if (connectToLocalElectron) {
+    sample.push(ELECTRON_GUN_URL);
+  }
+  console.log('random peers', sample);
+  return sample;
 }
 
 var askForPeers = _.once(pub => {
