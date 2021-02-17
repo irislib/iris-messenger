@@ -12,6 +12,7 @@ let onlineTimeout;
 let ourActivity;
 let hasFollowers;
 const follows = {};
+const blocks = {};
 const channels = window.channels = {};
 
 const DEFAULT_SETTINGS = {
@@ -50,7 +51,8 @@ function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
 
   addFollow(k, currentDepth - 1);
 
-  State.public.user(k).get('follow').map().once((isFollowing, followedKey) => { // TODO: .on for unfollow
+  State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: .on for unfollow
+    if (follows[followedKey] === isFollowing) { return; }
     if (isFollowing) {
       addFollow(followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
@@ -137,6 +139,11 @@ function login(k) {
   State.local.get('follows').put({a:null});
   Notifications.init();
   State.local.get('loggedIn').put(true);
+  State.public.get('block').map().on((isBlocked, user) => {
+    blocks[user] = isBlocked;
+    isBlocked && (follows[user] = null);
+    State.local.get('follows').get(user).put(isBlocked);
+  });
   getFollowsFn((k, info) => {
     State.local.get('follows').get(k).put(true);
     if (!hasFollowers && k === getPubKey() && info.followers.size) {

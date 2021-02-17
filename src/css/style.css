@@ -1408,32 +1408,39 @@ form.public {
   font-weight: bold;
 }
 
-.follow {
+.follow, .block {
   min-width: 110px;
   transition: background-color 0.1s ease;
   padding: 5px 20px;
 }
 
-.follow.following {
+.block.blocked, .follow.following {
   background-color: var(--notify);
   color: var(--text-color);
   border: var(--button-border-size) solid var(--notify);
 }
 
-.follow.following:hover {
+.block.blocked {
   background-color: var(--warning-background);
-  border-color: var(--warning-background);
 }
 
-.follow .hover {
+.block.blocked:hover {
+  background-color: var(--notify);
+}
+
+.follow.following:hover {
+  background-color: var(--warning-background);
+}
+
+.block .hover, .follow .hover {
   display: none;
 }
 
-.follow.following:hover .hover {
+.block.blocked:hover .hover, .follow.following:hover .hover {
   display: inline;
 }
 
-.follow.following:hover .nonhover {
+.block.blocked:hover .nonhover, .follow.following:hover .nonhover {
   display: none;
 }
 

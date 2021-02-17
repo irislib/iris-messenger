@@ -15,7 +15,7 @@ class SearchBox extends Component {
     this.state = {results:[]};
     this.debouncedIndexAndSearch = _.debounce(() => {
       const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
-      this.fuse = new Fuse(Object.values(Session.getFollows()), options);
+      this.fuse = new Fuse(Object.values(Session.getFollows()), options); // TODO: this gets reinitialized with Header on each view change. slow?
       this.search();
     }, 200);
   }

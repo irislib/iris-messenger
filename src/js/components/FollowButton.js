@@ -8,21 +8,30 @@ class FollowButton extends Component {
   constructor() {
     super();
     this.eventListeners = {};
+    this.key = 'follow';
+    this.activeClass = 'following';
+    this.hoverAction = 'unfollow';
   }
 
   onClick(e) {
     e.preventDefault();
-    const follow = !this.state.following;
-    State.public.user().get('follow').get(this.props.id).put(follow);
-    if (follow) {
+    const value = !this.state[this.key];
+    if (value && this.key === 'follow') {
       Session.newChannel(this.props.id);
+      State.public.user().get('block').get(this.props.id).put(false);
     }
+    if (value && this.key === 'block') {
+      State.public.user().get('follow').get(this.props.id).put(false);
+    }
+    State.public.user().get(this.key).get(this.props.id).put(value);
   }
 
   componentDidMount() {
-    State.public.user().get('follow').get(this.props.id).on((following, a, b, e) => {
-      this.setState({following});
-      this.eventListeners['follow'] = e;
+    State.public.user().get(this.key).get(this.props.id).on((value, a, b, e) => {
+      const s = {};
+      s[this.key] = value;
+      this.setState(s);
+      this.eventListeners[this.key] = e;
     });
   }
 
@@ -32,9 +41,9 @@ class FollowButton extends Component {
 
   render() {
     return html`
-      <button class="follow ${this.state.following ? 'following' : ''}" onClick=${e => this.onClick(e)}>
-        <span class="nonhover">${this.state.following ? t('following') : t('follow')}</span>
-        <span class="hover">${t('unfollow')}</span>
+      <button class="${this.key} ${this.state[this.key] ? this.activeClass : ''}" onClick=${e => this.onClick(e)}>
+        <span class="nonhover">${this.state[this.key] ? t(this.activeClass) : t(this.key)}</span>
+        <span class="hover">${t(this.hoverAction)}</span>
       </button>
     `;
   }

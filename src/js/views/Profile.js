@@ -9,6 +9,7 @@ import { route } from '../lib/preact-router.es.js';
 import SafeImg from '../components/SafeImg.js';
 import CopyButton from '../components/CopyButton.js';
 import FollowButton from '../components/FollowButton.js';
+import BlockButton from '../components/BlockButton.js';
 import MessageFeed from '../components/MessageFeed.js';
 import Identicon from '../components/Identicon.js';
 import Name from '../components/Name.js';
@@ -240,6 +241,7 @@ class Profile extends View {
                 ${this.isMyProfile ? '' : html`
                   <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
                 `}
+                ${followable ? html`<${BlockButton} id=${this.props.id}/>` : ''}
               </div>
             </div>
           </div>
@@ -280,7 +282,6 @@ class Profile extends View {
             <hr/>
             <p>
               <button class="delete-chat" onClick=${() => deleteChat(this.props.id)}>${t('delete_chat')}</button>
-              <!-- <button class="block-user">${t('block_user')}</button> -->
             </p>
             <hr/>
           </div>

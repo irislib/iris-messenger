@@ -52,7 +52,7 @@ class Chat extends View {
     this.unsubscribe();
     this.sortedMessages = [];
     this.participants = {};
-    this.setState({sortedMessages: this.sortedMessages, participants: this.participants});
+    this.setState({sortedMessages: this.sortedMessages, participants: this.participants, sidebarOpen: false});
     this.iv = null;
     this.chat = null;
     const go = () => {
@@ -218,7 +218,7 @@ class Chat extends View {
       <div class="chat-message-form"><${MessageForm} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/></div>
       `: ''}
       </div>
-      ${this.props.id && this.props.id.length < 40 ? html`
+      ${this.props.id && this.props.id !== 'new' && this.props.id.length < 40 ? html`
         <div class="participant-list">
           ${this.state.participants ? Object.keys(this.state.participants).map(k =>
             html`
