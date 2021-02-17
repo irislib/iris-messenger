@@ -467,6 +467,10 @@ header.footer .header-content {
   flex: 1;
 }
 
+.desktop-non-mac .view-area {
+  border-top-left-radius: 4px;
+}
+
 .participant-list {
   width: 190px;
   overflow-x: hidden;
@@ -495,19 +499,20 @@ header.footer .header-content {
  background-color: var(--menu-bg);
  padding: none;
  margin: 0px;
+ display: flex;
+ align-items: center;
 }
 
-.windows-titlebar .title {
- position: fixed;
- top: 0px;
- left: 6px;
+.windows-titlebar img {
+  margin-left: 7px;
+  filter: var(--logotype-filter);
 }
 
 .windows-titlebar .title-bar-btns {
  -webkit-app-region: no-drag;
  position: fixed;
  top: 0px;
- right: 6px;
+ right: 0px;
 }
 
 .title-bar-btns button {

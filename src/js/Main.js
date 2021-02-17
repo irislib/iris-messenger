@@ -123,11 +123,12 @@ class Main extends Component {
 
   render() {
     let content = '';
+    const isDesktopNonMac = this.state.platform && this.state.platform !== 'darwin';
     if (this.state.loggedIn || window.location.hash.length <= 2) {
       content = this.state.loggedIn ? html`
-        ${this.state.platform && this.state.platform !== 'darwin' ? html`
+        ${isDesktopNonMac ? html`
           <div class="windows-titlebar">
-               <div class="title">Iris</div>
+               <img src="img/iris_logotype.png" height=16 width=28 />
                <div class="title-bar-btns">
                     <button class="min-btn" onClick=${() => this.electronCmd('minimize')}>-</button>
                     <button class="max-btn" onClick=${() => this.electronCmd('maximize')}>+</button>
@@ -135,7 +136,7 @@ class Main extends Component {
                </div>
           </div>
         ` : ''}
-        <section class="main ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
+        <section class="main ${isDesktopNonMac ? 'desktop-non-mac' : ''} ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
           <${MenuView} toggleMenu=${show => this.toggleMenu(show)}/>
           <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
           <div class="view-area">
