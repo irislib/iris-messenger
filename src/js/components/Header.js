@@ -97,7 +97,7 @@ class Header extends Component {
     e.stopPropagation();
     $('a.logo').blur();
     ($(window).width() > 625) && route('/');
-    this.props.toggleMenu();
+    State.local.get('toggleMenu').put(true);
   }
 
   render() {

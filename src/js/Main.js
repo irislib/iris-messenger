@@ -58,18 +58,18 @@ const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
   {url: '/about', text: t('about')},
 ];
 
-const MenuView = props => {
+const MenuView = () => {
   const pub = Session.getPubKey();
   return html`
     <div class="application-list">
       ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
-        <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="logo">
-          <img src="img/icon128.png" width=40 height=40/>
+        <a href="/" class="hidden-xs" onClick=${e => this.onLogoClick(e)} tabindex="0" class="logo">
+          <img class="hidden-xs" src="img/icon128.png" width=40 height=40/>
           <img src="img/iris_logotype.png" height=23 width=41 />
         </a>
       `}
       <div class="visible-xs-block">
-        <${Link} onClick=${() => props.toggleMenu(false)} activeClassName="active" href="/profile/${pub}">
+        <${Link} onClick=${() => State.local.get('toggleMenu').put(false)} activeClassName="active" href="/profile/${pub}">
           <span class="icon"><${Identicon} str=${pub} width=40/></span>
           <span class="text" style="font-size: 1.2em;border:0;margin-left: 7px;"><iris-text user="${pub}" path="profile/name" editable="false"/></span>
         <//>
@@ -78,7 +78,7 @@ const MenuView = props => {
       ${APPLICATIONS.map(a => {
         if (a.url) {
           return html`
-            <${a.native ? 'a' : Link} onClick=${() => props.toggleMenu(false)} activeClassName="active" href=${a.url}>
+            <${a.native ? 'a' : Link} onClick=${() => State.local.get('toggleMenu').put(false)} activeClassName="active" href=${a.url}>
               <span class="icon">${a.icon || Icons.circle}</span>
               <span class="text">${a.text}</span>
             <//>`;
@@ -93,6 +93,8 @@ const MenuView = props => {
 class Main extends Component {
   componentDidMount() {
     State.local.get('loggedIn').on(loggedIn => this.setState({loggedIn}));
+    State.local.get('toggleMenu').put(false);
+    State.local.get('toggleMenu').on(show => this.toggleMenu(show));
     State.electron && State.electron.get('platform').on(platform => this.setState({platform}));
   }
 
@@ -137,7 +139,7 @@ class Main extends Component {
           </div>
         ` : ''}
         <section class="main ${isDesktopNonMac ? 'desktop-non-mac' : ''} ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
-          <${MenuView} toggleMenu=${show => this.toggleMenu(show)}/>
+          <${MenuView}/>
           <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
           <div class="view-area">
             <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
