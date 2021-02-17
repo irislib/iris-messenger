@@ -1,13 +1,13 @@
 import { html } from '../Helpers.js';
 import State from '../State.js';
-import Identicon from './Identicon.js';
+import Identicon from '../components/Identicon.js';
 import {translate as t} from '../Translation.js';
-import FollowButton from './FollowButton.js';
-import Name from './Name.js';
-import IrisView from './IrisView.js';
+import FollowButton from '../components/FollowButton.js';
+import Name from '../components/Name.js';
+import View from './View.js';
 import Session from '../Session.js';
 
-class FollowsView extends IrisView {
+class Follows extends View {
   constructor() {
     super();
     this.eventListeners = {};
@@ -85,4 +85,4 @@ class FollowsView extends IrisView {
   }
 }
 
-export default FollowsView;
+export default Follows;

@@ -1,18 +1,18 @@
 import Helpers, { html } from '../Helpers.js';
 import PublicMessages from '../PublicMessages.js';
 import State from '../State.js';
-import MessageForm from './MessageForm.js';
-import Identicon from './Identicon.js';
-import FollowButton from './FollowButton.js';
-import CopyButton from './CopyButton.js';
-import MessageFeed from './MessageFeed.js';
+import MessageForm from '../components/MessageForm.js';
+import Identicon from '../components/Identicon.js';
+import FollowButton from '../components/FollowButton.js';
+import CopyButton from '../components/CopyButton.js';
+import MessageFeed from '../components/MessageFeed.js';
 import Session from '../Session.js';
-import IrisView from './IrisView.js';
+import View from './View.js';
 import {translate as t} from '../Translation.js';
 
 const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
-class FeedView extends IrisView {
+class Feed extends View {
   constructor() {
     super();
     this.eventListeners = {};
@@ -118,4 +118,4 @@ class FeedView extends IrisView {
   }
 }
 
-export default FeedView;
+export default Feed;

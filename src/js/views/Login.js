@@ -1,7 +1,7 @@
 import { html } from '../Helpers.js';
 import State from '../State.js';
 import { translate as t } from '../Translation.js';
-import LanguageSelector from './LanguageSelector.js';
+import LanguageSelector from '../components/LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
 import { Component } from '../lib/preact.js';

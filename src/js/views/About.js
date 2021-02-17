@@ -1,11 +1,15 @@
 import {translate as t} from '../Translation.js';
 import { html } from '../Helpers.js';
-import Header from './Header.js';
+import View from './View.js';
 
-export default () => {
-  return html`
-    <${Header}/>
-    <div class="main-view" id="settings">
+class About extends View {
+  constructor() {
+    super();
+    this.id = "settings";
+  }
+
+  renderView() {
+    return html`
       <div class="centered-container">
         <h3>${t('about')}</h3>
         <p>Iris is like the social networking apps we're used to, but better.</p>
@@ -47,6 +51,8 @@ export default () => {
         <p dangerouslySetInnerHTML=${{ __html:t('donate_info') + ': 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST' }}></p>
         <p>Dogecoin: DEsgP4H1Sjp4461PugHDNnoGd6S8pTvrm1</p>
       </div>
-    </div>
-  `;
+    `;
+  }
 };
+
+export default About;

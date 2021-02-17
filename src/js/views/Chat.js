@@ -1,16 +1,16 @@
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
-import IrisView from './IrisView.js';
+import View from './View.js';
 import State from '../State.js';
-import Header from './Header.js';
-import Identicon from './Identicon.js';
-import Message from './Message.js';
-import MessageForm from './MessageForm.js';
+import Header from '../components/Header.js';
+import Identicon from '../components/Identicon.js';
+import Message from '../components/Message.js';
+import MessageForm from '../components/MessageForm.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Notifications from '../Notifications.js';
-import ChatList from './ChatList.js';
-import NewChat from './NewChat.js';
+import ChatList from '../components/ChatList.js';
+import NewChat from '../components/NewChat.js';
 import ScrollWindow from '../lib/ScrollWindow.js';
 
 const caretDownSvg = html`
@@ -40,7 +40,7 @@ function copyMyChatLinkClicked(e) {
 
 const getNumFromStyle = numStr => Number(numStr.substring(0, numStr.length - 2));
 
-class ChatView extends IrisView {
+class Chat extends View {
   constructor() {
     super();
     this.eventListeners = {};
@@ -319,4 +319,4 @@ class ChatView extends IrisView {
   }
 }
 
-export default ChatView;
+export default Chat;

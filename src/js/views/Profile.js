@@ -1,20 +1,19 @@
-import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
-import Header from './Header.js';
-import MessageForm from './MessageForm.js';
-import ProfilePhotoPicker from './ProfilePhotoPicker.js';
+import MessageForm from '../components/MessageForm.js';
+import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
-import SafeImg from './SafeImg.js';
-import CopyButton from './CopyButton.js';
-import FollowButton from './FollowButton.js';
-import MessageFeed from './MessageFeed.js';
-import Identicon from './Identicon.js';
-import Name from './Name.js';
-import SearchBox from './SearchBox.js';
+import SafeImg from '../components/SafeImg.js';
+import CopyButton from '../components/CopyButton.js';
+import FollowButton from '../components/FollowButton.js';
+import MessageFeed from '../components/MessageFeed.js';
+import Identicon from '../components/Identicon.js';
+import Name from '../components/Name.js';
+import View from './View.js';
+import SearchBox from '../components/SearchBox.js';
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
@@ -22,12 +21,13 @@ function deleteChat(pub) {
   State.local.get('channels').get(pub).put(null);
 }
 
-class Profile extends Component {
+class Profile extends View {
   constructor() {
     super();
     this.eventListeners = [];
     this.followedUsers = new Set();
     this.followers = new Set();
+    this.id = "profile";
   }
 
   onProfilePhotoSet(src) {
@@ -188,7 +188,7 @@ class Profile extends Component {
     return '';
   }
 
-  render() {
+  renderView() {
     this.isMyProfile = Session.getPubKey() === this.props.id;
     const chat = Session.channels[this.props.id];
     const uuid = chat && chat.uuid;
@@ -206,8 +206,6 @@ class Profile extends Component {
       }
     }
     return html`
-    <${Header}/>
-    <div class="main-view" id="profile">
       <div class="content">
         <div class="profile-top">
           <div class="profile-header">
@@ -297,7 +295,7 @@ class Profile extends Component {
           </div>
         `}
       </div>
-    </div>`;
+    `;
   }
 
   componentWillUnmount() {
@@ -438,4 +436,4 @@ function areWeAdmin(uuid) {
   return !!(me && me.permissions && me.permissions.admin);
 }
 
-export default {Profile};
+export default Profile;

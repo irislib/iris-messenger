@@ -1,8 +1,8 @@
 import { Component } from '../lib/preact.js';
-import Header from './Header.js';
+import Header from '../components/Header.js';
 import { html } from '../Helpers.js';
 
-class IrisView extends Component {
+class View extends Component {
   render() {
     return html`
       <${Header}/>
@@ -13,4 +13,4 @@ class IrisView extends Component {
   }
 }
 
-export default IrisView;
+export default View;

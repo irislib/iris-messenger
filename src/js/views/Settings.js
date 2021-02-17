@@ -2,16 +2,16 @@ import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
-import LanguageSelector from './LanguageSelector.js';
+import LanguageSelector from '../components/LanguageSelector.js';
 import {translate as t} from '../Translation.js';
 import PeerManager from '../PeerManager.js';
-import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from './VideoCall.js';
-import CopyButton from './CopyButton.js';
-import IrisView from './IrisView.js';
+import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../components/VideoCall.js';
+import CopyButton from '../components/CopyButton.js';
+import View from './View.js';
 import { route } from '../lib/preact-router.es.js';
 import {ExistingAccountLogin} from './Login.js';
 
-class Settings extends IrisView {
+class Settings extends View {
   constructor() {
     super();
     this.eventListeners = [];

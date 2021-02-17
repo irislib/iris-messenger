@@ -2,15 +2,15 @@ import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
-import ProfilePhotoPicker from './ProfilePhotoPicker.js';
+import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
-import SafeImg from './SafeImg.js';
-import CopyButton from './CopyButton.js';
-import FollowButton from './FollowButton.js';
-import Identicon from './Identicon.js';
-import IrisView from './IrisView.js';
+import SafeImg from '../components/SafeImg.js';
+import CopyButton from '../components/CopyButton.js';
+import FollowButton from '../components/FollowButton.js';
+import Identicon from '../components/Identicon.js';
+import View from './View.js';
 
-class StoreView extends IrisView {
+class Store extends View {
   constructor() {
     super();
     this.eventListeners = [];
@@ -176,4 +176,4 @@ class StoreView extends IrisView {
   }
 }
 
-export default StoreView;
+export default Store;

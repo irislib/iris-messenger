@@ -1,10 +1,10 @@
 import { html } from '../Helpers.js';
-import PublicMessage from './PublicMessage.js';
-import MessageForm from './MessageForm.js';
+import PublicMessage from '../components/PublicMessage.js';
+import MessageForm from '../components/MessageForm.js';
 import { route } from '../lib/preact-router.es.js';
-import IrisView from './IrisView.js';
+import View from './View.js';
 
-class MessageView extends IrisView {
+class Message extends View {
   constructor() {
     super();
     this.class = "public-messages-view";
@@ -29,4 +29,4 @@ class MessageView extends IrisView {
   }
 }
 
-export default MessageView;
+export default Message;

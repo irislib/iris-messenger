@@ -3,7 +3,7 @@ import State from '../State.js';
 import Session from '../Session.js';
 import { Component } from '../lib/preact.js';
 import ScrollViewport from '../lib/preact-scroll-viewport.js';
-import IrisView from './IrisView.js';
+import View from './View.js';
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
@@ -20,7 +20,7 @@ const chevronRight = html`
 </svg>
 `;
 
-class ExplorerView extends IrisView {
+class Explorer extends View {
   renderView() {
     const split = (this.props.node || '').split('/');
     const gun = (split.length && split[0]) === 'local' ? State.local : State.public;
@@ -265,4 +265,4 @@ class ExplorerNode extends Component {
   }
 }
 
-export default ExplorerView;
+export default Explorer;

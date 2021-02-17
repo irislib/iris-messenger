@@ -11,22 +11,23 @@ import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 import { translate as t } from './Translation.js';
 
-import Settings from './components/Settings.js';
-import LogoutConfirmation from './components/LogoutConfirmation.js';
-import ChatView from './components/ChatView.js';
-import StoreView from './components/StoreView.js';
-import CheckoutView from './components/CheckoutView.js';
-import ProductView from './components/ProductView.js';
-import Login from './components/Login.js';
-import Profile from './components/Profile.js';
-import Footer from './components/Footer.js';
-import MessageView from './components/MessageView.js';
-import FollowsView from './components/FollowsView.js';
-import FeedView from './components/FeedView.js';
-import AboutView from './components/AboutView.js';
-import ExplorerView from './components/ExplorerView.js';
+import Settings from './views/Settings.js';
+import LogoutConfirmation from './views/LogoutConfirmation.js';
+import Chat from './views/Chat.js';
+import Store from './views/Store.js';
+import Checkout from './views/Checkout.js';
+import Product from './views/Product.js';
+import Login from './views/Login.js';
+import Profile from './views/Profile.js';
+import Message from './views/Message.js';
+import Follows from './views/Follows.js';
+import Feed from './views/Feed.js';
+import About from './views/About.js';
+import Explorer from './views/Explorer.js';
+
 import VideoCall from './components/VideoCall.js';
 import Identicon from './components/Identicon.js';
+import Footer from './components/Footer.js';
 import State from './State.js';
 import Icons from './Icons.js';
 import PublicMessages from './PublicMessages.js';
@@ -58,12 +59,12 @@ const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
   {url: '/about', text: t('about')},
 ];
 
-const MenuView = () => {
+const Menu = () => {
   const pub = Session.getPubKey();
   return html`
     <div class="application-list">
       ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
-        <a href="/" class="hidden-xs" onClick=${e => this.onLogoClick(e)} tabindex="0" class="logo">
+        <a href="/" class="hidden-xs" tabindex="0" class="logo">
           <img class="hidden-xs" src="img/icon128.png" width=40 height=40/>
           <img src="img/iris_logotype.png" height=23 width=41 />
         </a>
@@ -139,27 +140,27 @@ class Main extends Component {
           </div>
         ` : ''}
         <section class="main ${isDesktopNonMac ? 'desktop-non-mac' : ''} ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
-          <${MenuView}/>
+          <${Menu}/>
           <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
           <div class="view-area">
             <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
-              <${FeedView} path="/"/>
-              <${FeedView} path="/feed"/>
+              <${Feed} path="/"/>
+              <${Feed} path="/feed"/>
               <${Login} path="/login"/>
-              <${ChatView} path="/chat/:id?"/>
-              <${MessageView} path="/post/:hash"/>
-              <${AboutView} path="/about"/>
+              <${Chat} path="/chat/:id?"/>
+              <${Message} path="/post/:hash"/>
+              <${About} path="/about"/>
               <${Settings} path="/settings" showSwitchAccount=${true}/>
               <${LogoutConfirmation} path="/logout"/>
-              <${Profile.Profile} path="/profile/:id?"/>
-              <${StoreView} path="/store/:store?"/>
-              <${CheckoutView} path="/checkout/:store"/>
-              <${ProductView} path="/product/:product/:store"/>
-              <${ProductView} path="/product/new" store=Session.getPubKey()/>
-              <${ExplorerView} path="/explorer/:node"/>
-              <${ExplorerView} path="/explorer"/>
-              <${FollowsView} path="/follows/:id"/>
-              <${FollowsView} followers=${true} path="/followers/:id"/>
+              <${Profile} path="/profile/:id?"/>
+              <${Store} path="/store/:store?"/>
+              <${Checkout} path="/checkout/:store"/>
+              <${Product} path="/product/:product/:store"/>
+              <${Product} path="/product/new" store=Session.getPubKey()/>
+              <${Explorer} path="/explorer/:node"/>
+              <${Explorer} path="/explorer"/>
+              <${Follows} path="/follows/:id"/>
+              <${Follows} followers=${true} path="/followers/:id"/>
             </${Router}>
           </div>
         </section>

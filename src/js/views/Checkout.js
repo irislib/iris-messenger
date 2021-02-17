@@ -2,10 +2,10 @@ import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import { route } from '../lib/preact-router.es.js';
-import SafeImg from './SafeImg.js';
-import StoreView from './StoreView.js';
+import SafeImg from '../components/SafeImg.js';
+import Store from './Store.js';
 
-class CheckoutView extends StoreView {
+class Checkout extends Store {
   constructor() {
     super();
     this.eventListeners = [];
@@ -209,4 +209,4 @@ class CheckoutView extends StoreView {
   }
 }
 
-export default CheckoutView;
+export default Checkout;

@@ -2,9 +2,9 @@ import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import { route } from '../lib/preact-router.es.js';
-import StoreView from './StoreView.js';
+import StoreView from './Store.js';
 
-class ProductView extends StoreView {
+class Product extends StoreView {
   constructor() {
     super();
     this.eventListeners = [];
@@ -118,4 +118,4 @@ class ProductView extends StoreView {
   }
 }
 
-export default ProductView;
+export default Product;
