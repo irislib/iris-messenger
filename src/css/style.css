@@ -1690,7 +1690,11 @@ form.public {
   .feed-settings {
     margin: 0 15px 15px 15px;
     display: flex;
-  }fma
+  }
+  .feed-container > p button {
+    margin-right: 0;
+    margin-left: 5px;
+  }
   .feed-settings button {
     flex: 1;
     text-align: center;
