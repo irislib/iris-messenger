@@ -3,6 +3,7 @@ import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import ScrollWindow from '../lib/ScrollWindow.js';
 import State from '../State.js';
+import { translate as t } from '../Translation.js';
 
 const size = 10;
 
@@ -53,8 +54,8 @@ class MessageFeed extends Component {
       <div class="feed-container">
         ${showButtons ? html`
           <p>
-            <button onClick=${() => this.scroller.up()}>Up</button>
-            <button onClick=${() => this.topClicked()}>Top</button>
+            <button onClick=${() => this.scroller.up()}>${t(feed_up)}</button>
+            <button onClick=${() => this.topClicked()}>${t(feed_top)}</button>
           </p>
         `: ''}
         ${this.state.sortedMessages
@@ -62,8 +63,8 @@ class MessageFeed extends Component {
         }
         ${showButtons ? html`
           <p>
-            <button onClick=${() => this.scroller.down()}>Down</button>
-            <button onClick=${() => this.bottomClicked()}>Bottom</button>
+            <button onClick=${() => this.scroller.down()}>${t(feed_down)}</button>
+            <button onClick=${() => this.bottomClicked()}>${t(feed_bottom)}</button>
           </p>
         `: ''}
       </div>
