@@ -115,7 +115,11 @@ export default {
     on_call_with: "On call with",
     delete: 'Delete',
     confirm_delete_msg: 'Delete message?',
-    search: 'Search'
+    search: 'Search',
+    feed_up: 'Newer',
+    feed_top: 'Newest',
+    feed_down: 'Older',
+    feed_bottom: 'Oldest'
   },
    "es": {
     language_name: "Español",
