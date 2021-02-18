@@ -815,6 +815,7 @@ a.msg {
   flex-direction:column;
   flex:3;
   max-width:100%;
+  min-width: 0;
 }
 
 .chat-list .seen-indicator {
