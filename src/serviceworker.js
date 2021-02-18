@@ -62,12 +62,15 @@ self.addEventListener('push', async ev => {
     await getSavedKey();
   }
   const data = ev.data.json();
+  if (!data.title || !data.body) {
+    console.log('what?', data);
+  }
   if (self.irisKey && data.from && data.from.epub) {
     const secret = await Gun.SEA.secret(data.from.epub, self.irisKey);
     data.title = await Gun.SEA.decrypt(data.title, secret);
     data.body = await Gun.SEA.decrypt(data.body, secret);
   }
-  if (data.title.indexOf('SEA{') === 0) {
+  if (data.title && data.title.indexOf('SEA{') === 0) {
     data.title = '';
     data.body = 'Encrypted message';
   }

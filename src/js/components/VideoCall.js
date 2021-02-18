@@ -1,10 +1,11 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
+import { route } from '../lib/preact-router.es.js';
 
-import {chats, showChat} from '../Chat.js';
 import {translate as t} from '../Translation.js';
+import Session from '../Session.js';
 
-import {localState} from '../Main.js';
+import State from '../State.js';
 
 var ringSound = new Audio('../../audio/ring.mp3');
 ringSound.loop = true;
@@ -35,13 +36,13 @@ function setRTCConfig(c) {
 
 class VideoCall extends Component {
   componentDidMount() {
-    localState.get('activeCall').put(null);
-    localState.get('outgoingCall').put(null);
-    localState.get('incomingCall').put(null);
-    localState.get('call').open(call => {
+    State.local.get('activeCall').put(null);
+    State.local.get('outgoingCall').put(null);
+    State.local.get('incomingCall').put(null);
+    State.local.get('call').open(call => {
       this.onCallMessage(call.pub, call.call);
     });
-    localState.get('incomingCall').on(incomingCall => {
+    State.local.get('incomingCall').on(incomingCall => {
       if (!incomingCall) {
         clearTimeout(callTimeout);
         ringSound.pause();
@@ -54,19 +55,19 @@ class VideoCall extends Component {
       }
       this.setState({incomingCall});
     });
-    localState.get('activeCall').on(activeCall => {
+    State.local.get('activeCall').on(activeCall => {
       this.setState({activeCall})
       this.stopCalling();
     });
-    localState.get('outgoingCall').on(outgoingCall => {
+    State.local.get('outgoingCall').on(outgoingCall => {
       outgoingCall && this.onCallUser(outgoingCall);
       this.setState({outgoingCall});
     });
   }
 
   async answerCall(pub) {
-    localState.get('incomingCall').put(null);
-    localState.get('activeCall').put(pub);
+    State.local.get('incomingCall').put(null);
+    State.local.get('activeCall').put(pub);
     await this.initConnection(false, pub);
   }
 
@@ -79,13 +80,13 @@ class VideoCall extends Component {
         return;
       }
       if (call.offer) {
-        if (chats[pub].rejectedTime && (new Date() - chats[pub].rejectedTime < 5000)) {
+        if (Session.channels[pub].rejectedTime && (new Date() - Session.channels[pub].rejectedTime < 5000)) {
           this.rejectCall(pub);
           return;
         }
-        localState.get('incomingCall').put(pub);
+        State.local.get('incomingCall').put(pub);
         clearTimeout(callTimeout);
-        callTimeout = setTimeout(() => localState.get('incomingCall').put(null), 5000);
+        callTimeout = setTimeout(() => State.local.get('incomingCall').put(null), 5000);
       }
     } else {
       this.callClosed(pub);
@@ -94,23 +95,23 @@ class VideoCall extends Component {
 
   notifyIfNotVisible(pub, text) {
      if (document.visibilityState !== 'visible') {
-      incomingCallNotification = new Notification(chats[pub].name, {
+      incomingCallNotification = new Notification(Session.channels[pub].name, {
         icon: 'img/icon128.png',
         body: text,
         requireInteraction: true,
         silent: true
       });
       incomingCallNotification.onclick = function() {
-        showChat(pub);
+        route('/chat/' + pub);
         window.focus();
       };
     }
   }
 
   resetCalls() {
-    localState.get('outgoingCall').put(null);
-    localState.get('activeCall').put(null);
-    localState.get('incomingCall').put(null);
+    State.local.get('outgoingCall').put(null);
+    State.local.get('activeCall').put(null);
+    State.local.get('incomingCall').put(null);
   }
 
   callClosed(pub) {
@@ -121,11 +122,13 @@ class VideoCall extends Component {
       this.notifyIfNotVisible(t('call_rejected'));
     } else if (this.state.activeCall) {
       this.stopUserMedia(pub);
-      chats[pub].put('call', 'null');
+      Session.channels[pub].put('call', 'null');
       this.notifyIfNotVisible(t('call_ended'));
     }
-    chats[pub].pc && chats[pub].pc.close();
-    chats[pub].pc = null;
+    if (Session.channels[pub]) {
+      Session.channels[pub].pc && Session.channels[pub].pc.close();
+      Session.channels[pub].pc = null;      
+    }
   }
 
   async addStreamToPeerConnection(pc) {
@@ -155,7 +158,7 @@ class VideoCall extends Component {
 
     await this.initConnection(true, pub);
     console.log('calling', pub);
-    var call = () => chats[pub].put('call', {
+    var call = () => Session.channels[pub].put('call', {
       time: new Date().toISOString(),
       type: video ? 'video' : 'voice',
       offer: true,
@@ -164,16 +167,16 @@ class VideoCall extends Component {
     call();
     callSound.addEventListener('ended', () => this.timeoutPlayCallSound());
     callSound.play();
-    localState.get('outgoingCall').put(pub);
+    State.local.get('outgoingCall').put(pub);
   }
 
   cancelCall(pub) {
-    localState.get('outgoingCall').put(null);
+    State.local.get('outgoingCall').put(null);
     this.stopCalling();
     this.stopUserMedia(pub);
-    chats[pub].put('call', 'null');
-    chats[pub].pc && chats[pub].pc.close();
-    chats[pub].pc = null;
+    Session.channels[pub].put('call', 'null');
+    Session.channels[pub].pc && Session.channels[pub].pc.close();
+    Session.channels[pub].pc = null;
   }
 
   stopUserMedia() {
@@ -181,7 +184,7 @@ class VideoCall extends Component {
   }
 
   stopCalling() {
-    localState.get('outgoingCall').put(null);
+    State.local.get('outgoingCall').put(null);
     callSound.pause();
     callSound.removeEventListener('ended', () => this.timeoutPlayCallSound());
     clearTimeout(callSoundTimeout);
@@ -191,25 +194,25 @@ class VideoCall extends Component {
   }
 
   endCall(pub) {
-    chats[pub].pc && chats[pub].pc.close();
+    Session.channels[pub].pc && Session.channels[pub].pc.close();
     this.stopUserMedia(pub);
-    chats[pub].put('call', 'null');
-    chats[pub].pc = null;
-    localState.get('activeCall').put(null);
+    Session.channels[pub].put('call', 'null');
+    Session.channels[pub].pc = null;
+    State.local.get('activeCall').put(null);
   }
 
   rejectCall(pub) {
-    chats[pub].rejectedTime = new Date();
-    localState.get('incomingCall').put(null);
-    console.log('rejectCall', pub, chats[pub]);
-    chats[pub].put('call', 'null');
+    Session.channels[pub].rejectedTime = new Date();
+    State.local.get('incomingCall').put(null);
+    console.log('rejectCall', pub, Session.channels[pub]);
+    Session.channels[pub].put('call', 'null');
   }
 
   async initConnection(createOffer, pub) {
     console.log('initConnection', createOffer, pub);
     ourIceCandidates = {};
     const theirIceCandidateKeys = [];
-    const chat = chats[pub];
+    const chat = Session.channels[pub];
     chat.pc = new RTCPeerConnection(RTC_CONFIG);
     console.log(chat.pc.signalingState);
     await this.addStreamToPeerConnection(chat.pc);
@@ -277,7 +280,7 @@ class VideoCall extends Component {
         case "stable":
           this.stopCalling();
           console.log('call answered by', pub);
-          localState.get('activeCall').put(pub);
+          State.local.get('activeCall').put(pub);
           break;
         case "closed":
           console.log("Signalling state is 'closed'");
@@ -334,7 +337,7 @@ class VideoCall extends Component {
       <div id="active-call" style="position: fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; max-width: 100%; text-align: center; background: #000; color: #fff; padding: 15px 0">
         <div style="margin-bottom:5px;position:relative;height:50px;">
           ${resizeButton}
-          ${t('on_call_with')} ${chats[this.state.activeCall] && chats[this.state.activeCall].name}
+          ${t('on_call_with')} ${Session.channels[this.state.activeCall] && Session.channels[this.state.activeCall].name}
         </div>
         ${localVideo}
         ${remoteVideo}
@@ -342,7 +345,7 @@ class VideoCall extends Component {
       </div>`;
     } else if (this.state.outgoingCall) {
       return html`<div id="outgoing-call" style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px">
-        ${t('calling')} ${chats[this.state.outgoingCall] && chats[this.state.outgoingCall].name}
+        ${t('calling')} ${Session.channels[this.state.outgoingCall] && Session.channels[this.state.outgoingCall].name}
         <button onClick=${() => this.cancelCall(this.state.outgoingCall)} style="display:block; margin: 15px auto">
           ${t('cancel')}
         </button>
@@ -352,7 +355,7 @@ class VideoCall extends Component {
     } else if (this.state.incomingCall) {
       return html`
         <div id="incoming-call" style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px 0">
-          Incoming call from ${chats[this.state.incomingCall] && chats[this.state.incomingCall].name}
+          Incoming call from ${Session.channels[this.state.incomingCall] && Session.channels[this.state.incomingCall].name}
           <button style="display:block; margin: 15px auto" onClick=${() => this.answerCall(this.state.incomingCall)}>${t('answer')}</button>
           <button style="display:block; margin: 15px auto" onClick=${() => this.rejectCall(this.state.incomingCall)}>${t('reject')}</button>
         </div>

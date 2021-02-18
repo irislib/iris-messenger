@@ -1,8 +1,8 @@
 import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
-import {showChat} from '../Chat.js';
+import { route } from '../lib/preact-router.es.js';
 import { translate as t } from '../Translation.js';
-import {localState} from '../Main.js';
+import State from '../State.js';
 import Session from '../Session.js';
 import Identicon from './Identicon.js';
 import Helpers from '../Helpers.js';
@@ -13,12 +13,12 @@ class ChatListItem extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
-    this.eventListeners = [];
+    this.eventListeners = {};
   }
 
   componentDidMount() {
     const chat = this.props.chat;
-    localState.get('chats').get(chat.id).get('latest').on((latest, a, b, event) => {
+    State.local.get('channels').get(chat.id).get('latest').on((latest, a, b, event) => {
       /*
       if (msg.attachments) {
         text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
@@ -32,17 +32,12 @@ class ChatListItem extends Component {
       if (latest.time < chat.latestTime) { return; }
       latest.time = latest.time && new Date(latest.time);
       this.setState({latest});
-      this.eventListeners.push(event);
+      this.eventListeners['latest'] = event;
     });
   }
 
   componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
-  }
-
-  onClick() {
-    // chatListEl.find('.unseen').empty().hide();
-    showChat(this.props.chat.id);
+    Object.values(this.eventListeners).forEach(e => e.off());
   }
 
   render() {
@@ -61,13 +56,9 @@ class ChatListItem extends Component {
       name = html`📝 <b>${t('note_to_self')}</b>`;
     }
 
-    const photo = this.props.photo;
-    let iconEl;
-    if (photo) {
-      iconEl = html`<div class="identicon-container"><img src="${this.props.photo}" class="round-borders" height=49 width=49 alt=""/></div>`;
-    } else {
-      iconEl = html`<${Identicon} str=${chat.id} width=49/>`;
-    }
+    let iconEl = chat.photo ?
+      html`<div class="identicon-container"><img src="${chat.photo}" class="round-borders" height=49 width=49 alt=""/></div>` :
+      html`<${Identicon} str=${chat.id} width=49/>`;
 
     const latestEl = chat.isTyping ? '' : html`<small class="latest">
       ${this.state.latest.selfAuthored && seenIndicator}
@@ -79,7 +70,7 @@ class ChatListItem extends Component {
     const onlineIndicator = chat.id.length > 36 ? html`<div class="online-indicator"></div>` : '';
 
     return html`
-    <div class="chat-item ${activity} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => this.onClick()}>
+    <div class="chat-item ${activity} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => route('/chat/' + this.props.chat.id)}>
       ${iconEl}
       ${onlineIndicator}
       <div class="text">

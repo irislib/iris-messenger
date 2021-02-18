@@ -1,10 +1,9 @@
 import { Component } from '../lib/preact.js';
 import {html} from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import {chats} from '../Chat.js';
-import {publicState, activeProfile} from '../Main.js';
 import Helpers from '../Helpers.js';
 import SafeImg from './SafeImg.js';
+import Identicon from './Identicon.js';
 
 class ProfilePhotoPicker extends Component {
   useProfilePhotoClicked() {
@@ -19,14 +18,6 @@ class ProfilePhotoPicker extends Component {
       }
       this.setState({preview: null});
     });
-  }
-
-  removeProfilePhotoClicked() {
-    if (activeProfile) {
-      chats[activeProfile].put('photo', null);
-    } else {
-      publicState.user().get('profile').get('photo').put(null);
-    }
   }
 
   cancelProfilePhotoClicked() {
@@ -69,10 +60,9 @@ class ProfilePhotoPicker extends Component {
   }
 
   render() {
-    const currentPhoto = this.props.currentPhoto;
-    const currentPhotoEl = this.state.preview ?  '' : html`<${SafeImg} class="picker profile-photo" src=${currentPhoto} onClick=${() => this.clickProfilePhotoInput()}/>`;
+    const currentPhotoEl = this.state.preview ?  '' : html`<${SafeImg} class="picker profile-photo" src=${this.props.currentPhoto} onClick=${() => this.clickProfilePhotoInput()}/>`;
     const previewPhotoEl = this.state.preview ? html`<img id="profile-photo-preview" src=${this.state.preview}/>` : '';
-    const addProfilePhotoBtn = (currentPhoto || this.state.preview) ? '' : html`<button id="add-profile-photo" onClick=${() => this.clickProfilePhotoInput()}>${t('add_profile_photo')}</button>`;
+    const addProfilePhotoBtn = (this.props.currentPhoto || this.state.preview) ? '' : html`<div class="picker profile-photo"><${Identicon} str=${this.props.placeholder} width=250 onClick=${() => this.clickProfilePhotoInput()}/></div>`;
     return html`
       ${currentPhotoEl}
       ${addProfilePhotoBtn}
@@ -80,7 +70,6 @@ class ProfilePhotoPicker extends Component {
         ${previewPhotoEl}
       </div>
       <p>
-        <button id="remove-profile-photo" onClick=${() => this.removeProfilePhotoClicked()} class="hidden">${t('remove_photo')}</button>
         <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" onChange=${e => this.onProfilePhotoInputChange(e)} accept="image/*"/>
       </p>
       <p id="profile-photo-error" class="${this.state.hasError ? '' : 'hidden'}">${t('profile_photo_too_big')}</p>

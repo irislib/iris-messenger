@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/iriscx/public_html/
+    - /bin/cp -R src/* $DEPLOYPATH

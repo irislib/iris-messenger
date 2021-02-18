@@ -18,8 +18,13 @@ if (language !== 'en') {
   Object.keys(en).forEach(k => translation[k] = translation[k] || en[k]);
 }
 
+function capitalize(s) {
+  if (typeof s !== 'string') return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 function translate(k) {
-  return translation[k] || k;
+  return k && (translation[k] || capitalize(k.replace(/_/g, ' ')));
 }
 
 export {translate, AVAILABLE_LANGUAGES, language};

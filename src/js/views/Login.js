@@ -1,10 +1,11 @@
 import { html } from '../Helpers.js';
-import { publicState } from '../Main.js';
+import State from '../State.js';
 import { translate as t } from '../Translation.js';
-import LanguageSelector from './LanguageSelector.js';
+import LanguageSelector from '../components/LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
 import { Component } from '../lib/preact.js';
+import Helpers from '../Helpers.js';
 
 function onPastePrivKey(event) {
   const val = $(event.target).val();
@@ -18,6 +19,13 @@ function onPastePrivKey(event) {
   }
 }
 
+function onNameChange(event) {
+  if ($(event.target).val().indexOf('"priv"') !== -1) {
+    onPastePrivKey(event);
+    $(event.target).val('');
+  }
+}
+
 function showSwitchAccount(e) {
   e.preventDefault();
   $('#create-account').hide();
@@ -27,15 +35,15 @@ function showSwitchAccount(e) {
 
 function onLoginFormSubmit(e) {
   e.preventDefault();
-  var name = $('#login-form-name').val();
-  if (name.length) {
-    $('#login').hide();
-    Gun.SEA.pair().then(k => {
-      Session.login(k);
-      publicState.user().get('profile').get('name').put(name);
-      Session.createChatLink();
-    });
-  }
+  var name = $('#login-form-name').val() || Helpers.generateName();
+  $('#login').hide();
+  Gun.SEA.pair().then(k => {
+    Session.login(k);
+    State.public.user().get('profile').get('name').put(name);
+    Session.createChatLink();
+    State.local.get('noFollows').put(true);
+    State.local.get('noFollowers').put(true);
+  });
 }
 
 function showCreateAccount(e) {
@@ -57,19 +65,28 @@ function showScanPrivKey() {
   }
 }
 
+const ExistingAccountLogin = html`
+  <input id="paste-privkey" onInput=${e => onPastePrivKey(e)} placeholder="${t('paste_private_key')}"/>
+  <p>
+    <button id="scan-privkey-btn" onClick=${e => showScanPrivKey(e)}>${t('scan_private_key_qr_code')}</button>
+  </p>
+  <p>
+    <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;" class="hidden"></video>
+  </p>
+`;
+
 class Login extends Component {
   componentDidMount() {
     $('#login-form-name').focus();
   }
-
   render() {
-    return Session.getKey() ? '' : html`<section id="login">
+    return html`<section id="login">
       <div id="login-content">
         <form id="login-form" autocomplete="off" onSubmit=${e => onLoginFormSubmit(e)}>
           <div id="create-account">
             <img style="width: 86px" src="img/android-chrome-192x192.png" alt="Iris"/>
             <h1>Iris</h1>
-            <input autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
+            <input onInput=${e => onNameChange(e)} autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
             <p><button id="sign-up" type="submit">${t('new_user_go')}</button></p>
             <br/>
             <p><a href="#" id="show-existing-account-login" onClick=${e => showSwitchAccount(e)}>${t('already_have_an_account')}</a></p>
@@ -81,17 +98,12 @@ class Login extends Component {
         </form>
         <div id="existing-account-login" class="hidden">
           <p><a href="#" id="show-create-account" onClick=${e => showCreateAccount(e)}>> ${t('back')}</a></p>
-          <input id="paste-privkey" onInput=${e => onPastePrivKey(e)} placeholder="${t('paste_private_key')}"/>
-          <p>
-            <button id="scan-privkey-btn" onClick=${e => showScanPrivKey(e)}>${t('scan_private_key_qr_code')}</button>
-          </p>
-          <p>
-            <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;" class="hidden"></video>
-          </p>
+          ${ExistingAccountLogin}
         </div>
       </div>
     </section>`;
   }
 }
 
+export {ExistingAccountLogin};
 export default Login;

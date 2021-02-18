@@ -1,7 +1,7 @@
 import Helpers from './Helpers.js';
 import Session from './Session.js';
-import {chats, showChat, getDisplayName} from './Chat.js';
-import {publicState, localState} from './Main.js';
+import { route } from './lib/preact-router.es.js';
+import State from './State.js';
 import { translate as t } from './Translation.js';
 
 var notificationSound = new Audio('../../audio/notification.mp3');
@@ -28,11 +28,11 @@ function enableDesktopNotifications() {
 
 function notifyMsg(msg, info, pub) {
   function shouldNotify() {
-    if (msg.time < loginTime) { return false; }
+    if (msg.timeObj < loginTime) { return false; }
     if (info.selfAuthored) { return false; }
     if (document.visibilityState === 'visible') { return false; }
-    if (chats[pub].notificationSetting === 'nothing') { return false; }
-    if (chats[pub].notificationSetting === 'mentions' && !msg.text.includes(Session.getMyName())) { return false; }
+    if (Session.channels[pub].notificationSetting === 'nothing') { return false; }
+    if (Session.channels[pub].notificationSetting === 'mentions' && !msg.text.includes(Session.getMyName())) { return false; }
     return true;
   }
   function shouldDesktopNotify() {
@@ -46,15 +46,22 @@ function notifyMsg(msg, info, pub) {
     notificationSound.play();
   }
   if (shouldDesktopNotify()) {
-    var body = chats[pub].uuid ? `${chats[pub].participantProfiles[info.from].name}: ${msg.text}` : msg.text;
+    var body, title;
+    if (Session.channels[pub].uuid) {
+      title = Session.channels[pub].participantProfiles[info.from].name;
+      body = `${name}: ${msg.text}`;
+    } else {
+      title = 'Message'
+      body = msg.text;
+    }
     body = Helpers.truncateString(body, 50);
-    var desktopNotification = new Notification(getDisplayName(pub), {
+    var desktopNotification = new Notification(title, { // TODO: replace with actual name
       icon: 'img/icon128.png',
       body,
       silent: true
     });
     desktopNotification.onclick = function() {
-      showChat(pub);
+      route('/chat/' + pub);
       window.focus();
     };
   }
@@ -70,9 +77,9 @@ function setUnseenTotal() {
 }
 
 function changeChatUnseenCount(chatId, change) {
-  const chat = chats[chatId];
+  const chat = Session.channels[chatId];
   if (!chat) return;
-  const chatNode = localState.get('chats').get(chatId);
+  const chatNode = State.local.get('channels').get(chatId);
   if (change) {
     unseenTotal += change;
     chat.unseen += change;
@@ -82,7 +89,7 @@ function changeChatUnseenCount(chatId, change) {
   }
   chatNode.get('unseen').put(chat.unseen);
   unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
-  localState.get('unseenTotal').put(unseenTotal);
+  State.local.get('unseenTotal').put(unseenTotal);
   setUnseenTotal();
 }
 
@@ -122,9 +129,9 @@ async function subscribeToWebPush() {
 
 const addWebPushSubscriptionsToChats = _.debounce(() => {
   const arr = Object.values(webPushSubscriptions);
-  Object.values(chats).forEach(chat => {
-    if (chat.put) {
-      chat.put('webPushSubscriptions', arr);
+  Object.values(Session.channels).forEach(channel => {
+    if (channel.put) {
+      channel.put('webPushSubscriptions', arr);
     }
   });
 }, 5000);
@@ -149,7 +156,7 @@ const addWebPushSubscriptionsToSettingsDebounced = _.debounce(addWebPushSubscrip
 
 function removeSubscription(hash) {
   delete webPushSubscriptions[hash];
-  publicState.user().get('webPushSubscriptions').get(hash).put(null);
+  State.public.user().get('webPushSubscriptions').get(hash).put(null);
   addWebPushSubscriptionsToSettings();
   addWebPushSubscriptionsToChats();
 }
@@ -160,7 +167,7 @@ async function addWebPushSubscription(s, saveToGun = true) {
   const enc = await Gun.SEA.encrypt(s, mySecret);
   const hash = await iris.util.getHash(JSON.stringify(s));
   if (saveToGun) {
-    publicState.user().get('webPushSubscriptions').get(hash).put(enc);
+    State.public.user().get('webPushSubscriptions').get(hash).put(enc);
   }
   webPushSubscriptions[hash] = s;
   addWebPushSubscriptionsToChats();
@@ -170,7 +177,7 @@ async function addWebPushSubscription(s, saveToGun = true) {
 async function getWebPushSubscriptions() {
   const myKey = Session.getKey();
   const mySecret = await Gun.SEA.secret(myKey.epub, myKey);
-  publicState.user().get('webPushSubscriptions').map().on(async enc => {
+  State.public.user().get('webPushSubscriptions').map().on(async enc => {
     if (!enc) { return; }
     const s = await Gun.SEA.decrypt(enc, mySecret);
     addWebPushSubscription(s, false);
