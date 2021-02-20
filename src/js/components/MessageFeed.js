@@ -54,8 +54,8 @@ class MessageFeed extends Component {
       <div class="feed-container">
         ${showButtons ? html`
           <p>
-            <button onClick=${() => this.scroller.up()}>${t(feed_up)}</button>
-            <button onClick=${() => this.topClicked()}>${t(feed_top)}</button>
+            <button onClick=${() => this.scroller.up()}>${t('feed_up')}</button>
+            <button onClick=${() => this.topClicked()}>${t('feed_top')}</button>
           </p>
         `: ''}
         ${this.state.sortedMessages
@@ -63,8 +63,8 @@ class MessageFeed extends Component {
         }
         ${showButtons ? html`
           <p>
-            <button onClick=${() => this.scroller.down()}>${t(feed_down)}</button>
-            <button onClick=${() => this.bottomClicked()}>${t(feed_bottom)}</button>
+            <button onClick=${() => this.scroller.down()}>${t('feed_down')}</button>
+            <button onClick=${() => this.bottomClicked()}>${t('feed_bottom')}</button>
           </p>
         `: ''}
       </div>
