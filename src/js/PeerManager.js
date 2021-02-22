@@ -95,7 +95,6 @@ function getRandomPeers() {
   if (connectToLocalElectron) {
     sample.push(ELECTRON_GUN_URL);
   }
-  console.log('random peers', sample);
   return sample;
 }
 

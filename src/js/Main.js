@@ -24,6 +24,7 @@ import Follows from './views/Follows.js';
 import Feed from './views/Feed.js';
 import About from './views/About.js';
 import Explorer from './views/Explorer.js';
+import Contacts from './views/Contacts.js';
 
 import VideoCall from './components/VideoCall.js';
 import Identicon from './components/Identicon.js';
@@ -54,6 +55,7 @@ Helpers.checkColorScheme();
 const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
   {url: '/', text: t('home'), icon: Icons.home},
   {url: '/chat', text: t('messages'), icon: Icons.chat},
+  {url: '/contacts', text: t('contacts')},
   {url: '/settings', text: t('settings'), icon: Icons.settings},
   {url: '/explorer', text: t('explorer'), icon: Icons.folder},
   {url: '/about', text: t('about')},
@@ -172,6 +174,7 @@ class Main extends Component {
               <${Explorer} path="/explorer"/>
               <${Follows} path="/follows/:id"/>
               <${Follows} followers=${true} path="/followers/:id"/>
+              <${Contacts} path="/contacts"/>
             </${Router}>
           </div>
         </section>
