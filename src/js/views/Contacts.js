@@ -6,6 +6,7 @@ import FollowButton from '../components/FollowButton.js';
 import Name from '../components/Name.js';
 import View from './View.js';
 import Session from '../Session.js';
+import ScrollViewport from '../lib/preact-scroll-viewport.js';
 
 class Contacts extends View {
   constructor() {
@@ -49,19 +50,21 @@ class Contacts extends View {
     return html`
       <div class="centered-container">
         <div id="contacts-list">
-          ${keys.map(k => {
-            return html`
-            <div class="profile-link-container">
-              <a href="/profile/${k}" class="profile-link">
-                <${Identicon} key="i${k}" str=${k} width=49/>
-                <div>
-                  <${Name} key="k${k}" pub=${k}/><br/>
-                  <small class="follower-count">${this.contacts[k].followers && this.contacts[k].followers.size || '0'} followers that you know</small>
-                </div>
-              </a>
-              ${k !== Session.getPubKey() ? html`<${FollowButton} key="f${k}" id=${k}/>` : ''}
-            </div>`;
-          })}
+          <${ScrollViewport}>
+            ${keys.map(k => {
+              return html`
+              <div class="profile-link-container">
+                <a href="/profile/${k}" class="profile-link">
+                  <${Identicon} key="i${k}" str=${k} width=49/>
+                  <div>
+                    <${Name} key="k${k}" pub=${k}/><br/>
+                    <small class="follower-count">${this.contacts[k].followers && this.contacts[k].followers.size || '0'} followers that you know</small>
+                  </div>
+                </a>
+                ${k !== Session.getPubKey() ? html`<${FollowButton} key="f${k}" id=${k}/>` : ''}
+              </div>`;
+            })}
+          </${ScrollViewport}>
           ${keys.length === 0 ? '—' : ''}
         </div>
       </div>
