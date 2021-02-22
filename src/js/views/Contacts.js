@@ -53,13 +53,13 @@ class Contacts extends View {
             return html`
             <div class="profile-link-container">
               <a href="/profile/${k}" class="profile-link">
-                <${Identicon} str=${k} width=49/>
+                <${Identicon} key="i${k}" str=${k} width=49/>
                 <div>
-                  <${Name} pub=${k}/><br/>
+                  <${Name} key="k${k}" pub=${k}/><br/>
                   <small class="follower-count">${this.contacts[k].followers && this.contacts[k].followers.size || '0'} followers that you know</small>
                 </div>
               </a>
-              ${k !== Session.getPubKey() ? html`<${FollowButton} id=${k}/>` : ''}
+              ${k !== Session.getPubKey() ? html`<${FollowButton} key="f${k}" id=${k}/>` : ''}
             </div>`;
           })}
           ${keys.length === 0 ? '—' : ''}
