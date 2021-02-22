@@ -48,7 +48,6 @@ class Contacts extends View {
     });
     return html`
       <div class="centered-container">
-        <h3>${t('contacts')}</h3>
         <div id="contacts-list">
           ${keys.map(k => {
             return html`
