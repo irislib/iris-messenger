@@ -18,6 +18,7 @@ class Contacts extends View {
   getContacts() {
     const f = Session.getFollows();
     State.local.get('follows').map().on((contacts, pub, b, e) => {
+      if (pub === Session.getPubKey()) { return; }
       this.eventListeners['follow'] = e;
       if (contacts) {
         this.contacts[pub] = f[pub] || {};

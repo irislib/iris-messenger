@@ -196,6 +196,8 @@ class Chat extends View {
       `);
     });
 
+    const participantKeys = this.state.participants && Object.keys(this.state.participants);
+
     return html`
     <${ChatList} class=${this.props.id ? 'hidden-xs' : ''}/>
     <div id="chat-main" class=${this.props.id ? '' : 'hidden-xs'}>
@@ -220,7 +222,10 @@ class Chat extends View {
       </div>
       ${this.props.id && this.props.id !== 'new' && this.props.id.length < 40 ? html`
         <div class="participant-list">
-          ${this.state.participants ? Object.keys(this.state.participants).map(k =>
+          ${participantKeys && participantKeys.length ? html`
+            <small>${participantKeys.length} ${t('participants')}</small>
+          ` : ''}
+          ${participantKeys ? participantKeys.map(k =>
             html`
               <a href="/profile/${k}">
                 <span class="text">

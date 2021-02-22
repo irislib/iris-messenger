@@ -1505,6 +1505,12 @@ form.public {
   z-index: 1;
 }
 
+.participant-list small {
+  text-transform: uppercase;
+  font-weight: bold;
+  padding: 7px 15px;
+}
+
 .online > .online-indicator, .active > .online-indicator {
   background-color: #f6a539;
 }
