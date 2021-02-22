@@ -291,7 +291,7 @@ class Profile extends View {
             ${messageForm}
             <div class="public-messages-view">
               ${this.getNotification()}
-              <${MessageFeed} node=${State.public.user(this.props.id).get('msgs')} />
+              <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
             </div>
           </div>
         `}
