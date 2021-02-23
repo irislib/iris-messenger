@@ -45,6 +45,7 @@ class Chat extends View {
     super();
     this.eventListeners = {};
     this.id = "chat-view";
+    this.state = {sortedParticipants: []};
   }
 
   componentDidMount() {
@@ -54,7 +55,7 @@ class Chat extends View {
     this.participants = {};
     this.setState({
       sortedMessages: this.sortedMessages,
-      participants: this.participants,
+      sortedParticipants: [],
       showParticipants: true
     });
     this.iv = null;
@@ -86,8 +87,15 @@ class Chat extends View {
     });
     State.local.get('channels').get(this.props.id).get('participants').map().on((v, k, b, e) => {
       this.eventListeners['participants'] = e;
-      this.participants[k] = true;
-      this.setState({participants: this.participants});
+      if (!!v && !this.participants[k]) {
+        State.public.user(k).get('activity').on((activity, a, b, e) => {
+          this.eventListeners[k + 'activity'] = e;
+          if (this.participants[k]) { this.participants[k].activity = activity; }
+          this.setSortedParticipants();
+        });
+      }
+      this.participants[k] = v ? {} : false;
+      this.setSortedParticipants();
     });
     State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
     const node = State.local.get('channels').get(this.props.id).get('msgs');
@@ -98,6 +106,19 @@ class Chat extends View {
     container.style.paddingTop = 0;
     this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: limitedUpdate, stickTo: 'top'});
     this.initIntersectionObserver();
+  }
+
+  setSortedParticipants() {
+    const sortedParticipants = Object.keys(this.participants).sort((a, b) => {
+      const aO = this.participants[a];
+      const bO = this.participants[b];
+      const aActive = aO && aO.activity && aO.activity.time;
+      const bActive = bO && bO.activity && bO.activity.time;
+      if (bActive === undefined || aActive > bActive) { return -1; }
+      else if (aActive === undefined || aActive < bActive) { return 1; }
+      else { return 0; }
+    });
+    this.setState({sortedParticipants});
   }
 
   componentDidUpdate(prevProps) {
@@ -205,7 +226,7 @@ class Chat extends View {
       `);
     });
 
-    const participantKeys = this.state.participants && Object.keys(this.state.participants);
+    const participants = this.state.sortedParticipants;
 
     return html`
     <${ChatList} class=${this.props.id ? 'hidden-xs' : ''}/>
@@ -231,19 +252,19 @@ class Chat extends View {
       </div>
       ${this.props.id && this.props.id !== 'new' && this.props.id.length < 40 ? html`
         <div class="participant-list ${this.state.showParticipants ? 'open' : ''}">
-          ${participantKeys && participantKeys.length ? html`
-            <small>${participantKeys.length} ${t('participants')}</small>
+          ${participants.length ? html`
+            <small>${participants.length} ${t('participants')}</small>
           ` : ''}
-          ${participantKeys ? participantKeys.map(k =>
+          ${participants.map(k =>
             html`
               <a href="/profile/${k}">
                 <span class="text">
-                  <${Identicon} str=${k} width=30 activity=${true}/>
-                  <iris-text user=${k} path="profile/name" placeholder=" "/>
+                  <${Identicon} key="i${k}" str=${k} width=30 activity=${true}/>
+                  <iris-text key="t${k}" user=${k} path="profile/name" placeholder=" "/>
                 </span>
               </a>
             `
-          ) : ''}
+          )}
         </div>
       `: ''}
       `;
