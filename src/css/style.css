@@ -174,6 +174,10 @@ a.logo img:last-child {
   -webkit-app-region: no-drag;
 }
 
+.header-content a {
+  color: var(--msg-form-button-color);
+}
+
 .header .header-content > a:not(:last-child) {
   margin-right: 22px;
 }
@@ -361,7 +365,6 @@ a.logo img:last-child {
   flex-direction: row;
   align-items: center;
   max-width: 100%;
-  overflow: hidden;
 }
 
 header.footer .header-content {

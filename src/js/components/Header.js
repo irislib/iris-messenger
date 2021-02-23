@@ -145,7 +145,10 @@ class Header extends Component {
             </a> -->
         `: ''}
         ${this.chatId && this.chatId.length > 10 && this.chatId.length < 40 ? html`
-          <a class="hidden-xs" onClick=${() => State.local.get('showParticipants').put(!this.state.showParticipants)}>${Icons.user}</a>
+          <a class="tooltip hidden-xs" onClick=${() => State.local.get('showParticipants').put(!this.state.showParticipants)}>
+            <span class="tooltiptext">${t('participant_list')}</span>
+            ${Icons.group}
+          </a>
         ` : ''}
         <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
