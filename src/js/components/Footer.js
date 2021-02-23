@@ -45,7 +45,7 @@ class Footer extends Component {
           ${Icons.chat}
         </a>
         <a href="/post/new" class="btn ${activeRoute && activeRoute === '/post/new' ? 'active' : ''}">${plusIcon}</a>
-        <a href="/settings" class="btn ${activeRoute && activeRoute === '/settings' ? 'active' : ''}">${Icons.settings}</a>
+        <a href="/contacts" class="btn ${activeRoute && activeRoute === '/contacts' ? 'active' : ''}">${Icons.user}</a>
         <a href="/profile/${key}" class="${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>
