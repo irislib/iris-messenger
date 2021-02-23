@@ -87,14 +87,15 @@ class Chat extends View {
     });
     State.local.get('channels').get(this.props.id).get('participants').map().on((v, k, b, e) => {
       this.eventListeners['participants'] = e;
-      if (!!v && !this.participants[k]) {
+      const hasAlready = !!this.participants[k];
+      this.participants[k] = v ? {} : false;
+      if (!!v && !hasAlready) {
         State.public.user(k).get('activity').on((activity, a, b, e) => {
           this.eventListeners[k + 'activity'] = e;
           if (this.participants[k]) { this.participants[k].activity = activity; }
           this.setSortedParticipants();
         });
       }
-      this.participants[k] = v ? {} : false;
       this.setSortedParticipants();
     });
     State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
