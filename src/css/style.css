@@ -480,6 +480,11 @@ header.footer .header-content {
   transition: all 0.25s ease;
   padding-top: 15px;
   user-select: none;
+  margin-right: -190px;
+}
+
+.participant-list.open {
+  margin-right: 0;
 }
 
 .participant-list .text {
@@ -604,7 +609,7 @@ header.footer .header-content {
     bottom: 0;
   }
 
-  .participant-list {
+  .participant-list, .participant-list.open {
     width: 250px;
     margin-right: -250px;
     position: fixed;

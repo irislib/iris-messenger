@@ -52,7 +52,11 @@ class Chat extends View {
     this.unsubscribe();
     this.sortedMessages = [];
     this.participants = {};
-    this.setState({sortedMessages: this.sortedMessages, participants: this.participants, sidebarOpen: false});
+    this.setState({
+      sortedMessages: this.sortedMessages,
+      participants: this.participants,
+      showParticipants: true
+    });
     this.iv = null;
     this.chat = null;
     const go = () => {
@@ -75,6 +79,11 @@ class Chat extends View {
     this.iv = setInterval(go, 3000);
     go();
 
+    State.local.get('showParticipants').put(true);
+    State.local.get('showParticipants').on((showParticipants, k, b, e) => {
+      this.eventListeners['showParticipants'] = e;
+      this.setState({showParticipants})
+    });
     State.local.get('channels').get(this.props.id).get('participants').map().on((v, k, b, e) => {
       this.eventListeners['participants'] = e;
       this.participants[k] = true;
@@ -200,7 +209,7 @@ class Chat extends View {
 
     return html`
     <${ChatList} class=${this.props.id ? 'hidden-xs' : ''}/>
-    <div id="chat-main" class=${this.props.id ? '' : 'hidden-xs'}>
+    <div id="chat-main" class="${this.props.id ? '' : 'hidden-xs'}">
     ${this.props.id && this.props.id.length > 20 ? html`
       <div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
         <div id="message-list">
@@ -221,7 +230,7 @@ class Chat extends View {
       `: ''}
       </div>
       ${this.props.id && this.props.id !== 'new' && this.props.id.length < 40 ? html`
-        <div class="participant-list">
+        <div class="participant-list ${this.state.showParticipants ? 'open' : ''}">
           ${participantKeys && participantKeys.length ? html`
             <small>${participantKeys.length} ${t('participants')}</small>
           ` : ''}

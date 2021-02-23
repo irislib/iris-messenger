@@ -74,7 +74,7 @@ class Store extends View {
                     <span>${this.state.followedUserCount}</span> ${t('following')}
                   </a>
                   <a href="/followers/${this.props.store}">
-                    <span>${this.state.followerCount}</span> ${t('known_followers')}
+                    <span>${this.state.followerCount}</span> ${t('followers')}
                   </a>
                 </div>
                 ${this.followedUsers.has(Session.getPubKey()) ? html`

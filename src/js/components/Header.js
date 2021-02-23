@@ -46,6 +46,7 @@ class Header extends Component {
   }
 
   componentDidMount() {
+    State.local.get('showParticipants').on(showParticipants => this.setState({showParticipants}));
     State.local.get('unseenTotal').on(unseenTotal => {
       this.setState({unseenTotal});
     });
@@ -143,6 +144,9 @@ class Header extends Component {
             Icons.voiceCall
             </a> -->
         `: ''}
+        ${this.chatId && this.chatId.length > 10 && this.chatId.length < 40 ? html`
+          <a class="hidden-xs" onClick=${() => State.local.get('showParticipants').put(!this.state.showParticipants)}>${Icons.user}</a>
+        ` : ''}
         <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>

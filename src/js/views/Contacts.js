@@ -58,7 +58,7 @@ class Contacts extends View {
                   <${Identicon} key="i${k}" str=${k} width=49/>
                   <div>
                     <${Name} key="k${k}" pub=${k}/><br/>
-                    <small class="follower-count">${this.contacts[k].followers && this.contacts[k].followers.size || '0'} followers that you know</small>
+                    <small class="follower-count">${this.contacts[k].followers && this.contacts[k].followers.size || '0'} ${t('followers')}</small>
                   </div>
                 </a>
                 ${k !== Session.getPubKey() ? html`<${FollowButton} key="f${k}" id=${k}/>` : ''}

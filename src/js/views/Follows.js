@@ -63,7 +63,7 @@ class Follows extends View {
     return html`
       <div class="centered-container">
         <h3><a href="/profile/${this.props.id}"><${Name} pub=${this.props.id} placeholder="—" /></a>:<i> </i>
-        ${this.props.followers ? t('known_followers') : t('following')}</h3>
+        ${this.props.followers ? t('followers') : t('following')}</h3>
         <div id="follows-list">
           ${keys.map(k => {
             return html`
@@ -72,7 +72,7 @@ class Follows extends View {
                 <${Identicon} str=${k} width=49/>
                 <div>
                   <${Name} pub=${k}/><br/>
-                  <small class="follower-count">${this.follows[k].followers && this.follows[k].followers.size || '0'} followers that you know</small>
+                  <small class="follower-count">${this.follows[k].followers && this.follows[k].followers.size || '0'} followers</small>
                 </div>
               </a>
               ${k !== Session.getPubKey() ? html`<${FollowButton} id=${k}/>` : ''}
