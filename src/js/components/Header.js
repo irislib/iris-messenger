@@ -72,6 +72,7 @@ class Header extends Component {
       if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
         if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
           title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
+          this.setState({title});
         } else {
           State.local.get('channels').get(this.chatId).get('name').on((name, a, b, eve) => {
             this.eventListeners.push(eve);
