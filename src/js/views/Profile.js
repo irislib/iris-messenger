@@ -16,6 +16,8 @@ import Name from '../components/Name.js';
 import View from './View.js';
 import SearchBox from '../components/SearchBox.js';
 
+const SMS_VERIFIER_PUB = 'ysavwX9TVnlDw93w9IxezCJqSDMyzIU-qpD8VTN5yko.3ll1dFdxLkgyVpejFkEMOFkQzp_tRrkT3fImZEx94Co';
+
 function deleteChat(pub) {
   iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
   delete Session.channels[pub];
@@ -231,7 +233,9 @@ class Profile extends View {
                 `}
                 ${this.followedUsers.has(Session.getPubKey()) ? html`
                   <p><small>${t('follows_you')}</small></p>
-                `: ''}
+                `: this.props.id === SMS_VERIFIER_PUB ? html`
+                  <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
+                ` : ''}
                 ${followable ? html`<${FollowButton} id=${this.props.id}/>` : ''}
                 <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
                 ${uuid ? '' : html`

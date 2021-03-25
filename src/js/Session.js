@@ -30,7 +30,7 @@ const DEFAULT_SETTINGS = {
 
 const settings = DEFAULT_SETTINGS;
 
-function getFollowsFn(callback, k, maxDepth = 2, currentDepth = 1) {
+function getFollowsFn(callback, k, maxDepth = 3, currentDepth = 1) {
   k = k || key.pub;
 
   function addFollow(k, followDistance, follower) {
