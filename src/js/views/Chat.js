@@ -242,7 +242,7 @@ class Chat extends View {
         <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
       </div>` : html`<${NewChat}/>`
     }
-    ${this.props.id ? html`
+    ${this.props.id && this.props.id.length > 20 ? html`
       <div id="scroll-down-btn" style="display:none;" onClick=${() => this.scrollDown()}>${caretDownSvg}</div>
       <div id="not-seen-by-them" style="display: none">
       <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
