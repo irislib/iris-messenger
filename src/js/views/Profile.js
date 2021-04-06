@@ -116,6 +116,11 @@ class Profile extends View {
     this.setState({memberCandidate:null});
   }
 
+  onRemoveParticipant(pub) {
+    console.log('onRemoveParticipant', pub);
+    Session.channels[this.props.id].removeParticipant(pub);
+  }
+
   renderGroupSettings() {
     const chat = Session.channels[this.props.id];
     if (chat && chat.uuid) {
@@ -126,6 +131,7 @@ class Profile extends View {
             ${
               chat ? Object.keys(chat.participantProfiles).map(k => {
                 const profile = chat.participantProfiles[k];
+                if (!(profile.permissions && profile.permissions.read && profile.permissions.write)) { return; }
                 return html`
                   <div class="flex-row">
                     <div class="flex-cell">
@@ -141,7 +147,7 @@ class Profile extends View {
                     </div>
                     ${this.state.isAdmin ? html`
                       <div class="flex-cell no-flex">
-                        <button>${t('remove')}</button>
+                        <button onClick=${() => this.onRemoveParticipant(k)}>${t('remove')}</button>
                       </div>
                     ` : ''}
                   </div>

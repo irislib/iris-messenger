@@ -307,7 +307,11 @@ function addChannel(chat) {
       if (typeof participants === 'object') {
         var keys = Object.keys(participants);
         keys.forEach((k, i) => {
-          if (chat.participantProfiles[k]) { return; }
+          const p = chat.participantProfiles[k];
+          if (p && participants[k]) {
+            p.permissions = participants[k].permissions;
+            return;
+          }
           var hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
           chat.participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
           State.public.user(k).get('profile').get('name').on(name => {

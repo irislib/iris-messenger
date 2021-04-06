@@ -7894,6 +7894,10 @@
 	    });
 	  };
 
+	  Channel.prototype.removeParticipant = async function removeParticipant(pub) {
+	    this.addParticipant(pub, true, { read: false, write: false });
+	  };
+
 	  /**
 	  * Add a public key to the channel
 	  * @param {string} pub
@@ -7908,7 +7912,9 @@
 	    var permissions = arguments[2];
 	    var subscribe = arguments[3];
 
-	    permissions = permissions || this.DEFAULT_PERMISSIONS;
+	    if (permissions === undefined) {
+	      permissions = this.DEFAULT_PERMISSIONS;
+	    }
 	    if (this.secrets[pub] && _JSON$stringify(this.secrets[pub]) === _JSON$stringify(permissions)) {
 	      // TODO: should be this.participants[pub]
 	      return;
@@ -7938,6 +7944,7 @@
 	      }
 	    }
 	    if (subscribe) {
+	      // TODO: unsubscribe
 	      _Object$values(this.directSubscriptions).forEach(function (arr) {
 	        arr.forEach(function (o) {
 	          if (!o.from || o.from === pub) {
