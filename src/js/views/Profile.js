@@ -122,19 +122,28 @@ class Profile extends View {
       return html`
         <div>
           <p>${t('participants')}:</p>
-          <div>
+          <div class="flex-table">
             ${
               chat ? Object.keys(chat.participantProfiles).map(k => {
                 const profile = chat.participantProfiles[k];
                 return html`
-                  <div class="profile-link-container">
-                    <a class="profile-link" onClick=${() => route('/profile/' + k)}>
-                      <${Identicon} str=${k} width=40/>
-                      <${Name} pub=${k}/>
-                      ${profile.permissions && profile.permissions.admin ? html`
-                        <small style="margin-left:5px">${t('admin')}</small>
-                      `: ''}
-                    </a>
+                  <div class="flex-row">
+                    <div class="flex-cell">
+                      <div class="profile-link-container">
+                        <a class="profile-link" onClick=${() => route('/profile/' + k)}>
+                          <${Identicon} str=${k} width=40/>
+                          <${Name} pub=${k}/>
+                          ${profile.permissions && profile.permissions.admin ? html`
+                            <small style="margin-left:5px">${t('admin')}</small>
+                          `: ''}
+                        </a>
+                      </div>
+                    </div>
+                    ${this.state.isAdmin ? html`
+                      <div class="flex-cell no-flex">
+                        <button>${t('remove')}</button>
+                      </div>
+                    ` : ''}
                   </div>
                 `;
               }) : ''
