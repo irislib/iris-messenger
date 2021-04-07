@@ -88,7 +88,8 @@ class Chat extends View {
     State.local.get('channels').get(this.props.id).get('participants').map().on((v, k, b, e) => {
       this.eventListeners['participants'] = e;
       const hasAlready = !!this.participants[k];
-      this.participants[k] = v ? {} : false;
+      this.participants[k] = v;
+      console.log(1, v);
       if (!!v && !hasAlready) {
         State.public.user(k).get('activity').on((activity, a, b, e) => {
           this.eventListeners[k + 'activity'] = e;
@@ -110,7 +111,12 @@ class Chat extends View {
   }
 
   setSortedParticipants() {
-    const sortedParticipants = Object.keys(this.participants).sort((a, b) => {
+    const sortedParticipants = Object.keys(this.participants)
+    .filter(k => {
+      const p = this.participants[k];
+      return p && p.read && p.write;
+    })
+    .sort((a, b) => {
       const aO = this.participants[a];
       const bO = this.participants[b];
       const aActive = aO && aO.activity && aO.activity.time;

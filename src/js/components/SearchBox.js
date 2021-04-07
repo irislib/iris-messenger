@@ -63,6 +63,7 @@ class SearchBox extends Component {
 
   search() {
     const query = $(this.base).find('input').val();
+    if (!query) { return; }
 
     if (this.props.onSelect) {
       const s = query.split('https://iris.to/#/profile/');
