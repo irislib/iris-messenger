@@ -299,19 +299,17 @@ function addChannel(chat) {
     }
   });
   if (chat.uuid) {
+    var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     chat.participantProfiles = {};
     chat.on('name', v => State.local.get('channels').get(chat.uuid).get('name').put(v));
     chat.on('photo', v => State.local.get('channels').get(chat.uuid).get('photo').put(v));
     chat.on('about', v => State.local.get('channels').get(chat.uuid).get('about').put(v));
-    chat.onMy('participants', participants => {
+    chat.getParticipants(participants => {
       if (typeof participants === 'object') {
         var keys = Object.keys(participants);
         keys.forEach((k, i) => {
+          console.log(participants[k]);
           const p = chat.participantProfiles[k];
-          if (p && participants[k]) {
-            p.permissions = participants[k].permissions;
-            return;
-          }
           var hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
           chat.participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
           State.public.user(k).get('profile').get('name').on(name => {
@@ -319,9 +317,9 @@ function addChannel(chat) {
           });
         });
       }
+      State.local.get('channels').get(chat.uuid).get('participants').put(null);
       State.local.get('channels').get(chat.uuid).get('participants').put(participants);
     });
-    var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   } else {
     State.public.user(pub).get('profile').get('name').on(v => State.local.get('channels').get(pub).get('name').put(v))
   }
