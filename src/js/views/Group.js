@@ -344,9 +344,6 @@ class Profile extends View {
         $('#profile .profile-about-content:not(:focus)').text(about);
       }
     });
-    renderGroupPhotoSettings(chat.uuid);
-    $('#profile .profile-photo-container').show();
-    Helpers.setImgSrc($('#profile .profile-photo'), chat.photo);
   }
 
   componentDidMount() {
@@ -392,17 +389,6 @@ class Profile extends View {
 }
 
 var newGroupParticipant;
-
-function renderGroupPhotoSettings(uuid) {
-  const me = Session.channels[uuid].participantProfiles[Session.getKey().pub];
-  const isAdmin = !!(me && me.permissions && me.permissions.admin);
-  $('#current-profile-photo').toggle(!!Session.channels[uuid].photo);
-  $('#profile .profile-photo').toggle(!!Session.channels[uuid].photo);
-  if (isAdmin) {
-    Helpers.setImgSrc($('#current-profile-photo'), Session.channels[uuid].photo);
-    $('#profile .profile-photo').hide();
-  }
-}
 
 function areWeAdmin(uuid) {
   const me = Session.channels[uuid].participantProfiles[Session.getKey().pub];
