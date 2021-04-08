@@ -320,6 +320,12 @@ function addChannel(chat) {
       State.local.get('channels').get(chat.uuid).get('participants').put(null);
       State.local.get('channels').get(chat.uuid).get('participants').put(participants);
     });
+    chat.inviteLinks = {};
+    chat.getChatLinks({callback: ({url, id}) => {
+      console.log('got chat links');
+      chat.inviteLinks[id] = url; // TODO state
+      State.local.get('inviteLinksChanged').put(true);
+    }});
   } else {
     State.public.user(pub).get('profile').get('name').on(v => State.local.get('channels').get(pub).get('name').put(v))
   }

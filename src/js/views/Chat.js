@@ -68,12 +68,6 @@ class Chat extends View {
         this.chat.setMyMsgsLastSeenTime();
         Helpers.scrollToMessageListBottom();
         this.chat.setMyMsgsLastSeenTime();
-        if (this.chat.uuid) {
-          this.chat.inviteLinks = {};
-          this.chat.getChatLinks({callback: ({url, id}) => {
-            this.chat.inviteLinks[id] = url; // TODO state
-          }});
-        }
       }
     }
     this.iv = setInterval(go, 3000);

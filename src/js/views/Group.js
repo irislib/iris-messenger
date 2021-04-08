@@ -352,7 +352,7 @@ class Profile extends View {
   componentDidMount() {
     const pub = this.props.id;
     this.eventListeners.forEach(e => e.off());
-    this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
+    this.setState({name: '', photo: '', about: ''});
     const chat = Session.channels[pub];
     if (pub.length < 40) {
       if (!chat) {
@@ -372,8 +372,8 @@ class Profile extends View {
       const isAdmin = areWeAdmin(pub);
       this.setState({isAdmin});
     });
-    this.groupDidMount();
     if (chat) {
+      this.groupDidMount();
       $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
       $('input:radio[name=notificationPreference]').off().on('change', (event) => {
         chat.put('notificationSetting', event.target.value);
