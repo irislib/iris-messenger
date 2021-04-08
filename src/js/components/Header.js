@@ -39,12 +39,6 @@ class Header extends Component {
     route('/chat');
   }
 
-  onClick() {
-    if (this.chatId) {
-      route('/profile/' + this.chatId);
-    }
-  }
-
   componentDidMount() {
     State.local.get('showParticipants').on(showParticipants => this.setState({showParticipants}));
     State.local.get('unseenTotal').on(unseenTotal => {
@@ -90,8 +84,10 @@ class Header extends Component {
   }
 
   onTitleClicked() {
-    this.chatId && route('/profile/' + this.chatId);
-
+    if (this.chatId) {
+      const view = this.chatId.length < 40 ? '/group/' : '/profile/';
+      route(view + this.chatId);
+    }
   }
 
   onLogoClick(e) {

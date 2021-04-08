@@ -34,34 +34,21 @@ class Profile extends View {
   }
 
   onProfilePhotoSet(src) {
-    if (this.isMyProfile) {
-      State.public.user().get('profile').get('photo').put(src);
-    } else {
-      Session.channels[this.props.id].put('photo', src);
-    }
+    State.public.user().get('profile').get('photo').put(src);
   }
 
   onAboutInput(e) {
-    const about = $(e.target).text().trim();
-    if (this.isMyProfile) {
-      State.public.user().get('profile').get('about').put(about);
-    } else {
-      Session.channels[this.props.id].put('about', about);
-    }
+    State.public.user().get('profile').get('about').put(about);
   }
 
   onClickSettings() {
-    this.isMyProfile ? route('/settings') : $('#chat-settings').toggle();
+    $('#chat-settings').toggle();
   }
 
   onNameInput(e) {
     const name = $(e.target).text().trim();
     if (name.length) {
-      if (this.isMyProfile) {
-        State.public.user().get('profile').get('name').put(name);
-      } else {
-        Session.channels[this.props.id].put('name', name);
-      }
+      State.public.user().get('profile').get('name').put(name);
     }
   }
 
@@ -79,142 +66,12 @@ class Profile extends View {
     }
   }
 
-  onSelectCandidate(pub) {
-    console.log('onSelectCandidate', pub);
-    $('#profile-add-participant-input').hide();
-    if (pub) {
-      $('#profile-add-participant-candidate').remove();
-      var identicon = Helpers.getIdenticon(pub, 40).css({'margin-right':15});
-      var nameEl = $('<span>');
-      State.public.user(pub).get('profile').get('name').on(name => nameEl.text(name));
-      var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
-      var addBtn = $('<button>').css({'margin-left': 15}).text(t('add')).click(() => {
-        if (newGroupParticipant) {
-          Session.channels[this.props.id].addParticipant(newGroupParticipant);
-          newGroupParticipant = null;
-          $('#profile-add-participant-input').val('').show();
-          $('#profile-add-participant-candidate').remove();
-        }
-      });
-      var removeBtn = $('<button>').css({'margin-left': 15}).text(t('cancel')).click(() => {
-        el.remove();
-        $('#profile-add-participant-input').val('').show();
-        newGroupParticipant = null;
-      });
-      el.append(identicon);
-      el.append(nameEl);
-      el.append(addBtn);
-      el.append(removeBtn);
-      newGroupParticipant = pub;
-      $('#profile-add-participant-input').after(el);
-    }
-    $(event.target).val('');
-  }
-
-  onAddParticipant(add = true) {
-    add && Session.channels[this.props.id].addParticipant(this.state.memberCandidate);
-    this.setState({memberCandidate:null});
-  }
-
-  onRemoveParticipant(pub) {
-    console.log('onRemoveParticipant', pub);
-    Session.channels[this.props.id].removeParticipant(pub);
-  }
-
-  renderGroupSettings() {
-    const chat = Session.channels[this.props.id];
-    if (chat && chat.uuid) {
-      return html`
-        <div>
-          <p>${t('participants')}:</p>
-          <div class="flex-table">
-            ${
-              chat ? Object.keys(chat.participantProfiles).map(k => {
-                const profile = chat.participantProfiles[k];
-                if (!(profile.permissions && profile.permissions.read && profile.permissions.write)) { return; }
-                return html`
-                  <div class="flex-row">
-                    <div class="flex-cell">
-                      <div class="profile-link-container">
-                        <a class="profile-link" onClick=${() => route('/profile/' + k)}>
-                          <${Identicon} str=${k} width=40/>
-                          <${Name} pub=${k}/>
-                          ${profile.permissions && profile.permissions.admin ? html`
-                            <small style="margin-left:5px">${t('admin')}</small>
-                          `: ''}
-                        </a>
-                      </div>
-                    </div>
-                    ${this.state.isAdmin ? html`
-                      <div class="flex-cell no-flex">
-                        <button onClick=${() => this.onRemoveParticipant(k)}>${t('remove')}</button>
-                      </div>
-                    ` : ''}
-                  </div>
-                `;
-              }) : ''
-            }
-          </div>
-          ${this.state.isAdmin ? html`
-            <div>
-              <p>${t('add_participant')}:</p>
-              <p>
-              ${this.state.memberCandidate ? html`
-                <div class="profile-link-container"><div class="profile-link">
-                  <${Identicon} str=${this.state.memberCandidate} width=40/>
-                  <${Name} pub=${this.state.memberCandidate}/>
-                </div>
-                <button onClick=${() => this.onAddParticipant()}>Add</button>
-                <button onClick=${() => this.onAddParticipant(false)}>Cancel</button>
-                </div>
-              `: html`
-                <${SearchBox} onSelect=${item => this.setState({memberCandidate: item.key})}/>
-              `}
-              </p>
-            </div>
-          `: ''}
-          ${chat && chat.inviteLinks && Object.keys(chat.inviteLinks).length ? html`
-            <hr/>
-            <p>${t('invite_links')}</p>
-            <div class="flex-table">
-              ${Object.keys(chat.inviteLinks).map(id => {
-                const url = chat.inviteLinks[id];
-                return html`
-                  <div class="flex-row">
-                    <div class="flex-cell no-flex">
-                      <${CopyButton} copyStr=${url}/>
-                    </div>
-                    <div class="flex-cell">
-                      <input type="text" value=${url} onClick=${e => $(e.target).select()}/>
-                    </div>
-                    ${this.state.isAdmin ? html`
-                      <div class="flex-cell no-flex">
-                        <button onClick=${() => Session.removeChatLink(id)}>${t('remove')}</button>
-                      </div>
-                    `: ''}
-                  </div>
-                `;
-              })}
-            </div>
-          `: ''}
-          ${this.state.isAdmin ? html`
-            <p><button onClick=${() => chat.createChatLink()}>Create new invite link</button></p><hr/>
-          `: ''}
-        </div>
-      `;
-    }
-    return '';
-  }
-
   renderView() {
     this.isMyProfile = Session.getPubKey() === this.props.id;
     const chat = Session.channels[this.props.id];
-    const uuid = chat && chat.uuid;
     const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
-    const editable = !!(this.isMyProfile || this.state.isAdmin);
-    const followable = !(this.isMyProfile || this.props.id.length < 40);
     let profilePhoto;
-    if (editable) {
+    if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
     } else {
       if (this.state.photo) {
@@ -231,44 +88,38 @@ class Profile extends View {
               ${profilePhoto}
             </div>
             <div class="profile-header-stuff">
-              <h3 class="profile-name" placeholder=${editable ? t('name') : ''} contenteditable=${editable} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
+              <h3 class="profile-name" placeholder=${this.isMyProfile ? t('name') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
               <div class="profile-about hidden-xs">
-                <p class="profile-about-content" placeholder=${editable ? t('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
+                <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
               </div>
               <div class="profile-actions">
-                ${uuid ? '' : html`
-                  <div class="follow-count">
-                    <a href="/follows/${this.props.id}">
-                      <span>${this.state.followedUserCount}</span> ${t('following')}
-                    </a>
-                    <a href="/followers/${this.props.id}">
-                      <span>${this.state.followerCount}</span> ${t('followers')}
-                    </a>
-                  </div>
-                `}
+                <div class="follow-count">
+                  <a href="/follows/${this.props.id}">
+                    <span>${this.state.followedUserCount}</span> ${t('following')}
+                  </a>
+                  <a href="/followers/${this.props.id}">
+                    <span>${this.state.followerCount}</span> ${t('followers')}
+                  </a>
+                </div>
                 ${this.followedUsers.has(Session.getPubKey()) ? html`
                   <p><small>${t('follows_you')}</small></p>
                 `: this.props.id === SMS_VERIFIER_PUB ? html`
                   <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
                 ` : ''}
-                ${followable ? html`<${FollowButton} id=${this.props.id}/>` : ''}
+                ${this.isMyProfile ? '' : html`<${FollowButton} id=${this.props.id}/>`}
                 <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
-                ${uuid ? '' : html`
-                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
-                `}
+                <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
                 <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
                 ${this.isMyProfile ? '' : html`
                   <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
                 `}
-                ${followable ? html`<${BlockButton} id=${this.props.id}/>` : ''}
+                ${this.isMyProfile ? '' : html`<${BlockButton} id=${this.props.id}/>`}
               </div>
             </div>
           </div>
           <div class="profile-about visible-xs-flex">
             <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
-
-          ${this.renderGroupSettings()}
 
           <p id="profile-page-qr" style="display:none" class="qr-container"></p>
           <div id="chat-settings" style="display:none">
@@ -280,14 +131,12 @@ class Profile extends View {
                 ${t('nickname')}:
                 <input value=${chat && chat.theirNickname} onInput=${e => chat && chat.put('nickname', e.target.value)}/>
               </p>
-              ${uuid ? '' : html`
-                <p>
-                  ${t('their_nickname_for_you')}:
-                  <span>
-                    ${chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : ''}
-                  </span>
-                </p>
-              `}
+              <p>
+                ${t('their_nickname_for_you')}:
+                <span>
+                  ${chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : ''}
+                </span>
+              </p>
             </div>
             <div class="notification-settings">
               <h4>${t('notifications')}</h4>
@@ -305,15 +154,13 @@ class Profile extends View {
             <hr/>
           </div>
         </div>
-        ${uuid ? '' : html`
-          <div>
-            ${messageForm}
-            <div class="public-messages-view">
-              ${this.getNotification()}
-              <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
-            </div>
+        <div>
+          ${messageForm}
+          <div class="public-messages-view">
+            ${this.getNotification()}
+            <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
           </div>
-        `}
+        </div>
       </div>
     `;
   }
@@ -324,7 +171,7 @@ class Profile extends View {
 
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
-      this.setState({isAdmin:false,uuid:null, memberCandidate:null});
+      this.setState({memberCandidate:null});
       this.componentDidMount();
     }
   }
@@ -371,26 +218,6 @@ class Profile extends View {
     });
   }
 
-  groupDidMount() {
-    const chat = Session.channels[this.props.id];
-    chat.on('name', name => { // TODO: this really needs unsubscribe
-      if (!$('#profile .profile-name:focus').length) {
-        this.setState({name});
-      }
-    });
-    chat.on('photo', photo => this.setState({photo}));
-    chat.on('about', about => {
-      if (!$('#profile .profile-about-content:focus').length) {
-        this.setState({about});
-      } else {
-        $('#profile .profile-about-content:not(:focus)').text(about);
-      }
-    });
-    renderGroupPhotoSettings(chat.uuid);
-    $('#profile .profile-photo-container').show();
-    Helpers.setImgSrc($('#profile .profile-photo'), chat.photo);
-  }
-
   componentDidMount() {
     const pub = this.props.id;
     this.eventListeners.forEach(e => e.off());
@@ -410,16 +237,7 @@ class Profile extends View {
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
     State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
-    State.local.get('inviteLinksChanged').on(() => this.setState({}));
-    State.local.get('channels').get(this.props.id).get('participants').on(() => {
-      const isAdmin = areWeAdmin(pub);
-      this.setState({isAdmin});
-    });
-    if (chat && chat.uuid) {
-      this.groupDidMount();
-    } else {
-      this.userDidMount();
-    }
+    this.userDidMount();
     if (chat) {
       $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
       $('input:radio[name=notificationPreference]').off().on('change', (event) => {
@@ -436,24 +254,6 @@ class Profile extends View {
       correctLevel : QRCode.CorrectLevel.H
     });
   }
-}
-
-var newGroupParticipant;
-
-function renderGroupPhotoSettings(uuid) {
-  const me = Session.channels[uuid].participantProfiles[Session.getKey().pub];
-  const isAdmin = !!(me && me.permissions && me.permissions.admin);
-  $('#current-profile-photo').toggle(!!Session.channels[uuid].photo);
-  $('#profile .profile-photo').toggle(!!Session.channels[uuid].photo);
-  if (isAdmin) {
-    Helpers.setImgSrc($('#current-profile-photo'), Session.channels[uuid].photo);
-    $('#profile .profile-photo').hide();
-  }
-}
-
-function areWeAdmin(uuid) {
-  const me = Session.channels[uuid].participantProfiles[Session.getKey().pub];
-  return !!(me && me.permissions && me.permissions.admin);
 }
 
 export default Profile;

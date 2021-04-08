@@ -2,7 +2,6 @@ import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import View from './View.js';
 import State from '../State.js';
-import Header from '../components/Header.js';
 import Identicon from '../components/Identicon.js';
 import Message from '../components/Message.js';
 import MessageForm from '../components/MessageForm.js';

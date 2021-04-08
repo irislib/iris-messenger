@@ -19,6 +19,7 @@ import Checkout from './views/Checkout.js';
 import Product from './views/Product.js';
 import Login from './views/Login.js';
 import Profile from './views/Profile.js';
+import Group from './views/Group.js';
 import Message from './views/Message.js';
 import Follows from './views/Follows.js';
 import Feed from './views/Feed.js';
@@ -166,6 +167,7 @@ class Main extends Component {
               <${Settings} path="/settings" showSwitchAccount=${true}/>
               <${LogoutConfirmation} path="/logout"/>
               <${Profile} path="/profile/:id?"/>
+              <${Group} path="/group/:id?"/>
               <${Store} path="/store/:store?"/>
               <${Checkout} path="/checkout/:store"/>
               <${Product} path="/product/:product/:store"/>
