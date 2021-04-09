@@ -7963,7 +7963,6 @@
 	      }
 	    }
 	    if (subscribe) {
-	      // TODO: unsubscribe
 	      _Object$values(this.directSubscriptions).forEach(function (arr) {
 	        arr.forEach(function (o) {
 	          if (!o.from || o.from === pub) {
@@ -7973,13 +7972,15 @@
 	      });
 	      _Object$values(this.groupSubscriptions).forEach(function (arr) {
 	        arr.forEach(function (o) {
-	          if (!permissions.write) {
-	            return;
-	          }
 	          if (o.from && o.from !== pub) {
 	            return;
 	          }
-	          _this10._onTheirGroupFromUser(pub, o.key, o.callback);
+	          if (permissions.write) {
+	            _this10._onTheirGroupFromUser(pub, o.key, o.callback);
+	          } else {
+	            // unsubscribe
+	            o.event && o.event.off();
+	          }
 	        });
 	      });
 	    }
@@ -8215,14 +8216,17 @@
 	    return this.participants && this.participants[pub] && this.participants[pub].write;
 	  };
 
-	  Channel.prototype._onTheirGroupFromUser = async function _onTheirGroupFromUser(pub, key, callback) {
+	  Channel.prototype._onTheirGroupFromUser = async function _onTheirGroupFromUser(pub, key, callback, subscription) {
 	    var _this17 = this;
 
 	    if (!this.hasWritePermission(pub)) {
 	      return;
 	    }
 	    var theirSecretUuid = await this.getTheirSecretUuid(pub);
-	    this.gun.user(pub).get('chats').get(theirSecretUuid).get(key).on(async function (data) {
+	    this.gun.user(pub).get('chats').get(theirSecretUuid).get(key).on(async function (data, a, b, e) {
+	      if (subscription) {
+	        subscription.event = e;
+	      }
 	      if (!_this17.hasWritePermission(pub)) {
 	        return;
 	      }
@@ -8242,7 +8246,8 @@
 	    if (!this.groupSubscriptions.hasOwnProperty(key)) {
 	      this.groupSubscriptions[key] = [];
 	    }
-	    this.groupSubscriptions[key].push({ key: key, callback: callback, from: from });
+	    var subscription = { key: key, callback: callback, from: from };
+	    this.groupSubscriptions[key].push(subscription);
 
 	    this.getParticipants(function (participants) {
 	      _Object$keys(participants).forEach(async function (pub) {
@@ -8252,7 +8257,7 @@
 	        if (!(participants[pub] && participants[pub].write)) {
 	          return;
 	        }
-	        _this18._onTheirGroupFromUser(pub, key, callback);
+	        _this18._onTheirGroupFromUser(pub, key, callback, subscription);
 	      });
 	    });
 	  };
