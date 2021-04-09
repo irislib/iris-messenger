@@ -104,10 +104,15 @@ class Chat extends View {
   }
 
   setSortedParticipants() {
+    let noLongerParticipant = true;
     const sortedParticipants = Object.keys(this.participants)
     .filter(k => {
       const p = this.participants[k];
-      return p && p.read && p.write;
+      const hasPermissions = p && p.read && p.write;
+      if (noLongerParticipant && hasPermissions && k === Session.getPubKey()) {
+        noLongerParticipant = false;
+      }
+      return hasPermissions;
     })
     .sort((a, b) => {
       const aO = this.participants[a];
@@ -121,7 +126,7 @@ class Chat extends View {
       else if (aActive < bActive) { return 1; }
       else { return 0; }
     });
-    this.setState({sortedParticipants});
+    this.setState({sortedParticipants, noLongerParticipant});
   }
 
   componentDidUpdate(prevProps) {
@@ -250,7 +255,10 @@ class Chat extends View {
       <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
       <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_invite_link')}</button></p>
       </div>
-      <div class="chat-message-form"><${MessageForm} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/></div>
+      <div class="chat-message-form">
+        ${this.state.noLongerParticipant ? html`<div style="text-align:center">You can't send messages to this group because you're no longer a participant.</div>` :
+          html`<${MessageForm} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/>`}
+      </div>
       `: ''}
       </div>
       ${this.props.id && this.props.id !== 'new' && this.props.id.length < 40 ? html`
