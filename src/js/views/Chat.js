@@ -112,10 +112,13 @@ class Chat extends View {
     .sort((a, b) => {
       const aO = this.participants[a];
       const bO = this.participants[b];
-      const aActive = aO && aO.activity && aO.activity.time;
-      const bActive = bO && bO.activity && bO.activity.time;
-      if (bActive === undefined || aActive > bActive) { return -1; }
-      else if (aActive === undefined || aActive < bActive) { return 1; }
+      const aActive = new Date(aO && aO.activity && aO.activity.time || 0);
+      const bActive = new Date(bO && bO.activity && bO.activity.time || 0);
+      if (Math.abs(aActive - bActive) < 10000) {
+        return a > b ? -1 : 1;
+      }
+      if (aActive > bActive) { return -1; }
+      else if (aActive < bActive) { return 1; }
       else { return 0; }
     });
     this.setState({sortedParticipants});
