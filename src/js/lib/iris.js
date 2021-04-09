@@ -7521,7 +7521,7 @@
 	              _this.addParticipant(k, true, _Object$assign({}, _this.DEFAULT_PERMISSIONS, participants[k]), true);
 	            }
 	          });
-	          _this.onParticipantsChange();
+	          _this.participantsChanged();
 	          options.saved = true;
 	        }
 	      }
@@ -7670,7 +7670,7 @@
 	    }
 	  };
 
-	  Channel.prototype.onParticipantsChange = function onParticipantsChange() {
+	  Channel.prototype.participantsChanged = function participantsChanged() {
 	    var _this5 = this;
 
 	    _Object$keys(this.getParticipantsCallbacks).forEach(function (id) {
@@ -8039,6 +8039,7 @@
 	        myGroupSecret: this.getMyGroupSecret(),
 	        participants: this.participants // private participants list
 	      }, mySecret)));
+	      this.participantsChanged();
 	    } else {
 	      var keys = this.getCurrentParticipants();
 	      for (var i = 0; i < keys.length; i++) {
