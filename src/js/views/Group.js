@@ -54,8 +54,10 @@ class Group extends View {
   }
 
   removeChatLink(id) {
-    State.local.get('chatLinks').get(id).put(null);
-    Session.channels[this.props.id].removeGroupChatLink(id);
+    if (confirm("Remove chat link?")) {
+      State.local.get('chatLinks').get(id).put(null);
+      Session.channels[this.props.id].removeGroupChatLink(id);
+    }
   }
 
   onSelectCandidate(pub) {
@@ -96,7 +98,9 @@ class Group extends View {
   }
 
   onRemoveParticipant(pub) {
-    Session.channels[this.props.id].removeParticipant(pub);
+    if (confirm("Remove participant?")) {
+      Session.channels[this.props.id].removeParticipant(pub);
+    }
   }
 
   renderGroupSettings() {
