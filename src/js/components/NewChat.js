@@ -61,7 +61,7 @@ class NewChat extends Component {
       c.put('name', $('#new-group-name').val());
       $('#new-group-name').val('');
       Session.addChannel(c);
-      route('/profile/' + c.uuid);
+      route('/group/' + c.uuid);
     }
   }
 
@@ -76,11 +76,6 @@ class NewChat extends Component {
         delete this.chatLinks[id];
       }
       this.setState({chatLinks: this.chatLinks});
-    });
-
-    $(".profile-link").attr('href', Helpers.getProfileLink(Session.getKey() && Session.getKey().pub)).off().on('click', e => {
-      e.preventDefault();
-      route('/profile/' + Session.getKey().pub);
     });
   }
 
