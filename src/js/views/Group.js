@@ -24,7 +24,7 @@ function deleteChat(pub) {
   State.local.get('channels').get(pub).put(null);
 }
 
-class Profile extends View {
+class Group extends View {
   constructor() {
     super();
     this.eventListeners = [];
@@ -51,6 +51,11 @@ class Profile extends View {
     if (name.length) {
       Session.channels[this.props.id].put('name', name);
     }
+  }
+
+  removeChatLink(id) {
+    State.local.get('chatLinks').get(id).put(null);
+    Session.channels[this.props.id].removeGroupChatLink(id);
   }
 
   onSelectCandidate(pub) {
@@ -91,7 +96,6 @@ class Profile extends View {
   }
 
   onRemoveParticipant(pub) {
-    console.log('onRemoveParticipant', pub);
     Session.channels[this.props.id].removeParticipant(pub);
   }
 
@@ -153,6 +157,7 @@ class Profile extends View {
             <div class="flex-table">
               ${Object.keys(chat.inviteLinks).map(id => {
                 const url = chat.inviteLinks[id];
+                if (!url) { return; }
                 return html`
                   <div class="flex-row">
                     <div class="flex-cell no-flex">
@@ -163,7 +168,7 @@ class Profile extends View {
                     </div>
                     ${this.state.isAdmin ? html`
                       <div class="flex-cell no-flex">
-                        <button onClick=${() => Session.removeChatLink(id)}>${t('remove')}</button>
+                        <button onClick=${() => this.removeChatLink(id)}>${t('remove')}</button>
                       </div>
                     `: ''}
                   </div>
@@ -395,4 +400,4 @@ function areWeAdmin(uuid) {
   return !!(me && me.permissions && me.permissions.admin);
 }
 
-export default Profile;
+export default Group;

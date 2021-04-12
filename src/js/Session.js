@@ -177,12 +177,6 @@ function getMyChatLink() {
   return latestChatLink || Helpers.getProfileLink(key.pub);
 }
 
-function removeChatLink(id) {
-  console.log('removeChatLink', id);
-  State.local.get('chatLinks').get(id).put(null);
-  return iris.Channel.removeChatLink(State.public, key, id);
-}
-
 function getKey() { return key; }
 function getMyName() { return myName; }
 function getMyProfilePhoto() { return myProfilePhoto; }
@@ -322,8 +316,8 @@ function addChannel(chat) {
     });
     chat.inviteLinks = {};
     chat.getChatLinks({callback: ({url, id}) => {
-      console.log('got chat links');
-      chat.inviteLinks[id] = url; // TODO state
+      console.log('got chat link', id, url);
+      chat.inviteLinks[id] = url; // TODO use State
       State.local.get('inviteLinksChanged').put(true);
     }});
   } else {
@@ -380,4 +374,4 @@ function subscribeToMsgs(pub) {
   });
 }
 
-export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, removeChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };

@@ -8374,6 +8374,7 @@
 	      throw new Error('Only group channels may have chat links');
 	    }
 	    var chatLinks = [];
+	    var chatLinkSubscriptions = {};
 	    this.on('chatLinks', function (links, from) {
 	      // TODO: check admin permissions
 	      if (!links || (typeof links === 'undefined' ? 'undefined' : _typeof(links)) !== 'object') {
@@ -8383,18 +8384,23 @@
 	        var link = links[linkId];
 	        if (chatLinks.indexOf(linkId) !== -1) {
 	          return;
-	        } // TODO: check if link was nulled
+	        }
+	        if (link === null) {
+	          chatLinkSubscriptions[linkId] && chatLinkSubscriptions[linkId].off(); // unsubscribe removed chat link
+	          delete chatLinkSubscriptions[linkId];
+	          callback && callback({ id: linkId, url: null });
+	          return;
+	        }
 	        var channels = [];
 	        chatLinks.push(linkId);
 	        var url = Channel.formatChatLink({ urlRoot: urlRoot, inviter: from, channelId: _this21.uuid, sharedSecret: link.sharedSecret, linkId: linkId });
-	        if (callback) {
-	          callback({ url: url, id: linkId });
-	        }
+	        callback && callback({ url: url, id: linkId });
 	        if (subscribe) {
-	          _this21.gun.user(link.sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId) {
+	          _this21.gun.user(link.sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId, a, e) {
 	            if (!encPub || typeof encPub !== 'string' || encPub.length < 10) {
 	              return;
 	            }
+	            chatLinkSubscriptions[linkId] = e;
 	            var s = _JSON$stringify(encPub);
 	            if (channels.indexOf(s) === -1) {
 	              channels.push(s);
@@ -8753,7 +8759,18 @@
 	  */
 
 
-	  Channel.removeChatLink = function removeChatLink(gun, key, linkId) {
+	  Channel.prototype.removeGroupChatLink = function removeGroupChatLink(linkId) {
+	    this.chatLinks[linkId] = null;
+	    this.put('chatLinks', this.chatLinks);
+	    this.gun.user().get('chatLinks').get(linkId).put(null);
+	  };
+
+	  /**
+	  *
+	  */
+
+
+	  Channel.removePrivateChatLink = function removePrivateChatLink(gun, key, linkId) {
 	    gun.user().auth(key);
 	    gun.user().get('chatLinks').get(linkId).put(null);
 	  };

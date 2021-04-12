@@ -84,6 +84,11 @@ class NewChat extends Component {
     });
   }
 
+  removeChatLink(id) {
+    State.local.get('chatLinks').get(id).put(null);
+    return iris.Channel.removePrivateChatLink(State.public, Session.getKey(), id);
+  }
+
   render() {
     return html`
       <div class="main-view" id="new-chat">
@@ -118,7 +123,7 @@ class NewChat extends Component {
                   <input type="text" value=${url} onClick=${e => $(e.target).select()}/>
                 </div>
                 <div class="flex-cell no-flex">
-                  <button onClick=${() => Session.removeChatLink(id)}>${t('remove')}</button>
+                  <button onClick=${() => this.removeChatLink(id)}>${t('remove')}</button>
                 </div>
               </div>
             `;
