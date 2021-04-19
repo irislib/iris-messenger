@@ -61,6 +61,9 @@ class Chat extends View {
     this.chat = null;
     const go = () => {
       this.chat = Session.channels[this.props.id];
+      if (!this.chat && this.props.id.length > 40) {
+        this.chat = Session.newChannel(this.props.id);
+      }
       if (this.chat) {
         clearInterval(this.iv)
         Session.subscribeToMsgs(this.props.id);
@@ -82,7 +85,6 @@ class Chat extends View {
       this.eventListeners['participants'] = e;
       const hasAlready = !!this.participants[k];
       this.participants[k] = v;
-      console.log(1, v);
       if (!!v && !hasAlready) {
         State.public.user(k).get('activity').on((activity, a, b, e) => {
           this.eventListeners[k + 'activity'] = e;

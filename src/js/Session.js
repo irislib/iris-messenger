@@ -235,6 +235,7 @@ function newChannel(pub, chatLink) {
   }
   const chat = new iris.Channel({gun: State.public, key, chatLink: chatLink, participants: pub});
   addChannel(chat);
+  return chat;
 }
 
 function addChannel(chat) {
