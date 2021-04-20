@@ -86,7 +86,7 @@ class ScrollWindow {
       this.elements.set(key, val);
       this.sortedKeys = [...this.elements.keys()].sort();
       const sortedElements = this.sortedKeys.map(k => this.elements.get(k));
-      this.opts.onChange && this.opts.onChange(sortedElements);
+      this.opts.onChange && this.opts.onChange(sortedElements, this.elements);
     };
     const keys = this._getSortedKeys();
     if (keys.length < this.opts.size) {

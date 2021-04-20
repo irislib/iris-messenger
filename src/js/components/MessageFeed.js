@@ -10,7 +10,7 @@ const size = 10;
 class MessageFeed extends Component {
   constructor() {
     super();
-    this.state = {sortedMessages:[]};
+    this.state = {sortedMessages:[], mappedMessages: new Map()};
   }
 
   componentDidMount() {
@@ -20,14 +20,14 @@ class MessageFeed extends Component {
   }
 
   setUpScroller() {
-    this.scroller = new ScrollWindow(this.props.node, {size, onChange: sortedMessages => this.setState({sortedMessages: sortedMessages.reverse()})});
+    this.scroller = new ScrollWindow(this.props.node, {size, onChange: (sortedMessages, mappedMessages) => this.setState({sortedMessages: sortedMessages.reverse(), mappedMessages})});
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.node._.id !== prevProps.node._.id) {
       this.scroller && this.scroller.unsubscribe();
       this.setUpScroller();
-      this.setState({sortedMessages: []});
+      this.setState({sortedMessages: [], mappedMessages: new Map()});
     }
   }
 
@@ -48,8 +48,32 @@ class MessageFeed extends Component {
     container.css({'padding-top': 0, 'padding-bottom': 0});
   }
 
+  renderMessages() {
+    if (this.props.keyIsMsgHash) {
+
+      return html`
+        ${this.state.sortedMessages
+          .map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')
+        }
+      `;
+    } else {
+      return html`
+        ${this.state.sortedMessages
+          .map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')
+        }
+      `;
+    }
+  }
+
   render() {
     const showButtons = this.scroller && this.scroller.elements.size >= size;
+    let messages;
+    if (this.props.keyIsMsgHash) {
+      messages = Array.from(this.state.mappedMessages.keys()).sort().reverse();
+    } else {
+      messages = this.state.sortedMessages;
+    }
+    //console.log(1,messages);
     return html`
       <div class="feed-container">
         ${showButtons ? html`
@@ -58,8 +82,7 @@ class MessageFeed extends Component {
             <button onClick=${() => this.topClicked()}>${t('feed_top')}</button>
           </p>
         `: ''}
-        ${this.state.sortedMessages
-          .map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')
+        ${messages.map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')
         }
         ${showButtons ? html`
           <p>

@@ -177,13 +177,13 @@ class Profile extends View {
     if (this.props.tab === 'replies') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+          <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
         </div>
       `;
     } else if (this.props.tab === 'likes') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+          <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
         </div>
       `;
     } else {
