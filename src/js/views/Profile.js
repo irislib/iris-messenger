@@ -66,10 +66,45 @@ class Profile extends View {
     }
   }
 
-  renderView() {
+  renderSettings(chat) {
+    return html`
+    <div id="chat-settings" style="display:none">
+      <hr/>
+      <h3>${t('chat_settings')}</h3>
+      <div class="profile-nicknames">
+        <h4>${t('nicknames')}</h4>
+        <p>
+          ${t('nickname')}:
+          <input value=${chat && chat.theirNickname} onInput=${e => chat && chat.put('nickname', e.target.value)}/>
+        </p>
+        <p>
+          ${t('their_nickname_for_you')}:
+          <span>
+            ${chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : ''}
+          </span>
+        </p>
+      </div>
+      <div class="notification-settings">
+        <h4>${t('notifications')}</h4>
+        <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
+        <label for="notifyAll">${t('all_messages')}</label><br/>
+        <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
+        <label for="notifyMentionsOnly">${t('mentions_only')}</label><br/>
+        <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
+        <label for="notifyNothing">${t('nothing')}</label><br/>
+      </div>
+      <hr/>
+      <p>
+        <button class="delete-chat" onClick=${() => deleteChat(this.props.id)}>${t('delete_chat')}</button>
+      </p>
+      <hr/>
+    </div>
+    `;
+  }
+
+  renderDetails() {
     this.isMyProfile = Session.getPubKey() === this.props.id;
     const chat = Session.channels[this.props.id];
-    const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
     let profilePhoto;
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
@@ -81,86 +116,70 @@ class Profile extends View {
       }
     }
     return html`
-      <div class="content">
-        <div class="profile-top">
-          <div class="profile-header">
-            <div class="profile-photo-container">
-              ${profilePhoto}
-            </div>
-            <div class="profile-header-stuff">
-              <h3 class="profile-name" placeholder=${this.isMyProfile ? t('name') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
-              <div class="profile-about hidden-xs">
-                <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
-              </div>
-              <div class="profile-actions">
-                <div class="follow-count">
-                  <a href="/follows/${this.props.id}">
-                    <span>${this.state.followedUserCount}</span> ${t('following')}
-                  </a>
-                  <a href="/followers/${this.props.id}">
-                    <span>${this.state.followerCount}</span> ${t('followers')}
-                  </a>
-                </div>
-                ${this.followedUsers.has(Session.getPubKey()) ? html`
-                  <p><small>${t('follows_you')}</small></p>
-                `: this.props.id === SMS_VERIFIER_PUB ? html`
-                  <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
-                ` : ''}
-                ${this.isMyProfile ? '' : html`<${FollowButton} id=${this.props.id}/>`}
-                <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
-                <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
-                <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
-                ${this.isMyProfile ? '' : html`
-                  <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
-                `}
-                ${this.isMyProfile ? '' : html`<${BlockButton} id=${this.props.id}/>`}
-              </div>
-            </div>
-          </div>
-          <div class="profile-about visible-xs-flex">
+    <div class="profile-top">
+      <div class="profile-header">
+        <div class="profile-photo-container">
+          ${profilePhoto}
+        </div>
+        <div class="profile-header-stuff">
+          <h3 class="profile-name" placeholder=${this.isMyProfile ? t('name') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
+          <div class="profile-about hidden-xs">
             <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
+          <div class="profile-actions">
+            <div class="follow-count">
+              <a href="/follows/${this.props.id}">
+                <span>${this.state.followedUserCount}</span> ${t('following')}
+              </a>
+              <a href="/followers/${this.props.id}">
+                <span>${this.state.followerCount}</span> ${t('followers')}
+              </a>
+            </div>
+            ${this.followedUsers.has(Session.getPubKey()) ? html`
+              <p><small>${t('follows_you')}</small></p>
+            `: this.props.id === SMS_VERIFIER_PUB ? html`
+              <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
+            ` : ''}
+            ${this.isMyProfile ? '' : html`<${FollowButton} id=${this.props.id}/>`}
+            <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
+            <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+            <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
+            ${this.isMyProfile ? '' : html`
+              <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
+            `}
+            ${this.isMyProfile ? '' : html`<${BlockButton} id=${this.props.id}/>`}
+          </div>
+        </div>
+      </div>
+      <div class="profile-about visible-xs-flex">
+        <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
+      </div>
 
-          <p id="profile-page-qr" style="display:none" class="qr-container"></p>
-          <div id="chat-settings" style="display:none">
-            <hr/>
-            <h3>${t('chat_settings')}</h3>
-            <div class="profile-nicknames">
-              <h4>${t('nicknames')}</h4>
-              <p>
-                ${t('nickname')}:
-                <input value=${chat && chat.theirNickname} onInput=${e => chat && chat.put('nickname', e.target.value)}/>
-              </p>
-              <p>
-                ${t('their_nickname_for_you')}:
-                <span>
-                  ${chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : ''}
-                </span>
-              </p>
-            </div>
-            <div class="notification-settings">
-              <h4>${t('notifications')}</h4>
-              <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
-              <label for="notifyAll">${t('all_messages')}</label><br/>
-              <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
-              <label for="notifyMentionsOnly">${t('mentions_only')}</label><br/>
-              <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
-              <label for="notifyNothing">${t('nothing')}</label><br/>
-            </div>
-            <hr/>
-            <p>
-              <button class="delete-chat" onClick=${() => deleteChat(this.props.id)}>${t('delete_chat')}</button>
-            </p>
-            <hr/>
-          </div>
-        </div>
-        <div>
-          ${messageForm}
-          <div class="public-messages-view">
-            ${this.getNotification()}
-            <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
-          </div>
-        </div>
+      <p id="profile-page-qr" style="display:none" class="qr-container"></p>
+      ${this.renderSettings(chat)}
+    </div>
+    `;
+  }
+
+  renderTab() {
+    const chat = Session.channels[this.props.id];
+    const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
+    return html`
+    <div>
+      ${messageForm}
+      <div class="public-messages-view">
+        ${this.getNotification()}
+        <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+      </div>
+    </div>
+    `;
+  }
+
+  renderView() {
+    return html`
+      <div class="content">
+        ${this.renderDetails()}
+        ${this.renderTab()}
       </div>
     `;
   }
@@ -176,7 +195,7 @@ class Profile extends View {
     }
   }
 
-  userDidMount() {
+  getProfileDetails() {
     const pub = this.props.id;
     State.public.user(pub).get('follow').map().on((following,key,c,e) => {
       this.eventListeners.push(e);
@@ -237,7 +256,7 @@ class Profile extends View {
     var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
     State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
-    this.userDidMount();
+    this.getProfileDetails();
     if (chat) {
       $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
       $('input:radio[name=notificationPreference]').off().on('change', (event) => {
