@@ -166,7 +166,9 @@ class Main extends Component {
               <${About} path="/about"/>
               <${Settings} path="/settings" showSwitchAccount=${true}/>
               <${LogoutConfirmation} path="/logout"/>
-              <${Profile} path="/profile/:id?"/>
+              <${Profile} path="/profile/:id?" tab="profile"/>
+              <${Profile} path="/replies/:id?" tab="replies"/>
+              <${Profile} path="/likes/:id?" tab="likes"/>
               <${Group} path="/group/:id?"/>
               <${Store} path="/store/:store?"/>
               <${Checkout} path="/checkout/:store"/>

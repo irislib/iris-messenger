@@ -367,6 +367,33 @@ a.logo img:last-child {
   max-width: 100%;
 }
 
+.tabs {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 15px;
+}
+
+.tabs a {
+  flex: 1;
+  text-align: center;
+  padding: 15px 5px;
+  transition: all 0.25s ease;
+  user-select: none;
+  border-bottom: 2px solid rgba(0,0,0,0);
+}
+
+.tabs a.active {
+  border-bottom: 2px solid var(--link-color);
+}
+
+.tabs a:hover {
+  background: var(--msg-content-background);
+}
+
+.tabs a:focus, a:hover, a:active {
+  text-decoration: none;
+}
+
 header.footer .header-content {
   padding: 0;
 }

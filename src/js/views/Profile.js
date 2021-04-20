@@ -15,6 +15,7 @@ import Identicon from '../components/Identicon.js';
 import Name from '../components/Name.js';
 import View from './View.js';
 import SearchBox from '../components/SearchBox.js';
+import { Link } from '../lib/preact.match.js';
 
 const SMS_VERIFIER_PUB = 'ysavwX9TVnlDw93w9IxezCJqSDMyzIU-qpD8VTN5yko.3ll1dFdxLkgyVpejFkEMOFkQzp_tRrkT3fImZEx94Co';
 
@@ -161,24 +162,49 @@ class Profile extends View {
     `;
   }
 
-  renderTab() {
-    const chat = Session.channels[this.props.id];
-    const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
+  renderTabs() {
     return html`
-    <div>
-      ${messageForm}
-      <div class="public-messages-view">
-        ${this.getNotification()}
-        <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
-      </div>
+    <div class="tabs">
+      <${Link} activeClassName="active" href="/profile/${this.props.id}">Posts<//>
+      <${Link} activeClassName="active" href="/replies/${this.props.id}">Replies<//>
+      <${Link} activeClassName="active" href="/likes/${this.props.id}">Likes<//>
     </div>
     `;
+  }
+
+  renderTab() {
+    const chat = Session.channels[this.props.id];
+    if (this.props.tab === 'replies') {
+      return html`
+        <div class="public-messages-view">
+          <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+        </div>
+      `;
+    } else if (this.props.tab === 'likes') {
+      return html`
+        <div class="public-messages-view">
+          <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+        </div>
+      `;
+    } else {
+      const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
+      return html`
+      <div>
+        ${messageForm}
+        <div class="public-messages-view">
+          ${this.getNotification()}
+          <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+        </div>
+      </div>
+      `;
+    }
   }
 
   renderView() {
     return html`
       <div class="content">
         ${this.renderDetails()}
+        ${this.renderTabs()}
         ${this.renderTab()}
       </div>
     `;
