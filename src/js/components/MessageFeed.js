@@ -76,7 +76,7 @@ class MessageFeed extends Component {
     //console.log(1,messages);
     return html`
       <div class="feed-container">
-        ${showButtons ? html`
+        ${showButtons && this.scroller && this.scroller.opts.stickTo !== 'top' ? html`
           <p>
             <button onClick=${() => this.scroller.up()}>${t('feed_up')}</button>
             <button onClick=${() => this.topClicked()}>${t('feed_top')}</button>
@@ -84,7 +84,7 @@ class MessageFeed extends Component {
         `: ''}
         ${messages.map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')
         }
-        ${showButtons ? html`
+        ${showButtons && this.scroller && this.scroller.opts.stickTo !== 'bottom' ? html`
           <p>
             <button onClick=${() => this.scroller.down()}>${t('feed_down')}</button>
             <button onClick=${() => this.bottomClicked()}>${t('feed_bottom')}</button>
