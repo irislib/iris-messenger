@@ -40,12 +40,14 @@ class MessageFeed extends Component {
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
     Helpers.animateScrollTop('.main-view');
+    this.setState({});
   }
 
   bottomClicked() {
     this.scroller.bottom();
     const container = $(this.base).find('.feed-container');
     container.css({'padding-top': 0, 'padding-bottom': 0});
+    this.setState({});
   }
 
   renderMessages() {
