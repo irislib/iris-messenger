@@ -67,7 +67,9 @@ class Profile extends View {
     }
   }
 
-  renderSettings(chat) {
+  renderSettings() {
+    const chat = Session.channels[this.props.id];
+
     return html`
     <div id="chat-settings" style="display:none">
       <hr/>
@@ -105,7 +107,6 @@ class Profile extends View {
 
   renderDetails() {
     this.isMyProfile = Session.getPubKey() === this.props.id;
-    const chat = Session.channels[this.props.id];
     let profilePhoto;
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
@@ -157,7 +158,7 @@ class Profile extends View {
       </div>
 
       <p id="profile-page-qr" style="display:none" class="qr-container"></p>
-      ${this.renderSettings(chat)}
+      ${this.renderSettings()}
     </div>
     `;
   }
@@ -177,13 +178,13 @@ class Profile extends View {
     if (this.props.tab === 'replies') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
+          <${MessageFeed} key="replies${this.props.id}" node=${State.public.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
         </div>
       `;
     } else if (this.props.tab === 'likes') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
+          <${MessageFeed} key="likes${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
         </div>
       `;
     } else {
@@ -193,7 +194,7 @@ class Profile extends View {
         ${messageForm}
         <div class="public-messages-view">
           ${this.getNotification()}
-          <${MessageFeed} key="feed${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+          <${MessageFeed} key="posts${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
         </div>
       </div>
       `;
