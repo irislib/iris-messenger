@@ -83,6 +83,7 @@ class Settings extends View {
         ${iris.util.isElectron ? html`
           <h4>${t('your_public_address')}</h4>
           <p>http://${this.state.electron.publicIp || '-'}:8767/gun</p>
+          <p><small>If you're behind NAT (likely) and want to accept incoming connections, you need to configure your router to forward the port 8767 to this computer.</small></p>
         `: ''}
         <h4>Set up your own peer</h4>
         <p>
