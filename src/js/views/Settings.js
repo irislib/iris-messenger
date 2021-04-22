@@ -169,6 +169,7 @@ class Settings extends View {
   }
 
   componentDidMount() {
+    updatePeersFromGun();
     this.updatePeersFromGunInterval = setInterval(() => this.updatePeersFromGun(), 2000);
     $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
 
