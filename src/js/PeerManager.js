@@ -11,7 +11,7 @@ const DEFAULT_PEERS = {
   'https://iris.cx/gun': {},
   'https://gun-us.herokuapp.com/gun': {}
 };
-var peers = getPeers();
+var peers = getSavedPeers();
 
 async function addPeer(peer) {
   if (!Helpers.isUrl(peer.url)) {
@@ -43,10 +43,13 @@ function disconnectPeer(peerFromGun) {
 }
 
 function getPeers() {
+  return peers;
+}
+
+function getSavedPeers() {
   var p = localStorage.getItem('gunPeers');
   if (p && p !== 'undefined') {
     p = JSON.parse(p);
-    p = Object.assign({}, DEFAULT_PEERS, p);
   } else {
     p = DEFAULT_PEERS;
   }
@@ -59,7 +62,7 @@ function getPeers() {
 
 function resetPeers() {
   localStorage.setItem('gunPeers', undefined);
-  peers = getPeers();
+  peers = getSavedPeers();
 }
 
 function savePeers() {
@@ -143,62 +146,10 @@ function checkGunPeerCount() {
   }
 }
 
-function updatePeerList() {
-  var peersFromGun = State.public.back('opt.peers');
-  $('#peers .peer').remove();
-  $('#reset-peers').remove();
-  var urls = Object.keys(peers);
-  if (urls.length === 0) {
-    var resetBtn = $('<button>').attr('id', 'reset-peers').css({'margin-bottom': '15px'}).text(t('restore_defaults')).click(() => {
-      resetPeers();
-      updatePeerList();
-    });
-    $('#peers').prepend(resetBtn);
-  }
-  urls.forEach(url => {
-    var peer = peers[url];
-    var peerFromGun = peersFromGun[url];
-    var connected = peerFromGun && peerFromGun.wire && peerFromGun.wire.hied === 'hi';
-    var row = $('<div>').addClass('flex-row peer');
-    var urlEl = $('<div>').addClass('flex-cell').text(url);
-    var removeBtn = $('<button>').text(t('remove')).click(() => {
-      Helpers.hideAndRemove(row); // this may be screwed by setInterval removing before animation finished
-      removePeer(url);
-      if (peerFromGun) {
-        disconnectPeer(peerFromGun);
-      }
-    });
-    var connectBtn = $('<button>').text(peer.enabled ? t('disable') : t('enable')).click(function() {
-      if (peer.enabled) {
-        disablePeer(url, peerFromGun);
-      } else {
-        connectPeer(url);
-      }
-      updatePeerList();
-    });
-    row.append(urlEl).append($('<div>').addClass('flex-cell no-flex').append(connectBtn).append(removeBtn));
-    if (connected) {
-      row.prepend('<span style="color: var(--positive-color)"><svg height="14" width="14" x="0px" y="0px" viewBox="0 0 191.667 191.667"><path fill="currentColor" d="M95.833,0C42.991,0,0,42.99,0,95.833s42.991,95.834,95.833,95.834s95.833-42.991,95.833-95.834S148.676,0,95.833,0z M150.862,79.646l-60.207,60.207c-2.56,2.56-5.963,3.969-9.583,3.969c-3.62,0-7.023-1.409-9.583-3.969l-30.685-30.685 c-2.56-2.56-3.97-5.963-3.97-9.583c0-3.621,1.41-7.024,3.97-9.584c2.559-2.56,5.962-3.97,9.583-3.97c3.62,0,7.024,1.41,9.583,3.971 l21.101,21.1l50.623-50.623c2.56-2.56,5.963-3.969,9.583-3.969c3.62,0,7.023,1.409,9.583,3.969 C156.146,65.765,156.146,74.362,150.862,79.646z"/></svg></span>');
-    } else {
-      row.prepend('<small><svg width="14" height="14" x="0px" y="0px" viewBox="0 0 512 512" fill="currentColor"><path d="M257,0C116.39,0,0,114.39,0,255s116.39,257,257,257s255-116.39,255-257S397.61,0,257,0z M383.22,338.79 c11.7,11.7,11.7,30.73,0,42.44c-11.61,11.6-30.64,11.79-42.44,0L257,297.42l-85.79,83.82c-11.7,11.7-30.73,11.7-42.44,0 c-11.7-11.7-11.7-30.73,0-42.44l83.8-83.8l-83.8-83.8c-11.7-11.71-11.7-30.74,0-42.44c11.71-11.7,30.74-11.7,42.44,0L257,212.58 l83.78-83.82c11.68-11.68,30.71-11.72,42.44,0c11.7,11.7,11.7,30.73,0,42.44l-83.8,83.8L383.22,338.79z"/></svg></small>');
-    }
-    if (peer.from) {
-      urlEl.append($('<br>'));
-      urlEl.append(
-        $('<small>').text(t('from') + ' ' + Helpers.truncateString(peer.from, 10)) // TODO: show name
-        .css({cursor:'pointer'}).click(() => route('/chat/' + peer.from))
-      );
-    }
-    $('#peers').prepend(row);
-  });
-}
-
 function init() {
   State.local.get('settings').get('maxConnectedPeers').on(n => {
     if (n !== undefined) maxConnectedPeers = n;
   });
-  updatePeerList();
-  setInterval(updatePeerList, 2000);
   setInterval(checkGunPeerCount, 10000);
 }
 
@@ -213,6 +164,6 @@ export default {
   disconnectPeer,
   disablePeer,
   askForPeers,
-  updatePeerList,
+  resetPeers,
   checkGunPeerCount
 };
