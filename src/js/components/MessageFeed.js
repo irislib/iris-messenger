@@ -16,7 +16,11 @@ class MessageFeed extends Component {
   componentDidMount() {
     //this.initIntersectionObserver();
     this.setUpScroller();
-    State.local.get('scrollUp').on(() => this.topClicked());
+    let first = true;
+    State.local.get('scrollUp').on(() => {
+      !first && this.topClicked();
+      first = false;
+    });
   }
 
   setUpScroller() {
@@ -26,8 +30,8 @@ class MessageFeed extends Component {
   componentDidUpdate(prevProps) {
     if (this.props.node._.id !== prevProps.node._.id) {
       this.scroller && this.scroller.unsubscribe();
-      this.setUpScroller();
       this.setState({sortedMessages: [], mappedMessages: new Map()});
+      this.setUpScroller();
     }
   }
 
