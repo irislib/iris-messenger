@@ -40,6 +40,7 @@ class PublicMessage extends Message {
         });
       }
       State.local.get('follows').map().on((v, key, a, e) => {
+        if (this.eventListeners[key]) return;
         this.eventListeners[key] = e;
         State.public.user(key).get('likes').get(this.props.hash).on((liked,a,b,e) => {
           this.eventListeners[key+'likes'] = e;
