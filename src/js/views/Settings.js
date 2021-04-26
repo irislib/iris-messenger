@@ -115,7 +115,10 @@ class Settings extends View {
   }
 
   renderPeerList() {
-    const urls = Object.keys(PeerManager.getPeers());
+    let urls = Object.keys(PeerManager.getKnownPeers());
+    if (this.state.peersFromGun) {
+      Object.keys(this.state.peersFromGun).forEach(url => urls.indexOf(url) === -1 && urls.push(url));
+    }
 
     return html`
       <div id="peers" class="flex-table">
@@ -123,7 +126,7 @@ class Settings extends View {
           <button id="reset-peers" style="margin-bottom: 15px" onClick=${() => this.resetPeersClicked()}>${t('restore_defaults')}</button>
         `: ''}
         ${urls.map(url => {
-            const peer = PeerManager.getPeers()[url];
+            const peer = PeerManager.getKnownPeers()[url];
             const peerFromGun = this.state.peersFromGun && this.state.peersFromGun[url];
             const connected = peerFromGun && peerFromGun.wire && peerFromGun.wire.hied === 'hi';
             return html`
