@@ -126,7 +126,7 @@ class Settings extends View {
           <button id="reset-peers" style="margin-bottom: 15px" onClick=${() => this.resetPeersClicked()}>${t('restore_defaults')}</button>
         `: ''}
         ${urls.map(url => {
-            const peer = PeerManager.getKnownPeers()[url];
+            const peer = PeerManager.getKnownPeers()[url] || {};
             const peerFromGun = this.state.peersFromGun && this.state.peersFromGun[url];
             const connected = peerFromGun && peerFromGun.wire && peerFromGun.wire.hied === 'hi';
             return html`
