@@ -62,7 +62,7 @@ class ExplorerNode extends Component {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = {children: {}};
+    this.state = {children: {}, shownChildrenCount: 20};
     this.children = {};
   }
 
@@ -229,6 +229,8 @@ class ExplorerNode extends Component {
   }
 
   render() {
+    const children = Object.keys(this.state.children).sort();
+    const showMoreBtn = children.length > this.state.shownChildrenCount;
     return html`
       ${this.props.indent === 0 ? html`
         <div class="explorer-row" style="padding-left: ${this.props.indent}em">
@@ -250,7 +252,7 @@ class ExplorerNode extends Component {
           ` : ''}
         </div>
       `: ''}
-      ${Object.keys(this.state.children).sort().map(k => {
+      ${children.slice(0,this.state.shownChildrenCount).map(k => {
         const v = this.state.children[k].value;
         if (typeof v === 'object' && v && v['_']) {
           return this.renderChildObject(k, v);
@@ -258,6 +260,9 @@ class ExplorerNode extends Component {
           return this.renderChildValue(k, v);
         }
       })}
+      ${showMoreBtn ? html`
+        <a style="padding-left: ${this.props.indent + 1}em" href="" onClick=${e => {e.preventDefault();this.setState({shownChildrenCount: this.state.shownChildrenCount + 20})}}>More</a>
+      ` : ''}
     `;
   }
 }
