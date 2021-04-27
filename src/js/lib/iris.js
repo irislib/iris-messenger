@@ -10323,7 +10323,7 @@
 	  return SocialNetwork;
 	}();
 
-	var version$1 = "0.0.152";
+	var version$1 = "0.0.153";
 
 	var taggedTemplateLiteralLoose = createCommonjsModule(function (module, exports) {
 
