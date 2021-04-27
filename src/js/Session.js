@@ -352,7 +352,7 @@ function addChannel(chat) {
   if (chat.onTheir) {
     console.log('Listen to private peer url from', pub);
     chat.onTheir('my_peer', (url, k, from) => {
-      console.log('Got private peer url', url, 'from', pub);
+      console.log('Got private peer url', url, 'from', from);
       PeerManager.addPeer({url, from})
     });
   }

@@ -11,11 +11,18 @@ const DEFAULT_PEERS = {
   'https://iris.cx/gun': {},
   'https://gun-us.herokuapp.com/gun': {}
 };
-var knownPeers= getSavedPeers();
+var knownPeers = getSavedPeers();
 
 async function addPeer(peer) {
   if (!Helpers.isUrl(peer.url)) {
     throw new Error('Invalid url', peer.url);
+  }
+  if (peer.from) {
+    Object.keys(knownPeers).forEach(k => {
+      if (knownPeers[k].from === peer.from) { // remove previous peer url from the same user
+        delete knownPeers[k];
+      }
+    });
   }
   knownPeers[peer.url] = knownPeers[peer.url] || _.omit(peer, 'url');
   if (peer.visibility === 'public') {
@@ -26,7 +33,7 @@ async function addPeer(peer) {
     State.public.user().get('peers').get(encryptedUrlHash).put({url: peer.url, lastSeen: new Date().toISOString()});
   }
   if (peer.enabled !== false) {
-    connectPeer(peer.url);
+    connectPeer(peer.url); // this calls savePeers()
   } else {
     savePeers();
   }
@@ -130,7 +137,7 @@ function checkGunPeerCount() {
   var peersFromGun = State.public.back('opt.peers');
   var connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
     if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
-      console.log('Non-websocket peer', peer);
+      console.log('WebRTC peer', peer);
     }
     return peer && peer.wire && peer.wire.hied === 'hi' && peer.wire.constructor.name === 'WebSocket';
   });
