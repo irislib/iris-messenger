@@ -1,7 +1,7 @@
 import { Component } from '../lib/preact.js';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
-import ScrollWindow from '../lib/ScrollWindow.js';
+import ScrollViewport from '../lib/preact-scroll-viewport.js';
 import State from '../State.js';
 import { translate as t } from '../Translation.js';
 
@@ -10,92 +10,54 @@ const size = 10;
 class MessageFeed extends Component {
   constructor() {
     super();
-    this.state = {sortedMessages:[], mappedMessages: new Map()};
+    this.state = {sortedMessages:[]};
+    this.mappedMessages = new Map();
+    this.eventListeners = {};
   }
 
   componentDidMount() {
-    //this.initIntersectionObserver();
-    this.setUpScroller();
+    this.props.node.map().on((v, k, x, e) => {
+      if (!this.eventListeners['node']) {
+        this.eventListeners['node'] = e;
+      }
+      if (v) {
+        this.mappedMessages.set(k, this.props.keyIsMsgHash ? k : v);
+      } else {
+        this.mappedMessages.delete(k);
+      }
+      this.setState({
+        sortedMessages: Array.from(this.mappedMessages.keys()).sort().reverse().map(k => this.mappedMessages.get(k))
+      })
+    });
     let first = true;
     State.local.get('scrollUp').on(() => {
-      !first && this.topClicked();
+      !first && Helpers.animateScrollTop('.main-view');
       first = false;
     });
   }
 
-  setUpScroller() {
-    this.scroller = new ScrollWindow(this.props.node, {size, onChange: (sortedMessages, mappedMessages) => this.setState({sortedMessages: sortedMessages.reverse(), mappedMessages})});
+  unsubscribe() {
+    Object.values(this.eventListeners).forEach(e => e.off());
+    this.eventListeners = {};
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.node._.id !== prevProps.node._.id) {
-      this.scroller && this.scroller.unsubscribe();
+      this.unsubscribe();
       this.setState({sortedMessages: [], mappedMessages: new Map()});
-      this.setUpScroller();
     }
   }
 
   componentWillUnmount() {
-    this.scroller && this.scroller.unsubscribe();
-  }
-
-  topClicked() {
-    this.scroller.top();
-    const container = $(this.base).find('.feed-container');
-    container.css({'padding-top': 0, 'padding-bottom': 0});
-    Helpers.animateScrollTop('.main-view');
-    this.setState({});
-  }
-
-  bottomClicked() {
-    this.scroller.bottom();
-    const container = $(this.base).find('.feed-container');
-    container.css({'padding-top': 0, 'padding-bottom': 0});
-    this.setState({});
-  }
-
-  renderMessages() {
-    if (this.props.keyIsMsgHash) {
-
-      return html`
-        ${this.state.sortedMessages
-          .map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')
-        }
-      `;
-    } else {
-      return html`
-        ${this.state.sortedMessages
-          .map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')
-        }
-      `;
-    }
+    this.unsubscribe();
   }
 
   render() {
-    const showButtons = this.scroller && this.scroller.elements.size >= size;
-    let messages;
-    if (this.props.keyIsMsgHash) {
-      messages = Array.from(this.state.mappedMessages.keys()).sort().reverse();
-    } else {
-      messages = this.state.sortedMessages;
-    }
-    //console.log(1,messages);
     return html`
       <div class="feed-container">
-        ${showButtons && this.scroller && this.scroller.opts.stickTo !== 'top' ? html`
-          <p>
-            <button onClick=${() => this.scroller.up()}>${t('feed_up')}</button>
-            <button onClick=${() => this.topClicked()}>${t('feed_top')}</button>
-          </p>
-        `: ''}
-        ${messages.map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')
-        }
-        ${showButtons && this.scroller && this.scroller.opts.stickTo !== 'bottom' ? html`
-          <p>
-            <button onClick=${() => this.scroller.down()}>${t('feed_down')}</button>
-            <button onClick=${() => this.bottomClicked()}>${t('feed_bottom')}</button>
-          </p>
-        `: ''}
+        <${ScrollViewport}>
+          ${this.state.sortedMessages.map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')}
+        </${ScrollViewport}>
       </div>
     `;
   }
