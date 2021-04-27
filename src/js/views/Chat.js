@@ -10,7 +10,6 @@ import Session from '../Session.js';
 import Notifications from '../Notifications.js';
 import ChatList from '../components/ChatList.js';
 import NewChat from '../components/NewChat.js';
-import ScrollWindow from '../lib/ScrollWindow.js';
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
@@ -22,7 +21,6 @@ c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,35
 </g>
 </svg>
 `;
-const scrollerSize = 26;
 
 function copyMyChatLinkClicked(e) {
   Helpers.copyToClipboard(Session.getMyChatLink());
@@ -96,13 +94,17 @@ class Chat extends View {
     });
     State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
     const node = State.local.get('channels').get(this.props.id).get('msgs');
-    const limitedUpdate = _.throttle(sortedMessages => this.setState({sortedMessages}), 100); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?
-    this.scrollState = {previousDownIndex: -1, previousUpIndex: -1};
+    const limitedUpdate = _.throttle(() => this.setState({
+      sortedMessages: Object.keys(this.msgs).sort().map(k => this.msgs[k])
+    }), 100); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?
+    this.msgs = {};
+    node.map((msg, time) => {
+      this.msgs[time] = msg;
+      limitedUpdate();
+    });
     const container = document.getElementById("message-list");
     container.style.paddingBottom = 0;
     container.style.paddingTop = 0;
-    this.scroller = new ScrollWindow(node, {open: true, size: scrollerSize, onChange: limitedUpdate, stickTo: 'top'});
-    this.initIntersectionObserver();
   }
 
   setSortedParticipants() {
@@ -136,7 +138,7 @@ class Chat extends View {
       $('#not-seen-by-them').hide();
       this.componentDidMount();
     } else {
-      if (this.scroller && this.scroller.opts.stickTo === 'top') { Helpers.scrollToMessageListBottom(); }
+      Helpers.scrollToMessageListBottom();
       $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
       if (this.chat && !this.chat.uuid) {
         if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
@@ -150,7 +152,6 @@ class Chat extends View {
 
   unsubscribe() {
     clearInterval(this.iv);
-    this.scroller && this.scroller.unsubscribe();
     Object.values(this.eventListeners).forEach(e => e.off());
     this.eventListeners = {};
   }
@@ -194,7 +195,6 @@ class Chat extends View {
 
   scrollDown() {
     Helpers.scrollToMessageListBottom();
-    this.scroller.top();
     document.getElementById("message-list").style.paddingBottom = 0;
   }
 
@@ -281,89 +281,6 @@ class Chat extends View {
         </div>
       `: ''}
       `;
-  }
-
-  adjustPaddings(isScrollDown) {
-    const container = document.getElementById("message-list");
-    const currentPaddingTop = getNumFromStyle(container.style.paddingTop);
-    const currentPaddingBottom = getNumFromStyle(container.style.paddingBottom);
-    const remPaddingsVal = 62 * (scrollerSize / 2); // TODO: calculate actual element heights
-    if (isScrollDown) {
-      container.style.paddingTop = currentPaddingTop + remPaddingsVal + "px";
-      container.style.paddingBottom = currentPaddingBottom === 0 ? "0px" : currentPaddingBottom - remPaddingsVal + "px";
-    } else {
-      container.style.paddingBottom = currentPaddingBottom + remPaddingsVal + "px";
-      if (currentPaddingTop === 0) {
-        $('#message-view').scrollTop($('#topsentinel').offset().top + remPaddingsVal);
-      } else {
-        container.style.paddingTop = currentPaddingTop - remPaddingsVal + "px";
-      }
-    }
-  }
-
-  topSentCallback(entry) {
-    const container = document.getElementById("message-list");
-
-    const currentY = entry.boundingClientRect.top;
-    const currentRatio = entry.intersectionRatio;
-    const isIntersecting = entry.isIntersecting;
-
-    // conditional check for Scrolling up
-    if (
-      currentY > this.scrollState.topSentinelPreviousY &&
-      isIntersecting &&
-      currentRatio >= this.scrollState.topSentinelPreviousRatio &&
-      this.scroller.center !== this.scrollState.previousUpIndex && // stop if no new results were received
-      this.scroller.opts.stickTo !== 'bottom'
-    ) {
-      this.scrollState.previousUpIndex = this.scroller.center;
-      this.adjustPaddings(false);
-      this.scroller.down(scrollerSize / 2);
-    }
-    this.scrollState.topSentinelPreviousY = currentY;
-    this.scrollState.topSentinelPreviousRatio = currentRatio;
-  }
-
-  botSentCallback(entry) {
-    const currentY = entry.boundingClientRect.top;
-    const currentRatio = entry.intersectionRatio;
-    const isIntersecting = entry.isIntersecting;
-
-    // conditional check for Scrolling down
-    if (
-      currentY < this.scrollState.bottomSentinelPreviousY &&
-      currentRatio > this.scrollState.bottomSentinelPreviousRatio &&
-      isIntersecting &&
-      this.scroller.center !== this.scrollState.previousDownIndex &&  // stop if no new results were received
-      this.scroller.opts.stickTo !== 'top'
-    ) {
-      this.scrollState.previousDownIndex = this.scroller.center;
-      this.adjustPaddings(true);
-      this.scroller.up(scrollerSize / 2);
-    }
-    this.scrollState.bottomSentinelPreviousY = currentY;
-    this.scrollState.bottomSentinelPreviousRatio = currentRatio;
-  }
-
-  initIntersectionObserver() {
-    const options = {
-      //root: document.getElementById('message-view'),
-      //rootMargin: '500px',
-    }
-
-    const callback = entries => {
-      entries.forEach(entry => {
-        if (entry.target.id === 'topsentinel') {
-          this.topSentCallback(entry);
-        } else if (entry.target.id === `bottomsentinel`) {
-          this.botSentCallback(entry);
-        }
-      });
-    }
-
-    var observer = new IntersectionObserver(callback, options); // TODO: It's possible to quickly scroll past the sentinels without them firing. Top and bottom sentinels should extend to page top & bottom?
-    observer.observe(document.querySelector("#topsentinel"));
-    observer.observe(document.querySelector(`#bottomsentinel`));
   }
 }
 
