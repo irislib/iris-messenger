@@ -50,11 +50,16 @@ class PublicMessage extends Message {
           this.setState(s);
         });
         State.public.user(key).get('replies').get(this.props.hash).map().on((hash,time,b,e) => {
-          if (!hash || this.replies[hash]) return;
-          this.replies[hash] = {hash, time};
+          const k = key + time;
+          if (hash && this.replies[k]) return;
+          if (hash) {
+            this.replies[k] = {hash, time};
+          } else {
+            delete this.replies[k];
+          }
           this.eventListeners[key+'replies'] = e;
           const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
-          this.setState({replies: Object.keys(this.replies).length, sortedReplies });
+          this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
         });
       });
       if (msg.torrentId && Session.settings.local.enableWebtorrent) {
@@ -191,7 +196,7 @@ class PublicMessage extends Message {
               ${replyIcon}
             </a>
             <span class="count" onClick=${() => this.toggleReplies()}>
-              ${this.state.replies || ''}
+              ${this.state.replyCount || ''}
             </span>
             <a class="msg-btn like-btn ${this.state.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
               ${this.state.liked ? heartFull : heartEmpty}
