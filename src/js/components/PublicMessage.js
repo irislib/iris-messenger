@@ -147,10 +147,11 @@ class PublicMessage extends Message {
 
   onDelete(e) {
     e.preventDefault();
-    const msg = this.state.msg;
-    console.log(msg);
-    State.public.user().get('msgs').get(msg.time).put(null);
-    msg.replyingTo && State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
+    if (confirm('Delete message?')) {
+      const msg = this.state.msg;
+      State.public.user().get('msgs').get(msg.time).put(null);
+      msg.replyingTo && State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
+    }
   }
 
   render() {
