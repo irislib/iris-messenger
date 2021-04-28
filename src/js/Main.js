@@ -69,6 +69,12 @@ class Menu extends Component {
     });
   }
 
+  menuLinkClicked() {
+    State.local.get('toggleMenu').put(false);
+    State.local.get('scrollUp').put(true);
+    console.log(123);
+  }
+
   render() {
     const pub = Session.getPubKey();
     return html`
@@ -80,7 +86,7 @@ class Menu extends Component {
           </a>
         `}
         <div class="visible-xs-block">
-          <${Link} onClick=${() => State.local.get('toggleMenu').put(false)} activeClassName="active" href="/profile/${pub}">
+          <${Link} onClick=${() => this.menuLinkClicked()} activeClassName="active" href="/profile/${pub}">
             <span class="icon"><${Identicon} str=${pub} width=40/></span>
             <span class="text" style="font-size: 1.2em;border:0;margin-left: 7px;"><iris-text user="${pub}" path="profile/name" editable="false"/></span>
           <//>
@@ -89,7 +95,7 @@ class Menu extends Component {
         ${APPLICATIONS.map(a => {
           if (a.url) {
             return html`
-              <${a.native ? 'a' : Link} onClick=${() => State.local.get('toggleMenu').put(false)} activeClassName="active" href=${a.url}>
+              <${a.native ? 'a' : Link} onClick=${() => this.menuLinkClicked()} activeClassName="active" href=${a.url}>
                 <span class="icon">
                   ${a.text === t('messages') && this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
                   ${a.icon || Icons.circle}
