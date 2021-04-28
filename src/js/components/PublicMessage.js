@@ -1,8 +1,7 @@
 import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
-import PublicMessages from '../PublicMessages.js';
 import Identicon from './Identicon.js';
-import MessageForm from './MessageForm.js';
+import PublicMessageForm from './PublicMessageForm.js';
 import State from '../State.js';
 import { route } from '../lib/preact-router.es.js';
 import Message from './Message.js';
@@ -28,8 +27,36 @@ class PublicMessage extends Message {
     this.state = { sortedReplies: [] };
   }
 
+  fetchByHash() {
+    const hash = this.props.hash;
+    if (typeof hash !== 'string') throw new Error('hash must be a string, got ' + typeof hash + ' ' +  JSON.stringify(hash));
+    return new Promise(resolve => {
+      State.local.get('msgsByHash').get(hash).once(msg => {
+        if (typeof msg === 'string') {
+          try {
+            resolve(JSON.parse(msg));
+          } catch (e) {
+            console.error('message parsing failed', msg, e);
+          }
+        }
+      });
+      State.public.get('#').get(hash).on(async (serialized, a, b, event) => {
+        if (typeof serialized !== 'string') {
+          console.error('message parsing failed', hash, serialized);
+          return;
+        }
+        event.off();
+        const msg = await iris.SignedMessage.fromString(serialized);
+        if (msg) {
+          resolve(msg);
+          State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
+        }
+      });
+    });
+  }
+
   componentDidMount() {
-    PublicMessages.getMessageByHash(this.props.hash).then(r => {
+    this.fetchByHash().then(r => {
       const msg = r.signedData;
       msg.info = {from: r.signerKeyHash};
       this.setState({msg});
@@ -220,7 +247,7 @@ class PublicMessage extends Message {
             html`<${PublicMessage} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
           ) : ''}
           ${this.state.showReplyForm ? html`
-            <${MessageForm} activeChat="public" replyingTo=${this.props.hash} />
+            <${PublicMessageForm} replyingTo=${this.props.hash} />
           ` : ''}
         </div>
       </div>

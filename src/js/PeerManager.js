@@ -1,8 +1,6 @@
 import State from './State.js';
-import { route } from './lib/preact-router.es.js';
 import Helpers from './Helpers.js';
 import Session from './Session.js';
-import {translate as t} from './Translation.js';
 
 var MAX_PEER_LIST_SIZE = 10;
 const ELECTRON_GUN_URL = 'http://localhost:8767/gun';

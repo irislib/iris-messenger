@@ -1,7 +1,6 @@
 import Helpers, { html } from '../Helpers.js';
-import PublicMessages from '../PublicMessages.js';
 import State from '../State.js';
-import MessageForm from '../components/MessageForm.js';
+import PublicMessageForm from '../components/PublicMessageForm.js';
 import Identicon from '../components/Identicon.js';
 import FollowButton from '../components/FollowButton.js';
 import CopyButton from '../components/CopyButton.js';
@@ -23,6 +22,18 @@ class Feed extends View {
     this.class = 'public-messages-view';
   }
 
+  getMessagesByUser(pub, cb) {
+    const seen = new Set();
+    State.public.user(pub).get('msgs').map().on(async (hash, time) => {
+      if (typeof hash === 'string' && !seen.has(hash)) {
+        seen.add(hash);
+        cb(hash, time);
+      } else if (hash === null) {
+        cb(null, time);
+      }
+    });
+  }
+
   getMessages(/*show2ndDegreeFollows*/) {
     //const followsList = show2ndDegreeFollows ? State.local.get('follows') : State.public.user().get('follow');
     const followsList = State.local.get('follows');
@@ -33,7 +44,7 @@ class Feed extends View {
           this.state.noFollows && State.local.get('noFollows').put(false);
         }
         this.following.add(pub);
-        PublicMessages.getMessages(pub, (hash, time) => {
+        this.getMessagesByUser(pub, (hash, time) => {
           if (Session.getPubKey() !== pub) {
             this.state.noMessages && State.local.get('noMessages').put(false);
           }
@@ -104,7 +115,7 @@ class Feed extends View {
   renderView() {
     return html`
       <div class="centered-container">
-        <${MessageForm} activeChat="public" class="hidden-xs" autofocus=${false}/>
+        <${PublicMessageForm} class="hidden-xs" autofocus=${false}/>
         <!--<div class="feed-settings">
           <button onClick="${() => {
               State.local.get('show2ndDegreeFollows').put(!this.state.show2ndDegreeFollows);

@@ -4,7 +4,7 @@ import View from './View.js';
 import State from '../State.js';
 import Identicon from '../components/Identicon.js';
 import Message from '../components/Message.js';
-import MessageForm from '../components/MessageForm.js';
+import ChatMessageForm from '../components/ChatMessageForm.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Notifications from '../Notifications.js';
@@ -259,7 +259,7 @@ class Chat extends View {
       </div>
       <div class="chat-message-form">
         ${this.state.noLongerParticipant ? html`<div style="text-align:center">You can't send messages to this group because you're no longer a participant.</div>` :
-          html`<${MessageForm} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/>`}
+          html`<${ChatMessageForm} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/>`}
       </div>
       `: ''}
       </div>

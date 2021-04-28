@@ -3,7 +3,7 @@ import {translate as t} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
-import MessageForm from '../components/MessageForm.js';
+import PublicMessageForm from '../components/PublicMessageForm.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from '../components/SafeImg.js';
@@ -12,9 +12,7 @@ import FollowButton from '../components/FollowButton.js';
 import BlockButton from '../components/BlockButton.js';
 import MessageFeed from '../components/MessageFeed.js';
 import Identicon from '../components/Identicon.js';
-import Name from '../components/Name.js';
 import View from './View.js';
-import SearchBox from '../components/SearchBox.js';
 import { Link } from '../lib/preact.match.js';
 
 const SMS_VERIFIER_PUB = 'ysavwX9TVnlDw93w9IxezCJqSDMyzIU-qpD8VTN5yko.3ll1dFdxLkgyVpejFkEMOFkQzp_tRrkT3fImZEx94Co';
@@ -174,7 +172,6 @@ class Profile extends View {
   }
 
   renderTab() {
-    const chat = Session.channels[this.props.id];
     if (this.props.tab === 'replies') {
       return html`
         <div class="public-messages-view">
@@ -188,7 +185,7 @@ class Profile extends View {
         </div>
       `;
     } else {
-      const messageForm = this.isMyProfile ? html`<${MessageForm} class="hidden-xs" autofocus=${false} activeChat="public"/>` : '';
+      const messageForm = this.isMyProfile ? html`<${PublicMessageForm} class="hidden-xs" autofocus=${false}/>` : '';
       return html`
       <div>
         ${messageForm}

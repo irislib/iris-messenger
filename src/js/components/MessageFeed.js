@@ -3,9 +3,6 @@ import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import ScrollViewport from '../lib/preact-scroll-viewport.js';
 import State from '../State.js';
-import { translate as t } from '../Translation.js';
-
-const size = 10;
 
 class MessageFeed extends Component {
   constructor() {
