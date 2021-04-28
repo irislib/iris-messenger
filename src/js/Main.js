@@ -72,7 +72,6 @@ class Menu extends Component {
   menuLinkClicked() {
     State.local.get('toggleMenu').put(false);
     State.local.get('scrollUp').put(true);
-    console.log(123);
   }
 
   render() {

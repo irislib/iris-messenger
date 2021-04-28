@@ -259,8 +259,20 @@ a.logo img:last-child {
   z-index: 100;
   position: fixed;
   top: 50px;
-  left: calc(50% - 131px);
+  left: calc(50% - 80px);
   margin-top: 0;
+}
+
+@media (max-width: 625px) {
+  .nav .search-box-results {
+    left: calc(50% - 43px);
+  }
+}
+
+@media (min-width: 1268px) {
+  .nav .search-box-results {
+    left: calc(50% - 7px);
+  }
 }
 
 .search-box-results {
