@@ -55,8 +55,6 @@ class ChatMessageForm extends Component {
     chat.send(msg);
     this.closeAttachmentsPreview();
     textEl.val('');
-    const textarea = $('textarea.new-msg');
-    textarea && textarea.height("");
     this.webPush(msg);
     this.props.onSubmit && this.props.onSubmit(msg);
   }
@@ -64,11 +62,6 @@ class ChatMessageForm extends Component {
   onEmojiButtonClick(event) {
     event.preventDefault();
     this.picker.pickerVisible ? this.picker.hidePicker() : this.picker.showPicker(event.target);
-  }
-
-  setTextareaHeight(textarea) {
-    textarea.style.height = "";
-    textarea.style.height = event.target.scrollHeight + "px";
   }
 
   downloadWebtorrent(torrentId) {
@@ -101,9 +94,6 @@ class ChatMessageForm extends Component {
 
   onMsgTextInput(event) {
     const val = $(event.target).val();
-    if (event.target.type === 'textarea') {
-      this.setTextareaHeight(event.target);
-    }
     this.isTyping = this.isTyping !== undefined ? this.isTyping : false;
     const getIsTyping = () => val.length > 0;
     const setTyping = () => Session.channels[this.props.activeChat].setTyping(getIsTyping());
@@ -122,7 +112,7 @@ class ChatMessageForm extends Component {
     $(this.base).find('.attachment-input').click();
   }
 
-  openAttachmentsPreview() {
+  openAttachmentsPreview() { // TODO: this should be done using state, but we're editing an element in another component
     $('#floating-day-separator').remove();
     const attachmentsPreview = $('#attachment-preview');
     attachmentsPreview.removeClass('gallery');
