@@ -4,6 +4,7 @@ import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
+import SafeImg from './SafeImg.js';
 
 function twice(f) {
   f();
@@ -12,14 +13,17 @@ function twice(f) {
 
 class PublicMessageForm extends Component {
   componentDidMount() {
+    const textEl = $(this.base).find('.new-msg');
     this.picker = new EmojiButton({position: 'top-start'});
     this.picker.on('emoji', emoji => {
-      const textEl = $(this.base).find('.new-msg');
       textEl.val(textEl.val() + emoji);
       textEl.focus();
     });
     if (!iris.util.isMobile && this.props.autofocus !== false) {
       $(this.base).find(".new-msg").focus();
+    }
+    if (!this.props.replyingTo) {
+      State.local.get('channels').get('public').get('msgDraft').once(t => textEl.val(t));
     }
   }
 
@@ -64,10 +68,9 @@ class PublicMessageForm extends Component {
       msg.torrentId = this.state.torrentId;
     }
     this.send(msg);
-    this.closeAttachmentsPreview();
+    this.setState({attachments:null});
     textEl.val('');
-    const textarea = $('textarea.new-msg');
-    textarea && textarea.height("");
+    textEl.height("");
     this.props.onSubmit && this.props.onSubmit(msg);
   }
 
@@ -78,7 +81,7 @@ class PublicMessageForm extends Component {
 
   setTextareaHeight(textarea) {
     textarea.style.height = "";
-    textarea.style.height = event.target.scrollHeight + "px";
+    textarea.style.height = textarea.scrollHeight + "px";
   }
 
   downloadWebtorrent(torrentId) {
@@ -110,9 +113,7 @@ class PublicMessageForm extends Component {
   }
 
   onMsgTextInput(event) {
-    if (event.target.type === 'textarea') {
-      this.setTextareaHeight(event.target);
-    }
+    this.setTextareaHeight(event.target);
     State.local.get('channels').get('public').get('msgDraft').put($(event.target).val());
   }
 
@@ -121,52 +122,24 @@ class PublicMessageForm extends Component {
     $(this.base).find('.attachment-input').click();
   }
 
-  openAttachmentsPreview() {
-    $('#floating-day-separator').remove();
-    const attachmentsPreview = $(this.base).find('.attachment-preview');
-    attachmentsPreview.removeClass('gallery');
-    attachmentsPreview.empty();
-    var closeBtn = $('<button>').text(t('cancel')).click(() => this.closeAttachmentsPreview());
-    attachmentsPreview.append(closeBtn);
-
-    var files = $(this.base).find('.attachment-input')[0].files;
+  attachmentsChanged(event) {
+    var files = event.target.files;
     if (files) {
-      attachmentsPreview.show();
-      $('#message-list').hide();
       for (var i = 0;i < files.length;i++) {
         Helpers.getBase64(files[i]).then(base64 => {
-          const attachments = this.state.attachments || [];
-          attachments.push({type: 'image', data: base64});
-          var preview = Helpers.setImgSrc($('<img>'), base64);
-          attachmentsPreview.append(preview);
-          this.setState({attachments});
+          const a = this.state.attachments || [];
+          a.push({type: 'image', data: base64});
+          this.setState({attachments: a});
         });
       }
-      $(this.base).find('.attachment-input').val(null)
+      $(event.target).val(null);
       $(this.base).find('.new-msg').focus();
     }
-
-    $(document).off('keyup').on('keyup', e => {
-      if (e.key === "Escape") { // escape key maps to keycode `27`
-        $(document).off('keyup');
-        if ($('#attachment-preview:visible').length) {
-          this.closeAttachmentsPreview();
-        }
-      }
-    });
-  }
-
-  closeAttachmentsPreview() {
-    const attachmentsPreview = $(this.base).find('.attachment-preview');
-    attachmentsPreview.hide();
-    attachmentsPreview.removeClass('gallery');
-    $('#message-list').show();
-    this.setState({attachments: null});
   }
 
   render() {
     return html`<form autocomplete="off" class="message-form ${this.props.class || ''} public" onSubmit=${e => this.onMsgFormSubmit(e)}>
-      <input name="attachment-input" type="file" class="hidden attachment-input" accept="image/*" multiple onChange=${() => this.openAttachmentsPreview()}/>
+      <input name="attachment-input" type="file" class="hidden attachment-input" accept="image/*" multiple onChange=${e => this.attachmentsChanged(e)}/>
       <textarea onPaste=${e => this.onMsgTextPaste(e)} onInput=${e => this.onMsgTextInput(e)} class="new-msg" type="text" placeholder="${t('type_a_message')}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>
       <div>
           <button type="button" class="attach-file-btn" onClick=${e => this.attachFileClicked(e)}>
@@ -179,7 +152,11 @@ class PublicMessageForm extends Component {
             <svg class="svg-inline--fa fa-w-16" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;" width="100px" height="100px" fill="currentColor" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>
           </button>
        </div>
-      <div class="attachment-preview" style="display:none"></div>
+      <div class="attachment-preview">
+          ${this.state.attachments && this.state.attachments.map(a => html`
+            <${SafeImg} src=${a.data}/>
+          `)}
+      </div>
       <div id="webtorrent"></div>
     </form>`;
   }
