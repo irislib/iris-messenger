@@ -3,6 +3,11 @@ import Helpers, {html} from '../Helpers.js';
 import Session from "../Session.js";
 import { translate as tr } from '../Translation.js';
 
+const isOfType = (f, types) => types.indexOf(f.name.slice(-4))  !== -1;
+const isVideo = f => isOfType(f, ['webm', '.mp4', '.ogg']);
+const isAudio = f => isOfType(f, ['.mp3', '.wav', '.m4a']);
+const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
+
 class Torrent extends Component {
   componentDidMount() {
     if (!Session.settings.local.enableWebtorrent) return;
@@ -19,21 +24,32 @@ class Torrent extends Component {
     }
   }
 
-  setActiveFile(file) {
-    if (this.state.activeFilePath === file.path) return;
+  setActiveFile(file, clicked) {
+    if (this.state.activeFilePath === file.path) {
+      return $(this.base).find('video, audio').get(0).play();
+    };
     this.setState({activeFilePath: file.path});
-   // Stream the file in the browser
-    const autoplay = Session.settings.local.autoplayWebtorrent;
+    let autoplay, muted;
+    if (clicked) {
+      autoplay = true;
+      muted = false;
+    } else {
+      autoplay = isVideo(file) && Session.settings.local.autoplayWebtorrent;
+      muted = autoplay;
+    }
     const el = $(this.base).find('.player');
     el.empty();
-    file.appendTo(el[0], {autoplay, muted: autoplay});
+    file.appendTo(el[0], {autoplay, muted});
   }
 
   onTorrent(torrent) {
     // Torrents can contain many files. Let's use the .mp4 file
     console.log('got torrent', torrent);
     this.setState({torrent});
-    const file = torrent.files[0];
+    const video = torrent.files.find(f => isVideo(f));
+    const audio = torrent.files.find(f => isAudio(f));
+    const img = torrent.files.find(f => isImage(f));
+    const file = video || audio || img || torrent.files[0];
     file && this.setActiveFile(file);
   }
 
@@ -55,7 +71,7 @@ class Torrent extends Component {
             ${s.showFiles && t && t.files ? html`
               <div class="flex-table details">
                 ${t.files.map(f => html`
-                  <div onClick=${() => this.setActiveFile(f)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
+                  <div onClick=${() => this.setActiveFile(f, true)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
                       <div class="flex-cell">${f.name}</div>
                       <div class="flex-cell no-flex">${Helpers.formatBytes(f.length)}</div>
                   </div>
