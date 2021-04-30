@@ -5,6 +5,7 @@ import State from '../State.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import SafeImg from './SafeImg.js';
+import Torrent from './Torrent.js';
 
 function twice(f) {
   f();
@@ -31,9 +32,6 @@ class PublicMessageForm extends Component {
     if (!iris.util.isMobile && this.props.autofocus !== false) {
       $(this.base).find(".new-msg").focus();
     }
-    if (this.state.torrentId && this.state.torrentId !== prevState.torrentId) {
-      this.downloadWebtorrent(this.state.torrentId);
-    }
   }
 
   async send(msg) {
@@ -56,7 +54,7 @@ class PublicMessageForm extends Component {
     State.local.get('channels').get('public').get('msgDraft').put(null);
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
-    if (!text.length && !this.state.attachments) { return; }
+    if (!text.length && !this.state.attachments && !this.state.torrentId) { return; }
     const msg = {text};
     if (this.props.replyingTo) {
       msg.replyingTo = this.props.replyingTo;
@@ -68,7 +66,7 @@ class PublicMessageForm extends Component {
       msg.torrentId = this.state.torrentId;
     }
     this.send(msg);
-    this.setState({attachments:null});
+    this.setState({attachments:null, torrentId:null});
     textEl.val('');
     textEl.height("");
     this.props.onSubmit && this.props.onSubmit(msg);
@@ -82,25 +80,6 @@ class PublicMessageForm extends Component {
   setTextareaHeight(textarea) {
     textarea.style.height = "";
     textarea.style.height = textarea.scrollHeight + "px";
-  }
-
-  downloadWebtorrent(torrentId) {
-    console.log('trying to open webtorrent', torrentId);
-    function onTorrent(torrent) {
-      // Torrents can contain many files. Let's use the .mp4 file
-      var file = torrent.files.find(function (file) {
-        return file.name.endsWith('.mp4')
-      })
-      // Stream the file in the browser
-      file.appendTo('#webtorrent', {autoplay: true, muted: true})
-    }
-    const client = Helpers.getWebTorrentClient();
-    const existing = client.get(torrentId);
-    if (existing) {
-      onTorrent(existing);
-    } else {
-      client.add(torrentId, onTorrent);
-    }
   }
 
   onMsgTextPaste(event) {
@@ -153,11 +132,11 @@ class PublicMessageForm extends Component {
           </button>
        </div>
       <div class="attachment-preview">
+          ${this.state.torrentId ? html`<${Torrent} torrentId=${this.state.torrentId}/>`:''}
           ${this.state.attachments && this.state.attachments.map(a => html`
             <${SafeImg} src=${a.data}/>
           `)}
       </div>
-      <div id="webtorrent"></div>
     </form>`;
   }
 
