@@ -77,7 +77,7 @@ class Menu extends Component {
     return html`
       <div class="application-list">
         ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
-          <a href="/" class="hidden-xs" tabindex="0" class="logo">
+          <a href="/" onClick=${() => this.menuLinkClicked()} class="hidden-xs" tabindex="0" class="logo">
             <img class="hidden-xs" src="img/icon128.png" width=40 height=40/>
             <img src="img/iris_logotype.png" height=23 width=41 />
           </a>
