@@ -2,6 +2,7 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
+import Torrent from './Torrent.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
@@ -123,6 +124,9 @@ class Message extends Component {
           <div class="msg-sender">
             ${name && this.props.showName && html`<small onclick=${() => this.onNameClick(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
           </div>
+          ${this.props.torrentId ? html`
+            <${Torrent} torrentId=${this.props.torrentId}/>
+          `:''}
           ${this.props.attachments && this.props.attachments.map(a =>
             html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>` // TODO: escape a.data
           )}
