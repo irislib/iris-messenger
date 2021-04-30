@@ -412,6 +412,7 @@ header.footer .header-content {
 
 .torrent {
   text-align: center;
+  padding: 7px;
 }
 
 .torrent .details {

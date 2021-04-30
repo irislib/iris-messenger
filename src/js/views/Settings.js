@@ -89,7 +89,7 @@ class Settings extends View {
         `: ''}
         <hr/>
         <h3>${t('webtorrent')}</h3>
-        <p><input type="checkbox" checked=${this.state.local.enableWebtorrent} onChange=${() => State.local.get('settings').get('enableWebtorrent').put(!this.state.local.enableWebtorrent)} id="enableWebtorrent"/><label for="enableWebtorrent">Enable webtorrent videos</label></p>
+        <p><input type="checkbox" checked=${this.state.local.enableWebtorrent} onChange=${() => State.local.get('settings').get('enableWebtorrent').put(!this.state.local.enableWebtorrent)} id="enableWebtorrent"/><label for="enableWebtorrent">Automatically load webtorrent attachments</label></p>
         <p><input type="checkbox" checked=${this.state.local.autoplayWebtorrent} onChange=${() => State.local.get('settings').get('autoplayWebtorrent').put(!this.state.local.autoplayWebtorrent)} id="autoplayWebtorrent"/><label for="autoplayWebtorrent">Autoplay webtorrent videos</label></p>
         <hr/>
         <h3>${t('webrtc_connection_options')}</h3>

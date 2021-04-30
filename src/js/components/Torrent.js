@@ -10,17 +10,22 @@ const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class Torrent extends Component {
   componentDidMount() {
-    if (!Session.settings.local.enableWebtorrent) return;
+    if (Session.settings.local.enableWebtorrent) {
+      this.startTorrenting();
+    }
+  }
 
+  startTorrenting(clicked) {
+    this.setState({torrenting: true});
     const torrentId = this.props.torrentId;
     const client = Helpers.getWebTorrentClient();
     const existing = client.get(torrentId);
     if (existing) {
       console.log('opening existing', torrentId);
-      this.onTorrent(existing);
+      this.onTorrent(existing, clicked);
     } else {
       console.log('adding webtorrent', torrentId);
-      client.add(torrentId, t => this.onTorrent(t));
+      client.add(torrentId, t => this.onTorrent(t, clicked));
     }
   }
 
@@ -44,27 +49,35 @@ class Torrent extends Component {
     base.find('.info').toggle(!isVideo(file));
   }
 
-  onTorrent(torrent) {
-    // Torrents can contain many files. Let's use the .mp4 file
+  onTorrent(torrent, clicked) {
     console.log('got torrent', torrent);
     this.setState({torrent});
     const video = torrent.files.find(f => isVideo(f));
     const audio = torrent.files.find(f => isAudio(f));
     const img = torrent.files.find(f => isImage(f));
     const file = video || audio || img || torrent.files[0];
-    file && this.setActiveFile(file);
+    file && this.setActiveFile(file, clicked);
   }
 
-  showFilesClicked(event) {
-    event.preventDefault();
+  showFilesClicked(e) {
+    e.preventDefault();
     this.setState({showFiles: !this.state.showFiles});
+  }
+
+  openTorrentClicked(e) {
+    e.preventDefault();
+    this.startTorrenting(true);
   }
 
   render() {
     const s = this.state;
     const t = s.torrent;
     return html`
-        <div class="torrent" style="padding: 7px;">
+        <div class="torrent">
+            ${!Session.settings.local.enableWebtorrent && !s.torrenting ? html`
+              <a href="" onClick=${e => this.openTorrentClicked(e)}>Show attachment</a>
+            `:''}
+            ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>`:''}
             <p class="info">${s.activeFilePath}</p>
             <div class="player"></div>
             <a href=${this.props.torrentId} style="margin-right:7px;">Magnet link</a>
