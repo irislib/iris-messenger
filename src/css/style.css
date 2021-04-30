@@ -419,6 +419,10 @@ header.footer .header-content {
   width: 100%;
 }
 
+.torrent video {
+
+}
+
 .torrent .details {
   background: var(--main-color);
 }

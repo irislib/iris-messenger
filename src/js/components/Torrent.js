@@ -34,7 +34,11 @@ class Torrent extends Component {
     if (this.state.activeFilePath === file.path) {
       return base.find('video, audio').get(0).play();
     };
-    this.setState({activeFilePath: file.path});
+    let splitPath;
+    if (!isVideo(file)) {
+      splitPath = file.path.split('/');
+    }
+    this.setState({activeFilePath: file.path, splitPath});
     let autoplay, muted;
     if (clicked) {
       autoplay = true;
@@ -78,7 +82,11 @@ class Torrent extends Component {
               <a href="" onClick=${e => this.openTorrentClicked(e)}>Show attachment</a>
             `:''}
             ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>`:''}
-            <p class="info">${s.activeFilePath}</p>
+            <div class="info">
+                ${s.splitPath ? s.splitPath.map(
+                  (str, i) => i === s.splitPath.length - 1 ? html`<p><b>${str}</b></p>` : html`<p>${str}</p>`
+                ):''}
+            </div>
             <div class="player"></div>
             <a href=${this.props.torrentId} style="margin-right:7px;">Magnet link</a>
             ${t && t.files ? html`
