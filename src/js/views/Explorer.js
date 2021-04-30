@@ -3,6 +3,7 @@ import State from '../State.js';
 import Session from '../Session.js';
 import { Component } from '../lib/preact.js';
 import View from './View.js';
+import ScrollViewport from '../lib/preact-scroll-viewport.js';
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
@@ -230,6 +231,21 @@ class ExplorerNode extends Component {
 
   render() {
     const children = Object.keys(this.state.children).sort();
+
+    const renderChildren = children => {
+      return children.map(k => {
+        const v = this.state.children[k].value;
+        if (typeof v === 'object' && v && v['_']) {
+          return this.renderChildObject(k, v);
+        } else {
+          return this.renderChildValue(k, v);
+        }
+      });
+    }
+
+    const childrenEl = this.props.indent === 0 ? html`<${ScrollViewport}>${renderChildren(children)}</${ScrollViewport}>`
+      : renderChildren(children.slice(0, this.state.shownChildrenCount));
+
     const showMoreBtn = children.length > this.state.shownChildrenCount;
     return html`
       ${this.props.indent === 0 ? html`
@@ -252,14 +268,7 @@ class ExplorerNode extends Component {
           ` : ''}
         </div>
       `: ''}
-      ${children.slice(0,this.state.shownChildrenCount).map(k => {
-        const v = this.state.children[k].value;
-        if (typeof v === 'object' && v && v['_']) {
-          return this.renderChildObject(k, v);
-        } else {
-          return this.renderChildValue(k, v);
-        }
-      })}
+      ${childrenEl}
       ${showMoreBtn ? html`
         <a style="padding-left: ${this.props.indent + 1}em" href="" onClick=${e => {e.preventDefault();this.setState({shownChildrenCount: this.state.shownChildrenCount + 20})}}>More</a>
       ` : ''}
