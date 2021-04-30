@@ -51,6 +51,24 @@ class Torrent extends Component {
     el.empty();
     file.appendTo(el[0], {autoplay, muted});
     base.find('.info').toggle(!isVideo(file));
+    const player = base.find('video, audio').get(0);
+    player && player.addEventListener('ended', () => {
+      const typeCheck = player.tagName === 'VIDEO' ? isVideo : isAudio;
+      this.nextFile(typeCheck);
+    });
+  }
+
+  nextFile(typeCheck) {
+    const files = this.state.torrent.files;
+    const currentIndex = files.findIndex(f => f.path === this.state.activeFilePath);
+    let nextIndex = files.findIndex((f, i) => i > currentIndex && typeCheck(f));
+    if (nextIndex === -1) {
+      nextIndex = files.findIndex(f => typeCheck(f));
+    }
+    if (nextIndex === -1) {
+      nextIndex = currentIndex;
+    }
+    this.setActiveFile(files[nextIndex], true);
   }
 
   onTorrent(torrent, clicked) {
