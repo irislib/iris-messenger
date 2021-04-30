@@ -25,8 +25,9 @@ class Torrent extends Component {
   }
 
   setActiveFile(file, clicked) {
+    const base = $(this.base);
     if (this.state.activeFilePath === file.path) {
-      return $(this.base).find('video, audio').get(0).play();
+      return base.find('video, audio').get(0).play();
     };
     this.setState({activeFilePath: file.path});
     let autoplay, muted;
@@ -37,9 +38,10 @@ class Torrent extends Component {
       autoplay = isVideo(file) && Session.settings.local.autoplayWebtorrent;
       muted = autoplay;
     }
-    const el = $(this.base).find('.player');
+    const el = base.find('.player');
     el.empty();
     file.appendTo(el[0], {autoplay, muted});
+    base.find('.info').toggle(!isVideo(file));
   }
 
   onTorrent(torrent) {
@@ -63,12 +65,14 @@ class Torrent extends Component {
     const t = s.torrent;
     return html`
         <div class="torrent" style="padding: 7px;">
+            <p class="info">${s.activeFilePath}</p>
             <div class="player"></div>
             <a href=${this.props.torrentId} style="margin-right:7px;">Magnet link</a>
             ${t && t.files ? html`
-                <a href="" onClick=${e => this.showFilesClicked(e)}>${tr('details')}</a>
+                <a href="" onClick=${e => this.showFilesClicked(e)}>${tr('show_details')}</a>
             `:''}
             ${s.showFiles && t && t.files ? html`
+              <p>${tr('peers')}: ${t.numPeers}</p>
               <div class="flex-table details">
                 ${t.files.map(f => html`
                   <div onClick=${() => this.setActiveFile(f, true)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
