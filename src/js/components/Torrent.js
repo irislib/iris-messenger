@@ -29,7 +29,7 @@ class Torrent extends Component {
     }
   }
 
-  setActiveFile(file, clicked) {
+  openFile(file, clicked) {
     const base = $(this.base);
     if (this.state.activeFilePath === file.path) {
       return base.find('video, audio').get(0).play();
@@ -54,11 +54,11 @@ class Torrent extends Component {
     const player = base.find('video, audio').get(0);
     player && player.addEventListener('ended', () => {
       const typeCheck = player.tagName === 'VIDEO' ? isVideo : isAudio;
-      this.nextFile(typeCheck);
+      this.openNextFile(typeCheck);
     });
   }
 
-  nextFile(typeCheck) {
+  getNextIndex(typeCheck) {
     const files = this.state.torrent.files;
     const currentIndex = files.findIndex(f => f.path === this.state.activeFilePath);
     let nextIndex = files.findIndex((f, i) => i > currentIndex && typeCheck(f));
@@ -68,7 +68,12 @@ class Torrent extends Component {
     if (nextIndex === -1) {
       nextIndex = currentIndex;
     }
-    this.setActiveFile(files[nextIndex], true);
+    return nextIndex;
+  }
+  
+  openNextFile(typeCheck) {
+    const nextIndex = this.getNextIndex(typeCheck);
+    this.openFile(this.state.torrent.files[nextIndex], true);
   }
 
   onTorrent(torrent, clicked) {
@@ -78,7 +83,7 @@ class Torrent extends Component {
     const audio = torrent.files.find(f => isAudio(f));
     const img = torrent.files.find(f => isImage(f));
     const file = video || audio || img || torrent.files[0];
-    file && this.setActiveFile(file, clicked);
+    file && this.openFile(file, clicked);
   }
 
   showFilesClicked(e) {
@@ -105,7 +110,9 @@ class Torrent extends Component {
                   (str, i) => i === s.splitPath.length - 1 ? html`<p><b>${str}</b></p>` : html`<p>${str}</p>`
                 ):''}
             </div>
-            <div class="player"></div>
+            ${s.hasNext ? html`<b>prev</b>`:''}
+            <span class="player"></span>
+            ${s.hasNext ? html`<b>next</b>`:''}
             <a href=${this.props.torrentId}>Magnet link</a>
             ${t && t.files ? html`
                 <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr('show_details')}</a>
@@ -114,7 +121,7 @@ class Torrent extends Component {
               <p>${tr('peers')}: ${t.numPeers}</p>
               <div class="flex-table details">
                 ${t.files.map(f => html`
-                  <div onClick=${() => this.setActiveFile(f, true)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
+                  <div onClick=${() => this.openFile(f, true)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
                       <div class="flex-cell">${f.name}</div>
                       <div class="flex-cell no-flex">${Helpers.formatBytes(f.length)}</div>
                   </div>
