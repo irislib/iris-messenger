@@ -88,9 +88,9 @@ class Torrent extends Component {
                 ):''}
             </div>
             <div class="player"></div>
-            <a href=${this.props.torrentId} style="margin-right:7px;">Magnet link</a>
+            <a href=${this.props.torrentId}>Magnet link</a>
             ${t && t.files ? html`
-                <a href="" onClick=${e => this.showFilesClicked(e)}>${tr('show_details')}</a>
+                <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr('show_details')}</a>
             `:''}
             ${s.showFiles && t && t.files ? html`
               <p>${tr('peers')}: ${t.numPeers}</p>
