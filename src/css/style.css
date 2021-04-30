@@ -415,6 +415,10 @@ header.footer .header-content {
   padding: 7px;
 }
 
+.torrent audio, .torrent video {
+  width: 100%;
+}
+
 .torrent .details {
   background: var(--main-color);
 }
