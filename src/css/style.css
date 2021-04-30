@@ -410,12 +410,17 @@ header.footer .header-content {
   padding: 0;
 }
 
+.torrent {
+  text-align: center;
+}
+
 .torrent .details {
   background: var(--main-color);
 }
 
 .torrent .details .flex-row {
   cursor: pointer;
+  text-align: left;
 }
 
 .torrent .details .flex-row.active {
