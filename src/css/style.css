@@ -410,6 +410,18 @@ header.footer .header-content {
   padding: 0;
 }
 
+.torrent .details {
+  background: var(--main-color);
+}
+
+.torrent .details .flex-row {
+  cursor: pointer;
+}
+
+.torrent .details .flex-row.active {
+  background: var(--notify);
+}
+
 .flex-table {
   display: flex;
   flex-direction: column;

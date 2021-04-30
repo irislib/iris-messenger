@@ -19,15 +19,22 @@ class Torrent extends Component {
     }
   }
 
+  setActiveFile(file) {
+    if (this.state.activeFilePath === file.path) return;
+    this.setState({activeFilePath: file.path});
+   // Stream the file in the browser
+    const autoplay = Session.settings.local.autoplayWebtorrent;
+    const el = $(this.base).find('.player');
+    el.empty();
+    file.appendTo(el[0], {autoplay, muted: autoplay});
+  }
+
   onTorrent(torrent) {
     // Torrents can contain many files. Let's use the .mp4 file
     console.log('got torrent', torrent);
     this.setState({torrent});
     const file = torrent.files[0];
-
-    // Stream the file in the browser
-    const autoplay = Session.settings.local.autoplayWebtorrent;
-    file && file.appendTo($(this.base).find('.player')[0], {autoplay, muted: autoplay})
+    file && this.setActiveFile(file);
   }
 
   showFilesClicked(event) {
@@ -36,15 +43,25 @@ class Torrent extends Component {
   }
 
   render() {
-    const t = this.state.torrent;
+    const s = this.state;
+    const t = s.torrent;
     return html`
-        <div style="padding: 7px;">
+        <div class="torrent" style="padding: 7px;">
             <div class="player"></div>
             <a href=${this.props.torrentId} style="margin-right:7px;">Magnet link</a>
             ${t && t.files ? html`
                 <a href="" onClick=${e => this.showFilesClicked(e)}>${tr('details')}</a>
             `:''}
-            ${this.state.showFiles && t && t.files ? t.files.map(f => html`<p>${f.name}</p>`) : ''}
+            ${s.showFiles && t && t.files ? html`
+              <div class="flex-table details">
+                ${t.files.map(f => html`
+                  <div onClick=${() => this.setActiveFile(f)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
+                      <div class="flex-cell">${f.name}</div>
+                      <div class="flex-cell no-flex">${Helpers.formatBytes(f.length)}</div>
+                  </div>
+                `)}
+              </div>
+            ` : ''}
         </div>
     `;
   }
