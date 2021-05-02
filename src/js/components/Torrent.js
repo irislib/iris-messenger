@@ -50,23 +50,26 @@ class Torrent extends Component {
     if (this.state.activeFilePath === file.path) {
       return base.find('video, audio').get(0).play();
     }
+    const isVid = isVideo(file);
+    const isAud = !isVid && isAudio(file);
+
     let splitPath;
-    if (!isVideo(file)) {
+    if (!isVid) {
       splitPath = file.path.split('/');
     }
-    this.setState({activeFilePath: file.path, splitPath});
+    this.setState({activeFilePath: file.path, splitPath, isAudioOpen: isAud});
     let autoplay, muted;
     if (clicked) {
       autoplay = true;
       muted = false;
     } else {
-      autoplay = isVideo(file) && Session.settings.local.autoplayWebtorrent;
+      autoplay = isVid && Session.settings.local.autoplayWebtorrent;
       muted = autoplay;
     }
     const el = base.find('.player');
     el.empty();
     file.appendTo(el[0], {autoplay, muted});
-    base.find('.info').toggle(!isVideo(file));
+    base.find('.info').toggle(!isVid);
     const player = base.find('video, audio').get(0);
     if (player) {
       player.addEventListener('ended', () => {
@@ -98,11 +101,14 @@ class Torrent extends Component {
 
   onTorrent(torrent, clicked) {
     console.log('got torrent', torrent);
-    this.setState({torrent});
     const video = torrent.files.find(f => isVideo(f));
     const audio = torrent.files.find(f => isAudio(f));
     const img = torrent.files.find(f => isImage(f));
+    let poster = torrent.files.find(f => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1));
+    poster = poster || img;
+    poster.appendTo($(this.base).find('.cover').get(0));
     const file = video || audio || img || torrent.files[0];
+    this.setState({torrent, cover: img});
     file && this.openFile(file, clicked);
   }
 
@@ -125,6 +131,7 @@ class Torrent extends Component {
               <a href="" onClick=${e => this.openTorrentClicked(e)}>Show attachment</a>
             `:''}
             ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>`:''}
+            <div class="cover" style=${s.isAudioOpen ? '' : 'display:none'}></div>
             <div class="info">
                 ${s.splitPath ? s.splitPath.map(
                   (str, i) => i === s.splitPath.length - 1 ? html`<p><b>${str}</b></p>` : html`<p>${str}</p>`

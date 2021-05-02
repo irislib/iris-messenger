@@ -437,6 +437,10 @@ header.footer .header-content {
   padding: 7px;
 }
 
+.torrent .cover img {
+  max-height: 40vh;
+}
+
 .torrent audio, .torrent video {
   width: 100%;
 }
