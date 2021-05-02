@@ -106,7 +106,7 @@ class Torrent extends Component {
     const img = torrent.files.find(f => isImage(f));
     let poster = torrent.files.find(f => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1));
     poster = poster || img;
-    poster.appendTo($(this.base).find('.cover').get(0));
+    poster && poster.appendTo($(this.base).find('.cover').get(0));
     const file = video || audio || img || torrent.files[0];
     this.setState({torrent, cover: img});
     file && this.openFile(file, clicked);

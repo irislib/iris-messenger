@@ -438,7 +438,7 @@ header.footer .header-content {
 }
 
 .torrent .cover img {
-  max-height: 220px;
+  max-height: 40vh;
 }
 
 .torrent audio, .torrent video {
