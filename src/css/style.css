@@ -410,6 +410,28 @@ header.footer .header-content {
   padding: 0;
 }
 
+#media-player-container {
+  display: flex;
+}
+
+#media-player {
+  display: flex;
+  flex: 1;
+}
+
+#media-player audio {
+  flex: 1;
+}
+
+#close-media {
+  padding: 13px;
+  cursor: pointer;
+}
+
+#close-media svg {
+  width: 13px;
+}
+
 .torrent {
   text-align: center;
   padding: 7px;

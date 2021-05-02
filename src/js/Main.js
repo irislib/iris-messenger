@@ -185,6 +185,13 @@ class Main extends Component {
             </${Router}>
           </div>
         </section>
+        <div id="media-player-container" style="display:none">
+            <div id="media-player"></div>
+            <div id="close-media" onClick=${e => {
+              document.getElementById('media-player').innerHTML = '';
+              e.target.parentElement.style = 'display:none';
+            }}>${Icons.close}</div>
+        </div>
         <${Footer}/>
         <${VideoCall}/>
       ` : html`<${Login}/>`;

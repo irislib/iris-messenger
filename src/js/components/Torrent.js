@@ -15,6 +15,22 @@ class Torrent extends Component {
     }
   }
 
+  onPlay(e) {
+    !e.target.muted && $('#media-player').empty() && $('#media-player-container').hide();
+  }
+
+  componentWillUnmount() {
+    const mediaEl = $(this.base).find('audio').get(0);
+    if (mediaEl && !mediaEl.paused && !mediaEl.muted) {
+      const player = $('#media-player');
+      mediaEl.removeEventListener('play', this.onPlay);
+      mediaEl.removeEventListener('volumechange', this.onPlay);
+      player.empty();
+      player[0].appendChild(mediaEl);
+      $('#media-player-container').show();
+    }
+  }
+
   startTorrenting(clicked) {
     this.setState({torrenting: true});
     const torrentId = this.props.torrentId;
@@ -33,7 +49,7 @@ class Torrent extends Component {
     const base = $(this.base);
     if (this.state.activeFilePath === file.path) {
       return base.find('video, audio').get(0).play();
-    };
+    }
     let splitPath;
     if (!isVideo(file)) {
       splitPath = file.path.split('/');
@@ -52,10 +68,14 @@ class Torrent extends Component {
     file.appendTo(el[0], {autoplay, muted});
     base.find('.info').toggle(!isVideo(file));
     const player = base.find('video, audio').get(0);
-    player && player.addEventListener('ended', () => {
-      const typeCheck = player.tagName === 'VIDEO' ? isVideo : isAudio;
-      this.openNextFile(typeCheck);
-    });
+    if (player) {
+      player.addEventListener('ended', () => {
+        const typeCheck = player.tagName === 'VIDEO' ? isVideo : isAudio;
+        this.openNextFile(typeCheck);
+      });
+      player.addEventListener('play', this.onPlay);
+      player.addEventListener('volumechange', this.onPlay);
+    }
   }
 
   getNextIndex(typeCheck) {
