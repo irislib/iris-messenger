@@ -187,6 +187,8 @@ class Main extends Component {
         </section>
         <div id="media-player-container" style="display:none">
             <div id="media-player"></div>
+            <div id="media-cover"></div>
+            <div id="media-info"></div>
             <div id="close-media" onClick=${() => {
               document.getElementById('media-player').innerHTML = '';
               document.getElementById('media-player-container').style = 'display: none';

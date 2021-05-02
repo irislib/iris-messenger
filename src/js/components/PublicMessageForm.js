@@ -51,7 +51,9 @@ class PublicMessageForm extends Component {
 
   async onMsgFormSubmit(event) {
     event.preventDefault();
-    State.local.get('channels').get('public').get('msgDraft').put(null);
+    if (!this.props.replyingTo) {
+      State.local.get('channels').get('public').get('msgDraft').put(null);
+    }
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length && !this.state.attachments && !this.state.torrentId) { return; }
@@ -93,7 +95,9 @@ class PublicMessageForm extends Component {
 
   onMsgTextInput(event) {
     this.setTextareaHeight(event.target);
-    State.local.get('channels').get('public').get('msgDraft').put($(event.target).val());
+    if (!this.props.replyingTo) {
+      State.local.get('channels').get('public').get('msgDraft').put($(event.target).val());
+    }
   }
 
   attachFileClicked(event) {

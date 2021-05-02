@@ -21,12 +21,18 @@ class Torrent extends Component {
 
   componentWillUnmount() {
     const mediaEl = $(this.base).find('audio').get(0);
-    if (mediaEl && !mediaEl.paused && !mediaEl.muted) {
+    if (mediaEl && !mediaEl.paused && !mediaEl.muted) { // TODO: do this the preact way
       const player = $('#media-player');
+      const info = $('#media-info');
+      const cover = $('#media-cover');
       mediaEl.removeEventListener('play', this.onPlay);
       mediaEl.removeEventListener('volumechange', this.onPlay);
       player.empty();
       player[0].appendChild(mediaEl);
+      info.empty();
+      info[0].appendChild($(this.base).find('.info').get(0));
+      cover.empty();
+      cover[0].appendChild($(this.base).find('.cover').get(0));
       $('#media-player-container').show();
     }
   }

@@ -410,13 +410,48 @@ header.footer .header-content {
   padding: 0;
 }
 
+#media-player-container audio::-webkit-media-controls-play-button,
+  #media-player-container audio::-webkit-media-controls-panel {
+  background-color: var(--main-color);
+  color: var(--text-color);
+}
+
 #media-player-container {
   display: flex;
+  align-items: center;
+  max-height: 55px;
+  justify-content: center;
+  background-color: var(--main-color);
+  border-top: 1px solid var(--emoji-picker-border-color);
+}
+
+@media (max-width: 625px) {
+  #media-player-container {
+    font-size: 0.7em;
+  }
+}
+
+#media-info p {
+  margin: 0;
+}
+
+#media-info p:not(:last-of-type) {
+  margin-bottom: 3px;
+}
+
+#media-info, #media-cover {
+    margin-right: 15px;
+}
+
+#media-cover {
+  max-width: 40px;
+  max-height: 40px;
 }
 
 #media-player {
   display: flex;
   flex: 1;
+  max-width: 600px;
 }
 
 #media-player audio {
@@ -425,6 +460,7 @@ header.footer .header-content {
 
 #close-media {
   padding: 13px;
+  padding-right:28px;
   cursor: pointer;
 }
 
