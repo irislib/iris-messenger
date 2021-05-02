@@ -187,9 +187,9 @@ class Main extends Component {
         </section>
         <div id="media-player-container" style="display:none">
             <div id="media-player"></div>
-            <div id="close-media" onClick=${e => {
+            <div id="close-media" onClick=${() => {
               document.getElementById('media-player').innerHTML = '';
-              e.target.parentElement.style = 'display:none';
+              document.getElementById('media-player-container').style = 'display: none';
             }}>${Icons.close}</div>
         </div>
         <${Footer}/>
