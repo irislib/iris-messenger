@@ -134,11 +134,20 @@ class Torrent extends Component {
             <div class="cover" style=${s.isAudioOpen ? '' : 'display:none'}></div>
             <div class="info">
                 ${s.splitPath ? s.splitPath.map(
-                  (str, i) => i === s.splitPath.length - 1 ? html`<p><b>${str.split('.').slice(0, -1).join('.')}</b></p>` : html`<p>${str}</p>`
+                  (str, i) => {
+                    if (i === s.splitPath.length - 1) {
+                      if (s.isAudioOpen) {
+                        str = str.split('.').slice(0, -1).join('.');
+                      }
+                      return html`<p><b>${str}</b></p>`;
+                    } else {
+                      return html`<p>${str}</p>` 
+                    }
+                  }
                 ):''}
             </div>
             ${s.hasNext ? html`<b>prev</b>`:''}
-            <span class="player"></span>
+            <div class="player"></div>
             ${s.hasNext ? html`<b>next</b>`:''}
             <a href=${this.props.torrentId}>Magnet link</a>
             ${t && t.files ? html`
