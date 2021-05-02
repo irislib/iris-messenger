@@ -134,7 +134,7 @@ class Torrent extends Component {
             <div class="cover" style=${s.isAudioOpen ? '' : 'display:none'}></div>
             <div class="info">
                 ${s.splitPath ? s.splitPath.map(
-                  (str, i) => i === s.splitPath.length - 1 ? html`<p><b>${str}</b></p>` : html`<p>${str}</p>`
+                  (str, i) => i === s.splitPath.length - 1 ? html`<p><b>${str.split('.').slice(0, -1).join('.')}</b></p>` : html`<p>${str}</p>`
                 ):''}
             </div>
             ${s.hasNext ? html`<b>prev</b>`:''}
