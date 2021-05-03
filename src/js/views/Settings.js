@@ -33,12 +33,10 @@ class Settings extends View {
         <p>
           <button onClick=${() => route('/logout')}>${t('log_out')}</button>
         </p>
-        ${this.props.showSwitchAccount ? html`
-          <p>
-            <button onClick=${() => this.setState({showSwitchAccount: !this.state.showSwitchAccount})}>${t('switch_account')}</button>
-          </p>
-          ${this.state.showSwitchAccount ? ExistingAccountLogin : ''}
-        `: ''}
+        <p>
+          <button onClick=${() => this.setState({showSwitchAccount: !this.state.showSwitchAccount})}>${t('switch_account')}</button>
+        </p>
+        ${this.state.showSwitchAccount ? html`<${ExistingAccountLogin}/>` : ''}
         <h4>${t('private_key')}</h4>
         <p dangerouslySetInnerHTML=${{ __html: t('private_key_warning') }} ></p>
         <p>

@@ -167,7 +167,7 @@ class Main extends Component {
               <${Chat} path="/chat/:id?"/>
               <${Message} path="/post/:hash"/>
               <${About} path="/about"/>
-              <${Settings} path="/settings" showSwitchAccount=${true}/>
+              <${Settings} path="/settings"/>
               <${LogoutConfirmation} path="/logout"/>
               <${Profile} path="/profile/:id?" tab="profile"/>
               <${Profile} path="/replies/:id?" tab="replies"/>
