@@ -1957,14 +1957,6 @@ export default {
     });
   },
 
-  hideAndRemove(el) {
-    el.fadeTo(1000, 0.01, function() {
-      $(this).slideUp(150, function() {
-        $(this).remove();
-      });
-    });
-  },
-
   checkColorScheme() {
     // If `prefers-color-scheme` is not supported, fall back to light mode.
     if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
@@ -2005,20 +1997,6 @@ export default {
       this.wtClient = new WebTorrent();
     }
     return this.wtClient;
-  },
-
-  getIdenticon(pub, width) {
-    var el = $('<div>').width(width).height(width).addClass('identicon');
-    var identicon = $(new iris.Attribute({type: 'keyID', value: pub}).identicon({width, showType: false}));
-    el.html(identicon);
-    State.public.user(pub).get('profile').get('photo').on(data => { // TODO: limit size
-      if (data) {
-        el.html(setImgSrc($('<img>'), data).attr('width', width).attr('height', width).addClass('identicon-image'));
-      } else {
-        el.html(identicon);
-      }
-    });
-    return el;
   },
 
   getProfileLink(pub) {

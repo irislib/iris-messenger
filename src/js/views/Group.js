@@ -56,38 +56,6 @@ class Group extends View {
     }
   }
 
-  onSelectCandidate(pub) {
-    console.log('onSelectCandidate', pub);
-    $('#profile-add-participant-input').hide();
-    if (pub) {
-      $('#profile-add-participant-candidate').remove();
-      var identicon = Helpers.getIdenticon(pub, 40).css({'margin-right':15});
-      var nameEl = $('<span>');
-      State.public.user(pub).get('profile').get('name').on(name => nameEl.text(name));
-      var el = $('<p>').css({display:'flex', 'align-items': 'center'}).attr('id', 'profile-add-participant-candidate');
-      var addBtn = $('<button>').css({'margin-left': 15}).text(t('add')).click(() => {
-        if (newGroupParticipant) {
-          Session.channels[this.props.id].addParticipant(newGroupParticipant);
-          newGroupParticipant = null;
-          $('#profile-add-participant-input').val('').show();
-          $('#profile-add-participant-candidate').remove();
-        }
-      });
-      var removeBtn = $('<button>').css({'margin-left': 15}).text(t('cancel')).click(() => {
-        el.remove();
-        $('#profile-add-participant-input').val('').show();
-        newGroupParticipant = null;
-      });
-      el.append(identicon);
-      el.append(nameEl);
-      el.append(addBtn);
-      el.append(removeBtn);
-      newGroupParticipant = pub;
-      $('#profile-add-participant-input').after(el);
-    }
-    $(event.target).val('');
-  }
-
   onAddParticipant(add = true) {
     add && Session.channels[this.props.id].addParticipant(this.state.memberCandidate);
     this.setState({memberCandidate:null});

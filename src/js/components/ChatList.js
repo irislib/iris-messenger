@@ -32,9 +32,6 @@ class ChatList extends Component {
       limitedUpdate();
     });
     State.local.get('scrollUp').on(() => Helpers.animateScrollTop('.chat-list'));
-    if (Session.getKey()) {
-      $("#my-identicon").append(Helpers.getIdenticon(Session.getKey().pub, 40));
-    }
 
     if (window.Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
       setTimeout(() => {

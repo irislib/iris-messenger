@@ -1255,12 +1255,6 @@ hr {
   padding: 15px;
 }
 
-#my-identicon {
-  flex: none;
-  align-self: center;
-  margin-right: 15px;
-}
-
 .user-name {
   align-self: center;
   flex: 1;
