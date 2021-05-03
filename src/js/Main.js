@@ -208,12 +208,15 @@ class Main extends Component {
 
 render(html`<${Main}/>`, document.body);
 
-$('body').css('opacity', 1); // use opacity because setting focus on display: none elements fails
+document.body.style = 'opacity:1';
 
 Helpers.showConsoleWarning();
 
-$(window).resize(() => { // if resizing up from mobile size menu view
-  if ($(window).width() > 565 && $('.main-view:visible').length === 0) {
+window.addEventListener('resize', () => { // if resizing up from mobile size menu view
+  const el = document.querySelector('.main-view');
+  const visible = el && el.offsetWidth > 0 && el.offsetHeight > 0;
+  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+  if (vw > 565 && visible) {
     route('/');
   }
-});
+})
