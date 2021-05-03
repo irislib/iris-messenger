@@ -425,12 +425,6 @@ header.footer .header-content {
   border-top: 1px solid var(--emoji-picker-border-color);
 }
 
-@media (max-width: 625px) {
-  #media-player-container {
-    font-size: 0.7em;
-  }
-}
-
 #media-info p {
   margin: 0;
 }
@@ -466,6 +460,16 @@ header.footer .header-content {
 
 #close-media svg {
   width: 13px;
+}
+
+@media (max-width: 625px) {
+  #media-player-container {
+    font-size: 0.7em;
+  }
+
+  #media-info, #media-cover {
+    margin-right: 0px;
+  }
 }
 
 .torrent {
