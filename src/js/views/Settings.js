@@ -10,12 +10,14 @@ import CopyButton from '../components/CopyButton.js';
 import View from './View.js';
 import { route } from '../lib/preact-router.es.js';
 import {ExistingAccountLogin} from './Login.js';
+import Notifications from '../Notifications.js';
 
 class Settings extends View {
   constructor() {
     super();
     this.eventListeners = [];
     this.state = Session.DEFAULT_SETTINGS;
+    this.state.webPushSubscriptions = {};
     this.id = "settings";
   }
 
@@ -54,7 +56,19 @@ class Settings extends View {
         <hr/>
         <h3>Notifications</h3>
         <p>Web push subscriptions</p>
-        <div id="web-push-subscriptions" class="flex-table"></div>
+        <div class="flex-table">
+          ${Object.keys(this.state.webPushSubscriptions).map(k => {
+            const v = this.state.webPushSubscriptions[k];
+            return html`
+              <div class="flex-row">
+                  <div class="flex-cell">${v.endpoint}</div>
+                  <div class="flex-cell no-flex">
+                      <button onClick=${() => Notifications.removeSubscription(k)}>${t('remove')}</button>
+                  </div>
+              </div>
+            `;
+          })}
+        </div>
         <hr/>
         <h3>${t('peers')}</h3>
         ${this.renderPeerList()}
@@ -92,10 +106,14 @@ class Settings extends View {
         <hr/>
         <h3>${t('webrtc_connection_options')}</h3>
         <p><small>${t('webrtc_info')}</small></p>
-        <p><textarea rows="4" id="rtc-config" placeholder="${t('webrtc_connection_options')}"></textarea></p>
-        <button id="restore-default-rtc-config">${t('restore_defaults')}</button>
+        <p><textarea rows="4" id="rtc-config" placeholder="${t('webrtc_connection_options')}" onChange=${() => this.rtcConfigChanged()}></textarea></p>
+        <button onClick=${() => this.restoreDefaultRtcConfig()}>${t('restore_defaults')}</button>
       </div>
     `;
+  }
+
+  rtcConfigChanged() {
+    setRTCConfig(JSON.parse($('#rtc-config').val()));
   }
 
   resetPeersClicked() {
@@ -160,7 +178,7 @@ class Settings extends View {
             <input type="url" id="add-peer-url" placeholder="${t('peer_url')}"/>
             <input type="checkbox" id="add-peer-public"/>
             <label for="add-peer-public">${t('public')}</label>
-            <button id="add-peer-btn">${t('add')}</button>
+            <button id="add-peer-btn" onClick=${() => this.addPeerClicked()}>${t('add')}</button>
           </div>
         </div>
         <p>
@@ -175,26 +193,23 @@ class Settings extends View {
     this.setState({peersFromGun});
   }
 
+  addPeerClicked() {
+    var url = $('#add-peer-url').val();
+    var visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
+    PeerManager.addPeer({url, visibility});
+    $('#add-peer-url').val('');
+  }
+
+  restoreDefaultRtcConfig() {
+    setRTCConfig(DEFAULT_RTC_CONFIG);
+    $('#rtc-config').val(JSON.stringify(getRTCConfig()));
+  }
+
   componentDidMount() {
     this.updatePeersFromGun();
     this.updatePeersFromGunInterval = setInterval(() => this.updatePeersFromGun(), 2000);
-    $('#desktop-application-about').toggle(!iris.util.isMobile && !iris.util.isElectron);
-
-    $('#add-peer-btn').click(() => {
-      var url = $('#add-peer-url').val();
-      var visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
-      PeerManager.addPeer({url, visibility});
-      $('#add-peer-url').val('');
-    });
 
     $('#rtc-config').val(JSON.stringify(getRTCConfig()));
-    $('#rtc-config').change(() => {
-      setRTCConfig(JSON.parse($('#rtc-config').val()));
-    });
-    $('#restore-default-rtc-config').click(() => {
-      setRTCConfig(DEFAULT_RTC_CONFIG);
-      $('#rtc-config').val(JSON.stringify(getRTCConfig()));
-    });
 
     State.electron && State.electron.get('settings').on(electron => {
       this.setState({electron});
@@ -202,6 +217,7 @@ class Settings extends View {
     State.local.get('settings').on(local => {
       this.setState({local})
     });
+    State.public.user().get('webPushSubscriptions').map().on(() => this.setState({webPushSubscriptions: Notifications.webPushSubscriptions}));
   }
 
   componentWillUnmount() {

@@ -16,11 +16,9 @@ class Torrent extends Component {
   }
 
   onPlay(e) {
-    const mp = document.getElementById('media-player');
-    const mpc = document.getElementById('media-player-container');
     if (!e.target.muted) {
-      mp && (mp.innerHTML = '');
-      mpc && (mpc.style = 'display:none');
+      $('#media-player').empty();
+      $('#media-player-container').hide();
     }
   }
 

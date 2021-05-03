@@ -31,7 +31,7 @@ class Identicon extends Component {
     this.identicon = new iris.Attribute({type: 'keyID', value: pub}).identicon({width: this.props.width, showType: false});
     this.identiconRef.current.appendChild(this.identicon);
     State.public.user(pub).get('profile').get('photo').on(photo => { // TODO: limit size
-      this.identiconRef.current.children[0].style = (photo ? '' : 'display:none');
+      this.identiconRef.current && (this.identiconRef.current.children[0].style = (photo ? '' : 'display:none'));
       this.setState({photo});
     });
 

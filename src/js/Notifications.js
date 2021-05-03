@@ -2,11 +2,10 @@ import Helpers from './Helpers.js';
 import Session from './Session.js';
 import { route } from './lib/preact-router.es.js';
 import State from './State.js';
-import { translate as t } from './Translation.js';
 
-var notificationSound = new Audio('../../audio/notification.mp3');
-var loginTime;
-var unseenTotal;
+const notificationSound = new Audio('../../audio/notification.mp3');
+let loginTime;
+let unseenTotal;
 const webPushSubscriptions = {};
 
 function desktopNotificationsEnabled() {
@@ -136,28 +135,9 @@ const addWebPushSubscriptionsToChats = _.debounce(() => {
   });
 }, 5000);
 
-function addWebPushSubscriptionsToSettings() {
-  const el = $('#web-push-subscriptions');
-  el.empty();
-  const arr = Object.keys(webPushSubscriptions);
-  arr.forEach(k => {
-    const v = webPushSubscriptions[k];
-    const row = $('<div>').addClass('flex-row');
-    row.append($('<div>').addClass('flex-cell').text(v.endpoint));
-    const btnContainer = $('<div>').addClass('flex-cell no-flex');
-    const removeBtn = $('<button>').text(t('remove')).click(() => removeSubscription(k));
-    btnContainer.append(removeBtn);
-    row.append(btnContainer);
-    el.append(row);
-  });
-}
-
-const addWebPushSubscriptionsToSettingsDebounced = _.debounce(addWebPushSubscriptionsToSettings, 1000);
-
 function removeSubscription(hash) {
   delete webPushSubscriptions[hash];
   State.public.user().get('webPushSubscriptions').get(hash).put(null);
-  addWebPushSubscriptionsToSettings();
   addWebPushSubscriptionsToChats();
 }
 
@@ -171,7 +151,6 @@ async function addWebPushSubscription(s, saveToGun = true) {
   }
   webPushSubscriptions[hash] = s;
   addWebPushSubscriptionsToChats();
-  addWebPushSubscriptionsToSettingsDebounced();
 }
 
 async function getWebPushSubscriptions() {
