@@ -1,4 +1,3 @@
-import State from './State.js';
 import Session from './Session.js';
 import {translate as t} from './Translation.js';
 import {createElement} from './lib/preact.js';
