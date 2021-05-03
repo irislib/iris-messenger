@@ -1,5 +1,5 @@
 import { Component } from '../lib/preact.js';
-import Helpers, {html, el} from '../Helpers.js';
+import Helpers, {html} from '../Helpers.js';
 import Session from "../Session.js";
 import { translate as tr } from '../Translation.js';
 
@@ -16,9 +16,12 @@ class Torrent extends Component {
   }
 
   onPlay(e) {
-    const mp = document.getElementById('#media-player');
-    const mpc = document.getElementById()
-    !e.target.muted && mp.innerHTML = '' && $('#media-player-container').hide();
+    const mp = document.getElementById('media-player');
+    const mpc = document.getElementById('media-player-container');
+    if (!e.target.muted) {
+      mp && (mp.innerHTML = '');
+      mpc && (mpc.style = 'display:none');
+    }
   }
 
   componentWillUnmount() {
