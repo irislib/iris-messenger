@@ -18,6 +18,7 @@ class About extends View {
           <li><b>Secure</b>: It's open source. Users can validate that big brother doesn't read your private messages.</li>
           <li><b>Available</b>: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.</li>
         </ul>
+        <p>In other words, <b>you can't be deplatformed from Iris</b>.</p>
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
         <p><small>Version 1.7.1</small></p>
 
