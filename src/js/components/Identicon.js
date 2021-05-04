@@ -1,4 +1,4 @@
-import { Component, createRef } from '../lib/preact.js';
+import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import State from '../State.js';
 import SafeImg from './SafeImg.js';
@@ -8,7 +8,6 @@ class Identicon extends Component {
   constructor() {
     super();
     this.eventListeners = {};
-    this.identiconRef = createRef();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -29,9 +28,9 @@ class Identicon extends Component {
   componentDidMount() {
     const pub = this.props.str;
     this.identicon = new iris.Attribute({type: 'keyID', value: pub}).identicon({width: this.props.width, showType: false});
-    this.identiconRef.current.appendChild(this.identicon);
+    this.base.appendChild(this.identicon);
     State.public.user(pub).get('profile').get('photo').on(photo => { // TODO: limit size
-      this.identiconRef.current && (this.identiconRef.current.children[0].style = (photo ? '' : 'display:none'));
+      $(this.base).find('.iris-identicon').toggle(!photo);
       this.setState({photo});
     });
 
@@ -68,7 +67,7 @@ class Identicon extends Component {
     const activity = ['online', 'active'].indexOf(this.state.activity) > -1 ? this.state.activity : '';
     return html`
       <div onClick=${this.props.onClick} style="${this.props.onClick ? 'cursor: pointer;' : ''} position: relative;" class="identicon-container ${this.props.showTooltip ? 'tooltip' : ''} ${activity}">
-        <div style="width: ${width}; height: ${width}" class="identicon" ref=${this.identiconRef}>
+        <div style="width: ${width}; height: ${width}" class="identicon">
           ${this.state.photo ? html`<${SafeImg} src=${this.state.photo} class="identicon-image" width=${width}/>` : ''}
         </div>
         ${this.props.showTooltip && this.state.name ? html`<span class="tooltiptext">${this.state.name}</span>` : ''}
