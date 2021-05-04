@@ -33,6 +33,7 @@ class About extends View {
               </li>
               <li>Opens to background on login: stay online and get message notifications</li>
               <li>More secure and available: no need to open the browser application from a server</li>
+              <li>Direct-connect to the people you have an open chat with (if port 8767 open or upnp enabled in router)</li>
             </ul>
             <p><a href="https://github.com/irislib/iris-electron/releases">Download</a></p>
           </div>
