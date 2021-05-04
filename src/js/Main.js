@@ -174,6 +174,7 @@ class Main extends Component {
               <${Profile} path="/profile/:id?" tab="profile"/>
               <${Profile} path="/replies/:id?" tab="replies"/>
               <${Profile} path="/likes/:id?" tab="likes"/>
+              <${Profile} path="/media/:id?" tab="media"/>
               <${Group} path="/group/:id?"/>
               <${Store} path="/store/:store?"/>
               <${Checkout} path="/checkout/:store"/>

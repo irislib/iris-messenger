@@ -42,6 +42,7 @@ class PublicMessageForm extends Component {
     const hash = await iris.util.getHash(serialized);
     State.public.get('#').get(hash).put(serialized);
     if (msg.replyingTo) {
+      twice(() => State.public.user().get('replies').put({a:null}));
       twice(() => State.public.user().get('replies').get(msg.replyingTo).put({a:null}));
       twice(() => State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
     } else {

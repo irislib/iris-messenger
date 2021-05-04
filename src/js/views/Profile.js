@@ -167,6 +167,7 @@ class Profile extends View {
       <${Link} activeClassName="active" href="/profile/${this.props.id}">Posts<//>
       <${Link} activeClassName="active" href="/replies/${this.props.id}">Replies<//>
       <${Link} activeClassName="active" href="/likes/${this.props.id}">Likes<//>
+      <${Link} activeClassName="active" href="/media/${this.props.id}">Media<//>
     </div>
     `;
   }
@@ -182,6 +183,13 @@ class Profile extends View {
       return html`
         <div class="public-messages-view">
           <${MessageFeed} key="likes${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
+        </div>
+      `;
+    } else if (this.props.tab === 'media') {
+      return html`
+        <div class="public-messages-view">
+          ${this.isMyProfile ? html`<${PublicMessageForm} index="media" class="hidden-xs" autofocus=${false}/>` : ''}
+          <${MessageFeed} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
         </div>
       `;
     } else {
