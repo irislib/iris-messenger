@@ -53,6 +53,7 @@ Helpers.checkColorScheme();
 
 const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
   {url: '/', text: t('home'), icon: Icons.home},
+  {url: '/media', text: t('media'), icon: Icons.play},
   {url: '/chat', text: t('messages'), icon: Icons.chat},
   {url: '/contacts', text: t('contacts'), icon: Icons.user},
   {url: '/settings', text: t('settings'), icon: Icons.settings},
@@ -163,6 +164,7 @@ class Main extends Component {
             <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
               <${Feed} path="/"/>
               <${Feed} path="/feed"/>
+              <${Feed} path="/media" index="media"/>
               <${Login} path="/login"/>
               <${Chat} path="/chat/:id?"/>
               <${Message} path="/post/:hash"/>

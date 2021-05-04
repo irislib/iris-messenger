@@ -24,7 +24,7 @@ class Feed extends View {
 
   getMessagesByUser(pub, cb) {
     const seen = new Set();
-    State.public.user(pub).get('msgs').map().on(async (hash, time) => {
+    State.public.user(pub).get(this.props.index || 'msgs').map().on(async (hash, time) => {
       if (typeof hash === 'string' && !seen.has(hash)) {
         seen.add(hash);
         cb(hash, time);
@@ -50,9 +50,9 @@ class Feed extends View {
           }
           const id = time + pub.slice(0,20);
           if (hash) {
-            State.local.get('feed').get(id).put(hash);
+            State.local.get(this.props.index || 'feed').get(id).put(hash);
           } else {
-            State.local.get('feed').get(id).put(null);
+            State.local.get(this.props.index || 'feed').get(id).put(null);
           }
         });
       } else {
@@ -115,7 +115,7 @@ class Feed extends View {
   renderView() {
     return html`
       <div class="centered-container">
-        <${PublicMessageForm} class="hidden-xs" autofocus=${false}/>
+        <${PublicMessageForm} index=${this.props.index} class="hidden-xs" autofocus=${false}/>
         <!--<div class="feed-settings">
           <button onClick="${() => {
               State.local.get('show2ndDegreeFollows').put(!this.state.show2ndDegreeFollows);
@@ -124,7 +124,7 @@ class Feed extends View {
           </button>
         </div>-->
         ${this.getNotification()}
-        <${MessageFeed} node=${State.local.get('feed')} />
+        <${MessageFeed} key=${this.props.index || 'feed'} node=${State.local.get(this.props.index || 'feed')} />
       </div>
     `;
   }

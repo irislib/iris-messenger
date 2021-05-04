@@ -45,7 +45,8 @@ class PublicMessageForm extends Component {
       twice(() => State.public.user().get('replies').get(msg.replyingTo).put({a:null}));
       twice(() => State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
     } else {
-      State.public.user().get('msgs').get(msg.time).put(hash);
+      msg.torrentId && State.public.user().get('media').get(msg.time).put(hash);
+      State.public.user().get(this.props.index || 'msgs').get(msg.time).put(hash);
     }
   }
 
@@ -57,6 +58,7 @@ class PublicMessageForm extends Component {
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length && !this.state.attachments && !this.state.torrentId) { return; }
+    if (this.props.index === 'media' && !this.state.torrentId) { return; }
     const msg = {text};
     if (this.props.replyingTo) {
       msg.replyingTo = this.props.replyingTo;
@@ -121,9 +123,17 @@ class PublicMessageForm extends Component {
   }
 
   render() {
+    const textareaPlaceholder = this.props.index === 'media' ? 'type_a_message_or_paste_a_magnet_link' : 'type_a_message';
     return html`<form autocomplete="off" class="message-form ${this.props.class || ''} public" onSubmit=${e => this.onMsgFormSubmit(e)}>
       <input name="attachment-input" type="file" class="hidden attachment-input" accept="image/*" multiple onChange=${e => this.attachmentsChanged(e)}/>
-      <textarea onPaste=${e => this.onMsgTextPaste(e)} onInput=${e => this.onMsgTextInput(e)} class="new-msg" type="text" placeholder="${t('type_a_message')}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>
+      ${this.props.index === 'media' ? html`
+          <p>
+            <small>
+              Download <a href="https://webtorrent.io/desktop/">Webtorrent Desktop</a> to host your media files and paste their magnet links below.
+            </small>
+          </p>
+      `: ''}
+      <textarea onPaste=${e => this.onMsgTextPaste(e)} onInput=${e => this.onMsgTextInput(e)} class="new-msg" type="text" placeholder="${t(textareaPlaceholder)}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>
       <div>
           <button type="button" class="attach-file-btn" onClick=${e => this.attachFileClicked(e)}>
             <svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21.586 10.461l-10.05 10.075c-1.95 1.949-5.122 1.949-7.071 0s-1.95-5.122 0-7.072l10.628-10.585c1.17-1.17 3.073-1.17 4.243 0 1.169 1.17 1.17 3.072 0 4.242l-8.507 8.464c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414l7.093-7.05-1.415-1.414-7.093 7.049c-1.172 1.172-1.171 3.073 0 4.244s3.071 1.171 4.242 0l8.507-8.464c.977-.977 1.464-2.256 1.464-3.536 0-2.769-2.246-4.999-5-4.999-1.28 0-2.559.488-3.536 1.465l-10.627 10.583c-1.366 1.368-2.05 3.159-2.05 4.951 0 3.863 3.13 7 7 7 1.792 0 3.583-.684 4.95-2.05l10.05-10.075-1.414-1.414z"/></svg>

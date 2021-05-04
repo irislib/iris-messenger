@@ -143,7 +143,8 @@ class PublicMessage extends Message {
     e.preventDefault();
     if (confirm('Delete message?')) {
       const msg = this.state.msg;
-      State.public.user().get('msgs').get(msg.time).put(null);
+      msg.torrentId && State.public.user().get('media').get(msg.time).put(null);
+      State.public.user().get(this.props.index || 'msgs').get(msg.time).put(null);
       msg.replyingTo && State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
     }
   }
