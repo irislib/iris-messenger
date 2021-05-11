@@ -47,7 +47,7 @@ export default {
     log_out: "Log out",
     private_key: "Private key",
     download_private_key: "Download private key",
-    private_key_warning: "<b>DANGER!</b> Private key is used to <b>log in to your account</b>. Don't give or show your private key to anyone else!",
+    private_key_warning: "<b>DANGER!</b> Private key <b>gives access to your account</b>. Don't give or show your private key to anyone else!",
     copy_private_key: "Copy private key",
     show_privkey_qr: "Show private key QR code",
     hide_privkey_qr: "Hide private key QR code",
