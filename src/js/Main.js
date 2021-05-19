@@ -29,6 +29,7 @@ import Contacts from './views/Contacts.js';
 
 import VideoCall from './components/VideoCall.js';
 import Identicon from './components/Identicon.js';
+import MediaPlayer from './components/MediaPlayer.js';
 import Footer from './components/Footer.js';
 import State from './State.js';
 import Icons from './Icons.js';
@@ -188,15 +189,7 @@ class Main extends Component {
             </${Router}>
           </div>
         </section>
-        <div id="media-player-container" style="display:none">
-            <div id="media-player"></div>
-            <div id="media-cover"></div>
-            <div id="media-info"></div>
-            <div id="close-media" onClick=${() => {
-              document.getElementById('media-player').innerHTML = '';
-              document.getElementById('media-player-container').style = 'display: none';
-            }}>${Icons.close}</div>
-        </div>
+        <${MediaPlayer}/>
         <${Footer}/>
         <${VideoCall}/>
       ` : html`<${Login}/>`;
