@@ -170,7 +170,7 @@ class Main extends Component {
               <${Login} path="/login"/>
               <${Chat} path="/chat/:id?"/>
               <${Message} path="/post/:hash"/>
-              <${Torrent} path="/torrent/:id" showFiles=${true}/>
+              <${Torrent} path="/torrent/:id"/>
               <${About} path="/about"/>
               <${Settings} path="/settings"/>
               <${LogoutConfirmation} path="/logout"/>

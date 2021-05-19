@@ -11,7 +11,7 @@ class TorrentView extends View {
   renderView() {
     return html`
       <div id="message-list" class="centered-container">
-        <${Torrent} torrentId=${this.props.id}/>
+        <${Torrent} showFiles=${true} torrentId=${this.props.id}/>
       </div>
     `;
   }
