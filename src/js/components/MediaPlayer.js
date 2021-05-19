@@ -15,7 +15,7 @@ class MediaPlayer extends Component {
       if (torrentId !== this.torrentId) {
         this.filePath = filePath;
         this.torrentId = torrentId;
-        this.setState({isOpen: !!player, splitPath: filePath && filePath.split('/')});
+        this.setState({torrentId, isOpen: !!player, splitPath: filePath && filePath.split('/')});
         if (torrentId) {
           this.startTorrenting();
         }
@@ -67,7 +67,7 @@ class MediaPlayer extends Component {
       <div class="media-player">
         <div class="player"></div>
         <div class="cover"></div>
-        <div class="info">
+        <a href="/torrent/${encodeURIComponent(this.state.torrentId)}" class="info">
           ${s.splitPath ? s.splitPath.map(
             (str, i) => {
               if (i === s.splitPath.length - 1) {
@@ -80,7 +80,7 @@ class MediaPlayer extends Component {
               }
             }
           ):''}
-        </div>
+        </a>
         <div class="close" onClick=${() => State.local.get('player').put(null)}>${Icons.close}</div>
       </div>
     ` : '';

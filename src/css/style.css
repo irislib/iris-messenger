@@ -437,6 +437,10 @@ header.footer .header-content {
     margin-right: 15px;
 }
 
+.media-player .info {
+  color: var(--text-color);
+}
+
 .media-player .cover {
   max-width: 40px;
   max-height: 40px;

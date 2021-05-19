@@ -12,6 +12,8 @@ const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class Torrent extends Component {
   componentDidMount() {
+    const showFiles = typeof this.props.showFiles === 'undefined' ? true : this.props.showFiles;
+    this.setState({showFiles});
     if (Session.settings.local.enableWebtorrent) {
       this.startTorrenting();
     }

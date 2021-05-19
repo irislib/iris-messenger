@@ -26,6 +26,7 @@ import Feed from './views/Feed.js';
 import About from './views/About.js';
 import Explorer from './views/Explorer.js';
 import Contacts from './views/Contacts.js';
+import Torrent from './views/Torrent.js';
 
 import VideoCall from './components/VideoCall.js';
 import Identicon from './components/Identicon.js';
@@ -169,6 +170,7 @@ class Main extends Component {
               <${Login} path="/login"/>
               <${Chat} path="/chat/:id?"/>
               <${Message} path="/post/:hash"/>
+              <${Torrent} path="/torrent/:id" showFiles=${true}/>
               <${About} path="/about"/>
               <${Settings} path="/settings"/>
               <${LogoutConfirmation} path="/logout"/>
