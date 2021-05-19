@@ -159,6 +159,8 @@ class PublicMessage extends Message {
     const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
     const innerHTML = autolinker.link(h);
     const time = typeof this.state.msg.time === 'object' ? this.state.msg.time : new Date(this.state.msg.time);
+    const dateStr = time.toLocaleString(window.navigator.language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = time.toLocaleTimeString(window.navigator.language, {timeStyle: 'short'});
 
     return html`
       <div class="msg ${this.props.asReply ? 'reply' : ''}">
@@ -203,7 +205,12 @@ class PublicMessage extends Message {
               ${this.state.likes || ''}
             </span>
             <div class="time">
-              <a href="/post/${encodeURIComponent(this.props.hash)}">${Helpers.getRelativeTimeText(time)}</a>
+              <a href="/post/${encodeURIComponent(this.props.hash)}" class="tooltip">
+                  ${Helpers.getRelativeTimeText(time)}
+                  <span class="tooltiptext">
+                    ${dateStr} ${timeStr}
+                  </span>
+              </a>
             </div>
           </div>
           ${this.state.showLikes ? html`
