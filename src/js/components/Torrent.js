@@ -17,15 +17,20 @@ class Torrent extends Component {
   }
 
   componentDidMount() {
+    State.local.get('player').on((player,a,b,e) => {
+      this.player = player;
+      this.eventListeners['player'] = e;
+      this.setState({player});
+      if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
+        const file = this.getActiveFile(this.torrent);
+        file && this.openFile(file);
+      }
+    });
     const showFiles = this.props.showFiles;
     showFiles && this.setState({showFiles});
     if (Session.settings.local.enableWebtorrent) {
       this.startTorrenting();
     }
-    State.local.get('player').on((player,a,b,e) => {
-      this.eventListeners['player'] = e;
-      this.setState({player});
-    });
   }
 
   componentWillUnmount() {
@@ -120,8 +125,7 @@ class Torrent extends Component {
         const typeCheck = player.tagName === 'VIDEO' ? isVideo : isAudio;
         this.openNextFile(typeCheck);
       });
-      player.addEventListener('play', this.onPlay);
-      player.addEventListener('volumechange', this.onPlay);
+      player.onplay = player.onvolumechange = this.onPlay;
     }
   }
 
@@ -143,14 +147,27 @@ class Torrent extends Component {
     this.openFile(this.state.torrent.files[nextIndex], true);
   }
 
+  getActiveFile(torrent) {
+    const p = this.player;
+    let file;
+    if (p && p.torrentId === this.props.torrentId) {
+      file = torrent.files.find(f => {
+        return f.path === p.filePath;
+      });
+    }
+    return file;
+  }
+
   onTorrent(torrent, clicked) {
+    this.torrent = torrent;
     const video = torrent.files.find(f => isVideo(f));
     const audio = torrent.files.find(f => isAudio(f));
     const img = torrent.files.find(f => isImage(f));
     let poster = torrent.files.find(f => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1));
     poster = poster || img;
     poster && poster.appendTo($(this.base).find('.cover').get(0));
-    const file = video || audio || img || torrent.files[0];
+
+    const file = this.getActiveFile(torrent) || video || audio || img || torrent.files[0];
     this.setState({torrent, cover: img});
     file && this.openFile(file, clicked);
   }
