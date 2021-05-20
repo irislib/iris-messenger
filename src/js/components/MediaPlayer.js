@@ -39,6 +39,7 @@ class MediaPlayer extends Component {
     const el = $(this.base).find('.cover');
     el.empty();
     poster && poster.appendTo(el.get(0));
+    this.setState({isOpen: true});
     this.openFile();
   }
 
@@ -69,8 +70,8 @@ class MediaPlayer extends Component {
 
   render() {
     const s = this.state;
-    return s.isOpen ? html`
-      <div class="media-player">
+    return html`
+      <div class="media-player" style="${s.isOpen ? '':'display:none'}">
         <div class="player"></div>
         <div class="cover"></div>
         <a href="/torrent/${encodeURIComponent(this.state.torrentId)}" class="info">
@@ -89,7 +90,7 @@ class MediaPlayer extends Component {
         </a>
         <div class="close" onClick=${() => State.local.get('player').put(null)}>${Icons.close}</div>
       </div>
-    ` : '';
+    `;
   }
 }
 
