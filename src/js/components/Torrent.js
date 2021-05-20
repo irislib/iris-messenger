@@ -11,12 +11,25 @@ const isAudio = f => isOfType(f, ['.mp3', '.wav', '.m4a']);
 const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class Torrent extends Component {
+  constructor() {
+    super();
+    this.eventListeners = {};
+  }
+
   componentDidMount() {
     const showFiles = this.props.showFiles;
     showFiles && this.setState({showFiles});
     if (Session.settings.local.enableWebtorrent) {
       this.startTorrenting();
     }
+    State.local.get('player').on((player,a,b,e) => {
+      this.eventListeners['player'] = e;
+      this.setState({player});
+    });
+  }
+
+  componentWillUnmount() {
+    Object.values(this.eventListeners).forEach(e => e.off());
   }
 
   onPlay(e) {
@@ -55,8 +68,14 @@ class Torrent extends Component {
     }
   }
 
-  playAudio(filePath) {
+  playAudio(filePath, e) {
+    e && e.preventDefault();
     State.local.get('player').put({torrentId: this.props.torrentId, filePath, paused: false});
+  }
+
+  pauseAudio(e) {
+    e && e.preventDefault();
+    State.local.get('player').put({paused: true});
   }
 
   openFile(file, clicked) {
@@ -149,6 +168,16 @@ class Torrent extends Component {
   render() {
     const s = this.state;
     const t = s.torrent;
+    const p = s.player;
+    const playing = p && p.torrentId === this.props.torrentId && !p.paused;
+    let playButton = '';
+    if (s.isAudioOpen) {
+      playButton = playing ? html`
+          <a href="#" onClick=${e => this.pauseAudio(e)}>${Icons.pause}</a>
+      `: html`
+          <a href="#" onClick=${e => this.playAudio(s.activeFilePath, e)}>${Icons.play}</a>
+      `;
+    }
     return html`
         <div class="torrent">
             ${!Session.settings.local.enableWebtorrent && !s.torrenting ? html`
@@ -172,12 +201,7 @@ class Torrent extends Component {
             </div>
             ${s.hasNext ? html`<b>prev</b>`:''}
             <div class="player">
-                ${this.state.isAudioOpen ? html`
-                    <a href="#" onClick=${e => {
-                        e.preventDefault();
-                        this.playAudio(this.state.activeFilePath);
-                    }}>${Icons.play}</a>
-                `:''}
+                ${playButton}
             </div>
             ${s.hasNext ? html`<b>next</b>`:''}
             <a href=${this.props.torrentId}>Magnet link</a>

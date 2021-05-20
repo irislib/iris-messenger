@@ -48,6 +48,12 @@ class MediaPlayer extends Component {
       const el = $(this.base).find('.player');
       el.empty();
       file && file.appendTo(el.get(0), {autoplay: true, muted: false});
+      const audio = el.find('audio').get(0);
+      if (audio) {
+        audio.onpause = audio.onplay = e => {
+          State.local.get('player').get('paused').put(!!e.target.paused);
+        };
+      }
     }
   }
 
