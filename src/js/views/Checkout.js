@@ -196,7 +196,7 @@ class Checkout extends Store {
   }
 
   componentDidMount() {
-    StoreView.prototype.componentDidMount.call(this);
+    Store.prototype.componentDidMount.call(this);
     const pub = this.props.store;
     this.setState({page:'cart'})
     this.eventListeners.forEach(e => e.off());
