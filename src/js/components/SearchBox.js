@@ -1,4 +1,5 @@
 import { Component } from '../lib/preact.js';
+import { route } from '../lib/preact-router.es.js';
 import Helpers, { html } from '../Helpers.js';
 import State from '../State.js';
 import Identicon from './Identicon.js';
@@ -56,9 +57,11 @@ class SearchBox extends Component {
 
   onSubmit(e) {
     e.preventDefault();
-    const links = $(this.base).find('a:not(.follow-someone)');
-    links.length && links[0].click();
-    $(this.base).find('input').blur();
+    const el = $(this.base).find('input');
+    const query = el.val();
+    el.val('');
+    el.blur();
+    route(`/search/${query}`);
   }
 
   search() {

@@ -53,7 +53,9 @@ class MessageFeed extends Component {
     return html`
       <div class="feed-container">
         <${ScrollViewport} rowHeight=${165}>
-          ${this.state.sortedMessages.map(hash => typeof hash === 'string' ? html`<${PublicMessage} hash=${hash} key=${hash} showName=${true} />` : '')}
+          ${this.state.sortedMessages.map(
+            hash => typeof hash === 'string' ? html`<${PublicMessage} filter=${this.props.filter} hash=${hash} key=${hash} showName=${true} />` : ''
+          )}
         </${ScrollViewport}>
       </div>
     `;

@@ -150,7 +150,8 @@ class PublicMessage extends Message {
   }
 
   render() {
-    if (!this.state.msg) { return html``; }
+    if (!this.state.msg) { return ''; }
+    if (this.props.filter && !this.props.filter(this.state.msg)) { return ''; }
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name;
     const emojiOnly = this.state.msg.text && this.state.msg.text.length === 2 && Helpers.isEmoji(this.state.msg.text);

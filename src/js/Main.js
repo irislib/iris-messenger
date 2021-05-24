@@ -166,6 +166,7 @@ class Main extends Component {
             <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
               <${Feed} path="/"/>
               <${Feed} path="/feed"/>
+              <${Feed} path="/search/:term?/:type?"/>
               <${Feed} path="/media" index="media"/>
               <${Login} path="/login"/>
               <${Chat} path="/chat/:id?"/>
