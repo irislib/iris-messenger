@@ -1,4 +1,4 @@
-import { h, Component } from './preact.js';
+import { Component } from './preact.js';
 import {html} from '../Helpers.js';
 
 const EVENT_OPTS = {

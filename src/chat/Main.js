@@ -9,8 +9,8 @@ import QRScanner from '../js/QRScanner.js';
 import PeerManager from '../js/PeerManager.js';
 import Session from '../js/Session.js';
 
-import ChatView from '../js/components/ChatView.js';
-import Login from '../js/components/Login.js';
+import Chat from '../js/views/Chat.js';
+import Login from '../js/views/Login.js';
 import State from '../js/State.js';
 
 const userAgent = navigator.userAgent.toLowerCase();
@@ -54,9 +54,9 @@ class Main extends Component {
         <section class="main" style="flex-direction: row;">
           <div class="view-area">
             <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
-              <${ChatView} path="/"/>
-              <${ChatView} path="/:id?"/>
-              <${ChatView} path="/chat/:id?"/>
+              <${Chat} path="/"/>
+              <${Chat} path="/:id?"/>
+              <${Chat} path="/chat/:id?"/>
             </${Router}>
           </div>
         </section>
