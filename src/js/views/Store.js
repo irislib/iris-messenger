@@ -131,7 +131,7 @@ class Store extends View {
     }
     return html`
       <p>
-          This is a prototype store, where you can list items from your social network. Orders are sent via Iris private message. Your own store can be found <a href="/store/${Session.getPubKey()}">here</a>.
+          This is a prototype store that shows items from merchants your social network. Orders are sent via Iris private message. Your own store can be found <a href="/store/${Session.getPubKey()}">here</a>.
       </p>
       ${this.renderItems()}
     `;
