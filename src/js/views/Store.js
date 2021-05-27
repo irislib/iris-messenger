@@ -28,30 +28,18 @@ class Store extends View {
     State.local.get('cart').get(this.props.store).get(k).put(count);
   }
 
-  shouldRedirect() {
-    if (!this.props.store) {
-      route('/store/' + Session.getPubKey());
-      return true;
-    }
-  }
-
-  renderView() {
-    if (this.shouldRedirect()) {
-      return '';
-    }
-    const cartTotalItems = Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.items[k]).reduce((sum, k) => sum + this.cart[k], 0);
-    this.isMyProfile = Session.getPubKey() === this.props.store;
-    const chat = Session.channels[this.props.store];
+  renderUserStore(user) {
+    const chat = Session.channels[user];
     const uuid = chat && chat.uuid;
-    const followable = !(this.isMyProfile || this.props.store.length < 40);
+    const followable = !(this.isMyProfile || user.length < 40);
     let profilePhoto;
     if (this.isMyProfile) {
-      profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.store} callback=${src => this.onProfilePhotoSet(src)}/>`;
+      profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${user} callback=${src => this.onProfilePhotoSet(src)}/>`;
     } else {
       if (this.state.photo) {
         profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
       } else {
-        profilePhoto = html`<${Identicon} str=${this.props.store} width=250/>`
+        profilePhoto = html`<${Identicon} str=${user} width=250/>`
       }
     }
     return html`
@@ -62,26 +50,26 @@ class Store extends View {
               ${profilePhoto}
             </div>
             <div class="profile-header-stuff">
-              <h3 class="profile-name"><iris-text path="profile/name" placeholder="Name" user=${this.props.store}/></h3>
+              <h3 class="profile-name"><iris-text path="profile/name" placeholder="Name" user=${user}/></h3>
               <div class="profile-about hidden-xs">
                 <p class="profile-about-content">
-                  <iris-text path="store/about" placeholder="Store description" attr="about" user=${this.props.store}/>
+                  <iris-text path="store/about" placeholder="Store description" attr="about" user=${user}/>
                 </p>
               </div>
               <div class="profile-actions">
                 <div class="follow-count">
-                  <a href="/follows/${this.props.store}">
+                  <a href="/follows/${user}">
                     <span>${this.state.followedUserCount}</span> ${t('following')}
                   </a>
-                  <a href="/followers/${this.props.store}">
+                  <a href="/followers/${user}">
                     <span>${this.state.followerCount}</span> ${t('followers')}
                   </a>
                 </div>
                 ${this.followedUsers.has(Session.getPubKey()) ? html`
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
-                ${followable ? html`<${FollowButton} id=${this.props.store}/>` : ''}
-                <button onClick=${() => route('/chat/' + this.props.store)}>${t('send_message')}</button>
+                ${followable ? html`<${FollowButton} id=${user}/>` : ''}
+                <button onClick=${() => route('/chat/' + user)}>${t('send_message')}</button>
                 ${uuid ? '' : html`
                   <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
                 `}
@@ -94,45 +82,61 @@ class Store extends View {
         </div>
 
         <h3>Store</h3>
-        ${cartTotalItems ? html`
-          <p>
-            <button onClick=${() => route('/checkout/' + this.props.store)}>Shopping cart (${cartTotalItems})</button>
-          </p>
-        ` : ''}
-        <div class="store-items">
-          ${this.isMyProfile ? html`
-            <div class="store-item" onClick=${() => route(`/product/new`)}>
-              <a href="/product/new" class="name">Add item</a>
-            </div>
-          ` : ''}
-          ${Object.keys(this.state.items).map(k => {
-            const i = this.state.items[k];
-            return html`
-              <div class="store-item" onClick=${() => route(`/product/${k}/${this.props.store}`)}>
-                <${SafeImg} src=${i.photo}/>
-                <a href="/product/${k}/${this.props.store}" class="name">${i.name}</a>
-                <p class="description">${i.description}</p>
-                <p class="price">${i.price}</p>
-                <button class="add" onClick=${e => this.addToCart(k, e)}>
-                  Add to cart
-                  ${this.cart[k] ? ` (${this.cart[k]})` : ''}
-                </button>
-              </div>
-            `
-          })}
-        </div>
+        ${this.renderItems()}
       </div>
+    `;
+  }
+
+  renderItems() {
+    const cartTotalItems = Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.items[k]).reduce((sum, k) => sum + this.cart[k], 0);
+    return html`
+      ${cartTotalItems ? html`
+      <p>
+        <button onClick=${() => route('/checkout/')}>Shopping cart (${cartTotalItems})</button>
+      </p>
+    ` : ''}
+      <div class="store-items">
+         ${this.isMyProfile ? html`
+          <div class="store-item" onClick=${() => route(`/product/new`)}>
+            <a href="/product/new" class="name">Add item</a>
+          </div>
+        ` : ''}
+        ${Object.keys(this.state.items).map(k => {
+          const i = this.state.items[k];
+          return html`
+            <div class="store-item" onClick=${() => route(`/product/${k}/${i.user}`)}>
+              <${SafeImg} src=${i.photo}/>
+              <a href="/product/${k}/${i.user}" class="name">${i.name}</a>
+              ${this.props.store ? '':html`
+                <small>by <iris-text path="profile/name" editable="false" placeholder="Name" user=${i.user}/></small>
+              `}
+              <p class="description">${i.description}</p>
+              <p class="price">${i.price}</p>
+              <button class="add" onClick=${e => this.addToCart(k, e)}>
+                Add to cart
+                ${this.cart[k] ? ` (${this.cart[k]})` : ''}
+              </button>
+            </div>
+          `
+        })}
+      </div>
+    `;
+  }
+
+  renderView() {
+    if (this.props.store) {
+      return this.renderUserStore(this.props.store);
+    }
+    return html`
+      <p>
+          This is a prototype store, where you can list items from your social network. Orders are sent via Iris private message. Your own store can be found <a href="/store/${Session.getPubKey()}">here</a>.
+      </p>
+      ${this.renderItems()}
     `;
   }
 
   componentWillUnmount() {
     this.eventListeners.forEach(e => e.off());
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.store !== this.props.store) {
-      this.componentDidMount();
-    }
   }
 
   updateTotalPrice() {
@@ -144,33 +148,65 @@ class Store extends View {
     this.setState({totalPrice});
   }
 
-  componentDidMount() {
-    if (this.shouldRedirect()) {
-      return;
+  componentDidUpdate(prevProps) {
+    if (prevProps.store !== this.props.store) {
+      this.componentDidMount();
     }
-    const pub = this.props.store;
-    this.eventListeners.forEach(e => e.off());
-    this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', totalPrice: 0});
-    this.isMyProfile = Session.getPubKey() === pub;
-    this.cart = {};
+  }
 
-    State.local.get('cart').get(this.props.store).map().on((v, k) => {
+  getCartFromUser(user) {
+    State.local.get('cart').get(user).map().on((v, k, a, e) => {
+      this.eventListeners['cart' + user] = e;
       this.cart[k] = v;
       this.setState({cart: this.cart})
       this.updateTotalPrice();
     });
+  }
 
-    if (pub) {
-      State.public.user(pub).get('store').get('products').map().on((p, id) => {
-        if (p) {
-          const o = {};
-          o[id] = p;
-          Object.assign(this.items, o);
-          this.updateTotalPrice();
-        } else {
-          delete this.items[id];
+  getProductsFromUser(user) {
+    State.public.user(user).get('store').get('products').map().on((p, id, a, e) => {
+      this.eventListeners['products' + user] = e;
+      if (p) {
+        const o = {};
+        p.user = user;
+        o[id] = p;
+        Object.assign(this.items, o);
+        this.updateTotalPrice();
+      } else {
+        delete this.items[id];
+      }
+      this.setState({items: this.items});
+    });
+  }
+
+  componentDidMount() {
+    const user = this.props.store;
+    this.eventListeners.forEach(e => e.off());
+    this.cart = {};
+    this.items = {};
+    this.isMyProfile = Session.getPubKey() === user;
+    this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', totalPrice: 0, items: {}, cart: {}});
+
+    if (user) {
+      this.getCartFromUser(user);
+      this.getProductsFromUser(user);
+    } else {
+      const carts = {};
+      State.local.get('cart').map(user => {
+        if (!user) {
+          delete carts[user];
+          return;
         }
-        this.setState({items: this.items});
+        if (carts[user]) { return; }
+        carts[user] = true;
+        this.getCartFromUser(user);
+      });
+      State.local.get('follows').map().on((isFollowing, user, a, e) => {
+        this.eventListeners['follows'] = e;
+        console.log('user', user);
+        if (user && isFollowing) {
+          this.getProductsFromUser(user);
+        }
       });
     }
   }
