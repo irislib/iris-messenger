@@ -89,19 +89,21 @@ class Store extends View {
 
   renderItems() {
     const cartTotalItems = Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.items[k]).reduce((sum, k) => sum + this.cart[k], 0);
+    const keys = Object.keys(this.state.items);
     return html`
       ${cartTotalItems ? html`
-      <p>
-        <button onClick=${() => route('/checkout/')}>Shopping cart (${cartTotalItems})</button>
-      </p>
-    ` : ''}
+        <p>
+          <button onClick=${() => route('/checkout/')}>Shopping cart (${cartTotalItems})</button>
+        </p>
+      ` : ''}
       <div class="store-items">
          ${this.isMyProfile ? html`
           <div class="store-item" onClick=${() => route(`/product/new`)}>
             <a href="/product/new" class="name">Add item</a>
           </div>
         ` : ''}
-        ${Object.keys(this.state.items).map(k => {
+        ${!keys.length ? html`<p>No items found</p>`:''}
+        ${keys.map(k => {
           const i = this.state.items[k];
           return html`
             <div class="store-item" onClick=${() => route(`/product/${k}/${i.user}`)}>
@@ -201,12 +203,16 @@ class Store extends View {
         carts[user] = true;
         this.getCartFromUser(user);
       });
+      const follows = {};
       State.local.get('follows').map().on((isFollowing, user, a, e) => {
         this.eventListeners['follows'] = e;
-        console.log('user', user);
-        if (user && isFollowing) {
-          this.getProductsFromUser(user);
+        if (!isFollowing) {
+          delete follows[user];
+          return;
         }
+        if (follows[user]) { return; }
+        follows[user] = true;
+        this.getProductsFromUser(user);
       });
     }
   }
