@@ -88,6 +88,31 @@ class Store extends View {
     `;
   }
 
+  getNotification() {
+    const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
+    if (this.state.noFollows) {
+      return html`
+          <div class="centered-container">
+            <div class="msg">
+                <div class="msg-content">
+                    <p>${t('follow_someone_info')}</p>
+                    <div class="profile-link-container">
+                        <a href="/profile/${SUGGESTED_FOLLOW}" class="profile-link">
+                            <${Identicon} str=${SUGGESTED_FOLLOW} width=40/>
+                            <iris-text path="profile/name" user=${SUGGESTED_FOLLOW} placeholder="Suggested follow"/>
+                        </a>
+                        <${FollowButton} id=${SUGGESTED_FOLLOW}/>
+                    </div>
+                    <p>${t('alternatively')} <a
+                            href="/profile/${Session.getPubKey()}">${t('give_your_profile_link_to_someone')}</a>.</p>
+                </div>
+            </div>
+          </div>
+      `
+    }
+    return '';
+  }
+
   renderItems() {
     const cartTotalItems = Object.keys(this.cart).reduce((sum, k) => sum + this.cart[k], 0);
     const keys = Object.keys(this.state.items);
@@ -103,7 +128,7 @@ class Store extends View {
             <a href="/product/new" class="name">Add item</a>
           </div>
         ` : ''}
-        ${!keys.length ? html`<p>No items found</p>`:''}
+        ${!keys.length ? html`<p>No items to show</p>`:''}
         ${keys.map(k => {
           const i = this.state.items[k];
           return html`
@@ -134,6 +159,7 @@ class Store extends View {
       <p>
           This is a prototype store that shows items from merchants in your social network. Orders are sent via Iris private message. Your own store can be found <a href="/store/${Session.getPubKey()}">here</a>.
       </p>
+      ${this.getNotification()}
       ${this.renderItems()}
     `;
   }
@@ -201,6 +227,7 @@ class Store extends View {
   getAllProducts() {
     const follows = {};
     State.local.get('follows').map().on((isFollowing, user, a, e) => {
+      this.state.noFollows && Session.getPubKey() !== user && State.local.get('noFollows').put(false);
       this.eventListeners['follows'] = e;
       if (!isFollowing) {
         delete follows[user];
@@ -219,6 +246,8 @@ class Store extends View {
     this.items = {};
     this.isMyProfile = Session.getPubKey() === user;
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', totalPrice: 0, items: {}, cart: {}});
+
+    State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
 
     if (user) {
       this.getCartFromUser(user);
