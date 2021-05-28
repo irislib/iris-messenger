@@ -160,13 +160,17 @@ class Checkout extends Store {
     <div class="main-view" id="profile">
       <div class="content">
         <h2>Shopping carts</h2>
-        ${this.state.carts && Object.keys(this.state.carts).map(user => html`
+        ${this.state.carts && Object.keys(this.state.carts).map(user => {
+          const cartTotalItems = Object.keys(this.state.carts[user]).reduce((sum, k) => sum + this.state.carts[user][k], 0);
+          if (!cartTotalItems) { return; }
+          return html`
             <p>
               <a href="/checkout/${user}">
-                <iris-text path="profile/name" user=${user} editable="false"/>
+                <iris-text path="profile/name" user=${user} editable="false"/> (${cartTotalItems})
               </a>
             </p>
-        `)}
+          `;
+        })}
       </div>
     </div>`;
   }
@@ -228,14 +232,7 @@ class Checkout extends Store {
       State.local.get('paymentMethod').on(paymentMethod => this.setState({paymentMethod}));
       State.local.get('delivery').open(delivery => this.setState({delivery}));
     } else {
-      State.local.get('cart').map((v,user) => {
-        if (v) {
-          this.carts[user] = true;
-        } else {
-          delete this.carts[user];
-        }
-        this.setState({carts: this.carts});
-      });
+      this.getAllCarts();
     }
   }
 }

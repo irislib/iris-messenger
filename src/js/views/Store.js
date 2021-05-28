@@ -17,6 +17,7 @@ class Store extends View {
     this.followedUsers = new Set();
     this.followers = new Set();
     this.cart = {};
+    this.carts = {};
     this.state = {items:{}};
     this.items = {};
     this.id = 'profile';
@@ -161,7 +162,9 @@ class Store extends View {
       if (k === '#') { return; } // blah
       this.eventListeners['cart' + user] = e;
       this.cart[k + user] = v;
-      this.setState({cart: this.cart});
+      this.carts[user] = this.carts[user] || {};
+      this.carts[user][k] = v;
+      this.setState({cart: this.cart, carts: this.carts});
       this.updateTotalPrice();
     });
   }
@@ -182,6 +185,33 @@ class Store extends View {
     });
   }
 
+  getAllCarts() {
+    const carts = {};
+    State.local.get('cart').map((o, user) => {
+      if (!user) {
+        delete carts[user];
+        return;
+      }
+      if (carts[user]) { return; }
+      carts[user] = true;
+      this.getCartFromUser(user);
+    });
+  }
+
+  getAllProducts() {
+    const follows = {};
+    State.local.get('follows').map().on((isFollowing, user, a, e) => {
+      this.eventListeners['follows'] = e;
+      if (!isFollowing) {
+        delete follows[user];
+        return;
+      }
+      if (follows[user]) { return; }
+      follows[user] = true;
+      this.getProductsFromUser(user);
+    });
+  }
+
   componentDidMount() {
     const user = this.props.store;
     this.eventListeners.forEach(e => e.off());
@@ -194,27 +224,8 @@ class Store extends View {
       this.getCartFromUser(user);
       this.getProductsFromUser(user);
     } else {
-      const carts = {};
-      State.local.get('cart').map((o, user) => {
-        if (!user) {
-          delete carts[user];
-          return;
-        }
-        if (carts[user]) { return; }
-        carts[user] = true;
-        this.getCartFromUser(user);
-      });
-      const follows = {};
-      State.local.get('follows').map().on((isFollowing, user, a, e) => {
-        this.eventListeners['follows'] = e;
-        if (!isFollowing) {
-          delete follows[user];
-          return;
-        }
-        if (follows[user]) { return; }
-        follows[user] = true;
-        this.getProductsFromUser(user);
-      });
+      this.getAllCarts();
+      this.getAllProducts();
     }
   }
 }
