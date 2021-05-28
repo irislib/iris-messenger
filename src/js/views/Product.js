@@ -48,6 +48,7 @@ class Product extends StoreView {
   }
 
   showProduct() {
+    console.log('this.cart', this.cart);
     const cartTotalItems = Object.values(this.cart).reduce((sum, current) => sum + current, 0);
     const i = this.state.product;
     if (!i) return html``;

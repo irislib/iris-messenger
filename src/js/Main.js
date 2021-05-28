@@ -211,12 +211,3 @@ render(html`<${Main}/>`, document.body);
 document.body.style = 'opacity:1';
 
 Helpers.showConsoleWarning();
-
-window.addEventListener('resize', () => { // if resizing up from mobile size menu view
-  const el = document.querySelector('.main-view');
-  const visible = el && el.offsetWidth > 0 && el.offsetHeight > 0;
-  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-  if (vw > 565 && visible) {
-    route('/');
-  }
-})

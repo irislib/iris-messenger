@@ -22,10 +22,10 @@ class Store extends View {
     this.id = 'profile';
   }
 
-  addToCart(k, e) {
+  addToCart(k, user, e) {
     e.stopPropagation();
     const count = (this.cart[k] || 0) + 1;
-    State.local.get('cart').get(this.props.store).get(k).put(count);
+    State.local.get('cart').get(user).get(k).put(count);
   }
 
   renderUserStore(user) {
@@ -88,7 +88,7 @@ class Store extends View {
   }
 
   renderItems() {
-    const cartTotalItems = Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.items[k]).reduce((sum, k) => sum + this.cart[k], 0);
+    const cartTotalItems = Object.keys(this.cart).reduce((sum, k) => sum + this.cart[k], 0);
     const keys = Object.keys(this.state.items);
     return html`
       ${cartTotalItems ? html`
@@ -114,7 +114,7 @@ class Store extends View {
               `}
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>
-              <button class="add" onClick=${e => this.addToCart(k, e)}>
+              <button class="add" onClick=${e => this.addToCart(k, i.user, e)}>
                 Add to cart
                 ${this.cart[k] ? ` (${this.cart[k]})` : ''}
               </button>
@@ -131,7 +131,7 @@ class Store extends View {
     }
     return html`
       <p>
-          This is a prototype store that shows items from merchants your social network. Orders are sent via Iris private message. Your own store can be found <a href="/store/${Session.getPubKey()}">here</a>.
+          This is a prototype store that shows items from merchants in your social network. Orders are sent via Iris private message. Your own store can be found <a href="/store/${Session.getPubKey()}">here</a>.
       </p>
       ${this.renderItems()}
     `;
@@ -158,9 +158,10 @@ class Store extends View {
 
   getCartFromUser(user) {
     State.local.get('cart').get(user).map().on((v, k, a, e) => {
+      if (k === '#') { return; } // blah
       this.eventListeners['cart' + user] = e;
-      this.cart[k] = v;
-      this.setState({cart: this.cart})
+      this.cart[k + user] = v;
+      this.setState({cart: this.cart});
       this.updateTotalPrice();
     });
   }
@@ -194,7 +195,7 @@ class Store extends View {
       this.getProductsFromUser(user);
     } else {
       const carts = {};
-      State.local.get('cart').map(user => {
+      State.local.get('cart').map((o, user) => {
         if (!user) {
           delete carts[user];
           return;
