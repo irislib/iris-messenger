@@ -1911,6 +1911,9 @@ form.public {
   .side-padding-xs {
     padding: 5px 0 0 5px;
   }
+  .store-item {
+    width: 100%;
+  }
 }
 
 @media (min-width: 626px) {
