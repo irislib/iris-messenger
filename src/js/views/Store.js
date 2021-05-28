@@ -24,7 +24,7 @@ class Store extends View {
 
   addToCart(k, user, e) {
     e.stopPropagation();
-    const count = (this.cart[k] || 0) + 1;
+    const count = (this.cart[k + user] || 0) + 1;
     State.local.get('cart').get(user).get(k).put(count);
   }
 
@@ -93,7 +93,7 @@ class Store extends View {
     return html`
       ${cartTotalItems ? html`
         <p>
-          <button onClick=${() => route('/checkout/')}>Shopping cart (${cartTotalItems})</button>
+          <button onClick=${() => route('/checkout')}>Shopping cart (${cartTotalItems})</button>
         </p>
       ` : ''}
       <div class="store-items">

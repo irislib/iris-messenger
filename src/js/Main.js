@@ -182,7 +182,7 @@ class Main extends Component {
               <${Profile} path="/media/:id" tab="media"/>
               <${Group} path="/group/:id?"/>
               <${Store} path="/store/:store?"/>
-              <${Checkout} path="/checkout/:store"/>
+              <${Checkout} path="/checkout/:store?"/>
               <${Product} path="/product/:product/:store"/>
               <${Product} path="/product/new" store=Session.getPubKey()/>
               <${Explorer} path="/explorer/:node"/>

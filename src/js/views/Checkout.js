@@ -8,7 +8,6 @@ import Store from './Store.js';
 class Checkout extends Store {
   constructor() {
     super();
-    this.eventListeners = [];
     this.followedUsers = new Set();
     this.followers = new Set();
     this.state.paymentMethod = 'bitcoin';
@@ -156,7 +155,26 @@ class Checkout extends Store {
     `;
   }
 
+  renderCartList() {
+    return html`
+    <div class="main-view" id="profile">
+      <div class="content">
+        <h2>Shopping carts</h2>
+        ${this.state.carts && Object.keys(this.state.carts).map(user => html`
+            <p>
+              <a href="/checkout/${user}">
+                <iris-text path="profile/name" user=${user} editable="false"/>
+              </a>
+            </p>
+        `)}
+      </div>
+    </div>`;
+  }
+
   render() {
+    if (!this.props.store) {
+      return this.renderCartList();
+    }
     let page;
     const p = this.state.page;
     if (p === 'delivery') {
@@ -197,15 +215,28 @@ class Checkout extends Store {
 
   componentDidMount() {
     Store.prototype.componentDidMount.call(this);
+    Object.values(this.eventListeners).forEach(e => e.off());
+    this.eventListeners = [];
     const pub = this.props.store;
-    this.setState({page:'cart'})
-    this.eventListeners.forEach(e => e.off());
-    State.local.get('cart').get(pub).map().on((v, k) => {
-      this.cart[k] = v;
-      this.setState({cart: this.cart});
-    });
-    State.local.get('paymentMethod').on(paymentMethod => this.setState({paymentMethod}));
-    State.local.get('delivery').open(delivery => this.setState({delivery}));
+    this.carts = {};
+    if (pub) {
+      this.setState({page:'cart'})
+      State.local.get('cart').get(pub).map().on((v, k) => {
+        this.cart[k] = v;
+        this.setState({cart: this.cart});
+      });
+      State.local.get('paymentMethod').on(paymentMethod => this.setState({paymentMethod}));
+      State.local.get('delivery').open(delivery => this.setState({delivery}));
+    } else {
+      State.local.get('cart').map((v,user) => {
+        if (v) {
+          this.carts[user] = true;
+        } else {
+          delete this.carts[user];
+        }
+        this.setState({carts: this.carts});
+      });
+    }
   }
 }
 
