@@ -37,6 +37,7 @@ class Profile extends View {
   }
 
   onAboutInput(e) {
+    const about = $(e.target).text().trim();
     State.public.user().get('profile').get('about').put(about);
   }
 
