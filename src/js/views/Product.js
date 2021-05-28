@@ -48,7 +48,6 @@ class Product extends StoreView {
   }
 
   showProduct() {
-    console.log('this.cart', this.cart);
     const cartTotalItems = Object.values(this.cart).reduce((sum, current) => sum + current, 0);
     const i = this.state.product;
     if (!i) return html``;
@@ -102,7 +101,6 @@ class Product extends StoreView {
       description: this.newProductDescription,
       price: this.newProductPrice
     };
-    console.log(product);
     State.public.user().get('store').get('products').get(this.newProductId || this.newProductName).put(product);
     route(`/store/${Session.getPubKey()}`)
   }
