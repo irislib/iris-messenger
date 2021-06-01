@@ -1,6 +1,5 @@
 import { render } from './lib/preact.js';
-import { Router, route } from './lib/preact-router.es.js';
-import { createHashHistory } from './lib/history.production.min.js';
+import { Router } from './lib/preact-router.es.js';
 import { Component } from './lib/preact.js';
 import { Link } from './lib/preact.match.js';
 
