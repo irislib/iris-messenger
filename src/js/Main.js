@@ -82,8 +82,8 @@ class Menu extends Component {
       <div class="application-list">
         ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
           <a href="/" onClick=${() => this.menuLinkClicked()} class="hidden-xs" tabindex="0" class="logo">
-            <img class="hidden-xs" src="img/icon128.png" width=40 height=40/>
-            <img src="img/iris_logotype.png" height=23 width=41 />
+            <img class="hidden-xs" src="/img/icon128.png" width=40 height=40/>
+            <img src="/img/iris_logotype.png" height=23 width=41 />
           </a>
         `}
         <div class="visible-xs-block">
@@ -149,7 +149,7 @@ class Main extends Component {
       content = this.state.loggedIn ? html`
         ${isDesktopNonMac ? html`
           <div class="windows-titlebar">
-               <img src="img/iris_logotype.png" height=16 width=28 />
+               <img src="/img/iris_logotype.png" height=16 width=28 />
                <div class="title-bar-btns">
                     <button class="min-btn" onClick=${() => this.electronCmd('minimize')}>-</button>
                     <button class="max-btn" onClick=${() => this.electronCmd('maximize')}>+</button>
