@@ -25,10 +25,12 @@ class MediaPlayer extends Component {
         this.openFile();
       }
     });
-    State.local.get('player').get('paused').on(paused => {
-      const el = $(this.base).find('audio').get(0);
-      el && (paused ? el.pause() : el.play());
-    });
+    State.local.get('player').get('paused').on(p => this.setPaused(p));
+  }
+
+  setPaused(paused) {
+    const el = $(this.base).find('audio').get(0);
+    el && (paused ? el.pause() : el.play());
   }
 
   onTorrent(torrent) {
@@ -68,6 +70,11 @@ class MediaPlayer extends Component {
     }
   }
 
+  closeClicked() {
+    this.setPaused(true);
+    State.local.get('player').put(null);
+  }
+
   render() {
     const s = this.state;
     return html`
@@ -88,7 +95,7 @@ class MediaPlayer extends Component {
             }
           ):''}
         </a>
-        <div class="close" onClick=${() => State.local.get('player').put(null)}>${Icons.close}</div>
+        <div class="close" onClick=${() => this.closeClicked()}>${Icons.close}</div>
       </div>
     `;
   }
