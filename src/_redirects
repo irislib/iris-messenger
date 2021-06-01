@@ -1,5 +1,5 @@
 /audio/*  /audio/:splat
-/chat/*  /chat/:splat
+/messenger/*  /messenger/:splat
 /css/*  /css/:splat
 /font/*  /font/:splat
 /img/*  /img/:splat
