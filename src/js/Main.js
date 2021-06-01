@@ -122,9 +122,6 @@ class Main extends Component {
 
   handleRoute(e) {
     let activeRoute = e.url;
-    if (!activeRoute && window.location.hash) {
-      return route(window.location.hash.replace('#', '')); // bubblegum fix back navigation
-    }
     document.title = 'Iris';
     if (activeRoute && activeRoute.length > 1) { document.title += ' - ' + Helpers.capitalize(activeRoute.replace('/', '')); }
     State.local.get('activeRoute').put(activeRoute);
@@ -164,7 +161,7 @@ class Main extends Component {
           <${Menu}/>
           <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
           <div class="view-area">
-            <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
+            <${Router} onChange=${e => this.handleRoute(e)}>
               <${Feed} path="/"/>
               <${Feed} path="/feed"/>
               <${Feed} path="/search/:term?/:type?"/>
