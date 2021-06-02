@@ -95,7 +95,7 @@ class NewChat extends Component {
         <${CopyButton} text=${t('copy_your_invite_link')} copyStr=${Session.getMyChatLink}/>
         <button onClick=${() => $('#my-qr-code').toggle()}>${t('or_show_qr_code')}</button>
         <p id="my-qr-code" class="qr-container" style="display:none"></p>
-        <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_invite_link_publicly') }}></small></p>
+        <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_invite_link_publicly', `href="/profile/${Session.getPubKey()}"`) }}></small></p>
         <h3>${t('new_group')}</h3>
         <p>
           <form id="new-group-form" onSubmit=${e => this.onCreateGroupSubmit(e)}>

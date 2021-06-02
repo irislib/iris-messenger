@@ -87,7 +87,7 @@ class Settings extends View {
         `: ''}
         <h4>Set up your own peer</h4>
         <p>
-          <small dangerouslySetInnerHTML=${{ __html: t('peers_info')}}></small>
+          <small dangerouslySetInnerHTML=${{ __html: t('peers_info', "href=\"https://github.com/amark/gun#deploy\"")}}></small>
         </p>
         <p><a href="https://heroku.com/deploy?template=https://github.com/amark/gun">
            <img src="./img/herokubutton.svg" alt="Deploy"/>
