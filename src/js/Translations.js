@@ -620,6 +620,16 @@ export default {
     call_ended: "Puhelu päättyi",
     calling: "Soitetaan",
     on_call_with: "Puhelu käyttäjälle",
+    total: "Yhteensä",
+    home: "Koti",
+    messages: "Viestit",
+    store: "Kauppa",
+    contacts: "Yhteystiedot",
+    explorer: "Hakemisto",
+    no_followers_yet: "Jaa linkkisi, niin muut voivat seurata sinua:",
+    next: "Seuraava"
+
+
   },
   "it": {
     language_name: "Italian",

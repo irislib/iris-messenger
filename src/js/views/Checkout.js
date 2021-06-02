@@ -4,6 +4,7 @@ import Session from '../Session.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from '../components/SafeImg.js';
 import Store from './Store.js';
+import {translate as t} from '../Translation.js';
 
 class Checkout extends Store {
   constructor() {
@@ -65,11 +66,11 @@ class Checkout extends Store {
         })}
         <div class="flex-row">
           <div class="flex-cell"></div>
-          <div class="flex-cell no-flex"><b>Total ${this.state.totalPrice} €</b></div>
+          <div class="flex-cell no-flex"><b>${t('total')} ${this.state.totalPrice} €</b></div>
         </div>
       </div>
       <p class="side-padding-xs">
-        <button onClick=${() => this.setState({page:'delivery'})}>Next</button>
+        <button onClick=${() => this.setState({page:'delivery'})}>${t('next')}</button>
       </p>
     `;
   }
