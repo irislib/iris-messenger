@@ -23,8 +23,8 @@ function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function translate(k) {
-  return k && (translation[k] || capitalize(k.replace(/_/g, ' ')));
+function translate(k, linkProps) {
+  return k && (translation[k] || capitalize(k.replace(/_/g, ' '))).replace('<a', `<a ${linkProps||''}`);
 }
 
 export {translate, AVAILABLE_LANGUAGES, language};
