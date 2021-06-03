@@ -143,7 +143,7 @@ class Profile extends View {
             ` : ''}
             ${this.isMyProfile ? '' : html`<${FollowButton} id=${this.props.id}/>`}
             <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
-            <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+            <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to' + window.location.pathname}/>
             <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
             ${this.isMyProfile ? '' : html`
               <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
