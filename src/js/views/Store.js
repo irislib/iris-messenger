@@ -122,9 +122,9 @@ class Store extends View {
           <button onClick=${() => route('/checkout')}>Shopping cart (${cartTotalItems})</button>
         </p>
       ` : ''}
-      <div class="store-items">
+      <div class="thumbnail-items">
          ${this.isMyProfile ? html`
-          <div class="store-item" onClick=${() => route(`/product/new`)}>
+          <div class="thumbnail-item store-item" onClick=${() => route(`/product/new`)}>
             <a href="/product/new" class="name">Add item</a>
           </div>
         ` : ''}
@@ -132,7 +132,7 @@ class Store extends View {
         ${keys.map(k => {
           const i = this.state.items[k];
           return html`
-            <div class="store-item" onClick=${() => route(`/product/${k}/${i.user}`)}>
+            <div class="thumbnail-item store-item" onClick=${() => route(`/product/${k}/${i.user}`)}>
               <${SafeImg} src=${i.photo}/>
               <a href="/product/${k}/${i.user}" class="name">${i.name}</a>
               ${this.props.store ? '':html`
