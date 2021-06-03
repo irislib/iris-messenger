@@ -40,7 +40,7 @@ class Checkout extends Store {
 
   renderCart() {
     return html`
-      <h3 class="side-padding-xs">Shopping cart</h3>
+      <h3 class="side-padding-xs">${t('shopping_cart')}</h3>
       <div class="flex-table">
         ${Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.state.items[k]).map(k => {
           const i = this.state.items[k];
@@ -78,17 +78,17 @@ class Checkout extends Store {
   renderDelivery() {
     return html`
       <div class="side-padding-xs">
-        <h3>Delivery</h3>
+        <h3>${t('delivery')}</h3>
         <p>
-          <input type="text" placeholder="Name" value=${this.state.delivery.name} onInput=${e => State.local.get('delivery').get('name').put(e.target.value)}/>
+          <input type="text" placeholder=${t('name')} value=${this.state.delivery.name} onInput=${e => State.local.get('delivery').get('name').put(e.target.value)}/>
         </p>
         <p>
-          <input type="text" placeholder="Address" value=${this.state.delivery.address} onInput=${e => State.local.get('delivery').get('address').put(e.target.value)}/>
+          <input type="text" placeholder=${t('address')} value=${this.state.delivery.address} onInput=${e => State.local.get('delivery').get('address').put(e.target.value)}/>
         </p>
         <p>
-          <input type="text" placeholder="Email (optional)" value=${this.state.delivery.email} onInput=${e => State.local.get('delivery').get('email').put(e.target.value)}/>
+          <input type="text" placeholder=${t('email_optional')} value=${this.state.delivery.email} onInput=${e => State.local.get('delivery').get('email').put(e.target.value)}/>
         </p>
-        <button onClick=${() => this.setState({page:'payment'})}>Next</button>
+        <button onClick=${() => this.setState({page:'payment'})}>${t('next')}</button>
       </div>
     `;
   }
@@ -101,7 +101,7 @@ class Checkout extends Store {
   renderPayment() {
     return html`
       <div class="side-padding-xs">
-        <h3>Select a payment method</h3>
+        <h3>${t('select_a_payment_method')}</h3>
         <p>
           <label for="bitcoin" onClick=${e => this.paymentMethodChanged(e)}>
             <input type="radio" name="payment" id="bitcoin" value="bitcoin" checked=${this.state.paymentMethod === 'bitcoin'}/>
@@ -114,14 +114,14 @@ class Checkout extends Store {
             Dogecoin
           </label>
         </p>
-        <button onClick=${() => this.setState({page:'confirmation'})}>Next</button>
+        <button onClick=${() => this.setState({page:'confirmation'})}>${t('next')}</button>
       </div>
     `;
   }
 
   renderConfirmation() {
     return html`
-      <h3 class="side-padding-xs">Confirmation</h3>
+      <h3 class="side-padding-xs">${t('confirmation')}</h3>
       <div class="flex-table">
         ${Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.state.items[k]).map(k => {
           const i = this.state.items[k];
@@ -146,13 +146,13 @@ class Checkout extends Store {
         </div>
       </div>
       <p>
-        Delivery:<br/>
+      ${t('delivery_to')}:<br/>
         ${this.state.delivery.name}<br/>
         ${this.state.delivery.address}<br/>
         ${this.state.delivery.email}
       </p>
-      <p>Payment method: <b>${this.state.paymentMethod}</b></p>
-      <p class="side-padding-xs"><button onClick=${() => this.confirm()}>Confirm</button></p>
+      <p>${t('payment_method')} <b>${this.state.paymentMethod}</b></p>
+      <p class="side-padding-xs"><button onClick=${() => this.confirm()}>${t('confirm')}</button></p>
     `;
   }
 
@@ -160,7 +160,7 @@ class Checkout extends Store {
     return html`
     <div class="main-view" id="profile">
       <div class="content">
-        <h2>Shopping carts</h2>
+        <h2>${t('shopping_carts')}</h2>
         ${this.state.carts && Object.keys(this.state.carts).map(user => {
           const cartTotalItems = Object.keys(this.state.carts[user]).reduce((sum, k) => sum + this.state.carts[user][k], 0);
           if (!cartTotalItems) { return; }
@@ -198,10 +198,10 @@ class Checkout extends Store {
           <a href="/store/${this.props.store}"><iris-text path="profile/name" user=${this.props.store}/></a>
         </p>
         <div id="store-steps">
-          <div class=${p === 'cart' ? 'active' : ''} onClick=${() => this.setState({page:'cart'})}>Cart</div>
-          <div class=${p === 'delivery' ? 'active' : ''} onClick=${() => this.setState({page:'delivery'})}>Delivery</div>
-          <div class=${p === 'payment' ? 'active' : ''} onClick=${() => this.setState({page:'payment'})}>Payment</div>
-          <div class=${p === 'confirmation' ? 'active' : ''} onClick=${() => this.setState({page:'confirmation'})}>Confirm</div>
+          <div class=${p === 'cart' ? 'active' : ''} onClick=${() => this.setState({page:'cart'})}>${t('cart')}</div>
+          <div class=${p === 'delivery' ? 'active' : ''} onClick=${() => this.setState({page:'delivery'})}>${t('delivery')}</div>
+          <div class=${p === 'payment' ? 'active' : ''} onClick=${() => this.setState({page:'payment'})}>${t('payment')}</div>
+          <div class=${p === 'confirmation' ? 'active' : ''} onClick=${() => this.setState({page:'confirmation'})}>${t('confirm')}</div>
         </div>
         ${page}
       </div>

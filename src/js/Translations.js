@@ -119,7 +119,14 @@ export default {
     feed_up: 'Newer',
     feed_top: 'Newest',
     feed_down: 'Older',
-    feed_bottom: 'Oldest'
+    feed_bottom: 'Oldest',
+    select_a_payment_method: "Select a payment method",
+    email_optional: "Email (optional)",
+    delivery: "Delivery",
+    address: "Address",
+    confirmation: "Confirmation",
+    payment_method: "Payment method:",
+    delivery_to: "Delivery"
   },
    "es": {
     language_name: "Español",
@@ -627,9 +634,20 @@ export default {
     contacts: "Yhteystiedot",
     explorer: "Hakemisto",
     no_followers_yet: "Jaa linkkisi, niin muut voivat seurata sinua:",
-    next: "Seuraava"
-
-
+    next: "Seuraava",
+    shopping_carts: "Ostoskorit",
+    shopping_cart: "Ostoskori",
+    cart: "Kori",
+    delivery: "Toimitus",
+    payment: "Maksaminen",
+    payment_method: "Maksutapa:",
+    confirm: "Vahvista",
+    address: "Osoite",
+    email: "Sähköposti (valinnainen)",
+    name: "Nimi",
+    select_a_payment_method: "Valitse maksutapa",
+    confirmation: "Vahvistaminen",
+    delivery_to: "Toimitus",
   },
   "it": {
     language_name: "Italian",

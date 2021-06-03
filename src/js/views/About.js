@@ -55,6 +55,6 @@ class About extends View {
       </div>
     `;
   }
-};
+}
 
 export default About;
