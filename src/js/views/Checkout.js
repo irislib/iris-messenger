@@ -121,7 +121,7 @@ class Checkout extends Store {
 
   renderConfirmation() {
     return html`
-      <h3 class="side-padding-xs">${t('confirmation')}</h3>
+      <h3 class="side-padding-xs">${t('confirm')}</h3>
       <div class="flex-table">
         ${Object.keys(this.cart).filter(k => !!this.cart[k] && !!this.state.items[k]).map(k => {
           const i = this.state.items[k];
@@ -142,17 +142,17 @@ class Checkout extends Store {
         })}
         <div class="flex-row">
           <div class="flex-cell"></div>
-          <div class="flex-cell no-flex"><b>Total ${this.state.totalPrice} €</b></div>
+          <div class="flex-cell no-flex"><b>${t('total')} ${this.state.totalPrice} €</b></div>
         </div>
       </div>
       <p>
-      ${t('delivery_to')}:<br/>
+      ${t('delivery')}:<br/>
         ${this.state.delivery.name}<br/>
         ${this.state.delivery.address}<br/>
         ${this.state.delivery.email}
       </p>
       <p>${t('payment_method')} <b>${this.state.paymentMethod}</b></p>
-      <p class="side-padding-xs"><button onClick=${() => this.confirm()}>${t('confirm')}</button></p>
+      <p class="side-padding-xs"><button onClick=${() => this.confirm()}>${t('confirmation')}</button></p>
     `;
   }
 
@@ -198,7 +198,7 @@ class Checkout extends Store {
           <a href="/store/${this.props.store}"><iris-text path="profile/name" user=${this.props.store}/></a>
         </p>
         <div id="store-steps">
-          <div class=${p === 'cart' ? 'active' : ''} onClick=${() => this.setState({page:'cart'})}>${t('cart')}</div>
+          <div class=${p === 'cart' ? 'active' : ''} onClick=${() => this.setState({page:'cart'})}>${t('shopping_cart')}</div>
           <div class=${p === 'delivery' ? 'active' : ''} onClick=${() => this.setState({page:'delivery'})}>${t('delivery')}</div>
           <div class=${p === 'payment' ? 'active' : ''} onClick=${() => this.setState({page:'payment'})}>${t('payment')}</div>
           <div class=${p === 'confirmation' ? 'active' : ''} onClick=${() => this.setState({page:'confirmation'})}>${t('confirm')}</div>
