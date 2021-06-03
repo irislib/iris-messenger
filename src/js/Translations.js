@@ -123,10 +123,8 @@ export default {
     email_optional: "Email (optional)",
     delivery: "Delivery",
     address: "Address",
-    confirmation: "Confirmation",
+    confirmation_button: "Confirmation",
     payment_method: "Payment method",
-    delivery_to: "Delivery",
-    summary: "Summary",
   },
    "es": {
     language_name: "Español",
@@ -630,7 +628,6 @@ export default {
     total: "Yhteensä",
     home: "Koti",
     messages: "Viestit",
-<<<<<<< HEAD
     market: "Tori",
     contacts: "Yhteystiedot",
     explorer: "Hakemisto",
@@ -646,17 +643,10 @@ export default {
     address: "Osoite",
     email_optional: "Sähköposti (valinnainen)",
     name: "Nimi",
-    confirmation: "Vahvista",
+    confirm_button: "Vahvista",
     summary: "Yhteenveto",
-=======
-    store: "Kauppa",
-    contacts: "Yhteystiedot",
-    explorer: "Hakemisto",
-    no_followers_yet: "Jaa linkkisi, niin muut voivat seurata sinua:",
-    next: "Seuraava"
-
-
->>>>>>> translations
+    following: "Seurataan",
+    followers: "Seuraajia",
   },
   "it": {
     language_name: "Italian",
