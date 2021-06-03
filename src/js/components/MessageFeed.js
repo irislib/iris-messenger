@@ -50,11 +50,13 @@ class MessageFeed extends Component {
   }
 
   render() {
+    const thumbnails = this.props.thumbnails ? 'thumbnail-items' : '';
+    console.log(thumbnails);
     return html`
       <div class="feed-container">
-        <${ScrollViewport} rowHeight=${165}>
+        <${ScrollViewport} class=${thumbnails} rowHeight=${165}>
           ${this.state.sortedMessages.map(
-            hash => typeof hash === 'string' ? html`<${PublicMessage} filter=${this.props.filter} hash=${hash} key=${hash} showName=${true} />` : ''
+            hash => typeof hash === 'string' ? html`<${PublicMessage} thumbnail=${this.props.thumbnails} filter=${this.props.filter} hash=${hash} key=${hash} showName=${true} />` : ''
           )}
         </${ScrollViewport}>
       </div>

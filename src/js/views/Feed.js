@@ -147,7 +147,7 @@ class Feed extends View {
         ${this.state.searchTerm ? html`<h2>Search results for "${this.state.searchTerm}"</h2>` : html`
           ${this.getNotification()}
         `}
-        <${MessageFeed} filter=${this.state.searchTerm && (m => this.filter(m))} key=${this.props.index || 'feed'} node=${State.local.get(this.props.index || 'feed')} />
+        <${MessageFeed} filter=${this.state.searchTerm && (m => this.filter(m))} thumbnails=${this.props.thumbnails} key=${this.props.index || 'feed'} node=${State.local.get(this.props.index || 'feed')} />
       </div>
     `;
   }

@@ -164,7 +164,7 @@ class Main extends Component {
               <${Feed} path="/"/>
               <${Feed} path="/feed"/>
               <${Feed} path="/search/:term?/:type?"/>
-              <${Feed} path="/media" index="media"/>
+              <${Feed} path="/media" index="media" thumbnails=${true}/>
               <${Login} path="/login"/>
               <${Chat} path="/chat/:id?"/>
               <${Message} path="/post/:hash"/>

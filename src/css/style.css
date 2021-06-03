@@ -1689,22 +1689,29 @@ form.public {
   margin: 0 0 15px 0;
 }
 
-.store-items {
+.thumbnail-items {
   display: flex;
   flex-wrap: wrap;
 }
 
-.store-item {
+.thumbnail-item {
   display: flex;
   flex-direction: column;
   width: calc(33.33% - 8px);
-  background-color: var(--chat-hover);
-  padding: 15px;
   margin-right: 8px;
   margin-bottom: 8px;
-  cursor: pointer;
   transition: all 125ms;
   border-radius: 8px;
+}
+
+.thumbnail-item .msg-content {
+  height: 100%;
+}
+
+.store-item {
+  background-color: var(--chat-hover);
+  padding: 15px;
+  cursor: pointer;
 }
 
 .store-item a {
@@ -1911,7 +1918,7 @@ form.public {
   .side-padding-xs {
     padding: 5px 0 0 5px;
   }
-  .store-item {
+  .thumbnail-item {
     width: 100%;
     margin-left: 15px;
   }
