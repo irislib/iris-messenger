@@ -1999,13 +1999,14 @@ export default {
   },
 
   getProfileLink(pub) {
-    return 'https://iris.to/#/profile/' + encodeURIComponent(pub);
+    console.log(pub);
+    return 'https://iris.to/profile/' + encodeURIComponent(pub);
   },
 
   followChatLink(str) {
     if (str && str.indexOf('http') === 0) {
-      if (str.indexOf('https://iris.to/#/') === 0) {
-        route(str.replace('https://iris.to/#', ''));
+      if (str.indexOf('https://iris.to/') === 0) {
+        route(str.replace('https://iris.to/', ''));
         return true;
       } else if (str.length > 30) {
         const s = str.split('?');
