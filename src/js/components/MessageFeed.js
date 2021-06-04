@@ -51,7 +51,6 @@ class MessageFeed extends Component {
 
   render() {
     const thumbnails = this.props.thumbnails ? 'thumbnail-items' : '';
-    console.log(thumbnails);
     return html`
       <div class="feed-container">
         <${ScrollViewport} class=${thumbnails} rowHeight=${165}>
