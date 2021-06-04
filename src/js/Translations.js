@@ -123,8 +123,9 @@ export default {
     email_optional: "Email (optional)",
     delivery: "Delivery",
     address: "Address",
-    confirmation_button: "Confirmation",
+    confirmation: "Confirmation",
     payment_method: "Payment method",
+    summary: "Summary",
   },
    "es": {
     language_name: "Español",
@@ -643,7 +644,11 @@ export default {
     address: "Osoite",
     email_optional: "Sähköposti (valinnainen)",
     name: "Nimi",
+<<<<<<< HEAD
     confirm_button: "Vahvista",
+=======
+    confirmation: "Vahvista",
+>>>>>>> translations
     summary: "Yhteenveto",
     following: "Seurataan",
     followers: "Seuraajia",
