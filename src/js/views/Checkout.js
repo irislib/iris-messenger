@@ -101,7 +101,7 @@ class Checkout extends Store {
   renderPayment() {
     return html`
       <div class="side-padding-xs">
-        <h3>${t('select_a_payment_method')}</h3>
+        <h3>${t('payment_method')}:</h3>
         <p>
           <label for="bitcoin" onClick=${e => this.paymentMethodChanged(e)}>
             <input type="radio" name="payment" id="bitcoin" value="bitcoin" checked=${this.state.paymentMethod === 'bitcoin'}/>
