@@ -644,11 +644,7 @@ export default {
     address: "Osoite",
     email_optional: "Sähköposti (valinnainen)",
     name: "Nimi",
-<<<<<<< HEAD
     confirm_button: "Vahvista",
-=======
-    confirmation: "Vahvista",
->>>>>>> translations
     summary: "Yhteenveto",
     following: "Seurataan",
     followers: "Seuraajia",
