@@ -1,5 +1,5 @@
 import { html } from '../Helpers.js';
-import {translate as t} from '../Translation.js';
+import {translate as tr} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import Helpers from '../Helpers.js';
@@ -72,7 +72,7 @@ class Group extends View {
     if (chat && chat.uuid) {
       return html`
         <div>
-          <p>${t('participants')}:</p>
+          <p>${tr('participants')}:</p>
           <div class="flex-table">
             ${
               chat ? Object.keys(chat.participantProfiles).map(k => {
@@ -86,14 +86,14 @@ class Group extends View {
                           <${Identicon} str=${k} width=40/>
                           <${Name} pub=${k}/>
                           ${profile.permissions && profile.permissions.admin ? html`
-                            <small style="margin-left:5px">${t('admin')}</small>
+                            <small style="margin-left:5px">${tr('admin')}</small>
                           `: ''}
                         </a>
                       </div>
                     </div>
                     ${this.state.isAdmin ? html`
                       <div class="flex-cell no-flex">
-                        <button onClick=${() => this.onRemoveParticipant(k)}>${t('remove')}</button>
+                        <button onClick=${() => this.onRemoveParticipant(k)}>${tr('remove')}</button>
                       </div>
                     ` : ''}
                   </div>
@@ -103,7 +103,7 @@ class Group extends View {
           </div>
           ${this.state.isAdmin ? html`
             <div>
-              <p>${t('add_participant')}:</p>
+              <p>${tr('add_participant')}:</p>
               <p>
               ${this.state.memberCandidate ? html`
                 <div class="profile-link-container"><div class="profile-link">
@@ -121,7 +121,7 @@ class Group extends View {
           `: ''}
           ${chat && chat.inviteLinks && Object.keys(chat.inviteLinks).length ? html`
             <hr/>
-            <p>${t('invite_links')}</p>
+            <p>${tr('invite_links')}</p>
             <div class="flex-table">
               ${Object.keys(chat.inviteLinks).map(id => {
                 const url = chat.inviteLinks[id];
@@ -136,7 +136,7 @@ class Group extends View {
                     </div>
                     ${this.state.isAdmin ? html`
                       <div class="flex-cell no-flex">
-                        <button onClick=${() => this.removeChatLink(id)}>${t('remove')}</button>
+                        <button onClick=${() => this.removeChatLink(id)}>${tr('remove')}</button>
                       </div>
                     `: ''}
                   </div>
@@ -183,24 +183,24 @@ class Group extends View {
                 ${uuid ? '' : html`
                   <div class="follow-count">
                     <a href="/follows/${this.props.id}">
-                      <span>${this.state.followedUserCount}</span> ${t('following')}
+                      <span>${this.state.followedUserCount}</span> ${tr('following')}
                     </a>
                     <a href="/followers/${this.props.id}">
-                      <span>${this.state.followerCount}</span> ${t('followers')}
+                      <span>${this.state.followerCount}</span> ${tr('followers')}
                     </a>
                   </div>
                 `}
                 ${this.followedUsers.has(Session.getPubKey()) ? html`
-                  <p><small>${t('follows_you')}</small></p>
+                  <p><small>${tr('follows_you')}</small></p>
                 `: this.props.id === SMS_VERIFIER_PUB ? html`
                   <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
                 ` : ''}
-                <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
+                <button onClick=${() => route('/chat/' + this.props.id)}>${tr('send_message')}</button>
                 ${uuid ? '' : html`
-                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+                  <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
                 `}
-                <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
-                <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
+                <button onClick=${() => $('#profile-page-qr').toggle()}>${tr('show_qr_code')}</button>
+                <button class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}</button>
               </div>
             </div>
           </div>
@@ -213,16 +213,16 @@ class Group extends View {
           <p id="profile-page-qr" style="display:none" class="qr-container"></p>
           <div id="chat-settings" style="display:none">
             <hr/>
-            <h3>${t('chat_settings')}</h3>
+            <h3>${tr('chat_settings')}</h3>
             <div class="profile-nicknames">
-              <h4>${t('nicknames')}</h4>
+              <h4>${tr('nicknames')}</h4>
               <p>
-                ${t('nickname')}:
+                ${tr('nickname')}:
                 <input value=${chat && chat.theirNickname} onInput=${e => chat && chat.put('nickname', e.target.value)}/>
               </p>
               ${uuid ? '' : html`
                 <p>
-                  ${t('their_nickname_for_you')}:
+                  ${tr('their_nickname_for_you')}:
                   <span>
                     ${chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : ''}
                   </span>
@@ -230,17 +230,17 @@ class Group extends View {
               `}
             </div>
             <div class="notification-settings">
-              <h4>${t('notifications')}</h4>
+              <h4>${tr('notifications')}</h4>
               <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
-              <label for="notifyAll">${t('all_messages')}</label><br/>
+              <label for="notifyAll">${tr('all_messages')}</label><br/>
               <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
-              <label for="notifyMentionsOnly">${t('mentions_only')}</label><br/>
+              <label for="notifyMentionsOnly">${tr('mentions_only')}</label><br/>
               <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
-              <label for="notifyNothing">${t('nothing')}</label><br/>
+              <label for="notifyNothing">${tr('nothing')}</label><br/>
             </div>
             <hr/>
             <p>
-              <button class="delete-chat" onClick=${() => deleteChat(this.props.id)}>${t('delete_chat')}</button>
+              <button class="delete-chat" onClick=${() => deleteChat(this.props.id)}>${tr('delete_chat')}</button>
             </p>
             <hr/>
           </div>

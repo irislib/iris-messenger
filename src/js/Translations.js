@@ -608,7 +608,7 @@ export default {
     their_nickname_for_you: "Hänen lempinimensä sinulle",
     notifications: "Ilmoitukset",
     all_messages: "Kaikki viestit",
-    mentions_only: "Vain mainninat",
+    mentions_only: "Vain maininnat",
     nothing: "Ei mitään",
     delete_chat: "Poista keskustelu",
     block_user: "Estä käyttäjä",
@@ -647,7 +647,7 @@ export default {
     confirm_button: "Vahvista",
     summary: "Yhteenveto",
     following: "Seurataan",
-    followers: "Seuraajia",
+    followers: "Seuraajat",
   },
   "it": {
     language_name: "Italian",
