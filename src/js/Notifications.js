@@ -110,11 +110,15 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 async function subscribe(reg) {
-  const subscription = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
-  });
-  addWebPushSubscription(subscription);
+  try {
+    const subscription = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+    });
+    addWebPushSubscription(subscription);
+  } catch (e) {
+    console.error('web push subscription error', e);
+  }
 }
 
 async function subscribeToWebPush() {
