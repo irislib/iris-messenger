@@ -1743,6 +1743,7 @@ form.public {
   padding: 10px 15px;
   background-color: var(--input-bg);
   border-radius: 5px;
+  color: var(--text-color);
 }
 
 .unit-price {
