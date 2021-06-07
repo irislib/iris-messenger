@@ -630,6 +630,7 @@ export default {
     total: "Yhteensä",
     home: "Koti",
     messages: "Viestit",
+<<<<<<< HEAD
     market: "Tori",
     contacts: "Yhteystiedot",
     explorer: "Hakemisto",
@@ -647,6 +648,15 @@ export default {
     name: "Nimi",
     confirmation: "Vahvista",
     summary: "Yhteenveto",
+=======
+    store: "Kauppa",
+    contacts: "Yhteystiedot",
+    explorer: "Hakemisto",
+    no_followers_yet: "Jaa linkkisi, niin muut voivat seurata sinua:",
+    next: "Seuraava"
+
+
+>>>>>>> translations
   },
   "it": {
     language_name: "Italian",
