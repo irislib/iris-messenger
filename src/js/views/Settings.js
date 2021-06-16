@@ -54,8 +54,8 @@ class Settings extends View {
         <h3>${t('language')}</h3>
         <p><${LanguageSelector}/></p>
         <hr/>
-        <h3>Notifications</h3>
-        <p>Web push subscriptions</p>
+        <h3>${t('notifications')}</h3>
+        <p>${t('web_push_subscriptions')}</p>
         <div class="flex-table">
           ${Object.keys(this.state.webPushSubscriptions).map(k => {
             const v = this.state.webPushSubscriptions[k];
@@ -72,10 +72,10 @@ class Settings extends View {
         <hr/>
         <h3>${t('peers')}</h3>
         ${this.renderPeerList()}
-        <p><input type="checkbox" checked=${this.state.local.enablePublicPeerDiscovery} onChange=${() => State.local.get('settings').get('enablePublicPeerDiscovery').put(!this.state.local.enablePublicPeerDiscovery)} id="enablePublicPeerDiscovery"/><label for="enablePublicPeerDiscovery">Enable public peer discovery</label></p>
+        <p><input type="checkbox" checked=${this.state.local.enablePublicPeerDiscovery} onChange=${() => State.local.get('settings').get('enablePublicPeerDiscovery').put(!this.state.local.enablePublicPeerDiscovery)} id="enablePublicPeerDiscovery"/><label for="enablePublicPeerDiscovery">${t('enable_public_peer_discovery')}</label></p>
         <h4>${t('maximum_number_of_peer_connections')}</h4>
         <p>
-          <small>There's a bug that may cause high CPU and bandwidth usage when connecting to more than 1 peer. Working on it!</small>
+          <small>${t('there_is_a_bug')}</small>
         </p>
         <p>
           <input type="number" value=${this.state.local.maxConnectedPeers} onChange=${e => State.local.get('settings').get('maxConnectedPeers').put(e.target.value || 0)}/>
@@ -85,14 +85,14 @@ class Settings extends View {
           <p>http://${this.state.electron.publicIp || '-'}:8767/gun</p>
           <p><small>If you're behind NAT (likely) and want to accept incoming connections, you need to configure your router to forward the port 8767 to this computer.</small></p>
         `: ''}
-        <h4>Set up your own peer</h4>
+        <h4>${t('set_up_your_own_peer')}</h4>
         <p>
           <small dangerouslySetInnerHTML=${{ __html: t('peers_info', "href=\"https://github.com/amark/gun#deploy\"")}}></small>
         </p>
         <p><a href="https://heroku.com/deploy?template=https://github.com/amark/gun">
            <img src="./img/herokubutton.svg" alt="Deploy"/>
         </a></p>
-        <p>Or <a href="https://github.com/amark/gun#docker">Docker</a>, or <a href="https://github.com/irislib/iris-electron">Iris-electron</a>.</p>
+        <p>${t('also')} <a href="https://github.com/amark/gun#docker">Docker</a> ${t('or_small')} <a href="https://github.com/irislib/iris-electron">Iris-electron</a>.</p>
         ${iris.util.isElectron ? html`
           <hr/>
           <h3>Desktop</h3>
@@ -101,8 +101,8 @@ class Settings extends View {
         `: ''}
         <hr/>
         <h3>${t('webtorrent')}</h3>
-        <p><input type="checkbox" checked=${this.state.local.enableWebtorrent} onChange=${() => State.local.get('settings').get('enableWebtorrent').put(!this.state.local.enableWebtorrent)} id="enableWebtorrent"/><label for="enableWebtorrent">Automatically load webtorrent attachments</label></p>
-        <p><input type="checkbox" checked=${this.state.local.autoplayWebtorrent} onChange=${() => State.local.get('settings').get('autoplayWebtorrent').put(!this.state.local.autoplayWebtorrent)} id="autoplayWebtorrent"/><label for="autoplayWebtorrent">Autoplay webtorrent videos</label></p>
+        <p><input type="checkbox" checked=${this.state.local.enableWebtorrent} onChange=${() => State.local.get('settings').get('enableWebtorrent').put(!this.state.local.enableWebtorrent)} id="enableWebtorrent"/><label for="enableWebtorrent">${t('automatically_load_webtorrent_attachments')}</label></p>
+        <p><input type="checkbox" checked=${this.state.local.autoplayWebtorrent} onChange=${() => State.local.get('settings').get('autoplayWebtorrent').put(!this.state.local.autoplayWebtorrent)} id="autoplayWebtorrent"/><label for="autoplayWebtorrent">${t('autoplay_webtorrent_videos')}</label></p>
         <hr/>
         <h3>${t('webrtc_connection_options')}</h3>
         <p><small>${t('webrtc_info')}</small></p>

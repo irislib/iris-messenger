@@ -119,7 +119,7 @@ class Store extends View {
     return html`
       ${cartTotalItems ? html`
         <p>
-          <button onClick=${() => route('/checkout')}>Shopping cart (${cartTotalItems})</button>
+          <button onClick=${() => route('/checkout')}>${t('shopping_cart')}(${cartTotalItems})</button>
         </p>
       ` : ''}
       <div class="thumbnail-items">
@@ -141,7 +141,7 @@ class Store extends View {
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>
               <button class="add" onClick=${e => this.addToCart(k, i.user, e)}>
-                Add to cart
+              ${t('add_to_cart')}
                 ${this.cart[k] ? ` (${this.cart[k]})` : ''}
               </button>
             </div>
@@ -156,9 +156,8 @@ class Store extends View {
       return this.renderUserStore(this.props.store);
     }
     return html`
-      <p>
-          This is a prototype store that shows items from merchants in your social network. Orders are sent via Iris private message. Your own store can be found <a href="/store/${Session.getPubKey()}">here</a>.
-      </p>
+      <p dangerouslySetInnerHTML=${{ __html: t('this_is_a_prototype_store', `href="/store/${Session.getPubKey()}"`
+        )}}></p>
       ${this.getNotification()}
       ${this.renderItems()}
     `;

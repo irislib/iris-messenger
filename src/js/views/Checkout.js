@@ -152,7 +152,7 @@ class Checkout extends Store {
         ${this.state.delivery.email}
       </p>
       <p>${t('payment_method')}: <b>${this.state.paymentMethod}</b></p>
-      <p class="side-padding-xs"><button onClick=${() => this.confirm()}>${t('confirmation')}</button></p>
+      <p class="side-padding-xs"><button onClick=${() => this.confirm()}>${t('confirm_button')}</button></p>
     `;
   }
 

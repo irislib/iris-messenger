@@ -59,7 +59,7 @@ class Profile extends View {
           <div class="msg-content">
             <p>Share your profile link so ${this.state.name || 'this user'} can follow you:</p>
             <p><${CopyButton} text=${t('copy_link')} title=${Session.getMyName()} copyStr=${Helpers.getProfileLink(Session.getPubKey())}/></p>
-            <small>Your posts, replies and likes are only shown to your followers and their network.</small>
+            <small>${t('visibility')}</small>
           </div>
         </div>
       `;
@@ -165,9 +165,9 @@ class Profile extends View {
   renderTabs() {
     return html`
     <div class="tabs">
-      <${Link} activeClassName="active" href="/profile/${this.props.id}">Posts<//>
-      <${Link} activeClassName="active" href="/replies/${this.props.id}">Replies<//>
-      <${Link} activeClassName="active" href="/likes/${this.props.id}">Likes<//>
+      <${Link} activeClassName="active" href="/profile/${this.props.id}">${t('posts')}<//>
+      <${Link} activeClassName="active" href="/replies/${this.props.id}">${t('replies')}<//>
+      <${Link} activeClassName="active" href="/likes/${this.props.id}">${t('likes')}<//>
       <${Link} activeClassName="active" href="/media/${this.props.id}">Media<//>
     </div>
     `;
