@@ -70,7 +70,7 @@ class Product extends StoreView {
             <iris-text placeholder="Price" user=${this.props.store} path="store/products/${this.props.product}/price"/>
           </p>
           <button class="add" onClick=${() => this.addToCart()}>
-            Add to cart
+            ${t('add_to_cart')}
             ${this.cart[this.props.product] ? ` (${this.cart[this.props.product]})` : ''}
           </button>
           ${this.isMyProfile ? html`

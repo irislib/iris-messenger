@@ -129,9 +129,7 @@ class PublicMessageForm extends Component {
       <input name="attachment-input" type="file" class="hidden attachment-input" accept="image/*" multiple onChange=${e => this.attachmentsChanged(e)}/>
       ${this.props.index === 'media' ? html`
           <p>
-            <small>
-              Download <a href="https://webtorrent.io/desktop/">Webtorrent Desktop</a> to host your media files and paste their magnet links below.
-            </small>
+            <small dangerouslySetInnerHTML=${{ __html: t('download_webtorrent', 'href="https://webtorrent.io/desktop/"')}}/>
           </p>
       `: ''}
       <textarea onPaste=${e => this.onMsgTextPaste(e)} onInput=${e => this.onMsgTextInput(e)} class="new-msg" type="text" placeholder="${t(textareaPlaceholder)}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>

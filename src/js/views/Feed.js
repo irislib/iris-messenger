@@ -115,7 +115,12 @@ class Feed extends View {
           <div class="msg-content">
             <p>${t('no_followers_yet')}</p>
             <p><${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(Session.getPubKey())}/></p>
-            <p>Alternatively, get <a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">SMS verified</a> so others can find you.</p>
+            <p dangerouslySetInnerHTML=${{
+                __html: t(
+                  'alternatively_get_sms_verified',
+                  `href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}"`
+                )}}>
+            </p>
             <small>${t('no_followers_yet_info')}</small>
           </div>
         </div>
