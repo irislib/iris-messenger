@@ -26,12 +26,12 @@ class Explorer extends View {
     const gun = (split.length && split[0]) === 'local' ? State.local : State.public;
     const path = split.slice(1).join('/');
     const pathString = split.map((k, i) => html`
-      ${chevronRight} <a href="#/explorer/${encodeURIComponent(split.slice(0,i+1).join('/'))}">${decodeURIComponent(k)}</a>
+      ${chevronRight} <a href="/explorer/${encodeURIComponent(split.slice(0,i+1).join('/'))}">${decodeURIComponent(k)}</a>
     `);
     return html`
       ${path ? '' : html `<p>Useful debug data for nerds.</p>`}
       <p>
-        <a href="#/explorer">All</a> ${path ? pathString : ''}
+        <a href="/explorer">All</a> ${path ? pathString : ''}
       </p>
       ${path ? html`
         <${ExplorerNode} indent=${0} showTools=${true} gun=${gun} path=${this.props.node}/>
@@ -43,11 +43,11 @@ class Explorer extends View {
           ${chevronDown} Users
         </div>
         <div class="explorer-row" style="padding-left: 2em">
-          ${chevronDown} <a href="#/explorer/public%2F~${encodeURIComponent(Session.getPubKey())}">${Session.getPubKey()}</a>
+          ${chevronDown} <a href="/explorer/public%2F~${encodeURIComponent(Session.getPubKey())}">${Session.getPubKey()}</a>
         </div>
         <${ExplorerNode} indent=${3} gun=${State.public} path='public/~${Session.getPubKey()}'/>
         <div class="explorer-row" style="padding-left: 1em">
-          ${chevronRight} <a href="#/explorer/public%2F%23">#</a> (content-addressed values, such as public posts)
+          ${chevronRight} <a href="/explorer/public%2F%23">#</a> (content-addressed values, such as public posts)
         </div>
         <br/><br/>
         <div class="explorer-row">
@@ -135,7 +135,7 @@ class ExplorerNode extends Component {
     return html`
       <div class="explorer-row" style="padding-left: ${this.props.indent}em">
         <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.children[k].open ? chevronDown : chevronRight}</span>
-        <a href="#/explorer/${encodeURIComponent(path)}"><b>${k}</b></a>
+        <a href="/explorer/${encodeURIComponent(path)}"><b>${k}</b></a>
       </div>
       ${this.state.children[k].open ? html`<${ExplorerNode} gun=${this.props.gun} indent=${this.props.indent + 1} path=${path}/>` : ''}
     `;
@@ -147,8 +147,8 @@ class ExplorerNode extends Component {
     const decrypted = encryption === 'Decrypted';
     const lnk = (href, text) => html`<a class="mar-left5" href=${href}>${text}</a>`;
     const keyLinks = html`
-      ${typeof k === 'string' && k.match(hashRegex) ? lnk(`#/post/${encodeURIComponent(k)}`, '#') : ''}
-      ${typeof k === 'string' && k.match(pubKeyRegex) ? lnk(`#/explorer/public%2F~${encodeURIComponent(encodeURIComponent(k))}`, html`<iris-text user=${k} path="profile/name"/>`) : ''}
+      ${typeof k === 'string' && k.match(hashRegex) ? lnk(`/post/${encodeURIComponent(k)}`, '#') : ''}
+      ${typeof k === 'string' && k.match(pubKeyRegex) ? lnk(`/explorer/public%2F~${encodeURIComponent(encodeURIComponent(k))}`, html`<iris-text user=${k} path="profile/name"/>`) : ''}
     `;
     if (encryption) {
       if (!decrypted) {
@@ -173,8 +173,8 @@ class ExplorerNode extends Component {
         }
 
         const valueLinks = html`
-          ${typeof v === 'string' && v.match(hashRegex) ? lnk(`#/post/${encodeURIComponent(v)}`, '#') : ''}
-          ${typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`#/explorer/public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<iris-text user=${v} path="profile/name"/>`) : ''}
+          ${typeof v === 'string' && v.match(hashRegex) ? lnk(`/post/${encodeURIComponent(v)}`, '#') : ''}
+          ${typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`/explorer/public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<iris-text user=${v} path="profile/name"/>`) : ''}
         `;
 
         s = isMine ? html`
