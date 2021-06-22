@@ -35,8 +35,6 @@ function copyMyChatLinkClicked(e) {
   }, 2000);
 }
 
-const getNumFromStyle = numStr => Number(numStr.substring(0, numStr.length - 2));
-
 class Chat extends View {
   constructor() {
     super();
@@ -82,7 +80,7 @@ class Chat extends View {
     State.local.get('channels').get(this.props.id).get('participants').map().on((v, k, b, e) => {
       this.eventListeners['participants'] = e;
       const hasAlready = !!this.participants[k];
-      this.participants[k] = v;
+      this.participants[k] = v;
       if (!!v && !hasAlready) {
         State.public.user(k).get('activity').on((activity, a, b, e) => {
           this.eventListeners[k + 'activity'] = e;
@@ -204,7 +202,7 @@ class Chat extends View {
     let previousDateStr;
     let previousFrom;
     const msgListContent = [];
-    this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach((msg, i) => {
+    this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach(msg => {
       if (typeof msg !== 'object') {
         try {
           msg = JSON.parse(msg);
