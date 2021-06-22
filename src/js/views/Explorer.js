@@ -270,7 +270,7 @@ class ExplorerNode extends Component {
       `: ''}
       ${childrenEl}
       ${showMoreBtn ? html`
-        <a style="padding-left: ${this.props.indent + 1}em" href="" onClick=${e => {e.preventDefault();this.setState({shownChildrenCount: this.state.shownChildrenCount + 20})}}>More</a>
+        <a style="padding-left: ${this.props.indent + 1}em" href="" onClick=${e => {e.preventDefault();this.setState({shownChildrenCount: this.state.shownChildrenCount + 20})}}>More (${children.length - this.state.shownChildrenCount})</a>
       ` : ''}
     `;
   }
