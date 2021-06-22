@@ -2005,10 +2005,7 @@ export default {
 
   followChatLink(str) {
     if (str && str.indexOf('http') === 0) {
-      if (str.indexOf('https://iris.to/') === 0) {
-        route(str.replace('https://iris.to/', ''));
-        return true;
-      } else if (str.length > 30) {
+      if (str.length > 30) {
         const s = str.split('?');
         let chatId;
         if (s.length === 2) {
@@ -2019,6 +2016,9 @@ export default {
           route('/chat/' + chatId);
           return true;
         }
+      } else if (str.indexOf('https://iris.to') === 0) {
+        route(str.replace('https://iris.to', ''));
+        return true;
       }
     }
   }

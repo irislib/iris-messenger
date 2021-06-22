@@ -34,7 +34,7 @@ import Footer from './components/Footer.js';
 import State from './State.js';
 import Icons from './Icons.js';
 
-if (window.location.hash) { // redirect old urls
+if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redirect old urls
   window.location.href = window.location.href.replace('#/', '');
 }
 
