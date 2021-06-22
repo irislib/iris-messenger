@@ -65,10 +65,10 @@ function getFollowsFn(callback, k, maxDepth = 3, currentDepth = 1) {
 }
 
 function setOurOnlineStatus() {
-  const activeRoute = window.location.hash;
+  const activeRoute = window.location.pathname;
   iris.Channel.setActivity(State.public, ourActivity = 'active');
   const setActive = _.debounce(() => {
-    const chat = activeRoute && channels[activeRoute.replace('#/profile/','').replace('#/chat/','')];
+    const chat = activeRoute && channels[activeRoute.replace('/profile/','').replace('/chat/','')];
     if (chat && !ourActivity) {
       chat.setMyMsgsLastSeenTime();
     }
@@ -82,7 +82,7 @@ function setOurOnlineStatus() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
       iris.Channel.setActivity(State.public, ourActivity = 'active');
-      const chatId = activeRoute.replace('#/profile/','').replace('#/chat/','');
+      const chatId = activeRoute.replace('/profile/','').replace('/chat/','');
       const chat = activeRoute && channels[chatId];
       if (chat) {
         chat.setMyMsgsLastSeenTime();
@@ -368,7 +368,7 @@ function processMessage(chatId, msg, info) {
   State.local.get('channels').get(chatId).get('msgs').get(msg.time + (msg.from && msg.from.slice(0, 10))).put(JSON.stringify(msg));
   msg.timeObj = new Date(msg.time);
   if (!info.selfAuthored && msg.timeObj > (chat.myLastSeenTime || -Infinity)) {
-    if (window.location.hash !== '#/chat/' + chatId || document.visibilityState !== 'visible') {
+    if (window.location.pathname !== '/chat/' + chatId || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chatId, 1);
     }
   }

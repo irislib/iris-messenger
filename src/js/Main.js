@@ -34,6 +34,10 @@ import Footer from './components/Footer.js';
 import State from './State.js';
 import Icons from './Icons.js';
 
+if (window.location.hash) { // redirect old urls
+  window.location.href = window.location.href.replace('#/', '');
+}
+
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
 if (!isElectron && ('serviceWorker' in navigator)) {
@@ -47,7 +51,7 @@ if (!isElectron && ('serviceWorker' in navigator)) {
 }
 
 State.init();
-Session.init({autologin: window.location.hash.length > 2});
+Session.init({autologin: window.location.pathname.length > 2});
 PeerManager.init();
 
 Helpers.checkColorScheme();
@@ -144,7 +148,7 @@ class Main extends Component {
   render() {
     let content = '';
     const isDesktopNonMac = this.state.platform && this.state.platform !== 'darwin';
-    if (this.state.loggedIn || window.location.hash.length <= 2) {
+    if (this.state.loggedIn || window.location.pathname.length <= 2) {
       content = this.state.loggedIn ? html`
         ${isDesktopNonMac ? html`
           <div class="windows-titlebar">

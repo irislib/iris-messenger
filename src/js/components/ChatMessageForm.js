@@ -160,7 +160,7 @@ class ChatMessageForm extends Component {
   async webPush(msg) {
     const chat = Session.channels[this.props.activeChat];
     const myKey = Session.getKey();
-    const shouldWebPush = (window.location.hash === '#/chat/' + myKey.pub) || !(chat.activity);
+    const shouldWebPush = (window.location.pathname === '/chat/' + myKey.pub) || !(chat.activity);
     if (shouldWebPush && chat.webPushSubscriptions) {
       const subscriptions = [];
       const participants = Object.keys(chat.webPushSubscriptions);

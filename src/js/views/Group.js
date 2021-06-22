@@ -197,7 +197,7 @@ class Group extends View {
                 ` : ''}
                 <button onClick=${() => route('/chat/' + this.props.id)}>${tr('send_message')}</button>
                 ${uuid ? '' : html`
-                  <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+                  <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.pathname}/>
                 `}
                 <button onClick=${() => $('#profile-page-qr').toggle()}>${tr('show_qr_code')}</button>
                 <button class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}</button>
@@ -351,7 +351,7 @@ class Group extends View {
     }
     qrCodeEl.empty();
     new QRCode(qrCodeEl[0], {
-      text: 'https://iris.to/' + window.location.hash,
+      text: 'https://iris.to/' + window.location.pathname,
       width: 300,
       height: 300,
       colorDark : "#000000",
