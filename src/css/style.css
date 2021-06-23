@@ -88,6 +88,14 @@ input, button, .button {
   margin-right: 7px;
 }
 
+.btn-group button, .btn-group .button, .btn-group input {
+  margin-bottom: 15px;
+}
+
+.btn-group {
+  margin-bottom: -15px;
+}
+
 input, label {
   margin-right: 7px;
 }
@@ -1074,6 +1082,7 @@ a.msg {
   cursor: pointer;
   min-width: 2em;
   text-align: left;
+  user-select: none;
 }
 
 .msg .count:not(:last-of-type) {
