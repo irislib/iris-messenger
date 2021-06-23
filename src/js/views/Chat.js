@@ -138,13 +138,15 @@ class Chat extends View {
     } else {
       Helpers.scrollToMessageListBottom();
       $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
-      if (this.chat && !this.chat.uuid) {
-        if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
-          $('#not-seen-by-them').slideDown();
-        } else {
-          $('#not-seen-by-them').slideUp();
+      setTimeout(() => {
+        if (this.chat && !this.chat.uuid && this.props.id !== Session.getPubKey()) {
+          if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
+            $('#not-seen-by-them').slideDown();
+          } else {
+            $('#not-seen-by-them').slideUp();
+          }
         }
-      }
+      }, 1000);
     }
   }
 
