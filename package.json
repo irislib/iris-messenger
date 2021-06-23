@@ -8,6 +8,7 @@
     "http-server": "^0.12.1"
   },
   "scripts": {
-    "start": "echo 'Iris: http://localhost:8080'; npx http-server src --silent --proxy http://localhost:8080?"
+    "start": "echo 'Iris: http://localhost:8080'; npx http-server src --silent --proxy http://localhost:8080?",
+    "lint": "eslint src/js/*.js --fix;eslint src/js/components/*.js --fix; eslint src/js/views/*.js --fix"
   }
 }
