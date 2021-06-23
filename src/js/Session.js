@@ -279,7 +279,7 @@ function addChannel(chat) {
   //$(".chat-list").append(el);
   chat.theirMsgsLastSeenTime = '';
   chat.getTheirMsgsLastSeenTime(time => {
-    if (chat && time && time > chat.theirMsgsLastSeenTime) {
+    if (chat && time && time >= chat.theirMsgsLastSeenTime) {
       chat.theirMsgsLastSeenTime = time;
       chatNode.get('theirMsgsLastSeenTime').put(time);
     }
