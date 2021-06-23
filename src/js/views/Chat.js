@@ -146,7 +146,7 @@ class Chat extends View {
             $('#not-seen-by-them').slideUp();
           }
         }
-      }, 1000);
+      }, 2000);
     }
   }
 
