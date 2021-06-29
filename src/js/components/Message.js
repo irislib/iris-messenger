@@ -23,6 +23,20 @@ class Message extends Component {
         window.location = href.replace('https://iris.to/', '');
       }
     });
+
+    const seen = this.getSeenStatus().seen;
+    if (!seen) {
+      State.local.get('channels').get(this.props.id).get('theirLastSeenTime')
+    }
+  }
+
+  getSeenStatus() {
+    const chatId = this.props.chatId;
+    const chat = Session.channels[chatId];
+    const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
+    const seen = chat && chat.theirMsgsLastSeenDate >= time;
+    const delivered = chat && chat.online && chat.online.lastActive && new Date(chat.online.lastActive) >= time;
+    return {seen, delivered};
   }
 
   onNameClick(name) {

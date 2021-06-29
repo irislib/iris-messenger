@@ -30,7 +30,19 @@ const DEFAULT_SETTINGS = {
 
 const settings = DEFAULT_SETTINGS;
 
-function getFollowsFn(callback, k, maxDepth = 3, currentDepth = 1) {
+function groupGet(path, callback, groupNode = State.local.get('follows')) {
+  groupNode.map((isFollowing, k) => isFollowing && callback(State.public.user(k).get(path)));
+}
+
+function groupOn(path, callback, groupNode = State.local.get('follows')) {
+  groupGet(path, node => node.on((...args) => callback(...args)), groupNode);
+}
+
+function groupMap(path, callback, groupNode = State.local.get('follows')) {
+  groupGet(path, node => node.map((...args) => callback(...args)), groupNode);
+}
+
+function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   k = k || key.pub;
 
   function addFollow(k, followDistance, follower) {
@@ -56,7 +68,7 @@ function getFollowsFn(callback, k, maxDepth = 3, currentDepth = 1) {
     if (isFollowing) {
       addFollow(followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        getFollowsFn(callback, followedKey, maxDepth, currentDepth + 1);
+        getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
       }
     }
   });
@@ -144,7 +156,7 @@ function login(k) {
     isBlocked && (follows[user] = null);
     State.local.get('follows').get(user).put(isBlocked);
   });
-  getFollowsFn((k, info) => {
+  getExtendedFollows((k, info) => {
     State.local.get('follows').get(k).put(true);
     if (!hasFollowers && k === getPubKey() && info.followers.size) {
       State.local.get('noFollowers').put(false);
@@ -393,4 +405,4 @@ function subscribeToMsgs(pub) {
   });
 }
 
-export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs, groupOn, groupMap };

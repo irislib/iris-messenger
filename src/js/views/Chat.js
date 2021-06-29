@@ -136,7 +136,6 @@ class Chat extends View {
       $('#not-seen-by-them').hide();
       this.componentDidMount();
     } else {
-      Helpers.scrollToMessageListBottom();
       $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
       setTimeout(() => {
         if (this.chat && !this.chat.uuid && this.props.id !== Session.getPubKey()) {
