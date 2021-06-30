@@ -31,15 +31,23 @@ const DEFAULT_SETTINGS = {
 const settings = DEFAULT_SETTINGS;
 
 function groupGet(path, callback, groupNode = State.local.get('follows')) {
-  groupNode.map((isFollowing, k) => isFollowing && callback(State.public.user(k).get(path)));
-}
-
-function groupOn(path, callback, groupNode = State.local.get('follows')) {
-  groupGet(path, node => node.on((...args) => callback(...args)), groupNode);
+  const follows = {};
+  groupNode.map((isFollowing, user) => {
+    if (follows[user] && follows[user] === isFollowing) { return; }
+    follows[user] = isFollowing;
+    if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
+      const node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), State.public.user(user));
+      callback(node, user);
+    }
+  });
 }
 
 function groupMap(path, callback, groupNode = State.local.get('follows')) {
-  groupGet(path, node => node.map((...args) => callback(...args)), groupNode);
+  groupGet(path, (node, from) => node.map((...args) => callback(...args, from)), groupNode);
+}
+
+function groupOn(path, callback, groupNode = State.local.get('follows')) {
+  groupGet(path, (node, from) => node.on((...args) => callback(...args, from)), groupNode);
 }
 
 function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
@@ -361,7 +369,6 @@ function addChannel(chat) {
   });
   State.local.get('channels').get(pub).put({enabled:true});
   if (chat.onTheir) {
-    console.log('Listen to private peer url from', pub);
     chat.onTheir('my_peer', (url, k, from) => {
       console.log('Got private peer url', url, 'from', from);
       PeerManager.addPeer({url, from})

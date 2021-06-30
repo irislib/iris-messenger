@@ -132,15 +132,15 @@ class Store extends View {
         ${keys.map(k => {
           const i = this.state.items[k];
           return html`
-            <div class="thumbnail-item store-item" onClick=${() => route(`/product/${k}/${i.user}`)}>
+            <div class="thumbnail-item store-item" onClick=${() => route(`/product/${k}/${i.from}`)}>
               <${SafeImg} src=${i.photo}/>
-              <a href="/product/${k}/${i.user}" class="name">${i.name}</a>
+              <a href="/product/${k}/${i.from}" class="name">${i.name}</a>
               ${this.props.store ? '':html`
-                <small>by <iris-text path="profile/name" editable="false" placeholder="Name" user=${i.user}/></small>
+                <small>by <iris-text path="profile/name" editable="false" placeholder="Name" user=${i.from}/></small>
               `}
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>
-              <button class="add" onClick=${e => this.addToCart(k, i.user, e)}>
+              <button class="add" onClick=${e => this.addToCart(k, i.from, e)}>
               ${t('add_to_cart')}
                 ${this.cart[k] ? ` (${this.cart[k]})` : ''}
               </button>
@@ -194,19 +194,23 @@ class Store extends View {
     });
   }
 
+  onProduct(p, id, a, e, from) {
+    this.eventListeners['products' + from] = e;
+    if (p) {
+      const o = {};
+      p.from = from;
+      o[id] = p;
+      Object.assign(this.items, o);
+      this.updateTotalPrice();
+    } else {
+      delete this.items[id];
+    }
+    this.setState({items: this.items});
+  }
+
   getProductsFromUser(user) {
-    State.public.user(user).get('store').get('products').map().on((p, id, a, e) => {
-      this.eventListeners['products' + user] = e;
-      if (p) {
-        const o = {};
-        p.user = user;
-        o[id] = p;
-        Object.assign(this.items, o);
-        this.updateTotalPrice();
-      } else {
-        delete this.items[id];
-      }
-      this.setState({items: this.items});
+    State.public.user(user).get('store').get('products').map().on((...args) => {
+      return this.onProduct(...args, user);
     });
   }
 
@@ -224,17 +228,8 @@ class Store extends View {
   }
 
   getAllProducts() {
-    const follows = {};
-    State.local.get('follows').map().on((isFollowing, user, a, e) => {
-      this.state.noFollows && Session.getPubKey() !== user && State.local.get('noFollows').put(false);
-      this.eventListeners['follows'] = e;
-      if (!isFollowing) {
-        delete follows[user];
-        return;
-      }
-      if (follows[user]) { return; }
-      follows[user] = true;
-      this.getProductsFromUser(user);
+    Session.groupMap('store/products', (...args) => {
+      this.onProduct(...args);
     });
   }
 
@@ -247,6 +242,13 @@ class Store extends View {
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', totalPrice: 0, items: {}, cart: {}});
 
     State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
+
+    State.local.get('follows').map().on((isFollowing, user, a, e) => {
+      if (isFollowing && this.state.noFollows && Session.getPubKey() !== user) {
+        State.local.get('noFollows').put(false);
+        e.off();
+      }
+    });
 
     if (user) {
       this.getCartFromUser(user);

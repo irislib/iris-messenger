@@ -15,50 +15,24 @@ class Feed extends View {
   constructor() {
     super();
     this.eventListeners = {};
-    this.following = new Set();
     this.state = {sortedMessages: []};
     this.messages = {};
     this.id = 'message-view';
     this.class = 'public-messages-view';
   }
 
-  getMessagesByUser(pub, cb) {
-    const seen = new Set();
-    State.public.user(pub).get(this.props.index || 'msgs').map().on(async (hash, time) => {
-      if (typeof hash === 'string' && !seen.has(hash)) {
-        seen.add(hash);
-        cb(hash, time);
-      } else if (hash === null) {
-        cb(null, time);
-      }
-    });
-  }
-
-  getMessages(/*show2ndDegreeFollows*/) {
+  loadMessagesToLocalIndex(/*show2ndDegreeFollows*/) {
     //const followsList = show2ndDegreeFollows ? State.local.get('follows') : State.public.user().get('follow');
-    const followsList = State.local.get('follows');
-    followsList.map().once((follows, pub) => {
-      if (follows) {
-        if (this.following.has(pub)) return;
-        if (Session.getPubKey() !== pub) {
-          this.state.noFollows && State.local.get('noFollows').put(false);
-        }
-        this.following.add(pub);
-        this.getMessagesByUser(pub, (hash, time) => {
-          if (Session.getPubKey() !== pub) {
-            this.state.noMessages && State.local.get('noMessages').put(false);
-          }
-          const id = time + pub.slice(0,20);
-          if (hash) {
-            State.local.get(this.props.index || 'feed').get(id).put(hash);
-          } else {
-            State.local.get(this.props.index || 'feed').get(id).put(null);
-          }
-        });
-      } else {
-        this.following.delete(pub);
-        this.eventListeners[pub] && this.eventListeners[pub].off();
+    const seen = new Set();
+    Session.groupMap('msgs', (hash, time, a, b, from) => {
+      if (hash !== null && seen.has(hash)) { return; }
+      seen.add(hash);
+      if (Session.getPubKey() !== from) {
+        this.state.noMessages && State.local.get('noMessages').put(false);
+        this.state.noFollows && State.local.get('noFollows').put(false);
       }
+      const id = time + from.slice(0,20);
+      State.local.get(this.props.index || 'feed').get(id).put(hash || null);
     });
   }
 
@@ -84,7 +58,7 @@ class Feed extends View {
     State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
     State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
     State.local.get('noMessages').on(noMessages => this.setState({noMessages}));
-    this.getMessages();
+    this.loadMessagesToLocalIndex();
   }
 
   componentWillUnmount() {

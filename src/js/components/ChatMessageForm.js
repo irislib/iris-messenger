@@ -93,10 +93,11 @@ class ChatMessageForm extends Component {
   }
 
   onMsgTextInput(event) {
+    const channel = Session.channels[this.props.activeChat];
     const val = $(event.target).val();
     this.isTyping = this.isTyping !== undefined ? this.isTyping : false;
     const getIsTyping = () => val.length > 0;
-    const setTyping = () => Session.channels[this.props.activeChat].setTyping(getIsTyping());
+    const setTyping = () => channel.setTyping(getIsTyping());
     const setTypingThrottled = _.throttle(setTyping, 1000);
     if (this.isTyping === getIsTyping()) {
       setTypingThrottled();

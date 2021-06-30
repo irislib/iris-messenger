@@ -42,7 +42,7 @@ const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
 if (!isElectron && ('serviceWorker' in navigator)) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('serviceworker.js')
+    navigator.serviceWorker.register('/serviceworker.js')
     .catch(function(err) {
       // registration failed :(
       console.log('ServiceWorker registration failed: ', err);
