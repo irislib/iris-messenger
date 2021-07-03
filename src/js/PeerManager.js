@@ -98,7 +98,7 @@ function getRandomPeers() {
   const sample = _.sample(
     Object.keys(
       _.pick(knownPeers, (p, url) => {
-        const mixedContent = location.protocol === 'https:' && (url.indexOf('http:') === 0);
+        const mixedContent = (window.location.protocol === 'https:' && (url.indexOf('http:') === 0));
         return !mixedContent && p.enabled && !(iris.util.isElectron && url === ELECTRON_GUN_URL);
       })
     ), sampleSize
