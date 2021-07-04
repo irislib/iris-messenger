@@ -31,9 +31,9 @@ class SearchBox extends Component {
   }
 
   componentDidMount() {
-    State.local.get('follows').map().on(follows => {
+    State.local.get('follows').map().on(isFollowing => {
       this.hasFollows = this.hasFollows || Object.keys(Session.getFollows()).length > 1;
-      follows && this.debouncedIndexAndSearch();
+      isFollowing && this.debouncedIndexAndSearch();
     });
     State.local.get('activeRoute').on((a,b,c,e) => {
       this.eventListeners['activeRoute'] = e;

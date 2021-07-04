@@ -30,26 +30,6 @@ const DEFAULT_SETTINGS = {
 
 const settings = DEFAULT_SETTINGS;
 
-function groupGet(path, callback, groupNode = State.local.get('follows')) {
-  const follows = {};
-  groupNode.map((isFollowing, user) => {
-    if (follows[user] && follows[user] === isFollowing) { return; }
-    follows[user] = isFollowing;
-    if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
-      const node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), State.public.user(user));
-      callback(node, user);
-    }
-  });
-}
-
-function groupMap(path, callback, groupNode = State.local.get('follows')) {
-  groupGet(path, (node, from) => node.map((...args) => callback(...args, from)), groupNode);
-}
-
-function groupOn(path, callback, groupNode = State.local.get('follows')) {
-  groupGet(path, (node, from) => node.on((...args) => callback(...args, from)), groupNode);
-}
-
 function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   k = k || key.pub;
 
@@ -412,4 +392,4 @@ function subscribeToMsgs(pub) {
   });
 }
 
-export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs, groupOn, groupMap };
+export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };

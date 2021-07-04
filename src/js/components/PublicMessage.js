@@ -67,14 +67,14 @@ class PublicMessage extends Message {
           this.setState({name});
         });
       }
-      Session.groupOn(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
+      State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
         this.eventListeners[from+'likes'] = e;
         liked ? this.likedBy.add(from) : this.likedBy.delete(from);
         const s = {likes: this.likedBy.size};
         if (from === Session.getPubKey()) s['liked'] = liked;
         this.setState(s);
       });
-      Session.groupMap(`replies/${encodeURIComponent(this.props.hash)}`, (hash,time,b,e,from) => {
+      State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, (hash,time,b,e,from) => {
         const k = from + time;
         if (hash && this.replies[k]) return;
         if (hash) {
@@ -132,7 +132,6 @@ class PublicMessage extends Message {
   likeBtnClicked(e) {
     e.preventDefault();
     const liked = !this.state.liked;
-    console.log(liked);
     State.public.user().get('likes').get(this.props.hash).put(liked);
   }
 

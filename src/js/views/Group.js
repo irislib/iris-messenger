@@ -21,8 +21,6 @@ class Group extends View {
   constructor() {
     super();
     this.eventListeners = [];
-    this.followedUsers = new Set();
-    this.followers = new Set();
     this.id = "profile";
   }
 
@@ -220,48 +218,6 @@ class Group extends View {
       this.setState({isAdmin:false,uuid:null, memberCandidate:null});
       this.componentDidMount();
     }
-  }
-
-  userDidMount() {
-    const pub = this.props.id;
-    State.public.user(pub).get('follow').map().on((following,key,c,e) => {
-      this.eventListeners.push(e);
-      if (following) {
-        this.followedUsers.add(key);
-      } else {
-        this.followedUsers.delete(key);
-      }
-      this.setState({followedUserCount: this.followedUsers.size});
-    });
-    State.local.get('follows').map().once((following,key) => {
-      if (following) {
-        State.public.user(key).get('follow').get(pub).once(following => {
-          if (following) {
-            this.followers.add(key);
-            this.setState({followerCount: this.followers.size});
-          }
-        });
-      }
-    });
-    State.public.user(pub).get('profile').get('name').on((name,a,b,e) => {
-      document.title = name || document.title;
-      this.eventListeners.push(e);
-      if (!$('#profile .profile-name:focus').length) {
-        this.setState({name});
-      }
-    });
-    State.public.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
-      this.eventListeners.push(e);
-      this.setState({photo});
-    });
-    State.public.user(pub).get('profile').get('about').on((about,a,b,e) => {
-      this.eventListeners.push(e);
-      if (!$('#profile .profile-about-content:focus').length) {
-        this.setState({about});
-      } else {
-        $('#profile .profile-about-content:not(:focus)').text(about);
-      }
-    });
   }
 
   groupDidMount() {

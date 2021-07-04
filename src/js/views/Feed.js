@@ -24,7 +24,7 @@ class Feed extends View {
   loadMessagesToLocalIndex(/*show2ndDegreeFollows*/) {
     //const followsList = show2ndDegreeFollows ? State.local.get('follows') : State.public.user().get('follow');
     const seen = new Set();
-    Session.groupMap('msgs', (hash, time, a, b, from) => {
+    State.group().map('msgs', (hash, time, a, b, from) => {
       if (hash !== null && seen.has(hash)) { return; }
       seen.add(hash);
       if (Session.getPubKey() !== from) {

@@ -14,7 +14,34 @@ const State = {
     }
     window.State = this;
     window.iris.util.setPublicState && window.iris.util.setPublicState(this.public);
-  }
+  },
+
+  group: function(groupNode = State.local.get('follows')) {
+    return {
+      get: function(path, callback) {
+        const follows = {};
+        groupNode.map((isFollowing, user) => {
+          if (follows[user] && follows[user] === isFollowing) { return; }
+          follows[user] = isFollowing;
+          if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
+            let node = State.public.user(user);
+            if (path && path !== '/') {
+              node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
+            }
+            callback(node, user);
+          }
+        });
+      },
+
+      map: function(path, callback) {
+        this.get(path, (node, from) => node.map((...args) => callback(...args, from)));
+      },
+
+      on: function(path, callback) {
+        this.get(path, (node, from) => node.on((...args) => callback(...args, from)));
+      }
+    }
+  },
 };
 
 export default State;

@@ -228,7 +228,7 @@ class Store extends View {
   }
 
   getAllProducts() {
-    Session.groupMap('store/products', (...args) => {
+    State.group().map('store/products', (...args) => {
       this.onProduct(...args);
     });
   }
