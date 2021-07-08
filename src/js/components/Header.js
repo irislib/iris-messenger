@@ -9,8 +9,8 @@ import SearchBox from './SearchBox.js';
 import Icons from '../Icons.js';
 import iris from 'iris-lib';
 
-import logo from '../../img/icon128.png';
-import logoType from '../../img/iris_logotype.png';
+import logo from '../../assets/img/icon128.png';
+import logoType from '../../assets/img/iris_logotype.png';
 
 
 class Header extends Component {

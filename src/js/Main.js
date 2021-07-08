@@ -34,8 +34,8 @@ import Footer from './components/Footer.js';
 import State from './State.js';
 import Icons from './Icons.js';
 
-import logo from '../img/icon128.png';
-import logoType from '../img/iris_logotype.png';
+import logo from '../assets/img/icon128.png';
+import logoType from '../assets/img/iris_logotype.png';
 
 if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redirect old urls
   window.location.href = window.location.href.replace('#/', '');

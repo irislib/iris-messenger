@@ -7,7 +7,7 @@ import Session from '../Session.js';
 import { Component } from 'preact';
 import Helpers from '../Helpers.js';
 
-import logo from '../../img/android-chrome-192x192.png';
+import logo from '../../assets/img/android-chrome-192x192.png';
 
 class Login extends Component {
   componentDidMount() {
