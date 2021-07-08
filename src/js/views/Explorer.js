@@ -3,10 +3,11 @@ import State from '../State.js';
 import Session from '../Session.js';
 import { Component } from '../lib/preact.js';
 import View from './View.js';
-import ScrollViewport from '../lib/preact-scroll-viewport.js';
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
+
+const SHOW_CHILDREN_COUNT = 50;
 
 const chevronDown = html`
 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
@@ -74,7 +75,7 @@ class ExplorerNode extends Component {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = {children: {}, shownChildrenCount: 20};
+    this.state = {children: {}, shownChildrenCount: SHOW_CHILDREN_COUNT};
     this.children = {};
   }
 
@@ -264,9 +265,6 @@ class ExplorerNode extends Component {
       });
     }
 
-    const childrenEl = this.props.indent === 0 ? html`<${ScrollViewport}>${renderChildren(children)}</${ScrollViewport}>`
-      : renderChildren(children.slice(0, this.state.shownChildrenCount));
-
     const showMoreBtn = children.length > this.state.shownChildrenCount;
     return html`
       ${this.props.indent === 0 ? html`
@@ -289,9 +287,9 @@ class ExplorerNode extends Component {
           ` : ''}
         </div>
       `: ''}
-      ${childrenEl}
+      ${renderChildren(children.slice(0, this.state.shownChildrenCount))}
       ${showMoreBtn ? html`
-        <a style="padding-left: ${this.props.indent + 1}em" href="" onClick=${e => {e.preventDefault();this.setState({shownChildrenCount: this.state.shownChildrenCount + 20})}}>More (${children.length - this.state.shownChildrenCount})</a>
+        <a style="padding-left: ${this.props.indent + 1}em" href="" onClick=${e => {e.preventDefault();this.setState({shownChildrenCount: this.state.shownChildrenCount + SHOW_CHILDREN_COUNT})}}>More (${children.length - this.state.shownChildrenCount})</a>
       ` : ''}
     `;
   }
