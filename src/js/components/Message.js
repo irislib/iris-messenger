@@ -26,7 +26,7 @@ class Message extends Component {
     });
 
     const status = this.getSeenStatus().seen;
-    if (!status.delivered) {
+    if (!status.seen && !status.delivered) {
       State.local.get('channels').get(this.props.chatId).get('theirLastActiveTime').on((v, k, a, e) => {
         if (this.getSeenStatus().delivered) {
           this.setState({});
@@ -49,7 +49,7 @@ class Message extends Component {
     const chat = Session.channels[chatId];
     const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
     const seen = chat && chat.theirMsgsLastSeenDate >= time;
-    const delivered = chat && chat.online && chat.online.lastActive && new Date(chat.online.lastActive) >= time;
+    const delivered = chat && chat.activity && chat.activity.lastActive && new Date(chat.activity.lastActive) >= time;
     return {seen, delivered};
   }
 
@@ -142,8 +142,9 @@ class Message extends Component {
     const innerHTML = autolinker.link(h);
     const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
 
-    const seen = chat && chat.theirMsgsLastSeenDate >= time ? 'seen' : '';
-    const delivered = chat && chat.online && chat.online.lastActive && new Date(chat.online.lastActive) >= time ? 'delivered' : '';
+    const status = this.getSeenStatus();
+    const seen = status.seen ? 'seen' : '';
+    const delivered = status.delivered ? 'delivered' : '';
     const whose = this.props.selfAuthored ? 'our' : 'their';
 
     return html`
