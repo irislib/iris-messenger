@@ -2,7 +2,7 @@ import State from './State.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import PeerManager from './PeerManager.js';
-import { route } from './lib/preact-router.es.js';
+import { route } from 'preact-router';
 import iris from 'iris-lib';
 import _ from 'lodash';
 

@@ -1,7 +1,7 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
-import ScrollViewport from '../lib/preact-scroll-viewport.js';
+import ScrollViewport from 'preact-scroll-viewport';
 import State from '../State.js';
 
 class MessageFeed extends Component {

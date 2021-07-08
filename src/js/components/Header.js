@@ -1,9 +1,9 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import Identicon from './Identicon.js';
 import SearchBox from './SearchBox.js';
 import Icons from '../Icons.js';

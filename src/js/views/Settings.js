@@ -8,7 +8,7 @@ import PeerManager from '../PeerManager.js';
 import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../components/VideoCall.js';
 import CopyButton from '../components/CopyButton.js';
 import View from './View.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import {ExistingAccountLogin} from './Login.js';
 import Notifications from '../Notifications.js';
 import iris from 'iris-lib';

@@ -1,6 +1,6 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import { html } from '../Helpers.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';

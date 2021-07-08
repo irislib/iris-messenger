@@ -5,7 +5,7 @@ import Session from '../Session.js';
 import Helpers from '../Helpers.js';
 import PublicMessageForm from '../components/PublicMessageForm.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg.js';
 import CopyButton from '../components/CopyButton.js';
 import FollowButton from '../components/FollowButton.js';
@@ -13,7 +13,7 @@ import BlockButton from '../components/BlockButton.js';
 import MessageFeed from '../components/MessageFeed.js';
 import Identicon from '../components/Identicon.js';
 import View from './View.js';
-import { Link } from '../lib/preact.match.js';
+import { Link } from 'preact-router/match';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min.js';
 

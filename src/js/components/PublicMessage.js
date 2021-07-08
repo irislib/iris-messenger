@@ -3,7 +3,7 @@ import Helpers from '../Helpers.js';
 import Identicon from './Identicon.js';
 import PublicMessageForm from './PublicMessageForm.js';
 import State from '../State.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import Message from './Message.js';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';

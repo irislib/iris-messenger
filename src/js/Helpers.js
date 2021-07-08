@@ -1,8 +1,8 @@
 import Session from './Session.js';
 import {translate as t} from './Translation.js';
-import {createElement} from './lib/preact.js';
+import {createElement} from 'preact';
 import htm from './lib/htm.module.js';
-import { route } from './lib/preact-router.es.js';
+import { route } from 'preact-router';
 import $ from 'jquery';
 import _ from 'lodash';
 import iris from 'iris-lib';

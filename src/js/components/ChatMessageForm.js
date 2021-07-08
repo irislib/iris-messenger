@@ -1,4 +1,4 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';

@@ -1,5 +1,5 @@
-import { Component } from '../lib/preact.js';
-import { route } from '../lib/preact-router.es.js';
+import { Component } from 'preact';
+import { route } from 'preact-router';
 import Helpers, { html } from '../Helpers.js';
 import State from '../State.js';
 import Identicon from './Identicon.js';

@@ -1,4 +1,4 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import Helpers, {html} from '../Helpers.js';
 import Session from "../Session.js";
 import { translate as tr } from '../Translation.js';

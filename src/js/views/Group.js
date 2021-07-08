@@ -3,7 +3,7 @@ import {translate as tr} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg.js';
 import CopyButton from '../components/CopyButton.js';
 import Identicon from '../components/Identicon.js';

@@ -4,7 +4,7 @@ import { translate as t } from '../Translation.js';
 import LanguageSelector from '../components/LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import Helpers from '../Helpers.js';
 
 import logo from '../../img/android-chrome-192x192.png';

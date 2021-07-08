@@ -2,7 +2,7 @@ import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import {translate as t} from '../Translation.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import StoreView from './Store.js';
 
 class Product extends StoreView {

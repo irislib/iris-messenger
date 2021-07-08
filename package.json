@@ -27,15 +27,16 @@
     "sirv-cli": "1.0.3"
   },
   "dependencies": {
-    "preact": "^10.3.2",
-    "preact-render-to-string": "^5.1.4",
-    "preact-router": "^3.2.1",
     "@zxing/library": "^0.18.5",
     "autolinker": "^3.14.3",
     "gun": "^0.2020.1232",
     "iris-lib": "https://github.com/irislib/iris-lib",
     "jquery": "^3.6.0",
     "lodash": "^4.17.21",
+    "preact": "^10.3.2",
+    "preact-render-to-string": "^5.1.4",
+    "preact-router": "^3.2.1",
+    "preact-scroll-viewport": "^0.2.0",
     "webtorrent": "^0.118.0"
   },
   "jest": {

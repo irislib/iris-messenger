@@ -1,4 +1,4 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import Header from '../components/Header.js';
 import { html } from '../Helpers.js';
 

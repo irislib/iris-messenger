@@ -1,7 +1,6 @@
-import { render } from './lib/preact.js';
-import { Router } from './lib/preact-router.es.js';
-import { Component } from './lib/preact.js';
-import { Link } from './lib/preact.match.js';
+import { Component } from 'preact';
+import { Router } from 'preact-router';
+import { Link } from 'preact-router/match';
 import iris from 'iris-lib';
 
 import Helpers from './Helpers.js';
