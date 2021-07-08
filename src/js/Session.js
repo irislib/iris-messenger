@@ -369,6 +369,10 @@ function processMessage(chatId, msg, info) {
   if (!info.selfAuthored && msg.timeObj > (chat.myLastSeenTime || -Infinity)) {
     if (window.location.pathname !== '/chat/' + chatId || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chatId, 1);
+    } else {
+      if (ourActivity === 'active') {
+        chat.setMyMsgsLastSeenTime();
+      }
     }
   }
   if (!info.selfAuthored && msg.time > chat.theirMsgsLastSeenTime) {
