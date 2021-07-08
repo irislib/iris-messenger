@@ -51,7 +51,8 @@ class Chat extends View {
     this.setState({
       sortedMessages: this.sortedMessages,
       sortedParticipants: [],
-      showParticipants: true
+      showParticipants: true,
+      stickToBottom: true
     });
     this.iv = null;
     this.chat = null;
@@ -103,6 +104,15 @@ class Chat extends View {
     const container = document.getElementById("message-list");
     container.style.paddingBottom = 0;
     container.style.paddingTop = 0;
+    const el = $("#message-view");
+    el.off('scroll').on('scroll', () => {
+      const scrolledToBottom = (el[0].scrollHeight - el.scrollTop() == el.outerHeight());
+      if (this.state.stickToBottom && !scrolledToBottom) {
+        this.setState({stickToBottom: false});
+      } else if (!this.state.stickToBottom && scrolledToBottom) {
+        this.setState({stickToBottom: true});
+      }
+    });
   }
 
   setSortedParticipants() {
@@ -132,11 +142,14 @@ class Chat extends View {
   }
 
   componentDidUpdate(prevProps) {
+    if (this.state.stickToBottom) {
+      Helpers.scrollToMessageListBottom();
+    }
     if (prevProps.id !== this.props.id) {
       $('#not-seen-by-them').hide();
       this.componentDidMount();
     } else {
-      $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
+      $('.msg-content img').off('load').on('load', () => this.state.stickToBottom && Helpers.scrollToMessageListBottom());
       setTimeout(() => {
         if (this.chat && !this.chat.uuid && this.props.id !== Session.getPubKey()) {
           if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
