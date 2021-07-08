@@ -14,6 +14,8 @@ import MessageFeed from '../components/MessageFeed.js';
 import Identicon from '../components/Identicon.js';
 import View from './View.js';
 import { Link } from '../lib/preact.match.js';
+import $ from 'jquery';
+import QRCode from '../lib/qrcode.min.js';
 
 const SMS_VERIFIER_PUB = 'ysavwX9TVnlDw93w9IxezCJqSDMyzIU-qpD8VTN5yko.3ll1dFdxLkgyVpejFkEMOFkQzp_tRrkT3fImZEx94Co';
 

@@ -2,6 +2,7 @@ import { render } from './lib/preact.js';
 import { Router } from './lib/preact-router.es.js';
 import { Component } from './lib/preact.js';
 import { Link } from './lib/preact.match.js';
+import iris from 'iris-lib';
 
 import Helpers from './Helpers.js';
 import { html } from './Helpers.js';
@@ -34,21 +35,27 @@ import Footer from './components/Footer.js';
 import State from './State.js';
 import Icons from './Icons.js';
 
+import logo from '../img/icon128.png';
+import logoType from '../img/iris_logotype.png';
+
 if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redirect old urls
   window.location.href = window.location.href.replace('#/', '');
 }
 
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
+
+/*
 if (!isElectron && ('serviceWorker' in navigator)) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/serviceworker.js')
+    navigator.serviceWorker.register(new URL('../serviceworker.js', import.meta.url))
     .catch(function(err) {
       // registration failed :(
       console.log('ServiceWorker registration failed: ', err);
     });
   });
 }
+*/
 
 State.init();
 Session.init({autologin: window.location.pathname.length > 2});
@@ -85,8 +92,8 @@ class Menu extends Component {
       <div class="application-list">
         ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
           <a href="/" onClick=${() => this.menuLinkClicked()} class="hidden-xs" tabindex="0" class="logo">
-            <img class="hidden-xs" src="/img/icon128.png" width=40 height=40/>
-            <img src="/img/iris_logotype.png" height=23 width=41 />
+            <img class="hidden-xs" src=${logo} width=40 height=40/>
+            <img src=${logoType} height=23 width=41 />
           </a>
         `}
         <div class="visible-xs-block">
@@ -152,7 +159,7 @@ class Main extends Component {
       content = this.state.loggedIn ? html`
         ${isDesktopNonMac ? html`
           <div class="windows-titlebar">
-               <img src="/img/iris_logotype.png" height=16 width=28 />
+               <img src=${logoType} height=16 width=28 />
                <div class="title-bar-btns">
                     <button class="min-btn" onClick=${() => this.electronCmd('minimize')}>-</button>
                     <button class="max-btn" onClick=${() => this.electronCmd('maximize')}>+</button>
@@ -206,8 +213,6 @@ class Main extends Component {
   }
 }
 
-render(html`<${Main}/>`, document.body);
-
-document.body.style = 'opacity:1';
-
 Helpers.showConsoleWarning();
+
+export default Main;

@@ -3,6 +3,9 @@ import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
+import Autolinker from 'autolinker';
+import iris from 'iris-lib';
+import $ from 'jquery';
 import State from '../State.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});

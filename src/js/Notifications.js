@@ -2,6 +2,8 @@ import Helpers from './Helpers.js';
 import Session from './Session.js';
 import { route } from './lib/preact-router.es.js';
 import State from './State.js';
+import _ from 'lodash';
+import iris from 'iris-lib';
 
 const notificationSound = new Audio('../../audio/notification.mp3');
 let loginTime;

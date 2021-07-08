@@ -6,6 +6,8 @@ import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
 import Fuse from '../lib/fuse.basic.esm.min.js';
+import $ from 'jquery';
+import _ from 'lodash';
 
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 

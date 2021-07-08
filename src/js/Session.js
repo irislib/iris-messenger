@@ -3,6 +3,8 @@ import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import PeerManager from './PeerManager.js';
 import { route } from './lib/preact-router.es.js';
+import iris from 'iris-lib';
+import _ from 'lodash';
 
 let key;
 let myName;
@@ -210,7 +212,7 @@ function getPubKey() {
 
 function loginAsNewUser(name) {
   name = name || Helpers.generateName();
-  return Gun.SEA.pair().then(k => {
+  return SEA.pair().then(k => {
     login(k);
     name && State.public.user().get('profile').get('name').put(name);
     createChatLink();
@@ -235,7 +237,6 @@ function getFollows() {
 const myPeerUrl = ip => `http://${ip}:8767/gun`;
 
 function shareMyPeerUrl(channel) {
-  console.log('sharing my peer url', myPeerUrl(settings.electron.publicIp), channel.getId());
   channel.put && channel.put('my_peer', myPeerUrl(settings.electron.publicIp));
 }
 

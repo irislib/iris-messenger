@@ -2,6 +2,8 @@ import { Component } from '../lib/preact.js';
 import { html } from '../Helpers.js';
 import State from '../State.js';
 import SafeImg from './SafeImg.js';
+import iris from 'iris-lib';
+import $ from 'jquery';
 
 class Identicon extends Component {
 

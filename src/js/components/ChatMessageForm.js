@@ -4,6 +4,11 @@ import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
+import '../lib/emoji-button.js';
+import iris from 'iris-lib';
+import _ from 'lodash';
+import $ from 'jquery';
+import EmojiButton from '../lib/emoji-button.js';
 
 const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
 
@@ -65,7 +70,6 @@ class ChatMessageForm extends Component {
   }
 
   downloadWebtorrent(torrentId) {
-    console.log('trying to open webtorrent', torrentId);
     function onTorrent(torrent) {
       // Torrents can contain many files. Let's use the .mp4 file
       var file = torrent.files.find(function (file) {

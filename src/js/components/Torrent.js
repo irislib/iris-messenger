@@ -2,6 +2,7 @@ import { Component } from '../lib/preact.js';
 import Helpers, {html} from '../Helpers.js';
 import Session from "../Session.js";
 import { translate as tr } from '../Translation.js';
+import $ from 'jquery';
 import State from '../State.js';
 import Icons from '../Icons.js';
 

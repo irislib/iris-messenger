@@ -7,6 +7,8 @@ import Session from '../Session.js';
 import { Component } from '../lib/preact.js';
 import Helpers from '../Helpers.js';
 
+import logo from '../../img/android-chrome-192x192.png';
+
 class Login extends Component {
   componentDidMount() {
     const el = document.getElementById('login-form-name');
@@ -77,7 +79,7 @@ class Login extends Component {
         ${!this.state.showSwitchAccount ? html`
           <form id="login-form" autocomplete="off" onSubmit=${e => this.onLoginFormSubmit(e)}>
             <div id="create-account">
-              <img style="width: 86px" src="/img/android-chrome-192x192.png" alt="Iris"/>
+              <img style="width: 86px" src=${logo} alt="Iris"/>
               <h1>Iris</h1>
               <input onInput=${e => this.onNameChange(e)} autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
               <p><button id="sign-up" type="submit">${t('new_user_go')}</button></p>

@@ -1,6 +1,8 @@
-const window = self;
+import Gun from 'gun';
+import 'gun/sea';
+import './js/lib/localforage.min.js';
+
 const urlToOpen = new URL('/', self.location.origin).href;
-self.importScripts('js/lib/gun.js', 'js/lib/sea.js', 'js/lib/localforage.min.js');
 var CACHE_NAME = 'iris-messenger-cache-v1';
 
 async function getSavedKey() {

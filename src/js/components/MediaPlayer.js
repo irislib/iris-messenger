@@ -3,6 +3,7 @@ import {html} from '../Helpers.js';
 import State from '../State.js';
 import Icons from '../Icons.js';
 import Helpers from '../Helpers.js';
+import $ from 'jquery';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4))  !== -1;
 const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);

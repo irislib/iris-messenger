@@ -7,9 +7,9 @@ import Session from '../Session.js';
 
 import State from '../State.js';
 
-var ringSound = new Audio('../../audio/ring.mp3');
+const ringSound = new Audio('../../audio/ring.mp3');
 ringSound.loop = true;
-var callSound = new Audio('../../audio/call.mp3');
+const callSound = new Audio('../../audio/call.mp3');
 var callTimeout;
 var callSoundTimeout;
 var callingInterval;
@@ -39,9 +39,9 @@ class VideoCall extends Component {
     State.local.get('activeCall').put(null);
     State.local.get('outgoingCall').put(null);
     State.local.get('incomingCall').put(null);
-    State.local.get('call').open(call => {
+    /*State.local.get('call').open(call => {
       this.onCallMessage(call.pub, call.call);
-    });
+    });*/
     State.local.get('incomingCall').on(incomingCall => {
       if (!incomingCall) {
         clearTimeout(callTimeout);

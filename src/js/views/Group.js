@@ -10,6 +10,8 @@ import Identicon from '../components/Identicon.js';
 import Name from '../components/Name.js';
 import View from './View.js';
 import SearchBox from '../components/SearchBox.js';
+import $ from 'jquery';
+import QRCode from '../lib/qrcode.min.js';
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
@@ -280,7 +282,7 @@ class Group extends View {
 }
 
 function areWeAdmin(uuid) {
-  const me = Session.channels[uuid].participantProfiles[Session.getKey().pub];
+  const me = Session.channels[uuid] && Session.channels[uuid].participantProfiles[Session.getKey().pub];
   return !!(me && me.permissions && me.permissions.admin);
 }
 

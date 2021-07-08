@@ -7,6 +7,11 @@ import { route } from '../lib/preact-router.es.js';
 import Identicon from './Identicon.js';
 import SearchBox from './SearchBox.js';
 import Icons from '../Icons.js';
+import iris from 'iris-lib';
+
+import logo from '../../img/icon128.png';
+import logoType from '../../img/iris_logotype.png';
+
 
 class Header extends Component {
   constructor() {
@@ -113,8 +118,8 @@ class Header extends Component {
       <div class="header-content">
         ${iris.util.isElectron || (activeRoute && activeRoute.indexOf('/chat/') === 0) ? '' : html`
           <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
-            <img src="/img/icon128.png" width=40 height=40/>
-            <img src="/img/iris_logotype.png" height=23 width=41 />
+            <img src=${logo} width=40 height=40/>
+            <img src=${logoType} height=23 width=41 />
           </a>
         `}
         <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>

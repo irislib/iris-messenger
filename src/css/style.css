@@ -29,7 +29,6 @@ html {
 }
 
 body {
-  opacity: 0;
   font-size: 15px;
   color: var(--text-color);
   font-family: "SF Pro Text", "SF Pro Icons", system, -apple-system, system-ui, system-ui, "Helvetica Neue", Helvetica, "Lucida Grande", sans-serif;

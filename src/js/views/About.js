@@ -1,6 +1,7 @@
 import {translate as t} from '../Translation.js';
 import { html } from '../Helpers.js';
 import View from './View.js';
+import iris from 'iris-lib';
 
 class About extends View {
   constructor() {
