@@ -3,6 +3,7 @@ import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
+import State from '../State.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
@@ -24,9 +25,22 @@ class Message extends Component {
       }
     });
 
-    const seen = this.getSeenStatus().seen;
-    if (!seen) {
-      State.local.get('channels').get(this.props.id).get('theirLastSeenTime')
+    const status = this.getSeenStatus().seen;
+    if (!status.delivered) {
+      State.local.get('channels').get(this.props.chatId).get('theirLastActiveTime').on((v, k, a, e) => {
+        if (this.getSeenStatus().delivered) {
+          this.setState({});
+          e.off();
+        }
+      });
+    }
+    if (!status.seen) {
+      State.local.get('channels').get(this.props.chatId).get('theirMsgsLastSeenTime').on((v, k, a, e) => {
+        if (this.getSeenStatus().seen) {
+          this.setState({});
+          e.off();
+        }
+      });
     }
   }
 
