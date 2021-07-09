@@ -12,6 +12,7 @@ import iris from 'iris-lib';
 import logo from '../../assets/img/icon128.png';
 import logoType from '../../assets/img/iris_logotype.png';
 
+import $ from 'jquery';
 
 class Header extends Component {
   constructor() {
