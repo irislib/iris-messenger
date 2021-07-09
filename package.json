@@ -37,6 +37,7 @@
     "preact-render-to-string": "^5.1.4",
     "preact-router": "^3.2.1",
     "preact-scroll-viewport": "^0.2.0",
+    "react-virtualized": "^9.22.3",
     "webtorrent": "^0.118.0"
   },
   "jest": {

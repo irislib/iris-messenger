@@ -1,8 +1,10 @@
 import { Component } from 'preact';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
-import ScrollViewport from 'preact-scroll-viewport';
+import {List, WindowScroller} from 'react-virtualized';
 import State from '../State.js';
+import 'react-virtualized/styles.css';
+import $ from 'jquery';
 
 class MessageFeed extends Component {
   constructor() {
@@ -50,14 +52,34 @@ class MessageFeed extends Component {
   }
 
   render() {
-    const thumbnails = this.props.thumbnails ? 'thumbnail-items' : '';
+    const rowRenderer = ({ key, style, index }) => {
+      const hash = this.state.sortedMessages[index];
+      const msg = typeof hash === 'string' ? html`<${PublicMessage} filter=${this.props.filter} hash=${hash} key=${hash} showName=${true} />` : '';
+      return html`
+        <div key=${key} style=${style}>
+          ${msg}
+        </div>
+      `;
+    }
+
     return html`
       <div class="feed-container">
-        <${ScrollViewport} class=${thumbnails} rowHeight=${165}>
-          ${this.state.sortedMessages.map(
-            hash => typeof hash === 'string' ? html`<${PublicMessage} thumbnail=${this.props.thumbnails} filter=${this.props.filter} hash=${hash} key=${hash} showName=${true} />` : ''
-          )}
-        </${ScrollViewport}>
+          <${WindowScroller} scrollElement=${$('.main-view')[0]}>
+            ${({ height, width, isScrolling, onChildScroll, scrollTop }) => html`
+              <${List}
+                autoHeight
+                autoWidth
+                width=${width}
+                height=${height}
+                isScrolling=${isScrolling}
+                onScroll=${onChildScroll}
+                scrollTop=${scrollTop}
+                rowCount=${this.state.sortedMessages.length}
+                rowHeight=${165}
+                rowRenderer=${rowRenderer}
+              />
+            `}
+          </${WindowScroller}>
       </div>
     `;
   }
