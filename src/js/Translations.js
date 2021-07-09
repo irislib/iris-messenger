@@ -140,6 +140,7 @@ export default {
     or_small: "or",
     automatically_load_webtorrent_attachments: "Automatically load webtorrent attachments",
     autoplay_webtorrent_videos: "Autoplay webtorrent videos",
+    no_contacts_in_list: 'You don\'t have any contacts in your list.',
 
   },
    "es": {
@@ -241,6 +242,7 @@ export default {
     call_ended: "Llamada finalizada",
     calling: "Llamando",
     on_call_with: "En comunicación con",
+    no_contacts_in_list: 'No tienes ningún contacto en tu lista.',
   },
   "pt-BR": {
     language_name: "Português Brasil",
@@ -341,6 +343,7 @@ export default {
     call_ended: "Chamada encerrada",
     calling: "Chamando",
     on_call_with: "Em chamada com",
+    no_contacts_in_list: 'Você não tem nenhum contato na sua lista.'
   },
 "ru": {
     language_name: "Русский",
@@ -788,6 +791,7 @@ export default {
     call_ended: "Chiamata conclusa",
     calling: "Chiamata in corso",
     on_call_with: "In chiamata con",
+    no_contacts_in_list: 'Non hai contatti nella tua lista.',
   },
   "zh-cn":{
     language_name: "中文",

@@ -1595,6 +1595,12 @@ form.public {
   display: none;
 }
 
+.no-contacts-placeholder {
+  text-align: center;
+  font-size: 20px;
+  color: rgba(0,0,0,0.5)
+}
+
 .profile-link-container {
   margin-bottom: 15px;
   display: flex;

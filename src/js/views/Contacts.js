@@ -42,6 +42,13 @@ class Contacts extends View {
 
   renderView() {
     const keys = Object.keys(this.contacts);
+    if (keys.length === 0) {
+      return html`
+      <div class="centered-container">
+        <div class="no-contacts-placeholder">${t('no_contacts_in_list')}</div>
+      </div>
+      `
+    }
     keys.sort((a,b) => {
       const aF = this.contacts[a].followers && this.contacts[a].followers.size || 0;
       const bF = this.contacts[b].followers && this.contacts[b].followers.size || 0;
