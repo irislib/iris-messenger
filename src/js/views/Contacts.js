@@ -45,7 +45,7 @@ class Contacts extends View {
     if (keys.length === 0) {
       return html`
       <div class="centered-container">
-        <div class="no-contacts-placeholder">${t('no_contacts_in_list')}</div>
+        ${t('no_contacts_in_list')}
       </div>
       `
     }
