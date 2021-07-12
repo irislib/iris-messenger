@@ -243,7 +243,7 @@ class Store extends View {
 
     State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
 
-    State.local.get('follows').map().on((isFollowing, user, a, e) => {
+    State.local.get('groups').get('follows').map().on((isFollowing, user, a, e) => {
       if (isFollowing && this.state.noFollows && Session.getPubKey() !== user) {
         State.local.get('noFollows').put(false);
         e.off();

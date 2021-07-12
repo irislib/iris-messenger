@@ -11,6 +11,7 @@ let latestChatLink;
 let onlineTimeout;
 let ourActivity;
 let hasFollowers;
+let hasFollows;
 const follows = {};
 const blocks = {};
 const channels = window.channels = {};
@@ -51,7 +52,7 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
 
   addFollow(k, currentDepth - 1);
 
-  State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: .on for unfollow
+  State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
     if (follows[followedKey] === isFollowing) { return; }
     if (isFollowing) {
       addFollow(followedKey, currentDepth, k);
@@ -98,6 +99,21 @@ function setOurOnlineStatus() {
   });
 }
 
+function updateGroups() {
+  getExtendedFollows((k, info) => {
+    if (!hasFollows && info.followDistance >= 1) { State.local.get('noFollows').put(false); }
+    if (info.followDistance <= 1) {
+      State.local.get('groups').get('follows').get(k).put(true);
+    } else if (info.followDistance <= 2) {
+      State.local.get('groups').get('2ndDegreeFollows').get(k).put(true);
+    }
+    State.local.get('groups').get('everyone').get(k).put(true);
+    if (!hasFollowers && k === getPubKey() && info.followers.size) {
+      State.local.get('noFollowers').put(false);
+    }
+  });
+}
+
 function login(k) {
   const shouldRefresh = !!key;
   key = k;
@@ -136,20 +152,15 @@ function login(k) {
     myProfilePhoto = data;
   });
   State.public.get('follow').put({a:null});
-  State.local.get('follows').put({a:null});
+  State.local.get('groups').get('follows').put({a:null});
   Notifications.init();
   State.local.get('loggedIn').put(true);
   State.public.get('block').map().on((isBlocked, user) => {
     blocks[user] = isBlocked;
     isBlocked && (follows[user] = null);
-    State.local.get('follows').get(user).put(isBlocked);
+    State.local.get('groups').get('follows').get(user).put(isBlocked);
   });
-  getExtendedFollows((k, info) => {
-    State.local.get('follows').get(k).put(true);
-    if (!hasFollowers && k === getPubKey() && info.followers.size) {
-      State.local.get('noFollowers').put(false);
-    }
-  });
+  updateGroups();
   State.public.user().get('msgs').put({a:null}); // These need to be initialised for some reason, otherwise 1st write is slow
   State.public.user().get('replies').put({a:null});
   State.public.user().get('likes').put({a:null});

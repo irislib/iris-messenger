@@ -16,7 +16,7 @@ const State = {
     window.iris.util.setPublicState && window.iris.util.setPublicState(this.public);
   },
 
-  group: function(groupNode = State.local.get('follows')) {
+  group: function(groupNode = State.local.get('groups').get('everyone')) {
     return {
       get: function(path, callback) {
         const follows = {};
