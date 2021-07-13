@@ -36,7 +36,10 @@ class MessageFeed extends Component {
     if (this.props.node) {
       this.props.node.map().on((...args) => this.handleMessage(...args));
     } else if (this.props.group && this.props.path) { // TODO: make group use the same basic gun api
-      State.group(State.local.get('groups').get(this.props.group)).map(this.props.path, (...args) => this.handleMessage(...args));
+      const group = this.props.group === 'follows' ?
+        State.public.user().get('follow') :
+        State.local.get('groups').get(this.props.group);
+      State.group(group).map(this.props.path, (...args) => this.handleMessage(...args));
     }
   }
 
