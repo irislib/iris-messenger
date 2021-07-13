@@ -13,7 +13,6 @@ let ourActivity;
 let hasFollowers;
 let hasFollows;
 const follows = {};
-const blocks = {};
 const channels = window.channels = {};
 
 const DEFAULT_SETTINGS = {
@@ -166,10 +165,11 @@ function login(k) {
   State.local.get('groups').get('follows').put({a:null});
   Notifications.init();
   State.local.get('loggedIn').put(true);
-  State.public.get('block').map().on((isBlocked, user) => {
-    blocks[user] = isBlocked;
-    isBlocked && (follows[user] = null);
-    State.local.get('groups').get('follows').get(user).put(isBlocked);
+  State.public.user().get('block').map().on((isBlocked, user) => {
+    State.local.get('block').get(user).put(isBlocked);
+    if (isBlocked) {
+      delete follows[user];
+    }
   });
   updateGroups();
   State.public.user().get('msgs').put({a:null}); // These need to be initialised for some reason, otherwise 1st write is slow
