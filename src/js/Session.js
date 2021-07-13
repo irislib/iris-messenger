@@ -50,6 +50,15 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
     callback(k, follows[k]);
   }
 
+  function removeFollow(k, followDistance, follower) {
+    if (follows[k]) {
+      follows[k].followers.delete(follower);
+      if (followDistance === 1) {
+        State.local.get('groups').get('follows').get(k).put(false);
+      }
+    }
+  }
+
   addFollow(k, currentDepth - 1);
 
   State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
@@ -59,6 +68,8 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
       if (currentDepth < maxDepth) {
         getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
       }
+    } else {
+      removeFollow(followedKey, currentDepth, k);
     }
   });
 
