@@ -4,7 +4,7 @@ Gun.on('create', function(root){
     if(Gun.TESTING){ root.opt.file = 'radatatest' }
     this.to.next(root);
     var opt = root.opt, empty = {}, u;
-    if(false === opt.radisk){ return }
+    if(false === opt.rad || false === opt.radisk){ return }
     var Radisk = (Gun.window && Gun.window.Radisk) || require('./radisk');
     var Radix = Radisk.Radix;
     var dare = Radisk(opt), esc = String.fromCharCode(27);
@@ -26,7 +26,7 @@ Gun.on('create', function(root){
         }, id, DBG && (DBG.r = DBG.r || {}));
         DBG && (DBG.sps = DBG.sps || +new Date);
     });
-    var count = {}, obj_empty = Gun.obj.empty;
+    var count = {}, obj_empty = Object.empty;
  
     root.on('get', function(msg){
         this.to.next(msg);
@@ -56,7 +56,7 @@ Gun.on('create', function(root){
         if((tmp = get['%']) || o.limit){
             o.limit = (tmp <= (o.pack || (1000 * 100)))? tmp : 1;
         }
-        if(has['-'] || (soul||{})['-'] || get['-']){ o.reverse = true; }
+        if(has['-'] || (soul||{})['-']){ o.reverse = true }
         if((tmp = (root.next||'')[soul]) && tmp.put){
             if(o.atom){
                 tmp = (tmp.next||'')[o.atom] ;
@@ -89,7 +89,7 @@ Gun.on('create', function(root){
                     if(o.atom){
                         data = u;
                     } else {
-                        Radix.map(data, each, o); // IS A RADIX TREE, NOT FUNCTION!
+                        Radix.map(data, each); // IS A RADIX TREE, NOT FUNCTION!
                     }
                 }
                 if(!graph && data){ each(data, '') }
@@ -136,7 +136,7 @@ Gun.on('create', function(root){
             (graph = graph || {})[soul] = Gun.state.ify(graph[soul], has, state, val, soul);
         }
     });
-    var val_is = Gun.val.is
+    var val_is = Gun.valid;
     opt.store.stats = {get:{time:{}, count:0}, put: {time:{}, count:0}}; // STATS!
     var statg = 0, statp = 0; // STATS!
 });

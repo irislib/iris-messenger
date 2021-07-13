@@ -6,8 +6,7 @@ var MAX_PEER_LIST_SIZE = 10;
 const ELECTRON_GUN_URL = 'http://localhost:8767/gun';
 var maxConnectedPeers = iris.util.isElectron ? 2 : 1;
 const DEFAULT_PEERS = {
-  'https://iris.cx/gun': {},
-  'https://gun-us.herokuapp.com/gun': {}
+  'http://localhost:8765/gun': {},
 };
 var knownPeers = getSavedPeers();
 
