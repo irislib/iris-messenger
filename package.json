@@ -30,6 +30,7 @@
     "@zxing/library": "^0.18.6",
     "autolinker": "^3.14.3",
     "gun": "^0.2020.1232",
+    "immutable": "^4.0.0-rc.14",
     "iris-lib": "0.0.156",
     "jquery": "^3.6.0",
     "lodash": "^4.17.21",
