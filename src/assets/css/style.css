@@ -128,6 +128,10 @@ img, video {
   margin-left: 5px;
 }
 
+.filters .msg-content {
+  flex-direction: row !important;
+}
+
 .msg-content video, .message-form video {
   width: 100%;
   outline: none;

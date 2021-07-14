@@ -241,7 +241,7 @@ class Profile extends View {
       }
       this.setState({followedUserCount: this.followedUsers.size});
     });
-    State.local.get('follows').map().once((following,key) => {
+    State.local.get('groups').get('follows').map().once((following,key) => {
       if (following) {
         State.public.user(key).get('follow').get(pub).once(following => {
           if (following) {
