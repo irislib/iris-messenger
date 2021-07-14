@@ -34,6 +34,7 @@ class Feed extends View {
 
   componentDidMount() {
     this.search();
+    State.local.get('filters').get('group').on(group => this.setState({group}));
     State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
     State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
   }
@@ -88,7 +89,7 @@ class Feed extends View {
   }
 
   toggleGroup(group) {
-    this.setState({group});
+    State.local.get('filters').get('group').put(group);
   }
 
   renderView() {
