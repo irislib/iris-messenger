@@ -133,6 +133,10 @@ img, video {
   flex-direction: row !important;
 }
 
+.filters {
+  width: 100%;
+}
+
 .msg-content video, .message-form video {
   width: 100%;
   outline: none;

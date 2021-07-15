@@ -22,6 +22,7 @@ class Store extends View {
     this.state = {items:{}};
     this.items = {};
     this.id = 'profile';
+    this.class = 'public-messages-view';
   }
 
   addToCart(k, user, e) {
