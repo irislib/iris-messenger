@@ -23,18 +23,18 @@ export default class Filters extends Component {
         const s = this.state;
         return html`<div class="msg filters">
             <div class="msg-content">
+            <input checked=${s.group === "follows"} type="radio"/>
             <label onClick=${() => this.toggleGroup("follows")}>
-                <input checked=${s.group === "follows"} type="radio"/>
                 Follows
             </label>
             
+            <input checked=${s.group === "2ndDegreeFollows"} type="radio"/>
             <label onClick=${() => this.toggleGroup("2ndDegreeFollows")}>
-                <input checked=${s.group === "2ndDegreeFollows"} type="radio"/>
                 2nd degree follows
             </label>
             
+            <input checked=${s.group === "everyone"} type="radio"/>
             <label for="filterGroupChoice3" onClick=${() => this.toggleGroup("everyone")}>
-                <input checked=${s.group === "everyone"} type="radio"/>
                 Everyone
             </label>
             </div>

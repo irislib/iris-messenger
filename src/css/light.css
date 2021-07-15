@@ -39,4 +39,6 @@
     --non-string-value-color: blue;
     --nav-border-bottom: 1px solid rgba(0,0,0,.08);
     --positive-color: #80bf5e;
+    --radio-button-background: #fff;
+    --radio-button-checked-background: #00a0d1;
 }
