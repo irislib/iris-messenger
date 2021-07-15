@@ -210,7 +210,7 @@ async function logOut() {
   // TODO: remove subscription from your channels
   if (navigator.serviceWorker) {
     const reg = await navigator.serviceWorker.getRegistration();
-    if (reg) {
+    if (reg && reg.pushManager) {
       reg.active.postMessage({key: null});
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
