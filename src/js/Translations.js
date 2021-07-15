@@ -140,8 +140,13 @@ export default {
     or_small: "or",
     automatically_load_webtorrent_attachments: "Automatically load webtorrent attachments",
     autoplay_webtorrent_videos: "Autoplay webtorrent videos",
+    home: "Home",
+    media: "Media",
+    messages: "Messages",
+    market: "Market",
+    contacts: "Contacts",
+    explorer: "Explorer",
     no_contacts_in_list: 'You don\'t have any contacts in your list.',
-
   },
    "es": {
     language_name: "Español",
@@ -689,8 +694,7 @@ export default {
     or_small: "tai",
     automatically_load_webtorrent_attachments: "Lataa webtorrentin liitteet automaattisesti",
     autoplay_webtorrent_videos: "Käynnistä webtorrentin videot automaattisesti",
-
-
+    search: "Etsi",
   },
   "it": {
     language_name: "Italian",

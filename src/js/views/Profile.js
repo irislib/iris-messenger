@@ -168,7 +168,7 @@ class Profile extends View {
       <${Link} activeClassName="active" href="/profile/${this.props.id}">${t('posts')}<//>
       <${Link} activeClassName="active" href="/replies/${this.props.id}">${t('replies')}<//>
       <${Link} activeClassName="active" href="/likes/${this.props.id}">${t('likes')}<//>
-      <${Link} activeClassName="active" href="/media/${this.props.id}">Media<//>
+      <${Link} activeClassName="active" href="/media/${this.props.id}">${t('media')}<//>
     </div>
     `;
   }
