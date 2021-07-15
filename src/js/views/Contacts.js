@@ -18,7 +18,7 @@ class Contacts extends View {
 
   getContacts() {
     const f = Session.getFollows();
-    State.local.get('follows').map().on((contacts, pub, b, e) => {
+    State.local.get('groups').get('everyone').map().on((contacts, pub, b, e) => {
       if (pub === Session.getPubKey()) { return; }
       this.eventListeners['follow'] = e;
       if (contacts) {
@@ -42,6 +42,13 @@ class Contacts extends View {
 
   renderView() {
     const keys = Object.keys(this.contacts);
+    if (keys.length === 0) {
+      return html`
+      <div class="centered-container">
+        ${t('no_contacts_in_list')}
+      </div>
+      `
+    }
     keys.sort((a,b) => {
       const aF = this.contacts[a].followers && this.contacts[a].followers.size || 0;
       const bF = this.contacts[b].followers && this.contacts[b].followers.size || 0;

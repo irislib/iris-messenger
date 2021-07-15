@@ -5,6 +5,7 @@ import Session from '../Session.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from '../components/SafeImg.js';
+import Filters from '../components/Filters.js';
 import CopyButton from '../components/CopyButton.js';
 import FollowButton from '../components/FollowButton.js';
 import Identicon from '../components/Identicon.js';
@@ -21,6 +22,7 @@ class Store extends View {
     this.state = {items:{}};
     this.items = {};
     this.id = 'profile';
+    this.class = 'public-messages-view';
   }
 
   addToCart(k, user, e) {
@@ -72,7 +74,7 @@ class Store extends View {
                 ${followable ? html`<${FollowButton} id=${user}/>` : ''}
                 <button onClick=${() => route('/chat/' + user)}>${t('send_message')}</button>
                 ${uuid ? '' : html`
-                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.pathname}/>
                 `}
               </div>
             </div>
@@ -117,6 +119,7 @@ class Store extends View {
     const cartTotalItems = Object.keys(this.cart).reduce((sum, k) => sum + this.cart[k], 0);
     const keys = Object.keys(this.state.items);
     return html`
+      ${(this.props.store || this.state.noFollows) ? '' : html`<${Filters}/>`}
       ${cartTotalItems ? html`
         <p>
           <button onClick=${() => route('/checkout')}>${t('shopping_cart')}(${cartTotalItems})</button>
@@ -132,15 +135,15 @@ class Store extends View {
         ${keys.map(k => {
           const i = this.state.items[k];
           return html`
-            <div class="thumbnail-item store-item" onClick=${() => route(`/product/${k}/${i.user}`)}>
+            <div class="thumbnail-item store-item" onClick=${() => route(`/product/${k}/${i.from}`)}>
               <${SafeImg} src=${i.photo}/>
-              <a href="/product/${k}/${i.user}" class="name">${i.name}</a>
+              <a href="/product/${k}/${i.from}" class="name">${i.name}</a>
               ${this.props.store ? '':html`
-                <small>by <iris-text path="profile/name" editable="false" placeholder="Name" user=${i.user}/></small>
+                <small>by <iris-text path="profile/name" editable="false" placeholder="Name" user=${i.from}/></small>
               `}
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>
-              <button class="add" onClick=${e => this.addToCart(k, i.user, e)}>
+              <button class="add" onClick=${e => this.addToCart(k, i.from, e)}>
               ${t('add_to_cart')}
                 ${this.cart[k] ? ` (${this.cart[k]})` : ''}
               </button>
@@ -194,19 +197,23 @@ class Store extends View {
     });
   }
 
+  onProduct(p, id, a, e, from) {
+    this.eventListeners['products' + from] = e;
+    if (p) {
+      const o = {};
+      p.from = from;
+      o[id] = p;
+      Object.assign(this.items, o);
+      this.updateTotalPrice();
+    } else {
+      delete this.items[id];
+    }
+    this.setState({items: this.items});
+  }
+
   getProductsFromUser(user) {
-    State.public.user(user).get('store').get('products').map().on((p, id, a, e) => {
-      this.eventListeners['products' + user] = e;
-      if (p) {
-        const o = {};
-        p.user = user;
-        o[id] = p;
-        Object.assign(this.items, o);
-        this.updateTotalPrice();
-      } else {
-        delete this.items[id];
-      }
-      this.setState({items: this.items});
+    State.public.user(user).get('store').get('products').map().on((...args) => {
+      return this.onProduct(...args, user);
     });
   }
 
@@ -223,18 +230,9 @@ class Store extends View {
     });
   }
 
-  getAllProducts() {
-    const follows = {};
-    State.local.get('follows').map().on((isFollowing, user, a, e) => {
-      this.state.noFollows && Session.getPubKey() !== user && State.local.get('noFollows').put(false);
-      this.eventListeners['follows'] = e;
-      if (!isFollowing) {
-        delete follows[user];
-        return;
-      }
-      if (follows[user]) { return; }
-      follows[user] = true;
-      this.getProductsFromUser(user);
+  getAllProducts(group) {
+    State.group(group).map('store/products', (...args) => {
+      this.onProduct(...args);
     });
   }
 
@@ -248,12 +246,28 @@ class Store extends View {
 
     State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
 
+    State.local.get('groups').get('follows').map().on((isFollowing, user, a, e) => {
+      if (isFollowing && this.state.noFollows && Session.getPubKey() !== user) {
+        State.local.get('noFollows').put(false);
+        e.off();
+      }
+    });
+
     if (user) {
       this.getCartFromUser(user);
       this.getProductsFromUser(user);
     } else {
+      let prevGroup;
+      State.local.get('filters').get('group').on((group,k,x,e) => {
+        if (group !== prevGroup) {
+          this.items = {};
+          this.setState({items:{}});
+          prevGroup = group;
+          this.eventListeners.push(e);
+          this.getAllProducts(group);
+        }
+      });
       this.getAllCarts();
-      this.getAllProducts();
     }
   }
 }

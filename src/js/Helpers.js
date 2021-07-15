@@ -1289,6 +1289,9 @@ const adjectives = [
   'realistic',
   'back',
   'decent',
+  'decentralized',
+  'bitcoin',
+  'cypherpunk',
   'unnecessary',
   'flying',
   'random',
@@ -1999,26 +2002,24 @@ export default {
   },
 
   getProfileLink(pub) {
-    console.log(pub);
     return 'https://iris.to/profile/' + encodeURIComponent(pub);
   },
 
   followChatLink(str) {
     if (str && str.indexOf('http') === 0) {
-      if (str.indexOf('https://iris.to/') === 0) {
-        route(str.replace('https://iris.to/', ''));
+      const s = str.split('?');
+      let chatId;
+      if (s.length === 2) {
+        chatId = this.getUrlParameter('chatWith', s[1]) || this.getUrlParameter('channelId', s[1]);
+      }
+      if (chatId) {
+        Session.newChannel(chatId, str);
+        route('/chat/' + chatId);
         return true;
-      } else if (str.length > 30) {
-        const s = str.split('?');
-        let chatId;
-        if (s.length === 2) {
-          chatId = this.getUrlParameter('chatWith', s[1]) || this.getUrlParameter('channelId', s[1]);
-        }
-        if (chatId) {
-          Session.newChannel(chatId, str);
-          route('/chat/' + chatId);
-          return true;
-        }
+      }
+      if (str.indexOf('https://iris.to') === 0) {
+        route(str.replace('https://iris.to', ''));
+        return true;
       }
     }
   }

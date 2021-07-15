@@ -11,8 +11,8 @@ let latestChatLink;
 let onlineTimeout;
 let ourActivity;
 let hasFollowers;
+let hasFollows;
 const follows = {};
-const blocks = {};
 const channels = window.channels = {};
 
 const DEFAULT_SETTINGS = {
@@ -30,7 +30,7 @@ const DEFAULT_SETTINGS = {
 
 const settings = DEFAULT_SETTINGS;
 
-function getFollowsFn(callback, k, maxDepth = 3, currentDepth = 1) {
+function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   k = k || key.pub;
 
   function addFollow(k, followDistance, follower) {
@@ -49,15 +49,26 @@ function getFollowsFn(callback, k, maxDepth = 3, currentDepth = 1) {
     callback(k, follows[k]);
   }
 
+  function removeFollow(k, followDistance, follower) {
+    if (follows[k]) {
+      follows[k].followers.delete(follower);
+      if (followDistance === 1) {
+        State.local.get('groups').get('follows').get(k).put(false);
+      }
+    }
+  }
+
   addFollow(k, currentDepth - 1);
 
-  State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: .on for unfollow
+  State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
     if (follows[followedKey] === isFollowing) { return; }
     if (isFollowing) {
       addFollow(followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        getFollowsFn(callback, followedKey, maxDepth, currentDepth + 1);
+        getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
       }
+    } else {
+      removeFollow(followedKey, currentDepth, k);
     }
   });
 
@@ -65,10 +76,10 @@ function getFollowsFn(callback, k, maxDepth = 3, currentDepth = 1) {
 }
 
 function setOurOnlineStatus() {
-  const activeRoute = window.location.hash;
+  const activeRoute = window.location.pathname;
   iris.Channel.setActivity(State.public, ourActivity = 'active');
   const setActive = _.debounce(() => {
-    const chat = activeRoute && channels[activeRoute.replace('#/profile/','').replace('#/chat/','')];
+    const chat = activeRoute && channels[activeRoute.replace('/profile/','').replace('/chat/','')];
     if (chat && !ourActivity) {
       chat.setMyMsgsLastSeenTime();
     }
@@ -82,7 +93,7 @@ function setOurOnlineStatus() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
       iris.Channel.setActivity(State.public, ourActivity = 'active');
-      const chatId = activeRoute.replace('#/profile/','').replace('#/chat/','');
+      const chatId = activeRoute.replace('/profile/','').replace('/chat/','');
       const chat = activeRoute && channels[chatId];
       if (chat) {
         chat.setMyMsgsLastSeenTime();
@@ -95,6 +106,21 @@ function setOurOnlineStatus() {
   setActive();
   window.addEventListener("beforeunload", () => {
     iris.Channel.setActivity(State.public, ourActivity = null);
+  });
+}
+
+function updateGroups() {
+  getExtendedFollows((k, info) => {
+    if (!hasFollows && info.followDistance >= 1) { State.local.get('noFollows').put(false); }
+    if (info.followDistance <= 1) {
+      State.local.get('groups').get('follows').get(k).put(true);
+    } else if (info.followDistance <= 2) {
+      State.local.get('groups').get('2ndDegreeFollows').get(k).put(true);
+    }
+    State.local.get('groups').get('everyone').get(k).put(true);
+    if (!hasFollowers && k === getPubKey() && info.followers.size) {
+      State.local.get('noFollowers').put(false);
+    }
   });
 }
 
@@ -136,20 +162,16 @@ function login(k) {
     myProfilePhoto = data;
   });
   State.public.get('follow').put({a:null});
-  State.local.get('follows').put({a:null});
+  State.local.get('groups').get('follows').put({a:null});
   Notifications.init();
   State.local.get('loggedIn').put(true);
-  State.public.get('block').map().on((isBlocked, user) => {
-    blocks[user] = isBlocked;
-    isBlocked && (follows[user] = null);
-    State.local.get('follows').get(user).put(isBlocked);
-  });
-  getFollowsFn((k, info) => {
-    State.local.get('follows').get(k).put(true);
-    if (!hasFollowers && k === getPubKey() && info.followers.size) {
-      State.local.get('noFollowers').put(false);
+  State.public.user().get('block').map().on((isBlocked, user) => {
+    State.local.get('block').get(user).put(isBlocked);
+    if (isBlocked) {
+      delete follows[user];
     }
   });
+  updateGroups();
   State.public.user().get('msgs').put({a:null}); // These need to be initialised for some reason, otherwise 1st write is slow
   State.public.user().get('replies').put({a:null});
   State.public.user().get('likes').put({a:null});
@@ -188,7 +210,7 @@ async function logOut() {
   // TODO: remove subscription from your channels
   if (navigator.serviceWorker) {
     const reg = await navigator.serviceWorker.getRegistration();
-    if (reg) {
+    if (reg && reg.pushManager) {
       reg.active.postMessage({key: null});
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
@@ -216,6 +238,7 @@ function loginAsNewUser(name) {
     createChatLink();
     State.local.get('noFollows').put(true);
     State.local.get('noFollowers').put(true);
+    State.local.get('filters').get('group').put('everyone');
   });
 }
 
@@ -279,7 +302,7 @@ function addChannel(chat) {
   //$(".chat-list").append(el);
   chat.theirMsgsLastSeenTime = '';
   chat.getTheirMsgsLastSeenTime(time => {
-    if (chat && time && time > chat.theirMsgsLastSeenTime) {
+    if (chat && time && time >= chat.theirMsgsLastSeenTime) {
       chat.theirMsgsLastSeenTime = time;
       chatNode.get('theirMsgsLastSeenTime').put(time);
     }
@@ -349,7 +372,6 @@ function addChannel(chat) {
   });
   State.local.get('channels').get(pub).put({enabled:true});
   if (chat.onTheir) {
-    console.log('Listen to private peer url from', pub);
     chat.onTheir('my_peer', (url, k, from) => {
       console.log('Got private peer url', url, 'from', from);
       PeerManager.addPeer({url, from})
@@ -368,8 +390,12 @@ function processMessage(chatId, msg, info) {
   State.local.get('channels').get(chatId).get('msgs').get(msg.time + (msg.from && msg.from.slice(0, 10))).put(JSON.stringify(msg));
   msg.timeObj = new Date(msg.time);
   if (!info.selfAuthored && msg.timeObj > (chat.myLastSeenTime || -Infinity)) {
-    if (window.location.hash !== '#/chat/' + chatId || document.visibilityState !== 'visible') {
+    if (window.location.pathname !== '/chat/' + chatId || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chatId, 1);
+    } else {
+      if (ourActivity === 'active') {
+        chat.setMyMsgsLastSeenTime();
+      }
     }
   }
   if (!info.selfAuthored && msg.time > chat.theirMsgsLastSeenTime) {

@@ -45,7 +45,7 @@ class Header extends Component {
       this.setState({unseenTotal});
     });
     State.local.get('activeRoute').on(activeRoute => {
-      this.setState({about:null});
+      this.setState({about:null, title: ''});
       this.eventListeners.forEach(e => e.off());
       this.eventListeners = [];
       this.setState({activeRoute});
@@ -62,10 +62,9 @@ class Header extends Component {
         });
       }
 
-      let title = '';
       if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
         if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
-          title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
+          const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
           this.setState({title});
         } else {
           State.local.get('channels').get(this.chatId).get('name').on((name, a, b, eve) => {
@@ -77,8 +76,6 @@ class Header extends Component {
             this.setState({about});
           });
         }
-      } else {
-        this.setState({title});
       }
     });
   }

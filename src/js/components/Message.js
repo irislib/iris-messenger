@@ -3,6 +3,7 @@ import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
+import State from '../State.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
@@ -23,6 +24,33 @@ class Message extends Component {
         window.location = href.replace('https://iris.to/', '');
       }
     });
+
+    const status = this.getSeenStatus().seen;
+    if (!status.seen && !status.delivered) {
+      State.local.get('channels').get(this.props.chatId).get('theirLastActiveTime').on((v, k, a, e) => {
+        if (this.getSeenStatus().delivered) {
+          this.setState({});
+          e.off();
+        }
+      });
+    }
+    if (!status.seen) {
+      State.local.get('channels').get(this.props.chatId).get('theirMsgsLastSeenTime').on((v, k, a, e) => {
+        if (this.getSeenStatus().seen) {
+          this.setState({});
+          e.off();
+        }
+      });
+    }
+  }
+
+  getSeenStatus() {
+    const chatId = this.props.chatId;
+    const chat = Session.channels[chatId];
+    const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
+    const seen = chat && chat.theirMsgsLastSeenDate >= time;
+    const delivered = chat && chat.activity && chat.activity.lastActive && new Date(chat.activity.lastActive) >= time;
+    return {seen, delivered};
   }
 
   onNameClick(name) {
@@ -89,7 +117,7 @@ class Message extends Component {
       }});
     }
     $('#attachment-gallery').fadeOut({duration: ANIMATE_DURATION, complete: () => $('#attachment-gallery').remove()});
-    const activeChat = window.location.hash.replace('/profile/','').replace('/chat/','');
+    const activeChat = window.location.pathname.replace('/profile/','').replace('/chat/','');
     if (activeChat && Session.channels[activeChat]) {
       Session.channels[activeChat].attachments = null;
     }
@@ -114,8 +142,9 @@ class Message extends Component {
     const innerHTML = autolinker.link(h);
     const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
 
-    const seen = chat && chat.theirMsgsLastSeenDate >= time ? 'seen' : '';
-    const delivered = chat && chat.online && chat.online.lastActive && new Date(chat.online.lastActive) >= time ? 'delivered' : '';
+    const status = this.getSeenStatus();
+    const seen = status.seen ? 'seen' : '';
+    const delivered = status.delivered ? 'delivered' : '';
     const whose = this.props.selfAuthored ? 'our' : 'their';
 
     return html`

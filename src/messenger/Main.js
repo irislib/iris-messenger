@@ -26,7 +26,7 @@ if (!isElectron && ('serviceWorker' in navigator)) {
 }
 
 State.init();
-Session.init({autologin: window.location.hash.length > 2});
+Session.init({autologin: window.location.pathname.length > 2});
 PeerManager.init();
 
 Helpers.checkColorScheme();
@@ -38,8 +38,8 @@ class Main extends Component {
 
   handleRoute(e) {
     let activeRoute = e.url;
-    if (!activeRoute && window.location.hash) {
-      return route(window.location.hash.replace('#', '')); // bubblegum fix back navigation
+    if (!activeRoute && window.location.pathname) {
+      return route(window.location.pathname.replace('#', '')); // bubblegum fix back navigation
     }
     document.title = 'Iris';
     if (activeRoute && activeRoute.length > 1) { document.title += ' - ' + Helpers.capitalize(activeRoute.replace('/', '')); }
@@ -49,7 +49,7 @@ class Main extends Component {
 
   render() {
     let content = '';
-    if (this.state.loggedIn || window.location.hash.length <= 2) {
+    if (this.state.loggedIn || window.location.pathname.length <= 2) {
       content = this.state.loggedIn ? html`
         <section class="main" style="flex-direction: row;">
           <div class="view-area">

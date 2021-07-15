@@ -16,7 +16,8 @@ class SearchBox extends Component {
     this.state = {results:[]};
     this.debouncedIndexAndSearch = _.debounce(() => {
       const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
-      this.fuse = new Fuse(Object.values(Session.getFollows()), options); // TODO: this gets reinitialized with Header on each view change. slow?
+      const values = Object.values(_.omit(Session.getFollows(), Object.keys(State.blockedUsers)));
+      this.fuse = new Fuse(values, options); // TODO: this gets called all the time. slow?
       this.search();
     }, 200);
   }
@@ -31,9 +32,9 @@ class SearchBox extends Component {
   }
 
   componentDidMount() {
-    State.local.get('follows').map().on(follows => {
+    State.local.get('groups').get('everyone').map().on(isFollowing => {
       this.hasFollows = this.hasFollows || Object.keys(Session.getFollows()).length > 1;
-      follows && this.debouncedIndexAndSearch();
+      isFollowing && this.debouncedIndexAndSearch();
     });
     State.local.get('activeRoute').on((a,b,c,e) => {
       this.eventListeners['activeRoute'] = e;

@@ -35,8 +35,6 @@ function copyMyChatLinkClicked(e) {
   }, 2000);
 }
 
-const getNumFromStyle = numStr => Number(numStr.substring(0, numStr.length - 2));
-
 class Chat extends View {
   constructor() {
     super();
@@ -53,7 +51,8 @@ class Chat extends View {
     this.setState({
       sortedMessages: this.sortedMessages,
       sortedParticipants: [],
-      showParticipants: true
+      showParticipants: true,
+      stickToBottom: true
     });
     this.iv = null;
     this.chat = null;
@@ -82,7 +81,7 @@ class Chat extends View {
     State.local.get('channels').get(this.props.id).get('participants').map().on((v, k, b, e) => {
       this.eventListeners['participants'] = e;
       const hasAlready = !!this.participants[k];
-      this.participants[k] = v;
+      this.participants[k] = v;
       if (!!v && !hasAlready) {
         State.public.user(k).get('activity').on((activity, a, b, e) => {
           this.eventListeners[k + 'activity'] = e;
@@ -105,6 +104,15 @@ class Chat extends View {
     const container = document.getElementById("message-list");
     container.style.paddingBottom = 0;
     container.style.paddingTop = 0;
+    const el = $("#message-view");
+    el.off('scroll').on('scroll', () => {
+      const scrolledToBottom = (el[0].scrollHeight - el.scrollTop() == el.outerHeight());
+      if (this.state.stickToBottom && !scrolledToBottom) {
+        this.setState({stickToBottom: false});
+      } else if (!this.state.stickToBottom && scrolledToBottom) {
+        this.setState({stickToBottom: true});
+      }
+    });
   }
 
   setSortedParticipants() {
@@ -134,19 +142,23 @@ class Chat extends View {
   }
 
   componentDidUpdate(prevProps) {
+    if (this.state.stickToBottom) {
+      Helpers.scrollToMessageListBottom();
+    }
     if (prevProps.id !== this.props.id) {
       $('#not-seen-by-them').hide();
       this.componentDidMount();
     } else {
-      Helpers.scrollToMessageListBottom();
-      $('.msg-content img').off('load').on('load', () => Helpers.scrollToMessageListBottom());
-      if (this.chat && !this.chat.uuid) {
-        if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
-          $('#not-seen-by-them').slideDown();
-        } else {
-          $('#not-seen-by-them').slideUp();
+      $('.msg-content img').off('load').on('load', () => this.state.stickToBottom && Helpers.scrollToMessageListBottom());
+      setTimeout(() => {
+        if (this.chat && !this.chat.uuid && this.props.id !== Session.getPubKey()) {
+          if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
+            $('#not-seen-by-them').slideDown();
+          } else {
+            $('#not-seen-by-them').slideUp();
+          }
         }
-      }
+      }, 2000);
     }
   }
 
@@ -204,7 +216,7 @@ class Chat extends View {
     let previousDateStr;
     let previousFrom;
     const msgListContent = [];
-    this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach((msg, i) => {
+    this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach(msg => {
       if (typeof msg !== 'object') {
         try {
           msg = JSON.parse(msg);

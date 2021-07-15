@@ -97,7 +97,10 @@ function getRandomPeers() {
   const sampleSize = connectToLocalElectron ? Math.max(maxConnectedPeers - 1, 1) : maxConnectedPeers;
   const sample = _.sample(
     Object.keys(
-      _.pick(knownPeers, (p, url) => { return p.enabled && !(iris.util.isElectron && url === ELECTRON_GUN_URL); })
+      _.pick(knownPeers, (p, url) => {
+        const mixedContent = (window.location.protocol === 'https:' && (url.indexOf('http:') === 0));
+        return !mixedContent && p.enabled && !(iris.util.isElectron && url === ELECTRON_GUN_URL);
+      })
     ), sampleSize
   );
   if (connectToLocalElectron) {
@@ -143,7 +146,8 @@ function checkGunPeerCount() {
     var unconnectedPeers = _.filter(Object.keys(knownPeers), url => {
       var addedToGun = _.pluck(Object.values(peersFromGun), 'url').indexOf(url) > -1;
       var enabled = knownPeers[url].enabled;
-      return enabled && !addedToGun;
+      const mixedContent = (window.location.protocol === 'https:' && (url.indexOf('http:') === 0));
+      return !mixedContent && enabled && !addedToGun;
     });
     if (unconnectedPeers.length) {
       connectPeer(_.sample(unconnectedPeers));
@@ -172,6 +176,5 @@ export default {
   disconnectPeer,
   disablePeer,
   askForPeers,
-  resetPeers,
-  checkGunPeerCount
+  resetPeers
 };

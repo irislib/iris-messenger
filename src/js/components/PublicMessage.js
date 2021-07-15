@@ -67,28 +67,24 @@ class PublicMessage extends Message {
           this.setState({name});
         });
       }
-      State.local.get('follows').map().on((v, key, a, e) => {
-        if (this.eventListeners[key]) return;
-        this.eventListeners[key] = e;
-        State.public.user(key).get('likes').get(this.props.hash).on((liked,a,b,e) => {
-          this.eventListeners[key+'likes'] = e;
-          liked ? this.likedBy.add(key) : this.likedBy.delete(key);
-          const s = {likes: this.likedBy.size};
-          if (key === Session.getPubKey()) s['liked'] = liked;
-          this.setState(s);
-        });
-        State.public.user(key).get('replies').get(this.props.hash).map().on((hash,time,b,e) => {
-          const k = key + time;
-          if (hash && this.replies[k]) return;
-          if (hash) {
-            this.replies[k] = {hash, time};
-          } else {
-            delete this.replies[k];
-          }
-          this.eventListeners[key+'replies'] = e;
-          const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
-          this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
-        });
+      State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
+        this.eventListeners[from+'likes'] = e;
+        liked ? this.likedBy.add(from) : this.likedBy.delete(from);
+        const s = {likes: this.likedBy.size};
+        if (from === Session.getPubKey()) s['liked'] = liked;
+        this.setState(s);
+      });
+      State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, (hash,time,b,e,from) => {
+        const k = from + time;
+        if (hash && this.replies[k]) return;
+        if (hash) {
+          this.replies[k] = {hash, time};
+        } else {
+          delete this.replies[k];
+        }
+        this.eventListeners[from+'replies'] = e;
+        const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
+        this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
       });
     });
   }
