@@ -119,7 +119,7 @@ class Store extends View {
     const cartTotalItems = Object.keys(this.cart).reduce((sum, k) => sum + this.cart[k], 0);
     const keys = Object.keys(this.state.items);
     return html`
-      ${this.props.store ? '' : html`<${Filters}/>`}
+      ${(this.props.store || this.state.noFollows) ? '' : html`<${Filters}/>`}
       ${cartTotalItems ? html`
         <p>
           <button onClick=${() => route('/checkout')}>${t('shopping_cart')}(${cartTotalItems})</button>
