@@ -1777,6 +1777,7 @@ form.public {
 
 .store-item {
   background-color: var(--chat-hover);
+  min-width: 145px;
   padding: 15px;
   cursor: pointer;
 }
