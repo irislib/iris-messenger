@@ -92,8 +92,11 @@ class PublicMessage extends Message {
     });
     if(this.state.measureFirstCall===false && this.props.measure)
     {
-      this.props.measure();
-      this.setState({measureFirstCall:false})
+      setTimeout(() => {
+        this.props.measure();
+        this.setState({measureFirstCall:false})
+      }, 1);
+
     }
   }
 
@@ -124,6 +127,19 @@ class PublicMessage extends Message {
       this.props.measure();
     } else if (
       this.state.showReplyForm === false &&
+      this.state.calledMeasure === true && this.props.measure
+    ) {
+      console.log("This will call else measure");
+      this.setState({ calledMeasure: false });
+      this.props.measure();
+    }
+
+    if (this.state.showLikes && this.state.calledMeasure === false && this.props.measure) {
+      console.log("This will call measure");
+      this.setState({ calledMeasure: true });
+      this.props.measure();
+    } else if (
+      this.state.showLikes === false &&
       this.state.calledMeasure === true && this.props.measure
     ) {
       console.log("This will call else measure");
