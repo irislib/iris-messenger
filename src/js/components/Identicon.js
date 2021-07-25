@@ -35,7 +35,6 @@ class Identicon extends Component {
     this.base.appendChild(this.identicon);
     if (!this.props.hidePhoto) {
       State.public.user(pub).get('profile').get('photo').on(photo => { // TODO: limit size
-        $(this.base).find('.iris-identicon').toggle(!photo || this.props.hidePhoto);
         this.setState({photo});
       });
     } else {
@@ -73,8 +72,10 @@ class Identicon extends Component {
   render() {
     const width = this.props.width;
     const activity = ['online', 'active'].indexOf(this.state.activity) > -1 ? this.state.activity : '';
+    const hasPhoto = this.state.photo && !this.props.hidePhoto ? 'has-photo' : '';
+    const showTooltip = this.props.showTooltip ? 'tooltip' : '';
     return html`
-      <div onClick=${this.props.onClick} style="${this.props.onClick ? 'cursor: pointer;' : ''} position: relative;" class="identicon-container ${this.props.showTooltip ? 'tooltip' : ''} ${activity}">
+      <div onClick=${this.props.onClick} style="${this.props.onClick ? 'cursor: pointer;' : ''} position: relative;" class="identicon-container ${hasPhoto} ${showTooltip} ${activity}">
         <div style="width: ${width}; height: ${width}" class="identicon">
           ${(this.state.photo && !this.props.hidePhoto) ? html`<${SafeImg} src=${this.state.photo} class="identicon-image" width=${width}/>` : ''}
         </div>

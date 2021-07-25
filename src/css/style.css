@@ -1336,6 +1336,10 @@ hr {
   flex: 1;
 }
 
+.has-photo .iris-identicon {
+  display: none;
+}
+
 .iris-identicon img {
   border: none !important;
 }
