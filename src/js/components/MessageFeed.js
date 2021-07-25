@@ -93,6 +93,11 @@ class MessageFeed extends Component {
                           <img
               src
               style={{ display: "none" }}
+              onLoad={
+                ()=>{
+                  measure();
+                }
+              }
               onError={() => {
                 console.log("This is topest measure");
                 measure();
