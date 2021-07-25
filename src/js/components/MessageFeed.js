@@ -90,6 +90,14 @@ class MessageFeed extends Component {
                   showName=${true}
                 />`
               : ""}
+                          <img
+              src
+              style={{ display: "none" }}
+              onError={() => {
+                console.log("This is topest measure");
+                measure();
+              }}
+            ></img>
           </div>
         )}
       </CellMeasurer>
