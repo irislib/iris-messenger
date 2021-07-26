@@ -5,6 +5,7 @@ import PublicMessageForm from "./PublicMessageForm.js";
 import State from "../State.js";
 import { route } from "preact-router";
 import Message from "./Message.js";
+import SafeImg from "./SafeImg.js";
 import Session from "../Session.js";
 import Torrent from "./Torrent.js";
 import Autolinker from "autolinker";
@@ -297,7 +298,7 @@ class PublicMessage extends Message {
           this.state.msg.attachments.map(
             (a) =>
               html`<div class="img-container">
-                <img
+                <${SafeImg}
                   src=${a.data}
                   onclick=${(e) => {
                     this.openAttachmentsGallery(e);

@@ -1,9 +1,13 @@
 import Gun from 'gun';
-import 'gun/sea';
-import './js/lib/localforage.min.js';
+import localforage from './js/lib/localforage.min.js';
+import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
+
+setupRouting();
+
+const urlsToCache = getFiles();
+setupPrecaching(urlsToCache);
 
 const urlToOpen = new URL('/', self.location.origin).href;
-var CACHE_NAME = 'iris-messenger-cache-v1';
 
 async function getSavedKey() {
   try {
@@ -12,24 +16,6 @@ async function getSavedKey() {
     console.error('error loading iris key', err);
   }
   return self.irisKey;
-}
-
-// stale-while-revalidate
-if (self.location.host.indexOf('localhost') !== 0) {
-  self.addEventListener('fetch', function(event) {
-    if (event.request && event.request.method !== 'GET') { return; }
-    event.respondWith(
-      caches.open(CACHE_NAME).then(function(cache) {
-        return cache.match(event.request).then(function(response) {
-          var fetchPromise = fetch(event.request).then(function(networkResponse) {
-            cache.put(event.request, networkResponse.clone());
-            return networkResponse;
-          })
-          return response || fetchPromise;
-        })
-      })
-    );
-  });
 }
 
 self.onmessage = function(msg) {

@@ -56,14 +56,6 @@ class MessageFeed extends Component {
                   showName=${true}
                 />`
               : ""}
-            <img
-              src
-              style={{ display: "none" }}
-              onError={() => {
-                console.log("This is topest measure");
-                measure();
-              }}
-            ></img>
           </div>
         )}
       </CellMeasurer>
@@ -115,8 +107,6 @@ class MessageFeed extends Component {
       <div class="feed-container">
           <${WindowScroller} scrollElement=${$(".main-view")[0]}>
             ${({ height, width, isScrolling, onChildScroll, scrollTop }) => {
-              console.log("THis is cache", this._cache._rowHeightCache);
-
               return html`
                 <${List}
                   autoHeight
