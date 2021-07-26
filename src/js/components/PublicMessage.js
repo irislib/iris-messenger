@@ -29,7 +29,7 @@ class PublicMessage extends Message {
     this.likedBy = new Set();
     this.replies = {};
     this.subscribedReplies = new Set();
-    this.state = { sortedReplies: [], calledMeasure: false,measureFirstCall:false };
+    this.state = { sortedReplies: [] };
   }
 
   fetchByHash() {
@@ -91,17 +91,9 @@ class PublicMessage extends Message {
         this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
       });
     });
-    if(this.state.measureFirstCall===false && this.props.measure)
-    {
-      setTimeout(() => {
-        this.props.measure();
-        this.setState({measureFirstCall:false})
-      }, 1);
-
-    }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (prevProps.hash !== this.props.hash) {
       Object.values(this.eventListeners).forEach(e => e.off());
       this.eventListeners = {};
@@ -111,6 +103,10 @@ class PublicMessage extends Message {
       this.linksDone = false;
       this.setState({replies:0, likes: 0, sortedReplies:[]});
       this.componentDidMount();
+    } else if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
+      this.measure();
+    } else if (this.state.msg && this.state.msg !== prevState.msg && !this.state.msg.attachments) {
+      this.measure();
     }
     if (this.state.msg && !this.linksDone) {
       $(this.base).find('a').off().on('click', e => {
@@ -122,31 +118,10 @@ class PublicMessage extends Message {
       });
       this.linksDone = true;
     }
-    if (this.state.showReplyForm && this.state.calledMeasure === false && this.props.measure) {
-      console.log("This will call measure");
-      this.setState({ calledMeasure: true });
-      this.props.measure();
-    } else if (
-      this.state.showReplyForm === false &&
-      this.state.calledMeasure === true && this.props.measure
-    ) {
-      console.log("This will call else measure");
-      this.setState({ calledMeasure: false });
-      this.props.measure();
-    }
+  }
 
-    if (this.state.showLikes && this.state.calledMeasure === false && this.props.measure) {
-      console.log("This will call measure");
-      this.setState({ calledMeasure: true });
-      this.props.measure();
-    } else if (
-      this.state.showLikes === false &&
-      this.state.calledMeasure === true && this.props.measure
-    ) {
-      console.log("This will call else measure");
-      this.setState({ calledMeasure: false });
-      this.props.measure();
-    }
+  measure() {
+    this.props.measure && this.props.measure();
   }
 
   toggleReplies() {
@@ -204,7 +179,6 @@ class PublicMessage extends Message {
 
     return html`
       <div class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''}">
-
         <div class="msg-content">
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${() => this.onClickName()}>
@@ -222,17 +196,13 @@ class PublicMessage extends Message {
               </div>
             `: ''}
           </div>
-          ${
-            this.state.msg.torrentId && this.props.measure && this.props.measure()
-          }
           ${this.state.msg.torrentId ? html`
               <${Torrent} torrentId=${this.state.msg.torrentId}/>
           `:''}
-          ${
-            this.state.msg.attachments && this.props.measure && this.props.measure()
-          }
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
-            html`<div class="img-container"><${SafeImg} src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>`
+            html`<div class="img-container">
+                <${SafeImg} src=${a.data} onload=${() => this.measure()} onclick=${e => { this.openAttachmentsGallery(e); }}/>
+            </div>`
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           ${this.state.msg.replyingTo && !this.props.asReply ? html`

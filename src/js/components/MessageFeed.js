@@ -14,7 +14,7 @@ class MessageFeed extends Component {
     this.eventListeners = {};
     this._cache = new CellMeasurerCache({
       fixedWidth: true,
-      minHeight: 100,
+      minHeight: 0,
     });
     this.rowRenderer = this.rowRenderer.bind(this);
   }
@@ -30,7 +30,11 @@ class MessageFeed extends Component {
         this.mappedMessages.delete(k);
       }
       this.setState({
-        sortedMessages: Array.from(this.mappedMessages.keys()).sort().reverse().map(k => this.mappedMessages.get(k))
+        sortedMessages: Array.from(this.mappedMessages.keys())
+          .filter(hash => typeof hash === 'string')
+          .sort()
+          .reverse()
+          .map(k => this.mappedMessages.get(k))
       })
     });
     let first = true;
@@ -56,17 +60,8 @@ class MessageFeed extends Component {
     this.unsubscribe();
   }
 
-  rowRenderer = ({ index, key, parent, style,isScrolling }) => {
+  rowRenderer = ({ index, key, parent, style, isScrolling }) => {
     const hash = this.state.sortedMessages[index];
-    const msg =
-      typeof hash === "string"
-        ? html`<${PublicMessage}
-            filter=${this.props.filter}
-            hash=${hash}
-            key=${hash}
-            showName=${true}
-          />`
-        : "";
     return (
       <CellMeasurer
         cache={this._cache}
@@ -78,17 +73,15 @@ class MessageFeed extends Component {
         {({ measure, registerChild }) => (
           <div ref={registerChild} style={style}>
             {measure()}
-            {typeof hash === "string"
-              ? html`<${PublicMessage}
-                  filter=${this.props.filter}
-                  hash=${hash}
-                  key=${hash}
-                  measure=${() => {
-                    measure();
-                  }}
-                  showName=${true}
-                />`
-              : ""}
+            <PublicMessage
+              filter={this.props.filter}
+              hash={hash}
+              key={hash}
+              measure={() => {
+                measure();
+              }}
+              showName={true}
+            />
           </div>
         )}
       </CellMeasurer>
@@ -112,6 +105,7 @@ class MessageFeed extends Component {
                   rowCount=${this.state.sortedMessages.length}
                   rowHeight=${this._cache.rowHeight}
                   rowRenderer=${this.rowRenderer}
+                  overscanRowCount=${12}
                 />
               `;
             }}
