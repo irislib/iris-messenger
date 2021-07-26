@@ -57,7 +57,6 @@ class MessageFeed extends Component {
   }
 
   rowRenderer = ({ index, key, parent, style,isScrolling }) => {
-    // console.log("THiss is scrolling",isScrolling)
     const hash = this.state.sortedMessages[index];
     const msg =
       typeof hash === "string"
@@ -90,19 +89,6 @@ class MessageFeed extends Component {
                   showName=${true}
                 />`
               : ""}
-                          <img
-              src
-              style={{ display: "none" }}
-              onLoad={
-                ()=>{
-                  measure();
-                }
-              }
-              onError={() => {
-                console.log("This is topest measure");
-                measure();
-              }}
-            ></img>
           </div>
         )}
       </CellMeasurer>
@@ -112,21 +98,23 @@ class MessageFeed extends Component {
   render() {
     return html`
       <div class="feed-container">
-          <${WindowScroller} scrollElement=${$('.main-view')[0]}>
-            ${({ height, width, isScrolling, onChildScroll, scrollTop }) => html`
-              <${List}
-                autoHeight
-                autoWidth
-                width=${width}
-                height=${height}
-                isScrolling=${isScrolling}
-                onScroll=${onChildScroll}
-                scrollTop=${scrollTop}
-                rowCount=${this.state.sortedMessages.length}
-                rowHeight=${this._cache.rowHeight}
-                rowRenderer=${this.rowRenderer}
-              />
-            `}
+          <${WindowScroller} scrollElement=${$(".main-view")[0]}>
+            ${({ height, width, isScrolling, onChildScroll, scrollTop }) => {
+              return html`
+                <${List}
+                  autoHeight
+                  autoWidth
+                  width=${width}
+                  height=${height}
+                  isScrolling=${isScrolling}
+                  onScroll=${onChildScroll}
+                  scrollTop=${scrollTop}
+                  rowCount=${this.state.sortedMessages.length}
+                  rowHeight=${this._cache.rowHeight}
+                  rowRenderer=${this.rowRenderer}
+                />
+              `;
+            }}
           </${WindowScroller}>
       </div>
     `;

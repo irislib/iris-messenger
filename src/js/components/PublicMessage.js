@@ -5,6 +5,7 @@ import PublicMessageForm from './PublicMessageForm.js';
 import State from '../State.js';
 import { route } from 'preact-router';
 import Message from './Message.js';
+import SafeImg from './SafeImg.js';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
 import Autolinker from 'autolinker';
@@ -231,7 +232,7 @@ class PublicMessage extends Message {
             this.state.msg.attachments && this.props.measure && this.props.measure()
           }
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
-            html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>` // TODO: escape a.data
+            html`<div class="img-container"><${SafeImg} src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>`
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           ${this.state.msg.replyingTo && !this.props.asReply ? html`
