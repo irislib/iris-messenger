@@ -65,7 +65,7 @@ export default {
     public_peer_info: "<i>Public</i> peers are automatically discoverable by people you chat with (and others).",
     peers_info: "Peers are GunDB nodes that you can easily <a>spin up</a>. Upcoming: direct connection with friends over WebRTC.",
     webrtc_connection_options: "WebRTC connection options",
-    webrtc_info: "WebRTC is used for video calls. If you're behind a NAT, you might need to specify a TURN server here, which will relay your video traffic. Bandwidth is not free, so there are no free TURN servers around.",
+    webrtc_info: "WebRTC is used for video calls. If you're behind a NAT, you might need to specify a TURN server here, which will relay your video traffic.",
     restore_defaults: "Restore defaults",
     about: "About",  // About Iris
     application_security_warning: "The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.",

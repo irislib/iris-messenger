@@ -67,7 +67,7 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
       n = n + 1;
       addFollow(followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        setTimeout(() => { // without timeout the recursion hogs CPU
+        setTimeout(() => { // without timeout the recursion hogs CPU. or should we use requestAnimationFrame instead?
           getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
         }, n * 100);
       }
