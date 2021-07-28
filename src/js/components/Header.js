@@ -100,7 +100,7 @@ class Header extends Component {
     const chat = Session.channels[this.chatId];
     const isTyping = chat && chat.isTyping;
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
-    const key = Session.getKey().pub;
+    const key = Session.getPubKey();
     const searchBox = this.chatId ? '' : html`<${SearchBox}/>`;
 
     return html`

@@ -6,7 +6,6 @@ export default class Filters extends Component {
     componentDidMount() {
         this.eventListeners = {};
         State.local.get('filters').get('group').on((group,k,x,e) => {
-            console.log('group', group);
            this.eventListeners['group'] = e;
            this.setState({group});
         });
