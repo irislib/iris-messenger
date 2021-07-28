@@ -28,64 +28,37 @@ class PublicMessage extends Message {
     this.state = { sortedReplies: [] };
   }
 
-  fetchByHash() {
-    const hash = this.props.hash;
-    if (typeof hash !== 'string') throw new Error('hash must be a string, got ' + typeof hash + ' ' +  JSON.stringify(hash));
-    return new Promise(resolve => {
-      State.local.get('msgsByHash').get(hash).once(msg => {
-        if (typeof msg === 'string') {
-          try {
-            resolve(JSON.parse(msg));
-          } catch (e) {
-            console.error('message parsing failed', msg, e);
-          }
-        }
-      });
-      State.public.get('#').get(hash).on(async (serialized, a, b, event) => {
-        if (typeof serialized !== 'string') {
-          console.error('message parsing failed', hash, serialized);
-          return;
-        }
-        event.off();
-        const msg = await iris.SignedMessage.fromString(serialized);
-        if (msg) {
-          resolve(msg);
-          State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
-        }
-      });
-    });
-  }
+
 
   componentDidMount() {
-    this.fetchByHash().then(r => {
-      const msg = r.signedData;
-      msg.info = {from: r.signerKeyHash};
-      this.setState({msg});
-      if (this.props.showName && !this.props.name) {
-        State.public.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
-          this.eventListeners['name'] = e;
-          this.setState({name});
-        });
+    const r = this.props.message;  
+    const msg = r.signedData;
+    msg.info = {from: r.signerKeyHash};
+    this.setState({msg});
+    if (this.props.showName && !this.props.name) {
+      State.public.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
+        this.eventListeners['name'] = e;
+        this.setState({name});
+      });
+    }
+    State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
+      this.eventListeners[from+'likes'] = e;
+      liked ? this.likedBy.add(from) : this.likedBy.delete(from);
+      const s = {likes: this.likedBy.size};
+      if (from === Session.getPubKey()) s['liked'] = liked;
+      this.setState(s);
+    });
+    State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, (hash,time,b,e,from) => {
+      const k = from + time;
+      if (hash && this.replies[k]) return;
+      if (hash) {
+        this.replies[k] = {hash, time};
+      } else {
+        delete this.replies[k];
       }
-      State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
-        this.eventListeners[from+'likes'] = e;
-        liked ? this.likedBy.add(from) : this.likedBy.delete(from);
-        const s = {likes: this.likedBy.size};
-        if (from === Session.getPubKey()) s['liked'] = liked;
-        this.setState(s);
-      });
-      State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, (hash,time,b,e,from) => {
-        const k = from + time;
-        if (hash && this.replies[k]) return;
-        if (hash) {
-          this.replies[k] = {hash, time};
-        } else {
-          delete this.replies[k];
-        }
-        this.eventListeners[from+'replies'] = e;
-        const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
-        this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
-      });
+      this.eventListeners[from+'replies'] = e;
+      const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
+      this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
     });
   }
 
@@ -188,7 +161,7 @@ class PublicMessage extends Message {
               <${Torrent} torrentId=${this.state.msg.torrentId}/>
           `:''}
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
-            html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>` // TODO: escape a.data
+            html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}  height="200" /></div>` // TODO: escape a.data
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           ${this.state.msg.replyingTo && !this.props.asReply ? html`

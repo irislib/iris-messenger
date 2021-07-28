@@ -175,7 +175,13 @@ function login(k) {
       delete follows[user];
     }
   });
-  updateGroups();
+  
+  // Wait some time, to allow the feed to load first. 
+  // TODO: Needs a better solution not to be in conflict with feed loader.
+  setTimeout(() => {
+    updateGroups();
+  }, 15000);
+  
   State.public.user().get('msgs').put({a:null}); // These need to be initialised for some reason, otherwise 1st write is slow
   State.public.user().get('replies').put({a:null});
   State.public.user().get('likes').put({a:null});

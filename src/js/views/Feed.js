@@ -99,7 +99,7 @@ class Feed extends View {
         ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
           ${this.getNotification()}
         `}
-        ${s.noFollows ? '' : html`<${Filters}/>`}
+        
         <${MessageFeed} filter=${s.searchTerm && (m => this.filter(m))} thumbnails=${this.props.thumbnails} key=${this.props.index || 'feed'} group=${this.state.group} path=${this.props.index || 'msgs'} />
       </div>
     `;
@@ -107,3 +107,5 @@ class Feed extends View {
 }
 
 export default Feed;
+
+//${s.noFollows ? '' : html`<${Filters}/>`}
