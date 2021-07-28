@@ -60,12 +60,16 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
 
   addFollow(k, currentDepth - 1);
 
+  let n = 0;
   State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
     if (follows[followedKey] === isFollowing) { return; }
     if (isFollowing) {
+      n = n + 1;
       addFollow(followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
+        setTimeout(() => {
+          getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
+        }, n * 100);
       }
     } else {
       removeFollow(followedKey, currentDepth, k);
