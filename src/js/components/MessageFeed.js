@@ -284,7 +284,7 @@ class MessageFeed extends Component {
     );
 
     var loadMore = (items.length > 0 && !this.loading) ? html`<${LoadMore} loadMore=${this.loadMore.bind(this)}  />` : "";
-    var pleaseWait = (items.length == 0 && this.loading) ? html`<div>Loading - Please wait as a few seconds...</div>` : "";
+    var pleaseWait = (items.length == 0 && this.loading) ? html`<div>Loading - Please wait a few seconds...</div>` : "";
 
     return html`
     <div>
