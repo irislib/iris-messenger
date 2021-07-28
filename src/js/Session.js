@@ -118,7 +118,7 @@ function updateGroups() {
     if (!hasFollows && info.followDistance >= 1) { State.local.get('noFollows').put(false); }
     if (info.followDistance <= 1) {
       State.local.get('groups').get('follows').get(k).put(true);
-    } else if (info.followDistance <= 2) {
+    } else if (info.followDistance == 2) {
       State.local.get('groups').get('2ndDegreeFollows').get(k).put(true);
     }
     State.local.get('groups').get('everyone').get(k).put(true);
