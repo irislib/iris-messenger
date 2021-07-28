@@ -67,7 +67,7 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
       n = n + 1;
       addFollow(followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        setTimeout(() => {
+        setTimeout(() => { // without timeout the recursion hogs CPU
           getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
         }, n * 100);
       }
