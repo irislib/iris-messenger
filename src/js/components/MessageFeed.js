@@ -31,7 +31,7 @@ class MessageFeed extends Component {
     this.users = new Map();
     
 
-    this.batchSize = 10;
+    this.batchSize = 1;
     this.callloading = 0;
 
     this.loading = true;
@@ -220,10 +220,25 @@ class MessageFeed extends Component {
       //State.group(group).map(this.props.path, (...args) => this.handleMessage(...args));
     }
 
+    var time = 0;
+    var elapse = 200;
+
+    // Load messages and only show them when there are more than batchSize. Has to be more than batchSize becuase not to trigger a new event call.
+    var timerId = setInterval(() => {
+      time += elapse;
+      console.log("setInterval called: "+time + " - Messages: " + this.messagesLoadingOld.length)
+
+      // When will there be enough messages to sort on?
+      if(this.messagesLoadingOld.length < this.batchSize) return;
+      clearInterval(timerId);
+      this.addOldMessages();  
+
+    }, elapse);
 
     // Make sure to stop the interval, and load messages on screen if needed.
     // This case may occur when the messages found are less than 10 or the system is slow.
     setTimeout(() => {
+      clearInterval(timerId);
       console.log("setTimeout called");
       if(this.state.sortedMessages.length === 0 && this.messagesLoadingOld.length > 0) {
         this.addOldMessages();
@@ -284,7 +299,8 @@ class MessageFeed extends Component {
     );
 
     var loadMore = (items.length > 0 && !this.loading) ? html`<${LoadMore} loadMore=${this.loadMore.bind(this)}  />` : "";
-    var pleaseWait = (items.length == 0 && this.loading) ? html`<div>Loading - Please wait a few seconds...</div>` : "";
+    //var pleaseWait = (items.length == 0 && this.loading) ? html`<div>Loading - Please wait a few seconds...</div>` : "";
+    var pleaseWait = "";
 
     return html`
     <div>
