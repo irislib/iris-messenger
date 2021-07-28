@@ -30,6 +30,7 @@ class Footer extends Component {
 
   render() {
     const key = Session.getPubKey();
+    if (!key) { return; }
     const activeRoute = this.state.activeRoute;
 
     if (this.chatId) {

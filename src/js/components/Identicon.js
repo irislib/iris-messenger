@@ -31,6 +31,7 @@ class Identicon extends Component {
 
   componentDidMount() {
     const pub = this.props.str;
+    if (!pub) { return; }
     this.identicon = new iris.Attribute({type: 'keyID', value: pub}).identicon({width: this.props.width, showType: false});
     this.base.appendChild(this.identicon);
     if (!this.props.hidePhoto) {

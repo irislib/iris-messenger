@@ -96,11 +96,12 @@ class Header extends Component {
   }
 
   render() {
+    const key = Session.getPubKey();
+    if (!key) { return; }
     const activeRoute = this.state.activeRoute;
     const chat = Session.channels[this.chatId];
     const isTyping = chat && chat.isTyping;
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
-    const key = Session.getPubKey();
     const searchBox = this.chatId ? '' : html`<${SearchBox}/>`;
 
     return html`
