@@ -897,7 +897,7 @@ export default {
     calling: "拨号中",
     on_call_with: "通话对象:",
     },
-  "kr": {
+  "ko": {
 	language_name: "한글",
 	whats_your_name: "이름?",
 	new_user_go: "진행",
