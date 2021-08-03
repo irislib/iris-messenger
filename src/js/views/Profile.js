@@ -26,7 +26,7 @@ function deleteChat(pub) {
 class Profile extends View {
   constructor() {
     super();
-    this.eventListeners = [];
+    this.eventListeners = {};
     this.followedUsers = new Set();
     this.followers = new Set();
     this.id = "profile";
@@ -110,10 +110,10 @@ class Profile extends View {
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
     } else {
-      if (this.state.photo) {
+      if (this.state.photo && !this.state.blocked) {
         profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
       } else {
-        profilePhoto = html`<${Identicon} str=${this.props.id} width=250/>`
+        profilePhoto = html`<${Identicon} str=${this.props.id} hidePhoto=${this.state.blocked} width=250/>`
       }
     }
     return html`
@@ -168,7 +168,7 @@ class Profile extends View {
       <${Link} activeClassName="active" href="/profile/${this.props.id}">${t('posts')}<//>
       <${Link} activeClassName="active" href="/replies/${this.props.id}">${t('replies')}<//>
       <${Link} activeClassName="active" href="/likes/${this.props.id}">${t('likes')}<//>
-      <${Link} activeClassName="active" href="/media/${this.props.id}">Media<//>
+      <${Link} activeClassName="active" href="/media/${this.props.id}">${t('media')}<//>
     </div>
     `;
   }
@@ -211,19 +211,18 @@ class Profile extends View {
     return html`
       <div class="content">
         ${this.renderDetails()}
-        ${this.renderTabs()}
-        ${this.renderTab()}
+        ${this.state.blocked ? '' : this.renderTabs()}
+        ${this.state.blocked ? '' : this.renderTab()}
       </div>
     `;
   }
 
   componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
+    Object.values(this.eventListeners).forEach(e => e.off());
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
-      this.setState({memberCandidate:null});
       this.componentDidMount();
     }
   }
@@ -231,7 +230,7 @@ class Profile extends View {
   getProfileDetails() {
     const pub = this.props.id;
     State.public.user(pub).get('follow').map().on((following,key,c,e) => {
-      this.eventListeners.push(e);
+      this.eventListeners['follow'] = e;
       if (following) {
         this.followedUsers.add(key);
       } else {
@@ -251,17 +250,17 @@ class Profile extends View {
     });
     State.public.user(pub).get('profile').get('name').on((name,a,b,e) => {
       document.title = name || document.title;
-      this.eventListeners.push(e);
+      this.eventListeners['name'] = e;
       if (!$('#profile .profile-name:focus').length) {
         this.setState({name});
       }
     });
     State.public.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
-      this.eventListeners.push(e);
+      this.eventListeners['photo'] = e;
       this.setState({photo});
     });
     State.public.user(pub).get('profile').get('about').on((about,a,b,e) => {
-      this.eventListeners.push(e);
+      this.eventListeners['about'] = e;
       if (!$('#profile .profile-about-content:focus').length) {
         this.setState({about});
       } else {
@@ -272,8 +271,8 @@ class Profile extends View {
 
   componentDidMount() {
     const pub = this.props.id;
-    this.eventListeners.forEach(e => e.off());
-    this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
+    Object.values(this.eventListeners).forEach(e => e.off());
+    this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', blocked: false});
     this.isMyProfile = Session.getPubKey() === pub;
     const chat = Session.channels[pub];
     if (pub.length < 40) {
@@ -305,6 +304,10 @@ class Profile extends View {
       colorLight : "#ffffff",
       correctLevel : QRCode.CorrectLevel.H
     });
+    State.public.user().get('block').get(this.props.id).on((blocked,k,x,e) => {
+      this.eventListeners['block'] = e;
+      this.setState({blocked});
+    })
   }
 }
 

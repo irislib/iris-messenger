@@ -1,6 +1,6 @@
 /* light.css: 👉 dark-on-light */
 :root {
-    --body-bg: #fff;
+    --body-bg: #70d4f2;
     --text-color: #262626;
     --text-time: rgba(0, 0, 0, 0.45);
     --main-color: #fafafa;
@@ -39,4 +39,6 @@
     --non-string-value-color: blue;
     --nav-border-bottom: 1px solid rgba(0,0,0,.08);
     --positive-color: #80bf5e;
+    --radio-button-background: #fff;
+    --radio-button-checked-background: #00a0d1;
 }

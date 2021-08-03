@@ -12,6 +12,7 @@ class Identicon extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.str !== this.props.str) return true;
+    if (nextProps.hidePhoto !== this.props.hidePhoto) return true;
     if (nextState.photo !== this.state.photo) return true;
     if (nextState.name !== this.state.name) return true;
     if (nextState.activity !== this.state.activity) return true;
@@ -23,16 +24,23 @@ class Identicon extends Component {
       $(this.base).empty();
       this.componentDidMount();
     }
+    if (prevProps.hidePhoto !== this.props.hidePhoto) {
+      $(this.base).find('.iris-identicon').toggle(!this.state.photo || this.props.hidePhoto);
+    }
   }
 
   componentDidMount() {
     const pub = this.props.str;
+    if (!pub) { return; }
     this.identicon = new iris.Attribute({type: 'keyID', value: pub}).identicon({width: this.props.width, showType: false});
     this.base.appendChild(this.identicon);
-    State.public.user(pub).get('profile').get('photo').on(photo => { // TODO: limit size
-      $(this.base).find('.iris-identicon').toggle(!photo);
-      this.setState({photo});
-    });
+    if (!this.props.hidePhoto) {
+      State.public.user(pub).get('profile').get('photo').on(photo => { // TODO: limit size
+        this.setState({photo});
+      });
+    } else {
+      $(this.base).find('.iris-identicon').show();
+    }
 
     this.setState({activity: null});
     if (this.props.showTooltip) {
@@ -65,10 +73,12 @@ class Identicon extends Component {
   render() {
     const width = this.props.width;
     const activity = ['online', 'active'].indexOf(this.state.activity) > -1 ? this.state.activity : '';
+    const hasPhoto = this.state.photo && !this.props.hidePhoto ? 'has-photo' : '';
+    const showTooltip = this.props.showTooltip ? 'tooltip' : '';
     return html`
-      <div onClick=${this.props.onClick} style="${this.props.onClick ? 'cursor: pointer;' : ''} position: relative;" class="identicon-container ${this.props.showTooltip ? 'tooltip' : ''} ${activity}">
+      <div onClick=${this.props.onClick} style="${this.props.onClick ? 'cursor: pointer;' : ''} position: relative;" class="identicon-container ${hasPhoto} ${showTooltip} ${activity}">
         <div style="width: ${width}; height: ${width}" class="identicon">
-          ${this.state.photo ? html`<${SafeImg} src=${this.state.photo} class="identicon-image" width=${width}/>` : ''}
+          ${(this.state.photo && !this.props.hidePhoto) ? html`<${SafeImg} src=${this.state.photo} class="identicon-image" width=${width}/>` : ''}
         </div>
         ${this.props.showTooltip && this.state.name ? html`<span class="tooltiptext">${this.state.name}</span>` : ''}
         ${this.props.activity ? html`<div class="online-indicator"/>` : ''}

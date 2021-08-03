@@ -5,6 +5,7 @@ import Identicon from '../components/Identicon.js';
 import FollowButton from '../components/FollowButton.js';
 import CopyButton from '../components/CopyButton.js';
 import MessageFeed from '../components/MessageFeed.js';
+import Filters from '../components/Filters.js';
 import Session from '../Session.js';
 import View from './View.js';
 import {translate as t} from '../Translation.js';
@@ -88,10 +89,6 @@ class Feed extends View {
     return true;
   }
 
-  toggleGroup(group) {
-    State.local.get('filters').get('group').put(group);
-  }
-
   renderView() {
     const s = this.state;
     return html`
@@ -102,26 +99,7 @@ class Feed extends View {
         ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
           ${this.getNotification()}
         `}
-        ${s.noFollows ? '' : html`
-        <div class="msg filters">
-          <div class="msg-content">
-            <label onClick=${() => this.toggleGroup("follows")}>
-                <input checked=${s.group === "follows"} type="radio"/>
-                Follows
-            </label>
-              
-            <label onClick=${() => this.toggleGroup("2ndDegreeFollows")}>
-                <input checked=${s.group === "2ndDegreeFollows"} type="radio"/>
-                2nd degree follows
-            </label>
-              
-            <label for="filterGroupChoice3" onClick=${() => this.toggleGroup("everyone")}>
-                <input checked=${s.group === "everyone"} type="radio"/>
-                Everyone
-            </label>
-          </div>
-        </div>
-        `}
+        ${s.noFollows ? '' : html`<${Filters}/>`}
         <${MessageFeed} filter=${s.searchTerm && (m => this.filter(m))} thumbnails=${this.props.thumbnails} key=${this.props.index || 'feed'} group=${this.state.group} path=${this.props.index || 'msgs'} />
       </div>
     `;

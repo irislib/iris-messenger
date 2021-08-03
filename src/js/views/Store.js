@@ -5,6 +5,7 @@ import Session from '../Session.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
 import { route } from '../lib/preact-router.es.js';
 import SafeImg from '../components/SafeImg.js';
+import Filters from '../components/Filters.js';
 import CopyButton from '../components/CopyButton.js';
 import FollowButton from '../components/FollowButton.js';
 import Identicon from '../components/Identicon.js';
@@ -21,6 +22,7 @@ class Store extends View {
     this.state = {items:{}};
     this.items = {};
     this.id = 'profile';
+    this.class = 'public-messages-view';
   }
 
   addToCart(k, user, e) {
@@ -117,6 +119,7 @@ class Store extends View {
     const cartTotalItems = Object.keys(this.cart).reduce((sum, k) => sum + this.cart[k], 0);
     const keys = Object.keys(this.state.items);
     return html`
+      ${(this.props.store || this.state.noFollows) ? '' : html`<${Filters}/>`}
       ${cartTotalItems ? html`
         <p>
           <button onClick=${() => route('/checkout')}>${t('shopping_cart')}(${cartTotalItems})</button>
@@ -227,8 +230,8 @@ class Store extends View {
     });
   }
 
-  getAllProducts() {
-    State.group().map('store/products', (...args) => {
+  getAllProducts(group) {
+    State.group(group).map('store/products', (...args) => {
       this.onProduct(...args);
     });
   }
@@ -254,8 +257,17 @@ class Store extends View {
       this.getCartFromUser(user);
       this.getProductsFromUser(user);
     } else {
+      let prevGroup;
+      State.local.get('filters').get('group').on((group,k,x,e) => {
+        if (group !== prevGroup) {
+          this.items = {};
+          this.setState({items:{}});
+          prevGroup = group;
+          this.eventListeners.push(e);
+          this.getAllProducts(group);
+        }
+      });
       this.getAllCarts();
-      this.getAllProducts();
     }
   }
 }

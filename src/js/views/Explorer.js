@@ -22,6 +22,25 @@ const chevronRight = html`
 `;
 
 class Explorer extends View {
+  constructor() {
+    super();
+    this.state = {groups:{}};
+  }
+
+  componentDidMount() {
+    this.eventListeners = {};
+    const groups = {};
+    State.local.get('groups').map().on((v,k,x,e) => {
+      this.eventListeners['groups'] = e;
+      if (v) {
+        groups[k] = true;
+      } else {
+        delete groups[k];
+      }
+      this.setState({groups});
+    })
+  }
+
   renderView() {
     const split = (this.props.node || '').split('/');
     const scope = split.length && split[0];
@@ -29,7 +48,8 @@ class Explorer extends View {
     if (scope === 'local') {
       gun = State.local;
     } else if (scope === 'group') {
-      gun = State.group();
+      const group = (split.length >= 2) && split[1];
+      gun = State.group(group || undefined);
     }
     const path = split.slice(1).join('/');
     const pathString = split.map((k, i) => html`
@@ -63,9 +83,13 @@ class Explorer extends View {
         <${ExplorerNode} indent=${1} gun=${State.local} path='local'/>
         <br/><br/>
         <div class="explorer-row">
-            ${chevronDown} Group (experimental, composite of all the users in your extended social network)
+            ${chevronDown} Group (composite object of all the users in the group)
         </div>
-        <${ExplorerNode} indent=${1} gun=${State.group()} path='group'/>
+        ${Object.keys(this.state.groups).map(group => html`
+          <div class="explorer-row" style="padding-left: 1em">
+            ${chevronRight} <a href="/explorer/group%2F${encodeURIComponent(encodeURIComponent(group))}"><b>${group}</b></a>
+          </div>
+        `)}
       `}
     `;
   }
@@ -75,8 +99,8 @@ class ExplorerNode extends Component {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = {children: {}, shownChildrenCount: SHOW_CHILDREN_COUNT};
     this.children = {};
+    this.state = {children: {}, shownChildrenCount: SHOW_CHILDREN_COUNT};
   }
 
   getNode() {
@@ -95,12 +119,16 @@ class ExplorerNode extends Component {
   componentDidUpdate(prevProps) {
     if (prevProps.path !== this.props.path) {
       this.componentWillUnmount();
+      this.componentDidMount();
     }
   }
 
   componentDidMount() {
     this.isMine = this.props.path.indexOf('public/~' + Session.getPubKey()) === 0;
     this.isGroup = this.props.path.indexOf('group') === 0;
+
+    this.children = {};
+    this.setState({children: {}, shownChildrenCount: SHOW_CHILDREN_COUNT});
 
     const cb = async (v, k, c, e, from) => {
       if (k === '_') { return; }
@@ -132,7 +160,8 @@ class ExplorerNode extends Component {
     };
 
     if (this.isGroup) {
-      this.props.gun.map(this.props.path.slice(6), cb); // TODO: make State.group() provide the normal gun api
+      const path = this.props.path.split('/').slice(2).join('/');
+      this.props.gun.map(path, cb); // TODO: make State.group() provide the normal gun api
     } else {
       this.getNode().map().on(cb);
     }
@@ -157,7 +186,7 @@ class ExplorerNode extends Component {
         <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.children[k].open ? chevronDown : chevronRight}</span>
         <a href="/explorer/${encodeURIComponent(path)}"><b>${k}</b></a>
       </div>
-      ${this.state.children[k].open ? html`<${ExplorerNode} gun=${this.props.gun} indent=${this.props.indent + 1} path=${path}/>` : ''}
+      ${this.state.children[k].open ? html`<${ExplorerNode} gun=${this.props.gun} indent=${this.props.indent + 1} key=${path} path=${path} isGroup=${this.props.isGroup}/>` : ''}
     `;
   }
 

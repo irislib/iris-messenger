@@ -31,11 +31,14 @@ const State = {
     window.iris.util.setPublicState && window.iris.util.setPublicState(this.public);
   },
 
-  group: function(groupNode = State.local.get('groups').get('everyone')) {
+  group: function(groupNode = 'everyone') {
     const _this = this;
     return {
       get: function(path, callback) {
         const follows = {};
+        if (typeof groupNode === 'string') {
+          groupNode = _this.local.get('groups').get(groupNode);
+        }
         groupNode.map((isFollowing, user) => {
           if (_this.blockedUsers[user]) { return; } // TODO: allow to specifically query blocked users?
           if (follows[user] && follows[user] === isFollowing) { return; }

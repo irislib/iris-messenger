@@ -60,12 +60,16 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
 
   addFollow(k, currentDepth - 1);
 
+  let n = 0;
   State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
     if (follows[followedKey] === isFollowing) { return; }
     if (isFollowing) {
+      n = n + 1;
       addFollow(followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
+        setTimeout(() => { // without timeout the recursion hogs CPU. or should we use requestAnimationFrame instead?
+          getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
+        }, n * 100);
       }
     } else {
       removeFollow(followedKey, currentDepth, k);
@@ -114,7 +118,7 @@ function updateGroups() {
     if (!hasFollows && info.followDistance >= 1) { State.local.get('noFollows').put(false); }
     if (info.followDistance <= 1) {
       State.local.get('groups').get('follows').get(k).put(true);
-    } else if (info.followDistance <= 2) {
+    } else if (info.followDistance == 2) {
       State.local.get('groups').get('2ndDegreeFollows').get(k).put(true);
     }
     State.local.get('groups').get('everyone').get(k).put(true);
@@ -210,7 +214,7 @@ async function logOut() {
   // TODO: remove subscription from your channels
   if (navigator.serviceWorker) {
     const reg = await navigator.serviceWorker.getRegistration();
-    if (reg) {
+    if (reg && reg.pushManager) {
       reg.active.postMessage({key: null});
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
@@ -236,8 +240,6 @@ function loginAsNewUser(name) {
     login(k);
     name && State.public.user().get('profile').get('name').put(name);
     createChatLink();
-    State.local.get('noFollows').put(true);
-    State.local.get('noFollowers').put(true);
   });
 }
 

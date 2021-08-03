@@ -65,7 +65,7 @@ export default {
     public_peer_info: "<i>Public</i> peers are automatically discoverable by people you chat with (and others).",
     peers_info: "Peers are GunDB nodes that you can easily <a>spin up</a>. Upcoming: direct connection with friends over WebRTC.",
     webrtc_connection_options: "WebRTC connection options",
-    webrtc_info: "WebRTC is used for video calls. If you're behind a NAT, you might need to specify a TURN server here, which will relay your video traffic. Bandwidth is not free, so there are no free TURN servers around.",
+    webrtc_info: "WebRTC is used for video calls. If you're behind a NAT, you might need to specify a TURN server here, which will relay your video traffic.",
     restore_defaults: "Restore defaults",
     about: "About",  // About Iris
     application_security_warning: "The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.",
@@ -140,8 +140,13 @@ export default {
     or_small: "or",
     automatically_load_webtorrent_attachments: "Automatically load webtorrent attachments",
     autoplay_webtorrent_videos: "Autoplay webtorrent videos",
+    home: "Home",
+    media: "Media",
+    messages: "Messages",
+    market: "Market",
+    contacts: "Contacts",
+    explorer: "Explorer",
     no_contacts_in_list: 'You don\'t have any contacts in your list.',
-
   },
    "es": {
     language_name: "Español",
@@ -689,8 +694,7 @@ export default {
     or_small: "tai",
     automatically_load_webtorrent_attachments: "Lataa webtorrentin liitteet automaattisesti",
     autoplay_webtorrent_videos: "Käynnistä webtorrentin videot automaattisesti",
-
-
+    search: "Etsi",
   },
   "it": {
     language_name: "Italian",
@@ -893,7 +897,7 @@ export default {
     calling: "拨号中",
     on_call_with: "通话对象:",
     },
-  "kr": {
+  "ko": {
 	language_name: "한글",
 	whats_your_name: "이름?",
 	new_user_go: "진행",
