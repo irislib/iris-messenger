@@ -35,23 +35,6 @@ class MessageFeed extends Component {
   }
 
   componentDidMount() {
-    this.props.node.map().on((v, k, x, e) => {
-      if (!this.eventListeners['node']) {
-        this.eventListeners['node'] = e;
-      }
-      if (v) {
-        this.mappedMessages.set(k, this.props.keyIsMsgHash ? k : v);
-      } else {
-        this.mappedMessages.delete(k);
-      }
-      this.setState({
-        sortedMessages: Array.from(this.mappedMessages.keys())
-          .filter(hash => typeof hash === 'string')
-          .sort()
-          .reverse()
-          .map(k => this.mappedMessages.get(k))
-      })
-    });
     let first = true;
     State.local.get('scrollUp').on(() => {
       !first && Helpers.animateScrollTop('.main-view');

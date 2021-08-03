@@ -34,7 +34,9 @@ class PublicMessage extends Message {
 
   fetchByHash() {
     const hash = this.props.hash;
-    if (typeof hash !== 'string') throw new Error('hash must be a string, got ' + typeof hash + ' ' +  JSON.stringify(hash));
+    if (typeof hash !== 'string') {
+      return;
+    }
     return new Promise(resolve => {
       State.local.get('msgsByHash').get(hash).once(msg => {
         if (typeof msg === 'string') {
@@ -61,7 +63,9 @@ class PublicMessage extends Message {
   }
 
   componentDidMount() {
-    this.fetchByHash().then(r => {
+    const p = this.fetchByHash();
+    if (!p) { return; }
+    p.then(r => {
       const msg = r.signedData;
       msg.info = {from: r.signerKeyHash};
       this.setState({msg});
