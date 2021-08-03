@@ -5,6 +5,7 @@ import Identicon from '../components/Identicon.js';
 import FollowButton from '../components/FollowButton.js';
 import CopyButton from '../components/CopyButton.js';
 import MessageFeed from '../components/MessageFeed.js';
+import Filters from '../components/Filters.js';
 import Session from '../Session.js';
 import View from './View.js';
 import {translate as t} from '../Translation.js';
@@ -15,25 +16,10 @@ class Feed extends View {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = {sortedMessages: []};
+    this.state = {sortedMessages: [], group: "follows"};
     this.messages = {};
     this.id = 'message-view';
     this.class = 'public-messages-view';
-  }
-
-  loadMessagesToLocalIndex(/*show2ndDegreeFollows*/) {
-    //const followsList = show2ndDegreeFollows ? State.local.get('follows') : State.public.user().get('follow');
-    const seen = new Set();
-    State.group().map('msgs', (hash, time, a, b, from) => {
-      if (hash !== null && seen.has(hash)) { return; }
-      seen.add(hash);
-      if (Session.getPubKey() !== from) {
-        this.state.noMessages && State.local.get('noMessages').put(false);
-        this.state.noFollows && State.local.get('noFollows').put(false);
-      }
-      const id = time + from.slice(0,20);
-      State.local.get(this.props.index || 'feed').get(id).put(hash || null);
-    });
   }
 
   search() {
@@ -49,16 +35,9 @@ class Feed extends View {
 
   componentDidMount() {
     this.search();
-    /*
-    State.local.get('show2ndDegreeFollows').on(show => {
-      if (show === this.state.show2ndDegreeFollows) return;
-      this.setState({show2ndDegreeFollows: show});
-      //this.getMessages(show);
-    }); */
+    State.local.get('filters').get('group').on(group => this.setState({group}));
     State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
     State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
-    State.local.get('noMessages').on(noMessages => this.setState({noMessages}));
-    this.loadMessagesToLocalIndex();
   }
 
   componentWillUnmount() {
@@ -66,7 +45,7 @@ class Feed extends View {
   }
 
   getNotification() {
-    if (this.state.noFollows || this.state.noMessages) {
+    if (this.state.noFollows) {
       return html`
         <div class="msg">
           <div class="msg-content">
@@ -111,22 +90,17 @@ class Feed extends View {
   }
 
   renderView() {
+    const s = this.state;
     return html`
       <div class="centered-container">
-        ${this.state.searchTerm ? '' : html`
+        ${s.searchTerm ? '' : html`
           <${PublicMessageForm} index=${this.props.index} class="hidden-xs" autofocus=${false}/>
         `}
-        <!--<div class="feed-settings">
-          <button onClick="${() => {
-              State.local.get('show2ndDegreeFollows').put(!this.state.show2ndDegreeFollows);
-            }}">
-            ${this.state.show2ndDegreeFollows ? 'Hide' : 'Show'} messages from 2nd degree follows
-          </button>
-        </div>-->
-        ${this.state.searchTerm ? html`<h2>Search results for "${this.state.searchTerm}"</h2>` : html`
+        ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
           ${this.getNotification()}
         `}
-        <${MessageFeed} filter=${this.state.searchTerm && (m => this.filter(m))} thumbnails=${this.props.thumbnails} key=${this.props.index || 'feed'} node=${State.local.get(this.props.index || 'feed')} />
+        ${s.noFollows ? '' : html`<${Filters}/>`}
+        <${MessageFeed} filter=${s.searchTerm && (m => this.filter(m))} thumbnails=${this.props.thumbnails} key=${this.props.index || 'feed'} group=${this.state.group} path=${this.props.index || 'msgs'} />
       </div>
     `;
   }

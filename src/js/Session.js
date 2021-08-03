@@ -13,8 +13,8 @@ let latestChatLink;
 let onlineTimeout;
 let ourActivity;
 let hasFollowers;
+let hasFollows;
 const follows = {};
-const blocks = {};
 const channels = window.channels = {};
 
 const DEFAULT_SETTINGS = {
@@ -51,6 +51,15 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
     callback(k, follows[k]);
   }
 
+  function removeFollow(k, followDistance, follower) {
+    if (follows[k]) {
+      follows[k].followers.delete(follower);
+      if (followDistance === 1) {
+        State.local.get('groups').get('follows').get(k).put(false);
+      }
+    }
+  }
+
   addFollow(k, currentDepth - 1);
 
   let n = 0;
@@ -60,10 +69,12 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
       n = n + 1;
       addFollow(followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        setTimeout(() => {
+        setTimeout(() => { // without timeout the recursion hogs CPU. or should we use requestAnimationFrame instead?
           getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
         }, n * 100);
       }
+    } else {
+      removeFollow(followedKey, currentDepth, k);
     }
   });
 
@@ -101,6 +112,21 @@ function setOurOnlineStatus() {
   setActive();
   window.addEventListener("beforeunload", () => {
     iris.Channel.setActivity(State.public, ourActivity = null);
+  });
+}
+
+function updateGroups() {
+  getExtendedFollows((k, info) => {
+    if (!hasFollows && info.followDistance >= 1) { State.local.get('noFollows').put(false); }
+    if (info.followDistance <= 1) {
+      State.local.get('groups').get('follows').get(k).put(true);
+    } else if (info.followDistance == 2) {
+      State.local.get('groups').get('2ndDegreeFollows').get(k).put(true);
+    }
+    State.local.get('groups').get('everyone').get(k).put(true);
+    if (!hasFollowers && k === getPubKey() && info.followers.size) {
+      State.local.get('noFollowers').put(false);
+    }
   });
 }
 
@@ -142,20 +168,16 @@ function login(k) {
     myProfilePhoto = data;
   });
   State.public.get('follow').put({a:null});
-  State.local.get('follows').put({a:null});
+  State.local.get('groups').get('follows').put({a:null});
   Notifications.init();
   State.local.get('loggedIn').put(true);
-  State.public.get('block').map().on((isBlocked, user) => {
-    blocks[user] = isBlocked;
-    isBlocked && (follows[user] = null);
-    State.local.get('follows').get(user).put(isBlocked);
-  });
-  getExtendedFollows((k, info) => {
-    State.local.get('follows').get(k).put(true);
-    if (!hasFollowers && k === getPubKey() && info.followers.size) {
-      State.local.get('noFollowers').put(false);
+  State.public.user().get('block').map().on((isBlocked, user) => {
+    State.local.get('block').get(user).put(isBlocked);
+    if (isBlocked) {
+      delete follows[user];
     }
   });
+  updateGroups();
   State.public.user().get('msgs').put({a:null}); // These need to be initialised for some reason, otherwise 1st write is slow
   State.public.user().get('replies').put({a:null});
   State.public.user().get('likes').put({a:null});
@@ -194,7 +216,7 @@ async function logOut() {
   // TODO: remove subscription from your channels
   if (navigator.serviceWorker) {
     const reg = await navigator.serviceWorker.getRegistration();
-    if (reg) {
+    if (reg && reg.pushManager) {
       reg.active.postMessage({key: null});
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
@@ -220,8 +242,6 @@ function loginAsNewUser(name) {
     login(k);
     name && State.public.user().get('profile').get('name').put(name);
     createChatLink();
-    State.local.get('noFollows').put(true);
-    State.local.get('noFollowers').put(true);
   });
 }
 

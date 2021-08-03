@@ -1,6 +1,6 @@
 /* dark.css: 👉 light-on-dark */
 :root {
-    --body-bg: #1f2125;
+    --body-bg: #2e3036;
     --text-color: #dbdcde;
     --text-time: rgba(255, 255, 255, 0.45);
     --main-color: #35383f;
@@ -42,4 +42,6 @@
     --nav-border-bottom: 1px solid #222526;
     --nav-shadow: 0 1px 3px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.8);
     --positive-color: #80bf5e;
+    --radio-button-background: #666;
+    --radio-button-checked-background: #00bbf4;
 }

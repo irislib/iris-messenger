@@ -19,6 +19,21 @@ class MessageFeed extends Component {
     this.rowRenderer = this.rowRenderer.bind(this);
   }
 
+  handleMessage(v, k, x, e, from) {
+    if (from) { k = k + from; }
+    if (!this.eventListeners['node']) {
+      this.eventListeners['node'] = e;
+    }
+    if (v) {
+      this.mappedMessages.set(k, this.props.keyIsMsgHash ? k : v);
+    } else {
+      this.mappedMessages.delete(k);
+    }
+    this.setState({
+      sortedMessages: Array.from(this.mappedMessages.keys()).sort().reverse().map(k => this.mappedMessages.get(k))
+    })
+  }
+
   componentDidMount() {
     this.props.node.map().on((v, k, x, e) => {
       if (!this.eventListeners['node']) {
@@ -42,6 +57,12 @@ class MessageFeed extends Component {
       !first && Helpers.animateScrollTop('.main-view');
       first = false;
     });
+    if (this.props.node) {
+      this.props.node.map().on((...args) => this.handleMessage(...args));
+    } else if (this.props.group && this.props.path) { // TODO: make group use the same basic gun api
+      const group = State.local.get('groups').get(this.props.group);
+      State.group(group).map(this.props.path, (...args) => this.handleMessage(...args));
+    }
   }
 
   unsubscribe() {
@@ -50,9 +71,13 @@ class MessageFeed extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.node._.id !== prevProps.node._.id) {
+    const prevNodeId = prevProps.node && prevProps.node._ && prevProps.node._.id;
+    const newNodeId = this.props.node && this.props.node._ && this.props.node._.id;
+    if (prevNodeId !== newNodeId || this.props.group !== prevProps.group || this.props.path !== prevProps.path) {
       this.unsubscribe();
-      this.setState({sortedMessages: [], mappedMessages: new Map()});
+      this.mappedMessages = new Map();
+      this.setState({sortedMessages: []});
+      this.componentDidMount();
     }
   }
 
@@ -60,7 +85,7 @@ class MessageFeed extends Component {
     this.unsubscribe();
   }
 
-  rowRenderer = ({ index, key, parent, style, isScrolling }) => {
+  rowRenderer({ index, key, parent, style, isScrolling }) {
     const hash = this.state.sortedMessages[index];
     return (
       <CellMeasurer

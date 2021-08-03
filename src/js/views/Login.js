@@ -51,6 +51,7 @@ class Login extends Component {
       Session.createChatLink();
       State.local.get('noFollows').put(true);
       State.local.get('noFollowers').put(true);
+      State.local.get('filters').get('group').put('follows');
       this.base.style = 'display:none';
     });
   }

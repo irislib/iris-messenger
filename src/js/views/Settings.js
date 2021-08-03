@@ -18,9 +18,10 @@ import Icons from '../Icons.js';
 class Settings extends View {
   constructor() {
     super();
-    this.eventListeners = [];
+    this.eventListeners = {};
     this.state = Session.DEFAULT_SETTINGS;
     this.state.webPushSubscriptions = {};
+    this.state.blockedUsers = {};
     this.id = "settings";
   }
 
@@ -29,6 +30,7 @@ class Settings extends View {
   }
 
   renderView() {
+    const blockedUsers = _.filter(Object.keys(this.state.blockedUsers), user => this.state.blockedUsers[user]);
     return html`
       <div class="centered-container">
         <h3>${t('account')}</h3>
@@ -111,6 +113,14 @@ class Settings extends View {
         <p><small>${t('webrtc_info')}</small></p>
         <p><textarea rows="4" id="rtc-config" placeholder="${t('webrtc_connection_options')}" onChange=${() => this.rtcConfigChanged()}></textarea></p>
         <button onClick=${() => this.restoreDefaultRtcConfig()}>${t('restore_defaults')}</button>
+        <hr/>
+        <h3>${t('blocked_users')}</h3>
+        ${blockedUsers.map(user => {
+          if (this.state.blockedUsers[user]) {
+            return html`<p><a href="/profile/${encodeURIComponent(user)}"><iris-text user=${user} path="profile/name" placeholder="User"/></a></p>`;
+          }
+        })}
+        ${blockedUsers.length === 0 ? t('none') : ''}
       </div>
     `;
   }
@@ -210,6 +220,7 @@ class Settings extends View {
   }
 
   componentDidMount() {
+    const blockedUsers = {};
     this.updatePeersFromGun();
     this.updatePeersFromGunInterval = setInterval(() => this.updatePeersFromGun(), 2000);
 
@@ -222,10 +233,15 @@ class Settings extends View {
       this.setState({local})
     });
     State.public.user().get('webPushSubscriptions').map().on(() => this.setState({webPushSubscriptions: Notifications.webPushSubscriptions}));
+    State.public.user().get('block').map().on((v,k,x,e) => {
+      this.eventListeners['block'] = e;
+      blockedUsers[k] = v;
+      this.setState({blockedUsers});
+    });
   }
 
   componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
+    Object.values(this.eventListeners).forEach(e => e.off());
     clearInterval(this.updatePeersFromGunInterval);
   }
 }
