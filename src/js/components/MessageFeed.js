@@ -29,9 +29,14 @@ class MessageFeed extends Component {
     } else {
       this.mappedMessages.delete(k);
     }
-    this.setState({
-      sortedMessages: Array.from(this.mappedMessages.keys()).sort().reverse().map(k => this.mappedMessages.get(k))
-    })
+
+    this.updateSortedMessages = this.updateSortedMessages || _.debounce(() => {
+      this.setState({
+        sortedMessages: Array.from(this.mappedMessages.keys()).sort().reverse().map(k => this.mappedMessages.get(k))
+      })
+    }, 200);
+
+    this.updateSortedMessages();
   }
 
   componentDidMount() {
