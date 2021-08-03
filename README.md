@@ -1,4 +1,6 @@
-# iris-webpack
+# iris-messenger
+
+Non-webpacked branch: [no-buildtools](https://github.com/irislib/iris-messenger/tree/no-buildtools) ([deployed](https://iris-simple.netlify.app/)).
 
 ## CLI Commands
 
