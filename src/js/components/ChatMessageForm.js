@@ -69,7 +69,7 @@ class ChatMessageForm extends Component {
     this.picker.pickerVisible ? this.picker.hidePicker() : this.picker.showPicker(event.target);
   }
 
-  downloadWebtorrent(torrentId) {
+  async downloadWebtorrent(torrentId) {
     function onTorrent(torrent) {
       // Torrents can contain many files. Let's use the .mp4 file
       var file = torrent.files.find(function (file) {
@@ -78,7 +78,7 @@ class ChatMessageForm extends Component {
       // Stream the file in the browser
       file.appendTo('#webtorrent', {autoplay: true, muted: true})
     }
-    const client = Helpers.getWebTorrentClient();
+    const client = await Helpers.getWebTorrentClient();
     const existing = client.get(torrentId);
     if (existing) {
       onTorrent(existing);

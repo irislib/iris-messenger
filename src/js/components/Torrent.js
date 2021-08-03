@@ -44,10 +44,10 @@ class Torrent extends Component {
     }
   }
 
-  startTorrenting(clicked) {
+  async startTorrenting(clicked) {
     this.setState({torrenting: true});
     const torrentId = this.props.torrentId;
-    const client = Helpers.getWebTorrentClient();
+    const client = await Helpers.getWebTorrentClient();
     const existing = client.get(torrentId);
     if (existing) {
       this.onTorrent(existing, clicked);

@@ -61,8 +61,8 @@ class MediaPlayer extends Component {
     }
   }
 
-  startTorrenting() {
-    const client = Helpers.getWebTorrentClient();
+  async startTorrenting() {
+    const client = await Helpers.getWebTorrentClient();
     const existing = client.get(this.torrentId);
     if (existing) {
       this.onTorrent(existing);
