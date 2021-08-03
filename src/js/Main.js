@@ -44,18 +44,6 @@ if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redir
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
 
-/*
-if (!isElectron && ('serviceWorker' in navigator)) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register(new URL('../sw.js', import.meta.url))
-    .catch(function(err) {
-      // registration failed :(
-      console.log('ServiceWorker registration failed: ', err);
-    });
-  });
-}
-*/
-
 State.init();
 Session.init({autologin: window.location.pathname.length > 2});
 PeerManager.init();

@@ -193,6 +193,11 @@ function login(k) {
   State.local.get('settings').on(local => {
     settings.local = local;
   });
+  State.local.get('filters').get('group').once().then(v => {
+    if (!v) {
+      State.local.get('filters').get('group').put('follows');
+    }
+  });
 }
 
 async function createChatLink() {
