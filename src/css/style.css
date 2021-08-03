@@ -64,6 +64,16 @@ a:hover, a:focus {
     content: "";
 }
 
+
+.chat-message-form textarea{
+  background: var(--input-bg);
+  color: var(--input-text);
+  outline: none;
+  border: 0;
+  height: 45px;
+  max-height: 75;
+  border-radius: 60px;
+}
 textarea {
   width: 100%;
   outline: none;
@@ -1249,8 +1259,8 @@ hr {
 
 .chat-message-form button {
   display: flex;
-  align-items: center;
-  padding: 5px 10px !important;
+  align-items: end;
+  padding:15px 10px !important;
 }
 
 /*----- Sidebar------- */
@@ -1918,8 +1928,8 @@ form.public {
     padding: 0;
   }
   .chat-message-form form {
-    align-items: center;
-    height: 50px;
+    align-items: end;
+    height: 100px;
   }
   .chat-message-form input {
     padding: 8px 15px;

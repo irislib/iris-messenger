@@ -269,9 +269,9 @@ class Chat extends View {
       <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
       <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_invite_link')}</button></p>
       </div>
-      <div class="chat-message-form">
+      <div class="chat-message-form" id="maxheigthparent" style=${{maxHeight:85}}>
         ${this.state.noLongerParticipant ? html`<div style="text-align:center">You can't send messages to this group because you're no longer a participant.</div>` :
-          html`<${ChatMessageForm} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/>`}
+          html`<${ChatMessageForm} parent=${document.getElementById("maxheigthparent")} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/>`}
       </div>
       `: ''}
       </div>

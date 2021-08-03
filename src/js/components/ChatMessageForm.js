@@ -23,6 +23,7 @@ class ChatMessageForm extends Component {
     if (!iris.util.isMobile && this.props.autofocus !== false) {
       $(this.base).find(".new-msg").focus();
     }
+   
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -189,6 +190,14 @@ class ChatMessageForm extends Component {
   }
 
   render() {
+    if(this.props.parent)
+    {
+   var textBox = document.getElementById("autoResizeTextbox");
+      textBox.style.height  = localStorage.getItem("textBoxHeight");
+      this.props.parent.style.maxHeight = localStorage.getItem("parentHeight");
+      textBox.style.borderRadius = localStorage.getItem("textBoxRadius");
+    }
+
     const contentBtns = html`
       <button type="button" class="attach-file-btn" onClick=${e => this.attachFileClicked(e)}>
         <svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21.586 10.461l-10.05 10.075c-1.95 1.949-5.122 1.949-7.071 0s-1.95-5.122 0-7.072l10.628-10.585c1.17-1.17 3.073-1.17 4.243 0 1.169 1.17 1.17 3.072 0 4.242l-8.507 8.464c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414l7.093-7.05-1.415-1.414-7.093 7.049c-1.172 1.172-1.171 3.073 0 4.244s3.071 1.171 4.242 0l8.507-8.464c.977-.977 1.464-2.256 1.464-3.536 0-2.769-2.246-4.999-5-4.999-1.28 0-2.559.488-3.536 1.465l-10.627 10.583c-1.366 1.368-2.05 3.159-2.05 4.951 0 3.863 3.13 7 7 7 1.792 0 3.583-.684 4.95-2.05l10.05-10.075-1.414-1.414z"/></svg>
@@ -199,8 +208,38 @@ class ChatMessageForm extends Component {
 
     return html`<form autocomplete="off" class="message-form ${this.props.class || ''}" onSubmit=${e => this.onMsgFormSubmit(e)}>
       ${contentBtns}
-      <input name="attachment-input" type="file" class="hidden attachment-input" accept="image/*" multiple onChange=${() => this.openAttachmentsPreview()}/>
-      <input onPaste=${e => this.onMsgTextPaste(e)} onInput=${e => this.onMsgTextInput(e)} class="new-msg" type="text" placeholder="${t('type_a_message')}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>
+      <input name="attachment-input" wrap="off" type="file" class="hidden attachment-input" accept="image/*" multiple onChange=${() => this.openAttachmentsPreview()}/>
+      <textarea onPaste=${e => this.onMsgTextPaste(e)} 
+      id="autoResizeTextbox"
+      style=${{height:45,minHeight:45, borderRadius:60}} 
+      onInput=${(e) =>
+        { 
+          this.onMsgTextInput(e);
+          var textBox = document.getElementById("autoResizeTextbox")
+          textBox.style.height=0;
+          if(textBox.scrollHeight<75)
+          {
+            textBox.height = textBox.scrollHeight+"px"
+          }
+          if(textBox.scrollHeight>=56)
+          {
+            textBox.style.height="auto";
+            this.props.parent.style.maxHeight=120+'px';;
+            textBox.style.borderRadius = "16px"
+          }
+          if(textBox.style.height==="45px"|| textBox.style.height==="0px")
+          {
+            this.props.parent.style.maxHeight=85+"px";
+            textBox.style.borderRadius = "60px"
+          }
+          // console.log("This is text box ",textBox)
+              localStorage.setItem("parentHeight",this.props.parent.style.maxHeight)
+              localStorage.setItem("textBoxHeight",textBox.scrollHeight+"px")
+              localStorage.setItem("textBoxRadius",textBox.style.borderRadius)
+          }
+       
+        } 
+      class="new-msg" type="text" placeholder="${t('type_a_message')}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>
       ${submitButton}
       <div id="webtorrent"></div>
     </form>`;
