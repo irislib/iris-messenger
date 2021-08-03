@@ -1262,6 +1262,15 @@ a.msg {
   user-select: none;
 }
 
+.hideScrollBar {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important;
+}
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hideScrollBar::-webkit-scrollbar {
+  display: none;
+}
+
 .attachment-preview button {
   display: block;
   margin-bottom: 10px;

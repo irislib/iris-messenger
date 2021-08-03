@@ -190,7 +190,7 @@ class ChatMessageForm extends Component {
   }
 
   render() {
-    if(this.props.parent)
+    if(this.props.parent && localStorage.getItem("textBoxHeight"))
     {
    var textBox = document.getElementById("autoResizeTextbox");
       textBox.style.height  = localStorage.getItem("textBoxHeight");
@@ -208,7 +208,7 @@ class ChatMessageForm extends Component {
 
     return html`<form autocomplete="off" class="message-form ${this.props.class || ''}" onSubmit=${e => this.onMsgFormSubmit(e)}>
       ${contentBtns}
-      <input name="attachment-input" wrap="off" type="file" class="hidden attachment-input" accept="image/*" multiple onChange=${() => this.openAttachmentsPreview()}/>
+      <input name="attachment-input" wrap="off" type="file" class="hidden attachment-input hideScrollBar" accept="image/*" multiple onChange=${() => this.openAttachmentsPreview()}/>
       <textarea onPaste=${e => this.onMsgTextPaste(e)} 
       id="autoResizeTextbox"
       style=${{height:45,minHeight:45, borderRadius:60}} 
@@ -217,14 +217,40 @@ class ChatMessageForm extends Component {
           this.onMsgTextInput(e);
           var textBox = document.getElementById("autoResizeTextbox")
           textBox.style.height=0;
-          if(textBox.scrollHeight<75)
+          if(textBox.scrollHeight<56)
           {
+            console.log("textBox.scrollHeight<75",textBox.scrollHeight)
             textBox.height = textBox.scrollHeight+"px"
           }
-          if(textBox.scrollHeight>=56)
+          if(textBox.scrollHeight>=56  && textBox.scrollHeight<74)
           {
+            console.log("textBox.scrollHeight>=56",textBox.scrollHeight)
             textBox.style.height="auto";
-            this.props.parent.style.maxHeight=120+'px';;
+            this.props.parent.style.maxHeight=115+'px';;
+            textBox.style.borderRadius = "16px"
+          }
+          if(textBox.scrollHeight>=74&& textBox.scrollHeight<92 )
+          {
+            console.log("textBox.scrollHeight>=74",textBox.scrollHeight)
+            textBox.style.height="auto";
+            textBox.rows=3;
+            this.props.parent.style.maxHeight=135+'px';;
+            textBox.style.borderRadius = "16px"
+          }
+          if(textBox.scrollHeight>=92&& textBox.scrollHeight<110)
+          {
+            console.log("textBox.scrollHeight>=91",textBox.scrollHeight)
+            textBox.style.height="auto";
+            textBox.rows=4;
+            this.props.parent.style.maxHeight=150+'px';;
+            textBox.style.borderRadius = "16px"
+          }
+          if(textBox.scrollHeight>=110)
+          {
+            console.log("textBox.scrollHeight>=110",textBox.scrollHeight)
+            textBox.style.height="auto";
+            textBox.rows=5;
+            this.props.parent.style.maxHeight=170+'px';;
             textBox.style.borderRadius = "16px"
           }
           if(textBox.style.height==="45px"|| textBox.style.height==="0px")
