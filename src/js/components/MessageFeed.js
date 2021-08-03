@@ -113,7 +113,7 @@ class MessageFeed extends Component {
                   rowCount=${this.state.sortedMessages.length}
                   rowHeight=${this._cache.rowHeight}
                   rowRenderer=${this.rowRenderer}
-                  overscanRowCount=${12}
+                  overscanRowCount=${8}
                 />
               `;
             }}
