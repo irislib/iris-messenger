@@ -1,7 +1,5 @@
 # iris-messenger
 
-Non-webpacked branch: [no-buildtools](https://github.com/irislib/iris-messenger/tree/no-buildtools) ([deployed](https://iris-simple.netlify.app/)).
-
 ## CLI Commands
 
 ``` bash
@@ -22,3 +20,7 @@ npm run test
 ```
 
 For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
+
+## Non-webpacked version
+Branch [no-buildtools](https://github.com/irislib/iris-messenger/tree/no-buildtools) ([deployed](https://iris-simple.netlify.app/)).
+
