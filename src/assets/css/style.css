@@ -1936,8 +1936,10 @@ form.public {
 }
 
 /* Needs to be visible for tooltip */
-.ReactVirtualized__Grid, .ReactVirtualized__Grid__innerScrollContainer {
-  overflow: visible !important;
+@media (min-width: 626px) {
+  .ReactVirtualized__Grid, .ReactVirtualized__Grid__innerScrollContainer {
+    overflow: visible !important;
+  }
 }
 
 /* Tooltip arrow */
