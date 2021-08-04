@@ -67,19 +67,21 @@ class ProfilePhotoPicker extends Component {
     const previewPhotoEl = this.state.preview ? html`<img id="profile-photo-preview" src=${this.state.preview}/>` : '';
     const addProfilePhotoBtn = (this.props.currentPhoto || this.state.preview) ? '' : html`<div class="picker profile-photo"><${Identicon} str=${this.props.placeholder} width=250 onClick=${() => this.clickProfilePhotoInput()}/></div>`;
     return html`
-      ${currentPhotoEl}
-      ${addProfilePhotoBtn}
-      <div id="profile-photo-preview-container">
-        ${previewPhotoEl}
+      <div class="profile-photo-picker ${this.state.preview ? 'open' : ''}">
+        ${currentPhotoEl}
+        ${addProfilePhotoBtn}
+        <div id="profile-photo-preview-container">
+          ${previewPhotoEl}
+        </div>
+        <p>
+          <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" onChange=${e => this.onProfilePhotoInputChange(e)} accept="image/*"/>
+        </p>
+        <p id="profile-photo-error" class="${this.state.hasError ? '' : 'hidden'}">${t('profile_photo_too_big')}</p>
+        <p class=${this.state.preview ? '' : 'hidden'}>
+          <button id="cancel-profile-photo" onClick=${() => this.cancelProfilePhotoClicked()}>${t('cancel')}</button>
+          <button id="use-profile-photo" onClick=${() => this.useProfilePhotoClicked()}>${t('use_photo')}</button>
+        </p>
       </div>
-      <p>
-        <input name="profile-photo-input" type="file" class="hidden" id="profile-photo-input" onChange=${e => this.onProfilePhotoInputChange(e)} accept="image/*"/>
-      </p>
-      <p id="profile-photo-error" class="${this.state.hasError ? '' : 'hidden'}">${t('profile_photo_too_big')}</p>
-      <p class=${this.state.preview ? '' : 'hidden'}>
-        <button id="cancel-profile-photo" onClick=${() => this.cancelProfilePhotoClicked()}>${t('cancel')}</button>
-        <button id="use-profile-photo" onClick=${() => this.useProfilePhotoClicked()}>${t('use_photo')}</button>
-      </p>
     `;
   }
 }
