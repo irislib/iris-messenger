@@ -147,7 +147,10 @@ class PublicMessage extends Message {
 
   likeBtnClicked(e) {
     e.preventDefault();
-    const liked = !this.state.liked;
+    this.like(!this.state.liked);
+  }
+
+  like(liked = true) {
     State.public.user().get('likes').get(this.props.hash).put(liked);
   }
 
@@ -158,6 +161,26 @@ class PublicMessage extends Message {
       msg.torrentId && State.public.user().get('media').get(msg.time).put(null);
       State.public.user().get(this.props.index || 'msgs').get(msg.time).put(null);
       msg.replyingTo && State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
+    }
+  }
+
+  imageClicked(event) {
+    event.preventDefault();
+    if (window.innerWidth <= 625) {
+      clearTimeout(this.dblTimeout);
+      if (this.dbl) {
+        this.dbl = false;
+        this.like(); // like on double click
+        $(event.target).parent().addClass('like-animate');
+        setTimeout(() => $(event.target).parent().removeClass('like-animate'), 1000);
+      } else {
+        this.dbl = true;
+        this.dblTimeout = setTimeout(() => {
+          this.dbl = false;
+        }, 300);
+      }
+    } else {
+      this.openAttachmentsGallery(event);
     }
   }
 
@@ -205,7 +228,8 @@ class PublicMessage extends Message {
           `:''}
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
             html`<div class="img-container">
-                <${SafeImg} src=${a.data} onload=${() => this.measure()} onclick=${e => { this.openAttachmentsGallery(e); }}/>
+                <div class="heart"></div>
+                <${SafeImg} src=${a.data} onLoad=${() => this.measure()} onClick=${e => { this.imageClicked(e); }}/>
             </div>`
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
