@@ -1,4 +1,3 @@
-import { BrowserQRCodeReader } from '@zxing/library';
 var codeReader;
 
 function startPrivKeyQRScanner() {
@@ -17,7 +16,8 @@ function startChatLinkQRScanner(callback) {
   startQRScanner('chatlink-qr-video', callback);
 }
 
-function startQRScanner(videoElementId, callback) {
+async function startQRScanner(videoElementId, callback) {
+    const { BrowserQRCodeReader } = await import('@zxing/library');
     codeReader = new BrowserQRCodeReader();
     codeReader.decodeFromInputVideoDevice(undefined, videoElementId)
         .then(result => {
