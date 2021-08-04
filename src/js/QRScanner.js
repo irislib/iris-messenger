@@ -16,8 +16,9 @@ function startChatLinkQRScanner(callback) {
   startQRScanner('chatlink-qr-video', callback);
 }
 
-function startQRScanner(videoElementId, callback) {
-    codeReader = new ZXing.BrowserMultiFormatReader();
+async function startQRScanner(videoElementId, callback) {
+    const { BrowserQRCodeReader } = await import('@zxing/library');
+    codeReader = new BrowserQRCodeReader();
     codeReader.decodeFromInputVideoDevice(undefined, videoElementId)
         .then(result => {
             if (callback(result)) {

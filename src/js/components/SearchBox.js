@@ -1,11 +1,13 @@
-import { Component } from '../lib/preact.js';
-import { route } from '../lib/preact-router.es.js';
+import { Component } from 'preact';
+import { route } from 'preact-router';
 import Helpers, { html } from '../Helpers.js';
 import State from '../State.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
 import Fuse from '../lib/fuse.basic.esm.min.js';
+import $ from 'jquery';
+import _ from 'lodash';
 
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 

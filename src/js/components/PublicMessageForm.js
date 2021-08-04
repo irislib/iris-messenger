@@ -1,4 +1,4 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
@@ -6,6 +6,9 @@ import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import SafeImg from './SafeImg.js';
 import Torrent from './Torrent.js';
+import $ from 'jquery';
+import EmojiButton from '../lib/emoji-button.js';
+import iris from 'iris-lib';
 
 function twice(f) {
   f();

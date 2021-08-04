@@ -1,4 +1,15 @@
+import Gun from 'gun';
+import 'gun/sea';
+import 'gun/nts.js';
+import 'gun/lib/open';
+import 'gun/lib/radix';
+import 'gun/lib/radisk';
+import 'gun/lib/store';
+import 'gun/lib/rindexed';
+import _ from 'lodash';
+
 import PeerManager from './PeerManager.js';
+import iris from 'iris-lib';
 
 const State = {
   init: function(publicOpts) {
@@ -28,7 +39,7 @@ const State = {
     });
 
     window.State = this;
-    window.iris.util.setPublicState && window.iris.util.setPublicState(this.public);
+    iris.util.setPublicState && iris.util.setPublicState(this.public);
   },
 
   group: function(groupNode = 'everyone') {

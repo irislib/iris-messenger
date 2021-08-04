@@ -2,7 +2,9 @@ import State from './State.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import PeerManager from './PeerManager.js';
-import { route } from './lib/preact-router.es.js';
+import { route } from 'preact-router';
+import iris from 'iris-lib';
+import _ from 'lodash';
 
 let key;
 let myName;
@@ -118,7 +120,7 @@ function updateGroups() {
     if (!hasFollows && info.followDistance >= 1) { State.local.get('noFollows').put(false); }
     if (info.followDistance <= 1) {
       State.local.get('groups').get('follows').get(k).put(true);
-    } else if (info.followDistance <= 2) {
+    } else if (info.followDistance == 2) {
       State.local.get('groups').get('2ndDegreeFollows').get(k).put(true);
     }
     State.local.get('groups').get('everyone').get(k).put(true);
@@ -197,6 +199,11 @@ function login(k) {
   State.local.get('settings').on(local => {
     settings.local = local;
   });
+  State.local.get('filters').get('group').once().then(v => {
+    if (!v) {
+      State.local.get('filters').get('group').put('follows');
+    }
+  });
 }
 
 async function createChatLink() {
@@ -242,7 +249,7 @@ function getPubKey() {
 
 function loginAsNewUser(name) {
   name = name || Helpers.generateName();
-  return Gun.SEA.pair().then(k => {
+  return SEA.pair().then(k => {
     login(k);
     name && State.public.user().get('profile').get('name').put(name);
     createChatLink();
@@ -265,7 +272,6 @@ function getFollows() {
 const myPeerUrl = ip => `http://${ip}:8767/gun`;
 
 function shareMyPeerUrl(channel) {
-  console.log('sharing my peer url', myPeerUrl(settings.electron.publicIp), channel.getId());
   channel.put && channel.put('my_peer', myPeerUrl(settings.electron.publicIp));
 }
 

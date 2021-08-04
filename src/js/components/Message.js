@@ -1,8 +1,11 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
+import Autolinker from 'autolinker';
+import iris from 'iris-lib';
+import $ from 'jquery';
 import State from '../State.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
@@ -120,6 +123,9 @@ class Message extends Component {
     const activeChat = window.location.pathname.replace('/profile/','').replace('/chat/','');
     if (activeChat && Session.channels[activeChat]) {
       Session.channels[activeChat].attachments = null;
+    }
+    if ("activeElement" in document) {
+      document.activeElement.blur();
     }
   }
 

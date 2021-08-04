@@ -1,12 +1,14 @@
 import State from './State.js';
 import Helpers from './Helpers.js';
 import Session from './Session.js';
+import iris from 'iris-lib';
+import _ from 'lodash';
 
 var MAX_PEER_LIST_SIZE = 10;
 const ELECTRON_GUN_URL = 'http://localhost:8767/gun';
 var maxConnectedPeers = iris.util.isElectron ? 2 : 1;
 const DEFAULT_PEERS = {
-  // 'https://iris.cx/gun': {}, // remove this for now, because sync between them is poor and often unidirectional :D
+  //'https://iris.cx/gun': {},
   'https://gun-us.herokuapp.com/gun': {}
 };
 var knownPeers = getSavedPeers();
@@ -144,7 +146,7 @@ function checkGunPeerCount() {
   });
   if (connectedPeers.length < maxConnectedPeers) {
     var unconnectedPeers = _.filter(Object.keys(knownPeers), url => {
-      var addedToGun = _.pluck(Object.values(peersFromGun), 'url').indexOf(url) > -1;
+      var addedToGun = _.map(Object.values(peersFromGun), 'url').indexOf(url) > -1;
       var enabled = knownPeers[url].enabled;
       const mixedContent = (window.location.protocol === 'https:' && (url.indexOf('http:') === 0));
       return !mixedContent && enabled && !addedToGun;

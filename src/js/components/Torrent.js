@@ -1,7 +1,8 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import Helpers, {html} from '../Helpers.js';
 import Session from "../Session.js";
 import { translate as tr } from '../Translation.js';
+import $ from 'jquery';
 import State from '../State.js';
 import Icons from '../Icons.js';
 
@@ -43,10 +44,10 @@ class Torrent extends Component {
     }
   }
 
-  startTorrenting(clicked) {
+  async startTorrenting(clicked) {
     this.setState({torrenting: true});
     const torrentId = this.props.torrentId;
-    const client = Helpers.getWebTorrentClient();
+    const client = await Helpers.getWebTorrentClient();
     const existing = client.get(torrentId);
     if (existing) {
       this.onTorrent(existing, clicked);

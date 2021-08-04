@@ -1,7 +1,7 @@
 import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import View from './View.js';
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;

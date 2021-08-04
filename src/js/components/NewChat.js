@@ -5,8 +5,11 @@ import Helpers from '../Helpers.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
 import CopyButton from './CopyButton.js';
-import { Component } from '../lib/preact.js';
-import { route } from '../lib/preact-router.es.js';
+import { Component } from 'preact';
+import { route } from 'preact-router';
+import $ from 'jquery';
+import QRCode from '../lib/qrcode.min.js';
+import iris from 'iris-lib';
 
 function setChatLinkQrCode(link) {
   var qrCodeEl = $('#my-qr-code');

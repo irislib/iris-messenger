@@ -1,11 +1,14 @@
-import { Component } from '../lib/preact.js';import { html } from '../Helpers.js';
+import { Component } from 'preact';
+import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import ChatListItem from './ChatListItem.js';
 import Helpers from '../Helpers.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import Notifications from '../Notifications.js';
-import ScrollViewport from '../lib/preact-scroll-viewport.js';
+import ScrollViewport from 'preact-scroll-viewport';
+import _ from 'lodash';
+import $ from 'jquery';
 
 class ChatList extends Component {
   constructor() {

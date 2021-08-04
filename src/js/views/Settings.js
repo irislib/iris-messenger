@@ -8,9 +8,12 @@ import PeerManager from '../PeerManager.js';
 import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../components/VideoCall.js';
 import CopyButton from '../components/CopyButton.js';
 import View from './View.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import {ExistingAccountLogin} from './Login.js';
 import Notifications from '../Notifications.js';
+import iris from 'iris-lib';
+import $ from 'jquery';
+import Icons from '../Icons.js';
 
 class Settings extends View {
   constructor() {
@@ -92,7 +95,7 @@ class Settings extends View {
           <small dangerouslySetInnerHTML=${{ __html: t('peers_info', "href=\"https://github.com/amark/gun#deploy\"")}}></small>
         </p>
         <p><a href="https://heroku.com/deploy?template=https://github.com/amark/gun">
-           <img src="./img/herokubutton.svg" alt="Deploy"/>
+           ${Icons.herokuButton}
         </a></p>
         <p>${t('also')} <a href="https://github.com/amark/gun#docker">Docker</a> ${t('or_small')} <a href="https://github.com/irislib/iris-electron">Iris-electron</a>.</p>
         ${iris.util.isElectron ? html`

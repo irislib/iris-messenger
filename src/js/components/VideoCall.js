@@ -1,15 +1,15 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import { html } from '../Helpers.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
 
 import State from '../State.js';
 
-var ringSound = new Audio('../../audio/ring.mp3');
+const ringSound = new Audio('../../assets/audio/ring.mp3');
 ringSound.loop = true;
-var callSound = new Audio('../../audio/call.mp3');
+const callSound = new Audio('../../assets/audio/call.mp3');
 var callTimeout;
 var callSoundTimeout;
 var callingInterval;
@@ -39,9 +39,9 @@ class VideoCall extends Component {
     State.local.get('activeCall').put(null);
     State.local.get('outgoingCall').put(null);
     State.local.get('incomingCall').put(null);
-    State.local.get('call').open(call => {
+    /*State.local.get('call').open(call => {
       this.onCallMessage(call.pub, call.call);
-    });
+    });*/
     State.local.get('incomingCall').on(incomingCall => {
       if (!incomingCall) {
         clearTimeout(callTimeout);

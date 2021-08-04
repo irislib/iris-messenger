@@ -1,7 +1,7 @@
 import { html } from '../Helpers.js';
 import Session from '../Session.js';
 import {translate as t} from '../Translation.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 
 const LogoutConfirmation = () => html`<div class="main-view" id="logout-confirmation">
   <div class="centered-container">

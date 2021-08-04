@@ -1,12 +1,18 @@
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import Identicon from './Identicon.js';
 import SearchBox from './SearchBox.js';
 import Icons from '../Icons.js';
+import iris from 'iris-lib';
+
+import logo from '../../assets/img/icon128.png';
+import logoType from '../../assets/img/iris_logotype.png';
+
+import $ from 'jquery';
 
 class Header extends Component {
   constructor() {
@@ -114,8 +120,8 @@ class Header extends Component {
       <div class="header-content">
         ${iris.util.isElectron || (activeRoute && activeRoute.indexOf('/chat/') === 0) ? '' : html`
           <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
-            <img src="/img/icon128.png" width=40 height=40/>
-            <img src="/img/iris_logotype.png" height=23 width=41 />
+            <img src=${logo} width=40 height=40/>
+            <img src=${logoType} height=23 width=41 />
           </a>
         `}
         <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>

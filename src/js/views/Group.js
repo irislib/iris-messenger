@@ -3,13 +3,15 @@ import {translate as tr} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg.js';
 import CopyButton from '../components/CopyButton.js';
 import Identicon from '../components/Identicon.js';
 import Name from '../components/Name.js';
 import View from './View.js';
 import SearchBox from '../components/SearchBox.js';
+import $ from 'jquery';
+import QRCode from '../lib/qrcode.min.js';
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
@@ -280,7 +282,7 @@ class Group extends View {
 }
 
 function areWeAdmin(uuid) {
-  const me = Session.channels[uuid].participantProfiles[Session.getKey().pub];
+  const me = Session.channels[uuid] && Session.channels[uuid].participantProfiles[Session.getKey().pub];
   return !!(me && me.permissions && me.permissions.admin);
 }
 
