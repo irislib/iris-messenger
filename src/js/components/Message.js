@@ -124,6 +124,9 @@ class Message extends Component {
     if (activeChat && Session.channels[activeChat]) {
       Session.channels[activeChat].attachments = null;
     }
+    if ("activeElement" in document) {
+      document.activeElement.blur();
+    }
   }
 
   render() {
