@@ -3,10 +3,14 @@ import Helpers from '../Helpers.js';
 import Identicon from './Identicon.js';
 import PublicMessageForm from './PublicMessageForm.js';
 import State from '../State.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import Message from './Message.js';
+import SafeImg from './SafeImg.js';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
+import Autolinker from 'autolinker';
+import iris from 'iris-lib';
+import $ from 'jquery';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
@@ -28,41 +32,72 @@ class PublicMessage extends Message {
     this.state = { sortedReplies: [] };
   }
 
-
-
-  componentDidMount() {
-    const r = this.props.message;  
-    const msg = r.signedData;
-    msg.info = {from: r.signerKeyHash};
-    this.setState({msg});
-    if (this.props.showName && !this.props.name) {
-      State.public.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
-        this.eventListeners['name'] = e;
-        this.setState({name});
-      });
+  fetchByHash() {
+    const hash = this.props.hash;
+    if (typeof hash !== 'string') {
+      return;
     }
-    State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
-      this.eventListeners[from+'likes'] = e;
-      liked ? this.likedBy.add(from) : this.likedBy.delete(from);
-      const s = {likes: this.likedBy.size};
-      if (from === Session.getPubKey()) s['liked'] = liked;
-      this.setState(s);
-    });
-    State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, (hash,time,b,e,from) => {
-      const k = from + time;
-      if (hash && this.replies[k]) return;
-      if (hash) {
-        this.replies[k] = {hash, time};
-      } else {
-        delete this.replies[k];
-      }
-      this.eventListeners[from+'replies'] = e;
-      const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
-      this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
+    return new Promise(resolve => {
+      State.local.get('msgsByHash').get(hash).once(msg => {
+        if (typeof msg === 'string') {
+          try {
+            resolve(JSON.parse(msg));
+          } catch (e) {
+            console.error('message parsing failed', msg, e);
+          }
+        }
+      });
+      State.public.get('#').get(hash).on(async (serialized, a, b, event) => {
+        if (typeof serialized !== 'string') {
+          console.error('message parsing failed', hash, serialized);
+          return;
+        }
+        event.off();
+        const msg = await iris.SignedMessage.fromString(serialized);
+        if (msg) {
+          resolve(msg);
+          State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
+        }
+      });
     });
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidMount() {
+    const p = this.fetchByHash();
+    if (!p) { return; }
+    p.then(r => {
+      const msg = r.signedData;
+      msg.info = {from: r.signerKeyHash};
+      this.setState({msg});
+      if (this.props.showName && !this.props.name) {
+        State.public.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
+          this.eventListeners['name'] = e;
+          this.setState({name});
+        });
+      }
+      State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
+        this.eventListeners[from+'likes'] = e;
+        liked ? this.likedBy.add(from) : this.likedBy.delete(from);
+        const s = {likes: this.likedBy.size};
+        if (from === Session.getPubKey()) s['liked'] = liked;
+        this.setState(s);
+      });
+      State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, (hash,time,b,e,from) => {
+        const k = from + time;
+        if (hash && this.replies[k]) return;
+        if (hash) {
+          this.replies[k] = {hash, time};
+        } else {
+          delete this.replies[k];
+        }
+        this.eventListeners[from+'replies'] = e;
+        const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
+        this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
+      });
+    });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
     if (prevProps.hash !== this.props.hash) {
       Object.values(this.eventListeners).forEach(e => e.off());
       this.eventListeners = {};
@@ -72,6 +107,10 @@ class PublicMessage extends Message {
       this.linksDone = false;
       this.setState({replies:0, likes: 0, sortedReplies:[]});
       this.componentDidMount();
+    } else if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
+      this.measure();
+    } else if (this.state.msg && this.state.msg !== prevState.msg && !this.state.msg.attachments) {
+      this.measure();
     }
     if (this.state.msg && !this.linksDone) {
       $(this.base).find('a').off().on('click', e => {
@@ -83,6 +122,10 @@ class PublicMessage extends Message {
       });
       this.linksDone = true;
     }
+  }
+
+  measure() {
+    this.props.measure && this.props.measure();
   }
 
   toggleReplies() {
@@ -104,7 +147,10 @@ class PublicMessage extends Message {
 
   likeBtnClicked(e) {
     e.preventDefault();
-    const liked = !this.state.liked;
+    this.like(!this.state.liked);
+  }
+
+  like(liked = true) {
     State.public.user().get('likes').get(this.props.hash).put(liked);
   }
 
@@ -115,6 +161,26 @@ class PublicMessage extends Message {
       msg.torrentId && State.public.user().get('media').get(msg.time).put(null);
       State.public.user().get(this.props.index || 'msgs').get(msg.time).put(null);
       msg.replyingTo && State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
+    }
+  }
+
+  imageClicked(event) {
+    event.preventDefault();
+    if (window.innerWidth <= 625) {
+      clearTimeout(this.dblTimeout);
+      if (this.dbl) {
+        this.dbl = false;
+        this.like(); // like on double click
+        $(event.target).parent().addClass('like-animate');
+        setTimeout(() => $(event.target).parent().removeClass('like-animate'), 1000);
+      } else {
+        this.dbl = true;
+        this.dblTimeout = setTimeout(() => {
+          this.dbl = false;
+        }, 300);
+      }
+    } else {
+      this.openAttachmentsGallery(event);
     }
   }
 
@@ -161,7 +227,10 @@ class PublicMessage extends Message {
               <${Torrent} torrentId=${this.state.msg.torrentId}/>
           `:''}
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
-            html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}  height="200" /></div>` // TODO: escape a.data
+            html`<div class="img-container">
+                <div class="heart"></div>
+                <${SafeImg} src=${a.data} onLoad=${() => this.measure()} onClick=${e => { this.imageClicked(e); }}/>
+            </div>`
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           ${this.state.msg.replyingTo && !this.props.asReply ? html`
