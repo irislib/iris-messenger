@@ -47,16 +47,17 @@ class ProfilePhotoPicker extends Component {
     $(e.target).val('');
   }
 
-  async componentDidUpdate() {
+  componentDidUpdate() {
     this.cropper && this.cropper.destroy();
     if (this.state.preview) {
-      const { default: Cropper } = await import('../lib/cropper.min.js');
-      this.cropper = new Cropper($('#profile-photo-preview')[0], {
-        aspectRatio:1,
-        autoCropArea: 1,
-        viewMode: 1,
-        background: false,
-        zoomable: false
+      import('../lib/cropper.min.js').then(Cropper => {
+        this.cropper = new Cropper($('#profile-photo-preview')[0], {
+          aspectRatio:1,
+          autoCropArea: 1,
+          viewMode: 1,
+          background: false,
+          zoomable: false
+        });
       });
     }
   }

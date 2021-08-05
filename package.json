@@ -16,6 +16,16 @@
       "src/js/lib/",
       "src/assets",
       "src/static"
+    ],
+    "overrides": [
+      {
+        "files": ["*"],
+        "rules": {
+          "react/no-did-mount-set-state": "off",
+          "react/no-did-update-set-state": "off",
+          "radix": "off"
+        }
+      }
     ]
   },
   "devDependencies": {
