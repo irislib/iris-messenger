@@ -109,7 +109,7 @@ class PublicMessage extends Message {
       this.componentDidMount();
     } else if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
       this.measure();
-    } else if (this.state.msg && this.state.msg !== prevState.msg && !this.state.msg.attachments) {
+    } else if (this.state.msg && this.state.msg !== prevState.msg) {
       this.measure();
     }
     if (this.state.msg && !this.linksDone) {

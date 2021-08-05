@@ -5,7 +5,6 @@ import {  List, WindowScroller,CellMeasurer,CellMeasurerCache,} from 'react-virt
 import State from '../State.js';
 import 'react-virtualized/styles.css';
 import $ from 'jquery';
-import _ from 'lodash';
 
 class MessageFeed extends Component {
   constructor() {
@@ -31,13 +30,11 @@ class MessageFeed extends Component {
       this.mappedMessages.delete(k);
     }
 
-    this.updateSortedMessages = this.updateSortedMessages || _.debounce(() => {
+    requestAnimationFrame(() => {
       this.setState({
         sortedMessages: Array.from(this.mappedMessages.keys()).sort().reverse().map(k => this.mappedMessages.get(k))
       })
-    }, 200);
-
-    this.updateSortedMessages();
+    });
   }
 
   componentDidMount() {
