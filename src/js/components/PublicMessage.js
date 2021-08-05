@@ -38,8 +38,7 @@ class PublicMessage extends Message {
       return;
     }
     return new Promise(resolve => {
-      requestAnimationFrame(() => {
-        State.local.get('msgsByHash').get(hash).once(msg => {
+      State.local.get('msgsByHash').get(hash).once(msg => {
           if (typeof msg === 'string') {
             try {
               resolve(JSON.parse(msg));
@@ -60,7 +59,6 @@ class PublicMessage extends Message {
             State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
           }
         });
-      });
     });
   }
 
