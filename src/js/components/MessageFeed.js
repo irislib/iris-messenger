@@ -4,7 +4,6 @@ import PublicMessage from './PublicMessage.js';
 import {  List, WindowScroller,CellMeasurer,CellMeasurerCache,} from 'react-virtualized';
 import State from '../State.js';
 import 'react-virtualized/styles.css';
-import $ from 'jquery';
 import _ from 'lodash';
 
 class MessageFeed extends Component {
@@ -41,6 +40,7 @@ class MessageFeed extends Component {
   }
 
   componentDidMount() {
+    console.log(this.props);
     let first = true;
     State.local.get('scrollUp').on(() => {
       !first && Helpers.animateScrollTop('.main-view');
@@ -103,9 +103,10 @@ class MessageFeed extends Component {
   }
 
   render() {
+    if (!this.props.scrollElement) { return; }
     return html`
       <div class="feed-container">
-          <${WindowScroller} scrollElement=${$(".main-view")[0]}>
+          <${WindowScroller} scrollElement=${this.props.scrollElement}>
             ${({ height, width, isScrolling, onChildScroll, scrollTop }) => {
               return html`
                 <${List}
