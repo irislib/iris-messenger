@@ -5,6 +5,7 @@ import {  List, WindowScroller,CellMeasurer,CellMeasurerCache,} from 'react-virt
 import State from '../State.js';
 import 'react-virtualized/styles.css';
 import $ from 'jquery';
+import _ from 'lodash';
 
 class MessageFeed extends Component {
   constructor() {
@@ -73,7 +74,7 @@ class MessageFeed extends Component {
     this.unsubscribe();
   }
 
-  rowRenderer({ index, key, parent, style, isScrolling }) {
+  rowRenderer({ index, key, parent, style }) { // TODO: use isScrolling param to reduce rendering?
     const hash = this.state.sortedMessages[index];
     return (
       <CellMeasurer
@@ -99,7 +100,7 @@ class MessageFeed extends Component {
         )}
       </CellMeasurer>
     );
-  };
+  }
 
   render() {
     return html`

@@ -13,7 +13,7 @@ import iris from 'iris-lib';
 import Helpers from './Helpers.js';
 
 const State = {
-  init: function(publicOpts) {
+  init(publicOpts) {
     Gun.log.off = true;
     const o = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
     this.public = Gun(o);
@@ -43,10 +43,10 @@ const State = {
     iris.util.setPublicState && iris.util.setPublicState(this.public);
   },
 
-  group: function(groupNode = 'everyone') {
+  group(groupNode = 'everyone') {
     const _this = this;
     return {
-      get: function(path, callback) {
+      get(path, callback) {
         requestAnimationFrame(() => {
           const follows = {};
           if (typeof groupNode === 'string') {
@@ -67,11 +67,11 @@ const State = {
         });
       },
 
-      map: function(path, callback) {
+      map(path, callback) {
         this.get(path, (node, from) => node.map((...args) => callback(...args, from)));
       },
 
-      on: function(path, callback) {
+      on(path, callback) {
         this.get(path, (node, from) => node.on((...args) => callback(...args, from)));
       }
     }

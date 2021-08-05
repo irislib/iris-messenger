@@ -1,5 +1,4 @@
-import { html } from '../Helpers.js';
-import Helpers from '../Helpers.js';
+import Helpers, { html } from '../Helpers.js';
 import Identicon from './Identicon.js';
 import PublicMessageForm from './PublicMessageForm.js';
 import State from '../State.js';
@@ -77,7 +76,7 @@ class PublicMessage extends Message {
         });
       }
       State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
-        this.eventListeners[from+'likes'] = e;
+        this.eventListeners[`${from}likes`] = e;
         liked ? this.likedBy.add(from) : this.likedBy.delete(from);
         const s = {likes: this.likedBy.size};
         if (from === Session.getPubKey()) s['liked'] = liked;
@@ -91,7 +90,7 @@ class PublicMessage extends Message {
         } else {
           delete this.replies[k];
         }
-        this.eventListeners[from+'replies'] = e;
+        this.eventListeners[`${from}replies`] = e;
         const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
         this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
       });
@@ -143,7 +142,7 @@ class PublicMessage extends Message {
   }
 
   onClickName() {
-    route('/profile/' + this.state.msg.info.from);
+    route(`/profile/${  this.state.msg.info.from}`);
   }
 
   likeBtnClicked(e) {
@@ -194,7 +193,7 @@ class PublicMessage extends Message {
     const p = document.createElement('p');
     let text = this.state.msg.text;
     if (isThumbnail && text.length > 128) {
-      text = text.slice(0,128) + '...';
+      text = `${text.slice(0,128)  }...`;
     }
     p.innerText = text;
     const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
@@ -261,7 +260,7 @@ class PublicMessage extends Message {
           ${this.state.showLikes ? html`
             <div class="likes">
               ${Array.from(this.likedBy).map(key => {
-                return html`<${Identicon} showTooltip=${true} onClick=${() => route('/profile/' + key)} str=${key} width=32/>`;
+                return html`<${Identicon} showTooltip=${true} onClick=${() => route(`/profile/${  key}`)} str=${key} width=32/>`;
               })}
             </div>
           `: ''}

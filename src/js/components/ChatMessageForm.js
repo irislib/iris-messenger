@@ -1,14 +1,13 @@
 import { Component } from 'preact';
-import { html } from '../Helpers.js';
+import Helpers, { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
-import Helpers from '../Helpers.js';
 import Session from '../Session.js';
-import '../lib/emoji-button.js';
 import iris from 'iris-lib';
 import _ from 'lodash';
 import $ from 'jquery';
 import EmojiButton from '../lib/emoji-button.js';
+import Gun from 'gun';
 
 const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
 
@@ -72,7 +71,7 @@ class ChatMessageForm extends Component {
   async downloadWebtorrent(torrentId) {
     function onTorrent(torrent) {
       // Torrents can contain many files. Let's use the .mp4 file
-      var file = torrent.files.find(function (file) {
+      let file = torrent.files.find((file) => {
         return file.name.endsWith('.mp4')
       })
       // Stream the file in the browser
@@ -122,18 +121,18 @@ class ChatMessageForm extends Component {
     const attachmentsPreview = $('#attachment-preview');
     attachmentsPreview.removeClass('gallery');
     attachmentsPreview.empty();
-    var closeBtn = $('<button>').text(t('cancel')).click(() => this.closeAttachmentsPreview());
+    let closeBtn = $('<button>').text(t('cancel')).click(() => this.closeAttachmentsPreview());
     attachmentsPreview.append(closeBtn);
 
-    var files = $(this.base).find('.attachment-input')[0].files;
+    let files = $(this.base).find('.attachment-input')[0].files;
     if (files) {
       attachmentsPreview.show();
       $('#message-list').hide();
-      for (var i = 0;i < files.length;i++) {
+      for (let i = 0;i < files.length;i++) {
         Helpers.getBase64(files[i]).then(base64 => {
           Session.channels[this.props.activeChat].attachments = Session.channels[this.props.activeChat].attachments || [];
           Session.channels[this.props.activeChat].attachments.push({type: 'image', data: base64});
-          var preview = Helpers.setImgSrc($('<img>'), base64);
+          let preview = Helpers.setImgSrc($('<img>'), base64);
           attachmentsPreview.append(preview);
         });
       }
@@ -165,7 +164,7 @@ class ChatMessageForm extends Component {
   async webPush(msg) {
     const chat = Session.channels[this.props.activeChat];
     const myKey = Session.getKey();
-    const shouldWebPush = (window.location.pathname === '/chat/' + myKey.pub) || !(chat.activity);
+    const shouldWebPush = (window.location.pathname === `/chat/${  myKey.pub}`) || !(chat.activity);
     if (shouldWebPush && chat.webPushSubscriptions) {
       const subscriptions = [];
       const participants = Object.keys(chat.webPushSubscriptions);

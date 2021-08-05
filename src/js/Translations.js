@@ -1,5 +1,5 @@
 export default {
-  "en": {
+  en: {
     language_name: "English",
     whats_your_name: "What's your name?",
     new_user_go: "Go",
@@ -148,7 +148,7 @@ export default {
     explorer: "Explorer",
     no_contacts_in_list: 'You don\'t have any contacts in your list.',
   },
-   "es": {
+   es: {
     language_name: "Español",
     whats_your_name: "¿Cuál es tu nombre?",
     new_user_go: "Ir",
@@ -350,7 +350,7 @@ export default {
     on_call_with: "Em chamada com",
     no_contacts_in_list: 'Você não tem nenhum contato na sua lista.'
   },
-"ru": {
+ru: {
     language_name: "Русский",
     whats_your_name: "Как вас зовут?",
     new_user_go: "Поехали!",
@@ -450,7 +450,7 @@ export default {
     calling: "Звоню",
     on_call_with: "На звонке с",
   },
-  "de": {
+  de: {
     language_name: "Deutsch",
     whats_your_name: "Was ist Ihr Name?",
     new_user_go: "Auf Gehts",
@@ -550,7 +550,7 @@ export default {
     calling: "Rufe an",
     on_call_with: "Anruf mit",
   },
-  "fi": {
+  fi: {
     language_name: "Suomi",
     whats_your_name: "Mikä on nimesi?",
     new_user_go: "Aloita",
@@ -696,7 +696,7 @@ export default {
     autoplay_webtorrent_videos: "Käynnistä webtorrentin videot automaattisesti",
     search: "Etsi",
   },
-  "it": {
+  it: {
     language_name: "Italian",
     whats_your_name: "Quale è il tuo nome??",
     new_user_go: "Inizia",
@@ -897,7 +897,7 @@ export default {
     calling: "拨号中",
     on_call_with: "通话对象:",
     },
-  "ko": {
+  ko: {
 	language_name: "한글",
 	whats_your_name: "이름?",
 	new_user_go: "진행",

@@ -6,13 +6,16 @@
     "build": "preact build --no-prerender",
     "serve": "sirv build --port 8080 --cors --single",
     "dev": "preact watch",
-    "lint": "eslint src/js/*.js; eslint src/js/components/*.js; eslint src/js/views/*.js",
+    "lint": "eslint src",
     "test": "jest"
   },
   "eslintConfig": {
     "extends": "preact",
     "ignorePatterns": [
-      "build/"
+      "build/",
+      "src/js/lib/",
+      "src/assets",
+      "src/static"
     ]
   },
   "devDependencies": {

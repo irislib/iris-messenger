@@ -1,11 +1,10 @@
-import { html } from '../Helpers.js';
+import Helpers, { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import View from './View.js';
 import State from '../State.js';
 import Identicon from '../components/Identicon.js';
 import Message from '../components/Message.js';
 import ChatMessageForm from '../components/ChatMessageForm.js';
-import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Notifications from '../Notifications.js';
 import ChatList from '../components/ChatList.js';
@@ -27,9 +26,9 @@ c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,35
 
 function copyMyChatLinkClicked(e) {
   Helpers.copyToClipboard(Session.getMyChatLink());
-  var te = $(e.target);
-  var originalText = te.text();
-  var originalWidth = te.width();
+  let te = $(e.target);
+  let originalText = te.text();
+  let originalWidth = te.width();
   te.width(originalWidth);
   te.text(t('copied'));
   setTimeout(() => {
@@ -87,7 +86,7 @@ class Chat extends View {
       this.participants[k] = v;
       if (!!v && !hasAlready) {
         State.public.user(k).get('activity').on((activity, a, b, e) => {
-          this.eventListeners[k + 'activity'] = e;
+          this.eventListeners[`${k  }activity`] = e;
           if (this.participants[k]) { this.participants[k].activity = activity; }
           this.setSortedParticipants();
         });
@@ -139,7 +138,7 @@ class Chat extends View {
       }
       if (aActive > bActive) { return -1; }
       else if (aActive < bActive) { return 1; }
-      else { return 0; }
+       return 0; 
     });
     this.setState({sortedParticipants, noLongerParticipant});
   }
@@ -176,14 +175,14 @@ class Chat extends View {
   }
 
   addFloatingDaySeparator() {
-    var currentDaySeparator = $('.day-separator').last();
-    var pos = currentDaySeparator.position();
+    let currentDaySeparator = $('.day-separator').last();
+    let pos = currentDaySeparator.position();
     while (currentDaySeparator && pos && pos.top - 55 > 0) {
       currentDaySeparator = currentDaySeparator.prevAll('.day-separator').first();
       pos = currentDaySeparator.position();
     }
-    var s = currentDaySeparator.clone();
-    var center = $('<div>').css({position: 'fixed', top: 70, 'text-align': 'center'}).attr('id', 'floating-day-separator').width($('#message-view').width()).append(s);
+    let s = currentDaySeparator.clone();
+    let center = $('<div>').css({position: 'fixed', top: 70, 'text-align': 'center'}).attr('id', 'floating-day-separator').width($('#message-view').width()).append(s);
     $('#floating-day-separator').remove();
     setTimeout(() => s.fadeOut(), 2000);
     $('#message-view').prepend(center);
@@ -234,7 +233,7 @@ class Chat extends View {
         const dateStr = date.toLocaleDateString();
         if (dateStr !== previousDateStr) {
           isDifferentDay = true;
-          var separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
+          let separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
           msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
         }
         previousDateStr = dateStr;

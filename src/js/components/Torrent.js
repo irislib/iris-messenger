@@ -193,9 +193,9 @@ class Torrent extends Component {
                         str = str.split('.').slice(0, -1).join('.');
                       }
                       return html`<p><b>${str}</b></p>`;
-                    } else {
+                    } 
                       return html`<p>${str}</p>` 
-                    }
+                    
                   }
                 ):''}
             </div>

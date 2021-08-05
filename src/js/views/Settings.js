@@ -1,7 +1,6 @@
-import { html } from '../Helpers.js';
+import Helpers, { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
-import Helpers from '../Helpers.js';
 import LanguageSelector from '../components/LanguageSelector.js';
 import {translate as t} from '../Translation.js';
 import PeerManager from '../PeerManager.js';
@@ -13,6 +12,8 @@ import {ExistingAccountLogin} from './Login.js';
 import Notifications from '../Notifications.js';
 import $ from 'jquery';
 import Icons from '../Icons.js';
+import _ from 'lodash';
+import QRCode from '../lib/qrcode.min';
 
 class Settings extends View {
   constructor() {
@@ -174,7 +175,7 @@ class Settings extends View {
                   `}
                   ${url}
                   ${peer.from ? html`
-                    <br/><small style="cursor:pointer" onClick=${() => route('/profile/' + peer.from)}>${t('from')} ${Helpers.truncateString(peer.from, 10)}</small>
+                    <br/><small style="cursor:pointer" onClick=${() => route(`/profile/${  peer.from}`)}>${t('from')} ${Helpers.truncateString(peer.from, 10)}</small>
                   ` : ''}
                 </div>
                 <div class="flex-cell no-flex">
@@ -207,8 +208,8 @@ class Settings extends View {
   }
 
   addPeerClicked() {
-    var url = $('#add-peer-url').val();
-    var visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
+    let url = $('#add-peer-url').val();
+    let visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
     PeerManager.addPeer({url, visibility});
     $('#add-peer-url').val('');
   }
@@ -246,18 +247,18 @@ class Settings extends View {
 }
 
 function togglePrivateKeyQR(e) {
-  var btn = $(e.target);
-  var show = $('#private-key-qr img').length === 0;
-  var SHOW_TEXT = t('show_privkey_qr');
+  let btn = $(e.target);
+  let show = $('#private-key-qr img').length === 0;
+  let SHOW_TEXT = t('show_privkey_qr');
   let hidePrivateKeyInterval;
   function reset() {
     clearInterval(hidePrivateKeyInterval);
     $('#private-key-qr').empty();
     btn.text(SHOW_TEXT);
   }
-  function hideText(s) { return t('hide_privkey_qr') + ' (' + s + ')'; }
+  function hideText(s) { return `${t('hide_privkey_qr')  } (${  s  })`; }
   if (show) {
-    var showPrivateKeySecondsRemaining = 20;
+    let showPrivateKeySecondsRemaining = 20;
     btn.text(hideText(showPrivateKeySecondsRemaining));
     hidePrivateKeyInterval = setInterval(() => {
       if ($('#private-key-qr img').length === 0) {
@@ -270,7 +271,7 @@ function togglePrivateKeyQR(e) {
         btn.text(hideText(showPrivateKeySecondsRemaining));
       }
     }, 1000);
-    var qrCodeEl = $('#private-key-qr');
+    let qrCodeEl = $('#private-key-qr');
     new QRCode(qrCodeEl[0], {
       text: JSON.stringify(Session.getKey()),
       width: 300,

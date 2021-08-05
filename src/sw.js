@@ -19,7 +19,7 @@ async function getSavedKey() {
 }
 
 self.onmessage = function(msg) {
-  if (msg.data.hasOwnProperty('key')) {
+  if (Object.prototype.hasOwnProperty.call(msg, 'key')) {
     self.irisKey = msg.data.key;
     localforage.setItem('swIrisKey', self.irisKey);
   }
@@ -28,13 +28,13 @@ self.onmessage = function(msg) {
 function getOpenClient(event) {
   return new Promise(resolve => {
     event.waitUntil(
-      clients.matchAll({
+      self.clients.matchAll({
         type: "window",
         includeUncontrolled: true
       })
-      .then(function(clientList) {
-        for (var i = 0; i < clientList.length; i++) {
-          var client = clientList[i];
+      .then((clientList) => {
+        for (let i = 0; i < clientList.length; i++) {
+          let client = clientList[i];
           if (client.url === urlToOpen && 'focus' in client) return resolve(client);
         }
         resolve(null);
@@ -68,7 +68,7 @@ self.addEventListener('push', async ev => {
   });
 });
 
-self.addEventListener('notificationclick', async function(event) {
+self.addEventListener('notificationclick', async (event) => {
   // Android doesn't close the notification when you click on it
   // See: http://crbug.com/463146
   event.notification.close();
@@ -77,6 +77,6 @@ self.addEventListener('notificationclick', async function(event) {
   if (client) {
     client.focus();
   } else {
-    clients.openWindow && clients.openWindow(urlToOpen);
+    self.clients.openWindow && self.clients.openWindow(urlToOpen);
   }
 });

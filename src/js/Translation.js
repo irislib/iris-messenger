@@ -1,7 +1,7 @@
 import Translations from './Translations.js';
 
-var AVAILABLE_LANGUAGES = Object.keys(Translations);
-var language = localStorage.getItem('language') || navigator.language || 'en';
+let AVAILABLE_LANGUAGES = Object.keys(Translations);
+let language = localStorage.getItem('language') || navigator.language || 'en';
 if (AVAILABLE_LANGUAGES.indexOf(language) === -1) {
   const s = language.slice(0,2);
   language = 'en';
@@ -12,9 +12,9 @@ if (AVAILABLE_LANGUAGES.indexOf(language) === -1) {
     }
   }
 }
-var translation = Translations[language];
+let translation = Translations[language];
 if (language !== 'en') {
-  var en = Translations['en'];
+  let en = Translations['en'];
   Object.keys(en).forEach(k => translation[k] = translation[k] || en[k]);
 }
 

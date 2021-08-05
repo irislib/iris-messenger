@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { html } from '../Helpers.js';
+import Helpers, { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
@@ -8,7 +8,6 @@ import Identicon from './Identicon.js';
 import SearchBox from './SearchBox.js';
 import Icons from '../Icons.js';
 import iris from 'iris-lib';
-import Helpers from '../Helpers.js';
 
 import logo from '../../assets/img/icon128.png';
 import logoType from '../../assets/img/iris_logotype.png';
@@ -37,7 +36,7 @@ class Header extends Component {
         } else {
           lastSeenText = iris.util.formatDate(d);
         }
-        return (t('last_active') + ' ' + lastSeenText);
+        return (`${t('last_active')  } ${  lastSeenText}`);
       }
     }
   }
@@ -152,7 +151,7 @@ class Header extends Component {
             ${Icons.group}
           </a>
         ` : ''}
-        <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
+        <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === `/profile/${  key}` ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>
       </div>

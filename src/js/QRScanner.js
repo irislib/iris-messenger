@@ -1,9 +1,9 @@
-var codeReader;
+let codeReader;
 
 function startPrivKeyQRScanner() {
   return new Promise(resolve => {
     startQRScanner('privkey-qr-video', result => {
-      var qr = JSON.parse(result.text);
+      let qr = JSON.parse(result.text);
       if (qr.priv !== undefined) {
         resolve(qr);
         return true;
