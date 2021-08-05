@@ -298,7 +298,7 @@ class Profile extends View {
       });
     }
     qrCodeEl.empty();
-    new QRCode(qrCodeEl[0], {
+    new QRCode(qrCodeEl.get(0), {
       text: 'https://iris.to/' + window.location.pathname,
       width: 300,
       height: 300,

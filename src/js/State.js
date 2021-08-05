@@ -10,6 +10,7 @@ import _ from 'lodash';
 
 import PeerManager from './PeerManager.js';
 import iris from 'iris-lib';
+import Helpers from './Helpers.js';
 
 const State = {
   init: function(publicOpts) {
@@ -20,7 +21,7 @@ const State = {
       publicOpts.peers.forEach(url => PeerManager.addPeer({url}));
     }
     this.local = Gun({peers: [], file: 'State.local', multicast:false, localStorage: false}).get('state');
-    if (iris.util.isElectron) {
+    if (Helpers.isElectron) {
       this.electron = Gun({peers: ['http://localhost:8768/gun'], file: 'State.local', multicast:false, localStorage: false}).get('state');
     }
     this.blockedUsers = {};

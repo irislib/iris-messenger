@@ -99,7 +99,7 @@ class PublicMessage extends Message {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.hash !== this.props.hash || prevProps.filter !== this.props.filter) {
+    if (prevProps.hash !== this.props.hash) {
       Object.values(this.eventListeners).forEach(e => e.off());
       this.eventListeners = {};
       this.likedBy = new Set();
