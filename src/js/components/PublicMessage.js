@@ -39,26 +39,26 @@ class PublicMessage extends Message {
     }
     return new Promise(resolve => {
       State.local.get('msgsByHash').get(hash).once(msg => {
-        if (typeof msg === 'string') {
-          try {
-            resolve(JSON.parse(msg));
-          } catch (e) {
-            console.error('message parsing failed', msg, e);
+          if (typeof msg === 'string') {
+            try {
+              resolve(JSON.parse(msg));
+            } catch (e) {
+              console.error('message parsing failed', msg, e);
+            }
           }
-        }
-      });
-      State.public.get('#').get(hash).on(async (serialized, a, b, event) => {
-        if (typeof serialized !== 'string') {
-          console.error('message parsing failed', hash, serialized);
-          return;
-        }
-        event.off();
-        const msg = await iris.SignedMessage.fromString(serialized);
-        if (msg) {
-          resolve(msg);
-          State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
-        }
-      });
+        });
+        State.public.get('#').get(hash).on(async (serialized, a, b, event) => {
+          if (typeof serialized !== 'string') {
+            console.error('message parsing failed', hash, serialized);
+            return;
+          }
+          event.off();
+          const msg = await iris.SignedMessage.fromString(serialized);
+          if (msg) {
+            resolve(msg);
+            State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
+          }
+        });
     });
   }
 
@@ -68,6 +68,7 @@ class PublicMessage extends Message {
     p.then(r => {
       const msg = r.signedData;
       msg.info = {from: r.signerKeyHash};
+      if (this.props.filter && !this.props.filter(msg)) { return; }
       this.setState({msg});
       if (this.props.showName && !this.props.name) {
         State.public.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
@@ -105,7 +106,7 @@ class PublicMessage extends Message {
       this.replies = new Set();
       this.subscribedReplies = new Set();
       this.linksDone = false;
-      this.setState({replies:0, likes: 0, sortedReplies:[]});
+      this.setState({replies:0, likes: 0, sortedReplies:[], msg: null});
       this.componentDidMount();
     } else if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
       this.measure();
@@ -186,7 +187,6 @@ class PublicMessage extends Message {
 
   render() {
     if (!this.state.msg) { return ''; }
-    if (this.props.filter && !this.props.filter(this.state.msg)) { return ''; }
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name;
     const emojiOnly = this.state.msg.text && this.state.msg.text.length === 2 && Helpers.isEmoji(this.state.msg.text);

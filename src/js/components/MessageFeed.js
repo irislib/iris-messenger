@@ -61,7 +61,7 @@ class MessageFeed extends Component {
   componentDidUpdate(prevProps) {
     const prevNodeId = prevProps.node && prevProps.node._ && prevProps.node._.id;
     const newNodeId = this.props.node && this.props.node._ && this.props.node._.id;
-    if (prevNodeId !== newNodeId || this.props.group !== prevProps.group || this.props.path !== prevProps.path) {
+    if (prevNodeId !== newNodeId || this.props.group !== prevProps.group || this.props.path !== prevProps.path || this.props.filter !== prevProps.filter) {
       this.unsubscribe();
       this.mappedMessages = new Map();
       this.setState({sortedMessages: []});
@@ -118,7 +118,7 @@ class MessageFeed extends Component {
                   rowCount=${this.state.sortedMessages.length}
                   rowHeight=${this._cache.rowHeight}
                   rowRenderer=${this.rowRenderer}
-                  overscanRowCount=${8}
+                  overscanRowCount=${10}
                 />
               `;
             }}

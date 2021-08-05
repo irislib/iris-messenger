@@ -1,7 +1,7 @@
 import {translate as t} from '../Translation.js';
 import { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
 import View from './View.js';
-import iris from 'iris-lib';
 
 class About extends View {
   constructor() {
@@ -23,7 +23,7 @@ class About extends View {
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
         <p><small>Version 2.0.1</small></p>
 
-        ${iris.util.isElectron ? '' : html`
+        ${Helpers.isElectron ? '' : html`
           <div id="desktop-application-about">
             <h4>Get the desktop application</h4>
             <ul>

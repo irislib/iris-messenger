@@ -11,7 +11,6 @@ import View from './View.js';
 import { route } from 'preact-router';
 import {ExistingAccountLogin} from './Login.js';
 import Notifications from '../Notifications.js';
-import iris from 'iris-lib';
 import $ from 'jquery';
 import Icons from '../Icons.js';
 
@@ -85,7 +84,7 @@ class Settings extends View {
         <p>
           <input type="number" value=${this.state.local.maxConnectedPeers} onChange=${e => State.local.get('settings').get('maxConnectedPeers').put(e.target.value || 0)}/>
         </p>
-        ${iris.util.isElectron ? html`
+        ${Helpers.isElectron ? html`
           <h4>${t('your_public_address')}</h4>
           <p>http://${this.state.electron.publicIp || '-'}:8767/gun</p>
           <p><small>If you're behind NAT (likely) and want to accept incoming connections, you need to configure your router to forward the port 8767 to this computer.</small></p>
@@ -98,7 +97,7 @@ class Settings extends View {
            ${Icons.herokuButton}
         </a></p>
         <p>${t('also')} <a href="https://github.com/amark/gun#docker">Docker</a> ${t('or_small')} <a href="https://github.com/irislib/iris-electron">Iris-electron</a>.</p>
-        ${iris.util.isElectron ? html`
+        ${Helpers.isElectron ? html`
           <hr/>
           <h3>Desktop</h3>
           <p><input type="checkbox" checked=${this.state.electron.openAtLogin} onChange=${() => State.electron.get('settings').get('openAtLogin').put(!this.state.electron.openAtLogin)} id="openAtLogin"/><label for="openAtLogin">Open at login</label></p>

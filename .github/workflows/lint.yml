@@ -1,12 +1,11 @@
-name: Lint
-
-on: [push]
-
+name: CI
+on: push
 jobs:
-  eslint:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: stefanoeb/eslint-action@1.0.2
-        with:
-          files: src/js/*.js src/js/components/*.js
+    - uses: actions/checkout@v2
+    - name: Install modules
+      run: yarn
+    - name: Run ESLint
+      run: yarn lint
