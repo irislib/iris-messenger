@@ -40,7 +40,6 @@ class MessageFeed extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props);
     let first = true;
     State.local.get('scrollUp').on(() => {
       !first && Helpers.animateScrollTop('.main-view');

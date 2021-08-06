@@ -29,6 +29,13 @@ class Settings extends View {
     State.public.user().get('profile').get('photo').put(src);
   }
 
+  mailtoSubmit(e) {
+    e.preventDefault();
+    if (this.state.email && this.state.email === this.state.retypeEmail) {
+      window.location.href = `mailto:${this.state.email}?&subject=Iris%20private%20key&body=${JSON.stringify(Session.getKey())}`;
+    }
+  }
+
   renderView() {
     const blockedUsers = _.filter(Object.keys(this.state.blockedUsers), user => this.state.blockedUsers[user]);
     return html`
@@ -54,6 +61,16 @@ class Settings extends View {
           <button onClick=${e => togglePrivateKeyQR(e)}>${t('show_privkey_qr')}</button>
         </p>
         <div id="private-key-qr" class="qr-container"></div>
+        <p>
+          ${t('email_privkey_to_yourself')}:
+        </p>
+        <p>
+          <form onSubmit=${e => this.mailtoSubmit(e)}>
+            <input name="email" type="email" onChange=${e => this.setState({email:e.target.value.trim()})} placeholder=${t('email')}/>
+            <input name="verify_email" type="email" onChange=${e => this.setState({retypeEmail:e.target.value.trim()})} placeholder=${t('retype_email')}/>
+            <button type="submit">${t('go')}</button>
+          </form>
+        </p>
         <p><small dangerouslySetInnerHTML=${{ __html: t('privkey_storage_recommendation')}}></small></p>
         <hr/>
         <h3>${t('language')}</h3>

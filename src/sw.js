@@ -1,7 +1,25 @@
 import Gun from 'gun';
 import localforage from './js/lib/localforage.min.js';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
+import { registerRoute } from 'workbox-routing';
+import {StaleWhileRevalidate, NetworkOnly} from 'workbox-strategies';
+import { BackgroundSyncPlugin } from 'workbox-background-sync';
 
+const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
+	maxRetentionTime: 14 * 24 * 60
+});
+
+registerRoute(
+	'https://iris-notifications.herokuapp.com/notify',
+	new NetworkOnly({
+		plugins: [bgSyncPlugin]
+	}),
+	'POST'
+);
+registerRoute(
+  () => true,
+  new StaleWhileRevalidate()
+);
 setupRouting();
 
 const urlsToCache = getFiles();
