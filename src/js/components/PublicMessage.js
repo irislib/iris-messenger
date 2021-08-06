@@ -223,7 +223,7 @@ class PublicMessage extends Message {
             `: ''}
           </div>
           ${this.state.msg.torrentId ? html`
-              <${Torrent} torrentId=${this.state.msg.torrentId}/>
+              <${Torrent} torrentId=${this.state.msg.torrentId} autopause=${!this.props.standalone}/>
           `:''}
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
             html`<div class="img-container">

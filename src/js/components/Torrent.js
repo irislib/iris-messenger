@@ -34,6 +34,8 @@ class Torrent extends Component {
 
   componentWillUnmount() {
     Object.values(this.eventListeners).forEach(e => e.off());
+    this.observer && this.observer.disconnect();
+    delete this.observer;
   }
 
   onPlay(e) {
@@ -99,6 +101,25 @@ class Torrent extends Component {
     if (!isAud) {
       file.appendTo(el.get(0), {autoplay, muted});
     }
+    if (isVid && this.props.autopause) {
+      const vid = base.find('video').get(0);
+      const handlePlay = (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            autoplay && vid.play();
+          } else {
+            vid.pause();
+          }
+        });
+      }
+      const options = {
+        rootMargin: "0px",
+        threshold: [0.25, 0.75]
+      };
+      this.observer = new IntersectionObserver(handlePlay, options);
+      this.observer.observe(vid);
+    };
+
     base.find('.info').toggle(!isVid);
     const player = base.find('video, audio').get(0);
     if (player) {
