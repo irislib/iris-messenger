@@ -105,7 +105,7 @@ function getRandomPeers() {
       })
     ), sampleSize
   );
-  if (connectToLocalElectron) {
+  if (sample && connectToLocalElectron) {
     sample.push(ELECTRON_GUN_URL);
   }
   return sample;
