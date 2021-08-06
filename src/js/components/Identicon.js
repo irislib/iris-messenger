@@ -27,7 +27,7 @@ class Identicon extends Component {
       this.componentDidMount();
     }
     if (prevProps.hidePhoto !== this.props.hidePhoto) {
-      $(this.base).find('.iris-identicon').toggle(!this.state.photo || this.props.hidePhoto);
+      $(this.identicon).toggle(!this.state.photo || this.props.hidePhoto);
     }
   }
 
@@ -41,7 +41,7 @@ class Identicon extends Component {
         this.setState({photo});
       });
     } else {
-      $(this.base).find('.iris-identicon').show();
+      $(this.identicon).show();
     }
 
     this.setState({activity: null});

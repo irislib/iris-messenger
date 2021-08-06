@@ -118,7 +118,7 @@ class Torrent extends Component {
       };
       this.observer = new IntersectionObserver(handlePlay, options);
       this.observer.observe(vid);
-    };
+    }
 
     base.find('.info').toggle(!isVid);
     const player = base.find('video, audio').get(0);
