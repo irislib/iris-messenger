@@ -1,4 +1,5 @@
-import { Component, createRef } from 'preact';
+import Component from '../BaseComponent.js';
+import { createRef } from 'preact';
 import Header from '../components/Header.js';
 import { html } from '../Helpers.js';
 

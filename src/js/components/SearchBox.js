@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import Component from '../BaseComponent';
 import { route } from 'preact-router';
 import Helpers, { html } from '../Helpers.js';
 import State from '../State.js';
@@ -13,7 +13,6 @@ const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrn
 class SearchBox extends Component {
   constructor() {
     super();
-    this.eventListeners = {};
     this.state = {results:[]};
     this.debouncedIndexAndSearch = _.debounce(() => {
       this.search();
@@ -30,13 +29,16 @@ class SearchBox extends Component {
   }
 
   componentDidMount() {
-    State.local.get('groups').get('everyone').map().on(() => {
-      this.hasFollows = this.hasFollows || Object.keys(Session.getFollows()).length > 1;
-    });
-    State.local.get('activeRoute').on((a,b,c,e) => {
-      this.eventListeners['activeRoute'] = e;
-      this.close();
-    });
+    State.local.get('groups').get('everyone').map().on(this.sub(
+      () => {
+        this.hasFollows = this.hasFollows || Object.keys(Session.getFollows()).length > 1;
+      }
+    ));
+    State.local.get('activeRoute').on(this.sub(
+      () => {
+        this.close();
+      }
+    ));
     this.adjustResultsPosition();
   }
 
@@ -47,10 +49,6 @@ class SearchBox extends Component {
   adjustResultsPosition() {
     const input = $(this.base).find('input');
     this.offsetLeft = input[0].offsetLeft;
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
   }
 
   onSubmit(e) {

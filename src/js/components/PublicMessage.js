@@ -24,7 +24,6 @@ class PublicMessage extends Message {
   constructor() {
     super();
     this.i = 0;
-    this.eventListeners = {};
     this.likedBy = new Set();
     this.replies = {};
     this.subscribedReplies = new Set();
@@ -37,7 +36,8 @@ class PublicMessage extends Message {
       return;
     }
     return new Promise(resolve => {
-      State.local.get('msgsByHash').get(hash).once(msg => {
+      State.local.get('msgsByHash').get(hash).once(this.sub(
+msg => {
           if (typeof msg === 'string') {
             try {
               resolve(JSON.parse(msg));
@@ -45,8 +45,10 @@ class PublicMessage extends Message {
               console.error('message parsing failed', msg, e);
             }
           }
-        });
-        State.public.get('#').get(hash).on(async (serialized, a, b, event) => {
+        }
+      ));
+      State.public.get('#').get(hash).on(this.sub(
+async (serialized, a, b, event) => {
           if (typeof serialized !== 'string') {
             console.error('message parsing failed', hash, serialized);
             return;
@@ -57,7 +59,8 @@ class PublicMessage extends Message {
             resolve(msg);
             State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
           }
-        });
+        }
+      ));
     });
   }
 
@@ -70,30 +73,31 @@ class PublicMessage extends Message {
       if (this.props.filter && !this.props.filter(msg)) { return; }
       this.setState({msg});
       if (this.props.showName && !this.props.name) {
-        State.public.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
-          this.eventListeners['name'] = e;
-          this.setState({name});
-        });
+        State.public.user(msg.info.from).get('profile').get('name').on(this.inject());
       }
-      State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
-        this.eventListeners[`${from}likes`] = e;
-        liked ? this.likedBy.add(from) : this.likedBy.delete(from);
-        const s = {likes: this.likedBy.size};
-        if (from === Session.getPubKey()) s['liked'] = liked;
-        this.setState(s);
-      });
-      State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, (hash,time,b,e,from) => {
-        const k = from + time;
-        if (hash && this.replies[k]) return;
-        if (hash) {
-          this.replies[k] = {hash, time};
-        } else {
-          delete this.replies[k];
+      State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, this.sub(
+        (liked,a,b,e,from) => {
+          this.eventListeners[`${from}likes`] = e;
+          liked ? this.likedBy.add(from) : this.likedBy.delete(from);
+          const s = {likes: this.likedBy.size};
+          if (from === Session.getPubKey()) s['liked'] = liked;
+          this.setState(s);
         }
-        this.eventListeners[`${from}replies`] = e;
-        const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
-        this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
-      });
+      ));
+      State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, this.sub(
+        (hash,time,b,e,from) => {
+          const k = from + time;
+          if (hash && this.replies[k]) return;
+          if (hash) {
+            this.replies[k] = {hash, time};
+          } else {
+            delete this.replies[k];
+          }
+          this.eventListeners[`${from}replies`] = e;
+          const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
+          this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
+        }
+      ));
     });
   }
 
@@ -122,10 +126,6 @@ class PublicMessage extends Message {
   toggleReplies() {
     const showReplyForm = !this.state.showReplyForm;
     this.setState({showReplyForm});
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
   }
 
   shouldComponentUpdate() {

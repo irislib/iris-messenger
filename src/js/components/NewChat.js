@@ -4,11 +4,11 @@ import State from '../State.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
 import CopyButton from './CopyButton.js';
-import { Component } from 'preact';
 import { route } from 'preact-router';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min.js';
 import iris from 'iris-lib';
+import Component from '../BaseComponent';
 
 function setChatLinkQrCode(link) {
   let qrCodeEl = $('#my-qr-code');
@@ -27,13 +27,8 @@ function setChatLinkQrCode(link) {
 class NewChat extends Component {
   constructor() {
     super();
-    this.eventListeners = {};
     this.chatLinks = {};
     this.state = {chatLinks: {}};
-  }
-
-  componentDidUnmount() {
-    this.eventListeners.forEach(e => e.off());
   }
 
   scanChatLinkQr() {
@@ -68,17 +63,18 @@ class NewChat extends Component {
   }
 
   componentDidMount() {
-    State.local.get('chatLinks').map().on((url, id, b, e) => {
-      this.eventListeners['chatLinks'] = e;
-      if (url) {
-        if (typeof url !== 'string' || url.indexOf('http') !== 0) return;
-        this.chatLinks[id] = url;
-        setChatLinkQrCode(url);
-      } else {
-        delete this.chatLinks[id];
+    State.local.get('chatLinks').map().on(this.sub(
+      (url, id) => {
+        if (url) {
+          if (typeof url !== 'string' || url.indexOf('http') !== 0) return;
+          this.chatLinks[id] = url;
+          setChatLinkQrCode(url);
+        } else {
+          delete this.chatLinks[id];
+        }
+        this.setState({chatLinks: this.chatLinks});
       }
-      this.setState({chatLinks: this.chatLinks});
-    });
+    ));
   }
 
   removeChatLink(id) {

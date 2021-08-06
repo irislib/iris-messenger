@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import Component from '../BaseComponent';
 import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
@@ -11,21 +11,18 @@ class Footer extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
-    this.eventListeners = [];
     this.chatId = null;
   }
 
   componentDidMount() {
-    State.local.get('unseenTotal').on(unseenTotal => {
-      this.setState({unseenTotal});
-    });
-    State.local.get('activeRoute').on(activeRoute => {
-      this.eventListeners.forEach(e => e.off());
-      this.eventListeners = [];
-      this.setState({activeRoute});
-      const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-      this.chatId = replaced.length < activeRoute.length ? replaced : null;
-    });
+    State.local.get('unseenTotal').on(this.inject());
+    State.local.get('activeRoute').on(this.sub(
+      activeRoute => {
+        this.setState({activeRoute});
+        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+        this.chatId = replaced.length < activeRoute.length ? replaced : null;
+      }
+    ));
   }
 
   render() {

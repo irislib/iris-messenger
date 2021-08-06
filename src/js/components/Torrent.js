@@ -1,4 +1,5 @@
-import { Component, createRef } from 'preact';
+import Component from '../BaseComponent';
+import { createRef } from 'preact';
 import Helpers, {html} from '../Helpers.js';
 import Session from "../Session.js";
 import { translate as tr } from '../Translation.js';
@@ -12,19 +13,19 @@ const isAudio = f => isOfType(f, ['.mp3', '.wav', '.m4a']);
 const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class Torrent extends Component {
-  eventListeners = {};
   coverRef = createRef();
 
   componentDidMount() {
-    State.local.get('player').on((player,a,b,e) => {
-      this.player = player;
-      this.eventListeners['player'] = e;
-      this.setState({player});
-      if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
-        const file = this.getActiveFile(this.torrent);
-        file && this.openFile(file);
+    State.local.get('player').on(this.sub(
+      (player) => {
+        this.player = player;
+        this.setState({player});
+        if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
+          const file = this.getActiveFile(this.torrent);
+          file && this.openFile(file);
+        }
       }
-    });
+    ));
     const showFiles = this.props.showFiles;
     showFiles && this.setState({showFiles});
     if (Session.settings.local.enableWebtorrent) {
@@ -33,7 +34,7 @@ class Torrent extends Component {
   }
 
   componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
+    super.componentWillUnmount();
     this.observer && this.observer.disconnect();
     delete this.observer;
   }

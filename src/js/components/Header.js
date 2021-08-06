@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import Component from '../BaseComponent';
 import Helpers, { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
@@ -18,7 +18,6 @@ class Header extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
-    this.eventListeners = [];
     this.chatId = null;
   }
 
@@ -46,44 +45,34 @@ class Header extends Component {
   }
 
   componentDidMount() {
-    State.local.get('showParticipants').on(showParticipants => this.setState({showParticipants}));
-    State.local.get('unseenTotal').on(unseenTotal => {
-      this.setState({unseenTotal});
-    });
-    State.local.get('activeRoute').on(activeRoute => {
-      this.setState({about:null, title: ''});
-      this.eventListeners.forEach(e => e.off());
-      this.eventListeners = [];
-      this.setState({activeRoute});
-      const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-      this.chatId = replaced.length < activeRoute.length ? replaced : null;
-      if (this.chatId) {
-        State.local.get('channels').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
-          this.eventListeners.push(event);
-          this.setState({});
-        });
-        State.local.get('channels').get(this.chatId).get('theirLastActiveTime').on((t, a, b, event) => {
-          this.eventListeners.push(event);
-          this.setState({});
-        });
-      }
+    State.local.get('showParticipants').on(this.inject());
+    State.local.get('unseenTotal').on(this.inject());
+    State.local.get('activeRoute').on(this.sub(
+      activeRoute => {
+        this.setState({about:null, title: ''});
+        this.setState({activeRoute});
+        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+        this.chatId = replaced.length < activeRoute.length ? replaced : null;
+        if (this.chatId) {
+          State.local.get('channels').get(this.chatId).get('isTyping').on(this.sub(
+            () => this.setState({})
+          ));
+          State.local.get('channels').get(this.chatId).get('theirLastActiveTime').on(this.sub(
+            () => this.setState({})
+          ));
+        }
 
-      if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
-        if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
-          const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
-          this.setState({title});
-        } else {
-          State.local.get('channels').get(this.chatId).get('name').on((name, a, b, eve) => {
-            this.eventListeners.push(eve);
-            this.setState({title: name});
-          });
-          State.local.get('channels').get(this.chatId).get('about').on((about, a, b, eve) => {
-            this.eventListeners.push(eve);
-            this.setState({about});
-          });
+        if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
+          if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
+            const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
+            this.setState({title});
+          } else {
+            State.local.get('channels').get(this.chatId).get('name').on(this.inject('title'));
+            State.local.get('channels').get(this.chatId).get('about').on(this.inject());
+          }
         }
       }
-    });
+    ));
   }
 
   onTitleClicked() {

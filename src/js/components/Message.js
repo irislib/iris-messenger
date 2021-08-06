@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import Component from '../BaseComponent.js';
 import Helpers, { html } from '../Helpers.js';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
@@ -29,20 +29,24 @@ class Message extends Component {
 
     const status = this.getSeenStatus().seen;
     if (!status.seen && !status.delivered) {
-      State.local.get('channels').get(this.props.chatId).get('theirLastActiveTime').on((v, k, a, e) => {
-        if (this.getSeenStatus().delivered) {
-          this.setState({});
-          e.off();
-        }
-      });
+      State.local.get('channels').get(this.props.chatId).get('theirLastActiveTime').on(
+        this.sub((v, k, a, e) => {
+          if (this.getSeenStatus().delivered) {
+            this.setState({});
+            e.off();
+          }
+        })
+      );
     }
     if (!status.seen) {
-      State.local.get('channels').get(this.props.chatId).get('theirMsgsLastSeenTime').on((v, k, a, e) => {
-        if (this.getSeenStatus().seen) {
-          this.setState({});
-          e.off();
+      State.local.get('channels').get(this.props.chatId).get('theirMsgsLastSeenTime').on(this.sub(
+(v, k, a, e) => {
+          if (this.getSeenStatus().seen) {
+            this.setState({});
+            e.off();
+          }
         }
-      });
+      ));
     }
   }
 

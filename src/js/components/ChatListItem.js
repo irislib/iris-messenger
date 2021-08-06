@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import Component from '../BaseComponent';
 import Helpers, { html } from '../Helpers.js';
 import { route } from 'preact-router';
 import { translate as t } from '../Translation.js';
@@ -12,31 +12,27 @@ class ChatListItem extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
-    this.eventListeners = {};
   }
 
   componentDidMount() {
     const chat = this.props.chat;
-    State.local.get('channels').get(chat.id).get('latest').on((latest, a, b, event) => {
-      /*
-      if (msg.attachments) {
-        text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
-      } else {
-        text = msg.text;
+    State.local.get('channels').get(chat.id).get('latest').on(this.sub(
+      (latest) => {
+        /*
+        if (msg.attachments) {
+          text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
+        } else {
+          text = msg.text;
+        }
+        if (chat && chat.uuid && !msg.selfAuthored && msg.info.from && chat.participantProfiles[msg.info.from].name) {
+          text = chat.participantProfiles[msg.info.from].name + ': ' + text;
+        }
+        */
+        if (latest.time < chat.latestTime) { return; }
+        latest.time = latest.time && new Date(latest.time);
+        this.setState({latest});
       }
-      if (chat && chat.uuid && !msg.selfAuthored && msg.info.from && chat.participantProfiles[msg.info.from].name) {
-        text = chat.participantProfiles[msg.info.from].name + ': ' + text;
-      }
-      */
-      if (latest.time < chat.latestTime) { return; }
-      latest.time = latest.time && new Date(latest.time);
-      this.setState({latest});
-      this.eventListeners['latest'] = event;
-    });
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
+    ));
   }
 
   render() {

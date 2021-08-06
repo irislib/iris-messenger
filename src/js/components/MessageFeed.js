@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import Component from '../BaseComponent';
 import Helpers, { html } from '../Helpers.js';
 import PublicMessage from './PublicMessage.js';
 import {  List, WindowScroller,CellMeasurer,CellMeasurerCache,} from 'react-virtualized';
@@ -11,7 +11,6 @@ class MessageFeed extends Component {
     super();
     this.state = {sortedMessages:[]};
     this.mappedMessages = new Map();
-    this.eventListeners = {};
     this._cache = new CellMeasurerCache({
       fixedWidth: true,
       minHeight: 0,
@@ -21,9 +20,6 @@ class MessageFeed extends Component {
 
   handleMessage(v, k, x, e, from) {
     if (from) { k = k + from; }
-    if (!this.eventListeners['node']) {
-      this.eventListeners['node'] = e;
-    }
     if (v) {
       this.mappedMessages.set(k, this.props.keyIsMsgHash ? k : v);
     } else {
@@ -41,36 +37,30 @@ class MessageFeed extends Component {
 
   componentDidMount() {
     let first = true;
-    State.local.get('scrollUp').on(() => {
-      !first && Helpers.animateScrollTop('.main-view');
-      first = false;
-    });
+    State.local.get('scrollUp').on(this.sub(
+      () => {
+        !first && Helpers.animateScrollTop('.main-view');
+        first = false;
+      }
+    ));
     if (this.props.node) {
       this.props.node.map().on((...args) => this.handleMessage(...args));
     } else if (this.props.group && this.props.path) { // TODO: make group use the same basic gun api
       const group = State.local.get('groups').get(this.props.group);
-      State.group(group).map(this.props.path, (...args) => this.handleMessage(...args));
+      State.group(group).map(this.props.path, this.sub(
+        (...args) => this.handleMessage(...args)
+      ));
     }
-  }
-
-  unsubscribe() {
-    Object.values(this.eventListeners).forEach(e => e.off());
-    this.eventListeners = {};
   }
 
   componentDidUpdate(prevProps) {
     const prevNodeId = prevProps.node && prevProps.node._ && prevProps.node._.id;
     const newNodeId = this.props.node && this.props.node._ && this.props.node._.id;
     if (prevNodeId !== newNodeId || this.props.group !== prevProps.group || this.props.path !== prevProps.path || this.props.filter !== prevProps.filter) {
-      this.unsubscribe();
       this.mappedMessages = new Map();
       this.setState({sortedMessages: []});
       this.componentDidMount();
     }
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
   }
 
   rowRenderer({ index, key, parent, style }) { // TODO: use isScrolling param to reduce rendering?
@@ -111,8 +101,8 @@ class MessageFeed extends Component {
                 <${List}
                   autoHeight
                   autoWidth
-                  width=${width}
-                  height=${height}
+                  width=${width||0}
+                  height=${height||0}
                   isScrolling=${isScrolling}
                   onScroll=${onChildScroll}
                   scrollTop=${scrollTop}

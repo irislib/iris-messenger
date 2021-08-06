@@ -35,13 +35,9 @@ class Feed extends View {
 
   componentDidMount() {
     this.search();
-    State.local.get('filters').get('group').on(group => this.setState({group}));
-    State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
-    State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
+    State.local.get('filters').get('group').on(this.inject());
+    State.local.get('noFollows').on(this.inject());
+    State.local.get('noFollowers').on(this.inject());
   }
 
   getNotification() {
