@@ -11,7 +11,6 @@ import _ from 'lodash';
 import PeerManager from './PeerManager.js';
 import iris from 'iris-lib';
 import Helpers from './Helpers.js';
-import {updateUserSearchIndex} from './Session.js';
 
 const State = {
   init(publicOpts) {
@@ -38,11 +37,14 @@ const State = {
       } else {
         delete this.blockedUsers[user];
       }
-      updateUserSearchIndex();
     });
 
     window.State = this;
     iris.util.setPublicState && iris.util.setPublicState(this.public);
+  },
+
+  getBlockedUsers() {
+    return this.blockedUsers;
   },
 
   group(groupNode = 'everyone') {

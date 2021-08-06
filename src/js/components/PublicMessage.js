@@ -98,16 +98,7 @@ class PublicMessage extends Message {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.hash !== this.props.hash) {
-      Object.values(this.eventListeners).forEach(e => e.off());
-      this.eventListeners = {};
-      this.likedBy = new Set();
-      this.replies = new Set();
-      this.subscribedReplies = new Set();
-      this.linksDone = false;
-      this.setState({replies:0, likes: 0, sortedReplies:[], msg: null});
-      this.componentDidMount();
-    } else if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
+    if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
       this.measure();
     } else if (this.state.msg && this.state.msg !== prevState.msg) {
       this.measure();

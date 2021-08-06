@@ -37,11 +37,16 @@ const settings = DEFAULT_SETTINGS;
 
 const updateUserSearchIndex = _.debounce(() => {
   const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
-  const values = Object.values(_.omit(follows, Object.keys(State.blockedUsers)));
+  const values = Object.values(_.omit(follows, Object.keys(State.getBlockedUsers())));
   userSearchIndex = new Fuse(values, options);
-}, 200);
+}, 200, {leading:true});
 
-updateUserSearchIndex();
+setTimeout(() => {
+  State.local.get('block').map().on(() => {
+    updateUserSearchIndex();
+  });
+  updateUserSearchIndex();
+});
 
 function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   k = k || key.pub;

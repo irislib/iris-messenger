@@ -35,6 +35,9 @@ import Icons from './Icons.js';
 import logo from '../assets/img/icon128.png';
 import logoType from '../assets/img/iris_logotype.png';
 
+import '../css/style.css';
+import '../css/cropper.min.css';
+
 if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redirect old urls
   window.location.href = window.location.href.replace('#/', '');
 }

@@ -5,6 +5,7 @@ import Session from '../Session.js';
 import PublicMessageForm from '../components/PublicMessageForm.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
 import { route } from 'preact-router';
+import { createRef } from 'preact';
 import SafeImg from '../components/SafeImg.js';
 import CopyButton from '../components/CopyButton.js';
 import FollowButton from '../components/FollowButton.js';
@@ -32,6 +33,7 @@ class Profile extends View {
     this.followedUsers = new Set();
     this.followers = new Set();
     this.id = "profile";
+    this.qrRef = createRef();
   }
 
   onProfilePhotoSet(src) {
@@ -144,7 +146,7 @@ class Profile extends View {
             ${this.isMyProfile ? '' : html`<${FollowButton} id=${this.props.id}/>`}
             <button onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}</button>
             <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${`https://iris.to${  window.location.pathname}`}/>
-            <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
+            <button onClick=${() => $(this.qrRef.current).toggle()}>${t('show_qr_code')}</button>
             ${this.isMyProfile ? '' : html`
               <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
             `}
@@ -156,7 +158,7 @@ class Profile extends View {
         <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
       </div>
 
-      <p id="profile-page-qr" style="display:none" class="qr-container"></p>
+      <p ref=${this.qrRef} style="display:none" class="qr-container"></p>
       ${this.renderSettings()}
     </div>
     `;
@@ -285,7 +287,7 @@ class Profile extends View {
         }, 1000);
       }
     }
-    let qrCodeEl = $('#profile-page-qr');
+    let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
     State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
     this.getProfileDetails();

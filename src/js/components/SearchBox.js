@@ -30,9 +30,8 @@ class SearchBox extends Component {
   }
 
   componentDidMount() {
-    State.local.get('groups').get('everyone').map().on(isFollowing => {
+    State.local.get('groups').get('everyone').map().on(() => {
       this.hasFollows = this.hasFollows || Object.keys(Session.getFollows()).length > 1;
-      isFollowing && this.debouncedIndexAndSearch();
     });
     State.local.get('activeRoute').on((a,b,c,e) => {
       this.eventListeners['activeRoute'] = e;
@@ -120,7 +119,7 @@ class SearchBox extends Component {
               followText = 'Following';
             }
             if (i.followDistance === 2) {
-              if (i.followers.size === 1 && Session.getFollows()[[...i.followers][0]].name) {
+              if (i.followers.size === 1 && Session.getFollows()[[...i.followers][0]] && Session.getFollows()[[...i.followers][0]].name) {
                 followText = `Followed by ${  Session.getFollows()[[...i.followers][0]].name}`;
               } else {
                 followText = `Followed by ${  i.followers.size  } users you follow`;
@@ -128,7 +127,7 @@ class SearchBox extends Component {
             }
             return html`
               <a href="/profile/${i.key}" onClick=${e => this.onClick(e, i)}>
-                <${Identicon} str=${i.key} width=40/>
+                <${Identicon} key=${i.key + 'ic'} str=${i.key} width=40/>
                 <div>
                   ${i.name || ''}<br/>
                   <small>

@@ -51,7 +51,7 @@ class ProfilePhotoPicker extends Component {
     this.cropper && this.cropper.destroy();
     if (this.state.preview) {
       import('../lib/cropper.min.js').then(Cropper => {
-        this.cropper = new Cropper($('#profile-photo-preview')[0], {
+        this.cropper = new Cropper.default($('#profile-photo-preview')[0], {
           aspectRatio:1,
           autoCropArea: 1,
           viewMode: 1,
