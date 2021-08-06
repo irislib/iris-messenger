@@ -1,19 +1,18 @@
 import { Component } from 'preact';
-import {html} from '../Helpers.js';
+import Helpers, {html} from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import Helpers from '../Helpers.js';
 import SafeImg from './SafeImg.js';
 import Identicon from './Identicon.js';
 import $ from 'jquery';
 
 class ProfilePhotoPicker extends Component {
   async useProfilePhotoClicked() {
-    var canvas = this.cropper.getCroppedCanvas();
-    var resizedCanvas = document.createElement('canvas');
+    let canvas = this.cropper.getCroppedCanvas();
+    let resizedCanvas = document.createElement('canvas');
     resizedCanvas.width = resizedCanvas.height = Math.min(canvas.width, 800);
     const { default: pica } = await import('../lib/pica.min.js');
     pica().resize(canvas, resizedCanvas).then(() => {
-      var src = resizedCanvas.toDataURL('image/jpeg');
+      let src = resizedCanvas.toDataURL('image/jpeg');
       // var src = $('#profile-photo-preview').attr('src');
       if (this.props.callback) {
         this.props.callback(src);
@@ -31,9 +30,9 @@ class ProfilePhotoPicker extends Component {
   }
 
   onProfilePhotoInputChange(e) {
-    var files = e.target.files;
+    let files = e.target.files;
     if (files && files.length) {
-      var file = files[0];
+      let file = files[0];
       /*
       if (file.size > 1024 * 200) {
         $('#profile-photo-error').toggleClass('hidden', false);
@@ -48,16 +47,17 @@ class ProfilePhotoPicker extends Component {
     $(e.target).val('');
   }
 
-  async componentDidUpdate() {
+  componentDidUpdate() {
     this.cropper && this.cropper.destroy();
     if (this.state.preview) {
-      const { default: Cropper } = await import('../lib/cropper.min.js');
-      this.cropper = new Cropper($('#profile-photo-preview')[0], {
-        aspectRatio:1,
-        autoCropArea: 1,
-        viewMode: 1,
-        background: false,
-        zoomable: false
+      import('../lib/cropper.min.js').then(Cropper => {
+        this.cropper = new Cropper($('#profile-photo-preview')[0], {
+          aspectRatio:1,
+          autoCropArea: 1,
+          viewMode: 1,
+          background: false,
+          zoomable: false
+        });
       });
     }
   }

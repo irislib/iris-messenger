@@ -1,9 +1,8 @@
 import { Component } from 'preact';
-import { html } from '../Helpers.js';
+import Helpers, { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import ChatListItem from './ChatListItem.js';
-import Helpers from '../Helpers.js';
 import { route } from 'preact-router';
 import Notifications from '../Notifications.js';
 import ScrollViewport from 'preact-scroll-viewport';

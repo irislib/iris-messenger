@@ -5,6 +5,7 @@ import PeerManager from './PeerManager.js';
 import { route } from 'preact-router';
 import iris from 'iris-lib';
 import _ from 'lodash';
+import Fuse from "./lib/fuse.basic.esm.min";
 
 let key;
 let myName;
@@ -14,6 +15,7 @@ let onlineTimeout;
 let ourActivity;
 let hasFollowers;
 let hasFollows;
+let userSearchIndex;
 const follows = {};
 const channels = window.channels = {};
 
@@ -32,6 +34,14 @@ const DEFAULT_SETTINGS = {
 
 const settings = DEFAULT_SETTINGS;
 
+const updateUserSearchIndex = _.debounce(() => {
+  const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
+  const values = Object.values(_.omit(follows, Object.keys(State.blockedUsers)));
+  userSearchIndex = new Fuse(values, options);
+}, 200);
+
+updateUserSearchIndex();
+
 function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   k = k || key.pub;
 
@@ -49,6 +59,7 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
       });
     }
     callback(k, follows[k]);
+    updateUserSearchIndex();
   }
 
   function removeFollow(k, followDistance, follower) {
@@ -79,6 +90,10 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   });
 
   return follows;
+}
+
+function getUserSearchIndex() {
+  return userSearchIndex;
 }
 
 function setOurOnlineStatus() {
@@ -143,14 +158,14 @@ function login(k) {
   });
   setOurOnlineStatus();
   iris.Channel.getChannels(State.public, key, addChannel);
-  var chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
-  var inviter = Helpers.getUrlParameter('inviter');
+  let chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
+  let inviter = Helpers.getUrlParameter('inviter');
   function go() {
     if (inviter !== key.pub) {
       newChannel(chatId, window.location.href);
     }
-    _.defer(() => route('/chat/' + chatId)); // defer because router is only initialised after login
-    window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
+    _.defer(() => route(`/chat/${  chatId}`)); // defer because router is only initialised after login
+    window.history.pushState({}, "Iris Chat", `/${window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]}`); // remove param
   }
   if (chatId) {
     if (inviter) {
@@ -257,7 +272,7 @@ function loginAsNewUser(name) {
 }
 
 function init(options = {}) {
-  var localStorageKey = localStorage.getItem('chatKeyPair');
+  let localStorageKey = localStorage.getItem('chatKeyPair');
   if (localStorageKey) {
     login(JSON.parse(localStorageKey));
   } else if (options.autologin) {
@@ -279,13 +294,13 @@ function newChannel(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(channels, pub)) {
     return;
   }
-  const chat = new iris.Channel({gun: State.public, key, chatLink: chatLink, participants: pub});
+  const chat = new iris.Channel({gun: State.public, key, chatLink, participants: pub});
   addChannel(chat);
   return chat;
 }
 
 function addChannel(chat) {
-  var pub = chat.getId();
+  let pub = chat.getId();
   if (channels[pub]) { return; }
   channels[pub] = chat;
   const chatNode = State.local.get('channels').get(pub);
@@ -340,16 +355,16 @@ function addChannel(chat) {
     }
   });
   if (chat.uuid) {
-    var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     chat.participantProfiles = {};
     chat.on('name', v => State.local.get('channels').get(chat.uuid).get('name').put(v));
     chat.on('photo', v => State.local.get('channels').get(chat.uuid).get('photo').put(v));
     chat.on('about', v => State.local.get('channels').get(chat.uuid).get('about').put(v));
     chat.getParticipants(participants => {
       if (typeof participants === 'object') {
-        var keys = Object.keys(participants);
+        let keys = Object.keys(participants);
         keys.forEach((k, i) => {
-          var hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
+          let hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
           chat.participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
           State.public.user(k).get('profile').get('name').on(name => {
             chat.participantProfiles[k].name = name;
@@ -403,13 +418,11 @@ function processMessage(chatId, msg, info) {
   State.local.get('channels').get(chatId).get('msgs').get(msg.time + (msg.from && msg.from.slice(0, 10))).put(JSON.stringify(msg));
   msg.timeObj = new Date(msg.time);
   if (!info.selfAuthored && msg.timeObj > (chat.myLastSeenTime || -Infinity)) {
-    if (window.location.pathname !== '/chat/' + chatId || document.visibilityState !== 'visible') {
+    if (window.location.pathname !== `/chat/${  chatId}` || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chatId, 1);
-    } else {
-      if (ourActivity === 'active') {
+    } else if (ourActivity === 'active') {
         chat.setMyMsgsLastSeenTime();
       }
-    }
   }
   if (!info.selfAuthored && msg.time > chat.theirMsgsLastSeenTime) {
     State.local.get('channels').get(chatId).get('theirMsgsLastSeenTime').put(msg.time);
@@ -432,4 +445,27 @@ function subscribeToMsgs(pub) {
   });
 }
 
+<<<<<<< HEAD
 export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+=======
+function followChatLink(str) {
+  if (str && str.indexOf('http') === 0) {
+    const s = str.split('?');
+    let chatId;
+    if (s.length === 2) {
+      chatId = Helpers.getUrlParameter('chatWith', s[1]) || Helpers.getUrlParameter('channelId', s[1]);
+    }
+    if (chatId) {
+      newChannel(chatId, str);
+      route(`/chat/${  chatId}`);
+      return true;
+    }
+    if (str.indexOf('https://iris.to') === 0) {
+      route(str.replace('https://iris.to', ''));
+      return true;
+    }
+  }
+}
+
+export default {init, followChatLink, getKey, getPubKey, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+>>>>>>> upstream/master

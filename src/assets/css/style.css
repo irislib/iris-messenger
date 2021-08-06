@@ -1951,6 +1951,10 @@ form.public {
   transition: opacity 0.3s;
 }
 
+.ReactVirtualized__Grid {
+  outline: none;
+}
+
 /* Needs to be visible for tooltip */
 @media (min-width: 626px) {
   .ReactVirtualized__Grid, .ReactVirtualized__Grid__innerScrollContainer {

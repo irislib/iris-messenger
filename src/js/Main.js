@@ -3,8 +3,7 @@ import { Router } from 'preact-router';
 import { Link } from 'preact-router/match';
 import iris from 'iris-lib';
 
-import Helpers from './Helpers.js';
-import { html } from './Helpers.js';
+import Helpers, { html } from './Helpers.js';
 import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
@@ -100,9 +99,9 @@ class Menu extends Component {
                 </span>
                 <span class="text">${a.text}</span>
               <//>`;
-          } else {
+          } 
             return html`<br/><br/>`;
-          }
+          
         })}
       </div>
     `;
@@ -120,7 +119,7 @@ class Main extends Component {
   handleRoute(e) {
     let activeRoute = e.url;
     document.title = 'Iris';
-    if (activeRoute && activeRoute.length > 1) { document.title += ' - ' + Helpers.capitalize(activeRoute.replace('/', '')); }
+    if (activeRoute && activeRoute.length > 1) { document.title += ` - ${  Helpers.capitalize(activeRoute.replace('/', ''))}`; }
     State.local.get('activeRoute').put(activeRoute);
     QRScanner.cleanupScanner();
   }

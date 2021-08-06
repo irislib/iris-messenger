@@ -19,7 +19,7 @@ class Message extends View {
       `;
     } else {
       content = html`
-        <${PublicMessage} hash=${this.props.hash} showName=${true} showReplies=${true} />
+        <${PublicMessage} standalone=${true} hash=${this.props.hash} showName=${true} showReplies=${true} />
       `;
     }
     return html`

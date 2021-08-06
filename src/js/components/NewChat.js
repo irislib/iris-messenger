@@ -12,7 +12,7 @@ import QRCode from '../lib/qrcode.min.js';
 import iris from 'iris-lib';
 
 function setChatLinkQrCode(link) {
-  var qrCodeEl = $('#my-qr-code');
+  let qrCodeEl = $('#my-qr-code');
   if (qrCodeEl.length === 0) { return; }
   qrCodeEl.empty();
   new QRCode(qrCodeEl[0], {
@@ -56,7 +56,7 @@ class NewChat extends Component {
   onCreateGroupSubmit(e) {
     e.preventDefault();
     if ($('#new-group-name').val().length) {
-      var c = new iris.Channel({
+      let c = new iris.Channel({
         gun: State.public,
         key: Session.getKey(),
         participants: [],
@@ -64,7 +64,7 @@ class NewChat extends Component {
       c.put('name', $('#new-group-name').val());
       $('#new-group-name').val('');
       Session.addChannel(c);
-      route('/group/' + c.uuid);
+      route(`/group/${  c.uuid}`);
     }
   }
 

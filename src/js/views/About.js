@@ -1,5 +1,9 @@
 import {translate as t} from '../Translation.js';
+<<<<<<< HEAD
 import { html } from '../Helpers.js';
+=======
+import Helpers, { html } from '../Helpers.js';
+>>>>>>> upstream/master
 import View from './View.js';
 import iris from 'iris-lib';
 
@@ -51,7 +55,7 @@ class About extends View {
         <p>${t('application_security_warning')}</p>
 
         <h4>${t('donate')}</h4>
-        <p dangerouslySetInnerHTML=${{ __html:t('donate_info', "href=\"https://opencollective.com/iris-social\"") + ': 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST' }}></p>
+        <p dangerouslySetInnerHTML=${{ __html:`${t('donate_info', "href=\"https://opencollective.com/iris-social\"")  }: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST` }}></p>
         <p>Dogecoin: DEsgP4H1Sjp4461PugHDNnoGd6S8pTvrm1</p>
       </div>
     `;

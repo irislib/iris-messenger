@@ -1,8 +1,8 @@
 import { Component } from 'preact';
-import {html} from '../Helpers.js';
+import Helpers, {html} from '../Helpers.js';
 import {translate as t} from '../Translation.js';
-import Helpers from '../Helpers.js';
 import $ from 'jquery';
+import iris from 'iris-lib';
 
 class CopyButton extends Component {
   copy(e, copyStr) {
