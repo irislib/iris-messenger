@@ -20,7 +20,7 @@ class About extends View {
         </ul>
         <p>In other words, <b>you can't be deplatformed from Iris</b>.</p>
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-        <p><small>Version 2.0.1</small></p>
+        <p><small>Version 2.0.2</small></p>
 
         ${Helpers.isElectron ? '' : html`
           <div id="desktop-application-about">
