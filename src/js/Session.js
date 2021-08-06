@@ -6,6 +6,7 @@ import PeerManager from './PeerManager.js';
 import { route } from 'preact-router';
 import iris from 'iris-lib';
 import _ from 'lodash';
+import Fuse from "./lib/fuse.basic.esm.min";
 
 let key;
 let myName;
@@ -15,6 +16,7 @@ let onlineTimeout;
 let ourActivity;
 let hasFollowers;
 let hasFollows;
+let userSearchIndex;
 const follows = {};
 const channels = window.channels = {};
 
@@ -33,6 +35,14 @@ const DEFAULT_SETTINGS = {
 
 const settings = DEFAULT_SETTINGS;
 
+const updateUserSearchIndex = _.debounce(() => {
+  const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
+  const values = Object.values(_.omit(follows, Object.keys(State.blockedUsers)));
+  userSearchIndex = new Fuse(values, options);
+}, 200);
+
+updateUserSearchIndex();
+
 function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   k = k || key.pub;
 
@@ -50,6 +60,7 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
       });
     }
     callback(k, follows[k]);
+    updateUserSearchIndex();
   }
 
   function removeFollow(k, followDistance, follower) {
@@ -80,6 +91,10 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   });
 
   return follows;
+}
+
+function getUserSearchIndex() {
+  return userSearchIndex;
 }
 
 function setOurOnlineStatus() {
@@ -444,4 +459,4 @@ function followChatLink(str) {
   }
 }
 
-export default {init, followChatLink, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+export default {init, followChatLink, getKey, getPubKey, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };

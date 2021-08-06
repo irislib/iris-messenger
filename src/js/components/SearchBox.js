@@ -5,7 +5,6 @@ import State from '../State.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
-import Fuse from '../lib/fuse.basic.esm.min.js';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -17,9 +16,6 @@ class SearchBox extends Component {
     this.eventListeners = {};
     this.state = {results:[]};
     this.debouncedIndexAndSearch = _.debounce(() => {
-      const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
-      const values = Object.values(_.omit(Session.getFollows(), Object.keys(State.blockedUsers)));
-      this.fuse = new Fuse(values, options); // TODO: this gets called all the time. slow?
       this.search();
     }, 200);
   }
@@ -83,8 +79,8 @@ class SearchBox extends Component {
     }
     if (Session.followChatLink(query)) return;
 
-    if (query && this.fuse) {
-      const results = this.fuse.search(query).slice(0,5);
+    if (query) {
+      const results = Session.getUserSearchIndex().search(query).slice(0,5);
       if (results.length) {
         $(document).off('keyup').on('keyup', e => {
           if (e.key === "Escape") { // escape key maps to keycode `27`
