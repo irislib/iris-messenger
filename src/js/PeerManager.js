@@ -1,11 +1,12 @@
 import State from './State.js';
 import Helpers from './Helpers.js';
 import Session from './Session.js';
+import iris from 'iris-lib';
 import _ from 'lodash';
 
-const MAX_PEER_LIST_SIZE = 10;
+var MAX_PEER_LIST_SIZE = 10;
 const ELECTRON_GUN_URL = 'http://localhost:8767/gun';
-let maxConnectedPeers = Helpers.isElectron ? 2 : 1;
+var maxConnectedPeers = iris.util.isElectron ? 2 : 1;
 const DEFAULT_PEERS = {
   //'https://iris.cx/gun': {},
   'https://gun-us.herokuapp.com/gun': {}
@@ -59,7 +60,7 @@ function getSavedPeers() {
   } else {
     p = DEFAULT_PEERS;
   }
-  if (Helpers.isElectron) {
+  if (iris.util.isElectron) {
     p[ELECTRON_GUN_URL] = {};
   }
   Object.keys(p).forEach(k => _.defaults(p[k], {enabled: true}));
@@ -94,13 +95,13 @@ function disablePeer(url, peerFromGun) {
 }
 
 function getRandomPeers() {
-  const connectToLocalElectron = Helpers.isElectron && knownPeers[ELECTRON_GUN_URL] && knownPeers[ELECTRON_GUN_URL].enabled !== false;
+  const connectToLocalElectron = iris.util.isElectron && knownPeers[ELECTRON_GUN_URL] && knownPeers[ELECTRON_GUN_URL].enabled !== false;
   const sampleSize = connectToLocalElectron ? Math.max(maxConnectedPeers - 1, 1) : maxConnectedPeers;
   const sample = _.sample(
     Object.keys(
       _.pick(knownPeers, (p, url) => {
         const mixedContent = (window.location.protocol === 'https:' && (url.indexOf('http:') === 0));
-        return !mixedContent && p.enabled && !(Helpers.isElectron && url === ELECTRON_GUN_URL);
+        return !mixedContent && p.enabled && !(iris.util.isElectron && url === ELECTRON_GUN_URL);
       })
     ), sampleSize
   );

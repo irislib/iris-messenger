@@ -10,7 +10,6 @@ import _ from 'lodash';
 
 import PeerManager from './PeerManager.js';
 import iris from 'iris-lib';
-import Helpers from './Helpers.js';
 
 const State = {
   init: function(publicOpts) {
@@ -21,7 +20,7 @@ const State = {
       publicOpts.peers.forEach(url => PeerManager.addPeer({url}));
     }
     this.local = Gun({peers: [], file: 'State.local', multicast:false, localStorage: false}).get('state');
-    if (Helpers.isElectron) {
+    if (iris.util.isElectron) {
       this.electron = Gun({peers: ['http://localhost:8768/gun'], file: 'State.local', multicast:false, localStorage: false}).get('state');
     }
     this.blockedUsers = {};
@@ -47,23 +46,21 @@ const State = {
     const _this = this;
     return {
       get: function(path, callback) {
-        requestAnimationFrame(() => {
-          const follows = {};
-          if (typeof groupNode === 'string') {
-            groupNode = _this.local.get('groups').get(groupNode);
-          }
-          groupNode.map((isFollowing, user) => {
-            if (_this.blockedUsers[user]) { return; } // TODO: allow to specifically query blocked users?
-            if (follows[user] && follows[user] === isFollowing) { return; }
-            follows[user] = isFollowing;
-            if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
-              let node = State.public.user(user);
-              if (path && path !== '/') {
-                node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
-              }
-              callback(node, user);
+        const follows = {};
+        if (typeof groupNode === 'string') {
+          groupNode = _this.local.get('groups').get(groupNode);
+        }
+        groupNode.map((isFollowing, user) => {
+          if (_this.blockedUsers[user]) { return; } // TODO: allow to specifically query blocked users?
+          if (follows[user] && follows[user] === isFollowing) { return; }
+          follows[user] = isFollowing;
+          if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
+            let node = State.public.user(user);
+            if (path && path !== '/') {
+              node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
             }
-          })
+            callback(node, user);
+          }
         });
       },
 

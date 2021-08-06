@@ -81,7 +81,7 @@ class SearchBox extends Component {
         return this.props.onSelect({key});
       }
     }
-    if (Session.followChatLink(query)) return;
+    if (Helpers.followChatLink(query)) return;
 
     if (query && this.fuse) {
       const results = this.fuse.search(query).slice(0,5);

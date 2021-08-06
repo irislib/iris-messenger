@@ -1,4 +1,3 @@
-import Gun from 'gun';
 import State from './State.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
@@ -27,7 +26,7 @@ const DEFAULT_SETTINGS = {
     enableWebtorrent: !iris.util.isMobile,
     enablePublicPeerDiscovery: true,
     autoplayWebtorrent: true,
-    maxConnectedPeers: Helpers.isElectron ? 2 : 1
+    maxConnectedPeers: iris.util.isElectron ? 2 : 1
   }
 }
 
@@ -250,7 +249,7 @@ function getPubKey() {
 
 function loginAsNewUser(name) {
   name = name || Helpers.generateName();
-  return Gun.SEA.pair().then(k => {
+  return SEA.pair().then(k => {
     login(k);
     name && State.public.user().get('profile').get('name').put(name);
     createChatLink();
@@ -433,23 +432,4 @@ function subscribeToMsgs(pub) {
   });
 }
 
-function followChatLink(str) {
-  if (str && str.indexOf('http') === 0) {
-    const s = str.split('?');
-    let chatId;
-    if (s.length === 2) {
-      chatId = this.getUrlParameter('chatWith', s[1]) || this.getUrlParameter('channelId', s[1]);
-    }
-    if (chatId) {
-      newChannel(chatId, str);
-      route('/chat/' + chatId);
-      return true;
-    }
-    if (str.indexOf('https://iris.to') === 0) {
-      route(str.replace('https://iris.to', ''));
-      return true;
-    }
-  }
-}
-
-export default {init, followChatLink, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };

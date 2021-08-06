@@ -1,6 +1,7 @@
 import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
+import Helpers from '../Helpers.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
 import CopyButton from './CopyButton.js';
@@ -42,13 +43,13 @@ class NewChat extends Component {
       QRScanner.cleanupScanner();
     } else {
       $('#chatlink-qr-video').show();
-      QRScanner.startChatLinkQRScanner(result => result.text && Session.followChatLink(result.text));
+      QRScanner.startChatLinkQRScanner(result => result.text && Helpers.followChatLink(result.text));
     }
   }
 
   onPasteChatLink(e) {
     const val = $(e.target).val();
-    Session.followChatLink(val);
+    Helpers.followChatLink(val);
     $(e.target).val('');
   }
 

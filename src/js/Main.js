@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { Router } from 'preact-router';
 import { Link } from 'preact-router/match';
+import iris from 'iris-lib';
 
 import Helpers from './Helpers.js';
 import { html } from './Helpers.js';
@@ -40,6 +41,9 @@ if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redir
   window.location.href = window.location.href.replace('#/', '');
 }
 
+const userAgent = navigator.userAgent.toLowerCase();
+const isElectron = (userAgent.indexOf(' electron/') > -1);
+
 State.init();
 Session.init({autologin: window.location.pathname.length > 2});
 PeerManager.init();
@@ -73,7 +77,7 @@ class Menu extends Component {
     const pub = Session.getPubKey();
     return html`
       <div class="application-list">
-        ${Helpers.isElectron ? html`<div class="electron-padding"/>` : html`
+        ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
           <a href="/" onClick=${() => this.menuLinkClicked()} class="hidden-xs" tabindex="0" class="logo">
             <img class="hidden-xs" src=${logo} width=40 height=40/>
             <img src=${logoType} height=23 width=41 />

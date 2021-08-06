@@ -1,6 +1,8 @@
+import Session from './Session.js';
 import {translate as t} from './Translation.js';
 import {createElement} from 'preact';
 import htm from './lib/htm.module.js';
+import { route } from 'preact-router';
 import $ from 'jquery';
 import _ from 'lodash';
 import iris from 'iris-lib';
@@ -14,9 +16,6 @@ function setImgSrc(el, src) {
   }
   return el;
 }
-
-const userAgent = navigator.userAgent.toLowerCase();
-const isElectron = (userAgent.indexOf(' electron/') > -1);
 
 const animals = [
   'canidae',
@@ -2010,5 +2009,22 @@ export default {
     return 'https://iris.to/profile/' + encodeURIComponent(pub);
   },
 
-  isElectron
+  followChatLink(str) {
+    if (str && str.indexOf('http') === 0) {
+      const s = str.split('?');
+      let chatId;
+      if (s.length === 2) {
+        chatId = this.getUrlParameter('chatWith', s[1]) || this.getUrlParameter('channelId', s[1]);
+      }
+      if (chatId) {
+        Session.newChannel(chatId, str);
+        route('/chat/' + chatId);
+        return true;
+      }
+      if (str.indexOf('https://iris.to') === 0) {
+        route(str.replace('https://iris.to', ''));
+        return true;
+      }
+    }
+  }
 };
