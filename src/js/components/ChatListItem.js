@@ -1,5 +1,6 @@
 import Component from '../BaseComponent';
-import Helpers, { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import { route } from 'preact-router';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';

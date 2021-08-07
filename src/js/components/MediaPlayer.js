@@ -1,5 +1,6 @@
 import { Component } from 'preact';
-import Helpers, {html} from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Icons from '../Icons.js';
 import $ from 'jquery';

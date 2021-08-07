@@ -1,6 +1,7 @@
 import Component from '../BaseComponent';
 import { route } from 'preact-router';
-import Helpers, { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';

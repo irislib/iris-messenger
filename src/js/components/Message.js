@@ -1,5 +1,6 @@
 import Component from '../BaseComponent.js';
-import Helpers, { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
 import Autolinker from 'autolinker';
@@ -27,7 +28,7 @@ class Message extends Component {
       }
     });
 
-    const status = this.getSeenStatus().seen;
+    const status = this.getSeenStatus();
     if (!status.seen && !status.delivered) {
       State.local.get('channels').get(this.props.chatId).get('theirLastActiveTime').on(
         this.sub((v, k, a, e) => {

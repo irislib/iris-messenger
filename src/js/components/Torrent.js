@@ -1,6 +1,7 @@
 import Component from '../BaseComponent';
 import { createRef } from 'preact';
-import Helpers, {html} from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import Session from "../Session.js";
 import { translate as tr } from '../Translation.js';
 import $ from 'jquery';

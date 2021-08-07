@@ -2,7 +2,8 @@ import { Component } from 'preact';
 import { Router } from 'preact-router';
 import { Link } from 'preact-router/match';
 
-import Helpers, { html } from './Helpers.js';
+import Helpers from './Helpers.js';
+import { html } from 'htm/preact';
 import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';

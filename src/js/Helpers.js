@@ -1,6 +1,4 @@
 import {translate as t} from './Translation.js';
-import {createElement} from 'preact';
-import htm from './lib/htm.module.js';
 import $ from 'jquery';
 import _ from 'lodash';
 import iris from 'iris-lib';
@@ -1834,9 +1832,6 @@ const adjectives = [
   'yummy',
   'zany',
 ];
-
-const html = htm.bind(createElement);
-export { html };
 
 export default {
   isUrl(s) {

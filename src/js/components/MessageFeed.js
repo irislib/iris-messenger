@@ -1,5 +1,6 @@
 import Component from '../BaseComponent';
-import Helpers, { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import PublicMessage from './PublicMessage.js';
 import {  List, WindowScroller,CellMeasurer,CellMeasurerCache,} from 'react-virtualized';
 import State from '../State.js';

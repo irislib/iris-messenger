@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import { route } from 'preact-router';
 import $ from 'jquery';
 import Gun from 'gun';

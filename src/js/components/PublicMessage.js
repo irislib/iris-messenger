@@ -1,4 +1,5 @@
-import Helpers, { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import Identicon from './Identicon.js';
 import PublicMessageForm from './PublicMessageForm.js';
 import State from '../State.js';

@@ -1,5 +1,6 @@
 import { Component } from 'preact';
-import Helpers, { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';

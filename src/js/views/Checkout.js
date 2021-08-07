@@ -1,4 +1,4 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Session from '../Session.js';
 import { route } from 'preact-router';

@@ -1,5 +1,6 @@
 import {translate as t} from '../Translation.js';
-import Helpers, { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import View from './View.js';
 
 class About extends View {

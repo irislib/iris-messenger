@@ -1,5 +1,5 @@
 import Component from '../BaseComponent';
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 
 export default class Filters extends Component {

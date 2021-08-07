@@ -1,4 +1,4 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import Session from '../Session.js';
 import {translate as t} from '../Translation.js';
 import { route } from 'preact-router';

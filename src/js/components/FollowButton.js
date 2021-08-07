@@ -1,5 +1,5 @@
 import Component from '../BaseComponent';
-import {html} from '../Helpers.js';
+import { html } from 'htm/preact';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
 import State from '../State.js';
