@@ -212,9 +212,14 @@ class ChatMessageForm extends Component {
       <textarea onPaste=${e => this.onMsgTextPaste(e)} 
       id="autoResizeTextbox"
       style=${{height:45,minHeight:45, borderRadius:60}} 
-      onInput=${(e) =>
+      onKeyPress=${(e) =>
         { 
           this.onMsgTextInput(e);
+          console.log("THis is great",e.key)
+          if (e.key === 'Enter' && !e.shiftKey) 
+          {
+            this.onMsgFormSubmit(e)
+          }
           var textBox = document.getElementById("autoResizeTextbox")
           textBox.style.height=0;
           if(textBox.scrollHeight<56)
