@@ -55,7 +55,7 @@ class PublicMessage extends Message {
           }
         ));
       }
-      const timeout = setTimeout(askFromPublicState, 1000); // give local state some time to resolve first
+      const timeout = setTimeout(askFromPublicState, 5000); // give local state some time to resolve first
 
       State.local.get('msgsByHash').get(hash).once(this.sub(
 msg => {
@@ -76,6 +76,9 @@ msg => {
   }
 
   componentDidMount() {
+    if (this.props.standalone) {
+      this.fetchByHash(); // in standalone, call twice to circumvent gun issue
+    }
     const p = this.fetchByHash();
     if (!p) { return; }
     p.then(r => {
