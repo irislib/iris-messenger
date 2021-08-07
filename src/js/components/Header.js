@@ -1,18 +1,24 @@
-import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
+import Component from '../BaseComponent';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import Identicon from './Identicon.js';
 import SearchBox from './SearchBox.js';
 import Icons from '../Icons.js';
+import iris from 'iris-lib';
+
+import logo from '../../assets/img/icon128.png';
+import logoType from '../../assets/img/iris_logotype.png';
+
+import $ from 'jquery';
 
 class Header extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
-    this.eventListeners = [];
     this.chatId = null;
   }
 
@@ -30,7 +36,7 @@ class Header extends Component {
         } else {
           lastSeenText = iris.util.formatDate(d);
         }
-        return (t('last_active') + ' ' + lastSeenText);
+        return (`${t('last_active')  } ${  lastSeenText}`);
       }
     }
   }
@@ -40,44 +46,34 @@ class Header extends Component {
   }
 
   componentDidMount() {
-    State.local.get('showParticipants').on(showParticipants => this.setState({showParticipants}));
-    State.local.get('unseenTotal').on(unseenTotal => {
-      this.setState({unseenTotal});
-    });
-    State.local.get('activeRoute').on(activeRoute => {
-      this.setState({about:null, title: ''});
-      this.eventListeners.forEach(e => e.off());
-      this.eventListeners = [];
-      this.setState({activeRoute});
-      const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-      this.chatId = replaced.length < activeRoute.length ? replaced : null;
-      if (this.chatId) {
-        State.local.get('channels').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
-          this.eventListeners.push(event);
-          this.setState({});
-        });
-        State.local.get('channels').get(this.chatId).get('theirLastActiveTime').on((t, a, b, event) => {
-          this.eventListeners.push(event);
-          this.setState({});
-        });
-      }
+    State.local.get('showParticipants').on(this.inject());
+    State.local.get('unseenTotal').on(this.inject());
+    State.local.get('activeRoute').on(this.sub(
+      activeRoute => {
+        this.setState({about:null, title: ''});
+        this.setState({activeRoute});
+        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+        this.chatId = replaced.length < activeRoute.length ? replaced : null;
+        if (this.chatId) {
+          State.local.get('channels').get(this.chatId).get('isTyping').on(this.sub(
+            () => this.setState({})
+          ));
+          State.local.get('channels').get(this.chatId).get('theirLastActiveTime').on(this.sub(
+            () => this.setState({})
+          ));
+        }
 
-      if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
-        if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
-          const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
-          this.setState({title});
-        } else {
-          State.local.get('channels').get(this.chatId).get('name').on((name, a, b, eve) => {
-            this.eventListeners.push(eve);
-            this.setState({title: name});
-          });
-          State.local.get('channels').get(this.chatId).get('about').on((about, a, b, eve) => {
-            this.eventListeners.push(eve);
-            this.setState({about});
-          });
+        if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
+          if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
+            const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
+            this.setState({title});
+          } else {
+            State.local.get('channels').get(this.chatId).get('name').on(this.inject('title'));
+            State.local.get('channels').get(this.chatId).get('about').on(this.inject());
+          }
         }
       }
-    });
+    ));
   }
 
   onTitleClicked() {
@@ -112,10 +108,10 @@ class Header extends Component {
       </div>
       ` : ''}
       <div class="header-content">
-        ${iris.util.isElectron || (activeRoute && activeRoute.indexOf('/chat/') === 0) ? '' : html`
+        ${Helpers.isElectron || (activeRoute && activeRoute.indexOf('/chat/') === 0) ? '' : html`
           <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
-            <img src="/img/icon128.png" width=40 height=40/>
-            <img src="/img/iris_logotype.png" height=23 width=41 />
+            <img src=${logo} width=40 height=40/>
+            <img src=${logoType} height=23 width=41 />
           </a>
         `}
         <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
@@ -145,7 +141,7 @@ class Header extends Component {
             ${Icons.group}
           </a>
         ` : ''}
-        <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
+        <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === `/profile/${  key}` ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>
       </div>

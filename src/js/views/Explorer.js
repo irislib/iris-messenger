@@ -1,8 +1,9 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Session from '../Session.js';
-import { Component } from '../lib/preact.js';
+import { Component } from 'preact';
 import View from './View.js';
+import Gun from 'gun';
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
@@ -124,7 +125,7 @@ class ExplorerNode extends Component {
   }
 
   componentDidMount() {
-    this.isMine = this.props.path.indexOf('public/~' + Session.getPubKey()) === 0;
+    this.isMine = this.props.path.indexOf(`public/~${  Session.getPubKey()}`) === 0;
     this.isGroup = this.props.path.indexOf('group') === 0;
 
     this.children = {};
@@ -180,7 +181,7 @@ class ExplorerNode extends Component {
   }
 
   renderChildObject(k) {
-    const path = this.props.path + '/' + encodeURIComponent(k);
+    const path = `${this.props.path  }/${  encodeURIComponent(k)}`;
     return html`
       <div class="explorer-row" style="padding-left: ${this.props.indent}em">
         <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.children[k].open ? chevronDown : chevronRight}</span>
@@ -208,8 +209,8 @@ class ExplorerNode extends Component {
       }
     } else {
       const pub = Session.getPubKey();
-      const isMine = this.props.path.indexOf('public/~' + pub) === 0;
-      const path = isMine && (this.props.path + '/' + encodeURIComponent(k)).replace('public/~' + pub + '/', '');
+      const isMine = this.props.path.indexOf(`public/~${  pub}`) === 0;
+      const path = isMine && (`${this.props.path  }/${  encodeURIComponent(k)}`).replace(`public/~${  pub  }/`, '');
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
         s = isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
       } else {
@@ -288,9 +289,9 @@ class ExplorerNode extends Component {
         const v = this.state.children[k].value;
         if (typeof v === 'object' && v && v['_']) {
           return this.renderChildObject(k, v);
-        } else {
+        } 
           return this.renderChildValue(k, v);
-        }
+        
       });
     }
 

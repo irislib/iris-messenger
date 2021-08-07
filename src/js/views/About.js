@@ -1,5 +1,6 @@
 import {translate as t} from '../Translation.js';
-import { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import View from './View.js';
 
 class About extends View {
@@ -20,9 +21,9 @@ class About extends View {
         </ul>
         <p>In other words, <b>you can't be deplatformed from Iris</b>.</p>
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-        <p><small>Version 1.7.1</small></p>
+        <p><small>Version 2.0.3</small></p>
 
-        ${iris.util.isElectron ? '' : html`
+        ${Helpers.isElectron ? '' : html`
           <div id="desktop-application-about">
             <h4>Get the desktop application</h4>
             <ul>
@@ -50,7 +51,7 @@ class About extends View {
         <p>${t('application_security_warning')}</p>
 
         <h4>${t('donate')}</h4>
-        <p dangerouslySetInnerHTML=${{ __html:t('donate_info', "href=\"https://opencollective.com/iris-social\"") + ': 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST' }}></p>
+        <p dangerouslySetInnerHTML=${{ __html:`${t('donate_info', "href=\"https://opencollective.com/iris-social\"")  }: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST` }}></p>
         <p>Dogecoin: DEsgP4H1Sjp4461PugHDNnoGd6S8pTvrm1</p>
       </div>
     `;

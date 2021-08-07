@@ -1,11 +1,14 @@
-import { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import { translate as t } from '../Translation.js';
 import LanguageSelector from '../components/LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
-import { Component } from '../lib/preact.js';
-import Helpers from '../Helpers.js';
+import { Component } from 'preact';
+import Gun from 'gun';
+
+import logo from '../../assets/img/android-chrome-192x192.png';
 
 class Login extends Component {
   componentDidMount() {
@@ -26,7 +29,7 @@ class Login extends Component {
     const val = event.target.value;
     if (!val.length) { return; }
     try {
-      var k = JSON.parse(val);
+      let k = JSON.parse(val);
       Session.login(k);
       event.target.value = '';
     } catch (e) {
@@ -42,7 +45,7 @@ class Login extends Component {
 
   onLoginFormSubmit(e) {
     e.preventDefault();
-    var name = document.getElementById('login-form-name').value || Helpers.generateName();
+    let name = document.getElementById('login-form-name').value || Helpers.generateName();
     Gun.SEA.pair().then(k => {
       Session.login(k);
       State.public.user().get('profile').get('name').put(name);
@@ -78,7 +81,7 @@ class Login extends Component {
         ${!this.state.showSwitchAccount ? html`
           <form id="login-form" autocomplete="off" onSubmit=${e => this.onLoginFormSubmit(e)}>
             <div id="create-account">
-              <img style="width: 86px" src="/img/android-chrome-192x192.png" alt="Iris"/>
+              <img width="86" height="86" src=${logo} alt="Iris"/>
               <h1>Iris</h1>
               <input onInput=${e => this.onNameChange(e)} autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
               <p><button id="sign-up" type="submit">${t('new_user_go')}</button></p>

@@ -1,11 +1,11 @@
-import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
-import { route } from '../lib/preact-router.es.js';
+import Component from '../BaseComponent';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
+import { route } from 'preact-router';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import Identicon from './Identicon.js';
-import Helpers from '../Helpers.js';
 
 const seenIndicator = html`<span class="seen-indicator"><svg viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
 
@@ -13,31 +13,27 @@ class ChatListItem extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
-    this.eventListeners = {};
   }
 
   componentDidMount() {
     const chat = this.props.chat;
-    State.local.get('channels').get(chat.id).get('latest').on((latest, a, b, event) => {
-      /*
-      if (msg.attachments) {
-        text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
-      } else {
-        text = msg.text;
+    State.local.get('channels').get(chat.id).get('latest').on(this.sub(
+      (latest) => {
+        /*
+        if (msg.attachments) {
+          text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
+        } else {
+          text = msg.text;
+        }
+        if (chat && chat.uuid && !msg.selfAuthored && msg.info.from && chat.participantProfiles[msg.info.from].name) {
+          text = chat.participantProfiles[msg.info.from].name + ': ' + text;
+        }
+        */
+        if (latest.time < chat.latestTime) { return; }
+        latest.time = latest.time && new Date(latest.time);
+        this.setState({latest});
       }
-      if (chat && chat.uuid && !msg.selfAuthored && msg.info.from && chat.participantProfiles[msg.info.from].name) {
-        text = chat.participantProfiles[msg.info.from].name + ': ' + text;
-      }
-      */
-      if (latest.time < chat.latestTime) { return; }
-      latest.time = latest.time && new Date(latest.time);
-      this.setState({latest});
-      this.eventListeners['latest'] = event;
-    });
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
+    ));
   }
 
   render() {
@@ -70,7 +66,7 @@ class ChatListItem extends Component {
     const onlineIndicator = chat.id.length > 36 ? html`<div class="online-indicator"></div>` : '';
 
     return html`
-    <div class="chat-item ${activity} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => route('/chat/' + this.props.chat.id)}>
+    <div class="chat-item ${activity} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => route(`/chat/${  this.props.chat.id}`)}>
       ${iconEl}
       ${onlineIndicator}
       <div class="text">

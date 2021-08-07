@@ -1,7 +1,10 @@
-import { Component } from '../lib/preact.js';
-import Helpers, {html} from '../Helpers.js';
+import Component from '../BaseComponent';
+import { createRef } from 'preact';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import Session from "../Session.js";
 import { translate as tr } from '../Translation.js';
+import $ from 'jquery';
 import State from '../State.js';
 import Icons from '../Icons.js';
 
@@ -11,21 +14,19 @@ const isAudio = f => isOfType(f, ['.mp3', '.wav', '.m4a']);
 const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class Torrent extends Component {
-  constructor() {
-    super();
-    this.eventListeners = {};
-  }
+  coverRef = createRef();
 
   componentDidMount() {
-    State.local.get('player').on((player,a,b,e) => {
-      this.player = player;
-      this.eventListeners['player'] = e;
-      this.setState({player});
-      if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
-        const file = this.getActiveFile(this.torrent);
-        file && this.openFile(file);
+    State.local.get('player').on(this.sub(
+      (player) => {
+        this.player = player;
+        this.setState({player});
+        if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
+          const file = this.getActiveFile(this.torrent);
+          file && this.openFile(file);
+        }
       }
-    });
+    ));
     const showFiles = this.props.showFiles;
     showFiles && this.setState({showFiles});
     if (Session.settings.local.enableWebtorrent) {
@@ -33,8 +34,14 @@ class Torrent extends Component {
     }
   }
 
+  measure() {
+    (typeof this.props.measure === 'function') && this.props.measure();
+  }
+
   componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
+    super.componentWillUnmount();
+    this.observer && this.observer.disconnect();
+    delete this.observer;
   }
 
   onPlay(e) {
@@ -43,10 +50,10 @@ class Torrent extends Component {
     }
   }
 
-  startTorrenting(clicked) {
+  async startTorrenting(clicked) {
     this.setState({torrenting: true});
     const torrentId = this.props.torrentId;
-    const client = Helpers.getWebTorrentClient();
+    const client = await Helpers.getWebTorrentClient();
     const existing = client.get(torrentId);
     if (existing) {
       this.onTorrent(existing, clicked);
@@ -100,6 +107,25 @@ class Torrent extends Component {
     if (!isAud) {
       file.appendTo(el.get(0), {autoplay, muted});
     }
+    if (isVid && this.props.autopause) {
+      const vid = base.find('video').get(0);
+      const handlePlay = (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            autoplay && vid.play();
+          } else {
+            vid.pause();
+          }
+        });
+      }
+      const options = {
+        rootMargin: "0px",
+        threshold: [0.25, 0.75]
+      };
+      this.observer = new IntersectionObserver(handlePlay, options);
+      this.observer.observe(vid);
+    }
+
     base.find('.info').toggle(!isVid);
     const player = base.find('video, audio').get(0);
     if (player) {
@@ -109,6 +135,8 @@ class Torrent extends Component {
       });
       player.onplay = player.onvolumechange = this.onPlay;
     }
+    setTimeout(() => this.measure());
+    setTimeout(() => this.measure(), 100);
   }
 
   getNextIndex(typeCheck) {
@@ -141,13 +169,14 @@ class Torrent extends Component {
   }
 
   onTorrent(torrent, clicked) {
+    if (!this.coverRef.current) { return; }
     this.torrent = torrent;
     const video = torrent.files.find(f => isVideo(f));
     const audio = torrent.files.find(f => isAudio(f));
     const img = torrent.files.find(f => isImage(f));
     let poster = torrent.files.find(f => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1));
     poster = poster || img;
-    poster && poster.appendTo($(this.base).find('.cover').get(0));
+    poster && poster.appendTo(this.coverRef.current);
 
     const file = this.getActiveFile(torrent) || video || audio || img || torrent.files[0];
     this.setState({torrent, cover: img});
@@ -157,6 +186,7 @@ class Torrent extends Component {
   showFilesClicked(e) {
     e.preventDefault();
     this.setState({showFiles: !this.state.showFiles});
+    setTimeout(() => this.measure());
   }
 
   openTorrentClicked(e) {
@@ -183,7 +213,7 @@ class Torrent extends Component {
               <a href="" onClick=${e => this.openTorrentClicked(e)}>Show attachment</a>
             `:''}
             ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>`:''}
-            <div class="cover" style=${s.isAudioOpen ? '' : 'display:none'}></div>
+            <div class="cover" ref=${this.coverRef} style=${s.isAudioOpen ? '' : 'display:none'}></div>
             <div class="info">
                 ${s.splitPath ? s.splitPath.map(
                   (str, i) => {
@@ -192,9 +222,9 @@ class Torrent extends Component {
                         str = str.split('.').slice(0, -1).join('.');
                       }
                       return html`<p><b>${str}</b></p>`;
-                    } else {
+                    } 
                       return html`<p>${str}</p>` 
-                    }
+                    
                   }
                 ):''}
             </div>

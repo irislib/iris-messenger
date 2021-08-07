@@ -1,7 +1,7 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import PublicMessage from '../components/PublicMessage.js';
 import PublicMessageForm from '../components/PublicMessageForm.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import View from './View.js';
 
 class Message extends View {
@@ -19,7 +19,7 @@ class Message extends View {
       `;
     } else {
       content = html`
-        <${PublicMessage} hash=${this.props.hash} showName=${true} showReplies=${true} />
+        <${PublicMessage} key=${this.props.hash} standalone=${true} hash=${this.props.hash} showName=${true} showReplies=${true} />
       `;
     }
     return html`

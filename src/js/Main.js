@@ -1,10 +1,9 @@
-import { render } from './lib/preact.js';
-import { Router } from './lib/preact-router.es.js';
-import { Component } from './lib/preact.js';
-import { Link } from './lib/preact.match.js';
+import { Component } from 'preact';
+import { Router } from 'preact-router';
+import { Link } from 'preact-router/match';
 
 import Helpers from './Helpers.js';
-import { html } from './Helpers.js';
+import { html } from 'htm/preact';
 import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
@@ -34,20 +33,14 @@ import Footer from './components/Footer.js';
 import State from './State.js';
 import Icons from './Icons.js';
 
+import logo from '../assets/img/icon128.png';
+import logoType from '../assets/img/iris_logotype.png';
+
+import '../css/style.css';
+import '../css/cropper.min.css';
+
 if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redirect old urls
   window.location.href = window.location.href.replace('#/', '');
-}
-
-const userAgent = navigator.userAgent.toLowerCase();
-const isElectron = (userAgent.indexOf(' electron/') > -1);
-if (!isElectron && ('serviceWorker' in navigator)) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/serviceworker.js')
-    .catch(function(err) {
-      // registration failed :(
-      console.log('ServiceWorker registration failed: ', err);
-    });
-  });
 }
 
 State.init();
@@ -83,10 +76,10 @@ class Menu extends Component {
     const pub = Session.getPubKey();
     return html`
       <div class="application-list">
-        ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
+        ${Helpers.isElectron ? html`<div class="electron-padding"/>` : html`
           <a href="/" onClick=${() => this.menuLinkClicked()} class="hidden-xs" tabindex="0" class="logo">
-            <img class="hidden-xs" src="/img/icon128.png" width=40 height=40/>
-            <img src="/img/iris_logotype.png" height=23 width=41 />
+            <img class="hidden-xs" src=${logo} width=40 height=40/>
+            <img src=${logoType} height=23 width=41 />
           </a>
         `}
         <div class="visible-xs-block">
@@ -106,9 +99,9 @@ class Menu extends Component {
                 </span>
                 <span class="text">${a.text}</span>
               <//>`;
-          } else {
+          } 
             return html`<br/><br/>`;
-          }
+          
         })}
       </div>
     `;
@@ -126,7 +119,7 @@ class Main extends Component {
   handleRoute(e) {
     let activeRoute = e.url;
     document.title = 'Iris';
-    if (activeRoute && activeRoute.length > 1) { document.title += ' - ' + Helpers.capitalize(activeRoute.replace('/', '')); }
+    if (activeRoute && activeRoute.length > 1) { document.title += ` - ${  Helpers.capitalize(activeRoute.replace('/', ''))}`; }
     State.local.get('activeRoute').put(activeRoute);
     QRScanner.cleanupScanner();
   }
@@ -152,7 +145,7 @@ class Main extends Component {
       content = this.state.loggedIn ? html`
         ${isDesktopNonMac ? html`
           <div class="windows-titlebar">
-               <img src="/img/iris_logotype.png" height=16 width=28 />
+               <img src=${logoType} height=16 width=28 />
                <div class="title-bar-btns">
                     <button class="min-btn" onClick=${() => this.electronCmd('minimize')}>-</button>
                     <button class="max-btn" onClick=${() => this.electronCmd('maximize')}>+</button>
@@ -206,8 +199,6 @@ class Main extends Component {
   }
 }
 
-render(html`<${Main}/>`, document.body);
-
-document.body.style = 'opacity:1';
-
 Helpers.showConsoleWarning();
+
+export default Main;

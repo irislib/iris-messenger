@@ -1,4 +1,4 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import Torrent from '../components/Torrent.js';
 import View from './View.js';
 

@@ -1,16 +1,20 @@
-import { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Session from '../Session.js';
-import Helpers from '../Helpers.js';
 import LanguageSelector from '../components/LanguageSelector.js';
 import {translate as t} from '../Translation.js';
 import PeerManager from '../PeerManager.js';
 import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../components/VideoCall.js';
 import CopyButton from '../components/CopyButton.js';
 import View from './View.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import {ExistingAccountLogin} from './Login.js';
 import Notifications from '../Notifications.js';
+import $ from 'jquery';
+import Icons from '../Icons.js';
+import _ from 'lodash';
+import QRCode from '../lib/qrcode.min';
 
 class Settings extends View {
   constructor() {
@@ -24,6 +28,13 @@ class Settings extends View {
 
   onProfilePhotoSet(src) {
     State.public.user().get('profile').get('photo').put(src);
+  }
+
+  mailtoSubmit(e) {
+    e.preventDefault();
+    if (this.state.email && this.state.email === this.state.retypeEmail) {
+      window.location.href = `mailto:${this.state.email}?&subject=Iris%20private%20key&body=${JSON.stringify(Session.getKey())}`;
+    }
   }
 
   renderView() {
@@ -51,6 +62,16 @@ class Settings extends View {
           <button onClick=${e => togglePrivateKeyQR(e)}>${t('show_privkey_qr')}</button>
         </p>
         <div id="private-key-qr" class="qr-container"></div>
+        <p>
+          ${t('email_privkey_to_yourself')}:
+        </p>
+        <p>
+          <form onSubmit=${e => this.mailtoSubmit(e)}>
+            <input name="email" type="email" onChange=${e => this.setState({email:e.target.value.trim()})} placeholder=${t('email')}/>
+            <input name="verify_email" type="email" onChange=${e => this.setState({retypeEmail:e.target.value.trim()})} placeholder=${t('retype_email')}/>
+            <button type="submit">${t('go')}</button>
+          </form>
+        </p>
         <p><small dangerouslySetInnerHTML=${{ __html: t('privkey_storage_recommendation')}}></small></p>
         <hr/>
         <h3>${t('language')}</h3>
@@ -82,7 +103,7 @@ class Settings extends View {
         <p>
           <input type="number" value=${this.state.local.maxConnectedPeers} onChange=${e => State.local.get('settings').get('maxConnectedPeers').put(e.target.value || 0)}/>
         </p>
-        ${iris.util.isElectron ? html`
+        ${Helpers.isElectron ? html`
           <h4>${t('your_public_address')}</h4>
           <p>http://${this.state.electron.publicIp || '-'}:8767/gun</p>
           <p><small>If you're behind NAT (likely) and want to accept incoming connections, you need to configure your router to forward the port 8767 to this computer.</small></p>
@@ -92,10 +113,10 @@ class Settings extends View {
           <small dangerouslySetInnerHTML=${{ __html: t('peers_info', "href=\"https://github.com/amark/gun#deploy\"")}}></small>
         </p>
         <p><a href="https://heroku.com/deploy?template=https://github.com/amark/gun">
-           <img src="./img/herokubutton.svg" alt="Deploy"/>
+           ${Icons.herokuButton}
         </a></p>
         <p>${t('also')} <a href="https://github.com/amark/gun#docker">Docker</a> ${t('or_small')} <a href="https://github.com/irislib/iris-electron">Iris-electron</a>.</p>
-        ${iris.util.isElectron ? html`
+        ${Helpers.isElectron ? html`
           <hr/>
           <h3>Desktop</h3>
           <p><input type="checkbox" checked=${this.state.electron.openAtLogin} onChange=${() => State.electron.get('settings').get('openAtLogin').put(!this.state.electron.openAtLogin)} id="openAtLogin"/><label for="openAtLogin">Open at login</label></p>
@@ -172,7 +193,7 @@ class Settings extends View {
                   `}
                   ${url}
                   ${peer.from ? html`
-                    <br/><small style="cursor:pointer" onClick=${() => route('/profile/' + peer.from)}>${t('from')} ${Helpers.truncateString(peer.from, 10)}</small>
+                    <br/><small style="cursor:pointer" onClick=${() => route(`/profile/${  peer.from}`)}>${t('from')} ${Helpers.truncateString(peer.from, 10)}</small>
                   ` : ''}
                 </div>
                 <div class="flex-cell no-flex">
@@ -205,8 +226,8 @@ class Settings extends View {
   }
 
   addPeerClicked() {
-    var url = $('#add-peer-url').val();
-    var visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
+    let url = $('#add-peer-url').val();
+    let visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
     PeerManager.addPeer({url, visibility});
     $('#add-peer-url').val('');
   }
@@ -244,18 +265,18 @@ class Settings extends View {
 }
 
 function togglePrivateKeyQR(e) {
-  var btn = $(e.target);
-  var show = $('#private-key-qr img').length === 0;
-  var SHOW_TEXT = t('show_privkey_qr');
+  let btn = $(e.target);
+  let show = $('#private-key-qr img').length === 0;
+  let SHOW_TEXT = t('show_privkey_qr');
   let hidePrivateKeyInterval;
   function reset() {
     clearInterval(hidePrivateKeyInterval);
     $('#private-key-qr').empty();
     btn.text(SHOW_TEXT);
   }
-  function hideText(s) { return t('hide_privkey_qr') + ' (' + s + ')'; }
+  function hideText(s) { return `${t('hide_privkey_qr')  } (${  s  })`; }
   if (show) {
-    var showPrivateKeySecondsRemaining = 20;
+    let showPrivateKeySecondsRemaining = 20;
     btn.text(hideText(showPrivateKeySecondsRemaining));
     hidePrivateKeyInterval = setInterval(() => {
       if ($('#private-key-qr img').length === 0) {
@@ -268,7 +289,7 @@ function togglePrivateKeyQR(e) {
         btn.text(hideText(showPrivateKeySecondsRemaining));
       }
     }, 1000);
-    var qrCodeEl = $('#private-key-qr');
+    let qrCodeEl = $('#private-key-qr');
     new QRCode(qrCodeEl[0], {
       text: JSON.stringify(Session.getKey()),
       width: 300,

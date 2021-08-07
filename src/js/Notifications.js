@@ -1,9 +1,13 @@
 import Helpers from './Helpers.js';
 import Session from './Session.js';
-import { route } from './lib/preact-router.es.js';
+import { route } from 'preact-router';
 import State from './State.js';
+import _ from 'lodash';
+import iris from 'iris-lib';
+import Gun from 'gun';
+import $ from 'jquery';
 
-const notificationSound = new Audio('../../audio/notification.mp3');
+const notificationSound = new Audio('../../assets/audio/notification.mp3');
 let loginTime;
 let unseenTotal;
 const webPushSubscriptions = {};
@@ -45,7 +49,7 @@ function notifyMsg(msg, info, pub) {
     notificationSound.play();
   }
   if (shouldDesktopNotify()) {
-    var body, title;
+    let body, title;
     if (Session.channels[pub].uuid) {
       title = Session.channels[pub].participantProfiles[info.from].name;
       body = `${name}: ${msg.text}`;
@@ -54,22 +58,22 @@ function notifyMsg(msg, info, pub) {
       body = msg.text;
     }
     body = Helpers.truncateString(body, 50);
-    var desktopNotification = new Notification(title, { // TODO: replace with actual name
+    let desktopNotification = new Notification(title, { // TODO: replace with actual name
       icon: 'img/icon128.png',
       body,
       silent: true
     });
     desktopNotification.onclick = function() {
-      route('/chat/' + pub);
+      route(`/chat/${  pub}`);
       window.focus();
     };
   }
 }
 
-var initialTitle = document.title;
+let initialTitle = document.title;
 function setUnseenTotal() {
   if (unseenTotal) {
-    document.title = '(' + unseenTotal + ') ' + initialTitle;
+    document.title = `(${  unseenTotal  }) ${  initialTitle}`;
   } else {
     document.title = initialTitle;
   }

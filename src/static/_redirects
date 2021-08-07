@@ -1,0 +1,15 @@
+/audio/*  /audio/:splat
+/messenger/*  /messenger/:splat
+/css/*  /css/:splat
+/font/*  /font/:splat
+/img/*  /img/:splat
+/js/*  /js/:splat
+/browserconfig.xml /browserconfig.xml
+/favicon.ico /favicon.ico
+/google7b3cf94231e5de15.html /google7b3cf94231e5de15.html
+/index.html /index.html
+/privacy.txt /privacy.txt
+/robots.txt /robots.txt
+/swsw.js /swsw.js
+/site.webmanifest /site.webmanifest
+/* /index.html 200

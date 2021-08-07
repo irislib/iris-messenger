@@ -1,15 +1,17 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
-import Helpers from '../Helpers.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
 import CopyButton from './CopyButton.js';
-import { Component } from '../lib/preact.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
+import $ from 'jquery';
+import QRCode from '../lib/qrcode.min.js';
+import iris from 'iris-lib';
+import Component from '../BaseComponent';
 
 function setChatLinkQrCode(link) {
-  var qrCodeEl = $('#my-qr-code');
+  let qrCodeEl = $('#my-qr-code');
   if (qrCodeEl.length === 0) { return; }
   qrCodeEl.empty();
   new QRCode(qrCodeEl[0], {
@@ -25,13 +27,8 @@ function setChatLinkQrCode(link) {
 class NewChat extends Component {
   constructor() {
     super();
-    this.eventListeners = {};
     this.chatLinks = {};
     this.state = {chatLinks: {}};
-  }
-
-  componentDidUnmount() {
-    this.eventListeners.forEach(e => e.off());
   }
 
   scanChatLinkQr() {
@@ -40,20 +37,20 @@ class NewChat extends Component {
       QRScanner.cleanupScanner();
     } else {
       $('#chatlink-qr-video').show();
-      QRScanner.startChatLinkQRScanner(result => result.text && Helpers.followChatLink(result.text));
+      QRScanner.startChatLinkQRScanner(result => result.text && Session.followChatLink(result.text));
     }
   }
 
   onPasteChatLink(e) {
     const val = $(e.target).val();
-    Helpers.followChatLink(val);
+    Session.followChatLink(val);
     $(e.target).val('');
   }
 
   onCreateGroupSubmit(e) {
     e.preventDefault();
     if ($('#new-group-name').val().length) {
-      var c = new iris.Channel({
+      let c = new iris.Channel({
         gun: State.public,
         key: Session.getKey(),
         participants: [],
@@ -61,22 +58,23 @@ class NewChat extends Component {
       c.put('name', $('#new-group-name').val());
       $('#new-group-name').val('');
       Session.addChannel(c);
-      route('/group/' + c.uuid);
+      route(`/group/${  c.uuid}`);
     }
   }
 
   componentDidMount() {
-    State.local.get('chatLinks').map().on((url, id, b, e) => {
-      this.eventListeners['chatLinks'] = e;
-      if (url) {
-        if (typeof url !== 'string' || url.indexOf('http') !== 0) return;
-        this.chatLinks[id] = url;
-        setChatLinkQrCode(url);
-      } else {
-        delete this.chatLinks[id];
+    State.local.get('chatLinks').map().on(this.sub(
+      (url, id) => {
+        if (url) {
+          if (typeof url !== 'string' || url.indexOf('http') !== 0) return;
+          this.chatLinks[id] = url;
+          setChatLinkQrCode(url);
+        } else {
+          delete this.chatLinks[id];
+        }
+        this.setState({chatLinks: this.chatLinks});
       }
-      this.setState({chatLinks: this.chatLinks});
-    });
+    ));
   }
 
   removeChatLink(id) {

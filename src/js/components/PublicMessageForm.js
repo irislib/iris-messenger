@@ -1,11 +1,14 @@
-import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
+import { Component } from 'preact';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
-import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import SafeImg from './SafeImg.js';
 import Torrent from './Torrent.js';
+import $ from 'jquery';
+import EmojiButton from '../lib/emoji-button.js';
+import iris from 'iris-lib';
 
 function twice(f) {
   f();
@@ -84,7 +87,7 @@ class PublicMessageForm extends Component {
 
   setTextareaHeight(textarea) {
     textarea.style.height = "";
-    textarea.style.height = textarea.scrollHeight + "px";
+    textarea.style.height = `${textarea.scrollHeight  }px`;
   }
 
   onMsgTextPaste(event) {
@@ -109,9 +112,9 @@ class PublicMessageForm extends Component {
   }
 
   attachmentsChanged(event) {
-    var files = event.target.files;
+    let files = event.target.files;
     if (files) {
-      for (var i = 0;i < files.length;i++) {
+      for (let i = 0;i < files.length;i++) {
         Helpers.getBase64(files[i]).then(base64 => {
           const a = this.state.attachments || [];
           a.push({type: 'image', data: base64});

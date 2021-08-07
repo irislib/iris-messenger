@@ -1,8 +1,11 @@
-import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
+import Component from '../BaseComponent.js';
 import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
+import Autolinker from 'autolinker';
+import iris from 'iris-lib';
+import $ from 'jquery';
 import State from '../State.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
@@ -25,22 +28,26 @@ class Message extends Component {
       }
     });
 
-    const status = this.getSeenStatus().seen;
+    const status = this.getSeenStatus();
     if (!status.seen && !status.delivered) {
-      State.local.get('channels').get(this.props.chatId).get('theirLastActiveTime').on((v, k, a, e) => {
-        if (this.getSeenStatus().delivered) {
-          this.setState({});
-          e.off();
-        }
-      });
+      State.local.get('channels').get(this.props.chatId).get('theirLastActiveTime').on(
+        this.sub((v, k, a, e) => {
+          if (this.getSeenStatus().delivered) {
+            this.setState({});
+            e.off();
+          }
+        })
+      );
     }
     if (!status.seen) {
-      State.local.get('channels').get(this.props.chatId).get('theirMsgsLastSeenTime').on((v, k, a, e) => {
-        if (this.getSeenStatus().seen) {
-          this.setState({});
-          e.off();
+      State.local.get('channels').get(this.props.chatId).get('theirMsgsLastSeenTime').on(this.sub(
+(v, k, a, e) => {
+          if (this.getSeenStatus().seen) {
+            this.setState({});
+            e.off();
+          }
         }
-      });
+      ));
     }
   }
 
@@ -54,7 +61,7 @@ class Message extends Component {
   }
 
   onNameClick(name) {
-    $('.new-msg').val($('.new-msg').val().trim() + ` @${name} `);
+    $('.new-msg').val(`${$('.new-msg').val().trim()  } @${name} `);
     $('.new-msg').focus();
   }
 
@@ -64,7 +71,7 @@ class Message extends Component {
     const attachmentsPreview = $('<div>').attr('id', 'attachment-gallery').addClass('gallery').addClass('attachment-preview');
     $('body').append(attachmentsPreview);
     attachmentsPreview.fadeIn(ANIMATE_DURATION);
-    var left, top, width, img;
+    let left, top, width, img;
 
     if (msg.attachments) {
       msg.attachments.forEach(a => {
@@ -72,16 +79,16 @@ class Message extends Component {
           img = Helpers.setImgSrc($('<img>'), a.data);
           if (msg.attachments.length === 1) {
             attachmentsPreview.css({'justify-content': 'center'});
-            var original = $(event.target);
+            let original = $(event.target);
             left = original.offset().left;
             top = original.offset().top - $(window).scrollTop();
             width = original.width();
-            var transitionImg = img.clone().attr('id', 'transition-img').data('originalDimensions', {left,top,width});
+            let transitionImg = img.clone().attr('id', 'transition-img').data('originalDimensions', {left,top,width});
             transitionImg.css({position: 'fixed', left, top, width, 'max-width': 'none', 'max-height': 'none'});
             img.css({visibility: 'hidden', 'align-self': 'center'});
             attachmentsPreview.append(img);
             $('body').append(transitionImg);
-            var o = img.offset();
+            let o = img.offset();
             transitionImg.animate({width: img.width(), left: o.left, top: o.top}, {duration: ANIMATE_DURATION, complete: () => {
               img.css({visibility: 'visible'});
               transitionImg.hide();
@@ -107,9 +114,9 @@ class Message extends Component {
   }
 
   closeAttachmentsGallery() {
-    var transitionImg = $('#transition-img');
+    let transitionImg = $('#transition-img');
     if (transitionImg.length) {
-      var originalDimensions = transitionImg.data('originalDimensions');
+      let originalDimensions = transitionImg.data('originalDimensions');
       transitionImg.show();
       $('#attachment-gallery img').remove();
       transitionImg.animate(originalDimensions, {duration: ANIMATE_DURATION, complete: () => {
@@ -120,6 +127,9 @@ class Message extends Component {
     const activeChat = window.location.pathname.replace('/profile/','').replace('/chat/','');
     if (activeChat && Session.channels[activeChat]) {
       Session.channels[activeChat].attachments = null;
+    }
+    if ("activeElement" in document) {
+      document.activeElement.blur();
     }
   }
 

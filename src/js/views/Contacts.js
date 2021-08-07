@@ -1,4 +1,4 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Identicon from '../components/Identicon.js';
 import {translate as t} from '../Translation.js';
@@ -6,7 +6,7 @@ import FollowButton from '../components/FollowButton.js';
 import Name from '../components/Name.js';
 import View from './View.js';
 import Session from '../Session.js';
-import ScrollViewport from '../lib/preact-scroll-viewport.js';
+import ScrollViewport from 'preact-scroll-viewport';
 
 class Contacts extends View {
   constructor() {

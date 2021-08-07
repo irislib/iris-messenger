@@ -1,8 +1,8 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Session from '../Session.js';
 import {translate as t} from '../Translation.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import StoreView from './Store.js';
 
 class Product extends StoreView {
@@ -44,7 +44,7 @@ class Product extends StoreView {
   onClickDelete() {
     if (confirm('Delete product? This cannot be undone.')) {
       State.public.user().get('store').get('products').get(this.props.product).put(null);
-      route('/store/' + this.props.store);
+      route(`/store/${  this.props.store}`);
     }
   }
 
@@ -58,7 +58,7 @@ class Product extends StoreView {
         <a href="/store/${this.props.store}"><iris-text editable="false" path="profile/name" user=${this.props.store}/></a>
         ${cartTotalItems ? html`
           <p>
-            <button onClick=${() => route('/checkout/' + this.props.store)}>Shopping cart (${cartTotalItems})</button>
+            <button onClick=${() => route(`/checkout/${  this.props.store}`)}>Shopping cart (${cartTotalItems})</button>
           </p>
         ` : ''}
         ${this.state.product ? html`

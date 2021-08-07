@@ -1,22 +1,14 @@
-import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
+import Component from '../BaseComponent';
+import { html } from 'htm/preact';
 import State from '../State.js';
 
 export default class Filters extends Component {
     componentDidMount() {
-        this.eventListeners = {};
-        State.local.get('filters').get('group').on((group,k,x,e) => {
-           this.eventListeners['group'] = e;
-           this.setState({group});
-        });
+        State.local.get('filters').get('group').on(this.inject());
     }
 
     toggleGroup(group) {
         State.local.get('filters').get('group').put(group);
-    }
-
-    componentWillUnmount() {
-        Object.values(this.eventListeners).forEach(e => e.off());
     }
 
     render() {
