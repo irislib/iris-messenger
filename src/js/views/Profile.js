@@ -29,7 +29,6 @@ function deleteChat(pub) {
 class Profile extends View {
   constructor() {
     super();
-    this.eventListeners = {};
     this.followedUsers = new Set();
     this.followers = new Set();
     this.id = "profile";
@@ -219,10 +218,6 @@ class Profile extends View {
     `;
   }
 
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
       this.componentDidMount();
@@ -231,15 +226,16 @@ class Profile extends View {
 
   getProfileDetails() {
     const pub = this.props.id;
-    State.public.user(pub).get('follow').map().on((following,key,c,e) => {
-      this.eventListeners['follow'] = e;
-      if (following) {
-        this.followedUsers.add(key);
-      } else {
-        this.followedUsers.delete(key);
+    State.public.user(pub).get('follow').map().on(this.sub(
+      (following,key) => {
+        if (following) {
+          this.followedUsers.add(key);
+        } else {
+          this.followedUsers.delete(key);
+        }
+        this.setState({followedUserCount: this.followedUsers.size});
       }
-      this.setState({followedUserCount: this.followedUsers.size});
-    });
+    ));
     State.local.get('groups').get('follows').map().once((following,key) => {
       if (following) {
         State.public.user(key).get('follow').get(pub).once(following => {
@@ -250,30 +246,28 @@ class Profile extends View {
         });
       }
     });
-    State.public.user(pub).get('profile').get('name').on((name,a,b,e) => {
-      document.title = name || document.title;
-      this.eventListeners['name'] = e;
-      if (!$('#profile .profile-name:focus').length) {
-        this.setState({name});
+    State.public.user(pub).get('profile').get('name').on(this.sub(
+      name => {
+        document.title = name || document.title;
+        if (!$('#profile .profile-name:focus').length) {
+          this.setState({name});
+        }
       }
-    });
-    State.public.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
-      this.eventListeners['photo'] = e;
-      this.setState({photo});
-    });
-    State.public.user(pub).get('profile').get('about').on((about,a,b,e) => {
-      this.eventListeners['about'] = e;
-      if (!$('#profile .profile-about-content:focus').length) {
-        this.setState({about});
-      } else {
-        $('#profile .profile-about-content:not(:focus)').text(about);
+    ));
+    State.public.user(pub).get('profile').get('photo').on(this.inject());
+    State.public.user(pub).get('profile').get('about').on(this.sub(
+      about => {
+        if (!$('#profile .profile-about-content:focus').length) {
+          this.setState({about});
+        } else {
+          $('#profile .profile-about-content:not(:focus)').text(about);
+        }
       }
-    });
+    ));
   }
 
   componentDidMount() {
     const pub = this.props.id;
-    Object.values(this.eventListeners).forEach(e => e.off());
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', blocked: false});
     this.isMyProfile = Session.getPubKey() === pub;
     const chat = Session.channels[pub];
@@ -306,10 +300,11 @@ class Profile extends View {
       colorLight : "#ffffff",
       correctLevel : QRCode.CorrectLevel.H
     });
-    State.public.user().get('block').get(this.props.id).on((blocked,k,x,e) => {
-      this.eventListeners['block'] = e;
-      this.setState({blocked});
-    })
+    State.public.user().get('block').get(this.props.id).on(this.sub(
+      blocked => {
+        this.setState({blocked});
+      }
+    ))
   }
 }
 

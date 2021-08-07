@@ -33,6 +33,10 @@ class Torrent extends Component {
     }
   }
 
+  measure() {
+    (typeof this.props.measure === 'function') && this.props.measure();
+  }
+
   componentWillUnmount() {
     super.componentWillUnmount();
     this.observer && this.observer.disconnect();
@@ -130,6 +134,8 @@ class Torrent extends Component {
       });
       player.onplay = player.onvolumechange = this.onPlay;
     }
+    setTimeout(() => this.measure());
+    setTimeout(() => this.measure(), 100);
   }
 
   getNextIndex(typeCheck) {
@@ -179,6 +185,7 @@ class Torrent extends Component {
   showFilesClicked(e) {
     e.preventDefault();
     this.setState({showFiles: !this.state.showFiles});
+    setTimeout(() => this.measure());
   }
 
   openTorrentClicked(e) {
