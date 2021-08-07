@@ -29,7 +29,6 @@ html {
 }
 
 body {
-  opacity: 0;
   font-size: 15px;
   color: var(--text-color);
   font-family: "SF Pro Text", "SF Pro Icons", system, -apple-system, system-ui, system-ui, "Helvetica Neue", Helvetica, "Lucida Grande", sans-serif;
@@ -64,6 +63,13 @@ a:hover, a:focus {
     content: "";
 }
 
+img {
+    -khtml-user-select: none;
+    -o-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
 
 .chat-message-form textarea{
   background: var(--input-bg);
@@ -74,6 +80,7 @@ a:hover, a:focus {
   max-height: 75;
   border-radius: 60px;
 }
+
 textarea {
   width: 100%;
   outline: none;
@@ -950,6 +957,38 @@ a.msg {
   display: flex;
 }
 
+.img-container {
+  position: relative;
+}
+
+.heart {
+  width: 92px;
+  height: 81px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  background: url("../assets/img/heart.png") no-repeat center/contain;
+  opacity: 0;
+  transform: scale(0);
+}
+
+.like-animate .heart {
+  animation-duration: 1000ms;
+  animation-name: like-heart-animation;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes like-heart-animation {
+  0% { opacity:0; transform:scale(0); }
+  15% { opacity:.9; transform:scale(1.2); }
+  30% { transform:scale(.95); }
+  45%,
+  80% { opacity:.9; transform:scale(1); }
+}
+
 .dropbtn {
   padding: 5px;
   font-size: 24px;
@@ -1262,15 +1301,6 @@ a.msg {
   user-select: none;
 }
 
-.hideScrollBar {
-  -ms-overflow-style: none !important; /* IE and Edge */
-  scrollbar-width: none !important;
-}
-/* Hide scrollbar for Chrome, Safari and Opera */
-.hideScrollBar::-webkit-scrollbar {
-  display: none;
-}
-
 .attachment-preview button {
   display: block;
   margin-bottom: 10px;
@@ -1322,8 +1352,8 @@ hr {
 
 .chat-message-form button {
   display: flex;
-  align-items: end;
-  padding:15px 10px !important;
+  align-items: center;
+  padding: 5px 10px !important;
 }
 
 /*----- Sidebar------- */
@@ -1551,6 +1581,22 @@ small, .text-muted {
 
 .picker.profile-photo {
   max-height: 400px;
+}
+
+@media (max-width:625px) {
+  .profile-photo-picker.open {
+    position: fixed;
+    z-index: 10;
+    background: rgba(0,0,0,0.85);
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 #profile-photo-preview-container {
@@ -1915,6 +1961,17 @@ form.public {
   transition: opacity 0.3s;
 }
 
+.ReactVirtualized__Grid {
+  outline: none;
+}
+
+/* Needs to be visible for tooltip */
+@media (min-width: 626px) {
+  .ReactVirtualized__Grid, .ReactVirtualized__Grid__innerScrollContainer {
+    overflow: visible !important;
+  }
+}
+
 /* Tooltip arrow */
 /*
 .tooltip .tooltiptext::after {
@@ -1996,8 +2053,8 @@ form.public {
     padding: 0;
   }
   .chat-message-form form {
-    align-items: end;
-    height: 100px;
+    align-items: center;
+    height: 50px;
   }
   .chat-message-form input {
     padding: 8px 15px;

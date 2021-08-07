@@ -247,7 +247,7 @@ class ChatMessageForm extends Component {
             console.log("textBox.scrollHeight>=91",textBox.scrollHeight)
             textBox.style.height="auto";
             textBox.rows=4;
-            this.props.parent.style.maxHeight=150+'px';;
+            this.props.parent.style.maxHeight=155+'px';;
             textBox.style.borderRadius = "16px"
           }
           if(textBox.scrollHeight>=110)
