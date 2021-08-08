@@ -221,10 +221,57 @@ class ChatMessageForm extends Component {
           if (e.key === 'Enter' && !e.shiftKey) 
           {
             this.onMsgFormSubmit(e)
+            var textBox = document.getElementById("autoResizeTextbox")
+            textBox.style.height=0;
+            if(textBox.scrollHeight<56)
+            {
+              console.log("textBox.scrollHeight<56",textBox.scrollHeight)
+              textBox.height = textBox.scrollHeight+"px"
+            }
+            if(textBox.scrollHeight>=56  && textBox.scrollHeight<74)
+            {
+              console.log("textBox.scrollHeight>=56",textBox.scrollHeight)
+              textBox.style.height="auto";
+              this.props.parent.style.maxHeight=115+'px';;
+              textBox.style.borderRadius = "16px"
+            }
+            if(textBox.scrollHeight>=74&& textBox.scrollHeight<92 )
+            {
+              console.log("textBox.scrollHeight>=74",textBox.scrollHeight)
+              textBox.style.height="auto";
+              textBox.rows=3;
+              this.props.parent.style.maxHeight=135+'px';;
+              textBox.style.borderRadius = "16px"
+            }
+            if(textBox.scrollHeight>=92&& textBox.scrollHeight<110)
+            {
+              console.log("textBox.scrollHeight>=91",textBox.scrollHeight)
+              textBox.style.height="auto";
+              textBox.rows=4;
+              this.props.parent.style.maxHeight=155+'px';;
+              textBox.style.borderRadius = "16px"
+            }
+            if(textBox.scrollHeight>=110)
+            {
+              console.log("textBox.scrollHeight>=110",textBox.scrollHeight)
+              textBox.style.height="auto";
+              textBox.rows=5;
+              this.props.parent.style.maxHeight=170+'px';;
+              textBox.style.borderRadius = "16px"
+            }
+            if(textBox.style.height==="45px"|| textBox.style.height==="0px")
+            {
+              this.props.parent.style.maxHeight=85+"px";
+              textBox.style.borderRadius = "60px"
+            }
+            // console.log("This is text box ",textBox)
+                localStorage.setItem("parentHeight",this.props.parent.style.maxHeight)
+                localStorage.setItem("textBoxHeight",textBox.scrollHeight+"px")
+                localStorage.setItem("textBoxRadius",textBox.style.borderRadius)
           }
         }
       } 
-      onInput=${(e) =>
+      onChange=${(e) =>
         { 
           this.onMsgTextInput(e);
           var textBox = document.getElementById("autoResizeTextbox")
