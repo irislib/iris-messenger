@@ -97,9 +97,9 @@ function disablePeer(url, peerFromGun) {
 function getRandomPeers() {
   const connectToLocalElectron = Helpers.isElectron && knownPeers[ELECTRON_GUN_URL] && knownPeers[ELECTRON_GUN_URL].enabled !== false;
   const sampleSize = connectToLocalElectron ? Math.max(maxConnectedPeers - 1, 1) : maxConnectedPeers;
-  const sample = _.sample(
+  const sample = _.sampleSize(
     Object.keys(
-      _.pick(knownPeers, (p, url) => {
+      _.pickBy(knownPeers, (p, url) => {
         const mixedContent = (window.location.protocol === 'https:' && (url.indexOf('http:') === 0));
         return !mixedContent && p.enabled && !(Helpers.isElectron && url === ELECTRON_GUN_URL);
       })

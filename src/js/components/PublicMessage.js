@@ -76,9 +76,6 @@ msg => {
   }
 
   componentDidMount() {
-    if (this.props.standalone) {
-      this.fetchByHash(); // in standalone, call twice to circumvent gun issue
-    }
     const p = this.fetchByHash();
     if (!p) { return; }
     p.then(r => {
