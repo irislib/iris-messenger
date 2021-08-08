@@ -71,6 +71,16 @@ img {
     user-select: none;
 }
 
+.chat-message-form textarea{
+  background: var(--input-bg);
+  color: var(--input-text);
+  outline: none;
+  border: 0;
+  height: 45px;
+  max-height: 75;
+  border-radius: 60px;
+}
+
 textarea {
   width: 100%;
   outline: none;

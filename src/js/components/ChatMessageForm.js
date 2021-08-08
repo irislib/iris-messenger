@@ -215,20 +215,23 @@ class ChatMessageForm extends Component {
       <input name="attachment-input" wrap="off" type="file" class="hidden attachment-input hideScrollBar" accept="image/*" multiple onChange=${() => this.openAttachmentsPreview()}/>
       <textarea onPaste=${e => this.onMsgTextPaste(e)} 
       id="autoResizeTextbox"
-      style=${{height:45,minHeight:45, borderRadius:60}} 
-      onKeyPress=${(e) =>
-        { 
-          this.onMsgTextInput(e);
-          console.log("THis is great",e.key)
+      style=${{height:45,minHeight:45, borderRadius:60}}
+      onKeyPress=${
+        (e)=>{
           if (e.key === 'Enter' && !e.shiftKey) 
           {
             this.onMsgFormSubmit(e)
           }
+        }
+      } 
+      onInput=${(e) =>
+        { 
+          this.onMsgTextInput(e);
           var textBox = document.getElementById("autoResizeTextbox")
           textBox.style.height=0;
           if(textBox.scrollHeight<56)
           {
-            console.log("textBox.scrollHeight<75",textBox.scrollHeight)
+            console.log("textBox.scrollHeight<56",textBox.scrollHeight)
             textBox.height = textBox.scrollHeight+"px"
           }
           if(textBox.scrollHeight>=56  && textBox.scrollHeight<74)
