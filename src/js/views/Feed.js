@@ -99,13 +99,8 @@ class Feed extends View {
         ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
           ${this.getNotification()}
         `}
-<<<<<<< HEAD
         
         <${MessageFeed} filter=${s.searchTerm && (m => this.filter(m))} thumbnails=${this.props.thumbnails} key=${this.props.index || 'feed'} group=${this.state.group} path=${this.props.index || 'msgs'} />
-=======
-        ${s.noFollows ? '' : html`<${Filters}/>`}
-        <${MessageFeed} scrollElement=${this.scrollElement.current} filter=${s.searchTerm && (m => this.filter(m))} thumbnails=${this.props.thumbnails} key=${this.props.index || 'feed'} group=${this.state.group} path=${this.props.index || 'msgs'} />
->>>>>>> upstream/master
       </div>
     `;
   }

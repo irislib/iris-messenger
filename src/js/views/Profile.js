@@ -1,7 +1,8 @@
-import Helpers, { html } from '../Helpers.js';
+import { html } from '../Helpers.js';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
+import Helpers from '../Helpers.js';
 import PublicMessageForm from '../components/PublicMessageForm.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
 import { route } from 'preact-router';
@@ -15,7 +16,6 @@ import View from './View.js';
 import { Link } from 'preact-router/match';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min.js';
-import iris from 'iris-lib';
 
 const SMS_VERIFIER_PUB = 'ysavwX9TVnlDw93w9IxezCJqSDMyzIU-qpD8VTN5yko.3ll1dFdxLkgyVpejFkEMOFkQzp_tRrkT3fImZEx94Co';
 
@@ -111,11 +111,13 @@ class Profile extends View {
     let profilePhoto;
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
-    } else if (this.state.photo && !this.state.blocked) {
+    } else {
+      if (this.state.photo && !this.state.blocked) {
         profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
       } else {
         profilePhoto = html`<${Identicon} str=${this.props.id} hidePhoto=${this.state.blocked} width=250/>`
       }
+    }
     return html`
     <div class="profile-top">
       <div class="profile-header">
@@ -142,8 +144,8 @@ class Profile extends View {
               <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
             ` : ''}
             ${this.isMyProfile ? '' : html`<${FollowButton} id=${this.props.id}/>`}
-            <button onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}</button>
-            <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${`https://iris.to${  window.location.pathname}`}/>
+            <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
+            <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to' + window.location.pathname}/>
             <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
             ${this.isMyProfile ? '' : html`
               <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
@@ -177,34 +179,34 @@ class Profile extends View {
     if (this.props.tab === 'replies') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="replies${this.props.id}" node=${State.public.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
+          <${MessageFeed} key="replies${this.props.id}" node=${State.public.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
         </div>
       `;
     } else if (this.props.tab === 'likes') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="likes${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
+          <${MessageFeed} key="likes${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
         </div>
       `;
     } else if (this.props.tab === 'media') {
       return html`
         <div class="public-messages-view">
           ${this.isMyProfile ? html`<${PublicMessageForm} index="media" class="hidden-xs" autofocus=${false}/>` : ''}
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
+          <${MessageFeed} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
         </div>
       `;
-    } 
+    } else {
       const messageForm = this.isMyProfile ? html`<${PublicMessageForm} class="hidden-xs" autofocus=${false}/>` : '';
       return html`
       <div>
         ${messageForm}
         <div class="public-messages-view">
           ${this.getNotification()}
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="posts${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+          <${MessageFeed} key="posts${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
         </div>
       </div>
       `;
-    
+    }
   }
 
   renderView() {
@@ -285,24 +287,19 @@ class Profile extends View {
         }, 1000);
       }
     }
-    let qrCodeEl = $('#profile-page-qr');
+    var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
     State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
     this.getProfileDetails();
     if (chat) {
-      $(`input[name=notificationPreference][value=${  chat.notificationSetting  }]`).attr('checked', 'checked');
+      $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
       $('input:radio[name=notificationPreference]').off().on('change', (event) => {
         chat.put('notificationSetting', event.target.value);
       });
     }
     qrCodeEl.empty();
-<<<<<<< HEAD
     new QRCode(qrCodeEl[0], {
       text: 'https://iris.to/' + window.location.pathname,
-=======
-    new QRCode(qrCodeEl.get(0), {
-      text: `https://iris.to/${  window.location.pathname}`,
->>>>>>> upstream/master
       width: 300,
       height: 300,
       colorDark : "#000000",

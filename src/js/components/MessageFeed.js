@@ -4,7 +4,7 @@ import PublicMessage from './PublicMessage.js';
 import {  List, WindowScroller,CellMeasurer,CellMeasurerCache,} from 'react-virtualized';
 import State from '../State.js';
 import 'react-virtualized/styles.css';
-import _ from 'lodash';
+import $ from 'jquery';
 
 class MessageFeed extends Component {
   constructor() {
@@ -73,7 +73,7 @@ class MessageFeed extends Component {
     this.unsubscribe();
   }
 
-  rowRenderer({ index, key, parent, style }) { // TODO: use isScrolling param to reduce rendering?
+  rowRenderer({ index, key, parent, style, isScrolling }) {
     const hash = this.state.sortedMessages[index];
     return (
       <CellMeasurer
@@ -99,13 +99,12 @@ class MessageFeed extends Component {
         )}
       </CellMeasurer>
     );
-  }
+  };
 
   render() {
-    if (!this.props.scrollElement) { return; }
     return html`
       <div class="feed-container">
-          <${WindowScroller} scrollElement=${this.props.scrollElement}>
+          <${WindowScroller} scrollElement=${$(".main-view")[0]}>
             ${({ height, width, isScrolling, onChildScroll, scrollTop }) => {
               return html`
                 <${List}

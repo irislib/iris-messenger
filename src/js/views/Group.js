@@ -12,7 +12,6 @@ import View from './View.js';
 import SearchBox from '../components/SearchBox.js';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min.js';
-import iris from 'iris-lib';
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
@@ -80,7 +79,7 @@ class Group extends View {
                   <div class="flex-row">
                     <div class="flex-cell">
                       <div class="profile-link-container">
-                        <a class="profile-link" onClick=${() => route(`/profile/${  k}`)}>
+                        <a class="profile-link" onClick=${() => route('/profile/' + k)}>
                           <${Identicon} str=${k} width=40/>
                           <${Name} pub=${k}/>
                           ${profile.permissions && profile.permissions.admin ? html`
@@ -156,11 +155,13 @@ class Group extends View {
     let profilePhoto;
     if (editable) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
-    } else if (this.state.photo) {
+    } else {
+      if (this.state.photo) {
         profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
       } else {
         profilePhoto = html`<${Identicon} str=${this.props.id} width=250/>`
       }
+    }
     return html`
       <div class="content">
         <div class="profile-top">
@@ -174,7 +175,7 @@ class Group extends View {
                 <p class="profile-about-content" placeholder=${editable ? tr('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
               </div>
               <div class="profile-actions">
-                <button onClick=${() => route(`/chat/${  this.props.id}`)}>${tr('send_message')}</button>
+                <button onClick=${() => route('/chat/' + this.props.id)}>${tr('send_message')}</button>
                 <button onClick=${() => $('#profile-page-qr').toggle()}>${tr('show_qr_code')}</button>
                 <button class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}</button>
               </div>
@@ -253,7 +254,7 @@ class Group extends View {
         }, 1000);
       }
     }
-    let qrCodeEl = $('#profile-page-qr');
+    var qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
     State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
     State.local.get('inviteLinksChanged').on(() => this.setState({}));
@@ -263,14 +264,14 @@ class Group extends View {
     });
     if (chat) {
       this.groupDidMount();
-      $(`input[name=notificationPreference][value=${  chat.notificationSetting  }]`).attr('checked', 'checked');
+      $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
       $('input:radio[name=notificationPreference]').off().on('change', (event) => {
         chat.put('notificationSetting', event.target.value);
       });
     }
     qrCodeEl.empty();
     new QRCode(qrCodeEl[0], {
-      text: `https://iris.to/${  window.location.pathname}`,
+      text: 'https://iris.to/' + window.location.pathname,
       width: 300,
       height: 300,
       colorDark : "#000000",

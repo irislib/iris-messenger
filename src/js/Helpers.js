@@ -8,7 +8,7 @@ import _ from 'lodash';
 import iris from 'iris-lib';
 import Autolinker from 'autolinker';
 
-let emojiRegex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]+/ug;
+var emojiRegex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]+/ug;
 
 function setImgSrc(el, src) {
   if (src && src.indexOf('data:image') === 0) {
@@ -1839,7 +1839,7 @@ export { html };
 
 export default {
   isUrl(s) {
-    let matches = Autolinker.parse(s, {urls: true});
+    var matches = Autolinker.parse(s, {urls: true});
     return matches.length === 1 && matches[0].getUrl() === s;
   },
 
@@ -1849,7 +1849,7 @@ export default {
   },
 
   generateName() {
-    return `${this.capitalize(_.sample(adjectives))  } ${  this.capitalize(_.sample(animals))}`;
+    return this.capitalize(_.sample(adjectives)) + ' ' + this.capitalize(_.sample(animals));
   },
 
   isEmoji(s) {
@@ -1866,7 +1866,7 @@ export default {
       return window.clipboardData.setData("Text", text);
     }
     else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
-      let textarea = document.createElement("textarea");
+      var textarea = document.createElement("textarea");
       textarea.textContent = text;
       textarea.style.position = "fixed";  // Prevent scrolling to bottom of page in Microsoft Edge.
       document.body.appendChild(textarea);
@@ -1885,7 +1885,7 @@ export default {
   },
 
   getUrlParameter(sParam, sParams) {
-    let sPageURL = sParams || window.location.search.substring(1),
+    var sPageURL = sParams || window.location.search.substring(1),
       sURLVariables = sPageURL.split('&'),
       sParameterName,
       i;
@@ -1899,17 +1899,17 @@ export default {
   },
 
   showConsoleWarning() {
-    let i = "Stop!",
+    var i = "Stop!",
           j = "This is a browser feature intended for developers. If someone told you to copy-paste something here to enable a feature or \"hack\" someone's account, it is a scam and will give them access to your account.";
 
     if ((window.chrome || window.safari)) {
-      let l = 'font-family:helvetica; font-size:20px; ';
+      var l = 'font-family:helvetica; font-size:20px; ';
       [
-         [i, `${l  }font-size:50px; font-weight:bold; color:red; -webkit-text-stroke:1px black;`],
+         [i, l + 'font-size:50px; font-weight:bold; ' + 'color:red; -webkit-text-stroke:1px black;'],
          [j, l],
          ['', '']
-      ].map((r) => {
-          setTimeout(console.log.bind(console, `\n%c${  r[0]}`, r[1]));
+      ].map(function(r) {
+          setTimeout(console.log.bind(console, '\n%c' + r[0], r[1]));
       });
     }
   },
@@ -1930,34 +1930,34 @@ export default {
 
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))  } ${  sizes[i]}`;
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   },
 
   download(filename, data, type, charset, href) {
-    let hiddenElement;
+    var hiddenElement;
     if (charset === null) {
       charset = 'utf-8';
     }
     hiddenElement = document.createElement('a');
-    hiddenElement.href = href || (`data:${  type  };charset=${  charset  },${  encodeURI(data)}`);
+    hiddenElement.href = href || ("data:" + type + ";charset=" + charset + "," + (encodeURI(data)));
     hiddenElement.target = '_blank';
     hiddenElement.download = filename;
     return hiddenElement.click();
   },
 
   truncateString(s, length = 30) {
-    return s.length > length ? `${s.slice(0, length)  }...` : s;
+    return s.length > length ? s.slice(0, length) + '...' : s;
   },
 
   getBase64(file) {
-    let reader = new FileReader();
+    var reader = new FileReader();
     reader.readAsDataURL(file);
     return new Promise((resolve, reject) => {
       reader.onload = function () {
         resolve(reader.result);
       };
       reader.onerror = function (error) {
-        reject(`Error: ${  error}`);
+        reject('Error: ' + error);
       };
     });
   },
@@ -1983,9 +1983,9 @@ export default {
 
   animateScrollTop: selector => {
     const el = $(selector);
-    el.css({overflow:'hidden'});
+    el.css({'overflow':'hidden'});
     setTimeout(() => {
-      el.css({overflow:''});
+      el.css({'overflow':''});
       el.on("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart", e => {
         if (e.which > 0 || e.type === "mousedown" || e.type === "mousewheel" || e.type === 'touchstart') {
           el.stop(true);
@@ -2006,7 +2006,7 @@ export default {
   },
 
   getProfileLink(pub) {
-    return `https://iris.to/profile/${  encodeURIComponent(pub)}`;
+    return 'https://iris.to/profile/' + encodeURIComponent(pub);
   },
 
   followChatLink(str) {

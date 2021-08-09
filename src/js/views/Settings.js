@@ -1,6 +1,7 @@
-import Helpers, { html } from '../Helpers.js';
+import { html } from '../Helpers.js';
 import State from '../State.js';
 import Session from '../Session.js';
+import Helpers from '../Helpers.js';
 import LanguageSelector from '../components/LanguageSelector.js';
 import {translate as t} from '../Translation.js';
 import PeerManager from '../PeerManager.js';
@@ -13,8 +14,6 @@ import Notifications from '../Notifications.js';
 import iris from 'iris-lib';
 import $ from 'jquery';
 import Icons from '../Icons.js';
-import _ from 'lodash';
-import QRCode from '../lib/qrcode.min';
 
 class Settings extends View {
   constructor() {
@@ -28,13 +27,6 @@ class Settings extends View {
 
   onProfilePhotoSet(src) {
     State.public.user().get('profile').get('photo').put(src);
-  }
-
-  mailtoSubmit(e) {
-    e.preventDefault();
-    if (this.state.email && this.state.email === this.state.retypeEmail) {
-      window.location.href = `mailto:${this.state.email}?&subject=Iris%20private%20key&body=${JSON.stringify(Session.getKey())}`;
-    }
   }
 
   renderView() {
@@ -62,16 +54,6 @@ class Settings extends View {
           <button onClick=${e => togglePrivateKeyQR(e)}>${t('show_privkey_qr')}</button>
         </p>
         <div id="private-key-qr" class="qr-container"></div>
-        <p>
-          ${t('email_privkey_to_yourself')}:
-        </p>
-        <p>
-          <form onSubmit=${e => this.mailtoSubmit(e)}>
-            <input name="email" type="email" onChange=${e => this.setState({email:e.target.value.trim()})} placeholder=${t('email')}/>
-            <input name="verify_email" type="email" onChange=${e => this.setState({retypeEmail:e.target.value.trim()})} placeholder=${t('retype_email')}/>
-            <button type="submit">${t('go')}</button>
-          </form>
-        </p>
         <p><small dangerouslySetInnerHTML=${{ __html: t('privkey_storage_recommendation')}}></small></p>
         <hr/>
         <h3>${t('language')}</h3>
@@ -193,7 +175,7 @@ class Settings extends View {
                   `}
                   ${url}
                   ${peer.from ? html`
-                    <br/><small style="cursor:pointer" onClick=${() => route(`/profile/${  peer.from}`)}>${t('from')} ${Helpers.truncateString(peer.from, 10)}</small>
+                    <br/><small style="cursor:pointer" onClick=${() => route('/profile/' + peer.from)}>${t('from')} ${Helpers.truncateString(peer.from, 10)}</small>
                   ` : ''}
                 </div>
                 <div class="flex-cell no-flex">
@@ -226,8 +208,8 @@ class Settings extends View {
   }
 
   addPeerClicked() {
-    let url = $('#add-peer-url').val();
-    let visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
+    var url = $('#add-peer-url').val();
+    var visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
     PeerManager.addPeer({url, visibility});
     $('#add-peer-url').val('');
   }
@@ -265,18 +247,18 @@ class Settings extends View {
 }
 
 function togglePrivateKeyQR(e) {
-  let btn = $(e.target);
-  let show = $('#private-key-qr img').length === 0;
-  let SHOW_TEXT = t('show_privkey_qr');
+  var btn = $(e.target);
+  var show = $('#private-key-qr img').length === 0;
+  var SHOW_TEXT = t('show_privkey_qr');
   let hidePrivateKeyInterval;
   function reset() {
     clearInterval(hidePrivateKeyInterval);
     $('#private-key-qr').empty();
     btn.text(SHOW_TEXT);
   }
-  function hideText(s) { return `${t('hide_privkey_qr')  } (${  s  })`; }
+  function hideText(s) { return t('hide_privkey_qr') + ' (' + s + ')'; }
   if (show) {
-    let showPrivateKeySecondsRemaining = 20;
+    var showPrivateKeySecondsRemaining = 20;
     btn.text(hideText(showPrivateKeySecondsRemaining));
     hidePrivateKeyInterval = setInterval(() => {
       if ($('#private-key-qr img').length === 0) {
@@ -289,7 +271,7 @@ function togglePrivateKeyQR(e) {
         btn.text(hideText(showPrivateKeySecondsRemaining));
       }
     }, 1000);
-    let qrCodeEl = $('#private-key-qr');
+    var qrCodeEl = $('#private-key-qr');
     new QRCode(qrCodeEl[0], {
       text: JSON.stringify(Session.getKey()),
       width: 300,

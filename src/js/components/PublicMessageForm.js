@@ -1,7 +1,8 @@
 import { Component } from 'preact';
-import Helpers, { html } from '../Helpers.js';
+import { html } from '../Helpers.js';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
+import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import SafeImg from './SafeImg.js';
 import Torrent from './Torrent.js';
@@ -86,7 +87,7 @@ class PublicMessageForm extends Component {
 
   setTextareaHeight(textarea) {
     textarea.style.height = "";
-    textarea.style.height = `${textarea.scrollHeight  }px`;
+    textarea.style.height = textarea.scrollHeight + "px";
   }
 
   onMsgTextPaste(event) {
@@ -111,9 +112,9 @@ class PublicMessageForm extends Component {
   }
 
   attachmentsChanged(event) {
-    let files = event.target.files;
+    var files = event.target.files;
     if (files) {
-      for (let i = 0;i < files.length;i++) {
+      for (var i = 0;i < files.length;i++) {
         Helpers.getBase64(files[i]).then(base64 => {
           const a = this.state.attachments || [];
           a.push({type: 'image', data: base64});

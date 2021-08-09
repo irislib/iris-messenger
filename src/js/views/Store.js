@@ -38,11 +38,13 @@ class Store extends View {
     let profilePhoto;
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${user} callback=${src => this.onProfilePhotoSet(src)}/>`;
-    } else if (this.state.photo) {
+    } else {
+      if (this.state.photo) {
         profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
       } else {
         profilePhoto = html`<${Identicon} str=${user} width=250/>`
       }
+    }
     return html`
       <div class="content">
         <div class="profile-top">
@@ -70,9 +72,9 @@ class Store extends View {
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
                 ${followable ? html`<${FollowButton} id=${user}/>` : ''}
-                <button onClick=${() => route(`/chat/${  user}`)}>${t('send_message')}</button>
+                <button onClick=${() => route('/chat/' + user)}>${t('send_message')}</button>
                 ${uuid ? '' : html`
-                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${`https://iris.to/${  window.location.pathname}`}/>
+                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.pathname}/>
                 `}
               </div>
             </div>
@@ -186,7 +188,7 @@ class Store extends View {
   getCartFromUser(user) {
     State.local.get('cart').get(user).map().on((v, k, a, e) => {
       if (k === '#') { return; } // blah
-      this.eventListeners[`cart${  user}`] = e;
+      this.eventListeners['cart' + user] = e;
       this.cart[k + user] = v;
       this.carts[user] = this.carts[user] || {};
       this.carts[user][k] = v;
@@ -196,7 +198,7 @@ class Store extends View {
   }
 
   onProduct(p, id, a, e, from) {
-    this.eventListeners[`products${  from}`] = e;
+    this.eventListeners['products' + from] = e;
     if (p) {
       const o = {};
       p.from = from;

@@ -1,25 +1,7 @@
 import Gun from 'gun';
 import localforage from './js/lib/localforage.min.js';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
-import { registerRoute } from 'workbox-routing';
-import {StaleWhileRevalidate, NetworkOnly} from 'workbox-strategies';
-import { BackgroundSyncPlugin } from 'workbox-background-sync';
 
-const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
-	maxRetentionTime: 14 * 24 * 60
-});
-
-registerRoute(
-	'https://iris-notifications.herokuapp.com/notify',
-	new NetworkOnly({
-		plugins: [bgSyncPlugin]
-	}),
-	'POST'
-);
-registerRoute(
-  () => true,
-  new StaleWhileRevalidate()
-);
 setupRouting();
 
 const urlsToCache = getFiles();
@@ -37,7 +19,7 @@ async function getSavedKey() {
 }
 
 self.onmessage = function(msg) {
-  if (Object.prototype.hasOwnProperty.call(msg, 'key')) {
+  if (msg.data.hasOwnProperty('key')) {
     self.irisKey = msg.data.key;
     localforage.setItem('swIrisKey', self.irisKey);
   }
@@ -46,13 +28,13 @@ self.onmessage = function(msg) {
 function getOpenClient(event) {
   return new Promise(resolve => {
     event.waitUntil(
-      self.clients.matchAll({
+      clients.matchAll({
         type: "window",
         includeUncontrolled: true
       })
-      .then((clientList) => {
-        for (let i = 0; i < clientList.length; i++) {
-          let client = clientList[i];
+      .then(function(clientList) {
+        for (var i = 0; i < clientList.length; i++) {
+          var client = clientList[i];
           if (client.url === urlToOpen && 'focus' in client) return resolve(client);
         }
         resolve(null);
@@ -86,7 +68,7 @@ self.addEventListener('push', async ev => {
   });
 });
 
-self.addEventListener('notificationclick', async (event) => {
+self.addEventListener('notificationclick', async function(event) {
   // Android doesn't close the notification when you click on it
   // See: http://crbug.com/463146
   event.notification.close();
@@ -95,6 +77,6 @@ self.addEventListener('notificationclick', async (event) => {
   if (client) {
     client.focus();
   } else {
-    self.clients.openWindow && self.clients.openWindow(urlToOpen);
+    clients.openWindow && clients.openWindow(urlToOpen);
   }
 });

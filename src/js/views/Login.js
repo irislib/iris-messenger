@@ -1,11 +1,11 @@
-import Helpers, { html } from '../Helpers.js';
+import { html } from '../Helpers.js';
 import State from '../State.js';
 import { translate as t } from '../Translation.js';
 import LanguageSelector from '../components/LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
 import { Component } from 'preact';
-import Gun from 'gun';
+import Helpers from '../Helpers.js';
 
 import logo from '../../assets/img/android-chrome-192x192.png';
 
@@ -28,7 +28,7 @@ class Login extends Component {
     const val = event.target.value;
     if (!val.length) { return; }
     try {
-      let k = JSON.parse(val);
+      var k = JSON.parse(val);
       Session.login(k);
       event.target.value = '';
     } catch (e) {
@@ -44,7 +44,7 @@ class Login extends Component {
 
   onLoginFormSubmit(e) {
     e.preventDefault();
-    let name = document.getElementById('login-form-name').value || Helpers.generateName();
+    var name = document.getElementById('login-form-name').value || Helpers.generateName();
     Gun.SEA.pair().then(k => {
       Session.login(k);
       State.public.user().get('profile').get('name').put(name);

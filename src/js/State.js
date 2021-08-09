@@ -10,14 +10,9 @@ import _ from 'lodash';
 
 import PeerManager from './PeerManager.js';
 import iris from 'iris-lib';
-<<<<<<< HEAD
-=======
-import Helpers from './Helpers.js';
-import {updateUserSearchIndex} from './Session.js';
->>>>>>> upstream/master
 
 const State = {
-  init(publicOpts) {
+  init: function(publicOpts) {
     Gun.log.off = true;
     const o = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
     this.public = Gun(o);
@@ -41,17 +36,15 @@ const State = {
       } else {
         delete this.blockedUsers[user];
       }
-      updateUserSearchIndex();
     });
 
     window.State = this;
     iris.util.setPublicState && iris.util.setPublicState(this.public);
   },
 
-  group(groupNode = 'everyone') {
+  group: function(groupNode = 'everyone') {
     const _this = this;
     return {
-<<<<<<< HEAD
       get: function(path, callback) {
         const follows = {};
         if (typeof groupNode === 'string') {
@@ -65,35 +58,17 @@ const State = {
             let node = State.public.user(user);
             if (path && path !== '/') {
               node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
-=======
-      get(path, callback) {
-        requestAnimationFrame(() => {
-          const follows = {};
-          if (typeof groupNode === 'string') {
-            groupNode = _this.local.get('groups').get(groupNode);
-          }
-          groupNode.map((isFollowing, user) => {
-            if (_this.blockedUsers[user]) { return; } // TODO: allow to specifically query blocked users?
-            if (follows[user] && follows[user] === isFollowing) { return; }
-            follows[user] = isFollowing;
-            if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
-              let node = State.public.user(user);
-              if (path && path !== '/') {
-                node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
-              }
-              callback(node, user);
->>>>>>> upstream/master
             }
             callback(node, user);
           }
         });
       },
 
-      map(path, callback) {
+      map: function(path, callback) {
         this.get(path, (node, from) => node.map((...args) => callback(...args, from)));
       },
 
-      on(path, callback) {
+      on: function(path, callback) {
         this.get(path, (node, from) => node.on((...args) => callback(...args, from)));
       }
     }

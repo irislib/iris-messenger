@@ -1,5 +1,6 @@
 import { Component } from 'preact';
-import Helpers, { html } from '../Helpers.js';
+import { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
 import Autolinker from 'autolinker';
@@ -56,7 +57,7 @@ class Message extends Component {
   }
 
   onNameClick(name) {
-    $('.new-msg').val(`${$('.new-msg').val().trim()  } @${name} `);
+    $('.new-msg').val($('.new-msg').val().trim() + ` @${name} `);
     $('.new-msg').focus();
   }
 
@@ -66,7 +67,7 @@ class Message extends Component {
     const attachmentsPreview = $('<div>').attr('id', 'attachment-gallery').addClass('gallery').addClass('attachment-preview');
     $('body').append(attachmentsPreview);
     attachmentsPreview.fadeIn(ANIMATE_DURATION);
-    let left, top, width, img;
+    var left, top, width, img;
 
     if (msg.attachments) {
       msg.attachments.forEach(a => {
@@ -74,16 +75,16 @@ class Message extends Component {
           img = Helpers.setImgSrc($('<img>'), a.data);
           if (msg.attachments.length === 1) {
             attachmentsPreview.css({'justify-content': 'center'});
-            let original = $(event.target);
+            var original = $(event.target);
             left = original.offset().left;
             top = original.offset().top - $(window).scrollTop();
             width = original.width();
-            let transitionImg = img.clone().attr('id', 'transition-img').data('originalDimensions', {left,top,width});
+            var transitionImg = img.clone().attr('id', 'transition-img').data('originalDimensions', {left,top,width});
             transitionImg.css({position: 'fixed', left, top, width, 'max-width': 'none', 'max-height': 'none'});
             img.css({visibility: 'hidden', 'align-self': 'center'});
             attachmentsPreview.append(img);
             $('body').append(transitionImg);
-            let o = img.offset();
+            var o = img.offset();
             transitionImg.animate({width: img.width(), left: o.left, top: o.top}, {duration: ANIMATE_DURATION, complete: () => {
               img.css({visibility: 'visible'});
               transitionImg.hide();
@@ -109,9 +110,9 @@ class Message extends Component {
   }
 
   closeAttachmentsGallery() {
-    let transitionImg = $('#transition-img');
+    var transitionImg = $('#transition-img');
     if (transitionImg.length) {
-      let originalDimensions = transitionImg.data('originalDimensions');
+      var originalDimensions = transitionImg.data('originalDimensions');
       transitionImg.show();
       $('#attachment-gallery img').remove();
       transitionImg.animate(originalDimensions, {duration: ANIMATE_DURATION, complete: () => {

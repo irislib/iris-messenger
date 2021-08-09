@@ -29,13 +29,13 @@ class Checkout extends Store {
       v && (cart[k] = v);
     });
     Session.channels[pub].send({
-      text: `New order: ${  JSON.stringify(cart)  }, delivery: ${  JSON.stringify(this.state.delivery)  }, payment: ${  this.state.paymentMethod}`,
+      text: 'New order: ' + JSON.stringify(cart) + ', delivery: ' + JSON.stringify(this.state.delivery) + ', payment: ' + this.state.paymentMethod,
       order: true
     });
     State.local.get('cart').get(pub).map().once((v, k) => {
       !!v && State.local.get('cart').get(pub).get(k).put(null);
     });
-    route(`/chat/${  pub}`);
+    route('/chat/' + pub);
   }
 
   renderCart() {
@@ -47,7 +47,7 @@ class Checkout extends Store {
           return html`
             <div class="flex-row">
               <div class="flex-cell">
-                <a href=${`/product/${  k  }/${  this.props.store}`}>
+                <a href=${'/product/' + k + '/' + this.props.store}>
                   <${SafeImg} src=${i.thumbnail}/>
                   ${i.name || 'item'}
                 </a>

@@ -1,14 +1,12 @@
-import { Component, createRef } from 'preact';
+import { Component } from 'preact';
 import Header from '../components/Header.js';
 import { html } from '../Helpers.js';
 
 class View extends Component {
-  scrollElement = createRef();
-
   render() {
     return html`
       <${this.props.header || Header}/>
-      <div ref=${this.scrollElement} class="main-view ${this.class || ''}" id=${this.id}>
+      <div class="main-view ${this.class || ''}" id=${this.id}>
         ${this.renderView()}
       </div>
     `;

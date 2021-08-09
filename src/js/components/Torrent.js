@@ -1,4 +1,4 @@
-import { Component, createRef } from 'preact';
+import { Component } from 'preact';
 import Helpers, {html} from '../Helpers.js';
 import Session from "../Session.js";
 import { translate as tr } from '../Translation.js';
@@ -12,8 +12,10 @@ const isAudio = f => isOfType(f, ['.mp3', '.wav', '.m4a']);
 const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class Torrent extends Component {
-  eventListeners = {};
-  coverRef = createRef();
+  constructor() {
+    super();
+    this.eventListeners = {};
+  }
 
   componentDidMount() {
     State.local.get('player').on((player,a,b,e) => {
@@ -34,8 +36,6 @@ class Torrent extends Component {
 
   componentWillUnmount() {
     Object.values(this.eventListeners).forEach(e => e.off());
-    this.observer && this.observer.disconnect();
-    delete this.observer;
   }
 
   onPlay(e) {
@@ -101,25 +101,6 @@ class Torrent extends Component {
     if (!isAud) {
       file.appendTo(el.get(0), {autoplay, muted});
     }
-    if (isVid && this.props.autopause) {
-      const vid = base.find('video').get(0);
-      const handlePlay = (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            autoplay && vid.play();
-          } else {
-            vid.pause();
-          }
-        });
-      }
-      const options = {
-        rootMargin: "0px",
-        threshold: [0.25, 0.75]
-      };
-      this.observer = new IntersectionObserver(handlePlay, options);
-      this.observer.observe(vid);
-    };
-
     base.find('.info').toggle(!isVid);
     const player = base.find('video, audio').get(0);
     if (player) {
@@ -161,14 +142,13 @@ class Torrent extends Component {
   }
 
   onTorrent(torrent, clicked) {
-    if (!this.coverRef.current) { return; }
     this.torrent = torrent;
     const video = torrent.files.find(f => isVideo(f));
     const audio = torrent.files.find(f => isAudio(f));
     const img = torrent.files.find(f => isImage(f));
     let poster = torrent.files.find(f => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1));
     poster = poster || img;
-    poster && poster.appendTo(this.coverRef.current);
+    poster && poster.appendTo($(this.base).find('.cover').get(0));
 
     const file = this.getActiveFile(torrent) || video || audio || img || torrent.files[0];
     this.setState({torrent, cover: img});
@@ -204,7 +184,7 @@ class Torrent extends Component {
               <a href="" onClick=${e => this.openTorrentClicked(e)}>Show attachment</a>
             `:''}
             ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>`:''}
-            <div class="cover" ref=${this.coverRef} style=${s.isAudioOpen ? '' : 'display:none'}></div>
+            <div class="cover" style=${s.isAudioOpen ? '' : 'display:none'}></div>
             <div class="info">
                 ${s.splitPath ? s.splitPath.map(
                   (str, i) => {
@@ -213,9 +193,9 @@ class Torrent extends Component {
                         str = str.split('.').slice(0, -1).join('.');
                       }
                       return html`<p><b>${str}</b></p>`;
-                    } 
+                    } else {
                       return html`<p>${str}</p>` 
-                    
+                    }
                   }
                 ):''}
             </div>
