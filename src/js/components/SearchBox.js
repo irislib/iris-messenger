@@ -126,7 +126,7 @@ class SearchBox extends Component {
             }
             return html`
               <a href="/profile/${i.key}" onClick=${e => this.onClick(e, i)}>
-                <${Identicon} key=${i.key + 'ic'} str=${i.key} width=40/>
+                <${Identicon} key=${`${i.key  }ic`} str=${i.key} width=40/>
                 <div>
                   ${i.name || ''}<br/>
                   <small>
