@@ -59,12 +59,7 @@ class MessageFeed extends Component {
   componentDidUpdate(prevProps) {
     const prevNodeId = prevProps.node && prevProps.node._ && prevProps.node._.id;
     const newNodeId = this.props.node && this.props.node._ && this.props.node._.id;
-<<<<<<< HEAD
-    if (prevNodeId !== newNodeId || this.props.group !== prevProps.group || this.props.path !== prevProps.path) {
-      this.unsubscribe();
-=======
     if (prevNodeId !== newNodeId || this.props.group !== prevProps.group || this.props.path !== prevProps.path || this.props.filter !== prevProps.filter) {
->>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
       this.mappedMessages = new Map();
       this.setState({sortedMessages: []});
       this.componentDidMount();

@@ -49,21 +49,6 @@ const State = {
   group(groupNode = 'everyone') {
     const _this = this;
     return {
-<<<<<<< HEAD
-      get: function(path, callback) {
-        const follows = {};
-        if (typeof groupNode === 'string') {
-          groupNode = _this.local.get('groups').get(groupNode);
-        }
-        groupNode.map((isFollowing, user) => {
-          if (_this.blockedUsers[user]) { return; } // TODO: allow to specifically query blocked users?
-          if (follows[user] && follows[user] === isFollowing) { return; }
-          follows[user] = isFollowing;
-          if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
-            let node = State.public.user(user);
-            if (path && path !== '/') {
-              node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
-=======
       get(path, callback) {
         requestAnimationFrame(() => {
           const follows = {};
@@ -80,7 +65,6 @@ const State = {
                 node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
               }
               callback(node, user);
->>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
             }
             callback(node, user);
           }

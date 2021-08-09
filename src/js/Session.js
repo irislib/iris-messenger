@@ -450,9 +450,6 @@ function subscribeToMsgs(pub) {
   });
 }
 
-<<<<<<< HEAD
-export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
-=======
 function followChatLink(str) {
   if (str && str.indexOf('http') === 0) {
     const s = str.split('?');
@@ -473,4 +470,3 @@ function followChatLink(str) {
 }
 
 export default {init, followChatLink, getKey, getPubKey, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
->>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6

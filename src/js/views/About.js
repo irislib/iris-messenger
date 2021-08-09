@@ -1,10 +1,6 @@
 import {translate as t} from '../Translation.js';
-<<<<<<< HEAD
-import { html } from '../Helpers.js';
-=======
 import Helpers from '../Helpers.js';
 import { html } from 'htm/preact';
->>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
 import View from './View.js';
 import iris from 'iris-lib';
 

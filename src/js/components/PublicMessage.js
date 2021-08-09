@@ -37,29 +37,6 @@ class PublicMessage extends Message {
       return;
     }
     return new Promise(resolve => {
-<<<<<<< HEAD
-      State.local.get('msgsByHash').get(hash).once(msg => {
-        if (typeof msg === 'string') {
-          try {
-            resolve(JSON.parse(msg));
-          } catch (e) {
-            console.error('message parsing failed', msg, e);
-          }
-        }
-      });
-      State.public.get('#').get(hash).on(async (serialized, a, b, event) => {
-        if (typeof serialized !== 'string') {
-          console.error('message parsing failed', hash, serialized);
-          return;
-        }
-        event.off();
-        const msg = await iris.SignedMessage.fromString(serialized);
-        if (msg) {
-          resolve(msg);
-          State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
-        }
-      });
-=======
       let resolved;
       const askFromPublicState = () => {
         State.public.get('#').get(hash).on(this.sub(
@@ -95,7 +72,6 @@ msg => {
           }
         }
       ));
->>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
     });
   }
 
@@ -136,20 +112,7 @@ msg => {
   }
 
   componentDidUpdate(prevProps, prevState) {
-<<<<<<< HEAD
-    if (prevProps.hash !== this.props.hash) {
-      Object.values(this.eventListeners).forEach(e => e.off());
-      this.eventListeners = {};
-      this.likedBy = new Set();
-      this.replies = new Set();
-      this.subscribedReplies = new Set();
-      this.linksDone = false;
-      this.setState({replies:0, likes: 0, sortedReplies:[]});
-      this.componentDidMount();
-    } else if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
-=======
     if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
->>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
       this.measure();
     } else if (this.state.msg && this.state.msg !== prevState.msg) {
       this.measure();

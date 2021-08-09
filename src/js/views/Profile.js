@@ -293,13 +293,8 @@ class Profile extends View {
       });
     }
     qrCodeEl.empty();
-<<<<<<< HEAD
-    new QRCode(qrCodeEl[0], {
-      text: 'https://iris.to/' + window.location.pathname,
-=======
     new QRCode(qrCodeEl.get(0), {
       text: `https://iris.to/${  window.location.pathname}`,
->>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
       width: 300,
       height: 300,
       colorDark : "#000000",
