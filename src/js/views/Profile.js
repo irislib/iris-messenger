@@ -1,11 +1,12 @@
-import { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
-import Helpers from '../Helpers.js';
 import PublicMessageForm from '../components/PublicMessageForm.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
 import { route } from 'preact-router';
+import { createRef } from 'preact';
 import SafeImg from '../components/SafeImg.js';
 import CopyButton from '../components/CopyButton.js';
 import FollowButton from '../components/FollowButton.js';
@@ -16,6 +17,7 @@ import View from './View.js';
 import { Link } from 'preact-router/match';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min.js';
+import iris from 'iris-lib';
 
 const SMS_VERIFIER_PUB = 'ysavwX9TVnlDw93w9IxezCJqSDMyzIU-qpD8VTN5yko.3ll1dFdxLkgyVpejFkEMOFkQzp_tRrkT3fImZEx94Co';
 
@@ -28,10 +30,10 @@ function deleteChat(pub) {
 class Profile extends View {
   constructor() {
     super();
-    this.eventListeners = {};
     this.followedUsers = new Set();
     this.followers = new Set();
     this.id = "profile";
+    this.qrRef = createRef();
   }
 
   onProfilePhotoSet(src) {
@@ -111,13 +113,11 @@ class Profile extends View {
     let profilePhoto;
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
-    } else {
-      if (this.state.photo && !this.state.blocked) {
+    } else if (this.state.photo && !this.state.blocked) {
         profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
       } else {
         profilePhoto = html`<${Identicon} str=${this.props.id} hidePhoto=${this.state.blocked} width=250/>`
       }
-    }
     return html`
     <div class="profile-top">
       <div class="profile-header">
@@ -144,9 +144,9 @@ class Profile extends View {
               <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
             ` : ''}
             ${this.isMyProfile ? '' : html`<${FollowButton} id=${this.props.id}/>`}
-            <button onClick=${() => route('/chat/' + this.props.id)}>${t('send_message')}</button>
-            <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to' + window.location.pathname}/>
-            <button onClick=${() => $('#profile-page-qr').toggle()}>${t('show_qr_code')}</button>
+            <button onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}</button>
+            <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${`https://iris.to${  window.location.pathname}`}/>
+            <button onClick=${() => $(this.qrRef.current).toggle()}>${t('show_qr_code')}</button>
             ${this.isMyProfile ? '' : html`
               <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
             `}
@@ -158,7 +158,7 @@ class Profile extends View {
         <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
       </div>
 
-      <p id="profile-page-qr" style="display:none" class="qr-container"></p>
+      <p ref=${this.qrRef} style="display:none" class="qr-container"></p>
       ${this.renderSettings()}
     </div>
     `;
@@ -179,34 +179,34 @@ class Profile extends View {
     if (this.props.tab === 'replies') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} key="replies${this.props.id}" node=${State.public.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
+          <${MessageFeed} scrollElement=${this.scrollElement.current} key="replies${this.props.id}" node=${State.public.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
         </div>
       `;
     } else if (this.props.tab === 'likes') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} key="likes${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
+          <${MessageFeed} scrollElement=${this.scrollElement.current} key="likes${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
         </div>
       `;
     } else if (this.props.tab === 'media') {
       return html`
         <div class="public-messages-view">
           ${this.isMyProfile ? html`<${PublicMessageForm} index="media" class="hidden-xs" autofocus=${false}/>` : ''}
-          <${MessageFeed} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
+          <${MessageFeed} scrollElement=${this.scrollElement.current} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
         </div>
       `;
-    } else {
+    } 
       const messageForm = this.isMyProfile ? html`<${PublicMessageForm} class="hidden-xs" autofocus=${false}/>` : '';
       return html`
       <div>
         ${messageForm}
         <div class="public-messages-view">
           ${this.getNotification()}
-          <${MessageFeed} key="posts${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+          <${MessageFeed} scrollElement=${this.scrollElement.current} key="posts${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
         </div>
       </div>
       `;
-    }
+    
   }
 
   renderView() {
@@ -219,10 +219,6 @@ class Profile extends View {
     `;
   }
 
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
       this.componentDidMount();
@@ -231,15 +227,16 @@ class Profile extends View {
 
   getProfileDetails() {
     const pub = this.props.id;
-    State.public.user(pub).get('follow').map().on((following,key,c,e) => {
-      this.eventListeners['follow'] = e;
-      if (following) {
-        this.followedUsers.add(key);
-      } else {
-        this.followedUsers.delete(key);
+    State.public.user(pub).get('follow').map().on(this.sub(
+      (following,key) => {
+        if (following) {
+          this.followedUsers.add(key);
+        } else {
+          this.followedUsers.delete(key);
+        }
+        this.setState({followedUserCount: this.followedUsers.size});
       }
-      this.setState({followedUserCount: this.followedUsers.size});
-    });
+    ));
     State.local.get('groups').get('follows').map().once((following,key) => {
       if (following) {
         State.public.user(key).get('follow').get(pub).once(following => {
@@ -250,30 +247,28 @@ class Profile extends View {
         });
       }
     });
-    State.public.user(pub).get('profile').get('name').on((name,a,b,e) => {
-      document.title = name || document.title;
-      this.eventListeners['name'] = e;
-      if (!$('#profile .profile-name:focus').length) {
-        this.setState({name});
+    State.public.user(pub).get('profile').get('name').on(this.sub(
+      name => {
+        document.title = name || document.title;
+        if (!$('#profile .profile-name:focus').length) {
+          this.setState({name});
+        }
       }
-    });
-    State.public.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
-      this.eventListeners['photo'] = e;
-      this.setState({photo});
-    });
-    State.public.user(pub).get('profile').get('about').on((about,a,b,e) => {
-      this.eventListeners['about'] = e;
-      if (!$('#profile .profile-about-content:focus').length) {
-        this.setState({about});
-      } else {
-        $('#profile .profile-about-content:not(:focus)').text(about);
+    ));
+    State.public.user(pub).get('profile').get('photo').on(this.inject());
+    State.public.user(pub).get('profile').get('about').on(this.sub(
+      about => {
+        if (!$('#profile .profile-about-content:focus').length) {
+          this.setState({about});
+        } else {
+          $('#profile .profile-about-content:not(:focus)').text(about);
+        }
       }
-    });
+    ));
   }
 
   componentDidMount() {
     const pub = this.props.id;
-    Object.values(this.eventListeners).forEach(e => e.off());
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', blocked: false});
     this.isMyProfile = Session.getPubKey() === pub;
     const chat = Session.channels[pub];
@@ -287,29 +282,35 @@ class Profile extends View {
         }, 1000);
       }
     }
-    var qrCodeEl = $('#profile-page-qr');
+    let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
     State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
     this.getProfileDetails();
     if (chat) {
-      $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
+      $(`input[name=notificationPreference][value=${  chat.notificationSetting  }]`).attr('checked', 'checked');
       $('input:radio[name=notificationPreference]').off().on('change', (event) => {
         chat.put('notificationSetting', event.target.value);
       });
     }
     qrCodeEl.empty();
+<<<<<<< HEAD
     new QRCode(qrCodeEl[0], {
       text: 'https://iris.to/' + window.location.pathname,
+=======
+    new QRCode(qrCodeEl.get(0), {
+      text: `https://iris.to/${  window.location.pathname}`,
+>>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
       width: 300,
       height: 300,
       colorDark : "#000000",
       colorLight : "#ffffff",
       correctLevel : QRCode.CorrectLevel.H
     });
-    State.public.user().get('block').get(this.props.id).on((blocked,k,x,e) => {
-      this.eventListeners['block'] = e;
-      this.setState({blocked});
-    })
+    State.public.user().get('block').get(this.props.id).on(this.sub(
+      blocked => {
+        this.setState({blocked});
+      }
+    ))
   }
 }
 

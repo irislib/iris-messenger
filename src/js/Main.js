@@ -4,7 +4,7 @@ import { Link } from 'preact-router/match';
 import iris from 'iris-lib';
 
 import Helpers from './Helpers.js';
-import { html } from './Helpers.js';
+import { html } from 'htm/preact';
 import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
@@ -36,6 +36,9 @@ import Icons from './Icons.js';
 
 import logo from '../assets/img/icon128.png';
 import logoType from '../assets/img/iris_logotype.png';
+
+import '../css/style.css';
+import '../css/cropper.min.css';
 
 if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redirect old urls
   window.location.href = window.location.href.replace('#/', '');
@@ -100,9 +103,9 @@ class Menu extends Component {
                 </span>
                 <span class="text">${a.text}</span>
               <//>`;
-          } else {
+          } 
             return html`<br/><br/>`;
-          }
+          
         })}
       </div>
     `;
@@ -120,7 +123,7 @@ class Main extends Component {
   handleRoute(e) {
     let activeRoute = e.url;
     document.title = 'Iris';
-    if (activeRoute && activeRoute.length > 1) { document.title += ' - ' + Helpers.capitalize(activeRoute.replace('/', '')); }
+    if (activeRoute && activeRoute.length > 1) { document.title += ` - ${  Helpers.capitalize(activeRoute.replace('/', ''))}`; }
     State.local.get('activeRoute').put(activeRoute);
     QRScanner.cleanupScanner();
   }

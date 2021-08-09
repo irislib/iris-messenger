@@ -1,5 +1,5 @@
-import { html } from '../Helpers.js';
 import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import Identicon from './Identicon.js';
 import PublicMessageForm from './PublicMessageForm.js';
 import State from '../State.js';
@@ -25,7 +25,6 @@ class PublicMessage extends Message {
   constructor() {
     super();
     this.i = 0;
-    this.eventListeners = {};
     this.likedBy = new Set();
     this.replies = {};
     this.subscribedReplies = new Set();
@@ -38,6 +37,7 @@ class PublicMessage extends Message {
       return;
     }
     return new Promise(resolve => {
+<<<<<<< HEAD
       State.local.get('msgsByHash').get(hash).once(msg => {
         if (typeof msg === 'string') {
           try {
@@ -59,6 +59,43 @@ class PublicMessage extends Message {
           State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
         }
       });
+=======
+      let resolved;
+      const askFromPublicState = () => {
+        State.public.get('#').get(hash).on(this.sub(
+  async (serialized, a, b, event) => {
+            if (typeof serialized !== 'string') {
+              console.error('message parsing failed', hash, serialized);
+              return;
+            }
+            event.off();
+            const msg = await iris.SignedMessage.fromString(serialized);
+            if (msg) {
+              resolve(msg);
+              resolved = true;
+              State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
+            }
+          }
+        ));
+      }
+      const timeout = setTimeout(askFromPublicState, 5000); // give local state some time to resolve first
+
+      State.local.get('msgsByHash').get(hash).once(this.sub(
+msg => {
+          if (resolved) { return; }
+          clearTimeout(timeout);
+          if (typeof msg === 'string') {
+            try {
+              resolve(JSON.parse(msg));
+            } catch (e) {
+              console.error('message parsing failed', msg, e);
+            }
+          } else if (!msg) {
+            askFromPublicState();
+          }
+        }
+      ));
+>>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
     });
   }
 
@@ -70,34 +107,36 @@ class PublicMessage extends Message {
       msg.info = {from: r.signerKeyHash};
       this.setState({msg});
       if (this.props.showName && !this.props.name) {
-        State.public.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
-          this.eventListeners['name'] = e;
-          this.setState({name});
-        });
+        State.public.user(msg.info.from).get('profile').get('name').on(this.inject());
       }
-      State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
-        this.eventListeners[from+'likes'] = e;
-        liked ? this.likedBy.add(from) : this.likedBy.delete(from);
-        const s = {likes: this.likedBy.size};
-        if (from === Session.getPubKey()) s['liked'] = liked;
-        this.setState(s);
-      });
-      State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, (hash,time,b,e,from) => {
-        const k = from + time;
-        if (hash && this.replies[k]) return;
-        if (hash) {
-          this.replies[k] = {hash, time};
-        } else {
-          delete this.replies[k];
+      State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, this.sub(
+        (liked,a,b,e,from) => {
+          this.eventListeners[`${from}likes`] = e;
+          liked ? this.likedBy.add(from) : this.likedBy.delete(from);
+          const s = {likes: this.likedBy.size};
+          if (from === Session.getPubKey()) s['liked'] = liked;
+          this.setState(s);
         }
-        this.eventListeners[from+'replies'] = e;
-        const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
-        this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
-      });
+      ));
+      State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, this.sub(
+        (hash,time,b,e,from) => {
+          const k = from + time;
+          if (hash && this.replies[k]) return;
+          if (hash) {
+            this.replies[k] = {hash, time};
+          } else {
+            delete this.replies[k];
+          }
+          this.eventListeners[`${from}replies`] = e;
+          const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
+          this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
+        }
+      ));
     });
   }
 
   componentDidUpdate(prevProps, prevState) {
+<<<<<<< HEAD
     if (prevProps.hash !== this.props.hash) {
       Object.values(this.eventListeners).forEach(e => e.off());
       this.eventListeners = {};
@@ -108,8 +147,11 @@ class PublicMessage extends Message {
       this.setState({replies:0, likes: 0, sortedReplies:[]});
       this.componentDidMount();
     } else if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
+=======
+    if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
+>>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
       this.measure();
-    } else if (this.state.msg && this.state.msg !== prevState.msg && !this.state.msg.attachments) {
+    } else if (this.state.msg && this.state.msg !== prevState.msg) {
       this.measure();
     }
     if (this.state.msg && !this.linksDone) {
@@ -133,16 +175,12 @@ class PublicMessage extends Message {
     this.setState({showReplyForm});
   }
 
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
-  }
-
   shouldComponentUpdate() {
     return true;
   }
 
   onClickName() {
-    route('/profile/' + this.state.msg.info.from);
+    route(`/profile/${  this.state.msg.info.from}`);
   }
 
   likeBtnClicked(e) {
@@ -194,7 +232,7 @@ class PublicMessage extends Message {
     const p = document.createElement('p');
     let text = this.state.msg.text;
     if (isThumbnail && text.length > 128) {
-      text = text.slice(0,128) + '...';
+      text = `${text.slice(0,128)  }...`;
     }
     p.innerText = text;
     const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
@@ -224,7 +262,7 @@ class PublicMessage extends Message {
             `: ''}
           </div>
           ${this.state.msg.torrentId ? html`
-              <${Torrent} torrentId=${this.state.msg.torrentId}/>
+              <${Torrent} measure=${this.props.measure} torrentId=${this.state.msg.torrentId} autopause=${!this.props.standalone}/>
           `:''}
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
             html`<div class="img-container">
@@ -261,12 +299,12 @@ class PublicMessage extends Message {
           ${this.state.showLikes ? html`
             <div class="likes">
               ${Array.from(this.likedBy).map(key => {
-                return html`<${Identicon} showTooltip=${true} onClick=${() => route('/profile/' + key)} str=${key} width=32/>`;
+                return html`<${Identicon} showTooltip=${true} onClick=${() => route(`/profile/${  key}`)} str=${key} width=32/>`;
               })}
             </div>
           `: ''}
           ${(this.props.showReplies || this.state.showReplyForm) && this.state.sortedReplies && this.state.sortedReplies.length ? this.state.sortedReplies.map(r =>
-            html`<${PublicMessage} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
+            html`<${PublicMessage} measure=${this.props.measure} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
           ) : ''}
           ${this.state.showReplyForm ? html`
             <${PublicMessageForm} replyingTo=${this.props.hash} />

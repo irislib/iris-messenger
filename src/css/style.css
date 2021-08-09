@@ -551,7 +551,7 @@ header.footer .header-content {
 
 .torrent {
   text-align: center;
-  padding: 7px;
+  margin-bottom: 7px;
 }
 
 .torrent .player svg {
@@ -960,7 +960,7 @@ a.msg {
   bottom: 0;
   left: 0;
   margin: auto;
-  background: url("/assets/img/heart.png") no-repeat center/contain;
+  background: url("../assets/img/heart.png") no-repeat center/contain;
   opacity: 0;
   transform: scale(0);
 }
@@ -1951,6 +1951,10 @@ form.public {
   transition: opacity 0.3s;
 }
 
+.ReactVirtualized__Grid {
+  outline: none;
+}
+
 /* Needs to be visible for tooltip */
 @media (min-width: 626px) {
   .ReactVirtualized__Grid, .ReactVirtualized__Grid__innerScrollContainer {
@@ -2016,7 +2020,7 @@ form.public {
   .public-messages-view .msg .msg-content, textarea {
     border-radius: 0 !important;
   }
-  .public-messages-view .img-container {
+  .public-messages-view .img-container, .torrent {
     margin-left: -15px;
     margin-right: -15px;
   }

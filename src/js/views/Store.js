@@ -1,4 +1,4 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
@@ -38,13 +38,11 @@ class Store extends View {
     let profilePhoto;
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${user} callback=${src => this.onProfilePhotoSet(src)}/>`;
-    } else {
-      if (this.state.photo) {
+    } else if (this.state.photo) {
         profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
       } else {
         profilePhoto = html`<${Identicon} str=${user} width=250/>`
       }
-    }
     return html`
       <div class="content">
         <div class="profile-top">
@@ -72,9 +70,9 @@ class Store extends View {
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
                 ${followable ? html`<${FollowButton} id=${user}/>` : ''}
-                <button onClick=${() => route('/chat/' + user)}>${t('send_message')}</button>
+                <button onClick=${() => route(`/chat/${  user}`)}>${t('send_message')}</button>
                 ${uuid ? '' : html`
-                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.pathname}/>
+                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${`https://iris.to/${  window.location.pathname}`}/>
                 `}
               </div>
             </div>
@@ -186,19 +184,20 @@ class Store extends View {
   }
 
   getCartFromUser(user) {
-    State.local.get('cart').get(user).map().on((v, k, a, e) => {
-      if (k === '#') { return; } // blah
-      this.eventListeners['cart' + user] = e;
-      this.cart[k + user] = v;
-      this.carts[user] = this.carts[user] || {};
-      this.carts[user][k] = v;
-      this.setState({cart: this.cart, carts: this.carts});
-      this.updateTotalPrice();
-    });
+    State.local.get('cart').get(user).map().on(this.sub(
+      (v, k) => {
+        if (k === '#') { return; } // blah
+        this.cart[k + user] = v;
+        this.carts[user] = this.carts[user] || {};
+        this.carts[user][k] = v;
+        this.setState({cart: this.cart, carts: this.carts});
+        this.updateTotalPrice();
+      }, `cart${  user}`
+    ));
   }
 
   onProduct(p, id, a, e, from) {
-    this.eventListeners['products' + from] = e;
+    this.eventListeners[`products${  from}`] = e;
     if (p) {
       const o = {};
       p.from = from;
@@ -212,28 +211,34 @@ class Store extends View {
   }
 
   getProductsFromUser(user) {
-    State.public.user(user).get('store').get('products').map().on((...args) => {
-      return this.onProduct(...args, user);
-    });
+    State.public.user(user).get('store').get('products').map().on(this.sub(
+      (...args) => {
+        return this.onProduct(...args, user);
+      }, user + 'products'
+    ));
   }
 
   getAllCarts() {
     const carts = {};
-    State.local.get('cart').map((o, user) => {
-      if (!user) {
-        delete carts[user];
-        return;
+    State.local.get('cart').map(this.sub(
+      (o, user) => {
+        if (!user) {
+          delete carts[user];
+          return;
+        }
+        if (carts[user]) { return; }
+        carts[user] = true;
+        this.getCartFromUser(user);
       }
-      if (carts[user]) { return; }
-      carts[user] = true;
-      this.getCartFromUser(user);
-    });
+    ));
   }
 
   getAllProducts(group) {
-    State.group(group).map('store/products', (...args) => {
-      this.onProduct(...args);
-    });
+    State.group(group).map('store/products', this.sub(
+      (...args) => {
+        this.onProduct(...args);
+      }
+    ));
   }
 
   componentDidMount() {
@@ -244,29 +249,33 @@ class Store extends View {
     this.isMyProfile = Session.getPubKey() === user;
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', totalPrice: 0, items: {}, cart: {}});
 
-    State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
+    State.local.get('noFollows').on(this.inject());
 
-    State.local.get('groups').get('follows').map().on((isFollowing, user, a, e) => {
-      if (isFollowing && this.state.noFollows && Session.getPubKey() !== user) {
-        State.local.get('noFollows').put(false);
-        e.off();
+    State.local.get('groups').get('follows').map().on(this.sub(
+      (isFollowing, user, a, e) => {
+        if (isFollowing && this.state.noFollows && Session.getPubKey() !== user) {
+          State.local.get('noFollows').put(false);
+          e.off();
+        }
       }
-    });
+    ));
 
     if (user) {
       this.getCartFromUser(user);
       this.getProductsFromUser(user);
     } else {
       let prevGroup;
-      State.local.get('filters').get('group').on((group,k,x,e) => {
-        if (group !== prevGroup) {
-          this.items = {};
-          this.setState({items:{}});
-          prevGroup = group;
-          this.eventListeners.push(e);
-          this.getAllProducts(group);
+      State.local.get('filters').get('group').on(this.sub(
+        (group,k,x,e) => {
+          if (group !== prevGroup) {
+            this.items = {};
+            this.setState({items:{}});
+            prevGroup = group;
+            this.eventListeners.push(e);
+            this.getAllProducts(group);
+          }
         }
-      });
+      ));
       this.getAllCarts();
     }
   }

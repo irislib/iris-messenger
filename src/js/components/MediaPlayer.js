@@ -1,8 +1,8 @@
 import { Component } from 'preact';
-import {html} from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Icons from '../Icons.js';
-import Helpers from '../Helpers.js';
 import $ from 'jquery';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4))  !== -1;
@@ -90,9 +90,9 @@ class MediaPlayer extends Component {
                   str = str.split('.').slice(0, -1).join('.');
                 }
                 return html`<p><b>${str}</b></p>`;
-              } else {
+              } 
                 return html`<p>${str}</p>` 
-              }
+              
             }
           ):''}
         </a>

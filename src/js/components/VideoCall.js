@@ -1,6 +1,8 @@
 import { Component } from 'preact';
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import { route } from 'preact-router';
+import $ from 'jquery';
+import Gun from 'gun';
 
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
@@ -10,16 +12,16 @@ import State from '../State.js';
 const ringSound = new Audio('../../assets/audio/ring.mp3');
 ringSound.loop = true;
 const callSound = new Audio('../../assets/audio/call.mp3');
-var callTimeout;
-var callSoundTimeout;
-var callingInterval;
-var incomingCallNotification;
-var userMediaStream;
-var ourIceCandidates;
+let callTimeout;
+let callSoundTimeout;
+let callingInterval;
+let incomingCallNotification;
+let userMediaStream;
+let ourIceCandidates;
 
-var localStorageIce = localStorage.getItem('rtcConfig');
-var DEFAULT_RTC_CONFIG = {iceServers: [ { urls: ["stun:turn.hepic.tel"] }, { urls: ["stun:stun.l.google.com:19302"] } ]};
-var RTC_CONFIG = localStorageIce ? JSON.parse(localStorageIce) : DEFAULT_RTC_CONFIG;
+let localStorageIce = localStorage.getItem('rtcConfig');
+let DEFAULT_RTC_CONFIG = {iceServers: [ { urls: ["stun:turn.hepic.tel"] }, { urls: ["stun:stun.l.google.com:19302"] } ]};
+let RTC_CONFIG = localStorageIce ? JSON.parse(localStorageIce) : DEFAULT_RTC_CONFIG;
 
 function getRTCConfig() {
   return RTC_CONFIG;
@@ -74,7 +76,7 @@ class VideoCall extends Component {
   onCallMessage(pub, call) {
     this.stopCalling();
     if (call && call !== 'null' && call.time) {
-      var d = new Date(call.time);
+      let d = new Date(call.time);
       if (new Date() - d > 5000) {
         console.log('ignoring old call from', pub);
         return;
@@ -102,7 +104,7 @@ class VideoCall extends Component {
         silent: true
       });
       incomingCallNotification.onclick = function() {
-        route('/chat/' + pub);
+        route(`/chat/${  pub}`);
         window.focus();
       };
     }
@@ -132,7 +134,7 @@ class VideoCall extends Component {
   }
 
   async addStreamToPeerConnection(pc) {
-    var constraints = {
+    let constraints = {
       audio: true,
       video: true
     };
@@ -158,7 +160,7 @@ class VideoCall extends Component {
 
     await this.initConnection(true, pub);
     console.log('calling', pub);
-    var call = () => Session.channels[pub].put('call', {
+    let call = () => Session.channels[pub].put('call', {
       time: new Date().toISOString(),
       type: video ? 'video' : 'voice',
       offer: true,
@@ -220,7 +222,7 @@ class VideoCall extends Component {
       try {
         if (chat.isNegotiating) { return; }
         chat.isNegotiating = true;
-        var offer = await chat.pc.createOffer();
+        let offer = await chat.pc.createOffer();
         chat.pc.setLocalDescription(offer);
         console.log('sending our sdp', offer);
         chat.put('sdp', {time: new Date().toISOString(), data: offer});
@@ -253,7 +255,7 @@ class VideoCall extends Component {
     chat.pc.onicecandidate = chat.pc.onicecandidate || (({candidate}) => {
       if (!candidate) return;
       console.log('sending our ice candidate');
-      var i = Gun.SEA.random(12).toString('base64');
+      let i = Gun.SEA.random(12).toString('base64');
       ourIceCandidates[i] = candidate;
       chat.put('icecandidates', {time: new Date().toISOString(), data: ourIceCandidates});
     });
@@ -265,7 +267,7 @@ class VideoCall extends Component {
     chat.pc.onsignalingstatechange = async () => {
       if (!chat.pc) { return; }
       console.log(
-        "Signaling State Change:" + chat.pc,
+        `Signaling State Change:${  chat.pc}`,
         chat.pc.signalingState
       );
       switch (chat.pc.signalingState) {

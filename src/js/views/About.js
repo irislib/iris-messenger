@@ -1,5 +1,10 @@
 import {translate as t} from '../Translation.js';
+<<<<<<< HEAD
 import { html } from '../Helpers.js';
+=======
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
+>>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
 import View from './View.js';
 import iris from 'iris-lib';
 
@@ -21,7 +26,7 @@ class About extends View {
         </ul>
         <p>In other words, <b>you can't be deplatformed from Iris</b>.</p>
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-        <p><small>Version 2.0.1</small></p>
+        <p><small>Version 2.0.3</small></p>
 
         ${iris.util.isElectron ? '' : html`
           <div id="desktop-application-about">
@@ -51,7 +56,7 @@ class About extends View {
         <p>${t('application_security_warning')}</p>
 
         <h4>${t('donate')}</h4>
-        <p dangerouslySetInnerHTML=${{ __html:t('donate_info', "href=\"https://opencollective.com/iris-social\"") + ': 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST' }}></p>
+        <p dangerouslySetInnerHTML=${{ __html:`${t('donate_info', "href=\"https://opencollective.com/iris-social\"")  }: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST` }}></p>
         <p>Dogecoin: DEsgP4H1Sjp4461PugHDNnoGd6S8pTvrm1</p>
       </div>
     `;

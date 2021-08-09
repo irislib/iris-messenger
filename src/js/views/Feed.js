@@ -1,4 +1,5 @@
-import Helpers, { html } from '../Helpers.js';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import PublicMessageForm from '../components/PublicMessageForm.js';
 import Identicon from '../components/Identicon.js';
@@ -35,13 +36,9 @@ class Feed extends View {
 
   componentDidMount() {
     this.search();
-    State.local.get('filters').get('group').on(group => this.setState({group}));
-    State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
-    State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
+    State.local.get('filters').get('group').on(this.inject());
+    State.local.get('noFollows').on(this.inject());
+    State.local.get('noFollowers').on(this.inject());
   }
 
   getNotification() {
@@ -99,8 +96,13 @@ class Feed extends View {
         ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
           ${this.getNotification()}
         `}
+<<<<<<< HEAD
         
         <${MessageFeed} filter=${s.searchTerm && (m => this.filter(m))} thumbnails=${this.props.thumbnails} key=${this.props.index || 'feed'} group=${this.state.group} path=${this.props.index || 'msgs'} />
+=======
+        ${s.noFollows ? '' : html`<${Filters}/>`}
+        <${MessageFeed} scrollElement=${this.scrollElement.current} filter=${s.searchTerm && (m => this.filter(m))} thumbnails=${this.props.thumbnails} key=${this.props.index || 'feed'} group=${this.state.group} path=${this.props.index || 'msgs'} />
+>>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
       </div>
     `;
   }

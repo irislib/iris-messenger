@@ -1,6 +1,7 @@
-import {html} from '../Helpers.js';
+import { html } from 'htm/preact';
 import {AVAILABLE_LANGUAGES, language} from '../Translation.js';
 import Translations from '../Translations.js';
+import $ from 'jquery';
 
 function onLanguageChange(e) {
   const l = $(e.target).val();

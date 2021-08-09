@@ -1,9 +1,9 @@
-import { Component } from 'preact';
-import { html } from '../Helpers.js';
+import Component from '../BaseComponent';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import ChatListItem from './ChatListItem.js';
-import Helpers from '../Helpers.js';
 import { route } from 'preact-router';
 import Notifications from '../Notifications.js';
 import ScrollViewport from 'preact-scroll-viewport';
@@ -28,12 +28,16 @@ class ChatList extends Component {
         });
       this.setState({chats: sortedChats});
     }, 200);
-    State.local.get('channels').map().on((chat, id) => {
-      chat.id = id;
-      chats[id] = chat;
-      limitedUpdate();
-    });
-    State.local.get('scrollUp').on(() => Helpers.animateScrollTop('.chat-list'));
+    State.local.get('channels').map().on(this.sub(
+      (chat, id) => {
+        chat.id = id;
+        chats[id] = chat;
+        limitedUpdate();
+      }
+    ));
+    State.local.get('scrollUp').on(this.sub(
+      () => Helpers.animateScrollTop('.chat-list')
+    ));
 
     if (window.Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
       setTimeout(() => {

@@ -1,4 +1,4 @@
-import { html } from './Helpers.js';
+import { html } from 'htm/preact';
 
 export default {
   settings: html`<svg version="1.1" x="0px" y="0px" width="25px" height="25.001px" viewBox="0 0 25 25.001" style="enable-background:new 0 0 25 25.001;" xml:space="preserve">

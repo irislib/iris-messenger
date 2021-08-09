@@ -12,7 +12,7 @@ import PeerManager from './PeerManager.js';
 import iris from 'iris-lib';
 
 const State = {
-  init: function(publicOpts) {
+  init(publicOpts) {
     Gun.log.off = true;
     const o = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
     this.public = Gun(o);
@@ -42,9 +42,14 @@ const State = {
     iris.util.setPublicState && iris.util.setPublicState(this.public);
   },
 
-  group: function(groupNode = 'everyone') {
+  getBlockedUsers() {
+    return this.blockedUsers;
+  },
+
+  group(groupNode = 'everyone') {
     const _this = this;
     return {
+<<<<<<< HEAD
       get: function(path, callback) {
         const follows = {};
         if (typeof groupNode === 'string') {
@@ -58,17 +63,35 @@ const State = {
             let node = State.public.user(user);
             if (path && path !== '/') {
               node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
+=======
+      get(path, callback) {
+        requestAnimationFrame(() => {
+          const follows = {};
+          if (typeof groupNode === 'string') {
+            groupNode = _this.local.get('groups').get(groupNode);
+          }
+          groupNode.map((isFollowing, user) => {
+            if (_this.blockedUsers[user]) { return; } // TODO: allow to specifically query blocked users?
+            if (follows[user] && follows[user] === isFollowing) { return; }
+            follows[user] = isFollowing;
+            if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
+              let node = State.public.user(user);
+              if (path && path !== '/') {
+                node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
+              }
+              callback(node, user);
+>>>>>>> 237e308dc6969b69fdf40731f47631a707a0b7f6
             }
             callback(node, user);
           }
         });
       },
 
-      map: function(path, callback) {
+      map(path, callback) {
         this.get(path, (node, from) => node.map((...args) => callback(...args, from)));
       },
 
-      on: function(path, callback) {
+      on(path, callback) {
         this.get(path, (node, from) => node.on((...args) => callback(...args, from)));
       }
     }
