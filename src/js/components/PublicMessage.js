@@ -8,9 +8,8 @@ import SafeImg from './SafeImg.js';
 import Session from '../Session.js';
 import Torrent from './Torrent.js';
 import Autolinker from 'autolinker';
-//import iris from 'iris-lib';
+import iris from 'iris-lib';
 import $ from 'jquery';
-//import timeMe from '../lib/timeMe.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
@@ -20,7 +19,6 @@ const heartFull = html`<svg width="24" viewBox="0 -28 512.00002 512"><path fill=
 
 const replyIcon = html`<svg width="24" version="1.1" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;"><path fill="currentColor" d="M256,21.952c-141.163,0-256,95.424-256,212.715c0,60.267,30.805,117.269,84.885,157.717l-41.109,82.219 c-2.176,4.331-1.131,9.579,2.496,12.779c2.005,1.771,4.501,2.667,7.04,2.667c2.069,0,4.139-0.597,5.952-1.813l89.963-60.395
 c33.877,12.971,69.781,19.541,106.752,19.541C397.141,447.381,512,351.957,512,234.667S397.163,21.952,256,21.952z M255.979,426.048c-36.16,0-71.168-6.741-104.043-20.032c-3.264-1.323-6.997-0.96-9.941,1.024l-61.056,40.981l27.093-54.187 c2.368-4.757,0.896-10.517-3.477-13.547c-52.907-36.629-83.243-89.707-83.243-145.6c0-105.536,105.28-191.381,234.667-191.381 s234.667,85.824,234.667,191.36S385.365,426.048,255.979,426.048z"/></svg>`;
-
 
 class PublicMessage extends Message {
   constructor() {
@@ -33,21 +31,49 @@ class PublicMessage extends Message {
     this.state = { sortedReplies: [] };
   }
 
-  componentDidMount() {
-    const r = this.props.message;  
-    const msg = r.signedData;
-    msg.info = {from: r.signerKeyHash};
-
-    this.setState({msg});
-    
-    if (this.props.showName && !this.props.name) {
-      State.public.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
-        this.eventListeners['name'] = e;
-        this.setState({name});
-      });
+  fetchByHash() {
+    const hash = this.props.hash;
+    if (typeof hash !== 'string') {
+      return;
     }
+    return new Promise(resolve => {
+      State.local.get('msgsByHash').get(hash).once(msg => {
+        if (typeof msg === 'string') {
+          try {
+            resolve(JSON.parse(msg));
+          } catch (e) {
+            console.error('message parsing failed', msg, e);
+          }
+        }
+      });
+      State.public.get('#').get(hash).on(async (serialized, a, b, event) => {
+        if (typeof serialized !== 'string') {
+          console.error('message parsing failed', hash, serialized);
+          return;
+        }
+        event.off();
+        const msg = await iris.SignedMessage.fromString(serialized);
+        if (msg) {
+          resolve(msg);
+          State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
+        }
+      });
+    });
+  }
 
-    setTimeout(() => {
+  componentDidMount() {
+    const p = this.fetchByHash();
+    if (!p) { return; }
+    p.then(r => {
+      const msg = r.signedData;
+      msg.info = {from: r.signerKeyHash};
+      this.setState({msg});
+      if (this.props.showName && !this.props.name) {
+        State.public.user(msg.info.from).get('profile').get('name').on((name, a,b, e) => {
+          this.eventListeners['name'] = e;
+          this.setState({name});
+        });
+      }
       State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, (liked,a,b,e,from) => {
         this.eventListeners[`${from}likes`] = e;
         liked ? this.likedBy.add(from) : this.likedBy.delete(from);
@@ -55,9 +81,6 @@ class PublicMessage extends Message {
         if (from === Session.getPubKey()) s['liked'] = liked;
         this.setState(s);
       });
-    }, 1000);
-
-    setTimeout(() => {
       State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, (hash,time,b,e,from) => {
         const k = from + time;
         if (hash && this.replies[k]) return;
@@ -70,7 +93,7 @@ class PublicMessage extends Message {
         const sortedReplies = Object.values(this.replies).sort((a,b) => a.time > b.time ? 1 : -1);
         this.setState({replyCount: Object.keys(this.replies).length, sortedReplies });
       });
-    }, 1000);
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -161,7 +184,6 @@ class PublicMessage extends Message {
   }
 
   render() {
-
     if (!this.state.msg) { return ''; }
     if (this.props.filter && !this.props.filter(this.state.msg)) { return ''; }
     //if (++this.i > 1) console.log(this.i);
@@ -203,14 +225,12 @@ class PublicMessage extends Message {
           ${this.state.msg.torrentId ? html`
               <${Torrent} torrentId=${this.state.msg.torrentId} autopause=${!this.props.standalone}/>
           `:''}
-
           ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
             html`<div class="img-container">
                 <div class="heart"></div>
                 <${SafeImg} src=${a.data} onLoad=${() => this.measure()} onClick=${e => { this.imageClicked(e); }}/>
             </div>`
-          )}          
-
+          )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           ${this.state.msg.replyingTo && !this.props.asReply ? html`
             <div><a href="/post/${encodeURIComponent(this.state.msg.replyingTo)}">Show replied message</a></div>
@@ -257,5 +277,3 @@ class PublicMessage extends Message {
 }
 
 export default PublicMessage;
-
-
