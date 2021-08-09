@@ -214,7 +214,7 @@ class Store extends View {
     State.public.user(user).get('store').get('products').map().on(this.sub(
       (...args) => {
         return this.onProduct(...args, user);
-      }, user + 'products'
+      }, `${user  }products`
     ));
   }
 

@@ -1044,7 +1044,7 @@ ru: {
     no_contacts_in_list: '더 이상 친구 리스트가 없음.',
   },
 
-  "ur": {
+  ur: {
     language_name: "اردو",
     whats_your_name: "آپکا کیا نام ہے؟",
     new_user_go: "چلو",
