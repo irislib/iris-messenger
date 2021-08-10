@@ -211,14 +211,15 @@ class Profile extends View {
   }
 
   renderView() {
-    const title = `${this.state.name || 'Profile'} | Iris`;
+    const title = this.state.name || 'Profile';
+    const ogTitle = `${title} | Iris`;
     const description = `Latest posts by ${this.state.name || 'user'}. ${this.state.about || ''}`;
     return html`
       <div class="content">
-        <${Helmet} titleTemplate="">
+        <${Helmet}>
             <title>${title}</title>
             <meta name="description" content=${description} />
-            <meta property="og:title" content=${title} />
+            <meta property="og:title" content=${ogTitle} />
             <meta property="og:description" content=${description} />
         <//>
         ${this.renderDetails()}

@@ -13,6 +13,7 @@ import NewChat from '../components/NewChat.js';
 import _ from 'lodash';
 import $ from 'jquery';
 import iris from 'iris-lib';
+import {Helmet} from 'react-helmet';
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
@@ -254,6 +255,7 @@ class Chat extends View {
     const participants = this.state.sortedParticipants;
 
     return html`
+    <${Helmet}><title>${this.chat && this.chat.name || 'Messages'}</title><//>
     <${ChatList} class=${this.props.id ? 'hidden-xs' : ''}/>
     <div id="chat-main" class="${this.props.id ? '' : 'hidden-xs'}">
     ${this.props.id && this.props.id.length > 20 ? html`

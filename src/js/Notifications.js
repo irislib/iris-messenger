@@ -70,15 +70,6 @@ function notifyMsg(msg, info, pub) {
   }
 }
 
-let initialTitle = document.title;
-function setUnseenTotal() {
-  if (unseenTotal) {
-    document.title = `(${  unseenTotal  }) ${  initialTitle}`;
-  } else {
-    document.title = initialTitle;
-  }
-}
-
 function changeChatUnseenCount(chatId, change) {
   const chat = Session.channels[chatId];
   if (!chat) return;
@@ -93,7 +84,6 @@ function changeChatUnseenCount(chatId, change) {
   chatNode.get('unseen').put(chat.unseen);
   unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
   State.local.get('unseenTotal').put(unseenTotal);
-  setUnseenTotal();
 }
 
 const publicVapidKey = 'BMqSvZArOIdn7vGkYplSpkZ70-Qt8nhYbey26WVa3LF3SwzblSzm3n3HHycpNkAKVq7MCkrzFuTFs_en7Y_J2MI';

@@ -11,6 +11,7 @@ import Torrent from './Torrent.js';
 import Autolinker from 'autolinker';
 import iris from 'iris-lib';
 import $ from 'jquery';
+import {Helmet} from "react-helmet";
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
@@ -194,8 +195,9 @@ msg => {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     const p = document.createElement('p');
     let text = this.state.msg.text;
-    if (isThumbnail && text.length > 128) {
-      text = `${text.slice(0,128)  }...`;
+    const shortText = text.length > 128 ? `${text.slice(0,128)  }...` : text;
+    if (isThumbnail) {
+      text = shortText;
     }
     p.innerText = text;
     const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
@@ -224,6 +226,14 @@ msg => {
               </div>
             `: ''}
           </div>
+          ${this.props.standalone ? html`
+            <${Helmet} titleTemplate="%s">
+                <title>${name || 'User'} on Iris: "${shortText}"</title>
+                <meta name="description" content=${shortText} />
+                <meta property="og:title" content=${name || 'User'} on Iris />
+                <meta property="og:description" content=${shortText} />
+            <//>
+          ` : ''}
           ${this.state.msg.torrentId ? html`
               <${Torrent} measure=${this.props.measure} torrentId=${this.state.msg.torrentId} autopause=${!this.props.standalone}/>
           `:''}

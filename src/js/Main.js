@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import Component from './BaseComponent';
 import { Router } from 'preact-router';
 import { Link } from 'preact-router/match';
 import {Helmet} from "react-helmet";
@@ -63,9 +63,7 @@ const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
 
 class Menu extends Component {
   componentDidMount() {
-    State.local.get('unseenTotal').on(unseenTotal => {
-      this.setState({unseenTotal});
-    });
+    State.local.get('unseenTotal').on(this.inject());
   }
 
   menuLinkClicked() {
@@ -111,10 +109,11 @@ class Menu extends Component {
 
 class Main extends Component {
   componentDidMount() {
-    State.local.get('loggedIn').on(loggedIn => this.setState({loggedIn}));
+    State.local.get('loggedIn').on(this.inject());
     State.local.get('toggleMenu').put(false);
     State.local.get('toggleMenu').on(show => this.toggleMenu(show));
-    State.electron && State.electron.get('platform').on(platform => this.setState({platform}));
+    State.electron && State.electron.get('platform').on(this.inject());
+    State.local.get('unseenTotal').on(this.inject());
   }
 
   handleRoute(e) {
@@ -139,14 +138,17 @@ class Main extends Component {
   }
 
   render() {
-    let title = "Iris";
-    if (this.state.activeRoute && this.state.activeRoute.length > 1) {
-      title = `${Helpers.capitalize(this.state.activeRoute.replace('/', ''))} | Iris`;
+    let title = "";
+    const s = this.state;
+    if (s.activeRoute && s.activeRoute.length > 1) {
+      title = Helpers.capitalize(s.activeRoute.replace('/', ''));
     }
     let content = '';
-    const isDesktopNonMac = this.state.platform && this.state.platform !== 'darwin';
-    if (this.state.loggedIn || window.location.pathname.length <= 2) {
-      content = this.state.loggedIn ? html`
+    const isDesktopNonMac = s.platform && s.platform !== 'darwin';
+    const titleTemplate = s.unseenTotal ? `(${s.unseenTotal}) %s | Iris` : "%s | Iris";
+    const defaultTitle = s.unseenTotal ? `(${s.unseenTotal}) Iris` : 'Iris';
+    if (s.loggedIn || window.location.pathname.length <= 2) {
+      content = s.loggedIn ? html`
         ${isDesktopNonMac ? html`
           <div class="windows-titlebar">
                <img src=${logoType} height=16 width=28 />
@@ -157,11 +159,12 @@ class Main extends Component {
                </div>
           </div>
         ` : ''}
-        <section class="main ${isDesktopNonMac ? 'desktop-non-mac' : ''} ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
+        <section class="main ${isDesktopNonMac ? 'desktop-non-mac' : ''} ${s.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
           <${Menu}/>
-          <${Helmet} titleTemplate="%s | Iris" defaultTitle="Iris">
+          <${Helmet} titleTemplate=${titleTemplate} defaultTitle=${defaultTitle}>
+            <title>${title}</title>
             <meta name="description" content="Social Networking Freedom" />
-            <meta property="og:title" content="Iris" />
+            <meta property="og:title" content=${title} />
             <meta property="og:description" content="Social Networking Freedom" />
             <meta property="og:url" content=${`https://iris.to${window.location.pathname.length > 1 ? window.location.pathname : ''}`} />
             <meta property="og:image" content="https://iris.to/assets/img/cover.jpg" />
