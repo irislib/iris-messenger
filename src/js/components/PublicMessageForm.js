@@ -144,7 +144,13 @@ class PublicMessageForm extends Component {
           </button>
        </div>
       <div class="attachment-preview">
-          ${this.state.torrentId ? html`<${Torrent} torrentId=${this.state.torrentId}/>`:''}
+          ${this.state.torrentId ? html`
+              <p><a href="" onClick=${e => {e.preventDefault();this.setState({torrentId:null})}}>${t('remove_attachment')}</a></p>
+              <${Torrent} preview=${true} torrentId=${this.state.torrentId}/>
+          `:''}
+          ${this.state.attachments && this.state.attachments.length ? html`
+            <p><a href="" onClick=${e => {e.preventDefault();this.setState({attachments:null})}}>${t('remove_attachment')}</a></p>
+          ` : ''}
           ${this.state.attachments && this.state.attachments.map(a => html`
             <${SafeImg} src=${a.data}/>
           `)}

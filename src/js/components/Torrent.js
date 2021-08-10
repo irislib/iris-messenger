@@ -247,7 +247,7 @@ class Torrent extends Component {
                 ${playButton}
             </div>
             ${s.hasNext ? html`<b>next</b>`:''}
-            ${this.props.standalone ? html`
+            ${(this.props.standalone || this.props.preview) ? html`
               <a href=${this.props.torrentId}>Magnet link</a>
               ${t && t.files ? html`
                   <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr('show_files')}</a>
