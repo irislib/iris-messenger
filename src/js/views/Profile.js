@@ -18,6 +18,7 @@ import { Link } from 'preact-router/match';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min.js';
 import iris from 'iris-lib';
+import {Helmet} from "react-helmet";
 
 const SMS_VERIFIER_PUB = 'ysavwX9TVnlDw93w9IxezCJqSDMyzIU-qpD8VTN5yko.3ll1dFdxLkgyVpejFkEMOFkQzp_tRrkT3fImZEx94Co';
 
@@ -210,8 +211,16 @@ class Profile extends View {
   }
 
   renderView() {
+    const title = `${this.state.name || 'Profile'} | Iris`;
+    const description = `Latest posts by ${this.state.name || 'user'}. ${this.state.about || ''}`;
     return html`
       <div class="content">
+        <${Helmet} titleTemplate="">
+            <title>${title}</title>
+            <meta name="description" content=${description} />
+            <meta property="og:title" content=${title} />
+            <meta property="og:description" content=${description} />
+        <//>
         ${this.renderDetails()}
         ${this.state.blocked ? '' : this.renderTabs()}
         ${this.state.blocked ? '' : this.renderTab()}
@@ -249,7 +258,6 @@ class Profile extends View {
     });
     State.public.user(pub).get('profile').get('name').on(this.sub(
       name => {
-        document.title = name || document.title;
         if (!$('#profile .profile-name:focus').length) {
           this.setState({name});
         }

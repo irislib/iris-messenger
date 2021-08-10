@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { Router } from 'preact-router';
 import { Link } from 'preact-router/match';
+import {Helmet} from "react-helmet";
 
 import Helpers from './Helpers.js';
 import { html } from 'htm/preact';
@@ -118,8 +119,7 @@ class Main extends Component {
 
   handleRoute(e) {
     let activeRoute = e.url;
-    document.title = 'Iris';
-    if (activeRoute && activeRoute.length > 1) { document.title += ` - ${  Helpers.capitalize(activeRoute.replace('/', ''))}`; }
+    this.setState({activeRoute});
     State.local.get('activeRoute').put(activeRoute);
     QRScanner.cleanupScanner();
   }
@@ -139,6 +139,10 @@ class Main extends Component {
   }
 
   render() {
+    let title = "Iris";
+    if (this.state.activeRoute && this.state.activeRoute.length > 1) {
+      title = `${Helpers.capitalize(this.state.activeRoute.replace('/', ''))} | Iris`;
+    }
     let content = '';
     const isDesktopNonMac = this.state.platform && this.state.platform !== 'darwin';
     if (this.state.loggedIn || window.location.pathname.length <= 2) {
@@ -155,6 +159,13 @@ class Main extends Component {
         ` : ''}
         <section class="main ${isDesktopNonMac ? 'desktop-non-mac' : ''} ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
           <${Menu}/>
+          <${Helmet} titleTemplate="%s | Iris" defaultTitle="Iris">
+            <meta name="description" content="Social Networking Freedom" />
+            <meta property="og:title" content="Iris" />
+            <meta property="og:description" content="Social Networking Freedom" />
+            <meta property="og:url" content=${`https://iris.to${window.location.pathname.length > 1 ? window.location.pathname : ''}`} />
+            <meta property="og:image" content="https://iris.to/assets/img/cover.jpg" />
+          <//>
           <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
           <div class="view-area">
             <${Router} onChange=${e => this.handleRoute(e)}>
@@ -165,15 +176,15 @@ class Main extends Component {
               <${Login} path="/login"/>
               <${Chat} path="/chat/:id?"/>
               <${Message} path="/post/:hash+"/>
-              <${Torrent} path="/torrent/:id"/>
+              <${Torrent} path="/torrent/:id+"/>
               <${About} path="/about"/>
               <${Settings} path="/settings"/>
               <${LogoutConfirmation} path="/logout"/>
-              <${Profile} path="/profile/:id?" tab="profile"/>
-              <${Profile} path="/replies/:id?" tab="replies"/>
-              <${Profile} path="/likes/:id?" tab="likes"/>
-              <${Profile} path="/media/:id" tab="media"/>
-              <${Group} path="/group/:id?"/>
+              <${Profile} path="/profile/:id+" tab="profile"/>
+              <${Profile} path="/replies/:id+" tab="replies"/>
+              <${Profile} path="/likes/:id+" tab="likes"/>
+              <${Profile} path="/media/:id+" tab="media"/>
+              <${Group} path="/group/:id+"/>
               <${Store} path="/store/:store?"/>
               <${Checkout} path="/checkout/:store?"/>
               <${Product} path="/product/:product/:store"/>
