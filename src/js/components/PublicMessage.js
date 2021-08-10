@@ -230,6 +230,7 @@ msg => {
             <${Helmet} titleTemplate="%s">
                 <title>${name || 'User'} on Iris: "${shortText}"</title>
                 <meta name="description" content=${shortText} />
+                <meta property="og:type" content="article" />
                 <meta property="og:title" content=${name || 'User'} on Iris />
                 <meta property="og:description" content=${shortText} />
             <//>

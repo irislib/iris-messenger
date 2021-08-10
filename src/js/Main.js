@@ -164,6 +164,7 @@ class Main extends Component {
           <${Helmet} titleTemplate=${titleTemplate} defaultTitle=${defaultTitle}>
             <title>${title}</title>
             <meta name="description" content="Social Networking Freedom" />
+            <meta property="og:type" content="website" />
             <meta property="og:title" content=${title} />
             <meta property="og:description" content="Social Networking Freedom" />
             <meta property="og:url" content=${`https://iris.to${window.location.pathname.length > 1 ? window.location.pathname : ''}`} />

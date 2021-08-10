@@ -219,6 +219,7 @@ class Profile extends View {
         <${Helmet}>
             <title>${title}</title>
             <meta name="description" content=${description} />
+            <meta property="og:type" content="profile" />
             <meta property="og:title" content=${ogTitle} />
             <meta property="og:description" content=${description} />
         <//>

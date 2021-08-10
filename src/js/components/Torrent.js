@@ -7,6 +7,7 @@ import { translate as tr } from '../Translation.js';
 import $ from 'jquery';
 import State from '../State.js';
 import Icons from '../Icons.js';
+import {Helmet} from 'react-helmet';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4))  !== -1;
 const isVideo = f => isOfType(f, ['webm', '.mp4', '.ogg']);
@@ -207,8 +208,21 @@ class Torrent extends Component {
           <a href="#" onClick=${e => this.playAudio(s.activeFilePath, e)}>${Icons.play}</a>
       `;
     }
+    const title = s.splitPath && s.splitPath[s.splitPath.length - 1].split('.').slice(0, -1).join('.') || 'File sharing';
+    const ogTitle = `${title} | Iris`;
+    const description = 'Shared files';
+    const ogType = s.isAudioOpen ? 'music:song' : 'video.movie';
     return html`
         <div class="torrent">
+            ${this.props.standalone ? html`
+              <${Helmet}>
+                <title>${title}</title>
+                <meta name="description" content=${description} />
+                <meta property="og:type" content=${ogType} />
+                <meta property="og:title" content=${ogTitle} />
+                <meta property="og:description" content=${description} />
+              <//>
+            ` : ''}
             ${!Session.settings.local.enableWebtorrent && !s.torrenting ? html`
               <a href="" onClick=${e => this.openTorrentClicked(e)}>Show attachment</a>
             `:''}
@@ -233,10 +247,14 @@ class Torrent extends Component {
                 ${playButton}
             </div>
             ${s.hasNext ? html`<b>next</b>`:''}
-            <a href=${this.props.torrentId}>Magnet link</a>
-            ${t && t.files ? html`
-                <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr('show_files')}</a>
-            `:''}
+            ${this.props.standalone ? html`
+              <a href=${this.props.torrentId}>Magnet link</a>
+              ${t && t.files ? html`
+                  <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr('show_files')}</a>
+              `:''}
+            ` : html`
+                <a href="/torrent/${encodeURIComponent(this.props.torrentId)}">${tr('show_files')}</a>
+            `}
             ${s.showFiles && t && t.files ? html`
               <p>${tr('peers')}: ${t.numPeers}</p>
               <div class="flex-table details">
