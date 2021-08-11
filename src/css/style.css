@@ -231,7 +231,7 @@ a.logo:focus {
   opacity: 0.75;
 }
 
-a.logo img:first-child {
+a.logo img:not(:last-child) {
   margin-right: 9px;
 }
 

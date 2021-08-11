@@ -114,7 +114,7 @@ class Header extends Component {
           ${Helpers.isElectron || (activeRoute && activeRoute.indexOf('/chat/') === 0) ? '' : html`
             <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
               <div class="mobile-menu-icon">${Icons.menu}</div>
-              <img src=${logo} style="margin-right: 7px" width=30 height=30/>
+              <img src=${logo} style="margin-right: 10px" width=30 height=30/>
               <img src=${logoType} height=23 width=41 />
             </a>
           `}
