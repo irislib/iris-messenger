@@ -2,6 +2,7 @@ import { html } from 'htm/preact';
 import {AVAILABLE_LANGUAGES, language} from '../Translation.js';
 import Translations from '../Translations.js';
 import $ from 'jquery';
+import Icons from '../Icons.js';
 
 function onLanguageChange(e) {
   const l = $(e.target).val();
@@ -12,6 +13,7 @@ function onLanguageChange(e) {
 }
 
 const LanguageSelector = () => html`
+  ${Icons.language}
   <select class="language-selector" onChange=${e => onLanguageChange(e)} value=${language}>${
     AVAILABLE_LANGUAGES.map(l =>
       html`<option value=${l}>${Translations[l].language_name}</option>`

@@ -1900,6 +1900,10 @@ form.public {
   background-color: var(--chat-hover);
 }
 
+.language-selector {
+  margin-left: 5px;
+}
+
 .explorer-row {
   border-radius: 3px;
   padding: 3px;

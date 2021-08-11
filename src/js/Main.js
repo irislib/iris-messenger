@@ -8,7 +8,7 @@ import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
 
-import Settings from './views/Settings.js';
+import Settings from './views/settings/Settings.js';
 import LogoutConfirmation from './views/LogoutConfirmation.js';
 import Chat from './views/Chat.js';
 import Store from './views/Store.js';
