@@ -30,7 +30,7 @@ class Torrent extends Component {
     ));
     const showFiles = this.props.showFiles;
     showFiles && this.setState({showFiles});
-    if (Session.settings.local.enableWebtorrent) {
+    if (Session.settings.local.enableWebtorrent || this.props.standalone) {
       this.startTorrenting();
     }
   }
@@ -195,7 +195,7 @@ class Torrent extends Component {
     this.startTorrenting(true);
   }
 
-  render() {
+  renderLoadingTorrent() {
     const s = this.state;
     const t = s.torrent;
     const p = s.player;
@@ -208,66 +208,76 @@ class Torrent extends Component {
           <a href="#" onClick=${e => this.playAudio(s.activeFilePath, e)}>${Icons.play}</a>
       `;
     }
+    return html`
+      ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>`:''}
+      <div class="cover" ref=${this.coverRef} style=${s.isAudioOpen ? '' : 'display:none'}></div>
+      <div class="info">
+          ${s.splitPath ? s.splitPath.map(
+            (str, i) => {
+              if (i === s.splitPath.length - 1) {
+                if (s.isAudioOpen) {
+                  str = str.split('.').slice(0, -1).join('.');
+                }
+                return html`<p><b>${str}</b></p>`;
+              } 
+                return html`<p>${str}</p>` 
+              
+            }
+          ):''}
+      </div>
+      ${s.hasNext ? html`<b>prev</b>`:''}
+      <div class="player">
+          ${playButton}
+      </div>
+      ${s.hasNext ? html`<b>next</b>`:''}
+      ${(this.props.standalone || this.props.preview) ? html`
+        <a href=${this.props.torrentId}>Magnet link</a>
+        ${t && t.files ? html`
+            <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr(
+              s.showFiles ? 'hide_files' : 'show_files'
+            )}</a>
+        `:''}
+      ` : html`
+          <a href="/torrent/${encodeURIComponent(this.props.torrentId)}">${tr('show_files')}</a>
+      `}
+      ${s.showFiles && t && t.files ? html`
+        <p>${tr('peers')}: ${t.numPeers}</p>
+        <div class="flex-table details">
+          ${t.files.map(f => html`
+            <div onClick=${() => this.openFile(f, true)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
+                <div class="flex-cell">${f.name}</div>
+                <div class="flex-cell no-flex">${Helpers.formatBytes(f.length)}</div>
+            </div>
+          `)}
+        </div>
+      ` : ''}
+    `;
+  }
+  
+  renderMeta() {
+    const s = this.state;
     const title = s.splitPath && s.splitPath[s.splitPath.length - 1].split('.').slice(0, -1).join('.') || 'File sharing';
     const ogTitle = `${title} | Iris`;
     const description = 'Shared files';
     const ogType = s.isAudioOpen ? 'music:song' : 'video.movie';
     return html`
+      <${Helmet}>
+        <title>${title}</title>
+        <meta name="description" content=${description} />
+        <meta property="og:type" content=${ogType} />
+        <meta property="og:title" content=${ogTitle} />
+        <meta property="og:description" content=${description} />
+      <//>
+    `;
+  }
+
+  render() {
+    return html`
         <div class="torrent">
-            ${this.props.standalone ? html`
-              <${Helmet}>
-                <title>${title}</title>
-                <meta name="description" content=${description} />
-                <meta property="og:type" content=${ogType} />
-                <meta property="og:title" content=${ogTitle} />
-                <meta property="og:description" content=${description} />
-              <//>
-            ` : ''}
-            ${!Session.settings.local.enableWebtorrent && !s.torrenting ? html`
-              <a href="" onClick=${e => this.openTorrentClicked(e)}>Show attachment</a>
-            `:''}
-            ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>`:''}
-            <div class="cover" ref=${this.coverRef} style=${s.isAudioOpen ? '' : 'display:none'}></div>
-            <div class="info">
-                ${s.splitPath ? s.splitPath.map(
-                  (str, i) => {
-                    if (i === s.splitPath.length - 1) {
-                      if (s.isAudioOpen) {
-                        str = str.split('.').slice(0, -1).join('.');
-                      }
-                      return html`<p><b>${str}</b></p>`;
-                    } 
-                      return html`<p>${str}</p>` 
-                    
-                  }
-                ):''}
-            </div>
-            ${s.hasNext ? html`<b>prev</b>`:''}
-            <div class="player">
-                ${playButton}
-            </div>
-            ${s.hasNext ? html`<b>next</b>`:''}
-            ${(this.props.standalone || this.props.preview) ? html`
-              <a href=${this.props.torrentId}>Magnet link</a>
-              ${t && t.files ? html`
-                  <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr(
-                    s.showFiles ? 'hide_files' : 'show_files'
-                  )}</a>
-              `:''}
-            ` : html`
-                <a href="/torrent/${encodeURIComponent(this.props.torrentId)}">${tr('show_files')}</a>
-            `}
-            ${s.showFiles && t && t.files ? html`
-              <p>${tr('peers')}: ${t.numPeers}</p>
-              <div class="flex-table details">
-                ${t.files.map(f => html`
-                  <div onClick=${() => this.openFile(f, true)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
-                      <div class="flex-cell">${f.name}</div>
-                      <div class="flex-cell no-flex">${Helpers.formatBytes(f.length)}</div>
-                  </div>
-                `)}
-              </div>
-            ` : ''}
+            ${this.props.standalone ? this.renderMeta() : ''}
+            ${!Session.settings.local.enableWebtorrent && !this.state.torrenting && !this.props.standalone ? html`
+              <a href="" onClick=${e => this.openTorrentClicked(e)}>${tr('show_attachment')}</a>
+            `: this.renderLoadingTorrent()}
         </div>
     `;
   }
