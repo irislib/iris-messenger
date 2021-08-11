@@ -101,6 +101,7 @@ class Header extends Component {
     const searchBox = this.chatId ? '' : html`
         <${SearchBox} focus=${!!this.state.showMobileSearch}/>
     `;
+    const chatting = (activeRoute && activeRoute.indexOf('/chat/') === 0);
 
     return html`
     <header class="nav header">
@@ -111,7 +112,7 @@ class Header extends Component {
       ` : ''}
       <div class="header-content">
         <div class=${this.state.showMobileSearch ? 'hidden-xs':''}>
-          ${Helpers.isElectron || (activeRoute && activeRoute.indexOf('/chat/') === 0) ? '' : html`
+          ${Helpers.isElectron || chatting ? '' : html`
             <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
               <div class="mobile-menu-icon">${Icons.menu}</div>
               <img src=${logo} style="margin-right: 10px" width=30 height=30/>
@@ -119,11 +120,13 @@ class Header extends Component {
             </a>
           `}
         </div>
-        <div class=${this.state.showMobileSearch ? '' : 'hidden-xs'}>
-          <span class="visible-xs-inline-block" onClick=${() => this.setState({showMobileSearch:false})}>${Icons.close}</span>
-        </div>
-        <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
-          ${this.state.title && activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
+        ${chatting ? '' : html`
+          <div class=${this.state.showMobileSearch ? '' : 'hidden-xs'}>
+            <span class="visible-xs-inline-block" onClick=${() => this.setState({showMobileSearch:false})}>${Icons.close}</span>
+          </div>
+        `}
+        <div class="text" style=${this.chatId ? 'cursor:pointer;text-align:center' : ''} onClick=${() => this.onTitleClicked()}>
+          ${this.state.title && chatting ? html`
             <div class="name">
               ${this.state.title}
             </div>
@@ -131,14 +134,16 @@ class Header extends Component {
           ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
           ${this.state.about ? html`<small class="participants">${this.state.about}</small>` : ''}
           ${this.chatId ? html`<small class="last-seen">${onlineStatus || ''}</small>` : ''}
-          <div class=${this.state.showMobileSearch ? '' : 'hidden-xs'}>
-            ${searchBox}
-          </div>
-          <div class="mobile-search-btn ${this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'}" onClick=${() => {
-              this.setState({showMobileSearch: true});
-          }}>
-            ${Icons.search}
-          </div>
+          ${chatting ? '':html`
+            <div class=${this.state.showMobileSearch ? '' : 'hidden-xs'}>
+              ${searchBox}
+            </div>
+            <div class="mobile-search-btn ${this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'}" onClick=${() => {
+                this.setState({showMobileSearch: true});
+            }}>
+              ${Icons.search}
+            </div>
+          `}
         </div>
 
         ${chat && this.chatId !== key && !chat.uuid ? html`
