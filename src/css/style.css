@@ -783,6 +783,21 @@ header.footer .header-content {
   align-items: center;
   flex-direction: row;
   color: var(--text-color);
+  justify-content: left;
+}
+
+.application-list a.logo img:last-child {
+  margin-left: 5px;
+}
+
+@media (min-width:626px) and (max-width:1268px) {
+  .application-list a.logo img:last-child {
+    display: none;
+  }
+
+  .application-list a {
+    justify-content: center;
+  }
 }
 
 @media (max-width:1268px) {
@@ -792,7 +807,6 @@ header.footer .header-content {
   }
 
   .application-list a {
-    justify-content: center;
     padding: 15px;
   }
 
@@ -804,10 +818,6 @@ header.footer .header-content {
     margin-right: 0;
     width: 30px;
     height: 30px;
-  }
-
-  .application-list a.logo img:last-child {
-    display: none;
   }
 
   .application-list .text {

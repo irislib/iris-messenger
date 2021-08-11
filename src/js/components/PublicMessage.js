@@ -196,9 +196,11 @@ msg => {
     const p = document.createElement('p');
     let text = this.state.msg.text;
     const shortText = text.length > 128 ? `${text.slice(0,128)  }...` : text;
+    const quotedShortText = `"${shortText}"`;
     if (isThumbnail) {
       text = shortText;
     }
+    const title = `${name || 'User'} on Iris`;
     p.innerText = text;
     const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
     const innerHTML = autolinker.link(h);
@@ -228,11 +230,11 @@ msg => {
           </div>
           ${this.props.standalone ? html`
             <${Helmet} titleTemplate="%s">
-                <title>${name || 'User'} on Iris: "${shortText}"</title>
-                <meta name="description" content=${shortText} />
+                <title>${title}: ${quotedShortText}</title>
+                <meta name="description" content=${quotedShortText} />
                 <meta property="og:type" content="article" />
-                <meta property="og:title" content=${name || 'User'} on Iris />
-                <meta property="og:description" content=${shortText} />
+                <meta property="og:title" content=${title} />
+                <meta property="og:description" content=${quotedShortText} />
             <//>
           ` : ''}
           ${this.state.msg.torrentId ? html`
