@@ -43,8 +43,11 @@ class SearchBox extends Component {
     this.adjustResultsPosition();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     this.adjustResultsPosition();
+    if (prevProps.focus !== this.props.focus) {
+      $(this.base).find('input:visible').focus();
+    }
   }
 
   adjustResultsPosition() {
@@ -104,7 +107,7 @@ class SearchBox extends Component {
 
   render() {
     return html`
-      <div class="search-box">
+      <div class="search-box ${this.props.class}">
         <form onSubmit=${e => this.onSubmit(e)}>
           <label>
             <input type="text" placeholder=${t('search')} onInput=${() => this.onInput()}/>

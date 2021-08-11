@@ -98,7 +98,9 @@ class Header extends Component {
     const chat = Session.channels[this.chatId];
     const isTyping = chat && chat.isTyping;
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
-    const searchBox = this.chatId ? '' : html`<${SearchBox}/>`;
+    const searchBox = this.chatId ? '' : html`
+        <${SearchBox} focus=${!!this.state.showMobileSearch}/>
+    `;
 
     return html`
     <header class="nav header">
@@ -108,13 +110,18 @@ class Header extends Component {
       </div>
       ` : ''}
       <div class="header-content">
-        ${Helpers.isElectron || (activeRoute && activeRoute.indexOf('/chat/') === 0) ? '' : html`
-          <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
-            ${Icons.menu}
-            <img src=${logo} class="hidden-xs" width=40 height=40/>
-            <img src=${logoType} class="hidden-xs" height=23 width=41 />
-          </a>
-        `}
+        <div class=${this.state.showMobileSearch ? 'hidden-xs':''}>
+          ${Helpers.isElectron || (activeRoute && activeRoute.indexOf('/chat/') === 0) ? '' : html`
+            <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
+              <div class="mobile-menu-icon">${Icons.menu}</div>
+              <img src=${logo} style="margin-right: 7px" width=30 height=30/>
+              <img src=${logoType} height=23 width=41 />
+            </a>
+          `}
+        </div>
+        <div class=${this.state.showMobileSearch ? '' : 'hidden-xs'}>
+          <span class="visible-xs-inline-block" onClick=${() => this.setState({showMobileSearch:false})}>${Icons.close}</span>
+        </div>
         <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
           ${this.state.title && activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
             <div class="name">
@@ -124,7 +131,14 @@ class Header extends Component {
           ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
           ${this.state.about ? html`<small class="participants">${this.state.about}</small>` : ''}
           ${this.chatId ? html`<small class="last-seen">${onlineStatus || ''}</small>` : ''}
-          ${searchBox}
+          <div class=${this.state.showMobileSearch ? '' : 'hidden-xs'}>
+            ${searchBox}
+          </div>
+          <div class="mobile-search-btn ${this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'}" onClick=${() => {
+              this.setState({showMobileSearch: true});
+          }}>
+            ${Icons.search}
+          </div>
         </div>
 
         ${chat && this.chatId !== key && !chat.uuid ? html`
