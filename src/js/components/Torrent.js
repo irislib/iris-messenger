@@ -250,7 +250,9 @@ class Torrent extends Component {
             ${(this.props.standalone || this.props.preview) ? html`
               <a href=${this.props.torrentId}>Magnet link</a>
               ${t && t.files ? html`
-                  <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr('show_files')}</a>
+                  <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr(
+                    s.showFiles ? 'hide_files' : 'show_files'
+                  )}</a>
               `:''}
             ` : html`
                 <a href="/torrent/${encodeURIComponent(this.props.torrentId)}">${tr('show_files')}</a>

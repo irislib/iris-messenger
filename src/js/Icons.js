@@ -110,5 +110,6 @@ export default {
         </g>
     </g>
   </svg>
-  `
+  `,
+  menu: html`<svg fill="currentColor" x="0px" y="0px" viewBox="0 0 384 384" width="24px" height="24px" enable-background="new 0 0 384 384;"><g><rect x="0" y="277.333" width="384" height="42.667"/><rect x="0" y="170.667" width="384" height="42.667"/><rect x="0" y="64" width="384" height="42.667"/></g></svg>`,
 };
