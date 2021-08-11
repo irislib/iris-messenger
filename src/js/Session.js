@@ -226,8 +226,25 @@ async function createChatLink() {
 }
 
 function clearIndexedDB() {
-  window.indexedDB.deleteDatabase('State.local');
-  window.indexedDB.deleteDatabase('radata');
+  return new Promise(resolve => {
+    const r1 = window.indexedDB.deleteDatabase('State.local');
+    const r2 = window.indexedDB.deleteDatabase('radata');
+    let r1done;
+    let r2done;
+    const check = () => {
+      r1done && r2done && resolve();
+    }
+    r1.onerror = r2.onerror = e => console.error(e);
+    //r1.onblocked = r2.onblocked = e => console.error('blocked', e);
+    r1.onsuccess = () => {
+      r1done = true;
+      check();
+    }
+    r2.onsuccess = () => {
+      r2done = true;
+      check();
+    }
+  });
 }
 
 function getMyChatLink() {
@@ -252,7 +269,7 @@ async function logOut() {
       }
     }
   }
-  await clearIndexedDB();
+  clearIndexedDB();
   localStorage.clear();
   route('/');
   location.reload();
@@ -277,6 +294,8 @@ function init(options = {}) {
     login(JSON.parse(localStorageKey));
   } else if (options.autologin) {
     loginAsNewUser(name);
+  } else {
+    clearIndexedDB();
   }
 }
 

@@ -261,9 +261,7 @@ class Chat extends View {
     ${this.props.id && this.props.id.length > 20 ? html`
       <div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
         <div id="message-list">
-          <div id="topsentinel"></div>
           ${msgListContent}
-          <div id="bottomsentinel"></div>
         </div>
         <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
       </div>` : html`<${NewChat}/>`

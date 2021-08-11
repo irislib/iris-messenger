@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import Helpers from '../Helpers.js';
 import { html } from 'htm/preact';
 import { translate as t } from '../Translation.js';
+import Torrent from './Torrent';
 import State from '../State.js';
 import Session from '../Session.js';
 import iris from 'iris-lib';
@@ -30,12 +31,12 @@ class ChatMessageForm extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate() {
     if (!iris.util.isMobile && this.props.autofocus !== false) {
       $(this.base).find(".new-msg").focus();
     }
-    if (this.state.torrentId && this.state.torrentId !== prevState.torrentId) {
-      this.downloadWebtorrent(this.state.torrentId);
+    if ($('#attachment-preview:visible').length) {
+      $('#attachment-preview').append($('#webtorrent'));
     }
   }
 
@@ -69,30 +70,13 @@ class ChatMessageForm extends Component {
     this.picker.pickerVisible ? this.picker.hidePicker() : this.picker.showPicker(event.target);
   }
 
-  async downloadWebtorrent(torrentId) {
-    function onTorrent(torrent) {
-      // Torrents can contain many files. Let's use the .mp4 file
-      let file = torrent.files.find((file) => {
-        return file.name.endsWith('.mp4')
-      })
-      // Stream the file in the browser
-      file.appendTo('#webtorrent', {autoplay: true, muted: true})
-    }
-    const client = await Helpers.getWebTorrentClient();
-    const existing = client.get(torrentId);
-    if (existing) {
-      onTorrent(existing);
-    } else {
-      client.add(torrentId, onTorrent);
-    }
-  }
-
   onMsgTextPaste(event) {
     const pasted = (event.clipboardData || window.clipboardData).getData('text');
     const magnetRegex = /^magnet:\?xt=urn:btih:*/;
     if (pasted !== this.state.torrentId && pasted.indexOf('.torrent') > -1 || pasted.match(magnetRegex)) {
       event.preventDefault();
       this.setState({torrentId: pasted});
+      this.openAttachmentsPreview();
     }
   }
 
@@ -160,6 +144,7 @@ class ChatMessageForm extends Component {
       Session.channels[this.props.activeChat].attachments = null;
     }
     Helpers.scrollToMessageListBottom();
+    this.setState({torrentId:null});
   }
 
   async webPush(msg) {
@@ -206,7 +191,9 @@ class ChatMessageForm extends Component {
       <input name="attachment-input" type="file" class="hidden attachment-input" accept="image/*" multiple onChange=${() => this.openAttachmentsPreview()}/>
       <input onPaste=${e => this.onMsgTextPaste(e)} onInput=${e => this.onMsgTextInput(e)} class="new-msg" type="text" placeholder="${t('type_a_message')}" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off"/>
       ${submitButton}
-      <div id="webtorrent"></div>
+      <div id="webtorrent">
+          ${this.state.torrentId ? html`<${Torrent} preview=${true} torrentId=${this.state.torrentId}/>` : ''}
+      </div>
     </form>`;
   }
 
