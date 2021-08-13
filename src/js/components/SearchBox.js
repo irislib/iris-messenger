@@ -120,11 +120,11 @@ class SearchBox extends Component {
             if (i.followDistance === 1) {
               followText = 'Following';
             }
-            if (i.followDistance === 2) {
+            if (i.followDistance > 1) {
               if (i.followers.size === 1 && Session.getFollows()[[...i.followers][0]] && Session.getFollows()[[...i.followers][0]].name) {
                 followText = `Followed by ${  Session.getFollows()[[...i.followers][0]].name}`;
               } else {
-                followText = `Followed by ${  i.followers.size  } users you follow`;
+                followText = `${  i.followers.size  } followers`;
               }
             }
             return html`
