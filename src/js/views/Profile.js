@@ -196,7 +196,7 @@ class Profile extends View {
           <${MessageFeed} scrollElement=${this.scrollElement.current} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
         </div>
       `;
-    } 
+    }
       const messageForm = this.isMyProfile ? html`<${PublicMessageForm} class="hidden-xs" autofocus=${false}/>` : '';
       return html`
       <div>
@@ -207,7 +207,7 @@ class Profile extends View {
         </div>
       </div>
       `;
-    
+
   }
 
   renderView() {
@@ -248,16 +248,12 @@ class Profile extends View {
         this.setState({followedUserCount: this.followedUsers.size});
       }
     ));
-    State.local.get('groups').get('follows').map().once((following,key) => {
+    State.group().on(`follow/${pub}`, this.sub((following, a, b, e, user) => {
       if (following) {
-        State.public.user(key).get('follow').get(pub).once(following => {
-          if (following) {
-            this.followers.add(key);
-            this.setState({followerCount: this.followers.size});
-          }
-        });
+        this.followers.add(user);
+        this.setState({followerCount: this.followers.size});
       }
-    });
+    }));
     State.public.user(pub).get('profile').get('name').on(this.sub(
       name => {
         if (!$('#profile .profile-name:focus').length) {

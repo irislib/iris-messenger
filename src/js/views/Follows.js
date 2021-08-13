@@ -32,15 +32,13 @@ class Follows extends View {
 
   getFollowers() {
     const f = Session.getFollows();
-    State.local.get('groups').get('follows').map().once((follows, pub) => {
-      if (follows) {
-        State.public.user(pub).get('follow').get(this.props.id).on(follows => {
-          if (!follows) return;
-          this.follows[pub] = f[pub] || {};
+    State.group().on(`follow/${this.props.id}`, this.sub((following, a, b, e, user) => {
+      if (following) {
+          if (!following) return;
+          this.follows[user] = f[user] || {};
           this.setState({});
-        })
       }
-    });
+    }));
   }
 
   componentDidMount() {
