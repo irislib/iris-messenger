@@ -82,7 +82,12 @@ msg => {
     p.then(r => {
       const msg = r.signedData;
       msg.info = {from: r.signerKeyHash};
-      if (this.props.filter && !this.props.filter(msg)) { return; }
+      if (this.props.filter) {
+        this.measure();
+        if (!this.props.filter(msg)) {
+          return;
+        }
+      }
       this.setState({msg});
       if (this.props.showName && !this.props.name) {
         State.public.user(msg.info.from).get('profile').get('name').on(this.inject());
