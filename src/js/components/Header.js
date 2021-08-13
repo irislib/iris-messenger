@@ -137,7 +137,7 @@ class Header extends Component {
             e.preventDefault();
             this.setState({showMobileSearch: false})
           }}>
-            <span class="visible-xs-inline-block">${Icons.close}</span>
+            <span class="visible-xs-inline-block">${Icons.backArrow}</span>
           </a>
         `}
         <div class="text" style=${this.chatId ? 'cursor:pointer;text-align:center' : ''} onClick=${() => this.onTitleClicked()}>
