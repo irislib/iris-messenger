@@ -48,43 +48,43 @@ setTimeout(() => {
   updateUserSearchIndex();
 });
 
+function addFollow(callback, k, followDistance, follower) {
+  if (follows[k]) {
+    if (follows[k].followDistance > followDistance) {
+      follows[k].followDistance = followDistance;
+    }
+    follows[k].followers.add(follower);
+  } else {
+    follows[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
+    State.public.user(k).get('profile').get('name').on(name => {
+      follows[k].name = name;
+      callback && callback(k, follows[k]);
+    });
+  }
+  callback && callback(k, follows[k]);
+  updateUserSearchIndex();
+}
+
+function removeFollow(k, followDistance, follower) {
+  if (follows[k]) {
+    follows[k].followers.delete(follower);
+    if (followDistance === 1) {
+      State.local.get('groups').get('follows').get(k).put(false);
+    }
+  }
+}
+
 function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   k = k || key.pub;
 
-  function addFollow(k, followDistance, follower) {
-    if (follows[k]) {
-      if (follows[k].followDistance > followDistance) {
-        follows[k].followDistance = followDistance;
-      }
-      follows[k].followers.add(follower);
-    } else {
-      follows[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
-      State.public.user(k).get('profile').get('name').on(name => {
-        follows[k].name = name;
-        callback(k, follows[k]);
-      });
-    }
-    callback(k, follows[k]);
-    updateUserSearchIndex();
-  }
-
-  function removeFollow(k, followDistance, follower) {
-    if (follows[k]) {
-      follows[k].followers.delete(follower);
-      if (followDistance === 1) {
-        State.local.get('groups').get('follows').get(k).put(false);
-      }
-    }
-  }
-
-  addFollow(k, currentDepth - 1);
+  addFollow(callback, k, currentDepth - 1);
 
   let n = 0;
   State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
     if (follows[followedKey] === isFollowing) { return; }
     if (isFollowing) {
       n = n + 1;
-      addFollow(followedKey, currentDepth, k);
+      addFollow(callback, followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
         setTimeout(() => { // without timeout the recursion hogs CPU. or should we use requestAnimationFrame instead?
           getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
@@ -400,6 +400,8 @@ function addChannel(chat) {
       State.local.get('inviteLinksChanged').put(true);
     }});
   } else {
+    State.local.get('groups').get('everyone').get(pub).put(true);
+    addFollow(null, pub, -1);
     State.public.user(pub).get('profile').get('name').on(v => State.local.get('channels').get(pub).get('name').put(v))
   }
   if (chat.put) {
@@ -483,4 +485,4 @@ function followChatLink(str) {
   }
 }
 
-export default {init, followChatLink, getKey, getPubKey, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+export default {init, followChatLink, getKey, getPubKey, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };

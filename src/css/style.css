@@ -795,6 +795,10 @@ header.footer .header-content {
 }
 
 @media (min-width:626px) and (max-width:1268px) {
+  a.logo img:not(:last-child) {
+    margin-right: 0;
+  }
+
   .application-list a.logo img:last-child {
     display: none;
   }
