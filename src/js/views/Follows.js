@@ -67,13 +67,13 @@ class Follows extends View {
             return html`
             <div class="profile-link-container">
               <a href="/profile/${k}" class="profile-link">
-                <${Identicon} str=${k} width=49/>
+                <${Identicon} key=${k} str=${k} width=49/>
                 <div>
                   <${Name} pub=${k}/><br/>
                   <small class="follower-count">${this.follows[k].followers && this.follows[k].followers.size || '0'} followers</small>
                 </div>
               </a>
-              ${k !== Session.getPubKey() ? html`<${FollowButton} id=${k}/>` : ''}
+              ${k !== Session.getPubKey() ? html`<${FollowButton} key=${k} id=${k}/>` : ''}
             </div>`;
           })}
           ${keys.length === 0 ? '—' : ''}
