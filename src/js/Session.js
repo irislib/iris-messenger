@@ -110,7 +110,7 @@ function setOurOnlineStatus() {
     if (chat && !ourActivity) {
       chat.setMyMsgsLastSeenTime();
     }
-    iris.Channel.setActivity(State.public, ourActivity = 'active'); // TODO: also on keypress
+    iris.Channel.setActivity(State.public, ourActivity = 'active');
     clearTimeout(onlineTimeout);
     onlineTimeout = setTimeout(() => iris.Channel.setActivity(State.public, ourActivity = 'online'), 30000);
   }, 1000);
@@ -120,7 +120,7 @@ function setOurOnlineStatus() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
       iris.Channel.setActivity(State.public, ourActivity = 'active');
-      const chatId = activeRoute.replace('/profile/','').replace('/chat/','');
+      const chatId = location.pathname.slice(1).replace('chat/','');
       const chat = activeRoute && channels[chatId];
       if (chat) {
         chat.setMyMsgsLastSeenTime();

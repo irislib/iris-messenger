@@ -20,6 +20,13 @@ class Header extends Component {
     super();
     this.state = {latest: {}};
     this.chatId = null;
+    this.escFunction = this.escFunction.bind(this);
+  }
+
+  escFunction(event){
+    if(event.keyCode === 27) {
+      this.state.showMobileSearch && this.setState({showMobileSearch: false});
+    }
   }
 
   getOnlineStatusText() {
@@ -45,13 +52,18 @@ class Header extends Component {
     route('/chat');
   }
 
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    document.removeEventListener("keydown", this.escFunction, false);
+  }
+
   componentDidMount() {
+    document.addEventListener("keydown", this.escFunction, false);
     State.local.get('showParticipants').on(this.inject());
     State.local.get('unseenTotal').on(this.inject());
     State.local.get('activeRoute').on(this.sub(
       activeRoute => {
-        this.setState({about:null, title: ''});
-        this.setState({activeRoute});
+        this.setState({about:null, title: '', activeRoute, showMobileSearch: false});
         const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
         this.chatId = replaced.length < activeRoute.length ? replaced : null;
         if (this.chatId) {
@@ -121,9 +133,12 @@ class Header extends Component {
           `}
         </div>
         ${chatting ? '' : html`
-          <div class=${this.state.showMobileSearch ? '' : 'hidden-xs'}>
-            <span class="visible-xs-inline-block" onClick=${() => this.setState({showMobileSearch:false})}>${Icons.close}</span>
-          </div>
+          <a class=${this.state.showMobileSearch ? '' : 'hidden-xs'} href="" onClick=${e => {
+            e.preventDefault();
+            this.setState({showMobileSearch: false})
+          }}>
+            <span class="visible-xs-inline-block">${Icons.close}</span>
+          </a>
         `}
         <div class="text" style=${this.chatId ? 'cursor:pointer;text-align:center' : ''} onClick=${() => this.onTitleClicked()}>
           ${this.state.title && chatting ? html`
