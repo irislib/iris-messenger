@@ -275,6 +275,8 @@ class Profile extends View {
 
   componentDidMount() {
     const pub = this.props.id;
+    this.followedUsers = new Set();
+    this.followers = new Set();
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', blocked: false});
     this.isMyProfile = Session.getPubKey() === pub;
     const chat = Session.channels[pub];
