@@ -285,7 +285,7 @@ msg => {
             </div>
           `: ''}
           ${(this.props.showReplies || this.state.showReplyForm) && this.state.sortedReplies && this.state.sortedReplies.length ? this.state.sortedReplies.map(r =>
-            html`<${PublicMessage} measure=${this.props.measure} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
+            html`<${PublicMessage} measure=${this.props.measure} key=${r.hash} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
           ) : ''}
           ${this.state.showReplyForm ? html`
             <${PublicMessageForm} replyingTo=${this.props.hash} />
