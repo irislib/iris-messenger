@@ -78,7 +78,8 @@ msg => {
 
   async setOgImageUrl(msg) {
     if (this.props.standalone &&
-      navigator.userAgent.toLowerCase().indexOf('prerender') !== -1 &&
+      (navigator.userAgent.toLowerCase().indexOf('prerender') !== -1 ||
+      navigator.userAgent.toLowerCase().indexOf('bot') !== -1) &&
       msg.attachments && msg.attachments.length) {
       const src = msg.attachments[0].data;
       const image = new Image();
