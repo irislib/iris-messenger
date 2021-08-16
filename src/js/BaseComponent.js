@@ -32,6 +32,7 @@ export default class BaseComponent extends Component {
   }
 
   isUserAgentCrawler() {
+    // return true; // for testing
     const ua = navigator.userAgent.toLowerCase();
     return (ua.indexOf('prerender') !== -1 ||
       ua.indexOf('whatsapp') !== -1 ||

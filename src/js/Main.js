@@ -108,6 +108,7 @@ class Main extends Component {
             <meta property="og:description" content="Social Networking Freedom" />
             <meta property="og:url" content=${`https://iris.to${window.location.pathname.length > 1 ? window.location.pathname : ''}`} />
             <meta property="og:image" content="https://iris.to/assets/img/cover.jpg" />
+            <meta name="twitter:card" content="summary_large_image" />
           <//>
           <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
           <div class="view-area">
