@@ -76,6 +76,29 @@ msg => {
     });
   }
 
+  async setOgImageUrl(msg) {
+    if (this.props.standalone &&
+      navigator.userAgent.toLowerCase().indexOf('prerender') !== -1 &&
+      msg.attachments && msg.attachments.length) {
+      const src = msg.attachments[0].data;
+      const image = new Image();
+      image.onload = async () => {
+        const resizedCanvas = document.createElement('canvas');
+        const MAX_DIMENSION = 350;
+        const ratio = Math.max(Math.max(image.width, image.height) / MAX_DIMENSION, 1);
+        resizedCanvas.width = image.width / ratio;
+        resizedCanvas.height = image.height / ratio;
+        const { default: pica } = await import('../lib/pica.min.js');
+        await pica().resize(image, resizedCanvas);
+        const ogImage = resizedCanvas.toDataURL('image/jpeg', 0.1);
+        const ogImageUrl = `https://iris-base64-decoder.herokuapp.com/?s=${encodeURIComponent(ogImage)}`;
+        console.log(ogImageUrl);
+        this.setState({ogImageUrl});
+      };
+      image.src = src;
+    }
+  }
+
   componentDidMount() {
     const p = this.fetchByHash();
     if (!p) { return; }
@@ -88,6 +111,7 @@ msg => {
           return;
         }
       }
+      this.setOgImageUrl(msg);
       this.setState({msg});
       if (this.props.showName && !this.props.name) {
         State.public.user(msg.info.from).get('profile').get('name').on(this.inject());
@@ -238,6 +262,7 @@ msg => {
                 <title>${title}: ${quotedShortText}</title>
                 <meta name="description" content=${quotedShortText} />
                 <meta property="og:type" content="article" />
+                ${this.state.ogImageUrl ? html`<meta property="og:image" content=${this.state.ogImageUrl} />` : ''}
                 <meta property="og:title" content=${title} />
                 <meta property="og:description" content=${quotedShortText} />
             <//>
