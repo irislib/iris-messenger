@@ -317,7 +317,14 @@ class Profile extends View {
       blocked => {
         this.setState({blocked});
       }
-    ))
+    ));
+    if (this.isUserAgentCrawler() && !this.state.ogImageUrl && !this.state.photo) {
+      new iris.Attribute({type: 'keyID', value: this.props.id}).identiconSrc({width: 300, showType: false}).then(src => {
+        if (!this.state.ogImageUrl && !this.state.photo) {
+          this.setOgImageUrl(src);
+        }
+      });
+    }
   }
 }
 

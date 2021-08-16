@@ -43,7 +43,7 @@ export default class BaseComponent extends Component {
       image.onload = async () => {
         const resizedCanvas = document.createElement('canvas');
         const MAX_DIMENSION = 350;
-        const ratio = Math.max(Math.max(image.width, image.height) / MAX_DIMENSION, 1);
+        const ratio = Math.max(image.width, image.height) / MAX_DIMENSION;
         resizedCanvas.width = image.width / ratio;
         resizedCanvas.height = image.height / ratio;
         const { default: pica } = await import('./lib/pica.min.js');
