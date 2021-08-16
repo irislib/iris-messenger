@@ -30,4 +30,30 @@ export default class BaseComponent extends Component {
       delete this.eventListeners[k];
     });
   }
+
+  isUserAgentCrawler() {
+    return (navigator.userAgent.toLowerCase().indexOf('prerender') !== -1 ||
+      navigator.userAgent.toLowerCase().indexOf('whatsapp') !== -1 ||
+      navigator.userAgent.toLowerCase().indexOf('bot') !== -1);
+  }
+
+  async setOgImageUrl(imgSrc) {
+    if (imgSrc && this.isUserAgentCrawler()) {
+      const image = new Image();
+      image.onload = async () => {
+        const resizedCanvas = document.createElement('canvas');
+        const MAX_DIMENSION = 350;
+        const ratio = Math.max(Math.max(image.width, image.height) / MAX_DIMENSION, 1);
+        resizedCanvas.width = image.width / ratio;
+        resizedCanvas.height = image.height / ratio;
+        const { default: pica } = await import('./lib/pica.min.js');
+        await pica().resize(image, resizedCanvas);
+        const ogImage = resizedCanvas.toDataURL('image/jpeg', 0.1);
+        const ogImageUrl = `https://iris-base64-decoder.herokuapp.com/?s=${encodeURIComponent(ogImage)}`;
+        console.log(ogImageUrl);
+        this.setState({ogImageUrl});
+      };
+      image.src = imgSrc;
+    }
+  }
 }

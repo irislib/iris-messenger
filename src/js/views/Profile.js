@@ -220,6 +220,7 @@ class Profile extends View {
             <title>${title}</title>
             <meta name="description" content=${description} />
             <meta property="og:type" content="profile" />
+            ${this.state.ogImageUrl ? html`<meta property="og:image" content=${this.state.ogImageUrl} />` : ''}
             <meta property="og:title" content=${ogTitle} />
             <meta property="og:description" content=${description} />
         <//>
@@ -261,7 +262,10 @@ class Profile extends View {
         }
       }
     ));
-    State.public.user(pub).get('profile').get('photo').on(this.inject());
+    State.public.user(pub).get('profile').get('photo').on(this.sub(photo => {
+      this.setState({photo});
+      this.setOgImageUrl(photo);
+    }));
     State.public.user(pub).get('profile').get('about').on(this.sub(
       about => {
         if (!$('#profile .profile-about-content:focus').length) {

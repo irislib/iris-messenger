@@ -175,13 +175,23 @@ class Torrent extends Component {
     const video = torrent.files.find(f => isVideo(f));
     const audio = torrent.files.find(f => isAudio(f));
     const img = torrent.files.find(f => isImage(f));
-    let poster = torrent.files.find(f => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1));
-    poster = poster || img;
-    poster && poster.appendTo(this.coverRef.current);
 
     const file = this.getActiveFile(torrent) || video || audio || img || torrent.files[0];
     this.setState({torrent, cover: img});
     file && this.openFile(file, clicked);
+
+    let poster = torrent.files.find(f => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1));
+    poster = poster || img;
+    if (poster) {
+      poster.appendTo(this.coverRef.current);
+      if (this.props.standalone && this.isUserAgentCrawler()) {
+        const imgEl = this.coverRef.current.firstChild;
+        imgEl.onload = async () => {
+          const blob = await fetch(imgEl.src).then(r => r.blob());
+          Helpers.getBase64(blob).then(src => this.setOgImageUrl(src));
+        }
+      }
+    }
   }
 
   showFilesClicked(e) {
@@ -267,6 +277,7 @@ class Torrent extends Component {
         <meta property="og:type" content=${ogType} />
         <meta property="og:title" content=${ogTitle} />
         <meta property="og:description" content=${description} />
+        ${s.ogImageUrl ? html`<meta property="og:image" content=${s.ogImageUrl} />` : ''}
       <//>
     `;
   }
