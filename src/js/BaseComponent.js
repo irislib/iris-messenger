@@ -32,9 +32,11 @@ export default class BaseComponent extends Component {
   }
 
   isUserAgentCrawler() {
-    return (navigator.userAgent.toLowerCase().indexOf('prerender') !== -1 ||
-      navigator.userAgent.toLowerCase().indexOf('whatsapp') !== -1 ||
-      navigator.userAgent.toLowerCase().indexOf('bot') !== -1);
+    const ua = navigator.userAgent.toLowerCase();
+    return (ua.indexOf('prerender') !== -1 ||
+      ua.indexOf('whatsapp') !== -1 ||
+      ua.indexOf('crawl') !== -1 ||
+      ua.indexOf('bot') !== -1);
   }
 
   async setOgImageUrl(imgSrc) {
