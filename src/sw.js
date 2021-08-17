@@ -82,7 +82,7 @@ self.addEventListener('push', async ev => {
   }
   self.registration.showNotification(data.title || 'No title', {
     body: data.body || 'No text',
-    icon: './img/icon128.png'
+    icon: '/assets/img/icon128.png'
   });
 });
 

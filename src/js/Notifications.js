@@ -59,7 +59,7 @@ function notifyMsg(msg, info, pub) {
     }
     body = Helpers.truncateString(body, 50);
     let desktopNotification = new Notification(title, { // TODO: replace with actual name
-      icon: 'img/icon128.png',
+      icon: '/assets/img/icon128.png',
       body,
       silent: true
     });
@@ -161,9 +161,60 @@ async function getWebPushSubscriptions() {
   });
 }
 
+function getEpub(user) {
+  return new Promise(resolve => {
+    State.public.user(user).get('epub').on(async (epub,k,x,e) => {
+      if (epub) {
+        e.off();
+        resolve(epub);
+      }
+    });
+  });
+}
+
+function subscribeToIrisNotifications() {
+  let notificationsSeenTime;
+  State.public.user().get('notificationsSeenTime').on(v => notificationsSeenTime = v);
+  const setNotificationsSeenTime = _.debounce(() => {
+    State.public.user().get('notificationsSeenTime').put(new Date().toISOString());
+  }, 1000);
+  setTimeout(() => {
+    State.group().on(`notifications/${Session.getPubKey()}`, async (encryptedNotification, k, x, e, from) => {
+      const epub = await getEpub(from);
+      const secret = await Gun.SEA.secret(epub, Session.getKey());
+      const notification = await Gun.SEA.decrypt(encryptedNotification, secret);
+      if (!notification) { return; }
+      const name = await State.public.user(from).get('profile').get('name').once();
+      setNotificationsSeenTime();
+      console.log('decrypted notification', notification, 'from', name, from);
+      if (notificationsSeenTime < notification.time) {
+        console.log('was new!');
+        let desktopNotification = new Notification(`${name} liked your post`, { // TODO: replace with actual name
+          icon: '/assets/img/icon128.png',
+          body: `${name} liked your post`,
+          silent: true
+        });
+        desktopNotification.onclick = function() {
+          route(`/post/${notification.target}`);
+          window.focus();
+        };
+      }
+    });
+  }, 2000);
+}
+
+async function sendIrisNotification(recipient, notification) {
+  if (!(recipient && notification)) { return; } // TODO: use typescript or sth :D
+  if (typeof notification === 'object') { notification.time = new Date().toISOString() }
+  const epub = await getEpub(recipient);
+  const secret = await Gun.SEA.secret(epub, Session.getKey());
+  const enc = await Gun.SEA.encrypt(notification, secret);
+  State.public.user().get('notifications').get(recipient).put(enc);
+}
+
 function init() {
   loginTime = new Date();
   unseenTotal = 0;
 }
 
-export default {init, notifyMsg, enableDesktopNotifications, changeChatUnseenCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};
+export default {init, notifyMsg, subscribeToIrisNotifications, sendIrisNotification, enableDesktopNotifications, changeChatUnseenCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};

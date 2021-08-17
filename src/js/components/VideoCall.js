@@ -98,7 +98,7 @@ class VideoCall extends Component {
   notifyIfNotVisible(pub, text) {
      if (document.visibilityState !== 'visible') {
       incomingCallNotification = new Notification(Session.channels[pub].name, {
-        icon: 'img/icon128.png',
+        icon: '/assets/img/icon128.png',
         body: text,
         requireInteraction: true,
         silent: true

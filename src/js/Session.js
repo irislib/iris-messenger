@@ -158,6 +158,7 @@ function login(k) {
   iris.Channel.initUser(State.public, key);
   Notifications.subscribeToWebPush();
   Notifications.getWebPushSubscriptions();
+  Notifications.subscribeToIrisNotifications();
   iris.Channel.getMyChatLinks(State.public, key, undefined, chatLink => {
     State.local.get('chatLinks').get(chatLink.id).put(chatLink.url);
     latestChatLink = chatLink.url;

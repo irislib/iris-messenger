@@ -12,6 +12,7 @@ import Autolinker from 'autolinker';
 import iris from 'iris-lib';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
+import Notifications from '../Notifications';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
@@ -163,6 +164,12 @@ msg => {
 
   like(liked = true) {
     State.public.user().get('likes').get(this.props.hash).put(liked);
+    if (liked) {
+      const author = this.state.msg && this.state.msg.info && this.state.msg.info.from;
+      if (author !== Session.getPubKey()) {
+        Notifications.sendIrisNotification(author, {action:'like', target: this.props.hash});
+      }
+    }
   }
 
   onDelete(e) {
