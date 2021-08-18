@@ -54,7 +54,8 @@ class Chat extends View {
       sortedMessages: this.sortedMessages,
       sortedParticipants: [],
       showParticipants: true,
-      stickToBottom: true
+      stickToBottom: true,
+      noLongerParticipant: false
     });
     this.iv = null;
     this.chat = null;
