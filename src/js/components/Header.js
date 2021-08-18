@@ -9,6 +9,7 @@ import Identicon from './Identicon.js';
 import SearchBox from './SearchBox.js';
 import Icons from '../Icons.js';
 import iris from 'iris-lib';
+import {Link} from "preact-router/match";
 
 import logo from '../../assets/img/icon128.png';
 import logoType from '../../assets/img/iris_logotype.png';
@@ -176,12 +177,10 @@ class Header extends Component {
             ${Icons.group}
           </a>
         ` : ''}
-        <a href="/notifications">
-            ${Icons.circle}
-        </a>
-        <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === `/profile/${  key}` ? 'active' : ''} my-profile">
+        <${Link} activeClassName="active" href="/notifications">${Icons.heartEmpty}<//>
+        <${Link} activeClassName="active" href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs my-profile">
           <${Identicon} str=${key} width=34 />
-        </a>
+        <//>
       </div>
     </header>`;
   }
