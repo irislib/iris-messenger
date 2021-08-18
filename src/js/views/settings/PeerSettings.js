@@ -1,4 +1,5 @@
 import Component from "../../BaseComponent";
+import Name from "../../components/Name";
 import Session from "../../Session";
 import State from "../../State";
 import {html} from "htm/preact";
@@ -96,7 +97,10 @@ export default class PeerSettings extends Component {
                   `}
                   ${url}
                   ${peer.from ? html`
-                    <br/><small style="cursor:pointer" onClick=${() => route(`/profile/${  peer.from}`)}>${t('from')} ${Helpers.truncateString(peer.from, 10)}</small>
+                    <br/>
+                    <small style="cursor:pointer" onClick=${() => route(`/profile/${peer.from}`)}>
+                        ${t('from')} <${Name} pub=${peer.from} placeholder=${peer.from.slice(0,6)} />
+                    </small>
                   ` : ''}
                 </div>
                 <div class="flex-cell no-flex">
