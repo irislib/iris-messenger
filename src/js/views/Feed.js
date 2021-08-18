@@ -38,6 +38,9 @@ class Feed extends View {
 
   componentDidMount() {
     this.search();
+    if (this.props.hashtag) {
+      State.local.get('filters').get('group').put('everyone');
+    }
     State.local.get('filters').get('group').on(this.inject());
     State.local.get('noFollows').on(this.inject());
     State.local.get('noFollowers').on(this.inject());
