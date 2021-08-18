@@ -31,7 +31,7 @@ export default class Notifications extends View {
           const notification = this.notifications[k];
           return html`
             <p>
-                ${iris.util.formatDate(new Date(notification.time))}<br/>
+                <small>${iris.util.formatDate(new Date(notification.time))}</small><br/>
                 <a href="/profile/${notification.from}">
                   <${Identicon} str=${notification.from} width=30 />${' '}
                   <${Name} pub=${notification.from} /> 

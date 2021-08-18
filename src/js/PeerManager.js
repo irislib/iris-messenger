@@ -32,7 +32,7 @@ async function addPeer(peer) {
     let encryptedUrlHash = await Gun.SEA.work(encryptedUrl, null, null, {name: 'SHA-256'});
     State.public.user().get('peers').get(encryptedUrlHash).put({url: peer.url, lastSeen: new Date().toISOString()});
   }
-  if (peer.enabled !== false) {
+  if (peer.enabled !== false && !isMixedContent(peer.url)) {
     connectPeer(peer.url); // this calls savePeers()
   } else {
     savePeers();
@@ -94,14 +94,17 @@ function disablePeer(url, peerFromGun) {
   savePeers();
 }
 
+function isMixedContent(url) {
+  return window.location.protocol === 'https:' && (url.indexOf('http:') === 0);
+}
+
 function getRandomPeers() {
   const connectToLocalElectron = Helpers.isElectron && knownPeers[ELECTRON_GUN_URL] && knownPeers[ELECTRON_GUN_URL].enabled !== false;
   const sampleSize = connectToLocalElectron ? Math.max(maxConnectedPeers - 1, 1) : maxConnectedPeers;
   const sample = _.sampleSize(
     Object.keys(
-      _.pickBy(knownPeers, (p, url) => {
-        const mixedContent = (window.location.protocol === 'https:' && (url.indexOf('http:') === 0));
-        return !mixedContent && p.enabled && !(Helpers.isElectron && url === ELECTRON_GUN_URL);
+      _.pickBy(knownPeers, (peer, url) => {
+        return !isMixedContent(url) && peer.enabled && !(Helpers.isElectron && url === ELECTRON_GUN_URL);
       })
     ), sampleSize
   );
