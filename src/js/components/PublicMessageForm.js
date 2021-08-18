@@ -53,7 +53,11 @@ class PublicMessageForm extends Component {
     }
     const hashtags = msg.text && msg.text.match(/\B\#\w\w+\b/g);
     if (hashtags) {
-      hashtags.forEach(hashtag => State.public.user().get('hashtags').get(hashtag.replace('#', '')).get(msg.time).put(hash));
+      hashtags.forEach(match => {
+        const hashtag = match.replace('#', '');
+        State.public.user().get('hashtags').get(hashtag).put({a:null});
+        State.public.user().get('hashtags').get(hashtag).get(msg.time).put(hash)
+      });
     }
     msg.torrentId && State.public.user().get('media').get(msg.time).put(hash);
   }

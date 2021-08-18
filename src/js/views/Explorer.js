@@ -1,9 +1,9 @@
 import { html } from 'htm/preact';
 import State from '../State.js';
 import Session from '../Session.js';
-import { Component } from 'preact';
 import View from './View.js';
 import Gun from 'gun';
+import BaseComponent from "../BaseComponent";
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
@@ -29,17 +29,17 @@ class Explorer extends View {
   }
 
   componentDidMount() {
-    this.eventListeners = {};
     const groups = {};
-    State.local.get('groups').map().on((v,k,x,e) => {
-      this.eventListeners['groups'] = e;
-      if (v) {
-        groups[k] = true;
-      } else {
-        delete groups[k];
+    State.local.get('groups').map().on(this.sub(
+      (v,k) => {
+        if (v) {
+          groups[k] = true;
+        } else {
+          delete groups[k];
+        }
+        this.setState({groups});
       }
-      this.setState({groups});
-    })
+    ))
   }
 
   renderView() {
@@ -62,7 +62,7 @@ class Explorer extends View {
         <a href="/explorer">All</a> ${path ? pathString : ''}
       </p>
       ${path ? html`
-        <${ExplorerNode} indent=${0} showTools=${true} gun=${gun} path=${this.props.node}/>
+        <${ExplorerNode} indent=${0} showTools=${true} gun=${gun} key=${this.props.node} path=${this.props.node}/>
       ` : html`
         <div class="explorer-row">
           ${chevronDown} Public (synced with peers)
@@ -73,7 +73,7 @@ class Explorer extends View {
         <div class="explorer-row" style="padding-left: 2em">
           ${chevronDown} <a href="/explorer/public%2F~${encodeURIComponent(Session.getPubKey())}">${Session.getPubKey()}</a>
         </div>
-        <${ExplorerNode} indent=${3} gun=${State.public} path='public/~${Session.getPubKey()}'/>
+        <${ExplorerNode} indent=${3} gun=${State.public} key='public/~${Session.getPubKey()}' path='public/~${Session.getPubKey()}'/>
         <div class="explorer-row" style="padding-left: 1em">
           ${chevronRight} <a href="/explorer/public%2F%23">#</a> (content-addressed values, such as public posts)
         </div>
@@ -81,7 +81,7 @@ class Explorer extends View {
         <div class="explorer-row">
           ${chevronDown} Local (only stored on your device)
         </div>
-        <${ExplorerNode} indent=${1} gun=${State.local} path='local'/>
+        <${ExplorerNode} indent=${1} gun=${State.local} key="local" path='local'/>
         <br/><br/>
         <div class="explorer-row">
             ${chevronDown} Group (composite object of all the users in the group)
@@ -96,10 +96,9 @@ class Explorer extends View {
   }
 }
 
-class ExplorerNode extends Component {
+class ExplorerNode extends BaseComponent {
   constructor() {
     super();
-    this.eventListeners = {};
     this.children = {};
     this.state = {children: {}, shownChildrenCount: SHOW_CHILDREN_COUNT};
   }
@@ -112,18 +111,6 @@ class ExplorerNode extends Component {
     return this.props.gun;
   }
 
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
-    this.eventListeners = {};
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.path !== this.props.path) {
-      this.componentWillUnmount();
-      this.componentDidMount();
-    }
-  }
-
   componentDidMount() {
     this.isMine = this.props.path.indexOf(`public/~${  Session.getPubKey()}`) === 0;
     this.isGroup = this.props.path.indexOf('group') === 0;
@@ -131,34 +118,35 @@ class ExplorerNode extends Component {
     this.children = {};
     this.setState({children: {}, shownChildrenCount: SHOW_CHILDREN_COUNT});
 
-    const cb = async (v, k, c, e, from) => {
-      if (k === '_') { return; }
-      let encryption;
-      if (typeof v === 'string' && v.indexOf('SEA{') === 0) {
-        try {
-          const myKey = Session.getKey();
-          let dec = await Gun.SEA.decrypt(v, myKey);
-          if (dec === undefined) {
-            if (!this.mySecret) {
-              this.mySecret = await Gun.SEA.secret(myKey.epub, myKey);
-              dec = await Gun.SEA.decrypt(v, this.mySecret);
+    const cb = this.sub(
+      async (v, k, c, e, from) => {
+        if (k === '_') { return; }
+        let encryption;
+        if (typeof v === 'string' && v.indexOf('SEA{') === 0) {
+          try {
+            const myKey = Session.getKey();
+            let dec = await Gun.SEA.decrypt(v, myKey);
+            if (dec === undefined) {
+              if (!this.mySecret) {
+                this.mySecret = await Gun.SEA.secret(myKey.epub, myKey);
+                dec = await Gun.SEA.decrypt(v, this.mySecret);
+              }
             }
+            if (dec !== undefined) {
+              v = dec;
+              encryption = 'Decrypted';
+            } else {
+              encryption = 'Encrypted';
+            }
+          } catch(e) {
+            null;
           }
-          if (dec !== undefined) {
-            v = dec;
-            encryption = 'Decrypted';
-          } else {
-            encryption = 'Encrypted';
-          }
-        } catch(e) {
-          null;
         }
+        const prev = this.children[k] || {};
+        this.children[k] = Object.assign(prev, { value: v, encryption, from });
+        this.setState({children: this.children});
       }
-      this.eventListeners['n'] = e;
-      const prev = this.children[k] || {};
-      this.children[k] = Object.assign(prev, { value: v, encryption, from });
-      this.setState({children: this.children});
-    };
+    );
 
     if (this.isGroup) {
       const path = this.props.path.split('/').slice(2).join('/');
