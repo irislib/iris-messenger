@@ -41,6 +41,7 @@ class ChatList extends Component {
     ));
     State.public.user().get('hashtagSubscriptions').map().on(this.sub(
       (isSubscribed, hashtag) => {
+        console.log(hashtag, isSubscribed ? 'subscribed' : 'unsubscribed');
         if (isSubscribed) {
           hashtags[hashtag] = true;
         } else {

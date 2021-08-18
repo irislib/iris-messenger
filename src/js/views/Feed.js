@@ -10,6 +10,8 @@ import Filters from '../components/Filters.js';
 import Session from '../Session.js';
 import View from './View.js';
 import {translate as t} from '../Translation.js';
+import SubscribeHashtagButton from "../components/SubscribeHashtagButton";
+import Helmet from 'react-helmet';
 
 const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
@@ -89,11 +91,21 @@ class Feed extends View {
   renderView() {
     const s = this.state;
     let path = this.props.index || 'msgs';
-    if (this.props.hashtag) {
-      path = `hashtags/${this.props.hashtag}`;
+    const hashtag = this.props.hashtag;
+    const hashtagText = `#${hashtag}`;
+    if (hashtag) {
+      path = `hashtags/${hashtag}`;
     }
     return html`
       <div class="centered-container">
+        ${hashtag ? html`
+            <${Helmet}>
+                <title>${hashtagText}</title>
+                <meta property="og:title" content=${hashtagText} />
+            <//>
+            <h3>${hashtagText} <span style="float:right"><${SubscribeHashtagButton} id=${hashtag} /></span></h3>
+            
+        ` : ''}
         ${s.searchTerm ? '' : html`
           <${PublicMessageForm} index=${path} class="hidden-xs" autofocus=${false}/>
         `}
@@ -103,10 +115,10 @@ class Feed extends View {
         ${s.noFollows ? '' : html`<${Filters}/>`}
         <${MessageFeed}
                 scrollElement=${this.scrollElement.current}
-                hashtag=${this.props.hashtag}
+                hashtag=${hashtag}
                 filter=${s.searchTerm && (m => this.filter(m))}
                 thumbnails=${this.props.thumbnails}
-                key=${this.props.hashtag || this.props.index || 'feed'}
+                key=${hashtag || this.props.index || 'feed'}
                 group=${this.state.group}
                 path=${path} />
       </div>

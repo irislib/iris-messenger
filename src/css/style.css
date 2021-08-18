@@ -92,6 +92,9 @@ input, button, .button {
   border: 0;
   font-size: 15px;
   border-radius: 50px;
+}
+
+input:not(:last-child), button:not(:last-child), .button:not(:last-child) {
   margin-right: 7px;
 }
 
