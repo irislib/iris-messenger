@@ -13,11 +13,12 @@ import $ from 'jquery';
 class ChatList extends Component {
   constructor() {
     super();
-    this.state = {chats: []};
+    this.state = {chats: [], hashtags: {}};
   }
 
   componentDidMount() {
     const chats = {};
+    const hashtags = {};
     const limitedUpdate = _.debounce(() => {
       const sortedChats = Object.values(chats)
         .filter(chat => chat.id !== 'public')
@@ -37,6 +38,16 @@ class ChatList extends Component {
     ));
     State.local.get('scrollUp').on(this.sub(
       () => Helpers.animateScrollTop('.chat-list')
+    ));
+    State.public.user().get('hashtagSubscriptions').map().on(this.sub(
+      (isSubscribed, hashtag) => {
+        if (isSubscribed) {
+          hashtags[hashtag] = true;
+        } else {
+          delete hashtags[hashtag];
+        }
+        this.setState({hashtags});
+      }
     ));
 
     if (window.Notification && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
@@ -62,6 +73,15 @@ class ChatList extends Component {
           ${t('new_chat')}
         </div>
         <${ScrollViewport}>
+          ${Object.keys(this.state.hashtags).map(hashtag =>
+            html`<div class="chat-item" onClick=${() => route(`/hashtag/${hashtag}`)}>
+                <div class="text">
+                  <div>
+                    <span class="name">#${hashtag}</span>
+                  </div>
+                </div>
+              </div>`
+            )}
           ${this.state.chats.map(chat =>
             html`<${ChatListItem}
               photo=${chat.photo}

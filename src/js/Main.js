@@ -115,6 +115,7 @@ class Main extends Component {
             <${Router} onChange=${e => this.handleRoute(e)}>
               <${Feed} path="/"/>
               <${Feed} path="/feed"/>
+              <${Feed} path="/hashtag/:hashtag?"/>
               <${Feed} path="/search/:term?/:type?"/>
               <${Feed} path="/media" index="media" thumbnails=${true}/>
               <${Login} path="/login"/>

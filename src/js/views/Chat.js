@@ -42,14 +42,12 @@ function copyMyChatLinkClicked(e) {
 class Chat extends View {
   constructor() {
     super();
-    this.eventListeners = {};
     this.id = "chat-view";
     this.state = {sortedParticipants: []};
   }
 
   componentDidMount() {
     if (!(this.props.id && this.props.id.length > 20)) return;
-    this.unsubscribe();
     this.sortedMessages = [];
     this.participants = {};
     this.setState({
@@ -78,23 +76,22 @@ class Chat extends View {
     go();
 
     State.local.get('showParticipants').put(true);
-    State.local.get('showParticipants').on((showParticipants, k, b, e) => {
-      this.eventListeners['showParticipants'] = e;
-      this.setState({showParticipants})
-    });
-    State.local.get('channels').get(this.props.id).get('participants').map().on((v, k, b, e) => {
-      this.eventListeners['participants'] = e;
-      const hasAlready = !!this.participants[k];
-      this.participants[k] = v;
-      if (!!v && !hasAlready) {
-        State.public.user(k).get('activity').on((activity, a, b, e) => {
-          this.eventListeners[`${k  }activity`] = e;
-          if (this.participants[k]) { this.participants[k].activity = activity; }
-          this.setSortedParticipants();
-        });
+    State.local.get('showParticipants').on(this.inject());
+    State.local.get('channels').get(this.props.id).get('participants').map().on(this.sub(
+      (v, k) => {
+        const hasAlready = !!this.participants[k];
+        this.participants[k] = v;
+        if (!!v && !hasAlready) {
+          State.public.user(k).get('activity').on(this.sub(
+            (activity) => {
+              if (this.participants[k]) { this.participants[k].activity = activity; }
+              this.setSortedParticipants();
+            }
+          ), `${k}activity`);
+        }
+        this.setSortedParticipants();
       }
-      this.setSortedParticipants();
-    });
+    ));
     State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
     const node = State.local.get('channels').get(this.props.id).get('msgs');
     const limitedUpdate = _.throttle(() => this.setState({
@@ -166,14 +163,8 @@ class Chat extends View {
     }
   }
 
-  unsubscribe() {
-    clearInterval(this.iv);
-    Object.values(this.eventListeners).forEach(e => e.off());
-    this.eventListeners = {};
-  }
-
   componentWillUnmount() {
-    this.unsubscribe();
+    clearInterval(this.iv);
   }
 
   addFloatingDaySeparator() {

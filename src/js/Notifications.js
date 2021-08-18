@@ -189,9 +189,10 @@ function subscribeToIrisNotifications() {
       console.log('decrypted notification', notification, 'from', name, from);
       if (notificationsSeenTime < notification.time) {
         console.log('was new!');
-        let desktopNotification = new Notification(`${name} liked your post`, { // TODO: replace with actual name
+        const action = notification.action === 'like' ? 'liked' : 'replied to';
+        let desktopNotification = new Notification(`${name} ${action} your post`, {
           icon: '/assets/img/icon128.png',
-          body: `${name} liked your post`,
+          body: `${name} ${action} your post`,
           silent: true
         });
         desktopNotification.onclick = function() {

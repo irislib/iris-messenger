@@ -45,7 +45,11 @@ class PublicMessageForm extends Component {
       twice(() => State.public.user().get('replies').get(msg.replyingTo).put({a:null}));
       twice(() => State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
     } else {
-      State.public.user().get(this.props.index || 'msgs').get(msg.time).put(hash);
+      let node = State.public.user();
+      (this.props.index || 'msgs').split('/').forEach(s => {
+        node = node.get(s);
+      });
+      node.get(msg.time).put(hash);
     }
     msg.torrentId && State.public.user().get('media').get(msg.time).put(hash);
   }

@@ -47,6 +47,15 @@ class NewChat extends Component {
     $(e.target).val('');
   }
 
+  onSubscribeHashtag(e) {
+    e.preventDefault();
+    const v = $('#new-hashtag').val().trim().toLowerCase().replace('#', '');
+    if (v.length && v.match(/^\w+$/)) {
+      State.public.user().get('hashtagSubscriptions').get(v).put(true);
+      route(`/hashtag/${v}`);
+    }
+  }
+
   onCreateGroupSubmit(e) {
     e.preventDefault();
     if ($('#new-group-name').val().length) {
@@ -100,9 +109,16 @@ class NewChat extends Component {
         <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_invite_link_publicly', `href="/profile/${Session.getPubKey()}"`) }}></small></p>
         <h3>${t('new_group')}</h3>
         <p>
-          <form id="new-group-form" onSubmit=${e => this.onCreateGroupSubmit(e)}>
+          <form onSubmit=${e => this.onCreateGroupSubmit(e)}>
             <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
             <button type="submit">${t('create')}</button>
+          </form>
+        </p>
+        <h3>Subscribe to a hashtag (public)</h3>
+        <p>
+          <form onSubmit=${e => this.onSubscribeHashtag(e)}>
+            <input id="new-hashtag" type="text" placeholder="#hashtag"/>
+            <button type="submit">${t('subscribe')}</button>
           </form>
         </p>
         <hr/>

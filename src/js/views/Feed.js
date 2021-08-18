@@ -88,16 +88,27 @@ class Feed extends View {
 
   renderView() {
     const s = this.state;
+    let path = this.props.index || 'msgs';
+    if (this.props.hashtag) {
+      path = `hashtags/${this.props.hashtag}`;
+    }
     return html`
       <div class="centered-container">
         ${s.searchTerm ? '' : html`
-          <${PublicMessageForm} index=${this.props.index} class="hidden-xs" autofocus=${false}/>
+          <${PublicMessageForm} index=${path} class="hidden-xs" autofocus=${false}/>
         `}
         ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
           ${this.getNotification()}
         `}
         ${s.noFollows ? '' : html`<${Filters}/>`}
-        <${MessageFeed} scrollElement=${this.scrollElement.current} filter=${s.searchTerm && (m => this.filter(m))} thumbnails=${this.props.thumbnails} key=${this.props.index || 'feed'} group=${this.state.group} path=${this.props.index || 'msgs'} />
+        <${MessageFeed}
+                scrollElement=${this.scrollElement.current}
+                hashtag=${this.props.hashtag}
+                filter=${s.searchTerm && (m => this.filter(m))}
+                thumbnails=${this.props.thumbnails}
+                key=${this.props.hashtag || this.props.index || 'feed'}
+                group=${this.state.group}
+                path=${path} />
       </div>
     `;
   }
