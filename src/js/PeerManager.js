@@ -32,7 +32,7 @@ async function addPeer(peer) {
     let encryptedUrlHash = await Gun.SEA.work(encryptedUrl, null, null, {name: 'SHA-256'});
     State.public.user().get('peers').get(encryptedUrlHash).put({url: peer.url, lastSeen: new Date().toISOString()});
   }
-  if (peer.enabled !== false && !isMixedContent(peer.url)) {
+  if (peer.enabled !== false) {
     connectPeer(peer.url); // this calls savePeers()
   } else {
     savePeers();
@@ -77,6 +77,7 @@ function savePeers() {
 }
 
 function connectPeer(url) {
+  if (isMixedContent(url)) { return; }
   if (knownPeers[url]) {
     knownPeers[url].enabled = true;
     State.public.opt({peers: [url]});
