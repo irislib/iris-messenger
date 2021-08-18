@@ -177,7 +177,12 @@ class Header extends Component {
             ${Icons.group}
           </a>
         ` : ''}
-        <${Link} activeClassName="active" href="/notifications">${Icons.heartEmpty}<//>
+        <${Link} activeClassName="active"
+             href="/notifications"
+             style="margin: 0 30px;color:var(--text-color);"
+             class="${this.state.showMobileSearch ? 'hidden' : ''}">
+          ${Icons.heartEmpty}
+        <//>
         <${Link} activeClassName="active" href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs my-profile">
           <${Identicon} str=${key} width=34 />
         <//>
