@@ -8,6 +8,8 @@ class FollowButton extends Component {
   constructor() {
     super();
     this.key = 'follow';
+    this.actionDone = 'following';
+    this.action = 'follow';
     this.activeClass = 'following';
     this.hoverAction = 'unfollow';
   }
@@ -36,15 +38,9 @@ class FollowButton extends Component {
   }
 
   render() {
-    let nonhoverText;
-    if (this.state[this.key]) {
-      nonhoverText = this.actionDone || t(this.key);
-    } else {
-      nonhoverText = this.action || t(this.activeClass);
-    }
     return html`
       <button class="${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}" onClick=${e => this.onClick(e)}>
-        <span class="nonhover">${nonhoverText}</span>
+        <span class="nonhover">${t(this.state[this.key] ? this.actionDone : this.action)}</span>
         <span class="hover">${t(this.hoverAction)}</span>
       </button>
     `;

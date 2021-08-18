@@ -4,8 +4,8 @@ export default class SubscribeHashtagButton extends FollowButton {
   constructor() {
     super();
     this.cls = 'follow';
-    this.action = 'Subscribe';
-    this.actionDone = 'Subscribed';
+    this.action = 'subscribe';
+    this.actionDone = 'subscribed';
     this.key = 'hashtagSubscriptions';
     this.activeClass = 'following';
     this.hoverAction = 'unsubscribe';
