@@ -5,6 +5,7 @@ import {translate as t} from '../Translation.js';
 import Name from '../components/Name.js';
 import View from './View.js';
 import iris from 'iris-lib';
+import PublicMessage from "../components/PublicMessage";
 
 export default class Notifications extends View {
   notifications = {};
@@ -30,7 +31,7 @@ export default class Notifications extends View {
         ${Object.keys(this.notifications).sort().reverse().map(k => {
           const notification = this.notifications[k];
           return html`
-            <div class="msg">
+            <div class="msg" key=${notification.time + notification.target}>
               <div class="msg-content">
                 <div class="msg-sender">
                   <a class="msg-sender-link" href="/profile/${notification.from}">
@@ -39,6 +40,7 @@ export default class Notifications extends View {
                   </a>
                 </div>
                 <a href="/post/${encodeURIComponent(notification.target)}">${notification.action === 'like' ? 'liked' : 'replied to'} your post</a>
+                <${PublicMessage} hash=${notification.target}/>
                 <div class="below-text">
                   <div class="time">${iris.util.formatDate(new Date(notification.time))}</div><br/>
                 </div>
