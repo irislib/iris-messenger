@@ -15,7 +15,7 @@ class Footer extends Component {
   }
 
   componentDidMount() {
-    State.local.get('unseenTotal').on(this.inject());
+    State.local.get('unseenMsgsTotal').on(this.inject());
     State.local.get('activeRoute').on(this.sub(
       activeRoute => {
         this.setState({activeRoute});
@@ -39,7 +39,7 @@ class Footer extends Component {
       <div class="header-content" onClick=${() => State.local.get('scrollUp').put(true)}>
         <a href="/" class="btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${Icons.home}</a>
         <a href="/chat" class="btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
-          ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
+          ${this.state.unseenMsgsTotal ? html`<span class="unseen unseen-total">${this.state.unseenMsgsTotal}</span>`: ''}
           ${Icons.chat}
         </a>
         <a href="/post/new" class="btn ${activeRoute && activeRoute === '/post/new' ? 'active' : ''}">${plusIcon}</a>

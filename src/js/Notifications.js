@@ -9,7 +9,8 @@ import $ from 'jquery';
 
 const notificationSound = new Audio('../../assets/audio/notification.mp3');
 let loginTime;
-let unseenTotal;
+let unseenMsgsTotal;
+let unseenNotificationCount;
 const webPushSubscriptions = {};
 
 function desktopNotificationsEnabled() {
@@ -64,26 +65,27 @@ function notifyMsg(msg, info, pub) {
       silent: true
     });
     desktopNotification.onclick = function() {
+      changeUnseenNotificationCount(-1);
       route(`/chat/${  pub}`);
       window.focus();
     };
   }
 }
 
-function changeChatUnseenCount(chatId, change) {
+function changeChatUnseenMsgsCount(chatId, change) {
   const chat = Session.channels[chatId];
   if (!chat) return;
   const chatNode = State.local.get('channels').get(chatId);
   if (change) {
-    unseenTotal += change;
+    unseenMsgsTotal += change;
     chat.unseen += change;
   } else {
-    unseenTotal = unseenTotal - (chat.unseen || 0);
+    unseenMsgsTotal = unseenMsgsTotal - (chat.unseen || 0);
     chat.unseen = 0;
   }
   chatNode.get('unseen').put(chat.unseen);
-  unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
-  State.local.get('unseenTotal').put(unseenTotal);
+  unseenMsgsTotal = unseenMsgsTotal >= 0 ? unseenMsgsTotal : 0;
+  State.local.get('unseenMsgsTotal').put(unseenMsgsTotal);
 }
 
 const publicVapidKey = 'BMqSvZArOIdn7vGkYplSpkZ70-Qt8nhYbey26WVa3LF3SwzblSzm3n3HHycpNkAKVq7MCkrzFuTFs_en7Y_J2MI';
@@ -174,22 +176,31 @@ function getEpub(user) {
 
 function subscribeToIrisNotifications() {
   let notificationsSeenTime;
+  let notificationsShownTime;
   State.public.user().get('notificationsSeenTime').on(v => notificationsSeenTime = v);
-  const setNotificationsSeenTime = _.debounce(() => {
-    State.public.user().get('notificationsSeenTime').put(new Date().toISOString());
+  State.public.user().get('notificationsShownTime').on(v => notificationsShownTime = v);
+  const setNotificationsShownTime = _.debounce(() => {
+    State.public.user().get('notificationsShownTime').put(new Date().toISOString());
   }, 1000);
+  const alreadyHave = new Set();
   setTimeout(() => {
     State.group().on(`notifications/${Session.getPubKey()}`, async (encryptedNotification, k, x, e, from) => {
+      const id = from.slice(0,30) + encryptedNotification.slice(0,30);
+      if (alreadyHave.has(id)) { return; }
+      alreadyHave.add(id);
       const epub = await getEpub(from);
       const secret = await Gun.SEA.secret(epub, Session.getKey());
       const notification = await Gun.SEA.decrypt(encryptedNotification, secret);
       if (!notification) { return; }
       const name = await State.public.user(from).get('profile').get('name').once();
-      setNotificationsSeenTime();
+      setNotificationsShownTime();
       console.log('decrypted notification', notification, 'from', name, from);
       notification.from = from;
       State.local.get('notifications').get(notification.time).put(notification);
-      if (notificationsSeenTime < notification.time) {
+      if (!notificationsSeenTime || notificationsSeenTime < notification.time) {
+        changeUnseenNotificationCount(1);
+      }
+      if (!notificationsShownTime || notificationsShownTime < notification.time) {
         console.log('was new!');
         const action = notification.action === 'like' ? 'liked' : 'replied to';
         let desktopNotification = new Notification(`${name} ${action} your post`, {
@@ -199,11 +210,23 @@ function subscribeToIrisNotifications() {
         });
         desktopNotification.onclick = function() {
           route(`/post/${notification.target}`);
+          changeUnseenNotificationCount(-1);
           window.focus();
         };
       }
     });
   }, 2000);
+}
+
+function changeUnseenNotificationCount(change) {
+  if (!change) {
+    unseenNotificationCount = 0;
+    State.local.get('notificationsSeenTime').put(new Date().toISOString());
+  } else {
+    unseenNotificationCount += change;
+    unseenNotificationCount = Math.max(unseenNotificationCount, 0);
+  }
+  State.local.get('unseenNotificationCount').put(unseenNotificationCount);
 }
 
 async function sendIrisNotification(recipient, notification) {
@@ -217,7 +240,8 @@ async function sendIrisNotification(recipient, notification) {
 
 function init() {
   loginTime = new Date();
-  unseenTotal = 0;
+  unseenMsgsTotal = 0;
+  changeUnseenNotificationCount(0);
 }
 
-export default {init, notifyMsg, subscribeToIrisNotifications, sendIrisNotification, enableDesktopNotifications, changeChatUnseenCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};
+export default {init, notifyMsg, changeUnseenNotificationCount, subscribeToIrisNotifications, sendIrisNotification, enableDesktopNotifications, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};

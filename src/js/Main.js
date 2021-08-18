@@ -54,7 +54,7 @@ class Main extends Component {
     State.local.get('toggleMenu').put(false);
     State.local.get('toggleMenu').on(show => this.toggleMenu(show));
     State.electron && State.electron.get('platform').on(this.inject());
-    State.local.get('unseenTotal').on(this.inject());
+    State.local.get('unseenMsgsTotal').on(this.inject());
   }
 
   handleRoute(e) {
@@ -86,8 +86,8 @@ class Main extends Component {
     }
     let content = '';
     const isDesktopNonMac = s.platform && s.platform !== 'darwin';
-    const titleTemplate = s.unseenTotal ? `(${s.unseenTotal}) %s | Iris` : "%s | Iris";
-    const defaultTitle = s.unseenTotal ? `(${s.unseenTotal}) Iris` : 'Iris';
+    const titleTemplate = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) %s | Iris` : "%s | Iris";
+    const defaultTitle = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) Iris` : 'Iris';
     if (s.loggedIn || window.location.pathname.length <= 2) {
       content = s.loggedIn ? html`
         ${isDesktopNonMac ? html`

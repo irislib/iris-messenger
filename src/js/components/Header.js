@@ -61,7 +61,8 @@ class Header extends Component {
   componentDidMount() {
     document.addEventListener("keydown", this.escFunction, false);
     State.local.get('showParticipants').on(this.inject());
-    State.local.get('unseenTotal').on(this.inject());
+    State.local.get('unseenMsgsTotal').on(this.inject());
+    State.local.get('unseenNotificationCount').on(this.inject());
     State.local.get('activeRoute').on(this.sub(
       activeRoute => {
         this.setState({about:null, title: '', activeRoute, showMobileSearch: false});
@@ -180,8 +181,11 @@ class Header extends Component {
         <${Link} activeClassName="active"
              href="/notifications"
              style="margin-left: 22px;"
-             class="${this.state.showMobileSearch ? 'hidden' : ''}">
+             class="notifications-button ${this.state.showMobileSearch ? 'hidden' : ''}">
           ${Icons.heartEmpty}
+          ${this.state.unseenNotificationCount ? html`
+            <span class="unseen">${this.state.unseenNotificationCount}</span>
+          ` : ''}
         <//>
         <${Link} activeClassName="active" href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs my-profile">
           <${Identicon} str=${key} width=34 />

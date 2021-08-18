@@ -21,7 +21,7 @@ const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
 
 export default class Menu extends Component {
   componentDidMount() {
-    State.local.get('unseenTotal').on(this.inject());
+    State.local.get('unseenMsgsTotal').on(this.inject());
   }
 
   menuLinkClicked() {
@@ -44,7 +44,7 @@ export default class Menu extends Component {
             return html`
               <${a.native ? 'a' : Link} onClick=${() => this.menuLinkClicked()} activeClassName="active" href=${a.url}>
                 <span class="icon">
-                  ${a.text === t('messages') && this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
+                  ${a.text === t('messages') && this.state.unseenMsgsTotal ? html`<span class="unseen unseen-total">${this.state.unseenMsgsTotal}</span>`: ''}
                   ${a.icon || Icons.circle}
                 </span>
                 <span class="text">${a.text}</span>

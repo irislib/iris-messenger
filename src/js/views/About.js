@@ -2,6 +2,10 @@ import {translate as t} from '../Translation.js';
 import Helpers from '../Helpers.js';
 import { html } from 'htm/preact';
 import View from './View.js';
+import Identicon from '../components/Identicon';
+import FollowButton from '../components/FollowButton';
+
+const DEVELOPER = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
 class About extends View {
   constructor() {
@@ -50,6 +54,15 @@ class About extends View {
         <p>You can check your saved data in the <a href="/explorer">Explorer</a>.</p>
         <p>${t('application_security_warning')}</p>
 
+        <h4>Developer:</h4>
+        <div class="profile-link-container">
+          <a href="/profile/${DEVELOPER}" class="profile-link">
+            <${Identicon} str=${DEVELOPER} width=40 />
+            <iris-text path="profile/name" user=${DEVELOPER} placeholder="Iris developer's account"/>
+          </a>
+          <${FollowButton} id=${DEVELOPER} />
+        </div>
+          
         <h4>${t('donate')}</h4>
         <p dangerouslySetInnerHTML=${{ __html:`${t('donate_info', "href=\"https://opencollective.com/iris-social\"")  }: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST` }}></p>
         <p>Dogecoin: DEsgP4H1Sjp4461PugHDNnoGd6S8pTvrm1</p>

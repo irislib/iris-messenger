@@ -6,19 +6,23 @@ import Name from '../components/Name.js';
 import View from './View.js';
 import iris from 'iris-lib';
 import PublicMessage from "../components/PublicMessage";
+import NotificationTools from "../Notifications";
 
 export default class Notifications extends View {
   notifications = {};
 
   componentDidMount() {
-    State.local.get('notifications').map().on((notification, time) => {
-      if (notification) {
-        this.notifications[time] = notification;
-      } else {
-        delete this.notifications[time];
+    NotificationTools.changeUnseenNotificationCount(0);
+    State.local.get('notifications').map().on(this.sub(
+      (notification, time) => {
+        if (notification) {
+          this.notifications[time] = notification;
+        } else {
+          delete this.notifications[time];
+        }
+        this.setState({});
       }
-      this.setState({});
-    });
+    ));
   }
 
   renderView() {

@@ -885,14 +885,14 @@ header.footer .header-content {
   background: var(--chat-active);
 }
 
-.application-list .icon {
+.application-list .icon, .notifications-button {
   padding: 7px;
   min-width: 55px;
   text-align: center;
   position: relative;
 }
 
-.application-list .icon .unseen {
+.application-list .icon .unseen, .notifications-button .unseen {
   position: absolute;
   right: 5px;
   bottom: 5px;
@@ -1472,7 +1472,7 @@ hr {
   border-radius: 1.1em;
   padding: .3em .4em;
   min-width: .8em;
-  background-color: #4dd606;
+  background-color: var(--heart-color);
   color: white;
   text-align: center;
   font-size: 12px;
