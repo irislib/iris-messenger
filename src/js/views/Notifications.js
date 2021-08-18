@@ -24,7 +24,7 @@ export default class Notifications extends View {
     return html`
       <div class="centered-container">
         <h3>${t('notifications')}</h3>
-        ${Object.keys(this.notifications).length === 0 ? html`'
+        ${Object.keys(this.notifications).length === 0 ? html`
             <p>No notifications yet</p>
         `:''}
         ${Object.keys(this.notifications).sort().reverse().map(k => {
