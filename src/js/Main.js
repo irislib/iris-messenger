@@ -12,6 +12,7 @@ import Settings from './views/settings/Settings.js';
 import LogoutConfirmation from './views/LogoutConfirmation.js';
 import Chat from './views/Chat.js';
 import Notifications from './views/Notifications.js';
+import Hashtags from './views/Hashtags.js';
 import Store from './views/Store.js';
 import Checkout from './views/Checkout.js';
 import Product from './views/Product.js';
@@ -116,7 +117,8 @@ class Main extends Component {
             <${Router} onChange=${e => this.handleRoute(e)}>
               <${Feed} path="/"/>
               <${Feed} path="/feed"/>
-              <${Feed} path="/hashtag/:hashtag?"/>
+              <${Hashtags} path="/hashtag"/>
+              <${Feed} path="/hashtag/:hashtag+"/>
               <${Feed} path="/search/:term?/:type?"/>
               <${Feed} path="/media" index="media" thumbnails=${true}/>
               <${Login} path="/login"/>
