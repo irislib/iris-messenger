@@ -22,7 +22,7 @@ export default class Notifications extends View {
 
   renderView() {
     return html`
-      <div class="centered-container">
+      <div class="centered-container public-messages-view">
         <h3>${t('notifications')}</h3>
         ${Object.keys(this.notifications).length === 0 ? html`
             <p>No notifications yet</p>
@@ -30,15 +30,20 @@ export default class Notifications extends View {
         ${Object.keys(this.notifications).sort().reverse().map(k => {
           const notification = this.notifications[k];
           return html`
-            <p>
-                <small>${iris.util.formatDate(new Date(notification.time))}</small><br/>
-                <a href="/profile/${notification.from}">
-                  <${Identicon} str=${notification.from} width=30 />${' '}
-                  <${Name} pub=${notification.from} /> 
-                </a>
-                ${notification.action === 'like' ? ' liked ' : ' replied to '}
-                <a href="/post/${encodeURIComponent(notification.target)}">your post</a>
-            </p>
+            <div class="msg">
+              <div class="msg-content">
+                <div class="msg-sender">
+                  <a class="msg-sender-link" href="/profile/${notification.from}">
+                    <${Identicon} str=${notification.from} width=30 />${' '}
+                    <small class="msgSenderName"><${Name} pub=${notification.from} /></small> 
+                  </a>
+                </div>
+                <a href="/post/${encodeURIComponent(notification.target)}">${notification.action === 'like' ? 'liked' : 'replied to'} your post</a>
+                <div class="below-text">
+                  <div class="time">${iris.util.formatDate(new Date(notification.time))}</div><br/>
+                </div>
+              </div>
+            </div>
           `;
         })}
       </div>
