@@ -11,6 +11,7 @@ import Session from './Session.js';
 import Settings from './views/settings/Settings.js';
 import LogoutConfirmation from './views/LogoutConfirmation.js';
 import Chat from './views/Chat.js';
+import Notifications from './views/Notifications.js';
 import Store from './views/Store.js';
 import Checkout from './views/Checkout.js';
 import Product from './views/Product.js';
@@ -119,6 +120,7 @@ class Main extends Component {
               <${Feed} path="/search/:term?/:type?"/>
               <${Feed} path="/media" index="media" thumbnails=${true}/>
               <${Login} path="/login"/>
+              <${Notifications} path="/notifications"/>
               <${Chat} path="/chat/:id?"/>
               <${Message} path="/post/:hash+"/>
               <${Torrent} path="/torrent/:id+"/>

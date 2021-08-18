@@ -187,6 +187,8 @@ function subscribeToIrisNotifications() {
       const name = await State.public.user(from).get('profile').get('name').once();
       setNotificationsSeenTime();
       console.log('decrypted notification', notification, 'from', name, from);
+      notification.from = from;
+      State.local.get('notifications').get(notification.time).put(notification);
       if (notificationsSeenTime < notification.time) {
         console.log('was new!');
         const action = notification.action === 'like' ? 'liked' : 'replied to';

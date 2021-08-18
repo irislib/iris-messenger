@@ -176,6 +176,9 @@ class Header extends Component {
             ${Icons.group}
           </a>
         ` : ''}
+        <a href="/notifications">
+            ${Icons.circle}
+        </a>
         <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === `/profile/${  key}` ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>
