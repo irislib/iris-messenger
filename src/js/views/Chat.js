@@ -87,7 +87,7 @@ class Chat extends View {
               if (this.participants[k]) { this.participants[k].activity = activity; }
               this.setSortedParticipants();
             }
-          ), `${k}activity`);
+          ));
         }
         this.setSortedParticipants();
       }

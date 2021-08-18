@@ -101,7 +101,7 @@ class Feed extends View {
         ${hashtag ? html`
             <${Helmet}>
                 <title>${hashtagText}</title>
-                <meta property="og:title" content=${hashtagText} />
+                <meta property="og:title" content="${hashtagText} | Iris" />
             <//>
             <h3>${hashtagText} <span style="float:right"><${SubscribeHashtagButton} id=${hashtag} /></span></h3>
             

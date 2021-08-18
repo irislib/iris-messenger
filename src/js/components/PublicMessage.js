@@ -174,7 +174,7 @@ msg => {
 
   onDelete(e) {
     e.preventDefault();
-    if (confirm('Delete message?')) {
+    if (confirm('Delete message?')) { // TODO: remove from hashtag indexes
       const msg = this.state.msg;
       msg.torrentId && State.public.user().get('media').get(msg.time).put(null);
       State.public.user().get(this.props.index || 'msgs').get(msg.time).put(null);
