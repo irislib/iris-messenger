@@ -41,7 +41,6 @@ class ChatList extends Component {
     ));
     State.public.user().get('hashtagSubscriptions').map().on(this.sub(
       (isSubscribed, hashtag) => {
-        console.log(hashtag, isSubscribed ? 'subscribed' : 'unsubscribed');
         if (isSubscribed) {
           hashtags[hashtag] = true;
         } else {
@@ -78,7 +77,7 @@ class ChatList extends Component {
             html`<div class="chat-item" onClick=${() => route(`/hashtag/${hashtag}`)}>
                 <div class="text">
                   <div>
-                    <span class="name">#${hashtag}</span>
+                    <b class="name">#${hashtag}</b>
                   </div>
                 </div>
               </div>`

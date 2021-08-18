@@ -25,6 +25,7 @@
         "rules": {
           "react/no-did-mount-set-state": "off",
           "react/no-did-update-set-state": "off",
+	  "no-useless-escape": "off",
           "radix": "off"
         }
       }

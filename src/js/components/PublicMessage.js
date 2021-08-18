@@ -217,7 +217,11 @@ msg => {
     }
     const title = `${name || 'User'} on Iris`;
     p.innerText = text;
-    const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
+    let h = p.innerHTML;
+    if (!emojiOnly) {
+      h = Helpers.highlightEmoji(h);
+      h = Helpers.highlightHashtags(h);
+    }
     const innerHTML = autolinker.link(h);
     const time = typeof this.state.msg.time === 'object' ? this.state.msg.time : new Date(this.state.msg.time);
     const dateStr = time.toLocaleString(window.navigator.language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });

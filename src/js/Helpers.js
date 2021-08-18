@@ -1852,6 +1852,10 @@ export default {
     return s.match(emojiRegex);
   },
 
+  highlightHashtags(s) {
+    return s.replace(/\B\#\w\w+\b/g, match => `<a href="/hashtag/${match.replace('#', '')}">${match}</a>`);
+  },
+
   highlightEmoji(s) {
     return s.replace(emojiRegex, '<span class="emoji">$&</span>');
   },
