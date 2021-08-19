@@ -180,7 +180,6 @@ class Header extends Component {
         ` : ''}
         <${Link} activeClassName="active"
              href="/notifications"
-             style="margin-left: 22px;"
              class="notifications-button ${this.state.showMobileSearch ? 'hidden' : ''}">
           ${Icons.heartEmpty}
           ${this.state.unseenNotificationCount ? html`
