@@ -1,6 +1,6 @@
-import { Component } from 'preact';
+import { PureComponent } from 'preact/compat';
 
-export default class BaseComponent extends Component {
+export default class BaseComponent extends PureComponent {
   eventListeners = {};
 
   sub(callback, path) {
