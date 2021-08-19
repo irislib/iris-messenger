@@ -174,6 +174,17 @@ function getEpub(user) {
   });
 }
 
+async function getNotificationText(notification) {
+  const name = await State.public.user(notification.from).get('profile').get('name').once();
+  const event = notification.event || notification.action;
+  let eventText;
+  if (event === 'like') eventText = `${name} liked your post`;
+  else if (event === 'reply') eventText = `${name} replied to your post`;
+  else if (event === 'mention') eventText = `${name} mentioned you in their post`;
+  else eventText = `${name} sent you a notification: ${event}`;
+  return eventText;
+}
+
 function subscribeToIrisNotifications() {
   let notificationsSeenTime;
   let notificationsShownTime;
@@ -192,9 +203,7 @@ function subscribeToIrisNotifications() {
       const secret = await Gun.SEA.secret(epub, Session.getKey());
       const notification = await Gun.SEA.decrypt(encryptedNotification, secret);
       if (!notification) { return; }
-      const name = await State.public.user(from).get('profile').get('name').once();
       setNotificationsShownTime();
-      console.log('decrypted notification', notification, 'from', name, from);
       notification.from = from;
       State.local.get('notifications').get(notification.time).put(notification);
       if (!notificationsSeenTime || notificationsSeenTime < notification.time) {
@@ -202,10 +211,10 @@ function subscribeToIrisNotifications() {
       }
       if (!notificationsShownTime || notificationsShownTime < notification.time) {
         console.log('was new!');
-        const action = notification.action === 'like' ? 'liked' : 'replied to';
-        let desktopNotification = new Notification(`${name} ${action} your post`, {
+        const text = await getNotificationText(notification);
+        let desktopNotification = new Notification(text, {
           icon: '/assets/img/icon128.png',
-          body: `${name} ${action} your post`,
+          body: text,
           silent: true
         });
         desktopNotification.onclick = function() {
@@ -244,4 +253,4 @@ function init() {
   changeUnseenNotificationCount(0);
 }
 
-export default {init, notifyMsg, changeUnseenNotificationCount, subscribeToIrisNotifications, sendIrisNotification, enableDesktopNotifications, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};
+export default {init, notifyMsg, getNotificationText, changeUnseenNotificationCount, subscribeToIrisNotifications, sendIrisNotification, enableDesktopNotifications, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};

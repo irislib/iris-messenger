@@ -1,5 +1,6 @@
 import { Component, createRef } from 'preact';
 import Helpers from '../Helpers.js';
+import Notifications from '../Notifications';
 import { html } from 'htm/preact';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
@@ -74,6 +75,9 @@ class PublicMessageForm extends Component {
     const msg = {text};
     if (this.props.replyingTo) {
       msg.replyingTo = this.props.replyingTo;
+    }
+    if (this.props.replyingToUser) {
+      Notifications.sendIrisNotification(this.props.replyingToUser, {event:'reply', target: this.props.replyingTo});
     }
     if (this.state.attachments) {
       msg.attachments = this.state.attachments;

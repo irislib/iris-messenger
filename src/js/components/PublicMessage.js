@@ -164,7 +164,7 @@ msg => {
     if (liked) {
       const author = this.state.msg && this.state.msg.info && this.state.msg.info.from;
       if (author !== Session.getPubKey()) {
-        Notifications.sendIrisNotification(author, {action:'like', target: this.props.hash});
+        Notifications.sendIrisNotification(author, {event:'like', target: this.props.hash});
       }
     }
   }
@@ -223,17 +223,17 @@ msg => {
     const time = typeof this.state.msg.time === 'object' ? this.state.msg.time : new Date(this.state.msg.time);
     const dateStr = time.toLocaleString(window.navigator.language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const timeStr = time.toLocaleTimeString(window.navigator.language, {timeStyle: 'short'});
-
+    const s = this.state;
 
     return html`
       <div class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''}">
         <div class="msg-content">
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${() => this.onClickName()}>
-              ${this.state.msg.info.from ? html`<${Identicon} str=${this.state.msg.info.from} width=40/>` : ''}
+              ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width=40/>` : ''}
               ${name && this.props.showName && html`<small class="msgSenderName">${name}</small>`}
             </div>
-            ${this.state.msg.info.from === Session.getPubKey() ? html`
+            ${s.msg.info.from === Session.getPubKey() ? html`
               <div class="msg-menu-btn">
                 <div class="dropdown">
                   <div class="dropbtn">\u2026</div>
@@ -249,36 +249,36 @@ msg => {
                 <title>${title}: ${quotedShortText}</title>
                 <meta name="description" content=${quotedShortText} />
                 <meta property="og:type" content="article" />
-                ${this.state.ogImageUrl ? html`<meta property="og:image" content=${this.state.ogImageUrl} />` : ''}
+                ${s.ogImageUrl ? html`<meta property="og:image" content=${s.ogImageUrl} />` : ''}
                 <meta property="og:title" content=${title} />
                 <meta property="og:description" content=${quotedShortText} />
             <//>
           ` : ''}
-          ${this.state.msg.torrentId ? html`
-              <${Torrent} measure=${this.props.measure} torrentId=${this.state.msg.torrentId} autopause=${!this.props.standalone}/>
+          ${s.msg.torrentId ? html`
+              <${Torrent} measure=${this.props.measure} torrentId=${s.msg.torrentId} autopause=${!this.props.standalone}/>
           `:''}
-          ${this.state.msg.attachments && this.state.msg.attachments.map(a =>
+          ${s.msg.attachments && s.msg.attachments.map(a =>
             html`<div class="img-container">
                 <div class="heart"></div>
                 <${SafeImg} src=${a.data} onLoad=${() => this.measure()} onClick=${e => { this.imageClicked(e); }}/>
             </div>`
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
-          ${this.state.msg.replyingTo && !this.props.asReply ? html`
-            <div><a href="/post/${encodeURIComponent(this.state.msg.replyingTo)}">Show replied message</a></div>
+          ${s.msg.replyingTo && !this.props.asReply ? html`
+            <div><a href="/post/${encodeURIComponent(s.msg.replyingTo)}">Show replied message</a></div>
           ` : ''}
           <div class="below-text">
             <a class="msg-btn reply-btn" onClick=${() => this.toggleReplies()}>
               ${replyIcon}
             </a>
             <span class="count" onClick=${() => this.toggleReplies()}>
-              ${this.state.replyCount || ''}
+              ${s.replyCount || ''}
             </span>
-            <a class="msg-btn like-btn ${this.state.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
-              ${this.state.liked ? Icons.heartFull : Icons.heartEmpty}
+            <a class="msg-btn like-btn ${s.liked ? 'liked' : ''}" onClick=${e => this.likeBtnClicked(e)}>
+              ${s.liked ? Icons.heartFull : Icons.heartEmpty}
             </a>
-            <span class="count" onClick=${() => this.setState({showLikes: !this.state.showLikes})}>
-              ${this.state.likes || ''}
+            <span class="count" onClick=${() => this.setState({showLikes: !s.showLikes})}>
+              ${s.likes || ''}
             </span>
             <div class="time">
               <a href="/post/${encodeURIComponent(this.props.hash)}" class="tooltip">
@@ -289,18 +289,18 @@ msg => {
               </a>
             </div>
           </div>
-          ${this.state.showLikes ? html`
+          ${s.showLikes ? html`
             <div class="likes">
               ${Array.from(this.likedBy).map(key => {
                 return html`<${Identicon} showTooltip=${true} onClick=${() => route(`/profile/${  key}`)} str=${key} width=32/>`;
               })}
             </div>
           `: ''}
-          ${(this.props.showReplies || this.state.showReplyForm) && this.state.sortedReplies && this.state.sortedReplies.length ? this.state.sortedReplies.map(r =>
+          ${(this.props.showReplies || s.showReplyForm) && s.sortedReplies && s.sortedReplies.length ? s.sortedReplies.map(r =>
             html`<${PublicMessage} measure=${this.props.measure} key=${r.hash} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
           ) : ''}
-          ${this.state.showReplyForm ? html`
-            <${PublicMessageForm} replyingTo=${this.props.hash} />
+          ${s.showReplyForm ? html`
+            <${PublicMessageForm} replyingTo=${this.props.hash} replyingToUser=${s.msg.info.from} />
           ` : ''}
         </div>
       </div>

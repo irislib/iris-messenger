@@ -17,6 +17,10 @@ export default class Notifications extends View {
       (notification, time) => {
         if (notification) {
           this.notifications[time] = notification;
+          NotificationTools.getNotificationText(notification).then(text => {
+            this.notifications[time].text = text;
+            this.setState({});
+          });
         } else {
           delete this.notifications[time];
         }
@@ -43,7 +47,7 @@ export default class Notifications extends View {
                     <small class="msgSenderName"><${Name} pub=${notification.from} /></small> 
                   </a>
                 </div>
-                <a href="/post/${encodeURIComponent(notification.target)}">${notification.action === 'like' ? 'liked' : 'replied to'} your post</a>
+                <a href="/post/${encodeURIComponent(notification.target)}">${notification.text || ''}</a>
                 <${PublicMessage} hash=${notification.target}/>
                 <div class="below-text">
                   <div class="time">${iris.util.formatDate(new Date(notification.time))}</div><br/>
