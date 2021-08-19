@@ -146,10 +146,6 @@ msg => {
     this.setState({showReplyForm});
   }
 
-  shouldComponentUpdate() {
-    return true;
-  }
-
   onClickName() {
     route(`/profile/${  this.state.msg.info.from}`);
   }
