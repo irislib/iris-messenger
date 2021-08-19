@@ -16,7 +16,7 @@ const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
   {url: '/contacts', text: t('contacts'), icon: Icons.user},
   {url: '/settings', text: t('settings'), icon: Icons.settings},
   {url: '/explorer', text: t('explorer'), icon: Icons.folder},
-  {url: '/about', text: t('about')},
+  {url: '/about', text: t('about'), icon: Icons.info},
 ];
 
 export default class Menu extends Component {
