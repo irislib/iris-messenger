@@ -148,7 +148,13 @@ class Message extends Component {
 
     const p = document.createElement('p');
     p.innerText = this.props.text;
-    const h = emojiOnly ? p.innerHTML : Helpers.highlightEmoji(p.innerHTML);
+    let h = p.innerHTML;
+    if (!emojiOnly) {
+      h = Helpers.highlightEmoji(h);
+      h = Helpers.highlightHashtags(h);
+      h = Helpers.highlightMentions(h);
+    }
+
     const innerHTML = autolinker.link(h);
     const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
 

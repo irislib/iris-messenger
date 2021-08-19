@@ -188,7 +188,10 @@ async function getNotificationText(notification) {
 function subscribeToIrisNotifications() {
   let notificationsSeenTime;
   let notificationsShownTime;
-  State.public.user().get('notificationsSeenTime').on(v => notificationsSeenTime = v);
+  State.public.user().get('notificationsSeenTime').on(v => {
+    notificationsSeenTime = v;
+    console.log(v);
+  });
   State.public.user().get('notificationsShownTime').on(v => notificationsShownTime = v);
   const setNotificationsShownTime = _.debounce(() => {
     State.public.user().get('notificationsShownTime').put(new Date().toISOString());
@@ -230,7 +233,7 @@ function subscribeToIrisNotifications() {
 function changeUnseenNotificationCount(change) {
   if (!change) {
     unseenNotificationCount = 0;
-    State.local.get('notificationsSeenTime').put(new Date().toISOString());
+    State.public.user().get('notificationsSeenTime').put(new Date().toISOString());
   } else {
     unseenNotificationCount += change;
     unseenNotificationCount = Math.max(unseenNotificationCount, 0);
