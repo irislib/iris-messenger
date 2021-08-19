@@ -218,6 +218,7 @@ msg => {
     if (!emojiOnly) {
       h = Helpers.highlightEmoji(h);
       h = Helpers.highlightHashtags(h);
+      h = Helpers.highlightMentions(h);
     }
     const innerHTML = autolinker.link(h);
     const time = typeof this.state.msg.time === 'object' ? this.state.msg.time : new Date(this.state.msg.time);

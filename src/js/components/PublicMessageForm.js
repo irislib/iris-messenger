@@ -61,6 +61,7 @@ class PublicMessageForm extends Component {
       });
     }
     msg.torrentId && State.public.user().get('media').get(msg.time).put(hash);
+    return hash;
   }
 
   async onMsgFormSubmit(event) {
@@ -85,7 +86,14 @@ class PublicMessageForm extends Component {
     if (this.state.torrentId) {
       msg.torrentId = this.state.torrentId;
     }
-    this.send(msg);
+    this.send(msg).then(hash => {
+      const mentions = text.match(Helpers.pubKeyRegex);
+      if (mentions) {
+        mentions.forEach(match => {
+          Notifications.sendIrisNotification(match.slice(1), {event:'mention', target: hash});
+        });
+      }
+    });
     this.setState({attachments:null, torrentId:null});
     textEl.val('');
     textEl.height("");
