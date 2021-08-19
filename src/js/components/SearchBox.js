@@ -41,6 +41,7 @@ class SearchBox extends Component {
       }
     ));
     this.adjustResultsPosition();
+    this.search();
   }
 
   componentDidUpdate(prevProps) {
@@ -48,11 +49,16 @@ class SearchBox extends Component {
     if (prevProps.focus !== this.props.focus) {
       $(this.base).find('input:visible').focus();
     }
+    if (prevProps.query !== this.props.query) {
+      this.search();
+    }
   }
 
   adjustResultsPosition() {
     const input = $(this.base).find('input');
-    this.offsetLeft = input[0].offsetLeft;
+    if (input.length) {
+      this.offsetLeft = input[0].offsetLeft;
+    }
   }
 
   onSubmit(e) {
@@ -65,7 +71,7 @@ class SearchBox extends Component {
   }
 
   search() {
-    const query = $(this.base).find('input').val();
+    const query = this.props.query || $(this.base).find('input').val();
     if (!query) { return; }
 
     if (this.props.onSelect) {
@@ -108,11 +114,13 @@ class SearchBox extends Component {
   render() {
     return html`
       <div class="search-box ${this.props.class}">
-        <form onSubmit=${e => this.onSubmit(e)}>
-          <label>
-            <input type="text" placeholder=${t('search')} onInput=${() => this.onInput()}/>
-          </label>
-        </form>
+        ${this.props.resultsOnly ? '' : html`
+          <form onSubmit=${e => this.onSubmit(e)}>
+            <label>
+              <input type="text" placeholder=${t('search')} onInput=${() => this.onInput()}/>
+            </label>
+          </form>
+        `}
         <div class="search-box-results" style="left: ${this.offsetLeft || ''}">
           ${this.state.results.map(r => {
             const i = r.item;
