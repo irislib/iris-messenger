@@ -80,9 +80,6 @@ class PublicMessageForm extends Component {
     if (this.props.replyingTo) {
       msg.replyingTo = this.props.replyingTo;
     }
-    if (this.props.replyingToUser && this.props.replyingToUser !== Session.getPubKey()) {
-      Notifications.sendIrisNotification(this.props.replyingToUser, {event:'reply', target: this.props.replyingTo});
-    }
     if (this.state.attachments) {
       msg.attachments = this.state.attachments;
     }
@@ -90,6 +87,9 @@ class PublicMessageForm extends Component {
       msg.torrentId = this.state.torrentId;
     }
     this.send(msg).then(hash => {
+      if (this.props.replyingToUser && this.props.replyingToUser !== Session.getPubKey()) {
+        Notifications.sendIrisNotification(this.props.replyingToUser, {event:'reply', target: hash});
+      }
       const mentions = text.match(Helpers.pubKeyRegex);
       if (mentions) {
         mentions.forEach(match => {
