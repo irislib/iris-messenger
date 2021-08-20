@@ -31,7 +31,7 @@ class MessageFeed extends Component {
       this.setState({
         sortedMessages: Array.from(this.mappedMessages.keys()).sort().reverse().map(k => this.mappedMessages.get(k))
       })
-    }, 200);
+    }, 1);
 
     this.updateSortedMessages();
   }
