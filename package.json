@@ -55,7 +55,7 @@
     "preact-scroll-viewport": "^0.2.0",
     "react-helmet": "^6.1.0",
     "react-virtualized": "^9.22.3",
-    "webtorrent": "^1.4.0"
+    "webtorrent": "^1.5.1"
   },
   "jest": {
     "preset": "jest-preset-preact",

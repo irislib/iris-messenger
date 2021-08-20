@@ -20,13 +20,17 @@ class Follows extends View {
       (follows, pub) => {
         if (follows) {
           this.follows[pub] = f[pub] || {};
-          this.setState({follows:this.follows});
+          this.setState({});
         } else {
           delete this.follows[pub];
         }
-        this.setState({follows:this.follows});
+        this.setState({});
       }
     ));
+  }
+
+  shouldComponentUpdate() {
+    return true;
   }
 
   getFollowers() {
@@ -38,7 +42,7 @@ class Follows extends View {
           if (!following) return;
           console.log(f);
           this.follows[user] = f[user] || {};
-          this.setState({follows:this.follows});
+          this.setState({});
       }
     }));
   }

@@ -18,15 +18,20 @@ export default class Notifications extends View {
         if (notification) {
           this.notifications[time] = notification;
           NotificationTools.getNotificationText(notification).then(text => {
+            console.log('heii', text);
             this.notifications[time].text = text;
-            this.setState({notifications:this.notifications});
+            this.setState({});
           });
         } else {
           delete this.notifications[time];
         }
-        this.setState({notifications:this.notifications});
+        this.setState({d:new Date().toISOString()});
       }
     ));
+  }
+
+  shouldComponentUpdate() {
+    return true;
   }
 
   renderView() {
@@ -39,7 +44,7 @@ export default class Notifications extends View {
         ${Object.keys(this.notifications).sort().reverse().map(k => {
           const notification = this.notifications[k];
           return html`
-            <div class="msg" key=${notification.time + notification.target}>
+            <div class="msg" key=${(notification.time||'') + (notification.from||'') + (notification.target||'')}>
               <div class="msg-content">
                 <div class="msg-sender">
                   <a class="msg-sender-link" href="/profile/${notification.from}">
@@ -47,8 +52,8 @@ export default class Notifications extends View {
                     <small class="msgSenderName"><${Name} pub=${notification.from} /></small> 
                   </a>
                 </div>
-                <a href="/post/${encodeURIComponent(notification.target)}">${notification.text || ''}</a>
-                <${PublicMessage} hash=${notification.target}/>
+                ${notification.text || ''}
+                ${notification.target ? html`<${PublicMessage} hash=${notification.target}/>` :''}
                 <div class="below-text">
                   <div class="time">${iris.util.formatDate(new Date(notification.time))}</div><br/>
                 </div>

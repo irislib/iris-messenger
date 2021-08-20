@@ -53,7 +53,7 @@ export default class PeerSettings extends Component {
 
   resetPeersClicked() {
     PeerManager.resetPeers();
-    this.setState({peers:Object.keys(PeerManager.getKnownPeers())});
+    this.setState({});
   }
 
   removePeerClicked(url, peerFromGun) {
@@ -125,6 +125,10 @@ export default class PeerSettings extends Component {
         </p>
       </div>
     `;
+  }
+
+  shouldComponentUpdate() {
+    return true;
   }
 
   updatePeersFromGun() {

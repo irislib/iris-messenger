@@ -23,13 +23,17 @@ class Contacts extends View {
       this.eventListeners['follow'] = e;
       if (contacts) {
         this.contacts[pub] = f[pub] || {};
-        this.setState({contacts:this.contacts});
+        this.setState({});
       } else {
         delete this.contacts[pub];
         this.eventListeners[pub] && this.eventListeners[pub].off();
       }
-      this.setState({contacts:this.contacts});
+      this.setState({});
     });
+  }
+
+  shouldComponentUpdate() {
+    return true;
   }
 
   componentDidMount() {

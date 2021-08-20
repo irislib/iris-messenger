@@ -3,6 +3,7 @@ import { html } from 'htm/preact';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
 import State from '../State.js';
+import Notifications from '../Notifications';
 
 class FollowButton extends Component {
   constructor() {
@@ -20,6 +21,7 @@ class FollowButton extends Component {
     if (value && this.key === 'follow') {
       Session.newChannel(this.props.id);
       State.public.user().get('block').get(this.props.id).put(false);
+      Notifications.sendIrisNotification(this.props.id, {event:'follow'});
     }
     if (value && this.key === 'block') {
       State.public.user().get('follow').get(this.props.id).put(false);

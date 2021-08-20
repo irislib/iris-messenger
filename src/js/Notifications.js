@@ -181,6 +181,7 @@ async function getNotificationText(notification) {
   if (event === 'like') eventText = `${name} liked your post`;
   else if (event === 'reply') eventText = `${name} replied to your post`;
   else if (event === 'mention') eventText = `${name} mentioned you in their post`;
+  else if (event === 'follow') eventText = `${name} started following you`;
   else eventText = `${name} sent you a notification: ${event}`;
   return eventText;
 }
@@ -205,7 +206,7 @@ function subscribeToIrisNotifications() {
       const epub = await getEpub(from);
       const secret = await Gun.SEA.secret(epub, Session.getKey());
       const notification = await Gun.SEA.decrypt(encryptedNotification, secret);
-      if (!notification) { return; }
+      if (!notification || typeof notification !== 'object') { return; }
       setNotificationsShownTime();
       notification.from = from;
       State.local.get('notifications').get(notification.time).put(notification);
@@ -221,7 +222,8 @@ function subscribeToIrisNotifications() {
           silent: true
         });
         desktopNotification.onclick = function() {
-          route(`/post/${notification.target}`);
+          const link = notification.target ? `/post/${notification.target}` : `/profile/${notification.from}`;
+          route(link);
           changeUnseenNotificationCount(-1);
           window.focus();
         };
