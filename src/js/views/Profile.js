@@ -58,7 +58,7 @@ class Profile extends View {
   }
 
   getNotification() {
-    if (!this.state.hasFollowers && this.followers.has(Session.getPubKey())) {
+    if (this.state.noFollowers && this.followers.has(Session.getPubKey())) {
       return html`
         <div class="msg">
           <div class="msg-content">
@@ -296,7 +296,7 @@ class Profile extends View {
     }
     let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
-    State.local.get('hasFollowers').on(this.inject());
+    State.local.get('noFollowers').on(this.inject());
     this.getProfileDetails();
     if (chat) {
       $(`input[name=notificationPreference][value=${  chat.notificationSetting  }]`).attr('checked', 'checked');

@@ -27,11 +27,11 @@ class View extends Component {
   getNotification() {
     if (!this.followsSubscribed) {
       this.followsSubscribed = true;
-      State.local.get('hasFollowers').on(this.inject());
-      State.local.get('hasFollows').on(this.inject());
+      State.local.get('noFollowers').on(this.inject());
+      State.local.get('noFollows').on(this.inject());
     }
 
-    if (!this.state.hasFollows) {
+    if (this.state.noFollows) {
       return html`
         <div class="msg">
           <div class="msg-content">
@@ -48,7 +48,7 @@ class View extends Component {
         </div>
       `
     }
-    if (!this.state.hasFollowers) {
+    if (this.state.noFollowers) {
       return html`
         <div class="msg">
           <div class="msg-content">

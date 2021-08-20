@@ -67,7 +67,7 @@ class Feed extends View {
         ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
           ${this.getNotification()}
         `}
-        ${s.hasFollows ? html`<${Filters}/>` : ''}
+        ${!s.noFollows ? html`<${Filters}/>` : ''}
         <${MessageFeed}
                 scrollElement=${this.scrollElement.current}
                 hashtag=${hashtag}

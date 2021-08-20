@@ -14,8 +14,8 @@ let myProfilePhoto;
 let latestChatLink;
 let onlineTimeout;
 let ourActivity;
-let hasFollows;
-let hasFollowers;
+let noFollows;
+let noFollowers;
 let userSearchIndex;
 const follows = {};
 const channels = window.channels = {};
@@ -63,8 +63,8 @@ function addFollow(callback, k, followDistance, follower) {
   }
   callback && callback(k, follows[k]);
   updateUserSearchIndex();
-  updateHasFollows();
-  updateHasFollowers();
+  updateNoFollows();
+  updateNoFollowers();
 }
 
 function removeFollow(k, followDistance, follower) {
@@ -73,8 +73,8 @@ function removeFollow(k, followDistance, follower) {
     if (followDistance === 1) {
       State.local.get('groups').get('follows').get(k).put(false);
     }
-    updateHasFollows();
-    updateHasFollowers();
+    updateNoFollows();
+    updateNoFollowers();
   }
 }
 
@@ -102,21 +102,21 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   return follows;
 }
 
-function updateHasFollows() {
-  const v = Object.keys(follows).length > 1;
-  if (v !== hasFollows) {
-    hasFollows = v;
-    State.local.get('hasFollows').put(hasFollows);
+const updateNoFollows = _.debounce(() => {
+  const v = !(Object.keys(follows).length > 1);
+  if (v !== noFollows) {
+    noFollows = v;
+    State.local.get('noFollows').put(noFollows);
   }
-}
+}, 1000);
 
-function updateHasFollowers() {
-  const v = follows[key.pub] && (follows[key.pub].followers.size > 0);
-  if (v !== hasFollowers) {
-    hasFollowers = v;
-    State.local.get('hasFollowers').put(hasFollowers);
+const updateNoFollowers = _.debounce(() => {
+  const v = !(follows[key.pub] && (follows[key.pub].followers.size > 0));
+  if (v !== noFollowers) {
+    noFollowers = v;
+    State.local.get('noFollowers').put(noFollowers);
   }
-}
+}, 1000);
 
 function getUserSearchIndex() {
   return userSearchIndex;
@@ -165,7 +165,7 @@ function updateGroups() {
     }
     State.local.get('groups').get('everyone').get(k).put(true);
     if (k === getPubKey()) {
-      updateHasFollowers();
+      updateNoFollowers();
     }
   });
 }

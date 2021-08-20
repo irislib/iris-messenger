@@ -32,7 +32,7 @@ class SearchBox extends Component {
   componentDidMount() {
     State.local.get('groups').get('everyone').map().on(this.sub(
       () => {
-        this.hasFollows = this.hasFollows || Object.keys(Session.getFollows()).length > 1;
+        this.noFollows = this.noFollows || Object.keys(Session.getFollows()).length > 1;
       }
     ));
     State.local.get('activeRoute').on(this.sub(
@@ -147,7 +147,7 @@ class SearchBox extends Component {
               </a>
             `;
           })}
-          ${this.state.query && !this.hasFollows ? html`
+          ${this.state.query && !this.noFollows ? html`
             <a class="follow-someone">Follow someone to see more search results!</a>
             <a href="/profile/${suggestedFollow}" class="suggested">
               <${Identicon} str=${suggestedFollow} width=40/>
