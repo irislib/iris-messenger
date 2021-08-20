@@ -8,7 +8,6 @@ import StoreView from './Store.js';
 class Product extends StoreView {
   constructor() {
     super();
-    this.eventListeners = [];
     this.followedUsers = new Set();
     this.followers = new Set();
   }
@@ -19,7 +18,6 @@ class Product extends StoreView {
   }
 
   newProduct() {
-    console.log('new');
     return html`
       <div class="main-view" id="profile">
         <div class="content">
@@ -86,10 +84,6 @@ class Product extends StoreView {
     return (this.props.store && this.props.product ? this.showProduct() : this.newProduct());
   }
 
-  componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.product !== this.props.product) {
       this.componentDidMount();
@@ -109,7 +103,6 @@ class Product extends StoreView {
   componentDidMount() {
     StoreView.prototype.componentDidMount.call(this);
     const pub = this.props.store;
-    this.eventListeners.forEach(e => e.off());
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     this.isMyProfile = Session.getPubKey() === pub;
     if (this.props.product && pub) {

@@ -11,25 +11,24 @@ import ScrollViewport from 'preact-scroll-viewport';
 class Contacts extends View {
   constructor() {
     super();
-    this.eventListeners = {};
     this.contacts = {};
     this.id = "contacts-view";
   }
 
   getContacts() {
     const f = Session.getFollows();
-    State.local.get('groups').get('everyone').map().on((contacts, pub, b, e) => {
-      if (pub === Session.getPubKey()) { return; }
-      this.eventListeners['follow'] = e;
-      if (contacts) {
-        this.contacts[pub] = f[pub] || {};
+    State.local.get('groups').get('everyone').map().on(this.sub(
+      (isContact, pub) => {
+        if (pub === Session.getPubKey()) { return; }
+        if (isContact) {
+          this.contacts[pub] = f[pub] || {};
+          this.setState({});
+        } else {
+          delete this.contacts[pub];
+        }
         this.setState({});
-      } else {
-        delete this.contacts[pub];
-        this.eventListeners[pub] && this.eventListeners[pub].off();
       }
-      this.setState({});
-    });
+    ));
   }
 
   shouldComponentUpdate() {
@@ -38,10 +37,6 @@ class Contacts extends View {
 
   componentDidMount() {
     this.getContacts();
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
   }
 
   renderView() {

@@ -139,10 +139,6 @@ class Store extends View {
     `;
   }
 
-  componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
-  }
-
   updateTotalPrice() {
     const totalPrice = Object.keys(this.cart).reduce((sum, currentKey) => {
       const item = this.items[currentKey];

@@ -58,6 +58,11 @@ class Identicon extends Component {
     }
   }
 
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    clearTimeout(this.activityTimeout);
+  }
+
   render() {
     const width = this.props.width;
     const activity = ['online', 'active'].indexOf(this.state.activity) > -1 ? this.state.activity : '';

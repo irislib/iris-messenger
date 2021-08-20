@@ -208,10 +208,6 @@ class Checkout extends Store {
     </div>`;
   }
 
-  componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.store !== this.props.store) {
       this.componentDidMount();

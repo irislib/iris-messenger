@@ -2,13 +2,13 @@ import Helpers from '../Helpers.js';
 import { html } from 'htm/preact';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
-import Identicon from '../components/Identicon.js';
-import Message from '../components/Message.js';
-import ChatMessageForm from '../components/ChatMessageForm.js';
+import Identicon from './Identicon.js';
+import Message from './Message.js';
+import ChatMessageForm from './ChatMessageForm.js';
+import Name from './Name';
 import Session from '../Session.js';
 import Notifications from '../Notifications.js';
-import ChatList from '../components/ChatList.js';
-import NewChat from '../components/NewChat.js';
+import NewChat from './NewChat.js';
 import _ from 'lodash';
 import $ from 'jquery';
 import iris from 'iris-lib';
@@ -166,6 +166,7 @@ export default class ChatMain extends Component {
   }
 
   componentWillUnmount() {
+    super.componentWillUnmount();
     clearInterval(this.iv);
   }
 
@@ -280,7 +281,7 @@ export default class ChatMain extends Component {
               <a href="/profile/${k}">
                 <span class="text">
                   <${Identicon} key="i${k}" str=${k} width=30 activity=${true}/>
-                  <iris-text key="t${k}" user=${k} path="profile/name" placeholder=" "/>
+                  <${Name} pub=${k} key="t${k}" />
                 </span>
               </a>
             `

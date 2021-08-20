@@ -23,7 +23,6 @@ function deleteChat(pub) {
 class Group extends View {
   constructor() {
     super();
-    this.eventListeners = [];
     this.id = "profile";
   }
 
@@ -210,10 +209,6 @@ class Group extends View {
     `;
   }
 
-  componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
       this.setState({isAdmin:false,uuid:null, memberCandidate:null});
@@ -240,7 +235,6 @@ class Group extends View {
 
   componentDidMount() {
     const pub = this.props.id;
-    this.eventListeners.forEach(e => e.off());
     this.setState({name: '', photo: '', about: ''});
     const chat = Session.channels[pub];
     if (pub.length < 40) {

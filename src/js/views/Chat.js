@@ -1,7 +1,6 @@
 import { html } from 'htm/preact';
 import View from './View.js';
 import ChatList from '../components/ChatList.js';
-import {Helmet} from 'react-helmet';
 import ChatMain from '../components/ChatMain';
 
 class Chat extends View {

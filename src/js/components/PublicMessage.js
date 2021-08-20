@@ -74,10 +74,17 @@ msg => {
     });
   }
 
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    this.unmounted = true;
+  }
+
   componentDidMount() {
+    this.unmounted = false;
     const p = this.fetchByHash();
     if (!p) { return; }
     p.then(r => {
+      if (this.unmounted) { return; }
       const msg = r.signedData;
       msg.info = {from: r.signerKeyHash};
       if (this.props.filter) {
@@ -223,7 +230,7 @@ msg => {
     const s = this.state;
 
     return html`
-      <div class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''}">
+      <div ref=${this.ref} class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''}">
         <div class="msg-content">
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${() => this.onClickName()}>
