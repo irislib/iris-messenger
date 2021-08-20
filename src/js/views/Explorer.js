@@ -111,6 +111,10 @@ class ExplorerNode extends BaseComponent {
     return this.props.gun;
   }
 
+  shouldComponentUpdate() {
+    return true;
+  }
+
   componentDidMount() {
     this.isMine = this.props.path.indexOf(`public/~${  Session.getPubKey()}`) === 0;
     this.isGroup = this.props.path.indexOf('group') === 0;
