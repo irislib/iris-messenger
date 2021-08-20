@@ -19,12 +19,12 @@ export default class Notifications extends View {
           this.notifications[time] = notification;
           NotificationTools.getNotificationText(notification).then(text => {
             this.notifications[time].text = text;
-            this.setState({});
+            this.setState({notifications:this.notifications});
           });
         } else {
           delete this.notifications[time];
         }
-        this.setState({});
+        this.setState({notifications:this.notifications});
       }
     ));
   }

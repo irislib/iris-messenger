@@ -10,33 +10,35 @@ import Session from '../Session.js';
 class Follows extends View {
   constructor() {
     super();
-    this.eventListeners = {};
     this.follows = {};
     this.id = "follows-view";
   }
 
   getFollows() {
     const f = Session.getFollows();
-    State.public.user(this.props.id).get('follow').map().on((follows, pub, b, e) => {
-      this.eventListeners['follow'] = e;
-      if (follows) {
-        this.follows[pub] = f[pub] || {};
-        this.setState({});
-      } else {
-        delete this.follows[pub];
-        this.eventListeners[pub] && this.eventListeners[pub].off();
+    State.public.user(this.props.id).get('follow').map().on(this.sub(
+      (follows, pub) => {
+        if (follows) {
+          this.follows[pub] = f[pub] || {};
+          this.setState({follows:this.follows});
+        } else {
+          delete this.follows[pub];
+        }
+        this.setState({follows:this.follows});
       }
-      this.setState({});
-    });
+    ));
   }
 
   getFollowers() {
     const f = Session.getFollows();
+    console.log(`follow/${this.props.id}`);
     State.group().on(`follow/${this.props.id}`, this.sub((following, a, b, e, user) => {
+      console.log(user, following);
       if (following) {
           if (!following) return;
+          console.log(f);
           this.follows[user] = f[user] || {};
-          this.setState({});
+          this.setState({follows:this.follows});
       }
     }));
   }
@@ -45,10 +47,6 @@ class Follows extends View {
     if (this.props.id) {
       this.props.followers ? this.getFollowers() : this.getFollows();
     }
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
   }
 
   renderView() {

@@ -69,12 +69,8 @@ class Header extends Component {
         const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
         this.chatId = replaced.length < activeRoute.length ? replaced : null;
         if (this.chatId) {
-          State.local.get('channels').get(this.chatId).get('isTyping').on(this.sub(
-            () => this.setState({})
-          ));
-          State.local.get('channels').get(this.chatId).get('theirLastActiveTime').on(this.sub(
-            () => this.setState({})
-          ));
+          State.local.get('channels').get(this.chatId).get('isTyping').on(this.inject());
+          State.local.get('channels').get(this.chatId).get('theirLastActiveTime').on(this.inject());
         }
 
         if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {

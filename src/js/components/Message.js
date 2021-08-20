@@ -33,7 +33,7 @@ class Message extends Component {
       State.local.get('channels').get(this.props.chatId).get('theirLastActiveTime').on(
         this.sub((v, k, a, e) => {
           if (this.getSeenStatus().delivered) {
-            this.setState({});
+            this.setState({delivered:true});
             e.off();
           }
         })
@@ -43,7 +43,7 @@ class Message extends Component {
       State.local.get('channels').get(this.props.chatId).get('theirMsgsLastSeenTime').on(this.sub(
 (v, k, a, e) => {
           if (this.getSeenStatus().seen) {
-            this.setState({});
+            this.setState({seen:true});
             e.off();
           }
         }

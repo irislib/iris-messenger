@@ -23,12 +23,12 @@ class Contacts extends View {
       this.eventListeners['follow'] = e;
       if (contacts) {
         this.contacts[pub] = f[pub] || {};
-        this.setState({});
+        this.setState({contacts:this.contacts});
       } else {
         delete this.contacts[pub];
         this.eventListeners[pub] && this.eventListeners[pub].off();
       }
-      this.setState({});
+      this.setState({contacts:this.contacts});
     });
   }
 
