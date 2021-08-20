@@ -255,7 +255,6 @@ class Group extends View {
     }
     let qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
-    State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
     State.local.get('inviteLinksChanged').on(() => this.setState({}));
     State.local.get('channels').get(this.props.id).get('participants').on(() => {
       const isAdmin = areWeAdmin(pub);

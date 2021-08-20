@@ -14,8 +14,8 @@ let myProfilePhoto;
 let latestChatLink;
 let onlineTimeout;
 let ourActivity;
-let hasFollowers;
 let hasFollows;
+let hasFollowers;
 let userSearchIndex;
 const follows = {};
 const channels = window.channels = {};
@@ -63,6 +63,8 @@ function addFollow(callback, k, followDistance, follower) {
   }
   callback && callback(k, follows[k]);
   updateUserSearchIndex();
+  updateHasFollows();
+  updateHasFollowers();
 }
 
 function removeFollow(k, followDistance, follower) {
@@ -71,6 +73,8 @@ function removeFollow(k, followDistance, follower) {
     if (followDistance === 1) {
       State.local.get('groups').get('follows').get(k).put(false);
     }
+    updateHasFollows();
+    updateHasFollowers();
   }
 }
 
@@ -96,6 +100,22 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   });
 
   return follows;
+}
+
+function updateHasFollows() {
+  const v = Object.keys(follows).length > 1;
+  if (v !== hasFollows) {
+    hasFollows = v;
+    State.local.get('hasFollows').put(hasFollows);
+  }
+}
+
+function updateHasFollowers() {
+  const v = follows[key.pub] && (follows[key.pub].followers.size > 0);
+  if (v !== hasFollowers) {
+    hasFollowers = v;
+    State.local.get('hasFollowers').put(hasFollowers);
+  }
 }
 
 function getUserSearchIndex() {
@@ -138,15 +158,14 @@ function setOurOnlineStatus() {
 
 function updateGroups() {
   getExtendedFollows((k, info) => {
-    if (!hasFollows && info.followDistance >= 1) { State.local.get('noFollows').put(false); }
     if (info.followDistance <= 1) {
       State.local.get('groups').get('follows').get(k).put(true);
     } else if (info.followDistance == 2) {
       State.local.get('groups').get('2ndDegreeFollows').get(k).put(true);
     }
     State.local.get('groups').get('everyone').get(k).put(true);
-    if (!hasFollowers && k === getPubKey() && info.followers.size) {
-      State.local.get('noFollowers').put(false);
+    if (k === getPubKey()) {
+      updateHasFollowers();
     }
   });
 }

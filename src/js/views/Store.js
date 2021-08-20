@@ -88,36 +88,11 @@ class Store extends View {
     `;
   }
 
-  getNotification() {
-    const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
-    if (this.state.noFollows) {
-      return html`
-          <div class="centered-container">
-            <div class="msg">
-                <div class="msg-content">
-                    <p>${t('follow_someone_info')}</p>
-                    <div class="profile-link-container">
-                        <a href="/profile/${SUGGESTED_FOLLOW}" class="profile-link">
-                            <${Identicon} str=${SUGGESTED_FOLLOW} width=40/>
-                            <iris-text path="profile/name" user=${SUGGESTED_FOLLOW} placeholder="Suggested follow"/>
-                        </a>
-                        <${FollowButton} id=${SUGGESTED_FOLLOW}/>
-                    </div>
-                    <p>${t('alternatively')} <a
-                            href="/profile/${Session.getPubKey()}">${t('give_your_profile_link_to_someone')}</a>.</p>
-                </div>
-            </div>
-          </div>
-      `
-    }
-    return '';
-  }
-
   renderItems() {
     const cartTotalItems = Object.keys(this.cart).reduce((sum, k) => sum + this.cart[k], 0);
     const keys = Object.keys(this.state.items);
     return html`
-      ${(this.props.store || this.state.noFollows) ? '' : html`<${Filters}/>`}
+      ${(this.props.store || !this.state.hasFollows) ? '' : html`<${Filters}/>`}
       ${cartTotalItems ? html`
         <p>
           <button onClick=${() => route('/checkout')}>${t('shopping_cart')}(${cartTotalItems})</button>
@@ -248,17 +223,6 @@ class Store extends View {
     this.items = {};
     this.isMyProfile = Session.getPubKey() === user;
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', totalPrice: 0, items: {}, cart: {}});
-
-    State.local.get('noFollows').on(this.inject());
-
-    State.local.get('groups').get('follows').map().on(this.sub(
-      (isFollowing, user, a, e) => {
-        if (isFollowing && this.state.noFollows && Session.getPubKey() !== user) {
-          State.local.get('noFollows').put(false);
-          e.off();
-        }
-      }
-    ));
 
     if (user) {
       this.getCartFromUser(user);
