@@ -80,7 +80,7 @@ class PublicMessageForm extends Component {
     if (this.props.replyingTo) {
       msg.replyingTo = this.props.replyingTo;
     }
-    if (this.props.replyingToUser) {
+    if (this.props.replyingToUser && this.props.replyingToUser !== Session.getPubKey()) {
       Notifications.sendIrisNotification(this.props.replyingToUser, {event:'reply', target: this.props.replyingTo});
     }
     if (this.state.attachments) {

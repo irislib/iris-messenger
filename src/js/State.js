@@ -22,7 +22,7 @@ const State = {
     }
     this.local = Gun({peers: [], file: 'State.local', multicast:false, localStorage: false}).get('state');
     if (Helpers.isElectron) {
-      this.electron = Gun({peers: ['http://localhost:8768/gun'], file: 'State.local', multicast:false, localStorage: false}).get('state');
+      this.electron = Gun({peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast:false, localStorage: false}).get('state');
     }
     this.blockedUsers = {};
 
