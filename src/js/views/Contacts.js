@@ -15,7 +15,11 @@ class Contacts extends View {
     this.id = "contacts-view";
   }
 
-  getContacts() {
+  shouldComponentUpdate() {
+    return true;
+  }
+
+  componentDidMount() {
     const f = Session.getFollows();
     State.local.get('groups').get('everyone').map().on(this.sub(
       (isContact, pub) => {
@@ -29,14 +33,37 @@ class Contacts extends View {
         this.setState({});
       }
     ));
+    State.electron && State.electron.get('bonjour').on(s => {
+      const nearbyUsers = JSON.parse(s);
+      console.log('nearbyUsers', nearbyUsers);
+      this.setState({nearbyUsers});
+    });
   }
 
-  shouldComponentUpdate() {
-    return true;
-  }
-
-  componentDidMount() {
-    this.getContacts();
+  renderNearbyUsers() {
+    return this.state.nearbyUsers.map(peer => {
+      const k = peer.txt && peer.txt.user;
+      if (!k) { return html`<p>${peer.name}</p>`; }
+      return html`
+        <div class="profile-link-container">
+          ${k ? html`
+            <div class="">
+              <a href="/profile/${k}" class="profile-link">
+                <${Identicon} key="i${k}" str=${k} width=49/>
+                <div>
+                  <${Name} key="k${k}" pub=${k}/><br/>
+                  <small class="follower-count">
+                      ${peer.name}<br/>
+                      ${this.contacts[k] && this.contacts[k].followers && this.contacts[k].followers.size || '0'} ${t('followers')}
+                  </small>
+                </div>
+              </a>
+              ${k !== Session.getPubKey() ? html`<${FollowButton} key="f${k}" id=${k}/>` : ''}
+            </div>
+          `:''}
+        </div>
+      `;
+    });
   }
 
   renderView() {
@@ -56,6 +83,11 @@ class Contacts extends View {
     return html`
       <div class="centered-container">
         <div id="contacts-list">
+          ${this.state.nearbyUsers && this.state.nearbyUsers.length ? html`
+            <h3>Nearby users</h3>
+            ${this.renderNearbyUsers()}
+            <hr/><br/>
+          `:''}
           <${ScrollViewport}>
             ${keys.map(k => {
               return html`

@@ -225,12 +225,15 @@ function login(k) {
   if (shouldRefresh) {
     location.reload();
   }
-  State.electron && State.electron.get('settings').on(electron => {
-    settings.electron = electron;
-    if (electron.publicIp) {
-      Object.values(channels).forEach(shareMyPeerUrl);
-    }
-  });
+  if (State.electron) {
+    State.electron.get('settings').on(electron => {
+      settings.electron = electron;
+      if (electron.publicIp) {
+        Object.values(channels).forEach(shareMyPeerUrl);
+      }
+    });
+    State.electron.get('user').put(key.pub);
+  }
   State.local.get('settings').on(local => {
     settings.local = local;
   });
@@ -276,6 +279,9 @@ function getMyName() { return myName; }
 function getMyProfilePhoto() { return myProfilePhoto; }
 
 async function logOut() {
+  if (State.electron) {
+    State.electron.get('user').put(null);
+  }
   // TODO: remove subscription from your channels
   if (navigator.serviceWorker) {
     const reg = await navigator.serviceWorker.getRegistration();
