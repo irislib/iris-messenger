@@ -72,16 +72,16 @@ class ChatList extends Component {
           </svg>
           ${t('new_chat')}
         </div>
-        <${ScrollViewport}>
-          ${Object.keys(this.state.hashtags).map(hashtag =>
-            html`<div class="chat-item" onClick=${() => route(`/hashtag/${hashtag}`)}>
-                <div class="text">
-                  <div>
-                    <b class="name">#${hashtag}</b>
-                  </div>
+        ${Object.keys(this.state.hashtags).map(hashtag =>
+          html`<div class="chat-item" onClick=${() => route(`/hashtag/${hashtag}`)}>
+              <div class="text">
+                <div>
+                  <b class="name">#${hashtag}</b>
                 </div>
-              </div>`
-            )}
+              </div>
+            </div>`
+          )}
+        <${ScrollViewport}>
           ${this.state.chats.map(chat =>
             html`<${ChatListItem}
               photo=${chat.photo}
