@@ -9,6 +9,7 @@ import $ from 'jquery';
 import QRCode from '../lib/qrcode.min.js';
 import iris from 'iris-lib';
 import Component from '../BaseComponent';
+import {Helmet} from 'react-helmet';
 
 function setChatLinkQrCode(link) {
   let qrCodeEl = $('#my-qr-code');
@@ -93,6 +94,7 @@ class NewChat extends Component {
 
   render() {
     return html`
+      <${Helmet}><title>${t('new_chat')}</title><//>
       <div class="main-view" id="new-chat">
         <h3>${t('have_someones_invite_link')}</h3>
           <div class="btn-group">
