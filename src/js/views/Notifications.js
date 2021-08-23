@@ -18,7 +18,6 @@ export default class Notifications extends View {
         if (notification) {
           this.notifications[time] = notification;
           NotificationTools.getNotificationText(notification).then(text => {
-            console.log('heii', text);
             this.notifications[time].text = text;
             this.setState({});
           });
