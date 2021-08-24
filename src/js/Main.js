@@ -123,6 +123,7 @@ class Main extends Component {
               <${Feed} path="/media" index="media" thumbnails=${true}/>
               <${Login} path="/login"/>
               <${Notifications} path="/notifications"/>
+              <${Chat} path="/chat/hashtag/:hashtag?"/>
               <${Chat} path="/chat/:id?"/>
               <${Message} path="/post/:hash+"/>
               <${Torrent} path="/torrent/:id+"/>

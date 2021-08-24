@@ -1,5 +1,6 @@
 import Helpers from '../Helpers.js';
 import { html } from 'htm/preact';
+import {createRef} from 'preact';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Identicon from './Identicon.js';
@@ -14,6 +15,7 @@ import $ from 'jquery';
 import iris from 'iris-lib';
 import {Helmet} from 'react-helmet';
 import Component from '../BaseComponent';
+import MessageFeed from './MessageFeed';
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
@@ -42,6 +44,7 @@ function copyMyChatLinkClicked(e) {
 export default class ChatMain extends Component {
   constructor() {
     super();
+    this.hashtagChatRef = createRef();
     this.state = {sortedParticipants: []};
   }
 
@@ -205,89 +208,112 @@ export default class ChatMain extends Component {
 
   scrollDown() {
     Helpers.scrollToMessageListBottom();
-    document.getElementById("message-list").style.paddingBottom = 0;
+    const el = document.getElementById("message-list");
+    el && (el.style.paddingBottom = 0);
   }
 
-  render() {
-    const now = new Date();
-    const nowStr = now.toLocaleDateString();
-    let previousDateStr;
-    let previousFrom;
-    const msgListContent = [];
-    this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach(msg => {
-      if (typeof msg !== 'object') {
-        try {
-          msg = JSON.parse(msg);
-        } catch (e) {
-          console.error('JSON.parse(msg) failed', e);
-          return;
+  renderMainView() {
+    let mainView;
+    if (this.props.hashtag) {
+      mainView = html`
+        <div class="main-view public-messages-view" id="message-view" ref=${this.hashtagChatRef}>
+          <${MessageFeed} key=${this.props.hashtag} scrollElement=${this.hashtagChatRef.current} group="everyone" path="hashtags/${this.props.hashtag}"/>
+          <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
+        </div>`;
+    } else if (this.props.id && this.props.id.length > 20) {
+      const now = new Date();
+      const nowStr = now.toLocaleDateString();
+      let previousDateStr;
+      let previousFrom;
+      const msgListContent = [];
+      this.state.sortedMessages && Object.values(this.state.sortedMessages).forEach(msg => {
+        if (typeof msg !== 'object') {
+          try {
+            msg = JSON.parse(msg);
+          } catch (e) {
+            console.error('JSON.parse(msg) failed', e);
+            return;
+          }
         }
-      }
-      const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
-      let isDifferentDay;
-      if (date) {
-        const dateStr = date.toLocaleDateString();
-        if (dateStr !== previousDateStr) {
-          isDifferentDay = true;
-          let separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
-          msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
+        const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
+        let isDifferentDay;
+        if (date) {
+          const dateStr = date.toLocaleDateString();
+          if (dateStr !== previousDateStr) {
+            isDifferentDay = true;
+            let separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
+            msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
+          }
+          previousDateStr = dateStr;
         }
-        previousDateStr = dateStr;
-      }
 
-      let showName = false;
-      if (isDifferentDay || (previousFrom && (msg.from !== previousFrom))) {
-        msgListContent.push(html`<div class="from-separator"/>`);
-        showName = true;
-      }
-      previousFrom = msg.from;
-      msgListContent.push(html`
-        <${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${this.props.id}/>
-      `);
-    });
+        let showName = false;
+        if (isDifferentDay || (previousFrom && (msg.from !== previousFrom))) {
+          msgListContent.push(html`<div class="from-separator"/>`);
+          showName = true;
+        }
+        previousFrom = msg.from;
+        msgListContent.push(html`
+          <${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${this.props.id}/>
+        `);
+      });
 
-    const participants = this.state.sortedParticipants;
-
-    return html`
-    <${Helmet}><title>${this.chat && this.chat.name || 'Messages'}</title><//>
-    <div id="chat-main" class="${this.props.id ? '' : 'hidden-xs'}">
-    ${this.props.id && this.props.id.length > 20 ? html`
-      <div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
-        <div id="message-list">
-          ${msgListContent}
-        </div>
-        <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
-      </div>` : html`<${NewChat}/>`
+      mainView = html`
+        <div class="main-view" id="message-view" onScroll=${e => this.onMessageViewScroll(e)}>
+          <div id="message-list">
+            ${msgListContent}
+          </div>
+          <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
+        </div>`;
+    } else {
+      mainView = html`<${NewChat}/>`;
     }
-    ${this.props.id && this.props.id.length > 20 ? html`
+    return mainView;
+  }
+
+  renderParticipantList() {
+    const participants = this.state.sortedParticipants;
+    return this.props.id && this.props.id !== 'new' && this.props.id.length < 40 ? html`
+      <div class="participant-list ${this.state.showParticipants ? 'open' : ''}">
+        ${participants.length ? html`
+          <small>${participants.length} ${t('participants')}</small>
+        ` : ''}
+        ${participants.map(k =>
+          html`
+            <a href="/profile/${k}">
+              <span class="text">
+                <${Identicon} key="i${k}" str=${k} width=30 activity=${true}/>
+                <${Name} pub=${k} key="t${k}" />
+              </span>
+            </a>
+          `
+        )}
+      </div>
+    `: '';
+  }
+
+  renderMsgForm() {
+    return this.props.hashtag || (this.props.id && this.props.id.length > 20) ? html`
       <div id="scroll-down-btn" style="display:none;" onClick=${() => this.scrollDown()}>${caretDownSvg}</div>
       <div id="not-seen-by-them" style="display: none">
-      <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
-      <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_invite_link')}</button></p>
+        <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
+        <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_invite_link')}</button></p>
       </div>
       <div class="chat-message-form">
         ${this.state.noLongerParticipant ? html`<div style="text-align:center">You can't send messages to this group because you're no longer a participant.</div>` :
-          html`<${ChatMessageForm} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/>`}
+          html`<${ChatMessageForm} key=${this.props.hashtag || this.props.id} hashtag=${this.props.hashtag} activeChat=${this.props.id} onSubmit=${() => (!this.props.hashtag && this.scrollDown())}/>`}
       </div>
-      `: ''}
+      `: '';
+  }
+
+  render() {
+    return html`
+      <${Helmet}><title>${this.chat && this.chat.name || 'Messages'}</title><//>
+      <div id="chat-main" class="${(this.props.id || this.props.hashtag) ? '' : 'hidden-xs'}">
+        ${this.renderMainView()}
+        ${this.renderMsgForm()}
       </div>
-      ${this.props.id && this.props.id !== 'new' && this.props.id.length < 40 ? html`
-        <div class="participant-list ${this.state.showParticipants ? 'open' : ''}">
-          ${participants.length ? html`
-            <small>${participants.length} ${t('participants')}</small>
-          ` : ''}
-          ${participants.map(k =>
-            html`
-              <a href="/profile/${k}">
-                <span class="text">
-                  <${Identicon} key="i${k}" str=${k} width=30 activity=${true}/>
-                  <${Name} pub=${k} key="t${k}" />
-                </span>
-              </a>
-            `
-          )}
-        </div>
-      `: ''}
-      `;
+      ${this.renderParticipantList()}
+    `;
   }
 }

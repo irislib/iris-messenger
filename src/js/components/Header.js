@@ -77,6 +77,8 @@ class Header extends Component {
           if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
             const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
             this.setState({title});
+          } else if (activeRoute.indexOf('/chat/hashtag/') === 0) {
+            this.setState({title: `#${activeRoute.replace('/chat/hashtag/','')}`})
           } else {
             State.local.get('channels').get(this.chatId).get('name').on(this.inject('title'));
             State.local.get('channels').get(this.chatId).get('about').on(this.inject());

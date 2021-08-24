@@ -1,4 +1,3 @@
-import { Component } from 'preact';
 import Helpers from '../Helpers.js';
 import { html } from 'htm/preact';
 import { translate as t } from '../Translation.js';
@@ -10,6 +9,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import EmojiButton from '../lib/emoji-button.js';
 import Gun from 'gun';
+import MessageForm from './MessageForm';
 
 const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
 
@@ -18,7 +18,7 @@ const submitButton = html`
     <svg class="svg-inline--fa fa-w-16" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;" width="100px" height="100px" fill="currentColor" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>
   </button>`;
 
-class ChatMessageForm extends Component {
+class ChatMessageForm extends MessageForm {
   componentDidMount() {
     this.picker = new EmojiButton({position: 'top-start'});
     this.picker.on('emoji', emoji => {
@@ -31,18 +31,8 @@ class ChatMessageForm extends Component {
     }
   }
 
-  componentDidUpdate() {
-    if (!iris.util.isMobile && this.props.autofocus !== false) {
-      $(this.base).find(".new-msg").focus();
-    }
-    if ($('#attachment-preview:visible').length) {
-      $('#attachment-preview').append($('#webtorrent'));
-    }
-  }
-
-  async onMsgFormSubmit(event) {
+  sendToPrivateOrGroup() {
     const chat = Session.channels[this.props.activeChat];
-    event.preventDefault();
     State.local.get('channels').get(this.props.activeChat).get('msgDraft').put(null);
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
@@ -62,7 +52,38 @@ class ChatMessageForm extends Component {
     this.closeAttachmentsPreview();
     textEl.val('');
     this.webPush(msg);
-    this.props.onSubmit && this.props.onSubmit(msg);
+  }
+
+  sendToHashtag() {
+    State.local.get('channels').get(this.props.activeChat).get('msgDraft').put(null);
+    const textEl = $(this.base).find('.new-msg');
+    const text = textEl.val();
+    if (!text.length) { return; }
+    const msg = {text};
+    if (this.state.torrentId) {
+      msg.torrentId = this.state.torrentId;
+    }
+    this.sendPublic(msg);
+    this.closeAttachmentsPreview();
+    textEl.val('');
+  }
+
+  componentDidUpdate() {
+    if (!iris.util.isMobile && this.props.autofocus !== false) {
+      $(this.base).find(".new-msg").focus();
+    }
+    if ($('#attachment-preview:visible').length) {
+      $('#attachment-preview').append($('#webtorrent'));
+    }
+  }
+
+  async onMsgFormSubmit(event) {
+    event.preventDefault();
+    if (this.props.hashtag) {
+      this.sendToHashtag();
+    } else {
+      this.sendToPrivateOrGroup();
+    }
   }
 
   onEmojiButtonClick(event) {
@@ -82,6 +103,7 @@ class ChatMessageForm extends Component {
 
   onMsgTextInput(event) {
     const channel = Session.channels[this.props.activeChat];
+    if (!channel) {return;}
     const val = $(event.target).val();
     this.isTyping = this.isTyping !== undefined ? this.isTyping : false;
     const getIsTyping = () => val.length > 0;
@@ -143,7 +165,9 @@ class ChatMessageForm extends Component {
     if (Session.channels[this.props.activeChat]) {
       Session.channels[this.props.activeChat].attachments = null;
     }
-    Helpers.scrollToMessageListBottom();
+    if (!this.props.hashtag) {
+      Helpers.scrollToMessageListBottom();
+    }
     this.setState({torrentId:null});
   }
 

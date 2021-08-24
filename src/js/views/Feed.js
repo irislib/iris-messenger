@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
 import State from '../State.js';
-import PublicMessageForm from '../components/PublicMessageForm.js';
+import FeedMessageForm from '../components/FeedMessageForm.js';
 import MessageFeed from '../components/MessageFeed.js';
 import Filters from '../components/Filters.js';
 import View from './View.js';
@@ -65,7 +65,7 @@ class Feed extends View {
               <h3>${hashtagText} <span style="float:right"><${SubscribeHashtagButton} key=${hashtag} id=${hashtag} /></span></h3>
             ` : ''}
             ${s.searchTerm ? '' : html`
-              <${PublicMessageForm} index=${path} class="hidden-xs" autofocus=${false}/>
+              <${FeedMessageForm} key=${path} index=${path} class="hidden-xs" autofocus=${false}/>
             `}
             ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
               ${this.getNotification()}

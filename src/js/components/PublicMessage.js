@@ -1,7 +1,7 @@
 import Helpers from '../Helpers.js';
 import { html } from 'htm/preact';
 import Identicon from './Identicon.js';
-import PublicMessageForm from './PublicMessageForm.js';
+import FeedMessageForm from './FeedMessageForm.js';
 import State from '../State.js';
 import { route } from 'preact-router';
 import Message from './Message.js';
@@ -304,7 +304,7 @@ msg => {
             html`<${PublicMessage} measure=${this.props.measure} key=${r.hash} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
           ) : ''}
           ${s.showReplyForm ? html`
-            <${PublicMessageForm} replyingTo=${this.props.hash} replyingToUser=${s.msg.info.from} />
+            <${FeedMessageForm} replyingTo=${this.props.hash} replyingToUser=${s.msg.info.from} />
           ` : ''}
         </div>
       </div>

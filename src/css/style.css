@@ -645,6 +645,10 @@ header.footer .header-content {
   min-width: 0;
 }
 
+.main-view.public-messages-view {
+  padding: 0;
+}
+
 .msg {
   display: flex;
   flex-direction: column;

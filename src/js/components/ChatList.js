@@ -73,7 +73,7 @@ class ChatList extends Component {
           ${t('new_chat')}
         </div>
         ${Object.keys(this.state.hashtags).map(hashtag =>
-          html`<div class="chat-item" onClick=${() => route(`/hashtag/${hashtag}`)}>
+          html`<div class="chat-item" onClick=${() => route(`/chat/hashtag/${hashtag}`)}>
               <div class="text">
                 <div>
                   <b class="name">#${hashtag}</b>

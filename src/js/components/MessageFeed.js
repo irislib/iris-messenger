@@ -28,9 +28,11 @@ class MessageFeed extends Component {
     }
 
     this.updateSortedMessages = this.updateSortedMessages || _.debounce(() => {
-      this.setState({
-        sortedMessages: Array.from(this.mappedMessages.keys()).sort().reverse().map(k => this.mappedMessages.get(k))
-      })
+      let sortedMessages = Array.from(this.mappedMessages.keys()).sort().map(k => this.mappedMessages.get(k));
+      if (!this.props.reverse) {
+        sortedMessages = sortedMessages.reverse();
+      }
+      this.setState({sortedMessages})
     }, 1);
 
     this.updateSortedMessages();

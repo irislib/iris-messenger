@@ -3,7 +3,7 @@ import { html } from 'htm/preact';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
-import PublicMessageForm from '../components/PublicMessageForm.js';
+import FeedMessageForm from '../components/FeedMessageForm.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
 import { route } from 'preact-router';
 import { createRef } from 'preact';
@@ -192,12 +192,12 @@ class Profile extends View {
     } else if (this.props.tab === 'media') {
       return html`
         <div class="public-messages-view">
-          ${this.isMyProfile ? html`<${PublicMessageForm} index="media" class="hidden-xs" autofocus=${false}/>` : ''}
+          ${this.isMyProfile ? html`<${FeedMessageForm} index="media" class="hidden-xs" autofocus=${false}/>` : ''}
           <${MessageFeed} scrollElement=${this.scrollElement.current} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
         </div>
       `;
     }
-      const messageForm = this.isMyProfile ? html`<${PublicMessageForm} class="hidden-xs" autofocus=${false}/>` : '';
+      const messageForm = this.isMyProfile ? html`<${FeedMessageForm} class="hidden-xs" autofocus=${false}/>` : '';
       return html`
       <div>
         ${messageForm}

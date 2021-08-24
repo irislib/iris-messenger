@@ -11,8 +11,8 @@ class Chat extends View {
 
   renderView() {
     return html`
-      <${ChatList} class=${this.props.id ? 'hidden-xs' : ''}/>
-      <${ChatMain} id=${this.props.id} key=${this.props.id} />
+      <${ChatList} class=${this.props.id || this.props.hashtag ? 'hidden-xs' : ''}/>
+      <${ChatMain} hashtag=${this.props.hashtag} id=${this.props.id} key=${this.props.id || this.props.hashtag} />
     `;
   }
 }

@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
 import PublicMessage from '../components/PublicMessage.js';
-import PublicMessageForm from '../components/PublicMessageForm.js';
+import FeedMessageForm from '../components/FeedMessageForm.js';
 import { route } from 'preact-router';
 import View from './View.js';
 
@@ -15,7 +15,7 @@ class Message extends View {
     let content;
     if (this.props.hash === 'new') {
       content = html`
-        <${PublicMessageForm} activeChat="public" autofocus=${true} onSubmit=${() => route('/')}/>
+        <${FeedMessageForm} activeChat="public" autofocus=${true} onSubmit=${() => route('/')}/>
       `;
     } else {
       content = html`
