@@ -33,6 +33,7 @@ export default class HashtagList extends Component {
       isSubscribed ? subs.add(from) : subs.delete(from);
       const popularHashtags = Object.keys(this.hashtagSubscribers)
         .filter(k => this.hashtagSubscribers[k].size > 0)
+        .filter(k => !hashtags[k])
         .sort((tag1,tag2) => {
           const set1 = this.hashtagSubscribers[tag1];
           const set2 = this.hashtagSubscribers[tag2];
@@ -90,7 +91,7 @@ export default class HashtagList extends Component {
             )}
         </div>
       </div>
-      ${this.state.popularHashtags ? html`
+      ${this.state.popularHashtags && this.state.popularHashtags.length ? html`
         <div class="msg hashtag-list">
           <div class="msg-content">
             Popular hashtags<br/><br/>
