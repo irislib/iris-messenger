@@ -3,11 +3,13 @@ import { html } from 'htm/preact';
 import {createRef} from 'preact';
 import State from '../State.js';
 import {Link} from "preact-router/match";
+import {route} from 'preact-router';
 
 export default class HashtagList extends Component {
   constructor() {
     super();
     this.addHashtagInputRef = createRef();
+    this.hashtagSubscribers = {};
     this.state = {hashtags: {}};
   }
 
@@ -23,6 +25,25 @@ export default class HashtagList extends Component {
         this.setState({hashtags});
       }
     ));
+    State.group().map('hashtagSubscriptions', (isSubscribed, hashtag, a, b, from) => {
+      if (!this.hashtagSubscribers[hashtag]) {
+        this.hashtagSubscribers[hashtag] = new Set();
+      }
+      const subs = this.hashtagSubscribers[hashtag];
+      isSubscribed ? subs.add(from) : subs.delete(from);
+      const popularHashtags = Object.keys(this.hashtagSubscribers)
+        .filter(k => this.hashtagSubscribers[k].size > 0)
+        .sort((tag1,tag2) => {
+          const set1 = this.hashtagSubscribers[tag1];
+          const set2 = this.hashtagSubscribers[tag2];
+          if (set1.length !== set2.length) {
+            return set1.length > set2.length;
+          } else {
+            return tag1 > tag2;
+          }
+        }).slice(0,8);
+      this.setState({popularHashtags});
+    });
   }
 
   addHashtagClicked(e) {
@@ -32,11 +53,11 @@ export default class HashtagList extends Component {
 
   onAddHashtag(e) {
     e.preventDefault();
-    const hashtag = e.target.firstChild.value.replace('#', '');
-    console.log(hashtag);
+    const hashtag = e.target.firstChild.value.replace('#', '').trim();
     if (hashtag) {
       State.public.user().get('hashtagSubscriptions').get(hashtag).put(true);
       this.setState({showAddHashtagForm: false});
+      route(`/hashtag/${hashtag}`);
     }
   }
 
@@ -69,6 +90,17 @@ export default class HashtagList extends Component {
             )}
         </div>
       </div>
+      ${this.state.popularHashtags ? html`
+        <div class="msg hashtag-list">
+          <div class="msg-content">
+            Popular hashtags<br/><br/>
+  
+            ${this.state.popularHashtags.map(hashtag =>
+              html`<${Link} activeClassName="active" class="channel-listing" href="/hashtag/${hashtag}">#${hashtag}<//>`
+            )}
+          </div>
+        </div>
+      `:''}
     `;
   }
 }
