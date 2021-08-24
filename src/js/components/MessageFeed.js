@@ -61,7 +61,6 @@ class MessageFeed extends Component {
     if (prevNodeId !== newNodeId || this.props.group !== prevProps.group || this.props.path !== prevProps.path || this.props.filter !== prevProps.filter) {
       this.mappedMessages = new Map();
       this.setState({sortedMessages: []});
-      this.componentWillUnmount();
       this.componentDidMount();
     }
   }
