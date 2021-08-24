@@ -78,7 +78,7 @@ class Header extends Component {
             const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
             this.setState({title});
           } else if (activeRoute.indexOf('/chat/hashtag/') === 0) {
-            this.setState({title: `#${activeRoute.replace('/chat/hashtag/','')}`})
+            this.setState({title: `#${activeRoute.replace('/chat/hashtag/','')} (public)`})
           } else {
             State.local.get('channels').get(this.chatId).get('name').on(this.inject('title'));
             State.local.get('channels').get(this.chatId).get('about').on(this.inject());
@@ -89,7 +89,7 @@ class Header extends Component {
   }
 
   onTitleClicked() {
-    if (this.chatId) {
+    if (this.chatId && this.chatId.indexOf('hashtag') === -1) {
       const view = this.chatId.length < 40 ? '/group/' : '/profile/';
       route(view + this.chatId);
     }
