@@ -913,6 +913,26 @@ a.msg {
   color: var(--text-color);
 }
 
+.hashtag-list {
+  margin: 15px 0 15px 15px;
+}
+
+.hashtag-list a {
+  color: var(--text-color);
+}
+
+.hashtag-list a.active {
+  font-weight: bold;
+}
+
+.hashtag-list a:active,.hashtag-list a:focus,.hashtag-list a:visited {
+  text-decoration: none;
+}
+
+.hashtag-list a:hover:not(.active) {
+  text-decoration: underline;
+}
+
 .public-messages-view .img-container img {
   max-height: 80vh;
   border-radius: 0;

@@ -6,6 +6,7 @@ import Filters from '../components/Filters.js';
 import View from './View.js';
 import SubscribeHashtagButton from "../components/SubscribeHashtagButton";
 import Helmet from 'react-helmet';
+import HashtagList from '../components/HashtagList';
 
 class Feed extends View {
   constructor() {
@@ -53,29 +54,37 @@ class Feed extends View {
     }
     return html`
       <div class="centered-container">
-        ${hashtag ? html`
-            <${Helmet}>
-                <title>${hashtagText}</title>
-                <meta property="og:title" content="${hashtagText} | Iris" />
-            <//>
-            <h3>${hashtagText} <span style="float:right"><${SubscribeHashtagButton} id=${hashtag} /></span></h3>
-            
-        ` : ''}
-        ${s.searchTerm ? '' : html`
-          <${PublicMessageForm} index=${path} class="hidden-xs" autofocus=${false}/>
-        `}
-        ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
-          ${this.getNotification()}
-        `}
-        ${!s.noFollows ? html`<${Filters}/>` : ''}
-        <${MessageFeed}
-                scrollElement=${this.scrollElement.current}
-                hashtag=${hashtag}
-                filter=${s.searchTerm && (m => this.filter(m))}
-                thumbnails=${this.props.thumbnails}
-                key=${hashtag || this.props.index || 'feed'}
-                group=${this.state.group}
-                path=${path} />
+          <div style="display:flex;flex-direction:row">
+            <div style="flex:3">
+              ${hashtag ? html`
+                <${Helmet}>
+                    <title>${hashtagText}</title>
+                    <meta property="og:title" content="${hashtagText} | Iris" />
+                <//>
+                <h3>${hashtagText} <span style="float:right"><${SubscribeHashtagButton} key=${hashtag} id=${hashtag} /></span></h3>
+              ` : ''}
+              ${s.searchTerm ? '' : html`
+                <${PublicMessageForm} index=${path} class="hidden-xs" autofocus=${false}/>
+              `}
+              ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
+                ${this.getNotification()}
+              `}
+              ${!s.noFollows ? html`<${Filters}/>` : ''}
+              <${MessageFeed}
+                      scrollElement=${this.scrollElement.current}
+                      hashtag=${hashtag}
+                      filter=${s.searchTerm && (m => this.filter(m))}
+                      thumbnails=${this.props.thumbnails}
+                      key=${hashtag || this.props.index || 'feed'}
+                      group=${this.state.group}
+                      path=${path} />
+            </div>
+            ${this.props.index === 'media' ? '':html`
+              <div style="flex:1" class="hidden-xs">
+                <${HashtagList} />
+              </div>
+            `}
+          </div>
       </div>
     `;
   }
