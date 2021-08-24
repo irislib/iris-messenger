@@ -84,7 +84,7 @@ class Feed extends View {
             <div style="flex:1" class="hidden-xs">
               <${HashtagList} />
               ${this.props.hashtag ? html`
-                <${HashtagSubscriberList} hashtag=${this.props.hashtag} />
+                <${HashtagSubscriberList} key=${this.props.hashtag} hashtag=${this.props.hashtag} />
               `:''}
             </div>
           `}
