@@ -36,10 +36,10 @@ export default class HashtagList extends Component {
         .sort((tag1,tag2) => {
           const set1 = this.hashtagSubscribers[tag1];
           const set2 = this.hashtagSubscribers[tag2];
-          if (set1.length !== set2.length) {
-            return set1.length < set2.length;
+          if (set1.size !== set2.size) {
+            return set1.size > set2.size ? -1 : 1;
           } else {
-            return tag1 > tag2;
+            return tag1 > tag2 ? 1 : -1;
           }
         }).slice(0,8);
       this.setState({popularHashtags});
