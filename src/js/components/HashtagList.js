@@ -37,7 +37,7 @@ export default class HashtagList extends Component {
           const set1 = this.hashtagSubscribers[tag1];
           const set2 = this.hashtagSubscribers[tag2];
           if (set1.length !== set2.length) {
-            return set1.length > set2.length;
+            return set1.length < set2.length;
           } else {
             return tag1 > tag2;
           }
