@@ -8,6 +8,7 @@ import SubscribeHashtagButton from "../components/SubscribeHashtagButton";
 import Helmet from 'react-helmet';
 import HashtagList from '../components/HashtagList';
 import HashtagSubscriberList from '../components/HashtagSubscriberList';
+import OnboardingNotification from "../components/OnboardingNotification";
 
 class Feed extends View {
   constructor() {
@@ -68,7 +69,7 @@ class Feed extends View {
               <${FeedMessageForm} key=${path} index=${path} class="hidden-xs" autofocus=${false}/>
             `}
             ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
-              ${this.getNotification()}
+              <${OnboardingNotification} />
             `}
             ${!s.noFollows ? html`<${Filters}/>` : ''}
             <${MessageFeed}

@@ -10,6 +10,7 @@ import CopyButton from '../components/CopyButton.js';
 import FollowButton from '../components/FollowButton.js';
 import Identicon from '../components/Identicon.js';
 import View from './View.js';
+import OnboardingNotification from "../components/OnboardingNotification";
 
 class Store extends View {
   constructor() {
@@ -134,7 +135,7 @@ class Store extends View {
     return html`
       <p dangerouslySetInnerHTML=${{ __html: t('this_is_a_prototype_store', `href="/store/${Session.getPubKey()}"`
         )}}></p>
-      ${this.getNotification()}
+      <${OnboardingNotification} />
       ${this.renderItems()}
     `;
   }

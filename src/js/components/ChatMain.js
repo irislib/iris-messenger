@@ -16,6 +16,7 @@ import iris from 'iris-lib';
 import {Helmet} from 'react-helmet';
 import Component from '../BaseComponent';
 import MessageFeed from './MessageFeed';
+import OnboardingNotification from "./OnboardingNotification";
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
@@ -217,6 +218,7 @@ export default class ChatMain extends Component {
     if (this.props.hashtag) {
       mainView = html`
         <div class="main-view public-messages-view" id="message-view" ref=${this.hashtagChatRef}>
+          <${OnboardingNotification} />
           <${MessageFeed} key=${this.props.hashtag} scrollElement=${this.hashtagChatRef.current} group="everyone" path="hashtags/${this.props.hashtag}"/>
           <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
         </div>`;
