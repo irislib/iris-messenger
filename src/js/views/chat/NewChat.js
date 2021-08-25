@@ -1,14 +1,14 @@
 import { html } from 'htm/preact';
-import { translate as t } from '../Translation.js';
-import State from '../State.js';
-import QRScanner from '../QRScanner.js';
-import Session from '../Session.js';
-import CopyButton from './CopyButton.js';
+import { translate as t } from '../../Translation.js';
+import State from '../../State.js';
+import QRScanner from '../../QRScanner.js';
+import Session from '../../Session.js';
+import CopyButton from '../../components/CopyButton.js';
 import { route } from 'preact-router';
 import $ from 'jquery';
-import QRCode from '../lib/qrcode.min.js';
+import QRCode from '../../lib/qrcode.min.js';
 import iris from 'iris-lib';
-import Component from '../BaseComponent';
+import Component from '../../BaseComponent';
 import {Helmet} from 'react-helmet';
 
 function setChatLinkQrCode(link) {

@@ -1,15 +1,15 @@
-import Helpers from '../Helpers.js';
+import Helpers from '../../Helpers.js';
 import { html } from 'htm/preact';
-import { translate as t } from '../Translation.js';
-import Torrent from './Torrent';
-import State from '../State.js';
-import Session from '../Session.js';
+import { translate as t } from '../../Translation.js';
+import Torrent from '../../components/Torrent';
+import State from '../../State.js';
+import Session from '../../Session.js';
 import iris from 'iris-lib';
 import _ from 'lodash';
 import $ from 'jquery';
-import EmojiButton from '../lib/emoji-button.js';
+import EmojiButton from '../../lib/emoji-button.js';
 import Gun from 'gun';
-import MessageForm from './MessageForm';
+import MessageForm from '../../components/MessageForm';
 
 const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
 

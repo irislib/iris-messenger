@@ -1,11 +1,11 @@
-import Component from '../BaseComponent';
-import Helpers from '../Helpers.js';
+import Component from '../../BaseComponent';
+import Helpers from '../../Helpers.js';
 import { html } from 'htm/preact';
-import { translate as t } from '../Translation.js';
-import State from '../State.js';
+import { translate as t } from '../../Translation.js';
+import State from '../../State.js';
 import ChatListItem from './ChatListItem.js';
 import { route } from 'preact-router';
-import Notifications from '../Notifications.js';
+import Notifications from '../../Notifications.js';
 import ScrollViewport from 'preact-scroll-viewport';
 import _ from 'lodash';
 import $ from 'jquery';

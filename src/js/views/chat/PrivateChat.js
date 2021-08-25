@@ -1,22 +1,20 @@
-import Helpers from '../Helpers.js';
+import Helpers from '../../Helpers.js';
 import { html } from 'htm/preact';
 import {createRef} from 'preact';
-import { translate as t } from '../Translation.js';
-import State from '../State.js';
-import Identicon from './Identicon.js';
-import Message from './Message.js';
+import { translate as t } from '../../Translation.js';
+import State from '../../State.js';
+import Identicon from '../../components/Identicon.js';
+import Message from '../../components/Message.js';
 import ChatMessageForm from './ChatMessageForm.js';
-import Name from './Name';
-import Session from '../Session.js';
-import Notifications from '../Notifications.js';
+import Name from '../../components/Name';
+import Session from '../../Session.js';
+import Notifications from '../../Notifications.js';
 import NewChat from './NewChat.js';
 import _ from 'lodash';
 import $ from 'jquery';
 import iris from 'iris-lib';
 import {Helmet} from 'react-helmet';
-import Component from '../BaseComponent';
-import MessageFeed from './MessageFeed';
-import OnboardingNotification from "./OnboardingNotification";
+import Component from '../../BaseComponent';
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
@@ -42,11 +40,17 @@ function copyMyChatLinkClicked(e) {
   }, 2000);
 }
 
-export default class ChatMain extends Component {
+export default class PrivateChat extends Component {
   constructor() {
     super();
     this.hashtagChatRef = createRef();
-    this.state = {sortedParticipants: []};
+    this.state = {
+      sortedMessages: [],
+      sortedParticipants: [],
+      showParticipants: true,
+      stickToBottom: true,
+      noLongerParticipant: false
+    };
   }
 
   shouldComponentUpdate() {
@@ -55,15 +59,7 @@ export default class ChatMain extends Component {
 
   componentDidMount() {
     if (!(this.props.id && this.props.id.length > 20)) return;
-    this.sortedMessages = [];
     this.participants = {};
-    this.setState({
-      sortedMessages: this.sortedMessages,
-      sortedParticipants: [],
-      showParticipants: true,
-      stickToBottom: true,
-      noLongerParticipant: false
-    });
     this.iv = null;
     this.chat = null;
     const go = () => {
@@ -215,14 +211,7 @@ export default class ChatMain extends Component {
 
   renderMainView() {
     let mainView;
-    if (this.props.hashtag) {
-      mainView = html`
-        <div class="main-view public-messages-view" id="message-view" ref=${this.hashtagChatRef}>
-          <${OnboardingNotification} />
-          <${MessageFeed} key=${this.props.hashtag} scrollElement=${this.hashtagChatRef.current} group="everyone" path="hashtags/${this.props.hashtag}"/>
-          <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
-        </div>`;
-    } else if (this.props.id && this.props.id.length > 20) {
+    if (this.props.id && this.props.id.length > 20) {
       const now = new Date();
       const nowStr = now.toLocaleDateString();
       let previousDateStr;
@@ -295,7 +284,7 @@ export default class ChatMain extends Component {
   }
 
   renderMsgForm() {
-    return this.props.hashtag || (this.props.id && this.props.id.length > 20) ? html`
+    return this.props.id && this.props.id.length > 20 ? html`
       <div id="scroll-down-btn" style="display:none;" onClick=${() => this.scrollDown()}>${caretDownSvg}</div>
       <div id="not-seen-by-them" style="display: none">
         <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
@@ -303,7 +292,7 @@ export default class ChatMain extends Component {
       </div>
       <div class="chat-message-form">
         ${this.state.noLongerParticipant ? html`<div style="text-align:center">You can't send messages to this group because you're no longer a participant.</div>` :
-          html`<${ChatMessageForm} key=${this.props.hashtag || this.props.id} hashtag=${this.props.hashtag} activeChat=${this.props.id} onSubmit=${() => (!this.props.hashtag && this.scrollDown())}/>`}
+          html`<${ChatMessageForm} key=${this.props.id} activeChat=${this.props.id} onSubmit=${() => this.scrollDown()}/>`}
       </div>
       `: '';
   }
@@ -311,7 +300,7 @@ export default class ChatMain extends Component {
   render() {
     return html`
       <${Helmet}><title>${this.chat && this.chat.name || 'Messages'}</title><//>
-      <div id="chat-main" class="${(this.props.id || this.props.hashtag) ? '' : 'hidden-xs'}">
+      <div id="chat-main" class="${this.props.id ? '' : 'hidden-xs'}">
         ${this.renderMainView()}
         ${this.renderMsgForm()}
       </div>

@@ -10,7 +10,7 @@ import Session from './Session.js';
 
 import Settings from './views/settings/Settings.js';
 import LogoutConfirmation from './views/LogoutConfirmation.js';
-import Chat from './views/Chat.js';
+import Chat from './views/chat/Chat.js';
 import Notifications from './views/Notifications.js';
 import Hashtags from './views/Hashtags.js';
 import Store from './views/Store.js';
