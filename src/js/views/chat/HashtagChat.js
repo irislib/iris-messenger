@@ -113,10 +113,10 @@ export default class ChatMain extends Component {
   render() {
     return html`
       <${Helmet}><title>${this.chat && this.chat.name || 'Messages'}</title><//>
-      <div id="chat-main" class="${(this.props.id || this.props.hashtag) ? '' : 'hidden-xs'}">
+      <div id="chat-main">
         <div class="main-view public-messages-view" id="message-view" ref=${this.hashtagChatRef}>
+          <${MessageFeed} reverse=${true} key=${this.props.hashtag} scrollElement=${this.hashtagChatRef.current} group="everyone" path="hashtags/${this.props.hashtag}"/>
           <${OnboardingNotification} />
-          <${MessageFeed} key=${this.props.hashtag} scrollElement=${this.hashtagChatRef.current} group="everyone" path="hashtags/${this.props.hashtag}"/>
           <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
         </div>
         
@@ -127,7 +127,7 @@ export default class ChatMain extends Component {
           <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_invite_link')}</button></p>
         </div>
         <div class="chat-message-form">
-          <${ChatMessageForm} key=${this.props.hashtag} hashtag=${this.props.hashtag} onSubmit=${() => (!this.props.hashtag && this.scrollDown())} />
+          <${ChatMessageForm} key=${this.props.hashtag} hashtag=${this.props.hashtag} onSubmit=${() => this.scrollDown()} />
         </div>
       </div>
       
