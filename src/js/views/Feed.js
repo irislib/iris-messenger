@@ -66,7 +66,7 @@ class Feed extends View {
               <h3>${hashtagText} <span style="float:right"><${SubscribeHashtagButton} key=${hashtag} id=${hashtag} /></span></h3>
             ` : ''}
             ${s.searchTerm ? '' : html`
-              <${FeedMessageForm} key=${path} index=${path} class="hidden-xs" autofocus=${false}/>
+              <${FeedMessageForm} key="form${path}" index=${path} class="hidden-xs" autofocus=${false}/>
             `}
             ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
               <${OnboardingNotification} />
