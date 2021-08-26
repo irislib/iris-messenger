@@ -45,9 +45,9 @@
   "dependencies": {
     "@zxing/library": "^0.18.6",
     "autolinker": "^3.14.3",
-    "gun": "^0.2020.1232",
+    "gun": "^0.2020.1234",
     "htm": "^3.1.0",
-    "iris-lib": "^0.0.158",
+    "iris-lib": "^0.0.159",
     "jquery": "^3.6.0",
     "lodash": "^4.17.21",
     "preact": "^10.5.14",

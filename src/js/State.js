@@ -1,6 +1,5 @@
 import Gun from 'gun';
 import 'gun/sea';
-import 'gun/nts.js';
 import 'gun/lib/open';
 import 'gun/lib/radix';
 import 'gun/lib/radisk';
