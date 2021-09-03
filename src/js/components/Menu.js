@@ -7,6 +7,7 @@ import logoType from "../../assets/img/iris_logotype.png";
 import {Link} from "preact-router/match";
 import {translate as t} from "../Translation";
 import Icons from "../Icons";
+import _ from "lodash";
 
 const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
   {url: '/', text: t('home'), icon: Icons.home},
@@ -22,6 +23,24 @@ const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
 export default class Menu extends Component {
   componentDidMount() {
     State.local.get('unseenMsgsTotal').on(this.inject());
+    this.updatePeersFromGun();
+    this.iv = setInterval(() => this.updatePeersFromGun(), 1000);
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    clearInterval(this.iv);
+  }
+
+  updatePeersFromGun() {
+    const peersFromGun = State.public.back('opt.peers') || {};
+    const connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
+      if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
+        console.log('WebRTC peer', peer);
+      }
+      return peer && peer.wire && peer.wire.hied === 'hi' && peer.wire.constructor.name === 'WebSocket';
+    });
+    this.setState({connectedPeers});
   }
 
   menuLinkClicked() {
@@ -53,6 +72,14 @@ export default class Menu extends Component {
             return html`<br/><br/>`;
           
         })}
+        <p>
+          <a href="/settings">
+            <small>
+            ${this.state.connectedPeers ? this.state.connectedPeers.length : ''} ${t('connected_peers').toLowerCase()}
+            </small>
+          </a>
+        </p>
+        
       </div>
     `;
   }
