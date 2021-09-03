@@ -116,13 +116,6 @@ class NewChat extends Component {
             <button type="submit">${t('create')}</button>
           </form>
         </p>
-        <h3>Subscribe to a hashtag (public)</h3>
-        <p>
-          <form onSubmit=${e => this.onSubscribeHashtag(e)}>
-            <input id="new-hashtag" type="text" placeholder="#hashtag"/>
-            <button type="submit">${t('subscribe')}</button>
-          </form>
-        </p>
         <hr/>
         <h3>${t('your_invite_links')}</h3>
         <p><button onClick=${() => Session.createChatLink()}>${t('create_new_invite_link')}</button></p>
