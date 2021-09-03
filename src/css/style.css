@@ -224,6 +224,10 @@ img, video {
   padding: 15px 30px;
 }
 
+.application-list a.connected small {
+  color: var(--positive-color);
+}
+
 a.logo {
   display: flex;
   align-items: center;

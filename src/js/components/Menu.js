@@ -24,7 +24,7 @@ export default class Menu extends Component {
   componentDidMount() {
     State.local.get('unseenMsgsTotal').on(this.inject());
     this.updatePeersFromGun();
-    this.iv = setInterval(() => this.updatePeersFromGun(), 1000);
+    this.iv = setInterval(() => this.updatePeersFromGun(), 3000);
   }
 
   componentWillUnmount() {
@@ -73,9 +73,11 @@ export default class Menu extends Component {
           
         })}
         <p>
-          <a href="/settings">
+          <a href="/settings" class="tooltip ${this.state.connectedPeers && this.state.connectedPeers.length ? 'connected' : ''}">
+            <span class="tooltiptext">${t('connected_peers')}</span>
             <small>
-            ${this.state.connectedPeers ? this.state.connectedPeers.length : ''} ${t('connected_peers').toLowerCase()}
+              <span class="icon">${Icons.network}</span>
+              ${this.state.connectedPeers ? this.state.connectedPeers.length : ''}
             </small>
           </a>
         </p>
