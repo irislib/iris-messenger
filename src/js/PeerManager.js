@@ -7,10 +7,14 @@ import Gun from 'gun';
 const MAX_PEER_LIST_SIZE = 10;
 const ELECTRON_GUN_URL = 'http://localhost:8767/gun';
 let maxConnectedPeers = Helpers.isElectron ? 2 : 1;
-const DEFAULT_PEERS = {
-  //'https://iris.cx/gun': {},
-  'https://gun-us.herokuapp.com/gun': {}
-};
+const DEFAULT_PEERS = {};
+
+if (window.location.hostname.endsWith('herokuapp.com') || window.location.host === 'localhost:5000') {
+  DEFAULT_PEERS[window.location.origin + '/gun'] = {};
+} else {
+  DEFAULT_PEERS['https://gun-us.herokuapp.com/gun'] = {};
+}
+
 let knownPeers = getSavedPeers();
 
 async function addPeer(peer) {
