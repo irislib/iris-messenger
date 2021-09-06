@@ -23,24 +23,6 @@ const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
 export default class Menu extends Component {
   componentDidMount() {
     State.local.get('unseenMsgsTotal').on(this.inject());
-    this.updatePeersFromGun();
-    this.iv = setInterval(() => this.updatePeersFromGun(), 3000);
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    clearInterval(this.iv);
-  }
-
-  updatePeersFromGun() {
-    const peersFromGun = State.public.back('opt.peers') || {};
-    const connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
-      if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
-        console.log('WebRTC peer', peer);
-      }
-      return peer && peer.wire && peer.wire.hied === 'hi' && peer.wire.constructor.name === 'WebSocket';
-    });
-    this.setState({connectedPeers});
   }
 
   menuLinkClicked() {
@@ -72,16 +54,6 @@ export default class Menu extends Component {
             return html`<br/><br/>`;
           
         })}
-        <p>
-          <a href="/settings" class="tooltip ${this.state.connectedPeers && this.state.connectedPeers.length ? 'connected' : ''}">
-            <span class="tooltiptext">${t('connected_peers')}</span>
-            <small>
-              <span class="icon">${Icons.network}</span>
-              ${this.state.connectedPeers ? this.state.connectedPeers.length : ''}
-            </small>
-          </a>
-        </p>
-        
       </div>
     `;
   }

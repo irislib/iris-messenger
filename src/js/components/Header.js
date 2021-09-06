@@ -15,6 +15,7 @@ import logo from '../../assets/img/icon128.png';
 import logoType from '../../assets/img/iris_logotype.png';
 
 import $ from 'jquery';
+import _ from "lodash";
 
 class Header extends Component {
   constructor() {
@@ -55,6 +56,7 @@ class Header extends Component {
 
   componentWillUnmount() {
     super.componentWillUnmount();
+    clearInterval(this.iv);
     document.removeEventListener("keydown", this.escFunction, false);
   }
 
@@ -86,6 +88,8 @@ class Header extends Component {
         }
       }
     ));
+    this.updatePeersFromGun();
+    this.iv = setInterval(() => this.updatePeersFromGun(), 1000);
   }
 
   onTitleClicked() {
@@ -101,6 +105,17 @@ class Header extends Component {
     $('a.logo').blur();
     ($(window).width() > 625) && route('/');
     State.local.get('toggleMenu').put(true);
+  }
+
+  updatePeersFromGun() {
+    const peersFromGun = State.public.back('opt.peers') || {};
+    const connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
+      if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
+        console.log('WebRTC peer', peer);
+      }
+      return peer && peer.wire && peer.wire.hied === 'hi' && peer.wire.constructor.name === 'WebSocket';
+    });
+    this.setState({connectedPeers});
   }
 
   render() {
@@ -140,6 +155,13 @@ class Header extends Component {
             <span class="visible-xs-inline-block">${Icons.backArrow}</span>
           </a>
         `}
+        <a href="/settings" class="connected-peers tooltip ${this.state.showMobileSearch ? 'hidden-xs' : ''} ${this.state.connectedPeers && this.state.connectedPeers.length ? 'connected' : ''}">
+          <span class="tooltiptext">${t('connected_peers')}</span>
+          <small>
+            <span class="icon">${Icons.network}</span>
+            <span>${this.state.connectedPeers ? this.state.connectedPeers.length : ''}</span>
+          </small>
+        </a>
         <div class="text" style=${this.chatId ? 'cursor:pointer;text-align:center' : ''} onClick=${() => this.onTitleClicked()}>
           ${this.state.title && chatting ? html`
             <div class="name">

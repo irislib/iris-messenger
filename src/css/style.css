@@ -224,7 +224,28 @@ img, video {
   padding: 15px 30px;
 }
 
-.application-list a.connected small {
+.nav .connected-peers small {
+  display: flex;
+  align-items: center;
+}
+
+.connected-peers:hover small, .connected-peers:focus small {
+  opacity: 0.8;
+}
+
+.connected-peers:focus, .connected-peers:active {
+  text-decoration: none;
+}
+
+.connected-peers .icon {
+  margin-right: 5px;
+}
+
+.connected-peers small {
+  color: var(--input-placeholder);
+}
+
+.connected-peers.connected small {
   color: var(--positive-color);
 }
 
