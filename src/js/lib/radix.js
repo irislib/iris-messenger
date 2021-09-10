@@ -1,4 +1,4 @@
-;(function(){
+(function(){
 
 	function Radix(){
 		var radix = function(key, val, t){
@@ -58,7 +58,7 @@
 			}
 		}
 		return radix;
-	};
+	}
 
 	Radix.map = function rap(radix, cb, opt, pre){ pre = pre || []; // TODO: BUG: most out-of-memory crashes come from here.
 		var t = ('function' == typeof radix)? radix.$ || {} : radix;

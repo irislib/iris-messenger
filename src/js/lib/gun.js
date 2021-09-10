@@ -1,4 +1,4 @@
-;(function(){
+(function(){
 
   /* UNBUILD */
   function USE(arg, req){
@@ -13,7 +13,7 @@
   if(typeof module !== "undefined"){ var MODULE = module }
   /* UNBUILD */
 
-	;USE(function(module){
+	USE(function(module){
 		// Generic javascript utilities.
 		var Type = {};
 		//Type.fns = Type.fn = {is: function(fn){ return (!!fn && fn instanceof Function) }}
@@ -85,7 +85,7 @@
 		Type.obj.ify = function(o){
 			if(obj_is(o)){ return o }
 			try{o = JSON.parse(o);
-			}catch(e){o={}};
+			}catch(e){o={}}
 			return o;
 		}
 		;(function(){ var u;
@@ -112,7 +112,7 @@
 				return obj_map(o,empty,{n:n})? false : true;
 			}
 		}());
-		;(function(){
+		(function(){
 			function t(k,v){
 				if(2 === arguments.length){
 					t.r = t.r || {};
@@ -120,7 +120,7 @@
 					return;
 				} t.r = t.r || [];
 				t.r.push(k);
-			};
+			}
 			var keys = Object.keys, map, u;
 			Object.keys = Object.keys || function(o){ return map(o, function(v,k,t){t(k)}) }
 			Type.obj.map = map = function(l, c, _){
@@ -167,7 +167,7 @@
 		module.exports = Type;
 	})(USE, './type');
 
-	;USE(function(module){
+	USE(function(module){
 		// On event emitter generic javascript utility.
 		module.exports = function onto(tag, arg, as){
 			if(!tag){ return {to: onto} }
@@ -207,7 +207,7 @@
 		};
 	})(USE, './onto');
 
-	;USE(function(module){
+	USE(function(module){
 		var to = (typeof setImmediate !== "undefined")? setImmediate : setTimeout, puff = function(cb){
 			if(Q.length){ Q.push(cb); return } Q = [cb];
 			to(function go(S){ S = S || +new Date;
@@ -221,7 +221,7 @@
 		module.exports = setTimeout.puff = puff;
 	})(USE, './puff');
 
-	;USE(function(module){
+	USE(function(module){
 		/* Based on the Hypothetical Amnesia Machine thought experiment */
 		function HAM(machineState, incomingState, currentState, incomingValue, currentValue){
 			if(machineState < incomingState){
@@ -268,7 +268,7 @@
 		module.exports = HAM;
 	})(USE, './HAM');
 
-	;USE(function(module){
+	USE(function(module){
 		var Type = USE('./type');
 		var Val = {};
 		Val.is = function(v){ // Valid values are a subset of JSON: null, binary, number (!Infinity), text, or a soul relation. Arrays need special algorithms to handle concurrency, so they are not supported directly. Use an extension that supports them if needed but research their problems first.
@@ -283,7 +283,7 @@
 			return Val.link.is(v) || false; // is the value a soul relation? Then it is valid and return it. If not, everything else remaining is an invalid data type. Custom extensions can be built on top of these primitives to support other types.
 		}
 		Val.link = Val.rel = {_: '#'};
-		;(function(){
+		(function(){
 			Val.link.is = function(v){ // this defines whether an object is a soul relation or not, they look like this: {'#': 'UUID'}
 				if(v && v[rel_] && !v._ && obj_is(v)){ // must be an object.
 					var o = {};
@@ -313,7 +313,7 @@
 		module.exports = Val;
 	})(USE, './val');
 
-	;USE(function(module){
+	USE(function(module){
 		var Type = USE('./type');
 		var Val = USE('./val');
 		var Node = {_: '_'};
@@ -326,7 +326,7 @@
 			return n;
 		}
 		Node.soul._ = Val.link._;
-		;(function(){
+		(function(){
 			Node.is = function(n, cb, as){ var s; // checks to see if an object is a valid node.
 				if(!obj_is(n)){ return false } // must be an object.
 				if(s = Node.soul(n)){ // must have a soul on it.
@@ -340,7 +340,7 @@
 				if(this.cb){ this.cb.call(this.as, v, k, this.n, this.s) } // optionally callback each key/value.
 			}
 		}());
-		;(function(){
+		(function(){
 			Node.ify = function(obj, o, as){ // returns a node from a shallow object.
 				if(!o){ o = {} }
 				else if(typeof o === 'string'){ o = {soul: o} }
@@ -372,7 +372,7 @@
 		module.exports = Node;
 	})(USE, './node');
 
-	;USE(function(module){
+	USE(function(module){
 		var Type = USE('./type');
 		var Node = USE('./node');
 		function State(){
@@ -456,12 +456,12 @@
 		module.exports = State;
 	})(USE, './state');
 
-	;USE(function(module){
+	USE(function(module){
 		var Type = USE('./type');
 		var Val = USE('./val');
 		var Node = USE('./node');
 		var Graph = {};
-		;(function(){
+		(function(){
 			Graph.is = function(g, cb, fn, as){ // checks to see if an object is a valid graph.
 				if(!g || !obj_is(g) || obj_empty(g)){ return false } // must be an object.
 				return !obj_map(g, map, {cb:cb,fn:fn,as:as}); // makes sure it wasn't an empty object.
@@ -476,7 +476,7 @@
 				if(fn){ Node.is(nf.n, fn, nf.as) } // where we then have an optional callback for each key/value.
 			}
 		}());
-		;(function(){
+		(function(){
 			Graph.ify = function(obj, env, as){
 				var at = {path: [], obj: obj};
 				if(!env){
@@ -616,7 +616,7 @@
 		module.exports = Graph;
 	})(USE, './graph');
 
-	;USE(function(module){
+	USE(function(module){
 		// request / response module, for asking and acking messages.
 		USE('./onto'); // depends upon onto!
 		module.exports = function ask(cb, as){
@@ -640,7 +640,7 @@
 		}
 	})(USE, './ask');
 
-	;USE(function(module){
+	USE(function(module){
 		var Type = USE('./type');
 		function Dup(opt){
 			var dup = {s:{}}, s = dup.s;
@@ -669,7 +669,7 @@
 		module.exports = Dup;
 	})(USE, './dup');
 
-	;USE(function(module){
+	USE(function(module){
 
 		function Gun(o){
 			if(o instanceof Gun){ return (this._ = {$: this}).$ }
@@ -696,7 +696,7 @@
 		Gun.dup = USE('./dup');
 		Gun.puff = USE('./puff');
 
-		;(function(){
+		(function(){
 			Gun.create = function(at){
 				at.root = at.root || at;
 				at.graph = at.graph || {};
@@ -829,7 +829,7 @@
 			var HAM = Gun.HAM, MD = 2147483647, State = Gun.state;
 		}());
 
-		;(function(){
+		(function(){
 			Gun.on._put = function(msg, gun){
 				var at = gun._, ctx = {$: gun, graph: at.graph, put: {}, map: {}, souls: {}, machine: Gun.state(), ack: msg['@'], cat: at, stop: {}};
 				if(!Gun.obj.map(msg.put, perf, ctx)){ return } // HNPERF: performance test, not core code, do not port.
@@ -948,7 +948,7 @@
 			}
 		}());
 
-		;(function(){
+		(function(){
 			Gun.chain.opt = function(opt){
 				opt = opt || {};
 				var gun = this, at = gun._, tmp = opt.peers || opt;
@@ -993,11 +993,11 @@
 		(Gun.window||'').console = (Gun.window||'').console || {log: function(){}};
 		(C = console).only = function(i, s){ return (C.only.i && i === C.only.i && C.only.i++) && (C.log.apply(C, arguments) || s) };
 
-		;"Please do not remove welcome log unless you are paying for a monthly sponsorship, thanks!";
+		"Please do not remove welcome log unless you are paying for a monthly sponsorship, thanks!";
 		Gun.log.once("welcome", "Hello wonderful person! :) Thanks for using GUN, please ask for help on http://chat.gun.eco if anything takes you longer than 5min to figure out!");
 	})(USE, './root');
 
-	;USE(function(module){
+	USE(function(module){
 		var Gun = USE('./root');
 		Gun.chain.back = function(n, opt){ var tmp;
 			n = n || 1;
@@ -1038,7 +1038,7 @@
 		var empty = {}, u;
 	})(USE, './back');
 
-	;USE(function(module){
+	USE(function(module){
 		// WARNING: GUN is very simple, but the JavaScript chaining API around GUN
 		// is complicated and was extremely hard to build. If you port GUN to another
 		// language, consider implementing an easier API to build.
@@ -1177,7 +1177,7 @@
 				}
 				if(cat.has && at !== cat && obj_has(at, 'put')){
 					cat.put = at.put;
-				};
+				}
 				if((rel = Gun.node.soul(change)) && at.has){
 					at.put = (cat.root.$.get(rel)._).put;
 				}
@@ -1344,7 +1344,7 @@
 		var _soul = Gun.val.link._, node_ = Gun.node._;
 	})(USE, './chain');
 
-	;USE(function(module){
+	USE(function(module){
 		var Gun = USE('./root');
 		Gun.chain.get = function(key, cb, as){
 			var gun, tmp;
@@ -1487,7 +1487,7 @@
 		var empty = {}, u;
 	})(USE, './get');
 
-	;USE(function(module){
+	USE(function(module){
 		var Gun = USE('./root');
 		Gun.chain.put = function(data, cb, as){
 			var gun = this, at = (gun._), root = at.root.$, ctx = root._, M = 100, tmp;
@@ -1727,7 +1727,7 @@
 		var node_ = Gun.node._;
 	})(USE, './put');
 
-	;USE(function(module){
+	USE(function(module){
 		var Gun = USE('./root');
 		USE('./chain');
 		USE('./back');
@@ -1736,7 +1736,7 @@
 		module.exports = Gun;
 	})(USE, './index');
 
-	;USE(function(module){
+	USE(function(module){
 		var Gun = USE('./index');
 		Gun.chain.on = function(tag, arg, eas, as){
 			var gun = this, at = gun._, tmp, act, off;
@@ -1879,7 +1879,7 @@
 		var empty = {}, noop = function(){}, u;
 	})(USE, './on');
 
-	;USE(function(module){
+	USE(function(module){
 		var Gun = USE('./index');
 		Gun.chain.map = function(cb, opt, t){
 			var gun = this, cat = gun._, chain;
@@ -1916,7 +1916,7 @@
 		var obj_map = Gun.obj.map, noop = function(){}, event = {stun: noop, off: noop}, n_ = Gun.node._, u;
 	})(USE, './map');
 
-	;USE(function(module){
+	USE(function(module){
 		var Gun = USE('./index');
 		Gun.chain.set = function(item, cb, opt){
 			var gun = this, soul;
@@ -1940,7 +1940,7 @@
 		function uuid(){ return Gun.state.lex() + Gun.text.random(7) }
 	})(USE, './set');
 
-	;USE(function(module){
+	USE(function(module){
 		if(typeof Gun === 'undefined'){ return } // TODO: localStorage is Browser only. But it would be nice if it could somehow plugin into NodeJS compatible localStorage APIs?
 
 		var root, noop = function(){}, store, u;
@@ -2003,7 +2003,7 @@
 					});
 					flush();
 				}, opt.wait || 1);
-			};
+			}
 			ev.next(root);
 
 			var map = function(val, key, node, soul){
@@ -2054,7 +2054,7 @@
 				}
 				//if(!data && !Gun.obj.empty(opt.peers)){ return } // if data not found, don't ack if there are peers. // Hmm, what if we have peers but we are disconnected?
 				root.on('in', {'@': msg['#'], put: Gun.graph.node(data), lS:1});// || root.$});
-				};
+				}
 				Gun.debug? setTimeout(to,1) : to();
 			});
 
@@ -2091,7 +2091,7 @@
 		});
 	})(USE, './adapters/localStorage');
 
-	;USE(function(module){
+	USE(function(module){
 		var Type = USE('../type');
 
 		function Mesh(root){
@@ -2166,7 +2166,7 @@
 			var noop = function(){};
 			hear.c = hear.d = 0;
 
-			;(function(){
+			(function(){
 				var SMIA = 0;
 				var message, loop;
 				function each(peer){ mesh.say(message, peer) }
@@ -2200,7 +2200,7 @@
 					if(!peer || !peer.id){ message = msg;
 						if(!Type.obj.is(peer || opt.peers)){ return false }
 						var P = opt.puff, ps = opt.peers, pl = Object.keys(peer || opt.peers || {}); // TODO: BETTER PERF? No object.keys? It is polyfilled by Type.js tho.
-						;(function go(){
+						(function go(){
 							var S = +new Date;
 							//Type.obj.map(peer || opt.peers, each); // in case peer is a peer list.
 							loop = 1; var wr = meta.raw; meta.raw = raw; // quick perf hack
@@ -2268,7 +2268,7 @@
 				(peer.queue = peer.queue || []).push(raw);
 			}}
 
-			;(function(){
+			(function(){
 				// TODO: this caused a out-of-memory crash!
 				mesh.raw = function(msg){ // TODO: Clean this up / delete it / move logic out!
 					if(!msg){ return '' }
@@ -2361,7 +2361,7 @@
 			return mesh;
 		}
 
-		;(function(){
+		(function(){
 			var $ = JSON.stringify, u;
 
 			Type.obj.hash = function(obj, hash){
@@ -2392,7 +2392,7 @@
 
 	})(USE, './adapters/mesh');
 
-	;USE(function(module){
+	USE(function(module){
 		var Gun = USE('../index');
 		Gun.Mesh = USE('./mesh');
 

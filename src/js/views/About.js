@@ -14,29 +14,36 @@ class About extends View {
         <h3>${t('about')}</h3>
         <p>${t('iris_is_like')}</p>
         <ul>
-          <li><b>No phone number or signup required.</b> Just type in your name or alias and go!</li>
-          <li><b>Secure</b>: It's open source. Users can validate that big brother doesn't read your private messages.</li>
-          <li><b>Available</b>: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.</li>
+          <li dangerouslySetInnerHTML=${{ __html: t('iris_is_accessible')}}></li>
+          <li dangerouslySetInnerHTML=${{ __html: t('iris_is_secure')}}></li>
+          <li dangerouslySetInnerHTML=${{ __html: t('iris_is_always_available')}}></li>
         </ul>
-        <p>In other words, <b>you can't be deplatformed from Iris</b>.</p>
+        <p> ${t('in_other_words')} </p>
+
+
+
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
         <p><small>Version 1.7.1</small></p>
 
         ${iris.util.isElectron ? '' : html`
           <div id="desktop-application-about">
-            <h4>Get the desktop application</h4>
+            <h4> ${t('get_the_desktop_application')} </h4>
             <ul>
-              <li>Communicate and synchronize with local network peers without Internet access
+              <li> ${t('communicate_and_synchronize')} </li>
+
                 <ul>
-                  <li>When local peers eventually connect to the Internet, your messages are relayed globally</li>
-                  <li>Bluetooth support upcoming</li>
+                <li> ${t('when_local_peers')} </li>
+                <li> ${t('bluetooth_support_upcoming')} </li>
+
                 </ul>
-              </li>
-              <li>Opens to background on login: stay online and get message notifications</li>
-              <li>More secure and available: no need to open the browser application from a server</li>
-              <li>Direct-connect to the people you have an open chat with (if port 8767 open or upnp enabled in router)</li>
+
+              <li> ${t('opens_to_background')}  </li>
+
+              <li> ${t('more_secure_and_available')} </li>
+
+              <li> ${t('direct_connect_to_the')} </li>
             </ul>
-            <p><a href="https://github.com/irislib/iris-electron/releases">Download</a></p>
+            <a href="https://github.com/irislib/iris-electron/releases">Download</a>
           </div>
         `}
 
@@ -46,8 +53,8 @@ class About extends View {
         <p>In that regard, Iris prioritizes decentralization and availability over perfect privacy.</p>
         <p>Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.</p>
         <p>Iris makes no guarantees of data persistence.</p>
-        <p>You can check your saved data in the <a href="#/explorer">Explorer</a>.</p>
-        <p>${t('application_security_warning')}</p>
+        <p>You can check your saved data in the <a href="https://iris.to/explorer">Explorer</a></p>
+        <p> ${t('the_application_is_unaudited')}</p>
 
         <h4>${t('donate')}</h4>
         <p dangerouslySetInnerHTML=${{ __html:t('donate_info', "href=\"https://opencollective.com/iris-social\"") + ': 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST' }}></p>

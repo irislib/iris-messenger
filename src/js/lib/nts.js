@@ -1,4 +1,4 @@
-;(function(){
+(function(){
 	// NOTE: While the algorithm is P2P,
 	// the current implementation is one sided,
 	// only browsers self-modify, servers do not.

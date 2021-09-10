@@ -1,4 +1,4 @@
-;(function(){
+(function(){
 
 	function Radisk(opt){
 
@@ -327,7 +327,7 @@
 			var revo = {reverse: true};
 		}());
 
-		;(function(){
+		(function(){
 			/*
 				Let us start by assuming we are the only process that is
 				changing the directory or bucket. Not because we do not want
@@ -445,7 +445,7 @@
 			}
 		}());
 
-		;(function(){
+		(function(){
 			var dir, f = String.fromCharCode(28), Q;
 			r.find = function(key, cb){
 				if(!dir){
@@ -506,7 +506,7 @@
 		return r;
 	}
 
-	;(function(){
+	(function(){
 		var _ = String.fromCharCode(31), u;
 		Radisk.encode = function(d, o, s){ s = s || _;
 			var t = s, tmp;
