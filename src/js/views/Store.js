@@ -1,14 +1,16 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import {translate as t} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg.js';
+import Filters from '../components/Filters.js';
 import CopyButton from '../components/CopyButton.js';
 import FollowButton from '../components/FollowButton.js';
 import Identicon from '../components/Identicon.js';
 import View from './View.js';
+import OnboardingNotification from "../components/OnboardingNotification";
 
 class Store extends View {
   constructor() {
@@ -21,6 +23,7 @@ class Store extends View {
     this.state = {items:{}};
     this.items = {};
     this.id = 'profile';
+    this.class = 'public-messages-view';
   }
 
   addToCart(k, user, e) {
@@ -36,13 +39,11 @@ class Store extends View {
     let profilePhoto;
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${user} callback=${src => this.onProfilePhotoSet(src)}/>`;
-    } else {
-      if (this.state.photo) {
+    } else if (this.state.photo) {
         profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
       } else {
         profilePhoto = html`<${Identicon} str=${user} width=250/>`
       }
-    }
     return html`
       <div class="content">
         <div class="profile-top">
@@ -70,9 +71,9 @@ class Store extends View {
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
                 ${followable ? html`<${FollowButton} id=${user}/>` : ''}
-                <button onClick=${() => route('/chat/' + user)}>${t('send_message')}</button>
+                <button onClick=${() => route(`/chat/${  user}`)}>${t('send_message')}</button>
                 ${uuid ? '' : html`
-                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${`https://iris.to/${  window.location.pathname}`}/>
                 `}
               </div>
             </div>
@@ -88,35 +89,11 @@ class Store extends View {
     `;
   }
 
-  getNotification() {
-    const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
-    if (this.state.noFollows) {
-      return html`
-          <div class="centered-container">
-            <div class="msg">
-                <div class="msg-content">
-                    <p>${t('follow_someone_info')}</p>
-                    <div class="profile-link-container">
-                        <a href="/profile/${SUGGESTED_FOLLOW}" class="profile-link">
-                            <${Identicon} str=${SUGGESTED_FOLLOW} width=40/>
-                            <iris-text path="profile/name" user=${SUGGESTED_FOLLOW} placeholder="Suggested follow"/>
-                        </a>
-                        <${FollowButton} id=${SUGGESTED_FOLLOW}/>
-                    </div>
-                    <p>${t('alternatively')} <a
-                            href="/profile/${Session.getPubKey()}">${t('give_your_profile_link_to_someone')}</a>.</p>
-                </div>
-            </div>
-          </div>
-      `
-    }
-    return '';
-  }
-
   renderItems() {
     const cartTotalItems = Object.keys(this.cart).reduce((sum, k) => sum + this.cart[k], 0);
     const keys = Object.keys(this.state.items);
     return html`
+      ${(this.props.store || this.state.noFollows) ? '' : html`<${Filters}/>`}
       ${cartTotalItems ? html`
         <p>
           <button onClick=${() => route('/checkout')}>${t('shopping_cart')}(${cartTotalItems})</button>
@@ -132,15 +109,19 @@ class Store extends View {
         ${keys.map(k => {
           const i = this.state.items[k];
           return html`
-            <div class="thumbnail-item store-item" onClick=${() => route(`/product/${k}/${i.user}`)}>
+            <div class="thumbnail-item store-item" onClick=${() => route(`/product/${k}/${i.from}`)}>
               <${SafeImg} src=${i.photo}/>
-              <a href="/product/${k}/${i.user}" class="name">${i.name}</a>
+              <a href="/product/${k}/${i.from}" class="name">${i.name}</a>
               ${this.props.store ? '':html`
-                <small>by <iris-text path="profile/name" editable="false" placeholder="Name" user=${i.user}/></small>
+                <small>by <iris-text path="profile/name" editable="false" placeholder="Name" user=${i.from}/></small>
               `}
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>
+<<<<<<< HEAD
               <button class="add" onClick=${e => this.addToCart(k, i.user, e)}>
+=======
+              <button class="add" onClick=${e => this.addToCart(k, i.from, e)}>
+>>>>>>> origin/master
               ${t('add_to_cart')}
                 ${this.cart[k] ? ` (${this.cart[k]})` : ''}
               </button>
@@ -158,13 +139,13 @@ class Store extends View {
     return html`
       <p dangerouslySetInnerHTML=${{ __html: t('this_is_a_prototype_store', `href="/store/${Session.getPubKey()}"`
         )}}></p>
+<<<<<<< HEAD
       ${this.getNotification()}
+=======
+      <${OnboardingNotification} />
+>>>>>>> origin/master
       ${this.renderItems()}
     `;
-  }
-
-  componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
   }
 
   updateTotalPrice() {
@@ -183,59 +164,61 @@ class Store extends View {
   }
 
   getCartFromUser(user) {
-    State.local.get('cart').get(user).map().on((v, k, a, e) => {
-      if (k === '#') { return; } // blah
-      this.eventListeners['cart' + user] = e;
-      this.cart[k + user] = v;
-      this.carts[user] = this.carts[user] || {};
-      this.carts[user][k] = v;
-      this.setState({cart: this.cart, carts: this.carts});
+    State.local.get('cart').get(user).map().on(this.sub(
+      (v, k) => {
+        if (k === '#') { return; } // blah
+        this.cart[k + user] = v;
+        this.carts[user] = this.carts[user] || {};
+        this.carts[user][k] = v;
+        this.setState({cart: this.cart, carts: this.carts});
+        this.updateTotalPrice();
+      }, `cart${  user}`
+    ));
+  }
+
+  onProduct(p, id, a, e, from) {
+    this.eventListeners[`products${  from}`] = e;
+    if (p) {
+      const o = {};
+      p.from = from;
+      o[id] = p;
+      Object.assign(this.items, o);
       this.updateTotalPrice();
-    });
+    } else {
+      delete this.items[id];
+    }
+    this.setState({items: this.items});
   }
 
   getProductsFromUser(user) {
-    State.public.user(user).get('store').get('products').map().on((p, id, a, e) => {
-      this.eventListeners['products' + user] = e;
-      if (p) {
-        const o = {};
-        p.user = user;
-        o[id] = p;
-        Object.assign(this.items, o);
-        this.updateTotalPrice();
-      } else {
-        delete this.items[id];
-      }
-      this.setState({items: this.items});
-    });
+    State.public.user(user).get('store').get('products').map().on(this.sub(
+      (...args) => {
+        return this.onProduct(...args, user);
+      }, `${user  }products`
+    ));
   }
 
   getAllCarts() {
     const carts = {};
-    State.local.get('cart').map((o, user) => {
-      if (!user) {
-        delete carts[user];
-        return;
+    State.local.get('cart').map(this.sub(
+      (o, user) => {
+        if (!user) {
+          delete carts[user];
+          return;
+        }
+        if (carts[user]) { return; }
+        carts[user] = true;
+        this.getCartFromUser(user);
       }
-      if (carts[user]) { return; }
-      carts[user] = true;
-      this.getCartFromUser(user);
-    });
+    ));
   }
 
-  getAllProducts() {
-    const follows = {};
-    State.local.get('follows').map().on((isFollowing, user, a, e) => {
-      this.state.noFollows && Session.getPubKey() !== user && State.local.get('noFollows').put(false);
-      this.eventListeners['follows'] = e;
-      if (!isFollowing) {
-        delete follows[user];
-        return;
+  getAllProducts(group) {
+    State.group(group).map('store/products', this.sub(
+      (...args) => {
+        this.onProduct(...args);
       }
-      if (follows[user]) { return; }
-      follows[user] = true;
-      this.getProductsFromUser(user);
-    });
+    ));
   }
 
   componentDidMount() {
@@ -246,14 +229,23 @@ class Store extends View {
     this.isMyProfile = Session.getPubKey() === user;
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', totalPrice: 0, items: {}, cart: {}});
 
-    State.local.get('noFollows').on(noFollows => this.setState({noFollows}));
-
     if (user) {
       this.getCartFromUser(user);
       this.getProductsFromUser(user);
     } else {
+      let prevGroup;
+      State.local.get('filters').get('group').on(this.sub(
+        (group,k,x,e) => {
+          if (group !== prevGroup) {
+            this.items = {};
+            this.setState({items:{}});
+            prevGroup = group;
+            this.eventListeners.push(e);
+            this.getAllProducts(group);
+          }
+        }
+      ));
       this.getAllCarts();
-      this.getAllProducts();
     }
   }
 }

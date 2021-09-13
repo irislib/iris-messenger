@@ -1,4 +1,4 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Identicon from '../components/Identicon.js';
 import {translate as t} from '../Translation.js';
@@ -10,47 +10,47 @@ import Session from '../Session.js';
 class Follows extends View {
   constructor() {
     super();
-    this.eventListeners = {};
     this.follows = {};
     this.id = "follows-view";
   }
 
   getFollows() {
     const f = Session.getFollows();
-    State.public.user(this.props.id).get('follow').map().on((follows, pub, b, e) => {
-      this.eventListeners['follow'] = e;
-      if (follows) {
-        this.follows[pub] = f[pub] || {};
+    State.public.user(this.props.id).get('follow').map().on(this.sub(
+      (follows, pub) => {
+        if (follows) {
+          this.follows[pub] = f[pub] || {};
+          this.setState({});
+        } else {
+          delete this.follows[pub];
+        }
         this.setState({});
-      } else {
-        delete this.follows[pub];
-        this.eventListeners[pub] && this.eventListeners[pub].off();
       }
-      this.setState({});
-    });
+    ));
+  }
+
+  shouldComponentUpdate() {
+    return true;
   }
 
   getFollowers() {
     const f = Session.getFollows();
-    State.local.get('follows').map().once((follows, pub) => {
-      if (follows) {
-        State.public.user(pub).get('follow').get(this.props.id).on(follows => {
-          if (!follows) return;
-          this.follows[pub] = f[pub] || {};
+    console.log(`follow/${this.props.id}`);
+    State.group().on(`follow/${this.props.id}`, this.sub((following, a, b, e, user) => {
+      console.log(user, following);
+      if (following) {
+          if (!following) return;
+          console.log(f);
+          this.follows[user] = f[user] || {};
           this.setState({});
-        })
       }
-    });
+    }));
   }
 
   componentDidMount() {
     if (this.props.id) {
       this.props.followers ? this.getFollowers() : this.getFollows();
     }
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
   }
 
   renderView() {
@@ -67,7 +67,7 @@ class Follows extends View {
         <div id="follows-list">
           ${keys.map(k => {
             return html`
-            <div class="profile-link-container">
+            <div key=${k} class="profile-link-container">
               <a href="/profile/${k}" class="profile-link">
                 <${Identicon} str=${k} width=49/>
                 <div>

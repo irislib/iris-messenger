@@ -1,19 +1,34 @@
-import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
+import Component from '../BaseComponent';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import { translate as t } from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import Identicon from './Identicon.js';
 import SearchBox from './SearchBox.js';
 import Icons from '../Icons.js';
+import iris from 'iris-lib';
+import {Link} from "preact-router/match";
+
+import logo from '../../assets/img/icon128.png';
+import logoType from '../../assets/img/iris_logotype.png';
+
+import $ from 'jquery';
+import _ from "lodash";
 
 class Header extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
-    this.eventListeners = [];
     this.chatId = null;
+    this.escFunction = this.escFunction.bind(this);
+  }
+
+  escFunction(event){
+    if(event.keyCode === 27) {
+      this.state.showMobileSearch && this.setState({showMobileSearch: false});
+    }
   }
 
   getOnlineStatusText() {
@@ -30,7 +45,7 @@ class Header extends Component {
         } else {
           lastSeenText = iris.util.formatDate(d);
         }
-        return (t('last_active') + ' ' + lastSeenText);
+        return (`${t('last_active')  } ${  lastSeenText}`);
       }
     }
   }
@@ -39,52 +54,46 @@ class Header extends Component {
     route('/chat');
   }
 
-  componentDidMount() {
-    State.local.get('showParticipants').on(showParticipants => this.setState({showParticipants}));
-    State.local.get('unseenTotal').on(unseenTotal => {
-      this.setState({unseenTotal});
-    });
-    State.local.get('activeRoute').on(activeRoute => {
-      this.setState({about:null});
-      this.eventListeners.forEach(e => e.off());
-      this.eventListeners = [];
-      this.setState({activeRoute});
-      const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-      this.chatId = replaced.length < activeRoute.length ? replaced : null;
-      if (this.chatId) {
-        State.local.get('channels').get(this.chatId).get('isTyping').on((isTyping, a, b, event) => {
-          this.eventListeners.push(event);
-          this.setState({});
-        });
-        State.local.get('channels').get(this.chatId).get('theirLastActiveTime').on((t, a, b, event) => {
-          this.eventListeners.push(event);
-          this.setState({});
-        });
-      }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    clearInterval(this.iv);
+    document.removeEventListener("keydown", this.escFunction, false);
+  }
 
-      let title = '';
-      if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
-        if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
-          title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
-          this.setState({title});
-        } else {
-          State.local.get('channels').get(this.chatId).get('name').on((name, a, b, eve) => {
-            this.eventListeners.push(eve);
-            this.setState({title: name});
-          });
-          State.local.get('channels').get(this.chatId).get('about').on((about, a, b, eve) => {
-            this.eventListeners.push(eve);
-            this.setState({about});
-          });
+  componentDidMount() {
+    document.addEventListener("keydown", this.escFunction, false);
+    State.local.get('showParticipants').on(this.inject());
+    State.local.get('unseenMsgsTotal').on(this.inject());
+    State.local.get('unseenNotificationCount').on(this.inject());
+    State.local.get('activeRoute').on(this.sub(
+      activeRoute => {
+        this.setState({about:null, title: '', activeRoute, showMobileSearch: false});
+        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+        this.chatId = replaced.length < activeRoute.length ? replaced : null;
+        if (this.chatId) {
+          State.local.get('channels').get(this.chatId).get('isTyping').on(this.inject());
+          State.local.get('channels').get(this.chatId).get('theirLastActiveTime').on(this.inject());
         }
-      } else {
-        this.setState({title});
+
+        if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
+          if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
+            const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
+            this.setState({title});
+          } else if (activeRoute.indexOf('/chat/hashtag/') === 0) {
+            this.setState({title: `#${activeRoute.replace('/chat/hashtag/','')}`, about: 'Public'})
+          } else {
+            State.local.get('channels').get(this.chatId).get('name').on(this.inject('title'));
+            State.local.get('channels').get(this.chatId).get('about').on(this.inject());
+          }
+        }
       }
-    });
+    ));
+    this.updatePeersFromGun();
+    this.iv = setInterval(() => this.updatePeersFromGun(), 1000);
   }
 
   onTitleClicked() {
-    if (this.chatId) {
+    if (this.chatId && this.chatId.indexOf('hashtag') === -1) {
       const view = this.chatId.length < 40 ? '/group/' : '/profile/';
       route(view + this.chatId);
     }
@@ -98,13 +107,28 @@ class Header extends Component {
     State.local.get('toggleMenu').put(true);
   }
 
+  updatePeersFromGun() {
+    const peersFromGun = State.public.back('opt.peers') || {};
+    const connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
+      if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
+        console.log('WebRTC peer', peer);
+      }
+      return peer && peer.wire && peer.wire.hied === 'hi' && peer.wire.constructor.name === 'WebSocket';
+    });
+    this.setState({connectedPeers});
+  }
+
   render() {
+    const key = Session.getPubKey();
+    if (!key) { return; }
     const activeRoute = this.state.activeRoute;
     const chat = Session.channels[this.chatId];
     const isTyping = chat && chat.isTyping;
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
-    const key = Session.getKey().pub;
-    const searchBox = this.chatId ? '' : html`<${SearchBox}/>`;
+    const searchBox = this.chatId ? '' : html`
+        <${SearchBox} focus=${!!this.state.showMobileSearch}/>
+    `;
+    const chatting = (activeRoute && activeRoute.indexOf('/chat/') === 0);
 
     return html`
     <header class="nav header">
@@ -114,14 +138,32 @@ class Header extends Component {
       </div>
       ` : ''}
       <div class="header-content">
-        ${iris.util.isElectron || (activeRoute && activeRoute.indexOf('/chat/') === 0) ? '' : html`
-          <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
-            <img src="/img/icon128.png" width=40 height=40/>
-            <img src="/img/iris_logotype.png" height=23 width=41 />
+        <div class=${this.state.showMobileSearch ? 'hidden-xs':''}>
+          ${Helpers.isElectron || chatting ? '' : html`
+            <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
+              <div class="mobile-menu-icon">${Icons.menu}</div>
+              <img src=${logo} style="margin-right: 10px" width=30 height=30/>
+              <img src=${logoType} height=23 width=41 />
+            </a>
+          `}
+        </div>
+        ${chatting ? '' : html`
+          <a class=${this.state.showMobileSearch ? '' : 'hidden-xs'} href="" onClick=${e => {
+            e.preventDefault();
+            this.setState({showMobileSearch: false})
+          }}>
+            <span class="visible-xs-inline-block">${Icons.backArrow}</span>
           </a>
         `}
-        <div class="text" style=${this.chatId ? 'cursor:pointer' : ''} onClick=${() => this.onTitleClicked()}>
-          ${this.state.title && activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
+        <a href="/settings" class="connected-peers tooltip ${this.state.showMobileSearch ? 'hidden-xs' : ''} ${this.state.connectedPeers && this.state.connectedPeers.length ? 'connected' : ''}">
+          <span class="tooltiptext">${t('connected_peers')}</span>
+          <small>
+            <span class="icon">${Icons.network}</span>
+            <span>${this.state.connectedPeers ? this.state.connectedPeers.length : ''}</span>
+          </small>
+        </a>
+        <div class="text" style=${this.chatId ? 'cursor:pointer;text-align:center' : ''} onClick=${() => this.onTitleClicked()}>
+          ${this.state.title && chatting ? html`
             <div class="name">
               ${this.state.title}
             </div>
@@ -129,7 +171,16 @@ class Header extends Component {
           ${isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : ''}
           ${this.state.about ? html`<small class="participants">${this.state.about}</small>` : ''}
           ${this.chatId ? html`<small class="last-seen">${onlineStatus || ''}</small>` : ''}
-          ${searchBox}
+          ${chatting ? '':html`
+            <div class=${this.state.showMobileSearch ? '' : 'hidden-xs'}>
+              ${searchBox}
+            </div>
+            <div class="mobile-search-btn ${this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'}" onClick=${() => {
+                this.setState({showMobileSearch: true});
+            }}>
+              ${Icons.search}
+            </div>
+          `}
         </div>
 
         ${chat && this.chatId !== key && !chat.uuid ? html`
@@ -147,9 +198,17 @@ class Header extends Component {
             ${Icons.group}
           </a>
         ` : ''}
-        <a href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs ${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
+        <${Link} activeClassName="active"
+             href="/notifications"
+             class="notifications-button ${this.state.showMobileSearch ? 'hidden' : ''}">
+          ${Icons.heartEmpty}
+          ${this.state.unseenNotificationCount ? html`
+            <span class="unseen">${this.state.unseenNotificationCount}</span>
+          ` : ''}
+        <//>
+        <${Link} activeClassName="active" href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs my-profile">
           <${Identicon} str=${key} width=34 />
-        </a>
+        <//>
       </div>
     </header>`;
   }

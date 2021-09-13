@@ -1,4 +1,4 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import Torrent from '../components/Torrent.js';
 import View from './View.js';
 
@@ -11,7 +11,7 @@ class TorrentView extends View {
   renderView() {
     return html`
       <div id="message-list" class="centered-container">
-        <${Torrent} showFiles=${true} torrentId=${this.props.id}/>
+        <${Torrent} standalone=${true} showFiles=${true} torrentId=${this.props.id}/>
       </div>
     `;
   }

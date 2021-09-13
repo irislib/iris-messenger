@@ -1,5 +1,5 @@
-import { Component } from '../lib/preact.js';
-import { html } from '../Helpers.js';
+import Component from '../BaseComponent';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Session from '../Session.js';
 import Identicon from './Identicon.js';
@@ -11,25 +11,23 @@ class Footer extends Component {
   constructor() {
     super();
     this.state = {latest: {}};
-    this.eventListeners = [];
     this.chatId = null;
   }
 
   componentDidMount() {
-    State.local.get('unseenTotal').on(unseenTotal => {
-      this.setState({unseenTotal});
-    });
-    State.local.get('activeRoute').on(activeRoute => {
-      this.eventListeners.forEach(e => e.off());
-      this.eventListeners = [];
-      this.setState({activeRoute});
-      const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-      this.chatId = replaced.length < activeRoute.length ? replaced : null;
-    });
+    State.local.get('unseenMsgsTotal').on(this.inject());
+    State.local.get('activeRoute').on(this.sub(
+      activeRoute => {
+        this.setState({activeRoute});
+        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+        this.chatId = replaced.length < activeRoute.length ? replaced : null;
+      }
+    ));
   }
 
   render() {
-    const key = Session.getKey().pub;
+    const key = Session.getPubKey();
+    if (!key) { return; }
     const activeRoute = this.state.activeRoute;
 
     if (this.chatId) {
@@ -41,12 +39,12 @@ class Footer extends Component {
       <div class="header-content" onClick=${() => State.local.get('scrollUp').put(true)}>
         <a href="/" class="btn ${activeRoute && activeRoute === '/' ? 'active' : ''}">${Icons.home}</a>
         <a href="/chat" class="btn ${activeRoute && activeRoute.indexOf('/chat') === 0 ? 'active' : ''}">
-          ${this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
+          ${this.state.unseenMsgsTotal ? html`<span class="unseen unseen-total">${this.state.unseenMsgsTotal}</span>`: ''}
           ${Icons.chat}
         </a>
         <a href="/post/new" class="btn ${activeRoute && activeRoute === '/post/new' ? 'active' : ''}">${plusIcon}</a>
         <a href="/contacts" class="btn ${activeRoute && activeRoute === '/contacts' ? 'active' : ''}">${Icons.user}</a>
-        <a href="/profile/${key}" class="${activeRoute && activeRoute === '/profile/' + key ? 'active' : ''} my-profile">
+        <a href="/profile/${key}" class="${activeRoute && activeRoute === `/profile/${  key}` ? 'active' : ''} my-profile">
           <${Identicon} str=${key} width=34 />
         </a>
       </div>

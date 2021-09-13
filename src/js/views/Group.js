@@ -1,18 +1,18 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import {translate as tr} from '../Translation.js';
 import State from '../State.js';
 import Session from '../Session.js';
-import Helpers from '../Helpers.js';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
-import { route } from '../lib/preact-router.es.js';
+import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg.js';
 import CopyButton from '../components/CopyButton.js';
 import Identicon from '../components/Identicon.js';
 import Name from '../components/Name.js';
 import View from './View.js';
 import SearchBox from '../components/SearchBox.js';
-
-const SMS_VERIFIER_PUB = 'ysavwX9TVnlDw93w9IxezCJqSDMyzIU-qpD8VTN5yko.3ll1dFdxLkgyVpejFkEMOFkQzp_tRrkT3fImZEx94Co';
+import $ from 'jquery';
+import QRCode from '../lib/qrcode.min.js';
+import iris from 'iris-lib';
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
@@ -23,9 +23,6 @@ function deleteChat(pub) {
 class Group extends View {
   constructor() {
     super();
-    this.eventListeners = [];
-    this.followedUsers = new Set();
-    this.followers = new Set();
     this.id = "profile";
   }
 
@@ -82,7 +79,7 @@ class Group extends View {
                   <div class="flex-row">
                     <div class="flex-cell">
                       <div class="profile-link-container">
-                        <a class="profile-link" onClick=${() => route('/profile/' + k)}>
+                        <a class="profile-link" onClick=${() => route(`/profile/${  k}`)}>
                           <${Identicon} str=${k} width=40/>
                           <${Name} pub=${k}/>
                           ${profile.permissions && profile.permissions.admin ? html`
@@ -154,19 +151,15 @@ class Group extends View {
   }
 
   renderView() {
-    const chat = Session.channels[this.props.id];
-    const uuid = chat && chat.uuid;
     const editable = this.state.isAdmin;
     let profilePhoto;
     if (editable) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
-    } else {
-      if (this.state.photo) {
+    } else if (this.state.photo) {
         profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
       } else {
         profilePhoto = html`<${Identicon} str=${this.props.id} width=250/>`
       }
-    }
     return html`
       <div class="content">
         <div class="profile-top">
@@ -175,11 +168,12 @@ class Group extends View {
               ${profilePhoto}
             </div>
             <div class="profile-header-stuff">
-              <h3 class="profile-name" placeholder=${editable ? t('name') : ''} contenteditable=${editable} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
+              <h3 class="profile-name" placeholder=${editable ? tr('name') : ''} contenteditable=${editable} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
               <div class="profile-about hidden-xs">
-                <p class="profile-about-content" placeholder=${editable ? t('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
+                <p class="profile-about-content" placeholder=${editable ? tr('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
               </div>
               <div class="profile-actions">
+<<<<<<< HEAD
                 ${uuid ? '' : html`
                   <div class="follow-count">
                     <a href="/follows/${this.props.id}">
@@ -199,13 +193,16 @@ class Group extends View {
                 ${uuid ? '' : html`
                   <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
                 `}
+=======
+                <button onClick=${() => route(`/chat/${  this.props.id}`)}>${tr('send_message')}</button>
+>>>>>>> origin/master
                 <button onClick=${() => $('#profile-page-qr').toggle()}>${tr('show_qr_code')}</button>
                 <button class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}</button>
               </div>
             </div>
           </div>
           <div class="profile-about visible-xs-flex">
-            <p class="profile-about-content" placeholder=${editable ? t('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
+            <p class="profile-about-content" placeholder=${editable ? tr('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
 
           ${this.renderGroupSettings()}
@@ -214,6 +211,7 @@ class Group extends View {
           <div id="chat-settings" style="display:none">
             <hr/>
             <h3>${tr('chat_settings')}</h3>
+<<<<<<< HEAD
             <div class="profile-nicknames">
               <h4>${tr('nicknames')}</h4>
               <p>
@@ -229,6 +227,8 @@ class Group extends View {
                 </p>
               `}
             </div>
+=======
+>>>>>>> origin/master
             <div class="notification-settings">
               <h4>${tr('notifications')}</h4>
               <input type="radio" id="notifyAll" name="notificationPreference" value="all"/>
@@ -249,57 +249,11 @@ class Group extends View {
     `;
   }
 
-  componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
       this.setState({isAdmin:false,uuid:null, memberCandidate:null});
       this.componentDidMount();
     }
-  }
-
-  userDidMount() {
-    const pub = this.props.id;
-    State.public.user(pub).get('follow').map().on((following,key,c,e) => {
-      this.eventListeners.push(e);
-      if (following) {
-        this.followedUsers.add(key);
-      } else {
-        this.followedUsers.delete(key);
-      }
-      this.setState({followedUserCount: this.followedUsers.size});
-    });
-    State.local.get('follows').map().once((following,key) => {
-      if (following) {
-        State.public.user(key).get('follow').get(pub).once(following => {
-          if (following) {
-            this.followers.add(key);
-            this.setState({followerCount: this.followers.size});
-          }
-        });
-      }
-    });
-    State.public.user(pub).get('profile').get('name').on((name,a,b,e) => {
-      document.title = name || document.title;
-      this.eventListeners.push(e);
-      if (!$('#profile .profile-name:focus').length) {
-        this.setState({name});
-      }
-    });
-    State.public.user(pub).get('profile').get('photo').on((photo,a,b,e) => {
-      this.eventListeners.push(e);
-      this.setState({photo});
-    });
-    State.public.user(pub).get('profile').get('about').on((about,a,b,e) => {
-      this.eventListeners.push(e);
-      if (!$('#profile .profile-about-content:focus').length) {
-        this.setState({about});
-      } else {
-        $('#profile .profile-about-content:not(:focus)').text(about);
-      }
-    });
   }
 
   groupDidMount() {
@@ -321,7 +275,6 @@ class Group extends View {
 
   componentDidMount() {
     const pub = this.props.id;
-    this.eventListeners.forEach(e => e.off());
     this.setState({name: '', photo: '', about: ''});
     const chat = Session.channels[pub];
     if (pub.length < 40) {
@@ -334,24 +287,23 @@ class Group extends View {
         }, 1000);
       }
     }
-    var qrCodeEl = $('#profile-page-qr');
+    let qrCodeEl = $('#profile-page-qr');
     qrCodeEl.empty();
-    State.local.get('noFollowers').on(noFollowers => this.setState({noFollowers}));
-    State.local.get('inviteLinksChanged').on(() => this.setState({}));
+    State.local.get('inviteLinksChanged').on(() => this.setState({inviteLinksChanged: !this.state.inviteLinksChanged}));
     State.local.get('channels').get(this.props.id).get('participants').on(() => {
       const isAdmin = areWeAdmin(pub);
       this.setState({isAdmin});
     });
     if (chat) {
       this.groupDidMount();
-      $("input[name=notificationPreference][value=" + chat.notificationSetting + "]").attr('checked', 'checked');
+      $(`input[name=notificationPreference][value=${  chat.notificationSetting  }]`).attr('checked', 'checked');
       $('input:radio[name=notificationPreference]').off().on('change', (event) => {
         chat.put('notificationSetting', event.target.value);
       });
     }
     qrCodeEl.empty();
     new QRCode(qrCodeEl[0], {
-      text: 'https://iris.to/' + window.location.hash,
+      text: `https://iris.to/${  window.location.pathname}`,
       width: 300,
       height: 300,
       colorDark : "#000000",
@@ -361,10 +313,8 @@ class Group extends View {
   }
 }
 
-var newGroupParticipant;
-
 function areWeAdmin(uuid) {
-  const me = Session.channels[uuid].participantProfiles[Session.getKey().pub];
+  const me = Session.channels[uuid] && Session.channels[uuid].participantProfiles[Session.getKey().pub];
   return !!(me && me.permissions && me.permissions.admin);
 }
 

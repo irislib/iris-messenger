@@ -1,13 +1,13 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Session from '../Session.js';
-import { route } from '../lib/preact-router.es.js';
+import {translate as t} from '../Translation.js';
+import { route } from 'preact-router';
 import StoreView from './Store.js';
 
 class Product extends StoreView {
   constructor() {
     super();
-    this.eventListeners = [];
     this.followedUsers = new Set();
     this.followers = new Set();
   }
@@ -18,7 +18,6 @@ class Product extends StoreView {
   }
 
   newProduct() {
-    console.log('new');
     return html`
       <div class="main-view" id="profile">
         <div class="content">
@@ -43,7 +42,7 @@ class Product extends StoreView {
   onClickDelete() {
     if (confirm('Delete product? This cannot be undone.')) {
       State.public.user().get('store').get('products').get(this.props.product).put(null);
-      route('/store/' + this.props.store);
+      route(`/store/${  this.props.store}`);
     }
   }
 
@@ -57,7 +56,7 @@ class Product extends StoreView {
         <a href="/store/${this.props.store}"><iris-text editable="false" path="profile/name" user=${this.props.store}/></a>
         ${cartTotalItems ? html`
           <p>
-            <button onClick=${() => route('/checkout/' + this.props.store)}>Shopping cart (${cartTotalItems})</button>
+            <button onClick=${() => route(`/checkout/${  this.props.store}`)}>Shopping cart (${cartTotalItems})</button>
           </p>
         ` : ''}
         ${this.state.product ? html`
@@ -85,10 +84,6 @@ class Product extends StoreView {
     return (this.props.store && this.props.product ? this.showProduct() : this.newProduct());
   }
 
-  componentWillUnmount() {
-    this.eventListeners.forEach(e => e.off());
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.product !== this.props.product) {
       this.componentDidMount();
@@ -108,7 +103,6 @@ class Product extends StoreView {
   componentDidMount() {
     StoreView.prototype.componentDidMount.call(this);
     const pub = this.props.store;
-    this.eventListeners.forEach(e => e.off());
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     this.isMyProfile = Session.getPubKey() === pub;
     if (this.props.product && pub) {

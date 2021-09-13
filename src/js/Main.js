@@ -1,18 +1,18 @@
-import { render } from './lib/preact.js';
-import { Router } from './lib/preact-router.es.js';
-import { Component } from './lib/preact.js';
-import { Link } from './lib/preact.match.js';
+import Component from './BaseComponent';
+import { Router } from 'preact-router';
+import {Helmet} from "react-helmet";
 
 import Helpers from './Helpers.js';
-import { html } from './Helpers.js';
+import { html } from 'htm/preact';
 import QRScanner from './QRScanner.js';
 import PeerManager from './PeerManager.js';
 import Session from './Session.js';
-import { translate as t } from './Translation.js';
 
-import Settings from './views/Settings.js';
+import Settings from './views/settings/Settings.js';
 import LogoutConfirmation from './views/LogoutConfirmation.js';
-import Chat from './views/Chat.js';
+import Chat from './views/chat/Chat.js';
+import Notifications from './views/Notifications.js';
+import Hashtags from './views/Hashtags.js';
 import Store from './views/Store.js';
 import Checkout from './views/Checkout.js';
 import Product from './views/Product.js';
@@ -27,102 +27,39 @@ import Explorer from './views/Explorer.js';
 import Contacts from './views/Contacts.js';
 import Torrent from './views/Torrent.js';
 
+import Menu from './components/Menu.js';
 import VideoCall from './components/VideoCall.js';
-import Identicon from './components/Identicon.js';
 import MediaPlayer from './components/MediaPlayer.js';
 import Footer from './components/Footer.js';
 import State from './State.js';
-import Icons from './Icons.js';
 
-const userAgent = navigator.userAgent.toLowerCase();
-const isElectron = (userAgent.indexOf(' electron/') > -1);
-if (!isElectron && ('serviceWorker' in navigator)) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('serviceworker.js')
-    .catch(function(err) {
-      // registration failed :(
-      console.log('ServiceWorker registration failed: ', err);
-    });
-  });
+import logoType from '../assets/img/iris_logotype.png';
+
+import '../css/style.css';
+import '../css/cropper.min.css';
+
+if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redirect old urls
+  window.location.href = window.location.href.replace('#/', '');
 }
 
 State.init();
-Session.init({autologin: window.location.hash.length > 2});
+Session.init({autologin: window.location.pathname.length > 2});
 PeerManager.init();
 
 Helpers.checkColorScheme();
 
-const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
-  {url: '/', text: t('home'), icon: Icons.home},
-  {url: '/media', text: t('media'), icon: Icons.play},
-  {url: '/chat', text: t('messages'), icon: Icons.chat},
-  {url: '/store', text: t('market'), icon: Icons.store},
-  {url: '/contacts', text: t('contacts'), icon: Icons.user},
-  {url: '/settings', text: t('settings'), icon: Icons.settings},
-  {url: '/explorer', text: t('explorer'), icon: Icons.folder},
-  {url: '/about', text: t('about')},
-];
-
-class Menu extends Component {
-  componentDidMount() {
-    State.local.get('unseenTotal').on(unseenTotal => {
-      this.setState({unseenTotal});
-    });
-  }
-
-  menuLinkClicked() {
-    State.local.get('toggleMenu').put(false);
-    State.local.get('scrollUp').put(true);
-  }
-
-  render() {
-    const pub = Session.getPubKey();
-    return html`
-      <div class="application-list">
-        ${iris.util.isElectron ? html`<div class="electron-padding"/>` : html`
-          <a href="/" onClick=${() => this.menuLinkClicked()} class="hidden-xs" tabindex="0" class="logo">
-            <img class="hidden-xs" src="/img/icon128.png" width=40 height=40/>
-            <img src="/img/iris_logotype.png" height=23 width=41 />
-          </a>
-        `}
-        <div class="visible-xs-block">
-          <${Link} onClick=${() => this.menuLinkClicked()} activeClassName="active" href="/profile/${pub}">
-            <span class="icon"><${Identicon} str=${pub} width=40/></span>
-            <span class="text" style="font-size: 1.2em;border:0;margin-left: 7px;"><iris-text user="${pub}" path="profile/name" editable="false"/></span>
-          <//>
-          <br/><br/>
-        </div>
-        ${APPLICATIONS.map(a => {
-          if (a.url) {
-            return html`
-              <${a.native ? 'a' : Link} onClick=${() => this.menuLinkClicked()} activeClassName="active" href=${a.url}>
-                <span class="icon">
-                  ${a.text === t('messages') && this.state.unseenTotal ? html`<span class="unseen unseen-total">${this.state.unseenTotal}</span>`: ''}
-                  ${a.icon || Icons.circle}
-                </span>
-                <span class="text">${a.text}</span>
-              <//>`;
-          } else {
-            return html`<br/><br/>`;
-          }
-        })}
-      </div>
-    `;
-  }
-}
-
 class Main extends Component {
   componentDidMount() {
-    State.local.get('loggedIn').on(loggedIn => this.setState({loggedIn}));
+    State.local.get('loggedIn').on(this.inject());
     State.local.get('toggleMenu').put(false);
     State.local.get('toggleMenu').on(show => this.toggleMenu(show));
-    State.electron && State.electron.get('platform').on(platform => this.setState({platform}));
+    State.electron && State.electron.get('platform').on(this.inject());
+    State.local.get('unseenMsgsTotal').on(this.inject());
   }
 
   handleRoute(e) {
     let activeRoute = e.url;
-    document.title = 'Iris';
-    if (activeRoute && activeRoute.length > 1) { document.title += ' - ' + Helpers.capitalize(activeRoute.replace('/', '')); }
+    this.setState({activeRoute});
     State.local.get('activeRoute').put(activeRoute);
     QRScanner.cleanupScanner();
   }
@@ -142,13 +79,20 @@ class Main extends Component {
   }
 
   render() {
+    let title = "";
+    const s = this.state;
+    if (s.activeRoute && s.activeRoute.length > 1) {
+      title = Helpers.capitalize(s.activeRoute.replace('/', ''));
+    }
     let content = '';
-    const isDesktopNonMac = this.state.platform && this.state.platform !== 'darwin';
-    if (this.state.loggedIn || window.location.hash.length <= 2) {
-      content = this.state.loggedIn ? html`
+    const isDesktopNonMac = s.platform && s.platform !== 'darwin';
+    const titleTemplate = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) %s | Iris` : "%s | Iris";
+    const defaultTitle = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) Iris` : 'Iris';
+    if (s.loggedIn || window.location.pathname.length <= 2) {
+      content = s.loggedIn ? html`
         ${isDesktopNonMac ? html`
           <div class="windows-titlebar">
-               <img src="/img/iris_logotype.png" height=16 width=28 />
+               <img src=${logoType} height=16 width=28 />
                <div class="title-bar-btns">
                     <button class="min-btn" onClick=${() => this.electronCmd('minimize')}>-</button>
                     <button class="max-btn" onClick=${() => this.electronCmd('maximize')}>+</button>
@@ -156,27 +100,41 @@ class Main extends Component {
                </div>
           </div>
         ` : ''}
-        <section class="main ${isDesktopNonMac ? 'desktop-non-mac' : ''} ${this.state.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
+        <section class="main ${isDesktopNonMac ? 'desktop-non-mac' : ''} ${s.showMenu ? 'menu-visible-xs' : ''}" style="flex-direction: row;">
           <${Menu}/>
+          <${Helmet} titleTemplate=${titleTemplate} defaultTitle=${defaultTitle}>
+            <title>${title}</title>
+            <meta name="description" content="Social Networking Freedom" />
+            <meta property="og:type" content="website" />
+            <meta property="og:title" content=${title} />
+            <meta property="og:description" content="Social Networking Freedom" />
+            <meta property="og:url" content=${`https://iris.to${window.location.pathname.length > 1 ? window.location.pathname : ''}`} />
+            <meta property="og:image" content="https://iris.to/assets/img/cover.jpg" />
+            <meta name="twitter:card" content="summary_large_image" />
+          <//>
           <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
           <div class="view-area">
             <${Router} onChange=${e => this.handleRoute(e)}>
               <${Feed} path="/"/>
               <${Feed} path="/feed"/>
+              <${Hashtags} path="/hashtag"/>
+              <${Feed} path="/hashtag/:hashtag+"/>
               <${Feed} path="/search/:term?/:type?"/>
               <${Feed} path="/media" index="media" thumbnails=${true}/>
               <${Login} path="/login"/>
+              <${Notifications} path="/notifications"/>
+              <${Chat} path="/chat/hashtag/:hashtag?"/>
               <${Chat} path="/chat/:id?"/>
-              <${Message} path="/post/:hash"/>
-              <${Torrent} path="/torrent/:id"/>
+              <${Message} path="/post/:hash+"/>
+              <${Torrent} path="/torrent/:id+"/>
               <${About} path="/about"/>
               <${Settings} path="/settings"/>
               <${LogoutConfirmation} path="/logout"/>
-              <${Profile} path="/profile/:id?" tab="profile"/>
-              <${Profile} path="/replies/:id?" tab="replies"/>
-              <${Profile} path="/likes/:id?" tab="likes"/>
-              <${Profile} path="/media/:id" tab="media"/>
-              <${Group} path="/group/:id?"/>
+              <${Profile} path="/profile/:id+" tab="profile"/>
+              <${Profile} path="/replies/:id+" tab="replies"/>
+              <${Profile} path="/likes/:id+" tab="likes"/>
+              <${Profile} path="/media/:id+" tab="media"/>
+              <${Group} path="/group/:id+"/>
               <${Store} path="/store/:store?"/>
               <${Checkout} path="/checkout/:store?"/>
               <${Product} path="/product/:product/:store"/>
@@ -202,8 +160,6 @@ class Main extends Component {
   }
 }
 
-render(html`<${Main}/>`, document.body);
-
-document.body.style = 'opacity:1';
-
 Helpers.showConsoleWarning();
+
+export default Main;

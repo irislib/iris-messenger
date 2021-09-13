@@ -1,8 +1,12 @@
+import Gun from 'gun';
 import State from './State.js';
 import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import PeerManager from './PeerManager.js';
-import { route } from './lib/preact-router.es.js';
+import { route } from 'preact-router';
+import iris from 'iris-lib';
+import _ from 'lodash';
+import Fuse from "./lib/fuse.basic.esm.min";
 
 let key;
 let myName;
@@ -10,9 +14,10 @@ let myProfilePhoto;
 let latestChatLink;
 let onlineTimeout;
 let ourActivity;
-let hasFollowers;
+let noFollows;
+let noFollowers;
+let userSearchIndex;
 const follows = {};
-const blocks = {};
 const channels = window.channels = {};
 
 const DEFAULT_SETTINGS = {
@@ -24,55 +29,108 @@ const DEFAULT_SETTINGS = {
     enableWebtorrent: !iris.util.isMobile,
     enablePublicPeerDiscovery: true,
     autoplayWebtorrent: true,
-    maxConnectedPeers: iris.util.isElectron ? 2 : 1
+    maxConnectedPeers: Helpers.isElectron ? 2 : 1
   }
 }
 
 const settings = DEFAULT_SETTINGS;
 
-function getFollowsFn(callback, k, maxDepth = 3, currentDepth = 1) {
+const updateUserSearchIndex = _.debounce(() => {
+  const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
+  const values = Object.values(_.omit(follows, Object.keys(State.getBlockedUsers())));
+  userSearchIndex = new Fuse(values, options);
+}, 200, {leading:true});
+
+setTimeout(() => {
+  State.local.get('block').map().on(() => {
+    updateUserSearchIndex();
+  });
+  updateUserSearchIndex();
+});
+
+function addFollow(callback, k, followDistance, follower) {
+  if (follows[k]) {
+    if (follows[k].followDistance > followDistance) {
+      follows[k].followDistance = followDistance;
+    }
+    follows[k].followers.add(follower);
+  } else {
+    follows[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
+    State.public.user(k).get('profile').get('name').on(name => {
+      follows[k].name = name;
+      callback && callback(k, follows[k]);
+    });
+  }
+  callback && callback(k, follows[k]);
+  updateUserSearchIndex();
+  updateNoFollows();
+  updateNoFollowers();
+}
+
+function removeFollow(k, followDistance, follower) {
+  if (follows[k]) {
+    follows[k].followers.delete(follower);
+    if (followDistance === 1) {
+      State.local.get('groups').get('follows').get(k).put(false);
+    }
+    updateNoFollows();
+    updateNoFollowers();
+  }
+}
+
+function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   k = k || key.pub;
 
-  function addFollow(k, followDistance, follower) {
-    if (follows[k]) {
-      if (follows[k].followDistance > followDistance) {
-        follows[k].followDistance = followDistance;
-      }
-      follows[k].followers.add(follower);
-    } else {
-      follows[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
-      State.public.user(k).get('profile').get('name').on(name => {
-        follows[k].name = name;
-        callback(k, follows[k]);
-      });
-    }
-    callback(k, follows[k]);
-  }
+  addFollow(callback, k, currentDepth - 1);
 
-  addFollow(k, currentDepth - 1);
-
-  State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: .on for unfollow
+  let n = 0;
+  State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
     if (follows[followedKey] === isFollowing) { return; }
     if (isFollowing) {
-      addFollow(followedKey, currentDepth, k);
+      n = n + 1;
+      addFollow(callback, followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        getFollowsFn(callback, followedKey, maxDepth, currentDepth + 1);
+        setTimeout(() => { // without timeout the recursion hogs CPU. or should we use requestAnimationFrame instead?
+          getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
+        }, n * 100);
       }
+    } else {
+      removeFollow(followedKey, currentDepth, k);
     }
   });
 
   return follows;
 }
 
+const updateNoFollows = _.debounce(() => {
+  const v = !(Object.keys(follows).length > 1);
+  if (v !== noFollows) {
+    noFollows = v;
+    State.local.get('noFollows').put(noFollows);
+  }
+}, 1000);
+
+const updateNoFollowers = _.debounce(() => {
+  const v = !(follows[key.pub] && (follows[key.pub].followers.size > 0));
+  if (v !== noFollowers) {
+    noFollowers = v;
+    State.local.get('noFollowers').put(noFollowers);
+  }
+}, 1000);
+
+function getUserSearchIndex() {
+  return userSearchIndex;
+}
+
 function setOurOnlineStatus() {
-  const activeRoute = window.location.hash;
+  const activeRoute = window.location.pathname;
   iris.Channel.setActivity(State.public, ourActivity = 'active');
   const setActive = _.debounce(() => {
-    const chat = activeRoute && channels[activeRoute.replace('#/profile/','').replace('#/chat/','')];
+    const chat = activeRoute && channels[activeRoute.replace('/profile/','').replace('/chat/','')];
     if (chat && !ourActivity) {
       chat.setMyMsgsLastSeenTime();
     }
-    iris.Channel.setActivity(State.public, ourActivity = 'active'); // TODO: also on keypress
+    iris.Channel.setActivity(State.public, ourActivity = 'active');
     clearTimeout(onlineTimeout);
     onlineTimeout = setTimeout(() => iris.Channel.setActivity(State.public, ourActivity = 'online'), 30000);
   }, 1000);
@@ -82,7 +140,7 @@ function setOurOnlineStatus() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
       iris.Channel.setActivity(State.public, ourActivity = 'active');
-      const chatId = activeRoute.replace('#/profile/','').replace('#/chat/','');
+      const chatId = location.pathname.slice(1).replace('chat/','');
       const chat = activeRoute && channels[chatId];
       if (chat) {
         chat.setMyMsgsLastSeenTime();
@@ -98,6 +156,20 @@ function setOurOnlineStatus() {
   });
 }
 
+function updateGroups() {
+  getExtendedFollows((k, info) => {
+    if (info.followDistance <= 1) {
+      State.local.get('groups').get('follows').get(k).put(true);
+    } else if (info.followDistance == 2) {
+      State.local.get('groups').get('2ndDegreeFollows').get(k).put(true);
+    }
+    State.local.get('groups').get('everyone').get(k).put(true);
+    if (k === getPubKey()) {
+      updateNoFollowers();
+    }
+  });
+}
+
 function login(k) {
   const shouldRefresh = !!key;
   key = k;
@@ -105,20 +177,21 @@ function login(k) {
   iris.Channel.initUser(State.public, key);
   Notifications.subscribeToWebPush();
   Notifications.getWebPushSubscriptions();
+  Notifications.subscribeToIrisNotifications();
   iris.Channel.getMyChatLinks(State.public, key, undefined, chatLink => {
     State.local.get('chatLinks').get(chatLink.id).put(chatLink.url);
     latestChatLink = chatLink.url;
   });
   setOurOnlineStatus();
   iris.Channel.getChannels(State.public, key, addChannel);
-  var chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
-  var inviter = Helpers.getUrlParameter('inviter');
+  let chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
+  let inviter = Helpers.getUrlParameter('inviter');
   function go() {
     if (inviter !== key.pub) {
       newChannel(chatId, window.location.href);
     }
-    _.defer(() => route('/chat/' + chatId)); // defer because router is only initialised after login
-    window.history.pushState({}, "Iris Chat", "/"+window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
+    _.defer(() => route(`/chat/${  chatId}`)); // defer because router is only initialised after login
+    window.history.pushState({}, "Iris Chat", `/${window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]}`); // remove param
   }
   if (chatId) {
     if (inviter) {
@@ -136,34 +209,38 @@ function login(k) {
     myProfilePhoto = data;
   });
   State.public.get('follow').put({a:null});
-  State.local.get('follows').put({a:null});
+  State.local.get('groups').get('follows').put({a:null});
   Notifications.init();
   State.local.get('loggedIn').put(true);
-  State.public.get('block').map().on((isBlocked, user) => {
-    blocks[user] = isBlocked;
-    isBlocked && (follows[user] = null);
-    State.local.get('follows').get(user).put(isBlocked);
-  });
-  getFollowsFn((k, info) => {
-    State.local.get('follows').get(k).put(true);
-    if (!hasFollowers && k === getPubKey() && info.followers.size) {
-      State.local.get('noFollowers').put(false);
+  State.public.user().get('block').map().on((isBlocked, user) => {
+    State.local.get('block').get(user).put(isBlocked);
+    if (isBlocked) {
+      delete follows[user];
     }
   });
+  updateGroups();
   State.public.user().get('msgs').put({a:null}); // These need to be initialised for some reason, otherwise 1st write is slow
   State.public.user().get('replies').put({a:null});
   State.public.user().get('likes').put({a:null});
   if (shouldRefresh) {
     location.reload();
   }
-  State.electron && State.electron.get('settings').on(electron => {
-    settings.electron = electron;
-    if (electron.publicIp) {
-      Object.values(channels).forEach(shareMyPeerUrl);
-    }
-  });
+  if (State.electron) {
+    State.electron.get('settings').on(electron => {
+      settings.electron = electron;
+      if (electron.publicIp) {
+        Object.values(channels).forEach(shareMyPeerUrl);
+      }
+    });
+    State.electron.get('user').put(key.pub);
+  }
   State.local.get('settings').on(local => {
     settings.local = local;
+  });
+  State.local.get('filters').get('group').once().then(v => {
+    if (!v) {
+      State.local.get('filters').get('group').put('follows');
+    }
   });
 }
 
@@ -172,8 +249,25 @@ async function createChatLink() {
 }
 
 function clearIndexedDB() {
-  window.indexedDB.deleteDatabase('State.local');
-  window.indexedDB.deleteDatabase('radata');
+  return new Promise(resolve => {
+    const r1 = window.indexedDB.deleteDatabase('State.local');
+    const r2 = window.indexedDB.deleteDatabase('radata');
+    let r1done;
+    let r2done;
+    const check = () => {
+      r1done && r2done && resolve();
+    }
+    r1.onerror = r2.onerror = e => console.error(e);
+    //r1.onblocked = r2.onblocked = e => console.error('blocked', e);
+    r1.onsuccess = () => {
+      r1done = true;
+      check();
+    }
+    r2.onsuccess = () => {
+      r2done = true;
+      check();
+    }
+  });
 }
 
 function getMyChatLink() {
@@ -185,10 +279,13 @@ function getMyName() { return myName; }
 function getMyProfilePhoto() { return myProfilePhoto; }
 
 async function logOut() {
+  if (State.electron) {
+    State.electron.get('user').put(null);
+  }
   // TODO: remove subscription from your channels
   if (navigator.serviceWorker) {
     const reg = await navigator.serviceWorker.getRegistration();
-    if (reg) {
+    if (reg && reg.pushManager) {
       reg.active.postMessage({key: null});
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
@@ -198,7 +295,7 @@ async function logOut() {
       }
     }
   }
-  await clearIndexedDB();
+  clearIndexedDB();
   localStorage.clear();
   route('/');
   location.reload();
@@ -214,17 +311,17 @@ function loginAsNewUser(name) {
     login(k);
     name && State.public.user().get('profile').get('name').put(name);
     createChatLink();
-    State.local.get('noFollows').put(true);
-    State.local.get('noFollowers').put(true);
   });
 }
 
 function init(options = {}) {
-  var localStorageKey = localStorage.getItem('chatKeyPair');
+  let localStorageKey = localStorage.getItem('chatKeyPair');
   if (localStorageKey) {
     login(JSON.parse(localStorageKey));
   } else if (options.autologin) {
     loginAsNewUser(name);
+  } else {
+    clearIndexedDB();
   }
 }
 
@@ -235,7 +332,6 @@ function getFollows() {
 const myPeerUrl = ip => `http://${ip}:8767/gun`;
 
 function shareMyPeerUrl(channel) {
-  console.log('sharing my peer url', myPeerUrl(settings.electron.publicIp), channel.getId());
   channel.put && channel.put('my_peer', myPeerUrl(settings.electron.publicIp));
 }
 
@@ -243,13 +339,13 @@ function newChannel(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(channels, pub)) {
     return;
   }
-  const chat = new iris.Channel({gun: State.public, key, chatLink: chatLink, participants: pub});
+  const chat = new iris.Channel({gun: State.public, key, chatLink, participants: pub});
   addChannel(chat);
   return chat;
 }
 
 function addChannel(chat) {
-  var pub = chat.getId();
+  let pub = chat.getId();
   if (channels[pub]) { return; }
   channels[pub] = chat;
   const chatNode = State.local.get('channels').get(pub);
@@ -279,7 +375,7 @@ function addChannel(chat) {
   //$(".chat-list").append(el);
   chat.theirMsgsLastSeenTime = '';
   chat.getTheirMsgsLastSeenTime(time => {
-    if (chat && time && time > chat.theirMsgsLastSeenTime) {
+    if (chat && time && time >= chat.theirMsgsLastSeenTime) {
       chat.theirMsgsLastSeenTime = time;
       chatNode.get('theirMsgsLastSeenTime').put(time);
     }
@@ -304,16 +400,16 @@ function addChannel(chat) {
     }
   });
   if (chat.uuid) {
-    var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     chat.participantProfiles = {};
     chat.on('name', v => State.local.get('channels').get(chat.uuid).get('name').put(v));
     chat.on('photo', v => State.local.get('channels').get(chat.uuid).get('photo').put(v));
     chat.on('about', v => State.local.get('channels').get(chat.uuid).get('about').put(v));
     chat.getParticipants(participants => {
       if (typeof participants === 'object') {
-        var keys = Object.keys(participants);
+        let keys = Object.keys(participants);
         keys.forEach((k, i) => {
-          var hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
+          let hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
           chat.participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
           State.public.user(k).get('profile').get('name').on(name => {
             chat.participantProfiles[k].name = name;
@@ -330,6 +426,8 @@ function addChannel(chat) {
       State.local.get('inviteLinksChanged').put(true);
     }});
   } else {
+    State.local.get('groups').get('everyone').get(pub).put(true);
+    addFollow(null, pub, -1);
     State.public.user(pub).get('profile').get('name').on(v => State.local.get('channels').get(pub).get('name').put(v))
   }
   if (chat.put) {
@@ -349,7 +447,6 @@ function addChannel(chat) {
   });
   State.local.get('channels').get(pub).put({enabled:true});
   if (chat.onTheir) {
-    console.log('Listen to private peer url from', pub);
     chat.onTheir('my_peer', (url, k, from) => {
       console.log('Got private peer url', url, 'from', from);
       PeerManager.addPeer({url, from})
@@ -368,9 +465,11 @@ function processMessage(chatId, msg, info) {
   State.local.get('channels').get(chatId).get('msgs').get(msg.time + (msg.from && msg.from.slice(0, 10))).put(JSON.stringify(msg));
   msg.timeObj = new Date(msg.time);
   if (!info.selfAuthored && msg.timeObj > (chat.myLastSeenTime || -Infinity)) {
-    if (window.location.hash !== '#/chat/' + chatId || document.visibilityState !== 'visible') {
+    if (window.location.pathname !== `/chat/${  chatId}` || document.visibilityState !== 'visible') {
       Notifications.changeChatUnseenCount(chatId, 1);
-    }
+    } else if (ourActivity === 'active') {
+        chat.setMyMsgsLastSeenTime();
+      }
   }
   if (!info.selfAuthored && msg.time > chat.theirMsgsLastSeenTime) {
     State.local.get('channels').get(chatId).get('theirMsgsLastSeenTime').put(msg.time);
@@ -393,4 +492,23 @@ function subscribeToMsgs(pub) {
   });
 }
 
-export default {init, getKey, getPubKey, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+function followChatLink(str) {
+  if (str && str.indexOf('http') === 0) {
+    const s = str.split('?');
+    let chatId;
+    if (s.length === 2) {
+      chatId = Helpers.getUrlParameter('chatWith', s[1]) || Helpers.getUrlParameter('channelId', s[1]);
+    }
+    if (chatId) {
+      newChannel(chatId, str);
+      route(`/chat/${  chatId}`);
+      return true;
+    }
+    if (str.indexOf('https://iris.to') === 0) {
+      route(str.replace('https://iris.to', ''));
+      return true;
+    }
+  }
+}
+
+export default {init, followChatLink, getKey, getPubKey, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };

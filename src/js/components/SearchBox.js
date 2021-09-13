@@ -1,22 +1,21 @@
-import { Component } from '../lib/preact.js';
-import { route } from '../lib/preact-router.es.js';
-import Helpers, { html } from '../Helpers.js';
+import Component from '../BaseComponent';
+import { route } from 'preact-router';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Identicon from './Identicon.js';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
-import Fuse from '../lib/fuse.basic.esm.min.js';
+import $ from 'jquery';
+import _ from 'lodash';
 
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
 class SearchBox extends Component {
   constructor() {
     super();
-    this.eventListeners = {};
     this.state = {results:[]};
     this.debouncedIndexAndSearch = _.debounce(() => {
-      const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
-      this.fuse = new Fuse(Object.values(Session.getFollows()), options); // TODO: this gets reinitialized with Header on each view change. slow?
       this.search();
     }, 200);
   }
@@ -31,28 +30,35 @@ class SearchBox extends Component {
   }
 
   componentDidMount() {
-    State.local.get('follows').map().on(follows => {
-      this.hasFollows = this.hasFollows || Object.keys(Session.getFollows()).length > 1;
-      follows && this.debouncedIndexAndSearch();
-    });
-    State.local.get('activeRoute').on((a,b,c,e) => {
-      this.eventListeners['activeRoute'] = e;
-      this.close();
-    });
+    State.local.get('groups').get('everyone').map().on(this.sub(
+      () => {
+        this.noFollows = this.noFollows || Object.keys(Session.getFollows()).length > 1;
+      }
+    ));
+    State.local.get('activeRoute').on(this.sub(
+      () => {
+        this.close();
+      }
+    ));
     this.adjustResultsPosition();
+    this.search();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     this.adjustResultsPosition();
+    if (prevProps.focus !== this.props.focus) {
+      $(this.base).find('input:visible').focus();
+    }
+    if (prevProps.query !== this.props.query) {
+      this.search();
+    }
   }
 
   adjustResultsPosition() {
     const input = $(this.base).find('input');
-    this.offsetLeft = input[0].offsetLeft;
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
+    if (input.length) {
+      this.offsetLeft = input[0].offsetLeft;
+    }
   }
 
   onSubmit(e) {
@@ -65,7 +71,7 @@ class SearchBox extends Component {
   }
 
   search() {
-    const query = $(this.base).find('input').val();
+    const query = this.props.query || $(this.base).find('input').val();
     if (!query) { return; }
 
     if (this.props.onSelect) {
@@ -78,10 +84,10 @@ class SearchBox extends Component {
         return this.props.onSelect({key});
       }
     }
-    if (Helpers.followChatLink(query)) return;
+    if (Session.followChatLink(query)) return;
 
-    if (query && this.fuse) {
-      const results = this.fuse.search(query).slice(0,5);
+    if (query) {
+      const results = Session.getUserSearchIndex().search(query).slice(0,5);
       if (results.length) {
         $(document).off('keyup').on('keyup', e => {
           if (e.key === "Escape") { // escape key maps to keycode `27`
@@ -107,12 +113,14 @@ class SearchBox extends Component {
 
   render() {
     return html`
-      <div class="search-box">
-        <form onSubmit=${e => this.onSubmit(e)}>
-          <label>
-            <input type="text" placeholder=${t('search')} onInput=${() => this.onInput()}/>
-          </label>
-        </form>
+      <div class="search-box ${this.props.class}">
+        ${this.props.resultsOnly ? '' : html`
+          <form onSubmit=${e => this.onSubmit(e)}>
+            <label>
+              <input type="text" placeholder=${t('search')} onInput=${() => this.onInput()}/>
+            </label>
+          </form>
+        `}
         <div class="search-box-results" style="left: ${this.offsetLeft || ''}">
           ${this.state.results.map(r => {
             const i = r.item;
@@ -120,16 +128,16 @@ class SearchBox extends Component {
             if (i.followDistance === 1) {
               followText = 'Following';
             }
-            if (i.followDistance === 2) {
-              if (i.followers.size === 1 && Session.getFollows()[[...i.followers][0]].name) {
-                followText = 'Followed by ' + Session.getFollows()[[...i.followers][0]].name;
+            if (i.followDistance > 1) {
+              if (i.followers.size === 1 && Session.getFollows()[[...i.followers][0]] && Session.getFollows()[[...i.followers][0]].name) {
+                followText = `Followed by ${  Session.getFollows()[[...i.followers][0]].name}`;
               } else {
-                followText = 'Followed by ' + i.followers.size + ' users you follow';
+                followText = `${  i.followers.size  } followers`;
               }
             }
             return html`
               <a href="/profile/${i.key}" onClick=${e => this.onClick(e, i)}>
-                <${Identicon} str=${i.key} width=40/>
+                <${Identicon} key=${`${i.key  }ic`} str=${i.key} width=40/>
                 <div>
                   ${i.name || ''}<br/>
                   <small>
@@ -139,7 +147,7 @@ class SearchBox extends Component {
               </a>
             `;
           })}
-          ${this.state.query && !this.hasFollows ? html`
+          ${this.state.query && !this.noFollows ? html`
             <a class="follow-someone">Follow someone to see more search results!</a>
             <a href="/profile/${suggestedFollow}" class="suggested">
               <${Identicon} str=${suggestedFollow} width=40/>

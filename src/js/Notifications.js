@@ -1,11 +1,16 @@
 import Helpers from './Helpers.js';
 import Session from './Session.js';
-import { route } from './lib/preact-router.es.js';
+import { route } from 'preact-router';
 import State from './State.js';
+import _ from 'lodash';
+import iris from 'iris-lib';
+import Gun from 'gun';
+import $ from 'jquery';
 
-const notificationSound = new Audio('../../audio/notification.mp3');
+const notificationSound = new Audio('../../assets/audio/notification.mp3');
 let loginTime;
-let unseenTotal;
+let unseenMsgsTotal;
+let unseenNotificationCount;
 const webPushSubscriptions = {};
 
 function desktopNotificationsEnabled() {
@@ -45,7 +50,7 @@ function notifyMsg(msg, info, pub) {
     notificationSound.play();
   }
   if (shouldDesktopNotify()) {
-    var body, title;
+    let body, title;
     if (Session.channels[pub].uuid) {
       title = Session.channels[pub].participantProfiles[info.from].name;
       body = `${name}: ${msg.text}`;
@@ -54,42 +59,33 @@ function notifyMsg(msg, info, pub) {
       body = msg.text;
     }
     body = Helpers.truncateString(body, 50);
-    var desktopNotification = new Notification(title, { // TODO: replace with actual name
-      icon: 'img/icon128.png',
+    let desktopNotification = new Notification(title, { // TODO: replace with actual name
+      icon: '/assets/img/icon128.png',
       body,
       silent: true
     });
     desktopNotification.onclick = function() {
-      route('/chat/' + pub);
+      changeUnseenNotificationCount(-1);
+      route(`/chat/${  pub}`);
       window.focus();
     };
   }
 }
 
-var initialTitle = document.title;
-function setUnseenTotal() {
-  if (unseenTotal) {
-    document.title = '(' + unseenTotal + ') ' + initialTitle;
-  } else {
-    document.title = initialTitle;
-  }
-}
-
-function changeChatUnseenCount(chatId, change) {
+function changeChatUnseenMsgsCount(chatId, change) {
   const chat = Session.channels[chatId];
   if (!chat) return;
   const chatNode = State.local.get('channels').get(chatId);
   if (change) {
-    unseenTotal += change;
+    unseenMsgsTotal += change;
     chat.unseen += change;
   } else {
-    unseenTotal = unseenTotal - (chat.unseen || 0);
+    unseenMsgsTotal = unseenMsgsTotal - (chat.unseen || 0);
     chat.unseen = 0;
   }
   chatNode.get('unseen').put(chat.unseen);
-  unseenTotal = unseenTotal >= 0 ? unseenTotal : 0;
-  State.local.get('unseenTotal').put(unseenTotal);
-  setUnseenTotal();
+  unseenMsgsTotal = unseenMsgsTotal >= 0 ? unseenMsgsTotal : 0;
+  State.local.get('unseenMsgsTotal').put(unseenMsgsTotal);
 }
 
 const publicVapidKey = 'BMqSvZArOIdn7vGkYplSpkZ70-Qt8nhYbey26WVa3LF3SwzblSzm3n3HHycpNkAKVq7MCkrzFuTFs_en7Y_J2MI';
@@ -167,9 +163,99 @@ async function getWebPushSubscriptions() {
   });
 }
 
-function init() {
-  loginTime = new Date();
-  unseenTotal = 0;
+function getEpub(user) {
+  return new Promise(resolve => {
+    State.public.user(user).get('epub').on(async (epub,k,x,e) => {
+      if (epub) {
+        e.off();
+        resolve(epub);
+      }
+    });
+  });
 }
 
-export default {init, notifyMsg, enableDesktopNotifications, changeChatUnseenCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};
+async function getNotificationText(notification) {
+  const name = await State.public.user(notification.from).get('profile').get('name').once();
+  const event = notification.event || notification.action;
+  let eventText;
+  if (event === 'like') eventText = `${name} liked your post`;
+  else if (event === 'reply') eventText = `${name} replied to your post`;
+  else if (event === 'mention') eventText = `${name} mentioned you in their post`;
+  else if (event === 'follow') eventText = `${name} started following you`;
+  else eventText = `${name} sent you a notification: ${event}`;
+  return eventText;
+}
+
+function subscribeToIrisNotifications() {
+  let notificationsSeenTime;
+  let notificationsShownTime;
+  State.public.user().get('notificationsSeenTime').on(v => {
+    notificationsSeenTime = v;
+    console.log(v);
+  });
+  State.public.user().get('notificationsShownTime').on(v => notificationsShownTime = v);
+  const setNotificationsShownTime = _.debounce(() => {
+    State.public.user().get('notificationsShownTime').put(new Date().toISOString());
+  }, 1000);
+  const alreadyHave = new Set();
+  setTimeout(() => {
+    State.group().on(`notifications/${Session.getPubKey()}`, async (encryptedNotification, k, x, e, from) => {
+      const id = from.slice(0,30) + encryptedNotification.slice(0,30);
+      if (alreadyHave.has(id)) { return; }
+      alreadyHave.add(id);
+      const epub = await getEpub(from);
+      const secret = await Gun.SEA.secret(epub, Session.getKey());
+      const notification = await Gun.SEA.decrypt(encryptedNotification, secret);
+      if (!notification || typeof notification !== 'object') { return; }
+      setNotificationsShownTime();
+      notification.from = from;
+      State.local.get('notifications').get(notification.time).put(notification);
+      if (!notificationsSeenTime || notificationsSeenTime < notification.time) {
+        changeUnseenNotificationCount(1);
+      }
+      if (!notificationsShownTime || notificationsShownTime < notification.time) {
+        console.log('was new!');
+        const text = await getNotificationText(notification);
+        let desktopNotification = new Notification(text, {
+          icon: '/assets/img/icon128.png',
+          body: text,
+          silent: true
+        });
+        desktopNotification.onclick = function() {
+          const link = notification.target ? `/post/${notification.target}` : `/profile/${notification.from}`;
+          route(link);
+          changeUnseenNotificationCount(-1);
+          window.focus();
+        };
+      }
+    });
+  }, 2000);
+}
+
+function changeUnseenNotificationCount(change) {
+  if (!change) {
+    unseenNotificationCount = 0;
+    State.public.user().get('notificationsSeenTime').put(new Date().toISOString());
+  } else {
+    unseenNotificationCount += change;
+    unseenNotificationCount = Math.max(unseenNotificationCount, 0);
+  }
+  State.local.get('unseenNotificationCount').put(unseenNotificationCount);
+}
+
+async function sendIrisNotification(recipient, notification) {
+  if (!(recipient && notification)) { return; } // TODO: use typescript or sth :D
+  if (typeof notification === 'object') { notification.time = new Date().toISOString() }
+  const epub = await getEpub(recipient);
+  const secret = await Gun.SEA.secret(epub, Session.getKey());
+  const enc = await Gun.SEA.encrypt(notification, secret);
+  State.public.user().get('notifications').get(recipient).put(enc);
+}
+
+function init() {
+  loginTime = new Date();
+  unseenMsgsTotal = 0;
+  changeUnseenNotificationCount(0);
+}
+
+export default {init, notifyMsg, getNotificationText, changeUnseenNotificationCount, subscribeToIrisNotifications, sendIrisNotification, enableDesktopNotifications, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};

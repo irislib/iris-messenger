@@ -1,9 +1,13 @@
-import { Component } from '../lib/preact.js';
-import Helpers, {html} from '../Helpers.js';
+import Component from '../BaseComponent';
+import { createRef } from 'preact';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import Session from "../Session.js";
 import { translate as tr } from '../Translation.js';
+import $ from 'jquery';
 import State from '../State.js';
 import Icons from '../Icons.js';
+import {Helmet} from 'react-helmet';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4))  !== -1;
 const isVideo = f => isOfType(f, ['webm', '.mp4', '.ogg']);
@@ -11,30 +15,34 @@ const isAudio = f => isOfType(f, ['.mp3', '.wav', '.m4a']);
 const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class Torrent extends Component {
-  constructor() {
-    super();
-    this.eventListeners = {};
-  }
+  coverRef = createRef();
 
   componentDidMount() {
-    State.local.get('player').on((player,a,b,e) => {
-      this.player = player;
-      this.eventListeners['player'] = e;
-      this.setState({player});
-      if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
-        const file = this.getActiveFile(this.torrent);
-        file && this.openFile(file);
+    State.local.get('player').on(this.sub(
+      (player) => {
+        this.player = player;
+        this.setState({player});
+        if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
+          const file = this.getActiveFile(this.torrent);
+          file && this.openFile(file);
+        }
       }
-    });
+    ));
     const showFiles = this.props.showFiles;
     showFiles && this.setState({showFiles});
-    if (Session.settings.local.enableWebtorrent) {
+    if (Session.settings.local.enableWebtorrent || this.props.standalone) {
       this.startTorrenting();
     }
   }
 
+  measure() {
+    (typeof this.props.measure === 'function') && this.props.measure();
+  }
+
   componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
+    super.componentWillUnmount();
+    this.observer && this.observer.disconnect();
+    delete this.observer;
   }
 
   onPlay(e) {
@@ -43,10 +51,10 @@ class Torrent extends Component {
     }
   }
 
-  startTorrenting(clicked) {
+  async startTorrenting(clicked) {
     this.setState({torrenting: true});
     const torrentId = this.props.torrentId;
-    const client = Helpers.getWebTorrentClient();
+    const client = await Helpers.getWebTorrentClient();
     const existing = client.get(torrentId);
     if (existing) {
       this.onTorrent(existing, clicked);
@@ -100,6 +108,25 @@ class Torrent extends Component {
     if (!isAud) {
       file.appendTo(el.get(0), {autoplay, muted});
     }
+    if (isVid && this.props.autopause) {
+      const vid = base.find('video').get(0);
+      const handlePlay = (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            autoplay && vid.play();
+          } else {
+            vid.pause();
+          }
+        });
+      }
+      const options = {
+        rootMargin: "0px",
+        threshold: [0.25, 0.75]
+      };
+      this.observer = new IntersectionObserver(handlePlay, options);
+      this.observer.observe(vid);
+    }
+
     base.find('.info').toggle(!isVid);
     const player = base.find('video, audio').get(0);
     if (player) {
@@ -109,6 +136,8 @@ class Torrent extends Component {
       });
       player.onplay = player.onvolumechange = this.onPlay;
     }
+    setTimeout(() => this.measure());
+    setTimeout(() => this.measure(), 100);
   }
 
   getNextIndex(typeCheck) {
@@ -141,22 +170,34 @@ class Torrent extends Component {
   }
 
   onTorrent(torrent, clicked) {
+    if (!this.coverRef.current) { return; }
     this.torrent = torrent;
     const video = torrent.files.find(f => isVideo(f));
     const audio = torrent.files.find(f => isAudio(f));
     const img = torrent.files.find(f => isImage(f));
-    let poster = torrent.files.find(f => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1));
-    poster = poster || img;
-    poster && poster.appendTo($(this.base).find('.cover').get(0));
 
     const file = this.getActiveFile(torrent) || video || audio || img || torrent.files[0];
     this.setState({torrent, cover: img});
     file && this.openFile(file, clicked);
+
+    let poster = torrent.files.find(f => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1));
+    poster = poster || img;
+    if (poster) {
+      poster.appendTo(this.coverRef.current);
+      if (this.props.standalone && this.isUserAgentCrawler()) {
+        const imgEl = this.coverRef.current.firstChild;
+        imgEl.onload = async () => {
+          const blob = await fetch(imgEl.src).then(r => r.blob());
+          Helpers.getBase64(blob).then(src => this.setOgImageUrl(src));
+        }
+      }
+    }
   }
 
   showFilesClicked(e) {
     e.preventDefault();
     this.setState({showFiles: !this.state.showFiles});
+    setTimeout(() => this.measure());
   }
 
   openTorrentClicked(e) {
@@ -164,7 +205,7 @@ class Torrent extends Component {
     this.startTorrenting(true);
   }
 
-  render() {
+  renderLoadingTorrent() {
     const s = this.state;
     const t = s.torrent;
     const p = s.player;
@@ -178,46 +219,76 @@ class Torrent extends Component {
       `;
     }
     return html`
+      ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>`:''}
+      <div class="cover" ref=${this.coverRef} style=${s.isAudioOpen ? '' : 'display:none'}></div>
+      <div class="info">
+          ${s.splitPath ? s.splitPath.map(
+            (str, i) => {
+              if (i === s.splitPath.length - 1) {
+                if (s.isAudioOpen) {
+                  str = str.split('.').slice(0, -1).join('.');
+                }
+                return html`<p><b>${str}</b></p>`;
+              } 
+                return html`<p>${str}</p>` 
+              
+            }
+          ):''}
+      </div>
+      ${s.hasNext ? html`<b>prev</b>`:''}
+      <div class="player">
+          ${playButton}
+      </div>
+      ${s.hasNext ? html`<b>next</b>`:''}
+      ${(this.props.standalone || this.props.preview) ? html`
+        <a href=${this.props.torrentId}>Magnet link</a>
+        ${t && t.files ? html`
+            <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr(
+              s.showFiles ? 'hide_files' : 'show_files'
+            )}</a>
+        `:''}
+      ` : html`
+          <a href="/torrent/${encodeURIComponent(this.props.torrentId)}">${tr('show_files')}</a>
+      `}
+      ${s.showFiles && t && t.files ? html`
+        <p>${tr('peers')}: ${t.numPeers}</p>
+        <div class="flex-table details">
+          ${t.files.map(f => html`
+            <div onClick=${() => this.openFile(f, true)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
+                <div class="flex-cell">${f.name}</div>
+                <div class="flex-cell no-flex">${Helpers.formatBytes(f.length)}</div>
+            </div>
+          `)}
+        </div>
+      ` : ''}
+    `;
+  }
+  
+  renderMeta() {
+    const s = this.state;
+    const title = s.splitPath && s.splitPath[s.splitPath.length - 1].split('.').slice(0, -1).join('.') || 'File sharing';
+    const ogTitle = `${title} | Iris`;
+    const description = 'Shared files';
+    const ogType = s.isAudioOpen ? 'music:song' : 'video.movie';
+    return html`
+      <${Helmet}>
+        <title>${title}</title>
+        <meta name="description" content=${description} />
+        <meta property="og:type" content=${ogType} />
+        <meta property="og:title" content=${ogTitle} />
+        <meta property="og:description" content=${description} />
+        ${s.ogImageUrl ? html`<meta property="og:image" content=${s.ogImageUrl} />` : ''}
+      <//>
+    `;
+  }
+
+  render() {
+    return html`
         <div class="torrent">
-            ${!Session.settings.local.enableWebtorrent && !s.torrenting ? html`
-              <a href="" onClick=${e => this.openTorrentClicked(e)}>Show attachment</a>
-            `:''}
-            ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>`:''}
-            <div class="cover" style=${s.isAudioOpen ? '' : 'display:none'}></div>
-            <div class="info">
-                ${s.splitPath ? s.splitPath.map(
-                  (str, i) => {
-                    if (i === s.splitPath.length - 1) {
-                      if (s.isAudioOpen) {
-                        str = str.split('.').slice(0, -1).join('.');
-                      }
-                      return html`<p><b>${str}</b></p>`;
-                    } else {
-                      return html`<p>${str}</p>` 
-                    }
-                  }
-                ):''}
-            </div>
-            ${s.hasNext ? html`<b>prev</b>`:''}
-            <div class="player">
-                ${playButton}
-            </div>
-            ${s.hasNext ? html`<b>next</b>`:''}
-            <a href=${this.props.torrentId}>Magnet link</a>
-            ${t && t.files ? html`
-                <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr('show_files')}</a>
-            `:''}
-            ${s.showFiles && t && t.files ? html`
-              <p>${tr('peers')}: ${t.numPeers}</p>
-              <div class="flex-table details">
-                ${t.files.map(f => html`
-                  <div onClick=${() => this.openFile(f, true)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
-                      <div class="flex-cell">${f.name}</div>
-                      <div class="flex-cell no-flex">${Helpers.formatBytes(f.length)}</div>
-                  </div>
-                `)}
-              </div>
-            ` : ''}
+            ${this.props.standalone ? this.renderMeta() : ''}
+            ${!Session.settings.local.enableWebtorrent && !this.state.torrenting && !this.props.standalone ? html`
+              <a href="" onClick=${e => this.openTorrentClicked(e)}>${tr('show_attachment')}</a>
+            `: this.renderLoadingTorrent()}
         </div>
     `;
   }

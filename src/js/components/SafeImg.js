@@ -1,4 +1,4 @@
-import { html } from '../Helpers.js';
+import { html } from 'htm/preact';
 
 const SafeImg = props => {
   if (props.src && props.src.indexOf('data:image') !== 0) {

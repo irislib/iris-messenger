@@ -4,7 +4,7 @@ Iris is like the social networking apps we're used to, but better.
 * Secure: It's open source. Users can validate that big brother doesn't read your private messages.
 * Available: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.
 
-![Screenshot](src/img/screenshot.png)
+![Screenshot](screenshot.png)
 
 ## Use
 Browser application: [iris.to](https://iris.to)
@@ -21,18 +21,22 @@ Desktop application: ([download](https://github.com/irislib/iris-electron/releas
 * More secure and available: no need to open the browser application from a server.
 
 ## Develop
-```
-git clone https://github.com/irislib/iris-messenger.git
-cd iris-messenger
+``` bash
+# install dependencies
 yarn
-yarn start
+
+# serve with hot reload at localhost:8080
+yarn dev
+
+# build for production with minification
+yarn build
+
+# test the production build locally
+yarn serve
+
+# run tests with jest and enzyme
+yarn test
 ```
-
-No build tools! It just serves the `src` directory at http://localhost:8080
-
-Eslint: `yarn eslint src/js/*.js --fix;yarn eslint src/js/components/*.js --fix`
-
-The application was originally built in plain jQuery without a framework. While we now use [preact](https://preactjs.com/), there's still some jquery logic that should be ported.
 
 ## Privacy
 Private messages are end-to-end encrypted, but message timestamps and the number of chats aren't. In a decentralized network this information is potentially available to anyone.

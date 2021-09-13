@@ -1,8 +1,9 @@
-import { Component } from '../lib/preact.js';
-import {html} from '../Helpers.js';
+import { Component } from 'preact';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import State from '../State.js';
 import Icons from '../Icons.js';
-import Helpers from '../Helpers.js';
+import $ from 'jquery';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4))  !== -1;
 const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
@@ -60,8 +61,8 @@ class MediaPlayer extends Component {
     }
   }
 
-  startTorrenting() {
-    const client = Helpers.getWebTorrentClient();
+  async startTorrenting() {
+    const client = await Helpers.getWebTorrentClient();
     const existing = client.get(this.torrentId);
     if (existing) {
       this.onTorrent(existing);
@@ -89,9 +90,9 @@ class MediaPlayer extends Component {
                   str = str.split('.').slice(0, -1).join('.');
                 }
                 return html`<p><b>${str}</b></p>`;
-              } else {
+              } 
                 return html`<p>${str}</p>` 
-              }
+              
             }
           ):''}
         </a>

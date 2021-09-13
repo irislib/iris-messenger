@@ -58,7 +58,7 @@
   }
 
   try{
-    var Gun = Store.window.Gun || require('../gun');
+    var Gun = Store.window.Gun || require('./gun');
     Gun.on('create', function(root){
       this.to.next(root);
       root.opt.store = root.opt.store || Store(root.opt);

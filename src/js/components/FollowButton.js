@@ -1,14 +1,16 @@
-import { Component } from '../lib/preact.js';
-import {html} from '../Helpers.js';
+import Component from '../BaseComponent';
+import { html } from 'htm/preact';
 import {translate as t} from '../Translation.js';
 import Session from '../Session.js';
 import State from '../State.js';
+import Notifications from '../Notifications';
 
 class FollowButton extends Component {
   constructor() {
     super();
-    this.eventListeners = {};
     this.key = 'follow';
+    this.actionDone = 'following';
+    this.action = 'follow';
     this.activeClass = 'following';
     this.hoverAction = 'unfollow';
   }
@@ -19,6 +21,7 @@ class FollowButton extends Component {
     if (value && this.key === 'follow') {
       Session.newChannel(this.props.id);
       State.public.user().get('block').get(this.props.id).put(false);
+      Notifications.sendIrisNotification(this.props.id, {event:'follow'});
     }
     if (value && this.key === 'block') {
       State.public.user().get('follow').get(this.props.id).put(false);
@@ -27,22 +30,19 @@ class FollowButton extends Component {
   }
 
   componentDidMount() {
-    State.public.user().get(this.key).get(this.props.id).on((value, a, b, e) => {
-      const s = {};
-      s[this.key] = value;
-      this.setState(s);
-      this.eventListeners[this.key] = e;
-    });
-  }
-
-  componentWillUnmount() {
-    Object.values(this.eventListeners).forEach(e => e.off());
+    State.public.user().get(this.key).get(this.props.id).on(this.sub(
+      value => {
+        const s = {};
+        s[this.key] = value;
+        this.setState(s);
+      }
+    ));
   }
 
   render() {
     return html`
-      <button class="${this.key} ${this.state[this.key] ? this.activeClass : ''}" onClick=${e => this.onClick(e)}>
-        <span class="nonhover">${this.state[this.key] ? t(this.activeClass) : t(this.key)}</span>
+      <button class="${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}" onClick=${e => this.onClick(e)}>
+        <span class="nonhover">${t(this.state[this.key] ? this.actionDone : this.action)}</span>
         <span class="hover">${t(this.hoverAction)}</span>
       </button>
     `;

@@ -1,148 +1,126 @@
-import { Component } from '../lib/preact.js';
-import Helpers, { html } from '../Helpers.js';
+import Component from '../BaseComponent';
+import Helpers from '../Helpers.js';
+import { html } from 'htm/preact';
 import PublicMessage from './PublicMessage.js';
-import ScrollViewport from '../lib/preact-scroll-viewport.js';
+import {  List, WindowScroller,CellMeasurer,CellMeasurerCache,} from 'react-virtualized';
 import State from '../State.js';
+import 'react-virtualized/styles.css';
+import _ from 'lodash';
 
 class MessageFeed extends Component {
   constructor() {
     super();
     this.state = {sortedMessages:[]};
     this.mappedMessages = new Map();
-    this.eventListeners = {};
+    this._cache = new CellMeasurerCache({
+      fixedWidth: true,
+      minHeight: 0,
+    });
+    this.rowRenderer = this.rowRenderer.bind(this);
+  }
+
+  handleMessage(v, k, x, e, from) {
+    if (from) { k = k + from; }
+    if (v) {
+      this.mappedMessages.set(k, this.props.keyIsMsgHash ? k : v);
+    } else {
+      this.mappedMessages.delete(k);
+    }
+
+    this.updateSortedMessages = this.updateSortedMessages || _.debounce(() => {
+      let sortedMessages = Array.from(this.mappedMessages.keys()).sort().map(k => this.mappedMessages.get(k));
+      if (!this.props.reverse) {
+        sortedMessages = sortedMessages.reverse();
+      }
+      this.setState({sortedMessages})
+    }, 1);
+
+    this.updateSortedMessages();
   }
 
   componentDidMount() {
-    this.props.node.map().on((v, k, x, e) => {
-      if (!this.eventListeners['node']) {
-        this.eventListeners['node'] = e;
-      }
-      if (v) {
-        this.mappedMessages.set(k, this.props.keyIsMsgHash ? k : v);
-      } else {
-        this.mappedMessages.delete(k);
-      }
-      this.setState({
-        sortedMessages: Array.from(this.mappedMessages.keys()).sort().reverse().map(k => this.mappedMessages.get(k))
-      })
-    });
     let first = true;
-    State.local.get('scrollUp').on(() => {
-      !first && Helpers.animateScrollTop('.main-view');
-      first = false;
-    });
-  }
-
-  unsubscribe() {
-    Object.values(this.eventListeners).forEach(e => e.off());
-    this.eventListeners = {};
+    State.local.get('scrollUp').on(this.sub(
+      () => {
+        !first && Helpers.animateScrollTop('.main-view');
+        first = false;
+      }
+    ));
+    if (this.props.node) {
+      this.props.node.map().on(this.sub(
+        (...args) => this.handleMessage(...args)
+      ));
+    } else if (this.props.group && this.props.path) { // TODO: make group use the same basic gun api
+      State.group(this.props.group).map(this.props.path, this.sub(
+        (...args) => this.handleMessage(...args)
+      ));
+    }
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.node._.id !== prevProps.node._.id) {
-      this.unsubscribe();
-      this.setState({sortedMessages: [], mappedMessages: new Map()});
+    const prevNodeId = prevProps.node && prevProps.node._ && prevProps.node._.id;
+    const newNodeId = this.props.node && this.props.node._ && this.props.node._.id;
+    if (prevNodeId !== newNodeId || this.props.group !== prevProps.group || this.props.path !== prevProps.path || this.props.filter !== prevProps.filter) {
+      this.mappedMessages = new Map();
+      this.setState({sortedMessages: []});
+      this.componentDidMount();
     }
   }
 
-  componentWillUnmount() {
-    this.unsubscribe();
+  rowRenderer({ index, key, parent, style }) { // TODO: use isScrolling param to reduce rendering?
+    const hash = this.state.sortedMessages[index];
+    return (
+      <CellMeasurer
+        cache={this._cache}
+        columnIndex={0}
+        key={key}
+        rowIndex={index}
+        parent={parent}
+      >
+        {({ measure, registerChild }) => (
+          <div ref={registerChild} style={style}>
+            {measure()}
+            <PublicMessage
+              filter={this.props.filter}
+              hash={hash}
+              key={hash}
+              measure={() => {
+                measure();
+              }}
+              showName={true}
+            />
+          </div>
+        )}
+      </CellMeasurer>
+    );
   }
 
   render() {
-    const thumbnails = this.props.thumbnails ? 'thumbnail-items' : '';
+    if (!this.props.scrollElement) { return; }
     return html`
       <div class="feed-container">
-        <${ScrollViewport} class=${thumbnails} rowHeight=${165}>
-          ${this.state.sortedMessages.map(
-            hash => typeof hash === 'string' ? html`<${PublicMessage} thumbnail=${this.props.thumbnails} filter=${this.props.filter} hash=${hash} key=${hash} showName=${true} />` : ''
-          )}
-        </${ScrollViewport}>
+          <${WindowScroller} scrollElement=${this.props.scrollElement}>
+            ${({ height, width, isScrolling, onChildScroll, scrollTop }) => {
+              return html`
+                <${List}
+                  autoHeight
+                  autoWidth
+                  width=${width||0}
+                  height=${height||0}
+                  isScrolling=${isScrolling}
+                  onScroll=${onChildScroll}
+                  scrollTop=${scrollTop}
+                  rowCount=${this.state.sortedMessages.length}
+                  rowHeight=${this._cache.rowHeight}
+                  rowRenderer=${this.rowRenderer}
+                  overscanRowCount=${10}
+                />
+              `;
+            }}
+          </${WindowScroller}>
       </div>
     `;
   }
-  /*
-  adjustPaddings(isScrollDown) {
-    const container = document.getElementById("container");
-    const currentPaddingTop = getNumFromStyle(container.style.paddingTop);
-    const currentPaddingBottom = getNumFromStyle(container.style.paddingBottom);
-    const remPaddingsVal = 198 * (size / 2); // TODO: calculate actual element heights
-    if (isScrollDown) {
-      container.style.paddingTop = currentPaddingTop + remPaddingsVal + "px";
-      container.style.paddingBottom = currentPaddingBottom === 0 ? "0px" : currentPaddingBottom - remPaddingsVal + "px";
-    } else {
-      container.style.paddingBottom = currentPaddingBottom + remPaddingsVal + "px";
-      if (currentPaddingTop === 0) {
-        $(window).scrollTop($('#post0').offset().top + remPaddingsVal);
-      } else {
-        container.style.paddingTop = currentPaddingTop - remPaddingsVal + "px";
-      }
-    }
-  }
-
-  topSentCallback(entry) {
-    const container = document.getElementById("container");
-
-    const currentY = entry.boundingClientRect.top;
-    const currentRatio = entry.intersectionRatio;
-    const isIntersecting = entry.isIntersecting;
-
-    // conditional check for Scrolling up
-    if (
-      currentY > topSentinelPreviousY &&
-      isIntersecting &&
-      currentRatio >= topSentinelPreviousRatio &&
-      scroller.center !== previousUpIndex && // stop if no new results were received
-      scroller.opts.stickTo !== 'top'
-    ) {
-      previousUpIndex = scroller.center;
-      adjustPaddings(false);
-      scroller.up(size / 2);
-    }
-    topSentinelPreviousY = currentY;
-    topSentinelPreviousRatio = currentRatio;
-  }
-
-  botSentCallback(entry) {
-    const currentY = entry.boundingClientRect.top;
-    const currentRatio = entry.intersectionRatio;
-    const isIntersecting = entry.isIntersecting;
-
-    // conditional check for Scrolling down
-    if (
-      currentY < bottomSentinelPreviousY &&
-      currentRatio > bottomSentinelPreviousRatio &&
-      isIntersecting &&
-      scroller.center !== previousDownIndex &&  // stop if no new results were received
-      scroller.opts.stickTo !== 'bottom'
-    ) {
-      previousDownIndex = scroller.center;
-      adjustPaddings(true);
-      scroller.down(size / 2);
-    }
-    bottomSentinelPreviousY = currentY;
-    bottomSentinelPreviousRatio = currentRatio;
-  }
-
-  initIntersectionObserver() {
-    const options = {
-      //rootMargin: '190px',
-    }
-
-    const callback = entries => {
-      entries.forEach(entry => {
-        if (entry.target.id === 'post0') {
-          topSentCallback(entry);
-        } else if (entry.target.id === `post${size - 1}`) {
-          botSentCallback(entry);
-        }
-      });
-    }
-
-    var observer = new IntersectionObserver(callback, options); // TODO: It's possible to quickly scroll past the sentinels without them firing. Top and bottom sentinels should extend to page top & bottom?
-    observer.observe(document.querySelector("#post0"));
-    observer.observe(document.querySelector(`#post${size - 1}`));
-  } */
 }
 
 export default MessageFeed;
