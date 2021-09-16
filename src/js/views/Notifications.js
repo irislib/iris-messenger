@@ -38,7 +38,7 @@ export default class Notifications extends View {
       <div class="centered-container public-messages-view">
         <h3>${t('notifications')}</h3>
         ${Object.keys(this.notifications).length === 0 ? html`
-            <p>No notifications yet</p>
+            <p> ${t('no_notifications_yet')}</p>
         `:''}
         ${Object.keys(this.notifications).sort().reverse().map(k => {
           const notification = this.notifications[k];
@@ -48,7 +48,7 @@ export default class Notifications extends View {
                 <div class="msg-sender">
                   <a class="msg-sender-link" href="/profile/${notification.from}">
                     <${Identicon} str=${notification.from} width=30 />${' '}
-                    <small class="msgSenderName"><${Name} pub=${notification.from} /></small> 
+                    <small class="msgSenderName"><${Name} pub=${notification.from} /></small>
                   </a>
                 </div>
                 ${notification.text || ''}

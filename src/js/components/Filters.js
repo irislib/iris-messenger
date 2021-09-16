@@ -1,6 +1,7 @@
 import Component from '../BaseComponent';
 import { html } from 'htm/preact';
 import State from '../State.js';
+import {translate as t} from '../Translation.js';
 
 export default class Filters extends Component {
     componentDidMount() {
@@ -17,17 +18,19 @@ export default class Filters extends Component {
             <div class="msg-content">
             <input checked=${s.group === "follows"} type="radio"/>
             <label onClick=${() => this.toggleGroup("follows")}>
-                Follows
+            ${t('follows')}
             </label>
-            
+
             <input checked=${s.group === "2ndDegreeFollows"} type="radio"/>
             <label onClick=${() => this.toggleGroup("2ndDegreeFollows")}>
-                2nd degree follows
+            ${t('second_degree_follows')}
+
             </label>
-            
+
             <input checked=${s.group === "everyone"} type="radio"/>
             <label for="filterGroupChoice3" onClick=${() => this.toggleGroup("everyone")}>
-                Everyone
+            ${t('everyone')}
+
             </label>
             </div>
         </div>`;

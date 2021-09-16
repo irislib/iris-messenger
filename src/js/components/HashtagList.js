@@ -4,6 +4,7 @@ import {createRef} from 'preact';
 import State from '../State.js';
 import {Link} from "preact-router/match";
 import {route} from 'preact-router';
+import {translate as t} from '../Translation.js';
 
 export default class HashtagList extends Component {
   constructor() {
@@ -78,13 +79,13 @@ export default class HashtagList extends Component {
           ${this.state.showAddHashtagForm ? html`
             <form onSubmit=${e => this.onAddHashtag(e)}>
                 <input placeholder="#hashtag" ref=${this.addHashtagInputRef} style="margin-bottom: 7px" />
-                <button type="submit">Add</button>
-                <button onClick=${() => this.setState({showAddHashtagForm:false})}>Cancel</button>
-            </form><br/>  
+                <button type="submit"> ${t('add')}</button>
+                <button onClick=${() => this.setState({showAddHashtagForm:false})}>${t('cancel')}</button>
+            </form><br/>
           ` : html`
-            <a href="" onClick=${e => this.addHashtagClicked(e)}>+ Add hashtag</a><br/>          
-          `}
-          <${Link} activeClassName="active" href="/">All<//>
+            <a href="" onClick=${e => this.addHashtagClicked(e)}> ${t('add_hashtag')}</a><br/>
+            `}
+          <${Link} activeClassName="active" href="/"> ${t('all')}<//>
           ${Object.keys(this.state.hashtags).sort().map(hashtag =>
             html`<${Link} activeClassName="active" class="channel-listing" href="/hashtag/${hashtag}">#${hashtag}<//>`
             )}
@@ -93,8 +94,8 @@ export default class HashtagList extends Component {
       ${this.state.popularHashtags && this.state.popularHashtags.length ? html`
         <div class="msg hashtag-list">
           <div class="msg-content">
-            Popular hashtags<br/><br/>
-  
+          ${t('popular_hashtags')}<br/><br/>
+
             ${this.state.popularHashtags.map(hashtag =>
               html`<${Link} activeClassName="active" class="channel-listing" href="/hashtag/${hashtag}">#${hashtag}<//>`
             )}
