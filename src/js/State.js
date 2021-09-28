@@ -12,8 +12,11 @@ import PeerManager from './PeerManager.js';
 import iris from 'iris-lib';
 import Helpers from './Helpers.js';
 
+const Ipfs = require('../assets/js/ipfs.js');
+
 const State = {
   init(publicOpts) {
+    console.log(Ipfs);
     Gun.log.off = true;
     const o = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
     this.public = Gun(o);
