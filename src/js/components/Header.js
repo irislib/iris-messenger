@@ -20,7 +20,7 @@ import _ from "lodash";
 class Header extends Component {
   constructor() {
     super();
-    this.state = {latest: {}};
+    this.state = {latest: {}, topicPeerCount: 0};
     this.chatId = null;
     this.escFunction = this.escFunction.bind(this);
   }
@@ -116,6 +116,7 @@ class Header extends Component {
       return peer && peer.wire && peer.wire.hied === 'hi' && peer.wire.constructor.name === 'WebSocket';
     });
     this.setState({connectedPeers});
+    State.ipfs.pubsub.peers('gundb').then(peers => this.setState({topicPeerCount: peers.length}));
   }
 
   render() {
@@ -129,6 +130,8 @@ class Header extends Component {
         <${SearchBox} focus=${!!this.state.showMobileSearch}/>
     `;
     const chatting = (activeRoute && activeRoute.indexOf('/chat/') === 0);
+
+    const peerCount = (this.state.connectedPeers ? this.state.connectedPeers.length : 0) + this.state.topicPeerCount;
 
     return html`
     <header class="nav header">
@@ -155,11 +158,11 @@ class Header extends Component {
             <span class="visible-xs-inline-block">${Icons.backArrow}</span>
           </a>
         `}
-        <a href="/settings" class="connected-peers tooltip ${this.state.showMobileSearch ? 'hidden-xs' : ''} ${this.state.connectedPeers && this.state.connectedPeers.length ? 'connected' : ''}">
+        <a href="/settings" class="connected-peers tooltip ${this.state.showMobileSearch ? 'hidden-xs' : ''} ${peerCount ? 'connected' : ''}">
           <span class="tooltiptext">${t('connected_peers')}</span>
           <small>
             <span class="icon">${Icons.network}</span>
-            <span>${this.state.connectedPeers ? this.state.connectedPeers.length : ''}</span>
+            <span>${peerCount}</span>
           </small>
         </a>
         <div class="text" style=${this.chatId ? 'cursor:pointer;text-align:center' : ''} onClick=${() => this.onTitleClicked()}>
