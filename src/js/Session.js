@@ -41,13 +41,6 @@ const updateUserSearchIndex = _.debounce(() => {
   userSearchIndex = new Fuse(values, options);
 }, 200, {leading:true});
 
-setTimeout(() => {
-  State.local.get('block').map().on(() => {
-    updateUserSearchIndex();
-  });
-  updateUserSearchIndex();
-});
-
 function addFollow(callback, k, followDistance, follower) {
   if (follows[k]) {
     if (follows[k].followDistance > followDistance) {
@@ -323,6 +316,12 @@ function init(options = {}) {
   } else {
     clearIndexedDB();
   }
+  setTimeout(() => {
+    State.local.get('block').map().on(() => {
+      updateUserSearchIndex();
+    });
+    updateUserSearchIndex();
+  });
 }
 
 function getFollows() {

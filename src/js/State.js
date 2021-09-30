@@ -1,5 +1,6 @@
 import Gun from 'gun';
 import 'gun/sea';
+import 'gun/lib/ipfs';
 import 'gun/nts.js';
 import 'gun/lib/open';
 import 'gun/lib/radix';
@@ -12,13 +13,22 @@ import PeerManager from './PeerManager.js';
 import iris from 'iris-lib';
 import Helpers from './Helpers.js';
 
-const Ipfs = require('../assets/js/ipfs.js');
+const IPFS_CONFIG = {
+  config: {
+    Addresses:{
+      Swarm:[
+        '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
+        '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
+      ]
+    }
+  },
+};
 
 const State = {
-  init(publicOpts) {
-    console.log(Ipfs);
+  async init(publicOpts) {
+    const ipfs = await window.Ipfs.create(IPFS_CONFIG);
     Gun.log.off = true;
-    const o = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
+    const o = Object.assign({ ipfs, peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
     this.public = Gun(o);
     if (publicOpts && publicOpts.peers) {
       publicOpts.peers.forEach(url => PeerManager.addPeer({url}));

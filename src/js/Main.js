@@ -42,19 +42,20 @@ if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redir
   window.location.href = window.location.href.replace('#/', '');
 }
 
-State.init();
-Session.init({autologin: window.location.pathname.length > 2});
-PeerManager.init();
-
 Helpers.checkColorScheme();
 
 class Main extends Component {
   componentDidMount() {
-    State.local.get('loggedIn').on(this.inject());
-    State.local.get('toggleMenu').put(false);
-    State.local.get('toggleMenu').on(show => this.toggleMenu(show));
-    State.electron && State.electron.get('platform').on(this.inject());
-    State.local.get('unseenMsgsTotal').on(this.inject());
+    State.init().then(() => {
+      Session.init({autologin: window.location.pathname.length > 2});
+      PeerManager.init();
+
+      State.local.get('loggedIn').on(this.inject());
+      State.local.get('toggleMenu').put(false);
+      State.local.get('toggleMenu').on(show => this.toggleMenu(show));
+      State.electron && State.electron.get('platform').on(this.inject());
+      State.local.get('unseenMsgsTotal').on(this.inject());
+    });
   }
 
   handleRoute(e) {
