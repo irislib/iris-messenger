@@ -26,9 +26,9 @@ const IPFS_CONFIG = {
 
 const State = {
   async init(publicOpts) {
-    const ipfs = await window.Ipfs.create(IPFS_CONFIG);
+    this.ipfs = await window.Ipfs.create(IPFS_CONFIG);
     Gun.log.off = true;
-    const o = Object.assign({ ipfs, peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
+    const o = Object.assign({ ipfs: this.ipfs, peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
     this.public = Gun(o);
     if (publicOpts && publicOpts.peers) {
       publicOpts.peers.forEach(url => PeerManager.addPeer({url}));
