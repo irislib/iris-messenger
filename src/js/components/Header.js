@@ -116,7 +116,6 @@ class Header extends Component {
       return peer && peer.wire && peer.wire.hied === 'hi' && peer.wire.constructor.name === 'WebSocket';
     });
     this.setState({connectedPeers});
-    State.ipfs.pubsub.peers('gundb').then(peers => this.setState({topicPeerCount: peers.length}));
   }
 
   render() {

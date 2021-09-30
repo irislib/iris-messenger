@@ -135,9 +135,7 @@ export default class PeerSettings extends Component {
 
   updatePeersFromGun() {
     const peersFromGun = State.public.back('opt.peers') || {};
-    const pubsubPeers = State.ipfs.libp2p.metrics.peers.length;
-    this.setState({peersFromGun, pubsubPeers});
-    State.ipfs.pubsub.peers('gundb').then(peers => this.setState({topicPeers: peers.length}));
+    this.setState({peersFromGun});
   }
 
   addPeerClicked() {
