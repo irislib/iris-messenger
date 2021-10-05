@@ -10,10 +10,10 @@ import Session from '../Session.js';
 import Torrent from './Torrent.js';
 import Icons from '../Icons.js';
 import Autolinker from 'autolinker';
-import iris from 'iris-lib';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
 import Notifications from '../Notifications';
+import Gun from 'gun';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
@@ -35,7 +35,7 @@ class PublicMessage extends Message {
     if (typeof hash !== 'string') {
       return;
     }
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       let resolved;
       const askFromPublicState = () => {
         State.public.get('#').get(hash).on(this.sub(
@@ -45,11 +45,15 @@ class PublicMessage extends Message {
               return;
             }
             event.off();
-            const msg = await iris.SignedMessage.fromString(serialized);
-            if (msg) {
-              resolve(msg);
+            // verifying message here, because iris.SignedMessage.fromSig() broke the build on latest gun
+            const json = JSON.parse(serialized);
+            const signedData = await Gun.SEA.verify(json.sig.slice(1), json.pubKey);
+            if (signedData) {
+              resolve({signedData, signerKeyHash: json.pubKey});
               resolved = true;
-              State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
+              State.local.get('msgsByHash').get(hash).put(JSON.stringify(signedData));
+            } else {
+              reject(Gun.SEA.err);
             }
           }
         ));
