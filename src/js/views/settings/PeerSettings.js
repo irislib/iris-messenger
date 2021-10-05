@@ -72,8 +72,6 @@ export default class PeerSettings extends Component {
     }
 
     return html`
-      <p>Libp2p pubsub peers: ${this.state.pubsubPeers || 0}</p>
-      <p>Pubsub topic peers: ${this.state.topicPeers || 0}</p>
       <div id="peers" class="flex-table">
         ${urls.length === 0 ? html`
           <button id="reset-peers" style="margin-bottom: 15px" onClick=${() => this.resetPeersClicked()}>${t('restore_defaults')}</button>
