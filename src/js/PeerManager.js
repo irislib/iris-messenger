@@ -12,8 +12,8 @@ const DEFAULT_PEERS = {};
 if (window.location.hostname.endsWith('herokuapp.com') || window.location.host === 'localhost:5000') {
   DEFAULT_PEERS[window.location.origin + '/gun'] = {};
 } else {
-  DEFAULT_PEERS['https://gun-us.herokuapp.com/gun'] = {};
   DEFAULT_PEERS['https://gun-rs.iris.to/gun'] = {};
+  DEFAULT_PEERS['https://gun-us.herokuapp.com/gun'] = {};
 }
 
 let knownPeers = getSavedPeers();
