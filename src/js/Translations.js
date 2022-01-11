@@ -888,7 +888,7 @@ ru: {
     all: "Kaikki",
     give_your_profile_link_to_someone: "jaa profiililinkkisi",
     follows: "Seurattavat",
-    second_degree_follows: "2n asteen seurattavat",
+    second_degree_follows: "2. asteen seurattavat",
     everyone: "Kaikki",
     connected_peers: "Yhdistetyt vertaisverkot",
     no_notifications_yet: "Ei vielä ilmoituksia",
