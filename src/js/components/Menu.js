@@ -7,7 +7,6 @@ import logoType from "../../assets/img/iris_logotype.png";
 import {Link} from "preact-router/match";
 import {translate as t} from "../Translation";
 import Icons from "../Icons";
-import _ from "lodash";
 
 const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
   {url: '/', text: t('home'), icon: Icons.home},

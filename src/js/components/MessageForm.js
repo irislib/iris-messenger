@@ -19,15 +19,17 @@ export default class MessageForm extends Component {
     const hash = await iris.util.getHash(serialized);
     State.public.get('#').get(hash).put(serialized);
     if (msg.replyingTo) {
-      twice(() => State.public.user().get('replies').put({a:null}));
-      twice(() => State.public.user().get('replies').get(msg.replyingTo).put({a:null}));
+      twice(() => State.public.user().get('replies').put({}));
+      twice(() => State.public.user().get('replies').get(msg.replyingTo).put('a'));
+      twice(() => State.public.user().get('replies').get(msg.replyingTo).put({}));
       twice(() => State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
     } else {
       let node = State.public.user();
       (this.props.index || (this.props.hashtag && `hashtags/${this.props.hashtag}`) || 'msgs').split('/').forEach(s => {
+        node.put({});
         node = node.get(s);
       });
-      node.get(msg.time).put(hash);
+      twice(() => node.get(msg.time).put(hash));
     }
     const hashtags = msg.text && msg.text.match(/\B\#\w\w+\b/g);
     if (hashtags) {

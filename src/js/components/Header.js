@@ -20,7 +20,7 @@ import _ from "lodash";
 class Header extends Component {
   constructor() {
     super();
-    this.state = {latest: {}};
+    this.state = {latest: {}, topicPeerCount: 0};
     this.chatId = null;
     this.escFunction = this.escFunction.bind(this);
   }
@@ -130,6 +130,8 @@ class Header extends Component {
     `;
     const chatting = (activeRoute && activeRoute.indexOf('/chat/') === 0);
 
+    const peerCount = (this.state.connectedPeers ? this.state.connectedPeers.length : 0) + this.state.topicPeerCount;
+
     return html`
     <header class="nav header">
       ${activeRoute && activeRoute.indexOf('/chat/') === 0 ? html`
@@ -155,11 +157,11 @@ class Header extends Component {
             <span class="visible-xs-inline-block">${Icons.backArrow}</span>
           </a>
         `}
-        <a href="/settings" class="connected-peers tooltip ${this.state.showMobileSearch ? 'hidden-xs' : ''} ${this.state.connectedPeers && this.state.connectedPeers.length ? 'connected' : ''}">
+        <a href="/settings" class="connected-peers tooltip ${this.state.showMobileSearch ? 'hidden-xs' : ''} ${peerCount ? 'connected' : ''}">
           <span class="tooltiptext">${t('connected_peers')}</span>
           <small>
             <span class="icon">${Icons.network}</span>
-            <span>${this.state.connectedPeers ? this.state.connectedPeers.length : ''}</span>
+            <span>${peerCount}</span>
           </small>
         </a>
         <div class="text" style=${this.chatId ? 'cursor:pointer;text-align:center' : ''} onClick=${() => this.onTitleClicked()}>

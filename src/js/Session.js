@@ -41,13 +41,6 @@ const updateUserSearchIndex = _.debounce(() => {
   userSearchIndex = new Fuse(values, options);
 }, 200, {leading:true});
 
-setTimeout(() => {
-  State.local.get('block').map().on(() => {
-    updateUserSearchIndex();
-  });
-  updateUserSearchIndex();
-});
-
 function addFollow(callback, k, followDistance, follower) {
   if (follows[k]) {
     if (follows[k].followDistance > followDistance) {
@@ -222,6 +215,7 @@ function login(k) {
   State.public.user().get('msgs').put({a:null}); // These need to be initialised for some reason, otherwise 1st write is slow
   State.public.user().get('replies').put({a:null});
   State.public.user().get('likes').put({a:null});
+  State.public.user().get('follow').put({a:null});
   if (shouldRefresh) {
     location.reload();
   }
@@ -323,6 +317,12 @@ function init(options = {}) {
   } else {
     clearIndexedDB();
   }
+  setTimeout(() => {
+    State.local.get('block').map().on(() => {
+      updateUserSearchIndex();
+    });
+    updateUserSearchIndex();
+  });
 }
 
 function getFollows() {
