@@ -58,13 +58,6 @@ class About extends View {
         <p>In that regard, Iris prioritizes decentralization and availability over perfect privacy.</p>
         <p>Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.</p>
         <p>Iris makes no guarantees of data persistence.</p>
-<<<<<<< HEAD
-        <p>You can check your saved data in the <a href="https://iris.to/explorer">Explorer</a></p>
-        <p> ${t('the_application_is_unaudited')}</p>
-
-        <h4>${t('donate')}</h4>
-        <p dangerouslySetInnerHTML=${{ __html:t('donate_info', "href=\"https://opencollective.com/iris-social\"") + ': 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST' }}></p>
-=======
         <p>You can check your saved data in the <a href="/explorer">Explorer</a>.</p>
         <p>${t('application_security_warning')}</p>
 
@@ -76,10 +69,9 @@ class About extends View {
           </a>
           <${FollowButton} id=${DEVELOPER} />
         </div>
-          
+
         <h4>${t('donate')}</h4>
         <p dangerouslySetInnerHTML=${{ __html:`${t('donate_info', "href=\"https://opencollective.com/iris-social\"")  }: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST` }}></p>
->>>>>>> origin/master
         <p>Dogecoin: DEsgP4H1Sjp4461PugHDNnoGd6S8pTvrm1</p>
       </div>
     `;

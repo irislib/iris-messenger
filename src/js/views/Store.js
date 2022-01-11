@@ -117,11 +117,7 @@ class Store extends View {
               `}
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>
-<<<<<<< HEAD
-              <button class="add" onClick=${e => this.addToCart(k, i.user, e)}>
-=======
               <button class="add" onClick=${e => this.addToCart(k, i.from, e)}>
->>>>>>> origin/master
               ${t('add_to_cart')}
                 ${this.cart[k] ? ` (${this.cart[k]})` : ''}
               </button>
@@ -139,11 +135,7 @@ class Store extends View {
     return html`
       <p dangerouslySetInnerHTML=${{ __html: t('this_is_a_prototype_store', `href="/store/${Session.getPubKey()}"`
         )}}></p>
-<<<<<<< HEAD
-      ${this.getNotification()}
-=======
       <${OnboardingNotification} />
->>>>>>> origin/master
       ${this.renderItems()}
     `;
   }
