@@ -39,8 +39,10 @@ class ExplorerNode extends BaseComponent {
   }
 
   componentDidMount() {
-    this.isMine = this.props.path.indexOf(`public/~${  Session.getPubKey()}`) === 0;
-    this.isGroup = this.props.path.indexOf('group') === 0;
+    this.isMine = this.props.path.indexOf(`Public/~${  Session.getPubKey()}`) === 0;
+    this.isGroup = this.props.path.indexOf('Group') === 0;
+    this.isPublicRoot = this.props.path === 'Public';
+    this.isUserList = this.props.path === 'Public/Users';
 
     this.children = {};
     if (this.props.children && typeof this.props.children === "object") {
@@ -51,6 +53,7 @@ class ExplorerNode extends BaseComponent {
     const cb = this.sub(
       async (v, k, c, e, from) => {
         if (k === '_') { return; }
+        if (this.isPublicRoot && k.indexOf('~') === 0) { return; }
         let encryption;
         if (typeof v === 'string' && v.indexOf('SEA{') === 0) {
           try {
@@ -121,7 +124,7 @@ class ExplorerNode extends BaseComponent {
     const lnk = (href, text, cls) => html`<a class=${cls === undefined ? "mar-left5" : cls} href=${href}>${text}</a>`;
     const keyLinks = html`
       ${typeof k === 'string' && k.match(hashRegex) ? lnk(`/post/${encodeURIComponent(k)}`, '#') : ''}
-      ${typeof k === 'string' && k.match(pubKeyRegex) ? lnk(`/explorer/public%2F~${encodeURIComponent(encodeURIComponent(k))}`, html`<iris-text user=${k} path="profile/name"/>`) : ''}
+      ${typeof k === 'string' && k.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(k))}`, html`<iris-text user=${k} path="profile/name"/>`) : ''}
     `;
     if (encryption) {
       if (!decrypted) {
@@ -131,8 +134,8 @@ class ExplorerNode extends BaseComponent {
       }
     } else {
       const pub = Session.getPubKey();
-      const isMine = this.props.path.indexOf(`public/~${  pub}`) === 0;
-      const path = isMine && (`${this.props.path  }/${  encodeURIComponent(k)}`).replace(`public/~${  pub  }/`, '');
+      const isMine = this.props.path.indexOf(`Public/~${  pub}`) === 0;
+      const path = isMine && (`${this.props.path  }/${  encodeURIComponent(k)}`).replace(`Public/~${  pub  }/`, '');
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
         s = isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
       } else {
@@ -147,8 +150,8 @@ class ExplorerNode extends BaseComponent {
 
         const valueLinks = html`
           ${typeof v === 'string' && v.match(hashRegex) ? lnk(`/post/${encodeURIComponent(v)}`, '#') : ''}
-          ${typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`/explorer/public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<iris-text user=${v} path="profile/name"/>`) : ''}
-          ${typeof from === 'string' ? html`<small> from ${lnk(`/explorer/public%2F~${encodeURIComponent(encodeURIComponent(from))}`, html`<iris-text user=${from} path="profile/name"/>`, '')}</small>` : ''}
+          ${typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<iris-text user=${v} path="profile/name"/>`) : ''}
+          ${typeof from === 'string' ? html`<small> from ${lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(from))}`, html`<iris-text user=${from} path="profile/name"/>`, '')}</small>` : ''}
         `;
 
         s = isMine ? html`
