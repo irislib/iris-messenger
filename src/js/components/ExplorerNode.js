@@ -28,7 +28,11 @@ class ExplorerNode extends BaseComponent {
 
   getNode() {
     if (this.props.path.length > 1) {
-      const path = this.props.path.split('/');
+      let path = this.props.path;
+      if (path.indexOf('Public/Users') === 0) {
+        path = path.replace('/Users', '');
+      }
+      path = path.split('/');
       return path.slice(1).reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, this.props.gun);
     }
     return this.props.gun;
@@ -54,6 +58,7 @@ class ExplorerNode extends BaseComponent {
       async (v, k, c, e, from) => {
         if (k === '_') { return; }
         if (this.isPublicRoot && k.indexOf('~') === 0) { return; }
+        if (this.isUserList && !k.substr(1).match(pubKeyRegex)) { return; }
         let encryption;
         if (typeof v === 'string' && v.indexOf('SEA{') === 0) {
           try {
