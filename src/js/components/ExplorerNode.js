@@ -44,7 +44,7 @@ class ExplorerNode extends BaseComponent {
     return true;
   }
 
-  componentDidMount() {
+  componentDidMount() { // TODO: this is messy; create separate classes for Public / Group / Local
     this.isMine = this.props.path.indexOf(`Public/Users/~${  Session.getPubKey()}`) === 0;
     this.isGroup = this.props.path.indexOf('Group/') === 0;
     this.isPublicRoot = this.props.path === 'Public';
@@ -61,6 +61,11 @@ class ExplorerNode extends BaseComponent {
         '#':{value:{_:1}, displayName: "ContentAddressed"},
         Users:{value:{_:1}}
       });
+    }
+    if (this.isUserList) { // always add yourself to the user list
+      const obj = {};
+      obj['~' + Session.getPubKey()] = {value:{_:1}};
+      this.children = Object.assign(this.children, obj);
     }
     if (this.isGroupRoot) {
       const groups = {};
@@ -138,7 +143,7 @@ class ExplorerNode extends BaseComponent {
         <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.children[k].open ? chevronDown : chevronRight}</span>
         <a href="/explorer/${encodeURIComponent(path)}">
             <b>
-                ${typeof k === 'string' && k.substr(1).match(pubKeyRegex) ? html`<${Name} key=${k} pub=${k.substr(1)} placeholder="profile name"/>` : (displayName || k)}
+                ${typeof k === 'string' && k.substr(1).match(pubKeyRegex) ? html`<${Name} key=${k} pub=${k.substr(1)} placeholder="user"/>` : (displayName || k)}
             </b>
         </a>
       </div>
@@ -154,7 +159,7 @@ class ExplorerNode extends BaseComponent {
     const lnk = (href, text, cls) => html`<a class=${cls === undefined ? "mar-left5" : cls} href=${href}>${text}</a>`;
     const keyLinks = html`
       ${typeof k === 'string' && k.match(hashRegex) ? lnk(`/post/${encodeURIComponent(k)}`, '#') : ''}
-      ${typeof k === 'string' && k.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(k))}`, html`<${Name} key=${k} pub=${k} placeholder="profile name"/>`) : ''}
+      ${typeof k === 'string' && k.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(k))}`, html`<${Name} key=${k} pub=${k} placeholder="user"/>`) : ''}
     `;
     if (encryption) {
       if (!decrypted) {
@@ -180,8 +185,8 @@ class ExplorerNode extends BaseComponent {
 
         const valueLinks = html`
           ${typeof v === 'string' && v.match(hashRegex) ? lnk(`/post/${encodeURIComponent(v)}`, '#') : ''}
-          ${k !== 'epub' && typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<${Name} key=${v} pub=${v} placeholder="profile name"/>`) : ''}
-          ${typeof from === 'string' ? html`<small> from ${lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(from))}`, html`<${Name} key=${from} pub=${from} placeholder="profile name"/>`, '')}</small>` : ''}
+          ${k !== 'epub' && typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<${Name} key=${v} pub=${v} placeholder="user"/>`) : ''}
+          ${typeof from === 'string' ? html`<small> from ${lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(from))}`, html`<${Name} key=${from} pub=${from} placeholder="user"/>`, '')}</small>` : ''}
         `;
 
         s = this.isMine ? html`
