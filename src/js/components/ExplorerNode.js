@@ -3,6 +3,7 @@ import Session from "../Session";
 import Gun from "gun";
 import {html} from "htm/preact";
 import Name from "./Name";
+import State from "../State";
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
@@ -24,7 +25,7 @@ class ExplorerNode extends BaseComponent {
   constructor() {
     super();
     this.children = {};
-    this.state = {children: {}, shownChildrenCount: SHOW_CHILDREN_COUNT};
+    this.state = {groups:{}, children: {}, shownChildrenCount: SHOW_CHILDREN_COUNT};
   }
 
   getNode() {
@@ -45,9 +46,10 @@ class ExplorerNode extends BaseComponent {
 
   componentDidMount() {
     this.isMine = this.props.path.indexOf(`Public/Users/~${  Session.getPubKey()}`) === 0;
-    this.isGroup = this.props.path.indexOf('Group') === 0;
+    this.isGroup = this.props.path.indexOf('Group/') === 0;
     this.isPublicRoot = this.props.path === 'Public';
     this.isUserList = this.props.path === 'Public/Users';
+    this.isGroupRoot = this.props.path === 'Group';
 
     this.children = {};
     if (this.props.children && typeof this.props.children === "object") {
@@ -58,6 +60,19 @@ class ExplorerNode extends BaseComponent {
         '#':{value:{_:1}, displayName: "ContentAddressed"},
         Users:{value:{_:1}}
       });
+    }
+    if (this.isGroupRoot) {
+      const groups = {};
+      State.local.get('groups').map().on(this.sub(
+        (v,k) => {
+          if (v) {
+            groups[k] = true;
+          } else {
+            delete groups[k];
+          }
+          this.setState({groups});
+        }
+      ));
     }
     this.setState({children: this.children, shownChildrenCount: SHOW_CHILDREN_COUNT});
 
@@ -93,7 +108,9 @@ class ExplorerNode extends BaseComponent {
       }
     );
 
-    if (this.isGroup) {
+    if (this.isGroupRoot) {
+      return;
+    } else if (this.isGroup) {
       const path = this.props.path.split('/').slice(2).join('/');
       this.props.gun.map(path, cb); // TODO: make State.group() provide the normal gun api
     } else {
@@ -257,7 +274,14 @@ class ExplorerNode extends BaseComponent {
           ` : ''}
         </div>
       `: ''}
-      ${renderChildren(children.slice(0, this.state.shownChildrenCount))}
+      
+      ${this.isGroupRoot ? Object.keys(this.state.groups).map(group => html`
+          <div class="explorer-row" style="padding-left: 1em">
+              ${chevronRight}
+              <a href="/explorer/Group%2F${encodeURIComponent(encodeURIComponent(group))}"><b>${group}</b></a>
+          </div>
+      `) : renderChildren(children.slice(0, this.state.shownChildrenCount))}
+      
       ${showMoreBtn ? html`
         <a style="padding-left: ${this.props.indent + 1}em" href="" onClick=${e => {e.preventDefault();this.setState({shownChildrenCount: this.state.shownChildrenCount + SHOW_CHILDREN_COUNT})}}>More (${children.length - this.state.shownChildrenCount})</a>
       ` : ''}

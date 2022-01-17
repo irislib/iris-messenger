@@ -22,21 +22,6 @@ const chevronRight = html`
 class Explorer extends View {
   constructor() {
     super();
-    this.state = {groups:{}};
-  }
-
-  componentDidMount() {
-    const groups = {};
-    State.local.get('groups').map().on(this.sub(
-      (v,k) => {
-        if (v) {
-          groups[k] = true;
-        } else {
-          delete groups[k];
-        }
-        this.setState({groups});
-      }
-    ))
   }
 
   renderView() {
@@ -75,16 +60,9 @@ class Explorer extends View {
         ${s.publicOpen ? html`<${ExplorerNode} indent=${1} gun=${State.public} key='Public' path='Public'/>`:''}
         <div class="explorer-row">
             <span onClick=${() => this.setState({groupOpen:!s.groupOpen})}>${s.groupOpen ? chevronDown : chevronRight}</span>
-            <a href="/explorer/Group"><b>Group</b></a> (public data, composite object of all the users in the group)
+            <a href="/explorer/Group"><b>Group</b></a> (public data, composite object of all the users in the <a href="/explorer/Local%2Fgroups">group</a>)
         </div>
-        ${s.groupOpen ?
-          Object.keys(this.state.groups).map(group => html`
-            <div class="explorer-row" style="padding-left: 1em">
-              ${chevronRight}
-              <a href="/explorer/Group%2F${encodeURIComponent(encodeURIComponent(group))}"><b>${group}</b></a>
-            </div>
-          `)
-        :''}
+        ${s.groupOpen ? html`<${ExplorerNode} indent=${1} gun=${State.public} key='Group' path='Group'/>`:''}
         <div class="explorer-row">
             <span onClick=${() => this.setState({localOpen:!s.localOpen})}>${s.localOpen ? chevronDown : chevronRight}</span>
             <a href="/explorer/Local"><b>Local</b></a> (only stored on your device)
