@@ -50,6 +50,7 @@ class ExplorerNode extends BaseComponent {
     this.isPublicRoot = this.props.path === 'Public';
     this.isUserList = this.props.path === 'Public/Users';
     this.isGroupRoot = this.props.path === 'Group';
+    this.isLocal = this.props.path.indexOf('Local') === 0;
 
     this.children = {};
     if (this.props.children && typeof this.props.children === "object") {
@@ -163,11 +164,10 @@ class ExplorerNode extends BaseComponent {
       }
     } else {
       const pub = Session.getPubKey();
-      const isMine = this.props.path.indexOf(`Public/Users/~${  pub}`) === 0;
-      const path = isMine && (`${this.props.path  }/${  encodeURIComponent(k)}`).replace(`Public/~${  pub  }/`, '');
+      const path = this.isMine && (`${this.props.path  }/${  encodeURIComponent(k)}`).replace(`Public/Users/~${  pub  }/`, '');
 
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
-        s = isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
+        s = this.isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
       } else {
         let stringified = JSON.stringify(v);
         let showToggle;
@@ -180,11 +180,11 @@ class ExplorerNode extends BaseComponent {
 
         const valueLinks = html`
           ${typeof v === 'string' && v.match(hashRegex) ? lnk(`/post/${encodeURIComponent(v)}`, '#') : ''}
-          ${typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<${Name} key=${v} pub=${v} placeholder="profile name"/>`) : ''}
+          ${k !== 'epub' && typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<${Name} key=${v} pub=${v} placeholder="profile name"/>`) : ''}
           ${typeof from === 'string' ? html`<small> from ${lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(from))}`, html`<${Name} key=${from} pub=${from} placeholder="profile name"/>`, '')}</small>` : ''}
         `;
 
-        s = isMine ? html`
+        s = this.isMine ? html`
           <iris-text placeholder="empty" key=${path} user=${pub} path=${path} editable=${true} json=${true}/>
           ${valueLinks}
         ` :

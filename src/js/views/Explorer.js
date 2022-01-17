@@ -55,17 +55,20 @@ class Explorer extends View {
       ${isRootLevel ? html`
         <div class="explorer-row">
             <span onClick=${() => this.setState({publicOpen:!s.publicOpen})}>${s.publicOpen ? chevronDown : chevronRight}</span>
-            <a href="/explorer/Public"><b>Public</b></a> (synced with peers)
+            <a href="/explorer/Public"><b>Public</b></a>
+            <small class="mar-left5">(synced with peers)</small>
         </div>
         ${s.publicOpen ? html`<${ExplorerNode} indent=${1} gun=${State.public} key='Public' path='Public'/>`:''}
         <div class="explorer-row">
             <span onClick=${() => this.setState({groupOpen:!s.groupOpen})}>${s.groupOpen ? chevronDown : chevronRight}</span>
-            <a href="/explorer/Group"><b>Group</b></a> (public data, composite object of all the users in the <a href="/explorer/Local%2Fgroups">group</a>)
+            <a href="/explorer/Group"><b>Group</b></a>
+            <small class="mar-left5">(public data, composite object of all the users in the <a href="/explorer/Local%2Fgroups">group</a>)</small>
         </div>
         ${s.groupOpen ? html`<${ExplorerNode} indent=${1} gun=${State.public} key='Group' path='Group'/>`:''}
         <div class="explorer-row">
             <span onClick=${() => this.setState({localOpen:!s.localOpen})}>${s.localOpen ? chevronDown : chevronRight}</span>
-            <a href="/explorer/Local"><b>Local</b></a> (only stored on your device)
+            <a href="/explorer/Local"><b>Local</b></a>
+            <small class="mar-left5">(only stored on your device)</small>
         </div>
         ${s.localOpen ? html`<${ExplorerNode} indent=${1} gun=${State.local} key="Local" path='Local'/>`:''}
       `: html`
