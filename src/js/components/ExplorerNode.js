@@ -2,6 +2,7 @@ import BaseComponent from "../BaseComponent";
 import Session from "../Session";
 import Gun from "gun";
 import {html} from "htm/preact";
+import Name from "./Name";
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
@@ -43,7 +44,7 @@ class ExplorerNode extends BaseComponent {
   }
 
   componentDidMount() {
-    this.isMine = this.props.path.indexOf(`Public/~${  Session.getPubKey()}`) === 0;
+    this.isMine = this.props.path.indexOf(`Public/Users/~${  Session.getPubKey()}`) === 0;
     this.isGroup = this.props.path.indexOf('Group') === 0;
     this.isPublicRoot = this.props.path === 'Public';
     this.isUserList = this.props.path === 'Public/Users';
@@ -52,7 +53,13 @@ class ExplorerNode extends BaseComponent {
     if (this.props.children && typeof this.props.children === "object") {
       this.children = Object.assign(this.children, this.props.children);
     }
-    this.setState({children: {}, shownChildrenCount: SHOW_CHILDREN_COUNT});
+    if (this.isPublicRoot) {
+      this.children = Object.assign(this.children, {
+        '#':{value:{_:1}, displayName: "ContentAddressed"},
+        Users:{value:{_:1}}
+      });
+    }
+    this.setState({children: this.children, shownChildrenCount: SHOW_CHILDREN_COUNT});
 
     const cb = this.sub(
       async (v, k, c, e, from) => {
@@ -106,14 +113,14 @@ class ExplorerNode extends BaseComponent {
     this.setState({children: this.children});
   }
 
-  renderChildObject(k) {
+  renderChildObject(k, displayName) {
     const path = `${this.props.path  }/${  encodeURIComponent(k)}`;
     return html`
       <div class="explorer-row" style="padding-left: ${this.props.indent}em">
         <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.children[k].open ? chevronDown : chevronRight}</span>
         <a href="/explorer/${encodeURIComponent(path)}">
             <b>
-                ${typeof k === 'string' && k.substr(1).match(pubKeyRegex) ? html`<iris-text user=${k.substr(1)} path="profile/name"/>` : k}
+                ${typeof k === 'string' && k.substr(1).match(pubKeyRegex) ? html`<${Name} key=${k} pub=${k.substr(1)} placeholder="profile name"/>` : (displayName || k)}
             </b>
         </a>
       </div>
@@ -129,7 +136,7 @@ class ExplorerNode extends BaseComponent {
     const lnk = (href, text, cls) => html`<a class=${cls === undefined ? "mar-left5" : cls} href=${href}>${text}</a>`;
     const keyLinks = html`
       ${typeof k === 'string' && k.match(hashRegex) ? lnk(`/post/${encodeURIComponent(k)}`, '#') : ''}
-      ${typeof k === 'string' && k.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(k))}`, html`<iris-text user=${k} path="profile/name"/>`) : ''}
+      ${typeof k === 'string' && k.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(k))}`, html`<${Name} key=${k} pub=${k} placeholder="profile name"/>`) : ''}
     `;
     if (encryption) {
       if (!decrypted) {
@@ -139,8 +146,9 @@ class ExplorerNode extends BaseComponent {
       }
     } else {
       const pub = Session.getPubKey();
-      const isMine = this.props.path.indexOf(`Public/~${  pub}`) === 0;
+      const isMine = this.props.path.indexOf(`Public/Users/~${  pub}`) === 0;
       const path = isMine && (`${this.props.path  }/${  encodeURIComponent(k)}`).replace(`Public/~${  pub  }/`, '');
+
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
         s = isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
       } else {
@@ -155,12 +163,12 @@ class ExplorerNode extends BaseComponent {
 
         const valueLinks = html`
           ${typeof v === 'string' && v.match(hashRegex) ? lnk(`/post/${encodeURIComponent(v)}`, '#') : ''}
-          ${typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<iris-text user=${v} path="profile/name"/>`) : ''}
-          ${typeof from === 'string' ? html`<small> from ${lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(from))}`, html`<iris-text user=${from} path="profile/name"/>`, '')}</small>` : ''}
+          ${typeof v === 'string' && v.match(pubKeyRegex) ? lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(v))}`, html`<${Name} key=${v} pub=${v} placeholder="profile name"/>`) : ''}
+          ${typeof from === 'string' ? html`<small> from ${lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(from))}`, html`<${Name} key=${from} pub=${from} placeholder="profile name"/>`, '')}</small>` : ''}
         `;
 
         s = isMine ? html`
-          <iris-text placeholder="empty" user=${pub} path=${path} editable=${true} json=${true}/>
+          <iris-text placeholder="empty" key=${path} user=${pub} path=${path} editable=${true} json=${true}/>
           ${valueLinks}
         ` :
         html`
@@ -217,8 +225,9 @@ class ExplorerNode extends BaseComponent {
     const renderChildren = children => {
       return children.map(k => {
         const v = this.state.children[k].value;
+        const n = this.state.children[k].displayName;
         if (typeof v === 'object' && v && v['_']) {
-          return this.renderChildObject(k, v);
+          return this.renderChildObject(k, n);
         }
           return this.renderChildValue(k, v);
 

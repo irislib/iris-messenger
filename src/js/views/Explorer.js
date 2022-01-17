@@ -3,6 +3,7 @@ import State from '../State.js';
 import View from './View.js';
 import ExplorerNode from '../components/ExplorerNode';
 import { translate as t } from '../Translation';
+import Name from '../components/Name';
 
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
 
@@ -55,42 +56,40 @@ class Explorer extends View {
       const isPubKey = substr.match(pubKeyRegex);
       return html`
         ${chevronRight} <a href="/explorer/${encodeURIComponent(split.slice(0,i+1).join('/'))}">
-            ${isPubKey ? html`<iris-text user=${substr} path="profile/name" />` : k}
+            ${isPubKey ? html`<${Name} key=${substr} pub=${substr} placeholder="profile name" />` : k}
         </a>
-        ${isPubKey ? html`<small>
-            <a href="/profile/${substr}">
-                ${t('profile')}
-            </a></small>`: ''}
+        ${isPubKey ? html`<small> (<a href="/profile/${substr}">${t('profile')}</a>)</small>`: ''}
       `
     });
-    const publicDefaultChildren = {
-      '#':{value:{_:1}},
-      Users:{value:{_:1}}
-    };
+    const s = this.state;
     return html`
-      ${isRootLevel ? html `<p>Useful debug data for nerds.</p>` : ''}
       <p>
         <a href="/explorer">All</a> ${split[0].length ? pathString : ''}
+        ${isRootLevel ? html `<small class="mar-left5">Iris raw data.</small>` : ''}
       </p>
       ${isRootLevel ? html`
         <div class="explorer-row">
-            <a href="/explorer/Public">${chevronDown} <b>Public</b></a> (synced with peers)
+            <span onClick=${() => this.setState({publicOpen:!s.publicOpen})}>${s.publicOpen ? chevronDown : chevronRight}</span>
+            <a href="/explorer/Public"><b>Public</b></a> (synced with peers)
         </div>
-        <${ExplorerNode} indent=${1} gun=${State.public} key='Public' path='Public' children=${publicDefaultChildren}/>
-        <br/><br/>
+        ${s.publicOpen ? html`<${ExplorerNode} indent=${1} gun=${State.public} key='Public' path='Public'/>`:''}
         <div class="explorer-row">
-            <a href="/explorer/Local">${chevronDown} <b>Local</b></a> (only stored on your device)
+            <span onClick=${() => this.setState({groupOpen:!s.groupOpen})}>${s.groupOpen ? chevronDown : chevronRight}</span>
+            <a href="/explorer/Group"><b>Group</b></a> (public data, composite object of all the users in the group)
         </div>
-        <${ExplorerNode} indent=${1} gun=${State.local} key="Local" path='Local'/>
-        <br/><br/>
+        ${s.groupOpen ?
+          Object.keys(this.state.groups).map(group => html`
+            <div class="explorer-row" style="padding-left: 1em">
+              ${chevronRight}
+              <a href="/explorer/Group%2F${encodeURIComponent(encodeURIComponent(group))}"><b>${group}</b></a>
+            </div>
+          `)
+        :''}
         <div class="explorer-row">
-            <a href="/explorer/Group">${chevronDown} <b>Group</b></a> (public, composite object of all the users in the group)
+            <span onClick=${() => this.setState({localOpen:!s.localOpen})}>${s.localOpen ? chevronDown : chevronRight}</span>
+            <a href="/explorer/Local"><b>Local</b></a> (only stored on your device)
         </div>
-        ${Object.keys(this.state.groups).map(group => html`
-          <div class="explorer-row" style="padding-left: 1em">
-            ${chevronRight} <a href="/explorer/Group%2F${encodeURIComponent(encodeURIComponent(group))}"><b>${group}</b></a>
-          </div>
-        `)}
+        ${s.localOpen ? html`<${ExplorerNode} indent=${1} gun=${State.local} key="Local" path='Local'/>`:''}
       `: html`
         <${ExplorerNode} indent=${0} showTools=${true} gun=${gun} key=${this.props.node} path=${this.props.node}/>
       `}
