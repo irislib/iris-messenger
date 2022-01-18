@@ -4,6 +4,7 @@ import Gun from "gun";
 import {html} from "htm/preact";
 import Name from "./Name";
 import State from "../State";
+import Text from "./Text";
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
@@ -24,7 +25,7 @@ const chevronRight = html`
 class ExplorerNode extends BaseComponent {
   constructor() {
     super();
-    this.children = {};
+    this.children = [];
     this.state = {groups:{}, children: {}, shownChildrenCount: SHOW_CHILDREN_COUNT};
   }
 
@@ -173,7 +174,9 @@ class ExplorerNode extends BaseComponent {
       }
     } else {
       const pub = Session.getPubKey();
-      const path = this.isMine && (`${this.props.path  }/${  encodeURIComponent(k)}`).replace(`Public/Users/~${  pub  }/`, '');
+      const path = (this.isMine || this.isLocal) && (`${this.props.path  }/${  encodeURIComponent(k)}`)
+        .replace(`Public/Users/~${  pub  }/`, '')
+        .replace(`Local/`, '');
 
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
         s = this.isMine ? html`<iris-img user=${pub} path=${path}/>` : html`<img src=${v}/>`;
@@ -193,8 +196,9 @@ class ExplorerNode extends BaseComponent {
           ${typeof from === 'string' ? html`<small> from ${lnk(`/explorer/Public%2F~${encodeURIComponent(encodeURIComponent(from))}`, html`<${Name} key=${from} pub=${from} placeholder="user"/>`, '')}</small>` : ''}
         `;
 
-        s = this.isMine ? html`
-          <iris-text placeholder="empty" key=${path} user=${pub} path=${path} editable=${true} json=${true}/>
+        // TODO: || isGroup where you're participating
+        s = this.isMine || this.isLocal ? html`
+          <${Text} gun=${this.props.gun} placeholder="empty" key=${path} user=${this.isLocal ? null : pub} path=${path} editable=${true} json=${true}/>
           ${valueLinks}
         ` :
         html`
