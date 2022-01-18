@@ -138,14 +138,18 @@ class ExplorerNode extends BaseComponent {
 
   renderChildObject(k, displayName) {
     const path = `${this.props.path  }/${  encodeURIComponent(k)}`;
+    const substr = k.substr(1);
     return html`
       <div class="explorer-row" style="padding-left: ${this.props.indent}em">
         <span onClick=${e => this.onChildObjectClick(e, k)}>${this.state.children[k].open ? chevronDown : chevronRight}</span>
         <a href="/explorer/${encodeURIComponent(path)}">
             <b>
-                ${typeof k === 'string' && k.substr(1).match(pubKeyRegex) ? html`<${Name} key=${k} pub=${k.substr(1)} placeholder="user"/>` : (displayName || k)}
+                ${typeof k === 'string' && substr.match(pubKeyRegex) ?
+                        html`<${Name} key=${k} pub=${substr} placeholder="user"/>` :
+                        (displayName || k)}
             </b>
         </a>
+        ${Session.getPubKey() === substr ? html`<small class="mar-left5">(you)</small>` : ''}
       </div>
       ${this.state.children[k].open ? html`<${ExplorerNode} gun=${this.props.gun} indent=${this.props.indent + 1} key=${path} path=${path} isGroup=${this.props.isGroup}/>` : ''}
     `;
@@ -242,7 +246,12 @@ class ExplorerNode extends BaseComponent {
   }
 
   render() {
-    const children = Object.keys(this.state.children).sort();
+    const childrenKeys = Object.keys(this.state.children).sort();
+    const myKeyIndex = childrenKeys.indexOf('~' + Session.getPubKey());
+    if (myKeyIndex > 0) {
+      const a = childrenKeys.splice(myKeyIndex, 1);
+      childrenKeys.unshift(a[0]);
+    }
 
     const renderChildren = children => {
       return children.map(k => {
@@ -256,7 +265,7 @@ class ExplorerNode extends BaseComponent {
       });
     }
 
-    const showMoreBtn = children.length > this.state.shownChildrenCount;
+    const showMoreBtn = childrenKeys.length > this.state.shownChildrenCount;
     return html`
       ${this.props.indent === 0 ? html`
         <div class="explorer-row" style="padding-left: ${this.props.indent}em">
@@ -265,7 +274,7 @@ class ExplorerNode extends BaseComponent {
               <a onClick=${() => this.onExpandClicked()}>${this.state.expandAll ? 'Close all' : 'Expand all'}</a>
               <a onClick=${() => this.showNewItemClicked('object')}>New object</a>
               <a onClick=${() => this.showNewItemClicked('value')}>New value</a>
-              ${children.length} items
+              ${childrenKeys.length} items
             </p>
           `: ''}
           ${this.state.showNewItem ? html`
@@ -285,10 +294,10 @@ class ExplorerNode extends BaseComponent {
               ${chevronRight}
               <a href="/explorer/Group%2F${encodeURIComponent(encodeURIComponent(group))}"><b>${group}</b></a>
           </div>
-      `) : renderChildren(children.slice(0, this.state.shownChildrenCount))}
+      `) : renderChildren(childrenKeys.slice(0, this.state.shownChildrenCount))}
       
       ${showMoreBtn ? html`
-        <a style="padding-left: ${this.props.indent + 1}em" href="" onClick=${e => {e.preventDefault();this.setState({shownChildrenCount: this.state.shownChildrenCount + SHOW_CHILDREN_COUNT})}}>More (${children.length - this.state.shownChildrenCount})</a>
+        <a style="padding-left: ${this.props.indent + 1}em" href="" onClick=${e => {e.preventDefault();this.setState({shownChildrenCount: this.state.shownChildrenCount + SHOW_CHILDREN_COUNT})}}>More (${childrenKeys.length - this.state.shownChildrenCount})</a>
       ` : ''}
     `;
   }
