@@ -846,6 +846,7 @@ ru: {
     summary: "Yhteenveto",
     following: "Seurataan",
     followers: "Seuraajat",
+    follow: "Seuraa",
     likes: "Tykkäykset",
     replies: "Vastaukset",
     posts: "Julkaisut",

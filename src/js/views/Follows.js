@@ -76,6 +76,7 @@ class Follows extends View {
                 </div>
               </a>
               ${k !== Session.getPubKey() ? html`<${FollowButton} id=${k}/>` : ''}
+
             </div>`;
           })}
           ${keys.length === 0 ? '—' : ''}
