@@ -160,6 +160,7 @@ class Group extends View {
       } else {
         profilePhoto = html`<${Identicon} str=${this.props.id} width=250/>`
       }
+      const uuid = this.state.uuid;
     return html`
       <div class="content">
         <div class="profile-top">
@@ -170,10 +171,30 @@ class Group extends View {
             <div class="profile-header-stuff">
               <h3 class="profile-name" placeholder=${editable ? tr('name') : ''} contenteditable=${editable} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
               <div class="profile-about hidden-xs">
-                <p class="profile-about-content" placeholder=${editable ? tr('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
+                <p class="profile-about-content" placeholder=${editable ? tr('about') : ''}
+                contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>
+                ${this.state.about}</p>
               </div>
               <div class="profile-actions">
+                ${uuid ? '' : html`
+                  <div class="follow-count">
+                    <a href="/follows/${this.props.id}">
+                      <span>${this.state.followedUserCount}</span> ${tr('following')}
+                    </a>
+                    <a href="/followers/${this.props.id}">
+                      <span>${this.state.followerCount}</span> ${tr('followers')}
+                    </a>
+                  </div>
+                `}
+                ${this.followedUsers.has(Session.getPubKey()) ? html`
+                  <p><small>${tr('follows_you')}</small></p>
+                `: this.props.id === SMS_VERIFIER_PUB ? html`
+                  <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
+                ` : ''}
                 <button onClick=${() => route(`/chat/${  this.props.id}`)}>${tr('send_message')}</button>
+                ${uuid ? '' : html`
+                  <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+                `}
                 <button onClick=${() => $('#profile-page-qr').toggle()}>${tr('show_qr_code')}</button>
                 <button class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}</button>
               </div>

@@ -1,4 +1,4 @@
-;(function(){
+(function(){
 	var Gun = (typeof window !== "undefined")? window.Gun : require('../gun');
 
 	Gun.on('opt', function(root){
