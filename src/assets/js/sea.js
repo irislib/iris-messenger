@@ -1,4 +1,4 @@
-(function(){
+;(function(){
 
   /* UNBUILD */
   function USE(arg, req){
@@ -13,7 +13,7 @@
   if(typeof module !== "undefined"){ var MODULE = module }
   /* UNBUILD */
 
-  USE(function(module){
+  ;USE(function(module){
     // Security, Encryption, and Authorization: SEA.js
     // MANDATORY READING: https://gun.eco/explainers/data/security.html
     // IT IS IMPLEMENTED IN A POLYFILL/SHIM APPROACH.
@@ -30,7 +30,7 @@
     module.exports = SEA;
   })(USE, './root');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./root');
     try{ if(SEA.window){
       if(location.protocol.indexOf('s') < 0
@@ -43,7 +43,7 @@
     } }catch(e){}
   })(USE, './https');
 
-  USE(function(module){
+  ;USE(function(module){
     if(typeof btoa === "undefined"){
       if(typeof Buffer === "undefined") {
         global.Buffer = require("buffer").Buffer
@@ -53,7 +53,7 @@
     }
   })(USE, './base64');
 
-  USE(function(module){
+  ;USE(function(module){
     USE('./base64');
     // This is Array extended to have .toString(['utf8'|'hex'|'base64'])
     function SeaArray() {}
@@ -79,7 +79,7 @@
     module.exports = SeaArray;
   })(USE, './array');
 
-  USE(function(module){
+  ;USE(function(module){
     USE('./base64');
     // This is Buffer implementation used in SEA. Functionality is mostly
     // compatible with NodeJS 'safe-buffer' and is used for encoding conversions
@@ -159,7 +159,7 @@
     module.exports = SafeBuffer;
   })(USE, './buffer');
 
-  USE(function(module){
+  ;USE(function(module){
     const SEA = USE('./root')
     const Buffer = USE('./buffer')
     const api = {Buffer: Buffer}
@@ -197,7 +197,7 @@
     module.exports = api
   })(USE, './shim');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./root');
     var Buffer = USE('./buffer');
     var s = {};
@@ -242,7 +242,7 @@
     module.exports = s
   })(USE, './settings');
 
-  USE(function(module){
+  ;USE(function(module){
     var shim = USE('./shim');
     module.exports = async function(d, o){
       var t = (typeof d == 'string')? d : JSON.stringify(d);
@@ -251,7 +251,7 @@
     }
   })(USE, './sha256');
 
-  USE(function(module){
+  ;USE(function(module){
     // This internal func returns SHA-1 hashed data for KeyID generation
     const __shim = USE('./shim')
     const subtle = __shim.subtle
@@ -260,7 +260,7 @@
     module.exports = sha1hash
   })(USE, './sha1');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./root');
     var shim = USE('./shim');
     var S = USE('./settings');
@@ -303,7 +303,7 @@
     module.exports = SEA.work;
   })(USE, './work');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./root');
     var shim = USE('./shim');
     var S = USE('./settings');
@@ -377,7 +377,7 @@
     module.exports = SEA.pair;
   })(USE, './pair');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./root');
     var shim = USE('./shim');
     var S = USE('./settings');
@@ -421,7 +421,7 @@
     module.exports = SEA.sign;
   })(USE, './sign');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./root');
     var shim = USE('./shim');
     var S = USE('./settings');
@@ -500,7 +500,7 @@
 
   })(USE, './verify');
 
-  USE(function(module){
+  ;USE(function(module){
     var shim = USE('./shim');
     var S = USE('./settings');
     var sha256hash = USE('./sha256');
@@ -517,7 +517,7 @@
     module.exports = importGen;
   })(USE, './aeskey');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./root');
     var shim = USE('./shim');
     var S = USE('./settings');
@@ -557,7 +557,7 @@
     module.exports = SEA.encrypt;
   })(USE, './encrypt');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./root');
     var shim = USE('./shim');
     var S = USE('./settings');
@@ -599,7 +599,7 @@
     module.exports = SEA.decrypt;
   })(USE, './decrypt');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./root');
     var shim = USE('./shim');
     var S = USE('./settings');
@@ -652,7 +652,7 @@
     module.exports = SEA.secret;
   })(USE, './secret');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./root');
     
     // This is to certify that a group of "certificants" can "put" anything at a group of matched "paths" to the certificate authority's graph
@@ -728,7 +728,7 @@
     module.exports = SEA.certify;
   })(USE, './certify');
 
-  USE(function(module){
+  ;USE(function(module){
     var shim = USE('./shim');
     // Practical examples about usage found in tests.
     var SEA = USE('./root');
@@ -784,7 +784,7 @@
     module.exports = SEA
   })(USE, './sea');
 
-  USE(function(module){
+  ;USE(function(module){
     var Gun = USE('./sea').Gun;
     Gun.chain.then = function(cb, opt){
       var gun = this, p = (new Promise(function(res, rej){
@@ -794,7 +794,7 @@
     }
   })(USE, './then');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./sea');
     var Gun = SEA.Gun;
     var then = USE('./then');
@@ -802,7 +802,7 @@
     function User(root){ 
       this._ = {$: this};
     }
-    User.prototype = (function(){ function F(){} F.prototype = Gun.chain; return new F() }()) // Object.create polyfill
+    User.prototype = (function(){ function F(){}; F.prototype = Gun.chain; return new F() }()) // Object.create polyfill
     User.prototype.constructor = User;
 
     // let's extend the gun chain with a `user` function.
@@ -826,7 +826,7 @@
     module.exports = User;
   })(USE, './user');
 
-  USE(function(module){
+  ;USE(function(module){
     // TODO: This needs to be split into all separate functions.
     // Not just everything thrown into 'create'.
 
@@ -1057,7 +1057,7 @@
         sS = window.sessionStorage;
         delete sS.recall;
         delete sS.pair;
-        }catch(e){}
+        }catch(e){};
       }
       return gun;
     }
@@ -1211,7 +1211,7 @@
     module.exports = User
   })(USE, './create');
 
-  USE(function(module){
+  ;USE(function(module){
     var SEA = USE('./sea')
     var S = USE('./settings')
     var Gun = SEA.Gun;
@@ -1255,7 +1255,7 @@
         if(!SEA.opt.check(val)){ return }
         c++; // for each property on the node
         SEA.verify(val, false, function(data){ c--; // false just extracts the plain data.
-          node[key] = SEA.opt.unpack(data, key, node); // transform to plain value.
+          node[key] = SEA.opt.unpack(data, key, node);; // transform to plain value.
           if(d && !c && (c = -1)){ to.next(msg) }
         });
       });
