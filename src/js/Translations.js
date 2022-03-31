@@ -170,7 +170,15 @@ export default {
     popular_hashtags: "Popular hashtags",
     go: "Go",
     none: "None",
-
+    no_items_to_show: "No items to show",
+    store_description: "Store description",
+    add_item: "Add item",
+    name: "Name",
+    store: "Store",
+    item_id: "Item ID",
+    item_description: "Item description",
+    price: "Price",
+    delete_item: "Delete item",
   },
   fr: {
     language_name: "Français",
@@ -900,8 +908,16 @@ ru: {
     go: "Lähetä",
     blocked_users: "Estetyt käyttäjät",
     none: "Ei yhtään",
-
-
+    no_items_to_show: "Ei näytettäviä tuotteita",
+    store_description: "Kuvaus kaupasta",
+    profile_name: "Profiili/nimi",
+    store: "Kauppa",
+    item_id: "Tuotteen ID",
+    item_description: "Tuotteen kuvaus",
+    price: "Hinta",
+    delete_item: "Poista tuote",
+    add_item: "Lisää tuote",
+    no_contacts_in_list: "Ei yhteystietoja listalla",
   },
   it: {
     language_name: "Italian",
