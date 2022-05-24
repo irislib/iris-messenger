@@ -10,7 +10,7 @@ let maxConnectedPeers = Helpers.isElectron ? 2 : 1;
 const DEFAULT_PEERS = {};
 
 DEFAULT_PEERS['https://gun-rs.iris.to/gun'] = {};
-DEFAULT_PEERS['https://gun-us.herokuapp.com/gun'] = {};
+// DEFAULT_PEERS['https://gun-us.herokuapp.com/gun'] = {}; // disable for now
 const loc = window.location;
 const host = loc.host;
 const is_localhost_but_not_dev = host.startsWith('localhost') && host !== 'localhost:8080';

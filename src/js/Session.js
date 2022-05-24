@@ -216,6 +216,7 @@ function login(k) {
   State.public.user().get('replies').put({a:null});
   State.public.user().get('likes').put({a:null});
   State.public.user().get('follow').put({a:null});
+  State.public.user().get('profile').put({a:null});
   if (shouldRefresh) {
     location.reload();
   }
@@ -313,7 +314,7 @@ function init(options = {}) {
   if (localStorageKey) {
     login(JSON.parse(localStorageKey));
   } else if (options.autologin) {
-    loginAsNewUser(name);
+    loginAsNewUser();
   } else {
     clearIndexedDB();
   }

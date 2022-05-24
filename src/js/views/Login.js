@@ -48,8 +48,10 @@ class Login extends Component {
     let name = document.getElementById('login-form-name').value || Helpers.generateName();
     Gun.SEA.pair().then(k => {
       Session.login(k);
+      State.public.user().get('profile').put({a:null});
       State.public.user().get('profile').get('name').put(name);
       Session.createChatLink();
+      State.local.get('filters').put({a:null});
       State.local.get('filters').get('group').put('follows');
       this.base.style = 'display:none';
     });
