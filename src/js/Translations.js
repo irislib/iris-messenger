@@ -179,6 +179,7 @@ export default {
     item_description: "Item description",
     price: "Price",
     delete_item: "Delete item",
+    no_contacts_in_list: "No contacts in list",
   },
   fr: {
     language_name: "Français",
@@ -918,6 +919,7 @@ ru: {
     delete_item: "Poista tuote",
     add_item: "Lisää tuote",
     no_contacts_in_list: "Ei yhteystietoja listalla",
+    show_qr_code: "Näytä QR-koodi",
   },
   it: {
     language_name: "Italian",
