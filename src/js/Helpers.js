@@ -2014,7 +2014,7 @@ export default {
   },
 
   getProfileLink(pub) {
-    return `https://iris.to/profile/${  encodeURIComponent(pub)}`;
+    return `${window.location.origin}/profile/${  encodeURIComponent(pub)}`;
   },
 
   isElectron,

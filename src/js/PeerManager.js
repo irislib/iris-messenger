@@ -9,11 +9,14 @@ const ELECTRON_GUN_URL = 'http://localhost:8767/gun';
 let maxConnectedPeers = Helpers.isElectron ? 2 : 1;
 const DEFAULT_PEERS = {};
 
-if (window.location.hostname.endsWith('herokuapp.com') || window.location.host === 'localhost:5000') {
-  DEFAULT_PEERS[window.location.origin + '/gun'] = {};
-} else {
-  DEFAULT_PEERS['https://gun-rs.iris.to/gun'] = {};
-  DEFAULT_PEERS['https://gun-us.herokuapp.com/gun'] = {};
+DEFAULT_PEERS['https://gun-rs.iris.to/gun'] = {};
+// DEFAULT_PEERS['https://gun-us.herokuapp.com/gun'] = {}; // disable for now
+const loc = window.location;
+const host = loc.host;
+const is_localhost_but_not_dev = host.startsWith('localhost') && host !== 'localhost:8080';
+if (loc.hostname.endsWith('herokuapp.com') || is_localhost_but_not_dev) {
+  Object.keys(DEFAULT_PEERS).forEach(url => DEFAULT_PEERS[url].enabled = false);
+  DEFAULT_PEERS[loc.origin + '/gun'] = {enabled: true};
 }
 
 let knownPeers = getSavedPeers();

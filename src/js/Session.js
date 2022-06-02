@@ -216,6 +216,7 @@ function login(k) {
   State.public.user().get('replies').put({a:null});
   State.public.user().get('likes').put({a:null});
   State.public.user().get('follow').put({a:null});
+  State.public.user().get('profile').put({a:null});
   if (shouldRefresh) {
     location.reload();
   }
@@ -301,9 +302,14 @@ function getPubKey() {
 
 function loginAsNewUser(name) {
   name = name || Helpers.generateName();
+  console.log('loginAsNewUser name', name);
   return Gun.SEA.pair().then(k => {
     login(k);
-    name && State.public.user().get('profile').get('name').put(name);
+    State.public.user().get('profile').put({a:null});
+    State.public.user().get('profile').get('name').put(name);
+    setTimeout(() => State.public.user().get('profile').get('name').put(name), 1000); // for some reason this is necessary -_-
+    State.local.get('filters').put({a:null});
+    State.local.get('filters').get('group').put('follows');
     createChatLink();
   });
 }
@@ -313,7 +319,7 @@ function init(options = {}) {
   if (localStorageKey) {
     login(JSON.parse(localStorageKey));
   } else if (options.autologin) {
-    loginAsNewUser(name);
+    loginAsNewUser();
   } else {
     clearIndexedDB();
   }

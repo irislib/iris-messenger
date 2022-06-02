@@ -45,7 +45,7 @@ export default class PeerSettings extends Component {
       <p>
         <small dangerouslySetInnerHTML=${{ __html: t('peers_info', "href=\"https://github.com/amark/gun#deploy\"")}}></small>
       </p>
-      <p><a href="https://heroku.com/deploy?template=https://github.com/amark/gun">
+      <p><a href="https://heroku.com/deploy?template=https://github.com/mmalmi/rod">
          ${Icons.herokuButton}
       </a></p>
     `;

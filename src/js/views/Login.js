@@ -46,13 +46,8 @@ class Login extends Component {
   onLoginFormSubmit(e) {
     e.preventDefault();
     let name = document.getElementById('login-form-name').value || Helpers.generateName();
-    Gun.SEA.pair().then(k => {
-      Session.login(k);
-      State.public.user().get('profile').get('name').put(name);
-      Session.createChatLink();
-      State.local.get('filters').get('group').put('follows');
-      this.base.style = 'display:none';
-    });
+    Session.loginAsNewUser(name);
+    this.base.style = 'display:none';
   }
 
   onNameChange(event) {

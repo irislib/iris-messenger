@@ -17,6 +17,10 @@ registerRoute(
 	'POST'
 );
 registerRoute(
+	'/peer_id',
+	new NetworkOnly()
+);
+registerRoute(
   () => true,
   new StaleWhileRevalidate()
 );

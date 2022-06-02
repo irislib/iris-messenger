@@ -73,7 +73,7 @@ class Store extends View {
                 ${followable ? html`<${FollowButton} id=${user}/>` : ''}
                 <button onClick=${() => route(`/chat/${  user}`)}>${t('send_message')}</button>
                 ${uuid ? '' : html`
-                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${`https://iris.to/${  window.location.pathname}`}/>
+                  <${CopyButton} text=${t('copy_link')} title=${this.state.name} copyStr=${window.location.href}/>
                 `}
               </div>
             </div>

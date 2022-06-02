@@ -146,7 +146,7 @@ class Profile extends View {
             ` : ''}
             ${this.isMyProfile ? '' : html`<${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>`}
             <button onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}</button>
-            <${CopyButton} key=${`${this.props.id}copy`} text=${t('copy_link')} title=${this.state.name} copyStr=${`https://iris.to${  window.location.pathname}`}/>
+            <${CopyButton} key=${`${this.props.id}copy`} text=${t('copy_link')} title=${this.state.name} copyStr=${window.location.href}/>
             <button onClick=${() => $(this.qrRef.current).toggle()}>${t('show_qr_code')}</button>
             ${this.isMyProfile ? '' : html`
               <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
@@ -306,7 +306,7 @@ class Profile extends View {
     }
     qrCodeEl.empty();
     new QRCode(qrCodeEl.get(0), {
-      text: `https://iris.to/${  window.location.pathname}`,
+      text: window.location.href,
       width: 300,
       height: 300,
       colorDark : "#000000",
