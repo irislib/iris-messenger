@@ -21,19 +21,19 @@ class Product extends StoreView {
     return html`
       <div class="main-view" id="profile">
         <div class="content">
-          <a href="/store/${Session.getPubKey()}"><iris-text path="profile/name" user=${Session.getPubKey()} /></a>
-          <h3>Add item</h3>
-          <h2 contenteditable placeholder="Item name" onInput=${e => this.newProductName = e.target.innerText} />
-          <textarea placeholder="Item description" onInput=${e => this.newProductDescription = e.target.value} style="resize: vertical"/>
-          <input type="number" placeholder="Price" onInput=${e => this.newProductPrice = parseInt(e.target.value)}/>
+          <a href="/store/${Session.getPubKey()}"><iris-text path="profile/name" placeholder=${t('name')}  user=${Session.getPubKey()} /></a>
+          <h3> ${t('add_item')}</h3>
+          <h2 contenteditable placeholder=${t('item_id')} onInput=${e => this.newProductName = e.target.innerText} />
+          <textarea placeholder=${t('item_description')} onInput=${e => this.newProductDescription = e.target.value} style="resize: vertical"/>
+          <input type="number" placeholder=${t('price')} onInput=${e => this.newProductPrice = parseInt(e.target.value)}/>
           <hr/>
           <p>
-            Item ID:
+            ${t('item_id')}:
           </p>
           <p>
-            <input placeholder="Item ID" onInput=${e => this.newProductId = e.target.value} />
+            <input placeholder=${t('item_id')} onInput=${e => this.newProductId = e.target.value} />
           </p>
-          <button onClick=${e => this.addItemClicked(e)}>Add item</button>
+          <button onClick=${e => this.addItemClicked(e)}>${t('add_item')}</button>
         </div>
       </div>
     `;
@@ -56,7 +56,7 @@ class Product extends StoreView {
         <a href="/store/${this.props.store}"><iris-text editable="false" path="profile/name" user=${this.props.store}/></a>
         ${cartTotalItems ? html`
           <p>
-            <button onClick=${() => route(`/checkout/${  this.props.store}`)}>Shopping cart (${cartTotalItems})</button>
+            <button onClick=${() => route(`/checkout/${  this.props.store}`)}>${t('shopping_cart')} (${cartTotalItems})</button>
           </p>
         ` : ''}
         ${this.state.product ? html`
@@ -66,14 +66,14 @@ class Product extends StoreView {
             <iris-text user=${this.props.store} path="store/products/${this.props.product}/description"/>
           </p>
           <p class="price">
-            <iris-text placeholder="Price" user=${this.props.store} path="store/products/${this.props.product}/price"/>
+            <iris-text placeholder=${t('price')} user=${this.props.store} path="store/products/${this.props.product}/price"/>
           </p>
           <button class="add" onClick=${() => this.addToCart()}>
             ${t('add_to_cart')}
             ${this.cart[this.props.product] ? ` (${this.cart[this.props.product]})` : ''}
           </button>
           ${this.isMyProfile ? html`
-            <p><button onClick=${e => this.onClickDelete(e)}>Delete item</button></p>
+            <p><button onClick=${e => this.onClickDelete(e)}>${t('delete_item')}/button></p>
           ` : ''}
         ` : ''}
       </div>

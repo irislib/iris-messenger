@@ -52,10 +52,10 @@ class Store extends View {
               ${profilePhoto}
             </div>
             <div class="profile-header-stuff">
-              <h3 class="profile-name"><iris-text path="profile/name" placeholder="Name" user=${user}/></h3>
+              <h3 class="profile-name"><iris-text path= ${t('profile_name')} placeholder= ${t('name')} user=${user}/></h3>
               <div class="profile-about hidden-xs">
                 <p class="profile-about-content">
-                  <iris-text path="store/about" placeholder="Store description" attr="about" user=${user}/>
+                  <iris-text path="store/about" placeholder=${t('store_description')} attr="about" user=${user}/>
                 </p>
               </div>
               <div class="profile-actions">
@@ -83,7 +83,7 @@ class Store extends View {
           </div>
         </div>
 
-        <h3>Store</h3>
+        <h3> ${t('store')}</h3>
         ${this.renderItems()}
       </div>
     `;
@@ -102,10 +102,10 @@ class Store extends View {
       <div class="thumbnail-items">
          ${this.isMyProfile ? html`
           <div class="thumbnail-item store-item" onClick=${() => route(`/product/new`)}>
-            <a href="/product/new" class="name">Add item</a>
+            <a href="/product/new" class="name">${t('add_item')}</a>
           </div>
         ` : ''}
-        ${!keys.length ? html`<p>No items to show</p>`:''}
+        ${!keys.length ? html`<p> ${t('no_items_to_show')}</p>`:''}
         ${keys.map(k => {
           const i = this.state.items[k];
           return html`

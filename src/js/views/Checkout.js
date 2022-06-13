@@ -167,7 +167,7 @@ class Checkout extends Store {
           return html`
             <p>
               <a href="/checkout/${user}">
-                <iris-text path="profile/name" user=${user} editable="false"/> (${cartTotalItems})
+                <iris-text path= ${t('profile_name')} user=${user} editable="false"/> (${cartTotalItems})
               </a>
             </p>
           `;
