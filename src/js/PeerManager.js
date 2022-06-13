@@ -16,7 +16,7 @@ const host = loc.host;
 const is_localhost_but_not_dev = host.startsWith('localhost') && host !== 'localhost:8080';
 if (loc.hostname.endsWith('herokuapp.com') || is_localhost_but_not_dev) {
   Object.keys(DEFAULT_PEERS).forEach(url => DEFAULT_PEERS[url].enabled = false);
-  DEFAULT_PEERS[loc.origin + '/gun'] = {enabled: true};
+  DEFAULT_PEERS[`${loc.origin}/gun`] = {enabled: true};
 }
 
 let knownPeers = getSavedPeers();

@@ -20,10 +20,6 @@ const chevronRight = html`
 `;
 
 class Explorer extends View {
-  constructor() {
-    super();
-  }
-
   renderView() {
     const split = (this.props.node || '').split('/');
     const scope = split.length && split[0];

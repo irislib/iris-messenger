@@ -271,14 +271,15 @@ class VideoCall extends Component {
         chat.pc.signalingState
       );
       switch (chat.pc.signalingState) {
-        case "have-remote-offer":
-          var answer = await chat.pc.createAnswer({
+        case "have-remote-offer": {
+          const answer = await chat.pc.createAnswer({
             offerToReceiveAudio: 1,
             offerToReceiveVideo: 1
           });
           chat.pc.setLocalDescription(answer);
           chat.put('sdp', {time: new Date().toISOString(), data: answer});
           break;
+        }
         case "stable":
           this.stopCalling();
           console.log('call answered by', pub);

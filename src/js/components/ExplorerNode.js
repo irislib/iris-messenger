@@ -65,7 +65,7 @@ class ExplorerNode extends BaseComponent {
     }
     if (this.isUserList) { // always add yourself to the user list
       const obj = {};
-      obj['~' + Session.getPubKey()] = {value:{_:1}};
+      obj[`~${Session.getPubKey()}`] = {value:{_:1}};
       this.children = Object.assign(this.children, obj);
     }
     if (this.isGroupRoot) {
@@ -251,7 +251,7 @@ class ExplorerNode extends BaseComponent {
 
   render() {
     const childrenKeys = Object.keys(this.state.children).sort();
-    const myKeyIndex = childrenKeys.indexOf('~' + Session.getPubKey());
+    const myKeyIndex = childrenKeys.indexOf(`~${Session.getPubKey()}`);
     if (myKeyIndex > 0) {
       const a = childrenKeys.splice(myKeyIndex, 1);
       childrenKeys.unshift(a[0]);

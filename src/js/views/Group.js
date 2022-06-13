@@ -10,6 +10,7 @@ import Identicon from '../components/Identicon.js';
 import Name from '../components/Name.js';
 import View from './View.js';
 import SearchBox from '../components/SearchBox.js';
+import {SMS_VERIFIER_PUB} from '../SMS';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min.js';
 import iris from 'iris-lib';
@@ -189,11 +190,11 @@ class Group extends View {
                 ${this.followedUsers.has(Session.getPubKey()) ? html`
                   <p><small>${tr('follows_you')}</small></p>
                 `: this.props.id === SMS_VERIFIER_PUB ? html`
-                  <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
+                  <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${tr('ask_for_verification')}</a></p>
                 ` : ''}
                 <button onClick=${() => route(`/chat/${  this.props.id}`)}>${tr('send_message')}</button>
                 ${uuid ? '' : html`
-                  <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+                  <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${`https://iris.to/${window.location.hash}`}/>
                 `}
                 <button onClick=${() => $('#profile-page-qr').toggle()}>${tr('show_qr_code')}</button>
                 <button class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}</button>

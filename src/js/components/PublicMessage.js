@@ -14,7 +14,6 @@ import iris from 'iris-lib';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
 import Notifications from '../Notifications';
-import {translate as t} from '../Translation.js';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
