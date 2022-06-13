@@ -193,7 +193,7 @@ class Group extends View {
                 ` : ''}
                 <button onClick=${() => route(`/chat/${  this.props.id}`)}>${tr('send_message')}</button>
                 ${uuid ? '' : html`
-                  <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${'https://iris.to/' + window.location.hash}/>
+                  <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${`https://iris.to/${window.location.hash}`}/>
                 `}
                 <button onClick=${() => $('#profile-page-qr').toggle()}>${tr('show_qr_code')}</button>
                 <button class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}</button>
