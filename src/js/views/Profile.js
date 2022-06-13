@@ -19,8 +19,7 @@ import $ from 'jquery';
 import QRCode from '../lib/qrcode.min.js';
 import iris from 'iris-lib';
 import {Helmet} from "react-helmet";
-
-const SMS_VERIFIER_PUB = 'ysavwX9TVnlDw93w9IxezCJqSDMyzIU-qpD8VTN5yko.3ll1dFdxLkgyVpejFkEMOFkQzp_tRrkT3fImZEx94Co';
+import {SMS_VERIFIER_PUB} from '../SMS';
 
 function deleteChat(pub) {
   iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
