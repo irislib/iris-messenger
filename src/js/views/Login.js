@@ -1,12 +1,10 @@
 import Helpers from '../Helpers.js';
 import { html } from 'htm/preact';
-import State from '../State.js';
 import { translate as t } from '../Translation.js';
 import LanguageSelector from '../components/LanguageSelector.js';
 import QRScanner from '../QRScanner.js';
 import Session from '../Session.js';
 import { Component } from 'preact';
-import Gun from 'gun';
 
 import logo from '../../assets/img/android-chrome-192x192.png';
 
