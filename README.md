@@ -6,7 +6,7 @@ Check the METAVERSE-GUN Wiki for Features and Masterplan https://github.com/worl
 <br>
 
 ✅ Done, or works already<br>
-🚧 to do
+🚧 to do, or on its way
 
 ### A decentralised, open-sourced, interactive, digital twin of the real world (CesiumJS), combined with decentralised, planet-wide text, file, voice and video communication (GUN + Webtorrent + Iris) right from the start, at your command. With just adding two snippets of code to Iris. ✅
 <br>
