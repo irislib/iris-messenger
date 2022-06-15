@@ -26,6 +26,7 @@ Check the METAVERSE-GUN Wiki for Features and Masterplan https://github.com/worl
 ### Host websites and apps for free, from your desktop. Easy like dropping a file into a folder. 🚧
 - **Distribute your data, files, to peers and relays. For more resilence and faster global access** ✅
 - **Distribute your site, app via Peer-CDN on your site's/app's users devices** 🚧
+- **Need DynDNS? How a about decentralized DNS via peers and relays? Have an address for your page or even app, inside your swarm! GunNS 😍** 🚧
 
 ### Connects everything with everything, but decentralized
 
