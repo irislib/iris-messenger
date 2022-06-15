@@ -202,7 +202,8 @@ Contributions to the [browser application](https://github.com/irislib/iris-messe
 
 If you want to integrate Iris with your product or service, please check out [iris-lib](https://github.com/irislib/iris-lib) and create Github issues if needed.
 
-You are welcome to join the [ERA community](https://discord.gg/gnzgpBh) (GUN, Iris and other projects) on Discord!
+## Contact
+Join our [Discord](https://discord.gg/4CJc74JEUY) (will be moved onto Iris when group chat is ready) or send me a message on [Iris](https://iris.to/?chatWith=hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU&s=HlzYzNrhUsrn2PLi4yuRt6DiFUNM3hOmN8nFpgw6T-g&k=zvDfsInsMOI1).
 
 ## License
 
