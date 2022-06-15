@@ -16,9 +16,12 @@ import QRCode from '../lib/qrcode.min.js';
 import iris from 'iris-lib';
 
 function deleteChat(pub) {
-  iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
-  delete Session.channels[pub];
-  State.local.get('channels').get(pub).put(null);
+  if (confirm("Delete chat?")) {
+      iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
+      delete Session.channels[pub];
+      State.local.get('channels').get(pub).put(null);
+      route('/chat');
+  };
 }
 
 class Group extends View {

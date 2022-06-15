@@ -31,6 +31,7 @@ class ChatList extends Component {
     }, 200);
     State.local.get('channels').map().on(this.sub(
       (chat, id) => {
+        if (!chat) { return; }
         chat.id = id;
         chats[id] = chat;
         limitedUpdate();
