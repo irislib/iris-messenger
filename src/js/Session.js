@@ -452,7 +452,7 @@ function addChannel(chat) {
     State.local.get('call').put({pub, call});
   });
   State.local.get('channels').get(pub).put({enabled:true});
-  /* Disable private peer disovery, since they're not connecting anyway
+  /* Disable private peer discovery, since they're not connecting anyway
   if (chat.onTheir) {
     chat.onTheir('my_peer', (url, k, from) => {
       console.log('Got private peer url', url, 'from', from);
