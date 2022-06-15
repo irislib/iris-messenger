@@ -24,7 +24,8 @@ Check the METAVERSE-GUN Wiki for Features and Masterplan https://github.com/worl
 - **Need even more relays? Let your users 1-click deploy a relay for you! Donate Decentralize ✊** 🚧
 
 ### Host websites and apps for free, from your desktop. Easy like dropping a file into a folder. 🚧
-- **Distribute your site, app, data ✅ files ✅ to peers and relays. For more resilence and faster global access**
+- **Distribute your data, files, to peers and relays. For more resilence and faster global access** ✅
+- **Distribute your site, app via Peer-CDN on your site's/app's users devices** 🚧
 
 ### Connects everything with everything, but decentralized
 
