@@ -3,14 +3,40 @@ Check the METAVERSE-GUN Wiki for Features and Masterplan https://github.com/worl
 
 # METAVERSE-GUN (Iris Messenger + CesiumJS)
 ### aka "The Seed" aka "World Seed"
+<br>
+
+### A decentralised, open-sourced, interactive, digital twin of the real world (CesiumJS), combined with decentralised, planet-wide text, file, voice and video communication (GUN + Iris) right from the start, at your command. With just adding two snippets of code to Iris.
+<br>
+
+### Start to create and bring the real world to your desktop and then back into the real-world with Cesium for Unreal Engine 5...
+- **Unreal Engine 5 empowers all creators across all industries to deliver stunning real-time content and experiences.**
+- **Multiple Exports: mobile and desktop browser, mobile and desktop app, vr, webvr...** ✅
+- **Multiple Applications: websites, apps, games, software, professional tools...** ✅
+- **Best Practices: JAMStack(static, JS, API hydrated, Markup)🚧 PWA✅ CDN distribution 🚧 P2P✅**
+
+### Start instant with downloading the desktop app and support the re-decentralization of the internet automatically
+- **Every desktop app is a decentralization relay itself** ✅
+- **Need more relays? There is a 1-click deploy in the settings menu.** ✅
+- **Need even more relays? Let your users 1-click deploy a relay for you! Donate Decentralize ✊** 🚧
+
+### Host websites and apps for free, from your desktop. Easy like dropping a file into a folder. 🚧
+- **Distribute your site, app, data ✅ files ✅ to peers and relays. For more resilence and faster global access**
+
+### Connects everything with everything, but decentralized
+
+- **Multiple protocols (now: Gun, Webtorrent; coming: IPFS, hyper, dot, gemini, ssb, amm...)** ✅
+- **Multiple ways of connection: LAN, Wifi, Bluetooth (coming), Internet, P2P, QR Code, Invitation Link** ✅
+- **Anonymous Authentication: Sign up and Login via Metamask Wallet 🚧**
+- **Full Encryption 🚧**
+<br>
+
 ![Metaverse-Gun](https://user-images.githubusercontent.com/67427045/173232351-703fa1f3-f4e8-4635-be37-a903af958459.png)
 <br><br><br>
 ![image](https://user-images.githubusercontent.com/67427045/173239465-dda15148-68cd-4e92-9432-026c079ac70d.png)
 
 <br><br><br>
 
-#### (12.06.2022 3PM, Europe)
-I am about to add CesiumJS, to make the Mockup Starterkit a reality.<br>
+#### I am about to add CesiumJS.
 But i am not as fast, since React/Preact is not my typical framework, so i added an instruction, which makes you able to do it yourself, and dont have to wait for me ;)
 
 https://github.com/worldpeaceenginelabs/METAVERSE-GUN/blob/master/add-cesiumjs.js
@@ -26,7 +52,7 @@ Done
 
 <br><br><br>
 
-# Mockup Starterkit
+# Mockup Starterkit (coming soon) 🚧
 
 #### Not an IT person? No worries, we got your back!
 #### Templates and UI are on its way, so you can start being creative, even without being a professional!
@@ -36,14 +62,14 @@ Done
 ![image](https://user-images.githubusercontent.com/67427045/173517008-7fd86049-48bb-491a-813f-9007b6afcb52.png)
 <br><br><br>
 
-# Mockup Metaverse-Gun App Store (MGAS)
+# Mockup Metaverse-Gun App Store (MGAS) 🚧
 
-#### There is a store with UI and even logic already integrated into Iris. Lets use it as a base for MGAS
+#### There is a store with UI and even logic already integrated into Iris. Lets use it as a base for MGAS.
 
 ![image](https://user-images.githubusercontent.com/67427045/173530828-d5528d86-9371-4170-8d12-4b79bbc66d4d.png)
 <br><br><br>
 
-# Mockup of Live Coding Console with hot reloading
+# Mockup of Live Coding Console with hot reloading 🚧
 ### Every example you can do in Cesium Sandcastle and more...
 
 ![image](https://user-images.githubusercontent.com/67427045/173256852-77a9af68-0271-4da9-91cf-576bb177bd27.png)
