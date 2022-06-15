@@ -126,7 +126,7 @@ class Header extends Component {
     const isTyping = chat && chat.isTyping;
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
     const searchBox = this.chatId ? '' : html`
-        <${SearchBox} focus=${!!this.state.showMobileSearch}/>
+        <${SearchBox} onSelect=${item => route(`/profile/${item.key}`)} focus=${!!this.state.showMobileSearch}/>
     `;
     const chatting = (activeRoute && activeRoute.indexOf('/chat/') === 0);
 

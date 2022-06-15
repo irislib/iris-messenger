@@ -69,6 +69,8 @@ class About extends View {
           </a>
           <${FollowButton} id=${DEVELOPER} />
         </div>
+        
+        <p>While we're working on Iris group chats, you're welcome to join our <a href="https://discord.gg/4CJc74JEUY">Discord</a> community.</p>
 
         <h4>${t('donate')}</h4>
         <p dangerouslySetInnerHTML=${{ __html:`${t('donate_info', "href=\"https://opencollective.com/iris-social\"")  }: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST` }}></p>

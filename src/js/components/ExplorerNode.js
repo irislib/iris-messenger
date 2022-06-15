@@ -235,8 +235,12 @@ class ExplorerNode extends BaseComponent {
   onNewItemSubmit(e) {
     e.preventDefault();
     if (this.state.newItemName) {
-      this.getNode().get(this.state.newItemName.trim()).put(this.state.showNewItem === 'object' ? {a:null} : '');
-      this.setState({showNewItem: false, newItemName: ''});
+      let name = this.state.newItemName.trim();
+      this.getNode().get(name).put('');
+      if (this.state.newItemType === 'object') {
+        this.getNode().get(name).put({a:null});
+      }
+      this.setState({newItemType: false, newItemName: ''});
     }
   }
 
@@ -245,7 +249,7 @@ class ExplorerNode extends BaseComponent {
   }
 
   showNewItemClicked(type) {
-    this.setState({showNewItem:type});
+    this.setState({newItemType:type});
     setTimeout(() => document.querySelector('#newItemNameInput').focus(), 0);
   }
 
@@ -281,12 +285,12 @@ class ExplorerNode extends BaseComponent {
               ${childrenKeys.length} items
             </p>
           `: ''}
-          ${this.state.showNewItem ? html`
+          ${this.state.newItemType ? html`
             <p>
               <form onSubmit=${(e) => this.onNewItemSubmit(e)}>
-                <input id="newItemNameInput" type="text" onInput=${e => this.onNewItemNameInput(e)} value=${this.state.newItemName} placeholder="New ${this.state.showNewItem} name"/>
+                <input id="newItemNameInput" type="text" onInput=${e => this.onNewItemNameInput(e)} value=${this.state.newItemName} placeholder="New ${this.state.newItemType} name"/>
                 <button type="submit">Create</button>
-                <button onClick=${() => this.setState({showNewItem: false})}>Cancel</button>
+                <button onClick=${() => this.setState({newItemType: false})}>Cancel</button>
               </form>
             </p>
           ` : ''}

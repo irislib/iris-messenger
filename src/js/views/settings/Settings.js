@@ -76,6 +76,7 @@ class Settings extends View {
         <div class="flex-table">
           ${Object.keys(this.state.webPushSubscriptions).map(k => {
             const v = this.state.webPushSubscriptions[k];
+            if (!v) { return; }
             return html`
               <div class="flex-row">
                   <div class="flex-cell">${v.endpoint}</div>

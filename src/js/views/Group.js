@@ -16,9 +16,12 @@ import QRCode from '../lib/qrcode.min.js';
 import iris from 'iris-lib';
 
 function deleteChat(pub) {
-  iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
-  delete Session.channels[pub];
-  State.local.get('channels').get(pub).put(null);
+  if (confirm("Delete chat?")) {
+      iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
+      delete Session.channels[pub];
+      State.local.get('channels').get(pub).put(null);
+      route('/chat');
+  };
 }
 
 class Group extends View {
@@ -187,7 +190,7 @@ class Group extends View {
                     </a>
                   </div>
                 `}
-                ${this.followedUsers.has(Session.getPubKey()) ? html`
+                ${this.followedUsers && this.followedUsers.has(Session.getPubKey()) ? html`
                   <p><small>${tr('follows_you')}</small></p>
                 `: this.props.id === SMS_VERIFIER_PUB ? html`
                   <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${tr('ask_for_verification')}</a></p>
