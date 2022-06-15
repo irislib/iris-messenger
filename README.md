@@ -5,7 +5,7 @@ Check the METAVERSE-GUN Wiki for Features and Masterplan https://github.com/worl
 ### aka "The Seed" aka "World Seed"
 <br>
 
-### A decentralised, open-sourced, interactive, digital twin of the real world (CesiumJS), combined with decentralised, planet-wide text, file, voice and video communication (GUN + Iris) right from the start, at your command. With just adding two snippets of code to Iris.
+### A decentralised, open-sourced, interactive, digital twin of the real world (CesiumJS), combined with decentralised, planet-wide text, file, voice and video communication (GUN + Webtorrent + Iris) right from the start, at your command. With just adding two snippets of code to Iris.
 <br>
 
 ### Start to create and bring the real world to your desktop and then back into the real-world with Cesium for Unreal Engine 5...
