@@ -3,7 +3,7 @@ import Session from './Session.js';
 import { route } from 'preact-router';
 import State from './State.js';
 import _ from 'lodash';
-import iris from 'iris-lib';
+import iris from './iris-lib';
 import Gun from 'gun';
 import $ from 'jquery';
 

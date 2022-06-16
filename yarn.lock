@@ -3918,9 +3918,9 @@ cssstyle@^2.3.0:
     cssom "~0.3.6"
 
 csstype@^2.6.7:
-  version "2.6.19"
-  resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.19.tgz#feeb5aae89020bb389e1f63669a5ed490e391caa"
-  integrity sha512-ZVxXaNy28/k3kJg0Fou5MiYpp88j7H9hLZp8PDC3jV0WFjfH5E9xHb56L0W59cPbKbcHXeP4qyT8PrHp8t6LcQ==
+  version "2.6.20"
+  resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.20.tgz#9229c65ea0b260cf4d3d997cb06288e36a8d6dda"
+  integrity sha512-/WwNkdXfckNgw6S5R125rrW8ez139lBHWouiBvX8dfMFtcn6V81REDqnH7+CRpRipfYlyU1CmOnOxrmGcFOjeA==
 
 csstype@^3.0.2:
   version "3.0.10"
@@ -5332,10 +5332,10 @@ functions-have-names@^1.2.2:
   resolved "https://registry.yarnpkg.com/functions-have-names/-/functions-have-names-1.2.2.tgz#98d93991c39da9361f8e50b337c4f6e41f120e21"
   integrity sha512-bLgc3asbWdwPbx2mNk2S49kmJCuQeu0nfmaOgbs8WIyzzkw3r4htszdIi9Q9EMezDPTYuJx2wvjZ/EwgAthpnA==
 
-fuse.js@^6.4.2:
-  version "6.5.3"
-  resolved "https://registry.yarnpkg.com/fuse.js/-/fuse.js-6.5.3.tgz#7446c0acbc4ab0ab36fa602e97499bdb69452b93"
-  integrity sha512-sA5etGE7yD/pOqivZRBvUBd/NaL2sjAu6QuSaFoe1H2BrJSkH/T/UXAJ8CdXdw7DvY3Hs8CXKYkDWX7RiP5KOg==
+fuse.js@^6.6.2:
+  version "6.6.2"
+  resolved "https://registry.yarnpkg.com/fuse.js/-/fuse.js-6.6.2.tgz#fe463fed4b98c0226ac3da2856a415576dc9a111"
+  integrity sha512-cJaJkxCCxC8qIIcPBF9yGxY0W/tVZS3uEISDxhYIdtk8OL93pe+6Zj7LjCqVV4dzbqcriOZ+kQ/NE4RXZHsIGA==
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
@@ -5696,7 +5696,7 @@ hsla-regex@^1.0.0:
   resolved "https://registry.yarnpkg.com/hsla-regex/-/hsla-regex-1.0.0.tgz#c1ce7a3168c8c6614033a4b5f7877f3b225f9c38"
   integrity sha1-wc56MWjIxmFAM6S194d/OyJfnDg=
 
-htm@^3.0.4, htm@^3.1.0:
+htm@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/htm/-/htm-3.1.0.tgz#0c305493b60da9f6ed097a2aaf4c994bd85ea022"
   integrity sha512-L0s3Sid5r6YwrEvkig14SK3Emmc+kIjlfLhEGn2Vy3bk21JyDEes4MoDsbJk6luaPp8bugErnxPz86ZuAw6e5Q==
@@ -6059,18 +6059,6 @@ ipaddr.js@1.9.1, ipaddr.js@^1.9.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-2.0.1.tgz#eca256a7a877e917aeb368b0a7497ddf42ef81c0"
   integrity sha512-1qTgH9NG+IIJ4yfKs2e6Pp1bZg8wbDbKHT21HrLIeYBTRLgMYKnMTPAuI3Lcs61nfx5h1xlXnbJtH1kX5/d/ng==
-
-iris-lib@^0.0.158:
-  version "0.0.158"
-  resolved "https://registry.yarnpkg.com/iris-lib/-/iris-lib-0.0.158.tgz#4c7eaabd601de89e6fa9b0221b1e0f5e3592ee65"
-  integrity sha512-JTeHAFyOdBJf1NanmqX2dFSb+AnMb+SrmnR598HKNawcG9rSR8Cg4NoR76klnwPo8b59LJyCXHniE1xRcXpTlA==
-  dependencies:
-    fuse.js "^6.4.2"
-    htm "^3.0.4"
-    identicon.js "^2.3.3"
-    jsxstyle "^2.4.0"
-    preact "^10.5.5"
-    preact-custom-element "^4.2.1"
 
 is-absolute-url@^2.0.0:
   version "2.1.0"
@@ -7196,7 +7184,7 @@ jsxstyle-utils@^2.5.0:
   dependencies:
     csstype "^2.6.7"
 
-jsxstyle@^2.4.0:
+jsxstyle@^2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/jsxstyle/-/jsxstyle-2.5.1.tgz#53e9b435673857a19db59a70d95de918529387fd"
   integrity sha512-JboG+WT/+O93e2+QjMi4orfBY97S6IPv541gJav2crCajvRM7X4Z+zXHoBfK5LRkGVzXrXllP/63kgupjhi88w==
@@ -9358,7 +9346,7 @@ preact-scroll-viewport@^0.2.0:
   resolved "https://registry.yarnpkg.com/preact-scroll-viewport/-/preact-scroll-viewport-0.2.0.tgz#7c5c86dd9cb02c6b23d6b37834c08620a63068dc"
   integrity sha1-fFyG3ZywLGsj1rN4NMCGIKYwaNw=
 
-preact@^10.5.14, preact@^10.5.5:
+preact@^10.5.14:
   version "10.6.4"
   resolved "https://registry.yarnpkg.com/preact/-/preact-10.6.4.tgz#ad12c409ff1b4316158486e0a7b8d43636f7ced8"
   integrity sha512-WyosM7pxGcndU8hY0OQlLd54tOU+qmG45QXj2dAYrL11HoyU/EzOSTlpJsirbBr1QW7lICxSsVJJmcmUglovHQ==

@@ -13,7 +13,7 @@ import SearchBox from '../components/SearchBox.js';
 import {SMS_VERIFIER_PUB} from '../SMS';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min.js';
-import iris from 'iris-lib';
+import iris from '../iris-lib';
 
 function deleteChat(pub) {
   if (confirm("Delete chat?")) {

@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import State from '../State.js';
 import Session from '../Session.js';
-import iris from 'iris-lib';
+import iris from '../iris-lib';
 
 function twice(f) {
   f();

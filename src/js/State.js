@@ -1,6 +1,5 @@
 import Gun from 'gun';
 import 'gun/sea';
-import 'gun/nts.js';
 import 'gun/lib/open';
 import 'gun/lib/radix';
 import 'gun/lib/radisk';
@@ -9,7 +8,7 @@ import 'gun/lib/rindexed';
 import _ from 'lodash';
 
 import PeerManager from './PeerManager.js';
-import iris from 'iris-lib';
+import iris from './iris-lib';
 import Helpers from './Helpers.js';
 
 const State = {

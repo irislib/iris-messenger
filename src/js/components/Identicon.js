@@ -2,7 +2,7 @@ import Component from '../BaseComponent';
 import { html } from 'htm/preact';
 import State from '../State.js';
 import SafeImg from './SafeImg.js';
-import iris from 'iris-lib';
+import iris from '../iris-lib';
 import $ from 'jquery';
 
 class Identicon extends Component {

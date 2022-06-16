@@ -4,7 +4,7 @@ import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import PeerManager from './PeerManager.js';
 import { route } from 'preact-router';
-import iris from 'iris-lib';
+import iris from './iris-lib';
 import _ from 'lodash';
 import Fuse from "./lib/fuse.basic.esm.min";
 
