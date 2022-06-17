@@ -39,7 +39,7 @@ const updateUserSearchIndex = _.debounce(() => {
   const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
   const values = Object.values(_.omit(follows, Object.keys(State.getBlockedUsers())));
   userSearchIndex = new Fuse(values, options);
-}, 200, {leading:true});
+}, 2000, {leading:true});
 
 function addFollow(callback, k, followDistance, follower) {
   if (follows[k]) {
@@ -83,9 +83,9 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
       n = n + 1;
       addFollow(callback, followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        setTimeout(() => { // without timeout the recursion hogs CPU. or should we use requestAnimationFrame instead?
+        requestAnimationFrame(() => { // without timeout the recursion hogs CPU
           getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
-        }, n * 100);
+        });
       }
     } else {
       removeFollow(followedKey, currentDepth, k);
@@ -300,7 +300,6 @@ function loginAsNewUser(name) {
     login(k);
     State.public.user().get('profile').put({a:null});
     State.public.user().get('profile').get('name').put(name);
-    setTimeout(() => State.public.user().get('profile').get('name').put(name), 1000); // for some reason this is necessary -_-
     State.local.get('filters').put({a:null});
     State.local.get('filters').get('group').put('follows');
     createChatLink();

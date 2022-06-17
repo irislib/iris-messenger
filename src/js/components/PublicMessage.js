@@ -35,6 +35,7 @@ class PublicMessage extends Message {
     if (typeof hash !== 'string') {
       return;
     }
+    let resolved = false;
     return new Promise(resolve => {
       State.public.get('#').get(hash).on(this.sub(
 async (serialized, a, b, event) => {
@@ -43,9 +44,11 @@ async (serialized, a, b, event) => {
             return;
           }
           event.off();
+          if (resolved) return;
           const msg = await iris.SignedMessage.fromString(serialized);
           if (msg) {
             resolve(msg);
+            resolved = true;
           }
         }
       ));
