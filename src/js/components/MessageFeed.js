@@ -28,6 +28,7 @@ class MessageFeed extends Component {
     }
 
     this.updateSortedMessages = this.updateSortedMessages || _.debounce(() => {
+      if (this.unmounted) { return; }
       let sortedMessages = Array.from(this.mappedMessages.keys()).sort().map(k => this.mappedMessages.get(k));
       if (!this.props.reverse) {
         sortedMessages = sortedMessages.reverse();
@@ -96,7 +97,7 @@ class MessageFeed extends Component {
   }
 
   render() {
-    if (!this.props.scrollElement) { return; }
+    if (!this.props.scrollElement || this.unmounted) { return; }
     return html`
       <div class="feed-container">
           <${WindowScroller} scrollElement=${this.props.scrollElement}>

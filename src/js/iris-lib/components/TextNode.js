@@ -56,6 +56,7 @@ class TextNode extends Component {
     this.getNode(user).once();
     this.getNode(user).on((value, a, b, e) => {
       this.eventListeners[this.path] = e;
+      if (this.unmounted) return;
       if (!(this.ref.current && this.ref.current === document.activeElement)) {
         this.setState({value, class: typeof value === 'string' ? '' : 'iris-non-string'});
       }
@@ -68,6 +69,7 @@ class TextNode extends Component {
   }
 
   componentWillUnmount() {
+    this.unmounted = true;
     this.eventListenersOff();
   }
 
