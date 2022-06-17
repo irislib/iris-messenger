@@ -384,7 +384,7 @@ class Channel {
           }));
         }
       }
-    }, 2000);
+    }, 500);
 
     gun.user().get(`chats`).map().on(handleChannel);
   }
