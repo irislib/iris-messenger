@@ -2,6 +2,7 @@ import Gun from 'gun';
 import 'gun/sea';
 import util from './util';
 import Attribute from './Attribute';
+import _ from 'lodash';
 
 /**
 * Private communication channel between two or more participants ([Gun](https://github.com/amark/gun) public keys). Can be used independently of other Iris stuff.
@@ -352,7 +353,8 @@ class Channel {
       Channel.getMyChatLinks(gun, keypair, undefined, undefined, true);
     }
     const seen = {};
-    gun.user().get(`chats`).map().on(async (value, ourSecretChannelId) => {
+
+    const handleChannel = _.throttle(async (value, ourSecretChannelId) => {
       if (value && !seen[ourSecretChannelId]) {
         seen[ourSecretChannelId] = true;
         if (ourSecretChannelId.length > 44) {
@@ -382,7 +384,9 @@ class Channel {
           }));
         }
       }
-    });
+    }, 2000);
+
+    gun.user().get(`chats`).map().on(handleChannel);
   }
 
   getMyGroupSecret() { // group secret could be deterministic: hash(encryptToSelf(uuid + iterator))

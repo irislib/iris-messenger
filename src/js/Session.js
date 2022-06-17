@@ -71,7 +71,7 @@ function removeFollow(k, followDistance, follower) {
   }
 }
 
-function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
+const getExtendedFollows = _.throttle((callback, k, maxDepth = 3, currentDepth = 1) => {
   k = k || key.pub;
 
   addFollow(callback, k, currentDepth - 1);
@@ -83,9 +83,7 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
       n = n + 1;
       addFollow(callback, followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        requestAnimationFrame(() => { // without timeout the recursion hogs CPU
-          getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
-        });
+        getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
       }
     } else {
       removeFollow(followedKey, currentDepth, k);
@@ -93,7 +91,7 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   });
 
   return follows;
-}
+}, 2000);
 
 const updateNoFollows = _.debounce(() => {
   const v = !(Object.keys(follows).length > 1);
