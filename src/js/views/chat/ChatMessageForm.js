@@ -4,7 +4,7 @@ import { translate as t } from '../../Translation.js';
 import Torrent from '../../components/Torrent';
 import State from '../../State.js';
 import Session from '../../Session.js';
-import iris from 'iris-lib';
+import iris from '../../iris-lib';
 import _ from 'lodash';
 import $ from 'jquery';
 import EmojiButton from '../../lib/emoji-button.js';

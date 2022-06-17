@@ -7,7 +7,7 @@ import CopyButton from '../../components/CopyButton.js';
 import { route } from 'preact-router';
 import $ from 'jquery';
 import QRCode from '../../lib/qrcode.min.js';
-import iris from 'iris-lib';
+import iris from '../../iris-lib';
 import Component from '../../BaseComponent';
 import {Helmet} from 'react-helmet';
 

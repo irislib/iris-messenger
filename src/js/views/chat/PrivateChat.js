@@ -12,7 +12,7 @@ import Notifications from '../../Notifications.js';
 import NewChat from './NewChat.js';
 import _ from 'lodash';
 import $ from 'jquery';
-import iris from 'iris-lib';
+import iris from '../../iris-lib';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';
 

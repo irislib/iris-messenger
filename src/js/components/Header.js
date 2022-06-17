@@ -8,7 +8,7 @@ import { route } from 'preact-router';
 import Identicon from './Identicon.js';
 import SearchBox from './SearchBox.js';
 import Icons from '../Icons.js';
-import iris from 'iris-lib';
+import iris from '../iris-lib';
 import {Link} from "preact-router/match";
 
 import logo from '../../assets/img/icon128.png';

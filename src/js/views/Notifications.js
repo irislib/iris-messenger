@@ -4,7 +4,7 @@ import Identicon from '../components/Identicon.js';
 import {translate as t} from '../Translation.js';
 import Name from '../components/Name.js';
 import View from './View.js';
-import iris from 'iris-lib';
+import iris from '../iris-lib';
 import PublicMessage from "../components/PublicMessage";
 import NotificationTools from "../Notifications";
 

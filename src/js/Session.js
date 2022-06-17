@@ -4,7 +4,7 @@ import Notifications from './Notifications.js';
 import Helpers from './Helpers.js';
 import PeerManager from './PeerManager.js';
 import { route } from 'preact-router';
-import iris from 'iris-lib';
+import iris from './iris-lib';
 import _ from 'lodash';
 import Fuse from "./lib/fuse.basic.esm.min";
 
@@ -39,7 +39,7 @@ const updateUserSearchIndex = _.debounce(() => {
   const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
   const values = Object.values(_.omit(follows, Object.keys(State.getBlockedUsers())));
   userSearchIndex = new Fuse(values, options);
-}, 200, {leading:true});
+}, 2000, {leading:true});
 
 function addFollow(callback, k, followDistance, follower) {
   if (follows[k]) {
@@ -71,7 +71,7 @@ function removeFollow(k, followDistance, follower) {
   }
 }
 
-function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
+const getExtendedFollows = _.throttle((callback, k, maxDepth = 3, currentDepth = 1) => {
   k = k || key.pub;
 
   addFollow(callback, k, currentDepth - 1);
@@ -83,9 +83,7 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
       n = n + 1;
       addFollow(callback, followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        setTimeout(() => { // without timeout the recursion hogs CPU. or should we use requestAnimationFrame instead?
-          getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
-        }, n * 100);
+        getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
       }
     } else {
       removeFollow(followedKey, currentDepth, k);
@@ -93,7 +91,7 @@ function getExtendedFollows(callback, k, maxDepth = 3, currentDepth = 1) {
   });
 
   return follows;
-}
+}, 2000);
 
 const updateNoFollows = _.debounce(() => {
   const v = !(Object.keys(follows).length > 1);
@@ -201,8 +199,6 @@ function login(k) {
   State.public.user().get('profile').get('photo').on(data => {
     myProfilePhoto = data;
   });
-  State.public.get('follow').put({a:null});
-  State.local.get('groups').get('follows').put({a:null});
   Notifications.init();
   State.local.get('loggedIn').put(true);
   State.public.user().get('block').map().on((isBlocked, user) => {
@@ -212,11 +208,6 @@ function login(k) {
     }
   });
   updateGroups();
-  State.public.user().get('msgs').put({a:null}); // These need to be initialised for some reason, otherwise 1st write is slow
-  State.public.user().get('replies').put({a:null});
-  State.public.user().get('likes').put({a:null});
-  State.public.user().get('follow').put({a:null});
-  State.public.user().get('profile').put({a:null});
   if (shouldRefresh) {
     location.reload();
   }
@@ -307,7 +298,6 @@ function loginAsNewUser(name) {
     login(k);
     State.public.user().get('profile').put({a:null});
     State.public.user().get('profile').get('name').put(name);
-    setTimeout(() => State.public.user().get('profile').get('name').put(name), 1000); // for some reason this is necessary -_-
     State.local.get('filters').put({a:null});
     State.local.get('filters').get('group').put('follows');
     createChatLink();

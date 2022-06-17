@@ -236,9 +236,10 @@ class ExplorerNode extends BaseComponent {
     e.preventDefault();
     if (this.state.newItemName) {
       let name = this.state.newItemName.trim();
-      this.getNode().get(name).put('');
       if (this.state.newItemType === 'object') {
         this.getNode().get(name).put({a:null});
+      } else {
+        this.getNode().get(name).put('');
       }
       this.setState({newItemType: false, newItemName: ''});
     }

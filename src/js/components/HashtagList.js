@@ -26,7 +26,7 @@ export default class HashtagList extends Component {
         this.setState({hashtags});
       }
     ));
-    State.group().map('hashtagSubscriptions', (isSubscribed, hashtag, a, b, from) => {
+    State.group().map('hashtagSubscriptions', this.sub((isSubscribed, hashtag, a, b, from) => {
       if (!this.hashtagSubscribers[hashtag]) {
         this.hashtagSubscribers[hashtag] = new Set();
       }
@@ -44,7 +44,7 @@ export default class HashtagList extends Component {
           return tag1 > tag2 ? 1 : -1;
         }).slice(0,8);
       this.setState({popularHashtags});
-    });
+    }));
   }
 
   addHashtagClicked(e) {

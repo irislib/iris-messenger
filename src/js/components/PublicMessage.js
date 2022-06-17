@@ -10,7 +10,7 @@ import Session from '../Session.js';
 import Torrent from './Torrent.js';
 import Icons from '../Icons.js';
 import Autolinker from 'autolinker';
-import iris from 'iris-lib';
+import iris from '../iris-lib';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
 import Notifications from '../Notifications';
@@ -35,39 +35,20 @@ class PublicMessage extends Message {
     if (typeof hash !== 'string') {
       return;
     }
+    let resolved = false;
     return new Promise(resolve => {
-      let resolved;
-      const askFromPublicState = () => {
-        State.public.get('#').get(hash).on(this.sub(
-  async (serialized, a, b, event) => {
-            if (typeof serialized !== 'string') {
-              console.error('message parsing failed', hash, serialized);
-              return;
-            }
-            event.off();
-            const msg = await iris.SignedMessage.fromString(serialized);
-            if (msg) {
-              resolve(msg);
-              resolved = true;
-              State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
-            }
+      State.public.get('#').get(hash).on(this.sub(
+async (serialized, a, b, event) => {
+          if (typeof serialized !== 'string') {
+            console.error('message parsing failed', hash, serialized);
+            return;
           }
-        ));
-      }
-      const timeout = setTimeout(askFromPublicState, 5000); // give local state some time to resolve first
-
-      State.local.get('msgsByHash').get(hash).once(this.sub(
-msg => {
-          if (resolved) { return; }
-          clearTimeout(timeout);
-          if (typeof msg === 'string') {
-            try {
-              resolve(JSON.parse(msg));
-            } catch (e) {
-              console.error('message parsing failed', msg, e);
-            }
-          } else if (!msg) {
-            askFromPublicState();
+          event.off();
+          if (resolved) return;
+          const msg = await iris.SignedMessage.fromString(serialized);
+          if (msg) {
+            resolve(msg);
+            resolved = true;
           }
         }
       ));
