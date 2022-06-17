@@ -342,7 +342,8 @@ class SignedMessage {
     if (!obj.pubKey) {
       throw new Error(`Missing pubKey in object:`);
     }
-    const signedData = await Key.verify(obj.sig, obj.pubKey);
+    //const signedData = await Key.verify(obj.sig, obj.pubKey); // disable sig verification while migrating to new gun :(
+    const signedData = JSON.parse(obj.sig.slice(4)).m;
     const o = {signedData, sig: obj.sig, pubKey: obj.pubKey};
     return new SignedMessage(o);
   }
