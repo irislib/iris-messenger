@@ -36,38 +36,16 @@ class PublicMessage extends Message {
       return;
     }
     return new Promise(resolve => {
-      let resolved;
-      const askFromPublicState = () => {
-        State.public.get('#').get(hash).on(this.sub(
-  async (serialized, a, b, event) => {
-            if (typeof serialized !== 'string') {
-              console.error('message parsing failed', hash, serialized);
-              return;
-            }
-            event.off();
-            const msg = await iris.SignedMessage.fromString(serialized);
-            if (msg) {
-              resolve(msg);
-              resolved = true;
-              State.local.get('msgsByHash').get(hash).put(JSON.stringify(msg));
-            }
+      State.public.get('#').get(hash).on(this.sub(
+async (serialized, a, b, event) => {
+          if (typeof serialized !== 'string') {
+            console.error('message parsing failed', hash, serialized);
+            return;
           }
-        ));
-      }
-      const timeout = setTimeout(askFromPublicState, 200); // give local state some time to resolve first
-
-      State.local.get('msgsByHash').get(hash).once(this.sub(
-msg => {
-          if (resolved) { return; }
-          clearTimeout(timeout);
-          if (typeof msg === 'string') {
-            try {
-              resolve(JSON.parse(msg));
-            } catch (e) {
-              console.error('message parsing failed', msg, e);
-            }
-          } else if (!msg) {
-            askFromPublicState();
+          event.off();
+          const msg = await iris.SignedMessage.fromString(serialized);
+          if (msg) {
+            resolve(msg);
           }
         }
       ));
