@@ -54,7 +54,7 @@ class PublicMessage extends Message {
           }
         ));
       }
-      const timeout = setTimeout(askFromPublicState, 5000); // give local state some time to resolve first
+      const timeout = setTimeout(askFromPublicState, 200); // give local state some time to resolve first
 
       State.local.get('msgsByHash').get(hash).once(this.sub(
 msg => {
