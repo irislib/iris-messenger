@@ -33,7 +33,7 @@ class MessageFeed extends Component {
         sortedMessages = sortedMessages.reverse();
       }
       this.setState({sortedMessages})
-    }, 1);
+    }, 100);
 
     this.updateSortedMessages();
   }

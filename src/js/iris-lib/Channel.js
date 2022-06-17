@@ -1108,11 +1108,9 @@ class Channel {
   * to call this method.
   */
   static initUser(gun, key) {
-    console.log(313);
     const user = gun.user();
     user.auth(key);
     user.put({epub: key.epub});
-    user.get('chatLinks').put({a:0});
   }
 
   static formatChatLink({urlRoot, chatWith, channelId, inviter, sharedSecret, linkId}) {
@@ -1127,7 +1125,6 @@ class Channel {
   * Creates a channel link that can be used for two-way communication, i.e. only one link needs to be exchanged.
   */
   static async createChatLink(gun, key, urlRoot = 'https://iris.to/') {
-    console.log(2);
     const user = gun.user();
     user.auth(key);
 
@@ -1147,7 +1144,6 @@ class Channel {
 
     console.log(3);
 
-    user.get('chatLinks').put({a:0});
     user.get('chatLinks').get(linkId).put({encryptedSharedKey, ownerEncryptedSharedKey});
 
     return Channel.formatChatLink({urlRoot, chatWith: key.pub, sharedSecret, linkId});
@@ -1162,7 +1158,6 @@ class Channel {
     const mySecret = await Gun.SEA.secret(key.epub, key);
     const chatLinks = [];
     user.get('chatLinks').map().on((data, linkId) => {
-      console.log('data', data, 'linkid', linkId);
       if (!data || chatLinks.indexOf(linkId) !== -1) { return; }
       const channels = [];
       user.get('chatLinks').get(linkId).get('ownerEncryptedSharedKey').on(async enc => {

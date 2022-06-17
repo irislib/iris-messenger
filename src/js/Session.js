@@ -201,8 +201,6 @@ function login(k) {
   State.public.user().get('profile').get('photo').on(data => {
     myProfilePhoto = data;
   });
-  State.public.get('follow').put({a:null});
-  State.local.get('groups').get('follows').put({a:null});
   Notifications.init();
   State.local.get('loggedIn').put(true);
   State.public.user().get('block').map().on((isBlocked, user) => {
@@ -212,11 +210,6 @@ function login(k) {
     }
   });
   updateGroups();
-  State.public.user().get('msgs').put({a:null}); // These need to be initialised for some reason, otherwise 1st write is slow
-  State.public.user().get('replies').put({a:null});
-  State.public.user().get('likes').put({a:null});
-  State.public.user().get('follow').put({a:null});
-  State.public.user().get('profile').put({a:null});
   if (shouldRefresh) {
     location.reload();
   }
