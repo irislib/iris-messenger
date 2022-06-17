@@ -79,13 +79,10 @@ async function loadGunDepth(chain, maxDepth = 2, opts = {}) {
 }
 
 export default {
-  loadGunDepth: loadGunDepth,
-
-  gunOnceDefined: gunOnceDefined,
-
-  gunAsAnotherUser: gunAsAnotherUser,
-
-  getHash: async function(str, format = `base64`) {
+  loadGunDepth,
+  gunOnceDefined,
+  gunAsAnotherUser,
+  getHash: async (str, format = `base64`) => {
     if (!str) {
       return undefined;
     }

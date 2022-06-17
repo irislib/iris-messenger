@@ -371,17 +371,15 @@ class Channel {
             participants: chatId.pub || chatId,
             save: false
           }));
-        } else {
-          if (chatId.uuid && chatId.participants && chatId.myGroupSecret) {
-            callback(new Channel({
-              key: keypair,
-              gun,
-              participants: chatId.participants,
-              uuid: chatId.uuid,
-              myGroupSecret: chatId.myGroupSecret,
-              save: false
-            }));
-          }
+        } else if (chatId.uuid && chatId.participants && chatId.myGroupSecret) {
+          callback(new Channel({
+            key: keypair,
+            gun,
+            participants: chatId.participants,
+            uuid: chatId.uuid,
+            myGroupSecret: chatId.myGroupSecret,
+            save: false
+          }));
         }
       }
     });
@@ -734,7 +732,7 @@ class Channel {
     if (typeof callback !== 'function') {
       throw new Error(`onTheir callback must be a function, got ${typeof callback}`);
     }
-    if (!this.directSubscriptions.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(this.directSubscriptions, key)) {
       this.directSubscriptions[key] = [];
     }
     this.directSubscriptions[key].push({key, callback, from});
@@ -766,7 +764,7 @@ class Channel {
     if (typeof callback !== 'function') {
       throw new Error(`onTheir callback must be a function, got ${typeof callback}`);
     }
-    if (!this.groupSubscriptions.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(this.groupSubscriptions, key)) {
       this.groupSubscriptions[key] = [];
     }
     const subscription = {key, callback, from};
@@ -846,9 +844,8 @@ class Channel {
   getSimpleLink(urlRoot = 'https://iris.to/') {
     if (this.uuid) {
       return `${urlRoot}?channelId=${this.uuid}&inviter=${this.key.pub}`;
-    } else {
-      return `${urlRoot}?chatWith=${this.getCurrentParticipants()[0]}`;
     }
+    return `${urlRoot}?chatWith=${this.getCurrentParticipants()[0]}`;
   }
 
   /**
@@ -1122,9 +1119,8 @@ class Channel {
     const enc = encodeURIComponent;
     if (channelId && inviter) {
       return `${urlRoot}?channelId=${enc(channelId)}&inviter=${enc(inviter)}&s=${enc(sharedSecret)}&k=${enc(linkId)}`;
-    } else {
-      return `${urlRoot}?chatWith=${enc(chatWith)}&s=${enc(sharedSecret)}&k=${enc(linkId)}`;
     }
+    return `${urlRoot}?chatWith=${enc(chatWith)}&s=${enc(sharedSecret)}&k=${enc(linkId)}`;
   }
 
   /**

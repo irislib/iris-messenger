@@ -21,7 +21,7 @@ function deleteChat(pub) {
       delete Session.channels[pub];
       State.local.get('channels').get(pub).put(null);
       route('/chat');
-  };
+  }
 }
 
 class Group extends View {
