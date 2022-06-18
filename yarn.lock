@@ -5655,15 +5655,16 @@ growly@^1.3.0:
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
   integrity sha1-8QdIy+dq+WS3yWyTxrzCivEgwIE=
 
-gun@^0.2020.1237:
-  version "0.2020.1237"
-  resolved "https://registry.yarnpkg.com/gun/-/gun-0.2020.1237.tgz#e798917f66a7195a9d620a7c4de3bdc331d32c83"
-  integrity sha512-5WiAMqbLzKfYy/45AVGNrI0OiU7hG5z2hdMeRBMDYXGHzkOUDvbrOnO6qaEqmvCwlwzHJaIilKS51KvMyxhDTQ==
+gun@0.2020.1233:
+  version "0.2020.1233"
+  resolved "https://registry.yarnpkg.com/gun/-/gun-0.2020.1233.tgz#02472c436c234d97fb63011189ec0f2339371478"
+  integrity sha512-O/dt80ToqiDra/NYM0h1CJDQ7So15SGmcZPslZ9eXmGK8j65EAZnItfrs17qL1DULfdgpBHSBSoyMDVmUNkMgQ==
   dependencies:
     ws "^7.2.1"
   optionalDependencies:
     "@peculiar/webcrypto" "^1.1.1"
     emailjs "^2.2.0"
+    text-encoding "^0.7.0"
 
 gzip-size@^6.0.0:
   version "6.0.0"

@@ -48,7 +48,7 @@ Helpers.checkColorScheme();
 class Main extends Component {
   componentDidMount() {
     State.init();
-    Session.init({autologin: window.location.pathname.length > 2});
+    Session.init({autologin: window.location.hash.length > 2});
     PeerManager.init();
 
     State.local.get('loggedIn').on(this.inject());
@@ -109,7 +109,7 @@ class Main extends Component {
             <meta property="og:type" content="website" />
             <meta property="og:title" content=${title} />
             <meta property="og:description" content="Social Networking Freedom" />
-            <meta property="og:url" content=${`https://iris.to${window.location.pathname.length > 1 ? window.location.pathname : ''}`} />
+            <meta property="og:url" content=${`https://iris.to/${window.location.hash}`} />
             <meta property="og:image" content="https://iris.to/assets/img/cover.jpg" />
             <meta name="twitter:card" content="summary_large_image" />
           <//>

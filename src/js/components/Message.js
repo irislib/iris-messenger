@@ -124,7 +124,7 @@ class Message extends Component {
       }});
     }
     $('#attachment-gallery').fadeOut({duration: ANIMATE_DURATION, complete: () => $('#attachment-gallery').remove()});
-    const activeChat = window.location.pathname.replace('/profile/','').replace('/chat/','');
+    const activeChat = window.location.hash.replace('#/profile/','').replace('#/chat/','');
     if (activeChat && Session.channels[activeChat]) {
       Session.channels[activeChat].attachments = null;
     }
