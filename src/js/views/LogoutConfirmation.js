@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
-import Session from '../Session.js';
-import {translate as t} from '../Translation.js';
+import Session from '../Session';
+import {translate as t} from '../Translation';
 import { route } from 'preact-router';
 
 const LogoutConfirmation = () => html`<div class="main-view" id="logout-confirmation">

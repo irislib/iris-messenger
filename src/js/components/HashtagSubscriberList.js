@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
 import { html } from 'htm/preact';
-import State from '../State.js';
+import State from '../State';
 import Name from './Name';
 import Identicon from './Identicon';
 

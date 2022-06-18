@@ -6,9 +6,9 @@ import 'gun/lib/store';
 import 'gun/lib/rindexed';
 import _ from 'lodash';
 
-import PeerManager from './PeerManager.js';
+import PeerManager from './PeerManager';
 import iris from './iris-lib';
-import Helpers from './Helpers.js';
+import Helpers from './Helpers';
 
 const State = {
   init(publicOpts) {

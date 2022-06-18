@@ -1,13 +1,13 @@
 import Component from '../BaseComponent';
-import Helpers from '../Helpers.js';
+import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import { translate as t } from '../Translation.js';
-import State from '../State.js';
-import Session from '../Session.js';
+import { translate as t } from '../Translation';
+import State from '../State';
+import Session from '../Session';
 import { route } from 'preact-router';
-import Identicon from './Identicon.js';
-import SearchBox from './SearchBox.js';
-import Icons from '../Icons.js';
+import Identicon from './Identicon';
+import SearchBox from './SearchBox';
+import Icons from '../Icons';
 import iris from '../iris-lib';
 import {Link} from "preact-router/match";
 

@@ -4,8 +4,8 @@ import {html} from 'htm/preact';
 import {Row, Col} from 'jsxstyle/preact';
 import util from '../util';
 import Key from '../Key';
-import Identicon from './Identicon.js';
-import Fuse from 'fuse.js';
+import Identicon from './Identicon';
+import Fuse from 'fuse';
 
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 

@@ -4,10 +4,10 @@ import { route } from 'preact-router';
 import $ from 'jquery';
 import Gun from 'gun';
 
-import {translate as t} from '../Translation.js';
-import Session from '../Session.js';
+import {translate as t} from '../Translation';
+import Session from '../Session';
 
-import State from '../State.js';
+import State from '../State';
 
 const ringSound = new Audio('../../assets/audio/ring.mp3');
 ringSound.loop = true;

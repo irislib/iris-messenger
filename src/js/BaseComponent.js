@@ -49,7 +49,7 @@ export default class BaseComponent extends PureComponent {
         const ratio = Math.max(image.width, image.height) / MAX_DIMENSION;
         resizedCanvas.width = image.width / ratio;
         resizedCanvas.height = image.height / ratio;
-        const { default: pica } = await import('./lib/pica.min.js');
+        const { default: pica } = await import('./lib/pica.min');
         await pica().resize(image, resizedCanvas);
         const ogImage = resizedCanvas.toDataURL('image/jpeg', 0.1);
         const ogImageUrl = `https://iris-base64-decoder.herokuapp.com/?s=${encodeURIComponent(ogImage)}`;

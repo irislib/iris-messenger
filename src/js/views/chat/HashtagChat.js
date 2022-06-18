@@ -1,12 +1,12 @@
-import Helpers from '../../Helpers.js';
+import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import {createRef} from 'preact';
-import { translate as t } from '../../Translation.js';
-import State from '../../State.js';
-import Identicon from '../../components/Identicon.js';
-import ChatMessageForm from './ChatMessageForm.js';
+import { translate as t } from '../../Translation';
+import State from '../../State';
+import Identicon from '../../components/Identicon';
+import ChatMessageForm from './ChatMessageForm';
 import Name from '../../components/Name';
-import Session from '../../Session.js';
+import Session from '../../Session';
 import $ from 'jquery';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';

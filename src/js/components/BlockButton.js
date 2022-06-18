@@ -1,4 +1,4 @@
-import FollowButton from './FollowButton.js';
+import FollowButton from './FollowButton';
 
 class BlockButton extends FollowButton {
   constructor() {

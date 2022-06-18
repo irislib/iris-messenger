@@ -1,11 +1,11 @@
 import Component from '../BaseComponent';
 import { route } from 'preact-router';
-import Helpers from '../Helpers.js';
+import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import State from '../State.js';
-import Identicon from './Identicon.js';
-import {translate as t} from '../Translation.js';
-import Session from '../Session.js';
+import State from '../State';
+import Identicon from './Identicon';
+import {translate as t} from '../Translation';
+import Session from '../Session';
 import $ from 'jquery';
 import _ from 'lodash';
 

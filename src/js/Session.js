@@ -1,8 +1,8 @@
 import Gun from 'gun';
-import State from './State.js';
-import Notifications from './Notifications.js';
-import Helpers from './Helpers.js';
-import PeerManager from './PeerManager.js';
+import State from './State';
+import Notifications from './Notifications';
+import Helpers from './Helpers';
+import PeerManager from './PeerManager';
 import { route } from 'preact-router';
 import iris from './iris-lib';
 import _ from 'lodash';

@@ -1,6 +1,6 @@
-import State from './State.js';
-import Helpers from './Helpers.js';
-import Session from './Session.js';
+import State from './State';
+import Helpers from './Helpers';
+import Session from './Session';
 import _ from 'lodash';
 import Gun from 'gun';
 

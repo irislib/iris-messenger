@@ -1,4 +1,4 @@
-import Identicon from 'identicon.js';
+import Identicon from 'identicon';
 import Attribute from './Attribute';
 import util from './util';
 

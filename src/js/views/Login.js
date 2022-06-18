@@ -1,9 +1,9 @@
-import Helpers from '../Helpers.js';
+import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import { translate as t } from '../Translation.js';
-import LanguageSelector from '../components/LanguageSelector.js';
-import QRScanner from '../QRScanner.js';
-import Session from '../Session.js';
+import { translate as t } from '../Translation';
+import LanguageSelector from '../components/LanguageSelector';
+import QRScanner from '../QRScanner';
+import Session from '../Session';
 import { Component } from 'preact';
 
 import logo from '../../assets/img/android-chrome-192x192.png';

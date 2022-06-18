@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
-import State from '../State.js';
-import View from './View.js';
+import State from '../State';
+import View from './View';
 import ExplorerNode from '../components/ExplorerNode';
 import { translate as t } from '../Translation';
 import Name from '../components/Name';

@@ -1,9 +1,9 @@
 import { html } from 'htm/preact';
-import State from '../State.js';
-import Session from '../Session.js';
-import {translate as t} from '../Translation.js';
+import State from '../State';
+import Session from '../Session';
+import {translate as t} from '../Translation';
 import { route } from 'preact-router';
-import StoreView from './Store.js';
+import StoreView from './Store';
 
 class Product extends StoreView {
   constructor() {

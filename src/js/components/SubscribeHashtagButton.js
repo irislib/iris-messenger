@@ -1,4 +1,4 @@
-import FollowButton from './FollowButton.js';
+import FollowButton from './FollowButton';
 
 export default class SubscribeHashtagButton extends FollowButton {
   constructor() {

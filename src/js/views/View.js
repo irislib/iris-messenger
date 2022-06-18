@@ -1,6 +1,6 @@
-import Component from '../BaseComponent.js';
+import Component from '../BaseComponent';
 import { createRef } from 'preact';
-import Header from '../components/Header.js';
+import Header from '../components/Header';
 import { html } from 'htm/preact';
 
 class View extends Component {

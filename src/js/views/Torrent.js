@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
-import Torrent from '../components/Torrent.js';
-import View from './View.js';
+import Torrent from '../components/Torrent';
+import View from './View';
 
 class TorrentView extends View {
   constructor() {

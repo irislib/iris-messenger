@@ -1,18 +1,18 @@
 import { html } from 'htm/preact';
-import {translate as tr} from '../Translation.js';
-import State from '../State.js';
-import Session from '../Session.js';
-import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
+import {translate as tr} from '../Translation';
+import State from '../State';
+import Session from '../Session';
+import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
-import SafeImg from '../components/SafeImg.js';
-import CopyButton from '../components/CopyButton.js';
-import Identicon from '../components/Identicon.js';
-import Name from '../components/Name.js';
-import View from './View.js';
-import SearchBox from '../components/SearchBox.js';
+import SafeImg from '../components/SafeImg';
+import CopyButton from '../components/CopyButton';
+import Identicon from '../components/Identicon';
+import Name from '../components/Name';
+import View from './View';
+import SearchBox from '../components/SearchBox';
 import {SMS_VERIFIER_PUB} from '../SMS';
 import $ from 'jquery';
-import QRCode from '../lib/qrcode.min.js';
+import QRCode from '../lib/qrcode.min';
 import iris from '../iris-lib';
 
 function deleteChat(pub) {

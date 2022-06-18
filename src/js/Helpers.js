@@ -1,4 +1,4 @@
-import {translate as t} from './Translation.js';
+import {translate as t} from './Translation';
 import $ from 'jquery';
 import _ from 'lodash';
 import iris from './iris-lib';

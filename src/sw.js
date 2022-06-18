@@ -1,5 +1,5 @@
 import Gun from 'gun';
-import localforage from './js/lib/localforage.min.js';
+import localforage from './js/lib/localforage.min';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { registerRoute } from 'workbox-routing';
 import {StaleWhileRevalidate, NetworkOnly} from 'workbox-strategies';

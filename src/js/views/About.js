@@ -1,7 +1,7 @@
-import {translate as t} from '../Translation.js';
-import Helpers from '../Helpers.js';
+import {translate as t} from '../Translation';
+import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import View from './View.js';
+import View from './View';
 import Identicon from '../components/Identicon';
 import FollowButton from '../components/FollowButton';
 

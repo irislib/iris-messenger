@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
-import View from '../View.js';
-import ChatList from './ChatList.js';
+import View from '../View';
+import ChatList from './ChatList';
 import PrivateChat from './PrivateChat';
 import HashtagChat from './HashtagChat';
 
