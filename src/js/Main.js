@@ -39,6 +39,10 @@ import logoType from '../assets/img/iris_logotype.png';
 import '../css/style.css';
 import '../css/cropper.min.css';
 
+if (window.location.host === 'iris.to' && window.location.pathname !== '/') {
+  window.location.href = window.location.href.replace(window.location.pathname, '/');
+}
+
 Helpers.checkColorScheme();
 
 class Main extends Component {
