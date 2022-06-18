@@ -59,7 +59,7 @@ class ChatList extends Component {
   }
 
   render() {
-    const activeChat = window.location.pathname.replace('/chat/new', '').replace('/chat/', '');
+    const activeChat = window.location.hash.replace('#/chat/new', '').replace('#/chat/', '');
     return html`<section class="sidebar ${this.props.class || ''}">
       <div id="enable-notifications-prompt" onClick=${() => Notifications.enableDesktopNotifications()}>
         <div class="title">${t('get_notified_new_messages')}</div>

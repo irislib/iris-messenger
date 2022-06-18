@@ -260,6 +260,7 @@ class Group extends View {
 
   componentDidMount() {
     const pub = this.props.id;
+    console.log(this.props.id, 2);
     this.setState({name: '', photo: '', about: ''});
     const chat = Session.channels[pub];
     if (pub.length < 40) {
