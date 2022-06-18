@@ -98,7 +98,7 @@ class Search extends Component {
     const query = this.base.querySelector('input').value;
 
     if (this.props['on-select']) {
-      const s = query.split('https://iris.to/profile/');
+      const s = query.split('/profile/');
       if (s.length > 1) {
         return this.props['on-select']({key: s[1]});
       }

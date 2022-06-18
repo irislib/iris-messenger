@@ -288,7 +288,7 @@ class Group extends View {
     }
     qrCodeEl.empty();
     new QRCode(qrCodeEl[0], {
-      text: `https://iris.to/${  window.location.pathname}`,
+      text: `https://iris.to/${  window.location.hash}`,
       width: 300,
       height: 300,
       colorDark : "#000000",

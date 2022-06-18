@@ -1,5 +1,6 @@
 import Component from './BaseComponent';
 import { Router } from 'preact-router';
+import { createHashHistory } from 'history';
 import {Helmet} from "react-helmet";
 
 import Helpers from './Helpers.js';
@@ -37,10 +38,6 @@ import logoType from '../assets/img/iris_logotype.png';
 
 import '../css/style.css';
 import '../css/cropper.min.css';
-
-if (window.location.hash && window.location.hash.indexOf('#/') === 0) { // redirect old urls
-  window.location.href = window.location.href.replace('#/', '');
-}
 
 Helpers.checkColorScheme();
 
@@ -114,7 +111,7 @@ class Main extends Component {
           <//>
           <div class="overlay" onClick=${e => this.onClickOverlay(e)}></div>
           <div class="view-area">
-            <${Router} onChange=${e => this.handleRoute(e)}>
+            <${Router} history=${createHashHistory()} onChange=${e => this.handleRoute(e)}>
               <${Feed} path="/"/>
               <${Feed} path="/feed"/>
               <${Hashtags} path="/hashtag"/>
