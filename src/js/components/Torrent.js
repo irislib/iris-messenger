@@ -1,12 +1,12 @@
 import Component from '../BaseComponent';
 import { createRef } from 'preact';
-import Helpers from '../Helpers.js';
+import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import Session from "../Session.js";
-import { translate as tr } from '../Translation.js';
+import Session from "../Session";
+import { translate as tr } from '../Translation';
 import $ from 'jquery';
-import State from '../State.js';
-import Icons from '../Icons.js';
+import State from '../State';
+import Icons from '../Icons';
 import {Helmet} from 'react-helmet';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4))  !== -1;
@@ -152,7 +152,7 @@ class Torrent extends Component {
     }
     return nextIndex;
   }
-  
+
   openNextFile(typeCheck) {
     const nextIndex = this.getNextIndex(typeCheck);
     this.openFile(this.state.torrent.files[nextIndex], true);
@@ -229,9 +229,9 @@ class Torrent extends Component {
                   str = str.split('.').slice(0, -1).join('.');
                 }
                 return html`<p><b>${str}</b></p>`;
-              } 
-                return html`<p>${str}</p>` 
-              
+              }
+                return html`<p>${str}</p>`
+
             }
           ):''}
       </div>
@@ -263,7 +263,7 @@ class Torrent extends Component {
       ` : ''}
     `;
   }
-  
+
   renderMeta() {
     const s = this.state;
     const title = s.splitPath && s.splitPath[s.splitPath.length - 1].split('.').slice(0, -1).join('.') || 'File sharing';

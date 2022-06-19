@@ -1,10 +1,10 @@
 import Component from '../BaseComponent';
 import { html } from 'htm/preact';
 import {createRef} from 'preact';
-import State from '../State.js';
+import State from '../State';
 import {Link} from "preact-router/match";
 import {route} from 'preact-router';
-import {translate as t} from '../Translation.js';
+import {translate as t} from '../Translation';
 
 export default class HashtagList extends Component {
   constructor() {

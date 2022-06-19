@@ -1,7 +1,7 @@
 import Component from '../BaseComponent';
 import { html } from 'htm/preact';
-import State from '../State.js';
-import {translate as t} from '../Translation.js';
+import State from '../State';
+import {translate as t} from '../Translation';
 
 export default class Filters extends Component {
     componentDidMount() {

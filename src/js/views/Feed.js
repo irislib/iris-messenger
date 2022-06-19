@@ -1,9 +1,9 @@
 import { html } from 'htm/preact';
-import State from '../State.js';
-import FeedMessageForm from '../components/FeedMessageForm.js';
-import MessageFeed from '../components/MessageFeed.js';
-import Filters from '../components/Filters.js';
-import View from './View.js';
+import State from '../State';
+import FeedMessageForm from '../components/FeedMessageForm';
+import MessageFeed from '../components/MessageFeed';
+import Filters from '../components/Filters';
+import View from './View';
 import SubscribeHashtagButton from "../components/SubscribeHashtagButton";
 import Helmet from 'react-helmet';
 import HashtagList from '../components/HashtagList';

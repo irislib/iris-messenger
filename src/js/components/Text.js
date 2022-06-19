@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
-import State from '../State.js';
-import Session from '../Session.js';
+import State from '../State';
+import Session from '../Session';
 import {html} from "htm/preact";
 import {createRef} from "preact";
 

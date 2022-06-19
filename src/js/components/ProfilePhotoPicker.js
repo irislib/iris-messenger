@@ -1,9 +1,9 @@
 import { Component } from 'preact';
-import Helpers from '../Helpers.js';
+import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import {translate as t} from '../Translation.js';
-import SafeImg from './SafeImg.js';
-import Identicon from './Identicon.js';
+import {translate as t} from '../Translation';
+import SafeImg from './SafeImg';
+import Identicon from './Identicon';
 import $ from 'jquery';
 
 class ProfilePhotoPicker extends Component {
@@ -11,7 +11,7 @@ class ProfilePhotoPicker extends Component {
     let canvas = this.cropper.getCroppedCanvas();
     let resizedCanvas = document.createElement('canvas');
     resizedCanvas.width = resizedCanvas.height = Math.min(canvas.width, 800);
-    const { default: pica } = await import('../lib/pica.min.js');
+    const { default: pica } = await import('../lib/pica.min');
     pica().resize(canvas, resizedCanvas).then(() => {
       let src = resizedCanvas.toDataURL('image/jpeg');
       // var src = $('#profile-photo-preview').attr('src');
@@ -51,7 +51,7 @@ class ProfilePhotoPicker extends Component {
   componentDidUpdate() {
     this.cropper && this.cropper.destroy();
     if (this.state.preview) {
-      import('../lib/cropper.min.js').then(Cropper => {
+      import('../lib/cropper.min').then(Cropper => {
         this.cropper = new Cropper.default($('#profile-photo-preview')[0], {
           aspectRatio:1,
           autoCropArea: 1,

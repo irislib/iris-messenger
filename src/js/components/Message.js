@@ -1,12 +1,12 @@
-import Component from '../BaseComponent.js';
-import Helpers from '../Helpers.js';
+import Component from '../BaseComponent';
+import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import Session from '../Session.js';
-import Torrent from './Torrent.js';
+import Session from '../Session';
+import Torrent from './Torrent';
 import Autolinker from 'autolinker';
 import iris from '../iris-lib';
 import $ from 'jquery';
-import State from '../State.js';
+import State from '../State';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;

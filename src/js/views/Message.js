@@ -1,8 +1,8 @@
 import { html } from 'htm/preact';
-import PublicMessage from '../components/PublicMessage.js';
-import FeedMessageForm from '../components/FeedMessageForm.js';
+import PublicMessage from '../components/PublicMessage';
+import FeedMessageForm from '../components/FeedMessageForm';
 import { route } from 'preact-router';
-import View from './View.js';
+import View from './View';
 
 class Message extends View {
   constructor() {

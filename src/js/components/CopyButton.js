@@ -1,7 +1,7 @@
 import { Component } from 'preact';
-import Helpers from '../Helpers.js';
+import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import {translate as t} from '../Translation.js';
+import {translate as t} from '../Translation';
 import $ from 'jquery';
 import iris from '../iris-lib';
 

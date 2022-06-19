@@ -1,9 +1,9 @@
 import { html } from 'htm/preact';
-import State from '../State.js';
-import Identicon from '../components/Identicon.js';
-import {translate as t} from '../Translation.js';
-import Name from '../components/Name.js';
-import View from './View.js';
+import State from '../State';
+import Identicon from '../components/Identicon';
+import {translate as t} from '../Translation';
+import Name from '../components/Name';
+import View from './View';
 import iris from '../iris-lib';
 import PublicMessage from "../components/PublicMessage";
 import NotificationTools from "../Notifications";

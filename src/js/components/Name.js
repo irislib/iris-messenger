@@ -1,5 +1,5 @@
 import Component from '../BaseComponent';
-import State from '../State.js';
+import State from '../State';
 
 class Name extends Component {
   componentDidMount() {

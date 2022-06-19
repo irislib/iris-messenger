@@ -1,10 +1,10 @@
 import { html } from 'htm/preact';
-import State from '../State.js';
-import Session from '../Session.js';
+import State from '../State';
+import Session from '../Session';
 import { route } from 'preact-router';
-import SafeImg from '../components/SafeImg.js';
-import Store from './Store.js';
-import {translate as t} from '../Translation.js';
+import SafeImg from '../components/SafeImg';
+import Store from './Store';
+import {translate as t} from '../Translation';
 
 class Checkout extends Store {
   constructor() {

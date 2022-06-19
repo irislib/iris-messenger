@@ -1,8 +1,8 @@
 import { Component } from 'preact';
-import Helpers from '../Helpers.js';
+import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import State from '../State.js';
-import Icons from '../Icons.js';
+import State from '../State';
+import Icons from '../Icons';
 import $ from 'jquery';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4))  !== -1;

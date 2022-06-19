@@ -1,15 +1,15 @@
 import { html } from 'htm/preact';
-import {translate as t} from '../Translation.js';
-import State from '../State.js';
-import Session from '../Session.js';
-import ProfilePhotoPicker from '../components/ProfilePhotoPicker.js';
+import {translate as t} from '../Translation';
+import State from '../State';
+import Session from '../Session';
+import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
-import SafeImg from '../components/SafeImg.js';
-import Filters from '../components/Filters.js';
-import CopyButton from '../components/CopyButton.js';
-import FollowButton from '../components/FollowButton.js';
-import Identicon from '../components/Identicon.js';
-import View from './View.js';
+import SafeImg from '../components/SafeImg';
+import Filters from '../components/Filters';
+import CopyButton from '../components/CopyButton';
+import FollowButton from '../components/FollowButton';
+import Identicon from '../components/Identicon';
+import View from './View';
 import OnboardingNotification from "../components/OnboardingNotification";
 
 class Store extends View {

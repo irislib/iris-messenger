@@ -1,9 +1,9 @@
 import Component from '../BaseComponent';
-import Helpers from '../Helpers.js';
+import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import PublicMessage from './PublicMessage.js';
+import PublicMessage from './PublicMessage';
 import {  List, WindowScroller,CellMeasurer,CellMeasurerCache,} from 'react-virtualized';
-import State from '../State.js';
+import State from '../State';
 import 'react-virtualized/styles.css';
 import _ from 'lodash';
 

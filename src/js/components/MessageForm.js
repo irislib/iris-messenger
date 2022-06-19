@@ -1,6 +1,6 @@
 import { Component } from 'preact';
-import State from '../State.js';
-import Session from '../Session.js';
+import State from '../State';
+import Session from '../Session';
 import iris from '../iris-lib';
 
 function twice(f) {

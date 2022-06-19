@@ -1,7 +1,7 @@
 import Component from '../BaseComponent';
 import { html } from 'htm/preact';
-import State from '../State.js';
-import SafeImg from './SafeImg.js';
+import State from '../State';
+import SafeImg from './SafeImg';
 import iris from '../iris-lib';
 import $ from 'jquery';
 

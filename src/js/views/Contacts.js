@@ -1,11 +1,11 @@
 import { html } from 'htm/preact';
-import State from '../State.js';
-import Identicon from '../components/Identicon.js';
-import {translate as t} from '../Translation.js';
-import FollowButton from '../components/FollowButton.js';
-import Name from '../components/Name.js';
-import View from './View.js';
-import Session from '../Session.js';
+import State from '../State';
+import Identicon from '../components/Identicon';
+import {translate as t} from '../Translation';
+import FollowButton from '../components/FollowButton';
+import Name from '../components/Name';
+import View from './View';
+import Session from '../Session';
 import ScrollViewport from 'preact-scroll-viewport';
 
 class Contacts extends View {

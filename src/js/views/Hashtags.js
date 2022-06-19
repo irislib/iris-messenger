@@ -1,8 +1,8 @@
 import { html } from 'htm/preact';
-import State from '../State.js';
-import Filters from '../components/Filters.js';
-import {translate as t} from '../Translation.js';
-import View from './View.js';
+import State from '../State';
+import Filters from '../components/Filters';
+import {translate as t} from '../Translation';
+import View from './View';
 
 export default class Hashtags extends View {
   hashtags = {};

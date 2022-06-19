@@ -1,13 +1,13 @@
-import Helpers from '../../Helpers.js';
+import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
-import { translate as t } from '../../Translation.js';
+import { translate as t } from '../../Translation';
 import Torrent from '../../components/Torrent';
-import State from '../../State.js';
-import Session from '../../Session.js';
+import State from '../../State';
+import Session from '../../Session';
 import iris from '../../iris-lib';
 import _ from 'lodash';
 import $ from 'jquery';
-import EmojiButton from '../../lib/emoji-button.js';
+import EmojiButton from '../../lib/emoji-button';
 import Gun from 'gun';
 import MessageForm from '../../components/MessageForm';
 

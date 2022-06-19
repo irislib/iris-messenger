@@ -1,8 +1,8 @@
 import { html } from 'htm/preact';
-import {AVAILABLE_LANGUAGES, language} from '../Translation.js';
-import Translations from '../Translations.js';
+import {AVAILABLE_LANGUAGES, language} from '../Translation';
+import Translations from '../Translations';
 import $ from 'jquery';
-import Icons from '../Icons.js';
+import Icons from '../Icons';
 
 function onLanguageChange(e) {
   const l = $(e.target).val();
