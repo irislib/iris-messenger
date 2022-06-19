@@ -1,23 +1,29 @@
 import { PureComponent } from 'preact/compat';
 
-export default class BaseComponent extends PureComponent {
-  eventListeners = {};
+type EL = {
+  off: Function;
+}
 
-  sub(callback, path) {
-    return (v,k,x,e,f) => {
+export default abstract class BaseComponent extends PureComponent {
+  unmounted?: boolean;
+
+  eventListeners: Record<string, EL | undefined> = {};
+
+  sub(callback: Function, path?: string) {
+    return (v: unknown, k: string, x: unknown, e: EL | undefined, f: unknown) => {
       if (this.unmounted) {
         e && e.off();
         return;
       }
-      this.eventListeners[path || k] = e;
+      this.eventListeners[path ?? k] = e;
       callback(v,k,x,e,f);
     }
   }
 
-  inject(name, path) {
-    return this.sub((v,k) => {
-      const newState = {};
-      newState[name || k] = v;
+  inject(name?: string, path?: string) {
+    return this.sub((v: unknown, k: string) => {
+      const newState: Record<string, unknown> = {};
+      newState[name ?? k] = v;
       this.setState(newState);
     }, path);
   }
@@ -40,7 +46,7 @@ export default class BaseComponent extends PureComponent {
       ua.indexOf('bot') !== -1);
   }
 
-  async setOgImageUrl(imgSrc) {
+  async setOgImageUrl(imgSrc?: string) {
     if (imgSrc && this.isUserAgentCrawler()) {
       const image = new Image();
       image.onload = async () => {
