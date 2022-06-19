@@ -1,5 +1,5 @@
 /*eslint no-useless-escape: "off", camelcase: "off" */
-import Identicon from 'identicon';
+import Identicon from 'identicon.js';
 import util from './util';
 
 const UNIQUE_ID_VALIDATORS = {
