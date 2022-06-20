@@ -17,7 +17,7 @@
     --our-msg: #7074da;
     --notify: #7074da;
     --warning-background: #d87470;
-    --heart-color: #f2231d;
+    --heart-color: #FC005D;
     --login-background: #1f2125;
     --seen-indicator: rgba(255, 255, 255, 0.45);
     --input-bg: #1f2125;
@@ -25,11 +25,11 @@
     --input-placeholder: #ccc;
     --small-text-color: #8d9197;
     --msg-form-button-color: #b8b9be;
-    --button-bg: #853CFE;
+    --button-bg: #9E64FE;
+    --button-hover-bg: #853CFE;
     --button-color: #fefffe;
     --button-border: 0;
     --button-border-size: 0;
-    --button-hover-bg: #6D15FD;
     --menu-bg: #1f2125;
     --sidebar-bg: #2e3036;
     --sidebar-border-right: 1px solid #292b31;
@@ -38,15 +38,15 @@
     --emoji-picker-bg: #35383f;
     --emoji-picker-color: #fff;
     --emoji-picker-border-color: #1f2125;
-    --link-color: #00bbf4;
+    --link-color: #33B7FE;
     --day-separator-bg: rgba(30,32,37,0.85);
     --day-separator-color: rgba(255, 255, 255, 0.88);
-    --non-string-value-color: #8286ff;
+    --non-string-value-color: #9E64FE;
     --nav-border-bottom: 1px solid #222526;
     --nav-shadow: 0 1px 3px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.8);
-    --positive-color: #80bf5e;
+    --positive-color: #83FC00;
     --radio-button-background: #666;
-    --radio-button-checked-background: #00bbf4;
+    --radio-button-checked-background: #33B7FE;
 }
 
 ::-webkit-scrollbar {
@@ -729,7 +729,7 @@ header.footer .header-content {
 }
 
 .msg a {
-  color: #00b6ed;
+  color: var(--link-color);
 }
 
 .msg-content {
