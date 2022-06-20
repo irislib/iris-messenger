@@ -35,7 +35,7 @@ export default class Menu extends Component {
           <a href="/" onClick=${() => this.menuLinkClicked()} tabindex="0" class="logo">
             <div class="mobile-menu-icon visible-xs-inline-block">${Icons.menu}</div>
             <img src=${logo} width=30 height=30/>
-            <span style="font-size: 1.5em">iris</span>
+            <span style="font-size: 1.5em">Iris</span>
           </a>
         `}
         ${APPLICATIONS.map(a => {

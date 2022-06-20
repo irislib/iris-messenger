@@ -62,7 +62,10 @@
   -webkit-border-radius: 100px;
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+    font-family: Futura, "Trebuchet MS", Arial, sans-serif;
+}
 
 html {
   height:100%;
@@ -73,7 +76,7 @@ html {
 body {
   font-size: 15px;
   color: var(--text-color);
-  font-family: "Futura", system, -apple-system, system-ui, system-ui, "Helvetica Neue", Helvetica, "Lucida Grande", sans-serif;
+  font-family: Futura, "Trebuchet MS", Arial, sans-serif;
   padding: 0;
   margin: 0;
   height:100%;
@@ -112,12 +115,6 @@ img {
     -webkit-user-select: none;
     user-select: none;
 }
-
-* {
-    font-family: "Futura";
-}
-
-
 
 textarea {
   width: 100%;
