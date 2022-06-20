@@ -31,9 +31,6 @@ export default class PeerSettings extends Component {
       <p><input type="checkbox" checked=${this.state.local.enablePublicPeerDiscovery} onChange=${() => State.local.get('settings').get('enablePublicPeerDiscovery').put(!this.state.local.enablePublicPeerDiscovery)} id="enablePublicPeerDiscovery"/><label for="enablePublicPeerDiscovery">${t('enable_public_peer_discovery')}</label></p>
       <h4>${t('maximum_number_of_peer_connections')}</h4>
       <p>
-        <small>${t('there_is_a_bug')}</small>
-      </p>
-      <p>
         <input type="number" value=${this.state.local.maxConnectedPeers} onChange=${e => State.local.get('settings').get('maxConnectedPeers').put(e.target.value || 0)}/>
       </p>
       ${Helpers.isElectron ? html`
