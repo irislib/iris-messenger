@@ -1,10 +1,24 @@
 import Component from '../BaseComponent';
 import State from '../State';
 import Session from '../Session';
-import {html} from "htm/preact";
-import {createRef} from "preact";
+import {createRef, RefObject, JSX} from "preact";
 
-class Text extends Component {
+type Props = {
+  json: boolean;
+  path: string;
+  gun: unknown;
+  user: unknown;
+};
+
+type State = {
+  value: string;
+  class: string;
+  editable?: boolean;
+};
+
+class Text extends Component<Props, State> {
+  ref: RefObject<HTMLSpanElement>;
+
   constructor() {
     super();
     this.ref = createRef();
@@ -20,7 +34,7 @@ class Text extends Component {
     }));
   }
 
-  getParsedValue(s) {
+  getParsedValue(s: string): string {
     if (this.props.json) {
       try {
         s = JSON.parse(s);
@@ -40,18 +54,21 @@ class Text extends Component {
     return path.reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, base);
   }
 
-  onInput(e) {
-    const val = this.getParsedValue(e.target.value || e.target.innerText);
+  onInput(e: JSX.TargetedEvent<HTMLSpanElement>) {
+    const val = this.getParsedValue(e.currentTarget.innerText);
     this.getNode().put(val);
     this.setState({class: typeof val === 'string' ? '' : 'iris-non-string'});
   }
 
   render() {
     const val = this.props.json ? JSON.stringify(this.state.value) : this.state.value;
-    return this.state.editable ? html`
-        <span class=${this.state.class} ref=${this.ref} contenteditable="true" onInput=${e => this.onInput(e)}>
+    return this.state.editable
+      ? (
+        <span class={this.state.class} ref={this.ref} contentEditable onInput={e => this.onInput(e)}>
             ${val}
-        </span>` : val;
+        </span>
+      )
+      : val;
   }
 }
 

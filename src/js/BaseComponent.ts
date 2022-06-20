@@ -2,9 +2,13 @@ import { PureComponent } from 'preact/compat';
 
 type EL = {
   off: Function;
-}
+};
 
-export default abstract class BaseComponent extends PureComponent {
+type OwnState = {
+  ogImageUrl?: any;
+};
+
+export default abstract class BaseComponent<Props, State> extends PureComponent<Props, State & OwnState> {
   unmounted?: boolean;
 
   eventListeners: Record<string, EL | undefined> = {};
@@ -22,8 +26,8 @@ export default abstract class BaseComponent extends PureComponent {
 
   inject(name?: string, path?: string) {
     return this.sub((v: unknown, k: string) => {
-      const newState: Record<string, unknown> = {};
-      newState[name ?? k] = v;
+      const newState: Partial<State> = {};
+      newState[(name ?? k) as keyof State] = v as any;
       this.setState(newState);
     }, path);
   }
@@ -60,6 +64,7 @@ export default abstract class BaseComponent extends PureComponent {
         const ogImage = resizedCanvas.toDataURL('image/jpeg', 0.1);
         const ogImageUrl = `https://iris-base64-decoder.herokuapp.com/?s=${encodeURIComponent(ogImage)}`;
         console.log(ogImageUrl);
+        this.state.ogImageUrl
         this.setState({ogImageUrl});
       };
       image.src = imgSrc;
