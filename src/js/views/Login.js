@@ -72,8 +72,8 @@ class Login extends Component {
         ${!this.state.showSwitchAccount ? html`
           <form id="login-form" autocomplete="off" onSubmit=${e => this.onLoginFormSubmit(e)}>
             <div id="create-account">
-              <img width="86" height="86" src=${logo} alt="Iris"/>
-              <h1>Iris</h1>
+              <img width="86" height="86" src=${logo} alt="iris"/>
+              <h1>iris</h1>
               <input onInput=${e => this.onNameChange(e)} autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
               <p><button id="sign-up" type="submit">${t('new_user_go')}</button></p>
               <br/>

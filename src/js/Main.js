@@ -83,13 +83,13 @@ class Main extends Component {
     }
     let content = '';
     const isDesktopNonMac = s.platform && s.platform !== 'darwin';
-    const titleTemplate = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) %s | Iris` : "%s | Iris";
-    const defaultTitle = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) Iris` : 'Iris';
+    const titleTemplate = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) %s | iris` : "%s | iris";
+    const defaultTitle = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) iris` : 'iris';
     if (s.loggedIn || window.location.pathname.length <= 2) {
       content = s.loggedIn ? html`
         ${isDesktopNonMac ? html`
           <div class="windows-titlebar">
-               <span>Iris</span>
+               <span>iris</span>
                <div class="title-bar-btns">
                     <button class="min-btn" onClick=${() => this.electronCmd('minimize')}>-</button>
                     <button class="max-btn" onClick=${() => this.electronCmd('maximize')}>+</button>

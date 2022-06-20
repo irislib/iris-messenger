@@ -875,7 +875,7 @@ header.footer .header-content {
     margin-right: 0;
   }
 
-  .application-list a.logo img:last-child {
+  .application-list a.logo span {
     display: none;
   }
 
