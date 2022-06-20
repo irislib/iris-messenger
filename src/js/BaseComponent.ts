@@ -8,7 +8,7 @@ type OwnState = {
   ogImageUrl?: any;
 };
 
-export default abstract class BaseComponent<Props, State> extends PureComponent<Props, State & OwnState> {
+export default abstract class BaseComponent<Props = {}, State = {}> extends PureComponent<Props, State & OwnState> {
   unmounted?: boolean;
 
   eventListeners: Record<string, EL | undefined> = {};
