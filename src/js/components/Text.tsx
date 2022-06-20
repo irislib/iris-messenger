@@ -65,7 +65,7 @@ class Text extends Component<Props, State> {
     return this.state.editable
       ? (
         <span class={this.state.class} ref={this.ref} contentEditable onInput={e => this.onInput(e)}>
-            ${val}
+            {val}
         </span>
       )
       : val;
