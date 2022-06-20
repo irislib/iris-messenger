@@ -7,7 +7,7 @@ import Autolinker from 'autolinker';
 const emojiRegex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]+/ug;
 const pubKeyRegex = /\B\@[\w-_]{20,50}\.[\w-_]{20,50}\b/g;
 
-function setImgSrc(el, src) {
+function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {
   if (src && src.indexOf('data:image') === 0) {
     el.attr('src', src);
   }
@@ -17,7 +17,7 @@ function setImgSrc(el, src) {
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = (userAgent.indexOf(' electron/') > -1);
 
-const animals = [
+const animals: string[] = [
   'canidae',
   'felidae',
   'cat',
@@ -397,7 +397,7 @@ const animals = [
   'unicorn',
 ];
 
-const adjectives = [
+const adjectives: string[] = [
   'average',
   'big',
   'colossal',
@@ -1835,43 +1835,47 @@ const adjectives = [
 ];
 
 export default {
-  isUrl(s) {
+  wtClient: undefined as any,
+  isUrl(s: string): boolean {
     let matches = Autolinker.parse(s, {urls: true});
-    return matches.length === 1 && matches[0].getUrl() === s;
+    return matches.length === 1 && matches[0].getType() === 'url'
   },
 
-  capitalize(s) {
-    if (typeof s !== 'string') return '';
+  capitalize(s?: string): string {
+    if (s === undefined) {
+      return '';
+    }
     return s.charAt(0).toUpperCase() + s.slice(1);
   },
 
-  generateName() {
-    return `${this.capitalize(_.sample(adjectives))  } ${  this.capitalize(_.sample(animals))}`;
+  generateName(): string {
+    return `${this.capitalize(_.sample(adjectives))} ${this.capitalize(_.sample(animals))}`;
   },
 
-  isEmoji(s) {
-    return s.match(emojiRegex);
+  isEmoji(s: string): boolean {
+    return s.match(emojiRegex) !== null;
   },
 
-  highlightHashtags(s) {
+  highlightHashtags(s: string): string {
     return s.replace(/\B\#\w\w+\b/g, match => `<a href="/hashtag/${match.replace('#', '')}">${match}</a>`);
   },
 
-  highlightEmoji(s) {
+  highlightEmoji(s: string): string {
     return s.replace(emojiRegex, '<span class="emoji">$&</span>');
   },
 
-  highlightMentions(s) {
+  highlightMentions(s: string): string {
     return s.replace(pubKeyRegex, match => {
       const user = match.slice(1);
       return `<a href="/profile/${user}">@<iris-text user="${user}" path="profile/name" /></a>`;
     });
   },
 
-  copyToClipboard(text) {
+  copyToClipboard(text: string): boolean {
     if (window.clipboardData && window.clipboardData.setData) {
       // Internet Explorer-specific code path to prevent textarea being shown while dialog is visible.
-      return window.clipboardData.setData("Text", text);
+      window.clipboardData.setData("Text", text);
+      return true;
     }
     else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
       let textarea = document.createElement("textarea");
@@ -1888,12 +1892,13 @@ export default {
       }
       finally {
         document.body.removeChild(textarea);
+        return true;
       }
     }
   },
 
-  getUrlParameter(sParam, sParams) {
-    let sPageURL = sParams || window.location.search.substring(1),
+  getUrlParameter(sParam: string, sParams?: string) {
+    let sPageURL = sParams ?? window.location.search.substring(1),
       sURLVariables = sPageURL.split('&'),
       sParameterName,
       i;
@@ -1906,7 +1911,7 @@ export default {
     }
   },
 
-  showConsoleWarning() {
+  showConsoleWarning(): void {
     let i = "Stop!",
           j = "This is a browser feature intended for developers. If someone told you to copy-paste something here to enable a feature or \"hack\" someone's account, it is a scam and will give them access to your account.";
 
@@ -1922,14 +1927,14 @@ export default {
     }
   },
 
-  getRelativeTimeText(date) {
-    let text = date && iris.util.getDaySeparatorText(date, date.toLocaleDateString({dateStyle:'short'}));
+  getRelativeTimeText(date: Date): string {
+    let text = date && iris.util.getDaySeparatorText(date, date.toLocaleDateString(undefined, {dateStyle:'short'}));
     text = t(text);
     if (text === t('today')) { text = iris.util.formatTime(date); }
     return text;
   },
 
-  formatBytes(bytes, decimals = 2) {
+  formatBytes(bytes: number, decimals = 2): string {
     if (bytes === 0) return '0 Bytes';
 
     const k = 1024;
@@ -1941,23 +1946,23 @@ export default {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))  } ${  sizes[i]}`;
   },
 
-  download(filename, data, type, charset, href) {
+  download(filename: string, data: string, type: string, charset: string, href: string): void {
     let hiddenElement;
     if (charset === null) {
       charset = 'utf-8';
     }
     hiddenElement = document.createElement('a');
-    hiddenElement.href = href || (`data:${  type  };charset=${  charset  },${  encodeURI(data)}`);
+    hiddenElement.href = href || (`data:${type};charset=${charset},${encodeURI(data)}`);
     hiddenElement.target = '_blank';
     hiddenElement.download = filename;
-    return hiddenElement.click();
+    hiddenElement.click();
   },
 
-  truncateString(s, length = 30) {
-    return s.length > length ? `${s.slice(0, length)  }...` : s;
+  truncateString(s: string, length = 30): string {
+    return s.length > length ? `${s.slice(0, length)}...` : s;
   },
 
-  getBase64(file) {
+  getBase64(file: Blob): Promise<string | ArrayBuffer | null> {
     let reader = new FileReader();
     reader.readAsDataURL(file);
     return new Promise((resolve, reject) => {
@@ -1970,7 +1975,7 @@ export default {
     });
   },
 
-  checkColorScheme() {
+  checkColorScheme(): void {
     // If `prefers-color-scheme` is not supported, fall back to light mode.
     if (window.matchMedia('(prefers-color-scheme: dark)').media === 'not all') {
         document.documentElement.style.display = 'none';
@@ -1985,17 +1990,17 @@ export default {
     if ($('#message-view')[0]) {
       $('#message-view').scrollTop($('#message-view')[0].scrollHeight - $('#message-view')[0].clientHeight);
     }
-  }, 100, true),
+  }, 100),
 
   setImgSrc,
 
-  animateScrollTop: selector => {
+  animateScrollTop: (selector: string): void => {
     const el = $(selector);
     el.css({overflow:'hidden'});
     setTimeout(() => {
       el.css({overflow:''});
       el.on("scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart", e => {
-        if (e.which > 0 || e.type === "mousedown" || e.type === "mousewheel" || e.type === 'touchstart') {
+        if (e.which && e.which > 0 || e.type === "mousedown" || e.type === "mousewheel" || e.type === 'touchstart') {
           el.stop(true);
         }
       });
@@ -2013,8 +2018,8 @@ export default {
     return this.wtClient;
   },
 
-  getProfileLink(pub) {
-    return `${window.location.origin}/profile/${  encodeURIComponent(pub)}`;
+  getProfileLink(pub: string): string {
+    return `${window.location.origin}/profile/${encodeURIComponent(pub)}`;
   },
 
   isElectron,
