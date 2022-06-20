@@ -1,5 +1,48 @@
 :root {
-  color-scheme: light dark;
+    --body-bg: #2e3036;
+    --text-color: #dbdcde;
+    --text-time: rgba(255, 255, 255, 0.45);
+    --main-color: #35383f;
+    --gallery-background: rgba(0, 0, 0, 0.80);
+    --header-color: #2e3036;
+    --chat-active: #393b43;
+    --chat-hover: #33363c;
+    --msg-content-background: #2e3036;
+    --msg-border: none;
+    --our-msg: #7074da;
+    --notify: #7074da;
+    --warning-background: #d87470;
+    --heart-color: #f2231d;
+    --login-background: #1f2125;
+    --seen-indicator: rgba(255, 255, 255, 0.45);
+    --input-bg: #1f2125;
+    --input-text: #dbdcde;
+    --input-placeholder: #ccc;
+    --small-text-color: #8d9197;
+    --msg-form-button-color: #b8b9be;
+    --button-bg: #853CFE;
+    --button-color: #fefffe;
+    --button-border: 0;
+    --button-border-size: 0;
+    --button-hover-bg: #6D15FD;
+    --menu-bg: #1f2125;
+    --sidebar-bg: #2e3036;
+    --sidebar-border-right: 1px solid #292b31;
+    --sidebar-color: #8d9197;
+    --zebra-stripe-bg: #2e3036;
+    --emoji-picker-bg: #35383f;
+    --emoji-picker-color: #fff;
+    --emoji-picker-border-color: #1f2125;
+    --link-color: #00bbf4;
+    --day-separator-bg: rgba(30,32,37,0.85);
+    --day-separator-color: rgba(255, 255, 255, 0.88);
+    --logotype-filter: contrast(0) brightness(2);
+    --non-string-value-color: #8286ff;
+    --nav-border-bottom: 1px solid #222526;
+    --nav-shadow: 0 1px 3px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.8);
+    --positive-color: #80bf5e;
+    --radio-button-background: #666;
+    --radio-button-checked-background: #00bbf4;
 }
 
 ::-webkit-scrollbar {
@@ -31,7 +74,7 @@ html {
 body {
   font-size: 15px;
   color: var(--text-color);
-  font-family: "SF Pro Text", "SF Pro Icons", system, -apple-system, system-ui, system-ui, "Helvetica Neue", Helvetica, "Lucida Grande", sans-serif;
+  font-family: "Futura", system, -apple-system, system-ui, system-ui, "Helvetica Neue", Helvetica, "Lucida Grande", sans-serif;
   padding: 0;
   margin: 0;
   height:100%;
@@ -71,10 +114,15 @@ img {
     user-select: none;
 }
 
+* {
+    font-family: "Futura";
+}
+
+
+
 textarea {
   width: 100%;
   outline: none;
-  font-family: inherit;
   font-size: inherit;
   padding: 10px;
   border: 0;
@@ -174,6 +222,7 @@ button, .button {
   color: var(--button-color);
   border: var(--button-border);
   cursor: pointer;
+  transition: all 0.25s ease;
 }
 
 button:hover, button:active, button:focus, .button:hover, .button:active, .button:focus {
@@ -1305,6 +1354,23 @@ a.msg {
   bottom: 0;
   background-color: var(--login-background);
   z-index: 1000;
+  user-select: none;
+}
+
+#login ::-webkit-input-placeholder {
+   text-align: center;
+}
+
+#login :-moz-placeholder { /* Firefox 18- */
+   text-align: center;
+}
+
+#login ::-moz-placeholder {  /* Firefox 19+ */
+   text-align: center;
+}
+
+#login :-ms-input-placeholder {
+   text-align: center;
 }
 
 #login a {

@@ -43,8 +43,6 @@ if (window.location.host === 'iris.to' && window.location.pathname !== '/') {
   window.location.href = window.location.href.replace(window.location.pathname, '/');
 }
 
-Helpers.checkColorScheme();
-
 class Main extends Component {
   componentDidMount() {
     State.init();
