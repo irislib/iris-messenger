@@ -12,7 +12,6 @@ import iris from '../iris-lib';
 import {Link} from "preact-router/match";
 
 import logo from '../../assets/img/icon128.png';
-import logoType from '../../assets/img/iris_logotype.png';
 
 import $ from 'jquery';
 import _ from "lodash";
@@ -145,7 +144,6 @@ class Header extends Component {
             <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
               <div class="mobile-menu-icon">${Icons.menu}</div>
               <img src=${logo} style="margin-right: 10px" width=30 height=30/>
-              <img src=${logoType} height=23 width=41 />
             </a>
           `}
         </div>

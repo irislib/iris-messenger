@@ -34,8 +34,6 @@ import MediaPlayer from './components/MediaPlayer';
 import Footer from './components/Footer';
 import State from './State';
 
-import logoType from '../assets/img/iris_logotype.png';
-
 import '../css/style.css';
 import '../css/cropper.min.css';
 
@@ -91,7 +89,7 @@ class Main extends Component {
       content = s.loggedIn ? html`
         ${isDesktopNonMac ? html`
           <div class="windows-titlebar">
-               <img src=${logoType} height=16 width=28 />
+               <span>Iris</span>
                <div class="title-bar-btns">
                     <button class="min-btn" onClick=${() => this.electronCmd('minimize')}>-</button>
                     <button class="max-btn" onClick=${() => this.electronCmd('maximize')}>+</button>

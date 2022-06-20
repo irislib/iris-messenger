@@ -36,7 +36,6 @@
     --link-color: #00bbf4;
     --day-separator-bg: rgba(30,32,37,0.85);
     --day-separator-color: rgba(255, 255, 255, 0.88);
-    --logotype-filter: contrast(0) brightness(2);
     --non-string-value-color: #8286ff;
     --nav-border-bottom: 1px solid #222526;
     --nav-shadow: 0 1px 3px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.8);
@@ -310,10 +309,6 @@ a.logo:focus {
 
 a.logo img:not(:last-child) {
   margin-right: 9px;
-}
-
-a.logo img:last-child {
-  filter: var(--logotype-filter);
 }
 
 .header {
@@ -816,7 +811,6 @@ header.footer .header-content {
 
 .windows-titlebar img {
   margin-left: 7px;
-  filter: var(--logotype-filter);
 }
 
 .windows-titlebar .title-bar-btns {

@@ -3,7 +3,6 @@ import State from "../State";
 import {html} from "htm/preact";
 import Helpers from "../Helpers";
 import logo from "../../assets/img/icon128.png";
-import logoType from "../../assets/img/iris_logotype.png";
 import {Link} from "preact-router/match";
 import {translate as t} from "../Translation";
 import Icons from "../Icons";
@@ -36,7 +35,7 @@ export default class Menu extends Component {
           <a href="/" onClick=${() => this.menuLinkClicked()} tabindex="0" class="logo">
             <div class="mobile-menu-icon visible-xs-inline-block">${Icons.menu}</div>
             <img src=${logo} width=30 height=30/>
-            <img src=${logoType} height=23 width=41 />
+            <span style="font-size: 1.5em">iris</span>
           </a>
         `}
         ${APPLICATIONS.map(a => {
