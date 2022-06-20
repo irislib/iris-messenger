@@ -15,8 +15,8 @@
     --msg-content-background: #2e3036;
     --msg-border: none;
     --our-msg: #7074da;
-    --notify: #7074da;
-    --warning-background: #d87470;
+    --notify: #5E02F6;
+    --warning-background: #FE5493;
     --heart-color: #FC005D;
     --login-background: #1f2125;
     --seen-indicator: rgba(255, 255, 255, 0.45);
@@ -25,8 +25,8 @@
     --input-placeholder: #ccc;
     --small-text-color: #8d9197;
     --msg-form-button-color: #b8b9be;
-    --button-bg: #9E64FE;
-    --button-hover-bg: #853CFE;
+    --button-bg: #853CFE;
+    --button-hover-bg: #5E02F6;
     --button-color: #fefffe;
     --button-border: 0;
     --button-border-size: 0;
