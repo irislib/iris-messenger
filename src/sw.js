@@ -1,4 +1,5 @@
 import Gun from 'gun';
+import 'gun/sea';
 import localforage from './js/lib/localforage.min';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { registerRoute } from 'workbox-routing';
