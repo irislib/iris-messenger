@@ -40,7 +40,6 @@ class Follows extends View {
       console.log(user, following);
       if (following) {
           if (!following) return;
-          console.log(f);
           this.follows[user] = f[user] || {};
           this.setState({});
       }

@@ -94,12 +94,13 @@ class Identicon extends Component<Props, State> {
   render() {
     const width = this.props.width;
     const activity = ['online', 'active'].indexOf(this.state.activity ?? '') > -1 ? this.state.activity : '';
-    const hasPhoto = this.state.photo && !this.props.hidePhoto ? 'has-photo' : '';
+    const hasPhoto = this.state.photo && !this.props.hidePhoto && this.state.photo.indexOf('data:image') === 0;
+    const hasPhotoStyle = hasPhoto ? 'has-photo' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
     return (
-      <div onClick={this.props.onClick} style={{position: 'relative', cursor: this.props.onClick ? 'pointer' : undefined}} class={`identicon-container ${hasPhoto} ${showTooltip} ${activity}`}>
+      <div onClick={this.props.onClick} style={{position: 'relative', cursor: this.props.onClick ? 'pointer' : undefined}} class={`identicon-container ${hasPhotoStyle} ${showTooltip} ${activity}`}>
         <div style={{width: width, height: width}} class="identicon">
-          {(this.state.photo && !this.props.hidePhoto) ? <SafeImg src={this.state.photo} class="identicon-image" width={width}/> : null}
+          {hasPhoto ? <SafeImg src={this.state.photo} class="identicon-image" width={width}/> : null}
         </div>
         {this.props.showTooltip && this.state.name ? html`<span class="tooltiptext">${this.state.name}</span>` : ''}
         {this.props.activity ? <div class="online-indicator"/> : null}
