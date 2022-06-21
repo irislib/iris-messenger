@@ -20,8 +20,8 @@ type Props = {
 };
 
 type State = {
-  photo: unknown;
-  name: unknown;
+  photo: string | null;
+  name: string | null;
   activity: string | null;
 };
 
