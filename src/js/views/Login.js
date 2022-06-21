@@ -49,10 +49,13 @@ class Login extends Component {
   }
 
   onNameChange(event) {
-    if (event.target.value.indexOf('"priv"') !== -1) {
+    const val = event.target.value;
+    if (val.indexOf('"priv"') !== -1) {
       this.onPastePrivKey(event);
       event.target.value = '';
+      return;
     }
+    this.setState({inputStyle: val.length ? "text-align: center" : ""})
   }
 
   renderExistingAccountLogin() {
@@ -74,7 +77,7 @@ class Login extends Component {
             <div id="create-account">
               <img width="86" height="86" src=${logo} alt="iris"/>
               <h1>iris</h1>
-              <input onInput=${e => this.onNameChange(e)} autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
+              <input style=${this.state.inputStyle} onInput=${e => this.onNameChange(e)} autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
               <p><button id="sign-up" type="submit">${t('new_user_go')}</button></p>
               <br/>
               <p><a href="#" id="show-existing-account-login" onClick=${() => this.setState({showSwitchAccount: true})}>${t('already_have_an_account')}</a></p>
