@@ -77,7 +77,7 @@ export default class PeerSettings extends Component {
             if (url == 1) {return;} // weirdness
             const peer = PeerManager.getKnownPeers()[url] || {};
             const peerFromGun = this.state.peersFromGun && this.state.peersFromGun[url];
-            const connected = peerFromGun && peerFromGun.wire && peerFromGun.readyState == 1 && peerFromGun.wire.bufferedAmount === 0;
+            const connected = peerFromGun && peerFromGun.wire && peerFromGun.wire.readyState == 1 && peerFromGun.wire.bufferedAmount === 0;
             return html`
               <div class="flex-row peer">
                 <div class="flex-cell">

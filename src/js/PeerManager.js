@@ -150,7 +150,6 @@ let askForPeers = _.once(pub => {
 
 function checkGunPeerCount() {
   let peersFromGun = State.public.back('opt.peers');
-  console.log('peersFromGun', peersFromGun);
   let connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
     if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
       console.log('WebRTC peer', peer);
@@ -177,7 +176,7 @@ function init() {
   State.local.get('settings').get('maxConnectedPeers').on(n => {
     if (n !== undefined) maxConnectedPeers = n;
   });
-  setInterval(checkGunPeerCount, 10000);
+  setInterval(checkGunPeerCount, 2000);
 }
 
 export default {
