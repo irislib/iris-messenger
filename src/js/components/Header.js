@@ -112,7 +112,7 @@ class Header extends Component {
       if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
         console.log('WebRTC peer', peer);
       }
-      return peer && peer.wire && peer.wire.hied === 'hi' && peer.wire.constructor.name === 'WebSocket';
+      return peer && peer.wire && peer.wire.readyState === 1 && peer.wire.constructor.name === 'WebSocket';
     });
     this.setState({connectedPeers});
   }

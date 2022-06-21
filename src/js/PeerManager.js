@@ -150,11 +150,12 @@ let askForPeers = _.once(pub => {
 
 function checkGunPeerCount() {
   let peersFromGun = State.public.back('opt.peers');
+  console.log('peersFromGun', peersFromGun);
   let connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
     if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
       console.log('WebRTC peer', peer);
     }
-    return peer && peer.wire && peer.wire.hied === 'hi' && peer.wire.constructor.name === 'WebSocket';
+    return peer && peer.wire && peer.wire.readyState === 1 && peer.wire.constructor.name === 'WebSocket';
   });
   if (connectedPeers.length < maxConnectedPeers) {
     let unconnectedPeers = _.filter(Object.keys(knownPeers), url => {
