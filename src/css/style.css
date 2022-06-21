@@ -3,6 +3,11 @@
     src: url("./Futura-Medium.woff") format('woff');
 }
 
+@font-face {
+    font-family: "Metuo-Black";
+    src: url("./Metuo-Black.woff") format('woff');
+}
+
 :root {
     --body-bg: #2e3036;
     --text-color: #dbdcde;
@@ -873,6 +878,10 @@ header.footer .header-content {
 
 .application-list a.logo img:last-child {
   margin-left: 5px;
+}
+
+h1, .application-list a.logo span {
+    font-family: "Metuo-Black", Futura, Arial;
 }
 
 @media (min-width:626px) and (max-width:1268px) {
