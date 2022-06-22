@@ -1364,6 +1364,8 @@ a.msg {
   background-color: var(--login-background);
   z-index: 1000;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
 }
 
 #login ::-webkit-input-placeholder {

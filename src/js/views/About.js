@@ -24,11 +24,9 @@ class About extends View {
           <li dangerouslySetInnerHTML=${{ __html: t('iris_is_always_available')}}></li>
         </ul>
         <p> ${t('in_other_words')} </p>
-
-
-
+          
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-        <p><small>Version 2.1.1</small></p>
+        <p><small>Version 2.3.0</small></p>
 
         ${Helpers.isElectron ? '' : html`
           <div id="desktop-application-about">
