@@ -18,6 +18,7 @@ export default class HashtagList extends Component {
     const hashtags = {};
     State.public.user().get('hashtagSubscriptions').map().on(this.sub(
       (isSubscribed, hashtag) => {
+        if (hashtag.indexOf('~') === 0) { return; }
         if (isSubscribed) {
           hashtags[hashtag] = true;
         } else {
@@ -27,6 +28,7 @@ export default class HashtagList extends Component {
       }
     ));
     State.group().map('hashtagSubscriptions', this.sub((isSubscribed, hashtag, a, b, from) => {
+      if (hashtag.indexOf('~') === 0) { return; }
       if (!this.hashtagSubscribers[hashtag]) {
         this.hashtagSubscribers[hashtag] = new Set();
       }
