@@ -1,11 +1,21 @@
 import Component from '../BaseComponent';
-import { html } from 'htm/preact';
 import {translate as t} from '../Translation';
 import Session from '../Session';
 import State from '../State';
 import Notifications from '../Notifications';
 
-class FollowButton extends Component {
+type Props = {
+  id: string;
+}
+
+class FollowButton extends Component<Props> {
+  key: string;
+  cls?: string;
+  actionDone: string;
+  action: string;
+  activeClass: string;
+  hoverAction: string;
+
   constructor() {
     super();
     this.key = 'follow';
@@ -40,12 +50,12 @@ class FollowButton extends Component {
   }
 
   render() {
-    return html`
-      <button class="${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}" onClick=${e => this.onClick(e)}>
-        <span class="nonhover">${t(this.state[this.key] ? this.actionDone : this.action)}</span>
-        <span class="hover">${t(this.hoverAction)}</span>
+    return (
+      <button className={`${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}`} onClick={e => this.onClick(e)}>
+        <span className="nonhover">{t(this.state[this.key] ? this.actionDone : this.action)}</span>
+        <span className="hover">{t(this.hoverAction)}</span>
       </button>
-    `;
+    );
   }
 }
 
