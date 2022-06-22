@@ -73,7 +73,7 @@ class Product extends StoreView {
             ${this.cart[this.props.product] ? ` (${this.cart[this.props.product]})` : ''}
           </button>
           ${this.isMyProfile ? html`
-            <p><button onClick=${e => this.onClickDelete(e)}>${t('delete_item')}/button></p>
+            <p><button onClick=${e => this.onClickDelete(e)}>${t('delete_item')}</button></p>
           ` : ''}
         ` : ''}
       </div>

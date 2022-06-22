@@ -111,7 +111,7 @@ class Store extends View {
           return html`
             <div class="thumbnail-item store-item" onClick=${() => route(`/product/${k}/${i.from}`)}>
               <${SafeImg} src=${i.photo || ''}/>
-              <a href="/product/${k}/${i.from}" class="name">${i.name}</a>
+              <a href="/product/${k}/${i.from || this.props.store}" class="name">${i.name}</a>
               ${this.props.store ? '':html`
                 <small>by <iris-text path="profile/name" editable="false" placeholder="Name" user=${i.from}/></small>
               `}
@@ -169,7 +169,6 @@ class Store extends View {
   }
 
   onProduct(p, id, a, e, from) {
-    console.log(p, id, a);
     this.eventListeners[`products${  from}`] = e;
     if (p && typeof p === "object") { // TODO gun returning bad data (typeof p === "string")?
       const o = {};
