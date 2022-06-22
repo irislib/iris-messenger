@@ -169,8 +169,9 @@ class Store extends View {
   }
 
   onProduct(p, id, a, e, from) {
+    console.log(p, id, a);
     this.eventListeners[`products${  from}`] = e;
-    if (p) {
+    if (p && typeof p === "object") { // TODO gun returning bad data (typeof p === "string")?
       const o = {};
       p.from = from;
       o[id] = p;
