@@ -110,7 +110,7 @@ class Store extends View {
           const i = this.state.items[k];
           return html`
             <div class="thumbnail-item store-item" onClick=${() => route(`/product/${k}/${i.from}`)}>
-              <${SafeImg} src=${i.photo}/>
+              <${SafeImg} src=${i.photo || ''}/>
               <a href="/product/${k}/${i.from}" class="name">${i.name}</a>
               ${this.props.store ? '':html`
                 <small>by <iris-text path="profile/name" editable="false" placeholder="Name" user=${i.from}/></small>
