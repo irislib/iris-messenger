@@ -1,4 +1,4 @@
-import Gun from 'gun';
+import Gun, { IGunInstance, IGunChain, IGunUserInstance } from 'gun';
 import 'gun/sea';
 import 'gun/lib/yson';
 import 'gun/lib/radix';
@@ -11,7 +11,33 @@ import PeerManager from './PeerManager';
 import iris from './iris-lib';
 import Helpers from './Helpers';
 
-const State = {
+type Opts = {
+  peers: string[];
+}
+
+type Follows = Record<string, boolean>;
+
+type BlockedUsers = Record<string, boolean>;
+
+type Callback = (node: IGunUserInstance, user: string) => void;
+
+type Group = {
+  get: (path: string, callback: Callback) => void;
+  map: (path: string, callback: Callback) => void;
+  on: (path: string, callback: Callback) => void;
+}
+
+export type State = {
+  public?: IGunInstance;
+  local?: IGunChain<any>;
+  electron?: IGunChain<any>;
+  blockedUsers?: BlockedUsers;
+  init: (publicOpts: Opts) => void;
+  getBlockedUsers: () => BlockedUsers | undefined;
+  group: (groupNode?: string | IGunChain<any>) => Group;
+}
+
+const state: State = {
   init(publicOpts) {
     Gun.log.off = true;
     const o = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
@@ -27,11 +53,14 @@ const State = {
 
     // Is this the right place for this?
     this.local.get('block').map().on((isBlocked, user) => {
+      if (this.blockedUsers === undefined) { return; }
+      if (this.local === undefined) { return; }
       if (isBlocked === this.blockedUsers[user]) { return; }
       if (isBlocked) {
         this.blockedUsers[user] = isBlocked;
-        State.local.get('groups').map().once((v, k) => {
-          State.local.get('groups').get(k).get(user).put(false);
+        this.local.get('groups').map().once((_v, k) => {
+          if (this.local === undefined) { return; }
+          this.local.get('groups').get(k).get(user).put(false);
         });
       } else {
         delete this.blockedUsers[user];
@@ -47,20 +76,22 @@ const State = {
   },
 
   group(groupNode = 'everyone') {
-    const _this = this;
     return {
-      get(path, callback) {
+      get: (path, callback) => {
         requestAnimationFrame(() => {
-          const follows = {};
+          const follows: Follows = {};
           if (typeof groupNode === 'string') {
-            groupNode = _this.local.get('groups').get(groupNode);
+            if (this.local === undefined) { return; }
+            groupNode = this.local.get('groups').get(groupNode);
           }
           groupNode.map((isFollowing, user) => {
-            if (_this.blockedUsers[user]) { return; } // TODO: allow to specifically query blocked users?
+            if (this.blockedUsers === undefined) { return; }
+            if (this.blockedUsers[user]) { return; } // TODO: allow to specifically query blocked users?
             if (follows[user] && follows[user] === isFollowing) { return; }
             follows[user] = isFollowing;
             if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
-              let node = State.public.user(user);
+              if (state.public === undefined) { return; }
+              let node = state.public.user(user);
               if (path && path !== '/') {
                 node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
               }
@@ -81,4 +112,4 @@ const State = {
   },
 };
 
-export default State;
+export default state;

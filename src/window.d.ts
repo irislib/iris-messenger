@@ -1,3 +1,4 @@
+import { State } from './js/State';
 export {};
 
 declare global {
@@ -5,5 +6,6 @@ declare global {
     clipboardData: any;
     chrome: any;
     safari: any;
+    State: State;
   }
 }
