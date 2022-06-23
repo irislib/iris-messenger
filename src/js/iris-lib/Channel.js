@@ -1218,6 +1218,18 @@ class Channel {
     gun.user().get('channels').get(channelId).put(null);
     gun.user().get('channels').get(channelId).off();
   }
+
+  /**
+  *
+  */
+  static async deleteGroup(gun, key, uuid) {
+    const mySecret = await Gun.SEA.secret(key.epub, key);
+    const mySecretHash = await util.getHash(mySecret);
+    const mySecretUuid = await util.getHash(mySecretHash + uuid);
+    gun.user().auth(key);
+    gun.user().get('channels').get(mySecretUuid).put(null);
+    gun.user().get('channels').get(mySecretUuid).off();
+  }
 }
 
 export default Channel;

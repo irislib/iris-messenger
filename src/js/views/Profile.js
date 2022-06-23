@@ -22,9 +22,12 @@ import {Helmet} from "react-helmet";
 import {SMS_VERIFIER_PUB} from '../SMS';
 
 function deleteChat(pub) {
-  iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
-  delete Session.channels[pub];
-  State.local.get('channels').get(pub).put(null);
+  if (confirm(`${t('delete_chat')}?`)) {
+    iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
+    delete Session.channels[pub];
+    State.local.get('channels').get(pub).put(null);
+    route(`/chat`);
+  }
 }
 
 class Profile extends View {

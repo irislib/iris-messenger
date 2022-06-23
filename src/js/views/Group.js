@@ -15,11 +15,11 @@ import $ from 'jquery';
 import QRCode from '../lib/qrcode.min';
 import iris from '../iris-lib';
 
-function deleteChat(pub) {
+function deleteChat(uuid) {
   if (confirm("Delete chat?")) {
-      iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
-      delete Session.channels[pub];
-      State.local.get('channels').get(pub).put(null);
+      iris.Channel.deleteGroup(State.public, Session.getKey(), uuid);
+      delete Session.channels[uuid];
+      State.local.get('channels').get(uuid).put(null);
       route('/chat');
   }
 }

@@ -11,7 +11,6 @@ class Message extends View {
   }
 
   renderView() {
-
     let content;
     if (this.props.hash === 'new') {
       content = html`

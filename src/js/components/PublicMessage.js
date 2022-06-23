@@ -284,8 +284,8 @@ async (serialized, a, b, event) => {
           ${(this.props.showReplies || s.showReplyForm) && s.sortedReplies && s.sortedReplies.length ? s.sortedReplies.map(r =>
             html`<${PublicMessage} measure=${this.props.measure} key=${r.hash} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
           ) : ''}
-          ${s.showReplyForm ? html`
-            <${FeedMessageForm} replyingTo=${this.props.hash} replyingToUser=${s.msg.info.from} />
+          ${this.props.standalone || s.showReplyForm ? html`
+            <${FeedMessageForm} autofocus=${!this.props.standalone} replyingTo=${this.props.hash} replyingToUser=${s.msg.info.from} />
           ` : ''}
         </div>
       </div>

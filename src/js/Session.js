@@ -265,6 +265,7 @@ function getMyName() { return myName; }
 function getMyProfilePhoto() { return myProfilePhoto; }
 
 async function logOut() {
+  route('/');
   if (State.electron) {
     State.electron.get('user').put(null);
   }
@@ -283,7 +284,6 @@ async function logOut() {
   }
   clearIndexedDB();
   localStorage.clear();
-  route('/');
   location.reload();
 }
 
