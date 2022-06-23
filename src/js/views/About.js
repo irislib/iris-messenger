@@ -26,7 +26,7 @@ class About extends View {
         <p> ${t('in_other_words')} </p>
           
         <p>Released under MIT license. Code: <a href="https://github.com/irislib/iris-messenger">Github</a>.</p>
-        <p><small>Version 2.3.0</small></p>
+        <p><small>Version 2.3.2</small></p>
 
         ${Helpers.isElectron ? '' : html`
           <div id="desktop-application-about">
