@@ -23,7 +23,7 @@ class Message extends View {
       `;
     }
     return html`
-      <div id="message-list" class="centered-container">
+      <div class="centered-container">
         ${content}
       </div>
     `;

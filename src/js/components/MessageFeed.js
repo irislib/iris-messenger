@@ -68,17 +68,17 @@ class MessageFeed extends Component {
     if (!this.props.scrollElement || this.unmounted) { return; }
     const displayCount = this.state.displayCount;
     return html`
-      <div class="feed-container">
+      <div class="centered-container">
           ${this.state.sortedMessages.slice(0, displayCount).map(hash => html`
             <${PublicMessage} key=${hash} hash=${hash} showName=${true} />
           `)}
-          <p>
             ${displayCount < this.state.sortedMessages.length ? html`
-              <button onClick=${() => this.setState({displayCount: displayCount + PAGE_SIZE})}>
-                ${t('show_more')}
-              </button>
+              <p>
+                <button onClick=${() => this.setState({displayCount: displayCount + PAGE_SIZE})}>
+                  ${t('show_more')}
+                </button>
+              </p>
             ` : ''}
-          </p>
       </div>
     `;
   }
