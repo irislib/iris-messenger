@@ -6,7 +6,7 @@ import State from '../State';
 import _ from 'lodash';
 import {translate as t} from '../Translation';
 
-const PAGE_SIZE = 60;
+const PAGE_SIZE = 40;
 
 class MessageFeed extends Component {
   constructor() {
@@ -68,18 +68,16 @@ class MessageFeed extends Component {
     if (!this.props.scrollElement || this.unmounted) { return; }
     const displayCount = this.state.displayCount;
     return html`
-      <div class="centered-container">
-          ${this.state.sortedMessages.slice(0, displayCount).map(hash => html`
-            <${PublicMessage} key=${hash} hash=${hash} showName=${true} />
-          `)}
-            ${displayCount < this.state.sortedMessages.length ? html`
-              <p>
-                <button onClick=${() => this.setState({displayCount: displayCount + PAGE_SIZE})}>
-                  ${t('show_more')}
-                </button>
-              </p>
-            ` : ''}
-      </div>
+      ${this.state.sortedMessages.slice(0, displayCount).map(hash => html`
+        <${PublicMessage} key=${hash} hash=${hash} showName=${true} />
+      `)}
+        ${displayCount < this.state.sortedMessages.length ? html`
+          <p>
+            <button onClick=${() => this.setState({displayCount: displayCount + PAGE_SIZE})}>
+              ${t('show_more')}
+            </button>
+          </p>
+        ` : ''}
     `;
   }
 }

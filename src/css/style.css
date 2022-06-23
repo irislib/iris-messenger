@@ -763,6 +763,11 @@ header.footer .header-content {
   cursor: pointer;
 }
 
+.public-messages-view .img-container, .torrent {
+  margin-left: -14px;
+  margin-right: -14px;
+}
+
 #profile {
   display: flex;
   flex-direction: column;
