@@ -175,7 +175,8 @@ function getEpub(user) {
 }
 
 async function getNotificationText(notification) {
-  const name = await State.public.user(notification.from).get('profile').get('name').once();
+  const profile = await State.public.user(notification.from).get('profile').once();
+  const name = profile.name || 'someone';
   const event = notification.event || notification.action;
   let eventText;
   if (event === 'like') eventText = `${name} liked your post`;
