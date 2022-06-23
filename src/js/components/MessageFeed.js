@@ -2,21 +2,17 @@ import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import PublicMessage from './PublicMessage';
-import {  List, WindowScroller,CellMeasurer,CellMeasurerCache,} from 'react-virtualized';
 import State from '../State';
-import 'react-virtualized/styles.css';
 import _ from 'lodash';
+import {translate as t} from '../Translation';
+
+const PAGE_SIZE = 60;
 
 class MessageFeed extends Component {
   constructor() {
     super();
-    this.state = {sortedMessages:[]};
+    this.state = {sortedMessages:[], displayCount: PAGE_SIZE};
     this.mappedMessages = new Map();
-    this._cache = new CellMeasurerCache({
-      fixedWidth: true,
-      minHeight: 0,
-    });
-    this.rowRenderer = this.rowRenderer.bind(this);
   }
 
   handleMessage(v, k, x, e, from) {
@@ -68,57 +64,21 @@ class MessageFeed extends Component {
     }
   }
 
-  rowRenderer({ index, key, parent, style }) { // TODO: use isScrolling param to reduce rendering?
-    const hash = this.state.sortedMessages[index];
-    return (
-      <CellMeasurer
-        cache={this._cache}
-        columnIndex={0}
-        key={key}
-        rowIndex={index}
-        parent={parent}
-      >
-        {({ measure, registerChild }) => (
-          <div ref={registerChild} style={style}>
-            {measure()}
-            <PublicMessage
-              filter={this.props.filter}
-              hash={hash}
-              key={hash}
-              measure={() => {
-                measure();
-              }}
-              showName={true}
-            />
-          </div>
-        )}
-      </CellMeasurer>
-    );
-  }
-
   render() {
     if (!this.props.scrollElement || this.unmounted) { return; }
+    const displayCount = this.state.displayCount;
     return html`
       <div class="feed-container">
-          <${WindowScroller} scrollElement=${this.props.scrollElement}>
-            ${({ height, width, isScrolling, onChildScroll, scrollTop }) => {
-              return html`
-                <${List}
-                  autoHeight
-                  autoWidth
-                  width=${width||0}
-                  height=${height||0}
-                  isScrolling=${isScrolling}
-                  onScroll=${onChildScroll}
-                  scrollTop=${scrollTop}
-                  rowCount=${this.state.sortedMessages.length}
-                  rowHeight=${this._cache.rowHeight}
-                  rowRenderer=${this.rowRenderer}
-                  overscanRowCount=${10}
-                />
-              `;
-            }}
-          </${WindowScroller}>
+          ${this.state.sortedMessages.slice(0, displayCount).map(hash => html`
+            <${PublicMessage} key=${hash} hash=${hash} showName=${true} />
+          `)}
+          <p>
+            ${displayCount < this.state.sortedMessages.length ? html`
+              <button onClick=${() => this.setState({displayCount: displayCount + PAGE_SIZE})}>
+                ${t('show_more')}
+              </button>
+            ` : ''}
+          </p>
       </div>
     `;
   }
