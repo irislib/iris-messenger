@@ -81,7 +81,7 @@ class Store extends View {
           </div>
         </div>
 
-        <h3> ${t('store')}</h3>
+        <h3>${t('store')}</h3>
         ${this.renderItems()}
       </div>
     `;

@@ -71,13 +71,13 @@ class MessageFeed extends Component {
       ${this.state.sortedMessages.slice(0, displayCount).map(hash => html`
         <${PublicMessage} key=${hash} hash=${hash} showName=${true} />
       `)}
-        ${displayCount < this.state.sortedMessages.length ? html`
-          <p>
-            <button onClick=${() => this.setState({displayCount: displayCount + PAGE_SIZE})}>
-              ${t('show_more')}
-            </button>
-          </p>
-        ` : ''}
+      ${displayCount < this.state.sortedMessages.length ? html`
+        <p>
+          <button onClick=${() => this.setState({displayCount: displayCount + PAGE_SIZE})}>
+            ${t('show_more')}
+          </button>
+        </p>
+      ` : ''}
     `;
   }
 }

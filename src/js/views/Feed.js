@@ -57,7 +57,7 @@ class Feed extends View {
     return html`
       <div class="centered-container">
         <div style="display:flex;flex-direction:row">
-          <div style="flex:3">
+          <div style="flex:3;width: 100%">
             ${hashtag ? html`
               <${Helmet}>
                   <title>${hashtagText}</title>
