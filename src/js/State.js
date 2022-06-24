@@ -94,7 +94,7 @@ const State = {
         const cachedPath = _this.cache.get(cacheKey);
         if (!cachedPath) {
           _this.cache.set(cacheKey, new Map());
-          this.get(path, (node, from) => node.map((value,key,x,event) => {
+          this.get(path, (node, from) => node.map((value,key,x) => {
             const item = {value, key, from};
             _this.cache.get(cacheKey).set(key, item);
             for (let cb of _this.callbacks.get(cacheKey).values()) {
