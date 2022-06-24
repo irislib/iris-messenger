@@ -176,7 +176,7 @@ function init() {
   State.local.get('settings').get('maxConnectedPeers').on(n => {
     if (n !== undefined) maxConnectedPeers = n;
   });
-  setInterval(checkGunPeerCount, 2000);
+  setInterval(checkGunPeerCount, 1000);
 }
 
 export default {

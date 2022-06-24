@@ -6,12 +6,12 @@ import State from '../State';
 import _ from 'lodash';
 import {translate as t} from '../Translation';
 
-const PAGE_SIZE = 20;
+const INITIAL_PAGE_SIZE = 20;
 
 class MessageFeed extends Component {
   constructor() {
     super();
-    this.state = {sortedMessages:[], displayCount: PAGE_SIZE};
+    this.state = {sortedMessages:[], displayCount: INITIAL_PAGE_SIZE};
     this.mappedMessages = new Map();
   }
 
@@ -73,7 +73,7 @@ class MessageFeed extends Component {
       `)}
       ${displayCount < this.state.sortedMessages.length ? html`
         <p>
-          <button onClick=${() => this.setState({displayCount: displayCount + PAGE_SIZE})}>
+          <button onClick=${() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE * 3})}>
             ${t('show_more')}
           </button>
         </p>
