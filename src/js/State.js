@@ -25,6 +25,10 @@ const State = {
     }
     this.blockedUsers = {};
 
+    this.cache = new Map();
+    this.callbacks = new Map();
+    this.counter = 0;
+
     // Is this the right place for this?
     this.local.get('block').map().on((isBlocked, user) => {
       if (isBlocked === this.blockedUsers[user]) { return; }
@@ -42,19 +46,21 @@ const State = {
     iris.util.setPublicState && iris.util.setPublicState(this.public);
   },
 
+  counterNext() {
+    return this.counter++;
+  },
+
   getBlockedUsers() {
     return this.blockedUsers;
   },
 
-  group(groupNode = 'everyone') {
+  group(groupName = 'everyone') {
     const _this = this;
     return {
       get(path, callback) {
+        const groupNode = _this.local.get('groups').get(groupName);
         requestAnimationFrame(() => {
           const follows = {};
-          if (typeof groupNode === 'string') {
-            groupNode = _this.local.get('groups').get(groupNode);
-          }
           groupNode.map((isFollowing, user) => {
             if (_this.blockedUsers[user]) { return; } // TODO: allow to specifically query blocked users?
             if (follows[user] && follows[user] === isFollowing) { return; }
@@ -70,8 +76,36 @@ const State = {
         });
       },
 
-      map(path, callback) {
-        this.get(path, (node, from) => node.map((...args) => callback(...args, from)));
+      map(path, callback) { // group queries are slow, so we cache them
+        const cacheKey = groupName + ':' + path;
+
+        let id = _this.counterNext();
+        if (_this.callbacks.has(cacheKey)) {
+          _this.callbacks.get(cacheKey).set(id, callback);
+        } else {
+          _this.callbacks.set(cacheKey, new Map([[id, callback]]));
+        }
+
+        const myEvent = {off: () => {
+          let map = _this.callbacks.get(cacheKey);
+          map && map.delete(id);
+        }};
+
+        const cachedPath = _this.cache.get(cacheKey);
+        if (!cachedPath) {
+          _this.cache.set(cacheKey, new Map());
+          this.get(path, (node, from) => node.map((value,key,x,event) => {
+            const item = {value, key, from};
+            _this.cache.get(cacheKey).set(key, item);
+            for (let cb of _this.callbacks.get(cacheKey).values()) {
+              cb(value,key,x,myEvent,from);
+            }
+          }));
+        } else {
+          for (let item of cachedPath.values()) {
+            callback(item.value,item.key,0,myEvent,item.from);
+          }
+        }
       },
 
       on(path, callback) {

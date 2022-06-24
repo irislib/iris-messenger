@@ -6,7 +6,7 @@ import State from '../State';
 import _ from 'lodash';
 import {translate as t} from '../Translation';
 
-const PAGE_SIZE = 40;
+const PAGE_SIZE = 20;
 
 class MessageFeed extends Component {
   constructor() {
