@@ -25,7 +25,7 @@ const State = {
     }
     this.blockedUsers = {};
 
-    this.cache = new Map();
+    this.cache = new Map(); // TODO: reset cache when users are blocked
     this.callbacks = new Map();
     this.counter = 0;
 
@@ -59,8 +59,8 @@ const State = {
     return {
       get(path, callback) {
         const groupNode = _this.local.get('groups').get(groupName);
+        const follows = {};
         requestAnimationFrame(() => {
-          const follows = {};
           groupNode.map((isFollowing, user) => {
             if (_this.blockedUsers[user]) { return; } // TODO: allow to specifically query blocked users?
             if (follows[user] && follows[user] === isFollowing) { return; }
@@ -72,12 +72,48 @@ const State = {
               }
               callback(node, user);
             }
-          })
+          });
         });
       },
 
-      map(path, callback) { // group queries are slow, so we cache them
-        const cacheKey = groupName + ':' + path;
+      _cached_map(cached, cacheKey, path, myEvent, callback) {
+        if (!cached) {
+          _this.cache.set(cacheKey, new Map());
+          this.get(path, (node, from) => node.map((value, key, x) => {
+            const item = {value, key, from};
+            _this.cache.get(cacheKey).set(key, item);
+            for (let cb of _this.callbacks.get(cacheKey).values()) {
+              cb(value, key, x, myEvent, from);
+            }
+          }));
+        } else {
+          for (let item of cached.values()) {
+            callback(item.value, item.key, 0, myEvent, item.from);
+          }
+        }
+      },
+
+      // TODO: this should probably store just the most recent value, not everyone's value
+      // TODO: for counting of likes etc, use this.count() instead
+      _cached_on(cached, cacheKey, path, myEvent, callback) {
+        if (!cached) {
+          _this.cache.set(cacheKey, new Map());
+          this.get(path, (node, from) => node.on((value, key, x) => {
+            const item = {value, key, from};
+            _this.cache.get(cacheKey).set(from, item);
+            for (let cb of _this.callbacks.get(cacheKey).values()) {
+              cb(value, key, x, myEvent, from);
+            }
+          }));
+        } else {
+          for (let item of cached.values()) {
+            callback(item.value, item.key, 0, myEvent, item.from);
+          }
+        }
+      },
+
+      _cached_map_or_on(fn, path, callback) {
+        const cacheKey = fn + ':' + groupName + ':' + path;
 
         let id = _this.counterNext();
         if (_this.callbacks.has(cacheKey)) {
@@ -87,29 +123,25 @@ const State = {
         }
 
         const myEvent = {off: () => {
-          let map = _this.callbacks.get(cacheKey);
-          map && map.delete(id);
+          let callbacks = _this.callbacks.get(cacheKey);
+          callbacks && callbacks.delete(id);
         }};
 
-        const cachedPath = _this.cache.get(cacheKey);
-        if (!cachedPath) {
-          _this.cache.set(cacheKey, new Map());
-          this.get(path, (node, from) => node.map((value,key,x) => {
-            const item = {value, key, from};
-            _this.cache.get(cacheKey).set(key, item);
-            for (let cb of _this.callbacks.get(cacheKey).values()) {
-              cb(value,key,x,myEvent,from);
-            }
-          }));
+        const cached = _this.cache.get(cacheKey);
+
+        if (fn === 'map') {
+          this._cached_map(cached, cacheKey, path, myEvent, callback);
         } else {
-          for (let item of cachedPath.values()) {
-            callback(item.value,item.key,0,myEvent,item.from);
-          }
+          this._cached_on(cached, cacheKey, path, myEvent, callback);
         }
       },
 
+      map(path, callback) { // group queries are slow, so we cache them
+        this._cached_map_or_on('map', path, callback);
+      },
+
       on(path, callback) {
-        this.get(path, (node, from) => node.on((...args) => callback(...args, from)));
+        this._cached_map_or_on('on', path, callback);
       }
     }
   },
