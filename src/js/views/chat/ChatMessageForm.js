@@ -174,7 +174,7 @@ class ChatMessageForm extends MessageForm {
   async webPush(msg) {
     const chat = Session.channels[this.props.activeChat];
     const myKey = Session.getKey();
-    const shouldWebPush = (window.location.hash === `#/chat/${  myKey.pub}`) || !(chat.activity);
+    const shouldWebPush = (window.location.hash === `#/chat/${  myKey.pub}`) || !(chat.activity.isActive);
     if (shouldWebPush && chat.webPushSubscriptions) {
       const subscriptions = [];
       const participants = Object.keys(chat.webPushSubscriptions);
