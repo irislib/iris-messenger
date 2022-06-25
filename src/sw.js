@@ -78,6 +78,7 @@ self.addEventListener('push', async ev => {
   console.log('sw push', data);
   //console.log(self.irisKey, data.from, data.from.epub);
   if (self.irisKey && data.from && data.from.epub) {
+    // TODO we should also do a signature check here
     const secret = await Gun.SEA.secret(data.from.epub, self.irisKey);
     data.title = await Gun.SEA.decrypt(data.title, secret);
     data.body = await Gun.SEA.decrypt(data.body, secret);
@@ -88,7 +89,7 @@ self.addEventListener('push', async ev => {
   }
   self.registration.showNotification(data.title || 'No title', {
     body: data.body || 'No text',
-    icon: '/assets/img/icon128.png'
+    icon: '/assets/img/icon128.png',
   });
 });
 
