@@ -18,7 +18,7 @@ class Chat extends View {
       chat = html`<${PrivateChat} id=${this.props.id} key=${this.props.id} />`;
     }
     return html`
-      <${ChatList} class=${this.props.id || this.props.hashtag ? 'hidden-xs' : ''}/>
+      <${ChatList} activeChat=${this.props.id} class=${this.props.id || this.props.hashtag ? 'hidden-xs' : ''}/>
       ${chat}
     `;
   }

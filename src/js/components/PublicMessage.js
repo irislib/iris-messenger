@@ -69,7 +69,6 @@ async (serialized, a, b, event) => {
       const msg = r.signedData;
       msg.info = {from: r.signerKeyHash};
       if (this.props.filter) {
-        this.measure();
         if (!this.props.filter(msg)) {
           return;
         }
@@ -107,12 +106,7 @@ async (serialized, a, b, event) => {
     });
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.showLikes !== prevState.showLikes || this.state.showReplyForm !== prevState.showReplyForm) {
-      this.measure();
-    } else if (this.state.msg && this.state.msg !== prevState.msg) {
-      this.measure();
-    }
+  componentDidUpdate() {
     if (this.state.msg && !this.linksDone) {
       $(this.base).find('a').off().on('click', e => {
         const href = $(e.target).attr('href');
@@ -123,10 +117,6 @@ async (serialized, a, b, event) => {
       });
       this.linksDone = true;
     }
-  }
-
-  measure() {
-    this.props.measure && this.props.measure();
   }
 
   toggleReplies() {
@@ -211,7 +201,7 @@ async (serialized, a, b, event) => {
     const s = this.state;
 
     return html`
-      <div ref=${this.ref} class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''}">
+      <div ref=${this.ref} class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone ? 'standalone' : ''}">
         <div class="msg-content">
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${() => this.onClickName()}>
@@ -240,12 +230,12 @@ async (serialized, a, b, event) => {
             <//>
           ` : ''}
           ${s.msg.torrentId ? html`
-              <${Torrent} measure=${this.props.measure} torrentId=${s.msg.torrentId} autopause=${!this.props.standalone}/>
+              <${Torrent} torrentId=${s.msg.torrentId} autopause=${!this.props.standalone}/>
           `:''}
           ${s.msg.attachments && s.msg.attachments.map(a =>
             html`<div class="img-container">
                 <div class="heart"></div>
-                <${SafeImg} src=${a.data} onLoad=${() => this.measure()} onClick=${e => { this.imageClicked(e); }}/>
+                <${SafeImg} src=${a.data} onClick=${e => { this.imageClicked(e); }}/>
             </div>`
           )}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
@@ -282,7 +272,7 @@ async (serialized, a, b, event) => {
             </div>
           `: ''}
           ${(this.props.showReplies || s.showReplyForm) && s.sortedReplies && s.sortedReplies.length ? s.sortedReplies.map(r =>
-            html`<${PublicMessage} measure=${this.props.measure} key=${r.hash} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
+            html`<${PublicMessage} key=${r.hash} hash=${r.hash} asReply=${true} showName=${true} showReplies=${true} />`
           ) : ''}
           ${this.props.standalone || s.showReplyForm ? html`
             <${FeedMessageForm} autofocus=${!this.props.standalone} replyingTo=${this.props.hash} replyingToUser=${s.msg.info.from} />

@@ -2237,4 +2237,7 @@ form.public {
   .visible-xs-block, .visible-xs-inline-block, .visible-xs-flex {
     display: none !important;
   }
+  .msg.standalone {
+      margin-top: 15px;
+  }
 }

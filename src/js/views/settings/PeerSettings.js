@@ -16,7 +16,7 @@ export default class PeerSettings extends Component {
   componentDidMount() {
     State.local.get('settings').on(this.inject('local'));
     this.updatePeersFromGun();
-    this.updatePeersFromGunInterval = setInterval(() => this.updatePeersFromGun(), 2000);
+    this.updatePeersFromGunInterval = setInterval(() => this.updatePeersFromGun(), 1000);
   }
 
   componentWillUnmount() {
