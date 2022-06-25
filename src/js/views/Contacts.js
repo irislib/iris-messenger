@@ -8,6 +8,7 @@ import View from './View';
 import Session from '../Session';
 import ScrollViewport from 'preact-scroll-viewport';
 
+// TODO: add group selector
 class Contacts extends View {
   constructor() {
     super();

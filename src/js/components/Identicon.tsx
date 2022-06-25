@@ -3,7 +3,7 @@ import { html } from 'htm/preact';
 import State from '../State';
 import SafeImg from './SafeImg';
 import iris from '../iris-lib';
-import $ from 'jquery';
+import Identicon from 'identicon.js';
 
 type Activity = {
   time: string;
@@ -23,42 +23,28 @@ type State = {
   photo: string | null;
   name: string | null;
   activity: string | null;
+  identicon: string | null;
 };
 
-class Identicon extends Component<Props, State> {
-  identicon?: HTMLElement;
-  base?: HTMLElement;
+class MyIdenticon extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
 
-  shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
-    return nextProps.str !== this.props.str
-      || nextProps.hidePhoto !== this.props.hidePhoto
-      || nextState.photo !== this.state.photo
-      || nextState.name !== this.state.name
-      || nextState.activity !== this.state.activity
-  }
-
-  componentDidUpdate(prevProps: Props): void {
-    if (prevProps.str !== this.props.str && this.base !== undefined) {
-      $(this.base).empty();
-      this.componentDidMount();
-    }
-    if (prevProps.hidePhoto !== this.props.hidePhoto && this.identicon !== undefined) {
-      $(this.identicon).toggle(!this.state.photo || this.props.hidePhoto);
-    }
+  updateIdenticon() {
+    iris.util.getHash(this.props.str, `hex`)
+      .then(hash => {
+        const identicon = new Identicon(hash, {width: this.props.width, format: `svg`});
+        this.setState({identicon: `data:image/svg+xml;base64,${identicon.toString()}`});
+      });
   }
 
   componentDidMount() {
     const pub = this.props.str;
     if (!pub) { return; }
-    this.identicon = new iris.Attribute({type: 'keyID', value: pub}).identicon({width: this.props.width, showType: false});
-    if (this.base !== undefined && this.identicon !== undefined) {
-      this.base.appendChild(this.identicon);
-    }
+
+    this.updateIdenticon();
+
     if (!this.props.hidePhoto) {
       State.public.user(pub).get('profile').get('photo').on(this.inject()); // TODO: limit size
-    } else if (this.identicon !== undefined) {
-      $(this.identicon).show();
     }
 
     this.setState({activity: null});
@@ -98,9 +84,9 @@ class Identicon extends Component<Props, State> {
     const hasPhotoStyle = hasPhoto ? 'has-photo' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
     return (
-      <div onClick={this.props.onClick} style={{position: 'relative', cursor: this.props.onClick ? 'pointer' : undefined}} class={`identicon-container ${hasPhotoStyle} ${showTooltip} ${activity}`}>
+      <div onClick={this.props.onClick} style={{position: 'relative', width: `${width}px`, height: `${width}px`, cursor: this.props.onClick ? 'pointer' : undefined}} class={`identicon-container ${hasPhotoStyle} ${showTooltip} ${activity}`}>
         <div style={{width: width, height: width}} class="identicon">
-          {hasPhoto ? <SafeImg src={this.state.photo} class="identicon-image" width={width}/> : null}
+          {hasPhoto ? <SafeImg src={this.state.photo} width={width}/> : <img width={width} src={this.state.identicon} />}
         </div>
         {this.props.showTooltip && this.state.name ? html`<span class="tooltiptext">${this.state.name}</span>` : ''}
         {this.props.activity ? <div class="online-indicator"/> : null}
@@ -109,4 +95,4 @@ class Identicon extends Component<Props, State> {
   }
 }
 
-export default Identicon;
+export default MyIdenticon;

@@ -6101,7 +6101,7 @@ idb@^6.1.4:
 
 identicon.js@^2.3.3:
   version "2.3.3"
-  resolved "https://registry.npmjs.org/identicon.js/-/identicon.js-2.3.3.tgz"
+  resolved "https://registry.yarnpkg.com/identicon.js/-/identicon.js-2.3.3.tgz#c505b8d60ecc6ea13bbd991a33964c44c1ad60a1"
   integrity sha512-/qgOkXKZ7YbeCYbawJ9uQQ3XJ3uBg9VDpvHjabCAPp6aRMhjLaFAxG90+1TxzrhKaj6AYpVGrx6UXQfQA41UEA==
 
 identity-obj-proxy@^3.0.0:

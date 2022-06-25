@@ -123,7 +123,7 @@ class Channel {
         this.uuid = options.uuid;
         this.name = options.name;
       } else {
-        options.uuid = Attribute.getUuid().value;
+        options.uuid = util.getUuid();
         this.uuid = options.uuid;
         options.participants[this.key.pub].admin = true;
         options.participants[this.key.pub].founder = true;
