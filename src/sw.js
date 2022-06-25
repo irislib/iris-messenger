@@ -75,6 +75,8 @@ self.addEventListener('push', async ev => {
   if (!data.title || !data.body) {
     console.log('what?', data);
   }
+  console.log('sw push', data);
+  //console.log(self.irisKey, data.from, data.from.epub);
   if (self.irisKey && data.from && data.from.epub) {
     const secret = await Gun.SEA.secret(data.from.epub, self.irisKey);
     data.title = await Gun.SEA.decrypt(data.title, secret);

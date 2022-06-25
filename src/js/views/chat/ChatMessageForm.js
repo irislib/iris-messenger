@@ -33,11 +33,15 @@ class ChatMessageForm extends MessageForm {
 
   sendToPrivateOrGroup() {
     const chat = Session.channels[this.props.activeChat];
+    if (!chat) {
+      console.error("no chat", this.props.activeChat, "found");
+      return;
+    }
     State.local.get('channels').get(this.props.activeChat).get('msgDraft').put(null);
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length && !chat.attachments) { return; }
-    chat.setTyping(false);
+    chat.setTyping && chat.setTyping(false);
     const msg = {text};
     if (this.props.replyingTo) {
       msg.replyingTo = this.props.replyingTo;
@@ -174,7 +178,7 @@ class ChatMessageForm extends MessageForm {
   async webPush(msg) {
     const chat = Session.channels[this.props.activeChat];
     const myKey = Session.getKey();
-    const shouldWebPush = (window.location.hash === `#/chat/${  myKey.pub}`) || !(chat.activity.isActive);
+    const shouldWebPush = (this.props.activeChat === myKey.pub) || !(chat.activity && chat.activity.isActive);
     if (shouldWebPush && chat.webPushSubscriptions) {
       const subscriptions = [];
       const participants = Object.keys(chat.webPushSubscriptions);
@@ -189,7 +193,11 @@ class ChatMessageForm extends MessageForm {
           body: await Gun.SEA.encrypt(bodyText, secret),
           from:{pub: myKey.pub, epub: myKey.epub}
         };
-        chat.webPushSubscriptions[participant].forEach(s => subscriptions.push({subscription: s, payload}));
+        chat.webPushSubscriptions[participant].forEach(s => {
+          if (s && s.endpoint) {
+            subscriptions.push({subscription: s, payload});
+          }
+        });
       }
       fetch(notificationServiceUrl, {
         method: 'POST',
