@@ -101,6 +101,8 @@ class Settings extends View {
         <p><input type="checkbox" checked=${this.state.local.enableWebtorrent} onChange=${() => State.local.get('settings').get('enableWebtorrent').put(!this.state.local.enableWebtorrent)} id="enableWebtorrent"/><label for="enableWebtorrent">${t('automatically_load_webtorrent_attachments')}</label></p>
         <p><input type="checkbox" checked=${this.state.local.autoplayWebtorrent} onChange=${() => State.local.get('settings').get('autoplayWebtorrent').put(!this.state.local.autoplayWebtorrent)} id="autoplayWebtorrent"/><label for="autoplayWebtorrent">${t('autoplay_webtorrent_videos')}</label></p>
         <hr/>
+        <h3>Show beta features</h3>
+        <p><input type="checkbox" checked=${this.state.local.showBetaFeatures} onChange=${() => State.local.get('settings').get('showBetaFeatures').put(!this.state.local.showBetaFeatures)} id="showBetaFeatures"/><label for="showBetaFeatures">${t('show_beta_features')}</label></p>
         <h3>${t('webrtc_connection_options')}</h3>
         <p><small>${t('webrtc_info')}</small></p>
         <p><textarea rows="4" id="rtc-config" placeholder="${t('webrtc_connection_options')}" onChange=${e => this.rtcConfigChanged(e)}></textarea></p>
