@@ -251,11 +251,8 @@ class Profile extends View {
         this.setState({followedUserCount: this.followedUsers.size});
       }
     ));
-    State.group().on(`follow/${pub}`, this.sub((following, a, b, e, user) => {
-      if (following) {
-        this.followers.add(user);
-        this.setState({followerCount: this.followers.size});
-      }
+    State.group().count(`follow/${pub}`, this.sub((followerCount) => {
+      this.setState({followerCount});
     }));
     State.public.user(pub).get('profile').get('name').on(this.sub(
       name => {

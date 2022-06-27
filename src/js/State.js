@@ -113,7 +113,22 @@ const State = {
         }
       },
 
-      _cached_map_or_on(fn, path, callback) {
+      _cached_count(cached, cacheKey, path, myEvent, callback) {
+        if (!cached) {
+          _this.cache.set(cacheKey, new Map());
+          this.get(path, (node, from) => node.on((value, key) => {
+            value ? _this.cache.get(cacheKey).set(from, true) : _this.cache.get(cacheKey).delete(from);
+            const count = _this.cache.get(cacheKey).size;
+            for (let cb of _this.callbacks.get(cacheKey).values()) {
+              cb(count, key, null, myEvent, from);
+            }
+          }));
+        } else {
+          callback(_this.cache.get(cacheKey).size, path.split('/').pop(), null, myEvent);
+        }
+      },
+
+      _cached_fn(fn, path, callback) {
         const cacheKey = fn + ':' + groupName + ':' + path;
 
         let id = _this.counterNext();
@@ -130,19 +145,29 @@ const State = {
 
         const cached = _this.cache.get(cacheKey);
 
-        if (fn === 'map') {
-          this._cached_map(cached, cacheKey, path, myEvent, callback);
-        } else {
-          this._cached_on(cached, cacheKey, path, myEvent, callback);
+        switch (fn) {
+          case 'map':
+            this._cached_map(cached, cacheKey, path, myEvent, callback);
+            break;
+          case 'on':
+            this._cached_on(cached, cacheKey, path, myEvent, callback);
+            break;
+          case 'count':
+            this._cached_count(cached, cacheKey, path, myEvent, callback);
+            break;
         }
       },
 
       map(path, callback) { // group queries are slow, so we cache them
-        this._cached_map_or_on('map', path, callback);
+        this._cached_fn('map', path, callback);
       },
 
       on(path, callback) {
-        this._cached_map_or_on('on', path, callback);
+        this._cached_fn('on', path, callback);
+      },
+
+      count(path, callback) {
+        this._cached_fn('count', path, callback);
       }
     }
   },

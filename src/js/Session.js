@@ -71,6 +71,8 @@ function removeFollow(k, followDistance, follower) {
   }
 }
 
+// TODO: this is still a performance issue. With throttle, follower graph / counts are not correctly updated
+// without throttle, it hogs memory and cpu
 const getExtendedFollows = _.throttle((callback, k, maxDepth = 3, currentDepth = 1) => {
   k = k || key.pub;
 
