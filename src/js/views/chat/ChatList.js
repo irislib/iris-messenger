@@ -28,6 +28,7 @@ class ChatList extends Component {
           this.state.chats.has(id) && this.setState({chats: this.state.chats.delete(id)});
           return;
         }
+        chat.latestTime = chat.latestTime || '';
         chat.id = id;
         this.setState({chats: this.state.chats.set(id, chat)});
       }
@@ -55,7 +56,7 @@ class ChatList extends Component {
 
   render() {
     const activeChat = this.props.activeChat;
-    const sortedChats = _.sortBy(Array.from(this.state.chats.values()), chat => chat.latestTime || '').reverse();
+    const sortedChats = _.orderBy(Array.from(this.state.chats.values()), ['latestTime', 'name'], ['desc', 'asc']);
     return html`<section class="sidebar ${this.props.class || ''}">
       <div id="enable-notifications-prompt" onClick=${() => Notifications.enableDesktopNotifications()}>
         <div class="title">${t('get_notified_new_messages')}</div>
