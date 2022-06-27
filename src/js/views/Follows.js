@@ -54,10 +54,13 @@ class Follows extends View {
 
   renderView() {
     const keys = Object.keys(this.follows);
-    keys.sort((a,b) => {
-      const aF = this.follows[a].followers && this.follows[a].followers.size || 0;
-      const bF = this.follows[b].followers && this.follows[b].followers.size || 0;
-      return bF - aF;
+    keys.sort((aK,bK) => {
+      const a = this.follows[aK];
+      const b = this.follows[bK];
+      if (!a.name && !b.name) { return aK.localeCompare(bK); }
+      if (!a.name) { return 1; }
+      if (!b.name) { return -1; }
+      return a.name.localeCompare(b.name);
     });
     return html`
       <div class="centered-container">
