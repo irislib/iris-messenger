@@ -131,16 +131,16 @@ const State = {
       _cached_fn(fn, path, callback) {
         const cacheKey = fn + ':' + groupName + ':' + path;
 
-        let id = _this.counterNext();
+        let callbackId = _this.counterNext();
         if (_this.callbacks.has(cacheKey)) {
-          _this.callbacks.get(cacheKey).set(id, callback);
+          _this.callbacks.get(cacheKey).set(callbackId, callback);
         } else {
-          _this.callbacks.set(cacheKey, new Map([[id, callback]]));
+          _this.callbacks.set(cacheKey, new Map([[callbackId, callback]]));
         }
 
         const myEvent = {off: () => {
           let callbacks = _this.callbacks.get(cacheKey);
-          callbacks && callbacks.delete(id);
+          callbacks && callbacks.delete(callbackId);
         }};
 
         const cached = _this.cache.get(cacheKey);

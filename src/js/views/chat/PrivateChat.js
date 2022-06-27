@@ -155,7 +155,6 @@ export default class PrivateChat extends Component {
 
     $('.msg-content img').off('load').on('load', () => this.state.stickToBottom && Helpers.scrollToMessageListBottom());
       setTimeout(() => {
-        console.log(this.props.id, Session.getPubKey());
         if (this.chat && !this.chat.uuid && this.props.id !== Session.getPubKey()) {
           if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
             $('#not-seen-by-them').slideDown();
