@@ -15,6 +15,10 @@ class ChatListItem extends Component {
     this.state = {latest: {}};
   }
 
+  shouldComponentUpdate() {
+    return true;
+  }
+
   componentDidMount() {
     const chat = this.props.chat;
     State.local.get('channels').get(chat.id).get('latest').on(this.sub(

@@ -13,28 +13,23 @@ import $ from 'jquery';
 class ChatList extends Component {
   constructor() {
     super();
-    this.state = {chats: [], hashtags: {}};
+    this.state = {chats: new Map(), hashtags: {}};
+  }
+
+  shouldComponentUpdate() {
+    return true;
   }
 
   componentDidMount() {
-    const chats = {};
     const hashtags = {};
-    const limitedUpdate = _.debounce(() => {
-      const sortedChats = Object.values(chats)
-        .filter(chat => chat.id !== 'public')
-        .filter(chat => !!chat)
-        .sort((a, b) => {
-          if (b.latestTime === undefined || a.latestTime > b.latestTime) return -1;
-          return 1;
-        });
-      this.setState({chats: sortedChats});
-    }, 200);
     State.local.get('channels').map().on(this.sub(
       (chat, id) => {
-        if (!chat) { return; }
+        if (!chat) {
+          this.state.chats.has(id) && this.setState({chats: this.state.chats.delete(id)});
+          return;
+        }
         chat.id = id;
-        chats[id] = chat;
-        limitedUpdate();
+        this.setState({chats: this.state.chats.set(id, chat)});
       }
     ));
     State.local.get('scrollUp').on(this.sub(
@@ -60,6 +55,7 @@ class ChatList extends Component {
 
   render() {
     const activeChat = this.props.activeChat;
+    const sortedChats = _.sortBy(Array.from(this.state.chats.values()), chat => chat.latestTime || '').reverse();
     return html`<section class="sidebar ${this.props.class || ''}">
       <div id="enable-notifications-prompt" onClick=${() => Notifications.enableDesktopNotifications()}>
         <div class="title">${t('get_notified_new_messages')}</div>
@@ -74,7 +70,7 @@ class ChatList extends Component {
           ${t('new_chat')}
         </div>
         <${ScrollViewport}>
-          ${this.state.chats.map(chat =>
+          ${sortedChats.map(chat =>
             html`<${ChatListItem}
               photo=${chat.photo}
               active=${chat.id === activeChat}
