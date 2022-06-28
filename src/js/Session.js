@@ -352,7 +352,7 @@ function addChannel(chat) {
     if (t && (!chat.latestTime || t > chat.latestTime)) {
       chat.latestTime = t;
     } else {
-      chatNode.get('latestTime').put(chat.latestTime);
+      // chatNode.get('latestTime').put(chat.latestTime); // omg recursion?
     }
   });
   chatNode.get('theirMsgsLastSeenTime').on(t => {
