@@ -11,13 +11,25 @@ import _ from 'lodash';
 
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
-class SearchBox extends Component {
+type Props = {
+  onSelect?: (key: string) => void;
+  query?: string;
+  focus?: boolean;
+};
+
+type State = {
+  results: Array<Object>;
+  query: string;
+}
+
+class SearchBox extends Component<Props, State> {
+  debouncedIndexAndSearch = _.debounce(() => {
+    this.search();
+  }, 200);
+
   constructor() {
     super();
-    this.state = {results:[]};
-    this.debouncedIndexAndSearch = _.debounce(() => {
-      this.search();
-    }, 200);
+    this.state = {results:[], query: ''};
   }
 
   onInput() {
