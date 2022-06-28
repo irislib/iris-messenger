@@ -9390,6 +9390,11 @@ postcss@^8.2.1, postcss@^8.2.10, postcss@^8.2.15:
     picocolors "^1.0.0"
     source-map-js "^1.0.1"
 
+preact-async-route@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/preact-async-route/-/preact-async-route-2.2.1.tgz#729f8f8650281973251fbbf852d5004f32f48594"
+  integrity sha512-8bg1007akXs3YDmzYT4McaTe6ji2FIzcc0/NTlu+vjJaKPNQ8lNG/HQ6LP+FoIxQ4m/KH5vvJCHJN5ADp2iNGA==
+
 preact-cli@^3.2.2:
   version "3.3.5"
   resolved "https://registry.npmjs.org/preact-cli/-/preact-cli-3.3.5.tgz"

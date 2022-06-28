@@ -1,5 +1,6 @@
 import Component from './BaseComponent';
 import { Router, RouterOnChangeArgs, CustomHistory } from 'preact-router';
+import AsyncRoute from 'preact-async-route';
 import { createHashHistory } from 'history';
 import {Helmet} from "react-helmet";
 
@@ -13,9 +14,6 @@ import LogoutConfirmation from './views/LogoutConfirmation';
 import Chat from './views/chat/Chat';
 import Notifications from './views/Notifications';
 import Hashtags from './views/Hashtags';
-import Store from './views/Store';
-import Checkout from './views/Checkout';
-import Product from './views/Product';
 import Login from './views/Login';
 import Profile from './views/Profile';
 import Group from './views/Group';
@@ -23,7 +21,6 @@ import Message from './views/Message';
 import Follows from './views/Follows';
 import Feed from './views/Feed';
 import About from './views/About';
-import Explorer from './views/Explorer';
 import Contacts from './views/Contacts';
 import Torrent from './views/Torrent';
 
@@ -153,12 +150,33 @@ class Main extends Component<Props,State> {
               <Profile path="/likes/:id+" tab="likes"/>
               <Profile path="/media/:id+" tab="media"/>
               <Group path="/group/:id+"/>
-              <Store path="/store/:store?"/>
-              <Checkout path="/checkout/:store?"/>
-              <Product path="/product/:product/:store"/>
-              <Product path="/product/new" store={Session.getPubKey()}/>
-              <Explorer path="/explorer/:node"/>
-              <Explorer path="/explorer"/>
+              {/* Lazy load stuff that is used less often */}
+              <AsyncRoute
+                 path="/store/:store?"
+                getComponent={() => import('./views/Store').then(module => module.default)}
+              />
+              <AsyncRoute
+                 path="/checkout/:store?"
+                getComponent={() => import('./views/Checkout').then(module => module.default)}
+              />
+              <AsyncRoute
+                 path="/product/:product/:store"
+                getComponent={() => import('./views/Product').then(module => module.default)}
+              />
+              <AsyncRoute
+                 path="/product/new"
+                  store={Session.getPubKey()}
+                getComponent={() => import('./views/Product').then(module => module.default)}
+              />
+              <AsyncRoute
+                 path="/explorer/:node"
+                getComponent={() => import('./views/Explorer').then(module => module.default)}
+              />
+              <AsyncRoute
+                 path="/explorer"
+                  store={Session.getPubKey()}
+                getComponent={() => import('./views/Explorer').then(module => module.default)}
+              />
               <Follows path="/follows/:id"/>
               <Follows followers={true} path="/followers/:id"/>
               <Contacts path="/contacts"/>
