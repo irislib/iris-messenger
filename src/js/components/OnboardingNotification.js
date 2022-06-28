@@ -4,6 +4,7 @@ import Identicon from "./Identicon";
 import FollowButton from "./FollowButton";
 import Session from "../Session";
 import CopyButton from "./CopyButton";
+import Text from "./Text";
 import Helpers from "../Helpers";
 import Component from "../BaseComponent";
 import State from "../State";
@@ -25,7 +26,7 @@ export default class OnboardingNotification extends Component {
             <div class="profile-link-container">
               <a href="/profile/${SUGGESTED_FOLLOW}" class="profile-link">
                 <${Identicon} str=${SUGGESTED_FOLLOW} width=40 />
-                <iris-text path="profile/name" user=${SUGGESTED_FOLLOW} placeholder="Suggested follow"/>
+                <${Text} path="profile/name" user=${SUGGESTED_FOLLOW} placeholder="Suggested follow"/>
               </a>
               <${FollowButton} id=${SUGGESTED_FOLLOW} />
             </div>

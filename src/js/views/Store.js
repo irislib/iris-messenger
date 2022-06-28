@@ -5,6 +5,7 @@ import Session from '../Session';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';
+import Text from '../components/Text';
 import Filters from '../components/Filters';
 import CopyButton from '../components/CopyButton';
 import FollowButton from '../components/FollowButton';
@@ -50,10 +51,10 @@ class Store extends View {
               ${profilePhoto}
             </div>
             <div class="profile-header-stuff">
-              <h3 class="profile-name"><iris-text path= ${t('profile_name')} placeholder= ${t('name')} user=${user}/></h3>
+              <h3 class="profile-name"><${Text} path= ${t('profile_name')} placeholder= ${t('name')} user=${user}/></h3>
               <div class="profile-about hidden-xs">
                 <p class="profile-about-content">
-                  <iris-text path="store/about" placeholder=${t('store_description')} attr="about" user=${user}/>
+                  <${Text} path="store/about" placeholder=${t('store_description')} attr="about" user=${user}/>
                 </p>
               </div>
               <div class="profile-actions">
@@ -111,7 +112,7 @@ class Store extends View {
               <${SafeImg} src=${i.photo || ''}/>
               <a href="/product/${k}/${i.from || this.props.store}" class="name">${i.name}</a>
               ${this.props.store ? '':html`
-                <small>by <iris-text path="profile/name" editable="false" placeholder="Name" user=${i.from}/></small>
+                <small>by <${Text} path="profile/name" editable="false" placeholder="Name" user=${i.from}/></small>
               `}
               <p class="description">${i.description}</p>
               <p class="price">${i.price}</p>

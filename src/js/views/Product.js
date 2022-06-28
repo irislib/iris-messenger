@@ -4,6 +4,7 @@ import Session from '../Session';
 import {translate as t} from '../Translation';
 import { route } from 'preact-router';
 import StoreView from './Store';
+import Text from '../components/Text';
 
 class Product extends StoreView {
   constructor() {
@@ -21,7 +22,7 @@ class Product extends StoreView {
     return html`
       <div class="main-view" id="profile">
         <div class="content">
-          <a href="/store/${Session.getPubKey()}"><iris-text path="profile/name" placeholder=${t('name')}  user=${Session.getPubKey()} /></a>
+          <a href="/store/${Session.getPubKey()}"><${Text} path="profile/name" placeholder=${t('name')}  user=${Session.getPubKey()} /></a>
           <h3> ${t('add_item')}</h3>
           <h2 contenteditable placeholder=${t('item_id')} onInput=${e => this.newProductName = e.target.innerText} />
           <textarea placeholder=${t('item_description')} onInput=${e => this.newProductDescription = e.target.value} style="resize: vertical"/>
@@ -53,20 +54,20 @@ class Product extends StoreView {
     return html`
     <div class="main-view" id="profile">
       <div class="content">
-        <a href="/store/${this.props.store}"><iris-text editable="false" path="profile/name" user=${this.props.store}/></a>
+        <a href="/store/${this.props.store}"><${Text} editable="false" path="profile/name" user=${this.props.store}/></a>
         ${cartTotalItems ? html`
           <p>
             <button onClick=${() => route(`/checkout/${  this.props.store}`)}>${t('shopping_cart')} (${cartTotalItems})</button>
           </p>
         ` : ''}
         ${this.state.product ? html`
-          <iris-text tag="h3" user=${this.props.store} path="store/products/${this.props.product}/name"/>
+          <${Text} tag="h3" user=${this.props.store} path="store/products/${this.props.product}/name"/>
           <iris-img btn-class="btn btn-primary" user=${this.props.store} path="store/products/${this.props.product}/photo"/>
           <p class="description">
-            <iris-text user=${this.props.store} path="store/products/${this.props.product}/description"/>
+            <${Text} user=${this.props.store} path="store/products/${this.props.product}/description"/>
           </p>
           <p class="price">
-            <iris-text placeholder=${t('price')} user=${this.props.store} path="store/products/${this.props.product}/price"/>
+            <${Text} placeholder=${t('price')} user=${this.props.store} path="store/products/${this.props.product}/price"/>
           </p>
           <button class="add" onClick=${() => this.addToCart()}>
             ${t('add_to_cart')}

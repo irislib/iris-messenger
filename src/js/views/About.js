@@ -4,6 +4,7 @@ import { html } from 'htm/preact';
 import View from './View';
 import Identicon from '../components/Identicon';
 import FollowButton from '../components/FollowButton';
+import Text from '../components/Text';
 
 const DEVELOPER = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
@@ -63,7 +64,7 @@ class About extends View {
         <div class="profile-link-container">
           <a href="/profile/${DEVELOPER}" class="profile-link">
             <${Identicon} str=${DEVELOPER} width=40 />
-            <iris-text path="profile/name" user=${DEVELOPER} placeholder="Iris developer's account"/>
+            <${Text} path="profile/name" user=${DEVELOPER} placeholder="Iris developer's account"/>
           </a>
           <${FollowButton} id=${DEVELOPER} />
         </div>

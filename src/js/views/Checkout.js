@@ -5,6 +5,7 @@ import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';
 import Store from './Store';
 import {translate as t} from '../Translation';
+import Text from '../components/Text';
 
 class Checkout extends Store {
   constructor() {
@@ -167,7 +168,7 @@ class Checkout extends Store {
           return html`
             <p>
               <a href="/checkout/${user}">
-                <iris-text path= ${t('profile_name')} user=${user} editable="false"/> (${cartTotalItems})
+                <${Text} path= ${t('profile_name')} user=${user} editable="false"/> (${cartTotalItems})
               </a>
             </p>
           `;
@@ -195,7 +196,7 @@ class Checkout extends Store {
     <div class="main-view" id="profile">
       <div class="content">
         <p>
-          <a href="/store/${this.props.store}"><iris-text path="profile/name" user=${this.props.store}/></a>
+          <a href="/store/${this.props.store}"><${Text} path="profile/name" user=${this.props.store}/></a>
         </p>
         <div id="store-steps">
           <div class=${p === 'cart' ? 'active' : ''} onClick=${() => this.setState({page:'cart'})}>${t('shopping_cart')}</div>

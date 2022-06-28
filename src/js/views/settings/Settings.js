@@ -6,6 +6,7 @@ import LanguageSelector from '../../components/LanguageSelector';
 import {translate as t} from '../../Translation';
 import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../../components/VideoCall';
 import CopyButton from '../../components/CopyButton';
+import Text from '../../components/Text';
 import View from '../View';
 import { route } from 'preact-router';
 import {ExistingAccountLogin} from '../Login';
@@ -111,7 +112,7 @@ class Settings extends View {
         <h3>${t('blocked_users')}</h3>
         ${blockedUsers.map(user => {
           if (this.state.blockedUsers[user]) {
-            return html`<p><a href="/profile/${encodeURIComponent(user)}"><iris-text user=${user} path="profile/name" placeholder="User"/></a></p>`;
+            return html`<p><a href="/profile/${encodeURIComponent(user)}"><${Text} user=${user} path="profile/name" placeholder="User"/></a></p>`;
           }
         })}
         ${blockedUsers.length === 0 ? t('none') : ''}
