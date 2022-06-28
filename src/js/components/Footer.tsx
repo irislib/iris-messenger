@@ -48,9 +48,9 @@ class Footer extends Component<Props, State> {
               {this.state.unseenMsgsTotal ? <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>: ''}
               {Icons.chat}
             </a>
-            <a href="/post/new" class="btn ${activeRoute === '/post/new' ? 'active' : ''}">{plusIcon}</a>
-            <a href="/contacts" class="btn ${activeRoute === '/contacts' ? 'active' : ''}">{Icons.user}</a>
-            <a href="/profile/${key}" class="${activeRoute === `/profile/${  key}` ? 'active' : ''} my-profile">
+            <a href="/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>{plusIcon}</a>
+            <a href="/contacts" class={`btn ${activeRoute === '/contacts' ? 'active' : ''}`}>{Icons.user}</a>
+            <a href={`/profile/${key}`} class={`${activeRoute === `/profile/${  key}` ? 'active' : ''} my-profile`}>
               <Identicon str={key} width={34} />
             </a>
           </div>
