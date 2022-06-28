@@ -57,7 +57,7 @@ class SearchBox extends Component<Props, State> {
   }
 
   componentDidMount() {
-    State.local.get('groups').get('everyone').map().on(this.sub(
+    State.local.get('groups').get('everyone').map(this.sub(
       () => {
         if (this.state.noFollows && Object.keys(Session.getFollows()).length > 1) {
           this.setState({noFollows: false});

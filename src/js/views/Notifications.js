@@ -13,7 +13,7 @@ export default class Notifications extends View {
 
   componentDidMount() {
     NotificationTools.changeUnseenNotificationCount(0);
-    State.local.get('notifications').map().on(this.sub(
+    State.local.get('notifications').map(this.sub(
       (notification, time) => {
         if (notification) {
           this.notifications[time] = notification;

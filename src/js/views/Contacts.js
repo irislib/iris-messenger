@@ -22,7 +22,7 @@ class Contacts extends View {
 
   componentDidMount() {
     const f = Session.getFollows();
-    State.local.get('groups').get('everyone').map().on(this.sub(
+    State.local.get('groups').get('everyone').map(this.sub(
       (isContact, pub) => {
         if (pub === Session.getPubKey()) { return; }
         if (isContact) {

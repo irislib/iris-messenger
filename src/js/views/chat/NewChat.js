@@ -73,7 +73,7 @@ class NewChat extends Component {
   }
 
   componentDidMount() {
-    State.local.get('chatLinks').map().on(this.sub(
+    State.local.get('chatLinks').map(this.sub(
       (url, id) => {
         if (url) {
           if (typeof url !== 'string' || url.indexOf('http') !== 0) return;

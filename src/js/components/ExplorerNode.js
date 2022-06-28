@@ -70,7 +70,7 @@ class ExplorerNode extends BaseComponent {
     }
     if (this.isGroupRoot) {
       const groups = {};
-      State.local.get('groups').map().on(this.sub(
+      State.local.get('groups').map(this.sub(
         (v,k) => {
           if (v) {
             groups[k] = true;

@@ -155,7 +155,7 @@ class Store extends View {
   }
 
   getCartFromUser(user) {
-    State.local.get('cart').get(user).map().on(this.sub(
+    State.local.get('cart').get(user).map(this.sub(
       (v, k) => {
         if (k === '#') { return; } // blah
         this.cart[k + user] = v;
