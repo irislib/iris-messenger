@@ -85,7 +85,7 @@ const getExtendedFollows = _.throttle((callback, k, maxDepth = 3, currentDepth =
       if (isFollowing) {
         addFollow(callback, followedKey, currentDepth, k);
         if (currentDepth < maxDepth) {
-          getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1);
+          _.defer(() => getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1));
         }
       } else {
         removeFollow(followedKey, currentDepth, k);
