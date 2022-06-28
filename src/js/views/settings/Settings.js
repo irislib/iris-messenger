@@ -135,7 +135,11 @@ class Settings extends View {
     $('#rtc-config').val(JSON.stringify(getRTCConfig()));
 
     State.electron && State.electron.get('settings').on(this.inject('electron', 'electron'));
-    State.local.get('settings').on(this.inject('local', 'local'));
+    State.local.get('settings').on(this.sub(local => {
+      if (local) {
+        this.setState({local});
+      }
+    }));
     State.public.user().get('webPushSubscriptions').map().on(this.sub(
       () => this.setState({webPushSubscriptions: Notifications.webPushSubscriptions})
     ));

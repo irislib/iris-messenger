@@ -7,6 +7,7 @@ import { route } from 'preact-router';
 import iris from './iris-lib';
 import _ from 'lodash';
 import Fuse from "./lib/fuse.basic.esm.min";
+import localforage from './lib/localforage.min';
 
 let key;
 let myName;
@@ -287,7 +288,9 @@ async function logOut() {
   }
   clearIndexedDB();
   localStorage.clear();
-  location.reload();
+  localforage.clear().then(() => {
+    location.reload();
+  });
 }
 
 function getPubKey() {
