@@ -1,9 +1,9 @@
 import Component from '../BaseComponent';
 import { route } from 'preact-router';
 import Helpers from '../Helpers';
-import { html } from 'htm/preact';
 import State from '../State';
 import Identicon from './Identicon';
+import Text from './Text';
 import {translate as t} from '../Translation';
 import Session from '../Session';
 import $ from 'jquery';
@@ -15,11 +15,14 @@ type Props = {
   onSelect?: (key: string) => void;
   query?: string;
   focus?: boolean;
+  resultsOnly?: boolean;
+  class?: string;
 };
 
 type State = {
   results: Array<Object>;
   query: string;
+  noFollows: boolean;
 }
 
 class SearchBox extends Component<Props, State> {
@@ -29,7 +32,7 @@ class SearchBox extends Component<Props, State> {
 
   constructor() {
     super();
-    this.state = {results:[], query: ''};
+    this.state = {results:[], query: '', noFollows: true};
   }
 
   onInput() {
@@ -44,7 +47,9 @@ class SearchBox extends Component<Props, State> {
   componentDidMount() {
     State.local.get('groups').get('everyone').map().on(this.sub(
       () => {
-        this.noFollows = this.noFollows || Object.keys(Session.getFollows()).length > 1;
+        if (this.state.noFollows && Object.keys(Session.getFollows()).length > 1) {
+          this.setState({noFollows: false});
+        }
       }
     ));
     State.local.get('activeRoute').on(this.sub(
@@ -124,17 +129,17 @@ class SearchBox extends Component<Props, State> {
   }
 
   render() {
-    return html`
-      <div class="search-box ${this.props.class}">
-        ${this.props.resultsOnly ? '' : html`
-          <form onSubmit=${e => this.onSubmit(e)}>
+    return (
+      <div class={`search-box ${this.props.class}`}>
+        {this.props.resultsOnly ? '' : (
+          <form onSubmit={e => this.onSubmit(e)}>
             <label>
-              <input type="text" placeholder=${t('search')} onInput=${() => this.onInput()}/>
+              <input type="text" placeholder={t('search')} onInput={() => this.onInput()}/>
             </label>
           </form>
-        `}
+        )}
         <div class="search-box-results" style="left: ${this.offsetLeft || ''}">
-          ${this.state.results.map(r => {
+          {this.state.results.map(r => {
             const i = r.item;
             let followText = '';
             if (i.followDistance === 1) {
@@ -147,28 +152,33 @@ class SearchBox extends Component<Props, State> {
                 followText = `${  i.followers.size  } followers`;
               }
             }
-            return html`
-              <a href="/profile/${i.key}" onClick=${e => this.onClick(e, i)}>
-                <${Identicon} key=${`${i.key  }ic`} str=${i.key} width=40/>
+            return (
+              <a href={`/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
+                <Identicon key={`${i.key  }ic`} str={i.key} width={40} />
                 <div>
-                  ${i.name || ''}<br/>
+                  {i.name || ''}<br/>
                   <small>
-                    ${followText}
+                    {followText}
                   </small>
                 </div>
               </a>
-            `;
+            );
           })}
-          ${this.state.query && !this.noFollows ? html`
-            <a class="follow-someone">Follow someone to see more search results!</a>
-            <a href="/profile/${suggestedFollow}" class="suggested">
-              <${Identicon} str=${suggestedFollow} width=40/>
-              <i>Suggested</i>
-            </a>
-          ` : ''}
+          {this.state.query && this.state.noFollows ? (
+            <>
+              <a class="follow-someone">Follow someone to see more search results!</a>
+              <a href={`/profile/${suggestedFollow}`} class="suggested">
+                <Identicon str={suggestedFollow} width={40}/>
+                <div>
+                  <Text user={suggestedFollow} path="profile/name" /><br/>
+                  <small>Suggested</small>
+                </div>
+              </a>
+            </>
+          ) : ''}
         </div>
       </div>
-    `;
+    );
   }
 }
 
