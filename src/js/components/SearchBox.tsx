@@ -12,17 +12,29 @@ import _ from 'lodash';
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
 type Props = {
-  onSelect?: (key: string) => void;
+  onSelect?: (result: Object) => void;
   query?: string;
   focus?: boolean;
   resultsOnly?: boolean;
   class?: string;
 };
 
+type Result = {
+  item: ResultItem;
+}
+
+type ResultItem = {
+    key: string;
+    followers: Map<string, any>;
+    followDistance: number;
+    name?: string;
+}
+
 type State = {
-  results: Array<Object>;
+  results: Array<Result>;
   query: string;
   noFollows: boolean;
+  offsetLeft: number;
 }
 
 class SearchBox extends Component<Props, State> {
@@ -32,7 +44,7 @@ class SearchBox extends Component<Props, State> {
 
   constructor() {
     super();
-    this.state = {results:[], query: '', noFollows: true};
+    this.state = {results:[], query: '', noFollows: true, offsetLeft: 0};
   }
 
   onInput() {
@@ -74,7 +86,7 @@ class SearchBox extends Component<Props, State> {
   adjustResultsPosition() {
     const input = $(this.base).find('input');
     if (input.length) {
-      this.offsetLeft = input[0].offsetLeft;
+      this.setState({offsetLeft: input[0].offsetLeft});
     }
   }
 
@@ -88,7 +100,7 @@ class SearchBox extends Component<Props, State> {
   }
 
   search() {
-    const query = this.props.query || $(this.base).find('input').val();
+    const query = this.props.query || $(this.base).find('input')[0].value;
     if (!query) { return; }
 
     if (this.props.onSelect) {
@@ -138,7 +150,7 @@ class SearchBox extends Component<Props, State> {
             </label>
           </form>
         )}
-        <div class="search-box-results" style="left: ${this.offsetLeft || ''}">
+        <div class="search-box-results" style="left: ${this.state.offsetLeft || ''}">
           {this.state.results.map(r => {
             const i = r.item;
             let followText = '';
