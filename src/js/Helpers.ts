@@ -1867,7 +1867,7 @@ export default {
   highlightMentions(s: string): string {
     return s.replace(pubKeyRegex, match => {
       const user = match.slice(1);
-      return `<a href="/profile/${user}">@<${Text} user="${user}" path="profile/name" /></a>`;
+      return `<a href="/profile/${user}">@<iris-text user="${user}" path="profile/name" /></a>`;
     });
   },
 
