@@ -4,10 +4,11 @@ import Session from '../Session';
 import {createRef, RefObject, JSX} from "preact";
 
 type Props = {
-  json: boolean;
+  json?: boolean;
   path: string;
-  gun: unknown;
+  gun?: unknown;
   user: unknown;
+  placeholder?: string;
 };
 
 type State = {

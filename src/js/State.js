@@ -129,8 +129,8 @@ const State = {
       },
 
       _cached_fn(fn, path, callback) {
-        const cacheKey = fn + ':' + groupName + ':' + path;
-
+        const cacheKey = `${fn}:${groupName}:${path}`;
+        
         let callbackId = _this.counterNext();
         if (_this.callbacks.has(cacheKey)) {
           _this.callbacks.get(cacheKey).set(callbackId, callback);

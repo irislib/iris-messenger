@@ -12,9 +12,9 @@ type Activity = {
 
 type Props = {
   str: unknown;
-  hidePhoto: boolean;
-  showTooltip: boolean;
-  activity: string;
+  hidePhoto?: boolean;
+  showTooltip?: boolean;
+  activity?: string;
   onClick?: () => void;
   width: number;
 };
