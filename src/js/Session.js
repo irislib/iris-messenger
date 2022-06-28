@@ -76,22 +76,19 @@ function removeFollow(k, followDistance, follower) {
 const getExtendedFollows = _.throttle((callback, k, maxDepth = 3, currentDepth = 1) => {
   k = k || key.pub;
 
-  const shouldQuery = !follows[k];
   addFollow(callback, k, currentDepth - 1);
 
-  if (shouldQuery) {
-    State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
-      if (follows[followedKey] === isFollowing) { return; }
-      if (isFollowing) {
-        addFollow(callback, followedKey, currentDepth, k);
-        if (currentDepth < maxDepth) {
-          _.defer(() => getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1));
-        }
-      } else {
-        removeFollow(followedKey, currentDepth, k);
+  State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
+    if (follows[followedKey] === isFollowing) { return; }
+    if (isFollowing) {
+      addFollow(callback, followedKey, currentDepth, k);
+      if (currentDepth < maxDepth) {
+        _.defer(() => getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1));
       }
-    });
-  }
+    } else {
+      removeFollow(followedKey, currentDepth, k);
+    }
+  });
 
   return follows;
 }, 2000);
