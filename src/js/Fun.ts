@@ -1,11 +1,11 @@
 import localforage from './lib/localforage.min';
-import _ from 'lodash';
 
 type FunEventListener = {
   off: Function;
 };
 
 // Localforage returns null if an item is not found, so we represent null with this uuid instead.
+// not foolproof, but good enough for now.
 const LOCALFORAGE_NULL = "c2fc1ad0-f76f-11ec-b939-0242ac120002";
 const notInLocalForage = new Set();
 
@@ -39,15 +39,16 @@ export default class Node {
     }
 
     put(value: any): void {
+        // TODO this logic is wrong. make sure only the correct callbacks are called with correct data.
         if (typeof value === 'object' && value !== null && !(value instanceof Array)) {
             this.value = undefined;
             for (const key in value) {
                 this.get(key).put(value[key]);
             }
-        } else {
-            this.value = value;
+            return;
         }
-        _.defer(() => {
+        this.value = value;
+        setTimeout(() => {
             log('put', this.id, value, 'subs:', this.on_subscriptions.size, this.parent.map_subscriptions.size);
             for (const [id, callback] of this.on_subscriptions) {
                 log('on sub', this.id, this.value);
@@ -61,18 +62,20 @@ export default class Node {
                     this.once(callback, event, false);
                 }
             }
-        });
+        }, 0);
         localforage.setItem(this.id, value === null ? LOCALFORAGE_NULL : value);
     }
 
     async once(callback?: Function | null, event?: FunEventListener, returnIfUndefined = true): Promise<any> {
         let result;
         if (this.children.size) {
+            // return an object containing all children
             result = {};
             await Promise.all(Array.from(this.children.keys()).map(async key => {
-                result[key] = await this.get(key).once(callback, event);
+                result[key] = await this.get(key).once(null, event);
             }));
         } else if (this.value === undefined && !notInLocalForage.has(this.id)) {
+            // try to get the value from localforage
             result = await localforage.getItem(this.id);
             // getItem returns null if not found
             if (result === null) {
@@ -83,6 +86,7 @@ export default class Node {
             }
             this.value = result;
         } else {
+            // if the value was already memory cached
             result = this.value;
         }
         if (result !== undefined || returnIfUndefined) {
@@ -105,10 +109,10 @@ export default class Node {
         const id = this.counter++;
         this.map_subscriptions.set(this.counter++, callback);
         const event = { off: () => this.map_subscriptions.delete(id) };
-        _.defer(() => {
+        setTimeout(() => {
             for (const child of this.children.values()) {
                 child.once(callback, event, false);
             }
-        });
+        }, 0);
     }
 }

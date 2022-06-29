@@ -15,11 +15,10 @@ class Follows extends View {
   }
 
   getFollows() {
-    const f = Session.getFollows();
     State.public.user(this.props.id).get('follow').map().on(this.sub(
       (follows, pub) => {
         if (follows) {
-          this.follows[pub] = f[pub] || {};
+          this.follows[pub] = {};
           this.setState({});
         } else {
           delete this.follows[pub];
@@ -34,13 +33,10 @@ class Follows extends View {
   }
 
   getFollowers() {
-    const f = Session.getFollows();
-    console.log(`follow/${this.props.id}`);
     State.group().on(`follow/${this.props.id}`, this.sub((following, a, b, e, user) => {
-      console.log(user, following);
       if (following) {
           if (!following) return;
-          this.follows[user] = f[user] || {};
+          this.follows[user] = {};
           this.setState({});
       }
     }));

@@ -60,6 +60,30 @@ describe('Fun', () => {
           });
         });
       });
+
+      it('should not chain .map() callback too far back', async () => {
+        const fun = new Fun();
+        const mockCallback = jest.fn();
+        fun.get('settings').map(mockCallback);
+        const localCalled = new Promise(resolve => {
+          fun.get('settings').get('local').map(resolve);
+        });
+        fun.get('settings').get('local').get('language').put('klingon');
+        await localCalled;
+        expect(mockCallback).toBeCalledTimes(1);
+      });
+
+      it('should chain .map() callback', async () => {
+        const fun = new Fun();
+        fun.get('contacts').get('id123').put({name: 'John Doe', followerCount: 5});
+        await new Promise(resolve => {
+          fun.get('contacts').map((value, key) => {
+            expect(key).toBe('id123');
+            expect(value).toEqual({name: 'John Doe', followerCount: 5});
+            resolve();
+          });
+        });
+      });
     });
   });
 });
