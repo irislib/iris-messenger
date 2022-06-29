@@ -36,7 +36,7 @@ const State = {
       if (isBlocked === this.blockedUsers[user]) { return; }
       if (isBlocked) {
         this.blockedUsers[user] = isBlocked;
-        State.local.get('groups').map().once((v, k) => {
+        State.local.get('groups').map((v, k) => {
           State.local.get('groups').get(k).get(user).put(false);
         });
       } else {

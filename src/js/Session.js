@@ -18,7 +18,7 @@ let ourActivity;
 let noFollows;
 let noFollowers;
 let userSearchIndex;
-const follows = {};
+const contacts = {};
 const channels = window.channels = {};
 
 const DEFAULT_SETTINGS = {
@@ -34,36 +34,36 @@ const DEFAULT_SETTINGS = {
   }
 }
 
-const settings = DEFAULT_SETTINGS;
-
 const updateUserSearchIndex = _.throttle(() => {
   const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
-  const values = Object.values(_.omit(follows, Object.keys(State.getBlockedUsers())));
+  const values = Object.values(_.omit(contacts, Object.keys(State.getBlockedUsers())));
   userSearchIndex = new Fuse(values, options);
 }, 3000, {leading:true});
 
 function addFollow(callback, k, followDistance, follower) {
-  if (follows[k]) {
-    if (follows[k].followDistance > followDistance) {
-      follows[k].followDistance = followDistance;
+  if (contacts[k]) {
+    if (contacts[k].followDistance > followDistance) {
+      contacts[k].followDistance = followDistance;
     }
-    follows[k].followers.add(follower);
+    contacts[k].followers.add(follower);
   } else {
-    follows[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
+    contacts[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
     State.public.user(k).get('profile').get('name').on(name => {
-      follows[k].name = name;
-      callback && callback(k, follows[k]);
+      contacts[k].name = name;
+      State.local.get('contacts').get(k).get('name').put(name);
+      callback && callback(k, contacts[k]);
     });
   }
-  callback && callback(k, follows[k]);
+  State.local.get('contacts').get(k).put({followDistance: contacts[k].followDistance,followerCount: contacts[k].followers.size});
+  callback && callback(k, contacts[k]);
   updateUserSearchIndex();
   updateNoFollows();
   updateNoFollowers();
 }
 
 function removeFollow(k, followDistance, follower) {
-  if (follows[k]) {
-    follows[k].followers.delete(follower);
+  if (contacts[k]) {
+    contacts[k].followers.delete(follower);
     if (followDistance === 1) {
       State.local.get('groups').get('follows').get(k).put(false);
     }
@@ -80,7 +80,6 @@ const getExtendedFollows = _.throttle((callback, k, maxDepth = 3, currentDepth =
   addFollow(callback, k, currentDepth - 1);
 
   State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
-    if (follows[followedKey] === isFollowing) { return; }
     if (isFollowing) {
       addFollow(callback, followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
@@ -91,11 +90,11 @@ const getExtendedFollows = _.throttle((callback, k, maxDepth = 3, currentDepth =
     }
   });
 
-  return follows;
+  return contacts;
 }, 2000);
 
 const updateNoFollows = _.debounce(() => {
-  const v = !(Object.keys(follows).length > 1);
+  const v = Object.keys(contacts).length <= 1;
   if (v !== noFollows) {
     noFollows = v;
     State.local.get('noFollows').put(noFollows);
@@ -103,7 +102,7 @@ const updateNoFollows = _.debounce(() => {
 }, 1000);
 
 const updateNoFollowers = _.debounce(() => {
-  const v = !(follows[key.pub] && (follows[key.pub].followers.size > 0));
+  const v = !(contacts[key.pub] && (contacts[key.pub].followers.size > 0));
   if (v !== noFollowers) {
     noFollowers = v;
     State.local.get('noFollowers').put(noFollowers);
@@ -202,10 +201,11 @@ function login(k) {
   });
   Notifications.init();
   State.local.get('loggedIn').put(true);
+  State.local.get('settings').put(DEFAULT_SETTINGS);
   State.public.user().get('block').map().on((isBlocked, user) => {
     State.local.get('block').get(user).put(isBlocked);
     if (isBlocked) {
-      delete follows[user];
+      delete contacts[user];
     }
   });
   updateGroups();
@@ -214,17 +214,13 @@ function login(k) {
   }
   if (State.electron) {
     State.electron.get('settings').on(electron => {
-      settings.electron = electron;
+      State.local.get('settings').get('electron').put(electron);
       if (electron.publicIp) {
         Object.values(channels).forEach(shareMyPeerUrl);
       }
     });
     State.electron.get('user').put(key.pub);
   }
-  State.local.get('settings').on(local => {
-    console.log('local settings updated', local);
-    settings.local = local;
-  });
   State.local.get('filters').get('group').once().then(v => {
     if (!v) {
       State.local.get('filters').get('group').put('follows');
@@ -325,14 +321,11 @@ function init(options = {}) {
   });
 }
 
-function getFollows() {
-  return follows;
-}
-
 const myPeerUrl = ip => `http://${ip}:8767/gun`;
 
-function shareMyPeerUrl(channel) {
-  channel.put && channel.put('my_peer', myPeerUrl(settings.electron.publicIp));
+async function shareMyPeerUrl(channel) {
+  const myIp = await State.local.get('settings').get('electron').get('publicIp').once();
+  myIp && channel.put && channel.put('my_peer', myPeerUrl(myIp));
 }
 
 function newChannel(pub, chatLink) {
@@ -438,9 +431,7 @@ function addChannel(chat) {
     });
     const arr = Object.values(Notifications.webPushSubscriptions);
     setTimeout(() => chat.put('webPushSubscriptions', arr), 5000);
-    if (settings.electron && settings.electron.publicIp) {
-      shareMyPeerUrl(chat);
-    }
+    shareMyPeerUrl(chat);
   }
   chat.onTheir('call', call => {
     State.local.get('call').put({pub, call});
@@ -513,4 +504,4 @@ function followChatLink(str) {
   }
 }
 
-export default {init, followChatLink, getKey, getPubKey, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, getFollows, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, settings, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+export default {init, followChatLink, getKey, getPubKey, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };

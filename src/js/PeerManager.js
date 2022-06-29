@@ -123,8 +123,9 @@ function getRandomPeers() {
   return sample;
 }
 
-let askForPeers = _.once(pub => {
-  if (!Session.settings.local.enablePublicPeerDiscovery) { return; }
+let askForPeers = _.once(async pub => {
+  const enablePublicPeerDiscovery = await State.local.get('settings').get('local').get('enablePublicPeerDiscovery').once();
+  if (!enablePublicPeerDiscovery) { return; }
   _.defer(() => {
     State.public.user(pub).get('peers').once().map().on(peer => {
       if (peer && peer.url) {
