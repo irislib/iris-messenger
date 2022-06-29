@@ -2008,7 +2008,7 @@ export default {
   },
 
   getProfileLink(pub: string): string {
-    return `${window.location.origin}/profile/${encodeURIComponent(pub)}`;
+    return `${window.location.origin}/#/profile/${encodeURIComponent(pub)}`;
   },
 
   isElectron,
