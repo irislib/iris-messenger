@@ -222,6 +222,7 @@ function login(k) {
     State.electron.get('user').put(key.pub);
   }
   State.local.get('settings').on(local => {
+    console.log('local settings updated', local);
     settings.local = local;
   });
   State.local.get('filters').get('group').once().then(v => {
