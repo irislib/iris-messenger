@@ -1,4 +1,4 @@
-import localforage from './lib/localforage.min';
+import localForage from './lib/localforage.min';
 import _ from 'lodash';
 
 type FunEventListener = {
@@ -30,19 +30,46 @@ export default class Node {
         this.parent = parent;
     }
 
-    private save = _.throttle(async () => {
+    private saveLocalForage = _.throttle(async () => {
         if (!this.loaded) {
-            await this.load();
+            await this.loadLocalForage();
         }
         if (this.children.size) {
             const children = Array.from(this.children.keys());
-            localforage.setItem(this.id, children);
+            localForage.setItem(this.id, children);
         } else if (this.value === undefined) {
-            localforage.remove(this.id);
+            localForage.remove(this.id);
         } else {
-            localforage.setItem(this.id, this.value === null ? LOCALFORAGE_NULL : this.value);
+            localForage.setItem(this.id, this.value === null ? LOCALFORAGE_NULL : this.value);
         }
     }, 500, { leading: false });
+
+    private async loadLocalForage() {
+        if (notInLocalForage.has(this.id)) {
+            return undefined;
+        }
+        // try to get the value from localforage
+        let result = await localForage.getItem(this.id);
+        // getItem returns null if not found
+        if (result === null) {
+            result = undefined;
+            notInLocalForage.add(this.id);
+        } else if (result === LOCALFORAGE_NULL) {
+            result = null;
+        } else if (Array.isArray(result)) {
+            // result is a list of children
+            const newResult = {};
+            await Promise.all(result.map(async key => {
+                newResult[key] = await this.get(key).once();
+            }));
+            result = newResult;
+        } else {
+            // result is a value
+            this.value = result;
+        }
+        this.loaded = true;
+        return result;
+    }
 
     get(key: string): Node {
         const existing = this.children.get(key);
@@ -51,11 +78,11 @@ export default class Node {
         }
         const new_node = new Node(`${this.id}/${key}`, this);
         this.children.set(key, new_node);
-        this.save();
+        this.saveLocalForage();
         return new_node;
     }
 
-    private do_callbacks = _.throttle(() => {
+    private doCallbacks = _.throttle(() => {
         for (const [id, callback] of this.on_subscriptions) {
             log('on sub', this.id, this.value);
             const event = { off: () => this.on_subscriptions.delete(id) };
@@ -82,35 +109,8 @@ export default class Node {
             return;
         }
         this.value = value;
-        this.do_callbacks();
-        this.save();
-    }
-
-    private async load() {
-        if (notInLocalForage.has(this.id)) {
-            return undefined;
-        }
-        // try to get the value from localforage
-        let result = await localforage.getItem(this.id);
-        // getItem returns null if not found
-        if (result === null) {
-            result = undefined;
-            notInLocalForage.add(this.id);
-        } else if (result === LOCALFORAGE_NULL) {
-            result = null;
-        } else if (Array.isArray(result)) {
-            // result is a list of children
-            const newResult = {};
-            await Promise.all(result.map(async key => {
-                newResult[key] = await this.get(key).once();
-            }));
-            result = newResult;
-        } else {
-            // result is a value
-            this.value = result;
-        }
-        this.loaded = true;
-        return result;
+        this.doCallbacks();
+        this.saveLocalForage();
     }
 
     // protip: the code would be a lot cleaner if you separated the Node API from storage adapters.
@@ -125,7 +125,7 @@ export default class Node {
         } else if (this.value !== undefined) {
             result = this.value;
         } else {
-            result = await this.load();
+            result = await this.loadLocalForage();
         }
         if (result !== undefined || returnIfUndefined) {
             log('once', this.id, result);
@@ -144,16 +144,15 @@ export default class Node {
 
     async map(callback: Function): Promise<any> {
         log('map', this.id);
-        if (!this.loaded) {
-            await this.load(); // ensure that the list of children is loaded
-        }
         const id = this.counter++;
         this.map_subscriptions.set(this.counter++, callback);
         const event = { off: () => this.map_subscriptions.delete(id) };
-        setTimeout(() => {
-            for (const child of this.children.values()) {
-                child.once(callback, event, false);
-            }
-        }, 0);
+        if (!this.loaded) {
+            // ensure that the list of children is loaded
+            await this.loadLocalForage();
+        }
+        for (const child of this.children.values()) {
+            child.once(callback, event, false);
+        }
     }
 }
