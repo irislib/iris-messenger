@@ -1,4 +1,5 @@
 import localforage from './lib/localforage.min';
+import _ from 'lodash';
 
 type FunEventListener = {
   off: Function;
@@ -22,11 +23,26 @@ export default class Node {
     map_subscriptions = new Map<number, Function>();
     value = undefined;
     counter = 0;
+    loaded = false;
 
     constructor(id = '', parent?: Node) {
         this.id = id;
         this.parent = parent;
     }
+
+    private save = _.throttle(async () => {
+        if (!this.loaded) {
+            await this.load();
+        }
+        if (this.children.size) {
+            const children = Array.from(this.children.keys());
+            localforage.setItem(this.id, children);
+        } else if (this.value === undefined) {
+            localforage.remove(this.id);
+        } else {
+            localforage.setItem(this.id, this.value === null ? LOCALFORAGE_NULL : this.value);
+        }
+    }, 500, { leading: false });
 
     get(key: string): Node {
         const existing = this.children.get(key);
@@ -35,12 +51,30 @@ export default class Node {
         }
         const new_node = new Node(`${this.id}/${key}`, this);
         this.children.set(key, new_node);
+        this.save();
         return new_node;
     }
 
+    private do_callbacks = _.throttle(() => {
+        for (const [id, callback] of this.on_subscriptions) {
+            log('on sub', this.id, this.value);
+            const event = { off: () => this.on_subscriptions.delete(id) };
+            this.once(callback, event, false);
+        }
+        if (this.parent) {
+            for (const [id, callback] of this.parent.map_subscriptions) {
+                log('map sub', this.id, this.value);
+                const event = { off: () => this.parent.map_subscriptions.delete(id) };
+                this.once(callback, event, false);
+            }
+        }
+    }, 10);
+
     put(value: any): void {
-        // TODO this logic is wrong. make sure only the correct callbacks are called with correct data.
-        if (typeof value === 'object' && value !== null && !(value instanceof Array)) {
+        if (Array.isArray(value)) {
+            throw new Error('Sorry, we don\'t deal with arrays');
+        }
+        if (typeof value === 'object' && value !== null) {
             this.value = undefined;
             for (const key in value) {
                 this.get(key).put(value[key]);
@@ -48,24 +82,38 @@ export default class Node {
             return;
         }
         this.value = value;
-        setTimeout(() => {
-            log('put', this.id, value, 'subs:', this.on_subscriptions.size, this.parent.map_subscriptions.size);
-            for (const [id, callback] of this.on_subscriptions) {
-                log('on sub', this.id, this.value);
-                const event = { off: () => this.on_subscriptions.delete(id) };
-                this.once(callback, event, false);
-            }
-            if (this.parent) {
-                for (const [id, callback] of this.parent.map_subscriptions) {
-                    log('map sub', this.id, this.value);
-                    const event = { off: () => this.parent.map_subscriptions.delete(id) };
-                    this.once(callback, event, false);
-                }
-            }
-        }, 0);
-        localforage.setItem(this.id, value === null ? LOCALFORAGE_NULL : value);
+        this.do_callbacks();
+        this.save();
     }
 
+    private async load() {
+        if (notInLocalForage.has(this.id)) {
+            return undefined;
+        }
+        // try to get the value from localforage
+        let result = await localforage.getItem(this.id);
+        // getItem returns null if not found
+        if (result === null) {
+            result = undefined;
+            notInLocalForage.add(this.id);
+        } else if (result === LOCALFORAGE_NULL) {
+            result = null;
+        } else if (Array.isArray(result)) {
+            // result is a list of children
+            const newResult = {};
+            await Promise.all(result.map(async key => {
+                newResult[key] = await this.get(key).once();
+            }));
+            result = newResult;
+        } else {
+            // result is a value
+            this.value = result;
+        }
+        this.loaded = true;
+        return result;
+    }
+
+    // protip: the code would be a lot cleaner if you separated the Node API from storage adapters.
     async once(callback?: Function | null, event?: FunEventListener, returnIfUndefined = true): Promise<any> {
         let result;
         if (this.children.size) {
@@ -74,20 +122,10 @@ export default class Node {
             await Promise.all(Array.from(this.children.keys()).map(async key => {
                 result[key] = await this.get(key).once(null, event);
             }));
-        } else if (this.value === undefined && !notInLocalForage.has(this.id)) {
-            // try to get the value from localforage
-            result = await localforage.getItem(this.id);
-            // getItem returns null if not found
-            if (result === null) {
-                result = undefined;
-                notInLocalForage.add(this.id);
-            } else if (result === LOCALFORAGE_NULL) {
-                result = null;
-            }
-            this.value = result;
-        } else {
-            // if the value was already memory cached
+        } else if (this.value !== undefined) {
             result = this.value;
+        } else {
+            result = await this.load();
         }
         if (result !== undefined || returnIfUndefined) {
             log('once', this.id, result);
@@ -104,8 +142,11 @@ export default class Node {
         this.once(callback, event, false);
     }
 
-    map(callback: Function): void {
+    async map(callback: Function): Promise<any> {
         log('map', this.id);
+        if (!this.loaded) {
+            await this.load(); // ensure that the list of children is loaded
+        }
         const id = this.counter++;
         this.map_subscriptions.set(this.counter++, callback);
         const event = { off: () => this.map_subscriptions.delete(id) };

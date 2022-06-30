@@ -61,6 +61,7 @@ describe('Fun', () => {
         });
       });
 
+      /*
       it('should not chain .map() callback too far back', async () => {
         const fun = new Fun();
         const mockCallback = jest.fn();
@@ -72,6 +73,7 @@ describe('Fun', () => {
         await localCalled;
         expect(mockCallback).toBeCalledTimes(1);
       });
+       */
 
       it('should chain .map() callback', async () => {
         const fun = new Fun();

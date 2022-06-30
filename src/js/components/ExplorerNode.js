@@ -121,7 +121,7 @@ class ExplorerNode extends BaseComponent {
       const path = this.props.path.split('/').slice(2).join('/');
       this.props.gun.map(path, cb); // TODO: make State.group() provide the normal gun api
     } else {
-      this.getNode().map().on(cb);
+      this.getNode().map(cb);
     }
   }
 
