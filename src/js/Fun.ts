@@ -42,7 +42,7 @@ export default class Node {
         } else {
             localForage.setItem(this.id, this.value === null ? LOCALFORAGE_NULL : this.value);
         }
-    }, 500, { leading: false });
+    }, 500);
 
     private async loadLocalForage() {
         if (notInLocalForage.has(this.id)) {

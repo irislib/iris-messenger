@@ -136,6 +136,7 @@ class Settings extends View {
 
     State.electron && State.electron.get('settings').on(this.inject('electron', 'electron'));
     State.local.get('settings').on(this.sub(local => {
+      console.log('local settings', local);
       if (local) {
         this.setState({local});
       }

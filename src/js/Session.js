@@ -201,7 +201,11 @@ function login(k) {
   });
   Notifications.init();
   State.local.get('loggedIn').put(true);
-  State.local.get('settings').put(DEFAULT_SETTINGS);
+  State.local.get('settings').once().then(settings => {
+    if (!settings) {
+      State.local.get('settings').put(DEFAULT_SETTINGS.local)
+    }
+  });
   State.public.user().get('block').map().on((isBlocked, user) => {
     State.local.get('block').get(user).put(isBlocked);
     if (isBlocked) {
