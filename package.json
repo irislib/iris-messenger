@@ -59,7 +59,7 @@
     "lodash": "^4.17.21",
     "oldgun": "npm:gun@0.2020.1232",
     "preact": "^10.5.14",
-    "preact-async-route": "^2.2.1",
+    "preact-async-route": "2.2.1",
     "preact-custom-element": "^4.2.1",
     "preact-render-to-string": "^5.1.19",
     "preact-router": "^3.2.1",
