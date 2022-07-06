@@ -89,13 +89,18 @@ export default class Node {
             this.once(callback, event, false);
         }
         if (this.parent) {
+            for (const [id, callback] of this.parent.on_subscriptions) {
+                log('on sub', this.id, this.value);
+                const event = { off: () => this.parent.on_subscriptions.delete(id) };
+                this.parent.once(callback, event, false);
+            }
             for (const [id, callback] of this.parent.map_subscriptions) {
                 log('map sub', this.id, this.value);
                 const event = { off: () => this.parent.map_subscriptions.delete(id) };
                 this.once(callback, event, false);
             }
         }
-    }, 10);
+    }, 40);
 
     put(value: any): void {
         if (Array.isArray(value)) {
