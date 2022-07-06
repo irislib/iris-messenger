@@ -44,7 +44,9 @@ export default class Node {
         }
     }, 500);
 
-    private async loadLocalForage() {
+    // TODO: indexedDB has poor performance when there's lots of queries.
+    //  we should perhaps store child values with the parent node in order to reduce queries
+    private loadLocalForage = _.throttle(async () => {
         if (notInLocalForage.has(this.id)) {
             return undefined;
         }
@@ -69,7 +71,7 @@ export default class Node {
         }
         this.loaded = true;
         return result;
-    }
+    }, 500);
 
     get(key: string): Node {
         const existing = this.children.get(key);
