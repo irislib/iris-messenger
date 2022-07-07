@@ -14,6 +14,15 @@ class MessageFeed extends Component {
     this.state = {sortedMessages:[], displayCount: INITIAL_PAGE_SIZE};
     this.mappedMessages = new Map();
   }
+  
+  updateSortedMessages() {
+    if (this.unmounted) { return; }
+    let sortedMessages = Array.from(this.mappedMessages.keys()).sort().map(k => this.mappedMessages.get(k));
+    if (!this.props.reverse) {
+      sortedMessages = sortedMessages.reverse();
+    }
+    this.setState({sortedMessages})
+  }
 
   handleMessage(v, k, x, e, from) {
     if (from) { k = k + from; }
@@ -22,15 +31,6 @@ class MessageFeed extends Component {
     } else {
       this.mappedMessages.delete(k);
     }
-
-    this.updateSortedMessages = this.updateSortedMessages || _.throttle(() => {
-      if (this.unmounted) { return; }
-      let sortedMessages = Array.from(this.mappedMessages.keys()).sort().map(k => this.mappedMessages.get(k));
-      if (!this.props.reverse) {
-        sortedMessages = sortedMessages.reverse();
-      }
-      this.setState({sortedMessages})
-    }, 100);
 
     this.updateSortedMessages();
   }
