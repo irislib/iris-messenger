@@ -10,6 +10,10 @@ type FunEventListener = {
 const LOCALFORAGE_NULL = "c2fc1ad0-f76f-11ec-b939-0242ac120002";
 const notInLocalForage = new Set();
 
+localForage.config({
+    driver: [localForage.LOCALSTORAGE, localForage.INDEXEDDB, localForage.WEBSQL]
+})
+
 const debug = false;
 function log(...args: any[]) {
   debug && console.log(...args);
