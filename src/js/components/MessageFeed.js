@@ -67,7 +67,7 @@ class MessageFeed extends Component {
   render() {
     if (!this.props.scrollElement || this.unmounted) { return; }
     const displayCount = this.state.displayCount;
-    return html`
+    return html`<div>
       ${this.state.sortedMessages.slice(0, displayCount).map(hash => html`
         <${PublicMessage} key=${hash} hash=${hash} showName=${true} />
       `)}
@@ -78,6 +78,7 @@ class MessageFeed extends Component {
           </button>
         </p>
       ` : ''}
+      </div>
     `;
   }
 }
