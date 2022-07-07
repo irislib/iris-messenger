@@ -7,7 +7,6 @@ import Name from '../components/Name';
 import View from './View';
 import Session from '../Session';
 import ScrollViewport from 'preact-scroll-viewport';
-import _ from 'lodash';
 
 // TODO: add group selector
 class Contacts extends View {
