@@ -42,7 +42,7 @@ export default class Node {
             const children = Array.from(this.children.keys());
             localForage.setItem(this.id, children);
         } else if (this.value === undefined) {
-            localForage.remove(this.id);
+            localForage.removeItem(this.id);
         } else {
             localForage.setItem(this.id, this.value === null ? LOCALFORAGE_NULL : this.value);
         }
