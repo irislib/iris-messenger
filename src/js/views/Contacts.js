@@ -7,19 +7,18 @@ import Name from '../components/Name';
 import View from './View';
 import Session from '../Session';
 import ScrollViewport from 'preact-scroll-viewport';
-import SortedMap from 'collections/sorted-map';
+import _ from 'lodash';
 
 // TODO: add group selector
 class Contacts extends View {
   state = {sortedKeys: []};
   id = "contacts-view";
-  contacts = new SortedMap();
+  contacts = {};
 
   updateSortedKeys() {
-    console.log('this.contacts', this.contacts);
-    const sortedKeys = this.contacts.prototype.keys().sort((aK,bK) => {
-      const a = this.contacts.get(aK);
-      const b = this.contacts.get(bK);
+    const sortedKeys = Object.keys(this.contacts).sort((aK,bK) => {
+      const a = this.contacts[aK];
+      const b = this.contacts[bK];
       if (!a.name && !b.name) return aK.localeCompare(bK);
       if (!a.name) return 1;
       if (!b.name) return -1;
@@ -37,9 +36,9 @@ class Contacts extends View {
       (contact, pub) => {
         if (pub === Session.getPubKey()) { return; }
         if (contact) {
-          this.contacts.set(pub, contact);
+          this.contacts[pub] = contact;
         } else {
-          this.contacts.delete(pub);
+          delete this.contacts[pub];
         }
         this.updateSortedKeys();
       }
@@ -65,7 +64,7 @@ class Contacts extends View {
                   <${Name} key="k${k}" pub=${k}/><br/>
                   <small class="follower-count">
                       ${peer.name}<br/>
-                      ${this.contacts.has(k) && this.contacts.get(k).followers && this.contacts.get(k).followers.size || '0'} ${t('followers')}
+                      ${this.contacts[k] && this.contacts[k].followers && this.contacts[k].followers.size || '0'} ${t('followers')}
                   </small>
                 </div>
               </a>
@@ -96,7 +95,7 @@ class Contacts extends View {
           `:''}
           <${ScrollViewport}>
             ${keys.map(k => {
-              const contact = this.contacts.get(k);
+              const contact = this.contacts[k];
               return html`
               <div class="profile-link-container">
                 <a href="/profile/${k}" class="profile-link">
