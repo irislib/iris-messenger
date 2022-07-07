@@ -15,7 +15,7 @@ class Contacts extends View {
   id = "contacts-view";
   contacts = {};
 
-  updateSortedKeys = _.debounce(() => {
+  updateSortedKeys() {
     const sortedKeys = Object.keys(this.contacts).sort((aK,bK) => {
       const a = this.contacts[aK];
       const b = this.contacts[bK];
@@ -25,7 +25,7 @@ class Contacts extends View {
       return a.name.localeCompare(b.name);
     });
     this.setState({sortedKeys});
-  }, 100);
+  }
 
   shouldComponentUpdate() {
     return true;

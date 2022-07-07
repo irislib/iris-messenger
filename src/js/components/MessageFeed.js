@@ -23,7 +23,7 @@ class MessageFeed extends Component {
       this.mappedMessages.delete(k);
     }
 
-    this.updateSortedMessages = this.updateSortedMessages || _.debounce(() => {
+    this.updateSortedMessages = this.updateSortedMessages || _.throttle(() => {
       if (this.unmounted) { return; }
       let sortedMessages = Array.from(this.mappedMessages.keys()).sort().map(k => this.mappedMessages.get(k));
       if (!this.props.reverse) {
