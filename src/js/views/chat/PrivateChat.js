@@ -81,7 +81,7 @@ export default class PrivateChat extends Component {
 
     State.local.get('showParticipants').put(true);
     State.local.get('showParticipants').on(this.inject());
-    State.local.get('channels').get(this.props.id).get('participants').map().on(this.sub(
+    State.local.get('channels').get(this.props.id).get('participants').map(this.sub(
       (v, k) => {
         const hasAlready = !!this.participants[k];
         this.participants[k] = v;

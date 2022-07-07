@@ -2,7 +2,6 @@ import Component from '../BaseComponent';
 import { createRef } from 'preact';
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import Session from "../Session";
 import { translate as tr } from '../Translation';
 import $ from 'jquery';
 import State from '../State';
@@ -16,6 +15,7 @@ const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class Torrent extends Component {
   coverRef = createRef();
+  state = { local: {}};
 
   componentDidMount() {
     State.local.get('player').on(this.sub(
@@ -30,9 +30,12 @@ class Torrent extends Component {
     ));
     const showFiles = this.props.showFiles;
     showFiles && this.setState({showFiles});
-    if (Session.settings.local.enableWebtorrent || this.props.standalone) {
-      this.startTorrenting();
-    }
+    State.local.get('settings').get('local').on(this.inject());
+    (async () => {
+      if (this.props.standalone || (await State.local.get('settings').get('local').get('enableWebtorrent').once())) {
+        this.startTorrenting();
+      }
+    })();
   }
 
   componentWillUnmount() {
@@ -93,7 +96,7 @@ class Torrent extends Component {
       autoplay = true;
       muted = false;
     } else {
-      autoplay = isVid && Session.settings.local.autoplayWebtorrent;
+      autoplay = isVid && this.state.local.autoplayWebtorrent;
       muted = autoplay;
     }
     const el = base.find('.player');
@@ -279,7 +282,7 @@ class Torrent extends Component {
     return html`
         <div class="torrent">
             ${this.props.standalone ? this.renderMeta() : ''}
-            ${!Session.settings.local.enableWebtorrent && !this.state.torrenting && !this.props.standalone ? html`
+            ${!this.state.local.enableWebtorrent && !this.state.torrenting && !this.props.standalone ? html`
               <a href="" onClick=${e => this.openTorrentClicked(e)}>${tr('show_attachment')}</a>
             `: this.renderLoadingTorrent()}
         </div>

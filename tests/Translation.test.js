@@ -1,5 +1,7 @@
 import { AVAILABLE_LANGUAGES, translate } from '../src/js/Translation';
 
+console.log('hello from test');
+
 describe('Translation', () => {
   describe('AVAILABLE_LANGUAGES', () => {
     it('should include English', () => {

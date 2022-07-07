@@ -3,7 +3,7 @@ import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import PublicMessage from './PublicMessage';
 import State from '../State';
-import _ from 'lodash';
+import {debounce} from 'lodash';
 import {translate as t} from '../Translation';
 
 const INITIAL_PAGE_SIZE = 20;
@@ -14,6 +14,15 @@ class MessageFeed extends Component {
     this.state = {sortedMessages:[], displayCount: INITIAL_PAGE_SIZE};
     this.mappedMessages = new Map();
   }
+  
+  updateSortedMessages = debounce(() => {
+    if (this.unmounted) { return; }
+    let sortedMessages = Array.from(this.mappedMessages.keys()).sort().map(k => this.mappedMessages.get(k));
+    if (!this.props.reverse) {
+      sortedMessages = sortedMessages.reverse();
+    }
+    this.setState({sortedMessages})
+  }, 100);
 
   handleMessage(v, k, x, e, from) {
     if (from) { k = k + from; }
@@ -22,15 +31,6 @@ class MessageFeed extends Component {
     } else {
       this.mappedMessages.delete(k);
     }
-
-    this.updateSortedMessages = this.updateSortedMessages || _.debounce(() => {
-      if (this.unmounted) { return; }
-      let sortedMessages = Array.from(this.mappedMessages.keys()).sort().map(k => this.mappedMessages.get(k));
-      if (!this.props.reverse) {
-        sortedMessages = sortedMessages.reverse();
-      }
-      this.setState({sortedMessages})
-    }, 100);
 
     this.updateSortedMessages();
   }
@@ -67,7 +67,7 @@ class MessageFeed extends Component {
   render() {
     if (!this.props.scrollElement || this.unmounted) { return; }
     const displayCount = this.state.displayCount;
-    return html`
+    return html`<div>
       ${this.state.sortedMessages.slice(0, displayCount).map(hash => html`
         <${PublicMessage} key=${hash} hash=${hash} showName=${true} />
       `)}
@@ -78,6 +78,7 @@ class MessageFeed extends Component {
           </button>
         </p>
       ` : ''}
+      </div>
     `;
   }
 }

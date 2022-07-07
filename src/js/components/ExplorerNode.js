@@ -70,7 +70,7 @@ class ExplorerNode extends BaseComponent {
     }
     if (this.isGroupRoot) {
       const groups = {};
-      State.local.get('groups').map().on(this.sub(
+      State.local.get('groups').map(this.sub(
         (v,k) => {
           if (v) {
             groups[k] = true;
@@ -121,7 +121,7 @@ class ExplorerNode extends BaseComponent {
       const path = this.props.path.split('/').slice(2).join('/');
       this.props.gun.map(path, cb); // TODO: make State.group() provide the normal gun api
     } else {
-      this.getNode().map().on(cb);
+      this.getNode().map(cb);
     }
   }
 

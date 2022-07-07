@@ -6,6 +6,7 @@ import 'gun/lib/radisk';
 import 'gun/lib/store';
 import 'gun/lib/rindexed';
 import _ from 'lodash';
+import Fun from './Fun';
 
 import PeerManager from './PeerManager';
 import iris from './iris-lib';
@@ -20,7 +21,7 @@ const State = {
       publicOpts.peers.forEach(url => PeerManager.addPeer({url}));
     }
     // TODO: local space seems to get stuck
-    this.local = Gun({peers: [], multicast:false, rad: false, localStorage: true}).get('state');
+    this.local = new Fun();
     if (Helpers.isElectron) {
       this.electron = Gun({peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast:false, localStorage: false}).get('state');
     }
@@ -31,11 +32,11 @@ const State = {
     this.counter = 0;
 
     // Is this the right place for this?
-    this.local.get('block').map().on((isBlocked, user) => {
+    this.local.get('block').map((isBlocked, user) => {
       if (isBlocked === this.blockedUsers[user]) { return; }
       if (isBlocked) {
         this.blockedUsers[user] = isBlocked;
-        State.local.get('groups').map().once((v, k) => {
+        State.local.get('groups').map((v, k) => {
           State.local.get('groups').get(k).get(user).put(false);
         });
       } else {

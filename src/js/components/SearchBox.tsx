@@ -57,13 +57,7 @@ class SearchBox extends Component<Props, State> {
   }
 
   componentDidMount() {
-    State.local.get('groups').get('everyone').map().on(this.sub(
-      () => {
-        if (this.state.noFollows && Object.keys(Session.getFollows()).length > 1) {
-          this.setState({noFollows: false});
-        }
-      }
-    ));
+    State.local.get('noFollows').on(this.inject());
     State.local.get('activeRoute').on(this.sub(
       () => {
         this.close();
@@ -158,11 +152,14 @@ class SearchBox extends Component<Props, State> {
               followText = 'Following';
             }
             if (i.followDistance > 1) {
+              /*
               if (i.followers.size === 1 && Session.getFollows()[[...i.followers][0]] && Session.getFollows()[[...i.followers][0]].name) {
                 followText = `Followed by ${  Session.getFollows()[[...i.followers][0]].name}`;
               } else {
                 followText = `${  i.followers.size  } followers`;
               }
+              */
+              followText = `${  i.followers.size  } followers`;
             }
             return (
               <a href={`/profile/${i.key}`} onClick={e => this.onClick(e, i)}>

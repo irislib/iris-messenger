@@ -33,7 +33,7 @@ class Checkout extends Store {
       text: `New order: ${  JSON.stringify(cart)  }, delivery: ${  JSON.stringify(this.state.delivery)  }, payment: ${  this.state.paymentMethod}`,
       order: true
     });
-    State.local.get('cart').get(pub).map().once((v, k) => {
+    State.local.get('cart').get(pub).map((v, k) => {
       !!v && State.local.get('cart').get(pub).get(k).put(null);
     });
     route(`/chat/${  pub}`);
@@ -223,7 +223,7 @@ class Checkout extends Store {
     this.carts = {};
     if (pub) {
       this.setState({page:'cart'})
-      State.local.get('cart').get(pub).map().on((v, k) => {
+      State.local.get('cart').get(pub).map((v, k) => {
         this.cart[k] = v;
         this.setState({cart: this.cart});
       });
