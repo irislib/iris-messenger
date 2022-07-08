@@ -3,7 +3,7 @@ import State from '../State';
 
 type Props = {
   pub: string;
-  placeholder: string;
+  placeholder?: string;
 };
 
 type State = {

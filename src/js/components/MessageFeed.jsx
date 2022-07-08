@@ -1,6 +1,5 @@
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
-import { html } from 'htm/preact';
 import PublicMessage from './PublicMessage';
 import State from '../State';
 import {debounce} from 'lodash';
@@ -67,19 +66,20 @@ class MessageFeed extends Component {
   render() {
     if (!this.props.scrollElement || this.unmounted) { return; }
     const displayCount = this.state.displayCount;
-    return html`<div>
-      ${this.state.sortedMessages.slice(0, displayCount).map(hash => html`
-        <${PublicMessage} key=${hash} hash=${hash} showName=${true} />
-      `)}
-      ${displayCount < this.state.sortedMessages.length ? html`
-        <p>
-          <button onClick=${() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE * 3})}>
-            ${t('show_more')}
-          </button>
-        </p>
-      ` : ''}
-      </div>
-    `;
+    return (
+      <>
+        {this.state.sortedMessages.slice(0, displayCount).map(hash => (
+          <PublicMessage key={hash} hash={hash} showName={true} />
+        ))}
+        {displayCount < this.state.sortedMessages.length ? (
+          <p>
+            <button onClick={() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE * 3})}>
+              {t('show_more')}
+            </button>
+          </p>
+        ) : ''}
+      </>
+    );
   }
 }
 

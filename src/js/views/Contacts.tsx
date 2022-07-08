@@ -1,4 +1,3 @@
-import { html } from 'htm/preact';
 import State from '../State';
 import Identicon from '../components/Identicon';
 import {translate as t} from '../Translation';
@@ -52,66 +51,68 @@ class Contacts extends View {
   renderNearbyUsers() {
     return this.state.nearbyUsers.map(peer => {
       const k = peer.txt && peer.txt.user;
-      if (!k) { return html`<p>${peer.name}</p>`; }
-      return html`
+      if (!k) { return (<p>{peer.name}</p>); }
+      return (
         <div class="profile-link-container">
-          ${k ? html`
+          {k ? (
             <div class="">
-              <a href="/profile/${k}" class="profile-link">
-                <${Identicon} key="i${k}" str=${k} width=49/>
+              <a href={`/profile/${k}`} class="profile-link">
+                <Identicon key="i{k}" str={k} width={49} />
                 <div>
-                  <${Name} key="k${k}" pub=${k}/><br/>
+                  <Name key="k{k}" pub={k} /><br />
                   <small class="follower-count">
-                      ${peer.name}<br/>
-                      ${this.contacts[k] && this.contacts[k].followers && this.contacts[k].followers.size || '0'} ${t('followers')}
+                      {peer.name}<br />
+                      {this.contacts[k] && this.contacts[k].followers && this.contacts[k].followers.size || '0'} {t('followers')}
                   </small>
                 </div>
               </a>
-              ${k !== Session.getPubKey() ? html`<${FollowButton} key="f${k}" id=${k}/>` : ''}
+              {(k !== Session.getPubKey()) ? (<FollowButton key="f{k}" id={k} />) : ''}
             </div>
-          `:''}
+          ):''}
         </div>
-      `;
+      );
     });
   }
 
   renderView() {
     const keys = this.state.sortedKeys;
     if (keys.length === 0) {
-      return html`
+      return (
       <div class="centered-container">
-        ${t('no_contacts_in_list')}
-      </div>`
+        {t('no_contacts_in_list')}
+      </div>)
     }
 
-    return html`
+    return (
       <div class="centered-container">
         <div id="contacts-list">
-          ${this.state.nearbyUsers && this.state.nearbyUsers.length ? html`
-            <h3>Nearby users</h3>
-            ${this.renderNearbyUsers()}
-            <hr/><br/>
-          `:''}
-          <${ScrollViewport}>
-            ${keys.map(k => {
+          {(this.state.nearbyUsers && this.state.nearbyUsers.length) ? (
+              <>
+                <h3>Nearby users</h3>
+                {this.renderNearbyUsers()}
+                <hr /><br />
+              </>
+          ):''}
+          <ScrollViewport>
+            {keys.map(k => {
               const contact = this.contacts[k];
-              return html`
-              <div class="profile-link-container">
-                <a href="/profile/${k}" class="profile-link">
-                  <${Identicon} key="i${k}" str=${k} width=49/>
+              return (
+              <div key={k} class="profile-link-container">
+                <a href={`/profile/${k}`} class="profile-link">
+                  <Identicon key={`i${k}`} str={k} width={49} />
                   <div>
-                    <${Name} key="k${k}" pub=${k}/><br/>
-                    <small class="follower-count">${contact.followerCount || '0'} ${t('followers')}</small>
+                    <Name key={`k${k}`} pub={k} /><br />
+                    <small class="follower-count">{contact.followerCount || '0'} {t('followers')}</small>
                   </div>
                 </a>
-                ${k !== Session.getPubKey() ? html`<${FollowButton} key="f${k}" id=${k}/>` : ''}
-              </div>`;
+                {k !== Session.getPubKey() ? (<FollowButton key={`f${k}`} id={k} />) : ''}
+              </div>);
             })}
-          </${ScrollViewport}>
-          ${keys.length === 0 ? '—' : ''}
+          </ScrollViewport>
+          {keys.length === 0 ? '—' : ''}
         </div>
       </div>
-    `;
+    );
   }
 }
 
