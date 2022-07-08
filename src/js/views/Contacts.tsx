@@ -76,7 +76,7 @@ class Contacts extends View {
 
   renderView() {
     const keys = this.state.sortedKeys;
-    if (keys.length === 0) {
+    if (keys.length === 0 && !this.state.nearbyUsers) {
       return (
       <div class="centered-container">
         {t('no_contacts_in_list')}
@@ -86,10 +86,11 @@ class Contacts extends View {
     return (
       <div class="centered-container">
         <div id="contacts-list">
-          {(this.state.nearbyUsers && this.state.nearbyUsers.length) ? (
+          {(this.state.nearbyUsers) ? (
               <>
                 <h3>Nearby users</h3>
                 {this.renderNearbyUsers()}
+                {this.state.nearbyUsers.length === 0 ? (<p>—</p>) : ''}
                 <hr /><br />
               </>
           ):''}
