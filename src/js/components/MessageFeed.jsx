@@ -27,6 +27,7 @@ class MessageFeed extends Component {
     if (from) { k = k + from; }
     if (v) {
       if (this.props.keyIsMsgHash) {
+        // likes and replies are not indexed by timestamp, so we need to fetch all the messages to sort them by timestamp
         PublicMessage.fetchByHash(this, k).then(msg => {
           if (msg) {
             this.mappedMessages.set(msg.signedData.time, k);

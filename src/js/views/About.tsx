@@ -60,7 +60,7 @@ class About extends Component {
 
             <h4>Developer:</h4>
             <div class="profile-link-container">
-              <a href="/profile/{DEVELOPER}" class="profile-link">
+              <a href={`/profile/${DEVELOPER}`} class="profile-link">
                 <Identicon str={DEVELOPER} width={40} />
                 <Text path="profile/name" user={DEVELOPER} placeholder="Iris developer's account" />
               </a>
