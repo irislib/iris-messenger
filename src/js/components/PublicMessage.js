@@ -30,29 +30,29 @@ class PublicMessage extends Message {
     this.state = { sortedReplies: [] };
   }
 
-  fetchByHash() {
-    const hash = this.props.hash;
-    if (typeof hash !== 'string') {
-      return;
-    }
-    let resolved = false;
-    return new Promise(resolve => {
-      State.public.get('#').get(hash).on(this.sub(
-async (serialized, a, b, event) => {
+  static fetchByHash(thisArg, hash) {
+    return new Promise((resolve, reject) => {
+      if (typeof hash !== 'string') {
+        return reject();
+      }
+      State.public.get('#').get(hash).on(thisArg.sub(
+        async (serialized, a, b, event) => {
           if (typeof serialized !== 'string') {
             console.error('message parsing failed', hash, serialized);
             return;
           }
           event.off();
-          if (resolved) return;
           const msg = await iris.SignedMessage.fromString(serialized);
           if (msg) {
             resolve(msg);
-            resolved = true;
           }
         }
       ));
     });
+  }
+
+  fetchByHash() {
+    return PublicMessage.fetchByHash(this, this.props.hash);
   }
 
   componentWillUnmount() {

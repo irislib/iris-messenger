@@ -26,7 +26,16 @@ class MessageFeed extends Component {
   handleMessage(v, k, x, e, from) {
     if (from) { k = k + from; }
     if (v) {
-      this.mappedMessages.set(k, this.props.keyIsMsgHash ? k : v);
+      if (this.props.keyIsMsgHash) {
+        PublicMessage.fetchByHash(this, k).then(msg => {
+          if (msg) {
+            this.mappedMessages.set(msg.signedData.time, k);
+            this.updateSortedMessages();
+          }
+        });
+      } else {
+        this.mappedMessages.set(k, v);
+      }
     } else {
       this.mappedMessages.delete(k);
     }
