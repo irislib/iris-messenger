@@ -92,6 +92,7 @@ class Contacts extends View {
                 {this.renderNearbyUsers()}
                 {this.state.nearbyUsers.length === 0 ? (<p>—</p>) : ''}
                 <hr /><br />
+                <h3>Others</h3>
               </>
           ):''}
           <ScrollViewport>
