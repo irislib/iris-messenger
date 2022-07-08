@@ -88,6 +88,7 @@ class ChatMessageForm extends MessageForm {
     } else {
       this.sendToPrivateOrGroup();
     }
+    Helpers.scrollToMessageListBottom();
   }
 
   onEmojiButtonClick(event) {
