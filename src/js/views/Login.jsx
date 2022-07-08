@@ -1,11 +1,9 @@
 import Helpers from '../Helpers';
-import { html } from 'htm/preact';
 import { translate as t } from '../Translation';
 import LanguageSelector from '../components/LanguageSelector';
 import QRScanner from '../QRScanner';
 import Session from '../Session';
 import { Component } from 'preact';
-
 import logo from '../../assets/img/android-chrome-192x192.png';
 
 class Login extends Component {
@@ -59,41 +57,48 @@ class Login extends Component {
   }
 
   renderExistingAccountLogin() {
-    return html`<input id="paste-privkey" autofocus onInput=${e => this.onPastePrivKey(e)} placeholder="${t('paste_private_key')}"/>
-      <p>
-        <button id="scan-privkey-btn" onClick=${e => this.toggleScanPrivKey(e)}>${t('scan_private_key_qr_code')}</button>
-      </p>
-      <p>
-        <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;" class=${this.state.showScanPrivKey ? '':'hidden'}></video>
-      </p>
-    `;
+    return (
+      <>
+        <input id="paste-privkey" autoFocus onInput={e => this.onPastePrivKey(e)}
+               placeholder={t('paste_private_key')} />
+        <p>
+          <button id="scan-privkey-btn"
+                  onClick={e => this.toggleScanPrivKey(e)}>{t('scan_private_key_qr_code')}</button>
+        </p>
+        <p>
+          <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;"
+                 className={this.state.showScanPrivKey ? '' : 'hidden'} />
+        </p>
+      </>
+    );
   }
 
   render() {
-    return html`<section id="login">
+    return (<section id="login">
       <div id="login-content">
-        ${!this.state.showSwitchAccount ? html`
-          <form id="login-form" autocomplete="off" onSubmit=${e => this.onLoginFormSubmit(e)}>
+        {!this.state.showSwitchAccount ? (
+          <form id="login-form" autocomplete="off" onSubmit={e => this.onLoginFormSubmit(e)}>
             <div id="create-account">
-              <img width="86" height="86" src=${logo} alt="iris"/>
+              <img width="86" height="86" src={logo} alt="iris" />
               <h1>iris</h1>
-              <input style=${this.state.inputStyle} onInput=${e => this.onNameChange(e)} autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder="${t('whats_your_name')}"/>
-              <p><button id="sign-up" type="submit">${t('new_user_go')}</button></p>
-              <br/>
-              <p><a href="#" id="show-existing-account-login" onClick=${() => this.setState({showSwitchAccount: true})}>${t('already_have_an_account')}</a></p>
+              <input style={this.state.inputStyle} onInput={e => this.onNameChange(e)} autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder={t('whats_your_name')} />
+              <p><button id="sign-up" type="submit">{t('new_user_go')}</button></p>
+              <br />
+              <p><a href="#" id="show-existing-account-login" onClick={() => this.setState({showSwitchAccount: true})}>{t('already_have_an_account')}</a></p>
+              {/* window.ethereum && <p><a href="#" onClick={() => Session.ethereumLogin()}>{t('ethereum_login')}</a></p>*/}
               <p>
-                <${LanguageSelector}/>
+                <LanguageSelector />
               </p>
             </div>
           </form>
-        `:html`
+        ):(
           <div id="existing-account-login">
-            <p><a href="#" id="show-create-account" onClick=${e => this.showCreateAccount(e)}>> ${t('back')}</a></p>
-            ${this.renderExistingAccountLogin()}
+            <p><a href="#" id="show-create-account" onClick={e => this.showCreateAccount(e)}>> {t('back')}</a></p>
+            {this.renderExistingAccountLogin()}
           </div>
-        `}
+        )}
       </div>
-    </section>`;
+    </section>);
   }
 }
 
