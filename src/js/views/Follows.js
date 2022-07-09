@@ -35,9 +35,6 @@ class Follows extends View {
         if (follows && !this.follows.has(pub)) {
           this.follows.add(pub);
           this.getNameForUser(pub);
-        } else {
-          this.follows.delete(pub);
-          this.followNames.delete(pub);
         }
         this.updateSortedFollows();
       }));
