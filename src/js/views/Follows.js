@@ -6,38 +6,62 @@ import FollowButton from '../components/FollowButton';
 import Name from '../components/Name';
 import View from './View';
 import Session from '../Session';
+import {debounce} from 'lodash';
 
 class Follows extends View {
   constructor() {
     super();
-    this.follows = {};
+    this.follows = new Set();
+    this.followNames = new Map();
     this.id = "follows-view";
+    this.state = { follows: [] };
   }
+
+  updateSortedFollows = debounce(() => {
+    const follows = Array.from(this.follows).sort((aK,bK) => {
+      const aName = this.followNames.get(aK);
+      const bName = this.followNames.get(bK);
+      if (!aName && !bName) { return aK.localeCompare(bK); }
+      if (!aName) { return 1; }
+      if (!bName) { return -1; }
+      return aName.localeCompare(bName);
+    });
+    this.setState({follows});
+  }, 1000);
 
   getFollows() {
     State.public.user(this.props.id).get('follow').map().on(this.sub(
       (follows, pub) => {
-        if (follows) {
-          this.follows[pub] = {};
-          this.setState({});
+        if (follows && !this.follows.has(pub)) {
+          this.follows.add(pub);
+          this.getNameForUser(pub);
         } else {
-          delete this.follows[pub];
+          this.follows.delete(pub);
+          this.followNames.delete(pub);
         }
-        this.setState({});
-      }
-    ));
+        this.updateSortedFollows();
+      }));
   }
 
   shouldComponentUpdate() {
     return true;
   }
 
+  getNameForUser(user) {
+    State.public.user(user).get('profile').get('name').on(this.sub(name => {
+      if (!name) return;
+      this.followNames.set(user, name);
+      this.updateSortedFollows();
+    }));
+  }
+
   getFollowers() {
     State.group().on(`follow/${this.props.id}`, this.sub((following, a, b, e, user) => {
-      if (following) {
+      if (following && !this.follows.has(user)) {
           if (!following) return;
-          this.follows[user] = {};
-          this.setState({});
+          this.follows.add(user);
+          this.getNameForUser(user);
+          this.updateSortedFollows();
       }
     }));
   }
@@ -49,35 +73,26 @@ class Follows extends View {
   }
 
   renderView() {
-    const keys = Object.keys(this.follows);
-    keys.sort((aK,bK) => {
-      const a = this.follows[aK];
-      const b = this.follows[bK];
-      if (!a.name && !b.name) { return aK.localeCompare(bK); }
-      if (!a.name) { return 1; }
-      if (!b.name) { return -1; }
-      return a.name.localeCompare(b.name);
-    });
     return html`
       <div class="centered-container">
         <h3><a href="/profile/${this.props.id}"><${Name} pub=${this.props.id} placeholder="—" /></a>:<i> </i>
         ${this.props.followers ? t('followers') : t('following')}</h3>
         <div id="follows-list">
-          ${keys.map(k => {
+          ${this.state.follows.map(k => {
             return html`
             <div key=${k} class="profile-link-container">
               <a href="/profile/${k}" class="profile-link">
                 <${Identicon} str=${k} width=49/>
                 <div>
                   <${Name} pub=${k}/><br/>
-                  <small class="follower-count">${this.follows[k].followers && this.follows[k].followers.size || '0'} followers</small>
+                  <small class="follower-count">${'0'} followers</small>
                 </div>
               </a>
               ${k !== Session.getPubKey() ? html`<${FollowButton} id=${k}/>` : ''}
 
             </div>`;
           })}
-          ${keys.length === 0 ? '—' : ''}
+          ${this.state.follows.length === 0 ? '—' : ''}
         </div>
       </div>
     `;
