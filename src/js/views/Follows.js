@@ -6,7 +6,7 @@ import FollowButton from '../components/FollowButton';
 import Name from '../components/Name';
 import View from './View';
 import Session from '../Session';
-import {debounce} from 'lodash';
+import {throttle} from 'lodash';
 
 class Follows extends View {
   constructor() {
@@ -17,7 +17,7 @@ class Follows extends View {
     this.state = { follows: [] };
   }
 
-  updateSortedFollows = debounce(() => {
+  updateSortedFollows = throttle(() => {
     const follows = Array.from(this.follows).sort((aK,bK) => {
       const aName = this.followNames.get(aK);
       const bName = this.followNames.get(bK);
@@ -27,7 +27,7 @@ class Follows extends View {
       return aName.localeCompare(bName);
     });
     this.setState({follows});
-  }, 1000);
+  }, 1000, {leading: false});
 
   getFollows() {
     State.public.user(this.props.id).get('follow').map().on(this.sub(
