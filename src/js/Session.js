@@ -8,6 +8,8 @@ import iris from './iris-lib';
 import _ from 'lodash';
 import Fuse from "./lib/fuse.basic.esm.min";
 import localforage from './lib/localforage.min';
+import { ec as EC } from 'elliptic';
+import base64url from "base64url";
 
 let key;
 let myName;
@@ -159,6 +161,57 @@ function updateGroups() {
       updateNoFollowers();
     }
   });
+}
+
+const isHex = (maybeHex) =>
+  maybeHex.length !== 0 && maybeHex.length % 2 === 0 && !/[^a-fA-F0-9]/u.test(maybeHex);
+
+const hexToUint8Array = (hexString) => {
+  if (!isHex(hexString)) {
+    throw new Error('Not a hex string');
+  }
+  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+}
+
+const uint8ArrayToHex = (uint8Array) => {
+  return Array.from(uint8Array).map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function keyPairFromHash(hash) {
+  const ec = new EC('secp256k1');
+  console.log('hex string of hash', uint8ArrayToHex(new Uint8Array(hash)));
+  const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
+  let privKey = base64url.encode(keyPair.getPrivate("hex"), "hex");
+  let pubKey = keyPair.getPublic();
+  console.log('privKey', privKey);
+  console.log('pubKey', pubKey);
+  console.log(pubKey.getX().toString(16));
+  console.log(pubKey.getY().toString(16));
+  const pubX = base64url.encode(pubKey.getX().toString("hex"), "hex");
+  const pubY = base64url.encode(pubKey.getY().toString("hex"), "hex");
+  const kp = { pub: `${pubX}.${pubY}`, priv: privKey };
+  return kp;
+}
+
+async function ethereumLogin() {
+  const accounts = await window.ethereum.request({method: 'eth_accounts'});
+  if (accounts.length > 0) {
+    const message = "I'm trusting this application with irrevocable access to my Iris account.";
+    const signature = await window.ethereum.request({method: 'personal_sign', params: [accounts[0], message]});
+    const signatureBytes = hexToUint8Array(signature.substring(2));
+    const hash1 = await window.crypto.subtle.digest('SHA-256', signatureBytes);
+    const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
+    const signingKey = keyPairFromHash(hash1);
+    const encryptionKey = keyPairFromHash(hash2);
+    const k = {
+      pub: signingKey.pub,
+      priv: signingKey.priv,
+      epub: encryptionKey.pub,
+      epriv: encryptionKey.priv
+    };
+    console.log(k);
+    login(k);
+  }
 }
 
 function login(k) {
@@ -508,4 +561,4 @@ function followChatLink(str) {
   }
 }
 
-export default {init, followChatLink, getKey, getPubKey, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+export default {init, followChatLink, getKey, getPubKey, ethereumLogin, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
