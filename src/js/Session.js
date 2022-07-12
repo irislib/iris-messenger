@@ -9,7 +9,6 @@ import _ from 'lodash';
 import Fuse from "./lib/fuse.basic.esm.min";
 import localforage from './lib/localforage.min';
 import { ec as EC } from 'elliptic';
-import base64url from "base64url";
 
 let key;
 let myName;
@@ -173,30 +172,37 @@ const hexToUint8Array = (hexString) => {
   return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
 }
 
-const uint8ArrayToHex = (uint8Array) => {
-  return Array.from(uint8Array).map((byte) => byte.toString(16).padStart(2, '0')).join('');
+function arrayToBase64Url(array) {
+  return btoa(String.fromCharCode.apply(null, array)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
 function keyPairFromHash(hash) {
   const ec = new EC('secp256k1');
-  console.log('hex string of hash', uint8ArrayToHex(new Uint8Array(hash)));
   const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
-  let privKey = base64url.encode(keyPair.getPrivate("hex"), "hex");
-  let pubKey = keyPair.getPublic();
-  console.log('privKey', privKey);
-  console.log('pubKey', pubKey);
-  console.log(pubKey.getX().toString(16));
-  console.log(pubKey.getY().toString(16));
-  const pubX = base64url.encode(pubKey.getX().toString("hex"), "hex");
-  const pubY = base64url.encode(pubKey.getY().toString("hex"), "hex");
-  const kp = { pub: `${pubX}.${pubY}`, priv: privKey };
+
+  let privKey = keyPair.getPrivate().toArray("be", 32);
+  let x = keyPair.getPublic().getX().toArray("be", 32);
+  let y = keyPair.getPublic().getY().toArray("be", 32);
+
+  console.log(privKey);
+  console.log('x', x);
+  console.log('y', y);
+
+  privKey = arrayToBase64Url(privKey);
+  x = arrayToBase64Url(x);
+  y = arrayToBase64Url(y);
+
+  console.log(privKey);
+  console.log('x', x);
+  console.log('y', y);
+  const kp = { pub: `${x}.${y}`, priv: privKey };
   return kp;
 }
 
 async function ethereumLogin() {
   const accounts = await window.ethereum.request({method: 'eth_accounts'});
   if (accounts.length > 0) {
-    const message = "I'm trusting this application with irrevocable access to my Iris account.";
+    const message = "I'm trusting this application with an irrevocable access key to my Iris account.";
     const signature = await window.ethereum.request({method: 'personal_sign', params: [accounts[0], message]});
     const signatureBytes = hexToUint8Array(signature.substring(2));
     const hash1 = await window.crypto.subtle.digest('SHA-256', signatureBytes);
@@ -215,6 +221,7 @@ async function ethereumLogin() {
 }
 
 function login(k) {
+  console.log('login with', k, typeof k);
   const shouldRefresh = !!key;
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
