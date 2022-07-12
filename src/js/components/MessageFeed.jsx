@@ -83,7 +83,7 @@ class MessageFeed extends Component {
         ))}
         {displayCount < this.state.sortedMessages.length ? (
           <p>
-            <button onClick={() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE * 3})}>
+            <button onClick={() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE})}>
               {t('show_more')}
             </button>
           </p>
