@@ -8,6 +8,7 @@ import iris from './iris-lib';
 import _ from 'lodash';
 import Fuse from "./lib/fuse.basic.esm.min";
 import localforage from './lib/localforage.min';
+import { ec as EC } from 'elliptic';
 
 let key;
 let myName;
@@ -159,6 +160,65 @@ function updateGroups() {
       updateNoFollowers();
     }
   });
+}
+
+const isHex = (maybeHex) =>
+  maybeHex.length !== 0 && maybeHex.length % 2 === 0 && !/[^a-fA-F0-9]/u.test(maybeHex);
+
+const hexToUint8Array = (hexString) => {
+  if (!isHex(hexString)) {
+    throw new Error('Not a hex string');
+  }
+  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+}
+
+function arrayToBase64Url(array) {
+  return btoa(String.fromCharCode.apply(null, array)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+function keyPairFromHash(hash) {
+  const ec = new EC('p256');
+  const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
+
+  let privKey = keyPair.getPrivate().toArray("be", 32);
+  let x = keyPair.getPublic().getX().toArray("be", 32);
+  let y = keyPair.getPublic().getY().toArray("be", 32);
+
+  privKey = arrayToBase64Url(privKey);
+  x = arrayToBase64Url(x);
+  y = arrayToBase64Url(y);
+
+  const kp = { pub: `${x}.${y}`, priv: privKey };
+  return kp;
+}
+
+async function ethereumLogin(name) {
+  const accounts = await window.ethereum.request({method: 'eth_accounts'});
+  if (accounts.length > 0) {
+    const message = "I'm trusting this application with an irrevocable access key to my Iris account.";
+    const signature = await window.ethereum.request({method: 'personal_sign', params: [accounts[0], message]});
+    const signatureBytes = hexToUint8Array(signature.substring(2));
+    const hash1 = await window.crypto.subtle.digest('SHA-256', signatureBytes);
+    const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
+    const signingKey = keyPairFromHash(hash1);
+    const encryptionKey = keyPairFromHash(hash2);
+    const k = {
+      pub: signingKey.pub,
+      priv: signingKey.priv,
+      epub: encryptionKey.pub,
+      epriv: encryptionKey.priv
+    };
+    login(k);
+    setTimeout(async () => {
+      State.public.user().get('profile').get('name').once(existingName => {
+        if (typeof existingName !== 'string' || existingName === '') {
+          name = name || Helpers.generateName();
+          State.public.user().get('profile').put({a:null});
+          State.public.user().get('profile').get('name').put(name);
+        }
+      });
+    }, 2000);
+  }
 }
 
 function login(k) {
@@ -508,4 +568,4 @@ function followChatLink(str) {
   }
 }
 
-export default {init, followChatLink, getKey, getPubKey, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+export default {init, followChatLink, getKey, getPubKey, ethereumLogin, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
