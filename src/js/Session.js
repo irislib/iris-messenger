@@ -193,7 +193,7 @@ function keyPairFromHash(hash) {
 }
 
 async function ethereumLogin(name) {
-  const accounts = await window.ethereum.request({method: 'eth_accounts'});
+  const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
   if (accounts.length > 0) {
     const message = "I'm trusting this application with an irrevocable access key to my Iris account.";
     const signature = await window.ethereum.request({method: 'personal_sign', params: [accounts[0], message]});
