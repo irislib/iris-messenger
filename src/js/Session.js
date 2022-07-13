@@ -184,17 +184,10 @@ function keyPairFromHash(hash) {
   let x = keyPair.getPublic().getX().toArray("be", 32);
   let y = keyPair.getPublic().getY().toArray("be", 32);
 
-  console.log(privKey);
-  console.log('x', x);
-  console.log('y', y);
-
   privKey = arrayToBase64Url(privKey);
   x = arrayToBase64Url(x);
   y = arrayToBase64Url(y);
 
-  console.log(privKey);
-  console.log('x', x);
-  console.log('y', y);
   const kp = { pub: `${x}.${y}`, priv: privKey };
   return kp;
 }
@@ -215,13 +208,11 @@ async function ethereumLogin() {
       epub: encryptionKey.pub,
       epriv: encryptionKey.priv
     };
-    console.log(k);
     login(k);
   }
 }
 
 function login(k) {
-  console.log('login with', k, typeof k);
   const shouldRefresh = !!key;
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
