@@ -192,7 +192,7 @@ function keyPairFromHash(hash) {
   return kp;
 }
 
-async function ethereumLogin() {
+async function ethereumLogin(name) {
   const accounts = await window.ethereum.request({method: 'eth_accounts'});
   if (accounts.length > 0) {
     const message = "I'm trusting this application with an irrevocable access key to my Iris account.";
@@ -209,6 +209,15 @@ async function ethereumLogin() {
       epriv: encryptionKey.priv
     };
     login(k);
+    setTimeout(async () => {
+      State.public.user().get('profile').get('name').once(existingName => {
+        if (typeof existingName !== 'string' || existingName === '') {
+          name = name || Helpers.generateName();
+          State.public.user().get('profile').put({a:null});
+          State.public.user().get('profile').get('name').put(name);
+        }
+      });
+    }, 2000);
   }
 }
 
