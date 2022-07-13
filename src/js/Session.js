@@ -177,7 +177,7 @@ function arrayToBase64Url(array) {
 }
 
 function keyPairFromHash(hash) {
-  const ec = new EC('secp256k1');
+  const ec = new EC('p256');
   const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
 
   let privKey = keyPair.getPrivate().toArray("be", 32);
