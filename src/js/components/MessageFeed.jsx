@@ -78,9 +78,11 @@ class MessageFeed extends Component {
     const displayCount = this.state.displayCount;
     return (
       <>
-        {this.state.sortedMessages.slice(0, displayCount).map(hash => (
-          <PublicMessage key={hash} hash={hash} showName={true} />
-        ))}
+        <div>
+          {this.state.sortedMessages.slice(0, displayCount).map(hash => (
+            <PublicMessage key={hash} hash={hash} showName={true} />
+          ))}
+        </div>
         {displayCount < this.state.sortedMessages.length ? (
           <p>
             <button onClick={() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE})}>
