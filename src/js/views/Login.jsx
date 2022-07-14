@@ -85,7 +85,7 @@ class Login extends Component {
               <p><button id="sign-up" type="submit">{t('new_user_go')}</button></p>
               <br />
               <p><a href="#" id="show-existing-account-login" onClick={() => this.setState({showSwitchAccount: true})}>{t('already_have_an_account')}</a></p>
-              {window.ethereum && <p><a href="#" onClick={() => Session.ethereumLogin()}>{t('ethereum_login')}</a></p>}
+              {window.ethereum && <p><a href="#" onClick={() => Session.ethereumLogin()}>{t('web3_login')}</a></p>}
               <p>
                 <LanguageSelector />
               </p>

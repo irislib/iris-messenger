@@ -9,6 +9,9 @@ import _ from 'lodash';
 import Fuse from "./lib/fuse.basic.esm.min";
 import localforage from './lib/localforage.min';
 import { ec as EC } from 'elliptic';
+import Web3 from "web3";
+import Web3Modal from "web3modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 
 let key;
 let myName;
@@ -193,10 +196,32 @@ function keyPairFromHash(hash) {
 }
 
 async function ethereumLogin(name) {
-  const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
+  const providerOptions = {
+    walletconnect: {
+      package: WalletConnectProvider,
+      options: {
+        infuraId: "4bd8d95876de48e0b17d56c0da31880a"
+      }
+    }
+  };
+  const web3Modal = new Web3Modal({
+    network: "mainnet",
+    providerOptions,
+    theme: "dark"
+  });
+
+  web3Modal.on('accountsChanged', (provider) => {
+    console.log('connect', provider);
+  });
+
+  const provider = await web3Modal.connect();
+  const web3 = new Web3(provider);
+
+
+  const accounts = await web3.eth.getAccounts();
   if (accounts.length > 0) {
     const message = "I'm trusting this application with an irrevocable access key to my Iris account.";
-    const signature = await window.ethereum.request({method: 'personal_sign', params: [accounts[0], message]});
+    const signature = await web3.eth.sign(message, accounts[0]);
     const signatureBytes = hexToUint8Array(signature.substring(2));
     const hash1 = await window.crypto.subtle.digest('SHA-256', signatureBytes);
     const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);

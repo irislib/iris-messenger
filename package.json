@@ -47,6 +47,7 @@
     "webpack-build-notifier": "^2.3.0"
   },
   "dependencies": {
+    "@walletconnect/web3-provider": "^1.7.8",
     "@zxing/library": "^0.18.6",
     "autolinker": "^3.14.3",
     "elliptic": "^6.5.4",
@@ -67,6 +68,8 @@
     "preact-scroll-viewport": "^0.2.0",
     "react-helmet": "^6.1.0",
     "react-virtualized": "^9.22.3",
+    "web3": "^1.7.4",
+    "web3modal": "^1.9.8",
     "webtorrent": "^1.5.1"
   },
   "jest": {
