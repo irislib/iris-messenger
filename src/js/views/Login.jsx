@@ -28,6 +28,7 @@ class Login extends Component {
       let k = JSON.parse(val);
       Session.login(k);
       event.target.value = '';
+      Helpers.copyToClipboard(''); // clear the clipboard
     } catch (e) {
       console.error('Login with key', val, 'failed:', e);
     }
