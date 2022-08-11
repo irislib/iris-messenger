@@ -15,6 +15,7 @@ import $ from 'jquery';
 import {Helmet} from "react-helmet";
 import Notifications from '../Notifications';
 
+const MSG_TRUNCATE_LENGTH = 1000;
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
 const replyIcon = html`<svg width="24" version="1.1" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;"><path fill="currentColor" d="M256,21.952c-141.163,0-256,95.424-256,212.715c0,60.267,30.805,117.269,84.885,157.717l-41.109,82.219 c-2.176,4.331-1.131,9.579,2.496,12.779c2.005,1.771,4.501,2.667,7.04,2.667c2.069,0,4.139-0.597,5.952-1.813l89.963-60.395
@@ -187,7 +188,8 @@ class PublicMessage extends Message {
       text = shortText;
     }
     const title = `${name || 'User'} on Iris`;
-    p.innerText = text;
+    p.innerText = (text.length > MSG_TRUNCATE_LENGTH) && !this.state.showMore && !this.props.standalone ?
+      text.slice(0, MSG_TRUNCATE_LENGTH) + '...' : text;
     let h = p.innerHTML;
     if (!emojiOnly) {
       h = Helpers.highlightEmoji(h);
@@ -232,13 +234,23 @@ class PublicMessage extends Message {
           ${s.msg.torrentId ? html`
               <${Torrent} torrentId=${s.msg.torrentId} autopause=${!this.props.standalone}/>
           `:''}
-          ${s.msg.attachments && s.msg.attachments.map(a =>
-            html`<div class="img-container">
-                <div class="heart"></div>
-                <${SafeImg} src=${a.data} onClick=${e => { this.imageClicked(e); }}/>
-            </div>`
-          )}
+          ${s.msg.attachments && s.msg.attachments.map((a, i) => {
+            if (i > 0 && !this.props.standalone && !this.state.showMore) {
+              return;
+            }
+            return html`<div class="img-container">
+              <div class="heart"></div>
+              <${SafeImg} src=${a.data} onClick=${e => { this.imageClicked(e); }}/>
+            </div>`;
+          })}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
+          ${!this.props.standalone && (s.msg.attachments && (s.msg.attachments.length > 1) ||
+            (text.length > MSG_TRUNCATE_LENGTH)) ? html`
+            <a onClick=${e => {
+                e.preventDefault();
+                this.setState({showMore: !s.showMore});
+            }}>Show ${s.showMore ? 'less' : 'more'}</a>
+          ` : ''}
           ${s.msg.replyingTo && !this.props.asReply ? html`
             <div><a href="/post/${encodeURIComponent(s.msg.replyingTo)}">Show replied message</a></div>
           ` : ''}
