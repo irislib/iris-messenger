@@ -67,6 +67,7 @@
     "preact-router": "^3.2.1",
     "preact-scroll-viewport": "^0.2.0",
     "react-helmet": "^6.1.0",
+    "react-image-gallery": "^1.2.9",
     "react-virtualized": "^9.22.3",
     "web3": "^1.7.4",
     "web3modal": "^1.9.8",

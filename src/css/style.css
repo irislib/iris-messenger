@@ -140,7 +140,7 @@ textarea {
   resize: none;
 }
 
-input, button, .button {
+input, .button {
   padding: 15px;
   outline: none;
   border: 0;
@@ -148,7 +148,7 @@ input, button, .button {
   border-radius: 50px;
 }
 
-input:not(:last-child), button:not(:last-child), .button:not(:last-child) {
+input:not(:last-child), .button:not(:last-child) {
   margin-right: 7px;
 }
 
@@ -231,7 +231,7 @@ button, .button {
   transition: all 0.25s ease;
 }
 
-button:hover, button:active, button:focus, .button:hover, .button:active, .button:focus {
+.button:hover, .button:active, .button:focus {
   background: var(--button-hover-bg);
 }
 
@@ -2241,3 +2241,5 @@ form.public {
       margin-top: 15px;
   }
 }
+
+@import "~react-image-gallery/styles/css/image-gallery.css";

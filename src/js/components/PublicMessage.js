@@ -14,6 +14,7 @@ import iris from '../iris-lib';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
 import Notifications from '../Notifications';
+import ImageGallery from 'react-image-gallery';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
@@ -232,12 +233,19 @@ class PublicMessage extends Message {
           ${s.msg.torrentId ? html`
               <${Torrent} torrentId=${s.msg.torrentId} autopause=${!this.props.standalone}/>
           `:''}
-          ${s.msg.attachments && s.msg.attachments.map(a =>
+          ${s.msg.attachments && s.msg.attachments.length === 1 && s.msg.attachments.map(a =>
             html`<div class="img-container">
                 <div class="heart"></div>
                 <${SafeImg} src=${a.data} onClick=${e => { this.imageClicked(e); }}/>
             </div>`
           )}
+          ${s.msg.attachments && s.msg.attachments.length > 1 ? html`
+            <div class="img-container">
+              <${ImageGallery} infinite=${false} showThumbnails=${false} showBullets=${true} showPlayButton=${false} items=${s.msg.attachments.map(a => {
+                  return {original: a.data, thumbnail: a.data, originalHeight: 400};
+              })} />
+            </div>
+          ` : ''}
           <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
           ${s.msg.replyingTo && !this.props.asReply ? html`
             <div><a href="/post/${encodeURIComponent(s.msg.replyingTo)}">Show replied message</a></div>
