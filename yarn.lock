@@ -7006,9 +7006,9 @@ growly@^1.3.0:
   resolved "https://registry.npmjs.org/growly/-/growly-1.3.0.tgz"
   integrity sha1-8QdIy+dq+WS3yWyTxrzCivEgwIE=
 
-gun@mmalmi/gun:
+"gun@https://github.com/mmalmi/gun.git":
   version "0.2020.1238"
-  resolved "git+ssh://git@github.com/mmalmi/gun.git#fb588085920d8711e5e8b3fade3edb142cf36312"
+  resolved "https://github.com/mmalmi/gun.git#fb588085920d8711e5e8b3fade3edb142cf36312"
   dependencies:
     ws "^7.2.1"
   optionalDependencies:
