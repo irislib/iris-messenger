@@ -6,7 +6,6 @@ import {translate as t} from '../../Translation';
 import { route } from 'preact-router';
 import State from '../../State';
 import Session from '../../Session';
-//import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 export default class BlockedSettings extends Component {
   constructor() {

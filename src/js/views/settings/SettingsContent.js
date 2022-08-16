@@ -3,7 +3,6 @@ import _ from 'lodash';
 import Component from '../../BaseComponent';
 import {ExistingAccountLogin} from '../Login';
 import {translate as t} from '../../Translation';
-import {Router, Route, Routes } from "react-router-dom";
 
 import AccountSettings from './AccountSettings';
 import KeySettings from './KeySettings';

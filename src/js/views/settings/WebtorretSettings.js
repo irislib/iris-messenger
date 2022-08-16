@@ -7,7 +7,6 @@ import Component from '../../BaseComponent';
 import {ExistingAccountLogin} from '../Login';
 import {translate as t} from '../../Translation';
 import { route } from 'preact-router';
-//import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 export default class WebtorretSettings extends Component {
 

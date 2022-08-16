@@ -5,7 +5,6 @@ import Component from '../../BaseComponent';
 import {ExistingAccountLogin} from '../Login';
 import {translate as t} from '../../Translation';
 import { route } from 'preact-router';
-//import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import CopyButton from '../../components/CopyButton';
 import Session from '../../Session';
 
