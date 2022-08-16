@@ -1,4 +1,4 @@
-import Helpers from '../../Helpers';
+/*import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import State from '../../State';
 import Session from '../../Session';
@@ -198,4 +198,4 @@ function downloadKey() {
   return Helpers.download('iris_private_key.txt', JSON.stringify(key), 'text/plain', 'utf-8');
 }
 
-export default Settings;
+export default Settings;*/

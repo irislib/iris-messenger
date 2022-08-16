@@ -32,6 +32,7 @@ export default class PeerSettings extends Component {
   render() {
     return (
         <>
+        <div class="centered-container">
             <h3>{t('peers')}</h3>
             {this.renderPeerList()}
             <p><input type="checkbox" checked={this.state.local.enablePublicPeerDiscovery}
@@ -60,6 +61,8 @@ export default class PeerSettings extends Component {
             <p><a href="https://heroku.com/deploy?template=https://github.com/mmalmi/rod">
                 {Icons.herokuButton}
             </a></p>
+            <p>{t('also')} <a href="https://github.com/amark/gun#docker">Docker</a> {t('or_small')} <a href="https://github.com/irislib/iris-electron">Iris-electron</a>.</p>
+            </div>
         </>
     );
   }

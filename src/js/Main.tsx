@@ -143,7 +143,7 @@ class Main extends Component<Props,State> {
               <Message path="/post/:hash+"/>
               <Torrent path="/torrent/:id+"/>
               <About path="/about"/>
-              <Settings path="/settings"/>
+              <Settings path="/settings/:page?"/>
               <LogoutConfirmation path="/logout"/>
               <Profile path="/profile/:id+" tab="profile"/>
               <Profile path="/replies/:id+" tab="replies"/>

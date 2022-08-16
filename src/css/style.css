@@ -1001,6 +1001,44 @@ h1, .application-list a.logo span {
   padding-left: 0;
 }
 
+.settings-list {
+  z-index: 1;
+  width: 220px;
+  transition: all 0.25s ease;
+  background: var(--menu-bg);
+  border-right: var(--sidebar-border-right);
+  color: var(--sidebar-color);
+  font-family: "Metuo-Black", Futura, Arial;
+}
+
+.settings-list .electron-padding {
+  height: 40px;
+}
+
+.settings-list a {
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  color: var(--text-color);
+  justify-content: left;
+}
+
+.settings-list .text {
+  border-bottom: 1px solid var(--zebra-stripe-bg);
+  flex: 1;
+  padding: 15px;
+  padding-left: 0;
+}
+
+.settings-list a:hover {
+  background: var(--chat-hover);
+}
+
+.settings-list a.active {
+  background: var(--chat-active);
+}
+
 a.msg {
   color: var(--text-color);
 }
@@ -1183,6 +1221,15 @@ a.msg {
   width: 800px;
   align-self: center;
 }
+
+#settings {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  flex: 1;
+  padding: 0;
+}
+
 
 #chat-view {
   display: flex;
