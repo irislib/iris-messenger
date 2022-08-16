@@ -1,13 +1,9 @@
-import _ from 'lodash';
-import Component from '../../BaseComponent';
-import {translate as t} from '../../Translation';
-import LanguageSelector from '../../components/LanguageSelector';
-import {AVAILABLE_LANGUAGES, language} from '../../Translation';
+import {AVAILABLE_LANGUAGES, language, translate as t} from '../../Translation';
 import Translations from '../../Translations';
 import $ from 'jquery';
-export default class LanguageSettings extends Component {
 
-  render() {
+//export default class LanguageSettings extends Component {
+  const LanguageSettings = () => {
     return (
         <>
         <div class="centered-container">
@@ -17,7 +13,7 @@ export default class LanguageSettings extends Component {
           AVAILABLE_LANGUAGES.map(l => {
             let inputl = null;
             if(l == {language}.language){
-              inputl = <input type="radio" name="language" id={l} onChange={e => onLanguageChange(e)} value={l} checked/>;
+              inputl = <input type="radio" name="language" id={l} onChange={e => onLanguageChange(e)} value={l} checked />;
             }else{
               inputl = <input type="radio" name="language" id={l} onChange={e => onLanguageChange(e)} value={l} />;
             }
@@ -25,7 +21,7 @@ export default class LanguageSettings extends Component {
             <>
               {inputl}
               <label for={l}>{Translations[l].language_name}</label>
-              <br/>
+              <br />
             </>
            ); 
           }
@@ -36,8 +32,8 @@ export default class LanguageSettings extends Component {
         </div>
         </>
     );
-  }
 }
+
 function onLanguageChange(e) {
   const l = $(e.target).val();
   if (AVAILABLE_LANGUAGES.indexOf(l) >= 0) {
@@ -45,3 +41,4 @@ function onLanguageChange(e) {
     location.reload();
   }
 }
+export default LanguageSettings;

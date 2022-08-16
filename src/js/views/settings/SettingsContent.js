@@ -1,8 +1,5 @@
-import { html } from 'htm/preact';
-import _ from 'lodash';
 import Component from '../../BaseComponent';
-import {ExistingAccountLogin} from '../Login';
-import {translate as t} from '../../Translation';
+import { html } from 'htm/preact';
 
 import AccountSettings from './AccountSettings';
 import KeySettings from './KeySettings';
@@ -20,37 +17,28 @@ export default class SettingsContent extends Component {
   constructor() {
     super();
     this.content = "home";
-    //this.id = "settingslist";
   }
   render() {
-    //content = <AccountSettings/>;
     let page = this.props.id;
 
     if(page == "AccountSettings"){
-      return (<AccountSettings/>);
+      return (<AccountSettings />);
     }else if(page == "KeySettings"){
-      return (<KeySettings/>);
+      return (<KeySettings />);
     }else if(page == "PeerSettings"){
-      return (<PeerSettings/>);
+      return (<PeerSettings />);
     }else if(page == "LanguageSettings"){
-      return (<LanguageSettings/>);
+      return (html`<${LanguageSettings} key="moi" />`);
     }else if(page == "WebtorretSettings"){
-      return (<WebtorretSettings/>);
+      return (<WebtorretSettings />);
     }else if(page == "WebRTCSettings"){
-      return (<WebRTCSettings/>);
+      return (<WebRTCSettings />);
     }else if(page == "BetaSettings"){
-      return (<BetaSettings/>);
+      return (<BetaSettings />);
     }else if(page == "BlockedSettings"){
-      return (<BlockedSettings/>);
+      return (<BlockedSettings />);
     }else{
-      return (<AccountSettings/>);
+      return (<AccountSettings />);
     }
- 
-    return (<AccountSettings/>);
-    /*return (
-        <>
-        {content}
-        </>
-    );*/
   }
 }

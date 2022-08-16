@@ -11,9 +11,6 @@ class Settings extends Component {
   constructor() {
     super();
     this.state = Session.DEFAULT_SETTINGS;
-    //this.state.webPushSubscriptions = {};
-    //this.state.blockedUsers = {};
-    //this.id = "settings";
   }
 
   render() {
@@ -22,7 +19,7 @@ class Settings extends Component {
       <>
       <Header />
       <div class="main-view" id="settings">
-        <SettingsMenu/>
+        <SettingsMenu key="moi" />
         {page}    
       </div>
       </>

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import Component from '../../BaseComponent';
 import {translate as t} from '../../Translation';
 import { route } from 'preact-router';

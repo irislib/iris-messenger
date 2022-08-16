@@ -1,10 +1,8 @@
 import { html } from 'htm/preact';
 import _ from 'lodash';
-import Component from '../../BaseComponent';
-import {ExistingAccountLogin} from '../Login';
-import {translate as t} from '../../Translation';
-import { route } from 'preact-router';
 import State from '../../State';
+import Component from '../../BaseComponent';
+import {translate as t} from '../../Translation';
 import Session from '../../Session';
 
 export default class BlockedSettings extends Component {
@@ -32,4 +30,24 @@ export default class BlockedSettings extends Component {
         </>
     );
   }
+  componentDidMount() {
+    const blockedUsers = {};
+
+    State.electron && State.electron.get('settings').on(this.inject('electron', 'electron'));
+    State.local.get('settings').on(this.sub(local => {
+      console.log('local settings', local);
+      if (local) {
+        this.setState({local});
+      }
+    }));
+    State.public.user().get('block').map().on(this.sub(
+      (v,k) => {
+        blockedUsers[k] = v;
+        this.setState({blockedUsers});
+      }
+    ));
+  }
 }
+
+
+
