@@ -1,11 +1,7 @@
-import { html } from 'htm/preact';
-import Helpers from '../../Helpers';
-import _ from 'lodash';
 import State from '../../State';
 import Session from '../../Session';
 import Component from '../../BaseComponent';
 import {translate as t} from '../../Translation';
-import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../../components/VideoCall';
 import Notifications from '../../Notifications';
 import $ from 'jquery';
 
