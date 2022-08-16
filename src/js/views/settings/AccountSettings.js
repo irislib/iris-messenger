@@ -1,5 +1,4 @@
 import { html } from 'htm/preact';
-import _ from 'lodash';
 import Component from '../../BaseComponent';
 import {ExistingAccountLogin} from '../Login';
 import {translate as t} from '../../Translation';
