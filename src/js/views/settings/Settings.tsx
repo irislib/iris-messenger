@@ -8,7 +8,7 @@ import State from "../../State";
 import $ from 'jquery';
 import { route } from 'preact-router';
 
-type Props = { page: string;};
+type Props = { page?: string;};
 
 type State = {
   toggleSettingsMenu: boolean;
