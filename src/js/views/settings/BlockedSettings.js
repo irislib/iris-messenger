@@ -1,9 +1,9 @@
-import { html } from 'htm/preact';
 import _ from 'lodash';
 import State from '../../State';
 import Component from '../../BaseComponent';
 import {translate as t} from '../../Translation';
 import Session from '../../Session';
+import Text from '../../components/Text';
 
 export default class BlockedSettings extends Component {
   constructor() {
@@ -21,10 +21,12 @@ export default class BlockedSettings extends Component {
         <div class="centered-container">
         <h3>{t('blocked_users')}</h3>
         {blockedUsers.map(user => {
-          if (this.state.blockedUsers[user]) {
-            return html`<p><a href="/profile/${encodeURIComponent(user)}"><${Text} user=${user} path="profile/name" placeholder="User"/></a></p>`;
-          }
-        })}
+              if (this.state.blockedUsers[user]) {
+                return (<p><a href={`/profile/${  encodeURIComponent(user)}`} ><Text user={user} path="profile/name" placeholder="User" /></a></p>);
+              }
+            }
+          )
+        }
         {blockedUsers.length === 0 ? t('none') : ''}
         </div>
         </>

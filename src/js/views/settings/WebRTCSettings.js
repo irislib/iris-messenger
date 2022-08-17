@@ -13,7 +13,7 @@ export default class WebRTCSettings extends Component {
           <div class="centered-container">
             <h3>{t('webrtc_connection_options')}</h3>
             <p><small>{t('webrtc_info')}</small></p>
-            <p><textarea rows="4" id="rtc-config" placeholder="${t('webrtc_connection_options')}" onChange={e => this.rtcConfigChanged(e)} /></p>
+            <p><textarea rows="4" id="rtc-config" placeholder={t('webrtc_connection_options')} onChange={e => this.rtcConfigChanged(e)} /></p>
             <button onClick={() => this.restoreDefaultRtcConfig()}>{t('restore_defaults')}</button>
           </div>
         </>

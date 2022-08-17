@@ -1,8 +1,8 @@
 import {AVAILABLE_LANGUAGES, language, translate as t} from '../../Translation';
 import Translations from '../../Translations';
 import $ from 'jquery';
+import { Fragment } from 'preact';
 
-//export default class LanguageSettings extends Component {
   const LanguageSettings = () => {
     return (
         <>
@@ -11,19 +11,20 @@ import $ from 'jquery';
         <div class="centered-container">
         {
           AVAILABLE_LANGUAGES.map(l => {
-            let inputl = null;
+            let inputl = "";
             if(l == {language}.language){
               inputl = <input type="radio" name="language" id={l} onChange={e => onLanguageChange(e)} value={l} checked />;
             }else{
               inputl = <input type="radio" name="language" id={l} onChange={e => onLanguageChange(e)} value={l} />;
             }
            return(
-            <>
-              {inputl}
-              <label for={l}>{Translations[l].language_name}</label>
-              <br />
-            </>
-           ); 
+              <Fragment key={l.id} >
+                {inputl}
+                <label for={l}>{Translations[l].language_name}</label>
+                <br />
+              </Fragment >
+           );
+           
           }
           )
         }

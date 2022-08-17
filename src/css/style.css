@@ -885,7 +885,7 @@ header.footer .header-content {
   justify-content: left;
 }
 
-.application-list a.logo img:last-child {
+.application-list a.logo img:last-child,.settings-list a.logo img:last-child {
   margin-left: 5px;
 }
 
@@ -917,7 +917,7 @@ h1, .application-list a.logo span {
     padding: 15px;
   }
 
-  .application-list a.logo {
+  .application-list a.logo, .settings-list a.logo {
    padding: 15px;
   }
 
@@ -930,6 +930,12 @@ h1, .application-list a.logo span {
   .application-list .text {
     display: none;
   }
+  
+}
+@media (min-width:626px){
+  .settings-list {
+    background: var(--menu-bg);
+  }
 }
 
 @media (max-width:625px) {
@@ -940,6 +946,11 @@ h1, .application-list a.logo span {
     top: 0;
     left:0;
     bottom: 0;
+    
+  }
+  .settings-list {
+    flex: 1;
+    background: var(--body-bg);
   }
 
   .participant-list, .participant-list.open {
@@ -951,15 +962,15 @@ h1, .application-list a.logo span {
     bottom: 0;
   }
 
-  .application-list a {
+  .application-list a{
     padding: 0;
   }
 
-  .application-list .text {
+  .application-list .text{
     display: flex;
   }
 
-  .menu-visible-xs .application-list {
+  .menu-visible-xs .application-list{
     margin-left: 0;
   }
 
@@ -981,14 +992,14 @@ h1, .application-list a.logo span {
   background: var(--chat-active);
 }
 
-.application-list .icon, .notifications-button {
+.application-list .icon, .notifications-button , .settings-list .icon{
   padding: 7px;
   min-width: 55px;
   text-align: center;
   position: relative;
 }
 
-.application-list .icon .unseen, .notifications-button .unseen {
+.application-list .icon .unseen, .notifications-button .unseen{
   position: absolute;
   right: 5px;
   bottom: 5px;
@@ -1003,11 +1014,11 @@ h1, .application-list a.logo span {
 
 .settings-list {
   z-index: 1;
-  width: 220px;
+  min-width: 220px;
+  
   transition: all 0.25s ease;
-  background: var(--menu-bg);
   border-right: var(--sidebar-border-right);
-  color: var(--sidebar-color);
+  color: var(--text-color);
   font-family: "Metuo-Black", Futura, Arial;
 }
 

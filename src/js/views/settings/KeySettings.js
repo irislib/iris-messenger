@@ -24,7 +24,7 @@ export default class KeySettings extends Component {
     return (
         <>
         <div class="centered-container">
-        <h4>{t('private_key')}</h4>
+        <h3>{t('private_key')}</h3>
         <p dangerouslySetInnerHTML={{ __html: t('private_key_warning') }} />
         <p>
           <button onClick={() => downloadKey()}>{t('download_private_key')}</button>
@@ -34,6 +34,7 @@ export default class KeySettings extends Component {
           <button onClick={e => togglePrivateKeyQR(e)}>{t('show_privkey_qr')}</button>
         </p>
         <div id="private-key-qr" class="qr-container" />
+        <hr />
         <p>
           {t('email_privkey_to_yourself')}:
         </p>
@@ -41,9 +42,10 @@ export default class KeySettings extends Component {
           <form onSubmit={e => this.mailtoSubmit(e)}>
             <input name="email" type="email" onChange={e => this.setState({email:e.target.value.trim()})} placeholder={t('email')} />
             <input name="verify_email" type="email" onChange={e => this.setState({retypeEmail:e.target.value.trim()})} placeholder={t('retype_email')} />
-            <button type="submit">{t('go')}</button>
+            <button type="submit">{t('send email')}</button>
           </form>
         </p>
+        <hr />
         <p><small dangerouslySetInnerHTML={{ __html: t('privkey_storage_recommendation')}} /></p>
         </div>
         </>

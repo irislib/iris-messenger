@@ -82,7 +82,7 @@ export default {
   loadGunDepth,
   gunOnceDefined,
   gunAsAnotherUser,
-  getHash: async function (str, format = `base64`) {
+  async getHash (str, format = `base64`) {
     if (!str) {
       return undefined;
     }

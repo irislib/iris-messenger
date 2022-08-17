@@ -34,7 +34,7 @@ export default class Menu extends Component {
       <div class="application-list">
         ${Helpers.isElectron ? html`<div class="electron-padding"/>` : html`
           <a href="/" onClick=${() => this.menuLinkClicked()} tabindex="0" class="logo">
-            <div class="mobile-menu-icon visible-xs-inline-block">${Icons.menu}</div>
+          <div class="mobile-menu-icon visible-xs-inline-block">${Icons.menu}</div>
             <img src=${logo} width=30 height=30/>
             <span style="font-size: 1.5em">iris</span>
           </a>

@@ -14,12 +14,10 @@ export default class AccountSettings extends Component {
         <p>
           <b>{t('save_backup_of_privkey_first')}</b> {t('otherwise_cant_log_in_again')}
         </p>
-        <p>
+        <div style="">
           <button onClick={() => route('/logout')}>{t('log_out')}</button>
-        </p>
-        <p>
           <button onClick={() => this.setState({showSwitchAccount: !this.state.showSwitchAccount})}>{t('switch_account')}</button>
-        </p>
+        </div>
         {this.state.showSwitchAccount ? html`<${ExistingAccountLogin}/>` : ''}
         </div>
         </>

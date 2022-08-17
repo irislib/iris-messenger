@@ -1,5 +1,4 @@
 import Component from '../../BaseComponent';
-import { html } from 'htm/preact';
 
 import AccountSettings from './AccountSettings';
 import KeySettings from './KeySettings';
@@ -28,7 +27,7 @@ export default class SettingsContent extends Component {
     }else if(page == "PeerSettings"){
       return (<PeerSettings />);
     }else if(page == "LanguageSettings"){
-      return (html`<${LanguageSettings} key="moi" />`);
+      return (<LanguageSettings />);
     }else if(page == "WebtorretSettings"){
       return (<WebtorretSettings />);
     }else if(page == "WebRTCSettings"){
@@ -37,8 +36,8 @@ export default class SettingsContent extends Component {
       return (<BetaSettings />);
     }else if(page == "BlockedSettings"){
       return (<BlockedSettings />);
-    }else{
-      return (<AccountSettings />);
     }
+      return (<AccountSettings />);
+    
   }
 }
