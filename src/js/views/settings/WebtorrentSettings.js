@@ -3,7 +3,7 @@ import Session from '../../Session';
 import Component from '../../BaseComponent';
 import {translate as t} from '../../Translation';
 
-export default class WebtorretSettings extends Component {
+export default class WebtorrentSettings extends Component {
 
   constructor() {
     super();

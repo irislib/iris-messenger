@@ -4,7 +4,7 @@ import AccountSettings from './AccountSettings';
 import KeySettings from './KeySettings';
 import PeerSettings from './PeerSettings';
 import LanguageSettings from './LanguageSettings';
-import WebtorretSettings from './WebtorretSettings';
+import WebtorrentSettings from './WebtorrentSettings';
 import WebRTCSettings from './WebRTCSettings';
 import BetaSettings from './BetaSettings';
 import BlockedSettings from './BlockedSettings';
@@ -28,8 +28,8 @@ export default class SettingsContent extends Component {
       return (<PeerSettings />);
     }else if(page == "LanguageSettings"){
       return (<LanguageSettings />);
-    }else if(page == "WebtorretSettings"){
-      return (<WebtorretSettings />);
+    }else if(page == "WebtorrentSettings"){
+      return (<WebtorrentSettings />);
     }else if(page == "WebRTCSettings"){
       return (<WebRTCSettings />);
     }else if(page == "BetaSettings"){

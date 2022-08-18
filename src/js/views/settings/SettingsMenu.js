@@ -10,7 +10,7 @@ const SETTINGS = [
   {url: 'KeySettings', text: t('privateKey')},
   {url: 'PeerSettings', text: t('peer')},
   {url: 'LanguageSettings', text: t('language')},
-  {url: 'WebtorretSettings', text: t('webtorret')},
+  {url: 'WebtorrentSettings', text: t('webtorrent')},
   {url: 'WebRTCSettings', text: t('webRTC')},
   {url: 'BetaSettings', text: t('beta')},
   {url: 'BlockedSettings', text: t('blocked Users')},

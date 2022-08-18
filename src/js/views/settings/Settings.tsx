@@ -48,6 +48,7 @@ class Settings extends Component<Props,State> {
     return (
       <>
       <Header />
+      <div class="main-view" id="settings">
       <div style="flex-direction: row;" id="settings">
         <div class='logo' style={(mainpage || ($(window).width() > 625)) ? 'display: none !important;' : 'display: flex;' }>
           <div href="/settings/" onClick={e => this.onLogoClick(e) } style="margin: 1em; display:flex;" >
@@ -55,6 +56,7 @@ class Settings extends Component<Props,State> {
           </div>
         </div>
           {page}  
+      </div>
       </div>
       </>
     );
