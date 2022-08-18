@@ -1962,6 +1962,7 @@ form.public {
 
 .profile-photo {
   border-radius: 50%;
+  cursor: pointer;
   max-width: min(100%, 300px);
   max-height: min(30vw, 300px);
 }
