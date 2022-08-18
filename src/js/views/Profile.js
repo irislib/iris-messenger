@@ -7,7 +7,6 @@ import FeedMessageForm from '../components/FeedMessageForm';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
 import { createRef } from 'preact';
-import SafeImg from '../components/SafeImg';
 import CopyButton from '../components/CopyButton';
 import FollowButton from '../components/FollowButton';
 import BlockButton from '../components/BlockButton';
@@ -20,6 +19,7 @@ import QRCode from '../lib/qrcode.min';
 import iris from '../iris-lib';
 import {Helmet} from "react-helmet";
 import {SMS_VERIFIER_PUB} from '../SMS';
+import ProfilePhoto from '../components/ProfilePhoto';
 
 function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
@@ -117,7 +117,7 @@ class Profile extends View {
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
     } else if (this.state.photo && !this.state.blocked && this.state.photo.indexOf('data:image') === 0) {
-        profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo}/>`
+        profilePhoto = html`<${ProfilePhoto} photo=${this.state.photo}/>`;
       } else {
         profilePhoto = html`<${Identicon} str=${this.props.id} hidePhoto=${this.state.blocked} width=250/>`
       }
