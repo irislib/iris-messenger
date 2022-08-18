@@ -885,7 +885,7 @@ header.footer .header-content {
   justify-content: left;
 }
 
-.application-list a.logo img:last-child {
+.application-list a.logo img:last-child,.settings-list a.logo img:last-child {
   margin-left: 5px;
 }
 
@@ -917,7 +917,7 @@ h1, .application-list a.logo span {
     padding: 15px;
   }
 
-  .application-list a.logo {
+  .application-list a.logo, .settings-list a.logo {
    padding: 15px;
   }
 
@@ -930,6 +930,12 @@ h1, .application-list a.logo span {
   .application-list .text {
     display: none;
   }
+  
+}
+@media (min-width:626px){
+  .settings-list {
+    background: var(--menu-bg);
+  }
 }
 
 @media (max-width:625px) {
@@ -940,6 +946,11 @@ h1, .application-list a.logo span {
     top: 0;
     left:0;
     bottom: 0;
+    
+  }
+  .settings-list {
+    flex: 1;
+    background: var(--body-bg);
   }
 
   .participant-list, .participant-list.open {
@@ -951,15 +962,15 @@ h1, .application-list a.logo span {
     bottom: 0;
   }
 
-  .application-list a {
+  .application-list a{
     padding: 0;
   }
 
-  .application-list .text {
+  .application-list .text{
     display: flex;
   }
 
-  .menu-visible-xs .application-list {
+  .menu-visible-xs .application-list{
     margin-left: 0;
   }
 
@@ -981,14 +992,14 @@ h1, .application-list a.logo span {
   background: var(--chat-active);
 }
 
-.application-list .icon, .notifications-button {
+.application-list .icon, .notifications-button , .settings-list .icon{
   padding: 7px;
   min-width: 55px;
   text-align: center;
   position: relative;
 }
 
-.application-list .icon .unseen, .notifications-button .unseen {
+.application-list .icon .unseen, .notifications-button .unseen{
   position: absolute;
   right: 5px;
   bottom: 5px;
@@ -999,6 +1010,44 @@ h1, .application-list a.logo span {
   flex: 1;
   padding: 15px;
   padding-left: 0;
+}
+
+.settings-list {
+  z-index: 1;
+  min-width: 220px;
+  
+  transition: all 0.25s ease;
+  border-right: var(--sidebar-border-right);
+  color: var(--text-color);
+  font-family: "Metuo-Black", Futura, Arial;
+}
+
+.settings-list .electron-padding {
+  height: 40px;
+}
+
+.settings-list a {
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  color: var(--text-color);
+  justify-content: left;
+}
+
+.settings-list .text {
+  border-bottom: 1px solid var(--zebra-stripe-bg);
+  flex: 1;
+  padding: 15px;
+  padding-left: 0;
+}
+
+.settings-list a:hover {
+  background: var(--chat-hover);
+}
+
+.settings-list a.active {
+  background: var(--chat-active);
 }
 
 a.msg {
@@ -1183,6 +1232,15 @@ a.msg {
   width: 800px;
   align-self: center;
 }
+
+#settings {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  flex: 1;
+  padding: 0;
+}
+
 
 #chat-view {
   display: flex;

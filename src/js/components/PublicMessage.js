@@ -189,7 +189,7 @@ class PublicMessage extends Message {
     }
     const title = `${name || 'User'} on Iris`;
     p.innerText = (text.length > MSG_TRUNCATE_LENGTH) && !this.state.showMore && !this.props.standalone ?
-      text.slice(0, MSG_TRUNCATE_LENGTH) + '...' : text;
+      `${text.slice(0, MSG_TRUNCATE_LENGTH)  }...` : text;
     let h = p.innerHTML;
     if (!emojiOnly) {
       h = Helpers.highlightEmoji(h);

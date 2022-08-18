@@ -37,6 +37,7 @@ export default class Notifications extends View {
     return html`
       <div class="centered-container public-messages-view">
         <h3>${t('notifications')}</h3>
+        
         ${Object.keys(this.notifications).length === 0 ? html`
             <p> ${t('no_notifications_yet')}</p>
         `:''}

@@ -21,6 +21,7 @@ class Chat extends View {
       <${ChatList} activeChat=${this.props.id} class=${this.props.id || this.props.hashtag ? 'hidden-xs' : ''}/>
       ${chat}
     `;
+    
   }
 }
 
