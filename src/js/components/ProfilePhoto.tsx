@@ -3,7 +3,6 @@ import Helpers from '../Helpers';
 import $ from 'jquery';
 import Session from '../Session';
 import SafeImg from './SafeImg';
-import { html } from 'htm/preact';
 
 type Props = { photo?: string;};
 const ANIMATE_DURATION = 200;
@@ -13,7 +12,7 @@ class ProfilePhoto extends Component<Props> {
     render() {
 
         return (
-          html`<${SafeImg} class="profile-photo" src=${this.props.photo} onClick=${e => { this.imageClicked(e); }} />`
+          <SafeImg class="profile-photo" src={this.props.photo} onClick={e => { this.imageClicked(e); }} />
         );
     }
 
