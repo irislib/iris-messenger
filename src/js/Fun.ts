@@ -119,6 +119,7 @@ export default class Node {
             }
             return;
         }
+        this.children = new Map();
         this.value = value;
         this.doCallbacks();
         this.saveLocalForage();

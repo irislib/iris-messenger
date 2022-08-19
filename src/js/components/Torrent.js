@@ -171,7 +171,7 @@ class Torrent extends Component {
     if (!this.coverRef.current) { return; }
     this.torrent = torrent;
     if (!torrent.files) {
-      console.error("no torrent.files", torrent);
+      console.error("no files found in torrent:", torrent);
       return;
     }
     const video = torrent.files.find(f => isVideo(f));
