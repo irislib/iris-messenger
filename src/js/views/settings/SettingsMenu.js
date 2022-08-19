@@ -6,14 +6,14 @@ import Helpers from "../../Helpers";
 import {html} from "htm/preact";
 
 const SETTINGS = [
-  {url: 'AccountSettings', text: t('account')},
-  {url: 'KeySettings', text: t('privateKey')},
-  {url: 'PeerSettings', text: t('peer')},
-  {url: 'LanguageSettings', text: t('language')},
-  {url: 'WebtorrentSettings', text: t('webtorrent')},
-  {url: 'WebRTCSettings', text: t('webRTC')},
-  {url: 'BetaSettings', text: t('beta')},
-  {url: 'BlockedSettings', text: t('blocked Users')},
+  {url: 'account', text: t('account')},
+  {url: 'key', text: t('privateKey')},
+  {url: 'peer', text: t('peer')},
+  {url: 'language', text: t('language')},
+  {url: 'webtorrent', text: t('webtorrent')},
+  {url: 'webrtc', text: t('webRTC')},
+  {url: 'beta', text: t('beta')},
+  {url: 'blocked', text: t('blocked Users')},
 ];
 
 export default class SettingsMenu extends Component{
@@ -29,7 +29,7 @@ export default class SettingsMenu extends Component{
     <>
       <div class="settings-list">
       {Helpers.isElectron ? html`<div class="electron-padding"/>` : html`
-            <h2 style="padding: 0px 15px;">Settings</h2>
+            <h3 style="padding: 0px 15px;">Settings</h3>
         `}
       {SETTINGS.map((item) => {
           return (

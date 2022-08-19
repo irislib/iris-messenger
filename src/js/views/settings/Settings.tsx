@@ -32,7 +32,7 @@ class Settings extends Component<Props,State> {
 
     console.log("page: " + this.props.page);
     let mainpage = (this.props.page == 'undefined' || this.props.page == null || this.props.page == '');
-    
+
     if(mainpage){
       page = html`<${SettingsMenu} />`;
     }else if(!($(window).width() > 625)){

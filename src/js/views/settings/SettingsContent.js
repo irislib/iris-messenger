@@ -18,26 +18,23 @@ export default class SettingsContent extends Component {
     this.content = "home";
   }
   render() {
-    let page = this.props.id;
-
-    if(page == "AccountSettings"){
-      return (<AccountSettings />);
-    }else if(page == "KeySettings"){
-      return (<KeySettings />);
-    }else if(page == "PeerSettings"){
-      return (<PeerSettings />);
-    }else if(page == "LanguageSettings"){
-      return (<LanguageSettings />);
-    }else if(page == "WebtorrentSettings"){
-      return (<WebtorrentSettings />);
-    }else if(page == "WebRTCSettings"){
-      return (<WebRTCSettings />);
-    }else if(page == "BetaSettings"){
-      return (<BetaSettings />);
-    }else if(page == "BlockedSettings"){
-      return (<BlockedSettings />);
+    switch (this.props.id) {
+      case "key":
+        return (<KeySettings />);
+      case "peer":
+        return (<PeerSettings />);
+      case "language":
+        return (<LanguageSettings />);
+      case "webtorrent":
+        return (<WebtorrentSettings />);
+      case "webrtc":
+        return (<WebRTCSettings />);
+      case "beta":
+        return (<BetaSettings />);
+      case "blocked":
+        return (<BlockedSettings />);
+      default:
+        return (<AccountSettings />);
     }
-      return (<AccountSettings />);
-    
   }
 }
