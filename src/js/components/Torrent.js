@@ -15,7 +15,7 @@ const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class Torrent extends Component {
   coverRef = createRef();
-  state = { local: {}};
+  state = { settings: {}};
 
   componentDidMount() {
     State.local.get('player').on(this.sub(
@@ -97,7 +97,7 @@ class Torrent extends Component {
       autoplay = true;
       muted = false;
     } else {
-      autoplay = isVid && this.state.local.autoplayWebtorrent;
+      autoplay = isVid && this.state.settings.autoplayWebtorrent;
       muted = autoplay;
     }
     const el = base.find('.player');
@@ -287,7 +287,7 @@ class Torrent extends Component {
     return html`
         <div class="torrent">
             ${this.props.standalone ? this.renderMeta() : ''}
-            ${!this.state.local.enableWebtorrent && !this.state.torrenting && !this.props.standalone ? html`
+            ${!this.state.settings.enableWebtorrent && !this.state.settings.torrenting && !this.props.standalone ? html`
               <a href="" onClick=${e => this.openTorrentClicked(e)}>${tr('show_attachment')}</a>
             `: this.renderLoadingTorrent()}
         </div>
