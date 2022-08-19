@@ -24,7 +24,7 @@ class ChatList extends Component {
     const hashtags = {};
     State.local.get('channels').map(this.sub(
       (chat, id) => {
-        if (!chat) {
+        if (!chat || id === 'public') {
           this.state.chats.has(id) && this.setState({chats: this.state.chats.delete(id)});
           return;
         }
