@@ -288,7 +288,10 @@ function login(k) {
   State.local.get('loggedIn').put(true);
   State.local.get('settings').once().then(settings => {
     if (!settings) {
-      State.local.get('settings').put(DEFAULT_SETTINGS.local)
+      State.local.get('settings').put(DEFAULT_SETTINGS.local);
+    } else if (settings.enableWebtorrent === undefined || settings.autoplayWebtorrent === undefined) {
+      State.local.get('settings').get('enableWebtorrent').put(DEFAULT_SETTINGS.local.enableWebtorrent);
+      State.local.get('settings').get('autoplayWebtorrent').put(DEFAULT_SETTINGS.local.autoplayWebtorrent);
     }
   });
   State.public.user().get('block').map().on((isBlocked, user) => {

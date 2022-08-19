@@ -30,9 +30,9 @@ class Torrent extends Component {
     ));
     const showFiles = this.props.showFiles;
     showFiles && this.setState({showFiles});
-    State.local.get('settings').get('local').on(this.inject());
+    State.local.get('settings').on(this.inject());
     (async () => {
-      if (this.props.standalone || (await State.local.get('settings').get('local').get('enableWebtorrent').once())) {
+      if (this.props.standalone || (await State.local.get('settings').get('enableWebtorrent').once())) {
         this.startTorrenting();
       }
     })();
