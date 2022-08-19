@@ -53,12 +53,13 @@ class Torrent extends Component {
   async startTorrenting(clicked) {
     this.setState({torrenting: true});
     const torrentId = this.props.torrentId;
-    const client = await Helpers.getWebTorrentClient();
+    const { default: AetherTorrent } = await import('aether-torrent');
+    const client = new AetherTorrent();
     const existing = client.get(torrentId);
     if (existing) {
       this.onTorrent(existing, clicked);
     } else {
-      client.add(torrentId, t => this.onTorrent(t, clicked));
+      client.add(torrentId, (err, t) => t && !err && this.onTorrent(t, clicked));
     }
   }
 
@@ -169,6 +170,10 @@ class Torrent extends Component {
   onTorrent(torrent, clicked) {
     if (!this.coverRef.current) { return; }
     this.torrent = torrent;
+    if (!torrent.files) {
+      console.error("no torrent.files", torrent);
+      return;
+    }
     const video = torrent.files.find(f => isVideo(f));
     const audio = torrent.files.find(f => isAudio(f));
     const img = torrent.files.find(f => isImage(f));

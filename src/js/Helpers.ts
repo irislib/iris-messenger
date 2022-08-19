@@ -1999,14 +1999,6 @@ export default {
     }, 10);
   },
 
-  async getWebTorrentClient() {
-    const { default: WebTorrent } = await import('webtorrent');
-    if (!this.wtClient) {
-      this.wtClient = new WebTorrent();
-    }
-    return this.wtClient;
-  },
-
   getProfileLink(pub: string): string {
     return `${window.location.origin}/#/profile/${encodeURIComponent(pub)}`;
   },

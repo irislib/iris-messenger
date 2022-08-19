@@ -1,5 +1,4 @@
 import { Component } from 'preact';
-import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import State from '../State';
 import Icons from '../Icons';
@@ -62,12 +61,13 @@ class MediaPlayer extends Component {
   }
 
   async startTorrenting() {
-    const client = await Helpers.getWebTorrentClient();
+    const { default: AetherTorrent } = await import('aether-torrent');
+    const client = new AetherTorrent();
     const existing = client.get(this.torrentId);
     if (existing) {
       this.onTorrent(existing);
     } else {
-      client.add(this.torrentId, t => this.onTorrent(t));
+      client.add(this.torrentId, (e, t) => this.onTorrent(t));
     }
   }
 
