@@ -25,15 +25,16 @@ export default class SettingsMenu extends Component{
   }
 
   render() {
+    const activePage = this.props.activePage || 'account';
     return (
     <>
-      <div class="settings-list">
+      <div className={!this.props.activePage ? 'settings-list' : 'settings-list hidden-xs' }>
       {Helpers.isElectron ? html`<div class="electron-padding"/>` : html`
             <h3 style="padding: 0px 15px;">Settings</h3>
         `}
       {SETTINGS.map((item) => {
           return (
-            <a activeClassName="active" onClick={() => this.menuLinkClicked(item.url)} key={item.id}>
+            <a class={(activePage === item.url && window.innerWidth > 624) ? 'active' : ''} onClick={() => this.menuLinkClicked(item.url)} key={item.id}>
               <span class="text">{item.text}</span>
             </a>
           );

@@ -27,36 +27,26 @@ class Settings extends Component<Props,State> {
   }
 
   render() {
-    let page = null;
     const isDesktopNonMac = this.state.platform && this.state.platform !== 'darwin';
 
     console.log("page: " + this.props.page);
-    let mainpage = (this.props.page == 'undefined' || this.props.page == null || this.props.page == '');
-
-    if(mainpage){
-      page = html`<${SettingsMenu} />`;
-    }else if(!($(window).width() > 625)){
-      page = html`<div style="padding: 0px 15px;"> <${SettingsContent} id=${this.props.page} /> </div>`;
-    }else{
-      page = html`<${SettingsMenu} /> <div style="padding: 0px 15px;"> <${SettingsContent} id=${this.props.page} /> </div>`;
-    }
-    
-    
-    
     console.log("Visible: " + this.state.showSettingsMenu);
 
     return (
       <>
       <Header />
       <div class="main-view" id="settings">
-      <div style="flex-direction: row;" id="settings">
-        <div class='logo' style={(mainpage || ($(window).width() > 625)) ? 'display: none !important;' : 'display: flex;' }>
-          <div href="/settings/" onClick={e => this.onLogoClick(e) } style="margin: 1em; display:flex;" >
-            <div>{Icons.backArrow}</div>
+        <div style="flex-direction: row;" id="settings">
+          <div class='logo' className={this.props.page ? 'visible-xs-flex' : 'hidden' }>
+            <div href="/settings/" onClick={e => this.onLogoClick(e) } style="margin: 1em; display:flex;" >
+              <div>{Icons.backArrow}</div>
+            </div>
+          </div>
+          <SettingsMenu activePage={this.props.page} />
+          <div className={this.props.page ? '' : 'hidden-xs' } style="padding: 0px 15px;">
+            <SettingsContent id={this.props.page} />
           </div>
         </div>
-          {page}  
-      </div>
       </div>
       </>
     );
