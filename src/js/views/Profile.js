@@ -20,6 +20,7 @@ import iris from '../iris-lib';
 import {Helmet} from "react-helmet";
 import {SMS_VERIFIER_PUB} from '../SMS';
 import ProfilePhoto from '../components/ProfilePhoto';
+import Button from '../components/basic/Button';
 
 function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
@@ -104,7 +105,7 @@ class Profile extends View {
       </div>
       <hr/>
       <p>
-        <button class="delete-chat" onClick=${() => deleteChat(this.props.id)}>${t('delete_chat')}</button>
+        <${Button} class="delete-chat" onClick=${() => deleteChat(this.props.id)}>${t('delete_chat')}<//>
       </p>
       <hr/>
     </div>
@@ -147,11 +148,11 @@ class Profile extends View {
               <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
             ` : ''}
             ${this.isMyProfile ? '' : html`<${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>`}
-            <button onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}</button>
+            <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
             <${CopyButton} key=${`${this.props.id}copy`} text=${t('copy_link')} title=${this.state.name} copyStr=${window.location.href}/>
-            <button onClick=${() => $(this.qrRef.current).toggle()}>${t('show_qr_code')}</button>
+            <${Button} onClick=${() => $(this.qrRef.current).toggle()}>${t('show_qr_code')}<//>
             ${this.isMyProfile ? '' : html`
-              <button class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}</button>
+              <${Button} class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}<//>
             `}
             ${this.isMyProfile ? '' : html`<${BlockButton} key=${`${this.props.id}block`} id=${this.props.id}/>`}
           </div>

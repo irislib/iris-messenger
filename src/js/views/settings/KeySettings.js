@@ -5,6 +5,7 @@ import CopyButton from '../../components/CopyButton';
 import Session from '../../Session';
 import QRCode from '../../lib/qrcode.min';
 import $ from 'jquery';
+import Button from '../../components/basic/Button';
 
 export default class KeySettings extends Component {
 
@@ -27,11 +28,11 @@ export default class KeySettings extends Component {
         <h3>{t('private_key')}</h3>
         <p dangerouslySetInnerHTML={{ __html: t('private_key_warning') }} />
         <p>
-          <button onClick={() => downloadKey()}>{t('download_private_key')}</button>
+          <Button onClick={() => downloadKey()}>{t('download_private_key')}</Button>
           <CopyButton notShareable={true} text={t('copy_private_key')} copyStr={JSON.stringify(Session.getKey())} />
         </p>
         <p>
-          <button onClick={e => togglePrivateKeyQR(e)}>{t('show_privkey_qr')}</button>
+          <Button onClick={e => togglePrivateKeyQR(e)}>{t('show_privkey_qr')}</Button>
         </p>
         <div id="private-key-qr" class="qr-container" />
         <hr />
@@ -42,7 +43,7 @@ export default class KeySettings extends Component {
           <form onSubmit={e => this.mailtoSubmit(e)}>
             <input name="email" type="email" onChange={e => this.setState({email:e.target.value.trim()})} placeholder={t('email')} />
             <input name="verify_email" type="email" onChange={e => this.setState({retypeEmail:e.target.value.trim()})} placeholder={t('retype_email')} />
-            <button type="submit">{t('send email')}</button>
+            <Button type="submit">{t('send email')}</Button>
           </form>
         </p>
         <hr />

@@ -15,6 +15,7 @@ import $ from 'jquery';
 import iris from '../../iris-lib';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';
+import Button from '../../components/basic/Button';
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
@@ -288,7 +289,7 @@ export default class PrivateChat extends Component {
       <div id="scroll-down-btn" style="display:none;" onClick=${() => this.scrollDown()}>${caretDownSvg}</div>
       <div id="not-seen-by-them" style="display: none">
         <p dangerouslySetInnerHTML=${{ __html: t('if_other_person_doesnt_see_message') }}></p>
-        <p><button onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_invite_link')}</button></p>
+        <p><${Button} onClick=${e => copyMyChatLinkClicked(e)}>${t('copy_your_invite_link')}<//></p>
       </div>
       <div class="chat-message-form">
         ${this.state.noLongerParticipant ? html`<div style="text-align:center">You can't send messages to this group because you're no longer a participant.</div>` :

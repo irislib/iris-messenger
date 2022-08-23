@@ -31,7 +31,7 @@
     --small-text-color: #8d9197;
     --msg-form-button-color: #b8b9be;
     --button-bg: #853CFE;
-    --button-hover-bg: #5E02F6;
+    --button-bg-hover: #5E02F6;
     --button-color: #fefffe;
     --button-border: 0;
     --button-border-size: 0;
@@ -140,7 +140,7 @@ textarea {
   resize: none;
 }
 
-input, button, .button {
+input, button {
   padding: 15px;
   outline: none;
   border: 0;
@@ -148,7 +148,7 @@ input, button, .button {
   border-radius: 50px;
 }
 
-input:not(:last-child), button:not(:last-child), .button:not(:last-child) {
+input:not(:last-child), button:not(:last-child) {
   margin-right: 7px;
 }
 
@@ -202,7 +202,7 @@ input:not(:last-child), button:not(:last-child), .button:not(:last-child) {
     transform: scale(1);
 }
 
-.btn-group button, .btn-group .button, .btn-group input {
+.btn-group button, .btn-group input {
   margin-bottom: 15px;
 }
 
@@ -221,18 +221,6 @@ input {
 
 ::placeholder {
   color: var(--input-placeholder);
-}
-
-button, .button {
-  background: var(--button-bg);
-  color: var(--button-color);
-  border: var(--button-border);
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-button:hover, button:active, button:focus, .button:hover, .button:active, .button:focus {
-  background: var(--button-hover-bg);
 }
 
 img, video {
@@ -351,7 +339,7 @@ a.logo img:not(:last-child) {
 }
 
 .nav a.my-profile:focus .identicon img {
-  border: 1px solid var(--button-hover-bg);
+  border: 1px solid var(--button-bg-hover);
 }
 
 .nav a.my-profile {

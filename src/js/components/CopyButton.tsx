@@ -4,6 +4,7 @@ import {translate as t} from '../Translation';
 import $ from 'jquery';
 import iris from '../iris-lib';
 import { OptionalGetter } from '../types';
+import Button from './basic/Button';
 
 type Props = {
   copyStr: OptionalGetter<string>;
@@ -58,9 +59,9 @@ class CopyButton extends Component<Props, State> {
   render() {
     const text = this.state.copied ? t('copied') : (this.props.text || t('copy'));
     return (
-      <button class="copy-button" onClick={e => this.onClick(e)}>
+      <Button class="copy-button" onClick={e => this.onClick(e)}>
         {text}
-      </button>
+      </Button>
     );
   }
 }

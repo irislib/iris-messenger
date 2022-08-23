@@ -4,6 +4,7 @@ import State from '../../State';
 import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../../components/VideoCall';
 import Notifications from '../../Notifications';
 import $ from 'jquery';
+import Button from '../../components/basic/Button';
 
 export default class WebRTCSettings extends Component {
 
@@ -14,7 +15,7 @@ export default class WebRTCSettings extends Component {
             <h3>{t('webrtc_connection_options')}</h3>
             <p><small>{t('webrtc_info')}</small></p>
             <p><textarea rows="4" id="rtc-config" placeholder={t('webrtc_connection_options')} onChange={e => this.rtcConfigChanged(e)} /></p>
-            <button onClick={() => this.restoreDefaultRtcConfig()}>{t('restore_defaults')}</button>
+            <Button onClick={() => this.restoreDefaultRtcConfig()}>{t('restore_defaults')}</Button>
           </div>
         </>
     );

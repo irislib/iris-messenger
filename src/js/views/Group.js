@@ -14,6 +14,7 @@ import {SMS_VERIFIER_PUB} from '../SMS';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min';
 import iris from '../iris-lib';
+import Button from '../components/basic/Button';
 
 function deleteChat(uuid) {
   if (confirm("Delete chat?")) {
@@ -94,7 +95,7 @@ class Group extends View {
                     </div>
                     ${this.state.isAdmin ? html`
                       <div class="flex-cell no-flex">
-                        <button onClick=${() => this.onRemoveParticipant(k)}>${tr('remove')}</button>
+                        <${Button} onClick=${() => this.onRemoveParticipant(k)}>${tr('remove')}<//>
                       </div>
                     ` : ''}
                   </div>
@@ -111,8 +112,8 @@ class Group extends View {
                   <${Identicon} str=${this.state.memberCandidate} width=40/>
                   <${Name} pub=${this.state.memberCandidate}/>
                 </div>
-                <button onClick=${() => this.onAddParticipant()}>Add</button>
-                <button onClick=${() => this.onAddParticipant(false)}>Cancel</button>
+                <${Button} onClick=${() => this.onAddParticipant()}>Add<//>
+                <${Button} onClick=${() => this.onAddParticipant(false)}>Cancel<//>
                 </div>
               `: html`
                 <${SearchBox} onSelect=${item => this.setState({memberCandidate: item.key})}/>
@@ -137,7 +138,7 @@ class Group extends View {
                     </div>
                     ${this.state.isAdmin ? html`
                       <div class="flex-cell no-flex">
-                        <button onClick=${() => this.removeChatLink(id)}>${tr('remove')}</button>
+                        <${Button} onClick=${() => this.removeChatLink(id)}>${tr('remove')}<//>
                       </div>
                     `: ''}
                   </div>
@@ -146,7 +147,7 @@ class Group extends View {
             </div>
           `: ''}
           ${this.state.isAdmin ? html`
-            <p><button onClick=${() => chat.createChatLink()}>Create new invite link</button></p><hr/>
+            <p><${Button} onClick=${() => chat.createChatLink()}>Create new invite link<//></p><hr/>
           `: ''}
         </div>
       `;
@@ -195,12 +196,12 @@ class Group extends View {
                 `: this.props.id === SMS_VERIFIER_PUB ? html`
                   <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${tr('ask_for_verification')}</a></p>
                 ` : ''}
-                <button onClick=${() => route(`/chat/${  this.props.id}`)}>${tr('send_message')}</button>
+                <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${tr('send_message')}<//>
                 ${uuid ? '' : html`
                   <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${`https://iris.to/${window.location.hash}`}/>
                 `}
-                <button onClick=${() => $('#profile-page-qr').toggle()}>${tr('show_qr_code')}</button>
-                <button class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}</button>
+                <${Button} onClick=${() => $('#profile-page-qr').toggle()}>${tr('show_qr_code')}<//>
+                <${Button} class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}<//>
               </div>
             </div>
           </div>
@@ -225,7 +226,7 @@ class Group extends View {
             </div>
             <hr/>
             <p>
-              <button class="delete-chat" onClick=${() => deleteChat(this.props.id)}>${tr('delete_chat')}</button>
+              <${Button} class="delete-chat" onClick=${() => deleteChat(this.props.id)}>${tr('delete_chat')}<//>
             </p>
             <hr/>
           </div>

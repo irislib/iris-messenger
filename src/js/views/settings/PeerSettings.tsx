@@ -8,6 +8,7 @@ import Icons from "../../Icons";
 import PeerManager from "../../PeerManager";
 import {route} from "preact-router";
 import $ from "jquery";
+import Button from "../../components/basic/Button";
 
 export default class PeerSettings extends Component {
   state = Session.DEFAULT_SETTINGS;
@@ -90,7 +91,7 @@ export default class PeerSettings extends Component {
     return (
       <div id="peers" class="flex-table">
         {urls.length === 0 ?
-          <button id="reset-peers" style="margin-bottom: 15px" onClick={() => this.resetPeersClicked()}>{t('restore_defaults')}</button>
+          <Button id="reset-peers" style="margin-bottom: 15px" onClick={() => this.resetPeersClicked()}>{t('restore_defaults')}</Button>
         : ''}
         {urls.map(url => {
             const peer = PeerManager.getKnownPeers()[url] || {};
@@ -121,8 +122,8 @@ export default class PeerSettings extends Component {
                   ) : ''}
                 </div>
                 <div class="flex-cell no-flex">
-                  <button onClick={() => this.removePeerClicked(url, peerFromGun)}>{t('remove')}</button>
-                  <button onClick={() => this.enablePeerClicked(url, peerFromGun, peer)}>{peer.enabled ? t('disable') : t('enable')}</button>
+                  <Button onClick={() => this.removePeerClicked(url, peerFromGun)}>{t('remove')}</Button>
+                  <Button onClick={() => this.enablePeerClicked(url, peerFromGun, peer)}>{peer.enabled ? t('disable') : t('enable')}</Button>
                 </div>
               </div>
             );
@@ -134,7 +135,7 @@ export default class PeerSettings extends Component {
             <input type="url" id="add-peer-url" placeholder={t('peer_url')} />
             <input type="checkbox" id="add-peer-public" />
             <label for="add-peer-public">{t('public')}</label>
-            <button id="add-peer-btn" onClick={() => this.addPeerClicked()}>{t('add')}</button>
+            <Button id="add-peer-btn" onClick={() => this.addPeerClicked()}>{t('add')}</Button>
           </div>
         </div>
         <p>

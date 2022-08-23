@@ -5,6 +5,7 @@ import QRScanner from '../QRScanner';
 import Session from '../Session';
 import { Component } from 'preact';
 import logo from '../../assets/img/android-chrome-192x192.png';
+import Button from '../components/basic/Button';
 
 class Login extends Component {
   componentDidMount() {
@@ -63,8 +64,8 @@ class Login extends Component {
         <input id="paste-privkey" autoFocus onInput={e => this.onPastePrivKey(e)}
                placeholder={t('paste_private_key')} />
         <p>
-          <button id="scan-privkey-btn"
-                  onClick={e => this.toggleScanPrivKey(e)}>{t('scan_private_key_qr_code')}</button>
+          <Button id="scan-privkey-btn"
+                  onClick={e => this.toggleScanPrivKey(e)}>{t('scan_private_key_qr_code')}</Button>
         </p>
         <p>
           <video id="privkey-qr-video" width="320" height="320" style="object-fit: cover;"
@@ -83,7 +84,7 @@ class Login extends Component {
               <img width="86" height="86" src={logo} alt="iris" />
               <h1>iris</h1>
               <input style={this.state.inputStyle} onInput={e => this.onNameChange(e)} autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="off" id="login-form-name" type="text" name="name" placeholder={t('whats_your_name')} />
-              <p><button id="sign-up" type="submit">{t('new_user_go')}</button></p>
+              <p><Button id="sign-up" type="submit">{t('new_user_go')}</Button></p>
               <br />
               <p><a href="#" id="show-existing-account-login" onClick={() => this.setState({showSwitchAccount: true})}>{t('already_have_an_account')}</a></p>
               <p><a href="#" onClick={() => Session.ethereumLogin()}>{t('web3_login')}</a></p>

@@ -1,5 +1,4 @@
 import { Component, html } from 'htm/preact';
-import _ from 'lodash';
 import SettingsMenu from './SettingsMenu';
 import SettingsContent from './SettingsContent';
 import Header from '../../components/Header';
@@ -28,9 +27,6 @@ class Settings extends Component<Props,State> {
 
   render() {
     const isDesktopNonMac = this.state.platform && this.state.platform !== 'darwin';
-
-    console.log("page: " + this.props.page);
-    console.log("Visible: " + this.state.showSettingsMenu);
 
     return (
       <>

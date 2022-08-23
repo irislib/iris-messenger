@@ -3,6 +3,7 @@ import {translate as t} from '../Translation';
 import Session from '../Session';
 import State from '../State';
 import Notifications from '../Notifications';
+import Button from './basic/Button';
 
 type Props = {
   id: string;
@@ -51,10 +52,10 @@ class FollowButton extends Component<Props> {
 
   render() {
     return (
-      <button className={`${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}`} onClick={e => this.onClick(e)}>
+      <Button className={`${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}`} onClick={e => this.onClick(e)}>
         <span className="nonhover">{t(this.state[this.key] ? this.actionDone : this.action)}</span>
         <span className="hover">{t(this.hoverAction)}</span>
-      </button>
+      </Button>
     );
   }
 }

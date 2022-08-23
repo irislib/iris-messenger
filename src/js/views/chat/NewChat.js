@@ -10,6 +10,7 @@ import QRCode from '../../lib/qrcode.min';
 import iris from '../../iris-lib';
 import Component from '../../BaseComponent';
 import {Helmet} from 'react-helmet';
+import Button from '../../components/basic/Button';
 
 function setChatLinkQrCode(link) {
   let qrCodeEl = $('#my-qr-code');
@@ -99,13 +100,13 @@ class NewChat extends Component {
         <h3>${t('have_someones_invite_link')}</h3>
           <div class="btn-group">
             <input id="paste-chat-link" onInput=${e => this.onPasteChatLink(e)} type="text" placeholder="${t('paste_their_invite_link')}"/>
-            <button id="scan-chatlink-qr-btn" onClick=${() => this.scanChatLinkQr()}>${t('or_scan_qr_code')}</button>
+            <${Button} id="scan-chatlink-qr-btn" onClick=${() => this.scanChatLinkQr()}>${t('or_scan_qr_code')}<//>
           </div>
         <video id="chatlink-qr-video" width="320" height="320" style="object-fit: cover;"></video>
         <h3>${t('give_your_invite_link')}</h3>
         <div class="btn-group">
           <${CopyButton} text=${t('copy_your_invite_link')} copyStr=${Session.getMyChatLink}/>
-          <button onClick=${() => $('#my-qr-code').toggle()}>${t('or_show_qr_code')}</button>
+          <${Button} onClick=${() => $('#my-qr-code').toggle()}>${t('or_show_qr_code')}<//>
         </div>
         <p id="my-qr-code" class="qr-container" style="display:none"></p>
         <p><small dangerouslySetInnerHTML=${{ __html: t('beware_of_sharing_invite_link_publicly', `href="/profile/${Session.getPubKey()}"`) }}></small></p>
@@ -113,12 +114,12 @@ class NewChat extends Component {
         <p>
           <form onSubmit=${e => this.onCreateGroupSubmit(e)}>
             <input id="new-group-name" type="text" placeholder="${t('group_name')}"/>
-            <button type="submit">${t('create')}</button>
+            <${Button} type="submit">${t('create')}<//>
           </form>
         </p>
         <hr/>
         <h3>${t('your_invite_links')}</h3>
-        <p><button onClick=${() => Session.createChatLink()}>${t('create_new_invite_link')}</button></p>
+        <p><${Button} onClick=${() => Session.createChatLink()}>${t('create_new_invite_link')}<//></p>
         <div id="my-chat-links" class="flex-table">
           ${Object.keys(this.state.chatLinks).map(id => {
             const url = this.state.chatLinks[id];
@@ -131,7 +132,7 @@ class NewChat extends Component {
                   <input type="text" value=${url} onClick=${e => $(e.target).select()}/>
                 </div>
                 <div class="flex-cell no-flex">
-                  <button onClick=${() => this.removeChatLink(id)}>${t('remove')}</button>
+                  <${Button} onClick=${() => this.removeChatLink(id)}>${t('remove')}<//>
                 </div>
               </div>
             `;

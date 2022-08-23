@@ -5,6 +5,7 @@ import {html} from "htm/preact";
 import Name from "./Name";
 import State from "../State";
 import Text from "./Text";
+import Button from "./basic/Button";
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;
@@ -290,8 +291,8 @@ class ExplorerNode extends BaseComponent {
             <p>
               <form onSubmit=${(e) => this.onNewItemSubmit(e)}>
                 <input id="newItemNameInput" type="text" onInput=${e => this.onNewItemNameInput(e)} value=${this.state.newItemName} placeholder="New ${this.state.newItemType} name"/>
-                <button type="submit">Create</button>
-                <button onClick=${() => this.setState({newItemType: false})}>Cancel</button>
+                <${Button} type="submit">Create<//>
+                <${Button} onClick=${() => this.setState({newItemType: false})}>Cancel<//>
               </form>
             </p>
           ` : ''}
