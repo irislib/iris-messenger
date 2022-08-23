@@ -12,7 +12,7 @@ const seenIndicator = html`<span class="seen-indicator"><svg viewBox="0 0 59 42"
 class ChatListItem extends Component {
   constructor() {
     super();
-    this.state = {latest: {}};
+    this.state = {latest: {}, unseen : {}};
   }
 
   shouldComponentUpdate() {
@@ -21,6 +21,11 @@ class ChatListItem extends Component {
 
   componentDidMount() {
     const chat = this.props.chat;
+    State.local.get('channels').get(chat.id).get('unseen').on(this.sub(
+      (unseen) => {
+        this.setState({unseen});
+      }
+    ));
     State.local.get('channels').get(chat.id).get('latest').on(this.sub(
       (latest) => {
         /*
@@ -45,8 +50,8 @@ class ChatListItem extends Component {
     const active = this.props.active ? "active-item" : "";
     const seen = chat.theirMsgsLastSeenTime >= chat.latestTime ? "seen" : "";
     const delivered = chat.theirLastActiveTime >= chat.latestTime ? "delivered" : "";
-    const hasUnseen = chat.unseen ? 'has-unseen' : '';
-    const unseenEl = chat.unseen ? html`<span class="unseen">${chat.unseen}</span>` : '';
+    const hasUnseen = this.state.unseen ? 'has-unseen' : '';
+    const unseenEl = this.state.unseen ? html`<span class="unseen">${JSON.stringify(this.state.unseen)}</span>` : '';
     const activity = ['online', 'active'].indexOf(chat.activity) > -1 ? chat.activity : '';
     const time = chat.latestTime && new Date(chat.latestTime);
     let latestTimeText = Helpers.getRelativeTimeText(time);
