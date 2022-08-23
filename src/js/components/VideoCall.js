@@ -8,6 +8,7 @@ import {translate as t} from '../Translation';
 import Session from '../Session';
 
 import State from '../State';
+import Button from './basic/Button';
 
 const ringSound = new Audio('../../assets/audio/ring.mp3');
 ringSound.loop = true;
@@ -344,14 +345,14 @@ class VideoCall extends Component {
         </div>
         ${localVideo}
         ${remoteVideo}
-        <button style="display:block;margin:15px auto" onClick=${() => this.endCall(this.state.activeCall)}>End call</button>
+        <${Button} style="display:block;margin:15px auto" onClick=${() => this.endCall(this.state.activeCall)}>End call<//>
       </div>`;
     } else if (this.state.outgoingCall) {
       return html`<div id="outgoing-call" style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px">
         ${t('calling')} ${Session.channels[this.state.outgoingCall] && Session.channels[this.state.outgoingCall].name}
-        <button onClick=${() => this.cancelCall(this.state.outgoingCall)} style="display:block; margin: 15px auto">
+        <${Button} onClick=${() => this.cancelCall(this.state.outgoingCall)} style="display:block; margin: 15px auto">
           ${t('cancel')}
-        </button>
+        <//>
         ${localVideo}
         ${remoteVideo}
       </div>`;
@@ -359,8 +360,8 @@ class VideoCall extends Component {
       return html`
         <div id="incoming-call" style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px 0">
           Incoming call from ${Session.channels[this.state.incomingCall] && Session.channels[this.state.incomingCall].name}
-          <button style="display:block; margin: 15px auto" onClick=${() => this.answerCall(this.state.incomingCall)}>${t('answer')}</button>
-          <button style="display:block; margin: 15px auto" onClick=${() => this.rejectCall(this.state.incomingCall)}>${t('reject')}</button>
+          <${Button} style="display:block; margin: 15px auto" onClick=${() => this.answerCall(this.state.incomingCall)}>${t('answer')}<//>
+          <${Button} style="display:block; margin: 15px auto" onClick=${() => this.rejectCall(this.state.incomingCall)}>${t('reject')}<//>
         </div>
       `;
     }

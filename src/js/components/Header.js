@@ -184,7 +184,7 @@ class Header extends Component {
         </div>
 
         ${chat && this.chatId !== key && !chat.uuid ? html`
-          <a class="tooltip" style="width:24px; height:24px; color: var(--msg-form-button-color)" id="start-video-call" onClick=${() => State.local.get('outgoingCall').put(this.chatId)}>
+          <a class="tooltip" style="width:24px; height:24px; color: var(--msg-form-button-color)" id="<start-video-call" onClick=${() => State.local.get('outgoingCall').put(this.chatId)}>
             <span class="tooltiptext">${t('video_call')}</span>
             ${Icons.videoCall}
           </a>

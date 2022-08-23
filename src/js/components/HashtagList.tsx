@@ -4,6 +4,7 @@ import State from '../State';
 import {Link} from "preact-router/match";
 import {route} from 'preact-router';
 import {translate as t} from '../Translation';
+import Button from './basic/Button';
 
 type Props = {};
 
@@ -97,8 +98,8 @@ export default class HashtagList extends Component<Props, State> {
               <Fragment>
                 <form onSubmit={e => this.onAddHashtag(e)}>
                     <input placeholder="#hashtag" ref={this.addHashtagInputRef} style="margin-bottom: 7px" />
-                    <button type="submit">{t('add')}</button>
-                    <button onClick={() => this.setState({showAddHashtagForm:false})}>{t('cancel')}</button>
+                    <Button type="submit">{t('add')}</Button>
+                    <Button onClick={() => this.setState({showAddHashtagForm:false})}>{t('cancel')}</Button>
                 </form>
                 <br/>
               </Fragment>

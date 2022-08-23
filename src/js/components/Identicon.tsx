@@ -4,6 +4,7 @@ import State from '../State';
 import SafeImg from './SafeImg';
 import iris from '../iris-lib';
 import Identicon from 'identicon.js';
+import styled from 'styled-components';
 
 type Activity = {
   time: string;
@@ -25,6 +26,17 @@ type State = {
   activity: string | null;
   identicon: string | null;
 };
+
+const IdenticonContainer = styled.div`
+    width: ${(props: Props) => props.width}px;
+    height: ${(props: Props) => props.width}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    user-select: none;
+`;
 
 class MyIdenticon extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
@@ -84,13 +96,13 @@ class MyIdenticon extends Component<Props, State> {
     const hasPhotoStyle = hasPhoto ? 'has-photo' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
     return (
-      <div onClick={this.props.onClick} style={{position: 'relative', width: `${width}px`, height: `${width}px`, cursor: this.props.onClick ? 'pointer' : undefined}} class={`identicon-container ${hasPhotoStyle} ${showTooltip} ${activity}`}>
+      <IdenticonContainer width={width} onClick={this.props.onClick} style={{cursor: this.props.onClick ? 'pointer' : undefined}} className={`identicon-container ${hasPhotoStyle} ${showTooltip} ${activity}`}>
         <div style={{width: width, height: width}} class="identicon">
           {hasPhoto ? <SafeImg src={this.state.photo} width={width}/> : <img width={width} src={this.state.identicon} />}
         </div>
         {this.props.showTooltip && this.state.name ? html`<span class="tooltiptext">${this.state.name}</span>` : ''}
         {this.props.activity ? <div class="online-indicator"/> : null}
-      </div>
+      </IdenticonContainer>
     );
   }
 }

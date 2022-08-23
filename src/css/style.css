@@ -1342,7 +1342,7 @@ a.msg {
   color: var(--text-time);
 }
 
-.btn, .msg-btn, .identicon-container {
+.btn, .msg-btn {
   user-select: none;
 }
 
@@ -1610,10 +1610,6 @@ hr {
   align-items: stretch;
   margin-top: -1px;
   position: relative;
-}
-
-.identicon-container {
-  display: inline-block;
 }
 
 .chat-item .identicon-container {

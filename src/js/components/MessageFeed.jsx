@@ -4,6 +4,7 @@ import PublicMessage from './PublicMessage';
 import State from '../State';
 import {debounce} from 'lodash';
 import {translate as t} from '../Translation';
+import Button from '../components/basic/Button';
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -85,9 +86,9 @@ class MessageFeed extends Component {
         </div>
         {displayCount < this.state.sortedMessages.length ? (
           <p>
-            <button onClick={() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE})}>
+            <Button onClick={() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE})}>
               {t('show_more')}
-            </button>
+            </Button>
           </p>
         ) : ''}
       </>
