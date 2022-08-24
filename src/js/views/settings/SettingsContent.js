@@ -12,29 +12,25 @@ import BlockedSettings from './BlockedSettings';
 
 export default class SettingsContent extends Component {
     content ="";
+    pages = {
+      account: AccountSettings,
+      key: KeySettings,
+      peer: PeerSettings,
+      language: LanguageSettings,
+      webtorrent: WebtorrentSettings,
+      webrtc: WebRTCSettings,
+      beta: BetaSettings,
+      blocked: BlockedSettings,
+    };
 
   constructor() {
     super();
     this.content = "home";
   }
   render() {
-    switch (this.props.id) {
-      case "key":
-        return (<KeySettings />);
-      case "peer":
-        return (<PeerSettings />);
-      case "language":
-        return (<LanguageSettings />);
-      case "webtorrent":
-        return (<WebtorrentSettings />);
-      case "webrtc":
-        return (<WebRTCSettings />);
-      case "beta":
-        return (<BetaSettings />);
-      case "blocked":
-        return (<BlockedSettings />);
-      default:
-        return (<AccountSettings />);
-    }
+    const Content = this.pages[this.props.id] || this.pages.account;
+    return (
+      <Content />
+    );
   }
 }

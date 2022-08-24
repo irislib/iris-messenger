@@ -5,16 +5,16 @@ import State from "../../State";
 import Helpers from "../../Helpers";
 import {html} from "htm/preact";
 
-const SETTINGS = [
-  {url: 'account', text: t('account')},
-  {url: 'key', text: t('privateKey')},
-  {url: 'peer', text: t('peer')},
-  {url: 'language', text: t('language')},
-  {url: 'webtorrent', text: t('webtorrent')},
-  {url: 'webrtc', text: t('webRTC')},
-  {url: 'beta', text: t('beta')},
-  {url: 'blocked', text: t('blocked Users')},
-];
+const SETTINGS = {
+  account: t('account'),
+  key: t('private_key'),
+  peer: t('peer'),
+  language: t('language'),
+  webtorrent: t('webtorrent'),
+  webrtc: t('webRTC'),
+  beta: t('beta'),
+  blocked: t('blocked_users'),
+};
 
 export default class SettingsMenu extends Component{
 
@@ -32,10 +32,10 @@ export default class SettingsMenu extends Component{
       {Helpers.isElectron ? html`<div class="electron-padding"/>` : html`
             <h3 style="padding: 0px 15px;">Settings</h3>
         `}
-      {SETTINGS.map((item) => {
+      {Object.keys(SETTINGS).map(page => {
           return (
-            <a class={(activePage === item.url && window.innerWidth > 624) ? 'active' : ''} onClick={() => this.menuLinkClicked(item.url)} key={item.id}>
-              <span class="text">{item.text}</span>
+            <a class={(activePage === page && window.innerWidth > 624) ? 'active' : ''} onClick={() => this.menuLinkClicked(page)} key={page}>
+              <span class="text">{SETTINGS[page]}</span>
             </a>
           );
         }
