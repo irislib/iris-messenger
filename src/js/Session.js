@@ -195,7 +195,7 @@ function keyPairFromHash(hash) {
   return kp;
 }
 
-async function ethereumLogin(name) {
+async function ethereumConnect() {
   const providerOptions = {
     walletconnect: {
       package: WalletConnectProvider,
@@ -216,9 +216,12 @@ async function ethereumLogin(name) {
 
   const provider = await web3Modal.connect();
   const web3 = new Web3(provider);
+  return web3.eth.getAccounts();
+}
 
+async function ethereumLogin(name) {
+  const accounts = await ethereumConnect();
 
-  const accounts = await web3.eth.getAccounts();
   if (accounts.length > 0) {
     const message = "I'm trusting this application with an irrevocable access key to my Iris account.";
     const signature = await web3.eth.sign(message, accounts[0]);
@@ -596,4 +599,4 @@ function followChatLink(str) {
   }
 }
 
-export default {init, followChatLink, getKey, getPubKey, ethereumLogin, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+export default {init, followChatLink, getKey, getPubKey, ethereumLogin, ethereumConnect, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };

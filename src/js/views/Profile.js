@@ -112,6 +112,18 @@ class Profile extends View {
     `;
   }
 
+  // if window.ethereum is defined, suggest to sign a message with the user's ethereum account
+  renderConnectEthereum() {
+    if (window.ethereum) {
+      return html`
+        <a href="#" onClick=${e => {
+            e.preventDefault();
+            Session.ethereumConnect();
+        }}>${t('Connect_Ethereum_Account')}</a>
+      `;
+    }
+  }
+
   renderDetails() {
     this.isMyProfile = Session.getPubKey() === this.props.id;
     let profilePhoto;
@@ -133,6 +145,7 @@ class Profile extends View {
           <div class="profile-about hidden-xs">
             <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
+          ${this.renderConnectEthereum()}
           <div class="profile-actions">
             <div class="follow-count">
               <a href="/follows/${this.props.id}">
