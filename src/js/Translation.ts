@@ -1,4 +1,4 @@
-import Translations from './Translations';
+import Translations from './Translations.mjs';
 
 let AVAILABLE_LANGUAGES = Object.keys(Translations);
 let language = localStorage.getItem('language') || navigator.language || 'en';
