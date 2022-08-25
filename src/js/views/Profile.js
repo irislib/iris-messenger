@@ -22,6 +22,26 @@ import {SMS_VERIFIER_PUB} from '../SMS';
 import ProfilePhoto from '../components/ProfilePhoto';
 import Button from '../components/basic/Button';
 import Web3 from 'web3';
+import { Alchemy, Network } from "alchemy-sdk";
+import styled from 'styled-components';
+
+// styled-component ImageWithMenu that has the menu (class="dropdown") in the top right corner
+// & .dropbtn should have a black background shadow
+const ImageWithMenu = styled.div`
+  position: relative;
+  display: inline-block;
+  margin-right: 5px;
+  & .dropdown {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  & .dropbtn {
+    padding-top: 0px;
+    margin-top: -5px;
+    text-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+  }
+`;
 
 function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
@@ -141,8 +161,11 @@ class Profile extends View {
       return html`
         <p>
           Eth: <a href="https://etherscan.io/address/${this.state.eth.address}">${this.state.eth.address.slice(0, 6)}...</a>
-          <i> </i>
+            <i> </i>
           ${this.isMyProfile ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)` : ''}
+            ${this.state.nfts.length ? html`
+              <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.length})</a>
+            ` : ''}
         </p>
       `;
     }
@@ -224,6 +247,31 @@ class Profile extends View {
     `;
   }
 
+  useAsPfp(nft, e) {
+    e.preventDefault();
+    const src = nft.media[0].raw;
+    if (src.indexOf('data:image') === 0) {
+      State.public.user().get('profile').get('photo').put(src);
+    } else {
+      // load image and convert to base64
+      const img = new Image();
+      img.src = src;
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL('image/png');
+        State.public.user().get('profile').get('photo').put(dataURL);
+      }
+    }
+    $('.main-view').animate({
+      scrollTop: 0
+    }, 'slow');
+  }
+
   renderTab() {
     if (this.props.tab === 'replies') {
       return html`
@@ -242,6 +290,25 @@ class Profile extends View {
         <div class="public-messages-view">
           ${this.isMyProfile ? html`<${FeedMessageForm} index="media" class="hidden-xs" autofocus=${false}/>` : ''}
           <${MessageFeed} scrollElement=${this.scrollElement.current} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
+        </div>
+      `;
+    } else if (this.props.tab === 'nfts') {
+      return html`
+        <div class="public-messages-view">
+          <h3>NFT</h3>
+            ${this.state.nfts && this.state.nfts.map(nft => html`
+              <${ImageWithMenu}>
+                ${this.isMyProfile ? html`
+                  <div class="dropdown">
+                    <div class="dropbtn">\u2026</div>
+                    <div class="dropdown-content">
+                      <a href="#" onClick=${e => this.useAsPfp(nft, e)}>${t('use_as_pfp')}</a>
+                    </div>
+                  </div>
+                ` : ''}
+                <img src=${nft.media[0].raw} alt=${nft.title} />
+              <//>
+            `)}
         </div>
       `;
     }
@@ -279,6 +346,32 @@ class Profile extends View {
     `;
   }
 
+  getNfts(address) {
+    const config = {
+      apiKey: "DGLWKXjx7nRC5Dmz7mavP8CX1frKT1Ar",
+      network: Network.ETH_RINKEBY,
+    };
+    const alchemy = new Alchemy(config);
+
+    const main = async () => {
+      // Get all NFTs
+      const nfts = await alchemy.nft.getNftsForOwner(address);
+      // Print NFTs
+      this.setState({ nfts: nfts.ownedNfts });
+      console.log(nfts);
+    };
+
+    const runMain = async () => {
+      try {
+        await main();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    runMain();
+  }
+
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
       this.unsubscribe();
@@ -302,11 +395,12 @@ class Profile extends View {
       this.setState({followerCount});
     }));
     State.public.user(pub).get('profile').get('eth').on(this.sub(eth => {
-      if (eth && eth.address && eth.proof) {
+      if (eth && eth.address && eth.proof && eth.address !== (this.state.eth && this.state.eth.address)) {
         const web3 = new Web3();
         const signer = web3.eth.accounts.recover(this.getEthIrisProofString(), eth.proof);
         if (signer === eth.address) {
           this.setState({eth});
+          this.getNfts(eth.address);
         }
       } else {
         this.setState({eth: null});
@@ -351,6 +445,7 @@ class Profile extends View {
       about: '',
       blocked: false,
       ethereumAddress: null,
+      nfts: [],
     });
     this.isMyProfile = Session.getPubKey() === pub;
     const chat = Session.channels[pub];

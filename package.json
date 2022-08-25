@@ -50,6 +50,7 @@
     "@walletconnect/web3-provider": "^1.7.8",
     "@zxing/library": "^0.18.6",
     "aether-torrent": "^0.3.0",
+    "alchemy-sdk": "^2.0.3",
     "autolinker": "^3.14.3",
     "elliptic": "^6.5.4",
     "fuse.js": "^6.6.2",
