@@ -19,27 +19,32 @@ class InviteView extends Component {
         this.setState({chatLinks: this.props.chatLinks});
       }  
     
-  onPasteChatLink(e) {
-    const val = $(e.target).val();
-    Session.followChatLink(val);
-    $(e.target).val('');
-  }
-
-
-  onCreateGroupSubmit(e) {
-    e.preventDefault();
-    if ($('#new-group-name').val().length) {
-      let c = new iris.Channel({
-        gun: State.public,
-        key: Session.getKey(),
-        participants: [],
-      });
-      c.put('name', $('#new-group-name').val());
-      $('#new-group-name').val('');
-      Session.addChannel(c);
-      route(`/group/${  c.uuid}`);
+    onPasteChatLink(e) {
+        const val = $(e.target).val();
+        Session.followChatLink(val);
+        $(e.target).val('');
     }
-  }
+
+
+    onCreateGroupSubmit(e) {
+        e.preventDefault();
+        if ($('#new-group-name').val().length) {
+        let c = new iris.Channel({
+            gun: State.public,
+            key: Session.getKey(),
+            participants: [],
+        });
+        c.put('name', $('#new-group-name').val());
+        $('#new-group-name').val('');
+        Session.addChannel(c);
+        route(`/group/${  c.uuid}`);
+        }
+    }
+
+    createnewinvite(){
+        Session.createChatLink();
+        route(`/chat/new/MainView`);
+    }
 
     render(){
         return(
@@ -50,7 +55,8 @@ class InviteView extends Component {
                     <div class="btn-group">
                         <input id="paste-chat-link" onInput={e => this.onPasteChatLink(e)} type="text" placeholder={t('paste_their_invite_link')} />
                     </div>
-                    <br />
+                    <h3>{t('create_new_invite_link')}</h3>
+                    <p><Button onClick={() => this.createnewinvite()}>{t('create_new_invite_link')}</Button></p>
                     <h3>{t('new_group')}</h3>
                     <p>
                         <form onSubmit={e => this.onCreateGroupSubmit(e)}>

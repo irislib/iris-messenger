@@ -17,7 +17,12 @@ class MainView extends Component {
     }
     removeChatLink(id) {
         State.local.get('chatLinks').get(id).put(null);
+        this.chatLinks[id] = null;
+        this.props.chatLinks[id] = null;
+        this.setState({chatLinks: this.chatLinks});
+        console.log("chat: " + JSON.stringify(this.props.chatLinks));
         return iris.Channel.removePrivateChatLink(State.public, Session.getKey(), id);
+        
     }
     componentDidMount() {
         this.chatLinks = this.props.chatLinks;
