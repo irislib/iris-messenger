@@ -171,10 +171,10 @@ class Profile extends View {
   renderTabs() {
     return html`
     <div class="tabs">
-      <${Link} activeClassName="active" href="/profile/${this.props.id}">${t('posts')}<//>
-      <${Link} activeClassName="active" href="/replies/${this.props.id}">${t('replies')}<//>
-      <${Link} activeClassName="active" href="/likes/${this.props.id}">${t('likes')}<//>
-      <${Link} activeClassName="active" href="/media/${this.props.id}">${t('media')}<//>
+      <${Link} activeClassName="active" href="/profile/${this.props.id}">${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//>
+      <${Link} activeClassName="active" href="/replies/${this.props.id}">${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//>
+      <${Link} activeClassName="active" href="/likes/${this.props.id}">${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//>
+      <${Link} activeClassName="active" href="/media/${this.props.id}">${t('media')} ${this.state.noMedia ? '(0)' : ''}<//>
     </div>
     `;
   }
@@ -236,6 +236,7 @@ class Profile extends View {
 
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
+      this.unsubscribe();
       this.componentDidMount();
     }
   }
@@ -281,7 +282,18 @@ class Profile extends View {
     const pub = this.props.id;
     this.followedUsers = new Set();
     this.followers = new Set();
-    this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: '', blocked: false});
+    this.setState({
+      followedUserCount: 0,
+      followerCount: 0,
+      noPosts: false,
+      noReplies: false,
+      noLikes: false,
+      noMedia: false,
+      name: '',
+      photo: '',
+      about: '',
+      blocked: false,
+    });
     this.isMyProfile = Session.getPubKey() === pub;
     const chat = Session.channels[pub];
     if (pub.length < 40) {
@@ -316,6 +328,17 @@ class Profile extends View {
     State.public.user().get('block').get(this.props.id).on(this.sub(
       blocked => {
         this.setState({blocked});
+      }
+    ));
+    State.public.user(this.props.id).on(this.sub(
+      (user, id) => {
+        console.log('user', id, user);
+        this.setState({
+          noPosts: !user.msgs,
+          noMedia: !user.media,
+          noLikes: !user.likes,
+          noReplies: !user.replies,
+        });
       }
     ));
     if (this.isUserAgentCrawler() && !this.state.ogImageUrl && !this.state.photo) {

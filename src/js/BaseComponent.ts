@@ -32,13 +32,17 @@ export default abstract class BaseComponent<Props = {}, State = {}> extends Pure
     }, path);
   }
 
-  componentWillUnmount() {
-    this.unmounted = true;
+  unsubscribe() {
     Object.keys(this.eventListeners).forEach(k => {
       const l = this.eventListeners[k];
       l && l.off();
       delete this.eventListeners[k];
     });
+  }
+
+  componentWillUnmount() {
+    this.unmounted = true;
+    this.unsubscribe();
   }
 
   isUserAgentCrawler() {
