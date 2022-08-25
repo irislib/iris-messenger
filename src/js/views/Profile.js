@@ -331,8 +331,7 @@ class Profile extends View {
       }
     ));
     State.public.user(this.props.id).on(this.sub(
-      (user, id) => {
-        console.log('user', id, user);
+      user => {
         this.setState({
           noPosts: !user.msgs,
           noMedia: !user.media,
