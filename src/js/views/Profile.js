@@ -150,7 +150,7 @@ class Profile extends View {
     if (this.isMyProfile) {
       return html`
         <p>
-          <a href="#" onClick=${e => this.connectEthereumClicked(e)}>${t('Connect_Ethereum_Account')}</a>
+          <a href="#" onClick=${e => this.connectEthereumClicked(e)}>${t('Connect_Ethereum_account')}</a>
         </p>
       `;
     }
@@ -388,7 +388,7 @@ class Profile extends View {
         this.setState({blocked});
       }
     ));
-    State.public.user().on(this.sub(
+    State.public.user(this.props.id).on(this.sub(
       user => {
         this.setState({
           noPosts: !user.msgs,
