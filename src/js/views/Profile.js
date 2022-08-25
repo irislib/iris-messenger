@@ -21,6 +21,7 @@ import {Helmet} from "react-helmet";
 import {SMS_VERIFIER_PUB} from '../SMS';
 import ProfilePhoto from '../components/ProfilePhoto';
 import Button from '../components/basic/Button';
+import Web3 from 'web3';
 
 function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
@@ -112,10 +113,26 @@ class Profile extends View {
     `;
   }
 
+  getEthIrisProofString() {
+    return `My Iris account is ${this.props.id}`;
+  }
+
   async connectEthereumClicked(e) {
     e.preventDefault();
-    await Session.ethereumConnect();
-    State.public.user().get('profile').get('eth').get('address').put(window.ethereum.selectedAddress);
+    const web3 = await Session.ethereumConnect();
+    const address = (await web3.eth.getAccounts())[0];
+    const proof = await web3.eth.personal.sign(this.getEthIrisProofString(), address);
+    State.public.user().get('profile').get('eth').put({
+      address,
+      proof
+    });
+  }
+
+  async disconnectEthereumClicked(e) {
+    e.preventDefault();
+    if (confirm(`${t('disconnect_ethereum_account')}?`)) {
+      State.public.user().get('profile').get('eth').put(null);
+    }
   }
 
   // if window.ethereum is defined, suggest to sign a message with the user's ethereum account
@@ -124,13 +141,17 @@ class Profile extends View {
       return html`
         <p>
           Eth: <a href="https://etherscan.io/address/${this.state.eth.address}">${this.state.eth.address.slice(0, 6)}...</a>
+          <i> </i>
+          ${this.isMyProfile ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)` : ''}
         </p>
       `;
     }
 
-    if (window.ethereum && (Session.getPubKey() === this.props.id)) {
+    if (this.isMyProfile) {
       return html`
-        <a href="#" onClick=${e => this.connectEthereumClicked(e)}>${t('Connect_Ethereum_Account')}</a>
+        <p>
+          <a href="#" onClick=${e => this.connectEthereumClicked(e)}>${t('Connect_Ethereum_Account')}</a>
+        </p>
       `;
     }
   }
@@ -281,7 +302,15 @@ class Profile extends View {
       this.setState({followerCount});
     }));
     State.public.user(pub).get('profile').get('eth').on(this.sub(eth => {
-      this.setState({eth});
+      if (eth && eth.address && eth.proof) {
+        const web3 = new Web3();
+        const signer = web3.eth.accounts.recover(this.getEthIrisProofString(), eth.proof);
+        if (signer === eth.address) {
+          this.setState({eth});
+        }
+      } else {
+        this.setState({eth: null});
+      }
     }));
     State.public.user(pub).get('profile').get('name').on(this.sub(
       name => {

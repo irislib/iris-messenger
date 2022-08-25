@@ -224,7 +224,7 @@ async function ethereumLogin(name) {
 
   if (accounts.length > 0) {
     const message = "I'm trusting this application with an irrevocable access key to my Iris account.";
-    const signature = await web3.eth.sign(message, accounts[0]);
+    const signature = await web3.eth.personal.sign(message, accounts[0]);
     const signatureBytes = hexToUint8Array(signature.substring(2));
     const hash1 = await window.crypto.subtle.digest('SHA-256', signatureBytes);
     const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
