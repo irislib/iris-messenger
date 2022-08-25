@@ -215,12 +215,12 @@ async function ethereumConnect() {
   });
 
   const provider = await web3Modal.connect();
-  const web3 = new Web3(provider);
-  return web3.eth.getAccounts();
+  return new Web3(provider);
 }
 
 async function ethereumLogin(name) {
-  const accounts = await ethereumConnect();
+  const web3 = await ethereumConnect();
+  const accounts = await web3.eth.getAccounts();
 
   if (accounts.length > 0) {
     const message = "I'm trusting this application with an irrevocable access key to my Iris account.";

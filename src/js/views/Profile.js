@@ -112,14 +112,25 @@ class Profile extends View {
     `;
   }
 
+  async connectEthereumClicked(e) {
+    e.preventDefault();
+    await Session.ethereumConnect();
+    State.public.user().get('profile').get('eth').get('address').put(window.ethereum.selectedAddress);
+  }
+
   // if window.ethereum is defined, suggest to sign a message with the user's ethereum account
-  renderConnectEthereum() {
-    if (window.ethereum) {
+  renderEthereum() {
+    if (this.state.eth && this.state.eth.address) {
       return html`
-        <a href="#" onClick=${e => {
-            e.preventDefault();
-            Session.ethereumConnect();
-        }}>${t('Connect_Ethereum_Account')}</a>
+        <p>
+          Eth: <a href="https://etherscan.io/address/${this.state.eth.address}">${this.state.eth.address.slice(0, 6)}...</a>
+        </p>
+      `;
+    }
+
+    if (window.ethereum && (Session.getPubKey() === this.props.id)) {
+      return html`
+        <a href="#" onClick=${e => this.connectEthereumClicked(e)}>${t('Connect_Ethereum_Account')}</a>
       `;
     }
   }
@@ -145,7 +156,7 @@ class Profile extends View {
           <div class="profile-about hidden-xs">
             <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
-          ${this.renderConnectEthereum()}
+          ${this.renderEthereum()}
           <div class="profile-actions">
             <div class="follow-count">
               <a href="/follows/${this.props.id}">
@@ -269,6 +280,9 @@ class Profile extends View {
     State.group().count(`follow/${pub}`, this.sub((followerCount) => {
       this.setState({followerCount});
     }));
+    State.public.user(pub).get('profile').get('eth').on(this.sub(eth => {
+      this.setState({eth});
+    }));
     State.public.user(pub).get('profile').get('name').on(this.sub(
       name => {
         if (!$('#profile .profile-name:focus').length) {
@@ -302,10 +316,12 @@ class Profile extends View {
       noReplies: false,
       noLikes: false,
       noMedia: false,
+      eth: null,
       name: '',
       photo: '',
       about: '',
       blocked: false,
+      ethereumAddress: null,
     });
     this.isMyProfile = Session.getPubKey() === pub;
     const chat = Session.channels[pub];
@@ -343,7 +359,7 @@ class Profile extends View {
         this.setState({blocked});
       }
     ));
-    State.public.user(this.props.id).on(this.sub(
+    State.public.user().on(this.sub(
       user => {
         this.setState({
           noPosts: !user.msgs,
