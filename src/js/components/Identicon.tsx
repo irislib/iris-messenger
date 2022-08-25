@@ -30,7 +30,7 @@ type State = {
 const IdenticonContainer = styled.div`
     width: ${(props: Props) => props.width}px;
     height: ${(props: Props) => props.width}px;
-    display: flex;
+    display: inline-block;
     align-items: center;
     justify-content: center;
     flex-direction: column;
