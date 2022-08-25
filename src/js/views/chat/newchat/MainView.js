@@ -1,7 +1,7 @@
 import { html } from 'htm/preact';
 import { translate as t } from '../../../Translation';
 import Session from '../../../Session';
-import State from '../../State';
+import State from '../../../State';
 import CopyButton from '../../../components/CopyButton';
 import Button from '../../../components/basic/Button';
 import $ from 'jquery';
