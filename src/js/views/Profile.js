@@ -42,7 +42,7 @@ const GalleryImage = styled.div`
     margin-top: -5px;
     text-shadow: 0px 0px 5px rgba(0,0,0,0.5);
   }
-  & a {
+  & > a {
     display: inline-block;
     width: 100%;
     padding-bottom: 100%;
