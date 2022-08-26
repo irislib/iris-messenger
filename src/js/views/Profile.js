@@ -166,8 +166,8 @@ class Profile extends View {
             </a>
             <i> </i>
           ${this.isMyProfile ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)` : ''}
-          ${this.state.nfts.length ? html`
-            <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.length})</a>
+          ${this.state.nfts.totalCount ? html`
+            <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.totalCount})</a>
           ` : ''}
         </p>
       `;
@@ -302,7 +302,7 @@ class Profile extends View {
       return html`
         <div class="public-messages-view">
           <h3>NFT</h3>
-            ${this.state.nfts && this.state.nfts.map(nft => {
+            ${this.state.nfts && this.state.nfts.ownedNfts && this.state.nfts.ownedNfts.map(nft => {
               let src = nft.media && nft.media[0] && nft.media[0].raw;
               if (src && src.indexOf('ipfs://') === 0) {
                 src = `https://ipfs.io/ipfs/${src.substring(7)}`;
@@ -369,7 +369,7 @@ class Profile extends View {
       // Get all NFTs
       const nfts = await alchemy.nft.getNftsForOwner(address);
       // Print NFTs
-      this.setState({ nfts: nfts.ownedNfts });
+      this.setState({ nfts });
       console.log(nfts);
     };
 
