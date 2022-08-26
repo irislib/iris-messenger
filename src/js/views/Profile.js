@@ -172,6 +172,15 @@ class Profile extends View {
     }
   }
 
+  scrollToNfts() {
+    // only on mobile
+    if (window.innerWidth < 625) {
+      $('.main-view').animate({
+        scrollTop: $('.public-messages-view').offset().top - 60
+      }, 500);
+    }
+  }
+
   // if window.ethereum is defined, suggest to sign a message with the user's ethereum account
   renderEthereum() {
     if (this.state.eth && this.state.eth.address) {
@@ -183,7 +192,7 @@ class Profile extends View {
             <i> </i>
           ${this.isMyProfile ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)` : ''}
           ${this.state.nfts.totalCount ? html`
-            <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.totalCount})</a>
+            <br /><a href="/nfts/${this.props.id}" onClick=${this.scrollToNfts}>NFT (${this.state.nfts.totalCount})</a>
           ` : ''}
         </p>
       `;
