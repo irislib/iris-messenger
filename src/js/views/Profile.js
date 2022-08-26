@@ -25,11 +25,12 @@ import Web3 from 'web3';
 import { Alchemy, Network } from "alchemy-sdk";
 import styled from 'styled-components';
 
-// styled-component ImageWithMenu that has the menu (class="dropdown") in the top right corner
+// styled-component GalleryImage that has the menu (class="dropdown") in the top right corner
 // & .dropbtn should have a black background shadow
-const ImageWithMenu = styled.div`
+const GalleryImage = styled.div`
   position: relative;
   display: inline-block;
+  max-width: 30%;
   margin-right: 5px;
   & .dropdown {
     position: absolute;
@@ -302,9 +303,12 @@ class Profile extends View {
         <div class="public-messages-view">
           <h3>NFT</h3>
             ${this.state.nfts && this.state.nfts.map(nft => {
-              const src = nft.media && nft.media[0] && nft.media[0].raw;
+              let src = nft.media && nft.media[0] && nft.media[0].raw;
+              if (src && src.indexOf('ipfs://') === 0) {
+                src = `https://ipfs.io/ipfs/${src.substring(7)}`;
+              }
               return html`
-                <${ImageWithMenu}>
+                <${GalleryImage}>
                   ${this.isMyProfile ? html`
                     <div class="dropdown">
                       <div class="dropbtn">\u2026</div>
