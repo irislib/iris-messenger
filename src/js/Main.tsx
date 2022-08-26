@@ -150,6 +150,7 @@ class Main extends Component<Props,State> {
               <Profile path="/replies/:id+" tab="replies"/>
               <Profile path="/likes/:id+" tab="likes"/>
               <Profile path="/media/:id+" tab="media"/>
+              <Profile path="/nfts/:id+" tab="nfts"/>
               <Group path="/group/:id+"/>
               {/* Lazy load stuff that is used less often */}
               <AsyncRoute
