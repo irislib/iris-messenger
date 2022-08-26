@@ -17,7 +17,7 @@ import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';
 
 import Button from '../../components/basic/Button';
-import { route, Router } from 'preact-router';
+import { Router } from 'preact-router';
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
@@ -260,7 +260,7 @@ export default class PrivateChat extends Component {
           <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
         </div>`;
     } else {
-      mainView = <Router><NewChat path="/chat/new/:view?" /><NewChat path="/chat"/></Router>;
+      mainView = <Router><NewChat path="/chat/new/:view?" /><NewChat path="/chat" /></Router>;
     }
     return mainView;
   }
