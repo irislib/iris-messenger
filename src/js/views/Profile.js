@@ -165,9 +165,9 @@ class Profile extends View {
             </a>
             <i> </i>
           ${this.isMyProfile ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)` : ''}
-            ${this.state.nfts.length ? html`
-              <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.length})</a>
-            ` : ''}
+          ${this.state.nfts.length ? html`
+            <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.length})</a>
+          ` : ''}
         </p>
       `;
     }
@@ -303,7 +303,7 @@ class Profile extends View {
           <h3>NFT</h3>
             ${this.state.nfts && this.state.nfts.map(nft => {
               const src = nft.media && nft.media[0] && nft.media[0].raw;
-              html`
+              return html`
                 <${ImageWithMenu}>
                   ${this.isMyProfile ? html`
                     <div class="dropdown">
