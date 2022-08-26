@@ -30,7 +30,7 @@ import styled from 'styled-components';
 const GalleryImage = styled.div`
   position: relative;
   display: inline-block;
-  max-width: 30%;
+  width: 32%;
   margin-right: 5px;
   & .dropdown {
     position: absolute;
@@ -41,6 +41,14 @@ const GalleryImage = styled.div`
     padding-top: 0px;
     margin-top: -5px;
     text-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+  }
+  & a {
+    display: inline-block;
+    width: 100%;
+    padding-bottom: 100%;
+    background-size: cover;
+    background-position: center;
+    background-color: #ccc;
   }
 `;
 
@@ -317,8 +325,9 @@ class Profile extends View {
                       </div>
                     </div>
                   ` : ''}
-                    <a href="https://etherscan.io/address/${nft.contract.address}" target="_blank">
-                      <img src=${src} alt=${nft.title} onerror=${this.onNftImgError} />
+                    <a href="https://etherscan.io/address/${nft.contract.address}"
+                       target="_blank"
+                        style="background-image: url(${src});">
                     </a>
                 <//>
               `
