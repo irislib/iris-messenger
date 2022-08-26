@@ -318,7 +318,7 @@ class Profile extends View {
                     </div>
                   ` : ''}
                     <a href="https://etherscan.io/address/${nft.contract.address}" target="_blank">
-                      <img src=${src} alt=${nft.title} />
+                      <img src=${src} alt=${nft.title} onerror=${this.onNftImgError} />
                     </a>
                 <//>
               `
@@ -337,6 +337,10 @@ class Profile extends View {
       </div>
       `;
 
+  }
+
+  onNftImgError(e) {
+    e.target.style = 'display:none';
   }
 
   renderView() {
