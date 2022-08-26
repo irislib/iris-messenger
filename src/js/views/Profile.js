@@ -249,12 +249,15 @@ class Profile extends View {
 
   useAsPfp(nft, e) {
     e.preventDefault();
-    const src = nft.media[0].raw;
+    let src = nft.media[0].raw;
     if (src.indexOf('data:image') === 0) {
       State.public.user().get('profile').get('photo').put(src);
     } else {
       // load image and convert to base64
       const img = new Image();
+      if (src.indexOf('ipfs://') === 0) {
+        src = `https://ipfs.io/ipfs/${src.substring(7)}`;
+      }
       img.src = src;
       img.crossOrigin = 'anonymous';
       img.onload = () => {
@@ -296,19 +299,22 @@ class Profile extends View {
       return html`
         <div class="public-messages-view">
           <h3>NFT</h3>
-            ${this.state.nfts && this.state.nfts.map(nft => html`
-              <${ImageWithMenu}>
-                ${this.isMyProfile ? html`
-                  <div class="dropdown">
-                    <div class="dropbtn">\u2026</div>
-                    <div class="dropdown-content">
-                      <a href="#" onClick=${e => this.useAsPfp(nft, e)}>${t('use_as_PFP')}</a>
+            ${this.state.nfts && this.state.nfts.map(nft => {
+              const src = nft.media && nft.media[0] && nft.media[0].raw;
+              html`
+                <${ImageWithMenu}>
+                  ${this.isMyProfile ? html`
+                    <div class="dropdown">
+                      <div class="dropbtn">\u2026</div>
+                      <div class="dropdown-content">
+                        <a href="#" onClick=${e => this.useAsPfp(nft, e)}>${t('use_as_PFP')}</a>
+                      </div>
                     </div>
-                  </div>
-                ` : ''}
-                <img src=${nft.media[0].raw} alt=${nft.title} />
-              <//>
-            `)}
+                  ` : ''}
+                  <img src=${src} alt=${nft.title} />
+                <//>
+              `
+            })}
         </div>
       `;
     }
