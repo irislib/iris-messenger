@@ -25,30 +25,35 @@ import Web3 from 'web3';
 import { Alchemy, Network } from "alchemy-sdk";
 import styled from 'styled-components';
 
+const ImageGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+`;
+
 // styled-component GalleryImage that has the menu (class="dropdown") in the top right corner
 // & .dropbtn should have a black background shadow
-const GalleryImage = styled.div`
+const GalleryImage = styled.a`
   position: relative;
-  display: inline-block;
-  width: 32%;
-  margin-right: 5px;
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  background-color: #ccc;
+  background-image: url(${props => props.src});
   & .dropdown {
     position: absolute;
     top: 0;
     right: 0;
+    z-index: 1;
   }
   & .dropbtn {
     padding-top: 0px;
     margin-top: -5px;
     text-shadow: 0px 0px 5px rgba(0,0,0,0.5);
-  }
-  & > a {
-    display: inline-block;
-    width: 100%;
-    padding-bottom: 100%;
-    background-size: cover;
-    background-position: center;
-    background-color: #ccc;
+    color: white;
+    user-select: none;
   }
 `;
 
@@ -310,28 +315,29 @@ class Profile extends View {
       return html`
         <div class="public-messages-view">
           <h3>NFT</h3>
-            ${this.state.nfts && this.state.nfts.ownedNfts && this.state.nfts.ownedNfts.map(nft => {
-              let src = nft.media && nft.media[0] && (nft.media[0].gateway || nft.media[0].raw);
-              if (src && src.indexOf('ipfs://') === 0) {
-                src = `https://ipfs.io/ipfs/${src.substring(7)}`;
-              }
-              return html`
-                <${GalleryImage}>
-                  ${this.isMyProfile ? html`
-                    <div class="dropdown">
-                      <div class="dropbtn">\u2026</div>
-                      <div class="dropdown-content">
-                        <a href="#" onClick=${e => this.useAsPfp(nft, e)}>${t('use_as_PFP')}</a>
+            <${ImageGrid}>
+              ${this.state.nfts && this.state.nfts.ownedNfts && this.state.nfts.ownedNfts.map(nft => {
+                let src = nft.media && nft.media[0] && (nft.media[0].gateway || nft.media[0].raw);
+                if (src && src.indexOf('ipfs://') === 0) {
+                  src = `https://ipfs.io/ipfs/${src.substring(7)}`;
+                }
+                return html`
+                  <${GalleryImage}
+                          href="https://etherscan.io/address/${nft.contract.address}"
+                          target="_blank"
+                          src=${src}>
+                    ${this.isMyProfile ? html`
+                      <div class="dropdown">
+                        <div class="dropbtn">\u2026</div>
+                        <div class="dropdown-content">
+                          <a href="#" onClick=${e => this.useAsPfp(nft, e)}>${t('use_as_PFP')}</a>
+                        </div>
                       </div>
-                    </div>
-                  ` : ''}
-                    <a href="https://etherscan.io/address/${nft.contract.address}"
-                       target="_blank"
-                        style="background-image: url(${src});">
-                    </a>
-                <//>
-              `
-            })}
+                    ` : ''}
+                  <//>
+                `
+              })}
+            <//>
         </div>
       `;
     }
