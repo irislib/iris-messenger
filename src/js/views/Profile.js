@@ -395,7 +395,10 @@ class Profile extends View {
       this.setState({followerCount});
     }));
     State.public.user(pub).get('profile').get('eth').on(this.sub(eth => {
-      if (eth && eth.address && eth.proof && eth.address !== (this.state.eth && this.state.eth.address)) {
+      if (eth && eth.address && eth.proof) {
+        if (eth.address === (this.state.eth && this.state.eth.address)) {
+          return;
+        }
         const web3 = new Web3();
         const signer = web3.eth.accounts.recover(this.getEthIrisProofString(), eth.proof);
         if (signer === eth.address) {
