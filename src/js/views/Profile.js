@@ -302,7 +302,7 @@ class Profile extends View {
                   <div class="dropdown">
                     <div class="dropbtn">\u2026</div>
                     <div class="dropdown-content">
-                      <a href="#" onClick=${e => this.useAsPfp(nft, e)}>${t('use_as_pfp')}</a>
+                      <a href="#" onClick=${e => this.useAsPfp(nft, e)}>${t('use_as_PFP')}</a>
                     </div>
                   </div>
                 ` : ''}
@@ -349,7 +349,7 @@ class Profile extends View {
   getNfts(address) {
     const config = {
       apiKey: "DGLWKXjx7nRC5Dmz7mavP8CX1frKT1Ar",
-      network: Network.ETH_RINKEBY,
+      network: Network.ETH_MAINNET,
     };
     const alchemy = new Alchemy(config);
 
