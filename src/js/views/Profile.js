@@ -252,7 +252,7 @@ class Profile extends View {
 
   useAsPfp(nft, e) {
     e.preventDefault();
-    let src = nft.media[0].raw;
+    let src = (nft.media[0].gateway || nft.media[0].raw);
     if (src.indexOf('data:image') === 0) {
       State.public.user().get('profile').get('photo').put(src);
     } else {
@@ -303,7 +303,7 @@ class Profile extends View {
         <div class="public-messages-view">
           <h3>NFT</h3>
             ${this.state.nfts && this.state.nfts.ownedNfts && this.state.nfts.ownedNfts.map(nft => {
-              let src = nft.media && nft.media[0] && nft.media[0].raw;
+              let src = nft.media && nft.media[0] && (nft.media[0].gateway || nft.media[0].raw);
               if (src && src.indexOf('ipfs://') === 0) {
                 src = `https://ipfs.io/ipfs/${src.substring(7)}`;
               }
@@ -317,7 +317,9 @@ class Profile extends View {
                       </div>
                     </div>
                   ` : ''}
-                  <img src=${src} alt=${nft.title} />
+                    <a href="https://etherscan.io/address/${nft.contract.address}" target="_blank">
+                      <img src=${src} alt=${nft.title} />
+                    </a>
                 <//>
               `
             })}
