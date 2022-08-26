@@ -10,7 +10,7 @@ import Icons from "../Icons";
 const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
   {url: '/', text: t('home'), icon: Icons.home},
   {url: '/media', text: t('media'), icon: Icons.play},
-  {url: '/chat/new', text: t('messages'), icon: Icons.chat},
+  {url: '/chat', text: t('messages'), icon: Icons.chat},
   {url: '/store', text: t('market'), icon: Icons.store, beta: true },
   {url: '/contacts', text: t('contacts'), icon: Icons.user},
   {url: '/settings', text: t('settings'), icon: Icons.settings},
