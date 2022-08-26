@@ -160,7 +160,9 @@ class Profile extends View {
     if (this.state.eth && this.state.eth.address) {
       return html`
         <p>
-          Eth: <a href="https://etherscan.io/address/${this.state.eth.address}">${this.state.eth.address.slice(0, 6)}...</a>
+          Eth: <a href="https://etherscan.io/address/${this.state.eth.address}">
+              ${this.state.eth.address.slice(0, 4)}...${this.state.eth.address.slice(-4)}
+            </a>
             <i> </i>
           ${this.isMyProfile ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)` : ''}
             ${this.state.nfts.length ? html`
