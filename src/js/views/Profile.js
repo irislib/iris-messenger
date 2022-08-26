@@ -27,10 +27,13 @@ import styled from 'styled-components';
 
 const ImageGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 10px;
   margin-top: 10px;
   margin-bottom: 10px;
+  @media (max-width: 625px) {
+    grid-gap: 1px;
+  }
 `;
 
 // styled-component GalleryImage that has the menu (class="dropdown") in the top right corner
