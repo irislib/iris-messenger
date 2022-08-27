@@ -249,19 +249,22 @@ class Profile extends View {
             `: this.props.id === SMS_VERIFIER_PUB ? html`
               <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
             ` : ''}
-            <div class="hidden-xs">
-              ${this.isMyProfile ? '' : html`<${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>`}
-              <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
-            </div>
+              ${this.isMyProfile ? '' : html`
+                <div class="hidden-xs">
+                  <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>
+                  <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
+                </div>
+              `}
           </div>
         </div>
       </div>
       
-        <!-- align right -->
-      <div class="visible-xs-flex profile-actions" style="justify-content: flex-end">
-        ${this.isMyProfile ? '' : html`<${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>`}
-        <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
-      </div>
+      ${this.isMyProfile ? '' : html`
+        <div class="visible-xs-flex profile-actions" style="justify-content: flex-end">
+          <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>
+          <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
+        </div>
+      `}
         
       ${(this.isMyProfile || this.state.about) ? html`
         <div class="profile-about visible-xs-flex">
