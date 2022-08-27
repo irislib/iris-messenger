@@ -330,8 +330,12 @@ class Profile extends View {
             <${ImageGrid}>
               ${this.state.nfts && this.state.nfts.ownedNfts && this.state.nfts.ownedNfts.map(nft => {
                 let src = nft.media && nft.media[0] && (nft.media[0].gateway || nft.media[0].raw);
-                if (src && src.indexOf('ipfs://') === 0) {
-                  src = `https://ipfs.io/ipfs/${src.substring(7)}`;
+                if (src && src.indexOf('data:image') !== 0) {
+                  if (src && src.indexOf('ipfs://') === 0) {
+                    src = `https://ipfs.io/ipfs/${src.substring(7)}`;
+                  } else if (src && src.indexOf('https://ipfs.io/ipfs/') !== 0) {
+                    src = `https://iris-image-proxy.herokuapp.com/insecure/plain/${src}`;
+                  }
                 }
                 return html`
                   <${GalleryImage}
