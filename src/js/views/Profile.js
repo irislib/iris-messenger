@@ -334,7 +334,7 @@ class Profile extends View {
                   if (src && src.indexOf('ipfs://') === 0) {
                     src = `https://ipfs.io/ipfs/${src.substring(7)}`;
                   } else if (src && src.indexOf('https://ipfs.io/ipfs/') !== 0) {
-                    src = `https://iris-image-proxy.herokuapp.com/insecure/rs:fill:520:520/plain/${src}`;
+                    src = `https://proxy.irismessengers.wtf/insecure/rs:fill:520:520/plain/${src}`;
                   }
                 }
                 return html`
