@@ -224,7 +224,24 @@ class Profile extends View {
           ${profilePhoto}
         </div>
         <div class="profile-header-stuff">
-          <h3 class="profile-name" placeholder=${this.isMyProfile ? t('name') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
+          <div style="display:flex; flex-direction:row;">
+            <h3 style="flex: 1" class="profile-name" placeholder=${this.isMyProfile ? t('name') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>
+                ${this.state.name}
+            </h3>
+            <div class="dropdown profile-actions">
+              <div class="dropbtn">\u2026</div>
+              <div class="dropdown-content">
+                ${this.isMyProfile ? '' : html`<${BlockButton} key=${`${this.props.id}block`} id=${this.props.id}/>`}
+                <${CopyButton} key=${`${this.props.id}copy`} text=${t('copy_link')} title=${this.state.name} copyStr=${window.location.href}/>
+                <${Button} onClick=${() => $(this.qrRef.current).toggle()}>${t('show_qr_code')}<//>
+                ${this.isMyProfile ? '' : html`
+                  <${Button} class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}<//>
+                `}
+              </div>
+            </div>
+
+          </div>
+            
           <div class="profile-about hidden-xs">
             <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
@@ -245,18 +262,14 @@ class Profile extends View {
             ` : ''}
             ${this.isMyProfile ? '' : html`<${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>`}
             <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
-            <${CopyButton} key=${`${this.props.id}copy`} text=${t('copy_link')} title=${this.state.name} copyStr=${window.location.href}/>
-            <${Button} onClick=${() => $(this.qrRef.current).toggle()}>${t('show_qr_code')}<//>
-            ${this.isMyProfile ? '' : html`
-              <${Button} class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}<//>
-            `}
-            ${this.isMyProfile ? '' : html`<${BlockButton} key=${`${this.props.id}block`} id=${this.props.id}/>`}
           </div>
         </div>
       </div>
-      <div class="profile-about visible-xs-flex">
-        <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
-      </div>
+      ${(this.isMyProfile || this.state.about) ? html`
+        <div class="profile-about visible-xs-flex">
+          <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
+        </div>
+      ` : ''}
 
       <p ref=${this.qrRef} style="display:none" class="qr-container"></p>
       ${this.renderSettings()}
