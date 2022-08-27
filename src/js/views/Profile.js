@@ -29,8 +29,6 @@ const ImageGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
   @media (max-width: 625px) {
     grid-gap: 1px;
   }
@@ -172,15 +170,6 @@ class Profile extends View {
     }
   }
 
-  scrollToNfts() {
-    // only on mobile
-    if (window.innerWidth < 625) {
-      $('.main-view').animate({
-        scrollTop: $('.public-messages-view').offset().top - 60
-      }, 500);
-    }
-  }
-
   // if window.ethereum is defined, suggest to sign a message with the user's ethereum account
   renderEthereum() {
     if (this.state.eth && this.state.eth.address) {
@@ -192,7 +181,7 @@ class Profile extends View {
             <i> </i>
           ${this.isMyProfile ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)` : ''}
           ${this.state.nfts.totalCount ? html`
-            <br /><a href="/nfts/${this.props.id}" onClick=${this.scrollToNfts}>NFT (${this.state.nfts.totalCount})</a>
+            <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.totalCount})</a>
           ` : ''}
         </p>
       `;
@@ -260,11 +249,20 @@ class Profile extends View {
             `: this.props.id === SMS_VERIFIER_PUB ? html`
               <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
             ` : ''}
-            ${this.isMyProfile ? '' : html`<${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>`}
-            <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
+            <div class="hidden-xs">
+              ${this.isMyProfile ? '' : html`<${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>`}
+              <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
+            </div>
           </div>
         </div>
       </div>
+      
+        <!-- align right -->
+      <div class="visible-xs-flex profile-actions" style="justify-content: flex-end">
+        ${this.isMyProfile ? '' : html`<${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>`}
+        <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
+      </div>
+        
       ${(this.isMyProfile || this.state.about) ? html`
         <div class="profile-about visible-xs-flex">
           <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
@@ -339,34 +337,33 @@ class Profile extends View {
     } else if (this.props.tab === 'nfts') {
       return html`
         <div class="public-messages-view">
-          <h3>NFT</h3>
-            <${ImageGrid}>
-              ${this.state.nfts && this.state.nfts.ownedNfts && this.state.nfts.ownedNfts.map(nft => {
-                let src = nft.media && nft.media[0] && (nft.media[0].gateway || nft.media[0].raw);
-                if (src && src.indexOf('data:image') !== 0) {
-                  if (src && src.indexOf('ipfs://') === 0) {
-                    src = `https://ipfs.io/ipfs/${src.substring(7)}`;
-                  } else if (src && src.indexOf('https://ipfs.io/ipfs/') !== 0) {
-                    src = `https://proxy.irismessengers.wtf/insecure/rs:fill:520:520/plain/${src}`;
-                  }
+          <${ImageGrid}>
+            ${this.state.nfts && this.state.nfts.ownedNfts && this.state.nfts.ownedNfts.map(nft => {
+              let src = nft.media && nft.media[0] && (nft.media[0].gateway || nft.media[0].raw);
+              if (src && src.indexOf('data:image') !== 0) {
+                if (src && src.indexOf('ipfs://') === 0) {
+                  src = `https://ipfs.io/ipfs/${src.substring(7)}`;
+                } else if (src && src.indexOf('https://ipfs.io/ipfs/') !== 0) {
+                  src = `https://proxy.irismessengers.wtf/insecure/rs:fill:520:520/plain/${src}`;
                 }
-                return html`
-                  <${GalleryImage}
-                          href="https://etherscan.io/address/${nft.contract.address}"
-                          target="_blank"
-                          src=${src}>
-                    ${this.isMyProfile ? html`
-                      <div class="dropdown">
-                        <div class="dropbtn">\u2026</div>
-                        <div class="dropdown-content">
-                          <a href="#" onClick=${e => this.useAsPfp(nft, e)}>${t('use_as_PFP')}</a>
-                        </div>
+              }
+              return html`
+                <${GalleryImage}
+                        href="https://etherscan.io/address/${nft.contract.address}"
+                        target="_blank"
+                        src=${src}>
+                  ${this.isMyProfile ? html`
+                    <div class="dropdown">
+                      <div class="dropbtn">\u2026</div>
+                      <div class="dropdown-content">
+                        <a href="#" onClick=${e => this.useAsPfp(nft, e)}>${t('use_as_PFP')}</a>
                       </div>
-                    ` : ''}
-                  <//>
-                `
-              })}
-            <//>
+                    </div>
+                  ` : ''}
+                <//>
+              `
+            })}
+          <//>
         </div>
       `;
     }
