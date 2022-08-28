@@ -25,21 +25,36 @@ import Web3 from 'web3';
 import { Alchemy, Network } from "alchemy-sdk";
 import styled from 'styled-components';
 
-// styled-component ImageWithMenu that has the menu (class="dropdown") in the top right corner
+const ImageGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 10px;
+  @media (max-width: 625px) {
+    grid-gap: 1px;
+  }
+`;
+
+// styled-component GalleryImage that has the menu (class="dropdown") in the top right corner
 // & .dropbtn should have a black background shadow
-const ImageWithMenu = styled.div`
+const GalleryImage = styled.a`
   position: relative;
-  display: inline-block;
-  margin-right: 5px;
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  background-color: #ccc;
+  background-image: url(${props => props.src});
   & .dropdown {
     position: absolute;
     top: 0;
     right: 0;
+    z-index: 1;
   }
   & .dropbtn {
     padding-top: 0px;
     margin-top: -5px;
     text-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+    color: white;
+    user-select: none;
   }
 `;
 
@@ -160,12 +175,14 @@ class Profile extends View {
     if (this.state.eth && this.state.eth.address) {
       return html`
         <p>
-          Eth: <a href="https://etherscan.io/address/${this.state.eth.address}">${this.state.eth.address.slice(0, 6)}...</a>
+          Eth: <a href="https://etherscan.io/address/${this.state.eth.address}">
+              ${this.state.eth.address.slice(0, 4)}...${this.state.eth.address.slice(-4)}
+            </a>
             <i> </i>
           ${this.isMyProfile ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)` : ''}
-            ${this.state.nfts.length ? html`
-              <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.length})</a>
-            ` : ''}
+          ${this.state.nfts.totalCount ? html`
+            <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.totalCount})</a>
+          ` : ''}
         </p>
       `;
     }
@@ -196,7 +213,24 @@ class Profile extends View {
           ${profilePhoto}
         </div>
         <div class="profile-header-stuff">
-          <h3 class="profile-name" placeholder=${this.isMyProfile ? t('name') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>${this.state.name}</h3>
+          <div style="display:flex; flex-direction:row;">
+            <h3 style="flex: 1" class="profile-name" placeholder=${this.isMyProfile ? t('name') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onNameInput(e)}>
+                ${this.state.name}
+            </h3>
+            <div class="dropdown profile-actions">
+              <div class="dropbtn">\u2026</div>
+              <div class="dropdown-content">
+                ${this.isMyProfile ? '' : html`<${BlockButton} key=${`${this.props.id}block`} id=${this.props.id}/>`}
+                <${CopyButton} key=${`${this.props.id}copy`} text=${t('copy_link')} title=${this.state.name} copyStr=${window.location.href}/>
+                <${Button} onClick=${() => $(this.qrRef.current).toggle()}>${t('show_qr_code')}<//>
+                ${this.isMyProfile ? '' : html`
+                  <${Button} class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}<//>
+                `}
+              </div>
+            </div>
+
+          </div>
+            
           <div class="profile-about hidden-xs">
             <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
@@ -215,20 +249,28 @@ class Profile extends View {
             `: this.props.id === SMS_VERIFIER_PUB ? html`
               <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
             ` : ''}
-            ${this.isMyProfile ? '' : html`<${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>`}
-            <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
-            <${CopyButton} key=${`${this.props.id}copy`} text=${t('copy_link')} title=${this.state.name} copyStr=${window.location.href}/>
-            <${Button} onClick=${() => $(this.qrRef.current).toggle()}>${t('show_qr_code')}<//>
-            ${this.isMyProfile ? '' : html`
-              <${Button} class="show-settings" onClick=${() => this.onClickSettings()}>${t('settings')}<//>
-            `}
-            ${this.isMyProfile ? '' : html`<${BlockButton} key=${`${this.props.id}block`} id=${this.props.id}/>`}
+              ${this.isMyProfile ? '' : html`
+                <div class="hidden-xs">
+                  <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>
+                  <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
+                </div>
+              `}
           </div>
         </div>
       </div>
-      <div class="profile-about visible-xs-flex">
-        <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
-      </div>
+      
+      ${this.isMyProfile ? '' : html`
+        <div class="visible-xs-flex profile-actions" style="justify-content: flex-end">
+          <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id}/>
+          <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${t('send_message')}<//>
+        </div>
+      `}
+        
+      ${(this.isMyProfile || this.state.about) ? html`
+        <div class="profile-about visible-xs-flex">
+          <p class="profile-about-content" placeholder=${this.isMyProfile ? t('about') : ''} contenteditable=${this.isMyProfile} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
+        </div>
+      ` : ''}
 
       <p ref=${this.qrRef} style="display:none" class="qr-container"></p>
       ${this.renderSettings()}
@@ -249,7 +291,7 @@ class Profile extends View {
 
   useAsPfp(nft, e) {
     e.preventDefault();
-    let src = nft.media[0].raw;
+    let src = (nft.media[0].gateway || nft.media[0].raw);
     if (src.indexOf('data:image') === 0) {
       State.public.user().get('profile').get('photo').put(src);
     } else {
@@ -298,11 +340,21 @@ class Profile extends View {
     } else if (this.props.tab === 'nfts') {
       return html`
         <div class="public-messages-view">
-          <h3>NFT</h3>
-            ${this.state.nfts && this.state.nfts.map(nft => {
-              const src = nft.media && nft.media[0] && nft.media[0].raw;
-              html`
-                <${ImageWithMenu}>
+          <${ImageGrid}>
+            ${this.state.nfts && this.state.nfts.ownedNfts && this.state.nfts.ownedNfts.map(nft => {
+              let src = nft.media && nft.media[0] && (nft.media[0].gateway || nft.media[0].raw);
+              if (src && src.indexOf('data:image') !== 0) {
+                if (src && src.indexOf('ipfs://') === 0) {
+                  src = `https://ipfs.io/ipfs/${src.substring(7)}`;
+                } else if (src && src.indexOf('https://ipfs.io/ipfs/') !== 0) {
+                  src = `https://proxy.irismessengers.wtf/insecure/rs:fill:520:520/plain/${src}`;
+                }
+              }
+              return html`
+                <${GalleryImage}
+                        href="https://etherscan.io/address/${nft.contract.address}"
+                        target="_blank"
+                        src=${src}>
                   ${this.isMyProfile ? html`
                     <div class="dropdown">
                       <div class="dropbtn">\u2026</div>
@@ -311,10 +363,10 @@ class Profile extends View {
                       </div>
                     </div>
                   ` : ''}
-                  <img src=${src} alt=${nft.title} />
                 <//>
               `
             })}
+          <//>
         </div>
       `;
     }
@@ -329,6 +381,10 @@ class Profile extends View {
       </div>
       `;
 
+  }
+
+  onNftImgError(e) {
+    e.target.style = 'display:none';
   }
 
   renderView() {
@@ -363,7 +419,7 @@ class Profile extends View {
       // Get all NFTs
       const nfts = await alchemy.nft.getNftsForOwner(address);
       // Print NFTs
-      this.setState({ nfts: nfts.ownedNfts });
+      this.setState({ nfts });
       console.log(nfts);
     };
 

@@ -2290,6 +2290,10 @@ form.public {
     width: 100%;
     margin-left: 15px;
   }
+
+  .profile-header {
+      margin-bottom: 0;
+  }
 }
 
 @media (min-width: 626px) {

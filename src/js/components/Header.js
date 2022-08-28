@@ -155,7 +155,7 @@ class Header extends Component {
             <span class="visible-xs-inline-block">${Icons.backArrow}</span>
           </a>
         `}
-        <a href="/settings" class="connected-peers tooltip ${this.state.showMobileSearch ? 'hidden-xs' : ''} ${peerCount ? 'connected' : ''}">
+        <a href="/settings/peer" class="connected-peers tooltip ${this.state.showMobileSearch ? 'hidden-xs' : ''} ${peerCount ? 'connected' : ''}">
           <span class="tooltiptext">${t('connected_peers')}</span>
           <small>
             <span class="icon">${Icons.network}</span>
