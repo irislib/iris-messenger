@@ -26,25 +26,6 @@ class ChatListItem extends Component {
         this.setState({unseen});
       }
     ));
-  /*  State.local.get('channels').get(chat.id).get('latest').on(this.sub(
-      (latest) => {
-        
-        if (msg.attachments) {
-          text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
-        } else {
-          text = msg.text;
-        }
-        if (chat && chat.uuid && !msg.selfAuthored && msg.info.from && chat.participantProfiles[msg.info.from].name) {
-          text = chat.participantProfiles[msg.info.from].name + ': ' + text;
-        }
-        
-        if (latest.time < chat.latestTime) { return; }
-        latest.time = latest.time && new Date(latest.time);
-        this.setState({latest});
-        console.log("Latesttime set Item");
-        
-      }
-    ));*/
   }
 
   render() {

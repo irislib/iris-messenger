@@ -14,7 +14,7 @@ class ChatList extends Component {
   
   constructor(props) {
     super(props);
-    this.state = {chats: new Map(), hashtags: {}, latesttime: null};
+    this.state = {chats: new Map(), hashtags: {}, latestTime: null};
   }
 
   componentDidMount() {
@@ -28,7 +28,7 @@ class ChatList extends Component {
         chat.latestTime = chat.latestTime || '';
         State.local.get('channels').get(id).get('latest').on(this.sub(
           (latest) => {
-            this.setState({latesttime : latest});
+            this.setState({latestTime : latest});
             chat.latestTime = latest.time || '';
             chat.latest = latest;
             chat.id = id;
@@ -62,8 +62,7 @@ class ChatList extends Component {
 
   render() {
     const activeChat = this.props.activeChat;
-    const sortedchats = _.orderBy(Array.from(this.state.chats.values()), ['latestTime', 'name'], ['desc', 'asc'])
-    
+    const sortedChats = _.orderBy(Array.from(this.state.chats.values()), ['latestTime', 'name'], ['desc', 'asc']);
     return html`<section class="sidebar ${this.props.class || ''}">
       <div id="enable-notifications-prompt" onClick=${() => Notifications.enableDesktopNotifications()}>
         <div class="title">${t('get_notified_new_messages')}</div>
@@ -78,13 +77,13 @@ class ChatList extends Component {
           ${t('new_chat')}
         </div>
         <${ScrollViewport}>
-          ${sortedchats.map(chat =>
+          ${sortedChats.map(chat =>
             html`<${ChatListItem}
               photo=${chat.photo}
               active=${chat.id === activeChat}
               key=${chat.id}
               chat=${chat}
-              lates=${this.state.latesttime}/>`
+              lates=${this.state.latestTime}/>`
             )
           }
         </${ScrollViewport}>

@@ -12,7 +12,6 @@ import iris from '../../../iris-lib';
 class MainView extends Component {
     constructor() {
         super();
-        this.chatLinks = {};
         this.state = {chatLinks: {}};
         this.removeChatLink = this.removeChatLink.bind(this);
     }
@@ -20,13 +19,12 @@ class MainView extends Component {
     removeChatLink(id) {
         State.local.get('chatLinks').get(id).put(null);
         this.props.chatLinks[id] = null;
-        this.setState({chatLinks: this.chatLinks});
+        this.setState({chatLinks: this.props.chatLinks});
         this.forceUpdate();
         return iris.Channel.removePrivateChatLink(State.public, Session.getKey(), id);
         
     }
     componentDidMount() {
-        this.chatLinks = this.props.chatLinks;
         this.setState({chatLinks: this.props.chatLinks});
     }
 
@@ -49,8 +47,8 @@ class MainView extends Component {
                 
                 <h3>{t("your_invite_links")}</h3>
                 <div id="my-chat-links" class="flex-table">
-                    {Object.keys(this.chatLinks).map(id => {
-                        const url = this.chatLinks[id];
+                    {Object.keys(this.state.chatLinks).map(id => {
+                        const url = this.state.chatLinks[id];
                         if(url == null){
                             return html``;
                         }

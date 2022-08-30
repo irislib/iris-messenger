@@ -569,7 +569,7 @@ export default {
     if(dayDifference == 0){
       return 'today';
     }
-    if (dayDifference <= 1) {
+    if (dayDifference == 1) {
       return 'yesterday';
     }
     if (dayDifference <= 5) {
