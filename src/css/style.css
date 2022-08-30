@@ -1612,17 +1612,17 @@ hr {
   position: relative;
 }
 .chat-new-item {
-  padding: 0px 10px 0px 15px;
   overflow-x: hidden;
   cursor: pointer;
   flex-direction: row;
   display: flex;
   height: 72px;
   position: relative;
-  align-items: stretch;
+
   background: var(--chat-hover);
 }
 .chat-new-item-inner {
+  padding: 0px 10px 0px 15px;
   align-items: center; 
   flex-direction: row; 
   display: flex;
@@ -1694,7 +1694,7 @@ small, .text-muted {
   background: var(--chat-hover);
 }
 
-.chat-item.new, .chat-item.public-messages,.chat-new-item {
+.chat-item.new, .chat-item.public-messages {
   align-items: center;
 }
 
