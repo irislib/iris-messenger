@@ -29,17 +29,12 @@ class ChatList extends Component {
         State.local.get('channels').get(id).get('latest').on(this.sub(
           (latest) => {
             this.setState({latesttime : latest});
-            console.log("Latesttime set List");
-            
             chat.latestTime = latest.time || '';
             chat.latest = latest;
             chat.id = id;
             this.setState({chats: this.state.chats.set(id, chat)});
           }
         ));
-
-        
-        
         chat.id = id;
         this.setState({chats: this.state.chats.set(id, chat)});
       }
@@ -68,7 +63,6 @@ class ChatList extends Component {
   render() {
     const activeChat = this.props.activeChat;
     const sortedchats = _.orderBy(Array.from(this.state.chats.values()), ['latestTime', 'name'], ['desc', 'asc'])
-    console.log("Render List");
     
     return html`<section class="sidebar ${this.props.class || ''}">
       <div id="enable-notifications-prompt" onClick=${() => Notifications.enableDesktopNotifications()}>
