@@ -9,13 +9,15 @@ import ChatMessageForm from './ChatMessageForm';
 import Name from '../../components/Name';
 import Session from '../../Session';
 import Notifications from '../../Notifications';
-import NewChat from './NewChat';
+import NewChat from './newchat/NewChat';
 import _ from 'lodash';
 import $ from 'jquery';
 import iris from '../../iris-lib';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';
+
 import Button from '../../components/basic/Button';
+import { Router } from 'preact-router';
 
 const caretDownSvg = html`
 <svg x="0px" y="0px"
@@ -258,14 +260,15 @@ export default class PrivateChat extends Component {
           <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
         </div>`;
     } else {
-      mainView = html`<${NewChat}/>`;
+      mainView = <Router><NewChat path="/chat/new/:view?" /><NewChat path="/chat" /></Router>;
     }
     return mainView;
   }
 
   renderParticipantList() {
     const participants = this.state.sortedParticipants;
-    return this.props.id && this.props.id !== 'new' && this.props.id.length < 40 ? html`
+    
+    return this.props.id && this.props.id !== 'new' && this.props.id !== 'InviteView' && this.props.id !== 'QRView' && this.props.id.length < 40 ? html`
       <div class="participant-list ${this.state.showParticipants ? 'open' : ''}">
         ${participants.length ? html`
           <small>${participants.length} ${t('participants')}</small>

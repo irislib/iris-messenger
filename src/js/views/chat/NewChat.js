@@ -1,4 +1,4 @@
-import { html } from 'htm/preact';
+/*import { html } from 'htm/preact';
 import { translate as t } from '../../Translation';
 import State from '../../State';
 import QRScanner from '../../QRScanner';
@@ -142,4 +142,4 @@ class NewChat extends Component {
   }
 }
 
-export default NewChat;
+export default NewChat;*/

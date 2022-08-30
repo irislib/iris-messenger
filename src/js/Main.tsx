@@ -140,6 +140,7 @@ class Main extends Component<Props,State> {
               <Notifications path="/notifications"/>
               <Chat path="/chat/hashtag/:hashtag?"/>
               <Chat path="/chat/:id?"/>
+              <Chat path="/chat/new/:id"/>
               <Message path="/post/:hash+"/>
               <Torrent path="/torrent/:id+"/>
               <About path="/about"/>

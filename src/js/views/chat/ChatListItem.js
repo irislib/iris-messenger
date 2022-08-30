@@ -26,23 +26,6 @@ class ChatListItem extends Component {
         this.setState({unseen});
       }
     ));
-    State.local.get('channels').get(chat.id).get('latest').on(this.sub(
-      (latest) => {
-        /*
-        if (msg.attachments) {
-          text = '['+ t('attachment') +']' + (text.length ? ': ' + text : '');
-        } else {
-          text = msg.text;
-        }
-        if (chat && chat.uuid && !msg.selfAuthored && msg.info.from && chat.participantProfiles[msg.info.from].name) {
-          text = chat.participantProfiles[msg.info.from].name + ': ' + text;
-        }
-        */
-        if (latest.time < chat.latestTime) { return; }
-        latest.time = latest.time && new Date(latest.time);
-        this.setState({latest});
-      }
-    ));
   }
 
   render() {
@@ -65,9 +48,9 @@ class ChatListItem extends Component {
       html`<div class="identicon-container"><img src="${chat.photo}" class="round-borders" height=49 width=49 alt=""/></div>` :
       html`<${Identicon} str=${chat.id} width=49/>`;
 
-    const latestEl = chat.isTyping ? '' : html`<small class="latest">
-      ${this.state.latest.selfAuthored && seenIndicator}
-      ${this.state.latest.text}
+    const latestEl = chat.isTyping || !chat.latest ? '' : html`<small class="latest">
+      ${chat.latest.selfAuthored && seenIndicator}
+      ${chat.latest.text}
     </small>`;
 
     const typingIndicator = chat.isTyping ? html`<small class="typing-indicator">${t('typing')}</small>` : '';

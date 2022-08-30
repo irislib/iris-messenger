@@ -11,24 +11,30 @@ import _ from 'lodash';
 import $ from 'jquery';
 
 class ChatList extends Component {
-  constructor() {
-    super();
-    this.state = {chats: new Map(), hashtags: {}};
-  }
-
-  shouldComponentUpdate() {
-    return true;
+  
+  constructor(props) {
+    super(props);
+    this.state = {chats: new Map(), hashtags: {}, latestTime: null};
   }
 
   componentDidMount() {
     const hashtags = {};
     State.local.get('channels').map(this.sub(
       (chat, id) => {
-        if (!chat || id === 'public') {
+        if (!chat || id === 'public' || chat.name == null) {
           this.state.chats.has(id) && this.setState({chats: this.state.chats.delete(id)});
           return;
         }
         chat.latestTime = chat.latestTime || '';
+        State.local.get('channels').get(id).get('latest').on(this.sub(
+          (latest) => {
+            this.setState({latestTime : latest});
+            chat.latestTime = latest.time || '';
+            chat.latest = latest;
+            chat.id = id;
+            this.setState({chats: this.state.chats.set(id, chat)});
+          }
+        ));
         chat.id = id;
         this.setState({chats: this.state.chats.set(id, chat)});
       }
@@ -76,7 +82,8 @@ class ChatList extends Component {
               photo=${chat.photo}
               active=${chat.id === activeChat}
               key=${chat.id}
-              chat=${chat}/>`
+              chat=${chat}
+              lates=${this.state.latestTime}/>`
             )
           }
         </${ScrollViewport}>
