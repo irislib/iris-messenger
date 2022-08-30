@@ -11,13 +11,10 @@ import _ from 'lodash';
 import $ from 'jquery';
 
 class ChatList extends Component {
-  constructor() {
-    super();
-    this.state = {chats: new Map(), hashtags: {}};
-  }
-
-  shouldComponentUpdate() {
-    return true;
+  
+  constructor(props) {
+    super(props);
+    this.state = {chats: new Map(), hashtags: {}, latesttime: null};
   }
 
   componentDidMount() {
@@ -29,6 +26,20 @@ class ChatList extends Component {
           return;
         }
         chat.latestTime = chat.latestTime || '';
+        State.local.get('channels').get(id).get('latest').on(this.sub(
+          (latest) => {
+            this.setState({latesttime : latest});
+            console.log("Latesttime set List");
+            
+            chat.latestTime = latest.time || '';
+            chat.latest = latest;
+            chat.id = id;
+            this.setState({chats: this.state.chats.set(id, chat)});
+          }
+        ));
+
+        
+        
         chat.id = id;
         this.setState({chats: this.state.chats.set(id, chat)});
       }
@@ -56,7 +67,9 @@ class ChatList extends Component {
 
   render() {
     const activeChat = this.props.activeChat;
-    const sortedChats = _.orderBy(Array.from(this.state.chats.values()), ['latestTime', 'name'], ['desc', 'asc']);
+    const sortedchats = _.orderBy(Array.from(this.state.chats.values()), ['latestTime', 'name'], ['desc', 'asc'])
+    console.log("Render List");
+    
     return html`<section class="sidebar ${this.props.class || ''}">
       <div id="enable-notifications-prompt" onClick=${() => Notifications.enableDesktopNotifications()}>
         <div class="title">${t('get_notified_new_messages')}</div>
@@ -71,12 +84,13 @@ class ChatList extends Component {
           ${t('new_chat')}
         </div>
         <${ScrollViewport}>
-          ${sortedChats.map(chat =>
+          ${sortedchats.map(chat =>
             html`<${ChatListItem}
               photo=${chat.photo}
               active=${chat.id === activeChat}
               key=${chat.id}
-              chat=${chat}/>`
+              chat=${chat}
+              lates=${this.state.latesttime}/>`
             )
           }
         </${ScrollViewport}>
