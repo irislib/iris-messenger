@@ -1,4 +1,4 @@
-import Fun from '../src/js/Fun';
+import Fun from '../src/js/db/Fun';
 
 describe('Fun', () => {
   describe('Basic API', () => {

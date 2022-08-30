@@ -1,4 +1,4 @@
-import localForage from './lib/localforage.min';
+import localForage from '../lib/localforage.min';
 import _ from 'lodash';
 
 type FunEventListener = {
