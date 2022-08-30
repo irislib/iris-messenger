@@ -1,9 +1,24 @@
 import localForage from '../lib/localforage.min';
 import _ from 'lodash';
+import Actor, { ActorContext } from './Actor';
+import {Get, Message, Put} from './Message';
 
 type FunEventListener = {
-  off: Function;
+    off: Function;
 };
+
+export type Config = {
+    peerId?: string;
+    allowPublicSpace: boolean;
+    myPublicKey?: string;
+    enableStats: boolean;
+    webSocketPeers?: string[];
+}
+
+export const DEFAULT_CONFIG: Config = {
+    allowPublicSpace: false,
+    enableStats: true
+}
 
 // Localforage returns null if an item is not found, so we represent null with this uuid instead.
 // not foolproof, but good enough for now.
@@ -15,12 +30,14 @@ localForage.config({
 })
 
 const debug = false;
+
 function log(...args: any[]) {
-  debug && console.log(...args);
+    debug && console.log(...args);
 }
 
-export default class Node {
+export default class Node implements Actor {
     id: string;
+    actorContext: ActorContext;
     parent?: Node;
     children = new Map<string, Node>();
     on_subscriptions = new Map<number, Function>();
@@ -29,10 +46,20 @@ export default class Node {
     counter = 0;
     loaded = false;
 
-    constructor(id = '', parent?: Node) {
+    constructor(id = '', parent?: Node, actorContext?: ActorContext) {
         this.id = id;
         this.parent = parent;
+        this.actorContext = actorContext || new ActorContext();
     }
+
+    handle(message: Message): void {
+        console.log('handle', this.id, message);
+        if (message instanceof Put) {
+            for (const [key, value] of Object.entries(message.updatedNodes)) {
+                this.get(key).put(value);
+            }
+        }
+    };
 
     private saveLocalForage = _.throttle(async () => {
         if (!this.loaded) {
@@ -152,6 +179,7 @@ export default class Node {
         this.on_subscriptions.set(id, callback);
         const event = { off: () => this.map_subscriptions.delete(id) };
         this.once(callback, event, false);
+        this.actorContext.router.send(Get.new(this.actorContext.addr, this.id));
     }
 
     async map(callback: Function): Promise<any> {

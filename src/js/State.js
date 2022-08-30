@@ -6,7 +6,7 @@ import 'gun/lib/radisk';
 import 'gun/lib/store';
 import 'gun/lib/rindexed';
 import _ from 'lodash';
-import Fun from './db/Fun';
+import Fun from './db/Node';
 
 import PeerManager from './PeerManager';
 import iris from './iris-lib';
