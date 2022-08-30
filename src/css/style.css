@@ -1612,18 +1612,22 @@ hr {
   position: relative;
 }
 .chat-new-item {
-  
+  padding: 0px 10px 0px 15px;
   overflow-x: hidden;
   cursor: pointer;
   flex-direction: row;
   display: flex;
   height: 72px;
-  margin-top: -1px;
   position: relative;
   align-items: stretch;
   background: var(--chat-hover);
 }
-
+.chat-new-item-inner {
+  align-items: center; 
+  flex-direction: row; 
+  display: flex;
+  margin-top: -1px;
+}
 .chat-new-item:hover {
   background-color: var(--body-bg);
 }
