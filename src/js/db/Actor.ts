@@ -30,15 +30,12 @@ export class ServiceWorkerAddr implements Addr {
 }
 
 export class ActorContext {
-    addr: Addr;
-    router: Addr;
+    addr?: Addr;
+    router?: Addr;
     peerId: string;
-    rootNode: Node;
-    constructor(addr: Addr, router: Addr, peerId: string, rootNode: Node) {
-        this.addr = addr;
-        this.router = router;
+    rootNode?: Node;
+    constructor(peerId = Math.random().toString(36).slice(2, 10)) {
         this.peerId = peerId;
-        this.rootNode = rootNode;
     }
 }
 

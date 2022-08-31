@@ -45,11 +45,18 @@ export default class Node implements Actor {
     value = undefined;
     counter = 0;
     loaded = false;
+    config = DEFAULT_CONFIG;
 
-    constructor(id = '', parent?: Node, actorContext?: ActorContext) {
+    constructor(id = '', parent?: Node, actorContext?: ActorContext, config = DEFAULT_CONFIG) {
         this.id = id;
         this.parent = parent;
-        this.actorContext = actorContext || new ActorContext();
+        this.config = config;
+        if (actorContext) {
+            this.actorContext = actorContext;
+        } else {
+            this.actorContext = new ActorContext();
+            this.actorContext.startActor(this);
+        }
     }
 
     handle(message: Message): void {
@@ -109,10 +116,10 @@ export default class Node implements Actor {
         if (existing) {
             return existing;
         }
-        const new_node = new Node(`${this.id}/${key}`, this);
-        this.children.set(key, new_node);
+        const newNode = new Node(`${this.id}/${key}`, this, this.actorContext, );
+        this.children.set(key, newNode);
         this.saveLocalForage();
-        return new_node;
+        return newNode;
     }
 
     private doCallbacks = _.throttle(() => {

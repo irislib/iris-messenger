@@ -28,7 +28,7 @@ export default class Websocket implements Actor {
         this.ws = ws;
     }
 
-    handle(message: Message, context: ActorContext) {
+    handle(message: Message, _context: ActorContext) {
         this.ws!.send(message.toJsonString());
     }
 }

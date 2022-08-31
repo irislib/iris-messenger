@@ -79,12 +79,20 @@ export class Put implements Message {
     }
 }
 
-export function messageFromJsonString(jsonStr: string): Message {
+const parseGet = (get: any, from: Addr): Get => {
+    return new Get(get.id, from, get.nodeId, get.recipients, get.childKey, get.jsonStr, get.checksum);
+}
+
+const parsePut = (put: any, from: Addr): Put => {
+    return new Put(put.id, from, put.nodeId, put.childKey, put.inResponseTo, put.recipients, put.jsonStr, put.checksum);
+}
+
+export function messageFromJsonString(jsonStr: string, from: Addr): Message {
     const obj = JSON.parse(jsonStr);
     if (obj.get) {
-        return new Get(obj.id, obj.from, obj.nodeId, obj.recipients, obj.childKey, obj.jsonStr, obj.checksum);
+        return parseGet(obj.get, from);
     } else if (obj.put) {
-        return new Put(obj.id, obj.from, obj.nodeId, obj.childKey, obj.inResponseTo, obj.recipients, obj.jsonStr, obj.checksum);
+        return parsePut(obj.put, from);
     } else {
         throw new Error('Unknown message type');
     }
