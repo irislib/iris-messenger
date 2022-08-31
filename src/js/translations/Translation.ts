@@ -1,3 +1,5 @@
+import english from './en.mjs';
+
 const AVAILABLE_LANGUAGES = {
     "en": "English",
     "es": "Español",
@@ -32,9 +34,7 @@ let translation = {};
 const translationLoaded = import(`./${language}.mjs`).then(module => {
     translation = module.default;
     if (language !== 'en') {
-      return import(`./en.mjs`).then(module => {
-        translation = { ...module.default, ...translation };
-      }).catch(() => {});
+      translation = { ...english, ...translation };
     }
 });
 
