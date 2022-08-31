@@ -22,7 +22,6 @@ import {SMS_VERIFIER_PUB} from '../SMS';
 import ProfilePhoto from '../components/ProfilePhoto';
 import Button from '../components/basic/Button';
 import Web3 from 'web3';
-import { Alchemy, Network } from "alchemy-sdk";
 import styled from 'styled-components';
 
 const ImageGrid = styled.div`
@@ -408,7 +407,8 @@ class Profile extends View {
     `;
   }
 
-  getNfts(address) {
+  async getNfts(address) {
+    const { Alchemy, Network } = await import('alchemy-sdk');
     const config = {
       apiKey: "DGLWKXjx7nRC5Dmz7mavP8CX1frKT1Ar",
       network: Network.ETH_MAINNET,
@@ -420,7 +420,6 @@ class Profile extends View {
       const nfts = await alchemy.nft.getNftsForOwner(address);
       // Print NFTs
       this.setState({ nfts });
-      console.log(nfts);
     };
 
     const runMain = async () => {
