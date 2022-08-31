@@ -77,6 +77,7 @@ class Profile extends View {
 
   onProfilePhotoSet(src) {
     State.public.user().get('profile').get('photo').put(src);
+    State.public.user().get('profile').get('nftPfp').put(false);
   }
 
   onAboutInput(e) {
@@ -290,7 +291,7 @@ class Profile extends View {
 
   useAsPfp(nft, e) {
     e.preventDefault();
-    let src = (nft.media[0].gateway || nft.media[0].raw);
+    let src = this.getSrcForNft(nft, false);
     if (src.indexOf('data:image') === 0) {
       State.public.user().get('profile').get('photo').put(src);
     } else {
@@ -314,6 +315,28 @@ class Profile extends View {
     $('.main-view').animate({
       scrollTop: 0
     }, 'slow');
+  }
+
+  getSrcForNft(nft, thumbnail = true) {
+    let src = '';
+    if (nft.rawMetadata.image_url) {
+      src = nft.rawMetadata.image_url;
+    } else if (nft.rawMetadata.image) {
+      src = nft.rawMetadata.image;
+    } else if (nft.media && nft.media[0]) {
+      if (nft.media[0].gateway) {
+        src = nft.media[0].gateway;
+      }
+      src = nft.media[0].raw;
+    }
+    if (src && src.indexOf('data:image') !== 0) {
+      if (src && src.indexOf('ipfs://') === 0) {
+        src = `https://ipfs.io/ipfs/${src.substring(7)}`;
+      } else if (src && src.indexOf('https://ipfs.io/ipfs/') !== 0) {
+        src = `https://proxy.irismessengers.wtf/insecure/${thumbnail ? 'rs:fill:520:520/' : ''}plain/${src}`;
+      }
+    }
+    return src;
   }
 
   renderTab() {
@@ -341,14 +364,7 @@ class Profile extends View {
         <div class="public-messages-view">
           <${ImageGrid}>
             ${this.state.nfts && this.state.nfts.ownedNfts && this.state.nfts.ownedNfts.map(nft => {
-              let src = nft.media && nft.media[0] && (nft.media[0].gateway || nft.media[0].raw);
-              if (src && src.indexOf('data:image') !== 0) {
-                if (src && src.indexOf('ipfs://') === 0) {
-                  src = `https://ipfs.io/ipfs/${src.substring(7)}`;
-                } else if (src && src.indexOf('https://ipfs.io/ipfs/') !== 0) {
-                  src = `https://proxy.irismessengers.wtf/insecure/rs:fill:520:520/plain/${src}`;
-                }
-              }
+              let src = this.getSrcForNft(nft, true);
               return html`
                 <${GalleryImage}
                         href="https://etherscan.io/address/${nft.contract.address}"
@@ -420,6 +436,7 @@ class Profile extends View {
       const nfts = await alchemy.nft.getNftsForOwner(address);
       // Print NFTs
       this.setState({ nfts });
+      console.log('nfts', address, nfts);
     };
 
     const runMain = async () => {

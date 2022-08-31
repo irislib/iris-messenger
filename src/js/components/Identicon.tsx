@@ -104,7 +104,7 @@ class MyIdenticon extends Component<Props, State> {
           <style>
             {`.a {
               fill: white;
-              stroke-width: 65px;
+              stroke-width: 0px;
               stroke: rgba(255, 255, 255, 0.5);
               stroke-linejoin:round;
             }`}
