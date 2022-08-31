@@ -1,9 +1,11 @@
-import Translations from "../src/js/Translations.mjs";
+import Translations from "../src/js/translations/Translations.mjs";
 import fs from "fs";
 
 // Create a csv file where each row is a translation key and the column is the translation in different languages.
 // The file is created in the current working directory.
 // The file name is "translations.csv".
+
+// TODO: read translations from .mjs files in ../src/js/translations/
 
 function translationsToCsv() {
     let csv = '';

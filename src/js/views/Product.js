@@ -1,7 +1,7 @@
 import { html } from 'htm/preact';
 import State from '../State';
 import Session from '../Session';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import { route } from 'preact-router';
 import StoreView from './Store';
 import Text from '../components/Text';

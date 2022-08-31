@@ -2,7 +2,7 @@ import { html } from 'htm/preact';
 import State from '../State';
 import View from './View';
 import ExplorerNode from '../components/ExplorerNode';
-import { translate as t } from '../Translation';
+import { translate as t } from '../translations/Translation';
 import Name from '../components/Name';
 
 const pubKeyRegex = /^[A-Za-z0-9\-\_]{40,50}\.[A-Za-z0-9\_\-]{40,50}$/;

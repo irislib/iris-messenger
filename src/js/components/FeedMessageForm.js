@@ -2,7 +2,7 @@ import { createRef } from 'preact';
 import Helpers from '../Helpers';
 import Notifications from '../Notifications';
 import { html } from 'htm/preact';
-import { translate as t } from '../Translation';
+import { translate as t } from '../translations/Translation';
 import State from '../State';
 import Session from '../Session';
 import SafeImg from './SafeImg';

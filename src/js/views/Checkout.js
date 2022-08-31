@@ -4,7 +4,7 @@ import Session from '../Session';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';
 import Store from './Store';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import Text from '../components/Text';
 
 class Checkout extends Store {

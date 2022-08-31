@@ -1,5 +1,5 @@
 import Component from '../../BaseComponent';
-import {translate as t} from '../../Translation';
+import {translate as t} from '../../translations/Translation';
 import { route } from 'preact-router';
 import State from "../../State";
 import Helpers from "../../Helpers";

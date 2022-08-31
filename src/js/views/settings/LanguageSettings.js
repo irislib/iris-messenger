@@ -1,5 +1,4 @@
-import {AVAILABLE_LANGUAGES, language, translate as t} from '../../Translation';
-import Translations from '../../Translations';
+import {AVAILABLE_LANGUAGES, AVAILABLE_LANGUAGE_KEYS, language, translate as t} from '../../translations/Translation';
 import $ from 'jquery';
 import { Fragment } from 'preact';
 
@@ -10,17 +9,17 @@ import { Fragment } from 'preact';
         <h3>{t('language')}</h3>
         <div class="centered-container">
         {
-          AVAILABLE_LANGUAGES.map(l => {
+          Object.keys(AVAILABLE_LANGUAGES).map(l => {
             let inputl = "";
-            if(l == {language}.language){
+            if(l == language){
               inputl = <input type="radio" name="language" id={l} onChange={e => onLanguageChange(e)} value={l} checked />;
             }else{
               inputl = <input type="radio" name="language" id={l} onChange={e => onLanguageChange(e)} value={l} />;
             }
            return(
-              <Fragment key={l.id} >
+              <Fragment key={l} >
                 {inputl}
-                <label for={l}>{Translations[l].language_name}</label>
+                <label for={l}>{AVAILABLE_LANGUAGES[l]}</label>
                 <br />
               </Fragment >
            );
@@ -37,7 +36,7 @@ import { Fragment } from 'preact';
 
 function onLanguageChange(e) {
   const l = $(e.target).val();
-  if (AVAILABLE_LANGUAGES.indexOf(l) >= 0) {
+  if (AVAILABLE_LANGUAGE_KEYS.indexOf(l) >= 0) {
     localStorage.setItem('language', l);
     location.reload();
   }

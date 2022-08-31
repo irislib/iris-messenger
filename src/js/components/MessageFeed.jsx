@@ -3,7 +3,7 @@ import Helpers from '../Helpers';
 import PublicMessage from './PublicMessage';
 import State from '../State';
 import {debounce} from 'lodash';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import Button from '../components/basic/Button';
 
 const INITIAL_PAGE_SIZE = 20;

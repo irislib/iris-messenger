@@ -1,6 +1,6 @@
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import State from '../State';
 import Session from '../Session';
 import FeedMessageForm from '../components/FeedMessageForm';

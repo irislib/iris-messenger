@@ -1,5 +1,5 @@
 import Component from '../BaseComponent';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import Session from '../Session';
 import State from '../State';
 import Notifications from '../Notifications';

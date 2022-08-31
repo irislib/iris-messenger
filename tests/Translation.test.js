@@ -1,11 +1,11 @@
-import { AVAILABLE_LANGUAGES, translate } from '../src/js/Translation';
+import { AVAILABLE_LANGUAGE_KEYS, translate } from '../src/js/translations/Translation';
 
 console.log('hello from test');
 
 describe('Translation', () => {
   describe('AVAILABLE_LANGUAGES', () => {
     it('should include English', () => {
-      expect(AVAILABLE_LANGUAGES).toContain('en');
+      expect(AVAILABLE_LANGUAGE_KEYS).toContain('en');
     });
   });
 

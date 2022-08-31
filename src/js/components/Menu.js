@@ -4,7 +4,7 @@ import {html} from "htm/preact";
 import Helpers from "../Helpers";
 import logo from "../../assets/img/icon128.png";
 import {Link} from "preact-router/match";
-import {translate as t} from "../Translation";
+import {translate as t} from "../translations/Translation";
 import Icons from "../Icons";
 
 const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun

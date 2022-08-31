@@ -2,7 +2,7 @@ import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import { route } from 'preact-router';
-import { translate as t } from '../../Translation';
+import { translate as t } from '../../translations/Translation';
 import State from '../../State';
 import Session from '../../Session';
 import Identicon from '../../components/Identicon';

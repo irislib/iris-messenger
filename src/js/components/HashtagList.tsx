@@ -3,7 +3,7 @@ import {Fragment, createRef, RefObject, JSX} from 'preact';
 import State from '../State';
 import {Link} from "preact-router/match";
 import {route} from 'preact-router';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import Button from './basic/Button';
 
 type Props = {};

@@ -1,5 +1,5 @@
 import Component from '../../BaseComponent';
-import {translate as t} from '../../Translation';
+import {translate as t} from '../../translations/Translation';
 import State from '../../State';
 import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../../components/VideoCall';
 import Notifications from '../../Notifications';

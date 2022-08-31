@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import { translate as t } from '../../../Translation';
+import { translate as t } from '../../../translations/Translation';
 import Session from '../../../Session';
 import State from '../../../State';
 import CopyButton from '../../../components/CopyButton';

@@ -2,7 +2,7 @@ import Component from '../BaseComponent';
 import { createRef } from 'preact';
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import { translate as tr } from '../Translation';
+import { translate as tr } from '../translations/Translation';
 import $ from 'jquery';
 import State from '../State';
 import Icons from '../Icons';

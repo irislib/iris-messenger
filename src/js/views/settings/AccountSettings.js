@@ -1,7 +1,7 @@
 import { html } from 'htm/preact';
 import Component from '../../BaseComponent';
 import {ExistingAccountLogin} from '../Login';
-import {translate as t} from '../../Translation';
+import {translate as t} from '../../translations/Translation';
 import { route } from 'preact-router';
 import Button from '../../components/basic/Button';
 

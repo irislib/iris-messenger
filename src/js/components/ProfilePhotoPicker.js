@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import SafeImg from './SafeImg';
 import Identicon from './Identicon';
 import $ from 'jquery';
