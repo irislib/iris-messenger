@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import Helpers from '../Helpers';
-import {translate as t} from '../translations/Translation';
+import {translate as t} from '../translations/Translation.mjs';
 import $ from 'jquery';
 import iris from '../iris-lib';
 import { OptionalGetter } from '../types';
