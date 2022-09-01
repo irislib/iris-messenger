@@ -46,7 +46,6 @@ type State = {
   unseenMsgsTotal: number;
   activeRoute: string;
   platform: string;
-  translationLoaded: boolean;
 }
 
 class Main extends Component<Props,State> {

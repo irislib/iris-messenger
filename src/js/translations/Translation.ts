@@ -15,6 +15,7 @@ const AVAILABLE_LANGUAGES = {
 };
 
 let AVAILABLE_LANGUAGE_KEYS = Object.keys(AVAILABLE_LANGUAGES);
+
 let language = localStorage.getItem('language') || navigator.language || 'en';
 if (AVAILABLE_LANGUAGE_KEYS.indexOf(language) === -1) {
   const s = language.slice(0,2);
@@ -27,9 +28,7 @@ if (AVAILABLE_LANGUAGE_KEYS.indexOf(language) === -1) {
   }
 }
 
-console.log(language);
-
-let translation = {};
+let translation;
 
 const translationLoaded = import(`./${language}.mjs`).then(module => {
     translation = module.default;
@@ -44,7 +43,6 @@ function capitalize(s: string) {
 }
 
 function translate(k?: string, linkProps?: string) {
-  console.log(translation[k]);
   return k && (translation[k] || capitalize(k.replace(/_/g, ' '))).replace('<a', `<a ${linkProps||''}`);
 }
 
