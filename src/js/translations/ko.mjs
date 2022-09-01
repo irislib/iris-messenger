@@ -1,5 +1,4 @@
 export default {
-	language_name: "한글",
 	whats_your_name: "이름?",
 	new_user_go: "진행",
 	already_have_an_account: "기존 계정이 있나요?",

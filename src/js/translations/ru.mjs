@@ -1,5 +1,4 @@
 export default {
-  language_name: "Русский",
   whats_your_name: "Как вас зовут?",
   new_user_go: "Поехали!",
   already_have_an_account: "Уже есть аккаунт?",

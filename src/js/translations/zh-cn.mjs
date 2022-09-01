@@ -1,5 +1,4 @@
 export default {
-  language_name: "中文",
   whats_your_name: "你叫什么名字？",
   new_user_go: "开始",
   already_have_an_account: "已有账户？",

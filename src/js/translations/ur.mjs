@@ -1,5 +1,4 @@
 export default {
-  language_name: "اردو",
   whats_your_name: "آپکا کیا نام ہے؟",
   new_user_go: "چلو",
   already_have_an_account: "پہلے ہی اکاؤنٹ موجود ہے؟",

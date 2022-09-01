@@ -1,5 +1,4 @@
 export default {
-  language_name: "Suomi",
   whats_your_name: "Mikä on nimesi?",
   new_user_go: "Aloita",
   already_have_an_account: "Onko sinulla jo tili?",

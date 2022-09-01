@@ -1,5 +1,4 @@
 export default {
-    language_name: "Português Brasil",
     whats_your_name: "Qual o seu nome?",
     new_user_go: "Vai",
     already_have_an_account: "Já tem uma conta?",
