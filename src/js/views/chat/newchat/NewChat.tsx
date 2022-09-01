@@ -1,4 +1,4 @@
-import { translate as t } from '../../../Translation';
+import { translate as t } from '../../../translations/Translation';
 import Component from '../../../BaseComponent';
 import {Helmet} from 'react-helmet';
 import InviteView from './InviteView';

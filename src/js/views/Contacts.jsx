@@ -1,6 +1,6 @@
 import State from '../State';
 import Identicon from '../components/Identicon';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import FollowButton from '../components/FollowButton';
 import Name from '../components/Name';
 import View from './View';

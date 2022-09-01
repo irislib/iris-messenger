@@ -1,5 +1,5 @@
 import Helpers from '../Helpers';
-import { translate as t } from '../Translation';
+import { translate as t } from '../translations/Translation';
 import LanguageSelector from '../components/LanguageSelector';
 import QRScanner from '../QRScanner';
 import Session from '../Session';

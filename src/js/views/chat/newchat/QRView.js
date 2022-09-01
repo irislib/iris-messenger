@@ -1,4 +1,4 @@
-import { translate as t } from '../../../Translation';
+import { translate as t } from '../../../translations/Translation';
 import Session from '../../../Session';
 import QRScanner from '../../../QRScanner';
 import Button from '../../../components/basic/Button';

@@ -1,7 +1,7 @@
 import { html } from 'htm/preact';
 import State from '../State';
 import Identicon from '../components/Identicon';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import Name from '../components/Name';
 import View from './View';
 import iris from '../iris-lib';

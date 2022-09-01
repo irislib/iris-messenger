@@ -1,4 +1,4 @@
-import { translate as t } from '../../../Translation';
+import { translate as t } from '../../../translations/Translation';
 import Session from '../../../Session';
 import $ from 'jquery';
 import Component from '../../../BaseComponent';

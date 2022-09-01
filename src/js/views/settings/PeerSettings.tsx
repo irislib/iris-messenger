@@ -2,7 +2,7 @@ import Component from "../../BaseComponent";
 import Name from "../../components/Name";
 import Session from "../../Session";
 import State from "../../State";
-import {translate as t} from "../../Translation";
+import {translate as t} from "../../translations/Translation";
 import Helpers from "../../Helpers";
 import Icons from "../../Icons";
 import PeerManager from "../../PeerManager";

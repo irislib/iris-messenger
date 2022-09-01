@@ -1,7 +1,7 @@
 import State from '../../State';
 import Session from '../../Session';
 import Component from '../../BaseComponent';
-import {translate as t} from '../../Translation';
+import {translate as t} from '../../translations/Translation';
 
 export default class BetaSettings extends Component {
   constructor() {

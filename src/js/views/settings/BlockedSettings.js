@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import State from '../../State';
 import Component from '../../BaseComponent';
-import {translate as t} from '../../Translation';
+import {translate as t} from '../../translations/Translation';
 import Session from '../../Session';
 import Text from '../../components/Text';
 

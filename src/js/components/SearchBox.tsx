@@ -4,7 +4,7 @@ import Helpers from '../Helpers';
 import State from '../State';
 import Identicon from './Identicon';
 import Text from './Text';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import Session from '../Session';
 import $ from 'jquery';
 import _ from 'lodash';

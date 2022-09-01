@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import {translate as tr} from '../Translation';
+import {translate as tr} from '../translations/Translation';
 import State from '../State';
 import Session from '../Session';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
