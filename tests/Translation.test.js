@@ -11,8 +11,8 @@ describe('Translation', () => {
 
   describe('translate', () => {
     it('should translate language_name', () => {
-      localStorage.setItem('language', 'es')
-      expect(translate('language_name')).toBe('English');
+      localStorage.setItem('language', 'en')
+      expect(translate('new_user_go')).toBe('Go');
     });
 
     // TODO: update the API of Translation.js so that we can test with other
