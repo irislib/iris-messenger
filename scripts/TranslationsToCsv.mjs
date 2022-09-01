@@ -15,7 +15,6 @@ async function translationsToCsv() {
 
     for (let lang of AVAILABLE_LANGUAGE_KEYS) {
         const translation = (await import (`../src/js/translations/${lang}.mjs`)).default;
-        console.log(translation);
         translations[lang] = translation;
         languages.push(lang);
         for (let key in translation) {
@@ -53,6 +52,7 @@ async function translationsToCsv() {
 
     // output csv to file
     fs.writeFileSync('translations.csv', csv);
+    console.log('wrote translations.csv');
 }
 
 // convert the csv back to Translations.mjs in the same format as the original Translations.mjs file
