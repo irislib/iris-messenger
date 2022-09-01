@@ -44,6 +44,7 @@
     "jest-preset-preact": "^4.0.5",
     "preact-cli": "^3.2.2",
     "sirv-cli": "1.0.14",
+    "worker-loader": "^3.0.8",
     "webpack-build-notifier": "^2.3.0"
   },
   "dependencies": {

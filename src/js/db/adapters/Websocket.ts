@@ -1,34 +1,36 @@
-import Actor, { ActorContext } from "../Actor";
-import { Message, messageFromJsonString } from "../Message";
+import {Actor, ActorContext} from '../Actor';
+import {Message} from '../Message';
+import Worker from './Websocket.worker.js';
 
-// Web Worker that sends outgoing messages to websockets and passes incoming messages to router
-export default class Websocket implements Actor {
-    url: string;
-    ws?: WebSocket;
+export default class Websocket extends Actor {
+    worker: Worker;
+    wsUrl: string;
 
-    constructor(url: string) {
-        this.url = url;
+    constructor(wsUrl: string) {
+        super();
+        this.wsUrl = wsUrl;
+        console.log('constructing worker');
     }
 
-    preStart(context: ActorContext) {
-        const ws = new WebSocket(this.url);
-        ws.onopen = () => {
-            console.log(`Connected to ${this.url}`);
+    start(context: ActorContext) {
+        this.worker = new Worker();
+        this.worker.postMessage({url: this.wsUrl});
+        console.log('starting worker');
+        this.worker.onmessage = (e) => {
+            console.log('got message from worker', e);
+            const message = e.data;
+            message.from = this;
+            context.router.handle(message, context);
         }
-        ws.onmessage = (event) => {
-            const message = messageFromJsonString(event.data);
-            context.router.send(message);
+        this.worker.onerror = (e) => {
+            console.log('error', e);
         }
-        ws.onclose = (event) => {
-            console.log(`Disconnected from ${this.url}`);
-        }
-        ws.onerror = (event) => {
-            console.log(`Error on ${this.url}`);
-        }
-        this.ws = ws;
     }
 
     handle(message: Message, _context: ActorContext) {
-        this.ws!.send(message.toJsonString());
+        const fromUuid = message.from ? message.from.uuid : 'unknown';
+        message.from = null;
+        console.log('sending msg to websocket worker', message);
+        this.worker.postMessage({message, fromUuid});
     }
 }

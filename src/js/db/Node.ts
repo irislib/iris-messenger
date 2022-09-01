@@ -1,7 +1,8 @@
 import localForage from '../lib/localforage.min';
 import _ from 'lodash';
-import Actor, { ActorContext } from './Actor';
+import {Actor, ActorContext}  from './Actor';
 import {Get, Message, Put} from './Message';
+import Router from './Router';
 
 type FunEventListener = {
     off: Function;
@@ -35,9 +36,8 @@ function log(...args: any[]) {
     debug && console.log(...args);
 }
 
-export default class Node implements Actor {
+export default class Node extends Actor {
     id: string;
-    actorContext: ActorContext;
     parent?: Node;
     children = new Map<string, Node>();
     on_subscriptions = new Map<number, Function>();
@@ -46,20 +46,23 @@ export default class Node implements Actor {
     counter = 0;
     loaded = false;
     config = DEFAULT_CONFIG;
+    actorContext: ActorContext;
 
-    constructor(id = '', parent?: Node, actorContext?: ActorContext, config = DEFAULT_CONFIG) {
+    constructor(id = '', config?: Config, parent?: Node) {
+        super();
         this.id = id;
         this.parent = parent;
-        this.config = config;
-        if (actorContext) {
-            this.actorContext = actorContext;
+        this.config = config || (parent && parent.config) || DEFAULT_CONFIG;
+        if (parent && parent.actorContext) {
+            this.actorContext = parent.actorContext;
         } else {
-            this.actorContext = new ActorContext();
-            this.actorContext.startActor(this);
+            const router = new Router();
+            this.actorContext = new ActorContext(this.config, router);
+            router.start(this.actorContext);
         }
     }
 
-    handle(message: Message): void {
+    handle(message: Message, _context: ActorContext): void {
         console.log('handle', this.id, message);
         if (message instanceof Put) {
             for (const [key, value] of Object.entries(message.updatedNodes)) {
@@ -116,7 +119,7 @@ export default class Node implements Actor {
         if (existing) {
             return existing;
         }
-        const newNode = new Node(`${this.id}/${key}`, this, this.actorContext, );
+        const newNode = new Node(`${this.id}/${key}`, this.config, this);
         this.children.set(key, newNode);
         this.saveLocalForage();
         return newNode;
@@ -186,7 +189,7 @@ export default class Node implements Actor {
         this.on_subscriptions.set(id, callback);
         const event = { off: () => this.map_subscriptions.delete(id) };
         this.once(callback, event, false);
-        this.actorContext.router.send(Get.new(this.actorContext.addr, this.id));
+        this.actorContext.router.handle(Get.new(this, this.id), this.actorContext);
     }
 
     async map(callback: Function): Promise<any> {

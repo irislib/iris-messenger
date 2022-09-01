@@ -13,6 +13,10 @@ export default {
         warningSound: false,
         suppressWarning: true,
       })
-    )
+    );
+    config.module.rules.push({
+      test: /\.worker\.js$/,
+      use: { loader: 'worker-loader' }
+    });
   }
 }
