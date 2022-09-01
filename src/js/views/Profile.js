@@ -1,6 +1,6 @@
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import State from '../State';
 import Session from '../Session';
 import FeedMessageForm from '../components/FeedMessageForm';
@@ -22,7 +22,6 @@ import {SMS_VERIFIER_PUB} from '../SMS';
 import ProfilePhoto from '../components/ProfilePhoto';
 import Button from '../components/basic/Button';
 import Web3 from 'web3';
-import { Alchemy, Network } from "alchemy-sdk";
 import styled from 'styled-components';
 
 const ImageGrid = styled.div`
@@ -78,6 +77,7 @@ class Profile extends View {
 
   onProfilePhotoSet(src) {
     State.public.user().get('profile').get('photo').put(src);
+    State.public.user().get('profile').get('nftPfp').put(false);
   }
 
   onAboutInput(e) {
@@ -291,7 +291,7 @@ class Profile extends View {
 
   useAsPfp(nft, e) {
     e.preventDefault();
-    let src = (nft.media[0].gateway || nft.media[0].raw);
+    let src = this.getSrcForNft(nft, false);
     if (src.indexOf('data:image') === 0) {
       State.public.user().get('profile').get('photo').put(src);
     } else {
@@ -315,6 +315,28 @@ class Profile extends View {
     $('.main-view').animate({
       scrollTop: 0
     }, 'slow');
+  }
+
+  getSrcForNft(nft, thumbnail = true) {
+    let src = '';
+    if (nft.rawMetadata.image_url) {
+      src = nft.rawMetadata.image_url;
+    } else if (nft.rawMetadata.image) {
+      src = nft.rawMetadata.image;
+    } else if (nft.media && nft.media[0]) {
+      if (nft.media[0].gateway) {
+        src = nft.media[0].gateway;
+      }
+      src = nft.media[0].raw;
+    }
+    if (src && src.indexOf('data:image') !== 0) {
+      if (src && src.indexOf('ipfs://') === 0) {
+        src = `https://ipfs.io/ipfs/${src.substring(7)}`;
+      } else if (src && src.indexOf('https://ipfs.io/ipfs/') !== 0) {
+        src = `https://proxy.irismessengers.wtf/insecure/${thumbnail ? 'rs:fill:520:520/' : ''}plain/${src}`;
+      }
+    }
+    return src;
   }
 
   renderTab() {
@@ -342,14 +364,7 @@ class Profile extends View {
         <div class="public-messages-view">
           <${ImageGrid}>
             ${this.state.nfts && this.state.nfts.ownedNfts && this.state.nfts.ownedNfts.map(nft => {
-              let src = nft.media && nft.media[0] && (nft.media[0].gateway || nft.media[0].raw);
-              if (src && src.indexOf('data:image') !== 0) {
-                if (src && src.indexOf('ipfs://') === 0) {
-                  src = `https://ipfs.io/ipfs/${src.substring(7)}`;
-                } else if (src && src.indexOf('https://ipfs.io/ipfs/') !== 0) {
-                  src = `https://proxy.irismessengers.wtf/insecure/rs:fill:520:520/plain/${src}`;
-                }
-              }
+              let src = this.getSrcForNft(nft, true);
               return html`
                 <${GalleryImage}
                         href="https://etherscan.io/address/${nft.contract.address}"
@@ -408,7 +423,8 @@ class Profile extends View {
     `;
   }
 
-  getNfts(address) {
+  async getNfts(address) {
+    const { Alchemy, Network } = await import('alchemy-sdk');
     const config = {
       apiKey: "DGLWKXjx7nRC5Dmz7mavP8CX1frKT1Ar",
       network: Network.ETH_MAINNET,
@@ -420,7 +436,7 @@ class Profile extends View {
       const nfts = await alchemy.nft.getNftsForOwner(address);
       // Print NFTs
       this.setState({ nfts });
-      console.log(nfts);
+      console.log('nfts', address, nfts);
     };
 
     const runMain = async () => {

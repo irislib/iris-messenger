@@ -3,6 +3,7 @@ import { Router, RouterOnChangeArgs, CustomHistory } from 'preact-router';
 import AsyncRoute from 'preact-async-route';
 import { createHashHistory } from 'history';
 import {Helmet} from "react-helmet";
+import { translationLoaded } from "./translations/Translation";
 
 import Helpers from './Helpers';
 import QRScanner from './QRScanner';
@@ -45,6 +46,7 @@ type State = {
   unseenMsgsTotal: number;
   activeRoute: string;
   platform: string;
+  translationLoaded: boolean;
 }
 
 class Main extends Component<Props,State> {
@@ -58,6 +60,7 @@ class Main extends Component<Props,State> {
     State.local.get('toggleMenu').on((show: boolean) => this.toggleMenu(show));
     State.electron && State.electron.get('platform').on(this.inject());
     State.local.get('unseenMsgsTotal').on(this.inject());
+    translationLoaded.then(() => this.setState({translationLoaded: true}));
   }
 
   handleRoute(e: RouterOnChangeArgs) {
@@ -90,6 +93,11 @@ class Main extends Component<Props,State> {
     const isDesktopNonMac = s.platform && s.platform !== 'darwin';
     const titleTemplate = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) %s | iris` : "%s | iris";
     const defaultTitle = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) iris` : 'iris';
+    if (!s.translationLoaded) {
+      return (
+        <div id="main-content" />
+      );
+    }
     if (!s.loggedIn && window.location.pathname.length > 2) {
       return (
         <div id="main-content" />
@@ -140,6 +148,7 @@ class Main extends Component<Props,State> {
               <Notifications path="/notifications"/>
               <Chat path="/chat/hashtag/:hashtag?"/>
               <Chat path="/chat/:id?"/>
+              <Chat path="/chat/new/:id"/>
               <Message path="/post/:hash+"/>
               <Torrent path="/torrent/:id+"/>
               <About path="/about"/>

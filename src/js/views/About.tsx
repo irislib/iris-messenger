@@ -1,4 +1,4 @@
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import Helpers from '../Helpers';
 import Identicon from '../components/Identicon';
 import FollowButton from '../components/FollowButton';

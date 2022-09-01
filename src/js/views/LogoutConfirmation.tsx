@@ -1,5 +1,5 @@
 import Session from '../Session';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import { route } from 'preact-router';
 import Button from '../components/basic/Button';
 import Component from '../BaseComponent';

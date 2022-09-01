@@ -1,5 +1,5 @@
 import {html} from "htm/preact";
-import {translate as t} from "../Translation";
+import {translate as t} from "../translations/Translation";
 import Identicon from "./Identicon";
 import FollowButton from "./FollowButton";
 import Session from "../Session";

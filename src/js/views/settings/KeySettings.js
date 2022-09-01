@@ -1,6 +1,6 @@
 import Helpers from '../../Helpers';
 import Component from '../../BaseComponent';
-import {translate as t} from '../../Translation';
+import {translate as t} from '../../translations/Translation';
 import CopyButton from '../../components/CopyButton';
 import Session from '../../Session';
 import QRCode from '../../lib/qrcode.min';

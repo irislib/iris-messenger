@@ -4,7 +4,7 @@ import { route } from 'preact-router';
 import $ from 'jquery';
 import Gun from 'gun';
 
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 import Session from '../Session';
 
 import State from '../State';

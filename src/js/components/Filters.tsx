@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
 import State from '../State';
-import {translate as t} from '../Translation';
+import {translate as t} from '../translations/Translation';
 
 type Props = {};
 

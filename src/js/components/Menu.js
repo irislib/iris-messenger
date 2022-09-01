@@ -4,18 +4,18 @@ import {html} from "htm/preact";
 import Helpers from "../Helpers";
 import logo from "../../assets/img/icon128.png";
 import {Link} from "preact-router/match";
-import {translate as t} from "../Translation";
+import {translate as t} from "../translations/Translation";
 import Icons from "../Icons";
 
 const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
-  {url: '/', text: t('home'), icon: Icons.home},
-  {url: '/media', text: t('media'), icon: Icons.play},
-  {url: '/chat', text: t('messages'), icon: Icons.chat},
-  {url: '/store', text: t('market'), icon: Icons.store, beta: true },
-  {url: '/contacts', text: t('contacts'), icon: Icons.user},
-  {url: '/settings', text: t('settings'), icon: Icons.settings},
-  {url: '/explorer', text: t('explorer'), icon: Icons.folder, beta: true },
-  {url: '/about', text: t('about'), icon: Icons.info},
+  {url: '/', text: 'home', icon: Icons.home},
+  {url: '/media', text: 'media', icon: Icons.play},
+  {url: '/chat', text: 'messages', icon: Icons.chat},
+  {url: '/store', text: 'market', icon: Icons.store, beta: true },
+  {url: '/contacts', text: 'contacts', icon: Icons.user},
+  {url: '/settings', text: 'settings', icon: Icons.settings},
+  {url: '/explorer', text: 'explorer', icon: Icons.folder, beta: true },
+  {url: '/about', text: 'about', icon: Icons.info},
 ];
 
 export default class Menu extends Component {
@@ -44,10 +44,10 @@ export default class Menu extends Component {
             return html`
               <${a.native ? 'a' : Link} onClick=${() => this.menuLinkClicked()} activeClassName="active" href=${a.url}>
                 <span class="icon">
-                  ${a.text === t('messages') && this.state.unseenMsgsTotal ? html`<span class="unseen unseen-total">${this.state.unseenMsgsTotal}</span>`: ''}
+                  ${a.text === 'messages' && this.state.unseenMsgsTotal ? html`<span class="unseen unseen-total">${this.state.unseenMsgsTotal}</span>`: ''}
                   ${a.icon || Icons.circle}
                 </span>
-                <span class="text">${a.text}</span>
+                <span class="text">${t(a.text)}</span>
               <//>`;
           }
         })}
