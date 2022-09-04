@@ -17,26 +17,20 @@ export class ActorContext {
     }
 }
 
-export function startWorker(worker: Worker, context: ActorContext) {
-    const p = new Promise((resolve, _reject) => {
+export function startWorker(worker: Worker, context: ActorContext): Promise<BroadcastChannel> {
+    const p = new Promise<BroadcastChannel>((resolve, _reject) => {
         worker.onmessage = (e) => {
+            console.log('message from worker to startWorker', e);
             resolve(new BroadcastChannel(e.data));
         }
+        worker.postMessage(context);
     });
-    worker.postMessage(context);
     return p;
 }
 
 export class Actor {
     channel: BroadcastChannel;
     context?: ActorContext;
-
-    start(context: ActorContext) {
-        this.context = context;
-        this.channel.onmessage = (e) => {
-            this.handle(e.data);
-        }
-    }
 
     handle(message: Message) {
         throw new Error('not implemented');
@@ -46,7 +40,12 @@ export class Actor {
         return new BroadcastChannel(this.channel.name);
     }
 
-    constructor() {
+    constructor(context?: ActorContext) {
+        this.context = context;
         this.channel = new BroadcastChannel(generateUuid());
+        this.channel.onmessage = (e) => {
+            const message = Message.fromObject(e.data);
+            this.handle(message);
+        }
     }
 }

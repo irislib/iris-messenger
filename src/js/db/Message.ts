@@ -1,10 +1,21 @@
-import { Actor } from './Actor';
-
-export interface Message {
+export class Message {
     type: string;
     id: string;
     from: string;
-    toJsonString(): string;
+    toJsonString(): string {
+        throw new Error('not implemented');
+    }
+
+    // When Messages are sent over BroadcastChannel, class name is lost.
+    static fromObject(obj: any): Message {
+        if (obj.type === 'get') {
+            return Get.fromObject(obj);
+        } else if (obj.type === 'put') {
+            return Put.fromObject(obj);
+        } else {
+            throw new Error('not implemented');
+        }
+    }
 }
 
 function generateMsgId(): string {
@@ -33,6 +44,10 @@ export class Get implements Message {
         });
     }
 
+    static fromObject(obj: any): Get {
+        return new Get(obj.id, obj.from, obj.nodeId, obj.recipients, obj.childKey, obj.jsonStr, obj.checksum);
+    }
+
     static new(from: string, nodeId: string, recipients?: string[], childKey?: string, jsonStr?: string, checksum?: string): Get {
         const id = generateMsgId();
         return new Get(id, from, nodeId, recipients, childKey, jsonStr, checksum);
@@ -53,8 +68,6 @@ export class Put implements Message {
     type: string = 'put';
     id: string;
     from: string;
-    nodeId: string;
-    childKey: string;
     updatedNodes: object;
     inResponseTo?: string;
     recipients?: string[];
@@ -65,16 +78,25 @@ export class Put implements Message {
         return JSON.stringify(this);
     }
 
-    static new(from: string, nodeId: string, childKey: string, inResponseTo?: string, recipients?: string[], jsonStr?: string, checksum?: string): Put {
-        const id = generateMsgId();
-        return new Put(id, from, nodeId, childKey, inResponseTo, recipients, jsonStr, checksum);
+    static fromObject(obj: any): Put {
+        return new Put(obj.id, obj.updatedNodes, obj.from, obj.inResponseTo, obj.recipients, obj.jsonStr, obj.checksum);
     }
 
-    constructor(id: string, from: string, nodeId: string, childKey: string, inResponseTo?: string, recipients?: string[], jsonStr?: string, checksum?: string) {
+    static new(updatedNodes: object, from: string, inResponseTo?: string, recipients?: string[], jsonStr?: string, checksum?: string): Put {
+        const id = generateMsgId();
+        return new Put(id, updatedNodes, from, inResponseTo, recipients, jsonStr, checksum);
+    }
+
+    static newFromKv(key: string, children: object, from:string) {
+        const updatedNodes = {};
+        updatedNodes[key] = children;
+        return Put.new(updatedNodes, from);
+    }
+
+    constructor(id: string, updatedNodes: object, from: string, inResponseTo?: string, recipients?: string[], jsonStr?: string, checksum?: string) {
         this.id = id;
         this.from = from;
-        this.nodeId = nodeId;
-        this.childKey = childKey;
+        this.updatedNodes = updatedNodes;
         this.inResponseTo = inResponseTo;
         this.recipients = recipients;
         this.jsonStr = jsonStr;
@@ -87,7 +109,7 @@ const parseGet = (get: any, from: string): Get => {
 }
 
 const parsePut = (put: any, from: string): Put => {
-    return new Put(put.id, from, put.nodeId, put.childKey, put.inResponseTo, put.recipients, put.jsonStr, put.checksum);
+    return new Put(put.id, put.updatedNodes, from, put.inResponseTo, put.recipients, put.jsonStr, put.checksum);
 }
 
 export function messageFromJsonString(jsonStr: string, from: string): Message {

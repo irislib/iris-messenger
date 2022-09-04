@@ -25,11 +25,11 @@ export default class Router extends Actor {
 
     async start(context: ActorContext) {
         const localForage = await startWorker(new LocalForageWorker(), context);
+        console.log('localForage uuid', localForage);
         this.storageAdapters.add(localForage);
-        const websocket = await startWorker(new WebsocketWorker('wss://gun-us.herokuapp.com/gun'), context);
-        // websocket.start(context);
-        this.networkAdapters.add(websocket);
-        return super.start(context);
+        //const websocket = await startWorker(new WebsocketWorker('wss://gun-us.herokuapp.com/gun'), context);
+        //websocket.start(context);
+        //this.networkAdapters.add(websocket);
     }
 
     handle(message: Message): void {
@@ -49,6 +49,7 @@ export default class Router extends Actor {
             const subscribers = this.subscribersByTopic.get(topic);
             // send to storage adapters
             for (const storageAdapter of this.storageAdapters) {
+                console.log('send put to storage adapter', put);
                 storageAdapter.postMessage(put);
             }
 
@@ -63,9 +64,10 @@ export default class Router extends Actor {
     }
 
     handleGet(get: Get): void {
-        console.log('handleGet', get);
         const topic = get.nodeId.split('/')[1];
+        console.log('handleGet', get);
         for (const storageAdapter of this.storageAdapters) {
+            console.log('send get to storage adapter', get);
             storageAdapter.postMessage(get);
         }
         if (!this.subscribersByTopic.has(topic)) {

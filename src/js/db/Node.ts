@@ -1,4 +1,3 @@
-import localForage from '../lib/localforage.min';
 import _ from 'lodash';
 import {Actor, ActorContext}  from './Actor';
 import {Get, Message, Put} from './Message';
@@ -21,16 +20,7 @@ export const DEFAULT_CONFIG: Config = {
     enableStats: true
 }
 
-// Localforage returns null if an item is not found, so we represent null with this uuid instead.
-// not foolproof, but good enough for now.
-const LOCALFORAGE_NULL = "c2fc1ad0-f76f-11ec-b939-0242ac120002";
-const notInLocalForage = new Set();
-
-localForage.config({
-    driver: [localForage.LOCALSTORAGE, localForage.INDEXEDDB, localForage.WEBSQL]
-})
-
-const debug = false;
+const debug = true;
 
 function log(...args: any[]) {
     debug && console.log(...args);
@@ -45,8 +35,11 @@ export default class Node extends Actor {
     value = undefined;
     counter = 0;
     loaded = false;
-    config = DEFAULT_CONFIG;
     actorContext: ActorContext;
+    router: Router;
+    routerStarted: Promise<void>;
+    routerChannel: BroadcastChannel;
+    config: Config;
 
     constructor(id = '', config?: Config, parent?: Node) {
         super();
@@ -55,64 +48,28 @@ export default class Node extends Actor {
         this.config = config || (parent && parent.config) || DEFAULT_CONFIG;
         if (parent && parent.actorContext) {
             this.actorContext = parent.actorContext;
+            this.router = parent.router;
+            this.routerChannel = parent.routerChannel;
+            this.routerStarted = parent.routerStarted;
         } else {
-            const router = new Router();
-            this.actorContext = new ActorContext(this.config, router);
-            router.start2(this.actorContext);
+            this.router = new Router();
+            this.routerChannel = new BroadcastChannel(this.router.channel.name);
+            this.actorContext = new ActorContext(config, this.router.channel.name);
+            this.routerStarted = this.router.start(this.actorContext);
         }
     }
 
     handle(message: Message): void {
-        console.log('handle', this.id, message);
         if (message instanceof Put) {
             for (const [key, value] of Object.entries(message.updatedNodes)) {
-                this.get(key).put(value);
+                console.log('node', this.id,'got put response', key, value);
+                if (key === this.id) {
+                    console.log('yess');
+                    this.put(value);
+                }
             }
         }
     };
-
-    private saveLocalForage = _.throttle(async () => {
-        if (!this.loaded) {
-            await this.loadLocalForage();
-        }
-        if (this.children.size) {
-            const children = Array.from(this.children.keys());
-            localForage.setItem(this.id, children);
-        } else if (this.value === undefined) {
-            localForage.removeItem(this.id);
-        } else {
-            localForage.setItem(this.id, this.value === null ? LOCALFORAGE_NULL : this.value);
-        }
-    }, 500);
-
-    // TODO: indexedDB has poor performance when there's lots of queries.
-    //  we should perhaps store child values with the parent node in order to reduce queries
-    private loadLocalForage = _.throttle(async () => {
-        if (notInLocalForage.has(this.id)) {
-            return undefined;
-        }
-        // try to get the value from localforage
-        let result = await localForage.getItem(this.id);
-        // getItem returns null if not found
-        if (result === null) {
-            result = undefined;
-            notInLocalForage.add(this.id);
-        } else if (result === LOCALFORAGE_NULL) {
-            result = null;
-        } else if (Array.isArray(result)) {
-            // result is a list of children
-            const newResult = {};
-            await Promise.all(result.map(async key => {
-                newResult[key] = await this.get(key).once();
-            }));
-            result = newResult;
-        } else {
-            // result is a value
-            this.value = result;
-        }
-        this.loaded = true;
-        return result;
-    }, 500);
 
     get(key: string): Node {
         const existing = this.children.get(key);
@@ -121,7 +78,6 @@ export default class Node extends Actor {
         }
         const newNode = new Node(`${this.id}/${key}`, this.config, this);
         this.children.set(key, newNode);
-        this.saveLocalForage();
         return newNode;
     }
 
@@ -159,12 +115,18 @@ export default class Node extends Actor {
         this.children = new Map();
         this.value = value;
         this.doCallbacks();
-        this.saveLocalForage();
-        const key = this.id.split('/').pop();
-        //this.actorContext.router.handle(Put.new(this.uuid, this.parent.id, key), this.actorContext);
+        const split = this.id.split('/');
+        const key = split[split.length - 1];
+        const path = split.slice(0, split.length - 1).join('/');
+        this.sendToRouter(Put.newFromKv(path, { [key]: value }, this.channel.name));
     }
 
-    // protip: the code would be a lot cleaner if you separated the Node API from storage adapters.
+    private sendToRouter(message: Message): void {
+        this.routerStarted.then(() => {
+            this.router.handle(message);
+        });
+    }
+
     async once(callback?: Function | null, event?: FunEventListener, returnIfUndefined = true): Promise<any> {
         let result;
         if (this.children.size) {
@@ -176,8 +138,7 @@ export default class Node extends Actor {
         } else if (this.value !== undefined) {
             result = this.value;
         } else {
-            result = await this.loadLocalForage();
-            this.actorContext.router.handle(Get.new(this.uuid, this.id), this.actorContext);
+            this.sendToRouter(Get.new(this.channel.name, this.id));
         }
         if (result !== undefined || returnIfUndefined) {
             log('once', this.id, result);
@@ -194,15 +155,11 @@ export default class Node extends Actor {
         this.once(callback, event, false);
     }
 
-    async map(callback: Function): Promise<any> {
+    map(callback: Function): void {
         log('map', this.id);
         const id = this.counter++;
         this.map_subscriptions.set(this.counter++, callback);
         const event = { off: () => this.map_subscriptions.delete(id) };
-        if (!this.loaded) {
-            // ensure that the list of children is loaded
-            await this.loadLocalForage();
-        }
         for (const child of this.children.values()) {
             child.once(callback, event, false);
         }
