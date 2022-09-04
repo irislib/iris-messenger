@@ -17,7 +17,9 @@ export default class Router extends Actor {
         const localForage = new LocalForageAdapter()
         localForage.start(context);
         this.storageAdapters.add(localForage);
-        this.networkAdapters.add(new WebsocketAdapter('wss://gun-us.herokuapp.com/gun'));
+        const websocket = new WebsocketAdapter('wss://gun-us.herokuapp.com/gun');
+        // websocket.start(context);
+        this.networkAdapters.add(websocket);
     }
 
     handle(message: Message, context: ActorContext): void {

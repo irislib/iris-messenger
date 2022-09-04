@@ -160,6 +160,8 @@ export default class Node extends Actor {
         this.value = value;
         this.doCallbacks();
         this.saveLocalForage();
+        const key = this.id.split('/').pop();
+        //this.actorContext.router.handle(Put.new(this.uuid, this.parent.id, key), this.actorContext);
     }
 
     // protip: the code would be a lot cleaner if you separated the Node API from storage adapters.
@@ -175,6 +177,7 @@ export default class Node extends Actor {
             result = this.value;
         } else {
             result = await this.loadLocalForage();
+            this.actorContext.router.handle(Get.new(this.uuid, this.id), this.actorContext);
         }
         if (result !== undefined || returnIfUndefined) {
             log('once', this.id, result);
@@ -189,7 +192,6 @@ export default class Node extends Actor {
         this.on_subscriptions.set(id, callback);
         const event = { off: () => this.map_subscriptions.delete(id) };
         this.once(callback, event, false);
-        this.actorContext.router.handle(Get.new(this, this.id), this.actorContext);
     }
 
     async map(callback: Function): Promise<any> {

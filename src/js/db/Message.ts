@@ -2,7 +2,7 @@ import { Actor } from './Actor';
 
 export interface Message {
     id: string;
-    from?: Actor;
+    from: string;
     toJsonString(): string;
 }
 
@@ -12,7 +12,7 @@ function generateMsgId(): string {
 
 export class Get implements Message {
     id: string;
-    from?: Actor;
+    from: string;
     nodeId: string;
     recipients?: string[];
     childKey?: string;
@@ -31,12 +31,12 @@ export class Get implements Message {
         });
     }
 
-    static new(from: Actor, nodeId: string, recipients?: string[], childKey?: string, jsonStr?: string, checksum?: string): Get {
+    static new(from: string, nodeId: string, recipients?: string[], childKey?: string, jsonStr?: string, checksum?: string): Get {
         const id = generateMsgId();
         return new Get(id, from, nodeId, recipients, childKey, jsonStr, checksum);
     }
 
-    constructor(id: string, from: Actor, nodeId: string, recipients?: string[], childKey?: string, jsonStr?: string, checksum?: string) {
+    constructor(id: string, from: string, nodeId: string, recipients?: string[], childKey?: string, jsonStr?: string, checksum?: string) {
         this.id = id;
         this.from = from;
         this.nodeId = nodeId;
@@ -49,7 +49,7 @@ export class Get implements Message {
 
 export class Put implements Message {
     id: string;
-    from?: Actor;
+    from: string;
     nodeId: string;
     childKey: string;
     updatedNodes: object;
@@ -62,12 +62,12 @@ export class Put implements Message {
         return JSON.stringify(this);
     }
 
-    static new(from: Actor, nodeId: string, childKey: string, inResponseTo?: string, recipients?: string[], jsonStr?: string, checksum?: string): Put {
+    static new(from: string, nodeId: string, childKey: string, inResponseTo?: string, recipients?: string[], jsonStr?: string, checksum?: string): Put {
         const id = generateMsgId();
         return new Put(id, from, nodeId, childKey, inResponseTo, recipients, jsonStr, checksum);
     }
 
-    constructor(id: string, from: Actor, nodeId: string, childKey: string, inResponseTo?: string, recipients?: string[], jsonStr?: string, checksum?: string) {
+    constructor(id: string, from: string, nodeId: string, childKey: string, inResponseTo?: string, recipients?: string[], jsonStr?: string, checksum?: string) {
         this.id = id;
         this.from = from;
         this.nodeId = nodeId;
@@ -79,15 +79,15 @@ export class Put implements Message {
     }
 }
 
-const parseGet = (get: any, from?: Actor): Get => {
+const parseGet = (get: any, from: string): Get => {
     return new Get(get.id, from, get.nodeId, get.recipients, get.childKey, get.jsonStr, get.checksum);
 }
 
-const parsePut = (put: any, from?: Actor): Put => {
+const parsePut = (put: any, from: string): Put => {
     return new Put(put.id, from, put.nodeId, put.childKey, put.inResponseTo, put.recipients, put.jsonStr, put.checksum);
 }
 
-export function messageFromJsonString(jsonStr: string, from?: Actor): Message {
+export function messageFromJsonString(jsonStr: string, from: string): Message {
     const obj = JSON.parse(jsonStr);
     if (obj.get) {
         return parseGet(obj.get, from);

@@ -1,7 +1,5 @@
 import { messageFromJsonString } from "../Message";
 
-console.log('hello from fucking worker');
-
 let ws;
 const startWebSocket = (url) => {
     ws = new WebSocket(url);
