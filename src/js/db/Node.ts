@@ -58,11 +58,11 @@ export default class Node extends Actor {
         } else {
             const router = new Router();
             this.actorContext = new ActorContext(this.config, router);
-            router.start(this.actorContext);
+            router.start2(this.actorContext);
         }
     }
 
-    handle(message: Message, _context: ActorContext): void {
+    handle(message: Message): void {
         console.log('handle', this.id, message);
         if (message instanceof Put) {
             for (const [key, value] of Object.entries(message.updatedNodes)) {

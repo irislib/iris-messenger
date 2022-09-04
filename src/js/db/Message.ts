@@ -1,6 +1,7 @@
 import { Actor } from './Actor';
 
 export interface Message {
+    type: string;
     id: string;
     from: string;
     toJsonString(): string;
@@ -11,6 +12,7 @@ function generateMsgId(): string {
 }
 
 export class Get implements Message {
+    type: string = 'get';
     id: string;
     from: string;
     nodeId: string;
@@ -48,6 +50,7 @@ export class Get implements Message {
 }
 
 export class Put implements Message {
+    type: string = 'put';
     id: string;
     from: string;
     nodeId: string;

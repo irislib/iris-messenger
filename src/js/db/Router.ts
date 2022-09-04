@@ -1,74 +1,84 @@
-import {Actor, ActorContext} from "./Actor";
+import {Actor, ActorContext, startWorker} from "./Actor";
 import { Message, Put, Get } from "./Message";
-import WebsocketAdapter from "./adapters/Websocket";
-import LocalForageAdapter from "./adapters/LocalForage";
+import WebsocketWorker from "./adapters/Websocket.worker.js";
+import LocalForageWorker from "./adapters/LocalForage.worker.js";
+
+class SeenGetMessage {
+    id: string;
+    from: string;
+    lastReplyChecksum: string;
+    constructor(id: string, from: string, lastReplyChecksum: string) {
+        this.id = id;
+        this.from = from;
+        this.lastReplyChecksum = lastReplyChecksum;
+    }
+}
 
 export default class Router extends Actor {
-    knownPeers = new Set<Actor>();
-    storageAdapters = new Set<Actor>();
-    networkAdapters = new Set<Actor>();
-    serverPeers = new Set<Actor>();
+    storageAdapters = new Set<BroadcastChannel>();
+    networkAdapters = new Set<BroadcastChannel>();
+    serverPeers = new Set<BroadcastChannel>();
     seenMessages = new Set<string>();
-    getMessageSenders = new Map<string, Set<Actor>>();
-    subscribersByTopic = new Map<string, Set<Actor>>();
+    seenGetMessages = new Map<string, SeenGetMessage>();
+    subscribersByTopic = new Map<string, Map<string, BroadcastChannel>>();
     msgCounter = 0;
 
-    start(context: ActorContext): void {
-        const localForage = new LocalForageAdapter()
-        localForage.start(context);
+    async start(context: ActorContext) {
+        const localForage = await startWorker(new LocalForageWorker(), context);
         this.storageAdapters.add(localForage);
-        const websocket = new WebsocketAdapter('wss://gun-us.herokuapp.com/gun');
+        const websocket = await startWorker(new WebsocketWorker('wss://gun-us.herokuapp.com/gun'), context);
         // websocket.start(context);
         this.networkAdapters.add(websocket);
+        return super.start(context);
     }
 
-    handle(message: Message, context: ActorContext): void {
+    handle(message: Message): void {
         if (this.seenMessages.has(message.id)) {
             return;
         }
         this.seenMessages.add(message.id);
         if (message instanceof Put) {
-            this.handlePut(message, context);
+            this.handlePut(message);
         } else if (message instanceof Get) {
-            this.handleGet(message, context);
+            this.handleGet(message);
         }
     }
 
-    handlePut(put: Put, context: ActorContext): void {
+    handlePut(put: Put): void {
         Object.keys(put.updatedNodes).forEach(topic => {
             const subscribers = this.subscribersByTopic.get(topic);
             // send to storage adapters
             for (const storageAdapter of this.storageAdapters) {
-                storageAdapter.handle(put, context);
+                storageAdapter.postMessage(put);
             }
 
             if (subscribers) {
-                subscribers.forEach(subscriber => {
-                    if (subscriber !== put.from) {
-                        subscriber.handle(put, context);
+                for (const [k, v] of subscribers) {
+                    if (k !== put.from) {
+                        v.postMessage(put);
                     }
-                });
+                }
             }
         });
     }
 
-    handleGet(get: Get, context: ActorContext): void {
+    handleGet(get: Get): void {
         console.log('handleGet', get);
         const topic = get.nodeId.split('/')[1];
         for (const storageAdapter of this.storageAdapters) {
-            storageAdapter.handle(get, context);
-        }
-        const subscribers = this.subscribersByTopic.get(topic);
-        if (subscribers) {
-            for (const subscriber of subscribers) {
-                if (subscriber !== get.from) {
-                    subscriber.handle(get, context);
-                }
-            }
+            storageAdapter.postMessage(get);
         }
         if (!this.subscribersByTopic.has(topic)) {
-            this.subscribersByTopic.set(topic, new Set());
+            this.subscribersByTopic.set(topic, new Map());
         }
-        this.subscribersByTopic.get(topic).add(get.from);
+        const subscribers = this.subscribersByTopic.get(topic);
+        for (const [k, v] of subscribers) { // TODO: sample
+            if (k !== get.from) {
+                v.postMessage(get);
+            }
+        }
+        if (!subscribers.has(get.from)) {
+            subscribers.set(get.from, new BroadcastChannel(get.from));
+        }
     }
 }

@@ -9,22 +9,44 @@ export function generateUuid() {
 }
 
 export class ActorContext {
-    router?: Actor;
+    router?: string;
     config: Config;
-    constructor(config: Config, router?: Actor) {
+    constructor(config: Config, router?: string) {
         this.router = router;
         this.config = config;
     }
 }
 
-export class Actor {
-    uuid: string;
+export function startWorker(worker: Worker, context: ActorContext) {
+    const p = new Promise((resolve, _reject) => {
+        worker.onmessage = (e) => {
+            resolve(new BroadcastChannel(e.data));
+        }
+    });
+    worker.postMessage(context);
+    return p;
+}
 
-    handle(message: Message, context: ActorContext) {
+export class Actor {
+    channel: BroadcastChannel;
+    context?: ActorContext;
+
+    start(context: ActorContext) {
+        this.context = context;
+        this.channel.onmessage = (e) => {
+            this.handle(e.data);
+        }
+    }
+
+    handle(message: Message) {
         throw new Error('not implemented');
     }
 
+    getChannel() {
+        return new BroadcastChannel(this.channel.name);
+    }
+
     constructor() {
-        this.uuid = generateUuid();
+        this.channel = new BroadcastChannel(generateUuid());
     }
 }
