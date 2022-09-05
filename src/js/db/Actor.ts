@@ -20,7 +20,6 @@ export class ActorContext {
 export function startWorker(worker: Worker, context: ActorContext): Promise<BroadcastChannel> {
     const p = new Promise<BroadcastChannel>((resolve, _reject) => {
         worker.onmessage = (e) => {
-            console.log('message from worker to startWorker', e);
             resolve(new BroadcastChannel(e.data));
         }
         worker.postMessage(context);

@@ -1,9 +1,9 @@
 import localForage from '../../lib/localforage.min';
-import { Message, Put, Get } from '../Message'
+import { Put, Get } from '../Message'
 import { Actor } from '../Actor';
 import _ from "lodash";
 
-console.log('worker loaded');
+console.log('localforage worker loaded');
 
 // Localforage returns null if an item is not found, so we represent null with this uuid instead.
 // not foolproof, but good enough for now.
@@ -34,32 +34,30 @@ class LocalForage extends Actor {
 
     handleGet(message) {
         if (notInLocalForage.has(message.nodeId)) {
-            console.log('have not', message);
+            //console.log('have not', message);
             // TODO message implying that the key is not in localforage
             return;
         }
         localForage.getItem(message.nodeId).then((value) => {
             if (value === null) {
-                console.log('have not', message);
+                //console.log('have not', message);
                 notInLocalForage.add(message.nodeId);
                 // TODO message implying that the key is not in localforage
             } else {
                 const putMessage = Put.newFromKv(message.nodeId, value, this.channel.name);
                 putMessage.inResponseTo = message.id;
-                console.log('have', message);
-                console.log('respond with', putMessage);
+                //console.log('have', message);
+                //console.log('respond with', putMessage);
                 new BroadcastChannel(message.from || this.context.router).postMessage(putMessage);
             }
         });
     }
 
     handlePut(message) {
-        Object.keys(message.updatedNodes).forEach(nodeName => {
-            const children = message.updatedNodes[nodeName];
-            Object.keys(children).forEach(childName => {
+        Object.entries(message.updatedNodes).forEach(([nodeName, children]) => {
+            Object.entries(children).forEach(([childName, value]) => {
                 const path = `${nodeName}/${childName}`;
                 notInLocalForage.delete(path);
-                const value = children[childName];
                 if (value === null) {
                     localForage.removeItem(path);
                 } else {
@@ -72,7 +70,7 @@ class LocalForage extends Actor {
 
 
 
-    ///aaaaa
+    /// old stuff
     _saveLocalForage = _.throttle(async () => {
         if (!this.loaded) {
             await this.loadLocalForage();

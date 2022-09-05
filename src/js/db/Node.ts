@@ -1,7 +1,8 @@
 import _ from 'lodash';
-import {Actor, ActorContext}  from './Actor';
+import {Actor, ActorContext, startWorker}  from './Actor';
 import {Get, Message, Put} from './Message';
-import Router from './Router';
+import Router from './Router.worker.js';
+import LocalForageWorker from "./adapters/LocalForage.worker.js";
 
 type FunEventListener = {
     off: Function;
@@ -13,14 +14,16 @@ export type Config = {
     myPublicKey?: string;
     enableStats: boolean;
     webSocketPeers?: string[];
+    localOnly: boolean;
 }
 
 export const DEFAULT_CONFIG: Config = {
     allowPublicSpace: false,
-    enableStats: true
+    enableStats: true,
+    localOnly: true
 }
 
-const debug = true;
+const debug = false;
 
 function log(...args: any[]) {
     debug && console.log(...args);
@@ -36,9 +39,7 @@ export default class Node extends Actor {
     counter = 0;
     loaded = false;
     actorContext: ActorContext;
-    router: Router;
-    routerStarted: Promise<void>;
-    routerChannel: BroadcastChannel;
+    router: Promise<BroadcastChannel>;
     config: Config;
 
     constructor(id = '', config?: Config, parent?: Node) {
@@ -49,22 +50,23 @@ export default class Node extends Actor {
         if (parent && parent.actorContext) {
             this.actorContext = parent.actorContext;
             this.router = parent.router;
-            this.routerChannel = parent.routerChannel;
-            this.routerStarted = parent.routerStarted;
         } else {
-            this.router = new Router();
-            this.routerChannel = new BroadcastChannel(this.router.channel.name);
-            this.actorContext = new ActorContext(config, this.router.channel.name);
-            this.routerStarted = this.router.start(this.actorContext);
+            this.actorContext = new ActorContext(config);
+            if (this.config.localOnly) {
+                this.router = startWorker(new LocalForageWorker(), this.actorContext);
+            } else {
+                this.router = startWorker(new Router(), this.actorContext);
+            }
+            this.router.then(routerAddress => {
+                this.actorContext.router = routerAddress.name;
+            });
         }
     }
 
     handle(message: Message): void {
         if (message instanceof Put) {
             for (const [key, value] of Object.entries(message.updatedNodes)) {
-                console.log('node', this.id,'got put response', key, value);
                 if (key === this.id) {
-                    console.log('yess');
                     this.put(value);
                 }
             }
@@ -103,7 +105,7 @@ export default class Node extends Actor {
 
     put(value: any): void {
         if (Array.isArray(value)) {
-            throw new Error('Sorry, we don\'t deal with arrays');
+            throw new Error('put() does not support arrays');
         }
         if (typeof value === 'object' && value !== null) {
             this.value = undefined;
@@ -121,10 +123,8 @@ export default class Node extends Actor {
         this.sendToRouter(Put.newFromKv(path, { [key]: value }, this.channel.name));
     }
 
-    private sendToRouter(message: Message): void {
-        this.routerStarted.then(() => {
-            this.router.handle(message);
-        });
+    private async sendToRouter(message: Message) {
+        (await this.router).postMessage(message);
     }
 
     async once(callback?: Function | null, event?: FunEventListener, returnIfUndefined = true): Promise<any> {

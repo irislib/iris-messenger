@@ -4,26 +4,30 @@ import WebsocketWorker from "./adapters/Websocket.worker.js";
 import LocalForageWorker from "./adapters/LocalForage.worker.js";
 
 class SeenGetMessage {
-    id: string;
-    from: string;
-    lastReplyChecksum: string;
-    constructor(id: string, from: string, lastReplyChecksum: string) {
+    constructor(id, from, lastReplyChecksum) {
         this.id = id;
         this.from = from;
         this.lastReplyChecksum = lastReplyChecksum;
     }
 }
 
+// get context as message, respond with actor channel name
+onmessage = (context) => {
+    console.log('worker got context, starting')
+    const actor = new Router(context);
+    postMessage(actor.channel.name);
+}
+
 export default class Router extends Actor {
-    storageAdapters = new Set<BroadcastChannel>();
-    networkAdapters = new Set<BroadcastChannel>();
-    serverPeers = new Set<BroadcastChannel>();
-    seenMessages = new Set<string>();
-    seenGetMessages = new Map<string, SeenGetMessage>();
-    subscribersByTopic = new Map<string, Map<string, BroadcastChannel>>();
+    storageAdapters = new Set();
+    networkAdapters = new Set();
+    serverPeers = new Set();
+    seenMessages = new Set();
+    seenGetMessages = new Map();
+    subscribersByTopic = new Map();
     msgCounter = 0;
 
-    async start(context: ActorContext) {
+    async start(context) {
         const localForage = await startWorker(new LocalForageWorker(), context);
         console.log('localForage uuid', localForage);
         this.storageAdapters.add(localForage);
@@ -32,7 +36,7 @@ export default class Router extends Actor {
         //this.networkAdapters.add(websocket);
     }
 
-    handle(message: Message): void {
+    handle(message) {
         if (this.seenMessages.has(message.id)) {
             return;
         }
@@ -44,12 +48,11 @@ export default class Router extends Actor {
         }
     }
 
-    handlePut(put: Put): void {
+    handlePut(put) {
         Object.keys(put.updatedNodes).forEach(topic => {
             const subscribers = this.subscribersByTopic.get(topic);
             // send to storage adapters
             for (const storageAdapter of this.storageAdapters) {
-                console.log('send put to storage adapter', put);
                 storageAdapter.postMessage(put);
             }
 
@@ -63,11 +66,9 @@ export default class Router extends Actor {
         });
     }
 
-    handleGet(get: Get): void {
+    handleGet(get) {
         const topic = get.nodeId.split('/')[1];
-        console.log('handleGet', get);
         for (const storageAdapter of this.storageAdapters) {
-            console.log('send get to storage adapter', get);
             storageAdapter.postMessage(get);
         }
         if (!this.subscribersByTopic.has(topic)) {
