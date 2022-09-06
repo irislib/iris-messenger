@@ -1,7 +1,7 @@
 import {Actor, startWorker} from "./Actor";
 import { Put, Get } from "./Message";
 //import WebsocketWorker from "./adapters/Websocket.worker.js";
-import LocalForageWorker from "./adapters/LocalForage.worker.js";
+import IndexedDBWorker from "./adapters/IndexedDB.worker.js";
 
 /*
 class SeenGetMessage {
@@ -30,7 +30,7 @@ export default class Router extends Actor {
     msgCounter = 0;
 
     async start(context) {
-        const localForage = await startWorker(new LocalForageWorker(), context);
+        const localForage = await startWorker(new IndexedDBWorker(), context);
         console.log('localForage uuid', localForage);
         this.storageAdapters.add(localForage);
         //const websocket = await startWorker(new WebsocketWorker('wss://gun-us.herokuapp.com/gun'), context);

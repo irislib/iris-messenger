@@ -2,7 +2,7 @@ import _ from 'lodash';
 import {Actor, ActorContext, startWorker}  from './Actor';
 import {Get, Message, Put} from './Message';
 import Router from './Router.worker.js';
-import LocalForageWorker from "./adapters/LocalForage.worker.js";
+import IndexedDBWorker from "./adapters/IndexedDB.worker.js";
 
 type FunEventListener = {
     off: Function;
@@ -53,7 +53,7 @@ export default class Node extends Actor {
         } else {
             this.actorContext = new ActorContext(config);
             if (this.config.localOnly) {
-                this.router = startWorker(new LocalForageWorker(), this.actorContext);
+                this.router = startWorker(new IndexedDBWorker(), this.actorContext);
             } else {
                 this.router = startWorker(new Router(), this.actorContext);
             }
@@ -104,11 +104,15 @@ export default class Node extends Actor {
     }, 40);
 
     put(value: any): void {
+        if (this.value === value) {
+            return; // TODO: when timestamps are added, this should be removed
+        }
         if (Array.isArray(value)) {
             throw new Error('put() does not support arrays');
         }
         if (typeof value === 'object' && value !== null) {
             this.value = undefined;
+            // TODO: update the whole path of parent nodes
             for (const key in value) {
                 this.get(key).put(value[key]);
             }
@@ -117,14 +121,28 @@ export default class Node extends Actor {
         this.children = new Map();
         this.value = value;
         this.doCallbacks();
-        const split = this.id.split('/');
-        const key = split[split.length - 1];
-        const path = split.slice(0, split.length - 1).join('/');
-        this.sendToRouter(Put.newFromKv(path, { [key]: value }, this.channel.name));
+        const updatedNodes = {};
+        this.addParentNodes(updatedNodes);
+        this.sendToRouter(Put.new(updatedNodes, this.channel.name));
     }
 
-    private async sendToRouter(message: Message) {
-        (await this.router).postMessage(message);
+    private addParentNodes(updatedNodes: object) {
+        if (this.parent) {
+            this.parent.value = undefined;
+            const children = {};
+            for (const [key, child] of this.parent.children) {
+                const v = child.value === undefined ? Array.from(child.children.keys()) : child.value;
+                children[key] = v;
+            }
+            updatedNodes[this.parent.id] = children;
+            this.parent.addParentNodes(updatedNodes);
+        }
+    }
+
+    private sendToRouter(message: Message) {
+        this.router.then(router => {
+            router.postMessage(message);
+        });
     }
 
     async once(callback?: Function | null, event?: FunEventListener, returnIfUndefined = true): Promise<any> {
@@ -138,7 +156,7 @@ export default class Node extends Actor {
         } else if (this.value !== undefined) {
             result = this.value;
         } else {
-            this.sendToRouter(Get.new(this.channel.name, this.id));
+            this.sendToRouter(Get.new(this.id, this.channel.name));
         }
         if (result !== undefined || returnIfUndefined) {
             log('once', this.id, result);

@@ -44,8 +44,8 @@
     "jest-preset-preact": "^4.0.5",
     "preact-cli": "^3.2.2",
     "sirv-cli": "1.0.14",
-    "worker-loader": "^3.0.8",
-    "webpack-build-notifier": "^2.3.0"
+    "webpack-build-notifier": "^2.3.0",
+    "worker-loader": "^3.0.8"
   },
   "dependencies": {
     "@walletconnect/web3-provider": "^1.7.8",
@@ -53,6 +53,7 @@
     "aether-torrent": "^0.3.0",
     "alchemy-sdk": "^2.0.3",
     "autolinker": "^3.14.3",
+    "dexie": "^3.2.2",
     "elliptic": "^6.5.4",
     "fuse.js": "^6.6.2",
     "gun": "https://github.com/mmalmi/gun.git",

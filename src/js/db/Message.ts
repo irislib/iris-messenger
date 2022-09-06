@@ -25,8 +25,8 @@ function generateMsgId(): string {
 export class Get implements Message {
     type: string = 'get';
     id: string;
-    from: string;
     nodeId: string;
+    from: string;
     recipients?: string[];
     childKey?: string;
     jsonStr?: string;
@@ -45,15 +45,15 @@ export class Get implements Message {
     }
 
     static fromObject(obj: any): Get {
-        return new Get(obj.id, obj.from, obj.nodeId, obj.recipients, obj.childKey, obj.jsonStr, obj.checksum);
+        return new Get(obj.id, obj.nodeId, obj.from, obj.recipients, obj.childKey, obj.jsonStr, obj.checksum);
     }
 
-    static new(from: string, nodeId: string, recipients?: string[], childKey?: string, jsonStr?: string, checksum?: string): Get {
+    static new(nodeId: string, from: string, recipients?: string[], childKey?: string, jsonStr?: string, checksum?: string): Get {
         const id = generateMsgId();
-        return new Get(id, from, nodeId, recipients, childKey, jsonStr, checksum);
+        return new Get(id, nodeId, from, recipients, childKey, jsonStr, checksum);
     }
 
-    constructor(id: string, from: string, nodeId: string, recipients?: string[], childKey?: string, jsonStr?: string, checksum?: string) {
+    constructor(id: string, nodeId: string, from: string, recipients?: string[], childKey?: string, jsonStr?: string, checksum?: string) {
         this.id = id;
         this.from = from;
         this.nodeId = nodeId;
@@ -105,7 +105,7 @@ export class Put implements Message {
 }
 
 const parseGet = (get: any, from: string): Get => {
-    return new Get(get.id, from, get.nodeId, get.recipients, get.childKey, get.jsonStr, get.checksum);
+    return new Get(get.id, get.nodeId, from, get.recipients, get.childKey, get.jsonStr, get.checksum);
 }
 
 const parsePut = (put: any, from: string): Put => {
