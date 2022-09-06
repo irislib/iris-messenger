@@ -3,8 +3,6 @@ import { Put, Get } from '../Message'
 import { Actor } from '../Actor';
 import _ from "lodash";
 
-console.log('localforage worker loaded');
-
 // Localforage returns null if an item is not found, so we represent null with this uuid instead.
 // not foolproof, but good enough for now.
 const LOCALFORAGE_NULL = "c2fc1ad0-f76f-11ec-b939-0242ac120002";
@@ -16,7 +14,6 @@ localForage.config({
 
 // get context as message, respond with actor channel name
 onmessage = (context) => {
-    console.log('worker got context, starting')
     const actor = new LocalForage(context);
     postMessage(actor.channel.name);
 }

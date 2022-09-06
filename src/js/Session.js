@@ -377,8 +377,11 @@ async function logOut() {
   }
   clearIndexedDB();
   localStorage.clear();
+  // TODO: stop web workers
   localforage.clear().then(() => {
-    location.reload();
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
   });
 }
 
