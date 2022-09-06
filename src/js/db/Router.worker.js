@@ -1,8 +1,9 @@
-import {Actor, ActorContext, startWorker} from "./Actor";
-import { Message, Put, Get } from "./Message";
-import WebsocketWorker from "./adapters/Websocket.worker.js";
+import {Actor, startWorker} from "./Actor";
+import { Put, Get } from "./Message";
+//import WebsocketWorker from "./adapters/Websocket.worker.js";
 import LocalForageWorker from "./adapters/LocalForage.worker.js";
 
+/*
 class SeenGetMessage {
     constructor(id, from, lastReplyChecksum) {
         this.id = id;
@@ -10,6 +11,7 @@ class SeenGetMessage {
         this.lastReplyChecksum = lastReplyChecksum;
     }
 }
+*/
 
 // get context as message, respond with actor channel name
 onmessage = (context) => {
