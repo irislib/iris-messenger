@@ -67,9 +67,19 @@ export default class Node extends Actor {
         if (message instanceof Put) {
             for (const [key, value] of Object.entries(message.updatedNodes)) {
                 if (key === this.id) {
-                    this.put(value);
+                    if (Array.isArray(value)) {
+                        value.forEach(childKey => this.get(childKey));
+                    } else {
+                        this.value = value;
+                    }
+                    this.parent.handle(message);
+                    for (const child of this.children.values()) {
+                        child.handle(message);
+                    }
                 }
             }
+            this.doCallbacks();
+            setTimeout(() => this.doCallbacks(), 100);
         }
     };
 
@@ -131,8 +141,11 @@ export default class Node extends Actor {
             this.parent.value = undefined;
             const children = {};
             for (const [key, child] of this.parent.children) {
-                const v = child.value === undefined ? Array.from(child.children.keys()) : child.value;
-                children[key] = v;
+                if (child.children.size > 0) {
+                    children[key] = Array.from(child.children.keys());
+                } else if (child.value !== undefined) {
+                    children[key] = child.value;
+                }
             }
             updatedNodes[this.parent.id] = children;
             this.parent.addParentNodes(updatedNodes);

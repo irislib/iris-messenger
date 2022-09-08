@@ -39,7 +39,7 @@ class IndexedDBWorker extends Actor {
         const values = keys.map(key => this.putQueue[key]);
         this.db.nodes.bulkPut(values, keys);
         this.putQueue = {};
-    }, 1000);
+    }, 500);
 
     get(path, callback) {
         this.getQueue[path] = this.getQueue[path] || [];
@@ -62,7 +62,7 @@ class IndexedDBWorker extends Actor {
             }
         });
         this.getQueue = {};
-    }, 500);
+    }, 100);
 
     handle(message) {
         this.queue = (this.queue && this.queue++) || 1;
@@ -110,6 +110,9 @@ class IndexedDBWorker extends Actor {
                 //console.log('merging', path, existing, newValue);
                 if (Array.isArray(existing) && Array.isArray(newValue)) {
                     newValue = _.uniq(existing.concat(newValue));
+                }
+                if (Array.isArray(newValue) && newValue.length === 0) {
+                    console.log('no kids', path);
                 }
                 this.put(path, newValue);
             } else {
