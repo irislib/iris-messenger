@@ -1,7 +1,5 @@
-import {Actor, startWorker} from "./Actor";
+import {Actor, MySharedWorker} from "./Actor";
 import { Put, Get } from "./Message";
-//import WebsocketWorker from "./adapters/Websocket.worker.js";
-import IndexedDBWorker from "./adapters/IndexedDB.worker.js";
 
 /*
 class SeenGetMessage {
@@ -13,11 +11,23 @@ class SeenGetMessage {
 }
 */
 
+let actor;
+
 // get context as message, respond with actor channel name
-onmessage = (context) => {
-    console.log('worker got context, starting')
-    const actor = new Router(context);
-    postMessage(actor.channel.name);
+onconnect = (event) => {
+    const port = event.ports[0];
+    port.onmessage = (msg) => {
+        const data = msg.data;
+        console.log('router got msg ', data);
+        if (data.context) {
+            console.log('msg.context ', data.context);
+            actor = new Router(data.context);
+            port.postMessage(actor.channel.name);
+        } else if (data.message && data.message.adapters) {
+            console.log('got adapters', data.message);
+            actor.addAdapters(data.message.adapters);
+        }
+    }
 }
 
 export default class Router extends Actor {
@@ -29,13 +39,14 @@ export default class Router extends Actor {
     subscribersByTopic = new Map();
     msgCounter = 0;
 
-    async start(context) {
-        const localForage = await startWorker(new IndexedDBWorker(), context);
-        console.log('localForage uuid', localForage);
-        this.storageAdapters.add(localForage);
-        //const websocket = await startWorker(new WebsocketWorker('wss://gun-us.herokuapp.com/gun'), context);
-        //websocket.start(context);
-        //this.networkAdapters.add(websocket);
+    addAdapters(adapters) {
+        console.log('adding adapters', adapters);
+        if (adapters.storage) {
+            this.storageAdapters.add(new BroadcastChannel(adapters.storage));
+        }
+        if (adapters.network) {
+            this.networkAdapters.add(new BroadcastChannel(adapters.network));
+        }
     }
 
     handle(message) {

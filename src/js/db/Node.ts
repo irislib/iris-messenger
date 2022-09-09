@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import {Actor, ActorContext, startSharedWorker}  from './Actor';
+import {Actor, ActorContext, startSharedWorker, MySharedWorker}  from './Actor';
 import {Get, Message, Put} from './Message';
-import Router from './Router.worker.js';
-import IndexedDBWorker from "./adapters/IndexedDB.worker.js";
+import Router from './Router.sharedworker.js';
+import IndexedDBWorker from "./adapters/IndexedDB.sharedworker.js";
 
 type FunEventListener = {
     off: Function;
@@ -51,14 +51,17 @@ export default class Node extends Actor {
             this.actorContext = parent.actorContext;
             this.router = parent.router;
         } else {
-            this.actorContext = new ActorContext(config);
-            if (this.config.localOnly) {
-                this.router = startSharedWorker(new IndexedDBWorker(), this.actorContext);
-            } else {
-                this.router = startSharedWorker(new Router(), this.actorContext);
-            }
-            this.router.then(routerAddress => {
+            this.actorContext = new ActorContext(this.config);
+            // all workers must be started in the main thread
+            const router = new MySharedWorker(new Router(), this.actorContext);
+            console.log('router', router);
+            this.router = router.channel;
+            this.router.then(async routerAddress => {
+                console.log('router address', routerAddress);
                 this.actorContext.router = routerAddress.name;
+                const indexedDb = await startSharedWorker(new IndexedDBWorker(), this.actorContext);
+                console.log('indexedDb', indexedDb);
+                router.postMessage({adapters:{storage: indexedDb.name}});
             });
         }
     }
@@ -72,13 +75,16 @@ export default class Node extends Actor {
                     } else {
                         this.value = value;
                     }
+                    if (this.value && this.value.indexOf && this.value.indexOf('asdf') !== -1) {
+                        console.log('asdf', this.id, this.value);
+                        this.doCallbacks(true);
+                    }
                     this.parent.handle(message);
                     for (const child of this.children.values()) {
                         child.handle(message);
                     }
                 }
             }
-            this.doCallbacks();
             setTimeout(() => this.doCallbacks(), 100);
         }
     };
@@ -93,20 +99,23 @@ export default class Node extends Actor {
         return newNode;
     }
 
-    private doCallbacks = _.throttle(() => {
+    private doCallbacks = _.throttle((log = false) => {
+        log && console.log('doCallbacks', this.id, this.value, this.on_subscriptions.size, this.map_subscriptions.size);
+        log && console.log('this.parent.on_subscriptions.size', this.parent && this.parent.on_subscriptions.size);
+        log && console.log('this.parent.map_subscriptions.size', this.parent && this.parent.map_subscriptions.size);
         for (const [id, callback] of this.on_subscriptions) {
-            log('on sub', this.id, this.value);
+            log && console.log('on sub', this.id, this.value);
             const event = { off: () => this.on_subscriptions.delete(id) };
             this.once(callback, event, false);
         }
         if (this.parent) {
             for (const [id, callback] of this.parent.on_subscriptions) {
-                log('on sub', this.id, this.value);
+                log && console.log('on sub', this.id, this.value);
                 const event = { off: () => this.parent.on_subscriptions.delete(id) };
                 this.parent.once(callback, event, false);
             }
             for (const [id, callback] of this.parent.map_subscriptions) {
-                log('map sub', this.id, this.value);
+                log && console.log('map sub', this.id, this.value);
                 const event = { off: () => this.parent.map_subscriptions.delete(id) };
                 this.once(callback, event, false);
             }
@@ -115,7 +124,7 @@ export default class Node extends Actor {
 
     put(value: any): void {
         if (this.value === value) {
-            return; // TODO: when timestamps are added, this should be removed
+            return; // TODO: when timestamps are added, this should be changed
         }
         if (Array.isArray(value)) {
             throw new Error('put() does not support arrays');

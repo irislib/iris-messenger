@@ -18,6 +18,13 @@ export default {
       test: /\.worker\.js$/,
       loader: 'worker-loader',
       options: {
+        worker: "Worker",
+      }
+    });
+    config.module.rules.push({
+      test: /\.sharedworker\.js$/,
+      loader: 'worker-loader',
+      options: {
         worker: "SharedWorker",
       }
     });

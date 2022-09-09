@@ -17,24 +17,28 @@ export class ActorContext {
     }
 }
 
-export function startWorker(worker: Worker, context: ActorContext): Promise<BroadcastChannel> {
-    const p = new Promise<BroadcastChannel>((resolve, _reject) => {
-        worker.onmessage = (e) => {
-            resolve(new BroadcastChannel(e.data));
-        }
-        worker.postMessage(context);
-    });
-    return p;
-}
-
-export function startSharedWorker(worker: SharedWorker, context: ActorContext): Promise<BroadcastChannel> {
+export function startSharedWorker(worker: SharedWorker, context: ActorContext) {
     return new Promise<BroadcastChannel>((resolve, _reject) => {
         worker.port.start();
         worker.port.onmessage = (e) => {
             resolve(new BroadcastChannel(e.data));
         }
-        worker.port.postMessage(context);
+        worker.port.postMessage({context});
     });
+}
+
+export class MySharedWorker {
+    worker: SharedWorker;
+    channel: Promise<BroadcastChannel>;
+
+    constructor(worker: SharedWorker, context: ActorContext) {
+        this.worker = worker;
+        this.channel = startSharedWorker(worker, context);
+    }
+
+    postMessage(message: any) {
+        this.worker.port.postMessage({message});
+    }
 }
 
 export class Actor {
