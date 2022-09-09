@@ -150,7 +150,7 @@ export default class Node {
         log('on', this.id);
         const id = this.counter++;
         this.on_subscriptions.set(id, callback);
-        const event = { off: () => this.map_subscriptions.delete(id) };
+        const event = { off: () => this.on_subscriptions.delete(id) };
         this.once(callback, event, false);
     }
 
