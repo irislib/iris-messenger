@@ -33,6 +33,7 @@ export default class Node extends Actor {
     id: string;
     parent?: Node;
     children = new Map<string, Node>();
+    once_subscriptions = new Map<number, Function>();
     on_subscriptions = new Map<number, Function>();
     map_subscriptions = new Map<number, Function>();
     value = undefined;
@@ -99,7 +100,7 @@ export default class Node extends Actor {
         return newNode;
     }
 
-    private doCallbacks = _.throttle((log = false) => {
+    doCallbacks = _.throttle((log = false) => {
         log && console.log('doCallbacks', this.id, this.value, this.on_subscriptions.size, this.map_subscriptions.size);
         log && console.log('this.parent.on_subscriptions.size', this.parent && this.parent.on_subscriptions.size);
         log && console.log('this.parent.map_subscriptions.size', this.parent && this.parent.map_subscriptions.size);
@@ -107,6 +108,11 @@ export default class Node extends Actor {
             log && console.log('on sub', this.id, this.value);
             const event = { off: () => this.on_subscriptions.delete(id) };
             this.once(callback, event, false);
+        }
+        for (const [id, callback] of this.once_subscriptions) {
+            log && console.log('once sub', this.id, this.value);
+            this.once(callback, undefined, false);
+            this.once_subscriptions.delete(id);
         }
         if (this.parent) {
             for (const [id, callback] of this.parent.on_subscriptions) {
@@ -179,6 +185,8 @@ export default class Node extends Actor {
             result = this.value;
         } else {
             this.sendToRouter(Get.new(this.id, this.channel.name));
+            const id = this.counter++;
+            callback && this.once_subscriptions.set(this.counter++, callback);
         }
         if (result !== undefined || returnIfUndefined) {
             log('once', this.id, result);
@@ -191,14 +199,14 @@ export default class Node extends Actor {
         log('on', this.id);
         const id = this.counter++;
         this.on_subscriptions.set(id, callback);
-        const event = { off: () => this.map_subscriptions.delete(id) };
+        const event = { off: () => this.on_subscriptions.delete(id) };
         this.once(callback, event, false);
     }
 
     map(callback: Function): void {
         log('map', this.id);
         const id = this.counter++;
-        this.map_subscriptions.set(this.counter++, callback);
+        this.map_subscriptions.set(id, callback);
         const event = { off: () => this.map_subscriptions.delete(id) };
         for (const child of this.children.values()) {
             child.once(callback, event, false);
