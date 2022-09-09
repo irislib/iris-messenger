@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Actor, ActorContext, startWorker}  from './Actor';
+import {Actor, ActorContext, startSharedWorker}  from './Actor';
 import {Get, Message, Put} from './Message';
 import Router from './Router.worker.js';
 import IndexedDBWorker from "./adapters/IndexedDB.worker.js";
@@ -53,9 +53,9 @@ export default class Node extends Actor {
         } else {
             this.actorContext = new ActorContext(config);
             if (this.config.localOnly) {
-                this.router = startWorker(new IndexedDBWorker(), this.actorContext);
+                this.router = startSharedWorker(new IndexedDBWorker(), this.actorContext);
             } else {
-                this.router = startWorker(new Router(), this.actorContext);
+                this.router = startSharedWorker(new Router(), this.actorContext);
             }
             this.router.then(routerAddress => {
                 this.actorContext.router = routerAddress.name;

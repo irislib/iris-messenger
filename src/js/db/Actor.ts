@@ -27,6 +27,16 @@ export function startWorker(worker: Worker, context: ActorContext): Promise<Broa
     return p;
 }
 
+export function startSharedWorker(worker: SharedWorker, context: ActorContext): Promise<BroadcastChannel> {
+    return new Promise<BroadcastChannel>((resolve, _reject) => {
+        worker.port.start();
+        worker.port.onmessage = (e) => {
+            resolve(new BroadcastChannel(e.data));
+        }
+        worker.port.postMessage(context);
+    });
+}
+
 export class Actor {
     channel: BroadcastChannel;
     context?: ActorContext;

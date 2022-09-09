@@ -5,10 +5,22 @@ import Dexie from 'dexie';
 
 const notStored = new Set();
 
-// get context as message, respond with actor channel name
+/*
+// for Worker
 onmessage = (context) => {
+    // get context as message, respond with actor channel name
     const actor = new IndexedDBWorker(context);
     postMessage(actor.channel.name);
+}
+ */
+
+// for SharedWorker
+onconnect = (event) => {
+    const port = event.ports[0];
+    port.onmessage = (context) => {
+        const actor = new IndexedDBWorker(context);
+        port.postMessage(actor.channel.name);
+    }
 }
 
 class IndexedDBWorker extends Actor {
