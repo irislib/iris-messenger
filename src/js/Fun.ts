@@ -157,7 +157,7 @@ export default class Node {
     async map(callback: Function): Promise<any> {
         log('map', this.id);
         const id = this.counter++;
-        this.map_subscriptions.set(this.counter++, callback);
+        this.map_subscriptions.set(id, callback);
         const event = { off: () => this.map_subscriptions.delete(id) };
         if (!this.loaded) {
             // ensure that the list of children is loaded
