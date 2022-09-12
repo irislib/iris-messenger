@@ -2,29 +2,16 @@ import { Put, Get } from '../Message'
 import { Actor } from '../Actor';
 import _ from "lodash";
 import Dexie from 'dexie';
-
-const notStored = new Set();
-
-onconnect = (event) => {
-    const port = event.ports[0];
-    port.onmessage = (message) => {
-        console.log('indexedDB got msg ', message);
-        const data = message.data;
-        if (data.context) {
-            console.log('indexedDB got context', data.context);
-            const actor = new IndexedDBSharedWorker(data.context);
-            port.postMessage(actor.channel.name);
-        }
-    }
-}
+// import * as Comlink from "comlink";
 
 class IndexedDBSharedWorker extends Actor {
-    constructor(context) {
-        super(context);
+    constructor() {
+        super('indexeddb');
+        this.notStored = new Set();
         this.putQueue = {};
         this.getQueue = {};
         this.i = 0;
-        const dbName = (context.config && context.config.indexeddb && context.config.indexeddb.name) || 'iris';
+        const dbName = (this.config && this.config.indexeddb && this.config.indexeddb.name) || 'iris';
         this.db = new Dexie(dbName);
         this.db.version(1).stores({
             nodes: ',value'
@@ -86,7 +73,7 @@ class IndexedDBSharedWorker extends Actor {
     }
 
     handleGet(message) {
-        if (notStored.has(message.nodeId)) {
+        if (this.notStored.has(message.nodeId)) {
             console.log('notStored', message.nodeId);
             // TODO message implying that the key is not stored
             return;
@@ -95,14 +82,14 @@ class IndexedDBSharedWorker extends Actor {
             // TODO: this takes a long time to return
             if (value === undefined) {
                 console.log('have not', message.nodeId);
-                notStored.add(message.nodeId);
+                this.notStored.add(message.nodeId);
                 // TODO message implying that the key is not stored
             } else {
                 console.log('have', message.nodeId, value);
                 const putMessage = Put.newFromKv(message.nodeId, value, this.channel.name);
                 putMessage.inResponseTo = message.id;
                 console.log('respond with', putMessage);
-                new BroadcastChannel(message.from || this.context.router).postMessage(putMessage);
+                new BroadcastChannel(message.from || 'router').postMessage(putMessage);
             }
         });
     }
@@ -134,9 +121,9 @@ class IndexedDBSharedWorker extends Actor {
                 const path = `${nodeName}/${childName}`;
                 if (newValue === undefined) {
                     this.db.nodes.delete(path);
-                    notStored.add(path);
+                    this.notStored.add(path);
                 } else {
-                    notStored.delete(path);
+                    this.notStored.delete(path);
                     this.mergeAndSave(path, newValue);
                 }
             }
@@ -164,7 +151,7 @@ class IndexedDBSharedWorker extends Actor {
         // TODO: indexedDB has poor performance when there's lots of queries.
     //  we should perhaps store child values with the parent node in order to reduce queries
     _loadLocalForage = _.throttle(async () => {
-        if (notStored.has(this.id)) {
+        if (this.notStored.has(this.id)) {
             return undefined;
         }
         // try to get the value from localforage
@@ -172,7 +159,7 @@ class IndexedDBSharedWorker extends Actor {
         // getItem returns null if not found
         if (result === null) {
             result = undefined;
-            notStored.add(this.id);
+            this.notStored.add(this.id);
         } else if (Array.isArray(result)) {
             // result is a list of children
             const newResult = {};
@@ -188,3 +175,15 @@ class IndexedDBSharedWorker extends Actor {
         return result;
     }, 500);
 }
+
+let actor;
+onconnect = () => {
+    if (actor) {
+        console.log ('worker already exists');
+    } else {
+        console.log('starting worker');
+        actor = actor || new IndexedDBSharedWorker();
+    }
+}
+
+// self.onconnect = (e) => Comlink.expose(actor, e.ports[0]);

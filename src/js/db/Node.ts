@@ -1,8 +1,9 @@
 import _ from 'lodash';
-import {Actor, ActorContext, startSharedWorker, MySharedWorker}  from './Actor';
+import {Actor}  from './Actor';
 import {Get, Message, Put} from './Message';
 import Router from './Router.sharedworker.js';
 import IndexedDBWorker from "./adapters/IndexedDB.sharedworker.js";
+import * as Comlink from "comlink";
 
 type FunEventListener = {
     off: Function;
@@ -39,31 +40,18 @@ export default class Node extends Actor {
     value = undefined;
     counter = 0;
     loaded = false;
-    actorContext: ActorContext;
-    router: Promise<BroadcastChannel>;
     config: Config;
+    router = new BroadcastChannel('router');
 
     constructor(id = '', config?: Config, parent?: Node) {
         super();
         this.id = id;
         this.parent = parent;
         this.config = config || (parent && parent.config) || DEFAULT_CONFIG;
-        if (parent && parent.actorContext) {
-            this.actorContext = parent.actorContext;
-            this.router = parent.router;
-        } else {
-            this.actorContext = new ActorContext(this.config);
-            // all workers must be started in the main thread
-            const router = new MySharedWorker(new Router(), this.actorContext);
-            console.log('router', router);
-            this.router = router.channel;
-            this.router.then(async routerAddress => {
-                console.log('router address', routerAddress);
-                this.actorContext.router = routerAddress.name;
-                const indexedDb = await startSharedWorker(new IndexedDBWorker(), this.actorContext);
-                console.log('indexedDb', indexedDb);
-                router.postMessage({adapters:{storage: indexedDb.name}});
-            });
+        if (!parent) {
+            const routerWorker = new Router();
+            const idbWorker = new IndexedDBWorker();
+            //const router = Comlink.wrap(routerWorker);
         }
     }
 
@@ -148,7 +136,7 @@ export default class Node extends Actor {
         this.doCallbacks();
         const updatedNodes = {};
         this.addParentNodes(updatedNodes);
-        this.sendToRouter(Put.new(updatedNodes, this.channel.name));
+        this.router.postMessage(Put.new(updatedNodes, this.channel.name));
     }
 
     private addParentNodes(updatedNodes: object) {
@@ -167,12 +155,6 @@ export default class Node extends Actor {
         }
     }
 
-    private sendToRouter(message: Message) {
-        this.router.then(router => {
-            router.postMessage(message);
-        });
-    }
-
     async once(callback?: Function | null, event?: FunEventListener, returnIfUndefined = true): Promise<any> {
         let result;
         if (this.children.size) {
@@ -184,7 +166,7 @@ export default class Node extends Actor {
         } else if (this.value !== undefined) {
             result = this.value;
         } else {
-            this.sendToRouter(Get.new(this.id, this.channel.name));
+            this.router.postMessage(Get.new(this.id, this.channel.name));
             const id = this.counter++;
             callback && this.once_subscriptions.set(this.counter++, callback);
         }

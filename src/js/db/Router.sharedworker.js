@@ -1,5 +1,6 @@
-import {Actor, MySharedWorker} from "./Actor";
+import {Actor} from "./Actor";
 import { Put, Get } from "./Message";
+// import * as Comlink from "comlink";
 
 /*
 class SeenGetMessage {
@@ -11,26 +12,7 @@ class SeenGetMessage {
 }
 */
 
-let actor;
-
-// get context as message, respond with actor channel name
-onconnect = (event) => {
-    const port = event.ports[0];
-    port.onmessage = (msg) => {
-        const data = msg.data;
-        console.log('router got msg ', data);
-        if (data.context) {
-            console.log('msg.context ', data.context);
-            actor = new Router(data.context);
-            port.postMessage(actor.channel.name);
-        } else if (data.message && data.message.adapters) {
-            console.log('got adapters', data.message);
-            actor.addAdapters(data.message.adapters);
-        }
-    }
-}
-
-export default class Router extends Actor {
+class Router extends Actor {
     storageAdapters = new Set();
     networkAdapters = new Set();
     serverPeers = new Set();
@@ -39,17 +21,13 @@ export default class Router extends Actor {
     subscribersByTopic = new Map();
     msgCounter = 0;
 
-    addAdapters(adapters) {
-        console.log('adding adapters', adapters);
-        if (adapters.storage) {
-            this.storageAdapters.add(new BroadcastChannel(adapters.storage));
-        }
-        if (adapters.network) {
-            this.networkAdapters.add(new BroadcastChannel(adapters.network));
-        }
+    constructor() {
+        super('router');
+        this.storageAdapters.add(new BroadcastChannel('indexeddb'));
     }
 
     handle(message) {
+        // console.log('router received', message);
         if (this.seenMessages.has(message.id)) {
             return;
         }
@@ -98,3 +76,10 @@ export default class Router extends Actor {
         }
     }
 }
+
+let actor;
+onconnect = () => {
+    actor = actor || new Router();
+}
+
+// self.onconnect = (e) => Comlink.expose(actor, e.ports[0]);
