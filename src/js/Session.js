@@ -44,6 +44,18 @@ const updateUserSearchIndex = _.throttle(() => {
   userSearchIndex = new Fuse(values, options);
 }, 3000, {leading:true});
 
+const taskQueue = [];
+setInterval(() => {
+  if (taskQueue.length) {
+    //console.log('taskQueue', taskQueue.length);
+    taskQueue.shift()();
+  }
+}, 10);
+
+const saveContact = _.throttle(k => {
+    State.local.get('contacts').get(k).put({followDistance: contacts[k].followDistance,followerCount: contacts[k].followers.size});
+}, 1000, {leading:true});
+
 function addFollow(callback, k, followDistance, follower) {
   if (contacts[k]) {
     if (contacts[k].followDistance > followDistance) {
@@ -52,13 +64,15 @@ function addFollow(callback, k, followDistance, follower) {
     contacts[k].followers.add(follower);
   } else {
     contacts[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
-    State.public.user(k).get('profile').get('name').on(name => {
-      contacts[k].name = name;
-      State.local.get('contacts').get(k).get('name').put(name);
-      callback && callback(k, contacts[k]);
+    taskQueue.push(() => {
+      State.public.user(k).get('profile').get('name').on(name => {
+        contacts[k].name = name;
+        State.local.get('contacts').get(k).get('name').put(name);
+        callback && callback(k, contacts[k]);
+      });
     });
   }
-  State.local.get('contacts').get(k).put({followDistance: contacts[k].followDistance,followerCount: contacts[k].followers.size});
+  saveContact(k);
   callback && callback(k, contacts[k]);
   updateUserSearchIndex();
   updateNoFollows();
@@ -76,9 +90,14 @@ function removeFollow(k, followDistance, follower) {
   }
 }
 
-// TODO: this is still a performance issue. With throttle, follower graph / counts are not correctly updated
-// without throttle, it hogs memory and cpu
-const getExtendedFollows = _.throttle((callback, k, maxDepth = 3, currentDepth = 1) => {
+// TODO: don't re-call
+const getExtendedFollowsCalled = {};
+const getExtendedFollows = (callback, k, maxDepth = 3, currentDepth = 1) => {
+  if (getExtendedFollowsCalled[k] <= currentDepth) {
+    return;
+  }
+  getExtendedFollowsCalled[k] = currentDepth;
+
   k = k || key.pub;
 
   addFollow(callback, k, currentDepth - 1);
@@ -87,7 +106,7 @@ const getExtendedFollows = _.throttle((callback, k, maxDepth = 3, currentDepth =
     if (isFollowing) {
       addFollow(callback, followedKey, currentDepth, k);
       if (currentDepth < maxDepth) {
-        _.defer(() => getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1));
+        taskQueue.push(() => getExtendedFollows(callback, followedKey, maxDepth, currentDepth + 1));
       }
     } else {
       removeFollow(followedKey, currentDepth, k);
@@ -95,23 +114,23 @@ const getExtendedFollows = _.throttle((callback, k, maxDepth = 3, currentDepth =
   });
 
   return contacts;
-}, 2000);
+};
 
-const updateNoFollows = _.debounce(() => {
+const updateNoFollows = _.throttle(() => {
   const v = Object.keys(contacts).length <= 1;
   if (v !== noFollows) {
     noFollows = v;
     State.local.get('noFollows').put(noFollows);
   }
-}, 1000);
+}, 1000, {leading:true});
 
-const updateNoFollowers = _.debounce(() => {
+const updateNoFollowers = _.throttle(() => {
   const v = !(contacts[key.pub] && (contacts[key.pub].followers.size > 0));
   if (v !== noFollowers) {
     noFollowers = v;
     State.local.get('noFollowers').put(noFollowers);
   }
-}, 1000);
+}, 1000, {leading:true});
 
 function getUserSearchIndex() {
   return userSearchIndex;
@@ -433,113 +452,117 @@ function newChannel(pub, chatLink) {
 }
 
 function addChannel(chat) {
-  let pub = chat.getId();
-  if (channels[pub]) { return; }
-  channels[pub] = chat;
-  const chatNode = State.local.get('channels').get(pub);
-  chatNode.get('latestTime').on(t => {
-    if (t && (!chat.latestTime || t > chat.latestTime)) {
-      chat.latestTime = t;
-    } else {
-      // chatNode.get('latestTime').put(chat.latestTime); // omg recursion
-    }
-  });
-  chatNode.get('theirMsgsLastSeenTime').on(t => {
-    if (!t) { return; }
-    const d = new Date(t);
-    if (!chat.theirMsgsLastSeenDate || chat.theirMsgsLastSeenDate < d) {
-      chat.theirMsgsLastSeenDate = d;
-    }
-  });
-  chat.messageIds = chat.messageIds || {};
-  chat.getLatestMsg && chat.getLatestMsg((latest, info) => {
-    processMessage(pub, latest, info);
-  });
-  Notifications.changeChatUnseenCount(pub, 0);
-  chat.notificationSetting = 'all';
-  chat.onMy('notificationSetting', (val) => {
-    chat.notificationSetting = val;
-  });
-  //$(".chat-list").append(el);
-  chat.theirMsgsLastSeenTime = '';
-  chat.getTheirMsgsLastSeenTime(time => {
-    if (chat && time && time >= chat.theirMsgsLastSeenTime) {
-      chat.theirMsgsLastSeenTime = time;
-      chatNode.get('theirMsgsLastSeenTime').put(time);
-    }
-  });
-  chat.getMyMsgsLastSeenTime(time => {
-    chat.myLastSeenTime = new Date(time);
-    if (chat.latest && chat.myLastSeenTime >= chat.latest.time) {
-      Notifications.changeChatUnseenCount(pub, 0);
-    }
-    PeerManager.askForPeers(pub); // TODO: this should be done only if we have a chat history or friendship with them
-  });
-  chat.isTyping = false;
-  chat.getTyping(isTyping => {
-    chat.isTyping = isTyping;
-    State.local.get('channels').get(pub).get('isTyping').put(isTyping);
-  });
-  chat.online = {};
-  iris.Channel.getActivity(State.public, pub, (activity) => {
-    if (chat) {
-      chatNode.put({theirLastActiveTime: activity && activity.lastActive, activity: activity && activity.isActive && activity.status});
-      chat.activity = activity;
-    }
-  });
-  if (chat.uuid) {
-    let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    chat.participantProfiles = {};
-    chat.on('name', v => State.local.get('channels').get(chat.uuid).get('name').put(v));
-    chat.on('photo', v => State.local.get('channels').get(chat.uuid).get('photo').put(v));
-    chat.on('about', v => State.local.get('channels').get(chat.uuid).get('about').put(v));
-    chat.getParticipants(participants => {
-      if (typeof participants === 'object') {
-        let keys = Object.keys(participants);
-        keys.forEach((k, i) => {
-          let hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
-          chat.participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
-          State.public.user(k).get('profile').get('name').on(name => {
-            chat.participantProfiles[k].name = name;
-          });
-        });
+  taskQueue.push(() => {
+
+    let pub = chat.getId();
+    if (channels[pub]) { return; }
+    channels[pub] = chat;
+    const chatNode = State.local.get('channels').get(pub);
+    chatNode.get('latestTime').on(t => {
+      if (t && (!chat.latestTime || t > chat.latestTime)) {
+        chat.latestTime = t;
+      } else {
+        // chatNode.get('latestTime').put(chat.latestTime); // omg recursion
       }
-      State.local.get('channels').get(chat.uuid).get('participants').put(null);
-      State.local.get('channels').get(chat.uuid).get('participants').put(participants);
     });
-    chat.inviteLinks = {};
-    chat.getChatLinks({callback: ({url, id}) => {
-      console.log('got chat link', id, url);
-      chat.inviteLinks[id] = url; // TODO use State
-      State.local.get('inviteLinksChanged').put(true);
-    }});
-  } else {
-    State.local.get('groups').get('everyone').get(pub).put(true);
-    addFollow(null, pub, -1);
-    State.public.user(pub).get('profile').get('name').on(v => State.local.get('channels').get(pub).get('name').put(v))
-  }
-  if (chat.put) {
-    chat.onTheir('webPushSubscriptions', (s, k, from) => {
-      if (!Array.isArray(s)) { return; }
-      chat.webPushSubscriptions = chat.webPushSubscriptions || {};
-      chat.webPushSubscriptions[from || pub] = s;
+    chatNode.get('theirMsgsLastSeenTime').on(t => {
+      if (!t) { return; }
+      const d = new Date(t);
+      if (!chat.theirMsgsLastSeenDate || chat.theirMsgsLastSeenDate < d) {
+        chat.theirMsgsLastSeenDate = d;
+      }
     });
-    const arr = Object.values(Notifications.webPushSubscriptions);
-    setTimeout(() => chat.put('webPushSubscriptions', arr), 5000);
-    shareMyPeerUrl(chat);
-  }
-  chat.onTheir('call', call => {
-    State.local.get('call').put({pub, call});
+    chat.messageIds = chat.messageIds || {};
+    chat.getLatestMsg && chat.getLatestMsg((latest, info) => {
+      processMessage(pub, latest, info);
+    });
+    Notifications.changeChatUnseenCount(pub, 0);
+    chat.notificationSetting = 'all';
+    chat.onMy('notificationSetting', (val) => {
+      chat.notificationSetting = val;
+    });
+    //$(".chat-list").append(el);
+    chat.theirMsgsLastSeenTime = '';
+    chat.getTheirMsgsLastSeenTime(time => {
+      if (chat && time && time >= chat.theirMsgsLastSeenTime) {
+        chat.theirMsgsLastSeenTime = time;
+        chatNode.get('theirMsgsLastSeenTime').put(time);
+      }
+    });
+    chat.getMyMsgsLastSeenTime(time => {
+      chat.myLastSeenTime = new Date(time);
+      if (chat.latest && chat.myLastSeenTime >= chat.latest.time) {
+        Notifications.changeChatUnseenCount(pub, 0);
+      }
+      PeerManager.askForPeers(pub); // TODO: this should be done only if we have a chat history or friendship with them
+    });
+    chat.isTyping = false;
+    chat.getTyping(isTyping => {
+      chat.isTyping = isTyping;
+      State.local.get('channels').get(pub).get('isTyping').put(isTyping);
+    });
+    chat.online = {};
+    iris.Channel.getActivity(State.public, pub, (activity) => {
+      if (chat) {
+        chatNode.put({theirLastActiveTime: activity && activity.lastActive, activity: activity && activity.isActive && activity.status});
+        chat.activity = activity;
+      }
+    });
+    if (chat.uuid) {
+      let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      chat.participantProfiles = {};
+      chat.on('name', v => State.local.get('channels').get(chat.uuid).get('name').put(v));
+      chat.on('photo', v => State.local.get('channels').get(chat.uuid).get('photo').put(v));
+      chat.on('about', v => State.local.get('channels').get(chat.uuid).get('about').put(v));
+      chat.getParticipants(participants => {
+        if (typeof participants === 'object') {
+          let keys = Object.keys(participants);
+          keys.forEach((k, i) => {
+            let hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
+            chat.participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
+            State.public.user(k).get('profile').get('name').on(name => {
+              chat.participantProfiles[k].name = name;
+            });
+          });
+        }
+        State.local.get('channels').get(chat.uuid).get('participants').put(null);
+        State.local.get('channels').get(chat.uuid).get('participants').put(participants);
+      });
+      chat.inviteLinks = {};
+      chat.getChatLinks({callback: ({url, id}) => {
+        console.log('got chat link', id, url);
+        chat.inviteLinks[id] = url; // TODO use State
+        State.local.get('inviteLinksChanged').put(true);
+      }});
+    } else {
+      State.local.get('groups').get('everyone').get(pub).put(true);
+      addFollow(null, pub, -1);
+      State.public.user(pub).get('profile').get('name').on(v => State.local.get('channels').get(pub).get('name').put(v))
+    }
+    if (chat.put) {
+      chat.onTheir('webPushSubscriptions', (s, k, from) => {
+        if (!Array.isArray(s)) { return; }
+        chat.webPushSubscriptions = chat.webPushSubscriptions || {};
+        chat.webPushSubscriptions[from || pub] = s;
+      });
+      const arr = Object.values(Notifications.webPushSubscriptions);
+      setTimeout(() => chat.put('webPushSubscriptions', arr), 5000);
+      shareMyPeerUrl(chat);
+    }
+    chat.onTheir('call', call => {
+      State.local.get('call').put({pub, call});
+    });
+    State.local.get('channels').get(pub).put({enabled:true});
+    /* Disable private peer discovery, since they're not connecting anyway
+    if (chat.onTheir) {
+      chat.onTheir('my_peer', (url, k, from) => {
+        console.log('Got private peer url', url, 'from', from);
+        PeerManager.addPeer({url, from})
+      });
+    }
+     */
+
   });
-  State.local.get('channels').get(pub).put({enabled:true});
-  /* Disable private peer discovery, since they're not connecting anyway
-  if (chat.onTheir) {
-    chat.onTheir('my_peer', (url, k, from) => {
-      console.log('Got private peer url', url, 'from', from);
-      PeerManager.addPeer({url, from})
-    });
-  }
-   */
 }
 
 function processMessage(chatId, msg, info) {
