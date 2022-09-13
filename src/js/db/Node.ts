@@ -64,14 +64,7 @@ export default class Node extends Actor {
                     } else {
                         this.value = value;
                     }
-                    if (this.value && this.value.indexOf && this.value.indexOf('asdf') !== -1) {
-                        console.log('asdf', this.id, this.value);
-                        this.doCallbacks(true);
-                    }
-                    this.parent.handle(message);
-                    for (const child of this.children.values()) {
-                        child.handle(message);
-                    }
+                    this.parent && this.parent.handle(message);
                 }
             }
             setTimeout(() => this.doCallbacks(), 100);
@@ -88,28 +81,21 @@ export default class Node extends Actor {
         return newNode;
     }
 
-    doCallbacks = _.throttle((log = false) => {
-        log && console.log('doCallbacks', this.id, this.value, this.on_subscriptions.size, this.map_subscriptions.size);
-        log && console.log('this.parent.on_subscriptions.size', this.parent && this.parent.on_subscriptions.size);
-        log && console.log('this.parent.map_subscriptions.size', this.parent && this.parent.map_subscriptions.size);
+    doCallbacks = _.throttle(() => {
         for (const [id, callback] of this.on_subscriptions) {
-            log && console.log('on sub', this.id, this.value);
             const event = { off: () => this.on_subscriptions.delete(id) };
             this.once(callback, event, false);
         }
         for (const [id, callback] of this.once_subscriptions) {
-            log && console.log('once sub', this.id, this.value);
             this.once(callback, undefined, false);
             this.once_subscriptions.delete(id);
         }
         if (this.parent) {
             for (const [id, callback] of this.parent.on_subscriptions) {
-                log && console.log('on sub', this.id, this.value);
                 const event = { off: () => this.parent.on_subscriptions.delete(id) };
                 this.parent.once(callback, event, false);
             }
             for (const [id, callback] of this.parent.map_subscriptions) {
-                log && console.log('map sub', this.id, this.value);
                 const event = { off: () => this.parent.map_subscriptions.delete(id) };
                 this.once(callback, event, false);
             }
@@ -135,6 +121,7 @@ export default class Node extends Actor {
         this.value = value;
         this.doCallbacks();
         const updatedNodes = {};
+        updatedNodes[this.id] = value;
         this.addParentNodes(updatedNodes);
         this.router.postMessage(Put.new(updatedNodes, this.channel.name));
     }

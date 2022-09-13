@@ -40,9 +40,11 @@ class Router extends Actor {
     }
 
     handlePut(put) {
-        Object.keys(put.updatedNodes).forEach(topic => {
+        Object.keys(put.updatedNodes).forEach(path => {
+            const topic = path.split('/')[1] || '';
             const subscribers = this.subscribersByTopic.get(topic);
             // send to storage adapters
+            console.log('put subscribers', subscribers);
             for (const storageAdapter of this.storageAdapters) {
                 storageAdapter.postMessage(put);
             }
