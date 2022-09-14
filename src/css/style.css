@@ -2241,6 +2241,9 @@ form.public {
   #profile .content, .main-view.public-messages-view {
     padding: 0;
   }
+  .main-view.public-messages-view .centered-container > h3 {
+      padding-left: 15px;
+  }
   .public-messages-view .msg .msg-content, textarea {
     border-radius: 0 !important;
   }

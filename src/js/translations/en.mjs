@@ -158,7 +158,6 @@ export default {
   add_hashtag: "+ Add hashtag",
   all: "All",
   follows: "Follows",
-  second_degree_follows: "2nd degree follows",
   everyone: "Everyone",
   connected_peers: "Connected peers",
   no_notifications_yet: "No notifications yet",

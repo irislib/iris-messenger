@@ -1,6 +1,7 @@
 import { html } from 'htm/preact';
 import State from '../State';
 import Identicon from '../components/Identicon';
+import Button from '../components/basic/Button';
 import {translate as t} from '../translations/Translation';
 import Name from '../components/Name';
 import View from './View';
@@ -8,8 +9,14 @@ import iris from '../iris-lib';
 import PublicMessage from "../components/PublicMessage";
 import NotificationTools from "../Notifications";
 
+const PAGE_SIZE = 10;
+
 export default class Notifications extends View {
   notifications = {};
+  class = 'public-messages-view';
+  state = {
+    displayCount: PAGE_SIZE
+  }
 
   componentDidMount() {
     NotificationTools.changeUnseenNotificationCount(0);
@@ -34,14 +41,16 @@ export default class Notifications extends View {
   }
 
   renderView() {
+    const displayCount = this.state.displayCount;
+    const notificationKeys = Object.keys(this.notifications).sort().reverse();
     return html`
-      <div class="centered-container public-messages-view">
+      <div class="centered-container" style="margin-bottom: 15px;">
         <h3>${t('notifications')}</h3>
         
         ${Object.keys(this.notifications).length === 0 ? html`
             <p> ${t('no_notifications_yet')}</p>
         `:''}
-        ${Object.keys(this.notifications).sort().reverse().map(k => {
+        ${notificationKeys.slice(0, this.state.displayCount).map(k => {
           const notification = this.notifications[k];
           return html`
             <div class="msg" key=${(notification.time||'') + (notification.from||'') + (notification.target||'')}>
@@ -61,6 +70,13 @@ export default class Notifications extends View {
             </div>
           `;
         })}
+        ${displayCount < notificationKeys.length ? html`
+          <div>
+            <${Button} onClick=${() => this.setState({displayCount: displayCount + PAGE_SIZE})}>
+              ${t('show_more')}
+            <//>
+          </div>
+        ` : ''}
       </div>
     `;
   }

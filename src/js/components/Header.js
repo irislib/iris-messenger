@@ -11,8 +11,6 @@ import Icons from '../Icons';
 import iris from '../iris-lib';
 import {Link} from "preact-router/match";
 
-import logo from '../../assets/img/icon128.png';
-
 import $ from 'jquery';
 import _ from "lodash";
 
@@ -143,7 +141,6 @@ class Header extends Component {
           ${Helpers.isElectron || chatting ? '' : html`
             <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
               <div class="mobile-menu-icon">${Icons.menu}</div>
-              <img src=${logo} style="margin-right: 10px" width=30 height=30/>
             </a>
           `}
         </div>
