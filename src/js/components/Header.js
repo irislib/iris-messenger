@@ -123,7 +123,7 @@ class Header extends Component {
     const isTyping = chat && chat.isTyping;
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
     const searchBox = this.chatId ? '' : html`
-        <${SearchBox} onSelect=${item => route(item.uuid ? `/group/${item.uuid}` : `/profile/${item.key}`)} focus=${!!this.state.showMobileSearch}/>
+        <${SearchBox} onSelect=${item => route(item.uuid ? `/chat/${item.uuid}` : `/profile/${item.key}`)} />
     `;
     const chatting = (activeRoute && activeRoute.indexOf('/chat/') === 0);
 
@@ -172,8 +172,13 @@ class Header extends Component {
             <div class=${this.state.showMobileSearch ? '' : 'hidden-xs'}>
               ${searchBox}
             </div>
-            <div class="mobile-search-btn ${this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'}" onClick=${() => {
+            <div class=" ${this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'}" onClick=${() => {
                 this.setState({showMobileSearch: true});
+                // focus the search input
+                setTimeout(() => {
+                  const input = document.querySelector('.search-box input');
+                  input && input.focus();
+                });
             }}>
               ${Icons.search}
             </div>
