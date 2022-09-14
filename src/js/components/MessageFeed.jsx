@@ -51,7 +51,6 @@ class MessageFeed extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props.scrollElement.current);
     this.props.scrollElement.current.addEventListener('scroll',this.scrollEvent);
     this.view = this.props.scrollElement.current;
     let first = true;
@@ -109,6 +108,10 @@ class MessageFeed extends Component {
   render() {
     const displayCount = this.state.displayCount;
     let sortedMessages = [];
+    let setRef = (el) => {
+      this.showMoreButton = el;
+    };
+
     if(this.state.tmpRender == true){
       sortedMessages = Array(20).fill(Math.random() * 10);
       return(
@@ -126,12 +129,8 @@ class MessageFeed extends Component {
     }else {
       sortedMessages = this.state.sortedMessages;
     }
-    let setRef = (el) => {
-      this.showMoreButton = el;
-    };
     return (
       <>
-        <div ref={setRef2}></div>
         <div>
           {sortedMessages.slice(0, displayCount + INITIAL_PAGE_SIZE).map(hash => (
             <PublicMessage key={hash} hash={hash} showName={true} tmpRender={true} />

@@ -32,7 +32,6 @@ class Feed extends View {
   }
 
   componentDidMount() {
-    
     this.search();
     if (this.props.hashtag) {
       State.local.get('filters').get('group').put('everyone');
@@ -55,7 +54,6 @@ class Feed extends View {
     if (hashtag) {
       path = `hashtags/${hashtag}`;
     }
-    console.log(this.scrollElement);
     return html`
       <div class="centered-container">
         <div style="display:flex;flex-direction:row">

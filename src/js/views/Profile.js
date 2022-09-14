@@ -343,20 +343,20 @@ class Profile extends View {
     if (this.props.tab === 'replies') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="replies${this.props.id}" node=${State.public.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
+          <${MessageFeed} scrollElement=${this.scrollElement} key="replies${this.props.id}" node=${State.public.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
         </div>
       `;
     } else if (this.props.tab === 'likes') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="likes${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
+          <${MessageFeed} scrollElement=${this.scrollElement} key="likes${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
         </div>
       `;
     } else if (this.props.tab === 'media') {
       return html`
         <div class="public-messages-view">
           ${this.isMyProfile ? html`<${FeedMessageForm} index="media" class="hidden-xs" autofocus=${false}/>` : ''}
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
+          <${MessageFeed} scrollElement=${this.scrollElement} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
         </div>
       `;
     } else if (this.props.tab === 'nfts') {
@@ -391,7 +391,7 @@ class Profile extends View {
         ${messageForm}
         <div class="public-messages-view">
           ${this.getNotification()}
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="posts${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+          <${MessageFeed} scrollElement=${this.scrollElement} key="posts${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
         </div>
       </div>
       `;
