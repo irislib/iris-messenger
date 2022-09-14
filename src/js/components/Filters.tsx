@@ -23,13 +23,8 @@ export default class Filters extends Component<Props, State> {
       <div className="msg filters">
         <div className="msg-content">
           <input checked={s.group === "follows"} type="radio"/>
-          <label onClick={() => this.toggleGroup("follows")}>
+          <label onClick={() => this.toggleGroup("follows")} style="margin-right:15px">
             {t('follows')}
-          </label>
-
-          <input checked={s.group === "2ndDegreeFollows"} type="radio"/>
-          <label onClick={() => this.toggleGroup("2ndDegreeFollows")}>
-            {t('second_degree_follows')}
           </label>
 
           <input checked={s.group === "everyone"} type="radio"/>

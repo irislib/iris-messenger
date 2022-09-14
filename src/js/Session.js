@@ -174,8 +174,6 @@ function updateGroups() {
   getExtendedFollows((k, info) => {
     if (info.followDistance <= 1) {
       State.local.get('groups').get('follows').get(k).put(true);
-    } else if (info.followDistance == 2) {
-      State.local.get('groups').get('2ndDegreeFollows').get(k).put(true);
     }
     State.local.get('groups').get('everyone').get(k).put(true);
     if (k === getPubKey()) {
