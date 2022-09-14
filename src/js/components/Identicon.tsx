@@ -17,6 +17,7 @@ type Props = {
   activity?: string;
   onClick?: () => void;
   width: number;
+  photo?: string | null;
 };
 
 type State = {
@@ -93,11 +94,18 @@ class MyIdenticon extends Component<Props, State> {
   render() {
     const width = this.props.width;
     const activity = ['online', 'active'].indexOf(this.state.activity ?? '') > -1 ? this.state.activity : '';
-    const hasPhoto = this.state.photo && !this.props.hidePhoto && this.state.photo.indexOf('data:image') === 0;
+    let hasPhoto =  false;
+    if(this.state.photo && this.state.photo.indexOf('data:image') === 0){
+        hasPhoto = true;
+    }else if(this.props.photo){
+      if(String(this.props.photo).indexOf('data:image') === 0){
+        hasPhoto = true;
+      }
+    }
     const hasPhotoStyle = hasPhoto ? 'has-photo' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 
-    const imgSrc = this.state.photo || this.state.identicon;
+    const imgSrc = this.state.photo || this.state.identicon || this.props.photo;
     const photoElement = this.state.nftPfp ? (
     <svg style={`max-width:${width}px;max-height:${width}px`} width="327.846" height="318.144" viewBox="0 0 327.846 318.144">
         <defs>

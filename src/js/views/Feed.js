@@ -32,6 +32,7 @@ class Feed extends View {
   }
 
   componentDidMount() {
+    
     this.search();
     if (this.props.hashtag) {
       State.local.get('filters').get('group').put('everyone');
@@ -54,6 +55,7 @@ class Feed extends View {
     if (hashtag) {
       path = `hashtags/${hashtag}`;
     }
+    console.log(this.scrollElement);
     return html`
       <div class="centered-container">
         <div style="display:flex;flex-direction:row">
@@ -73,7 +75,7 @@ class Feed extends View {
             `}
             ${!s.noFollows ? html`<${Filters}/>` : ''}
             <${MessageFeed}
-                    scrollElement=${this.scrollElement.current}
+                    scrollElement=${this.scrollElement}
                     hashtag=${hashtag}
                     filter=${s.searchTerm && (m => this.filter(m))}
                     thumbnails=${this.props.thumbnails}

@@ -5,6 +5,7 @@ import FeedMessageForm from './FeedMessageForm';
 import State from '../State';
 import { route } from 'preact-router';
 import Message from './Message';
+import TmpMessage from './TmpMessage';
 import SafeImg from './SafeImg';
 import Session from '../Session';
 import Torrent from './Torrent';
@@ -28,7 +29,8 @@ class PublicMessage extends Message {
     this.likedBy = new Set();
     this.replies = {};
     this.subscribedReplies = new Set();
-    this.state = { sortedReplies: [] };
+    this.state = { sortedReplies: [],tmpRender: true };
+    this.r = Math.random() * 10;
   }
 
   static fetchByHash(thisArg, hash) {
@@ -78,6 +80,17 @@ class PublicMessage extends Message {
         this.setOgImageUrl(msg.attachments[0].data);
       }
       this.setState({msg});
+      let photo;
+      State.public.user(msg.info.from).get('profile').get('photo').on(() => photo=this);
+      
+      //State.public.user(msg.info.from).get('profile').get('photo').on(this.inject());
+      if(!photo){
+        this.setState({photo : "-"});
+      }else{
+        this.setState({photo});
+      }
+      
+      this.setState({tmpRender: false});
       if (this.props.showName && !this.props.name) {
         State.public.user(msg.info.from).get('profile').get('name').on(this.inject());
       }
@@ -175,8 +188,11 @@ class PublicMessage extends Message {
   }
 
   render() {
-    if (!this.state.msg) { return ''; }
-    //if (++this.i > 1) console.log(this.i);
+    if(this.props.tmpRender && this.state.tmpRender){
+      return html`<${TmpMessage} r=${this.r} />`;
+    }
+    if (!this.state.msg|| !this.state.photo || !(this.state.name || this.props.name)) { return html`<${TmpMessage} r=${this.r} />`; }
+
     let name = this.props.name || this.state.name;
     const emojiOnly = this.state.msg.text && this.state.msg.text.length === 2 && Helpers.isEmoji(this.state.msg.text);
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
@@ -201,13 +217,14 @@ class PublicMessage extends Message {
     const dateStr = time.toLocaleString(window.navigator.language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const timeStr = time.toLocaleTimeString(window.navigator.language, {timeStyle: 'short'});
     const s = this.state;
+    const photo =  this.state.photo;
 
     return html`
       <div ref=${this.ref} class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone ? 'standalone' : ''}">
         <div class="msg-content">
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${() => this.onClickName()}>
-              ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width=40/>` : ''}
+              ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width=40 photo=${photo} />` : ''}
               ${name && this.props.showName && html`<small class="msgSenderName">${name}</small>`}
             </div>
             ${s.msg.info.from === Session.getPubKey() ? html`

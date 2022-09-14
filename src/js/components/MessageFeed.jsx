@@ -1,18 +1,21 @@
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import PublicMessage from './PublicMessage';
+import TmpMessage from './TmpMessage';
 import State from '../State';
 import {debounce} from 'lodash';
 import {translate as t} from '../translations/Translation';
 import Button from '../components/basic/Button';
 
-const INITIAL_PAGE_SIZE = 20;
+const INITIAL_PAGE_SIZE = 10;
+const TMP_RENDER = true;
 
 class MessageFeed extends Component {
   constructor() {
     super();
-    this.state = {sortedMessages:[], displayCount: INITIAL_PAGE_SIZE};
+    this.state = {sortedMessages:[], displayCount: INITIAL_PAGE_SIZE, tmprender: TMP_RENDER};
     this.mappedMessages = new Map();
+    this.scrollEvent = this.scrollEvent.bind(this);
   }
   
   updateSortedMessages = debounce(() => {
@@ -21,7 +24,7 @@ class MessageFeed extends Component {
     if (!this.props.reverse) {
       sortedMessages = sortedMessages.reverse();
     }
-    this.setState({sortedMessages})
+    this.setState({sortedMessages});
   }, 100);
 
   handleMessage(v, k, x, e, from) {
@@ -36,7 +39,9 @@ class MessageFeed extends Component {
           }
         });
       } else {
-        this.mappedMessages.set(k, v);
+        if(v.length < 45){
+          this.mappedMessages.set(k, v);
+        }
       }
     } else {
       this.mappedMessages.delete(k);
@@ -46,6 +51,9 @@ class MessageFeed extends Component {
   }
 
   componentDidMount() {
+    console.log(this.props.scrollElement.current);
+    this.props.scrollElement.current.addEventListener('scroll',this.scrollEvent);
+    this.view = this.props.scrollElement.current;
     let first = true;
     State.local.get('scrollUp').on(this.sub(
       () => {
@@ -64,33 +72,81 @@ class MessageFeed extends Component {
     }
   }
 
+  componentWillUnmount(){
+    this.view.removeEventListener('scroll',this.scrollEvent)
+  }
+
+  addPosts = debounce(() => {      
+    this.setState({displayCount: this.state.displayCount + INITIAL_PAGE_SIZE});
+  },2000);
+  
+  scrollEvent(){
+      try{
+        let bottom = this.viewElement.getBoundingClientRect().bottom;
+        bottom = bottom - window.innerHeight;
+        if(bottom < 0)
+        {
+          this.addPosts();
+        }
+      }catch(e){
+        console.log("still loading" + e);
+      }
+  }
+
   componentDidUpdate(prevProps) {
     const prevNodeId = prevProps.node && prevProps.node._ && prevProps.node._.id;
     const newNodeId = this.props.node && this.props.node._ && this.props.node._.id;
+    if(this.state.sortedMessages.length > 600 && this.state.tmprender){
+      this.setState({tmprender:false});
+    }
     if (prevNodeId !== newNodeId || this.props.group !== prevProps.group || this.props.path !== prevProps.path || this.props.filter !== prevProps.filter) {
       this.mappedMessages = new Map();
       this.setState({sortedMessages: []});
       this.componentDidMount();
     }
   }
-
+  
   render() {
-    if (!this.props.scrollElement || this.unmounted) { return; }
     const displayCount = this.state.displayCount;
+    let sortedMessages = [];
+    if(this.state.tmprender == true){
+      sortedMessages = Array(20).fill(Math.random() * 10);
+      return(
+        <>
+          {sortedMessages.map(() => (<><div><TmpMessage tmprender={true}/></div></>))}
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <p>
+                <Button ref={setRef} onClick={() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE})}>
+                  {t('show_more')}
+                </Button>
+            </p>
+          </div>
+        </>
+        );
+    }else {
+      sortedMessages = this.state.sortedMessages;
+    }
+    let setRef = (el) => {
+      this.viewElement = el;
+    };
+    let setRef2 = (el) => {
+      this.viewElement2 = el;
+    };
     return (
       <>
+        <div ref={setRef2}></div>
         <div>
-          {this.state.sortedMessages.slice(0, displayCount).map(hash => (
-            <PublicMessage key={hash} hash={hash} showName={true} />
+          {sortedMessages.slice(0, displayCount + INITIAL_PAGE_SIZE).map(hash => (
+            <PublicMessage key={hash} hash={hash} showName={true} tmpRender={true} />
           ))}
         </div>
-        {displayCount < this.state.sortedMessages.length ? (
+        <div style="display: flex; align-items: center; justify-content: center;">
           <p>
-            <Button onClick={() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE})}>
+            <Button ref={setRef} onClick={() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE})}>
               {t('show_more')}
             </Button>
           </p>
-        ) : ''}
+        </div>
       </>
     );
   }

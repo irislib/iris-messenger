@@ -1097,7 +1097,37 @@ a.msg {
 .public-messages-view .msgSenderName {
   margin-left: 15px;
 }
-
+.tmpProfilePhoto{
+  height: 40px;
+  width: 40px;
+  background-color: var(--main-color);
+  border-radius: 50%;
+  display: inline-block;
+}
+.tmpMsgSenderName{
+  height: 20px;
+  width: 100px;
+  background-color: var(--main-color);
+  border-radius: 10px;
+  display: inline-block;
+  margin-left: 15px;
+}
+.tmpImg{
+  height: 200px;
+  width: 200px;
+  background-color: var(--main-color);
+  border-radius: 10px;
+  display: inline-block;
+}
+.tmpText{
+  height: 20px;
+  width: 300px;
+  background-color: var(--main-color);
+  border-radius: 10px;
+  display: inline-block;
+  margin-left: 15px;
+  margin-bottom: 5px;
+}
 .public-messages-view .img-container {
   display: flex;
   align-items: center;

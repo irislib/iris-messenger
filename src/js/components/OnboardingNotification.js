@@ -14,11 +14,11 @@ const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtr
 export default class OnboardingNotification extends Component {
   componentDidMount() {
     State.local.get('noFollowers').on(this.inject());
-    State.local.get('noFollows').on(this.inject());
+    State.local.get('noFollows').on(this.inject());    
   }
 
   render() {
-    if (this.state.noFollows) {
+    if (this.state.noFollows && !this.state.noFollowers) {
       return html`
         <div class="msg">
           <div class="msg-content">
