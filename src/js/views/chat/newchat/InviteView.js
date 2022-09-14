@@ -41,11 +41,6 @@ class InviteView extends Component {
         }
     }
 
-    createnewinvite(){
-        Session.createChatLink();
-        route(`/chat/new/MainView`);
-    }
-
     render(){
         return(
             <>
@@ -55,8 +50,6 @@ class InviteView extends Component {
                     <div class="btn-group">
                         <input id="paste-chat-link" onInput={e => this.onPasteChatLink(e)} type="text" placeholder={t('paste_their_invite_link')} />
                     </div>
-                    <h3>{t('create_new_invite_link')}</h3>
-                    <p><Button onClick={() => this.createnewinvite()}>{t('create_new_invite_link')}</Button></p>
                     <h3>{t('new_group')}</h3>
                     <p>
                         <form onSubmit={e => this.onCreateGroupSubmit(e)}>

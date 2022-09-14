@@ -1827,6 +1827,10 @@ small, .text-muted {
   margin-bottom: 30px;
 }
 
+button {
+    cursor: pointer;
+}
+
 form.public button {
   height: 47px;
   width: 47px;

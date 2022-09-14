@@ -27,6 +27,11 @@ class MainView extends Component {
     componentDidMount() {
         this.setState({chatLinks: this.props.chatLinks});
     }
+    
+    createNewInvite(){
+        Session.createChatLink();
+        route(`/chat/new/MainView`);
+    }
 
     render(){
        
@@ -57,21 +62,26 @@ class MainView extends Component {
                             return html``;
                         }
                         return html`
-                                        <div class="flex-row">
-                                            <div class="flex-cell no-flex">
-                                                <${CopyButton} copyStr=${url}/>
-                                            </div>
-                                            <div class="flex-cell">
-                                                <input type="text" value=${url} onClick=${e => $(e.target).select()}/>
-                                            </div>
-                                            <div class="flex-cell no-flex">
-                                                <${Button} onClick=${() => this.removeChatLink(id)}>${t('remove')}</${Button}>
-                                            </div>
-                                        </div>
-                                        `;
+                            <div class="flex-row">
+                                <div class="flex-cell no-flex">
+                                    <${CopyButton} copyStr=${url}/>
+                                </div>
+                                <div class="flex-cell">
+                                    <input type="text" value=${url} onClick=${e => $(e.target).select()}/>
+                                </div>
+                                <div class="flex-cell no-flex">
+                                    <${Button} onClick=${() => this.removeChatLink(id)}>${t('remove')}</${Button}>
+                                </div>
+                            </div>
+                            `;
                     })}
+                    <p>
+                        <Button onClick={() => this.createNewInvite()}>
+                            {t('create_new_invite_link')}
+                        </Button>
+                    </p>
+                    <p><small dangerouslySetInnerHTML={{ __html: t('beware_of_sharing_invite_link_publicly', `href="/profile/${Session.getPubKey()}"`) }} /></p>
                 </div>
-                <p><small dangerouslySetInnerHTML={{ __html: t('beware_of_sharing_invite_link_publicly', `href="/profile/${Session.getPubKey()}"`) }} /></p>
             </>
         );
     }
