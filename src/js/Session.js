@@ -21,8 +21,8 @@ let onlineTimeout;
 let ourActivity;
 let noFollows;
 let noFollowers;
-let userSearchIndex;
-const contacts = {};
+let searchIndex;
+const searchableItems = {};
 const channels = window.channels = {};
 
 const DEFAULT_SETTINGS = {
@@ -38,10 +38,10 @@ const DEFAULT_SETTINGS = {
   }
 }
 
-const updateUserSearchIndex = _.throttle(() => {
+const updateSearchIndex = _.throttle(() => {
   const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
-  const values = Object.values(_.omit(contacts, Object.keys(State.getBlockedUsers())));
-  userSearchIndex = new Fuse(values, options);
+  const values = Object.values(_.omit(searchableItems, Object.keys(State.getBlockedUsers())));
+  searchIndex = new Fuse(values, options);
 }, 3000, {leading:true});
 
 const taskQueue = [];
@@ -52,36 +52,36 @@ setInterval(() => {
   }
 }, 10);
 
-const saveContact = _.throttle(k => {
-    State.local.get('contacts').get(k).put({followDistance: contacts[k].followDistance,followerCount: contacts[k].followers.size});
+const saveSearchResult = _.throttle(k => {
+    State.local.get('contacts').get(k).put({followDistance: searchableItems[k].followDistance,followerCount: searchableItems[k].followers.size});
 }, 1000, {leading:true});
 
 function addFollow(callback, k, followDistance, follower) {
-  if (contacts[k]) {
-    if (contacts[k].followDistance > followDistance) {
-      contacts[k].followDistance = followDistance;
+  if (searchableItems[k]) {
+    if (searchableItems[k].followDistance > followDistance) {
+      searchableItems[k].followDistance = followDistance;
     }
-    contacts[k].followers.add(follower);
+    searchableItems[k].followers.add(follower);
   } else {
-    contacts[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
+    searchableItems[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
     taskQueue.push(() => {
       State.public.user(k).get('profile').get('name').on(name => {
-        contacts[k].name = name;
+        searchableItems[k].name = name;
         State.local.get('contacts').get(k).get('name').put(name);
-        callback && callback(k, contacts[k]);
+        callback && callback(k, searchableItems[k]);
       });
     });
   }
-  saveContact(k);
-  callback && callback(k, contacts[k]);
-  updateUserSearchIndex();
+  saveSearchResult(k);
+  callback && callback(k, searchableItems[k]);
+  updateSearchIndex();
   updateNoFollows();
   updateNoFollowers();
 }
 
 function removeFollow(k, followDistance, follower) {
-  if (contacts[k]) {
-    contacts[k].followers.delete(follower);
+  if (searchableItems[k]) {
+    searchableItems[k].followers.delete(follower);
     if (followDistance === 1) {
       State.local.get('groups').get('follows').get(k).put(false);
     }
@@ -113,11 +113,11 @@ const getExtendedFollows = (callback, k, maxDepth = 3, currentDepth = 1) => {
     }
   });
 
-  return contacts;
+  return searchableItems;
 };
 
 const updateNoFollows = _.throttle(() => {
-  const v = Object.keys(contacts).length <= 1;
+  const v = Object.keys(searchableItems).length <= 1;
   if (v !== noFollows) {
     noFollows = v;
     State.local.get('noFollows').put(noFollows);
@@ -125,15 +125,15 @@ const updateNoFollows = _.throttle(() => {
 }, 1000, {leading:true});
 
 const updateNoFollowers = _.throttle(() => {
-  const v = !(contacts[key.pub] && (contacts[key.pub].followers.size > 0));
+  const v = !(searchableItems[key.pub] && (searchableItems[key.pub].followers.size > 0));
   if (v !== noFollowers) {
     noFollowers = v;
     State.local.get('noFollowers').put(noFollowers);
   }
 }, 1000, {leading:true});
 
-function getUserSearchIndex() {
-  return userSearchIndex;
+function getSearchIndex() {
+  return searchIndex;
 }
 
 function setOurOnlineStatus() {
@@ -317,7 +317,7 @@ function login(k) {
   State.public.user().get('block').map().on((isBlocked, user) => {
     State.local.get('block').get(user).put(isBlocked);
     if (isBlocked) {
-      delete contacts[user];
+      delete searchableItems[user];
     }
   });
   updateGroups();
@@ -427,9 +427,9 @@ function init(options = {}) {
   }
   setTimeout(() => {
     State.local.get('block').map(() => {
-      updateUserSearchIndex();
+      updateSearchIndex();
     });
-    updateUserSearchIndex();
+    updateSearchIndex();
   });
 }
 
@@ -509,8 +509,15 @@ function addChannel(chat) {
     if (chat.uuid) {
       let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       chat.participantProfiles = {};
-      chat.on('name', v => State.local.get('channels').get(chat.uuid).get('name').put(v));
-      chat.on('photo', v => State.local.get('channels').get(chat.uuid).get('photo').put(v));
+      chat.on('name', v => {
+        searchableItems[chat.uuid] = {name: v, uuid: chat.uuid};
+        State.local.get('channels').get(chat.uuid).get('name').put(v);
+      });
+      chat.on('photo', v => {
+        searchableItems[chat.uuid] = searchableItems[chat.uuid] || {};
+        searchableItems[chat.uuid].photo = v;
+        State.local.get('channels').get(chat.uuid).get('photo').put(v)
+      });
       chat.on('about', v => State.local.get('channels').get(chat.uuid).get('about').put(v));
       chat.getParticipants(participants => {
         if (typeof participants === 'object') {
@@ -620,4 +627,4 @@ function followChatLink(str) {
   }
 }
 
-export default {init, followChatLink, getKey, getPubKey, ethereumLogin, ethereumConnect, updateUserSearchIndex, getUserSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+export default {init, followChatLink, getKey, getPubKey, ethereumLogin, ethereumConnect, updateSearchIndex, getSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };

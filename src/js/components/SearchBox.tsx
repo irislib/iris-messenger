@@ -8,6 +8,7 @@ import {translate as t} from '../translations/Translation';
 import Session from '../Session';
 import $ from 'jquery';
 import _ from 'lodash';
+import SafeImg from './SafeImg';
 
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
@@ -28,6 +29,8 @@ type ResultItem = {
     followers: Map<string, any>;
     followDistance: number;
     name?: string;
+    photo?: string;
+    uuid?: string;
 }
 
 type State = {
@@ -90,7 +93,7 @@ class SearchBox extends Component<Props, State> {
     const query = el.val();
     el.val('');
     el.blur();
-    route(`/search/${query}`);
+    // TODO go to first result
   }
 
   search() {
@@ -110,7 +113,7 @@ class SearchBox extends Component<Props, State> {
     if (Session.followChatLink(query)) return;
 
     if (query) {
-      const results = Session.getUserSearchIndex().search(query).slice(0,5);
+      const results = Session.getSearchIndex().search(query).slice(0,5);
       if (results.length) {
         $(document).off('keyup').on('keyup', e => {
           if (e.key === "Escape") { // escape key maps to keycode `27`
@@ -162,8 +165,8 @@ class SearchBox extends Component<Props, State> {
               followText = `${  i.followers.size  } followers`;
             }
             return (
-              <a href={`/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
-                <Identicon key={`${i.key  }ic`} str={i.key} width={40} />
+              <a href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
+                {i.photo ? <div class="identicon-container"><img src={i.photo} class="round-borders" height={40} width={40} alt=""/></div> : <Identicon key={`${i.key  }ic`} str={i.key} width={40} />}
                 <div>
                   {i.name || ''}<br/>
                   <small>
