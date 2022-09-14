@@ -12,7 +12,6 @@ import View from './View';
 import SearchBox from '../components/SearchBox';
 import {SMS_VERIFIER_PUB} from '../SMS';
 import $ from 'jquery';
-import QRCode from '../lib/qrcode.min';
 import iris from '../iris-lib';
 import Button from '../components/basic/Button';
 
@@ -147,7 +146,7 @@ class Group extends View {
             </div>
           `: ''}
           ${this.state.isAdmin ? html`
-            <p><${Button} onClick=${() => chat.createChatLink()}>Create new invite link<//></p><hr/>
+            <p><${Button} onClick=${() => chat.createChatLink()}>Create new invite link<//></p>
           `: ''}
         </div>
       `;
@@ -165,7 +164,6 @@ class Group extends View {
       } else {
         profilePhoto = html`<${Identicon} str=${this.props.id} width=250/>`
       }
-      const uuid = this.state.uuid;
     return html`
       <div class="content">
         <div class="profile-top">
@@ -181,26 +179,12 @@ class Group extends View {
                 ${this.state.about}</p>
               </div>
               <div class="profile-actions">
-                ${uuid ? '' : html`
-                  <div class="follow-count">
-                    <a href="/follows/${this.props.id}">
-                      <span>${this.state.followedUserCount}</span> ${tr('following')}
-                    </a>
-                    <a href="/followers/${this.props.id}">
-                      <span>${this.state.followerCount}</span> ${tr('followers')}
-                    </a>
-                  </div>
-                `}
                 ${this.followedUsers && this.followedUsers.has(Session.getPubKey()) ? html`
                   <p><small>${tr('follows_you')}</small></p>
                 `: this.props.id === SMS_VERIFIER_PUB ? html`
                   <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${tr('ask_for_verification')}</a></p>
                 ` : ''}
                 <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${tr('send_message')}<//>
-                ${uuid ? '' : html`
-                  <${CopyButton} text=${tr('copy_link')} title=${this.state.name} copyStr=${`https://iris.to/${window.location.hash}`}/>
-                `}
-                <${Button} onClick=${() => $('#profile-page-qr').toggle()}>${tr('show_qr_code')}<//>
                 <${Button} class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}<//>
               </div>
             </div>
@@ -208,10 +192,7 @@ class Group extends View {
           <div class="profile-about visible-xs-flex">
             <p class="profile-about-content" placeholder=${editable ? tr('about') : ''} contenteditable=${editable} onInput=${e => this.onAboutInput(e)}>${this.state.about}</p>
           </div>
-
-          ${this.renderGroupSettings()}
-
-          <p id="profile-page-qr" style="display:none" class="qr-container"></p>
+            
           <div id="chat-settings" style="display:none">
             <hr/>
             <h3>${tr('chat_settings')}</h3>
@@ -222,7 +203,7 @@ class Group extends View {
               <input type="radio" id="notifyMentionsOnly" name="notificationPreference" value="mentions"/>
               <label for="notifyMentionsOnly">${tr('mentions_only')}</label><br/>
               <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing"/>
-              <label for="notifyNothing">${tr('nothing')}</label><br/>
+              <label for="notifyNothing">${tr('nothing')}</label><br/><br/>
             </div>
             <hr/>
             <p>
@@ -230,6 +211,8 @@ class Group extends View {
             </p>
             <hr/>
           </div>
+
+          ${this.renderGroupSettings()}
         </div>
       </div>
     `;
@@ -274,8 +257,6 @@ class Group extends View {
         }, 1000);
       }
     }
-    let qrCodeEl = $('#profile-page-qr');
-    qrCodeEl.empty();
     State.local.get('inviteLinksChanged').on(() => this.setState({inviteLinksChanged: !this.state.inviteLinksChanged}));
     State.local.get('channels').get(this.props.id).get('participants').on(() => {
       const isAdmin = areWeAdmin(pub);
@@ -288,15 +269,6 @@ class Group extends View {
         chat.put('notificationSetting', event.target.value);
       });
     }
-    qrCodeEl.empty();
-    new QRCode(qrCodeEl[0], {
-      text: `https://iris.to/${  window.location.hash}`,
-      width: 300,
-      height: 300,
-      colorDark : "#000000",
-      colorLight : "#ffffff",
-      correctLevel : QRCode.CorrectLevel.H
-    });
   }
 }
 
