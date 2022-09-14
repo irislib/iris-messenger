@@ -13,7 +13,7 @@ const TMP_RENDER = true;
 class MessageFeed extends Component {
   constructor() {
     super();
-    this.state = {sortedMessages:[], displayCount: INITIAL_PAGE_SIZE, tmprender: TMP_RENDER};
+    this.state = {sortedMessages:[], displayCount: INITIAL_PAGE_SIZE, tmpRender: TMP_RENDER};
     this.mappedMessages = new Map();
     this.scrollEvent = this.scrollEvent.bind(this);
   }
@@ -82,7 +82,7 @@ class MessageFeed extends Component {
   
   scrollEvent(){
       try{
-        let bottom = this.viewElement.getBoundingClientRect().bottom;
+        let bottom = this.showMoreButton.getBoundingClientRect().bottom;
         bottom = bottom - window.innerHeight;
         if(bottom < 0)
         {
@@ -96,8 +96,8 @@ class MessageFeed extends Component {
   componentDidUpdate(prevProps) {
     const prevNodeId = prevProps.node && prevProps.node._ && prevProps.node._.id;
     const newNodeId = this.props.node && this.props.node._ && this.props.node._.id;
-    if(this.state.sortedMessages.length > 600 && this.state.tmprender){
-      this.setState({tmprender:false});
+    if(this.state.sortedMessages.length > 600 && this.state.tmpRender){
+      this.setState({tmpRender:false});
     }
     if (prevNodeId !== newNodeId || this.props.group !== prevProps.group || this.props.path !== prevProps.path || this.props.filter !== prevProps.filter) {
       this.mappedMessages = new Map();
@@ -109,11 +109,11 @@ class MessageFeed extends Component {
   render() {
     const displayCount = this.state.displayCount;
     let sortedMessages = [];
-    if(this.state.tmprender == true){
+    if(this.state.tmpRender == true){
       sortedMessages = Array(20).fill(Math.random() * 10);
       return(
         <>
-          {sortedMessages.map(() => (<><div><TmpMessage tmprender={true}/></div></>))}
+          {sortedMessages.map(() => (<><div><TmpMessage tmpRender={true}/></div></>))}
           <div style="display: flex; align-items: center; justify-content: center;">
             <p>
                 <Button ref={setRef} onClick={() => this.setState({displayCount: displayCount + INITIAL_PAGE_SIZE})}>
@@ -127,10 +127,7 @@ class MessageFeed extends Component {
       sortedMessages = this.state.sortedMessages;
     }
     let setRef = (el) => {
-      this.viewElement = el;
-    };
-    let setRef2 = (el) => {
-      this.viewElement2 = el;
+      this.showMoreButton = el;
     };
     return (
       <>
