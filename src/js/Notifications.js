@@ -9,8 +9,8 @@ import $ from 'jquery';
 
 const notificationSound = new Audio('../../assets/audio/notification.mp3');
 let loginTime;
-let unseenMsgsTotal;
-let unseenNotificationCount;
+let unseenMsgsTotal = 0;
+let unseenNotificationCount = 0;
 const webPushSubscriptions = {};
 
 function desktopNotificationsEnabled() {
@@ -199,8 +199,7 @@ function subscribeToIrisNotifications() {
     State.public.user().get('notificationsShownTime').put(new Date().toISOString());
   }, 1000);
   const alreadyHave = new Set();
-  setTimeout(() => {
-    State.group().on(`notifications/${Session.getPubKey()}`, async (encryptedNotification, k, x, e, from) => {
+  State.group().on(`notifications/${Session.getPubKey()}`, async (encryptedNotification, k, x, e, from) => {
       const id = from.slice(0,30) + encryptedNotification.slice(0,30);
       if (alreadyHave.has(id)) { return; }
       alreadyHave.add(id);
@@ -211,7 +210,7 @@ function subscribeToIrisNotifications() {
       setNotificationsShownTime();
       notification.from = from;
       State.local.get('notifications').get(notification.time).put(notification);
-      if (!notificationsSeenTime || notificationsSeenTime < notification.time) {
+      if (!notificationsSeenTime || (notificationsSeenTime < notification.time)) {
         changeUnseenNotificationCount(1);
       }
       if (!notificationsShownTime || notificationsShownTime < notification.time) {
@@ -230,7 +229,6 @@ function subscribeToIrisNotifications() {
         };
       }
     });
-  }, 2000);
 }
 
 function changeUnseenNotificationCount(change) {
@@ -256,7 +254,6 @@ async function sendIrisNotification(recipient, notification) {
 function init() {
   loginTime = new Date();
   unseenMsgsTotal = 0;
-  changeUnseenNotificationCount(0);
 }
 
 export default {init, notifyMsg, getNotificationText, changeUnseenNotificationCount, subscribeToIrisNotifications, sendIrisNotification, enableDesktopNotifications, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};
