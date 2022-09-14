@@ -6,8 +6,6 @@ import Filters from '../components/Filters';
 import View from './View';
 import SubscribeHashtagButton from "../components/SubscribeHashtagButton";
 import Helmet from 'react-helmet';
-import HashtagList from '../components/HashtagList';
-import HashtagSubscriberList from '../components/HashtagSubscriberList';
 import OnboardingNotification from "../components/OnboardingNotification";
 
 class Feed extends View {

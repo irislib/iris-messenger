@@ -594,7 +594,7 @@ function processMessage(chatId, msg, info) {
 
 function subscribeToMsgs(pub) {
   const c = channels[pub];
-  if (c.subscribed) { return; }
+  if (!c || c.subscribed) { return; }
   c.subscribed = true;
   c.getMessages((msg, info) => {
     processMessage(pub, msg, info);
