@@ -1,6 +1,7 @@
 import { html } from 'htm/preact';
 import {translate as tr} from '../translations/Translation';
 import State from '../State';
+import {Helmet} from "react-helmet";
 import Session from '../Session';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
@@ -169,6 +170,7 @@ class Group extends View {
       }
     return html`
       <div class="content">
+        <${Helmet}><title>${this.state.name || 'Group'}</title><//>
         <div class="profile-top">
           <div class="profile-header">
             <div class="profile-photo-container">
