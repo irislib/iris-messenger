@@ -415,6 +415,10 @@ a.logo img:not(:last-child) {
   margin-top: 0;
 }
 
+.search-box-results a.selected {
+    background-color: var(--button-bg-hover);
+}
+
 @media (max-width: 625px) {
   .nav .search-box-results {
     left: calc(50% - 43px);

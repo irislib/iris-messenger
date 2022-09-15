@@ -94,11 +94,18 @@ class SearchBox extends Component<Props, State> {
     el.val('');
     el.blur();
     // TODO go to first result
+    const selected = $(this.base).find('.search-box-results a.selected');
+    if (selected.length) {
+      selected[0].click();
+    }
   }
 
   search() {
     const query = this.props.query || $(this.base).find('input')[0].value;
-    if (!query) { return; }
+    if (!query) {
+      this.close();
+      return;
+    }
 
     if (this.props.onSelect) {
       const s = query.split('/profile/');
@@ -119,6 +126,20 @@ class SearchBox extends Component<Props, State> {
           if (e.key === "Escape") { // escape key maps to keycode `27`
             $(document).off('keyup');
             this.close();
+          }
+          // up and down buttons
+          else if (e.keyCode === 38 || e.keyCode === 40) {
+            e.preventDefault();
+            const selected = $(this.base).find('.search-box-results a.selected');
+            if (selected.length) {
+              const next = e.keyCode === 38 ? selected.prev() : selected.next();
+              if (next.length) {
+                selected.removeClass('selected');
+                next.addClass('selected');
+              }
+            } else {
+              $(this.base).find('.search-box-results a').first().addClass('selected');
+            }
           }
         });
       }
@@ -148,7 +169,7 @@ class SearchBox extends Component<Props, State> {
           </form>
         )}
         <div class="search-box-results" style="left: ${this.state.offsetLeft || ''}">
-          {this.state.results.map(r => {
+          {this.state.results.map((r, index) => {
             const i = r.item;
             let followText = '';
             if (i.followDistance === 1) {
@@ -165,7 +186,7 @@ class SearchBox extends Component<Props, State> {
               followText = `${  i.followers.size  } followers`;
             }
             return (
-              <a href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
+              <a className={index === 0 ? 'selected' : ''} href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
                 {i.photo ? <div class="identicon-container"><img src={i.photo} class="round-borders" height={40} width={40} alt=""/></div> : <Identicon key={`${i.key  }ic`} str={i.key} width={40} />}
                 <div>
                   {i.name || ''}<br/>
