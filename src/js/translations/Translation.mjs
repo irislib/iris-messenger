@@ -22,7 +22,7 @@ let translationLoaded;
 
 // if not node.js
 if (typeof module !== 'undefined') {
-  let language = localStorage.getItem('language') || navigator.language || 'en';
+  language = localStorage.getItem('language') || navigator.language || 'en';
   if (AVAILABLE_LANGUAGE_KEYS.indexOf(language) === -1) {
     const s = language.slice(0,2);
     language = 'en';
