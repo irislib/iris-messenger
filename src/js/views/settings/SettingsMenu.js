@@ -18,7 +18,8 @@ const SETTINGS = {
 
 export default class SettingsMenu extends Component{
 
-  menuLinkClicked(url) {
+  menuLinkClicked(url,e) {
+    e.preventDefault();
     State.local.get('toggleSettingsMenu').put(false);
     State.local.get('scrollUp').put(true);
     route(`/settings/${url}`);
@@ -34,7 +35,7 @@ export default class SettingsMenu extends Component{
       `}
       {Object.keys(SETTINGS).map(page => {
           return (
-            <a class={(activePage === page && window.innerWidth > 624) ? 'active' : ''} onClick={() => this.menuLinkClicked(page)} key={page}>
+            <a href="#" class={(activePage === page && window.innerWidth > 624) ? 'active' : ''} onClick={e => this.menuLinkClicked(page,e)} key={page}>
               <span class="text">{t(SETTINGS[page])}</span>
             </a>
           );

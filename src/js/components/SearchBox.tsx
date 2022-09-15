@@ -50,7 +50,6 @@ class SearchBox extends Component<Props, State> {
   }
 
   onInput(_e) {
-    console.log('onInput');
     this.search();
   }
 
@@ -86,6 +85,9 @@ class SearchBox extends Component<Props, State> {
       if (e.key === "Tab" && document.activeElement.tagName === 'BODY') {
           e.preventDefault();
           $(this.base).find('input').focus();
+      } else if (e.key === "Escape") {
+        this.close();
+        $(this.base).find('input').blur();
       }
     });
   }
@@ -129,8 +131,14 @@ class SearchBox extends Component<Props, State> {
     }
   }
 
+  preventUpDownDefault(e) {
+    if (e.keyCode === 38 || e.keyCode === 40) {
+      e.preventDefault();
+    }
+  }
+
   search() {
-    const query = this.props.query || $(this.base).find('input')[0].value;
+    const query = String(this.props.query || $(this.base).find('input').first().val());
     if (!query) {
       this.close();
       return;
@@ -171,7 +179,12 @@ class SearchBox extends Component<Props, State> {
         {this.props.resultsOnly ? '' : (
           <form onSubmit={e => this.onSubmit(e)}>
             <label>
-                <input type="text" onKeyUp={e => this.onKeyUp(e)} placeholder={t('search')} onInput={(e) => this.onInput(e)}/>
+                <input type="text"
+                       onKeyPress={e => this.preventUpDownDefault(e)}
+                       onKeyDown={e => this.preventUpDownDefault(e)}
+                       onKeyUp={e => this.onKeyUp(e)}
+                       placeholder={t('search')}
+                       onInput={(e) => this.onInput(e)}/>
             </label>
           </form>
         )}

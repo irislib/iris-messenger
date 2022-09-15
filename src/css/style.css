@@ -972,7 +972,8 @@ h1, .application-list a.logo span {
   }
 }
 
-.application-list a:hover, .application-list a:focus, .application-list a:active {
+.application-list a:hover, .application-list a:focus, .application-list a:active,
+.settings-list a:hover, .settings-list a:focus, .settings-list a:active{
   text-decoration: none;
 }
 
@@ -1035,6 +1036,10 @@ h1, .application-list a.logo span {
 }
 
 .settings-list a:hover {
+  background: var(--chat-hover);
+}
+
+.settings-list a:focus:not(.active), .application-list a:focus:not(.active) {
   background: var(--chat-hover);
 }
 
