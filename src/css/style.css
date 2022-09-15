@@ -415,7 +415,7 @@ a.logo img:not(:last-child) {
   margin-top: 0;
 }
 
-.search-box-results a.selected {
+.search-box-results .result.selected {
     background-color: var(--button-bg-hover);
 }
 

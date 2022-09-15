@@ -139,7 +139,7 @@ class Header extends Component {
       <div class="header-content">
         <div class="mobile-search-hidden ${this.state.showMobileSearch ? 'hidden-xs':''}">
           ${Helpers.isElectron || chatting ? '' : html`
-            <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
+            <a href="/" onClick=${e => this.onLogoClick(e)} class="visible-xs-flex logo">
               <div class="mobile-menu-icon">${Icons.menu}</div>
             </a>
           `}

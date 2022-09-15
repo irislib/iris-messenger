@@ -10,6 +10,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import SafeImg from './SafeImg';
 
+const RESULTS_MAX = 5;
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
 type Props = {
@@ -18,6 +19,7 @@ type Props = {
   focus?: boolean;
   resultsOnly?: boolean;
   class?: string;
+  tabIndex?: number;
 };
 
 type Result = {
@@ -38,20 +40,29 @@ type State = {
   query: string;
   noFollows: boolean;
   offsetLeft: number;
+  selected: number;
 }
 
 class SearchBox extends Component<Props, State> {
-  debouncedIndexAndSearch = _.debounce(() => {
-    this.search();
-  }, 200);
-
   constructor() {
     super();
-    this.state = {results:[], query: '', noFollows: true, offsetLeft: 0};
+    this.state = {results:[], query: '', noFollows: true, offsetLeft: 0, selected: 0};
   }
 
-  onInput() {
+  onInput(_e) {
+    console.log('onInput');
     this.search();
+  }
+
+  onKeyUp(e) {
+    // up and down buttons
+    if (e.keyCode === 38 || e.keyCode === 40) {
+      e.preventDefault();
+      const selected = this.state.selected;
+      let next = e.keyCode === 40 ? selected + 1 : selected - 1;
+      next = Math.max(0, Math.min(this.state.results.length - 1, next));
+      this.setState({selected: next});
+    }
   }
 
   close() {
@@ -71,9 +82,15 @@ class SearchBox extends Component<Props, State> {
     ));
     this.adjustResultsPosition();
     this.search();
+    $(document).off('keydown').on('keydown', (e) => {
+      if (e.key === "Tab" && document.activeElement.tagName === 'BODY') {
+          e.preventDefault();
+          $(this.base).find('input').focus();
+      }
+    });
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     this.adjustResultsPosition();
     if (prevProps.focus !== this.props.focus) {
       $(this.base).find('input:visible').focus();
@@ -81,6 +98,15 @@ class SearchBox extends Component<Props, State> {
     if (prevProps.query !== this.props.query) {
       this.search();
     }
+    // if first 5 results are different, set selected = 0
+    if (!_.isEqual(this.state.results.slice(0, this.state.selected + 1), prevState.results.slice(0, this.state.selected + 1))) {
+      this.setState({selected: 0});
+    }
+  }
+
+  // remove keyup listener on unmount
+  componentWillUnmount() {
+    $(document).off('keyup');
   }
 
   adjustResultsPosition() {
@@ -97,7 +123,7 @@ class SearchBox extends Component<Props, State> {
     el.val('');
     el.blur();
     // TODO go to first result
-    const selected = $(this.base).find('.search-box-results a.selected');
+    const selected = $(this.base).find('.result.selected');
     if (selected.length) {
       selected[0].click();
     }
@@ -123,29 +149,7 @@ class SearchBox extends Component<Props, State> {
     if (Session.followChatLink(query)) return;
 
     if (query) {
-      const results = Session.getSearchIndex().search(query).slice(0,5);
-      if (results.length) {
-        $(document).off('keyup').on('keyup', e => {
-          if (e.key === "Escape") { // escape key maps to keycode `27`
-            $(document).off('keyup');
-            this.close();
-          }
-          // up and down buttons
-          else if (e.keyCode === 38 || e.keyCode === 40) {
-            e.preventDefault();
-            const selected = $(this.base).find('.search-box-results a.selected');
-            if (selected.length) {
-              const next = e.keyCode === 38 ? selected.prev() : selected.next();
-              if (next.length) {
-                selected.removeClass('selected');
-                next.addClass('selected');
-              }
-            } else {
-              $(this.base).find('.search-box-results a').first().addClass('selected');
-            }
-          }
-        });
-      }
+      const results = Session.getSearchIndex().search(query).slice(0,RESULTS_MAX);
       this.setState({results, query});
     } else {
       this.setState({results:[], query});
@@ -167,7 +171,7 @@ class SearchBox extends Component<Props, State> {
         {this.props.resultsOnly ? '' : (
           <form onSubmit={e => this.onSubmit(e)}>
             <label>
-              <input type="text" placeholder={t('search')} onInput={() => this.onInput()}/>
+                <input type="text" onKeyUp={e => this.onKeyUp(e)} placeholder={t('search')} onInput={(e) => this.onInput(e)}/>
             </label>
           </form>
         )}
@@ -189,7 +193,7 @@ class SearchBox extends Component<Props, State> {
               followText = `${  i.followers.size  } followers`;
             }
             return (
-              <a className={index === 0 ? 'selected' : ''} href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
+              <a className={'result ' + (index === this.state.selected ? 'selected' : '')} href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
                 {i.photo ? <div class="identicon-container"><img src={i.photo} class="round-borders" height={40} width={40} alt=""/></div> : <Identicon key={`${i.key  }ic`} str={i.key} width={40} />}
                 <div>
                   {i.name || ''}<br/>
