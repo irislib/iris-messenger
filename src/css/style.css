@@ -1630,6 +1630,8 @@ hr {
 
   background: var(--chat-hover);
 }
+
+
 .chat-new-item-inner {
   padding: 0px 10px 0px 15px;
   align-items: center; 
@@ -1699,8 +1701,9 @@ small, .text-muted {
   background: var(--chat-active);
 }
 
-.chat-item:hover {
+.chat-item:hover, .chat-item:focus {
   background: var(--chat-hover);
+  outline: none;
 }
 
 .chat-item.new, .chat-item.public-messages {

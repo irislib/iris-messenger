@@ -28,6 +28,13 @@ class ChatListItem extends Component {
     ));
   }
 
+  onKeyUp(e) {
+    // if enter was pressed, click the element
+    if (e.keyCode === 13) {
+      e.target.click();
+    }
+  }
+
   render() {
     const chat = this.props.chat;
     const active = this.props.active ? "active-item" : "";
@@ -57,8 +64,9 @@ class ChatListItem extends Component {
 
     const onlineIndicator = chat.id.length > 36 ? html`<div class="online-indicator"></div>` : '';
 
+    // TODO use button so we can use keyboard to navigate
     return html`
-    <div class="chat-item ${activity} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => route(`/chat/${  this.props.chat.id}`)}>
+    <div onKeyUp=${e => this.onKeyUp(e)} role="button" tabindex="0" class="chat-item ${activity} ${hasUnseen} ${active} ${seen} ${delivered}" onClick=${() => route(`/chat/${  this.props.chat.id}`)}>
       ${iconEl}
       ${onlineIndicator}
       <div class="text">

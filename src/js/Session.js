@@ -531,7 +531,7 @@ function addChannel(chat) {
             });
           });
         }
-        State.local.get('channels').get(chat.uuid).get('participants').put(JSON.stringify(participants)); // TODO this is stringified because fundb doesn't handle object properly?
+        State.local.get('channels').get(chat.uuid).get('participants').put(JSON.stringify(participants));
       });
       chat.inviteLinks = {};
       chat.getChatLinks({callback: ({url, id}) => {

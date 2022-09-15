@@ -173,6 +173,10 @@ class SearchBox extends Component<Props, State> {
     this.close();
   }
 
+  onResultFocus(e, index) {
+    this.setState({selected: index});
+  }
+
   render() {
     return (
       <div class={`search-box ${this.props.class}`}>
@@ -184,11 +188,12 @@ class SearchBox extends Component<Props, State> {
                        onKeyDown={e => this.preventUpDownDefault(e)}
                        onKeyUp={e => this.onKeyUp(e)}
                        placeholder={t('search')}
+                       tabindex="1"
                        onInput={(e) => this.onInput(e)}/>
             </label>
           </form>
         )}
-        <div class="search-box-results" style="left: ${this.state.offsetLeft || ''}">
+        <div onKeyUp={e => this.onKeyUp(e)} class="search-box-results" style="left: ${this.state.offsetLeft || ''}">
           {this.state.results.map((r, index) => {
             const i = r.item;
             let followText = '';
@@ -206,7 +211,7 @@ class SearchBox extends Component<Props, State> {
               followText = `${  i.followers.size  } followers`;
             }
             return (
-              <a className={'result ' + (index === this.state.selected ? 'selected' : '')} href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
+              <a onFocus={e => this.onResultFocus(e, index)} tabindex="2" className={'result ' + (index === this.state.selected ? 'selected' : '')} href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
                 {i.photo ? <div class="identicon-container"><img src={i.photo} class="round-borders" height={40} width={40} alt=""/></div> : <Identicon key={`${i.key  }ic`} str={i.key} width={40} />}
                 <div>
                   {i.name || ''}<br/>
