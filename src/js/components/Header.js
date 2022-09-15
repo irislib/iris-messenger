@@ -137,7 +137,7 @@ class Header extends Component {
       </div>
       ` : ''}
       <div class="header-content">
-        <div class=${this.state.showMobileSearch ? 'hidden-xs':''}>
+        <div class="mobile-search-hidden ${this.state.showMobileSearch ? 'hidden-xs':''}">
           ${Helpers.isElectron || chatting ? '' : html`
             <a href="/" onClick=${e => this.onLogoClick(e)} tabindex="0" class="visible-xs-flex logo">
               <div class="mobile-menu-icon">${Icons.menu}</div>
@@ -145,14 +145,14 @@ class Header extends Component {
           `}
         </div>
         ${chatting ? '' : html`
-          <a class=${this.state.showMobileSearch ? '' : 'hidden-xs'} href="" onClick=${e => {
+          <a class="mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}" href="" onClick=${e => {
             e.preventDefault();
             this.setState({showMobileSearch: false})
           }}>
             <span class="visible-xs-inline-block">${Icons.backArrow}</span>
           </a>
         `}
-        <a href="/settings/peer" class="connected-peers tooltip ${this.state.showMobileSearch ? 'hidden-xs' : ''} ${peerCount ? 'connected' : ''}">
+        <a href="/settings/peer" class="connected-peers tooltip mobile-search-hidden ${this.state.showMobileSearch ? 'hidden-xs' : ''} ${peerCount ? 'connected' : ''}">
           <span class="tooltiptext">${t('connected_peers')}</span>
           <small>
             <span class="icon">${Icons.network}</span>
@@ -169,16 +169,16 @@ class Header extends Component {
           ${this.state.about ? html`<small class="participants">${this.state.about}</small>` : ''}
           ${this.chatId ? html`<small class="last-seen">${onlineStatus || ''}</small>` : ''}
           ${chatting ? '':html`
-            <div class=${this.state.showMobileSearch ? '' : 'hidden-xs'}>
+            <div id="mobile-search" class="mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}">
               ${searchBox}
             </div>
-            <div class=" ${this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'}" onClick=${() => {
+            <div id="mobile-search-btn" class="mobile-search-hidden ${this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'}" onClick=${() => {
+                // also synchronously make element visible so it can be focused
+                $('.mobile-search-visible').removeClass('hidden-xs hidden');
+                $('.mobile-search-hidden').removeClass('visible-xs-inline-block').addClass('hidden');
+                const input = document.querySelector('.search-box input');
+                input && input.focus();
                 this.setState({showMobileSearch: true});
-                // focus the search input
-                setTimeout(() => {
-                  const input = document.querySelector('.search-box input');
-                  input && input.focus();
-                });
             }}>
               ${Icons.search}
             </div>
@@ -202,7 +202,7 @@ class Header extends Component {
         ` : ''}
         <${Link} activeClassName="active"
              href="/notifications"
-             class="notifications-button ${this.state.showMobileSearch ? 'hidden' : ''}">
+             class="notifications-button mobile-search-hidden ${this.state.showMobileSearch ? 'hidden' : ''}">
           ${Icons.heartEmpty}
           ${this.state.unseenNotificationCount ? html`
             <span class="unseen">${this.state.unseenNotificationCount}</span>
