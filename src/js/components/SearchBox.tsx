@@ -61,6 +61,9 @@ class SearchBox extends Component<Props, State> {
 
   componentDidMount() {
     State.local.get('noFollows').on(this.inject());
+    State.local.get('searchIndexUpdated').on(this.sub(
+        () => this.search()
+    ));
     State.local.get('activeRoute').on(this.sub(
       () => {
         this.close();

@@ -42,7 +42,8 @@ const updateSearchIndex = _.throttle(() => {
   const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
   const values = Object.values(_.omit(searchableItems, Object.keys(State.getBlockedUsers())));
   searchIndex = new Fuse(values, options);
-}, 3000, {leading:true});
+  State.local.get('searchIndexUpdated').put(true);
+}, 1000, {leading:true});
 
 const taskQueue = [];
 setInterval(() => {
