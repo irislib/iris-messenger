@@ -78,6 +78,9 @@ class Group extends View {
             ${
               chat ? Object.keys(chat.participantProfiles).map(k => {
                 const profile = chat.participantProfiles[k];
+                if (!k || !profile) {
+                  return;
+                }
                 if (!(profile.permissions && profile.permissions.read && profile.permissions.write)) { return; }
                 return html`
                   <div class="flex-row">
@@ -258,9 +261,9 @@ class Group extends View {
       }
     }
     State.local.get('inviteLinksChanged').on(() => this.setState({inviteLinksChanged: !this.state.inviteLinksChanged}));
-    State.local.get('channels').get(this.props.id).get('participants').on(() => {
+    State.local.get('channels').get(this.props.id).get('participants').on(participants => {
       const isAdmin = areWeAdmin(pub);
-      this.setState({isAdmin});
+      this.setState({isAdmin, participants});
     });
     if (chat) {
       this.groupDidMount();
