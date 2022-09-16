@@ -11,20 +11,32 @@ import _ from 'lodash';
 
 // TODO: add group selector
 class Contacts extends View {
-  state = {sortedKeys: []};
+  state = {sortedKeys: [], nearbyUsers: null, group: null, allContacts: {}};
   id = "contacts-view";
-  contacts = {};
+  shownContacts = {};
+  allContacts = {};
 
   updateSortedKeys() {
-    const sortedKeys = Object.keys(this.contacts).sort((aK,bK) => {
-      const a = this.contacts[aK];
-      const b = this.contacts[bK];
+    const sortedKeys = Object.keys(this.shownContacts).sort((aK,bK) => {
+      const a = this.allContacts[aK];
+      const b = this.allContacts[bK];
+      if (!a && !b) return 0;
+      if (!a) return 1;
+      if (!b) return -1;
+      if (this.state.group === 'everyone') {
+        // sort by followers
+        if (a.followerCount !== b.followerCount) {
+          return b.followerCount - a.followerCount;
+        }
+      }
       if (!a.name && !b.name) return aK.localeCompare(bK);
       if (!a.name) return 1;
       if (!b.name) return -1;
       return a.name.localeCompare(b.name);
     });
-    _.remove(sortedKeys, k => k === Session.getPubKey());
+    if (this.state.group !== 'everyone') {
+      _.remove(sortedKeys, k => k === Session.getPubKey());
+    }
     this.setState({sortedKeys});
   }
 
@@ -33,13 +45,20 @@ class Contacts extends View {
   }
 
   componentDidMount() {
-    let contactsSub;
+    this.contactsSub && this.contactsSub.off();
+    State.local.get('contacts').on(this.sub(allContacts => {
+      this.allContacts = allContacts;
+      this.setState({allContacts});
+      this.updateSortedKeys();
+    }));
     State.local.get('filters').get('group').on(this.sub(group => {
-      this.contacts = {};
+      if (group === this.state.group) return;
+      this.shownContacts = {};
+      this.setState({group});
       State.local.get('groups').get(group).on(this.sub((contacts,k,x,e) => {
-        contactsSub && contactsSub.off();
-        contactsSub = e;
-        this.contacts = contacts;
+        this.contactsSub && this.contactsSub.off();
+        this.contactsSub = e;
+        this.shownContacts = contacts;
         this.updateSortedKeys();
       }));
     }));
@@ -65,7 +84,7 @@ class Contacts extends View {
                   <Name key="k{k}" pub={k} /><br />
                   <small class="follower-count">
                       {peer.name}<br />
-                      {this.contacts[k] && this.contacts[k].followers && this.contacts[k].followers.size || '0'} {t('followers')}
+                      {this.shownContacts[k] && this.shownContacts[k].followers && this.shownContacts[k].followers.size || '0'} {t('followers')}
                   </small>
                 </div>
               </a>
@@ -102,7 +121,7 @@ class Contacts extends View {
           <Filters /><br />
           <ScrollViewport>
             {keys.map(k => {
-              const contact = this.contacts[k];
+              const contact = this.state.allContacts[k] || {};
               return (
               <div key={k} class="profile-link-container">
                 <a href={`/profile/${k}`} class="profile-link">
