@@ -1,11 +1,13 @@
 import State from '../State';
 import Identicon from '../components/Identicon';
+import Filters from '../components/Filters';
 import {translate as t} from '../translations/Translation';
 import FollowButton from '../components/FollowButton';
 import Name from '../components/Name';
 import View from './View';
 import Session from '../Session';
 import ScrollViewport from 'preact-scroll-viewport';
+import _ from 'lodash';
 
 // TODO: add group selector
 class Contacts extends View {
@@ -22,6 +24,7 @@ class Contacts extends View {
       if (!b.name) return -1;
       return a.name.localeCompare(b.name);
     });
+    _.remove(sortedKeys, k => k === Session.getPubKey());
     this.setState({sortedKeys});
   }
 
@@ -30,17 +33,17 @@ class Contacts extends View {
   }
 
   componentDidMount() {
-    State.local.get('contacts').map(this.sub(
-      (contact, pub) => {
-        if (pub === Session.getPubKey()) { return; }
-        if (contact) {
-          this.contacts[pub] = contact;
-        } else {
-          delete this.contacts[pub];
-        }
+    let contactsSub;
+    State.local.get('filters').get('group').on(this.sub(group => {
+      this.contacts = {};
+      State.local.get('groups').get(group).on(this.sub((contacts,k,x,e) => {
+        contactsSub && contactsSub.off();
+        contactsSub = e;
+        this.contacts = contacts;
         this.updateSortedKeys();
-      }
-    ));
+      }));
+    }));
+
     State.electron && State.electron.get('bonjour').on(s => {
       const nearbyUsers = JSON.parse(s);
       console.log('nearbyUsers', nearbyUsers);
@@ -79,6 +82,7 @@ class Contacts extends View {
     if (keys.length === 0 && !this.state.nearbyUsers) {
       return (
       <div class="centered-container">
+        <Filters /><br />
         {t('no_contacts_in_list')}
       </div>)
     }
@@ -95,6 +99,7 @@ class Contacts extends View {
                 <h3>Others</h3>
               </>
           ):''}
+          <Filters /><br />
           <ScrollViewport>
             {keys.map(k => {
               const contact = this.contacts[k];
