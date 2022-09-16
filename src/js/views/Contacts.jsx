@@ -46,9 +46,9 @@ class Contacts extends View {
 
   componentDidMount() {
     this.contactsSub && this.contactsSub.off();
-    State.local.get('contacts').on(this.sub(allContacts => {
-      this.allContacts = allContacts;
-      this.setState({allContacts});
+    State.local.get('contacts').map(this.sub((contact, k) => {
+      this.allContacts[k] = contact;
+      this.setState({allContacts: this.allContacts});
       this.updateSortedKeys();
     }));
     State.local.get('filters').get('group').on(this.sub(group => {
@@ -131,7 +131,7 @@ class Contacts extends View {
                     <small class="follower-count">{contact.followerCount || '0'} {t('followers')}</small>
                   </div>
                 </a>
-                {k !== Session.getPubKey() ? (<FollowButton key={`f${k}`} id={k} />) : ''}
+                {(this.state.group !== 'follows' && k !== Session.getPubKey()) ? (<FollowButton key={`f${k}`} id={k} />) : ''}
               </div>);
             })}
           </ScrollViewport>
