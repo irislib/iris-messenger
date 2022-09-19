@@ -197,23 +197,14 @@ class SearchBox extends Component<Props, State> {
           {this.state.results.map((r, index) => {
             const i = r.item;
             let followText = '';
-            if (i.followDistance === 1) {
-              followText = 'Following';
-            }
-            if (i.followDistance > 1) {
-              /*
-              if (i.followers.size === 1 && Session.getFollows()[[...i.followers][0]] && Session.getFollows()[[...i.followers][0]].name) {
-                followText = `Followed by ${  Session.getFollows()[[...i.followers][0]].name}`;
-              } else {
-                followText = `${  i.followers.size  } followers`;
-              }
-              */
-              followText = `${  i.followers.size  } followers`;
+            if (i.followers) {
+              followText = (i.followDistance === 1) ? 'Following' : `${  i.followers.size  } followers`;
             }
             return (
               <a onFocus={e => this.onResultFocus(e, index)} tabIndex={2} className={'result ' + (index === this.state.selected ? 'selected' : '')} href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
                 {i.photo ? <div class="identicon-container"><img src={i.photo} class="round-borders" height={40} width={40} alt=""/></div> : <Identicon key={`${i.key  }ic`} str={i.key} width={40} />}
                 <div>
+
                   {i.name || ''}<br/>
                   <small>
                     {followText}
