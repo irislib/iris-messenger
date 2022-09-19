@@ -26,7 +26,7 @@ class Contacts extends View {
       if (this.state.group === 'everyone') {
         // sort by followers
         if (a.followerCount !== b.followerCount) {
-          return b.followerCount - a.followerCount;
+          return (b.followerCount || 0) - (a.followerCount || 0);
         }
       }
       if (!a.name && !b.name) return aK.localeCompare(bK);
@@ -119,22 +119,20 @@ class Contacts extends View {
               </>
           ):''}
           <Filters /><br />
-          <ScrollViewport>
-            {keys.map(k => {
-              const contact = this.state.allContacts[k] || {};
-              return (
-              <div key={k} class="profile-link-container">
-                <a href={`/profile/${k}`} class="profile-link">
-                  <Identicon key={`i${k}`} str={k} width={49} />
-                  <div>
-                    <Name key={`k${k}`} pub={k} /><br />
-                    <small class="follower-count">{contact.followerCount || '0'} {t('followers')}</small>
-                  </div>
-                </a>
-                {(this.state.group !== 'follows' && k !== Session.getPubKey()) ? (<FollowButton key={`f${k}`} id={k} />) : ''}
-              </div>);
-            })}
-          </ScrollViewport>
+          {keys.map(k => {
+            const contact = this.state.allContacts[k] || {};
+            return (
+            <div key={k} class="profile-link-container">
+              <a href={`/profile/${k}`} class="profile-link">
+                <Identicon key={`i${k}`} str={k} width={49} />
+                <div>
+                  <Name key={`k${k}`} pub={k} /><br />
+                  <small class="follower-count">{contact.followerCount || '0'} {t('followers')}</small>
+                </div>
+              </a>
+              {(this.state.group !== 'follows' && k !== Session.getPubKey()) ? (<FollowButton key={`f${k}`} id={k} />) : ''}
+            </div>);
+          })}
           {keys.length === 0 ? '—' : ''}
         </div>
       </div>
