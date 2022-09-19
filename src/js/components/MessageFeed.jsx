@@ -35,7 +35,7 @@ class MessageFeed extends Component {
             this.updateSortedMessages();
           }
         });
-      } else {
+      } else if (v.length < 45) { // filter out invalid hashes. TODO: where are they coming from?
         this.mappedMessages.set(k, v);
       }
     } else {
