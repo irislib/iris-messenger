@@ -129,6 +129,7 @@ export default class PrivateChat extends Component {
     let noLongerParticipant = true;
     const sortedParticipants = Object.keys(this.participants)
     .filter(k => {
+      if (k === 'undefined') return false;
       const p = this.participants[k];
       const hasPermissions = p && p.read && p.write;
       if (noLongerParticipant && hasPermissions && k === Session.getPubKey()) {
@@ -267,7 +268,7 @@ export default class PrivateChat extends Component {
 
   renderParticipantList() {
     const participants = this.state.sortedParticipants;
-    
+
     return this.props.id && this.props.id !== 'new' && this.props.id !== 'InviteView' && this.props.id !== 'QRView' && this.props.id.length < 40 ? html`
       <div class="participant-list ${this.state.showParticipants ? 'open' : ''}">
         ${participants.length ? html`

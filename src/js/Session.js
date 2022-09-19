@@ -520,6 +520,7 @@ function addChannel(chat) {
       });
       chat.on('about', v => State.local.get('channels').get(chat.uuid).get('about').put(v));
       chat.getParticipants(participants => {
+        delete participants.undefined; // TODO fix where it comes from
         if (typeof participants === 'object') {
           let keys = Object.keys(participants);
           keys.forEach((k, i) => {
@@ -530,7 +531,7 @@ function addChannel(chat) {
             });
           });
         }
-        State.local.get('channels').get(chat.uuid).get('participants').put(JSON.stringify(participants));
+        State.local.get('channels').get(chat.uuid).get('participants').put(participants);
       });
       chat.inviteLinks = {};
       chat.getChatLinks({callback: ({url, id}) => {
