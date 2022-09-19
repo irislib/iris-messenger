@@ -91,7 +91,6 @@ function removeFollow(k, followDistance, follower) {
   }
 }
 
-// TODO: don't re-call
 const getExtendedFollowsCalled = {};
 const getExtendedFollows = (callback, k, maxDepth = 3, currentDepth = 1) => {
   if (getExtendedFollowsCalled[k] <= currentDepth) {

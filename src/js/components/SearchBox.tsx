@@ -158,7 +158,6 @@ class SearchBox extends Component<Props, State> {
 
     if (query) {
       const results = Session.getSearchIndex().search(query).slice(0,RESULTS_MAX);
-      console.log('search results', results);
       this.setState({results, query});
     } else {
       this.setState({results:[], query});
@@ -199,7 +198,13 @@ class SearchBox extends Component<Props, State> {
             const i = r.item;
             let followText = '';
             if (i.followers) {
-              followText = (i.followDistance === 1) ? 'Following' : `${  i.followers.size  } followers`;
+              if (i.followDistance === 0) {
+                followText = 'You';
+              } else if (i.followDistance === 1) {
+                followText = 'Following';
+              } else {
+                followText = `${  i.followers.size  } followers`;
+              }
             }
             return (
               <a onFocus={e => this.onResultFocus(e, index)} tabIndex={2} className={'result ' + (index === this.state.selected ? 'selected' : '')} href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`} onClick={e => this.onClick(e, i)}>
