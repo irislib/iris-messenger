@@ -14,7 +14,7 @@ class Follows extends View {
     this.follows = new Set();
     this.followNames = new Map();
     this.id = "follows-view";
-    this.state = { follows: [] };
+    this.state = { follows: [], contacts: {} };
   }
 
   updateSortedFollows = throttle(() => {
@@ -66,6 +66,7 @@ class Follows extends View {
   componentDidMount() {
     if (this.props.id) {
       this.props.followers ? this.getFollowers() : this.getFollows();
+      State.local.get('contacts').on(this.inject());
     }
   }
 
@@ -82,7 +83,7 @@ class Follows extends View {
                 <${Identicon} str=${k} width=49/>
                 <div>
                   <${Name} pub=${k}/><br/>
-                  <small class="follower-count">${'0'} followers</small>
+                  <small class="follower-count">${this.state.contacts[k] && this.state.contacts[k].followerCount} followers</small>
                 </div>
               </a>
               ${k !== Session.getPubKey() ? html`<${FollowButton} id=${k}/>` : ''}
