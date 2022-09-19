@@ -59,6 +59,11 @@ class Contacts extends View {
         this.contactsSub && this.contactsSub.off();
         this.contactsSub = e;
         this.shownContacts = contacts;
+        for (let k in this.shownContacts) { // remove some invalid keys. TODO: why are they there?
+          if ((k.indexOf('~') === 0) || (k.length < 40)) {
+            delete this.shownContacts[k];
+          }
+        }
         this.updateSortedKeys();
       }));
     }));
