@@ -1304,6 +1304,10 @@ a.msg {
   align-items: flex-start;
 }
 
+.msg.their .msg-content, .msg.our .msg-content {
+  max-width: 75%;
+}
+
 .msg.their + .msg.our .msg-content, .day-separator + .msg.our .msg-content, .from-separator + .msg.our .msg-content {
   margin-top: 15px;
   border-radius: 8px 0px 8px 8px;
