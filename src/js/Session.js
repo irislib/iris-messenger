@@ -541,7 +541,7 @@ function addChannel(chat) {
       }});
     } else {
       State.local.get('groups').get('everyone').get(pub).put(true);
-      addFollow(null, pub, -1);
+      addFollow(null, pub, Infinity);
       State.public.user(pub).get('profile').get('name').on(v => State.local.get('channels').get(pub).get('name').put(v))
     }
     if (chat.put) {

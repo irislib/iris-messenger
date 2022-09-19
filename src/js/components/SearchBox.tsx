@@ -158,6 +158,7 @@ class SearchBox extends Component<Props, State> {
 
     if (query) {
       const results = Session.getSearchIndex().search(query).slice(0,RESULTS_MAX);
+      console.log('search results', results);
       this.setState({results, query});
     } else {
       this.setState({results:[], query});
