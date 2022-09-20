@@ -59,7 +59,7 @@ class CopyButton extends Component<Props, State> {
   render() {
     const text = this.state.copied ? t('copied') : (this.props.text || t('copy'));
     return (
-      <Button class="copy-button" onClick={e => this.onClick(e)}>
+      <Button className="copy-button" onClick={e => this.onClick(e)}>
         {text}
       </Button>
     );
