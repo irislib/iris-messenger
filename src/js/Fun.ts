@@ -14,11 +14,6 @@ localForage.config({
     driver: [localForage.LOCALSTORAGE, localForage.INDEXEDDB, localForage.WEBSQL]
 })
 
-const debug = false;
-function log(...args: any[]) {
-  debug && console.log(...args);
-}
-
 export default class Node {
     id: string;
     parent?: Node;
@@ -90,18 +85,15 @@ export default class Node {
 
     private doCallbacks = _.throttle(() => {
         for (const [id, callback] of this.on_subscriptions) {
-            log('on sub', this.id, this.value);
             const event = { off: () => this.on_subscriptions.delete(id) };
             this.once(callback, event, false);
         }
         if (this.parent) {
             for (const [id, callback] of this.parent.on_subscriptions) {
-                log('on sub', this.id, this.value);
                 const event = { off: () => this.parent.on_subscriptions.delete(id) };
                 this.parent.once(callback, event, false);
             }
             for (const [id, callback] of this.parent.map_subscriptions) {
-                log('map sub', this.id, this.value);
                 const event = { off: () => this.parent.map_subscriptions.delete(id) };
                 this.once(callback, event, false);
             }
@@ -117,6 +109,7 @@ export default class Node {
             for (const key in value) {
                 this.get(key).put(value[key]);
             }
+            _.defer(() => this.doCallbacks(), 100);
             return;
         }
         this.children = new Map();
@@ -140,14 +133,12 @@ export default class Node {
             result = await this.loadLocalForage();
         }
         if (result !== undefined || returnIfUndefined) {
-            log('once', this.id, result);
             callback && callback(result, this.id.slice(this.id.lastIndexOf('/') + 1), null, event);
             return result;
         }
     }
 
     on(callback: Function): void {
-        log('on', this.id);
         const id = this.counter++;
         this.on_subscriptions.set(id, callback);
         const event = { off: () => this.on_subscriptions.delete(id) };
@@ -155,7 +146,6 @@ export default class Node {
     }
 
     async map(callback: Function): Promise<any> {
-        log('map', this.id);
         const id = this.counter++;
         this.map_subscriptions.set(id, callback);
         const event = { off: () => this.map_subscriptions.delete(id) };
