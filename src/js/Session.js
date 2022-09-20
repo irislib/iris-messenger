@@ -577,6 +577,11 @@ function processMessage(chatId, msg, info) {
   if (info) {
     msg = Object.assign(msg, info);
   }
+  if (msg.invite) {
+    const chatLink = `https://iris.to/?channelId=${msg.invite.group}&inviter=${chatId}`;
+    newChannel(msg.invite.group, chatLink);
+    return;
+  }
   msg.selfAuthored = info.selfAuthored;
   State.local.get('channels').get(chatId).get('msgs').get(msg.time + (msg.from && msg.from.slice(0, 10))).put(JSON.stringify(msg));
   msg.timeObj = new Date(msg.time);

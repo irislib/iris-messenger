@@ -60,6 +60,8 @@ class Group extends View {
 
   onAddParticipant(add = true) {
     add && Session.channels[this.props.id].addParticipant(this.state.memberCandidate);
+    // send invite msg
+    Session.channels[this.state.memberCandidate].send({invite:{group:this.props.id}});
     this.setState({memberCandidate:null});
   }
 
