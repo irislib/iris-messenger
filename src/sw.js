@@ -1,4 +1,4 @@
-import Gun from 'oldgun';
+import SEA from 'gun/sea';
 import localforage from './js/lib/localforage.min';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { registerRoute } from 'workbox-routing';
@@ -77,13 +77,12 @@ self.addEventListener('push', async ev => {
   if (!data.title || !data.body) {
     console.log('what?', data);
   }
-  console.log('sw push', data);
   //console.log(self.irisKey, data.from, data.from.epub);
-  if (self.irisKey && data.from && data.from.epub && Gun.SEA) {
+  if (self.irisKey && data.from && data.from.epub && SEA) {
     // TODO we should also do a signature check here
-    const secret = await Gun.SEA.secret(data.from.epub, self.irisKey);
-    data.title = await Gun.SEA.decrypt(data.title, secret);
-    data.body = await Gun.SEA.decrypt(data.body, secret);
+    const secret = await SEA.secret(data.from.epub, self.irisKey);
+    data.title = await SEA.decrypt(data.title, secret);
+    data.body = await SEA.decrypt(data.body, secret);
   }
   if (data.title && data.title.indexOf('SEA{') === 0) {
     data.title = '';

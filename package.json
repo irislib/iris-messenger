@@ -61,7 +61,6 @@
     "jquery": "^3.6.0",
     "jsxstyle": "^2.5.1",
     "lodash": "^4.17.21",
-    "oldgun": "npm:gun@0.2020.1232",
     "preact": "^10.5.14",
     "preact-async-route": "2.2.1",
     "preact-custom-element": "^4.2.1",
