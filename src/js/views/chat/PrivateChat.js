@@ -125,7 +125,7 @@ export default class PrivateChat extends Component {
     });
   }
 
-  setSortedParticipants = _.debounce(() => {
+  setSortedParticipants = _.throttle(() => {
     let noLongerParticipant = true;
     const sortedParticipants = Object.keys(this.participants)
     .filter(k => {
@@ -150,7 +150,7 @@ export default class PrivateChat extends Component {
        return 0;
     });
     this.setState({sortedParticipants, noLongerParticipant});
-  }, 1000, {leading: true});
+  }, 2000, {leading: true});
 
   componentDidUpdate() {
     if (this.state.stickToBottom) {
