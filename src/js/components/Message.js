@@ -7,6 +7,7 @@ import Autolinker from 'autolinker';
 import iris from '../iris-lib';
 import $ from 'jquery';
 import State from '../State';
+import {route} from 'preact-router';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
@@ -60,9 +61,8 @@ class Message extends Component {
     return {seen, delivered};
   }
 
-  onNameClick(name) {
-    $('.new-msg').val(`${$('.new-msg').val().trim()  } @${name} `);
-    $('.new-msg').focus();
+  onNameClick() {
+    route('/chat/' + this.props.from);
   }
 
   openAttachmentsGallery(event) {
@@ -167,7 +167,7 @@ class Message extends Component {
       <div class="msg ${whose} ${seen} ${delivered}">
         <div class="msg-content">
           <div class="msg-sender">
-            ${name && this.props.showName && html`<small onclick=${() => this.onNameClick(name)} class="msgSenderName" style="color: ${color}">${name}</small>`}
+            ${name && this.props.showName && html`<small onclick=${() => this.onNameClick()} class="msgSenderName" style="color: ${color}">${name}</small>`}
           </div>
           ${this.props.torrentId ? html`
             <${Torrent} torrentId=${this.props.torrentId}/>

@@ -125,7 +125,7 @@ export default class PrivateChat extends Component {
     });
   }
 
-  setSortedParticipants() {
+  setSortedParticipants = _.debounce(() => {
     let noLongerParticipant = true;
     const sortedParticipants = Object.keys(this.participants)
     .filter(k => {
@@ -150,7 +150,7 @@ export default class PrivateChat extends Component {
        return 0;
     });
     this.setState({sortedParticipants, noLongerParticipant});
-  }
+  }, 1000)
 
   componentDidUpdate() {
     if (this.state.stickToBottom) {

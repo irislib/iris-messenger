@@ -22,7 +22,7 @@ export default class BlockedSettings extends Component {
         <h3>{t('blocked_users')}</h3>
         {blockedUsers.map(user => {
               if (this.state.blockedUsers[user]) {
-                return (<p><a href={`/profile/${  encodeURIComponent(user)}`} ><Text user={user} path="profile/name" placeholder="User" /></a></p>);
+                return (<p key={user}><a href={`/profile/${  encodeURIComponent(user)}`} ><Text user={user} path="profile/name" placeholder="User" /></a></p>);
               }
             }
           )

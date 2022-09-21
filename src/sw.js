@@ -21,7 +21,7 @@ registerRoute(
 	new NetworkOnly()
 );
 registerRoute(
-  () => true,
+  () => location.host !== 'localhost:8080',
   new StaleWhileRevalidate()
 );
 setupRouting();
