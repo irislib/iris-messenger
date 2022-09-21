@@ -510,6 +510,7 @@ function addChannel(chat) {
       let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       chat.participantProfiles = {};
       chat.on('name', v => {
+        chat.name = v;
         searchableItems[chat.uuid] = {name: v, uuid: chat.uuid};
         State.local.get('channels').get(chat.uuid).get('name').put(v);
       });
