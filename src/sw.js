@@ -21,7 +21,7 @@ registerRoute(
 	new NetworkOnly()
 );
 registerRoute(
-  () => location.host !== 'localhost:8080',
+  () => location.host.indexOf('localhost') !== 0,
   new StaleWhileRevalidate()
 );
 setupRouting();
@@ -58,7 +58,7 @@ function getOpenClient(event) {
       .then((clientList) => {
         for (let i = 0; i < clientList.length; i++) {
           let client = clientList[i];
-          if (client.url === urlToOpen && 'focus' in client) return resolve(client);
+          return resolve(client);
         }
         resolve(null);
       })
@@ -68,8 +68,6 @@ function getOpenClient(event) {
 
 self.addEventListener('push', async ev => {
   console.log('Got push', ev);
-  const client = await getOpenClient(ev);
-  if (client && client.visibilityState === 'visible') return;
   if (!self.irisKey) {
     await getSavedKey();
   }
@@ -77,6 +75,9 @@ self.addEventListener('push', async ev => {
   if (!data.title || !data.body) {
     console.log('what?', data);
   }
+  const client = await getOpenClient(ev);
+  const fromSelf = (data.from && data.from.pub) === self.irisKey.pub; // always allow notifs from self
+  if (!fromSelf && client && client.visibilityState === 'visible') return;
   //console.log(self.irisKey, data.from, data.from.epub);
   if (self.irisKey && data.from && data.from.epub && SEA) {
     // TODO we should also do a signature check here
