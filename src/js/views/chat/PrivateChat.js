@@ -150,7 +150,7 @@ export default class PrivateChat extends Component {
        return 0;
     });
     this.setState({sortedParticipants, noLongerParticipant});
-  }, 1000)
+  }, 1000, {leading: true});
 
   componentDidUpdate() {
     if (this.state.stickToBottom) {

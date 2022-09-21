@@ -7,7 +7,9 @@
     "serve": "sirv build --port 8080 --cors --single",
     "dev": "preact watch --host localhost --sw",
     "lint": "eslint src",
-    "test": "jest"
+    "test": "jest",
+    "build:lib": "echo 'placeholder for building lib'",
+    "build:docs": "documentation build src/js/iris-lib/** -f html -o docs"
   },
   "eslintConfig": {
     "extends": "preact",
@@ -36,6 +38,7 @@
     "@types/lodash": "4.14.182",
     "@types/react-helmet": "6.1.5",
     "@types/webtorrent": "0.109.3",
+    "documentation": "^14.0.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-preact-pure": "^3.1.0",
     "eslint": "^7.32.0",
