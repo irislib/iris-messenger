@@ -118,6 +118,7 @@ async function subscribe(reg) {
 }
 
 async function subscribeToWebPush() {
+  console.log('subscribing to web push', navigator.serviceWorker);
   if (!desktopNotificationsEnabled() || !navigator.serviceWorker) { return false; }
   await navigator.serviceWorker.ready;
   const reg = await navigator.serviceWorker.getRegistration();

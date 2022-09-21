@@ -40,12 +40,13 @@ async function getSavedKey() {
   return self.irisKey;
 }
 
-self.onmessage = function(msg) {
-  if (Object.prototype.hasOwnProperty.call(msg, 'key')) {
+self.addEventListener('message', (msg) => {
+  //console.log('sw got postMessage from client', msg);
+  if (msg.data && msg.data.key) {
     self.irisKey = msg.data.key;
     localforage.setItem('swIrisKey', self.irisKey);
   }
-}
+});
 
 function getOpenClient(event) {
   return new Promise(resolve => {
@@ -66,6 +67,7 @@ function getOpenClient(event) {
 }
 
 self.addEventListener('push', async ev => {
+  console.log('Got push', ev);
   const client = await getOpenClient(ev);
   if (client && client.visibilityState === 'visible') return;
   if (!self.irisKey) {
@@ -77,7 +79,7 @@ self.addEventListener('push', async ev => {
   }
   console.log('sw push', data);
   //console.log(self.irisKey, data.from, data.from.epub);
-  if (self.irisKey && data.from && data.from.epub) {
+  if (self.irisKey && data.from && data.from.epub && Gun.SEA) {
     // TODO we should also do a signature check here
     const secret = await Gun.SEA.secret(data.from.epub, self.irisKey);
     data.title = await Gun.SEA.decrypt(data.title, secret);
