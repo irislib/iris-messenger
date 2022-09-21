@@ -54,7 +54,10 @@ class FeedMessageForm extends MessageForm {
     }
     this.sendPublic(msg).then(hash => {
       if (this.props.replyingToUser && this.props.replyingToUser !== Session.getPubKey()) {
+        const title = `${Session.getMyName()  } replied to your message`;
+        const body = `'${text.length > 100 ? `${text.slice(0, 100)  }...` : text}'`;
         Notifications.sendIrisNotification(this.props.replyingToUser, {event:'reply', target: hash});
+        Notifications.sendWebPushNotification(this.props.replyingToUser, {title,body});
       }
       const mentions = text.match(Helpers.pubKeyRegex);
       if (mentions) {

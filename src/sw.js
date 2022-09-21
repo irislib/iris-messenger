@@ -10,14 +10,13 @@ const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
 });
 
 registerRoute(
-	'https://iris-notifications.herokuapp.com/notify',
+  ({ request }) => request.method === 'POST',
 	new NetworkOnly({
 		plugins: [bgSyncPlugin]
-	}),
-	'POST'
+	})
 );
 registerRoute(
-	'/peer_id',
+  ({ url }) => url.pathname === '/peer_id',
 	new NetworkOnly()
 );
 registerRoute(

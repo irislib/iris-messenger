@@ -7,6 +7,7 @@ import iris from './iris-lib';
 import Gun from 'gun';
 import $ from 'jquery';
 
+const NOTIFICATION_SERVICE_URL = 'https://iris-notifications.herokuapp.com/notify';
 const notificationSound = new Audio('../../assets/audio/notification.mp3');
 let loginTime;
 let unseenMsgsTotal = 0;
@@ -252,9 +253,43 @@ async function sendIrisNotification(recipient, notification) {
   State.public.user().get('notifications').get(recipient).put(enc);
 }
 
+async function sendWebPushNotification(recipient, notification) {
+  console.log('sending web push notification to', recipient, notification);
+  const channel = Session.channels[recipient];
+  if (!channel) { return; }
+  const myKey = Session.getKey();
+  const shouldWebPush = (recipient === myKey.pub) || !(channel.activity && channel.activity.isActive);
+  if (shouldWebPush && channel.webPushSubscriptions) {
+    const subscriptions = [];
+    const participants = Object.keys(channel.webPushSubscriptions);
+    for (let i = 0; i < participants.length; i++) {
+      const participant = participants[i];
+      const secret = await channel.getSecret(participant);
+      const payload = {
+        title: await Gun.SEA.encrypt(notification.title, secret),
+        body: await Gun.SEA.encrypt(notification.body, secret),
+        from:{pub: myKey.pub, epub: myKey.epub}
+      };
+      channel.webPushSubscriptions[participant].forEach(s => {
+        if (s && s.endpoint) {
+          subscriptions.push({subscription: s, payload});
+        }
+      });
+    }
+    if (subscriptions.length === 0) {return;}
+    fetch(NOTIFICATION_SERVICE_URL, {
+      method: 'POST',
+      body: JSON.stringify({subscriptions}),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).catch(() => {});
+  }
+}
+
 function init() {
   loginTime = new Date();
   unseenMsgsTotal = 0;
 }
 
-export default {init, notifyMsg, getNotificationText, changeUnseenNotificationCount, subscribeToIrisNotifications, sendIrisNotification, enableDesktopNotifications, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};
+export default {init, notifyMsg, getNotificationText, sendWebPushNotification, changeUnseenNotificationCount, subscribeToIrisNotifications, sendIrisNotification, enableDesktopNotifications, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};

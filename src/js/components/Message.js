@@ -62,7 +62,7 @@ class Message extends Component {
   }
 
   onNameClick() {
-    route('/chat/' + this.props.from);
+    route(`/chat/${  this.props.from}`);
   }
 
   openAttachmentsGallery(event) {

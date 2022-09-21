@@ -139,7 +139,11 @@ class PublicMessage extends Message {
     if (liked) {
       const author = this.state.msg && this.state.msg.info && this.state.msg.info.from;
       if (author !== Session.getPubKey()) {
+        const t = (this.state.msg.text || '').trim();
+        const title =  `${Session.getMyName()  } liked your post`;
+        const body = `'${t.slice(0, 100)}${t.length > 100 ? '...' : ''}'`;
         Notifications.sendIrisNotification(author, {event:'like', target: this.props.hash});
+        Notifications.sendWebPushNotification(author, {title, body});
       }
     }
   }

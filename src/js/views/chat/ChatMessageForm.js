@@ -8,10 +8,8 @@ import iris from '../../iris-lib';
 import _ from 'lodash';
 import $ from 'jquery';
 import EmojiButton from '../../lib/emoji-button';
-import Gun from 'gun';
 import MessageForm from '../../components/MessageForm';
-
-const notificationServiceUrl = 'https://iris-notifications.herokuapp.com/notify';
+import Notifications from '../../Notifications';
 
 const submitButton = html`
   <button type="submit">
@@ -176,38 +174,15 @@ class ChatMessageForm extends MessageForm {
     this.setState({torrentId:null});
   }
 
-  async webPush(msg) {
+  webPush(msg) {
     const chat = Session.channels[this.props.activeChat];
     const myKey = Session.getKey();
     const shouldWebPush = (this.props.activeChat === myKey.pub) || !(chat.activity && chat.activity.isActive);
-    if (shouldWebPush && chat.webPushSubscriptions) {
-      const subscriptions = [];
-      const participants = Object.keys(chat.webPushSubscriptions);
-      for (let i = 0; i < participants.length; i++) {
-        const participant = participants[i];
-        const secret = await chat.getSecret(participant);
-        const myName = Session.getMyName();
-        const titleText = chat.uuid ? chat.name : myName;
-        const bodyText = chat.uuid ? `${myName}: ${msg.text}` : msg.text;
-        const payload = {
-          title: await Gun.SEA.encrypt(titleText, secret),
-          body: await Gun.SEA.encrypt(bodyText, secret),
-          from:{pub: myKey.pub, epub: myKey.epub}
-        };
-        chat.webPushSubscriptions[participant].forEach(s => {
-          if (s && s.endpoint) {
-            subscriptions.push({subscription: s, payload});
-          }
-        });
-      }
-      if (subscriptions.length === 0) {return;}
-      fetch(notificationServiceUrl, {
-        method: 'POST',
-        body: JSON.stringify({subscriptions}),
-        headers: {
-          'content-type': 'application/json'
-        }
-      }).catch(() => {});
+    if (shouldWebPush) {
+      const myName = Session.getMyName();
+      const title = chat.uuid ? chat.name : myName;
+      const body = chat.uuid ? `${myName}: ${msg.text}` : msg.text;
+      Notifications.sendWebPushNotification(this.props.activeChat, {title, body});
     }
   }
 
