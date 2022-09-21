@@ -200,6 +200,7 @@ class ChatMessageForm extends MessageForm {
           }
         });
       }
+      if (subscriptions.length === 0) {return;}
       fetch(notificationServiceUrl, {
         method: 'POST',
         body: JSON.stringify({subscriptions}),
