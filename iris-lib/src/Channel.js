@@ -558,7 +558,7 @@ class Channel {
           if (o.from && o.from !== pub) { return; }
           if (permissions.write) {
             this._onTheirGroupFromUser(pub, o.key, o.callback);
-          } else {  // unsubscribe
+          } else { // unsubscribe
             o.event && o.event.off();
           }
         });
@@ -731,7 +731,7 @@ class Channel {
     });
   }
 
-  async onTheirDirect(key, callback, from) {  // TODO: subscribe to new channel participants
+  async onTheirDirect(key, callback, from) { // TODO: subscribe to new channel participants
     if (typeof callback !== 'function') {
       throw new Error(`onTheir callback must be a function, got ${typeof callback}`);
     }
@@ -954,7 +954,7 @@ class Channel {
     const typingIndicator = util.createElement('div', 'iris-typing-indicator', chatBox);
     typingIndicator.innerText = 'typing...';
     this.getTyping(isTyping => {
-      typingIndicator.setAttribute('class', `iris-typing-indicator${  isTyping ? ' yes' : ''}`);
+      typingIndicator.setAttribute('class', `iris-typing-indicator${ isTyping ? ' yes' : ''}`);
     });
 
     const inputWrapper = util.createElement('div', 'iris-chat-input-wrapper', chatBox);
@@ -978,13 +978,13 @@ class Channel {
       const pub = participants[0];
       this.gun.user(pub).get('profile').get('name').on(name => nameEl.innerText = name);
       Channel.getActivity(this.gun, pub, status => {
-        const cls = `iris-online-indicator${  status.isActive ? ' yes' : ''}`;
+        const cls = `iris-online-indicator${ status.isActive ? ' yes' : ''}`;
         onlineIndicator.setAttribute('class', cls);
         const undelivered = messages.querySelectorAll('.iris-chat-message:not(.delivered)');
         undelivered.forEach(msg => {
           if (msg.getAttribute('data-time') <= status.lastActive) {
             const c = msg.getAttribute('class');
-            msg.setAttribute('class', `${c  } delivered`);
+            msg.setAttribute('class', `${c } delivered`);
           }
         });
       });
@@ -997,7 +997,7 @@ class Channel {
         if (msgEl.getAttribute('data-time') <= time) {
           const msgClass = msgEl.getAttribute('class');
           if (msgClass.indexOf('delivered') === -1) {
-            msgEl.setAttribute('class', `${msgClass  } delivered`);
+            msgEl.setAttribute('class', `${msgClass } delivered`);
           }
           indicator.setAttribute('class', 'iris-seen yes');
         }
@@ -1041,7 +1041,7 @@ class Channel {
         const content = textArea.value;
         const caret = util.getCaret(textArea);
         if (event.shiftKey) {
-          textArea.value = `${content.substring(0, caret - 1)  }\n${  content.substring(caret, content.length)}`;
+          textArea.value = `${content.substring(0, caret - 1) }\n${ content.substring(caret, content.length)}`;
         } else {
           textArea.value = content.substring(0, caret - 1) + content.substring(caret, content.length);
           this.send(textArea.value);

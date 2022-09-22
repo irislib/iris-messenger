@@ -13,7 +13,7 @@ import View from './View';
 import SearchBox from '../components/SearchBox';
 import {SMS_VERIFIER_PUB} from '../SMS';
 import $ from 'jquery';
-import iris from '../iris-lib';
+import iris from 'iris-lib';
 import Button from '../components/basic/Button';
 
 function deleteChat(uuid) {

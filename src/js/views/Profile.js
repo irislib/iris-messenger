@@ -16,7 +16,7 @@ import View from './View';
 import { Link } from 'preact-router/match';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min';
-import iris from '../iris-lib';
+import iris from 'iris-lib';
 import {Helmet} from "react-helmet";
 import {SMS_VERIFIER_PUB} from '../SMS';
 import ProfilePhoto from '../components/ProfilePhoto';

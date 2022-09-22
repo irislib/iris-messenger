@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
 import State from '../State';
-import iris from '../iris-lib';
+import iris from 'iris-lib';
 import Identicon from 'identicon.js';
 import SafeImg from './SafeImg';
 import styled from 'styled-components';

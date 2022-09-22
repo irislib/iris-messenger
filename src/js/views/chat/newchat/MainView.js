@@ -7,7 +7,7 @@ import Button from '../../../components/basic/Button';
 import $ from 'jquery';
 import Component from '../../../BaseComponent';
 import { route } from 'preact-router';
-import iris from '../../../iris-lib';
+import iris from 'iris-lib';
 
 class MainView extends Component {
     constructor() {

@@ -1,0 +1,12 @@
+es
+cjs
+node_modules
+coverage
+*.log
+test-report.html
+jest-stare
+.iris
+.idea
+.env
+radata
+*.key

@@ -9,7 +9,7 @@ import _ from 'lodash';
 import Fun from './Fun';
 
 import PeerManager from './PeerManager';
-import iris from './iris-lib';
+import iris from 'iris-lib';
 import Helpers from './Helpers';
 
 const State = {

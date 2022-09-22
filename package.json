@@ -6,10 +6,9 @@
     "build": "preact build --no-prerender",
     "serve": "sirv build --port 8080 --cors --single",
     "dev": "preact watch --host localhost --sw",
-    "lint": "eslint src",
+    "lint": "eslint src;eslint iris-lib/src",
     "test": "jest",
-    "build:lib": "echo 'placeholder for building lib'",
-    "build:docs": "documentation build src/js/iris-lib/** -f html -o docs"
+    "build:docs": "documentation build iris-lib/src/** -f html -o docs"
   },
   "eslintConfig": {
     "extends": "preact",
@@ -50,6 +49,7 @@
     "webpack-build-notifier": "^2.3.0"
   },
   "dependencies": {
+    "iris-lib": "file:./iris-lib",
     "@walletconnect/web3-provider": "^1.7.8",
     "@zxing/library": "^0.18.6",
     "aether-torrent": "^0.3.0",

@@ -1,0 +1,135 @@
+{
+  "name": "iris-lib",
+  "version": "0.0.159",
+  "description": "Basic tools for reading and writing Iris messages and identities.",
+  "main": "src/index.js",
+  "react-native": {
+    "fs": false
+  },
+  "browser": "dist/iris.js",
+  "module": "es/index.js",
+  "jsxnext:main": "es/index.js",
+  "jest": {
+    "testURL": "http://localhost/",
+    "bail": true,
+    "forceExit": true,
+    "testEnvironment": "jsdom",
+    "verbose": true,
+    "collectCoverage": true,
+    "watchPathIgnorePatterns": [
+      "jest-results.json",
+      "jest-stare.*",
+      ""
+    ],
+    "reporters": [
+      "default",
+      [
+        "./node_modules/jest-html-reporter",
+        {
+          "pageTitle": "Test Report",
+          "includeFailureMsg": true,
+          "includeConsoleLog": true
+        }
+      ],
+      "jest-stare"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/yarn_dev/",
+      "/yarn_prod/"
+    ],
+    "modulePaths": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/cjs/"
+    ]
+  },
+  "files": [
+    "dist",
+    "cjs",
+    "es",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "release": "release-it",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
+    "lint": "yarn run lint:eslint",
+    "lint:eslint": "eslint src/*.js",
+    "lint:flow": "flow --color always",
+    "test": "clear && jest",
+    "test:coverage": "jest --coverage ",
+    "test:watch": "clear && yarn build:cjs && jest --watchAll",
+    "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
+    "test:all": "yarn lint:test && yarn lint && yarn test:coverage --runInBand",
+    "lint:test": "yarn run lint && npm run test:coverage",
+    "build": "clear && npm run build:cjs && npm run lint:test && npm run build:es && npm run build:umd && npm run build:docs",
+    "build:watch": "clear && rimraf cjs && cross-env BABEL_ENV=cjs babel -w src --out-dir cjs",
+    "build:es": "rimraf es && cross-env BABEL_ENV=es babel src --out-dir es",
+    "build:cjs": "rimraf cjs && cross-env BABEL_ENV=cjs babel src --out-dir cjs",
+    "build:umd": "rimraf dist && cross-env BABEL_ENV=es rollup -c & cross-env BABEL_ENV=es NODE_ENV=production rollup -c",
+    "build:umdev": "rimraf dist && cross-env BABEL_ENV=es rollup -c",
+    "build:docs": "documentation build src/** -f html -o docs --config documentation.yml",
+    "build:run": "clear && rimraf cjs && cross-env BABEL_ENV=cjs yarn nodemon src/server.js --watch src --exec babel-node",
+    "dev": "concurrently -n build,tests \"yarn build:watch\" \"yarn test:watch\"",
+    "dev:server": "concurrently -n build,tests,server \"yarn build:watch\" \"yarn test:watch\" \"yarn build:run\"",
+    "serve": "node cjs/server.js",
+    "start": "node cjs/server.js",
+    "heroku-postbuild": "echo \"not running build script\""
+  },
+  "keywords": [],
+  "author": "Martti Malmi (martti.malmi@iki.fi)",
+  "license": "MIT",
+  "repository": "https://github.com/irislib/iris-lib",
+  "homepage": "https://github.com/irislib/iris-lib",
+  "devDependencies": {
+    "@babel/core": "^7.19.1",
+    "@babel/node": "^7.19.1",
+    "@babel/preset-env": "^7.19.1",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-plugin-add-module-exports": "^1.0.4",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1",
+    "concurrently": "^4.1.1",
+    "coveralls": "^3.0.2",
+    "cross-env": "^5.2.0",
+    "documentation": "^9.1.1",
+    "eslint": "^8.23.1",
+    "flow-bin": "^0.79.1",
+    "http-server": "^0.12.1",
+    "jest": "^23.5.0",
+    "jest-html-reporter": "^2.5.0",
+    "jest-stare": "^1.16.0",
+    "jquery": "^3.4.1",
+    "nodemon": "^1.19.1",
+    "release-it": "^12.3.0",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.65.0",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-commonjs": "^9.1.6",
+    "rollup-plugin-filesize": "^4.0.1",
+    "rollup-plugin-hypothetical": "^2.1.0",
+    "rollup-plugin-ignore": "^1.0.4",
+    "rollup-plugin-json": "^3.0.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.2.1",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-terser": "^1.0.1"
+  },
+  "peerDependencies": {
+    "gun": "^0.2020.1238"
+  },
+  "dependencies": {
+    "fuse.js": "^6.6.2",
+    "htm": "^3.1.1",
+    "identicon.js": "^2.3.3",
+    "jsxstyle": "^2.5.1",
+    "preact": "^10.11.0",
+    "preact-custom-element": "^4.2.1"
+  }
+}

@@ -1,0 +1,112 @@
+<html>
+<head>
+  <title>identifi-lib</title>
+  <!--<script type="text/javascript" src="../dist/iris.js"></script>-->
+  <script type="text/javascript" src="./assets/gun.js"></script>
+  <script type="text/javascript" src="./assets/gun.then.js"></script>
+  <script type="text/javascript" src="./assets/gun.open.js"></script>
+  <script type="text/javascript" src="../dist/iris.js"></script>
+  <script src="script.js"></script>
+  <link rel="stylesheet" href="./assets/bootstrap.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Saving the world with identifi-lib</h1>
+
+    <p>The building blocks of Identifi data are digitally signed <b>Messages</b>
+    which are typically <i>verifications</i> or <i>ratings</i>.</p>
+
+    <p>Ratings are used to build a <i>web of trust</i>. Your web of trust consists
+    of the identities that you have rated positively, the identities that they have rated
+    positively and so on, up to an arbitrary <i>trust distance</i>.</p>
+
+    <p>Verifications are claims that certain <b>Attributes</b>
+    (name, email, bitcoin address etc.) belong to the same <b>Identity</b>.
+    Verifications from your web of trust are used to bundle together
+    attributes into Identity objects.</p>
+
+    <p>Identifi-lib can be used to read and write <b>Indices</b> of Messages and
+    Identities. An Identifi Index typically contains four indices:
+    <i>messagesByTimestamp</i>, <i>messagesByTrustDistance</i>,
+    <i>identitiesByTrustDistance</i> and <i>identitiesBySearchKey</i>.</p>
+
+    <p>Identifi messages and indexes are stored on GUN. Additionally, messages are saved to IPFS.</p>
+
+    <h2>Including the library</h2>
+    <h3>Browser</h3>
+    <pre>&lt;script type="text/javascript" src="https://unpkg.com/identifi-lib/dist/iris.min.js">&lt;/script></pre>
+    <p>The lib will be available as <i>window.irisLib</i>.</p>
+
+    <h3>Node.js</h3>
+    <pre>npm install identifi-lib</pre>
+
+    <!--
+    <h2>index = await Index.load(indexRootIpfsUri)</h2>
+    <p>Load an Index from a given index root IPFS/IPNS URI. If ipfsUri is undefined,
+    identi.fi index is loaded by default. As of April 2018, identi.fi index consists
+    mostly of data crawled from bitcoin-otc.com.</p>
+    -->
+
+    <h2>index.search(value, type, callback, limit)</h2>
+    <p>Search an identifi index for identitiesBySearchKey. Callback is called for each result.</p>
+    <input type="text" value="ma" id="query" onkeyup="search()" class="form-control">
+    <p id="searchResults"></p>
+
+    <p>You can create a similar search widget with:</p>
+    <pre>window.irisLib.Identity.appendSearchWidget(parentElement, index);</pre>
+    <p id="searchWidget"></p>
+
+    <h2>index.get([type,] value)</h2>
+    <p>Search the identitiesBySearchKey index using type and value. If an exact
+    match is found, the resulting Identity object is returned. If type is not defined,
+    it will be guessed using a regex list.</p>
+    <p><input type="text" value="martti@moni.com" id="profileQuery" onkeyup="getProfile()" class="form-control"></p>
+    <textarea style="width:100%" rows=10 id="profileResults" class="form-control"></textarea>
+
+    <h3>identity.identicon(100)</h3>
+    <p>Generate identicon of width 100px:</p>
+    <p id="identicon"></p>
+
+    <h3>identity.verified('name')</h3>
+    <p>Get the most verified attribute of type 'name':</p>
+    <p>Result: <b id="verifiedAttribute"></b></p>
+
+    <h2>Create, sign and publish a message</h2>
+    <pre>msg = await Message.createRating(</pre>
+    <textarea id="ratingMsg" style="width: 100%" rows=12 class="form-control">
+      {
+        "author": {
+          name: "Alice",
+          email: "alice@example.com"
+        },
+        "recipient": {
+          name: "Bob",
+          keyID: "4321DCBA"
+        },
+        "rating": 10,
+        "comment": "Good"
+      }</textarea>
+    <pre>
+);
+key = await util.getDefaultKey();</pre>
+    <p><input type="button" value="msg.sign(key);" id="signMsg" class="btn btn-primary"></p>
+    <pre id="signMsgResult"></pre>
+    <p><input type="button" value="index.addMessage(msg);" id="publishMsg" class="btn btn-primary"></p>
+    <pre id="publishMsgResult"></pre>
+    <p id="publishMsgResultLink"></p>
+
+    <p>Possible applications:</p>
+    <ul>
+      <li>Contact details search in any application</li>
+      <li>Finding payment addresses in crypto wallets</li>
+      <li>Finding public keys of other users in encrypted instant messaging apps</li>
+      <li>Finding network addresses of servers (instead of using DNS)</li>
+      <li>Filter out untrusted content in decentralized social media</li>
+      <li>Browser plugin to filter the content in existing social media</li>
+      <li>Email spam filtering</li>
+      <li>Filter reviews on marketplace platforms (Airbnb, eBay, Uber, LocalBitcoins)</li>
+      <li>Uncensorable platforms for dispute announcement and resolution</li>
+    </ul>
+  </div>
+</body>
+</html>

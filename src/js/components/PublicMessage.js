@@ -10,7 +10,7 @@ import Session from '../Session';
 import Torrent from './Torrent';
 import Icons from '../Icons';
 import Autolinker from 'autolinker';
-import iris from '../iris-lib';
+import iris from 'iris-lib';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
 import Notifications from '../Notifications';

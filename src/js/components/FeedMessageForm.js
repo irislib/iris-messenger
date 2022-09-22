@@ -9,7 +9,7 @@ import SafeImg from './SafeImg';
 import Torrent from './Torrent';
 import $ from 'jquery';
 import EmojiButton from '../lib/emoji-button';
-import iris from '../iris-lib';
+import iris from 'iris-lib';
 import SearchBox from './SearchBox';
 import MessageForm from './MessageForm';
 

@@ -4,7 +4,7 @@ import { html } from 'htm/preact';
 import Session from '../Session';
 import Torrent from './Torrent';
 import Autolinker from 'autolinker';
-import iris from '../iris-lib';
+import iris from 'iris-lib';
 import $ from 'jquery';
 import State from '../State';
 import {route} from 'preact-router';

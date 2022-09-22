@@ -3,7 +3,7 @@ import Session from '../../../Session';
 import $ from 'jquery';
 import Component from '../../../BaseComponent';
 import Button from '../../../components/basic/Button';
-import iris from '../../../iris-lib';
+import iris from 'iris-lib';
 import { route } from 'preact-router';
 import State from '../../../State';
 

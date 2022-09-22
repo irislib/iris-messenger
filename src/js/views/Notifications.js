@@ -5,7 +5,7 @@ import Button from '../components/basic/Button';
 import {translate as t} from '../translations/Translation';
 import Name from '../components/Name';
 import View from './View';
-import iris from '../iris-lib';
+import iris from 'iris-lib';
 import PublicMessage from "../components/PublicMessage";
 import NotificationTools from "../Notifications";
 

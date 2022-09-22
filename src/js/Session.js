@@ -4,7 +4,7 @@ import Notifications from './Notifications';
 import Helpers from './Helpers';
 import PeerManager from './PeerManager';
 import { route } from 'preact-router';
-import iris from './iris-lib';
+import iris from 'iris-lib';
 import _ from 'lodash';
 import Fuse from "./lib/fuse.basic.esm.min";
 import localforage from './lib/localforage.min';

@@ -101,7 +101,7 @@ export default {
     let result = '';
     for (let i = 0; i < raw.length; i++) {
       const hex = raw.charCodeAt(i).toString(16);
-      result += (hex.length === 2 ? hex : `0${  hex}`);
+      result += (hex.length === 2 ? hex : `0${ hex}`);
     }
     return result;
   },
@@ -123,7 +123,7 @@ export default {
     } else if (document.selection) {
       el.focus();
       const r = document.selection.createRange();
-      if (r == null) {
+      if (r === null) {
         return 0;
       }
       const re = el.createTextRange(), rc = re.duplicate();
@@ -528,7 +528,7 @@ export default {
     const t = date.toLocaleTimeString(undefined, {timeStyle: 'short'});
     const s = t.split(':');
     if (s.length === 3) { // safari tries to display seconds
-      return `${s[0]  }:${  s[1]  }${s[2].slice(2)}`;
+      return `${s[0] }:${ s[1] }${s[2].slice(2)}`;
     }
     return t;
   },
@@ -537,7 +537,7 @@ export default {
     const t = date.toLocaleString(undefined, {dateStyle: 'short', timeStyle: 'short'});
     const s = t.split(':');
     if (s.length === 3) { // safari tries to display seconds
-      return `${s[0]  }:${  s[1]  }${s[2].slice(2)}`;
+      return `${s[0] }:${ s[1] }${s[2].slice(2)}`;
     }
     return t;
   },
@@ -566,10 +566,10 @@ export default {
       return 'today';
     }
     const dayDifference = Math.round((now - date) / (1000 * 60 * 60 * 24));
-    if(dayDifference == 0){
+    if (dayDifference === 0) {
       return 'today';
     }
-    if (dayDifference == 1) {
+    if (dayDifference === 1) {
       return 'yesterday';
     }
     if (dayDifference <= 5) {

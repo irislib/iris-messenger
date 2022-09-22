@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Iris web components</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+    <script src="../iris.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="jumbotron">
+      <div class="container">
+        <h1 class="display-1">Iris web components</h1>
+        <p class="lead">
+          Just include iris, gun and sea, and these web components are available on your page.
+        </p>
+        <pre>
+&lt;script src="https://cdn.jsdelivr.net/npm/gun/gun.js">&lt;/script>
+&lt;script src="https://cdn.jsdelivr.net/npm/gun/sea.js">&lt;/script>
+&lt;script src="https://cdn.jsdelivr.net/npm/iris-lib/dist/iris.js">&lt;/script>
+        </pre>
+        <p><a href="https://github.com/irislib/iris-lib">GitHub</a></p>
+      </div>
+    </div>
+
+    <div class="container">
+      <h2>Text node</h2>
+      <p>
+        Get a text node, optionally editable, from <code>gun.user(pub)</code> space. Useful for fetching profile attributes and other text fields.
+      </p>
+      <p>
+        <code>&lt;iris-text path="profile/name" user="hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU"/></code>
+      </p>
+      <p>
+        <iris-text path="profile/name" user="hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU"/>
+      </p>
+      <p>
+        <code>&lt;iris-text path="profile/about" user="hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU"/></code>
+      </p>
+      <p>
+        <iris-text path="profile/about" user="hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU"/>
+      </p>
+
+      <p>For currently logged in user attribute, leave user blank: <code>user=""</code>. It will be contenteditable, unless you add <code>editable="false"</code>.</p>
+      <p>
+        <code>&lt;iris-text placeholder="What's your name?" user="" path="profile/name"/></code><br/>
+        <code>Hello &lt;b>&lt;iris-text placeholder="name" user="" editable="false" path="profile/name"/>&lt;/b>!</code>
+      </p>
+      <p>
+        <iris-text placeholder="What's your name?" user="" path="profile/name"/>
+        <br/>
+        Hello <b><iris-text placeholder="name" user="" editable="false" path="profile/name"></iris-text></b>!
+      </p>
+
+      <p>To parse user input as JSON, add <code>json="true"</code>.</p>
+
+      <h2>Image node</h2>
+      <p>Same as text node, but stores a base64 image. If user === loggedInUser, you can click the photo to change it.</p>
+      <p>
+        <code>&lt;iris-img btn-class="btn btn-primary" path="profile/photo"/></code>
+      </p>
+      <p>
+        <iris-img btn-class="btn btn-primary" path="profile/photo"/>
+      </p>
+
+      <h2>Identicon</h2>
+      <p>
+        <code>&lt;iris-identicon user="hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU" width="100"/></code>
+      </p>
+      <p>
+        <iris-identicon user="hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU" width="100"/>
+      </p>
+
+      <h2>Copy button</h2>
+      <p>
+        <code>&lt;iris-copy-button inner-class="btn btn-primary" str="https://iris.to/#/profile/hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU"/></code>
+      </p>
+      <p>
+        <iris-copy-button inner-class="btn btn-primary" str="https://iris.to/#/profile/hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU"/>
+      </p>
+
+      <h2>Follow button</h2>
+      <p>
+        <code>&lt;iris-follow-button inner-class="btn btn-primary" user="hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU"/></code>
+      </p>
+      <p>
+        <iris-follow-button inner-class="btn btn-primary" user="hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU"/>
+      </p>
+
+      <h2>Search</h2>
+      <p>
+        <code>&lt;iris-search inner-class="form-control"/></code>
+<pre>
+&lt;script type="text/javascript">
+  window.onIrisSearchSelect = item => doSomething(item);
+&lt;/script>
+</pre>
+      </p>
+      <p>
+        <iris-search id="search" inner-class="form-control"/>
+        <script type="text/javascript">
+          window.onIrisSearchSelect = i => {
+            console.log(i);
+            const identicon = document.querySelector('#selected-result-identicon');
+            identicon.style.display = '';
+            identicon.setAttribute('user', i.key);
+            const nameEl = document.querySelector('#selected-result-name');
+            nameEl.style.display = '';
+            nameEl.setAttribute('user', i.key);
+            document.querySelector('#search-result-raw').innerHTML = JSON.stringify(i);
+          }
+        </script>
+      </p>
+
+      <h3>
+        <iris-text style="display:none" id="selected-result-name" path="profile/name"/>
+      </h3>
+      <p>
+        <iris-identicon style="display: none;" id="selected-result-identicon" width="100"/>
+      </p>
+      <pre id="search-result-raw"></pre>
+
+      <hr style="margin-bottom:500px" />
+    </div>
+  </body>
+</html>
