@@ -2782,7 +2782,7 @@
 	    } else if (document.selection) {
 	      el.focus();
 	      var r = document.selection.createRange();
-	      if (r == null) {
+	      if (r === null) {
 	        return 0;
 	      }
 	      var re = el.createTextRange(),
@@ -2858,10 +2858,10 @@
 	      return 'today';
 	    }
 	    var dayDifference = Math.round((now - date) / (1000 * 60 * 60 * 24));
-	    if (dayDifference == 0) {
+	    if (dayDifference === 0) {
 	      return 'today';
 	    }
-	    if (dayDifference == 1) {
+	    if (dayDifference === 1) {
 	      return 'yesterday';
 	    }
 	    if (dayDifference <= 5) {

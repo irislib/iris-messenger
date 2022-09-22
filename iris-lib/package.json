@@ -64,7 +64,7 @@
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
     "test:all": "yarn lint:test && yarn lint && yarn test:coverage --runInBand",
     "lint:test": "yarn run lint && npm run test:coverage",
-    "build": "clear && npm run build:cjs && npm run lint:test && npm run build:es && npm run build:umd && npm run build:docs",
+    "build": "clear && npm run build:cjs && npm run build:es && npm run build:umd && npm run build:docs",
     "build:watch": "clear && rimraf cjs && cross-env BABEL_ENV=cjs babel -w src --out-dir cjs",
     "build:es": "rimraf es && cross-env BABEL_ENV=es babel src --out-dir es",
     "build:cjs": "rimraf cjs && cross-env BABEL_ENV=cjs babel src --out-dir cjs",
