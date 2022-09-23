@@ -11,19 +11,19 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
+      <main className="flex w-full flex-1 flex-col items-center justify-center px-5 md:px-20 text-center">
         <h1 className="text-6xl font-bold">
           Iris Dashboard
         </h1>
 
-        <div className="mt-6 w-full grid grid-cols-2 gap-4">
+        <div className="mt-6 w-full grid grid-cols-1 md:grid-cols-2 gap-4">
           <div
             className="rounded-xl border p-6 text-left"
           >
             <Github />
           </div>
           <div
-            className="rounded-xl border p-6 text-left"
+            className="rounded-xl border text-left bg-white"
           >
             <Npm />
           </div>
@@ -31,14 +31,9 @@ const Home: NextPage = () => {
       </main>
 
       <footer className="flex h-24 w-full items-center justify-center border-t">
-        <a
-          className="flex items-center justify-center gap-2"
-          href="https://github.com/irislib/iris-messenger"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Github
-        </a>
+        <a href="https://twitter.com/iris_dot_to?ref_src=twsrc%5Etfw" className="twitter-follow-button"
+           data-show-count="true">Follow @iris_dot_to</a>
+        <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
       </footer>
     </div>
   )
