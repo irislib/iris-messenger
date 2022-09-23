@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-type RepoResponse = {
-  stargazers_count: number;
-}
-
 export default function Github() {
-  const [data, setData] = useState<RepoResponse>({ stargazers_count: 0 });
+  const [data, setData] = useState<any>({ stargazers_count: 0, forks: 0 });
   const [contributors, setContributors] = useState<any[]>([])
 
   useEffect(() => {
