@@ -7,7 +7,7 @@
     "fs": false
   },
   "browser": "dist/iris.js",
-  "module": "es/index.js",
+  "module": "src/index.js",
   "jsxnext:main": "es/index.js",
   "jest": {
     "testURL": "http://localhost/",
