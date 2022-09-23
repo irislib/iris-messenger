@@ -26,8 +26,9 @@ export default function Github() {
 
   return (
     <>
-      <a href="https://github.com/irislib/iris-messenger">Github</a>
+      <b>Iris Messenger on <a href="https://github.com/irislib/iris-messenger">Github</a></b>
       <p>Stars: {data && data.stargazers_count}</p>
+      <p>Forks: {data && data.forks}</p>
       <p>Contributors: {contributors && contributors.length}</p>
     </>
   )
