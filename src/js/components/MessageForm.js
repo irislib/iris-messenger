@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import Session from '../Session';
 import iris from 'iris-lib';
 

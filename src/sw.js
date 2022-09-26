@@ -1,5 +1,5 @@
 import SEA from 'gun/sea';
-import localforage from './js/lib/localforage.min';
+import localforage from 'localforage';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { registerRoute } from 'workbox-routing';
 import {StaleWhileRevalidate, NetworkOnly} from 'workbox-strategies';

@@ -1,4 +1,4 @@
-import Fun from '../src/js/Fun';
+import Fun from '../iris-lib/src/Fun';
 
 describe('Fun', () => {
   describe('Basic API', () => {

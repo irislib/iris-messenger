@@ -1,7 +1,7 @@
 import Component from '../BaseComponent';
 import {translate as t} from '../translations/Translation';
 import Session from '../Session';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import Notifications from '../Notifications';
 import Button from './basic/Button';
 

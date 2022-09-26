@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
 import {translate as tr} from '../translations/Translation';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import {Helmet} from "react-helmet";
 import Session from '../Session';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';

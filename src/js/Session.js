@@ -1,5 +1,5 @@
 import Gun from 'gun';
-import State from './State';
+import State from '../../iris-lib/src/State';
 import Notifications from './Notifications';
 import Helpers from './Helpers';
 import PeerManager from './PeerManager';
@@ -7,7 +7,7 @@ import { route } from 'preact-router';
 import iris from 'iris-lib';
 import _ from 'lodash';
 import Fuse from "./lib/fuse.basic.esm.min";
-import localforage from './lib/localforage.min';
+import localforage from 'localforage';
 import { ec as EC } from 'elliptic';
 import Web3 from "web3";
 import Web3Modal from "web3modal";

@@ -9,12 +9,14 @@ import TextNode from './components/TextNode';
 import ImageNode from './components/ImageNode';
 import CopyButton from './components/CopyButton';
 import FollowButton from './components/FollowButton';
+import Fun from './Fun';
 
 export default {
   SignedMessage,
   Attribute,
   Key,
   Channel,
+  Fun,
   util,
   components: {
     TextNode,

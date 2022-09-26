@@ -29,7 +29,7 @@ import Menu from './components/Menu';
 import VideoCall from './components/VideoCall';
 import MediaPlayer from './components/MediaPlayer';
 import Footer from './components/Footer';
-import State from './State';
+import State from '../../iris-lib/src/State';
 
 import '../css/style.css';
 import '../css/cropper.min.css';

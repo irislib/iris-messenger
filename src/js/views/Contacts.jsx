@@ -1,4 +1,4 @@
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import Identicon from '../components/Identicon';
 import Filters from '../components/Filters';
 import {translate as t} from '../translations/Translation';

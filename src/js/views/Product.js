@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import Session from '../Session';
 import {translate as t} from '../translations/Translation';
 import { route } from 'preact-router';

@@ -1,7 +1,7 @@
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import {translate as t} from '../translations/Translation';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import Session from '../Session';
 import FeedMessageForm from '../components/FeedMessageForm';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';

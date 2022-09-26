@@ -2,7 +2,7 @@ import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import { translate as t } from '../../translations/Translation';
 import Torrent from '../../components/Torrent';
-import State from '../../State';
+import State from '../../../../iris-lib/src/State';
 import Session from '../../Session';
 import iris from 'iris-lib';
 import _ from 'lodash';

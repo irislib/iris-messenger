@@ -1,7 +1,7 @@
 import Helpers from './Helpers';
 import Session from './Session';
 import { route } from 'preact-router';
-import State from './State';
+import State from '../../iris-lib/src/State';
 import _ from 'lodash';
 import iris from 'iris-lib';
 import Gun from 'gun';

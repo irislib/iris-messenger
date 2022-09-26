@@ -1,7 +1,7 @@
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import PublicMessage from './PublicMessage';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import {debounce} from 'lodash';
 import {translate as t} from '../translations/Translation';
 import Button from '../components/basic/Button';

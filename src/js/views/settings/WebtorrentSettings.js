@@ -1,4 +1,4 @@
-import State from '../../State';
+import State from '../../../../iris-lib/src/State';
 import Session from '../../Session';
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';

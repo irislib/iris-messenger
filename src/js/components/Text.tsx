@@ -1,5 +1,5 @@
 import Component from '../BaseComponent';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import Session from '../Session';
 import {createRef, RefObject, JSX} from "preact";
 

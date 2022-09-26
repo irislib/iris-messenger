@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
 import {Fragment, createRef, RefObject, JSX} from 'preact';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import {Link} from "preact-router/match";
 import {route} from 'preact-router';
 import {translate as t} from '../translations/Translation';

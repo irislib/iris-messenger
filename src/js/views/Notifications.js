@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import Identicon from '../components/Identicon';
 import Button from '../components/basic/Button';
 import {translate as t} from '../translations/Translation';

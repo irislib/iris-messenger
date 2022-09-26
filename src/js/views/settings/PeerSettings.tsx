@@ -1,7 +1,7 @@
 import Component from "../../BaseComponent";
 import Name from "../../components/Name";
 import Session from "../../Session";
-import State from "../../State";
+import State from "../../../../iris-lib/src/State";
 import {translate as t} from "../../translations/Translation";
 import Helpers from "../../Helpers";
 import Icons from "../../Icons";

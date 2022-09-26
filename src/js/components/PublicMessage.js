@@ -2,7 +2,7 @@ import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import Identicon from './Identicon';
 import FeedMessageForm from './FeedMessageForm';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import { route } from 'preact-router';
 import Message from './Message';
 import SafeImg from './SafeImg';

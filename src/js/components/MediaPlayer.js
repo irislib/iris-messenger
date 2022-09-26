@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { html } from 'htm/preact';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import Icons from '../Icons';
 import $ from 'jquery';
 

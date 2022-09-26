@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import Session from '../Session';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';

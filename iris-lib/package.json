@@ -129,6 +129,8 @@
     "htm": "^3.1.1",
     "identicon.js": "^2.3.3",
     "jsxstyle": "^2.5.1",
+    "localforage": "^1.10.0",
+    "lodash": "^4.17.21",
     "preact": "^10.11.0",
     "preact-custom-element": "^4.2.1"
   }

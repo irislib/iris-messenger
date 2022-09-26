@@ -3,7 +3,7 @@ import Session from "../Session";
 import Gun from "gun";
 import {html} from "htm/preact";
 import Name from "./Name";
-import State from "../State";
+import State from "../../../iris-lib/src/State";
 import Text from "./Text";
 import Button from "./basic/Button";
 

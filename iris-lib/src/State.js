@@ -8,9 +8,8 @@ import 'gun/lib/rindexed';
 import _ from 'lodash';
 import Fun from './Fun';
 
-import PeerManager from './PeerManager';
-import iris from 'iris-lib';
-import Helpers from './Helpers';
+import PeerManager from '../../src/js/PeerManager';
+import util from './util';
 
 const State = {
   init(publicOpts) {
@@ -20,9 +19,8 @@ const State = {
     if (publicOpts && publicOpts.peers) {
       publicOpts.peers.forEach(url => PeerManager.addPeer({url}));
     }
-    // TODO: local space seems to get stuck
     this.local = new Fun();
-    if (Helpers.isElectron) {
+    if (util.isElectron) {
       this.electron = Gun({peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast:false, localStorage: false}).get('state');
     }
     this.blockedUsers = {};
@@ -45,7 +43,7 @@ const State = {
     });
 
     window.State = this;
-    iris.util.setPublicState && iris.util.setPublicState(this.public);
+    util.setPublicState && util.setPublicState(this.public);
   },
 
   counterNext() {

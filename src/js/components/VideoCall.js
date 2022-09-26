@@ -7,7 +7,7 @@ import Gun from 'gun';
 import {translate as t} from '../translations/Translation';
 import Session from '../Session';
 
-import State from '../State';
+import State from '../../../iris-lib/src/State';
 import Button from './basic/Button';
 
 const ringSound = new Audio('../../assets/audio/ring.mp3');
