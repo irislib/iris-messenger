@@ -10,10 +10,13 @@ localForage.config({
     driver: [localForage.LOCALSTORAGE, localForage.INDEXEDDB, localForage.WEBSQL]
 })
 
-/*
+/**
   Our very own implementation of the Gun API. Local state only.
  */
 export default class Node {
+    /**
+     *
+     */
     constructor(id = '', parent) {
         this.id = id;
         this.parent = parent;
@@ -83,6 +86,12 @@ export default class Node {
         }, 40);
     }
 
+    /**
+     *
+     * @param key
+     * @returns {Node}
+     * @example node.get('users').get('alice').put({name: 'Alice'})
+     */
     get(key) {
         const existing = this.children.get(key);
         if (existing) {
@@ -94,6 +103,11 @@ export default class Node {
         return new_node;
     }
 
+    /**
+     * Set a value to the node. If the value is an object, it will be converted to child nodes.
+     * @param value
+     * @example node.get('users').get('alice').put({name: 'Alice'})
+     */
     put(value) {
         if (Array.isArray(value)) {
             throw new Error('Sorry, we don\'t deal with arrays');
@@ -113,6 +127,13 @@ export default class Node {
     }
 
     // protip: the code would be a lot cleaner if you separated the Node API from storage adapters.
+    /**
+     * Return a value without subscribing to it
+     * @param callback
+     * @param event
+     * @param returnIfUndefined
+     * @returns {Promise<*>}
+     */
     async once(callback, event, returnIfUndefined = true) {
         let result;
         if (this.children.size) {
@@ -132,6 +153,10 @@ export default class Node {
         }
     }
 
+    /**
+     * Subscribe to a value
+     * @param callback
+     */
     on(callback) {
         const id = this.counter++;
         this.on_subscriptions.set(id, callback);
@@ -139,6 +164,11 @@ export default class Node {
         this.once(callback, event, false);
     }
 
+    /**
+     * Subscribe to the children of a node. Callback is called separately for each child.
+     * @param callback
+     * @returns {Promise<void>}
+     */
     async map(callback) {
         const id = this.counter++;
         this.map_subscriptions.set(id, callback);

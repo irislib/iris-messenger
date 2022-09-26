@@ -1,15 +1,15 @@
-import Fun from '../iris-lib/src/Fun';
+import Node from 'iris-lib/src/Node';
 
-describe('Fun', () => {
+describe('Node', () => {
   describe('Basic API', () => {
     it('should have a constructor', () => {
-      const fun = new Fun();
-      expect(fun).toBeInstanceOf(Fun);
+      const fun = new Node();
+      expect(fun).toBeInstanceOf(Node);
     });
 
     describe('once', () => {
       it('should return the saved value', async () => {
-        const fun = new Fun();
+        const fun = new Node();
         fun.get('settings').get('language').put('klingon');
         const value = await fun.get('settings').get('language').once();
         expect(value).toBe('klingon');
@@ -24,7 +24,7 @@ describe('Fun', () => {
       };
 
       it('should return all the saved child values', async () => {
-        const fun = new Fun();
+        const fun = new Node();
         Object.keys(test_data).forEach(key => {
           fun.get('settings').get('local').get(key).put(test_data[key]);
         });
@@ -42,7 +42,7 @@ describe('Fun', () => {
       });
 
       it('should subscribe to changes in child values', async () => {
-        const fun = new Fun();
+        const fun = new Node();
         const seenKeys = new Set();
         setTimeout(() => {
           Object.keys(test_data).forEach(key => {
@@ -63,7 +63,7 @@ describe('Fun', () => {
 
       /*
       it('should not chain .map() callback too far back', async () => {
-        const fun = new Fun();
+        const fun = new Node();
         const mockCallback = jest.fn();
         fun.get('settings').map(mockCallback);
         const localCalled = new Promise(resolve => {
@@ -76,7 +76,7 @@ describe('Fun', () => {
        */
 
       it('should chain .map() callback', async () => {
-        const fun = new Fun();
+        const fun = new Node();
         fun.get('contacts').get('id123').put({name: 'John Doe', followerCount: 5});
         await new Promise(resolve => {
           fun.get('contacts').map((value, key) => {

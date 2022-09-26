@@ -6,7 +6,7 @@ import 'gun/lib/radisk';
 import 'gun/lib/store';
 import 'gun/lib/rindexed';
 import _ from 'lodash';
-import Fun from './Fun';
+import Node from './Node';
 
 import PeerManager from '../../src/js/PeerManager';
 import util from './util';
@@ -19,7 +19,7 @@ const State = {
     if (publicOpts && publicOpts.peers) {
       publicOpts.peers.forEach(url => PeerManager.addPeer({url}));
     }
-    this.local = new Fun();
+    this.local = new Node();
     if (util.isElectron) {
       this.electron = Gun({peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast:false, localStorage: false}).get('state');
     }
