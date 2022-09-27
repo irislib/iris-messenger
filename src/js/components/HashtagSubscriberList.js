@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
 import { html } from 'htm/preact';
-import State from '../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import Name from './Name';
 import Identicon from './Identicon';
 

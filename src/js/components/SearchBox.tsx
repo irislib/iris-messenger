@@ -1,10 +1,10 @@
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
-import State from '../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import Identicon from './Identicon';
 import Text from './Text';
 import {translate as t} from '../translations/Translation';
-import Session from '../../../iris-lib/src/Session';
+import Session from 'iris-lib/src/Session';
 import $ from 'jquery';
 import _ from 'lodash';
 

@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import State from '../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import View from './View';
 import ExplorerNode from '../components/ExplorerNode';
 import { translate as t } from '../translations/Translation';

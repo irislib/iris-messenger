@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import State from '../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import FeedMessageForm from '../components/FeedMessageForm';
 import MessageFeed from '../components/MessageFeed';
 import Filters from '../components/Filters';

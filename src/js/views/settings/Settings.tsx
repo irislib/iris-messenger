@@ -3,7 +3,7 @@ import SettingsMenu from './SettingsMenu';
 import SettingsContent from './SettingsContent';
 import Header from '../../components/Header';
 import Icons from '../../Icons';
-import State from "../../../../iris-lib/src/State";
+import State from "iris-lib/src/State";
 import $ from 'jquery';
 import { route } from 'preact-router';
 

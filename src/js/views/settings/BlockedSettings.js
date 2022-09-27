@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import State from '../../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
 import Session from 'iris-lib/src/Session';

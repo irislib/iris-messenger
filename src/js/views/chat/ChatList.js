@@ -2,7 +2,7 @@ import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import { translate as t } from '../../translations/Translation';
-import State from '../../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import ChatListItem from './ChatListItem';
 import { route } from 'preact-router';
 import Notifications from 'iris-lib/src/Notifications';

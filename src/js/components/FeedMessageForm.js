@@ -3,7 +3,7 @@ import Helpers from '../Helpers';
 import Notifications from 'iris-lib/src/Notifications';
 import { html } from 'htm/preact';
 import { translate as t } from '../translations/Translation';
-import State from '../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import Session from 'iris-lib/src/Session';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';

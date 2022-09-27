@@ -2,7 +2,7 @@ import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import {createRef} from 'preact';
 import { translate as t } from '../../translations/Translation';
-import State from '../../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import Identicon from '../../components/Identicon';
 import ChatMessageForm from './ChatMessageForm';
 import Name from '../../components/Name';

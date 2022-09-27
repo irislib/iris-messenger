@@ -6,7 +6,7 @@ import Torrent from './Torrent';
 import Autolinker from 'autolinker';
 import iris from 'iris-lib';
 import $ from 'jquery';
-import State from '../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import {route} from 'preact-router';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});

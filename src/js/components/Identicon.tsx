@@ -1,5 +1,5 @@
 import Component from '../BaseComponent';
-import State from '../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import iris from 'iris-lib';
 import Identicon from 'identicon.js';
 import SafeImg from './SafeImg';
