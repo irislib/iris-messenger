@@ -22558,17 +22558,7 @@
 
 	// TODO this class could perhaps be removed
 
-	/**
-	* A simple key-value pair with helper functions.
-	*
-	* Constructor: new Attribute(value), new Attribute(type, value) or new Attribute({type, value})
-	*/
-
 	var Attribute = function () {
-	  /**
-	  * @param {string} a
-	  * @param {string} b
-	  */
 	  function Attribute(a, b) {
 	    _classCallCheck(this, Attribute);
 
@@ -22608,11 +22598,6 @@
 	    }
 	  }
 
-	  /**
-	  * @returns {Attribute} uuid
-	  */
-
-
 	  Attribute.getUuid = function getUuid() {
 	    var b = function b(a) {
 	      return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
@@ -22620,39 +22605,17 @@
 	    return new Attribute('uuid', b());
 	  };
 
-	  /**
-	  * @returns {Object} an object with attribute types as keys and regex patterns as values
-	  */
-
-
 	  Attribute.getUniqueIdValidators = function getUniqueIdValidators() {
 	    return UNIQUE_ID_VALIDATORS;
 	  };
-
-	  /**
-	  * @param {string} type attribute type
-	  * @returns {boolean} true if the attribute type is unique
-	  */
-
 
 	  Attribute.isUniqueType = function isUniqueType(type) {
 	    return _Object$keys(UNIQUE_ID_VALIDATORS).indexOf(type) > -1;
 	  };
 
-	  /**
-	  * @returns {boolean} true if the attribute type is unique
-	  */
-
-
 	  Attribute.prototype.isUniqueType = function isUniqueType() {
 	    return Attribute.isUniqueType(this.type);
 	  };
-
-	  /**
-	  * @param {string} value guess type of this attribute value
-	  * @returns {string} type of attribute value or undefined
-	  */
-
 
 	  Attribute.guessTypeOf = function guessTypeOf(value) {
 	    for (var key in UNIQUE_ID_VALIDATORS) {
@@ -22662,33 +22625,13 @@
 	    }
 	  };
 
-	  /**
-	  * @param {Attribute} a
-	  * @param {Attribute} b
-	  * @returns {boolean} true if params are equal
-	  */
-
-
 	  Attribute.equals = function equals(a, b) {
 	    return a.equals(b);
 	  };
 
-	  /**
-	  * @param {Attribute} a attribute to compare to
-	  * @returns {boolean} true if attribute matches param
-	  */
-
-
 	  Attribute.prototype.equals = function equals(a) {
 	    return a && this.type === a.type && this.value === a.value;
 	  };
-
-	  /**
-	  * @returns {string} uri - `${encodeURIComponent(this.value)}:${encodeURIComponent(this.type)}`
-	  * @example
-	  * user%20example.com:email
-	  */
-
 
 	  Attribute.prototype.uri = function uri() {
 	    return encodeURIComponent(this.value) + ':' + encodeURIComponent(this.type);
@@ -22711,13 +22654,6 @@
 	      return 'data:image/svg+xml;base64,' + identicon$$1.toString();
 	    });
 	  };
-
-	  /**
-	  * Generate a visually recognizable representation of the attribute
-	  * @param {object} options {width}
-	  * @returns {HTMLElement} identicon div element
-	  */
-
 
 	  Attribute.prototype.identicon = function identicon$$1() {
 	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -31524,6 +31460,10 @@
 	  });
 	}
 
+	// TODO merge with State
+	/**
+	 * Utilities for Iris sessions
+	 */
 	var Session = { init: init$2, getKey: getKey, getPubKey: getPubKey, updateSearchIndex: updateSearchIndex, getSearchIndex: getSearchIndex, getMyName: getMyName, getMyProfilePhoto: getMyProfilePhoto, getMyChatLink: getMyChatLink, createChatLink: createChatLink, ourActivity: ourActivity, login: login, logOut: logOut, addFollow: addFollow, removeFollow: removeFollow, loginAsNewUser: loginAsNewUser, DEFAULT_SETTINGS: DEFAULT_SETTINGS, channels: channels, newChannel: newChannel, addChannel: addChannel, processMessage: processMessage, subscribeToMsgs: subscribeToMsgs };
 
 	var MAX_PEER_LIST_SIZE = 10;
@@ -31997,6 +31937,7 @@
 	  Key: Key,
 	  Channel: Channel,
 	  State: State,
+	  PeerManager: PeerManager,
 	  Session: Session,
 	  Node: Node,
 	  util: util,

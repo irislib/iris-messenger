@@ -58,7 +58,7 @@
     "build:cjs": "rimraf cjs && cross-env BABEL_ENV=cjs babel src --out-dir cjs",
     "build:umd": "rimraf dist && cross-env BABEL_ENV=es rollup -c & cross-env BABEL_ENV=es NODE_ENV=production rollup -c",
     "build:umdev": "rimraf dist && cross-env BABEL_ENV=es rollup -c",
-    "build:docs": "documentation build src/** --shallow -f html -o docs;cp -R components_docs docs/components",
+    "build:docs": "documentation build src/** --shallow -f html -o docs;cp -R components_docs/* docs/components",
     "build:run": "clear && rimraf cjs && cross-env BABEL_ENV=cjs yarn nodemon src/server.js --watch src --exec babel-node",
     "dev": "concurrently -n build,tests \"yarn build:watch\" \"yarn test:watch\"",
     "dev:server": "concurrently -n build,tests,server \"yarn build:watch\" \"yarn test:watch\" \"yarn build:run\"",

@@ -7,7 +7,7 @@ import { translationLoaded } from "./translations/Translation";
 
 import Helpers from './Helpers';
 import QRScanner from './QRScanner';
-import PeerManager from '../../iris-lib/src/PeerManager';
+import {PeerManager} from 'iris-lib';
 import Session from '../../iris-lib/src/Session';
 
 import Settings from './views/settings/Settings';

@@ -5,7 +5,7 @@ import State from "../../../../iris-lib/src/State";
 import {translate as t} from "../../translations/Translation";
 import Helpers from "../../Helpers";
 import Icons from "../../Icons";
-import PeerManager from "../../../../iris-lib/src/PeerManager";
+import {PeerManager} from "iris-lib";
 import {route} from "preact-router";
 import $ from "jquery";
 import Button from "../../components/basic/Button";

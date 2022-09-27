@@ -11,6 +11,7 @@ import CopyButton from './components/CopyButton';
 import FollowButton from './components/FollowButton';
 import Node from './Node';
 import State from './State';
+import PeerManager from './PeerManager';
 import Session from './Session';
 
 export default {
@@ -19,6 +20,7 @@ export default {
   Key,
   Channel,
   State,
+  PeerManager,
   Session,
   Node,
   util,
