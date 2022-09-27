@@ -51,7 +51,7 @@ export default {
       const s = str.split('?');
       let chatId;
       if (s.length === 2) {
-        chatId = iris.util.getUrlParameter('chatWith', s[1]) || util.getUrlParameter('channelId', s[1]);
+        chatId = iris.util.getUrlParameter('chatWith', s[1]) || iris.util.getUrlParameter('channelId', s[1]);
       }
       if (chatId) {
         iris.Session.newChannel(chatId, str);
