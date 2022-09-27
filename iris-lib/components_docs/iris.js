@@ -19959,6 +19959,9 @@
 	    }
 	    return hash;
 	  },
+	  capitalize: function capitalize(s) {
+	    return s.charAt(0).toUpperCase() + s.slice(1);
+	  },
 	  generateName: function generateName() {
 	    return this.capitalize(lodash.sample(adjectives)) + ' ' + this.capitalize(lodash.sample(animals));
 	  },
@@ -22552,6 +22555,8 @@
 	  account: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
 	  uuid: /[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}/
 	};
+
+	// TODO this class could perhaps be removed
 
 	/**
 	* A simple key-value pair with helper functions.
@@ -31173,24 +31178,6 @@
 	  });
 	  setOurOnlineStatus();
 	  Channel.getChannels(State.public, key, addChannel);
-	  var chatId = util.getUrlParameter('chatWith') || util.getUrlParameter('channelId');
-	  var inviter = util.getUrlParameter('inviter');
-	  function go() {
-	    if (inviter !== key.pub) {
-	      newChannel(chatId, window.location.href);
-	    }
-	    lodash.defer(function () {
-	      return route('/chat/' + chatId);
-	    }); // defer because router is only initialised after login
-	    window.history.pushState({}, "Iris Chat", '/' + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]); // remove param
-	  }
-	  if (chatId) {
-	    if (inviter) {
-	      setTimeout(go, 2000); // wait a sec to not re-create the same chat
-	    } else {
-	      go();
-	    }
-	  }
 	  State.public.user().get('profile').get('name').on(function (name) {
 	    if (name && typeof name === 'string') {
 	      myName = name;
@@ -31278,7 +31265,6 @@
 	}
 
 	async function logOut() {
-	  window.location.href = '/';
 	  if (State.electron) {
 	    State.electron.get('user').put(null);
 	  }
@@ -31298,6 +31284,8 @@
 	  clearIndexedDB();
 	  localStorage.clear();
 	  localforage.clear().then(function () {
+	    window.location.hash = '';
+	    window.location.href = '/';
 	    location.reload();
 	  });
 	}
@@ -31536,26 +31524,7 @@
 	  });
 	}
 
-	function followChatLink(str) {
-	  if (str && str.indexOf('http') === 0) {
-	    var s = str.split('?');
-	    var chatId = void 0;
-	    if (s.length === 2) {
-	      chatId = util.getUrlParameter('chatWith', s[1]) || util.getUrlParameter('channelId', s[1]);
-	    }
-	    if (chatId) {
-	      newChannel(chatId, str);
-	      // route(`/chat/${  chatId}`); // TODO
-	      return true;
-	    }
-	    if (str.indexOf('https://iris.to') === 0) {
-	      // route(str.replace('https://iris.to', '')); // TODO
-	      return true;
-	    }
-	  }
-	}
-
-	var Session = { init: init$2, followChatLink: followChatLink, getKey: getKey, getPubKey: getPubKey, updateSearchIndex: updateSearchIndex, getSearchIndex: getSearchIndex, getMyName: getMyName, getMyProfilePhoto: getMyProfilePhoto, getMyChatLink: getMyChatLink, createChatLink: createChatLink, ourActivity: ourActivity, login: login, logOut: logOut, addFollow: addFollow, removeFollow: removeFollow, loginAsNewUser: loginAsNewUser, DEFAULT_SETTINGS: DEFAULT_SETTINGS, channels: channels, newChannel: newChannel, addChannel: addChannel, processMessage: processMessage, subscribeToMsgs: subscribeToMsgs };
+	var Session = { init: init$2, getKey: getKey, getPubKey: getPubKey, updateSearchIndex: updateSearchIndex, getSearchIndex: getSearchIndex, getMyName: getMyName, getMyProfilePhoto: getMyProfilePhoto, getMyChatLink: getMyChatLink, createChatLink: createChatLink, ourActivity: ourActivity, login: login, logOut: logOut, addFollow: addFollow, removeFollow: removeFollow, loginAsNewUser: loginAsNewUser, DEFAULT_SETTINGS: DEFAULT_SETTINGS, channels: channels, newChannel: newChannel, addChannel: addChannel, processMessage: processMessage, subscribeToMsgs: subscribeToMsgs };
 
 	var MAX_PEER_LIST_SIZE = 10;
 	var ELECTRON_GUN_URL = 'http://localhost:8767/gun';
@@ -31759,7 +31728,17 @@
 	  resetPeers: resetPeers
 	};
 
+	/**
+	 * The main class for interacting with the Iris network.
+	 *
+	 * Contains State.local which is only accessible in the local environment and State.public which is synchronized with the world.
+	 *
+	 */
 	var State = {
+	  /**
+	   * Initialize the state: start gun instances State.public and State.local
+	   * @param publicOpts Options for the State.public gun instance
+	   */
 	  init: function init(publicOpts) {
 	    var _this2 = this;
 
@@ -31802,9 +31781,20 @@
 	  counterNext: function counterNext() {
 	    return this.counter++;
 	  },
+
+
+	  /**
+	   * Return the object that contains blocked users
+	   */
 	  getBlockedUsers: function getBlockedUsers() {
 	    return this.blockedUsers;
 	  },
+
+
+	  /**
+	   * Get a group object that aggregates content from all the users in the group
+	   * @param groupName
+	   */
 	  group: function group() {
 	    var groupName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'everyone';
 
@@ -32007,6 +31997,7 @@
 	  Key: Key,
 	  Channel: Channel,
 	  State: State,
+	  Session: Session,
 	  Node: Node,
 	  util: util,
 	  components: {
