@@ -7,7 +7,7 @@ import Name from '../components/Name';
 import View from './View';
 import iris from 'iris-lib';
 import PublicMessage from "../components/PublicMessage";
-import NotificationTools from "../Notifications";
+import NotificationTools from "iris-lib/src/Notifications";
 
 const PAGE_SIZE = 10;
 

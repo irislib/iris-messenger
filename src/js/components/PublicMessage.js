@@ -6,14 +6,14 @@ import State from '../../../iris-lib/src/State';
 import { route } from 'preact-router';
 import Message from './Message';
 import SafeImg from './SafeImg';
-import Session from '../Session';
+import Session from 'iris-lib/src/Session';
 import Torrent from './Torrent';
 import Icons from '../Icons';
 import Autolinker from 'autolinker';
 import iris from 'iris-lib';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
-import Notifications from '../Notifications';
+import Notifications from 'iris-lib/src/Notifications';
 
 const MSG_TRUNCATE_LENGTH = 1000;
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});

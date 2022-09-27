@@ -2,10 +2,127 @@ import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation';
 import LanguageSelector from '../components/LanguageSelector';
 import QRScanner from '../QRScanner';
-import Session from '../Session';
+import Session from 'iris-lib/src/Session';
 import { Component } from 'preact';
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
+import iris from 'iris-lib';
+import {ec as EC} from "elliptic";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+import Web3Modal from "web3modal";
+import Web3 from "web3";
+import State from "iris-lib/src/State";
+import util from "iris-lib/src/util";
+import _ from 'lodash';
+import { route } from 'preact-router';
+
+const isHex = (maybeHex) =>
+  maybeHex.length !== 0 && maybeHex.length % 2 === 0 && !/[^a-fA-F0-9]/u.test(maybeHex);
+
+const hexToUint8Array = (hexString) => {
+  if (!isHex(hexString)) {
+    throw new Error('Not a hex string');
+  }
+  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+}
+
+function arrayToBase64Url(array) {
+  return btoa(String.fromCharCode.apply(null, array)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+function keyPairFromHash(hash) {
+  const ec = new EC('p256');
+  const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
+
+  let privKey = keyPair.getPrivate().toArray("be", 32);
+  let x = keyPair.getPublic().getX().toArray("be", 32);
+  let y = keyPair.getPublic().getY().toArray("be", 32);
+
+  privKey = arrayToBase64Url(privKey);
+  x = arrayToBase64Url(x);
+  y = arrayToBase64Url(y);
+
+  const kp = { pub: `${x}.${y}`, priv: privKey };
+  return kp;
+}
+
+async function ethereumConnect() {
+  const providerOptions = {
+    walletconnect: {
+      package: WalletConnectProvider,
+      options: {
+        infuraId: "4bd8d95876de48e0b17d56c0da31880a"
+      }
+    }
+  };
+  const web3Modal = new Web3Modal({
+    network: "mainnet",
+    providerOptions,
+    theme: "dark"
+  });
+
+  web3Modal.on('accountsChanged', (provider) => {
+    console.log('connect', provider);
+  });
+
+  const provider = await web3Modal.connect();
+  return new Web3(provider);
+}
+
+function maybeGoToChat(key) {
+  let chatId = util.getUrlParameter('chatWith') || util.getUrlParameter('channelId');
+  let inviter = util.getUrlParameter('inviter');
+  function go() {
+    if (inviter !== key.pub) {
+      Session.newChannel(chatId, window.location.href);
+    }
+    _.defer(() => route(`/chat/${  chatId}`)); // defer because router is only initialised after login // TODO fix
+    window.history.pushState({}, "Iris Chat", `/${window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]}`); // remove param
+  }
+  if (chatId) {
+    if (inviter) {
+      setTimeout(go, 2000); // wait a sec to not re-create the same chat
+    } else {
+      go();
+    }
+  }
+}
+
+function login(k) {
+  Session.login(k);
+  maybeGoToChat(k);
+}
+
+async function ethereumLogin(name) {
+  const web3 = await ethereumConnect();
+  const accounts = await web3.eth.getAccounts();
+
+  if (accounts.length > 0) {
+    const message = "I'm trusting this application with an irrevocable access key to my Iris account.";
+    const signature = await web3.eth.personal.sign(message, accounts[0]);
+    const signatureBytes = hexToUint8Array(signature.substring(2));
+    const hash1 = await window.crypto.subtle.digest('SHA-256', signatureBytes);
+    const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
+    const signingKey = keyPairFromHash(hash1);
+    const encryptionKey = keyPairFromHash(hash2);
+    const k = {
+      pub: signingKey.pub,
+      priv: signingKey.priv,
+      epub: encryptionKey.pub,
+      epriv: encryptionKey.priv
+    };
+    login(k);
+    setTimeout(async () => {
+      State.public.user().get('profile').get('name').once(existingName => {
+        if (typeof existingName !== 'string' || existingName === '') {
+          name = name || util.generateName();
+          State.public.user().get('profile').put({a:null});
+          State.public.user().get('profile').get('name').put(name);
+        }
+      });
+    }, 2000);
+  }
+}
 
 class Login extends Component {
   componentDidMount() {
@@ -17,7 +134,7 @@ class Login extends Component {
     if (this.state.showScanPrivKey) {
       QRScanner.cleanupScanner();
     } else {
-      QRScanner.startPrivKeyQRScanner().then(Session.login);
+      QRScanner.startPrivKeyQRScanner().then(login);
     }
     this.setState({showScanPrivKey: !this.state.showScanPrivKey});
   }
@@ -27,7 +144,7 @@ class Login extends Component {
     if (!val.length) { return; }
     try {
       let k = JSON.parse(val);
-      Session.login(k);
+      login(k);
       event.target.value = '';
       Helpers.copyToClipboard(''); // clear the clipboard
     } catch (e) {
@@ -43,7 +160,7 @@ class Login extends Component {
 
   onLoginFormSubmit(e) {
     e.preventDefault();
-    let name = document.getElementById('login-form-name').value || Helpers.generateName();
+    let name = document.getElementById('login-form-name').value || iris.util.generateName();
     Session.loginAsNewUser(name);
     this.base.style = 'display:none';
   }
@@ -87,7 +204,7 @@ class Login extends Component {
               <p><Button id="sign-up" type="submit">{t('new_user_go')}</Button></p>
               <br />
               <p><a href="#" id="show-existing-account-login" onClick={() => this.setState({showSwitchAccount: true})}>{t('already_have_an_account')}</a></p>
-              <p><a href="#" onClick={() => Session.ethereumLogin()}>{t('web3_login')}</a></p>
+              <p><a href="#" onClick={() => ethereumLogin()}>{t('web3_login')}</a></p>
               <p>
                 <LanguageSelector />
               </p>

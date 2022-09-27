@@ -1,4 +1,4 @@
-import Node from 'iris-lib/src/Node';
+import Node from '../src/Node';
 
 describe('Node', () => {
   describe('Basic API', () => {

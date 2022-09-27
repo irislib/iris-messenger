@@ -5,7 +5,7 @@ import { translate as t } from '../../translations/Translation';
 import State from '../../../../iris-lib/src/State';
 import ChatListItem from './ChatListItem';
 import { route } from 'preact-router';
-import Notifications from '../../Notifications';
+import Notifications from 'iris-lib/src/Notifications';
 import ScrollViewport from 'preact-scroll-viewport';
 import _ from 'lodash';
 import $ from 'jquery';
@@ -15,6 +15,19 @@ class ChatList extends Component {
   constructor(props) {
     super(props);
     this.state = {chats: new Map(), hashtags: {}, latestTime: null};
+  }
+
+  enableDesktopNotifications() {
+    if (window.Notification) {
+      Notification.requestPermission(() => {
+        if (Notification.permission === 'granted' || Notification.permission === 'denied') {
+          $('#enable-notifications-prompt').slideUp();
+        }
+        if (Notification.permission === 'granted') {
+          Notifications.subscribeToWebPush();
+        }
+      });
+    }
   }
 
   componentDidMount() {

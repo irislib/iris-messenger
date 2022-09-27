@@ -10,12 +10,16 @@ import ImageNode from './components/ImageNode';
 import CopyButton from './components/CopyButton';
 import FollowButton from './components/FollowButton';
 import Node from './Node';
+import State from './State';
+import Session from './Session';
 
 export default {
   SignedMessage,
   Attribute,
   Key,
   Channel,
+  State,
+  Session,
   Node,
   util,
   components: {

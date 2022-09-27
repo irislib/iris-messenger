@@ -1,5 +1,5 @@
 import BaseComponent from "../BaseComponent";
-import Session from "../Session";
+import Session from "iris-lib/src/Session";
 import Gun from "gun";
 import {html} from "htm/preact";
 import Name from "./Name";

@@ -1,11 +1,12 @@
 import { translate as t } from '../../../translations/Translation';
-import Session from '../../../Session';
+import Session from 'iris-lib/src/Session';
 import $ from 'jquery';
 import Component from '../../../BaseComponent';
 import Button from '../../../components/basic/Button';
 import iris from 'iris-lib';
 import { route } from 'preact-router';
 import State from '../../../../../iris-lib/src/State';
+import Helpers from '../../../Helpers';
 
 class InviteView extends Component {
     constructor() {
@@ -21,7 +22,7 @@ class InviteView extends Component {
     
     onPasteChatLink(e) {
         const val = $(e.target).val();
-        Session.followChatLink(val);
+        Helpers.followChatLink(val);
         $(e.target).val('');
     }
 

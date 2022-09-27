@@ -1,7 +1,7 @@
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import Session from '../Session';
+import Session from 'iris-lib/src/Session';
 import Torrent from './Torrent';
 import Autolinker from 'autolinker';
 import iris from 'iris-lib';

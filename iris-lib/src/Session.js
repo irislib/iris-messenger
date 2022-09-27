@@ -1,17 +1,12 @@
 import Gun from 'gun';
-import State from '../../iris-lib/src/State';
+import State from './State';
 import Notifications from './Notifications';
-import Helpers from './Helpers';
 import PeerManager from './PeerManager';
-import { route } from 'preact-router';
-import iris from 'iris-lib';
+import Channel from './Channel';
+import util from './util';
 import _ from 'lodash';
-import Fuse from "./lib/fuse.basic.esm.min";
+import Fuse from "fuse.js";
 import localforage from 'localforage';
-import { ec as EC } from 'elliptic';
-import Web3 from "web3";
-import Web3Modal from "web3modal";
-import WalletConnectProvider from "@walletconnect/web3-provider";
 
 let key;
 let myName;
@@ -31,10 +26,10 @@ const DEFAULT_SETTINGS = {
     minimizeOnClose: true
   },
   local: {
-    enableWebtorrent: !iris.util.isMobile,
+    enableWebtorrent: !util.isMobile,
     enablePublicPeerDiscovery: true,
     autoplayWebtorrent: true,
-    maxConnectedPeers: Helpers.isElectron ? 3 : 2
+    maxConnectedPeers: util.isElectron ? 3 : 2
   }
 }
 
@@ -138,22 +133,22 @@ function getSearchIndex() {
 
 function setOurOnlineStatus() {
   const activeRoute = window.location.hash;
-  iris.Channel.setActivity(State.public, ourActivity = 'active');
+  Channel.setActivity(State.public, ourActivity = 'active');
   const setActive = _.debounce(() => {
     const chat = activeRoute && channels[activeRoute.replace('#/profile/','').replace('#/chat/','')];
     if (chat && !ourActivity) {
       chat.setMyMsgsLastSeenTime();
     }
-    iris.Channel.setActivity(State.public, ourActivity = 'active');
+    Channel.setActivity(State.public, ourActivity = 'active');
     clearTimeout(onlineTimeout);
-    onlineTimeout = setTimeout(() => iris.Channel.setActivity(State.public, ourActivity = 'online'), 30000);
+    onlineTimeout = setTimeout(() => Channel.setActivity(State.public, ourActivity = 'online'), 30000);
   }, 1000);
   document.addEventListener("touchmove", setActive);
   document.addEventListener("mousemove", setActive);
   document.addEventListener("keypress", setActive);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
-      iris.Channel.setActivity(State.public, ourActivity = 'active');
+      Channel.setActivity(State.public, ourActivity = 'active');
       const chatId = location.pathname.slice(1).replace('chat/','');
       const chat = activeRoute && channels[chatId];
       if (chat) {
@@ -161,12 +156,12 @@ function setOurOnlineStatus() {
         Notifications.changeChatUnseenCount(chatId, 0);
       }
     } else {
-      iris.Channel.setActivity(State.public, ourActivity = 'online');
+      Channel.setActivity(State.public, ourActivity = 'online');
     }
   });
   setActive();
   window.addEventListener("beforeunload", () => {
-    iris.Channel.setActivity(State.public, ourActivity = null);
+    Channel.setActivity(State.public, ourActivity = null);
   });
 }
 
@@ -182,120 +177,20 @@ function updateGroups() {
   });
 }
 
-const isHex = (maybeHex) =>
-  maybeHex.length !== 0 && maybeHex.length % 2 === 0 && !/[^a-fA-F0-9]/u.test(maybeHex);
-
-const hexToUint8Array = (hexString) => {
-  if (!isHex(hexString)) {
-    throw new Error('Not a hex string');
-  }
-  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
-}
-
-function arrayToBase64Url(array) {
-  return btoa(String.fromCharCode.apply(null, array)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-}
-
-function keyPairFromHash(hash) {
-  const ec = new EC('p256');
-  const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
-
-  let privKey = keyPair.getPrivate().toArray("be", 32);
-  let x = keyPair.getPublic().getX().toArray("be", 32);
-  let y = keyPair.getPublic().getY().toArray("be", 32);
-
-  privKey = arrayToBase64Url(privKey);
-  x = arrayToBase64Url(x);
-  y = arrayToBase64Url(y);
-
-  const kp = { pub: `${x}.${y}`, priv: privKey };
-  return kp;
-}
-
-async function ethereumConnect() {
-  const providerOptions = {
-    walletconnect: {
-      package: WalletConnectProvider,
-      options: {
-        infuraId: "4bd8d95876de48e0b17d56c0da31880a"
-      }
-    }
-  };
-  const web3Modal = new Web3Modal({
-    network: "mainnet",
-    providerOptions,
-    theme: "dark"
-  });
-
-  web3Modal.on('accountsChanged', (provider) => {
-    console.log('connect', provider);
-  });
-
-  const provider = await web3Modal.connect();
-  return new Web3(provider);
-}
-
-async function ethereumLogin(name) {
-  const web3 = await ethereumConnect();
-  const accounts = await web3.eth.getAccounts();
-
-  if (accounts.length > 0) {
-    const message = "I'm trusting this application with an irrevocable access key to my Iris account.";
-    const signature = await web3.eth.personal.sign(message, accounts[0]);
-    const signatureBytes = hexToUint8Array(signature.substring(2));
-    const hash1 = await window.crypto.subtle.digest('SHA-256', signatureBytes);
-    const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
-    const signingKey = keyPairFromHash(hash1);
-    const encryptionKey = keyPairFromHash(hash2);
-    const k = {
-      pub: signingKey.pub,
-      priv: signingKey.priv,
-      epub: encryptionKey.pub,
-      epriv: encryptionKey.priv
-    };
-    login(k);
-    setTimeout(async () => {
-      State.public.user().get('profile').get('name').once(existingName => {
-        if (typeof existingName !== 'string' || existingName === '') {
-          name = name || Helpers.generateName();
-          State.public.user().get('profile').put({a:null});
-          State.public.user().get('profile').get('name').put(name);
-        }
-      });
-    }, 2000);
-  }
-}
-
 function login(k) {
   const shouldRefresh = !!key;
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
-  iris.Channel.initUser(State.public, key);
+  Channel.initUser(State.public, key);
   Notifications.subscribeToWebPush();
   Notifications.getWebPushSubscriptions();
   Notifications.subscribeToIrisNotifications();
-  iris.Channel.getMyChatLinks(State.public, key, undefined, chatLink => {
+  Channel.getMyChatLinks(State.public, key, undefined, chatLink => {
     State.local.get('chatLinks').get(chatLink.id).put(chatLink.url);
     latestChatLink = chatLink.url;
   });
   setOurOnlineStatus();
-  iris.Channel.getChannels(State.public, key, addChannel);
-  let chatId = Helpers.getUrlParameter('chatWith') || Helpers.getUrlParameter('channelId');
-  let inviter = Helpers.getUrlParameter('inviter');
-  function go() {
-    if (inviter !== key.pub) {
-      newChannel(chatId, window.location.href);
-    }
-    _.defer(() => route(`/chat/${  chatId}`)); // defer because router is only initialised after login
-    window.history.pushState({}, "Iris Chat", `/${window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]}`); // remove param
-  }
-  if (chatId) {
-    if (inviter) {
-      setTimeout(go, 2000); // wait a sec to not re-create the same chat
-    } else {
-      go();
-    }
-  }
+  Channel.getChannels(State.public, key, addChannel);
   State.public.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       myName = name;
@@ -341,7 +236,7 @@ function login(k) {
 }
 
 async function createChatLink() {
-  latestChatLink = await iris.Channel.createChatLink(State.public, key);
+  latestChatLink = await Channel.createChatLink(State.public, key);
 }
 
 function clearIndexedDB() {
@@ -367,7 +262,7 @@ function clearIndexedDB() {
 }
 
 function getMyChatLink() {
-  return latestChatLink || Helpers.getProfileLink(key.pub);
+  return latestChatLink || util.getProfileLink(key.pub);
 }
 
 function getKey() { return key; }
@@ -375,7 +270,6 @@ function getMyName() { return myName; }
 function getMyProfilePhoto() { return myProfilePhoto; }
 
 async function logOut() {
-  route('/');
   if (State.electron) {
     State.electron.get('user').put(null);
   }
@@ -386,7 +280,7 @@ async function logOut() {
       reg.active.postMessage({key: null});
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
-        const hash = await iris.util.getHash(JSON.stringify(sub));
+        const hash = await util.getHash(JSON.stringify(sub));
         Notifications.removeSubscription(hash);
         sub.unsubscribe && sub.unsubscribe();
       }
@@ -395,6 +289,8 @@ async function logOut() {
   clearIndexedDB();
   localStorage.clear();
   localforage.clear().then(() => {
+    window.location.hash = '';
+    window.location.href = '/';
     location.reload();
   });
 }
@@ -404,7 +300,7 @@ function getPubKey() {
 }
 
 function loginAsNewUser(name) {
-  name = name || Helpers.generateName();
+  name = name || util.generateName();
   console.log('loginAsNewUser name', name);
   return Gun.SEA.pair().then(k => {
     login(k);
@@ -444,7 +340,7 @@ function newChannel(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(channels, pub)) {
     return;
   }
-  const chat = new iris.Channel({gun: State.public, key, chatLink, participants: pub});
+  const chat = new Channel({gun: State.public, key, chatLink, participants: pub});
   addChannel(chat);
   return chat;
 }
@@ -500,7 +396,7 @@ function addChannel(chat) {
       State.local.get('channels').get(pub).get('isTyping').put(isTyping);
     });
     chat.online = {};
-    iris.Channel.getActivity(State.public, pub, (activity) => {
+    Channel.getActivity(State.public, pub, (activity) => {
       if (chat) {
         chatNode.put({theirLastActiveTime: activity && activity.lastActive, activity: activity && activity.isActive && activity.status});
         chat.activity = activity;
@@ -571,7 +467,7 @@ function addChannel(chat) {
   });
 }
 
-function processMessage(chatId, msg, info) {
+function processMessage(chatId, msg, info, onClickNotification) {
   const chat = channels[chatId];
   if (chat.messageIds[msg.time + info.from]) return;
   chat.messageIds[msg.time + info.from] = true;
@@ -602,7 +498,8 @@ function processMessage(chatId, msg, info) {
       latest: {time: msg.time, text: msg.text, selfAuthored: info.selfAuthored}
     });
   }
-  Notifications.notifyMsg(msg, info, chatId);
+  // TODO: onclickNotification should do       route(`/chat/${  pub}`);
+  Notifications.notifyMsg(msg, info, chatId, onClickNotification);
 }
 
 function subscribeToMsgs(pub) {
@@ -614,23 +511,8 @@ function subscribeToMsgs(pub) {
   });
 }
 
-function followChatLink(str) {
-  if (str && str.indexOf('http') === 0) {
-    const s = str.split('?');
-    let chatId;
-    if (s.length === 2) {
-      chatId = Helpers.getUrlParameter('chatWith', s[1]) || Helpers.getUrlParameter('channelId', s[1]);
-    }
-    if (chatId) {
-      newChannel(chatId, str);
-      route(`/chat/${  chatId}`);
-      return true;
-    }
-    if (str.indexOf('https://iris.to') === 0) {
-      route(str.replace('https://iris.to', ''));
-      return true;
-    }
-  }
-}
-
-export default {init, followChatLink, getKey, getPubKey, ethereumLogin, ethereumConnect, updateSearchIndex, getSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };
+// TODO merge with State
+/**
+ * Utilities for Iris sessions
+ */
+export default {init, getKey, getPubKey, updateSearchIndex, getSearchIndex, getMyName, getMyProfilePhoto, getMyChatLink, createChatLink, ourActivity, login, logOut, addFollow, removeFollow, loginAsNewUser, DEFAULT_SETTINGS, channels, newChannel, addChannel, processMessage, subscribeToMsgs };

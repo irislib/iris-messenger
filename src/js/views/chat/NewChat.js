@@ -11,6 +11,7 @@ import iris from 'iris-lib';
 import Component from '../../BaseComponent';
 import {Helmet} from 'react-helmet';
 import Button from '../../components/basic/Button';
+import Helpers from '../../Helpers';
 
 function setChatLinkQrCode(link) {
   let qrCodeEl = $('#my-qr-code');
@@ -39,13 +40,13 @@ class NewChat extends Component {
       QRScanner.cleanupScanner();
     } else {
       $('#chatlink-qr-video').show();
-      QRScanner.startChatLinkQRScanner(result => result.text && Session.followChatLink(result.text));
+      QRScanner.startChatLinkQRScanner(result => result.text && Helpers.followChatLink(result.text));
     }
   }
 
   onPasteChatLink(e) {
     const val = $(e.target).val();
-    Session.followChatLink(val);
+    Helpers.followChatLink(val);
     $(e.target).val('');
   }
 

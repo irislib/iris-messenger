@@ -3,13 +3,13 @@ import { html } from 'htm/preact';
 import { translate as t } from '../../translations/Translation';
 import Torrent from '../../components/Torrent';
 import State from '../../../../iris-lib/src/State';
-import Session from '../../Session';
+import Session from 'iris-lib/src/Session';
 import iris from 'iris-lib';
 import _ from 'lodash';
 import $ from 'jquery';
 import EmojiButton from '../../lib/emoji-button';
 import MessageForm from '../../components/MessageForm';
-import Notifications from '../../Notifications';
+import Notifications from 'iris-lib/src/Notifications';
 
 const submitButton = html`
   <button type="submit">

@@ -6,7 +6,7 @@ import State from '../../../../iris-lib/src/State';
 import Identicon from '../../components/Identicon';
 import ChatMessageForm from './ChatMessageForm';
 import Name from '../../components/Name';
-import Session from '../../Session';
+import Session from 'iris-lib/src/Session';
 import $ from 'jquery';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';

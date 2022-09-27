@@ -1,14 +1,12 @@
 import Component from '../BaseComponent';
-import { route } from 'preact-router';
 import Helpers from '../Helpers';
 import State from '../../../iris-lib/src/State';
 import Identicon from './Identicon';
 import Text from './Text';
 import {translate as t} from '../translations/Translation';
-import Session from '../Session';
+import Session from '../../../iris-lib/src/Session';
 import $ from 'jquery';
 import _ from 'lodash';
-import SafeImg from './SafeImg';
 
 const RESULTS_MAX = 5;
 const suggestedFollow = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
@@ -154,7 +152,7 @@ class SearchBox extends Component<Props, State> {
         return this.props.onSelect({key});
       }
     }
-    if (Session.followChatLink(query)) return;
+    if (Helpers.followChatLink(query)) return;
 
     if (query) {
       const results = Session.getSearchIndex().search(query).slice(0,RESULTS_MAX);

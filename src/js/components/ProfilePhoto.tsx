@@ -1,7 +1,7 @@
 import {Component} from 'preact';
 import Helpers from '../Helpers';
 import $ from 'jquery';
-import Session from '../Session';
+import Session from '../../../iris-lib/src/Session';
 import SafeImg from './SafeImg';
 import { html } from 'htm/preact';
 

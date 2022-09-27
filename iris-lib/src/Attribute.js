@@ -19,16 +19,9 @@ const UNIQUE_ID_VALIDATORS = {
   uuid: /[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}/
 };
 
-/**
-* A simple key-value pair with helper functions.
-*
-* Constructor: new Attribute(value), new Attribute(type, value) or new Attribute({type, value})
-*/
+// TODO this class could perhaps be removed
+
 class Attribute {
-  /**
-  * @param {string} a
-  * @param {string} b
-  */
   constructor(a, b) {
     if (typeof a === `object`) {
       if (typeof a.value !== `string`) { throw new Error(`param1.value must be a string, got ${typeof a.value}: ${JSON.stringify(a.value)}`); }
@@ -54,40 +47,23 @@ class Attribute {
     }
   }
 
-  /**
-  * @returns {Attribute} uuid
-  */
   static getUuid() {
     const b = a => a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
     return new Attribute(`uuid`, b());
   }
 
-  /**
-  * @returns {Object} an object with attribute types as keys and regex patterns as values
-  */
   static getUniqueIdValidators() {
     return UNIQUE_ID_VALIDATORS;
   }
 
-  /**
-  * @param {string} type attribute type
-  * @returns {boolean} true if the attribute type is unique
-  */
   static isUniqueType(type) {
     return Object.keys(UNIQUE_ID_VALIDATORS).indexOf(type) > -1;
   }
 
-  /**
-  * @returns {boolean} true if the attribute type is unique
-  */
   isUniqueType() {
     return Attribute.isUniqueType(this.type);
   }
 
-  /**
-  * @param {string} value guess type of this attribute value
-  * @returns {string} type of attribute value or undefined
-  */
   static guessTypeOf(value) {
     for (const key in UNIQUE_ID_VALIDATORS) {
       if (value.match(UNIQUE_ID_VALIDATORS[key])) {
@@ -96,28 +72,14 @@ class Attribute {
     }
   }
 
-  /**
-  * @param {Attribute} a
-  * @param {Attribute} b
-  * @returns {boolean} true if params are equal
-  */
   static equals(a, b) {
     return a.equals(b);
   }
 
-  /**
-  * @param {Attribute} a attribute to compare to
-  * @returns {boolean} true if attribute matches param
-  */
   equals(a) {
     return a && this.type === a.type && this.value === a.value;
   }
 
-  /**
-  * @returns {string} uri - `${encodeURIComponent(this.value)}:${encodeURIComponent(this.type)}`
-  * @example
-  * user%20example.com:email
-  */
   uri() {
     return `${encodeURIComponent(this.value)}:${encodeURIComponent(this.type)}`;
   }
@@ -138,11 +100,6 @@ class Attribute {
       });
   }
 
-  /**
-  * Generate a visually recognizable representation of the attribute
-  * @param {object} options {width}
-  * @returns {HTMLElement} identicon div element
-  */
   identicon(options = {}) {
     options = Object.assign({
       width: 50,

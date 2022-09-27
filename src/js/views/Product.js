@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
 import State from '../../../iris-lib/src/State';
-import Session from '../Session';
+import Session from 'iris-lib/src/Session';
 import {translate as t} from '../translations/Translation';
 import { route } from 'preact-router';
 import StoreView from './Store';

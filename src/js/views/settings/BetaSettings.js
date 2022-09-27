@@ -1,5 +1,5 @@
 import State from '../../../../iris-lib/src/State';
-import Session from '../../Session';
+import Session from 'iris-lib/src/Session';
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
 

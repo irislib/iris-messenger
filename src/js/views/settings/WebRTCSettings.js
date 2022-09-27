@@ -2,7 +2,7 @@ import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
 import State from '../../../../iris-lib/src/State';
 import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../../components/VideoCall';
-import Notifications from '../../Notifications';
+import Notifications from 'iris-lib/src/Notifications';
 import $ from 'jquery';
 import Button from '../../components/basic/Button';
 

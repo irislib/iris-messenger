@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
 import { translate as t } from '../../../translations/Translation';
-import Session from '../../../Session';
+import Session from 'iris-lib/src/Session';
 import State from '../../../../../iris-lib/src/State';
 import CopyButton from '../../../components/CopyButton';
 import Button from '../../../components/basic/Button';

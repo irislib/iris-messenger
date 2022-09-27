@@ -2,7 +2,7 @@ import { html } from 'htm/preact';
 import {translate as tr} from '../translations/Translation';
 import State from '../../../iris-lib/src/State';
 import {Helmet} from "react-helmet";
-import Session from '../Session';
+import Session from 'iris-lib/src/Session';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';

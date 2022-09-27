@@ -1,10 +1,11 @@
 import { translate as t } from '../../../translations/Translation';
-import Session from '../../../Session';
+import Session from 'iris-lib/src/Session';
 import QRScanner from '../../../QRScanner';
 import Button from '../../../components/basic/Button';
 import $ from 'jquery';
 import Component from '../../../BaseComponent';
 import QRCode from '../../../lib/qrcode.min';
+import Helpers from '../../../Helpers';
 
 function setChatLinkQrCode(link) {
     let qrCodeEl = $('#my-qr-code');
@@ -32,7 +33,7 @@ function setChatLinkQrCode(link) {
           QRScanner.cleanupScanner();
         } else {
           $('#chatlink-qr-video').show();
-          QRScanner.startChatLinkQRScanner(result => result.text && Session.followChatLink(result.text));
+          QRScanner.startChatLinkQRScanner(result => result.text && Helpers.followChatLink(result.text));
         }
       }
 

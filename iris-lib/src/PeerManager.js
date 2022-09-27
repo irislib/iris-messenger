@@ -1,8 +1,8 @@
-import State from '../../iris-lib/src/State';
-import Helpers from './Helpers';
+import State from './State';
 import Session from './Session';
 import _ from 'lodash';
 import Gun from 'gun';
+import util from './util';
 
 const MAX_PEER_LIST_SIZE = 10;
 const ELECTRON_GUN_URL = 'http://localhost:8767/gun';
@@ -21,10 +21,13 @@ if (loc.hostname.endsWith('herokuapp.com') || is_localhost_but_not_dev) {
 
 let knownPeers = getSavedPeers();
 
+const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
+
 async function addPeer(peer) {
-  if (!Helpers.isUrl(peer.url)) {
+  if (!urlRegex.test(peer.url)) {
     throw new Error('Invalid url', peer.url);
   }
+
   if (peer.from) {
     Object.keys(knownPeers).forEach(k => {
       if (knownPeers[k].from === peer.from) { // remove previous peer url from the same user
@@ -68,7 +71,7 @@ function getSavedPeers() {
   } else {
     p = DEFAULT_PEERS;
   }
-  if (Helpers.isElectron) {
+  if (util.isElectron) {
     p[ELECTRON_GUN_URL] = {};
   }
   Object.keys(p).forEach(k => _.defaults(p[k], {enabled: true}));
@@ -108,12 +111,12 @@ function isMixedContent(url) {
 }
 
 function getRandomPeers() {
-  const connectToLocalElectron = Helpers.isElectron && knownPeers[ELECTRON_GUN_URL] && knownPeers[ELECTRON_GUN_URL].enabled !== false;
+  const connectToLocalElectron = util.isElectron && knownPeers[ELECTRON_GUN_URL] && knownPeers[ELECTRON_GUN_URL].enabled !== false;
   const sampleSize = connectToLocalElectron ? Math.max(maxConnectedPeers - 1, 1) : maxConnectedPeers;
   const sample = _.sampleSize(
     Object.keys(
       _.pickBy(knownPeers, (peer, url) => {
-        return !isMixedContent(url) && peer.enabled && !(Helpers.isElectron && url === ELECTRON_GUN_URL);
+        return !isMixedContent(url) && peer.enabled && !(util.isElectron && url === ELECTRON_GUN_URL);
       })
     ), sampleSize
   );

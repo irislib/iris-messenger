@@ -1,17 +1,27 @@
 import Gun from 'gun';
-import 'gun/sea';
+/*import 'gun/sea';
 import 'gun/lib/yson';
 import 'gun/lib/radix';
 import 'gun/lib/radisk';
 import 'gun/lib/store';
-import 'gun/lib/rindexed';
+import 'gun/lib/rindexed';*/
 import _ from 'lodash';
 import Node from './Node';
 
-import PeerManager from '../../src/js/PeerManager';
+import PeerManager from './PeerManager';
 import util from './util';
 
+/**
+ * The main class for interacting with the Iris network.
+ *
+ * Contains State.local which is only accessible in the local environment and State.public which is synchronized with the world.
+ *
+ */
 const State = {
+  /**
+   * Initialize the state: start gun instances State.public and State.local
+   * @param publicOpts Options for the State.public gun instance
+   */
   init(publicOpts) {
     Gun.log.off = true;
     const o = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
@@ -50,10 +60,17 @@ const State = {
     return this.counter++;
   },
 
+  /**
+   * Return the object that contains blocked users
+   */
   getBlockedUsers() {
     return this.blockedUsers;
   },
 
+  /**
+   * Get a group object that aggregates content from all the users in the group
+   * @param groupName
+   */
   group(groupName = 'everyone') {
     const _this = this;
     return {
@@ -129,7 +146,7 @@ const State = {
 
       _cached_fn(fn, path, callback) {
         const cacheKey = `${fn}:${groupName}:${path}`;
-        
+
         let callbackId = _this.counterNext();
         if (_this.callbacks.has(cacheKey)) {
           _this.callbacks.get(cacheKey).set(callbackId, callback);

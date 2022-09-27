@@ -1,10 +1,10 @@
 import { createRef } from 'preact';
 import Helpers from '../Helpers';
-import Notifications from '../Notifications';
+import Notifications from 'iris-lib/src/Notifications';
 import { html } from 'htm/preact';
 import { translate as t } from '../translations/Translation';
 import State from '../../../iris-lib/src/State';
-import Session from '../Session';
+import Session from 'iris-lib/src/Session';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
 import $ from 'jquery';
