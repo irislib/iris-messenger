@@ -1,10 +1,10 @@
 import Gun from 'gun';
-/*import 'gun/sea';
+import 'gun/sea';
 import 'gun/lib/yson';
 import 'gun/lib/radix';
 import 'gun/lib/radisk';
 import 'gun/lib/store';
-import 'gun/lib/rindexed';*/
+import 'gun/lib/rindexed';
 import _ from 'lodash';
 import Node from './Node';
 
@@ -25,13 +25,13 @@ const State = {
   init(publicOpts) {
     Gun.log.off = true;
     const o = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
-    this.public = Gun(o);
+    this.public = new Gun(o);
     if (publicOpts && publicOpts.peers) {
       publicOpts.peers.forEach(url => PeerManager.addPeer({url}));
     }
     this.local = new Node();
     if (util.isElectron) {
-      this.electron = Gun({peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast:false, localStorage: false}).get('state');
+      this.electron = new Gun({peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast:false, localStorage: false}).get('state');
     }
     this.blockedUsers = {};
 
