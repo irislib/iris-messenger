@@ -59,7 +59,7 @@ const GalleryImage = styled.a`
 
 function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
-    iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
+    iris.Channel.deleteChannel(Session.getKey(), pub);
     delete Session.channels[pub];
     State.local.get('channels').get(pub).put(null);
     route(`/chat`);

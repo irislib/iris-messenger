@@ -18,7 +18,7 @@ import Button from '../components/basic/Button';
 
 function deleteChat(uuid) {
   if (confirm("Delete chat?")) {
-      iris.Channel.deleteGroup(State.public, Session.getKey(), uuid);
+      iris.Channel.deleteGroup(Session.getKey(), uuid);
       delete Session.channels[uuid];
       State.local.get('channels').get(uuid).put(null);
       route('/chat');

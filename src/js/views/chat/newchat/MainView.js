@@ -30,7 +30,6 @@ class MainView extends Component {
     
     createNewInvite(){
         Session.createChatLink();
-        route(`/chat/new/MainView`);
     }
 
     render(){

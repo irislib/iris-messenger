@@ -236,7 +236,7 @@ function login(k) {
 }
 
 async function createChatLink() {
-  latestChatLink = await Channel.createChatLink(State.public, key);
+  latestChatLink = await Channel.createChatLink(key);
 }
 
 function clearIndexedDB() {
@@ -396,7 +396,7 @@ function addChannel(chat) {
       State.local.get('channels').get(pub).get('isTyping').put(isTyping);
     });
     chat.online = {};
-    Channel.getActivity(State.public, pub, (activity) => {
+    Channel.getActivity(pub, (activity) => {
       if (chat) {
         chatNode.put({theirLastActiveTime: activity && activity.lastActive, activity: activity && activity.isActive && activity.status});
         chat.activity = activity;
