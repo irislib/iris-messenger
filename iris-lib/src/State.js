@@ -189,4 +189,6 @@ const State = {
   },
 };
 
+State.init();
+
 export default State;
