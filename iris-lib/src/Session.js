@@ -340,7 +340,7 @@ function newChannel(pub, chatLink) {
   if (!pub || Object.prototype.hasOwnProperty.call(channels, pub)) {
     return;
   }
-  const chat = new Channel({gun: State.public, key, chatLink, participants: pub});
+  const chat = new Channel({key, chatLink, participants: pub});
   addChannel(chat);
   return chat;
 }
