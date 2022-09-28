@@ -17,7 +17,8 @@ import util from './util';
  * Contains State.local which is only accessible in the local environment and State.public which is synchronized with the world.
  *
  */
-const State = {
+
+export default {
   /**
    * Initialize the state: start gun instances State.public and State.local
    * @param publicOpts Options for the State.public gun instance
@@ -44,8 +45,8 @@ const State = {
       if (isBlocked === this.blockedUsers[user]) { return; }
       if (isBlocked) {
         this.blockedUsers[user] = isBlocked;
-        State.local.get('groups').map((v, k) => {
-          State.local.get('groups').get(k).get(user).put(false);
+        this.local.get('groups').map((v, k) => {
+          this.local.get('groups').get(k).get(user).put(false);
         });
       } else {
         delete this.blockedUsers[user];
@@ -83,7 +84,7 @@ const State = {
             if (follows[user] && follows[user] === isFollowing) { return; }
             follows[user] = isFollowing;
             if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
-              let node = State.public.user(user);
+              let node = _this.public.user(user);
               if (path && path !== '/') {
                 node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
               }
@@ -188,7 +189,3 @@ const State = {
     }
   },
 };
-
-State.init();
-
-export default State;

@@ -50,12 +50,13 @@ type State = {
   translationLoaded: boolean;
 }
 
+State.init();
+Session.init({autologin: window.location.hash.length > 2});
+PeerManager.init();
+
+
 class Main extends Component<Props,State> {
   componentDidMount() {
-    State.init();
-    Session.init({autologin: window.location.hash.length > 2});
-    PeerManager.init();
-
     State.local.get('loggedIn').on(this.inject());
     State.local.get('toggleMenu').put(false);
     State.local.get('toggleMenu').on((show: boolean) => this.toggleMenu(show));
