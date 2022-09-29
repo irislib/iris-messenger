@@ -41,7 +41,7 @@ if (window.location.host === 'iris.to' && window.location.pathname !== '/') {
 
 type Props = {};
 
-type State = {
+type ReactState = {
   loggedIn: boolean;
   showMenu: boolean;
   unseenMsgsTotal: number;
@@ -50,7 +50,7 @@ type State = {
   translationLoaded: boolean;
 }
 
-class Main extends Component<Props,State> {
+class Main extends Component<Props,ReactState> {
   componentDidMount() {
     State.init();
     Session.init({autologin: window.location.hash.length > 2});
