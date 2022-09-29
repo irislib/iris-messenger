@@ -52,7 +52,7 @@ type ReactState = {
 
 class Main extends Component<Props,ReactState> {
   componentDidMount() {
-    State.init();
+    State.init(); // TODO merge with Session.init and PeerManager.init
     Session.init({autologin: window.location.hash.length > 2});
     PeerManager.init();
     State.local.get('loggedIn').on(this.inject());
