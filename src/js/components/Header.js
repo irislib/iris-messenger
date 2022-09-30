@@ -8,8 +8,8 @@ import { route } from 'preact-router';
 import Identicon from './Identicon';
 import SearchBox from './SearchBox';
 import Icons from '../Icons';
-import iris from 'iris-lib';
 import {Link} from "preact-router/match";
+import util from 'iris-lib/src/util';
 
 import $ from 'jquery';
 import _ from "lodash";
@@ -36,11 +36,11 @@ class Header extends Component {
         return(t('online'));
       } else if (activity.lastActive) {
         const d = new Date(activity.lastActive);
-        let lastSeenText = t(iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
+        let lastSeenText = t(util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
         if (lastSeenText === t('today')) {
-          lastSeenText = iris.util.formatTime(d);
+          lastSeenText = util.formatTime(d);
         } else {
-          lastSeenText = iris.util.formatDate(d);
+          lastSeenText = util.formatDate(d);
         }
         return (`${t('last_active')  } ${  lastSeenText}`);
       }

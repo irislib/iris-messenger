@@ -10,10 +10,10 @@ import Session from 'iris-lib/src/Session';
 import Torrent from './Torrent';
 import Icons from '../Icons';
 import Autolinker from 'autolinker';
-import iris from 'iris-lib';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
 import Notifications from 'iris-lib/src/Notifications';
+import SignedMessage from 'iris-lib/src/SignedMessage';
 
 const MSG_TRUNCATE_LENGTH = 1000;
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
@@ -43,7 +43,7 @@ class PublicMessage extends Message {
             return;
           }
           event.off();
-          const msg = await iris.SignedMessage.fromString(serialized);
+          const msg = await SignedMessage.fromString(serialized);
           if (msg) {
             resolve(msg);
           }
