@@ -1,4 +1,4 @@
-import Session from '../../../iris-lib/src/Session';
+import Session from 'iris-lib/src/Session';
 import {translate as t} from '../translations/Translation';
 import { route } from 'preact-router';
 import Button from '../components/basic/Button';
