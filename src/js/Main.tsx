@@ -29,7 +29,6 @@ import MediaPlayer from './components/MediaPlayer';
 import Footer from './components/Footer';
 
 import State from 'iris-lib/src/State';
-import PeerManager from "iris-lib/src/PeerManager";
 import Session from 'iris-lib/src/Session';
 
 import '../css/style.css';
@@ -53,8 +52,6 @@ type ReactState = {
 class Main extends Component<Props,ReactState> {
   componentDidMount() {
     State.init(); // TODO merge with Session.init and PeerManager.init
-    Session.init({autologin: window.location.hash.length > 2});
-    PeerManager.init();
     State.local.get('loggedIn').on(this.inject());
     State.local.get('toggleMenu').put(false);
     State.local.get('toggleMenu').on((show: boolean) => this.toggleMenu(show));

@@ -7,7 +7,7 @@ import Button from '../../../components/basic/Button';
 import $ from 'jquery';
 import Component from '../../../BaseComponent';
 import { route } from 'preact-router';
-import iris from 'iris-lib';
+import Channel from 'iris-lib/src/Channel';
 
 class MainView extends Component {
     constructor() {
@@ -21,7 +21,7 @@ class MainView extends Component {
         this.props.chatLinks[id] = null;
         this.setState({chatLinks: this.props.chatLinks});
         this.forceUpdate();
-        return iris.Channel.removePrivateChatLink(State.public, Session.getKey(), id);
+        return Channel.removePrivateChatLink(State.public, Session.getKey(), id);
         
     }
     componentDidMount() {

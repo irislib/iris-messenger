@@ -6,7 +6,6 @@ import Session from 'iris-lib/src/Session';
 import { Component } from 'preact';
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
-import iris from 'iris-lib';
 import {ec as EC} from "elliptic";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3Modal from "web3modal";
@@ -160,7 +159,7 @@ class Login extends Component {
 
   onLoginFormSubmit(e) {
     e.preventDefault();
-    let name = document.getElementById('login-form-name').value || iris.util.generateName();
+    let name = document.getElementById('login-form-name').value || util.generateName();
     Session.loginAsNewUser(name);
     this.base.style = 'display:none';
   }

@@ -8,6 +8,7 @@ import 'gun/lib/rindexed';
 import _ from 'lodash';
 import Node from './Node';
 
+import Session from './Session';
 import PeerManager from './PeerManager';
 import util from './util';
 
@@ -55,6 +56,8 @@ export default {
 
     window.State = this;
     util.setPublicState && util.setPublicState(this.public);
+    Session.init({autologin: window.location.hash.length > 2});
+    PeerManager.init();
   },
 
   counterNext() {

@@ -13,12 +13,12 @@ import View from './View';
 import SearchBox from '../components/SearchBox';
 import {SMS_VERIFIER_PUB} from '../SMS';
 import $ from 'jquery';
-import iris from 'iris-lib';
 import Button from '../components/basic/Button';
+import Channel from 'iris-lib/src/Channel';
 
 function deleteChat(uuid) {
   if (confirm("Delete chat?")) {
-      iris.Channel.deleteGroup(Session.getKey(), uuid);
+      Channel.deleteGroup(Session.getKey(), uuid);
       delete Session.channels[uuid];
       State.local.get('channels').get(uuid).put(null);
       route('/chat');

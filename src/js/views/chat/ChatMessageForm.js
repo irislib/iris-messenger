@@ -4,12 +4,12 @@ import { translate as t } from '../../translations/Translation';
 import Torrent from '../../components/Torrent';
 import State from 'iris-lib/src/State';
 import Session from 'iris-lib/src/Session';
-import iris from 'iris-lib';
 import _ from 'lodash';
 import $ from 'jquery';
 import EmojiButton from '../../lib/emoji-button';
 import MessageForm from '../../components/MessageForm';
 import Notifications from 'iris-lib/src/Notifications';
+import util from 'iris-lib/src/util';
 
 const submitButton = html`
   <button type="submit">
@@ -24,7 +24,7 @@ class ChatMessageForm extends MessageForm {
       textEl.val(textEl.val() + emoji);
       textEl.focus();
     });
-    if (!iris.util.isMobile && this.props.autofocus !== false) {
+    if (!util.isMobile && this.props.autofocus !== false) {
       $(this.base).find(".new-msg").focus();
     }
   }
@@ -71,7 +71,7 @@ class ChatMessageForm extends MessageForm {
   }
 
   componentDidUpdate() {
-    if (!iris.util.isMobile && this.props.autofocus !== false) {
+    if (!util.isMobile && this.props.autofocus !== false) {
       $(this.base).find(".new-msg").focus();
     }
     if ($('#attachment-preview:visible').length) {

@@ -16,13 +16,13 @@ import View from './View';
 import { Link } from 'preact-router/match';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min';
-import iris from 'iris-lib';
 import {Helmet} from "react-helmet";
 import {SMS_VERIFIER_PUB} from '../SMS';
 import ProfilePhoto from '../components/ProfilePhoto';
 import Button from '../components/basic/Button';
 import Web3 from 'web3';
 import styled from 'styled-components';
+import Channel from 'iris-lib/src/Channel';
 
 const ImageGrid = styled.div`
   display: grid;
@@ -59,7 +59,7 @@ const GalleryImage = styled.a`
 
 function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
-    iris.Channel.deleteChannel(Session.getKey(), pub);
+    Channel.deleteChannel(Session.getKey(), pub);
     delete Session.channels[pub];
     State.local.get('channels').get(pub).put(null);
     route(`/chat`);

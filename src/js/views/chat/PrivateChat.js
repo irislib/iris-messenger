@@ -12,9 +12,9 @@ import Notifications from 'iris-lib/src/Notifications';
 import NewChat from './newchat/NewChat';
 import _ from 'lodash';
 import $ from 'jquery';
-import iris from 'iris-lib';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';
+import util from 'iris-lib/src/util';
 
 import Button from '../../components/basic/Button';
 import { Router } from 'preact-router';
@@ -236,7 +236,7 @@ export default class PrivateChat extends Component {
           const dateStr = date.toLocaleDateString();
           if (dateStr !== previousDateStr) {
             isDifferentDay = true;
-            let separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
+            let separatorText = util.getDaySeparatorText(date, dateStr, now, nowStr);
             msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
           }
           previousDateStr = dateStr;
