@@ -105,10 +105,11 @@
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.2.1",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-terser": "^1.0.1"
+    "rollup-plugin-terser": "^1.0.1",
+    "gun": "https://github.com/mmalmi/gun.git"
   },
   "peerDependencies": {
-    "gun": "^0.2020.1238"
+    "gun": "https://github.com/mmalmi/gun.git"
   },
   "dependencies": {
     "fuse.js": "^6.6.2",

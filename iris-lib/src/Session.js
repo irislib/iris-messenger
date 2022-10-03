@@ -20,6 +20,14 @@ let searchIndex;
 const searchableItems = {};
 const channels = window.channels = {};
 
+const taskQueue = [];
+setInterval(() => {
+  if (taskQueue.length) {
+    //console.log('taskQueue', taskQueue.length);
+    taskQueue.shift()();
+  }
+}, 10);
+
 const DEFAULT_SETTINGS = {
   electron: {
     openAtLogin: true,
@@ -39,14 +47,6 @@ const updateSearchIndex = _.throttle(() => {
   searchIndex = new Fuse(values, options);
   State.local.get('searchIndexUpdated').put(true);
 }, 2000, {leading:true});
-
-const taskQueue = [];
-setInterval(() => {
-  if (taskQueue.length) {
-    //console.log('taskQueue', taskQueue.length);
-    taskQueue.shift()();
-  }
-}, 10);
 
 const saveSearchResult = _.throttle(k => {
     State.local.get('contacts').get(k).put({followDistance: searchableItems[k].followDistance,followerCount: searchableItems[k].followers.size});
