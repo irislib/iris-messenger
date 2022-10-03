@@ -1,6 +1,4 @@
 [build]
-  publish = "build"
-  command = "yarn build"
   environment = { NETLIFY_USE_YARN = "true" }
 
 [dev]
