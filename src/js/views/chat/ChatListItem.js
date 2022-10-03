@@ -3,8 +3,8 @@ import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import { route } from 'preact-router';
 import { translate as t } from '../../translations/Translation';
-import State from '../../../../iris-lib/src/State';
-import Session from '../../Session';
+import State from 'iris-lib/src/State';
+import Session from 'iris-lib/src/Session';
 import Identicon from '../../components/Identicon';
 
 const seenIndicator = html`<span class="seen-indicator"><svg viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;

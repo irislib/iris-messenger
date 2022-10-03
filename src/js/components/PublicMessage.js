@@ -2,18 +2,18 @@ import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import Identicon from './Identicon';
 import FeedMessageForm from './FeedMessageForm';
-import State from '../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import { route } from 'preact-router';
 import Message from './Message';
 import SafeImg from './SafeImg';
-import Session from '../Session';
+import Session from 'iris-lib/src/Session';
 import Torrent from './Torrent';
 import Icons from '../Icons';
 import Autolinker from 'autolinker';
-import iris from 'iris-lib';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
-import Notifications from '../Notifications';
+import Notifications from 'iris-lib/src/Notifications';
+import SignedMessage from 'iris-lib/src/SignedMessage';
 
 const MSG_TRUNCATE_LENGTH = 1000;
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
@@ -43,7 +43,7 @@ class PublicMessage extends Message {
             return;
           }
           event.off();
-          const msg = await iris.SignedMessage.fromString(serialized);
+          const msg = await SignedMessage.fromString(serialized);
           if (msg) {
             resolve(msg);
           }

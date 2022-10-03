@@ -1,14 +1,11 @@
-import Helpers from './Helpers';
 import Session from './Session';
-import { route } from 'preact-router';
-import State from '../../iris-lib/src/State';
+import State from './State';
 import _ from 'lodash';
-import iris from 'iris-lib';
 import Gun from 'gun';
-import $ from 'jquery';
+import util from './util';
 
 const NOTIFICATION_SERVICE_URL = 'https://iris-notifications.herokuapp.com/notify';
-const notificationSound = new Audio('../../assets/audio/notification.mp3');
+// const notificationSound = new Audio('../../assets/audio/notification.mp3'); // TODO
 let loginTime;
 let unseenMsgsTotal = 0;
 let unseenNotificationCount = 0;
@@ -18,20 +15,7 @@ function desktopNotificationsEnabled() {
   return window.Notification && Notification.permission === 'granted';
 }
 
-function enableDesktopNotifications() {
-  if (window.Notification) {
-    Notification.requestPermission(() => {
-      if (Notification.permission === 'granted' || Notification.permission === 'denied') {
-        $('#enable-notifications-prompt').slideUp();
-      }
-      if (Notification.permission === 'granted') {
-        subscribeToWebPush();
-      }
-    });
-  }
-}
-
-function notifyMsg(msg, info, pub) {
+function notifyMsg(msg, info, pub, onClick) {
   function shouldNotify() {
     if (msg.timeObj < loginTime) { return false; }
     if (info.selfAuthored) { return false; }
@@ -48,7 +32,7 @@ function notifyMsg(msg, info, pub) {
     return shouldNotify();
   }
   if (shouldAudioNotify()) {
-    notificationSound.play();
+    //notificationSound.play(); // TODO
   }
   if (shouldDesktopNotify()) {
     let body, title;
@@ -59,7 +43,7 @@ function notifyMsg(msg, info, pub) {
       title = 'Message'
       body = msg.text;
     }
-    body = Helpers.truncateString(body, 50);
+    body = util.truncateString(body, 50);
     let desktopNotification = new Notification(title, { // TODO: replace with actual name
       icon: '/assets/img/icon128.png',
       body,
@@ -67,7 +51,7 @@ function notifyMsg(msg, info, pub) {
     });
     desktopNotification.onclick = function() {
       changeUnseenNotificationCount(-1);
-      route(`/chat/${  pub}`);
+      onClick && onClick();
       window.focus();
     };
   }
@@ -147,7 +131,7 @@ async function addWebPushSubscription(s, saveToGun = true) {
   const myKey = Session.getKey();
   const mySecret = await Gun.SEA.secret(myKey.epub, myKey);
   const enc = await Gun.SEA.encrypt(s, mySecret);
-  const hash = await iris.util.getHash(JSON.stringify(s));
+  const hash = await util.getHash(JSON.stringify(s));
   if (saveToGun) {
     State.public.user().get('webPushSubscriptions').get(hash).put(enc);
   }
@@ -189,7 +173,7 @@ async function getNotificationText(notification) {
   return eventText;
 }
 
-function subscribeToIrisNotifications() {
+function subscribeToIrisNotifications(onClick) {
   let notificationsSeenTime;
   let notificationsShownTime;
   State.public.user().get('notificationsSeenTime').on(v => {
@@ -225,7 +209,7 @@ function subscribeToIrisNotifications() {
         });
         desktopNotification.onclick = function() {
           const link = notification.target ? `/post/${notification.target}` : `/profile/${notification.from}`;
-          route(link);
+          onClick && onClick(link);
           changeUnseenNotificationCount(-1);
           window.focus();
         };
@@ -292,4 +276,4 @@ function init() {
   unseenMsgsTotal = 0;
 }
 
-export default {init, notifyMsg, getNotificationText, sendWebPushNotification, changeUnseenNotificationCount, subscribeToIrisNotifications, sendIrisNotification, enableDesktopNotifications, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};
+export default {init, notifyMsg, getNotificationText, sendWebPushNotification, changeUnseenNotificationCount, subscribeToIrisNotifications, sendIrisNotification, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions, subscribeToWebPush, getWebPushSubscriptions, removeSubscription};

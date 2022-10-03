@@ -1,13 +1,13 @@
 import { html } from 'htm/preact';
 import { translate as t } from '../../../translations/Translation';
-import Session from '../../../Session';
-import State from '../../../../../iris-lib/src/State';
+import Session from 'iris-lib/src/Session';
+import State from 'iris-lib/src/State';
 import CopyButton from '../../../components/CopyButton';
 import Button from '../../../components/basic/Button';
 import $ from 'jquery';
 import Component from '../../../BaseComponent';
 import { route } from 'preact-router';
-import iris from 'iris-lib';
+import Channel from 'iris-lib/src/Channel';
 
 class MainView extends Component {
     constructor() {
@@ -21,7 +21,7 @@ class MainView extends Component {
         this.props.chatLinks[id] = null;
         this.setState({chatLinks: this.props.chatLinks});
         this.forceUpdate();
-        return iris.Channel.removePrivateChatLink(State.public, Session.getKey(), id);
+        return Channel.removePrivateChatLink(State.public, Session.getKey(), id);
         
     }
     componentDidMount() {
@@ -30,7 +30,6 @@ class MainView extends Component {
     
     createNewInvite(){
         Session.createChatLink();
-        route(`/chat/new/MainView`);
     }
 
     render(){

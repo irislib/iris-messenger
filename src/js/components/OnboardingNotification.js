@@ -2,12 +2,12 @@ import {html} from "htm/preact";
 import {translate as t} from "../translations/Translation";
 import Identicon from "./Identicon";
 import FollowButton from "./FollowButton";
-import Session from "../Session";
+import Session from "iris-lib/src/Session";
 import CopyButton from "./CopyButton";
 import Text from "./Text";
 import Helpers from "../Helpers";
 import Component from "../BaseComponent";
-import State from "../../../iris-lib/src/State";
+import State from "iris-lib/src/State";
 
 const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 

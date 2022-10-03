@@ -8,20 +8,32 @@ import 'gun/lib/rindexed';
 import _ from 'lodash';
 import Node from './Node';
 
-import PeerManager from '../../src/js/PeerManager';
+import Session from './Session';
+import PeerManager from './PeerManager';
 import util from './util';
 
-const State = {
+/**
+ * The main class for interacting with the Iris network.
+ *
+ * Contains State.local which is only accessible in the local environment and State.public which is synchronized with the world.
+ *
+ */
+
+export default {
+  /**
+   * Initialize the state: start gun instances State.public and State.local
+   * @param publicOpts Options for the State.public gun instance
+   */
   init(publicOpts) {
     Gun.log.off = true;
     const o = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
-    this.public = Gun(o);
+    this.public = new Gun(o);
     if (publicOpts && publicOpts.peers) {
       publicOpts.peers.forEach(url => PeerManager.addPeer({url}));
     }
     this.local = new Node();
     if (util.isElectron) {
-      this.electron = Gun({peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast:false, localStorage: false}).get('state');
+      this.electron = new Gun({peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast:false, localStorage: false}).get('state');
     }
     this.blockedUsers = {};
 
@@ -34,8 +46,8 @@ const State = {
       if (isBlocked === this.blockedUsers[user]) { return; }
       if (isBlocked) {
         this.blockedUsers[user] = isBlocked;
-        State.local.get('groups').map((v, k) => {
-          State.local.get('groups').get(k).get(user).put(false);
+        this.local.get('groups').map((v, k) => {
+          this.local.get('groups').get(k).get(user).put(false);
         });
       } else {
         delete this.blockedUsers[user];
@@ -44,16 +56,25 @@ const State = {
 
     window.State = this;
     util.setPublicState && util.setPublicState(this.public);
+    Session.init({autologin: window.location.hash.length > 2});
+    PeerManager.init();
   },
 
   counterNext() {
     return this.counter++;
   },
 
+  /**
+   * Return the object that contains blocked users
+   */
   getBlockedUsers() {
     return this.blockedUsers;
   },
 
+  /**
+   * Get a group object that aggregates content from all the users in the group
+   * @param groupName
+   */
   group(groupName = 'everyone') {
     const _this = this;
     return {
@@ -66,7 +87,7 @@ const State = {
             if (follows[user] && follows[user] === isFollowing) { return; }
             follows[user] = isFollowing;
             if (isFollowing) { // TODO: callback on unfollow, for unsubscribe
-              let node = State.public.user(user);
+              let node = _this.public.user(user);
               if (path && path !== '/') {
                 node = _.reduce(path.split('/'), (sum, s) => sum.get(decodeURIComponent(s)), node);
               }
@@ -129,7 +150,7 @@ const State = {
 
       _cached_fn(fn, path, callback) {
         const cacheKey = `${fn}:${groupName}:${path}`;
-        
+
         let callbackId = _this.counterNext();
         if (_this.callbacks.has(cacheKey)) {
           _this.callbacks.get(cacheKey).set(callbackId, callback);
@@ -171,5 +192,3 @@ const State = {
     }
   },
 };
-
-export default State;

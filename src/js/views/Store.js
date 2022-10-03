@@ -1,7 +1,7 @@
 import { html } from 'htm/preact';
 import {translate as t} from '../translations/Translation';
-import State from '../../../iris-lib/src/State';
-import Session from '../Session';
+import State from 'iris-lib/src/State';
+import Session from 'iris-lib/src/Session';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';

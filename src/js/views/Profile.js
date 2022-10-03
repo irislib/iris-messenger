@@ -1,8 +1,8 @@
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import {translate as t} from '../translations/Translation';
-import State from '../../../iris-lib/src/State';
-import Session from '../Session';
+import State from 'iris-lib/src/State';
+import Session from 'iris-lib/src/Session';
 import FeedMessageForm from '../components/FeedMessageForm';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
@@ -16,13 +16,14 @@ import View from './View';
 import { Link } from 'preact-router/match';
 import $ from 'jquery';
 import QRCode from '../lib/qrcode.min';
-import iris from 'iris-lib';
 import {Helmet} from "react-helmet";
 import {SMS_VERIFIER_PUB} from '../SMS';
 import ProfilePhoto from '../components/ProfilePhoto';
 import Button from '../components/basic/Button';
 import Web3 from 'web3';
 import styled from 'styled-components';
+import Channel from 'iris-lib/src/Channel';
+import Attribute from 'iris-lib/src/Attribute';
 
 const ImageGrid = styled.div`
   display: grid;
@@ -59,7 +60,7 @@ const GalleryImage = styled.a`
 
 function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
-    iris.Channel.deleteChannel(State.public, Session.getKey(), pub);
+    Channel.deleteChannel(Session.getKey(), pub);
     delete Session.channels[pub];
     State.local.get('channels').get(pub).put(null);
     route(`/chat`);
@@ -575,7 +576,7 @@ class Profile extends View {
       }
     ));
     if (this.isUserAgentCrawler() && !this.state.ogImageUrl && !this.state.photo) {
-      new iris.Attribute({type: 'keyID', value: this.props.id}).identiconSrc({width: 300, showType: false}).then(src => {
+      new Attribute({type: 'keyID', value: this.props.id}).identiconSrc({width: 300, showType: false}).then(src => {
         if (!this.state.ogImageUrl && !this.state.photo) {
           this.setOgImageUrl(src);
         }

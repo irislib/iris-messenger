@@ -1,11 +1,11 @@
 import { html } from 'htm/preact';
-import State from '../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import Identicon from '../components/Identicon';
 import {translate as t} from '../translations/Translation';
 import FollowButton from '../components/FollowButton';
 import Name from '../components/Name';
 import View from './View';
-import Session from '../Session';
+import Session from 'iris-lib/src/Session';
 import {throttle} from 'lodash';
 
 class Follows extends View {

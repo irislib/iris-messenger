@@ -1,7 +1,7 @@
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
 import { route } from 'preact-router';
-import State from "../../../../iris-lib/src/State";
+import State from "iris-lib/src/State";
 import Helpers from "../../Helpers";
 import {html} from "htm/preact";
 

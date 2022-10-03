@@ -1,11 +1,11 @@
-import State from '../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import Identicon from '../components/Identicon';
 import Filters from '../components/Filters';
 import {translate as t} from '../translations/Translation';
 import FollowButton from '../components/FollowButton';
 import Name from '../components/Name';
 import View from './View';
-import Session from '../Session';
+import Session from 'iris-lib/src/Session';
 import ScrollViewport from 'preact-scroll-viewport';
 import _ from 'lodash';
 

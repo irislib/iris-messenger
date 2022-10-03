@@ -7,8 +7,6 @@ import { translationLoaded } from "./translations/Translation";
 
 import Helpers from './Helpers';
 import QRScanner from './QRScanner';
-import PeerManager from './PeerManager';
-import Session from './Session';
 
 import Settings from './views/settings/Settings';
 import LogoutConfirmation from './views/LogoutConfirmation';
@@ -29,7 +27,9 @@ import Menu from './components/Menu';
 import VideoCall from './components/VideoCall';
 import MediaPlayer from './components/MediaPlayer';
 import Footer from './components/Footer';
-import State from '../../iris-lib/src/State';
+
+import State from 'iris-lib/src/State';
+import Session from 'iris-lib/src/Session';
 
 import '../css/style.css';
 import '../css/cropper.min.css';
@@ -40,7 +40,7 @@ if (window.location.host === 'iris.to' && window.location.pathname !== '/') {
 
 type Props = {};
 
-type State = {
+type ReactState = {
   loggedIn: boolean;
   showMenu: boolean;
   unseenMsgsTotal: number;
@@ -49,12 +49,11 @@ type State = {
   translationLoaded: boolean;
 }
 
-class Main extends Component<Props,State> {
-  componentDidMount() {
-    State.init();
-    Session.init({autologin: window.location.hash.length > 2});
-    PeerManager.init();
+State.init();
 
+class Main extends Component<Props,ReactState> {
+  componentDidMount() {
+    // State.init();
     State.local.get('loggedIn').on(this.inject());
     State.local.get('toggleMenu').put(false);
     State.local.get('toggleMenu').on((show: boolean) => this.toggleMenu(show));

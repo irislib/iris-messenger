@@ -2,19 +2,19 @@ import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import {createRef} from 'preact';
 import { translate as t } from '../../translations/Translation';
-import State from '../../../../iris-lib/src/State';
+import State from 'iris-lib/src/State';
 import Identicon from '../../components/Identicon';
 import Message from '../../components/Message';
 import ChatMessageForm from './ChatMessageForm';
 import Name from '../../components/Name';
-import Session from '../../Session';
-import Notifications from '../../Notifications';
+import Session from 'iris-lib/src/Session';
+import Notifications from 'iris-lib/src/Notifications';
 import NewChat from './newchat/NewChat';
 import _ from 'lodash';
 import $ from 'jquery';
-import iris from 'iris-lib';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';
+import util from 'iris-lib/src/util';
 
 import Button from '../../components/basic/Button';
 import { Router } from 'preact-router';
@@ -236,7 +236,7 @@ export default class PrivateChat extends Component {
           const dateStr = date.toLocaleDateString();
           if (dateStr !== previousDateStr) {
             isDifferentDay = true;
-            let separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
+            let separatorText = util.getDaySeparatorText(date, dateStr, now, nowStr);
             msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
           }
           previousDateStr = dateStr;

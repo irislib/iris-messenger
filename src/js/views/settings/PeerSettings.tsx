@@ -1,11 +1,11 @@
 import Component from "../../BaseComponent";
 import Name from "../../components/Name";
-import Session from "../../Session";
-import State from "../../../../iris-lib/src/State";
+import Session from "iris-lib/src/Session";
+import State from "iris-lib/src/State";
 import {translate as t} from "../../translations/Translation";
 import Helpers from "../../Helpers";
 import Icons from "../../Icons";
-import PeerManager from "../../PeerManager";
+import PeerManager from "iris-lib/src/PeerManager";
 import {route} from "preact-router";
 import $ from "jquery";
 import Button from "../../components/basic/Button";

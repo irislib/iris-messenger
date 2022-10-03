@@ -1,8 +1,8 @@
 import Component from '../BaseComponent';
 import {translate as t} from '../translations/Translation';
-import Session from '../Session';
-import State from '../../../iris-lib/src/State';
-import Notifications from '../Notifications';
+import Session from 'iris-lib/src/Session';
+import State from 'iris-lib/src/State';
+import Notifications from 'iris-lib/src/Notifications';
 import Button from './basic/Button';
 
 type Props = {
@@ -37,6 +37,7 @@ class FollowButton extends Component<Props> {
     if (value && this.key === 'block') {
       State.public.user().get('follow').get(this.props.id).put(false);
     }
+    State.public.user().get(this.key).get(this.props.id).put(value);
     State.public.user().get(this.key).get(this.props.id).put(value);
   }
 

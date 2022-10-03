@@ -1,7 +1,8 @@
 import { Component } from 'preact';
-import State from '../../../iris-lib/src/State';
-import Session from '../Session';
-import iris from 'iris-lib';
+import State from 'iris-lib/src/State';
+import Session from 'iris-lib/src/Session';
+import SignedMessage from 'iris-lib/src/SignedMessage';
+import util from 'iris-lib/src/util';
 
 function twice(f) {
   f();
@@ -14,9 +15,9 @@ export default class MessageForm extends Component {
   async sendPublic(msg) {
     msg.time = new Date().toISOString();
     msg.type = 'post';
-    const signedMsg = await iris.SignedMessage.create(msg, Session.getKey());
+    const signedMsg = await SignedMessage.create(msg, Session.getKey());
     const serialized = signedMsg.toString();
-    const hash = await iris.util.getHash(serialized);
+    const hash = await util.getHash(serialized);
     State.public.get('#').get(hash).put(serialized);
     if (msg.replyingTo) {
       twice(() => State.public.user().get('replies').put({}));

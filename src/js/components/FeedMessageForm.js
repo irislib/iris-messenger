@@ -1,17 +1,17 @@
 import { createRef } from 'preact';
 import Helpers from '../Helpers';
-import Notifications from '../Notifications';
+import Notifications from 'iris-lib/src/Notifications';
 import { html } from 'htm/preact';
 import { translate as t } from '../translations/Translation';
-import State from '../../../iris-lib/src/State';
-import Session from '../Session';
+import State from 'iris-lib/src/State';
+import Session from 'iris-lib/src/Session';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
 import $ from 'jquery';
 import EmojiButton from '../lib/emoji-button';
-import iris from 'iris-lib';
 import SearchBox from './SearchBox';
 import MessageForm from './MessageForm';
+import util from 'iris-lib/src/util';
 
 const mentionRegex = /\B\@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
 
@@ -25,7 +25,7 @@ class FeedMessageForm extends MessageForm {
       textEl.val(textEl.val() + emoji);
       textEl.focus();
     });
-    if (!iris.util.isMobile && this.props.autofocus !== false) {
+    if (!util.isMobile && this.props.autofocus !== false) {
       textEl.focus();
     }
     if (!this.props.replyingTo) {

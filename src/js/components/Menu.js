@@ -1,5 +1,5 @@
 import Component from "../BaseComponent";
-import State from "../../../iris-lib/src/State";
+import State from "iris-lib/src/State";
 import {html} from "htm/preact";
 import Helpers from "../Helpers";
 import logo from "../../assets/img/icon128.png";

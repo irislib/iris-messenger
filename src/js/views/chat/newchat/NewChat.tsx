@@ -4,7 +4,7 @@ import {Helmet} from 'react-helmet';
 import InviteView from './InviteView';
 import QRView from './QRView';
 import MainView from './MainView';
-import State from "../../../../../iris-lib/src/State";
+import State from "iris-lib/src/State";
 
 type Props = { view?: string; chatLinks: {URL?: string , ID?: string}};
 type State = {chatLinks : {}};

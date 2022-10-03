@@ -5,3 +5,4 @@ size-plugin.json
 translations.csv
 .DS_Store
 .idea
+.netlify
