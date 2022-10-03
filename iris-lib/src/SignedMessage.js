@@ -21,28 +21,11 @@ class ValidationError extends Error {}
 *
 * For example, a crawler can import and sign other people's messages from Twitter. Only the users who trust the crawler will see the messages.
 *
-* "Rating" type messages, when added to an SocialNetwork, can add or remove Identities from the web of trust. Verification/unverification messages can add or remove Attributes from an Contact. Other types of messages such as social media "post" are just indexed by their author, recipient and time.
-*
-* Constructor: creates a message from the param obj.signedData that must contain at least the mandatory fields: author, recipient, type and time. You can use createRating() and createVerification() to automatically populate some of these fields and optionally sign the message.
+* Constructor: creates a message from the param obj.signedData that must contain at least the mandatory fields: author, type and time.
 * @param obj
 *
 * @example
 * https://github.com/irislib/iris-lib/blob/master/__tests__/SignedMessage.js
-*
-* Rating message:
-* {
-*   signedData: {
-*     author: {name:'Alice', key:'ABCD1234'},
-*     recipient: {name:'Bob', email:'bob@example.com'},
-*     type: 'rating',
-*     rating: 1,
-*     maxRating: 10,
-*     minRating: -10,
-*     text: 'Traded 1 BTC'
-*   },
-*   signer: 'ABCD1234',
-*   signature: '1234ABCD'
-* }
 *
 * Verification message:
 * {
@@ -115,38 +98,22 @@ class SignedMessage {
     };
   }
 
-  /**
-  * @returns {object} Javascript iterator over author attributes
-  */
   getAuthorIterable() {
     return SignedMessage._getIterable(this.signedData.author);
   }
 
-  /**
-  * @returns {object} Javascript iterator over recipient attributes
-  */
   getRecipientIterable() {
     return SignedMessage._getIterable(this.signedData.recipient);
   }
 
-  /**
-  * @returns {array} Array containing author attributes
-  */
   getAuthorArray() {
     return SignedMessage._getArray(this.signedData.author);
   }
 
-  /**
-  * @returns {array} Array containing recipient attributes
-  */
   getRecipientArray() {
     return this.signedData.recipient ? SignedMessage._getArray(this.signedData.recipient) : [];
   }
 
-
-  /**
-  * @returns {string} SignedMessage signer keyID, i.e. base64 hash of public key
-  */
   getSignerKeyID() {
     return this.pubKey; // hack until gun supports keyID lookups
     //return util.getHash(this.pubKey);
@@ -224,23 +191,14 @@ class SignedMessage {
     return true;
   }
 
-  /**
-  * @returns {boolean} true if message has a positive rating
-  */
   isPositive() {
     return this.signedData.type === `rating` && this.signedData.rating > (this.signedData.maxRating + this.signedData.minRating) / 2;
   }
 
-  /**
-  * @returns {boolean} true if message has a negative rating
-  */
   isNegative() {
     return this.signedData.type === `rating` && this.signedData.rating < (this.signedData.maxRating + this.signedData.minRating) / 2;
   }
 
-  /**
-  * @returns {boolean} true if message has a neutral rating
-  */
   isNeutral() {
     return this.signedData.type === `rating` && this.signedData.rating === (this.signedData.maxRating + this.signedData.minRating) / 2;
   }
@@ -273,19 +231,11 @@ class SignedMessage {
     return m;
   }
 
-  /**
-  * Create an  verification message. SignedMessage signedData's type and time are automatically set. Recipient must be set. If signingKey is specified and author omitted, signingKey will be used as author.
-  * @returns {Promise<Object>} message object promise
-  */
   static createVerification(signedData, signingKey) {
     signedData.type = `verification`;
     return SignedMessage.create(signedData, signingKey);
   }
 
-  /**
-  * Create an  rating message. SignedMessage signedData's type, maxRating, minRating, time and context are set automatically. Recipient and rating must be set. If signingKey is specified and author omitted, signingKey will be used as author.
-  * @returns {Promise<Object>} message object promise
-  */
   static createRating(signedData, signingKey) {
     signedData.type = `rating`;
     signedData.context = signedData.context || `iris`;
@@ -294,10 +244,6 @@ class SignedMessage {
     return SignedMessage.create(signedData, signingKey);
   }
 
-  /**
-  * @param {Index} index index to look up the message author from
-  * @returns {Contact} message author identity
-  */
   getAuthor(index) {
     for (const a of this.getAuthorIterable()) {
       if (a.isUniqueType()) {
@@ -306,10 +252,6 @@ class SignedMessage {
     }
   }
 
-  /**
-  * @param {Index} index index to look up the message recipient from
-  * @returns {Contact} message recipient identity or undefined
-  */
   getRecipient(index) {
     if (!this.signedData.recipient) {
       return undefined;
@@ -394,9 +336,6 @@ class SignedMessage {
     return SignedMessage.fromSig(JSON.parse(s));
   }
 
-  /**
-  *
-  */
   static async setReaction(gun, msg, reaction) {
     const hash = await msg.getHash();
     gun.get(`reactions`).get(hash).put(reaction);

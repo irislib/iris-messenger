@@ -3,7 +3,6 @@
 import SignedMessage from './SignedMessage';
 import Attribute from './Attribute';
 import util from './util';
-import Key from './Key';
 import Channel from './Channel';
 import TextNode from './components/TextNode';
 import ImageNode from './components/ImageNode';
@@ -17,7 +16,6 @@ import Session from './Session';
 export default {
   SignedMessage,
   Attribute,
-  Key,
   Channel,
   State,
   PeerManager,

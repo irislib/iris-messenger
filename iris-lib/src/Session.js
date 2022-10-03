@@ -33,7 +33,7 @@ const DEFAULT_SETTINGS = {
   }
 }
 
-const Session = {
+export default {
   DEFAULT_SETTINGS,
   channels: {},
   taskQueue: [],
@@ -513,5 +513,3 @@ const Session = {
     });
   }
 };
-
-export default Session;
