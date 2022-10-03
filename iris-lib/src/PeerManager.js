@@ -117,7 +117,7 @@ export default {
     const sample = _.sampleSize(
       Object.keys(
         _.pickBy(this.knownPeers, (peer, url) => {
-          return !isMixedContent(url) && peer.enabled && !(util.isElectron && url === ELECTRON_GUN_URL);
+          return !this.isMixedContent(url) && peer.enabled && !(util.isElectron && url === ELECTRON_GUN_URL);
         })
       ), sampleSize
     );

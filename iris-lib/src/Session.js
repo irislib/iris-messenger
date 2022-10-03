@@ -282,7 +282,7 @@ const Session = {
         }
       }
     }
-    clearIndexedDB();
+    this.clearIndexedDB();
     localStorage.clear();
     localforage.clear().then(() => {
       window.location.hash = '';
@@ -299,12 +299,12 @@ const Session = {
     name = name || util.generateName();
     console.log('loginAsNewUser name', name);
     return Gun.SEA.pair().then(k => {
-      login(k);
+      this.login(k);
       State.public.user().get('profile').put({a:null});
       State.public.user().get('profile').get('name').put(name);
       State.local.get('filters').put({a:null});
       State.local.get('filters').get('group').put('follows');
-      createChatLink();
+      this.createChatLink();
     });
   },
 
