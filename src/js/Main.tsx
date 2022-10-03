@@ -49,9 +49,11 @@ type ReactState = {
   translationLoaded: boolean;
 }
 
+State.init();
+
 class Main extends Component<Props,ReactState> {
   componentDidMount() {
-    State.init(); // TODO merge with Session.init and PeerManager.init
+    // State.init();
     State.local.get('loggedIn').on(this.inject());
     State.local.get('toggleMenu').put(false);
     State.local.get('toggleMenu').on((show: boolean) => this.toggleMenu(show));

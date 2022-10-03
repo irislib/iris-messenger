@@ -133,22 +133,22 @@ function getSearchIndex() {
 
 function setOurOnlineStatus() {
   const activeRoute = window.location.hash;
-  Channel.setActivity(State.public, ourActivity = 'active');
+  Channel.setActivity(ourActivity = 'active');
   const setActive = _.debounce(() => {
     const chat = activeRoute && channels[activeRoute.replace('#/profile/','').replace('#/chat/','')];
     if (chat && !ourActivity) {
       chat.setMyMsgsLastSeenTime();
     }
-    Channel.setActivity(State.public, ourActivity = 'active');
+    Channel.setActivity(ourActivity = 'active');
     clearTimeout(onlineTimeout);
-    onlineTimeout = setTimeout(() => Channel.setActivity(State.public, ourActivity = 'online'), 30000);
+    onlineTimeout = setTimeout(() => Channel.setActivity(ourActivity = 'online'), 30000);
   }, 1000);
   document.addEventListener("touchmove", setActive);
   document.addEventListener("mousemove", setActive);
   document.addEventListener("keypress", setActive);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === 'visible') {
-      Channel.setActivity(State.public, ourActivity = 'active');
+      Channel.setActivity(ourActivity = 'active');
       const chatId = location.pathname.slice(1).replace('chat/','');
       const chat = activeRoute && channels[chatId];
       if (chat) {
@@ -156,12 +156,12 @@ function setOurOnlineStatus() {
         Notifications.changeChatUnseenCount(chatId, 0);
       }
     } else {
-      Channel.setActivity(State.public, ourActivity = 'online');
+      Channel.setActivity(ourActivity = 'online');
     }
   });
   setActive();
   window.addEventListener("beforeunload", () => {
-    Channel.setActivity(State.public, ourActivity = null);
+    Channel.setActivity(ourActivity = null);
   });
 }
 
@@ -181,16 +181,16 @@ function login(k) {
   const shouldRefresh = !!key;
   key = k;
   localStorage.setItem('chatKeyPair', JSON.stringify(k));
-  Channel.initUser(State.public, key);
+  Channel.initUser(key);
   Notifications.subscribeToWebPush();
   Notifications.getWebPushSubscriptions();
   Notifications.subscribeToIrisNotifications();
-  Channel.getMyChatLinks(State.public, key, undefined, chatLink => {
+  Channel.getMyChatLinks(key, undefined, chatLink => {
     State.local.get('chatLinks').get(chatLink.id).put(chatLink.url);
     latestChatLink = chatLink.url;
   });
   setOurOnlineStatus();
-  Channel.getChannels(State.public, key, addChannel);
+  Channel.getChannels(key, addChannel);
   State.public.user().get('profile').get('name').on(name => {
     if (name && typeof name === 'string') {
       myName = name;

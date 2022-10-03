@@ -1142,8 +1142,6 @@ class Channel {
       user.get('chatRequests').put({a: 1});
     });
 
-    console.log(3);
-
     user.get('chatLinks').get(linkId).put({encryptedSharedKey, ownerEncryptedSharedKey});
 
     return Channel.formatChatLink({urlRoot, chatWith: key.pub, sharedSecret, linkId});
@@ -1179,7 +1177,7 @@ class Channel {
               const channel = new Channel({key, participants: pub});
               channel.save();
             }
-            util.gunAsAnotherUser(sharedKey, user => { // remove the channel request after reading
+            util.gunAsAnotherUser(State.public, sharedKey, user => { // remove the channel request after reading
               user.get('chatRequests').get(requestId).put(null);
             });
           });

@@ -38,6 +38,7 @@ class FollowButton extends Component<Props> {
       State.public.user().get('follow').get(this.props.id).put(false);
     }
     State.public.user().get(this.key).get(this.props.id).put(value);
+    State.public.user().get(this.key).get(this.props.id).put(value);
   }
 
   componentDidMount() {
