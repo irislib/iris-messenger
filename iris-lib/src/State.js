@@ -72,7 +72,7 @@ export default {
   },
 
   /**
-   * Get a group object that aggregates content from all the users in the group
+   * Get a group object that aggregates public content from all the users in the group
    * @param groupName
    */
   group(groupName = 'everyone') {

@@ -1,6 +1,4 @@
 /*eslint no-useless-escape: "off", camelcase: "off" */
-import Identicon from 'identicon.js';
-import util from './util';
 
 const UNIQUE_ID_VALIDATORS = {
   email: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
@@ -82,53 +80,6 @@ class Attribute {
 
   uri() {
     return `${encodeURIComponent(this.value)}:${encodeURIComponent(this.type)}`;
-  }
-
-  identiconXml(options = {}) {
-    return util.getHash(`${encodeURIComponent(this.type)}:${encodeURIComponent(this.value)}`, `hex`)
-      .then(hash => {
-        const identicon = new Identicon(hash, {width: options.width, format: `svg`});
-        return identicon.toString(true);
-      });
-  }
-
-  identiconSrc(options = {}) {
-    return util.getHash(`${encodeURIComponent(this.type)}:${encodeURIComponent(this.value)}`, `hex`)
-      .then(hash => {
-        const identicon = new Identicon(hash, {width: options.width, format: `svg`});
-        return `data:image/svg+xml;base64,${identicon.toString()}`;
-      });
-  }
-
-  identicon(options = {}) {
-    options = Object.assign({
-      width: 50,
-      showType: true,
-    }, options);
-    util.injectCss(); // some other way that is not called on each identicon generation?
-
-    const div = document.createElement(`div`);
-    div.className = `iris-identicon`;
-    div.style.width = `${options.width}px`;
-    div.style.height = `${options.width}px`;
-
-    const img = document.createElement(`img`);
-    img.alt = ``;
-    img.width = options.width;
-    img.height = options.width;
-    this.identiconSrc(options).then(src => img.src = src);
-
-    if (options.showType) {
-      const name = document.createElement(`span`);
-      name.className = `iris-distance`;
-      name.style.fontSize = options.width > 50 ? `${options.width / 4}px` : `10px`;
-      name.textContent = this.type.slice(0, 5);
-      div.appendChild(name);
-    }
-
-    div.appendChild(img);
-
-    return div;
   }
 }
 

@@ -3265,11 +3265,6 @@ cssstyle@^1.0.0:
   dependencies:
     cssom "0.3.x"
 
-csstype@^2.6.7:
-  version "2.6.21"
-  resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.21.tgz#2efb85b7cc55c80017c66a5ad7cbd931fda3a90e"
-  integrity sha512-Z1PhmomIfypOpoMjRQB70jfvy/wxT50qW08YXO5lMIJkrdq4yOTR+AW7FqutScmB9NkLwxo+jU+kZLbofZZq/w==
-
 dashdash@^1.12.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
@@ -4651,9 +4646,10 @@ growly@^1.3.0:
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
   integrity sha512-+xGQY0YyAWCnqy7Cd++hc2JqMYzlm0dG30Jd0beaA64sROr8C4nt8Yc9V5Ro3avlSUDTN0ulqP/VBKi1/lLygw==
 
-"gun@https://github.com/mmalmi/gun.git":
+gun@^0.2020.1238:
   version "0.2020.1238"
-  resolved "https://github.com/mmalmi/gun.git#4d16b9ecb2da2cd1919ad450f38167eb1fc3b3ef"
+  resolved "https://registry.yarnpkg.com/gun/-/gun-0.2020.1238.tgz#d80ff692dcec769edbfc716909d9a80a6285b9e3"
+  integrity sha512-8rKaAN74o3RTc2/a3CZca3Rx6rWnYpB1nS7mCtWH+LC7wvt2tzPR1yfRCq61haoR/Vtbl45qdq8iyoz9lAY8mg==
   dependencies:
     ws "^7.2.1"
   optionalDependencies:
@@ -4889,11 +4885,6 @@ hosted-git-info@^4.0.1:
   dependencies:
     lru-cache "^6.0.0"
 
-htm@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/htm/-/htm-3.1.1.tgz#49266582be0dc66ed2235d5ea892307cc0c24b78"
-  integrity sha512-983Vyg8NwUE7JkZ6NmOqpCZ+sh1bKv2iYTlUkzlWmA5JD2acKoxd4KVxbMmxX/85mtfdnDmTFoNKcg5DGAvxNQ==
-
 html-encoding-sniffer@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/html-encoding-sniffer/-/html-encoding-sniffer-1.0.2.tgz#e70d84b94da53aa375e11fe3a351be6642ca46f8"
@@ -4956,11 +4947,6 @@ idb-wrapper@^1.5.0:
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/idb-wrapper/-/idb-wrapper-1.7.2.tgz#8251afd5e77fe95568b1c16152eb44b396767ea2"
   integrity sha512-zfNREywMuf0NzDo9mVsL0yegjsirJxHpKHvWcyRozIqQy89g0a3U+oBPOCN4cc0oCiOuYgZHimzaW/R46G1Mpg==
-
-identicon.js@^2.3.3:
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/identicon.js/-/identicon.js-2.3.3.tgz#c505b8d60ecc6ea13bbd991a33964c44c1ad60a1"
-  integrity sha512-/qgOkXKZ7YbeCYbawJ9uQQ3XJ3uBg9VDpvHjabCAPp6aRMhjLaFAxG90+1TxzrhKaj6AYpVGrx6UXQfQA41UEA==
 
 ieee754@^1.1.13:
   version "1.2.1"
@@ -6135,20 +6121,6 @@ jsprim@^1.2.2:
     extsprintf "1.3.0"
     json-schema "0.4.0"
     verror "1.10.0"
-
-jsxstyle-utils@^2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/jsxstyle-utils/-/jsxstyle-utils-2.5.0.tgz#457f3ae258ff774409d5a36cc22d0a8c29c35bd0"
-  integrity sha512-Egs051eTn+jywl4vqySypTAVaPOeIKqYnK8ACd7zFmSVXSvV0OdKELYm1DuztVaQiZNmtchF+dmTFocBMK5ntQ==
-  dependencies:
-    csstype "^2.6.7"
-
-jsxstyle@^2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/jsxstyle/-/jsxstyle-2.5.1.tgz#53e9b435673857a19db59a70d95de918529387fd"
-  integrity sha512-JboG+WT/+O93e2+QjMi4orfBY97S6IPv541gJav2crCajvRM7X4Z+zXHoBfK5LRkGVzXrXllP/63kgupjhi88w==
-  dependencies:
-    jsxstyle-utils "^2.5.0"
 
 keyv@^3.0.0:
   version "3.1.0"
@@ -8005,16 +7977,6 @@ postcss@^8.1.10:
     nanoid "^3.3.4"
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
-
-preact-custom-element@^4.2.1:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/preact-custom-element/-/preact-custom-element-4.2.1.tgz#a18752ef60823ea61199d9cdc1866e51139b3f46"
-  integrity sha512-/fiEEAyC+MXRlCBRmv/owoN5BLpO2nF/MF3YBHLtp4C2lNqlhV+a4he74A5DhfDoRmxDHm0sYVgQzWFEyzTDsw==
-
-preact@^10.11.0:
-  version "10.11.0"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.11.0.tgz#26af45a0613f4e17a197cc39d7a1ea23e09b2532"
-  integrity sha512-Fk6+vB2kb6mSJfDgODq0YDhMfl0HNtK5+Uc9QqECO4nlyPAQwCI+BKyWO//idA7ikV7o+0Fm6LQmNuQi1wXI1w==
 
 prebuild-install@^5.3.3:
   version "5.3.6"
