@@ -20,14 +20,19 @@ import util from './util';
  */
 
 export default {
+  counter: 0,
+  blockedUsers: {},
+  cache: new Map(),
+  callbacks: new Map(),
+
   /**
    * Initialize the state: start gun instances State.public and State.local
    * @param publicOpts Options for the State.public gun instance
    */
   init(publicOpts) {
     Gun.log.off = true;
-    const o = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
-    this.public = new Gun(o);
+    const opts = Object.assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry:Infinity }, publicOpts);
+    this.public = new Gun(opts);
     if (publicOpts && publicOpts.peers) {
       publicOpts.peers.forEach(url => PeerManager.addPeer({url}));
     }
@@ -35,11 +40,6 @@ export default {
     if (util.isElectron) {
       this.electron = new Gun({peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast:false, localStorage: false}).get('state');
     }
-    this.blockedUsers = {};
-
-    this.cache = new Map(); // TODO: reset cache when users are blocked
-    this.callbacks = new Map();
-    this.counter = 0;
 
     // Is this the right place for this?
     this.local.get('block').map((isBlocked, user) => {
@@ -54,7 +54,6 @@ export default {
       }
     });
 
-    window.State = this;
     util.setPublicState && util.setPublicState(this.public);
     Session.init({autologin: window.location.hash.length > 2});
     PeerManager.init();
