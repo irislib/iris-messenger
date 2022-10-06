@@ -1,11 +1,11 @@
 import { html } from 'htm/preact';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Identicon from '../components/Identicon';
 import {translate as t} from '../translations/Translation';
 import FollowButton from '../components/FollowButton';
 import Name from '../components/Name';
 import View from './View';
-import Session from 'iris-lib/src/Session';
+import Session from 'iris-lib/src/session';
 import {throttle} from 'lodash';
 
 class Follows extends View {
@@ -30,7 +30,7 @@ class Follows extends View {
   }, 1000, {leading: false});
 
   getFollows() {
-    State.public.user(this.props.id).get('follow').map().on(this.sub(
+    iris.user(this.props.id).get('follow').map().on(this.sub(
       (follows, pub) => {
         if (follows && !this.follows.has(pub)) {
           this.follows.add(pub);
@@ -45,7 +45,7 @@ class Follows extends View {
   }
 
   getNameForUser(user) {
-    State.public.user(user).get('profile').get('name').on(this.sub(name => {
+    iris.user(user).get('profile').get('name').on(this.sub(name => {
       if (!name) return;
       this.followNames.set(user, name);
       this.updateSortedFollows();
@@ -53,7 +53,7 @@ class Follows extends View {
   }
 
   getFollowers() {
-    State.group().on(`follow/${this.props.id}`, this.sub((following, a, b, e, user) => {
+    iris.group().on(`follow/${this.props.id}`, this.sub((following, a, b, e, user) => {
       if (following && !this.follows.has(user)) {
           if (!following) return;
           this.follows.add(user);
@@ -66,7 +66,7 @@ class Follows extends View {
   componentDidMount() {
     if (this.props.id) {
       this.props.followers ? this.getFollowers() : this.getFollows();
-      State.local.get('contacts').on(this.inject());
+      iris.local().get('contacts').on(this.inject());
     }
   }
 

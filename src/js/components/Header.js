@@ -2,8 +2,8 @@ import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import { translate as t } from '../translations/Translation';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+import Session from 'iris-lib/src/session';
 import { route } from 'preact-router';
 import Identicon from './Identicon';
 import SearchBox from './SearchBox';
@@ -59,17 +59,17 @@ class Header extends Component {
 
   componentDidMount() {
     document.addEventListener("keydown", this.escFunction, false);
-    State.local.get('showParticipants').on(this.inject());
-    State.local.get('unseenMsgsTotal').on(this.inject());
-    State.local.get('unseenNotificationCount').on(this.inject());
-    State.local.get('activeRoute').on(this.sub(
+    iris.local().get('showParticipants').on(this.inject());
+    iris.local().get('unseenMsgsTotal').on(this.inject());
+    iris.local().get('unseenNotificationCount').on(this.inject());
+    iris.local().get('activeRoute').on(this.sub(
       activeRoute => {
         this.setState({about:null, title: '', activeRoute, showMobileSearch: false});
         const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
         this.chatId = replaced.length < activeRoute.length ? replaced : null;
         if (this.chatId) {
-          State.local.get('channels').get(this.chatId).get('isTyping').on(this.inject());
-          State.local.get('channels').get(this.chatId).get('theirLastActiveTime').on(this.inject());
+          iris.local().get('channels').get(this.chatId).get('isTyping').on(this.inject());
+          iris.local().get('channels').get(this.chatId).get('theirLastActiveTime').on(this.inject());
         }
 
         if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
@@ -79,8 +79,8 @@ class Header extends Component {
           } else if (activeRoute.indexOf('/chat/hashtag/') === 0) {
             this.setState({title: `#${activeRoute.replace('/chat/hashtag/','')}`, about: 'Public'})
           } else {
-            State.local.get('channels').get(this.chatId).get('name').on(this.inject('title'));
-            State.local.get('channels').get(this.chatId).get('about').on(this.inject());
+            iris.local().get('channels').get(this.chatId).get('name').on(this.inject('title'));
+            iris.local().get('channels').get(this.chatId).get('about').on(this.inject());
           }
         }
       }
@@ -101,11 +101,11 @@ class Header extends Component {
     e.stopPropagation();
     $('a.logo').blur();
     ($(window).width() > 625) && route('/');
-    State.local.get('toggleMenu').put(true);
+    iris.local().get('toggleMenu').put(true);
   }
 
   updatePeersFromGun() {
-    const peersFromGun = State.public.back('opt.peers') || {};
+    const peersFromGun = iris.public().back('opt.peers') || {};
     const connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
       if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
         console.log('WebRTC peer', peer);
@@ -186,7 +186,7 @@ class Header extends Component {
         </div>
 
         ${chat && this.chatId !== key && !chat.uuid ? html`
-          <a class="tooltip" style="width:24px; height:24px; color: var(--msg-form-button-color)" id="<start-video-call" onClick=${() => State.local.get('outgoingCall').put(this.chatId)}>
+          <a class="tooltip" style="width:24px; height:24px; color: var(--msg-form-button-color)" id="<start-video-call" onClick=${() => iris.local().get('outgoingCall').put(this.chatId)}>
             <span class="tooltiptext">${t('video_call')}</span>
             ${Icons.videoCall}
           </a>
@@ -195,7 +195,7 @@ class Header extends Component {
             </a> -->
         `: ''}
         ${this.chatId && this.chatId.length > 10 && this.chatId.length < 40 ? html`
-          <a class="tooltip hidden-xs" onClick=${() => State.local.get('showParticipants').put(!this.state.showParticipants)}>
+          <a class="tooltip hidden-xs" onClick=${() => iris.local().get('showParticipants').put(!this.state.showParticipants)}>
             <span class="tooltiptext">${t('participant_list')}</span>
             ${Icons.group}
           </a>
@@ -208,7 +208,7 @@ class Header extends Component {
             <span class="unseen">${this.state.unseenNotificationCount}</span>
           ` : ''}
         <//>
-        <${Link} activeClassName="active" href="/profile/${key}" onClick=${() => State.local.get('scrollUp').put(true)} class="hidden-xs my-profile">
+        <${Link} activeClassName="active" href="/profile/${key}" onClick=${() => iris.local().get('scrollUp').put(true)} class="hidden-xs my-profile">
           <${Identicon} str=${key} width=34 />
         <//>
       </div>

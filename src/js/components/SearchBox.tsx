@@ -1,10 +1,10 @@
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Identicon from './Identicon';
 import Text from './Text';
 import {translate as t} from '../translations/Translation';
-import Session from 'iris-lib/src/Session';
+import Session from 'iris-lib/src/session';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -68,11 +68,11 @@ class SearchBox extends Component<Props, State> {
   }
 
   componentDidMount() {
-    State.local.get('noFollows').on(this.inject());
-    State.local.get('searchIndexUpdated').on(this.sub(
+    iris.local().get('noFollows').on(this.inject());
+    iris.local().get('searchIndexUpdated').on(this.sub(
         () => this.search()
     ));
-    State.local.get('activeRoute').on(this.sub(
+    iris.local().get('activeRoute').on(this.sub(
       () => {
         this.close();
       }

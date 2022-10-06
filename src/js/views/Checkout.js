@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+import Session from 'iris-lib/src/session';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';
 import Store from './Store';
@@ -18,7 +18,7 @@ class Checkout extends Store {
 
   changeItemCount(k, v) {
     this.cart[k] = Math.max(this.cart[k] + v, 0);
-    State.local.get('cart').get(this.props.store).get(k).put(this.cart[k]);
+    iris.local().get('cart').get(this.props.store).get(k).put(this.cart[k]);
   }
 
   confirm() {
@@ -33,8 +33,8 @@ class Checkout extends Store {
       text: `New order: ${  JSON.stringify(cart)  }, delivery: ${  JSON.stringify(this.state.delivery)  }, payment: ${  this.state.paymentMethod}`,
       order: true
     });
-    State.local.get('cart').get(pub).map((v, k) => {
-      !!v && State.local.get('cart').get(pub).get(k).put(null);
+    iris.local().get('cart').get(pub).map((v, k) => {
+      !!v && iris.local().get('cart').get(pub).get(k).put(null);
     });
     route(`/chat/${  pub}`);
   }
@@ -81,13 +81,13 @@ class Checkout extends Store {
       <div class="side-padding-xs">
         <h3>${t('delivery')}</h3>
         <p>
-          <input type="text" placeholder=${t('name')} value=${this.state.delivery.name} onInput=${e => State.local.get('delivery').get('name').put(e.target.value)}/>
+          <input type="text" placeholder=${t('name')} value=${this.state.delivery.name} onInput=${e => iris.local().get('delivery').get('name').put(e.target.value)}/>
         </p>
         <p>
-          <input type="text" placeholder=${t('address')} value=${this.state.delivery.address} onInput=${e => State.local.get('delivery').get('address').put(e.target.value)}/>
+          <input type="text" placeholder=${t('address')} value=${this.state.delivery.address} onInput=${e => iris.local().get('delivery').get('address').put(e.target.value)}/>
         </p>
         <p>
-          <input type="text" placeholder=${t('email_optional')} value=${this.state.delivery.email} onInput=${e => State.local.get('delivery').get('email').put(e.target.value)}/>
+          <input type="text" placeholder=${t('email_optional')} value=${this.state.delivery.email} onInput=${e => iris.local().get('delivery').get('email').put(e.target.value)}/>
         </p>
         <button onClick=${() => this.setState({page:'payment'})}>${t('next')}</button>
       </div>
@@ -96,7 +96,7 @@ class Checkout extends Store {
 
   paymentMethodChanged(e) {
     const val = e.target.firstChild && e.target.firstChild.value;
-    val && State.local.get('paymentMethod').put(val);
+    val && iris.local().get('paymentMethod').put(val);
   }
 
   renderPayment() {
@@ -223,12 +223,12 @@ class Checkout extends Store {
     this.carts = {};
     if (pub) {
       this.setState({page:'cart'})
-      State.local.get('cart').get(pub).map((v, k) => {
+      iris.local().get('cart').get(pub).map((v, k) => {
         this.cart[k] = v;
         this.setState({cart: this.cart});
       });
-      State.local.get('paymentMethod').on(paymentMethod => this.setState({paymentMethod}));
-      State.local.get('delivery').open(delivery => this.setState({delivery}));
+      iris.local().get('paymentMethod').on(paymentMethod => this.setState({paymentMethod}));
+      iris.local().get('delivery').open(delivery => this.setState({delivery}));
     } else {
       this.getAllCarts();
     }

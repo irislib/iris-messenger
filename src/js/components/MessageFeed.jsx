@@ -1,7 +1,7 @@
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import PublicMessage from './PublicMessage';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import {debounce} from 'lodash';
 import {translate as t} from '../translations/Translation';
 import Button from '../components/basic/Button';
@@ -47,7 +47,7 @@ class MessageFeed extends Component {
 
   componentDidMount() {
     let first = true;
-    State.local.get('scrollUp').on(this.sub(
+    iris.local().get('scrollUp').on(this.sub(
       () => {
         !first && Helpers.animateScrollTop('.main-view');
         first = false;
@@ -58,7 +58,7 @@ class MessageFeed extends Component {
         (...args) => this.handleMessage(...args)
       ));
     } else if (this.props.group && this.props.path) { // TODO: make group use the same basic gun api
-      State.group(this.props.group).map(this.props.path, this.sub(
+      iris.group(this.props.group).map(this.props.path, this.sub(
         (...args) => this.handleMessage(...args)
       ));
     }

@@ -1,8 +1,8 @@
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import {translate as t} from '../translations/Translation';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+import Session from 'iris-lib/src/session';
 import FeedMessageForm from '../components/FeedMessageForm';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
@@ -62,7 +62,7 @@ function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
     Channel.deleteChannel(Session.getKey(), pub);
     delete Session.channels[pub];
-    State.local.get('channels').get(pub).put(null);
+    iris.local().get('channels').get(pub).put(null);
     route(`/chat`);
   }
 }
@@ -77,13 +77,13 @@ class Profile extends View {
   }
 
   onProfilePhotoSet(src) {
-    State.public.user().get('profile').get('photo').put(src);
-    State.public.user().get('profile').get('nftPfp').put(false);
+    iris.user().get('profile').get('photo').put(src);
+    iris.user().get('profile').get('nftPfp').put(false);
   }
 
   onAboutInput(e) {
     const about = $(e.target).text().trim();
-    State.public.user().get('profile').get('about').put(about);
+    iris.user().get('profile').get('about').put(about);
   }
 
   onClickSettings() {
@@ -93,7 +93,7 @@ class Profile extends View {
   onNameInput(e) {
     const name = $(e.target).text().trim();
     if (name.length) {
-      State.public.user().get('profile').get('name').put(name);
+      iris.user().get('profile').get('name').put(name);
     }
   }
 
@@ -158,7 +158,7 @@ class Profile extends View {
     const web3 = await Session.ethereumConnect();
     const address = (await web3.eth.getAccounts())[0];
     const proof = await web3.eth.personal.sign(this.getEthIrisProofString(), address);
-    State.public.user().get('profile').get('eth').put({
+    iris.user().get('profile').get('eth').put({
       address,
       proof
     });
@@ -167,7 +167,7 @@ class Profile extends View {
   async disconnectEthereumClicked(e) {
     e.preventDefault();
     if (confirm(`${t('disconnect_ethereum_account')}?`)) {
-      State.public.user().get('profile').get('eth').put(null);
+      iris.user().get('profile').get('eth').put(null);
     }
   }
 
@@ -294,7 +294,7 @@ class Profile extends View {
     e.preventDefault();
     let src = this.getSrcForNft(nft, false);
     if (src.indexOf('data:image') === 0) {
-      State.public.user().get('profile').get('photo').put(src);
+      iris.user().get('profile').get('photo').put(src);
     } else {
       // load image and convert to base64
       const img = new Image();
@@ -310,7 +310,7 @@ class Profile extends View {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
         const dataURL = canvas.toDataURL('image/png');
-        State.public.user().get('profile').get('photo').put(dataURL);
+        iris.user().get('profile').get('photo').put(dataURL);
       }
     }
     $('.main-view').animate({
@@ -344,20 +344,20 @@ class Profile extends View {
     if (this.props.tab === 'replies') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="replies${this.props.id}" node=${State.public.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
+          <${MessageFeed} scrollElement=${this.scrollElement.current} key="replies${this.props.id}" node=${iris.user(this.props.id).get('replies')} keyIsMsgHash=${true} />
         </div>
       `;
     } else if (this.props.tab === 'likes') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="likes${this.props.id}" node=${State.public.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
+          <${MessageFeed} scrollElement=${this.scrollElement.current} key="likes${this.props.id}" node=${iris.user(this.props.id).get('likes')} keyIsMsgHash=${true}/>
         </div>
       `;
     } else if (this.props.tab === 'media') {
       return html`
         <div class="public-messages-view">
           ${this.isMyProfile ? html`<${FeedMessageForm} index="media" class="hidden-xs" autofocus=${false}/>` : ''}
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="media${this.props.id}" node=${State.public.user(this.props.id).get('media')}/>
+          <${MessageFeed} scrollElement=${this.scrollElement.current} key="media${this.props.id}" node=${iris.user(this.props.id).get('media')}/>
         </div>
       `;
     } else if (this.props.tab === 'nfts') {
@@ -392,7 +392,7 @@ class Profile extends View {
         ${messageForm}
         <div class="public-messages-view">
           ${this.getNotification()}
-          <${MessageFeed} scrollElement=${this.scrollElement.current} key="posts${this.props.id}" node=${State.public.user(this.props.id).get('msgs')} />
+          <${MessageFeed} scrollElement=${this.scrollElement.current} key="posts${this.props.id}" node=${iris.user(this.props.id).get('msgs')} />
         </div>
       </div>
       `;
@@ -460,7 +460,7 @@ class Profile extends View {
 
   getProfileDetails() {
     const pub = this.props.id;
-    State.public.user(pub).get('follow').map().on(this.sub(
+    iris.user(pub).get('follow').map().on(this.sub(
       (following,key) => {
         if (following) {
           this.followedUsers.add(key);
@@ -470,10 +470,10 @@ class Profile extends View {
         this.setState({followedUserCount: this.followedUsers.size});
       }
     ));
-    State.group().count(`follow/${pub}`, this.sub((followerCount) => {
+    iris.group().count(`follow/${pub}`, this.sub((followerCount) => {
       this.setState({followerCount});
     }));
-    State.public.user(pub).get('profile').get('eth').on(this.sub(eth => {
+    iris.user(pub).get('profile').get('eth').on(this.sub(eth => {
       if (eth && eth.address && eth.proof) {
         if (eth.address === (this.state.eth && this.state.eth.address)) {
           return;
@@ -488,18 +488,18 @@ class Profile extends View {
         this.setState({eth: null});
       }
     }));
-    State.public.user(pub).get('profile').get('name').on(this.sub(
+    iris.user(pub).get('profile').get('name').on(this.sub(
       name => {
         if (!$('#profile .profile-name:focus').length) {
           this.setState({name});
         }
       }
     ));
-    State.public.user(pub).get('profile').get('photo').on(this.sub(photo => {
+    iris.user(pub).get('profile').get('photo').on(this.sub(photo => {
       this.setState({photo});
       this.setOgImageUrl(photo);
     }));
-    State.public.user(pub).get('profile').get('about').on(this.sub(
+    iris.user(pub).get('profile').get('about').on(this.sub(
       about => {
         if (!$('#profile .profile-about-content:focus').length) {
           this.setState({about});
@@ -543,7 +543,7 @@ class Profile extends View {
     }
     let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
-    State.local.get('noFollowers').on(this.inject());
+    iris.local().get('noFollowers').on(this.inject());
     this.getProfileDetails();
     if (chat) {
       $(`input[name=notificationPreference][value=${  chat.notificationSetting  }]`).attr('checked', 'checked');
@@ -560,12 +560,12 @@ class Profile extends View {
       colorLight : "#ffffff",
       correctLevel : QRCode.CorrectLevel.H
     });
-    State.public.user().get('block').get(this.props.id).on(this.sub(
+    iris.user().get('block').get(this.props.id).on(this.sub(
       blocked => {
         this.setState({blocked});
       }
     ));
-    State.public.user(this.props.id).on(this.sub(
+    iris.user(this.props.id).on(this.sub(
       user => {
         this.setState({
           noPosts: !user.msgs,

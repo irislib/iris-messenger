@@ -3,8 +3,8 @@ import Helpers from '../Helpers';
 import Notifications from 'iris-lib/src/Notifications';
 import { html } from 'htm/preact';
 import { translate as t } from '../translations/Translation';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+import Session from 'iris-lib/src/session';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
 import $ from 'jquery';
@@ -29,14 +29,14 @@ class FeedMessageForm extends MessageForm {
       textEl.focus();
     }
     if (!this.props.replyingTo) {
-      State.local.get('channels').get('public').get('msgDraft').once(t => !textEl.val() && textEl.val(t));
+      iris.local().get('channels').get('public').get('msgDraft').once(t => !textEl.val() && textEl.val(t));
     }
   }
 
   async onMsgFormSubmit(event) {
     event.preventDefault();
     if (!this.props.replyingTo) {
-      State.local.get('channels').get('public').get('msgDraft').put(null);
+      iris.local().get('channels').get('public').get('msgDraft').put(null);
     }
     const textEl = $(this.newMsgRef.current);
     const text = textEl.val();
@@ -100,7 +100,7 @@ class FeedMessageForm extends MessageForm {
   onMsgTextInput(event) {
     this.setTextareaHeight(event.target);
     if (!this.props.replyingTo) {
-      State.local.get('channels').get('public').get('msgDraft').put($(event.target).val());
+      iris.local().get('channels').get('public').get('msgDraft').put($(event.target).val());
     }
     this.checkMention(event);
   }

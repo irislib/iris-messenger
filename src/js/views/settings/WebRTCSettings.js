@@ -1,10 +1,10 @@
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
-import State from 'iris-lib/src/State';
 import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../../components/VideoCall';
 import Notifications from 'iris-lib/src/Notifications';
 import $ from 'jquery';
 import Button from '../../components/basic/Button';
+import iris from 'iris-lib';
 
 export default class WebRTCSettings extends Component {
 
@@ -26,17 +26,17 @@ export default class WebRTCSettings extends Component {
 
     $('#rtc-config').val(JSON.stringify(getRTCConfig()));
 
-    State.electron && State.electron.get('settings').on(this.inject('electron', 'electron'));
-    State.local.get('settings').on(this.sub(local => {
+    iris.electron && iris.electron.get('settings').on(this.inject('electron', 'electron'));
+    iris.local().get('settings').on(this.sub(local => {
       console.log('local settings', local);
       if (local) {
         this.setState({local});
       }
     }));
-    State.public.user().get('webPushSubscriptions').map().on(this.sub(
+    iris.user().get('webPushSubscriptions').map().on(this.sub(
       () => this.setState({webPushSubscriptions: Notifications.webPushSubscriptions})
     ));
-    State.public.user().get('block').map().on(this.sub(
+    iris.user().get('block').map().on(this.sub(
       (v,k) => {
         blockedUsers[k] = v;
         this.setState({blockedUsers});

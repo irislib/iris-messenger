@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Identicon from '../components/Identicon';
 import Button from '../components/basic/Button';
 import {translate as t} from '../translations/Translation';
@@ -20,7 +20,7 @@ export default class Notifications extends View {
 
   componentDidMount() {
     NotificationTools.changeUnseenNotificationCount(0);
-    State.local.get('notifications').map(this.sub(
+    iris.local().get('notifications').map(this.sub(
       (notification, time) => {
         if (notification) {
           this.notifications[time] = notification;

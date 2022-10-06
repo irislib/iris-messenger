@@ -2,11 +2,11 @@ import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import Identicon from './Identicon';
 import FeedMessageForm from './FeedMessageForm';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import { route } from 'preact-router';
 import Message from './Message';
 import SafeImg from './SafeImg';
-import Session from 'iris-lib/src/Session';
+import Session from 'iris-lib/src/session';
 import Torrent from './Torrent';
 import Icons from '../Icons';
 import Autolinker from 'autolinker';
@@ -36,19 +36,16 @@ class PublicMessage extends Message {
       if (typeof hash !== 'string') {
         return reject();
       }
-      State.public.get('#').get(hash).on(thisArg.sub(
-        async (serialized, a, b, event) => {
-          if (typeof serialized !== 'string') {
-            console.error('message parsing failed', hash, serialized);
-            return;
-          }
-          event.off();
-          const msg = await SignedMessage.fromString(serialized);
-          if (msg) {
-            resolve(msg);
-          }
+      iris.static.get(hash).then(async (serialized) => {
+        if (typeof serialized !== 'string') {
+          console.error('message parsing failed', hash, serialized);
+          return;
         }
-      ));
+        const msg = await SignedMessage.fromString(serialized);
+        if (msg) {
+          resolve(msg);
+        }
+      });
     });
   }
 
@@ -79,9 +76,9 @@ class PublicMessage extends Message {
       }
       this.setState({msg});
       if (this.props.showName && !this.props.name) {
-        State.public.user(msg.info.from).get('profile').get('name').on(this.inject());
+        iris.user(msg.info.from).get('profile').get('name').on(this.inject());
       }
-      State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, this.sub(
+      iris.group().on(`likes/${encodeURIComponent(this.props.hash)}`, this.sub(
         (liked,a,b,e,from) => {
           this.eventListeners[`${from}likes`] = e;
           liked ? this.likedBy.add(from) : this.likedBy.delete(from);
@@ -90,7 +87,7 @@ class PublicMessage extends Message {
           this.setState(s);
         }
       ));
-      State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, this.sub(
+      iris.group().map(`replies/${encodeURIComponent(this.props.hash)}`, this.sub(
         (hash,time,b,e,from) => {
           const k = from + time;
           if (hash && this.replies[k]) return;
@@ -135,7 +132,7 @@ class PublicMessage extends Message {
   }
 
   like(liked = true) {
-    State.public.user().get('likes').get(this.props.hash).put(liked);
+    iris.user().get('likes').get(this.props.hash).put(liked);
     if (liked) {
       const author = this.state.msg && this.state.msg.info && this.state.msg.info.from;
       if (author !== Session.getPubKey()) {
@@ -152,9 +149,9 @@ class PublicMessage extends Message {
     e.preventDefault();
     if (confirm('Delete message?')) { // TODO: remove from hashtag indexes
       const msg = this.state.msg;
-      msg.torrentId && State.public.user().get('media').get(msg.time).put(null);
-      State.public.user().get(this.props.index || 'msgs').get(msg.time).put(null);
-      msg.replyingTo && State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
+      msg.torrentId && iris.user().get('media').get(msg.time).put(null);
+      iris.user().get(this.props.index || 'msgs').get(msg.time).put(null);
+      msg.replyingTo && iris.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
     }
   }
 

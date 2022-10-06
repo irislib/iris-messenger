@@ -1,11 +1,11 @@
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import Session from 'iris-lib/src/Session';
+import Session from 'iris-lib/src/session';
 import Torrent from './Torrent';
 import Autolinker from 'autolinker';
 import $ from 'jquery';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import {route} from 'preact-router';
 import util from 'iris-lib/src/util';
 
@@ -31,7 +31,7 @@ class Message extends Component {
 
     const status = this.getSeenStatus();
     if (!status.seen && !status.delivered) {
-      State.local.get('channels').get(this.props.chatId).get('theirLastActiveTime').on(
+      iris.local().get('channels').get(this.props.chatId).get('theirLastActiveTime').on(
         this.sub((v, k, a, e) => {
           if (this.getSeenStatus().delivered) {
             this.setState({delivered:true});
@@ -41,7 +41,7 @@ class Message extends Component {
       );
     }
     if (!status.seen) {
-      State.local.get('channels').get(this.props.chatId).get('theirMsgsLastSeenTime').on(this.sub(
+      iris.local().get('channels').get(this.props.chatId).get('theirMsgsLastSeenTime').on(this.sub(
 (v, k, a, e) => {
           if (this.getSeenStatus().seen) {
             this.setState({seen:true});

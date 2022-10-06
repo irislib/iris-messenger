@@ -1,8 +1,10 @@
-import Session from './Session';
-import State from './State';
+import Session from './session';
 import _ from 'lodash';
 import Gun from 'gun';
 import util from './util';
+import publicState from './public';
+import local from './local';
+import group from './group';
 
 const NOTIFICATION_SERVICE_URL = 'https://iris-notifications.herokuapp.com/notify';
 // const notificationSound = new Audio('../../assets/audio/notification.mp3'); // TODO
@@ -60,7 +62,7 @@ function notifyMsg(msg, info, pub, onClick) {
 function changeChatUnseenMsgsCount(chatId, change) {
   const chat = Session.channels[chatId];
   if (!chat) return;
-  const chatNode = State.local.get('channels').get(chatId);
+  const chatNode = local().get('channels').get(chatId);
   if (change) {
     unseenMsgsTotal += change;
     chat.unseen += change;
@@ -70,7 +72,7 @@ function changeChatUnseenMsgsCount(chatId, change) {
   }
   chatNode.get('unseen').put(chat.unseen);
   unseenMsgsTotal = unseenMsgsTotal >= 0 ? unseenMsgsTotal : 0;
-  State.local.get('unseenMsgsTotal').put(unseenMsgsTotal);
+  local().get('unseenMsgsTotal').put(unseenMsgsTotal);
 }
 
 const publicVapidKey = 'BMqSvZArOIdn7vGkYplSpkZ70-Qt8nhYbey26WVa3LF3SwzblSzm3n3HHycpNkAKVq7MCkrzFuTFs_en7Y_J2MI';
@@ -123,7 +125,7 @@ const addWebPushSubscriptionsToChats = _.debounce(() => {
 
 function removeSubscription(hash) {
   delete webPushSubscriptions[hash];
-  State.public.user().get('webPushSubscriptions').get(hash).put(null);
+  publicState().user().get('webPushSubscriptions').get(hash).put(null);
   addWebPushSubscriptionsToChats();
 }
 
@@ -133,7 +135,7 @@ async function addWebPushSubscription(s, saveToGun = true) {
   const enc = await Gun.SEA.encrypt(s, mySecret);
   const hash = await util.getHash(JSON.stringify(s));
   if (saveToGun) {
-    State.public.user().get('webPushSubscriptions').get(hash).put(enc);
+    publicState().user().get('webPushSubscriptions').get(hash).put(enc);
   }
   webPushSubscriptions[hash] = s;
   addWebPushSubscriptionsToChats();
@@ -142,7 +144,7 @@ async function addWebPushSubscription(s, saveToGun = true) {
 async function getWebPushSubscriptions() {
   const myKey = Session.getKey();
   const mySecret = await Gun.SEA.secret(myKey.epub, myKey);
-  State.public.user().get('webPushSubscriptions').map().on(async enc => {
+  publicState().user().get('webPushSubscriptions').map().on(async enc => {
     if (!enc) { return; }
     const s = await Gun.SEA.decrypt(enc, mySecret);
     addWebPushSubscription(s, false);
@@ -151,7 +153,7 @@ async function getWebPushSubscriptions() {
 
 function getEpub(user) {
   return new Promise(resolve => {
-    State.public.user(user).get('epub').on(async (epub,k,x,e) => {
+    publicState().user(user).get('epub').on(async (epub,k,x,e) => {
       if (epub) {
         e.off();
         resolve(epub);
@@ -161,7 +163,7 @@ function getEpub(user) {
 }
 
 async function getNotificationText(notification) {
-  const profile = await State.public.user(notification.from).get('profile').once();
+  const profile = await publicState().user(notification.from).get('profile').once();
   const name = (profile && profile.name) || 'someone';
   const event = notification.event || notification.action;
   let eventText;
@@ -176,16 +178,16 @@ async function getNotificationText(notification) {
 function subscribeToIrisNotifications(onClick) {
   let notificationsSeenTime;
   let notificationsShownTime;
-  State.public.user().get('notificationsSeenTime').on(v => {
+  publicState().user().get('notificationsSeenTime').on(v => {
     notificationsSeenTime = v;
     console.log(v);
   });
-  State.public.user().get('notificationsShownTime').on(v => notificationsShownTime = v);
+  publicState().user().get('notificationsShownTime').on(v => notificationsShownTime = v);
   const setNotificationsShownTime = _.debounce(() => {
-    State.public.user().get('notificationsShownTime').put(new Date().toISOString());
+    publicState().user().get('notificationsShownTime').put(new Date().toISOString());
   }, 1000);
   const alreadyHave = new Set();
-  State.group().on(`notifications/${Session.getPubKey()}`, async (encryptedNotification, k, x, e, from) => {
+  group().on(`notifications/${Session.getPubKey()}`, async (encryptedNotification, k, x, e, from) => {
       const id = from.slice(0,30) + encryptedNotification.slice(0,30);
       if (alreadyHave.has(id)) { return; }
       alreadyHave.add(id);
@@ -195,7 +197,7 @@ function subscribeToIrisNotifications(onClick) {
       if (!notification || typeof notification !== 'object') { return; }
       setNotificationsShownTime();
       notification.from = from;
-      State.local.get('notifications').get(notification.time).put(notification);
+      local().get('notifications').get(notification.time).put(notification);
       if (!notificationsSeenTime || (notificationsSeenTime < notification.time)) {
         changeUnseenNotificationCount(1);
       }
@@ -220,12 +222,12 @@ function subscribeToIrisNotifications(onClick) {
 function changeUnseenNotificationCount(change) {
   if (!change) {
     unseenNotificationCount = 0;
-    State.public.user().get('notificationsSeenTime').put(new Date().toISOString());
+    publicState().user().get('notificationsSeenTime').put(new Date().toISOString());
   } else {
     unseenNotificationCount += change;
     unseenNotificationCount = Math.max(unseenNotificationCount, 0);
   }
-  State.local.get('unseenNotificationCount').put(unseenNotificationCount);
+  local().get('unseenNotificationCount').put(unseenNotificationCount);
 }
 
 async function sendIrisNotification(recipient, notification) {
@@ -234,7 +236,7 @@ async function sendIrisNotification(recipient, notification) {
   const epub = await getEpub(recipient);
   const secret = await Gun.SEA.secret(epub, Session.getKey());
   const enc = await Gun.SEA.encrypt(notification, secret);
-  State.public.user().get('notifications').get(recipient).put(enc);
+  publicState().user().get('notifications').get(recipient).put(enc);
 }
 
 async function sendWebPushNotification(recipient, notification) {

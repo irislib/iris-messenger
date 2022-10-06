@@ -1,7 +1,7 @@
 import { html } from 'htm/preact';
 import { translate as t } from '../../../translations/Translation';
-import Session from 'iris-lib/src/Session';
-import State from 'iris-lib/src/State';
+import Session from 'iris-lib/src/session';
+import iris from 'iris-lib';
 import CopyButton from '../../../components/CopyButton';
 import Button from '../../../components/basic/Button';
 import $ from 'jquery';
@@ -17,11 +17,11 @@ class MainView extends Component {
     }
 
     removeChatLink(id) {
-        State.local.get('chatLinks').get(id).put(null);
+        iris.local().get('chatLinks').get(id).put(null);
         this.props.chatLinks[id] = null;
         this.setState({chatLinks: this.props.chatLinks});
         this.forceUpdate();
-        return Channel.removePrivateChatLink(State.public, Session.getKey(), id);
+        return Channel.removePrivateChatLink(iris.public(), Session.getKey(), id);
         
     }
     componentDidMount() {

@@ -2,19 +2,19 @@ import {html} from "htm/preact";
 import {translate as t} from "../translations/Translation";
 import Identicon from "./Identicon";
 import FollowButton from "./FollowButton";
-import Session from "iris-lib/src/Session";
+import Session from "iris-lib/src/session";
 import CopyButton from "./CopyButton";
 import Text from "./Text";
 import Helpers from "../Helpers";
 import Component from "../BaseComponent";
-import State from "iris-lib/src/State";
+import iris from 'iris-lib';
 
 const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
 export default class OnboardingNotification extends Component {
   componentDidMount() {
-    State.local.get('noFollowers').on(this.inject());
-    State.local.get('noFollows').on(this.inject());
+    iris.local().get('noFollowers').on(this.inject());
+    iris.local().get('noFollows').on(this.inject());
   }
 
   render() {

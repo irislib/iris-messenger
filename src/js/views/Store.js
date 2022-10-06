@@ -1,7 +1,7 @@
 import { html } from 'htm/preact';
 import {translate as t} from '../translations/Translation';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+import Session from 'iris-lib/src/session';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';
@@ -28,7 +28,7 @@ class Store extends View {
   addToCart(k, user, e) {
     e.stopPropagation();
     const count = (this.cart[k + user] || 0) + 1;
-    State.local.get('cart').get(user).get(k).put(count);
+    iris.local().get('cart').get(user).get(k).put(count);
   }
 
   renderUserStore(user) {
@@ -155,7 +155,7 @@ class Store extends View {
   }
 
   getCartFromUser(user) {
-    State.local.get('cart').get(user).map(this.sub(
+    iris.local().get('cart').get(user).map(this.sub(
       (v, k) => {
         if (k === '#') { return; } // blah
         this.cart[k + user] = v;
@@ -183,7 +183,7 @@ class Store extends View {
   }
 
   getProductsFromUser(user) {
-    State.public.user(user).get('store').get('products').map().on(this.sub(
+    iris.user(user).get('store').get('products').map().on(this.sub(
       (...args) => {
         return this.onProduct(...args, user);
       }, `${user  }products`
@@ -192,7 +192,7 @@ class Store extends View {
 
   getAllCarts() {
     const carts = {};
-    State.local.get('cart').map(this.sub(
+    iris.local().get('cart').map(this.sub(
       (o, user) => {
         if (!user) {
           delete carts[user];
@@ -206,7 +206,7 @@ class Store extends View {
   }
 
   getAllProducts(group) {
-    State.group(group).map('store/products', this.sub(
+    iris.group(group).map('store/products', this.sub(
       (...args) => {
         this.onProduct(...args);
       }
@@ -224,7 +224,7 @@ class Store extends View {
       this.getProductsFromUser(user);
     } else {
       let prevGroup;
-      State.local.get('filters').get('group').on(this.sub(
+      iris.local().get('filters').get('group').on(this.sub(
         group => {
           if (group && group !== prevGroup) {
             prevGroup = group;

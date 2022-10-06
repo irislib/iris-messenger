@@ -2,7 +2,7 @@ import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation';
 import LanguageSelector from '../components/LanguageSelector';
 import QRScanner from '../QRScanner';
-import Session from 'iris-lib/src/Session';
+import Session from 'iris-lib/src/session';
 import { Component } from 'preact';
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
@@ -10,7 +10,7 @@ import {ec as EC} from "elliptic";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3Modal from "web3modal";
 import Web3 from "web3";
-import State from "iris-lib/src/State";
+import iris from 'iris-lib';
 import util from "iris-lib/src/util";
 import _ from 'lodash';
 import { route } from 'preact-router';
@@ -112,11 +112,11 @@ async function ethereumLogin(name) {
     };
     login(k);
     setTimeout(async () => {
-      State.public.user().get('profile').get('name').once(existingName => {
+      iris.user().get('profile').get('name').once(existingName => {
         if (typeof existingName !== 'string' || existingName === '') {
           name = name || util.generateName();
-          State.public.user().get('profile').put({a:null});
-          State.public.user().get('profile').get('name').put(name);
+          iris.user().get('profile').put({a:null});
+          iris.user().get('profile').get('name').put(name);
         }
       });
     }, 2000);

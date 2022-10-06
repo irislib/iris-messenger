@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { html } from 'htm/preact';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Icons from '../Icons';
 import $ from 'jquery';
 
@@ -9,7 +9,7 @@ const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class MediaPlayer extends Component {
   componentDidMount() {
-    State.local.get('player').on(player => {
+    iris.local().get('player').on(player => {
       const torrentId = player && player.torrentId;
       const filePath = player && player.filePath;
       if (torrentId !== this.torrentId) {
@@ -25,7 +25,7 @@ class MediaPlayer extends Component {
         this.openFile();
       }
     });
-    State.local.get('player').get('paused').on(p => this.setPaused(p));
+    iris.local().get('player').get('paused').on(p => this.setPaused(p));
   }
 
   setPaused(paused) {
@@ -54,7 +54,7 @@ class MediaPlayer extends Component {
       const audio = el.find('audio').get(0);
       if (audio) {
         audio.onpause = audio.onplay = e => {
-          State.local.get('player').get('paused').put(!!e.target.paused);
+          iris.local().get('player').get('paused').put(!!e.target.paused);
         };
       }
     }
@@ -73,7 +73,7 @@ class MediaPlayer extends Component {
 
   closeClicked() {
     this.setPaused(true);
-    State.local.get('player').put(null);
+    iris.local().get('player').put(null);
   }
 
   render() {

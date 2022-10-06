@@ -1,8 +1,8 @@
 import { html } from 'htm/preact';
 import {translate as tr} from '../translations/Translation';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import {Helmet} from "react-helmet";
-import Session from 'iris-lib/src/Session';
+import Session from 'iris-lib/src/session';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';
@@ -20,7 +20,7 @@ function deleteChat(uuid) {
   if (confirm("Delete chat?")) {
       Channel.deleteGroup(Session.getKey(), uuid);
       delete Session.channels[uuid];
-      State.local.get('channels').get(uuid).put(null);
+      iris.local().get('channels').get(uuid).put(null);
       route('/chat');
   }
 }
@@ -53,7 +53,7 @@ class Group extends View {
 
   removeChatLink(id) {
     if (confirm("Remove chat link?")) {
-      State.local.get('chatLinks').get(id).put(null);
+      iris.local().get('chatLinks').get(id).put(null);
       Session.channels[this.props.id].removeGroupChatLink(id);
     }
   }
@@ -264,8 +264,8 @@ class Group extends View {
         }, 1000);
       }
     }
-    State.local.get('inviteLinksChanged').on(() => this.setState({inviteLinksChanged: !this.state.inviteLinksChanged}));
-    State.local.get('channels').get(this.props.id).get('participants').on(participants => {
+    iris.local().get('inviteLinksChanged').on(() => this.setState({inviteLinksChanged: !this.state.inviteLinksChanged}));
+    iris.local().get('channels').get(this.props.id).get('participants').on(participants => {
       const isAdmin = areWeAdmin(pub);
       this.setState({isAdmin, participants});
     });

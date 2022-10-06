@@ -1,14 +1,13 @@
 import _ from 'lodash';
-import State from 'iris-lib/src/State';
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
-import Session from 'iris-lib/src/Session';
 import Text from '../../components/Text';
+import iris from 'iris-lib';
 
 export default class BlockedSettings extends Component {
   constructor() {
     super();
-    this.state = Session.DEFAULT_SETTINGS;
+    this.state = iris.session.DEFAULT_SETTINGS;
     this.state.webPushSubscriptions = {};
     this.state.blockedUsers = {};
     this.id = "settings";
@@ -35,14 +34,14 @@ export default class BlockedSettings extends Component {
   componentDidMount() {
     const blockedUsers = {};
 
-    State.electron && State.electron.get('settings').on(this.inject('electron', 'electron'));
-    State.local.get('settings').on(this.sub(local => {
+    iris.electron && iris.electron.get('settings').on(this.inject('electron', 'electron'));
+    iris.local().get('settings').on(this.sub(local => {
       console.log('local settings', local);
       if (local) {
         this.setState({local});
       }
     }));
-    State.public.user().get('block').map().on(this.sub(
+    iris.user().get('block').map().on(this.sub(
       (v,k) => {
         blockedUsers[k] = v;
         this.setState({blockedUsers});

@@ -1,12 +1,15 @@
 import Gun from 'gun';
-import State from './State';
 import Notifications from './Notifications';
-import PeerManager from './PeerManager';
+import PeerManager from './peers';
 import Channel from './Channel';
 import util from './util';
 import _ from 'lodash';
 import Fuse from "fuse.js";
 import localforage from 'localforage';
+import local from './local';
+import electron from './electron';
+import publicState from './public';
+import blockedUsers from './blockedUsers';
 
 let key;
 let myName;
@@ -40,13 +43,13 @@ export default {
 
   updateSearchIndex: _.throttle(() => {
     const options = {keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3};
-    const values = Object.values(_.omit(searchableItems, Object.keys(State.getBlockedUsers())));
+    const values = Object.values(_.omit(searchableItems, Object.keys(blockedUsers())));
     searchIndex = new Fuse(values, options);
-    State.local.get('searchIndexUpdated').put(true);
+    local().get('searchIndexUpdated').put(true);
   }, 2000, {leading:true}),
 
   saveSearchResult: _.throttle(k => {
-      State.local.get('contacts').get(k).put({followDistance: searchableItems[k].followDistance,followerCount: searchableItems[k].followers.size});
+      local().get('contacts').get(k).put({followDistance: searchableItems[k].followDistance,followerCount: searchableItems[k].followers.size});
   }, 1000, {leading:true}),
 
   addFollow(callback, k, followDistance, follower) {
@@ -58,9 +61,9 @@ export default {
     } else {
       searchableItems[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
       this.taskQueue.push(() => {
-        State.public.user(k).get('profile').get('name').on(name => {
+        publicState().user(k).get('profile').get('name').on(name => {
           searchableItems[k].name = name;
-          State.local.get('contacts').get(k).get('name').put(name);
+          local().get('contacts').get(k).get('name').put(name);
           callback && callback(k, searchableItems[k]);
         });
       });
@@ -76,7 +79,7 @@ export default {
     if (searchableItems[k]) {
       searchableItems[k].followers.delete(follower);
       if (followDistance === 1) {
-        State.local.get('groups').get('follows').get(k).put(false);
+        local().get('groups').get('follows').get(k).put(false);
       }
       this.updateNoFollows();
       this.updateNoFollowers();
@@ -93,7 +96,7 @@ export default {
 
     this.addFollow(callback, k, currentDepth - 1);
 
-    State.public.user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
+    publicState().user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
       if (isFollowing) {
         this.addFollow(callback, followedKey, currentDepth, k);
         if (currentDepth < maxDepth) {
@@ -111,7 +114,7 @@ export default {
     const v = Object.keys(searchableItems).length <= 1;
     if (v !== noFollows) {
       noFollows = v;
-      State.local.get('noFollows').put(noFollows);
+      local().get('noFollows').put(noFollows);
     }
   }, 1000, {leading:true}),
 
@@ -119,7 +122,7 @@ export default {
     const v = !(searchableItems[key.pub] && (searchableItems[key.pub].followers.size > 0));
     if (v !== noFollowers) {
       noFollowers = v;
-      State.local.get('noFollowers').put(noFollowers);
+      local().get('noFollowers').put(noFollowers);
     }
   }, 1000, {leading:true}),
 
@@ -164,9 +167,9 @@ export default {
   updateGroups() {
     this.getExtendedFollows((k, info) => {
       if (info.followDistance <= 1) {
-        State.local.get('groups').get('follows').get(k).put(true);
+        local().get('groups').get('follows').get(k).put(true);
       }
-      State.local.get('groups').get('everyone').get(k).put(true);
+      local().get('groups').get('everyone').get(k).put(true);
       if (k === this.getPubKey()) {
         this.updateNoFollowers();
       }
@@ -182,31 +185,31 @@ export default {
     Notifications.getWebPushSubscriptions();
     Notifications.subscribeToIrisNotifications();
     Channel.getMyChatLinks(key, undefined, chatLink => {
-      State.local.get('chatLinks').get(chatLink.id).put(chatLink.url);
+      local().get('chatLinks').get(chatLink.id).put(chatLink.url);
       latestChatLink = chatLink.url;
     });
     this.setOurOnlineStatus();
     Channel.getChannels(key, c => this.addChannel(c));
-    State.public.user().get('profile').get('name').on(name => {
+    publicState().user().get('profile').get('name').on(name => {
       if (name && typeof name === 'string') {
         myName = name;
       }
     });
-    State.public.user().get('profile').get('photo').on(data => {
+    publicState().user().get('profile').get('photo').on(data => {
       myProfilePhoto = data;
     });
     Notifications.init();
-    State.local.get('loggedIn').put(true);
-    State.local.get('settings').once().then(settings => {
+    local().get('loggedIn').put(true);
+    local().get('settings').once().then(settings => {
       if (!settings) {
-        State.local.get('settings').put(DEFAULT_SETTINGS.local);
+        local().get('settings').put(DEFAULT_SETTINGS.local);
       } else if (settings.enableWebtorrent === undefined || settings.autoplayWebtorrent === undefined) {
-        State.local.get('settings').get('enableWebtorrent').put(DEFAULT_SETTINGS.local.enableWebtorrent);
-        State.local.get('settings').get('autoplayWebtorrent').put(DEFAULT_SETTINGS.local.autoplayWebtorrent);
+        local().get('settings').get('enableWebtorrent').put(DEFAULT_SETTINGS.local.enableWebtorrent);
+        local().get('settings').get('autoplayWebtorrent').put(DEFAULT_SETTINGS.local.autoplayWebtorrent);
       }
     });
-    State.public.user().get('block').map().on((isBlocked, user) => {
-      State.local.get('block').get(user).put(isBlocked);
+    publicState().user().get('block').map().on((isBlocked, user) => {
+      local().get('block').get(user).put(isBlocked);
       if (isBlocked) {
         delete searchableItems[user];
       }
@@ -215,18 +218,18 @@ export default {
     if (shouldRefresh) {
       location.reload();
     }
-    if (State.electron) {
-      State.electron.get('settings').on(electron => {
-        State.local.get('settings').get('electron').put(electron);
+    if (electron) {
+      electron.get('settings').on(electron => {
+        local().get('settings').get('electron').put(electron);
         if (electron.publicIp) {
           Object.values(this.channels).forEach(channel => this.shareMyPeerUrl(channel));
         }
       });
-      State.electron.get('user').put(key.pub);
+      electron.get('user').put(key.pub);
     }
-    State.local.get('filters').get('group').once().then(v => {
+    local().get('filters').get('group').once().then(v => {
       if (!v) {
-        State.local.get('filters').get('group').put('follows');
+        local().get('filters').get('group').put('follows');
       }
     });
   },
@@ -237,7 +240,7 @@ export default {
 
   clearIndexedDB() {
     return new Promise(resolve => {
-      const r1 = window.indexedDB.deleteDatabase('State.local');
+      const r1 = window.indexedDB.deleteDatabase('local()');
       const r2 = window.indexedDB.deleteDatabase('radata');
       let r1done;
       let r2done;
@@ -266,8 +269,8 @@ export default {
   getMyProfilePhoto() { return myProfilePhoto; },
 
   async logOut() {
-    if (State.electron) {
-      State.electron.get('user').put(null);
+    if (electron) {
+      electron.get('user').put(null);
     }
     // TODO: remove subscription from your channels
     if (navigator.serviceWorker) {
@@ -300,10 +303,10 @@ export default {
     console.log('loginAsNewUser name', name);
     return Gun.SEA.pair().then(k => {
       this.login(k);
-      State.public.user().get('profile').put({a:null});
-      State.public.user().get('profile').get('name').put(name);
-      State.local.get('filters').put({a:null});
-      State.local.get('filters').get('group').put('follows');
+      publicState().user().get('profile').put({a:null});
+      publicState().user().get('profile').get('name').put(name);
+      local().get('filters').put({a:null});
+      local().get('filters').get('group').put('follows');
       this.createChatLink();
     });
   },
@@ -318,7 +321,7 @@ export default {
       this.clearIndexedDB();
     }
     setTimeout(() => {
-      State.local.get('block').map(() => {
+      local().get('block').map(() => {
         this.updateSearchIndex();
       });
       this.updateSearchIndex();
@@ -334,7 +337,7 @@ export default {
   myPeerUrl: ip => `http://${ip}:8767/gun`,
 
   async shareMyPeerUrl(channel) {
-    const myIp = await State.local.get('settings').get('electron').get('publicIp').once();
+    const myIp = await local().get('settings').get('electron').get('publicIp').once();
     myIp && channel.put && channel.put('my_peer', this.myPeerUrl(myIp));
   },
 
@@ -349,11 +352,10 @@ export default {
 
   addChannel(chat) {
     this.taskQueue.push(() => {
-
       let pub = chat.getId();
       if (this.channels[pub]) { return; }
       this.channels[pub] = chat;
-      const chatNode = State.local.get('channels').get(pub);
+      const chatNode = local().get('channels').get(pub);
       chatNode.get('latestTime').on(t => {
         if (t && (!chat.latestTime || t > chat.latestTime)) {
           chat.latestTime = t;
@@ -395,7 +397,7 @@ export default {
       chat.isTyping = false;
       chat.getTyping(isTyping => {
         chat.isTyping = isTyping;
-        State.local.get('channels').get(pub).get('isTyping').put(isTyping);
+        local().get('channels').get(pub).get('isTyping').put(isTyping);
       });
       chat.online = {};
       Channel.getActivity(pub, (activity) => {
@@ -410,14 +412,14 @@ export default {
         chat.on('name', v => {
           chat.name = v;
           searchableItems[chat.uuid] = {name: v, uuid: chat.uuid};
-          State.local.get('channels').get(chat.uuid).get('name').put(v);
+          local().get('channels').get(chat.uuid).get('name').put(v);
         });
         chat.on('photo', v => {
           searchableItems[chat.uuid] = searchableItems[chat.uuid] || {};
           searchableItems[chat.uuid].photo = v;
-          State.local.get('channels').get(chat.uuid).get('photo').put(v)
+          local().get('channels').get(chat.uuid).get('photo').put(v)
         });
-        chat.on('about', v => State.local.get('channels').get(chat.uuid).get('about').put(v));
+        chat.on('about', v => local().get('channels').get(chat.uuid).get('about').put(v));
         chat.getParticipants(participants => {
           delete participants.undefined; // TODO fix where it comes from
           if (typeof participants === 'object') {
@@ -425,23 +427,23 @@ export default {
             keys.forEach((k, i) => {
               let hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
               chat.participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
-              State.public.user(k).get('profile').get('name').on(name => {
+              publicState().user(k).get('profile').get('name').on(name => {
                 chat.participantProfiles[k].name = name;
               });
             });
           }
-          State.local.get('channels').get(chat.uuid).get('participants').put(participants);
+          local().get('channels').get(chat.uuid).get('participants').put(participants);
         });
         chat.inviteLinks = {};
         chat.getChatLinks({callback: ({url, id}) => {
           console.log('got chat link', id, url);
           chat.inviteLinks[id] = url; // TODO use State
-          State.local.get('inviteLinksChanged').put(true);
+          local().get('inviteLinksChanged').put(true);
         }});
       } else {
-        State.local.get('groups').get('everyone').get(pub).put(true);
+        local().get('groups').get('everyone').get(pub).put(true);
         this.addFollow(null, pub, Infinity);
-        State.public.user(pub).get('profile').get('name').on(v => State.local.get('channels').get(pub).get('name').put(v))
+        publicState().user(pub).get('profile').get('name').on(v => local().get('channels').get(pub).get('name').put(v))
       }
       if (chat.put) {
         chat.onTheir('webPushSubscriptions', (s, k, from) => {
@@ -454,9 +456,9 @@ export default {
         this.shareMyPeerUrl(chat);
       }
       chat.onTheir('call', call => {
-        State.local.get('call').put({pub, call});
+        local().get('call').put({pub, call});
       });
-      State.local.get('channels').get(pub).put({enabled:true});
+      local().get('channels').get(pub).put({enabled:true});
       /* Disable private peer discovery, since they're not connecting anyway
       if (chat.onTheir) {
         chat.onTheir('my_peer', (url, k, from) => {
@@ -482,7 +484,7 @@ export default {
       return;
     }
     msg.selfAuthored = info.selfAuthored;
-    State.local.get('channels').get(chatId).get('msgs').get(msg.time + (msg.from && msg.from.slice(0, 10))).put(JSON.stringify(msg));
+    local().get('channels').get(chatId).get('msgs').get(msg.time + (msg.from && msg.from.slice(0, 10))).put(JSON.stringify(msg));
     msg.timeObj = new Date(msg.time);
     if (!info.selfAuthored && msg.timeObj > chat.myLastSeenTime) {
       if (window.location.hash !== `#/chat/${  chatId}` || document.visibilityState !== 'visible') {
@@ -492,10 +494,10 @@ export default {
         }
     }
     if (!info.selfAuthored && msg.time > chat.theirMsgsLastSeenTime) {
-      State.local.get('channels').get(chatId).get('theirMsgsLastSeenTime').put(msg.time);
+      local().get('channels').get(chatId).get('theirMsgsLastSeenTime').put(msg.time);
     }
     if (!chat.latestTime || (msg.time > chat.latestTime)) {
-      State.local.get('channels').get(chatId).put({
+      local().get('channels').get(chatId).put({
         latestTime: msg.time,
         latest: {time: msg.time, text: msg.text, selfAuthored: info.selfAuthored}
       });

@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+import Session from 'iris-lib/src/session';
 import {translate as t} from '../translations/Translation';
 import { route } from 'preact-router';
 import StoreView from './Store';
@@ -15,7 +15,7 @@ class Product extends StoreView {
 
   addToCart() {
     const count = (this.cart[this.props.product] || 0) + 1;
-    State.local.get('cart').get(this.props.store).get(this.props.product).put(count);
+    iris.local().get('cart').get(this.props.store).get(this.props.product).put(count);
   }
 
   newProduct() {
@@ -42,7 +42,7 @@ class Product extends StoreView {
 
   onClickDelete() {
     if (confirm('Delete product? This cannot be undone.')) {
-      State.public.user().get('store').get('products').get(this.props.product).put(null);
+      iris.user().get('store').get('products').get(this.props.product).put(null);
       route(`/store/${  this.props.store}`);
     }
   }
@@ -97,7 +97,7 @@ class Product extends StoreView {
       description: this.newProductDescription,
       price: this.newProductPrice
     };
-    State.public.user().get('store').get('products').get(this.newProductId || this.newProductName).put(product);
+    iris.user().get('store').get('products').get(this.newProductId || this.newProductName).put(product);
     route(`/store/${Session.getPubKey()}`)
   }
 
@@ -107,7 +107,7 @@ class Product extends StoreView {
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     this.isMyProfile = Session.getPubKey() === pub;
     if (this.props.product && pub) {
-      State.public.user(pub).get('store').get('products').get(this.props.product).on(product => this.setState({product}));
+      iris.user(pub).get('store').get('products').get(this.props.product).on(product => this.setState({product}));
     }
   }
 }

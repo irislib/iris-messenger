@@ -11,12 +11,10 @@ localForage.config({
 })
 
 /**
-  Our very own implementation of the Gun API. Local state only.
+  Our very own implementation of the Gun API. Used for iris.local() only.
  */
 export default class Node {
-    /**
-     *
-     */
+    /** */
     constructor(id = '', parent) {
         this.id = id;
         this.parent = parent;

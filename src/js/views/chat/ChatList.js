@@ -2,7 +2,7 @@ import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import { translate as t } from '../../translations/Translation';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import ChatListItem from './ChatListItem';
 import { route } from 'preact-router';
 import Notifications from 'iris-lib/src/Notifications';
@@ -32,14 +32,14 @@ class ChatList extends Component {
 
   componentDidMount() {
     const hashtags = {};
-    State.local.get('channels').map(this.sub(
+    iris.local().get('channels').map(this.sub(
       (chat, id) => {
         if (!chat || id === 'public' || chat.name == null) {
           this.state.chats.has(id) && this.setState({chats: this.state.chats.delete(id)});
           return;
         }
         chat.latestTime = chat.latestTime || '';
-        State.local.get('channels').get(id).get('latest').on(this.sub(
+        iris.local().get('channels').get(id).get('latest').on(this.sub(
           (latest) => {
             this.setState({latestTime : latest});
             chat.latestTime = latest.time || '';
@@ -52,10 +52,10 @@ class ChatList extends Component {
         this.setState({chats: this.state.chats.set(id, chat)});
       }
     ));
-    State.local.get('scrollUp').on(this.sub(
+    iris.local().get('scrollUp').on(this.sub(
       () => Helpers.animateScrollTop('.chat-list')
     ));
-    State.public.user().get('hashtagSubscriptions').map().on(this.sub(
+    iris.user().get('hashtagSubscriptions').map().on(this.sub(
       (isSubscribed, hashtag) => {
         if (isSubscribed) {
           hashtags[hashtag] = true;

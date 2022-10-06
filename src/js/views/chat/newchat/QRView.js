@@ -1,5 +1,5 @@
 import { translate as t } from '../../../translations/Translation';
-import Session from 'iris-lib/src/Session';
+import Session from 'iris-lib/src/session';
 import QRScanner from '../../../QRScanner';
 import Button from '../../../components/basic/Button';
 import $ from 'jquery';

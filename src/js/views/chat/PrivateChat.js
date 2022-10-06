@@ -2,12 +2,12 @@ import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import {createRef} from 'preact';
 import { translate as t } from '../../translations/Translation';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Identicon from '../../components/Identicon';
 import Message from '../../components/Message';
 import ChatMessageForm from './ChatMessageForm';
 import Name from '../../components/Name';
-import Session from 'iris-lib/src/Session';
+import Session from 'iris-lib/src/session';
 import Notifications from 'iris-lib/src/Notifications';
 import NewChat from './newchat/NewChat';
 import _ from 'lodash';
@@ -82,14 +82,14 @@ export default class PrivateChat extends Component {
     this.iv = setInterval(go, 3000);
     go();
 
-    State.local.get('showParticipants').put(true);
-    State.local.get('showParticipants').on(this.inject());
-    State.local.get('channels').get(this.props.id).get('participants').map(this.sub(
+    iris.local().get('showParticipants').put(true);
+    iris.local().get('showParticipants').on(this.inject());
+    iris.local().get('channels').get(this.props.id).get('participants').map(this.sub(
       (v, k) => {
         const hasAlready = !!this.participants[k];
         this.participants[k] = v;
         if (!!v && !hasAlready) {
-          State.public.user(k).get('activity').on(this.sub(
+          iris.user(k).get('activity').on(this.sub(
             (activity) => {
               if (this.participants[k]) { this.participants[k].activity = activity; }
               this.setSortedParticipants();
@@ -99,8 +99,8 @@ export default class PrivateChat extends Component {
         this.setSortedParticipants();
       }
     ));
-    State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
-    const node = State.local.get('channels').get(this.props.id).get('msgs');
+    iris.local().get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
+    const node = iris.local().get('channels').get(this.props.id).get('msgs');
     const limitedUpdate = _.throttle(() => this.setState({
       sortedMessages: Object.keys(this.msgs).sort().map(k => this.msgs[k])
     }), 100); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?

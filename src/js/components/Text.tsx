@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+import Session from 'iris-lib/src/session';
 import {createRef, RefObject, JSX} from "preact";
 
 type Props = {
@@ -45,7 +45,7 @@ class Text extends Component<Props, State> {
   }
 
   getNode() {
-    let base = this.props.gun || State.public;
+    let base = this.props.gun || iris.public();
     const user = this.props.user;
     if (user) {
       base = base.user(user);

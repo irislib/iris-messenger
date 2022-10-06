@@ -2,8 +2,8 @@ import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import { translate as t } from '../../translations/Translation';
 import Torrent from '../../components/Torrent';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+import Session from 'iris-lib/src/session';
 import _ from 'lodash';
 import $ from 'jquery';
 import EmojiButton from '../../lib/emoji-button';
@@ -35,7 +35,7 @@ class ChatMessageForm extends MessageForm {
       console.error("no chat", this.props.activeChat, "found");
       return;
     }
-    State.local.get('channels').get(this.props.activeChat).get('msgDraft').put(null);
+    iris.local().get('channels').get(this.props.activeChat).get('msgDraft').put(null);
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length && !chat.attachments) { return; }
@@ -57,7 +57,7 @@ class ChatMessageForm extends MessageForm {
   }
 
   sendToHashtag() {
-    State.local.get('channels').get(this.props.activeChat).get('msgDraft').put(null);
+    iris.local().get('channels').get(this.props.activeChat).get('msgDraft').put(null);
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length) { return; }
@@ -118,7 +118,7 @@ class ChatMessageForm extends MessageForm {
       setTyping();
     }
     this.isTyping = getIsTyping();
-    State.local.get('channels').get(this.props.activeChat).get('msgDraft').put($(event.target).val());
+    iris.local().get('channels').get(this.props.activeChat).get('msgDraft').put($(event.target).val());
   }
 
   attachFileClicked(event) {

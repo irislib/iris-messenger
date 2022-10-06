@@ -1,9 +1,7 @@
 import BaseComponent from "../BaseComponent";
-import Session from "iris-lib/src/Session";
-import Gun from "gun";
+import iris from "iris-lib";
 import {html} from "htm/preact";
 import Name from "./Name";
-import State from "iris-lib/src/State";
 import Text from "./Text";
 import Button from "./basic/Button";
 
@@ -47,7 +45,7 @@ class ExplorerNode extends BaseComponent {
   }
 
   componentDidMount() { // TODO: this is messy; create separate classes for Public / Group / Local
-    this.isMine = this.props.path.indexOf(`Public/Users/~${  Session.getPubKey()}`) === 0;
+    this.isMine = this.props.path.indexOf(`Public/Users/~${  iris.session.getPubKey()}`) === 0;
     this.isGroup = this.props.path.indexOf('Group/') === 0;
     this.isPublicRoot = this.props.path === 'Public';
     this.isUserList = this.props.path === 'Public/Users';
@@ -66,12 +64,12 @@ class ExplorerNode extends BaseComponent {
     }
     if (this.isUserList) { // always add yourself to the user list
       const obj = {};
-      obj[`~${Session.getPubKey()}`] = {value:{_:1}};
+      obj[`~${iris.session.getPubKey()}`] = {value:{_:1}};
       this.children = Object.assign(this.children, obj);
     }
     if (this.isGroupRoot) {
       const groups = {};
-      State.local.get('groups').map(this.sub(
+      iris.local().get('groups').map(this.sub(
         (v,k) => {
           if (v) {
             groups[k] = true;
@@ -92,12 +90,12 @@ class ExplorerNode extends BaseComponent {
         let encryption;
         if (typeof v === 'string' && v.indexOf('SEA{') === 0) {
           try {
-            const myKey = Session.getKey();
-            let dec = await Gun.SEA.decrypt(v, myKey);
+            const myKey = iris.session.getKey();
+            let dec = await iris.SEA.decrypt(v, myKey);
             if (dec === undefined) {
               if (!this.mySecret) {
-                this.mySecret = await Gun.SEA.secret(myKey.epub, myKey);
-                dec = await Gun.SEA.decrypt(v, this.mySecret);
+                this.mySecret = await iris.SEA.secret(myKey.epub, myKey);
+                dec = await iris.SEA.decrypt(v, this.mySecret);
               }
             }
             if (dec !== undefined) {
@@ -120,7 +118,7 @@ class ExplorerNode extends BaseComponent {
       return;
     } else if (this.isGroup) {
       const path = this.props.path.split('/').slice(2).join('/');
-      this.props.gun.map(path, cb); // TODO: make State.group() provide the normal gun api
+      this.props.gun.map(path, cb); // TODO: make iris.group() provide the normal gun api
     } else {
       this.getNode().map(cb);
     }
@@ -151,7 +149,7 @@ class ExplorerNode extends BaseComponent {
                         (displayName || k)}
             </b>
         </a>
-        ${Session.getPubKey() === substr ? html`<small class="mar-left5">(you)</small>` : ''}
+        ${iris.session.getPubKey() === substr ? html`<small class="mar-left5">(you)</small>` : ''}
       </div>
       ${this.state.children[k].open ? html`<${ExplorerNode} gun=${this.props.gun} indent=${this.props.indent + 1} key=${path} path=${path} isGroup=${this.props.isGroup}/>` : ''}
     `;
@@ -174,7 +172,7 @@ class ExplorerNode extends BaseComponent {
         s = JSON.stringify(v);
       }
     } else {
-      const pub = Session.getPubKey();
+      const pub = iris.session.getPubKey();
       const path = (this.isMine || this.isLocal) && (`${this.props.path  }/${  encodeURIComponent(k)}`)
         .replace(`Public/Users/~${  pub  }/`, '')
         .replace(`Local/`, '');
@@ -257,7 +255,7 @@ class ExplorerNode extends BaseComponent {
 
   render() {
     const childrenKeys = Object.keys(this.state.children).sort();
-    const myKeyIndex = childrenKeys.indexOf(`~${Session.getPubKey()}`);
+    const myKeyIndex = childrenKeys.indexOf(`~${iris.session.getPubKey()}`);
     if (myKeyIndex > 0) {
       const a = childrenKeys.splice(myKeyIndex, 1);
       childrenKeys.unshift(a[0]);

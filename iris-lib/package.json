@@ -1,6 +1,6 @@
 {
   "name": "iris-lib",
-  "version": "0.0.161",
+  "version": "0.1.0",
   "description": "Basic tools for reading and writing Iris messages and identities.",
   "main": "src/index.js",
   "react-native": {
@@ -108,12 +108,10 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-terser": "^1.0.1"
   },
-  "peerDependencies": {
-    "gun": "^0.2020.1238"
-  },
   "dependencies": {
     "fuse.js": "^6.6.2",
     "localforage": "^1.10.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "gun": "^0.2020.1238"
   }
 }

@@ -2,12 +2,11 @@ import { Component } from 'preact';
 import { html } from 'htm/preact';
 import { route } from 'preact-router';
 import $ from 'jquery';
-import Gun from 'gun';
 
 import {translate as t} from '../translations/Translation';
-import Session from 'iris-lib/src/Session';
+import Session from 'iris-lib/src/session';
 
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Button from './basic/Button';
 
 const ringSound = new Audio('../../assets/audio/ring.mp3');
@@ -39,13 +38,13 @@ function setRTCConfig(c) {
 
 class VideoCall extends Component {
   componentDidMount() {
-    State.local.get('activeCall').put(null);
-    State.local.get('outgoingCall').put(null);
-    State.local.get('incomingCall').put(null);
-    /*State.local.get('call').open(call => {
+    iris.local().get('activeCall').put(null);
+    iris.local().get('outgoingCall').put(null);
+    iris.local().get('incomingCall').put(null);
+    /*iris.local().get('call').open(call => {
       this.onCallMessage(call.pub, call.call);
     });*/
-    State.local.get('incomingCall').on(incomingCall => {
+    iris.local().get('incomingCall').on(incomingCall => {
       if (!incomingCall) {
         clearTimeout(callTimeout);
         ringSound.pause();
@@ -58,19 +57,19 @@ class VideoCall extends Component {
       }
       this.setState({incomingCall});
     });
-    State.local.get('activeCall').on(activeCall => {
+    iris.local().get('activeCall').on(activeCall => {
       this.setState({activeCall})
       this.stopCalling();
     });
-    State.local.get('outgoingCall').on(outgoingCall => {
+    iris.local().get('outgoingCall').on(outgoingCall => {
       outgoingCall && this.onCallUser(outgoingCall);
       this.setState({outgoingCall});
     });
   }
 
   async answerCall(pub) {
-    State.local.get('incomingCall').put(null);
-    State.local.get('activeCall').put(pub);
+    iris.local().get('incomingCall').put(null);
+    iris.local().get('activeCall').put(pub);
     await this.initConnection(false, pub);
   }
 
@@ -87,9 +86,9 @@ class VideoCall extends Component {
           this.rejectCall(pub);
           return;
         }
-        State.local.get('incomingCall').put(pub);
+        iris.local().get('incomingCall').put(pub);
         clearTimeout(callTimeout);
-        callTimeout = setTimeout(() => State.local.get('incomingCall').put(null), 5000);
+        callTimeout = setTimeout(() => iris.local().get('incomingCall').put(null), 5000);
       }
     } else {
       this.callClosed(pub);
@@ -112,9 +111,9 @@ class VideoCall extends Component {
   }
 
   resetCalls() {
-    State.local.get('outgoingCall').put(null);
-    State.local.get('activeCall').put(null);
-    State.local.get('incomingCall').put(null);
+    iris.local().get('outgoingCall').put(null);
+    iris.local().get('activeCall').put(null);
+    iris.local().get('incomingCall').put(null);
   }
 
   callClosed(pub) {
@@ -170,11 +169,11 @@ class VideoCall extends Component {
     call();
     callSound.addEventListener('ended', () => this.timeoutPlayCallSound());
     callSound.play();
-    State.local.get('outgoingCall').put(pub);
+    iris.local().get('outgoingCall').put(pub);
   }
 
   cancelCall(pub) {
-    State.local.get('outgoingCall').put(null);
+    iris.local().get('outgoingCall').put(null);
     this.stopCalling();
     this.stopUserMedia(pub);
     Session.channels[pub].put('call', 'null');
@@ -187,7 +186,7 @@ class VideoCall extends Component {
   }
 
   stopCalling() {
-    State.local.get('outgoingCall').put(null);
+    iris.local().get('outgoingCall').put(null);
     callSound.pause();
     callSound.removeEventListener('ended', () => this.timeoutPlayCallSound());
     clearTimeout(callSoundTimeout);
@@ -201,12 +200,12 @@ class VideoCall extends Component {
     this.stopUserMedia(pub);
     Session.channels[pub].put('call', 'null');
     Session.channels[pub].pc = null;
-    State.local.get('activeCall').put(null);
+    iris.local().get('activeCall').put(null);
   }
 
   rejectCall(pub) {
     Session.channels[pub].rejectedTime = new Date();
-    State.local.get('incomingCall').put(null);
+    iris.local().get('incomingCall').put(null);
     console.log('rejectCall', pub, Session.channels[pub]);
     Session.channels[pub].put('call', 'null');
   }
@@ -256,7 +255,7 @@ class VideoCall extends Component {
     chat.pc.onicecandidate = chat.pc.onicecandidate || (({candidate}) => {
       if (!candidate) return;
       console.log('sending our ice candidate');
-      let i = Gun.SEA.random(12).toString('base64');
+      let i = btoa(Math.random().toString()).slice(0, 12);
       ourIceCandidates[i] = candidate;
       chat.put('icecandidates', {time: new Date().toISOString(), data: ourIceCandidates});
     });
@@ -284,7 +283,7 @@ class VideoCall extends Component {
         case "stable":
           this.stopCalling();
           console.log('call answered by', pub);
-          State.local.get('activeCall').put(pub);
+          iris.local().get('activeCall').put(pub);
           break;
         case "closed":
           console.log("Signalling state is 'closed'");
