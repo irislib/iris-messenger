@@ -1,7 +1,16 @@
 import publicSpace from './public';
 import util from './util';
 
+/**
+ * Content-addressed storage
+ */
 export default {
+  /**
+   * Get a file identified by its hash
+   * @param hash
+   * @param callback
+   * @returns {Promise<unknown>}
+   */
   get(hash, callback) {
     return new Promise((resolve, reject) => {
       if (!hash) {
@@ -20,6 +29,11 @@ export default {
     });
   },
 
+  /**
+   * Store a file and return its hash
+   * @param value
+   * @returns {Promise<string>}
+   */
   async put(value) {
     const hash = await util.getHash(value);
     publicSpace().get('#').get(hash).put(value);

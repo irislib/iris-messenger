@@ -17,8 +17,7 @@ export default class MessageForm extends Component {
     msg.type = 'post';
     const signedMsg = await SignedMessage.create(msg, Session.getKey());
     const serialized = signedMsg.toString();
-    const hash = await util.getHash(serialized);
-    iris.local().get(hash).put(serialized);
+    const hash = await iris.static.put(serialized);
     if (msg.replyingTo) {
       twice(() => iris.user().get('replies').put({}));
       twice(() => iris.user().get('replies').get(msg.replyingTo).put('a'));
