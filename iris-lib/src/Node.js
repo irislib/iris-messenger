@@ -11,7 +11,7 @@ localForage.config({
 })
 
 /**
-  Our very own implementation of the Gun API. Used for iris.local() only.
+  Our very own implementation of the Gun API. Used for iris.local() only. Memory and local storage only.
  */
 export default class Node {
     /** */

@@ -8,7 +8,7 @@ const cache = new Map();
 const callbacks = new Map();
 
 /**
- * Aggregate getter that returns the path
+ * Aggregates public data from all users in the group.
  *
  * @param groupName
  * @returns object

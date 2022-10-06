@@ -3,7 +3,7 @@ import Node from './Node';
 let local;
 
 /**
- * Get the local state
+ * Get a state that is only synced in memory and local storage
  * @returns {Node}
  */
 export default function() {

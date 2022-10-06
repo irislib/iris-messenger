@@ -6273,8 +6273,6 @@
 	    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
 	      // Set @@toStringTag to native iterators
 	      _setToStringTag(IteratorPrototype, TAG, true);
-	      // fix for some old engines
-	      if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
 	    }
 	  }
 	  // fix Array#{values, @@iterator}.name in V8 / FF
@@ -6283,7 +6281,7 @@
 	    $default = function values() { return $native.call(this); };
 	  }
 	  // Define iterator
-	  if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+	  if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
 	    _hide(proto, ITERATOR, $default);
 	  }
 	  // Plug for library
@@ -29709,13 +29707,11 @@
 	});
 
 	/**
-	  Our very own implementation of the Gun API. Local state only.
+	  Our very own implementation of the Gun API. Used for iris.local() only.
 	 */
 
 	var Node = function () {
-	    /**
-	     *
-	     */
+	    /** */
 	    function Node() {
 	        var _this = this;
 
@@ -30002,6 +29998,10 @@
 
 	var local = void 0;
 
+	/**
+	 * Get the local state
+	 * @returns {Node}
+	 */
 	function local$1 () {
 	  if (!local) {
 	    local = new Node();
@@ -30009,6 +30009,11 @@
 	  return local;
 	}
 
+	/**
+	 *
+	 * @param pub
+	 * @returns gun user node
+	 */
 	function userSpace (pub) {
 	  return publicState$1().user(pub);
 	}
@@ -30039,6 +30044,12 @@
 	var cache = new _Map();
 	var callbacks = new _Map();
 
+	/**
+	 * Aggregate getter that returns the path
+	 *
+	 * @param groupName
+	 * @returns object
+	 */
 	function group () {
 	  var groupName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'everyone';
 
@@ -30562,10 +30573,14 @@
 
 	var urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
 
+	/**
+	 * Peer management utilities
+	 */
 	var PeerManager = {
 	  known: {},
 
-	  addPeer: async function addPeer(peer) {
+	  /** */
+	  add: async function add(peer) {
 	    var _this = this;
 
 	    if (!urlRegex.test(peer.url)) {
@@ -30589,23 +30604,29 @@
 	      publicState$1().user().get('peers').get(encryptedUrlHash).put({ url: peer.url, lastSeen: new Date().toISOString() });
 	    }
 	    if (peer.enabled !== false) {
-	      this.connectPeer(peer.url); // this calls savePeers()
+	      this.connect(peer.url); // this calls savePeers()
 	    } else {
-	      this.savePeers();
+	      this.save();
 	    }
 	  },
-	  removePeer: function removePeer(url) {
+
+
+	  /** */
+	  remove: function remove(url) {
 	    delete this.known[url];
-	    this.savePeers();
+	    this.save();
 	  },
-	  disconnectPeer: function disconnectPeer(peerFromGun) {
+
+
+	  /** */
+	  disconnect: function disconnect(peerFromGun) {
 	    publicState$1().on('bye', peerFromGun);
 	    peerFromGun.url = '';
 	  },
-	  getKnownPeers: function getKnownPeers() {
-	    return this.known;
+	  save: function save() {
+	    localStorage.setItem('gunPeers', _JSON$stringify(this.known));
 	  },
-	  getSavedPeers: function getSavedPeers() {
+	  getSaved: function getSaved() {
 	    var p = localStorage.getItem('gunPeers');
 	    if (p && p !== 'undefined') {
 	      p = JSON.parse(p);
@@ -30620,36 +30641,42 @@
 	    });
 	    return p;
 	  },
-	  resetPeers: function resetPeers() {
+
+
+	  /** */
+	  reset: function reset() {
 	    localStorage.setItem('gunPeers', undefined);
-	    this.known = this.getSavedPeers();
+	    this.known = this.getSaved();
 	  },
-	  savePeers: function savePeers() {
-	    localStorage.setItem('gunPeers', _JSON$stringify(this.known));
-	  },
-	  connectPeer: function connectPeer(url) {
+
+
+	  /** */
+	  connect: function connect(url) {
 	    if (this.isMixedContent(url)) {
 	      return;
 	    }
 	    if (this.known[url]) {
 	      this.known[url].enabled = true;
 	      publicState$1().opt({ peers: [url] });
-	      this.savePeers();
+	      this.save();
 	    } else {
-	      this.addPeer({ url: url });
+	      this.add({ url: url });
 	    }
 	  },
+
+
+	  /** */
 	  disable: function disable(url, peerFromGun) {
 	    this.known[url].enabled = false;
 	    if (peerFromGun) {
-	      this.disconnectPeer(peerFromGun);
+	      this.disconnect(peerFromGun);
 	    }
-	    this.savePeers();
+	    this.save();
 	  },
 	  isMixedContent: function isMixedContent(url) {
 	    return window.location.protocol === 'https:' && url.indexOf('http:') === 0;
 	  },
-	  getRandom: function getRandom() {
+	  random: function random() {
 	    var _this2 = this;
 
 	    var connectToLocalElectron = util.isElectron && this.known[ELECTRON_GUN_URL] && this.known[ELECTRON_GUN_URL].enabled !== false;
@@ -30681,7 +30708,7 @@
 	              peerSourceCount += 1;
 	            }
 	            var maxPeersFromSource = MAX_PEER_LIST_SIZE / peerSourceCount;
-	            _this3.addPeer({ url: peer.url, connect: true, from: pub });
+	            _this3.add({ url: peer.url, connect: true, from: pub });
 	            while (_Object$keys(_this3.known).length > MAX_PEER_LIST_SIZE) {
 	              lodash.each(_Object$keys(peerCountBySource), function (source) {
 	                if (peerCountBySource[source] > maxPeersFromSource) {
@@ -30714,17 +30741,17 @@
 	        return !mixedContent && enabled && !addedToGun;
 	      });
 	      if (unconnectedPeers.length) {
-	        this.connectPeer(lodash.sample(unconnectedPeers));
+	        this.connect(lodash.sample(unconnectedPeers));
 	      }
 	    }
 	    if (connectedPeers.length > maxConnectedPeers) {
-	      this.disconnectPeer(lodash.sample(connectedPeers));
+	      this.disconnect(lodash.sample(connectedPeers));
 	    }
 	  },
 	  init: function init() {
 	    var _this5 = this;
 
-	    this.known = this.getSavedPeers();
+	    this.known = this.getSaved();
 	    local$1().get('settings').get('maxConnectedPeers').on(function (n) {
 	      if (n !== undefined) maxConnectedPeers = n;
 	    });
@@ -36136,11 +36163,11 @@
 	   */
 	  init: function init(publicOpts) {
 	    browser.log.off = true;
-	    var opts = _Object$assign({ peers: PeerManager.getRandom(), localStorage: false, retry: Infinity }, publicOpts);
+	    var opts = _Object$assign({ peers: PeerManager.random(), localStorage: false, retry: Infinity }, publicOpts);
 	    publicState$1(opts);
 	    if (publicOpts && publicOpts.peers) {
 	      publicOpts.peers.forEach(function (url) {
-	        return PeerManager.addPeer({ url: url });
+	        return PeerManager.add({ url: url });
 	      });
 	    }
 	    util.setPublicState && util.setPublicState(this.public);
@@ -36162,7 +36189,6 @@
 
 	  SEA: browser.SEA,
 	  SignedMessage: SignedMessage,
-	  Attribute: Attribute,
 	  Channel: Channel,
 	  Node: Node
 	};
