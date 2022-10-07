@@ -41,14 +41,14 @@ const DEFAULT_SETTINGS = {
  */
 export default {
   /**
-   * Log in with a key from localStorage. If no key is found and options.autologin is true, a new user will be created.
+   * Log in with a key from localStorage. If no key is found and options.autologin is not false, a new user will be created.
    * @param options
    */
   init(options = {}) {
     let localStorageKey = localStorage.getItem('chatKeyPair');
     if (localStorageKey) {
       this.login(JSON.parse(localStorageKey));
-    } else if (options.autologin) {
+    } else if (options.autologin !== false) {
       this.loginAsNewUser();
     } else {
       this.clearIndexedDB();
