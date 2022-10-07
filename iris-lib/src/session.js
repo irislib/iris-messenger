@@ -280,7 +280,7 @@ export default {
    * @returns {Promise<*>}
    */
   loginAsNewUser(options = {}) {
-    name = options.name || util.generateName();
+    const name = options.name || util.generateName();
     console.log('loginAsNewUser name', name);
     return Gun.SEA.pair().then(k => {
       this.login(k);
