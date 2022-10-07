@@ -43,7 +43,11 @@ const DEFAULT_SETTINGS = {
  */
 export default {
   /**
-   * Log in with a key from localStorage. If no key is found and options.autologin is not false, a new user will be created.
+   * Log in with a key from localStorage.
+   *
+   * If no key is found and options.autologin is not false, a new user will be created.
+   *
+   * If options.autofollow is not false, the default follow will be added.
    * @param options
    */
   init(options = {}) {
@@ -290,7 +294,7 @@ export default {
           console.log('autofollowing', DEFAULT_FOLLOW);
           publicState().user().get('follow').get(DEFAULT_FOLLOW).put(true);
         }
-      }, 100);
+      }, 100); // maybe wait for login return instead
     });
   },
 
