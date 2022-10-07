@@ -1,4 +1,5 @@
-import Session from './session';
+import session from './session';
+import privateState from './private';
 import _ from 'lodash';
 import Gun from 'gun';
 import util from './util';
@@ -17,13 +18,14 @@ function desktopNotificationsEnabled() {
   return window.Notification && Notification.permission === 'granted';
 }
 
-function notifyMsg(msg, info, pub, onClick) {
+function notifyMsg(msg, info, channelId, onClick) {
   function shouldNotify() {
     if (msg.timeObj < loginTime) { return false; }
     if (info.selfAuthored) { return false; }
     if (document.visibilityState === 'visible') { return false; }
-    if (Session.channels[pub].notificationSetting === 'nothing') { return false; }
-    if (Session.channels[pub].notificationSetting === 'mentions' && !msg.text.includes(Session.getMyName())) { return false; }
+    const channel = privateState(channelId);
+    if (channel.notificationSetting === 'nothing') { return false; }
+    if (channel.notificationSetting === 'mentions' && !msg.text.includes(session.getMyName())) { return false; }
     return true;
   }
   function shouldDesktopNotify() {
@@ -38,8 +40,9 @@ function notifyMsg(msg, info, pub, onClick) {
   }
   if (shouldDesktopNotify()) {
     let body, title;
-    if (Session.channels[pub].uuid) {
-      title = Session.channels[pub].participantProfiles[info.from].name;
+    const channel = privateState(channelId);
+    if (channel.uuid) {
+      title = channel.participantProfiles[info.from].name;
       body = `${name}: ${msg.text}`;
     } else {
       title = 'Message'
@@ -60,7 +63,7 @@ function notifyMsg(msg, info, pub, onClick) {
 }
 
 function changeChatUnseenMsgsCount(chatId, change) {
-  const chat = Session.channels[chatId];
+  const chat = privateState(chatId);
   if (!chat) return;
   const chatNode = local().get('channels').get(chatId);
   if (change) {
@@ -109,17 +112,15 @@ async function subscribeToWebPush() {
   if (!desktopNotificationsEnabled() || !navigator.serviceWorker) { return false; }
   await navigator.serviceWorker.ready;
   const reg = await navigator.serviceWorker.getRegistration();
-  reg.active.postMessage({key: Session.getKey()});
+  reg.active.postMessage({key: session.getKey()});
   const sub = await reg.pushManager.getSubscription();
   sub ? addWebPushSubscription(sub) : subscribe(reg);
 }
 
 const addWebPushSubscriptionsToChats = _.debounce(() => {
   const arr = Object.values(webPushSubscriptions);
-  Object.values(Session.channels).forEach(channel => {
-    if (channel.put) {
-      channel.put('webPushSubscriptions', arr);
-    }
+  session.channelIds.forEach(channelId => {
+    privateState(channelId).put('webPushSubscriptions', arr);
   });
 }, 5000);
 
@@ -130,7 +131,7 @@ function removeSubscription(hash) {
 }
 
 async function addWebPushSubscription(s, saveToGun = true) {
-  const myKey = Session.getKey();
+  const myKey = session.getKey();
   const mySecret = await Gun.SEA.secret(myKey.epub, myKey);
   const enc = await Gun.SEA.encrypt(s, mySecret);
   const hash = await util.getHash(JSON.stringify(s));
@@ -142,7 +143,7 @@ async function addWebPushSubscription(s, saveToGun = true) {
 }
 
 async function getWebPushSubscriptions() {
-  const myKey = Session.getKey();
+  const myKey = session.getKey();
   const mySecret = await Gun.SEA.secret(myKey.epub, myKey);
   publicState().user().get('webPushSubscriptions').map().on(async enc => {
     if (!enc) { return; }
@@ -187,12 +188,12 @@ function subscribeToIrisNotifications(onClick) {
     publicState().user().get('notificationsShownTime').put(new Date().toISOString());
   }, 1000);
   const alreadyHave = new Set();
-  group().on(`notifications/${Session.getPubKey()}`, async (encryptedNotification, k, x, e, from) => {
+  group().on(`notifications/${session.getPubKey()}`, async (encryptedNotification, k, x, e, from) => {
       const id = from.slice(0,30) + encryptedNotification.slice(0,30);
       if (alreadyHave.has(id)) { return; }
       alreadyHave.add(id);
       const epub = await getEpub(from);
-      const secret = await Gun.SEA.secret(epub, Session.getKey());
+      const secret = await Gun.SEA.secret(epub, session.getKey());
       const notification = await Gun.SEA.decrypt(encryptedNotification, secret);
       if (!notification || typeof notification !== 'object') { return; }
       setNotificationsShownTime();
@@ -234,16 +235,15 @@ async function sendIrisNotification(recipient, notification) {
   if (!(recipient && notification)) { return; } // TODO: use typescript or sth :D
   if (typeof notification === 'object') { notification.time = new Date().toISOString() }
   const epub = await getEpub(recipient);
-  const secret = await Gun.SEA.secret(epub, Session.getKey());
+  const secret = await Gun.SEA.secret(epub, session.getKey());
   const enc = await Gun.SEA.encrypt(notification, secret);
   publicState().user().get('notifications').get(recipient).put(enc);
 }
 
 async function sendWebPushNotification(recipient, notification) {
   console.log('sending web push notification to', recipient, notification);
-  const channel = Session.channels[recipient];
-  if (!channel) { return; }
-  const myKey = Session.getKey();
+  const channel = iris.private(recipient);
+  const myKey = session.getKey();
   const shouldWebPush = (recipient === myKey.pub) || !(channel.activity && channel.activity.isActive);
   if (shouldWebPush && channel.webPushSubscriptions) {
     const subscriptions = [];

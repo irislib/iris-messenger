@@ -9,6 +9,7 @@ import localforage from 'localforage';
 import local from './local';
 import electron from './electron';
 import publicState from './public';
+import privateState from './private';
 import blockedUsers from './blockedUsers';
 
 let key;
@@ -38,7 +39,7 @@ const DEFAULT_SETTINGS = {
 
 export default {
   DEFAULT_SETTINGS,
-  channels: {},
+  channelIds: new Set(),
   taskQueue: [],
 
   updateSearchIndex: _.throttle(() => {
@@ -134,7 +135,8 @@ export default {
     const activeRoute = window.location.hash;
     Channel.setActivity(ourActivity = 'active');
     const setActive = _.debounce(() => {
-      const chat = activeRoute && this.channels[activeRoute.replace('#/profile/','').replace('#/chat/','')];
+      const chatId = activeRoute && activeRoute.replace('#/profile/','').replace('#/chat/','');
+      const chat = privateState(chatId);
       if (chat && !ourActivity) {
         chat.setMyMsgsLastSeenTime();
       }
@@ -149,7 +151,7 @@ export default {
       if (document.visibilityState === 'visible') {
         Channel.setActivity(ourActivity = 'active');
         const chatId = location.pathname.slice(1).replace('chat/','');
-        const chat = activeRoute && this.channels[chatId];
+        const chat = activeRoute && privateState(chatId);
         if (chat) {
           chat.setMyMsgsLastSeenTime();
           Notifications.changeChatUnseenCount(chatId, 0);
@@ -180,7 +182,8 @@ export default {
     const shouldRefresh = !!key;
     key = k;
     localStorage.setItem('chatKeyPair', JSON.stringify(k));
-    Channel.initUser(key);
+    publicState().user().auth(key);
+    publicState().user().put({epub: key.epub});
     Notifications.subscribeToWebPush();
     Notifications.getWebPushSubscriptions();
     Notifications.subscribeToIrisNotifications();
@@ -222,7 +225,7 @@ export default {
       electron.get('settings').on(electron => {
         local().get('settings').get('electron').put(electron);
         if (electron.publicIp) {
-          Object.values(this.channels).forEach(channel => this.shareMyPeerUrl(channel));
+          this.channelIds.forEach(id => privateState(id).shareMyPeerUrl());
         }
       });
       electron.get('user').put(key.pub);
@@ -342,10 +345,10 @@ export default {
   },
 
   newChannel(pub, chatLink) {
-    if (!pub || Object.prototype.hasOwnProperty.call(this.channels, pub)) {
+    if (!pub || this.channelIds.has(pub)) {
       return;
     }
-    const chat = new Channel({key, chatLink, participants: pub});
+    const chat = privateState(pub, chatLink);
     this.addChannel(chat);
     return chat;
   },
@@ -353,8 +356,8 @@ export default {
   addChannel(chat) {
     this.taskQueue.push(() => {
       let pub = chat.getId();
-      if (this.channels[pub]) { return; }
-      this.channels[pub] = chat;
+      if (this.channelIds[pub]) { return; }
+      this.channelIds[pub] = chat;
       const chatNode = local().get('channels').get(pub);
       chatNode.get('latestTime').on(t => {
         if (t && (!chat.latestTime || t > chat.latestTime)) {
@@ -472,7 +475,7 @@ export default {
   },
 
   processMessage(chatId, msg, info, onClickNotification) {
-    const chat = this.channels[chatId];
+    const chat = this.channelIds[chatId];
     if (chat.messageIds[msg.time + info.from]) return;
     chat.messageIds[msg.time + info.from] = true;
     if (info) {
@@ -507,7 +510,7 @@ export default {
   },
 
   subscribeToMsgs(pub) {
-    const c = this.channels[pub];
+    const c = this.channelIds[pub];
     if (!c || c.subscribed) { return; }
     c.subscribed = true;
     c.getMessages((msg, info) => {

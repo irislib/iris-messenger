@@ -29,8 +29,8 @@ class Header extends Component {
   }
 
   getOnlineStatusText() {
-    const chat = Session.channels[this.chatId];
-    const activity = chat && chat.activity;
+    const channel = iris.private(this.chatId);
+    const activity = channel.activity;
     if (activity) {
       if (activity.isActive) {
         return(t('online'));
@@ -119,7 +119,7 @@ class Header extends Component {
     const key = Session.getPubKey();
     if (!key) { return; }
     const activeRoute = this.state.activeRoute;
-    const chat = Session.channels[this.chatId];
+    const chat = this.chatId && iris.private(this.chatId);
     const isTyping = chat && chat.isTyping;
     const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
     const searchBox = this.chatId ? '' : html`

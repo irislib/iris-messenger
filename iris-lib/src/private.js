@@ -1,5 +1,5 @@
-import publicState from './public';
 import Channel from './Channel';
+import session from './session';
 
 const channels = new Map();
 
@@ -8,9 +8,9 @@ const channels = new Map();
  * @param publicKey
  * @returns {Channel}
  */
-export default function(publicKey) {
+export default function(publicKey = session.getKey(), chatLink) {
   if (!channels.has(publicKey)) {
-    channels.set(publicKey, new Channel(publicState.user(publicKey)));
+    channels.set(publicKey, new Channel({participants: publicKey, chatLink}));
   }
   return channels.get(publicKey);
 }

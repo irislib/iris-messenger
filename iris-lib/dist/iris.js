@@ -6273,6 +6273,8 @@
 	    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
 	      // Set @@toStringTag to native iterators
 	      _setToStringTag(IteratorPrototype, TAG, true);
+	      // fix for some old engines
+	      if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
 	    }
 	  }
 	  // fix Array#{values, @@iterator}.name in V8 / FF
@@ -6281,7 +6283,7 @@
 	    $default = function values() { return $native.call(this); };
 	  }
 	  // Define iterator
-	  if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+	  if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
 	    _hide(proto, ITERATOR, $default);
 	  }
 	  // Plug for library
@@ -29707,7 +29709,7 @@
 	});
 
 	/**
-	  Our very own implementation of the Gun API. Used for iris.local() only.
+	  Our very own implementation of the Gun API. Used for iris.local() only. Memory and local storage only.
 	 */
 
 	var Node = function () {
@@ -29999,7 +30001,7 @@
 	var local = void 0;
 
 	/**
-	 * Get the local state
+	 * Get a state that is only synced in memory and local storage
 	 * @returns {Node}
 	 */
 	function local$1 () {
@@ -30010,7 +30012,7 @@
 	}
 
 	/**
-	 *
+	 * Get a user space where only the user can write. Others can read.
 	 * @param pub
 	 * @returns gun user node
 	 */
@@ -30045,7 +30047,7 @@
 	var callbacks = new _Map();
 
 	/**
-	 * Aggregate getter that returns the path
+	 * Aggregates public data from all users in the group.
 	 *
 	 * @param groupName
 	 * @returns object
@@ -34651,6 +34653,11 @@
 
 	var channels = new _Map();
 
+	/**
+	 * Private channel that only you and publicKey can read/write.
+	 * @param publicKey
+	 * @returns {Channel}
+	 */
 	function privateState (publicKey) {
 	  if (!channels.has(publicKey)) {
 	    channels.set(publicKey, new Channel(publicState$1.user(publicKey)));
@@ -34658,7 +34665,16 @@
 	  return channels.get(publicKey);
 	}
 
+	/**
+	 * Content-addressed storage
+	 */
 	var staticState = {
+	  /**
+	   * Get a file identified by its hash
+	   * @param hash
+	   * @param callback
+	   * @returns {Promise<unknown>}
+	   */
 	  get: function get(hash, callback) {
 	    return new _Promise(function (resolve, reject) {
 	      if (!hash) {
@@ -34676,6 +34692,13 @@
 	      });
 	    });
 	  },
+
+
+	  /**
+	   * Store a file and return its hash
+	   * @param value
+	   * @returns {Promise<string>}
+	   */
 	  put: async function put(value) {
 	    var hash = await util.getHash(value);
 	    publicState$1().get('#').get(hash).put(value);
@@ -36188,6 +36211,7 @@
 	  algorithms: {},
 
 	  SEA: browser.SEA,
+	  Gun: browser,
 	  SignedMessage: SignedMessage,
 	  Channel: Channel,
 	  Node: Node

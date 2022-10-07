@@ -47,6 +47,7 @@ export default {
   algorithms: {},
 
   SEA: Gun.SEA,
+  Gun,
   SignedMessage,
   Channel,
   Node,
