@@ -1,7 +1,7 @@
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
-import Session from 'iris-lib/src/session';
+import session from 'iris-lib/src/session';
 import Torrent from './Torrent';
 import Autolinker from 'autolinker';
 import $ from 'jquery';
@@ -54,7 +54,7 @@ class Message extends Component {
 
   getSeenStatus() {
     const chatId = this.props.chatId;
-    const chat = Session.channels[chatId];
+    const chat = iris.private(chatId);
     const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
     const seen = chat && chat.theirMsgsLastSeenDate >= time;
     const delivered = chat && chat.activity && chat.activity.lastActive && new Date(chat.activity.lastActive) >= time;
@@ -125,8 +125,8 @@ class Message extends Component {
     }
     $('#attachment-gallery').fadeOut({duration: ANIMATE_DURATION, complete: () => $('#attachment-gallery').remove()});
     const activeChat = window.location.hash.replace('#/profile/','').replace('#/chat/','');
-    if (activeChat && Session.channels[activeChat]) {
-      Session.channels[activeChat].attachments = null;
+    if (activeChat) {
+      iris.private(activeChat).attachments = null;
     }
     if ("activeElement" in document) {
       document.activeElement.blur();
@@ -138,7 +138,7 @@ class Message extends Component {
     let name = this.props.name || this.state.name;
     let color;
     const chatId = this.props.chatId;
-    const chat = Session.channels[chatId];
+    const chat = iris.private(chatId);
     if (chat && chat.uuid && !this.props.selfAuthored) {
       const profile = chat.participantProfiles[this.props.from];
       name = profile && profile.name;

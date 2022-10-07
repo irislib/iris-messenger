@@ -89,7 +89,7 @@
     "documentation": "^14.0.0",
     "eslint": "^8.23.1",
     "flow-bin": "^0.79.1",
-    "gun": "^0.2020.1238",
+    "gun": "https://github.com/mmalmi/gun",
     "http-server": "^0.12.1",
     "jest": "^23.5.0",
     "jquery": "^3.4.1",
