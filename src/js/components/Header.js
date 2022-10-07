@@ -29,7 +29,7 @@ class Header extends Component {
   }
 
   getOnlineStatusText() {
-    const channel = iris.private(this.chatId);
+    const channel = this.chatId && iris.private(this.chatId);
     const activity = channel.activity;
     if (activity) {
       if (activity.isActive) {
@@ -121,7 +121,7 @@ class Header extends Component {
     const activeRoute = this.state.activeRoute;
     const chat = this.chatId && iris.private(this.chatId);
     const isTyping = chat && chat.isTyping;
-    const onlineStatus = !(chat && chat.uuid) && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
+    const onlineStatus = chat && chat.uuid && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
     const searchBox = this.chatId ? '' : html`
         <${SearchBox} onSelect=${item => route(item.uuid ? `/chat/${item.uuid}` : `/profile/${item.key}`)} />
     `;

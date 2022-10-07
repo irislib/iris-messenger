@@ -6,7 +6,6 @@ import Autolinker from 'autolinker';
 import $ from 'jquery';
 import iris from 'iris-lib';
 import {route} from 'preact-router';
-import util from 'iris-lib/src/util';
 
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
@@ -180,7 +179,7 @@ class Message extends Component {
           ` : ''}
           <div class="below-text">
             <div class="time">
-              ${this.props.hash ? html`<a href="/post/${encodeURIComponent(this.props.hash)}">${Helpers.getRelativeTimeText(time)}</a>` : util.formatTime(time)}
+              ${this.props.hash ? html`<a href="/post/${encodeURIComponent(this.props.hash)}">${Helpers.getRelativeTimeText(time)}</a>` : iris.util.formatTime(time)}
               ${this.props.selfAuthored && seenIndicator}
             </div>
           </div>
