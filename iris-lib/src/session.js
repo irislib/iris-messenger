@@ -1,6 +1,6 @@
 import Gun from 'gun';
-import Notifications from './Notifications';
-import PeerManager from './peers';
+import notifications from './notifications';
+import peers from './peers';
 import Channel from './Channel';
 import util from './util';
 import _ from 'lodash';
@@ -20,6 +20,7 @@ let ourActivity;
 let noFollows;
 let noFollowers;
 let searchIndex;
+let initCalled;
 const searchableItems = {};
 const getExtendedFollowsCalled = {};
 
@@ -51,6 +52,8 @@ export default {
    * @param options
    */
   init(options = {}) {
+    if (initCalled) { return; }
+    initCalled = true;
     let localStorageKey = localStorage.getItem('chatKeyPair');
     if (localStorageKey) {
       this.login(JSON.parse(localStorageKey));
@@ -190,7 +193,7 @@ export default {
         const chat = activeRoute && privateState(chatId);
         if (chat) {
           chat.setMyMsgsLastSeenTime();
-          Notifications.changeChatUnseenCount(chatId, 0);
+          notifications.changeChatUnseenCount(chatId, 0);
         }
       } else {
         Channel.setActivity(ourActivity = 'online');
@@ -224,9 +227,9 @@ export default {
     localStorage.setItem('chatKeyPair', JSON.stringify(k));
     user().auth(key);
     user().put({epub: key.epub});
-    Notifications.subscribeToWebPush();
-    Notifications.getWebPushSubscriptions();
-    Notifications.subscribeToIrisNotifications();
+    notifications.subscribeToWebPush();
+    notifications.getWebPushSubscriptions();
+    notifications.subscribeToIrisNotifications();
     Channel.getMyChatLinks(key, undefined, chatLink => {
       local().get('chatLinks').get(chatLink.id).put(chatLink.url);
       latestChatLink = chatLink.url;
@@ -238,7 +241,7 @@ export default {
         myName = name;
       }
     });
-    Notifications.init();
+    notifications.init();
     local().get('loggedIn').put(true);
     local().get('settings').once().then(settings => {
       if (!settings) {
@@ -314,7 +317,7 @@ export default {
         const sub = await reg.pushManager.getSubscription();
         if (sub) {
           const hash = await util.getHash(JSON.stringify(sub));
-          Notifications.removeSubscription(hash);
+          notifications.removeSubscription(hash);
           sub.unsubscribe && sub.unsubscribe();
         }
       }
@@ -417,7 +420,7 @@ export default {
       chat.getLatestMsg && chat.getLatestMsg((latest, info) => {
         this.processMessage(pub, latest, info);
       });
-      Notifications.changeChatUnseenCount(pub, 0);
+      notifications.changeChatUnseenCount(pub, 0);
       chat.notificationSetting = 'all';
       chat.onMy('notificationSetting', (val) => {
         chat.notificationSetting = val;
@@ -433,9 +436,9 @@ export default {
       chat.getMyMsgsLastSeenTime(time => {
         chat.myLastSeenTime = new Date(time);
         if (chat.latest && chat.myLastSeenTime >= chat.latest.time) {
-          Notifications.changeChatUnseenCount(pub, 0);
+          notifications.changeChatUnseenCount(pub, 0);
         }
-        PeerManager.askForPeers(pub); // TODO: this should be done only if we have a chat history or friendship with them
+        peers.askForPeers(pub); // TODO: this should be done only if we have a chat history or friendship with them
       });
       chat.isTyping = false;
       chat.getTyping(isTyping => {
@@ -494,7 +497,7 @@ export default {
           chat.webPushSubscriptions = chat.webPushSubscriptions || {};
           chat.webPushSubscriptions[from || pub] = s;
         });
-        const arr = Object.values(Notifications.webPushSubscriptions);
+        const arr = Object.values(notifications.webPushSubscriptions);
         setTimeout(() => chat.put('webPushSubscriptions', arr), 5000);
         this.shareMyPeerUrl(chat);
       }
@@ -506,7 +509,7 @@ export default {
       if (chat.onTheir) {
         chat.onTheir('my_peer', (url, k, from) => {
           console.log('Got private peer url', url, 'from', from);
-          PeerManager.addPeer({url, from})
+          peers.addPeer({url, from})
         });
       }
        */
@@ -532,7 +535,7 @@ export default {
     msg.timeObj = new Date(msg.time);
     if (!info.selfAuthored && msg.timeObj > chat.myLastSeenTime) {
       if (window.location.hash !== `#/chat/${  chatId}` || document.visibilityState !== 'visible') {
-        Notifications.changeChatUnseenCount(chatId, 1);
+        notifications.changeChatUnseenCount(chatId, 1);
       } else if (ourActivity === 'active') {
           chat.setMyMsgsLastSeenTime();
         }
@@ -547,7 +550,7 @@ export default {
       });
     }
     // TODO: onclickNotification should do       route(`/chat/${  pub}`);
-    Notifications.notifyMsg(msg, info, chatId, onClickNotification);
+    notifications.notifyMsg(msg, info, chatId, onClickNotification);
   },
 
   subscribeToMsgs(pub) {

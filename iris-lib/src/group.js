@@ -10,6 +10,7 @@ const callbacks = new Map();
 /**
  * Aggregates public data from all users in the group.
  *
+ * For example, the public message feed, message replies and likes are aggregated using this.
  * @param groupName
  * @returns object
  */

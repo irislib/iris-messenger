@@ -1,6 +1,6 @@
 import { createRef } from 'preact';
 import Helpers from '../Helpers';
-import Notifications from 'iris-lib/src/Notifications';
+import notifications from 'iris-lib/src/notifications';
 import { html } from 'htm/preact';
 import { translate as t } from '../translations/Translation';
 import iris from 'iris-lib';
@@ -56,13 +56,13 @@ class FeedMessageForm extends MessageForm {
       if (this.props.replyingToUser && this.props.replyingToUser !== iris.session.getPubKey()) {
         const title = `${iris.session.getMyName()  } replied to your message`;
         const body = `'${text.length > 100 ? `${text.slice(0, 100)  }...` : text}'`;
-        Notifications.sendIrisNotification(this.props.replyingToUser, {event:'reply', target: hash});
-        Notifications.sendWebPushNotification(this.props.replyingToUser, {title,body});
+        notifications.sendIrisNotification(this.props.replyingToUser, {event:'reply', target: hash});
+        notifications.sendWebPushNotification(this.props.replyingToUser, {title,body});
       }
       const mentions = text.match(Helpers.pubKeyRegex);
       if (mentions) {
         mentions.forEach(match => {
-          Notifications.sendIrisNotification(match.slice(1), {event:'mention', target: hash});
+          notifications.sendIrisNotification(match.slice(1), {event:'mention', target: hash});
         });
       }
     });
