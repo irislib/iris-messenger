@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
 import iris from 'iris-lib';
-import Session from 'iris-lib/src/session';
+
 import Identicon from './Identicon';
 import Icons from '../Icons';
 
@@ -32,7 +32,7 @@ class Footer extends Component<Props, State> {
   }
 
   render() {
-    const key = Session.getPubKey();
+    const key = iris.session.getPubKey();
     if (!key) { return; }
     const activeRoute = this.state.activeRoute;
 

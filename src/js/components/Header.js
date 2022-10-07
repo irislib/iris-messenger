@@ -3,7 +3,7 @@ import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import { translate as t } from '../translations/Translation';
 import iris from 'iris-lib';
-import Session from 'iris-lib/src/session';
+
 import { route } from 'preact-router';
 import Identicon from './Identicon';
 import SearchBox from './SearchBox';
@@ -73,7 +73,7 @@ class Header extends Component {
         }
 
         if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
-          if (activeRoute.indexOf('/chat/') === 0 && Session.getKey() && this.chatId === Session.getKey().pub) {
+          if (activeRoute.indexOf('/chat/') === 0 && iris.session.getKey() && this.chatId === iris.session.getKey().pub) {
             const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
             this.setState({title});
           } else if (activeRoute.indexOf('/chat/hashtag/') === 0) {
@@ -116,7 +116,7 @@ class Header extends Component {
   }
 
   render() {
-    const key = Session.getPubKey();
+    const key = iris.session.getPubKey();
     if (!key) { return; }
     const activeRoute = this.state.activeRoute;
     const chat = this.chatId && iris.private(this.chatId);

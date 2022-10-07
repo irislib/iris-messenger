@@ -6,7 +6,6 @@ import iris from 'iris-lib';
 import Identicon from '../../components/Identicon';
 import ChatMessageForm from './ChatMessageForm';
 import Name from '../../components/Name';
-import Session from 'iris-lib/src/session';
 import $ from 'jquery';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';
@@ -25,7 +24,7 @@ c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,35
 `;
 
 function copyMyChatLinkClicked(e) {
-  Helpers.copyToClipboard(Session.getMyChatLink());
+  Helpers.copyToClipboard(iris.session.getMyChatLink());
   let te = $(e.target);
   let originalText = te.text();
   let originalWidth = te.width();

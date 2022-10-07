@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
 import {translate as t} from '../translations/Translation';
-import Session from 'iris-lib/src/session';
+
 import iris from 'iris-lib';
 import Notifications from 'iris-lib/src/Notifications';
 import Button from './basic/Button';
@@ -30,7 +30,7 @@ class FollowButton extends Component<Props> {
     e.preventDefault();
     const value = !this.state[this.key];
     if (value && this.key === 'follow') {
-      Session.newChannel(this.props.id);
+      iris.session.newChannel(this.props.id);
       iris.user().get('block').get(this.props.id).put(false);
       Notifications.sendIrisNotification(this.props.id, {event:'follow'});
     }

@@ -4,7 +4,6 @@ import iris from 'iris-lib';
 import Identicon from './Identicon';
 import Text from './Text';
 import {translate as t} from '../translations/Translation';
-import Session from 'iris-lib/src/session';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -155,7 +154,7 @@ class SearchBox extends Component<Props, State> {
     if (Helpers.followChatLink(query)) return;
 
     if (query) {
-      const results = Session.getSearchIndex().search(query).slice(0,RESULTS_MAX);
+      const results = iris.session.getSearchIndex().search(query).slice(0,RESULTS_MAX);
       this.setState({results, query});
     } else {
       this.setState({results:[], query});

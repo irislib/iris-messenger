@@ -1,6 +1,5 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
-import Session from 'iris-lib/src/session';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';
 import Store from './Store';
@@ -23,13 +22,13 @@ class Checkout extends Store {
 
   confirm() {
     const pub = this.props.store;
-    Session.newChannel(pub);
+    iris.session.newChannel(pub);
     const cart = {};
     Object.keys(this.cart).forEach(k => {
       const v = this.cart[k];
       v && (cart[k] = v);
     });
-    Session.channels[pub].send({
+    iris.private(pub).send({
       text: `New order: ${  JSON.stringify(cart)  }, delivery: ${  JSON.stringify(this.state.delivery)  }, payment: ${  this.state.paymentMethod}`,
       order: true
     });

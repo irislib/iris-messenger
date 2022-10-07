@@ -1,5 +1,5 @@
 import iris from 'iris-lib';
-import Session from 'iris-lib/src/session';
+
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
 
@@ -7,7 +7,7 @@ export default class WebtorrentSettings extends Component {
 
   constructor() {
     super();
-    this.state = { settings: Session.DEFAULT_SETTINGS.local };
+    this.state = { settings: iris.session.DEFAULT_SETTINGS.local };
     this.state.webPushSubscriptions = {};
     this.state.blockedUsers = {};
     this.id = "settings";

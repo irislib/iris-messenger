@@ -2,7 +2,6 @@ import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import {translate as t} from '../translations/Translation';
 import iris from 'iris-lib';
-import Session from 'iris-lib/src/session';
 import FeedMessageForm from '../components/FeedMessageForm';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
@@ -60,8 +59,8 @@ const GalleryImage = styled.a`
 
 function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
-    Channel.deleteChannel(Session.getKey(), pub);
-    delete Session.channels[pub];
+    Channel.deleteChannel(iris.session.getKey(), pub);
+    iris.session.channelIds.delete(pub);
     iris.local().get('channels').get(pub).put(null);
     route(`/chat`);
   }
@@ -98,12 +97,12 @@ class Profile extends View {
   }
 
   getNotification() {
-    if (this.state.noFollowers && this.followers.has(Session.getPubKey())) {
+    if (this.state.noFollowers && this.followers.has(iris.session.getPubKey())) {
       return html`
         <div class="msg">
           <div class="msg-content">
             <p>Share your profile link so ${this.state.name || 'this user'} can follow you:</p>
-            <p><${CopyButton} text=${t('copy_link')} title=${Session.getMyName()} copyStr=${Helpers.getProfileLink(Session.getPubKey())}/></p>
+            <p><${CopyButton} text=${t('copy_link')} title=${iris.session.getMyName()} copyStr=${Helpers.getProfileLink(iris.session.getPubKey())}/></p>
             <small>${t('visibility')}</small>
           </div>
         </div>
@@ -112,7 +111,7 @@ class Profile extends View {
   }
 
   renderSettings() {
-    const chat = Session.channels[this.props.id];
+    const chat = iris.private(this.props.id);
 
     return html`
     <div id="chat-settings" style="display:none">
@@ -155,7 +154,7 @@ class Profile extends View {
 
   async connectEthereumClicked(e) {
     e.preventDefault();
-    const web3 = await Session.ethereumConnect();
+    const web3 = await iris.session.ethereumConnect();
     const address = (await web3.eth.getAccounts())[0];
     const proof = await web3.eth.personal.sign(this.getEthIrisProofString(), address);
     iris.user().get('profile').get('eth').put({
@@ -198,7 +197,7 @@ class Profile extends View {
   }
 
   renderDetails() {
-    this.isMyProfile = Session.getPubKey() === this.props.id;
+    this.isMyProfile = iris.session.getPubKey() === this.props.id;
     let profilePhoto;
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker} currentPhoto=${this.state.photo} placeholder=${this.props.id} callback=${src => this.onProfilePhotoSet(src)}/>`;
@@ -245,10 +244,10 @@ class Profile extends View {
                 <span>${this.state.followerCount}</span> ${t('followers')}
               </a>
             </div>
-            ${this.followedUsers.has(Session.getPubKey()) ? html`
+            ${this.followedUsers.has(iris.session.getPubKey()) ? html`
               <p><small>${t('follows_you')}</small></p>
             `: this.props.id === SMS_VERIFIER_PUB ? html`
-              <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${t('ask_for_verification')}</a></p>
+              <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${iris.session.getPubKey()}">${t('ask_for_verification')}</a></p>
             ` : ''}
               ${this.isMyProfile ? '' : html`
                 <div class="hidden-xs">
@@ -529,12 +528,12 @@ class Profile extends View {
       ethereumAddress: null,
       nfts: [],
     });
-    this.isMyProfile = Session.getPubKey() === pub;
-    const chat = Session.channels[pub];
+    this.isMyProfile = iris.session.getPubKey() === pub;
+    const chat = iris.private(pub);
     if (pub.length < 40) {
       if (!chat) {
         const interval = setInterval(() => {
-          if (Session.channels[pub]) {
+          if (iris.private(pub)) {
             clearInterval(interval);
             this.componentDidMount();
           }

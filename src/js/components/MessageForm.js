@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import iris from 'iris-lib';
-import Session from 'iris-lib/src/session';
+
 import SignedMessage from 'iris-lib/src/SignedMessage';
 import util from 'iris-lib/src/util';
 
@@ -15,7 +15,7 @@ export default class MessageForm extends Component {
   async sendPublic(msg) {
     msg.time = new Date().toISOString();
     msg.type = 'post';
-    const signedMsg = await SignedMessage.create(msg, Session.getKey());
+    const signedMsg = await SignedMessage.create(msg, iris.session.getKey());
     const serialized = signedMsg.toString();
     const hash = await iris.static.put(serialized);
     if (msg.replyingTo) {

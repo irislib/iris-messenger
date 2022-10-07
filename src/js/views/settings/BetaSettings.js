@@ -1,4 +1,4 @@
-import Session from 'iris-lib/src/session';
+
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
 import iris from 'iris-lib';
@@ -6,7 +6,7 @@ import iris from 'iris-lib';
 export default class BetaSettings extends Component {
   constructor() {
     super();
-    this.state = Session.DEFAULT_SETTINGS;
+    this.state = iris.session.DEFAULT_SETTINGS;
     this.state.webPushSubscriptions = {};
     this.state.blockedUsers = {};
     this.id = "settings";

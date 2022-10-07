@@ -1,6 +1,5 @@
 import Component from "../../BaseComponent";
 import Name from "../../components/Name";
-import Session from "iris-lib/src/session";
 import iris from 'iris-lib';
 import {translate as t} from "../../translations/Translation";
 import Helpers from "../../Helpers";
@@ -10,7 +9,7 @@ import $ from "jquery";
 import Button from "../../components/basic/Button";
 
 export default class PeerSettings extends Component {
-  state = Session.DEFAULT_SETTINGS;
+  state = iris.session.DEFAULT_SETTINGS;
   updatePeersFromGunInterval = 0;
 
   componentDidMount() {

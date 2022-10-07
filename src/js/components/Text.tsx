@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
 import iris from 'iris-lib';
-import Session from 'iris-lib/src/session';
+
 import {createRef, RefObject, JSX} from "preact";
 
 type Props = {
@@ -50,7 +50,7 @@ class Text extends Component<Props, State> {
     if (user) {
       base = base.user(user);
     }
-    this.setState({editable: !user || user === Session.getPubKey()});
+    this.setState({editable: !user || user === iris.session.getPubKey()});
     const path = this.props.path.split('/');
     return path.reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, base);
   }

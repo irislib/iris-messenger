@@ -1,5 +1,5 @@
 import { translate as t } from '../../../translations/Translation';
-import Session from 'iris-lib/src/session';
+
 import $ from 'jquery';
 import Component from '../../../BaseComponent';
 import Button from '../../../components/basic/Button';
@@ -32,12 +32,12 @@ class InviteView extends Component {
         if ($('#new-group-name').val().length) {
         let c = new Channel({
             gun: iris.public(),
-            key: Session.getKey(),
+            key: iris.session.getKey(),
             participants: [],
         });
         c.put('name', $('#new-group-name').val());
         $('#new-group-name').val('');
-        Session.addChannel(c);
+        iris.session.addChannel(c);
         route(`/group/${  c.uuid}`);
         }
     }

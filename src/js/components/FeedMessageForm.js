@@ -4,7 +4,7 @@ import Notifications from 'iris-lib/src/Notifications';
 import { html } from 'htm/preact';
 import { translate as t } from '../translations/Translation';
 import iris from 'iris-lib';
-import Session from 'iris-lib/src/session';
+
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
 import $ from 'jquery';
@@ -53,8 +53,8 @@ class FeedMessageForm extends MessageForm {
       msg.torrentId = this.state.torrentId;
     }
     this.sendPublic(msg).then(hash => {
-      if (this.props.replyingToUser && this.props.replyingToUser !== Session.getPubKey()) {
-        const title = `${Session.getMyName()  } replied to your message`;
+      if (this.props.replyingToUser && this.props.replyingToUser !== iris.session.getPubKey()) {
+        const title = `${iris.session.getMyName()  } replied to your message`;
         const body = `'${text.length > 100 ? `${text.slice(0, 100)  }...` : text}'`;
         Notifications.sendIrisNotification(this.props.replyingToUser, {event:'reply', target: hash});
         Notifications.sendWebPushNotification(this.props.replyingToUser, {title,body});

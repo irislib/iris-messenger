@@ -2,7 +2,6 @@ import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation';
 import LanguageSelector from '../components/LanguageSelector';
 import QRScanner from '../QRScanner';
-import Session from 'iris-lib/src/session';
 import { Component } from 'preact';
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
@@ -73,7 +72,7 @@ function maybeGoToChat(key) {
   let inviter = util.getUrlParameter('inviter');
   function go() {
     if (inviter !== key.pub) {
-      Session.newChannel(chatId, window.location.href);
+      iris.session.newChannel(chatId, window.location.href);
     }
     _.defer(() => route(`/chat/${  chatId}`)); // defer because router is only initialised after login // TODO fix
     window.history.pushState({}, "Iris Chat", `/${window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]}`); // remove param
@@ -88,7 +87,7 @@ function maybeGoToChat(key) {
 }
 
 function login(k) {
-  Session.login(k);
+  iris.session.login(k);
   maybeGoToChat(k);
 }
 
@@ -160,7 +159,7 @@ class Login extends Component {
   onLoginFormSubmit(e) {
     e.preventDefault();
     let name = document.getElementById('login-form-name').value || util.generateName();
-    Session.loginAsNewUser(name);
+    iris.session.loginAsNewUser(name);
     this.base.style = 'display:none';
   }
 

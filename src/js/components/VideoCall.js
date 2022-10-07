@@ -4,7 +4,6 @@ import { route } from 'preact-router';
 import $ from 'jquery';
 
 import {translate as t} from '../translations/Translation';
-import Session from 'iris-lib/src/session';
 
 import iris from 'iris-lib';
 import Button from './basic/Button';
@@ -82,7 +81,7 @@ class VideoCall extends Component {
         return;
       }
       if (call.offer) {
-        if (Session.channels[pub].rejectedTime && (new Date() - Session.channels[pub].rejectedTime < 5000)) {
+        if (iris.private(pub).rejectedTime && (new Date() - iris.private(pub).rejectedTime < 5000)) {
           this.rejectCall(pub);
           return;
         }
@@ -97,7 +96,7 @@ class VideoCall extends Component {
 
   notifyIfNotVisible(pub, text) {
      if (document.visibilityState !== 'visible') {
-      incomingCallNotification = new Notification(Session.channels[pub].name, {
+      incomingCallNotification = new Notification(iris.private(pub).name, {
         icon: '/assets/img/icon128.png',
         body: text,
         requireInteraction: true,
@@ -124,12 +123,12 @@ class VideoCall extends Component {
       this.notifyIfNotVisible(t('call_rejected'));
     } else if (this.state.activeCall) {
       this.stopUserMedia(pub);
-      Session.channels[pub].put('call', 'null');
+      iris.private(pub).put('call', 'null');
       this.notifyIfNotVisible(t('call_ended'));
     }
-    if (Session.channels[pub]) {
-      Session.channels[pub].pc && Session.channels[pub].pc.close();
-      Session.channels[pub].pc = null;      
+    if (iris.private(pub)) {
+      iris.private(pub).pc && iris.private(pub).pc.close();
+      iris.private(pub).pc = null;      
     }
   }
 
@@ -160,7 +159,7 @@ class VideoCall extends Component {
 
     await this.initConnection(true, pub);
     console.log('calling', pub);
-    let call = () => Session.channels[pub].put('call', {
+    let call = () => iris.private(pub).put('call', {
       time: new Date().toISOString(),
       type: video ? 'video' : 'voice',
       offer: true,
@@ -176,9 +175,9 @@ class VideoCall extends Component {
     iris.local().get('outgoingCall').put(null);
     this.stopCalling();
     this.stopUserMedia(pub);
-    Session.channels[pub].put('call', 'null');
-    Session.channels[pub].pc && Session.channels[pub].pc.close();
-    Session.channels[pub].pc = null;
+    iris.private(pub).put('call', 'null');
+    iris.private(pub).pc && iris.private(pub).pc.close();
+    iris.private(pub).pc = null;
   }
 
   stopUserMedia() {
@@ -196,25 +195,25 @@ class VideoCall extends Component {
   }
 
   endCall(pub) {
-    Session.channels[pub].pc && Session.channels[pub].pc.close();
+    iris.private(pub).pc && iris.private(pub).pc.close();
     this.stopUserMedia(pub);
-    Session.channels[pub].put('call', 'null');
-    Session.channels[pub].pc = null;
+    iris.private(pub).put('call', 'null');
+    iris.private(pub).pc = null;
     iris.local().get('activeCall').put(null);
   }
 
   rejectCall(pub) {
-    Session.channels[pub].rejectedTime = new Date();
+    iris.private(pub).rejectedTime = new Date();
     iris.local().get('incomingCall').put(null);
-    console.log('rejectCall', pub, Session.channels[pub]);
-    Session.channels[pub].put('call', 'null');
+    console.log('rejectCall', pub, iris.private(pub));
+    iris.private(pub).put('call', 'null');
   }
 
   async initConnection(createOffer, pub) {
     console.log('initConnection', createOffer, pub);
     ourIceCandidates = {};
     const theirIceCandidateKeys = [];
-    const chat = Session.channels[pub];
+    const chat = iris.private(pub);
     chat.pc = new RTCPeerConnection(RTC_CONFIG);
     console.log(chat.pc.signalingState);
     await this.addStreamToPeerConnection(chat.pc);
@@ -238,7 +237,7 @@ class VideoCall extends Component {
       if (!chat.pc) { console.log(1); return; }
       if (createOffer && chat.pc.signalingState === 'stable') { console.log(2); return; }
       if (sdp.data && sdp.time && new Date(sdp.time).getTime() < (new Date() - 5000)) { console.log(3); return; }
-      chat.pc.setRemoteDescription(new RTCSessionDescription(sdp.data));
+      chat.pc.setRemoteDescription(new RTCiris.sessionDescription(sdp.data));
       console.log(4);
     });
     chat.onTheir('icecandidates', c => {
@@ -340,7 +339,7 @@ class VideoCall extends Component {
       <div id="active-call" style="position: fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; max-width: 100%; text-align: center; background: #000; color: #fff; padding: 15px 0">
         <div style="margin-bottom:5px;position:relative;height:50px;">
           ${resizeButton}
-          ${t('on_call_with')} ${Session.channels[this.state.activeCall] && Session.channels[this.state.activeCall].name}
+          ${t('on_call_with')} ${iris.private(this.state.activeCall) && iris.private(this.state.activeCall).name}
         </div>
         ${localVideo}
         ${remoteVideo}
@@ -348,7 +347,7 @@ class VideoCall extends Component {
       </div>`;
     } else if (this.state.outgoingCall) {
       return html`<div id="outgoing-call" style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px">
-        ${t('calling')} ${Session.channels[this.state.outgoingCall] && Session.channels[this.state.outgoingCall].name}
+        ${t('calling')} ${iris.private(this.state.outgoingCall).name}
         <${Button} onClick=${() => this.cancelCall(this.state.outgoingCall)} style="display:block; margin: 15px auto">
           ${t('cancel')}
         <//>
@@ -358,7 +357,7 @@ class VideoCall extends Component {
     } else if (this.state.incomingCall) {
       return html`
         <div id="incoming-call" style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px 0">
-          Incoming call from ${Session.channels[this.state.incomingCall] && Session.channels[this.state.incomingCall].name}
+          Incoming call from ${iris.private(this.state.incomingCall).name}
           <${Button} style="display:block; margin: 15px auto" onClick=${() => this.answerCall(this.state.incomingCall)}>${t('answer')}<//>
           <${Button} style="display:block; margin: 15px auto" onClick=${() => this.rejectCall(this.state.incomingCall)}>${t('reject')}<//>
         </div>

@@ -5,7 +5,6 @@ import {translate as t} from '../translations/Translation';
 import FollowButton from '../components/FollowButton';
 import Name from '../components/Name';
 import View from './View';
-import Session from 'iris-lib/src/session';
 import {throttle} from 'lodash';
 
 class Follows extends View {
@@ -86,7 +85,7 @@ class Follows extends View {
                   <small class="follower-count">${this.state.contacts[k] && this.state.contacts[k].followerCount} followers</small>
                 </div>
               </a>
-              ${k !== Session.getPubKey() ? html`<${FollowButton} id=${k}/>` : ''}
+              ${k !== iris.session.getPubKey() ? html`<${FollowButton} id=${k}/>` : ''}
 
             </div>`;
           })}

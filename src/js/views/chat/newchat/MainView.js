@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
 import { translate as t } from '../../../translations/Translation';
-import Session from 'iris-lib/src/session';
+
 import iris from 'iris-lib';
 import CopyButton from '../../../components/CopyButton';
 import Button from '../../../components/basic/Button';
@@ -21,7 +21,7 @@ class MainView extends Component {
         this.props.chatLinks[id] = null;
         this.setState({chatLinks: this.props.chatLinks});
         this.forceUpdate();
-        return Channel.removePrivateChatLink(iris.public(), Session.getKey(), id);
+        return Channel.removePrivateChatLink(iris.public(), iris.session.getKey(), id);
         
     }
     componentDidMount() {
@@ -29,7 +29,7 @@ class MainView extends Component {
     }
     
     createNewInvite(){
-        Session.createChatLink();
+        iris.session.createChatLink();
     }
 
     render(){
@@ -79,7 +79,7 @@ class MainView extends Component {
                             {t('create_new_invite_link')}
                         </Button>
                     </p>
-                    <p><small dangerouslySetInnerHTML={{ __html: t('beware_of_sharing_invite_link_publicly', `href="/profile/${Session.getPubKey()}"`) }} /></p>
+                    <p><small dangerouslySetInnerHTML={{ __html: t('beware_of_sharing_invite_link_publicly', `href="/profile/${iris.session.getPubKey()}"`) }} /></p>
                 </div>
             </>
         );
