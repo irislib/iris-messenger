@@ -2,6 +2,7 @@ import Helpers from '../../Helpers';
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
 import CopyButton from '../../components/CopyButton';
+import iris from 'iris-lib';
 
 import QRCode from '../../lib/qrcode.min';
 import $ from 'jquery';

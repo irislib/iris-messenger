@@ -1,9 +1,10 @@
-import session from './session';
-import privateState from './private';
 import _ from 'lodash';
 import Gun from 'gun';
+
+import session from './session';
 import util from './util';
 import publicState from './public';
+import privateState from './private';
 import local from './local';
 import group from './group';
 
@@ -242,7 +243,7 @@ async function sendIrisNotification(recipient, notification) {
 
 async function sendWebPushNotification(recipient, notification) {
   console.log('sending web push notification to', recipient, notification);
-  const channel = iris.private(recipient);
+  const channel = privateState(recipient);
   const myKey = session.getKey();
   const shouldWebPush = (recipient === myKey.pub) || !(channel.activity && channel.activity.isActive);
   if (shouldWebPush && channel.webPushSubscriptions) {

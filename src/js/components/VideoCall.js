@@ -237,7 +237,7 @@ class VideoCall extends Component {
       if (!chat.pc) { console.log(1); return; }
       if (createOffer && chat.pc.signalingState === 'stable') { console.log(2); return; }
       if (sdp.data && sdp.time && new Date(sdp.time).getTime() < (new Date() - 5000)) { console.log(3); return; }
-      chat.pc.setRemoteDescription(new RTCiris.sessionDescription(sdp.data));
+      chat.pc.setRemoteDescription(new RTCSessionDescription(sdp.data));
       console.log(4);
     });
     chat.onTheir('icecandidates', c => {

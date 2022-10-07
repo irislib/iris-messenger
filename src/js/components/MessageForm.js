@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import iris from 'iris-lib';
 
 import SignedMessage from 'iris-lib/src/SignedMessage';
-import util from 'iris-lib/src/util';
 
 function twice(f) {
   f();

@@ -356,8 +356,8 @@ export default {
   addChannel(chat) {
     this.taskQueue.push(() => {
       let pub = chat.getId();
-      if (this.channelIds[pub]) { return; }
-      this.channelIds[pub] = chat;
+      if (this.channelIds.has(pub)) { return; }
+      this.channelIds.add(pub);
       const chatNode = local().get('channels').get(pub);
       chatNode.get('latestTime').on(t => {
         if (t && (!chat.latestTime || t > chat.latestTime)) {
@@ -373,7 +373,6 @@ export default {
           chat.theirMsgsLastSeenDate = d;
         }
       });
-      chat.messageIds = chat.messageIds || {};
       chat.getLatestMsg && chat.getLatestMsg((latest, info) => {
         this.processMessage(pub, latest, info);
       });
@@ -475,7 +474,8 @@ export default {
   },
 
   processMessage(chatId, msg, info, onClickNotification) {
-    const chat = this.channelIds[chatId];
+    const chat = privateState(chatId);
+    chat.messageIds = chat.messageIds || {};
     if (chat.messageIds[msg.time + info.from]) return;
     chat.messageIds[msg.time + info.from] = true;
     if (info) {
@@ -510,8 +510,8 @@ export default {
   },
 
   subscribeToMsgs(pub) {
-    const c = this.channelIds[pub];
-    if (!c || c.subscribed) { return; }
+    const c = privateState(pub);
+    if (c.subscribed) { return; }
     c.subscribed = true;
     c.getMessages((msg, info) => {
       this.processMessage(pub, msg, info);
