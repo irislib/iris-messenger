@@ -14,7 +14,6 @@ import blockedUsers from './blockedUsers';
 
 let key;
 let myName;
-let myProfilePhoto;
 let latestChatLink;
 let onlineTimeout;
 let ourActivity;
@@ -37,9 +36,39 @@ const DEFAULT_SETTINGS = {
   }
 }
 
+/**
+ * User session management utilities.
+ */
 export default {
+  /**
+   * Log in with a key from localStorage. If no key is found and options.autologin is true, a new user will be created.
+   * @param options
+   */
+  init(options = {}) {
+    let localStorageKey = localStorage.getItem('chatKeyPair');
+    if (localStorageKey) {
+      this.login(JSON.parse(localStorageKey));
+    } else if (options.autologin) {
+      this.loginAsNewUser();
+    } else {
+      this.clearIndexedDB();
+    }
+    setTimeout(() => {
+      local().get('block').map(() => {
+        this.updateSearchIndex();
+      });
+      this.updateSearchIndex();
+    });
+    setInterval(() => {
+      if (this.taskQueue.length) {
+        //console.log('this.taskQueue', this.taskQueue.length);
+        this.taskQueue.shift()();
+      }
+    }, 10);
+  },
+
   DEFAULT_SETTINGS,
-  channelIds: new Set(),
+
   taskQueue: [],
 
   updateSearchIndex: _.throttle(() => {
@@ -178,6 +207,10 @@ export default {
     });
   },
 
+  /**
+   * Log in with a private key.
+   * @param key
+   */
   login(k) {
     const shouldRefresh = !!key;
     key = k;
@@ -197,9 +230,6 @@ export default {
       if (name && typeof name === 'string') {
         myName = name;
       }
-    });
-    publicState().user().get('profile').get('photo').on(data => {
-      myProfilePhoto = data;
     });
     Notifications.init();
     local().get('loggedIn').put(true);
@@ -237,6 +267,54 @@ export default {
     });
   },
 
+  /**
+   * Create a new user account and log in.
+   * @param name If not provided, a random name will be generated.
+   * @returns {Promise<*>}
+   */
+  loginAsNewUser(name) {
+    name = name || util.generateName();
+    console.log('loginAsNewUser name', name);
+    return Gun.SEA.pair().then(k => {
+      this.login(k);
+      publicState().user().get('profile').put({a:null});
+      publicState().user().get('profile').get('name').put(name);
+      local().get('filters').put({a:null});
+      local().get('filters').get('group').put('follows');
+      this.createChatLink();
+    });
+  },
+
+  /**
+   * Log out the current user.
+   * @returns {Promise<void>}
+   */
+  async logOut() {
+    if (electron) {
+      electron.get('user').put(null);
+    }
+    // TODO: remove subscription from your channels
+    if (navigator.serviceWorker) {
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg && reg.pushManager) {
+        reg.active.postMessage({key: null});
+        const sub = await reg.pushManager.getSubscription();
+        if (sub) {
+          const hash = await util.getHash(JSON.stringify(sub));
+          Notifications.removeSubscription(hash);
+          sub.unsubscribe && sub.unsubscribe();
+        }
+      }
+    }
+    this.clearIndexedDB();
+    localStorage.clear();
+    localforage.clear().then(() => {
+      window.location.hash = '';
+      window.location.href = '/';
+      location.reload();
+    });
+  },
+
   async createChatLink() {
     latestChatLink = await Channel.createChatLink(key);
   },
@@ -267,75 +345,25 @@ export default {
     return latestChatLink || util.getProfileLink(key.pub);
   },
 
+  /**
+   * Get the keypair of the logged in user.
+   * @returns {*}
+   */
   getKey() { return key; },
-  getMyName() { return myName; },
-  getMyProfilePhoto() { return myProfilePhoto; },
 
-  async logOut() {
-    if (electron) {
-      electron.get('user').put(null);
-    }
-    // TODO: remove subscription from your channels
-    if (navigator.serviceWorker) {
-      const reg = await navigator.serviceWorker.getRegistration();
-      if (reg && reg.pushManager) {
-        reg.active.postMessage({key: null});
-        const sub = await reg.pushManager.getSubscription();
-        if (sub) {
-          const hash = await util.getHash(JSON.stringify(sub));
-          Notifications.removeSubscription(hash);
-          sub.unsubscribe && sub.unsubscribe();
-        }
-      }
-    }
-    this.clearIndexedDB();
-    localStorage.clear();
-    localforage.clear().then(() => {
-      window.location.hash = '';
-      window.location.href = '/';
-      location.reload();
-    });
-  },
-
+  /**
+   * Get the public key of the logged in user.
+   * @returns {*}
+   */
   getPubKey() {
     return key && key.pub;
   },
 
-  loginAsNewUser(name) {
-    name = name || util.generateName();
-    console.log('loginAsNewUser name', name);
-    return Gun.SEA.pair().then(k => {
-      this.login(k);
-      publicState().user().get('profile').put({a:null});
-      publicState().user().get('profile').get('name').put(name);
-      local().get('filters').put({a:null});
-      local().get('filters').get('group').put('follows');
-      this.createChatLink();
-    });
-  },
-
-  init(options = {}) {
-    let localStorageKey = localStorage.getItem('chatKeyPair');
-    if (localStorageKey) {
-      this.login(JSON.parse(localStorageKey));
-    } else if (options.autologin) {
-      this.loginAsNewUser();
-    } else {
-      this.clearIndexedDB();
-    }
-    setTimeout(() => {
-      local().get('block').map(() => {
-        this.updateSearchIndex();
-      });
-      this.updateSearchIndex();
-    });
-    setInterval(() => {
-      if (this.taskQueue.length) {
-        //console.log('this.taskQueue', this.taskQueue.length);
-        this.taskQueue.shift()();
-      }
-    }, 10);
-  },
+  /**
+   * Get the name of the logged in user.
+   * @returns {*}
+   */
+  getMyName() { return myName; }, // TODO maybe remove and use iris.user().get('profile').get('name') instead?
 
   myPeerUrl: ip => `http://${ip}:8767/gun`,
 
@@ -516,5 +544,10 @@ export default {
     c.getMessages((msg, info) => {
       this.processMessage(pub, msg, info);
     });
-  }
+  },
+
+  /**
+   * Known private channels with other users
+   */
+  channelIds: new Set(),
 };

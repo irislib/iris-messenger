@@ -30,7 +30,6 @@ export default {
     if (publicOpts && publicOpts.peers) {
       publicOpts.peers.forEach(url => peers.add({url}));
     }
-    util.setPublicState && util.setPublicState(this.public);
     session.init({autologin: window.location.hash.length > 2});
     peers.init();
   },
