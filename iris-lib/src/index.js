@@ -18,21 +18,9 @@ import SignedMessage from './SignedMessage';
 import Channel from './Channel';
 import Node from './Node';
 
+Gun.log.off = true;
+
 export default {
-  /**
-   * Initialize the state: start gun instances State.public and State.local
-   * @param publicOpts Options for the State.public gun instance
-   */
-  init(publicOpts) {
-    Gun.log.off = true;
-    const opts = Object.assign({ peers: peers.random(), localStorage: false, retry:Infinity }, publicOpts);
-    publicState(opts);
-    if (publicOpts && publicOpts.peers) {
-      publicOpts.peers.forEach(url => peers.add({url}));
-    }
-    session.init({autologin: window.location.hash.length > 2});
-    peers.init();
-  },
   local,
   public: publicState,
   group,

@@ -48,7 +48,7 @@ type ReactState = {
   translationLoaded: boolean;
 }
 
-iris.init();
+iris.session.init({autologin: window.location.hash.length > 2});
 
 class Main extends Component<Props,ReactState> {
   componentDidMount() {
