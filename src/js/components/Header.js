@@ -119,7 +119,6 @@ class Header extends Component {
     const key = iris.session.getPubKey();
     if (!key) { return; }
     const activeRoute = this.state.activeRoute;
-    console.log('activeRoute', activeRoute);
     const chat = activeRoute && activeRoute.indexOf('/chat') === 0 && this.chatId && iris.private(this.chatId);
     const isTyping = chat && chat.isTyping;
     const onlineStatus = chat && chat.uuid && activeRoute && activeRoute.length > 20 && !isTyping && this.getOnlineStatusText();
