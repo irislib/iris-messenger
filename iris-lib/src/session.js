@@ -8,7 +8,7 @@ import Fuse from "fuse.js";
 import localforage from 'localforage';
 import local from './local';
 import electron from './electron';
-import publicState from './public';
+import user from './user';
 import privateState from './private';
 import blockedUsers from './blockedUsers';
 
@@ -98,7 +98,7 @@ export default {
     } else {
       searchableItems[k] = {key: k, followDistance, followers: new Set(follower && [follower])};
       this.taskQueue.push(() => {
-        publicState().user(k).get('profile').get('name').on(name => {
+        user(k).get('profile').get('name').on(name => {
           searchableItems[k].name = name;
           local().get('contacts').get(k).get('name').put(name);
           callback && callback(k, searchableItems[k]);
@@ -133,7 +133,7 @@ export default {
 
     this.addFollow(callback, k, currentDepth - 1);
 
-    publicState().user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
+    user(k).get('follow').map().on((isFollowing, followedKey) => { // TODO: unfollow
       if (isFollowing) {
         this.addFollow(callback, followedKey, currentDepth, k);
         if (currentDepth < maxDepth) {
@@ -222,8 +222,8 @@ export default {
     const shouldRefresh = !!key;
     key = k;
     localStorage.setItem('chatKeyPair', JSON.stringify(k));
-    publicState().user().auth(key);
-    publicState().user().put({epub: key.epub});
+    user().auth(key);
+    user().put({epub: key.epub});
     Notifications.subscribeToWebPush();
     Notifications.getWebPushSubscriptions();
     Notifications.subscribeToIrisNotifications();
@@ -233,7 +233,7 @@ export default {
     });
     this.setOurOnlineStatus();
     Channel.getChannels(key, c => this.addChannel(c));
-    publicState().user().get('profile').get('name').on(name => {
+    user().get('profile').get('name').on(name => {
       if (name && typeof name === 'string') {
         myName = name;
       }
@@ -248,7 +248,7 @@ export default {
         local().get('settings').get('autoplayWebtorrent').put(DEFAULT_SETTINGS.local.autoplayWebtorrent);
       }
     });
-    publicState().user().get('block').map().on((isBlocked, user) => {
+    user().get('block').map().on((isBlocked, user) => {
       local().get('block').get(user).put(isBlocked);
       if (isBlocked) {
         delete searchableItems[user];
@@ -284,15 +284,15 @@ export default {
     console.log('loginAsNewUser name', name);
     return Gun.SEA.pair().then(k => {
       this.login(k);
-      publicState().user().get('profile').put({a:null});
-      publicState().user().get('profile').get('name').put(name);
+      user().get('profile').put({a:null});
+      user().get('profile').get('name').put(name);
       local().get('filters').put({a:null});
       local().get('filters').get('group').put('follows');
       this.createChatLink();
       setTimeout(() => {
         if (options.autofollow !== false) {
           console.log('autofollowing', DEFAULT_FOLLOW);
-          publicState().user().get('follow').get(DEFAULT_FOLLOW).put(true);
+          user().get('follow').get(DEFAULT_FOLLOW).put(true);
         }
       }, 100); // maybe wait for login return instead
     });
@@ -470,7 +470,7 @@ export default {
             keys.forEach((k, i) => {
               let hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
               chat.participantProfiles[k] = {permissions: participants[k], color: `hsl(${hue}, 98%, ${isDarkMode ? 80 : 33}%)`};
-              publicState().user(k).get('profile').get('name').on(name => {
+              user(k).get('profile').get('name').on(name => {
                 chat.participantProfiles[k].name = name;
               });
             });
@@ -486,7 +486,7 @@ export default {
       } else {
         local().get('groups').get('everyone').get(pub).put(true);
         this.addFollow(null, pub, Infinity);
-        publicState().user(pub).get('profile').get('name').on(v => local().get('channels').get(pub).get('name').put(v))
+        user(pub).get('profile').get('name').on(v => local().get('channels').get(pub).get('name').put(v))
       }
       if (chat.put) {
         chat.onTheir('webPushSubscriptions', (s, k, from) => {

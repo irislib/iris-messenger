@@ -112,6 +112,6 @@
     "fuse.js": "^6.6.2",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
-    "gun": "^0.2020.1238"
+    "gun": "https://github.com/mmalmi/gun"
   }
 }
