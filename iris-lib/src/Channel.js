@@ -510,6 +510,9 @@ class Channel {
   * @param {string} pub
   */
   async addParticipant(pub, save = true, permissions, subscribe) {
+    if (this.uuid) {
+      return; // break group chat, fix iris memory bug. TODO: fix
+    }
     if (permissions === undefined) {
       permissions = this.DEFAULT_PERMISSIONS;
     }
