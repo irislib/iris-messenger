@@ -1,8 +1,8 @@
-
 import {translate as t} from '../translations/Translation';
 import { route } from 'preact-router';
 import Button from '../components/basic/Button';
 import Component from '../BaseComponent';
+import iris from 'iris-lib';
 
 export default class LogoutConfirmation extends Component {
 render () {

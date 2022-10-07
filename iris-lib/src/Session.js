@@ -23,6 +23,8 @@ let searchIndex;
 const searchableItems = {};
 const getExtendedFollowsCalled = {};
 
+const DEFAULT_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
+
 const DEFAULT_SETTINGS = {
   electron: {
     openAtLogin: true,
@@ -49,7 +51,7 @@ export default {
     if (localStorageKey) {
       this.login(JSON.parse(localStorageKey));
     } else if (options.autologin !== false) {
-      this.loginAsNewUser();
+      this.loginAsNewUser(options);
     } else {
       this.clearIndexedDB();
     }
@@ -68,6 +70,7 @@ export default {
   },
 
   DEFAULT_SETTINGS,
+  DEFAULT_FOLLOW,
 
   taskQueue: [],
 
@@ -269,11 +272,11 @@ export default {
 
   /**
    * Create a new user account and log in.
-   * @param name If not provided, a random name will be generated.
+   * @param options {Object} - Options for the new account.
    * @returns {Promise<*>}
    */
-  loginAsNewUser(name) {
-    name = name || util.generateName();
+  loginAsNewUser(options = {}) {
+    name = options.name || util.generateName();
     console.log('loginAsNewUser name', name);
     return Gun.SEA.pair().then(k => {
       this.login(k);
@@ -282,6 +285,12 @@ export default {
       local().get('filters').put({a:null});
       local().get('filters').get('group').put('follows');
       this.createChatLink();
+      setTimeout(() => {
+        if (options.autofollow !== false) {
+          console.log('autofollowing', DEFAULT_FOLLOW);
+          publicState().user().get('follow').get(DEFAULT_FOLLOW).put(true);
+        }
+      }, 100);
     });
   },
 
@@ -307,7 +316,7 @@ export default {
       }
     }
     this.clearIndexedDB();
-    localStorage.clear();
+    localStorage.clear(); // TODO clear only iris data
     localforage.clear().then(() => {
       window.location.hash = '';
       window.location.href = '/';
