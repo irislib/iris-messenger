@@ -5,6 +5,7 @@ import Attribute from './Attribute';
 import session from './session';
 import publicState from './public';
 import userState from './user';
+import _ from 'lodash';
 
 /**
 * Private communication channel between two or more participants ([Gun](https://github.com/amark/gun) public keys). Can be used independently of other Iris stuff.
@@ -510,7 +511,11 @@ class Channel {
   * Add a public key to the channel or update its permissions
   * @param {string} pub
   */
-  async addParticipant(pub, save = true, permissions, subscribe) {
+  addParticipant = _.memoize(async (pub, save = true, permissions) => {
+    return this.addParticipantInner(pub, save, permissions);
+  })
+
+  async addParticipantInner(pub, save = true, permissions, subscribe) {
     if (this.uuid) {
       return; // break group chat, fix iris memory bug. TODO: fix
     }
