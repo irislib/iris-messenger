@@ -513,10 +513,7 @@ class Channel {
   * @param {string} pub
   */
   addParticipant = _.memoize(async (pub, save = true, permissions, subscribe) => {
-    return this.addParticipantInner(pub, save, permissions, subscribe);
-  })
-
-  async addParticipantInner(pub, save = true, permissions, subscribe) {
+    console.log('addParticipant', pub, permissions);
     if (permissions === undefined) {
       permissions = this.DEFAULT_PERMISSIONS;
     }
@@ -566,7 +563,7 @@ class Channel {
         });
       });
     }
-  }
+  })
 
   /**
   * Send a message to the channel
