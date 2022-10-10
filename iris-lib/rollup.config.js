@@ -12,21 +12,6 @@ import ignore from 'rollup-plugin-ignore';
 const name = `iris`;
 
 const plugins = [
-  ignore(['gun/lib/then', 'gun/lib/load']),
-  hypothetical({
-    allowFallthrough: true,
-    files: {
-      'node-webcrypto-ossl/': `
-        export default {};
-      `,
-      'text-encoding/': `
-        export default {};
-      `,
-      '@trust/webcrypto/': `
-        export default {};
-      `
-    }
-  }),
   json(),
   babel({
     exclude: 'node_modules/**',
