@@ -3,6 +3,7 @@ import 'gun/sea';
 import util from './util';
 import Attribute from './Attribute';
 import State from './State';
+import _ from 'lodash';
 
 /**
 * Private communication channel between two or more participants ([Gun](https://github.com/amark/gun) public keys). Can be used independently of other Iris stuff.
@@ -511,7 +512,11 @@ class Channel {
   * Add a public key to the channel or update its permissions
   * @param {string} pub
   */
-  async addParticipant(pub, save = true, permissions, subscribe) {
+  addParticipant = _.memoize(async (pub, save = true, permissions, subscribe) => {
+    return this.addParticipantInner(pub, save, permissions, subscribe);
+  })
+
+  async addParticipantInner(pub, save = true, permissions, subscribe) {
     if (permissions === undefined) {
       permissions = this.DEFAULT_PERMISSIONS;
     }
