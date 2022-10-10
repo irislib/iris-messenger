@@ -512,13 +512,6 @@ class Channel {
   * @param {string} pub
   */
   addParticipant = _.memoize(async (pub, save = true, permissions, subscribe) => {
-    return this.addParticipantInner(pub, save, permissions, subscribe);
-  })
-
-  async addParticipantInner(pub, save = true, permissions, subscribe) {
-    if (this.uuid) {
-      return; // break group chat, fix iris memory bug. TODO: fix
-    }
     if (permissions === undefined) {
       permissions = this.DEFAULT_PERMISSIONS;
     }
@@ -568,7 +561,7 @@ class Channel {
         });
       });
     }
-  }
+  });
 
   /**
   * Send a message to the channel
