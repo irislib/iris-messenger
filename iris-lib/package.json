@@ -46,7 +46,7 @@
     "lint": "yarn run lint:eslint",
     "lint:eslint": "eslint src/*.js",
     "lint:flow": "flow --color always",
-    "test": "clear && jest",
+    "test": "yarn build:cjs;clear && jest",
     "test:coverage": "jest --coverage ",
     "test:watch": "clear && yarn build:cjs && jest --watchAll",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
