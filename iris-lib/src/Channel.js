@@ -12,6 +12,7 @@ import _ from 'lodash';
 *
 * Used as a core element of [iris-messenger](https://github.com/irislib/iris-messenger).
 *
+* You can use iris.private(pub) to always use the same Channel object for a given pub.
 * ---
 *
 * #### Key-value API
@@ -29,8 +30,6 @@ import _ from 'lodash';
 * ---
 *
 * You can open a channel with yourself for a private key-value space or a "note to self" type chat with yourself.
-*
-* **Note!** As of April 2020 Gun.SEA hashing function [is broken on Safari](https://github.com/amark/gun/issues/892). Channels don't work on Safari unless you patch sea.js by adding [this line](https://github.com/irislib/iris-messenger/blob/1e012581793485e6b8b5ed3c2ad0629716709366/src/js/sea.js#L270).
 *
 * **Privacy disclaimer:** Channel ids, data values and messages are encrypted, but message timestamps are unencrypted so that peers can return them to you in a sequential order. By looking at the unencrypted timestamps (or Gun subscriptions), it is possible to guess who are communicating with each other. This could be improved by indexing messages by *day* only, so making the guess would be more difficult, while you could still return them in a semi-sequential order.
 *
