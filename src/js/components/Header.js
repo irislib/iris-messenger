@@ -9,7 +9,6 @@ import Identicon from './Identicon';
 import SearchBox from './SearchBox';
 import Icons from '../Icons';
 import {Link} from "preact-router/match";
-import util from 'iris-lib/src/util';
 
 import $ from 'jquery';
 import _ from "lodash";
@@ -36,11 +35,11 @@ class Header extends Component {
         return(t('online'));
       } else if (activity.lastActive) {
         const d = new Date(activity.lastActive);
-        let lastSeenText = t(util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
+        let lastSeenText = t(iris.util.getDaySeparatorText(d, d.toLocaleDateString({dateStyle:'short'})));
         if (lastSeenText === t('today')) {
-          lastSeenText = util.formatTime(d);
+          lastSeenText = iris.util.formatTime(d);
         } else {
-          lastSeenText = util.formatDate(d);
+          lastSeenText = iris.util.formatDate(d);
         }
         return (`${t('last_active')  } ${  lastSeenText}`);
       }

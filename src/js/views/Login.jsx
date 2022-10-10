@@ -10,7 +10,6 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3Modal from "web3modal";
 import Web3 from "web3";
 import iris from 'iris-lib';
-import util from "iris-lib/src/util";
 import _ from 'lodash';
 import { route } from 'preact-router';
 
@@ -68,8 +67,8 @@ async function ethereumConnect() {
 }
 
 function maybeGoToChat(key) {
-  let chatId = util.getUrlParameter('chatWith') || util.getUrlParameter('channelId');
-  let inviter = util.getUrlParameter('inviter');
+  let chatId = iris.util.getUrlParameter('chatWith') || iris.util.getUrlParameter('channelId');
+  let inviter = iris.util.getUrlParameter('inviter');
   function go() {
     if (inviter !== key.pub) {
       iris.session.newChannel(chatId, window.location.href);
@@ -113,7 +112,7 @@ async function ethereumLogin(name) {
     setTimeout(async () => {
       iris.user().get('profile').get('name').once(existingName => {
         if (typeof existingName !== 'string' || existingName === '') {
-          name = name || util.generateName();
+          name = name || iris.util.generateName();
           iris.user().get('profile').put({a:null});
           iris.user().get('profile').get('name').put(name);
         }
@@ -158,7 +157,7 @@ class Login extends Component {
 
   onLoginFormSubmit(e) {
     e.preventDefault();
-    let name = document.getElementById('login-form-name').value || util.generateName();
+    let name = document.getElementById('login-form-name').value || iris.util.generateName();
     iris.session.loginAsNewUser(name);
     this.base.style = 'display:none';
   }

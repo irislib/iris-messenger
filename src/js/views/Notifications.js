@@ -6,7 +6,6 @@ import {translate as t} from '../translations/Translation';
 import Name from '../components/Name';
 import View from './View';
 import PublicMessage from "../components/PublicMessage";
-import util from "iris-lib/src/util";
 
 const PAGE_SIZE = 10;
 
@@ -63,7 +62,7 @@ export default class Notifications extends View {
                 ${notification.text || ''}
                 ${notification.target ? html`<${PublicMessage} hash=${notification.target}/>` :''}
                 <div class="below-text">
-                  <div class="time">${util.formatDate(new Date(notification.time))}</div><br/>
+                  <div class="time">${iris.util.formatDate(new Date(notification.time))}</div><br/>
                 </div>
               </div>
             </div>

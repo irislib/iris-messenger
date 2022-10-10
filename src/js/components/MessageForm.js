@@ -1,8 +1,6 @@
 import { Component } from 'preact';
 import iris from 'iris-lib';
 
-import SignedMessage from 'iris-lib/src/SignedMessage';
-
 function twice(f) {
   f();
   setTimeout(f, 100); // write many times and maybe it goes through :D
@@ -14,7 +12,7 @@ export default class MessageForm extends Component {
   async sendPublic(msg) {
     msg.time = new Date().toISOString();
     msg.type = 'post';
-    const signedMsg = await SignedMessage.create(msg, iris.session.getKey());
+    const signedMsg = await iris.SignedMessage.create(msg, iris.session.getKey());
     const serialized = signedMsg.toString();
     const hash = await iris.static.put(serialized);
     if (msg.replyingTo) {

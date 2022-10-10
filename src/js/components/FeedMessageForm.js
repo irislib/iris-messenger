@@ -10,7 +10,6 @@ import $ from 'jquery';
 import EmojiButton from '../lib/emoji-button';
 import SearchBox from './SearchBox';
 import MessageForm from './MessageForm';
-import util from 'iris-lib/src/util';
 
 const mentionRegex = /\B\@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
 
@@ -24,7 +23,7 @@ class FeedMessageForm extends MessageForm {
       textEl.val(textEl.val() + emoji);
       textEl.focus();
     });
-    if (!util.isMobile && this.props.autofocus !== false) {
+    if (!iris.util.isMobile && this.props.autofocus !== false) {
       textEl.focus();
     }
     if (!this.props.replyingTo) {

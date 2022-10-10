@@ -3,7 +3,6 @@ import iris from 'iris-lib';
 import Identicon from 'identicon.js';
 import SafeImg from './SafeImg';
 import styled from 'styled-components';
-import util from 'iris-lib/src/util';
 
 type Activity = {
   time: string;
@@ -42,7 +41,7 @@ class MyIdenticon extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
 
   updateIdenticon() {
-    util.getHash(this.props.str, `hex`)
+    iris.util.getHash(this.props.str, `hex`)
       .then(hash => {
         const identicon = new Identicon(hash, {width: this.props.width, format: `svg`});
         this.setState({identicon: `data:image/svg+xml;base64,${identicon.toString()}`});

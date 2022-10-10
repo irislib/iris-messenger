@@ -5,7 +5,6 @@ import Component from '../../../BaseComponent';
 import Button from '../../../components/basic/Button';
 import { route } from 'preact-router';
 import iris from 'iris-lib';
-import Channel from 'iris-lib/src/Channel';
 import Helpers from '../../../Helpers';
 
 class InviteView extends Component {
@@ -30,7 +29,7 @@ class InviteView extends Component {
     onCreateGroupSubmit(e) {
         e.preventDefault();
         if ($('#new-group-name').val().length) {
-        let c = new Channel({
+        let c = new iris.Channel({
             gun: iris.public(),
             key: iris.session.getKey(),
             participants: [],

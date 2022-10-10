@@ -21,8 +21,6 @@ import ProfilePhoto from '../components/ProfilePhoto';
 import Button from '../components/basic/Button';
 import Web3 from 'web3';
 import styled from 'styled-components';
-import Channel from 'iris-lib/src/Channel';
-import Attribute from 'iris-lib/src/Attribute';
 
 const ImageGrid = styled.div`
   display: grid;
@@ -59,7 +57,7 @@ const GalleryImage = styled.a`
 
 function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
-    Channel.deleteChannel(iris.session.getKey(), pub);
+    iris.Channel.deleteChannel(iris.session.getKey(), pub);
     iris.session.channelIds.delete(pub);
     iris.local().get('channels').get(pub).put(null);
     route(`/chat`);
@@ -575,7 +573,7 @@ class Profile extends View {
       }
     ));
     if (this.isUserAgentCrawler() && !this.state.ogImageUrl && !this.state.photo) {
-      new Attribute({type: 'keyID', value: this.props.id}).identiconSrc({width: 300, showType: false}).then(src => {
+      new iris.Attribute({type: 'keyID', value: this.props.id}).identiconSrc({width: 300, showType: false}).then(src => {
         if (!this.state.ogImageUrl && !this.state.photo) {
           this.setOgImageUrl(src);
         }
