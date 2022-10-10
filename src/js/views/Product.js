@@ -1,6 +1,6 @@
 import { html } from 'htm/preact';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+
 import {translate as t} from '../translations/Translation';
 import { route } from 'preact-router';
 import StoreView from './Store';
@@ -15,14 +15,14 @@ class Product extends StoreView {
 
   addToCart() {
     const count = (this.cart[this.props.product] || 0) + 1;
-    State.local.get('cart').get(this.props.store).get(this.props.product).put(count);
+    iris.local().get('cart').get(this.props.store).get(this.props.product).put(count);
   }
 
   newProduct() {
     return html`
       <div class="main-view" id="profile">
         <div class="content">
-          <a href="/store/${Session.getPubKey()}"><${Text} path="profile/name" placeholder=${t('name')}  user=${Session.getPubKey()} /></a>
+          <a href="/store/${iris.session.getPubKey()}"><${Text} path="profile/name" placeholder=${t('name')}  user=${iris.session.getPubKey()} /></a>
           <h3> ${t('add_item')}</h3>
           <h2 contenteditable placeholder=${t('item_id')} onInput=${e => this.newProductName = e.target.innerText} />
           <textarea placeholder=${t('item_description')} onInput=${e => this.newProductDescription = e.target.value} style="resize: vertical"/>
@@ -42,7 +42,7 @@ class Product extends StoreView {
 
   onClickDelete() {
     if (confirm('Delete product? This cannot be undone.')) {
-      State.public.user().get('store').get('products').get(this.props.product).put(null);
+      iris.user().get('store').get('products').get(this.props.product).put(null);
       route(`/store/${  this.props.store}`);
     }
   }
@@ -97,17 +97,17 @@ class Product extends StoreView {
       description: this.newProductDescription,
       price: this.newProductPrice
     };
-    State.public.user().get('store').get('products').get(this.newProductId || this.newProductName).put(product);
-    route(`/store/${Session.getPubKey()}`)
+    iris.user().get('store').get('products').get(this.newProductId || this.newProductName).put(product);
+    route(`/store/${iris.session.getPubKey()}`)
   }
 
   componentDidMount() {
     StoreView.prototype.componentDidMount.call(this);
     const pub = this.props.store;
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
-    this.isMyProfile = Session.getPubKey() === pub;
+    this.isMyProfile = iris.session.getPubKey() === pub;
     if (this.props.product && pub) {
-      State.public.user(pub).get('store').get('products').get(this.props.product).on(product => this.setState({product}));
+      iris.user(pub).get('store').get('products').get(this.props.product).on(product => this.setState({product}));
     }
   }
 }

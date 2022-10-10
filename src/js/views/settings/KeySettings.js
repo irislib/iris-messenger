@@ -2,7 +2,8 @@ import Helpers from '../../Helpers';
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
 import CopyButton from '../../components/CopyButton';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+
 import QRCode from '../../lib/qrcode.min';
 import $ from 'jquery';
 import Button from '../../components/basic/Button';
@@ -11,13 +12,13 @@ export default class KeySettings extends Component {
 
     constructor(){
         super();
-        this.state = Session.DEFAULT_SETTINGS;
+        this.state = iris.session.DEFAULT_SETTINGS;
     }
 
     mailtoSubmit(e) {
         e.preventDefault();
         if (this.state.email && this.state.email === this.state.retypeEmail) {
-          window.location.href = `mailto:${this.state.email}?&subject=Iris%20private%20key&body=${JSON.stringify(Session.getKey())}`;
+          window.location.href = `mailto:${this.state.email}?&subject=Iris%20private%20key&body=${JSON.stringify(iris.session.getKey())}`;
         }
       }
 
@@ -29,7 +30,7 @@ export default class KeySettings extends Component {
         <p dangerouslySetInnerHTML={{ __html: t('private_key_warning') }} />
         <p>
           <Button onClick={() => downloadKey()}>{t('download_private_key')}</Button>
-          <CopyButton notShareable={true} text={t('copy_private_key')} copyStr={JSON.stringify(Session.getKey())} />
+          <CopyButton notShareable={true} text={t('copy_private_key')} copyStr={JSON.stringify(iris.session.getKey())} />
         </p>
         <p>
           <Button onClick={e => togglePrivateKeyQR(e)}>{t('show_privkey_qr')}</Button>
@@ -56,7 +57,7 @@ export default class KeySettings extends Component {
 }
 
 function downloadKey() {
-  const key = Session.getKey();
+  const key = iris.session.getKey();
   delete key['#'];
   return Helpers.download('iris_private_key.txt', JSON.stringify(key), 'text/plain', 'utf-8');
 }
@@ -88,7 +89,7 @@ function togglePrivateKeyQR(e) {
     }, 1000);
     let qrCodeEl = $('#private-key-qr');
     new QRCode(qrCodeEl[0], {
-      text: JSON.stringify(Session.getKey()),
+      text: JSON.stringify(iris.session.getKey()),
       width: 300,
       height: 300,
       colorDark : "#000000",

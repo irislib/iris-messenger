@@ -1,13 +1,12 @@
 import { html } from 'htm/preact';
 import { translate as t } from '../../../translations/Translation';
-import Session from 'iris-lib/src/Session';
-import State from 'iris-lib/src/State';
+
+import iris from 'iris-lib';
 import CopyButton from '../../../components/CopyButton';
 import Button from '../../../components/basic/Button';
 import $ from 'jquery';
 import Component from '../../../BaseComponent';
 import { route } from 'preact-router';
-import Channel from 'iris-lib/src/Channel';
 
 class MainView extends Component {
     constructor() {
@@ -17,19 +16,15 @@ class MainView extends Component {
     }
 
     removeChatLink(id) {
-        State.local.get('chatLinks').get(id).put(null);
+        iris.local().get('chatLinks').get(id).put(null);
         this.props.chatLinks[id] = null;
         this.setState({chatLinks: this.props.chatLinks});
         this.forceUpdate();
-        return Channel.removePrivateChatLink(State.public, Session.getKey(), id);
+        return iris.Channel.removePrivateChatLink(iris.public(), iris.session.getKey(), id);
         
     }
     componentDidMount() {
         this.setState({chatLinks: this.props.chatLinks});
-    }
-    
-    createNewInvite(){
-        Session.createChatLink();
     }
 
     render(){
@@ -75,11 +70,11 @@ class MainView extends Component {
                             `;
                     })}
                     <p>
-                        <Button onClick={() => this.createNewInvite()}>
+                        <Button onClick={() => iris.Channel.createChatLink()}>
                             {t('create_new_invite_link')}
                         </Button>
                     </p>
-                    <p><small dangerouslySetInnerHTML={{ __html: t('beware_of_sharing_invite_link_publicly', `href="/profile/${Session.getPubKey()}"`) }} /></p>
+                    <p><small dangerouslySetInnerHTML={{ __html: t('beware_of_sharing_invite_link_publicly', `href="/profile/${iris.session.getPubKey()}"`) }} /></p>
                 </div>
             </>
         );

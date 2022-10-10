@@ -1,13 +1,11 @@
 import { html } from 'htm/preact';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Identicon from '../components/Identicon';
 import Button from '../components/basic/Button';
 import {translate as t} from '../translations/Translation';
 import Name from '../components/Name';
 import View from './View';
 import PublicMessage from "../components/PublicMessage";
-import NotificationTools from "iris-lib/src/Notifications";
-import util from "iris-lib/src/util";
 
 const PAGE_SIZE = 10;
 
@@ -19,12 +17,12 @@ export default class Notifications extends View {
   }
 
   componentDidMount() {
-    NotificationTools.changeUnseenNotificationCount(0);
-    State.local.get('notifications').map(this.sub(
+    iris.notifications.changeUnseenNotificationCount(0);
+    iris.local().get('notifications').map(this.sub(
       (notification, time) => {
         if (notification) {
           this.notifications[time] = notification;
-          NotificationTools.getNotificationText(notification).then(text => {
+          iris.notifications.getNotificationText(notification).then(text => {
             this.notifications[time].text = text;
             this.setState({});
           });
@@ -64,7 +62,7 @@ export default class Notifications extends View {
                 ${notification.text || ''}
                 ${notification.target ? html`<${PublicMessage} hash=${notification.target}/>` :''}
                 <div class="below-text">
-                  <div class="time">${util.formatDate(new Date(notification.time))}</div><br/>
+                  <div class="time">${iris.util.formatDate(new Date(notification.time))}</div><br/>
                 </div>
               </div>
             </div>

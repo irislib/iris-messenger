@@ -1,17 +1,15 @@
 import { createRef } from 'preact';
 import Helpers from '../Helpers';
-import Notifications from 'iris-lib/src/Notifications';
 import { html } from 'htm/preact';
 import { translate as t } from '../translations/Translation';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
 import $ from 'jquery';
 import EmojiButton from '../lib/emoji-button';
 import SearchBox from './SearchBox';
 import MessageForm from './MessageForm';
-import util from 'iris-lib/src/util';
 
 const mentionRegex = /\B\@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
 
@@ -25,18 +23,18 @@ class FeedMessageForm extends MessageForm {
       textEl.val(textEl.val() + emoji);
       textEl.focus();
     });
-    if (!util.isMobile && this.props.autofocus !== false) {
+    if (!iris.util.isMobile && this.props.autofocus !== false) {
       textEl.focus();
     }
     if (!this.props.replyingTo) {
-      State.local.get('channels').get('public').get('msgDraft').once(t => !textEl.val() && textEl.val(t));
+      iris.local().get('channels').get('public').get('msgDraft').once(t => !textEl.val() && textEl.val(t));
     }
   }
 
   async onMsgFormSubmit(event) {
     event.preventDefault();
     if (!this.props.replyingTo) {
-      State.local.get('channels').get('public').get('msgDraft').put(null);
+      iris.local().get('channels').get('public').get('msgDraft').put(null);
     }
     const textEl = $(this.newMsgRef.current);
     const text = textEl.val();
@@ -53,16 +51,16 @@ class FeedMessageForm extends MessageForm {
       msg.torrentId = this.state.torrentId;
     }
     this.sendPublic(msg).then(hash => {
-      if (this.props.replyingToUser && this.props.replyingToUser !== Session.getPubKey()) {
-        const title = `${Session.getMyName()  } replied to your message`;
+      if (this.props.replyingToUser && this.props.replyingToUser !== iris.session.getPubKey()) {
+        const title = `${iris.session.getMyName()  } replied to your message`;
         const body = `'${text.length > 100 ? `${text.slice(0, 100)  }...` : text}'`;
-        Notifications.sendIrisNotification(this.props.replyingToUser, {event:'reply', target: hash});
-        Notifications.sendWebPushNotification(this.props.replyingToUser, {title,body});
+        iris.notifications.sendIrisNotification(this.props.replyingToUser, {event:'reply', target: hash});
+        iris.notifications.sendWebPushNotification(this.props.replyingToUser, {title,body});
       }
       const mentions = text.match(Helpers.pubKeyRegex);
       if (mentions) {
         mentions.forEach(match => {
-          Notifications.sendIrisNotification(match.slice(1), {event:'mention', target: hash});
+          iris.notifications.sendIrisNotification(match.slice(1), {event:'mention', target: hash});
         });
       }
     });
@@ -100,7 +98,7 @@ class FeedMessageForm extends MessageForm {
   onMsgTextInput(event) {
     this.setTextareaHeight(event.target);
     if (!this.props.replyingTo) {
-      State.local.get('channels').get('public').get('msgDraft').put($(event.target).val());
+      iris.local().get('channels').get('public').get('msgDraft').put($(event.target).val());
     }
     this.checkMention(event);
   }

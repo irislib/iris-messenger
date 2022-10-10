@@ -1,18 +1,18 @@
 import { translate as t } from '../../../translations/Translation';
-import Session from 'iris-lib/src/Session';
 import QRScanner from '../../../QRScanner';
 import Button from '../../../components/basic/Button';
 import $ from 'jquery';
 import Component from '../../../BaseComponent';
 import QRCode from '../../../lib/qrcode.min';
 import Helpers from '../../../Helpers';
+import iris from 'iris-lib';
 
 function setChatLinkQrCode(link) {
     let qrCodeEl = $('#my-qr-code');
     if (qrCodeEl.length === 0) { return; }
     qrCodeEl.empty();
     new QRCode(qrCodeEl[0], {
-      text: link || Session.getMyChatLink(),
+      text: link || iris.session.getMyChatLink(),
       width: 320,
       height: 320,
       colorDark : "#000000",

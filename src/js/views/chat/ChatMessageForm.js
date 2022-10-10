@@ -2,14 +2,11 @@ import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import { translate as t } from '../../translations/Translation';
 import Torrent from '../../components/Torrent';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
 import _ from 'lodash';
 import $ from 'jquery';
 import EmojiButton from '../../lib/emoji-button';
 import MessageForm from '../../components/MessageForm';
-import Notifications from 'iris-lib/src/Notifications';
-import util from 'iris-lib/src/util';
 
 const submitButton = html`
   <button type="submit">
@@ -24,18 +21,18 @@ class ChatMessageForm extends MessageForm {
       textEl.val(textEl.val() + emoji);
       textEl.focus();
     });
-    if (!util.isMobile && this.props.autofocus !== false) {
+    if (!iris.util.isMobile && this.props.autofocus !== false) {
       $(this.base).find(".new-msg").focus();
     }
   }
 
   sendToPrivateOrGroup() {
-    const chat = Session.channels[this.props.activeChat];
+    const chat = iris.private(this.props.activeChat);
     if (!chat) {
       console.error("no chat", this.props.activeChat, "found");
       return;
     }
-    State.local.get('channels').get(this.props.activeChat).get('msgDraft').put(null);
+    iris.local().get('channels').get(this.props.activeChat).get('msgDraft').put(null);
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length && !chat.attachments) { return; }
@@ -57,7 +54,7 @@ class ChatMessageForm extends MessageForm {
   }
 
   sendToHashtag() {
-    State.local.get('channels').get(this.props.activeChat).get('msgDraft').put(null);
+    iris.local().get('channels').get(this.props.activeChat).get('msgDraft').put(null);
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length) { return; }
@@ -71,7 +68,7 @@ class ChatMessageForm extends MessageForm {
   }
 
   componentDidUpdate() {
-    if (!util.isMobile && this.props.autofocus !== false) {
+    if (!iris.util.isMobile && this.props.autofocus !== false) {
       $(this.base).find(".new-msg").focus();
     }
     if ($('#attachment-preview:visible').length) {
@@ -105,7 +102,7 @@ class ChatMessageForm extends MessageForm {
   }
 
   onMsgTextInput(event) {
-    const channel = Session.channels[this.props.activeChat];
+    const channel = iris.private(this.props.activeChat);
     if (!channel) {return;}
     const val = $(event.target).val();
     this.isTyping = this.isTyping !== undefined ? this.isTyping : false;
@@ -118,7 +115,7 @@ class ChatMessageForm extends MessageForm {
       setTyping();
     }
     this.isTyping = getIsTyping();
-    State.local.get('channels').get(this.props.activeChat).get('msgDraft').put($(event.target).val());
+    iris.local().get('channels').get(this.props.activeChat).get('msgDraft').put($(event.target).val());
   }
 
   attachFileClicked(event) {
@@ -140,8 +137,9 @@ class ChatMessageForm extends MessageForm {
       $('#message-list').hide();
       for (let i = 0;i < files.length;i++) {
         Helpers.getBase64(files[i]).then(base64 => {
-          Session.channels[this.props.activeChat].attachments = Session.channels[this.props.activeChat].attachments || [];
-          Session.channels[this.props.activeChat].attachments.push({type: 'image', data: base64});
+          const channel = iris.private(this.props.activeChat);
+          channel.attachments = channel.attachments || [];
+          channel.attachments.push({type: 'image', data: base64});
           let preview = Helpers.setImgSrc($('<img>'), base64);
           attachmentsPreview.append(preview);
         });
@@ -165,9 +163,7 @@ class ChatMessageForm extends MessageForm {
     attachmentsPreview.hide();
     attachmentsPreview.removeClass('gallery');
     $('#message-list').show();
-    if (Session.channels[this.props.activeChat]) {
-      Session.channels[this.props.activeChat].attachments = null;
-    }
+    iris.private(this.props.activeChat).attachments = null;
     if (!this.props.hashtag) {
       Helpers.scrollToMessageListBottom();
     }
@@ -175,14 +171,14 @@ class ChatMessageForm extends MessageForm {
   }
 
   webPush(msg) {
-    const chat = Session.channels[this.props.activeChat];
-    const myKey = Session.getKey();
+    const chat = iris.private(this.props.activeChat);
+    const myKey = iris.session.getKey();
     const shouldWebPush = (this.props.activeChat === myKey.pub) || !(chat.activity && chat.activity.isActive);
     if (shouldWebPush) {
-      const myName = Session.getMyName();
+      const myName = iris.session.getMyName();
       const title = chat.uuid ? chat.name : myName;
       const body = chat.uuid ? `${myName}: ${msg.text}` : msg.text;
-      Notifications.sendWebPushNotification(this.props.activeChat, {title, body});
+      iris.notifications.sendWebPushNotification(this.props.activeChat, {title, body});
     }
   }
 

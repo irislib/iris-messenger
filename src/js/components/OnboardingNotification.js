@@ -2,19 +2,18 @@ import {html} from "htm/preact";
 import {translate as t} from "../translations/Translation";
 import Identicon from "./Identicon";
 import FollowButton from "./FollowButton";
-import Session from "iris-lib/src/Session";
 import CopyButton from "./CopyButton";
 import Text from "./Text";
 import Helpers from "../Helpers";
 import Component from "../BaseComponent";
-import State from "iris-lib/src/State";
+import iris from 'iris-lib';
 
 const SUGGESTED_FOLLOW = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
 export default class OnboardingNotification extends Component {
   componentDidMount() {
-    State.local.get('noFollowers').on(this.inject());
-    State.local.get('noFollows').on(this.inject());
+    iris.local().get('noFollowers').on(this.inject());
+    iris.local().get('noFollows').on(this.inject());
   }
 
   render() {
@@ -30,7 +29,7 @@ export default class OnboardingNotification extends Component {
               </a>
               <${FollowButton} id=${SUGGESTED_FOLLOW} />
             </div>
-            <p>${t('alternatively')} <a href="/profile/${Session.getPubKey()}">${t('give_your_profile_link_to_someone')}</a>.</p>
+            <p>${t('alternatively')} <a href="/profile/${iris.session.getPubKey()}">${t('give_your_profile_link_to_someone')}</a>.</p>
           </div>
         </div>
       `
@@ -40,11 +39,11 @@ export default class OnboardingNotification extends Component {
         <div class="msg">
           <div class="msg-content">
             <p>${t('no_followers_yet')}</p>
-            <p><${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(Session.getPubKey())}/></p>
+            <p><${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(iris.session.getPubKey())}/></p>
             <p dangerouslySetInnerHTML=${{
                 __html: t(
                   'alternatively_get_sms_verified',
-                  `href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}"`
+                  `href="https://iris-sms-auth.herokuapp.com/?pub=${iris.session.getPubKey()}"`
                 )}}>
             </p>
             <small>${t('no_followers_yet_info')}</small>

@@ -1,10 +1,8 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('gun'), require('gun/sea')) :
-	typeof define === 'function' && define.amd ? define(['gun', 'gun/sea'], factory) :
-	(global.iris = factory(global.Gun));
-}(this, (function (Gun$1) { 'use strict';
-
-	Gun$1 = Gun$1 && Gun$1.hasOwnProperty('default') ? Gun$1['default'] : Gun$1;
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.iris = factory());
+}(this, (function () { 'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -20,57 +18,6 @@
 		return module = { exports: {} }, fn(module, module.exports), module.exports;
 	}
 
-	var _core = createCommonjsModule(function (module) {
-	var core = module.exports = { version: '2.6.12' };
-	if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
-	});
-	var _core_1 = _core.version;
-
-	var $JSON = _core.JSON || (_core.JSON = { stringify: JSON.stringify });
-	var stringify = function stringify(it) { // eslint-disable-line no-unused-vars
-	  return $JSON.stringify.apply($JSON, arguments);
-	};
-
-	var stringify$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": stringify, __esModule: true };
-	});
-
-	var _JSON$stringify = unwrapExports(stringify$1);
-
-	var _iterStep = function (done, value) {
-	  return { value: value, done: !!done };
-	};
-
-	var _iterators = {};
-
-	var toString = {}.toString;
-
-	var _cof = function (it) {
-	  return toString.call(it).slice(8, -1);
-	};
-
-	// fallback for non-array-like ES3 and non-enumerable old V8 strings
-
-	// eslint-disable-next-line no-prototype-builtins
-	var _iobject = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
-	  return _cof(it) == 'String' ? it.split('') : Object(it);
-	};
-
-	// 7.2.1 RequireObjectCoercible(argument)
-	var _defined = function (it) {
-	  if (it == undefined) throw TypeError("Can't call method on  " + it);
-	  return it;
-	};
-
-	// to indexed object, toObject with fallback for non-array-like ES3 strings
-
-
-	var _toIobject = function (it) {
-	  return _iobject(_defined(it));
-	};
-
-	var _library = true;
-
 	var _global = createCommonjsModule(function (module) {
 	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 	var global = module.exports = typeof window != 'undefined' && window.Math == Math
@@ -79,6 +26,12 @@
 	  : Function('return this')();
 	if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 	});
+
+	var _core = createCommonjsModule(function (module) {
+	var core = module.exports = { version: '2.6.12' };
+	if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
+	});
+	var _core_1 = _core.version;
 
 	var _aFunction = function (it) {
 	  if (typeof it != 'function') throw TypeError(it + ' is not a function!');
@@ -249,7 +202,31 @@
 	$export.R = 128; // real proto method for `library`
 	var _export = $export;
 
-	var _redefine = _hide;
+	var toString = {}.toString;
+
+	var _cof = function (it) {
+	  return toString.call(it).slice(8, -1);
+	};
+
+	// fallback for non-array-like ES3 and non-enumerable old V8 strings
+
+	// eslint-disable-next-line no-prototype-builtins
+	var _iobject = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
+	  return _cof(it) == 'String' ? it.split('') : Object(it);
+	};
+
+	// 7.2.1 RequireObjectCoercible(argument)
+	var _defined = function (it) {
+	  if (it == undefined) throw TypeError("Can't call method on  " + it);
+	  return it;
+	};
+
+	// to indexed object, toObject with fallback for non-array-like ES3 strings
+
+
+	var _toIobject = function (it) {
+	  return _iobject(_defined(it));
+	};
 
 	// 7.1.4 ToInteger
 	var ceil = Math.ceil;
@@ -295,6 +272,8 @@
 	    } return !IS_INCLUDES && -1;
 	  };
 	};
+
+	var _library = true;
 
 	var _shared = createCommonjsModule(function (module) {
 	var SHARED = '__core-js_shared__';
@@ -349,6 +328,5817 @@
 	var _objectKeys = Object.keys || function keys(O) {
 	  return _objectKeysInternal(O, _enumBugKeys);
 	};
+
+	var f$1 = Object.getOwnPropertySymbols;
+
+	var _objectGops = {
+		f: f$1
+	};
+
+	var f$2 = {}.propertyIsEnumerable;
+
+	var _objectPie = {
+		f: f$2
+	};
+
+	// 7.1.13 ToObject(argument)
+
+	var _toObject = function (it) {
+	  return Object(_defined(it));
+	};
+
+	// 19.1.2.1 Object.assign(target, source, ...)
+
+
+
+
+
+
+	var $assign = Object.assign;
+
+	// should work with symbols and should have deterministic property order (V8 bug)
+	var _objectAssign = !$assign || _fails(function () {
+	  var A = {};
+	  var B = {};
+	  // eslint-disable-next-line no-undef
+	  var S = Symbol();
+	  var K = 'abcdefghijklmnopqrst';
+	  A[S] = 7;
+	  K.split('').forEach(function (k) { B[k] = k; });
+	  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
+	}) ? function assign(target, source) { // eslint-disable-line no-unused-vars
+	  var T = _toObject(target);
+	  var aLen = arguments.length;
+	  var index = 1;
+	  var getSymbols = _objectGops.f;
+	  var isEnum = _objectPie.f;
+	  while (aLen > index) {
+	    var S = _iobject(arguments[index++]);
+	    var keys = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S);
+	    var length = keys.length;
+	    var j = 0;
+	    var key;
+	    while (length > j) {
+	      key = keys[j++];
+	      if (!_descriptors || isEnum.call(S, key)) T[key] = S[key];
+	    }
+	  } return T;
+	} : $assign;
+
+	// 19.1.3.1 Object.assign(target, source)
+
+
+	_export(_export.S + _export.F, 'Object', { assign: _objectAssign });
+
+	var assign = _core.Object.assign;
+
+	var assign$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": assign, __esModule: true };
+	});
+
+	var _Object$assign = unwrapExports(assign$1);
+
+	var gun = createCommonjsModule(function (module) {
+	(function(){
+
+	  /* UNBUILD */
+	  function USE(arg, req){
+	    return req? commonjsRequire(arg) : arg.slice? USE[R(arg)] : function(mod, path){
+	      arg(mod = {exports: {}});
+	      USE[R(path)] = mod.exports;
+	    }
+	    function R(p){
+	      return p.split('/').slice(-1).toString().replace('.js','');
+	    }
+	  }
+	  { var MODULE = module; }
+	USE(function(module){
+			// Shim for generic javascript utilities.
+			String.random = function(l, c){
+				var s = '';
+				l = l || 24; // you are not going to make a 0 length random number, so no need to check type
+				c = c || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXZabcdefghijklmnopqrstuvwxyz';
+				while(l-- > 0){ s += c.charAt(Math.floor(Math.random() * c.length)); }
+				return s;
+			};
+			String.match = function(t, o){ var tmp, u;
+				if('string' !== typeof t){ return false }
+				if('string' == typeof o){ o = {'=': o}; }
+				o = o || {};
+				tmp = (o['='] || o['*'] || o['>'] || o['<']);
+				if(t === tmp){ return true }
+				if(u !== o['=']){ return false }
+				tmp = (o['*'] || o['>']);
+				if(t.slice(0, (tmp||'').length) === tmp){ return true }
+				if(u !== o['*']){ return false }
+				if(u !== o['>'] && u !== o['<']){
+					return (t >= o['>'] && t <= o['<'])? true : false;
+				}
+				if(u !== o['>'] && t >= o['>']){ return true }
+				if(u !== o['<'] && t <= o['<']){ return true }
+				return false;
+			};
+			String.hash = function(s, c){ // via SO
+				if(typeof s !== 'string'){ return }
+		    c = c || 0; // CPU schedule hashing by
+		    if(!s.length){ return c }
+		    for(var i=0,l=s.length,n; i<l; ++i){
+		      n = s.charCodeAt(i);
+		      c = ((c<<5)-c)+n;
+		      c |= 0;
+		    }
+		    return c;
+		  };
+			var has = Object.prototype.hasOwnProperty;
+			Object.plain = function(o){ return o? (o instanceof Object && o.constructor === Object) || Object.prototype.toString.call(o).match(/^\[object (\w+)\]$/)[1] === 'Object' : false };
+			Object.empty = function(o, n){
+				for(var k in o){ if(has.call(o, k) && (!n || -1==n.indexOf(k))){ return false } }
+				return true;
+			};
+			Object.keys = Object.keys || function(o){
+				var l = [];
+				for(var k in o){ if(has.call(o, k)){ l.push(k); } }
+				return l;
+			}
+			;(function(){
+				var u, sT = setTimeout, l = 0, c = 0
+				, sI = (typeof setImmediate !== ''+u && setImmediate) || (function(c,f){
+					if(typeof MessageChannel == ''+u){ return sT }
+					(c = new MessageChannel()).port1.onmessage = function(e){ ''==e.data && f(); };
+					return function(q){ f=q;c.port2.postMessage(''); }
+				}()), check = sT.check = sT.check || (typeof performance !== ''+u && performance)
+				|| {now: function(){ return +new Date }};
+				sT.hold = sT.hold || 9; // half a frame benchmarks faster than < 1ms?
+				sT.poll = sT.poll || function(f){
+					if((sT.hold >= (check.now() - l)) && c++ < 3333){ f(); return }
+					sI(function(){ l = check.now(); f(); },c=0);
+				};
+			}());
+	(function(){ // Too many polls block, this "threads" them in turns over a single thread in time.
+				var sT = setTimeout, t = sT.turn = sT.turn || function(f){ 1 == s.push(f) && p(T); }
+				, s = t.s = [], p = sT.poll, i = 0, f, T = function(){
+					if(f = s[i++]){ f(); }
+					if(i == s.length || 99 == i){
+						s = t.s = s.slice(i);
+						i = 0;
+					}
+					if(s.length){ p(T); }
+				};
+			}());
+	(function(){
+				var u, sT = setTimeout, T = sT.turn;
+				(sT.each = sT.each || function(l,f,e,S){ S = S || 9; (function t(s,L,r){
+				  if(L = (s = (l||[]).splice(0,S)).length){
+				  	for(var i = 0; i < L; i++){
+				  		if(u !== (r = f(s[i]))){ break }
+				  	}
+				  	if(u === r){ T(t); return }
+				  } e && e(r);
+				}());})();
+			}());
+		})(USE, './shim');
+	USE(function(module){
+			// On event emitter generic javascript utility.
+			module.exports = function onto(tag, arg, as){
+				if(!tag){ return {to: onto} }
+				var u, f = 'function' == typeof arg, tag = (this.tag || (this.tag = {}))[tag] || f && (
+					this.tag[tag] = {tag: tag, to: onto._ = { next: function(arg){ var tmp;
+						if(tmp = this.to){ tmp.next(arg); }
+				}}});
+				if(f){
+					var be = {
+						off: onto.off ||
+						(onto.off = function(){
+							if(this.next === onto._.next){ return !0 }
+							if(this === this.the.last){
+								this.the.last = this.back;
+							}
+							this.to.back = this.back;
+							this.next = onto._.next;
+							this.back.to = this.to;
+							if(this.the.last === this.the){
+								delete this.on.tag[this.the.tag];
+							}
+						}),
+						to: onto._,
+						next: arg,
+						the: tag,
+						on: this,
+						as: as,
+					};
+					(be.back = tag.last || tag).to = be;
+					return tag.last = be;
+				}
+				if((tag = tag.to) && u !== arg){ tag.next(arg); }
+				return tag;
+			};
+		})(USE, './onto');
+	USE(function(module){
+			// Valid values are a subset of JSON: null, binary, number (!Infinity), text,
+			// or a soul relation. Arrays need special algorithms to handle concurrency,
+			// so they are not supported directly. Use an extension that supports them if
+			// needed but research their problems first.
+			module.exports = function (v) {
+			  // "deletes", nulling out keys.
+			  return v === null ||
+				"string" === typeof v ||
+				"boolean" === typeof v ||
+				// we want +/- Infinity to be, but JSON does not support it, sad face.
+				// can you guess what v === v checks for? ;)
+				("number" === typeof v && v != Infinity && v != -Infinity && v === v) ||
+				(!!v && "string" == typeof v["#"] && Object.keys(v).length === 1 && v["#"]);
+			};
+		})(USE, './valid');
+	USE(function(module){
+			USE('./shim');
+			function State(){
+				var t = +new Date;
+				if(last < t){
+					return N = 0, last = t + State.drift;
+				}
+				return last = t + ((N += 1) / D) + State.drift;
+			}
+			State.drift = 0;
+			var NI = -Infinity, N = 0, D = 999, last = NI, u; // WARNING! In the future, on machines that are D times faster than 2016AD machines, you will want to increase D by another several orders of magnitude so the processing speed never out paces the decimal resolution (increasing an integer effects the state accuracy).
+			State.is = function(n, k, o){ // convenience function to get the state on a key on a node and return it.
+				var tmp = (k && n && n._ && n._['>']) || o;
+				if(!tmp){ return }
+				return ('number' == typeof (tmp = tmp[k]))? tmp : NI;
+			};
+			State.ify = function(n, k, s, v, soul){ // put a key's state on a node.
+				(n = n || {})._ = n._ || {}; // safety check or init.
+				if(soul){ n._['#'] = soul; } // set a soul if specified.
+				var tmp = n._['>'] || (n._['>'] = {}); // grab the states data.
+				if(u !== k && k !== '_'){
+					if('number' == typeof s){ tmp[k] = s; } // add the valid state.
+					if(u !== v){ n[k] = v; } // Note: Not its job to check for valid values!
+				}
+				return n;
+			};
+			module.exports = State;
+		})(USE, './state');
+	USE(function(module){
+			USE('./shim');
+			function Dup(opt){
+				var dup = {s:{}}, s = dup.s;
+				opt = opt || {max: 999, age: 1000 * 9};//*/ 1000 * 9 * 3};
+				dup.check = function(id){
+					if(!s[id]){ return false }
+					return dt(id);
+				};
+				var dt = dup.track = function(id){
+					var it = s[id] || (s[id] = {});
+					it.was = dup.now = +new Date;
+					if(!dup.to){ dup.to = setTimeout(dup.drop, opt.age + 9); }
+					return it;
+				};
+				dup.drop = function(age){
+					dup.to = null;
+					dup.now = +new Date;
+					var l = Object.keys(s);
+					console.STAT && console.STAT(dup.now, +new Date - dup.now, 'dup drop keys'); // prev ~20% CPU 7% RAM 300MB // now ~25% CPU 7% RAM 500MB
+					setTimeout.each(l, function(id){ var it = s[id]; // TODO: .keys( is slow?
+						if(it && (age || opt.age) > (dup.now - it.was)){ return }
+						delete s[id];
+					},0,99);
+				};
+				return dup;
+			}
+			module.exports = Dup;
+		})(USE, './dup');
+	USE(function(module){
+			// request / response module, for asking and acking messages.
+			USE('./onto'); // depends upon onto!
+			module.exports = function ask(cb, as){
+				if(!this.on){ return }
+				var lack = (this.opt||{}).lack || 9000;
+				if(!('function' == typeof cb)){
+					if(!cb){ return }
+					var id = cb['#'] || cb, tmp = (this.tag||'')[id];
+					if(!tmp){ return }
+					if(as){
+						tmp = this.on(id, as);
+						clearTimeout(tmp.err);
+						tmp.err = setTimeout(function(){ tmp.off(); }, lack);
+					}
+					return true;
+				}
+				var id = (as && as['#']) || random(9);
+				if(!cb){ return id }
+				var to = this.on(id, cb, as);
+				to.err = to.err || setTimeout(function(){ to.off();
+					to.next({err: "Error: No ACK yet.", lack: true});
+				}, lack);
+				return id;
+			};
+			var random = String.random || function(){ return Math.random().toString(36).slice(2) };
+		})(USE, './ask');
+	USE(function(module){
+
+			function Gun(o){
+				if(o instanceof Gun){ return (this._ = {$: this}).$ }
+				if(!(this instanceof Gun)){ return new Gun(o) }
+				return Gun.create(this._ = {$: this, opt: o});
+			}
+
+			Gun.is = function($){ return ($ instanceof Gun) || ($ && $._ && ($ === $._.$)) || false };
+
+			Gun.version = 0.2020;
+
+			Gun.chain = Gun.prototype;
+			Gun.chain.toJSON = function(){};
+
+			USE('./shim');
+			Gun.valid = USE('./valid');
+			Gun.state = USE('./state');
+			Gun.on = USE('./onto');
+			Gun.dup = USE('./dup');
+			Gun.ask = USE('./ask');
+	(function(){
+				Gun.create = function(at){
+					at.root = at.root || at;
+					at.graph = at.graph || {};
+					at.on = at.on || Gun.on;
+					at.ask = at.ask || Gun.ask;
+					at.dup = at.dup || Gun.dup();
+					var gun = at.$.opt(at.opt);
+					if(!at.once){
+						at.on('in', universe, at);
+						at.on('out', universe, at);
+						at.on('put', map, at);
+						Gun.on('create', at);
+						at.on('create', at);
+					}
+					at.once = 1;
+					return gun;
+				};
+				function universe(msg){
+					// TODO: BUG! msg.out = null being set!
+					//if(!F){ var eve = this; setTimeout(function(){ universe.call(eve, msg,1) },Math.random() * 100);return; } // ADD F TO PARAMS!
+					if(!msg){ return }
+					if(msg.out === universe){ this.to.next(msg); return }
+					var eve = this, as = eve.as, at = as.at || as, gun = at.$, dup = at.dup, tmp, DBG = msg.DBG;
+					(tmp = msg['#']) || (tmp = msg['#'] = text_rand(9));
+					if(dup.check(tmp)){ return } dup.track(tmp);
+					tmp = msg._; msg._ = ('function' == typeof tmp)? tmp : function(){};
+					(msg.$ && (msg.$ === (msg.$._||'').$)) || (msg.$ = gun);
+					if(msg['@'] && !msg.put){ ack(msg); }
+					if(!at.ask(msg['@'], msg)){ // is this machine listening for an ack?
+						DBG && (DBG.u = +new Date);
+						if(msg.put){ put(msg); return } else
+						if(msg.get){ Gun.on.get(msg, gun); }
+					}
+					DBG && (DBG.uc = +new Date);
+					eve.to.next(msg);
+					DBG && (DBG.ua = +new Date);
+					if(msg.nts || msg.NTS){ return } // TODO: This shouldn't be in core, but fast way to prevent NTS spread. Delete this line after all peers have upgraded to newer versions.
+					msg.out = universe; at.on('out', msg);
+					DBG && (DBG.ue = +new Date);
+				}
+				function put(msg){
+					if(!msg){ return }
+					var ctx = msg._||'', root = ctx.root = ((ctx.$ = msg.$||'')._||'').root;
+					if(msg['@'] && ctx.faith && !ctx.miss){ // TODO: AXE may split/route based on 'put' what should we do here? Detect @ in AXE? I think we don't have to worry, as DAM will route it on @.
+						msg.out = universe;
+						root.on('out', msg);
+						return;
+					}
+					ctx.latch = root.hatch; ctx.match = root.hatch = [];
+					var put = msg.put;
+					var DBG = ctx.DBG = msg.DBG, S = +new Date; CT = CT || S;
+					if(put['#'] && put['.']){ /*root && root.on('put', msg);*/ return } // TODO: BUG! This needs to call HAM instead.
+					DBG && (DBG.p = S);
+					ctx['#'] = msg['#'];
+					ctx.msg = msg;
+					ctx.all = 0;
+					ctx.stun = 1;
+					var nl = Object.keys(put);//.sort(); // TODO: This is unbounded operation, large graphs will be slower. Write our own CPU scheduled sort? Or somehow do it in below? Keys itself is not O(1) either, create ES5 shim over ?weak map? or custom which is constant.
+					console.STAT && console.STAT(S, ((DBG||ctx).pk = +new Date) - S, 'put sort');
+					var ni = 0, nj, kl, soul, node, states, err, tmp;
+					(function pop(o){
+						if(nj != ni){ nj = ni;
+							if(!(soul = nl[ni])){
+								console.STAT && console.STAT(S, ((DBG||ctx).pd = +new Date) - S, 'put');
+								fire(ctx);
+								return;
+							}
+							if(!(node = put[soul])){ err = ERR+cut(soul)+"no node."; } else
+							if(!(tmp = node._)){ err = ERR+cut(soul)+"no meta."; } else
+							if(soul !== tmp['#']){ err = ERR+cut(soul)+"soul not same."; } else
+							if(!(states = tmp['>'])){ err = ERR+cut(soul)+"no state."; }
+							kl = Object.keys(node||{}); // TODO: .keys( is slow
+						}
+						if(err){
+							msg.err = ctx.err = err; // invalid data should error and stun the message.
+							fire(ctx);
+							//console.log("handle error!", err) // handle!
+							return;
+						}
+						var i = 0, key; o = o || 0;
+						while(o++ < 9 && (key = kl[i++])){
+							if('_' === key){ continue }
+							var val = node[key], state = states[key];
+							if(u === state){ err = ERR+cut(key)+"on"+cut(soul)+"no state."; break }
+							if(!valid(val)){ err = ERR+cut(key)+"on"+cut(soul)+"bad "+(typeof val)+cut(val); break }
+							//ctx.all++; //ctx.ack[soul+key] = '';
+							ham(val, key, soul, state, msg);
+							++C; // courtesy count;
+						}
+						if((kl = kl.slice(i)).length){ turn(pop); return }
+						++ni; kl = null; pop(o);
+					}());
+				} Gun.on.put = put;
+				// TODO: MARK!!! clock below, reconnect sync, SEA certify wire merge, User.auth taking multiple times, // msg put, put, say ack, hear loop...
+				// WASIS BUG! local peer not ack. .off other people: .open
+				function ham(val, key, soul, state, msg){
+					var ctx = msg._||'', root = ctx.root, graph = root.graph, tmp;
+					var vertex = graph[soul] || empty, was = state_is(vertex, key, 1), known = vertex[key];
+					
+					var DBG = ctx.DBG; if(tmp = console.STAT){ if(!graph[soul] || !known){ tmp.has = (tmp.has || 0) + 1; } }
+
+					var now = State();
+					if(state > now){
+						setTimeout(function(){ ham(val, key, soul, state, msg); }, (tmp = state - now) > MD? MD : tmp); // Max Defer 32bit. :(
+						console.STAT && console.STAT(((DBG||ctx).Hf = +new Date), tmp, 'future');
+						return;
+					}
+					if(state < was){ /*old;*/ { return } } // but some chains have a cache miss that need to re-fire. // TODO: Improve in future. // for AXE this would reduce rebroadcast, but GUN does it on message forwarding. // TURNS OUT CACHE MISS WAS NOT NEEDED FOR NEW CHAINS ANYMORE!!! DANGER DANGER DANGER, ALWAYS RETURN! (or am I missing something?)
+					if(!ctx.faith){ // TODO: BUG? Can this be used for cache miss as well? // Yes this was a bug, need to check cache miss for RAD tests, but should we care about the faith check now? Probably not.
+						if(state === was && (val === known || L(val) <= L(known))){ /*console.log("same");*/ /*same;*/ if(!ctx.miss){ return } } // same
+					}
+					ctx.stun++; // TODO: 'forget' feature in SEA tied to this, bad approach, but hacked in for now. Any changes here must update there.
+					var aid = msg['#']+ctx.all++, id = {toString: function(){ return aid }, _: ctx}; id.toJSON = id.toString; // this *trick* makes it compatible between old & new versions.
+					root.dup.track(id)['#'] = msg['#']; // fixes new OK acks for RPC like RTC.
+					DBG && (DBG.ph = DBG.ph || +new Date);
+					root.on('put', {'#': id, '@': msg['@'], put: {'#': soul, '.': key, ':': val, '>': state}, ok: msg.ok, _: ctx});
+				}
+				function map(msg){
+					var DBG; if(DBG = (msg._||'').DBG){ DBG.pa = +new Date; DBG.pm = DBG.pm || +new Date;}
+	      	var eve = this, root = eve.as, graph = root.graph, ctx = msg._, put = msg.put, soul = put['#'], key = put['.'], val = put[':'], state = put['>'], id = msg['#'], tmp;
+	      	if((tmp = ctx.msg) && (tmp = tmp.put) && (tmp = tmp[soul])){ state_ify(tmp, key, state, val, soul); } // necessary! or else out messages do not get SEA transforms.
+	      	//var bytes = ((graph[soul]||'')[key]||'').length||1;
+					graph[soul] = state_ify(graph[soul], key, state, val, soul);
+					if(tmp = (root.next||'')[soul]){
+						//tmp.bytes = (tmp.bytes||0) + ((val||'').length||1) - bytes;
+						//if(tmp.bytes > 2**13){ Gun.log.once('byte-limit', "Note: In the future, GUN peers will enforce a ~4KB query limit. Please see https://gun.eco/docs/Page") }
+						tmp.on('in', msg);
+					}
+					fire(ctx);
+					eve.to.next(msg);
+				}
+				function fire(ctx, msg){ var root;
+					if(ctx.stop){ return }
+					if(!ctx.err && 0 < --ctx.stun){ return } // TODO: 'forget' feature in SEA tied to this, bad approach, but hacked in for now. Any changes here must update there.
+					ctx.stop = 1;
+					if(!(root = ctx.root)){ return }
+					var tmp = ctx.match; tmp.end = 1;
+					if(tmp === root.hatch){ if(!(tmp = ctx.latch) || tmp.end){ delete root.hatch; } else { root.hatch = tmp; } }
+					ctx.hatch && ctx.hatch(); // TODO: rename/rework how put & this interact.
+					setTimeout.each(ctx.match, function(cb){cb && cb();}); 
+					if(!(msg = ctx.msg) || ctx.err || msg.err){ return }
+					msg.out = universe;
+					ctx.root.on('out', msg);
+
+					CF(); // courtesy check;
+				}
+				function ack(msg){ // aggregate ACKs.
+					var id = msg['@'] || '', ctx;
+					if(!(ctx = id._)){
+						var dup = (dup = msg.$) && (dup = dup._) && (dup = dup.root) && (dup = dup.dup);
+						if(!(dup = dup.check(id))){ return }
+						msg['@'] = dup['#'] || msg['@']; // This doesn't do anything anymore, backtrack it to something else?
+						return;
+					}
+					ctx.acks = (ctx.acks||0) + 1;
+					if(ctx.err = msg.err){
+						msg['@'] = ctx['#'];
+						fire(ctx); // TODO: BUG? How it skips/stops propagation of msg if any 1 item is error, this would assume a whole batch/resync has same malicious intent.
+					}
+					ctx.ok = msg.ok || ctx.ok;
+					if(!ctx.stop && !ctx.crack){ ctx.crack = ctx.match && ctx.match.push(function(){back(ctx);}); } // handle synchronous acks. NOTE: If a storage peer ACKs synchronously then the PUT loop has not even counted up how many items need to be processed, so ctx.STOP flags this and adds only 1 callback to the end of the PUT loop.
+					back(ctx);
+				}
+				function back(ctx){
+					if(!ctx || !ctx.root){ return }
+					if(ctx.stun || ctx.acks !== ctx.all){ return }
+					ctx.root.on('in', {'@': ctx['#'], err: ctx.err, ok: ctx.err? u : ctx.ok || {'':1}});
+				}
+
+				var ERR = "Error: Invalid graph!";
+				var cut = function(s){ return " '"+(''+s).slice(0,9)+"...' " };
+				var L = JSON.stringify, MD = 2147483647, State = Gun.state;
+				var C = 0, CT, CF = function(){if(C>999 && (C/-(CT - (CT = +new Date))>1)){Gun.window && console.log("Warning: You're syncing 1K+ records a second, faster than DOM can update - consider limiting query.");CF=function(){C=0;};}};
+
+			}());
+	(function(){
+				Gun.on.get = function(msg, gun){
+					var root = gun._, get = msg.get, soul = get['#'], node = root.graph[soul], has = get['.'];
+					var next = root.next || (root.next = {}), at = next[soul];
+					// queue concurrent GETs?
+					// TODO: consider tagging original message into dup for DAM.
+					// TODO: ^ above? In chat app, 12 messages resulted in same peer asking for `#user.pub` 12 times. (same with #user GET too, yipes!) // DAM note: This also resulted in 12 replies from 1 peer which all had same ##hash but none of them deduped because each get was different.
+					// TODO: Moving quick hacks fixing these things to axe for now.
+					// TODO: a lot of GET #foo then GET #foo."" happening, why?
+					// TODO: DAM's ## hash check, on same get ACK, producing multiple replies still, maybe JSON vs YSON?
+					// TMP note for now: viMZq1slG was chat LEX query #.
+					/*if(gun !== (tmp = msg.$) && (tmp = (tmp||'')._)){
+						if(tmp.Q){ tmp.Q[msg['#']] = ''; return } // chain does not need to ask for it again.
+						tmp.Q = {};
+					}*/
+					/*if(u === has){
+						if(at.Q){
+							//at.Q[msg['#']] = '';
+							//return;
+						}
+						at.Q = {};
+					}*/
+					var ctx = msg._||{}, DBG = ctx.DBG = msg.DBG;
+					DBG && (DBG.g = +new Date);
+					//console.log("GET:", get, node, has);
+					if(!node){ return root.on('get', msg) }
+					if(has){
+						if('string' != typeof has || u === node[has]){ return root.on('get', msg) }
+						node = state_ify({}, has, state_is(node, has), node[has], soul);
+						// If we have a key in-memory, do we really need to fetch?
+						// Maybe... in case the in-memory key we have is a local write
+						// we still need to trigger a pull/merge from peers.
+					}
+					//Gun.window? Gun.obj.copy(node) : node; // HNPERF: If !browser bump Performance? Is this too dangerous to reference root graph? Copy / shallow copy too expensive for big nodes. Gun.obj.to(node); // 1 layer deep copy // Gun.obj.copy(node); // too slow on big nodes
+					node && ack(msg, node);
+					root.on('get', msg); // send GET to storage adapters.
+				};
+				function ack(msg, node){
+					var S = +new Date, ctx = msg._||{}, DBG = ctx.DBG = msg.DBG;
+					var to = msg['#'], id = text_rand(9), keys = Object.keys(node||'').sort(), soul = ((node||'')._||'')['#'], kl = keys.length, root = msg.$._.root, F = (node === root.graph[soul]);
+					console.STAT && console.STAT(S, ((DBG||ctx).gk = +new Date) - S, 'got keys');
+					// PERF: Consider commenting this out to force disk-only reads for perf testing? // TODO: .keys( is slow
+					node && (function go(){
+						S = +new Date;
+						var i = 0, k, put = {}, tmp;
+						while(i < 9 && (k = keys[i++])){
+							state_ify(put, k, state_is(node, k), node[k], soul);
+						}
+						keys = keys.slice(i);
+						(tmp = {})[soul] = put; put = tmp;
+						var faith; if(F){ faith = function(){}; faith.ram = faith.faith = true; } // HNPERF: We're testing performance improvement by skipping going through security again, but this should be audited.
+						tmp = keys.length;
+						console.STAT && console.STAT(S, -(S - (S = +new Date)), 'got copied some');
+						DBG && (DBG.ga = +new Date);
+						root.on('in', {'@': to, '#': id, put: put, '%': (tmp? (id = text_rand(9)) : u), $: root.$, _: faith, DBG: DBG});
+						console.STAT && console.STAT(S, +new Date - S, 'got in');
+						if(!tmp){ return }
+						setTimeout.turn(go);
+					}());
+					if(!node){ root.on('in', {'@': msg['#']}); } // TODO: I don't think I like this, the default lS adapter uses this but "not found" is a sensitive issue, so should probably be handled more carefully/individually.
+				} Gun.on.get.ack = ack;
+			}());
+	(function(){
+				Gun.chain.opt = function(opt){
+					opt = opt || {};
+					var gun = this, at = gun._, tmp = opt.peers || opt;
+					if(!Object.plain(opt)){ opt = {}; }
+					if(!Object.plain(at.opt)){ at.opt = opt; }
+					if('string' == typeof tmp){ tmp = [tmp]; }
+					if(!Object.plain(at.opt.peers)){ at.opt.peers = {};}
+					if(tmp instanceof Array){
+						opt.peers = {};
+						tmp.forEach(function(url){
+							var p = {}; p.id = p.url = url;
+							opt.peers[url] = at.opt.peers[url] = at.opt.peers[url] || p;
+						});
+					}
+					obj_each(opt, function each(k){ var v = this[k];
+						if((this && this.hasOwnProperty(k)) || 'string' == typeof v || Object.empty(v)){ this[k] = v; return }
+						if(v && v.constructor !== Object && !(v instanceof Array)){ return }
+						obj_each(v, each);
+					});
+					at.opt.from = opt;
+					Gun.on('opt', at);
+					at.opt.uuid = at.opt.uuid || function uuid(l){ return Gun.state().toString(36).replace('.','') + String.random(l||12) };
+					return gun;
+				};
+			}());
+
+			var obj_each = function(o,f){ Object.keys(o).forEach(f,o); }, text_rand = String.random, turn = setTimeout.turn, valid = Gun.valid, state_is = Gun.state.is, state_ify = Gun.state.ify, u, empty = {}, C;
+
+			Gun.log = function(){ return (!Gun.log.off && C.log.apply(C, arguments)), [].slice.call(arguments).join(' ') };
+			Gun.log.once = function(w,s,o){ return (o = Gun.log.once)[w] = o[w] || 0, o[w]++ || Gun.log(s) };
+
+			if(typeof window !== "undefined"){ (window.GUN = window.Gun = Gun).window = window; }
+			try{ if(typeof MODULE !== "undefined"){ MODULE.exports = Gun; } }catch(e){}
+			module.exports = Gun;
+			
+			(Gun.window||{}).console = (Gun.window||{}).console || {log: function(){}};
+			(C = console).only = function(i, s){ return (C.only.i && i === C.only.i && C.only.i++) && (C.log.apply(C, arguments) || s) };
+			Gun.log.once("welcome", "Hello wonderful person! :) Thanks for using GUN, please ask for help on http://chat.gun.eco if anything takes you longer than 5min to figure out!");
+		})(USE, './root');
+	USE(function(module){
+			var Gun = USE('./root');
+			Gun.chain.back = function(n, opt){ var tmp;
+				n = n || 1;
+				if(-1 === n || Infinity === n){
+					return this._.root.$;
+				} else
+				if(1 === n){
+					return (this._.back || this._).$;
+				}
+				var gun = this, at = gun._;
+				if(typeof n === 'string'){
+					n = n.split('.');
+				}
+				if(n instanceof Array){
+					var i = 0, l = n.length, tmp = at;
+					for(i; i < l; i++){
+						tmp = (tmp||empty)[n[i]];
+					}
+					if(u !== tmp){
+						return opt? gun : tmp;
+					} else
+					if((tmp = at.back)){
+						return tmp.$.back(n, opt);
+					}
+					return;
+				}
+				if('function' == typeof n){
+					var yes, tmp = {back: at};
+					while((tmp = tmp.back)
+					&& u === (yes = n(tmp, opt))){}
+					return yes;
+				}
+				if('number' == typeof n){
+					return (at.back || at).$.back(n - 1);
+				}
+				return this;
+			};
+			var empty = {}, u;
+		})(USE, './back');
+	USE(function(module){
+			// WARNING: GUN is very simple, but the JavaScript chaining API around GUN
+			// is complicated and was extremely hard to build. If you port GUN to another
+			// language, consider implementing an easier API to build.
+			var Gun = USE('./root');
+			Gun.chain.chain = function(sub){
+				var gun = this, at = gun._, chain = new (sub || gun).constructor(gun), cat = chain._, root;
+				cat.root = root = at.root;
+				cat.id = ++root.once;
+				cat.back = gun._;
+				cat.on = Gun.on;
+				cat.on('in', Gun.on.in, cat); // For 'in' if I add my own listeners to each then I MUST do it before in gets called. If I listen globally for all incoming data instead though, regardless of individual listeners, I can transform the data there and then as well.
+				cat.on('out', Gun.on.out, cat); // However for output, there isn't really the global option. I must listen by adding my own listener individually BEFORE this one is ever called.
+				return chain;
+			};
+
+			function output(msg){
+				var get, at = this.as, back = at.back, root = at.root, tmp;
+				if(!msg.$){ msg.$ = at.$; }
+				this.to.next(msg);
+				if(at.err){ at.on('in', {put: at.put = u, $: at.$}); return }
+				if(get = msg.get){
+					/*if(u !== at.put){
+						at.on('in', at);
+						return;
+					}*/
+					if(root.pass){ root.pass[at.id] = at; } // will this make for buggy behavior elsewhere?
+					if(at.lex){ Object.keys(at.lex).forEach(function(k){ tmp[k] = at.lex[k]; }, tmp = msg.get = msg.get || {}); }
+					if(get['#'] || at.soul){
+						get['#'] = get['#'] || at.soul;
+						msg['#'] || (msg['#'] = text_rand(9)); // A3120 ?
+						back = (root.$.get(get['#'])._);
+						if(!(get = get['.'])){ // soul
+							tmp = back.ask && back.ask['']; // check if we have already asked for the full node
+							(back.ask || (back.ask = {}))[''] = back; // add a flag that we are now.
+							if(u !== back.put){ // if we already have data,
+								back.on('in', back); // send what is cached down the chain
+								if(tmp){ return } // and don't ask for it again.
+							}
+							msg.$ = back.$;
+						} else
+						if(obj_has(back.put, get)){ // TODO: support #LEX !
+							tmp = back.ask && back.ask[get];
+							(back.ask || (back.ask = {}))[get] = back.$.get(get)._;
+							back.on('in', {get: get, put: {'#': back.soul, '.': get, ':': back.put[get], '>': state_is(root.graph[back.soul], get)}});
+							if(tmp){ return }
+						}
+							/*put = (back.$.get(get)._);
+							if(!(tmp = put.ack)){ put.ack = -1 }
+							back.on('in', {
+								$: back.$,
+								put: Gun.state.ify({}, get, Gun.state(back.put, get), back.put[get]),
+								get: back.get
+							});
+							if(tmp){ return }
+						} else
+						if('string' != typeof get){
+							var put = {}, meta = (back.put||{})._;
+							Gun.obj.map(back.put, function(v,k){
+								if(!Gun.text.match(k, get)){ return }
+								put[k] = v;
+							})
+							if(!Gun.obj.empty(put)){
+								put._ = meta;
+								back.on('in', {$: back.$, put: put, get: back.get})
+							}
+							if(tmp = at.lex){
+								tmp = (tmp._) || (tmp._ = function(){});
+								if(back.ack < tmp.ask){ tmp.ask = back.ack }
+								if(tmp.ask){ return }
+								tmp.ask = 1;
+							}
+						}
+						*/
+						root.ask(ack, msg); // A3120 ?
+						return root.on('in', msg);
+					}
+					//if(root.now){ root.now[at.id] = root.now[at.id] || true; at.pass = {} }
+					if(get['.']){
+						if(at.get){
+							msg = {get: {'.': at.get}, $: at.$};
+							(back.ask || (back.ask = {}))[at.get] = msg.$._; // TODO: PERFORMANCE? More elegant way?
+							return back.on('out', msg);
+						}
+						msg = {get: at.lex? msg.get : {}, $: at.$};
+						return back.on('out', msg);
+					}
+					(at.ask || (at.ask = {}))[''] = at;	 //at.ack = at.ack || -1;
+					if(at.get){
+						get['.'] = at.get;
+						(back.ask || (back.ask = {}))[at.get] = msg.$._; // TODO: PERFORMANCE? More elegant way?
+						return back.on('out', msg);
+					}
+				}
+				return back.on('out', msg);
+			} Gun.on.out = output;
+
+			function input(msg, cat){ cat = cat || this.as; // TODO: V8 may not be able to optimize functions with different parameter calls, so try to do benchmark to see if there is any actual difference.
+				var root = cat.root, gun = msg.$ || (msg.$ = cat.$), at = (gun||'')._ || empty, tmp = msg.put||'', soul = tmp['#'], key = tmp['.'], change = (u !== tmp['='])? tmp['='] : tmp[':'], state = tmp['>'] || -Infinity, sat; // eve = event, at = data at, cat = chain at, sat = sub at (children chains).
+				if(u !== msg.put && (u === tmp['#'] || u === tmp['.'] || (u === tmp[':'] && u === tmp['=']) || u === tmp['>'])){ // convert from old format
+					if(!valid(tmp)){
+						if(!(soul = ((tmp||'')._||'')['#'])){ console.log("chain not yet supported for", tmp, '...', msg, cat); return; }
+						gun = cat.root.$.get(soul);
+						return setTimeout.each(Object.keys(tmp).sort(), function(k){ // TODO: .keys( is slow // BUG? ?Some re-in logic may depend on this being sync?
+							if('_' == k || u === (state = state_is(tmp, k))){ return }
+							cat.on('in', {$: gun, put: {'#': soul, '.': k, '=': tmp[k], '>': state}, VIA: msg});
+						});
+					}
+					cat.on('in', {$: at.back.$, put: {'#': soul = at.back.soul, '.': key = at.has || at.get, '=': tmp, '>': state_is(at.back.put, key)}, via: msg}); // TODO: This could be buggy! It assumes/approxes data, other stuff could have corrupted it.
+					return;
+				}
+				if((msg.seen||'')[cat.id]){ return } (msg.seen || (msg.seen = function(){}))[cat.id] = cat; // help stop some infinite loops
+
+				if(cat !== at){ // don't worry about this when first understanding the code, it handles changing contexts on a message. A soul chain will never have a different context.
+					Object.keys(msg).forEach(function(k){ tmp[k] = msg[k]; }, tmp = {}); // make copy of message
+					tmp.get = cat.get || tmp.get;
+					if(!cat.soul && !cat.has){ // if we do not recognize the chain type
+						tmp.$$$ = tmp.$$$ || cat.$; // make a reference to wherever it came from.
+					} else
+					if(at.soul){ // a has (property) chain will have a different context sometimes if it is linked (to a soul chain). Anything that is not a soul or has chain, will always have different contexts.
+						tmp.$ = cat.$;
+						tmp.$$ = tmp.$$ || at.$;
+					}
+					msg = tmp; // use the message with the new context instead;
+				}
+				unlink(msg, cat);
+
+				if(((cat.soul/* && (cat.ask||'')['']*/) || msg.$$) && state >= state_is(root.graph[soul], key)){ // The root has an in-memory cache of the graph, but if our peer has asked for the data then we want a per deduplicated chain copy of the data that might have local edits on it.
+					(tmp = root.$.get(soul)._).put = state_ify(tmp.put, key, state, change, soul);
+				}
+				if(!at.soul /*&& (at.ask||'')['']*/ && state >= state_is(root.graph[soul], key) && (sat = (root.$.get(soul)._.next||'')[key])){ // Same as above here, but for other types of chains. // TODO: Improve perf by preventing echoes recaching.
+					sat.put = change; // update cache
+					if('string' == typeof (tmp = valid(change))){
+						sat.put = root.$.get(tmp)._.put || change; // share same cache as what we're linked to.
+					}
+				}
+
+				this.to && this.to.next(msg); // 1st API job is to call all chain listeners.
+				// TODO: Make input more reusable by only doing these (some?) calls if we are a chain we recognize? This means each input listener would be responsible for when listeners need to be called, which makes sense, as they might want to filter.
+				cat.any && setTimeout.each(Object.keys(cat.any), function(any){ (any = cat.any[any]) && any(msg); },0,99); // 1st API job is to call all chain listeners. // TODO: .keys( is slow // BUG: Some re-in logic may depend on this being sync.
+				cat.echo && setTimeout.each(Object.keys(cat.echo), function(lat){ (lat = cat.echo[lat]) && lat.on('in', msg); },0,99); // & linked at chains // TODO: .keys( is slow // BUG: Some re-in logic may depend on this being sync.
+
+				if(((msg.$$||'')._||at).soul){ // comments are linear, but this line of code is non-linear, so if I were to comment what it does, you'd have to read 42 other comments first... but you can't read any of those comments until you first read this comment. What!? // shouldn't this match link's check?
+					// is there cases where it is a $$ that we do NOT want to do the following? 
+					if((sat = cat.next) && (sat = sat[key])){ // TODO: possible trick? Maybe have `ionmap` code set a sat? // TODO: Maybe we should do `cat.ask` instead? I guess does not matter.
+						tmp = {}; Object.keys(msg).forEach(function(k){ tmp[k] = msg[k]; });
+						tmp.$ = (msg.$$||msg.$).get(tmp.get = key); delete tmp.$$; delete tmp.$$$;
+						sat.on('in', tmp);
+					}
+				}
+
+				link(msg, cat);
+			} Gun.on.in = input;
+
+			function link(msg, cat){ cat = cat || this.as || msg.$._;
+				if(msg.$$ && this !== Gun.on){ return } // $$ means we came from a link, so we are at the wrong level, thus ignore it unless overruled manually by being called directly.
+				if(!msg.put || cat.soul){ return } // But you cannot overrule being linked to nothing, or trying to link a soul chain - that must never happen.
+				var put = msg.put||'', link = put['=']||put[':'], tmp;
+				var root = cat.root, tat = root.$.get(put['#']).get(put['.'])._;
+				if('string' != typeof (link = valid(link))){
+					if(this === Gun.on){ (tat.echo || (tat.echo = {}))[cat.id] = cat; } // allow some chain to explicitly force linking to simple data.
+					return; // by default do not link to data that is not a link.
+				}
+				if((tat.echo || (tat.echo = {}))[cat.id] // we've already linked ourselves so we do not need to do it again. Except... (annoying implementation details)
+					&& !(root.pass||'')[cat.id]){ return } // if a new event listener was added, we need to make a pass through for it. The pass will be on the chain, not always the chain passed down. 
+				if(tmp = root.pass){ if(tmp[link+cat.id]){ return } tmp[link+cat.id] = 1; } // But the above edge case may "pass through" on a circular graph causing infinite passes, so we hackily add a temporary check for that.
+
+				(tat.echo||(tat.echo={}))[cat.id] = cat; // set ourself up for the echo! // TODO: BUG? Echo to self no longer causes problems? Confirm.
+
+				if(cat.has){ cat.link = link; }
+				var sat = root.$.get(tat.link = link)._; // grab what we're linking to.
+				(sat.echo || (sat.echo = {}))[tat.id] = tat; // link it.
+				var tmp = cat.ask||''; // ask the chain for what needs to be loaded next!
+				if(tmp[''] || cat.lex){ // we might need to load the whole thing // TODO: cat.lex probably has edge case bugs to it, need more test coverage.
+					sat.on('out', {get: {'#': link}});
+				}
+				setTimeout.each(Object.keys(tmp), function(get, sat){ // if sub chains are asking for data. // TODO: .keys( is slow // BUG? ?Some re-in logic may depend on this being sync?
+					if(!get || !(sat = tmp[get])){ return }
+					sat.on('out', {get: {'#': link, '.': get}}); // go get it.
+				},0,99);
+			} Gun.on.link = link;
+
+			function unlink(msg, cat){ // ugh, so much code for seemingly edge case behavior.
+				var put = msg.put||'', change = (u !== put['='])? put['='] : put[':'], root = cat.root, link, tmp;
+				if(u === change){ // 1st edge case: If we have a brand new database, no data will be found.
+					// TODO: BUG! because emptying cache could be async from below, make sure we are not emptying a newer cache. So maybe pass an Async ID to check against?
+					// TODO: BUG! What if this is a map? // Warning! Clearing things out needs to be robust against sync/async ops, or else you'll see `map val get put` test catastrophically fail because map attempts to link when parent graph is streamed before child value gets set. Need to differentiate between lack acks and force clearing.
+					if(cat.soul && u !== cat.put){ return } // data may not be found on a soul, but if a soul already has data, then nothing can clear the soul as a whole.
+					//if(!cat.has){ return }
+					tmp = (msg.$$||msg.$||'')._||'';
+					if(msg['@'] && (u !== tmp.put || u !== cat.put)){ return } // a "not found" from other peers should not clear out data if we have already found it.
+					//if(cat.has && u === cat.put && !(root.pass||'')[cat.id]){ return } // if we are already unlinked, do not call again, unless edge case. // TODO: BUG! This line should be deleted for "unlink deeply nested".
+					if(link = cat.link || msg.linked){
+						delete (root.$.get(link)._.echo||'')[cat.id];
+					}
+					if(cat.has){ // TODO: Empty out links, maps, echos, acks/asks, etc.?
+						cat.link = null;
+					}
+					cat.put = u; // empty out the cache if, for example, alice's car's color no longer exists (relative to alice) if alice no longer has a car.
+					// TODO: BUG! For maps, proxy this so the individual sub is triggered, not all subs.
+					setTimeout.each(Object.keys(cat.next||''), function(get, sat){ // empty out all sub chains. // TODO: .keys( is slow // BUG? ?Some re-in logic may depend on this being sync? // TODO: BUG? This will trigger deeper put first, does put logic depend on nested order? // TODO: BUG! For map, this needs to be the isolated child, not all of them.
+						if(!(sat = cat.next[get])){ return }
+						//if(cat.has && u === sat.put && !(root.pass||'')[sat.id]){ return } // if we are already unlinked, do not call again, unless edge case. // TODO: BUG! This line should be deleted for "unlink deeply nested".
+						if(link){ delete (root.$.get(link).get(get)._.echo||'')[sat.id]; }
+						sat.on('in', {get: get, put: u, $: sat.$}); // TODO: BUG? Add recursive seen check?
+					},0,99);
+					return;
+				}
+				if(cat.soul){ return } // a soul cannot unlink itself.
+				if(msg.$$){ return } // a linked chain does not do the unlinking, the sub chain does. // TODO: BUG? Will this cancel maps?
+				link = valid(change); // need to unlink anytime we are not the same link, though only do this once per unlink (and not on init).
+				tmp = msg.$._||'';
+				if(link === tmp.link || (cat.has && !tmp.link)){
+					if((root.pass||'')[cat.id] && 'string' !== typeof link); else {
+						return;
+					}
+				}
+				delete (tmp.echo||'')[cat.id];
+				unlink({get: cat.get, put: u, $: msg.$, linked: msg.linked = msg.linked || tmp.link}, cat); // unlink our sub chains.
+			} Gun.on.unlink = unlink;
+
+			function ack(msg, ev){
+				//if(!msg['%'] && (this||'').off){ this.off() } // do NOT memory leak, turn off listeners! Now handled by .ask itself
+				// manhattan:
+				var as = this.as, at = as.$._, root = at.root, get = as.get||'', tmp = (msg.put||'')[get['#']]||'';
+				if(!msg.put || ('string' == typeof get['.'] && u === tmp[get['.']])){
+					if(u !== at.put){ return }
+					if(!at.soul && !at.has){ return } // TODO: BUG? For now, only core-chains will handle not-founds, because bugs creep in if non-core chains are used as $ but we can revisit this later for more powerful extensions.
+					at.ack = (at.ack || 0) + 1;
+					at.on('in', {
+						get: at.get,
+						put: at.put = u,
+						$: at.$,
+						'@': msg['@']
+					});
+					/*(tmp = at.Q) && setTimeout.each(Object.keys(tmp), function(id){ // TODO: Temporary testing, not integrated or being used, probably delete.
+						Object.keys(msg).forEach(function(k){ tmp[k] = msg[k] }, tmp = {}); tmp['@'] = id; // copy message
+						root.on('in', tmp);
+					}); delete at.Q;*/
+					return;
+				}
+				(msg._||{}).miss = 1;
+				Gun.on.put(msg);
+				return; // eom
+			}
+
+			var empty = {}, u, text_rand = String.random, valid = Gun.valid, obj_has = function(o, k){ return o && Object.prototype.hasOwnProperty.call(o, k) }, state = Gun.state, state_is = state.is, state_ify = state.ify;
+		})(USE, './chain');
+	USE(function(module){
+			var Gun = USE('./root');
+			Gun.chain.get = function(key, cb, as){
+				var gun, tmp;
+				if(typeof key === 'string'){
+					if(key.length == 0) {	
+						(gun = this.chain())._.err = {err: Gun.log('0 length key!', key)};
+						if(cb){ cb.call(gun, gun._.err); }
+						return gun;
+					}
+					var back = this, cat = back._;
+					var next = cat.next || empty;
+					if(!(gun = next[key])){
+						gun = key && cache(key, back);
+					}
+					gun = gun && gun.$;
+				} else
+				if('function' == typeof key){
+					if(true === cb){ return soul(this, key, cb, as), this }
+					gun = this;
+					var cat = gun._, opt = cb || {}, root = cat.root, id;
+					opt.at = cat;
+					opt.ok = key;
+					var wait = {}; // can we assign this to the at instead, like in once?
+					//var path = []; cat.$.back(at => { at.get && path.push(at.get.slice(0,9))}); path = path.reverse().join('.');
+					function any(msg, eve, f){
+						if(any.stun){ return }
+						if((tmp = root.pass) && !tmp[id]){ return }
+						var at = msg.$._, sat = (msg.$$||'')._, data = (sat||at).put, odd = (!at.has && !at.soul), test = {}, link, tmp;
+						if(odd || u === data){ // handles non-core
+							data = (u === ((tmp = msg.put)||'')['='])? (u === (tmp||'')[':'])? tmp : tmp[':'] : tmp['='];
+						}
+						if(link = ('string' == typeof (tmp = Gun.valid(data)))){
+							data = (u === (tmp = root.$.get(tmp)._.put))? opt.not? u : data : tmp;
+						}
+						if(opt.not && u === data){ return }
+						if(u === opt.stun){
+							if((tmp = root.stun) && tmp.on){
+								cat.$.back(function(a){ // our chain stunned?
+									tmp.on(''+a.id, test = {});
+									if((test.run || 0) < any.id){ return test } // if there is an earlier stun on gapless parents/self.
+								});
+								!test.run && tmp.on(''+at.id, test = {}); // this node stunned?
+								!test.run && sat && tmp.on(''+sat.id, test = {}); // linked node stunned?
+								if(any.id > test.run){
+									if(!test.stun || test.stun.end){
+										test.stun = tmp.on('stun');
+										test.stun = test.stun && test.stun.last;
+									}
+									if(test.stun && !test.stun.end){
+										//if(odd && u === data){ return }
+										//if(u === msg.put){ return } // "not found" acks will be found if there is stun, so ignore these.
+										(test.stun.add || (test.stun.add = {}))[id] = function(){ any(msg,eve,1); }; // add ourself to the stun callback list that is called at end of the write.
+										return;
+									}
+								}
+							}
+							if(/*odd &&*/ u === data){ f = 0; } // if data not found, keep waiting/trying.
+							/*if(f && u === data){
+								cat.on('out', opt.out);
+								return;
+							}*/
+							if((tmp = root.hatch) && !tmp.end && u === opt.hatch && !f){ // quick hack! // What's going on here? Because data is streamed, we get things one by one, but a lot of developers would rather get a callback after each batch instead, so this does that by creating a wait list per chain id that is then called at the end of the batch by the hatch code in the root put listener.
+								if(wait[at.$._.id]){ return } wait[at.$._.id] = 1;
+								tmp.push(function(){any(msg,eve,1);});
+								return;
+							} wait = {}; // end quick hack.
+						}
+						// call:
+						if(root.pass){ if(root.pass[id+at.id]){ return } root.pass[id+at.id] = 1; }
+						if(opt.on){ opt.ok.call(at.$, data, at.get, msg, eve || any); return } // TODO: Also consider breaking `this` since a lot of people do `=>` these days and `.call(` has slower performance.
+						if(opt.v2020){ opt.ok(msg, eve || any); return }
+						Object.keys(msg).forEach(function(k){ tmp[k] = msg[k]; }, tmp = {}); msg = tmp; msg.put = data; // 2019 COMPATIBILITY! TODO: GET RID OF THIS!
+						opt.ok.call(opt.as, msg, eve || any); // is this the right
+					}				any.at = cat;
+					//(cat.any||(cat.any=function(msg){ setTimeout.each(Object.keys(cat.any||''), function(act){ (act = cat.any[act]) && act(msg) },0,99) }))[id = String.random(7)] = any; // maybe switch to this in future?
+					(cat.any||(cat.any={}))[id = String.random(7)] = any;
+					any.off = function(){ any.stun = 1; if(!cat.any){ return } delete cat.any[id]; };
+					any.rid = rid; // logic from old version, can we clean it up now?
+					any.id = opt.run || ++root.once; // used in callback to check if we are earlier than a write. // will this ever cause an integer overflow?
+					tmp = root.pass; (root.pass = {})[id] = 1; // Explanation: test trade-offs want to prevent recursion so we add/remove pass flag as it gets fulfilled to not repeat, however map map needs many pass flags - how do we reconcile?
+					opt.out = opt.out || {get: {}};
+					cat.on('out', opt.out);
+					root.pass = tmp;
+					return gun;
+				} else
+				if('number' == typeof key){
+					return this.get(''+key, cb, as);
+				} else
+				if('string' == typeof (tmp = valid(key))){
+					return this.get(tmp, cb, as);
+				} else
+				if(tmp = this.get.next){
+					gun = tmp(this, key);
+				}
+				if(!gun){
+					(gun = this.chain())._.err = {err: Gun.log('Invalid get request!', key)}; // CLEAN UP
+					if(cb){ cb.call(gun, gun._.err); }
+					return gun;
+				}
+				if(cb && 'function' == typeof cb){
+					gun.get(cb, as);
+				}
+				return gun;
+			};
+			function cache(key, back){
+				var cat = back._, next = cat.next, gun = back.chain(), at = gun._;
+				if(!next){ next = cat.next = {}; }
+				next[at.get = key] = at;
+				if(back === cat.root.$){
+					at.soul = key;
+				} else
+				if(cat.soul || cat.has){
+					at.has = key;
+					//if(obj_has(cat.put, key)){
+						//at.put = cat.put[key];
+					//}
+				}
+				return at;
+			}
+			function soul(gun, cb, opt, as){
+				var cat = gun._, acks = 0, tmp;
+				if(tmp = cat.soul || cat.link){ return cb(tmp, as, cat) }
+				if(cat.jam){ return cat.jam.push([cb, as]) }
+				cat.jam = [[cb,as]];
+				gun.get(function go(msg, eve){
+					if(u === msg.put && !cat.root.opt.super && (tmp = Object.keys(cat.root.opt.peers).length) && ++acks <= tmp){ // TODO: super should not be in core code, bring AXE up into core instead to fix? // TODO: .keys( is slow
+						return;
+					}
+					eve.rid(msg);
+					var at = ((at = msg.$) && at._) || {}, i = 0, as;
+					tmp = cat.jam; delete cat.jam; // tmp = cat.jam.splice(0, 100);
+					//if(tmp.length){ process.nextTick(function(){ go(msg, eve) }) }
+					while(as = tmp[i++]){ //Gun.obj.map(tmp, function(as, cb){
+						var cb = as[0], id; as = as[1];
+						cb && cb(id = at.link || at.soul || Gun.valid(msg.put) || ((msg.put||{})._||{})['#'], as, msg, eve);
+					} //);
+				}, {out: {get: {'.':true}}});
+				return gun;
+			}
+			function rid(at){
+				var cat = this.at || this.on;
+				if(!at || cat.soul || cat.has){ return this.off() }
+				if(!(at = (at = (at = at.$ || at)._ || at).id)){ return }
+				var map = cat.map, tmp, seen;
+				//if(!map || !(tmp = map[at]) || !(tmp = tmp.at)){ return }
+				if(tmp = (seen = this.seen || (this.seen = {}))[at]){ return true }
+				seen[at] = true;
+				return;
+				//tmp.echo[cat.id] = {}; // TODO: Warning: This unsubscribes ALL of this chain's listeners from this link, not just the one callback event.
+				//obj.del(map, at); // TODO: Warning: This unsubscribes ALL of this chain's listeners from this link, not just the one callback event.
+				return;
+			}
+			var empty = {}, valid = Gun.valid, u;
+		})(USE, './get');
+	USE(function(module){
+			var Gun = USE('./root');
+			Gun.chain.put = function(data, cb, as){ // I rewrote it :)
+				var gun = this, at = gun._, root = at.root;
+				as = as || {};
+				as.root = at.root;
+				as.run || (as.run = root.once);
+				stun(as, at.id); // set a flag for reads to check if this chain is writing.
+				as.ack = as.ack || cb;
+				as.via = as.via || gun;
+				as.data = as.data || data;
+				as.soul || (as.soul = at.soul || ('string' == typeof cb && cb));
+				var s = as.state = as.state || Gun.state();
+				if('function' == typeof data){ data(function(d){ as.data = d; gun.put(u,u,as); }); return gun }
+				if(!as.soul){ return get(as), gun }
+				as.$ = root.$.get(as.soul); // TODO: This may not allow user chaining and similar?
+				as.todo = [{it: as.data, ref: as.$}];
+				as.turn = as.turn || turn;
+				as.ran = as.ran || ran;
+				//var path = []; as.via.back(at => { at.get && path.push(at.get.slice(0,9)) }); path = path.reverse().join('.');
+				// TODO: Perf! We only need to stun chains that are being modified, not necessarily written to.
+				(function walk(){
+					var to = as.todo, at = to.pop(), d = at.it, cid = at.ref && at.ref._.id, v, k, cat, tmp, g;
+					stun(as, at.ref);
+					if(tmp = at.todo){
+						k = tmp.pop(); d = d[k];
+						if(tmp.length){ to.push(at); }
+					}
+					k && (to.path || (to.path = [])).push(k);
+					if(!(v = valid(d)) && !(g = Gun.is(d))){
+						if(!Object.plain(d)){ ran.err(as, "Invalid data: "+ check(d) +" at " + (as.via.back(function(at){at.get && tmp.push(at.get);}, tmp = []) || tmp.join('.'))+'.'+(to.path||[]).join('.')); return }
+						var seen = as.seen || (as.seen = []), i = seen.length;
+						while(i--){ if(d === (tmp = seen[i]).it){ v = d = tmp.link; break } }
+					}
+					if(k && v){ at.node = state_ify(at.node, k, s, d); } // handle soul later.
+					else {
+						if(!as.seen){ ran.err(as, "Data at root of graph must be a node (an object)."); return }
+						as.seen.push(cat = {it: d, link: {}, todo: g? [] : Object.keys(d).sort().reverse(), path: (to.path||[]).slice(), up: at}); // Any perf reasons to CPU schedule this .keys( ?
+						at.node = state_ify(at.node, k, s, cat.link);
+						!g && cat.todo.length && to.push(cat);
+						// ---------------
+						var id = as.seen.length;
+						(as.wait || (as.wait = {}))[id] = '';
+						tmp = (cat.ref = (g? d : k? at.ref.get(k) : at.ref))._;
+						(tmp = (d && (d._||'')['#']) || tmp.soul || tmp.link)? resolve({soul: tmp}) : cat.ref.get(resolve, {run: as.run, /*hatch: 0,*/ v2020:1, out:{get:{'.':' '}}}); // TODO: BUG! This should be resolve ONLY soul to prevent full data from being loaded. // Fixed now?
+						//setTimeout(function(){ if(F){ return } console.log("I HAVE NOT BEEN CALLED!", path, id, cat.ref._.id, k) }, 9000); var F; // MAKE SURE TO ADD F = 1 below!
+						function resolve(msg, eve){
+							var end = cat.link['#'];
+							if(eve){ eve.off(); eve.rid(msg); } // TODO: Too early! Check all peers ack not found.
+							// TODO: BUG maybe? Make sure this does not pick up a link change wipe, that it uses the changign link instead.
+							var soul = end || msg.soul || (tmp = (msg.$$||msg.$)._||'').soul || tmp.link || ((tmp = tmp.put||'')._||'')['#'] || tmp['#'] || (((tmp = msg.put||'') && msg.$$)? tmp['#'] : (tmp['=']||tmp[':']||'')['#']);
+							!end && stun(as, msg.$);
+							if(!soul && !at.link['#']){ // check soul link above us
+								(at.wait || (at.wait = [])).push(function(){ resolve(msg, eve); }); // wait
+								return;
+							}
+							if(!soul){
+								soul = [];
+								(msg.$$||msg.$).back(function(at){
+									if(tmp = at.soul || at.link){ return soul.push(tmp) }
+									soul.push(at.get);
+								});
+								soul = soul.reverse().join('/');
+							}
+							cat.link['#'] = soul;
+							!g && (((as.graph || (as.graph = {}))[soul] = (cat.node || (cat.node = {_:{}})))._['#'] = soul);
+							delete as.wait[id];
+							cat.wait && setTimeout.each(cat.wait, function(cb){ cb && cb(); });
+							as.ran(as);
+						}					// ---------------
+					}
+					if(!to.length){ return as.ran(as) }
+					as.turn(walk);
+				}());
+				return gun;
+			};
+
+			function stun(as, id){
+				if(!id){ return } id = (id._||'').id||id;
+				var run = as.root.stun || (as.root.stun = {on: Gun.on}), test = {}, tmp;
+				as.stun || (as.stun = run.on('stun', function(){ }));
+				if(tmp = run.on(''+id)){ tmp.the.last.next(test); }
+				if(test.run >= as.run){ return }
+				run.on(''+id, function(test){
+					if(as.stun.end){
+						this.off();
+						this.to.next(test);
+						return;
+					}
+					test.run = test.run || as.run;
+					test.stun = test.stun || as.stun; return;
+					if(this.to.to){
+						this.the.last.next(test);
+						return;
+					}
+					test.stun = as.stun;
+				});
+			}
+
+			function ran(as){
+				if(as.err){ ran.end(as.stun, as.root); return } // move log handle here.
+				if(as.todo.length || as.end || !Object.empty(as.wait)){ return } as.end = 1;
+				//(as.retry = function(){ as.acks = 0;
+				var cat = (as.$.back(-1)._), root = cat.root, ask = cat.ask(function(ack){
+					root.on('ack', ack);
+					if(ack.err && !ack.lack){ Gun.log(ack); }
+					if(++acks > (as.acks || 0)){ this.off(); } // Adjustable ACKs! Only 1 by default.
+					if(!as.ack){ return }
+					as.ack(ack, this);
+				}, as.opt), acks = 0, stun = as.stun, tmp;
+				(tmp = function(){ // this is not official yet, but quick solution to hack in for now.
+					if(!stun){ return }
+					ran.end(stun, root);
+					setTimeout.each(Object.keys(stun = stun.add||''), function(cb){ if(cb = stun[cb]){cb();} }); // resume the stunned reads // Any perf reasons to CPU schedule this .keys( ?
+				}).hatch = tmp; // this is not official yet ^
+				//console.log(1, "PUT", as.run, as.graph);
+				if(as.ack && !as.ok){ as.ok = as.acks || 9; } // TODO: In future! Remove this! This is just old API support.
+				(as.via._).on('out', {put: as.out = as.graph, ok: as.ok && {'@': as.ok+1}, opt: as.opt, '#': ask, _: tmp});
+				//})();
+			} ran.end = function(stun,root){
+				stun.end = noop; // like with the earlier id, cheaper to make this flag a function so below callbacks do not have to do an extra type check.
+				if(stun.the.to === stun && stun === stun.the.last){ delete root.stun; }
+				stun.off();
+			}; ran.err = function(as, err){
+				(as.ack||noop).call(as, as.out = { err: as.err = Gun.log(err) });
+				as.ran(as);
+			};
+
+			function get(as){
+				var at = as.via._, tmp;
+				as.via = as.via.back(function(at){
+					if(at.soul || !at.get){ return at.$ }
+					tmp = as.data; (as.data = {})[at.get] = tmp;
+				});
+				if(!as.via || !as.via._.soul){
+					as.via = at.root.$.get(((as.data||'')._||'')['#'] || at.$.back('opt.uuid')());
+				}
+				as.via.put(as.data, as.ack, as);
+				
+
+				return;
+				if(at.get && at.back.soul){
+					tmp = as.data;
+					as.via = at.back.$;
+					(as.data = {})[at.get] = tmp; 
+					as.via.put(as.data, as.ack, as);
+					return;
+				}
+			}
+			function check(d, tmp){ return ((d && (tmp = d.constructor) && tmp.name) || typeof d) }
+
+			var u, noop = function(){}, turn = setTimeout.turn, valid = Gun.valid, state_ify = Gun.state.ify;
+		})(USE, './put');
+	USE(function(module){
+			var Gun = USE('./root');
+			USE('./chain');
+			USE('./back');
+			USE('./put');
+			USE('./get');
+			module.exports = Gun;
+		})(USE, './index');
+	USE(function(module){
+			var Gun = USE('./index');
+			Gun.chain.on = function(tag, arg, eas, as){ // don't rewrite!
+				var gun = this, cat = gun._, root = cat.root, act;
+				if(typeof tag === 'string'){
+					if(!arg){ return cat.on(tag) }
+					act = cat.on(tag, arg, eas || cat, as);
+					if(eas && eas.$){
+						(eas.subs || (eas.subs = [])).push(act);
+					}
+					return gun;
+				}
+				var opt = arg;
+				(opt = (true === opt)? {change: true} : opt || {}).not = 1; opt.on = 1;
+				gun.get(tag, opt);
+				/*gun.get(function on(data,key,msg,eve){ var $ = this;
+					if(tmp = root.hatch){ // quick hack!
+						if(wait[$._.id]){ return } wait[$._.id] = 1;
+						tmp.push(function(){on.call($, data,key,msg,eve)});
+						return;
+					}; wait = {}; // end quick hack.
+					tag.call($, data,key,msg,eve);
+				}, opt); // TODO: PERF! Event listener leak!!!?*/
+				/*
+				function one(msg, eve){
+					if(one.stun){ return }
+					var at = msg.$._, data = at.put, tmp;
+					if(tmp = at.link){ data = root.$.get(tmp)._.put }
+					if(opt.not===u && u === data){ return }
+					if(opt.stun===u && (tmp = root.stun) && (tmp = tmp[at.id] || tmp[at.back.id]) && !tmp.end){ // Remember! If you port this into `.get(cb` make sure you allow stun:0 skip option for `.put(`.
+						tmp[id] = function(){one(msg,eve)};
+						return;
+					}
+					//tmp = one.wait || (one.wait = {}); console.log(tmp[at.id] === ''); if(tmp[at.id] !== ''){ tmp[at.id] = tmp[at.id] || setTimeout(function(){tmp[at.id]='';one(msg,eve)},1); return } delete tmp[at.id];
+					// call:
+					if(opt.as){
+						opt.ok.call(opt.as, msg, eve || one);
+					} else {
+						opt.ok.call(at.$, data, msg.get || at.get, msg, eve || one);
+					}
+				};
+				one.at = cat;
+				(cat.act||(cat.act={}))[id = String.random(7)] = one;
+				one.off = function(){ one.stun = 1; if(!cat.act){ return } delete cat.act[id] }
+				cat.on('out', {get: {}});*/
+				return gun;
+			};
+			// Rules:
+			// 1. If cached, should be fast, but not read while write.
+			// 2. Should not retrigger other listeners, should get triggered even if nothing found.
+			// 3. If the same callback passed to many different once chains, each should resolve - an unsubscribe from the same callback should not effect the state of the other resolving chains, if you do want to cancel them all early you should mutate the callback itself with a flag & check for it at top of callback
+			Gun.chain.once = function(cb, opt){ opt = opt || {}; // avoid rewriting
+				if(!cb){ return none(this,opt) }
+				var gun = this, cat = gun._, root = cat.root, data = cat.put, id = String.random(7), tmp;
+				gun.get(function(data,key,msg,eve){
+					var $ = this, at = $._, one = (at.one||(at.one={}));
+					if(eve.stun){ return } if('' === one[id]){ return }
+					if(true === (tmp = Gun.valid(data))){ once(); return }
+					if('string' == typeof tmp){ return } // TODO: BUG? Will this always load?
+					clearTimeout((cat.one||'')[id]); // clear "not found" since they only get set on cat.
+					clearTimeout(one[id]); one[id] = setTimeout(once, opt.wait||99); // TODO: Bug? This doesn't handle plural chains.
+					function once(f){
+						if(!at.has && !at.soul){ at = {put: data, get: key}; } // handles non-core messages.
+						if(u === (tmp = at.put)){ tmp = ((msg.$$||'')._||'').put; }
+						if('string' == typeof Gun.valid(tmp)){
+							tmp = root.$.get(tmp)._.put;
+							if(tmp === u && !f){
+								one[id] = setTimeout(function(){ once(1); }, opt.wait||99); // TODO: Quick fix. Maybe use ack count for more predictable control?
+								return
+							}
+						}
+						//console.log("AND VANISHED", data);
+						if(eve.stun){ return } if('' === one[id]){ return } one[id] = '';
+						if(cat.soul || cat.has){ eve.off(); } // TODO: Plural chains? // else { ?.off() } // better than one check?
+						cb.call($, tmp, at.get);
+						clearTimeout(one[id]); // clear "not found" since they only get set on cat. // TODO: This was hackily added, is it necessary or important? Probably not, in future try removing this. Was added just as a safety for the `&& !f` check.
+					}			}, {on: 1});
+				return gun;
+			};
+			function none(gun,opt,chain){
+				Gun.log.once("valonce", "Chainable val is experimental, its behavior and API may change moving forward. Please play with it and report bugs and ideas on how to improve it.");
+				(chain = gun.chain())._.nix = gun.once(function(data, key){ chain._.on('in', this._); });
+				chain._.lex = gun._.lex; // TODO: Better approach in future? This is quick for now.
+				return chain;
+			}
+
+			Gun.chain.off = function(){
+				// make off more aggressive. Warning, it might backfire!
+				var gun = this, at = gun._, tmp;
+				var cat = at.back;
+				if(!cat){ return }
+				at.ack = 0; // so can resubscribe.
+				if(tmp = cat.next){
+					if(tmp[at.get]){
+						delete tmp[at.get];
+					}
+				}
+				// TODO: delete cat.one[map.id]?
+				if(tmp = cat.ask){
+					delete tmp[at.get];
+				}
+				if(tmp = cat.put){
+					delete tmp[at.get];
+				}
+				if(tmp = at.soul){
+					delete cat.root.graph[tmp];
+				}
+				if(tmp = at.map){
+					Object.keys(tmp).forEach(function(i,at){ at = tmp[i]; //obj_map(tmp, function(at){
+						if(at.link){
+							cat.root.$.get(at.link).off();
+						}
+					});
+				}
+				if(tmp = at.next){
+					Object.keys(tmp).forEach(function(i,neat){ neat = tmp[i]; //obj_map(tmp, function(neat){
+						neat.$.off();
+					});
+				}
+				at.on('off', {});
+				return gun;
+			};
+			var u;
+		})(USE, './on');
+	USE(function(module){
+			var Gun = USE('./index'), next = Gun.chain.get.next;
+			Gun.chain.get.next = function(gun, lex){ var tmp;
+				if(!Object.plain(lex)){ return (next||noop)(gun, lex) }
+				if(tmp = ((tmp = lex['#'])||'')['='] || tmp){ return gun.get(tmp) }
+				(tmp = gun.chain()._).lex = lex; // LEX!
+				gun.on('in', function(eve){
+					if(String.match(eve.get|| (eve.put||'')['.'], lex['.'] || lex['#'] || lex)){
+						tmp.on('in', eve);
+					}
+					this.to.next(eve);
+				});
+				return tmp.$;
+			};
+			Gun.chain.map = function(cb, opt, t){
+				var gun = this, cat = gun._, lex, chain;
+				if(Object.plain(cb)){ lex = cb['.']? cb : {'.': cb}; cb = u; }
+				if(!cb){
+					if(chain = cat.each){ return chain }
+					(cat.each = chain = gun.chain())._.lex = lex || chain._.lex || cat.lex;
+					chain._.nix = gun.back('nix');
+					gun.on('in', map, chain._);
+					return chain;
+				}
+				Gun.log.once("mapfn", "Map functions are experimental, their behavior and API may change moving forward. Please play with it and report bugs and ideas on how to improve it.");
+				chain = gun.chain();
+				gun.map().on(function(data, key, msg, eve){
+					var next = (cb||noop).call(this, data, key, msg, eve);
+					if(u === next){ return }
+					if(data === next){ return chain._.on('in', msg) }
+					if(Gun.is(next)){ return chain._.on('in', next._) }
+					var tmp = {}; Object.keys(msg.put).forEach(function(k){ tmp[k] = msg.put[k]; }, tmp); tmp['='] = next; 
+					chain._.on('in', {get: key, put: tmp});
+				});
+				return chain;
+			};
+			function map(msg){ this.to.next(msg);
+				var cat = this.as, gun = msg.$, at = gun._, put = msg.put, tmp;
+				if(!at.soul && !msg.$$){ return } // this line took hundreds of tries to figure out. It only works if core checks to filter out above chains during link tho. This says "only bother to map on a node" for this layer of the chain. If something is not a node, map should not work.
+				if((tmp = cat.lex) && !String.match(msg.get|| (put||'')['.'], tmp['.'] || tmp['#'] || tmp)){ return }
+				Gun.on.link(msg, cat);
+			}
+			var noop = function(){}, u;
+		})(USE, './map');
+	USE(function(module){
+			var Gun = USE('./index');
+			Gun.chain.set = function(item, cb, opt){
+				var gun = this, root = gun.back(-1), soul, tmp;
+				cb = cb || function(){};
+				opt = opt || {}; opt.item = opt.item || item;
+				if(soul = ((item||'')._||'')['#']){ (item = {})['#'] = soul; } // check if node, make link.
+				if('string' == typeof (tmp = Gun.valid(item))){ return gun.get(soul = tmp).put(item, cb, opt) } // check if link
+				if(!Gun.is(item)){
+					if(Object.plain(item)){
+						item = root.get(soul = gun.back('opt.uuid')()).put(item);
+					}
+					return gun.get(soul || root.back('opt.uuid')(7)).put(item, cb, opt);
+				}
+				gun.put(function(go){
+					item.get(function(soul, o, msg){ // TODO: BUG! We no longer have this option? & go error not handled?
+						if(!soul){ return cb.call(gun, {err: Gun.log('Only a node can be linked! Not "' + msg.put + '"!')}) }
+						(tmp = {})[soul] = {'#': soul}; go(tmp);
+					},true);
+				});
+				return item;
+			};
+		})(USE, './set');
+	USE(function(module){
+			USE('./shim');
+
+			var noop = function(){};
+			var parse = JSON.parseAsync || function(t,cb,r){ var u, d = +new Date; try{ cb(u, JSON.parse(t,r), json.sucks(+new Date - d)); }catch(e){ cb(e); } };
+			var json = JSON.stringifyAsync || function(v,cb,r,s){ var u, d = +new Date; try{ cb(u, JSON.stringify(v,r,s), json.sucks(+new Date - d)); }catch(e){ cb(e); } };
+			json.sucks = function(d){ if(d > 99){ console.log("Warning: JSON blocking CPU detected. Add `gun/lib/yson.js` to fix."); json.sucks = noop; } };
+
+			function Mesh(root){
+				var mesh = function(){};
+				var opt = root.opt || {};
+				opt.log = opt.log || console.log;
+				opt.gap = opt.gap || opt.wait || 0;
+				opt.max = opt.max || (opt.memory? (opt.memory * 999 * 999) : 300000000) * 0.3;
+				opt.pack = opt.pack || (opt.max * 0.01 * 0.01);
+				opt.puff = opt.puff || 9; // IDEA: do a start/end benchmark, divide ops/result.
+				var puff = setTimeout.turn || setTimeout;
+
+				var dup = root.dup, dup_check = dup.check, dup_track = dup.track;
+
+				var hear = mesh.hear = function(raw, peer){
+					if(!raw){ return }
+					if(opt.max <= raw.length){ return mesh.say({dam: '!', err: "Message too big!"}, peer) }
+					if(mesh === this){
+						/*if('string' == typeof raw){ try{
+							var stat = console.STAT || {};
+							//console.log('HEAR:', peer.id, (raw||'').slice(0,250), ((raw||'').length / 1024 / 1024).toFixed(4));
+							
+							//console.log(setTimeout.turn.s.length, 'stacks', parseFloat((-(LT - (LT = +new Date))/1000).toFixed(3)), 'sec', parseFloat(((LT-ST)/1000 / 60).toFixed(1)), 'up', stat.peers||0, 'peers', stat.has||0, 'has', stat.memhused||0, stat.memused||0, stat.memax||0, 'heap mem max');
+						}catch(e){ console.log('DBG err', e) }}*/
+						hear.d += raw.length||0 ; ++hear.c; } // STATS!
+					var S = peer.SH = +new Date;
+					var tmp = raw[0], msg;
+					//raw && raw.slice && console.log("hear:", ((peer.wire||'').headers||'').origin, raw.length, raw.slice && raw.slice(0,50)); //tc-iamunique-tc-package-ds1
+					if('[' === tmp){
+						parse(raw, function(err, msg){
+							if(err || !msg){ return mesh.say({dam: '!', err: "DAM JSON parse error."}, peer) }
+							console.STAT && console.STAT(+new Date, msg.length, '# on hear batch');
+							var P = opt.puff;
+							(function go(){
+								var S = +new Date;
+								var i = 0, m; while(i < P && (m = msg[i++])){ mesh.hear(m, peer); }
+								msg = msg.slice(i); // slicing after is faster than shifting during.
+								console.STAT && console.STAT(S, +new Date - S, 'hear loop');
+								flush(peer); // force send all synchronously batched acks.
+								if(!msg.length){ return }
+								puff(go, 0);
+							}());
+						});
+						raw = ''; // 
+						return;
+					}
+					if('{' === tmp || ((raw['#'] || Object.plain(raw)) && (msg = raw))){
+						if(msg){ return hear.one(msg, peer, S) }
+						parse(raw, function(err, msg){
+							if(err || !msg){ return mesh.say({dam: '!', err: "DAM JSON parse error."}, peer) }
+							hear.one(msg, peer, S);
+						});
+						return;
+					}
+				};
+				hear.one = function(msg, peer, S){ // S here is temporary! Undo.
+					var id, hash, tmp, ash, DBG;
+					if(msg.DBG){ msg.DBG = DBG = {DBG: msg.DBG}; }
+					DBG && (DBG.h = S);
+					DBG && (DBG.hp = +new Date);
+					if(!(id = msg['#'])){ id = msg['#'] = String.random(9); }
+					if(tmp = dup_check(id)){ return }
+					// DAM logic:
+					if(!(hash = msg['##']) && false && u !== msg.put); // disable hashing for now // TODO: impose warning/penalty instead (?)
+					if(hash && (tmp = msg['@'] || (msg.get && id)) && dup.check(ash = tmp+hash)){ return } // Imagine A <-> B <=> (C & D), C & D reply with same ACK but have different IDs, B can use hash to dedup. Or if a GET has a hash already, we shouldn't ACK if same.
+					(msg._ = function(){}).via = mesh.leap = peer;
+					if((tmp = msg['><']) && 'string' == typeof tmp){ tmp.slice(0,99).split(',').forEach(function(k){ this[k] = 1; }, (msg._).yo = {}); } // Peers already sent to, do not resend.
+					// DAM ^
+					if(tmp = msg.dam){
+						if(tmp = mesh.hear[tmp]){
+							tmp(msg, peer, root);
+						}
+						dup_track(id);
+						return;
+					}
+					if(tmp = msg.ok){ msg._.near = tmp['/']; }
+					var S = +new Date;
+					DBG && (DBG.is = S); peer.SI = id;
+					root.on('in', mesh.last = msg);
+					//ECHO = msg.put || ECHO; !(msg.ok !== -3740) && mesh.say({ok: -3740, put: ECHO, '@': msg['#']}, peer);
+					DBG && (DBG.hd = +new Date);
+					console.STAT && console.STAT(S, +new Date - S, msg.get? 'msg get' : msg.put? 'msg put' : 'msg');
+					(tmp = dup_track(id)).via = peer; // don't dedup message ID till after, cause GUN has internal dedup check.
+					if(msg.get){ tmp.it = msg; }
+					if(ash){ dup_track(ash); } //dup.track(tmp+hash, true).it = it(msg);
+					mesh.leap = mesh.last = null; // warning! mesh.leap could be buggy.
+				};
+				hear.c = hear.d = 0;
+	(function(){
+					var SMIA = 0;
+					var loop;
+					mesh.hash = function(msg, peer){ var h, s, t;
+						var S = +new Date;
+						json(msg.put, function hash(err, text){
+							var ss = (s || (s = t = text||'')).slice(0, 32768); // 1024 * 32
+						  h = String.hash(ss, h); s = s.slice(32768);
+						  if(s){ puff(hash, 0); return }
+							console.STAT && console.STAT(S, +new Date - S, 'say json+hash');
+						  msg._.$put = t;
+						  msg['##'] = h;
+						  mesh.say(msg, peer);
+						  delete msg._.$put;
+						}, sort);
+					};
+					function sort(k, v){ var tmp;
+						if(!(v instanceof Object)){ return v }
+						Object.keys(v).sort().forEach(sorta, {to: tmp = {}, on: v});
+						return tmp;
+					} function sorta(k){ this.to[k] = this.on[k]; }
+
+					var say = mesh.say = function(msg, peer){ var tmp;
+						if((tmp = this) && (tmp = tmp.to) && tmp.next){ tmp.next(msg); } // compatible with middleware adapters.
+						if(!msg){ return false }
+						var id, hash, raw, ack = msg['@'];
+	//if(opt.super && (!ack || !msg.put)){ return } // TODO: MANHATTAN STUB //OBVIOUSLY BUG! But squelch relay. // :( get only is 100%+ CPU usage :(
+						var meta = msg._||(msg._=function(){});
+						var DBG = msg.DBG, S = +new Date; meta.y = meta.y || S; if(!peer){ DBG && (DBG.y = S); }
+						if(!(id = msg['#'])){ id = msg['#'] = String.random(9); }
+						!loop && dup_track(id);//.it = it(msg); // track for 9 seconds, default. Earth<->Mars would need more! // always track, maybe move this to the 'after' logic if we split function.
+						//if(msg.put && (msg.err || (dup.s[id]||'').err)){ return false } // TODO: in theory we should not be able to stun a message, but for now going to check if it can help network performance preventing invalid data to relay.
+						if(!(hash = msg['##']) && u !== msg.put && !meta.via && ack){ mesh.hash(msg, peer); return } // TODO: Should broadcasts be hashed?
+						if(!peer && ack){ peer = ((tmp = dup.s[ack]) && (tmp.via || ((tmp = tmp.it) && (tmp = tmp._) && tmp.via))) || ((tmp = mesh.last) && ack === tmp['#'] && mesh.leap); } // warning! mesh.leap could be buggy! mesh last check reduces this.
+						if(!peer && ack){ // still no peer, then ack daisy chain 'tunnel' got lost.
+							if(dup.s[ack]){ return } // in dups but no peer hints that this was ack to ourself, ignore.
+							console.STAT && console.STAT(+new Date, ++SMIA, 'total no peer to ack to'); // TODO: Delete this now. Dropping lost ACKs is protocol fine now.
+							return false;
+						} // TODO: Temporary? If ack via trace has been lost, acks will go to all peers, which trashes browser bandwidth. Not relaying the ack will force sender to ask for ack again. Note, this is technically wrong for mesh behavior.
+						if(!peer && mesh.way){ return mesh.way(msg) }
+						DBG && (DBG.yh = +new Date);
+						if(!(raw = meta.raw)){ mesh.raw(msg, peer); return }
+						DBG && (DBG.yr = +new Date);
+						if(!peer || !peer.id){
+							if(!Object.plain(peer || opt.peers)){ return false }
+							var S = +new Date;
+							var P = opt.puff, ps = opt.peers, pl = Object.keys(peer || opt.peers || {}); // TODO: .keys( is slow
+							console.STAT && console.STAT(S, +new Date - S, 'peer keys');
+	(function go(){
+								var S = +new Date;
+								//Type.obj.map(peer || opt.peers, each); // in case peer is a peer list.
+								loop = 1; var wr = meta.raw; meta.raw = raw; // quick perf hack
+								var i = 0, p; while(i < 9 && (p = (pl||'')[i++])){
+									if(!(p = ps[p] || (peer||'')[p])){ continue }
+									mesh.say(msg, p);
+								}
+								meta.raw = wr; loop = 0;
+								pl = pl.slice(i); // slicing after is faster than shifting during.
+								console.STAT && console.STAT(S, +new Date - S, 'say loop');
+								if(!pl.length){ return }
+								puff(go, 0);
+								ack && dup_track(ack); // keep for later
+							}());
+							return;
+						}
+						// TODO: PERF: consider splitting function here, so say loops do less work.
+						if(!peer.wire && mesh.wire){ mesh.wire(peer); }
+						if(id === peer.last){ return } peer.last = id;  // was it just sent?
+						if(peer === meta.via){ return false } // don't send back to self.
+						if((tmp = meta.yo) && (tmp[peer.url] || tmp[peer.pid] || tmp[peer.id]) /*&& !o*/){ return false }
+						console.STAT && console.STAT(S, ((DBG||meta).yp = +new Date) - (meta.y || S), 'say prep');
+						!loop && ack && dup_track(ack); // streaming long responses needs to keep alive the ack.
+						if(peer.batch){
+							peer.tail = (tmp = peer.tail || 0) + raw.length;
+							if(peer.tail <= opt.pack){
+								peer.batch += (tmp?',':'')+raw;
+								return;
+							}
+							flush(peer);
+						}
+						peer.batch = '['; // Prevents double JSON!
+						var ST = +new Date;
+						setTimeout(function(){
+							console.STAT && console.STAT(ST, +new Date - ST, '0ms TO');
+							flush(peer);
+						}, opt.gap); // TODO: queuing/batching might be bad for low-latency video game performance! Allow opt out?
+						send(raw, peer);
+						console.STAT && (ack === peer.SI) && console.STAT(S, +new Date - peer.SH, 'say ack');
+					};
+					mesh.say.c = mesh.say.d = 0;
+					// TODO: this caused a out-of-memory crash!
+					mesh.raw = function(msg, peer){ // TODO: Clean this up / delete it / move logic out!
+						if(!msg){ return '' }
+						var meta = (msg._) || {}, put, tmp;
+						if(tmp = meta.raw){ return tmp }
+						if('string' == typeof msg){ return msg }
+						var hash = msg['##'], ack = msg['@'];
+						if(hash && ack){
+							if(!meta.via && dup_check(ack+hash)){ return false } // for our own out messages, memory & storage may ack the same thing, so dedup that. Tho if via another peer, we already tracked it upon hearing, so this will always trigger false positives, so don't do that!
+							if((tmp = (dup.s[ack]||'').it) || ((tmp = mesh.last) && ack === tmp['#'])){
+								if(hash === tmp['##']){ return false } // if ask has a matching hash, acking is optional.
+								if(!tmp['##']){ tmp['##'] = hash; } // if none, add our hash to ask so anyone we relay to can dedup. // NOTE: May only check against 1st ack chunk, 2nd+ won't know and still stream back to relaying peers which may then dedup. Any way to fix this wasted bandwidth? I guess force rate limiting breaking change, that asking peer has to ask for next lexical chunk.
+							}
+						}
+						if(!msg.dam && !msg['@']){
+							var i = 0, to = []; tmp = opt.peers;
+							for(var k in tmp){ var p = tmp[k]; // TODO: Make it up peers instead!
+								to.push(p.url || p.pid || p.id);
+								if(++i > 6){ break }
+							}
+							if(i > 1){ msg['><'] = to.join(); } // TODO: BUG! This gets set regardless of peers sent to! Detect?
+						}
+						if(msg.put && (tmp = msg.ok)){ msg.ok = {'@':(tmp['@']||1)-1, '/': (tmp['/']==msg._.near)? mesh.near : tmp['/']}; }
+						if(put = meta.$put){
+							tmp = {}; Object.keys(msg).forEach(function(k){ tmp[k] = msg[k]; });
+							tmp.put = ':])([:';
+							json(tmp, function(err, raw){
+								if(err){ return } // TODO: Handle!!
+								var S = +new Date;
+								tmp = raw.indexOf('"put":":])([:"');
+								res(u, raw = raw.slice(0, tmp+6) + put + raw.slice(tmp + 14));
+								console.STAT && console.STAT(S, +new Date - S, 'say slice');
+							});
+							return;
+						}
+						json(msg, res);
+						function res(err, raw){
+							if(err){ return } // TODO: Handle!!
+							meta.raw = raw; //if(meta && (raw||'').length < (999 * 99)){ meta.raw = raw } // HNPERF: If string too big, don't keep in memory.
+							mesh.say(msg, peer);
+						}
+					};
+				}());
+
+				function flush(peer){
+					var tmp = peer.batch, t = 'string' == typeof tmp;
+					if(t){ tmp += ']'; }// TODO: Prevent double JSON!
+					peer.batch = peer.tail = null;
+					if(!tmp){ return }
+					if(t? 3 > tmp.length : !tmp.length){ return } // TODO: ^
+					if(!t){try{tmp = (1 === tmp.length? tmp[0] : JSON.stringify(tmp));
+					}catch(e){return opt.log('DAM JSON stringify error', e)}}
+					if(!tmp){ return }
+					send(tmp, peer);
+				}
+				// for now - find better place later.
+				function send(raw, peer){ try{
+					var wire = peer.wire;
+					if(peer.say){
+						peer.say(raw);
+					} else
+					if(wire.send){
+						wire.send(raw);
+					}
+					mesh.say.d += raw.length||0; ++mesh.say.c; // STATS!
+				}catch(e){
+					(peer.queue = peer.queue || []).push(raw);
+				}}
+
+				mesh.near = 0;
+				mesh.hi = function(peer){
+					var wire = peer.wire, tmp;
+					if(!wire){ mesh.wire((peer.length && {url: peer, id: peer}) || peer); return }
+					if(peer.id){
+						opt.peers[peer.url || peer.id] = peer;
+					} else {
+						tmp = peer.id = peer.id || peer.url || String.random(9);
+						mesh.say({dam: '?', pid: root.opt.pid}, opt.peers[tmp] = peer);
+						delete dup.s[peer.last]; // IMPORTANT: see https://gun.eco/docs/DAM#self
+					}
+					if(!peer.met){
+						mesh.near++;
+						peer.met = +(new Date);
+						root.on('hi', peer);
+					}
+					// @rogowski I need this here by default for now to fix go1dfish's bug
+					tmp = peer.queue; peer.queue = [];
+					setTimeout.each(tmp||[],function(msg){
+						send(msg, peer);
+					},0,9);
+					//Type.obj.native && Type.obj.native(); // dirty place to check if other JS polluted.
+				};
+				mesh.bye = function(peer){
+					peer.met && --mesh.near;
+					delete peer.met;
+					root.on('bye', peer);
+					var tmp = +(new Date); tmp = (tmp - (peer.met||tmp));
+					mesh.bye.time = ((mesh.bye.time || tmp) + tmp) / 2;
+				};
+				mesh.hear['!'] = function(msg, peer){ opt.log('Error:', msg.err); };
+				mesh.hear['?'] = function(msg, peer){
+					if(msg.pid){
+						if(!peer.pid){ peer.pid = msg.pid; }
+						if(msg['@']){ return }
+					}
+					mesh.say({dam: '?', pid: opt.pid, '@': msg['#']}, peer);
+					delete dup.s[peer.last]; // IMPORTANT: see https://gun.eco/docs/DAM#self
+				};
+				mesh.hear['mob'] = function(msg, peer){ // NOTE: AXE will overload this with better logic.
+					if(!msg.peers){ return }
+					var peers = Object.keys(msg.peers), one = peers[(Math.random()*peers.length) >> 0];
+					if(!one){ return }
+					mesh.bye(peer);
+					mesh.hi(one);
+				};
+
+				root.on('create', function(root){
+					root.opt.pid = root.opt.pid || String.random(9);
+					this.to.next(root);
+					root.on('out', mesh.say);
+				});
+
+				root.on('bye', function(peer, tmp){
+					peer = opt.peers[peer.id || peer] || peer;
+					this.to.next(peer);
+					peer.bye? peer.bye() : (tmp = peer.wire) && tmp.close && tmp.close();
+					delete opt.peers[peer.id];
+					peer.wire = null;
+				});
+				root.on('bye', function(peer, tmp){ this.to.next(peer);
+					if(tmp = console.STAT){ tmp.peers = mesh.near; }
+					if(!(tmp = peer.url)){ return }				setTimeout(function(){ },opt.lack || 9000);
+				});
+				root.on('hi', function(peer, tmp){ this.to.next(peer);
+					if(tmp = console.STAT){ tmp.peers = mesh.near; }
+					if(opt.super){ return } // temporary (?) until we have better fix/solution?
+					var souls = Object.keys(root.next||''); // TODO: .keys( is slow
+					if(souls.length > 9999 && !console.SUBS){ console.log(console.SUBS = "Warning: You have more than 10K live GETs, which might use more bandwidth than your screen can show - consider `.off()`."); }
+					setTimeout.each(souls, function(soul){ var node = root.next[soul];
+						if(opt.super || (node.ask||'')['']){ mesh.say({get: {'#': soul}}, peer); return }
+						setTimeout.each(Object.keys(node.ask||''), function(key){ if(!key){ return }
+							// is the lack of ## a !onion hint?
+							mesh.say({'##': String.hash((root.graph[soul]||'')[key]), get: {'#': soul, '.': key}}, peer);
+							// TODO: Switch this so Book could route?
+						});
+					});
+				});
+
+				return mesh;
+			}
+		  var u;
+
+		  try{ module.exports = Mesh; }catch(e){}
+
+		})(USE, './mesh');
+	USE(function(module){
+			var Gun = USE('./index');
+			Gun.Mesh = USE('./mesh');
+
+			// TODO: resync upon reconnect online/offline
+			//window.ononline = window.onoffline = function(){ console.log('online?', navigator.onLine) }
+
+			Gun.on('opt', function(root){
+				this.to.next(root);
+				if(root.once){ return }
+				var opt = root.opt;
+				if(false === opt.WebSocket){ return }
+
+				var env = Gun.window || {};
+				var websocket = opt.WebSocket || env.WebSocket || env.webkitWebSocket || env.mozWebSocket;
+				if(!websocket){ return }
+				opt.WebSocket = websocket;
+
+				var mesh = opt.mesh = opt.mesh || Gun.Mesh(root);
+
+				var wire = mesh.wire || opt.wire;
+				mesh.wire = opt.wire = open;
+				function open(peer){ try{
+					if(!peer || !peer.url){ return wire && wire(peer) }
+					var url = peer.url.replace(/^http/, 'ws');
+					var wire = peer.wire = new opt.WebSocket(url);
+					wire.onclose = function(){
+						reconnect(peer);
+						opt.mesh.bye(peer);
+					};
+					wire.onerror = function(err){
+						reconnect(peer);
+					};
+					wire.onopen = function(){
+						opt.mesh.hi(peer);
+					};
+					wire.onmessage = function(msg){
+						if(!msg){ return }
+						opt.mesh.hear(msg.data || msg, peer);
+					};
+					return wire;
+				}catch(e){ opt.mesh.bye(peer); }}
+
+				setTimeout(function(){ !opt.super && root.on('out', {dam:'hi'}); },1); // it can take a while to open a socket, so maybe no longer lazy load for perf reasons?
+
+				var wait = 2 * 999;
+				function reconnect(peer){
+					clearTimeout(peer.defer);
+					if(!opt.peers[peer.url]){ return }
+					if(doc && peer.retry <= 0){ return }
+					peer.retry = (peer.retry || opt.retry+1 || 60) - ((-peer.tried + (peer.tried = +new Date) < wait*4)?1:0);
+					peer.defer = setTimeout(function to(){
+						if(doc && doc.hidden){ return setTimeout(to,wait) }
+						open(peer);
+					}, wait);
+				}
+				var doc = (''+u !== typeof document) && document;
+			});
+			var u;
+		})(USE, './websocket');
+	USE(function(module){
+			if(typeof Gun === 'undefined'){ return }
+
+			var noop = function(){}, store;
+			try{store = (Gun.window||noop).localStorage;}catch(e){}
+			if(!store){
+				Gun.log("Warning: No localStorage exists to persist data to!");
+				store = {setItem: function(k,v){this[k]=v;}, removeItem: function(k){delete this[k];}, getItem: function(k){return this[k]}};
+			}
+
+			var parse = JSON.parseAsync || function(t,cb,r){ var u; try{ cb(u, JSON.parse(t,r)); }catch(e){ cb(e); } };
+			var json = JSON.stringifyAsync || function(v,cb,r,s){ var u; try{ cb(u, JSON.stringify(v,r,s)); }catch(e){ cb(e); } };
+
+			Gun.on('create', function lg(root){
+				this.to.next(root);
+				var opt = root.opt, graph = root.graph, acks = [], disk, to, size, stop;
+				if(false === opt.localStorage){ return }
+				opt.prefix = opt.file || 'gun/';
+				try{ disk = lg[opt.prefix] = lg[opt.prefix] || JSON.parse(size = store.getItem(opt.prefix)) || {}; // TODO: Perf! This will block, should we care, since limited to 5MB anyways?
+				}catch(e){ disk = lg[opt.prefix] = {}; }
+				size = (size||'').length;
+
+				root.on('get', function(msg){
+					this.to.next(msg);
+					var lex = msg.get, soul, data, tmp, u;
+					if(!lex || !(soul = lex['#'])){ return }
+					data = disk[soul] || u;
+					if(data && (tmp = lex['.']) && !Object.plain(tmp)){ // pluck!
+						data = Gun.state.ify({}, tmp, Gun.state.is(data, tmp), data[tmp], soul);
+					}
+					//if(data){ (tmp = {})[soul] = data } // back into a graph.
+					//setTimeout(function(){
+					Gun.on.get.ack(msg, data); //root.on('in', {'@': msg['#'], put: tmp, lS:1});// || root.$});
+					//}, Math.random() * 10); // FOR TESTING PURPOSES!
+				});
+
+				root.on('put', function(msg){
+					this.to.next(msg); // remember to call next middleware adapter
+					var put = msg.put, soul = put['#'], key = put['.'], id = msg['#'], ok = msg.ok||''; // pull data off wire envelope
+					disk[soul] = Gun.state.ify(disk[soul], key, put['>'], put[':'], soul); // merge into disk object
+					if(stop && size > (4999880)){ root.on('in', {'@': id, err: "localStorage max!"}); return; }
+					//if(!msg['@']){ acks.push(id) } // then ack any non-ack write. // TODO: use batch id.
+					if(!msg['@'] && (!msg._.via || Math.random() < (ok['@'] / ok['/']))){ acks.push(id); } // then ack any non-ack write. // TODO: use batch id.
+					if(to){ return }
+					to = setTimeout(flush, 9+(size / 333)); // 0.1MB = 0.3s, 5MB = 15s 
+				});
+				function flush(){
+					if(!acks.length && ((setTimeout.turn||'').s||'').length){ setTimeout(flush,99); return; } // defer if "busy" && no saves.
+					var ack = acks; clearTimeout(to); to = false; acks = [];
+					json(disk, function(err, tmp){
+						try{!err && store.setItem(opt.prefix, tmp);
+						}catch(e){ err = stop = e || "localStorage failure"; }
+						if(err){
+							Gun.log(err + " Consider using GUN's IndexedDB plugin for RAD for more storage space, https://gun.eco/docs/RAD#install");
+							root.on('localStorage:error', {err: err, get: opt.prefix, put: disk});
+						}
+						size = tmp.length;
+
+						//if(!err && !Object.empty(opt.peers)){ return } // only ack if there are no peers. // Switch this to probabilistic mode
+						setTimeout.each(ack, function(id){
+							root.on('in', {'@': id, err: err, ok: 0}); // localStorage isn't reliable, so make its `ok` code be a low number.
+						},0,99);
+					});
+				}
+			
+			});
+		})(USE, './localStorage');
+
+	}());
+	(function(){
+		var u;
+		if(''+u == typeof Gun){ return }
+		var DEP = function(n){ console.warn("Warning! Deprecated internal utility will break in next version:", n); };
+		// Generic javascript utilities.
+		var Type = Gun;
+		//Type.fns = Type.fn = {is: function(fn){ return (!!fn && fn instanceof Function) }}
+		Type.fn = Type.fn || {is: function(fn){ DEP('fn'); return (!!fn && 'function' == typeof fn) }};
+		Type.bi = Type.bi || {is: function(b){ DEP('bi');return (b instanceof Boolean || typeof b == 'boolean') }};
+		Type.num = Type.num || {is: function(n){ DEP('num'); return !list_is(n) && ((n - parseFloat(n) + 1) >= 0 || Infinity === n || -Infinity === n) }};
+		Type.text = Type.text || {is: function(t){ DEP('text'); return (typeof t == 'string') }};
+		Type.text.ify = Type.text.ify || function(t){ DEP('text.ify');
+			if(Type.text.is(t)){ return t }
+			if(typeof JSON !== "undefined"){ return JSON.stringify(t) }
+			return (t && t.toString)? t.toString() : t;
+		};
+		Type.text.random = Type.text.random || function(l, c){ DEP('text.random');
+			var s = '';
+			l = l || 24; // you are not going to make a 0 length random number, so no need to check type
+			c = c || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXZabcdefghijklmnopqrstuvwxyz';
+			while(l > 0){ s += c.charAt(Math.floor(Math.random() * c.length)); l--; }
+			return s;
+		};
+		Type.text.match = Type.text.match || function(t, o){ var tmp, u; DEP('text.match');
+			if('string' !== typeof t){ return false }
+			if('string' == typeof o){ o = {'=': o}; }
+			o = o || {};
+			tmp = (o['='] || o['*'] || o['>'] || o['<']);
+			if(t === tmp){ return true }
+			if(u !== o['=']){ return false }
+			tmp = (o['*'] || o['>'] || o['<']);
+			if(t.slice(0, (tmp||'').length) === tmp){ return true }
+			if(u !== o['*']){ return false }
+			if(u !== o['>'] && u !== o['<']){
+				return (t >= o['>'] && t <= o['<'])? true : false;
+			}
+			if(u !== o['>'] && t >= o['>']){ return true }
+			if(u !== o['<'] && t <= o['<']){ return true }
+			return false;
+		};
+		Type.text.hash = Type.text.hash || function(s, c){ // via SO
+			DEP('text.hash');
+			if(typeof s !== 'string'){ return }
+		  c = c || 0;
+		  if(!s.length){ return c }
+		  for(var i=0,l=s.length,n; i<l; ++i){
+		    n = s.charCodeAt(i);
+		    c = ((c<<5)-c)+n;
+		    c |= 0;
+		  }
+		  return c;
+		};
+		Type.list = Type.list || {is: function(l){ DEP('list'); return (l instanceof Array) }};
+		Type.list.slit = Type.list.slit || Array.prototype.slice;
+		Type.list.sort = Type.list.sort || function(k){ // creates a new sort function based off some key
+			DEP('list.sort');
+			return function(A,B){
+				if(!A || !B){ return 0 } A = A[k]; B = B[k];
+				if(A < B){ return -1 }else if(A > B){ return 1 }
+				else { return 0 }
+			}
+		};
+		Type.list.map = Type.list.map || function(l, c, _){ DEP('list.map'); return obj_map(l, c, _) };
+		Type.list.index = 1; // change this to 0 if you want non-logical, non-mathematical, non-matrix, non-convenient array notation
+		Type.obj = Type.boj || {is: function(o){ DEP('obj'); return o? (o instanceof Object && o.constructor === Object) || Object.prototype.toString.call(o).match(/^\[object (\w+)\]$/)[1] === 'Object' : false }};
+		Type.obj.put = Type.obj.put || function(o, k, v){ DEP('obj.put'); return (o||{})[k] = v, o };
+		Type.obj.has = Type.obj.has || function(o, k){ DEP('obj.has'); return o && Object.prototype.hasOwnProperty.call(o, k) };
+		Type.obj.del = Type.obj.del || function(o, k){ DEP('obj.del'); 
+			if(!o){ return }
+			o[k] = null;
+			delete o[k];
+			return o;
+		};
+		Type.obj.as = Type.obj.as || function(o, k, v, u){ DEP('obj.as'); return o[k] = o[k] || (u === v? {} : v) };
+		Type.obj.ify = Type.obj.ify || function(o){ DEP('obj.ify'); 
+			if(obj_is(o)){ return o }
+			try{o = JSON.parse(o);
+			}catch(e){o={};}		return o;
+		}
+		;(function(){ var u;
+			function map(v,k){
+				if(obj_has(this,k) && u !== this[k]){ return }
+				this[k] = v;
+			}
+			Type.obj.to = Type.obj.to || function(from, to){ DEP('obj.to'); 
+				to = to || {};
+				obj_map(from, map, to);
+				return to;
+			};
+		}());
+		Type.obj.copy = Type.obj.copy || function(o){ DEP('obj.copy'); // because http://web.archive.org/web/20140328224025/http://jsperf.com/cloning-an-object/2
+			return !o? o : JSON.parse(JSON.stringify(o)); // is shockingly faster than anything else, and our data has to be a subset of JSON anyways!
+		}
+		;(function(){
+			function empty(v,i){ var n = this.n, u;
+				if(n && (i === n || (obj_is(n) && obj_has(n, i)))){ return }
+				if(u !== i){ return true }
+			}
+			Type.obj.empty = Type.obj.empty || function(o, n){ DEP('obj.empty'); 
+				if(!o){ return true }
+				return obj_map(o,empty,{n:n})? false : true;
+			};
+		}());
+	(function(){
+			function t(k,v){
+				if(2 === arguments.length){
+					t.r = t.r || {};
+					t.r[k] = v;
+					return;
+				} t.r = t.r || [];
+				t.r.push(k);
+			}		var keys = Object.keys, map;
+			Object.keys = Object.keys || function(o){ return map(o, function(v,k,t){t(k);}) };
+			Type.obj.map = map = Type.obj.map || function(l, c, _){ DEP('obj.map'); 
+				var u, i = 0, x, r, ll, lle, f = 'function' == typeof c;
+				t.r = u;
+				if(keys && obj_is(l)){
+					ll = keys(l); lle = true;
+				}
+				_ = _ || {};
+				if(list_is(l) || ll){
+					x = (ll || l).length;
+					for(;i < x; i++){
+						var ii = (i + Type.list.index);
+						if(f){
+							r = lle? c.call(_, l[ll[i]], ll[i], t) : c.call(_, l[i], ii, t);
+							if(r !== u){ return r }
+						} else {
+							//if(Type.test.is(c,l[i])){ return ii } // should implement deep equality testing!
+							if(c === l[lle? ll[i] : i]){ return ll? ll[i] : ii } // use this for now
+						}
+					}
+				} else {
+					for(i in l){
+						if(f){
+							if(obj_has(l,i)){
+								r = _? c.call(_, l[i], i, t) : c(l[i], i, t);
+								if(r !== u){ return r }
+							}
+						} else {
+							//if(a.test.is(c,l[i])){ return i } // should implement deep equality testing!
+							if(c === l[i]){ return i } // use this for now
+						}
+					}
+				}
+				return f? t.r : Type.list.index? 0 : -1;
+			};
+		}());
+		Type.time = Type.time || {};
+		Type.time.is = Type.time.is || function(t){ DEP('time'); return t? t instanceof Date : (+new Date().getTime()) };
+
+		var fn_is = Type.fn.is;
+		var list_is = Type.list.is;
+		var obj = Type.obj, obj_is = obj.is, obj_has = obj.has, obj_map = obj.map;
+
+		var Val = {};
+		Val.is = function(v){ DEP('val.is'); // Valid values are a subset of JSON: null, binary, number (!Infinity), text, or a soul relation. Arrays need special algorithms to handle concurrency, so they are not supported directly. Use an extension that supports them if needed but research their problems first.
+			if(v === u){ return false }
+			if(v === null){ return true } // "deletes", nulling out keys.
+			if(v === Infinity){ return false } // we want this to be, but JSON does not support it, sad face.
+			if(text_is(v) // by "text" we mean strings.
+			|| bi_is(v) // by "binary" we mean boolean.
+			|| num_is(v)){ // by "number" we mean integers or decimals.
+				return true; // simple values are valid.
+			}
+			return Val.link.is(v) || false; // is the value a soul relation? Then it is valid and return it. If not, everything else remaining is an invalid data type. Custom extensions can be built on top of these primitives to support other types.
+		};
+		Val.link = Val.rel = {_: '#'};
+	(function(){
+			Val.link.is = function(v){ DEP('val.link.is'); // this defines whether an object is a soul relation or not, they look like this: {'#': 'UUID'}
+				if(v && v[rel_] && !v._ && obj_is(v)){ // must be an object.
+					var o = {};
+					obj_map(v, map, o);
+					if(o.id){ // a valid id was found.
+						return o.id; // yay! Return it.
+					}
+				}
+				return false; // the value was not a valid soul relation.
+			};
+			function map(s, k){ var o = this; // map over the object...
+				if(o.id){ return o.id = false } // if ID is already defined AND we're still looping through the object, it is considered invalid.
+				if(k == rel_ && text_is(s)){ // the key should be '#' and have a text value.
+					o.id = s; // we found the soul!
+				} else {
+					return o.id = false; // if there exists anything else on the object that isn't the soul, then it is considered invalid.
+				}
+			}
+		}());
+		Val.link.ify = function(t){ DEP('val.link.ify'); return obj_put({}, rel_, t) }; // convert a soul into a relation and return it.
+		Type.obj.has._ = '.';
+		var rel_ = Val.link._, u;
+		var bi_is = Type.bi.is;
+		var num_is = Type.num.is;
+		var text_is = Type.text.is;
+		var obj = Type.obj, obj_is = obj.is, obj_put = obj.put, obj_map = obj.map;
+
+		Type.val = Type.val || Val;
+
+		var Node = {_: '_'};
+		Node.soul = function(n, o){ DEP('node.soul'); return (n && n._ && n._[o || soul_]) }; // convenience function to check to see if there is a soul on a node and return it.
+		Node.soul.ify = function(n, o){ DEP('node.soul.ify'); // put a soul on an object.
+			o = (typeof o === 'string')? {soul: o} : o || {};
+			n = n || {}; // make sure it exists.
+			n._ = n._ || {}; // make sure meta exists.
+			n._[soul_] = o.soul || n._[soul_] || text_random(); // put the soul on it.
+			return n;
+		};
+		Node.soul._ = Val.link._;
+	(function(){
+			Node.is = function(n, cb, as){ DEP('node.is'); var s; // checks to see if an object is a valid node.
+				if(!obj_is(n)){ return false } // must be an object.
+				if(s = Node.soul(n)){ // must have a soul on it.
+					return !obj_map(n, map, {as:as,cb:cb,s:s,n:n});
+				}
+				return false; // nope! This was not a valid node.
+			};
+			function map(v, k){ // we invert this because the way we check for this is via a negation.
+				if(k === Node._){ return } // skip over the metadata.
+				if(!Val.is(v)){ return true } // it is true that this is an invalid node.
+				if(this.cb){ this.cb.call(this.as, v, k, this.n, this.s); } // optionally callback each key/value.
+			}
+		}());
+	(function(){
+			Node.ify = function(obj, o, as){ DEP('node.ify'); // returns a node from a shallow object.
+				if(!o){ o = {}; }
+				else if(typeof o === 'string'){ o = {soul: o}; }
+				else if('function' == typeof o){ o = {map: o}; }
+				if(o.map){ o.node = o.map.call(as, obj, u, o.node || {}); }
+				if(o.node = Node.soul.ify(o.node || {}, o)){
+					obj_map(obj, map, {o:o,as:as});
+				}
+				return o.node; // This will only be a valid node if the object wasn't already deep!
+			};
+			function map(v, k){ var o = this.o, tmp, u; // iterate over each key/value.
+				if(o.map){
+					tmp = o.map.call(this.as, v, ''+k, o.node);
+					if(u === tmp){
+						obj_del(o.node, k);
+					} else
+					if(o.node){ o.node[k] = tmp; }
+					return;
+				}
+				if(Val.is(v)){
+					o.node[k] = v;
+				}
+			}
+		}());
+		var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_map = obj.map;
+		var text = Type.text, text_random = text.random;
+		var soul_ = Node.soul._;
+		var u;
+		Type.node = Type.node || Node;
+
+		var State = Type.state;
+		State.lex = function(){ DEP('state.lex'); return State().toString(36).replace('.','') };
+		State.to = function(from, k, to){ DEP('state.to'); 
+			var val = (from||{})[k];
+			if(obj_is(val)){
+				val = obj_copy(val);
+			}
+			return State.ify(to, k, State.is(from, k), val, Node.soul(from));
+		}
+		;(function(){
+			State.map = function(cb, s, as){ DEP('state.map'); var u; // for use with Node.ify
+				var o = obj_is(o = cb || s)? o : null;
+				cb = fn_is(cb = cb || s)? cb : null;
+				if(o && !cb){
+					s = num_is(s)? s : State();
+					o[N_] = o[N_] || {};
+					obj_map(o, map, {o:o,s:s});
+					return o;
+				}
+				as = as || obj_is(s)? s : u;
+				s = num_is(s)? s : State();
+				return function(v, k, o, opt){
+					if(!cb){
+						map.call({o: o, s: s}, v,k);
+						return v;
+					}
+					cb.call(as || this || {}, v, k, o, opt);
+					if(obj_has(o,k) && u === o[k]){ return }
+					map.call({o: o, s: s}, v,k);
+				}
+			};
+			function map(v,k){
+				if(N_ === k){ return }
+				State.ify(this.o, k, this.s) ;
+			}
+		}());
+		var obj = Type.obj, obj_as = obj.as, obj_has = obj.has, obj_is = obj.is, obj_map = obj.map, obj_copy = obj.copy;
+		var num = Type.num, num_is = num.is;
+		var fn = Type.fn, fn_is = fn.is;
+		var N_ = Node._, u;
+
+		var Graph = {};
+	(function(){
+			Graph.is = function(g, cb, fn, as){ DEP('graph.is'); // checks to see if an object is a valid graph.
+				if(!g || !obj_is(g) || obj_empty(g)){ return false } // must be an object.
+				return !obj_map(g, map, {cb:cb,fn:fn,as:as}); // makes sure it wasn't an empty object.
+			};
+			function map(n, s){ // we invert this because the way'? we check for this is via a negation.
+				if(!n || s !== Node.soul(n) || !Node.is(n, this.fn, this.as)){ return true } // it is true that this is an invalid graph.
+				if(!this.cb){ return }
+				nf.n = n; nf.as = this.as; // sequential race conditions aren't races.
+				this.cb.call(nf.as, n, s, nf);
+			}
+			function nf(fn){ // optional callback for each node.
+				if(fn){ Node.is(nf.n, fn, nf.as); } // where we then have an optional callback for each key/value.
+			}
+		}());
+	(function(){
+			Graph.ify = function(obj, env, as){ DEP('graph.ify'); 
+				var at = {path: [], obj: obj};
+				if(!env){
+					env = {};
+				} else
+				if(typeof env === 'string'){
+					env = {soul: env};
+				} else
+				if('function' == typeof env){
+					env.map = env;
+				}
+				if(typeof as === 'string'){
+					env.soul = env.soul || as;
+					as = u;
+				}
+				if(env.soul){
+					at.link = Val.link.ify(env.soul);
+				}
+				env.shell = (as||{}).shell;
+				env.graph = env.graph || {};
+				env.seen = env.seen || [];
+				env.as = env.as || as;
+				node(env, at);
+				env.root = at.node;
+				return env.graph;
+			};
+			function node(env, at){ var tmp;
+				if(tmp = seen(env, at)){ return tmp }
+				at.env = env;
+				at.soul = soul;
+				if(Node.ify(at.obj, map, at)){
+					at.link = at.link || Val.link.ify(Node.soul(at.node));
+					if(at.obj !== env.shell){
+						env.graph[Val.link.is(at.link)] = at.node;
+					}
+				}
+				return at;
+			}
+			function map(v,k,n){
+				var at = this, env = at.env, is, tmp;
+				if(Node._ === k && obj_has(v,Val.link._)){
+					return n._; // TODO: Bug?
+				}
+				if(!(is = valid(v,k,n, at,env))){ return }
+				if(!k){
+					at.node = at.node || n || {};
+					if(obj_has(v, Node._) && Node.soul(v)){ // ? for safety ?
+						at.node._ = obj_copy(v._);
+					}
+					at.node = Node.soul.ify(at.node, Val.link.is(at.link));
+					at.link = at.link || Val.link.ify(Node.soul(at.node));
+				}
+				if(tmp = env.map){
+					tmp.call(env.as || {}, v,k,n, at);
+					if(obj_has(n,k)){
+						v = n[k];
+						if(u === v){
+							obj_del(n, k);
+							return;
+						}
+						if(!(is = valid(v,k,n, at,env))){ return }
+					}
+				}
+				if(!k){ return at.node }
+				if(true === is){
+					return v;
+				}
+				tmp = node(env, {obj: v, path: at.path.concat(k)});
+				if(!tmp.node){ return }
+				return tmp.link; //{'#': Node.soul(tmp.node)};
+			}
+			function soul(id){ var at = this;
+				var prev = Val.link.is(at.link), graph = at.env.graph;
+				at.link = at.link || Val.link.ify(id);
+				at.link[Val.link._] = id;
+				if(at.node && at.node[Node._]){
+					at.node[Node._][Val.link._] = id;
+				}
+				if(obj_has(graph, prev)){
+					graph[id] = graph[prev];
+					obj_del(graph, prev);
+				}
+			}
+			function valid(v,k,n, at,env){ var tmp;
+				if(Val.is(v)){ return true }
+				if(obj_is(v)){ return 1 }
+				if(tmp = env.invalid){
+					v = tmp.call(env.as || {}, v,k,n);
+					return valid(v,k,n, at,env);
+				}
+				env.err = "Invalid value at '" + at.path.concat(k).join('.') + "'!";
+				if(Type.list.is(v)){ env.err += " Use `.set(item)` instead of an Array."; }
+			}
+			function seen(env, at){
+				var arr = env.seen, i = arr.length, has;
+				while(i--){ has = arr[i];
+					if(at.obj === has.obj){ return has }
+				}
+				arr.push(at);
+			}
+		}());
+		Graph.node = function(node){ DEP('graph.node'); 
+			var soul = Node.soul(node);
+			if(!soul){ return }
+			return obj_put({}, soul, node);
+		}
+		;(function(){
+			Graph.to = function(graph, root, opt){ DEP('graph.to'); 
+				if(!graph){ return }
+				var obj = {};
+				opt = opt || {seen: {}};
+				obj_map(graph[root], map, {obj:obj, graph: graph, opt: opt});
+				return obj;
+			};
+			function map(v,k){ var tmp, obj;
+				if(Node._ === k){
+					if(obj_empty(v, Val.link._)){
+						return;
+					}
+					this.obj[k] = obj_copy(v);
+					return;
+				}
+				if(!(tmp = Val.link.is(v))){
+					this.obj[k] = v;
+					return;
+				}
+				if(obj = this.opt.seen[tmp]){
+					this.obj[k] = obj;
+					return;
+				}
+				this.obj[k] = this.opt.seen[tmp] = Graph.to(this.graph, tmp, this.opt);
+			}
+		}());
+		var fn_is = Type.fn.is;
+		var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_has = obj.has, obj_empty = obj.empty, obj_put = obj.put, obj_map = obj.map, obj_copy = obj.copy;
+		var u;
+		Type.graph = Type.graph || Graph;
+	}());
+	});
+
+	var browser = gun;
+
+	var global$1 = (typeof global !== "undefined" ? global :
+	            typeof self !== "undefined" ? self :
+	            typeof window !== "undefined" ? window : {});
+
+	var lookup = [];
+	var revLookup = [];
+	var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array;
+	var inited = false;
+	function init () {
+	  inited = true;
+	  var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+	  for (var i = 0, len = code.length; i < len; ++i) {
+	    lookup[i] = code[i];
+	    revLookup[code.charCodeAt(i)] = i;
+	  }
+
+	  revLookup['-'.charCodeAt(0)] = 62;
+	  revLookup['_'.charCodeAt(0)] = 63;
+	}
+
+	function toByteArray (b64) {
+	  if (!inited) {
+	    init();
+	  }
+	  var i, j, l, tmp, placeHolders, arr;
+	  var len = b64.length;
+
+	  if (len % 4 > 0) {
+	    throw new Error('Invalid string. Length must be a multiple of 4')
+	  }
+
+	  // the number of equal signs (place holders)
+	  // if there are two placeholders, than the two characters before it
+	  // represent one byte
+	  // if there is only one, then the three characters before it represent 2 bytes
+	  // this is just a cheap hack to not do indexOf twice
+	  placeHolders = b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0;
+
+	  // base64 is 4/3 + up to two characters of the original data
+	  arr = new Arr(len * 3 / 4 - placeHolders);
+
+	  // if there are placeholders, only get up to the last complete 4 chars
+	  l = placeHolders > 0 ? len - 4 : len;
+
+	  var L = 0;
+
+	  for (i = 0, j = 0; i < l; i += 4, j += 3) {
+	    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)];
+	    arr[L++] = (tmp >> 16) & 0xFF;
+	    arr[L++] = (tmp >> 8) & 0xFF;
+	    arr[L++] = tmp & 0xFF;
+	  }
+
+	  if (placeHolders === 2) {
+	    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4);
+	    arr[L++] = tmp & 0xFF;
+	  } else if (placeHolders === 1) {
+	    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2);
+	    arr[L++] = (tmp >> 8) & 0xFF;
+	    arr[L++] = tmp & 0xFF;
+	  }
+
+	  return arr
+	}
+
+	function tripletToBase64 (num) {
+	  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
+	}
+
+	function encodeChunk (uint8, start, end) {
+	  var tmp;
+	  var output = [];
+	  for (var i = start; i < end; i += 3) {
+	    tmp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2]);
+	    output.push(tripletToBase64(tmp));
+	  }
+	  return output.join('')
+	}
+
+	function fromByteArray (uint8) {
+	  if (!inited) {
+	    init();
+	  }
+	  var tmp;
+	  var len = uint8.length;
+	  var extraBytes = len % 3; // if we have 1 byte left, pad 2 bytes
+	  var output = '';
+	  var parts = [];
+	  var maxChunkLength = 16383; // must be multiple of 3
+
+	  // go through the array every three bytes, we'll deal with trailing stuff later
+	  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+	    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)));
+	  }
+
+	  // pad the end with zeros, but make sure to not forget the extra bytes
+	  if (extraBytes === 1) {
+	    tmp = uint8[len - 1];
+	    output += lookup[tmp >> 2];
+	    output += lookup[(tmp << 4) & 0x3F];
+	    output += '==';
+	  } else if (extraBytes === 2) {
+	    tmp = (uint8[len - 2] << 8) + (uint8[len - 1]);
+	    output += lookup[tmp >> 10];
+	    output += lookup[(tmp >> 4) & 0x3F];
+	    output += lookup[(tmp << 2) & 0x3F];
+	    output += '=';
+	  }
+
+	  parts.push(output);
+
+	  return parts.join('')
+	}
+
+	function read (buffer, offset, isLE, mLen, nBytes) {
+	  var e, m;
+	  var eLen = nBytes * 8 - mLen - 1;
+	  var eMax = (1 << eLen) - 1;
+	  var eBias = eMax >> 1;
+	  var nBits = -7;
+	  var i = isLE ? (nBytes - 1) : 0;
+	  var d = isLE ? -1 : 1;
+	  var s = buffer[offset + i];
+
+	  i += d;
+
+	  e = s & ((1 << (-nBits)) - 1);
+	  s >>= (-nBits);
+	  nBits += eLen;
+	  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+	  m = e & ((1 << (-nBits)) - 1);
+	  e >>= (-nBits);
+	  nBits += mLen;
+	  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+	  if (e === 0) {
+	    e = 1 - eBias;
+	  } else if (e === eMax) {
+	    return m ? NaN : ((s ? -1 : 1) * Infinity)
+	  } else {
+	    m = m + Math.pow(2, mLen);
+	    e = e - eBias;
+	  }
+	  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+	}
+
+	function write (buffer, value, offset, isLE, mLen, nBytes) {
+	  var e, m, c;
+	  var eLen = nBytes * 8 - mLen - 1;
+	  var eMax = (1 << eLen) - 1;
+	  var eBias = eMax >> 1;
+	  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0);
+	  var i = isLE ? 0 : (nBytes - 1);
+	  var d = isLE ? 1 : -1;
+	  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
+
+	  value = Math.abs(value);
+
+	  if (isNaN(value) || value === Infinity) {
+	    m = isNaN(value) ? 1 : 0;
+	    e = eMax;
+	  } else {
+	    e = Math.floor(Math.log(value) / Math.LN2);
+	    if (value * (c = Math.pow(2, -e)) < 1) {
+	      e--;
+	      c *= 2;
+	    }
+	    if (e + eBias >= 1) {
+	      value += rt / c;
+	    } else {
+	      value += rt * Math.pow(2, 1 - eBias);
+	    }
+	    if (value * c >= 2) {
+	      e++;
+	      c /= 2;
+	    }
+
+	    if (e + eBias >= eMax) {
+	      m = 0;
+	      e = eMax;
+	    } else if (e + eBias >= 1) {
+	      m = (value * c - 1) * Math.pow(2, mLen);
+	      e = e + eBias;
+	    } else {
+	      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
+	      e = 0;
+	    }
+	  }
+
+	  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+	  e = (e << mLen) | m;
+	  eLen += mLen;
+	  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+	  buffer[offset + i - d] |= s * 128;
+	}
+
+	var toString$1 = {}.toString;
+
+	var isArray = Array.isArray || function (arr) {
+	  return toString$1.call(arr) == '[object Array]';
+	};
+
+	var INSPECT_MAX_BYTES = 50;
+
+	/**
+	 * If `Buffer.TYPED_ARRAY_SUPPORT`:
+	 *   === true    Use Uint8Array implementation (fastest)
+	 *   === false   Use Object implementation (most compatible, even IE6)
+	 *
+	 * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
+	 * Opera 11.6+, iOS 4.2+.
+	 *
+	 * Due to various browser bugs, sometimes the Object implementation will be used even
+	 * when the browser supports typed arrays.
+	 *
+	 * Note:
+	 *
+	 *   - Firefox 4-29 lacks support for adding new properties to `Uint8Array` instances,
+	 *     See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
+	 *
+	 *   - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
+	 *
+	 *   - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
+	 *     incorrect length in some situations.
+
+	 * We detect these buggy browsers and set `Buffer.TYPED_ARRAY_SUPPORT` to `false` so they
+	 * get the Object implementation, which is slower but behaves correctly.
+	 */
+	Buffer.TYPED_ARRAY_SUPPORT = global$1.TYPED_ARRAY_SUPPORT !== undefined
+	  ? global$1.TYPED_ARRAY_SUPPORT
+	  : true;
+
+	function kMaxLength () {
+	  return Buffer.TYPED_ARRAY_SUPPORT
+	    ? 0x7fffffff
+	    : 0x3fffffff
+	}
+
+	function createBuffer (that, length) {
+	  if (kMaxLength() < length) {
+	    throw new RangeError('Invalid typed array length')
+	  }
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    // Return an augmented `Uint8Array` instance, for best performance
+	    that = new Uint8Array(length);
+	    that.__proto__ = Buffer.prototype;
+	  } else {
+	    // Fallback: Return an object instance of the Buffer class
+	    if (that === null) {
+	      that = new Buffer(length);
+	    }
+	    that.length = length;
+	  }
+
+	  return that
+	}
+
+	/**
+	 * The Buffer constructor returns instances of `Uint8Array` that have their
+	 * prototype changed to `Buffer.prototype`. Furthermore, `Buffer` is a subclass of
+	 * `Uint8Array`, so the returned instances will have all the node `Buffer` methods
+	 * and the `Uint8Array` methods. Square bracket notation works as expected -- it
+	 * returns a single octet.
+	 *
+	 * The `Uint8Array` prototype remains unmodified.
+	 */
+
+	function Buffer (arg, encodingOrOffset, length) {
+	  if (!Buffer.TYPED_ARRAY_SUPPORT && !(this instanceof Buffer)) {
+	    return new Buffer(arg, encodingOrOffset, length)
+	  }
+
+	  // Common case.
+	  if (typeof arg === 'number') {
+	    if (typeof encodingOrOffset === 'string') {
+	      throw new Error(
+	        'If encoding is specified then the first argument must be a string'
+	      )
+	    }
+	    return allocUnsafe(this, arg)
+	  }
+	  return from(this, arg, encodingOrOffset, length)
+	}
+
+	Buffer.poolSize = 8192; // not used by this implementation
+
+	// TODO: Legacy, not needed anymore. Remove in next major version.
+	Buffer._augment = function (arr) {
+	  arr.__proto__ = Buffer.prototype;
+	  return arr
+	};
+
+	function from (that, value, encodingOrOffset, length) {
+	  if (typeof value === 'number') {
+	    throw new TypeError('"value" argument must not be a number')
+	  }
+
+	  if (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) {
+	    return fromArrayBuffer(that, value, encodingOrOffset, length)
+	  }
+
+	  if (typeof value === 'string') {
+	    return fromString(that, value, encodingOrOffset)
+	  }
+
+	  return fromObject(that, value)
+	}
+
+	/**
+	 * Functionally equivalent to Buffer(arg, encoding) but throws a TypeError
+	 * if value is a number.
+	 * Buffer.from(str[, encoding])
+	 * Buffer.from(array)
+	 * Buffer.from(buffer)
+	 * Buffer.from(arrayBuffer[, byteOffset[, length]])
+	 **/
+	Buffer.from = function (value, encodingOrOffset, length) {
+	  return from(null, value, encodingOrOffset, length)
+	};
+
+	if (Buffer.TYPED_ARRAY_SUPPORT) {
+	  Buffer.prototype.__proto__ = Uint8Array.prototype;
+	  Buffer.__proto__ = Uint8Array;
+	}
+
+	function assertSize (size) {
+	  if (typeof size !== 'number') {
+	    throw new TypeError('"size" argument must be a number')
+	  } else if (size < 0) {
+	    throw new RangeError('"size" argument must not be negative')
+	  }
+	}
+
+	function alloc (that, size, fill, encoding) {
+	  assertSize(size);
+	  if (size <= 0) {
+	    return createBuffer(that, size)
+	  }
+	  if (fill !== undefined) {
+	    // Only pay attention to encoding if it's a string. This
+	    // prevents accidentally sending in a number that would
+	    // be interpretted as a start offset.
+	    return typeof encoding === 'string'
+	      ? createBuffer(that, size).fill(fill, encoding)
+	      : createBuffer(that, size).fill(fill)
+	  }
+	  return createBuffer(that, size)
+	}
+
+	/**
+	 * Creates a new filled Buffer instance.
+	 * alloc(size[, fill[, encoding]])
+	 **/
+	Buffer.alloc = function (size, fill, encoding) {
+	  return alloc(null, size, fill, encoding)
+	};
+
+	function allocUnsafe (that, size) {
+	  assertSize(size);
+	  that = createBuffer(that, size < 0 ? 0 : checked(size) | 0);
+	  if (!Buffer.TYPED_ARRAY_SUPPORT) {
+	    for (var i = 0; i < size; ++i) {
+	      that[i] = 0;
+	    }
+	  }
+	  return that
+	}
+
+	/**
+	 * Equivalent to Buffer(num), by default creates a non-zero-filled Buffer instance.
+	 * */
+	Buffer.allocUnsafe = function (size) {
+	  return allocUnsafe(null, size)
+	};
+	/**
+	 * Equivalent to SlowBuffer(num), by default creates a non-zero-filled Buffer instance.
+	 */
+	Buffer.allocUnsafeSlow = function (size) {
+	  return allocUnsafe(null, size)
+	};
+
+	function fromString (that, string, encoding) {
+	  if (typeof encoding !== 'string' || encoding === '') {
+	    encoding = 'utf8';
+	  }
+
+	  if (!Buffer.isEncoding(encoding)) {
+	    throw new TypeError('"encoding" must be a valid string encoding')
+	  }
+
+	  var length = byteLength(string, encoding) | 0;
+	  that = createBuffer(that, length);
+
+	  var actual = that.write(string, encoding);
+
+	  if (actual !== length) {
+	    // Writing a hex string, for example, that contains invalid characters will
+	    // cause everything after the first invalid character to be ignored. (e.g.
+	    // 'abxxcd' will be treated as 'ab')
+	    that = that.slice(0, actual);
+	  }
+
+	  return that
+	}
+
+	function fromArrayLike (that, array) {
+	  var length = array.length < 0 ? 0 : checked(array.length) | 0;
+	  that = createBuffer(that, length);
+	  for (var i = 0; i < length; i += 1) {
+	    that[i] = array[i] & 255;
+	  }
+	  return that
+	}
+
+	function fromArrayBuffer (that, array, byteOffset, length) {
+	  array.byteLength; // this throws if `array` is not a valid ArrayBuffer
+
+	  if (byteOffset < 0 || array.byteLength < byteOffset) {
+	    throw new RangeError('\'offset\' is out of bounds')
+	  }
+
+	  if (array.byteLength < byteOffset + (length || 0)) {
+	    throw new RangeError('\'length\' is out of bounds')
+	  }
+
+	  if (byteOffset === undefined && length === undefined) {
+	    array = new Uint8Array(array);
+	  } else if (length === undefined) {
+	    array = new Uint8Array(array, byteOffset);
+	  } else {
+	    array = new Uint8Array(array, byteOffset, length);
+	  }
+
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    // Return an augmented `Uint8Array` instance, for best performance
+	    that = array;
+	    that.__proto__ = Buffer.prototype;
+	  } else {
+	    // Fallback: Return an object instance of the Buffer class
+	    that = fromArrayLike(that, array);
+	  }
+	  return that
+	}
+
+	function fromObject (that, obj) {
+	  if (internalIsBuffer(obj)) {
+	    var len = checked(obj.length) | 0;
+	    that = createBuffer(that, len);
+
+	    if (that.length === 0) {
+	      return that
+	    }
+
+	    obj.copy(that, 0, 0, len);
+	    return that
+	  }
+
+	  if (obj) {
+	    if ((typeof ArrayBuffer !== 'undefined' &&
+	        obj.buffer instanceof ArrayBuffer) || 'length' in obj) {
+	      if (typeof obj.length !== 'number' || isnan(obj.length)) {
+	        return createBuffer(that, 0)
+	      }
+	      return fromArrayLike(that, obj)
+	    }
+
+	    if (obj.type === 'Buffer' && isArray(obj.data)) {
+	      return fromArrayLike(that, obj.data)
+	    }
+	  }
+
+	  throw new TypeError('First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.')
+	}
+
+	function checked (length) {
+	  // Note: cannot use `length < kMaxLength()` here because that fails when
+	  // length is NaN (which is otherwise coerced to zero.)
+	  if (length >= kMaxLength()) {
+	    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
+	                         'size: 0x' + kMaxLength().toString(16) + ' bytes')
+	  }
+	  return length | 0
+	}
+	Buffer.isBuffer = isBuffer;
+	function internalIsBuffer (b) {
+	  return !!(b != null && b._isBuffer)
+	}
+
+	Buffer.compare = function compare (a, b) {
+	  if (!internalIsBuffer(a) || !internalIsBuffer(b)) {
+	    throw new TypeError('Arguments must be Buffers')
+	  }
+
+	  if (a === b) return 0
+
+	  var x = a.length;
+	  var y = b.length;
+
+	  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
+	    if (a[i] !== b[i]) {
+	      x = a[i];
+	      y = b[i];
+	      break
+	    }
+	  }
+
+	  if (x < y) return -1
+	  if (y < x) return 1
+	  return 0
+	};
+
+	Buffer.isEncoding = function isEncoding (encoding) {
+	  switch (String(encoding).toLowerCase()) {
+	    case 'hex':
+	    case 'utf8':
+	    case 'utf-8':
+	    case 'ascii':
+	    case 'latin1':
+	    case 'binary':
+	    case 'base64':
+	    case 'ucs2':
+	    case 'ucs-2':
+	    case 'utf16le':
+	    case 'utf-16le':
+	      return true
+	    default:
+	      return false
+	  }
+	};
+
+	Buffer.concat = function concat (list, length) {
+	  if (!isArray(list)) {
+	    throw new TypeError('"list" argument must be an Array of Buffers')
+	  }
+
+	  if (list.length === 0) {
+	    return Buffer.alloc(0)
+	  }
+
+	  var i;
+	  if (length === undefined) {
+	    length = 0;
+	    for (i = 0; i < list.length; ++i) {
+	      length += list[i].length;
+	    }
+	  }
+
+	  var buffer = Buffer.allocUnsafe(length);
+	  var pos = 0;
+	  for (i = 0; i < list.length; ++i) {
+	    var buf = list[i];
+	    if (!internalIsBuffer(buf)) {
+	      throw new TypeError('"list" argument must be an Array of Buffers')
+	    }
+	    buf.copy(buffer, pos);
+	    pos += buf.length;
+	  }
+	  return buffer
+	};
+
+	function byteLength (string, encoding) {
+	  if (internalIsBuffer(string)) {
+	    return string.length
+	  }
+	  if (typeof ArrayBuffer !== 'undefined' && typeof ArrayBuffer.isView === 'function' &&
+	      (ArrayBuffer.isView(string) || string instanceof ArrayBuffer)) {
+	    return string.byteLength
+	  }
+	  if (typeof string !== 'string') {
+	    string = '' + string;
+	  }
+
+	  var len = string.length;
+	  if (len === 0) return 0
+
+	  // Use a for loop to avoid recursion
+	  var loweredCase = false;
+	  for (;;) {
+	    switch (encoding) {
+	      case 'ascii':
+	      case 'latin1':
+	      case 'binary':
+	        return len
+	      case 'utf8':
+	      case 'utf-8':
+	      case undefined:
+	        return utf8ToBytes(string).length
+	      case 'ucs2':
+	      case 'ucs-2':
+	      case 'utf16le':
+	      case 'utf-16le':
+	        return len * 2
+	      case 'hex':
+	        return len >>> 1
+	      case 'base64':
+	        return base64ToBytes(string).length
+	      default:
+	        if (loweredCase) return utf8ToBytes(string).length // assume utf8
+	        encoding = ('' + encoding).toLowerCase();
+	        loweredCase = true;
+	    }
+	  }
+	}
+	Buffer.byteLength = byteLength;
+
+	function slowToString (encoding, start, end) {
+	  var loweredCase = false;
+
+	  // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
+	  // property of a typed array.
+
+	  // This behaves neither like String nor Uint8Array in that we set start/end
+	  // to their upper/lower bounds if the value passed is out of range.
+	  // undefined is handled specially as per ECMA-262 6th Edition,
+	  // Section 13.3.3.7 Runtime Semantics: KeyedBindingInitialization.
+	  if (start === undefined || start < 0) {
+	    start = 0;
+	  }
+	  // Return early if start > this.length. Done here to prevent potential uint32
+	  // coercion fail below.
+	  if (start > this.length) {
+	    return ''
+	  }
+
+	  if (end === undefined || end > this.length) {
+	    end = this.length;
+	  }
+
+	  if (end <= 0) {
+	    return ''
+	  }
+
+	  // Force coersion to uint32. This will also coerce falsey/NaN values to 0.
+	  end >>>= 0;
+	  start >>>= 0;
+
+	  if (end <= start) {
+	    return ''
+	  }
+
+	  if (!encoding) encoding = 'utf8';
+
+	  while (true) {
+	    switch (encoding) {
+	      case 'hex':
+	        return hexSlice(this, start, end)
+
+	      case 'utf8':
+	      case 'utf-8':
+	        return utf8Slice(this, start, end)
+
+	      case 'ascii':
+	        return asciiSlice(this, start, end)
+
+	      case 'latin1':
+	      case 'binary':
+	        return latin1Slice(this, start, end)
+
+	      case 'base64':
+	        return base64Slice(this, start, end)
+
+	      case 'ucs2':
+	      case 'ucs-2':
+	      case 'utf16le':
+	      case 'utf-16le':
+	        return utf16leSlice(this, start, end)
+
+	      default:
+	        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+	        encoding = (encoding + '').toLowerCase();
+	        loweredCase = true;
+	    }
+	  }
+	}
+
+	// The property is used by `Buffer.isBuffer` and `is-buffer` (in Safari 5-7) to detect
+	// Buffer instances.
+	Buffer.prototype._isBuffer = true;
+
+	function swap (b, n, m) {
+	  var i = b[n];
+	  b[n] = b[m];
+	  b[m] = i;
+	}
+
+	Buffer.prototype.swap16 = function swap16 () {
+	  var len = this.length;
+	  if (len % 2 !== 0) {
+	    throw new RangeError('Buffer size must be a multiple of 16-bits')
+	  }
+	  for (var i = 0; i < len; i += 2) {
+	    swap(this, i, i + 1);
+	  }
+	  return this
+	};
+
+	Buffer.prototype.swap32 = function swap32 () {
+	  var len = this.length;
+	  if (len % 4 !== 0) {
+	    throw new RangeError('Buffer size must be a multiple of 32-bits')
+	  }
+	  for (var i = 0; i < len; i += 4) {
+	    swap(this, i, i + 3);
+	    swap(this, i + 1, i + 2);
+	  }
+	  return this
+	};
+
+	Buffer.prototype.swap64 = function swap64 () {
+	  var len = this.length;
+	  if (len % 8 !== 0) {
+	    throw new RangeError('Buffer size must be a multiple of 64-bits')
+	  }
+	  for (var i = 0; i < len; i += 8) {
+	    swap(this, i, i + 7);
+	    swap(this, i + 1, i + 6);
+	    swap(this, i + 2, i + 5);
+	    swap(this, i + 3, i + 4);
+	  }
+	  return this
+	};
+
+	Buffer.prototype.toString = function toString () {
+	  var length = this.length | 0;
+	  if (length === 0) return ''
+	  if (arguments.length === 0) return utf8Slice(this, 0, length)
+	  return slowToString.apply(this, arguments)
+	};
+
+	Buffer.prototype.equals = function equals (b) {
+	  if (!internalIsBuffer(b)) throw new TypeError('Argument must be a Buffer')
+	  if (this === b) return true
+	  return Buffer.compare(this, b) === 0
+	};
+
+	Buffer.prototype.inspect = function inspect () {
+	  var str = '';
+	  var max = INSPECT_MAX_BYTES;
+	  if (this.length > 0) {
+	    str = this.toString('hex', 0, max).match(/.{2}/g).join(' ');
+	    if (this.length > max) str += ' ... ';
+	  }
+	  return '<Buffer ' + str + '>'
+	};
+
+	Buffer.prototype.compare = function compare (target, start, end, thisStart, thisEnd) {
+	  if (!internalIsBuffer(target)) {
+	    throw new TypeError('Argument must be a Buffer')
+	  }
+
+	  if (start === undefined) {
+	    start = 0;
+	  }
+	  if (end === undefined) {
+	    end = target ? target.length : 0;
+	  }
+	  if (thisStart === undefined) {
+	    thisStart = 0;
+	  }
+	  if (thisEnd === undefined) {
+	    thisEnd = this.length;
+	  }
+
+	  if (start < 0 || end > target.length || thisStart < 0 || thisEnd > this.length) {
+	    throw new RangeError('out of range index')
+	  }
+
+	  if (thisStart >= thisEnd && start >= end) {
+	    return 0
+	  }
+	  if (thisStart >= thisEnd) {
+	    return -1
+	  }
+	  if (start >= end) {
+	    return 1
+	  }
+
+	  start >>>= 0;
+	  end >>>= 0;
+	  thisStart >>>= 0;
+	  thisEnd >>>= 0;
+
+	  if (this === target) return 0
+
+	  var x = thisEnd - thisStart;
+	  var y = end - start;
+	  var len = Math.min(x, y);
+
+	  var thisCopy = this.slice(thisStart, thisEnd);
+	  var targetCopy = target.slice(start, end);
+
+	  for (var i = 0; i < len; ++i) {
+	    if (thisCopy[i] !== targetCopy[i]) {
+	      x = thisCopy[i];
+	      y = targetCopy[i];
+	      break
+	    }
+	  }
+
+	  if (x < y) return -1
+	  if (y < x) return 1
+	  return 0
+	};
+
+	// Finds either the first index of `val` in `buffer` at offset >= `byteOffset`,
+	// OR the last index of `val` in `buffer` at offset <= `byteOffset`.
+	//
+	// Arguments:
+	// - buffer - a Buffer to search
+	// - val - a string, Buffer, or number
+	// - byteOffset - an index into `buffer`; will be clamped to an int32
+	// - encoding - an optional encoding, relevant is val is a string
+	// - dir - true for indexOf, false for lastIndexOf
+	function bidirectionalIndexOf (buffer, val, byteOffset, encoding, dir) {
+	  // Empty buffer means no match
+	  if (buffer.length === 0) return -1
+
+	  // Normalize byteOffset
+	  if (typeof byteOffset === 'string') {
+	    encoding = byteOffset;
+	    byteOffset = 0;
+	  } else if (byteOffset > 0x7fffffff) {
+	    byteOffset = 0x7fffffff;
+	  } else if (byteOffset < -0x80000000) {
+	    byteOffset = -0x80000000;
+	  }
+	  byteOffset = +byteOffset;  // Coerce to Number.
+	  if (isNaN(byteOffset)) {
+	    // byteOffset: it it's undefined, null, NaN, "foo", etc, search whole buffer
+	    byteOffset = dir ? 0 : (buffer.length - 1);
+	  }
+
+	  // Normalize byteOffset: negative offsets start from the end of the buffer
+	  if (byteOffset < 0) byteOffset = buffer.length + byteOffset;
+	  if (byteOffset >= buffer.length) {
+	    if (dir) return -1
+	    else byteOffset = buffer.length - 1;
+	  } else if (byteOffset < 0) {
+	    if (dir) byteOffset = 0;
+	    else return -1
+	  }
+
+	  // Normalize val
+	  if (typeof val === 'string') {
+	    val = Buffer.from(val, encoding);
+	  }
+
+	  // Finally, search either indexOf (if dir is true) or lastIndexOf
+	  if (internalIsBuffer(val)) {
+	    // Special case: looking for empty string/buffer always fails
+	    if (val.length === 0) {
+	      return -1
+	    }
+	    return arrayIndexOf$1(buffer, val, byteOffset, encoding, dir)
+	  } else if (typeof val === 'number') {
+	    val = val & 0xFF; // Search for a byte value [0-255]
+	    if (Buffer.TYPED_ARRAY_SUPPORT &&
+	        typeof Uint8Array.prototype.indexOf === 'function') {
+	      if (dir) {
+	        return Uint8Array.prototype.indexOf.call(buffer, val, byteOffset)
+	      } else {
+	        return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset)
+	      }
+	    }
+	    return arrayIndexOf$1(buffer, [ val ], byteOffset, encoding, dir)
+	  }
+
+	  throw new TypeError('val must be string, number or Buffer')
+	}
+
+	function arrayIndexOf$1 (arr, val, byteOffset, encoding, dir) {
+	  var indexSize = 1;
+	  var arrLength = arr.length;
+	  var valLength = val.length;
+
+	  if (encoding !== undefined) {
+	    encoding = String(encoding).toLowerCase();
+	    if (encoding === 'ucs2' || encoding === 'ucs-2' ||
+	        encoding === 'utf16le' || encoding === 'utf-16le') {
+	      if (arr.length < 2 || val.length < 2) {
+	        return -1
+	      }
+	      indexSize = 2;
+	      arrLength /= 2;
+	      valLength /= 2;
+	      byteOffset /= 2;
+	    }
+	  }
+
+	  function read$$1 (buf, i) {
+	    if (indexSize === 1) {
+	      return buf[i]
+	    } else {
+	      return buf.readUInt16BE(i * indexSize)
+	    }
+	  }
+
+	  var i;
+	  if (dir) {
+	    var foundIndex = -1;
+	    for (i = byteOffset; i < arrLength; i++) {
+	      if (read$$1(arr, i) === read$$1(val, foundIndex === -1 ? 0 : i - foundIndex)) {
+	        if (foundIndex === -1) foundIndex = i;
+	        if (i - foundIndex + 1 === valLength) return foundIndex * indexSize
+	      } else {
+	        if (foundIndex !== -1) i -= i - foundIndex;
+	        foundIndex = -1;
+	      }
+	    }
+	  } else {
+	    if (byteOffset + valLength > arrLength) byteOffset = arrLength - valLength;
+	    for (i = byteOffset; i >= 0; i--) {
+	      var found = true;
+	      for (var j = 0; j < valLength; j++) {
+	        if (read$$1(arr, i + j) !== read$$1(val, j)) {
+	          found = false;
+	          break
+	        }
+	      }
+	      if (found) return i
+	    }
+	  }
+
+	  return -1
+	}
+
+	Buffer.prototype.includes = function includes (val, byteOffset, encoding) {
+	  return this.indexOf(val, byteOffset, encoding) !== -1
+	};
+
+	Buffer.prototype.indexOf = function indexOf (val, byteOffset, encoding) {
+	  return bidirectionalIndexOf(this, val, byteOffset, encoding, true)
+	};
+
+	Buffer.prototype.lastIndexOf = function lastIndexOf (val, byteOffset, encoding) {
+	  return bidirectionalIndexOf(this, val, byteOffset, encoding, false)
+	};
+
+	function hexWrite (buf, string, offset, length) {
+	  offset = Number(offset) || 0;
+	  var remaining = buf.length - offset;
+	  if (!length) {
+	    length = remaining;
+	  } else {
+	    length = Number(length);
+	    if (length > remaining) {
+	      length = remaining;
+	    }
+	  }
+
+	  // must be an even number of digits
+	  var strLen = string.length;
+	  if (strLen % 2 !== 0) throw new TypeError('Invalid hex string')
+
+	  if (length > strLen / 2) {
+	    length = strLen / 2;
+	  }
+	  for (var i = 0; i < length; ++i) {
+	    var parsed = parseInt(string.substr(i * 2, 2), 16);
+	    if (isNaN(parsed)) return i
+	    buf[offset + i] = parsed;
+	  }
+	  return i
+	}
+
+	function utf8Write (buf, string, offset, length) {
+	  return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length)
+	}
+
+	function asciiWrite (buf, string, offset, length) {
+	  return blitBuffer(asciiToBytes(string), buf, offset, length)
+	}
+
+	function latin1Write (buf, string, offset, length) {
+	  return asciiWrite(buf, string, offset, length)
+	}
+
+	function base64Write (buf, string, offset, length) {
+	  return blitBuffer(base64ToBytes(string), buf, offset, length)
+	}
+
+	function ucs2Write (buf, string, offset, length) {
+	  return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length)
+	}
+
+	Buffer.prototype.write = function write$$1 (string, offset, length, encoding) {
+	  // Buffer#write(string)
+	  if (offset === undefined) {
+	    encoding = 'utf8';
+	    length = this.length;
+	    offset = 0;
+	  // Buffer#write(string, encoding)
+	  } else if (length === undefined && typeof offset === 'string') {
+	    encoding = offset;
+	    length = this.length;
+	    offset = 0;
+	  // Buffer#write(string, offset[, length][, encoding])
+	  } else if (isFinite(offset)) {
+	    offset = offset | 0;
+	    if (isFinite(length)) {
+	      length = length | 0;
+	      if (encoding === undefined) encoding = 'utf8';
+	    } else {
+	      encoding = length;
+	      length = undefined;
+	    }
+	  // legacy write(string, encoding, offset, length) - remove in v0.13
+	  } else {
+	    throw new Error(
+	      'Buffer.write(string, encoding, offset[, length]) is no longer supported'
+	    )
+	  }
+
+	  var remaining = this.length - offset;
+	  if (length === undefined || length > remaining) length = remaining;
+
+	  if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
+	    throw new RangeError('Attempt to write outside buffer bounds')
+	  }
+
+	  if (!encoding) encoding = 'utf8';
+
+	  var loweredCase = false;
+	  for (;;) {
+	    switch (encoding) {
+	      case 'hex':
+	        return hexWrite(this, string, offset, length)
+
+	      case 'utf8':
+	      case 'utf-8':
+	        return utf8Write(this, string, offset, length)
+
+	      case 'ascii':
+	        return asciiWrite(this, string, offset, length)
+
+	      case 'latin1':
+	      case 'binary':
+	        return latin1Write(this, string, offset, length)
+
+	      case 'base64':
+	        // Warning: maxLength not taken into account in base64Write
+	        return base64Write(this, string, offset, length)
+
+	      case 'ucs2':
+	      case 'ucs-2':
+	      case 'utf16le':
+	      case 'utf-16le':
+	        return ucs2Write(this, string, offset, length)
+
+	      default:
+	        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+	        encoding = ('' + encoding).toLowerCase();
+	        loweredCase = true;
+	    }
+	  }
+	};
+
+	Buffer.prototype.toJSON = function toJSON () {
+	  return {
+	    type: 'Buffer',
+	    data: Array.prototype.slice.call(this._arr || this, 0)
+	  }
+	};
+
+	function base64Slice (buf, start, end) {
+	  if (start === 0 && end === buf.length) {
+	    return fromByteArray(buf)
+	  } else {
+	    return fromByteArray(buf.slice(start, end))
+	  }
+	}
+
+	function utf8Slice (buf, start, end) {
+	  end = Math.min(buf.length, end);
+	  var res = [];
+
+	  var i = start;
+	  while (i < end) {
+	    var firstByte = buf[i];
+	    var codePoint = null;
+	    var bytesPerSequence = (firstByte > 0xEF) ? 4
+	      : (firstByte > 0xDF) ? 3
+	      : (firstByte > 0xBF) ? 2
+	      : 1;
+
+	    if (i + bytesPerSequence <= end) {
+	      var secondByte, thirdByte, fourthByte, tempCodePoint;
+
+	      switch (bytesPerSequence) {
+	        case 1:
+	          if (firstByte < 0x80) {
+	            codePoint = firstByte;
+	          }
+	          break
+	        case 2:
+	          secondByte = buf[i + 1];
+	          if ((secondByte & 0xC0) === 0x80) {
+	            tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F);
+	            if (tempCodePoint > 0x7F) {
+	              codePoint = tempCodePoint;
+	            }
+	          }
+	          break
+	        case 3:
+	          secondByte = buf[i + 1];
+	          thirdByte = buf[i + 2];
+	          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
+	            tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F);
+	            if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
+	              codePoint = tempCodePoint;
+	            }
+	          }
+	          break
+	        case 4:
+	          secondByte = buf[i + 1];
+	          thirdByte = buf[i + 2];
+	          fourthByte = buf[i + 3];
+	          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
+	            tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F);
+	            if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
+	              codePoint = tempCodePoint;
+	            }
+	          }
+	      }
+	    }
+
+	    if (codePoint === null) {
+	      // we did not generate a valid codePoint so insert a
+	      // replacement char (U+FFFD) and advance only 1 byte
+	      codePoint = 0xFFFD;
+	      bytesPerSequence = 1;
+	    } else if (codePoint > 0xFFFF) {
+	      // encode to utf16 (surrogate pair dance)
+	      codePoint -= 0x10000;
+	      res.push(codePoint >>> 10 & 0x3FF | 0xD800);
+	      codePoint = 0xDC00 | codePoint & 0x3FF;
+	    }
+
+	    res.push(codePoint);
+	    i += bytesPerSequence;
+	  }
+
+	  return decodeCodePointsArray(res)
+	}
+
+	// Based on http://stackoverflow.com/a/22747272/680742, the browser with
+	// the lowest limit is Chrome, with 0x10000 args.
+	// We go 1 magnitude less, for safety
+	var MAX_ARGUMENTS_LENGTH = 0x1000;
+
+	function decodeCodePointsArray (codePoints) {
+	  var len = codePoints.length;
+	  if (len <= MAX_ARGUMENTS_LENGTH) {
+	    return String.fromCharCode.apply(String, codePoints) // avoid extra slice()
+	  }
+
+	  // Decode in chunks to avoid "call stack size exceeded".
+	  var res = '';
+	  var i = 0;
+	  while (i < len) {
+	    res += String.fromCharCode.apply(
+	      String,
+	      codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH)
+	    );
+	  }
+	  return res
+	}
+
+	function asciiSlice (buf, start, end) {
+	  var ret = '';
+	  end = Math.min(buf.length, end);
+
+	  for (var i = start; i < end; ++i) {
+	    ret += String.fromCharCode(buf[i] & 0x7F);
+	  }
+	  return ret
+	}
+
+	function latin1Slice (buf, start, end) {
+	  var ret = '';
+	  end = Math.min(buf.length, end);
+
+	  for (var i = start; i < end; ++i) {
+	    ret += String.fromCharCode(buf[i]);
+	  }
+	  return ret
+	}
+
+	function hexSlice (buf, start, end) {
+	  var len = buf.length;
+
+	  if (!start || start < 0) start = 0;
+	  if (!end || end < 0 || end > len) end = len;
+
+	  var out = '';
+	  for (var i = start; i < end; ++i) {
+	    out += toHex(buf[i]);
+	  }
+	  return out
+	}
+
+	function utf16leSlice (buf, start, end) {
+	  var bytes = buf.slice(start, end);
+	  var res = '';
+	  for (var i = 0; i < bytes.length; i += 2) {
+	    res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256);
+	  }
+	  return res
+	}
+
+	Buffer.prototype.slice = function slice (start, end) {
+	  var len = this.length;
+	  start = ~~start;
+	  end = end === undefined ? len : ~~end;
+
+	  if (start < 0) {
+	    start += len;
+	    if (start < 0) start = 0;
+	  } else if (start > len) {
+	    start = len;
+	  }
+
+	  if (end < 0) {
+	    end += len;
+	    if (end < 0) end = 0;
+	  } else if (end > len) {
+	    end = len;
+	  }
+
+	  if (end < start) end = start;
+
+	  var newBuf;
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    newBuf = this.subarray(start, end);
+	    newBuf.__proto__ = Buffer.prototype;
+	  } else {
+	    var sliceLen = end - start;
+	    newBuf = new Buffer(sliceLen, undefined);
+	    for (var i = 0; i < sliceLen; ++i) {
+	      newBuf[i] = this[i + start];
+	    }
+	  }
+
+	  return newBuf
+	};
+
+	/*
+	 * Need to make sure that buffer isn't trying to write out of bounds.
+	 */
+	function checkOffset (offset, ext, length) {
+	  if ((offset % 1) !== 0 || offset < 0) throw new RangeError('offset is not uint')
+	  if (offset + ext > length) throw new RangeError('Trying to access beyond buffer length')
+	}
+
+	Buffer.prototype.readUIntLE = function readUIntLE (offset, byteLength, noAssert) {
+	  offset = offset | 0;
+	  byteLength = byteLength | 0;
+	  if (!noAssert) checkOffset(offset, byteLength, this.length);
+
+	  var val = this[offset];
+	  var mul = 1;
+	  var i = 0;
+	  while (++i < byteLength && (mul *= 0x100)) {
+	    val += this[offset + i] * mul;
+	  }
+
+	  return val
+	};
+
+	Buffer.prototype.readUIntBE = function readUIntBE (offset, byteLength, noAssert) {
+	  offset = offset | 0;
+	  byteLength = byteLength | 0;
+	  if (!noAssert) {
+	    checkOffset(offset, byteLength, this.length);
+	  }
+
+	  var val = this[offset + --byteLength];
+	  var mul = 1;
+	  while (byteLength > 0 && (mul *= 0x100)) {
+	    val += this[offset + --byteLength] * mul;
+	  }
+
+	  return val
+	};
+
+	Buffer.prototype.readUInt8 = function readUInt8 (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 1, this.length);
+	  return this[offset]
+	};
+
+	Buffer.prototype.readUInt16LE = function readUInt16LE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 2, this.length);
+	  return this[offset] | (this[offset + 1] << 8)
+	};
+
+	Buffer.prototype.readUInt16BE = function readUInt16BE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 2, this.length);
+	  return (this[offset] << 8) | this[offset + 1]
+	};
+
+	Buffer.prototype.readUInt32LE = function readUInt32LE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length);
+
+	  return ((this[offset]) |
+	      (this[offset + 1] << 8) |
+	      (this[offset + 2] << 16)) +
+	      (this[offset + 3] * 0x1000000)
+	};
+
+	Buffer.prototype.readUInt32BE = function readUInt32BE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length);
+
+	  return (this[offset] * 0x1000000) +
+	    ((this[offset + 1] << 16) |
+	    (this[offset + 2] << 8) |
+	    this[offset + 3])
+	};
+
+	Buffer.prototype.readIntLE = function readIntLE (offset, byteLength, noAssert) {
+	  offset = offset | 0;
+	  byteLength = byteLength | 0;
+	  if (!noAssert) checkOffset(offset, byteLength, this.length);
+
+	  var val = this[offset];
+	  var mul = 1;
+	  var i = 0;
+	  while (++i < byteLength && (mul *= 0x100)) {
+	    val += this[offset + i] * mul;
+	  }
+	  mul *= 0x80;
+
+	  if (val >= mul) val -= Math.pow(2, 8 * byteLength);
+
+	  return val
+	};
+
+	Buffer.prototype.readIntBE = function readIntBE (offset, byteLength, noAssert) {
+	  offset = offset | 0;
+	  byteLength = byteLength | 0;
+	  if (!noAssert) checkOffset(offset, byteLength, this.length);
+
+	  var i = byteLength;
+	  var mul = 1;
+	  var val = this[offset + --i];
+	  while (i > 0 && (mul *= 0x100)) {
+	    val += this[offset + --i] * mul;
+	  }
+	  mul *= 0x80;
+
+	  if (val >= mul) val -= Math.pow(2, 8 * byteLength);
+
+	  return val
+	};
+
+	Buffer.prototype.readInt8 = function readInt8 (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 1, this.length);
+	  if (!(this[offset] & 0x80)) return (this[offset])
+	  return ((0xff - this[offset] + 1) * -1)
+	};
+
+	Buffer.prototype.readInt16LE = function readInt16LE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 2, this.length);
+	  var val = this[offset] | (this[offset + 1] << 8);
+	  return (val & 0x8000) ? val | 0xFFFF0000 : val
+	};
+
+	Buffer.prototype.readInt16BE = function readInt16BE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 2, this.length);
+	  var val = this[offset + 1] | (this[offset] << 8);
+	  return (val & 0x8000) ? val | 0xFFFF0000 : val
+	};
+
+	Buffer.prototype.readInt32LE = function readInt32LE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length);
+
+	  return (this[offset]) |
+	    (this[offset + 1] << 8) |
+	    (this[offset + 2] << 16) |
+	    (this[offset + 3] << 24)
+	};
+
+	Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length);
+
+	  return (this[offset] << 24) |
+	    (this[offset + 1] << 16) |
+	    (this[offset + 2] << 8) |
+	    (this[offset + 3])
+	};
+
+	Buffer.prototype.readFloatLE = function readFloatLE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length);
+	  return read(this, offset, true, 23, 4)
+	};
+
+	Buffer.prototype.readFloatBE = function readFloatBE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 4, this.length);
+	  return read(this, offset, false, 23, 4)
+	};
+
+	Buffer.prototype.readDoubleLE = function readDoubleLE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 8, this.length);
+	  return read(this, offset, true, 52, 8)
+	};
+
+	Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
+	  if (!noAssert) checkOffset(offset, 8, this.length);
+	  return read(this, offset, false, 52, 8)
+	};
+
+	function checkInt (buf, value, offset, ext, max, min) {
+	  if (!internalIsBuffer(buf)) throw new TypeError('"buffer" argument must be a Buffer instance')
+	  if (value > max || value < min) throw new RangeError('"value" argument is out of bounds')
+	  if (offset + ext > buf.length) throw new RangeError('Index out of range')
+	}
+
+	Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  byteLength = byteLength | 0;
+	  if (!noAssert) {
+	    var maxBytes = Math.pow(2, 8 * byteLength) - 1;
+	    checkInt(this, value, offset, byteLength, maxBytes, 0);
+	  }
+
+	  var mul = 1;
+	  var i = 0;
+	  this[offset] = value & 0xFF;
+	  while (++i < byteLength && (mul *= 0x100)) {
+	    this[offset + i] = (value / mul) & 0xFF;
+	  }
+
+	  return offset + byteLength
+	};
+
+	Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  byteLength = byteLength | 0;
+	  if (!noAssert) {
+	    var maxBytes = Math.pow(2, 8 * byteLength) - 1;
+	    checkInt(this, value, offset, byteLength, maxBytes, 0);
+	  }
+
+	  var i = byteLength - 1;
+	  var mul = 1;
+	  this[offset + i] = value & 0xFF;
+	  while (--i >= 0 && (mul *= 0x100)) {
+	    this[offset + i] = (value / mul) & 0xFF;
+	  }
+
+	  return offset + byteLength
+	};
+
+	Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) checkInt(this, value, offset, 1, 0xff, 0);
+	  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value);
+	  this[offset] = (value & 0xff);
+	  return offset + 1
+	};
+
+	function objectWriteUInt16 (buf, value, offset, littleEndian) {
+	  if (value < 0) value = 0xffff + value + 1;
+	  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; ++i) {
+	    buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
+	      (littleEndian ? i : 1 - i) * 8;
+	  }
+	}
+
+	Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0);
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value & 0xff);
+	    this[offset + 1] = (value >>> 8);
+	  } else {
+	    objectWriteUInt16(this, value, offset, true);
+	  }
+	  return offset + 2
+	};
+
+	Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0);
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value >>> 8);
+	    this[offset + 1] = (value & 0xff);
+	  } else {
+	    objectWriteUInt16(this, value, offset, false);
+	  }
+	  return offset + 2
+	};
+
+	function objectWriteUInt32 (buf, value, offset, littleEndian) {
+	  if (value < 0) value = 0xffffffff + value + 1;
+	  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; ++i) {
+	    buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff;
+	  }
+	}
+
+	Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0);
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset + 3] = (value >>> 24);
+	    this[offset + 2] = (value >>> 16);
+	    this[offset + 1] = (value >>> 8);
+	    this[offset] = (value & 0xff);
+	  } else {
+	    objectWriteUInt32(this, value, offset, true);
+	  }
+	  return offset + 4
+	};
+
+	Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0);
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value >>> 24);
+	    this[offset + 1] = (value >>> 16);
+	    this[offset + 2] = (value >>> 8);
+	    this[offset + 3] = (value & 0xff);
+	  } else {
+	    objectWriteUInt32(this, value, offset, false);
+	  }
+	  return offset + 4
+	};
+
+	Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) {
+	    var limit = Math.pow(2, 8 * byteLength - 1);
+
+	    checkInt(this, value, offset, byteLength, limit - 1, -limit);
+	  }
+
+	  var i = 0;
+	  var mul = 1;
+	  var sub = 0;
+	  this[offset] = value & 0xFF;
+	  while (++i < byteLength && (mul *= 0x100)) {
+	    if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) {
+	      sub = 1;
+	    }
+	    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF;
+	  }
+
+	  return offset + byteLength
+	};
+
+	Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) {
+	    var limit = Math.pow(2, 8 * byteLength - 1);
+
+	    checkInt(this, value, offset, byteLength, limit - 1, -limit);
+	  }
+
+	  var i = byteLength - 1;
+	  var mul = 1;
+	  var sub = 0;
+	  this[offset + i] = value & 0xFF;
+	  while (--i >= 0 && (mul *= 0x100)) {
+	    if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) {
+	      sub = 1;
+	    }
+	    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF;
+	  }
+
+	  return offset + byteLength
+	};
+
+	Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) checkInt(this, value, offset, 1, 0x7f, -0x80);
+	  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value);
+	  if (value < 0) value = 0xff + value + 1;
+	  this[offset] = (value & 0xff);
+	  return offset + 1
+	};
+
+	Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000);
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value & 0xff);
+	    this[offset + 1] = (value >>> 8);
+	  } else {
+	    objectWriteUInt16(this, value, offset, true);
+	  }
+	  return offset + 2
+	};
+
+	Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000);
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value >>> 8);
+	    this[offset + 1] = (value & 0xff);
+	  } else {
+	    objectWriteUInt16(this, value, offset, false);
+	  }
+	  return offset + 2
+	};
+
+	Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000);
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value & 0xff);
+	    this[offset + 1] = (value >>> 8);
+	    this[offset + 2] = (value >>> 16);
+	    this[offset + 3] = (value >>> 24);
+	  } else {
+	    objectWriteUInt32(this, value, offset, true);
+	  }
+	  return offset + 4
+	};
+
+	Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) {
+	  value = +value;
+	  offset = offset | 0;
+	  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000);
+	  if (value < 0) value = 0xffffffff + value + 1;
+	  if (Buffer.TYPED_ARRAY_SUPPORT) {
+	    this[offset] = (value >>> 24);
+	    this[offset + 1] = (value >>> 16);
+	    this[offset + 2] = (value >>> 8);
+	    this[offset + 3] = (value & 0xff);
+	  } else {
+	    objectWriteUInt32(this, value, offset, false);
+	  }
+	  return offset + 4
+	};
+
+	function checkIEEE754 (buf, value, offset, ext, max, min) {
+	  if (offset + ext > buf.length) throw new RangeError('Index out of range')
+	  if (offset < 0) throw new RangeError('Index out of range')
+	}
+
+	function writeFloat (buf, value, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38);
+	  }
+	  write(buf, value, offset, littleEndian, 23, 4);
+	  return offset + 4
+	}
+
+	Buffer.prototype.writeFloatLE = function writeFloatLE (value, offset, noAssert) {
+	  return writeFloat(this, value, offset, true, noAssert)
+	};
+
+	Buffer.prototype.writeFloatBE = function writeFloatBE (value, offset, noAssert) {
+	  return writeFloat(this, value, offset, false, noAssert)
+	};
+
+	function writeDouble (buf, value, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308);
+	  }
+	  write(buf, value, offset, littleEndian, 52, 8);
+	  return offset + 8
+	}
+
+	Buffer.prototype.writeDoubleLE = function writeDoubleLE (value, offset, noAssert) {
+	  return writeDouble(this, value, offset, true, noAssert)
+	};
+
+	Buffer.prototype.writeDoubleBE = function writeDoubleBE (value, offset, noAssert) {
+	  return writeDouble(this, value, offset, false, noAssert)
+	};
+
+	// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
+	Buffer.prototype.copy = function copy (target, targetStart, start, end) {
+	  if (!start) start = 0;
+	  if (!end && end !== 0) end = this.length;
+	  if (targetStart >= target.length) targetStart = target.length;
+	  if (!targetStart) targetStart = 0;
+	  if (end > 0 && end < start) end = start;
+
+	  // Copy 0 bytes; we're done
+	  if (end === start) return 0
+	  if (target.length === 0 || this.length === 0) return 0
+
+	  // Fatal error conditions
+	  if (targetStart < 0) {
+	    throw new RangeError('targetStart out of bounds')
+	  }
+	  if (start < 0 || start >= this.length) throw new RangeError('sourceStart out of bounds')
+	  if (end < 0) throw new RangeError('sourceEnd out of bounds')
+
+	  // Are we oob?
+	  if (end > this.length) end = this.length;
+	  if (target.length - targetStart < end - start) {
+	    end = target.length - targetStart + start;
+	  }
+
+	  var len = end - start;
+	  var i;
+
+	  if (this === target && start < targetStart && targetStart < end) {
+	    // descending copy from end
+	    for (i = len - 1; i >= 0; --i) {
+	      target[i + targetStart] = this[i + start];
+	    }
+	  } else if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
+	    // ascending copy from start
+	    for (i = 0; i < len; ++i) {
+	      target[i + targetStart] = this[i + start];
+	    }
+	  } else {
+	    Uint8Array.prototype.set.call(
+	      target,
+	      this.subarray(start, start + len),
+	      targetStart
+	    );
+	  }
+
+	  return len
+	};
+
+	// Usage:
+	//    buffer.fill(number[, offset[, end]])
+	//    buffer.fill(buffer[, offset[, end]])
+	//    buffer.fill(string[, offset[, end]][, encoding])
+	Buffer.prototype.fill = function fill (val, start, end, encoding) {
+	  // Handle string cases:
+	  if (typeof val === 'string') {
+	    if (typeof start === 'string') {
+	      encoding = start;
+	      start = 0;
+	      end = this.length;
+	    } else if (typeof end === 'string') {
+	      encoding = end;
+	      end = this.length;
+	    }
+	    if (val.length === 1) {
+	      var code = val.charCodeAt(0);
+	      if (code < 256) {
+	        val = code;
+	      }
+	    }
+	    if (encoding !== undefined && typeof encoding !== 'string') {
+	      throw new TypeError('encoding must be a string')
+	    }
+	    if (typeof encoding === 'string' && !Buffer.isEncoding(encoding)) {
+	      throw new TypeError('Unknown encoding: ' + encoding)
+	    }
+	  } else if (typeof val === 'number') {
+	    val = val & 255;
+	  }
+
+	  // Invalid ranges are not set to a default, so can range check early.
+	  if (start < 0 || this.length < start || this.length < end) {
+	    throw new RangeError('Out of range index')
+	  }
+
+	  if (end <= start) {
+	    return this
+	  }
+
+	  start = start >>> 0;
+	  end = end === undefined ? this.length : end >>> 0;
+
+	  if (!val) val = 0;
+
+	  var i;
+	  if (typeof val === 'number') {
+	    for (i = start; i < end; ++i) {
+	      this[i] = val;
+	    }
+	  } else {
+	    var bytes = internalIsBuffer(val)
+	      ? val
+	      : utf8ToBytes(new Buffer(val, encoding).toString());
+	    var len = bytes.length;
+	    for (i = 0; i < end - start; ++i) {
+	      this[i + start] = bytes[i % len];
+	    }
+	  }
+
+	  return this
+	};
+
+	// HELPER FUNCTIONS
+	// ================
+
+	var INVALID_BASE64_RE = /[^+\/0-9A-Za-z-_]/g;
+
+	function base64clean (str) {
+	  // Node strips out invalid characters like \n and \t from the string, base64-js does not
+	  str = stringtrim(str).replace(INVALID_BASE64_RE, '');
+	  // Node converts strings with length < 2 to ''
+	  if (str.length < 2) return ''
+	  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
+	  while (str.length % 4 !== 0) {
+	    str = str + '=';
+	  }
+	  return str
+	}
+
+	function stringtrim (str) {
+	  if (str.trim) return str.trim()
+	  return str.replace(/^\s+|\s+$/g, '')
+	}
+
+	function toHex (n) {
+	  if (n < 16) return '0' + n.toString(16)
+	  return n.toString(16)
+	}
+
+	function utf8ToBytes (string, units) {
+	  units = units || Infinity;
+	  var codePoint;
+	  var length = string.length;
+	  var leadSurrogate = null;
+	  var bytes = [];
+
+	  for (var i = 0; i < length; ++i) {
+	    codePoint = string.charCodeAt(i);
+
+	    // is surrogate component
+	    if (codePoint > 0xD7FF && codePoint < 0xE000) {
+	      // last char was a lead
+	      if (!leadSurrogate) {
+	        // no lead yet
+	        if (codePoint > 0xDBFF) {
+	          // unexpected trail
+	          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
+	          continue
+	        } else if (i + 1 === length) {
+	          // unpaired lead
+	          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
+	          continue
+	        }
+
+	        // valid lead
+	        leadSurrogate = codePoint;
+
+	        continue
+	      }
+
+	      // 2 leads in a row
+	      if (codePoint < 0xDC00) {
+	        if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
+	        leadSurrogate = codePoint;
+	        continue
+	      }
+
+	      // valid surrogate pair
+	      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000;
+	    } else if (leadSurrogate) {
+	      // valid bmp char, but last char was a lead
+	      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
+	    }
+
+	    leadSurrogate = null;
+
+	    // encode utf8
+	    if (codePoint < 0x80) {
+	      if ((units -= 1) < 0) break
+	      bytes.push(codePoint);
+	    } else if (codePoint < 0x800) {
+	      if ((units -= 2) < 0) break
+	      bytes.push(
+	        codePoint >> 0x6 | 0xC0,
+	        codePoint & 0x3F | 0x80
+	      );
+	    } else if (codePoint < 0x10000) {
+	      if ((units -= 3) < 0) break
+	      bytes.push(
+	        codePoint >> 0xC | 0xE0,
+	        codePoint >> 0x6 & 0x3F | 0x80,
+	        codePoint & 0x3F | 0x80
+	      );
+	    } else if (codePoint < 0x110000) {
+	      if ((units -= 4) < 0) break
+	      bytes.push(
+	        codePoint >> 0x12 | 0xF0,
+	        codePoint >> 0xC & 0x3F | 0x80,
+	        codePoint >> 0x6 & 0x3F | 0x80,
+	        codePoint & 0x3F | 0x80
+	      );
+	    } else {
+	      throw new Error('Invalid code point')
+	    }
+	  }
+
+	  return bytes
+	}
+
+	function asciiToBytes (str) {
+	  var byteArray = [];
+	  for (var i = 0; i < str.length; ++i) {
+	    // Node's code seems to be doing this and not & 0x7F..
+	    byteArray.push(str.charCodeAt(i) & 0xFF);
+	  }
+	  return byteArray
+	}
+
+	function utf16leToBytes (str, units) {
+	  var c, hi, lo;
+	  var byteArray = [];
+	  for (var i = 0; i < str.length; ++i) {
+	    if ((units -= 2) < 0) break
+
+	    c = str.charCodeAt(i);
+	    hi = c >> 8;
+	    lo = c % 256;
+	    byteArray.push(lo);
+	    byteArray.push(hi);
+	  }
+
+	  return byteArray
+	}
+
+
+	function base64ToBytes (str) {
+	  return toByteArray(base64clean(str))
+	}
+
+	function blitBuffer (src, dst, offset, length) {
+	  for (var i = 0; i < length; ++i) {
+	    if ((i + offset >= dst.length) || (i >= src.length)) break
+	    dst[i + offset] = src[i];
+	  }
+	  return i
+	}
+
+	function isnan (val) {
+	  return val !== val // eslint-disable-line no-self-compare
+	}
+
+
+	// the following is from is-buffer, also by Feross Aboukhadijeh and with same lisence
+	// The _isBuffer check is for Safari 5-7 support, because it's missing
+	// Object.prototype.constructor. Remove this eventually
+	function isBuffer(obj) {
+	  return obj != null && (!!obj._isBuffer || isFastBuffer(obj) || isSlowBuffer(obj))
+	}
+
+	function isFastBuffer (obj) {
+	  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+	}
+
+	// For Node v0.10 support. Remove this eventually.
+	function isSlowBuffer (obj) {
+	  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isFastBuffer(obj.slice(0, 0))
+	}
+
+	var sea = createCommonjsModule(function (module) {
+	(function(){
+
+	  /* UNBUILD */
+	  function USE(arg, req){
+	    return req? commonjsRequire(arg) : arg.slice? USE[R(arg)] : function(mod, path){
+	      arg(mod = {exports: {}});
+	      USE[R(path)] = mod.exports;
+	    }
+	    function R(p){
+	      return p.split('/').slice(-1).toString().replace('.js','');
+	    }
+	  }
+	  { var MODULE = module; }
+	USE(function(module){
+	    // Security, Encryption, and Authorization: SEA.js
+	    // MANDATORY READING: https://gun.eco/explainers/data/security.html
+	    // IT IS IMPLEMENTED IN A POLYFILL/SHIM APPROACH.
+	    // THIS IS AN EARLY ALPHA!
+
+	    if(typeof window !== "undefined"){ module.window = window; }
+
+	    var tmp = module.window || module, u;
+	    var SEA = tmp.SEA || {};
+
+	    if(SEA.window = module.window){ SEA.window.SEA = SEA; }
+
+	    try{ if(u+'' !== typeof MODULE){ MODULE.exports = SEA; } }catch(e){}
+	    module.exports = SEA;
+	  })(USE, './root');
+	USE(function(module){
+	    var SEA = USE('./root');
+	    try{ if(SEA.window){
+	      if(location.protocol.indexOf('s') < 0
+	      && location.host.indexOf('localhost') < 0
+	      && ! /^127\.\d+\.\d+\.\d+$/.test(location.hostname)
+	      && location.protocol.indexOf('file:') < 0){
+	        console.warn('HTTPS needed for WebCrypto in SEA, redirecting...');
+	        location.protocol = 'https:'; // WebCrypto does NOT work without HTTPS!
+	      }
+	    } }catch(e){}
+	  })(USE, './https');
+	USE(function(module){
+	    var u;
+	    if(u+''== typeof btoa){
+	      if(u+'' == typeof Buffer){
+	        try{ commonjsGlobal.Buffer = USE("buffer", 1).Buffer; }catch(e){ console.log("Please `npm install buffer` or add it to your package.json !"); }
+	      }
+	      commonjsGlobal.btoa = function(data){ return Buffer.from(data, "binary").toString("base64") };
+	      commonjsGlobal.atob = function(data){ return Buffer.from(data, "base64").toString("binary") };
+	    }
+	  })(USE, './base64');
+	USE(function(module){
+	    USE('./base64');
+	    // This is Array extended to have .toString(['utf8'|'hex'|'base64'])
+	    function SeaArray() {}
+	    Object.assign(SeaArray, { from: Array.from });
+	    SeaArray.prototype = Object.create(Array.prototype);
+	    SeaArray.prototype.toString = function(enc, start, end) { enc = enc || 'utf8'; start = start || 0;
+	      const length = this.length;
+	      if (enc === 'hex') {
+	        const buf = new Uint8Array(this);
+	        return [ ...Array(((end && (end + 1)) || length) - start).keys()]
+	        .map((i) => buf[ i + start ].toString(16).padStart(2, '0')).join('')
+	      }
+	      if (enc === 'utf8') {
+	        return Array.from(
+	          { length: (end || length) - start },
+	          (_, i) => String.fromCharCode(this[ i + start])
+	        ).join('')
+	      }
+	      if (enc === 'base64') {
+	        return btoa(this)
+	      }
+	    };
+	    module.exports = SeaArray;
+	  })(USE, './array');
+	USE(function(module){
+	    USE('./base64');
+	    // This is Buffer implementation used in SEA. Functionality is mostly
+	    // compatible with NodeJS 'safe-buffer' and is used for encoding conversions
+	    // between binary and 'hex' | 'utf8' | 'base64'
+	    // See documentation and validation for safe implementation in:
+	    // https://github.com/feross/safe-buffer#update
+	    var SeaArray = USE('./array');
+	    function SafeBuffer(...props) {
+	      console.warn('new SafeBuffer() is depreciated, please use SafeBuffer.from()');
+	      return SafeBuffer.from(...props)
+	    }
+	    SafeBuffer.prototype = Object.create(Array.prototype);
+	    Object.assign(SafeBuffer, {
+	      // (data, enc) where typeof data === 'string' then enc === 'utf8'|'hex'|'base64'
+	      from() {
+	        if (!Object.keys(arguments).length || arguments[0]==null) {
+	          throw new TypeError('First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.')
+	        }
+	        const input = arguments[0];
+	        let buf;
+	        if (typeof input === 'string') {
+	          const enc = arguments[1] || 'utf8';
+	          if (enc === 'hex') {
+	            const bytes = input.match(/([\da-fA-F]{2})/g)
+	            .map((byte) => parseInt(byte, 16));
+	            if (!bytes || !bytes.length) {
+	              throw new TypeError('Invalid first argument for type \'hex\'.')
+	            }
+	            buf = SeaArray.from(bytes);
+	          } else if (enc === 'utf8' || 'binary' === enc) { // EDIT BY MARK: I think this is safe, tested it against a couple "binary" strings. This lets SafeBuffer match NodeJS Buffer behavior more where it safely btoas regular strings.
+	            const length = input.length;
+	            const words = new Uint16Array(length);
+	            buf = SeaArray.from(words);
+	          } else if (enc === 'base64') {
+	            const dec = atob(input);
+	            const length = dec.length;
+	            const bytes = new Uint8Array(length);
+	            buf = SeaArray.from(bytes);
+	          } else if (enc === 'binary') { // deprecated by above comment
+	            buf = SeaArray.from(input); // some btoas were mishandled.
+	          } else {
+	            console.info('SafeBuffer.from unknown encoding: '+enc);
+	          }
+	          return buf
+	        }
+	        const byteLength = input.byteLength; // what is going on here? FOR MARTTI
+	        const length = input.byteLength ? input.byteLength : input.length;
+	        if (length) {
+	          let buf;
+	          if (input instanceof ArrayBuffer) {
+	            buf = new Uint8Array(input);
+	          }
+	          return SeaArray.from(buf || input)
+	        }
+	      },
+	      // This is 'safe-buffer.alloc' sans encoding support
+	      alloc(length, fill = 0 /*, enc*/ ) {
+	        return SeaArray.from(new Uint8Array(Array.from({ length: length }, () => fill)))
+	      },
+	      // This is normal UNSAFE 'buffer.alloc' or 'new Buffer(length)' - don't use!
+	      allocUnsafe(length) {
+	        return SeaArray.from(new Uint8Array(Array.from({ length : length })))
+	      },
+	      // This puts together array of array like members
+	      concat(arr) { // octet array
+	        if (!Array.isArray(arr)) {
+	          throw new TypeError('First argument must be Array containing ArrayBuffer or Uint8Array instances.')
+	        }
+	        return SeaArray.from(arr.reduce((ret, item) => ret.concat(Array.from(item)), []))
+	      }
+	    });
+	    SafeBuffer.prototype.from = SafeBuffer.from;
+	    SafeBuffer.prototype.toString = SeaArray.prototype.toString;
+
+	    module.exports = SafeBuffer;
+	  })(USE, './buffer');
+	USE(function(module){
+	    const SEA = USE('./root');
+	    const api = {Buffer: USE('./buffer')};
+	    var o = {}, u;
+
+	    // ideally we can move away from JSON entirely? unlikely due to compatibility issues... oh well.
+	    JSON.parseAsync = JSON.parseAsync || function(t,cb,r){ var u; try{ cb(u, JSON.parse(t,r)); }catch(e){ cb(e); } };
+	    JSON.stringifyAsync = JSON.stringifyAsync || function(v,cb,r,s){ var u; try{ cb(u, JSON.stringify(v,r,s)); }catch(e){ cb(e); } };
+
+	    api.parse = function(t,r){ return new Promise(function(res, rej){
+	      JSON.parseAsync(t,function(err, raw){ err? rej(err) : res(raw); },r);
+	    })};
+	    api.stringify = function(v,r,s){ return new Promise(function(res, rej){
+	      JSON.stringifyAsync(v,function(err, raw){ err? rej(err) : res(raw); },r,s);
+	    })};
+
+	    if(SEA.window){
+	      api.crypto = window.crypto || window.msCrypto;
+	      api.subtle = (api.crypto||o).subtle || (api.crypto||o).webkitSubtle;
+	      api.TextEncoder = window.TextEncoder;
+	      api.TextDecoder = window.TextDecoder;
+	      api.random = (len) => api.Buffer.from(api.crypto.getRandomValues(new Uint8Array(api.Buffer.alloc(len))));
+	    }
+	    if(!api.TextDecoder)
+	    {
+	      const { TextEncoder, TextDecoder } = USE((u+'' == typeof MODULE?'.':'')+'./lib/text-encoding', 1);
+	      api.TextDecoder = TextDecoder;
+	      api.TextEncoder = TextEncoder;
+	    }
+	    if(!api.crypto)
+	    {
+	      try
+	      {
+	      var crypto = USE('crypto', 1);
+	      Object.assign(api, {
+	        crypto,
+	        random: (len) => api.Buffer.from(crypto.randomBytes(len))
+	      });      
+	      const { Crypto: WebCrypto } = USE('@peculiar/webcrypto', 1);
+	      api.ossl = api.subtle = new WebCrypto({directory: 'ossl'}).subtle; // ECDH
+	    }
+	    catch(e){
+	      console.log("Please `npm install @peculiar/webcrypto` or add it to your package.json !");
+	    }}
+
+	    module.exports = api;
+	  })(USE, './shim');
+	USE(function(module){
+	    var SEA = USE('./root');
+	    var shim = USE('./shim');
+	    var s = {};
+	    s.pbkdf2 = {hash: {name : 'SHA-256'}, iter: 100000, ks: 64};
+	    s.ecdsa = {
+	      pair: {name: 'ECDSA', namedCurve: 'P-256'},
+	      sign: {name: 'ECDSA', hash: {name: 'SHA-256'}}
+	    };
+	    s.ecdh = {name: 'ECDH', namedCurve: 'P-256'};
+
+	    // This creates Web Cryptography API compliant JWK for sign/verify purposes
+	    s.jwk = function(pub, d){  // d === priv
+	      pub = pub.split('.');
+	      var x = pub[0], y = pub[1];
+	      var jwk = {kty: "EC", crv: "P-256", x: x, y: y, ext: true};
+	      jwk.key_ops = d ? ['sign'] : ['verify'];
+	      if(d){ jwk.d = d; }
+	      return jwk;
+	    };
+	    
+	    s.keyToJwk = function(keyBytes) {
+	      const keyB64 = keyBytes.toString('base64');
+	      const k = keyB64.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
+	      return { kty: 'oct', k: k, ext: false, alg: 'A256GCM' };
+	    };
+
+	    s.recall = {
+	      validity: 12 * 60 * 60, // internally in seconds : 12 hours
+	      hook: function(props){ return props } // { iat, exp, alias, remember } // or return new Promise((resolve, reject) => resolve(props)
+	    };
+
+	    s.check = function(t){ return (typeof t == 'string') && ('SEA{' === t.slice(0,4)) };
+	    s.parse = async function p(t){ try {
+	      var yes = (typeof t == 'string');
+	      if(yes && 'SEA{' === t.slice(0,4)){ t = t.slice(3); }
+	      return yes ? await shim.parse(t) : t;
+	      } catch (e) {}
+	      return t;
+	    };
+
+	    SEA.opt = s;
+	    module.exports = s;
+	  })(USE, './settings');
+	USE(function(module){
+	    var shim = USE('./shim');
+	    module.exports = async function(d, o){
+	      var t = (typeof d == 'string')? d : await shim.stringify(d);
+	      var hash = await shim.subtle.digest({name: o||'SHA-256'}, new shim.TextEncoder().encode(t));
+	      return shim.Buffer.from(hash);
+	    };
+	  })(USE, './sha256');
+	USE(function(module){
+	    // This internal func returns SHA-1 hashed data for KeyID generation
+	    const __shim = USE('./shim');
+	    const subtle = __shim.subtle;
+	    const ossl = __shim.ossl ? __shim.ossl : subtle;
+	    const sha1hash = (b) => ossl.digest({name: 'SHA-1'}, new ArrayBuffer(b));
+	    module.exports = sha1hash;
+	  })(USE, './sha1');
+	USE(function(module){
+	    var SEA = USE('./root');
+	    var shim = USE('./shim');
+	    var S = USE('./settings');
+	    var sha = USE('./sha256');
+	    var u;
+
+	    SEA.work = SEA.work || (async (data, pair, cb, opt) => { try { // used to be named `proof`
+	      var salt = (pair||{}).epub || pair; // epub not recommended, salt should be random!
+	      opt = opt || {};
+	      if(salt instanceof Function){
+	        cb = salt;
+	        salt = u;
+	      }
+	      data = (typeof data == 'string')? data : await shim.stringify(data);
+	      if('sha' === (opt.name||'').toLowerCase().slice(0,3)){
+	        var rsha = shim.Buffer.from(await sha(data, opt.name), 'binary').toString(opt.encode || 'base64');
+	        if(cb){ try{ cb(rsha); }catch(e){console.log(e);} }
+	        return rsha;
+	      }
+	      salt = salt || shim.random(9);
+	      var key = await (shim.ossl || shim.subtle).importKey('raw', new shim.TextEncoder().encode(data), {name: opt.name || 'PBKDF2'}, false, ['deriveBits']);
+	      var work = await (shim.ossl || shim.subtle).deriveBits({
+	        name: opt.name || 'PBKDF2',
+	        iterations: opt.iterations || S.pbkdf2.iter,
+	        salt: new shim.TextEncoder().encode(opt.salt || salt),
+	        hash: opt.hash || S.pbkdf2.hash,
+	      }, key, opt.length || (S.pbkdf2.ks * 8));
+	      data = shim.random(data.length);  // Erase data in case of passphrase
+	      var r = shim.Buffer.from(work, 'binary').toString(opt.encode || 'base64');
+	      if(cb){ try{ cb(r); }catch(e){console.log(e);} }
+	      return r;
+	    } catch(e) { 
+	      console.log(e);
+	      SEA.err = e;
+	      if(SEA.throw){ throw e }
+	      if(cb){ cb(); }
+	      return;
+	    }});
+
+	    module.exports = SEA.work;
+	  })(USE, './work');
+	USE(function(module){
+	    var SEA = USE('./root');
+	    var shim = USE('./shim');
+	    var S = USE('./settings');
+
+	    SEA.name = SEA.name || (async (cb, opt) => { try {
+	      if(cb){ try{ cb(); }catch(e){console.log(e);} }
+	      return;
+	    } catch(e) {
+	      console.log(e);
+	      SEA.err = e;
+	      if(SEA.throw){ throw e }
+	      if(cb){ cb(); }
+	      return;
+	    }});
+
+	    //SEA.pair = async (data, proof, cb) => { try {
+	    SEA.pair = SEA.pair || (async (cb, opt) => { try {
+
+	      var ecdhSubtle = shim.ossl || shim.subtle;
+	      // First: ECDSA keys for signing/verifying...
+	      var sa = await shim.subtle.generateKey({name: 'ECDSA', namedCurve: 'P-256'}, true, [ 'sign', 'verify' ])
+	      .then(async (keys) => {
+	        // privateKey scope doesn't leak out from here!
+	        //const { d: priv } = await shim.subtle.exportKey('jwk', keys.privateKey)
+	        var key = {};
+	        key.priv = (await shim.subtle.exportKey('jwk', keys.privateKey)).d;
+	        var pub = await shim.subtle.exportKey('jwk', keys.publicKey);
+	        //const pub = Buff.from([ x, y ].join(':')).toString('base64') // old
+	        key.pub = pub.x+'.'+pub.y; // new
+	        // x and y are already base64
+	        // pub is UTF8 but filename/URL safe (https://www.ietf.org/rfc/rfc3986.txt)
+	        // but split on a non-base64 letter.
+	        return key;
+	      });
+	      
+	      // To include PGPv4 kind of keyId:
+	      // const pubId = await SEA.keyid(keys.pub)
+	      // Next: ECDH keys for encryption/decryption...
+
+	      try{
+	      var dh = await ecdhSubtle.generateKey({name: 'ECDH', namedCurve: 'P-256'}, true, ['deriveKey'])
+	      .then(async (keys) => {
+	        // privateKey scope doesn't leak out from here!
+	        var key = {};
+	        key.epriv = (await ecdhSubtle.exportKey('jwk', keys.privateKey)).d;
+	        var pub = await ecdhSubtle.exportKey('jwk', keys.publicKey);
+	        //const epub = Buff.from([ ex, ey ].join(':')).toString('base64') // old
+	        key.epub = pub.x+'.'+pub.y; // new
+	        // ex and ey are already base64
+	        // epub is UTF8 but filename/URL safe (https://www.ietf.org/rfc/rfc3986.txt)
+	        // but split on a non-base64 letter.
+	        return key;
+	      });
+	      }catch(e){
+	        if(SEA.window){ throw e }
+	        if(e == 'Error: ECDH is not a supported algorithm'){ console.log('Ignoring ECDH...'); }
+	        else { throw e }
+	      } dh = dh || {};
+
+	      var r = { pub: sa.pub, priv: sa.priv, /* pubId, */ epub: dh.epub, epriv: dh.epriv };
+	      if(cb){ try{ cb(r); }catch(e){console.log(e);} }
+	      return r;
+	    } catch(e) {
+	      console.log(e);
+	      SEA.err = e;
+	      if(SEA.throw){ throw e }
+	      if(cb){ cb(); }
+	      return;
+	    }});
+
+	    module.exports = SEA.pair;
+	  })(USE, './pair');
+	USE(function(module){
+	    var SEA = USE('./root');
+	    var shim = USE('./shim');
+	    var S = USE('./settings');
+	    var sha = USE('./sha256');
+	    var u;
+
+	    SEA.sign = SEA.sign || (async (data, pair, cb, opt) => { try {
+	      opt = opt || {};
+	      if(!(pair||opt).priv){
+	        if(!SEA.I){ throw 'No signing key.' }
+	        pair = await SEA.I(null, {what: data, how: 'sign', why: opt.why});
+	      }
+	      if(u === data){ throw '`undefined` not allowed.' }
+	      var json = await S.parse(data);
+	      var check = opt.check = opt.check || json;
+	      if(SEA.verify && (SEA.opt.check(check) || (check && check.s && check.m))
+	      && u !== await SEA.verify(check, pair)){ // don't sign if we already signed it.
+	        var r = await S.parse(check);
+	        if(!opt.raw){ r = 'SEA' + await shim.stringify(r); }
+	        if(cb){ try{ cb(r); }catch(e){console.log(e);} }
+	        return r;
+	      }
+	      var pub = pair.pub;
+	      var priv = pair.priv;
+	      var jwk = S.jwk(pub, priv);
+	      var hash = await sha(json);
+	      var sig = await (shim.ossl || shim.subtle).importKey('jwk', jwk, {name: 'ECDSA', namedCurve: 'P-256'}, false, ['sign'])
+	      .then((key) => (shim.ossl || shim.subtle).sign({name: 'ECDSA', hash: {name: 'SHA-256'}}, key, new Uint8Array(hash))); // privateKey scope doesn't leak out from here!
+	      var r = {m: json, s: shim.Buffer.from(sig, 'binary').toString(opt.encode || 'base64')};
+	      if(!opt.raw){ r = 'SEA' + await shim.stringify(r); }
+
+	      if(cb){ try{ cb(r); }catch(e){console.log(e);} }
+	      return r;
+	    } catch(e) {
+	      console.log(e);
+	      SEA.err = e;
+	      if(SEA.throw){ throw e }
+	      if(cb){ cb(); }
+	      return;
+	    }});
+
+	    module.exports = SEA.sign;
+	  })(USE, './sign');
+	USE(function(module){
+	    var SEA = USE('./root');
+	    var shim = USE('./shim');
+	    var S = USE('./settings');
+	    var sha = USE('./sha256');
+	    var u;
+
+	    SEA.verify = SEA.verify || (async (data, pair, cb, opt) => { try {
+	      var json = await S.parse(data);
+	      if(false === pair){ // don't verify!
+	        var raw = await S.parse(json.m);
+	        if(cb){ try{ cb(raw); }catch(e){console.log(e);} }
+	        return raw;
+	      }
+	      opt = opt || {};
+	      // SEA.I // verify is free! Requires no user permission.
+	      var pub = pair.pub || pair;
+	      var key = SEA.opt.slow_leak? await SEA.opt.slow_leak(pub) : await (shim.ossl || shim.subtle).importKey('jwk', S.jwk(pub), {name: 'ECDSA', namedCurve: 'P-256'}, false, ['verify']);
+	      var hash = await sha(json.m);
+	      var buf, sig, check; try{
+	        buf = shim.Buffer.from(json.s, opt.encode || 'base64'); // NEW DEFAULT!
+	        sig = new Uint8Array(buf);
+	        check = await (shim.ossl || shim.subtle).verify({name: 'ECDSA', hash: {name: 'SHA-256'}}, key, sig, new Uint8Array(hash));
+	        if(!check){ throw "Signature did not match." }
+	      }catch(e){
+	        if(SEA.opt.fallback){
+	          return await SEA.opt.fall_verify(data, pair, cb, opt);
+	        }
+	      }
+	      var r = check? await S.parse(json.m) : u;
+
+	      if(cb){ try{ cb(r); }catch(e){console.log(e);} }
+	      return r;
+	    } catch(e) {
+	      console.log(e); // mismatched owner FOR MARTTI
+	      SEA.err = e;
+	      if(SEA.throw){ throw e }
+	      if(cb){ cb(); }
+	      return;
+	    }});
+
+	    module.exports = SEA.verify;
+	    // legacy & ossl memory leak mitigation:
+
+	    var knownKeys = {};
+	    var keyForPair = SEA.opt.slow_leak = pair => {
+	      if (knownKeys[pair]) return knownKeys[pair];
+	      var jwk = S.jwk(pair);
+	      knownKeys[pair] = (shim.ossl || shim.subtle).importKey("jwk", jwk, {name: 'ECDSA', namedCurve: 'P-256'}, false, ["verify"]);
+	      return knownKeys[pair];
+	    };
+
+	    var O = SEA.opt;
+	    SEA.opt.fall_verify = async function(data, pair, cb, opt, f){
+	      if(f === SEA.opt.fallback){ throw "Signature did not match" } f = f || 1;
+	      var tmp = data||'';
+	      data = SEA.opt.unpack(data) || data;
+	      var json = await S.parse(data), pub = pair.pub || pair, key = await SEA.opt.slow_leak(pub);
+	      var hash = (f <= SEA.opt.fallback)? shim.Buffer.from(await shim.subtle.digest({name: 'SHA-256'}, new shim.TextEncoder().encode(await S.parse(json.m)))) : await sha(json.m); // this line is old bad buggy code but necessary for old compatibility.
+	      var buf; var sig; var check; try{
+	        buf = shim.Buffer.from(json.s, opt.encode || 'base64'); // NEW DEFAULT!
+	        sig = new Uint8Array(buf);
+	        check = await (shim.ossl || shim.subtle).verify({name: 'ECDSA', hash: {name: 'SHA-256'}}, key, sig, new Uint8Array(hash));
+	        if(!check){ throw "Signature did not match." }
+	      }catch(e){ try{
+	        buf = shim.Buffer.from(json.s, 'utf8'); // AUTO BACKWARD OLD UTF8 DATA!
+	        sig = new Uint8Array(buf);
+	        check = await (shim.ossl || shim.subtle).verify({name: 'ECDSA', hash: {name: 'SHA-256'}}, key, sig, new Uint8Array(hash));
+	        }catch(e){
+	        if(!check){ throw "Signature did not match." }
+	        }
+	      }
+	      var r = check? await S.parse(json.m) : u;
+	      O.fall_soul = tmp['#']; O.fall_key = tmp['.']; O.fall_val = data; O.fall_state = tmp['>'];
+	      if(cb){ try{ cb(r); }catch(e){console.log(e);} }
+	      return r;
+	    };
+	    SEA.opt.fallback = 2;
+
+	  })(USE, './verify');
+	USE(function(module){
+	    var shim = USE('./shim');
+	    var S = USE('./settings');
+	    var sha256hash = USE('./sha256');
+
+	    const importGen = async (key, salt, opt) => {
+	      //const combo = shim.Buffer.concat([shim.Buffer.from(key, 'utf8'), salt || shim.random(8)]).toString('utf8') // old
+	      opt = opt || {};
+	      const combo = key + (salt || shim.random(8)).toString('utf8'); // new
+	      const hash = shim.Buffer.from(await sha256hash(combo), 'binary');
+	      
+	      const jwkKey = S.keyToJwk(hash);      
+	      return await shim.subtle.importKey('jwk', jwkKey, {name:'AES-GCM'}, false, ['encrypt', 'decrypt'])
+	    };
+	    module.exports = importGen;
+	  })(USE, './aeskey');
+	USE(function(module){
+	    var SEA = USE('./root');
+	    var shim = USE('./shim');
+	    var S = USE('./settings');
+	    var aeskey = USE('./aeskey');
+	    var u;
+
+	    SEA.encrypt = SEA.encrypt || (async (data, pair, cb, opt) => { try {
+	      opt = opt || {};
+	      var key = (pair||opt).epriv || pair;
+	      if(u === data){ throw '`undefined` not allowed.' }
+	      if(!key){
+	        if(!SEA.I){ throw 'No encryption key.' }
+	        pair = await SEA.I(null, {what: data, how: 'encrypt', why: opt.why});
+	        key = pair.epriv || pair;
+	      }
+	      var msg = (typeof data == 'string')? data : await shim.stringify(data);
+	      var rand = {s: shim.random(9), iv: shim.random(15)}; // consider making this 9 and 15 or 18 or 12 to reduce == padding.
+	      var ct = await aeskey(key, rand.s, opt).then((aes) => (/*shim.ossl ||*/ shim.subtle).encrypt({ // Keeping the AES key scope as private as possible...
+	        name: opt.name || 'AES-GCM', iv: new Uint8Array(rand.iv)
+	      }, aes, new shim.TextEncoder().encode(msg)));
+	      var r = {
+	        ct: shim.Buffer.from(ct, 'binary').toString(opt.encode || 'base64'),
+	        iv: rand.iv.toString(opt.encode || 'base64'),
+	        s: rand.s.toString(opt.encode || 'base64')
+	      };
+	      if(!opt.raw){ r = 'SEA' + await shim.stringify(r); }
+
+	      if(cb){ try{ cb(r); }catch(e){console.log(e);} }
+	      return r;
+	    } catch(e) { 
+	      console.log(e);
+	      SEA.err = e;
+	      if(SEA.throw){ throw e }
+	      if(cb){ cb(); }
+	      return;
+	    }});
+
+	    module.exports = SEA.encrypt;
+	  })(USE, './encrypt');
+	USE(function(module){
+	    var SEA = USE('./root');
+	    var shim = USE('./shim');
+	    var S = USE('./settings');
+	    var aeskey = USE('./aeskey');
+
+	    SEA.decrypt = SEA.decrypt || (async (data, pair, cb, opt) => { try {
+	      opt = opt || {};
+	      var key = (pair||opt).epriv || pair;
+	      if(!key){
+	        if(!SEA.I){ throw 'No decryption key.' }
+	        pair = await SEA.I(null, {what: data, how: 'decrypt', why: opt.why});
+	        key = pair.epriv || pair;
+	      }
+	      var json = await S.parse(data);
+	      var buf, bufiv, bufct; try{
+	        buf = shim.Buffer.from(json.s, opt.encode || 'base64');
+	        bufiv = shim.Buffer.from(json.iv, opt.encode || 'base64');
+	        bufct = shim.Buffer.from(json.ct, opt.encode || 'base64');
+	        var ct = await aeskey(key, buf, opt).then((aes) => (/*shim.ossl ||*/ shim.subtle).decrypt({  // Keeping aesKey scope as private as possible...
+	          name: opt.name || 'AES-GCM', iv: new Uint8Array(bufiv), tagLength: 128
+	        }, aes, new Uint8Array(bufct)));
+	      }catch(e){
+	        if('utf8' === opt.encode){ throw "Could not decrypt" }
+	        if(SEA.opt.fallback){
+	          opt.encode = 'utf8';
+	          return await SEA.decrypt(data, pair, cb, opt);
+	        }
+	      }
+	      var r = await S.parse(new shim.TextDecoder('utf8').decode(ct));
+	      if(cb){ try{ cb(r); }catch(e){console.log(e);} }
+	      return r;
+	    } catch(e) { 
+	      console.log(e);
+	      SEA.err = e;
+	      if(SEA.throw){ throw e }
+	      if(cb){ cb(); }
+	      return;
+	    }});
+
+	    module.exports = SEA.decrypt;
+	  })(USE, './decrypt');
+	USE(function(module){
+	    var SEA = USE('./root');
+	    var shim = USE('./shim');
+	    var S = USE('./settings');
+	    // Derive shared secret from other's pub and my epub/epriv 
+	    SEA.secret = SEA.secret || (async (key, pair, cb, opt) => { try {
+	      opt = opt || {};
+	      if(!pair || !pair.epriv || !pair.epub){
+	        if(!SEA.I){ throw 'No secret mix.' }
+	        pair = await SEA.I(null, {what: key, how: 'secret', why: opt.why});
+	      }
+	      var pub = key.epub || key;
+	      var epub = pair.epub;
+	      var epriv = pair.epriv;
+	      var ecdhSubtle = shim.ossl || shim.subtle;
+	      var pubKeyData = keysToEcdhJwk(pub);
+	      var props = Object.assign({ public: await ecdhSubtle.importKey(...pubKeyData, true, []) },{name: 'ECDH', namedCurve: 'P-256'}); // Thanks to @sirpy !
+	      var privKeyData = keysToEcdhJwk(epub, epriv);
+	      var derived = await ecdhSubtle.importKey(...privKeyData, false, ['deriveBits']).then(async (privKey) => {
+	        // privateKey scope doesn't leak out from here!
+	        var derivedBits = await ecdhSubtle.deriveBits(props, privKey, 256);
+	        var rawBits = new Uint8Array(derivedBits);
+	        var derivedKey = await ecdhSubtle.importKey('raw', rawBits,{ name: 'AES-GCM', length: 256 }, true, [ 'encrypt', 'decrypt' ]);
+	        return ecdhSubtle.exportKey('jwk', derivedKey).then(({ k }) => k);
+	      });
+	      var r = derived;
+	      if(cb){ try{ cb(r); }catch(e){console.log(e);} }
+	      return r;
+	    } catch(e) {
+	      console.log(e);
+	      SEA.err = e;
+	      if(SEA.throw){ throw e }
+	      if(cb){ cb(); }
+	      return;
+	    }});
+
+	    // can this be replaced with settings.jwk?
+	    var keysToEcdhJwk = (pub, d) => { // d === priv
+	      //var [ x, y ] = shim.Buffer.from(pub, 'base64').toString('utf8').split(':') // old
+	      var [ x, y ] = pub.split('.'); // new
+	      var jwk = d ? { d: d } : {};
+	      return [  // Use with spread returned value...
+	        'jwk',
+	        Object.assign(
+	          jwk,
+	          { x: x, y: y, kty: 'EC', crv: 'P-256', ext: true }
+	        ), // ??? refactor
+	        {name: 'ECDH', namedCurve: 'P-256'}
+	      ]
+	    };
+
+	    module.exports = SEA.secret;
+	  })(USE, './secret');
+	USE(function(module){
+	    var SEA = USE('./root');
+	    // This is to certify that a group of "certificants" can "put" anything at a group of matched "paths" to the certificate authority's graph
+	    SEA.certify = SEA.certify || (async (certificants, policy = {}, authority, cb, opt = {}) => { try {
+	      /*
+	      The Certify Protocol was made out of love by a Vietnamese code enthusiast. Vietnamese people around the world deserve respect!
+	      IMPORTANT: A Certificate is like a Signature. No one knows who (authority) created/signed a cert until you put it into their graph.
+	      "certificants": '*' or a String (Bob.pub) || an Object that contains "pub" as a key || an array of [object || string]. These people will have the rights.
+	      "policy": A string ('inbox'), or a RAD/LEX object {'*': 'inbox'}, or an Array of RAD/LEX objects or strings. RAD/LEX object can contain key "?" with indexOf("*") > -1 to force key equals certificant pub. This rule is used to check against soul+'/'+key using Gun.text.match or String.match.
+	      "authority": Key pair or priv of the certificate authority.
+	      "cb": A callback function after all things are done.
+	      "opt": If opt.expiry (a timestamp) is set, SEA won't sync data after opt.expiry. If opt.block is set, SEA will look for block before syncing.
+	      */
+	      console.log('SEA.certify() is an early experimental community supported method that may change API behavior without warning in any future version.');
+
+	      certificants = (() => {
+	        var data = [];
+	        if (certificants) {
+	          if ((typeof certificants === 'string' || Array.isArray(certificants)) && certificants.indexOf('*') > -1) return '*'
+	          if (typeof certificants === 'string') return certificants
+	          if (Array.isArray(certificants)) {
+	            if (certificants.length === 1 && certificants[0]) return typeof certificants[0] === 'object' && certificants[0].pub ? certificants[0].pub : typeof certificants[0] === 'string' ? certificants[0] : null
+	            certificants.map(certificant => {
+	              if (typeof certificant ==='string') data.push(certificant);
+	              else if (typeof certificant === 'object' && certificant.pub) data.push(certificant.pub);
+	            });
+	          }
+
+	          if (typeof certificants === 'object' && certificants.pub) return certificants.pub
+	          return data.length > 0 ? data : null
+	        }
+	        return
+	      })();
+
+	      if (!certificants) return console.log("No certificant found.")
+
+	      const expiry = opt.expiry && (typeof opt.expiry === 'number' || typeof opt.expiry === 'string') ? parseFloat(opt.expiry) : null;
+	      const readPolicy = (policy || {}).read ? policy.read : null;
+	      const writePolicy = (policy || {}).write ? policy.write : typeof policy === 'string' || Array.isArray(policy) || policy["+"] || policy["#"] || policy["."] || policy["="] || policy["*"] || policy[">"] || policy["<"] ? policy : null;
+	      // The "blacklist" feature is now renamed to "block". Why ? BECAUSE BLACK LIVES MATTER!
+	      // We can now use 3 keys: block, blacklist, ban
+	      const block = (opt || {}).block || (opt || {}).blacklist || (opt || {}).ban || {};
+	      const readBlock = block.read && (typeof block.read === 'string' || (block.read || {})['#']) ? block.read : null;
+	      const writeBlock = typeof block === 'string' ? block : block.write && (typeof block.write === 'string' || block.write['#']) ? block.write : null;
+
+	      if (!readPolicy && !writePolicy) return console.log("No policy found.")
+
+	      // reserved keys: c, e, r, w, rb, wb
+	      const data = JSON.stringify({
+	        c: certificants,
+	        ...(expiry ? {e: expiry} : {}), // inject expiry if possible
+	        ...(readPolicy ? {r: readPolicy }  : {}), // "r" stands for read, which means read permission.
+	        ...(writePolicy ? {w: writePolicy} : {}), // "w" stands for write, which means write permission.
+	        ...(readBlock ? {rb: readBlock} : {}), // inject READ block if possible
+	        ...(writeBlock ? {wb: writeBlock} : {}), // inject WRITE block if possible
+	      });
+
+	      const certificate = await SEA.sign(data, authority, null, {raw:1});
+
+	      var r = certificate;
+	      if(!opt.raw){ r = 'SEA'+JSON.stringify(r); }
+	      if(cb){ try{ cb(r); }catch(e){console.log(e);} }
+	      return r;
+	    } catch(e) {
+	      SEA.err = e;
+	      if(SEA.throw){ throw e }
+	      if(cb){ cb(); }
+	      return;
+	    }});
+
+	    module.exports = SEA.certify;
+	  })(USE, './certify');
+	USE(function(module){
+	    var shim = USE('./shim');
+	    // Practical examples about usage found in tests.
+	    var SEA = USE('./root');
+	    SEA.work = USE('./work');
+	    SEA.sign = USE('./sign');
+	    SEA.verify = USE('./verify');
+	    SEA.encrypt = USE('./encrypt');
+	    SEA.decrypt = USE('./decrypt');
+	    SEA.certify = USE('./certify');
+	    //SEA.opt.aeskey = USE('./aeskey'); // not official! // this causes problems in latest WebCrypto.
+
+	    SEA.random = SEA.random || shim.random;
+
+	    // This is Buffer used in SEA and usable from Gun/SEA application also.
+	    // For documentation see https://nodejs.org/api/buffer.html
+	    SEA.Buffer = SEA.Buffer || USE('./buffer');
+
+	    // These SEA functions support now ony Promises or
+	    // async/await (compatible) code, use those like Promises.
+	    //
+	    // Creates a wrapper library around Web Crypto API
+	    // for various AES, ECDSA, PBKDF2 functions we called above.
+	    // Calculate public key KeyID aka PGPv4 (result: 8 bytes as hex string)
+	    SEA.keyid = SEA.keyid || (async (pub) => {
+	      try {
+	        // base64('base64(x):base64(y)') => shim.Buffer(xy)
+	        const pb = shim.Buffer.concat(
+	          pub.replace(/-/g, '+').replace(/_/g, '/').split('.')
+	          .map((t) => shim.Buffer.from(t, 'base64'))
+	        );
+	        // id is PGPv4 compliant raw key
+	        const id = shim.Buffer.concat([
+	          shim.Buffer.from([0x99, pb.length / 0x100, pb.length % 0x100]), pb
+	        ]);
+	        const sha1 = await sha1hash(id);
+	        const hash = shim.Buffer.from(sha1, 'binary');
+	        return hash.toString('hex', hash.length - 8)  // 16-bit ID as hex
+	      } catch (e) {
+	        console.log(e);
+	        throw e
+	      }
+	    });
+	    // all done!
+	    // Obviously it is missing MANY necessary features. This is only an alpha release.
+	    // Please experiment with it, audit what I've done so far, and complain about what needs to be added.
+	    // SEA should be a full suite that is easy and seamless to use.
+	    // Again, scroll naer the top, where I provide an EXAMPLE of how to create a user and sign in.
+	    // Once logged in, the rest of the code you just read handled automatically signing/validating data.
+	    // But all other behavior needs to be equally easy, like opinionated ways of
+	    // Adding friends (trusted public keys), sending private messages, etc.
+	    // Cheers! Tell me what you think.
+	    ((SEA.window||{}).GUN||{}).SEA = SEA;
+
+	    module.exports = SEA;
+	    // -------------- END SEA MODULES --------------------
+	    // -- BEGIN SEA+GUN MODULES: BUNDLED BY DEFAULT UNTIL OTHERS USE SEA ON OWN -------
+	  })(USE, './sea');
+	USE(function(module){
+	    var SEA = USE('./sea'), Gun, u;
+	    if(SEA.window){
+	      Gun = SEA.window.GUN || {chain:{}};
+	    } else {
+	      Gun = USE((u+'' == typeof MODULE?'.':'')+'./gun', 1);
+	    }
+	    SEA.GUN = Gun;
+
+	    function User(root){ 
+	      this._ = {$: this};
+	    }
+	    User.prototype = (function(){ function F(){} F.prototype = Gun.chain; return new F() }()); // Object.create polyfill
+	    User.prototype.constructor = User;
+
+	    // let's extend the gun chain with a `user` function.
+	    // only one user can be logged in at a time, per gun instance.
+	    Gun.chain.user = function(pub){
+	      var gun = this, root = gun.back(-1), user;
+	      if(pub){
+	        pub = SEA.opt.pub((pub._||'')['#']) || pub;
+	        return root.get('~'+pub);
+	      }
+	      if(user = root.back('user')){ return user }
+	      var root = (root._), at = root, uuid = at.opt.uuid || lex;
+	      (at = (user = at.user = gun.chain(new User))._).opt = {};
+	      at.opt.uuid = function(cb){
+	        var id = uuid(), pub = root.user;
+	        if(!pub || !(pub = pub.is) || !(pub = pub.pub)){ return id }
+	        id = '~' + pub + '/' + id;
+	        if(cb && cb.call){ cb(null, id); }
+	        return id;
+	      };
+	      return user;
+	    };
+	    function lex(){ return Gun.state().toString(36).replace('.','') }
+	    Gun.User = User;
+	    User.GUN = Gun;
+	    User.SEA = Gun.SEA = SEA;
+	    module.exports = User;
+	  })(USE, './user');
+	USE(function(module){
+	    var u, Gun = (''+u != typeof window)? (window.Gun||{chain:{}}) : USE((''+u === typeof MODULE?'.':'')+'./gun', 1);
+	    Gun.chain.then = function(cb, opt){
+	      var gun = this, p = (new Promise(function(res, rej){
+	        gun.once(res, opt);
+	      }));
+	      return cb? p.then(cb) : p;
+	    };
+	  })(USE, './then');
+	USE(function(module){
+	    var User = USE('./user'), SEA = User.SEA, Gun = User.GUN, noop = function(){};
+
+	    // Well first we have to actually create a user. That is what this function does.
+	    User.prototype.create = function(...args){
+	      var pair = typeof args[0] === 'object' && (args[0].pub || args[0].epub) ? args[0] : typeof args[1] === 'object' && (args[1].pub || args[1].epub) ? args[1] : null;
+	      var alias = pair && (pair.pub || pair.epub) ? pair.pub : typeof args[0] === 'string' ? args[0] : null;
+	      var pass = pair && (pair.pub || pair.epub) ? pair : alias && typeof args[1] === 'string' ? args[1] : null;
+	      var cb = args.filter(arg => typeof arg === 'function')[0] || null; // cb now can stand anywhere, after alias/pass or pair
+	      var opt = args && args.length > 1 && typeof args[args.length-1] === 'object' ? args[args.length-1] : {}; // opt is always the last parameter which typeof === 'object' and stands after cb
+	      
+	      var gun = this, cat = (gun._), root = gun.back(-1);
+	      cb = cb || noop;
+	      opt = opt || {};
+	      if(false !== opt.check){
+	        var err;
+	        if(!alias){ err = "No user."; }
+	        if((pass||'').length < 8){ err = "Password too short!"; }
+	        if(err){
+	          cb({err: Gun.log(err)});
+	          return gun;
+	        }
+	      }
+	      if(cat.ing){
+	        (cb || noop)({err: Gun.log("User is already being created or authenticated!"), wait: true});
+	        return gun;
+	      }
+	      cat.ing = true;
+	      var act = {};
+	      act.a = function(pubs){
+	        act.pubs = pubs;
+	        if(pubs && !opt.already){
+	          // If we can enforce that a user name is already taken, it might be nice to try, but this is not guaranteed.
+	          var ack = {err: Gun.log('User already created!')};
+	          cat.ing = false;
+	          (cb || noop)(ack);
+	          gun.leave();
+	          return;
+	        }
+	        act.salt = String.random(64); // pseudo-randomly create a salt, then use PBKDF2 function to extend the password with it.
+	        SEA.work(pass, act.salt, act.b); // this will take some short amount of time to produce a proof, which slows brute force attacks.
+	      };
+	      act.b = function(proof){
+	        act.proof = proof;
+	        pair ? act.c(pair) : SEA.pair(act.c); // generate a brand new key pair or use the existing.
+	      };
+	      act.c = function(pair){
+	        var tmp;
+	        act.pair = pair || {};
+	        if(tmp = cat.root.user){
+	          tmp._.sea = pair;
+	          tmp.is = {pub: pair.pub, epub: pair.epub, alias: alias};
+	        }
+	        // the user's public key doesn't need to be signed. But everything else needs to be signed with it! // we have now automated it! clean up these extra steps now!
+	        act.data = {pub: pair.pub};
+	        act.d();
+	      };
+	      act.d = function(){
+	        act.data.alias = alias;
+	        act.e();
+	      };
+	      act.e = function(){
+	        act.data.epub = act.pair.epub; 
+	        SEA.encrypt({priv: act.pair.priv, epriv: act.pair.epriv}, act.proof, act.f, {raw:1}); // to keep the private key safe, we AES encrypt it with the proof of work!
+	      };
+	      act.f = function(auth){
+	        act.data.auth = JSON.stringify({ek: auth, s: act.salt}); 
+	        act.g(act.data.auth);
+	      };
+	      act.g = function(auth){ var tmp;
+	        act.data.auth = act.data.auth || auth;
+	        root.get(tmp = '~'+act.pair.pub).put(act.data).on(act.h); // awesome, now we can actually save the user with their public key as their ID.
+	        var link = {}; link[tmp] = {'#': tmp}; root.get('~@'+alias).put(link).get(tmp).on(act.i); // next up, we want to associate the alias with the public key. So we add it to the alias list.
+	      };
+	      act.h = function(data, key, msg, eve){
+	        eve.off(); act.h.ok = 1; act.i();
+	      };
+	      act.i = function(data, key, msg, eve){
+	        if(eve){ act.i.ok = 1; eve.off(); }
+	        if(!act.h.ok || !act.i.ok){ return }
+	        cat.ing = false;
+	        cb({ok: 0, pub: act.pair.pub}); // callback that the user has been created. (Note: ok = 0 because we didn't wait for disk to ack)
+	        if(noop === cb){ pair ? gun.auth(pair) : gun.auth(alias, pass); } // if no callback is passed, auto-login after signing up.
+	      };
+	      root.get('~@'+alias).once(act.a);
+	      return gun;
+	    };
+	    User.prototype.leave = function(opt, cb){
+	      var gun = this, user = (gun.back(-1)._).user;
+	      if(user){
+	        delete user.is;
+	        delete user._.is;
+	        delete user._.sea;
+	      }
+	      if(SEA.window){
+	        try{var sS = {};
+	        sS = window.sessionStorage;
+	        delete sS.recall;
+	        delete sS.pair;
+	        }catch(e){}      }
+	      return gun;
+	    };
+	  })(USE, './create');
+	USE(function(module){
+	    var User = USE('./user'), SEA = User.SEA, Gun = User.GUN, noop = function(){};
+	    // now that we have created a user, we want to authenticate them!
+	    User.prototype.auth = function(...args){ // TODO: this PR with arguments need to be cleaned up / refactored.
+	      var pair = typeof args[0] === 'object' && (args[0].pub || args[0].epub) ? args[0] : typeof args[1] === 'object' && (args[1].pub || args[1].epub) ? args[1] : null;
+	      var alias = !pair && typeof args[0] === 'string' ? args[0] : null;
+	      var pass = (alias || (pair && !(pair.priv && pair.epriv))) && typeof args[1] === 'string' ? args[1] : null;
+	      var cb = args.filter(arg => typeof arg === 'function')[0] || null; // cb now can stand anywhere, after alias/pass or pair
+	      var opt = args && args.length > 1 && typeof args[args.length-1] === 'object' ? args[args.length-1] : {}; // opt is always the last parameter which typeof === 'object' and stands after cb
+	      
+	      var gun = this, cat = (gun._), root = gun.back(-1);
+	      
+	      if(cat.ing){
+	        (cb || noop)({err: Gun.log("User is already being created or authenticated!"), wait: true});
+	        return gun;
+	      }
+	      cat.ing = true;
+	      
+	      var act = {}, u, tries = 9;
+	      act.a = function(data){
+	        if(!data){ return act.b() }
+	        if(!data.pub){
+	          var tmp = []; Object.keys(data).forEach(function(k){ if('_'==k){ return } tmp.push(data[k]); });
+	          return act.b(tmp);
+	        }
+	        if(act.name){ return act.f(data) }
+	        act.c((act.data = data).auth);
+	      };
+	      act.b = function(list){
+	        var get = (act.list = (act.list||[]).concat(list||[])).shift();
+	        if(u === get){
+	          if(act.name){ return act.err('Your user account is not published for dApps to access, please consider syncing it online, or allowing local access by adding your device as a peer.') }
+	          if(alias && tries--){
+	            root.get('~@'+alias).once(act.a);
+	            return;
+	          }
+	          return act.err('Wrong user or password.') 
+	        }
+	        root.get(get).once(act.a);
+	      };
+	      act.c = function(auth){
+	        if(u === auth){ return act.b() }
+	        if('string' == typeof auth){ return act.c(obj_ify(auth)) } // in case of legacy
+	        SEA.work(pass, (act.auth = auth).s, act.d, act.enc); // the proof of work is evidence that we've spent some time/effort trying to log in, this slows brute force.
+	      };
+	      act.d = function(proof){
+	        SEA.decrypt(act.auth.ek, proof, act.e, act.enc);
+	      };
+	      act.e = function(half){
+	        if(u === half){
+	          if(!act.enc){ // try old format
+	            act.enc = {encode: 'utf8'};
+	            return act.c(act.auth);
+	          } act.enc = null; // end backwards
+	          return act.b();
+	        }
+	        act.half = half;
+	        act.f(act.data);
+	      };
+	      act.f = function(pair){
+	        var half = act.half || {}, data = act.data || {};
+	        act.g(act.lol = {pub: pair.pub || data.pub, epub: pair.epub || data.epub, priv: pair.priv || half.priv, epriv: pair.epriv || half.epriv});
+	      };
+	      act.g = function(pair){
+	        if(!pair || !pair.pub || !pair.epub){ return act.b() }
+	        act.pair = pair;
+	        var user = (root._).user, at = (user._);
+	        var tmp = at.tag;
+	        var upt = at.opt;
+	        at = user._ = root.get('~'+pair.pub)._;
+	        at.opt = upt;
+	        // add our credentials in-memory only to our root user instance
+	        user.is = {pub: pair.pub, epub: pair.epub, alias: alias || pair.pub};
+	        at.sea = act.pair;
+	        cat.ing = false;
+	        try{if(pass && u == (obj_ify(cat.root.graph['~'+pair.pub].auth)||'')[':']){ opt.shuffle = opt.change = pass; } }catch(e){} // migrate UTF8 & Shuffle!
+	        opt.change? act.z() : (cb || noop)(at);
+	        if(SEA.window && ((gun.back('user')._).opt||opt).remember){
+	          // TODO: this needs to be modular.
+	          try{var sS = {};
+	          sS = window.sessionStorage; // TODO: FIX BUG putting on `.is`!
+	          sS.recall = true;
+	          sS.pair = JSON.stringify(pair); // auth using pair is more reliable than alias/pass
+	          }catch(e){}
+	        }
+	        try{
+	          if(root._.tag.auth){ // auth handle might not be registered yet
+	          (root._).on('auth', at); // TODO: Deprecate this, emit on user instead! Update docs when you do.
+	          } else { setTimeout(function(){ (root._).on('auth', at); },1); } // if not, hackily add a timeout.
+	          //at.on('auth', at) // Arrgh, this doesn't work without event "merge" code, but "merge" code causes stack overflow and crashes after logging in & trying to write data.
+	        }catch(e){
+	          Gun.log("Your 'auth' callback crashed with:", e);
+	        }
+	      };
+	      act.h = function(data){
+	        if(!data){ return act.b() }
+	        alias = data.alias;
+	        if(!alias)
+	          alias = data.alias = "~" + pair.pub;        
+	        if(!data.auth){
+	          return act.g(pair);
+	        }
+	        pair = null;
+	        act.c((act.data = data).auth);
+	      };
+	      act.z = function(){
+	        // password update so encrypt private key using new pwd + salt
+	        act.salt = String.random(64); // pseudo-random
+	        SEA.work(opt.change, act.salt, act.y);
+	      };
+	      act.y = function(proof){
+	        SEA.encrypt({priv: act.pair.priv, epriv: act.pair.epriv}, proof, act.x, {raw:1});
+	      };
+	      act.x = function(auth){
+	        act.w(JSON.stringify({ek: auth, s: act.salt}));
+	      };
+	      act.w = function(auth){
+	        if(opt.shuffle){ // delete in future!
+	          console.log('migrate core account from UTF8 & shuffle');
+	          var tmp = {}; Object.keys(act.data).forEach(function(k){ tmp[k] = act.data[k]; });
+	          delete tmp._;
+	          tmp.auth = auth;
+	          root.get('~'+act.pair.pub).put(tmp);
+	        } // end delete
+	        root.get('~'+act.pair.pub).get('auth').put(auth, cb || noop);
+	      };
+	      act.err = function(e){
+	        var ack = {err: Gun.log(e || 'User cannot be found!')};
+	        cat.ing = false;
+	        (cb || noop)(ack);
+	      };
+	      act.plugin = function(name){
+	        if(!(act.name = name)){ return act.err() }
+	        var tmp = [name];
+	        if('~' !== name[0]){
+	          tmp[1] = '~'+name;
+	          tmp[2] = '~@'+name;
+	        }
+	        act.b(tmp);
+	      };
+	      if(pair){
+	        if(pair.priv && pair.epriv)
+	          act.g(pair);
+	        else
+	          root.get('~'+pair.pub).once(act.h);
+	      } else
+	      if(alias){
+	        root.get('~@'+alias).once(act.a);
+	      } else
+	      if(!alias && !pass){
+	        SEA.name(act.plugin);
+	      }
+	      return gun;
+	    };
+	    function obj_ify(o){
+	      if('string' != typeof o){ return o }
+	      try{o = JSON.parse(o);
+	      }catch(e){o={};}      return o;
+	    }
+	  })(USE, './auth');
+	USE(function(module){
+	    var User = USE('./user'), SEA = User.SEA, Gun = User.GUN;
+	    User.prototype.recall = function(opt, cb){
+	      var gun = this, root = gun.back(-1);
+	      opt = opt || {};
+	      if(opt && opt.sessionStorage){
+	        if(SEA.window){
+	          try{
+	            var sS = {};
+	            sS = window.sessionStorage; // TODO: FIX BUG putting on `.is`!
+	            if(sS){
+	              (root._).opt.remember = true;
+	              ((gun.back('user')._).opt||opt).remember = true;
+	              if(sS.recall || sS.pair) root.user().auth(JSON.parse(sS.pair), cb); // pair is more reliable than alias/pass
+	            }
+	          }catch(e){}
+	        }
+	        return gun;
+	      }
+	      /*
+	        TODO: copy mhelander's expiry code back in.
+	        Although, we should check with community,
+	        should expiry be core or a plugin?
+	      */
+	      return gun;
+	    };
+	  })(USE, './recall');
+	USE(function(module){
+	    var User = USE('./user'), SEA = User.SEA, Gun = User.GUN, noop = function(){};
+	    User.prototype.pair = function(){
+	      var user = this, proxy; // undeprecated, hiding with proxies.
+	      try{ proxy = new Proxy({DANGER:'\u2620'}, {get: function(t,p,r){
+	        if(!user.is || !(user._||'').sea){ return }
+	        return user._.sea[p];
+	      }});}catch(e){}
+	      return proxy;
+	    };
+	    // If authenticated user wants to delete his/her account, let's support it!
+	    User.prototype.delete = async function(alias, pass, cb){
+	      console.log("user.delete() IS DEPRECATED AND WILL BE MOVED TO A MODULE!!!");
+	      var gun = this, root = gun.back(-1), user = gun.back('user');
+	      try {
+	        user.auth(alias, pass, function(ack){
+	          var pub = (user.is||{}).pub;
+	          // Delete user data
+	          user.map().once(function(){ this.put(null); });
+	          // Wipe user data from memory
+	          user.leave();
+	          (cb || noop)({ok: 0});
+	        });
+	      } catch (e) {
+	        Gun.log('User.delete failed! Error:', e);
+	      }
+	      return gun;
+	    };
+	    User.prototype.alive = async function(){
+	      console.log("user.alive() IS DEPRECATED!!!");
+	      const gunRoot = this.back(-1);
+	      try {
+	        // All is good. Should we do something more with actual recalled data?
+	        await authRecall(gunRoot);
+	        return gunRoot._.user._
+	      } catch (e) {
+	        const err = 'No session!';
+	        Gun.log(err);
+	        throw { err }
+	      }
+	    };
+	    User.prototype.trust = async function(user){
+	      console.log("`.trust` API MAY BE DELETED OR CHANGED OR RENAMED, DO NOT USE!");
+	      // TODO: BUG!!! SEA `node` read listener needs to be async, which means core needs to be async too.
+	      //gun.get('alice').get('age').trust(bob);
+	      if (Gun.is(user)) {
+	        user.get('pub').get((ctx, ev) => {
+	          console.log(ctx, ev);
+	        });
+	      }
+	      user.get('trust').get(path).put(theirPubkey);
+
+	      // do a lookup on this gun chain directly (that gets bob's copy of the data)
+	      // do a lookup on the metadata trust table for this path (that gets all the pubkeys allowed to write on this path)
+	      // do a lookup on each of those pubKeys ON the path (to get the collab data "layers")
+	      // THEN you perform Jachen's mix operation
+	      // and return the result of that to...
+	    };
+	    User.prototype.grant = function(to, cb){
+	      console.log("`.grant` API MAY BE DELETED OR CHANGED OR RENAMED, DO NOT USE!");
+	      var gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+	      gun.back(function(at){ if(at.is){ return } path += (at.get||''); });
+	      (async function(){
+	      var enc, sec = await user.get('grant').get(pair.pub).get(path).then();
+	      sec = await SEA.decrypt(sec, pair);
+	      if(!sec){
+	        sec = SEA.random(16).toString();
+	        enc = await SEA.encrypt(sec, pair);
+	        user.get('grant').get(pair.pub).get(path).put(enc);
+	      }
+	      var pub = to.get('pub').then();
+	      var epub = to.get('epub').then();
+	      pub = await pub; epub = await epub;
+	      var dh = await SEA.secret(epub, pair);
+	      enc = await SEA.encrypt(sec, dh);
+	      user.get('grant').get(pub).get(path).put(enc, cb);
+	      }());
+	      return gun;
+	    };
+	    User.prototype.secret = function(data, cb){
+	      console.log("`.secret` API MAY BE DELETED OR CHANGED OR RENAMED, DO NOT USE!");
+	      var gun = this, user = gun.back(-1).user(), pair = user.pair(), path = '';
+	      gun.back(function(at){ if(at.is){ return } path += (at.get||''); });
+	      (async function(){
+	      var enc, sec = await user.get('trust').get(pair.pub).get(path).then();
+	      sec = await SEA.decrypt(sec, pair);
+	      if(!sec){
+	        sec = SEA.random(16).toString();
+	        enc = await SEA.encrypt(sec, pair);
+	        user.get('trust').get(pair.pub).get(path).put(enc);
+	      }
+	      enc = await SEA.encrypt(data, sec);
+	      gun.put(enc, cb);
+	      }());
+	      return gun;
+	    };
+
+	    /**
+	     * returns the decrypted value, encrypted by secret
+	     * @returns {Promise<any>}
+	     // Mark needs to review 1st before officially supported
+	    User.prototype.decrypt = function(cb) {
+	      let gun = this,
+	        path = ''
+	      gun.back(function(at) {
+	        if (at.is) {
+	          return
+	        }
+	        path += at.get || ''
+	      })
+	      return gun
+	        .then(async data => {
+	          if (data == null) {
+	            return
+	          }
+	          const user = gun.back(-1).user()
+	          const pair = user.pair()
+	          let sec = await user
+	            .get('trust')
+	            .get(pair.pub)
+	            .get(path)
+	          sec = await SEA.decrypt(sec, pair)
+	          if (!sec) {
+	            return data
+	          }
+	          let decrypted = await SEA.decrypt(data, sec)
+	          return decrypted
+	        })
+	        .then(res => {
+	          cb && cb(res)
+	          return res
+	        })
+	    }
+	    */
+	    module.exports = User;
+	  })(USE, './share');
+	USE(function(module){
+	    var SEA = USE('./sea'), S = USE('./settings'), noop = function() {}, u;
+	    var Gun = (''+u != typeof window)? (window.Gun||{on:noop}) : USE((''+u === typeof MODULE?'.':'')+'./gun', 1);
+	    // After we have a GUN extension to make user registration/login easy, we then need to handle everything else.
+
+	    // We do this with a GUN adapter, we first listen to when a gun instance is created (and when its options change)
+	    Gun.on('opt', function(at){
+	      if(!at.sea){ // only add SEA once per instance, on the "at" context.
+	        at.sea = {own: {}};
+	        at.on('put', check, at); // SEA now runs its firewall on HAM diffs, not all i/o.
+	      }
+	      this.to.next(at); // make sure to call the "next" middleware adapter.
+	    });
+
+	    // Alright, this next adapter gets run at the per node level in the graph database.
+	    // correction: 2020 it gets run on each key/value pair in a node upon a HAM diff.
+	    // This will let us verify that every property on a node has a value signed by a public key we trust.
+	    // If the signature does not match, the data is just `undefined` so it doesn't get passed on.
+	    // If it does match, then we transform the in-memory "view" of the data into its plain value (without the signature).
+	    // Now NOTE! Some data is "system" data, not user data. Example: List of public keys, aliases, etc.
+	    // This data is self-enforced (the value can only match its ID), but that is handled in the `security` function.
+	    // From the self-enforced data, we can see all the edges in the graph that belong to a public key.
+	    // Example: ~ASDF is the ID of a node with ASDF as its public key, signed alias and salt, and
+	    // its encrypted private key, but it might also have other signed values on it like `profile = <ID>` edge.
+	    // Using that directed edge's ID, we can then track (in memory) which IDs belong to which keys.
+	    // Here is a problem: Multiple public keys can "claim" any node's ID, so this is dangerous!
+	    // This means we should ONLY trust our "friends" (our key ring) public keys, not any ones.
+	    // I have not yet added that to SEA yet in this alpha release. That is coming soon, but beware in the meanwhile!
+
+	    function check(msg){ // REVISE / IMPROVE, NO NEED TO PASS MSG/EVE EACH SUB?
+	      var eve = this, at = eve.as, put = msg.put, soul = put['#'], key = put['.'], val = put[':'], state = put['>'], id = msg['#'], tmp;
+	      if(!soul || !key){ return }
+	      if((msg._||'').faith && (at.opt||'').faith && 'function' == typeof msg._){
+	        SEA.opt.pack(put, function(raw){
+	        SEA.verify(raw, false, function(data){ // this is synchronous if false
+	          put['='] = SEA.opt.unpack(data);
+	          eve.to.next(msg);
+	        });});
+	        return 
+	      }
+	      var no = function(why){ at.on('in', {'@': id, err: msg.err = why}); }; // exploit internal relay stun for now, maybe violates spec, but testing for now. // Note: this may be only the sharded message, not original batch.
+	      //var no = function(why){ msg.ack(why) };
+	      (msg._||'').DBG && ((msg._||'').DBG.c = +new Date);
+	      if(0 <= soul.indexOf('<?')){ // special case for "do not sync data X old" forget
+	        // 'a~pub.key/b<?9'
+	        tmp = parseFloat(soul.split('<?')[1]||'');
+	        if(tmp && (state < (Gun.state() - (tmp * 1000)))){ // sec to ms
+	          (tmp = msg._) && (tmp.stun) && (tmp.stun--); // THIS IS BAD CODE! It assumes GUN internals do something that will probably change in future, but hacking in now.
+	          return; // omit!
+	        }
+	      }
+	      
+	      if('~@' === soul){  // special case for shared system data, the list of aliases.
+	        check.alias(eve, msg, val, key, soul, at, no); return;
+	      }
+	      if('~@' === soul.slice(0,2)){ // special case for shared system data, the list of public keys for an alias.
+	        check.pubs(eve, msg, val, key, soul, at, no); return;
+	      }
+	      //if('~' === soul.slice(0,1) && 2 === (tmp = soul.slice(1)).split('.').length){ // special case, account data for a public key.
+	      if(tmp = SEA.opt.pub(soul)){ // special case, account data for a public key.
+	        check.pub(eve, msg, val, key, soul, at, no, at.user||'', tmp); return;
+	      }
+	      if(0 <= soul.indexOf('#')){ // special case for content addressing immutable hashed data.
+	        check.hash(eve, msg, val, key, soul, at, no); return;
+	      } 
+	      check.any(eve, msg, val, key, soul, at, no, at.user||''); return;
+	      eve.to.next(msg); // not handled
+	    }
+	    check.hash = function(eve, msg, val, key, soul, at, no){ // mark unbuilt @i001962 's epic hex contrib!
+	      SEA.work(val, null, function(data){
+	        function hexToBase64(hexStr) {
+	          let base64 = "";
+	          for(let i = 0; i < hexStr.length; i++) {
+	            base64 += !(i - 1 & 1) ? String.fromCharCode(parseInt(hexStr.substring(i - 1, i + 1), 16)) : "";}
+	          return btoa(base64);}  
+	        if(data && data === key.split('#').slice(-1)[0]){ return eve.to.next(msg) }
+	          else if (data && data === hexToBase64(key.split('#').slice(-1)[0])){ 
+	          return eve.to.next(msg) }
+	        no("Data hash not same as hash!");
+	      }, {name: 'SHA-256'});
+	    };
+	    check.alias = function(eve, msg, val, key, soul, at, no){ // Example: {_:#~@, ~@alice: {#~@alice}}
+	      if(!val){ return no("Data must exist!") } // data MUST exist
+	      if('~@'+key === link_is(val)){ return eve.to.next(msg) } // in fact, it must be EXACTLY equal to itself
+	      no("Alias not same!"); // if it isn't, reject.
+	    };
+	    check.pubs = function(eve, msg, val, key, soul, at, no){ // Example: {_:#~@alice, ~asdf: {#~asdf}}
+	      if(!val){ return no("Alias must exist!") } // data MUST exist
+	      if(key === link_is(val)){ return eve.to.next(msg) } // and the ID must be EXACTLY equal to its property
+	      no("Alias not same!"); // that way nobody can tamper with the list of public keys.
+	    };
+	    check.pub = async function(eve, msg, val, key, soul, at, no, user, pub){ var tmp; // Example: {_:#~asdf, hello:'world'~fdsa}}
+	      const raw = await S.parse(val) || {};
+	      const verify = (certificate, certificant, cb) => {
+	        if (certificate.m && certificate.s && certificant && pub)
+	          // now verify certificate
+	          return SEA.verify(certificate, pub, data => { // check if "pub" (of the graph owner) really issued this cert
+	            if (u !== data && u !== data.e && msg.put['>'] && msg.put['>'] > parseFloat(data.e)) return no("Certificate expired.") // certificate expired
+	            // "data.c" = a list of certificants/certified users
+	            // "data.w" = lex WRITE permission, in the future, there will be "data.r" which means lex READ permission
+	            if (u !== data && data.c && data.w && (data.c === certificant || data.c.indexOf('*') > -1)) {
+	              // ok, now "certificant" is in the "certificants" list, but is "path" allowed? Check path
+	              let path = soul.indexOf('/') > -1 ? soul.replace(soul.substring(0, soul.indexOf('/') + 1), '') : '';
+	              String.match = String.match || Gun.text.match;
+	              const w = Array.isArray(data.w) ? data.w : typeof data.w === 'object' || typeof data.w === 'string' ? [data.w] : [];
+	              for (const lex of w) {
+	                if ((String.match(path, lex['#']) && String.match(key, lex['.'])) || (!lex['.'] && String.match(path, lex['#'])) || (!lex['#'] && String.match(key, lex['.'])) || String.match((path ? path + '/' + key : key), lex['#'] || lex)) {
+	                  // is Certificant forced to present in Path
+	                  if (lex['+'] && lex['+'].indexOf('*') > -1 && path && path.indexOf(certificant) == -1 && key.indexOf(certificant) == -1) return no(`Path "${path}" or key "${key}" must contain string "${certificant}".`)
+	                  // path is allowed, but is there any WRITE block? Check it out
+	                  if (data.wb && (typeof data.wb === 'string' || ((data.wb || {})['#']))) { // "data.wb" = path to the WRITE block
+	                    var root = eve.as.root.$.back(-1);
+	                    if (typeof data.wb === 'string' && '~' !== data.wb.slice(0, 1)) root = root.get('~' + pub);
+	                    return root.get(data.wb).get(certificant).once(value => { // TODO: INTENT TO DEPRECATE.
+	                      if (value && (value === 1 || value === true)) return no(`Certificant ${certificant} blocked.`)
+	                      return cb(data)
+	                    })
+	                  }
+	                  return cb(data)
+	                }
+	              }
+	              return no("Certificate verification fail.")
+	            }
+	          })
+	        return
+	      };
+	      
+	      if ('pub' === key && '~' + pub === soul) {
+	        if (val === pub) return eve.to.next(msg) // the account MUST match `pub` property that equals the ID of the public key.
+	        return no("Account not same!")
+	      }
+
+	      if ((tmp = user.is) && tmp.pub && !raw['*'] && !raw['+'] && (pub === tmp.pub || (pub !== tmp.pub && ((msg._.msg || {}).opt || {}).cert))){
+	        SEA.opt.pack(msg.put, packed => {
+	          SEA.sign(packed, (user._).sea, async function(data) {
+	            if (u === data) return no(SEA.err || 'Signature fail.')
+	            msg.put[':'] = {':': tmp = SEA.opt.unpack(data.m), '~': data.s};
+	            msg.put['='] = tmp;
+	  
+	            // if writing to own graph, just allow it
+	            if (pub === user.is.pub) {
+	              if (tmp = link_is(val)) (at.sea.own[tmp] = at.sea.own[tmp] || {})[pub] = 1;
+	              JSON.stringifyAsync(msg.put[':'], function(err,s){
+	                if(err){ return no(err || "Stringify error.") }
+	                msg.put[':'] = s;
+	                return eve.to.next(msg);
+	              });
+	              return
+	            }
+	  
+	            // if writing to other's graph, check if cert exists then try to inject cert into put, also inject self pub so that everyone can verify the put
+	            if (pub !== user.is.pub && ((msg._.msg || {}).opt || {}).cert) {
+	              const cert = await S.parse(msg._.msg.opt.cert);
+	              // even if cert exists, we must verify it
+	              if (cert && cert.m && cert.s)
+	                verify(cert, user.is.pub, _ => {
+	                  msg.put[':']['+'] = cert; // '+' is a certificate
+	                  msg.put[':']['*'] = user.is.pub; // '*' is pub of the user who puts
+	                  JSON.stringifyAsync(msg.put[':'], function(err,s){
+	                    if(err){ return no(err || "Stringify error.") }
+	                    msg.put[':'] = s;
+	                    return eve.to.next(msg);
+	                  });
+	                  return
+	                });
+	            }
+	          }, {raw: 1});
+	        });
+	        return;
+	      }
+
+	      SEA.opt.pack(msg.put, packed => {
+	        SEA.verify(packed, raw['*'] || pub, function(data){ var tmp;
+	          data = SEA.opt.unpack(data);
+	          if (u === data) return no("Unverified data.") // make sure the signature matches the account it claims to be on. // reject any updates that are signed with a mismatched account.
+	          if ((tmp = link_is(data)) && pub === SEA.opt.pub(tmp)) (at.sea.own[tmp] = at.sea.own[tmp] || {})[pub] = 1;
+	          
+	          // check if cert ('+') and putter's pub ('*') exist
+	          if (raw['+'] && raw['+']['m'] && raw['+']['s'] && raw['*'])
+	            // now verify certificate
+	            verify(raw['+'], raw['*'], _ => {
+	              msg.put['='] = data;
+	              return eve.to.next(msg);
+	            });
+	          else {
+	            msg.put['='] = data;
+	            return eve.to.next(msg);
+	          }
+	        });
+	      });
+	      return
+	    };
+	    check.any = function(eve, msg, val, key, soul, at, no, user){      if(at.opt.secure){ return no("Soul missing public key at '" + key + "'.") }
+	      // TODO: Ask community if should auto-sign non user-graph data.
+	      at.on('secure', function(msg){ this.off();
+	        if(!at.opt.secure){ return eve.to.next(msg) }
+	        no("Data cannot be changed.");
+	      }).on.on('secure', msg);
+	      return;
+	    };
+
+	    var valid = Gun.valid, link_is = function(d,l){ return 'string' == typeof (l = valid(d)) && l }, state_ify = (Gun.state||'').ify;
+
+	    var pubcut = /[^\w_-]/; // anything not alphanumeric or _ -
+	    SEA.opt.pub = function(s){
+	      if(!s){ return }
+	      s = s.split('~');
+	      if(!s || !(s = s[1])){ return }
+	      s = s.split(pubcut).slice(0,2);
+	      if(!s || 2 != s.length){ return }
+	      if('@' === (s[0]||'')[0]){ return }
+	      s = s.slice(0,2).join('.');
+	      return s;
+	    };
+	    SEA.opt.stringy = function(t){
+	      // TODO: encrypt etc. need to check string primitive. Make as breaking change.
+	    };
+	    SEA.opt.pack = function(d,cb,k, n,s){ var tmp, f; // pack for verifying
+	      if(SEA.opt.check(d)){ return cb(d) }
+	      if(d && d['#'] && d['.'] && d['>']){ tmp = d[':']; f = 1; }
+	      JSON.parseAsync(f? tmp : d, function(err, meta){
+	        var sig = ((u !== (meta||'')[':']) && (meta||'')['~']); // or just ~ check?
+	        if(!sig){ cb(d); return }
+	        cb({m: {'#':s||d['#'],'.':k||d['.'],':':(meta||'')[':'],'>':d['>']||Gun.state.is(n, k)}, s: sig});
+	      });
+	    };
+	    var O = SEA.opt;
+	    SEA.opt.unpack = function(d, k, n){ var tmp;
+	      if(u === d){ return }
+	      if(d && (u !== (tmp = d[':']))){ return tmp }
+	      k = k || O.fall_key; if(!n && O.fall_val){ n = {}; n[k] = O.fall_val; }
+	      if(!k || !n){ return }
+	      if(d === n[k]){ return d }
+	      if(!SEA.opt.check(n[k])){ return d }
+	      var soul = (n && n._ && n._['#']) || O.fall_soul, s = Gun.state.is(n, k) || O.fall_state;
+	      if(d && 4 === d.length && soul === d[0] && k === d[1] && fl(s) === fl(d[3])){
+	        return d[2];
+	      }
+	      if(s < SEA.opt.shuffle_attack){
+	        return d;
+	      }
+	    };
+	    SEA.opt.shuffle_attack = 1546329600000; // Jan 1, 2019
+	    var fl = Math.floor; // TODO: Still need to fix inconsistent state issue.
+	    // TODO: Potential bug? If pub/priv key starts with `-`? IDK how possible.
+
+	  })(USE, './index');
+	}());
+	});
+
+	// true  -> String#at
+	// false -> String#codePointAt
+	var _stringAt = function (TO_STRING) {
+	  return function (that, pos) {
+	    var s = String(_defined(that));
+	    var i = _toInteger(pos);
+	    var l = s.length;
+	    var a, b;
+	    if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
+	    a = s.charCodeAt(i);
+	    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
+	      ? TO_STRING ? s.charAt(i) : a
+	      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+	  };
+	};
+
+	var _redefine = _hide;
+
+	var _iterators = {};
 
 	var _objectDps = _descriptors ? Object.defineProperties : function defineProperties(O, Properties) {
 	  _anObject(O);
@@ -437,12 +6227,6 @@
 	  _setToStringTag(Constructor, NAME + ' Iterator');
 	};
 
-	// 7.1.13 ToObject(argument)
-
-	var _toObject = function (it) {
-	  return Object(_defined(it));
-	};
-
 	// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
 
 
@@ -489,8 +6273,6 @@
 	    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
 	      // Set @@toStringTag to native iterators
 	      _setToStringTag(IteratorPrototype, TAG, true);
-	      // fix for some old engines
-	      if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
 	    }
 	  }
 	  // fix Array#{values, @@iterator}.name in V8 / FF
@@ -499,7 +6281,7 @@
 	    $default = function values() { return $native.call(this); };
 	  }
 	  // Define iterator
-	  if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+	  if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
 	    _hide(proto, ITERATOR, $default);
 	  }
 	  // Plug for library
@@ -516,6 +6298,27 @@
 	    } else _export(_export.P + _export.F * (BUGGY || VALUES_BUG), NAME, methods);
 	  }
 	  return methods;
+	};
+
+	var $at = _stringAt(true);
+
+	// 21.1.3.27 String.prototype[@@iterator]()
+	_iterDefine(String, 'String', function (iterated) {
+	  this._t = String(iterated); // target
+	  this._i = 0;                // next index
+	// 21.1.5.2.1 %StringIteratorPrototype%.next()
+	}, function () {
+	  var O = this._t;
+	  var index = this._i;
+	  var point;
+	  if (index >= O.length) return { value: undefined, done: true };
+	  point = $at(O, index);
+	  this._i += point.length;
+	  return { value: point, done: false };
+	});
+
+	var _iterStep = function (done, value) {
+	  return { value: value, done: !!done };
 	};
 
 	// 22.1.3.4 Array.prototype.entries()
@@ -559,89 +6362,10 @@
 	  _iterators[NAME] = _iterators.Array;
 	}
 
-	// true  -> String#at
-	// false -> String#codePointAt
-	var _stringAt = function (TO_STRING) {
-	  return function (that, pos) {
-	    var s = String(_defined(that));
-	    var i = _toInteger(pos);
-	    var l = s.length;
-	    var a, b;
-	    if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
-	    a = s.charCodeAt(i);
-	    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
-	      ? TO_STRING ? s.charAt(i) : a
-	      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-	  };
-	};
-
-	var $at = _stringAt(true);
-
-	// 21.1.3.27 String.prototype[@@iterator]()
-	_iterDefine(String, 'String', function (iterated) {
-	  this._t = String(iterated); // target
-	  this._i = 0;                // next index
-	// 21.1.5.2.1 %StringIteratorPrototype%.next()
-	}, function () {
-	  var O = this._t;
-	  var index = this._i;
-	  var point;
-	  if (index >= O.length) return { value: undefined, done: true };
-	  point = $at(O, index);
-	  this._i += point.length;
-	  return { value: point, done: false };
-	});
-
-	// getting tag from 19.1.3.6 Object.prototype.toString()
-
-	var TAG$1 = _wks('toStringTag');
-	// ES3 wrong here
-	var ARG = _cof(function () { return arguments; }()) == 'Arguments';
-
-	// fallback for IE11 Script Access Denied error
-	var tryGet = function (it, key) {
-	  try {
-	    return it[key];
-	  } catch (e) { /* empty */ }
-	};
-
-	var _classof = function (it) {
-	  var O, T, B;
-	  return it === undefined ? 'Undefined' : it === null ? 'Null'
-	    // @@toStringTag case
-	    : typeof (T = tryGet(O = Object(it), TAG$1)) == 'string' ? T
-	    // builtinTag case
-	    : ARG ? _cof(O)
-	    // ES3 arguments fallback
-	    : (B = _cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-	};
-
-	var ITERATOR$1 = _wks('iterator');
-
-	var core_getIteratorMethod = _core.getIteratorMethod = function (it) {
-	  if (it != undefined) return it[ITERATOR$1]
-	    || it['@@iterator']
-	    || _iterators[_classof(it)];
-	};
-
-	var core_getIterator = _core.getIterator = function (it) {
-	  var iterFn = core_getIteratorMethod(it);
-	  if (typeof iterFn != 'function') throw TypeError(it + ' is not iterable!');
-	  return _anObject(iterFn.call(it));
-	};
-
-	var getIterator = core_getIterator;
-
-	var getIterator$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": getIterator, __esModule: true };
-	});
-
-	var _getIterator = unwrapExports(getIterator$1);
-
-	var f$1 = _wks;
+	var f$3 = _wks;
 
 	var _wksExt = {
-		f: f$1
+		f: f$3
 	};
 
 	var iterator = _wksExt.f('iterator');
@@ -719,18 +6443,6 @@
 	  if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: _wksExt.f(name) });
 	};
 
-	var f$2 = Object.getOwnPropertySymbols;
-
-	var _objectGops = {
-		f: f$2
-	};
-
-	var f$3 = {}.propertyIsEnumerable;
-
-	var _objectPie = {
-		f: f$3
-	};
-
 	// all enumerable object keys, includes symbols
 
 
@@ -768,7 +6480,7 @@
 	// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
 
 	var gOPN = _objectGopn.f;
-	var toString$1 = {}.toString;
+	var toString$2 = {}.toString;
 
 	var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
 	  ? Object.getOwnPropertyNames(window) : [];
@@ -782,7 +6494,7 @@
 	};
 
 	var f$5 = function getOwnPropertyNames(it) {
-	  return windowNames && toString$1.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(_toIobject(it));
+	  return windowNames && toString$2.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(_toIobject(it));
 	};
 
 	var _objectGopnExt = {
@@ -836,8 +6548,8 @@
 	var dP$1 = _objectDp.f;
 	var gOPN$1 = _objectGopnExt.f;
 	var $Symbol = _global.Symbol;
-	var $JSON$1 = _global.JSON;
-	var _stringify = $JSON$1 && $JSON$1.stringify;
+	var $JSON = _global.JSON;
+	var _stringify = $JSON && $JSON.stringify;
 	var PROTOTYPE$2 = 'prototype';
 	var HIDDEN = _wks('_hidden');
 	var TO_PRIMITIVE = _wks('toPrimitive');
@@ -1018,7 +6730,7 @@
 	});
 
 	// 24.3.2 JSON.stringify(value [, replacer [, space]])
-	$JSON$1 && _export(_export.S + _export.F * (!USE_NATIVE || _fails(function () {
+	$JSON && _export(_export.S + _export.F * (!USE_NATIVE || _fails(function () {
 	  var S = $Symbol();
 	  // MS Edge converts symbol values to JSON as {}
 	  // WebKit converts symbol values to JSON as null
@@ -1037,7 +6749,7 @@
 	      if (!isSymbol(value)) return value;
 	    };
 	    args[1] = replacer;
-	    return _stringify.apply($JSON$1, args);
+	    return _stringify.apply($JSON, args);
 	  }
 	});
 
@@ -1087,926 +6799,29 @@
 
 	var _typeof = unwrapExports(_typeof_1);
 
-	var runtime = createCommonjsModule(function (module) {
-	/**
-	 * Copyright (c) 2014-present, Facebook, Inc.
-	 *
-	 * This source code is licensed under the MIT license found in the
-	 * LICENSE file in the root directory of this source tree.
-	 */
+	// getting tag from 19.1.3.6 Object.prototype.toString()
 
-	!(function(global) {
+	var TAG$1 = _wks('toStringTag');
+	// ES3 wrong here
+	var ARG = _cof(function () { return arguments; }()) == 'Arguments';
 
-	  var Op = Object.prototype;
-	  var hasOwn = Op.hasOwnProperty;
-	  var undefined; // More compressible than void 0.
-	  var $Symbol = typeof Symbol === "function" ? Symbol : {};
-	  var iteratorSymbol = $Symbol.iterator || "@@iterator";
-	  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
-	  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
-	  var runtime = global.regeneratorRuntime;
-	  if (runtime) {
-	    {
-	      // If regeneratorRuntime is defined globally and we're in a module,
-	      // make the exports object identical to regeneratorRuntime.
-	      module.exports = runtime;
-	    }
-	    // Don't bother evaluating the rest of this file if the runtime was
-	    // already defined globally.
-	    return;
-	  }
-
-	  // Define the runtime globally (as expected by generated code) as either
-	  // module.exports (if we're in a module) or a new, empty object.
-	  runtime = global.regeneratorRuntime = module.exports;
-
-	  function wrap(innerFn, outerFn, self, tryLocsList) {
-	    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
-	    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
-	    var generator = Object.create(protoGenerator.prototype);
-	    var context = new Context(tryLocsList || []);
-
-	    // The ._invoke method unifies the implementations of the .next,
-	    // .throw, and .return methods.
-	    generator._invoke = makeInvokeMethod(innerFn, self, context);
-
-	    return generator;
-	  }
-	  runtime.wrap = wrap;
-
-	  // Try/catch helper to minimize deoptimizations. Returns a completion
-	  // record like context.tryEntries[i].completion. This interface could
-	  // have been (and was previously) designed to take a closure to be
-	  // invoked without arguments, but in all the cases we care about we
-	  // already have an existing method we want to call, so there's no need
-	  // to create a new function object. We can even get away with assuming
-	  // the method takes exactly one argument, since that happens to be true
-	  // in every case, so we don't have to touch the arguments object. The
-	  // only additional allocation required is the completion record, which
-	  // has a stable shape and so hopefully should be cheap to allocate.
-	  function tryCatch(fn, obj, arg) {
-	    try {
-	      return { type: "normal", arg: fn.call(obj, arg) };
-	    } catch (err) {
-	      return { type: "throw", arg: err };
-	    }
-	  }
-
-	  var GenStateSuspendedStart = "suspendedStart";
-	  var GenStateSuspendedYield = "suspendedYield";
-	  var GenStateExecuting = "executing";
-	  var GenStateCompleted = "completed";
-
-	  // Returning this object from the innerFn has the same effect as
-	  // breaking out of the dispatch switch statement.
-	  var ContinueSentinel = {};
-
-	  // Dummy constructor functions that we use as the .constructor and
-	  // .constructor.prototype properties for functions that return Generator
-	  // objects. For full spec compliance, you may wish to configure your
-	  // minifier not to mangle the names of these two functions.
-	  function Generator() {}
-	  function GeneratorFunction() {}
-	  function GeneratorFunctionPrototype() {}
-
-	  // This is a polyfill for %IteratorPrototype% for environments that
-	  // don't natively support it.
-	  var IteratorPrototype = {};
-	  IteratorPrototype[iteratorSymbol] = function () {
-	    return this;
-	  };
-
-	  var getProto = Object.getPrototypeOf;
-	  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
-	  if (NativeIteratorPrototype &&
-	      NativeIteratorPrototype !== Op &&
-	      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
-	    // This environment has a native %IteratorPrototype%; use it instead
-	    // of the polyfill.
-	    IteratorPrototype = NativeIteratorPrototype;
-	  }
-
-	  var Gp = GeneratorFunctionPrototype.prototype =
-	    Generator.prototype = Object.create(IteratorPrototype);
-	  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
-	  GeneratorFunctionPrototype.constructor = GeneratorFunction;
-	  GeneratorFunctionPrototype[toStringTagSymbol] =
-	    GeneratorFunction.displayName = "GeneratorFunction";
-
-	  // Helper for defining the .next, .throw, and .return methods of the
-	  // Iterator interface in terms of a single ._invoke method.
-	  function defineIteratorMethods(prototype) {
-	    ["next", "throw", "return"].forEach(function(method) {
-	      prototype[method] = function(arg) {
-	        return this._invoke(method, arg);
-	      };
-	    });
-	  }
-
-	  runtime.isGeneratorFunction = function(genFun) {
-	    var ctor = typeof genFun === "function" && genFun.constructor;
-	    return ctor
-	      ? ctor === GeneratorFunction ||
-	        // For the native GeneratorFunction constructor, the best we can
-	        // do is to check its .name property.
-	        (ctor.displayName || ctor.name) === "GeneratorFunction"
-	      : false;
-	  };
-
-	  runtime.mark = function(genFun) {
-	    if (Object.setPrototypeOf) {
-	      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
-	    } else {
-	      genFun.__proto__ = GeneratorFunctionPrototype;
-	      if (!(toStringTagSymbol in genFun)) {
-	        genFun[toStringTagSymbol] = "GeneratorFunction";
-	      }
-	    }
-	    genFun.prototype = Object.create(Gp);
-	    return genFun;
-	  };
-
-	  // Within the body of any async function, `await x` is transformed to
-	  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
-	  // `hasOwn.call(value, "__await")` to determine if the yielded value is
-	  // meant to be awaited.
-	  runtime.awrap = function(arg) {
-	    return { __await: arg };
-	  };
-
-	  function AsyncIterator(generator) {
-	    function invoke(method, arg, resolve, reject) {
-	      var record = tryCatch(generator[method], generator, arg);
-	      if (record.type === "throw") {
-	        reject(record.arg);
-	      } else {
-	        var result = record.arg;
-	        var value = result.value;
-	        if (value &&
-	            typeof value === "object" &&
-	            hasOwn.call(value, "__await")) {
-	          return Promise.resolve(value.__await).then(function(value) {
-	            invoke("next", value, resolve, reject);
-	          }, function(err) {
-	            invoke("throw", err, resolve, reject);
-	          });
-	        }
-
-	        return Promise.resolve(value).then(function(unwrapped) {
-	          // When a yielded Promise is resolved, its final value becomes
-	          // the .value of the Promise<{value,done}> result for the
-	          // current iteration. If the Promise is rejected, however, the
-	          // result for this iteration will be rejected with the same
-	          // reason. Note that rejections of yielded Promises are not
-	          // thrown back into the generator function, as is the case
-	          // when an awaited Promise is rejected. This difference in
-	          // behavior between yield and await is important, because it
-	          // allows the consumer to decide what to do with the yielded
-	          // rejection (swallow it and continue, manually .throw it back
-	          // into the generator, abandon iteration, whatever). With
-	          // await, by contrast, there is no opportunity to examine the
-	          // rejection reason outside the generator function, so the
-	          // only option is to throw it from the await expression, and
-	          // let the generator function handle the exception.
-	          result.value = unwrapped;
-	          resolve(result);
-	        }, reject);
-	      }
-	    }
-
-	    var previousPromise;
-
-	    function enqueue(method, arg) {
-	      function callInvokeWithMethodAndArg() {
-	        return new Promise(function(resolve, reject) {
-	          invoke(method, arg, resolve, reject);
-	        });
-	      }
-
-	      return previousPromise =
-	        // If enqueue has been called before, then we want to wait until
-	        // all previous Promises have been resolved before calling invoke,
-	        // so that results are always delivered in the correct order. If
-	        // enqueue has not been called before, then it is important to
-	        // call invoke immediately, without waiting on a callback to fire,
-	        // so that the async generator function has the opportunity to do
-	        // any necessary setup in a predictable way. This predictability
-	        // is why the Promise constructor synchronously invokes its
-	        // executor callback, and why async functions synchronously
-	        // execute code before the first await. Since we implement simple
-	        // async functions in terms of async generators, it is especially
-	        // important to get this right, even though it requires care.
-	        previousPromise ? previousPromise.then(
-	          callInvokeWithMethodAndArg,
-	          // Avoid propagating failures to Promises returned by later
-	          // invocations of the iterator.
-	          callInvokeWithMethodAndArg
-	        ) : callInvokeWithMethodAndArg();
-	    }
-
-	    // Define the unified helper method that is used to implement .next,
-	    // .throw, and .return (see defineIteratorMethods).
-	    this._invoke = enqueue;
-	  }
-
-	  defineIteratorMethods(AsyncIterator.prototype);
-	  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
-	    return this;
-	  };
-	  runtime.AsyncIterator = AsyncIterator;
-
-	  // Note that simple async functions are implemented on top of
-	  // AsyncIterator objects; they just return a Promise for the value of
-	  // the final result produced by the iterator.
-	  runtime.async = function(innerFn, outerFn, self, tryLocsList) {
-	    var iter = new AsyncIterator(
-	      wrap(innerFn, outerFn, self, tryLocsList)
-	    );
-
-	    return runtime.isGeneratorFunction(outerFn)
-	      ? iter // If outerFn is a generator, return the full iterator.
-	      : iter.next().then(function(result) {
-	          return result.done ? result.value : iter.next();
-	        });
-	  };
-
-	  function makeInvokeMethod(innerFn, self, context) {
-	    var state = GenStateSuspendedStart;
-
-	    return function invoke(method, arg) {
-	      if (state === GenStateExecuting) {
-	        throw new Error("Generator is already running");
-	      }
-
-	      if (state === GenStateCompleted) {
-	        if (method === "throw") {
-	          throw arg;
-	        }
-
-	        // Be forgiving, per 25.3.3.3.3 of the spec:
-	        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
-	        return doneResult();
-	      }
-
-	      context.method = method;
-	      context.arg = arg;
-
-	      while (true) {
-	        var delegate = context.delegate;
-	        if (delegate) {
-	          var delegateResult = maybeInvokeDelegate(delegate, context);
-	          if (delegateResult) {
-	            if (delegateResult === ContinueSentinel) continue;
-	            return delegateResult;
-	          }
-	        }
-
-	        if (context.method === "next") {
-	          // Setting context._sent for legacy support of Babel's
-	          // function.sent implementation.
-	          context.sent = context._sent = context.arg;
-
-	        } else if (context.method === "throw") {
-	          if (state === GenStateSuspendedStart) {
-	            state = GenStateCompleted;
-	            throw context.arg;
-	          }
-
-	          context.dispatchException(context.arg);
-
-	        } else if (context.method === "return") {
-	          context.abrupt("return", context.arg);
-	        }
-
-	        state = GenStateExecuting;
-
-	        var record = tryCatch(innerFn, self, context);
-	        if (record.type === "normal") {
-	          // If an exception is thrown from innerFn, we leave state ===
-	          // GenStateExecuting and loop back for another invocation.
-	          state = context.done
-	            ? GenStateCompleted
-	            : GenStateSuspendedYield;
-
-	          if (record.arg === ContinueSentinel) {
-	            continue;
-	          }
-
-	          return {
-	            value: record.arg,
-	            done: context.done
-	          };
-
-	        } else if (record.type === "throw") {
-	          state = GenStateCompleted;
-	          // Dispatch the exception by looping back around to the
-	          // context.dispatchException(context.arg) call above.
-	          context.method = "throw";
-	          context.arg = record.arg;
-	        }
-	      }
-	    };
-	  }
-
-	  // Call delegate.iterator[context.method](context.arg) and handle the
-	  // result, either by returning a { value, done } result from the
-	  // delegate iterator, or by modifying context.method and context.arg,
-	  // setting context.delegate to null, and returning the ContinueSentinel.
-	  function maybeInvokeDelegate(delegate, context) {
-	    var method = delegate.iterator[context.method];
-	    if (method === undefined) {
-	      // A .throw or .return when the delegate iterator has no .throw
-	      // method always terminates the yield* loop.
-	      context.delegate = null;
-
-	      if (context.method === "throw") {
-	        if (delegate.iterator.return) {
-	          // If the delegate iterator has a return method, give it a
-	          // chance to clean up.
-	          context.method = "return";
-	          context.arg = undefined;
-	          maybeInvokeDelegate(delegate, context);
-
-	          if (context.method === "throw") {
-	            // If maybeInvokeDelegate(context) changed context.method from
-	            // "return" to "throw", let that override the TypeError below.
-	            return ContinueSentinel;
-	          }
-	        }
-
-	        context.method = "throw";
-	        context.arg = new TypeError(
-	          "The iterator does not provide a 'throw' method");
-	      }
-
-	      return ContinueSentinel;
-	    }
-
-	    var record = tryCatch(method, delegate.iterator, context.arg);
-
-	    if (record.type === "throw") {
-	      context.method = "throw";
-	      context.arg = record.arg;
-	      context.delegate = null;
-	      return ContinueSentinel;
-	    }
-
-	    var info = record.arg;
-
-	    if (! info) {
-	      context.method = "throw";
-	      context.arg = new TypeError("iterator result is not an object");
-	      context.delegate = null;
-	      return ContinueSentinel;
-	    }
-
-	    if (info.done) {
-	      // Assign the result of the finished delegate to the temporary
-	      // variable specified by delegate.resultName (see delegateYield).
-	      context[delegate.resultName] = info.value;
-
-	      // Resume execution at the desired location (see delegateYield).
-	      context.next = delegate.nextLoc;
-
-	      // If context.method was "throw" but the delegate handled the
-	      // exception, let the outer generator proceed normally. If
-	      // context.method was "next", forget context.arg since it has been
-	      // "consumed" by the delegate iterator. If context.method was
-	      // "return", allow the original .return call to continue in the
-	      // outer generator.
-	      if (context.method !== "return") {
-	        context.method = "next";
-	        context.arg = undefined;
-	      }
-
-	    } else {
-	      // Re-yield the result returned by the delegate method.
-	      return info;
-	    }
-
-	    // The delegate iterator is finished, so forget it and continue with
-	    // the outer generator.
-	    context.delegate = null;
-	    return ContinueSentinel;
-	  }
-
-	  // Define Generator.prototype.{next,throw,return} in terms of the
-	  // unified ._invoke helper method.
-	  defineIteratorMethods(Gp);
-
-	  Gp[toStringTagSymbol] = "Generator";
-
-	  // A Generator should always return itself as the iterator object when the
-	  // @@iterator function is called on it. Some browsers' implementations of the
-	  // iterator prototype chain incorrectly implement this, causing the Generator
-	  // object to not be returned from this call. This ensures that doesn't happen.
-	  // See https://github.com/facebook/regenerator/issues/274 for more details.
-	  Gp[iteratorSymbol] = function() {
-	    return this;
-	  };
-
-	  Gp.toString = function() {
-	    return "[object Generator]";
-	  };
-
-	  function pushTryEntry(locs) {
-	    var entry = { tryLoc: locs[0] };
-
-	    if (1 in locs) {
-	      entry.catchLoc = locs[1];
-	    }
-
-	    if (2 in locs) {
-	      entry.finallyLoc = locs[2];
-	      entry.afterLoc = locs[3];
-	    }
-
-	    this.tryEntries.push(entry);
-	  }
-
-	  function resetTryEntry(entry) {
-	    var record = entry.completion || {};
-	    record.type = "normal";
-	    delete record.arg;
-	    entry.completion = record;
-	  }
-
-	  function Context(tryLocsList) {
-	    // The root entry object (effectively a try statement without a catch
-	    // or a finally block) gives us a place to store values thrown from
-	    // locations where there is no enclosing try statement.
-	    this.tryEntries = [{ tryLoc: "root" }];
-	    tryLocsList.forEach(pushTryEntry, this);
-	    this.reset(true);
-	  }
-
-	  runtime.keys = function(object) {
-	    var keys = [];
-	    for (var key in object) {
-	      keys.push(key);
-	    }
-	    keys.reverse();
-
-	    // Rather than returning an object with a next method, we keep
-	    // things simple and return the next function itself.
-	    return function next() {
-	      while (keys.length) {
-	        var key = keys.pop();
-	        if (key in object) {
-	          next.value = key;
-	          next.done = false;
-	          return next;
-	        }
-	      }
-
-	      // To avoid creating an additional object, we just hang the .value
-	      // and .done properties off the next function object itself. This
-	      // also ensures that the minifier will not anonymize the function.
-	      next.done = true;
-	      return next;
-	    };
-	  };
-
-	  function values(iterable) {
-	    if (iterable) {
-	      var iteratorMethod = iterable[iteratorSymbol];
-	      if (iteratorMethod) {
-	        return iteratorMethod.call(iterable);
-	      }
-
-	      if (typeof iterable.next === "function") {
-	        return iterable;
-	      }
-
-	      if (!isNaN(iterable.length)) {
-	        var i = -1, next = function next() {
-	          while (++i < iterable.length) {
-	            if (hasOwn.call(iterable, i)) {
-	              next.value = iterable[i];
-	              next.done = false;
-	              return next;
-	            }
-	          }
-
-	          next.value = undefined;
-	          next.done = true;
-
-	          return next;
-	        };
-
-	        return next.next = next;
-	      }
-	    }
-
-	    // Return an iterator with no values.
-	    return { next: doneResult };
-	  }
-	  runtime.values = values;
-
-	  function doneResult() {
-	    return { value: undefined, done: true };
-	  }
-
-	  Context.prototype = {
-	    constructor: Context,
-
-	    reset: function(skipTempReset) {
-	      this.prev = 0;
-	      this.next = 0;
-	      // Resetting context._sent for legacy support of Babel's
-	      // function.sent implementation.
-	      this.sent = this._sent = undefined;
-	      this.done = false;
-	      this.delegate = null;
-
-	      this.method = "next";
-	      this.arg = undefined;
-
-	      this.tryEntries.forEach(resetTryEntry);
-
-	      if (!skipTempReset) {
-	        for (var name in this) {
-	          // Not sure about the optimal order of these conditions:
-	          if (name.charAt(0) === "t" &&
-	              hasOwn.call(this, name) &&
-	              !isNaN(+name.slice(1))) {
-	            this[name] = undefined;
-	          }
-	        }
-	      }
-	    },
-
-	    stop: function() {
-	      this.done = true;
-
-	      var rootEntry = this.tryEntries[0];
-	      var rootRecord = rootEntry.completion;
-	      if (rootRecord.type === "throw") {
-	        throw rootRecord.arg;
-	      }
-
-	      return this.rval;
-	    },
-
-	    dispatchException: function(exception) {
-	      if (this.done) {
-	        throw exception;
-	      }
-
-	      var context = this;
-	      function handle(loc, caught) {
-	        record.type = "throw";
-	        record.arg = exception;
-	        context.next = loc;
-
-	        if (caught) {
-	          // If the dispatched exception was caught by a catch block,
-	          // then let that catch block handle the exception normally.
-	          context.method = "next";
-	          context.arg = undefined;
-	        }
-
-	        return !! caught;
-	      }
-
-	      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-	        var entry = this.tryEntries[i];
-	        var record = entry.completion;
-
-	        if (entry.tryLoc === "root") {
-	          // Exception thrown outside of any try block that could handle
-	          // it, so set the completion value of the entire function to
-	          // throw the exception.
-	          return handle("end");
-	        }
-
-	        if (entry.tryLoc <= this.prev) {
-	          var hasCatch = hasOwn.call(entry, "catchLoc");
-	          var hasFinally = hasOwn.call(entry, "finallyLoc");
-
-	          if (hasCatch && hasFinally) {
-	            if (this.prev < entry.catchLoc) {
-	              return handle(entry.catchLoc, true);
-	            } else if (this.prev < entry.finallyLoc) {
-	              return handle(entry.finallyLoc);
-	            }
-
-	          } else if (hasCatch) {
-	            if (this.prev < entry.catchLoc) {
-	              return handle(entry.catchLoc, true);
-	            }
-
-	          } else if (hasFinally) {
-	            if (this.prev < entry.finallyLoc) {
-	              return handle(entry.finallyLoc);
-	            }
-
-	          } else {
-	            throw new Error("try statement without catch or finally");
-	          }
-	        }
-	      }
-	    },
-
-	    abrupt: function(type, arg) {
-	      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-	        var entry = this.tryEntries[i];
-	        if (entry.tryLoc <= this.prev &&
-	            hasOwn.call(entry, "finallyLoc") &&
-	            this.prev < entry.finallyLoc) {
-	          var finallyEntry = entry;
-	          break;
-	        }
-	      }
-
-	      if (finallyEntry &&
-	          (type === "break" ||
-	           type === "continue") &&
-	          finallyEntry.tryLoc <= arg &&
-	          arg <= finallyEntry.finallyLoc) {
-	        // Ignore the finally entry if control is not jumping to a
-	        // location outside the try/catch block.
-	        finallyEntry = null;
-	      }
-
-	      var record = finallyEntry ? finallyEntry.completion : {};
-	      record.type = type;
-	      record.arg = arg;
-
-	      if (finallyEntry) {
-	        this.method = "next";
-	        this.next = finallyEntry.finallyLoc;
-	        return ContinueSentinel;
-	      }
-
-	      return this.complete(record);
-	    },
-
-	    complete: function(record, afterLoc) {
-	      if (record.type === "throw") {
-	        throw record.arg;
-	      }
-
-	      if (record.type === "break" ||
-	          record.type === "continue") {
-	        this.next = record.arg;
-	      } else if (record.type === "return") {
-	        this.rval = this.arg = record.arg;
-	        this.method = "return";
-	        this.next = "end";
-	      } else if (record.type === "normal" && afterLoc) {
-	        this.next = afterLoc;
-	      }
-
-	      return ContinueSentinel;
-	    },
-
-	    finish: function(finallyLoc) {
-	      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-	        var entry = this.tryEntries[i];
-	        if (entry.finallyLoc === finallyLoc) {
-	          this.complete(entry.completion, entry.afterLoc);
-	          resetTryEntry(entry);
-	          return ContinueSentinel;
-	        }
-	      }
-	    },
-
-	    "catch": function(tryLoc) {
-	      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-	        var entry = this.tryEntries[i];
-	        if (entry.tryLoc === tryLoc) {
-	          var record = entry.completion;
-	          if (record.type === "throw") {
-	            var thrown = record.arg;
-	            resetTryEntry(entry);
-	          }
-	          return thrown;
-	        }
-	      }
-
-	      // The context.catch method must only be called with a location
-	      // argument that corresponds to a known catch block.
-	      throw new Error("illegal catch attempt");
-	    },
-
-	    delegateYield: function(iterable, resultName, nextLoc) {
-	      this.delegate = {
-	        iterator: values(iterable),
-	        resultName: resultName,
-	        nextLoc: nextLoc
-	      };
-
-	      if (this.method === "next") {
-	        // Deliberately forget the last sent value so that we don't
-	        // accidentally pass it on to the delegate.
-	        this.arg = undefined;
-	      }
-
-	      return ContinueSentinel;
-	    }
-	  };
-	})(
-	  // In sloppy mode, unbound `this` refers to the global object, fallback to
-	  // Function constructor if we're in global strict mode. That is sadly a form
-	  // of indirect eval which violates Content Security Policy.
-	  (function() { return this })() || Function("return this")()
-	);
-	});
-
-	/**
-	 * Copyright (c) 2014-present, Facebook, Inc.
-	 *
-	 * This source code is licensed under the MIT license found in the
-	 * LICENSE file in the root directory of this source tree.
-	 */
-
-	// This method of obtaining a reference to the global object needs to be
-	// kept identical to the way it is obtained in runtime.js
-	var g = (function() { return this })() || Function("return this")();
-
-	// Use `getOwnPropertyNames` because not all browsers support calling
-	// `hasOwnProperty` on the global `self` object in a worker. See #183.
-	var hadRuntime = g.regeneratorRuntime &&
-	  Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
-
-	// Save the old regeneratorRuntime in case it needs to be restored later.
-	var oldRuntime = hadRuntime && g.regeneratorRuntime;
-
-	// Force reevalutation of runtime.js.
-	g.regeneratorRuntime = undefined;
-
-	var runtimeModule = runtime;
-
-	if (hadRuntime) {
-	  // Restore the original runtime.
-	  g.regeneratorRuntime = oldRuntime;
-	} else {
-	  // Remove the global property added by runtime.js.
+	// fallback for IE11 Script Access Denied error
+	var tryGet = function (it, key) {
 	  try {
-	    delete g.regeneratorRuntime;
-	  } catch(e) {
-	    g.regeneratorRuntime = undefined;
-	  }
-	}
-
-	var regenerator = runtimeModule;
-
-	// most Object methods by ES6 should accept primitives
-
-
-
-	var _objectSap = function (KEY, exec) {
-	  var fn = (_core.Object || {})[KEY] || Object[KEY];
-	  var exp = {};
-	  exp[KEY] = exec(fn);
-	  _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
+	    return it[key];
+	  } catch (e) { /* empty */ }
 	};
 
-	// 19.1.2.14 Object.keys(O)
-
-
-
-	_objectSap('keys', function () {
-	  return function keys(it) {
-	    return _objectKeys(_toObject(it));
-	  };
-	});
-
-	var keys = _core.Object.keys;
-
-	var keys$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": keys, __esModule: true };
-	});
-
-	var _Object$keys = unwrapExports(keys$1);
-
-	var classCallCheck = createCommonjsModule(function (module, exports) {
-
-	exports.__esModule = true;
-
-	exports.default = function (instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
+	var _classof = function (it) {
+	  var O, T, B;
+	  return it === undefined ? 'Undefined' : it === null ? 'Null'
+	    // @@toStringTag case
+	    : typeof (T = tryGet(O = Object(it), TAG$1)) == 'string' ? T
+	    // builtinTag case
+	    : ARG ? _cof(O)
+	    // ES3 arguments fallback
+	    : (B = _cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
 	};
-	});
-
-	var _classCallCheck = unwrapExports(classCallCheck);
-
-	var possibleConstructorReturn = createCommonjsModule(function (module, exports) {
-
-	exports.__esModule = true;
-
-
-
-	var _typeof3 = _interopRequireDefault(_typeof_1);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = function (self, call) {
-	  if (!self) {
-	    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-	  }
-
-	  return call && ((typeof call === "undefined" ? "undefined" : (0, _typeof3.default)(call)) === "object" || typeof call === "function") ? call : self;
-	};
-	});
-
-	var _possibleConstructorReturn = unwrapExports(possibleConstructorReturn);
-
-	// Works with __proto__ only. Old v8 can't work with null proto objects.
-	/* eslint-disable no-proto */
-
-
-	var check = function (O, proto) {
-	  _anObject(O);
-	  if (!_isObject(proto) && proto !== null) throw TypeError(proto + ": can't set as prototype!");
-	};
-	var _setProto = {
-	  set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
-	    function (test, buggy, set) {
-	      try {
-	        set = _ctx(Function.call, _objectGopd.f(Object.prototype, '__proto__').set, 2);
-	        set(test, []);
-	        buggy = !(test instanceof Array);
-	      } catch (e) { buggy = true; }
-	      return function setPrototypeOf(O, proto) {
-	        check(O, proto);
-	        if (buggy) O.__proto__ = proto;
-	        else set(O, proto);
-	        return O;
-	      };
-	    }({}, false) : undefined),
-	  check: check
-	};
-
-	// 19.1.3.19 Object.setPrototypeOf(O, proto)
-
-	_export(_export.S, 'Object', { setPrototypeOf: _setProto.set });
-
-	var setPrototypeOf = _core.Object.setPrototypeOf;
-
-	var setPrototypeOf$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": setPrototypeOf, __esModule: true };
-	});
-
-	unwrapExports(setPrototypeOf$1);
-
-	// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-	_export(_export.S, 'Object', { create: _objectCreate });
-
-	var $Object = _core.Object;
-	var create = function create(P, D) {
-	  return $Object.create(P, D);
-	};
-
-	var create$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": create, __esModule: true };
-	});
-
-	unwrapExports(create$1);
-
-	var inherits = createCommonjsModule(function (module, exports) {
-
-	exports.__esModule = true;
-
-
-
-	var _setPrototypeOf2 = _interopRequireDefault(setPrototypeOf$1);
-
-
-
-	var _create2 = _interopRequireDefault(create$1);
-
-
-
-	var _typeof3 = _interopRequireDefault(_typeof_1);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = function (subClass, superClass) {
-	  if (typeof superClass !== "function" && superClass !== null) {
-	    throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : (0, _typeof3.default)(superClass)));
-	  }
-
-	  subClass.prototype = (0, _create2.default)(superClass && superClass.prototype, {
-	    constructor: {
-	      value: subClass,
-	      enumerable: false,
-	      writable: true,
-	      configurable: true
-	    }
-	  });
-	  if (superClass) _setPrototypeOf2.default ? (0, _setPrototypeOf2.default)(subClass, superClass) : subClass.__proto__ = superClass;
-	};
-	});
-
-	var _inherits = unwrapExports(inherits);
-
-	var global$1 = (typeof global !== "undefined" ? global :
-	            typeof self !== "undefined" ? self :
-	            typeof window !== "undefined" ? window : {});
 
 	var _anInstance = function (it, Constructor, name, forbiddenField) {
 	  if (!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)) {
@@ -2029,11 +6844,19 @@
 
 	// check on default Array iterator
 
-	var ITERATOR$2 = _wks('iterator');
+	var ITERATOR$1 = _wks('iterator');
 	var ArrayProto = Array.prototype;
 
 	var _isArrayIter = function (it) {
-	  return it !== undefined && (_iterators.Array === it || ArrayProto[ITERATOR$2] === it);
+	  return it !== undefined && (_iterators.Array === it || ArrayProto[ITERATOR$1] === it);
+	};
+
+	var ITERATOR$2 = _wks('iterator');
+
+	var core_getIteratorMethod = _core.getIteratorMethod = function (it) {
+	  if (it != undefined) return it[ITERATOR$2]
+	    || it['@@iterator']
+	    || _iterators[_classof(it)];
 	};
 
 	var _forOf = createCommonjsModule(function (module) {
@@ -2623,6 +7446,398 @@
 	});
 
 	var _Promise = unwrapExports(promise$1);
+
+	var $JSON$1 = _core.JSON || (_core.JSON = { stringify: JSON.stringify });
+	var stringify = function stringify(it) { // eslint-disable-line no-unused-vars
+	  return $JSON$1.stringify.apply($JSON$1, arguments);
+	};
+
+	var stringify$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": stringify, __esModule: true };
+	});
+
+	var _JSON$stringify = unwrapExports(stringify$1);
+
+	var _validateCollection = function (it, TYPE) {
+	  if (!_isObject(it) || it._t !== TYPE) throw TypeError('Incompatible receiver, ' + TYPE + ' required!');
+	  return it;
+	};
+
+	var dP$2 = _objectDp.f;
+
+
+
+
+
+
+
+
+
+	var fastKey = _meta.fastKey;
+
+	var SIZE = _descriptors ? '_s' : 'size';
+
+	var getEntry = function (that, key) {
+	  // fast case
+	  var index = fastKey(key);
+	  var entry;
+	  if (index !== 'F') return that._i[index];
+	  // frozen object case
+	  for (entry = that._f; entry; entry = entry.n) {
+	    if (entry.k == key) return entry;
+	  }
+	};
+
+	var _collectionStrong = {
+	  getConstructor: function (wrapper, NAME, IS_MAP, ADDER) {
+	    var C = wrapper(function (that, iterable) {
+	      _anInstance(that, C, NAME, '_i');
+	      that._t = NAME;         // collection type
+	      that._i = _objectCreate(null); // index
+	      that._f = undefined;    // first entry
+	      that._l = undefined;    // last entry
+	      that[SIZE] = 0;         // size
+	      if (iterable != undefined) _forOf(iterable, IS_MAP, that[ADDER], that);
+	    });
+	    _redefineAll(C.prototype, {
+	      // 23.1.3.1 Map.prototype.clear()
+	      // 23.2.3.2 Set.prototype.clear()
+	      clear: function clear() {
+	        for (var that = _validateCollection(this, NAME), data = that._i, entry = that._f; entry; entry = entry.n) {
+	          entry.r = true;
+	          if (entry.p) entry.p = entry.p.n = undefined;
+	          delete data[entry.i];
+	        }
+	        that._f = that._l = undefined;
+	        that[SIZE] = 0;
+	      },
+	      // 23.1.3.3 Map.prototype.delete(key)
+	      // 23.2.3.4 Set.prototype.delete(value)
+	      'delete': function (key) {
+	        var that = _validateCollection(this, NAME);
+	        var entry = getEntry(that, key);
+	        if (entry) {
+	          var next = entry.n;
+	          var prev = entry.p;
+	          delete that._i[entry.i];
+	          entry.r = true;
+	          if (prev) prev.n = next;
+	          if (next) next.p = prev;
+	          if (that._f == entry) that._f = next;
+	          if (that._l == entry) that._l = prev;
+	          that[SIZE]--;
+	        } return !!entry;
+	      },
+	      // 23.2.3.6 Set.prototype.forEach(callbackfn, thisArg = undefined)
+	      // 23.1.3.5 Map.prototype.forEach(callbackfn, thisArg = undefined)
+	      forEach: function forEach(callbackfn /* , that = undefined */) {
+	        _validateCollection(this, NAME);
+	        var f = _ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3);
+	        var entry;
+	        while (entry = entry ? entry.n : this._f) {
+	          f(entry.v, entry.k, this);
+	          // revert to the last existing entry
+	          while (entry && entry.r) entry = entry.p;
+	        }
+	      },
+	      // 23.1.3.7 Map.prototype.has(key)
+	      // 23.2.3.7 Set.prototype.has(value)
+	      has: function has(key) {
+	        return !!getEntry(_validateCollection(this, NAME), key);
+	      }
+	    });
+	    if (_descriptors) dP$2(C.prototype, 'size', {
+	      get: function () {
+	        return _validateCollection(this, NAME)[SIZE];
+	      }
+	    });
+	    return C;
+	  },
+	  def: function (that, key, value) {
+	    var entry = getEntry(that, key);
+	    var prev, index;
+	    // change existing entry
+	    if (entry) {
+	      entry.v = value;
+	    // create new entry
+	    } else {
+	      that._l = entry = {
+	        i: index = fastKey(key, true), // <- index
+	        k: key,                        // <- key
+	        v: value,                      // <- value
+	        p: prev = that._l,             // <- previous entry
+	        n: undefined,                  // <- next entry
+	        r: false                       // <- removed
+	      };
+	      if (!that._f) that._f = entry;
+	      if (prev) prev.n = entry;
+	      that[SIZE]++;
+	      // add to index
+	      if (index !== 'F') that._i[index] = entry;
+	    } return that;
+	  },
+	  getEntry: getEntry,
+	  setStrong: function (C, NAME, IS_MAP) {
+	    // add .keys, .values, .entries, [@@iterator]
+	    // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
+	    _iterDefine(C, NAME, function (iterated, kind) {
+	      this._t = _validateCollection(iterated, NAME); // target
+	      this._k = kind;                     // kind
+	      this._l = undefined;                // previous
+	    }, function () {
+	      var that = this;
+	      var kind = that._k;
+	      var entry = that._l;
+	      // revert to the last existing entry
+	      while (entry && entry.r) entry = entry.p;
+	      // get next entry
+	      if (!that._t || !(that._l = entry = entry ? entry.n : that._t._f)) {
+	        // or finish the iteration
+	        that._t = undefined;
+	        return _iterStep(1);
+	      }
+	      // return step by kind
+	      if (kind == 'keys') return _iterStep(0, entry.k);
+	      if (kind == 'values') return _iterStep(0, entry.v);
+	      return _iterStep(0, [entry.k, entry.v]);
+	    }, IS_MAP ? 'entries' : 'values', !IS_MAP, true);
+
+	    // add [@@species], 23.1.2.2, 23.2.2.2
+	    _setSpecies(NAME);
+	  }
+	};
+
+	var SPECIES$2 = _wks('species');
+
+	var _arraySpeciesConstructor = function (original) {
+	  var C;
+	  if (_isArray(original)) {
+	    C = original.constructor;
+	    // cross-realm fallback
+	    if (typeof C == 'function' && (C === Array || _isArray(C.prototype))) C = undefined;
+	    if (_isObject(C)) {
+	      C = C[SPECIES$2];
+	      if (C === null) C = undefined;
+	    }
+	  } return C === undefined ? Array : C;
+	};
+
+	// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
+
+
+	var _arraySpeciesCreate = function (original, length) {
+	  return new (_arraySpeciesConstructor(original))(length);
+	};
+
+	// 0 -> Array#forEach
+	// 1 -> Array#map
+	// 2 -> Array#filter
+	// 3 -> Array#some
+	// 4 -> Array#every
+	// 5 -> Array#find
+	// 6 -> Array#findIndex
+
+
+
+
+
+	var _arrayMethods = function (TYPE, $create) {
+	  var IS_MAP = TYPE == 1;
+	  var IS_FILTER = TYPE == 2;
+	  var IS_SOME = TYPE == 3;
+	  var IS_EVERY = TYPE == 4;
+	  var IS_FIND_INDEX = TYPE == 6;
+	  var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
+	  var create = $create || _arraySpeciesCreate;
+	  return function ($this, callbackfn, that) {
+	    var O = _toObject($this);
+	    var self = _iobject(O);
+	    var f = _ctx(callbackfn, that, 3);
+	    var length = _toLength(self.length);
+	    var index = 0;
+	    var result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
+	    var val, res;
+	    for (;length > index; index++) if (NO_HOLES || index in self) {
+	      val = self[index];
+	      res = f(val, index, O);
+	      if (TYPE) {
+	        if (IS_MAP) result[index] = res;   // map
+	        else if (res) switch (TYPE) {
+	          case 3: return true;             // some
+	          case 5: return val;              // find
+	          case 6: return index;            // findIndex
+	          case 2: result.push(val);        // filter
+	        } else if (IS_EVERY) return false; // every
+	      }
+	    }
+	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+	  };
+	};
+
+	var dP$3 = _objectDp.f;
+	var each = _arrayMethods(0);
+
+
+	var _collection = function (NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
+	  var Base = _global[NAME];
+	  var C = Base;
+	  var ADDER = IS_MAP ? 'set' : 'add';
+	  var proto = C && C.prototype;
+	  var O = {};
+	  if (!_descriptors || typeof C != 'function' || !(IS_WEAK || proto.forEach && !_fails(function () {
+	    new C().entries().next();
+	  }))) {
+	    // create collection constructor
+	    C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
+	    _redefineAll(C.prototype, methods);
+	    _meta.NEED = true;
+	  } else {
+	    C = wrapper(function (target, iterable) {
+	      _anInstance(target, C, NAME, '_c');
+	      target._c = new Base();
+	      if (iterable != undefined) _forOf(iterable, IS_MAP, target[ADDER], target);
+	    });
+	    each('add,clear,delete,forEach,get,has,set,keys,values,entries,toJSON'.split(','), function (KEY) {
+	      var IS_ADDER = KEY == 'add' || KEY == 'set';
+	      if (KEY in proto && !(IS_WEAK && KEY == 'clear')) _hide(C.prototype, KEY, function (a, b) {
+	        _anInstance(this, C, KEY);
+	        if (!IS_ADDER && IS_WEAK && !_isObject(a)) return KEY == 'get' ? undefined : false;
+	        var result = this._c[KEY](a === 0 ? 0 : a, b);
+	        return IS_ADDER ? this : result;
+	      });
+	    });
+	    IS_WEAK || dP$3(C.prototype, 'size', {
+	      get: function () {
+	        return this._c.size;
+	      }
+	    });
+	  }
+
+	  _setToStringTag(C, NAME);
+
+	  O[NAME] = C;
+	  _export(_export.G + _export.W + _export.F, O);
+
+	  if (!IS_WEAK) common.setStrong(C, NAME, IS_MAP);
+
+	  return C;
+	};
+
+	var SET = 'Set';
+
+	// 23.2 Set Objects
+	var es6_set = _collection(SET, function (get) {
+	  return function Set() { return get(this, arguments.length > 0 ? arguments[0] : undefined); };
+	}, {
+	  // 23.2.3.1 Set.prototype.add(value)
+	  add: function add(value) {
+	    return _collectionStrong.def(_validateCollection(this, SET), value = value === 0 ? 0 : value, value);
+	  }
+	}, _collectionStrong);
+
+	var _arrayFromIterable = function (iter, ITERATOR) {
+	  var result = [];
+	  _forOf(iter, false, result.push, result, ITERATOR);
+	  return result;
+	};
+
+	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
+
+
+	var _collectionToJson = function (NAME) {
+	  return function toJSON() {
+	    if (_classof(this) != NAME) throw TypeError(NAME + "#toJSON isn't generic");
+	    return _arrayFromIterable(this);
+	  };
+	};
+
+	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
+
+
+	_export(_export.P + _export.R, 'Set', { toJSON: _collectionToJson('Set') });
+
+	// https://tc39.github.io/proposal-setmap-offrom/
+
+
+	var _setCollectionOf = function (COLLECTION) {
+	  _export(_export.S, COLLECTION, { of: function of() {
+	    var length = arguments.length;
+	    var A = new Array(length);
+	    while (length--) A[length] = arguments[length];
+	    return new this(A);
+	  } });
+	};
+
+	// https://tc39.github.io/proposal-setmap-offrom/#sec-set.of
+	_setCollectionOf('Set');
+
+	// https://tc39.github.io/proposal-setmap-offrom/
+
+
+
+
+
+	var _setCollectionFrom = function (COLLECTION) {
+	  _export(_export.S, COLLECTION, { from: function from(source /* , mapFn, thisArg */) {
+	    var mapFn = arguments[1];
+	    var mapping, A, n, cb;
+	    _aFunction(this);
+	    mapping = mapFn !== undefined;
+	    if (mapping) _aFunction(mapFn);
+	    if (source == undefined) return new this();
+	    A = [];
+	    if (mapping) {
+	      n = 0;
+	      cb = _ctx(mapFn, arguments[2], 2);
+	      _forOf(source, false, function (nextItem) {
+	        A.push(cb(nextItem, n++));
+	      });
+	    } else {
+	      _forOf(source, false, A.push, A);
+	    }
+	    return new this(A);
+	  } });
+	};
+
+	// https://tc39.github.io/proposal-setmap-offrom/#sec-set.from
+	_setCollectionFrom('Set');
+
+	var set = _core.Set;
+
+	var set$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": set, __esModule: true };
+	});
+
+	var _Set = unwrapExports(set$1);
+
+	// most Object methods by ES6 should accept primitives
+
+
+
+	var _objectSap = function (KEY, exec) {
+	  var fn = (_core.Object || {})[KEY] || Object[KEY];
+	  var exp = {};
+	  exp[KEY] = exec(fn);
+	  _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
+	};
+
+	// 19.1.2.14 Object.keys(O)
+
+
+
+	_objectSap('keys', function () {
+	  return function keys(it) {
+	    return _objectKeys(_toObject(it));
+	  };
+	});
+
+	var keys = _core.Object.keys;
+
+	var keys$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": keys, __esModule: true };
+	});
+
+	var _Object$keys = unwrapExports(keys$1);
 
 	var isEnum$1 = _objectPie.f;
 	var _objectToArray = function (isEntries) {
@@ -19874,7 +25089,7 @@
 
 	function gunAsAnotherUser(gun, key, f) {
 	  // Hacky way to use multiple users with gun
-	  var gun2 = new Gun$1({ radisk: false, peers: _Object$keys(gun._.opt.peers) }); // TODO: copy other options too
+	  var gun2 = new browser({ radisk: false, peers: _Object$keys(gun._.opt.peers) }); // TODO: copy other options too
 	  var user = gun2.user();
 	  user.auth(key);
 	  setTimeout(function () {
@@ -19914,7 +25129,7 @@
 	    var bcount = 0;
 	    var promises = _Object$keys(layer).map(function (key) {
 	      // Only fetch links & restrict total search queries to maxBreadth ^ maxDepth requests
-	      if (!Gun$1.val.link.is(layer[key]) || ++bcount >= opts.maxBreadth) {
+	      if (!browser.val.link.is(layer[key]) || ++bcount >= opts.maxBreadth) {
 	        return;
 	      }
 
@@ -19950,7 +25165,7 @@
 	    if (!str) {
 	      return undefined;
 	    }
-	    var hash = await Gun$1.SEA.work(str, undefined, undefined, { name: 'SHA-256' });
+	    var hash = await browser.SEA.work(str, undefined, undefined, { name: 'SHA-256' });
 	    if (hash.length > 44) {
 	      throw new Error('Gun.SEA.work returned an invalid SHA-256 hash longer than 44 chars: ' + hash + '. This is probably due to a sea.js bug on Safari.');
 	    }
@@ -20079,7 +25294,7 @@
 	  },
 	  getPublicState: function getPublicState() {
 	    if (!this.publicState) {
-	      this.publicState = new Gun$1('https://gun-us.herokuapp.com/gun');
+	      this.publicState = new browser('https://gun-us.herokuapp.com/gun');
 	    }
 	    return this.publicState;
 	  },
@@ -20107,1115 +25322,6 @@
 	  isElectron: isElectron,
 	  isMobile: isMobile
 	};
-
-	/*eslint no-useless-escape: "off", camelcase: "off" */
-
-	var UNIQUE_ID_VALIDATORS = {
-	  email: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
-	  bitcoin: /^[13][a-km-zA-HJ-NP-Z0-9]{26,33}$/,
-	  bitcoin_address: /^[13][a-km-zA-HJ-NP-Z0-9]{26,33}$/,
-	  ip: /^(([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$/,
-	  ipv6: /^(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}$/,
-	  gpg_fingerprint: null,
-	  gpg_keyid: null,
-	  google_oauth2: null,
-	  tel: /^\d{7,}$/,
-	  phone: /^\d{7,}$/,
-	  keyID: null,
-	  url: /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi,
-	  account: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
-	  uuid: /[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}/
-	};
-
-	// TODO this class could perhaps be removed
-
-	var Attribute = function () {
-	  function Attribute(a, b) {
-	    _classCallCheck(this, Attribute);
-
-	    if (typeof a === "object") {
-	      if (typeof a.value !== "string") {
-	        throw new Error("param1.value must be a string, got " + _typeof(a.value) + ": " + _JSON$stringify(a.value));
-	      }
-	      if (typeof a.type !== "string") {
-	        throw new Error("param1.type must be a string, got " + _typeof(a.type) + ": " + _JSON$stringify(a.type));
-	      }
-	      b = a.value;
-	      a = a.type;
-	    }
-	    if (typeof a !== "string") {
-	      throw new Error("First param must be a string, got " + (typeof a === "undefined" ? "undefined" : _typeof(a)) + ": " + _JSON$stringify(a));
-	    }
-	    if (!a.length) {
-	      throw new Error("First param string is empty");
-	    }
-	    if (b) {
-	      if (typeof b !== "string") {
-	        throw new Error("Second parameter must be a string, got " + (typeof b === "undefined" ? "undefined" : _typeof(b)) + ": " + _JSON$stringify(b));
-	      }
-	      if (!b.length) {
-	        throw new Error("Second param string is empty");
-	      }
-	      this.type = a;
-	      this.value = b;
-	    } else {
-	      this.value = a;
-	      var t = Attribute.guessTypeOf(this.value);
-	      if (t) {
-	        this.type = t;
-	      } else {
-	        throw new Error("Type of attribute was omitted and could not be guessed");
-	      }
-	    }
-	  }
-
-	  Attribute.getUuid = function getUuid() {
-	    var b = function b(a) {
-	      return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
-	    };
-	    return new Attribute("uuid", b());
-	  };
-
-	  Attribute.getUniqueIdValidators = function getUniqueIdValidators() {
-	    return UNIQUE_ID_VALIDATORS;
-	  };
-
-	  Attribute.isUniqueType = function isUniqueType(type) {
-	    return _Object$keys(UNIQUE_ID_VALIDATORS).indexOf(type) > -1;
-	  };
-
-	  Attribute.prototype.isUniqueType = function isUniqueType() {
-	    return Attribute.isUniqueType(this.type);
-	  };
-
-	  Attribute.guessTypeOf = function guessTypeOf(value) {
-	    for (var key in UNIQUE_ID_VALIDATORS) {
-	      if (value.match(UNIQUE_ID_VALIDATORS[key])) {
-	        return key;
-	      }
-	    }
-	  };
-
-	  Attribute.equals = function equals(a, b) {
-	    return a.equals(b);
-	  };
-
-	  Attribute.prototype.equals = function equals(a) {
-	    return a && this.type === a.type && this.value === a.value;
-	  };
-
-	  Attribute.prototype.uri = function uri() {
-	    return encodeURIComponent(this.value) + ":" + encodeURIComponent(this.type);
-	  };
-
-	  return Attribute;
-	}();
-
-	// eslint-disable-line no-unused-vars
-
-	var myKey = void 0;
-
-	var Key = function () {
-	  function Key() {
-	    _classCallCheck(this, Key);
-	  }
-
-	  Key.getActiveKey = async function getActiveKey() {
-	    var datadir = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.';
-	    var keyfile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'iris.key';
-	    var fs = arguments[2];
-
-	    if (myKey) {
-	      return myKey;
-	    }
-	    if (fs) {
-	      var privKeyFile = datadir + '/' + keyfile;
-	      if (fs.existsSync(privKeyFile)) {
-	        var f = fs.readFileSync(privKeyFile, 'utf8');
-	        myKey = Key.fromString(f);
-	      } else {
-	        var newKey = await Key.generate();
-	        myKey = myKey || newKey; // eslint-disable-line require-atomic-updates
-	        fs.writeFileSync(privKeyFile, Key.toString(myKey));
-	        fs.chmodSync(privKeyFile, 400);
-	      }
-	      if (!myKey) {
-	        throw new Error('loading default key failed - check ' + datadir + '/' + keyfile);
-	      }
-	    } else {
-	      var str = window.localStorage.getItem('iris.myKey');
-	      if (str) {
-	        myKey = Key.fromString(str);
-	      } else {
-	        var _newKey = await Key.generate();
-	        myKey = myKey || _newKey; // eslint-disable-line require-atomic-updates
-	        window.localStorage.setItem('iris.myKey', Key.toString(myKey));
-	      }
-	      if (!myKey) {
-	        throw new Error('loading default key failed - check localStorage iris.myKey');
-	      }
-	    }
-	    return myKey;
-	  };
-
-	  Key.getDefault = function getDefault() {
-	    var datadir = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.';
-	    var keyfile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'iris.key';
-
-	    return Key.getActiveKey(datadir, keyfile);
-	  };
-
-	  Key.getActivePub = async function getActivePub() {
-	    var datadir = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.';
-	    var keyfile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'iris.key';
-
-	    var key = await Key.getActiveKey(datadir, keyfile);
-	    return key.pub;
-	  };
-
-	  Key.setActiveKey = function setActiveKey(key) {
-	    var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-	    var datadir = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '.';
-	    var keyfile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'iris.key';
-	    var fs = arguments[4];
-
-	    myKey = key;
-	    if (!save) return;
-	    if (util.isNode) {
-	      var privKeyFile = datadir + '/' + keyfile;
-	      fs.writeFileSync(privKeyFile, Key.toString(myKey));
-	      fs.chmodSync(privKeyFile, 400);
-	    } else {
-	      window.localStorage.setItem('iris.myKey', Key.toString(myKey));
-	    }
-	  };
-
-	  Key.toString = function toString(key) {
-	    return _JSON$stringify(key);
-	  };
-
-	  Key.getId = function getId(key) {
-	    if (!(key && key.pub)) {
-	      throw new Error('missing param');
-	    }
-	    return key.pub; // hack until GUN supports lookups by keyID
-	    //return util.getHash(key.pub);
-	  };
-
-	  Key.fromString = function fromString(str) {
-	    return JSON.parse(str);
-	  };
-
-	  Key.generate = function generate() {
-	    return Gun$1.SEA.pair();
-	  };
-
-	  Key.sign = async function sign(msg, pair) {
-	    var sig = await Gun$1.SEA.sign(msg, pair);
-	    return 'a' + sig;
-	  };
-
-	  Key.verify = function verify(msg, pubKey) {
-	    return Gun$1.SEA.verify(msg.slice(1), pubKey);
-	  };
-
-	  return Key;
-	}();
-
-	var errorMsg = 'Invalid  message:';
-
-	var ValidationError = function (_Error) {
-	  _inherits(ValidationError, _Error);
-
-	  function ValidationError() {
-	    _classCallCheck(this, ValidationError);
-
-	    return _possibleConstructorReturn(this, _Error.apply(this, arguments));
-	  }
-
-	  return ValidationError;
-	}(Error);
-
-	/**
-	* Signed message object. Your friends can index and relay your messages, while others can still verify that they were signed by you.
-	*
-	* Fields: signedData, signer (public key) and signature.
-	*
-	* signedData has an author, signer, type, time and optionally other fields.
-	*
-	* signature covers the utf8 string representation of signedData. Since messages are digitally signed, users only need to care about the message signer and not who relayed it or whose index it was found from.
-	*
-	* signer is the entity that verified its origin. In other words: message author and signer can be different entities, and only the signer needs to use Iris.
-	*
-	* For example, a crawler can import and sign other people's messages from Twitter. Only the users who trust the crawler will see the messages.
-	*
-	* Constructor: creates a message from the param obj.signedData that must contain at least the mandatory fields: author, type and time.
-	* @param obj
-	*
-	* @example
-	* https://github.com/irislib/iris-lib/blob/master/__tests__/SignedMessage.js
-	*
-	* Verification message:
-	* {
-	*   signedData: {
-	*     author: {name:'Alice', key:'ABCD1234'},
-	*     recipient: {
-	*       name: 'Bob',
-	*       email: ['bob@example.com', 'bob.saget@example.com'],
-	*       bitcoin: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'
-	*     },
-	*     type: 'verification'
-	*   },
-	*   signer: 'ABCD1234',
-	*   signature: '1234ABCD'
-	* }
-	*/
-
-
-	var SignedMessage = function () {
-	  function SignedMessage(obj) {
-	    _classCallCheck(this, SignedMessage);
-
-	    if (obj.signedData) {
-	      this.signedData = obj.signedData;
-	    }
-	    if (obj.pubKey) {
-	      this.pubKey = obj.pubKey;
-	    }
-	    if (obj.sig) {
-	      if (typeof obj.sig !== 'string') {
-	        throw new ValidationError('SignedMessage signature must be a string');
-	      }
-	      this.sig = obj.sig;
-	      this.getHash();
-	    }
-	    this._validate();
-	  }
-
-	  SignedMessage._getArray = function _getArray(authorOrRecipient) {
-	    var arr = [];
-	    var keys = _Object$keys(authorOrRecipient);
-	    for (var i = 0; i < keys.length; i++) {
-	      var type = keys[i];
-	      var value = authorOrRecipient[keys[i]];
-	      if (typeof value === 'string') {
-	        arr.push(new Attribute(type, value));
-	      } else {
-	        // array
-	        for (var j = 0; j < value.length; j++) {
-	          var elementValue = value[j];
-	          arr.push(new Attribute(type, elementValue));
-	        }
-	      }
-	    }
-	    return arr;
-	  };
-
-	  SignedMessage._getIterable = function _getIterable(authorOrRecipient) {
-	    var _ref;
-
-	    return _ref = {}, _ref[_Symbol$iterator] = /*#__PURE__*/regenerator.mark(function _callee() {
-	      var keys, i, type, value, j, elementValue;
-	      return regenerator.wrap(function _callee$(_context) {
-	        while (1) {
-	          switch (_context.prev = _context.next) {
-	            case 0:
-	              keys = _Object$keys(authorOrRecipient);
-	              i = 0;
-
-	            case 2:
-	              if (!(i < keys.length)) {
-	                _context.next = 21;
-	                break;
-	              }
-
-	              type = keys[i];
-	              value = authorOrRecipient[keys[i]];
-
-	              if (!(typeof value === 'string')) {
-	                _context.next = 10;
-	                break;
-	              }
-
-	              _context.next = 8;
-	              return new Attribute(type, value);
-
-	            case 8:
-	              _context.next = 18;
-	              break;
-
-	            case 10:
-	              j = 0;
-
-	            case 11:
-	              if (!(j < value.length)) {
-	                _context.next = 18;
-	                break;
-	              }
-
-	              elementValue = value[j];
-	              _context.next = 15;
-	              return new Attribute(type, elementValue);
-
-	            case 15:
-	              j++;
-	              _context.next = 11;
-	              break;
-
-	            case 18:
-	              i++;
-	              _context.next = 2;
-	              break;
-
-	            case 21:
-	            case 'end':
-	              return _context.stop();
-	          }
-	        }
-	      }, _callee, this);
-	    }), _ref;
-	  };
-
-	  SignedMessage.prototype.getAuthorIterable = function getAuthorIterable() {
-	    return SignedMessage._getIterable(this.signedData.author);
-	  };
-
-	  SignedMessage.prototype.getRecipientIterable = function getRecipientIterable() {
-	    return SignedMessage._getIterable(this.signedData.recipient);
-	  };
-
-	  SignedMessage.prototype.getAuthorArray = function getAuthorArray() {
-	    return SignedMessage._getArray(this.signedData.author);
-	  };
-
-	  SignedMessage.prototype.getRecipientArray = function getRecipientArray() {
-	    return this.signedData.recipient ? SignedMessage._getArray(this.signedData.recipient) : [];
-	  };
-
-	  SignedMessage.prototype.getSignerKeyID = function getSignerKeyID() {
-	    return this.pubKey; // hack until gun supports keyID lookups
-	    //return util.getHash(this.pubKey);
-	  };
-
-	  SignedMessage.prototype._validate = function _validate() {
-	    if (!this.signedData) {
-	      throw new ValidationError(errorMsg + ' Missing signedData');
-	    }
-	    if (typeof this.signedData !== 'object') {
-	      throw new ValidationError(errorMsg + ' signedData must be an object');
-	    }
-	    var d = this.signedData;
-
-	    if (!d.type) {
-	      throw new ValidationError(errorMsg + ' Missing type definition');
-	    }
-	    if (!d.author) {
-	      throw new ValidationError(errorMsg + ' Missing author');
-	    }
-	    if (typeof d.author !== 'object') {
-	      throw new ValidationError(errorMsg + ' Author must be object');
-	    }
-	    if (Array.isArray(d.author)) {
-	      throw new ValidationError(errorMsg + ' Author must not be an array');
-	    }
-	    if (_Object$keys(d.author).length === 0) {
-	      throw new ValidationError(errorMsg + ' Author empty');
-	    }
-	    if (this.pubKey) {
-	      this.signerKeyHash = this.getSignerKeyID();
-	    }
-	    for (var attr in d.author) {
-	      var t = _typeof(d.author[attr]);
-	      if (t !== 'string') {
-	        if (Array.isArray(d.author[attr])) {
-	          for (var i = 0; i < d.author[attr].length; i++) {
-	            if (typeof d.author[attr][i] !== 'string') {
-	              throw new ValidationError(errorMsg + ' Author attribute must be string, got ' + attr + ': [' + d.author[attr][i] + ']');
-	            }
-	            if (d.author[attr][i].length === 0) {
-	              throw new ValidationError(errorMsg + ' author ' + attr + ' in array[' + i + '] is empty');
-	            }
-	          }
-	        } else {
-	          throw new ValidationError(errorMsg + ' Author attribute must be string or array, got ' + attr + ': ' + d.author[attr]);
-	        }
-	      }
-	      if (attr === 'keyID') {
-	        if (t !== 'string') {
-	          throw new ValidationError(errorMsg + ' Author keyID must be string, got ' + t);
-	        }
-	        if (this.signerKeyHash && d.author[attr] !== this.signerKeyHash) {
-	          throw new ValidationError(errorMsg + ' If message has a keyID author, it must be signed by the same key');
-	        }
-	      }
-	    }
-	    if (d.recipient) {
-	      if (typeof d.recipient !== 'object') {
-	        throw new ValidationError(errorMsg + ' Recipient must be object');
-	      }
-	      if (Array.isArray(d.recipient)) {
-	        throw new ValidationError(errorMsg + ' Recipient must not be an array');
-	      }
-	      if (_Object$keys(d.recipient).length === 0) {
-	        throw new ValidationError(errorMsg + ' Recipient empty');
-	      }
-	      for (var _attr in d.recipient) {
-	        var _t = _typeof(d.recipient[_attr]);
-	        if (_t !== 'string') {
-	          if (Array.isArray(d.recipient[_attr])) {
-	            for (var _i = 0; _i < d.recipient[_attr].length; _i++) {
-	              if (typeof d.recipient[_attr][_i] !== 'string') {
-	                throw new ValidationError(errorMsg + ' Recipient attribute must be string, got ' + _attr + ': [' + d.recipient[_attr][_i] + ']');
-	              }
-	              if (d.recipient[_attr][_i].length === 0) {
-	                throw new ValidationError(errorMsg + ' recipient ' + _attr + ' in array[' + _i + '] is empty');
-	              }
-	            }
-	          } else {
-	            throw new ValidationError(errorMsg + ' Recipient attribute must be string or array, got ' + _attr + ': ' + d.recipient[_attr]);
-	          }
-	        }
-	      }
-	    }
-	    if (!(d.time || d.timestamp)) {
-	      throw new ValidationError(errorMsg + ' Missing time field');
-	    }
-
-	    if (!Date.parse(d.time || d.timestamp)) {
-	      throw new ValidationError(errorMsg + ' Invalid time field');
-	    }
-
-	    if (d.type === 'rating') {
-	      if (isNaN(d.rating)) {
-	        throw new ValidationError(errorMsg + ' Invalid rating');
-	      }
-	      if (isNaN(d.maxRating)) {
-	        throw new ValidationError(errorMsg + ' Invalid maxRating');
-	      }
-	      if (isNaN(d.minRating)) {
-	        throw new ValidationError(errorMsg + ' Invalid minRating');
-	      }
-	      if (d.rating > d.maxRating) {
-	        throw new ValidationError(errorMsg + ' Rating is above maxRating');
-	      }
-	      if (d.rating < d.minRating) {
-	        throw new ValidationError(errorMsg + ' Rating is below minRating');
-	      }
-	      if (typeof d.context !== 'string' || !d.context.length) {
-	        throw new ValidationError(errorMsg + ' Rating messages must have a context field');
-	      }
-	    }
-
-	    if (d.type === 'verification' || d.type === 'unverification') {
-	      if (d.recipient.length < 2) {
-	        throw new ValidationError(errorMsg + ' At least 2 recipient attributes are needed for a connection / disconnection. Got: ' + d.recipient);
-	      }
-	    }
-
-	    return true;
-	  };
-
-	  SignedMessage.prototype.isPositive = function isPositive() {
-	    return this.signedData.type === 'rating' && this.signedData.rating > (this.signedData.maxRating + this.signedData.minRating) / 2;
-	  };
-
-	  SignedMessage.prototype.isNegative = function isNegative() {
-	    return this.signedData.type === 'rating' && this.signedData.rating < (this.signedData.maxRating + this.signedData.minRating) / 2;
-	  };
-
-	  SignedMessage.prototype.isNeutral = function isNeutral() {
-	    return this.signedData.type === 'rating' && this.signedData.rating === (this.signedData.maxRating + this.signedData.minRating) / 2;
-	  };
-
-	  /**
-	  * @param {Object} key Gun.SEA keypair to sign the message with
-	  */
-
-
-	  SignedMessage.prototype.sign = async function sign(key) {
-	    this.sig = await Key.sign(this.signedData, key);
-	    this.pubKey = key.pub;
-	    await this.getHash();
-	    return true;
-	  };
-
-	  /**
-	  * Create an iris message. SignedMessage time is automatically set. If signingKey is specified and author omitted, signingKey will be used as author.
-	  * @param {Object} signedData message data object including author, recipient and other possible attributes
-	  * @param {Object} signingKey optionally, you can set the key to sign the message with
-	  * @returns {Promise<SignedMessage>}  message
-	  */
-
-
-	  SignedMessage.create = async function create(signedData, signingKey) {
-	    if (!signedData.author && signingKey) {
-	      signedData.author = { keyID: Key.getId(signingKey) };
-	    }
-	    signedData.time = signedData.time || new Date().toISOString();
-	    var m = new SignedMessage({ signedData: signedData });
-	    if (signingKey) {
-	      await m.sign(signingKey);
-	    }
-	    return m;
-	  };
-
-	  SignedMessage.createVerification = function createVerification(signedData, signingKey) {
-	    signedData.type = 'verification';
-	    return SignedMessage.create(signedData, signingKey);
-	  };
-
-	  SignedMessage.createRating = function createRating(signedData, signingKey) {
-	    signedData.type = 'rating';
-	    signedData.context = signedData.context || 'iris';
-	    signedData.maxRating = signedData.maxRating || 10;
-	    signedData.minRating = signedData.minRating || -10;
-	    return SignedMessage.create(signedData, signingKey);
-	  };
-
-	  SignedMessage.prototype.getAuthor = function getAuthor(index) {
-	    for (var _iterator = this.getAuthorIterable(), _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _getIterator(_iterator);;) {
-	      var _ref2;
-
-	      if (_isArray) {
-	        if (_i2 >= _iterator.length) break;
-	        _ref2 = _iterator[_i2++];
-	      } else {
-	        _i2 = _iterator.next();
-	        if (_i2.done) break;
-	        _ref2 = _i2.value;
-	      }
-
-	      var a = _ref2;
-
-	      if (a.isUniqueType()) {
-	        return index.getContacts(a);
-	      }
-	    }
-	  };
-
-	  SignedMessage.prototype.getRecipient = function getRecipient(index) {
-	    if (!this.signedData.recipient) {
-	      return undefined;
-	    }
-	    for (var _iterator2 = this.getRecipientIterable(), _isArray2 = Array.isArray(_iterator2), _i3 = 0, _iterator2 = _isArray2 ? _iterator2 : _getIterator(_iterator2);;) {
-	      var _ref3;
-
-	      if (_isArray2) {
-	        if (_i3 >= _iterator2.length) break;
-	        _ref3 = _iterator2[_i3++];
-	      } else {
-	        _i3 = _iterator2.next();
-	        if (_i3.done) break;
-	        _ref3 = _i3.value;
-	      }
-
-	      var a = _ref3;
-
-	      if (a.isUniqueType()) {
-	        return index.getContacts(a);
-	      }
-	    }
-	  };
-
-	  /**
-	  * @returns {string} base64 sha256 hash of message
-	  */
-
-
-	  SignedMessage.prototype.getHash = async function getHash() {
-	    if (this.sig && !this.hash) {
-	      this.hash = await util.getHash(this.sig);
-	    }
-	    return this.hash;
-	  };
-
-	  SignedMessage.prototype.getId = function getId() {
-	    return this.getHash();
-	  };
-
-	  SignedMessage.fromSig = async function fromSig(obj) {
-	    if (!obj.sig) {
-	      throw new Error('Missing signature in object:', obj);
-	    }
-	    if (!obj.pubKey) {
-	      throw new Error('Missing pubKey in object:');
-	    }
-	    //const signedData = await Key.verify(obj.sig, obj.pubKey); // disable sig verification while migrating to new gun :(
-	    var signedData = JSON.parse(obj.sig.slice(4)).m;
-	    var o = { signedData: signedData, sig: obj.sig, pubKey: obj.pubKey };
-	    return new SignedMessage(o);
-	  };
-
-	  /**
-	  * @return {boolean} true if message signature is valid. Otherwise throws ValidationError.
-	  */
-
-
-	  SignedMessage.prototype.verify = async function verify() {
-	    if (!this.pubKey) {
-	      throw new ValidationError(errorMsg + ' SignedMessage has no .pubKey');
-	    }
-	    if (!this.sig) {
-	      throw new ValidationError(errorMsg + ' SignedMessage has no .sig');
-	    }
-	    this.signedData = await Key.verify(this.sig, this.pubKey);
-	    if (!this.signedData) {
-	      throw new ValidationError(errorMsg + ' Invalid signature');
-	    }
-	    if (this.hash) {
-	      if (this.hash !== (await util.getHash(this.sig))) {
-	        throw new ValidationError(errorMsg + ' Invalid message hash');
-	      }
-	    } else {
-	      this.getHash();
-	    }
-	    return true;
-	  };
-
-	  /**
-	  * @returns {string}
-	  */
-
-
-	  SignedMessage.prototype.serialize = function serialize() {
-	    return { sig: this.sig, pubKey: this.pubKey };
-	  };
-
-	  SignedMessage.prototype.toString = function toString() {
-	    return _JSON$stringify(this.serialize());
-	  };
-
-	  /**
-	  * @returns {Promise<SignedMessage>}
-	  */
-
-
-	  SignedMessage.deserialize = async function deserialize(s) {
-	    return SignedMessage.fromSig(s);
-	  };
-
-	  SignedMessage.fromString = async function fromString(s) {
-	    return SignedMessage.fromSig(JSON.parse(s));
-	  };
-
-	  SignedMessage.setReaction = async function setReaction(gun, msg, reaction) {
-	    var hash = await msg.getHash();
-	    gun.get('reactions').get(hash).put(reaction);
-	    gun.get('reactions').get(hash).put(reaction);
-	    gun.get('messagesByHash').get(hash).get('reactions').get(this.rootContact.value).put(reaction);
-	    gun.get('messagesByHash').get(hash).get('reactions').get(this.rootContact.value).put(reaction);
-	  };
-
-	  return SignedMessage;
-	}();
-
-	// 19.1.2.1 Object.assign(target, source, ...)
-
-
-
-
-
-
-	var $assign = Object.assign;
-
-	// should work with symbols and should have deterministic property order (V8 bug)
-	var _objectAssign = !$assign || _fails(function () {
-	  var A = {};
-	  var B = {};
-	  // eslint-disable-next-line no-undef
-	  var S = Symbol();
-	  var K = 'abcdefghijklmnopqrst';
-	  A[S] = 7;
-	  K.split('').forEach(function (k) { B[k] = k; });
-	  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
-	}) ? function assign(target, source) { // eslint-disable-line no-unused-vars
-	  var T = _toObject(target);
-	  var aLen = arguments.length;
-	  var index = 1;
-	  var getSymbols = _objectGops.f;
-	  var isEnum = _objectPie.f;
-	  while (aLen > index) {
-	    var S = _iobject(arguments[index++]);
-	    var keys = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S);
-	    var length = keys.length;
-	    var j = 0;
-	    var key;
-	    while (length > j) {
-	      key = keys[j++];
-	      if (!_descriptors || isEnum.call(S, key)) T[key] = S[key];
-	    }
-	  } return T;
-	} : $assign;
-
-	// 19.1.3.1 Object.assign(target, source)
-
-
-	_export(_export.S + _export.F, 'Object', { assign: _objectAssign });
-
-	var assign = _core.Object.assign;
-
-	var assign$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": assign, __esModule: true };
-	});
-
-	var _Object$assign = unwrapExports(assign$1);
-
-	var _validateCollection = function (it, TYPE) {
-	  if (!_isObject(it) || it._t !== TYPE) throw TypeError('Incompatible receiver, ' + TYPE + ' required!');
-	  return it;
-	};
-
-	var dP$2 = _objectDp.f;
-
-
-
-
-
-
-
-
-
-	var fastKey = _meta.fastKey;
-
-	var SIZE = _descriptors ? '_s' : 'size';
-
-	var getEntry = function (that, key) {
-	  // fast case
-	  var index = fastKey(key);
-	  var entry;
-	  if (index !== 'F') return that._i[index];
-	  // frozen object case
-	  for (entry = that._f; entry; entry = entry.n) {
-	    if (entry.k == key) return entry;
-	  }
-	};
-
-	var _collectionStrong = {
-	  getConstructor: function (wrapper, NAME, IS_MAP, ADDER) {
-	    var C = wrapper(function (that, iterable) {
-	      _anInstance(that, C, NAME, '_i');
-	      that._t = NAME;         // collection type
-	      that._i = _objectCreate(null); // index
-	      that._f = undefined;    // first entry
-	      that._l = undefined;    // last entry
-	      that[SIZE] = 0;         // size
-	      if (iterable != undefined) _forOf(iterable, IS_MAP, that[ADDER], that);
-	    });
-	    _redefineAll(C.prototype, {
-	      // 23.1.3.1 Map.prototype.clear()
-	      // 23.2.3.2 Set.prototype.clear()
-	      clear: function clear() {
-	        for (var that = _validateCollection(this, NAME), data = that._i, entry = that._f; entry; entry = entry.n) {
-	          entry.r = true;
-	          if (entry.p) entry.p = entry.p.n = undefined;
-	          delete data[entry.i];
-	        }
-	        that._f = that._l = undefined;
-	        that[SIZE] = 0;
-	      },
-	      // 23.1.3.3 Map.prototype.delete(key)
-	      // 23.2.3.4 Set.prototype.delete(value)
-	      'delete': function (key) {
-	        var that = _validateCollection(this, NAME);
-	        var entry = getEntry(that, key);
-	        if (entry) {
-	          var next = entry.n;
-	          var prev = entry.p;
-	          delete that._i[entry.i];
-	          entry.r = true;
-	          if (prev) prev.n = next;
-	          if (next) next.p = prev;
-	          if (that._f == entry) that._f = next;
-	          if (that._l == entry) that._l = prev;
-	          that[SIZE]--;
-	        } return !!entry;
-	      },
-	      // 23.2.3.6 Set.prototype.forEach(callbackfn, thisArg = undefined)
-	      // 23.1.3.5 Map.prototype.forEach(callbackfn, thisArg = undefined)
-	      forEach: function forEach(callbackfn /* , that = undefined */) {
-	        _validateCollection(this, NAME);
-	        var f = _ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3);
-	        var entry;
-	        while (entry = entry ? entry.n : this._f) {
-	          f(entry.v, entry.k, this);
-	          // revert to the last existing entry
-	          while (entry && entry.r) entry = entry.p;
-	        }
-	      },
-	      // 23.1.3.7 Map.prototype.has(key)
-	      // 23.2.3.7 Set.prototype.has(value)
-	      has: function has(key) {
-	        return !!getEntry(_validateCollection(this, NAME), key);
-	      }
-	    });
-	    if (_descriptors) dP$2(C.prototype, 'size', {
-	      get: function () {
-	        return _validateCollection(this, NAME)[SIZE];
-	      }
-	    });
-	    return C;
-	  },
-	  def: function (that, key, value) {
-	    var entry = getEntry(that, key);
-	    var prev, index;
-	    // change existing entry
-	    if (entry) {
-	      entry.v = value;
-	    // create new entry
-	    } else {
-	      that._l = entry = {
-	        i: index = fastKey(key, true), // <- index
-	        k: key,                        // <- key
-	        v: value,                      // <- value
-	        p: prev = that._l,             // <- previous entry
-	        n: undefined,                  // <- next entry
-	        r: false                       // <- removed
-	      };
-	      if (!that._f) that._f = entry;
-	      if (prev) prev.n = entry;
-	      that[SIZE]++;
-	      // add to index
-	      if (index !== 'F') that._i[index] = entry;
-	    } return that;
-	  },
-	  getEntry: getEntry,
-	  setStrong: function (C, NAME, IS_MAP) {
-	    // add .keys, .values, .entries, [@@iterator]
-	    // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
-	    _iterDefine(C, NAME, function (iterated, kind) {
-	      this._t = _validateCollection(iterated, NAME); // target
-	      this._k = kind;                     // kind
-	      this._l = undefined;                // previous
-	    }, function () {
-	      var that = this;
-	      var kind = that._k;
-	      var entry = that._l;
-	      // revert to the last existing entry
-	      while (entry && entry.r) entry = entry.p;
-	      // get next entry
-	      if (!that._t || !(that._l = entry = entry ? entry.n : that._t._f)) {
-	        // or finish the iteration
-	        that._t = undefined;
-	        return _iterStep(1);
-	      }
-	      // return step by kind
-	      if (kind == 'keys') return _iterStep(0, entry.k);
-	      if (kind == 'values') return _iterStep(0, entry.v);
-	      return _iterStep(0, [entry.k, entry.v]);
-	    }, IS_MAP ? 'entries' : 'values', !IS_MAP, true);
-
-	    // add [@@species], 23.1.2.2, 23.2.2.2
-	    _setSpecies(NAME);
-	  }
-	};
-
-	var SPECIES$2 = _wks('species');
-
-	var _arraySpeciesConstructor = function (original) {
-	  var C;
-	  if (_isArray(original)) {
-	    C = original.constructor;
-	    // cross-realm fallback
-	    if (typeof C == 'function' && (C === Array || _isArray(C.prototype))) C = undefined;
-	    if (_isObject(C)) {
-	      C = C[SPECIES$2];
-	      if (C === null) C = undefined;
-	    }
-	  } return C === undefined ? Array : C;
-	};
-
-	// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
-
-
-	var _arraySpeciesCreate = function (original, length) {
-	  return new (_arraySpeciesConstructor(original))(length);
-	};
-
-	// 0 -> Array#forEach
-	// 1 -> Array#map
-	// 2 -> Array#filter
-	// 3 -> Array#some
-	// 4 -> Array#every
-	// 5 -> Array#find
-	// 6 -> Array#findIndex
-
-
-
-
-
-	var _arrayMethods = function (TYPE, $create) {
-	  var IS_MAP = TYPE == 1;
-	  var IS_FILTER = TYPE == 2;
-	  var IS_SOME = TYPE == 3;
-	  var IS_EVERY = TYPE == 4;
-	  var IS_FIND_INDEX = TYPE == 6;
-	  var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
-	  var create = $create || _arraySpeciesCreate;
-	  return function ($this, callbackfn, that) {
-	    var O = _toObject($this);
-	    var self = _iobject(O);
-	    var f = _ctx(callbackfn, that, 3);
-	    var length = _toLength(self.length);
-	    var index = 0;
-	    var result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
-	    var val, res;
-	    for (;length > index; index++) if (NO_HOLES || index in self) {
-	      val = self[index];
-	      res = f(val, index, O);
-	      if (TYPE) {
-	        if (IS_MAP) result[index] = res;   // map
-	        else if (res) switch (TYPE) {
-	          case 3: return true;             // some
-	          case 5: return val;              // find
-	          case 6: return index;            // findIndex
-	          case 2: result.push(val);        // filter
-	        } else if (IS_EVERY) return false; // every
-	      }
-	    }
-	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
-	  };
-	};
-
-	var dP$3 = _objectDp.f;
-	var each = _arrayMethods(0);
-
-
-	var _collection = function (NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
-	  var Base = _global[NAME];
-	  var C = Base;
-	  var ADDER = IS_MAP ? 'set' : 'add';
-	  var proto = C && C.prototype;
-	  var O = {};
-	  if (!_descriptors || typeof C != 'function' || !(IS_WEAK || proto.forEach && !_fails(function () {
-	    new C().entries().next();
-	  }))) {
-	    // create collection constructor
-	    C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
-	    _redefineAll(C.prototype, methods);
-	    _meta.NEED = true;
-	  } else {
-	    C = wrapper(function (target, iterable) {
-	      _anInstance(target, C, NAME, '_c');
-	      target._c = new Base();
-	      if (iterable != undefined) _forOf(iterable, IS_MAP, target[ADDER], target);
-	    });
-	    each('add,clear,delete,forEach,get,has,set,keys,values,entries,toJSON'.split(','), function (KEY) {
-	      var IS_ADDER = KEY == 'add' || KEY == 'set';
-	      if (KEY in proto && !(IS_WEAK && KEY == 'clear')) _hide(C.prototype, KEY, function (a, b) {
-	        _anInstance(this, C, KEY);
-	        if (!IS_ADDER && IS_WEAK && !_isObject(a)) return KEY == 'get' ? undefined : false;
-	        var result = this._c[KEY](a === 0 ? 0 : a, b);
-	        return IS_ADDER ? this : result;
-	      });
-	    });
-	    IS_WEAK || dP$3(C.prototype, 'size', {
-	      get: function () {
-	        return this._c.size;
-	      }
-	    });
-	  }
-
-	  _setToStringTag(C, NAME);
-
-	  O[NAME] = C;
-	  _export(_export.G + _export.W + _export.F, O);
-
-	  if (!IS_WEAK) common.setStrong(C, NAME, IS_MAP);
-
-	  return C;
-	};
-
-	var MAP = 'Map';
-
-	// 23.1 Map Objects
-	var es6_map = _collection(MAP, function (get) {
-	  return function Map() { return get(this, arguments.length > 0 ? arguments[0] : undefined); };
-	}, {
-	  // 23.1.3.6 Map.prototype.get(key)
-	  get: function get(key) {
-	    var entry = _collectionStrong.getEntry(_validateCollection(this, MAP), key);
-	    return entry && entry.v;
-	  },
-	  // 23.1.3.9 Map.prototype.set(key, value)
-	  set: function set(key, value) {
-	    return _collectionStrong.def(_validateCollection(this, MAP), key === 0 ? 0 : key, value);
-	  }
-	}, _collectionStrong, true);
-
-	var _arrayFromIterable = function (iter, ITERATOR) {
-	  var result = [];
-	  _forOf(iter, false, result.push, result, ITERATOR);
-	  return result;
-	};
-
-	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
-
-
-	var _collectionToJson = function (NAME) {
-	  return function toJSON() {
-	    if (_classof(this) != NAME) throw TypeError(NAME + "#toJSON isn't generic");
-	    return _arrayFromIterable(this);
-	  };
-	};
-
-	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
-
-
-	_export(_export.P + _export.R, 'Map', { toJSON: _collectionToJson('Map') });
-
-	// https://tc39.github.io/proposal-setmap-offrom/
-
-
-	var _setCollectionOf = function (COLLECTION) {
-	  _export(_export.S, COLLECTION, { of: function of() {
-	    var length = arguments.length;
-	    var A = new Array(length);
-	    while (length--) A[length] = arguments[length];
-	    return new this(A);
-	  } });
-	};
-
-	// https://tc39.github.io/proposal-setmap-offrom/#sec-map.of
-	_setCollectionOf('Map');
-
-	// https://tc39.github.io/proposal-setmap-offrom/
-
-
-
-
-
-	var _setCollectionFrom = function (COLLECTION) {
-	  _export(_export.S, COLLECTION, { from: function from(source /* , mapFn, thisArg */) {
-	    var mapFn = arguments[1];
-	    var mapping, A, n, cb;
-	    _aFunction(this);
-	    mapping = mapFn !== undefined;
-	    if (mapping) _aFunction(mapFn);
-	    if (source == undefined) return new this();
-	    A = [];
-	    if (mapping) {
-	      n = 0;
-	      cb = _ctx(mapFn, arguments[2], 2);
-	      _forOf(source, false, function (nextItem) {
-	        A.push(cb(nextItem, n++));
-	      });
-	    } else {
-	      _forOf(source, false, A.push, A);
-	    }
-	    return new this(A);
-	  } });
-	};
-
-	// https://tc39.github.io/proposal-setmap-offrom/#sec-map.from
-	_setCollectionFrom('Map');
-
-	var map = _core.Map;
-
-	var map$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": map, __esModule: true };
-	});
-
-	var _Map = unwrapExports(map$1);
 
 	var yson = createCommonjsModule(function (module) {
 	(function(){
@@ -21609,2254 +25715,6 @@
 			r.find.bad(f);
 		});
 	};
-
-	var gun = createCommonjsModule(function (module) {
-	(function(){
-
-	  /* UNBUILD */
-	  function USE(arg, req){
-	    return req? commonjsRequire(arg) : arg.slice? USE[R(arg)] : function(mod, path){
-	      arg(mod = {exports: {}});
-	      USE[R(path)] = mod.exports;
-	    }
-	    function R(p){
-	      return p.split('/').slice(-1).toString().replace('.js','');
-	    }
-	  }
-	  { var MODULE = module; }
-	USE(function(module){
-			// Shim for generic javascript utilities.
-			String.random = function(l, c){
-				var s = '';
-				l = l || 24; // you are not going to make a 0 length random number, so no need to check type
-				c = c || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXZabcdefghijklmnopqrstuvwxyz';
-				while(l-- > 0){ s += c.charAt(Math.floor(Math.random() * c.length)); }
-				return s;
-			};
-			String.match = function(t, o){ var tmp, u;
-				if('string' !== typeof t){ return false }
-				if('string' == typeof o){ o = {'=': o}; }
-				o = o || {};
-				tmp = (o['='] || o['*'] || o['>'] || o['<']);
-				if(t === tmp){ return true }
-				if(u !== o['=']){ return false }
-				tmp = (o['*'] || o['>']);
-				if(t.slice(0, (tmp||'').length) === tmp){ return true }
-				if(u !== o['*']){ return false }
-				if(u !== o['>'] && u !== o['<']){
-					return (t >= o['>'] && t <= o['<'])? true : false;
-				}
-				if(u !== o['>'] && t >= o['>']){ return true }
-				if(u !== o['<'] && t <= o['<']){ return true }
-				return false;
-			};
-			String.hash = function(s, c){ // via SO
-				if(typeof s !== 'string'){ return }
-		    c = c || 0; // CPU schedule hashing by
-		    if(!s.length){ return c }
-		    for(var i=0,l=s.length,n; i<l; ++i){
-		      n = s.charCodeAt(i);
-		      c = ((c<<5)-c)+n;
-		      c |= 0;
-		    }
-		    return c;
-		  };
-			var has = Object.prototype.hasOwnProperty;
-			Object.plain = function(o){ return o? (o instanceof Object && o.constructor === Object) || Object.prototype.toString.call(o).match(/^\[object (\w+)\]$/)[1] === 'Object' : false };
-			Object.empty = function(o, n){
-				for(var k in o){ if(has.call(o, k) && (!n || -1==n.indexOf(k))){ return false } }
-				return true;
-			};
-			Object.keys = Object.keys || function(o){
-				var l = [];
-				for(var k in o){ if(has.call(o, k)){ l.push(k); } }
-				return l;
-			}
-			;(function(){
-				var u, sT = setTimeout, l = 0, c = 0
-				, sI = (typeof setImmediate !== ''+u && setImmediate) || (function(c,f){
-					if(typeof MessageChannel == ''+u){ return sT }
-					(c = new MessageChannel()).port1.onmessage = function(e){ ''==e.data && f(); };
-					return function(q){ f=q;c.port2.postMessage(''); }
-				}()), check = sT.check = sT.check || (typeof performance !== ''+u && performance)
-				|| {now: function(){ return +new Date }};
-				sT.hold = sT.hold || 9; // half a frame benchmarks faster than < 1ms?
-				sT.poll = sT.poll || function(f){
-					if((sT.hold >= (check.now() - l)) && c++ < 3333){ f(); return }
-					sI(function(){ l = check.now(); f(); },c=0);
-				};
-			}());
-	(function(){ // Too many polls block, this "threads" them in turns over a single thread in time.
-				var sT = setTimeout, t = sT.turn = sT.turn || function(f){ 1 == s.push(f) && p(T); }
-				, s = t.s = [], p = sT.poll, i = 0, f, T = function(){
-					if(f = s[i++]){ f(); }
-					if(i == s.length || 99 == i){
-						s = t.s = s.slice(i);
-						i = 0;
-					}
-					if(s.length){ p(T); }
-				};
-			}());
-	(function(){
-				var u, sT = setTimeout, T = sT.turn;
-				(sT.each = sT.each || function(l,f,e,S){ S = S || 9; (function t(s,L,r){
-				  if(L = (s = (l||[]).splice(0,S)).length){
-				  	for(var i = 0; i < L; i++){
-				  		if(u !== (r = f(s[i]))){ break }
-				  	}
-				  	if(u === r){ T(t); return }
-				  } e && e(r);
-				}());})();
-			}());
-		})(USE, './shim');
-	USE(function(module){
-			// On event emitter generic javascript utility.
-			module.exports = function onto(tag, arg, as){
-				if(!tag){ return {to: onto} }
-				var u, f = 'function' == typeof arg, tag = (this.tag || (this.tag = {}))[tag] || f && (
-					this.tag[tag] = {tag: tag, to: onto._ = { next: function(arg){ var tmp;
-						if(tmp = this.to){ tmp.next(arg); }
-				}}});
-				if(f){
-					var be = {
-						off: onto.off ||
-						(onto.off = function(){
-							if(this.next === onto._.next){ return !0 }
-							if(this === this.the.last){
-								this.the.last = this.back;
-							}
-							this.to.back = this.back;
-							this.next = onto._.next;
-							this.back.to = this.to;
-							if(this.the.last === this.the){
-								delete this.on.tag[this.the.tag];
-							}
-						}),
-						to: onto._,
-						next: arg,
-						the: tag,
-						on: this,
-						as: as,
-					};
-					(be.back = tag.last || tag).to = be;
-					return tag.last = be;
-				}
-				if((tag = tag.to) && u !== arg){ tag.next(arg); }
-				return tag;
-			};
-		})(USE, './onto');
-	USE(function(module){
-			// Valid values are a subset of JSON: null, binary, number (!Infinity), text,
-			// or a soul relation. Arrays need special algorithms to handle concurrency,
-			// so they are not supported directly. Use an extension that supports them if
-			// needed but research their problems first.
-			module.exports = function (v) {
-			  // "deletes", nulling out keys.
-			  return v === null ||
-				"string" === typeof v ||
-				"boolean" === typeof v ||
-				// we want +/- Infinity to be, but JSON does not support it, sad face.
-				// can you guess what v === v checks for? ;)
-				("number" === typeof v && v != Infinity && v != -Infinity && v === v) ||
-				(!!v && "string" == typeof v["#"] && Object.keys(v).length === 1 && v["#"]);
-			};
-		})(USE, './valid');
-	USE(function(module){
-			USE('./shim');
-			function State(){
-				var t = +new Date;
-				if(last < t){
-					return N = 0, last = t + State.drift;
-				}
-				return last = t + ((N += 1) / D) + State.drift;
-			}
-			State.drift = 0;
-			var NI = -Infinity, N = 0, D = 999, last = NI, u; // WARNING! In the future, on machines that are D times faster than 2016AD machines, you will want to increase D by another several orders of magnitude so the processing speed never out paces the decimal resolution (increasing an integer effects the state accuracy).
-			State.is = function(n, k, o){ // convenience function to get the state on a key on a node and return it.
-				var tmp = (k && n && n._ && n._['>']) || o;
-				if(!tmp){ return }
-				return ('number' == typeof (tmp = tmp[k]))? tmp : NI;
-			};
-			State.ify = function(n, k, s, v, soul){ // put a key's state on a node.
-				(n = n || {})._ = n._ || {}; // safety check or init.
-				if(soul){ n._['#'] = soul; } // set a soul if specified.
-				var tmp = n._['>'] || (n._['>'] = {}); // grab the states data.
-				if(u !== k && k !== '_'){
-					if('number' == typeof s){ tmp[k] = s; } // add the valid state.
-					if(u !== v){ n[k] = v; } // Note: Not its job to check for valid values!
-				}
-				return n;
-			};
-			module.exports = State;
-		})(USE, './state');
-	USE(function(module){
-			USE('./shim');
-			function Dup(opt){
-				var dup = {s:{}}, s = dup.s;
-				opt = opt || {max: 999, age: 1000 * 9};//*/ 1000 * 9 * 3};
-				dup.check = function(id){
-					if(!s[id]){ return false }
-					return dt(id);
-				};
-				var dt = dup.track = function(id){
-					var it = s[id] || (s[id] = {});
-					it.was = dup.now = +new Date;
-					if(!dup.to){ dup.to = setTimeout(dup.drop, opt.age + 9); }
-					return it;
-				};
-				dup.drop = function(age){
-					dup.to = null;
-					dup.now = +new Date;
-					var l = Object.keys(s);
-					console.STAT && console.STAT(dup.now, +new Date - dup.now, 'dup drop keys'); // prev ~20% CPU 7% RAM 300MB // now ~25% CPU 7% RAM 500MB
-					setTimeout.each(l, function(id){ var it = s[id]; // TODO: .keys( is slow?
-						if(it && (age || opt.age) > (dup.now - it.was)){ return }
-						delete s[id];
-					},0,99);
-				};
-				return dup;
-			}
-			module.exports = Dup;
-		})(USE, './dup');
-	USE(function(module){
-			// request / response module, for asking and acking messages.
-			USE('./onto'); // depends upon onto!
-			module.exports = function ask(cb, as){
-				if(!this.on){ return }
-				var lack = (this.opt||{}).lack || 9000;
-				if(!('function' == typeof cb)){
-					if(!cb){ return }
-					var id = cb['#'] || cb, tmp = (this.tag||'')[id];
-					if(!tmp){ return }
-					if(as){
-						tmp = this.on(id, as);
-						clearTimeout(tmp.err);
-						tmp.err = setTimeout(function(){ tmp.off(); }, lack);
-					}
-					return true;
-				}
-				var id = (as && as['#']) || random(9);
-				if(!cb){ return id }
-				var to = this.on(id, cb, as);
-				to.err = to.err || setTimeout(function(){ to.off();
-					to.next({err: "Error: No ACK yet.", lack: true});
-				}, lack);
-				return id;
-			};
-			var random = String.random || function(){ return Math.random().toString(36).slice(2) };
-		})(USE, './ask');
-	USE(function(module){
-
-			function Gun(o){
-				if(o instanceof Gun){ return (this._ = {$: this}).$ }
-				if(!(this instanceof Gun)){ return new Gun(o) }
-				return Gun.create(this._ = {$: this, opt: o});
-			}
-
-			Gun.is = function($){ return ($ instanceof Gun) || ($ && $._ && ($ === $._.$)) || false };
-
-			Gun.version = 0.2020;
-
-			Gun.chain = Gun.prototype;
-			Gun.chain.toJSON = function(){};
-
-			USE('./shim');
-			Gun.valid = USE('./valid');
-			Gun.state = USE('./state');
-			Gun.on = USE('./onto');
-			Gun.dup = USE('./dup');
-			Gun.ask = USE('./ask');
-	(function(){
-				Gun.create = function(at){
-					at.root = at.root || at;
-					at.graph = at.graph || {};
-					at.on = at.on || Gun.on;
-					at.ask = at.ask || Gun.ask;
-					at.dup = at.dup || Gun.dup();
-					var gun = at.$.opt(at.opt);
-					if(!at.once){
-						at.on('in', universe, at);
-						at.on('out', universe, at);
-						at.on('put', map, at);
-						Gun.on('create', at);
-						at.on('create', at);
-					}
-					at.once = 1;
-					return gun;
-				};
-				function universe(msg){
-					// TODO: BUG! msg.out = null being set!
-					//if(!F){ var eve = this; setTimeout(function(){ universe.call(eve, msg,1) },Math.random() * 100);return; } // ADD F TO PARAMS!
-					if(!msg){ return }
-					if(msg.out === universe){ this.to.next(msg); return }
-					var eve = this, as = eve.as, at = as.at || as, gun = at.$, dup = at.dup, tmp, DBG = msg.DBG;
-					(tmp = msg['#']) || (tmp = msg['#'] = text_rand(9));
-					if(dup.check(tmp)){ return } dup.track(tmp);
-					tmp = msg._; msg._ = ('function' == typeof tmp)? tmp : function(){};
-					(msg.$ && (msg.$ === (msg.$._||'').$)) || (msg.$ = gun);
-					if(msg['@'] && !msg.put){ ack(msg); }
-					if(!at.ask(msg['@'], msg)){ // is this machine listening for an ack?
-						DBG && (DBG.u = +new Date);
-						if(msg.put){ put(msg); return } else
-						if(msg.get){ Gun.on.get(msg, gun); }
-					}
-					DBG && (DBG.uc = +new Date);
-					eve.to.next(msg);
-					DBG && (DBG.ua = +new Date);
-					if(msg.nts || msg.NTS){ return } // TODO: This shouldn't be in core, but fast way to prevent NTS spread. Delete this line after all peers have upgraded to newer versions.
-					msg.out = universe; at.on('out', msg);
-					DBG && (DBG.ue = +new Date);
-				}
-				function put(msg){
-					if(!msg){ return }
-					var ctx = msg._||'', root = ctx.root = ((ctx.$ = msg.$||'')._||'').root;
-					if(msg['@'] && ctx.faith && !ctx.miss){ // TODO: AXE may split/route based on 'put' what should we do here? Detect @ in AXE? I think we don't have to worry, as DAM will route it on @.
-						msg.out = universe;
-						root.on('out', msg);
-						return;
-					}
-					ctx.latch = root.hatch; ctx.match = root.hatch = [];
-					var put = msg.put;
-					var DBG = ctx.DBG = msg.DBG, S = +new Date; CT = CT || S;
-					if(put['#'] && put['.']){ /*root && root.on('put', msg);*/ return } // TODO: BUG! This needs to call HAM instead.
-					DBG && (DBG.p = S);
-					ctx['#'] = msg['#'];
-					ctx.msg = msg;
-					ctx.all = 0;
-					ctx.stun = 1;
-					var nl = Object.keys(put);//.sort(); // TODO: This is unbounded operation, large graphs will be slower. Write our own CPU scheduled sort? Or somehow do it in below? Keys itself is not O(1) either, create ES5 shim over ?weak map? or custom which is constant.
-					console.STAT && console.STAT(S, ((DBG||ctx).pk = +new Date) - S, 'put sort');
-					var ni = 0, nj, kl, soul, node, states, err, tmp;
-					(function pop(o){
-						if(nj != ni){ nj = ni;
-							if(!(soul = nl[ni])){
-								console.STAT && console.STAT(S, ((DBG||ctx).pd = +new Date) - S, 'put');
-								fire(ctx);
-								return;
-							}
-							if(!(node = put[soul])){ err = ERR+cut(soul)+"no node."; } else
-							if(!(tmp = node._)){ err = ERR+cut(soul)+"no meta."; } else
-							if(soul !== tmp['#']){ err = ERR+cut(soul)+"soul not same."; } else
-							if(!(states = tmp['>'])){ err = ERR+cut(soul)+"no state."; }
-							kl = Object.keys(node||{}); // TODO: .keys( is slow
-						}
-						if(err){
-							msg.err = ctx.err = err; // invalid data should error and stun the message.
-							fire(ctx);
-							//console.log("handle error!", err) // handle!
-							return;
-						}
-						var i = 0, key; o = o || 0;
-						while(o++ < 9 && (key = kl[i++])){
-							if('_' === key){ continue }
-							var val = node[key], state = states[key];
-							if(u === state){ err = ERR+cut(key)+"on"+cut(soul)+"no state."; break }
-							if(!valid(val)){ err = ERR+cut(key)+"on"+cut(soul)+"bad "+(typeof val)+cut(val); break }
-							//ctx.all++; //ctx.ack[soul+key] = '';
-							ham(val, key, soul, state, msg);
-							++C; // courtesy count;
-						}
-						if((kl = kl.slice(i)).length){ turn(pop); return }
-						++ni; kl = null; pop(o);
-					}());
-				} Gun.on.put = put;
-				// TODO: MARK!!! clock below, reconnect sync, SEA certify wire merge, User.auth taking multiple times, // msg put, put, say ack, hear loop...
-				// WASIS BUG! local peer not ack. .off other people: .open
-				function ham(val, key, soul, state, msg){
-					var ctx = msg._||'', root = ctx.root, graph = root.graph, tmp;
-					var vertex = graph[soul] || empty, was = state_is(vertex, key, 1), known = vertex[key];
-					
-					var DBG = ctx.DBG; if(tmp = console.STAT){ if(!graph[soul] || !known){ tmp.has = (tmp.has || 0) + 1; } }
-
-					var now = State();
-					if(state > now){
-						setTimeout(function(){ ham(val, key, soul, state, msg); }, (tmp = state - now) > MD? MD : tmp); // Max Defer 32bit. :(
-						console.STAT && console.STAT(((DBG||ctx).Hf = +new Date), tmp, 'future');
-						return;
-					}
-					if(state < was){ /*old;*/ { return } } // but some chains have a cache miss that need to re-fire. // TODO: Improve in future. // for AXE this would reduce rebroadcast, but GUN does it on message forwarding. // TURNS OUT CACHE MISS WAS NOT NEEDED FOR NEW CHAINS ANYMORE!!! DANGER DANGER DANGER, ALWAYS RETURN! (or am I missing something?)
-					if(!ctx.faith){ // TODO: BUG? Can this be used for cache miss as well? // Yes this was a bug, need to check cache miss for RAD tests, but should we care about the faith check now? Probably not.
-						if(state === was && (val === known || L(val) <= L(known))){ /*console.log("same");*/ /*same;*/ if(!ctx.miss){ return } } // same
-					}
-					ctx.stun++; // TODO: 'forget' feature in SEA tied to this, bad approach, but hacked in for now. Any changes here must update there.
-					var aid = msg['#']+ctx.all++, id = {toString: function(){ return aid }, _: ctx}; id.toJSON = id.toString; // this *trick* makes it compatible between old & new versions.
-					root.dup.track(id)['#'] = msg['#']; // fixes new OK acks for RPC like RTC.
-					DBG && (DBG.ph = DBG.ph || +new Date);
-					root.on('put', {'#': id, '@': msg['@'], put: {'#': soul, '.': key, ':': val, '>': state}, ok: msg.ok, _: ctx});
-				}
-				function map(msg){
-					var DBG; if(DBG = (msg._||'').DBG){ DBG.pa = +new Date; DBG.pm = DBG.pm || +new Date;}
-	      	var eve = this, root = eve.as, graph = root.graph, ctx = msg._, put = msg.put, soul = put['#'], key = put['.'], val = put[':'], state = put['>'], id = msg['#'], tmp;
-	      	if((tmp = ctx.msg) && (tmp = tmp.put) && (tmp = tmp[soul])){ state_ify(tmp, key, state, val, soul); } // necessary! or else out messages do not get SEA transforms.
-	      	//var bytes = ((graph[soul]||'')[key]||'').length||1;
-					graph[soul] = state_ify(graph[soul], key, state, val, soul);
-					if(tmp = (root.next||'')[soul]){
-						//tmp.bytes = (tmp.bytes||0) + ((val||'').length||1) - bytes;
-						//if(tmp.bytes > 2**13){ Gun.log.once('byte-limit', "Note: In the future, GUN peers will enforce a ~4KB query limit. Please see https://gun.eco/docs/Page") }
-						tmp.on('in', msg);
-					}
-					fire(ctx);
-					eve.to.next(msg);
-				}
-				function fire(ctx, msg){ var root;
-					if(ctx.stop){ return }
-					if(!ctx.err && 0 < --ctx.stun){ return } // TODO: 'forget' feature in SEA tied to this, bad approach, but hacked in for now. Any changes here must update there.
-					ctx.stop = 1;
-					if(!(root = ctx.root)){ return }
-					var tmp = ctx.match; tmp.end = 1;
-					if(tmp === root.hatch){ if(!(tmp = ctx.latch) || tmp.end){ delete root.hatch; } else { root.hatch = tmp; } }
-					ctx.hatch && ctx.hatch(); // TODO: rename/rework how put & this interact.
-					setTimeout.each(ctx.match, function(cb){cb && cb();}); 
-					if(!(msg = ctx.msg) || ctx.err || msg.err){ return }
-					msg.out = universe;
-					ctx.root.on('out', msg);
-
-					CF(); // courtesy check;
-				}
-				function ack(msg){ // aggregate ACKs.
-					var id = msg['@'] || '', ctx;
-					if(!(ctx = id._)){
-						var dup = (dup = msg.$) && (dup = dup._) && (dup = dup.root) && (dup = dup.dup);
-						if(!(dup = dup.check(id))){ return }
-						msg['@'] = dup['#'] || msg['@']; // This doesn't do anything anymore, backtrack it to something else?
-						return;
-					}
-					ctx.acks = (ctx.acks||0) + 1;
-					if(ctx.err = msg.err){
-						msg['@'] = ctx['#'];
-						fire(ctx); // TODO: BUG? How it skips/stops propagation of msg if any 1 item is error, this would assume a whole batch/resync has same malicious intent.
-					}
-					ctx.ok = msg.ok || ctx.ok;
-					if(!ctx.stop && !ctx.crack){ ctx.crack = ctx.match && ctx.match.push(function(){back(ctx);}); } // handle synchronous acks. NOTE: If a storage peer ACKs synchronously then the PUT loop has not even counted up how many items need to be processed, so ctx.STOP flags this and adds only 1 callback to the end of the PUT loop.
-					back(ctx);
-				}
-				function back(ctx){
-					if(!ctx || !ctx.root){ return }
-					if(ctx.stun || ctx.acks !== ctx.all){ return }
-					ctx.root.on('in', {'@': ctx['#'], err: ctx.err, ok: ctx.err? u : ctx.ok || {'':1}});
-				}
-
-				var ERR = "Error: Invalid graph!";
-				var cut = function(s){ return " '"+(''+s).slice(0,9)+"...' " };
-				var L = JSON.stringify, MD = 2147483647, State = Gun.state;
-				var C = 0, CT, CF = function(){if(C>999 && (C/-(CT - (CT = +new Date))>1)){Gun.window && console.log("Warning: You're syncing 1K+ records a second, faster than DOM can update - consider limiting query.");CF=function(){C=0;};}};
-
-			}());
-	(function(){
-				Gun.on.get = function(msg, gun){
-					var root = gun._, get = msg.get, soul = get['#'], node = root.graph[soul], has = get['.'];
-					var next = root.next || (root.next = {}), at = next[soul];
-					// queue concurrent GETs?
-					// TODO: consider tagging original message into dup for DAM.
-					// TODO: ^ above? In chat app, 12 messages resulted in same peer asking for `#user.pub` 12 times. (same with #user GET too, yipes!) // DAM note: This also resulted in 12 replies from 1 peer which all had same ##hash but none of them deduped because each get was different.
-					// TODO: Moving quick hacks fixing these things to axe for now.
-					// TODO: a lot of GET #foo then GET #foo."" happening, why?
-					// TODO: DAM's ## hash check, on same get ACK, producing multiple replies still, maybe JSON vs YSON?
-					// TMP note for now: viMZq1slG was chat LEX query #.
-					/*if(gun !== (tmp = msg.$) && (tmp = (tmp||'')._)){
-						if(tmp.Q){ tmp.Q[msg['#']] = ''; return } // chain does not need to ask for it again.
-						tmp.Q = {};
-					}*/
-					/*if(u === has){
-						if(at.Q){
-							//at.Q[msg['#']] = '';
-							//return;
-						}
-						at.Q = {};
-					}*/
-					var ctx = msg._||{}, DBG = ctx.DBG = msg.DBG;
-					DBG && (DBG.g = +new Date);
-					//console.log("GET:", get, node, has);
-					if(!node){ return root.on('get', msg) }
-					if(has){
-						if('string' != typeof has || u === node[has]){ return root.on('get', msg) }
-						node = state_ify({}, has, state_is(node, has), node[has], soul);
-						// If we have a key in-memory, do we really need to fetch?
-						// Maybe... in case the in-memory key we have is a local write
-						// we still need to trigger a pull/merge from peers.
-					}
-					//Gun.window? Gun.obj.copy(node) : node; // HNPERF: If !browser bump Performance? Is this too dangerous to reference root graph? Copy / shallow copy too expensive for big nodes. Gun.obj.to(node); // 1 layer deep copy // Gun.obj.copy(node); // too slow on big nodes
-					node && ack(msg, node);
-					root.on('get', msg); // send GET to storage adapters.
-				};
-				function ack(msg, node){
-					var S = +new Date, ctx = msg._||{}, DBG = ctx.DBG = msg.DBG;
-					var to = msg['#'], id = text_rand(9), keys = Object.keys(node||'').sort(), soul = ((node||'')._||'')['#'], kl = keys.length, root = msg.$._.root, F = (node === root.graph[soul]);
-					console.STAT && console.STAT(S, ((DBG||ctx).gk = +new Date) - S, 'got keys');
-					// PERF: Consider commenting this out to force disk-only reads for perf testing? // TODO: .keys( is slow
-					node && (function go(){
-						S = +new Date;
-						var i = 0, k, put = {}, tmp;
-						while(i < 9 && (k = keys[i++])){
-							state_ify(put, k, state_is(node, k), node[k], soul);
-						}
-						keys = keys.slice(i);
-						(tmp = {})[soul] = put; put = tmp;
-						var faith; if(F){ faith = function(){}; faith.ram = faith.faith = true; } // HNPERF: We're testing performance improvement by skipping going through security again, but this should be audited.
-						tmp = keys.length;
-						console.STAT && console.STAT(S, -(S - (S = +new Date)), 'got copied some');
-						DBG && (DBG.ga = +new Date);
-						root.on('in', {'@': to, '#': id, put: put, '%': (tmp? (id = text_rand(9)) : u), $: root.$, _: faith, DBG: DBG});
-						console.STAT && console.STAT(S, +new Date - S, 'got in');
-						if(!tmp){ return }
-						setTimeout.turn(go);
-					}());
-					if(!node){ root.on('in', {'@': msg['#']}); } // TODO: I don't think I like this, the default lS adapter uses this but "not found" is a sensitive issue, so should probably be handled more carefully/individually.
-				} Gun.on.get.ack = ack;
-			}());
-	(function(){
-				Gun.chain.opt = function(opt){
-					opt = opt || {};
-					var gun = this, at = gun._, tmp = opt.peers || opt;
-					if(!Object.plain(opt)){ opt = {}; }
-					if(!Object.plain(at.opt)){ at.opt = opt; }
-					if('string' == typeof tmp){ tmp = [tmp]; }
-					if(!Object.plain(at.opt.peers)){ at.opt.peers = {};}
-					if(tmp instanceof Array){
-						opt.peers = {};
-						tmp.forEach(function(url){
-							var p = {}; p.id = p.url = url;
-							opt.peers[url] = at.opt.peers[url] = at.opt.peers[url] || p;
-						});
-					}
-					obj_each(opt, function each(k){ var v = this[k];
-						if((this && this.hasOwnProperty(k)) || 'string' == typeof v || Object.empty(v)){ this[k] = v; return }
-						if(v && v.constructor !== Object && !(v instanceof Array)){ return }
-						obj_each(v, each);
-					});
-					at.opt.from = opt;
-					Gun.on('opt', at);
-					at.opt.uuid = at.opt.uuid || function uuid(l){ return Gun.state().toString(36).replace('.','') + String.random(l||12) };
-					return gun;
-				};
-			}());
-
-			var obj_each = function(o,f){ Object.keys(o).forEach(f,o); }, text_rand = String.random, turn = setTimeout.turn, valid = Gun.valid, state_is = Gun.state.is, state_ify = Gun.state.ify, u, empty = {}, C;
-
-			Gun.log = function(){ return (!Gun.log.off && C.log.apply(C, arguments)), [].slice.call(arguments).join(' ') };
-			Gun.log.once = function(w,s,o){ return (o = Gun.log.once)[w] = o[w] || 0, o[w]++ || Gun.log(s) };
-
-			if(typeof window !== "undefined"){ (window.GUN = window.Gun = Gun).window = window; }
-			try{ if(typeof MODULE !== "undefined"){ MODULE.exports = Gun; } }catch(e){}
-			module.exports = Gun;
-			
-			(Gun.window||{}).console = (Gun.window||{}).console || {log: function(){}};
-			(C = console).only = function(i, s){ return (C.only.i && i === C.only.i && C.only.i++) && (C.log.apply(C, arguments) || s) };
-			Gun.log.once("welcome", "Hello wonderful person! :) Thanks for using GUN, please ask for help on http://chat.gun.eco if anything takes you longer than 5min to figure out!");
-		})(USE, './root');
-	USE(function(module){
-			var Gun = USE('./root');
-			Gun.chain.back = function(n, opt){ var tmp;
-				n = n || 1;
-				if(-1 === n || Infinity === n){
-					return this._.root.$;
-				} else
-				if(1 === n){
-					return (this._.back || this._).$;
-				}
-				var gun = this, at = gun._;
-				if(typeof n === 'string'){
-					n = n.split('.');
-				}
-				if(n instanceof Array){
-					var i = 0, l = n.length, tmp = at;
-					for(i; i < l; i++){
-						tmp = (tmp||empty)[n[i]];
-					}
-					if(u !== tmp){
-						return opt? gun : tmp;
-					} else
-					if((tmp = at.back)){
-						return tmp.$.back(n, opt);
-					}
-					return;
-				}
-				if('function' == typeof n){
-					var yes, tmp = {back: at};
-					while((tmp = tmp.back)
-					&& u === (yes = n(tmp, opt))){}
-					return yes;
-				}
-				if('number' == typeof n){
-					return (at.back || at).$.back(n - 1);
-				}
-				return this;
-			};
-			var empty = {}, u;
-		})(USE, './back');
-	USE(function(module){
-			// WARNING: GUN is very simple, but the JavaScript chaining API around GUN
-			// is complicated and was extremely hard to build. If you port GUN to another
-			// language, consider implementing an easier API to build.
-			var Gun = USE('./root');
-			Gun.chain.chain = function(sub){
-				var gun = this, at = gun._, chain = new (sub || gun).constructor(gun), cat = chain._, root;
-				cat.root = root = at.root;
-				cat.id = ++root.once;
-				cat.back = gun._;
-				cat.on = Gun.on;
-				cat.on('in', Gun.on.in, cat); // For 'in' if I add my own listeners to each then I MUST do it before in gets called. If I listen globally for all incoming data instead though, regardless of individual listeners, I can transform the data there and then as well.
-				cat.on('out', Gun.on.out, cat); // However for output, there isn't really the global option. I must listen by adding my own listener individually BEFORE this one is ever called.
-				return chain;
-			};
-
-			function output(msg){
-				var get, at = this.as, back = at.back, root = at.root, tmp;
-				if(!msg.$){ msg.$ = at.$; }
-				this.to.next(msg);
-				if(at.err){ at.on('in', {put: at.put = u, $: at.$}); return }
-				if(get = msg.get){
-					/*if(u !== at.put){
-						at.on('in', at);
-						return;
-					}*/
-					if(root.pass){ root.pass[at.id] = at; } // will this make for buggy behavior elsewhere?
-					if(at.lex){ Object.keys(at.lex).forEach(function(k){ tmp[k] = at.lex[k]; }, tmp = msg.get = msg.get || {}); }
-					if(get['#'] || at.soul){
-						get['#'] = get['#'] || at.soul;
-						msg['#'] || (msg['#'] = text_rand(9)); // A3120 ?
-						back = (root.$.get(get['#'])._);
-						if(!(get = get['.'])){ // soul
-							tmp = back.ask && back.ask['']; // check if we have already asked for the full node
-							(back.ask || (back.ask = {}))[''] = back; // add a flag that we are now.
-							if(u !== back.put){ // if we already have data,
-								back.on('in', back); // send what is cached down the chain
-								if(tmp){ return } // and don't ask for it again.
-							}
-							msg.$ = back.$;
-						} else
-						if(obj_has(back.put, get)){ // TODO: support #LEX !
-							tmp = back.ask && back.ask[get];
-							(back.ask || (back.ask = {}))[get] = back.$.get(get)._;
-							back.on('in', {get: get, put: {'#': back.soul, '.': get, ':': back.put[get], '>': state_is(root.graph[back.soul], get)}});
-							if(tmp){ return }
-						}
-							/*put = (back.$.get(get)._);
-							if(!(tmp = put.ack)){ put.ack = -1 }
-							back.on('in', {
-								$: back.$,
-								put: Gun.state.ify({}, get, Gun.state(back.put, get), back.put[get]),
-								get: back.get
-							});
-							if(tmp){ return }
-						} else
-						if('string' != typeof get){
-							var put = {}, meta = (back.put||{})._;
-							Gun.obj.map(back.put, function(v,k){
-								if(!Gun.text.match(k, get)){ return }
-								put[k] = v;
-							})
-							if(!Gun.obj.empty(put)){
-								put._ = meta;
-								back.on('in', {$: back.$, put: put, get: back.get})
-							}
-							if(tmp = at.lex){
-								tmp = (tmp._) || (tmp._ = function(){});
-								if(back.ack < tmp.ask){ tmp.ask = back.ack }
-								if(tmp.ask){ return }
-								tmp.ask = 1;
-							}
-						}
-						*/
-						root.ask(ack, msg); // A3120 ?
-						return root.on('in', msg);
-					}
-					//if(root.now){ root.now[at.id] = root.now[at.id] || true; at.pass = {} }
-					if(get['.']){
-						if(at.get){
-							msg = {get: {'.': at.get}, $: at.$};
-							(back.ask || (back.ask = {}))[at.get] = msg.$._; // TODO: PERFORMANCE? More elegant way?
-							return back.on('out', msg);
-						}
-						msg = {get: at.lex? msg.get : {}, $: at.$};
-						return back.on('out', msg);
-					}
-					(at.ask || (at.ask = {}))[''] = at;	 //at.ack = at.ack || -1;
-					if(at.get){
-						get['.'] = at.get;
-						(back.ask || (back.ask = {}))[at.get] = msg.$._; // TODO: PERFORMANCE? More elegant way?
-						return back.on('out', msg);
-					}
-				}
-				return back.on('out', msg);
-			} Gun.on.out = output;
-
-			function input(msg, cat){ cat = cat || this.as; // TODO: V8 may not be able to optimize functions with different parameter calls, so try to do benchmark to see if there is any actual difference.
-				var root = cat.root, gun = msg.$ || (msg.$ = cat.$), at = (gun||'')._ || empty, tmp = msg.put||'', soul = tmp['#'], key = tmp['.'], change = (u !== tmp['='])? tmp['='] : tmp[':'], state = tmp['>'] || -Infinity, sat; // eve = event, at = data at, cat = chain at, sat = sub at (children chains).
-				if(u !== msg.put && (u === tmp['#'] || u === tmp['.'] || (u === tmp[':'] && u === tmp['=']) || u === tmp['>'])){ // convert from old format
-					if(!valid(tmp)){
-						if(!(soul = ((tmp||'')._||'')['#'])){ console.log("chain not yet supported for", tmp, '...', msg, cat); return; }
-						gun = cat.root.$.get(soul);
-						return setTimeout.each(Object.keys(tmp).sort(), function(k){ // TODO: .keys( is slow // BUG? ?Some re-in logic may depend on this being sync?
-							if('_' == k || u === (state = state_is(tmp, k))){ return }
-							cat.on('in', {$: gun, put: {'#': soul, '.': k, '=': tmp[k], '>': state}, VIA: msg});
-						});
-					}
-					cat.on('in', {$: at.back.$, put: {'#': soul = at.back.soul, '.': key = at.has || at.get, '=': tmp, '>': state_is(at.back.put, key)}, via: msg}); // TODO: This could be buggy! It assumes/approxes data, other stuff could have corrupted it.
-					return;
-				}
-				if((msg.seen||'')[cat.id]){ return } (msg.seen || (msg.seen = function(){}))[cat.id] = cat; // help stop some infinite loops
-
-				if(cat !== at){ // don't worry about this when first understanding the code, it handles changing contexts on a message. A soul chain will never have a different context.
-					Object.keys(msg).forEach(function(k){ tmp[k] = msg[k]; }, tmp = {}); // make copy of message
-					tmp.get = cat.get || tmp.get;
-					if(!cat.soul && !cat.has){ // if we do not recognize the chain type
-						tmp.$$$ = tmp.$$$ || cat.$; // make a reference to wherever it came from.
-					} else
-					if(at.soul){ // a has (property) chain will have a different context sometimes if it is linked (to a soul chain). Anything that is not a soul or has chain, will always have different contexts.
-						tmp.$ = cat.$;
-						tmp.$$ = tmp.$$ || at.$;
-					}
-					msg = tmp; // use the message with the new context instead;
-				}
-				unlink(msg, cat);
-
-				if(((cat.soul/* && (cat.ask||'')['']*/) || msg.$$) && state >= state_is(root.graph[soul], key)){ // The root has an in-memory cache of the graph, but if our peer has asked for the data then we want a per deduplicated chain copy of the data that might have local edits on it.
-					(tmp = root.$.get(soul)._).put = state_ify(tmp.put, key, state, change, soul);
-				}
-				if(!at.soul /*&& (at.ask||'')['']*/ && state >= state_is(root.graph[soul], key) && (sat = (root.$.get(soul)._.next||'')[key])){ // Same as above here, but for other types of chains. // TODO: Improve perf by preventing echoes recaching.
-					sat.put = change; // update cache
-					if('string' == typeof (tmp = valid(change))){
-						sat.put = root.$.get(tmp)._.put || change; // share same cache as what we're linked to.
-					}
-				}
-
-				this.to && this.to.next(msg); // 1st API job is to call all chain listeners.
-				// TODO: Make input more reusable by only doing these (some?) calls if we are a chain we recognize? This means each input listener would be responsible for when listeners need to be called, which makes sense, as they might want to filter.
-				cat.any && setTimeout.each(Object.keys(cat.any), function(any){ (any = cat.any[any]) && any(msg); },0,99); // 1st API job is to call all chain listeners. // TODO: .keys( is slow // BUG: Some re-in logic may depend on this being sync.
-				cat.echo && setTimeout.each(Object.keys(cat.echo), function(lat){ (lat = cat.echo[lat]) && lat.on('in', msg); },0,99); // & linked at chains // TODO: .keys( is slow // BUG: Some re-in logic may depend on this being sync.
-
-				if(((msg.$$||'')._||at).soul){ // comments are linear, but this line of code is non-linear, so if I were to comment what it does, you'd have to read 42 other comments first... but you can't read any of those comments until you first read this comment. What!? // shouldn't this match link's check?
-					// is there cases where it is a $$ that we do NOT want to do the following? 
-					if((sat = cat.next) && (sat = sat[key])){ // TODO: possible trick? Maybe have `ionmap` code set a sat? // TODO: Maybe we should do `cat.ask` instead? I guess does not matter.
-						tmp = {}; Object.keys(msg).forEach(function(k){ tmp[k] = msg[k]; });
-						tmp.$ = (msg.$$||msg.$).get(tmp.get = key); delete tmp.$$; delete tmp.$$$;
-						sat.on('in', tmp);
-					}
-				}
-
-				link(msg, cat);
-			} Gun.on.in = input;
-
-			function link(msg, cat){ cat = cat || this.as || msg.$._;
-				if(msg.$$ && this !== Gun.on){ return } // $$ means we came from a link, so we are at the wrong level, thus ignore it unless overruled manually by being called directly.
-				if(!msg.put || cat.soul){ return } // But you cannot overrule being linked to nothing, or trying to link a soul chain - that must never happen.
-				var put = msg.put||'', link = put['=']||put[':'], tmp;
-				var root = cat.root, tat = root.$.get(put['#']).get(put['.'])._;
-				if('string' != typeof (link = valid(link))){
-					if(this === Gun.on){ (tat.echo || (tat.echo = {}))[cat.id] = cat; } // allow some chain to explicitly force linking to simple data.
-					return; // by default do not link to data that is not a link.
-				}
-				if((tat.echo || (tat.echo = {}))[cat.id] // we've already linked ourselves so we do not need to do it again. Except... (annoying implementation details)
-					&& !(root.pass||'')[cat.id]){ return } // if a new event listener was added, we need to make a pass through for it. The pass will be on the chain, not always the chain passed down. 
-				if(tmp = root.pass){ if(tmp[link+cat.id]){ return } tmp[link+cat.id] = 1; } // But the above edge case may "pass through" on a circular graph causing infinite passes, so we hackily add a temporary check for that.
-
-				(tat.echo||(tat.echo={}))[cat.id] = cat; // set ourself up for the echo! // TODO: BUG? Echo to self no longer causes problems? Confirm.
-
-				if(cat.has){ cat.link = link; }
-				var sat = root.$.get(tat.link = link)._; // grab what we're linking to.
-				(sat.echo || (sat.echo = {}))[tat.id] = tat; // link it.
-				var tmp = cat.ask||''; // ask the chain for what needs to be loaded next!
-				if(tmp[''] || cat.lex){ // we might need to load the whole thing // TODO: cat.lex probably has edge case bugs to it, need more test coverage.
-					sat.on('out', {get: {'#': link}});
-				}
-				setTimeout.each(Object.keys(tmp), function(get, sat){ // if sub chains are asking for data. // TODO: .keys( is slow // BUG? ?Some re-in logic may depend on this being sync?
-					if(!get || !(sat = tmp[get])){ return }
-					sat.on('out', {get: {'#': link, '.': get}}); // go get it.
-				},0,99);
-			} Gun.on.link = link;
-
-			function unlink(msg, cat){ // ugh, so much code for seemingly edge case behavior.
-				var put = msg.put||'', change = (u !== put['='])? put['='] : put[':'], root = cat.root, link, tmp;
-				if(u === change){ // 1st edge case: If we have a brand new database, no data will be found.
-					// TODO: BUG! because emptying cache could be async from below, make sure we are not emptying a newer cache. So maybe pass an Async ID to check against?
-					// TODO: BUG! What if this is a map? // Warning! Clearing things out needs to be robust against sync/async ops, or else you'll see `map val get put` test catastrophically fail because map attempts to link when parent graph is streamed before child value gets set. Need to differentiate between lack acks and force clearing.
-					if(cat.soul && u !== cat.put){ return } // data may not be found on a soul, but if a soul already has data, then nothing can clear the soul as a whole.
-					//if(!cat.has){ return }
-					tmp = (msg.$$||msg.$||'')._||'';
-					if(msg['@'] && (u !== tmp.put || u !== cat.put)){ return } // a "not found" from other peers should not clear out data if we have already found it.
-					//if(cat.has && u === cat.put && !(root.pass||'')[cat.id]){ return } // if we are already unlinked, do not call again, unless edge case. // TODO: BUG! This line should be deleted for "unlink deeply nested".
-					if(link = cat.link || msg.linked){
-						delete (root.$.get(link)._.echo||'')[cat.id];
-					}
-					if(cat.has){ // TODO: Empty out links, maps, echos, acks/asks, etc.?
-						cat.link = null;
-					}
-					cat.put = u; // empty out the cache if, for example, alice's car's color no longer exists (relative to alice) if alice no longer has a car.
-					// TODO: BUG! For maps, proxy this so the individual sub is triggered, not all subs.
-					setTimeout.each(Object.keys(cat.next||''), function(get, sat){ // empty out all sub chains. // TODO: .keys( is slow // BUG? ?Some re-in logic may depend on this being sync? // TODO: BUG? This will trigger deeper put first, does put logic depend on nested order? // TODO: BUG! For map, this needs to be the isolated child, not all of them.
-						if(!(sat = cat.next[get])){ return }
-						//if(cat.has && u === sat.put && !(root.pass||'')[sat.id]){ return } // if we are already unlinked, do not call again, unless edge case. // TODO: BUG! This line should be deleted for "unlink deeply nested".
-						if(link){ delete (root.$.get(link).get(get)._.echo||'')[sat.id]; }
-						sat.on('in', {get: get, put: u, $: sat.$}); // TODO: BUG? Add recursive seen check?
-					},0,99);
-					return;
-				}
-				if(cat.soul){ return } // a soul cannot unlink itself.
-				if(msg.$$){ return } // a linked chain does not do the unlinking, the sub chain does. // TODO: BUG? Will this cancel maps?
-				link = valid(change); // need to unlink anytime we are not the same link, though only do this once per unlink (and not on init).
-				tmp = msg.$._||'';
-				if(link === tmp.link || (cat.has && !tmp.link)){
-					if((root.pass||'')[cat.id] && 'string' !== typeof link); else {
-						return;
-					}
-				}
-				delete (tmp.echo||'')[cat.id];
-				unlink({get: cat.get, put: u, $: msg.$, linked: msg.linked = msg.linked || tmp.link}, cat); // unlink our sub chains.
-			} Gun.on.unlink = unlink;
-
-			function ack(msg, ev){
-				//if(!msg['%'] && (this||'').off){ this.off() } // do NOT memory leak, turn off listeners! Now handled by .ask itself
-				// manhattan:
-				var as = this.as, at = as.$._, root = at.root, get = as.get||'', tmp = (msg.put||'')[get['#']]||'';
-				if(!msg.put || ('string' == typeof get['.'] && u === tmp[get['.']])){
-					if(u !== at.put){ return }
-					if(!at.soul && !at.has){ return } // TODO: BUG? For now, only core-chains will handle not-founds, because bugs creep in if non-core chains are used as $ but we can revisit this later for more powerful extensions.
-					at.ack = (at.ack || 0) + 1;
-					at.on('in', {
-						get: at.get,
-						put: at.put = u,
-						$: at.$,
-						'@': msg['@']
-					});
-					/*(tmp = at.Q) && setTimeout.each(Object.keys(tmp), function(id){ // TODO: Temporary testing, not integrated or being used, probably delete.
-						Object.keys(msg).forEach(function(k){ tmp[k] = msg[k] }, tmp = {}); tmp['@'] = id; // copy message
-						root.on('in', tmp);
-					}); delete at.Q;*/
-					return;
-				}
-				(msg._||{}).miss = 1;
-				Gun.on.put(msg);
-				return; // eom
-			}
-
-			var empty = {}, u, text_rand = String.random, valid = Gun.valid, obj_has = function(o, k){ return o && Object.prototype.hasOwnProperty.call(o, k) }, state = Gun.state, state_is = state.is, state_ify = state.ify;
-		})(USE, './chain');
-	USE(function(module){
-			var Gun = USE('./root');
-			Gun.chain.get = function(key, cb, as){
-				var gun, tmp;
-				if(typeof key === 'string'){
-					if(key.length == 0) {	
-						(gun = this.chain())._.err = {err: Gun.log('0 length key!', key)};
-						if(cb){ cb.call(gun, gun._.err); }
-						return gun;
-					}
-					var back = this, cat = back._;
-					var next = cat.next || empty;
-					if(!(gun = next[key])){
-						gun = key && cache(key, back);
-					}
-					gun = gun && gun.$;
-				} else
-				if('function' == typeof key){
-					if(true === cb){ return soul(this, key, cb, as), this }
-					gun = this;
-					var cat = gun._, opt = cb || {}, root = cat.root, id;
-					opt.at = cat;
-					opt.ok = key;
-					var wait = {}; // can we assign this to the at instead, like in once?
-					//var path = []; cat.$.back(at => { at.get && path.push(at.get.slice(0,9))}); path = path.reverse().join('.');
-					function any(msg, eve, f){
-						if(any.stun){ return }
-						if((tmp = root.pass) && !tmp[id]){ return }
-						var at = msg.$._, sat = (msg.$$||'')._, data = (sat||at).put, odd = (!at.has && !at.soul), test = {}, link, tmp;
-						if(odd || u === data){ // handles non-core
-							data = (u === ((tmp = msg.put)||'')['='])? (u === (tmp||'')[':'])? tmp : tmp[':'] : tmp['='];
-						}
-						if(link = ('string' == typeof (tmp = Gun.valid(data)))){
-							data = (u === (tmp = root.$.get(tmp)._.put))? opt.not? u : data : tmp;
-						}
-						if(opt.not && u === data){ return }
-						if(u === opt.stun){
-							if((tmp = root.stun) && tmp.on){
-								cat.$.back(function(a){ // our chain stunned?
-									tmp.on(''+a.id, test = {});
-									if((test.run || 0) < any.id){ return test } // if there is an earlier stun on gapless parents/self.
-								});
-								!test.run && tmp.on(''+at.id, test = {}); // this node stunned?
-								!test.run && sat && tmp.on(''+sat.id, test = {}); // linked node stunned?
-								if(any.id > test.run){
-									if(!test.stun || test.stun.end){
-										test.stun = tmp.on('stun');
-										test.stun = test.stun && test.stun.last;
-									}
-									if(test.stun && !test.stun.end){
-										//if(odd && u === data){ return }
-										//if(u === msg.put){ return } // "not found" acks will be found if there is stun, so ignore these.
-										(test.stun.add || (test.stun.add = {}))[id] = function(){ any(msg,eve,1); }; // add ourself to the stun callback list that is called at end of the write.
-										return;
-									}
-								}
-							}
-							if(/*odd &&*/ u === data){ f = 0; } // if data not found, keep waiting/trying.
-							/*if(f && u === data){
-								cat.on('out', opt.out);
-								return;
-							}*/
-							if((tmp = root.hatch) && !tmp.end && u === opt.hatch && !f){ // quick hack! // What's going on here? Because data is streamed, we get things one by one, but a lot of developers would rather get a callback after each batch instead, so this does that by creating a wait list per chain id that is then called at the end of the batch by the hatch code in the root put listener.
-								if(wait[at.$._.id]){ return } wait[at.$._.id] = 1;
-								tmp.push(function(){any(msg,eve,1);});
-								return;
-							} wait = {}; // end quick hack.
-						}
-						// call:
-						if(root.pass){ if(root.pass[id+at.id]){ return } root.pass[id+at.id] = 1; }
-						if(opt.on){ opt.ok.call(at.$, data, at.get, msg, eve || any); return } // TODO: Also consider breaking `this` since a lot of people do `=>` these days and `.call(` has slower performance.
-						if(opt.v2020){ opt.ok(msg, eve || any); return }
-						Object.keys(msg).forEach(function(k){ tmp[k] = msg[k]; }, tmp = {}); msg = tmp; msg.put = data; // 2019 COMPATIBILITY! TODO: GET RID OF THIS!
-						opt.ok.call(opt.as, msg, eve || any); // is this the right
-					}				any.at = cat;
-					//(cat.any||(cat.any=function(msg){ setTimeout.each(Object.keys(cat.any||''), function(act){ (act = cat.any[act]) && act(msg) },0,99) }))[id = String.random(7)] = any; // maybe switch to this in future?
-					(cat.any||(cat.any={}))[id = String.random(7)] = any;
-					any.off = function(){ any.stun = 1; if(!cat.any){ return } delete cat.any[id]; };
-					any.rid = rid; // logic from old version, can we clean it up now?
-					any.id = opt.run || ++root.once; // used in callback to check if we are earlier than a write. // will this ever cause an integer overflow?
-					tmp = root.pass; (root.pass = {})[id] = 1; // Explanation: test trade-offs want to prevent recursion so we add/remove pass flag as it gets fulfilled to not repeat, however map map needs many pass flags - how do we reconcile?
-					opt.out = opt.out || {get: {}};
-					cat.on('out', opt.out);
-					root.pass = tmp;
-					return gun;
-				} else
-				if('number' == typeof key){
-					return this.get(''+key, cb, as);
-				} else
-				if('string' == typeof (tmp = valid(key))){
-					return this.get(tmp, cb, as);
-				} else
-				if(tmp = this.get.next){
-					gun = tmp(this, key);
-				}
-				if(!gun){
-					(gun = this.chain())._.err = {err: Gun.log('Invalid get request!', key)}; // CLEAN UP
-					if(cb){ cb.call(gun, gun._.err); }
-					return gun;
-				}
-				if(cb && 'function' == typeof cb){
-					gun.get(cb, as);
-				}
-				return gun;
-			};
-			function cache(key, back){
-				var cat = back._, next = cat.next, gun = back.chain(), at = gun._;
-				if(!next){ next = cat.next = {}; }
-				next[at.get = key] = at;
-				if(back === cat.root.$){
-					at.soul = key;
-				} else
-				if(cat.soul || cat.has){
-					at.has = key;
-					//if(obj_has(cat.put, key)){
-						//at.put = cat.put[key];
-					//}
-				}
-				return at;
-			}
-			function soul(gun, cb, opt, as){
-				var cat = gun._, acks = 0, tmp;
-				if(tmp = cat.soul || cat.link){ return cb(tmp, as, cat) }
-				if(cat.jam){ return cat.jam.push([cb, as]) }
-				cat.jam = [[cb,as]];
-				gun.get(function go(msg, eve){
-					if(u === msg.put && !cat.root.opt.super && (tmp = Object.keys(cat.root.opt.peers).length) && ++acks <= tmp){ // TODO: super should not be in core code, bring AXE up into core instead to fix? // TODO: .keys( is slow
-						return;
-					}
-					eve.rid(msg);
-					var at = ((at = msg.$) && at._) || {}, i = 0, as;
-					tmp = cat.jam; delete cat.jam; // tmp = cat.jam.splice(0, 100);
-					//if(tmp.length){ process.nextTick(function(){ go(msg, eve) }) }
-					while(as = tmp[i++]){ //Gun.obj.map(tmp, function(as, cb){
-						var cb = as[0], id; as = as[1];
-						cb && cb(id = at.link || at.soul || Gun.valid(msg.put) || ((msg.put||{})._||{})['#'], as, msg, eve);
-					} //);
-				}, {out: {get: {'.':true}}});
-				return gun;
-			}
-			function rid(at){
-				var cat = this.at || this.on;
-				if(!at || cat.soul || cat.has){ return this.off() }
-				if(!(at = (at = (at = at.$ || at)._ || at).id)){ return }
-				var map = cat.map, tmp, seen;
-				//if(!map || !(tmp = map[at]) || !(tmp = tmp.at)){ return }
-				if(tmp = (seen = this.seen || (this.seen = {}))[at]){ return true }
-				seen[at] = true;
-				return;
-				//tmp.echo[cat.id] = {}; // TODO: Warning: This unsubscribes ALL of this chain's listeners from this link, not just the one callback event.
-				//obj.del(map, at); // TODO: Warning: This unsubscribes ALL of this chain's listeners from this link, not just the one callback event.
-				return;
-			}
-			var empty = {}, valid = Gun.valid, u;
-		})(USE, './get');
-	USE(function(module){
-			var Gun = USE('./root');
-			Gun.chain.put = function(data, cb, as){ // I rewrote it :)
-				var gun = this, at = gun._, root = at.root;
-				as = as || {};
-				as.root = at.root;
-				as.run || (as.run = root.once);
-				stun(as, at.id); // set a flag for reads to check if this chain is writing.
-				as.ack = as.ack || cb;
-				as.via = as.via || gun;
-				as.data = as.data || data;
-				as.soul || (as.soul = at.soul || ('string' == typeof cb && cb));
-				var s = as.state = as.state || Gun.state();
-				if('function' == typeof data){ data(function(d){ as.data = d; gun.put(u,u,as); }); return gun }
-				if(!as.soul){ return get(as), gun }
-				as.$ = root.$.get(as.soul); // TODO: This may not allow user chaining and similar?
-				as.todo = [{it: as.data, ref: as.$}];
-				as.turn = as.turn || turn;
-				as.ran = as.ran || ran;
-				//var path = []; as.via.back(at => { at.get && path.push(at.get.slice(0,9)) }); path = path.reverse().join('.');
-				// TODO: Perf! We only need to stun chains that are being modified, not necessarily written to.
-				(function walk(){
-					var to = as.todo, at = to.pop(), d = at.it, cid = at.ref && at.ref._.id, v, k, cat, tmp, g;
-					stun(as, at.ref);
-					if(tmp = at.todo){
-						k = tmp.pop(); d = d[k];
-						if(tmp.length){ to.push(at); }
-					}
-					k && (to.path || (to.path = [])).push(k);
-					if(!(v = valid(d)) && !(g = Gun.is(d))){
-						if(!Object.plain(d)){ ran.err(as, "Invalid data: "+ check(d) +" at " + (as.via.back(function(at){at.get && tmp.push(at.get);}, tmp = []) || tmp.join('.'))+'.'+(to.path||[]).join('.')); return }
-						var seen = as.seen || (as.seen = []), i = seen.length;
-						while(i--){ if(d === (tmp = seen[i]).it){ v = d = tmp.link; break } }
-					}
-					if(k && v){ at.node = state_ify(at.node, k, s, d); } // handle soul later.
-					else {
-						if(!as.seen){ ran.err(as, "Data at root of graph must be a node (an object)."); return }
-						as.seen.push(cat = {it: d, link: {}, todo: g? [] : Object.keys(d).sort().reverse(), path: (to.path||[]).slice(), up: at}); // Any perf reasons to CPU schedule this .keys( ?
-						at.node = state_ify(at.node, k, s, cat.link);
-						!g && cat.todo.length && to.push(cat);
-						// ---------------
-						var id = as.seen.length;
-						(as.wait || (as.wait = {}))[id] = '';
-						tmp = (cat.ref = (g? d : k? at.ref.get(k) : at.ref))._;
-						(tmp = (d && (d._||'')['#']) || tmp.soul || tmp.link)? resolve({soul: tmp}) : cat.ref.get(resolve, {run: as.run, /*hatch: 0,*/ v2020:1, out:{get:{'.':' '}}}); // TODO: BUG! This should be resolve ONLY soul to prevent full data from being loaded. // Fixed now?
-						//setTimeout(function(){ if(F){ return } console.log("I HAVE NOT BEEN CALLED!", path, id, cat.ref._.id, k) }, 9000); var F; // MAKE SURE TO ADD F = 1 below!
-						function resolve(msg, eve){
-							var end = cat.link['#'];
-							if(eve){ eve.off(); eve.rid(msg); } // TODO: Too early! Check all peers ack not found.
-							// TODO: BUG maybe? Make sure this does not pick up a link change wipe, that it uses the changign link instead.
-							var soul = end || msg.soul || (tmp = (msg.$$||msg.$)._||'').soul || tmp.link || ((tmp = tmp.put||'')._||'')['#'] || tmp['#'] || (((tmp = msg.put||'') && msg.$$)? tmp['#'] : (tmp['=']||tmp[':']||'')['#']);
-							!end && stun(as, msg.$);
-							if(!soul && !at.link['#']){ // check soul link above us
-								(at.wait || (at.wait = [])).push(function(){ resolve(msg, eve); }); // wait
-								return;
-							}
-							if(!soul){
-								soul = [];
-								(msg.$$||msg.$).back(function(at){
-									if(tmp = at.soul || at.link){ return soul.push(tmp) }
-									soul.push(at.get);
-								});
-								soul = soul.reverse().join('/');
-							}
-							cat.link['#'] = soul;
-							!g && (((as.graph || (as.graph = {}))[soul] = (cat.node || (cat.node = {_:{}})))._['#'] = soul);
-							delete as.wait[id];
-							cat.wait && setTimeout.each(cat.wait, function(cb){ cb && cb(); });
-							as.ran(as);
-						}					// ---------------
-					}
-					if(!to.length){ return as.ran(as) }
-					as.turn(walk);
-				}());
-				return gun;
-			};
-
-			function stun(as, id){
-				if(!id){ return } id = (id._||'').id||id;
-				var run = as.root.stun || (as.root.stun = {on: Gun.on}), test = {}, tmp;
-				as.stun || (as.stun = run.on('stun', function(){ }));
-				if(tmp = run.on(''+id)){ tmp.the.last.next(test); }
-				if(test.run >= as.run){ return }
-				run.on(''+id, function(test){
-					if(as.stun.end){
-						this.off();
-						this.to.next(test);
-						return;
-					}
-					test.run = test.run || as.run;
-					test.stun = test.stun || as.stun; return;
-					if(this.to.to){
-						this.the.last.next(test);
-						return;
-					}
-					test.stun = as.stun;
-				});
-			}
-
-			function ran(as){
-				if(as.err){ ran.end(as.stun, as.root); return } // move log handle here.
-				if(as.todo.length || as.end || !Object.empty(as.wait)){ return } as.end = 1;
-				//(as.retry = function(){ as.acks = 0;
-				var cat = (as.$.back(-1)._), root = cat.root, ask = cat.ask(function(ack){
-					root.on('ack', ack);
-					if(ack.err && !ack.lack){ Gun.log(ack); }
-					if(++acks > (as.acks || 0)){ this.off(); } // Adjustable ACKs! Only 1 by default.
-					if(!as.ack){ return }
-					as.ack(ack, this);
-				}, as.opt), acks = 0, stun = as.stun, tmp;
-				(tmp = function(){ // this is not official yet, but quick solution to hack in for now.
-					if(!stun){ return }
-					ran.end(stun, root);
-					setTimeout.each(Object.keys(stun = stun.add||''), function(cb){ if(cb = stun[cb]){cb();} }); // resume the stunned reads // Any perf reasons to CPU schedule this .keys( ?
-				}).hatch = tmp; // this is not official yet ^
-				//console.log(1, "PUT", as.run, as.graph);
-				if(as.ack && !as.ok){ as.ok = as.acks || 9; } // TODO: In future! Remove this! This is just old API support.
-				(as.via._).on('out', {put: as.out = as.graph, ok: as.ok && {'@': as.ok+1}, opt: as.opt, '#': ask, _: tmp});
-				//})();
-			} ran.end = function(stun,root){
-				stun.end = noop; // like with the earlier id, cheaper to make this flag a function so below callbacks do not have to do an extra type check.
-				if(stun.the.to === stun && stun === stun.the.last){ delete root.stun; }
-				stun.off();
-			}; ran.err = function(as, err){
-				(as.ack||noop).call(as, as.out = { err: as.err = Gun.log(err) });
-				as.ran(as);
-			};
-
-			function get(as){
-				var at = as.via._, tmp;
-				as.via = as.via.back(function(at){
-					if(at.soul || !at.get){ return at.$ }
-					tmp = as.data; (as.data = {})[at.get] = tmp;
-				});
-				if(!as.via || !as.via._.soul){
-					as.via = at.root.$.get(((as.data||'')._||'')['#'] || at.$.back('opt.uuid')());
-				}
-				as.via.put(as.data, as.ack, as);
-				
-
-				return;
-				if(at.get && at.back.soul){
-					tmp = as.data;
-					as.via = at.back.$;
-					(as.data = {})[at.get] = tmp; 
-					as.via.put(as.data, as.ack, as);
-					return;
-				}
-			}
-			function check(d, tmp){ return ((d && (tmp = d.constructor) && tmp.name) || typeof d) }
-
-			var u, noop = function(){}, turn = setTimeout.turn, valid = Gun.valid, state_ify = Gun.state.ify;
-		})(USE, './put');
-	USE(function(module){
-			var Gun = USE('./root');
-			USE('./chain');
-			USE('./back');
-			USE('./put');
-			USE('./get');
-			module.exports = Gun;
-		})(USE, './index');
-	USE(function(module){
-			var Gun = USE('./index');
-			Gun.chain.on = function(tag, arg, eas, as){ // don't rewrite!
-				var gun = this, cat = gun._, root = cat.root, act;
-				if(typeof tag === 'string'){
-					if(!arg){ return cat.on(tag) }
-					act = cat.on(tag, arg, eas || cat, as);
-					if(eas && eas.$){
-						(eas.subs || (eas.subs = [])).push(act);
-					}
-					return gun;
-				}
-				var opt = arg;
-				(opt = (true === opt)? {change: true} : opt || {}).not = 1; opt.on = 1;
-				gun.get(tag, opt);
-				/*gun.get(function on(data,key,msg,eve){ var $ = this;
-					if(tmp = root.hatch){ // quick hack!
-						if(wait[$._.id]){ return } wait[$._.id] = 1;
-						tmp.push(function(){on.call($, data,key,msg,eve)});
-						return;
-					}; wait = {}; // end quick hack.
-					tag.call($, data,key,msg,eve);
-				}, opt); // TODO: PERF! Event listener leak!!!?*/
-				/*
-				function one(msg, eve){
-					if(one.stun){ return }
-					var at = msg.$._, data = at.put, tmp;
-					if(tmp = at.link){ data = root.$.get(tmp)._.put }
-					if(opt.not===u && u === data){ return }
-					if(opt.stun===u && (tmp = root.stun) && (tmp = tmp[at.id] || tmp[at.back.id]) && !tmp.end){ // Remember! If you port this into `.get(cb` make sure you allow stun:0 skip option for `.put(`.
-						tmp[id] = function(){one(msg,eve)};
-						return;
-					}
-					//tmp = one.wait || (one.wait = {}); console.log(tmp[at.id] === ''); if(tmp[at.id] !== ''){ tmp[at.id] = tmp[at.id] || setTimeout(function(){tmp[at.id]='';one(msg,eve)},1); return } delete tmp[at.id];
-					// call:
-					if(opt.as){
-						opt.ok.call(opt.as, msg, eve || one);
-					} else {
-						opt.ok.call(at.$, data, msg.get || at.get, msg, eve || one);
-					}
-				};
-				one.at = cat;
-				(cat.act||(cat.act={}))[id = String.random(7)] = one;
-				one.off = function(){ one.stun = 1; if(!cat.act){ return } delete cat.act[id] }
-				cat.on('out', {get: {}});*/
-				return gun;
-			};
-			// Rules:
-			// 1. If cached, should be fast, but not read while write.
-			// 2. Should not retrigger other listeners, should get triggered even if nothing found.
-			// 3. If the same callback passed to many different once chains, each should resolve - an unsubscribe from the same callback should not effect the state of the other resolving chains, if you do want to cancel them all early you should mutate the callback itself with a flag & check for it at top of callback
-			Gun.chain.once = function(cb, opt){ opt = opt || {}; // avoid rewriting
-				if(!cb){ return none(this,opt) }
-				var gun = this, cat = gun._, root = cat.root, data = cat.put, id = String.random(7), tmp;
-				gun.get(function(data,key,msg,eve){
-					var $ = this, at = $._, one = (at.one||(at.one={}));
-					if(eve.stun){ return } if('' === one[id]){ return }
-					if(true === (tmp = Gun.valid(data))){ once(); return }
-					if('string' == typeof tmp){ return } // TODO: BUG? Will this always load?
-					clearTimeout((cat.one||'')[id]); // clear "not found" since they only get set on cat.
-					clearTimeout(one[id]); one[id] = setTimeout(once, opt.wait||99); // TODO: Bug? This doesn't handle plural chains.
-					function once(f){
-						if(!at.has && !at.soul){ at = {put: data, get: key}; } // handles non-core messages.
-						if(u === (tmp = at.put)){ tmp = ((msg.$$||'')._||'').put; }
-						if('string' == typeof Gun.valid(tmp)){
-							tmp = root.$.get(tmp)._.put;
-							if(tmp === u && !f){
-								one[id] = setTimeout(function(){ once(1); }, opt.wait||99); // TODO: Quick fix. Maybe use ack count for more predictable control?
-								return
-							}
-						}
-						//console.log("AND VANISHED", data);
-						if(eve.stun){ return } if('' === one[id]){ return } one[id] = '';
-						if(cat.soul || cat.has){ eve.off(); } // TODO: Plural chains? // else { ?.off() } // better than one check?
-						cb.call($, tmp, at.get);
-						clearTimeout(one[id]); // clear "not found" since they only get set on cat. // TODO: This was hackily added, is it necessary or important? Probably not, in future try removing this. Was added just as a safety for the `&& !f` check.
-					}			}, {on: 1});
-				return gun;
-			};
-			function none(gun,opt,chain){
-				Gun.log.once("valonce", "Chainable val is experimental, its behavior and API may change moving forward. Please play with it and report bugs and ideas on how to improve it.");
-				(chain = gun.chain())._.nix = gun.once(function(data, key){ chain._.on('in', this._); });
-				chain._.lex = gun._.lex; // TODO: Better approach in future? This is quick for now.
-				return chain;
-			}
-
-			Gun.chain.off = function(){
-				// make off more aggressive. Warning, it might backfire!
-				var gun = this, at = gun._, tmp;
-				var cat = at.back;
-				if(!cat){ return }
-				at.ack = 0; // so can resubscribe.
-				if(tmp = cat.next){
-					if(tmp[at.get]){
-						delete tmp[at.get];
-					}
-				}
-				// TODO: delete cat.one[map.id]?
-				if(tmp = cat.ask){
-					delete tmp[at.get];
-				}
-				if(tmp = cat.put){
-					delete tmp[at.get];
-				}
-				if(tmp = at.soul){
-					delete cat.root.graph[tmp];
-				}
-				if(tmp = at.map){
-					Object.keys(tmp).forEach(function(i,at){ at = tmp[i]; //obj_map(tmp, function(at){
-						if(at.link){
-							cat.root.$.get(at.link).off();
-						}
-					});
-				}
-				if(tmp = at.next){
-					Object.keys(tmp).forEach(function(i,neat){ neat = tmp[i]; //obj_map(tmp, function(neat){
-						neat.$.off();
-					});
-				}
-				at.on('off', {});
-				return gun;
-			};
-			var u;
-		})(USE, './on');
-	USE(function(module){
-			var Gun = USE('./index'), next = Gun.chain.get.next;
-			Gun.chain.get.next = function(gun, lex){ var tmp;
-				if(!Object.plain(lex)){ return (next||noop)(gun, lex) }
-				if(tmp = ((tmp = lex['#'])||'')['='] || tmp){ return gun.get(tmp) }
-				(tmp = gun.chain()._).lex = lex; // LEX!
-				gun.on('in', function(eve){
-					if(String.match(eve.get|| (eve.put||'')['.'], lex['.'] || lex['#'] || lex)){
-						tmp.on('in', eve);
-					}
-					this.to.next(eve);
-				});
-				return tmp.$;
-			};
-			Gun.chain.map = function(cb, opt, t){
-				var gun = this, cat = gun._, lex, chain;
-				if(Object.plain(cb)){ lex = cb['.']? cb : {'.': cb}; cb = u; }
-				if(!cb){
-					if(chain = cat.each){ return chain }
-					(cat.each = chain = gun.chain())._.lex = lex || chain._.lex || cat.lex;
-					chain._.nix = gun.back('nix');
-					gun.on('in', map, chain._);
-					return chain;
-				}
-				Gun.log.once("mapfn", "Map functions are experimental, their behavior and API may change moving forward. Please play with it and report bugs and ideas on how to improve it.");
-				chain = gun.chain();
-				gun.map().on(function(data, key, msg, eve){
-					var next = (cb||noop).call(this, data, key, msg, eve);
-					if(u === next){ return }
-					if(data === next){ return chain._.on('in', msg) }
-					if(Gun.is(next)){ return chain._.on('in', next._) }
-					var tmp = {}; Object.keys(msg.put).forEach(function(k){ tmp[k] = msg.put[k]; }, tmp); tmp['='] = next; 
-					chain._.on('in', {get: key, put: tmp});
-				});
-				return chain;
-			};
-			function map(msg){ this.to.next(msg);
-				var cat = this.as, gun = msg.$, at = gun._, put = msg.put, tmp;
-				if(!at.soul && !msg.$$){ return } // this line took hundreds of tries to figure out. It only works if core checks to filter out above chains during link tho. This says "only bother to map on a node" for this layer of the chain. If something is not a node, map should not work.
-				if((tmp = cat.lex) && !String.match(msg.get|| (put||'')['.'], tmp['.'] || tmp['#'] || tmp)){ return }
-				Gun.on.link(msg, cat);
-			}
-			var noop = function(){}, u;
-		})(USE, './map');
-	USE(function(module){
-			var Gun = USE('./index');
-			Gun.chain.set = function(item, cb, opt){
-				var gun = this, root = gun.back(-1), soul, tmp;
-				cb = cb || function(){};
-				opt = opt || {}; opt.item = opt.item || item;
-				if(soul = ((item||'')._||'')['#']){ (item = {})['#'] = soul; } // check if node, make link.
-				if('string' == typeof (tmp = Gun.valid(item))){ return gun.get(soul = tmp).put(item, cb, opt) } // check if link
-				if(!Gun.is(item)){
-					if(Object.plain(item)){
-						item = root.get(soul = gun.back('opt.uuid')()).put(item);
-					}
-					return gun.get(soul || root.back('opt.uuid')(7)).put(item, cb, opt);
-				}
-				gun.put(function(go){
-					item.get(function(soul, o, msg){ // TODO: BUG! We no longer have this option? & go error not handled?
-						if(!soul){ return cb.call(gun, {err: Gun.log('Only a node can be linked! Not "' + msg.put + '"!')}) }
-						(tmp = {})[soul] = {'#': soul}; go(tmp);
-					},true);
-				});
-				return item;
-			};
-		})(USE, './set');
-	USE(function(module){
-			USE('./shim');
-
-			var noop = function(){};
-			var parse = JSON.parseAsync || function(t,cb,r){ var u, d = +new Date; try{ cb(u, JSON.parse(t,r), json.sucks(+new Date - d)); }catch(e){ cb(e); } };
-			var json = JSON.stringifyAsync || function(v,cb,r,s){ var u, d = +new Date; try{ cb(u, JSON.stringify(v,r,s), json.sucks(+new Date - d)); }catch(e){ cb(e); } };
-			json.sucks = function(d){ if(d > 99){ console.log("Warning: JSON blocking CPU detected. Add `gun/lib/yson.js` to fix."); json.sucks = noop; } };
-
-			function Mesh(root){
-				var mesh = function(){};
-				var opt = root.opt || {};
-				opt.log = opt.log || console.log;
-				opt.gap = opt.gap || opt.wait || 0;
-				opt.max = opt.max || (opt.memory? (opt.memory * 999 * 999) : 300000000) * 0.3;
-				opt.pack = opt.pack || (opt.max * 0.01 * 0.01);
-				opt.puff = opt.puff || 9; // IDEA: do a start/end benchmark, divide ops/result.
-				var puff = setTimeout.turn || setTimeout;
-
-				var dup = root.dup, dup_check = dup.check, dup_track = dup.track;
-
-				var hear = mesh.hear = function(raw, peer){
-					if(!raw){ return }
-					if(opt.max <= raw.length){ return mesh.say({dam: '!', err: "Message too big!"}, peer) }
-					if(mesh === this){
-						/*if('string' == typeof raw){ try{
-							var stat = console.STAT || {};
-							//console.log('HEAR:', peer.id, (raw||'').slice(0,250), ((raw||'').length / 1024 / 1024).toFixed(4));
-							
-							//console.log(setTimeout.turn.s.length, 'stacks', parseFloat((-(LT - (LT = +new Date))/1000).toFixed(3)), 'sec', parseFloat(((LT-ST)/1000 / 60).toFixed(1)), 'up', stat.peers||0, 'peers', stat.has||0, 'has', stat.memhused||0, stat.memused||0, stat.memax||0, 'heap mem max');
-						}catch(e){ console.log('DBG err', e) }}*/
-						hear.d += raw.length||0 ; ++hear.c; } // STATS!
-					var S = peer.SH = +new Date;
-					var tmp = raw[0], msg;
-					//raw && raw.slice && console.log("hear:", ((peer.wire||'').headers||'').origin, raw.length, raw.slice && raw.slice(0,50)); //tc-iamunique-tc-package-ds1
-					if('[' === tmp){
-						parse(raw, function(err, msg){
-							if(err || !msg){ return mesh.say({dam: '!', err: "DAM JSON parse error."}, peer) }
-							console.STAT && console.STAT(+new Date, msg.length, '# on hear batch');
-							var P = opt.puff;
-							(function go(){
-								var S = +new Date;
-								var i = 0, m; while(i < P && (m = msg[i++])){ mesh.hear(m, peer); }
-								msg = msg.slice(i); // slicing after is faster than shifting during.
-								console.STAT && console.STAT(S, +new Date - S, 'hear loop');
-								flush(peer); // force send all synchronously batched acks.
-								if(!msg.length){ return }
-								puff(go, 0);
-							}());
-						});
-						raw = ''; // 
-						return;
-					}
-					if('{' === tmp || ((raw['#'] || Object.plain(raw)) && (msg = raw))){
-						if(msg){ return hear.one(msg, peer, S) }
-						parse(raw, function(err, msg){
-							if(err || !msg){ return mesh.say({dam: '!', err: "DAM JSON parse error."}, peer) }
-							hear.one(msg, peer, S);
-						});
-						return;
-					}
-				};
-				hear.one = function(msg, peer, S){ // S here is temporary! Undo.
-					var id, hash, tmp, ash, DBG;
-					if(msg.DBG){ msg.DBG = DBG = {DBG: msg.DBG}; }
-					DBG && (DBG.h = S);
-					DBG && (DBG.hp = +new Date);
-					if(!(id = msg['#'])){ id = msg['#'] = String.random(9); }
-					if(tmp = dup_check(id)){ return }
-					// DAM logic:
-					if(!(hash = msg['##']) && false && u !== msg.put); // disable hashing for now // TODO: impose warning/penalty instead (?)
-					if(hash && (tmp = msg['@'] || (msg.get && id)) && dup.check(ash = tmp+hash)){ return } // Imagine A <-> B <=> (C & D), C & D reply with same ACK but have different IDs, B can use hash to dedup. Or if a GET has a hash already, we shouldn't ACK if same.
-					(msg._ = function(){}).via = mesh.leap = peer;
-					if((tmp = msg['><']) && 'string' == typeof tmp){ tmp.slice(0,99).split(',').forEach(function(k){ this[k] = 1; }, (msg._).yo = {}); } // Peers already sent to, do not resend.
-					// DAM ^
-					if(tmp = msg.dam){
-						if(tmp = mesh.hear[tmp]){
-							tmp(msg, peer, root);
-						}
-						dup_track(id);
-						return;
-					}
-					if(tmp = msg.ok){ msg._.near = tmp['/']; }
-					var S = +new Date;
-					DBG && (DBG.is = S); peer.SI = id;
-					root.on('in', mesh.last = msg);
-					//ECHO = msg.put || ECHO; !(msg.ok !== -3740) && mesh.say({ok: -3740, put: ECHO, '@': msg['#']}, peer);
-					DBG && (DBG.hd = +new Date);
-					console.STAT && console.STAT(S, +new Date - S, msg.get? 'msg get' : msg.put? 'msg put' : 'msg');
-					(tmp = dup_track(id)).via = peer; // don't dedup message ID till after, cause GUN has internal dedup check.
-					if(msg.get){ tmp.it = msg; }
-					if(ash){ dup_track(ash); } //dup.track(tmp+hash, true).it = it(msg);
-					mesh.leap = mesh.last = null; // warning! mesh.leap could be buggy.
-				};
-				hear.c = hear.d = 0;
-	(function(){
-					var SMIA = 0;
-					var loop;
-					mesh.hash = function(msg, peer){ var h, s, t;
-						var S = +new Date;
-						json(msg.put, function hash(err, text){
-							var ss = (s || (s = t = text||'')).slice(0, 32768); // 1024 * 32
-						  h = String.hash(ss, h); s = s.slice(32768);
-						  if(s){ puff(hash, 0); return }
-							console.STAT && console.STAT(S, +new Date - S, 'say json+hash');
-						  msg._.$put = t;
-						  msg['##'] = h;
-						  mesh.say(msg, peer);
-						  delete msg._.$put;
-						}, sort);
-					};
-					function sort(k, v){ var tmp;
-						if(!(v instanceof Object)){ return v }
-						Object.keys(v).sort().forEach(sorta, {to: tmp = {}, on: v});
-						return tmp;
-					} function sorta(k){ this.to[k] = this.on[k]; }
-
-					var say = mesh.say = function(msg, peer){ var tmp;
-						if((tmp = this) && (tmp = tmp.to) && tmp.next){ tmp.next(msg); } // compatible with middleware adapters.
-						if(!msg){ return false }
-						var id, hash, raw, ack = msg['@'];
-	//if(opt.super && (!ack || !msg.put)){ return } // TODO: MANHATTAN STUB //OBVIOUSLY BUG! But squelch relay. // :( get only is 100%+ CPU usage :(
-						var meta = msg._||(msg._=function(){});
-						var DBG = msg.DBG, S = +new Date; meta.y = meta.y || S; if(!peer){ DBG && (DBG.y = S); }
-						if(!(id = msg['#'])){ id = msg['#'] = String.random(9); }
-						!loop && dup_track(id);//.it = it(msg); // track for 9 seconds, default. Earth<->Mars would need more! // always track, maybe move this to the 'after' logic if we split function.
-						//if(msg.put && (msg.err || (dup.s[id]||'').err)){ return false } // TODO: in theory we should not be able to stun a message, but for now going to check if it can help network performance preventing invalid data to relay.
-						if(!(hash = msg['##']) && u !== msg.put && !meta.via && ack){ mesh.hash(msg, peer); return } // TODO: Should broadcasts be hashed?
-						if(!peer && ack){ peer = ((tmp = dup.s[ack]) && (tmp.via || ((tmp = tmp.it) && (tmp = tmp._) && tmp.via))) || ((tmp = mesh.last) && ack === tmp['#'] && mesh.leap); } // warning! mesh.leap could be buggy! mesh last check reduces this.
-						if(!peer && ack){ // still no peer, then ack daisy chain 'tunnel' got lost.
-							if(dup.s[ack]){ return } // in dups but no peer hints that this was ack to ourself, ignore.
-							console.STAT && console.STAT(+new Date, ++SMIA, 'total no peer to ack to'); // TODO: Delete this now. Dropping lost ACKs is protocol fine now.
-							return false;
-						} // TODO: Temporary? If ack via trace has been lost, acks will go to all peers, which trashes browser bandwidth. Not relaying the ack will force sender to ask for ack again. Note, this is technically wrong for mesh behavior.
-						if(!peer && mesh.way){ return mesh.way(msg) }
-						DBG && (DBG.yh = +new Date);
-						if(!(raw = meta.raw)){ mesh.raw(msg, peer); return }
-						DBG && (DBG.yr = +new Date);
-						if(!peer || !peer.id){
-							if(!Object.plain(peer || opt.peers)){ return false }
-							var S = +new Date;
-							var P = opt.puff, ps = opt.peers, pl = Object.keys(peer || opt.peers || {}); // TODO: .keys( is slow
-							console.STAT && console.STAT(S, +new Date - S, 'peer keys');
-	(function go(){
-								var S = +new Date;
-								//Type.obj.map(peer || opt.peers, each); // in case peer is a peer list.
-								loop = 1; var wr = meta.raw; meta.raw = raw; // quick perf hack
-								var i = 0, p; while(i < 9 && (p = (pl||'')[i++])){
-									if(!(p = ps[p] || (peer||'')[p])){ continue }
-									mesh.say(msg, p);
-								}
-								meta.raw = wr; loop = 0;
-								pl = pl.slice(i); // slicing after is faster than shifting during.
-								console.STAT && console.STAT(S, +new Date - S, 'say loop');
-								if(!pl.length){ return }
-								puff(go, 0);
-								ack && dup_track(ack); // keep for later
-							}());
-							return;
-						}
-						// TODO: PERF: consider splitting function here, so say loops do less work.
-						if(!peer.wire && mesh.wire){ mesh.wire(peer); }
-						if(id === peer.last){ return } peer.last = id;  // was it just sent?
-						if(peer === meta.via){ return false } // don't send back to self.
-						if((tmp = meta.yo) && (tmp[peer.url] || tmp[peer.pid] || tmp[peer.id]) /*&& !o*/){ return false }
-						console.STAT && console.STAT(S, ((DBG||meta).yp = +new Date) - (meta.y || S), 'say prep');
-						!loop && ack && dup_track(ack); // streaming long responses needs to keep alive the ack.
-						if(peer.batch){
-							peer.tail = (tmp = peer.tail || 0) + raw.length;
-							if(peer.tail <= opt.pack){
-								peer.batch += (tmp?',':'')+raw;
-								return;
-							}
-							flush(peer);
-						}
-						peer.batch = '['; // Prevents double JSON!
-						var ST = +new Date;
-						setTimeout(function(){
-							console.STAT && console.STAT(ST, +new Date - ST, '0ms TO');
-							flush(peer);
-						}, opt.gap); // TODO: queuing/batching might be bad for low-latency video game performance! Allow opt out?
-						send(raw, peer);
-						console.STAT && (ack === peer.SI) && console.STAT(S, +new Date - peer.SH, 'say ack');
-					};
-					mesh.say.c = mesh.say.d = 0;
-					// TODO: this caused a out-of-memory crash!
-					mesh.raw = function(msg, peer){ // TODO: Clean this up / delete it / move logic out!
-						if(!msg){ return '' }
-						var meta = (msg._) || {}, put, tmp;
-						if(tmp = meta.raw){ return tmp }
-						if('string' == typeof msg){ return msg }
-						var hash = msg['##'], ack = msg['@'];
-						if(hash && ack){
-							if(!meta.via && dup_check(ack+hash)){ return false } // for our own out messages, memory & storage may ack the same thing, so dedup that. Tho if via another peer, we already tracked it upon hearing, so this will always trigger false positives, so don't do that!
-							if((tmp = (dup.s[ack]||'').it) || ((tmp = mesh.last) && ack === tmp['#'])){
-								if(hash === tmp['##']){ return false } // if ask has a matching hash, acking is optional.
-								if(!tmp['##']){ tmp['##'] = hash; } // if none, add our hash to ask so anyone we relay to can dedup. // NOTE: May only check against 1st ack chunk, 2nd+ won't know and still stream back to relaying peers which may then dedup. Any way to fix this wasted bandwidth? I guess force rate limiting breaking change, that asking peer has to ask for next lexical chunk.
-							}
-						}
-						if(!msg.dam && !msg['@']){
-							var i = 0, to = []; tmp = opt.peers;
-							for(var k in tmp){ var p = tmp[k]; // TODO: Make it up peers instead!
-								to.push(p.url || p.pid || p.id);
-								if(++i > 6){ break }
-							}
-							if(i > 1){ msg['><'] = to.join(); } // TODO: BUG! This gets set regardless of peers sent to! Detect?
-						}
-						if(msg.put && (tmp = msg.ok)){ msg.ok = {'@':(tmp['@']||1)-1, '/': (tmp['/']==msg._.near)? mesh.near : tmp['/']}; }
-						if(put = meta.$put){
-							tmp = {}; Object.keys(msg).forEach(function(k){ tmp[k] = msg[k]; });
-							tmp.put = ':])([:';
-							json(tmp, function(err, raw){
-								if(err){ return } // TODO: Handle!!
-								var S = +new Date;
-								tmp = raw.indexOf('"put":":])([:"');
-								res(u, raw = raw.slice(0, tmp+6) + put + raw.slice(tmp + 14));
-								console.STAT && console.STAT(S, +new Date - S, 'say slice');
-							});
-							return;
-						}
-						json(msg, res);
-						function res(err, raw){
-							if(err){ return } // TODO: Handle!!
-							meta.raw = raw; //if(meta && (raw||'').length < (999 * 99)){ meta.raw = raw } // HNPERF: If string too big, don't keep in memory.
-							mesh.say(msg, peer);
-						}
-					};
-				}());
-
-				function flush(peer){
-					var tmp = peer.batch, t = 'string' == typeof tmp;
-					if(t){ tmp += ']'; }// TODO: Prevent double JSON!
-					peer.batch = peer.tail = null;
-					if(!tmp){ return }
-					if(t? 3 > tmp.length : !tmp.length){ return } // TODO: ^
-					if(!t){try{tmp = (1 === tmp.length? tmp[0] : JSON.stringify(tmp));
-					}catch(e){return opt.log('DAM JSON stringify error', e)}}
-					if(!tmp){ return }
-					send(tmp, peer);
-				}
-				// for now - find better place later.
-				function send(raw, peer){ try{
-					var wire = peer.wire;
-					if(peer.say){
-						peer.say(raw);
-					} else
-					if(wire.send){
-						wire.send(raw);
-					}
-					mesh.say.d += raw.length||0; ++mesh.say.c; // STATS!
-				}catch(e){
-					(peer.queue = peer.queue || []).push(raw);
-				}}
-
-				mesh.near = 0;
-				mesh.hi = function(peer){
-					var wire = peer.wire, tmp;
-					if(!wire){ mesh.wire((peer.length && {url: peer, id: peer}) || peer); return }
-					if(peer.id){
-						opt.peers[peer.url || peer.id] = peer;
-					} else {
-						tmp = peer.id = peer.id || peer.url || String.random(9);
-						mesh.say({dam: '?', pid: root.opt.pid}, opt.peers[tmp] = peer);
-						delete dup.s[peer.last]; // IMPORTANT: see https://gun.eco/docs/DAM#self
-					}
-					if(!peer.met){
-						mesh.near++;
-						peer.met = +(new Date);
-						root.on('hi', peer);
-					}
-					// @rogowski I need this here by default for now to fix go1dfish's bug
-					tmp = peer.queue; peer.queue = [];
-					setTimeout.each(tmp||[],function(msg){
-						send(msg, peer);
-					},0,9);
-					//Type.obj.native && Type.obj.native(); // dirty place to check if other JS polluted.
-				};
-				mesh.bye = function(peer){
-					peer.met && --mesh.near;
-					delete peer.met;
-					root.on('bye', peer);
-					var tmp = +(new Date); tmp = (tmp - (peer.met||tmp));
-					mesh.bye.time = ((mesh.bye.time || tmp) + tmp) / 2;
-				};
-				mesh.hear['!'] = function(msg, peer){ opt.log('Error:', msg.err); };
-				mesh.hear['?'] = function(msg, peer){
-					if(msg.pid){
-						if(!peer.pid){ peer.pid = msg.pid; }
-						if(msg['@']){ return }
-					}
-					mesh.say({dam: '?', pid: opt.pid, '@': msg['#']}, peer);
-					delete dup.s[peer.last]; // IMPORTANT: see https://gun.eco/docs/DAM#self
-				};
-				mesh.hear['mob'] = function(msg, peer){ // NOTE: AXE will overload this with better logic.
-					if(!msg.peers){ return }
-					var peers = Object.keys(msg.peers), one = peers[(Math.random()*peers.length) >> 0];
-					if(!one){ return }
-					mesh.bye(peer);
-					mesh.hi(one);
-				};
-
-				root.on('create', function(root){
-					root.opt.pid = root.opt.pid || String.random(9);
-					this.to.next(root);
-					root.on('out', mesh.say);
-				});
-
-				root.on('bye', function(peer, tmp){
-					peer = opt.peers[peer.id || peer] || peer;
-					this.to.next(peer);
-					peer.bye? peer.bye() : (tmp = peer.wire) && tmp.close && tmp.close();
-					delete opt.peers[peer.id];
-					peer.wire = null;
-				});
-				root.on('bye', function(peer, tmp){ this.to.next(peer);
-					if(tmp = console.STAT){ tmp.peers = mesh.near; }
-					if(!(tmp = peer.url)){ return }				setTimeout(function(){ },opt.lack || 9000);
-				});
-				root.on('hi', function(peer, tmp){ this.to.next(peer);
-					if(tmp = console.STAT){ tmp.peers = mesh.near; }
-					if(opt.super){ return } // temporary (?) until we have better fix/solution?
-					var souls = Object.keys(root.next||''); // TODO: .keys( is slow
-					if(souls.length > 9999 && !console.SUBS){ console.log(console.SUBS = "Warning: You have more than 10K live GETs, which might use more bandwidth than your screen can show - consider `.off()`."); }
-					setTimeout.each(souls, function(soul){ var node = root.next[soul];
-						if(opt.super || (node.ask||'')['']){ mesh.say({get: {'#': soul}}, peer); return }
-						setTimeout.each(Object.keys(node.ask||''), function(key){ if(!key){ return }
-							// is the lack of ## a !onion hint?
-							mesh.say({'##': String.hash((root.graph[soul]||'')[key]), get: {'#': soul, '.': key}}, peer);
-							// TODO: Switch this so Book could route?
-						});
-					});
-				});
-
-				return mesh;
-			}
-		  var u;
-
-		  try{ module.exports = Mesh; }catch(e){}
-
-		})(USE, './mesh');
-	USE(function(module){
-			var Gun = USE('./index');
-			Gun.Mesh = USE('./mesh');
-
-			// TODO: resync upon reconnect online/offline
-			//window.ononline = window.onoffline = function(){ console.log('online?', navigator.onLine) }
-
-			Gun.on('opt', function(root){
-				this.to.next(root);
-				if(root.once){ return }
-				var opt = root.opt;
-				if(false === opt.WebSocket){ return }
-
-				var env = Gun.window || {};
-				var websocket = opt.WebSocket || env.WebSocket || env.webkitWebSocket || env.mozWebSocket;
-				if(!websocket){ return }
-				opt.WebSocket = websocket;
-
-				var mesh = opt.mesh = opt.mesh || Gun.Mesh(root);
-
-				var wire = mesh.wire || opt.wire;
-				mesh.wire = opt.wire = open;
-				function open(peer){ try{
-					if(!peer || !peer.url){ return wire && wire(peer) }
-					var url = peer.url.replace(/^http/, 'ws');
-					var wire = peer.wire = new opt.WebSocket(url);
-					wire.onclose = function(){
-						reconnect(peer);
-						opt.mesh.bye(peer);
-					};
-					wire.onerror = function(err){
-						reconnect(peer);
-					};
-					wire.onopen = function(){
-						opt.mesh.hi(peer);
-					};
-					wire.onmessage = function(msg){
-						if(!msg){ return }
-						opt.mesh.hear(msg.data || msg, peer);
-					};
-					return wire;
-				}catch(e){ opt.mesh.bye(peer); }}
-
-				setTimeout(function(){ !opt.super && root.on('out', {dam:'hi'}); },1); // it can take a while to open a socket, so maybe no longer lazy load for perf reasons?
-
-				var wait = 2 * 999;
-				function reconnect(peer){
-					clearTimeout(peer.defer);
-					if(!opt.peers[peer.url]){ return }
-					if(doc && peer.retry <= 0){ return }
-					peer.retry = (peer.retry || opt.retry+1 || 60) - ((-peer.tried + (peer.tried = +new Date) < wait*4)?1:0);
-					peer.defer = setTimeout(function to(){
-						if(doc && doc.hidden){ return setTimeout(to,wait) }
-						open(peer);
-					}, wait);
-				}
-				var doc = (''+u !== typeof document) && document;
-			});
-			var u;
-		})(USE, './websocket');
-	USE(function(module){
-			if(typeof Gun === 'undefined'){ return }
-
-			var noop = function(){}, store;
-			try{store = (Gun.window||noop).localStorage;}catch(e){}
-			if(!store){
-				Gun.log("Warning: No localStorage exists to persist data to!");
-				store = {setItem: function(k,v){this[k]=v;}, removeItem: function(k){delete this[k];}, getItem: function(k){return this[k]}};
-			}
-
-			var parse = JSON.parseAsync || function(t,cb,r){ var u; try{ cb(u, JSON.parse(t,r)); }catch(e){ cb(e); } };
-			var json = JSON.stringifyAsync || function(v,cb,r,s){ var u; try{ cb(u, JSON.stringify(v,r,s)); }catch(e){ cb(e); } };
-
-			Gun.on('create', function lg(root){
-				this.to.next(root);
-				var opt = root.opt, graph = root.graph, acks = [], disk, to, size, stop;
-				if(false === opt.localStorage){ return }
-				opt.prefix = opt.file || 'gun/';
-				try{ disk = lg[opt.prefix] = lg[opt.prefix] || JSON.parse(size = store.getItem(opt.prefix)) || {}; // TODO: Perf! This will block, should we care, since limited to 5MB anyways?
-				}catch(e){ disk = lg[opt.prefix] = {}; }
-				size = (size||'').length;
-
-				root.on('get', function(msg){
-					this.to.next(msg);
-					var lex = msg.get, soul, data, tmp, u;
-					if(!lex || !(soul = lex['#'])){ return }
-					data = disk[soul] || u;
-					if(data && (tmp = lex['.']) && !Object.plain(tmp)){ // pluck!
-						data = Gun.state.ify({}, tmp, Gun.state.is(data, tmp), data[tmp], soul);
-					}
-					//if(data){ (tmp = {})[soul] = data } // back into a graph.
-					//setTimeout(function(){
-					Gun.on.get.ack(msg, data); //root.on('in', {'@': msg['#'], put: tmp, lS:1});// || root.$});
-					//}, Math.random() * 10); // FOR TESTING PURPOSES!
-				});
-
-				root.on('put', function(msg){
-					this.to.next(msg); // remember to call next middleware adapter
-					var put = msg.put, soul = put['#'], key = put['.'], id = msg['#'], ok = msg.ok||''; // pull data off wire envelope
-					disk[soul] = Gun.state.ify(disk[soul], key, put['>'], put[':'], soul); // merge into disk object
-					if(stop && size > (4999880)){ root.on('in', {'@': id, err: "localStorage max!"}); return; }
-					//if(!msg['@']){ acks.push(id) } // then ack any non-ack write. // TODO: use batch id.
-					if(!msg['@'] && (!msg._.via || Math.random() < (ok['@'] / ok['/']))){ acks.push(id); } // then ack any non-ack write. // TODO: use batch id.
-					if(to){ return }
-					to = setTimeout(flush, 9+(size / 333)); // 0.1MB = 0.3s, 5MB = 15s 
-				});
-				function flush(){
-					if(!acks.length && ((setTimeout.turn||'').s||'').length){ setTimeout(flush,99); return; } // defer if "busy" && no saves.
-					var ack = acks; clearTimeout(to); to = false; acks = [];
-					json(disk, function(err, tmp){
-						try{!err && store.setItem(opt.prefix, tmp);
-						}catch(e){ err = stop = e || "localStorage failure"; }
-						if(err){
-							Gun.log(err + " Consider using GUN's IndexedDB plugin for RAD for more storage space, https://gun.eco/docs/RAD#install");
-							root.on('localStorage:error', {err: err, get: opt.prefix, put: disk});
-						}
-						size = tmp.length;
-
-						//if(!err && !Object.empty(opt.peers)){ return } // only ack if there are no peers. // Switch this to probabilistic mode
-						setTimeout.each(ack, function(id){
-							root.on('in', {'@': id, err: err, ok: 0}); // localStorage isn't reliable, so make its `ok` code be a low number.
-						},0,99);
-					});
-				}
-			
-			});
-		})(USE, './localStorage');
-
-	}());
-	(function(){
-		var u;
-		if(''+u == typeof Gun){ return }
-		var DEP = function(n){ console.warn("Warning! Deprecated internal utility will break in next version:", n); };
-		// Generic javascript utilities.
-		var Type = Gun;
-		//Type.fns = Type.fn = {is: function(fn){ return (!!fn && fn instanceof Function) }}
-		Type.fn = Type.fn || {is: function(fn){ DEP('fn'); return (!!fn && 'function' == typeof fn) }};
-		Type.bi = Type.bi || {is: function(b){ DEP('bi');return (b instanceof Boolean || typeof b == 'boolean') }};
-		Type.num = Type.num || {is: function(n){ DEP('num'); return !list_is(n) && ((n - parseFloat(n) + 1) >= 0 || Infinity === n || -Infinity === n) }};
-		Type.text = Type.text || {is: function(t){ DEP('text'); return (typeof t == 'string') }};
-		Type.text.ify = Type.text.ify || function(t){ DEP('text.ify');
-			if(Type.text.is(t)){ return t }
-			if(typeof JSON !== "undefined"){ return JSON.stringify(t) }
-			return (t && t.toString)? t.toString() : t;
-		};
-		Type.text.random = Type.text.random || function(l, c){ DEP('text.random');
-			var s = '';
-			l = l || 24; // you are not going to make a 0 length random number, so no need to check type
-			c = c || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXZabcdefghijklmnopqrstuvwxyz';
-			while(l > 0){ s += c.charAt(Math.floor(Math.random() * c.length)); l--; }
-			return s;
-		};
-		Type.text.match = Type.text.match || function(t, o){ var tmp, u; DEP('text.match');
-			if('string' !== typeof t){ return false }
-			if('string' == typeof o){ o = {'=': o}; }
-			o = o || {};
-			tmp = (o['='] || o['*'] || o['>'] || o['<']);
-			if(t === tmp){ return true }
-			if(u !== o['=']){ return false }
-			tmp = (o['*'] || o['>'] || o['<']);
-			if(t.slice(0, (tmp||'').length) === tmp){ return true }
-			if(u !== o['*']){ return false }
-			if(u !== o['>'] && u !== o['<']){
-				return (t >= o['>'] && t <= o['<'])? true : false;
-			}
-			if(u !== o['>'] && t >= o['>']){ return true }
-			if(u !== o['<'] && t <= o['<']){ return true }
-			return false;
-		};
-		Type.text.hash = Type.text.hash || function(s, c){ // via SO
-			DEP('text.hash');
-			if(typeof s !== 'string'){ return }
-		  c = c || 0;
-		  if(!s.length){ return c }
-		  for(var i=0,l=s.length,n; i<l; ++i){
-		    n = s.charCodeAt(i);
-		    c = ((c<<5)-c)+n;
-		    c |= 0;
-		  }
-		  return c;
-		};
-		Type.list = Type.list || {is: function(l){ DEP('list'); return (l instanceof Array) }};
-		Type.list.slit = Type.list.slit || Array.prototype.slice;
-		Type.list.sort = Type.list.sort || function(k){ // creates a new sort function based off some key
-			DEP('list.sort');
-			return function(A,B){
-				if(!A || !B){ return 0 } A = A[k]; B = B[k];
-				if(A < B){ return -1 }else if(A > B){ return 1 }
-				else { return 0 }
-			}
-		};
-		Type.list.map = Type.list.map || function(l, c, _){ DEP('list.map'); return obj_map(l, c, _) };
-		Type.list.index = 1; // change this to 0 if you want non-logical, non-mathematical, non-matrix, non-convenient array notation
-		Type.obj = Type.boj || {is: function(o){ DEP('obj'); return o? (o instanceof Object && o.constructor === Object) || Object.prototype.toString.call(o).match(/^\[object (\w+)\]$/)[1] === 'Object' : false }};
-		Type.obj.put = Type.obj.put || function(o, k, v){ DEP('obj.put'); return (o||{})[k] = v, o };
-		Type.obj.has = Type.obj.has || function(o, k){ DEP('obj.has'); return o && Object.prototype.hasOwnProperty.call(o, k) };
-		Type.obj.del = Type.obj.del || function(o, k){ DEP('obj.del'); 
-			if(!o){ return }
-			o[k] = null;
-			delete o[k];
-			return o;
-		};
-		Type.obj.as = Type.obj.as || function(o, k, v, u){ DEP('obj.as'); return o[k] = o[k] || (u === v? {} : v) };
-		Type.obj.ify = Type.obj.ify || function(o){ DEP('obj.ify'); 
-			if(obj_is(o)){ return o }
-			try{o = JSON.parse(o);
-			}catch(e){o={};}		return o;
-		}
-		;(function(){ var u;
-			function map(v,k){
-				if(obj_has(this,k) && u !== this[k]){ return }
-				this[k] = v;
-			}
-			Type.obj.to = Type.obj.to || function(from, to){ DEP('obj.to'); 
-				to = to || {};
-				obj_map(from, map, to);
-				return to;
-			};
-		}());
-		Type.obj.copy = Type.obj.copy || function(o){ DEP('obj.copy'); // because http://web.archive.org/web/20140328224025/http://jsperf.com/cloning-an-object/2
-			return !o? o : JSON.parse(JSON.stringify(o)); // is shockingly faster than anything else, and our data has to be a subset of JSON anyways!
-		}
-		;(function(){
-			function empty(v,i){ var n = this.n, u;
-				if(n && (i === n || (obj_is(n) && obj_has(n, i)))){ return }
-				if(u !== i){ return true }
-			}
-			Type.obj.empty = Type.obj.empty || function(o, n){ DEP('obj.empty'); 
-				if(!o){ return true }
-				return obj_map(o,empty,{n:n})? false : true;
-			};
-		}());
-	(function(){
-			function t(k,v){
-				if(2 === arguments.length){
-					t.r = t.r || {};
-					t.r[k] = v;
-					return;
-				} t.r = t.r || [];
-				t.r.push(k);
-			}		var keys = Object.keys, map;
-			Object.keys = Object.keys || function(o){ return map(o, function(v,k,t){t(k);}) };
-			Type.obj.map = map = Type.obj.map || function(l, c, _){ DEP('obj.map'); 
-				var u, i = 0, x, r, ll, lle, f = 'function' == typeof c;
-				t.r = u;
-				if(keys && obj_is(l)){
-					ll = keys(l); lle = true;
-				}
-				_ = _ || {};
-				if(list_is(l) || ll){
-					x = (ll || l).length;
-					for(;i < x; i++){
-						var ii = (i + Type.list.index);
-						if(f){
-							r = lle? c.call(_, l[ll[i]], ll[i], t) : c.call(_, l[i], ii, t);
-							if(r !== u){ return r }
-						} else {
-							//if(Type.test.is(c,l[i])){ return ii } // should implement deep equality testing!
-							if(c === l[lle? ll[i] : i]){ return ll? ll[i] : ii } // use this for now
-						}
-					}
-				} else {
-					for(i in l){
-						if(f){
-							if(obj_has(l,i)){
-								r = _? c.call(_, l[i], i, t) : c(l[i], i, t);
-								if(r !== u){ return r }
-							}
-						} else {
-							//if(a.test.is(c,l[i])){ return i } // should implement deep equality testing!
-							if(c === l[i]){ return i } // use this for now
-						}
-					}
-				}
-				return f? t.r : Type.list.index? 0 : -1;
-			};
-		}());
-		Type.time = Type.time || {};
-		Type.time.is = Type.time.is || function(t){ DEP('time'); return t? t instanceof Date : (+new Date().getTime()) };
-
-		var fn_is = Type.fn.is;
-		var list_is = Type.list.is;
-		var obj = Type.obj, obj_is = obj.is, obj_has = obj.has, obj_map = obj.map;
-
-		var Val = {};
-		Val.is = function(v){ DEP('val.is'); // Valid values are a subset of JSON: null, binary, number (!Infinity), text, or a soul relation. Arrays need special algorithms to handle concurrency, so they are not supported directly. Use an extension that supports them if needed but research their problems first.
-			if(v === u){ return false }
-			if(v === null){ return true } // "deletes", nulling out keys.
-			if(v === Infinity){ return false } // we want this to be, but JSON does not support it, sad face.
-			if(text_is(v) // by "text" we mean strings.
-			|| bi_is(v) // by "binary" we mean boolean.
-			|| num_is(v)){ // by "number" we mean integers or decimals.
-				return true; // simple values are valid.
-			}
-			return Val.link.is(v) || false; // is the value a soul relation? Then it is valid and return it. If not, everything else remaining is an invalid data type. Custom extensions can be built on top of these primitives to support other types.
-		};
-		Val.link = Val.rel = {_: '#'};
-	(function(){
-			Val.link.is = function(v){ DEP('val.link.is'); // this defines whether an object is a soul relation or not, they look like this: {'#': 'UUID'}
-				if(v && v[rel_] && !v._ && obj_is(v)){ // must be an object.
-					var o = {};
-					obj_map(v, map, o);
-					if(o.id){ // a valid id was found.
-						return o.id; // yay! Return it.
-					}
-				}
-				return false; // the value was not a valid soul relation.
-			};
-			function map(s, k){ var o = this; // map over the object...
-				if(o.id){ return o.id = false } // if ID is already defined AND we're still looping through the object, it is considered invalid.
-				if(k == rel_ && text_is(s)){ // the key should be '#' and have a text value.
-					o.id = s; // we found the soul!
-				} else {
-					return o.id = false; // if there exists anything else on the object that isn't the soul, then it is considered invalid.
-				}
-			}
-		}());
-		Val.link.ify = function(t){ DEP('val.link.ify'); return obj_put({}, rel_, t) }; // convert a soul into a relation and return it.
-		Type.obj.has._ = '.';
-		var rel_ = Val.link._, u;
-		var bi_is = Type.bi.is;
-		var num_is = Type.num.is;
-		var text_is = Type.text.is;
-		var obj = Type.obj, obj_is = obj.is, obj_put = obj.put, obj_map = obj.map;
-
-		Type.val = Type.val || Val;
-
-		var Node = {_: '_'};
-		Node.soul = function(n, o){ DEP('node.soul'); return (n && n._ && n._[o || soul_]) }; // convenience function to check to see if there is a soul on a node and return it.
-		Node.soul.ify = function(n, o){ DEP('node.soul.ify'); // put a soul on an object.
-			o = (typeof o === 'string')? {soul: o} : o || {};
-			n = n || {}; // make sure it exists.
-			n._ = n._ || {}; // make sure meta exists.
-			n._[soul_] = o.soul || n._[soul_] || text_random(); // put the soul on it.
-			return n;
-		};
-		Node.soul._ = Val.link._;
-	(function(){
-			Node.is = function(n, cb, as){ DEP('node.is'); var s; // checks to see if an object is a valid node.
-				if(!obj_is(n)){ return false } // must be an object.
-				if(s = Node.soul(n)){ // must have a soul on it.
-					return !obj_map(n, map, {as:as,cb:cb,s:s,n:n});
-				}
-				return false; // nope! This was not a valid node.
-			};
-			function map(v, k){ // we invert this because the way we check for this is via a negation.
-				if(k === Node._){ return } // skip over the metadata.
-				if(!Val.is(v)){ return true } // it is true that this is an invalid node.
-				if(this.cb){ this.cb.call(this.as, v, k, this.n, this.s); } // optionally callback each key/value.
-			}
-		}());
-	(function(){
-			Node.ify = function(obj, o, as){ DEP('node.ify'); // returns a node from a shallow object.
-				if(!o){ o = {}; }
-				else if(typeof o === 'string'){ o = {soul: o}; }
-				else if('function' == typeof o){ o = {map: o}; }
-				if(o.map){ o.node = o.map.call(as, obj, u, o.node || {}); }
-				if(o.node = Node.soul.ify(o.node || {}, o)){
-					obj_map(obj, map, {o:o,as:as});
-				}
-				return o.node; // This will only be a valid node if the object wasn't already deep!
-			};
-			function map(v, k){ var o = this.o, tmp, u; // iterate over each key/value.
-				if(o.map){
-					tmp = o.map.call(this.as, v, ''+k, o.node);
-					if(u === tmp){
-						obj_del(o.node, k);
-					} else
-					if(o.node){ o.node[k] = tmp; }
-					return;
-				}
-				if(Val.is(v)){
-					o.node[k] = v;
-				}
-			}
-		}());
-		var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_map = obj.map;
-		var text = Type.text, text_random = text.random;
-		var soul_ = Node.soul._;
-		var u;
-		Type.node = Type.node || Node;
-
-		var State = Type.state;
-		State.lex = function(){ DEP('state.lex'); return State().toString(36).replace('.','') };
-		State.to = function(from, k, to){ DEP('state.to'); 
-			var val = (from||{})[k];
-			if(obj_is(val)){
-				val = obj_copy(val);
-			}
-			return State.ify(to, k, State.is(from, k), val, Node.soul(from));
-		}
-		;(function(){
-			State.map = function(cb, s, as){ DEP('state.map'); var u; // for use with Node.ify
-				var o = obj_is(o = cb || s)? o : null;
-				cb = fn_is(cb = cb || s)? cb : null;
-				if(o && !cb){
-					s = num_is(s)? s : State();
-					o[N_] = o[N_] || {};
-					obj_map(o, map, {o:o,s:s});
-					return o;
-				}
-				as = as || obj_is(s)? s : u;
-				s = num_is(s)? s : State();
-				return function(v, k, o, opt){
-					if(!cb){
-						map.call({o: o, s: s}, v,k);
-						return v;
-					}
-					cb.call(as || this || {}, v, k, o, opt);
-					if(obj_has(o,k) && u === o[k]){ return }
-					map.call({o: o, s: s}, v,k);
-				}
-			};
-			function map(v,k){
-				if(N_ === k){ return }
-				State.ify(this.o, k, this.s) ;
-			}
-		}());
-		var obj = Type.obj, obj_as = obj.as, obj_has = obj.has, obj_is = obj.is, obj_map = obj.map, obj_copy = obj.copy;
-		var num = Type.num, num_is = num.is;
-		var fn = Type.fn, fn_is = fn.is;
-		var N_ = Node._, u;
-
-		var Graph = {};
-	(function(){
-			Graph.is = function(g, cb, fn, as){ DEP('graph.is'); // checks to see if an object is a valid graph.
-				if(!g || !obj_is(g) || obj_empty(g)){ return false } // must be an object.
-				return !obj_map(g, map, {cb:cb,fn:fn,as:as}); // makes sure it wasn't an empty object.
-			};
-			function map(n, s){ // we invert this because the way'? we check for this is via a negation.
-				if(!n || s !== Node.soul(n) || !Node.is(n, this.fn, this.as)){ return true } // it is true that this is an invalid graph.
-				if(!this.cb){ return }
-				nf.n = n; nf.as = this.as; // sequential race conditions aren't races.
-				this.cb.call(nf.as, n, s, nf);
-			}
-			function nf(fn){ // optional callback for each node.
-				if(fn){ Node.is(nf.n, fn, nf.as); } // where we then have an optional callback for each key/value.
-			}
-		}());
-	(function(){
-			Graph.ify = function(obj, env, as){ DEP('graph.ify'); 
-				var at = {path: [], obj: obj};
-				if(!env){
-					env = {};
-				} else
-				if(typeof env === 'string'){
-					env = {soul: env};
-				} else
-				if('function' == typeof env){
-					env.map = env;
-				}
-				if(typeof as === 'string'){
-					env.soul = env.soul || as;
-					as = u;
-				}
-				if(env.soul){
-					at.link = Val.link.ify(env.soul);
-				}
-				env.shell = (as||{}).shell;
-				env.graph = env.graph || {};
-				env.seen = env.seen || [];
-				env.as = env.as || as;
-				node(env, at);
-				env.root = at.node;
-				return env.graph;
-			};
-			function node(env, at){ var tmp;
-				if(tmp = seen(env, at)){ return tmp }
-				at.env = env;
-				at.soul = soul;
-				if(Node.ify(at.obj, map, at)){
-					at.link = at.link || Val.link.ify(Node.soul(at.node));
-					if(at.obj !== env.shell){
-						env.graph[Val.link.is(at.link)] = at.node;
-					}
-				}
-				return at;
-			}
-			function map(v,k,n){
-				var at = this, env = at.env, is, tmp;
-				if(Node._ === k && obj_has(v,Val.link._)){
-					return n._; // TODO: Bug?
-				}
-				if(!(is = valid(v,k,n, at,env))){ return }
-				if(!k){
-					at.node = at.node || n || {};
-					if(obj_has(v, Node._) && Node.soul(v)){ // ? for safety ?
-						at.node._ = obj_copy(v._);
-					}
-					at.node = Node.soul.ify(at.node, Val.link.is(at.link));
-					at.link = at.link || Val.link.ify(Node.soul(at.node));
-				}
-				if(tmp = env.map){
-					tmp.call(env.as || {}, v,k,n, at);
-					if(obj_has(n,k)){
-						v = n[k];
-						if(u === v){
-							obj_del(n, k);
-							return;
-						}
-						if(!(is = valid(v,k,n, at,env))){ return }
-					}
-				}
-				if(!k){ return at.node }
-				if(true === is){
-					return v;
-				}
-				tmp = node(env, {obj: v, path: at.path.concat(k)});
-				if(!tmp.node){ return }
-				return tmp.link; //{'#': Node.soul(tmp.node)};
-			}
-			function soul(id){ var at = this;
-				var prev = Val.link.is(at.link), graph = at.env.graph;
-				at.link = at.link || Val.link.ify(id);
-				at.link[Val.link._] = id;
-				if(at.node && at.node[Node._]){
-					at.node[Node._][Val.link._] = id;
-				}
-				if(obj_has(graph, prev)){
-					graph[id] = graph[prev];
-					obj_del(graph, prev);
-				}
-			}
-			function valid(v,k,n, at,env){ var tmp;
-				if(Val.is(v)){ return true }
-				if(obj_is(v)){ return 1 }
-				if(tmp = env.invalid){
-					v = tmp.call(env.as || {}, v,k,n);
-					return valid(v,k,n, at,env);
-				}
-				env.err = "Invalid value at '" + at.path.concat(k).join('.') + "'!";
-				if(Type.list.is(v)){ env.err += " Use `.set(item)` instead of an Array."; }
-			}
-			function seen(env, at){
-				var arr = env.seen, i = arr.length, has;
-				while(i--){ has = arr[i];
-					if(at.obj === has.obj){ return has }
-				}
-				arr.push(at);
-			}
-		}());
-		Graph.node = function(node){ DEP('graph.node'); 
-			var soul = Node.soul(node);
-			if(!soul){ return }
-			return obj_put({}, soul, node);
-		}
-		;(function(){
-			Graph.to = function(graph, root, opt){ DEP('graph.to'); 
-				if(!graph){ return }
-				var obj = {};
-				opt = opt || {seen: {}};
-				obj_map(graph[root], map, {obj:obj, graph: graph, opt: opt});
-				return obj;
-			};
-			function map(v,k){ var tmp, obj;
-				if(Node._ === k){
-					if(obj_empty(v, Val.link._)){
-						return;
-					}
-					this.obj[k] = obj_copy(v);
-					return;
-				}
-				if(!(tmp = Val.link.is(v))){
-					this.obj[k] = v;
-					return;
-				}
-				if(obj = this.opt.seen[tmp]){
-					this.obj[k] = obj;
-					return;
-				}
-				this.obj[k] = this.opt.seen[tmp] = Graph.to(this.graph, tmp, this.opt);
-			}
-		}());
-		var fn_is = Type.fn.is;
-		var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_has = obj.has, obj_empty = obj.empty, obj_put = obj.put, obj_map = obj.map, obj_copy = obj.copy;
-		var u;
-		Type.graph = Type.graph || Graph;
-	}());
-	});
 
 	var radisk = createCommonjsModule(function (module) {
 	(function(){
@@ -24592,7 +26450,7 @@
 	};
 	var title = 'browser';
 	var platform = 'browser';
-	var browser = true;
+	var browser$1 = true;
 	var env = {};
 	var argv = [];
 	var version = ''; // empty string to avoid regexp issues
@@ -24656,7 +26514,7 @@
 	var process$3 = {
 	  nextTick: nextTick,
 	  title: title,
-	  browser: browser,
+	  browser: browser$1,
 	  env: env,
 	  argv: argv,
 	  version: version,
@@ -24679,15 +26537,15 @@
 	  uptime: uptime
 	};
 
-	var Gun$2 = (typeof window !== "undefined")? window.Gun : gun;
+	var Gun$1 = (typeof window !== "undefined")? window.Gun : gun;
 
-	Gun$2.on('create', function(root){
-	    if(Gun$2.TESTING){ root.opt.file = 'radatatest'; }
+	Gun$1.on('create', function(root){
+	    if(Gun$1.TESTING){ root.opt.file = 'radatatest'; }
 	    this.to.next(root);
 	    var opt = root.opt, u;
 	    if(false === opt.rad || false === opt.radisk){ return }
 	    if((u+'' != typeof process$3) && 'false' === ''+(process$3.env||'').RAD){ return }
-	    var Radisk = (Gun$2.window && Gun$2.window.Radisk) || radisk;
+	    var Radisk = (Gun$1.window && Gun$1.window.Radisk) || radisk;
 	    var Radix = Radisk.Radix;
 	    var dare = Radisk(opt), esc = String.fromCharCode(27);
 	    var ST = 0;
@@ -24750,7 +26608,7 @@
 	            } else
 	            if(tmp && tmp.rad){ return }
 	        }
-	        var now = Gun$2.state();
+	        var now = Gun$1.state();
 	        var S = (+new Date), C = 0; // STATS!
 	        DBG && (DBG.sgm = S);
 	        //var GID = String.random(3); console.log("GET ------->>>", GID, key, o, '?', get);
@@ -24768,7 +26626,7 @@
 	            var va, ve;
 	            if(info.unit && data && u !== (va = data[':']) && u !== (ve = data['>'])){ // new format
 	                var tmp = key.split(esc), so = tmp[0], ha = tmp[1];
-	                (graph = graph || {})[so] = Gun$2.state.ify(graph[so], ha, ve, va, so);
+	                (graph = graph || {})[so] = Gun$1.state.ify(graph[so], ha, ve, va, so);
 	                root.$.get(so).get(ha)._.rad = now;
 	                // REMEMBER TO ADD _rad TO NODE/SOUL QUERY!
 	            } else
@@ -24812,7 +26670,7 @@
 	            //if(u !== (va = val[':']) && u !== (ve = val['>'])){ // THIS HANDLES NEW CODE!
 	            if('string' != typeof val){ // THIS HANDLES NEW CODE!
 	                va = val[':']; ve = val['>'];
-	                (graph = graph || {})[so] = Gun$2.state.ify(graph[so], ha, ve, va, so);
+	                (graph = graph || {})[so] = Gun$1.state.ify(graph[so], ha, ve, va, so);
 	                //root.$.get(so).get(ha)._.rad = now;
 	                o.count = (o.count || 0) + ((va||'').length || 9);
 	                return;
@@ -24821,10 +26679,10 @@
 	            var tmp = val.lastIndexOf('>');
 	            var state = Radisk.decode(val.slice(tmp+1), null, esc);
 	            val = Radisk.decode(val.slice(0,tmp), null, esc);
-	            (graph = graph || {})[soul] = Gun$2.state.ify(graph[soul], has, state, val, soul);
+	            (graph = graph || {})[soul] = Gun$1.state.ify(graph[soul], has, state, val, soul);
 	        }
 	    });
-	    var val_is = Gun$2.valid;
+	    var val_is = Gun$1.valid;
 	    (opt.store||{}).stats = {get:{time:{}, count:0}, put: {time:{}, count:0}}; // STATS!
 	    var statg = 0; // STATS!
 	});
@@ -24911,6 +26769,29 @@
 	}());
 	});
 
+	var publicState = void 0;
+
+	function publicState$1 (params) {
+	  if (!publicState) {
+	    publicState = new browser(params);
+	  }
+	  return publicState;
+	}
+
+	var core_getIterator = _core.getIterator = function (it) {
+	  var iterFn = core_getIteratorMethod(it);
+	  if (typeof iterFn != 'function') throw TypeError(it + ' is not iterable!');
+	  return _anObject(iterFn.call(it));
+	};
+
+	var getIterator = core_getIterator;
+
+	var getIterator$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": getIterator, __esModule: true };
+	});
+
+	var _getIterator = unwrapExports(getIterator$1);
+
 	var _createProperty = function (object, index, value) {
 	  if (index in object) _objectDp.f(object, index, _propertyDesc(0, value));
 	  else object[index] = value;
@@ -24952,36 +26833,54 @@
 
 	var _Array$from = unwrapExports(from_1$1);
 
-	var SET = 'Set';
+	var MAP = 'Map';
 
-	// 23.2 Set Objects
-	var es6_set = _collection(SET, function (get) {
-	  return function Set() { return get(this, arguments.length > 0 ? arguments[0] : undefined); };
+	// 23.1 Map Objects
+	var es6_map = _collection(MAP, function (get) {
+	  return function Map() { return get(this, arguments.length > 0 ? arguments[0] : undefined); };
 	}, {
-	  // 23.2.3.1 Set.prototype.add(value)
-	  add: function add(value) {
-	    return _collectionStrong.def(_validateCollection(this, SET), value = value === 0 ? 0 : value, value);
+	  // 23.1.3.6 Map.prototype.get(key)
+	  get: function get(key) {
+	    var entry = _collectionStrong.getEntry(_validateCollection(this, MAP), key);
+	    return entry && entry.v;
+	  },
+	  // 23.1.3.9 Map.prototype.set(key, value)
+	  set: function set(key, value) {
+	    return _collectionStrong.def(_validateCollection(this, MAP), key === 0 ? 0 : key, value);
 	  }
-	}, _collectionStrong);
+	}, _collectionStrong, true);
 
 	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
 
 
-	_export(_export.P + _export.R, 'Set', { toJSON: _collectionToJson('Set') });
+	_export(_export.P + _export.R, 'Map', { toJSON: _collectionToJson('Map') });
 
-	// https://tc39.github.io/proposal-setmap-offrom/#sec-set.of
-	_setCollectionOf('Set');
+	// https://tc39.github.io/proposal-setmap-offrom/#sec-map.of
+	_setCollectionOf('Map');
 
-	// https://tc39.github.io/proposal-setmap-offrom/#sec-set.from
-	_setCollectionFrom('Set');
+	// https://tc39.github.io/proposal-setmap-offrom/#sec-map.from
+	_setCollectionFrom('Map');
 
-	var set = _core.Set;
+	var map = _core.Map;
 
-	var set$1 = createCommonjsModule(function (module) {
-	module.exports = { "default": set, __esModule: true };
+	var map$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": map, __esModule: true };
 	});
 
-	var _Set = unwrapExports(set$1);
+	var _Map = unwrapExports(map$1);
+
+	var classCallCheck = createCommonjsModule(function (module, exports) {
+
+	exports.__esModule = true;
+
+	exports.default = function (instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	};
+	});
+
+	var _classCallCheck = unwrapExports(classCallCheck);
 
 	var localforage = createCommonjsModule(function (module, exports) {
 	/*!
@@ -27808,13 +29707,11 @@
 	});
 
 	/**
-	  Our very own implementation of the Gun API. Local state only.
+	  Our very own implementation of the Gun API. Used for iris.local() only.
 	 */
 
 	var Node = function () {
-	    /**
-	     *
-	     */
+	    /** */
 	    function Node() {
 	        var _this = this;
 
@@ -28099,6 +29996,252 @@
 	    return Node;
 	}();
 
+	var local = void 0;
+
+	/**
+	 * Get the local state
+	 * @returns {Node}
+	 */
+	function local$1 () {
+	  if (!local) {
+	    local = new Node();
+	  }
+	  return local;
+	}
+
+	/**
+	 *
+	 * @param pub
+	 * @returns gun user node
+	 */
+	function userSpace (pub) {
+	  return publicState$1().user(pub);
+	}
+
+	var blockedUsers = void 0;
+
+	function blockedUsers$1 () {
+	  if (!blockedUsers) {
+	    blockedUsers = {};
+	    local$1().get('block').map(function (isBlocked, user) {
+	      if (isBlocked === blockedUsers[user]) {
+	        return;
+	      }
+	      if (isBlocked) {
+	        blockedUsers[user] = isBlocked;
+	        local$1().get('groups').map(function (v, k) {
+	          local$1().get('groups').get(k).get(user).put(false);
+	        });
+	      } else {
+	        delete blockedUsers[user];
+	      }
+	    });
+	  }
+	  return blockedUsers;
+	}
+
+	var counter$1 = 0;
+	var cache = new _Map();
+	var callbacks = new _Map();
+
+	/**
+	 * Aggregate getter that returns the path
+	 *
+	 * @param groupName
+	 * @returns object
+	 */
+	function group () {
+	  var groupName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'everyone';
+
+	  return {
+	    get: function get(path, callback) {
+	      var groupNode = local$1().get('groups').get(groupName);
+	      var follows = {};
+	      requestAnimationFrame(function () {
+	        groupNode.map(function (isFollowing, user) {
+	          if (blockedUsers$1()[user]) {
+	            return;
+	          } // TODO: allow to specifically query blocked users?
+	          if (follows[user] && follows[user] === isFollowing) {
+	            return;
+	          }
+	          follows[user] = isFollowing;
+	          if (isFollowing) {
+	            // TODO: callback on unfollow, for unsubscribe
+	            var node = userSpace(user);
+	            if (path && path !== '/') {
+	              node = lodash.reduce(path.split('/'), function (sum, s) {
+	                return sum.get(decodeURIComponent(s));
+	              }, node);
+	            }
+	            callback(node, user);
+	          }
+	        });
+	      });
+	    },
+	    _cached_map: function _cached_map(cached, cacheKey, path, myEvent, callback) {
+	      if (!cached) {
+	        cache.set(cacheKey, new _Map());
+	        this.get(path, function (node, from) {
+	          return node.map(function (value, key, x) {
+	            var item = { value: value, key: key, from: from };
+	            cache.get(cacheKey).set(key, item);
+	            for (var _iterator = callbacks.get(cacheKey).values(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _getIterator(_iterator);;) {
+	              var _ref;
+
+	              if (_isArray) {
+	                if (_i >= _iterator.length) break;
+	                _ref = _iterator[_i++];
+	              } else {
+	                _i = _iterator.next();
+	                if (_i.done) break;
+	                _ref = _i.value;
+	              }
+
+	              var cb = _ref;
+
+	              cb(value, key, x, myEvent, from);
+	            }
+	          });
+	        });
+	      } else {
+	        for (var _iterator2 = cached.values(), _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _getIterator(_iterator2);;) {
+	          var _ref2;
+
+	          if (_isArray2) {
+	            if (_i2 >= _iterator2.length) break;
+	            _ref2 = _iterator2[_i2++];
+	          } else {
+	            _i2 = _iterator2.next();
+	            if (_i2.done) break;
+	            _ref2 = _i2.value;
+	          }
+
+	          var item = _ref2;
+
+	          callback(item.value, item.key, 0, myEvent, item.from);
+	        }
+	      }
+	    },
+
+
+	    // TODO: this should probably store just the most recent value, not everyone's value
+	    // TODO: for counting of likes etc, use this.count() instead
+	    _cached_on: function _cached_on(cached, cacheKey, path, myEvent, callback) {
+	      if (!cached) {
+	        cache.set(cacheKey, new _Map());
+	        this.get(path, function (node, from) {
+	          return node.on(function (value, key, x) {
+	            var item = { value: value, key: key, from: from };
+	            cache.get(cacheKey).set(from, item);
+	            for (var _iterator3 = callbacks.get(cacheKey).values(), _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _getIterator(_iterator3);;) {
+	              var _ref3;
+
+	              if (_isArray3) {
+	                if (_i3 >= _iterator3.length) break;
+	                _ref3 = _iterator3[_i3++];
+	              } else {
+	                _i3 = _iterator3.next();
+	                if (_i3.done) break;
+	                _ref3 = _i3.value;
+	              }
+
+	              var cb = _ref3;
+
+	              cb(value, key, x, myEvent, from);
+	            }
+	          });
+	        });
+	      } else {
+	        for (var _iterator4 = cached.values(), _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _getIterator(_iterator4);;) {
+	          var _ref4;
+
+	          if (_isArray4) {
+	            if (_i4 >= _iterator4.length) break;
+	            _ref4 = _iterator4[_i4++];
+	          } else {
+	            _i4 = _iterator4.next();
+	            if (_i4.done) break;
+	            _ref4 = _i4.value;
+	          }
+
+	          var item = _ref4;
+
+	          callback(item.value, item.key, 0, myEvent, item.from);
+	        }
+	      }
+	    },
+	    _cached_count: function _cached_count(cached, cacheKey, path, myEvent, callback) {
+	      if (!cached) {
+	        cache.set(cacheKey, new _Map());
+	        this.get(path, function (node, from) {
+	          return node.on(function (value, key) {
+	            value ? cache.get(cacheKey).set(from, true) : cache.get(cacheKey).delete(from);
+	            var count = cache.get(cacheKey).size;
+	            for (var _iterator5 = callbacks.get(cacheKey).values(), _isArray5 = Array.isArray(_iterator5), _i5 = 0, _iterator5 = _isArray5 ? _iterator5 : _getIterator(_iterator5);;) {
+	              var _ref5;
+
+	              if (_isArray5) {
+	                if (_i5 >= _iterator5.length) break;
+	                _ref5 = _iterator5[_i5++];
+	              } else {
+	                _i5 = _iterator5.next();
+	                if (_i5.done) break;
+	                _ref5 = _i5.value;
+	              }
+
+	              var cb = _ref5;
+
+	              cb(count, key, null, myEvent, from);
+	            }
+	          });
+	        });
+	      } else {
+	        callback(cache.get(cacheKey).size, path.split('/').pop(), null, myEvent);
+	      }
+	    },
+	    _cached_fn: function _cached_fn(fn, path, callback) {
+	      var cacheKey = fn + ":" + groupName + ":" + path;
+
+	      var callbackId = counter$1++;
+	      if (callbacks.has(cacheKey)) {
+	        callbacks.get(cacheKey).set(callbackId, callback);
+	      } else {
+	        callbacks.set(cacheKey, new _Map([[callbackId, callback]]));
+	      }
+
+	      var myEvent = { off: function off() {
+	          var myCallbacks = callbacks.get(cacheKey);
+	          myCallbacks && myCallbacks.delete(callbackId);
+	        } };
+
+	      var cached = cache.get(cacheKey);
+
+	      switch (fn) {
+	        case 'map':
+	          this._cached_map(cached, cacheKey, path, myEvent, callback);
+	          break;
+	        case 'on':
+	          this._cached_on(cached, cacheKey, path, myEvent, callback);
+	          break;
+	        case 'count':
+	          this._cached_count(cached, cacheKey, path, myEvent, callback);
+	          break;
+	      }
+	    },
+	    map: function map(path, callback) {
+	      // group queries are slow, so we cache them
+	      this._cached_fn('map', path, callback);
+	    },
+	    on: function on(path, callback) {
+	      this._cached_fn('on', path, callback);
+	    },
+	    count: function count(path, callback) {
+	      this._cached_fn('count', path, callback);
+	    }
+	  };
+	}
+
 	var NOTIFICATION_SERVICE_URL = 'https://iris-notifications.herokuapp.com/notify';
 	// const notificationSound = new Audio('../../assets/audio/notification.mp3'); // TODO
 	var loginTime = void 0;
@@ -28166,7 +30309,7 @@
 	function changeChatUnseenMsgsCount(chatId, change) {
 	  var chat = Session.channels[chatId];
 	  if (!chat) return;
-	  var chatNode = State.local.get('channels').get(chatId);
+	  var chatNode = local$1().get('channels').get(chatId);
 	  if (change) {
 	    unseenMsgsTotal += change;
 	    chat.unseen += change;
@@ -28176,7 +30319,7 @@
 	  }
 	  chatNode.get('unseen').put(chat.unseen);
 	  unseenMsgsTotal = unseenMsgsTotal >= 0 ? unseenMsgsTotal : 0;
-	  State.local.get('unseenMsgsTotal').put(unseenMsgsTotal);
+	  local$1().get('unseenMsgsTotal').put(unseenMsgsTotal);
 	}
 
 	var publicVapidKey = 'BMqSvZArOIdn7vGkYplSpkZ70-Qt8nhYbey26WVa3LF3SwzblSzm3n3HHycpNkAKVq7MCkrzFuTFs_en7Y_J2MI';
@@ -28229,7 +30372,7 @@
 
 	function removeSubscription(hash) {
 	  delete webPushSubscriptions[hash];
-	  State.public.user().get('webPushSubscriptions').get(hash).put(null);
+	  publicState$1().user().get('webPushSubscriptions').get(hash).put(null);
 	  addWebPushSubscriptionsToChats();
 	}
 
@@ -28237,11 +30380,11 @@
 	  var saveToGun = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
 	  var myKey = Session.getKey();
-	  var mySecret = await Gun$1.SEA.secret(myKey.epub, myKey);
-	  var enc = await Gun$1.SEA.encrypt(s, mySecret);
+	  var mySecret = await browser.SEA.secret(myKey.epub, myKey);
+	  var enc = await browser.SEA.encrypt(s, mySecret);
 	  var hash = await util.getHash(_JSON$stringify(s));
 	  if (saveToGun) {
-	    State.public.user().get('webPushSubscriptions').get(hash).put(enc);
+	    publicState$1().user().get('webPushSubscriptions').get(hash).put(enc);
 	  }
 	  webPushSubscriptions[hash] = s;
 	  addWebPushSubscriptionsToChats();
@@ -28249,19 +30392,19 @@
 
 	async function getWebPushSubscriptions() {
 	  var myKey = Session.getKey();
-	  var mySecret = await Gun$1.SEA.secret(myKey.epub, myKey);
-	  State.public.user().get('webPushSubscriptions').map().on(async function (enc) {
+	  var mySecret = await browser.SEA.secret(myKey.epub, myKey);
+	  publicState$1().user().get('webPushSubscriptions').map().on(async function (enc) {
 	    if (!enc) {
 	      return;
 	    }
-	    var s = await Gun$1.SEA.decrypt(enc, mySecret);
+	    var s = await browser.SEA.decrypt(enc, mySecret);
 	    addWebPushSubscription(s, false);
 	  });
 	}
 
 	function getEpub(user) {
 	  return new _Promise(function (resolve) {
-	    State.public.user(user).get('epub').on(async function (epub, k, x, e) {
+	    publicState$1().user(user).get('epub').on(async function (epub, k, x, e) {
 	      if (epub) {
 	        e.off();
 	        resolve(epub);
@@ -28271,7 +30414,7 @@
 	}
 
 	async function getNotificationText(notification) {
-	  var profile = await State.public.user(notification.from).get('profile').once();
+	  var profile = await publicState$1().user(notification.from).get('profile').once();
 	  var name = profile && profile.name || 'someone';
 	  var event = notification.event || notification.action;
 	  var eventText = void 0;
@@ -28282,32 +30425,32 @@
 	function subscribeToIrisNotifications(onClick) {
 	  var notificationsSeenTime = void 0;
 	  var notificationsShownTime = void 0;
-	  State.public.user().get('notificationsSeenTime').on(function (v) {
+	  publicState$1().user().get('notificationsSeenTime').on(function (v) {
 	    notificationsSeenTime = v;
 	    console.log(v);
 	  });
-	  State.public.user().get('notificationsShownTime').on(function (v) {
+	  publicState$1().user().get('notificationsShownTime').on(function (v) {
 	    return notificationsShownTime = v;
 	  });
 	  var setNotificationsShownTime = lodash.debounce(function () {
-	    State.public.user().get('notificationsShownTime').put(new Date().toISOString());
+	    publicState$1().user().get('notificationsShownTime').put(new Date().toISOString());
 	  }, 1000);
 	  var alreadyHave = new _Set();
-	  State.group().on('notifications/' + Session.getPubKey(), async function (encryptedNotification, k, x, e, from) {
+	  group().on('notifications/' + Session.getPubKey(), async function (encryptedNotification, k, x, e, from) {
 	    var id = from.slice(0, 30) + encryptedNotification.slice(0, 30);
 	    if (alreadyHave.has(id)) {
 	      return;
 	    }
 	    alreadyHave.add(id);
 	    var epub = await getEpub(from);
-	    var secret = await Gun$1.SEA.secret(epub, Session.getKey());
-	    var notification = await Gun$1.SEA.decrypt(encryptedNotification, secret);
+	    var secret = await browser.SEA.secret(epub, Session.getKey());
+	    var notification = await browser.SEA.decrypt(encryptedNotification, secret);
 	    if (!notification || (typeof notification === 'undefined' ? 'undefined' : _typeof(notification)) !== 'object') {
 	      return;
 	    }
 	    setNotificationsShownTime();
 	    notification.from = from;
-	    State.local.get('notifications').get(notification.time).put(notification);
+	    local$1().get('notifications').get(notification.time).put(notification);
 	    if (!notificationsSeenTime || notificationsSeenTime < notification.time) {
 	      changeUnseenNotificationCount(1);
 	    }
@@ -28332,12 +30475,12 @@
 	function changeUnseenNotificationCount(change) {
 	  if (!change) {
 	    unseenNotificationCount = 0;
-	    State.public.user().get('notificationsSeenTime').put(new Date().toISOString());
+	    publicState$1().user().get('notificationsSeenTime').put(new Date().toISOString());
 	  } else {
 	    unseenNotificationCount += change;
 	    unseenNotificationCount = Math.max(unseenNotificationCount, 0);
 	  }
-	  State.local.get('unseenNotificationCount').put(unseenNotificationCount);
+	  local$1().get('unseenNotificationCount').put(unseenNotificationCount);
 	}
 
 	async function sendIrisNotification(recipient, notification) {
@@ -28348,9 +30491,9 @@
 	    notification.time = new Date().toISOString();
 	  }
 	  var epub = await getEpub(recipient);
-	  var secret = await Gun$1.SEA.secret(epub, Session.getKey());
-	  var enc = await Gun$1.SEA.encrypt(notification, secret);
-	  State.public.user().get('notifications').get(recipient).put(enc);
+	  var secret = await browser.SEA.secret(epub, Session.getKey());
+	  var enc = await browser.SEA.encrypt(notification, secret);
+	  publicState$1().user().get('notifications').get(recipient).put(enc);
 	}
 
 	async function sendWebPushNotification(recipient, notification) {
@@ -28370,8 +30513,8 @@
 	        var participant = participants[i];
 	        var secret = await channel.getSecret(participant);
 	        var payload = {
-	          title: await Gun$1.SEA.encrypt(notification.title, secret),
-	          body: await Gun$1.SEA.encrypt(notification.body, secret),
+	          title: await browser.SEA.encrypt(notification.title, secret),
+	          body: await browser.SEA.encrypt(notification.body, secret),
 	          from: { pub: myKey.pub, epub: myKey.epub }
 	        };
 	        channel.webPushSubscriptions[participant].forEach(function (s) {
@@ -28402,12 +30545,12 @@
 	  }
 	}
 
-	function init() {
+	function init$1() {
 	  loginTime = new Date();
 	  unseenMsgsTotal = 0;
 	}
 
-	var Notifications = { init: init, notifyMsg: notifyMsg, getNotificationText: getNotificationText, sendWebPushNotification: sendWebPushNotification, changeUnseenNotificationCount: changeUnseenNotificationCount, subscribeToIrisNotifications: subscribeToIrisNotifications, sendIrisNotification: sendIrisNotification, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions: webPushSubscriptions, subscribeToWebPush: subscribeToWebPush, getWebPushSubscriptions: getWebPushSubscriptions, removeSubscription: removeSubscription };
+	var Notifications = { init: init$1, notifyMsg: notifyMsg, getNotificationText: getNotificationText, sendWebPushNotification: sendWebPushNotification, changeUnseenNotificationCount: changeUnseenNotificationCount, subscribeToIrisNotifications: subscribeToIrisNotifications, sendIrisNotification: sendIrisNotification, changeChatUnseenCount: changeChatUnseenMsgsCount, webPushSubscriptions: webPushSubscriptions, subscribeToWebPush: subscribeToWebPush, getWebPushSubscriptions: getWebPushSubscriptions, removeSubscription: removeSubscription };
 
 	var _this3 = undefined;
 
@@ -28430,10 +30573,14 @@
 
 	var urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
 
+	/**
+	 * Peer management utilities
+	 */
 	var PeerManager = {
-	  knownPeers: {},
+	  known: {},
 
-	  addPeer: async function addPeer(peer) {
+	  /** */
+	  add: async function add(peer) {
 	    var _this = this;
 
 	    if (!urlRegex.test(peer.url)) {
@@ -28441,39 +30588,45 @@
 	    }
 
 	    if (peer.from) {
-	      _Object$keys(this.knownPeers).forEach(function (k) {
-	        if (_this.knownPeers[k].from === peer.from) {
+	      _Object$keys(this.known).forEach(function (k) {
+	        if (_this.known[k].from === peer.from) {
 	          // remove previous peer url from the same user
-	          delete _this.knownPeers[k];
+	          delete _this.known[k];
 	        }
 	      });
 	    }
-	    this.knownPeers[peer.url] = this.knownPeers[peer.url] || lodash.omit(peer, 'url');
+	    this.known[peer.url] = this.known[peer.url] || lodash.omit(peer, 'url');
 	    if (peer.visibility === 'public') {
 	      // rolling some crypto operations to obfuscate actual url in case we want to remove it
-	      var secret = await Gun$1.SEA.secret(Session.getKey().epub, Session.getKey());
-	      var encryptedUrl = await Gun$1.SEA.encrypt(peer.url, secret);
-	      var encryptedUrlHash = await Gun$1.SEA.work(encryptedUrl, null, null, { name: 'SHA-256' });
-	      State.public.user().get('peers').get(encryptedUrlHash).put({ url: peer.url, lastSeen: new Date().toISOString() });
+	      var secret = await browser.SEA.secret(Session.getKey().epub, Session.getKey());
+	      var encryptedUrl = await browser.SEA.encrypt(peer.url, secret);
+	      var encryptedUrlHash = await browser.SEA.work(encryptedUrl, null, null, { name: 'SHA-256' });
+	      publicState$1().user().get('peers').get(encryptedUrlHash).put({ url: peer.url, lastSeen: new Date().toISOString() });
 	    }
 	    if (peer.enabled !== false) {
-	      this.connectPeer(peer.url); // this calls savePeers()
+	      this.connect(peer.url); // this calls savePeers()
 	    } else {
-	      this.savePeers();
+	      this.save();
 	    }
 	  },
-	  removePeer: function removePeer(url) {
-	    delete this.knownPeers[url];
-	    this.savePeers();
+
+
+	  /** */
+	  remove: function remove(url) {
+	    delete this.known[url];
+	    this.save();
 	  },
-	  disconnectPeer: function disconnectPeer(peerFromGun) {
-	    State.public.on('bye', peerFromGun);
+
+
+	  /** */
+	  disconnect: function disconnect(peerFromGun) {
+	    publicState$1().on('bye', peerFromGun);
 	    peerFromGun.url = '';
 	  },
-	  getKnownPeers: function getKnownPeers() {
-	    return this.knownPeers;
+	  save: function save() {
+	    localStorage.setItem('gunPeers', _JSON$stringify(this.known));
 	  },
-	  getSavedPeers: function getSavedPeers() {
+	  getSaved: function getSaved() {
 	    var p = localStorage.getItem('gunPeers');
 	    if (p && p !== 'undefined') {
 	      p = JSON.parse(p);
@@ -28488,41 +30641,47 @@
 	    });
 	    return p;
 	  },
-	  resetPeers: function resetPeers() {
+
+
+	  /** */
+	  reset: function reset() {
 	    localStorage.setItem('gunPeers', undefined);
-	    this.knownPeers = this.getSavedPeers();
+	    this.known = this.getSaved();
 	  },
-	  savePeers: function savePeers() {
-	    localStorage.setItem('gunPeers', _JSON$stringify(this.knownPeers));
-	  },
-	  connectPeer: function connectPeer(url) {
+
+
+	  /** */
+	  connect: function connect(url) {
 	    if (this.isMixedContent(url)) {
 	      return;
 	    }
-	    if (this.knownPeers[url]) {
-	      this.knownPeers[url].enabled = true;
-	      State.public.opt({ peers: [url] });
-	      this.savePeers();
+	    if (this.known[url]) {
+	      this.known[url].enabled = true;
+	      publicState$1().opt({ peers: [url] });
+	      this.save();
 	    } else {
-	      this.addPeer({ url: url });
+	      this.add({ url: url });
 	    }
 	  },
-	  disablePeer: function disablePeer(url, peerFromGun) {
-	    this.knownPeers[url].enabled = false;
+
+
+	  /** */
+	  disable: function disable(url, peerFromGun) {
+	    this.known[url].enabled = false;
 	    if (peerFromGun) {
-	      this.disconnectPeer(peerFromGun);
+	      this.disconnect(peerFromGun);
 	    }
-	    this.savePeers();
+	    this.save();
 	  },
 	  isMixedContent: function isMixedContent(url) {
 	    return window.location.protocol === 'https:' && url.indexOf('http:') === 0;
 	  },
-	  getRandomPeers: function getRandomPeers() {
+	  random: function random() {
 	    var _this2 = this;
 
-	    var connectToLocalElectron = util.isElectron && this.knownPeers[ELECTRON_GUN_URL] && this.knownPeers[ELECTRON_GUN_URL].enabled !== false;
+	    var connectToLocalElectron = util.isElectron && this.known[ELECTRON_GUN_URL] && this.known[ELECTRON_GUN_URL].enabled !== false;
 	    var sampleSize = connectToLocalElectron ? Math.max(maxConnectedPeers - 1, 1) : maxConnectedPeers;
-	    var sample = lodash.sampleSize(_Object$keys(lodash.pickBy(this.knownPeers, function (peer, url) {
+	    var sample = lodash.sampleSize(_Object$keys(lodash.pickBy(this.known, function (peer, url) {
 	      return !_this2.isMixedContent(url) && peer.enabled && !(util.isElectron && url === ELECTRON_GUN_URL);
 	    })), sampleSize);
 	    if (sample && connectToLocalElectron) {
@@ -28533,15 +30692,15 @@
 
 
 	  askForPeers: lodash.once(async function (pub) {
-	    var enablePublicPeerDiscovery = await State.local.get('settings').get('local').get('enablePublicPeerDiscovery').once();
+	    var enablePublicPeerDiscovery = await local$1().get('settings').get('local').get('enablePublicPeerDiscovery').once();
 	    if (!enablePublicPeerDiscovery) {
 	      return;
 	    }
 	    lodash.defer(function () {
-	      State.public.user(pub).get('peers').once().map().on(function (peer) {
+	      publicState$1().user(pub).get('peers').once().map().on(function (peer) {
 	        if (peer && peer.url) {
 	          (function () {
-	            var peerCountBySource = lodash.countBy(_this3.knownPeers, function (p) {
+	            var peerCountBySource = lodash.countBy(_this3.known, function (p) {
 	              return p.from;
 	            });
 	            var peerSourceCount = _Object$keys(peerCountBySource).length;
@@ -28549,11 +30708,11 @@
 	              peerSourceCount += 1;
 	            }
 	            var maxPeersFromSource = MAX_PEER_LIST_SIZE / peerSourceCount;
-	            _this3.addPeer({ url: peer.url, connect: true, from: pub });
-	            while (_Object$keys(_this3.knownPeers).length > MAX_PEER_LIST_SIZE) {
+	            _this3.add({ url: peer.url, connect: true, from: pub });
+	            while (_Object$keys(_this3.known).length > MAX_PEER_LIST_SIZE) {
 	              lodash.each(_Object$keys(peerCountBySource), function (source) {
 	                if (peerCountBySource[source] > maxPeersFromSource) {
-	                  delete _this3.knownPeers[lodash.sample(_Object$keys(_this3.knownPeers))];
+	                  delete _this3.known[lodash.sample(_Object$keys(_this3.known))];
 	                  peerCountBySource[source] -= 1;
 	                }
 	              });
@@ -28567,7 +30726,7 @@
 	  checkGunPeerCount: function checkGunPeerCount() {
 	    var _this4 = this;
 
-	    var peersFromGun = State.public.back('opt.peers');
+	    var peersFromGun = publicState$1().back('opt.peers');
 	    var connectedPeers = lodash.filter(_Object$values(peersFromGun), function (peer) {
 	      if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
 	        console.log('WebRTC peer', peer);
@@ -28575,25 +30734,25 @@
 	      return peer && peer.wire && peer.wire.readyState === 1 && peer.wire.bufferedAmount === 0 && peer.wire.constructor.name === 'WebSocket';
 	    });
 	    if (connectedPeers.length < maxConnectedPeers) {
-	      var unconnectedPeers = lodash.filter(_Object$keys(this.knownPeers), function (url) {
+	      var unconnectedPeers = lodash.filter(_Object$keys(this.known), function (url) {
 	        var addedToGun = lodash.map(_Object$values(peersFromGun), 'url').indexOf(url) > -1;
-	        var enabled = _this4.knownPeers[url].enabled;
+	        var enabled = _this4.known[url].enabled;
 	        var mixedContent = window.location.protocol === 'https:' && url.indexOf('http:') === 0;
 	        return !mixedContent && enabled && !addedToGun;
 	      });
 	      if (unconnectedPeers.length) {
-	        this.connectPeer(lodash.sample(unconnectedPeers));
+	        this.connect(lodash.sample(unconnectedPeers));
 	      }
 	    }
 	    if (connectedPeers.length > maxConnectedPeers) {
-	      this.disconnectPeer(lodash.sample(connectedPeers));
+	      this.disconnect(lodash.sample(connectedPeers));
 	    }
 	  },
 	  init: function init() {
 	    var _this5 = this;
 
-	    this.knownPeers = this.getSavedPeers();
-	    State.local.get('settings').get('maxConnectedPeers').on(function (n) {
+	    this.known = this.getSaved();
+	    local$1().get('settings').get('maxConnectedPeers').on(function (n) {
 	      if (n !== undefined) maxConnectedPeers = n;
 	    });
 	    setInterval(function () {
@@ -28601,6 +30760,1569 @@
 	    }, 1000);
 	  }
 	};
+
+	/*eslint no-useless-escape: "off", camelcase: "off" */
+
+	var UNIQUE_ID_VALIDATORS = {
+	  email: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
+	  bitcoin: /^[13][a-km-zA-HJ-NP-Z0-9]{26,33}$/,
+	  bitcoin_address: /^[13][a-km-zA-HJ-NP-Z0-9]{26,33}$/,
+	  ip: /^(([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}([1-9]?\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$/,
+	  ipv6: /^(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}$/,
+	  gpg_fingerprint: null,
+	  gpg_keyid: null,
+	  google_oauth2: null,
+	  tel: /^\d{7,}$/,
+	  phone: /^\d{7,}$/,
+	  keyID: null,
+	  url: /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi,
+	  account: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
+	  uuid: /[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}/
+	};
+
+	// TODO this class could perhaps be removed
+
+	var Attribute = function () {
+	  function Attribute(a, b) {
+	    _classCallCheck(this, Attribute);
+
+	    if (typeof a === "object") {
+	      if (typeof a.value !== "string") {
+	        throw new Error("param1.value must be a string, got " + _typeof(a.value) + ": " + _JSON$stringify(a.value));
+	      }
+	      if (typeof a.type !== "string") {
+	        throw new Error("param1.type must be a string, got " + _typeof(a.type) + ": " + _JSON$stringify(a.type));
+	      }
+	      b = a.value;
+	      a = a.type;
+	    }
+	    if (typeof a !== "string") {
+	      throw new Error("First param must be a string, got " + (typeof a === "undefined" ? "undefined" : _typeof(a)) + ": " + _JSON$stringify(a));
+	    }
+	    if (!a.length) {
+	      throw new Error("First param string is empty");
+	    }
+	    if (b) {
+	      if (typeof b !== "string") {
+	        throw new Error("Second parameter must be a string, got " + (typeof b === "undefined" ? "undefined" : _typeof(b)) + ": " + _JSON$stringify(b));
+	      }
+	      if (!b.length) {
+	        throw new Error("Second param string is empty");
+	      }
+	      this.type = a;
+	      this.value = b;
+	    } else {
+	      this.value = a;
+	      var t = Attribute.guessTypeOf(this.value);
+	      if (t) {
+	        this.type = t;
+	      } else {
+	        throw new Error("Type of attribute was omitted and could not be guessed");
+	      }
+	    }
+	  }
+
+	  Attribute.getUuid = function getUuid() {
+	    var b = function b(a) {
+	      return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
+	    };
+	    return new Attribute("uuid", b());
+	  };
+
+	  Attribute.getUniqueIdValidators = function getUniqueIdValidators() {
+	    return UNIQUE_ID_VALIDATORS;
+	  };
+
+	  Attribute.isUniqueType = function isUniqueType(type) {
+	    return _Object$keys(UNIQUE_ID_VALIDATORS).indexOf(type) > -1;
+	  };
+
+	  Attribute.prototype.isUniqueType = function isUniqueType() {
+	    return Attribute.isUniqueType(this.type);
+	  };
+
+	  Attribute.guessTypeOf = function guessTypeOf(value) {
+	    for (var key in UNIQUE_ID_VALIDATORS) {
+	      if (value.match(UNIQUE_ID_VALIDATORS[key])) {
+	        return key;
+	      }
+	    }
+	  };
+
+	  Attribute.equals = function equals(a, b) {
+	    return a.equals(b);
+	  };
+
+	  Attribute.prototype.equals = function equals(a) {
+	    return a && this.type === a.type && this.value === a.value;
+	  };
+
+	  Attribute.prototype.uri = function uri() {
+	    return encodeURIComponent(this.value) + ":" + encodeURIComponent(this.type);
+	  };
+
+	  return Attribute;
+	}();
+
+	/**
+	* Private communication channel between two or more participants ([Gun](https://github.com/amark/gun) public keys). Can be used independently of other Iris stuff.
+	*
+	* Used as a core element of [iris-messenger](https://github.com/irislib/iris-messenger).
+	*
+	* ---
+	*
+	* #### Key-value API
+	* `channel.put(key, value)` and `channel.on(key, callback)`.
+	*
+	* Note that each participant has their own versions of each key-value — they don't overwrite each other. `channel.on()` callback returns them all by default and has a parameter that indicates whose value you got.
+	*
+	* While values are encrypted, encryption of keys is not implemented yet.
+	*
+	* #### Message API
+	* `channel.send()` and `channel.getMessages()` for timestamp-indexed chat-style messaging.
+	*
+	* Message data is encrypted, but timestamps are public so that peers can return your messages in a sequential order.
+	*
+	* ---
+	*
+	* You can open a channel with yourself for a private key-value space or a "note to self" type chat with yourself.
+	*
+	* **Note!** As of April 2020 Gun.SEA hashing function [is broken on Safari](https://github.com/amark/gun/issues/892). Channels don't work on Safari unless you patch sea.js by adding [this line](https://github.com/irislib/iris-messenger/blob/1e012581793485e6b8b5ed3c2ad0629716709366/src/js/sea.js#L270).
+	*
+	* **Privacy disclaimer:** Channel ids, data values and messages are encrypted, but message timestamps are unencrypted so that peers can return them to you in a sequential order. By looking at the unencrypted timestamps (or Gun subscriptions), it is possible to guess who are communicating with each other. This could be improved by indexing messages by *day* only, so making the guess would be more difficult, while you could still return them in a semi-sequential order.
+	*
+	* @param {Object} options
+	* @param {string} options.key your keypair
+	* @param {Object} options.gun [gun](https://github.com/amark/gun) instance
+	* @param options.participants (optional) string or string array or permissions object ({'pub1':{read:true,write:true,admin:false},'pub2'...}) of participant public keys (your own key is included by default)
+	* @param {string} options.chatLink (optional) chat link instead of participants list
+	* @param {string} options.uuid (group channels only) unique channel identifier. Leave out for new channel.
+	* @param {string} options.name (group channels only) channel name
+	* @example
+	* // Copy & paste this to console at https://iris.to or other page that has gun, sea and iris-lib
+	* // Due to an unsolved bug, someoneElse's messages only start showing up after a reload
+	*
+	* var gun1 = new Gun('https://gun-us.herokuapp.com/gun');
+	* var gun2 = new Gun('https://gun-us.herokuapp.com/gun');
+	* var myKey = await iris.Key.getDefault();
+	* var someoneElse = localStorage.getItem('someoneElsesKey');
+	* if (someoneElse) {
+	*  someoneElse = JSON.parse(someoneElse);
+	* } else {
+	*  someoneElse = await iris.Key.generate();
+	*  localStorage.setItem('someoneElsesKey', JSON.stringify(someoneElse));
+	* }
+	*
+	* iris.Channel.initUser(gun1, myKey); // saves myKey.epub to gun.user().get('epub')
+	* iris.Channel.initUser(gun2, someoneElse);
+	*
+	* var ourChannel = new iris.Channel({key: myKey, gun: gun1, participants: someoneElse.pub});
+	* var theirChannel = new iris.Channel({key: someoneElse, gun: gun2, participants: myKey.pub});
+	*
+	* var myChannels = {}; // you can list them in a user interface
+	* function printMessage(msg, info) {
+	*  console.log(`[${new Date(msg.time).toLocaleString()}] ${info.from.slice(0,8)}: ${msg.text}`)
+	* }
+	* iris.Channel.getChannels(gun1, myKey, channel => {
+	*  var pub = channel.getCurrentParticipants()[0];
+	*  gun1.user(pub).get('profile').get('name').on(name => channel.name = name);
+	*  myChannels[pub] = channel;
+	*  channel.getMessages(printMessage);
+	*  channel.on('mood', (mood, from) => console.log(from.slice(0,8) + ' is feeling ' + mood));
+	* });
+	*
+	* // you can play with these in the console:
+	* ourChannel.send('message from myKey');
+	* theirChannel.send('message from someoneElse');
+	*
+	* ourChannel.put('mood', 'blessed');
+	* theirChannel.put('mood', 'happy');
+	*
+	* @example https://github.com/irislib/iris-lib/blob/master/__tests__/Channel.js
+	*/
+
+	var Channel = function () {
+	  function Channel(options) {
+	    var _this = this;
+
+	    _classCallCheck(this, Channel);
+
+	    this.DEFAULT_PERMISSIONS = { read: true, write: true };
+	    this.key = options.key;
+	    this.myGroupSecret = options.myGroupSecret;
+	    this.theirSecretUuids = {};
+	    this.theirGroupSecrets = {};
+	    this.user = publicState$1().user();
+	    this.user.auth(this.key);
+	    this.user.put({ epub: this.key.epub });
+	    this.secrets = {}; // maps participant public key to shared secret
+	    this.ourSecretChannelIds = {}; // maps participant public key to our secret mutual channel id
+	    this.theirSecretChannelIds = {}; // maps participant public key to their secret mutual channel id
+	    this.messages = {};
+	    this.chatLinks = {};
+	    this.groupSubscriptions = {};
+	    this.directSubscriptions = {};
+	    this.getParticipantsCallbacks = {};
+
+	    if (options.chatLink) {
+	      this.useChatLink(options);
+	    }
+
+	    if (typeof options.participants === 'string') {
+	      this.addParticipant(options.participants, options.save);
+	    } else if (Array.isArray(options.participants)) {
+	      var o = {};
+	      options.participants.forEach(function (p) {
+	        return o[p] = _Object$assign({}, _this.DEFAULT_PERMISSIONS);
+	      });
+	      options.participants = o;
+	    }
+	    if (typeof options.participants === 'object') {
+	      // it's a group channel
+	      var keys = _Object$keys(options.participants);
+	      keys.forEach(function (k) {
+	        if (k !== _this.key.pub) {
+	          _this.addParticipant(k, options.save, _Object$assign({}, _this.DEFAULT_PERMISSIONS, options.participants[k]));
+	        }
+	      });
+	      options.participants[this.key.pub] = options.participants[this.key.pub] || _Object$assign({}, this.DEFAULT_PERMISSIONS);
+	      if (options.uuid) {
+	        this.uuid = options.uuid;
+	        this.name = options.name;
+	      } else {
+	        options.uuid = Attribute.getUuid().value;
+	        this.uuid = options.uuid;
+	        options.participants[this.key.pub].admin = true;
+	        options.participants[this.key.pub].founder = true;
+	      }
+	      this.getChatLinks({ subscribe: true });
+	    }
+	    this.participants = options.participants;
+	    if (options.uuid) {
+	      // It's a group channel
+	      // share secret uuid with other participants. since secret is already non-deterministic, maybe uuid could also be?
+	      // generate channel-specific secret and share it with other participants
+	      // put() keys should be encrypted first? so you could do put(uuid, secret)
+	      // what if you join the channel with 2 unconnected devices? on reconnect, the older secret would be overwritten and messages unreadable. maybe participants should store each others' old keys? or maybe you should store them and re-encrypt old stuff when key changes? return them with map() instead?
+	      this.putDirect('S' + this.uuid, this.getMyGroupSecret());
+	      this.getMySecretUuid().then(function (s) {
+	        _this.putDirect(_this.uuid, s); // TODO: encrypt keys in put()
+	      });
+	      this.onTheirDirect(this.uuid, function (s, k, from) {
+	        _this.theirSecretUuids[from] = s;
+	      });
+	      this.onTheirDirect('S' + this.uuid, function (s, k, from) {
+	        _this.theirGroupSecrets[from] = s;
+	      });
+	      // need to make put(), on(), send() and getMessages() behave differently when it's a group and retain the old versions for mutual signaling
+	    }
+	    this.onTheir('participants', function (participants, k, from) {
+	      var hasAdmin = false;
+	      var keys = _Object$keys(_this.participants);
+	      for (var i = 0; i < keys.length; i++) {
+	        if (_this.participants[keys[i]].admin || _this.participants[keys[i]].inviter) {
+	          hasAdmin = true;
+	          break;
+	        }
+	      }
+	      if (!hasAdmin) {
+	        keys.forEach(function (k) {
+	          return _this.participants[k].admin = true;
+	        }); // if no admins, make everyone admin
+	      }
+	      if (_this.participants[from] && (_this.participants[from].admin || _this.participants[from].inviter)) {
+	        if (typeof participants === 'object') {
+	          if (_JSON$stringify(_this.participants) === _JSON$stringify(participants)) {
+	            return;
+	          }
+	          _this.participants = participants;
+	          delete _this.participants[from].inviter;
+	          _Object$keys(participants).forEach(function (k) {
+	            if (k !== _this.key.pub) {
+	              _this.addParticipant(k, true, _Object$assign({}, _this.DEFAULT_PERMISSIONS, participants[k]), true);
+	            }
+	          });
+	          _this.participantsChanged();
+	          options.saved = true;
+	        }
+	      }
+	    });
+	    if (!options.saved && (options.save === undefined || options.save === true)) {
+	      this.save();
+	    }
+	  }
+
+	  Channel.prototype.useChatLink = function useChatLink(options) {
+	    var _this2 = this;
+
+	    var s = options.chatLink.split('?');
+	    if (s.length === 2) {
+	      var chatWith = util.getUrlParameter('chatWith', s[1]);
+	      var channelId = util.getUrlParameter('channelId', s[1]);
+	      var inviter = util.getUrlParameter('inviter', s[1]);
+	      var pub = inviter || chatWith;
+	      if (chatWith) {
+	        options.participants = pub;
+	      } else if (channelId && inviter && inviter !== this.key.pub) {
+	        // TODO! initializing it twice breaks things - new secret is generated
+	        options.uuid = channelId;
+	        options.participants = {};
+	        options.participants[inviter] = _Object$assign({ inviter: true }, this.DEFAULT_PERMISSIONS);
+	      }
+	      if (pub !== this.key.pub) {
+	        var sharedSecret = util.getUrlParameter('s', s[1]);
+	        var linkId = util.getUrlParameter('k', s[1]);
+	        if (sharedSecret && linkId) {
+	          this.save(); // save the channel first so it's there before inviter subscribes to it
+	          options.saved = true;
+	          publicState$1().user(pub).get('chatLinks').get(linkId).get('encryptedSharedKey').on(async function (encrypted) {
+	            var sharedKey = await browser.SEA.decrypt(encrypted, sharedSecret);
+	            var encryptedChatRequest = await browser.SEA.encrypt(_this2.key.pub, sharedSecret); // TODO encrypt is not deterministic, it uses salt
+	            var channelRequestId = await util.getHash(encryptedChatRequest);
+	            util.gunAsAnotherUser(publicState$1(), sharedKey, function (user) {
+	              user.get('chatRequests').get(channelRequestId.slice(0, 12)).put(encryptedChatRequest);
+	            });
+	          });
+	        }
+	      }
+	    }
+	  };
+
+	  Channel.prototype.getTheirSecretUuid = function getTheirSecretUuid(pub) {
+	    var _this3 = this;
+
+	    return new _Promise(function (resolve) {
+	      if (!_this3.theirSecretUuids[pub]) {
+	        _this3.onTheirDirect(_this3.uuid, function (s) {
+	          _this3.theirSecretUuids[pub] = s;
+	          resolve(_this3.theirSecretUuids[pub]);
+	        }, pub);
+	      } else {
+	        resolve(_this3.theirSecretUuids[pub]);
+	      }
+	    });
+	  };
+
+	  Channel.prototype.getTheirGroupSecret = function getTheirGroupSecret(pub) {
+	    var _this4 = this;
+
+	    if (pub === this.key.pub) {
+	      return this.getMyGroupSecret();
+	    }
+	    return new _Promise(function (resolve) {
+	      if (!_this4.theirGroupSecrets[pub]) {
+	        _this4.onTheirDirect('S' + _this4.uuid, function (s) {
+	          _this4.theirGroupSecrets[pub] = s;
+	          resolve(_this4.theirGroupSecrets[pub]);
+	        }, pub);
+	      } else {
+	        resolve(_this4.theirGroupSecrets[pub]);
+	      }
+	    });
+	  };
+
+	  Channel.prototype.changeMyGroupSecret = function changeMyGroupSecret() {
+	    this.myGroupSecret = browser.SEA.random(32).toString('base64');
+	    // TODO: secret should be archived and probably messages should include the encryption key id so past messages don't become unreadable
+	    this.putDirect('S' + this.uuid, this.myGroupSecret);
+	  };
+
+	  /**
+	  * Unsubscribe messages from a channel participants
+	  *
+	  * @param {string} participant public key
+	  */
+
+
+	  Channel.prototype.mute = async function mute(participant) {
+	    publicState$1().user(participant).get(this.theirSecretUuids[participant]).off();
+	    // TODO: persist
+	  };
+
+	  /**
+	  * Mute user and prevent them from seeing your further (and maybe past) messages
+	  *
+	  * @param {string} participant public key
+	  */
+
+
+	  Channel.prototype.block = async function block(participant) {
+	    this.mute(participant);
+	    this.putDirect(this.uuid, null);
+	    this.putDirect('S' + this.uuid, null);
+	    delete this.secrets[participant];
+	    delete this.ourSecretChannelIds[participant];
+	    delete this.theirSecretChannelIds[participant];
+	    this.changeMyGroupSecret();
+	  };
+
+	  Channel.prototype.getMySecretUuid = async function getMySecretUuid() {
+	    if (!this.mySecretUuid) {
+	      var mySecret = await browser.SEA.secret(this.key.epub, this.key);
+	      var mySecretHash = await util.getHash(mySecret);
+	      this.mySecretUuid = await util.getHash(mySecretHash + this.uuid);
+	    }
+	    return this.mySecretUuid;
+	  };
+
+	  /**
+	  * List participants of the channel (other than you)
+	  */
+
+
+	  Channel.prototype.getCurrentParticipants = function getCurrentParticipants() {
+	    return _Object$keys(this.secrets);
+	  };
+
+	  /**
+	  * Subscribe to the changing list of participants by channel admins
+	  */
+
+
+	  Channel.prototype.getParticipants = function getParticipants(callback) {
+	    if (this.getParticipantsCallbackId) {
+	      this.getParticipantsCallbackId++;
+	    } else {
+	      this.getParticipantsCallbackId = 1;
+	    }
+	    this.getParticipantsCallbacks[this.getParticipantsCallbackId] = callback;
+	    if (this.participants) {
+	      callback(this.participants);
+	    }
+	  };
+
+	  Channel.prototype.participantsChanged = function participantsChanged() {
+	    var _this5 = this;
+
+	    _Object$keys(this.getParticipantsCallbacks).forEach(function (id) {
+	      _this5.getParticipantsCallbacks[id](_this5.participants);
+	    });
+	  };
+
+	  /**
+	  * Returns either the uuid of a group channel or the public key of a direct channel.
+	  */
+
+
+	  Channel.prototype.getId = function getId() {
+	    return this.uuid || this.getCurrentParticipants()[0];
+	  };
+
+	  Channel.prototype.getSecret = async function getSecret(pub) {
+	    if (!this.secrets[pub]) {
+	      var epub = await util.gunOnceDefined(publicState$1().user(pub).get('epub'));
+	      this.secrets[pub] = await browser.SEA.secret(epub, this.key);
+	    }
+	    return this.secrets[pub];
+	  };
+
+	  /**
+	  *
+	  */
+
+
+	  Channel.getOurSecretChannelId = async function getOurSecretChannelId(pub, pair) {
+	    var epub = await util.gunOnceDefined(publicState$1().user(pub).get('epub'));
+	    var secret = await browser.SEA.secret(epub, pair);
+	    return util.getHash(secret + pub);
+	  };
+
+	  /**
+	  *
+	  */
+
+
+	  Channel.getTheirSecretChannelId = async function getTheirSecretChannelId(pub, pair) {
+	    var epub = await util.gunOnceDefined(publicState$1().user(pub).get('epub'));
+	    var secret = await browser.SEA.secret(epub, pair);
+	    return util.getHash(secret + pair.pub);
+	  };
+
+	  /**
+	  * Calls back with Channels that you have initiated or written to.
+	  * @param {Object} keypair Gun.SEA keypair that the gun instance is authenticated with
+	  * @param callback callback function that is called for each public key you have a channel with
+	  */
+
+
+	  Channel.getChannels = async function getChannels(keypair, callback) {
+	    var listenToChatLinks = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
+	    var mySecret = await browser.SEA.secret(keypair.epub, keypair);
+	    if (listenToChatLinks) {
+	      Channel.getMyChatLinks(keypair, undefined, undefined, true);
+	    }
+	    var seen = {};
+
+	    var handleChannel = async function handleChannel(value, ourSecretChannelId) {
+	      if (value && !seen[ourSecretChannelId]) {
+	        seen[ourSecretChannelId] = true;
+	        if (ourSecretChannelId.length > 44) {
+	          publicState$1().user().get('chats').get(ourSecretChannelId).put(null);
+	          return;
+	        }
+	        var encryptedChatId = await util.gunOnceDefined(publicState$1().user().get('chats').get(ourSecretChannelId).get('pub'));
+	        var chatId = await browser.SEA.decrypt(encryptedChatId, mySecret);
+	        if (!chatId) {
+	          return;
+	        }
+	        if (chatId.pub || typeof chatId === 'string') {
+	          callback(new Channel({
+	            key: keypair,
+	            participants: chatId.pub || chatId,
+	            save: false
+	          }));
+	        } else if (chatId.uuid && chatId.participants && chatId.myGroupSecret) {
+	          callback(new Channel({
+	            key: keypair,
+	            participants: chatId.participants,
+	            uuid: chatId.uuid,
+	            myGroupSecret: chatId.myGroupSecret,
+	            save: false
+	          }));
+	        }
+	      }
+	    };
+
+	    publicState$1().user().get('chats').map().on(handleChannel);
+	  };
+
+	  Channel.prototype.getMyGroupSecret = function getMyGroupSecret() {
+	    // group secret could be deterministic: hash(encryptToSelf(uuid + iterator))
+	    if (!this.myGroupSecret) {
+	      this.changeMyGroupSecret();
+	    }
+	    return this.myGroupSecret;
+	  };
+
+	  Channel.prototype.getOurSecretChannelId = async function getOurSecretChannelId(pub) {
+	    if (!this.ourSecretChannelIds[pub]) {
+	      var secret = await this.getSecret(pub);
+	      this.ourSecretChannelIds[pub] = await util.getHash(secret + pub);
+	    }
+	    return this.ourSecretChannelIds[pub];
+	  };
+
+	  Channel.prototype.getTheirSecretChannelId = async function getTheirSecretChannelId(pub) {
+	    if (!this.theirSecretChannelIds[pub]) {
+	      var secret = await this.getSecret(pub);
+	      this.theirSecretChannelIds[pub] = await util.getHash(secret + this.key.pub);
+	    }
+	    return this.theirSecretChannelIds[pub];
+	  };
+
+	  /**
+	  * Get messages from the channel
+	  */
+
+
+	  Channel.prototype.getMessages = async function getMessages(callback) {
+	    var _this6 = this;
+
+	    // TODO: save callback and apply it when new participants are added to channel
+	    this.getCurrentParticipants().forEach(async function (pub) {
+	      if (pub !== _this6.key.pub) {
+	        // Subscribe to their messages
+	        var theirSecretChannelId = void 0;
+	        if (_this6.uuid) {
+	          theirSecretChannelId = await _this6.getTheirSecretUuid(pub);
+	        } else {
+	          theirSecretChannelId = await _this6.getTheirSecretChannelId(pub);
+	        }
+	        publicState$1().user(pub).get('chats').get(theirSecretChannelId).get('msgs').map().once(function (data, key) {
+	          _this6.messageReceived(callback, data, _this6.uuid || pub, false, key, pub);
+	        });
+	      }
+	      if (!_this6.uuid) {
+	        // Subscribe to our messages
+	        var ourSecretChannelId = await _this6.getOurSecretChannelId(pub);
+	        _this6.user.get('chats').get(ourSecretChannelId).get('msgs').map().once(function (data, key) {
+	          _this6.messageReceived(callback, data, pub, true, key, _this6.key.pub);
+	        });
+	      }
+	    });
+	    if (this.uuid) {
+	      // Subscribe to our messages
+	      var mySecretUuid = await this.getMySecretUuid();
+	      this.user.get('chats').get(mySecretUuid).get('msgs').map().once(function (data, key) {
+	        _this6.messageReceived(callback, data, _this6.uuid, true, key, _this6.key.pub);
+	      });
+	    }
+	  };
+
+	  Channel.prototype.messageReceived = async function messageReceived(callback, data, channelId, selfAuthored, key, from) {
+	    if (this.messages[key] || !data) {
+	      return;
+	    }
+	    var secret = this.uuid ? await this.getTheirGroupSecret(from) : await this.getSecret(channelId);
+	    var decrypted = await browser.SEA.decrypt(data, secret);
+	    if (typeof decrypted !== 'object') {
+	      return;
+	    }
+	    var info = { selfAuthored: selfAuthored, channelId: channelId, from: from };
+	    this.messages[key] = decrypted;
+	    callback(decrypted, info);
+	  };
+
+	  /**
+	  * Get latest message in this channel. Useful for channel listing.
+	  */
+
+
+	  Channel.prototype.getLatestMsg = async function getLatestMsg(callback) {
+	    var _this7 = this;
+
+	    var callbackIfLatest = async function callbackIfLatest(msg, info) {
+	      if (!_this7.latest) {
+	        _this7.latest = msg;
+	        callback(msg, info);
+	      } else {
+	        var t = typeof _this7.latest.time === 'string' ? _this7.latest.time : _this7.latest.time.toISOString();
+	        if (t < msg.time) {
+	          _this7.latest = msg;
+	          callback(msg, info);
+	        }
+	      }
+	    };
+	    this.onMy('latestMsg', function (msg) {
+	      return callbackIfLatest(msg, { selfAuthored: true, from: _this7.key.pub });
+	    });
+	    this.onTheir('latestMsg', function (msg, k, from) {
+	      return callbackIfLatest(msg, { selfAuthored: false, from: from });
+	    });
+	  };
+
+	  /**
+	  * Useful for notifications
+	  * @param {integer} time last seen msg time (default: now)
+	  */
+
+
+	  Channel.prototype.setMyMsgsLastSeenTime = async function setMyMsgsLastSeenTime(time) {
+	    time = time || new Date().toISOString();
+	    return this.put('msgsLastSeenTime', time);
+	  };
+
+	  /**
+	  * Useful for notifications
+	  */
+
+
+	  Channel.prototype.getMyMsgsLastSeenTime = async function getMyMsgsLastSeenTime(callback) {
+	    var _this8 = this;
+
+	    this.onMy('msgsLastSeenTime', function (time) {
+	      _this8.myMsgsLastSeenTime = time;
+	      if (callback) {
+	        callback(_this8.myMsgsLastSeenTime);
+	      }
+	    });
+	  };
+
+	  /**
+	  * For "seen" status indicator
+	  */
+
+
+	  Channel.prototype.getTheirMsgsLastSeenTime = async function getTheirMsgsLastSeenTime(callback) {
+	    var _this9 = this;
+
+	    this.onTheir('msgsLastSeenTime', function (time) {
+	      _this9.theirMsgsLastSeenTime = time;
+	      if (callback) {
+	        callback(_this9.theirMsgsLastSeenTime);
+	      }
+	    });
+	  };
+
+	  Channel.prototype.removeParticipant = async function removeParticipant(pub) {
+	    this.addParticipant(pub, true, { read: false, write: false });
+	  };
+
+	  /**
+	  * Add a public key to the channel or update its permissions
+	  * @param {string} pub
+	  */
+
+
+	  Channel.prototype.addParticipant = async function addParticipant(pub) {
+	    var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+	    var _this10 = this;
+
+	    var permissions = arguments[2];
+	    var subscribe = arguments[3];
+
+	    if (permissions === undefined) {
+	      permissions = this.DEFAULT_PERMISSIONS;
+	    }
+	    if (this.secrets[pub] && _JSON$stringify(this.secrets[pub]) === _JSON$stringify(permissions)) {
+	      // TODO: should be this.participants[pub]
+	      return;
+	    }
+	    this.secrets[pub] = null;
+	    this.getSecret(pub);
+	    var ourSecretChannelId = await this.getOurSecretChannelId(pub);
+	    if (save) {
+	      // Save their public key in encrypted format, so in channel listing we know who we are channeling with
+	      var mySecret = await browser.SEA.secret(this.key.epub, this.key);
+	      publicState$1().user().get('chats').get(ourSecretChannelId).get('pub').put((await browser.SEA.encrypt({ pub: pub }, mySecret)));
+	    }
+	    if (this.uuid) {
+	      this.participants[pub] = permissions;
+	      if (save) {
+	        this.putDirect('S' + this.uuid, this.getMyGroupSecret());
+	        this.getMySecretUuid().then(function (s) {
+	          _this10.putDirect(_this10.uuid, s); // TODO: encrypt keys in put()
+	        });
+	        this.onTheirDirect(this.uuid, function (s, k, from) {
+	          _this10.theirSecretUuids[from] = s;
+	        });
+	        this.onTheirDirect('S' + this.uuid, function (s, k, from) {
+	          _this10.theirGroupSecrets[from] = s;
+	        });
+	        this.save();
+	      }
+	    }
+	    if (subscribe) {
+	      _Object$values(this.directSubscriptions).forEach(function (arr) {
+	        arr.forEach(function (o) {
+	          if (!o.from || o.from === pub) {
+	            _this10._onTheirDirectFromUser(pub, o.key, o.callback);
+	          }
+	        });
+	      });
+	      _Object$values(this.groupSubscriptions).forEach(function (arr) {
+	        arr.forEach(function (o) {
+	          if (o.from && o.from !== pub) {
+	            return;
+	          }
+	          if (permissions.write) {
+	            _this10._onTheirGroupFromUser(pub, o.key, o.callback);
+	          } else {
+	            // unsubscribe
+	            o.event && o.event.off();
+	          }
+	        });
+	      });
+	    }
+	  };
+
+	  /**
+	  * Send a message to the channel
+	  * @param msg string or {time, text, ...} object
+	  */
+
+
+	  Channel.prototype.send = async function send(msg) {
+	    if (typeof msg === 'string') {
+	      msg = msg.trim();
+	      if (msg.length === 0) {
+	        return;
+	      }
+	      msg = {
+	        time: new Date().toISOString(),
+	        text: msg
+	      };
+	    } else if (typeof msg === 'object') {
+	      msg.time = msg.time || new Date().toISOString();
+	    } else {
+	      throw new Error('msg param must be a string or an object');
+	    }
+	    //publicState().user().get('message').set(temp);
+	    if (this.uuid) {
+	      var encrypted = await browser.SEA.encrypt(_JSON$stringify(msg), this.getMyGroupSecret());
+	      var mySecretUuid = await this.getMySecretUuid();
+	      this.user.get('chats').get(mySecretUuid).get('msgs').get('' + msg.time).put(encrypted);
+	      this.user.get('chats').get(mySecretUuid).get('latestMsg').put(encrypted);
+	    } else {
+	      var keys = this.getCurrentParticipants();
+	      for (var i = 0; i < keys.length; i++) {
+	        var _encrypted = await browser.SEA.encrypt(_JSON$stringify(msg), (await this.getSecret(keys[i])));
+	        var ourSecretChannelId = await this.getOurSecretChannelId(keys[i]);
+	        this.user.get('chats').get(ourSecretChannelId).get('msgs').get('' + msg.time).put(_encrypted);
+	        this.user.get('chats').get(ourSecretChannelId).get('latestMsg').put(_encrypted);
+	      }
+	    }
+	  };
+
+	  /**
+	  * Save the channel to our channels list without sending a message
+	  */
+
+
+	  Channel.prototype.save = async function save() {
+	    if (this.uuid) {
+	      var mySecretUuid = await this.getMySecretUuid();
+	      this.user.get('chats').get(mySecretUuid).get('msgs').get('a').put(null);
+	      this.put('participants', this.participants); // public participants list
+	      var mySecret = await browser.SEA.secret(this.key.epub, this.key);
+	      this.user.get('chats').get(mySecretUuid).get('pub').put((await browser.SEA.encrypt({
+	        uuid: this.uuid,
+	        myGroupSecret: this.getMyGroupSecret(),
+	        participants: this.participants // private participants list
+	      }, mySecret)));
+	      this.participantsChanged();
+	    } else {
+	      var keys = this.getCurrentParticipants();
+	      for (var i = 0; i < keys.length; i++) {
+	        var ourSecretChannelId = await this.getOurSecretChannelId(keys[i]);
+	        this.user.get('chats').get(ourSecretChannelId).get('msgs').get('a').put(null);
+	      }
+	    }
+	  };
+
+	  /**
+	  * Save a key-value pair, encrypt value. Each participant in the Channel writes to their own version of the key-value pair — they don't overwrite the same one.
+	  * @param {string} key
+	  * @param value
+	  */
+
+
+	  Channel.prototype.put = async function put(key, value) {
+	    return (this.uuid ? this.putGroup : this.putDirect).call(this, key, value);
+	  };
+
+	  Channel.prototype.putGroup = async function putGroup(key, value) {
+	    if (key === 'msgs') {
+	      throw new Error('Sorry, you can\'t overwrite the msgs field which is used for .send()');
+	    }
+	    var encrypted = await browser.SEA.encrypt(_JSON$stringify(value), this.getMyGroupSecret());
+	    var mySecretUuid = await this.getMySecretUuid();
+	    this.user.get('chats').get(mySecretUuid).get(key).put(encrypted);
+	  };
+
+	  Channel.prototype.putDirect = async function putDirect(key, value) {
+	    if (key === 'msgs') {
+	      throw new Error('Sorry, you can\'t overwrite the msgs field which is used for .send()');
+	    }
+	    var keys = this.getCurrentParticipants();
+	    for (var i = 0; i < keys.length; i++) {
+	      var encrypted = await browser.SEA.encrypt(_JSON$stringify(value), (await this.getSecret(keys[i])));
+	      var ourSecretChannelId = await this.getOurSecretChannelId(keys[i]);
+	      this.user.get('chats').get(ourSecretChannelId).get(key).put(encrypted);
+	    }
+	  };
+
+	  /**
+	  * Subscribe to a key-value pair. Callback returns every participant's value unless you limit it with *from* param.
+	  * @param {string} key
+	  * @param {function} callback
+	  * @param {string} from public key whose value you want, or *"me"* for your value only, or *"them"* for the value of others only
+	  */
+
+
+	  Channel.prototype.on = async function on(key, callback, from) {
+	    return (this.uuid ? this.onGroup : this.onDirect).call(this, key, callback, from);
+	  };
+
+	  Channel.prototype.onDirect = async function onDirect(key, callback, from) {
+	    var _this11 = this;
+
+	    if (!from || from === 'me' || from === this.key.pub) {
+	      this.onMy(key, function (val) {
+	        return callback(val, _this11.key.pub);
+	      });
+	    }
+	    if (!from || from !== 'me' && from !== this.key.pub) {
+	      this.onTheir(key, function (val, k, pub) {
+	        return callback(val, pub);
+	      });
+	    }
+	  };
+
+	  Channel.prototype.onGroup = async function onGroup(key, callback, from) {
+	    var _this12 = this;
+
+	    if (!from || from === 'me' || from === this.key.pub) {
+	      this.onMyGroup(key, function (val) {
+	        return callback(val, _this12.key.pub);
+	      });
+	    }
+	    if (!from || from !== 'me' && from !== this.key.pub) {
+	      this.onTheirGroup(key, function (val, k, pub) {
+	        return callback(val, pub);
+	      });
+	    }
+	  };
+
+	  Channel.prototype.onMy = async function onMy(key, callback) {
+	    return (this.uuid ? this.onMyGroup : this.onMyDirect).call(this, key, callback);
+	  };
+
+	  Channel.prototype.onMyDirect = async function onMyDirect(key, callback) {
+	    var _this13 = this;
+
+	    if (typeof callback !== 'function') {
+	      throw new Error('onMy callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
+	    }
+	    var keys = this.getCurrentParticipants();
+
+	    var _loop = async function _loop(i) {
+	      var ourSecretChannelId = await _this13.getOurSecretChannelId(keys[i]);
+	      publicState$1().user().get('chats').get(ourSecretChannelId).get(key).on(async function (data) {
+	        var decrypted = await browser.SEA.decrypt(data, (await _this13.getSecret(keys[i])));
+	        if (decrypted) {
+	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
+	        }
+	      });
+	      return 'break';
+	    };
+
+	    for (var i = 0; i < keys.length; i++) {
+	      var _ret = await _loop(i);
+
+	      if (_ret === 'break') break;
+	    }
+	  };
+
+	  Channel.prototype.onMyGroup = async function onMyGroup(key, callback) {
+	    var _this14 = this;
+
+	    if (typeof callback !== 'function') {
+	      throw new Error('onMy callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
+	    }
+	    var mySecretUuid = await this.getMySecretUuid();
+	    var mySecret = await this.getMyGroupSecret();
+	    publicState$1().user().get('chats').get(mySecretUuid).get(key).on(async function (data) {
+	      var decrypted = await browser.SEA.decrypt(data, mySecret);
+	      if (decrypted) {
+	        callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key, _this14.key.pub);
+	      }
+	    });
+	  };
+
+	  Channel.prototype.onTheir = async function onTheir(key, callback, from) {
+	    return (this.uuid ? this.onTheirGroup : this.onTheirDirect).call(this, key, callback, from);
+	  };
+
+	  Channel.prototype._onTheirDirectFromUser = async function _onTheirDirectFromUser(pub, key, callback) {
+	    var _this15 = this;
+
+	    if (!this.hasWritePermission(pub)) {
+	      return;
+	    }
+	    var theirSecretChannelId = await this.getTheirSecretChannelId(pub);
+	    publicState$1().user(pub).get('chats').get(theirSecretChannelId).get(key).on(async function (data) {
+	      if (!_this15.hasWritePermission(pub)) {
+	        return;
+	      }
+	      var decrypted = await browser.SEA.decrypt(data, (await _this15.getSecret(pub)));
+	      if (decrypted) {
+	        callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key, pub);
+	      }
+	    });
+	  };
+
+	  Channel.prototype.onTheirDirect = async function onTheirDirect(key, callback, from) {
+	    var _this16 = this;
+
+	    // TODO: subscribe to new channel participants
+	    if (typeof callback !== 'function') {
+	      throw new Error('onTheir callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
+	    }
+	    if (!Object.prototype.hasOwnProperty.call(this.directSubscriptions, key)) {
+	      this.directSubscriptions[key] = [];
+	    }
+	    this.directSubscriptions[key].push({ key: key, callback: callback, from: from });
+	    var participants = this.getCurrentParticipants();
+	    participants.forEach(async function (pub) {
+	      if (from && pub !== from) {
+	        return;
+	      }
+	      _this16._onTheirDirectFromUser(pub, key, callback);
+	    });
+	  };
+
+	  Channel.prototype.hasWritePermission = function hasWritePermission(pub) {
+	    return !this.uuid || this.participants && this.participants[pub] && this.participants[pub].write;
+	  };
+
+	  Channel.prototype._onTheirGroupFromUser = async function _onTheirGroupFromUser(pub, key, callback, subscription) {
+	    var _this17 = this;
+
+	    if (!this.hasWritePermission(pub)) {
+	      return;
+	    }
+	    var theirSecretUuid = await this.getTheirSecretUuid(pub);
+	    publicState$1().user(pub).get('chats').get(theirSecretUuid).get(key).on(async function (data, a, b, e) {
+	      if (subscription) {
+	        subscription.event = e;
+	      }
+	      if (!_this17.hasWritePermission(pub)) {
+	        return;
+	      }
+	      var decrypted = await browser.SEA.decrypt(data, (await _this17.getTheirGroupSecret(pub)));
+	      if (decrypted) {
+	        callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key, pub);
+	      }
+	    });
+	  };
+
+	  Channel.prototype.onTheirGroup = async function onTheirGroup(key, callback, from) {
+	    var _this18 = this;
+
+	    if (typeof callback !== 'function') {
+	      throw new Error('onTheir callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
+	    }
+	    if (!Object.prototype.hasOwnProperty.call(this.groupSubscriptions, key)) {
+	      this.groupSubscriptions[key] = [];
+	    }
+	    var subscription = { key: key, callback: callback, from: from };
+	    this.groupSubscriptions[key].push(subscription);
+
+	    this.getParticipants(function (participants) {
+	      _Object$keys(participants).forEach(async function (pub) {
+	        if (from && pub !== from) {
+	          return;
+	        }
+	        if (!(participants[pub] && participants[pub].write)) {
+	          return;
+	        }
+	        _this18._onTheirGroupFromUser(pub, key, callback, subscription);
+	      });
+	    });
+	  };
+
+	  /**
+	  * Set typing status
+	  */
+
+
+	  Channel.prototype.setTyping = function setTyping(isTyping) {
+	    var _this19 = this;
+
+	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
+
+	    isTyping = typeof isTyping === 'undefined' ? true : isTyping;
+	    timeout = timeout * 1000;
+	    this.put('typing', isTyping ? new Date().toISOString() : new Date(0).toISOString());
+	    clearTimeout(this.setTypingTimeout);
+	    this.setTypingTimeout = setTimeout(function () {
+	      return _this19.put('typing', false);
+	    }, timeout);
+	  };
+
+	  /**
+	  * Get typing status
+	  */
+
+
+	  Channel.prototype.getTyping = function getTyping(callback) {
+	    var _this20 = this;
+
+	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
+	    // TODO callback not called on setTyping(false), at least for self chat
+	    timeout = timeout * 1000;
+	    this.onTheir('typing', function (typing, key, pub) {
+	      if (callback) {
+	        var isTyping = typing && new Date() - new Date(typing) <= timeout;
+	        callback(isTyping, pub);
+	        _this20.getTypingTimeouts = _this20.getTypingTimeouts || {};
+	        clearTimeout(_this20.getTypingTimeouts[pub]);
+	        if (isTyping) {
+	          _this20.getTypingTimeouts[pub] = setTimeout(function () {
+	            return callback(false, pub);
+	          }, timeout);
+	        }
+	      }
+	    });
+	  };
+
+	  /**
+	  * Add a chat button to page
+	  * @param options {label, channelOptions}
+	  */
+
+
+	  Channel.addChatButton = function addChatButton() {
+	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+	    options = _Object$assign({ label: 'Chat' }, options);
+	    if (!options.channelOptions) {
+	      throw new Error('addChatButton missing options.channelOptions param');
+	    }
+	    util.injectCss();
+	    var channel = void 0,
+	        box = void 0;
+	    var btn = util.createElement('div', 'iris-chat-open-button', document.body);
+	    btn.setAttribute('id', 'iris-chat-open-button');
+	    btn.innerHTML = '<svg style="margin-right:7px;margin-bottom: -0.2em" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 510 510" xml:space="preserve"><path fill="currentColor" d="M459,0H51C22.95,0,0,22.95,0,51v459l102-102h357c28.05,0,51-22.95,51-51V51C510,22.95,487.05,0,459,0z M102,178.5h306v51 H102V178.5z M306,306H102v-51h204V306z M408,153H102v-51h306V153z"></path></svg> ' + options.label;
+	    btn.addEventListener('click', function () {
+	      btn.setAttribute('style', 'display: none');
+	      if (!channel) {
+	        channel = new Channel(options.channelOptions);
+	        box = channel.getChatBox();
+	        document.body.appendChild(box);
+	      } else {
+	        box.setAttribute('style', ''); // show
+	      }
+	    });
+	  };
+
+	  /**
+	  * Get a simple link that points to the channel.
+	  *
+	  * Direct channel: both users need to give their simple links. Use createChatLink() to get a two-way link that needs to be given by one user only.
+	  *
+	  * Group channel: Works only if the link recipient has been already added onto the channel participants list.
+	  */
+
+
+	  Channel.prototype.getSimpleLink = function getSimpleLink() {
+	    var urlRoot = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://iris.to/';
+
+	    if (this.uuid) {
+	      return urlRoot + '?channelId=' + this.uuid + '&inviter=' + this.key.pub;
+	    }
+	    return urlRoot + '?chatWith=' + this.getCurrentParticipants()[0];
+	  };
+
+	  /**
+	  *
+	  */
+
+
+	  Channel.prototype.getChatLinks = async function getChatLinks(_ref) {
+	    var _this21 = this;
+
+	    var callback = _ref.callback,
+	        urlRoot = _ref.urlRoot,
+	        subscribe = _ref.subscribe;
+
+	    urlRoot = urlRoot || 'https://iris.to/';
+	    if (!this.uuid) {
+	      throw new Error('Only group channels may have chat links');
+	    }
+	    var chatLinks = [];
+	    var chatLinkSubscriptions = {};
+	    this.on('chatLinks', function (links, from) {
+	      // TODO: check admin permissions
+	      if (!links || (typeof links === 'undefined' ? 'undefined' : _typeof(links)) !== 'object') {
+	        return;
+	      }
+	      _Object$keys(links).forEach(function (linkId) {
+	        var link = links[linkId];
+	        if (link === null) {
+	          chatLinkSubscriptions[linkId] && chatLinkSubscriptions[linkId].off(); // unsubscribe removed chat link
+	          delete chatLinkSubscriptions[linkId];
+	          callback && callback({ id: linkId, url: null });
+	          return;
+	        }
+	        if (chatLinks.indexOf(linkId) !== -1) {
+	          return;
+	        }
+	        var channels = [];
+	        chatLinks.push(linkId);
+	        var url = Channel.formatChatLink({ urlRoot: urlRoot, inviter: from, channelId: _this21.uuid, sharedSecret: link.sharedSecret, linkId: linkId });
+	        callback && callback({ url: url, id: linkId });
+	        if (subscribe) {
+	          publicState$1().user(link.sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId, a, e) {
+	            if (!encPub || typeof encPub !== 'string' || encPub.length < 10) {
+	              return;
+	            }
+	            chatLinkSubscriptions[linkId] = e;
+	            var s = _JSON$stringify(encPub);
+	            if (channels.indexOf(s) === -1) {
+	              channels.push(s);
+	              var pub = await browser.SEA.decrypt(encPub, link.sharedSecret);
+	              _this21.addParticipant(pub, undefined, undefined, true);
+	            }
+	          });
+	        }
+	      });
+	    });
+	  };
+
+	  Channel.prototype.createChatLink = async function createChatLink() {
+	    var urlRoot = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://iris.to/';
+
+	    var sharedKey = await browser.SEA.pair();
+	    var sharedKeyString = _JSON$stringify(sharedKey);
+	    var sharedSecret = await browser.SEA.secret(sharedKey.epub, sharedKey);
+	    var encryptedSharedKey = await browser.SEA.encrypt(sharedKeyString, sharedSecret);
+	    var ownerSecret = await browser.SEA.secret(this.key.epub, this.key);
+	    var ownerEncryptedSharedKey = await browser.SEA.encrypt(sharedKeyString, ownerSecret);
+	    var linkId = await util.getHash(encryptedSharedKey);
+	    linkId = linkId.slice(0, 12);
+
+	    // User has to exist, in order for .get(chatRequests).on() to be ever triggered
+	    await util.gunAsAnotherUser(publicState$1(), sharedKey, function (user) {
+	      return user.get('chatRequests').put({ a: 1 }).then();
+	    });
+
+	    this.chatLinks[linkId] = { sharedKey: sharedKey, sharedSecret: sharedSecret };
+	    this.put('chatLinks', this.chatLinks);
+	    this.user.get('chatLinks').get(linkId).put({ encryptedSharedKey: encryptedSharedKey, ownerEncryptedSharedKey: ownerEncryptedSharedKey });
+
+	    return Channel.formatChatLink({ urlRoot: urlRoot, channelId: this.uuid, inviter: this.key.pub, sharedSecret: sharedSecret, linkId: linkId });
+	  };
+
+	  /**
+	  * Get a channel box element that you can add to your page
+	  */
+
+
+	  Channel.prototype.getChatBox = function getChatBox() {
+	    var _this22 = this;
+
+	    util.injectCss();
+	    var minimized = false;
+
+	    var chatBox = util.createElement('div', 'iris-chat-box');
+	    var header = util.createElement('div', 'iris-chat-header', chatBox);
+	    var minimize = util.createElement('span', 'iris-chat-minimize', header);
+	    minimize.innerText = '—';
+	    minimize.addEventListener('click', function (e) {
+	      e.stopPropagation();
+	      chatBox.setAttribute('class', 'iris-chat-box minimized');
+	      minimized = true;
+	    });
+	    var headerText = util.createElement('div', 'iris-chat-header-text', header);
+	    var onlineIndicator = util.createElement('span', 'iris-online-indicator', headerText);
+	    onlineIndicator.innerHTML = '&#x25cf;';
+	    var nameEl = util.createElement('span', undefined, headerText);
+	    var close = util.createElement('span', 'iris-chat-close', header);
+	    close.innerHTML = '&#215;';
+	    close.addEventListener('click', function () {
+	      chatBox.setAttribute('style', 'display: none');
+	      var openChatBtn = document.getElementById('iris-chat-open-button');
+	      if (openChatBtn) {
+	        openChatBtn.setAttribute('style', ''); // show
+	      }
+	    });
+	    header.addEventListener('click', function () {
+	      if (minimized) {
+	        chatBox.setAttribute('class', 'iris-chat-box');
+	        minimized = false;
+	      }
+	    });
+
+	    var messages = util.createElement('div', 'iris-chat-messages', chatBox);
+
+	    var typingIndicator = util.createElement('div', 'iris-typing-indicator', chatBox);
+	    typingIndicator.innerText = 'typing...';
+	    this.getTyping(function (isTyping) {
+	      typingIndicator.setAttribute('class', 'iris-typing-indicator' + (isTyping ? ' yes' : ''));
+	    });
+
+	    var inputWrapper = util.createElement('div', 'iris-chat-input-wrapper', chatBox);
+	    var textArea = util.createElement('textarea', undefined, inputWrapper);
+	    textArea.setAttribute('rows', '1');
+	    textArea.setAttribute('placeholder', 'Type a message');
+	    if (util.isMobile) {
+	      var sendBtn = util.createElement('button', undefined, inputWrapper);
+	      sendBtn.innerHTML = '\n        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;" xml:space="preserve" width="100px" height="100px" fill="#000000" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>\n      ';
+	      sendBtn.addEventListener('click', function () {
+	        _this22.send(textArea.value);
+	        textArea.value = '';
+	        _this22.setTyping(false);
+	      });
+	    }
+
+	    var participants = this.getCurrentParticipants();
+	    if (participants.length) {
+	      var pub = participants[0];
+	      publicState$1().user(pub).get('profile').get('name').on(function (name) {
+	        return nameEl.innerText = name;
+	      });
+	      Channel.getActivity(publicState$1(), pub, function (status) {
+	        var cls = 'iris-online-indicator' + (status.isActive ? ' yes' : '');
+	        onlineIndicator.setAttribute('class', cls);
+	        var undelivered = messages.querySelectorAll('.iris-chat-message:not(.delivered)');
+	        undelivered.forEach(function (msg) {
+	          if (msg.getAttribute('data-time') <= status.lastActive) {
+	            var c = msg.getAttribute('class');
+	            msg.setAttribute('class', c + ' delivered');
+	          }
+	        });
+	      });
+	    }
+
+	    this.getTheirMsgsLastSeenTime(function (time) {
+	      var unseen = messages.querySelectorAll('.iris-seen:not(.yes)');
+	      unseen.forEach(function (indicator) {
+	        var msgEl = indicator.parentElement.parentElement.parentElement;
+	        if (msgEl.getAttribute('data-time') <= time) {
+	          var msgClass = msgEl.getAttribute('class');
+	          if (msgClass.indexOf('delivered') === -1) {
+	            msgEl.setAttribute('class', msgClass + ' delivered');
+	          }
+	          indicator.setAttribute('class', 'iris-seen yes');
+	        }
+	      });
+	    });
+
+	    this.getMessages(function (msg, info) {
+	      var msgContent = util.createElement('div', 'iris-msg-content');
+	      msgContent.innerText = msg.text;
+	      var time = util.createElement('div', 'time', msgContent);
+	      time.innerText = util.formatTime(new Date(msg.time));
+	      if (info.selfAuthored) {
+	        var cls = _this22.theirMsgsLastSeenTime >= msg.time ? 'iris-seen yes' : 'iris-seen';
+	        var seenIndicator = util.createElement('span', cls, time);
+	        seenIndicator.innerHTML = ' <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg>';
+	      }
+	      msgContent.innerHTML = msgContent.innerHTML.replace(/\n/g, '<br>\n');
+
+	      var msgEl = util.createElement('div', (info.selfAuthored ? 'our' : 'their') + ' iris-chat-message');
+	      msgEl.appendChild(msgContent);
+	      msgEl.setAttribute('data-time', msg.time);
+	      for (var i = messages.children.length; i >= 0; i--) {
+	        if (i === 0) {
+	          messages.insertBefore(msgEl, messages.firstChild);
+	        } else {
+	          var t = messages.children[i - 1].getAttribute('data-time');
+	          if (t && t < msg.time) {
+	            messages.children[i - 1].insertAdjacentElement('afterend', msgEl);
+	            break;
+	          }
+	        }
+	      }
+	      messages.scrollTop = messages.scrollHeight;
+	    });
+
+	    textArea.addEventListener('keyup', function (event) {
+	      Channel.setActivity(publicState$1(), true); // TODO
+	      _this22.setMyMsgsLastSeenTime(); // TODO
+	      if (event.keyCode === 13) {
+	        event.preventDefault();
+	        var content = textArea.value;
+	        var caret = util.getCaret(textArea);
+	        if (event.shiftKey) {
+	          textArea.value = content.substring(0, caret - 1) + '\n' + content.substring(caret, content.length);
+	        } else {
+	          textArea.value = content.substring(0, caret - 1) + content.substring(caret, content.length);
+	          _this22.send(textArea.value);
+	          textArea.value = '';
+	          _this22.setTyping(false);
+	        }
+	      } else {
+	        _this22.setTyping(!!textArea.value.length);
+	      }
+	    });
+
+	    return chatBox;
+	  };
+
+	  /**
+	  * Set the user's online/active status
+	  * @param {string} activity string: set the activity status every 3 seconds, null/false: stop updating
+	  */
+
+
+	  Channel.setActivity = function setActivity(activity) {
+	    if (publicState$1().irisActivityStatus === activity) {
+	      return;
+	    }
+	    publicState$1().irisActivityStatus = activity;
+	    clearTimeout(publicState$1().setActivityTimeout);
+	    var update = function update() {
+	      publicState$1().user().get('activity').put({ status: activity, time: new Date(browser.state()).toISOString() });
+	    };
+	    update();
+	    function timerUpdate() {
+	      update();
+	      publicState$1().setActivityTimeout = setTimeout(timerUpdate, 3000);
+	    }
+	    if (activity) {
+	      timerUpdate();
+	    }
+	  };
+
+	  /**
+	  * Get the online status of a user.
+	  *
+	  * @param {string} pubKey public key of the user
+	  * @param {boolean} callback receives a boolean each time the user's online status changes
+	  */
+
+
+	  Channel.getActivity = function getActivity(pubKey, callback) {
+	    var timeout = void 0;
+	    publicState$1().user(pubKey).get('activity').on(function (activity) {
+	      if (!activity || !(activity.time && activity.status)) {
+	        return;
+	      }
+	      clearTimeout(timeout);
+	      var now = new Date(browser.state());
+	      var activityDate = new Date(activity.time);
+	      var isActive = activityDate > new Date(now.getTime() - 10 * 1000) && activityDate < new Date(now.getTime() + 30 * 1000);
+	      callback({ isActive: isActive, lastActive: activity.time, status: activity.status });
+	      if (isActive) {
+	        timeout = setTimeout(function () {
+	          return callback({ isOnline: false, lastActive: activity.time });
+	        }, 10000);
+	      }
+	    });
+	  };
+
+	  /**
+	  * In order to receive messages from others, this method must be called for newly created
+	  * users that have not started a channel with an existing user yet.
+	  *
+	  * It saves the user's key.epub (public key for encryption) into their gun user space,
+	  * so others can find it and write encrypted messages to them.
+	  *
+	  * If you start a channel with an existing user, key.epub is saved automatically and you don't need
+	  * to call this method.
+	  */
+
+
+	  Channel.initUser = function initUser(key) {
+	    var user = publicState$1().user();
+	    user.auth(key);
+	    user.put({ epub: key.epub });
+	  };
+
+	  Channel.formatChatLink = function formatChatLink(_ref2) {
+	    var urlRoot = _ref2.urlRoot,
+	        chatWith = _ref2.chatWith,
+	        channelId = _ref2.channelId,
+	        inviter = _ref2.inviter,
+	        sharedSecret = _ref2.sharedSecret,
+	        linkId = _ref2.linkId;
+
+	    var enc = encodeURIComponent;
+	    if (channelId && inviter) {
+	      return urlRoot + '?channelId=' + enc(channelId) + '&inviter=' + enc(inviter) + '&s=' + enc(sharedSecret) + '&k=' + enc(linkId);
+	    }
+	    return urlRoot + '?chatWith=' + enc(chatWith) + '&s=' + enc(sharedSecret) + '&k=' + enc(linkId);
+	  };
+
+	  /**
+	  * Creates a channel link that can be used for two-way communication, i.e. only one link needs to be exchanged.
+	  */
+
+
+	  Channel.createChatLink = async function createChatLink(key) {
+	    var urlRoot = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://iris.to/';
+
+	    var user = publicState$1().user();
+	    user.auth(key);
+
+	    // We create a new Gun user whose private key is shared with the chat link recipients.
+	    // Chat link recipients can contact you by writing their public key to the shared key's user space.
+	    var sharedKey = await browser.SEA.pair();
+	    var sharedKeyString = _JSON$stringify(sharedKey);
+	    var sharedSecret = await browser.SEA.secret(sharedKey.epub, sharedKey);
+	    var encryptedSharedKey = await browser.SEA.encrypt(sharedKeyString, sharedSecret);
+	    var ownerSecret = await browser.SEA.secret(key.epub, key);
+	    var ownerEncryptedSharedKey = await browser.SEA.encrypt(sharedKeyString, ownerSecret);
+	    var linkId = await util.getHash(encryptedSharedKey);
+	    linkId = linkId.slice(0, 12);
+
+	    // User has to exist, in order for .get(chatRequests).on() to be ever triggered
+	    util.gunAsAnotherUser(publicState$1(), sharedKey, function (user) {
+	      user.get('chatRequests').put({ a: 1 });
+	    });
+
+	    user.get('chatLinks').get(linkId).put({ encryptedSharedKey: encryptedSharedKey, ownerEncryptedSharedKey: ownerEncryptedSharedKey });
+
+	    return Channel.formatChatLink({ urlRoot: urlRoot, chatWith: key.pub, sharedSecret: sharedSecret, linkId: linkId });
+	  };
+
+	  /**
+	  *
+	  */
+
+
+	  Channel.getMyChatLinks = async function getMyChatLinks(key) {
+	    var urlRoot = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://iris.to/';
+	    var callback = arguments[2];
+	    var subscribe = arguments[3];
+
+	    var user = publicState$1().user();
+	    user.auth(key);
+	    var mySecret = await browser.SEA.secret(key.epub, key);
+	    var chatLinks = [];
+	    user.get('chatLinks').map().on(function (data, linkId) {
+	      if (!data || chatLinks.indexOf(linkId) !== -1) {
+	        return;
+	      }
+	      var channels = [];
+	      user.get('chatLinks').get(linkId).get('ownerEncryptedSharedKey').on(async function (enc) {
+	        if (!enc || chatLinks.indexOf(linkId) !== -1) {
+	          return;
+	        }
+	        chatLinks.push(linkId);
+	        var sharedKey = await browser.SEA.decrypt(enc, mySecret);
+	        var sharedSecret = await browser.SEA.secret(sharedKey.epub, sharedKey);
+	        var url = Channel.formatChatLink({ urlRoot: urlRoot, chatWith: key.pub, sharedSecret: sharedSecret, linkId: linkId });
+	        if (callback) {
+	          callback({ url: url, id: linkId });
+	        }
+	        if (subscribe) {
+	          publicState$1().user(sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId) {
+	            if (!encPub) {
+	              return;
+	            }
+	            var s = _JSON$stringify(encPub);
+	            if (channels.indexOf(s) === -1) {
+	              channels.push(s);
+	              var pub = await browser.SEA.decrypt(encPub, sharedSecret);
+	              var channel = new Channel({ key: key, participants: pub });
+	              channel.save();
+	            }
+	            util.gunAsAnotherUser(publicState$1(), sharedKey, function (user) {
+	              // remove the channel request after reading
+	              user.get('chatRequests').get(requestId).put(null);
+	            });
+	          });
+	        }
+	      });
+	    });
+	  };
+
+	  /**
+	  *
+	  */
+
+
+	  Channel.prototype.removeGroupChatLink = function removeGroupChatLink(linkId) {
+	    this.chatLinks[linkId] = null;
+	    this.put('chatLinks', this.chatLinks);
+	    publicState$1().user().get('chatLinks').get(linkId).put(null);
+	  };
+
+	  /**
+	  *
+	  */
+
+
+	  Channel.removePrivateChatLink = function removePrivateChatLink(key, linkId) {
+	    publicState$1().user().auth(key);
+	    publicState$1().user().get('chatLinks').get(linkId).put(null);
+	  };
+
+	  /**
+	  *
+	  */
+
+
+	  Channel.deleteChannel = async function deleteChannel(key, pub) {
+	    publicState$1().user().auth(key);
+	    var channelId = await Channel.getOurSecretChannelId(pub, key);
+	    publicState$1().user().get('channels').get(channelId).put(null);
+	    publicState$1().user().get('channels').get(channelId).off();
+	  };
+
+	  /**
+	  *
+	  */
+
+
+	  Channel.deleteGroup = async function deleteGroup(key, uuid) {
+	    var mySecret = await browser.SEA.secret(key.epub, key);
+	    var mySecretHash = await util.getHash(mySecret);
+	    var mySecretUuid = await util.getHash(mySecretHash + uuid);
+	    publicState$1().user().auth(key);
+	    publicState$1().user().get('channels').get(mySecretUuid).put(null);
+	    publicState$1().user().get('channels').get(mySecretUuid).off();
+	  };
+
+	  return Channel;
+	}();
 
 	/**
 	 * Fuse.js v6.6.2 - Lightweight fuzzy-search (http://fusejs.io)
@@ -28611,7 +32333,7 @@
 	 * http://www.apache.org/licenses/LICENSE-2.0
 	 */
 
-	function isArray(value) {
+	function isArray$1(value) {
 	  return !Array.isArray
 	    ? getTag(value) === '[object Array]'
 	    : Array.isArray(value)
@@ -28628,7 +32350,7 @@
 	  return result == '0' && 1 / value == -INFINITY ? '-0' : result
 	}
 
-	function toString$2(value) {
+	function toString$3(value) {
 	  return value == null ? '' : baseToString(value)
 	}
 
@@ -28734,7 +32456,7 @@
 	  let weight = 1;
 	  let getFn = null;
 
-	  if (isString(key) || isArray(key)) {
+	  if (isString(key) || isArray$1(key)) {
 	    src = key;
 	    path = createKeyPath(key);
 	    id = createKeyId(key);
@@ -28763,11 +32485,11 @@
 	}
 
 	function createKeyPath(key) {
-	  return isArray(key) ? key : key.split('.')
+	  return isArray$1(key) ? key : key.split('.')
 	}
 
 	function createKeyId(key) {
-	  return isArray(key) ? key.join('.') : key
+	  return isArray$1(key) ? key.join('.') : key
 	}
 
 	function get(obj, path) {
@@ -28796,8 +32518,8 @@
 	        index === path.length - 1 &&
 	        (isString(value) || isNumber(value) || isBoolean(value))
 	      ) {
-	        list.push(toString$2(value));
-	      } else if (isArray(value)) {
+	        list.push(toString$3(value));
+	      } else if (isArray$1(value)) {
 	        arr = true;
 	        // Search each item in the array.
 	        for (let i = 0, len = value.length; i < len; i += 1) {
@@ -29008,7 +32730,7 @@
 	        return
 	      }
 
-	      if (isArray(value)) {
+	      if (isArray$1(value)) {
 	        let subRecords = [];
 	        const stack = [{ nestedArrIndex: -1, value }];
 
@@ -29027,7 +32749,7 @@
 	            };
 
 	            subRecords.push(subRecord);
-	          } else if (isArray(value)) {
+	          } else if (isArray$1(value)) {
 	            value.forEach((item, k) => {
 	              stack.push({
 	                nestedArrIndex: k,
@@ -29953,7 +33675,7 @@
 	const isPath = (query) => !!query[KeyType.PATH];
 
 	const isLeaf = (query) =>
-	  !isArray(query) && isObject(query) && !isExpression(query);
+	  !isArray$1(query) && isObject(query) && !isExpression(query);
 
 	const convertToExplicit = (query) => ({
 	  [LogicalOperator.AND]: Object.keys(query).map((key) => ({
@@ -30002,7 +33724,7 @@
 	    keys.forEach((key) => {
 	      const value = query[key];
 
-	      if (isArray(value)) {
+	      if (isArray$1(value)) {
 	        value.forEach((item) => {
 	          node.children.push(next(item));
 	        });
@@ -30335,7 +34057,7 @@
 
 	    let matches = [];
 
-	    if (isArray(value)) {
+	    if (isArray$1(value)) {
 	      value.forEach(({ v: text, i: idx, n: norm }) => {
 	        if (!isDefined(text)) {
 	          return
@@ -30381,6 +34103,8 @@
 	  register(ExtendedSearch);
 	}
 
+	var electron = util.isElectron ? new browser({ peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast: false, localStorage: false }).get('state') : null;
+
 	var key = void 0;
 	var myName = void 0;
 	var myProfilePhoto = void 0;
@@ -30413,13 +34137,13 @@
 
 	  updateSearchIndex: lodash.throttle(function () {
 	    var options = { keys: ['name'], includeScore: true, includeMatches: true, threshold: 0.3 };
-	    var values = _Object$values(lodash.omit(searchableItems, _Object$keys(State.getBlockedUsers())));
+	    var values = _Object$values(lodash.omit(searchableItems, _Object$keys(blockedUsers$1())));
 	    searchIndex = new Fuse(values, options);
-	    State.local.get('searchIndexUpdated').put(true);
+	    local$1().get('searchIndexUpdated').put(true);
 	  }, 2000, { leading: true }),
 
 	  saveSearchResult: lodash.throttle(function (k) {
-	    State.local.get('contacts').get(k).put({ followDistance: searchableItems[k].followDistance, followerCount: searchableItems[k].followers.size });
+	    local$1().get('contacts').get(k).put({ followDistance: searchableItems[k].followDistance, followerCount: searchableItems[k].followers.size });
 	  }, 1000, { leading: true }),
 
 	  addFollow: function addFollow(callback, k, followDistance, follower) {
@@ -30431,9 +34155,9 @@
 	    } else {
 	      searchableItems[k] = { key: k, followDistance: followDistance, followers: new _Set(follower && [follower]) };
 	      this.taskQueue.push(function () {
-	        State.public.user(k).get('profile').get('name').on(function (name) {
+	        publicState$1().user(k).get('profile').get('name').on(function (name) {
 	          searchableItems[k].name = name;
-	          State.local.get('contacts').get(k).get('name').put(name);
+	          local$1().get('contacts').get(k).get('name').put(name);
 	          callback && callback(k, searchableItems[k]);
 	        });
 	      });
@@ -30448,7 +34172,7 @@
 	    if (searchableItems[k]) {
 	      searchableItems[k].followers.delete(follower);
 	      if (followDistance === 1) {
-	        State.local.get('groups').get('follows').get(k).put(false);
+	        local$1().get('groups').get('follows').get(k).put(false);
 	      }
 	      this.updateNoFollows();
 	      this.updateNoFollowers();
@@ -30469,7 +34193,7 @@
 
 	    this.addFollow(callback, k, currentDepth - 1);
 
-	    State.public.user(k).get('follow').map().on(function (isFollowing, followedKey) {
+	    publicState$1().user(k).get('follow').map().on(function (isFollowing, followedKey) {
 	      // TODO: unfollow
 	      if (isFollowing) {
 	        _this.addFollow(callback, followedKey, currentDepth, k);
@@ -30491,7 +34215,7 @@
 	    var v = _Object$keys(searchableItems).length <= 1;
 	    if (v !== noFollows) {
 	      noFollows = v;
-	      State.local.get('noFollows').put(noFollows);
+	      local$1().get('noFollows').put(noFollows);
 	    }
 	  }, 1000, { leading: true }),
 
@@ -30499,7 +34223,7 @@
 	    var v = !(searchableItems[key.pub] && searchableItems[key.pub].followers.size > 0);
 	    if (v !== noFollowers) {
 	      noFollowers = v;
-	      State.local.get('noFollowers').put(noFollowers);
+	      local$1().get('noFollowers').put(noFollowers);
 	    }
 	  }, 1000, { leading: true }),
 
@@ -30548,9 +34272,9 @@
 
 	    this.getExtendedFollows(function (k, info) {
 	      if (info.followDistance <= 1) {
-	        State.local.get('groups').get('follows').get(k).put(true);
+	        local$1().get('groups').get('follows').get(k).put(true);
 	      }
-	      State.local.get('groups').get('everyone').get(k).put(true);
+	      local$1().get('groups').get('everyone').get(k).put(true);
 	      if (k === _this3.getPubKey()) {
 	        _this3.updateNoFollowers();
 	      }
@@ -30567,33 +34291,33 @@
 	    Notifications.getWebPushSubscriptions();
 	    Notifications.subscribeToIrisNotifications();
 	    Channel.getMyChatLinks(key, undefined, function (chatLink) {
-	      State.local.get('chatLinks').get(chatLink.id).put(chatLink.url);
+	      local$1().get('chatLinks').get(chatLink.id).put(chatLink.url);
 	      latestChatLink = chatLink.url;
 	    });
 	    this.setOurOnlineStatus();
 	    Channel.getChannels(key, function (c) {
 	      return _this4.addChannel(c);
 	    });
-	    State.public.user().get('profile').get('name').on(function (name) {
+	    publicState$1().user().get('profile').get('name').on(function (name) {
 	      if (name && typeof name === 'string') {
 	        myName = name;
 	      }
 	    });
-	    State.public.user().get('profile').get('photo').on(function (data) {
+	    publicState$1().user().get('profile').get('photo').on(function (data) {
 	      myProfilePhoto = data;
 	    });
 	    Notifications.init();
-	    State.local.get('loggedIn').put(true);
-	    State.local.get('settings').once().then(function (settings) {
+	    local$1().get('loggedIn').put(true);
+	    local$1().get('settings').once().then(function (settings) {
 	      if (!settings) {
-	        State.local.get('settings').put(DEFAULT_SETTINGS.local);
+	        local$1().get('settings').put(DEFAULT_SETTINGS.local);
 	      } else if (settings.enableWebtorrent === undefined || settings.autoplayWebtorrent === undefined) {
-	        State.local.get('settings').get('enableWebtorrent').put(DEFAULT_SETTINGS.local.enableWebtorrent);
-	        State.local.get('settings').get('autoplayWebtorrent').put(DEFAULT_SETTINGS.local.autoplayWebtorrent);
+	        local$1().get('settings').get('enableWebtorrent').put(DEFAULT_SETTINGS.local.enableWebtorrent);
+	        local$1().get('settings').get('autoplayWebtorrent').put(DEFAULT_SETTINGS.local.autoplayWebtorrent);
 	      }
 	    });
-	    State.public.user().get('block').map().on(function (isBlocked, user) {
-	      State.local.get('block').get(user).put(isBlocked);
+	    publicState$1().user().get('block').map().on(function (isBlocked, user) {
+	      local$1().get('block').get(user).put(isBlocked);
 	      if (isBlocked) {
 	        delete searchableItems[user];
 	      }
@@ -30602,20 +34326,20 @@
 	    if (shouldRefresh) {
 	      location.reload();
 	    }
-	    if (State.electron) {
-	      State.electron.get('settings').on(function (electron) {
-	        State.local.get('settings').get('electron').put(electron);
-	        if (electron.publicIp) {
+	    if (electron) {
+	      electron.get('settings').on(function (electron$$1) {
+	        local$1().get('settings').get('electron').put(electron$$1);
+	        if (electron$$1.publicIp) {
 	          _Object$values(_this4.channels).forEach(function (channel) {
 	            return _this4.shareMyPeerUrl(channel);
 	          });
 	        }
 	      });
-	      State.electron.get('user').put(key.pub);
+	      electron.get('user').put(key.pub);
 	    }
-	    State.local.get('filters').get('group').once().then(function (v) {
+	    local$1().get('filters').get('group').once().then(function (v) {
 	      if (!v) {
-	        State.local.get('filters').get('group').put('follows');
+	        local$1().get('filters').get('group').put('follows');
 	      }
 	    });
 	  },
@@ -30624,7 +34348,7 @@
 	  },
 	  clearIndexedDB: function clearIndexedDB() {
 	    return new _Promise(function (resolve) {
-	      var r1 = window.indexedDB.deleteDatabase('State.local');
+	      var r1 = window.indexedDB.deleteDatabase('local()');
 	      var r2 = window.indexedDB.deleteDatabase('radata');
 	      var r1done = void 0;
 	      var r2done = void 0;
@@ -30658,8 +34382,8 @@
 	    return myProfilePhoto;
 	  },
 	  logOut: async function logOut() {
-	    if (State.electron) {
-	      State.electron.get('user').put(null);
+	    if (electron) {
+	      electron.get('user').put(null);
 	    }
 	    // TODO: remove subscription from your channels
 	    if (navigator.serviceWorker) {
@@ -30690,12 +34414,12 @@
 
 	    name = name || util.generateName();
 	    console.log('loginAsNewUser name', name);
-	    return Gun$1.SEA.pair().then(function (k) {
+	    return browser.SEA.pair().then(function (k) {
 	      _this5.login(k);
-	      State.public.user().get('profile').put({ a: null });
-	      State.public.user().get('profile').get('name').put(name);
-	      State.local.get('filters').put({ a: null });
-	      State.local.get('filters').get('group').put('follows');
+	      publicState$1().user().get('profile').put({ a: null });
+	      publicState$1().user().get('profile').get('name').put(name);
+	      local$1().get('filters').put({ a: null });
+	      local$1().get('filters').get('group').put('follows');
 	      _this5.createChatLink();
 	    });
 	  },
@@ -30713,7 +34437,7 @@
 	      this.clearIndexedDB();
 	    }
 	    setTimeout(function () {
-	      State.local.get('block').map(function () {
+	      local$1().get('block').map(function () {
 	        _this6.updateSearchIndex();
 	      });
 	      _this6.updateSearchIndex();
@@ -30732,7 +34456,7 @@
 	  },
 
 	  shareMyPeerUrl: async function shareMyPeerUrl(channel) {
-	    var myIp = await State.local.get('settings').get('electron').get('publicIp').once();
+	    var myIp = await local$1().get('settings').get('electron').get('publicIp').once();
 	    myIp && channel.put && channel.put('my_peer', this.myPeerUrl(myIp));
 	  },
 	  newChannel: function newChannel(pub, chatLink) {
@@ -30747,13 +34471,12 @@
 	    var _this7 = this;
 
 	    this.taskQueue.push(function () {
-
 	      var pub = chat.getId();
 	      if (_this7.channels[pub]) {
 	        return;
 	      }
 	      _this7.channels[pub] = chat;
-	      var chatNode = State.local.get('channels').get(pub);
+	      var chatNode = local$1().get('channels').get(pub);
 	      chatNode.get('latestTime').on(function (t) {
 	        if (t && (!chat.latestTime || t > chat.latestTime)) {
 	          chat.latestTime = t;
@@ -30795,7 +34518,7 @@
 	      chat.isTyping = false;
 	      chat.getTyping(function (isTyping) {
 	        chat.isTyping = isTyping;
-	        State.local.get('channels').get(pub).get('isTyping').put(isTyping);
+	        local$1().get('channels').get(pub).get('isTyping').put(isTyping);
 	      });
 	      chat.online = {};
 	      Channel.getActivity(pub, function (activity) {
@@ -30810,15 +34533,15 @@
 	        chat.on('name', function (v) {
 	          chat.name = v;
 	          searchableItems[chat.uuid] = { name: v, uuid: chat.uuid };
-	          State.local.get('channels').get(chat.uuid).get('name').put(v);
+	          local$1().get('channels').get(chat.uuid).get('name').put(v);
 	        });
 	        chat.on('photo', function (v) {
 	          searchableItems[chat.uuid] = searchableItems[chat.uuid] || {};
 	          searchableItems[chat.uuid].photo = v;
-	          State.local.get('channels').get(chat.uuid).get('photo').put(v);
+	          local$1().get('channels').get(chat.uuid).get('photo').put(v);
 	        });
 	        chat.on('about', function (v) {
-	          return State.local.get('channels').get(chat.uuid).get('about').put(v);
+	          return local$1().get('channels').get(chat.uuid).get('about').put(v);
 	        });
 	        chat.getParticipants(function (participants) {
 	          delete participants.undefined; // TODO fix where it comes from
@@ -30827,12 +34550,12 @@
 	            keys.forEach(function (k, i) {
 	              var hue = 360 / Math.max(keys.length, 2) * i; // TODO use css filter brightness
 	              chat.participantProfiles[k] = { permissions: participants[k], color: 'hsl(' + hue + ', 98%, ' + (isDarkMode ? 80 : 33) + '%)' };
-	              State.public.user(k).get('profile').get('name').on(function (name) {
+	              publicState$1().user(k).get('profile').get('name').on(function (name) {
 	                chat.participantProfiles[k].name = name;
 	              });
 	            });
 	          }
-	          State.local.get('channels').get(chat.uuid).get('participants').put(participants);
+	          local$1().get('channels').get(chat.uuid).get('participants').put(participants);
 	        });
 	        chat.inviteLinks = {};
 	        chat.getChatLinks({ callback: function callback(_ref) {
@@ -30841,13 +34564,13 @@
 
 	            console.log('got chat link', id, url);
 	            chat.inviteLinks[id] = url; // TODO use State
-	            State.local.get('inviteLinksChanged').put(true);
+	            local$1().get('inviteLinksChanged').put(true);
 	          } });
 	      } else {
-	        State.local.get('groups').get('everyone').get(pub).put(true);
+	        local$1().get('groups').get('everyone').get(pub).put(true);
 	        _this7.addFollow(null, pub, Infinity);
-	        State.public.user(pub).get('profile').get('name').on(function (v) {
-	          return State.local.get('channels').get(pub).get('name').put(v);
+	        publicState$1().user(pub).get('profile').get('name').on(function (v) {
+	          return local$1().get('channels').get(pub).get('name').put(v);
 	        });
 	      }
 	      if (chat.put) {
@@ -30865,9 +34588,9 @@
 	        _this7.shareMyPeerUrl(chat);
 	      }
 	      chat.onTheir('call', function (call) {
-	        State.local.get('call').put({ pub: pub, call: call });
+	        local$1().get('call').put({ pub: pub, call: call });
 	      });
-	      State.local.get('channels').get(pub).put({ enabled: true });
+	      local$1().get('channels').get(pub).put({ enabled: true });
 	      /* Disable private peer discovery, since they're not connecting anyway
 	      if (chat.onTheir) {
 	        chat.onTheir('my_peer', (url, k, from) => {
@@ -30891,7 +34614,7 @@
 	      return;
 	    }
 	    msg.selfAuthored = info.selfAuthored;
-	    State.local.get('channels').get(chatId).get('msgs').get(msg.time + (msg.from && msg.from.slice(0, 10))).put(_JSON$stringify(msg));
+	    local$1().get('channels').get(chatId).get('msgs').get(msg.time + (msg.from && msg.from.slice(0, 10))).put(_JSON$stringify(msg));
 	    msg.timeObj = new Date(msg.time);
 	    if (!info.selfAuthored && msg.timeObj > chat.myLastSeenTime) {
 	      if (window.location.hash !== '#/chat/' + chatId || document.visibilityState !== 'visible') {
@@ -30901,10 +34624,10 @@
 	      }
 	    }
 	    if (!info.selfAuthored && msg.time > chat.theirMsgsLastSeenTime) {
-	      State.local.get('channels').get(chatId).get('theirMsgsLastSeenTime').put(msg.time);
+	      local$1().get('channels').get(chatId).get('theirMsgsLastSeenTime').put(msg.time);
 	    }
 	    if (!chat.latestTime || msg.time > chat.latestTime) {
-	      State.local.get('channels').get(chatId).put({
+	      local$1().get('channels').get(chatId).put({
 	        latestTime: msg.time,
 	        latest: { time: msg.time, text: msg.text, selfAuthored: info.selfAuthored }
 	      });
@@ -30926,1741 +34649,1548 @@
 	  }
 	};
 
+	var channels = new _Map();
+
+	function privateState (publicKey) {
+	  if (!channels.has(publicKey)) {
+	    channels.set(publicKey, new Channel(publicState$1.user(publicKey)));
+	  }
+	  return channels.get(publicKey);
+	}
+
+	var staticState = {
+	  get: function get(hash, callback) {
+	    return new _Promise(function (resolve, reject) {
+	      if (!hash) {
+	        reject('No hash provided');
+	      }
+	      if (typeof hash !== 'string') {
+	        reject('Hash must be a string');
+	      }
+	      publicState$1().get('#').get(hash).on(function (v, k, x, e) {
+	        if (v) {
+	          e.off();
+	          callback && callback(v);
+	          resolve(v);
+	        }
+	      });
+	    });
+	  },
+	  put: async function put(value) {
+	    var hash = await util.getHash(value);
+	    publicState$1().get('#').get(hash).put(value);
+	    return hash;
+	  }
+	};
+
+	var runtime = createCommonjsModule(function (module) {
 	/**
-	 * The main class for interacting with the Iris network.
+	 * Copyright (c) 2014-present, Facebook, Inc.
 	 *
-	 * Contains State.local which is only accessible in the local environment and State.public which is synchronized with the world.
-	 *
+	 * This source code is licensed under the MIT license found in the
+	 * LICENSE file in the root directory of this source tree.
 	 */
 
-	var State = {
+	!(function(global) {
+
+	  var Op = Object.prototype;
+	  var hasOwn = Op.hasOwnProperty;
+	  var undefined; // More compressible than void 0.
+	  var $Symbol = typeof Symbol === "function" ? Symbol : {};
+	  var iteratorSymbol = $Symbol.iterator || "@@iterator";
+	  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+	  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+	  var runtime = global.regeneratorRuntime;
+	  if (runtime) {
+	    {
+	      // If regeneratorRuntime is defined globally and we're in a module,
+	      // make the exports object identical to regeneratorRuntime.
+	      module.exports = runtime;
+	    }
+	    // Don't bother evaluating the rest of this file if the runtime was
+	    // already defined globally.
+	    return;
+	  }
+
+	  // Define the runtime globally (as expected by generated code) as either
+	  // module.exports (if we're in a module) or a new, empty object.
+	  runtime = global.regeneratorRuntime = module.exports;
+
+	  function wrap(innerFn, outerFn, self, tryLocsList) {
+	    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
+	    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+	    var generator = Object.create(protoGenerator.prototype);
+	    var context = new Context(tryLocsList || []);
+
+	    // The ._invoke method unifies the implementations of the .next,
+	    // .throw, and .return methods.
+	    generator._invoke = makeInvokeMethod(innerFn, self, context);
+
+	    return generator;
+	  }
+	  runtime.wrap = wrap;
+
+	  // Try/catch helper to minimize deoptimizations. Returns a completion
+	  // record like context.tryEntries[i].completion. This interface could
+	  // have been (and was previously) designed to take a closure to be
+	  // invoked without arguments, but in all the cases we care about we
+	  // already have an existing method we want to call, so there's no need
+	  // to create a new function object. We can even get away with assuming
+	  // the method takes exactly one argument, since that happens to be true
+	  // in every case, so we don't have to touch the arguments object. The
+	  // only additional allocation required is the completion record, which
+	  // has a stable shape and so hopefully should be cheap to allocate.
+	  function tryCatch(fn, obj, arg) {
+	    try {
+	      return { type: "normal", arg: fn.call(obj, arg) };
+	    } catch (err) {
+	      return { type: "throw", arg: err };
+	    }
+	  }
+
+	  var GenStateSuspendedStart = "suspendedStart";
+	  var GenStateSuspendedYield = "suspendedYield";
+	  var GenStateExecuting = "executing";
+	  var GenStateCompleted = "completed";
+
+	  // Returning this object from the innerFn has the same effect as
+	  // breaking out of the dispatch switch statement.
+	  var ContinueSentinel = {};
+
+	  // Dummy constructor functions that we use as the .constructor and
+	  // .constructor.prototype properties for functions that return Generator
+	  // objects. For full spec compliance, you may wish to configure your
+	  // minifier not to mangle the names of these two functions.
+	  function Generator() {}
+	  function GeneratorFunction() {}
+	  function GeneratorFunctionPrototype() {}
+
+	  // This is a polyfill for %IteratorPrototype% for environments that
+	  // don't natively support it.
+	  var IteratorPrototype = {};
+	  IteratorPrototype[iteratorSymbol] = function () {
+	    return this;
+	  };
+
+	  var getProto = Object.getPrototypeOf;
+	  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+	  if (NativeIteratorPrototype &&
+	      NativeIteratorPrototype !== Op &&
+	      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+	    // This environment has a native %IteratorPrototype%; use it instead
+	    // of the polyfill.
+	    IteratorPrototype = NativeIteratorPrototype;
+	  }
+
+	  var Gp = GeneratorFunctionPrototype.prototype =
+	    Generator.prototype = Object.create(IteratorPrototype);
+	  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
+	  GeneratorFunctionPrototype.constructor = GeneratorFunction;
+	  GeneratorFunctionPrototype[toStringTagSymbol] =
+	    GeneratorFunction.displayName = "GeneratorFunction";
+
+	  // Helper for defining the .next, .throw, and .return methods of the
+	  // Iterator interface in terms of a single ._invoke method.
+	  function defineIteratorMethods(prototype) {
+	    ["next", "throw", "return"].forEach(function(method) {
+	      prototype[method] = function(arg) {
+	        return this._invoke(method, arg);
+	      };
+	    });
+	  }
+
+	  runtime.isGeneratorFunction = function(genFun) {
+	    var ctor = typeof genFun === "function" && genFun.constructor;
+	    return ctor
+	      ? ctor === GeneratorFunction ||
+	        // For the native GeneratorFunction constructor, the best we can
+	        // do is to check its .name property.
+	        (ctor.displayName || ctor.name) === "GeneratorFunction"
+	      : false;
+	  };
+
+	  runtime.mark = function(genFun) {
+	    if (Object.setPrototypeOf) {
+	      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+	    } else {
+	      genFun.__proto__ = GeneratorFunctionPrototype;
+	      if (!(toStringTagSymbol in genFun)) {
+	        genFun[toStringTagSymbol] = "GeneratorFunction";
+	      }
+	    }
+	    genFun.prototype = Object.create(Gp);
+	    return genFun;
+	  };
+
+	  // Within the body of any async function, `await x` is transformed to
+	  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
+	  // `hasOwn.call(value, "__await")` to determine if the yielded value is
+	  // meant to be awaited.
+	  runtime.awrap = function(arg) {
+	    return { __await: arg };
+	  };
+
+	  function AsyncIterator(generator) {
+	    function invoke(method, arg, resolve, reject) {
+	      var record = tryCatch(generator[method], generator, arg);
+	      if (record.type === "throw") {
+	        reject(record.arg);
+	      } else {
+	        var result = record.arg;
+	        var value = result.value;
+	        if (value &&
+	            typeof value === "object" &&
+	            hasOwn.call(value, "__await")) {
+	          return Promise.resolve(value.__await).then(function(value) {
+	            invoke("next", value, resolve, reject);
+	          }, function(err) {
+	            invoke("throw", err, resolve, reject);
+	          });
+	        }
+
+	        return Promise.resolve(value).then(function(unwrapped) {
+	          // When a yielded Promise is resolved, its final value becomes
+	          // the .value of the Promise<{value,done}> result for the
+	          // current iteration. If the Promise is rejected, however, the
+	          // result for this iteration will be rejected with the same
+	          // reason. Note that rejections of yielded Promises are not
+	          // thrown back into the generator function, as is the case
+	          // when an awaited Promise is rejected. This difference in
+	          // behavior between yield and await is important, because it
+	          // allows the consumer to decide what to do with the yielded
+	          // rejection (swallow it and continue, manually .throw it back
+	          // into the generator, abandon iteration, whatever). With
+	          // await, by contrast, there is no opportunity to examine the
+	          // rejection reason outside the generator function, so the
+	          // only option is to throw it from the await expression, and
+	          // let the generator function handle the exception.
+	          result.value = unwrapped;
+	          resolve(result);
+	        }, reject);
+	      }
+	    }
+
+	    var previousPromise;
+
+	    function enqueue(method, arg) {
+	      function callInvokeWithMethodAndArg() {
+	        return new Promise(function(resolve, reject) {
+	          invoke(method, arg, resolve, reject);
+	        });
+	      }
+
+	      return previousPromise =
+	        // If enqueue has been called before, then we want to wait until
+	        // all previous Promises have been resolved before calling invoke,
+	        // so that results are always delivered in the correct order. If
+	        // enqueue has not been called before, then it is important to
+	        // call invoke immediately, without waiting on a callback to fire,
+	        // so that the async generator function has the opportunity to do
+	        // any necessary setup in a predictable way. This predictability
+	        // is why the Promise constructor synchronously invokes its
+	        // executor callback, and why async functions synchronously
+	        // execute code before the first await. Since we implement simple
+	        // async functions in terms of async generators, it is especially
+	        // important to get this right, even though it requires care.
+	        previousPromise ? previousPromise.then(
+	          callInvokeWithMethodAndArg,
+	          // Avoid propagating failures to Promises returned by later
+	          // invocations of the iterator.
+	          callInvokeWithMethodAndArg
+	        ) : callInvokeWithMethodAndArg();
+	    }
+
+	    // Define the unified helper method that is used to implement .next,
+	    // .throw, and .return (see defineIteratorMethods).
+	    this._invoke = enqueue;
+	  }
+
+	  defineIteratorMethods(AsyncIterator.prototype);
+	  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
+	    return this;
+	  };
+	  runtime.AsyncIterator = AsyncIterator;
+
+	  // Note that simple async functions are implemented on top of
+	  // AsyncIterator objects; they just return a Promise for the value of
+	  // the final result produced by the iterator.
+	  runtime.async = function(innerFn, outerFn, self, tryLocsList) {
+	    var iter = new AsyncIterator(
+	      wrap(innerFn, outerFn, self, tryLocsList)
+	    );
+
+	    return runtime.isGeneratorFunction(outerFn)
+	      ? iter // If outerFn is a generator, return the full iterator.
+	      : iter.next().then(function(result) {
+	          return result.done ? result.value : iter.next();
+	        });
+	  };
+
+	  function makeInvokeMethod(innerFn, self, context) {
+	    var state = GenStateSuspendedStart;
+
+	    return function invoke(method, arg) {
+	      if (state === GenStateExecuting) {
+	        throw new Error("Generator is already running");
+	      }
+
+	      if (state === GenStateCompleted) {
+	        if (method === "throw") {
+	          throw arg;
+	        }
+
+	        // Be forgiving, per 25.3.3.3.3 of the spec:
+	        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
+	        return doneResult();
+	      }
+
+	      context.method = method;
+	      context.arg = arg;
+
+	      while (true) {
+	        var delegate = context.delegate;
+	        if (delegate) {
+	          var delegateResult = maybeInvokeDelegate(delegate, context);
+	          if (delegateResult) {
+	            if (delegateResult === ContinueSentinel) continue;
+	            return delegateResult;
+	          }
+	        }
+
+	        if (context.method === "next") {
+	          // Setting context._sent for legacy support of Babel's
+	          // function.sent implementation.
+	          context.sent = context._sent = context.arg;
+
+	        } else if (context.method === "throw") {
+	          if (state === GenStateSuspendedStart) {
+	            state = GenStateCompleted;
+	            throw context.arg;
+	          }
+
+	          context.dispatchException(context.arg);
+
+	        } else if (context.method === "return") {
+	          context.abrupt("return", context.arg);
+	        }
+
+	        state = GenStateExecuting;
+
+	        var record = tryCatch(innerFn, self, context);
+	        if (record.type === "normal") {
+	          // If an exception is thrown from innerFn, we leave state ===
+	          // GenStateExecuting and loop back for another invocation.
+	          state = context.done
+	            ? GenStateCompleted
+	            : GenStateSuspendedYield;
+
+	          if (record.arg === ContinueSentinel) {
+	            continue;
+	          }
+
+	          return {
+	            value: record.arg,
+	            done: context.done
+	          };
+
+	        } else if (record.type === "throw") {
+	          state = GenStateCompleted;
+	          // Dispatch the exception by looping back around to the
+	          // context.dispatchException(context.arg) call above.
+	          context.method = "throw";
+	          context.arg = record.arg;
+	        }
+	      }
+	    };
+	  }
+
+	  // Call delegate.iterator[context.method](context.arg) and handle the
+	  // result, either by returning a { value, done } result from the
+	  // delegate iterator, or by modifying context.method and context.arg,
+	  // setting context.delegate to null, and returning the ContinueSentinel.
+	  function maybeInvokeDelegate(delegate, context) {
+	    var method = delegate.iterator[context.method];
+	    if (method === undefined) {
+	      // A .throw or .return when the delegate iterator has no .throw
+	      // method always terminates the yield* loop.
+	      context.delegate = null;
+
+	      if (context.method === "throw") {
+	        if (delegate.iterator.return) {
+	          // If the delegate iterator has a return method, give it a
+	          // chance to clean up.
+	          context.method = "return";
+	          context.arg = undefined;
+	          maybeInvokeDelegate(delegate, context);
+
+	          if (context.method === "throw") {
+	            // If maybeInvokeDelegate(context) changed context.method from
+	            // "return" to "throw", let that override the TypeError below.
+	            return ContinueSentinel;
+	          }
+	        }
+
+	        context.method = "throw";
+	        context.arg = new TypeError(
+	          "The iterator does not provide a 'throw' method");
+	      }
+
+	      return ContinueSentinel;
+	    }
+
+	    var record = tryCatch(method, delegate.iterator, context.arg);
+
+	    if (record.type === "throw") {
+	      context.method = "throw";
+	      context.arg = record.arg;
+	      context.delegate = null;
+	      return ContinueSentinel;
+	    }
+
+	    var info = record.arg;
+
+	    if (! info) {
+	      context.method = "throw";
+	      context.arg = new TypeError("iterator result is not an object");
+	      context.delegate = null;
+	      return ContinueSentinel;
+	    }
+
+	    if (info.done) {
+	      // Assign the result of the finished delegate to the temporary
+	      // variable specified by delegate.resultName (see delegateYield).
+	      context[delegate.resultName] = info.value;
+
+	      // Resume execution at the desired location (see delegateYield).
+	      context.next = delegate.nextLoc;
+
+	      // If context.method was "throw" but the delegate handled the
+	      // exception, let the outer generator proceed normally. If
+	      // context.method was "next", forget context.arg since it has been
+	      // "consumed" by the delegate iterator. If context.method was
+	      // "return", allow the original .return call to continue in the
+	      // outer generator.
+	      if (context.method !== "return") {
+	        context.method = "next";
+	        context.arg = undefined;
+	      }
+
+	    } else {
+	      // Re-yield the result returned by the delegate method.
+	      return info;
+	    }
+
+	    // The delegate iterator is finished, so forget it and continue with
+	    // the outer generator.
+	    context.delegate = null;
+	    return ContinueSentinel;
+	  }
+
+	  // Define Generator.prototype.{next,throw,return} in terms of the
+	  // unified ._invoke helper method.
+	  defineIteratorMethods(Gp);
+
+	  Gp[toStringTagSymbol] = "Generator";
+
+	  // A Generator should always return itself as the iterator object when the
+	  // @@iterator function is called on it. Some browsers' implementations of the
+	  // iterator prototype chain incorrectly implement this, causing the Generator
+	  // object to not be returned from this call. This ensures that doesn't happen.
+	  // See https://github.com/facebook/regenerator/issues/274 for more details.
+	  Gp[iteratorSymbol] = function() {
+	    return this;
+	  };
+
+	  Gp.toString = function() {
+	    return "[object Generator]";
+	  };
+
+	  function pushTryEntry(locs) {
+	    var entry = { tryLoc: locs[0] };
+
+	    if (1 in locs) {
+	      entry.catchLoc = locs[1];
+	    }
+
+	    if (2 in locs) {
+	      entry.finallyLoc = locs[2];
+	      entry.afterLoc = locs[3];
+	    }
+
+	    this.tryEntries.push(entry);
+	  }
+
+	  function resetTryEntry(entry) {
+	    var record = entry.completion || {};
+	    record.type = "normal";
+	    delete record.arg;
+	    entry.completion = record;
+	  }
+
+	  function Context(tryLocsList) {
+	    // The root entry object (effectively a try statement without a catch
+	    // or a finally block) gives us a place to store values thrown from
+	    // locations where there is no enclosing try statement.
+	    this.tryEntries = [{ tryLoc: "root" }];
+	    tryLocsList.forEach(pushTryEntry, this);
+	    this.reset(true);
+	  }
+
+	  runtime.keys = function(object) {
+	    var keys = [];
+	    for (var key in object) {
+	      keys.push(key);
+	    }
+	    keys.reverse();
+
+	    // Rather than returning an object with a next method, we keep
+	    // things simple and return the next function itself.
+	    return function next() {
+	      while (keys.length) {
+	        var key = keys.pop();
+	        if (key in object) {
+	          next.value = key;
+	          next.done = false;
+	          return next;
+	        }
+	      }
+
+	      // To avoid creating an additional object, we just hang the .value
+	      // and .done properties off the next function object itself. This
+	      // also ensures that the minifier will not anonymize the function.
+	      next.done = true;
+	      return next;
+	    };
+	  };
+
+	  function values(iterable) {
+	    if (iterable) {
+	      var iteratorMethod = iterable[iteratorSymbol];
+	      if (iteratorMethod) {
+	        return iteratorMethod.call(iterable);
+	      }
+
+	      if (typeof iterable.next === "function") {
+	        return iterable;
+	      }
+
+	      if (!isNaN(iterable.length)) {
+	        var i = -1, next = function next() {
+	          while (++i < iterable.length) {
+	            if (hasOwn.call(iterable, i)) {
+	              next.value = iterable[i];
+	              next.done = false;
+	              return next;
+	            }
+	          }
+
+	          next.value = undefined;
+	          next.done = true;
+
+	          return next;
+	        };
+
+	        return next.next = next;
+	      }
+	    }
+
+	    // Return an iterator with no values.
+	    return { next: doneResult };
+	  }
+	  runtime.values = values;
+
+	  function doneResult() {
+	    return { value: undefined, done: true };
+	  }
+
+	  Context.prototype = {
+	    constructor: Context,
+
+	    reset: function(skipTempReset) {
+	      this.prev = 0;
+	      this.next = 0;
+	      // Resetting context._sent for legacy support of Babel's
+	      // function.sent implementation.
+	      this.sent = this._sent = undefined;
+	      this.done = false;
+	      this.delegate = null;
+
+	      this.method = "next";
+	      this.arg = undefined;
+
+	      this.tryEntries.forEach(resetTryEntry);
+
+	      if (!skipTempReset) {
+	        for (var name in this) {
+	          // Not sure about the optimal order of these conditions:
+	          if (name.charAt(0) === "t" &&
+	              hasOwn.call(this, name) &&
+	              !isNaN(+name.slice(1))) {
+	            this[name] = undefined;
+	          }
+	        }
+	      }
+	    },
+
+	    stop: function() {
+	      this.done = true;
+
+	      var rootEntry = this.tryEntries[0];
+	      var rootRecord = rootEntry.completion;
+	      if (rootRecord.type === "throw") {
+	        throw rootRecord.arg;
+	      }
+
+	      return this.rval;
+	    },
+
+	    dispatchException: function(exception) {
+	      if (this.done) {
+	        throw exception;
+	      }
+
+	      var context = this;
+	      function handle(loc, caught) {
+	        record.type = "throw";
+	        record.arg = exception;
+	        context.next = loc;
+
+	        if (caught) {
+	          // If the dispatched exception was caught by a catch block,
+	          // then let that catch block handle the exception normally.
+	          context.method = "next";
+	          context.arg = undefined;
+	        }
+
+	        return !! caught;
+	      }
+
+	      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+	        var entry = this.tryEntries[i];
+	        var record = entry.completion;
+
+	        if (entry.tryLoc === "root") {
+	          // Exception thrown outside of any try block that could handle
+	          // it, so set the completion value of the entire function to
+	          // throw the exception.
+	          return handle("end");
+	        }
+
+	        if (entry.tryLoc <= this.prev) {
+	          var hasCatch = hasOwn.call(entry, "catchLoc");
+	          var hasFinally = hasOwn.call(entry, "finallyLoc");
+
+	          if (hasCatch && hasFinally) {
+	            if (this.prev < entry.catchLoc) {
+	              return handle(entry.catchLoc, true);
+	            } else if (this.prev < entry.finallyLoc) {
+	              return handle(entry.finallyLoc);
+	            }
+
+	          } else if (hasCatch) {
+	            if (this.prev < entry.catchLoc) {
+	              return handle(entry.catchLoc, true);
+	            }
+
+	          } else if (hasFinally) {
+	            if (this.prev < entry.finallyLoc) {
+	              return handle(entry.finallyLoc);
+	            }
+
+	          } else {
+	            throw new Error("try statement without catch or finally");
+	          }
+	        }
+	      }
+	    },
+
+	    abrupt: function(type, arg) {
+	      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+	        var entry = this.tryEntries[i];
+	        if (entry.tryLoc <= this.prev &&
+	            hasOwn.call(entry, "finallyLoc") &&
+	            this.prev < entry.finallyLoc) {
+	          var finallyEntry = entry;
+	          break;
+	        }
+	      }
+
+	      if (finallyEntry &&
+	          (type === "break" ||
+	           type === "continue") &&
+	          finallyEntry.tryLoc <= arg &&
+	          arg <= finallyEntry.finallyLoc) {
+	        // Ignore the finally entry if control is not jumping to a
+	        // location outside the try/catch block.
+	        finallyEntry = null;
+	      }
+
+	      var record = finallyEntry ? finallyEntry.completion : {};
+	      record.type = type;
+	      record.arg = arg;
+
+	      if (finallyEntry) {
+	        this.method = "next";
+	        this.next = finallyEntry.finallyLoc;
+	        return ContinueSentinel;
+	      }
+
+	      return this.complete(record);
+	    },
+
+	    complete: function(record, afterLoc) {
+	      if (record.type === "throw") {
+	        throw record.arg;
+	      }
+
+	      if (record.type === "break" ||
+	          record.type === "continue") {
+	        this.next = record.arg;
+	      } else if (record.type === "return") {
+	        this.rval = this.arg = record.arg;
+	        this.method = "return";
+	        this.next = "end";
+	      } else if (record.type === "normal" && afterLoc) {
+	        this.next = afterLoc;
+	      }
+
+	      return ContinueSentinel;
+	    },
+
+	    finish: function(finallyLoc) {
+	      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+	        var entry = this.tryEntries[i];
+	        if (entry.finallyLoc === finallyLoc) {
+	          this.complete(entry.completion, entry.afterLoc);
+	          resetTryEntry(entry);
+	          return ContinueSentinel;
+	        }
+	      }
+	    },
+
+	    "catch": function(tryLoc) {
+	      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+	        var entry = this.tryEntries[i];
+	        if (entry.tryLoc === tryLoc) {
+	          var record = entry.completion;
+	          if (record.type === "throw") {
+	            var thrown = record.arg;
+	            resetTryEntry(entry);
+	          }
+	          return thrown;
+	        }
+	      }
+
+	      // The context.catch method must only be called with a location
+	      // argument that corresponds to a known catch block.
+	      throw new Error("illegal catch attempt");
+	    },
+
+	    delegateYield: function(iterable, resultName, nextLoc) {
+	      this.delegate = {
+	        iterator: values(iterable),
+	        resultName: resultName,
+	        nextLoc: nextLoc
+	      };
+
+	      if (this.method === "next") {
+	        // Deliberately forget the last sent value so that we don't
+	        // accidentally pass it on to the delegate.
+	        this.arg = undefined;
+	      }
+
+	      return ContinueSentinel;
+	    }
+	  };
+	})(
+	  // In sloppy mode, unbound `this` refers to the global object, fallback to
+	  // Function constructor if we're in global strict mode. That is sadly a form
+	  // of indirect eval which violates Content Security Policy.
+	  (function() { return this })() || Function("return this")()
+	);
+	});
+
+	/**
+	 * Copyright (c) 2014-present, Facebook, Inc.
+	 *
+	 * This source code is licensed under the MIT license found in the
+	 * LICENSE file in the root directory of this source tree.
+	 */
+
+	// This method of obtaining a reference to the global object needs to be
+	// kept identical to the way it is obtained in runtime.js
+	var g = (function() { return this })() || Function("return this")();
+
+	// Use `getOwnPropertyNames` because not all browsers support calling
+	// `hasOwnProperty` on the global `self` object in a worker. See #183.
+	var hadRuntime = g.regeneratorRuntime &&
+	  Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
+
+	// Save the old regeneratorRuntime in case it needs to be restored later.
+	var oldRuntime = hadRuntime && g.regeneratorRuntime;
+
+	// Force reevalutation of runtime.js.
+	g.regeneratorRuntime = undefined;
+
+	var runtimeModule = runtime;
+
+	if (hadRuntime) {
+	  // Restore the original runtime.
+	  g.regeneratorRuntime = oldRuntime;
+	} else {
+	  // Remove the global property added by runtime.js.
+	  try {
+	    delete g.regeneratorRuntime;
+	  } catch(e) {
+	    g.regeneratorRuntime = undefined;
+	  }
+	}
+
+	var regenerator = runtimeModule;
+
+	var possibleConstructorReturn = createCommonjsModule(function (module, exports) {
+
+	exports.__esModule = true;
+
+
+
+	var _typeof3 = _interopRequireDefault(_typeof_1);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = function (self, call) {
+	  if (!self) {
+	    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+	  }
+
+	  return call && ((typeof call === "undefined" ? "undefined" : (0, _typeof3.default)(call)) === "object" || typeof call === "function") ? call : self;
+	};
+	});
+
+	var _possibleConstructorReturn = unwrapExports(possibleConstructorReturn);
+
+	// Works with __proto__ only. Old v8 can't work with null proto objects.
+	/* eslint-disable no-proto */
+
+
+	var check = function (O, proto) {
+	  _anObject(O);
+	  if (!_isObject(proto) && proto !== null) throw TypeError(proto + ": can't set as prototype!");
+	};
+	var _setProto = {
+	  set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
+	    function (test, buggy, set) {
+	      try {
+	        set = _ctx(Function.call, _objectGopd.f(Object.prototype, '__proto__').set, 2);
+	        set(test, []);
+	        buggy = !(test instanceof Array);
+	      } catch (e) { buggy = true; }
+	      return function setPrototypeOf(O, proto) {
+	        check(O, proto);
+	        if (buggy) O.__proto__ = proto;
+	        else set(O, proto);
+	        return O;
+	      };
+	    }({}, false) : undefined),
+	  check: check
+	};
+
+	// 19.1.3.19 Object.setPrototypeOf(O, proto)
+
+	_export(_export.S, 'Object', { setPrototypeOf: _setProto.set });
+
+	var setPrototypeOf = _core.Object.setPrototypeOf;
+
+	var setPrototypeOf$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": setPrototypeOf, __esModule: true };
+	});
+
+	unwrapExports(setPrototypeOf$1);
+
+	// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+	_export(_export.S, 'Object', { create: _objectCreate });
+
+	var $Object = _core.Object;
+	var create = function create(P, D) {
+	  return $Object.create(P, D);
+	};
+
+	var create$1 = createCommonjsModule(function (module) {
+	module.exports = { "default": create, __esModule: true };
+	});
+
+	unwrapExports(create$1);
+
+	var inherits = createCommonjsModule(function (module, exports) {
+
+	exports.__esModule = true;
+
+
+
+	var _setPrototypeOf2 = _interopRequireDefault(setPrototypeOf$1);
+
+
+
+	var _create2 = _interopRequireDefault(create$1);
+
+
+
+	var _typeof3 = _interopRequireDefault(_typeof_1);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = function (subClass, superClass) {
+	  if (typeof superClass !== "function" && superClass !== null) {
+	    throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : (0, _typeof3.default)(superClass)));
+	  }
+
+	  subClass.prototype = (0, _create2.default)(superClass && superClass.prototype, {
+	    constructor: {
+	      value: subClass,
+	      enumerable: false,
+	      writable: true,
+	      configurable: true
+	    }
+	  });
+	  if (superClass) _setPrototypeOf2.default ? (0, _setPrototypeOf2.default)(subClass, superClass) : subClass.__proto__ = superClass;
+	};
+	});
+
+	var _inherits = unwrapExports(inherits);
+
+	// eslint-disable-line no-unused-vars
+
+	var myKey = void 0;
+
+	var Key = function () {
+	  function Key() {
+	    _classCallCheck(this, Key);
+	  }
+
+	  Key.getActiveKey = async function getActiveKey() {
+	    var datadir = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.';
+	    var keyfile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'iris.key';
+	    var fs = arguments[2];
+
+	    if (myKey) {
+	      return myKey;
+	    }
+	    if (fs) {
+	      var privKeyFile = datadir + '/' + keyfile;
+	      if (fs.existsSync(privKeyFile)) {
+	        var f = fs.readFileSync(privKeyFile, 'utf8');
+	        myKey = Key.fromString(f);
+	      } else {
+	        var newKey = await Key.generate();
+	        myKey = myKey || newKey; // eslint-disable-line require-atomic-updates
+	        fs.writeFileSync(privKeyFile, Key.toString(myKey));
+	        fs.chmodSync(privKeyFile, 400);
+	      }
+	      if (!myKey) {
+	        throw new Error('loading default key failed - check ' + datadir + '/' + keyfile);
+	      }
+	    } else {
+	      var str = window.localStorage.getItem('iris.myKey');
+	      if (str) {
+	        myKey = Key.fromString(str);
+	      } else {
+	        var _newKey = await Key.generate();
+	        myKey = myKey || _newKey; // eslint-disable-line require-atomic-updates
+	        window.localStorage.setItem('iris.myKey', Key.toString(myKey));
+	      }
+	      if (!myKey) {
+	        throw new Error('loading default key failed - check localStorage iris.myKey');
+	      }
+	    }
+	    return myKey;
+	  };
+
+	  Key.getDefault = function getDefault() {
+	    var datadir = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.';
+	    var keyfile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'iris.key';
+
+	    return Key.getActiveKey(datadir, keyfile);
+	  };
+
+	  Key.getActivePub = async function getActivePub() {
+	    var datadir = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.';
+	    var keyfile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'iris.key';
+
+	    var key = await Key.getActiveKey(datadir, keyfile);
+	    return key.pub;
+	  };
+
+	  Key.setActiveKey = function setActiveKey(key) {
+	    var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+	    var datadir = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '.';
+	    var keyfile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'iris.key';
+	    var fs = arguments[4];
+
+	    myKey = key;
+	    if (!save) return;
+	    if (util.isNode) {
+	      var privKeyFile = datadir + '/' + keyfile;
+	      fs.writeFileSync(privKeyFile, Key.toString(myKey));
+	      fs.chmodSync(privKeyFile, 400);
+	    } else {
+	      window.localStorage.setItem('iris.myKey', Key.toString(myKey));
+	    }
+	  };
+
+	  Key.toString = function toString(key) {
+	    return _JSON$stringify(key);
+	  };
+
+	  Key.getId = function getId(key) {
+	    if (!(key && key.pub)) {
+	      throw new Error('missing param');
+	    }
+	    return key.pub; // hack until GUN supports lookups by keyID
+	    //return util.getHash(key.pub);
+	  };
+
+	  Key.fromString = function fromString(str) {
+	    return JSON.parse(str);
+	  };
+
+	  Key.generate = function generate() {
+	    return browser.SEA.pair();
+	  };
+
+	  Key.sign = async function sign(msg, pair) {
+	    var sig = await browser.SEA.sign(msg, pair);
+	    return 'a' + sig;
+	  };
+
+	  Key.verify = function verify(msg, pubKey) {
+	    return browser.SEA.verify(msg.slice(1), pubKey);
+	  };
+
+	  return Key;
+	}();
+
+	var errorMsg = 'Invalid  message:';
+
+	var ValidationError = function (_Error) {
+	  _inherits(ValidationError, _Error);
+
+	  function ValidationError() {
+	    _classCallCheck(this, ValidationError);
+
+	    return _possibleConstructorReturn(this, _Error.apply(this, arguments));
+	  }
+
+	  return ValidationError;
+	}(Error);
+
+	/**
+	* Signed message object. Your friends can index and relay your messages, while others can still verify that they were signed by you.
+	*
+	* Fields: signedData, signer (public key) and signature.
+	*
+	* signedData has an author, signer, type, time and optionally other fields.
+	*
+	* signature covers the utf8 string representation of signedData. Since messages are digitally signed, users only need to care about the message signer and not who relayed it or whose index it was found from.
+	*
+	* signer is the entity that verified its origin. In other words: message author and signer can be different entities, and only the signer needs to use Iris.
+	*
+	* For example, a crawler can import and sign other people's messages from Twitter. Only the users who trust the crawler will see the messages.
+	*
+	* Constructor: creates a message from the param obj.signedData that must contain at least the mandatory fields: author, type and time.
+	* @param obj
+	*
+	* @example
+	* https://github.com/irislib/iris-lib/blob/master/__tests__/SignedMessage.js
+	*
+	* Verification message:
+	* {
+	*   signedData: {
+	*     author: {name:'Alice', key:'ABCD1234'},
+	*     recipient: {
+	*       name: 'Bob',
+	*       email: ['bob@example.com', 'bob.saget@example.com'],
+	*       bitcoin: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'
+	*     },
+	*     type: 'verification'
+	*   },
+	*   signer: 'ABCD1234',
+	*   signature: '1234ABCD'
+	* }
+	*/
+
+
+	var SignedMessage = function () {
+	  function SignedMessage(obj) {
+	    _classCallCheck(this, SignedMessage);
+
+	    if (obj.signedData) {
+	      this.signedData = obj.signedData;
+	    }
+	    if (obj.pubKey) {
+	      this.pubKey = obj.pubKey;
+	    }
+	    if (obj.sig) {
+	      if (typeof obj.sig !== 'string') {
+	        throw new ValidationError('SignedMessage signature must be a string');
+	      }
+	      this.sig = obj.sig;
+	      this.getHash();
+	    }
+	    this._validate();
+	  }
+
+	  SignedMessage._getArray = function _getArray(authorOrRecipient) {
+	    var arr = [];
+	    var keys = _Object$keys(authorOrRecipient);
+	    for (var i = 0; i < keys.length; i++) {
+	      var type = keys[i];
+	      var value = authorOrRecipient[keys[i]];
+	      if (typeof value === 'string') {
+	        arr.push(new Attribute(type, value));
+	      } else {
+	        // array
+	        for (var j = 0; j < value.length; j++) {
+	          var elementValue = value[j];
+	          arr.push(new Attribute(type, elementValue));
+	        }
+	      }
+	    }
+	    return arr;
+	  };
+
+	  SignedMessage._getIterable = function _getIterable(authorOrRecipient) {
+	    var _ref;
+
+	    return _ref = {}, _ref[_Symbol$iterator] = /*#__PURE__*/regenerator.mark(function _callee() {
+	      var keys, i, type, value, j, elementValue;
+	      return regenerator.wrap(function _callee$(_context) {
+	        while (1) {
+	          switch (_context.prev = _context.next) {
+	            case 0:
+	              keys = _Object$keys(authorOrRecipient);
+	              i = 0;
+
+	            case 2:
+	              if (!(i < keys.length)) {
+	                _context.next = 21;
+	                break;
+	              }
+
+	              type = keys[i];
+	              value = authorOrRecipient[keys[i]];
+
+	              if (!(typeof value === 'string')) {
+	                _context.next = 10;
+	                break;
+	              }
+
+	              _context.next = 8;
+	              return new Attribute(type, value);
+
+	            case 8:
+	              _context.next = 18;
+	              break;
+
+	            case 10:
+	              j = 0;
+
+	            case 11:
+	              if (!(j < value.length)) {
+	                _context.next = 18;
+	                break;
+	              }
+
+	              elementValue = value[j];
+	              _context.next = 15;
+	              return new Attribute(type, elementValue);
+
+	            case 15:
+	              j++;
+	              _context.next = 11;
+	              break;
+
+	            case 18:
+	              i++;
+	              _context.next = 2;
+	              break;
+
+	            case 21:
+	            case 'end':
+	              return _context.stop();
+	          }
+	        }
+	      }, _callee, this);
+	    }), _ref;
+	  };
+
+	  SignedMessage.prototype.getAuthorIterable = function getAuthorIterable() {
+	    return SignedMessage._getIterable(this.signedData.author);
+	  };
+
+	  SignedMessage.prototype.getRecipientIterable = function getRecipientIterable() {
+	    return SignedMessage._getIterable(this.signedData.recipient);
+	  };
+
+	  SignedMessage.prototype.getAuthorArray = function getAuthorArray() {
+	    return SignedMessage._getArray(this.signedData.author);
+	  };
+
+	  SignedMessage.prototype.getRecipientArray = function getRecipientArray() {
+	    return this.signedData.recipient ? SignedMessage._getArray(this.signedData.recipient) : [];
+	  };
+
+	  SignedMessage.prototype.getSignerKeyID = function getSignerKeyID() {
+	    return this.pubKey; // hack until gun supports keyID lookups
+	    //return util.getHash(this.pubKey);
+	  };
+
+	  SignedMessage.prototype._validate = function _validate() {
+	    if (!this.signedData) {
+	      throw new ValidationError(errorMsg + ' Missing signedData');
+	    }
+	    if (typeof this.signedData !== 'object') {
+	      throw new ValidationError(errorMsg + ' signedData must be an object');
+	    }
+	    var d = this.signedData;
+
+	    if (!d.type) {
+	      throw new ValidationError(errorMsg + ' Missing type definition');
+	    }
+	    if (!d.author) {
+	      throw new ValidationError(errorMsg + ' Missing author');
+	    }
+	    if (typeof d.author !== 'object') {
+	      throw new ValidationError(errorMsg + ' Author must be object');
+	    }
+	    if (Array.isArray(d.author)) {
+	      throw new ValidationError(errorMsg + ' Author must not be an array');
+	    }
+	    if (_Object$keys(d.author).length === 0) {
+	      throw new ValidationError(errorMsg + ' Author empty');
+	    }
+	    if (this.pubKey) {
+	      this.signerKeyHash = this.getSignerKeyID();
+	    }
+	    for (var attr in d.author) {
+	      var t = _typeof(d.author[attr]);
+	      if (t !== 'string') {
+	        if (Array.isArray(d.author[attr])) {
+	          for (var i = 0; i < d.author[attr].length; i++) {
+	            if (typeof d.author[attr][i] !== 'string') {
+	              throw new ValidationError(errorMsg + ' Author attribute must be string, got ' + attr + ': [' + d.author[attr][i] + ']');
+	            }
+	            if (d.author[attr][i].length === 0) {
+	              throw new ValidationError(errorMsg + ' author ' + attr + ' in array[' + i + '] is empty');
+	            }
+	          }
+	        } else {
+	          throw new ValidationError(errorMsg + ' Author attribute must be string or array, got ' + attr + ': ' + d.author[attr]);
+	        }
+	      }
+	      if (attr === 'keyID') {
+	        if (t !== 'string') {
+	          throw new ValidationError(errorMsg + ' Author keyID must be string, got ' + t);
+	        }
+	        if (this.signerKeyHash && d.author[attr] !== this.signerKeyHash) {
+	          throw new ValidationError(errorMsg + ' If message has a keyID author, it must be signed by the same key');
+	        }
+	      }
+	    }
+	    if (d.recipient) {
+	      if (typeof d.recipient !== 'object') {
+	        throw new ValidationError(errorMsg + ' Recipient must be object');
+	      }
+	      if (Array.isArray(d.recipient)) {
+	        throw new ValidationError(errorMsg + ' Recipient must not be an array');
+	      }
+	      if (_Object$keys(d.recipient).length === 0) {
+	        throw new ValidationError(errorMsg + ' Recipient empty');
+	      }
+	      for (var _attr in d.recipient) {
+	        var _t = _typeof(d.recipient[_attr]);
+	        if (_t !== 'string') {
+	          if (Array.isArray(d.recipient[_attr])) {
+	            for (var _i = 0; _i < d.recipient[_attr].length; _i++) {
+	              if (typeof d.recipient[_attr][_i] !== 'string') {
+	                throw new ValidationError(errorMsg + ' Recipient attribute must be string, got ' + _attr + ': [' + d.recipient[_attr][_i] + ']');
+	              }
+	              if (d.recipient[_attr][_i].length === 0) {
+	                throw new ValidationError(errorMsg + ' recipient ' + _attr + ' in array[' + _i + '] is empty');
+	              }
+	            }
+	          } else {
+	            throw new ValidationError(errorMsg + ' Recipient attribute must be string or array, got ' + _attr + ': ' + d.recipient[_attr]);
+	          }
+	        }
+	      }
+	    }
+	    if (!(d.time || d.timestamp)) {
+	      throw new ValidationError(errorMsg + ' Missing time field');
+	    }
+
+	    if (!Date.parse(d.time || d.timestamp)) {
+	      throw new ValidationError(errorMsg + ' Invalid time field');
+	    }
+
+	    if (d.type === 'rating') {
+	      if (isNaN(d.rating)) {
+	        throw new ValidationError(errorMsg + ' Invalid rating');
+	      }
+	      if (isNaN(d.maxRating)) {
+	        throw new ValidationError(errorMsg + ' Invalid maxRating');
+	      }
+	      if (isNaN(d.minRating)) {
+	        throw new ValidationError(errorMsg + ' Invalid minRating');
+	      }
+	      if (d.rating > d.maxRating) {
+	        throw new ValidationError(errorMsg + ' Rating is above maxRating');
+	      }
+	      if (d.rating < d.minRating) {
+	        throw new ValidationError(errorMsg + ' Rating is below minRating');
+	      }
+	      if (typeof d.context !== 'string' || !d.context.length) {
+	        throw new ValidationError(errorMsg + ' Rating messages must have a context field');
+	      }
+	    }
+
+	    if (d.type === 'verification' || d.type === 'unverification') {
+	      if (d.recipient.length < 2) {
+	        throw new ValidationError(errorMsg + ' At least 2 recipient attributes are needed for a connection / disconnection. Got: ' + d.recipient);
+	      }
+	    }
+
+	    return true;
+	  };
+
+	  SignedMessage.prototype.isPositive = function isPositive() {
+	    return this.signedData.type === 'rating' && this.signedData.rating > (this.signedData.maxRating + this.signedData.minRating) / 2;
+	  };
+
+	  SignedMessage.prototype.isNegative = function isNegative() {
+	    return this.signedData.type === 'rating' && this.signedData.rating < (this.signedData.maxRating + this.signedData.minRating) / 2;
+	  };
+
+	  SignedMessage.prototype.isNeutral = function isNeutral() {
+	    return this.signedData.type === 'rating' && this.signedData.rating === (this.signedData.maxRating + this.signedData.minRating) / 2;
+	  };
+
+	  /**
+	  * @param {Object} key Gun.SEA keypair to sign the message with
+	  */
+
+
+	  SignedMessage.prototype.sign = async function sign(key) {
+	    this.sig = await Key.sign(this.signedData, key);
+	    this.pubKey = key.pub;
+	    await this.getHash();
+	    return true;
+	  };
+
+	  /**
+	  * Create an iris message. SignedMessage time is automatically set. If signingKey is specified and author omitted, signingKey will be used as author.
+	  * @param {Object} signedData message data object including author, recipient and other possible attributes
+	  * @param {Object} signingKey optionally, you can set the key to sign the message with
+	  * @returns {Promise<SignedMessage>}  message
+	  */
+
+
+	  SignedMessage.create = async function create(signedData, signingKey) {
+	    if (!signedData.author && signingKey) {
+	      signedData.author = { keyID: Key.getId(signingKey) };
+	    }
+	    signedData.time = signedData.time || new Date().toISOString();
+	    var m = new SignedMessage({ signedData: signedData });
+	    if (signingKey) {
+	      await m.sign(signingKey);
+	    }
+	    return m;
+	  };
+
+	  SignedMessage.createVerification = function createVerification(signedData, signingKey) {
+	    signedData.type = 'verification';
+	    return SignedMessage.create(signedData, signingKey);
+	  };
+
+	  SignedMessage.createRating = function createRating(signedData, signingKey) {
+	    signedData.type = 'rating';
+	    signedData.context = signedData.context || 'iris';
+	    signedData.maxRating = signedData.maxRating || 10;
+	    signedData.minRating = signedData.minRating || -10;
+	    return SignedMessage.create(signedData, signingKey);
+	  };
+
+	  SignedMessage.prototype.getAuthor = function getAuthor(index) {
+	    for (var _iterator = this.getAuthorIterable(), _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _getIterator(_iterator);;) {
+	      var _ref2;
+
+	      if (_isArray) {
+	        if (_i2 >= _iterator.length) break;
+	        _ref2 = _iterator[_i2++];
+	      } else {
+	        _i2 = _iterator.next();
+	        if (_i2.done) break;
+	        _ref2 = _i2.value;
+	      }
+
+	      var a = _ref2;
+
+	      if (a.isUniqueType()) {
+	        return index.getContacts(a);
+	      }
+	    }
+	  };
+
+	  SignedMessage.prototype.getRecipient = function getRecipient(index) {
+	    if (!this.signedData.recipient) {
+	      return undefined;
+	    }
+	    for (var _iterator2 = this.getRecipientIterable(), _isArray2 = Array.isArray(_iterator2), _i3 = 0, _iterator2 = _isArray2 ? _iterator2 : _getIterator(_iterator2);;) {
+	      var _ref3;
+
+	      if (_isArray2) {
+	        if (_i3 >= _iterator2.length) break;
+	        _ref3 = _iterator2[_i3++];
+	      } else {
+	        _i3 = _iterator2.next();
+	        if (_i3.done) break;
+	        _ref3 = _i3.value;
+	      }
+
+	      var a = _ref3;
+
+	      if (a.isUniqueType()) {
+	        return index.getContacts(a);
+	      }
+	    }
+	  };
+
+	  /**
+	  * @returns {string} base64 sha256 hash of message
+	  */
+
+
+	  SignedMessage.prototype.getHash = async function getHash() {
+	    if (this.sig && !this.hash) {
+	      this.hash = await util.getHash(this.sig);
+	    }
+	    return this.hash;
+	  };
+
+	  SignedMessage.prototype.getId = function getId() {
+	    return this.getHash();
+	  };
+
+	  SignedMessage.fromSig = async function fromSig(obj) {
+	    if (!obj.sig) {
+	      throw new Error('Missing signature in object:', obj);
+	    }
+	    if (!obj.pubKey) {
+	      throw new Error('Missing pubKey in object:');
+	    }
+	    //const signedData = await Key.verify(obj.sig, obj.pubKey); // disable sig verification while migrating to new gun :(
+	    var signedData = JSON.parse(obj.sig.slice(4)).m;
+	    var o = { signedData: signedData, sig: obj.sig, pubKey: obj.pubKey };
+	    return new SignedMessage(o);
+	  };
+
+	  /**
+	  * @return {boolean} true if message signature is valid. Otherwise throws ValidationError.
+	  */
+
+
+	  SignedMessage.prototype.verify = async function verify() {
+	    if (!this.pubKey) {
+	      throw new ValidationError(errorMsg + ' SignedMessage has no .pubKey');
+	    }
+	    if (!this.sig) {
+	      throw new ValidationError(errorMsg + ' SignedMessage has no .sig');
+	    }
+	    this.signedData = await Key.verify(this.sig, this.pubKey);
+	    if (!this.signedData) {
+	      throw new ValidationError(errorMsg + ' Invalid signature');
+	    }
+	    if (this.hash) {
+	      if (this.hash !== (await util.getHash(this.sig))) {
+	        throw new ValidationError(errorMsg + ' Invalid message hash');
+	      }
+	    } else {
+	      this.getHash();
+	    }
+	    return true;
+	  };
+
+	  /**
+	  * @returns {string}
+	  */
+
+
+	  SignedMessage.prototype.serialize = function serialize() {
+	    return { sig: this.sig, pubKey: this.pubKey };
+	  };
+
+	  SignedMessage.prototype.toString = function toString() {
+	    return _JSON$stringify(this.serialize());
+	  };
+
+	  /**
+	  * @returns {Promise<SignedMessage>}
+	  */
+
+
+	  SignedMessage.deserialize = async function deserialize(s) {
+	    return SignedMessage.fromSig(s);
+	  };
+
+	  SignedMessage.fromString = async function fromString(s) {
+	    return SignedMessage.fromSig(JSON.parse(s));
+	  };
+
+	  SignedMessage.setReaction = async function setReaction(gun, msg, reaction) {
+	    var hash = await msg.getHash();
+	    gun.get('reactions').get(hash).put(reaction);
+	    gun.get('reactions').get(hash).put(reaction);
+	    gun.get('messagesByHash').get(hash).get('reactions').get(this.rootContact.value).put(reaction);
+	    gun.get('messagesByHash').get(hash).get('reactions').get(this.rootContact.value).put(reaction);
+	  };
+
+	  return SignedMessage;
+	}();
+
+	var index = {
 	  /**
 	   * Initialize the state: start gun instances State.public and State.local
 	   * @param publicOpts Options for the State.public gun instance
 	   */
 	  init: function init(publicOpts) {
-	    var _this2 = this;
-
-	    Gun$1.log.off = true;
-	    var o = _Object$assign({ peers: PeerManager.getRandomPeers(), localStorage: false, retry: Infinity }, publicOpts);
-	    this.public = new Gun$1(o);
+	    browser.log.off = true;
+	    var opts = _Object$assign({ peers: PeerManager.random(), localStorage: false, retry: Infinity }, publicOpts);
+	    publicState$1(opts);
 	    if (publicOpts && publicOpts.peers) {
 	      publicOpts.peers.forEach(function (url) {
-	        return PeerManager.addPeer({ url: url });
+	        return PeerManager.add({ url: url });
 	      });
 	    }
-	    this.local = new Node();
-	    if (util.isElectron) {
-	      this.electron = new Gun$1({ peers: ['http://localhost:8768/gun'], file: 'State.electron', multicast: false, localStorage: false }).get('state');
-	    }
-	    this.blockedUsers = {};
-
-	    this.cache = new _Map(); // TODO: reset cache when users are blocked
-	    this.callbacks = new _Map();
-	    this.counter = 0;
-
-	    // Is this the right place for this?
-	    this.local.get('block').map(function (isBlocked, user) {
-	      if (isBlocked === _this2.blockedUsers[user]) {
-	        return;
-	      }
-	      if (isBlocked) {
-	        _this2.blockedUsers[user] = isBlocked;
-	        _this2.local.get('groups').map(function (v, k) {
-	          _this2.local.get('groups').get(k).get(user).put(false);
-	        });
-	      } else {
-	        delete _this2.blockedUsers[user];
-	      }
-	    });
-
-	    window.State = this;
 	    util.setPublicState && util.setPublicState(this.public);
 	    Session.init({ autologin: window.location.hash.length > 2 });
 	    PeerManager.init();
 	  },
-	  counterNext: function counterNext() {
-	    return this.counter++;
-	  },
 
-
-	  /**
-	   * Return the object that contains blocked users
-	   */
-	  getBlockedUsers: function getBlockedUsers() {
-	    return this.blockedUsers;
-	  },
-
-
-	  /**
-	   * Get a group object that aggregates public content from all the users in the group
-	   * @param groupName
-	   */
-	  group: function group() {
-	    var groupName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'everyone';
-
-	    var _this = this;
-	    return {
-	      get: function get(path, callback) {
-	        var groupNode = _this.local.get('groups').get(groupName);
-	        var follows = {};
-	        requestAnimationFrame(function () {
-	          groupNode.map(function (isFollowing, user) {
-	            if (_this.blockedUsers[user]) {
-	              return;
-	            } // TODO: allow to specifically query blocked users?
-	            if (follows[user] && follows[user] === isFollowing) {
-	              return;
-	            }
-	            follows[user] = isFollowing;
-	            if (isFollowing) {
-	              // TODO: callback on unfollow, for unsubscribe
-	              var node = _this.public.user(user);
-	              if (path && path !== '/') {
-	                node = lodash.reduce(path.split('/'), function (sum, s) {
-	                  return sum.get(decodeURIComponent(s));
-	                }, node);
-	              }
-	              callback(node, user);
-	            }
-	          });
-	        });
-	      },
-	      _cached_map: function _cached_map(cached, cacheKey, path, myEvent, callback) {
-	        if (!cached) {
-	          _this.cache.set(cacheKey, new _Map());
-	          this.get(path, function (node, from) {
-	            return node.map(function (value, key, x) {
-	              var item = { value: value, key: key, from: from };
-	              _this.cache.get(cacheKey).set(key, item);
-	              for (var _iterator = _this.callbacks.get(cacheKey).values(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _getIterator(_iterator);;) {
-	                var _ref;
-
-	                if (_isArray) {
-	                  if (_i >= _iterator.length) break;
-	                  _ref = _iterator[_i++];
-	                } else {
-	                  _i = _iterator.next();
-	                  if (_i.done) break;
-	                  _ref = _i.value;
-	                }
-
-	                var cb = _ref;
-
-	                cb(value, key, x, myEvent, from);
-	              }
-	            });
-	          });
-	        } else {
-	          for (var _iterator2 = cached.values(), _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _getIterator(_iterator2);;) {
-	            var _ref2;
-
-	            if (_isArray2) {
-	              if (_i2 >= _iterator2.length) break;
-	              _ref2 = _iterator2[_i2++];
-	            } else {
-	              _i2 = _iterator2.next();
-	              if (_i2.done) break;
-	              _ref2 = _i2.value;
-	            }
-
-	            var item = _ref2;
-
-	            callback(item.value, item.key, 0, myEvent, item.from);
-	          }
-	        }
-	      },
-
-
-	      // TODO: this should probably store just the most recent value, not everyone's value
-	      // TODO: for counting of likes etc, use this.count() instead
-	      _cached_on: function _cached_on(cached, cacheKey, path, myEvent, callback) {
-	        if (!cached) {
-	          _this.cache.set(cacheKey, new _Map());
-	          this.get(path, function (node, from) {
-	            return node.on(function (value, key, x) {
-	              var item = { value: value, key: key, from: from };
-	              _this.cache.get(cacheKey).set(from, item);
-	              for (var _iterator3 = _this.callbacks.get(cacheKey).values(), _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _getIterator(_iterator3);;) {
-	                var _ref3;
-
-	                if (_isArray3) {
-	                  if (_i3 >= _iterator3.length) break;
-	                  _ref3 = _iterator3[_i3++];
-	                } else {
-	                  _i3 = _iterator3.next();
-	                  if (_i3.done) break;
-	                  _ref3 = _i3.value;
-	                }
-
-	                var cb = _ref3;
-
-	                cb(value, key, x, myEvent, from);
-	              }
-	            });
-	          });
-	        } else {
-	          for (var _iterator4 = cached.values(), _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _getIterator(_iterator4);;) {
-	            var _ref4;
-
-	            if (_isArray4) {
-	              if (_i4 >= _iterator4.length) break;
-	              _ref4 = _iterator4[_i4++];
-	            } else {
-	              _i4 = _iterator4.next();
-	              if (_i4.done) break;
-	              _ref4 = _i4.value;
-	            }
-
-	            var item = _ref4;
-
-	            callback(item.value, item.key, 0, myEvent, item.from);
-	          }
-	        }
-	      },
-	      _cached_count: function _cached_count(cached, cacheKey, path, myEvent, callback) {
-	        if (!cached) {
-	          _this.cache.set(cacheKey, new _Map());
-	          this.get(path, function (node, from) {
-	            return node.on(function (value, key) {
-	              value ? _this.cache.get(cacheKey).set(from, true) : _this.cache.get(cacheKey).delete(from);
-	              var count = _this.cache.get(cacheKey).size;
-	              for (var _iterator5 = _this.callbacks.get(cacheKey).values(), _isArray5 = Array.isArray(_iterator5), _i5 = 0, _iterator5 = _isArray5 ? _iterator5 : _getIterator(_iterator5);;) {
-	                var _ref5;
-
-	                if (_isArray5) {
-	                  if (_i5 >= _iterator5.length) break;
-	                  _ref5 = _iterator5[_i5++];
-	                } else {
-	                  _i5 = _iterator5.next();
-	                  if (_i5.done) break;
-	                  _ref5 = _i5.value;
-	                }
-
-	                var cb = _ref5;
-
-	                cb(count, key, null, myEvent, from);
-	              }
-	            });
-	          });
-	        } else {
-	          callback(_this.cache.get(cacheKey).size, path.split('/').pop(), null, myEvent);
-	        }
-	      },
-	      _cached_fn: function _cached_fn(fn, path, callback) {
-	        var cacheKey = fn + ':' + groupName + ':' + path;
-
-	        var callbackId = _this.counterNext();
-	        if (_this.callbacks.has(cacheKey)) {
-	          _this.callbacks.get(cacheKey).set(callbackId, callback);
-	        } else {
-	          _this.callbacks.set(cacheKey, new _Map([[callbackId, callback]]));
-	        }
-
-	        var myEvent = { off: function off() {
-	            var callbacks = _this.callbacks.get(cacheKey);
-	            callbacks && callbacks.delete(callbackId);
-	          } };
-
-	        var cached = _this.cache.get(cacheKey);
-
-	        switch (fn) {
-	          case 'map':
-	            this._cached_map(cached, cacheKey, path, myEvent, callback);
-	            break;
-	          case 'on':
-	            this._cached_on(cached, cacheKey, path, myEvent, callback);
-	            break;
-	          case 'count':
-	            this._cached_count(cached, cacheKey, path, myEvent, callback);
-	            break;
-	        }
-	      },
-	      map: function map(path, callback) {
-	        // group queries are slow, so we cache them
-	        this._cached_fn('map', path, callback);
-	      },
-	      on: function on(path, callback) {
-	        this._cached_fn('on', path, callback);
-	      },
-	      count: function count(path, callback) {
-	        this._cached_fn('count', path, callback);
-	      }
-	    };
-	  }
-	};
-
-	/**
-	* Private communication channel between two or more participants ([Gun](https://github.com/amark/gun) public keys). Can be used independently of other Iris stuff.
-	*
-	* Used as a core element of [iris-messenger](https://github.com/irislib/iris-messenger).
-	*
-	* ---
-	*
-	* #### Key-value API
-	* `channel.put(key, value)` and `channel.on(key, callback)`.
-	*
-	* Note that each participant has their own versions of each key-value — they don't overwrite each other. `channel.on()` callback returns them all by default and has a parameter that indicates whose value you got.
-	*
-	* While values are encrypted, encryption of keys is not implemented yet.
-	*
-	* #### Message API
-	* `channel.send()` and `channel.getMessages()` for timestamp-indexed chat-style messaging.
-	*
-	* Message data is encrypted, but timestamps are public so that peers can return your messages in a sequential order.
-	*
-	* ---
-	*
-	* You can open a channel with yourself for a private key-value space or a "note to self" type chat with yourself.
-	*
-	* **Note!** As of April 2020 Gun.SEA hashing function [is broken on Safari](https://github.com/amark/gun/issues/892). Channels don't work on Safari unless you patch sea.js by adding [this line](https://github.com/irislib/iris-messenger/blob/1e012581793485e6b8b5ed3c2ad0629716709366/src/js/sea.js#L270).
-	*
-	* **Privacy disclaimer:** Channel ids, data values and messages are encrypted, but message timestamps are unencrypted so that peers can return them to you in a sequential order. By looking at the unencrypted timestamps (or Gun subscriptions), it is possible to guess who are communicating with each other. This could be improved by indexing messages by *day* only, so making the guess would be more difficult, while you could still return them in a semi-sequential order.
-	*
-	* @param {Object} options
-	* @param {string} options.key your keypair
-	* @param {Object} options.gun [gun](https://github.com/amark/gun) instance
-	* @param options.participants (optional) string or string array or permissions object ({'pub1':{read:true,write:true,admin:false},'pub2'...}) of participant public keys (your own key is included by default)
-	* @param {string} options.chatLink (optional) chat link instead of participants list
-	* @param {string} options.uuid (group channels only) unique channel identifier. Leave out for new channel.
-	* @param {string} options.name (group channels only) channel name
-	* @example
-	* // Copy & paste this to console at https://iris.to or other page that has gun, sea and iris-lib
-	* // Due to an unsolved bug, someoneElse's messages only start showing up after a reload
-	*
-	* var gun1 = new Gun('https://gun-us.herokuapp.com/gun');
-	* var gun2 = new Gun('https://gun-us.herokuapp.com/gun');
-	* var myKey = await iris.Key.getDefault();
-	* var someoneElse = localStorage.getItem('someoneElsesKey');
-	* if (someoneElse) {
-	*  someoneElse = JSON.parse(someoneElse);
-	* } else {
-	*  someoneElse = await iris.Key.generate();
-	*  localStorage.setItem('someoneElsesKey', JSON.stringify(someoneElse));
-	* }
-	*
-	* iris.Channel.initUser(gun1, myKey); // saves myKey.epub to gun.user().get('epub')
-	* iris.Channel.initUser(gun2, someoneElse);
-	*
-	* var ourChannel = new iris.Channel({key: myKey, gun: gun1, participants: someoneElse.pub});
-	* var theirChannel = new iris.Channel({key: someoneElse, gun: gun2, participants: myKey.pub});
-	*
-	* var myChannels = {}; // you can list them in a user interface
-	* function printMessage(msg, info) {
-	*  console.log(`[${new Date(msg.time).toLocaleString()}] ${info.from.slice(0,8)}: ${msg.text}`)
-	* }
-	* iris.Channel.getChannels(gun1, myKey, channel => {
-	*  var pub = channel.getCurrentParticipants()[0];
-	*  gun1.user(pub).get('profile').get('name').on(name => channel.name = name);
-	*  myChannels[pub] = channel;
-	*  channel.getMessages(printMessage);
-	*  channel.on('mood', (mood, from) => console.log(from.slice(0,8) + ' is feeling ' + mood));
-	* });
-	*
-	* // you can play with these in the console:
-	* ourChannel.send('message from myKey');
-	* theirChannel.send('message from someoneElse');
-	*
-	* ourChannel.put('mood', 'blessed');
-	* theirChannel.put('mood', 'happy');
-	*
-	* @example https://github.com/irislib/iris-lib/blob/master/__tests__/Channel.js
-	*/
-
-	var Channel = function () {
-	  function Channel(options) {
-	    var _this = this;
-
-	    _classCallCheck(this, Channel);
-
-	    this.DEFAULT_PERMISSIONS = { read: true, write: true };
-	    this.key = options.key;
-	    this.myGroupSecret = options.myGroupSecret;
-	    this.theirSecretUuids = {};
-	    this.theirGroupSecrets = {};
-	    this.user = State.public.user();
-	    this.user.auth(this.key);
-	    this.user.put({ epub: this.key.epub });
-	    this.secrets = {}; // maps participant public key to shared secret
-	    this.ourSecretChannelIds = {}; // maps participant public key to our secret mutual channel id
-	    this.theirSecretChannelIds = {}; // maps participant public key to their secret mutual channel id
-	    this.messages = {};
-	    this.chatLinks = {};
-	    this.groupSubscriptions = {};
-	    this.directSubscriptions = {};
-	    this.getParticipantsCallbacks = {};
-
-	    if (options.chatLink) {
-	      this.useChatLink(options);
-	    }
-
-	    if (typeof options.participants === 'string') {
-	      this.addParticipant(options.participants, options.save);
-	    } else if (Array.isArray(options.participants)) {
-	      var o = {};
-	      options.participants.forEach(function (p) {
-	        return o[p] = _Object$assign({}, _this.DEFAULT_PERMISSIONS);
-	      });
-	      options.participants = o;
-	    }
-	    if (typeof options.participants === 'object') {
-	      // it's a group channel
-	      var keys = _Object$keys(options.participants);
-	      keys.forEach(function (k) {
-	        if (k !== _this.key.pub) {
-	          _this.addParticipant(k, options.save, _Object$assign({}, _this.DEFAULT_PERMISSIONS, options.participants[k]));
-	        }
-	      });
-	      options.participants[this.key.pub] = options.participants[this.key.pub] || _Object$assign({}, this.DEFAULT_PERMISSIONS);
-	      if (options.uuid) {
-	        this.uuid = options.uuid;
-	        this.name = options.name;
-	      } else {
-	        options.uuid = Attribute.getUuid().value;
-	        this.uuid = options.uuid;
-	        options.participants[this.key.pub].admin = true;
-	        options.participants[this.key.pub].founder = true;
-	      }
-	      this.getChatLinks({ subscribe: true });
-	    }
-	    this.participants = options.participants;
-	    if (options.uuid) {
-	      // It's a group channel
-	      // share secret uuid with other participants. since secret is already non-deterministic, maybe uuid could also be?
-	      // generate channel-specific secret and share it with other participants
-	      // put() keys should be encrypted first? so you could do put(uuid, secret)
-	      // what if you join the channel with 2 unconnected devices? on reconnect, the older secret would be overwritten and messages unreadable. maybe participants should store each others' old keys? or maybe you should store them and re-encrypt old stuff when key changes? return them with map() instead?
-	      this.putDirect('S' + this.uuid, this.getMyGroupSecret());
-	      this.getMySecretUuid().then(function (s) {
-	        _this.putDirect(_this.uuid, s); // TODO: encrypt keys in put()
-	      });
-	      this.onTheirDirect(this.uuid, function (s, k, from) {
-	        _this.theirSecretUuids[from] = s;
-	      });
-	      this.onTheirDirect('S' + this.uuid, function (s, k, from) {
-	        _this.theirGroupSecrets[from] = s;
-	      });
-	      // need to make put(), on(), send() and getMessages() behave differently when it's a group and retain the old versions for mutual signaling
-	    }
-	    this.onTheir('participants', function (participants, k, from) {
-	      var hasAdmin = false;
-	      var keys = _Object$keys(_this.participants);
-	      for (var i = 0; i < keys.length; i++) {
-	        if (_this.participants[keys[i]].admin || _this.participants[keys[i]].inviter) {
-	          hasAdmin = true;
-	          break;
-	        }
-	      }
-	      if (!hasAdmin) {
-	        keys.forEach(function (k) {
-	          return _this.participants[k].admin = true;
-	        }); // if no admins, make everyone admin
-	      }
-	      if (_this.participants[from] && (_this.participants[from].admin || _this.participants[from].inviter)) {
-	        if (typeof participants === 'object') {
-	          if (_JSON$stringify(_this.participants) === _JSON$stringify(participants)) {
-	            return;
-	          }
-	          _this.participants = participants;
-	          delete _this.participants[from].inviter;
-	          _Object$keys(participants).forEach(function (k) {
-	            if (k !== _this.key.pub) {
-	              _this.addParticipant(k, true, _Object$assign({}, _this.DEFAULT_PERMISSIONS, participants[k]), true);
-	            }
-	          });
-	          _this.participantsChanged();
-	          options.saved = true;
-	        }
-	      }
-	    });
-	    if (!options.saved && (options.save === undefined || options.save === true)) {
-	      this.save();
-	    }
-	  }
-
-	  Channel.prototype.useChatLink = function useChatLink(options) {
-	    var _this2 = this;
-
-	    var s = options.chatLink.split('?');
-	    if (s.length === 2) {
-	      var chatWith = util.getUrlParameter('chatWith', s[1]);
-	      var channelId = util.getUrlParameter('channelId', s[1]);
-	      var inviter = util.getUrlParameter('inviter', s[1]);
-	      var pub = inviter || chatWith;
-	      if (chatWith) {
-	        options.participants = pub;
-	      } else if (channelId && inviter && inviter !== this.key.pub) {
-	        // TODO! initializing it twice breaks things - new secret is generated
-	        options.uuid = channelId;
-	        options.participants = {};
-	        options.participants[inviter] = _Object$assign({ inviter: true }, this.DEFAULT_PERMISSIONS);
-	      }
-	      if (pub !== this.key.pub) {
-	        var sharedSecret = util.getUrlParameter('s', s[1]);
-	        var linkId = util.getUrlParameter('k', s[1]);
-	        if (sharedSecret && linkId) {
-	          this.save(); // save the channel first so it's there before inviter subscribes to it
-	          options.saved = true;
-	          State.public.user(pub).get('chatLinks').get(linkId).get('encryptedSharedKey').on(async function (encrypted) {
-	            var sharedKey = await Gun$1.SEA.decrypt(encrypted, sharedSecret);
-	            var encryptedChatRequest = await Gun$1.SEA.encrypt(_this2.key.pub, sharedSecret); // TODO encrypt is not deterministic, it uses salt
-	            var channelRequestId = await util.getHash(encryptedChatRequest);
-	            util.gunAsAnotherUser(State.public, sharedKey, function (user) {
-	              user.get('chatRequests').get(channelRequestId.slice(0, 12)).put(encryptedChatRequest);
-	            });
-	          });
-	        }
-	      }
-	    }
-	  };
-
-	  Channel.prototype.getTheirSecretUuid = function getTheirSecretUuid(pub) {
-	    var _this3 = this;
-
-	    return new _Promise(function (resolve) {
-	      if (!_this3.theirSecretUuids[pub]) {
-	        _this3.onTheirDirect(_this3.uuid, function (s) {
-	          _this3.theirSecretUuids[pub] = s;
-	          resolve(_this3.theirSecretUuids[pub]);
-	        }, pub);
-	      } else {
-	        resolve(_this3.theirSecretUuids[pub]);
-	      }
-	    });
-	  };
-
-	  Channel.prototype.getTheirGroupSecret = function getTheirGroupSecret(pub) {
-	    var _this4 = this;
-
-	    if (pub === this.key.pub) {
-	      return this.getMyGroupSecret();
-	    }
-	    return new _Promise(function (resolve) {
-	      if (!_this4.theirGroupSecrets[pub]) {
-	        _this4.onTheirDirect('S' + _this4.uuid, function (s) {
-	          _this4.theirGroupSecrets[pub] = s;
-	          resolve(_this4.theirGroupSecrets[pub]);
-	        }, pub);
-	      } else {
-	        resolve(_this4.theirGroupSecrets[pub]);
-	      }
-	    });
-	  };
-
-	  Channel.prototype.changeMyGroupSecret = function changeMyGroupSecret() {
-	    this.myGroupSecret = Gun$1.SEA.random(32).toString('base64');
-	    // TODO: secret should be archived and probably messages should include the encryption key id so past messages don't become unreadable
-	    this.putDirect('S' + this.uuid, this.myGroupSecret);
-	  };
-
-	  /**
-	  * Unsubscribe messages from a channel participants
-	  *
-	  * @param {string} participant public key
-	  */
-
-
-	  Channel.prototype.mute = async function mute(participant) {
-	    State.public.user(participant).get(this.theirSecretUuids[participant]).off();
-	    // TODO: persist
-	  };
-
-	  /**
-	  * Mute user and prevent them from seeing your further (and maybe past) messages
-	  *
-	  * @param {string} participant public key
-	  */
-
-
-	  Channel.prototype.block = async function block(participant) {
-	    this.mute(participant);
-	    this.putDirect(this.uuid, null);
-	    this.putDirect('S' + this.uuid, null);
-	    delete this.secrets[participant];
-	    delete this.ourSecretChannelIds[participant];
-	    delete this.theirSecretChannelIds[participant];
-	    this.changeMyGroupSecret();
-	  };
-
-	  Channel.prototype.getMySecretUuid = async function getMySecretUuid() {
-	    if (!this.mySecretUuid) {
-	      var mySecret = await Gun$1.SEA.secret(this.key.epub, this.key);
-	      var mySecretHash = await util.getHash(mySecret);
-	      this.mySecretUuid = await util.getHash(mySecretHash + this.uuid);
-	    }
-	    return this.mySecretUuid;
-	  };
-
-	  /**
-	  * List participants of the channel (other than you)
-	  */
-
-
-	  Channel.prototype.getCurrentParticipants = function getCurrentParticipants() {
-	    return _Object$keys(this.secrets);
-	  };
-
-	  /**
-	  * Subscribe to the changing list of participants by channel admins
-	  */
-
-
-	  Channel.prototype.getParticipants = function getParticipants(callback) {
-	    if (this.getParticipantsCallbackId) {
-	      this.getParticipantsCallbackId++;
-	    } else {
-	      this.getParticipantsCallbackId = 1;
-	    }
-	    this.getParticipantsCallbacks[this.getParticipantsCallbackId] = callback;
-	    if (this.participants) {
-	      callback(this.participants);
-	    }
-	  };
-
-	  Channel.prototype.participantsChanged = function participantsChanged() {
-	    var _this5 = this;
-
-	    _Object$keys(this.getParticipantsCallbacks).forEach(function (id) {
-	      _this5.getParticipantsCallbacks[id](_this5.participants);
-	    });
-	  };
-
-	  /**
-	  * Returns either the uuid of a group channel or the public key of a direct channel.
-	  */
-
-
-	  Channel.prototype.getId = function getId() {
-	    return this.uuid || this.getCurrentParticipants()[0];
-	  };
-
-	  Channel.prototype.getSecret = async function getSecret(pub) {
-	    if (!this.secrets[pub]) {
-	      var epub = await util.gunOnceDefined(State.public.user(pub).get('epub'));
-	      this.secrets[pub] = await Gun$1.SEA.secret(epub, this.key);
-	    }
-	    return this.secrets[pub];
-	  };
-
-	  /**
-	  *
-	  */
-
-
-	  Channel.getOurSecretChannelId = async function getOurSecretChannelId(pub, pair) {
-	    var epub = await util.gunOnceDefined(State.public.user(pub).get('epub'));
-	    var secret = await Gun$1.SEA.secret(epub, pair);
-	    return util.getHash(secret + pub);
-	  };
-
-	  /**
-	  *
-	  */
-
-
-	  Channel.getTheirSecretChannelId = async function getTheirSecretChannelId(pub, pair) {
-	    var epub = await util.gunOnceDefined(State.public.user(pub).get('epub'));
-	    var secret = await Gun$1.SEA.secret(epub, pair);
-	    return util.getHash(secret + pair.pub);
-	  };
-
-	  /**
-	  * Calls back with Channels that you have initiated or written to.
-	  * @param {Object} keypair Gun.SEA keypair that the gun instance is authenticated with
-	  * @param callback callback function that is called for each public key you have a channel with
-	  */
-
-
-	  Channel.getChannels = async function getChannels(keypair, callback) {
-	    var listenToChatLinks = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-
-	    var mySecret = await Gun$1.SEA.secret(keypair.epub, keypair);
-	    if (listenToChatLinks) {
-	      Channel.getMyChatLinks(keypair, undefined, undefined, true);
-	    }
-	    var seen = {};
-
-	    var handleChannel = async function handleChannel(value, ourSecretChannelId) {
-	      if (value && !seen[ourSecretChannelId]) {
-	        seen[ourSecretChannelId] = true;
-	        if (ourSecretChannelId.length > 44) {
-	          State.public.user().get('chats').get(ourSecretChannelId).put(null);
-	          return;
-	        }
-	        var encryptedChatId = await util.gunOnceDefined(State.public.user().get('chats').get(ourSecretChannelId).get('pub'));
-	        var chatId = await Gun$1.SEA.decrypt(encryptedChatId, mySecret);
-	        if (!chatId) {
-	          return;
-	        }
-	        if (chatId.pub || typeof chatId === 'string') {
-	          callback(new Channel({
-	            key: keypair,
-	            participants: chatId.pub || chatId,
-	            save: false
-	          }));
-	        } else if (chatId.uuid && chatId.participants && chatId.myGroupSecret) {
-	          callback(new Channel({
-	            key: keypair,
-	            participants: chatId.participants,
-	            uuid: chatId.uuid,
-	            myGroupSecret: chatId.myGroupSecret,
-	            save: false
-	          }));
-	        }
-	      }
-	    };
-
-	    State.public.user().get('chats').map().on(handleChannel);
-	  };
-
-	  Channel.prototype.getMyGroupSecret = function getMyGroupSecret() {
-	    // group secret could be deterministic: hash(encryptToSelf(uuid + iterator))
-	    if (!this.myGroupSecret) {
-	      this.changeMyGroupSecret();
-	    }
-	    return this.myGroupSecret;
-	  };
-
-	  Channel.prototype.getOurSecretChannelId = async function getOurSecretChannelId(pub) {
-	    if (!this.ourSecretChannelIds[pub]) {
-	      var secret = await this.getSecret(pub);
-	      this.ourSecretChannelIds[pub] = await util.getHash(secret + pub);
-	    }
-	    return this.ourSecretChannelIds[pub];
-	  };
-
-	  Channel.prototype.getTheirSecretChannelId = async function getTheirSecretChannelId(pub) {
-	    if (!this.theirSecretChannelIds[pub]) {
-	      var secret = await this.getSecret(pub);
-	      this.theirSecretChannelIds[pub] = await util.getHash(secret + this.key.pub);
-	    }
-	    return this.theirSecretChannelIds[pub];
-	  };
-
-	  /**
-	  * Get messages from the channel
-	  */
-
-
-	  Channel.prototype.getMessages = async function getMessages(callback) {
-	    var _this6 = this;
-
-	    // TODO: save callback and apply it when new participants are added to channel
-	    this.getCurrentParticipants().forEach(async function (pub) {
-	      if (pub !== _this6.key.pub) {
-	        // Subscribe to their messages
-	        var theirSecretChannelId = void 0;
-	        if (_this6.uuid) {
-	          theirSecretChannelId = await _this6.getTheirSecretUuid(pub);
-	        } else {
-	          theirSecretChannelId = await _this6.getTheirSecretChannelId(pub);
-	        }
-	        State.public.user(pub).get('chats').get(theirSecretChannelId).get('msgs').map().once(function (data, key) {
-	          _this6.messageReceived(callback, data, _this6.uuid || pub, false, key, pub);
-	        });
-	      }
-	      if (!_this6.uuid) {
-	        // Subscribe to our messages
-	        var ourSecretChannelId = await _this6.getOurSecretChannelId(pub);
-	        _this6.user.get('chats').get(ourSecretChannelId).get('msgs').map().once(function (data, key) {
-	          _this6.messageReceived(callback, data, pub, true, key, _this6.key.pub);
-	        });
-	      }
-	    });
-	    if (this.uuid) {
-	      // Subscribe to our messages
-	      var mySecretUuid = await this.getMySecretUuid();
-	      this.user.get('chats').get(mySecretUuid).get('msgs').map().once(function (data, key) {
-	        _this6.messageReceived(callback, data, _this6.uuid, true, key, _this6.key.pub);
-	      });
-	    }
-	  };
-
-	  Channel.prototype.messageReceived = async function messageReceived(callback, data, channelId, selfAuthored, key, from) {
-	    if (this.messages[key] || !data) {
-	      return;
-	    }
-	    var secret = this.uuid ? await this.getTheirGroupSecret(from) : await this.getSecret(channelId);
-	    var decrypted = await Gun$1.SEA.decrypt(data, secret);
-	    if (typeof decrypted !== 'object') {
-	      return;
-	    }
-	    var info = { selfAuthored: selfAuthored, channelId: channelId, from: from };
-	    this.messages[key] = decrypted;
-	    callback(decrypted, info);
-	  };
-
-	  /**
-	  * Get latest message in this channel. Useful for channel listing.
-	  */
-
-
-	  Channel.prototype.getLatestMsg = async function getLatestMsg(callback) {
-	    var _this7 = this;
-
-	    var callbackIfLatest = async function callbackIfLatest(msg, info) {
-	      if (!_this7.latest) {
-	        _this7.latest = msg;
-	        callback(msg, info);
-	      } else {
-	        var t = typeof _this7.latest.time === 'string' ? _this7.latest.time : _this7.latest.time.toISOString();
-	        if (t < msg.time) {
-	          _this7.latest = msg;
-	          callback(msg, info);
-	        }
-	      }
-	    };
-	    this.onMy('latestMsg', function (msg) {
-	      return callbackIfLatest(msg, { selfAuthored: true, from: _this7.key.pub });
-	    });
-	    this.onTheir('latestMsg', function (msg, k, from) {
-	      return callbackIfLatest(msg, { selfAuthored: false, from: from });
-	    });
-	  };
-
-	  /**
-	  * Useful for notifications
-	  * @param {integer} time last seen msg time (default: now)
-	  */
-
-
-	  Channel.prototype.setMyMsgsLastSeenTime = async function setMyMsgsLastSeenTime(time) {
-	    time = time || new Date().toISOString();
-	    return this.put('msgsLastSeenTime', time);
-	  };
-
-	  /**
-	  * Useful for notifications
-	  */
-
-
-	  Channel.prototype.getMyMsgsLastSeenTime = async function getMyMsgsLastSeenTime(callback) {
-	    var _this8 = this;
-
-	    this.onMy('msgsLastSeenTime', function (time) {
-	      _this8.myMsgsLastSeenTime = time;
-	      if (callback) {
-	        callback(_this8.myMsgsLastSeenTime);
-	      }
-	    });
-	  };
-
-	  /**
-	  * For "seen" status indicator
-	  */
-
-
-	  Channel.prototype.getTheirMsgsLastSeenTime = async function getTheirMsgsLastSeenTime(callback) {
-	    var _this9 = this;
-
-	    this.onTheir('msgsLastSeenTime', function (time) {
-	      _this9.theirMsgsLastSeenTime = time;
-	      if (callback) {
-	        callback(_this9.theirMsgsLastSeenTime);
-	      }
-	    });
-	  };
-
-	  Channel.prototype.removeParticipant = async function removeParticipant(pub) {
-	    this.addParticipant(pub, true, { read: false, write: false });
-	  };
-
-	  /**
-	  * Add a public key to the channel or update its permissions
-	  * @param {string} pub
-	  */
-
-
-	  Channel.prototype.addParticipant = async function addParticipant(pub) {
-	    var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
-	    var _this10 = this;
-
-	    var permissions = arguments[2];
-	    var subscribe = arguments[3];
-
-	    if (permissions === undefined) {
-	      permissions = this.DEFAULT_PERMISSIONS;
-	    }
-	    if (this.secrets[pub] && _JSON$stringify(this.secrets[pub]) === _JSON$stringify(permissions)) {
-	      // TODO: should be this.participants[pub]
-	      return;
-	    }
-	    this.secrets[pub] = null;
-	    this.getSecret(pub);
-	    var ourSecretChannelId = await this.getOurSecretChannelId(pub);
-	    if (save) {
-	      // Save their public key in encrypted format, so in channel listing we know who we are channeling with
-	      var mySecret = await Gun$1.SEA.secret(this.key.epub, this.key);
-	      State.public.user().get('chats').get(ourSecretChannelId).get('pub').put((await Gun$1.SEA.encrypt({ pub: pub }, mySecret)));
-	    }
-	    if (this.uuid) {
-	      this.participants[pub] = permissions;
-	      if (save) {
-	        this.putDirect('S' + this.uuid, this.getMyGroupSecret());
-	        this.getMySecretUuid().then(function (s) {
-	          _this10.putDirect(_this10.uuid, s); // TODO: encrypt keys in put()
-	        });
-	        this.onTheirDirect(this.uuid, function (s, k, from) {
-	          _this10.theirSecretUuids[from] = s;
-	        });
-	        this.onTheirDirect('S' + this.uuid, function (s, k, from) {
-	          _this10.theirGroupSecrets[from] = s;
-	        });
-	        this.save();
-	      }
-	    }
-	    if (subscribe) {
-	      _Object$values(this.directSubscriptions).forEach(function (arr) {
-	        arr.forEach(function (o) {
-	          if (!o.from || o.from === pub) {
-	            _this10._onTheirDirectFromUser(pub, o.key, o.callback);
-	          }
-	        });
-	      });
-	      _Object$values(this.groupSubscriptions).forEach(function (arr) {
-	        arr.forEach(function (o) {
-	          if (o.from && o.from !== pub) {
-	            return;
-	          }
-	          if (permissions.write) {
-	            _this10._onTheirGroupFromUser(pub, o.key, o.callback);
-	          } else {
-	            // unsubscribe
-	            o.event && o.event.off();
-	          }
-	        });
-	      });
-	    }
-	  };
-
-	  /**
-	  * Send a message to the channel
-	  * @param msg string or {time, text, ...} object
-	  */
-
-
-	  Channel.prototype.send = async function send(msg) {
-	    if (typeof msg === 'string') {
-	      msg = msg.trim();
-	      if (msg.length === 0) {
-	        return;
-	      }
-	      msg = {
-	        time: new Date().toISOString(),
-	        text: msg
-	      };
-	    } else if (typeof msg === 'object') {
-	      msg.time = msg.time || new Date().toISOString();
-	    } else {
-	      throw new Error('msg param must be a string or an object');
-	    }
-	    //State.public.user().get('message').set(temp);
-	    if (this.uuid) {
-	      var encrypted = await Gun$1.SEA.encrypt(_JSON$stringify(msg), this.getMyGroupSecret());
-	      var mySecretUuid = await this.getMySecretUuid();
-	      this.user.get('chats').get(mySecretUuid).get('msgs').get('' + msg.time).put(encrypted);
-	      this.user.get('chats').get(mySecretUuid).get('latestMsg').put(encrypted);
-	    } else {
-	      var keys = this.getCurrentParticipants();
-	      for (var i = 0; i < keys.length; i++) {
-	        var _encrypted = await Gun$1.SEA.encrypt(_JSON$stringify(msg), (await this.getSecret(keys[i])));
-	        var ourSecretChannelId = await this.getOurSecretChannelId(keys[i]);
-	        this.user.get('chats').get(ourSecretChannelId).get('msgs').get('' + msg.time).put(_encrypted);
-	        this.user.get('chats').get(ourSecretChannelId).get('latestMsg').put(_encrypted);
-	      }
-	    }
-	  };
-
-	  /**
-	  * Save the channel to our channels list without sending a message
-	  */
-
-
-	  Channel.prototype.save = async function save() {
-	    if (this.uuid) {
-	      var mySecretUuid = await this.getMySecretUuid();
-	      this.user.get('chats').get(mySecretUuid).get('msgs').get('a').put(null);
-	      this.put('participants', this.participants); // public participants list
-	      var mySecret = await Gun$1.SEA.secret(this.key.epub, this.key);
-	      this.user.get('chats').get(mySecretUuid).get('pub').put((await Gun$1.SEA.encrypt({
-	        uuid: this.uuid,
-	        myGroupSecret: this.getMyGroupSecret(),
-	        participants: this.participants // private participants list
-	      }, mySecret)));
-	      this.participantsChanged();
-	    } else {
-	      var keys = this.getCurrentParticipants();
-	      for (var i = 0; i < keys.length; i++) {
-	        var ourSecretChannelId = await this.getOurSecretChannelId(keys[i]);
-	        this.user.get('chats').get(ourSecretChannelId).get('msgs').get('a').put(null);
-	      }
-	    }
-	  };
-
-	  /**
-	  * Save a key-value pair, encrypt value. Each participant in the Channel writes to their own version of the key-value pair — they don't overwrite the same one.
-	  * @param {string} key
-	  * @param value
-	  */
-
-
-	  Channel.prototype.put = async function put(key, value) {
-	    return (this.uuid ? this.putGroup : this.putDirect).call(this, key, value);
-	  };
-
-	  Channel.prototype.putGroup = async function putGroup(key, value) {
-	    if (key === 'msgs') {
-	      throw new Error('Sorry, you can\'t overwrite the msgs field which is used for .send()');
-	    }
-	    var encrypted = await Gun$1.SEA.encrypt(_JSON$stringify(value), this.getMyGroupSecret());
-	    var mySecretUuid = await this.getMySecretUuid();
-	    this.user.get('chats').get(mySecretUuid).get(key).put(encrypted);
-	  };
-
-	  Channel.prototype.putDirect = async function putDirect(key, value) {
-	    if (key === 'msgs') {
-	      throw new Error('Sorry, you can\'t overwrite the msgs field which is used for .send()');
-	    }
-	    var keys = this.getCurrentParticipants();
-	    for (var i = 0; i < keys.length; i++) {
-	      var encrypted = await Gun$1.SEA.encrypt(_JSON$stringify(value), (await this.getSecret(keys[i])));
-	      var ourSecretChannelId = await this.getOurSecretChannelId(keys[i]);
-	      this.user.get('chats').get(ourSecretChannelId).get(key).put(encrypted);
-	    }
-	  };
-
-	  /**
-	  * Subscribe to a key-value pair. Callback returns every participant's value unless you limit it with *from* param.
-	  * @param {string} key
-	  * @param {function} callback
-	  * @param {string} from public key whose value you want, or *"me"* for your value only, or *"them"* for the value of others only
-	  */
-
-
-	  Channel.prototype.on = async function on(key, callback, from) {
-	    return (this.uuid ? this.onGroup : this.onDirect).call(this, key, callback, from);
-	  };
-
-	  Channel.prototype.onDirect = async function onDirect(key, callback, from) {
-	    var _this11 = this;
-
-	    if (!from || from === 'me' || from === this.key.pub) {
-	      this.onMy(key, function (val) {
-	        return callback(val, _this11.key.pub);
-	      });
-	    }
-	    if (!from || from !== 'me' && from !== this.key.pub) {
-	      this.onTheir(key, function (val, k, pub) {
-	        return callback(val, pub);
-	      });
-	    }
-	  };
-
-	  Channel.prototype.onGroup = async function onGroup(key, callback, from) {
-	    var _this12 = this;
-
-	    if (!from || from === 'me' || from === this.key.pub) {
-	      this.onMyGroup(key, function (val) {
-	        return callback(val, _this12.key.pub);
-	      });
-	    }
-	    if (!from || from !== 'me' && from !== this.key.pub) {
-	      this.onTheirGroup(key, function (val, k, pub) {
-	        return callback(val, pub);
-	      });
-	    }
-	  };
-
-	  Channel.prototype.onMy = async function onMy(key, callback) {
-	    return (this.uuid ? this.onMyGroup : this.onMyDirect).call(this, key, callback);
-	  };
-
-	  Channel.prototype.onMyDirect = async function onMyDirect(key, callback) {
-	    var _this13 = this;
-
-	    if (typeof callback !== 'function') {
-	      throw new Error('onMy callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
-	    }
-	    var keys = this.getCurrentParticipants();
-
-	    var _loop = async function _loop(i) {
-	      var ourSecretChannelId = await _this13.getOurSecretChannelId(keys[i]);
-	      State.public.user().get('chats').get(ourSecretChannelId).get(key).on(async function (data) {
-	        var decrypted = await Gun$1.SEA.decrypt(data, (await _this13.getSecret(keys[i])));
-	        if (decrypted) {
-	          callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key);
-	        }
-	      });
-	      return 'break';
-	    };
-
-	    for (var i = 0; i < keys.length; i++) {
-	      var _ret = await _loop(i);
-
-	      if (_ret === 'break') break;
-	    }
-	  };
-
-	  Channel.prototype.onMyGroup = async function onMyGroup(key, callback) {
-	    var _this14 = this;
-
-	    if (typeof callback !== 'function') {
-	      throw new Error('onMy callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
-	    }
-	    var mySecretUuid = await this.getMySecretUuid();
-	    var mySecret = await this.getMyGroupSecret();
-	    State.public.user().get('chats').get(mySecretUuid).get(key).on(async function (data) {
-	      var decrypted = await Gun$1.SEA.decrypt(data, mySecret);
-	      if (decrypted) {
-	        callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key, _this14.key.pub);
-	      }
-	    });
-	  };
-
-	  Channel.prototype.onTheir = async function onTheir(key, callback, from) {
-	    return (this.uuid ? this.onTheirGroup : this.onTheirDirect).call(this, key, callback, from);
-	  };
-
-	  Channel.prototype._onTheirDirectFromUser = async function _onTheirDirectFromUser(pub, key, callback) {
-	    var _this15 = this;
-
-	    if (!this.hasWritePermission(pub)) {
-	      return;
-	    }
-	    var theirSecretChannelId = await this.getTheirSecretChannelId(pub);
-	    State.public.user(pub).get('chats').get(theirSecretChannelId).get(key).on(async function (data) {
-	      if (!_this15.hasWritePermission(pub)) {
-	        return;
-	      }
-	      var decrypted = await Gun$1.SEA.decrypt(data, (await _this15.getSecret(pub)));
-	      if (decrypted) {
-	        callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key, pub);
-	      }
-	    });
-	  };
-
-	  Channel.prototype.onTheirDirect = async function onTheirDirect(key, callback, from) {
-	    var _this16 = this;
-
-	    // TODO: subscribe to new channel participants
-	    if (typeof callback !== 'function') {
-	      throw new Error('onTheir callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
-	    }
-	    if (!Object.prototype.hasOwnProperty.call(this.directSubscriptions, key)) {
-	      this.directSubscriptions[key] = [];
-	    }
-	    this.directSubscriptions[key].push({ key: key, callback: callback, from: from });
-	    var participants = this.getCurrentParticipants();
-	    participants.forEach(async function (pub) {
-	      if (from && pub !== from) {
-	        return;
-	      }
-	      _this16._onTheirDirectFromUser(pub, key, callback);
-	    });
-	  };
-
-	  Channel.prototype.hasWritePermission = function hasWritePermission(pub) {
-	    return !this.uuid || this.participants && this.participants[pub] && this.participants[pub].write;
-	  };
-
-	  Channel.prototype._onTheirGroupFromUser = async function _onTheirGroupFromUser(pub, key, callback, subscription) {
-	    var _this17 = this;
-
-	    if (!this.hasWritePermission(pub)) {
-	      return;
-	    }
-	    var theirSecretUuid = await this.getTheirSecretUuid(pub);
-	    State.public.user(pub).get('chats').get(theirSecretUuid).get(key).on(async function (data, a, b, e) {
-	      if (subscription) {
-	        subscription.event = e;
-	      }
-	      if (!_this17.hasWritePermission(pub)) {
-	        return;
-	      }
-	      var decrypted = await Gun$1.SEA.decrypt(data, (await _this17.getTheirGroupSecret(pub)));
-	      if (decrypted) {
-	        callback(typeof decrypted.v !== 'undefined' ? decrypted.v : decrypted, key, pub);
-	      }
-	    });
-	  };
-
-	  Channel.prototype.onTheirGroup = async function onTheirGroup(key, callback, from) {
-	    var _this18 = this;
-
-	    if (typeof callback !== 'function') {
-	      throw new Error('onTheir callback must be a function, got ' + (typeof callback === 'undefined' ? 'undefined' : _typeof(callback)));
-	    }
-	    if (!Object.prototype.hasOwnProperty.call(this.groupSubscriptions, key)) {
-	      this.groupSubscriptions[key] = [];
-	    }
-	    var subscription = { key: key, callback: callback, from: from };
-	    this.groupSubscriptions[key].push(subscription);
-
-	    this.getParticipants(function (participants) {
-	      _Object$keys(participants).forEach(async function (pub) {
-	        if (from && pub !== from) {
-	          return;
-	        }
-	        if (!(participants[pub] && participants[pub].write)) {
-	          return;
-	        }
-	        _this18._onTheirGroupFromUser(pub, key, callback, subscription);
-	      });
-	    });
-	  };
-
-	  /**
-	  * Set typing status
-	  */
-
-
-	  Channel.prototype.setTyping = function setTyping(isTyping) {
-	    var _this19 = this;
-
-	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
-
-	    isTyping = typeof isTyping === 'undefined' ? true : isTyping;
-	    timeout = timeout * 1000;
-	    this.put('typing', isTyping ? new Date().toISOString() : new Date(0).toISOString());
-	    clearTimeout(this.setTypingTimeout);
-	    this.setTypingTimeout = setTimeout(function () {
-	      return _this19.put('typing', false);
-	    }, timeout);
-	  };
-
-	  /**
-	  * Get typing status
-	  */
-
-
-	  Channel.prototype.getTyping = function getTyping(callback) {
-	    var _this20 = this;
-
-	    var timeout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 5;
-	    // TODO callback not called on setTyping(false), at least for self chat
-	    timeout = timeout * 1000;
-	    this.onTheir('typing', function (typing, key, pub) {
-	      if (callback) {
-	        var isTyping = typing && new Date() - new Date(typing) <= timeout;
-	        callback(isTyping, pub);
-	        _this20.getTypingTimeouts = _this20.getTypingTimeouts || {};
-	        clearTimeout(_this20.getTypingTimeouts[pub]);
-	        if (isTyping) {
-	          _this20.getTypingTimeouts[pub] = setTimeout(function () {
-	            return callback(false, pub);
-	          }, timeout);
-	        }
-	      }
-	    });
-	  };
-
-	  /**
-	  * Add a chat button to page
-	  * @param options {label, channelOptions}
-	  */
-
-
-	  Channel.addChatButton = function addChatButton() {
-	    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-	    options = _Object$assign({ label: 'Chat' }, options);
-	    if (!options.channelOptions) {
-	      throw new Error('addChatButton missing options.channelOptions param');
-	    }
-	    util.injectCss();
-	    var channel = void 0,
-	        box = void 0;
-	    var btn = util.createElement('div', 'iris-chat-open-button', document.body);
-	    btn.setAttribute('id', 'iris-chat-open-button');
-	    btn.innerHTML = '<svg style="margin-right:7px;margin-bottom: -0.2em" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 510 510" xml:space="preserve"><path fill="currentColor" d="M459,0H51C22.95,0,0,22.95,0,51v459l102-102h357c28.05,0,51-22.95,51-51V51C510,22.95,487.05,0,459,0z M102,178.5h306v51 H102V178.5z M306,306H102v-51h204V306z M408,153H102v-51h306V153z"></path></svg> ' + options.label;
-	    btn.addEventListener('click', function () {
-	      btn.setAttribute('style', 'display: none');
-	      if (!channel) {
-	        channel = new Channel(options.channelOptions);
-	        box = channel.getChatBox();
-	        document.body.appendChild(box);
-	      } else {
-	        box.setAttribute('style', ''); // show
-	      }
-	    });
-	  };
-
-	  /**
-	  * Get a simple link that points to the channel.
-	  *
-	  * Direct channel: both users need to give their simple links. Use createChatLink() to get a two-way link that needs to be given by one user only.
-	  *
-	  * Group channel: Works only if the link recipient has been already added onto the channel participants list.
-	  */
-
-
-	  Channel.prototype.getSimpleLink = function getSimpleLink() {
-	    var urlRoot = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://iris.to/';
-
-	    if (this.uuid) {
-	      return urlRoot + '?channelId=' + this.uuid + '&inviter=' + this.key.pub;
-	    }
-	    return urlRoot + '?chatWith=' + this.getCurrentParticipants()[0];
-	  };
-
-	  /**
-	  *
-	  */
-
-
-	  Channel.prototype.getChatLinks = async function getChatLinks(_ref) {
-	    var _this21 = this;
-
-	    var callback = _ref.callback,
-	        urlRoot = _ref.urlRoot,
-	        subscribe = _ref.subscribe;
-
-	    urlRoot = urlRoot || 'https://iris.to/';
-	    if (!this.uuid) {
-	      throw new Error('Only group channels may have chat links');
-	    }
-	    var chatLinks = [];
-	    var chatLinkSubscriptions = {};
-	    this.on('chatLinks', function (links, from) {
-	      // TODO: check admin permissions
-	      if (!links || (typeof links === 'undefined' ? 'undefined' : _typeof(links)) !== 'object') {
-	        return;
-	      }
-	      _Object$keys(links).forEach(function (linkId) {
-	        var link = links[linkId];
-	        if (link === null) {
-	          chatLinkSubscriptions[linkId] && chatLinkSubscriptions[linkId].off(); // unsubscribe removed chat link
-	          delete chatLinkSubscriptions[linkId];
-	          callback && callback({ id: linkId, url: null });
-	          return;
-	        }
-	        if (chatLinks.indexOf(linkId) !== -1) {
-	          return;
-	        }
-	        var channels = [];
-	        chatLinks.push(linkId);
-	        var url = Channel.formatChatLink({ urlRoot: urlRoot, inviter: from, channelId: _this21.uuid, sharedSecret: link.sharedSecret, linkId: linkId });
-	        callback && callback({ url: url, id: linkId });
-	        if (subscribe) {
-	          State.public.user(link.sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId, a, e) {
-	            if (!encPub || typeof encPub !== 'string' || encPub.length < 10) {
-	              return;
-	            }
-	            chatLinkSubscriptions[linkId] = e;
-	            var s = _JSON$stringify(encPub);
-	            if (channels.indexOf(s) === -1) {
-	              channels.push(s);
-	              var pub = await Gun$1.SEA.decrypt(encPub, link.sharedSecret);
-	              _this21.addParticipant(pub, undefined, undefined, true);
-	            }
-	          });
-	        }
-	      });
-	    });
-	  };
-
-	  Channel.prototype.createChatLink = async function createChatLink() {
-	    var urlRoot = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://iris.to/';
-
-	    var sharedKey = await Gun$1.SEA.pair();
-	    var sharedKeyString = _JSON$stringify(sharedKey);
-	    var sharedSecret = await Gun$1.SEA.secret(sharedKey.epub, sharedKey);
-	    var encryptedSharedKey = await Gun$1.SEA.encrypt(sharedKeyString, sharedSecret);
-	    var ownerSecret = await Gun$1.SEA.secret(this.key.epub, this.key);
-	    var ownerEncryptedSharedKey = await Gun$1.SEA.encrypt(sharedKeyString, ownerSecret);
-	    var linkId = await util.getHash(encryptedSharedKey);
-	    linkId = linkId.slice(0, 12);
-
-	    // User has to exist, in order for .get(chatRequests).on() to be ever triggered
-	    await util.gunAsAnotherUser(State.public, sharedKey, function (user) {
-	      return user.get('chatRequests').put({ a: 1 }).then();
-	    });
-
-	    this.chatLinks[linkId] = { sharedKey: sharedKey, sharedSecret: sharedSecret };
-	    this.put('chatLinks', this.chatLinks);
-	    this.user.get('chatLinks').get(linkId).put({ encryptedSharedKey: encryptedSharedKey, ownerEncryptedSharedKey: ownerEncryptedSharedKey });
-
-	    return Channel.formatChatLink({ urlRoot: urlRoot, channelId: this.uuid, inviter: this.key.pub, sharedSecret: sharedSecret, linkId: linkId });
-	  };
-
-	  /**
-	  * Get a channel box element that you can add to your page
-	  */
-
-
-	  Channel.prototype.getChatBox = function getChatBox() {
-	    var _this22 = this;
-
-	    util.injectCss();
-	    var minimized = false;
-
-	    var chatBox = util.createElement('div', 'iris-chat-box');
-	    var header = util.createElement('div', 'iris-chat-header', chatBox);
-	    var minimize = util.createElement('span', 'iris-chat-minimize', header);
-	    minimize.innerText = '—';
-	    minimize.addEventListener('click', function (e) {
-	      e.stopPropagation();
-	      chatBox.setAttribute('class', 'iris-chat-box minimized');
-	      minimized = true;
-	    });
-	    var headerText = util.createElement('div', 'iris-chat-header-text', header);
-	    var onlineIndicator = util.createElement('span', 'iris-online-indicator', headerText);
-	    onlineIndicator.innerHTML = '&#x25cf;';
-	    var nameEl = util.createElement('span', undefined, headerText);
-	    var close = util.createElement('span', 'iris-chat-close', header);
-	    close.innerHTML = '&#215;';
-	    close.addEventListener('click', function () {
-	      chatBox.setAttribute('style', 'display: none');
-	      var openChatBtn = document.getElementById('iris-chat-open-button');
-	      if (openChatBtn) {
-	        openChatBtn.setAttribute('style', ''); // show
-	      }
-	    });
-	    header.addEventListener('click', function () {
-	      if (minimized) {
-	        chatBox.setAttribute('class', 'iris-chat-box');
-	        minimized = false;
-	      }
-	    });
-
-	    var messages = util.createElement('div', 'iris-chat-messages', chatBox);
-
-	    var typingIndicator = util.createElement('div', 'iris-typing-indicator', chatBox);
-	    typingIndicator.innerText = 'typing...';
-	    this.getTyping(function (isTyping) {
-	      typingIndicator.setAttribute('class', 'iris-typing-indicator' + (isTyping ? ' yes' : ''));
-	    });
-
-	    var inputWrapper = util.createElement('div', 'iris-chat-input-wrapper', chatBox);
-	    var textArea = util.createElement('textarea', undefined, inputWrapper);
-	    textArea.setAttribute('rows', '1');
-	    textArea.setAttribute('placeholder', 'Type a message');
-	    if (util.isMobile) {
-	      var sendBtn = util.createElement('button', undefined, inputWrapper);
-	      sendBtn.innerHTML = '\n        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 486.736 486.736" style="enable-background:new 0 0 486.736 486.736;" xml:space="preserve" width="100px" height="100px" fill="#000000" stroke="#000000" stroke-width="0"><path fill="currentColor" d="M481.883,61.238l-474.3,171.4c-8.8,3.2-10.3,15-2.6,20.2l70.9,48.4l321.8-169.7l-272.4,203.4v82.4c0,5.6,6.3,9,11,5.9 l60-39.8l59.1,40.3c5.4,3.7,12.8,2.1,16.3-3.5l214.5-353.7C487.983,63.638,485.083,60.038,481.883,61.238z"></path></svg>\n      ';
-	      sendBtn.addEventListener('click', function () {
-	        _this22.send(textArea.value);
-	        textArea.value = '';
-	        _this22.setTyping(false);
-	      });
-	    }
-
-	    var participants = this.getCurrentParticipants();
-	    if (participants.length) {
-	      var pub = participants[0];
-	      State.public.user(pub).get('profile').get('name').on(function (name) {
-	        return nameEl.innerText = name;
-	      });
-	      Channel.getActivity(State.public, pub, function (status) {
-	        var cls = 'iris-online-indicator' + (status.isActive ? ' yes' : '');
-	        onlineIndicator.setAttribute('class', cls);
-	        var undelivered = messages.querySelectorAll('.iris-chat-message:not(.delivered)');
-	        undelivered.forEach(function (msg) {
-	          if (msg.getAttribute('data-time') <= status.lastActive) {
-	            var c = msg.getAttribute('class');
-	            msg.setAttribute('class', c + ' delivered');
-	          }
-	        });
-	      });
-	    }
-
-	    this.getTheirMsgsLastSeenTime(function (time) {
-	      var unseen = messages.querySelectorAll('.iris-seen:not(.yes)');
-	      unseen.forEach(function (indicator) {
-	        var msgEl = indicator.parentElement.parentElement.parentElement;
-	        if (msgEl.getAttribute('data-time') <= time) {
-	          var msgClass = msgEl.getAttribute('class');
-	          if (msgClass.indexOf('delivered') === -1) {
-	            msgEl.setAttribute('class', msgClass + ' delivered');
-	          }
-	          indicator.setAttribute('class', 'iris-seen yes');
-	        }
-	      });
-	    });
-
-	    this.getMessages(function (msg, info) {
-	      var msgContent = util.createElement('div', 'iris-msg-content');
-	      msgContent.innerText = msg.text;
-	      var time = util.createElement('div', 'time', msgContent);
-	      time.innerText = util.formatTime(new Date(msg.time));
-	      if (info.selfAuthored) {
-	        var cls = _this22.theirMsgsLastSeenTime >= msg.time ? 'iris-seen yes' : 'iris-seen';
-	        var seenIndicator = util.createElement('span', cls, time);
-	        seenIndicator.innerHTML = ' <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg>';
-	      }
-	      msgContent.innerHTML = msgContent.innerHTML.replace(/\n/g, '<br>\n');
-
-	      var msgEl = util.createElement('div', (info.selfAuthored ? 'our' : 'their') + ' iris-chat-message');
-	      msgEl.appendChild(msgContent);
-	      msgEl.setAttribute('data-time', msg.time);
-	      for (var i = messages.children.length; i >= 0; i--) {
-	        if (i === 0) {
-	          messages.insertBefore(msgEl, messages.firstChild);
-	        } else {
-	          var t = messages.children[i - 1].getAttribute('data-time');
-	          if (t && t < msg.time) {
-	            messages.children[i - 1].insertAdjacentElement('afterend', msgEl);
-	            break;
-	          }
-	        }
-	      }
-	      messages.scrollTop = messages.scrollHeight;
-	    });
-
-	    textArea.addEventListener('keyup', function (event) {
-	      Channel.setActivity(State.public, true); // TODO
-	      _this22.setMyMsgsLastSeenTime(); // TODO
-	      if (event.keyCode === 13) {
-	        event.preventDefault();
-	        var content = textArea.value;
-	        var caret = util.getCaret(textArea);
-	        if (event.shiftKey) {
-	          textArea.value = content.substring(0, caret - 1) + '\n' + content.substring(caret, content.length);
-	        } else {
-	          textArea.value = content.substring(0, caret - 1) + content.substring(caret, content.length);
-	          _this22.send(textArea.value);
-	          textArea.value = '';
-	          _this22.setTyping(false);
-	        }
-	      } else {
-	        _this22.setTyping(!!textArea.value.length);
-	      }
-	    });
-
-	    return chatBox;
-	  };
-
-	  /**
-	  * Set the user's online/active status
-	  * @param {string} activity string: set the activity status every 3 seconds, null/false: stop updating
-	  */
-
-
-	  Channel.setActivity = function setActivity(activity) {
-	    if (State.public.irisActivityStatus === activity) {
-	      return;
-	    }
-	    State.public.irisActivityStatus = activity;
-	    clearTimeout(State.public.setActivityTimeout);
-	    var update = function update() {
-	      State.public.user().get('activity').put({ status: activity, time: new Date(Gun$1.state()).toISOString() });
-	    };
-	    update();
-	    function timerUpdate() {
-	      update();
-	      State.public.setActivityTimeout = setTimeout(timerUpdate, 3000);
-	    }
-	    if (activity) {
-	      timerUpdate();
-	    }
-	  };
-
-	  /**
-	  * Get the online status of a user.
-	  *
-	  * @param {string} pubKey public key of the user
-	  * @param {boolean} callback receives a boolean each time the user's online status changes
-	  */
-
-
-	  Channel.getActivity = function getActivity(pubKey, callback) {
-	    var timeout = void 0;
-	    State.public.user(pubKey).get('activity').on(function (activity) {
-	      if (!activity || !(activity.time && activity.status)) {
-	        return;
-	      }
-	      clearTimeout(timeout);
-	      var now = new Date(Gun$1.state());
-	      var activityDate = new Date(activity.time);
-	      var isActive = activityDate > new Date(now.getTime() - 10 * 1000) && activityDate < new Date(now.getTime() + 30 * 1000);
-	      callback({ isActive: isActive, lastActive: activity.time, status: activity.status });
-	      if (isActive) {
-	        timeout = setTimeout(function () {
-	          return callback({ isOnline: false, lastActive: activity.time });
-	        }, 10000);
-	      }
-	    });
-	  };
-
-	  /**
-	  * In order to receive messages from others, this method must be called for newly created
-	  * users that have not started a channel with an existing user yet.
-	  *
-	  * It saves the user's key.epub (public key for encryption) into their gun user space,
-	  * so others can find it and write encrypted messages to them.
-	  *
-	  * If you start a channel with an existing user, key.epub is saved automatically and you don't need
-	  * to call this method.
-	  */
-
-
-	  Channel.initUser = function initUser(key) {
-	    var user = State.public.user();
-	    user.auth(key);
-	    user.put({ epub: key.epub });
-	  };
-
-	  Channel.formatChatLink = function formatChatLink(_ref2) {
-	    var urlRoot = _ref2.urlRoot,
-	        chatWith = _ref2.chatWith,
-	        channelId = _ref2.channelId,
-	        inviter = _ref2.inviter,
-	        sharedSecret = _ref2.sharedSecret,
-	        linkId = _ref2.linkId;
-
-	    var enc = encodeURIComponent;
-	    if (channelId && inviter) {
-	      return urlRoot + '?channelId=' + enc(channelId) + '&inviter=' + enc(inviter) + '&s=' + enc(sharedSecret) + '&k=' + enc(linkId);
-	    }
-	    return urlRoot + '?chatWith=' + enc(chatWith) + '&s=' + enc(sharedSecret) + '&k=' + enc(linkId);
-	  };
-
-	  /**
-	  * Creates a channel link that can be used for two-way communication, i.e. only one link needs to be exchanged.
-	  */
-
-
-	  Channel.createChatLink = async function createChatLink(key) {
-	    var urlRoot = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://iris.to/';
-
-	    var user = State.public.user();
-	    user.auth(key);
-
-	    // We create a new Gun user whose private key is shared with the chat link recipients.
-	    // Chat link recipients can contact you by writing their public key to the shared key's user space.
-	    var sharedKey = await Gun$1.SEA.pair();
-	    var sharedKeyString = _JSON$stringify(sharedKey);
-	    var sharedSecret = await Gun$1.SEA.secret(sharedKey.epub, sharedKey);
-	    var encryptedSharedKey = await Gun$1.SEA.encrypt(sharedKeyString, sharedSecret);
-	    var ownerSecret = await Gun$1.SEA.secret(key.epub, key);
-	    var ownerEncryptedSharedKey = await Gun$1.SEA.encrypt(sharedKeyString, ownerSecret);
-	    var linkId = await util.getHash(encryptedSharedKey);
-	    linkId = linkId.slice(0, 12);
-
-	    // User has to exist, in order for .get(chatRequests).on() to be ever triggered
-	    util.gunAsAnotherUser(State.public, sharedKey, function (user) {
-	      user.get('chatRequests').put({ a: 1 });
-	    });
-
-	    user.get('chatLinks').get(linkId).put({ encryptedSharedKey: encryptedSharedKey, ownerEncryptedSharedKey: ownerEncryptedSharedKey });
-
-	    return Channel.formatChatLink({ urlRoot: urlRoot, chatWith: key.pub, sharedSecret: sharedSecret, linkId: linkId });
-	  };
-
-	  /**
-	  *
-	  */
-
-
-	  Channel.getMyChatLinks = async function getMyChatLinks(key) {
-	    var urlRoot = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://iris.to/';
-	    var callback = arguments[2];
-	    var subscribe = arguments[3];
-
-	    var user = State.public.user();
-	    user.auth(key);
-	    var mySecret = await Gun$1.SEA.secret(key.epub, key);
-	    var chatLinks = [];
-	    user.get('chatLinks').map().on(function (data, linkId) {
-	      if (!data || chatLinks.indexOf(linkId) !== -1) {
-	        return;
-	      }
-	      var channels = [];
-	      user.get('chatLinks').get(linkId).get('ownerEncryptedSharedKey').on(async function (enc) {
-	        if (!enc || chatLinks.indexOf(linkId) !== -1) {
-	          return;
-	        }
-	        chatLinks.push(linkId);
-	        var sharedKey = await Gun$1.SEA.decrypt(enc, mySecret);
-	        var sharedSecret = await Gun$1.SEA.secret(sharedKey.epub, sharedKey);
-	        var url = Channel.formatChatLink({ urlRoot: urlRoot, chatWith: key.pub, sharedSecret: sharedSecret, linkId: linkId });
-	        if (callback) {
-	          callback({ url: url, id: linkId });
-	        }
-	        if (subscribe) {
-	          State.public.user(sharedKey.pub).get('chatRequests').map().on(async function (encPub, requestId) {
-	            if (!encPub) {
-	              return;
-	            }
-	            var s = _JSON$stringify(encPub);
-	            if (channels.indexOf(s) === -1) {
-	              channels.push(s);
-	              var pub = await Gun$1.SEA.decrypt(encPub, sharedSecret);
-	              var channel = new Channel({ key: key, participants: pub });
-	              channel.save();
-	            }
-	            util.gunAsAnotherUser(State.public, sharedKey, function (user) {
-	              // remove the channel request after reading
-	              user.get('chatRequests').get(requestId).put(null);
-	            });
-	          });
-	        }
-	      });
-	    });
-	  };
-
-	  /**
-	  *
-	  */
-
-
-	  Channel.prototype.removeGroupChatLink = function removeGroupChatLink(linkId) {
-	    this.chatLinks[linkId] = null;
-	    this.put('chatLinks', this.chatLinks);
-	    State.public.user().get('chatLinks').get(linkId).put(null);
-	  };
-
-	  /**
-	  *
-	  */
-
-
-	  Channel.removePrivateChatLink = function removePrivateChatLink(key, linkId) {
-	    State.public.user().auth(key);
-	    State.public.user().get('chatLinks').get(linkId).put(null);
-	  };
-
-	  /**
-	  *
-	  */
-
-
-	  Channel.deleteChannel = async function deleteChannel(key, pub) {
-	    State.public.user().auth(key);
-	    var channelId = await Channel.getOurSecretChannelId(pub, key);
-	    State.public.user().get('channels').get(channelId).put(null);
-	    State.public.user().get('channels').get(channelId).off();
-	  };
-
-	  /**
-	  *
-	  */
-
-
-	  Channel.deleteGroup = async function deleteGroup(key, uuid) {
-	    var mySecret = await Gun$1.SEA.secret(key.epub, key);
-	    var mySecretHash = await util.getHash(mySecret);
-	    var mySecretUuid = await util.getHash(mySecretHash + uuid);
-	    State.public.user().auth(key);
-	    State.public.user().get('channels').get(mySecretUuid).put(null);
-	    State.public.user().get('channels').get(mySecretUuid).off();
-	  };
-
-	  return Channel;
-	}();
-
-	/*eslint no-useless-escape: "off", camelcase: "off" */
-
-	var index = {
+	  local: local$1,
+	  public: publicState$1,
+	  group: group,
+	  user: userSpace,
+	  private: privateState,
+	  static: staticState,
+	  electron: electron,
+	  peers: PeerManager,
+	  session: Session,
+	  util: util,
+	  algorithms: {},
+
+	  SEA: browser.SEA,
 	  SignedMessage: SignedMessage,
-	  Attribute: Attribute,
 	  Channel: Channel,
-	  State: State,
-	  PeerManager: PeerManager,
-	  Session: Session,
-	  Node: Node,
-	  util: util
+	  Node: Node
 	};
 
 	return index;

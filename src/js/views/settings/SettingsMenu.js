@@ -1,7 +1,7 @@
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
 import { route } from 'preact-router';
-import State from "iris-lib/src/State";
+import iris from 'iris-lib';
 import Helpers from "../../Helpers";
 import {html} from "htm/preact";
 
@@ -20,8 +20,8 @@ export default class SettingsMenu extends Component{
 
   menuLinkClicked(url,e) {
     e.preventDefault();
-    State.local.get('toggleSettingsMenu').put(false);
-    State.local.get('scrollUp').put(true);
+    iris.local().get('toggleSettingsMenu').put(false);
+    iris.local().get('scrollUp').put(true);
     route(`/settings/${url}`);
   }
 

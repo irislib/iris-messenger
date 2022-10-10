@@ -1,8 +1,7 @@
 import { html } from 'htm/preact';
 import {translate as tr} from '../translations/Translation';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import {Helmet} from "react-helmet";
-import Session from 'iris-lib/src/Session';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';
@@ -14,13 +13,12 @@ import SearchBox from '../components/SearchBox';
 import {SMS_VERIFIER_PUB} from '../SMS';
 import $ from 'jquery';
 import Button from '../components/basic/Button';
-import Channel from 'iris-lib/src/Channel';
 
 function deleteChat(uuid) {
   if (confirm("Delete chat?")) {
-      Channel.deleteGroup(Session.getKey(), uuid);
-      delete Session.channels[uuid];
-      State.local.get('channels').get(uuid).put(null);
+      iris.Channel.deleteGroup(iris.session.getKey(), uuid);
+      iris.session.channelIds.delete(uuid);
+      iris.local().get('channels').get(uuid).put(null);
       route('/chat');
   }
 }
@@ -32,12 +30,12 @@ class Group extends View {
   }
 
   onProfilePhotoSet(src) {
-    Session.channels[this.props.id].put('photo', src);
+    iris.private(this.props.id).put('photo', src);
   }
 
   onAboutInput(e) {
     const about = $(e.target).text().trim();
-    Session.channels[this.props.id].put('about', about);
+    iris.private(this.props.id).put('about', about);
   }
 
   onClickSettings() {
@@ -47,32 +45,32 @@ class Group extends View {
   onNameInput(e) {
     const name = $(e.target).text().trim();
     if (name.length) {
-      Session.channels[this.props.id].put('name', name);
+      iris.private(this.props.id).put('name', name);
     }
   }
 
   removeChatLink(id) {
     if (confirm("Remove chat link?")) {
-      State.local.get('chatLinks').get(id).put(null);
-      Session.channels[this.props.id].removeGroupChatLink(id);
+      iris.local().get('chatLinks').get(id).put(null);
+      iris.private(this.props.id).removeGroupChatLink(id);
     }
   }
 
   onAddParticipant(add = true) {
-    add && Session.channels[this.props.id].addParticipant(this.state.memberCandidate);
+    add && iris.private(this.props.id).addParticipant(this.state.memberCandidate);
     // send invite msg
-    Session.channels[this.state.memberCandidate].send({invite:{group:this.props.id}});
+    iris.private(this.state.memberCandidate).send({invite:{group:this.props.id}});
     this.setState({memberCandidate:null});
   }
 
   onRemoveParticipant(pub) {
     if (confirm("Remove participant?")) {
-      Session.channels[this.props.id].removeParticipant(pub);
+      iris.private(this.props.id).removeParticipant(pub);
     }
   }
 
   renderGroupSettings() {
-    const chat = Session.channels[this.props.id];
+    const chat = iris.private(this.props.id);
     if (chat && chat.uuid) {
       return html`
         <div>
@@ -186,10 +184,10 @@ class Group extends View {
                 ${this.state.about}</p>
               </div>
               <div class="profile-actions">
-                ${this.followedUsers && this.followedUsers.has(Session.getPubKey()) ? html`
+                ${this.followedUsers && this.followedUsers.has(iris.session.getPubKey()) ? html`
                   <p><small>${tr('follows_you')}</small></p>
                 `: this.props.id === SMS_VERIFIER_PUB ? html`
-                  <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${Session.getPubKey()}">${tr('ask_for_verification')}</a></p>
+                  <p><a href="https://iris-sms-auth.herokuapp.com/?pub=${iris.session.getPubKey()}">${tr('ask_for_verification')}</a></p>
                 ` : ''}
                 <${Button} onClick=${() => route(`/chat/${  this.props.id}`)}>${tr('send_message')}<//>
                 <${Button} class="show-settings" onClick=${() => this.onClickSettings()}>${tr('settings')}<//>
@@ -233,7 +231,7 @@ class Group extends View {
   }
 
   groupDidMount() {
-    const chat = Session.channels[this.props.id];
+    const chat = iris.private(this.props.id);
     chat.on('name', name => { // TODO: this really needs unsubscribe
       if (!$('#profile .profile-name:focus').length) {
         this.setState({name});
@@ -253,19 +251,19 @@ class Group extends View {
     const pub = this.props.id;
     console.log(this.props.id, 2);
     this.setState({name: '', photo: '', about: ''});
-    const chat = Session.channels[pub];
+    const chat = iris.private(pub);
     if (pub.length < 40) {
       if (!chat) {
         const interval = setInterval(() => {
-          if (Session.channels[pub]) {
+          if (iris.private(pub)) {
             clearInterval(interval);
             this.componentDidMount();
           }
         }, 1000);
       }
     }
-    State.local.get('inviteLinksChanged').on(() => this.setState({inviteLinksChanged: !this.state.inviteLinksChanged}));
-    State.local.get('channels').get(this.props.id).get('participants').on(participants => {
+    iris.local().get('inviteLinksChanged').on(() => this.setState({inviteLinksChanged: !this.state.inviteLinksChanged}));
+    iris.local().get('channels').get(this.props.id).get('participants').on(participants => {
       const isAdmin = areWeAdmin(pub);
       this.setState({isAdmin, participants});
     });
@@ -280,7 +278,7 @@ class Group extends View {
 }
 
 function areWeAdmin(uuid) {
-  const me = Session.channels[uuid] && Session.channels[uuid].participantProfiles[Session.getKey().pub];
+  const me = iris.private(uuid).participantProfiles[iris.session.getKey().pub];
   return !!(me && me.permissions && me.permissions.admin);
 }
 

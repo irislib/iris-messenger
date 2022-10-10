@@ -2,7 +2,6 @@ import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation';
 import LanguageSelector from '../components/LanguageSelector';
 import QRScanner from '../QRScanner';
-import Session from 'iris-lib/src/Session';
 import { Component } from 'preact';
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
@@ -10,8 +9,7 @@ import {ec as EC} from "elliptic";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3Modal from "web3modal";
 import Web3 from "web3";
-import State from "iris-lib/src/State";
-import util from "iris-lib/src/util";
+import iris from 'iris-lib';
 import _ from 'lodash';
 import { route } from 'preact-router';
 
@@ -69,11 +67,11 @@ async function ethereumConnect() {
 }
 
 function maybeGoToChat(key) {
-  let chatId = util.getUrlParameter('chatWith') || util.getUrlParameter('channelId');
-  let inviter = util.getUrlParameter('inviter');
+  let chatId = iris.util.getUrlParameter('chatWith') || iris.util.getUrlParameter('channelId');
+  let inviter = iris.util.getUrlParameter('inviter');
   function go() {
     if (inviter !== key.pub) {
-      Session.newChannel(chatId, window.location.href);
+      iris.session.newChannel(chatId, window.location.href);
     }
     _.defer(() => route(`/chat/${  chatId}`)); // defer because router is only initialised after login // TODO fix
     window.history.pushState({}, "Iris Chat", `/${window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("?")[0]}`); // remove param
@@ -88,7 +86,7 @@ function maybeGoToChat(key) {
 }
 
 function login(k) {
-  Session.login(k);
+  iris.session.login(k);
   maybeGoToChat(k);
 }
 
@@ -112,11 +110,11 @@ async function ethereumLogin(name) {
     };
     login(k);
     setTimeout(async () => {
-      State.public.user().get('profile').get('name').once(existingName => {
+      iris.user().get('profile').get('name').once(existingName => {
         if (typeof existingName !== 'string' || existingName === '') {
-          name = name || util.generateName();
-          State.public.user().get('profile').put({a:null});
-          State.public.user().get('profile').get('name').put(name);
+          name = name || iris.util.generateName();
+          iris.user().get('profile').put({a:null});
+          iris.user().get('profile').get('name').put(name);
         }
       });
     }, 2000);
@@ -159,8 +157,8 @@ class Login extends Component {
 
   onLoginFormSubmit(e) {
     e.preventDefault();
-    let name = document.getElementById('login-form-name').value || util.generateName();
-    Session.loginAsNewUser(name);
+    let name = document.getElementById('login-form-name').value || iris.util.generateName();
+    iris.session.loginAsNewUser(name);
     this.base.style = 'display:none';
   }
 

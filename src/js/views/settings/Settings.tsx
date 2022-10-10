@@ -3,7 +3,7 @@ import SettingsMenu from './SettingsMenu';
 import SettingsContent from './SettingsContent';
 import Header from '../../components/Header';
 import Icons from '../../Icons';
-import State from "iris-lib/src/State";
+import iris from 'iris-lib';
 import $ from 'jquery';
 import { route } from 'preact-router';
 
@@ -19,7 +19,7 @@ class Settings extends Component<Props,State> {
   
   
   componentDidMount() {
-    State.local.get('toggleSettingsMenu').on((show: boolean) => this.toggleMenu(show));
+    iris.local().get('toggleSettingsMenu').on((show: boolean) => this.toggleMenu(show));
   }
   toggleMenu(show: boolean): void {
     this.setState({showSettingsMenu: typeof show === 'undefined' ? !this.state.toggleSettingsMenu : show});
@@ -54,7 +54,7 @@ class Settings extends Component<Props,State> {
     e.stopPropagation();
     $('a.logo').blur();
     ($(window).width() > 625);
-    State.local.get('toggleSettingsMenu').put(true);
+    iris.local().get('toggleSettingsMenu').put(true);
     route('/settings/')
   }
 }

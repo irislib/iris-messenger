@@ -2,19 +2,16 @@ import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import {createRef} from 'preact';
 import { translate as t } from '../../translations/Translation';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Identicon from '../../components/Identicon';
 import Message from '../../components/Message';
 import ChatMessageForm from './ChatMessageForm';
 import Name from '../../components/Name';
-import Session from 'iris-lib/src/Session';
-import Notifications from 'iris-lib/src/Notifications';
 import NewChat from './newchat/NewChat';
 import _ from 'lodash';
 import $ from 'jquery';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';
-import util from 'iris-lib/src/util';
 
 import Button from '../../components/basic/Button';
 import { Router } from 'preact-router';
@@ -31,7 +28,7 @@ c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,35
 `;
 
 function copyMyChatLinkClicked(e) {
-  Helpers.copyToClipboard(Session.getMyChatLink());
+  Helpers.copyToClipboard(iris.session.getMyChatLink());
   let te = $(e.target);
   let originalText = te.text();
   let originalWidth = te.width();
@@ -66,14 +63,14 @@ export default class PrivateChat extends Component {
     this.iv = null;
     this.chat = null;
     const go = () => {
-      this.chat = Session.channels[this.props.id];
+      this.chat = iris.private(this.props.id); // TODO: it might be a group chat that doesn't exist yet
       if (!this.chat && this.props.id.length > 40) {
-        this.chat = Session.newChannel(this.props.id);
+        this.chat = iris.session.newChannel(this.props.id);
       }
       if (this.chat) {
         clearInterval(this.iv)
-        Session.subscribeToMsgs(this.props.id);
-        Notifications.changeChatUnseenCount(this.props.id, 0);
+        iris.session.subscribeToMsgs(this.props.id);
+        iris.notifications.changeChatUnseenCount(this.props.id, 0);
         this.chat.setMyMsgsLastSeenTime();
         Helpers.scrollToMessageListBottom();
         this.chat.setMyMsgsLastSeenTime();
@@ -82,14 +79,14 @@ export default class PrivateChat extends Component {
     this.iv = setInterval(go, 3000);
     go();
 
-    State.local.get('showParticipants').put(true);
-    State.local.get('showParticipants').on(this.inject());
-    State.local.get('channels').get(this.props.id).get('participants').map(this.sub(
+    iris.local().get('showParticipants').put(true);
+    iris.local().get('showParticipants').on(this.inject());
+    iris.local().get('channels').get(this.props.id).get('participants').map(this.sub(
       (v, k) => {
         const hasAlready = !!this.participants[k];
         this.participants[k] = v;
         if (!!v && !hasAlready) {
-          State.public.user(k).get('activity').on(this.sub(
+          iris.user(k).get('activity').on(this.sub(
             (activity) => {
               if (this.participants[k]) { this.participants[k].activity = activity; }
               this.setSortedParticipants();
@@ -99,8 +96,8 @@ export default class PrivateChat extends Component {
         this.setSortedParticipants();
       }
     ));
-    State.local.get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
-    const node = State.local.get('channels').get(this.props.id).get('msgs');
+    iris.local().get('channels').get(this.props.id).get('msgDraft').once(m => $('.new-msg').val(m));
+    const node = iris.local().get('channels').get(this.props.id).get('msgs');
     const limitedUpdate = _.throttle(() => this.setState({
       sortedMessages: Object.keys(this.msgs).sort().map(k => this.msgs[k])
     }), 100); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?
@@ -132,7 +129,7 @@ export default class PrivateChat extends Component {
       if (k === 'undefined') return false;
       const p = this.participants[k];
       const hasPermissions = p && p.read && p.write;
-      if (noLongerParticipant && hasPermissions && k === Session.getPubKey()) {
+      if (noLongerParticipant && hasPermissions && k === iris.session.getPubKey()) {
         noLongerParticipant = false;
       }
       return hasPermissions;
@@ -159,7 +156,7 @@ export default class PrivateChat extends Component {
 
     $('.msg-content img').off('load').on('load', () => this.state.stickToBottom && Helpers.scrollToMessageListBottom());
       setTimeout(() => {
-        if (this.chat && !this.chat.uuid && this.props.id !== Session.getPubKey()) {
+        if (this.chat && !this.chat.uuid && this.props.id !== iris.session.getPubKey()) {
           if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
             $('#not-seen-by-them').slideDown();
           } else {
@@ -236,7 +233,7 @@ export default class PrivateChat extends Component {
           const dateStr = date.toLocaleDateString();
           if (dateStr !== previousDateStr) {
             isDifferentDay = true;
-            let separatorText = util.getDaySeparatorText(date, dateStr, now, nowStr);
+            let separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
             msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
           }
           previousDateStr = dateStr;

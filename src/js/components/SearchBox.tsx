@@ -1,10 +1,9 @@
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Identicon from './Identicon';
 import Text from './Text';
 import {translate as t} from '../translations/Translation';
-import Session from 'iris-lib/src/Session';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -68,11 +67,11 @@ class SearchBox extends Component<Props, State> {
   }
 
   componentDidMount() {
-    State.local.get('noFollows').on(this.inject());
-    State.local.get('searchIndexUpdated').on(this.sub(
+    iris.local().get('noFollows').on(this.inject());
+    iris.local().get('searchIndexUpdated').on(this.sub(
         () => this.search()
     ));
-    State.local.get('activeRoute').on(this.sub(
+    iris.local().get('activeRoute').on(this.sub(
       () => {
         this.close();
       }
@@ -155,7 +154,7 @@ class SearchBox extends Component<Props, State> {
     if (Helpers.followChatLink(query)) return;
 
     if (query) {
-      const results = Session.getSearchIndex().search(query).slice(0,RESULTS_MAX);
+      const results = iris.session.getSearchIndex().search(query).slice(0,RESULTS_MAX);
       this.setState({results, query});
     } else {
       this.setState({results:[], query});

@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
 import { html } from 'htm/preact';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Name from './Name';
 import Identicon from './Identicon';
 
@@ -11,7 +11,7 @@ export default class HashtagSubscriberList extends Component {
   }
 
   componentDidMount() {
-    State.group().on(`hashtagSubscriptions/${this.props.hashtag}`, this.sub(
+    iris.group().on(`hashtagSubscriptions/${this.props.hashtag}`, this.sub(
       (isSubscribed, hashtag, a, b, from) => {
         isSubscribed ? this.subs.add(from) : this.subs.delete(from);
         this.setState({});

@@ -1,9 +1,8 @@
 import Component from '../BaseComponent';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Identicon from 'identicon.js';
 import SafeImg from './SafeImg';
 import styled from 'styled-components';
-import util from 'iris-lib/src/util';
 
 type Activity = {
   time: string;
@@ -42,7 +41,7 @@ class MyIdenticon extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
 
   updateIdenticon() {
-    util.getHash(this.props.str, `hex`)
+    iris.util.getHash(this.props.str, `hex`)
       .then(hash => {
         const identicon = new Identicon(hash, {width: this.props.width, format: `svg`});
         this.setState({identicon: `data:image/svg+xml;base64,${identicon.toString()}`});
@@ -56,16 +55,16 @@ class MyIdenticon extends Component<Props, State> {
     this.updateIdenticon();
 
     if (!this.props.hidePhoto) {
-      State.public.user(pub).get('profile').get('photo').on(this.inject()); // TODO: limit size
-      State.public.user(pub).get('profile').get('nftPfp').on(this.inject());
+      iris.user(pub).get('profile').get('photo').on(this.inject()); // TODO: limit size
+      iris.user(pub).get('profile').get('nftPfp').on(this.inject());
     }
 
     this.setState({activity: null});
     if (this.props.showTooltip) {
-      State.public.user(pub).get('profile').get('name').on(this.inject());
+      iris.user(pub).get('profile').get('name').on(this.inject());
     }
     if (this.props.activity) {
-      State.public.user(pub).get('activity').on(this.sub(
+      iris.user(pub).get('activity').on(this.sub(
         (activity?: Activity) => {
           if (activity) {
             if (activity.time && ((new Date()).getTime() - (new Date(activity.time)).getTime() < 30000)) {

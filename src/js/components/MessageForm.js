@@ -1,8 +1,5 @@
 import { Component } from 'preact';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
-import SignedMessage from 'iris-lib/src/SignedMessage';
-import util from 'iris-lib/src/util';
+import iris from 'iris-lib';
 
 function twice(f) {
   f();
@@ -15,17 +12,16 @@ export default class MessageForm extends Component {
   async sendPublic(msg) {
     msg.time = new Date().toISOString();
     msg.type = 'post';
-    const signedMsg = await SignedMessage.create(msg, Session.getKey());
+    const signedMsg = await iris.SignedMessage.create(msg, iris.session.getKey());
     const serialized = signedMsg.toString();
-    const hash = await util.getHash(serialized);
-    State.public.get('#').get(hash).put(serialized);
+    const hash = await iris.static.put(serialized);
     if (msg.replyingTo) {
-      twice(() => State.public.user().get('replies').put({}));
-      twice(() => State.public.user().get('replies').get(msg.replyingTo).put('a'));
-      twice(() => State.public.user().get('replies').get(msg.replyingTo).put({}));
-      twice(() => State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
+      twice(() => iris.user().get('replies').put({}));
+      twice(() => iris.user().get('replies').get(msg.replyingTo).put('a'));
+      twice(() => iris.user().get('replies').get(msg.replyingTo).put({}));
+      twice(() => iris.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
     } else {
-      let node = State.public.user();
+      let node = iris.user();
       (this.props.index || (this.props.hashtag && `hashtags/${this.props.hashtag}`) || 'msgs').split('/').forEach(s => {
         node.put({});
         node = node.get(s);
@@ -36,11 +32,11 @@ export default class MessageForm extends Component {
     if (hashtags) {
       hashtags.forEach(match => {
         const hashtag = match.replace('#', '');
-        State.public.user().get('hashtags').get(hashtag).put({a:null});
-        State.public.user().get('hashtags').get(hashtag).get(msg.time).put(hash)
+        iris.user().get('hashtags').get(hashtag).put({a:null});
+        iris.user().get('hashtags').get(hashtag).get(msg.time).put(hash)
       });
     }
-    msg.torrentId && State.public.user().get('media').get(msg.time).put(hash);
+    msg.torrentId && iris.user().get('media').get(msg.time).put(hash);
     this.props.onSubmit && this.props.onSubmit(msg);
     return hash;
   }

@@ -28,8 +28,7 @@ import VideoCall from './components/VideoCall';
 import MediaPlayer from './components/MediaPlayer';
 import Footer from './components/Footer';
 
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
 
 import '../css/style.css';
 import '../css/cropper.min.css';
@@ -49,23 +48,22 @@ type ReactState = {
   translationLoaded: boolean;
 }
 
-State.init();
+iris.session.init({autologin: window.location.hash.length > 2});
 
 class Main extends Component<Props,ReactState> {
   componentDidMount() {
-    // State.init();
-    State.local.get('loggedIn').on(this.inject());
-    State.local.get('toggleMenu').put(false);
-    State.local.get('toggleMenu').on((show: boolean) => this.toggleMenu(show));
-    State.electron && State.electron.get('platform').on(this.inject());
-    State.local.get('unseenMsgsTotal').on(this.inject());
+    iris.local().get('loggedIn').on(this.inject());
+    iris.local().get('toggleMenu').put(false);
+    iris.local().get('toggleMenu').on((show: boolean) => this.toggleMenu(show));
+    iris.electron && iris.electron.get('platform').on(this.inject());
+    iris.local().get('unseenMsgsTotal').on(this.inject());
     translationLoaded.then(() => this.setState({translationLoaded: true}));
   }
 
   handleRoute(e: RouterOnChangeArgs) {
     let activeRoute = e.url;
     this.setState({activeRoute});
-    State.local.get('activeRoute').put(activeRoute);
+    iris.local().get('activeRoute').put(activeRoute);
     QRScanner.cleanupScanner();
   }
 
@@ -80,7 +78,7 @@ class Main extends Component<Props,ReactState> {
   }
 
   electronCmd(name: string): void {
-    State.electron.get('cmd').put({name, time: new Date().toISOString()});
+    iris.electron.get('cmd').put({name, time: new Date().toISOString()});
   }
 
   render() {
@@ -174,7 +172,7 @@ class Main extends Component<Props,ReactState> {
               />
               <AsyncRoute
                  path="/product/new"
-                  store={Session.getPubKey()}
+                  store={iris.session.getPubKey()}
                 getComponent={() => import('./views/Product').then(module => module.default)}
               />
               <AsyncRoute
@@ -183,7 +181,7 @@ class Main extends Component<Props,ReactState> {
               />
               <AsyncRoute
                  path="/explorer"
-                  store={Session.getPubKey()}
+                  store={iris.session.getPubKey()}
                 getComponent={() => import('./views/Explorer').then(module => module.default)}
               />
               <Follows path="/follows/:id"/>

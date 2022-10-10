@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import FeedMessageForm from '../components/FeedMessageForm';
 import MessageFeed from '../components/MessageFeed';
 import Filters from '../components/Filters';
@@ -32,9 +32,9 @@ class Feed extends View {
   componentDidMount() {
     this.search();
     if (this.props.hashtag) {
-      State.local.get('filters').get('group').put('everyone');
+      iris.local().get('filters').get('group').put('everyone');
     }
-    State.local.get('filters').get('group').on(this.inject());
+    iris.local().get('filters').get('group').on(this.inject());
   }
 
   filter(msg) {

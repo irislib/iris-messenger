@@ -2,11 +2,10 @@ import Helpers from '../../Helpers';
 import { html } from 'htm/preact';
 import {createRef} from 'preact';
 import { translate as t } from '../../translations/Translation';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Identicon from '../../components/Identicon';
 import ChatMessageForm from './ChatMessageForm';
 import Name from '../../components/Name';
-import Session from 'iris-lib/src/Session';
 import $ from 'jquery';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';
@@ -25,7 +24,7 @@ c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,35
 `;
 
 function copyMyChatLinkClicked(e) {
-  Helpers.copyToClipboard(Session.getMyChatLink());
+  Helpers.copyToClipboard(iris.session.getMyChatLink());
   let te = $(e.target);
   let originalText = te.text();
   let originalWidth = te.width();
@@ -50,13 +49,13 @@ export default class ChatMain extends Component {
   }
 
   componentDidMount() {
-    State.local.get('showParticipants').put(true);
-    State.local.get('showParticipants').on(this.inject());
-    State.group().on(`hashtagSubscriptions/${this.props.hashtag}`, this.sub(
+    iris.local().get('showParticipants').put(true);
+    iris.local().get('showParticipants').on(this.inject());
+    iris.group().on(`hashtagSubscriptions/${this.props.hashtag}`, this.sub(
       (isSubscribing, k, b, c, from) => {
         if (isSubscribing && !this.participants[from]) {
           this.participants[from] = {};
-          State.public.user(from).get('activity').on(this.sub(
+          iris.user(from).get('activity').on(this.sub(
             (activity) => {
               if (this.participants[from]) { this.participants[from].activity = activity; }
               this.setSortedParticipants();
@@ -68,7 +67,7 @@ export default class ChatMain extends Component {
         this.setSortedParticipants();
       }
     ));
-    State.local.get('hashtags').get(this.props.hashtag).get('msgDraft').once(m => $('.new-msg').val(m));
+    iris.local().get('hashtags').get(this.props.hashtag).get('msgDraft').once(m => $('.new-msg').val(m));
     const el = $("#message-view");
     el.off('scroll').on('scroll', () => {
       const scrolledToBottom = (el[0].scrollHeight - el.scrollTop() == el.outerHeight());

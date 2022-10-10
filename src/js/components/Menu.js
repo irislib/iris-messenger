@@ -1,5 +1,5 @@
 import Component from "../BaseComponent";
-import State from "iris-lib/src/State";
+import iris from 'iris-lib';
 import {html} from "htm/preact";
 import Helpers from "../Helpers";
 import logo from "../../assets/img/icon128.png";
@@ -20,13 +20,13 @@ const APPLICATIONS = [ // TODO: move editable shortcuts to localState gun
 
 export default class Menu extends Component {
   componentDidMount() {
-    State.local.get('unseenMsgsTotal').on(this.inject());
-    State.local.get('settings').get('showBetaFeatures').on(this.inject());
+    iris.local().get('unseenMsgsTotal').on(this.inject());
+    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
   }
 
   menuLinkClicked() {
-    State.local.get('toggleMenu').put(false);
-    State.local.get('scrollUp').put(true);
+    iris.local().get('toggleMenu').put(false);
+    iris.local().get('scrollUp').put(true);
   }
 
   render() {

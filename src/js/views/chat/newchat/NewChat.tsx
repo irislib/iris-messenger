@@ -4,7 +4,7 @@ import {Helmet} from 'react-helmet';
 import InviteView from './InviteView';
 import QRView from './QRView';
 import MainView from './MainView';
-import State from "iris-lib/src/State";
+import iris from 'iris-lib';
 
 type Props = { view?: string; chatLinks: {URL?: string , ID?: string}};
 type State = {chatLinks : {}};
@@ -17,7 +17,7 @@ class NewChat extends Component<Props,State> {
   }
     
     componentDidMount() {
-      State.local.get('chatLinks').map(this.sub(
+      iris.local().get('chatLinks').map(this.sub(
         (url, id) => {
           if (url) {
             if (typeof url !== 'string' || url.indexOf('http') !== 0) return;

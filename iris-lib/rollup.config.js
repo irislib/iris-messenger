@@ -51,14 +51,10 @@ if (isProd) plugins.push(terser());
 
 export default {
   input: `src/index.js`,
-  external: ['gun', 'gun/sea'],
   plugins,
   output: {
     file: `dist/${name}${isProd ? `.min` : ``}.js`,
     name,
     format: `umd`,
-    globals: {
-      gun: 'Gun'
-    }
   }
 };

@@ -1,12 +1,10 @@
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Identicon from '../components/Identicon';
 import Filters from '../components/Filters';
 import {translate as t} from '../translations/Translation';
 import FollowButton from '../components/FollowButton';
 import Name from '../components/Name';
 import View from './View';
-import Session from 'iris-lib/src/Session';
-import ScrollViewport from 'preact-scroll-viewport';
 import _ from 'lodash';
 
 // TODO: add group selector
@@ -35,7 +33,7 @@ class Contacts extends View {
       return a.name.localeCompare(b.name);
     });
     if (this.state.group !== 'everyone') {
-      _.remove(sortedKeys, k => k === Session.getPubKey());
+      _.remove(sortedKeys, k => k === iris.session.getPubKey());
     }
     this.setState({sortedKeys});
   }
@@ -46,16 +44,16 @@ class Contacts extends View {
 
   componentDidMount() {
     this.contactsSub && this.contactsSub.off();
-    State.local.get('contacts').map(this.sub((contact, k) => {
+    iris.local().get('contacts').map(this.sub((contact, k) => {
       this.allContacts[k] = contact;
       this.setState({allContacts: this.allContacts});
       this.updateSortedKeys();
     }));
-    State.local.get('filters').get('group').on(this.sub(group => {
+    iris.local().get('filters').get('group').on(this.sub(group => {
       if (group === this.state.group) return;
       this.shownContacts = {};
       this.setState({group});
-      State.local.get('groups').get(group).on(this.sub((contacts,k,x,e) => {
+      iris.local().get('groups').get(group).on(this.sub((contacts,k,x,e) => {
         this.contactsSub && this.contactsSub.off();
         this.contactsSub = e;
         this.shownContacts = contacts;
@@ -68,7 +66,7 @@ class Contacts extends View {
       }));
     }));
 
-    State.electron && State.electron.get('bonjour').on(s => {
+    iris.electron && iris.electron.get('bonjour').on(s => {
       const nearbyUsers = JSON.parse(s);
       console.log('nearbyUsers', nearbyUsers);
       this.setState({nearbyUsers});
@@ -93,7 +91,7 @@ class Contacts extends View {
                   </small>
                 </div>
               </a>
-              {(k !== Session.getPubKey()) ? (<FollowButton key="f{k}" id={k} />) : ''}
+              {(k !== iris.session.getPubKey()) ? (<FollowButton key="f{k}" id={k} />) : ''}
             </div>
           ):''}
         </div>
@@ -135,7 +133,7 @@ class Contacts extends View {
                   <small class="follower-count">{contact.followerCount || '0'} {t('followers')}</small>
                 </div>
               </a>
-              {(this.state.group !== 'follows' && k !== Session.getPubKey()) ? (<FollowButton key={`f${k}`} id={k} />) : ''}
+              {(this.state.group !== 'follows' && k !== iris.session.getPubKey()) ? (<FollowButton key={`f${k}`} id={k} />) : ''}
             </div>);
           })}
           {keys.length === 0 ? '—' : ''}

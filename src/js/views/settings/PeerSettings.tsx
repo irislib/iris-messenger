@@ -1,21 +1,19 @@
 import Component from "../../BaseComponent";
 import Name from "../../components/Name";
-import Session from "iris-lib/src/Session";
-import State from "iris-lib/src/State";
+import iris from 'iris-lib';
 import {translate as t} from "../../translations/Translation";
 import Helpers from "../../Helpers";
 import Icons from "../../Icons";
-import PeerManager from "iris-lib/src/PeerManager";
 import {route} from "preact-router";
 import $ from "jquery";
 import Button from "../../components/basic/Button";
 
 export default class PeerSettings extends Component {
-  state = Session.DEFAULT_SETTINGS;
+  state = iris.session.DEFAULT_SETTINGS;
   updatePeersFromGunInterval = 0;
 
   componentDidMount() {
-    State.local.get('settings').on(this.sub(local => {
+    iris.local().get('settings').on(this.sub(local => {
         console.log('settings', local);
         if (local) {
           this.setState(local);
@@ -37,14 +35,14 @@ export default class PeerSettings extends Component {
             <h3>{t('peers')}</h3>
             {this.renderPeerList()}
             <p><input type="checkbox" checked={this.state.local.enablePublicPeerDiscovery}
-                      onChange={() => State.local.get('settings').get('enablePublicPeerDiscovery').put(!this.state.local.enablePublicPeerDiscovery)}
+                      onChange={() => iris.local().get('settings').get('enablePublicPeerDiscovery').put(!this.state.local.enablePublicPeerDiscovery)}
                       id="enablePublicPeerDiscovery" />
                 <label htmlFor="enablePublicPeerDiscovery">{t('enable_public_peer_discovery')}</label></p>
             <h4>{t('maximum_number_of_peer_connections')}</h4>
             <p>
                 <input type="number" value={this.state.local.maxConnectedPeers} onChange={e => {
                     const target = e.target as HTMLInputElement;
-                    State.local.get('settings').get('maxConnectedPeers').put(target.value || 0);
+                    iris.local().get('settings').get('maxConnectedPeers').put(target.value || 0);
                 }}/>
             </p>
             {Helpers.isElectron ? (
@@ -69,21 +67,21 @@ export default class PeerSettings extends Component {
   }
 
   resetPeersClicked() {
-    PeerManager.resetPeers();
+    iris.peers.reset();
     this.setState({});
   }
 
   removePeerClicked(url, peerFromGun) {
-    PeerManager.removePeer(url);
-    peerFromGun && PeerManager.disconnectPeer(peerFromGun);
+    iris.peers.remove(url);
+    peerFromGun && iris.peers.disconnect(peerFromGun);
   }
 
   enablePeerClicked(url, peerFromGun, peer) {
-    peer.enabled ? PeerManager.disablePeer(url,peerFromGun) : PeerManager.connectPeer(url);
+    peer.enabled ? iris.peers.disable(url,peerFromGun) : iris.peers.connect(url);
   }
 
   renderPeerList() {
-    let urls = Object.keys(PeerManager.getKnownPeers());
+    let urls = Object.keys(iris.peers.known);
     if (this.state.peersFromGun) {
       Object.keys(this.state.peersFromGun).forEach(url => urls.indexOf(url) === -1 && urls.push(url));
     }
@@ -94,7 +92,7 @@ export default class PeerSettings extends Component {
           <Button id="reset-peers" style="margin-bottom: 15px" onClick={() => this.resetPeersClicked()}>{t('restore_defaults')}</Button>
         : ''}
         {urls.map(url => {
-            const peer = PeerManager.getKnownPeers()[url] || {};
+            const peer = iris.peers.known[url] || {};
             const peerFromGun = this.state.peersFromGun && this.state.peersFromGun[url];
             const connected = peerFromGun && peerFromGun.wire && peerFromGun.wire.readyState == 1 && peerFromGun.wire.bufferedAmount === 0;
             return (
@@ -150,7 +148,7 @@ export default class PeerSettings extends Component {
   }
 
   updatePeersFromGun() {
-    const peersFromGun = State.public.back('opt.peers') || {};
+    const peersFromGun = iris.public().back('opt.peers') || {};
     // @ts-ignore
       this.setState({peersFromGun});
   }
@@ -158,7 +156,7 @@ export default class PeerSettings extends Component {
   addPeerClicked() {
     let url = $('#add-peer-url').val();
     let visibility = $('#add-peer-public').is(':checked') ? 'public' : undefined;
-    PeerManager.addPeer({url, visibility});
+    iris.peers.add({url, visibility});
     $('#add-peer-url').val('');
   }
 }

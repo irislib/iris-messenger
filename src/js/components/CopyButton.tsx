@@ -4,7 +4,7 @@ import {translate as t} from '../translations/Translation';
 import $ from 'jquery';
 import { OptionalGetter } from '../types';
 import Button from './basic/Button';
-import util from 'iris-lib/src/util';
+import iris from 'iris-lib';
 
 type Props = {
   copyStr: OptionalGetter<string>;
@@ -46,7 +46,7 @@ class CopyButton extends Component<Props, State> {
     e.preventDefault();
     const copyStr = typeof this.props.copyStr === 'function' ? this.props.copyStr() : this.props.copyStr;
 
-    if (util.isMobile && !this.props.notShareable) {
+    if (iris.util.isMobile && !this.props.notShareable) {
       navigator.share({url: copyStr, title: this.props.title}).catch(err => {
         console.error('share failed', err);
         this.copy(e, copyStr);

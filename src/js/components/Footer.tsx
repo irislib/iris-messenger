@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
+
 import Identicon from './Identicon';
 import Icons from '../Icons';
 
@@ -21,8 +21,8 @@ class Footer extends Component<Props, State> {
   }
 
   componentDidMount() {
-    State.local.get('unseenMsgsTotal').on(this.inject());
-    State.local.get('activeRoute').on(this.sub(
+    iris.local().get('unseenMsgsTotal').on(this.inject());
+    iris.local().get('activeRoute').on(this.sub(
       activeRoute => {
         const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
         const chatId = replaced.length < activeRoute.length ? replaced : null;
@@ -32,7 +32,7 @@ class Footer extends Component<Props, State> {
   }
 
   render() {
-    const key = Session.getPubKey();
+    const key = iris.session.getPubKey();
     if (!key) { return; }
     const activeRoute = this.state.activeRoute;
 
@@ -42,7 +42,7 @@ class Footer extends Component<Props, State> {
 
     return (
         <footer class="visible-xs-flex nav footer">
-          <div class="header-content" onClick={() => State.local.get('scrollUp').put(true)}>
+          <div class="header-content" onClick={() => iris.local().get('scrollUp').put(true)}>
             <a href="/" class={`btn ${activeRoute === '/' ? 'active' : ''}`}>{Icons.home}</a>
             <a href="/chat" class={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
               {this.state.unseenMsgsTotal ? <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>: ''}

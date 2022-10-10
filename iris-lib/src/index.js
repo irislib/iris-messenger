@@ -1,21 +1,43 @@
 /*eslint no-useless-escape: "off", camelcase: "off" */
 
-import SignedMessage from './SignedMessage';
-import Attribute from './Attribute';
+import Gun from 'gun';
+import 'gun/sea';
+
+import session from './session';
+import peers from './peers';
 import util from './util';
+import local from './local';
+import publicState from './public';
+import user from './user';
+import group from './group';
+import electron from './electron';
+import privateState from './private';
+import staticState from './static';
+import notifications from './notifications';
+
+import SignedMessage from './SignedMessage';
 import Channel from './Channel';
 import Node from './Node';
-import State from './State';
-import PeerManager from './PeerManager';
-import Session from './Session';
+
+Gun.log.off = true;
 
 export default {
-  SignedMessage,
-  Attribute,
-  Channel,
-  State,
-  PeerManager,
-  Session,
-  Node,
+  local,
+  public: publicState,
+  group,
+  user,
+  private: privateState,
+  static: staticState,
+  electron,
+  peers,
+  session,
   util,
+  algorithms: {},
+  notifications,
+
+  SEA: Gun.SEA,
+  Gun,
+  SignedMessage,
+  Channel,
+  Node,
 };

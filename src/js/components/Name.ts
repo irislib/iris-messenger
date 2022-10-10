@@ -1,5 +1,5 @@
 import Component from '../BaseComponent';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 
 type Props = {
   pub: string;
@@ -12,7 +12,7 @@ type State = {
 
 class Name extends Component<Props, State> {
   componentDidMount(): void {
-    State.public.user(this.props.pub).get('profile').get('name').on(this.inject());
+    iris.user(this.props.pub).get('profile').get('name').on(this.inject());
   }
 
   render() {

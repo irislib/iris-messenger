@@ -2,18 +2,16 @@ import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import Identicon from './Identicon';
 import FeedMessageForm from './FeedMessageForm';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import { route } from 'preact-router';
 import Message from './Message';
 import SafeImg from './SafeImg';
-import Session from 'iris-lib/src/Session';
+
 import Torrent from './Torrent';
 import Icons from '../Icons';
 import Autolinker from 'autolinker';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
-import Notifications from 'iris-lib/src/Notifications';
-import SignedMessage from 'iris-lib/src/SignedMessage';
 
 const MSG_TRUNCATE_LENGTH = 1000;
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
@@ -36,19 +34,16 @@ class PublicMessage extends Message {
       if (typeof hash !== 'string') {
         return reject();
       }
-      State.public.get('#').get(hash).on(thisArg.sub(
-        async (serialized, a, b, event) => {
-          if (typeof serialized !== 'string') {
-            console.error('message parsing failed', hash, serialized);
-            return;
-          }
-          event.off();
-          const msg = await SignedMessage.fromString(serialized);
-          if (msg) {
-            resolve(msg);
-          }
+      iris.static.get(hash).then(async (serialized) => {
+        if (typeof serialized !== 'string') {
+          console.error('message parsing failed', hash, serialized);
+          return;
         }
-      ));
+        const msg = await iris.SignedMessage.fromString(serialized);
+        if (msg) {
+          resolve(msg);
+        }
+      });
     });
   }
 
@@ -79,18 +74,18 @@ class PublicMessage extends Message {
       }
       this.setState({msg});
       if (this.props.showName && !this.props.name) {
-        State.public.user(msg.info.from).get('profile').get('name').on(this.inject());
+        iris.user(msg.info.from).get('profile').get('name').on(this.inject());
       }
-      State.group().on(`likes/${encodeURIComponent(this.props.hash)}`, this.sub(
+      iris.group().on(`likes/${encodeURIComponent(this.props.hash)}`, this.sub(
         (liked,a,b,e,from) => {
           this.eventListeners[`${from}likes`] = e;
           liked ? this.likedBy.add(from) : this.likedBy.delete(from);
           const s = {likes: this.likedBy.size};
-          if (from === Session.getPubKey()) s['liked'] = liked;
+          if (from === iris.session.getPubKey()) s['liked'] = liked;
           this.setState(s);
         }
       ));
-      State.group().map(`replies/${encodeURIComponent(this.props.hash)}`, this.sub(
+      iris.group().map(`replies/${encodeURIComponent(this.props.hash)}`, this.sub(
         (hash,time,b,e,from) => {
           const k = from + time;
           if (hash && this.replies[k]) return;
@@ -135,15 +130,15 @@ class PublicMessage extends Message {
   }
 
   like(liked = true) {
-    State.public.user().get('likes').get(this.props.hash).put(liked);
+    iris.user().get('likes').get(this.props.hash).put(liked);
     if (liked) {
       const author = this.state.msg && this.state.msg.info && this.state.msg.info.from;
-      if (author !== Session.getPubKey()) {
+      if (author !== iris.session.getPubKey()) {
         const t = (this.state.msg.text || '').trim();
-        const title =  `${Session.getMyName()  } liked your post`;
+        const title =  `${iris.session.getMyName()  } liked your post`;
         const body = `'${t.slice(0, 100)}${t.length > 100 ? '...' : ''}'`;
-        Notifications.sendIrisNotification(author, {event:'like', target: this.props.hash});
-        Notifications.sendWebPushNotification(author, {title, body});
+        iris.notifications.sendIrisNotification(author, {event:'like', target: this.props.hash});
+        iris.notifications.sendWebPushNotification(author, {title, body});
       }
     }
   }
@@ -152,9 +147,9 @@ class PublicMessage extends Message {
     e.preventDefault();
     if (confirm('Delete message?')) { // TODO: remove from hashtag indexes
       const msg = this.state.msg;
-      msg.torrentId && State.public.user().get('media').get(msg.time).put(null);
-      State.public.user().get(this.props.index || 'msgs').get(msg.time).put(null);
-      msg.replyingTo && State.public.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
+      msg.torrentId && iris.user().get('media').get(msg.time).put(null);
+      iris.user().get(this.props.index || 'msgs').get(msg.time).put(null);
+      msg.replyingTo && iris.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
     }
   }
 
@@ -214,7 +209,7 @@ class PublicMessage extends Message {
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width=40/>` : ''}
               ${name && this.props.showName && html`<small class="msgSenderName">${name}</small>`}
             </div>
-            ${s.msg.info.from === Session.getPubKey() ? html`
+            ${s.msg.info.from === iris.session.getPubKey() ? html`
               <div class="msg-menu-btn">
                 <div class="dropdown">
                   <div class="dropbtn">\u2026</div>

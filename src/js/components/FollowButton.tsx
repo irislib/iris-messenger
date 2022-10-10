@@ -1,8 +1,7 @@
 import Component from '../BaseComponent';
 import {translate as t} from '../translations/Translation';
-import Session from 'iris-lib/src/Session';
-import State from 'iris-lib/src/State';
-import Notifications from 'iris-lib/src/Notifications';
+
+import iris from 'iris-lib';
 import Button from './basic/Button';
 
 type Props = {
@@ -30,19 +29,19 @@ class FollowButton extends Component<Props> {
     e.preventDefault();
     const value = !this.state[this.key];
     if (value && this.key === 'follow') {
-      Session.newChannel(this.props.id);
-      State.public.user().get('block').get(this.props.id).put(false);
-      Notifications.sendIrisNotification(this.props.id, {event:'follow'});
+      iris.session.newChannel(this.props.id);
+      iris.user().get('block').get(this.props.id).put(false);
+      iris.notifications.sendIrisNotification(this.props.id, {event:'follow'});
     }
     if (value && this.key === 'block') {
-      State.public.user().get('follow').get(this.props.id).put(false);
+      iris.user().get('follow').get(this.props.id).put(false);
     }
-    State.public.user().get(this.key).get(this.props.id).put(value);
-    State.public.user().get(this.key).get(this.props.id).put(value);
+    iris.user().get(this.key).get(this.props.id).put(value);
+    iris.user().get(this.key).get(this.props.id).put(value);
   }
 
   componentDidMount() {
-    State.public.user().get(this.key).get(this.props.id).on(this.sub(
+    iris.user().get(this.key).get(this.props.id).on(this.sub(
       value => {
         const s = {};
         s[this.key] = value;

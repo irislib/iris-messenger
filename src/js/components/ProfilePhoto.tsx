@@ -1,7 +1,7 @@
 import {Component} from 'preact';
 import Helpers from '../Helpers';
 import $ from 'jquery';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
 import SafeImg from './SafeImg';
 import { html } from 'htm/preact';
 
@@ -67,9 +67,7 @@ class ProfilePhoto extends Component<Props> {
       }
       $('#attachment-gallery').fadeOut({duration: ANIMATE_DURATION, complete: () => $('#attachment-gallery').remove()});
       const activeChat = window.location.hash.replace('#/profile/','').replace('#/chat/','');
-      if (activeChat && Session.channels[activeChat]) {
-        Session.channels[activeChat].attachments = null;
-      }
+      iris.private(activeChat).attachments = null;
     }
 
     imageClicked(event) {

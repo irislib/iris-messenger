@@ -1,11 +1,10 @@
 import { translate as t } from '../../../translations/Translation';
-import Session from 'iris-lib/src/Session';
+
 import $ from 'jquery';
 import Component from '../../../BaseComponent';
 import Button from '../../../components/basic/Button';
 import { route } from 'preact-router';
-import State from 'iris-lib/src/State';
-import Channel from 'iris-lib/src/Channel';
+import iris from 'iris-lib';
 import Helpers from '../../../Helpers';
 
 class InviteView extends Component {
@@ -30,14 +29,14 @@ class InviteView extends Component {
     onCreateGroupSubmit(e) {
         e.preventDefault();
         if ($('#new-group-name').val().length) {
-        let c = new Channel({
-            gun: State.public,
-            key: Session.getKey(),
+        let c = new iris.Channel({
+            gun: iris.public(),
+            key: iris.session.getKey(),
             participants: [],
         });
         c.put('name', $('#new-group-name').val());
         $('#new-group-name').val('');
-        Session.addChannel(c);
+        iris.session.addChannel(c);
         route(`/group/${  c.uuid}`);
         }
     }

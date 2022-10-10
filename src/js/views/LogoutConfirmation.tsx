@@ -1,8 +1,8 @@
-import Session from 'iris-lib/src/Session';
 import {translate as t} from '../translations/Translation';
 import { route } from 'preact-router';
 import Button from '../components/basic/Button';
 import Component from '../BaseComponent';
+import iris from 'iris-lib';
 
 export default class LogoutConfirmation extends Component {
 render () {
@@ -14,7 +14,7 @@ render () {
                 <Button onClick={() => route('/settings')}>{t('back')}</Button>
             </p>
             <p>
-                <Button className="logout-button" onClick={() => Session.logOut()}>{t('log_out')}</Button>
+                <Button className="logout-button" onClick={() => iris.session.logOut()}>{t('log_out')}</Button>
             </p>
         </div>
     </div>

@@ -1,7 +1,6 @@
 import { html } from 'htm/preact';
 import {translate as t} from '../translations/Translation';
-import State from 'iris-lib/src/State';
-import Session from 'iris-lib/src/Session';
+import iris from 'iris-lib';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import { route } from 'preact-router';
 import SafeImg from '../components/SafeImg';
@@ -28,11 +27,11 @@ class Store extends View {
   addToCart(k, user, e) {
     e.stopPropagation();
     const count = (this.cart[k + user] || 0) + 1;
-    State.local.get('cart').get(user).get(k).put(count);
+    iris.local().get('cart').get(user).get(k).put(count);
   }
 
   renderUserStore(user) {
-    const chat = Session.channels[user];
+    const chat = iris.private(user);
     const uuid = chat && chat.uuid;
     const followable = !(this.isMyProfile || user.length < 40);
     let profilePhoto;
@@ -66,7 +65,7 @@ class Store extends View {
                     <span>${this.state.followerCount}</span> ${t('followers')}
                   </a>
                 </div>
-                ${this.followedUsers.has(Session.getPubKey()) ? html`
+                ${this.followedUsers.has(iris.session.getPubKey()) ? html`
                   <p><small>${t('follows_you')}</small></p>
                 `: ''}
                 ${followable ? html`<${FollowButton} id=${user}/>` : ''}
@@ -132,7 +131,7 @@ class Store extends View {
       return this.renderUserStore(this.props.store);
     }
     return html`
-      <p dangerouslySetInnerHTML=${{ __html: t('this_is_a_prototype_store', `href="/store/${Session.getPubKey()}"`
+      <p dangerouslySetInnerHTML=${{ __html: t('this_is_a_prototype_store', `href="/store/${iris.session.getPubKey()}"`
         )}}></p>
       <${OnboardingNotification} />
       ${this.renderItems()}
@@ -155,7 +154,7 @@ class Store extends View {
   }
 
   getCartFromUser(user) {
-    State.local.get('cart').get(user).map(this.sub(
+    iris.local().get('cart').get(user).map(this.sub(
       (v, k) => {
         if (k === '#') { return; } // blah
         this.cart[k + user] = v;
@@ -183,7 +182,7 @@ class Store extends View {
   }
 
   getProductsFromUser(user) {
-    State.public.user(user).get('store').get('products').map().on(this.sub(
+    iris.user(user).get('store').get('products').map().on(this.sub(
       (...args) => {
         return this.onProduct(...args, user);
       }, `${user  }products`
@@ -192,7 +191,7 @@ class Store extends View {
 
   getAllCarts() {
     const carts = {};
-    State.local.get('cart').map(this.sub(
+    iris.local().get('cart').map(this.sub(
       (o, user) => {
         if (!user) {
           delete carts[user];
@@ -206,7 +205,7 @@ class Store extends View {
   }
 
   getAllProducts(group) {
-    State.group(group).map('store/products', this.sub(
+    iris.group(group).map('store/products', this.sub(
       (...args) => {
         this.onProduct(...args);
       }
@@ -217,14 +216,14 @@ class Store extends View {
     const user = this.props.store;
     Object.values(this.eventListeners).forEach(e => e.off());
     this.cart = {};
-    this.isMyProfile = Session.getPubKey() === user;
+    this.isMyProfile = iris.session.getPubKey() === user;
 
     if (user) {
       this.getCartFromUser(user);
       this.getProductsFromUser(user);
     } else {
       let prevGroup;
-      State.local.get('filters').get('group').on(this.sub(
+      iris.local().get('filters').get('group').on(this.sub(
         group => {
           if (group && group !== prevGroup) {
             prevGroup = group;

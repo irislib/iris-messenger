@@ -4,7 +4,7 @@ import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import { translate as tr } from '../translations/Translation';
 import $ from 'jquery';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import Icons from '../Icons';
 import {Helmet} from 'react-helmet';
 
@@ -18,7 +18,7 @@ class Torrent extends Component {
   state = { settings: {}};
 
   componentDidMount() {
-    State.local.get('player').on(this.sub(
+    iris.local().get('player').on(this.sub(
       (player) => {
         this.player = player;
         this.setState({player});
@@ -30,9 +30,9 @@ class Torrent extends Component {
     ));
     const showFiles = this.props.showFiles;
     showFiles && this.setState({showFiles});
-    State.local.get('settings').on(this.inject());
+    iris.local().get('settings').on(this.inject());
     (async () => {
-      if (this.props.standalone || (await State.local.get('settings').get('enableWebtorrent').once())) {
+      if (this.props.standalone || (await iris.local().get('settings').get('enableWebtorrent').once())) {
         this.startTorrenting();
       }
     })();
@@ -46,7 +46,7 @@ class Torrent extends Component {
 
   onPlay(e) {
     if (!e.target.muted) {
-      State.local.get('player').get('paused').put(true);
+      iris.local().get('player').get('paused').put(true);
     }
   }
 
@@ -65,12 +65,12 @@ class Torrent extends Component {
 
   playAudio(filePath, e) {
     e && e.preventDefault();
-    State.local.get('player').put({torrentId: this.props.torrentId, filePath, paused: false});
+    iris.local().get('player').put({torrentId: this.props.torrentId, filePath, paused: false});
   }
 
   pauseAudio(e) {
     e && e.preventDefault();
-    State.local.get('player').put({paused: true});
+    iris.local().get('player').put({paused: true});
   }
 
   openFile(file, clicked) {
@@ -82,7 +82,7 @@ class Torrent extends Component {
         const el = base.find('video').get(0);
         el && el.play();
       } else if (isAud) {
-        State.local.get('player').get('paused').put(false);
+        iris.local().get('player').get('paused').put(false);
       }
       return;
     }

@@ -1,6 +1,6 @@
 import Component from '../BaseComponent';
 import {Fragment, createRef, RefObject, JSX} from 'preact';
-import State from 'iris-lib/src/State';
+import iris from 'iris-lib';
 import {Link} from "preact-router/match";
 import {route} from 'preact-router';
 import {translate as t} from '../translations/Translation';
@@ -31,7 +31,7 @@ export default class HashtagList extends Component<Props, State> {
 
   componentDidMount() {
     const hashtags = {};
-    State.public.user().get('hashtagSubscriptions').map().on(this.sub(
+    iris.user().get('hashtagSubscriptions').map().on(this.sub(
       (isSubscribed: boolean, hashtag: string) => {
         if (hashtag.indexOf('~') === 0) { return; }
         if (isSubscribed) {
@@ -42,7 +42,7 @@ export default class HashtagList extends Component<Props, State> {
         this.setState({hashtags});
       }
     ));
-    State.group().map('hashtagSubscriptions', this.sub((isSubscribed, hashtag, a, b, from) => {
+    iris.group().map('hashtagSubscriptions', this.sub((isSubscribed, hashtag, a, b, from) => {
       if (hashtag.indexOf('~') === 0) { return; }
       if (!this.hashtagSubscribers[hashtag]) {
         this.hashtagSubscribers[hashtag] = new Set();
@@ -73,7 +73,7 @@ export default class HashtagList extends Component<Props, State> {
     e.preventDefault();
     const hashtag = ((e.target as HTMLFormElement).firstChild as HTMLInputElement).value.replace('#', '').trim();
     if (hashtag) {
-      State.public.user().get('hashtagSubscriptions').get(hashtag).put(true);
+      iris.user().get('hashtagSubscriptions').get(hashtag).put(true);
       this.setState({showAddHashtagForm: false});
       route(`/hashtag/${hashtag}`);
     }
