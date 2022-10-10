@@ -5,7 +5,6 @@ import { translate as t } from '../../translations/Translation';
 import iris from 'iris-lib';
 import ChatListItem from './ChatListItem';
 import { route } from 'preact-router';
-import Notifications from 'iris-lib/src/Notifications';
 import ScrollViewport from 'preact-scroll-viewport';
 import _ from 'lodash';
 import $ from 'jquery';
@@ -24,7 +23,7 @@ class ChatList extends Component {
           $('#enable-notifications-prompt').slideUp();
         }
         if (Notification.permission === 'granted') {
-          Notifications.subscribeToWebPush();
+          iris.notifications.subscribeToWebPush();
         }
       });
     }
@@ -77,7 +76,7 @@ class ChatList extends Component {
     const activeChat = this.props.activeChat;
     const sortedChats = _.orderBy(Array.from(this.state.chats.values()), ['latestTime', 'name'], ['desc', 'asc']);
     return html`<section class="sidebar ${this.props.class || ''}">
-      <div id="enable-notifications-prompt" onClick=${() => Notifications.enableDesktopNotifications()}>
+      <div id="enable-notifications-prompt" onClick=${() => iris.notifications.enableDesktopNotifications()}>
         <div class="title">${t('get_notified_new_messages')}</div>
         <div><a>${t('turn_on_desktop_notifications')}</a></div>
       </div>

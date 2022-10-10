@@ -6,7 +6,6 @@ import {translate as t} from '../translations/Translation';
 import Name from '../components/Name';
 import View from './View';
 import PublicMessage from "../components/PublicMessage";
-import NotificationTools from "iris-lib/src/Notifications";
 import util from "iris-lib/src/util";
 
 const PAGE_SIZE = 10;
@@ -19,12 +18,12 @@ export default class Notifications extends View {
   }
 
   componentDidMount() {
-    NotificationTools.changeUnseenNotificationCount(0);
+    iris.notifications.changeUnseenNotificationCount(0);
     iris.local().get('notifications').map(this.sub(
       (notification, time) => {
         if (notification) {
           this.notifications[time] = notification;
-          NotificationTools.getNotificationText(notification).then(text => {
+          iris.notifications.getNotificationText(notification).then(text => {
             this.notifications[time].text = text;
             this.setState({});
           });

@@ -7,8 +7,6 @@ import _ from 'lodash';
 import $ from 'jquery';
 import EmojiButton from '../../lib/emoji-button';
 import MessageForm from '../../components/MessageForm';
-import Notifications from 'iris-lib/src/Notifications';
-import util from 'iris-lib/src/util';
 
 const submitButton = html`
   <button type="submit">
@@ -23,7 +21,7 @@ class ChatMessageForm extends MessageForm {
       textEl.val(textEl.val() + emoji);
       textEl.focus();
     });
-    if (!util.isMobile && this.props.autofocus !== false) {
+    if (!iris.util.isMobile && this.props.autofocus !== false) {
       $(this.base).find(".new-msg").focus();
     }
   }
@@ -70,7 +68,7 @@ class ChatMessageForm extends MessageForm {
   }
 
   componentDidUpdate() {
-    if (!util.isMobile && this.props.autofocus !== false) {
+    if (!iris.util.isMobile && this.props.autofocus !== false) {
       $(this.base).find(".new-msg").focus();
     }
     if ($('#attachment-preview:visible').length) {
@@ -180,7 +178,7 @@ class ChatMessageForm extends MessageForm {
       const myName = iris.session.getMyName();
       const title = chat.uuid ? chat.name : myName;
       const body = chat.uuid ? `${myName}: ${msg.text}` : msg.text;
-      Notifications.sendWebPushNotification(this.props.activeChat, {title, body});
+      iris.notifications.sendWebPushNotification(this.props.activeChat, {title, body});
     }
   }
 

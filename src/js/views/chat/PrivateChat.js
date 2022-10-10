@@ -7,14 +7,11 @@ import Identicon from '../../components/Identicon';
 import Message from '../../components/Message';
 import ChatMessageForm from './ChatMessageForm';
 import Name from '../../components/Name';
-import session from 'iris-lib/src/session';
-import Notifications from 'iris-lib/src/Notifications';
 import NewChat from './newchat/NewChat';
 import _ from 'lodash';
 import $ from 'jquery';
 import {Helmet} from 'react-helmet';
 import Component from '../../BaseComponent';
-import util from 'iris-lib/src/util';
 
 import Button from '../../components/basic/Button';
 import { Router } from 'preact-router';
@@ -31,7 +28,7 @@ c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,35
 `;
 
 function copyMyChatLinkClicked(e) {
-  Helpers.copyToClipboard(session.getMyChatLink());
+  Helpers.copyToClipboard(iris.session.getMyChatLink());
   let te = $(e.target);
   let originalText = te.text();
   let originalWidth = te.width();
@@ -68,12 +65,12 @@ export default class PrivateChat extends Component {
     const go = () => {
       this.chat = iris.private(this.props.id); // TODO: it might be a group chat that doesn't exist yet
       if (!this.chat && this.props.id.length > 40) {
-        this.chat = session.newChannel(this.props.id);
+        this.chat = iris.session.newChannel(this.props.id);
       }
       if (this.chat) {
         clearInterval(this.iv)
-        session.subscribeToMsgs(this.props.id);
-        Notifications.changeChatUnseenCount(this.props.id, 0);
+        iris.session.subscribeToMsgs(this.props.id);
+        iris.notifications.changeChatUnseenCount(this.props.id, 0);
         this.chat.setMyMsgsLastSeenTime();
         Helpers.scrollToMessageListBottom();
         this.chat.setMyMsgsLastSeenTime();
@@ -132,7 +129,7 @@ export default class PrivateChat extends Component {
       if (k === 'undefined') return false;
       const p = this.participants[k];
       const hasPermissions = p && p.read && p.write;
-      if (noLongerParticipant && hasPermissions && k === session.getPubKey()) {
+      if (noLongerParticipant && hasPermissions && k === iris.session.getPubKey()) {
         noLongerParticipant = false;
       }
       return hasPermissions;
@@ -159,7 +156,7 @@ export default class PrivateChat extends Component {
 
     $('.msg-content img').off('load').on('load', () => this.state.stickToBottom && Helpers.scrollToMessageListBottom());
       setTimeout(() => {
-        if (this.chat && !this.chat.uuid && this.props.id !== session.getPubKey()) {
+        if (this.chat && !this.chat.uuid && this.props.id !== iris.session.getPubKey()) {
           if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
             $('#not-seen-by-them').slideDown();
           } else {
@@ -236,7 +233,7 @@ export default class PrivateChat extends Component {
           const dateStr = date.toLocaleDateString();
           if (dateStr !== previousDateStr) {
             isDifferentDay = true;
-            let separatorText = util.getDaySeparatorText(date, dateStr, now, nowStr);
+            let separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
             msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
           }
           previousDateStr = dateStr;

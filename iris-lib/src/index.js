@@ -13,6 +13,7 @@ import group from './group';
 import electron from './electron';
 import privateState from './private';
 import staticState from './static';
+import notifications from './notifications';
 
 import SignedMessage from './SignedMessage';
 import Channel from './Channel';
@@ -32,6 +33,7 @@ export default {
   session,
   util,
   algorithms: {},
+  notifications,
 
   SEA: Gun.SEA,
   Gun,

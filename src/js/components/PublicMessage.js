@@ -12,8 +12,6 @@ import Icons from '../Icons';
 import Autolinker from 'autolinker';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
-import notifications from 'iris-lib/src/notifications';
-import SignedMessage from 'iris-lib/src/SignedMessage';
 
 const MSG_TRUNCATE_LENGTH = 1000;
 const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
@@ -41,7 +39,7 @@ class PublicMessage extends Message {
           console.error('message parsing failed', hash, serialized);
           return;
         }
-        const msg = await SignedMessage.fromString(serialized);
+        const msg = await iris.SignedMessage.fromString(serialized);
         if (msg) {
           resolve(msg);
         }
@@ -139,8 +137,8 @@ class PublicMessage extends Message {
         const t = (this.state.msg.text || '').trim();
         const title =  `${iris.session.getMyName()  } liked your post`;
         const body = `'${t.slice(0, 100)}${t.length > 100 ? '...' : ''}'`;
-        notifications.sendIrisNotification(author, {event:'like', target: this.props.hash});
-        notifications.sendWebPushNotification(author, {title, body});
+        iris.notifications.sendIrisNotification(author, {event:'like', target: this.props.hash});
+        iris.notifications.sendWebPushNotification(author, {title, body});
       }
     }
   }

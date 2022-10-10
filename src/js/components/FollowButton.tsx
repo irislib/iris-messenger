@@ -2,7 +2,6 @@ import Component from '../BaseComponent';
 import {translate as t} from '../translations/Translation';
 
 import iris from 'iris-lib';
-import notifications from 'iris-lib/src/notifications';
 import Button from './basic/Button';
 
 type Props = {
@@ -32,7 +31,7 @@ class FollowButton extends Component<Props> {
     if (value && this.key === 'follow') {
       iris.session.newChannel(this.props.id);
       iris.user().get('block').get(this.props.id).put(false);
-      notifications.sendIrisNotification(this.props.id, {event:'follow'});
+      iris.notifications.sendIrisNotification(this.props.id, {event:'follow'});
     }
     if (value && this.key === 'block') {
       iris.user().get('follow').get(this.props.id).put(false);

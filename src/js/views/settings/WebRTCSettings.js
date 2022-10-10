@@ -1,7 +1,6 @@
 import Component from '../../BaseComponent';
 import {translate as t} from '../../translations/Translation';
 import {setRTCConfig, getRTCConfig, DEFAULT_RTC_CONFIG} from '../../components/VideoCall';
-import Notifications from 'iris-lib/src/Notifications';
 import $ from 'jquery';
 import Button from '../../components/basic/Button';
 import iris from 'iris-lib';
@@ -34,7 +33,7 @@ export default class WebRTCSettings extends Component {
       }
     }));
     iris.user().get('webPushSubscriptions').map().on(this.sub(
-      () => this.setState({webPushSubscriptions: Notifications.webPushSubscriptions})
+      () => this.setState({webPushSubscriptions: iris.notifications.webPushSubscriptions})
     ));
     iris.user().get('block').map().on(this.sub(
       (v,k) => {
