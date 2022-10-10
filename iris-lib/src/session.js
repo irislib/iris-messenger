@@ -300,7 +300,7 @@ export default {
           console.log('autofollowing', DEFAULT_FOLLOW);
           user().get('follow').get(DEFAULT_FOLLOW).put(true);
         }
-      }, 100); // maybe wait for login return instead
+      }, 1000); // maybe wait for login return instead
     });
   },
 
