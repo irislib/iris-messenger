@@ -227,15 +227,18 @@ export default {
     localStorage.setItem('chatKeyPair', JSON.stringify(k));
     user().auth(key);
     user().put({epub: key.epub});
+    user().get('likes').put({a:null}); // gun bug?
+    user().get('msgs').put({a:null}); // gun bug?
+    user().get('replies').put({a:null}); // gun bug?
     notifications.subscribeToWebPush();
     notifications.getWebPushSubscriptions();
     notifications.subscribeToIrisNotifications();
-    Channel.getMyChatLinks(key, undefined, chatLink => {
+    Channel.getMyChatLinks( undefined, chatLink => {
       local().get('chatLinks').get(chatLink.id).put(chatLink.url);
       latestChatLink = chatLink.url;
     });
     this.setOurOnlineStatus();
-    Channel.getChannels(key, c => this.addChannel(c));
+    Channel.getChannels( c => this.addChannel(c));
     user().get('profile').get('name').on(name => {
       if (name && typeof name === 'string') {
         myName = name;
@@ -291,7 +294,7 @@ export default {
       user().get('profile').get('name').put(name);
       local().get('filters').put({a:null});
       local().get('filters').get('group').put('follows');
-      this.createChatLink();
+      Channel.createChatLink().then(l => latestChatLink = l);
       setTimeout(() => {
         if (options.autofollow !== false) {
           console.log('autofollowing', DEFAULT_FOLLOW);
@@ -329,10 +332,6 @@ export default {
       window.location.href = '/';
       location.reload();
     });
-  },
-
-  async createChatLink() {
-    latestChatLink = await Channel.createChatLink(key);
   },
 
   clearIndexedDB() {

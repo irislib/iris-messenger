@@ -6,12 +6,13 @@ import session from './session';
  * @param pub
  * @returns {Node} The user space.
  */
-export default function(pub) {
-  const user = publicState().user(pub);
-  if (!pub && !user._.root.user.is) { // better way to check if user is logged in?
-    console.log('auth');
-    user.auth(session.getKey());
-  }
 
-  return user;
+let currentUser;
+
+export default function(pub) {
+  if (!currentUser) {
+    currentUser = publicState().user();
+    currentUser.auth(session.getKey());
+  }
+  return pub ? publicState().user(pub) : currentUser;
 }

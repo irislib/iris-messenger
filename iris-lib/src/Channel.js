@@ -343,10 +343,11 @@ class Channel {
   * @param {Object} keypair Gun.SEA keypair that the gun instance is authenticated with
   * @param callback callback function that is called for each public key you have a channel with
   */
-  static async getChannels(keypair, callback, listenToChatLinks = true) {
+  static async getChannels(callback, listenToChatLinks = true) {
+    const keypair = session.getKey();
     const mySecret = await Gun.SEA.secret(keypair.epub, keypair);
     if (listenToChatLinks) {
-      Channel.getMyChatLinks(keypair, undefined, undefined, true);
+      Channel.getMyChatLinks( undefined, undefined, true);
     }
     const seen = {};
 
@@ -1107,9 +1108,9 @@ class Channel {
   /**
   * Creates a channel link that can be used for two-way communication, i.e. only one link needs to be exchanged.
   */
-  static async createChatLink(key, urlRoot = 'https://iris.to/') {
+  static async createChatLink(urlRoot = 'https://iris.to/') {
     const user = publicState().user();
-    user.auth(key);
+    const key = session.getKey();
 
     // We create a new Gun user whose private key is shared with the chat link recipients.
     // Chat link recipients can contact you by writing their public key to the shared key's user space.
@@ -1135,9 +1136,9 @@ class Channel {
   /**
   *
   */
-  static async getMyChatLinks(key, urlRoot = 'https://iris.to/', callback, subscribe) {
+  static async getMyChatLinks(urlRoot = 'https://iris.to/', callback, subscribe) {
+    const key = session.getKey();
     const user = publicState().user();
-    user.auth(key);
     const mySecret = await Gun.SEA.secret(key.epub, key);
     const chatLinks = [];
     user.get('chatLinks').map().on((data, linkId) => {

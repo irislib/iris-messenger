@@ -27,10 +27,6 @@ class MainView extends Component {
     componentDidMount() {
         this.setState({chatLinks: this.props.chatLinks});
     }
-    
-    createNewInvite(){
-        iris.session.createChatLink();
-    }
 
     render(){
        
@@ -75,7 +71,7 @@ class MainView extends Component {
                             `;
                     })}
                     <p>
-                        <Button onClick={() => this.createNewInvite()}>
+                        <Button onClick={() => iris.Channel.createChatLink()}>
                             {t('create_new_invite_link')}
                         </Button>
                     </p>
