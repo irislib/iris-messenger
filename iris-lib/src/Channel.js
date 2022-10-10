@@ -511,8 +511,8 @@ class Channel {
   * Add a public key to the channel or update its permissions
   * @param {string} pub
   */
-  addParticipant = _.memoize(async (pub, save = true, permissions) => {
-    return this.addParticipantInner(pub, save, permissions);
+  addParticipant = _.memoize(async (pub, save = true, permissions, subscribe) => {
+    return this.addParticipantInner(pub, save, permissions, subscribe);
   })
 
   async addParticipantInner(pub, save = true, permissions, subscribe) {
