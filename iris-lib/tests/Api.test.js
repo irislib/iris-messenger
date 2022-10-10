@@ -1,11 +1,7 @@
-import iris from '../src';
+import iris from '../cjs';
 
 /* Iris API provides a singleton instance of the Iris class. */
 describe('iris API', () => {
-  it('should have iris.init(params)', () => {
-    expect(typeof iris.init).toBe('function');
-  });
-
   it('should have iris.local() for local state', () => {
     expect(typeof iris.local).toBe('function');
   });
