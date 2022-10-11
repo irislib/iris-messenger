@@ -15,6 +15,7 @@ import _ from 'lodash';
 * Used as a core element of [iris-messenger](https://github.com/irislib/iris-messenger).
 *
 * You can use iris.private(pub) to always use the same Channel object for a given pub.
+*
 * ---
 *
 * #### Key-value API
@@ -512,64 +513,59 @@ class Channel {
   * Add a public key to the channel or update its permissions
   * @param {string} pub
   */
-  addParticipant(pub, save = true, permissions, subscribe) {
-    if (!this.addParticipantInner) {
-      this.addParticipantInner = _.memoize(async (pub, save = true, permissions, subscribe) => {
-        if (this.uuid) {
-          return;
-        }
-        if (permissions === undefined) {
-          permissions = this.DEFAULT_PERMISSIONS;
-        }
-        if (this.secrets[pub] && JSON.stringify(this.secrets[pub]) === JSON.stringify(permissions)) { // TODO: should be this.participants[pub]
-          return;
-        }
-        this.secrets[pub] = null;
-        this.getSecret(pub);
-        const ourSecretChannelId = await this.getOurSecretChannelId(pub);
-        if (save) {
-          // Save their public key in encrypted format, so in channel listing we know who we are channeling with
-          const mySecret = await Gun.SEA.secret(session.getKey().epub, session.getKey());
-          publicState().user().get(`chats`).get(ourSecretChannelId).get(`pub`).put(await Gun.SEA.encrypt({pub}, mySecret));
-        }
-        if (this.uuid) {
-          this.participants[pub] = permissions;
-          if (save) {
-            this.putDirect(`S${this.uuid}`, this.getMyGroupSecret());
-            this.getMySecretUuid().then(s => {
-              this.putDirect(this.uuid, s); // TODO: encrypt keys in put()
-            });
-            this.onTheirDirect(this.uuid, (s, k, from) => {
-              this.theirSecretUuids[from] = s;
-            });
-            this.onTheirDirect(`S${this.uuid}`, (s, k, from) => {
-              this.theirGroupSecrets[from] = s;
-            });
-            this.save();
+  async addParticipant(pub, save = true, permissions, subscribe) {
+    if (this.uuid) {
+      return;
+    }
+    if (permissions === undefined) {
+      permissions = this.DEFAULT_PERMISSIONS;
+    }
+    if (this.secrets[pub] && JSON.stringify(this.secrets[pub]) === JSON.stringify(permissions)) { // TODO: should be this.participants[pub]
+      return;
+    }
+    this.secrets[pub] = null;
+    this.getSecret(pub);
+    const ourSecretChannelId = await this.getOurSecretChannelId(pub);
+    if (save) {
+      // Save their public key in encrypted format, so in channel listing we know who we are channeling with
+      const mySecret = await Gun.SEA.secret(session.getKey().epub, session.getKey());
+      publicState().user().get(`chats`).get(ourSecretChannelId).get(`pub`).put(await Gun.SEA.encrypt({pub}, mySecret));
+    }
+    if (this.uuid) {
+      this.participants[pub] = permissions;
+      if (save) {
+        this.putDirect(`S${this.uuid}`, this.getMyGroupSecret());
+        this.getMySecretUuid().then(s => {
+          this.putDirect(this.uuid, s); // TODO: encrypt keys in put()
+        });
+        this.onTheirDirect(this.uuid, (s, k, from) => {
+          this.theirSecretUuids[from] = s;
+        });
+        this.onTheirDirect(`S${this.uuid}`, (s, k, from) => {
+          this.theirGroupSecrets[from] = s;
+        });
+        this.save();
+      }
+    }
+    if (subscribe) {
+      Object.values(this.directSubscriptions).forEach(arr => {
+        arr.forEach(o => {
+          if (!o.from || o.from === pub) {
+            this._onTheirDirectFromUser(pub, o.key, o.callback);
           }
-        }
-        if (subscribe) {
-          Object.values(this.directSubscriptions).forEach(arr => {
-            arr.forEach(o => {
-              if (!o.from || o.from === pub) {
-                this._onTheirDirectFromUser(pub, o.key, o.callback);
-              }
-            });
-          });
-          Object.values(this.groupSubscriptions).forEach(arr => {
-            arr.forEach(o => {
-              if (o.from && o.from !== pub) { return; }
-              if (permissions.write) {
-                this._onTheirGroupFromUser(pub, o.key, o.callback);
-              } else { // unsubscribe
-                o.event && o.event.off();
-              }
-            });
-          });
-        }
+        });
+      });
+      Object.values(this.groupSubscriptions).forEach(arr => {
+        arr.forEach(o => {
+          if (o.from && o.from !== pub) { return; }
+          if (permissions.write) {
+            this._onTheirGroupFromUser(pub, o.key, o.callback);
+          } else { // unsubscribe
+            o.event && o.event.off();
+          }
+        });
       });
     }
-    return this.addParticipantInner(pub, save, permissions, subscribe);
   }
 
   /**
@@ -764,7 +760,7 @@ class Channel {
       if (!this.hasWritePermission(pub)) { return; }
       const decrypted = await Gun.SEA.decrypt(data, (await this.getTheirGroupSecret(pub)));
       if (decrypted) {
-        //callback(typeof decrypted.v !== `undefined` ? decrypted.v : decrypted, key, pub);
+        callback(typeof decrypted.v !== `undefined` ? decrypted.v : decrypted, key, pub);
       }
     });
   }
