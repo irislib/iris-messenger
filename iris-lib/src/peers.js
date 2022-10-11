@@ -7,7 +7,7 @@ import local from './local';
 
 const MAX_PEER_LIST_SIZE = 10;
 const ELECTRON_GUN_URL = 'http://localhost:8767/gun';
-let maxConnectedPeers = 3;
+let maxConnectedPeers = 1;
 const DEFAULT_PEERS = {};
 
 DEFAULT_PEERS['https://gun-rs.iris.to/gun'] = {};

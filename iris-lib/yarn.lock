@@ -4641,10 +4641,9 @@ growly@^1.3.0:
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
   integrity sha512-+xGQY0YyAWCnqy7Cd++hc2JqMYzlm0dG30Jd0beaA64sROr8C4nt8Yc9V5Ro3avlSUDTN0ulqP/VBKi1/lLygw==
 
-gun@^0.2020.1238:
+"gun@https://github.com/mmalmi/gun":
   version "0.2020.1238"
-  resolved "https://registry.yarnpkg.com/gun/-/gun-0.2020.1238.tgz#d80ff692dcec769edbfc716909d9a80a6285b9e3"
-  integrity sha512-8rKaAN74o3RTc2/a3CZca3Rx6rWnYpB1nS7mCtWH+LC7wvt2tzPR1yfRCq61haoR/Vtbl45qdq8iyoz9lAY8mg==
+  resolved "https://github.com/mmalmi/gun#77409e4e6edc20b7b77649a0910603bd1b5e4988"
   dependencies:
     ws "^7.2.1"
   optionalDependencies:

@@ -35,7 +35,7 @@ const DEFAULT_SETTINGS = {
     enableWebtorrent: !util.isMobile,
     enablePublicPeerDiscovery: true,
     autoplayWebtorrent: true,
-    maxConnectedPeers: util.isElectron ? 3 : 2
+    maxConnectedPeers: util.isElectron ? 2 : 1
   }
 }
 
