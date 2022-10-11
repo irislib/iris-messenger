@@ -185,9 +185,11 @@ export default {
 
   init() {
     this.known = this.getSaved();
+    /* use the default value of 1 for now because of memory issue
     local().get('settings').get('maxConnectedPeers').on(n => {
       if (n !== undefined) maxConnectedPeers = n;
     });
+     */
     setInterval(() => this.checkGunPeerCount(), 1000);
   }
 };

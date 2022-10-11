@@ -210,6 +210,7 @@
 					var it = s[id] || (s[id] = {});
 					it.was = dup.now = +new Date;
 					if(!dup.to){ dup.to = setTimeout(dup.drop, opt.age + 9); }
+					if(dt.ed){ dt.ed(id); }
 					return it;
 				};
 				dup.drop = function(age){
@@ -454,6 +455,9 @@
 				Gun.on.get = function(msg, gun){
 					var root = gun._, get = msg.get, soul = get['#'], node = root.graph[soul], has = get['.'];
 					var next = root.next || (root.next = {}), at = next[soul];
+
+					// TODO: Azarattum bug, what is in graph is not same as what is in next. Fix!
+
 					// queue concurrent GETs?
 					// TODO: consider tagging original message into dup for DAM.
 					// TODO: ^ above? In chat app, 12 messages resulted in same peer asking for `#user.pub` 12 times. (same with #user GET too, yipes!) // DAM note: This also resulted in 12 replies from 1 peer which all had same ##hash but none of them deduped because each get was different.
@@ -477,7 +481,9 @@
 					//console.log("GET:", get, node, has);
 					if(!node){ return root.on('get', msg) }
 					if(has){
-						if('string' != typeof has || u === node[has]){ return root.on('get', msg) }
+						if('string' != typeof has || u === node[has]){
+							if(!((at||'').next||'')[has]){ root.on('get', msg); return }
+						}
 						node = state_ify({}, has, state_is(node, has), node[has], soul);
 						// If we have a key in-memory, do we really need to fetch?
 						// Maybe... in case the in-memory key we have is a local write
@@ -504,7 +510,7 @@
 						tmp = keys.length;
 						console.STAT && console.STAT(S, -(S - (S = +new Date)), 'got copied some');
 						DBG && (DBG.ga = +new Date);
-						root.on('in', {'@': to, '#': id, put: put, '%': (tmp? (id = text_rand(9)) : u), $: root.$, _: faith, DBG: DBG});
+						root.on('in', {'@': to, '#': id, put: put, '%': (tmp? (id = text_rand(9)) : u), $: root.$, _: faith, DBG: DBG, FOO: 1});
 						console.STAT && console.STAT(S, +new Date - S, 'got in');
 						if(!tmp){ return }
 						setTimeout.turn(go);
@@ -622,6 +628,7 @@
 					if(at.lex){ Object.keys(at.lex).forEach(function(k){ tmp[k] = at.lex[k]; }, tmp = msg.get = msg.get || {}); }
 					if(get['#'] || at.soul){
 						get['#'] = get['#'] || at.soul;
+						//root.graph[get['#']] = root.graph[get['#']] || {_:{'#':get['#'],'>':{}}};
 						msg['#'] || (msg['#'] = text_rand(9)); // A3120 ?
 						back = (root.$.get(get['#'])._);
 						if(!(get = get['.'])){ // soul
@@ -951,6 +958,7 @@
 				next[at.get = key] = at;
 				if(back === cat.root.$){
 					at.soul = key;
+					//at.put = {};
 				} else
 				if(cat.soul || cat.has){
 					at.has = key;
@@ -1431,12 +1439,17 @@
 					if(tmp = msg.ok){ msg._.near = tmp['/']; }
 					var S = +new Date;
 					DBG && (DBG.is = S); peer.SI = id;
+					dup_track.ed = function(d){
+						if(id !== d){ return }
+						dup_track.ed = 0;
+						if(!(d = dup.s[id])){ return }
+						d.via = peer;
+						if(msg.get){ d.it = msg; }
+					};
 					root.on('in', mesh.last = msg);
-					//ECHO = msg.put || ECHO; !(msg.ok !== -3740) && mesh.say({ok: -3740, put: ECHO, '@': msg['#']}, peer);
 					DBG && (DBG.hd = +new Date);
 					console.STAT && console.STAT(S, +new Date - S, msg.get? 'msg get' : msg.put? 'msg put' : 'msg');
-					(tmp = dup_track(id)).via = peer; // don't dedup message ID till after, cause GUN has internal dedup check.
-					if(msg.get){ tmp.it = msg; }
+					dup_track(id); // in case 'in' does not call track.
 					if(ash){ dup_track(ash); } //dup.track(tmp+hash, true).it = it(msg);
 					mesh.leap = mesh.last = null; // warning! mesh.leap could be buggy.
 				};
@@ -1474,12 +1487,13 @@
 						!loop && dup_track(id);//.it = it(msg); // track for 9 seconds, default. Earth<->Mars would need more! // always track, maybe move this to the 'after' logic if we split function.
 						//if(msg.put && (msg.err || (dup.s[id]||'').err)){ return false } // TODO: in theory we should not be able to stun a message, but for now going to check if it can help network performance preventing invalid data to relay.
 						if(!(hash = msg['##']) && u !== msg.put && !meta.via && ack){ mesh.hash(msg, peer); return } // TODO: Should broadcasts be hashed?
-						if(!peer && ack){ peer = ((tmp = dup.s[ack]) && (tmp.via || ((tmp = tmp.it) && (tmp = tmp._) && tmp.via))) || ((tmp = mesh.last) && ack === tmp['#'] && mesh.leap); } // warning! mesh.leap could be buggy! mesh last check reduces this.
+						if(!peer && ack){ peer = ((tmp = dup.s[ack]) && (tmp.via || ((tmp = tmp.it) && (tmp = tmp._) && tmp.via))) || ((tmp = mesh.last) && ack === tmp['#'] && mesh.leap); } // warning! mesh.leap could be buggy! mesh last check reduces this. // TODO: CLEAN UP THIS LINE NOW? `.it` should be reliable.
 						if(!peer && ack){ // still no peer, then ack daisy chain 'tunnel' got lost.
 							if(dup.s[ack]){ return } // in dups but no peer hints that this was ack to ourself, ignore.
 							console.STAT && console.STAT(+new Date, ++SMIA, 'total no peer to ack to'); // TODO: Delete this now. Dropping lost ACKs is protocol fine now.
 							return false;
 						} // TODO: Temporary? If ack via trace has been lost, acks will go to all peers, which trashes browser bandwidth. Not relaying the ack will force sender to ask for ack again. Note, this is technically wrong for mesh behavior.
+						if(ack && !msg.put && !hash && ((dup.s[ack]||'').it||'')['##']){ return false } // If we're saying 'not found' but a relay had data, do not bother sending our not found. // Is this correct, return false? // NOTE: ADD PANIC TEST FOR THIS!
 						if(!peer && mesh.way){ return mesh.way(msg) }
 						DBG && (DBG.yh = +new Date);
 						if(!(raw = meta.raw)){ mesh.raw(msg, peer); return }
@@ -1540,7 +1554,7 @@
 						var hash = msg['##'], ack = msg['@'];
 						if(hash && ack){
 							if(!meta.via && dup_check(ack+hash)){ return false } // for our own out messages, memory & storage may ack the same thing, so dedup that. Tho if via another peer, we already tracked it upon hearing, so this will always trigger false positives, so don't do that!
-							if((tmp = (dup.s[ack]||'').it) || ((tmp = mesh.last) && ack === tmp['#'])){
+							if(tmp = (dup.s[ack]||'').it){
 								if(hash === tmp['##']){ return false } // if ask has a matching hash, acking is optional.
 								if(!tmp['##']){ tmp['##'] = hash; } // if none, add our hash to ask so anyone we relay to can dedup. // NOTE: May only check against 1st ack chunk, 2nd+ won't know and still stream back to relaying peers which may then dedup. Any way to fix this wasted bandwidth? I guess force rate limiting breaking change, that asking peer has to ask for next lexical chunk.
 							}
@@ -4235,6 +4249,8 @@
 
 	var sea = createCommonjsModule(function (module) {
 	(function(){
+
+	  var window = this || self || window;
 
 	  /* UNBUILD */
 	  function USE(arg, req){
@@ -25627,47 +25643,50 @@
 			};
 			return radix;
 		}
-		Radix.map = function rap(radix, cb, opt, pre){ pre = pre || []; // TODO: BUG: most out-of-memory crashes come from here.
-			var t = ('function' == typeof radix)? radix.$ || {} : radix;
-			//!opt && console.log("WHAT IS T?", JSON.stringify(t).length);
-			if(!t){ return }
-			if('string' == typeof t){ if(Radix.debug){ throw ['BUG:', radix, cb, opt, pre] } return; }
-			var keys = (t[_]||no).sort || (t[_] = function $(){ $.sort = Object.keys(t).sort(); return $ }()).sort, rev; // ONLY 17% of ops are pre-sorted!
-			//var keys = Object.keys(t).sort();
-			opt = (true === opt)? {branch: true} : (opt || {});
-			if(rev = opt.reverse){ keys = keys.slice(0).reverse(); }
-			var start = opt.start, end = opt.end, END = '\uffff';
-			var i = 0, l = keys.length;
-			for(;i < l; i++){ var key = keys[i], tree = t[key], tmp, p, pt;
-				if(!tree || '' === key || _ === key || 'undefined' === key){ continue }
-				p = pre.slice(0); p.push(key);
-				pt = p.join('');
-				if(u !== start && pt < (start||'').slice(0,pt.length)){ continue }
-				if(u !== end && (end || END) < pt){ continue }
-				if(rev){ // children must be checked first when going in reverse.
-					tmp = rap(tree, cb, opt, p);
-					if(u !== tmp){ return tmp }
-				}
-				if(u !== (tmp = tree[''])){
-					var yes = 1;
-					if(u !== start && pt < (start||'')){ yes = 0; }
-					if(u !== end && pt > (end || END)){ yes = 0; }
-					if(yes){
-						tmp = cb(tmp, pt, key, pre);
+		Radix.map = function rap(radix, cb, opt, pre){
+			try {
+				pre = pre || []; // TODO: BUG: most out-of-memory crashes come from here.
+				var t = ('function' == typeof radix)? radix.$ || {} : radix;
+				//!opt && console.log("WHAT IS T?", JSON.stringify(t).length);
+				if(!t){ return }
+				if('string' == typeof t){ if(Radix.debug){ throw ['BUG:', radix, cb, opt, pre] } return; }
+				var keys = (t[_]||no).sort || (t[_] = function $(){ $.sort = Object.keys(t).sort(); return $ }()).sort, rev; // ONLY 17% of ops are pre-sorted!
+				//var keys = Object.keys(t).sort();
+				opt = (true === opt)? {branch: true} : (opt || {});
+				if(rev = opt.reverse){ keys = keys.slice(0).reverse(); }
+				var start = opt.start, end = opt.end, END = '\uffff';
+				var i = 0, l = keys.length;
+				for(;i < l; i++){ var key = keys[i], tree = t[key], tmp, p, pt;
+					if(!tree || '' === key || _ === key || 'undefined' === key){ continue }
+					p = pre.slice(0); p.push(key);
+					pt = p.join('');
+					if(u !== start && pt < (start||'').slice(0,pt.length)){ continue }
+					if(u !== end && (end || END) < pt){ continue }
+					if(rev){ // children must be checked first when going in reverse.
+						tmp = rap(tree, cb, opt, p);
 						if(u !== tmp){ return tmp }
 					}
-				} else
-				if(opt.branch){
-					tmp = cb(u, pt, key, pre);
-					if(u !== tmp){ return tmp }
+					if(u !== (tmp = tree[''])){
+						var yes = 1;
+						if(u !== start && pt < (start||'')){ yes = 0; }
+						if(u !== end && pt > (end || END)){ yes = 0; }
+						if(yes){
+							tmp = cb(tmp, pt, key, pre);
+							if(u !== tmp){ return tmp }
+						}
+					} else
+					if(opt.branch){
+						tmp = cb(u, pt, key, pre);
+						if(u !== tmp){ return tmp }
+					}
+					pre = p;
+					if(!rev){
+						tmp = rap(tree, cb, opt, pre);
+						if(u !== tmp){ return tmp }
+					}
+					pre.pop();
 				}
-				pre = p;
-				if(!rev){
-					tmp = rap(tree, cb, opt, pre);
-					if(u !== tmp){ return tmp }
-				}
-				pre.pop();
-			}
+			} catch (e) { console.error(e); }
 		};
 
 		if(typeof window !== "undefined"){
@@ -29999,10 +30018,11 @@
 
 	var MAX_PEER_LIST_SIZE = 10;
 	var ELECTRON_GUN_URL = 'http://localhost:8767/gun';
-	var maxConnectedPeers = 3;
+	var maxConnectedPeers = 1;
 	var DEFAULT_PEERS = {};
 
 	DEFAULT_PEERS['https://gun-rs.iris.to/gun'] = {};
+	DEFAULT_PEERS['https://gun-us.herokuapp.com/gun'] = {};
 	var loc = window.location;
 	var host = loc.host;
 	var is_localhost_but_not_dev = host.startsWith('localhost') && host !== 'localhost:8080';
@@ -30339,10 +30359,14 @@
 	  return pub ? publicState$1().user(pub) : currentUser;
 	}
 
+	// TODO: extract Group channels into their own class
+
 	/**
 	* Private communication channel between two or more participants ([Gun](https://github.com/amark/gun) public keys). Can be used independently of other Iris stuff.
 	*
 	* Used as a core element of [iris-messenger](https://github.com/irislib/iris-messenger).
+	*
+	* You can use iris.private(pub) to always use the same Channel object for a given pub.
 	*
 	* ---
 	*
@@ -30361,8 +30385,6 @@
 	* ---
 	*
 	* You can open a channel with yourself for a private key-value space or a "note to self" type chat with yourself.
-	*
-	* **Note!** As of April 2020 Gun.SEA hashing function [is broken on Safari](https://github.com/amark/gun/issues/892). Channels don't work on Safari unless you patch sea.js by adding [this line](https://github.com/irislib/iris-messenger/blob/1e012581793485e6b8b5ed3c2ad0629716709366/src/js/sea.js#L270).
 	*
 	* **Privacy disclaimer:** Channel ids, data values and messages are encrypted, but message timestamps are unencrypted so that peers can return them to you in a sequential order. By looking at the unencrypted timestamps (or Gun subscriptions), it is possible to guess who are communicating with each other. This could be improved by indexing messages by *day* only, so making the guess would be more difficult, while you could still return them in a semi-sequential order.
 	*
@@ -30915,7 +30937,7 @@
 	  */
 
 
-	  Channel.prototype.addParticipant = function addParticipant(pub) {
+	  Channel.prototype.addParticipant = async function addParticipant(pub) {
 	    var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
 	    var _this9 = this;
@@ -30923,71 +30945,62 @@
 	    var permissions = arguments[2];
 	    var subscribe = arguments[3];
 
-	    if (!this.addParticipantInner) {
-	      this.addParticipantInner = lodash.memoize(async function (pub) {
-	        var save = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-	        var permissions = arguments[2];
-	        var subscribe = arguments[3];
-
-	        if (_this9.uuid) {
-	          return;
-	        }
-	        if (permissions === undefined) {
-	          permissions = _this9.DEFAULT_PERMISSIONS;
-	        }
-	        if (_this9.secrets[pub] && _JSON$stringify(_this9.secrets[pub]) === _JSON$stringify(permissions)) {
-	          // TODO: should be this.participants[pub]
-	          return;
-	        }
-	        _this9.secrets[pub] = null;
-	        _this9.getSecret(pub);
-	        var ourSecretChannelId = await _this9.getOurSecretChannelId(pub);
-	        if (save) {
-	          // Save their public key in encrypted format, so in channel listing we know who we are channeling with
-	          var mySecret = await browser.SEA.secret(session.getKey().epub, session.getKey());
-	          publicState$1().user().get('chats').get(ourSecretChannelId).get('pub').put((await browser.SEA.encrypt({ pub: pub }, mySecret)));
-	        }
-	        if (_this9.uuid) {
-	          _this9.participants[pub] = permissions;
-	          if (save) {
-	            _this9.putDirect('S' + _this9.uuid, _this9.getMyGroupSecret());
-	            _this9.getMySecretUuid().then(function (s) {
-	              _this9.putDirect(_this9.uuid, s); // TODO: encrypt keys in put()
-	            });
-	            _this9.onTheirDirect(_this9.uuid, function (s, k, from) {
-	              _this9.theirSecretUuids[from] = s;
-	            });
-	            _this9.onTheirDirect('S' + _this9.uuid, function (s, k, from) {
-	              _this9.theirGroupSecrets[from] = s;
-	            });
-	            _this9.save();
+	    if (this.uuid) {
+	      return;
+	    }
+	    if (permissions === undefined) {
+	      permissions = this.DEFAULT_PERMISSIONS;
+	    }
+	    if (this.secrets[pub] && _JSON$stringify(this.secrets[pub]) === _JSON$stringify(permissions)) {
+	      // TODO: should be this.participants[pub]
+	      return;
+	    }
+	    this.secrets[pub] = null;
+	    this.getSecret(pub);
+	    var ourSecretChannelId = await this.getOurSecretChannelId(pub);
+	    if (save) {
+	      // Save their public key in encrypted format, so in channel listing we know who we are channeling with
+	      var mySecret = await browser.SEA.secret(session.getKey().epub, session.getKey());
+	      publicState$1().user().get('chats').get(ourSecretChannelId).get('pub').put((await browser.SEA.encrypt({ pub: pub }, mySecret)));
+	    }
+	    if (this.uuid) {
+	      this.participants[pub] = permissions;
+	      if (save) {
+	        this.putDirect('S' + this.uuid, this.getMyGroupSecret());
+	        this.getMySecretUuid().then(function (s) {
+	          _this9.putDirect(_this9.uuid, s); // TODO: encrypt keys in put()
+	        });
+	        this.onTheirDirect(this.uuid, function (s, k, from) {
+	          _this9.theirSecretUuids[from] = s;
+	        });
+	        this.onTheirDirect('S' + this.uuid, function (s, k, from) {
+	          _this9.theirGroupSecrets[from] = s;
+	        });
+	        this.save();
+	      }
+	    }
+	    if (subscribe) {
+	      _Object$values(this.directSubscriptions).forEach(function (arr) {
+	        arr.forEach(function (o) {
+	          if (!o.from || o.from === pub) {
+	            _this9._onTheirDirectFromUser(pub, o.key, o.callback);
 	          }
-	        }
-	        if (subscribe) {
-	          _Object$values(_this9.directSubscriptions).forEach(function (arr) {
-	            arr.forEach(function (o) {
-	              if (!o.from || o.from === pub) {
-	                _this9._onTheirDirectFromUser(pub, o.key, o.callback);
-	              }
-	            });
-	          });
-	          _Object$values(_this9.groupSubscriptions).forEach(function (arr) {
-	            arr.forEach(function (o) {
-	              if (o.from && o.from !== pub) {
-	                return;
-	              }
-	              if (permissions.write) {
-	                _this9._onTheirGroupFromUser(pub, o.key, o.callback);
-	              } else {
-	                // unsubscribe
-	                o.event && o.event.off();
-	              }
-	            });
-	          });
-	        }
+	        });
+	      });
+	      _Object$values(this.groupSubscriptions).forEach(function (arr) {
+	        arr.forEach(function (o) {
+	          if (o.from && o.from !== pub) {
+	            return;
+	          }
+	          if (permissions.write) {
+	            _this9._onTheirGroupFromUser(pub, o.key, o.callback);
+	          } else {
+	            // unsubscribe
+	            o.event && o.event.off();
+	          }
+	        });
 	      });
 	    }
-	    return this.addParticipantInner(pub, save, permissions, subscribe);
 	  };
 
 	  /**
@@ -34135,7 +34148,7 @@
 	    enableWebtorrent: !util.isMobile,
 	    enablePublicPeerDiscovery: true,
 	    autoplayWebtorrent: true,
-	    maxConnectedPeers: util.isElectron ? 3 : 2
+	    maxConnectedPeers: util.isElectron ? 2 : 1
 	  }
 
 	  /**
