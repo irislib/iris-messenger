@@ -104,7 +104,7 @@ class Header extends Component {
   }
 
   updatePeersFromGun() {
-    const peersFromGun = iris.public().back('opt.peers') || {};
+    const peersFromGun = iris.global().back('opt.peers') || {};
     const connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
       if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
         console.log('WebRTC peer', peer);

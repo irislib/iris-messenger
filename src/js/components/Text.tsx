@@ -45,7 +45,7 @@ class Text extends Component<Props, State> {
   }
 
   getNode() {
-    let base = this.props.gun || iris.public();
+    let base = this.props.gun || iris.global();
     const user = this.props.user;
     if (user) {
       base = base.user(user);

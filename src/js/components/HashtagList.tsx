@@ -31,7 +31,7 @@ export default class HashtagList extends Component<Props, State> {
 
   componentDidMount() {
     const hashtags = {};
-    iris.user().get('hashtagSubscriptions').map().on(this.sub(
+    iris.public().get('hashtagSubscriptions').map().on(this.sub(
       (isSubscribed: boolean, hashtag: string) => {
         if (hashtag.indexOf('~') === 0) { return; }
         if (isSubscribed) {
@@ -73,7 +73,7 @@ export default class HashtagList extends Component<Props, State> {
     e.preventDefault();
     const hashtag = ((e.target as HTMLFormElement).firstChild as HTMLInputElement).value.replace('#', '').trim();
     if (hashtag) {
-      iris.user().get('hashtagSubscriptions').get(hashtag).put(true);
+      iris.public().get('hashtagSubscriptions').get(hashtag).put(true);
       this.setState({showAddHashtagForm: false});
       route(`/hashtag/${hashtag}`);
     }

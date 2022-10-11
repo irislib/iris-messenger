@@ -12,7 +12,7 @@ type State = {
 
 class Name extends Component<Props, State> {
   componentDidMount(): void {
-    iris.user(this.props.pub).get('profile').get('name').on(this.inject());
+    iris.public(this.props.pub).get('profile').get('name').on(this.inject());
   }
 
   render() {

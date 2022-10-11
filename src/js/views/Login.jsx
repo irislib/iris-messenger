@@ -110,11 +110,11 @@ async function ethereumLogin(name) {
     };
     login(k);
     setTimeout(async () => {
-      iris.user().get('profile').get('name').once(existingName => {
+      iris.public().get('profile').get('name').once(existingName => {
         if (typeof existingName !== 'string' || existingName === '') {
           name = name || iris.util.generateName();
-          iris.user().get('profile').put({a:null});
-          iris.user().get('profile').get('name').put(name);
+          iris.public().get('profile').put({a:null});
+          iris.public().get('profile').get('name').put(name);
         }
       });
     }, 2000);

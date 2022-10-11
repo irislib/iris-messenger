@@ -23,7 +23,7 @@ class Explorer extends View {
   renderView() {
     const split = (this.props.node || '').split('/');
     const scope = split.length && split[0];
-    let gun = iris.public();
+    let gun = iris.global();
     if (scope === 'Local') {
       gun = iris.local();
     } else if (scope === 'Group') {
@@ -54,13 +54,13 @@ class Explorer extends View {
             <a href="/explorer/Public"><b>Public</b></a>
             <small class="mar-left5">(synced with peers)</small>
         </div>
-        ${s.publicOpen ? html`<${ExplorerNode} indent=${1} gun=${iris.public()} key='Public' path='Public'/>`:''}
+        ${s.publicOpen ? html`<${ExplorerNode} indent=${1} gun=${iris.global()} key='Public' path='Public'/>`:''}
         <div class="explorer-row">
             <span onClick=${() => this.setState({groupOpen:!s.groupOpen})}>${s.groupOpen ? chevronDown : chevronRight}</span>
             <a href="/explorer/Group"><b>Group</b></a>
             <small class="mar-left5">(public data, composite object of all the users in the <a href="/explorer/Local%2Fgroups">group</a>)</small>
         </div>
-        ${s.groupOpen ? html`<${ExplorerNode} indent=${1} gun=${iris.public()} key='Group' path='Group'/>`:''}
+        ${s.groupOpen ? html`<${ExplorerNode} indent=${1} gun=${iris.global()} key='Group' path='Group'/>`:''}
         <div class="explorer-row">
             <span onClick=${() => this.setState({localOpen:!s.localOpen})}>${s.localOpen ? chevronDown : chevronRight}</span>
             <a href="/explorer/Local"><b>Local</b></a>

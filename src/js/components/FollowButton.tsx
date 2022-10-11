@@ -30,18 +30,18 @@ class FollowButton extends Component<Props> {
     const value = !this.state[this.key];
     if (value && this.key === 'follow') {
       iris.session.newChannel(this.props.id);
-      iris.user().get('block').get(this.props.id).put(false);
+      iris.public().get('block').get(this.props.id).put(false);
       iris.notifications.sendIrisNotification(this.props.id, {event:'follow'});
     }
     if (value && this.key === 'block') {
-      iris.user().get('follow').get(this.props.id).put(false);
+      iris.public().get('follow').get(this.props.id).put(false);
     }
-    iris.user().get(this.key).get(this.props.id).put(value);
-    iris.user().get(this.key).get(this.props.id).put(value);
+    iris.public().get(this.key).get(this.props.id).put(value);
+    iris.public().get(this.key).get(this.props.id).put(value);
   }
 
   componentDidMount() {
-    iris.user().get(this.key).get(this.props.id).on(this.sub(
+    iris.public().get(this.key).get(this.props.id).on(this.sub(
       value => {
         const s = {};
         s[this.key] = value;

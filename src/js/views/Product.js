@@ -42,7 +42,7 @@ class Product extends StoreView {
 
   onClickDelete() {
     if (confirm('Delete product? This cannot be undone.')) {
-      iris.user().get('store').get('products').get(this.props.product).put(null);
+      iris.public().get('store').get('products').get(this.props.product).put(null);
       route(`/store/${  this.props.store}`);
     }
   }
@@ -97,7 +97,7 @@ class Product extends StoreView {
       description: this.newProductDescription,
       price: this.newProductPrice
     };
-    iris.user().get('store').get('products').get(this.newProductId || this.newProductName).put(product);
+    iris.public().get('store').get('products').get(this.newProductId || this.newProductName).put(product);
     route(`/store/${iris.session.getPubKey()}`)
   }
 
@@ -107,7 +107,7 @@ class Product extends StoreView {
     this.setState({followedUserCount: 0, followerCount: 0, name: '', photo: '', about: ''});
     this.isMyProfile = iris.session.getPubKey() === pub;
     if (this.props.product && pub) {
-      iris.user(pub).get('store').get('products').get(this.props.product).on(product => this.setState({product}));
+      iris.public(pub).get('store').get('products').get(this.props.product).on(product => this.setState({product}));
     }
   }
 }

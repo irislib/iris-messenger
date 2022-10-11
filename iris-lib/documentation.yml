@@ -1,8 +1,8 @@
 toc:
   - session
-  - user
-  - local
+  - public
   - private
   - group
+  - local
   - static
   - peers

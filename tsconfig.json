@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "rootDir": "src",
     "outDir": "dist",
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
@@ -16,6 +15,7 @@
     }
   },
   "exclude": [
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    "iris-lib/test/*.ts"
   ]
 }

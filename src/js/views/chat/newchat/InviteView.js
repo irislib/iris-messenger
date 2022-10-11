@@ -30,7 +30,7 @@ class InviteView extends Component {
         e.preventDefault();
         if ($('#new-group-name').val().length) {
         let c = new iris.Channel({
-            gun: iris.public(),
+            gun: iris.global(),
             key: iris.session.getKey(),
             participants: [],
         });

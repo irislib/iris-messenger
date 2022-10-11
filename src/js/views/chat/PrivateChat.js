@@ -86,7 +86,7 @@ export default class PrivateChat extends Component {
         const hasAlready = !!this.participants[k];
         this.participants[k] = v;
         if (!!v && !hasAlready) {
-          iris.user(k).get('activity').on(this.sub(
+          iris.public(k).get('activity').on(this.sub(
             (activity) => {
               if (this.participants[k]) { this.participants[k].activity = activity; }
               this.setSortedParticipants();

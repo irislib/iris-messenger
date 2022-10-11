@@ -74,7 +74,7 @@ class PublicMessage extends Message {
       }
       this.setState({msg});
       if (this.props.showName && !this.props.name) {
-        iris.user(msg.info.from).get('profile').get('name').on(this.inject());
+        iris.public(msg.info.from).get('profile').get('name').on(this.inject());
       }
       iris.group().on(`likes/${encodeURIComponent(this.props.hash)}`, this.sub(
         (liked,a,b,e,from) => {
@@ -130,7 +130,7 @@ class PublicMessage extends Message {
   }
 
   like(liked = true) {
-    iris.user().get('likes').get(this.props.hash).put(liked);
+    iris.public().get('likes').get(this.props.hash).put(liked);
     if (liked) {
       const author = this.state.msg && this.state.msg.info && this.state.msg.info.from;
       if (author !== iris.session.getPubKey()) {
@@ -147,9 +147,9 @@ class PublicMessage extends Message {
     e.preventDefault();
     if (confirm('Delete message?')) { // TODO: remove from hashtag indexes
       const msg = this.state.msg;
-      msg.torrentId && iris.user().get('media').get(msg.time).put(null);
-      iris.user().get(this.props.index || 'msgs').get(msg.time).put(null);
-      msg.replyingTo && iris.user().get('replies').get(msg.replyingTo).get(msg.time).put(null);
+      msg.torrentId && iris.public().get('media').get(msg.time).put(null);
+      iris.public().get(this.props.index || 'msgs').get(msg.time).put(null);
+      msg.replyingTo && iris.public().get('replies').get(msg.replyingTo).get(msg.time).put(null);
     }
   }
 

@@ -55,7 +55,7 @@ export default class ChatMain extends Component {
       (isSubscribing, k, b, c, from) => {
         if (isSubscribing && !this.participants[from]) {
           this.participants[from] = {};
-          iris.user(from).get('activity').on(this.sub(
+          iris.public(from).get('activity').on(this.sub(
             (activity) => {
               if (this.participants[from]) { this.participants[from].activity = activity; }
               this.setSortedParticipants();

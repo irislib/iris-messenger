@@ -29,7 +29,7 @@ class Follows extends View {
   }, 1000, {leading: false});
 
   getFollows() {
-    iris.user(this.props.id).get('follow').map().on(this.sub(
+    iris.public(this.props.id).get('follow').map().on(this.sub(
       (follows, pub) => {
         if (follows && !this.follows.has(pub)) {
           this.follows.add(pub);
@@ -44,7 +44,7 @@ class Follows extends View {
   }
 
   getNameForUser(user) {
-    iris.user(user).get('profile').get('name').on(this.sub(name => {
+    iris.public(user).get('profile').get('name').on(this.sub(name => {
       if (!name) return;
       this.followNames.set(user, name);
       this.updateSortedFollows();

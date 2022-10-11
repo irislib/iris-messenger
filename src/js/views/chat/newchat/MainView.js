@@ -20,7 +20,7 @@ class MainView extends Component {
         this.props.chatLinks[id] = null;
         this.setState({chatLinks: this.props.chatLinks});
         this.forceUpdate();
-        return iris.Channel.removePrivateChatLink(iris.public(), iris.session.getKey(), id);
+        return iris.Channel.removePrivateChatLink(iris.global(), iris.session.getKey(), id);
         
     }
     componentDidMount() {

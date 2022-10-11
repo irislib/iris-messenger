@@ -148,7 +148,7 @@ export default class PeerSettings extends Component {
   }
 
   updatePeersFromGun() {
-    const peersFromGun = iris.public().back('opt.peers') || {};
+    const peersFromGun = iris.global().back('opt.peers') || {};
     // @ts-ignore
       this.setState({peersFromGun});
   }

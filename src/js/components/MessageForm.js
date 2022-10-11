@@ -16,12 +16,12 @@ export default class MessageForm extends Component {
     const serialized = signedMsg.toString();
     const hash = await iris.static.put(serialized);
     if (msg.replyingTo) {
-      twice(() => iris.user().get('replies').put({}));
-      twice(() => iris.user().get('replies').get(msg.replyingTo).put('a'));
-      twice(() => iris.user().get('replies').get(msg.replyingTo).put({}));
-      twice(() => iris.user().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
+      twice(() => iris.public().get('replies').put({}));
+      twice(() => iris.public().get('replies').get(msg.replyingTo).put('a'));
+      twice(() => iris.public().get('replies').get(msg.replyingTo).put({}));
+      twice(() => iris.public().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
     } else {
-      let node = iris.user();
+      let node = iris.public();
       (this.props.index || (this.props.hashtag && `hashtags/${this.props.hashtag}`) || 'msgs').split('/').forEach(s => {
         node.put({});
         node = node.get(s);
@@ -32,11 +32,11 @@ export default class MessageForm extends Component {
     if (hashtags) {
       hashtags.forEach(match => {
         const hashtag = match.replace('#', '');
-        iris.user().get('hashtags').get(hashtag).put({a:null});
-        iris.user().get('hashtags').get(hashtag).get(msg.time).put(hash)
+        iris.public().get('hashtags').get(hashtag).put({a:null});
+        iris.public().get('hashtags').get(hashtag).get(msg.time).put(hash)
       });
     }
-    msg.torrentId && iris.user().get('media').get(msg.time).put(hash);
+    msg.torrentId && iris.public().get('media').get(msg.time).put(hash);
     this.props.onSubmit && this.props.onSubmit(msg);
     return hash;
   }
