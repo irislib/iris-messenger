@@ -5,7 +5,6 @@ import Attribute from './Attribute';
 import session from './session';
 import publicState from './public';
 import userState from './user';
-import _ from 'lodash';
 
 // TODO: extract Group channels into their own class
 
