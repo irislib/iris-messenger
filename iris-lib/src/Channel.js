@@ -7,6 +7,8 @@ import publicState from './public';
 import userState from './user';
 import _ from 'lodash';
 
+// TODO: extract Group channels into their own class
+
 /**
 * Private communication channel between two or more participants ([Gun](https://github.com/amark/gun) public keys). Can be used independently of other Iris stuff.
 *
@@ -762,7 +764,7 @@ class Channel {
       if (!this.hasWritePermission(pub)) { return; }
       const decrypted = await Gun.SEA.decrypt(data, (await this.getTheirGroupSecret(pub)));
       if (decrypted) {
-        callback(typeof decrypted.v !== `undefined` ? decrypted.v : decrypted, key, pub);
+        //callback(typeof decrypted.v !== `undefined` ? decrypted.v : decrypted, key, pub);
       }
     });
   }
