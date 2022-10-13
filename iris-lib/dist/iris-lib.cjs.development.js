@@ -1,12 +1,18 @@
-import Gun from 'gun';
-import 'gun/sea';
-import 'gun/lib/yson';
-import 'gun/lib/radix';
-import 'gun/lib/radisk';
-import 'gun/lib/store';
-import 'gun/lib/rindexed';
-import localForage from 'localforage';
-import Fuse from 'fuse.js';
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var Gun = _interopDefault(require('gun'));
+require('gun/sea');
+require('gun/lib/yson');
+require('gun/lib/radix');
+require('gun/lib/radisk');
+require('gun/lib/store');
+require('gun/lib/rindexed');
+var localForage = _interopDefault(require('localforage'));
+var Fuse = _interopDefault(require('fuse.js'));
 
 function _regeneratorRuntime() {
   _regeneratorRuntime = function () {
@@ -6510,5 +6516,5 @@ var index = {
   Node: Node
 };
 
-export default index;
-//# sourceMappingURL=iris.esm.js.map
+exports.default = index;
+//# sourceMappingURL=iris-lib.cjs.development.js.map

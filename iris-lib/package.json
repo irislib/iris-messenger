@@ -1,5 +1,5 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.4",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "fuse.js": "^6.6.2",
-    "gun": "file:../gun",
+    "gun": "https://github.com/mmalmi/gun",
     "localforage": "^1.10.0"
   }
 }
