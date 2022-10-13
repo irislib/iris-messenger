@@ -13,6 +13,9 @@ Iris is a fully decentralized p2p database that you can use to build all kinds o
   - Fetch 3d objects in a virtual room from your friends.
 * Super simple API
 
+Used by [iris-messenger](https://iris.to) ([source](https://github.com/irislib/iris-messenger)), a decentralized social
+networking application.
+
 ## Installation
 
 ```sh
