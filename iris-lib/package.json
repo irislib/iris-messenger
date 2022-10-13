@@ -3,6 +3,8 @@
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "repository": "https://github.com/irislib/iris-messenger/tree/master/iris-lib",
+  "homepage": "https://docs.iris.to",
   "files": [
     "dist",
     "src"
@@ -34,7 +36,7 @@
   },
   "name": "iris-lib",
   "author": "Martti Malmi",
-  "module": "dist/iris-lib.esm.js",
+  "module": "dist/iris.esm.js",
   "size-limit": [
     {
       "path": "dist/iris.cjs.production.min.js",
