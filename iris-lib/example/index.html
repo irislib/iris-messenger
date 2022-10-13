@@ -11,7 +11,6 @@
 		iris.private().put('secretFriendList', ['alice', 'bob']);
 		iris.private().on('secretFriendList', (v,k) => console.log('secretFriendList changed:',k,v));
 		setTimeout(() => {
-			console.log(5);
 			iris.public('hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU').get('profile').on(profile => {
 				delete profile['_'];
 				console.log('profile', profile);

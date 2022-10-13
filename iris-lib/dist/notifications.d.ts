@@ -1,0 +1,26 @@
+declare function notifyMsg(msg: any, info: any, channelId: any, onClick: any): void;
+declare function changeChatUnseenMsgsCount(chatId: any, change: any): void;
+declare function subscribeToWebPush(): Promise<false | undefined>;
+declare function removeSubscription(hash: any): void;
+declare function getWebPushSubscriptions(): Promise<void>;
+declare function getNotificationText(notification: any): Promise<string>;
+declare function subscribeToIrisNotifications(onClick?: Function): void;
+declare function changeUnseenNotificationCount(change: any): void;
+declare function sendIrisNotification(recipient: any, notification: any): Promise<void>;
+declare function sendWebPushNotification(recipient: any, notification: any): Promise<void>;
+declare function init(): void;
+declare const _default: {
+    init: typeof init;
+    notifyMsg: typeof notifyMsg;
+    getNotificationText: typeof getNotificationText;
+    sendWebPushNotification: typeof sendWebPushNotification;
+    changeUnseenNotificationCount: typeof changeUnseenNotificationCount;
+    subscribeToIrisNotifications: typeof subscribeToIrisNotifications;
+    sendIrisNotification: typeof sendIrisNotification;
+    changeChatUnseenCount: typeof changeChatUnseenMsgsCount;
+    webPushSubscriptions: {};
+    subscribeToWebPush: typeof subscribeToWebPush;
+    getWebPushSubscriptions: typeof getWebPushSubscriptions;
+    removeSubscription: typeof removeSubscription;
+};
+export default _default;
