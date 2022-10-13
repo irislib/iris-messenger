@@ -85,6 +85,7 @@ declare class Channel {
     latest: any;
     uuid: any;
     name: any;
+    attachments: any;
     theirSecretUuids: {};
     theirGroupSecrets: {};
     secrets: {};

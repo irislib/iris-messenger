@@ -9,8 +9,8 @@ import $ from "jquery";
 import Button from "../../components/basic/Button";
 
 export default class PeerSettings extends Component {
-  state = iris.session.DEFAULT_SETTINGS;
   updatePeersFromGunInterval = 0;
+  state = iris.session.DEFAULT_SETTINGS;
 
   componentDidMount() {
     iris.local().get('settings').on(this.sub(local => {
@@ -41,7 +41,7 @@ export default class PeerSettings extends Component {
             <h4>{t('maximum_number_of_peer_connections')}</h4>
             <p>
                 <input type="number" value={this.state.local.maxConnectedPeers} onChange={e => {
-                    const target = e.target as HTMLInputElement;
+                    const target = e.target;
                     iris.local().get('settings').get('maxConnectedPeers').put(target.value || 0);
                 }}/>
             </p>
