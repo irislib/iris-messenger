@@ -2,7 +2,11 @@
   "name": "gun",
   "version": "0.2020.1238",
   "description": "A realtime, decentralized, offline-first, graph data synchronization engine.",
-  "main": "gun.js",
+  "types": "index.d.ts",
+  "main": "index.js",
+  "tsd": {
+    "directory": "types"
+  },
   "scripts": {
     "start": "node --prof examples/http.js",
     "debug": "node --prof-process --preprocess -j isolate*.log > v8data.json && rm isolate*.log && echo 'drag & drop ./v8data.json into https://mapbox.github.io/flamebearer/'",

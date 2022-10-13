@@ -1,4 +1,4 @@
-import Session from './session';
+import session from './session';
 import _ from './lodash';
 import Gun from 'gun';
 import util from './util';
@@ -56,7 +56,7 @@ export default {
     this.known[url] = this.known[url] || _.omit(peer, ['url']);
     if (peer.visibility === 'public') {
       // rolling some crypto operations to obfuscate actual url in case we want to remove it
-      let secret = await Gun.SEA.secret(Session.getKey().epub, Session.getKey()) || '';
+      let secret = await Gun.SEA.secret(session.getKey().epub, session.getKey()) || '';
       let encryptedUrl = await Gun.SEA.encrypt(peer.url, secret);
       let encryptedUrlHash = await Gun.SEA.work(encryptedUrl, null, null, {name: 'SHA-256'});
       publicState().user().get('peers').get(encryptedUrlHash).put({url: peer.url, lastSeen: new Date().toISOString()});

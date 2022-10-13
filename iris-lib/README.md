@@ -3,32 +3,37 @@
 
 Iris is a fully decentralized p2p database that you can use to build all kinds of decentralized applications.
 
-* "Accounts" are just keypairs that can be created at will. No signup required.
-* All data is stored offline-first, and synced with other peers.
-* Publish-subscribe network and a callback system for real-time updates.
-* Public and private (encrypted) data is supported.
+* "Accounts" are just key pairs that can be created at will. No signup required.
+* Stores everything offline-first, and syncs with other users over a publish-subscribe network.
+* Callback system for real-time updates.
+* Supports public and private (encrypted) data.
 * Make aggregate queries from your social network or other group. For example:
   - Fetch the latest 10 posts from your extended social network.
-  - Fetch the latest posts from the users on list maintained by a moderator of your choice.
-  - Fetch 3d objects in virtual room from your friends.
+  - Fetch the latest posts from the users on a list maintained by a moderator of your choice.
+  - Fetch 3d objects in a virtual room from your friends.
 * Super simple API
 
 ## Installation
 
 ```sh
 npm install iris-lib
+```
+
 or
+
+```sh
 yarn add iris-lib
 ```
 
+Import:
 ```js
-const iris = require('iris-lib');
+import iris from 'iris-lib';
 ```
 
 or include the script in your html:
 
 ```html
-<script src="https://unpkg.com/iris-lib"></script>
+<script src="https://raw.githubusercontent.com/irislib/iris-messenger/master/iris-lib/dist/iris.umd.production.min.js"></script>
 ```
 
 ## Usage
@@ -38,7 +43,7 @@ Read/write public profiles:
 iris.public().get('profile').get('name').on((name) => {
   console.log('My name is', name);
 });
-iris.public().get('profile').get('name').set('John Doe');
+iris.public().get('profile').get('name').put('John Doe');
 iris.public('hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU').get('profile').get('name').on((name) => {
   console.log('Someone else\'s name is', name);
 });
