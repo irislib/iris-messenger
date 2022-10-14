@@ -8,14 +8,14 @@ Iris is a fully decentralized p2p database that you can use to build all kinds o
 * Callback system for real-time updates.
 * Supports public and private (encrypted) data.
 * Make aggregate queries from your social network or other group. For example:
-  - Fetch the latest 10 posts from your extended social network.
+  - Fetch the latest posts from your extended social network.
   - Fetch the latest posts from the users on a list maintained by a moderator of your choice.
   - Fetch 3d objects in a virtual room from your friends.
 * Super simple API
 
 Used by [iris-messenger](https://iris.to) ([source](https://github.com/irislib/iris-messenger)), a decentralized social
 networking application.
-
+do
 ## Installation
 
 ```sh
@@ -43,11 +43,16 @@ or include the script in your html:
 
 Read/write public profiles:
 ```js
+// Subscribe to your profile name
 iris.public().get('profile').get('name').on((name) => {
   console.log('My name is', name);
 });
+// Set your profile name
 iris.public().get('profile').get('name').put('John Doe');
-iris.public('hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU').get('profile').get('name').on((name) => {
+
+// Subscribe to someone else's profile name
+const pub = 'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU'; // Iris public key
+iris.public(pub).get('profile').get('name').on((name) => {
   console.log('Someone else\'s name is', name);
 });
 ```
