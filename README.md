@@ -38,6 +38,8 @@ yarn serve
 yarn test
 ```
 
+[iris-lib](https://github.com/irislib/iris-lib) is a core part of the application. You can clone it and run `yarn link` in the iris-lib directory. Then run `yarn link iris-lib` in the iris-messenger directory.
+
 ## Privacy
 The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.
 
