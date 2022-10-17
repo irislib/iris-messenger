@@ -9,12 +9,10 @@ import SafeImg from './SafeImg';
 
 import Torrent from './Torrent';
 import Icons from '../Icons';
-import Autolinker from 'autolinker';
 import $ from 'jquery';
 import {Helmet} from "react-helmet";
 
 const MSG_TRUNCATE_LENGTH = 1000;
-const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 
 const replyIcon = html`<svg width="24" version="1.1" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;"><path fill="currentColor" d="M256,21.952c-141.163,0-256,95.424-256,212.715c0,60.267,30.805,117.269,84.885,157.717l-41.109,82.219 c-2.176,4.331-1.131,9.579,2.496,12.779c2.005,1.771,4.501,2.667,7.04,2.667c2.069,0,4.139-0.597,5.952-1.813l89.963-60.395
 c33.877,12.971,69.781,19.541,106.752,19.541C397.141,447.381,512,351.957,512,234.667S397.163,21.952,256,21.952z M255.979,426.048c-36.16,0-71.168-6.741-104.043-20.032c-3.264-1.323-6.997-0.96-9.941,1.024l-61.056,40.981l27.093-54.187 c2.368-4.757,0.896-10.517-3.477-13.547c-52.907-36.629-83.243-89.707-83.243-145.6c0-105.536,105.28-191.381,234.667-191.381 s234.667,85.824,234.667,191.36S385.365,426.048,255.979,426.048z"/></svg>`;
@@ -179,7 +177,6 @@ class PublicMessage extends Message {
     let name = this.props.name || this.state.name;
     const emojiOnly = this.state.msg.text && this.state.msg.text.length === 2 && Helpers.isEmoji(this.state.msg.text);
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
-    const p = document.createElement('p');
     let text = this.state.msg.text;
     const shortText = text.length > 128 ? `${text.slice(0,128)  }...` : text;
     const quotedShortText = `"${shortText}"`;
@@ -187,15 +184,12 @@ class PublicMessage extends Message {
       text = shortText;
     }
     const title = `${name || 'User'} on Iris`;
-    p.innerText = (text.length > MSG_TRUNCATE_LENGTH) && !this.state.showMore && !this.props.standalone ?
+    text = (text.length > MSG_TRUNCATE_LENGTH) && !this.state.showMore && !this.props.standalone ?
       `${text.slice(0, MSG_TRUNCATE_LENGTH)  }...` : text;
-    let h = p.innerHTML;
-    if (!emojiOnly) {
-      h = Helpers.highlightEmoji(h);
-      h = Helpers.highlightHashtags(h);
-      h = Helpers.highlightMentions(h);
-    }
-    const innerHTML = autolinker.link(h);
+
+    text = Helpers.highlightEverything(text);
+    //console.log('text', text);
+
     const time = typeof this.state.msg.time === 'object' ? this.state.msg.time : new Date(this.state.msg.time);
     const dateStr = time.toLocaleString(window.navigator.language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const timeStr = time.toLocaleTimeString(window.navigator.language, {timeStyle: 'short'});
@@ -242,9 +236,11 @@ class PublicMessage extends Message {
               <${SafeImg} src=${a.data} onClick=${e => { this.imageClicked(e); }}/>
             </div>`;
           })}
-          <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
+          <div class="text ${emojiOnly && 'emoji-only'}">
+              ${text}
+          </div>
           ${!this.props.standalone && (s.msg.attachments && (s.msg.attachments.length > 1) ||
-            (text.length > MSG_TRUNCATE_LENGTH)) ? html`
+            (this.state.msg.text.length > MSG_TRUNCATE_LENGTH)) ? html`
             <a onClick=${e => {
                 e.preventDefault();
                 this.setState({showMore: !s.showMore});

@@ -2,12 +2,10 @@ import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import { html } from 'htm/preact';
 import Torrent from './Torrent';
-import Autolinker from 'autolinker';
 import $ from 'jquery';
 import iris from 'iris-lib';
 import {route} from 'preact-router';
 
-const autolinker = new Autolinker({ stripPrefix: false, stripTrailingSlash: false});
 const ANIMATE_DURATION = 200;
 
 const seenIndicator = html`<span class="seen-indicator"><svg viewBox="0 0 59 42"><polygon fill="currentColor" points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"></polygon><polygon class="iris-delivered-checkmark" fill="currentColor" points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"></polygon></svg></span>`;
@@ -144,16 +142,8 @@ class Message extends Component {
     }
     const emojiOnly = this.props.text && this.props.text.length === 2 && Helpers.isEmoji(this.props.text);
 
-    const p = document.createElement('p');
-    p.innerText = this.props.text;
-    let h = p.innerHTML;
-    if (!emojiOnly) {
-      h = Helpers.highlightEmoji(h);
-      h = Helpers.highlightHashtags(h);
-      h = Helpers.highlightMentions(h);
-    }
+    let text = Helpers.highlightEverything(this.props.text);
 
-    const innerHTML = autolinker.link(h);
     const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
 
     const status = this.getSeenStatus();
@@ -173,7 +163,9 @@ class Message extends Component {
           ${this.props.attachments && this.props.attachments.map(a =>
             html`<div class="img-container"><img src=${a.data} onclick=${e => { this.openAttachmentsGallery(e); }}/></div>` // TODO: escape a.data
           )}
-          <div class="text ${emojiOnly && 'emoji-only'}" dangerouslySetInnerHTML=${{ __html: innerHTML }} />
+          <div class="text ${emojiOnly && 'emoji-only'}">
+            ${text}
+          </div>
           ${this.props.replyingTo ? html`
             <div><a href="/post/${encodeURIComponent(this.props.replyingTo)}">Show replied message</a></div>
           ` : ''}
