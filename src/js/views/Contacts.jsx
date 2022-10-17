@@ -32,9 +32,6 @@ class Contacts extends View {
       if (!b.name) return -1;
       return a.name.localeCompare(b.name);
     });
-    if (this.state.group !== 'everyone') {
-      _.remove(sortedKeys, k => k === iris.session.getPubKey());
-    }
     this.setState({sortedKeys});
   }
 
@@ -58,7 +55,7 @@ class Contacts extends View {
         this.contactsSub = e;
         this.shownContacts = contacts;
         for (let k in this.shownContacts) { // remove some invalid keys. TODO: why are they there?
-          if ((k.indexOf('~') === 0) || (k.length < 40)) {
+          if (!this.shownContacts[k] || (k.indexOf('~') === 0) || (k.length < 40)) {
             delete this.shownContacts[k];
           }
         }
@@ -123,6 +120,7 @@ class Contacts extends View {
           ):''}
           <Filters /><br />
           {keys.map(k => {
+            if (this.state.group !== 'everyone' && k === iris.session.getPubKey()) return;
             const contact = this.state.allContacts[k] || {};
             return (
             <div key={k} class="profile-link-container">
