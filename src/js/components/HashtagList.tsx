@@ -31,7 +31,7 @@ export default class HashtagList extends Component<Props, State> {
 
   componentDidMount() {
     const hashtags = {};
-    iris.public().get('hashtagSubscriptions').map().on(this.sub(
+    iris.public().get('hashtagSubscriptions').map(this.sub(
       (isSubscribed: boolean, hashtag: string) => {
         if (hashtag.indexOf('~') === 0) { return; }
         if (isSubscribed) {

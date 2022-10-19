@@ -24,6 +24,7 @@ class Footer extends Component<Props, State> {
     iris.local().get('unseenMsgsTotal').on(this.inject());
     iris.local().get('activeRoute').on(this.sub(
       activeRoute => {
+        if (typeof activeRoute !== 'string') return;
         const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
         const chatId = replaced.length < activeRoute.length ? replaced : null;
         this.setState({activeRoute, chatId});

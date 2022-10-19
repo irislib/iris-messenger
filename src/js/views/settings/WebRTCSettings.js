@@ -32,10 +32,10 @@ export default class WebRTCSettings extends Component {
         this.setState({local});
       }
     }));
-    iris.public().get('webPushSubscriptions').map().on(this.sub(
+    iris.public().get('webPushSubscriptions').map(this.sub(
       () => this.setState({webPushSubscriptions: iris.notifications.webPushSubscriptions})
     ));
-    iris.public().get('block').map().on(this.sub(
+    iris.public().get('block').map(this.sub(
       (v,k) => {
         blockedUsers[k] = v;
         this.setState({blockedUsers});

@@ -29,7 +29,7 @@ class Follows extends View {
   }, 1000, {leading: false});
 
   getFollows() {
-    iris.public(this.props.id).get('follow').map().on(this.sub(
+    iris.public(this.props.id).get('follow').map(this.sub(
       (follows, pub) => {
         if (follows && !this.follows.has(pub)) {
           this.follows.add(pub);

@@ -457,7 +457,7 @@ class Profile extends View {
 
   getProfileDetails() {
     const pub = this.props.id;
-    iris.public(pub).get('follow').map().on(this.sub(
+    iris.public(pub).get('follow').map(this.sub(
       (following,key) => {
         if (following) {
           this.followedUsers.add(key);

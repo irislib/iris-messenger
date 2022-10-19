@@ -182,7 +182,7 @@ class Store extends View {
   }
 
   getProductsFromUser(user) {
-    iris.public(user).get('store').get('products').map().on(this.sub(
+    iris.public(user).get('store').get('products').map(this.sub(
       (...args) => {
         return this.onProduct(...args, user);
       }, `${user  }products`

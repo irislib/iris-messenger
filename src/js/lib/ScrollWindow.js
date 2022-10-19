@@ -21,8 +21,8 @@ class ScrollWindow {
     this.unsubscribe();
 
     const subscribe = params => {
-      // this.node.get({ '.': params}).map().on((val, key, a, eve) => { // TODO: broken in gun?
-      this.node.map().on((val, key, a, eve) => {
+      // this.node.get({ '.': params}).map((val, key, a, eve) => { // TODO: broken in gun?
+      this.node.map((val, key, a, eve) => {
         if (params['-']) {
           this.downSubscription = eve;
         } else {

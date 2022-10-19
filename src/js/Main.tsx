@@ -192,7 +192,6 @@ class Main extends Component<Props,ReactState> {
         </section>
         <MediaPlayer/>
         <Footer/>
-        <VideoCall/>
       </div>
     );
   }

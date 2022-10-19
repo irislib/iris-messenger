@@ -41,7 +41,7 @@ export default class BlockedSettings extends Component {
         this.setState({local});
       }
     }));
-    iris.public().get('block').map().on(this.sub(
+    iris.public().get('block').map(this.sub(
       (v,k) => {
         blockedUsers[k] = v;
         this.setState({blockedUsers});

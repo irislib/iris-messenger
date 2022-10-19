@@ -54,7 +54,7 @@ class ChatList extends Component {
     iris.local().get('scrollUp').on(this.sub(
       () => Helpers.animateScrollTop('.chat-list')
     ));
-    iris.public().get('hashtagSubscriptions').map().on(this.sub(
+    iris.public().get('hashtagSubscriptions').map(this.sub(
       (isSubscribed, hashtag) => {
         if (isSubscribed) {
           hashtags[hashtag] = true;
