@@ -1,18 +1,20 @@
+import Helmet from 'react-helmet';
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
+
 import FeedMessageForm from '../components/FeedMessageForm';
-import MessageFeed from '../components/MessageFeed';
 import Filters from '../components/Filters';
+import MessageFeed from '../components/MessageFeed';
+import OnboardingNotification from '../components/OnboardingNotification';
+import SubscribeHashtagButton from '../components/SubscribeHashtagButton';
+
 import View from './View';
-import SubscribeHashtagButton from "../components/SubscribeHashtagButton";
-import Helmet from 'react-helmet';
-import OnboardingNotification from "../components/OnboardingNotification";
 
 class Feed extends View {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = {sortedMessages: [], group: "follows"};
+    this.state = { sortedMessages: [], group: 'follows' };
     this.messages = {};
     this.id = 'message-view';
     this.class = 'public-messages-view';
@@ -20,7 +22,7 @@ class Feed extends View {
 
   search() {
     const searchTerm = this.props.term && this.props.term.toLowerCase();
-    this.setState({searchTerm});
+    this.setState({ searchTerm });
   }
 
   componentDidUpdate(prevProps) {
@@ -39,7 +41,7 @@ class Feed extends View {
 
   filter(msg) {
     if (this.state.searchTerm) {
-      return msg.text && (msg.text.toLowerCase().indexOf(this.state.searchTerm) > -1);
+      return msg.text && msg.text.toLowerCase().indexOf(this.state.searchTerm) > -1;
     }
     return true;
   }
@@ -56,28 +58,43 @@ class Feed extends View {
       <div class="centered-container">
         <div style="display:flex;flex-direction:row">
           <div style="flex:3;width: 100%">
-            ${hashtag ? html`
-              <${Helmet}>
-                  <title>${hashtagText}</title>
-                  <meta property="og:title" content="${hashtagText} | Iris" />
-              <//>
-              <h3>${hashtagText} <span style="float:right"><${SubscribeHashtagButton} key=${hashtag} id=${hashtag} /></span></h3>
-            ` : ''}
-            ${s.searchTerm ? '' : html`
-              <${FeedMessageForm} key="form${path}" index=${path} class="hidden-xs" autofocus=${false}/>
-            `}
-            ${s.searchTerm ? html`<h2>Search results for "${s.searchTerm}"</h2>` : html`
-              <${OnboardingNotification} />
-            `}
-            ${!s.noFollows ? html`<${Filters}/>` : ''}
+            ${hashtag
+              ? html`
+                  <${Helmet}>
+                    <title>${hashtagText}</title>
+                    <meta property="og:title" content="${hashtagText} | Iris" />
+                  <//>
+                  <h3>
+                    ${hashtagText}
+                    <span style="float:right"
+                      ><${SubscribeHashtagButton} key=${hashtag} id=${hashtag}
+                    /></span>
+                  </h3>
+                `
+              : ''}
+            ${s.searchTerm
+              ? ''
+              : html`
+                  <${FeedMessageForm}
+                    key="form${path}"
+                    index=${path}
+                    class="hidden-xs"
+                    autofocus=${false}
+                  />
+                `}
+            ${s.searchTerm
+              ? html`<h2>Search results for "${s.searchTerm}"</h2>`
+              : html` <${OnboardingNotification} /> `}
+            ${!s.noFollows ? html`<${Filters} />` : ''}
             <${MessageFeed}
-                    scrollElement=${this.scrollElement.current}
-                    hashtag=${hashtag}
-                    filter=${s.searchTerm && (m => this.filter(m))}
-                    thumbnails=${this.props.thumbnails}
-                    key=${hashtag || this.props.index || 'feed'}
-                    group=${this.state.group}
-                    path=${path} />
+              scrollElement=${this.scrollElement.current}
+              hashtag=${hashtag}
+              filter=${s.searchTerm && ((m) => this.filter(m))}
+              thumbnails=${this.props.thumbnails}
+              key=${hashtag || this.props.index || 'feed'}
+              group=${this.state.group}
+              path=${path}
+            />
           </div>
         </div>
       </div>

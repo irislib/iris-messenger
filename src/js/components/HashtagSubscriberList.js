@@ -1,8 +1,10 @@
-import Component from '../BaseComponent';
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
-import Name from './Name';
+
+import Component from '../BaseComponent';
+
 import Identicon from './Identicon';
+import Name from './Name';
 
 export default class HashtagSubscriberList extends Component {
   constructor() {
@@ -11,12 +13,13 @@ export default class HashtagSubscriberList extends Component {
   }
 
   componentDidMount() {
-    iris.group().on(`hashtagSubscriptions/${this.props.hashtag}`, this.sub(
-      (isSubscribed, hashtag, a, b, from) => {
+    iris.group().on(
+      `hashtagSubscriptions/${this.props.hashtag}`,
+      this.sub((isSubscribed, hashtag, a, b, from) => {
         isSubscribed ? this.subs.add(from) : this.subs.delete(from);
         this.setState({});
-      }
-    ));
+      }),
+    );
   }
 
   shouldComponentUpdate() {
@@ -26,23 +29,27 @@ export default class HashtagSubscriberList extends Component {
   render() {
     const subs = Array.from(this.subs);
     return html`
-      ${subs.length ? html`
-        <div class="msg hashtag-list">
-          <div class="msg-content">
-            #${this.props.hashtag} subscribers (${subs.length})<br/><br/>
-              
-            ${subs.map(k =>
-              html`
-                <a href="/profile/${k}">
-                  <span class="text">
-                    <${Identicon} key="i${k}" str=${k} width=30 activity=${true}/> <${Name} pub=${k} key="t${k}" />
-                  </span>
-                </a>
-              `
-            )}
-          </div>
-        </div>
-      `:''}
+      ${subs.length
+        ? html`
+            <div class="msg hashtag-list">
+              <div class="msg-content">
+                #${this.props.hashtag} subscribers (${subs.length})<br /><br />
+
+                ${subs.map(
+                  (k) =>
+                    html`
+                      <a href="/profile/${k}">
+                        <span class="text">
+                          <${Identicon} key="i${k}" str=${k} width="30" activity=${true} />
+                          <${Name} pub=${k} key="t${k}" />
+                        </span>
+                      </a>
+                    `,
+                )}
+              </div>
+            </div>
+          `
+        : ''}
     `;
   }
 }

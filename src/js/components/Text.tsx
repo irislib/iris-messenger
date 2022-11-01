@@ -1,7 +1,7 @@
-import Component from '../BaseComponent';
 import iris from 'iris-lib';
+import { createRef, JSX, RefObject } from 'preact';
 
-import {createRef, RefObject, JSX} from "preact";
+import Component from '../BaseComponent';
 
 type Props = {
   json?: boolean;
@@ -24,22 +24,29 @@ class Text extends Component<Props, State> {
     super();
     this.ref = createRef();
     this.eventListeners = {};
-    this.state = {value: '', class: ''};
+    this.state = { value: '', class: '' };
   }
 
   componentDidMount() {
-    this.getNode().on(this.sub(value => {
-      if (!(this.ref.current && this.ref.current === document.activeElement)) {
-        this.setState({value, class: typeof value === 'string' ? '' : 'iris-non-string'});
-      }
-    }));
+    this.getNode().on(
+      this.sub((value) => {
+        if (!(this.ref.current && this.ref.current === document.activeElement)) {
+          this.setState({
+            value,
+            class: typeof value === 'string' ? '' : 'iris-non-string',
+          });
+        }
+      }),
+    );
   }
 
   getParsedValue(s: string): string {
     if (this.props.json) {
       try {
         s = JSON.parse(s);
-      } catch (e) { null; }
+      } catch (e) {
+        null;
+      }
     }
     return s;
   }
@@ -50,26 +57,34 @@ class Text extends Component<Props, State> {
     if (user) {
       base = base.user(user);
     }
-    this.setState({editable: !user || user === iris.session.getPubKey()});
+    this.setState({ editable: !user || user === iris.session.getPubKey() });
     const path = this.props.path.split('/');
-    return path.reduce((sum, current) => (current && sum.get(decodeURIComponent(current))) || sum, base);
+    return path.reduce(
+      (sum, current) => (current && sum.get(decodeURIComponent(current))) || sum,
+      base,
+    );
   }
 
   onInput(e: JSX.TargetedEvent<HTMLSpanElement>) {
     const val = this.getParsedValue(e.currentTarget.innerText);
     this.getNode().put(val);
-    this.setState({class: typeof val === 'string' ? '' : 'iris-non-string'});
+    this.setState({ class: typeof val === 'string' ? '' : 'iris-non-string' });
   }
 
   render() {
     const val = this.props.json ? JSON.stringify(this.state.value) : this.state.value;
-    return this.state.editable
-      ? (
-        <span class={this.state.class} ref={this.ref} contentEditable onInput={e => this.onInput(e)}>
-            {val}
-        </span>
-      )
-      : val;
+    return this.state.editable ? (
+      <span
+        class={this.state.class}
+        ref={this.ref}
+        contentEditable
+        onInput={(e) => this.onInput(e)}
+      >
+        {val}
+      </span>
+    ) : (
+      val
+    );
   }
 }
 

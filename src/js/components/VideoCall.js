@@ -1,11 +1,12 @@
-import { Component } from 'preact';
 import { html } from 'htm/preact';
-import { route } from 'preact-router';
-import $ from 'jquery';
-
-import {translate as t} from '../translations/Translation';
-
 import iris from 'iris-lib';
+import $ from 'jquery';
+import noop from 'lodash/noop';
+import { Component } from 'preact';
+import { route } from 'preact-router';
+
+import { translate as t } from '../translations/Translation';
+
 import Button from './basic/Button';
 
 const ringSound = new Audio('../../assets/audio/ring.mp3');
@@ -19,7 +20,9 @@ let userMediaStream;
 let ourIceCandidates;
 
 let localStorageIce = localStorage.getItem('rtcConfig');
-let DEFAULT_RTC_CONFIG = {iceServers: [ { urls: ["stun:turn.hepic.tel"] }, { urls: ["stun:stun.l.google.com:19302"] } ]};
+let DEFAULT_RTC_CONFIG = {
+  iceServers: [{ urls: ['stun:turn.hepic.tel'] }, { urls: ['stun:stun.l.google.com:19302'] }],
+};
 let RTC_CONFIG = localStorageIce ? JSON.parse(localStorageIce) : DEFAULT_RTC_CONFIG;
 
 function getRTCConfig() {
@@ -43,27 +46,36 @@ class VideoCall extends Component {
     /*iris.local().get('call').open(call => {
       this.onCallMessage(call.pub, call.call);
     });*/
-    iris.local().get('incomingCall').on(incomingCall => {
-      if (!incomingCall) {
-        clearTimeout(callTimeout);
-        ringSound.pause();
-        ringSound.currentTime = 0;
-        incomingCallNotification && incomingCallNotification.close();
-      } else {
-        if (this.state.activeCall) return;
-        ringSound.play().catch(() => {});
-        this.notifyIfNotVisible(incomingCall, t('incoming_call'));
-      }
-      this.setState({incomingCall});
-    });
-    iris.local().get('activeCall').on(activeCall => {
-      this.setState({activeCall})
-      this.stopCalling();
-    });
-    iris.local().get('outgoingCall').on(outgoingCall => {
-      outgoingCall && this.onCallUser(outgoingCall);
-      this.setState({outgoingCall});
-    });
+    iris
+      .local()
+      .get('incomingCall')
+      .on((incomingCall) => {
+        if (!incomingCall) {
+          clearTimeout(callTimeout);
+          ringSound.pause();
+          ringSound.currentTime = 0;
+          incomingCallNotification && incomingCallNotification.close();
+        } else {
+          if (this.state.activeCall) return;
+          ringSound.play().catch(noop);
+          this.notifyIfNotVisible(incomingCall, t('incoming_call'));
+        }
+        this.setState({ incomingCall });
+      });
+    iris
+      .local()
+      .get('activeCall')
+      .on((activeCall) => {
+        this.setState({ activeCall });
+        this.stopCalling();
+      });
+    iris
+      .local()
+      .get('outgoingCall')
+      .on((outgoingCall) => {
+        outgoingCall && this.onCallUser(outgoingCall);
+        this.setState({ outgoingCall });
+      });
   }
 
   async answerCall(pub) {
@@ -81,7 +93,7 @@ class VideoCall extends Component {
         return;
       }
       if (call.offer) {
-        if (iris.private(pub).rejectedTime && (new Date() - iris.private(pub).rejectedTime < 5000)) {
+        if (iris.private(pub).rejectedTime && new Date() - iris.private(pub).rejectedTime < 5000) {
           this.rejectCall(pub);
           return;
         }
@@ -95,15 +107,15 @@ class VideoCall extends Component {
   }
 
   notifyIfNotVisible(pub, text) {
-     if (document.visibilityState !== 'visible') {
+    if (document.visibilityState !== 'visible') {
       incomingCallNotification = new Notification(iris.private(pub).name, {
         icon: '/assets/img/icon128.png',
         body: text,
         requireInteraction: true,
-        silent: true
+        silent: true,
       });
-      incomingCallNotification.onclick = function() {
-        route(`/chat/${  pub}`);
+      incomingCallNotification.onclick = function () {
+        route(`/chat/${pub}`);
         window.focus();
       };
     }
@@ -128,22 +140,22 @@ class VideoCall extends Component {
     }
     if (iris.private(pub)) {
       iris.private(pub).pc && iris.private(pub).pc.close();
-      iris.private(pub).pc = null;      
+      iris.private(pub).pc = null;
     }
   }
 
   async addStreamToPeerConnection(pc) {
     let constraints = {
       audio: true,
-      video: true
+      video: true,
     };
     userMediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-    userMediaStream.getTracks().forEach(track => {
+    userMediaStream.getTracks().forEach((track) => {
       pc.addTrack(track, userMediaStream);
     });
     const localVideo = $('#localvideo');
     localVideo[0].srcObject = userMediaStream;
-    localVideo[0].onloadedmetadata = function() {
+    localVideo[0].onloadedmetadata = function () {
       localVideo[0].muted = true;
       localVideo[0].play();
     };
@@ -155,15 +167,18 @@ class VideoCall extends Component {
   }
 
   async onCallUser(pub, video = true) {
-    if (this.state.outgoingCall) { return; }
+    if (this.state.outgoingCall) {
+      return;
+    }
 
     await this.initConnection(true, pub);
     console.log('calling', pub);
-    let call = () => iris.private(pub).put('call', {
-      time: new Date().toISOString(),
-      type: video ? 'video' : 'voice',
-      offer: true,
-    });
+    let call = () =>
+      iris.private(pub).put('call', {
+        time: new Date().toISOString(),
+        type: video ? 'video' : 'voice',
+        offer: true,
+      });
     callingInterval = setInterval(call, 1000);
     call();
     callSound.addEventListener('ended', () => this.timeoutPlayCallSound());
@@ -181,7 +196,7 @@ class VideoCall extends Component {
   }
 
   stopUserMedia() {
-    userMediaStream.getTracks().forEach(track => track.stop());
+    userMediaStream.getTracks().forEach((track) => track.stop());
   }
 
   stopCalling() {
@@ -219,12 +234,14 @@ class VideoCall extends Component {
     await this.addStreamToPeerConnection(chat.pc);
     async function createOfferFn() {
       try {
-        if (chat.isNegotiating) { return; }
+        if (chat.isNegotiating) {
+          return;
+        }
         chat.isNegotiating = true;
         let offer = await chat.pc.createOffer();
         chat.pc.setLocalDescription(offer);
         console.log('sending our sdp', offer);
-        chat.put('sdp', {time: new Date().toISOString(), data: offer});
+        chat.put('sdp', { time: new Date().toISOString(), data: offer });
       } finally {
         chat.isNegotiating = false;
       }
@@ -232,59 +249,76 @@ class VideoCall extends Component {
     if (createOffer) {
       await createOfferFn();
     }
-    chat.onTheir('sdp', async sdp => {
+    chat.onTheir('sdp', async (sdp) => {
       console.log('got their sdp', sdp);
-      if (!chat.pc) { console.log(1); return; }
-      if (createOffer && chat.pc.signalingState === 'stable') { console.log(2); return; }
-      if (sdp.data && sdp.time && new Date(sdp.time).getTime() < (new Date() - 5000)) { console.log(3); return; }
+      if (!chat.pc) {
+        console.log(1);
+        return;
+      }
+      if (createOffer && chat.pc.signalingState === 'stable') {
+        console.log(2);
+        return;
+      }
+      if (sdp.data && sdp.time && new Date(sdp.time).getTime() < new Date() - 5000) {
+        console.log(3);
+        return;
+      }
       chat.pc.setRemoteDescription(new RTCSessionDescription(sdp.data));
       console.log(4);
     });
-    chat.onTheir('icecandidates', c => {
+    chat.onTheir('icecandidates', (c) => {
       console.log('got their icecandidates', c);
-      if (!chat.pc || chat.pc.signalingState === 'closed') { return; }
-      if (c.data && c.time && new Date(c.time).getTime() < (new Date() - 5000)) { return; }
-      Object.keys(c.data).forEach(k => {
+      if (!chat.pc || chat.pc.signalingState === 'closed') {
+        return;
+      }
+      if (c.data && c.time && new Date(c.time).getTime() < new Date() - 5000) {
+        return;
+      }
+      Object.keys(c.data).forEach((k) => {
         if (theirIceCandidateKeys.indexOf(k) === -1) {
           theirIceCandidateKeys.push(k);
           chat.pc.addIceCandidate(new RTCIceCandidate(c.data[k])).then(console.log, console.error);
         }
       });
     });
-    chat.pc.onicecandidate = chat.pc.onicecandidate || (({candidate}) => {
-      if (!candidate) return;
-      console.log('sending our ice candidate');
-      let i = btoa(Math.random().toString()).slice(0, 12);
-      ourIceCandidates[i] = candidate;
-      chat.put('icecandidates', {time: new Date().toISOString(), data: ourIceCandidates});
-    });
+    chat.pc.onicecandidate =
+      chat.pc.onicecandidate ||
+      (({ candidate }) => {
+        if (!candidate) return;
+        console.log('sending our ice candidate');
+        let i = btoa(Math.random().toString()).slice(0, 12);
+        ourIceCandidates[i] = candidate;
+        chat.put('icecandidates', {
+          time: new Date().toISOString(),
+          data: ourIceCandidates,
+        });
+      });
     if (createOffer) {
       chat.pc.onnegotiationneeded = async () => {
         createOfferFn();
       };
     }
     chat.pc.onsignalingstatechange = async () => {
-      if (!chat.pc) { return; }
-      console.log(
-        `Signaling State Change:${  chat.pc}`,
-        chat.pc.signalingState
-      );
+      if (!chat.pc) {
+        return;
+      }
+      console.log(`Signaling State Change:${chat.pc}`, chat.pc.signalingState);
       switch (chat.pc.signalingState) {
-        case "have-remote-offer": {
+        case 'have-remote-offer': {
           const answer = await chat.pc.createAnswer({
             offerToReceiveAudio: 1,
-            offerToReceiveVideo: 1
+            offerToReceiveVideo: 1,
           });
           chat.pc.setLocalDescription(answer);
-          chat.put('sdp', {time: new Date().toISOString(), data: answer});
+          chat.put('sdp', { time: new Date().toISOString(), data: answer });
           break;
         }
-        case "stable":
+        case 'stable':
           this.stopCalling();
           console.log('call answered by', pub);
           iris.local().get('activeCall').put(pub);
           break;
-        case "closed":
+        case 'closed':
           console.log("Signalling state is 'closed'");
           this.callClosed(pub);
           break;
@@ -293,22 +327,22 @@ class VideoCall extends Component {
     chat.pc.onconnectionstatechange = () => {
       console.log('iceConnectionState changed', chat.pc.iceConnectionState);
       switch (chat.pc.iceConnectionState) {
-        case "connected":
+        case 'connected':
           break;
-        case "disconnected":
+        case 'disconnected':
           this.callClosed(pub);
           break;
-        case "new":
+        case 'new':
           //this.callClosed(pub);
           break;
-        case "failed":
+        case 'failed':
           this.callClosed(pub);
           break;
-        case "closed":
+        case 'closed':
           this.callClosed(pub);
           break;
         default:
-          console.log("Change of state", chat.pc.iceConnectionState);
+          console.log('Change of state', chat.pc.iceConnectionState);
           break;
       }
     };
@@ -317,7 +351,7 @@ class VideoCall extends Component {
       const remoteVideo = $('#remotevideo');
       if (remoteVideo[0].srcObject !== event.streams[0]) {
         remoteVideo[0].srcObject = event.streams[0];
-        remoteVideo[0].onloadedmetadata = function() {
+        remoteVideo[0].onloadedmetadata = function () {
           console.log('metadata loaded');
           remoteVideo[0].play();
         };
@@ -327,39 +361,74 @@ class VideoCall extends Component {
   }
 
   render() {
-    const resizeButton = html`<span style="cursor:pointer;margin-left:15px;font-size:2em;position:absolute;left:0;top:0" onClick=${() => this.setState({maximized: !this.state.maximized})}>${this.state.maximized ? '-' : '+'}</span>`;
+    const resizeButton = html`<span
+      style="cursor:pointer;margin-left:15px;font-size:2em;position:absolute;left:0;top:0"
+      onClick=${() => this.setState({ maximized: !this.state.maximized })}
+      >${this.state.maximized ? '-' : '+'}</span
+    >`;
     const width = this.state.maximized ? '100%' : '400px';
     const height = this.state.maximized ? '100%' : '400px';
     const bottom = this.state.maximized ? '0' : '70px';
-    const localVideo = html`<video id="localvideo" autoplay="true" playsinline="true" style="width:50%;max-height:60%" />`;
-    const remoteVideo = html`<video id="remotevideo" autoplay="true" playsinline="true" style="width:50%;max-height:60%" />`;
+    const localVideo = html`<video
+      id="localvideo"
+      autoplay="true"
+      playsinline="true"
+      style="width:50%;max-height:60%"
+    />`;
+    const remoteVideo = html`<video
+      id="remotevideo"
+      autoplay="true"
+      playsinline="true"
+      style="width:50%;max-height:60%"
+    />`;
 
     if (this.state.activeCall) {
-      return html`
-      <div id="active-call" style="position: fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; max-width: 100%; text-align: center; background: #000; color: #fff; padding: 15px 0">
+      return html` <div
+        id="active-call"
+        style="position: fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; max-width: 100%; text-align: center; background: #000; color: #fff; padding: 15px 0"
+      >
         <div style="margin-bottom:5px;position:relative;height:50px;">
-          ${resizeButton}
-          ${t('on_call_with')} ${iris.private(this.state.activeCall) && iris.private(this.state.activeCall).name}
+          ${resizeButton} ${t('on_call_with')}
+          ${iris.private(this.state.activeCall) && iris.private(this.state.activeCall).name}
         </div>
-        ${localVideo}
-        ${remoteVideo}
-        <${Button} style="display:block;margin:15px auto" onClick=${() => this.endCall(this.state.activeCall)}>End call<//>
+        ${localVideo} ${remoteVideo}
+        <${Button}
+          style="display:block;margin:15px auto"
+          onClick=${() => this.endCall(this.state.activeCall)}
+          >End call<//
+        >
       </div>`;
     } else if (this.state.outgoingCall) {
-      return html`<div id="outgoing-call" style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px">
+      return html`<div
+        id="outgoing-call"
+        style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px"
+      >
         ${t('calling')} ${iris.private(this.state.outgoingCall).name}
-        <${Button} onClick=${() => this.cancelCall(this.state.outgoingCall)} style="display:block; margin: 15px auto">
+        <${Button}
+          onClick=${() => this.cancelCall(this.state.outgoingCall)}
+          style="display:block; margin: 15px auto"
+        >
           ${t('cancel')}
         <//>
-        ${localVideo}
-        ${remoteVideo}
+        ${localVideo} ${remoteVideo}
       </div>`;
     } else if (this.state.incomingCall) {
       return html`
-        <div id="incoming-call" style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px 0">
+        <div
+          id="incoming-call"
+          style="position:fixed; right:0; bottom: ${bottom}; height:${height}; width: ${width}; text-align: center; background: #000; color: #fff; padding: 15px 0"
+        >
           Incoming call from ${iris.private(this.state.incomingCall).name}
-          <${Button} style="display:block; margin: 15px auto" onClick=${() => this.answerCall(this.state.incomingCall)}>${t('answer')}<//>
-          <${Button} style="display:block; margin: 15px auto" onClick=${() => this.rejectCall(this.state.incomingCall)}>${t('reject')}<//>
+          <${Button}
+            style="display:block; margin: 15px auto"
+            onClick=${() => this.answerCall(this.state.incomingCall)}
+            >${t('answer')}<//
+          >
+          <${Button}
+            style="display:block; margin: 15px auto"
+            onClick=${() => this.rejectCall(this.state.incomingCall)}
+            >${t('reject')}<//
+          >
         </div>
       `;
     }
@@ -367,9 +436,4 @@ class VideoCall extends Component {
 }
 
 export default VideoCall;
-export {
-  RTC_CONFIG,
-  DEFAULT_RTC_CONFIG,
-  setRTCConfig,
-  getRTCConfig
-};
+export { RTC_CONFIG, DEFAULT_RTC_CONFIG, setRTCConfig, getRTCConfig };

@@ -1,38 +1,45 @@
-import Component from '../BaseComponent';
-import { createRef } from 'preact';
-import Helpers from '../Helpers';
+import { Helmet } from 'react-helmet';
 import { html } from 'htm/preact';
-import { translate as tr } from '../translations/Translation';
-import $ from 'jquery';
 import iris from 'iris-lib';
-import Icons from '../Icons';
-import {Helmet} from 'react-helmet';
+import $ from 'jquery';
+import { createRef } from 'preact';
 
-const isOfType = (f, types) => types.indexOf(f.name.slice(-4))  !== -1;
-const isVideo = f => isOfType(f, ['webm', '.mp4', '.ogg']);
-const isAudio = f => isOfType(f, ['.mp3', '.wav', '.m4a']);
-const isImage = f => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
+import Component from '../BaseComponent';
+import Helpers from '../Helpers';
+import Icons from '../Icons';
+import { translate as tr } from '../translations/Translation';
+
+const isOfType = (f, types) => types.indexOf(f.name.slice(-4)) !== -1;
+const isVideo = (f) => isOfType(f, ['webm', '.mp4', '.ogg']);
+const isAudio = (f) => isOfType(f, ['.mp3', '.wav', '.m4a']);
+const isImage = (f) => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class Torrent extends Component {
   coverRef = createRef();
-  state = { settings: {}};
+  state = { settings: {} };
 
   componentDidMount() {
-    iris.local().get('player').on(this.sub(
-      (player) => {
-        this.player = player;
-        this.setState({player});
-        if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
-          const file = this.getActiveFile(this.torrent);
-          file && this.openFile(file);
-        }
-      }
-    ));
+    iris
+      .local()
+      .get('player')
+      .on(
+        this.sub((player) => {
+          this.player = player;
+          this.setState({ player });
+          if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
+            const file = this.getActiveFile(this.torrent);
+            file && this.openFile(file);
+          }
+        }),
+      );
     const showFiles = this.props.showFiles;
-    showFiles && this.setState({showFiles});
+    showFiles && this.setState({ showFiles });
     iris.local().get('settings').on(this.inject());
     (async () => {
-      if (this.props.standalone || (await iris.local().get('settings').get('enableWebtorrent').once())) {
+      if (
+        this.props.standalone ||
+        (await iris.local().get('settings').get('enableWebtorrent').once())
+      ) {
         this.startTorrenting();
       }
     })();
@@ -51,7 +58,7 @@ class Torrent extends Component {
   }
 
   async startTorrenting(clicked) {
-    this.setState({torrenting: true});
+    this.setState({ torrenting: true });
     const torrentId = this.props.torrentId;
     const { default: AetherTorrent } = await import('aether-torrent');
     const client = new AetherTorrent();
@@ -65,12 +72,12 @@ class Torrent extends Component {
 
   playAudio(filePath, e) {
     e && e.preventDefault();
-    iris.local().get('player').put({torrentId: this.props.torrentId, filePath, paused: false});
+    iris.local().get('player').put({ torrentId: this.props.torrentId, filePath, paused: false });
   }
 
   pauseAudio(e) {
     e && e.preventDefault();
-    iris.local().get('player').put({paused: true});
+    iris.local().get('player').put({ paused: true });
   }
 
   openFile(file, clicked) {
@@ -91,7 +98,7 @@ class Torrent extends Component {
     if (!isVid) {
       splitPath = file.path.split('/');
     }
-    this.setState({activeFilePath: file.path, splitPath, isAudioOpen: isAud});
+    this.setState({ activeFilePath: file.path, splitPath, isAudioOpen: isAud });
     let autoplay, muted;
     if (clicked) {
       autoplay = true;
@@ -106,7 +113,7 @@ class Torrent extends Component {
       this.playAudio(file.path);
     }
     if (!isAud) {
-      file.appendTo(el.get(0), {autoplay, muted});
+      file.appendTo(el.get(0), { autoplay, muted });
     }
     if (isVid && this.props.autopause) {
       const vid = base.find('video').get(0);
@@ -118,10 +125,10 @@ class Torrent extends Component {
             vid.pause();
           }
         });
-      }
+      };
       const options = {
-        rootMargin: "0px",
-        threshold: [0.25, 0.75]
+        rootMargin: '0px',
+        threshold: [0.25, 0.75],
       };
       this.observer = new IntersectionObserver(handlePlay, options);
       this.observer.observe(vid);
@@ -140,10 +147,10 @@ class Torrent extends Component {
 
   getNextIndex(typeCheck) {
     const files = this.state.torrent.files;
-    const currentIndex = files.findIndex(f => f.path === this.state.activeFilePath);
+    const currentIndex = files.findIndex((f) => f.path === this.state.activeFilePath);
     let nextIndex = files.findIndex((f, i) => i > currentIndex && typeCheck(f));
     if (nextIndex === -1) {
-      nextIndex = files.findIndex(f => typeCheck(f));
+      nextIndex = files.findIndex((f) => typeCheck(f));
     }
     if (nextIndex === -1) {
       nextIndex = currentIndex;
@@ -160,7 +167,7 @@ class Torrent extends Component {
     const p = this.player;
     let file;
     if (p && p.torrentId === this.props.torrentId) {
-      file = torrent.files.find(f => {
+      file = torrent.files.find((f) => {
         return f.path === p.filePath;
       });
     }
@@ -168,37 +175,41 @@ class Torrent extends Component {
   }
 
   onTorrent(torrent, clicked) {
-    if (!this.coverRef.current) { return; }
-    this.torrent = torrent;
-    if (!torrent.files) {
-      console.error("no files found in torrent:", torrent);
+    if (!this.coverRef.current) {
       return;
     }
-    const video = torrent.files.find(f => isVideo(f));
-    const audio = torrent.files.find(f => isAudio(f));
-    const img = torrent.files.find(f => isImage(f));
+    this.torrent = torrent;
+    if (!torrent.files) {
+      console.error('no files found in torrent:', torrent);
+      return;
+    }
+    const video = torrent.files.find((f) => isVideo(f));
+    const audio = torrent.files.find((f) => isAudio(f));
+    const img = torrent.files.find((f) => isImage(f));
 
     const file = this.getActiveFile(torrent) || video || audio || img || torrent.files[0];
-    this.setState({torrent, cover: img});
+    this.setState({ torrent, cover: img });
     file && this.openFile(file, clicked);
 
-    let poster = torrent.files.find(f => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1));
+    let poster = torrent.files.find(
+      (f) => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1),
+    );
     poster = poster || img;
     if (poster) {
       poster.appendTo(this.coverRef.current);
       if (this.props.standalone && this.isUserAgentCrawler()) {
         const imgEl = this.coverRef.current.firstChild;
         imgEl.onload = async () => {
-          const blob = await fetch(imgEl.src).then(r => r.blob());
-          Helpers.getBase64(blob).then(src => this.setOgImageUrl(src));
-        }
+          const blob = await fetch(imgEl.src).then((r) => r.blob());
+          Helpers.getBase64(blob).then((src) => this.setOgImageUrl(src));
+        };
       }
     }
   }
 
   showFilesClicked(e) {
     e.preventDefault();
-    this.setState({showFiles: !this.state.showFiles});
+    this.setState({ showFiles: !this.state.showFiles });
   }
 
   openTorrentClicked(e) {
@@ -213,61 +224,71 @@ class Torrent extends Component {
     const playing = p && p.torrentId === this.props.torrentId && !p.paused;
     let playButton = '';
     if (s.isAudioOpen) {
-      playButton = playing ? html`
-          <a href="#" onClick=${e => this.pauseAudio(e)}>${Icons.pause}</a>
-      `: html`
-          <a href="#" onClick=${e => this.playAudio(s.activeFilePath, e)}>${Icons.play}</a>
-      `;
+      playButton = playing
+        ? html` <a href="#" onClick=${(e) => this.pauseAudio(e)}>${Icons.pause}</a> `
+        : html`
+            <a href="#" onClick=${(e) => this.playAudio(s.activeFilePath, e)}>${Icons.play}</a>
+          `;
     }
     return html`
-      ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>`:''}
+      ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>` : ''}
       <div class="cover" ref=${this.coverRef} style=${s.isAudioOpen ? '' : 'display:none'}></div>
       <div class="info">
-          ${s.splitPath ? s.splitPath.map(
-            (str, i) => {
+        ${s.splitPath
+          ? s.splitPath.map((str, i) => {
               if (i === s.splitPath.length - 1) {
                 if (s.isAudioOpen) {
                   str = str.split('.').slice(0, -1).join('.');
                 }
                 return html`<p><b>${str}</b></p>`;
               }
-                return html`<p>${str}</p>`
-
-            }
-          ):''}
+              return html`<p>${str}</p>`;
+            })
+          : ''}
       </div>
-      ${s.hasNext ? html`<b>prev</b>`:''}
-      <div class="player">
-          ${playButton}
-      </div>
-      ${s.hasNext ? html`<b>next</b>`:''}
-      ${(this.props.standalone || this.props.preview) ? html`
-        <a href=${this.props.torrentId}>Magnet link</a>
-        ${t && t.files ? html`
-            <a href="" style="margin-left:30px;" onClick=${e => this.showFilesClicked(e)}>${tr(
-              s.showFiles ? 'hide_files' : 'show_files'
-            )}</a>
-        `:''}
-      ` : html`
-          <a href="/torrent/${encodeURIComponent(this.props.torrentId)}">${tr('show_files')}</a>
-      `}
-      ${s.showFiles && t && t.files ? html`
-        <p>${tr('peers')}: ${t.numPeers}</p>
-        <div class="flex-table details">
-          ${t.files.map(f => html`
-            <div onClick=${() => this.openFile(f, true)} class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}">
-                <div class="flex-cell">${f.name}</div>
-                <div class="flex-cell no-flex">${Helpers.formatBytes(f.length)}</div>
+      ${s.hasNext ? html`<b>prev</b>` : ''}
+      <div class="player">${playButton}</div>
+      ${s.hasNext ? html`<b>next</b>` : ''}
+      ${this.props.standalone || this.props.preview
+        ? html`
+            <a href=${this.props.torrentId}>Magnet link</a>
+            ${t && t.files
+              ? html`
+                  <a href="" style="margin-left:30px;" onClick=${(e) => this.showFilesClicked(e)}
+                    >${tr(s.showFiles ? 'hide_files' : 'show_files')}</a
+                  >
+                `
+              : ''}
+          `
+        : html`
+            <a href="/torrent/${encodeURIComponent(this.props.torrentId)}">${tr('show_files')}</a>
+          `}
+      ${s.showFiles && t && t.files
+        ? html`
+            <p>${tr('peers')}: ${t.numPeers}</p>
+            <div class="flex-table details">
+              ${t.files.map(
+                (f) => html`
+                  <div
+                    onClick=${() => this.openFile(f, true)}
+                    class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}"
+                  >
+                    <div class="flex-cell">${f.name}</div>
+                    <div class="flex-cell no-flex">${Helpers.formatBytes(f.length)}</div>
+                  </div>
+                `,
+              )}
             </div>
-          `)}
-        </div>
-      ` : ''}
+          `
+        : ''}
     `;
   }
 
   renderMeta() {
     const s = this.state;
-    const title = s.splitPath && s.splitPath[s.splitPath.length - 1].split('.').slice(0, -1).join('.') || 'File sharing';
+    const title =
+      (s.splitPath && s.splitPath[s.splitPath.length - 1].split('.').slice(0, -1).join('.')) ||
+      'File sharing';
     const ogTitle = `${title} | Iris`;
     const description = 'Shared files';
     const ogType = s.isAudioOpen ? 'music:song' : 'video.movie';
@@ -285,12 +306,16 @@ class Torrent extends Component {
 
   render() {
     return html`
-        <div class="torrent">
-            ${this.props.standalone ? this.renderMeta() : ''}
-            ${!this.state.settings.enableWebtorrent && !this.state.settings.torrenting && !this.props.standalone ? html`
-              <a href="" onClick=${e => this.openTorrentClicked(e)}>${tr('show_attachment')}</a>
-            `: this.renderLoadingTorrent()}
-        </div>
+      <div class="torrent">
+        ${this.props.standalone ? this.renderMeta() : ''}
+        ${!this.state.settings.enableWebtorrent &&
+        !this.state.settings.torrenting &&
+        !this.props.standalone
+          ? html`
+              <a href="" onClick=${(e) => this.openTorrentClicked(e)}>${tr('show_attachment')}</a>
+            `
+          : this.renderLoadingTorrent()}
+      </div>
     `;
   }
 }

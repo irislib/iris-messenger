@@ -8,14 +8,13 @@
     "module": "es2020",
     "moduleResolution": "node",
     "skipLibCheck": true,
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
       "react": ["./node_modules/preact/compat/"],
-      "react-dom": ["./node_modules/preact/compat/"]
-    }
+      "react-dom": ["./node_modules/preact/compat/"],
+      "*": ["./types/*"]
+    },
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "exclude": [
-    "tests/**/*.ts",
-    "iris-lib/test/*.ts"
-  ]
+  "exclude": ["node_modules", "tests/**/*.ts", "iris-lib/test/*.ts"]
 }

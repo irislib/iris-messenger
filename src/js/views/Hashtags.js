@@ -1,7 +1,9 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
+
 import Filters from '../components/Filters';
-import {translate as t} from '../translations/Translation';
+import { translate as t } from '../translations/Translation';
+
 import View from './View';
 
 export default class Hashtags extends View {
@@ -20,16 +22,16 @@ export default class Hashtags extends View {
       <div class="centered-container">
         <h3>${t('hashtags')}</h3>
         <${Filters} />
-        ${Object.keys(this.hashtags).length === 0 ? html`
-            <p>No hashtags yet</p>
-        `:''}
-        ${Object.keys(this.hashtags).sort().map(hashtag => {
-          return html`
-            <p>
+        ${Object.keys(this.hashtags).length === 0 ? html` <p>No hashtags yet</p> ` : ''}
+        ${Object.keys(this.hashtags)
+          .sort()
+          .map((hashtag) => {
+            return html`
+              <p>
                 <a href="/hashtag/${hashtag}">#${hashtag}</a>
-            </p>
-          `;
-        })}
+              </p>
+            `;
+          })}
       </div>
     `;
   }

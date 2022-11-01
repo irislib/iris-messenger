@@ -1,5 +1,6 @@
-import Component from '../BaseComponent';
 import iris from 'iris-lib';
+
+import Component from '../BaseComponent';
 
 type Props = {
   pub: string;

@@ -1,7 +1,7 @@
+import iris from 'iris-lib';
 
 import Component from '../../BaseComponent';
-import {translate as t} from '../../translations/Translation';
-import iris from 'iris-lib';
+import { translate as t } from '../../translations/Translation';
 
 export default class BetaSettings extends Component {
   constructor() {
@@ -9,26 +9,45 @@ export default class BetaSettings extends Component {
     this.state = iris.session.DEFAULT_SETTINGS;
     this.state.webPushSubscriptions = {};
     this.state.blockedUsers = {};
-    this.id = "settings";
+    this.id = 'settings';
   }
 
   render() {
     return (
-        <>
+      <>
         <div class="centered-container">
-        <h3>Show beta features</h3>
-        <p><input type="checkbox" checked={this.state.local.showBetaFeatures} onChange={() => iris.local().get('settings').get('showBetaFeatures').put(!this.state.local.showBetaFeatures)} id="showBetaFeatures" /><label for="showBetaFeatures">{t('show_beta_features')}</label></p>
+          <h3>{t('show_beta_features')}</h3>
+          <p>
+            <input
+              type="checkbox"
+              checked={this.state.local.showBetaFeatures}
+              onChange={() =>
+                iris
+                  .local()
+                  .get('settings')
+                  .get('showBetaFeatures')
+                  .put(!this.state.local.showBetaFeatures)
+              }
+              id="showBetaFeatures"
+            />
+            <label for="showBetaFeatures">{t('show_beta_features')}</label>
+          </p>
         </div>
-        </>
+      </>
     );
   }
   componentDidMount() {
     iris.electron && iris.electron.get('settings').on(this.inject('electron', 'electron'));
-    iris.local().get('settings').on(this.sub(local => {
-      console.log('local settings', local);
-      if (local) {
-        this.setState({local});
-      }
-    }));
+    iris
+      .local()
+      .get('settings')
+      .on(
+        this.sub((local) => {
+          console.log('local settings', local);
+          if (local) {
+            this.setState({ local });
+          }
+        }),
+      );
   }
 }

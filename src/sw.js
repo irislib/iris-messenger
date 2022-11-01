@@ -1,28 +1,22 @@
 import SEA from 'gun/sea';
 import localforage from 'localforage';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
-import { registerRoute } from 'workbox-routing';
-import {StaleWhileRevalidate, NetworkOnly} from 'workbox-strategies';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
+import { registerRoute } from 'workbox-routing';
+import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies';
 
 const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
-	maxRetentionTime: 14 * 24 * 60
+  maxRetentionTime: 14 * 24 * 60,
 });
 
 registerRoute(
   ({ request }) => request.method === 'POST',
-	new NetworkOnly({
-		plugins: [bgSyncPlugin]
-	})
+  new NetworkOnly({
+    plugins: [bgSyncPlugin],
+  }),
 );
-registerRoute(
-  ({ url }) => url.pathname === '/peer_id',
-	new NetworkOnly()
-);
-registerRoute(
-  () => location.host.indexOf('localhost') !== 0,
-  new StaleWhileRevalidate()
-);
+registerRoute(({ url }) => url.pathname === '/peer_id', new NetworkOnly());
+registerRoute(() => location.host.indexOf('localhost') !== 0, new StaleWhileRevalidate());
 setupRouting();
 
 const urlsToCache = getFiles();
@@ -48,24 +42,25 @@ self.addEventListener('message', (msg) => {
 });
 
 function getOpenClient(event) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     event.waitUntil(
-      self.clients.matchAll({
-        type: "window",
-        includeUncontrolled: true
-      })
-      .then((clientList) => {
-        for (let i = 0; i < clientList.length; i++) {
-          let client = clientList[i];
-          return resolve(client);
-        }
-        resolve(null);
-      })
+      self.clients
+        .matchAll({
+          type: 'window',
+          includeUncontrolled: true,
+        })
+        .then((clientList) => {
+          for (let i = 0; i < clientList.length; i++) {
+            let client = clientList[i];
+            return resolve(client);
+          }
+          resolve(null);
+        }),
     );
   });
 }
 
-self.addEventListener('push', async ev => {
+self.addEventListener('push', async (ev) => {
   console.log('Got push', ev);
   if (!self.irisKey) {
     await getSavedKey();

@@ -1,27 +1,33 @@
 # Iris
+
 Iris is like the social networking apps we're used to, but better.
-* No phone number or signup required. Just type in your name or alias and go!
-* Secure: It's open source. Users can validate that big brother doesn't read your private messages.
-* Available: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.
+
+- No phone number or signup required. Just type in your name or alias and go!
+- Secure: It's open source. Users can validate that big brother doesn't read your private messages.
+- Available: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.
 
 ![Screenshot](screenshot.png)
 
 ## Use
+
 Browser application: [iris.to](https://iris.to)
-* No installation required
-* Progressive web app
-  * Use offline
-  * Save as an app to home screen or desktop
+
+- No installation required
+- Progressive web app
+  - Use offline
+  - Save as an app to home screen or desktop
 
 Desktop application: ([download](https://github.com/irislib/iris-electron/releases), [source code](https://github.com/irislib/iris-electron)):
-* Communicate and synchronize with local network peers without Internet access
-  * When local peers eventually connect to the Internet, your messages are relayed globally
-  * Bluetooth support upcoming
-* Opens to background on login: stay online and get message notifications!
-* More secure and available: no need to open the browser application from a server.
+
+- Communicate and synchronize with local network peers without Internet access
+  - When local peers eventually connect to the Internet, your messages are relayed globally
+  - Bluetooth support upcoming
+- Opens to background on login: stay online and get message notifications!
+- More secure and available: no need to open the browser application from a server.
 
 ## Develop
-``` bash
+
+```bash
 # install dependencies
 yarn
 
@@ -41,6 +47,7 @@ yarn test
 [iris-lib](https://github.com/irislib/iris-lib) is a core part of the application. You can clone it and run `yarn link` in the iris-lib directory. Then run `yarn link iris-lib` in the iris-messenger directory.
 
 ## Privacy
+
 The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.
 
 Private messages are end-to-end encrypted, but message timestamps and the number of chats aren't. In a decentralized network this information is potentially available to anyone.
@@ -52,6 +59,7 @@ In that regard, Iris prioritizes decentralization and availability over perfect 
 Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.
 
 ## Contact
+
 Join our [Discord](https://discord.gg/4CJc74JEUY) (will be moved onto Iris when group chat is ready) or send me a message on [Iris](https://iris.to/?chatWith=hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU&s=HlzYzNrhUsrn2PLi4yuRt6DiFUNM3hOmN8nFpgw6T-g&k=zvDfsInsMOI1).
 
 ---

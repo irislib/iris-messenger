@@ -1,39 +1,42 @@
-import { PureComponent } from 'preact/compat';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { PureComponent } from 'react';
+import type { GunCallbackOn, GunSchema, IGunOnEvent } from 'gun';
 
-type EL = {
-  off: Function;
-};
+type EL = IGunOnEvent;
 
 type OwnState = {
   ogImageUrl?: any;
 };
 
-export default abstract class BaseComponent<Props = {}, State = {}> extends PureComponent<Props, State & OwnState> {
+export default abstract class BaseComponent<Props = any, State = any> extends PureComponent<
+  Props,
+  State & OwnState
+> {
   unmounted?: boolean;
 
   eventListeners: Record<string, EL | undefined> = {};
 
-  sub(callback: Function, path?: string) {
-    return (v: unknown, k: string, x: unknown, e: EL | undefined, f: unknown) => {
+  sub(callback: CallableFunction, path?: string): GunCallbackOn<GunSchema, string> {
+    return (data, key, message, event): void => {
       if (this.unmounted) {
-        e && e.off();
+        event && event.off();
         return;
       }
-      this.eventListeners[path ?? k] = e;
-      callback(v,k,x,e,f);
-    }
+      this.eventListeners[path ?? key] = event;
+      callback(data, key, message, event);
+    };
   }
 
-  inject(name?: string, path?: string) {
+  inject(name?: string, path?: string): GunCallbackOn<GunSchema, string> {
     return this.sub((v: unknown, k: string) => {
-      const newState: Partial<State> = {};
+      const newState: any = {};
       newState[(name ?? k) as keyof State] = v as any;
       this.setState(newState);
     }, path);
   }
 
   unsubscribe() {
-    Object.keys(this.eventListeners).forEach(k => {
+    Object.keys(this.eventListeners).forEach((k) => {
       const l = this.eventListeners[k];
       l && l.off();
       delete this.eventListeners[k];
@@ -48,10 +51,12 @@ export default abstract class BaseComponent<Props = {}, State = {}> extends Pure
   isUserAgentCrawler() {
     // return true; // for testing
     const ua = navigator.userAgent.toLowerCase();
-    return (ua.indexOf('prerender') !== -1 ||
+    return (
+      ua.indexOf('prerender') !== -1 ||
       ua.indexOf('whatsapp') !== -1 ||
       ua.indexOf('crawl') !== -1 ||
-      ua.indexOf('bot') !== -1);
+      ua.indexOf('bot') !== -1
+    );
   }
 
   async setOgImageUrl(imgSrc?: string) {
@@ -66,10 +71,12 @@ export default abstract class BaseComponent<Props = {}, State = {}> extends Pure
         const { default: pica } = await import('./lib/pica.min');
         await pica().resize(image, resizedCanvas);
         const ogImage = resizedCanvas.toDataURL('image/jpeg', 0.1);
-        const ogImageUrl = `https://iris-base64-decoder.herokuapp.com/?s=${encodeURIComponent(ogImage)}`;
+        const ogImageUrl = `https://iris-base64-decoder.herokuapp.com/?s=${encodeURIComponent(
+          ogImage,
+        )}`;
         console.log(ogImageUrl);
-        this.state.ogImageUrl
-        this.setState({ogImageUrl});
+        this.state.ogImageUrl;
+        this.setState({ ogImageUrl });
       };
       image.src = imgSrc;
     }

@@ -9,6 +9,6 @@ const SafeImg = (props: Props) => {
     props.src = '';
   }
   return <img {...props} />;
-}
+};
 
 export default SafeImg;
