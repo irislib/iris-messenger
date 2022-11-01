@@ -16,7 +16,7 @@ class Name extends Component<Props, State> {
   }
 
   render() {
-    return this.state.name ?? this.props.placeholder ?? '';
+    return this.state.name ?? this.props.placeholder ?? this.props.pub ?? '';
   }
 }
 
