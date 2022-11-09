@@ -92,6 +92,7 @@ class PublicMessage extends Message {
       if (this.props.showName && !this.props.name) {
         iris.public(msg.info.from).get('profile').get('name').on(this.inject());
       }
+
       iris.group().on(
         `likes/${encodeURIComponent(this.props.hash)}`,
         this.sub((liked, a, b, e, from) => {

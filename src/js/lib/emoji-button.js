@@ -2352,7 +2352,7 @@
         key: 'disableEventListeners',
         value: function disableEventListeners$$1() {
           return disableEventListeners.call(this);
-        }
+        },
         /**
          * Schedules an update. It will run on the next UI update available.
          * @method scheduleUpdate
@@ -2373,7 +2373,7 @@
          * @deprecated since version 1.8
          * @member Utils
          * @memberof Popper
-         */,
+         */
       },
     ]);
     return Popper;

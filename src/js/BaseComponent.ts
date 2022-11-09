@@ -17,14 +17,16 @@ export default abstract class BaseComponent<Props = any, State = any> extends Pu
   eventListeners: Record<string, EL | undefined> = {};
 
   sub(callback: CallableFunction, path?: string): GunCallbackOn<GunSchema, string> {
-    return (data, key, message, event): void => {
+    const cb = (data, key, message, event, f): void => {
       if (this.unmounted) {
         event && event.off();
         return;
       }
       this.eventListeners[path ?? key] = event;
-      callback(data, key, message, event);
+      callback(data, key, message, event, f);
     };
+
+    return cb as any;
   }
 
   inject(name?: string, path?: string): GunCallbackOn<GunSchema, string> {
