@@ -11,7 +11,7 @@ import Icons from '../Icons';
 import {Link} from "preact-router/match";
 
 import $ from 'jquery';
-import _ from "lodash";
+//import _ from "lodash";
 
 class Header extends Component {
   constructor() {
@@ -107,7 +107,7 @@ class Header extends Component {
   }
 
   updatePeersFromGun() {
-    return;
+    /*
     const peersFromGun = iris.global().back('opt.peers') || {};
     const connectedPeers = _.filter(Object.values(peersFromGun), (peer) => {
       if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
@@ -116,6 +116,7 @@ class Header extends Component {
       return peer && peer.wire && peer.wire.readyState === 1  && peer.wire.bufferedAmount === 0 && peer.wire.constructor.name === 'WebSocket';
     });
     this.setState({connectedPeers});
+     */
   }
 
   render() {

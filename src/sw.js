@@ -1,9 +1,9 @@
-import SEA from 'gun/sea';
 import localforage from 'localforage';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { registerRoute } from 'workbox-routing';
 import {StaleWhileRevalidate, NetworkOnly} from 'workbox-strategies';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
+import iris from 'iris-lib';
 
 const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
 	maxRetentionTime: 14 * 24 * 60
@@ -78,11 +78,11 @@ self.addEventListener('push', async ev => {
   const fromSelf = (data.from && data.from.pub) === self.irisKey.pub; // always allow notifs from self
   if (!fromSelf && client && client.visibilityState === 'visible') return;
   //console.log(self.irisKey, data.from, data.from.epub);
-  if (self.irisKey && data.from && data.from.epub && SEA) {
+  if (self.irisKey && data.from && data.from.epub) {
     // TODO we should also do a signature check here
-    const secret = await SEA.secret(data.from.epub, self.irisKey);
-    data.title = await SEA.decrypt(data.title, secret);
-    data.body = await SEA.decrypt(data.body, secret);
+    const secret = await iris.Key.secret(data.from.epub, self.irisKey);
+    data.title = await iris.Key.decrypt(data.title, secret);
+    data.body = await iris.Key.decrypt(data.body, secret);
   }
   if (data.title && data.title.indexOf('SEA{') === 0) {
     data.title = '';
