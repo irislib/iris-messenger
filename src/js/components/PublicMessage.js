@@ -261,7 +261,7 @@ class PublicMessage extends Message {
             </a>
             <span class="count" onClick=${() => this.setState({showLikes: !s.showLikes})}>
               ${s.likes || ''}
-            </span> 
+            </span>
             <div class="time">
               <a href="/post/${encodeURIComponent(this.props.hash)}" class="tooltip">
                   ${Helpers.getRelativeTimeText(time)}
