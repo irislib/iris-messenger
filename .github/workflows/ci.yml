@@ -11,7 +11,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
-          cache: "yarn"
+          cache: 'yarn'
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Build
@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
-          cache: "yarn"
+          cache: 'yarn'
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Lint
@@ -37,7 +37,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
-          cache: "yarn"
+          cache: 'yarn'
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Test

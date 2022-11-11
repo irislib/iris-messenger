@@ -1,13 +1,15 @@
 import { html } from 'htm/preact';
+
 import View from '../View';
+
 import ChatList from './ChatList';
-import PrivateChat from './PrivateChat';
 import HashtagChat from './HashtagChat';
+import PrivateChat from './PrivateChat';
 
 class Chat extends View {
   constructor() {
     super();
-    this.id = "chat-view";
+    this.id = 'chat-view';
   }
 
   renderView() {
@@ -18,10 +20,12 @@ class Chat extends View {
       chat = html`<${PrivateChat} id=${this.props.id} key=${this.props.id} />`;
     }
     return html`
-      <${ChatList} activeChat=${this.props.id} class=${this.props.id || this.props.hashtag ? 'hidden-xs' : ''}/>
+      <${ChatList}
+        activeChat=${this.props.id}
+        class=${this.props.id || this.props.hashtag ? 'hidden-xs' : ''}
+      />
       ${chat}
     `;
-    
   }
 }
 

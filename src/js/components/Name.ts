@@ -1,5 +1,6 @@
-import Component from '../BaseComponent';
 import iris from 'iris-lib';
+
+import Component from '../BaseComponent';
 
 type Props = {
   pub: string;
@@ -16,7 +17,7 @@ class Name extends Component<Props, State> {
   }
 
   render() {
-    return this.state.name ?? this.props.placeholder ?? '';
+    return this.state.name ?? this.props.placeholder ?? this.props.pub ?? '';
   }
 }
 

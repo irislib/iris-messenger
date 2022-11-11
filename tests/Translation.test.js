@@ -11,7 +11,7 @@ describe('Translation', () => {
 
   describe('translate', () => {
     it('should translate language_name', () => {
-      localStorage.setItem('language', 'en')
+      localStorage.setItem('language', 'en');
       expect(translate('new_user_go')).toBe('Go');
     });
 

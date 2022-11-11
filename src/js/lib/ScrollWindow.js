@@ -20,7 +20,7 @@ class ScrollWindow {
   updateSubscriptions() {
     this.unsubscribe();
 
-    const subscribe = params => {
+    const subscribe = (params) => {
       // this.node.get({ '.': params}).map().on((val, key, a, eve) => { // TODO: broken in gun?
       this.node.map().on((val, key, a, eve) => {
         if (params['-']) {
@@ -34,7 +34,7 @@ class ScrollWindow {
 
     if (this.center) {
       subscribe({ '>': this.center, '<': '\uffff' });
-      subscribe({'<': this.center, '>' : '', '-': true});
+      subscribe({ '<': this.center, '>': '', '-': true });
     } else {
       subscribe({ '<': '\uffff', '>': '', '-': this.opts.stickTo === 'top' });
     }
@@ -48,7 +48,7 @@ class ScrollWindow {
   _upOrDown(n, up) {
     this.opts.stickTo = null;
     const keys = this._getSortedKeys();
-    n = n || (keys.length / 2);
+    n = n || keys.length / 2;
     n = up ? n : -n;
     const half = Math.floor(keys.length / 2);
     const newMiddleIndex = Math.max(Math.min(half + n, keys.length - 1), 0);
@@ -86,7 +86,7 @@ class ScrollWindow {
     const add = () => {
       this.elements.set(key, val);
       this.sortedKeys = [...this.elements.keys()].sort();
-      const sortedElements = this.sortedKeys.map(k => this.elements.get(k));
+      const sortedElements = this.sortedKeys.map((k) => this.elements.get(k));
       this.opts.onChange && this.opts.onChange(sortedElements, this.elements);
     };
     const keys = this._getSortedKeys();
@@ -100,7 +100,7 @@ class ScrollWindow {
         this.elements.delete(keys[keys.length - 1]);
         add();
       } else if (this.center) {
-        if (keys.indexOf(this.center) < (keys.length / 2)) {
+        if (keys.indexOf(this.center) < keys.length / 2) {
           if (key < keys[keys.length - 1]) {
             this.elements.delete(keys[keys.length - 1]);
             add();

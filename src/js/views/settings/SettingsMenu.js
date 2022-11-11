@@ -1,14 +1,15 @@
-import Component from '../../BaseComponent';
-import {translate as t} from '../../translations/Translation';
-import { route } from 'preact-router';
+import { html } from 'htm/preact';
 import iris from 'iris-lib';
-import Helpers from "../../Helpers";
-import {html} from "htm/preact";
+import { route } from 'preact-router';
+
+import Component from '../../BaseComponent';
+import Helpers from '../../Helpers';
+import { translate as t } from '../../translations/Translation';
 
 const SETTINGS = {
   account: 'account',
   key: 'private_key',
-  peer: 'peer',
+  peer: 'peers',
   language: 'language',
   webtorrent: 'webtorrent',
   webrtc: 'webRTC',
@@ -16,9 +17,8 @@ const SETTINGS = {
   blocked: 'blocked_users',
 };
 
-export default class SettingsMenu extends Component{
-
-  menuLinkClicked(url,e) {
+export default class SettingsMenu extends Component {
+  menuLinkClicked(url, e) {
     e.preventDefault();
     iris.local().get('toggleSettingsMenu').put(false);
     iris.local().get('scrollUp').put(true);
@@ -28,21 +28,25 @@ export default class SettingsMenu extends Component{
   render() {
     const activePage = this.props.activePage || 'account';
     return (
-    <>
-      <div className={!this.props.activePage ? 'settings-list' : 'settings-list hidden-xs' }>
-      {Helpers.isElectron ? html`<div class="electron-padding"/>` : html`
-        <h3 class="visible-xs-block" style="padding: 0px 15px;">${t('settings')}</h3>
-      `}
-      {Object.keys(SETTINGS).map(page => {
-          return (
-            <a href="#" class={(activePage === page && window.innerWidth > 624) ? 'active' : ''} onClick={e => this.menuLinkClicked(page,e)} key={page}>
-              <span class="text">{t(SETTINGS[page])}</span>
-            </a>
-          );
-        }
-      )}
-      </div>
-    </>  
-    ); 
+      <>
+        <div className={!this.props.activePage ? 'settings-list' : 'settings-list hidden-xs'}>
+          {Helpers.isElectron
+            ? html`<div class="electron-padding" />`
+            : html` <h3 class="visible-xs-block" style="padding: 0px 15px;">${t('settings')}</h3> `}
+          {Object.keys(SETTINGS).map((page) => {
+            return (
+              <a
+                href="#"
+                class={activePage === page && window.innerWidth > 624 ? 'active' : ''}
+                onClick={(e) => this.menuLinkClicked(page, e)}
+                key={page}
+              >
+                <span class="text">{t(SETTINGS[page])}</span>
+              </a>
+            );
+          })}
+        </div>
+      </>
+    );
   }
 }

@@ -1,5 +1,6 @@
-import Component from '../BaseComponent';
 import { createRef } from 'preact';
+
+import Component from '../BaseComponent';
 import Header from '../components/Header';
 
 abstract class View extends Component {
@@ -11,12 +12,12 @@ abstract class View extends Component {
 
   render() {
     return (
-        <>
-          <Header />
-          <div ref={this.scrollElement} class={`main-view ${this.class}`} id={this.id}>
-            {this.renderView()}
-          </div>
-        </>
+      <>
+        <Header />
+        <div ref={this.scrollElement} class={`main-view ${this.class}`} id={this.id}>
+          {this.renderView()}
+        </div>
+      </>
     );
   }
 }
