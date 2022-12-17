@@ -56,6 +56,7 @@
     "webpack-build-notifier": "^2.3.0"
   },
   "dependencies": {
+    "@noble/secp256k1": "^1.7.0",
     "@walletconnect/web3-provider": "^1.8.0",
     "@zxing/library": "^0.19.1",
     "aether-torrent": "^0.3.0",

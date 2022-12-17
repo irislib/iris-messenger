@@ -6,6 +6,7 @@ import { Component } from 'preact';
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
 import { ec as EC } from 'elliptic';
+import * as secp from '@noble/secp256k1';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Web3Modal from 'web3modal';
 import Web3 from 'web3';
@@ -30,6 +31,12 @@ function arrayToBase64Url(array) {
     .replace(/=/g, '');
 }
 
+function arrayToHex(array) {
+  return Array.from(array, (byte) => {
+    return ('0' + (byte & 0xff).toString(16)).slice(-2);
+  }).join('');
+}
+
 function irisKeyPairFromHash(hash) {
   const ec = new EC('p256');
   const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
@@ -50,10 +57,11 @@ function nostrKeyPairFromHash(hash) {
   const ec = new EC('secp256k1');
   const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
 
-  let priv = keyPair.getPrivate().toString(16);
-  let pub = keyPair.getPublic().encode('hex');
+  const priv = keyPair.getPrivate().toArray('be', 32);
 
-  const kp = { pub, priv };
+  const rpub = arrayToHex(secp.schnorr.getPublicKey(priv));
+
+  const kp = { rpub, priv: priv.toString(16) };
   console.log('nostr keypair', kp);
   return kp;
 }
@@ -179,8 +187,7 @@ class Login extends Component {
     try {
       k = JSON.parse(val);
     } catch (e) {}
-    // check if hex && more than 60 chars
-    if (!k && val.length > 60 && val.length < 70 && val.match(/^[0-9a-fA-F]+$/)) {
+    if (!k && secp.utils.isValidPrivateKey(val)) {
       // it's a nostr secp256k1 private key (hex). generate iris keypair from it
       const hash1 = hexToUint8Array(val);
       const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
@@ -188,11 +195,8 @@ class Login extends Component {
       const k2 = irisKeyPairFromHash(hash2);
       k.epub = k2.pub;
       k.epriv = k2.priv;
-      // get public key from private key
-      const ec = new EC('secp256k1');
-      const keyPair = ec.keyFromPrivate(val);
-      const pub = keyPair.getPublic().encode('hex');
-      k.secp256k1 = { priv: val, pub };
+      const rpub = arrayToHex(secp.schnorr.getPublicKey(val));
+      k.secp256k1 = { priv: val, rpub };
     }
     await login(k);
     event.target.value = '';
@@ -214,8 +218,7 @@ class Login extends Component {
 
   onNameChange(event) {
     const val = event.target.value;
-    // if contains "priv" or is hex between 60 and 70 chars
-    if ((val.indexOf('"priv"') !== -1) || (val.length > 60 && val.length < 70 && val.match(/^[0-9a-fA-F]+$/))) {
+    if ((val.indexOf('"priv"') !== -1) || secp.utils.isValidPrivateKey(val)) {
       this.onPastePrivKey(event);
       event.target.value = '';
       return;
