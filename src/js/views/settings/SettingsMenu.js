@@ -10,6 +10,7 @@ const SETTINGS = {
   account: 'account',
   key: 'private_key',
   peer: 'peers',
+  nostr: 'nostr',
   language: 'language',
   webtorrent: 'webtorrent',
   webrtc: 'webRTC',

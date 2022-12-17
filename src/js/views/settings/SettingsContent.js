@@ -8,6 +8,7 @@ import LanguageSettings from './LanguageSettings';
 import PeerSettings from './PeerSettings';
 import WebRTCSettings from './WebRTCSettings';
 import WebtorrentSettings from './WebtorrentSettings';
+import NostrSettings from './NostrSettings';
 
 export default class SettingsContent extends Component {
   content = '';
@@ -15,6 +16,7 @@ export default class SettingsContent extends Component {
     account: AccountSettings,
     key: KeySettings,
     peer: PeerSettings,
+    nostr: NostrSettings,
     language: LanguageSettings,
     webtorrent: WebtorrentSettings,
     webrtc: WebRTCSettings,

@@ -10,6 +10,8 @@ import { filter } from 'lodash';
 import Button from '../../components/basic/Button';
 import { forEach } from 'lodash';
 
+import React, { useState } from 'react';
+
 export default class PeerSettings extends Component {
   updatePeersFromGunInterval = 0;
   state = iris.session.DEFAULT_SETTINGS;
