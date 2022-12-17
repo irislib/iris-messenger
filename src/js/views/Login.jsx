@@ -30,7 +30,7 @@ function arrayToBase64Url(array) {
     .replace(/=/g, '');
 }
 
-function keyPairFromHash(hash) {
+function irisKeyPairFromHash(hash) {
   const ec = new EC('p256');
   const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
 
@@ -43,6 +43,18 @@ function keyPairFromHash(hash) {
   y = arrayToBase64Url(y);
 
   const kp = { pub: `${x}.${y}`, priv: privKey };
+  return kp;
+}
+
+function nostrKeyPairFromHash(hash) {
+  const ec = new EC('secp256k1');
+  const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
+
+  let priv = keyPair.getPrivate().toString(16);
+  let pub = keyPair.getPublic().encode('hex');
+
+  const kp = { pub, priv };
+  console.log('nostr keypair', kp);
   return kp;
 }
 
@@ -92,7 +104,17 @@ function maybeGoToChat(key) {
   }
 }
 
-function login(k) {
+async function login(k) {
+  if (k.priv && !k.secp256k1) {
+    // k.priv is not hex
+    const uintArray = new Uint8Array(k.priv.length);
+    for (let i = 0; i < k.priv.length; i++) {
+      uintArray[i] = k.priv.charCodeAt(i);
+    }
+    const hash = await window.crypto.subtle.digest('SHA-256', uintArray);
+    k.secp256k1 = nostrKeyPairFromHash(hash);
+  }
+  console.log('login', k);
   iris.session.login(k);
   maybeGoToChat(k);
 }
@@ -108,15 +130,15 @@ async function ethereumLogin(name) {
     const signatureBytes = hexToUint8Array(signature.substring(2));
     const hash1 = await window.crypto.subtle.digest('SHA-256', signatureBytes);
     const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
-    const signingKey = keyPairFromHash(hash1);
-    const encryptionKey = keyPairFromHash(hash2);
+    const signingKey = irisKeyPairFromHash(hash1);
+    const encryptionKey = irisKeyPairFromHash(hash2);
     const k = {
       pub: signingKey.pub,
       priv: signingKey.priv,
       epub: encryptionKey.pub,
       epriv: encryptionKey.priv,
     };
-    login(k);
+    await login(k);
     setTimeout(async () => {
       iris
         .public()
@@ -148,19 +170,33 @@ class Login extends Component {
     this.setState({ showScanPrivKey: !this.state.showScanPrivKey });
   }
 
-  onPastePrivKey(event) {
+  async onPastePrivKey(event) {
     const val = event.target.value;
     if (!val.length) {
       return;
     }
+    let k;
     try {
-      let k = JSON.parse(val);
-      login(k);
-      event.target.value = '';
-      Helpers.copyToClipboard(''); // clear the clipboard
-    } catch (e) {
-      console.error('Login with key', val, 'failed:', e);
+      k = JSON.parse(val);
+    } catch (e) {}
+    // check if hex && more than 60 chars
+    if (!k && val.length > 60 && val.length < 70 && val.match(/^[0-9a-fA-F]+$/)) {
+      // it's a nostr secp256k1 private key (hex). generate iris keypair from it
+      const hash1 = hexToUint8Array(val);
+      const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
+      k = irisKeyPairFromHash(hash1);
+      const k2 = irisKeyPairFromHash(hash2);
+      k.epub = k2.pub;
+      k.epriv = k2.priv;
+      // get public key from private key
+      const ec = new EC('secp256k1');
+      const keyPair = ec.keyFromPrivate(val);
+      const pub = keyPair.getPublic().encode('hex');
+      k.secp256k1 = { priv: val, pub };
     }
+    await login(k);
+    event.target.value = '';
+    Helpers.copyToClipboard(''); // clear the clipboard
   }
 
   showCreateAccount(e) {
@@ -178,7 +214,8 @@ class Login extends Component {
 
   onNameChange(event) {
     const val = event.target.value;
-    if (val.indexOf('"priv"') !== -1) {
+    // if contains "priv" or is hex between 60 and 70 chars
+    if ((val.indexOf('"priv"') !== -1) || (val.length > 60 && val.length < 70 && val.match(/^[0-9a-fA-F]+$/))) {
       this.onPastePrivKey(event);
       event.target.value = '';
       return;
