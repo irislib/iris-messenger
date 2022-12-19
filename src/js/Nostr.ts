@@ -11,7 +11,7 @@ export default {
       const key = iris.session.getKey();
       this.pool.setPrivateKey(key.secp256k1.priv);
 
-      this.pool.addRelay('wss://relay.nostr.info', {read: true, write: true})
+      this.pool.addRelay('wss://relay.damus.io', {read: true, write: true})
       this.pool.addRelay('wss://nostr-pub.wellorder.net', {read: true, write: true})
 
       // example callback functions for listeners
@@ -53,7 +53,11 @@ export default {
         const updatedAt = msg.put['>'];
         if (!this.profile.name || this.profile.name.updatedAt < updatedAt) {
           this.profile.name = { value: name, updatedAt };
-          this.setMetadata({name});
+          const metadata = {name};
+          if (this.profile.about) {
+            metadata['about'] = this.profile.about.value;
+          }
+          this.setMetadata(metadata);
         }
       }, 1000));
       iris.public().get('profile').get('about').on(debounce((about, _k, msg) => {
@@ -61,7 +65,11 @@ export default {
         const updatedAt = msg.put['>'];
         if (!this.profile.about || this.profile.about.updatedAt < updatedAt) {
           this.profile.about = { value: about, updatedAt };
-          this.setMetadata({about});
+          const metadata = {about};
+          if (this.profile.name) {
+            metadata['name'] = this.profile.name.value;
+          }
+          this.setMetadata(metadata);
         }
       }, 1000));
     });

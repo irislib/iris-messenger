@@ -23,6 +23,31 @@ import { SMS_VERIFIER_PUB } from '../SMS';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
+import WalletConnectProvider from "@walletconnect/web3-provider";
+import Web3Modal from "web3modal";
+
+async function ethereumConnect() {
+  const providerOptions = {
+    walletconnect: {
+      package: WalletConnectProvider,
+      options: {
+        infuraId: '4bd8d95876de48e0b17d56c0da31880a',
+      },
+    },
+  };
+  const web3Modal = new Web3Modal({
+    network: 'mainnet',
+    providerOptions,
+    theme: 'dark',
+  });
+
+  web3Modal.on('accountsChanged', (provider) => {
+    console.log('connect', provider);
+  });
+
+  const provider = await web3Modal.connect();
+  return new Web3(provider);
+}
 
 const ImageGrid = styled.div`
   display: grid;
@@ -170,7 +195,7 @@ class Profile extends View {
 
   async connectEthereumClicked(e) {
     e.preventDefault();
-    const web3 = await iris.session.ethereumConnect();
+    const web3 = await ethereumConnect();
     const address = (await web3.eth.getAccounts())[0];
     const proof = await web3.eth.personal.sign(this.getEthIrisProofString(), address);
     iris.public().get('profile').get('eth').put({
