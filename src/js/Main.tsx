@@ -26,6 +26,8 @@ import Torrent from './views/Torrent';
 import Component from './BaseComponent';
 import Helpers from './Helpers';
 import QRScanner from './QRScanner';
+import Nostr from './Nostr';
+import { debounce } from 'lodash';
 
 import '../css/style.css';
 import '../css/cropper.min.css';
@@ -46,6 +48,7 @@ type ReactState = {
 };
 
 iris.session.init({ autologin: window.location.hash.length > 2 });
+Nostr.init();
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {
