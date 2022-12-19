@@ -6,7 +6,7 @@ export default {
   pool: null,
   init: function() {
     this.pool = relayPool();
-    setTimeout(() => {
+    iris.local().get('loggedIn').on(() => {
       const key = iris.session.getKey();
       this.pool.setPrivateKey(key.secp256k1.priv);
 
@@ -23,23 +23,20 @@ export default {
       function onEvent(event) {
         console.log('received event', event);
       }
-      console.log('subscribing to nostr events by', key.secp256k1.rpub);
-      this.pool.sub({ cb: onEvent, filter: { authors: [key.secp256k1.rpub] } });
-      console.log('Nostr', this.pool);
-      window.nostr = this.pool;
 
-      iris.local().get('loggedIn').on(() => {
+      console.log('subscribing to nostr events by', key.secp256k1.rpub);
+      this.pool.sub({cb: onEvent, filter: {authors: [key.secp256k1.rpub]}});
+      console.log('Nostr', this.pool);
+
       iris.public().get('profile').get('name').on(debounce(name => {
         console.log('set nostr name', name);
-        this.setMetadata({ name });
+        this.setMetadata({name});
       }, 1000));
       iris.public().get('profile').get('about').on(debounce(about => {
         console.log('set nostr bio', about);
-        this.setMetadata({ about });
+        this.setMetadata({about});
       }, 1000));
     });
-
-    }, 1000);
   },
 
   setMetadata(data) {
