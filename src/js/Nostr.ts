@@ -4,6 +4,7 @@ import {debounce} from "lodash";
 
 export default {
   pool: null,
+  profile: {},
   init: function() {
     this.pool = relayPool();
     iris.local().get('loggedIn').on(() => {
@@ -20,21 +21,48 @@ export default {
       //  - id: sub id for sub specific listeners ('EVENT' or 'EOSE')
       //  - event: event object, only for 'event' listener
       //  - notice: notice message, only for 'notice' listener
-      function onEvent(event) {
+
+      const onEvent = event => {
         console.log('received event', event);
+        if (event.kind === 0) {
+          try {
+            const content = JSON.parse(event.content);
+            const updatedAt = event.created_at * 1000;
+            if (content.name && (!this.profile.name || this.profile.name.updatedAt < updatedAt)) {
+              this.profile.name = { value: content.name, updatedAt };
+              iris.public().get('profile').get('name').put(content.name);
+            }
+            if (content.about && (!this.profile.about || this.profile.about.updatedAt < updatedAt)) {
+              this.profile.about = { value: content.about, updatedAt };
+              iris.public().get('profile').get('about').put(content.about);
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
       }
 
-      console.log('subscribing to nostr events by', key.secp256k1.rpub);
-      this.pool.sub({cb: onEvent, filter: {authors: [key.secp256k1.rpub]}});
-      console.log('Nostr', this.pool);
+      setTimeout(() => {
+        console.log('subscribing to nostr events by', key.secp256k1.rpub);
+        this.pool.sub({cb: onEvent, filter: {authors: [key.secp256k1.rpub]}});
+        console.log('Nostr', this.pool);
+      }, 1000);
 
-      iris.public().get('profile').get('name').on(debounce(name => {
-        console.log('set nostr name', name);
-        this.setMetadata({name});
+      iris.public().get('profile').get('name').on(debounce((name, _k, msg) => {
+        console.log('set nostr name', name, msg);
+        const updatedAt = msg.put['>'];
+        if (!this.profile.name || this.profile.name.updatedAt < updatedAt) {
+          this.profile.name = { value: name, updatedAt };
+          this.setMetadata({name});
+        }
       }, 1000));
-      iris.public().get('profile').get('about').on(debounce(about => {
-        console.log('set nostr bio', about);
-        this.setMetadata({about});
+      iris.public().get('profile').get('about').on(debounce((about, _k, msg) => {
+        console.log('set nostr bio', about, msg);
+        const updatedAt = msg.put['>'];
+        if (!this.profile.about || this.profile.about.updatedAt < updatedAt) {
+          this.profile.about = { value: about, updatedAt };
+          this.setMetadata({about});
+        }
       }, 1000));
     });
   },
