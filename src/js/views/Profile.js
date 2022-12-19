@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
 import $ from 'jquery';
@@ -7,6 +8,7 @@ import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 import styled from 'styled-components';
 import Web3 from 'web3';
+import Web3Modal from 'web3modal';
 
 import Button from '../components/basic/Button';
 import BlockButton from '../components/BlockButton';
@@ -19,12 +21,11 @@ import ProfilePhoto from '../components/ProfilePhoto';
 import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
 import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
+import Nostr from '../Nostr';
 import { SMS_VERIFIER_PUB } from '../SMS';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
-import WalletConnectProvider from "@walletconnect/web3-provider";
-import Web3Modal from "web3modal";
 
 async function ethereumConnect() {
   const providerOptions = {
@@ -600,6 +601,24 @@ class Profile extends View {
     }
   }
 
+  getNostrProfile() {
+    const pub = this.props.id;
+    Nostr.pool.sub({
+      filter: { authors: [pub] },
+      cb: (event) => {
+        console.log('event', event);
+        if (event.kind === 0 && event.pubkey === this.props.id) {
+          try {
+            const content = JSON.parse(event.content);
+            this.setState({ name: content.name, about: content.about });
+          } catch (e) {
+            console.log('error parsing nostr profile', e);
+          }
+        }
+      },
+    });
+  }
+
   getProfileDetails() {
     const pub = this.props.id;
     iris
@@ -713,7 +732,12 @@ class Profile extends View {
     let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
     iris.local().get('noFollowers').on(this.inject());
-    this.getProfileDetails();
+    // if pub is hex, it's a nostr address
+    if (pub.match(/^[0-9a-fA-F]{64}$/)) {
+      this.getNostrProfile();
+    } else {
+      this.getProfileDetails();
+    }
     if (chat) {
       $(`input[name=notificationPreference][value=${chat.notificationSetting}]`).attr(
         'checked',

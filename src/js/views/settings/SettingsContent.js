@@ -5,10 +5,10 @@ import BetaSettings from './BetaSettings';
 import BlockedSettings from './BlockedSettings';
 import KeySettings from './KeySettings';
 import LanguageSettings from './LanguageSettings';
+import NostrSettings from './NostrSettings';
 import PeerSettings from './PeerSettings';
 import WebRTCSettings from './WebRTCSettings';
 import WebtorrentSettings from './WebtorrentSettings';
-import NostrSettings from './NostrSettings';
 
 export default class SettingsContent extends Component {
   content = '';

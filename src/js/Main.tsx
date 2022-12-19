@@ -25,9 +25,8 @@ import Settings from './views/settings/Settings';
 import Torrent from './views/Torrent';
 import Component from './BaseComponent';
 import Helpers from './Helpers';
-import QRScanner from './QRScanner';
 import Nostr from './Nostr';
-import { debounce } from 'lodash';
+import QRScanner from './QRScanner';
 
 import '../css/style.css';
 import '../css/cropper.min.css';
