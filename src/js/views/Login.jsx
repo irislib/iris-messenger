@@ -5,7 +5,6 @@ import QRScanner from '../QRScanner';
 import { Component } from 'preact';
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
-import { ec as EC } from 'elliptic';
 import * as secp from '@noble/secp256k1';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Web3Modal from 'web3modal';
@@ -13,58 +12,6 @@ import Web3 from 'web3';
 import iris from 'iris-lib';
 import _ from 'lodash';
 import { route } from 'preact-router';
-
-const isHex = (maybeHex) =>
-  maybeHex.length !== 0 && maybeHex.length % 2 === 0 && !/[^a-fA-F0-9]/u.test(maybeHex);
-
-const hexToUint8Array = (hexString) => {
-  if (!isHex(hexString)) {
-    throw new Error('Not a hex string');
-  }
-  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
-};
-
-function arrayToBase64Url(array) {
-  return btoa(String.fromCharCode.apply(null, array))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
-}
-
-function arrayToHex(array) {
-  return Array.from(array, (byte) => {
-    return ('0' + (byte & 0xff).toString(16)).slice(-2);
-  }).join('');
-}
-
-function irisKeyPairFromHash(hash) {
-  const ec = new EC('p256');
-  const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
-
-  let privKey = keyPair.getPrivate().toArray('be', 32);
-  let x = keyPair.getPublic().getX().toArray('be', 32);
-  let y = keyPair.getPublic().getY().toArray('be', 32);
-
-  privKey = arrayToBase64Url(privKey);
-  x = arrayToBase64Url(x);
-  y = arrayToBase64Url(y);
-
-  const kp = { pub: `${x}.${y}`, priv: privKey };
-  return kp;
-}
-
-function nostrKeyPairFromHash(hash) {
-  const ec = new EC('secp256k1');
-  const keyPair = ec.keyFromPrivate(new Uint8Array(hash));
-
-  const priv = keyPair.getPrivate().toArray('be', 32);
-
-  const rpub = arrayToHex(secp.schnorr.getPublicKey(priv));
-
-  const kp = { rpub, priv: priv.toString(16) };
-  console.log('nostr keypair', kp);
-  return kp;
-}
 
 async function ethereumConnect() {
   const providerOptions = {
@@ -113,16 +60,6 @@ function maybeGoToChat(key) {
 }
 
 async function login(k) {
-  if (k.priv && !k.secp256k1) {
-    // k.priv is not hex
-    const uintArray = new Uint8Array(k.priv.length);
-    for (let i = 0; i < k.priv.length; i++) {
-      uintArray[i] = k.priv.charCodeAt(i);
-    }
-    const hash = await window.crypto.subtle.digest('SHA-256', uintArray);
-    k.secp256k1 = nostrKeyPairFromHash(hash);
-  }
-  console.log('login', k);
   iris.session.login(k);
   maybeGoToChat(k);
 }
@@ -136,16 +73,7 @@ async function ethereumLogin(name) {
       "I'm trusting this application with an irrevocable access key to my Iris account.";
     const signature = await web3.eth.personal.sign(message, accounts[0]);
     const signatureBytes = hexToUint8Array(signature.substring(2));
-    const hash1 = await window.crypto.subtle.digest('SHA-256', signatureBytes);
-    const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
-    const signingKey = irisKeyPairFromHash(hash1);
-    const encryptionKey = irisKeyPairFromHash(hash2);
-    const k = {
-      pub: signingKey.pub,
-      priv: signingKey.priv,
-      epub: encryptionKey.pub,
-      epriv: encryptionKey.priv,
-    };
+    const k = iris.Key.deriveFromBytes(signatureBytes);
     await login(k);
     setTimeout(async () => {
       iris
@@ -188,15 +116,7 @@ class Login extends Component {
       k = JSON.parse(val);
     } catch (e) {}
     if (!k && secp.utils.isValidPrivateKey(val)) {
-      // it's a nostr secp256k1 private key (hex). generate iris keypair from it
-      const hash1 = hexToUint8Array(val);
-      const hash2 = await window.crypto.subtle.digest('SHA-256', hash1);
-      k = irisKeyPairFromHash(hash1);
-      const k2 = irisKeyPairFromHash(hash2);
-      k.epub = k2.pub;
-      k.epriv = k2.priv;
-      const rpub = arrayToHex(secp.schnorr.getPublicKey(val));
-      k.secp256k1 = { priv: val, rpub };
+      k = await iris.Key.fromSecp256k1(val);
     }
     await login(k);
     event.target.value = '';

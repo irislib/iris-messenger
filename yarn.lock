@@ -1769,7 +1769,12 @@
   dependencies:
     eslint-scope "5.1.1"
 
-"@noble/secp256k1@^1.7.0":
+"@noble/hashes@^0.5.5", "@noble/hashes@^0.5.7":
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-0.5.9.tgz#9f3051a4cc6f7c168022b3b7fbbe9fe2a35cccf0"
+  integrity sha512-7lN1Qh6d8DUGmfN36XRsbN/WcGIPNtTGhkw26vWId/DlCIGsYJJootTtPGghTLcn/AaXPx2Q0b3cacrwXa7OVw==
+
+"@noble/secp256k1@^1.3.4", "@noble/secp256k1@^1.5.2", "@noble/secp256k1@^1.7.0":
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.7.0.tgz#d15357f7c227e751d90aa06b05a0e5cf993ba8c1"
   integrity sha512-kbacwGSsH/CTout0ZnZWxnW1B+jH/7r/WAAKLBtrRJ/+CUH7lgmQzl3GTrQua3SGKWNSDsS6lmjnDpIJ5Dxyaw==
@@ -3849,7 +3854,7 @@ browserify-aes@^1.0.0, browserify-aes@^1.0.4, browserify-aes@^1.2.0:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
-browserify-cipher@^1.0.0:
+browserify-cipher@>=1, browserify-cipher@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/browserify-cipher/-/browserify-cipher-1.0.1.tgz#8d6474c1b870bfdabcd3bcfcc1934a10e94f15f0"
   integrity sha512-sPhkz0ARKbf4rRQt2hTpAHqn47X3llLkUGn+xEJzLjwY8LRs2p0v7ljvI5EyoRO/mexrNunNECisZs+gw2zz1w==
@@ -3979,6 +3984,14 @@ buffer-xor@^1.0.3:
   resolved "https://registry.yarnpkg.com/buffer-xor/-/buffer-xor-1.0.3.tgz#26e61ed1422fb70dd42e6e36729ed51d855fe8d9"
   integrity sha512-571s0T7nZWK6vB67HI5dyUF7wXiNcfaPPPTl6zYCNApANjIvYJTg7hlud/+cJpdAhS7dVzqMLmfhfHR3rAcOjQ==
 
+buffer@>=5, buffer@^6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
+  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
+  dependencies:
+    base64-js "^1.3.1"
+    ieee754 "^1.2.1"
+
 buffer@^4.3.0:
   version "4.9.2"
   resolved "https://registry.yarnpkg.com/buffer/-/buffer-4.9.2.tgz#230ead344002988644841ab0244af8c44bbe3ef8"
@@ -3995,14 +4008,6 @@ buffer@^5.0.5, buffer@^5.4.3, buffer@^5.5.0, buffer@^5.6.0:
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
-
-buffer@^6.0.3:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
-  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
-  dependencies:
-    base64-js "^1.3.1"
-    ieee754 "^1.2.1"
 
 bufferutil@^4.0.1, bufferutil@^4.0.3:
   version "4.0.7"
@@ -9607,6 +9612,28 @@ methods@~1.1.2:
   resolved "https://registry.yarnpkg.com/methods/-/methods-1.1.2.tgz#5529a4d67654134edcc5266656835b0f851afcee"
   integrity sha512-iclAHeNqNm68zFtnZ0e+1L2yUIdvzNoauKU4WBA3VvH/vPFieF7qfRlwUZU+DA9P9bPXIS90ulxoUoCH23sV2w==
 
+micro-base@^0.10.1:
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/micro-base/-/micro-base-0.10.2.tgz#f6f9f0bd949ce511883e5a99f9147d80ddc32f5a"
+  integrity sha512-lqqJrT7lfJtDmmiQ4zRLZuIJBk96t0RAc5pCrrWpL9zDeH5i/SUL85mku9HqzTI/OCZ8EQ3aicbMW+eK5Nyu5w==
+
+micro-bip32@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/micro-bip32/-/micro-bip32-0.1.0.tgz#ca51b80eddf9e5afee5da41a2c93ba679297e84b"
+  integrity sha512-HxwYJzokbObqPHUqQuzRpCEqZ3EE4uHKrGlLX5ylt0ktD6m9LeS3RkWuQ1HApXEgrGMs3XgykN5Bic2YHE0f6Q==
+  dependencies:
+    "@noble/hashes" "^0.5.7"
+    "@noble/secp256k1" "^1.3.4"
+    micro-base "^0.10.1"
+
+micro-bip39@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/micro-bip39/-/micro-bip39-0.1.3.tgz#f0866912da588fc97e27b7315cdd484c0b43186c"
+  integrity sha512-lEaRG/MKxFQvG19lfJfPkLIG0rgT28nWud3otN+VgAbrozGqXn2PLaZuYPsy9guQjIZWBTvoLw/HDJQxmMXjMA==
+  dependencies:
+    "@noble/hashes" "^0.5.5"
+    micro-base "^0.10.1"
+
 microevent.ts@~0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/microevent.ts/-/microevent.ts-0.1.1.tgz#70b09b83f43df5172d0205a63025bce0f7357fa0"
@@ -10148,6 +10175,21 @@ normalize-url@^6.0.1:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
+
+nostr-tools@^0.24.1:
+  version "0.24.1"
+  resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-0.24.1.tgz#99f73c2ea58bb3a0e964485120f497180522fa9a"
+  integrity sha512-+aUWblwNTYra8ZsjmfzxStr4XSKAb0gPsehNP3oBiSouLevqD3FWngc++kh8l+zfMYEPPGS6kS0i9iaq/5ZF6A==
+  dependencies:
+    "@noble/hashes" "^0.5.7"
+    "@noble/secp256k1" "^1.5.2"
+    browserify-cipher ">=1"
+    buffer ">=5"
+    create-hash "^1.2.0"
+    cross-fetch "^3.1.4"
+    micro-bip32 "^0.1.0"
+    micro-bip39 "^0.1.3"
+    websocket-polyfill "^0.0.3"
 
 npm-run-path@^4.0.1:
   version "4.0.1"
@@ -13702,6 +13744,11 @@ tslib@^2.0.0, tslib@^2.4.0, tslib@^2.4.1:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
   integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
 
+tstl@^2.0.7:
+  version "2.5.13"
+  resolved "https://registry.yarnpkg.com/tstl/-/tstl-2.5.13.tgz#a5a5d27b79a12767e46a08525b3e045c5cdb1180"
+  integrity sha512-h9wayHHFI5+yqt8iau0vqH96cTNhezhZ/Fk/hrIdpfkiMu3lg9nzyvMfs5bIdX51IVzZO6DudLqhkL/rVXpT6g==
+
 tsutils@^3.21.0:
   version "3.21.0"
   resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-3.21.0.tgz#b48717d394cea6c1e096983eed58e9d61715b623"
@@ -14683,7 +14730,15 @@ websocket-extensions@>=0.1.1:
   resolved "https://registry.yarnpkg.com/websocket-extensions/-/websocket-extensions-0.1.4.tgz#7f8473bc839dfd87608adb95d7eb075211578a42"
   integrity sha512-OqedPIGOfsDlo31UNwYbCFMSaO9m9G/0faIHj5/dZFDMFqPTcx6UwqyOy3COEaEOg/9VsGIpdqn62W5KhoKSpg==
 
-websocket@^1.0.32, websocket@^1.0.34:
+websocket-polyfill@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/websocket-polyfill/-/websocket-polyfill-0.0.3.tgz#7321ada0f5f17516290ba1cb587ac111b74ce6a5"
+  integrity sha512-pF3kR8Uaoau78MpUmFfzbIRxXj9PeQrCuPepGE6JIsfsJ/o/iXr07Q2iQNzKSSblQJ0FiGWlS64N4pVSm+O3Dg==
+  dependencies:
+    tstl "^2.0.7"
+    websocket "^1.0.28"
+
+websocket@^1.0.28, websocket@^1.0.32, websocket@^1.0.34:
   version "1.0.34"
   resolved "https://registry.yarnpkg.com/websocket/-/websocket-1.0.34.tgz#2bdc2602c08bf2c82253b730655c0ef7dcab3111"
   integrity sha512-PRDso2sGwF6kM75QykIesBijKSVceR6jL2G8NGYyq2XrItNC2P5/qL5XeR056GhA+Ly7JMFvJb9I312mJfmqnQ==
