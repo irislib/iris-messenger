@@ -12,14 +12,39 @@ function arrayToHex(array: any) {
 export default {
   pool: null,
   profile: {},
-  toNostrAddress: (str) => {
+  knownAddresses: new Set<string>(),
+  followers: new Map<string, Set<string>>(),
+  follow: function(address: string) {
+    const event: any = getBlankEvent();
+    event.created_at = Math.round(Date.now() / 1000);
+    event.content = "";
+    event.pubkey = iris.session.getKey().secp256k1.rpub;
+    event.kind = 3;
+    const signature = signEvent(event, iris.session.getKey().secp256k1.priv)[0];
+    event.sig = signature;
+    console.log('publishing event', event, signature);
+    this.pool.publish(event);
+  },
+  addFollower: function (address: string, follower: string) {
+    if (!this.followers.has(address)) {
+      this.followers.set(address, new Set<string>());
+    }
+    this.followers.get(address)?.add(follower);
+  },
+  followerCount: function (address: string) {
+    return this.followers.get(address)?.size ?? 0;
+  },
+  toNostrAddress(str) {
     if (str.match(/^[0-9a-fA-F]{64}$/)) {
+      this.knownAddresses.add(str);
       return str;
     }
     try {
       const { prefix, data } = bech32.decode(str);
       if (prefix === 'npub') {
-        return arrayToHex(data);
+        const addr = arrayToHex(data);
+        this.knownAddresses.add(addr);
+        return addr;
       }
     } catch (e) {}
     return null;

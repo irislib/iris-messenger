@@ -1,6 +1,7 @@
 import iris from 'iris-lib';
 
 import Component from '../BaseComponent';
+import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import Button from './basic/Button';
@@ -30,11 +31,16 @@ class FollowButton extends Component<Props> {
     e.preventDefault();
     const value = !this.state[this.key];
     if (value && this.key === 'follow') {
-      iris.session.newChannel(this.props.id);
-      iris.public().get('block').get(this.props.id).put(false);
-      iris.notifications.sendIrisNotification(this.props.id, {
-        event: 'follow',
-      });
+      const nostrAddr = Nostr.getNostrAddr(this.props.id);
+      if (nostrAddr) {
+        Nostr.follow(nostrAddr);
+      } else {
+        iris.session.newChannel(this.props.id);
+        iris.public().get('block').get(this.props.id).put(false);
+        iris.notifications.sendIrisNotification(this.props.id, {
+          event: 'follow',
+        });
+      }
     }
     if (value && this.key === 'block') {
       iris.public().get('follow').get(this.props.id).put(false);

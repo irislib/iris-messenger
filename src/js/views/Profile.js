@@ -222,7 +222,7 @@ class Profile extends View {
             ${this.state.eth.address.slice(0, 4)}...${this.state.eth.address.slice(-4)}
           </a>
           <i> </i>
-          ${this.isMyProfile && window.ethereum
+          ${this.isMyProfile && window.ethereum && !window.nostr
             ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)`
             : ''}
           ${this.state.nfts.totalCount
@@ -602,7 +602,9 @@ class Profile extends View {
       filter: { authors: [address] },
       cb: (event) => {
         console.log('event', event);
-        if (event.pubkey === Nostr.toNostrAddress(this.props.id)) {
+        const nostrAddress = Nostr.toNostrAddress(this.props.id);
+        if (event.pubkey === nostrAddress) {
+          this.setState({ followerCount: Nostr.followerCount(nostrAddress) });
           if (event.kind === 0) {
             try {
               const content = JSON.parse(event.content);
@@ -613,6 +615,7 @@ class Profile extends View {
           } else if (event.kind === 3 && Array.isArray(event.tags)) {
             for (let tag of event.tags) {
               if (Array.isArray(tag) && tag[0] === 'p') {
+                Nostr.addFollower(tag[1], nostrAddress);
                 this.followedUsers.add(tag[1]);
                 this.setState({ followedUserCount: this.followedUsers.size });
               }
