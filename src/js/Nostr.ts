@@ -13,12 +13,17 @@ export default {
   pool: null,
   profile: {},
   knownAddresses: new Set<string>(),
+  followedUsers: new Set<string>(),
   followers: new Map<string, Set<string>>(),
   follow: function(address: string) {
+    this.followedUsers.add(address);
     const event: any = getBlankEvent();
     event.created_at = Math.round(Date.now() / 1000);
     event.content = "";
     event.pubkey = iris.session.getKey().secp256k1.rpub;
+    event.tags = Array.from(this.followedUsers).map((address: string) => {
+      return ["p", address];
+    });
     event.kind = 3;
     const signature = signEvent(event, iris.session.getKey().secp256k1.priv)[0];
     event.sig = signature;
@@ -34,7 +39,7 @@ export default {
   followerCount: function (address: string) {
     return this.followers.get(address)?.size ?? 0;
   },
-  toNostrAddress(str) {
+  toNostrAddress(str: string) {
     if (str.match(/^[0-9a-fA-F]{64}$/)) {
       this.knownAddresses.add(str);
       return str;
@@ -88,6 +93,13 @@ export default {
               }
             } catch (e) {
               console.error(e);
+            }
+          } else if (event.kind === 3) {
+            for (const tag of event.tags) {
+              if (tag[0] === 'p') {
+                this.addFollower(tag[1], event.pubkey);
+                this.followedUsers.add(tag[1]);
+              }
             }
           }
         };
