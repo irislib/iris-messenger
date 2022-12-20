@@ -222,7 +222,7 @@ class Profile extends View {
             ${this.state.eth.address.slice(0, 4)}...${this.state.eth.address.slice(-4)}
           </a>
           <i> </i>
-          ${this.isMyProfile
+          ${this.isMyProfile && window.ethereum
             ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)`
             : ''}
           ${this.state.nfts.totalCount
@@ -232,7 +232,7 @@ class Profile extends View {
       `;
     }
 
-    if (this.isMyProfile) {
+    if (this.isMyProfile && window.ethereum) {
       return html`
         <p>
           <a href="#" onClick=${(e) => this.connectEthereumClicked(e)}
