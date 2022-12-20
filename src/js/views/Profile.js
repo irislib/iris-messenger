@@ -252,11 +252,7 @@ class Profile extends View {
         placeholder=${this.props.id}
         callback=${(src) => this.onProfilePhotoSet(src)}
       />`;
-    } else if (
-      this.state.photo &&
-      !this.state.blocked &&
-      this.state.photo.indexOf('data:image') === 0
-    ) {
+    } else if (this.state.photo && !this.state.blocked) {
       profilePhoto = html`<${ProfilePhoto} photo=${this.state.photo} />`;
     } else {
       profilePhoto = html`<${Identicon}
@@ -609,7 +605,7 @@ class Profile extends View {
         if (event.kind === 0 && event.pubkey === Nostr.toNostrAddress(this.props.id)) {
           try {
             const content = JSON.parse(event.content);
-            this.setState({ name: content.name, about: content.about });
+            this.setState({ name: content.name, about: content.about, photo: content.picture });
           } catch (e) {
             console.log('error parsing nostr profile', e);
           }

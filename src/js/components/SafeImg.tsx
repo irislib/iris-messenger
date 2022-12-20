@@ -6,7 +6,7 @@ type Props = {
 
 const SafeImg = (props: Props) => {
   if (props.src && props.src.indexOf('data:image') !== 0) {
-    props.src = '';
+    props.src = `https://proxy.irismessengers.wtf/insecure/plain/${props.src}`;
   }
   return <img {...props} />;
 };
