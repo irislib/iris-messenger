@@ -602,12 +602,21 @@ class Profile extends View {
       filter: { authors: [address] },
       cb: (event) => {
         console.log('event', event);
-        if (event.kind === 0 && event.pubkey === Nostr.toNostrAddress(this.props.id)) {
-          try {
-            const content = JSON.parse(event.content);
-            this.setState({ name: content.name, about: content.about, photo: content.picture });
-          } catch (e) {
-            console.log('error parsing nostr profile', e);
+        if (event.pubkey === Nostr.toNostrAddress(this.props.id)) {
+          if (event.kind === 0) {
+            try {
+              const content = JSON.parse(event.content);
+              this.setState({ name: content.name, about: content.about, photo: content.picture });
+            } catch (e) {
+              console.log('error parsing nostr profile', e);
+            }
+          } else if (event.kind === 3 && Array.isArray(event.tags)) {
+            for (let tag of event.tags) {
+              if (Array.isArray(tag) && tag[0] === 'p') {
+                this.followedUsers.add(tag[1]);
+                this.setState({ followedUserCount: this.followedUsers.size });
+              }
+            }
           }
         }
       },
