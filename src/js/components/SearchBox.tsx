@@ -4,6 +4,7 @@ import isEqual from 'lodash/isEqual';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
+import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import Identicon from './Identicon';
@@ -168,6 +169,9 @@ class SearchBox extends Component<Props, State> {
       const key = Helpers.getUrlParameter('chatWith', s[1]);
       if (key) {
         return this.props.onSelect({ key });
+      }
+      if (Nostr.toNostrAddress(query)) {
+        return this.props.onSelect({ key: query });
       }
     }
     if (Helpers.followChatLink(query)) return;

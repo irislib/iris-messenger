@@ -18,13 +18,10 @@ export default {
     }
     try {
       const { prefix, data } = bech32.decode(str);
-      console.log('nostr', prefix, data);
       if (prefix === 'npub') {
         return arrayToHex(data);
       }
-    } catch (e) {
-      console.log('nostr', e);
-    }
+    } catch (e) {}
     return null;
   },
   init: function () {
