@@ -601,13 +601,12 @@ class Profile extends View {
     }
   }
 
-  getNostrProfile() {
-    const pub = this.props.id;
+  getNostrProfile(address) {
     Nostr.pool.sub({
-      filter: { authors: [pub] },
+      filter: { authors: [address] },
       cb: (event) => {
         console.log('event', event);
-        if (event.kind === 0 && event.pubkey === this.props.id) {
+        if (event.kind === 0 && event.pubkey === Nostr.toNostrAddress(this.props.id)) {
           try {
             const content = JSON.parse(event.content);
             this.setState({ name: content.name, about: content.about });
@@ -733,8 +732,10 @@ class Profile extends View {
     qrCodeEl.empty();
     iris.local().get('noFollowers').on(this.inject());
     // if pub is hex, it's a nostr address
-    if (pub.match(/^[0-9a-fA-F]{64}$/)) {
-      this.getNostrProfile();
+    const nostrAddr = Nostr.toNostrAddress(pub);
+    console.log('nostrAddr', nostrAddr);
+    if (nostrAddr) {
+      this.getNostrProfile(nostrAddr);
     } else {
       this.getProfileDetails();
     }

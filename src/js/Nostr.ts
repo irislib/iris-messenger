@@ -1,10 +1,32 @@
 import iris from 'iris-lib';
 import { debounce } from 'lodash';
 import { getBlankEvent, relayPool, signEvent } from 'nostr-tools';
+const bech32 = require('bech32-buffer');
+
+function arrayToHex(array: any) {
+  return Array.from(array, (byte: any) => {
+    return ('0' + (byte & 0xff).toString(16)).slice(-2);
+  }).join('');
+}
 
 export default {
   pool: null,
   profile: {},
+  toNostrAddress: (str) => {
+    if (str.match(/^[0-9a-fA-F]{64}$/)) {
+      return str;
+    }
+    try {
+      const { prefix, data } = bech32.decode(str);
+      console.log('nostr', prefix, data);
+      if (prefix === 'npub') {
+        return arrayToHex(data);
+      }
+    } catch (e) {
+      console.log('nostr', e);
+    }
+    return null;
+  },
   init: function () {
     this.pool = relayPool();
     iris
