@@ -209,11 +209,13 @@ class Login extends Component {
                     {t('already_have_an_account')}
                   </a>
                 </p>
-                <p>
-                  <a href="#" onClick={() => ethereumLogin()}>
-                    {t('web3_login')}
-                  </a>
-                </p>
+                {!!window.nostr ? '' : ( // lol, hide ethereum for nostr users
+                  <p>
+                    <a href="#" onClick={() => ethereumLogin()}>
+                      {t('ethereum_login')}
+                    </a>
+                  </p>
+                )}
                 <p>
                   <LanguageSelector />
                 </p>
