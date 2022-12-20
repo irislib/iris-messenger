@@ -208,12 +208,16 @@ class PublicMessage extends Message {
     }
   }
 
+  shortPubKey(pubKey) {
+    return pubKey.slice(0, 4) + '...' + pubKey.slice(-4);
+  }
+
   render() {
     if (!this.state.msg) {
       return '';
     }
     //if (++this.i > 1) console.log(this.i);
-    let name = this.props.name || this.state.name;
+    let name = this.props.name || this.state.name || this.shortPubKey(this.state.msg.info.from);
     const emojiOnly =
       this.state.msg.text &&
       this.state.msg.text.length === 2 &&

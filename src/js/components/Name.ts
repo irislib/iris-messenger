@@ -16,8 +16,14 @@ class Name extends Component<Props, State> {
     iris.public(this.props.pub).get('profile').get('name').on(this.inject());
   }
 
+  shortPub(): string {
+    // derive an adjective + animal name instead?
+    const pub = this.props.pub;
+    return pub.slice(0, 4) + '...' + pub.slice(-4);
+  }
+
   render() {
-    return this.state.name ?? this.props.placeholder ?? this.props.pub ?? '';
+    return this.state.name ?? this.props.placeholder ?? this.shortPub() ?? '';
   }
 }
 

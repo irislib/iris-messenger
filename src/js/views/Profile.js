@@ -278,7 +278,7 @@ class Profile extends View {
                 contenteditable=${this.isMyProfile}
                 onInput=${(e) => this.onNameInput(e)}
               >
-                ${this.state.name}
+                ${this.state.name || this.props.id.slice(0, 4) + '...' + this.props.id.slice(-4)}
               </h3>
               <div class="dropdown profile-actions">
                 <div class="dropbtn">…</div>
