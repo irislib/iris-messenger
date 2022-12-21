@@ -183,7 +183,10 @@ export default {
             debounce((name, _k, msg) => {
               console.log('set nostr name', name, msg);
               const updatedAt = msg.put['>'];
-              if (!this.profile.name || this.profile.name.updatedAt < updatedAt) {
+              if (
+                !this.profile.name ||
+                (this.profile.name.value !== name && this.profile.name.updatedAt < updatedAt)
+              ) {
                 this.profile.name = { value: name, updatedAt };
                 const metadata = { name };
                 if (this.profile.about) {
@@ -201,7 +204,10 @@ export default {
             debounce((about, _k, msg) => {
               console.log('set nostr bio', about, msg);
               const updatedAt = msg.put['>'];
-              if (!this.profile.about || this.profile.about.updatedAt < updatedAt) {
+              if (
+                !this.profile.about ||
+                (this.profile.about.value !== about && this.profile.about.updatedAt < updatedAt)
+              ) {
                 this.profile.about = { value: about, updatedAt };
                 const metadata = { about };
                 if (this.profile.name) {
