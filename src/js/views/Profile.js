@@ -322,7 +322,8 @@ class Profile extends View {
                   <span>${this.state.followerCount}</span> ${t('followers')}
                 </a>
               </div>
-              ${this.followedUsers.has(iris.session.getPubKey())
+              ${this.followedUsers.has(iris.session.getPubKey()) ||
+              this.followedUsers.has(iris.session.getKey().secp256k1.rpub)
                 ? html` <p><small>${t('follows_you')}</small></p> `
                 : this.props.id === SMS_VERIFIER_PUB
                 ? html`
@@ -598,12 +599,19 @@ class Profile extends View {
   }
 
   getNostrProfile(address) {
+    const nostrAddress = Nostr.toNostrAddress(this.props.id);
+    const setFollowCounts = () => {
+      nostrAddress &&
+        this.setState({
+          followedUserCount: Nostr.followedByUser.get(nostrAddress)?.size,
+          followerCount: Nostr.followersByUser.get(nostrAddress)?.size,
+        });
+    };
+    setFollowCounts();
     Nostr.subscribe(
       (event) => {
         console.log('event', event);
-        const nostrAddress = Nostr.toNostrAddress(this.props.id);
         if (event.pubkey === nostrAddress) {
-          this.setState({ followerCount: Nostr.followerCount(nostrAddress) });
           if (event.kind === 0) {
             try {
               const content = JSON.parse(event.content);
@@ -615,11 +623,11 @@ class Profile extends View {
             for (let tag of event.tags) {
               if (Array.isArray(tag) && tag[0] === 'p') {
                 Nostr.addFollower(tag[1], nostrAddress);
-                this.followedUsers.add(tag[1]);
-                this.setState({ followedUserCount: this.followedUsers.size });
+                this.setState({ followedUserCount: Nostr.followedByUser.get(nostrAddress)?.size });
               }
             }
           }
+          setFollowCounts();
         }
       },
       [{ authors: [address] }],

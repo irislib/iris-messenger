@@ -5,6 +5,7 @@ import throttle from 'lodash/throttle';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
+import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -41,19 +42,26 @@ class Follows extends View {
   );
 
   getFollows() {
-    iris
-      .public(this.props.id)
-      .get('follow')
-      .map()
-      .on(
-        this.sub((follows, pub) => {
-          if (follows && !this.follows.has(pub)) {
-            this.follows.add(pub);
-            this.getNameForUser(pub);
-          }
-          this.updateSortedFollows();
-        }),
-      );
+    const nostrAddress = Nostr.toNostrAddress(this.props.id);
+
+    if (nostrAddress) {
+      this.follows = Nostr.followedByUser.get(nostrAddress);
+      this.updateSortedFollows();
+    } else {
+      iris
+        .public(this.props.id)
+        .get('follow')
+        .map()
+        .on(
+          this.sub((follows, pub) => {
+            if (follows && !this.follows.has(pub)) {
+              this.follows.add(pub);
+              this.getNameForUser(pub);
+            }
+            this.updateSortedFollows();
+          }),
+        );
+    }
   }
 
   shouldComponentUpdate() {
@@ -75,17 +83,25 @@ class Follows extends View {
   }
 
   getFollowers() {
-    iris.group().on(
-      `follow/${this.props.id}`,
-      this.sub((following, a, b, e, user) => {
-        if (following && !this.follows.has(user)) {
-          if (!following) return;
-          this.follows.add(user);
-          this.getNameForUser(user);
-          this.updateSortedFollows();
-        }
-      }),
-    );
+    const nostrAddress = Nostr.toNostrAddress(this.props.id);
+
+    if (nostrAddress) {
+      this.follows = Nostr.followersByUser.get(nostrAddress);
+      this.updateSortedFollows();
+      console.log('nostr followers', this.follows);
+    } else {
+      iris.group().on(
+        `follow/${this.props.id}`,
+        this.sub((following, a, b, e, user) => {
+          if (following && !this.follows.has(user)) {
+            if (!following) return;
+            this.follows.add(user);
+            this.getNameForUser(user);
+            this.updateSortedFollows();
+          }
+        }),
+      );
+    }
   }
 
   componentDidMount() {

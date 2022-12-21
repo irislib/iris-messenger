@@ -21,19 +21,20 @@ export default {
   pool: null,
   profile: {},
   knownAddresses: new Set<string>(),
-  followedUsers: new Set<string>(),
-  followers: new Map<string, Set<string>>(),
+  followedByUser: new Map<string, Set<string>>(),
+  followersByUser: new Map<string, Set<string>>(),
   maxRelays: 3,
   relays: defaultRelays,
   follow: function (address: string) {
-    this.followedUsers.add(address);
+    const pubkey = iris.session.getKey().secp256k1.rpub;
+    this.addFollower(address, pubkey);
 
     const event: Event = {
       kind: 3,
       created_at: Math.round(Date.now() / 1000),
       content: '',
-      pubkey: iris.session.getKey().secp256k1.rpub,
-      tags: Array.from(this.followedUsers).map((address: string) => {
+      pubkey,
+      tags: Array.from(this.followedByUser.get(pubkey)).map((address: string) => {
         return ['p', address];
       }),
     };
@@ -50,13 +51,18 @@ export default {
     this.relays.delete(url);
   },
   addFollower: function (address: string, follower: string) {
-    if (!this.followers.has(address)) {
-      this.followers.set(address, new Set<string>());
+    if (!this.followersByUser.has(address)) {
+      this.followersByUser.set(address, new Set<string>());
     }
-    this.followers.get(address)?.add(follower);
+    this.followersByUser.get(address)?.add(follower);
+
+    if (!this.followedByUser.has(follower)) {
+      this.followedByUser.set(follower, new Set<string>());
+    }
+    this.followedByUser.get(follower)?.add(address);
   },
   followerCount: function (address: string) {
-    return this.followers.get(address)?.size ?? 0;
+    return this.followersByUser.get(address)?.size ?? 0;
   },
   toNostrAddress(str: string) {
     if (str.match(/^[0-9a-fA-F]{64}$/)) {
@@ -164,7 +170,6 @@ export default {
             for (const tag of event.tags) {
               if (tag[0] === 'p') {
                 this.addFollower(tag[1], event.pubkey);
-                this.followedUsers.add(tag[1]);
               }
             }
           }
