@@ -6,6 +6,7 @@ import { route } from 'preact-router';
 
 import Helpers from '../Helpers';
 import Icons from '../Icons';
+import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import FeedMessageForm from './FeedMessageForm';
@@ -13,6 +14,13 @@ import Identicon from './Identicon';
 import Message from './Message';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
+const bech32 = require('bech32-buffer');
+
+function arrayToHex(array) {
+  return Array.from(array, (byte) => {
+    return ('0' + (byte & 0xff).toString(16)).slice(-2);
+  }).join('');
+}
 
 const MSG_TRUNCATE_LENGTH = 1000;
 
@@ -41,7 +49,42 @@ class PublicMessage extends Message {
     this.state = { sortedReplies: [] };
   }
 
+  static toNostrId(str) {
+    if (str.match(/^[0-9a-fA-F]{64}$/)) {
+      return str;
+    }
+    try {
+      const { prefix, data } = bech32.decode(str);
+      if (prefix === 'note') {
+        return arrayToHex(data);
+      }
+    } catch (e) {}
+    return null;
+  }
+
   static fetchByHash(thisArg, hash) {
+    const nostrId = PublicMessage.toNostrId(hash);
+
+    if (nostrId) {
+      console.log('fetching by nostr id', nostrId);
+      return new Promise((resolve) => {
+        Nostr.subscribe(
+          (event) => {
+            console.log('got msg', nostrId, event);
+            const msg = {
+              signerKeyHash: event.pubkey,
+              signedData: {
+                text: event.content,
+                time: event.created_at * 1000,
+              },
+            };
+            resolve(msg);
+          },
+          [{ ids: [nostrId] }],
+        );
+      });
+    }
+
     return new Promise((resolve, reject) => {
       if (typeof hash !== 'string') {
         return reject();

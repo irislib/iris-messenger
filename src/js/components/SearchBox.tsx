@@ -1,6 +1,7 @@
 import iris from 'iris-lib';
 import $ from 'jquery';
 import isEqual from 'lodash/isEqual';
+import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
@@ -162,6 +163,9 @@ class SearchBox extends Component<Props, State> {
     }
 
     if (this.props.onSelect) {
+      if (query.startsWith('note')) {
+        route('/post/' + query);
+      }
       const s = query.split('/profile/');
       if (s.length > 1) {
         return this.props.onSelect({ key: s[1] });
