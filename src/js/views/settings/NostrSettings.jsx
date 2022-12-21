@@ -39,6 +39,21 @@ const NostrSettings = () => {
     }
   }
 
+  const getClassName = (relay) => {
+    switch (getStatus(relay)) {
+      case 0:
+        return "neutral";
+      case 1:
+        return "positive";
+      case 2:
+        return "neutral";
+      case 3:
+        return "";
+      default:
+        return "status";
+    }
+  }
+
   return (
     <div className="centered-container">
       <h2>Nostr</h2>
@@ -72,6 +87,7 @@ const NostrSettings = () => {
         {relays.map((relay) => (
           <div className="flex-row peer">
             <div className="flex-cell" key={relay.url}>
+              <span className={getClassName(relay)}>&#x2B24; </span>
               {relay.url}
             </div>
             <div className="flex-cell no-flex">

@@ -50,6 +50,8 @@
   --nav-border-bottom: 1px solid #222526;
   --nav-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.8);
   --positive-color: #83fc00;
+  --negative-color: #fe5493;
+  --neutral-color: #f9f900;
   --radio-button-background: #666;
   --radio-button-checked-background: #33b7fe;
 }
@@ -303,6 +305,18 @@ video {
 
 .connected-peers.connected small {
   color: var(--positive-color);
+}
+
+.positive {
+    color: var(--positive-color);
+}
+
+.negative {
+    color: var(--negative-color);
+}
+
+.neutral {
+    color: var(--neutral-color);
 }
 
 a.logo {
