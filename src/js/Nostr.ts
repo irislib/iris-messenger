@@ -1,6 +1,6 @@
 import iris from 'iris-lib';
 import { debounce } from 'lodash';
-import { getBlankEvent, relayPool, signEvent } from 'nostr-tools';
+import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from 'nostr-tools';
 const bech32 = require('bech32-buffer');
 
 function arrayToHex(array: any) {
@@ -9,26 +9,36 @@ function arrayToHex(array: any) {
   }).join('');
 }
 
+const defaultRelays = new Map<string, Relay>([
+  ['wss://relay.damus.io', relayInit('wss://relay.damus.io')],
+  ['wss://nostr-pub.wellorder.net', relayInit('wss://nostr-pub.wellorder.net')],
+  ['wss://relay.nostr.info', relayInit('wss://relay.nostr.info')],
+  ['wss://nostr.bitcoiner.social', relayInit('wss://nostr.bitcoiner.social')],
+  ['wss://nostr.onsats.org', relayInit('wss://nostr.onsats.org')],
+]);
+
 export default {
   pool: null,
   profile: {},
   knownAddresses: new Set<string>(),
   followedUsers: new Set<string>(),
   followers: new Map<string, Set<string>>(),
-  follow: function(address: string) {
+  maxRelays: 3,
+  relays: defaultRelays,
+  follow: function (address: string) {
     this.followedUsers.add(address);
-    const event: any = getBlankEvent();
-    event.created_at = Math.round(Date.now() / 1000);
-    event.content = "";
-    event.pubkey = iris.session.getKey().secp256k1.rpub;
-    event.tags = Array.from(this.followedUsers).map((address: string) => {
-      return ["p", address];
-    });
-    event.kind = 3;
-    const signature = signEvent(event, iris.session.getKey().secp256k1.priv)[0];
-    event.sig = signature;
-    console.log('publishing event', event, signature);
-    this.pool.publish(event);
+
+    const event: Event = {
+      kind: 3,
+      created_at: Math.round(Date.now() / 1000),
+      content: '',
+      pubkey: iris.session.getKey().secp256k1.rpub,
+      tags: Array.from(this.followedUsers).map((address: string) => {
+        return ['p', address];
+      }),
+    };
+
+    this.publish(event);
   },
   addFollower: function (address: string, follower: string) {
     if (!this.followers.has(address)) {
@@ -54,17 +64,56 @@ export default {
     } catch (e) {}
     return null;
   },
+  publish: async function (event: Event) {
+    event.id = getEventHash(event);
+    event.sig = await signEvent(event, iris.session.getKey().secp256k1.priv);
+    if (!(event.id && event.sig)) {
+      console.error('Failed to sign event', event);
+      throw new Error('Invalid event');
+    }
+    for (const relay of this.relays.values()) {
+      console.log('publishing event', event, 'to', relay);
+      relay.publish(event);
+    }
+  },
+  subscribe: function (cb: Function, filters: Filter[], opts = {}) {
+    for (const relay of this.relays.values()) {
+      const sub = relay.sub(filters, opts);
+      sub.on('event', cb);
+    }
+  },
+  manageRelays: function () {
+    const go = () => {
+      const relays: Array<Relay> = Array.from(this.relays.values());
+      const getStatus = (relay: Relay) => {
+        // workaround for nostr-tools bug
+        try {
+          return relay.status;
+        } catch (e) {
+          return 3;
+        }
+      };
+      // ws status codes: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
+      const openRelays = relays.filter((relay: Relay) => getStatus(relay) === 1);
+      const connectingRelays = relays.filter((relay: Relay) => getStatus(relay) === 0);
+      if (openRelays.length + connectingRelays.length < this.maxRelays) {
+        const closedRelays = relays.filter((relay: Relay) => getStatus(relay) === 3);
+        if (closedRelays.length) {
+          relays[Math.floor(Math.random() * relays.length)].connect();
+        }
+      }
+    };
+    go();
+
+    setInterval(go, 1000);
+  },
   init: function () {
-    this.pool = relayPool();
     iris
       .local()
       .get('loggedIn')
       .on(() => {
         const key = iris.session.getKey();
-        this.pool.setPrivateKey(key.secp256k1.priv);
-
-        this.pool.addRelay('wss://relay.damus.io', { read: true, write: true });
-        this.pool.addRelay('wss://nostr-pub.wellorder.net', { read: true, write: true });
+        this.manageRelays();
 
         // example callback functions for listeners
         // callback functions take an object argument with following keys:
@@ -106,8 +155,7 @@ export default {
 
         setTimeout(() => {
           console.log('subscribing to nostr events by', key.secp256k1.rpub);
-          this.pool.sub({ cb: onEvent, filter: { authors: [key.secp256k1.rpub] } });
-          console.log('Nostr', this.pool);
+          this.subscribe(onEvent, [{ authors: [key.secp256k1.rpub] }]);
         }, 1000);
 
         iris
@@ -151,15 +199,15 @@ export default {
 
   setMetadata(data) {
     setTimeout(() => {
-      const event: any = getBlankEvent();
-      event.created_at = Math.round(Date.now() / 1000);
-      event.content = JSON.stringify(data);
-      event.pubkey = iris.session.getKey().secp256k1.rpub;
-      event.kind = 0;
-      const signature = signEvent(event, iris.session.getKey().secp256k1.priv)[0];
-      event.sig = signature;
-      console.log('publishing event', event, signature);
-      this.pool.publish(event);
+      const event: Event = {
+        kind: 0,
+        pubkey: iris.session.getKey().secp256k1.rpub,
+        content: JSON.stringify(data),
+        tags: [],
+        created_at: Math.floor(Date.now() / 1000),
+      };
+
+      this.publish(event);
     }, 1001);
   },
 };

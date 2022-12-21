@@ -72,7 +72,7 @@
     "jsxstyle": "^2.5.1",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
-    "nostr-tools": "^0.24.1",
+    "nostr-tools": "1.0.0-beta",
     "preact": "^10.11.2",
     "preact-async-route": "2.2.1",
     "preact-custom-element": "^4.2.1",

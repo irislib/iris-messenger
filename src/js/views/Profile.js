@@ -598,9 +598,8 @@ class Profile extends View {
   }
 
   getNostrProfile(address) {
-    Nostr.pool.sub({
-      filter: { authors: [address] },
-      cb: (event) => {
+    Nostr.subscribe(
+      (event) => {
         console.log('event', event);
         const nostrAddress = Nostr.toNostrAddress(this.props.id);
         if (event.pubkey === nostrAddress) {
@@ -623,7 +622,8 @@ class Profile extends View {
           }
         }
       },
-    });
+      [{ authors: [address] }],
+    );
   }
 
   getProfileDetails() {

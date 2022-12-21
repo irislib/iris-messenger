@@ -5,20 +5,27 @@ import iris from 'iris-lib';
 import CopyButton from '../../components/CopyButton';
 
 const NostrSettings = () => {
-  const [relays, setRelays] = useState({});
+  const [relays, setRelays] = useState([]);
 
   setInterval(() => {
-    // console.log(111, Nostr.pool);
-    setRelays(Nostr.pool.relays);
+    setRelays(Array.from(Nostr.relays.values()));
   }, 1000);
 
-  const handleConnectClick = (relayId) => {
-    // Connect to the selected relay
+  const handleConnectClick = (relay) => {
+    relay.connect();
   };
 
-  const handleDisconnectClick = (relayId) => {
-    Nostr.pool.removeRelay(relayId);
+  const handleDisconnectClick = (relay) => {
+    relay.close();
   };
+
+  const getStatus = (relay) => {
+    try {
+      return relay.status;
+    } catch (e) {
+      return 3;
+    }
+  }
 
   return (
     <div className="centered-container">
@@ -50,16 +57,16 @@ const NostrSettings = () => {
 
       <h3>Relays</h3>
       <div id="peers" className="flex-table">
-        {Object.keys(relays).map((id) => (
+        {relays.map((relay) => (
           <div className="flex-row peer">
-            <div className="flex-cell" key={id}>
-              {id}
+            <div className="flex-cell" key={relay.url}>
+              {relay.url}
             </div>
             <div className="flex-cell no-flex">
-              {relays[id] ? (
-                <Button onClick={() => handleDisconnectClick(id)}>Disconnect</Button>
+              {getStatus(relay) === 1 ? (
+                <Button onClick={() => handleDisconnectClick(relay)}>Disconnect</Button>
               ) : (
-                <Button onClick={() => handleConnectClick(id)}>Connect</Button>
+                <Button onClick={() => handleConnectClick(relay)}>Connect</Button>
               )}
             </div>
           </div>
