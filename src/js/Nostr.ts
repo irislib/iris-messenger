@@ -40,6 +40,15 @@ export default {
 
     this.publish(event);
   },
+  addRelay(url: string) {
+    if (this.relays.has(url)) return;
+
+    this.relays.set(url, relayInit(url));
+  },
+  removeRelay(url: string) {
+    this.relays.get(url)?.close();
+    this.relays.delete(url);
+  },
   addFollower: function (address: string, follower: string) {
     if (!this.followers.has(address)) {
       this.followers.set(address, new Set<string>());
@@ -83,16 +92,17 @@ export default {
     }
   },
   manageRelays: function () {
+    const getStatus = (relay: Relay) => {
+      // workaround for nostr-tools bug
+      try {
+        return relay.status;
+      } catch (e) {
+        return 3;
+      }
+    };
+
     const go = () => {
       const relays: Array<Relay> = Array.from(this.relays.values());
-      const getStatus = (relay: Relay) => {
-        // workaround for nostr-tools bug
-        try {
-          return relay.status;
-        } catch (e) {
-          return 3;
-        }
-      };
       // ws status codes: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
       const openRelays = relays.filter((relay: Relay) => getStatus(relay) === 1);
       const connectingRelays = relays.filter((relay: Relay) => getStatus(relay) === 0);
@@ -103,7 +113,10 @@ export default {
         }
       }
     };
-    go();
+
+    for (let i = 0; i < this.maxRelays; i++) {
+      go();
+    }
 
     setInterval(go, 1000);
   },

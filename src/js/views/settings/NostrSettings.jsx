@@ -3,9 +3,11 @@ import Nostr from "../../Nostr";
 import Button from '../../components/basic/Button';
 import iris from 'iris-lib';
 import CopyButton from '../../components/CopyButton';
+import { translate as t } from '../../translations/Translation';
 
 const NostrSettings = () => {
-  const [relays, setRelays] = useState([]);
+  const [relays, setRelays] = useState(Array.from(Nostr.relays.values()));
+  const [newRelayUrl, setNewRelayUrl] = useState(""); // added state to store the new relay URL
 
   setInterval(() => {
     setRelays(Array.from(Nostr.relays.values()));
@@ -18,6 +20,16 @@ const NostrSettings = () => {
   const handleDisconnectClick = (relay) => {
     relay.close();
   };
+
+  const handleRemoveRelay = (relay) => {
+    Nostr.removeRelay(relay.url);
+  };
+
+  const handleAddRelay = (event) => {
+    event.preventDefault(); // prevent the form from reloading the page
+    Nostr.addRelay(newRelayUrl); // add the new relay using the Nostr method
+    setNewRelayUrl(""); // reset the new relay URL
+  }
 
   const getStatus = (relay) => {
     try {
@@ -63,6 +75,12 @@ const NostrSettings = () => {
               {relay.url}
             </div>
             <div className="flex-cell no-flex">
+              <Button onClick={() => handleRemoveRelay(relay)}>
+                {t('remove')}
+              </Button>
+            </div>
+            <div className="flex-cell no-flex">
+
               {getStatus(relay) === 1 ? (
                 <Button onClick={() => handleDisconnectClick(relay)}>Disconnect</Button>
               ) : (
@@ -71,6 +89,20 @@ const NostrSettings = () => {
             </div>
           </div>
         ))}
+        <div className="flex-row peer">
+          <div className="flex-cell" key="new">
+            <input
+              id="new-relay-url"
+              type="text"
+              placeholder={t('new_relay_url')}
+              value={newRelayUrl}
+              onChange={event => setNewRelayUrl(event.target.value)}
+            />
+          </div>
+          <div className="flex-cell no-flex">
+            <Button onClick={handleAddRelay}>{t('add')}</Button>
+          </div>
+        </div>
       </div>
     </div>
   );
