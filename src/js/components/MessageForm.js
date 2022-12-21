@@ -1,6 +1,8 @@
 import iris from 'iris-lib';
 import { Component } from 'preact';
 
+import Nostr from '../Nostr';
+
 function twice(f) {
   f();
   setTimeout(f, 100); // write many times and maybe it goes through :D
@@ -40,7 +42,16 @@ export default class MessageForm extends Component {
     }
     msg.torrentId && iris.public().get('media').get(msg.time).put(hash);
     this.props.onSubmit && this.props.onSubmit(msg);
+    this.sendNostr(msg);
     return hash;
+  }
+
+  sendNostr(msg) {
+    const event = {
+      kind: 1,
+      content: msg.text,
+    };
+    Nostr.publish(event);
   }
 
   onMsgTextPaste(event) {

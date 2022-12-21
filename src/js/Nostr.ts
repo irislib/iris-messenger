@@ -73,7 +73,11 @@ export default {
     } catch (e) {}
     return null;
   },
-  publish: async function (event: Event) {
+  publish: async function (event: any) {
+    event.tags = event.tags || [];
+    event.content = event.content || '';
+    event.created_at = event.created_at || Math.floor(Date.now() / 1000);
+    event.pubkey = iris.session.getKey().secp256k1.rpub;
     event.id = getEventHash(event);
     event.sig = await signEvent(event, iris.session.getKey().secp256k1.priv);
     if (!(event.id && event.sig)) {
@@ -212,12 +216,9 @@ export default {
 
   setMetadata(data) {
     setTimeout(() => {
-      const event: Event = {
+      const event = {
         kind: 0,
-        pubkey: iris.session.getKey().secp256k1.rpub,
         content: JSON.stringify(data),
-        tags: [],
-        created_at: Math.floor(Date.now() / 1000),
       };
 
       this.publish(event);
