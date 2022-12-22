@@ -36,6 +36,8 @@ export default {
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: 3,
   relays: defaultRelays,
+  messagesByUser: new Map<string, Set<string>>(),
+  messagesById: new Map<string, Event>(),
   follow: function (address: string) {
     const pubkey = iris.session.getKey().secp256k1.rpub;
     this.addFollower(address, pubkey);
@@ -191,6 +193,41 @@ export default {
             }, 1000),
           );
       });
+  },
+
+  async getMessageById(id: string) {
+    if (this.messagesById.has(id)) {
+      return this.messagesById.get(id);
+    }
+
+    return new Promise((resolve) => {
+      this.subscribe(
+        (event) => {
+          this.messagesById.set(event.id, event);
+          resolve(event);
+        },
+        [{ ids: [id], kinds: [1] }],
+      );
+    });
+  },
+
+  getMessagesByUser(address: string, cb: Function) {
+    if (this.messagesByUser.has(address)) {
+      cb(this.messagesByUser.get(address));
+      return;
+    }
+
+    this.messagesByUser.set(address, new Set());
+    this.subscribe(
+      (event) => {
+        if (event.kind === 1 && event.pubkey === address) {
+          this.messagesById.set(event.id, event);
+          this.messagesByUser.get(address)?.add(event.id);
+          cb(this.messagesByUser.get(address));
+        }
+      },
+      [{ kinds: [1], authors: [address] }],
+    );
   },
 
   getProfile(address, callback: Function | null, recursion = 0) {

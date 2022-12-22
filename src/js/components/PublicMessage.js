@@ -66,21 +66,14 @@ class PublicMessage extends Message {
     const nostrId = PublicMessage.toNostrId(hash);
 
     if (nostrId) {
-      console.log('fetching by nostr id', nostrId);
-      return new Promise((resolve) => {
-        Nostr.subscribe(
-          (event) => {
-            const msg = {
-              signerKeyHash: event.pubkey,
-              signedData: {
-                text: event.content,
-                time: event.created_at * 1000,
-              },
-            };
-            resolve(msg);
+      return Nostr.getMessageById(nostrId).then((event) => {
+        return {
+          signerKeyHash: event.pubkey,
+          signedData: {
+            text: event.content,
+            time: event.created_at * 1000,
           },
-          [{ ids: [nostrId] }],
-        );
+        };
       });
     }
 
