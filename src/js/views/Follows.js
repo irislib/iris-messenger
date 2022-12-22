@@ -69,6 +69,7 @@ class Follows extends View {
   }
 
   getNameForUser(user) {
+    // TODO get from nostr
     iris
       .public(user)
       .get('profile')

@@ -1,9 +1,9 @@
 import Identicon from 'identicon.js';
 import iris from 'iris-lib';
 import styled from 'styled-components';
-import Nostr from '../Nostr';
 
 import Component from '../BaseComponent';
+import Nostr from '../Nostr';
 
 import SafeImg from './SafeImg';
 
@@ -118,8 +118,7 @@ class MyIdenticon extends Component<Props, State> {
     const width = this.props.width;
     const activity =
       ['online', 'active'].indexOf(this.state.activity ?? '') > -1 ? this.state.activity : '';
-    const hasPhoto =
-      this.state.photo && !this.props.hidePhoto;
+    const hasPhoto = this.state.photo && !this.props.hidePhoto;
     const hasPhotoStyle = hasPhoto ? 'has-photo' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 

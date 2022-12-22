@@ -9,6 +9,15 @@ function arrayToHex(array: any) {
   }).join('');
 }
 
+const getRelayStatus = (relay: Relay) => {
+  // workaround for nostr-tools bug
+  try {
+    return relay.status;
+  } catch (e) {
+    return 3;
+  }
+};
+
 const defaultRelays = new Map<string, Relay>([
   ['wss://relay.damus.io', relayInit('wss://relay.damus.io')],
   ['wss://nostr-pub.wellorder.net', relayInit('wss://nostr-pub.wellorder.net')],
@@ -95,27 +104,28 @@ export default {
   },
   subscribe: function (cb: Function, filters: Filter[], opts = {}) {
     for (const relay of this.relays.values()) {
-      const sub = relay.sub(filters, opts);
-      sub.on('event', cb);
+      const go = () => {
+        const sub = relay.sub(filters, opts);
+        sub.on('event', cb);
+      };
+      const status = getRelayStatus(relay);
+      if (status === 0) {
+        relay.on('connect', () => {
+          go();
+        });
+      } else if (status === 1) {
+        go();
+      }
     }
   },
   manageRelays: function () {
-    const getStatus = (relay: Relay) => {
-      // workaround for nostr-tools bug
-      try {
-        return relay.status;
-      } catch (e) {
-        return 3;
-      }
-    };
-
     const go = () => {
       const relays: Array<Relay> = Array.from(this.relays.values());
       // ws status codes: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
-      const openRelays = relays.filter((relay: Relay) => getStatus(relay) === 1);
-      const connectingRelays = relays.filter((relay: Relay) => getStatus(relay) === 0);
+      const openRelays = relays.filter((relay: Relay) => getRelayStatus(relay) === 1);
+      const connectingRelays = relays.filter((relay: Relay) => getRelayStatus(relay) === 0);
       if (openRelays.length + connectingRelays.length < this.maxRelays) {
-        const closedRelays = relays.filter((relay: Relay) => getStatus(relay) === 3);
+        const closedRelays = relays.filter((relay: Relay) => getRelayStatus(relay) === 3);
         if (closedRelays.length) {
           relays[Math.floor(Math.random() * relays.length)].connect();
         }
@@ -239,6 +249,11 @@ export default {
               name: content.name,
               about: content.about,
               photo: content.picture,
+            });
+            iris.session.addToSearchIndex(address, {
+              key: address,
+              name: content.name,
+              followers: this.followersByUser.get(address) ?? new Set(),
             });
             callback({ name: content.name, about: content.about, photo: content.picture }, address);
           } catch (e) {
