@@ -67,6 +67,11 @@ class PublicMessage extends Message {
 
     if (nostrId) {
       return Nostr.getMessageById(nostrId).then((event) => {
+        Nostr.getProfile(event.pubkey, (profile) => {
+          if (!thisArg.unmounted) {
+            thisArg.setState({ name: profile.name });
+          }
+        });
         return {
           signerKeyHash: event.pubkey,
           signedData: {
