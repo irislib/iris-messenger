@@ -75,7 +75,7 @@ export default {
     this.followedByUser.get(follower)?.add(address);
     if (follower === iris.session.getKey().secp256k1.rpub) {
       iris.public().get('follow').get(address).put(true);
-      this.getMessagesByUser(address, () => {});
+      this.getMessagesByUser(address);
     }
   },
   followerCount: function (address: string) {
@@ -153,6 +153,7 @@ export default {
         const key = iris.session.getKey();
         this.manageRelays();
         this.getProfile(key.secp256k1.rpub, null, INITIAL_RECURSION);
+        this.getMessagesByUser(key.secp256k1.rpub);
 
         iris
           .public()
@@ -215,9 +216,9 @@ export default {
     });
   },
 
-  getMessagesByUser(address: string, cb: Function) {
+  getMessagesByUser(address: string, cb: Function | undefined) {
     if (this.messagesByUser.has(address)) {
-      cb(this.messagesByUser.get(address));
+      cb && cb(this.messagesByUser.get(address));
       return;
     }
 
@@ -227,7 +228,7 @@ export default {
         if (event.kind === 1 && event.pubkey === address) {
           this.messagesById.set(event.id, event);
           this.messagesByUser.get(address)?.add(event.id);
-          cb(this.messagesByUser.get(address));
+          cb && cb(this.messagesByUser.get(address));
         }
       },
       [{ kinds: [1], authors: [address] }],
