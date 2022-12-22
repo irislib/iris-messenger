@@ -1,4 +1,5 @@
 import iris from 'iris-lib';
+import Nostr from '../Nostr';
 
 import Component from '../BaseComponent';
 
@@ -13,7 +14,14 @@ type State = {
 
 class Name extends Component<Props, State> {
   componentDidMount(): void {
-    iris.public(this.props.pub).get('profile').get('name').on(this.inject());
+    const nostrAddr = Nostr.toNostrHexAddress(this.props.pub);
+    if (nostrAddr) {
+      Nostr.getProfile(nostrAddr, (profile) => {
+        this.setState({ name: profile.name });
+      });
+    } else {
+      iris.public(this.props.pub).get('profile').get('name').on(this.inject());
+    }
   }
 
   shortPub(): string {

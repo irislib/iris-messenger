@@ -599,39 +599,17 @@ class Profile extends View {
   }
 
   getNostrProfile(address) {
-    const nostrAddress = Nostr.toNostrAddress(this.props.id);
     const setFollowCounts = () => {
-      nostrAddress &&
+      address &&
         this.setState({
-          followedUserCount: Nostr.followedByUser.get(nostrAddress)?.size,
-          followerCount: Nostr.followersByUser.get(nostrAddress)?.size,
+          followedUserCount: Nostr.followedByUser.get(address)?.size,
+          followerCount: Nostr.followersByUser.get(address)?.size,
         });
     };
     setFollowCounts();
-    Nostr.subscribe(
-      (event) => {
-        console.log('event', event);
-        if (event.pubkey === nostrAddress) {
-          if (event.kind === 0) {
-            try {
-              const content = JSON.parse(event.content);
-              this.setState({ name: content.name, about: content.about, photo: content.picture });
-            } catch (e) {
-              console.log('error parsing nostr profile', e);
-            }
-          } else if (event.kind === 3 && Array.isArray(event.tags)) {
-            for (let tag of event.tags) {
-              if (Array.isArray(tag) && tag[0] === 'p') {
-                Nostr.addFollower(tag[1], nostrAddress);
-                this.setState({ followedUserCount: Nostr.followedByUser.get(nostrAddress)?.size });
-              }
-            }
-          }
-          setFollowCounts();
-        }
-      },
-      [{ authors: [address] }],
-    );
+    Nostr.getProfile(address, (data, addr) => {
+      (addr === this.props.id) && this.setState(data);
+    });
   }
 
   getProfileDetails() {
@@ -748,7 +726,7 @@ class Profile extends View {
     qrCodeEl.empty();
     iris.local().get('noFollowers').on(this.inject());
     // if pub is hex, it's a nostr address
-    const nostrAddr = Nostr.toNostrAddress(pub);
+    const nostrAddr = Nostr.toNostrHexAddress(pub);
     console.log('nostrAddr', nostrAddr);
     if (nostrAddr) {
       this.getNostrProfile(nostrAddr);

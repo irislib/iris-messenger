@@ -174,7 +174,7 @@ class SearchBox extends Component<Props, State> {
       if (key) {
         return this.props.onSelect({ key });
       }
-      if (Nostr.toNostrAddress(query)) {
+      if (Nostr.toNostrHexAddress(query)) {
         return this.props.onSelect({ key: query });
       }
     }

@@ -20,7 +20,7 @@ const defaultRelays = new Map<string, Relay>([
 export default {
   pool: null,
   profile: {},
-  knownAddresses: new Set<string>(),
+  userProfiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: 3,
@@ -64,16 +64,14 @@ export default {
   followerCount: function (address: string) {
     return this.followersByUser.get(address)?.size ?? 0;
   },
-  toNostrAddress(str: string) {
+  toNostrHexAddress(str: string): string | null {
     if (str.match(/^[0-9a-fA-F]{64}$/)) {
-      this.knownAddresses.add(str);
       return str;
     }
     try {
       const { prefix, data } = bech32.decode(str);
       if (prefix === 'npub') {
         const addr = arrayToHex(data);
-        this.knownAddresses.add(addr);
         return addr;
       }
     } catch (e) {}
@@ -223,6 +221,40 @@ export default {
             }, 1000),
           );
       });
+  },
+
+  getProfile(address, callback: Function) {
+    if (this.userProfiles.has(address)) {
+      const profile = this.userProfiles.get(address);
+      callback(profile, address);
+      return;
+    }
+
+    this.subscribe(
+      (event) => {
+        if (event.kind === 0) {
+          try {
+            const content = JSON.parse(event.content);
+            this.userProfiles.set(address, {
+              name: content.name,
+              about: content.about,
+              photo: content.picture
+            });
+            callback({ name: content.name, about: content.about, photo: content.picture }, address);
+          } catch (e) {
+            console.log('error parsing nostr profile', e);
+          }
+        } else if (event.kind === 3 && Array.isArray(event.tags)) {
+          for (let tag of event.tags) {
+            if (Array.isArray(tag) && tag[0] === 'p') {
+              this.addFollower(tag[1], address);
+              callback({ followedUserCount: this.followedByUser.get(address)?.size }, address);
+            }
+          }
+        }
+      },
+      [{ authors: [address], kinds: [0, 3] }],
+    );
   },
 
   setMetadata(data) {

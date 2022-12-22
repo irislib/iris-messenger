@@ -42,7 +42,7 @@ class Follows extends View {
   );
 
   getFollows() {
-    const nostrAddress = Nostr.toNostrAddress(this.props.id);
+    const nostrAddress = Nostr.toNostrHexAddress(this.props.id);
 
     if (nostrAddress) {
       this.follows = Nostr.followedByUser.get(nostrAddress);
@@ -83,7 +83,7 @@ class Follows extends View {
   }
 
   getFollowers() {
-    const nostrAddress = Nostr.toNostrAddress(this.props.id);
+    const nostrAddress = Nostr.toNostrHexAddress(this.props.id);
 
     if (nostrAddress) {
       this.follows = Nostr.followersByUser.get(nostrAddress);

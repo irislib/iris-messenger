@@ -31,7 +31,7 @@ class FollowButton extends Component<Props> {
     e.preventDefault();
     const value = !this.state[this.key];
     if (value && this.key === 'follow') {
-      const nostrAddr = Nostr.toNostrAddress(this.props.id);
+      const nostrAddr = Nostr.toNostrHexAddress(this.props.id);
       if (nostrAddr) {
         Nostr.follow(nostrAddr);
       } else {
