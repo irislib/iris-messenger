@@ -115,9 +115,10 @@ class Follows extends View {
     return html`
       <div class="centered-container">
         <h3>
-          <a href="/profile/${this.props.id}">
-              <${Name} pub=${this.props.id} />
-          </a>:<i> </i> ${this.props.followers ? t('followers') : t('following')}
+          <a href="/profile/${this.props.id}"> <${Name} pub=${this.props.id} /> </a>:<i> </i> ${this
+            .props.followers
+            ? t('followers')
+            : t('following')}
         </h3>
         <div id="follows-list">
           ${this.state.follows.map((k) => {
@@ -127,8 +128,8 @@ class Follows extends View {
                 <div>
                   <${Name} pub=${k} /><br />
                   <small class="follower-count"
-                    >${this.state.contacts[k] && this.state.contacts[k].followerCount || 0}<i> </i>
-                    followers</small
+                    >${(this.state.contacts[k] && this.state.contacts[k].followerCount) || 0}<i
+                    > </i> followers</small
                   >
                 </div>
               </a>

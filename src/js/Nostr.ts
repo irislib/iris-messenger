@@ -144,48 +144,7 @@ export default {
       .on(() => {
         const key = iris.session.getKey();
         this.manageRelays();
-
-        // example callback functions for listeners
-        // callback functions take an object argument with following keys:
-        //  - relay: relay url
-        //  - type: type of listener
-        //  - id: sub id for sub specific listeners ('EVENT' or 'EOSE')
-        //  - event: event object, only for 'event' listener
-        //  - notice: notice message, only for 'notice' listener
-
-        const onEvent = (event) => {
-          console.log('received event', event);
-          if (event.kind === 0) {
-            try {
-              const content = JSON.parse(event.content);
-              const updatedAt = event.created_at * 1000;
-              if (content.name && (!this.profile.name || this.profile.name.updatedAt < updatedAt)) {
-                this.profile.name = { value: content.name, updatedAt };
-                iris.public().get('profile').get('name').put(content.name);
-              }
-              if (
-                content.about &&
-                (!this.profile.about || this.profile.about.updatedAt < updatedAt)
-              ) {
-                this.profile.about = { value: content.about, updatedAt };
-                iris.public().get('profile').get('about').put(content.about);
-              }
-            } catch (e) {
-              console.error(e);
-            }
-          } else if (event.kind === 3) {
-            for (const tag of event.tags) {
-              if (tag[0] === 'p') {
-                this.addFollower(tag[1], event.pubkey);
-              }
-            }
-          }
-        };
-
-        setTimeout(() => {
-          console.log('subscribing to nostr events by', key.secp256k1.rpub);
-          this.getProfile(key.secp256k1.rpub, null, 2);
-        }, 1000);
+        this.getProfile(key.secp256k1.rpub, null, 1);
 
         iris
           .public()
@@ -238,6 +197,7 @@ export default {
       callback && callback(profile, address);
       return;
     }
+    console.log('getProfile', address);
 
     this.subscribe(
       (event) => {
@@ -254,7 +214,11 @@ export default {
               name: content.name,
               followers: this.followersByUser.get(address) ?? new Set(),
             });
-            callback && callback({ name: content.name, about: content.about, photo: content.picture }, address);
+            callback &&
+              callback(
+                { name: content.name, about: content.about, photo: content.picture },
+                address,
+              );
           } catch (e) {
             console.log('error parsing nostr profile', e);
           }
@@ -269,7 +233,8 @@ export default {
                 }, i);
               }
               this.addFollower(tag[1], address);
-              callback && callback({ followedUserCount: this.followedByUser.get(address)?.size }, address);
+              callback &&
+                callback({ followedUserCount: this.followedByUser.get(address)?.size }, address);
             }
           }
         }

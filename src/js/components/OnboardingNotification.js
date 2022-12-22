@@ -37,7 +37,7 @@ export default class OnboardingNotification extends Component {
               <${FollowButton} id=${SUGGESTED_FOLLOW} />
             </div>
             <p>
-              ${t('alternatively')}
+              ${t('alternatively')}<i> </i>
               <a href="/profile/${iris.session.getPubKey()}"
                 >${t('give_your_profile_link_to_someone')}</a
               >.
