@@ -116,8 +116,9 @@ class Follows extends View {
     return html`
       <div class="centered-container">
         <h3>
-          <a href="/profile/${this.props.id}"><${Name} pub=${this.props.id} placeholder="—" /></a
-          >:<i> </i> ${this.props.followers ? t('followers') : t('following')}
+          <a href="/profile/${this.props.id}">
+              <${Name} pub=${this.props.id} />
+          </a>:<i> </i> ${this.props.followers ? t('followers') : t('following')}
         </h3>
         <div id="follows-list">
           ${this.state.follows.map((k) => {

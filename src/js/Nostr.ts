@@ -185,7 +185,7 @@ export default {
 
         setTimeout(() => {
           console.log('subscribing to nostr events by', key.secp256k1.rpub);
-          this.subscribe(onEvent, [{ authors: [key.secp256k1.rpub] }]);
+          this.getProfile(key.secp256k1.rpub, null, 2);
         }, 1000);
 
         iris
@@ -233,10 +233,10 @@ export default {
       });
   },
 
-  getProfile(address, callback: Function) {
+  getProfile(address, callback: Function | null, recursion = 0) {
     if (this.userProfiles.has(address)) {
       const profile = this.userProfiles.get(address);
-      callback(profile, address);
+      callback && callback(profile, address);
       return;
     }
 
@@ -255,15 +255,22 @@ export default {
               name: content.name,
               followers: this.followersByUser.get(address) ?? new Set(),
             });
-            callback({ name: content.name, about: content.about, photo: content.picture }, address);
+            callback && callback({ name: content.name, about: content.about, photo: content.picture }, address);
           } catch (e) {
             console.log('error parsing nostr profile', e);
           }
         } else if (event.kind === 3 && Array.isArray(event.tags)) {
+          let i = 0;
           for (const tag of event.tags) {
             if (Array.isArray(tag) && tag[0] === 'p') {
+              if (recursion) {
+                i += 100;
+                setTimeout(() => {
+                  this.getProfile(tag[1], null, recursion - 1);
+                }, i);
+              }
               this.addFollower(tag[1], address);
-              callback({ followedUserCount: this.followedByUser.get(address)?.size }, address);
+              callback && callback({ followedUserCount: this.followedByUser.get(address)?.size }, address);
             }
           }
         }
