@@ -98,7 +98,6 @@ export default {
       throw new Error('Invalid event');
     }
     for (const relay of this.relays.values()) {
-      console.log('publishing event', event, 'to', relay);
       relay.publish(event);
     }
   },

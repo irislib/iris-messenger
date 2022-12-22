@@ -7302,9 +7302,9 @@ growly@^1.3.0:
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
   integrity sha512-+xGQY0YyAWCnqy7Cd++hc2JqMYzlm0dG30Jd0beaA64sROr8C4nt8Yc9V5Ro3avlSUDTN0ulqP/VBKi1/lLygw==
 
-gun@^0.2020.1238, "gun@https://github.com/mmalmi/gun":
+gun@^0.2020.1238, "gun@git+https://github.com/mmalmi/gun.git":
   version "0.2020.1238"
-  resolved "https://github.com/mmalmi/gun#759784f9ce96044e47a83176fa1392dea14aef2f"
+  resolved "git+https://github.com/mmalmi/gun.git#759784f9ce96044e47a83176fa1392dea14aef2f"
   dependencies:
     ws "^7.2.1"
   optionalDependencies:
@@ -7863,10 +7863,10 @@ ipaddr.js@1.9.1:
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-2.0.1.tgz#eca256a7a877e917aeb368b0a7497ddf42ef81c0"
   integrity sha512-1qTgH9NG+IIJ4yfKs2e6Pp1bZg8wbDbKHT21HrLIeYBTRLgMYKnMTPAuI3Lcs61nfx5h1xlXnbJtH1kX5/d/ng==
 
-iris-lib@^0.1.9:
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/iris-lib/-/iris-lib-0.1.9.tgz#21e224e4e0eae30614b7db838dea765fb69fdc03"
-  integrity sha512-z7vNhxfV/lxzpehGUXRGDk5YY0N0Q+LW7qnt2eBNYl/CfqpQNf8m1PRGIRaie82EUgU3tc7vzoiVb09kfLSvQw==
+iris-lib@^0.1.11:
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/iris-lib/-/iris-lib-0.1.11.tgz#14d9dadc211a4b65e44a1b9bad7a19fdba2d93ec"
+  integrity sha512-1i79q7PaoCpZuTu0KhBJeLt5hivkIHX33fFxyi8ekL2kDArOsrFVDnmT8qhhnJ7l13cCuu4Wcf7G/3BkzvThhg==
   dependencies:
     "@noble/secp256k1" "^1.7.0"
     elliptic "^6.5.4"

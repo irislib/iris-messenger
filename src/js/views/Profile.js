@@ -727,7 +727,6 @@ class Profile extends View {
     iris.local().get('noFollowers').on(this.inject());
     // if pub is hex, it's a nostr address
     const nostrAddr = Nostr.toNostrHexAddress(pub);
-    console.log('nostrAddr', nostrAddr);
     if (nostrAddr) {
       this.getNostrProfile(nostrAddr);
     } else {

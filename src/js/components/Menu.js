@@ -11,7 +11,7 @@ import { translate as t } from '../translations/Translation';
 const APPLICATIONS = [
   // TODO: move editable shortcuts to localState gun
   { url: '/', text: 'home', icon: Icons.home },
-  { url: '/media', text: 'media', icon: Icons.play },
+  { url: '/media', text: 'media', icon: Icons.play, beta: true },
   { url: '/chat', text: 'messages', icon: Icons.chat },
   { url: '/store', text: 'market', icon: Icons.store, beta: true },
   { url: '/contacts', text: 'contacts', icon: Icons.user },
