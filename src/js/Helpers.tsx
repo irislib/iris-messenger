@@ -13,7 +13,10 @@ const emojiRegex =
 const pubKeyRegex = /(\B@[\w-_]{20,50}\.[\w-_]{20,50}\b)/g;
 
 function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {
-  if (src && src.indexOf('data:image') === 0) {
+  if (src) {
+    if (src.indexOf('data:image') !== 0) {
+      src = `https://proxy.irismessengers.wtf/insecure/plain/${src}`;
+    }
     el.attr('src', src);
   }
   return el;
