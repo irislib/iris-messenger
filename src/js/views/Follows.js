@@ -38,14 +38,14 @@ class Follows extends View {
       this.setState({ follows });
     },
     1000,
-    { leading: false },
+    { leading: true },
   );
 
   getFollows() {
     const nostrAddress = Nostr.toNostrHexAddress(this.props.id);
 
     if (nostrAddress) {
-      this.follows = Nostr.followedByUser.get(nostrAddress);
+      this.follows = Nostr.followedByUser.get(nostrAddress) ?? new Set();
       this.updateSortedFollows();
     } else {
       iris
@@ -86,7 +86,7 @@ class Follows extends View {
     const nostrAddress = Nostr.toNostrHexAddress(this.props.id);
 
     if (nostrAddress) {
-      this.follows = Nostr.followersByUser.get(nostrAddress);
+      this.follows = Nostr.followersByUser.get(nostrAddress) ?? new Set();
       this.updateSortedFollows();
       console.log('nostr followers', this.follows);
     } else {

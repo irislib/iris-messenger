@@ -238,14 +238,14 @@ export default {
             this.userProfiles.set(address, {
               name: content.name,
               about: content.about,
-              photo: content.picture
+              photo: content.picture,
             });
             callback({ name: content.name, about: content.about, photo: content.picture }, address);
           } catch (e) {
             console.log('error parsing nostr profile', e);
           }
         } else if (event.kind === 3 && Array.isArray(event.tags)) {
-          for (let tag of event.tags) {
+          for (const tag of event.tags) {
             if (Array.isArray(tag) && tag[0] === 'p') {
               this.addFollower(tag[1], address);
               callback({ followedUserCount: this.followedByUser.get(address)?.size }, address);

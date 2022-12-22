@@ -602,13 +602,13 @@ class Profile extends View {
     const setFollowCounts = () => {
       address &&
         this.setState({
-          followedUserCount: Nostr.followedByUser.get(address)?.size,
-          followerCount: Nostr.followersByUser.get(address)?.size,
+          followedUserCount: Nostr.followedByUser.get(address)?.size ?? 0,
+          followerCount: Nostr.followersByUser.get(address)?.size ?? 0,
         });
     };
     setFollowCounts();
     Nostr.getProfile(address, (data, addr) => {
-      (addr === this.props.id) && this.setState(data);
+      addr === this.props.id && this.setState(data);
     });
   }
 

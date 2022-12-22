@@ -1,6 +1,7 @@
 import Identicon from 'identicon.js';
 import iris from 'iris-lib';
 import styled from 'styled-components';
+import Nostr from '../Nostr';
 
 import Component from '../BaseComponent';
 
@@ -62,6 +63,16 @@ class MyIdenticon extends Component<Props, State> {
 
     this.updateIdenticon();
 
+    const nostrAddr = Nostr.toNostrHexAddress(pub);
+    if (nostrAddr) {
+      Nostr.getProfile(nostrAddr, (profile) => {
+        this.setState({
+          photo: profile.photo,
+          name: profile.name,
+        });
+      });
+    }
+
     if (!this.props.hidePhoto) {
       iris.public(pub).get('profile').get('photo').on(this.inject()); // TODO: limit size
       iris.public(pub).get('profile').get('nftPfp').on(this.inject());
@@ -108,7 +119,7 @@ class MyIdenticon extends Component<Props, State> {
     const activity =
       ['online', 'active'].indexOf(this.state.activity ?? '') > -1 ? this.state.activity : '';
     const hasPhoto =
-      this.state.photo && !this.props.hidePhoto && this.state.photo.indexOf('data:image') === 0;
+      this.state.photo && !this.props.hidePhoto;
     const hasPhotoStyle = hasPhoto ? 'has-photo' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 

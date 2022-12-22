@@ -1,7 +1,7 @@
 import iris from 'iris-lib';
-import Nostr from '../Nostr';
 
 import Component from '../BaseComponent';
+import Nostr from '../Nostr';
 
 type Props = {
   pub: string;
