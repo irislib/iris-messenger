@@ -80,10 +80,13 @@ class MessageFeed extends Component {
         this.props.node.map().on(this.sub((...args) => this.handleMessage(...args)));
       } else if (this.props.group && this.props.path) { // public messages
         // TODO: make group use the same basic gun api
+        /* comment out while debugging
         iris.group(this.props.group).map(
           this.props.path,
           this.sub((...args) => this.handleMessage(...args)),
         );
+
+         */
         // iterate over Nostr.messagesById.values()
         // horrible code, b ut we're in a hurry
         const go = () => {
