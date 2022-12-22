@@ -2,6 +2,7 @@ import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import PublicMessage from './PublicMessage';
 import iris from 'iris-lib';
+import Nostr from '../Nostr';
 import { debounce } from 'lodash';
 import { translate as t } from '../translations/Translation';
 import Button from '../components/basic/Button';
@@ -54,23 +55,34 @@ class MessageFeed extends Component {
 
   componentDidMount() {
     let first = true;
-    iris
-      .local()
-      .get('scrollUp')
-      .on(
-        this.sub(() => {
-          !first && Helpers.animateScrollTop('.main-view');
-          first = false;
-        }),
-      );
-    if (this.props.node) {
-      this.props.node.map().on(this.sub((...args) => this.handleMessage(...args)));
-    } else if (this.props.group && this.props.path) {
-      // TODO: make group use the same basic gun api
-      iris.group(this.props.group).map(
-        this.props.path,
-        this.sub((...args) => this.handleMessage(...args)),
-      );
+
+    if (this.props.nostrUser) {
+      Nostr.subscribe(event => {
+        if (event.kind === 1 && event.pubkey === this.props.nostrUser) {
+          console.log('msg from nostr', event);
+          this.mappedMessages.set(event.created_at, event.id);
+          this.updateSortedMessages();
+        }
+      }, [{ kinds: [1], authors: [this.props.nostrUser] }]);
+    } else {
+      iris
+        .local()
+        .get('scrollUp')
+        .on(
+          this.sub(() => {
+            !first && Helpers.animateScrollTop('.main-view');
+            first = false;
+          }),
+        );
+      if (this.props.node) {
+        this.props.node.map().on(this.sub((...args) => this.handleMessage(...args)));
+      } else if (this.props.group && this.props.path) {
+        // TODO: make group use the same basic gun api
+        iris.group(this.props.group).map(
+          this.props.path,
+          this.sub((...args) => this.handleMessage(...args)),
+        );
+      }
     }
   }
 

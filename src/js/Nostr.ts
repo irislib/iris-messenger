@@ -18,6 +18,8 @@ const getRelayStatus = (relay: Relay) => {
   }
 };
 
+const INITIAL_RECURSION = 2;
+
 const defaultRelays = new Map<string, Relay>([
   ['wss://relay.damus.io', relayInit('wss://relay.damus.io')],
   ['wss://nostr-pub.wellorder.net', relayInit('wss://nostr-pub.wellorder.net')],
@@ -144,7 +146,7 @@ export default {
       .on(() => {
         const key = iris.session.getKey();
         this.manageRelays();
-        this.getProfile(key.secp256k1.rpub, null, 1);
+        this.getProfile(key.secp256k1.rpub, null, INITIAL_RECURSION);
 
         iris
           .public()
@@ -197,7 +199,6 @@ export default {
       callback && callback(profile, address);
       return;
     }
-    console.log('getProfile', address);
 
     this.subscribe(
       (event) => {
@@ -230,7 +231,7 @@ export default {
                 i += 100;
                 setTimeout(() => {
                   this.getProfile(tag[1], null, recursion - 1);
-                }, i);
+                }, i + (INITIAL_RECURSION - recursion) * 1000);
               }
               this.addFollower(tag[1], address);
               callback &&

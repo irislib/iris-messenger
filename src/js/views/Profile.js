@@ -523,6 +523,8 @@ class Profile extends View {
     const messageForm = this.isMyProfile
       ? html`<${FeedMessageForm} class="hidden-xs" autofocus=${false} />`
       : '';
+    const nostrAddr = Nostr.toNostrHexAddress(this.props.id);
+
     return html`
       <div>
         ${messageForm}
@@ -531,7 +533,8 @@ class Profile extends View {
           <${MessageFeed}
             scrollElement=${this.scrollElement.current}
             key="posts${this.props.id}"
-            node=${iris.public(this.props.id).get('msgs')}
+            node=${nostrAddr ? null : iris.public(this.props.id).get('msgs')}
+            nostrUser=${nostrAddr}
           />
         </div>
       </div>

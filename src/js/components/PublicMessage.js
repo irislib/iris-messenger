@@ -70,7 +70,6 @@ class PublicMessage extends Message {
       return new Promise((resolve) => {
         Nostr.subscribe(
           (event) => {
-            console.log('got msg', nostrId, event);
             const msg = {
               signerKeyHash: event.pubkey,
               signedData: {
