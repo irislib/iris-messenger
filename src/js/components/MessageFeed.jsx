@@ -88,7 +88,7 @@ class MessageFeed extends Component {
         // horrible code, b ut we're in a hurry
         const go = () => {
           for (let [id, msg] of Nostr.messagesById) {
-            this.mappedMessages.set(msg.created_at, id);
+            this.mappedMessages.set(msg.created_at * 1000, id);
             this.updateSortedMessages();
           }
         };

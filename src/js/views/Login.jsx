@@ -136,7 +136,7 @@ class Login extends Component {
     iris.session.loginAsNewUser({ name });
     // follow the developer's nostr key also
     setTimeout(() => {
-      const k = '7dd2a857cec09774e445ee2478119e793462325ee34e320fd89232b3f97d6d81';
+      const k = '82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2';
       Nostr.follow(k);
       iris.public().get('follow').get(k).put(true);
     }, 1000);
