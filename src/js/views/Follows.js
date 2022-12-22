@@ -89,7 +89,6 @@ class Follows extends View {
     if (nostrAddress) {
       this.follows = Nostr.followersByUser.get(nostrAddress) ?? new Set();
       this.updateSortedFollows();
-      console.log('nostr followers', this.follows);
     } else {
       iris.group().on(
         `follow/${this.props.id}`,
@@ -128,7 +127,7 @@ class Follows extends View {
                 <div>
                   <${Name} pub=${k} /><br />
                   <small class="follower-count"
-                    >${this.state.contacts[k] && this.state.contacts[k].followerCount}
+                    >${this.state.contacts[k] && this.state.contacts[k].followerCount || 0}<i> </i>
                     followers</small
                   >
                 </div>
