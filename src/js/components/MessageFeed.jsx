@@ -55,7 +55,6 @@ class MessageFeed extends Component {
 
   componentDidMount() {
     let first = true;
-
     if (this.props.nostrUser) {
       Nostr.getMessagesByUser(this.props.nostrUser, eventIds => {
         for (let eventId of eventIds) {
@@ -79,12 +78,23 @@ class MessageFeed extends Component {
         );
       if (this.props.node) {
         this.props.node.map().on(this.sub((...args) => this.handleMessage(...args)));
-      } else if (this.props.group && this.props.path) {
+      } else if (this.props.group && this.props.path) { // public messages
         // TODO: make group use the same basic gun api
         iris.group(this.props.group).map(
           this.props.path,
           this.sub((...args) => this.handleMessage(...args)),
         );
+        // iterate over Nostr.messagesById.values()
+        // horrible code, b ut we're in a hurry
+        const go = () => {
+          for (let [id, msg] of Nostr.messagesById) {
+            this.mappedMessages.set(msg.created_at, id);
+            this.updateSortedMessages();
+          }
+        };
+        go();
+        setTimeout(() => go(), 1000);
+        setInterval(() => go(), 5 * 1000);
       }
     }
   }

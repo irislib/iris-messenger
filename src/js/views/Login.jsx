@@ -12,6 +12,7 @@ import Web3 from 'web3';
 import iris from 'iris-lib';
 import _ from 'lodash';
 import { route } from 'preact-router';
+import Nostr from "../Nostr";
 
 async function ethereumConnect() {
   const providerOptions = {
@@ -133,6 +134,12 @@ class Login extends Component {
     e.preventDefault();
     let name = document.getElementById('login-form-name').value || iris.util.generateName();
     iris.session.loginAsNewUser({ name });
+    // follow the developer's nostr key also
+    setTimeout(() => {
+      const k = '7dd2a857cec09774e445ee2478119e793462325ee34e320fd89232b3f97d6d81';
+      Nostr.follow(k);
+      iris.public().get('follow').get(k).put(true);
+    }, 1000);
     this.base.style = 'display:none';
   }
 

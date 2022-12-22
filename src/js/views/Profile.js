@@ -253,9 +253,10 @@ class Profile extends View {
         callback=${(src) => this.onProfilePhotoSet(src)}
       />`;
     } else if (this.state.photo && !this.state.blocked) {
-      profilePhoto = html`<${ProfilePhoto} photo=${this.state.photo} />`;
+      profilePhoto = html`<${ProfilePhoto} key=${this.props.id} photo=${this.state.photo} />`;
     } else {
       profilePhoto = html`<${Identicon}
+        key=${this.props.id}
         str=${this.props.id}
         hidePhoto=${this.state.blocked}
         width="250"

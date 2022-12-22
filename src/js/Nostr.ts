@@ -73,6 +73,10 @@ export default {
       this.followedByUser.set(follower, new Set<string>());
     }
     this.followedByUser.get(follower)?.add(address);
+    if (follower === iris.session.getKey().secp256k1.rpub) {
+      iris.public().get('follow').get(address).put(true);
+      this.getMessagesByUser(address, () => {});
+    }
   },
   followerCount: function (address: string) {
     return this.followersByUser.get(address)?.size ?? 0;
