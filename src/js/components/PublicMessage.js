@@ -94,6 +94,7 @@ class PublicMessage extends Message {
 
   componentDidMount() {
     this.unmounted = false;
+
     const p = this.fetchByHash();
     if (!p) {
       return;

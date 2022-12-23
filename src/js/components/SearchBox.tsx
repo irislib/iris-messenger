@@ -163,8 +163,9 @@ class SearchBox extends Component<Props, State> {
     }
 
     if (this.props.onSelect) {
-      if (query.startsWith('note')) {
+      if (query.indexOf('note') === 0) {
         route('/post/' + query);
+        return;
       }
       const s = query.split('/profile/');
       if (s.length > 1) {

@@ -3,7 +3,7 @@ import Helpers from '../Helpers';
 import PublicMessage from './PublicMessage';
 import iris from 'iris-lib';
 import Nostr from '../Nostr';
-import { debounce } from 'lodash';
+import { throttle } from 'lodash';
 import { translate as t } from '../translations/Translation';
 import Button from '../components/basic/Button';
 
@@ -16,7 +16,7 @@ class MessageFeed extends Component {
     this.mappedMessages = new Map();
   }
 
-  updateSortedMessages = debounce(() => {
+  updateSortedMessages = throttle(() => {
     if (this.unmounted) {
       return;
     }
@@ -27,7 +27,7 @@ class MessageFeed extends Component {
       sortedMessages = sortedMessages.reverse();
     }
     this.setState({ sortedMessages });
-  }, 100);
+  }, 1000);
 
   handleMessage(v, k, x, e, from) {
     if (from) {

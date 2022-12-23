@@ -106,11 +106,9 @@ export default {
       return str;
     }
     try {
-      const { prefix, data } = bech32.decode(str);
-      if (prefix === 'npub') {
-        const addr = arrayToHex(data);
-        return addr;
-      }
+      const { data } = bech32.decode(str);
+      const addr = arrayToHex(data);
+      return addr;
     } catch (e) {}
     return null;
   },
