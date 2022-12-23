@@ -3,7 +3,7 @@ import Helpers from '../Helpers';
 import PublicMessage from './PublicMessage';
 import iris from 'iris-lib';
 import Nostr from '../Nostr';
-import { throttle } from 'lodash';
+import { debounce } from 'lodash';
 import { translate as t } from '../translations/Translation';
 import Button from '../components/basic/Button';
 
@@ -16,7 +16,7 @@ class MessageFeed extends Component {
     this.mappedMessages = new Map();
   }
 
-  updateSortedMessages = throttle(() => {
+  updateSortedMessages = debounce(() => {
     if (this.unmounted) {
       return;
     }
@@ -27,7 +27,7 @@ class MessageFeed extends Component {
       sortedMessages = sortedMessages.reverse();
     }
     this.setState({ sortedMessages });
-  }, 1000);
+  }, 100);
 
   handleMessage(v, k, x, e, from) {
     if (from) {
@@ -56,16 +56,23 @@ class MessageFeed extends Component {
   componentDidMount() {
     let first = true;
     if (this.props.nostrUser) {
-      Nostr.getMessagesByUser(this.props.nostrUser, eventIds => {
-        for (let eventId of eventIds) {
-          Nostr.getMessageById(eventId).then(event => {
-            if (event.kind === 1 && event.pubkey === this.props.nostrUser) {
-              this.mappedMessages.set(event.created_at, event.id);
-              this.updateSortedMessages();
-            }
-          });
+      this.nostrPollInterval = setInterval(() => { // setInterval hnngh
+        if (this.unmounted) {
+          clearInterval(this.nostrPollInterval);
+          return;
         }
-      });
+
+        Nostr.getMessagesByUser(this.props.nostrUser, eventIds => {
+          for (let eventId of eventIds) {
+            Nostr.getMessageById(eventId).then(event => {
+              if (event.kind === 1 && event.pubkey === this.props.nostrUser) {
+                this.mappedMessages.set(event.created_at, event.id);
+                this.updateSortedMessages();
+              }
+            });
+          }
+        });
+      }, 3000);
     } else {
       iris
         .local()

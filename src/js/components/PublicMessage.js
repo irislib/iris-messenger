@@ -118,36 +118,53 @@ class PublicMessage extends Message {
         iris.public(msg.info.from).get('profile').get('name').on(this.inject());
       }
 
-      iris.group().on(
-        `likes/${encodeURIComponent(this.props.hash)}`,
-        this.sub((liked, a, b, e, from) => {
-          this.eventListeners[`${from}likes`] = e;
-          liked ? this.likedBy.add(from) : this.likedBy.delete(from);
-          const s = { likes: this.likedBy.size };
-          if (from === iris.session.getPubKey()) s['liked'] = liked;
-          this.setState(s);
-        }),
-      );
-      iris.group().map(
-        `replies/${encodeURIComponent(this.props.hash)}`,
-        this.sub((hash, time, b, e, from) => {
-          const k = from + time;
-          if (hash && this.replies[k]) return;
-          if (hash) {
-            this.replies[k] = { hash, time };
-          } else {
-            delete this.replies[k];
-          }
-          this.eventListeners[`${from}replies`] = e;
-          const sortedReplies = Object.values(this.replies).sort((a, b) =>
-            a.time > b.time ? 1 : -1,
-          );
+      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+
+      if (nostrId) {
+        Nostr.getRepliesAndLikes(this.props.hash, (replies, likes) => {
+          console.log('replies', replies);
+          console.log('likes', likes);
+          this.likedBy = new Set(likes);
+          const sortedReplies = replies && Array.from(replies).sort((a, b) => b.time - a.time);
+          console.log('sortedReplies', sortedReplies);
           this.setState({
-            replyCount: Object.keys(this.replies).length,
+            likes: this.likedBy.size,
+            replyCount: sortedReplies?.length ?? 0,
             sortedReplies,
           });
-        }),
-      );
+        });
+      } else {
+        iris.group().on(
+          `likes/${encodeURIComponent(this.props.hash)}`,
+          this.sub((liked, a, b, e, from) => {
+            this.eventListeners[`${from}likes`] = e;
+            liked ? this.likedBy.add(from) : this.likedBy.delete(from);
+            const s = { likes: this.likedBy.size };
+            if (from === iris.session.getPubKey()) s['liked'] = liked;
+            this.setState(s);
+          }),
+        );
+        iris.group().map(
+          `replies/${encodeURIComponent(this.props.hash)}`,
+          this.sub((hash, time, b, e, from) => {
+            const k = from + time;
+            if (hash && this.replies[k]) return;
+            if (hash) {
+              this.replies[k] = { hash, time };
+            } else {
+              delete this.replies[k];
+            }
+            this.eventListeners[`${from}replies`] = e;
+            const sortedReplies = Object.values(this.replies).sort((a, b) =>
+              a.time > b.time ? 1 : -1,
+            );
+            this.setState({
+              replyCount: Object.keys(this.replies).length,
+              sortedReplies,
+            });
+          }),
+        );
+      }
     });
   }
 

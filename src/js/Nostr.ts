@@ -38,6 +38,9 @@ export default {
   relays: defaultRelays,
   messagesByUser: new Map<string, Set<string>>(),
   messagesById: new Map<string, Event>(),
+  repliesByMessageId: new Map<string, Set<string>>(),
+  likesByMessageId: new Map<string, Set<string>>(),
+
   follow: function (address: string) {
     const pubkey = iris.session.getKey().secp256k1.rpub;
     this.addFollower(address, pubkey);
@@ -224,6 +227,28 @@ export default {
       });
   },
 
+  getRepliesAndLikes(id: string, cb: Function | null) {
+    this.subscribe(
+      (event) => {
+        console.log('got reaction / reply', event);
+        if (event.kind === 1) {
+          if (!this.repliesByMessageId.has(id)) {
+            this.repliesByMessageId.set(id, new Set());
+          }
+          this.repliesByMessageId.get(id).add({ hash: event.id, time: event.created_at * 1000 });
+          cb && cb(this.repliesByMessageId.get(id), this.likesByMessageId.get(id));
+        } else if (event.kind === 7) {
+          if (!this.likesByMessageId.has(id)) {
+            this.likesByMessageId.set(id, new Set());
+          }
+          this.likesByMessageId.get(id).add(event.pubkey);
+          cb && cb(this.repliesByMessageId.get(id), this.likesByMessageId.get(id));
+        }
+      },
+      [{ kinds: [1, 7], '#e': [id] }],
+    );
+  },
+
   async getMessageById(id: string) {
     if (this.messagesById.has(id)) {
       return this.messagesById.get(id);
@@ -265,7 +290,7 @@ export default {
           cb && cb(this.messagesByUser.get(address));
         }
       },
-      [{ kinds: [1], authors: [address] }],
+      [{ kinds: [1, 7], authors: [address] }],
     );
   },
 
@@ -317,7 +342,7 @@ export default {
           for (const tag of event.tags) {
             if (Array.isArray(tag) && tag[0] === 'p') {
               if (recursion) {
-                i += 100;
+                i += 500;
                 setTimeout(() => {
                   this.getProfile(tag[1], null, recursion - 1);
                 }, i + (INITIAL_RECURSION - recursion) * 1000);
