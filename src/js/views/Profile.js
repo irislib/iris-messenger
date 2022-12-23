@@ -315,8 +315,10 @@ class Profile extends View {
                 ${this.state.about}
               </p>
             </div>
-            ${this.state.nostr ? html`<a href="/profile/${this.state.nostr}">Nostr</a>` : ''}
-            ${this.state.iris ? html`<a href="/profile/${this.state.iris}">Iris</a>` : ''}
+            ${this.state.nostr
+              ? html`<a href="/profile/${this.state.nostr}">Nostr profile</a>`
+              : ''}
+            ${this.state.iris ? html`<a href="/profile/${this.state.iris}">Iris profile</a>` : ''}
             ${this.renderEthereum()}
             <div class="profile-actions">
               <div class="follow-count">

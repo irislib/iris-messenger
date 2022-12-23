@@ -53,6 +53,7 @@ export default class MessageForm extends Component {
     };
     if (msg.replyingTo) {
       event.tags = [['e', msg.replyingTo, Nostr.getSomeRelayUrl(), 'reply']];
+      // TODO add p tags from replied event, and replied event.pubkey
     }
     Nostr.publish(event);
   }

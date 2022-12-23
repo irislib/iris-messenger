@@ -1,3 +1,5 @@
+<i><b>Note 23.12.2022:</b> Heavily under construction: started integrating Nostr this week.</i>
+
 # Iris
 
 Iris is like the social networking apps we're used to, but better.

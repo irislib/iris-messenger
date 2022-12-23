@@ -14,13 +14,6 @@ import Identicon from './Identicon';
 import Message from './Message';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
-const bech32 = require('bech32-buffer');
-
-function arrayToHex(array) {
-  return Array.from(array, (byte) => {
-    return ('0' + (byte & 0xff).toString(16)).slice(-2);
-  }).join('');
-}
 
 const MSG_TRUNCATE_LENGTH = 1000;
 
@@ -200,6 +193,27 @@ class PublicMessage extends Message {
           target: this.props.hash,
         });
         iris.notifications.sendWebPushNotification(author, { title, body });
+      }
+
+      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+      console.log('nostrId', nostrId);
+      if (nostrId) {
+        Nostr.publish({
+          kind: 7,
+          content: '+',
+          tags: [
+            ['e', nostrId],
+            ['p', author],
+          ],
+        });
+        console.log({
+          kind: 7,
+          content: '+',
+          tags: [
+            ['e', nostrId],
+            ['p', author],
+          ],
+        });
       }
     }
   }

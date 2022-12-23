@@ -15,6 +15,10 @@ class About extends Component {
         <Header />
         <div class="main-view" id="settings">
           <div class="centered-container">
+            <p>
+              <b>Note 23.12.2022:</b> Heavily under construction: started integrating Nostr this
+              week.
+            </p>
             <h3>{t('about')}</h3>
             <p>{t('iris_is_like')}</p>
             <ul>
