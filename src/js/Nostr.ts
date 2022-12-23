@@ -269,16 +269,28 @@ export default {
     }
 
     this.subscribe(
-      (event) => {
+      // are we sure that event.pubkey === address ?
+      async (event) => {
         if (event.kind === 0) {
           try {
             const content = JSON.parse(event.content);
-            this.userProfiles.set(address, {
+            const profile: any = {
               name: content.name,
               about: content.about,
               photo: content.picture,
-              iris: content.iris,
-            });
+            };
+            if (content.iris) {
+              try {
+                const irisData = JSON.parse(content.iris);
+                const nostrAddrSignedByIris = await iris.Key.verify(irisData.sig, irisData.pub);
+                if (nostrAddrSignedByIris === address) {
+                  profile.iris = irisData.pub;
+                }
+              } catch (e) {
+                // console.error('Invalid iris data', e);
+              }
+            }
+            this.userProfiles.set(address, profile);
             iris.session.addToSearchIndex(address, {
               key: address,
               name: content.name,
@@ -314,10 +326,14 @@ export default {
   },
 
   setMetadata() {
-    setTimeout(() => {
+    setTimeout(async () => {
       // for each child of this.profile, if it has a value, set it
+      const irisData = JSON.stringify({
+        pub: iris.session.getPubKey(),
+        sig: await iris.Key.sign(iris.session.getKey().secp256k1.rpub, iris.session.getKey()),
+      });
       const data = {
-        iris: iris.session.getPubKey(),
+        iris: irisData,
       };
       for (const key in this.profile) {
         if (this.profile[key].value) {

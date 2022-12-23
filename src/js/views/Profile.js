@@ -651,10 +651,11 @@ class Profile extends View {
       .get('profile')
       .get('nostr')
       .on(
-        this.sub((nostr) => {
+        this.sub(async (nostr) => {
           try {
             nostr = JSON.parse(nostr);
-            this.setState({ nostr: nostr.rpub }); //TODO verify
+            const valid = await iris.Key.schnorrVerify(nostr.sig, pub, nostr.rpub);
+            valid && this.setState({ nostr: nostr.rpub });
           } catch (e) {
             console.log('nostr parse error', e);
           }
