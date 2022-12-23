@@ -19,17 +19,19 @@ type Props = Record<string, unknown>;
 type State = {
   activeRoute: string;
   unseenMsgsTotal: number;
+  showBetaFeatures: boolean;
   chatId?: string;
 };
 
 class Footer extends Component<Props, State> {
   constructor() {
     super();
-    this.state = { unseenMsgsTotal: 0, activeRoute: '/' };
+    this.state = { showBetaFeatures: false, unseenMsgsTotal: 0, activeRoute: '/' };
   }
 
   componentDidMount() {
     iris.local().get('unseenMsgsTotal').on(this.inject());
+    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
     iris
       .local()
       .get('activeRoute')
@@ -59,14 +61,16 @@ class Footer extends Component<Props, State> {
           <a href="/" class={`btn ${activeRoute === '/' ? 'active' : ''}`}>
             {Icons.home}
           </a>
-          <a href="/chat" class={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
-            {this.state.unseenMsgsTotal ? (
-              <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
-            ) : (
-              ''
-            )}
-            {Icons.chat}
-          </a>
+          {this.state.showBetaFeatures && (
+            <a href="/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
+              {this.state.unseenMsgsTotal ? (
+                <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
+              ) : (
+                ''
+              )}
+              {Icons.chat}
+            </a>
+          )}
           <a href="/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
             {plusIcon}
           </a>

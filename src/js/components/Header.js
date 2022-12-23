@@ -63,6 +63,7 @@ class Header extends Component {
     iris.local().get('showParticipants').on(this.inject());
     iris.local().get('unseenMsgsTotal').on(this.inject());
     iris.local().get('unseenNotificationCount').on(this.inject());
+    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
     iris
       .local()
       .get('activeRoute')
@@ -143,7 +144,7 @@ class Header extends Component {
   }
 
   render() {
-    const key = iris.session.getPubKey();
+    const key = iris.session.getKey().secp256k1.rpub;
     if (!key) {
       return;
     }
@@ -286,18 +287,23 @@ class Header extends Component {
               </a>
             `
           : ''}
-        <${Link}
-          activeClassName="active"
-          href="/notifications"
-          class="notifications-button mobile-search-hidden ${this.state.showMobileSearch
-            ? 'hidden'
-            : ''}"
-        >
-          ${Icons.heartEmpty}
-          ${this.state.unseenNotificationCount
-            ? html` <span class="unseen">${this.state.unseenNotificationCount}</span> `
-            : ''}
-        <//>
+        ${this.state.showBetaFeatures
+          ? html`
+              <${Link}
+                activeClassName="active"
+                href="/notifications"
+                class="notifications-button mobile-search-hidden ${this.state.showMobileSearch
+                  ? 'hidden'
+                  : ''}"
+              >
+                ${Icons.heartEmpty}
+                ${this.state.unseenNotificationCount
+                  ? html` <span class="unseen">${this.state.unseenNotificationCount}</span> `
+                  : ''}
+              <//>
+            `
+          : ''}
+
         <${Link}
           activeClassName="active"
           href="/profile/${key}"
