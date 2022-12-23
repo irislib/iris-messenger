@@ -20,16 +20,18 @@ const getRelayStatus = (relay: Relay) => {
 
 const INITIAL_RECURSION = 0; // 0 for now to limit the amount of requests. need to bundle the requests together.
 
-const defaultRelays = new Map<string, Relay>([
-  'wss://expensive-relay.fiatjaf.com',
-  'wss://rsslay.fiatjaf.com',
-  'wss://nostr-relay.wlvs.space',
-  'wss://relay.damus.io',
-  'wss://nostr-pub.wellorder.net',
-  'wss://relay.nostr.info',
-  'wss://nostr.bitcoiner.social',
-  'wss://nostr.onsats.org',
-].map((url) => [url, relayInit(url)]));
+const defaultRelays = new Map<string, Relay>(
+  [
+    'wss://expensive-relay.fiatjaf.com',
+    'wss://rsslay.fiatjaf.com',
+    'wss://nostr-relay.wlvs.space',
+    'wss://relay.damus.io',
+    'wss://nostr-pub.wellorder.net',
+    'wss://relay.nostr.info',
+    'wss://nostr.bitcoiner.social',
+    'wss://nostr.onsats.org',
+  ].map((url) => [url, relayInit(url)]),
+);
 
 type Subscription = {
   filters: Filter[];
@@ -237,12 +239,12 @@ export default {
       let profile: any = {
         name: content.name,
         photo: content.picture,
-        about: content.about
+        about: content.about,
       };
       if (content.iris) {
         try {
           const irisData = JSON.parse(content.iris);
-          iris.Key.verify(irisData.sig, irisData.pub).then(nostrAddrSignedByIris => {
+          iris.Key.verify(irisData.sig, irisData.pub).then((nostrAddrSignedByIris) => {
             if (nostrAddrSignedByIris === event.pubkey) {
               profile.iris = irisData.pub;
             }
