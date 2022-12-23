@@ -244,9 +244,6 @@ class Profile extends View {
   }
 
   renderDetails() {
-    this.isMyProfile =
-      iris.session.getPubKey() === this.props.id ||
-      iris.session.getKey().secp256k1.rpub === this.props.id;
     let profilePhoto;
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker}
@@ -318,7 +315,9 @@ class Profile extends View {
             ${this.state.nostr
               ? html`<a href="/profile/${this.state.nostr}">Nostr profile</a>`
               : ''}
-            ${this.state.iris ? html`<a href="/profile/${this.state.iris}">Iris profile</a>` : ''}
+            ${this.state.iris
+              ? html`<a href="/profile/${this.state.iris}">Iris profile (editable)</a>`
+              : ''}
             ${this.renderEthereum()}
             <div class="profile-actions">
               <div class="follow-count">
@@ -346,9 +345,13 @@ class Profile extends View {
                 : html`
                     <div class="hidden-xs">
                       <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                      <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
-                        >${t('send_message')}<//
-                      >
+                      ${this.state.showBetaFeatures
+                        ? html`
+                            <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
+                              >${t('send_message')}<//
+                            >
+                          `
+                        : ''}
                     </div>
                   `}
             </div>
@@ -729,6 +732,9 @@ class Profile extends View {
     }
     this.followedUsers = new Set();
     this.followers = new Set();
+    this.isMyProfile =
+      iris.session.getPubKey() === this.props.id ||
+      iris.session.getKey().secp256k1.rpub === this.props.id;
     this.setState({
       followedUserCount: 0,
       followerCount: 0,
@@ -737,7 +743,7 @@ class Profile extends View {
       noLikes: false,
       noMedia: false,
       nostr: null,
-      iris: null,
+      iris: nostrNpub && this.isMyProfile ? iris.session.getPubKey() : null,
       eth: null,
       name: '',
       photo: '',
@@ -746,7 +752,6 @@ class Profile extends View {
       ethereumAddress: null,
       nfts: [],
     });
-    this.isMyProfile = iris.session.getPubKey() === pub;
     const chat = iris.private(pub);
     if (pub.length < 40) {
       if (!chat) {
@@ -761,6 +766,7 @@ class Profile extends View {
     let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
     iris.local().get('noFollowers').on(this.inject());
+    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
     // if pub is hex, it's a nostr address
     const nostrAddr = Nostr.toNostrHexAddress(pub);
     if (nostrAddr) {
