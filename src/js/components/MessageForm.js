@@ -51,6 +51,9 @@ export default class MessageForm extends Component {
       kind: 1,
       content: msg.text,
     };
+    if (msg.replyingTo) {
+      event.tags = [['e', msg.replyingTo, Nostr.getSomeRelayUrl(), 'reply']];
+    }
     Nostr.publish(event);
   }
 

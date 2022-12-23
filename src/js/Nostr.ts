@@ -242,6 +242,16 @@ export default {
     });
   },
 
+  getSomeRelayUrl() {
+    // try to find a connected relay, but if none are connected, just return the first one
+    const relays: Relay[] = Array.from(this.relays.values());
+    const connectedRelays: Relay[] = relays.filter((relay: Relay) => getRelayStatus(relay) === 1);
+    if (connectedRelays.length) {
+      return connectedRelays[0].url;
+    }
+    return relays.length ? relays[0].url : null;
+  },
+
   getMessagesByUser(address: string, cb: Function | undefined) {
     if (this.messagesByUser.has(address)) {
       cb && cb(this.messagesByUser.get(address));
