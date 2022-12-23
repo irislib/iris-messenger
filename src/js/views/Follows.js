@@ -44,7 +44,7 @@ class Follows extends View {
   getFollows() {
     const nostrAddress = Nostr.toNostrHexAddress(this.props.id);
 
-    if (nostrAddress) {
+    if (nostrAddress) { // TODO subscription system
       this.follows = Nostr.followedByUser.get(nostrAddress) ?? new Set();
       this.updateSortedFollows();
     } else {

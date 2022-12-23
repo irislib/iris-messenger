@@ -48,6 +48,7 @@ class PublicMessage extends Message {
     if (nostrId) {
       return Nostr.getMessageById(nostrId).then((event) => {
         Nostr.getProfile(event.pubkey, (profile) => {
+          if (!profile) return;
           if (!thisArg.unmounted) {
             thisArg.setState({ name: profile.name });
           }
@@ -125,11 +126,8 @@ class PublicMessage extends Message {
 
       if (nostrId) {
         Nostr.getRepliesAndLikes(this.props.hash, (replies, likes) => {
-          console.log('replies', replies);
-          console.log('likes', likes);
           this.likedBy = new Set(likes);
           const sortedReplies = replies && Array.from(replies).sort((a, b) => b.time - a.time);
-          console.log('sortedReplies', sortedReplies);
           this.setState({
             likes: this.likedBy.size,
             replyCount: sortedReplies?.length ?? 0,

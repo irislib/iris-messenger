@@ -52,7 +52,7 @@ export default {
   subscribedUsers: new Set<string>(),
   messagesByUser: new Map<string, Set<string>>(),
   messagesById: new Map<string, Event>(),
-  repliesByMessageId: new Map<string, Set<string>>(),
+  repliesByMessageId: new Map<string, Map<string, any>>(),
   likesByMessageId: new Map<string, Set<string>>(),
 
   follow: function (address: string) {
@@ -210,9 +210,9 @@ export default {
     const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
     for (const [_, replyId] of repliedMessages) {
       if (!this.repliesByMessageId.has(event.id)) {
-        this.repliesByMessageId.set(event.id, new Set<string>());
+        this.repliesByMessageId.set(event.id, new Map<string, any>());
       }
-      this.repliesByMessageId.get(event.id)?.add(replyId);
+      this.repliesByMessageId.get(event.id)?.set(replyId, {hash: replyId, time: event.created_at});
     }
   },
   handleReaction(event: Event) {
@@ -311,10 +311,10 @@ export default {
     if (filter.authors && !filter.authors.includes(event.pubkey)) {
       return false;
     }
-    if (filter['#e'] && !event.tags.some((tag: any) => tag[0] === 'e' && tag[1] === filter['#e'])) {
+    if (filter['#e'] && !event.tags.some((tag: any) => tag[0] === 'e' && filter['#e'].includes(tag[1]))) {
       return false;
     }
-    if (filter['#p'] && !event.tags.some((tag: any) => tag[0] === 'e' && tag[1] === filter['#p'])) {
+    if (filter['#p'] && !event.tags.some((tag: any) => tag[0] === 'e' && filter['#p'].includes(tag[1]))) {
       return false;
     }
     return true;
@@ -381,7 +381,14 @@ export default {
   },
 
   getRepliesAndLikes(id: string, cb: Function | undefined) {
-    this.subscribe([{ kinds: [1, 7], '#e': [id] }], cb);
+    const callback = () => {
+      cb && cb(new Set(this.repliesByMessageId.get(id)?.values()), this.likesByMessageId.get(id));
+    }
+    if (this.repliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
+      callback();
+    }
+
+    this.subscribe([{ kinds: [1, 7], '#e': [id] }], callback);
   },
 
   async getMessageById(id: string) {
