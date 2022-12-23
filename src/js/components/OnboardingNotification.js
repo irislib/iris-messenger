@@ -16,6 +16,7 @@ const SUGGESTED_FOLLOW =
 export default class OnboardingNotification extends Component {
   componentDidMount() {
     iris.local().get('noFollowers').on(this.inject());
+    iris.local().get('hasNostrFollowers').on(this.inject());
     iris.local().get('noFollows').on(this.inject());
   }
 
@@ -46,7 +47,7 @@ export default class OnboardingNotification extends Component {
         </div>
       `;
     }
-    if (this.state.noFollowers) {
+    if (this.state.noFollowers && !this.state.hasNostrFollowers) {
       return html`
         <div class="msg">
           <div class="msg-content">
@@ -54,7 +55,7 @@ export default class OnboardingNotification extends Component {
             <p>
               <${CopyButton}
                 text=${t('copy_link')}
-                copyStr=${Helpers.getProfileLink(iris.session.getPubKey())}
+                copyStr=${Helpers.getProfileLink(iris.session.getKey().secp256k1.rpub)}
               />
             </p>
             <p

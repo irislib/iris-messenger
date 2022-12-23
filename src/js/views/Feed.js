@@ -3,7 +3,6 @@ import { html } from 'htm/preact';
 import iris from 'iris-lib';
 
 import FeedMessageForm from '../components/FeedMessageForm';
-import Filters from '../components/Filters';
 import MessageFeed from '../components/MessageFeed';
 import OnboardingNotification from '../components/OnboardingNotification';
 import SubscribeHashtagButton from '../components/SubscribeHashtagButton';
@@ -85,7 +84,6 @@ class Feed extends View {
             ${s.searchTerm
               ? html`<h2>Search results for "${s.searchTerm}"</h2>`
               : html` <${OnboardingNotification} /> `}
-            ${!s.noFollows ? html`<${Filters} />` : ''}
             <${MessageFeed}
               scrollElement=${this.scrollElement.current}
               hashtag=${hashtag}

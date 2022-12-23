@@ -77,9 +77,29 @@ export default {
       iris.public().get('follow').get(address).put(true);
       this.getMessagesByUser(address);
     }
+    if (address === iris.session.getKey().secp256k1.rpub) {
+      if (this.followersByUser.get(address)?.size === 1) {
+        iris.local().get('hasNostrFollowers').put(true);
+      }
+    }
   },
   followerCount: function (address: string) {
     return this.followersByUser.get(address)?.size ?? 0;
+  },
+  toNostrBech32Address: function (address: string, prefix) {
+    try {
+      const decoded = bech32.decode(address);
+      if (prefix !== decoded.prefix) {
+        return null;
+      }
+      return bech32.encode(prefix, decoded.words);
+    } catch (e) {}
+
+    if (address.match(/^[0-9a-fA-F]{64}$/)) {
+      const words = Buffer.from(address, 'hex');
+      return bech32.encode(prefix, words);
+    }
+    return null;
   },
   toNostrHexAddress(str: string): string | null {
     if (str.match(/^[0-9a-fA-F]{64}$/)) {
@@ -257,6 +277,7 @@ export default {
               name: content.name,
               about: content.about,
               photo: content.picture,
+              iris: content.iris,
             });
             iris.session.addToSearchIndex(address, {
               key: address,
@@ -295,7 +316,9 @@ export default {
   setMetadata() {
     setTimeout(() => {
       // for each child of this.profile, if it has a value, set it
-      const data = {};
+      const data = {
+        iris: iris.session.getPubKey(),
+      };
       for (const key in this.profile) {
         if (this.profile[key].value) {
           data[key] = this.profile[key].value;

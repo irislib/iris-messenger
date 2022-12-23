@@ -3,7 +3,6 @@ import FollowButton from '../components/FollowButton';
 import Header from '../components/Header';
 import Identicon from '../components/Identicon';
 import Text from '../components/Text';
-import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation';
 
 const DEVELOPER =

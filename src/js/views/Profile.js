@@ -316,6 +316,7 @@ class Profile extends View {
               </p>
             </div>
             ${this.state.nostr ? html`<a href="/profile/${this.state.nostr}">Nostr</a>` : ''}
+            ${this.state.iris ? html`<a href="/profile/${this.state.iris}">Iris</a>` : ''}
             ${this.renderEthereum()}
             <div class="profile-actions">
               <div class="follow-count">
@@ -615,7 +616,11 @@ class Profile extends View {
     };
     setFollowCounts();
     Nostr.getProfile(address, (data, addr) => {
-      addr === this.props.id && this.setState(data);
+      const profile = {};
+      data.name && (profile.name = data.name);
+      data.about && (profile.about = data.about);
+      data.iris && (profile.iris = data.iris);
+      addr === this.props.id && this.setState(profile);
     });
   }
 
@@ -724,6 +729,7 @@ class Profile extends View {
       noLikes: false,
       noMedia: false,
       nostr: null,
+      iris: null,
       eth: null,
       name: '',
       photo: '',
