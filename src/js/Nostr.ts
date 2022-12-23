@@ -28,6 +28,13 @@ const defaultRelays = new Map<string, Relay>([
   ['wss://nostr.onsats.org', relayInit('wss://nostr.onsats.org')],
 ]);
 
+type Subscription = {
+  filters: Filter[];
+  callback?: (event: Event) => void;
+}
+
+let subscriptionId = 0;
+
 export default {
   pool: null,
   profile: {},
@@ -36,6 +43,8 @@ export default {
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: 3,
   relays: defaultRelays,
+  subscriptions: new Map<Number, Subscription>(),
+  subscribedUsers: new Set<string>(),
   messagesByUser: new Map<string, Set<string>>(),
   messagesById: new Map<string, Event>(),
   repliesByMessageId: new Map<string, Set<string>>(),
@@ -130,11 +139,12 @@ export default {
       relay.publish(event);
     }
   },
-  subscribe: function (cb: Function, filters: Filter[], opts = {}) {
-    for (const relay of this.relays.values()) {
+  subscribeAuthors: debounce((_this) => {
+    console.log('subscribe to', Array.from(_this.subscribedUsers));
+    for (const relay of _this.relays.values()) {
       const go = () => {
-        const sub = relay.sub(filters, opts);
-        sub.on('event', cb);
+        const sub = relay.sub([{authors: Array.from(_this.subscribedUsers)}], {});
+        sub.on('event', event => _this.handleEvent(event));
       };
       const status = getRelayStatus(relay);
       if (status === 0) {
@@ -145,6 +155,21 @@ export default {
         go();
       }
     }
+  }, 1000),
+  subscribe: function (filters: Filter[], cb: Function) {
+    this.subscriptions.set(subscriptionId++, {
+      filter: filters,
+      callback: cb,
+    });
+
+    for (const filter of filters) {
+      if (filter.authors) {
+        for (const author of filter.authors) {
+          this.subscribedUsers.add(author);
+        }
+      }
+    }
+    this.subscribeAuthors(this);
   },
   manageRelays: function () {
     const go = () => {
@@ -165,6 +190,116 @@ export default {
     }
 
     setInterval(go, 1000);
+  },
+  handleNote(event: Event) {
+    this.messagesById.set(event.id, event);
+    this.messagesByUser.get(event.pubkey)?.add(event.id);
+    const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
+    for (const [_, replyId] of repliedMessages) {
+      if (!this.repliesByMessageId.has(event.id)) {
+        this.repliesByMessageId.set(event.id, new Set<string>());
+      }
+      this.repliesByMessageId.get(event.id)?.add(replyId);
+    }
+  },
+  handleReaction(event: Event) {
+    if (event.content !== '+') return; // for now we handle only likes
+    const subjects = event.tags.filter((tag: any) => tag[0] === 'e');
+    for (const subject of subjects) {
+      const id = subject[1];
+      if (!this.likesByMessageId.has(id)) {
+        this.likesByMessageId.set(id, new Set());
+      }
+      this.likesByMessageId.get(id).add(event.pubkey);
+    }
+  },
+  handleFollow(event: Event) {
+    for (const tag of event.tags) {
+      if (Array.isArray(tag) && tag[0] === 'p') {
+        this.addFollower(tag[1], event.pubkey);
+      }
+    }
+  },
+  async handleMetadata(event: Event) {
+    try {
+      const content = JSON.parse(event.content);
+      const profile: any = {
+        name: content.name,
+        about: content.about,
+        photo: content.picture,
+      };
+      if (content.iris) {
+        try {
+          const irisData = JSON.parse(content.iris);
+          const nostrAddrSignedByIris = await iris.Key.verify(irisData.sig, irisData.pub);
+          if (nostrAddrSignedByIris === event.pubkey) {
+            profile.iris = irisData.pub;
+          }
+        } catch (e) {
+          // console.error('Invalid iris data', e);
+        }
+      }
+      this.userProfiles.set(event.pubkey, profile);
+      iris.session.addToSearchIndex(event.pubkey, {
+        key: event.pubkey,
+        name: content.name,
+        followers: this.followersByUser.get(event.pubkey) ?? new Set(),
+      });
+    } catch (e) {
+      console.log('error parsing nostr profile', e);
+    }
+  },
+  handleEvent(event: Event) {
+    switch (event.kind) {
+      case 0:
+        this.handleMetadata(event);
+        break;
+      case 1:
+        this.handleNote(event);
+        break;
+      case 3:
+        this.handleFollow(event);
+        break;
+      case 7:
+        this.handleReaction(event);
+        break;
+    }
+    // go through subscriptions and callback if filters match
+    for (const sub of this.subscriptions.values()) {
+      if (!sub.filters) {
+        return;
+      }
+      if (this.matchesOneFilter(event, sub.filters)) {
+        sub.callback && sub.callback(event);
+      }
+    }
+  },
+  // if one of the filters matches, return true
+  matchesOneFilter(event: Event, filters: Filter[]) {
+    for (const filter of filters) {
+      if (this.matchFilter(event, filter)) {
+        return true;
+      }
+    }
+    return false;
+  },
+  matchFilter(event: Event, filter: Filter) {
+    if (filter.ids && !filter.ids.includes(event.id)) {
+      return false;
+    }
+    if (filter.kinds && !filter.kinds.includes(event.kind)) {
+      return false;
+    }
+    if (filter.authors && !filter.authors.includes(event.pubkey)) {
+      return false;
+    }
+    if (filter['#e'] && !event.tags.some((tag: any) => tag[0] === 'e' && tag[1] === filter['#e'])) {
+      return false;
+    }
+    if (filter['#p'] && !event.tags.some((tag: any) => tag[0] === 'e' && tag[1] === filter['#p'])) {
+      return false;
+    }
+    return true;
   },
   init: function () {
     iris
@@ -228,25 +363,22 @@ export default {
   },
 
   getRepliesAndLikes(id: string, cb: Function | null) {
-    this.subscribe(
-      (event) => {
-        console.log('got reaction / reply', event);
-        if (event.kind === 1) {
-          if (!this.repliesByMessageId.has(id)) {
-            this.repliesByMessageId.set(id, new Set());
-          }
-          this.repliesByMessageId.get(id).add({ hash: event.id, time: event.created_at * 1000 });
-          cb && cb(this.repliesByMessageId.get(id), this.likesByMessageId.get(id));
-        } else if (event.kind === 7) {
-          if (!this.likesByMessageId.has(id)) {
-            this.likesByMessageId.set(id, new Set());
-          }
-          this.likesByMessageId.get(id).add(event.pubkey);
-          cb && cb(this.repliesByMessageId.get(id), this.likesByMessageId.get(id));
+    this.subscribe([{ kinds: [1, 7], '#e': [id] }], (event) => {
+      console.log('got reaction / reply', event);
+      if (event.kind === 1) {
+        if (!this.repliesByMessageId.has(id)) {
+          this.repliesByMessageId.set(id, new Set());
         }
-      },
-      [{ kinds: [1, 7], '#e': [id] }],
-    );
+        this.repliesByMessageId.get(id).add({ hash: event.id, time: event.created_at * 1000 });
+        cb && cb(this.repliesByMessageId.get(id), this.likesByMessageId.get(id));
+      } else if (event.kind === 7) {
+        if (!this.likesByMessageId.has(id)) {
+          this.likesByMessageId.set(id, new Set());
+        }
+        this.likesByMessageId.get(id).add(event.pubkey);
+        cb && cb(this.repliesByMessageId.get(id), this.likesByMessageId.get(id));
+      }
+    });
   },
 
   async getMessageById(id: string) {
@@ -255,13 +387,10 @@ export default {
     }
 
     return new Promise((resolve) => {
-      this.subscribe(
-        (event) => {
-          this.messagesById.set(event.id, event);
-          resolve(event);
-        },
-        [{ ids: [id] }],
-      );
+      this.subscribe([{ ids: [id] }], (event) => {
+        this.messagesById.set(event.id, event);
+        resolve(event);
+      });
     });
   },
 
@@ -282,16 +411,13 @@ export default {
     }
 
     this.messagesByUser.set(address, new Set());
-    this.subscribe(
-      (event) => {
-        if (event.kind === 1 && event.pubkey === address) {
-          this.messagesById.set(event.id, event);
-          this.messagesByUser.get(address)?.add(event.id);
-          cb && cb(this.messagesByUser.get(address));
-        }
-      },
-      [{ kinds: [1, 7], authors: [address] }],
-    );
+    this.subscribe([{ kinds: [1, 7], authors: [address] }], (event) => {
+      if (event.kind === 1 && event.pubkey === address) {
+        this.messagesById.set(event.id, event);
+        this.messagesByUser.get(address)?.add(event.id);
+        cb && cb(this.messagesByUser.get(address));
+      }
+    });
   },
 
   getProfile(address, callback: Function | null, recursion = 0) {
@@ -302,6 +428,7 @@ export default {
     }
 
     this.subscribe(
+      [{ authors: [address], kinds: [0, 3] }],
       // are we sure that event.pubkey === address ?
       async (event) => {
         if (event.kind === 0) {
@@ -354,7 +481,6 @@ export default {
           }
         }
       },
-      [{ authors: [address], kinds: [0, 3] }],
     );
   },
 
