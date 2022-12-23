@@ -54,7 +54,7 @@ class PublicMessage extends Message {
         });
         // if it's a reply, one of event.tags is ["e", <event-id>, <relay-url>, <marker>]
         let replyTag = event.tags.find((tag) => tag[0] === 'e' && tag[3] === 'reply');
-        if (replyTag) {
+        if (!replyTag) {
           replyTag = event.tags.find((tag) => tag[0] === 'e');
         }
         const replyingTo = replyTag && replyTag[1];

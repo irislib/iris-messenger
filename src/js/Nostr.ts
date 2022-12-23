@@ -98,7 +98,7 @@ export default {
       }
     }
   },
-  // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime
+  // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime. and replies
   followerCount: function (address: string) {
     return this.followersByUser.get(address)?.size ?? 0;
   },
