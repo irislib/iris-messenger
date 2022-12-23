@@ -49,21 +49,8 @@ class PublicMessage extends Message {
     this.state = { sortedReplies: [] };
   }
 
-  static toNostrId(str) {
-    if (str.match(/^[0-9a-fA-F]{64}$/)) {
-      return str;
-    }
-    try {
-      const { prefix, data } = bech32.decode(str);
-      if (prefix === 'note') {
-        return arrayToHex(data);
-      }
-    } catch (e) {}
-    return null;
-  }
-
   static fetchByHash(thisArg, hash) {
-    const nostrId = PublicMessage.toNostrId(hash);
+    const nostrId = Nostr.toNostrHexAddress(hash);
 
     if (nostrId) {
       return Nostr.getMessageById(nostrId).then((event) => {
@@ -72,7 +59,7 @@ class PublicMessage extends Message {
             thisArg.setState({ name: profile.name });
           }
         });
-        // if it's a reply, there's tag ["e", <event-id>, <relay-url>, <marker>] in one of event.tags
+        // if it's a reply, one of event.tags is ["e", <event-id>, <relay-url>, <marker>]
         const replyTag = event.tags.find((tag) => tag[0] === 'e');
         const replyingTo = replyTag && replyTag[1];
         return {

@@ -237,7 +237,7 @@ export default {
           this.messagesById.set(event.id, event);
           resolve(event);
         },
-        [{ ids: [id], kinds: [1] }],
+        [{ ids: [id] }],
       );
     });
   },
