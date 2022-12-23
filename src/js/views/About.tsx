@@ -37,29 +37,6 @@ class About extends Component {
               <small>Version 2.3.3</small>
             </p>
 
-            {Helpers.isElectron ? (
-              ''
-            ) : (
-              <div id="desktop-application-about">
-                <h4> {t('get_the_desktop_application')} </h4>
-                <ul>
-                  <li> {t('communicate_and_synchronize')} </li>
-
-                  <ul>
-                    <li> {t('when_local_peers')} </li>
-                    <li> {t('bluetooth_support_upcoming')} </li>
-                  </ul>
-
-                  <li> {t('opens_to_background')} </li>
-
-                  <li> {t('more_secure_and_available')} </li>
-
-                  <li> {t('direct_connect_to_the')} </li>
-                </ul>
-                <a href="https://github.com/irislib/iris-electron/releases">Download</a>
-              </div>
-            )}
-
             <h4>Privacy</h4>
             <p>{t('application_security_warning')}</p>
             <p>

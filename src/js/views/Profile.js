@@ -244,7 +244,9 @@ class Profile extends View {
   }
 
   renderDetails() {
-    this.isMyProfile = iris.session.getPubKey() === this.props.id;
+    this.isMyProfile =
+      iris.session.getPubKey() === this.props.id ||
+      iris.session.getKey().secp256k1.rpub === this.props.id;
     let profilePhoto;
     if (this.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker}
@@ -313,6 +315,7 @@ class Profile extends View {
                 ${this.state.about}
               </p>
             </div>
+            ${this.state.nostr ? html`<a href="/profile/${this.state.nostr}">Nostr</a>` : ''}
             ${this.renderEthereum()}
             <div class="profile-actions">
               <div class="follow-count">
@@ -641,6 +644,20 @@ class Profile extends View {
     iris
       .public(pub)
       .get('profile')
+      .get('nostr')
+      .on(
+        this.sub((nostr) => {
+          try {
+            nostr = JSON.parse(nostr);
+            this.setState({ nostr: nostr.rpub }); //TODO verify
+          } catch (e) {
+            console.log('nostr parse error', e);
+          }
+        }),
+      );
+    iris
+      .public(pub)
+      .get('profile')
       .get('eth')
       .on(
         this.sub((eth) => {
@@ -706,6 +723,7 @@ class Profile extends View {
       noReplies: false,
       noLikes: false,
       noMedia: false,
+      nostr: null,
       eth: null,
       name: '',
       photo: '',

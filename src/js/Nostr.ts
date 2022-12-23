@@ -161,18 +161,13 @@ export default {
           .get('name')
           .on(
             debounce((name, _k, msg) => {
-              console.log('set nostr name', name, msg);
               const updatedAt = msg.put['>'];
               if (
                 !this.profile.name ||
                 (this.profile.name.value !== name && this.profile.name.updatedAt < updatedAt)
               ) {
                 this.profile.name = { value: name, updatedAt };
-                const metadata = { name };
-                if (this.profile.about) {
-                  metadata['about'] = this.profile.about.value;
-                }
-                this.setMetadata(metadata);
+                this.setMetadata();
               }
             }, 1000),
           );
@@ -182,18 +177,29 @@ export default {
           .get('about')
           .on(
             debounce((about, _k, msg) => {
-              console.log('set nostr bio', about, msg);
               const updatedAt = msg.put['>'];
               if (
                 !this.profile.about ||
                 (this.profile.about.value !== about && this.profile.about.updatedAt < updatedAt)
               ) {
                 this.profile.about = { value: about, updatedAt };
-                const metadata = { about };
-                if (this.profile.name) {
-                  metadata['name'] = this.profile.name.value;
-                }
-                this.setMetadata(metadata);
+                this.setMetadata();
+              }
+            }, 1000),
+          );
+        iris
+          .public()
+          .get('profile')
+          .get('photo')
+          .on(
+            debounce((photo, _k, msg) => {
+              const updatedAt = msg.put['>'];
+              if (
+                !this.profile.picture ||
+                (this.profile.picture.value !== photo && this.profile.picture.updatedAt < updatedAt)
+              ) {
+                this.profile.picture = { value: photo, updatedAt };
+                this.setMetadata();
               }
             }, 1000),
           );
@@ -286,8 +292,15 @@ export default {
     );
   },
 
-  setMetadata(data) {
+  setMetadata() {
     setTimeout(() => {
+      // for each child of this.profile, if it has a value, set it
+      const data = {};
+      for (const key in this.profile) {
+        if (this.profile[key].value) {
+          data[key] = this.profile[key].value;
+        }
+      }
       const event = {
         kind: 0,
         content: JSON.stringify(data),
