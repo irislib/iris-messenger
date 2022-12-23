@@ -21,12 +21,15 @@ const getRelayStatus = (relay: Relay) => {
 const INITIAL_RECURSION = 0; // 0 for now to limit the amount of requests. need to bundle the requests together.
 
 const defaultRelays = new Map<string, Relay>([
-  ['wss://relay.damus.io', relayInit('wss://relay.damus.io')],
-  ['wss://nostr-pub.wellorder.net', relayInit('wss://nostr-pub.wellorder.net')],
-  ['wss://relay.nostr.info', relayInit('wss://relay.nostr.info')],
-  ['wss://nostr.bitcoiner.social', relayInit('wss://nostr.bitcoiner.social')],
-  ['wss://nostr.onsats.org', relayInit('wss://nostr.onsats.org')],
-]);
+  'wss://expensive-relay.fiatjaf.com',
+  'wss://rsslay.fiatjaf.com',
+  'wss://nostr-relay.wlvs.space',
+  'wss://relay.damus.io',
+  'wss://nostr-pub.wellorder.net',
+  'wss://relay.nostr.info',
+  'wss://nostr.bitcoiner.social',
+  'wss://nostr.onsats.org',
+].map((url) => [url, relayInit(url)]));
 
 type Subscription = {
   filters: Filter[];
@@ -38,10 +41,10 @@ let subscriptionId = 0;
 export default {
   pool: null,
   profile: {},
-  userProfiles: new Map<string, any>(),
+  profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  maxRelays: 2,
+  maxRelays: 3,
   relays: defaultRelays,
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
@@ -95,6 +98,7 @@ export default {
       }
     }
   },
+  // TODO subscription methods for followersByUser and followedByUser
   followerCount: function (address: string) {
     return this.followersByUser.get(address)?.size ?? 0;
   },
@@ -227,26 +231,31 @@ export default {
       }
     }
   },
-  async handleMetadata(event: Event) {
+  handleMetadata(event: Event) {
     try {
       const content = JSON.parse(event.content);
-      const profile: any = {
+      let profile: any = {
         name: content.name,
-        about: content.about,
         photo: content.picture,
+        about: content.about
       };
       if (content.iris) {
         try {
           const irisData = JSON.parse(content.iris);
-          const nostrAddrSignedByIris = await iris.Key.verify(irisData.sig, irisData.pub);
-          if (nostrAddrSignedByIris === event.pubkey) {
-            profile.iris = irisData.pub;
-          }
+          iris.Key.verify(irisData.sig, irisData.pub).then(nostrAddrSignedByIris => {
+            if (nostrAddrSignedByIris === event.pubkey) {
+              profile.iris = irisData.pub;
+            }
+          });
         } catch (e) {
           // console.error('Invalid iris data', e);
         }
       }
-      this.userProfiles.set(event.pubkey, profile);
+      const existing = this.profiles.get(event.pubkey);
+      if (existing) {
+        profile = { ...existing, ...profile };
+      }
+      this.profiles.set(event.pubkey, profile);
       iris.session.addToSearchIndex(event.pubkey, {
         key: event.pubkey,
         name: content.name,
@@ -422,8 +431,12 @@ export default {
 
   getProfile(address, cb: Function | undefined) {
     const callback = () => {
-      cb && cb(this.userProfiles.get(address), address);
+      const profile = this.profiles.get(address);
+      cb && cb(profile, address);
     };
+    if (this.profiles.has(address)) {
+      callback();
+    }
 
     this.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
   },

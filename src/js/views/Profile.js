@@ -621,6 +621,7 @@ class Profile extends View {
     };
     setFollowCounts();
     Nostr.getProfile(address, (data, addr) => {
+      if (!data) return;
       const profile = {};
       data.name && (profile.name = data.name);
       data.about && (profile.about = data.about);
