@@ -17,7 +17,7 @@ class Name extends Component<Props, State> {
     const nostrAddr = Nostr.toNostrHexAddress(this.props.pub);
     if (nostrAddr) {
       Nostr.getProfile(nostrAddr, (profile) => {
-        this.setState({ name: profile.name });
+        profile && this.setState({ name: profile.name });
       });
     } else {
       iris.public(this.props.pub).get('profile').get('name').on(this.inject());

@@ -66,10 +66,12 @@ class MyIdenticon extends Component<Props, State> {
     const nostrAddr = Nostr.toNostrHexAddress(pub);
     if (nostrAddr) {
       Nostr.getProfile(nostrAddr, (profile) => {
-        this.setState({
-          photo: profile.photo,
-          name: profile.name,
-        });
+        profile &&
+          this.setState({
+            // TODO why profile undefined sometimes?
+            photo: profile.photo,
+            name: profile.name,
+          });
       });
     }
 

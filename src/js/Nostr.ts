@@ -31,7 +31,7 @@ const defaultRelays = new Map<string, Relay>([
 type Subscription = {
   filters: Filter[];
   callback?: (event: Event) => void;
-}
+};
 
 let subscriptionId = 0;
 
@@ -41,9 +41,9 @@ export default {
   userProfiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  maxRelays: 3,
+  maxRelays: 2,
   relays: defaultRelays,
-  subscriptions: new Map<Number, Subscription>(),
+  subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
   messagesByUser: new Map<string, Set<string>>(),
   messagesById: new Map<string, Event>(),
@@ -143,8 +143,8 @@ export default {
     console.log('subscribe to', Array.from(_this.subscribedUsers));
     for (const relay of _this.relays.values()) {
       const go = () => {
-        const sub = relay.sub([{authors: Array.from(_this.subscribedUsers)}], {});
-        sub.on('event', event => _this.handleEvent(event));
+        const sub = relay.sub([{ authors: Array.from(_this.subscribedUsers) }], {});
+        sub.on('event', (event) => _this.handleEvent(event));
       };
       const status = getRelayStatus(relay);
       if (status === 0) {
@@ -156,20 +156,24 @@ export default {
       }
     }
   }, 1000),
-  subscribe: function (filters: Filter[], cb: Function) {
+  subscribe: function (filters: Filter[], cb: Function | undefined) {
     this.subscriptions.set(subscriptionId++, {
-      filter: filters,
+      filters,
       callback: cb,
     });
 
+    let hasNew = false;
     for (const filter of filters) {
       if (filter.authors) {
         for (const author of filter.authors) {
-          this.subscribedUsers.add(author);
+          if (!this.subscribedUsers.has(author)) {
+            hasNew = true;
+            this.subscribedUsers.add(author);
+          }
         }
       }
     }
-    this.subscribeAuthors(this);
+    hasNew && this.subscribeAuthors(this);
   },
   manageRelays: function () {
     const go = () => {
@@ -193,6 +197,9 @@ export default {
   },
   handleNote(event: Event) {
     this.messagesById.set(event.id, event);
+    if (!this.messagesByUser.has(event.pubkey)) {
+      this.messagesByUser.set(event.pubkey, new Set());
+    }
     this.messagesByUser.get(event.pubkey)?.add(event.id);
     const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
     for (const [_, replyId] of repliedMessages) {
@@ -308,7 +315,7 @@ export default {
       .on(() => {
         const key = iris.session.getKey();
         this.manageRelays();
-        this.getProfile(key.secp256k1.rpub, null, INITIAL_RECURSION);
+        this.getProfile(key.secp256k1.rpub, undefined);
         this.getMessagesByUser(key.secp256k1.rpub);
 
         iris
@@ -362,23 +369,8 @@ export default {
       });
   },
 
-  getRepliesAndLikes(id: string, cb: Function | null) {
-    this.subscribe([{ kinds: [1, 7], '#e': [id] }], (event) => {
-      console.log('got reaction / reply', event);
-      if (event.kind === 1) {
-        if (!this.repliesByMessageId.has(id)) {
-          this.repliesByMessageId.set(id, new Set());
-        }
-        this.repliesByMessageId.get(id).add({ hash: event.id, time: event.created_at * 1000 });
-        cb && cb(this.repliesByMessageId.get(id), this.likesByMessageId.get(id));
-      } else if (event.kind === 7) {
-        if (!this.likesByMessageId.has(id)) {
-          this.likesByMessageId.set(id, new Set());
-        }
-        this.likesByMessageId.get(id).add(event.pubkey);
-        cb && cb(this.repliesByMessageId.get(id), this.likesByMessageId.get(id));
-      }
-    });
+  getRepliesAndLikes(id: string, cb: Function | undefined) {
+    this.subscribe([{ kinds: [1, 7], '#e': [id] }], cb);
   },
 
   async getMessageById(id: string) {
@@ -387,10 +379,24 @@ export default {
     }
 
     return new Promise((resolve) => {
-      this.subscribe([{ ids: [id] }], (event) => {
-        this.messagesById.set(event.id, event);
-        resolve(event);
-      });
+      for (const relay of this.relays.values()) {
+        const go = () => {
+          const sub = relay.sub([{ ids: [id] }], {});
+          sub.on('event', (event) => {
+            this.handleEvent(event);
+            sub.unsub();
+            resolve(event);
+          });
+        };
+        const status = getRelayStatus(relay);
+        if (status === 0) {
+          relay.on('connect', () => {
+            go();
+          });
+        } else if (status === 1) {
+          go();
+        }
+      }
     });
   },
 
@@ -405,83 +411,21 @@ export default {
   },
 
   getMessagesByUser(address: string, cb: Function | undefined) {
-    if (this.messagesByUser.has(address)) {
+    const callback = () => {
       cb && cb(this.messagesByUser.get(address));
-      return;
+    };
+    if (this.messagesByUser.has(address)) {
+      callback();
     }
-
-    this.messagesByUser.set(address, new Set());
-    this.subscribe([{ kinds: [1, 7], authors: [address] }], (event) => {
-      if (event.kind === 1 && event.pubkey === address) {
-        this.messagesById.set(event.id, event);
-        this.messagesByUser.get(address)?.add(event.id);
-        cb && cb(this.messagesByUser.get(address));
-      }
-    });
+    this.subscribe([{ kinds: [1, 7], authors: [address] }], callback);
   },
 
-  getProfile(address, callback: Function | null, recursion = 0) {
-    if (this.userProfiles.has(address)) {
-      const profile = this.userProfiles.get(address);
-      callback && callback(profile, address);
-      return;
-    }
+  getProfile(address, cb: Function | undefined) {
+    const callback = () => {
+      cb && cb(this.userProfiles.get(address), address);
+    };
 
-    this.subscribe(
-      [{ authors: [address], kinds: [0, 3] }],
-      // are we sure that event.pubkey === address ?
-      async (event) => {
-        if (event.kind === 0) {
-          try {
-            const content = JSON.parse(event.content);
-            const profile: any = {
-              name: content.name,
-              about: content.about,
-              photo: content.picture,
-            };
-            if (content.iris) {
-              try {
-                const irisData = JSON.parse(content.iris);
-                const nostrAddrSignedByIris = await iris.Key.verify(irisData.sig, irisData.pub);
-                if (nostrAddrSignedByIris === address) {
-                  profile.iris = irisData.pub;
-                }
-              } catch (e) {
-                // console.error('Invalid iris data', e);
-              }
-            }
-            this.userProfiles.set(address, profile);
-            iris.session.addToSearchIndex(address, {
-              key: address,
-              name: content.name,
-              followers: this.followersByUser.get(address) ?? new Set(),
-            });
-            callback &&
-              callback(
-                { name: content.name, about: content.about, photo: content.picture },
-                address,
-              );
-          } catch (e) {
-            console.log('error parsing nostr profile', e);
-          }
-        } else if (event.kind === 3 && Array.isArray(event.tags)) {
-          let i = 0;
-          for (const tag of event.tags) {
-            if (Array.isArray(tag) && tag[0] === 'p') {
-              if (recursion) {
-                i += 100;
-                setTimeout(() => {
-                  this.getProfile(tag[1], null, recursion - 1);
-                }, i + (INITIAL_RECURSION - recursion) * 1000);
-              }
-              this.addFollower(tag[1], address);
-              callback &&
-                callback({ followedUserCount: this.followedByUser.get(address)?.size }, address);
-            }
-          }
-        }
-      },
-    );
+    this.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
   },
 
   setMetadata() {

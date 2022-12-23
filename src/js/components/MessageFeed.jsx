@@ -56,23 +56,17 @@ class MessageFeed extends Component {
   componentDidMount() {
     let first = true;
     if (this.props.nostrUser) {
-      this.nostrPollInterval = setInterval(() => { // setInterval hnngh
-        if (this.unmounted) {
-          clearInterval(this.nostrPollInterval);
-          return;
+      Nostr.getMessagesByUser(this.props.nostrUser, eventIds => {
+        if (!eventIds) return;
+        for (let eventId of eventIds) {
+          Nostr.getMessageById(eventId).then(event => {
+            if (event.kind === 1 && event.pubkey === this.props.nostrUser) {
+              this.mappedMessages.set(event.created_at, event.id);
+              this.updateSortedMessages();
+            }
+          });
         }
-
-        Nostr.getMessagesByUser(this.props.nostrUser, eventIds => {
-          for (let eventId of eventIds) {
-            Nostr.getMessageById(eventId).then(event => {
-              if (event.kind === 1 && event.pubkey === this.props.nostrUser) {
-                this.mappedMessages.set(event.created_at, event.id);
-                this.updateSortedMessages();
-              }
-            });
-          }
-        });
-      }, 3000);
+      });
     } else {
       iris
         .local()
