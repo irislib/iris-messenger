@@ -18,7 +18,7 @@ const getRelayStatus = (relay: Relay) => {
   }
 };
 
-const INITIAL_RECURSION = 2;
+const INITIAL_RECURSION = 0; // 0 for now to limit the amount of requests. need to bundle the requests together.
 
 const defaultRelays = new Map<string, Relay>([
   ['wss://relay.damus.io', relayInit('wss://relay.damus.io')],
@@ -342,7 +342,7 @@ export default {
           for (const tag of event.tags) {
             if (Array.isArray(tag) && tag[0] === 'p') {
               if (recursion) {
-                i += 500;
+                i += 100;
                 setTimeout(() => {
                   this.getProfile(tag[1], null, recursion - 1);
                 }, i + (INITIAL_RECURSION - recursion) * 1000);
