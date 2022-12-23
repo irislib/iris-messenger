@@ -72,11 +72,15 @@ class PublicMessage extends Message {
             thisArg.setState({ name: profile.name });
           }
         });
+        // if it's a reply, there's tag ["e", <event-id>, <relay-url>, <marker>] in one of event.tags
+        const replyTag = event.tags.find((tag) => tag[0] === 'e');
+        const replyingTo = replyTag && replyTag[1];
         return {
           signerKeyHash: event.pubkey,
           signedData: {
             text: event.content,
             time: event.created_at * 1000,
+            replyingTo,
           },
         };
       });

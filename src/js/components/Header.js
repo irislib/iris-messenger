@@ -1,6 +1,5 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
-import Nostr from '../Nostr';
 import $ from 'jquery';
 import filter from 'lodash/filter';
 import { route } from 'preact-router';
@@ -9,6 +8,7 @@ import { Link } from 'preact-router/match';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
+import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import Identicon from './Identicon';

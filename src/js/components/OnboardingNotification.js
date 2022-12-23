@@ -1,9 +1,9 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
-import Nostr from '../Nostr';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
+import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import CopyButton from './CopyButton';
@@ -56,10 +56,7 @@ export default class OnboardingNotification extends Component {
           <div class="msg-content">
             <p>${t('no_followers_yet')}</p>
             <p>
-              <${CopyButton}
-                text=${t('copy_link')}
-                copyStr=${Helpers.getProfileLink(npub)}
-              />
+              <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(npub)} />
             </p>
             <p
               dangerouslySetInnerHTML=${{
