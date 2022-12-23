@@ -620,7 +620,7 @@ class Profile extends View {
       data.name && (profile.name = data.name);
       data.about && (profile.about = data.about);
       data.iris && (profile.iris = data.iris);
-      addr === this.props.id && this.setState(profile);
+      Nostr.toNostrBech32Address(addr, 'npub') === this.props.id && this.setState(profile);
     });
   }
 
@@ -720,6 +720,11 @@ class Profile extends View {
 
   componentDidMount() {
     const pub = this.props.id;
+    const nostrNpub = Nostr.toNostrBech32Address(pub, 'npub');
+    if (nostrNpub && nostrNpub !== pub) {
+      route(`/profile/${nostrNpub}`);
+      return;
+    }
     this.followedUsers = new Set();
     this.followers = new Set();
     this.setState({

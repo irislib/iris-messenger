@@ -1,5 +1,6 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
+import Nostr from '../Nostr';
 import $ from 'jquery';
 import filter from 'lodash/filter';
 import { route } from 'preact-router';
@@ -144,10 +145,11 @@ class Header extends Component {
   }
 
   render() {
-    const key = iris.session.getKey().secp256k1.rpub;
+    const key = iris.session.getKey();
     if (!key) {
       return;
     }
+    const npub = Nostr.toNostrBech32Address(key.secp256k1.rpub, 'npub');
     const activeRoute = this.state.activeRoute;
     const chat =
       activeRoute && activeRoute.indexOf('/chat') === 0 && this.chatId && iris.private(this.chatId);
@@ -259,7 +261,7 @@ class Header extends Component {
               `}
         </div>
 
-        ${chat && this.chatId !== key && !chat.uuid
+        ${chat && this.chatId !== npub && !chat.uuid
           ? html`
               <a
                 class="tooltip"
@@ -306,11 +308,11 @@ class Header extends Component {
 
         <${Link}
           activeClassName="active"
-          href="/profile/${key}"
+          href="/profile/${npub}"
           onClick=${() => iris.local().get('scrollUp').put(true)}
           class="hidden-xs my-profile"
         >
-          <${Identicon} str=${key} width="34" />
+          <${Identicon} str=${npub} width="34" />
         <//>
       </div>
     </header>`;

@@ -1,5 +1,6 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
+import Nostr from '../Nostr';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
@@ -48,6 +49,8 @@ export default class OnboardingNotification extends Component {
       `;
     }
     if (this.state.noFollowers && !this.state.hasNostrFollowers) {
+      const rpub = iris.session.getKey().secp256k1.rpub;
+      const npub = rpub && Nostr.toNostrBech32Address(iris.session.getKey().secp256k1.rpub, 'npub');
       return html`
         <div class="msg">
           <div class="msg-content">
@@ -55,7 +58,7 @@ export default class OnboardingNotification extends Component {
             <p>
               <${CopyButton}
                 text=${t('copy_link')}
-                copyStr=${Helpers.getProfileLink(iris.session.getKey().secp256k1.rpub)}
+                copyStr=${Helpers.getProfileLink(npub)}
               />
             </p>
             <p
