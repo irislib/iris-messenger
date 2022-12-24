@@ -107,10 +107,11 @@ export default {
   toNostrBech32Address: function (address: string, prefix) {
     try {
       const decoded = bech32.decode(address);
+      console.log(decoded);
       if (prefix !== decoded.prefix) {
         return null;
       }
-      return bech32.encode(prefix, decoded.words);
+      return bech32.encode(prefix, decoded.data);
     } catch (e) {}
 
     if (address.match(/^[0-9a-fA-F]{64}$/)) {
@@ -212,7 +213,9 @@ export default {
       if (!this.repliesByMessageId.has(event.id)) {
         this.repliesByMessageId.set(event.id, new Map<string, any>());
       }
-      this.repliesByMessageId.get(event.id)?.set(replyId, {hash: replyId, time: event.created_at});
+      this.repliesByMessageId
+        .get(event.id)
+        ?.set(replyId, { hash: replyId, time: event.created_at });
     }
   },
   handleReaction(event: Event) {
@@ -311,10 +314,16 @@ export default {
     if (filter.authors && !filter.authors.includes(event.pubkey)) {
       return false;
     }
-    if (filter['#e'] && !event.tags.some((tag: any) => tag[0] === 'e' && filter['#e'].includes(tag[1]))) {
+    if (
+      filter['#e'] &&
+      !event.tags.some((tag: any) => tag[0] === 'e' && filter['#e'].includes(tag[1]))
+    ) {
       return false;
     }
-    if (filter['#p'] && !event.tags.some((tag: any) => tag[0] === 'e' && filter['#p'].includes(tag[1]))) {
+    if (
+      filter['#p'] &&
+      !event.tags.some((tag: any) => tag[0] === 'e' && filter['#p'].includes(tag[1]))
+    ) {
       return false;
     }
     return true;
@@ -383,7 +392,7 @@ export default {
   getRepliesAndLikes(id: string, cb: Function | undefined) {
     const callback = () => {
       cb && cb(new Set(this.repliesByMessageId.get(id)?.values()), this.likesByMessageId.get(id));
-    }
+    };
     if (this.repliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }

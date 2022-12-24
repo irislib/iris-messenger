@@ -315,9 +315,7 @@ class Profile extends View {
             ${this.state.nostr
               ? html`<a href="/profile/${this.state.nostr}">Nostr profile</a>`
               : ''}
-            ${this.state.iris
-              ? html`<a href="/profile/${this.state.iris}">Iris profile (editable)</a>`
-              : ''}
+            ${this.state.iris ? html`<a href="/profile/${this.state.iris}">Iris profile</a>` : ''}
             ${this.renderEthereum()}
             <div class="profile-actions">
               <div class="follow-count">
@@ -733,9 +731,8 @@ class Profile extends View {
     }
     this.followedUsers = new Set();
     this.followers = new Set();
-    this.isMyProfile =
-      iris.session.getPubKey() === this.props.id ||
-      iris.session.getKey().secp256k1.rpub === this.props.id;
+    this.isMyProfile = iris.session.getPubKey() === this.props.id || nostrNpub === this.props.id;
+    console.log('isMyProfile', this.isMyProfile, this.props.id, nostrNpub);
     this.setState({
       followedUserCount: 0,
       followerCount: 0,
