@@ -133,7 +133,7 @@ class Login extends Component {
   onLoginFormSubmit(e) {
     e.preventDefault();
     let name = document.getElementById('login-form-name').value || iris.util.generateName();
-    iris.session.loginAsNewUser({ name });
+    iris.session.loginAsNewUser({ name, autofollow: false });
     // follow the developer's nostr key also
     setTimeout(() => {
       const k = '82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2';

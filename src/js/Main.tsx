@@ -46,7 +46,7 @@ type ReactState = {
   translationLoaded: boolean;
 };
 
-iris.session.init({ autologin: window.location.hash.length > 2 });
+iris.session.init({ autologin: window.location.hash.length > 2, autofollow: false });
 Nostr.init();
 
 class Main extends Component<Props, ReactState> {
