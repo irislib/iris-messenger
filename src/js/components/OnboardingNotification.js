@@ -11,8 +11,7 @@ import FollowButton from './FollowButton';
 import Identicon from './Identicon';
 import Text from './Text';
 
-const SUGGESTED_FOLLOW =
-  'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s';
+const SUGGESTED_FOLLOW = 'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s';
 
 export default class OnboardingNotification extends Component {
   componentDidMount() {

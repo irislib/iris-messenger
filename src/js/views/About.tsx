@@ -2,11 +2,10 @@ import Component from '../BaseComponent';
 import FollowButton from '../components/FollowButton';
 import Header from '../components/Header';
 import Identicon from '../components/Identicon';
-import Text from '../components/Text';
+import Name from '../components/Name';
 import { translate as t } from '../translations/Translation';
 
-const DEVELOPER =
-  'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
+const DEVELOPER = 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk';
 
 class About extends Component {
   render() {
@@ -71,7 +70,7 @@ class About extends Component {
             <div class="profile-link-container">
               <a href={`/profile/${DEVELOPER}`} class="profile-link">
                 <Identicon str={DEVELOPER} width={40} />
-                <Text path="profile/name" user={DEVELOPER} placeholder="Iris developer's account" />
+                <Name pub={DEVELOPER} placeholder="Iris developer's account" />
               </a>
               <FollowButton id={DEVELOPER} />
             </div>
