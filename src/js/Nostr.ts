@@ -219,8 +219,11 @@ export default {
     }
   },
   handleReaction(event: Event) {
-    if (event.content !== '+') return; // for now we handle only likes
+    if (event.content !== '+' && event.content !== '') return; // for now we handle only likes
     const subjects = event.tags.filter((tag: any) => tag[0] === 'e');
+    /*if (subjects.length > 1) {
+      console.log('reaction with multiple subjects. what are these?', event);
+    }*/
     for (const subject of subjects) {
       const id = subject[1];
       if (!this.likesByMessageId.has(id)) {

@@ -46,6 +46,7 @@ type ReactState = {
   translationLoaded: boolean;
 };
 
+// need to add initChannels: true to here and login() to get channels to load. disabled to test performance
 iris.session.init({ autologin: window.location.hash.length > 2, autofollow: false });
 Nostr.init();
 

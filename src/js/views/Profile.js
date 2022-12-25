@@ -222,7 +222,7 @@ class Profile extends View {
             ${this.state.eth.address.slice(0, 4)}...${this.state.eth.address.slice(-4)}
           </a>
           <i> </i>
-          ${this.isMyProfile && window.ethereum && !window.nostr
+          ${this.state.isMyProfile && window.ethereum && !window.nostr
             ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)`
             : ''}
           ${this.state.nfts.totalCount
@@ -232,7 +232,7 @@ class Profile extends View {
       `;
     }
 
-    if (this.isMyProfile && window.ethereum) {
+    if (this.state.isMyProfile && window.ethereum) {
       return html`
         <p>
           <a href="#" onClick=${(e) => this.connectEthereumClicked(e)}
@@ -245,7 +245,7 @@ class Profile extends View {
 
   renderDetails() {
     let profilePhoto;
-    if (this.isMyProfile) {
+    if (this.state.isMyProfile) {
       profilePhoto = html`<${ProfilePhotoPicker}
         currentPhoto=${this.state.photo}
         placeholder=${this.props.id}
@@ -270,8 +270,8 @@ class Profile extends View {
               <h3
                 style="flex: 1"
                 class="profile-name"
-                placeholder=${this.isMyProfile ? t('name') : ''}
-                contenteditable=${this.isMyProfile}
+                placeholder=${this.state.isMyProfile ? t('name') : ''}
+                contenteditable=${this.state.isMyProfile}
                 onInput=${(e) => this.onNameInput(e)}
               >
                 ${this.state.name || this.props.id.slice(0, 4) + '...' + this.props.id.slice(-4)}
@@ -279,7 +279,7 @@ class Profile extends View {
               <div class="dropdown profile-actions">
                 <div class="dropbtn">…</div>
                 <div class="dropdown-content">
-                  ${this.isMyProfile
+                  ${this.state.isMyProfile
                     ? ''
                     : html`<${BlockButton} key=${`${this.props.id}block`} id=${this.props.id} />`}
                   <${CopyButton}
@@ -291,7 +291,7 @@ class Profile extends View {
                   <${Button} onClick=${() => $(this.qrRef.current).toggle()}
                     >${t('show_qr_code')}<//
                   >
-                  ${this.isMyProfile
+                  ${this.state.isMyProfile
                     ? ''
                     : html`
                         <${Button} class="show-settings" onClick=${() => this.onClickSettings()}
@@ -305,8 +305,8 @@ class Profile extends View {
             <div class="profile-about hidden-xs">
               <p
                 class="profile-about-content"
-                placeholder=${this.isMyProfile ? t('about') : ''}
-                contenteditable=${this.isMyProfile}
+                placeholder=${this.state.isMyProfile ? t('about') : ''}
+                contenteditable=${this.state.isMyProfile}
                 onInput=${(e) => this.onAboutInput(e)}
               >
                 ${this.state.about}
@@ -338,7 +338,7 @@ class Profile extends View {
                     </p>
                   `
                 : ''}
-              ${this.isMyProfile
+              ${this.state.isMyProfile
                 ? ''
                 : html`
                     <div class="hidden-xs">
@@ -356,7 +356,7 @@ class Profile extends View {
           </div>
         </div>
 
-        ${this.isMyProfile
+        ${this.state.isMyProfile
           ? ''
           : html`
               <div class="visible-xs-flex profile-actions" style="justify-content: flex-end">
@@ -364,13 +364,13 @@ class Profile extends View {
                 <${Button} onClick=${() => route(`/chat/${this.props.id}`)}>${t('send_message')}<//>
               </div>
             `}
-        ${this.isMyProfile || this.state.about
+        ${this.state.isMyProfile || this.state.about
           ? html`
               <div class="profile-about visible-xs-flex">
                 <p
                   class="profile-about-content"
-                  placeholder=${this.isMyProfile ? t('about') : ''}
-                  contenteditable=${this.isMyProfile}
+                  placeholder=${this.state.isMyProfile ? t('about') : ''}
+                  contenteditable=${this.state.isMyProfile}
                   onInput=${(e) => this.onAboutInput(e)}
                 >
                   ${this.state.about}
@@ -485,7 +485,7 @@ class Profile extends View {
     } else if (this.props.tab === 'media') {
       return html`
         <div class="public-messages-view">
-          ${this.isMyProfile
+          ${this.state.isMyProfile
             ? html`<${FeedMessageForm} index="media" class="hidden-xs" autofocus=${false} />`
             : ''}
           <${MessageFeed}
@@ -509,7 +509,7 @@ class Profile extends View {
                   target="_blank"
                   src=${src}
                 >
-                  ${this.isMyProfile
+                  ${this.state.isMyProfile
                     ? html`
                         <div class="dropdown">
                           <div class="dropbtn">…</div>
@@ -528,7 +528,7 @@ class Profile extends View {
         </div>
       `;
     }
-    const messageForm = this.isMyProfile
+    const messageForm = this.state.isMyProfile
       ? html`<${FeedMessageForm} class="hidden-xs" autofocus=${false} />`
       : '';
     const nostrAddr = Nostr.toNostrHexAddress(this.props.id);
@@ -600,13 +600,6 @@ class Profile extends View {
     };
 
     runMain();
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.id !== this.props.id) {
-      this.unsubscribe();
-      this.componentDidMount();
-    }
   }
 
   getNostrProfile(address) {
@@ -722,26 +715,34 @@ class Profile extends View {
       );
   }
 
-  componentDidMount() {
+  componentDidUpdate(prevProps) {
+    if (prevProps.id !== this.props.id) {
+      this.unsubscribe();
+      this.subscribeProfile();
+    }
+  }
+
+  subscribeProfile() {
     const pub = this.props.id;
     const nostrNpub = Nostr.toNostrBech32Address(pub, 'npub');
     if (nostrNpub && nostrNpub !== pub) {
       route(`/profile/${nostrNpub}`);
       return;
     }
+    const nostrHex = Nostr.toNostrHexAddress(pub);
+    const isMyProfile = (iris.session.getPubKey() === pub) || (nostrHex === iris.session.getKey().secp256k1.rpub);
     this.followedUsers = new Set();
     this.followers = new Set();
-    this.isMyProfile = iris.session.getPubKey() === this.props.id || nostrNpub === this.props.id;
-    console.log('isMyProfile', this.isMyProfile, this.props.id, nostrNpub);
     this.setState({
       followedUserCount: 0,
       followerCount: 0,
+      isMyProfile,
       noPosts: false,
       noReplies: false,
       noLikes: false,
       noMedia: false,
       nostr: null,
-      iris: nostrNpub && this.isMyProfile ? iris.session.getPubKey() : null,
+      iris: nostrNpub && isMyProfile ? iris.session.getPubKey() : null,
       eth: null,
       name: '',
       photo: '',
@@ -820,6 +821,10 @@ class Profile extends View {
           }
         });
     }
+  }
+
+  componentDidMount() {
+    this.subscribeProfile();
   }
 }
 
