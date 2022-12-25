@@ -17,7 +17,7 @@ import SearchBox from './SearchBox';
 class Header extends Component {
   constructor() {
     super();
-    this.state = { latest: {}, topicPeerCount: 0 };
+    this.state = { latest: {} };
     this.chatId = null;
     this.escFunction = this.escFunction.bind(this);
   }
@@ -108,8 +108,8 @@ class Header extends Component {
           }
         }),
       );
-    this.updatePeersFromGun();
-    this.iv = setInterval(() => this.updatePeersFromGun(), 1000);
+    this.updateRelayCount();
+    this.iv = setInterval(() => this.updateRelayCount(), 1000);
   }
 
   onTitleClicked() {
@@ -127,21 +127,9 @@ class Header extends Component {
     iris.local().get('toggleMenu').put(true);
   }
 
-  updatePeersFromGun() {
-    const peersFromGun = iris.global().back('opt.peers') || {};
-    const connectedPeers = filter(Object.values(peersFromGun), (peer) => {
-      if (peer && peer.wire && peer.wire.constructor.name !== 'WebSocket') {
-        console.log('WebRTC peer', peer);
-      }
-      return (
-        peer &&
-        peer.wire &&
-        peer.wire.readyState === 1 &&
-        peer.wire.bufferedAmount === 0 &&
-        peer.wire.constructor.name === 'WebSocket'
-      );
-    });
-    this.setState({ connectedPeers });
+  updateRelayCount() {
+    this.setState({ connectedRelays: Nostr.getConnectedRelayCount() });
+    console.log(this.state.connectedRelays);
   }
 
   render() {
@@ -169,10 +157,6 @@ class Header extends Component {
           />
         `;
     const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
-
-    const peerCount =
-      (this.state.connectedPeers ? this.state.connectedPeers.length : 0) +
-      this.state.topicPeerCount;
 
     return html` <header class="nav header">
       ${activeRoute && activeRoute.indexOf('/chat/') === 0
@@ -211,15 +195,15 @@ class Header extends Component {
               </a>
             `}
         <a
-          href="/settings/peer"
+          href="/settings/nostr"
           class="connected-peers tooltip mobile-search-hidden ${this.state.showMobileSearch
             ? 'hidden-xs'
-            : ''} ${peerCount ? 'connected' : ''}"
+            : ''} ${this.state.connectedRelays ? 'connected' : ''}"
         >
-          <span class="tooltiptext">${t('connected_peers')}</span>
+          <span class="tooltiptext">${t('connected_relays')}</span>
           <small>
             <span class="icon">${Icons.network}</span>
-            <span>${peerCount}</span>
+            <span>${this.state.connectedRelays}</span>
           </small>
         </a>
         <div

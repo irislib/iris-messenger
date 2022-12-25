@@ -191,6 +191,15 @@ export default {
     }
     hasNew && this.subscribeAuthors(this);
   },
+  getConnectedRelayCount: function () {
+    let count = 0;
+    for (const relay of this.relays.values()) {
+      if (getRelayStatus(relay) === 1) {
+        count++;
+      }
+    }
+    return count;
+  },
   manageRelays: function () {
     const go = () => {
       const relays: Array<Relay> = Array.from(this.relays.values());
