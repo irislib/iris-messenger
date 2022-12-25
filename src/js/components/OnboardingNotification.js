@@ -12,7 +12,7 @@ import Identicon from './Identicon';
 import Text from './Text';
 
 const SUGGESTED_FOLLOW =
-  'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
+  'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s';
 
 export default class OnboardingNotification extends Component {
   componentDidMount() {
