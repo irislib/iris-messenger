@@ -730,7 +730,8 @@ class Profile extends View {
       return;
     }
     const nostrHex = Nostr.toNostrHexAddress(pub);
-    const isMyProfile = (iris.session.getPubKey() === pub) || (nostrHex === iris.session.getKey().secp256k1.rpub);
+    const isMyProfile =
+      iris.session.getPubKey() === pub || nostrHex === iris.session.getKey().secp256k1.rpub;
     this.followedUsers = new Set();
     this.followers = new Set();
     this.setState({

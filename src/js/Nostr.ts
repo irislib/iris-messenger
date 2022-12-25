@@ -216,13 +216,13 @@ export default {
     }
     this.messagesByUser.get(event.pubkey)?.add(event.id);
     const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
-    for (const [_, replyId] of repliedMessages) {
-      if (!this.repliesByMessageId.has(event.id)) {
-        this.repliesByMessageId.set(event.id, new Map<string, any>());
+    for (const [_, replyingTo] of repliedMessages) {
+      if (!this.repliesByMessageId.has(replyingTo)) {
+        this.repliesByMessageId.set(replyingTo, new Map<string, any>());
       }
       this.repliesByMessageId
-        .get(event.id)
-        ?.set(replyId, { hash: replyId, time: event.created_at });
+        .get(replyingTo)
+        ?.set(event.id, { hash: event.id, time: event.created_at });
     }
   },
   handleReaction(event: Event) {
