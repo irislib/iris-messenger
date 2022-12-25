@@ -90,14 +90,19 @@ export default {
       this.followedByUser.set(follower, new Set<string>());
     }
     this.followedByUser.get(follower)?.add(address);
-    if (follower === iris.session.getKey().secp256k1.rpub) {
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    if (follower === myPub) {
       iris.public().get('follow').get(address).put(true);
       this.getMessagesByUser(address);
     }
-    if (address === iris.session.getKey().secp256k1.rpub) {
+    if (address === myPub) {
       if (this.followersByUser.get(address)?.size === 1) {
         iris.local().get('hasNostrFollowers').put(true);
       }
+    }
+    if (this.followedByUser.get(myPub)?.has(follower)) {
+      this.subscribedUsers.add(address); // subscribe to events from 2nd degree follows
+      this.subscribeAuthors(this);
     }
   },
   // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime. and replies
