@@ -101,8 +101,10 @@ export default {
       }
     }
     if (this.followedByUser.get(myPub)?.has(follower)) {
-      this.subscribedUsers.add(address); // subscribe to events from 2nd degree follows
-      this.subscribeAuthors(this);
+      if (!this.subscribedUsers.has(address)) {
+        this.subscribedUsers.add(address); // subscribe to events from 2nd degree follows
+        this.subscribeAuthors(this);
+      }
     }
   },
   // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime. and replies
