@@ -125,7 +125,7 @@ class PublicMessage extends Message {
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
 
       if (nostrId) {
-        Nostr.getRepliesAndLikes(this.props.hash, (replies, likes) => {
+        Nostr.getRepliesAndLikes(nostrId, (replies, likes) => {
           this.likedBy = new Set(likes);
           const sortedReplies = replies && Array.from(replies).sort((a, b) => b.time - a.time);
           this.setState({
