@@ -423,7 +423,24 @@ export default {
 
     this.subscribe([{ kinds: [1, 7], '#e': [id] }], callback);
   },
-
+  getFollowedByUser: function (address: string, cb: Function | undefined) {
+    const callback = () => {
+      cb && cb(this.followedByUser.get(address));
+    };
+    if (this.followedByUser.has(address)) {
+      callback();
+    }
+    this.subscribe([{ kinds: [3], authors: [address] }], callback);
+  },
+  getFollowersByUser: function (address: string, cb: Function | undefined) {
+    const callback = () => {
+      cb && cb(this.followersByUser.get(address));
+    };
+    if (this.followersByUser.has(address)) {
+      callback();
+    }
+    this.subscribe([{ kinds: [3], '#p': [address] }], callback);
+  },
   async getMessageById(id: string) {
     if (this.messagesById.has(id)) {
       return this.messagesById.get(id);

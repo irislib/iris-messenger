@@ -45,9 +45,11 @@ class Follows extends View {
     const nostrAddress = Nostr.toNostrHexAddress(this.props.id);
 
     if (nostrAddress) {
-      // TODO subscription system
-      this.follows = Nostr.followedByUser.get(nostrAddress) ?? new Set();
-      this.updateSortedFollows();
+      Nostr.getFollowedByUser(nostrAddress, (follows) => {
+        console.log('follows', follows);
+        this.follows = follows;
+        this.updateSortedFollows();
+      });
     } else {
       iris
         .public(this.props.id)
@@ -88,8 +90,10 @@ class Follows extends View {
     const nostrAddress = Nostr.toNostrHexAddress(this.props.id);
 
     if (nostrAddress) {
-      this.follows = Nostr.followersByUser.get(nostrAddress) ?? new Set();
-      this.updateSortedFollows();
+      Nostr.getFollowersByUser(nostrAddress, (follows) => {
+        this.follows = follows;
+        this.updateSortedFollows();
+      });
     } else {
       iris.group().on(
         `follow/${this.props.id}`,
@@ -129,7 +133,7 @@ class Follows extends View {
                 <div>
                   <${Name} pub=${k} /><br />
                   <small class="follower-count"
-                    >${(this.state.contacts[k] && this.state.contacts[k].followerCount) || 0}<i
+                    >${(Nostr.followersByUser.get(k) || new Set()).size || 0}<i
                     > </i> followers</small
                   >
                 </div>

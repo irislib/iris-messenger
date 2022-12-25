@@ -610,7 +610,8 @@ class Profile extends View {
           followerCount: Nostr.followersByUser.get(address)?.size ?? 0,
         });
     };
-    setFollowCounts();
+    Nostr.getFollowersByUser(address, setFollowCounts);
+    Nostr.getFollowedByUser(address, setFollowCounts);
     Nostr.getProfile(address, (data, addr) => {
       if (!data) return;
       const profile = {};

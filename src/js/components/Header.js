@@ -129,7 +129,6 @@ class Header extends Component {
 
   updateRelayCount() {
     this.setState({ connectedRelays: Nostr.getConnectedRelayCount() });
-    console.log(this.state.connectedRelays);
   }
 
   render() {
