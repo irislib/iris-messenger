@@ -39,7 +39,7 @@ export default {
     return s.match(emojiRegex) !== null;
   },
 
-  highlightEverything(s: string): any[] {
+  highlightEverything(s: string, event?: any): any[] {
     let replacedText = reactStringReplace(s, emojiRegex, (match, i) => {
       return (
         <span key={match + i} className="emoji">
@@ -60,6 +60,21 @@ export default {
         {match}
       </a>
     ));
+    if (event && event.tags) {
+      // replace "#[0]" tags with links to the user: event.tags[n][1]
+      replacedText = reactStringReplace(replacedText, /#\[(\d+)\]/g, (match, i) => {
+        const tag = event.tags[parseInt(match, 10)];
+        if (tag) {
+          const link = `/profile/${tag[1]}`;
+          return (
+            <a href={link}>
+              @<Name key={match + i} pub={tag[1]} />
+            </a>
+          );
+        }
+        return match;
+      });
+    }
     return replacedText;
   },
 

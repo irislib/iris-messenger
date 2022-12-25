@@ -65,6 +65,7 @@ class PublicMessage extends Message {
             text: event.content,
             time: event.created_at * 1000,
             replyingTo,
+            event,
           },
         };
       });
@@ -301,7 +302,7 @@ class PublicMessage extends Message {
         ? `${text.slice(0, MSG_TRUNCATE_LENGTH)}...`
         : text;
 
-    text = Helpers.highlightEverything(text);
+    text = Helpers.highlightEverything(text, this.state.msg.event);
     //console.log('text', text);
 
     const time =

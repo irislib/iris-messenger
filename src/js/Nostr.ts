@@ -159,6 +159,7 @@ export default {
     for (const relay of _this.relays.values()) {
       const go = () => {
         const sub = relay.sub([{ authors: Array.from(_this.subscribedUsers) }], {});
+        // TODO update relay lastSeen
         sub.on('event', (event) => _this.handleEvent(event));
       };
       const status = getRelayStatus(relay);
