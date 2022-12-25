@@ -46,7 +46,7 @@ export default {
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  maxRelays: 3,
+  maxRelays: 2,
   relays: defaultRelays,
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
