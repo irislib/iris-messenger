@@ -56,6 +56,7 @@ export default {
   likesByMessageId: new Map<string, Set<string>>(),
 
   follow: function (address: string) {
+    address = this.toNostrHexAddress(address);
     const pubkey = iris.session.getKey().secp256k1.rpub;
     this.addFollower(address, pubkey);
 
