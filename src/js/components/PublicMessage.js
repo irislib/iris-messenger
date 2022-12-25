@@ -103,6 +103,7 @@ class PublicMessage extends Message {
     if (!p) {
       return;
     }
+    const myPub = iris.session.getKey().secp256k1.rpub;
     p.then((r) => {
       if (this.unmounted) {
         return;
@@ -130,6 +131,7 @@ class PublicMessage extends Message {
           const sortedReplies = replies && Array.from(replies).sort((a, b) => b.time - a.time);
           this.setState({
             likes: this.likedBy.size,
+            liked: this.likedBy.has(myPub),
             replyCount: sortedReplies?.length ?? 0,
             sortedReplies,
           });
