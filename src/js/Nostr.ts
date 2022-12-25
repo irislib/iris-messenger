@@ -212,6 +212,9 @@ export default {
           relays[Math.floor(Math.random() * relays.length)].connect();
         }
       }
+      if (openRelays.length > this.maxRelays) {
+        openRelays[Math.floor(Math.random() * openRelays.length)].close();
+      }
     };
 
     for (let i = 0; i < this.maxRelays; i++) {
