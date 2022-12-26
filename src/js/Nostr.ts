@@ -2,6 +2,7 @@ import iris from 'iris-lib';
 import { debounce } from 'lodash';
 import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from 'nostr-tools';
 const bech32 = require('bech32-buffer');
+import SortedLimitedEventSet from "./SortedLimitedEventSet";
 
 function arrayToHex(array: any) {
   return Array.from(array, (byte: any) => {
@@ -18,7 +19,8 @@ const getRelayStatus = (relay: Relay) => {
   }
 };
 
-const INITIAL_RECURSION = 0; // 0 for now to limit the amount of requests. need to bundle the requests together.
+const MAX_MSGS_BY_USER = 100;
+const MAX_LATEST_MSGS = 500;
 
 const defaultRelays = new Map<string, Relay>(
   [
@@ -50,9 +52,10 @@ export default {
   relays: defaultRelays,
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
-  messagesByUser: new Map<string, Set<string>>(),
+  messagesByUser: new Map<string, SortedLimitedEventSet>(),
   messagesById: new Map<string, Event>(),
-  followedUserMessagesByTime: new Map<Number, Set<string>>(),
+  latestMessagesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  latestMessagesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   repliesByMessageId: new Map<string, Map<string, any>>(),
   likesByMessageId: new Map<string, Set<string>>(),
 
@@ -227,12 +230,16 @@ export default {
     setInterval(go, 1000);
   },
   handleNote(event: Event) {
+    if (this.messagesById.has(event.id)) {
+      return;
+    }
     this.messagesById.set(event.id, event);
     if (!this.messagesByUser.has(event.pubkey)) {
-      this.messagesByUser.set(event.pubkey, new Set());
+      this.messagesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
     }
-    this.followedUserMessagesByTime.set(event.created_at, event);
-    this.messagesByUser.get(event.pubkey)?.add(event.id);
+    this.messagesByUser.get(event.pubkey)?.add(event);
+    this.latestMessagesByEveryone.add(event);
+    //this.latestMessagesByFollows.add(event);
     const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
     for (const [_, replyingTo] of repliedMessages) {
       if (!this.repliesByMessageId.has(replyingTo)) {
@@ -482,9 +489,20 @@ export default {
     return relays.length ? relays[0].url : null;
   },
 
-  getMessagesByUser(address: string, cb: Function | undefined) {
+  getMessagesByEveryone(cb: Function) {
     const callback = () => {
-      cb && cb(this.messagesByUser.get(address));
+      cb && cb(this.latestMessagesByEveryone.eventIds);
+    };
+    callback();
+    this.subscribe([{ kinds: [1, 7] }], callback);
+  },
+
+  getMessagesByUser(address: string, cb: Function | undefined) {
+    if (!address) {
+      return;
+    }
+    const callback = () => {
+      cb && cb(this.messagesByUser.get(address).eventIds);
     };
     if (this.messagesByUser.has(address)) {
       callback();

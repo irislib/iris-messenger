@@ -3,7 +3,7 @@ import Helpers from '../Helpers';
 import PublicMessage from './PublicMessage';
 import iris from 'iris-lib';
 import Nostr from '../Nostr';
-import { debounce } from 'lodash';
+import { throttle } from 'lodash';
 import { translate as t } from '../translations/Translation';
 import Button from '../components/basic/Button';
 
@@ -16,18 +16,12 @@ class MessageFeed extends Component {
     this.mappedMessages = new Map();
   }
 
-  updateSortedMessages = debounce(() => {
+  updateSortedMessages = throttle(sortedMessages => {
     if (this.unmounted) {
       return;
     }
-    let sortedMessages = Array.from(this.mappedMessages.keys())
-      .sort()
-      .map((k) => this.mappedMessages.get(k));
-    if (!this.props.reverse) {
-      sortedMessages = sortedMessages.reverse();
-    }
     this.setState({ sortedMessages });
-  }, 100);
+  }, 3000, { leading: true });
 
   handleMessage(v, k, x, e, from) {
     if (from) {
@@ -56,17 +50,7 @@ class MessageFeed extends Component {
   componentDidMount() {
     let first = true;
     if (this.props.nostrUser) {
-      Nostr.getMessagesByUser(this.props.nostrUser, eventIds => {
-        if (!eventIds) return;
-        for (let eventId of eventIds) {
-          Nostr.getMessageById(eventId).then(event => {
-            if (event.kind === 1 && event.pubkey === this.props.nostrUser) {
-              this.mappedMessages.set(event.created_at, event.id);
-              this.updateSortedMessages();
-            }
-          });
-        }
-      });
+      Nostr.getMessagesByUser(this.props.nostrUser, eventIds => this.updateSortedMessages(eventIds));
     } else {
       iris
         .local()
@@ -88,17 +72,8 @@ class MessageFeed extends Component {
         );
 
          */
-        // iterate over Nostr.messagesById.values()
-        // horrible code, b ut we're in a hurry
-        const go = () => {
-          for (let [id, msg] of Nostr.messagesById) {
-            this.mappedMessages.set(msg.created_at * 1000, id);
-            this.updateSortedMessages();
-          }
-        };
-        go();
-        setTimeout(() => go(), 1000);
-        setInterval(() => go(), 5 * 1000);
+
+        Nostr.getMessagesByEveryone(messages => this.updateSortedMessages(messages));
       }
     }
   }
