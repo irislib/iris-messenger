@@ -1,6 +1,6 @@
 import iris from 'iris-lib';
 import { debounce } from 'lodash';
-import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from 'nostr-tools';
+import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from './nostr-tools';
 const bech32 = require('bech32-buffer');
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 
