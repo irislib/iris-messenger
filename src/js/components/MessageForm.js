@@ -42,20 +42,28 @@ export default class MessageForm extends Component {
     }
     msg.torrentId && iris.public().get('media').get(msg.time).put(hash);
     this.props.onSubmit && this.props.onSubmit(msg);
-    this.sendNostr(msg);
-    return hash;
+    return this.sendNostr(msg);
   }
 
-  sendNostr(msg) {
+  async sendNostr(msg) {
     const event = {
       kind: 1,
       content: msg.text,
     };
     if (msg.replyingTo) {
-      event.tags = [['e', msg.replyingTo, Nostr.getSomeRelayUrl(), 'reply']];
+      const replyingTo = await Nostr.getMessageById(msg.replyingTo);
+      event.tags = [
+        ['e', msg.replyingTo, Nostr.getSomeRelayUrl(), 'reply'],
+        ['p', replyingTo.pubkey],
+      ];
+      for (const tag of replyingTo.tags) {
+        if (tag[0] === 'p') {
+          event.tags.push(tag);
+        }
+      }
       // TODO add p tags from replied event, and replied event.pubkey
     }
-    Nostr.publish(event);
+    return Nostr.publish(event);
   }
 
   onMsgTextPaste(event) {

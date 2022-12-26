@@ -153,6 +153,8 @@ export default {
     for (const relay of this.relays.values()) {
       relay.publish(event);
     }
+    this.handleEvent(event);
+    return event.id;
   },
   subscribeAuthors: debounce((_this) => {
     console.log('subscribe to', Array.from(_this.subscribedUsers));

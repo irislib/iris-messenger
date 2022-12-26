@@ -727,7 +727,7 @@ class Profile extends View {
     const pub = this.props.id;
     const nostrNpub = Nostr.toNostrBech32Address(pub, 'npub');
     if (nostrNpub && nostrNpub !== pub) {
-      route(`/profile/${nostrNpub}`);
+      route(`/profile/${nostrNpub}`, true);
       return;
     }
     const nostrHex = Nostr.toNostrHexAddress(pub);

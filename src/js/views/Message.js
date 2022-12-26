@@ -16,7 +16,7 @@ class Message extends View {
   componentDidMount() {
     const nostrBech32Id = Nostr.toNostrBech32Address(this.props.hash, 'note');
     if (nostrBech32Id && this.props.hash !== nostrBech32Id) {
-      route(`/post/${nostrBech32Id}`);
+      route(`/post/${nostrBech32Id}`, true);
       return;
     }
   }
