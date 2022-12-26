@@ -2,7 +2,7 @@ import iris from 'iris-lib';
 import { debounce } from 'lodash';
 import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from 'nostr-tools';
 const bech32 = require('bech32-buffer');
-import SortedLimitedEventSet from "./SortedLimitedEventSet";
+import SortedLimitedEventSet from './SortedLimitedEventSet';
 
 function arrayToHex(array: any) {
   return Array.from(array, (byte: any) => {
@@ -241,7 +241,8 @@ export default {
     this.latestMessagesByEveryone.add(event);
     //this.latestMessagesByFollows.add(event);
     const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
-    for (const [_, replyingTo] of repliedMessages) {
+    for (const [_, replyingTo, _preferredRelayUrl, marker] of repliedMessages) {
+      if (marker === 'root') continue;
       if (!this.repliesByMessageId.has(replyingTo)) {
         this.repliesByMessageId.set(replyingTo, new Map<string, any>());
       }

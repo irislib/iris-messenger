@@ -1,7 +1,7 @@
 import { Event } from 'nostr-tools';
 
 export default class SortedLimitedEventSet {
-  private events: { id: string, created_at: number }[];
+  private events: { id: string; created_at: number }[];
   private maxSize: number;
 
   constructor(maxSize: number) {
@@ -26,6 +26,6 @@ export default class SortedLimitedEventSet {
   }
 
   get eventIds(): string[] {
-    return this.events.map(event => event.id);
+    return this.events.map((event) => event.id);
   }
 }

@@ -1,7 +1,6 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
 import $ from 'jquery';
-import filter from 'lodash/filter';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
