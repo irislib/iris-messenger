@@ -19,7 +19,7 @@ const getRelayStatus = (relay: Relay) => {
   }
 };
 
-const MAX_MSGS_BY_USER = 100;
+const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
 
 const defaultRelays = new Map<string, Relay>(

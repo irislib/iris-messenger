@@ -7,7 +7,7 @@ import { throttle } from 'lodash';
 import { translate as t } from '../translations/Translation';
 import Button from '../components/basic/Button';
 
-const INITIAL_PAGE_SIZE = 20;
+const INITIAL_PAGE_SIZE = 40;
 
 class MessageFeed extends Component {
   constructor() {
