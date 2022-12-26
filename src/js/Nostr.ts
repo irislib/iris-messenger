@@ -1,6 +1,6 @@
 import iris from 'iris-lib';
 import { debounce } from 'lodash';
-import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from './nostr-tools';
+import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer');
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 
@@ -48,7 +48,7 @@ export default {
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  maxRelays: 2,
+  maxRelays: 3,
   relays: defaultRelays,
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
@@ -164,9 +164,15 @@ export default {
     console.log('subscribe to', Array.from(_this.subscribedUsers));
     for (const relay of _this.relays.values()) {
       const go = () => {
-        const sub = relay.sub([{ authors: Array.from(_this.subscribedUsers) }], {});
+        // first sub to profiles, then everything else
+        const sub = relay.sub([{ kinds: [0, 3], authors: Array.from(_this.subscribedUsers) }], {});
         // TODO update relay lastSeen
         sub.on('event', (event) => _this.handleEvent(event));
+        setTimeout(() => {
+          const sub2 = relay.sub([{ authors: Array.from(_this.subscribedUsers) }], {});
+          // TODO update relay lastSeen
+          sub2.on('event', (event) => _this.handleEvent(event));
+        }, 500);
       };
       const status = getRelayStatus(relay);
       if (status === 0) {
@@ -179,7 +185,7 @@ export default {
     }
   }, 1000),
   subscribe: function (filters: Filter[], cb: Function | undefined) {
-    this.subscriptions.set(subscriptionId++, {
+    cb && this.subscriptions.set(subscriptionId++, {
       filters,
       callback: cb,
     });

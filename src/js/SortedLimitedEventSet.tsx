@@ -1,4 +1,4 @@
-import { Event } from './nostr-tools';
+import { Event } from './lib/nostr-tools';
 
 export default class SortedLimitedEventSet {
   private events: { id: string; created_at: number }[];
