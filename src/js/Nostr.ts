@@ -52,6 +52,7 @@ export default {
   subscribedUsers: new Set<string>(),
   messagesByUser: new Map<string, Set<string>>(),
   messagesById: new Map<string, Event>(),
+  followedUserMessagesByTime: new Map<Number, Set<string>>(),
   repliesByMessageId: new Map<string, Map<string, any>>(),
   likesByMessageId: new Map<string, Set<string>>(),
 
@@ -230,6 +231,7 @@ export default {
     if (!this.messagesByUser.has(event.pubkey)) {
       this.messagesByUser.set(event.pubkey, new Set());
     }
+    this.followedUserMessagesByTime.set(event.created_at, event);
     this.messagesByUser.get(event.pubkey)?.add(event.id);
     const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
     for (const [_, replyingTo] of repliedMessages) {
