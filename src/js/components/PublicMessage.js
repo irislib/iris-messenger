@@ -129,7 +129,7 @@ class PublicMessage extends Message {
       if (nostrId) {
         Nostr.getRepliesAndLikes(nostrId, (replies, likes) => {
           this.likedBy = new Set(likes);
-          const sortedReplies = replies && Array.from(replies).sort((a, b) => b.time - a.time);
+          const sortedReplies = replies && Array.from(replies).sort((a, b) => a.time - b.time);
           this.setState({
             likes: this.likedBy.size,
             liked: this.likedBy.has(myPub),
