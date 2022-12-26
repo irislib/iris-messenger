@@ -7302,9 +7302,9 @@ growly@^1.3.0:
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
   integrity sha512-+xGQY0YyAWCnqy7Cd++hc2JqMYzlm0dG30Jd0beaA64sROr8C4nt8Yc9V5Ro3avlSUDTN0ulqP/VBKi1/lLygw==
 
-gun@^0.2020.1238, "gun@git+https://github.com/mmalmi/gun.git":
+gun@^0.2020.1238, "gun@https://github.com/mmalmi/gun":
   version "0.2020.1238"
-  resolved "git+https://github.com/mmalmi/gun.git#759784f9ce96044e47a83176fa1392dea14aef2f"
+  resolved "https://github.com/mmalmi/gun#759784f9ce96044e47a83176fa1392dea14aef2f"
   dependencies:
     ws "^7.2.1"
   optionalDependencies:
@@ -10192,20 +10192,6 @@ normalize-url@^6.0.1:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
-
-nostr-tools@1.0.0-beta:
-  version "1.0.0-beta"
-  resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-1.0.0-beta.tgz#7cee5ba70913d805cafe288923fe24b7ea636996"
-  integrity sha512-TyqxqsWzdALOITgvTYcEoRmjvGk3VtJobHSfW9eqIUtInUcusVfpYjblUEGnAnr02RyUp3BnNq/jPAcYKEKVXw==
-  dependencies:
-    "@noble/hashes" "^0.5.7"
-    "@noble/secp256k1" "^1.7.0"
-    "@scure/bip32" "^1.1.1"
-    "@scure/bip39" "^1.1.0"
-    bech32 "^2.0.0"
-    browserify-cipher ">=1"
-    buffer "^6.0.3"
-    websocket-polyfill "^0.0.3"
 
 npm-run-path@^4.0.1:
   version "4.0.1"

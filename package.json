@@ -56,6 +56,13 @@
     "webpack-build-notifier": "^2.3.0"
   },
   "dependencies": {
+    "@noble/hashes": "^0.5.7",
+    "@scure/bip32": "^1.1.1",
+    "@scure/bip39": "^1.1.0",
+    "bech32": "^2.0.0",
+    "browserify-cipher": ">=1",
+    "buffer": "^6.0.3",
+    "websocket-polyfill": "^0.0.3",
     "@noble/secp256k1": "^1.7.0",
     "@walletconnect/web3-provider": "^1.8.0",
     "@zxing/library": "^0.19.1",
