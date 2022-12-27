@@ -244,11 +244,17 @@ export default {
       this.messagesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
     }
     this.messagesByUser.get(event.pubkey)?.add(event);
-    this.latestMessagesByEveryone.add(event);
-    const myPub = iris.session.getKey().secp256k1.rpub;
-    if (this.followedByUser.get(myPub)?.has(event.pubkey)) {
-      this.latestMessagesByFollows.add(event);
+
+    // don't index messages that are too far in the future. TODO: buffer for future messages
+    if (new Date(event.created_at * 1000) < new Date(Date.now() + 60 * 60 * 1000)) {
+      this.latestMessagesByEveryone.add(event);
+      const myPub = iris.session.getKey().secp256k1.rpub;
+      if (this.followedByUser.get(myPub)?.has(event.pubkey)) {
+        this.latestMessagesByFollows.add(event);
+      }
     }
+
+
     const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
     for (const [_, replyingTo, _preferredRelayUrl, marker] of repliedMessages) {
       if (marker === 'root') continue;
