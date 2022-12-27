@@ -83,7 +83,7 @@ class PublicMessage extends Message {
       }
 
       return Nostr.getMessageById(nostrId).then((event) => {
-        processNostrMessage(event);
+        return processNostrMessage(event);
       });
     }
 

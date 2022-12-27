@@ -51,9 +51,10 @@ export default class MessageForm extends Component {
       content: msg.text,
     };
     if (msg.replyingTo) {
-      const replyingTo = await Nostr.getMessageById(msg.replyingTo);
+      const id = Nostr.toNostrHexAddress(msg.replyingTo);
+      const replyingTo = await Nostr.getMessageById(id);
       event.tags = [
-        ['e', msg.replyingTo, Nostr.getSomeRelayUrl(), 'reply'],
+        ['e', id, Nostr.getSomeRelayUrl(), 'reply'],
         ['p', replyingTo.pubkey],
       ];
       for (const tag of replyingTo.tags) {

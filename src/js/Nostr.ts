@@ -29,6 +29,9 @@ const saveLocalStorageEvents = throttle((_this: any) => {
 }, 5000);
 
 const saveLocalStorageProfiles = throttle((myFollows: Set<string>, profileMap: Map<string, any>) => {
+  if (!(myFollows && profileMap)) {
+    return;
+  }
   // should we save profile events instead? application state would be only changed by events
   const profiles = Array.from(myFollows).map(pub => {
     const p = profileMap.get(pub);
@@ -595,7 +598,7 @@ export default {
       return;
     }
     const callback = () => {
-      cb && cb(this.messagesByUser.get(address).eventIds);
+      cb && cb(this.messagesByUser.get(address)?.eventIds);
     };
     if (this.messagesByUser.has(address)) {
       callback();
