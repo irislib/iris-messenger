@@ -44,9 +44,16 @@ class PublicMessage extends Message {
 
   static fetchByHash(thisArg, hash) {
     const nostrId = Nostr.toNostrHexAddress(hash);
+    const retrievingTimeout = setTimeout(() => {
+      thisArg.setState({ retrieving: true });
+    }, 1000);
 
     if (nostrId) {
       return Nostr.getMessageById(nostrId).then((event) => {
+        clearTimeout(retrievingTimeout);
+        if (thisArg.state.retrieving) {
+          thisArg.setState({ retrieving: false });
+        }
         Nostr.getProfile(event.pubkey, (profile) => {
           if (!profile) return;
           if (!thisArg.unmounted) {
@@ -271,8 +278,18 @@ class PublicMessage extends Message {
   }
 
   render() {
+    const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     if (!this.state.msg) {
-      return '';
+      return html`
+        <div ref=${this.ref} key=${this.props.hash}
+        class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
+          ? 'standalone'
+          : ''}"
+        >
+          <div class="msg-content">
+              ${this.state.retrieving ? html`<div class="retrieving">Retrieving message...</div>` : ''}
+          </div>
+        </div>`;
     }
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name || this.shortPubKey(this.state.msg.info.from);
@@ -280,7 +297,6 @@ class PublicMessage extends Message {
       this.state.msg.text &&
       this.state.msg.text.length === 2 &&
       Helpers.isEmoji(this.state.msg.text);
-    const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     let text = this.state.msg.text;
     const shortText = text.length > 128 ? `${text.slice(0, 128)}...` : text;
     const quotedShortText = `"${shortText}"`;
@@ -311,6 +327,7 @@ class PublicMessage extends Message {
 
     return html`
       <div
+        key=${this.props.hash}
         ref=${this.ref}
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'

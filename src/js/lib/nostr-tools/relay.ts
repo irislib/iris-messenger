@@ -131,7 +131,7 @@ export function relayInit(url: string): Relay {
     var queue: any[] = []
     setInterval(() => {
       if (queue.length > 0) {
-        log(`relay ${url} queue length: ${queue.length}`)
+        log(`relay ${url} msg processing queue length: ${queue.length}`)
         var data = queue.pop()
         try {
           data = JSON.parse(data)
