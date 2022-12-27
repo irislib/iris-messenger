@@ -143,6 +143,21 @@ class PublicMessage extends Message {
         iris.public(msg.info.from).get('profile').get('name').on(this.inject());
       }
 
+      // find .jpg .jpeg .gif .png urls in msg.text and add them to msg.attachments
+      if (msg.text) {
+        const urls = msg.text.match(/(https?:\/\/[^\s]+)/g);
+        if (urls) {
+          urls.forEach((url) => {
+            if (url.match(/\.(jpg|jpeg|gif|png)$/)) {
+              if (!msg.attachments) {
+                msg.attachments = [];
+              }
+              msg.attachments.push({ type: 'image', data: url });
+            }
+          });
+        }
+      }
+
       if (nostrId) {
         Nostr.getRepliesAndLikes(nostrId, (replies, likes) => {
           this.likedBy = new Set(likes);
