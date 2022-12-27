@@ -135,11 +135,6 @@ class Login extends Component {
     let name = document.getElementById('login-form-name').value || iris.util.generateName();
     iris.session.loginAsNewUser({ name, autofollow: false });
     // follow the developer's nostr key also
-    setTimeout(() => {
-      const k = 'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s';
-      Nostr.follow(k);
-      iris.public().get('follow').get(k).put(true);
-    }, 1000);
     this.base.style = 'display:none';
   }
 
