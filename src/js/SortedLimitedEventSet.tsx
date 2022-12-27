@@ -9,7 +9,7 @@ export default class SortedLimitedEventSet {
     this.maxSize = maxSize;
   }
 
-  add(event: Event) {
+  add(event: Event): boolean {
     if (this.events.length < this.maxSize) {
       // If the set is not full, simply add the event
       this.events.push({ id: event.id, created_at: event.created_at });
@@ -18,11 +18,12 @@ export default class SortedLimitedEventSet {
       this.events[this.events.length - 1] = { id: event.id, created_at: event.created_at };
     } else {
       // If the set is full and the new event has an older timestamp, do nothing
-      return;
+      return false;
     }
 
     // Sort the events in descending order by created_at
     this.events.sort((a, b) => b.created_at - a.created_at);
+    return true;
   }
 
   get eventIds(): string[] {

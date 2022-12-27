@@ -45,7 +45,7 @@ class Footer extends Component<Props, State> {
   }
 
   render() {
-    const key = iris.session.getPubKey();
+    const key = iris.session.getKey().secp256k1.rpub;
     if (!key) {
       return;
     }

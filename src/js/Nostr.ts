@@ -1,8 +1,9 @@
 import iris from 'iris-lib';
-import { debounce } from 'lodash';
+import { debounce, throttle } from 'lodash';
 import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer');
 import SortedLimitedEventSet from './SortedLimitedEventSet';
+import localForage from "localforage";
 
 function arrayToHex(array: any) {
   return Array.from(array, (byte: any) => {
@@ -18,6 +19,25 @@ const getRelayStatus = (relay: Relay) => {
     return 3;
   }
 };
+
+const saveLocalStorageEvents = throttle((_this: any) => {
+  const latestMsgs = _this.latestMessagesByFollows.eventIds.slice(0, 50).map((eventId: any) => {
+    return _this.messagesById.get(eventId);
+  });
+  console.log('saving some events to local storage');
+  localForage.setItem('latestMsgs', latestMsgs);
+}, 1000);
+
+const saveLocalStorageProfiles = throttle((_this: any) => {
+  const myPub = iris.session.getKey().secp256k1.rpub;
+  const follows = _this.followedByUser.get(myPub);
+  const profiles = Array.from(follows).map(pub => {
+    const p = _this.profiles.get(pub);
+    p && (p.pub = pub);
+  });
+  console.log('saving profiles to local storage', profiles);
+  localForage.setItem('profiles', profiles);
+}, 1000);
 
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
@@ -43,7 +63,7 @@ type Subscription = {
 let subscriptionId = 0;
 
 export default {
-  pool: null,
+  localStorageLoaded: false,
   profile: {},
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
@@ -75,6 +95,28 @@ export default {
     };
 
     this.publish(event);
+  },
+
+  loadLocalStorageEvents: async function () {
+    const latestMsgs = await localForage.getItem('latestMsgs');
+    const profiles = await localForage.getItem('profiles');
+    const myFollowsEvent = await localForage.getItem('myFollowsEvent');
+    this.localStorageLoaded = true;
+    console.log('load', latestMsgs, myFollowsEvent);
+    console.log('load', profiles);
+    if (myFollowsEvent) {
+      console.log('loaded myFollows');
+      this.handleEvent(myFollowsEvent as Event);
+    }
+    if (Array.isArray(profiles)) {
+      profiles.forEach(p => p && this.profiles.set(p.pub, p));
+    }
+    if (Array.isArray(latestMsgs)) {
+      console.log('loaded latestmsgs');
+      latestMsgs.forEach(msg => {
+        this.handleEvent(msg); // TODO this does nothing because follows are not known yet
+      });
+    }
   },
   addRelay(url: string) {
     if (this.relays.has(url)) return;
@@ -245,12 +287,12 @@ export default {
     }
     this.messagesByUser.get(event.pubkey)?.add(event);
 
-    // don't index messages that are too far in the future. TODO: buffer for future messages
-    if (new Date(event.created_at * 1000) < new Date(Date.now() + 60 * 60 * 1000)) {
-      this.latestMessagesByEveryone.add(event);
-      const myPub = iris.session.getKey().secp256k1.rpub;
-      if (this.followedByUser.get(myPub)?.has(event.pubkey)) {
-        this.latestMessagesByFollows.add(event);
+    this.latestMessagesByEveryone.add(event);
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+      const changed = this.latestMessagesByFollows.add(event);
+      if (changed && this.localStorageLoaded) {
+        saveLocalStorageEvents(this); // TODO only save if was changed
       }
     }
 
@@ -286,6 +328,11 @@ export default {
         this.addFollower(tag[1], event.pubkey);
       }
     }
+    if (event.pubkey === iris.session.getKey().secp256k1.rpub) {
+      if (!this.myFollowsEvent || this.myFollowsEvent.created_at < event.created_at) {
+        localForage.setItem('myFollowsEvent', event);
+      }
+    }
   },
   handleMetadata(event: Event) {
     try {
@@ -317,11 +364,17 @@ export default {
         name: content.name,
         followers: this.followersByUser.get(event.pubkey) ?? new Set(),
       });
+      const myPub = iris.session.getKey().secp256k1.rpub;
+      if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+        console.log('save profile');
+        this.localStorageLoaded && saveLocalStorageProfiles(this);
+      }
     } catch (e) {
       console.log('error parsing nostr profile', e);
     }
   },
   handleEvent(event: Event) {
+    if (!event) return;
     switch (event.kind) {
       case 0:
         this.handleMetadata(event);
@@ -388,6 +441,7 @@ export default {
         this.manageRelays();
         this.getProfile(key.secp256k1.rpub, undefined);
         this.getMessagesByUser(key.secp256k1.rpub);
+        this.loadLocalStorageEvents();
 
         iris
           .public()
