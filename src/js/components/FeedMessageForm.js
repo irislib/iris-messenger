@@ -60,29 +60,7 @@ class FeedMessageForm extends MessageForm {
     if (this.state.torrentId) {
       msg.torrentId = this.state.torrentId;
     }
-    this.sendPublic(msg).then((hash) => {
-      if (this.props.replyingToUser && this.props.replyingToUser !== iris.session.getPubKey()) {
-        const title = `${iris.session.getMyName()} replied to your message`;
-        const body = `'${text.length > 100 ? `${text.slice(0, 100)}...` : text}'`;
-        iris.notifications.sendIrisNotification(this.props.replyingToUser, {
-          event: 'reply',
-          target: hash,
-        });
-        iris.notifications.sendWebPushNotification(this.props.replyingToUser, {
-          title,
-          body,
-        });
-      }
-      const mentions = text.match(Helpers.pubKeyRegex);
-      if (mentions) {
-        mentions.forEach((match) => {
-          iris.notifications.sendIrisNotification(match.slice(1), {
-            event: 'mention',
-            target: hash,
-          });
-        });
-      }
-    });
+    await this.sendPublic(msg);
     this.setState({ attachments: null, torrentId: null });
     textEl.val('');
     textEl.height('');

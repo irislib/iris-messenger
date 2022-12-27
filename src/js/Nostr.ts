@@ -299,7 +299,8 @@ export default {
 
     const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
     for (const [_, replyingTo, _preferredRelayUrl, marker] of repliedMessages) {
-      if (marker === 'root') continue;
+      if (marker === 'root' && repliedMessages.length !== 1) continue;
+      if (!marker && repliedMessages.length > 1) continue; // positional "e" tag, first refers to root
       if (!this.repliesByMessageId.has(replyingTo)) {
         this.repliesByMessageId.set(replyingTo, new Map<string, any>());
       }

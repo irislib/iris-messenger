@@ -207,16 +207,6 @@ class PublicMessage extends Message {
     iris.public().get('likes').get(this.props.hash).put(liked);
     if (liked) {
       const author = this.state.msg && this.state.msg.info && this.state.msg.info.from;
-      if (author !== iris.session.getPubKey()) {
-        const t = (this.state.msg.text || '').trim();
-        const title = `${iris.session.getMyName()} liked your post`;
-        const body = `'${t.slice(0, 100)}${t.length > 100 ? '...' : ''}'`;
-        iris.notifications.sendIrisNotification(author, {
-          event: 'like',
-          target: this.props.hash,
-        });
-        iris.notifications.sendWebPushNotification(author, { title, body });
-      }
 
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       console.log('nostrId', nostrId);

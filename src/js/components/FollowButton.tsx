@@ -35,11 +35,7 @@ class FollowButton extends Component<Props> {
       if (nostrAddr) {
         Nostr.follow(nostrAddr);
       } else {
-        iris.session.newChannel(this.props.id);
         iris.public().get('block').get(this.props.id).put(false);
-        iris.notifications.sendIrisNotification(this.props.id, {
-          event: 'follow',
-        });
       }
     }
     if (value && this.key === 'block') {
