@@ -65,6 +65,7 @@ class PublicMessage extends Message {
             text: event.content,
             time: event.created_at * 1000,
             replyingTo,
+            noteId: Nostr.toNostrBech32Address(event.id, 'note'),
             event,
           },
         };
@@ -109,8 +110,10 @@ class PublicMessage extends Message {
       if (this.unmounted) {
         return;
       }
+      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+
       const msg = r.signedData;
-      msg.info = { from: r.signerKeyHash };
+      msg.info = { from: nostrId ? Nostr.toNostrBech32Address(r.signerKeyHash, 'npub') : r.signerKeyHash };
       if (this.props.filter) {
         if (!this.props.filter(msg)) {
           return;
@@ -124,12 +127,10 @@ class PublicMessage extends Message {
         iris.public(msg.info.from).get('profile').get('name').on(this.inject());
       }
 
-      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
-
       if (nostrId) {
         Nostr.getRepliesAndLikes(nostrId, (replies, likes) => {
           this.likedBy = new Set(likes);
-          const sortedReplies = replies && Array.from(replies).sort((a, b) => a.time - b.time);
+          const sortedReplies = replies && Array.from(replies).sort((a, b) => b.time - a.time);
           this.setState({
             likes: this.likedBy.size,
             liked: this.likedBy.has(myPub),
@@ -411,7 +412,7 @@ class PublicMessage extends Message {
               ${s.likes || ''}
             </span>
             <div class="time">
-              <a href="/post/${encodeURIComponent(this.props.hash)}" class="tooltip">
+              <a href="/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}" class="tooltip">
                 ${Helpers.getRelativeTimeText(time)}
                 <span class="tooltiptext"> ${dateStr} ${timeStr} </span>
               </a>

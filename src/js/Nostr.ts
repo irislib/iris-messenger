@@ -26,7 +26,7 @@ const saveLocalStorageEvents = throttle((_this: any) => {
   });
   console.log('saving some events to local storage');
   localForage.setItem('latestMsgs', latestMsgs);
-}, 1000);
+}, 5000);
 
 const saveLocalStorageProfiles = throttle((_this: any) => {
   const myPub = iris.session.getKey().secp256k1.rpub;
@@ -37,7 +37,7 @@ const saveLocalStorageProfiles = throttle((_this: any) => {
   });
   console.log('saving profiles to local storage', profiles);
   localForage.setItem('profiles', profiles);
-}, 1000);
+}, 5000);
 
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
