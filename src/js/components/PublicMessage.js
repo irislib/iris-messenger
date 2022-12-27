@@ -49,7 +49,7 @@ class PublicMessage extends Message {
     }, 1000);
 
     if (nostrId) {
-      return Nostr.getMessageById(nostrId).then((event) => { // for faster painting of messages / feed this should be synchronous
+      const processNostrMessage = (event) => {
         clearTimeout(retrievingTimeout);
         if (thisArg.state.retrieving) {
           thisArg.setState({ retrieving: false });
@@ -76,6 +76,14 @@ class PublicMessage extends Message {
             event,
           },
         };
+      };
+
+      if (Nostr.messagesById.has(nostrId)) { // for faster painting, return synchronously if we have the message
+        return processNostrMessage(Nostr.messagesById.get(nostrId));
+      }
+
+      return Nostr.getMessageById(nostrId).then((event) => {
+        processNostrMessage(event);
       });
     }
 
@@ -113,7 +121,8 @@ class PublicMessage extends Message {
       return;
     }
     const myPub = iris.session.getKey().secp256k1.rpub;
-    p.then((r) => {
+
+    const handleMessage = (r) => {
       if (this.unmounted) {
         return;
       }
@@ -177,7 +186,13 @@ class PublicMessage extends Message {
           }),
         );
       }
-    });
+    };
+
+    if (p.then) {
+      p.then(handleMessage);
+    } else {
+      handleMessage(p);
+    }
   }
 
   componentDidUpdate() {
