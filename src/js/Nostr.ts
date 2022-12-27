@@ -369,11 +369,10 @@ export default {
   handleMetadata(event: Event) {
     try {
       const content = JSON.parse(event.content);
-      let profile: any = {
-        name: content.name,
-        photo: content.picture,
-        about: content.about,
-      };
+      let profile: any = {};
+      content.name && (profile.name = content.name);
+      content.picture && (profile.photo = content.picture);
+      content.about && (profile.about = content.about);
       if (content.iris) {
         try {
           const irisData = JSON.parse(content.iris);

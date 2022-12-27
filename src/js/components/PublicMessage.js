@@ -49,7 +49,7 @@ class PublicMessage extends Message {
     }, 1000);
 
     if (nostrId) {
-      return Nostr.getMessageById(nostrId).then((event) => {
+      return Nostr.getMessageById(nostrId).then((event) => { // for faster painting of messages / feed this should be synchronous
         clearTimeout(retrievingTimeout);
         if (thisArg.state.retrieving) {
           thisArg.setState({ retrieving: false });
