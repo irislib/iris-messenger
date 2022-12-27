@@ -361,7 +361,13 @@ class Profile extends View {
           : html`
               <div class="visible-xs-flex profile-actions" style="justify-content: flex-end">
                 <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                <${Button} onClick=${() => route(`/chat/${this.props.id}`)}>${t('send_message')}<//>
+                ${this.state.showBetaFeatures
+                  ? html`
+                      <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
+                        >${t('send_message')}<//
+                      >
+                    `
+                  : ''}
               </div>
             `}
         ${this.state.isMyProfile || this.state.about
