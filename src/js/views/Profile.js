@@ -624,6 +624,7 @@ class Profile extends View {
       data.name && (profile.name = data.name);
       data.about && (profile.about = data.about);
       data.iris && (profile.iris = data.iris);
+      data.photo && (profile.photo = data.photo);
       Nostr.toNostrBech32Address(addr, 'npub') === this.props.id && this.setState(profile);
     });
   }
