@@ -63,17 +63,12 @@ class MessageFeed extends Component {
         );
       if (this.props.node) {
         this.props.node.map().on(this.sub((...args) => this.handleMessage(...args)));
-      } else if (this.props.group && this.props.path) { // public messages
-        // TODO: make group use the same basic gun api
-        /* comment out while debugging
-        iris.group(this.props.group).map(
-          this.props.path,
-          this.sub((...args) => this.handleMessage(...args)),
-        );
-
-         */
-
-        Nostr.getMessagesByEveryone(messages => this.updateSortedMessages(messages));
+      } else if (this.props.index) { // public messages
+        if (this.props.index === 'everyone') {
+          Nostr.getMessagesByEveryone(messages => this.updateSortedMessages(messages));
+        } else {
+          Nostr.getMessagesByFollows(messages => this.updateSortedMessages(messages));
+        }
       }
     }
   }

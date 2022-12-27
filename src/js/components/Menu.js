@@ -14,7 +14,7 @@ const APPLICATIONS = [
   { url: '/media', text: 'media', icon: Icons.play, beta: true },
   { url: '/chat', text: 'messages', icon: Icons.chat, beta: true },
   { url: '/store', text: 'market', icon: Icons.store, beta: true },
-  { url: '/contacts', text: 'contacts', icon: Icons.user },
+  { url: '/discover', text: 'discover', icon: Icons.search },
   { url: '/settings', text: 'settings', icon: Icons.settings },
   { url: '/explorer', text: 'explorer', icon: Icons.folder, beta: true },
   { url: '/about', text: 'about', icon: Icons.info },

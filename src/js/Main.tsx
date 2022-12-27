@@ -147,8 +147,8 @@ class Main extends Component<Props, ReactState> {
           <div className="overlay" onClick={() => this.onClickOverlay()}></div>
           <div className="view-area">
             <Router history={history as CustomHistory} onChange={(e) => this.handleRoute(e)}>
-              <Feed path="/" />
-              <Feed path="/feed" />
+              <Feed path="/" index="follows" />
+              <Feed path="/discover" index="everyone" />
               <Hashtags path="/hashtag" />
               <Feed path="/hashtag/:hashtag+" />
               <Feed path="/search/:term?/:type?" />
@@ -198,7 +198,6 @@ class Main extends Component<Props, ReactState> {
               />
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
-              <Contacts path="/contacts" />
             </Router>
           </div>
         </section>

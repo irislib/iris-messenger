@@ -126,7 +126,7 @@ export function relayInit(url: string): Relay {
 
     const log = throttle((msg: string) => {
       console.log(msg)
-    }, 1000);
+    }, 3000);
 
     var queue: any[] = []
     setInterval(() => {

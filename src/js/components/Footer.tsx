@@ -74,8 +74,8 @@ class Footer extends Component<Props, State> {
           <a href="/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
             {plusIcon}
           </a>
-          <a href="/contacts" class={`btn ${activeRoute === '/contacts' ? 'active' : ''}`}>
-            {Icons.user}
+          <a href="/discover" class={`btn ${activeRoute === '/discover' ? 'active' : ''}`}>
+            {Icons.search}
           </a>
           <a
             href={`/profile/${key}`}

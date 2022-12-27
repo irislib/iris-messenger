@@ -245,7 +245,10 @@ export default {
     }
     this.messagesByUser.get(event.pubkey)?.add(event);
     this.latestMessagesByEveryone.add(event);
-    //this.latestMessagesByFollows.add(event);
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    if (this.followedByUser.get(myPub)?.has(event.pubkey)) {
+      this.latestMessagesByFollows.add(event);
+    }
     const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
     for (const [_, replyingTo, _preferredRelayUrl, marker] of repliedMessages) {
       if (marker === 'root') continue;
@@ -503,7 +506,13 @@ export default {
     callback();
     this.subscribe([{ kinds: [1, 7] }], callback);
   },
-
+  getMessagesByFollows(cb: Function) {
+    const callback = () => {
+      cb && cb(this.latestMessagesByFollows.eventIds);
+    };
+    callback();
+    this.subscribe([{ kinds: [1, 7] }], callback);
+  },
   getMessagesByUser(address: string, cb: Function | undefined) {
     if (!address) {
       return;

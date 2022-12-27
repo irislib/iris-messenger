@@ -76,7 +76,6 @@ class Feed extends View {
               : html`
                   <${FeedMessageForm}
                     key="form${path}"
-                    index=${path}
                     class="hidden-xs"
                     autofocus=${false}
                   />
@@ -90,7 +89,7 @@ class Feed extends View {
               filter=${s.searchTerm && ((m) => this.filter(m))}
               thumbnails=${this.props.thumbnails}
               key=${hashtag || this.props.index || 'feed'}
-              group=${this.state.group}
+              index=${this.props.index}
               path=${path}
             />
           </div>
