@@ -11,7 +11,6 @@ import VideoCall from './components/VideoCall';
 import { translationLoaded } from './translations/Translation';
 import About from './views/About';
 import Chat from './views/chat/Chat';
-import Contacts from './views/Contacts';
 import Feed from './views/Feed';
 import Follows from './views/Follows';
 import Group from './views/Group';

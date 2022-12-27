@@ -28,12 +28,11 @@ const saveLocalStorageEvents = throttle((_this: any) => {
   localForage.setItem('latestMsgs', latestMsgs);
 }, 5000);
 
-const saveLocalStorageProfiles = throttle((_this: any) => {
-  const myPub = iris.session.getKey().secp256k1.rpub;
-  const follows = _this.followedByUser.get(myPub);
-  const profiles = Array.from(follows).map(pub => {
-    const p = _this.profiles.get(pub);
+const saveLocalStorageProfiles = throttle((myFollows: Set<string>, profileMap: Map<string, any>) => {
+  const profiles = Array.from(myFollows).map(pub => {
+    const p = profileMap.get(pub);
     p && (p.pub = pub);
+    return p;
   });
   console.log('saving profiles to local storage', profiles);
   localForage.setItem('profiles', profiles);
@@ -72,6 +71,7 @@ export default {
   relays: defaultRelays,
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
+  subscribedPosts: new Set<string>(),
   messagesByUser: new Map<string, SortedLimitedEventSet>(),
   messagesById: new Map<string, Event>(),
   latestMessagesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
@@ -150,7 +150,7 @@ export default {
     if (this.followedByUser.get(myPub)?.has(follower)) {
       if (!this.subscribedUsers.has(address)) {
         this.subscribedUsers.add(address); // subscribe to events from 2nd degree follows
-        this.subscribeAuthors(this);
+        this.subscribeToAuthors(this);
       }
     }
   },
@@ -202,7 +202,7 @@ export default {
     this.handleEvent(event);
     return event.id;
   },
-  subscribeAuthors: debounce((_this) => {
+  subscribeToAuthors: debounce((_this) => {
     console.log('subscribe to', Array.from(_this.subscribedUsers));
     for (const relay of _this.relays.values()) {
       const go = () => {
@@ -226,24 +226,53 @@ export default {
       }
     }
   }, 1000),
+  subscribeToPosts: debounce((_this) => {
+    if (_this.subscribedPosts.size === 0) return;
+    console.log('subscribe to posts', Array.from(_this.subscribedPosts));
+    for (const relay of _this.relays.values()) {
+      const go = () => {
+        const sub = relay.sub([{ ids: Array.from(_this.subscribedPosts) }], {});
+        // TODO update relay lastSeen
+        sub.on('event', (event) => _this.handleEvent(event));
+      };
+      const status = getRelayStatus(relay);
+      if (status === 0) {
+        relay.on('connect', () => {
+          go();
+        });
+      } else if (status === 1) {
+        go();
+      }
+    }
+  }, 1000),
   subscribe: function (filters: Filter[], cb: Function | undefined) {
     cb && this.subscriptions.set(subscriptionId++, {
       filters,
       callback: cb,
     });
 
-    let hasNew = false;
+    let hasNewAuthors = false;
+    let hasNewIds = false;
     for (const filter of filters) {
       if (filter.authors) {
         for (const author of filter.authors) {
           if (!this.subscribedUsers.has(author)) {
-            hasNew = true;
+            hasNewAuthors = true;
             this.subscribedUsers.add(author);
           }
         }
       }
+      if (filter.ids) {
+        for (const id of filter.ids) {
+          if (!this.subscribedPosts.has(id)) {
+            hasNewIds = true;
+            this.subscribedPosts.add(id);
+          }
+        }
+      }
     }
-    hasNew && this.subscribeAuthors(this);
+    hasNewAuthors && this.subscribeToAuthors(this);
+    hasNewIds && this.subscribeToPosts(this);
   },
   getConnectedRelayCount: function () {
     let count = 0;
@@ -369,7 +398,7 @@ export default {
       const myPub = iris.session.getKey().secp256k1.rpub;
       if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
         console.log('save profile');
-        this.localStorageLoaded && saveLocalStorageProfiles(this);
+        this.localStorageLoaded && saveLocalStorageProfiles(this.followedByUser.get(myPub), this.profiles);
       }
     } catch (e) {
       console.log('error parsing nostr profile', e);
@@ -391,6 +420,7 @@ export default {
         this.handleReaction(event);
         break;
     }
+    this.subscribedPosts.delete(event.id);
     // go through subscriptions and callback if filters match
     for (const sub of this.subscriptions.values()) {
       if (!sub.filters) {
@@ -530,24 +560,9 @@ export default {
     }
 
     return new Promise((resolve) => {
-      for (const relay of this.relays.values()) {
-        const go = () => {
-          const sub = relay.sub([{ ids: [id] }], {});
-          sub.on('event', (event) => {
-            this.handleEvent(event);
-            sub.unsub();
-            resolve(event);
-          });
-        };
-        const status = getRelayStatus(relay);
-        if (status === 0) {
-          relay.on('connect', () => {
-            go();
-          });
-        } else if (status === 1) {
-          go();
-        }
-      }
+      this.subscribe([{ ids: [id] }], () => { // TODO turn off subscription
+        resolve(this.messagesById.get(id));
+      });
     });
   },
 
