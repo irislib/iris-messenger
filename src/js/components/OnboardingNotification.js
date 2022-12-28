@@ -9,7 +9,7 @@ import { translate as t } from '../translations/Translation';
 import CopyButton from './CopyButton';
 import FollowButton from './FollowButton';
 import Identicon from './Identicon';
-import Text from './Text';
+import Name from './Name';
 
 const SUGGESTED_FOLLOW = 'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s';
 
@@ -29,11 +29,7 @@ export default class OnboardingNotification extends Component {
             <div class="profile-link-container">
               <a href="/profile/${SUGGESTED_FOLLOW}" class="profile-link">
                 <${Identicon} str=${SUGGESTED_FOLLOW} width="40" />
-                <${Text}
-                  path="profile/name"
-                  user=${SUGGESTED_FOLLOW}
-                  placeholder="Suggested follow"
-                />
+                <${Name} pub=${SUGGESTED_FOLLOW} placeholder="Suggested follow" />
               </a>
               <${FollowButton} id=${SUGGESTED_FOLLOW} />
             </div>
