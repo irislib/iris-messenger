@@ -22,7 +22,7 @@ const getRelayStatus = (relay: Relay) => {
   }
 };
 
-const saveLocalStorageEvents = throttle((_this: any) => {
+const saveLocalStorageEvents = debounce((_this: any) => {
   const latestMsgs = _this.latestMessagesByFollows.eventIds.slice(0, 50).map((eventId: any) => {
     return _this.messagesById.get(eventId);
   });
@@ -30,14 +30,12 @@ const saveLocalStorageEvents = throttle((_this: any) => {
   localForage.setItem('latestMsgs', latestMsgs);
 }, 5000);
 
-const saveLocalStorageProfilesAndFollows = throttle((_this) => {
-  if (!_this.profileAndFollowEvents) {
-    return;
-  }
-  // should we save profile events instead? application state would be only changed by events
-  const events = Array.from(_this.profileAndFollowEvents.values());
-  console.log('saving', events.length, 'events to local storage');
-  localForage.setItem('profiles', events);
+const saveLocalStorageProfilesAndFollows = debounce((_this) => {
+  const profileEvents = Array.from(_this.profileEventByUser.values());
+  const followEvents = Array.from(_this.followEventByUser.values());
+  console.log('saving', profileEvents.length + followEvents.length, 'events to local storage');
+  localForage.setItem('profileEvents', profileEvents);
+  localForage.setItem('followEvents', followEvents);
 }, 5000);
 
 const MAX_MSGS_BY_USER = 500;
@@ -81,7 +79,8 @@ export default {
   messagesById: new Map<string, Event>(),
   latestMessagesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestMessagesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
-  profileAndFollowEvents: new Map<string, Event>(),
+  profileEventByUser: new Map<string, Event>(),
+  followEventByUser: new Map<string, Event>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
@@ -106,17 +105,18 @@ export default {
 
   loadLocalStorageEvents: async function () {
     const latestMsgs = await localForage.getItem('latestMsgs');
-    const profileAndFollowEvents = await localForage.getItem('profiles');
-    const myFollowsEvent = await localForage.getItem('myFollowsEvent');
+    const followEvents = await localForage.getItem('followEvents');
+    const profileEvents = await localForage.getItem('profileEvents');
     this.localStorageLoaded = true;
-    console.log('load', latestMsgs, myFollowsEvent);
-    console.log('load', profileAndFollowEvents);
-    if (myFollowsEvent) {
-      console.log('loaded myFollows');
-      this.handleEvent(myFollowsEvent as Event);
+    console.log('loaded from local storage');
+    console.log('latestMsgs', latestMsgs);
+    console.log('followEvents', followEvents);
+    console.log('profileEvents', profileEvents);
+    if (Array.isArray(followEvents)) {
+      followEvents.forEach(e => this.handleEvent(e));
     }
-    if (Array.isArray(profileAndFollowEvents)) {
-      profileAndFollowEvents.forEach(e => this.handleEvent(e));
+    if (Array.isArray(profileEvents)) {
+      profileEvents.forEach(e => this.handleEvent(e));
     }
     if (Array.isArray(latestMsgs)) {
       console.log('loaded latestmsgs');
@@ -379,14 +379,12 @@ export default {
       }
     }
     const myPub = iris.session.getKey().secp256k1.rpub;
-    if (event.pubkey === myPub) {
-      if (!this.myFollowsEvent || this.myFollowsEvent.created_at < event.created_at) {
-        localForage.setItem('myFollowsEvent', event);
-      }
-    }
     if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-      this.profileAndFollowEvents.set(event.id, event);
-      this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
+      const existing = this.followEventByUser.get(event.pubkey);
+      if (!existing || existing.created_at < event.created_at) {
+        this.followEventByUser.set(event.pubkey, event);
+        this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
+      }
     }
   },
   handleMetadata(event: Event) {
@@ -419,10 +417,13 @@ export default {
         followers: this.followersByUser.get(event.pubkey) ?? new Set(),
       });
       const myPub = iris.session.getKey().secp256k1.rpub;
-      if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-        this.profileAndFollowEvents.set(event.id, event);
-        this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
-      }
+      //if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+        const existingEvent = this.profileEventByUser.get(event.pubkey);
+        if (!existingEvent || existingEvent.created_at < event.created_at) {
+          this.profileEventByUser.set(event.pubkey, event);
+          this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
+        }
+      //}
     } catch (e) {
       console.log('error parsing nostr profile', e);
     }

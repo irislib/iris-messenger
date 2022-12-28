@@ -41,7 +41,6 @@ class PublicMessage extends Message {
   }
 
   static fetchByHash(thisArg, hash) {
-    console.log('fetchByHash', hash);
     if (!hash) {
       return;
     }
