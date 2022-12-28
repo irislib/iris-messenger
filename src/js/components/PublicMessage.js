@@ -63,7 +63,6 @@ class PublicMessage extends Message {
           }
         });
         const replyingTo = Nostr.getEventReplyingTo(event);
-        console.log('replyingTo', replyingTo);
         return {
           signerKeyHash: event.pubkey,
           signedData: {
@@ -144,11 +143,12 @@ class PublicMessage extends Message {
         const urls = msg.text.match(/(https?:\/\/[^\s]+)/g);
         if (urls) {
           urls.forEach((url) => {
-            if (url.match(/\.(jpg|jpeg|gif|png)$/)) {
+            const parsedUrl = new URL(url);
+            if (parsedUrl.pathname.match(/\.(jpg|jpeg|gif|png)$/)) {
               if (!msg.attachments) {
                 msg.attachments = [];
               }
-              msg.attachments.push({ type: 'image', data: url });
+              msg.attachments.push({ type: 'image', data: parsedUrl.origin + parsedUrl.pathname });
             }
           });
         }
@@ -156,7 +156,6 @@ class PublicMessage extends Message {
 
       if (nostrId) {
         Nostr.getRepliesAndLikes(nostrId, (replies, likes, threadReplyCount) => {
-          console.log('gotRepliesAndLikes', replies, likes, threadReplyCount);
           this.likedBy = new Set(likes);
           const sortedReplies = replies && Array.from(replies).sort((a, b) => a.time - b.time);
           this.setState({
