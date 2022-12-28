@@ -1,5 +1,5 @@
 import iris from 'iris-lib';
-import { debounce, throttle } from 'lodash';
+import { debounce } from 'lodash';
 
 import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer');
@@ -7,10 +7,8 @@ import localForage from 'localforage';
 
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 
-function arrayToHex(array: any) {
-  return Array.from(array, (byte: any) => {
-    return ('0' + (byte & 0xff).toString(16)).slice(-2);
-  }).join('');
+interface Window {
+  nostr?: any;
 }
 
 const getRelayStatus = (relay: Relay) => {
@@ -85,6 +83,12 @@ export default {
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
 
+  arrayToHex(array: any) {
+    return Array.from(array, (byte: any) => {
+      return ('0' + (byte & 0xff).toString(16)).slice(-2);
+    }).join('');
+  },
+
   follow: function (address: string) {
     address = this.toNostrHexAddress(address);
     const pubkey = iris.session.getKey().secp256k1.rpub;
@@ -113,10 +117,10 @@ export default {
     console.log('followEvents', followEvents);
     console.log('profileEvents', profileEvents);
     if (Array.isArray(followEvents)) {
-      followEvents.forEach(e => this.handleEvent(e));
+      followEvents.forEach((e) => this.handleEvent(e));
     }
     if (Array.isArray(profileEvents)) {
-      profileEvents.forEach(e => this.handleEvent(e));
+      profileEvents.forEach((e) => this.handleEvent(e));
     }
     if (Array.isArray(latestMsgs)) {
       console.log('loaded latestmsgs');
@@ -187,7 +191,7 @@ export default {
     }
     try {
       const { data } = bech32.decode(str);
-      const addr = arrayToHex(data);
+      const addr = this.arrayToHex(data);
       return addr;
     } catch (e) {}
     return null;
@@ -198,7 +202,14 @@ export default {
     event.created_at = event.created_at || Math.floor(Date.now() / 1000);
     event.pubkey = iris.session.getKey().secp256k1.rpub;
     event.id = getEventHash(event);
-    event.sig = await signEvent(event, iris.session.getKey().secp256k1.priv);
+    const myPriv = iris.session.getKey().secp256k1.priv;
+    if (myPriv) {
+      event.sig = await signEvent(event, myPriv);
+    } else if (window.nostr) {
+      event = await window.nostr.signEvent(event);
+    } else {
+      alert('no nostr extension to sign the event with');
+    }
     if (!(event.id && event.sig)) {
       console.error('Failed to sign event', event);
       throw new Error('Invalid event');
@@ -418,11 +429,11 @@ export default {
       });
       const myPub = iris.session.getKey().secp256k1.rpub;
       //if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-        const existingEvent = this.profileEventByUser.get(event.pubkey);
-        if (!existingEvent || existingEvent.created_at < event.created_at) {
-          this.profileEventByUser.set(event.pubkey, event);
-          this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
-        }
+      const existingEvent = this.profileEventByUser.get(event.pubkey);
+      if (!existingEvent || existingEvent.created_at < event.created_at) {
+        this.profileEventByUser.set(event.pubkey, event);
+        this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
+      }
       //}
     } catch (e) {
       console.log('error parsing nostr profile', e);
@@ -669,6 +680,7 @@ export default {
   },
 
   setMetadata() {
+    if (!iris.session.getKey().secp256k1.rpriv) return;
     setTimeout(async () => {
       // for each child of this.profile, if it has a value, set it
       const irisData = JSON.stringify({

@@ -13,6 +13,7 @@ import iris from 'iris-lib';
 import _ from 'lodash';
 import { route } from 'preact-router';
 import Nostr from "../Nostr";
+const bech32 = require('bech32-buffer');
 
 async function ethereumConnect() {
   const providerOptions = {
@@ -65,6 +66,26 @@ async function login(k) {
   maybeGoToChat(k);
 }
 
+async function nostrLogin(name) {
+  const rpub = await window.nostr.getPublicKey();
+  const k = await iris.Key.generate();
+  k.secp256k1 = { rpub };
+  await login(k);
+  setTimeout(async () => {
+    iris
+      .public()
+      .get('profile')
+      .get('name')
+      .once((existingName) => {
+        if (typeof existingName !== 'string' || existingName === '') {
+          name = name || iris.util.generateName();
+          iris.public().get('profile').put({ a: null });
+          iris.public().get('profile').get('name').put(name);
+        }
+      });
+  }, 2000);
+}
+
 async function ethereumLogin(name) {
   const web3 = await ethereumConnect();
   const accounts = await web3.eth.getAccounts();
@@ -107,7 +128,7 @@ class Login extends Component {
     this.setState({ showScanPrivKey: !this.state.showScanPrivKey });
   }
 
-  async onPastePrivKey(event) {
+  async onPasteKey(event) {
     const val = event.target.value;
     if (!val.length) {
       return;
@@ -116,9 +137,31 @@ class Login extends Component {
     try {
       k = JSON.parse(val);
     } catch (e) {}
-    if (!k && secp.utils.isValidPrivateKey(val)) {
-      k = await iris.Key.fromSecp256k1(val);
+    if (!k) {
+      console.log(1);
+      if (secp.utils.isValidPrivateKey(val)) {
+        console.log(2);
+        k = await iris.Key.fromSecp256k1(val);
+      }
+      try {
+        const { data, prefix } = bech32.decode(val);
+        console.log('data', data, 'prefix', prefix);
+        const hex = Nostr.arrayToHex(data);
+        if (prefix === 'npub') {
+          k = await iris.Key.generate();
+          k.secp256k1 = { rpub: hex };
+        } else if (prefix === 'nsec') {
+          k = await iris.Key.fromSecp256k1(hex);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
+    console.log('k', k);
+    if (!k) {
+      return;
+    }
+    console.log('login with', k);
     await login(k);
     event.target.value = '';
     Helpers.copyToClipboard(''); // clear the clipboard
@@ -140,8 +183,11 @@ class Login extends Component {
 
   onNameChange(event) {
     const val = event.target.value;
-    if ((val.indexOf('"priv"') !== -1) || secp.utils.isValidPrivateKey(val)) {
-      this.onPastePrivKey(event);
+    if ((val.indexOf('"priv"') !== -1) ||
+        secp.utils.isValidPrivateKey(val) ||
+        val.startsWith('nsec') ||
+        val.startsWith('npub')) {
+      this.onPasteKey(event);
       event.target.value = '';
       return;
     }
@@ -154,7 +200,7 @@ class Login extends Component {
         <input
           id="paste-privkey"
           autoFocus
-          onInput={(e) => this.onPastePrivKey(e)}
+          onInput={(e) => this.onPasteKey(e)}
           placeholder={t('paste_private_key')}
         />
         <p>
@@ -211,6 +257,13 @@ class Login extends Component {
                     {t('already_have_an_account')}
                   </a>
                 </p>
+                {window.nostr ? (
+                  <p>
+                    <a href="#" onClick={() => nostrLogin()}>
+                      {t('nostr_login')}
+                    </a>
+                  </p>
+                ) : null}
                 {(!window.nostr && window.ethereum) ? ( // lol, hide ethereum for nostr users
                   <p>
                     <a href="#" onClick={() => ethereumLogin()}>

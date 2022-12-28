@@ -4,6 +4,7 @@ import Button from '../../components/basic/Button';
 import iris from 'iris-lib';
 import CopyButton from '../../components/CopyButton';
 import { translate as t } from '../../translations/Translation';
+const bech32 = require('bech32-buffer');
 
 const NostrSettings = () => {
   const [relays, setRelays] = useState(Array.from(Nostr.relays.values()));
@@ -54,6 +55,13 @@ const NostrSettings = () => {
     }
   }
 
+  let myPriv = iris.session.getKey().secp256k1.priv;
+  if (myPriv) {
+    myPriv = bech32.encode('nsec', Buffer.from(myPriv, 'hex'));
+  }
+  let myPub = iris.session.getKey().secp256k1.rpub;
+  myPub = bech32.encode('npub', Buffer.from(myPub, 'hex'));
+
   return (
     <div className="centered-container">
       <h2>Nostr</h2>
@@ -62,11 +70,11 @@ const NostrSettings = () => {
         <div className="flex-row">
           <div className="flex-cell">
             <p>Public key:</p>
-            <input type="text" value={iris.session.getKey().secp256k1.rpub} />
+            <input type="text" value={myPub} />
           </div>
           <div className="flex-cell no-flex">
             <CopyButton
-              copyStr={iris.session.getKey().secp256k1.rpub}
+              copyStr={myPub}
               text="Copy public key" />
           </div>
         </div>
@@ -75,9 +83,14 @@ const NostrSettings = () => {
             Private key
           </div>
           <div className="flex-cell no-flex">
-            <CopyButton
-              copyStr={iris.session.getKey().secp256k1.priv}
+            {myPriv ? (
+              <CopyButton
+              copyStr={myPriv}
               text="Copy private key" />
+            ) : (
+              <p>Not present</p>
+            )}
+
           </div>
         </div>
       </div>
