@@ -81,7 +81,8 @@ export default {
   latestMessagesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestMessagesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   profileAndMetadataEvents: new Map<string, Event>(),
-  repliesByMessageId: new Map<string, Map<string, any>>(),
+  threadRepliesByMessageId: new Map<string, Set<string>>(),
+  directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
 
   follow: function (address: string) {
@@ -330,19 +331,35 @@ export default {
       }
     }
 
-
-    const repliedMessages = event.tags.filter((tag: any) => tag[0] === 'e');
-    let i = 0;
-    for (const [_, replyingTo, _preferredRelayUrl, marker] of repliedMessages) {
-      if (marker === 'root' && repliedMessages.length !== 1) continue;
-      if (!this.repliesByMessageId.has(replyingTo)) {
-        this.repliesByMessageId.set(replyingTo, new Map<string, any>());
+    const replyingTo = this.getEventReplyingTo(event);
+    if (replyingTo) {
+      if (!this.directRepliesByMessageId.has(replyingTo)) {
+        this.directRepliesByMessageId.set(replyingTo, new Set<string>());
       }
-      this.repliesByMessageId
-        .get(replyingTo)
-        ?.set(event.id, { hash: event.id, time: event.created_at });
-      i++;
+      this.directRepliesByMessageId.get(replyingTo)?.add(event.id);
+
+      const repliedMsgs = event.tags.filter((tag) => tag[0] === 'e').map(tag => tag[1]);
+      for (const id of repliedMsgs) {
+        if (!this.threadRepliesByMessageId.has(id)) {
+          this.threadRepliesByMessageId.set(id, new Set<string>());
+        }
+        this.threadRepliesByMessageId.get(id)?.add(event.id);
+      }
     }
+  },
+  getEventReplyingTo: function (event: Event) {
+    const replyTags = event.tags.filter((tag) => tag[0] === 'e');
+    if (replyTags.length === 1) {
+      return replyTags[0][1];
+    }
+    const replyTag = event.tags.find((tag) => tag[0] === 'e' && tag[3] === 'reply');
+    if (replyTag) {
+      return replyTag[1];
+    }
+    if (replyTags.length > 1) {
+      return replyTags[1][1];
+    }
+    return undefined;
   },
   handleReaction(event: Event) {
     if (event.content !== '+' && event.content !== '') return; // for now we handle only likes
@@ -532,9 +549,9 @@ export default {
 
   getRepliesAndLikes(id: string, cb: Function | undefined) {
     const callback = () => {
-      cb && cb(new Set(this.repliesByMessageId.get(id)?.values()), this.likesByMessageId.get(id));
+      cb && cb(this.directRepliesByMessageId.get(id), this.likesByMessageId.get(id), this.threadRepliesByMessageId.get(id)?.size ?? 0);
     };
-    if (this.repliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
+    if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }
 

@@ -37,12 +37,14 @@ class PublicMessage extends Message {
     super();
     this.i = 0;
     this.likedBy = new Set();
-    this.replies = {};
     this.subscribedReplies = new Set();
     this.state = { sortedReplies: [] };
   }
 
   static fetchByHash(thisArg, hash) {
+    if (!hash) {
+      return;
+    }
     const nostrId = Nostr.toNostrHexAddress(hash);
     const retrievingTimeout = setTimeout(() => {
       thisArg.setState({ retrieving: true });
@@ -60,12 +62,7 @@ class PublicMessage extends Message {
             thisArg.setState({ name: profile.name });
           }
         });
-        // if it's a reply, one of event.tags is ["e", <event-id>, <relay-url>, <marker>]
-        let replyTag = event.tags.find((tag) => tag[0] === 'e' && tag[3] === 'reply');
-        if (!replyTag) {
-          replyTag = event.tags.find((tag) => tag[0] === 'e');
-        }
-        const replyingTo = replyTag && replyTag[1];
+        const replyingTo = Nostr.getEventReplyingTo(event);
         return {
           signerKeyHash: event.pubkey,
           signedData: {
@@ -123,6 +120,7 @@ class PublicMessage extends Message {
     const myPub = iris.session.getKey().secp256k1.rpub;
 
     const handleMessage = (r) => {
+      this.props.standalone && console.log('got message', r);
       if (this.unmounted) {
         return;
       }
@@ -139,67 +137,35 @@ class PublicMessage extends Message {
         this.setOgImageUrl(msg.attachments[0].data);
       }
       this.setState({ msg });
-      if (this.props.showName && !this.props.name) {
-        iris.public(msg.info.from).get('profile').get('name').on(this.inject());
-      }
 
       // find .jpg .jpeg .gif .png urls in msg.text and add them to msg.attachments
       if (msg.text) {
         const urls = msg.text.match(/(https?:\/\/[^\s]+)/g);
         if (urls) {
           urls.forEach((url) => {
-            if (url.match(/\.(jpg|jpeg|gif|png)$/)) {
+            const parsedUrl = new URL(url);
+            if (parsedUrl.pathname.match(/\.(jpg|jpeg|gif|png)$/)) {
               if (!msg.attachments) {
                 msg.attachments = [];
               }
-              msg.attachments.push({ type: 'image', data: url });
+              msg.attachments.push({ type: 'image', data: parsedUrl.pathname });
             }
           });
         }
       }
 
       if (nostrId) {
-        Nostr.getRepliesAndLikes(nostrId, (replies, likes) => {
+        Nostr.getRepliesAndLikes(nostrId, (replies, likes, threadReplyCount) => {
+          console.log('gotRepliesAndLikes', replies, likes, threadReplyCount);
           this.likedBy = new Set(likes);
-          const sortedReplies = replies && Array.from(replies).sort((a, b) => b.time - a.time);
+          const sortedReplies = replies && Array.from(replies).sort((a, b) => a.time - b.time);
           this.setState({
             likes: this.likedBy.size,
             liked: this.likedBy.has(myPub),
-            replyCount: sortedReplies?.length ?? 0,
+            replyCount: threadReplyCount,
             sortedReplies,
           });
         });
-      } else {
-        iris.group().on(
-          `likes/${encodeURIComponent(this.props.hash)}`,
-          this.sub((liked, a, b, e, from) => {
-            this.eventListeners[`${from}likes`] = e;
-            liked ? this.likedBy.add(from) : this.likedBy.delete(from);
-            const s = { likes: this.likedBy.size };
-            if (from === iris.session.getPubKey()) s['liked'] = liked;
-            this.setState(s);
-          }),
-        );
-        iris.group().map(
-          `replies/${encodeURIComponent(this.props.hash)}`,
-          this.sub((hash, time, b, e, from) => {
-            const k = from + time;
-            if (hash && this.replies[k]) return;
-            if (hash) {
-              this.replies[k] = { hash, time };
-            } else {
-              delete this.replies[k];
-            }
-            this.eventListeners[`${from}replies`] = e;
-            const sortedReplies = Object.values(this.replies).sort((a, b) =>
-              a.time > b.time ? 1 : -1,
-            );
-            this.setState({
-              replyCount: Object.keys(this.replies).length,
-              sortedReplies,
-            });
-          }),
-        );
       }
     };
 
@@ -271,15 +237,7 @@ class PublicMessage extends Message {
   onDelete(e) {
     e.preventDefault();
     if (confirm('Delete message?')) {
-      // TODO: remove from hashtag indexes
-      const msg = this.state.msg;
-      msg.torrentId && iris.public().get('media').get(msg.time).put(null);
-      iris
-        .public()
-        .get(this.props.index || 'msgs')
-        .get(msg.time)
-        .put(null);
-      msg.replyingTo && iris.public().get('replies').get(msg.replyingTo).get(msg.time).put(null);
+      // TODO: send nostr delete event
     }
   }
 
@@ -473,8 +431,8 @@ class PublicMessage extends Message {
             ? s.sortedReplies.map(
                 (r) =>
                   html`<${PublicMessage}
-                    key=${r.hash}
-                    hash=${r.hash}
+                    key=${r}
+                    hash=${r}
                     asReply=${true}
                     showName=${true}
                     showReplies=${true}
