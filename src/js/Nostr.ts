@@ -211,44 +211,24 @@ export default {
   subscribeToAuthors: debounce((_this) => {
     console.log('subscribe to', Array.from(_this.subscribedUsers));
     for (const relay of _this.relays.values()) {
-      const go = () => {
-        // first sub to profiles, then everything else
-        const sub = relay.sub([{ kinds: [0, 3], authors: Array.from(_this.subscribedUsers) }], {});
+      // first sub to profiles, then everything else
+      const sub = relay.sub([{ kinds: [0, 3], authors: Array.from(_this.subscribedUsers) }], {});
+      // TODO update relay lastSeen
+      sub.on('event', (event) => _this.handleEvent(event));
+      setTimeout(() => {
+        const sub2 = relay.sub([{ authors: Array.from(_this.subscribedUsers), limit: 40000 }], {});
         // TODO update relay lastSeen
-        sub.on('event', (event) => _this.handleEvent(event));
-        setTimeout(() => {
-          const sub2 = relay.sub([{ authors: Array.from(_this.subscribedUsers), limit: 20000 }], {});
-          // TODO update relay lastSeen
-          sub2.on('event', (event) => _this.handleEvent(event));
-        }, 500);
-      };
-      const status = getRelayStatus(relay);
-      if (status === 0) {
-        relay.on('connect', () => {
-          go();
-        });
-      } else if (status === 1) {
-        go();
-      }
+        sub2.on('event', (event) => _this.handleEvent(event));
+      }, 500);
     }
   }, 1000),
   subscribeToPosts: debounce((_this) => {
     if (_this.subscribedPosts.size === 0) return;
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     for (const relay of _this.relays.values()) {
-      const go = () => {
         const sub = relay.sub([{ ids: Array.from(_this.subscribedPosts) }], {});
         // TODO update relay lastSeen
         sub.on('event', (event) => _this.handleEvent(event));
-      };
-      const status = getRelayStatus(relay);
-      if (status === 0) {
-        relay.on('connect', () => {
-          go();
-        });
-      } else if (status === 1) {
-        go();
-      }
     }
   }, 1000),
   subscribe: function (filters: Filter[], cb: Function | undefined) {
@@ -290,6 +270,7 @@ export default {
     return count;
   },
   manageRelays: function () {
+    // TODO keep track of subscriptions and send them to new relays
     const go = () => {
       const relays: Array<Relay> = Array.from(this.relays.values());
       // ws status codes: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
@@ -338,7 +319,8 @@ export default {
       }
       this.directRepliesByMessageId.get(replyingTo)?.add(event.id);
 
-      const repliedMsgs = event.tags.filter((tag) => tag[0] === 'e').map(tag => tag[1]);
+      // are boost messages screwing this up?
+      const repliedMsgs = event.tags.filter((tag) => tag[0] === 'e').map(tag => tag[1]).slice(0,2);
       for (const id of repliedMsgs) {
         if (!this.threadRepliesByMessageId.has(id)) {
           this.threadRepliesByMessageId.set(id, new Set<string>());

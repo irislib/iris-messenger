@@ -37,7 +37,6 @@ class PublicMessage extends Message {
     super();
     this.i = 0;
     this.likedBy = new Set();
-    this.subscribedReplies = new Set();
     this.state = { sortedReplies: [] };
   }
 
@@ -157,7 +156,7 @@ class PublicMessage extends Message {
       if (nostrId) {
         Nostr.getRepliesAndLikes(nostrId, (replies, likes, threadReplyCount) => {
           this.likedBy = new Set(likes);
-          const sortedReplies = replies && Array.from(replies).sort((a, b) => a.time - b.time);
+          const sortedReplies = replies && Array.from(replies).sort((a, b) => Nostr.messagesById.get(a)?.time - Nostr.messagesById.get(b)?.time);
           this.setState({
             likes: this.likedBy.size,
             liked: this.likedBy.has(myPub),
