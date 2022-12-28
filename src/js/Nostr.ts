@@ -392,6 +392,9 @@ export default {
       }
     }
     const myPub = iris.session.getKey().secp256k1.rpub;
+    if (event.pubkey === myPub && event.tags.length) {
+      iris.local().get('noFollows').put(false);
+    }
     if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
       const existing = this.followEventByUser.get(event.pubkey);
       if (!existing || existing.created_at < event.created_at) {
