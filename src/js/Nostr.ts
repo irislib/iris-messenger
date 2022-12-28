@@ -28,17 +28,16 @@ const saveLocalStorageEvents = throttle((_this: any) => {
   localForage.setItem('latestMsgs', latestMsgs);
 }, 5000);
 
-const saveLocalStorageProfiles = throttle((myFollows: Set<string>, profileMap: Map<string, any>) => {
-  if (!(myFollows && profileMap)) {
+const saveLocalStorageProfiles = throttle((profileMap: Map<string, any>) => {
+  if (!profileMap) {
     return;
   }
   // should we save profile events instead? application state would be only changed by events
-  const profiles = Array.from(myFollows).map(pub => {
+  const profiles = Array.from(profileMap.keys()).map(pub => {
     const p = profileMap.get(pub);
     p && (p.pub = pub);
     return p;
   });
-  console.log('saving profiles to local storage', profiles);
   localForage.setItem('profiles', profiles);
 }, 5000);
 
@@ -81,6 +80,7 @@ export default {
   messagesById: new Map<string, Event>(),
   latestMessagesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestMessagesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  profileAndMetadataEvents: new Map<string, Event>(),
   repliesByMessageId: new Map<string, Map<string, any>>(),
   likesByMessageId: new Map<string, Set<string>>(),
 
@@ -216,7 +216,7 @@ export default {
         // TODO update relay lastSeen
         sub.on('event', (event) => _this.handleEvent(event));
         setTimeout(() => {
-          const sub2 = relay.sub([{ authors: Array.from(_this.subscribedUsers), limit: 10000 }], {});
+          const sub2 = relay.sub([{ authors: Array.from(_this.subscribedUsers), limit: 20000 }], {});
           // TODO update relay lastSeen
           sub2.on('event', (event) => _this.handleEvent(event));
         }, 500);
@@ -402,7 +402,7 @@ export default {
       const myPub = iris.session.getKey().secp256k1.rpub;
       if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
         console.log('save profile');
-        this.localStorageLoaded && saveLocalStorageProfiles(this.followedByUser.get(myPub), this.profiles);
+        this.localStorageLoaded && saveLocalStorageProfiles(this.profiles);
       }
     } catch (e) {
       console.log('error parsing nostr profile', e);
