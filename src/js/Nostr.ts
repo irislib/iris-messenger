@@ -1,9 +1,11 @@
 import iris from 'iris-lib';
 import { debounce, throttle } from 'lodash';
+
 import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer');
+import localForage from 'localforage';
+
 import SortedLimitedEventSet from './SortedLimitedEventSet';
-import localForage from "localforage";
 
 function arrayToHex(array: any) {
   return Array.from(array, (byte: any) => {
@@ -33,7 +35,7 @@ const saveLocalStorageProfiles = throttle((profileMap: Map<string, any>) => {
     return;
   }
   // should we save profile events instead? application state would be only changed by events
-  const profiles = Array.from(profileMap.keys()).map(pub => {
+  const profiles = Array.from(profileMap.keys()).map((pub) => {
     const p = profileMap.get(pub);
     p && (p.pub = pub);
     return p;
@@ -115,11 +117,11 @@ export default {
       this.handleEvent(myFollowsEvent as Event);
     }
     if (Array.isArray(profiles)) {
-      profiles.forEach(p => p && this.profiles.set(p.pub, p));
+      profiles.forEach((p) => p && this.profiles.set(p.pub, p));
     }
     if (Array.isArray(latestMsgs)) {
       console.log('loaded latestmsgs');
-      latestMsgs.forEach(msg => {
+      latestMsgs.forEach((msg) => {
         this.handleEvent(msg); // TODO this does nothing because follows are not known yet
       });
     }
@@ -226,16 +228,17 @@ export default {
     if (_this.subscribedPosts.size === 0) return;
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     for (const relay of _this.relays.values()) {
-        const sub = relay.sub([{ ids: Array.from(_this.subscribedPosts) }], {});
-        // TODO update relay lastSeen
-        sub.on('event', (event) => _this.handleEvent(event));
+      const sub = relay.sub([{ ids: Array.from(_this.subscribedPosts) }], {});
+      // TODO update relay lastSeen
+      sub.on('event', (event) => _this.handleEvent(event));
     }
   }, 1000),
   subscribe: function (filters: Filter[], cb: Function | undefined) {
-    cb && this.subscriptions.set(subscriptionId++, {
-      filters,
-      callback: cb,
-    });
+    cb &&
+      this.subscriptions.set(subscriptionId++, {
+        filters,
+        callback: cb,
+      });
 
     let hasNewAuthors = false;
     let hasNewIds = false;
@@ -320,7 +323,10 @@ export default {
       this.directRepliesByMessageId.get(replyingTo)?.add(event.id);
 
       // are boost messages screwing this up?
-      const repliedMsgs = event.tags.filter((tag) => tag[0] === 'e').map(tag => tag[1]).slice(0,2);
+      const repliedMsgs = event.tags
+        .filter((tag) => tag[0] === 'e')
+        .map((tag) => tag[1])
+        .slice(0, 2);
       for (const id of repliedMsgs) {
         if (!this.threadRepliesByMessageId.has(id)) {
           this.threadRepliesByMessageId.set(id, new Set<string>());
@@ -531,7 +537,12 @@ export default {
 
   getRepliesAndLikes(id: string, cb: Function | undefined) {
     const callback = () => {
-      cb && cb(this.directRepliesByMessageId.get(id), this.likesByMessageId.get(id), this.threadRepliesByMessageId.get(id)?.size ?? 0);
+      cb &&
+        cb(
+          this.directRepliesByMessageId.get(id),
+          this.likesByMessageId.get(id),
+          this.threadRepliesByMessageId.get(id)?.size ?? 0,
+        );
     };
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
@@ -563,7 +574,8 @@ export default {
     }
 
     return new Promise((resolve) => {
-      this.subscribe([{ ids: [id] }], () => { // TODO turn off subscription
+      this.subscribe([{ ids: [id] }], () => {
+        // TODO turn off subscription
         resolve(this.messagesById.get(id));
       });
     });

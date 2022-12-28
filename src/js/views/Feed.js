@@ -74,11 +74,7 @@ class Feed extends View {
             ${s.searchTerm
               ? ''
               : html`
-                  <${FeedMessageForm}
-                    key="form${path}"
-                    class="hidden-xs"
-                    autofocus=${false}
-                  />
+                  <${FeedMessageForm} key="form${path}" class="hidden-xs" autofocus=${false} />
                 `}
             ${s.searchTerm
               ? html`<h2>Search results for "${s.searchTerm}"</h2>`

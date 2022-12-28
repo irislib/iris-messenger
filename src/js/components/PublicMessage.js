@@ -74,7 +74,8 @@ class PublicMessage extends Message {
         };
       };
 
-      if (Nostr.messagesById.has(nostrId)) { // for faster painting, return synchronously if we have the message
+      if (Nostr.messagesById.has(nostrId)) {
+        // for faster painting, return synchronously if we have the message
         return processNostrMessage(Nostr.messagesById.get(nostrId));
       }
 
@@ -126,7 +127,9 @@ class PublicMessage extends Message {
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
 
       const msg = r.signedData;
-      msg.info = { from: nostrId ? Nostr.toNostrBech32Address(r.signerKeyHash, 'npub') : r.signerKeyHash };
+      msg.info = {
+        from: nostrId ? Nostr.toNostrBech32Address(r.signerKeyHash, 'npub') : r.signerKeyHash,
+      };
       if (this.props.filter) {
         if (!this.props.filter(msg)) {
           return;
@@ -156,7 +159,11 @@ class PublicMessage extends Message {
       if (nostrId) {
         Nostr.getRepliesAndLikes(nostrId, (replies, likes, threadReplyCount) => {
           this.likedBy = new Set(likes);
-          const sortedReplies = replies && Array.from(replies).sort((a, b) => Nostr.messagesById.get(a)?.time - Nostr.messagesById.get(b)?.time);
+          const sortedReplies =
+            replies &&
+            Array.from(replies).sort(
+              (a, b) => Nostr.messagesById.get(a)?.time - Nostr.messagesById.get(b)?.time,
+            );
           this.setState({
             likes: this.likedBy.size,
             liked: this.likedBy.has(myPub),
@@ -266,16 +273,17 @@ class PublicMessage extends Message {
   render() {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     if (!this.state.msg) {
-      return html`
-        <div ref=${this.ref} key=${this.props.hash}
+      return html` <div
+        ref=${this.ref}
+        key=${this.props.hash}
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
           : ''}"
-        >
-          <div class="msg-content">
-              ${this.state.retrieving ? html`<div class="retrieving">Looking up message...</div>` : ''}
-          </div>
-        </div>`;
+      >
+        <div class="msg-content">
+          ${this.state.retrieving ? html`<div class="retrieving">Looking up message...</div>` : ''}
+        </div>
+      </div>`;
     }
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name || this.shortPubKey(this.state.msg.info.from);
@@ -405,7 +413,10 @@ class PublicMessage extends Message {
               ${s.likes || ''}
             </span>
             <div class="time">
-              <a href="/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}" class="tooltip">
+              <a
+                href="/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
+                class="tooltip"
+              >
                 ${Helpers.getRelativeTimeText(time)}
                 <span class="tooltiptext"> ${dateStr} ${timeStr} </span>
               </a>
