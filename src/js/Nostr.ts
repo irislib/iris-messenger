@@ -680,7 +680,7 @@ export default {
   },
 
   setMetadata() {
-    if (!iris.session.getKey().secp256k1.rpriv) return;
+    if (!iris.session.getKey().secp256k1.priv) return;
     setTimeout(async () => {
       // for each child of this.profile, if it has a value, set it
       const irisData = JSON.stringify({
