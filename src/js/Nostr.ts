@@ -7,8 +7,10 @@ import localForage from 'localforage';
 
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 
-interface Window {
-  nostr?: any;
+declare global {
+    interface Window {
+        nostr: any;
+    }
 }
 
 const getRelayStatus = (relay: Relay) => {
