@@ -63,6 +63,7 @@ class PublicMessage extends Message {
           }
         });
         const replyingTo = Nostr.getEventReplyingTo(event);
+        console.log('replyingTo', replyingTo);
         return {
           signerKeyHash: event.pubkey,
           signedData: {
@@ -143,12 +144,11 @@ class PublicMessage extends Message {
         const urls = msg.text.match(/(https?:\/\/[^\s]+)/g);
         if (urls) {
           urls.forEach((url) => {
-            const parsedUrl = new URL(url);
-            if (parsedUrl.pathname.match(/\.(jpg|jpeg|gif|png)$/)) {
+            if (url.match(/\.(jpg|jpeg|gif|png)$/)) {
               if (!msg.attachments) {
                 msg.attachments = [];
               }
-              msg.attachments.push({ type: 'image', data: parsedUrl.pathname });
+              msg.attachments.push({ type: 'image', data: url });
             }
           });
         }
