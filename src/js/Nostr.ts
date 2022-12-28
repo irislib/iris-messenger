@@ -30,17 +30,14 @@ const saveLocalStorageEvents = throttle((_this: any) => {
   localForage.setItem('latestMsgs', latestMsgs);
 }, 5000);
 
-const saveLocalStorageProfiles = throttle((profileMap: Map<string, any>) => {
-  if (!profileMap) {
+const saveLocalStorageProfilesAndFollows = throttle((_this) => {
+  if (!_this.profileAndFollowEvents) {
     return;
   }
   // should we save profile events instead? application state would be only changed by events
-  const profiles = Array.from(profileMap.keys()).map((pub) => {
-    const p = profileMap.get(pub);
-    p && (p.pub = pub);
-    return p;
-  });
-  localForage.setItem('profiles', profiles);
+  const events = Array.from(_this.profileAndFollowEvents.values());
+  console.log('saving', events.length, 'events to local storage');
+  localForage.setItem('profiles', events);
 }, 5000);
 
 const MAX_MSGS_BY_USER = 500;
@@ -84,7 +81,7 @@ export default {
   messagesById: new Map<string, Event>(),
   latestMessagesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestMessagesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
-  profileAndMetadataEvents: new Map<string, Event>(),
+  profileAndFollowEvents: new Map<string, Event>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
@@ -109,22 +106,22 @@ export default {
 
   loadLocalStorageEvents: async function () {
     const latestMsgs = await localForage.getItem('latestMsgs');
-    const profiles = await localForage.getItem('profiles');
+    const profileAndFollowEvents = await localForage.getItem('profiles');
     const myFollowsEvent = await localForage.getItem('myFollowsEvent');
     this.localStorageLoaded = true;
     console.log('load', latestMsgs, myFollowsEvent);
-    console.log('load', profiles);
+    console.log('load', profileAndFollowEvents);
     if (myFollowsEvent) {
       console.log('loaded myFollows');
       this.handleEvent(myFollowsEvent as Event);
     }
-    if (Array.isArray(profiles)) {
-      profiles.forEach((p) => p && this.profiles.set(p.pub, p));
+    if (Array.isArray(profileAndFollowEvents)) {
+      profileAndFollowEvents.forEach(e => this.handleEvent(e));
     }
     if (Array.isArray(latestMsgs)) {
       console.log('loaded latestmsgs');
       latestMsgs.forEach((msg) => {
-        this.handleEvent(msg); // TODO this does nothing because follows are not known yet
+        this.handleEvent(msg);
       });
     }
   },
@@ -381,10 +378,15 @@ export default {
         this.addFollower(tag[1], event.pubkey);
       }
     }
-    if (event.pubkey === iris.session.getKey().secp256k1.rpub) {
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    if (event.pubkey === myPub) {
       if (!this.myFollowsEvent || this.myFollowsEvent.created_at < event.created_at) {
         localForage.setItem('myFollowsEvent', event);
       }
+    }
+    if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+      this.profileAndFollowEvents.set(event.id, event);
+      this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
     }
   },
   handleMetadata(event: Event) {
@@ -418,8 +420,8 @@ export default {
       });
       const myPub = iris.session.getKey().secp256k1.rpub;
       if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-        console.log('save profile');
-        this.localStorageLoaded && saveLocalStorageProfiles(this.profiles);
+        this.profileAndFollowEvents.set(event.id, event);
+        this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
       }
     } catch (e) {
       console.log('error parsing nostr profile', e);

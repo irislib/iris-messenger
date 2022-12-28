@@ -30,7 +30,6 @@ class MessageFeed extends Component {
         Nostr.getPostsAndRepliesByUser(this.props.nostrUser, eventIds => this.updateSortedMessages(eventIds));
       } else if (this.props.index === 'likes') {
         Nostr.getLikesByUser(this.props.nostrUser, eventIds => {
-          console.log('got likes', eventIds);
           this.updateSortedMessages(eventIds)
         });
       } else if (this.props.index === 'posts') {
