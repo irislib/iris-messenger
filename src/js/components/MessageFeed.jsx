@@ -23,34 +23,19 @@ class MessageFeed extends Component {
     this.setState({ sortedMessages });
   }, 3000, { leading: true });
 
-  handleMessage(v, k, x, e, from) {
-    if (from) {
-      k = k + from;
-    }
-    if (v) {
-      if (this.props.keyIsMsgHash) {
-        // likes and replies are not indexed by timestamp, so we need to fetch all the messages to sort them by timestamp
-        PublicMessage.fetchByHash(this, k).then((msg) => {
-          if (msg) {
-            this.mappedMessages.set(msg.signedData.time, k);
-            this.updateSortedMessages();
-          }
-        });
-      } else if (v.length < 45) {
-        // filter out invalid hashes. TODO: where are they coming from?
-        this.mappedMessages.set(k, v);
-      }
-    } else {
-      this.mappedMessages.delete(k);
-    }
-
-    this.updateSortedMessages();
-  }
-
   componentDidMount() {
     let first = true;
     if (this.props.nostrUser) {
-      Nostr.getMessagesByUser(this.props.nostrUser, eventIds => this.updateSortedMessages(eventIds));
+      if (this.props.index === 'postsAndReplies') {
+        Nostr.getPostsAndRepliesByUser(this.props.nostrUser, eventIds => this.updateSortedMessages(eventIds));
+      } else if (this.props.index === 'likes') {
+        Nostr.getLikesByUser(this.props.nostrUser, eventIds => {
+          console.log('got likes', eventIds);
+          this.updateSortedMessages(eventIds)
+        });
+      } else if (this.props.index === 'posts') {
+        Nostr.getPostsByUser(this.props.nostrUser, eventIds => this.updateSortedMessages(eventIds));
+      }
     } else {
       iris
         .local()
@@ -61,9 +46,7 @@ class MessageFeed extends Component {
             first = false;
           }),
         );
-      if (this.props.node) {
-        this.props.node.map().on(this.sub((...args) => this.handleMessage(...args)));
-      } else if (this.props.index) { // public messages
+      if (this.props.index) { // public messages
         if (this.props.index === 'everyone') {
           Nostr.getMessagesByEveryone(messages => this.updateSortedMessages(messages));
         } else {

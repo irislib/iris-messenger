@@ -10,6 +10,9 @@ export default class SortedLimitedEventSet {
   }
 
   add(event: Event): boolean {
+    if (!event || !event.id || !event.created_at) {
+      throw new Error('Invalid event');
+    }
     if (this.events.length < this.maxSize) {
       // If the set is not full, simply add the event
       this.events.push({ id: event.id, created_at: event.created_at });

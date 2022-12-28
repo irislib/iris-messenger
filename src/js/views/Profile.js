@@ -466,14 +466,15 @@ class Profile extends View {
   }
 
   renderTab() {
+    const nostrAddr = Nostr.toNostrHexAddress(this.props.id);
     if (this.props.tab === 'replies') {
       return html`
         <div class="public-messages-view">
           <${MessageFeed}
             scrollElement=${this.scrollElement.current}
             key="replies${this.props.id}"
-            node=${iris.public(this.props.id).get('replies')}
-            keyIsMsgHash=${true}
+            index="postsAndReplies"
+            nostrUser=${nostrAddr}
           />
         </div>
       `;
@@ -483,8 +484,8 @@ class Profile extends View {
           <${MessageFeed}
             scrollElement=${this.scrollElement.current}
             key="likes${this.props.id}"
-            node=${iris.public(this.props.id).get('likes')}
-            keyIsMsgHash=${true}
+            index="likes"
+            nostrUser=${nostrAddr}
           />
         </div>
       `;
@@ -537,7 +538,6 @@ class Profile extends View {
     const messageForm = this.state.isMyProfile
       ? html`<${FeedMessageForm} class="hidden-xs" autofocus=${false} />`
       : '';
-    const nostrAddr = Nostr.toNostrHexAddress(this.props.id);
 
     return html`
       <div>
@@ -547,7 +547,7 @@ class Profile extends View {
           <${MessageFeed}
             scrollElement=${this.scrollElement.current}
             key="posts${this.props.id}"
-            node=${nostrAddr ? null : iris.public(this.props.id).get('msgs')}
+            index="posts"
             nostrUser=${nostrAddr}
           />
         </div>

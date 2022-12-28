@@ -78,7 +78,9 @@ export default {
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
-  messagesByUser: new Map<string, SortedLimitedEventSet>(),
+  likesByUser: new Map<string, SortedLimitedEventSet>(),
+  postsByUser: new Map<string, SortedLimitedEventSet>(),
+  postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
   messagesById: new Map<string, Event>(),
   latestMessagesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestMessagesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
@@ -148,7 +150,7 @@ export default {
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (follower === myPub) {
       iris.public().get('follow').get(address).put(true);
-      this.getMessagesByUser(address);
+      this.getPostsAndRepliesByUser(address);
     }
     if (address === myPub) {
       if (this.followersByUser.get(address)?.size === 1) {
@@ -301,10 +303,10 @@ export default {
       return;
     }
     this.messagesById.set(event.id, event);
-    if (!this.messagesByUser.has(event.pubkey)) {
-      this.messagesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
+    if (!this.postsAndRepliesByUser.has(event.pubkey)) {
+      this.postsAndRepliesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
     }
-    this.messagesByUser.get(event.pubkey)?.add(event);
+    this.postsAndRepliesByUser.get(event.pubkey)?.add(event);
 
     this.latestMessagesByEveryone.add(event);
     const myPub = iris.session.getKey().secp256k1.rpub;
@@ -333,6 +335,11 @@ export default {
         }
         this.threadRepliesByMessageId.get(id)?.add(event.id);
       }
+    } else {
+      if (!this.postsByUser.has(event.pubkey)) {
+        this.postsByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
+      }
+      this.postsByUser.get(event.pubkey)?.add(event);
     }
   },
   getEventReplyingTo: function (event: Event) {
@@ -361,6 +368,11 @@ export default {
         this.likesByMessageId.set(id, new Set());
       }
       this.likesByMessageId.get(id).add(event.pubkey);
+
+      if (!this.likesByUser.has(event.pubkey)) {
+        this.likesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
+      }
+      this.likesByUser.get(event.pubkey).add(event);
     }
   },
   handleFollow(event: Event) {
@@ -482,7 +494,7 @@ export default {
         this.loadLocalStorageEvents();
         this.manageRelays();
         this.getProfile(key.secp256k1.rpub, undefined);
-        this.getMessagesByUser(key.secp256k1.rpub);
+        this.getPostsAndRepliesByUser(key.secp256k1.rpub);
 
         iris
           .public()
@@ -605,19 +617,42 @@ export default {
     callback();
     this.subscribe([{ kinds: [1, 7] }], callback);
   },
-  getMessagesByUser(address: string, cb: Function | undefined) {
+  getPostsAndRepliesByUser(address: string, cb: Function | undefined) {
     if (!address) {
       return;
     }
     const callback = () => {
-      cb && cb(this.messagesByUser.get(address)?.eventIds);
+      cb && cb(this.postsAndRepliesByUser.get(address)?.eventIds);
     };
-    if (this.messagesByUser.has(address)) {
+    if (this.postsAndRepliesByUser.has(address)) {
       callback();
     }
     this.subscribe([{ kinds: [1, 7], authors: [address] }], callback);
   },
-
+  getPostsByUser(address: string, cb: Function | undefined) {
+    if (!address) {
+      return;
+    }
+    const callback = () => {
+      cb && cb(this.postsByUser.get(address)?.eventIds);
+    };
+    if (this.postsByUser.has(address)) {
+      callback();
+    }
+    this.subscribe([{ kinds: [1, 7], authors: [address] }], callback);
+  },
+  getLikesByUser(address: string, cb: Function | undefined) {
+    if (!address) {
+      return;
+    }
+    const callback = () => {
+      cb && cb(this.likesByUser.get(address)?.eventIds);
+    };
+    if (this.likesByUser.has(address)) {
+      callback();
+    }
+    this.subscribe([{ kinds: [7], authors: [address] }], callback);
+  },
   getProfile(address, cb: Function | undefined) {
     const callback = () => {
       const profile = this.profiles.get(address);
