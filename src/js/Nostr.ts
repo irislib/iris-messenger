@@ -55,6 +55,7 @@ const defaultRelays = new Map<string, Relay>(
     'wss://relay.nostr.info',
     'wss://nostr.bitcoiner.social',
     'wss://nostr.onsats.org',
+    'wss://nostr.mom',
   ].map((url) => [url, relayInit(url)]),
 );
 
@@ -215,7 +216,7 @@ export default {
         // TODO update relay lastSeen
         sub.on('event', (event) => _this.handleEvent(event));
         setTimeout(() => {
-          const sub2 = relay.sub([{ authors: Array.from(_this.subscribedUsers) }], {});
+          const sub2 = relay.sub([{ authors: Array.from(_this.subscribedUsers), limit: 10000 }], {});
           // TODO update relay lastSeen
           sub2.on('event', (event) => _this.handleEvent(event));
         }, 500);
@@ -473,10 +474,10 @@ export default {
       .get('loggedIn')
       .on(() => {
         const key = iris.session.getKey();
+        this.loadLocalStorageEvents();
         this.manageRelays();
         this.getProfile(key.secp256k1.rpub, undefined);
         this.getMessagesByUser(key.secp256k1.rpub);
-        this.loadLocalStorageEvents();
 
         iris
           .public()
