@@ -377,8 +377,12 @@ export default {
   },
   handleMetadata(event: Event) {
     try {
+      const existing = this.profiles.get(event.pubkey);
+      if (existing?.created_at >= event.created_at) {
+        return;
+      }
       const content = JSON.parse(event.content);
-      let profile: any = {};
+      const profile: any = { created_at: event.created_at };
       content.name && (profile.name = content.name);
       content.picture && (profile.photo = content.picture);
       content.about && (profile.about = content.about);
@@ -393,10 +397,6 @@ export default {
         } catch (e) {
           // console.error('Invalid iris data', e);
         }
-      }
-      const existing = this.profiles.get(event.pubkey);
-      if (existing) {
-        profile = { ...existing, ...profile };
       }
       this.profiles.set(event.pubkey, profile);
       iris.session.addToSearchIndex(event.pubkey, {
