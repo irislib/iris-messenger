@@ -232,7 +232,7 @@ class Profile extends View {
       `;
     }
 
-    if (this.state.isMyProfile && window.ethereum) {
+    if (this.state.isMyProfile && window.ethereum && !window.nostr) {
       return html`
         <p>
           <a href="#" onClick=${(e) => this.connectEthereumClicked(e)}
