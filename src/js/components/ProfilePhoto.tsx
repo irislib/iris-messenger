@@ -14,7 +14,6 @@ class ProfilePhoto extends Component<Props> {
   render() {
     return html`<${SafeImg}
       class="profile-photo"
-      width=${250}
       src=${this.props.photo}
       onClick=${(e) => {
         this.imageClicked(e);

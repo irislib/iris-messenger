@@ -196,7 +196,7 @@ class Profile extends View {
       profilePhoto = html`<${Identicon}
         key=${this.props.id}
         str=${this.props.id}
-        hidePhoto=${this.state.blocked}
+        hidePhoto=${true}
         width="250"
       />`;
     }
@@ -558,11 +558,12 @@ class Profile extends View {
     Nostr.getFollowedByUser(address, setFollowCounts);
     Nostr.getProfile(address, (data, addr) => {
       if (!data) return;
-      const profile = {};
-      data.name && (profile.name = data.name);
-      data.about && (profile.about = data.about);
-      data.iris && (profile.iris = data.iris);
-      data.photo && (profile.photo = data.photo);
+      const profile = Object.assign({}, {
+        name: data.name,
+        about: data.about,
+        iris: data.iris,
+        photo: data.photo,
+      });
       Nostr.toNostrBech32Address(addr, 'npub') === this.props.id && this.setState(profile);
     });
   }
