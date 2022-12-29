@@ -8,9 +8,9 @@ import localForage from 'localforage';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 
 declare global {
-    interface Window {
-        nostr: any;
-    }
+  interface Window {
+    nostr: any;
+  }
 }
 
 const getRelayStatus = (relay: Relay) => {
@@ -43,9 +43,10 @@ const MAX_LATEST_MSGS = 500;
 
 const defaultRelays = new Map<string, Relay>(
   [
-    'wss://expensive-relay.fiatjaf.com',
-    'wss://rsslay.fiatjaf.com',
+    'wss://jiggytom.ddns.net',
     'wss://nostr-relay.wlvs.space',
+    'wss://nostr.fmt.wiz.biz',
+    'wss://nostr.ono.re',
     'wss://relay.damus.io',
     'wss://nostr-pub.wellorder.net',
     'wss://relay.nostr.info',
@@ -230,7 +231,7 @@ export default {
       // TODO update relay lastSeen
       sub.on('event', (event) => _this.handleEvent(event));
       setTimeout(() => {
-        const sub2 = relay.sub([{ authors: Array.from(_this.subscribedUsers), limit: 40000 }], {});
+        const sub2 = relay.sub([{ authors: Array.from(_this.subscribedUsers), limit: 20000 }], {});
         // TODO update relay lastSeen
         sub2.on('event', (event) => _this.handleEvent(event));
       }, 500);
