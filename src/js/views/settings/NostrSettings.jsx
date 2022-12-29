@@ -9,27 +9,39 @@ const bech32 = require('bech32-buffer');
 const NostrSettings = () => {
   const [relays, setRelays] = useState(Array.from(Nostr.relays.values()));
   const [newRelayUrl, setNewRelayUrl] = useState(""); // added state to store the new relay URL
+  const [maxRelays, setMaxRelays] = useState(Nostr.maxRelays);
 
   setInterval(() => {
     setRelays(Array.from(Nostr.relays.values()));
   }, 1000);
 
   const handleConnectClick = (relay) => {
+    iris.local().get('relays').get(relay.url).put({ enabled: true });
     relay.connect();
   };
 
   const handleDisconnectClick = (relay) => {
+    iris.local().get('relays').get(relay.url).put({ enabled: false });
     relay.close();
   };
 
   const handleRemoveRelay = (relay) => {
+    iris.local().get('relays').get(relay.url).put(null);
     Nostr.removeRelay(relay.url);
   };
 
   const handleAddRelay = (event) => {
+    iris.local().get('relays').get(newRelayUrl).put({ enabled: true });
     event.preventDefault(); // prevent the form from reloading the page
     Nostr.addRelay(newRelayUrl); // add the new relay using the Nostr method
     setNewRelayUrl(""); // reset the new relay URL
+  }
+
+  const maxRelaysChanged = (event) => {
+    // parse int
+    const maxRelays = parseInt(event.target.value);
+    Nostr.maxRelays = maxRelays;
+    setMaxRelays(maxRelays);
   }
 
   const getStatus = (relay) => {
@@ -96,6 +108,13 @@ const NostrSettings = () => {
       </div>
 
       <h3>Relays</h3>
+      <p>
+        Max relays: <input
+          type="number"
+          value={maxRelays}
+          onChange={maxRelaysChanged}
+        />
+      </p>
       <div id="peers" className="flex-table">
         {relays.map((relay) => (
           <div className="flex-row peer">
