@@ -150,8 +150,19 @@ export default {
     if (!this.followedByUser.has(follower)) {
       this.followedByUser.set(follower, new Set<string>());
     }
-    this.followedByUser.get(follower)?.add(address);
     const myPub = iris.session.getKey().secp256k1.rpub;
+
+    // if new follow, move all their posts to followedByUser
+    if (follower === myPub && !this.followedByUser.get(myPub).has(address)) {
+      const posts = this.postsByUser.get(address);
+      if (posts) {
+        posts.eventIds.forEach((eventId) => {
+          const event = this.messagesById.get(eventId);
+          event && this.latestMessagesByFollows.add(event);
+        });
+      }
+    }
+    this.followedByUser.get(follower)?.add(address);
     if (follower === myPub) {
       iris.public().get('follow').get(address).put(true);
       this.getPostsAndRepliesByUser(address);
