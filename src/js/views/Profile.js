@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet';
-import WalletConnectProvider from '@walletconnect/web3-provider';
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
 import $ from 'jquery';
@@ -7,8 +6,6 @@ import { createRef } from 'preact';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 import styled from 'styled-components';
-import Web3 from 'web3';
-import Web3Modal from 'web3modal';
 
 import Button from '../components/basic/Button';
 import BlockButton from '../components/BlockButton';
@@ -26,29 +23,6 @@ import { SMS_VERIFIER_PUB } from '../SMS';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
-
-async function ethereumConnect() {
-  const providerOptions = {
-    walletconnect: {
-      package: WalletConnectProvider,
-      options: {
-        infuraId: '4bd8d95876de48e0b17d56c0da31880a',
-      },
-    },
-  };
-  const web3Modal = new Web3Modal({
-    network: 'mainnet',
-    providerOptions,
-    theme: 'dark',
-  });
-
-  web3Modal.on('accountsChanged', (provider) => {
-    console.log('connect', provider);
-  });
-
-  const provider = await web3Modal.connect();
-  return new Web3(provider);
-}
 
 const ImageGrid = styled.div`
   display: grid;
@@ -190,28 +164,6 @@ class Profile extends View {
     `;
   }
 
-  getEthIrisProofString() {
-    return `My Iris account is ${this.props.id}`;
-  }
-
-  async connectEthereumClicked(e) {
-    e.preventDefault();
-    const web3 = await ethereumConnect();
-    const address = (await web3.eth.getAccounts())[0];
-    const proof = await web3.eth.personal.sign(this.getEthIrisProofString(), address);
-    iris.public().get('profile').get('eth').put({
-      address,
-      proof,
-    });
-  }
-
-  async disconnectEthereumClicked(e) {
-    e.preventDefault();
-    if (confirm(`${t('disconnect_ethereum_account')}?`)) {
-      iris.public().get('profile').get('eth').put(null);
-    }
-  }
-
   // if window.ethereum is defined, suggest to sign a message with the user's ethereum account
   renderEthereum() {
     if (this.state.eth && this.state.eth.address) {
@@ -222,22 +174,9 @@ class Profile extends View {
             ${this.state.eth.address.slice(0, 4)}...${this.state.eth.address.slice(-4)}
           </a>
           <i> </i>
-          ${this.state.isMyProfile && window.ethereum && !window.nostr
-            ? html`(<a href="#" onClick=${this.disconnectEthereumClicked}>${t('disconnect')}</a>)`
-            : ''}
           ${this.state.nfts.totalCount
             ? html` <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.totalCount})</a> `
             : ''}
-        </p>
-      `;
-    }
-
-    if (this.state.isMyProfile && window.ethereum && !window.nostr) {
-      return html`
-        <p>
-          <a href="#" onClick=${(e) => this.connectEthereumClicked(e)}
-            >${t('connect_Ethereum_account')}</a
-          >
         </p>
       `;
     }
@@ -315,7 +254,6 @@ class Profile extends View {
             ${this.state.nostr
               ? html`<a href="/profile/${this.state.nostr}">Nostr profile</a>`
               : ''}
-            ${this.state.iris ? html`<a href="/profile/${this.state.iris}">Iris profile</a>` : ''}
             ${this.renderEthereum()}
             <div class="profile-actions">
               <div class="follow-count">
@@ -663,27 +601,6 @@ class Profile extends View {
             valid && this.setState({ nostr: nostr.rpub });
           } catch (e) {
             console.log('nostr parse error', e);
-          }
-        }),
-      );
-    iris
-      .public(pub)
-      .get('profile')
-      .get('eth')
-      .on(
-        this.sub((eth) => {
-          if (eth && eth.address && eth.proof) {
-            if (eth.address === (this.state.eth && this.state.eth.address)) {
-              return;
-            }
-            const web3 = new Web3();
-            const signer = web3.eth.accounts.recover(this.getEthIrisProofString(), eth.proof);
-            if (signer === eth.address) {
-              this.setState({ eth });
-              this.getNfts(eth.address);
-            }
-          } else {
-            this.setState({ eth: null });
           }
         }),
       );
