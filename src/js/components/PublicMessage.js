@@ -139,14 +139,14 @@ class PublicMessage extends Message {
         this.setOgImageUrl(msg.attachments[0].data);
       }
 
-      // find .jpg .jpeg .gif .png urls in msg.text and add them to msg.attachments
+      // find .jpg .jpeg .gif .png .webp urls in msg.text and add them to msg.attachments
       if (msg.text) {
         let text = msg.text;
         const urls = msg.text.match(/(https?:\/\/[^\s]+)/g);
         if (urls) {
           urls.forEach((url) => {
             const parsedUrl = new URL(url);
-            if (parsedUrl.pathname.match(/\.(jpg|jpeg|gif|png)$/)) {
+            if (parsedUrl.pathname.match(/\.(jpg|jpeg|gif|png|webp)$/)) {
               if (!msg.attachments) {
                 msg.attachments = [];
               }
