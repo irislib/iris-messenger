@@ -23,7 +23,7 @@ const getRelayStatus = (relay: Relay) => {
 };
 
 const saveLocalStorageEvents = debounce((_this: any) => {
-  const latestMsgs = _this.latestMessagesByFollows.eventIds.slice(0, 50).map((eventId: any) => {
+  const latestMsgs = _this.latestMessagesByFollows.eventIds.slice(0, 200).map((eventId: any) => {
     return _this.messagesById.get(eventId);
   });
   console.log('saving some events to local storage');
@@ -522,8 +522,8 @@ export default {
       .get('loggedIn')
       .on(() => {
         const key = iris.session.getKey();
-        this.loadLocalStorageEvents();
         this.manageRelays();
+        this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
         this.getPostsAndRepliesByUser(key.secp256k1.rpub);
 
