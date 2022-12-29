@@ -138,10 +138,10 @@ class PublicMessage extends Message {
       if (this.props.standalone && msg.attachments && msg.attachments.length) {
         this.setOgImageUrl(msg.attachments[0].data);
       }
-      this.setState({ msg });
 
       // find .jpg .jpeg .gif .png urls in msg.text and add them to msg.attachments
       if (msg.text) {
+        let text = msg.text;
         const urls = msg.text.match(/(https?:\/\/[^\s]+)/g);
         if (urls) {
           urls.forEach((url) => {
@@ -151,10 +151,18 @@ class PublicMessage extends Message {
                 msg.attachments = [];
               }
               msg.attachments.push({ type: 'image', data: parsedUrl.origin + parsedUrl.pathname });
+
+              // Remove URL from beginning or end of line
+              text = text
+                .replace(new RegExp(`^${url}`, 'g'), '')
+                .replace(new RegExp(`${url}$`, 'g'), '');
             }
           });
         }
+        msg.text = text;
       }
+
+      this.setState({ msg });
 
       if (nostrId) {
         Nostr.getRepliesAndLikes(nostrId, (replies, likes, threadReplyCount) => {
