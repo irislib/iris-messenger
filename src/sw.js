@@ -3,7 +3,7 @@ import localforage from 'localforage';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
 import { registerRoute } from 'workbox-routing';
-import { NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies';
+import { NetworkOnly, StaleWhileRevalidate, NetworkFirst } from 'workbox-strategies';
 
 const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
   maxRetentionTime: 14 * 24 * 60,
@@ -15,7 +15,7 @@ registerRoute(
     plugins: [bgSyncPlugin],
   }),
 );
-registerRoute(({ url }) => url.pathname === '/peer_id', new NetworkOnly());
+registerRoute(({ url }) => url.pathname === '/', new NetworkFirst());
 registerRoute(() => location.host.indexOf('localhost') !== 0, new StaleWhileRevalidate());
 setupRouting();
 
