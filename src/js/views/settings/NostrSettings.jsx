@@ -17,7 +17,7 @@ const NostrSettings = () => {
 
   const handleConnectClick = (relay) => {
     iris.local().get('relays').get(relay.url).put({ enabled: true });
-    relay.connect();
+    Nostr.connectRelay(relay);
   };
 
   const handleDisconnectClick = (relay) => {

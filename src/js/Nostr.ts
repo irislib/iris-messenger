@@ -1,5 +1,5 @@
 import iris from 'iris-lib';
-import { debounce } from 'lodash';
+import { debounce, isEqual } from 'lodash';
 
 import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer');
@@ -71,6 +71,7 @@ export default {
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: 3,
   relays: defaultRelays,
+  relaySubscriptions: new Array<Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
@@ -234,28 +235,32 @@ export default {
     this.handleEvent(event);
     return event.id;
   },
+  sendSubToRelays: function(filters: Filter[]) {
+    // test if identical filters already exists in this.relaySubscriptions
+    for (const existingFilters of this.relaySubscriptions) {
+      if (isEqual(existingFilters, filters)) {
+        return;
+      }
+    }
+
+    this.relaySubscriptions.push(filters);
+    for (const relay of this.relays.values()) {
+      const sub = relay.sub(filters, {});
+      // TODO update relay lastSeen
+      sub.on('event', (event) => this.handleEvent(event));
+    }
+  },
   subscribeToAuthors: debounce((_this) => {
     console.log('subscribe to', Array.from(_this.subscribedUsers));
-    for (const relay of _this.relays.values()) {
-      // first sub to profiles, then everything else
-      const sub = relay.sub([{ kinds: [0, 3], authors: Array.from(_this.subscribedUsers) }], {});
-      // TODO update relay lastSeen
-      sub.on('event', (event) => _this.handleEvent(event));
-      setTimeout(() => {
-        const sub2 = relay.sub([{ authors: Array.from(_this.subscribedUsers), limit: 20000 }], {});
-        // TODO update relay lastSeen
-        sub2.on('event', (event) => _this.handleEvent(event));
-      }, 500);
-    }
+    _this.sendSubToRelays([{ kinds: [0, 3], authors: Array.from(_this.subscribedUsers) }]);
+    setTimeout(() => {
+      _this.sendSubToRelays([{ authors: Array.from(_this.subscribedUsers), limit: 20000 }]);
+    }, 500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
     if (_this.subscribedPosts.size === 0) return;
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
-    for (const relay of _this.relays.values()) {
-      const sub = relay.sub([{ ids: Array.from(_this.subscribedPosts) }], {});
-      // TODO update relay lastSeen
-      sub.on('event', (event) => _this.handleEvent(event));
-    }
+    _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }]);
   }, 1000),
   subscribe: function (filters: Filter[], cb: Function | undefined) {
     cb &&
@@ -269,6 +274,11 @@ export default {
     for (const filter of filters) {
       if (filter.authors) {
         for (const author of filter.authors) {
+          // make sure the author is valid hex
+          if (!author.match(/^[0-9a-fA-F]{64}$/)) {
+            console.error('Invalid author', author);
+            continue;
+          }
           if (!this.subscribedUsers.has(author)) {
             hasNewAuthors = true;
             this.subscribedUsers.add(author);
@@ -296,6 +306,14 @@ export default {
     }
     return count;
   },
+  connectRelay: function(relay: Relay) {
+    relay.connect();
+    relay.on('connect', () => {
+      for (const filters of this.relaySubscriptions) {
+        relay.sub(filters, {});
+      }
+    });
+  },
   manageRelays: function () {
     // TODO keep track of subscriptions and send them to new relays
     const go = () => {
@@ -306,7 +324,8 @@ export default {
       if (openRelays.length + connectingRelays.length < this.maxRelays) {
         const closedRelays = relays.filter((relay: Relay) => getRelayStatus(relay) === 3);
         if (closedRelays.length) {
-          relays[Math.floor(Math.random() * relays.length)].connect();
+          const newRelay = relays[Math.floor(Math.random() * relays.length)];
+          this.connectRelay(newRelay);
         }
       }
       if (openRelays.length > this.maxRelays) {
