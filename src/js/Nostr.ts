@@ -254,7 +254,7 @@ export default {
     console.log('subscribe to', Array.from(_this.subscribedUsers));
     _this.sendSubToRelays([{ kinds: [0, 3], authors: Array.from(_this.subscribedUsers) }]);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: Array.from(_this.subscribedUsers), limit: 20000 }]);
+      _this.sendSubToRelays([{ authors: Array.from(_this.subscribedUsers), limit: 50000 }]);
     }, 500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
