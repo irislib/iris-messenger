@@ -251,11 +251,21 @@ export default {
     }
   },
   subscribeToAuthors: debounce((_this) => {
-    console.log('subscribe to', Array.from(_this.subscribedUsers));
-    _this.sendSubToRelays([{ kinds: [0, 3], authors: Array.from(_this.subscribedUsers) }]);
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    const followedUsers = Array.from(_this.followedByUser.get(myPub) ?? []);
+    followedUsers.push(myPub);
+    const otherSubscribedUsers = Array.from(_this.subscribedUsers).filter((u) => !followedUsers.includes(u));
+    console.log('subscribe to', followedUsers, otherSubscribedUsers);
+    _this.sendSubToRelays([{ kinds: [0, 3], authors: followedUsers }]);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: Array.from(_this.subscribedUsers), limit: 50000 }]);
+      _this.sendSubToRelays([{ kinds: [0, 3], authors: otherSubscribedUsers }]);
     }, 500);
+    setTimeout(() => {
+      _this.sendSubToRelays([{ authors: followedUsers, limit: 30000 }]);
+    }, 1000);
+    setTimeout(() => {
+      _this.sendSubToRelays([{ authors: otherSubscribedUsers, limit: 20000 }]);
+    }, 1500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
     if (_this.subscribedPosts.size === 0) return;

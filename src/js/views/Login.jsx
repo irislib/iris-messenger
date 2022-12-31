@@ -145,7 +145,6 @@ class Login extends Component {
       }
       try {
         const { data, prefix } = bech32.decode(val);
-        console.log('data', data, 'prefix', prefix);
         const hex = Nostr.arrayToHex(data);
         if (prefix === 'npub') {
           k = await iris.Key.generate();
