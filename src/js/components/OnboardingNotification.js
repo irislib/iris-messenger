@@ -53,14 +53,14 @@ export default class OnboardingNotification extends Component {
             <p>
               <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(npub)} />
             </p>
-            <p
+            <!--<p
               dangerouslySetInnerHTML=${{
                 __html: t(
                   'alternatively_get_sms_verified',
                   `href="https://iris-sms-auth.herokuapp.com/?pub=${iris.session.getPubKey()}"`,
                 ),
               }}
-            ></p>
+            ></p>-->
             <small>${t('no_followers_yet_info')}</small>
           </div>
         </div>
