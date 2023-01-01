@@ -271,7 +271,7 @@ export default {
     if (_this.subscribedPosts.size === 0) return;
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }]);
-  }, 1000),
+  }, 100),
   subscribe: function (filters: Filter[], cb: Function | undefined) {
     cb &&
       this.subscriptions.set(subscriptionId++, {
