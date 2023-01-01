@@ -740,6 +740,7 @@ export default {
     this.subscribe([{ kinds: [1, 7] }], callback);
   },
   getPostsAndRepliesByUser(address: string, cb: Function | undefined) {
+    // TODO subscribe on view profile and unsub on leave profile
     if (!address) {
       return;
     }
