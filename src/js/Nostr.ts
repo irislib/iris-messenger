@@ -87,6 +87,7 @@ export default {
   threadRepliesByMessageId: new Map<string, Set<string>>(),
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
+  handledMsgsPerSecond: 0,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -260,7 +261,6 @@ export default {
     followedUsers.push(myPub);
     const otherSubscribedUsers = Array.from(_this.subscribedUsers).filter((u) => !followedUsers.includes(u));
     console.log('subscribe to', followedUsers, otherSubscribedUsers);
-    _this.sendSubToRelays([{kinds: [0,1,3,7], since: now}]);
     _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: followedUsers }]);
     setTimeout(() => {
       _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }]);
@@ -386,6 +386,7 @@ export default {
         .map((tag) => tag[1])
         .slice(0, 2);
       for (const id of repliedMsgs) {
+        this.getMessageById(id);
         if (!this.threadRepliesByMessageId.has(id)) {
           this.threadRepliesByMessageId.set(id, new Set<string>());
         }
@@ -420,6 +421,7 @@ export default {
     }*/
     for (const subject of subjects) {
       const id = subject[1];
+      this.getMessageById(id);
       if (!this.likesByMessageId.has(id)) {
         this.likesByMessageId.set(id, new Set());
       }
@@ -491,11 +493,11 @@ export default {
     }
   },
   handleEvent(event: Event) {
-    console.log('this.knownUsers', this.knownUsers.size);
     if (!event) return;
     if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
       return;
     }
+    this.handledMsgsPerSecond++;
     switch (event.kind) {
       case 0:
         this.handleMetadata(event);
@@ -565,6 +567,11 @@ export default {
         this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
         this.getPostsAndRepliesByUser(key.secp256k1.rpub);
+        this.sendSubToRelays([{kinds: [0,1,3,7], since: Math.floor(Date.now() / 1000)}]); // everything new
+        setInterval(() => {
+          console.log('handled msgs per second', this.handledMsgsPerSecond);
+          this.handledMsgsPerSecond = 0;
+        }, 1000);
 
         iris
           .public()
