@@ -341,9 +341,6 @@ class Profile extends View {
         <${Link} activeClassName="active" href="/likes/${this.props.id}"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
         >
-        <${Link} activeClassName="active" href="/media/${this.props.id}"
-          >${t('media')} ${this.state.noMedia ? '(0)' : ''}<//
-        >
       </div>
     `;
   }
