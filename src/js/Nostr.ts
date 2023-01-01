@@ -23,11 +23,15 @@ const getRelayStatus = (relay: Relay) => {
 };
 
 const saveLocalStorageEvents = debounce((_this: any) => {
-  const latestMsgs = _this.latestMessagesByFollows.eventIds.slice(0, 200).map((eventId: any) => {
+  const latestMsgs = _this.latestMessagesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
+    return _this.messagesById.get(eventId);
+  });
+  const latestMsgsByEveryone = _this.latestMessagesByEveryone.eventIds.slice(0, 1000).map((eventId: any) => {
     return _this.messagesById.get(eventId);
   });
   console.log('saving some events to local storage');
   localForage.setItem('latestMsgs', latestMsgs);
+  localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
 }, 5000);
 
 const saveLocalStorageProfilesAndFollows = debounce((_this) => {
@@ -115,6 +119,7 @@ export default {
 
   loadLocalStorageEvents: async function () {
     const latestMsgs = await localForage.getItem('latestMsgs');
+    const latestMsgsByEveryone = await localForage.getItem('latestMsgsByEveryone');
     const followEvents = await localForage.getItem('followEvents');
     const profileEvents = await localForage.getItem('profileEvents');
     this.localStorageLoaded = true;
@@ -131,6 +136,12 @@ export default {
     if (Array.isArray(latestMsgs)) {
       console.log('loaded latestmsgs');
       latestMsgs.forEach((msg) => {
+        this.handleEvent(msg);
+      });
+    }
+    if (Array.isArray(latestMsgsByEveryone)) {
+      console.log('loaded latestMsgsByEveryone');
+      latestMsgsByEveryone.forEach((msg) => {
         this.handleEvent(msg);
       });
     }
@@ -327,6 +338,9 @@ export default {
       for (const filters of this.relaySubscriptions) {
         relay.sub(filters, {});
       }
+    });
+    relay.on('notice', (notice) => {
+      console.log('notice from ', relay.url, notice);
     });
   },
   manageRelays: function () {
