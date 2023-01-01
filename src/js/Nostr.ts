@@ -83,7 +83,7 @@ export default {
   knownUsers: new Set<string>(),
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
-  likesByUser: new Map<string, SortedLimitedEventSet>(),
+  likesByUser: new Map<string, Set<string>>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
   messagesById: new Map<string, Event>(),
@@ -469,9 +469,9 @@ export default {
       this.likesByMessageId.get(id).add(event.pubkey);
 
       if (!this.likesByUser.has(event.pubkey)) {
-        this.likesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
+        this.likesByUser.set(event.pubkey, new Set());
       }
-      this.likesByUser.get(event.pubkey).add(event);
+      this.likesByUser.get(event.pubkey).add(id);
       const myPub = iris.session.getKey().secp256k1.rpub;
       if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
         this.getMessageById(id);
@@ -611,7 +611,7 @@ export default {
         this.manageRelays();
         this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
-        this.getPostsAndRepliesByUser(key.secp256k1.rpub);
+        this.sendSubToRelays([{authors: [key.secp256k1.rpub]}]); // our stuff
         this.sendSubToRelays([{ kinds: [0, 1, 3, 7], since: Math.floor(Date.now() / 1000) }]); // everything new
         setInterval(() => {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
@@ -710,7 +710,8 @@ export default {
     return new Promise((resolve) => {
       this.subscribe([{ ids: [id] }], () => {
         // TODO turn off subscription
-        resolve(this.messagesById.get(id));
+        const msg = this.messagesById.get(id);
+        msg && resolve(msg);
       });
     });
   },
@@ -772,7 +773,7 @@ export default {
     }
     this.knownUsers.add(address);
     const callback = () => {
-      cb && cb(this.likesByUser.get(address)?.eventIds);
+      cb && cb(this.likesByUser.get(address));
     };
     if (this.likesByUser.has(address)) {
       callback();

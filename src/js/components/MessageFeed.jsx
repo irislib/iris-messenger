@@ -30,7 +30,9 @@ class MessageFeed extends Component {
         Nostr.getPostsAndRepliesByUser(this.props.nostrUser, eventIds => this.updateSortedMessages(eventIds));
       } else if (this.props.index === 'likes') {
         Nostr.getLikesByUser(this.props.nostrUser, eventIds => {
-          this.updateSortedMessages(eventIds)
+          console.log('likes', eventIds);
+          // remove duplicates (why are they there in the first place?)
+          this.updateSortedMessages(Array.from(eventIds));
         });
       } else if (this.props.index === 'posts') {
         Nostr.getPostsByUser(this.props.nostrUser, eventIds => this.updateSortedMessages(eventIds));
