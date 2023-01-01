@@ -771,6 +771,15 @@ header.footer .header-content {
   flex: none;
 }
 
+.quote {
+  padding-right: 15px;
+}
+
+.quote .msg-content {
+  background-color: rgba(0,0,0,0.05);
+  padding: 7px 15px !important;
+}
+
 .reply .msg-content {
   box-shadow: none;
   padding-right: 0 !important;

@@ -333,17 +333,16 @@ class PublicMessage extends Message {
         ref=${this.ref}
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
-          : ''}"
+          : ''} ${this.props.asQuote ? 'quote' : ''}"
       >
         <div class="msg-content">
-          ${s.msg.replyingTo && !this.props.asReply
+          ${s.msg.replyingTo && !this.props.asReply && !this.props.asQuote
           ? html`
-              <div class="replying-to" style="padding: 0 15px 0 15px">
+              <div style="padding: 0 15px 0 15px">
               <${PublicMessage}
                 key=${s.msg.replyingTo}
                 hash=${s.msg.replyingTo}
                 asQuote=${true}
-                asReply=${true}
                 showName=${true}
                 showReplies=${false}
               />
