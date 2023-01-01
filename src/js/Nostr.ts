@@ -266,10 +266,10 @@ export default {
       _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }]);
     }, 500);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: followedUsers, until: now, limit: 30000 }]);
+      _this.sendSubToRelays([{ authors: followedUsers, until: now, limit: 10000 }]);
     }, 1000);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: otherSubscribedUsers, until: now, limit: 20000 }]);
+      _this.sendSubToRelays([{ authors: otherSubscribedUsers, until: now, limit: 10000 }]);
     }, 1500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
