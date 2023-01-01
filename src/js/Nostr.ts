@@ -1,7 +1,7 @@
 import iris from 'iris-lib';
 import { debounce, isEqual } from 'lodash';
 
-import { Event, Filter, getEventHash, Relay, relayInit, signEvent } from './lib/nostr-tools';
+import { Sub, Event, Filter, getEventHash, Relay, relayInit, signEvent } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer');
 import localForage from 'localforage';
 
@@ -77,6 +77,7 @@ export default {
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: 3,
   relays: defaultRelays,
+  subscriptionsById: new Map<string, Set<Sub>>(),
   relaySubscriptions: new Array<Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
   knownUsers: new Set<string>(),
@@ -252,7 +253,7 @@ export default {
     this.handleEvent(event);
     return event.id;
   },
-  sendSubToRelays: function (filters: Filter[]) {
+  sendSubToRelays: function (filters: Filter[], id?: string) {
     // test if identical filters already exists in this.relaySubscriptions
     for (const existingFilters of this.relaySubscriptions) {
       if (isEqual(existingFilters, filters)) {
@@ -260,11 +261,29 @@ export default {
       }
     }
 
+    // if subs with same id already exists, remove them
+    if (id) {
+      const subs = this.subscriptionsById.get(id);
+      if (subs) {
+        subs.forEach((sub) => {
+          console.log('unsub', id);
+          sub.unsub();
+        });
+      }
+      this.subscriptionsById.delete(id);
+    }
+
     this.relaySubscriptions.push(filters);
     for (const relay of this.relays.values()) {
       const sub = relay.sub(filters, {});
       // TODO update relay lastSeen
       sub.on('event', (event) => this.handleEvent(event));
+      if (id) {
+        if (!this.subscriptionsById.has(id)) {
+          this.subscriptionsById.set(id, new Set());
+        }
+        this.subscriptionsById.get(id)?.add(sub);
+      }
     }
   },
   subscribeToAuthors: debounce((_this) => {
@@ -276,21 +295,21 @@ export default {
       (u) => !followedUsers.includes(u),
     );
     console.log('subscribe to', followedUsers, otherSubscribedUsers);
-    _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: followedUsers }]);
+    _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: followedUsers }], 'followed');
     setTimeout(() => {
-      _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }]);
+      _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }], 'other');
     }, 500);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: followedUsers, until: now, limit: 10000 }]);
+      _this.sendSubToRelays([{ authors: followedUsers, until: now, limit: 10000 }], 'followedHistory');
     }, 1000);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: otherSubscribedUsers, until: now, limit: 10000 }]);
+      _this.sendSubToRelays([{ authors: otherSubscribedUsers, until: now, limit: 10000 }], 'otherHistory');
     }, 1500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
     if (_this.subscribedPosts.size === 0) return;
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
-    _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }]);
+    _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
   }, 100),
   subscribe: function (filters: Filter[], cb: Function | undefined) {
     cb &&
