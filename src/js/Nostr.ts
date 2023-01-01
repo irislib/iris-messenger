@@ -73,6 +73,7 @@ export default {
   relays: defaultRelays,
   relaySubscriptions: new Array<Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
+  knownUsers: new Set<string>(),
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
   likesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -146,6 +147,8 @@ export default {
     if (!this.followersByUser.has(address)) {
       this.followersByUser.set(address, new Set<string>());
     }
+    this.knownUsers.add(address);
+    this.knownUsers.add(follower);
     this.followersByUser.get(address)?.add(follower);
 
     if (!this.followedByUser.has(follower)) {
@@ -251,21 +254,22 @@ export default {
     }
   },
   subscribeToAuthors: debounce((_this) => {
+    const now = Math.floor(Date.now() / 1000);
     const myPub = iris.session.getKey().secp256k1.rpub;
     const followedUsers = Array.from(_this.followedByUser.get(myPub) ?? []);
     followedUsers.push(myPub);
     const otherSubscribedUsers = Array.from(_this.subscribedUsers).filter((u) => !followedUsers.includes(u));
     console.log('subscribe to', followedUsers, otherSubscribedUsers);
-    _this.sendSubToRelays([{kinds: [0,1,3,7], since: Math.floor(Date.now() / 1000)}]);
-    _this.sendSubToRelays([{ kinds: [0, 3], authors: followedUsers }]);
+    _this.sendSubToRelays([{kinds: [0,1,3,7], since: now}]);
+    _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: followedUsers }]);
     setTimeout(() => {
-      _this.sendSubToRelays([{ kinds: [0, 3], authors: otherSubscribedUsers }]);
+      _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }]);
     }, 500);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: followedUsers, limit: 30000 }]);
+      _this.sendSubToRelays([{ authors: followedUsers, until: now, limit: 30000 }]);
     }, 1000);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: otherSubscribedUsers, limit: 20000 }]);
+      _this.sendSubToRelays([{ authors: otherSubscribedUsers, until: now, limit: 20000 }]);
     }, 1500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
@@ -487,7 +491,11 @@ export default {
     }
   },
   handleEvent(event: Event) {
+    console.log('this.knownUsers', this.knownUsers.size);
     if (!event) return;
+    if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
+      return;
+    }
     switch (event.kind) {
       case 0:
         this.handleMetadata(event);
@@ -552,6 +560,7 @@ export default {
       .get('loggedIn')
       .on(() => {
         const key = iris.session.getKey();
+        this.knownUsers.add(key);
         this.manageRelays();
         this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
@@ -682,6 +691,7 @@ export default {
     if (!address) {
       return;
     }
+    this.knownUsers.add(address);
     const callback = () => {
       cb && cb(this.postsAndRepliesByUser.get(address)?.eventIds);
     };
@@ -694,6 +704,7 @@ export default {
     if (!address) {
       return;
     }
+    this.knownUsers.add(address);
     const callback = () => {
       cb && cb(this.postsByUser.get(address)?.eventIds);
     };
@@ -706,6 +717,7 @@ export default {
     if (!address) {
       return;
     }
+    this.knownUsers.add(address);
     const callback = () => {
       cb && cb(this.likesByUser.get(address)?.eventIds);
     };
@@ -715,6 +727,7 @@ export default {
     this.subscribe([{ kinds: [7], authors: [address] }], callback);
   },
   getProfile(address, cb: Function | undefined) {
+    this.knownUsers.add(address);
     const callback = () => {
       const profile = this.profiles.get(address);
       cb && cb(profile, address);
