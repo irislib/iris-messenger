@@ -23,12 +23,14 @@ const getRelayStatus = (relay: Relay) => {
 };
 
 const saveLocalStorageEvents = debounce((_this: any) => {
-  const latestMsgs = _this.latestMessagesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
+  const latestMsgs = _this.latestNotesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
     return _this.messagesById.get(eventId);
   });
-  const latestMsgsByEveryone = _this.latestMessagesByEveryone.eventIds.slice(0, 1000).map((eventId: any) => {
-    return _this.messagesById.get(eventId);
-  });
+  const latestMsgsByEveryone = _this.latestNotesByEveryone.eventIds
+    .slice(0, 1000)
+    .map((eventId: any) => {
+      return _this.messagesById.get(eventId);
+    });
   console.log('saving some events to local storage');
   localForage.setItem('latestMsgs', latestMsgs);
   localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
@@ -84,8 +86,8 @@ export default {
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
   messagesById: new Map<string, Event>(),
-  latestMessagesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
-  latestMessagesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
@@ -174,7 +176,7 @@ export default {
       if (posts) {
         posts.eventIds.forEach((eventId) => {
           const event = this.messagesById.get(eventId);
-          event && this.latestMessagesByFollows.add(event);
+          event && this.latestNotesByFollows.add(event);
         });
       }
     }
@@ -250,7 +252,7 @@ export default {
     this.handleEvent(event);
     return event.id;
   },
-  sendSubToRelays: function(filters: Filter[]) {
+  sendSubToRelays: function (filters: Filter[]) {
     // test if identical filters already exists in this.relaySubscriptions
     for (const existingFilters of this.relaySubscriptions) {
       if (isEqual(existingFilters, filters)) {
@@ -270,7 +272,9 @@ export default {
     const myPub = iris.session.getKey().secp256k1.rpub;
     const followedUsers = Array.from(_this.followedByUser.get(myPub) ?? []);
     followedUsers.push(myPub);
-    const otherSubscribedUsers = Array.from(_this.subscribedUsers).filter((u) => !followedUsers.includes(u));
+    const otherSubscribedUsers = Array.from(_this.subscribedUsers).filter(
+      (u) => !followedUsers.includes(u),
+    );
     console.log('subscribe to', followedUsers, otherSubscribedUsers);
     _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: followedUsers }]);
     setTimeout(() => {
@@ -332,7 +336,7 @@ export default {
     }
     return count;
   },
-  connectRelay: function(relay: Relay) {
+  connectRelay: function (relay: Relay) {
     relay.connect();
     relay.on('connect', () => {
       for (const filters of this.relaySubscriptions) {
@@ -378,10 +382,10 @@ export default {
     }
     this.postsAndRepliesByUser.get(event.pubkey)?.add(event);
 
-    this.latestMessagesByEveryone.add(event);
+    this.latestNotesByEveryone.add(event);
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-      const changed = this.latestMessagesByFollows.add(event);
+      const changed = this.latestNotesByFollows.add(event);
       if (changed && this.localStorageLoaded) {
         saveLocalStorageEvents(this); // TODO only save if was changed
       }
@@ -399,8 +403,13 @@ export default {
         .filter((tag) => tag[0] === 'e')
         .map((tag) => tag[1])
         .slice(0, 2);
+      const myPub = iris.session.getKey().secp256k1.rpub;
+      const isFollowed =
+        event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey);
       for (const id of repliedMsgs) {
-        this.getMessageById(id);
+        if (isFollowed) {
+          this.getMessageById(id);
+        }
         if (!this.threadRepliesByMessageId.has(id)) {
           this.threadRepliesByMessageId.set(id, new Set<string>());
         }
@@ -435,7 +444,6 @@ export default {
     }*/
     for (const subject of subjects) {
       const id = subject[1];
-      this.getMessageById(id);
       if (!this.likesByMessageId.has(id)) {
         this.likesByMessageId.set(id, new Set());
       }
@@ -445,6 +453,10 @@ export default {
         this.likesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
       }
       this.likesByUser.get(event.pubkey).add(event);
+      const myPub = iris.session.getKey().secp256k1.rpub;
+      if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+        this.getMessageById(id);
+      }
     }
   },
   handleFollow(event: Event) {
@@ -581,7 +593,7 @@ export default {
         this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
         this.getPostsAndRepliesByUser(key.secp256k1.rpub);
-        this.sendSubToRelays([{kinds: [0,1,3,7], since: Math.floor(Date.now() / 1000)}]); // everything new
+        this.sendSubToRelays([{ kinds: [0, 1, 3, 7], since: Math.floor(Date.now() / 1000) }]); // everything new
         setInterval(() => {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
           this.handledMsgsPerSecond = 0;
@@ -696,14 +708,14 @@ export default {
 
   getMessagesByEveryone(cb: Function) {
     const callback = () => {
-      cb && cb(this.latestMessagesByEveryone.eventIds);
+      cb && cb(this.latestNotesByEveryone.eventIds);
     };
     callback();
     this.subscribe([{ kinds: [1, 7] }], callback);
   },
   getMessagesByFollows(cb: Function) {
     const callback = () => {
-      cb && cb(this.latestMessagesByFollows.eventIds);
+      cb && cb(this.latestNotesByFollows.eventIds);
     };
     callback();
     this.subscribe([{ kinds: [1, 7] }], callback);

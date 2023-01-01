@@ -558,12 +558,15 @@ class Profile extends View {
     Nostr.getFollowedByUser(address, setFollowCounts);
     Nostr.getProfile(address, (data, addr) => {
       if (!data) return;
-      const profile = Object.assign({}, {
-        name: data.name,
-        about: data.about,
-        iris: data.iris,
-        photo: data.photo,
-      });
+      const profile = Object.assign(
+        {},
+        {
+          name: data.name,
+          about: data.about,
+          iris: data.iris,
+          photo: data.photo,
+        },
+      );
       Nostr.toNostrBech32Address(addr, 'npub') === this.props.id && this.setState(profile);
     });
   }

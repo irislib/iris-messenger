@@ -3,7 +3,7 @@ import localforage from 'localforage';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
 import { registerRoute } from 'workbox-routing';
-import { NetworkOnly, StaleWhileRevalidate, NetworkFirst } from 'workbox-strategies';
+import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies';
 
 const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
   maxRetentionTime: 14 * 24 * 60,
