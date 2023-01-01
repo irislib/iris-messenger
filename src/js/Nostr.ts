@@ -256,6 +256,7 @@ export default {
     followedUsers.push(myPub);
     const otherSubscribedUsers = Array.from(_this.subscribedUsers).filter((u) => !followedUsers.includes(u));
     console.log('subscribe to', followedUsers, otherSubscribedUsers);
+    _this.sendSubToRelays([{kinds: [0,1,3,7], since: Math.floor(Date.now() / 1000)}]);
     _this.sendSubToRelays([{ kinds: [0, 3], authors: followedUsers }]);
     setTimeout(() => {
       _this.sendSubToRelays([{ kinds: [0, 3], authors: otherSubscribedUsers }]);
