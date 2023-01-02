@@ -629,7 +629,7 @@ export default {
         const hex = this.toNostrHexAddress(this.SUGGESTED_FOLLOW);
         this.knownUsers.add(hex);
         this.getProfile(this.toNostrHexAddress(hex), undefined);
-        this.sendSubToRelays([{ kinds: [0, 1, 3, 7], limit: 100 }], 'new'); // everything new
+        this.sendSubToRelays([{ kinds: [0, 1, 3, 7], limit: 200 }], 'new'); // everything new
         setTimeout(() => {
           this.sendSubToRelays([{authors: [key.secp256k1.rpub]}], 'ours'); // our stuff
         }, 200);
