@@ -441,7 +441,7 @@ export default {
         event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey);
       for (const id of repliedMsgs) {
         if (isFollowed) {
-          this.getMessageById(id);
+          //this.getMessageById(id);
         }
         if (!this.threadRepliesByMessageId.has(id)) {
           this.threadRepliesByMessageId.set(id, new Set<string>());
@@ -488,7 +488,7 @@ export default {
       this.likesByUser.get(event.pubkey).add({id, created_at: event.created_at });
       const myPub = iris.session.getKey().secp256k1.rpub;
       if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-        this.getMessageById(id);
+        //this.getMessageById(id);
       }
     }
   },
