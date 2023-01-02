@@ -198,7 +198,11 @@ export function relayInit(url: string): Relay {
     let msg = JSON.stringify(params)
 
     await untilOpen
-    ws.send(msg)
+    try {
+      ws.send(msg)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const sub = (
