@@ -77,12 +77,13 @@ export default {
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: 3,
   relays: defaultRelays,
-  subscriptionsById: new Map<string, Set<Sub>>(),
-  relaySubscriptions: new Array<Filter[]>(),
+  subscriptionsByName: new Map<string, Set<Sub>>(),
+  subscribedFiltersByName: new Map<string, Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
   knownUsers: new Set<string>(),
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
+  subscribedRepliesAndLikes: new Set<string>(),
   likesByUser: new Map<string, SortedLimitedEventSet>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -253,28 +254,22 @@ export default {
     this.handleEvent(event);
     return event.id;
   },
-  sendSubToRelays: function (filters: Filter[], id?: string, once = false) {
-    // test if identical filters already exists in this.relaySubscriptions
-    for (const existingFilters of this.relaySubscriptions) {
-      if (isEqual(existingFilters, filters)) {
-        return;
-      }
-    }
-
+  sendSubToRelays: function (filters: Filter[], id: string, once = false) {
     // if subs with same id already exists, remove them
     if (id) {
-      // TODO: remove from relaySubscriptions
-      const subs = this.subscriptionsById.get(id);
+      // TODO: remove from subscribedFilters
+      const subs = this.subscriptionsByName.get(id);
       if (subs) {
         subs.forEach((sub) => {
           console.log('unsub', id);
           sub.unsub();
         });
       }
-      this.subscriptionsById.delete(id);
+      this.subscriptionsByName.delete(id);
     }
 
-    this.relaySubscriptions.push(filters);
+    this.subscribedFiltersByName.set(id, filters);
+    
     for (const relay of this.relays.values()) {
       const sub = relay.sub(filters, {});
       // TODO update relay lastSeen
@@ -283,13 +278,17 @@ export default {
         sub.on('eose', () => sub.unsub());
       }
       if (id) {
-        if (!this.subscriptionsById.has(id)) {
-          this.subscriptionsById.set(id, new Set());
+        if (!this.subscriptionsByName.has(id)) {
+          this.subscriptionsByName.set(id, new Set());
         }
-        this.subscriptionsById.get(id)?.add(sub);
+        this.subscriptionsByName.get(id)?.add(sub);
       }
     }
   },
+  subscribeToRepliesAndLikes: debounce((_this) => {
+    //console.log('subscribeToRepliesAndLikes', _this.subscribedRepliesAndLikes);
+    //_this.sendSubToRelays([{ kinds: [0, 3], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }], 'subscribedRepliesAndLikes', true);
+  }, 500),
   subscribeToAuthors: debounce((_this) => {
     const now = Math.floor(Date.now() / 1000);
     const myPub = iris.session.getKey().secp256k1.rpub;
@@ -304,10 +303,10 @@ export default {
       _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }], 'other', true);
     }, 500);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: followedUsers, until: now, limit: 10000 }], 'followedHistory', true);
+      _this.sendSubToRelays([{ authors: followedUsers, limit: 10000, until: now }], 'followedHistory', true);
     }, 1000);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: otherSubscribedUsers, until: now, limit: 10000 }], 'otherHistory', true);
+      _this.sendSubToRelays([{ authors: otherSubscribedUsers, limit: 10000, until: now }], 'otherHistory', true);
     }, 1500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
@@ -324,6 +323,7 @@ export default {
 
     let hasNewAuthors = false;
     let hasNewIds = false;
+    let hasNewReplyAndLikeSubs = false;
     for (const filter of filters) {
       if (filter.authors) {
         for (const author of filter.authors) {
@@ -346,9 +346,19 @@ export default {
           }
         }
       }
+      if (Array.isArray(filter['#e'])) {
+        for (const id of filter['#e']) {
+          if (!this.subscribedRepliesAndLikes.has(id)) {
+            hasNewReplyAndLikeSubs = true;
+            this.subscribedRepliesAndLikes.add(id);
+          }
+        }
+      }
     }
+    hasNewReplyAndLikeSubs && this.subscribeToRepliesAndLikes(this);
     hasNewAuthors && this.subscribeToAuthors(this);
     hasNewIds && this.subscribeToPosts(this);
+
   },
   getConnectedRelayCount: function () {
     let count = 0;
@@ -362,7 +372,7 @@ export default {
   connectRelay: function (relay: Relay) {
     relay.connect();
     relay.on('connect', () => {
-      for (const filters of this.relaySubscriptions) {
+      for (const filters of this.subscribedFiltersByName.values()) {
         relay.sub(filters, {});
       }
     });
@@ -615,9 +625,9 @@ export default {
         this.manageRelays();
         this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
-        this.sendSubToRelays([{ kinds: [0, 1, 3, 7], limit: 100 }]); // everything new
+        this.sendSubToRelays([{ kinds: [0, 1, 3, 7], limit: 100 }], 'new'); // everything new
         setTimeout(() => {
-          this.sendSubToRelays([{authors: [key.secp256k1.rpub]}]); // our stuff
+          this.sendSubToRelays([{authors: [key.secp256k1.rpub]}], 'ours'); // our stuff
         }, 200);
         setInterval(() => {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
