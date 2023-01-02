@@ -145,7 +145,13 @@ class PublicMessage extends Message {
         const urls = msg.text.match(/(https?:\/\/[^\s]+)/g);
         if (urls) {
           urls.forEach((url) => {
-            const parsedUrl = new URL(url);
+            let parsedUrl;
+            try {
+              parsedUrl = new URL(url);
+            } catch(e) {
+              console.log('invalid url', url);
+              return;
+            }
             if (parsedUrl.pathname.match(/\.(jpg|jpeg|gif|png|webp)$/)) {
               if (!msg.attachments) {
                 msg.attachments = [];

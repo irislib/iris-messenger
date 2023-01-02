@@ -263,6 +263,7 @@ export default {
 
     // if subs with same id already exists, remove them
     if (id) {
+      // TODO: remove from relaySubscriptions
       const subs = this.subscriptionsById.get(id);
       if (subs) {
         subs.forEach((sub) => {
@@ -615,7 +616,9 @@ export default {
         this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
         this.sendSubToRelays([{ kinds: [0, 1, 3, 7], limit: 100 }]); // everything new
-        this.sendSubToRelays([{authors: [key.secp256k1.rpub]}]); // our stuff
+        setTimeout(() => {
+          this.sendSubToRelays([{authors: [key.secp256k1.rpub]}]); // our stuff
+        }, 200);
         setInterval(() => {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
           this.handledMsgsPerSecond = 0;
