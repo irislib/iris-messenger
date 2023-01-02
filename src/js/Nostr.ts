@@ -253,7 +253,7 @@ export default {
     this.handleEvent(event);
     return event.id;
   },
-  sendSubToRelays: function (filters: Filter[], id?: string) {
+  sendSubToRelays: function (filters: Filter[], id?: string, once = false) {
     // test if identical filters already exists in this.relaySubscriptions
     for (const existingFilters of this.relaySubscriptions) {
       if (isEqual(existingFilters, filters)) {
@@ -278,6 +278,9 @@ export default {
       const sub = relay.sub(filters, {});
       // TODO update relay lastSeen
       sub.on('event', (event) => this.handleEvent(event));
+      if (once) {
+        sub.on('eose', () => sub.unsub());
+      }
       if (id) {
         if (!this.subscriptionsById.has(id)) {
           this.subscriptionsById.set(id, new Set());
@@ -295,15 +298,15 @@ export default {
       (u) => !followedUsers.includes(u),
     );
     console.log('subscribe to', followedUsers, otherSubscribedUsers);
-    _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: followedUsers }], 'followed');
+    _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: followedUsers }], 'followed', true);
     setTimeout(() => {
-      _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }], 'other');
+      _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }], 'other', true);
     }, 500);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: followedUsers, until: now, limit: 10000 }], 'followedHistory');
+      _this.sendSubToRelays([{ authors: followedUsers, until: now, limit: 10000 }], 'followedHistory', true);
     }, 1000);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: otherSubscribedUsers, until: now, limit: 10000 }], 'otherHistory');
+      _this.sendSubToRelays([{ authors: otherSubscribedUsers, until: now, limit: 10000 }], 'otherHistory', true);
     }, 1500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
@@ -611,8 +614,8 @@ export default {
         this.manageRelays();
         this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
+        this.sendSubToRelays([{ kinds: [0, 1, 3, 7], limit: 100 }]); // everything new
         this.sendSubToRelays([{authors: [key.secp256k1.rpub]}]); // our stuff
-        this.sendSubToRelays([{ kinds: [0, 1, 3, 7], since: Math.floor(Date.now() / 1000) }]); // everything new
         setInterval(() => {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
           this.handledMsgsPerSecond = 0;
