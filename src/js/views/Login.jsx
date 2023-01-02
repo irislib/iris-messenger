@@ -263,13 +263,6 @@ class Login extends Component {
                     </a>
                   </p>
                 ) : null}
-                {(!window.nostr && window.ethereum) ? ( // lol, hide ethereum for nostr users
-                  <p>
-                    <a href="#" onClick={() => ethereumLogin()}>
-                      {t('ethereum_login')}
-                    </a>
-                  </p>
-                ) : ''}
                 <p>
                   <LanguageSelector />
                 </p>
