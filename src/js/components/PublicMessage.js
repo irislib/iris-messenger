@@ -256,7 +256,14 @@ class PublicMessage extends Message {
   onDelete(e) {
     e.preventDefault();
     if (confirm('Delete message?')) {
-      // TODO: send nostr delete event
+      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+      if (nostrId) {
+        Nostr.publish({
+          kind: 5,
+          content: 'deleted',
+          tags: [['e', nostrId]],
+        });
+      }
     }
   }
 

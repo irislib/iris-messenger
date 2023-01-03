@@ -75,7 +75,7 @@ export default {
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  maxRelays: 3,
+  maxRelays: 4,
   relays: defaultRelays,
   subscriptionsByName: new Map<string, Set<Sub>>(),
   subscribedFiltersByName: new Map<string, Filter[]>(),
@@ -293,7 +293,9 @@ export default {
       true,
     );
   }, 500),
-  subscribeToAuthors: debounce((_this) => { // TODO we shouldn't bang the history queries all the time. only ask a users history once per relay.
+  // TODO we shouldn't bang the history queries all the time. only ask a users history once per relay.
+  // then we can increase the limit
+  subscribeToAuthors: debounce((_this) => {
     const now = Math.floor(Date.now() / 1000);
     const myPub = iris.session.getKey().secp256k1.rpub;
     const followedUsers = Array.from(_this.followedByUser.get(myPub) ?? []);
@@ -316,14 +318,14 @@ export default {
     }, 500);
     setTimeout(() => {
       _this.sendSubToRelays(
-        [{ authors: followedUsers, limit: 1000, until: now }],
+        [{ authors: followedUsers, limit: 500, until: now }],
         'followedHistory',
         true,
       );
     }, 1000);
     setTimeout(() => {
       _this.sendSubToRelays(
-        [{ authors: otherSubscribedUsers, limit: 1000, until: now }],
+        [{ authors: otherSubscribedUsers, limit: 500, until: now }],
         'otherHistory',
         true,
       );
@@ -576,6 +578,16 @@ export default {
       console.log('error parsing nostr profile', e);
     }
   },
+  handleDelete(event: Event) {
+    const id = event.tags.find((tag) => tag[0] === 'e')?.[1];
+    if (id) {
+      if (this.messagesById.has(id)) {
+        this.messagesById.delete(id);
+        // TODO remove from other places
+      }
+      this.deletedMessages.add(id);
+    }
+  },
   handleEvent(event: Event) {
     if (!event) return;
     if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
@@ -589,6 +601,8 @@ export default {
       case 1:
         this.handleNote(event);
         break;
+      case 5:
+        this.handleDelete(event);
       case 3:
         this.handleFollow(event);
         break;
@@ -775,14 +789,14 @@ export default {
       cb && cb(this.latestNotesByEveryone.eventIds);
     };
     callback();
-    this.subscribe([{ kinds: [1, 7] }], callback);
+    this.subscribe([{ kinds: [1, 5, 7] }], callback);
   },
   getMessagesByFollows(cb: Function) {
     const callback = () => {
       cb && cb(this.latestNotesByFollows.eventIds);
     };
     callback();
-    this.subscribe([{ kinds: [1, 7] }], callback);
+    this.subscribe([{ kinds: [1, 5, 7] }], callback);
   },
   getPostsAndRepliesByUser(address: string, cb: Function | undefined) {
     // TODO subscribe on view profile and unsub on leave profile
@@ -796,7 +810,7 @@ export default {
     if (this.postsAndRepliesByUser.has(address)) {
       callback();
     }
-    this.subscribe([{ kinds: [1, 7], authors: [address] }], callback);
+    this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getPostsByUser(address: string, cb: Function | undefined) {
     if (!address) {
@@ -809,7 +823,7 @@ export default {
     if (this.postsByUser.has(address)) {
       callback();
     }
-    this.subscribe([{ kinds: [1, 7], authors: [address] }], callback);
+    this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getLikesByUser(address: string, cb: Function | undefined) {
     if (!address) {
@@ -822,7 +836,7 @@ export default {
     if (this.likesByUser.has(address)) {
       callback();
     }
-    this.subscribe([{ kinds: [7], authors: [address] }], callback);
+    this.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
   },
   getProfile(address, cb: Function | undefined) {
     this.knownUsers.add(address);
