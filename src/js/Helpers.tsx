@@ -56,7 +56,7 @@ export default {
       );
     });
     replacedText = reactStringReplace(replacedText, /(https?:\/\/\S+)/g, (match, i) => (
-      <a key={match + i} href={match}>
+      <a key={match + i} href={match} target="_blank">
         {match}
       </a>
     ));
