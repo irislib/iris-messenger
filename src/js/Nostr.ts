@@ -293,7 +293,7 @@ export default {
       true,
     );
   }, 500),
-  subscribeToAuthors: debounce((_this) => {
+  subscribeToAuthors: debounce((_this) => { // TODO we shouldn't bang the history queries all the time. only ask a users history once per relay.
     const now = Math.floor(Date.now() / 1000);
     const myPub = iris.session.getKey().secp256k1.rpub;
     const followedUsers = Array.from(_this.followedByUser.get(myPub) ?? []);
@@ -316,14 +316,14 @@ export default {
     }, 500);
     setTimeout(() => {
       _this.sendSubToRelays(
-        [{ authors: followedUsers, limit: 10000, until: now }],
+        [{ authors: followedUsers, limit: 1000, until: now }],
         'followedHistory',
         true,
       );
     }, 1000);
     setTimeout(() => {
       _this.sendSubToRelays(
-        [{ authors: otherSubscribedUsers, limit: 10000, until: now }],
+        [{ authors: otherSubscribedUsers, limit: 1000, until: now }],
         'otherHistory',
         true,
       );
