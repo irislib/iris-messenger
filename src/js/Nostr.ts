@@ -584,7 +584,6 @@ export default {
     const id = event.tags.find((tag) => tag[0] === 'e')?.[1];
     if (id) {
       if (this.messagesById.has(id)) {
-        this.messagesById.delete(id);
         this.postsAndRepliesByUser.get(event.pubkey)?.delete(id);
         // TODO remove from other places
       }

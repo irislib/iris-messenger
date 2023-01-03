@@ -264,6 +264,7 @@ class PublicMessage extends Message {
           content: 'deleted',
           tags: [['e', nostrId]],
         });
+        this.setState({ msg: null });
       }
     }
   }
@@ -388,8 +389,8 @@ class PublicMessage extends Message {
                     <div class="dropdown">
                       <div class="dropbtn">…</div>
                       <div class="dropdown-content">
-                        <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a>
-                        <a href="#" onClick=${(e) => this.onBroadcast(e)}>Broadcast</a>
+                        <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> -->
+                        <a href="#" onClick=${(e) => this.onBroadcast(e)}>Re-broadcast</a>
                       </div>
                     </div>
                   </div>
