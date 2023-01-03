@@ -1,7 +1,7 @@
 import iris from 'iris-lib';
 import { debounce, isEqual } from 'lodash';
 
-import { Sub, Event, Filter, getEventHash, Relay, relayInit, signEvent } from './lib/nostr-tools';
+import { Event, Filter, getEventHash, Relay, relayInit, signEvent, Sub } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer');
 import localForage from 'localforage';
 
@@ -269,7 +269,7 @@ export default {
     }
 
     this.subscribedFiltersByName.set(id, filters);
-    
+
     for (const relay of this.relays.values()) {
       const sub = relay.sub(filters, {});
       // TODO update relay lastSeen
@@ -298,15 +298,31 @@ export default {
       (u) => !followedUsers.includes(u),
     );
     console.log('subscribe to', followedUsers, otherSubscribedUsers);
-    _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: followedUsers }], 'followed', true);
+    _this.sendSubToRelays(
+      [{ kinds: [0, 3], until: now, authors: followedUsers }],
+      'followed',
+      true,
+    );
     setTimeout(() => {
-      _this.sendSubToRelays([{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }], 'other', true);
+      _this.sendSubToRelays(
+        [{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }],
+        'other',
+        true,
+      );
     }, 500);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: followedUsers, limit: 10000, until: now }], 'followedHistory', true);
+      _this.sendSubToRelays(
+        [{ authors: followedUsers, limit: 10000, until: now }],
+        'followedHistory',
+        true,
+      );
     }, 1000);
     setTimeout(() => {
-      _this.sendSubToRelays([{ authors: otherSubscribedUsers, limit: 10000, until: now }], 'otherHistory', true);
+      _this.sendSubToRelays(
+        [{ authors: otherSubscribedUsers, limit: 10000, until: now }],
+        'otherHistory',
+        true,
+      );
     }, 1500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
@@ -358,7 +374,6 @@ export default {
     hasNewReplyAndLikeSubs && this.subscribeToRepliesAndLikes(this);
     hasNewAuthors && this.subscribeToAuthors(this);
     hasNewIds && this.subscribeToPosts(this);
-
   },
   getConnectedRelayCount: function () {
     let count = 0;
@@ -486,7 +501,7 @@ export default {
       if (!this.likesByUser.has(event.pubkey)) {
         this.likesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
       }
-      this.likesByUser.get(event.pubkey).add({id, created_at: event.created_at });
+      this.likesByUser.get(event.pubkey).add({ id, created_at: event.created_at });
       const myPub = iris.session.getKey().secp256k1.rpub;
       if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
         //this.getMessageById(id);
@@ -535,8 +550,9 @@ export default {
         }
       }
       this.profiles.set(event.pubkey, profile);
-      iris.session.addToSearchIndex(event.pubkey, {
-        key: event.pubkey,
+      const key = this.toNostrBech32Address(event.pubkey, 'npub');
+      iris.session.addToSearchIndex(key, {
+        key,
         name: content.name,
         followers: this.followersByUser.get(event.pubkey) ?? new Set(),
       });
@@ -631,7 +647,7 @@ export default {
         this.getProfile(this.toNostrHexAddress(hex), undefined);
         this.sendSubToRelays([{ kinds: [0, 1, 3, 7], limit: 200 }], 'new'); // everything new
         setTimeout(() => {
-          this.sendSubToRelays([{authors: [key.secp256k1.rpub]}], 'ours'); // our stuff
+          this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
         }, 200);
         setInterval(() => {
           console.log('handled msgs per second', this.handledMsgsPerSecond);

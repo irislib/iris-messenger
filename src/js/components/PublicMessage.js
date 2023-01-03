@@ -148,7 +148,7 @@ class PublicMessage extends Message {
             let parsedUrl;
             try {
               parsedUrl = new URL(url);
-            } catch(e) {
+            } catch (e) {
               console.log('invalid url', url);
               return;
             }
@@ -343,19 +343,19 @@ class PublicMessage extends Message {
       >
         <div class="msg-content">
           ${s.msg.replyingTo && !this.props.asReply && !this.props.asQuote
-          ? html`
-              <div style="padding: 0 15px 0 15px">
-              <${PublicMessage}
-                key=${s.msg.replyingTo}
-                hash=${s.msg.replyingTo}
-                asQuote=${true}
-                showName=${true}
-                showReplies=${false}
-              />
-              </div>
-            `
-          : ''}
-            
+            ? html`
+                <div style="padding: 0 15px 0 15px">
+                  <${PublicMessage}
+                    key=${s.msg.replyingTo}
+                    hash=${s.msg.replyingTo}
+                    asQuote=${true}
+                    showName=${true}
+                    showReplies=${false}
+                  />
+                </div>
+              `
+            : ''}
+
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${() => this.onClickName()}>
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
@@ -422,19 +422,25 @@ class PublicMessage extends Message {
               `
             : ''}
           <div class="below-text">
-            ${this.props.asQuote ? '' : html`
-              <a class="msg-btn reply-btn" onClick=${() => this.toggleReplies()}> ${replyIcon} </a>
-              <span class="count" onClick=${() => this.toggleReplies()}> ${s.replyCount || ''} </span>
-              <a
-                class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
-                onClick=${(e) => this.likeBtnClicked(e)}
-              >
-                ${s.liked ? Icons.heartFull : Icons.heartEmpty}
-              </a>
-              <span class="count" onClick=${() => this.setState({ showLikes: !s.showLikes })}>
-                ${s.likes || ''}
-              </span>
-            `}
+            ${this.props.asQuote
+              ? ''
+              : html`
+                  <a class="msg-btn reply-btn" onClick=${() => this.toggleReplies()}>
+                    ${replyIcon}
+                  </a>
+                  <span class="count" onClick=${() => this.toggleReplies()}>
+                    ${s.replyCount || ''}
+                  </span>
+                  <a
+                    class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
+                    onClick=${(e) => this.likeBtnClicked(e)}
+                  >
+                    ${s.liked ? Icons.heartFull : Icons.heartEmpty}
+                  </a>
+                  <span class="count" onClick=${() => this.setState({ showLikes: !s.showLikes })}>
+                    ${s.likes || ''}
+                  </span>
+                `}
             <div class="time">
               <a
                 href="/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
