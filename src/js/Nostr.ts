@@ -287,8 +287,11 @@ export default {
   },
   subscribeToRepliesAndLikes: debounce((_this) => {
     console.log('subscribeToRepliesAndLikes', _this.subscribedRepliesAndLikes);
-    // wen unsubscribe?
-    _this.sendSubToRelays([{ kinds: [1, 7], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }], 'subscribedRepliesAndLikes', true);
+    _this.sendSubToRelays(
+      [{ kinds: [1, 7], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }],
+      'subscribedRepliesAndLikes',
+      true,
+    );
   }, 500),
   subscribeToAuthors: debounce((_this) => {
     const now = Math.floor(Date.now() / 1000);
@@ -368,6 +371,10 @@ export default {
           if (!this.subscribedRepliesAndLikes.has(id)) {
             hasNewReplyAndLikeSubs = true;
             this.subscribedRepliesAndLikes.add(id);
+            setTimeout(() => {
+              // remove after some time, so the requests don't grow too large
+              this.subscribedRepliesAndLikes.delete(id);
+            }, 60 * 1000);
           }
         }
       }
