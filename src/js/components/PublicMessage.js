@@ -366,7 +366,7 @@ class PublicMessage extends Message {
         <div class="msg-content">
           ${s.msg.replyingTo && !this.props.asReply && !this.props.asQuote
             ? html`
-                <div style="padding: 0 15px 0 15px">
+                <div>
                   <${PublicMessage}
                     key=${s.msg.replyingTo}
                     hash=${s.msg.replyingTo}

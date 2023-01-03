@@ -805,7 +805,7 @@ header.footer .header-content {
 }
 
 #profile .content {
-  width: 700px;
+  width: 600px;
   max-width: 100%;
 }
 
@@ -1132,7 +1132,6 @@ a.msg {
 
 .public-messages-view .msg {
   align-items: flex-start;
-  margin-bottom: 15px;
 }
 
 .public-messages-view .msg-sender {
@@ -1175,11 +1174,19 @@ a.msg {
 
 .public-messages-view .msg .msg-content {
   max-width: none;
-  border-radius: 8px !important;
+  border-radius: 0;
   width: 100%;
   padding: 15px;
   flex-direction: column;
   display: flex;
+}
+
+.public-messages-view .msg:first-of-type .msg-content {
+  border-radius: 8px 8px 0 0 !important;
+}
+
+.public-messages-view .msg:last-of-type .msg-content {
+  border-radius: 0 0 8px 8px !important;
 }
 
 .img-container {
@@ -1595,7 +1602,7 @@ hr {
 
 .centered-container {
   display: flex;
-  max-width: 700px;
+  max-width: 600px;
   flex-direction: column;
   margin: 0 auto 0 auto;
 }
