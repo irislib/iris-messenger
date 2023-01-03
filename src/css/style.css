@@ -232,7 +232,7 @@ input {
 img,
 video {
   max-width: 100%;
-  max-height: 80vh;
+  max-height: 70vh;
 }
 
 .mar-left5 {
@@ -805,7 +805,7 @@ header.footer .header-content {
 }
 
 #profile .content {
-  width: 800px;
+  width: 700px;
   max-width: 100%;
 }
 
@@ -1122,7 +1122,7 @@ a.msg {
 }
 
 .public-messages-view .img-container img {
-  max-height: 80vh;
+  max-height: 60vh;
   border-radius: 0;
 }
 
@@ -1595,7 +1595,7 @@ hr {
 
 .centered-container {
   display: flex;
-  max-width: 1000px;
+  max-width: 600px;
   flex-direction: column;
   margin: 0 auto 0 auto;
 }
