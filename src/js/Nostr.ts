@@ -256,7 +256,7 @@ export default {
     this.handleEvent(event);
     return event.id;
   },
-  sendSubToRelays: function (filters: Filter[], id: string, once = false) {
+  sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
     // if subs with same id already exists, remove them
     if (id) {
       // TODO: remove from subscribedFilters
@@ -272,6 +272,13 @@ export default {
 
     this.subscribedFiltersByName.set(id, filters);
 
+    if (unsubscribeTimeout) {
+      setTimeout(() => {
+        this.subscriptionsByName.delete(id);
+        this.subscribedFiltersByName.delete(id);
+      }, unsubscribeTimeout);
+    }
+
     for (const relay of this.relays.values()) {
       const sub = relay.sub(filters, {});
       // TODO update relay lastSeen
@@ -279,11 +286,14 @@ export default {
       if (once) {
         sub.on('eose', () => sub.unsub());
       }
-      if (id) {
-        if (!this.subscriptionsByName.has(id)) {
-          this.subscriptionsByName.set(id, new Set());
-        }
-        this.subscriptionsByName.get(id)?.add(sub);
+      if (!this.subscriptionsByName.has(id)) {
+        this.subscriptionsByName.set(id, new Set());
+      }
+      this.subscriptionsByName.get(id)?.add(sub);
+      if (unsubscribeTimeout) {
+        setTimeout(() => {
+          sub.unsub();
+        }, unsubscribeTimeout);
       }
     }
   },
