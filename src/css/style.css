@@ -805,7 +805,7 @@ header.footer .header-content {
 }
 
 #profile .content {
-  width: 600px;
+  width: 650px;
   max-width: 100%;
 }
 
@@ -1614,7 +1614,7 @@ hr {
 
 .centered-container {
   display: flex;
-  max-width: 600px;
+  max-width: 650px;
   flex-direction: column;
   margin: 0 auto 0 auto;
 }
