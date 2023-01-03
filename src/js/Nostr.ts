@@ -286,8 +286,9 @@ export default {
     }
   },
   subscribeToRepliesAndLikes: debounce((_this) => {
-    //console.log('subscribeToRepliesAndLikes', _this.subscribedRepliesAndLikes);
-    //_this.sendSubToRelays([{ kinds: [0, 3], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }], 'subscribedRepliesAndLikes', true);
+    console.log('subscribeToRepliesAndLikes', _this.subscribedRepliesAndLikes);
+    // wen unsubscribe?
+    _this.sendSubToRelays([{ kinds: [1, 7], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }], 'subscribedRepliesAndLikes', true);
   }, 500),
   subscribeToAuthors: debounce((_this) => {
     const now = Math.floor(Date.now() / 1000);
