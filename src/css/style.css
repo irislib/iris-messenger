@@ -1134,6 +1134,14 @@ a.msg {
   align-items: flex-start;
 }
 
+.public-messages-view .msg .msg:first-of-type {
+  margin-bottom: 15px;
+}
+
+.public-messages-view .msg .msg .msg-content {
+  padding: 15px 15px 0 15px;
+}
+
 .public-messages-view .msg-sender {
   margin-bottom: 15px;
   display: flex;
@@ -1187,6 +1195,10 @@ a.msg {
 
 .public-messages-view .msg:last-of-type .msg-content {
   border-radius: 0 0 8px 8px !important;
+}
+
+.public-messages-view .msg:only-of-type .msg-content {
+  border-radius: 8px 8px 8px 8px !important;
 }
 
 .img-container {
