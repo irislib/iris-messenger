@@ -129,6 +129,7 @@ class PublicMessage extends Message {
       const msg = r.signedData;
       msg.info = {
         from: nostrId ? Nostr.toNostrBech32Address(r.signerKeyHash, 'npub') : r.signerKeyHash,
+        isMine: myPub === r.signerKeyHash,
       };
       if (this.props.filter) {
         if (!this.props.filter(msg)) {
@@ -267,6 +268,19 @@ class PublicMessage extends Message {
     }
   }
 
+  onBroadcast(e) {
+    // republish message on nostr
+    e.preventDefault();
+    const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+    if (nostrId) {
+      const event = Nostr.messagesById.get(nostrId);
+      if (event) {
+        console.log('broadcasting');
+        Nostr.publish(event);
+      }
+    }
+  }
+
   imageClicked(event) {
     event.preventDefault();
     if (window.innerWidth <= 625) {
@@ -368,13 +382,14 @@ class PublicMessage extends Message {
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
               ${name && this.props.showName && html`<small class="msgSenderName">${name}</small>`}
             </div>
-            ${s.msg.info.from === iris.session.getPubKey()
+            ${s.msg.info.isMine
               ? html`
                   <div class="msg-menu-btn">
                     <div class="dropdown">
                       <div class="dropbtn">…</div>
                       <div class="dropdown-content">
                         <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a>
+                        <a href="#" onClick=${(e) => this.onBroadcast(e)}>Broadcast</a>
                       </div>
                     </div>
                   </div>

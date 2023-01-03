@@ -236,17 +236,19 @@ export default {
     event.created_at = event.created_at || Math.floor(Date.now() / 1000);
     event.pubkey = iris.session.getKey().secp256k1.rpub;
     event.id = getEventHash(event);
-    const myPriv = iris.session.getKey().secp256k1.priv;
-    if (myPriv) {
-      event.sig = await signEvent(event, myPriv);
-    } else if (window.nostr) {
-      event = await window.nostr.signEvent(event);
-    } else {
-      alert('no nostr extension to sign the event with');
-    }
-    if (!(event.id && event.sig)) {
-      console.error('Failed to sign event', event);
-      throw new Error('Invalid event');
+    if (!event.sig) {
+      const myPriv = iris.session.getKey().secp256k1.priv;
+      if (myPriv) {
+        event.sig = await signEvent(event, myPriv);
+      } else if (window.nostr) {
+        event = await window.nostr.signEvent(event);
+      } else {
+        alert('no nostr extension to sign the event with');
+      }
+      if (!(event.id && event.sig)) {
+        console.error('Failed to sign event', event);
+        throw new Error('Invalid event');
+      }
     }
     for (const relay of this.relays.values()) {
       relay.publish(event);
@@ -583,9 +585,9 @@ export default {
     if (id) {
       if (this.messagesById.has(id)) {
         this.messagesById.delete(id);
+        this.postsAndRepliesByUser.get(event.pubkey)?.delete(id);
         // TODO remove from other places
       }
-      this.deletedMessages.add(id);
     }
   },
   handleEvent(event: Event) {
@@ -603,6 +605,7 @@ export default {
         break;
       case 5:
         this.handleDelete(event);
+        break;
       case 3:
         this.handleFollow(event);
         break;

@@ -29,6 +29,15 @@ export default class SortedLimitedEventSet {
     return true;
   }
 
+  delete(eventId: string): boolean {
+    const index = this.events.findIndex((event) => event.id === eventId);
+    if (index === -1) {
+      return false;
+    }
+    this.events.splice(index, 1);
+    return true;
+  }
+
   get eventIds(): string[] {
     return this.events.map((event) => event.id);
   }
