@@ -117,6 +117,8 @@ class Login extends Component {
   componentDidMount() {
     const el = document.getElementById('login-form-name');
     el && el.focus();
+    // re-render after 1 sec to make sure window.nostr is set
+    setTimeout(() => this.setState({}), 100);
   }
 
   toggleScanPrivKey() {
