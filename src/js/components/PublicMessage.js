@@ -388,18 +388,18 @@ class PublicMessage extends Message {
               <div class="dropdown">
                 <div class="dropbtn">…</div>
                 <div class="dropdown-content">
-                    <${CopyButton}
-                      key=${`${this.props.hash}copy`}
-                      text=${t('copy_note_ID')}
-                      title="Note ID"
-                      copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
-                    />
-                    ${s.msg.info.isMine
-                      ? html`
-                          <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> -->
-                        `
-                      : ''}
-                  <a href="#" onClick=${(e) => this.onBroadcast(e)}>Re-broadcast</a>
+                  <${CopyButton}
+                    key=${`${this.props.hash}copy`}
+                    text=${t('copy_note_ID')}
+                    title="Note ID"
+                    copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
+                  />
+                  ${s.msg.info.isMine
+                    ? html`
+                        <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> -->
+                      `
+                    : ''}
+                  <a href="#" onClick=${(e) => this.onBroadcast(e)}>Broadcast</a>
                 </div>
               </div>
             </div>

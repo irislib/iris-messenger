@@ -55,11 +55,28 @@ export default {
         </a>
       );
     });
+
+    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})(?:\S+)?/g;
+    replacedText = reactStringReplace(replacedText, youtubeRegex, (match, i) => {
+      return (
+        <iframe
+          key={match + i}
+          width="560"
+          height="315"
+          src={`https://www.youtube.com/embed/${match}`}
+          frameBorder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      );
+    });
+
     replacedText = reactStringReplace(replacedText, /(https?:\/\/\S+)/g, (match, i) => (
       <a key={match + i} href={match} target="_blank">
         {match}
       </a>
     ));
+
     if (event && event.tags) {
       // replace "#[0]" tags with links to the user: event.tags[n][1]
       replacedText = reactStringReplace(replacedText, /#\[(\d+)\]/g, (match, i) => {
