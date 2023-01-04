@@ -222,13 +222,13 @@ class Profile extends View {
                     ? ''
                     : html`<${BlockButton} key=${`${this.props.id}block`} id=${this.props.id} />`}
                   <${CopyButton}
-                    key=${`${this.props.id}copy`}
+                    key=${`${this.props.id}copyLink`}
                     text=${t('copy_link')}
                     title=${this.state.name}
                     copyStr=${window.location.href}
                   />
                   <${CopyButton}
-                    key=${`${this.props.id}copy`}
+                    key=${`${this.props.id}copyNpub`}
                     text=${t('copy_npub')}
                     title=${this.state.name}
                     copyStr=${this.props.id}

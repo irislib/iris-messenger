@@ -1,8 +1,8 @@
 import iris from 'iris-lib';
-import { debounce, isEqual } from 'lodash';
+import { debounce } from 'lodash';
 
 import { Event, Filter, getEventHash, Relay, relayInit, signEvent, Sub } from './lib/nostr-tools';
-const bech32 = require('bech32-buffer');
+const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import localForage from 'localforage';
 
 import SortedLimitedEventSet from './SortedLimitedEventSet';
@@ -67,11 +67,18 @@ type Subscription = {
   callback?: (event: Event) => void;
 };
 
+type Profile = {
+  created_at: number;
+  name?: string;
+  photo?: string;
+  about?: string;
+};
+
 let subscriptionId = 0;
 
 export default {
   localStorageLoaded: false,
-  profiles: new Map<string, any>(),
+  profiles: new Map<string, Profile>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: 5,
@@ -210,7 +217,9 @@ export default {
         return null;
       }
       return bech32.encode(prefix, decoded.data);
-    } catch (e) {}
+    } catch (e) {
+      // not a bech32 address
+    }
 
     if (address.match(/^[0-9a-fA-F]{64}$/)) {
       const words = Buffer.from(address, 'hex');
@@ -226,7 +235,9 @@ export default {
       const { data } = bech32.decode(str);
       const addr = this.arrayToHex(data);
       return addr;
-    } catch (e) {}
+    } catch (e) {
+      // not a bech32 address
+    }
     return null;
   },
   publish: async function (event: any) {
@@ -347,7 +358,7 @@ export default {
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
   }, 100),
-  subscribe: function (filters: Filter[], cb?: Function) {
+  subscribe: function (filters: Filter[], cb?: (event: Event) => void) {
     cb &&
       this.subscriptions.set(subscriptionId++, {
         filters,
@@ -554,22 +565,10 @@ export default {
         return;
       }
       const content = JSON.parse(event.content);
-      const profile: any = { created_at: event.created_at };
+      const profile: Profile = { created_at: event.created_at };
       content.name && (profile.name = content.name);
       content.picture && (profile.photo = content.picture);
       content.about && (profile.about = content.about);
-      if (content.iris) {
-        try {
-          const irisData = JSON.parse(content.iris);
-          iris.Key.verify(irisData.sig, irisData.pub).then((nostrAddrSignedByIris) => {
-            if (nostrAddrSignedByIris === event.pubkey) {
-              profile.iris = irisData.pub;
-            }
-          });
-        } catch (e) {
-          // console.error('Invalid iris data', e);
-        }
-      }
       this.profiles.set(event.pubkey, profile);
       const key = this.toNostrBech32Address(event.pubkey, 'npub');
       iris.session.addToSearchIndex(key, {
@@ -749,7 +748,10 @@ export default {
           );
       });
   },
-  getRepliesAndLikes(id: string, cb?: Function) {
+  getRepliesAndLikes(
+    id: string,
+    cb?: (replies: Event[], likes: Event[], threadReplyCount: number) => void,
+  ) {
     const callback = () => {
       cb &&
         cb(
@@ -763,14 +765,14 @@ export default {
     }
     this.subscribe([{ kinds: [1, 7], '#e': [id] }], callback);
   },
-  getFollowedByUser: function (address: string, cb?: Function) {
+  getFollowedByUser: function (address: string, cb?: (followedUsers: Set<string>) => void) {
     const callback = () => {
       cb?.(this.followedByUser.get(address));
     };
     this.followedByUser.has(address) && callback();
     this.subscribe([{ kinds: [3], authors: [address] }], callback);
   },
-  getFollowersByUser: function (address: string, cb?: Function) {
+  getFollowersByUser: function (address: string, cb?: (followers: Set<string>) => void) {
     const callback = () => {
       cb?.(this.followersByUser.get(address));
     };
@@ -801,21 +803,21 @@ export default {
     return relays.length ? relays[0].url : null;
   },
 
-  getMessagesByEveryone(cb: Function) {
+  getMessagesByEveryone(cb: (messageIds: string[]) => void) {
     const callback = () => {
       cb(this.latestNotesByEveryone.eventIds);
     };
     callback();
     this.subscribe([{ kinds: [1, 5, 7] }], callback);
   },
-  getMessagesByFollows(cb: Function) {
+  getMessagesByFollows(cb: (messageIds: string[]) => void) {
     const callback = () => {
       cb(this.latestNotesByFollows.eventIds);
     };
     callback();
     this.subscribe([{ kinds: [1, 5, 7] }], callback);
   },
-  getPostsAndRepliesByUser(address: string, cb?: Function) {
+  getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile
     this.knownUsers.add(address);
     const callback = () => {
@@ -824,7 +826,7 @@ export default {
     this.postsAndRepliesByUser.has(address) && callback();
     this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
-  getPostsByUser(address: string, cb?: Function) {
+  getPostsByUser(address: string, cb?: (messageIds: string[]) => void) {
     this.knownUsers.add(address);
     const callback = () => {
       cb?.(this.postsByUser.get(address)?.eventIds);
@@ -832,7 +834,7 @@ export default {
     this.postsByUser.has(address) && callback();
     this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
-  getLikesByUser(address: string, cb?: Function) {
+  getLikesByUser(address: string, cb?: (messageIds: string[]) => void) {
     this.knownUsers.add(address);
     const callback = () => {
       cb?.(this.likesByUser.get(address).eventIds);
@@ -840,7 +842,7 @@ export default {
     this.likesByUser.has(address) && callback();
     this.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
   },
-  getProfile(address, cb?: Function) {
+  getProfile(address, cb?: (profile: Profile, address: string) => void) {
     this.knownUsers.add(address);
     const callback = () => {
       cb?.(this.profiles.get(address), address);
