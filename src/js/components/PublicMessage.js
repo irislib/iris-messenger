@@ -154,7 +154,7 @@ class PublicMessage extends Message {
               console.log('invalid url', url);
               return;
             }
-            if (parsedUrl.pathname.match(/\.(jpg|jpeg|gif|png|webp)$/)) {
+            if (parsedUrl.pathname.toLowerCase().match(/\.(jpg|jpeg|gif|png|webp)$/)) {
               if (!msg.attachments) {
                 msg.attachments = [];
               }
