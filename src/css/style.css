@@ -753,7 +753,7 @@ header.footer .header-content {
 .msg {
   display: flex;
   flex-direction: column;
-  margin-bottom: 4px;
+  margin-bottom: 7px;
   overflow-wrap: break-word;
   white-space: pre-wrap;
 }
