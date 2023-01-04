@@ -249,6 +249,18 @@ class Profile extends View {
               >
                 ${this.state.about}
               </p>
+              ${this.state.lightning ? html`
+                  <p>
+                      <a href=${this.state.lightning}>⚡ Tip</a>
+                  </p>
+              ` : ''}
+              ${this.state.website ? html`
+                <p>
+                  <a href=${this.state.website}>
+                    ${this.state.website.replace(/^https?:\/\//, '')}
+                  </a>
+                </p>
+            ` : ''}
             </div>
             ${this.state.nostr
               ? html`<a href="/profile/${this.state.nostr}">Nostr profile</a>`
@@ -556,16 +568,18 @@ class Profile extends View {
     Nostr.getProfile(address, (data, addr) => {
       addr = Nostr.toNostrBech32Address(addr, 'npub');
       if (!data || addr !== this.props.id) return;
-      const profile = Object.assign(
-        {},
-        {
-          name: data.name,
-          about: data.about,
-          iris: data.iris,
-          photo: data.photo,
-        },
-      );
-      this.setState(profile);
+      let lightning = data.lightning;
+      if (lightning && !lightning.startsWith('lightning:')) {
+        lightning = 'lightning:' + lightning;
+      }
+
+      this.setState({
+        name: data.name,
+        about: data.about,
+        photo: data.photo,
+        lightning,
+        website: data.website,
+      });
     });
   }
 

@@ -72,6 +72,8 @@ type Profile = {
   name?: string;
   photo?: string;
   about?: string;
+  lightning?: string;
+  website?: string;
 };
 
 let subscriptionId = 0;
@@ -569,6 +571,8 @@ export default {
       content.name && (profile.name = content.name);
       content.picture && (profile.photo = content.picture);
       content.about && (profile.about = content.about);
+      content.lud16 && (profile.lightning = content.lud16);
+      content.website && (profile.website = content.website);
       this.profiles.set(event.pubkey, profile);
       const key = this.toNostrBech32Address(event.pubkey, 'npub');
       iris.session.addToSearchIndex(key, {
@@ -580,7 +584,7 @@ export default {
       const myPub = iris.session.getKey().secp256k1.rpub;
       if (event.pubkey === myPub) {
         iris.public().get('profile').put(profile);
-        console.log('saved profile to iris', profile);
+        console.log('saved profile to iris', content);
       }
       const existingEvent = this.profileEventByUser.get(event.pubkey);
       if (!existingEvent || existingEvent.created_at < event.created_at) {
