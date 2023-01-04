@@ -17,6 +17,7 @@ import SafeImg from './SafeImg';
 import Torrent from './Torrent';
 
 const MSG_TRUNCATE_LENGTH = 1000;
+const MSG_TRUNCATE_LINES = 10;
 
 const replyIcon = html`<svg
   width="24"
@@ -340,8 +341,13 @@ class PublicMessage extends Message {
         ? `${text.slice(0, MSG_TRUNCATE_LENGTH)}...`
         : text;
 
+    const lines = text.split('\n');
+    text =
+      lines.length > MSG_TRUNCATE_LINES && !this.state.showMore && !this.props.standalone
+        ? `${lines.slice(0, MSG_TRUNCATE_LINES).join('\n')}...`
+        : text;
+
     text = Helpers.highlightEverything(text, this.state.msg.event);
-    //console.log('text', text);
 
     const time =
       typeof this.state.msg.time === 'object' ? this.state.msg.time : new Date(this.state.msg.time);
@@ -437,7 +443,8 @@ class PublicMessage extends Message {
           <div class="text ${emojiOnly && 'emoji-only'}">${text}</div>
           ${!this.props.standalone &&
           ((s.msg.attachments && s.msg.attachments.length > 1) ||
-            this.state.msg.text.length > MSG_TRUNCATE_LENGTH)
+            this.state.msg.text.length > MSG_TRUNCATE_LENGTH ||
+            lines.length > MSG_TRUNCATE_LINES)
             ? html`
                 <a
                   onClick=${(e) => {
