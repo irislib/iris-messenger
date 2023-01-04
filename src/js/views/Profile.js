@@ -249,18 +249,22 @@ class Profile extends View {
               >
                 ${this.state.about}
               </p>
-              ${this.state.lightning ? html`
-                  <p>
+              ${this.state.lightning
+                ? html`
+                    <p>
                       <a href=${this.state.lightning}>⚡ Tip</a>
-                  </p>
-              ` : ''}
-              ${this.state.website ? html`
-                <p>
-                  <a href=${this.state.website}>
-                    ${this.state.website.replace(/^https?:\/\//, '')}
-                  </a>
-                </p>
-            ` : ''}
+                    </p>
+                  `
+                : ''}
+              ${this.state.website
+                ? html`
+                    <p>
+                      <a href=${this.state.website}>
+                        ${this.state.website.replace(/^https?:\/\//, '')}
+                      </a>
+                    </p>
+                  `
+                : ''}
             </div>
             ${this.state.nostr
               ? html`<a href="/profile/${this.state.nostr}">Nostr profile</a>`
@@ -573,7 +577,9 @@ class Profile extends View {
         lightning = 'lightning:' + lightning;
       }
 
-      let website = data.website && (data.website.match(/^https?:\/\//) ? data.website : 'http://' + data.website)
+      let website =
+        data.website &&
+        (data.website.match(/^https?:\/\//) ? data.website : 'http://' + data.website);
 
       this.setState({
         name: data.name,

@@ -474,6 +474,34 @@ export default {
       }
     }
 
+    /* todo: handle boost (retweet) message, example from astral.ninja. damus uses some other format.
+    {
+      "id": "97ef4480664c38857cc6e906be3cc13e0728b5eb87744b994ed0e0187566e0f2",
+      "pubkey": "4523be58d395b1b196a9b8c82b038b6895cb02b683d0c253a955068dba1facd0",
+      "created_at": 1672858762,
+      "kind": 1,
+      "tags": [
+        [
+          "p",
+          "1577e4599dd10c863498fe3c20bd82aafaf829a595ce83c5cf8ac3463531b09b",
+          "wss://nostr.zebedee.cloud"
+        ],
+        [
+          "e",
+          "f51e72133af57072fced5897c4477ae1f48725013373fd6367b5024ad657e5ea",
+          "wss://relay.nostr.info",
+          "mention"
+        ],
+        [
+          "client",
+          "astral"
+        ]
+      ],
+      "content": "#[1]",
+      "sig": "2d3f4bbf5ab6d954e48b94310c82a2408e91982f8abf3b959676ef0a38e205a1e873e6020d6dc91fe7076f7eaf038c3e410ad4d205ba496a8394b2366bef362e"
+    }
+     */
+
     const replyingTo = this.getEventReplyingTo(event);
     if (replyingTo) {
       if (!this.directRepliesByMessageId.has(replyingTo)) {
@@ -601,7 +629,7 @@ export default {
     if (id) {
       if (this.messagesById.has(id)) {
         this.postsAndRepliesByUser.get(event.pubkey)?.delete(id);
-        // TODO remove from other places
+        // TODO remove from other indexes. sql.js instead of our own indexing would make life easier here.
       }
     }
   },

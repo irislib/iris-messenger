@@ -373,7 +373,16 @@ class PublicMessage extends Message {
         <div class="msg-content">
           ${s.msg.replyingTo && !this.props.asReply && !this.props.asQuote
             ? html`
-                <div>
+                <div
+                  style="cursor: pointer"
+                  onClick=${(e) => {
+                    e.preventDefault();
+                    // if event target is not a link or a button, open reply
+                    if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                      route(`/post/${s.msg.replyingTo}`);
+                    }
+                  }}
+                >
                   <${PublicMessage}
                     key=${s.msg.replyingTo}
                     hash=${s.msg.replyingTo}

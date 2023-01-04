@@ -73,14 +73,13 @@ export default {
       );
     });
 
-    const lnRegex = /(lightning:[\w.-]+@[\w.-]+|lightning:\w+\?amount=\d+|(?:lightning:)?lnbc[\da-z]+)/g
-    replacedText = reactStringReplace(replacedText, lnRegex, (match, i) => {
+    const lnRegex =
+      /(lightning:[\w.-]+@[\w.-]+|lightning:\w+\?amount=\d+|(?:lightning:)?lnbc[\da-z]+)/g;
+    replacedText = reactStringReplace(replacedText, lnRegex, (match) => {
       if (!match.startsWith('lightning:')) {
         match = `lightning:${match}`;
       }
-      return (
-        <a href={match}>⚡ Pay with lightning</a>
-      )
+      return <a href={match}>⚡ Pay with lightning</a>;
     });
 
     replacedText = reactStringReplace(replacedText, /(https?:\/\/\S+)/g, (match, i) => (
@@ -94,12 +93,18 @@ export default {
       replacedText = reactStringReplace(replacedText, /#\[(\d+)\]/g, (match, i) => {
         const tag = event.tags[parseInt(match, 10)];
         if (tag) {
-          const link = `/profile/${tag[1]}`;
-          return (
-            <a href={link}>
-              @<Name key={match + i} pub={tag[1]} />
-            </a>
-          );
+          if (tag[0] === 'p') {
+            // profile
+            const link = `/profile/${tag[1]}`;
+            return (
+              <a href={link}>
+                @<Name key={match + i} pub={tag[1]} />
+              </a>
+            );
+          } else if (tag[0] === 'e') {
+            // event
+            return;
+          }
         }
         return match;
       });
