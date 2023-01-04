@@ -67,9 +67,10 @@ const NostrSettings = () => {
     }
   }
 
-  let myPriv = iris.session.getKey().secp256k1.priv;
-  if (myPriv) {
-    myPriv = bech32.encode('nsec', Buffer.from(myPriv, 'hex'));
+  const myPrivHex = iris.session.getKey().secp256k1.priv;
+  let myPriv32;
+  if (myPrivHex) {
+    myPriv32 = bech32.encode('nsec', Buffer.from(myPrivHex, 'hex'));
   }
   let myPub = iris.session.getKey().secp256k1.rpub;
   myPub = bech32.encode('npub', Buffer.from(myPub, 'hex'));
@@ -95,10 +96,15 @@ const NostrSettings = () => {
             Private key
           </div>
           <div className="flex-cell no-flex">
-            {myPriv ? (
-              <CopyButton
-              copyStr={myPriv}
-              text="Copy private key" />
+            {myPrivHex ? (
+              <>
+                <CopyButton
+                copyStr={myPrivHex}
+                text="Copy hex" />
+                <CopyButton
+                copyStr={myPriv32}
+                text="Copy nsec" />
+              </>
             ) : (
               <p>Not present</p>
             )}
