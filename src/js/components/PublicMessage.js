@@ -493,6 +493,15 @@ class PublicMessage extends Message {
                 </div>
               `
             : ''}
+          ${this.props.standalone || s.showReplyForm
+            ? html`
+                <${FeedMessageForm}
+                  autofocus=${!this.props.standalone}
+                  replyingTo=${this.props.hash}
+                  replyingToUser=${s.msg.info.from}
+                />
+              `
+            : ''}
           ${(this.props.showReplies || s.showReplyForm) && s.sortedReplies && s.sortedReplies.length
             ? s.sortedReplies.map(
                 (r) =>
@@ -504,15 +513,6 @@ class PublicMessage extends Message {
                     showReplies=${true}
                   />`,
               )
-            : ''}
-          ${this.props.standalone || s.showReplyForm
-            ? html`
-                <${FeedMessageForm}
-                  autofocus=${!this.props.standalone}
-                  replyingTo=${this.props.hash}
-                  replyingToUser=${s.msg.info.from}
-                />
-              `
             : ''}
         </div>
       </div>
