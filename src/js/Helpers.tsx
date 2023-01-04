@@ -61,8 +61,9 @@ export default {
       return (
         <iframe
           key={match + i}
-          width="560"
-          height="315"
+          width="650"
+          height="400"
+          style={{ maxWidth: '100%' }}
           src={`https://www.youtube.com/embed/${match}`}
           frameBorder="0"
           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
