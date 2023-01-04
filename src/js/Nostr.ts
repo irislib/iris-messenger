@@ -347,7 +347,7 @@ export default {
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
   }, 100),
-  subscribe: function (filters: Filter[], cb: Function | undefined) {
+  subscribe: function (filters: Filter[], cb?: Function) {
     cb &&
       this.subscriptions.set(subscriptionId++, {
         filters,
@@ -749,8 +749,7 @@ export default {
           );
       });
   },
-
-  getRepliesAndLikes(id: string, cb: Function | undefined) {
+  getRepliesAndLikes(id: string, cb?: Function) {
     const callback = () => {
       cb &&
         cb(
@@ -762,25 +761,20 @@ export default {
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }
-
     this.subscribe([{ kinds: [1, 7], '#e': [id] }], callback);
   },
-  getFollowedByUser: function (address: string, cb: Function | undefined) {
+  getFollowedByUser: function (address: string, cb?: Function) {
     const callback = () => {
-      cb && cb(this.followedByUser.get(address));
+      cb?.(this.followedByUser.get(address));
     };
-    if (this.followedByUser.has(address)) {
-      callback();
-    }
+    this.followedByUser.has(address) && callback();
     this.subscribe([{ kinds: [3], authors: [address] }], callback);
   },
-  getFollowersByUser: function (address: string, cb: Function | undefined) {
+  getFollowersByUser: function (address: string, cb?: Function) {
     const callback = () => {
-      cb && cb(this.followersByUser.get(address));
+      cb?.(this.followersByUser.get(address));
     };
-    if (this.followersByUser.has(address)) {
-      callback();
-    }
+    this.followersByUser.has(address) && callback();
     this.subscribe([{ kinds: [3], '#p': [address] }], callback);
   },
   async getMessageById(id: string) {
@@ -809,67 +803,49 @@ export default {
 
   getMessagesByEveryone(cb: Function) {
     const callback = () => {
-      cb && cb(this.latestNotesByEveryone.eventIds);
+      cb(this.latestNotesByEveryone.eventIds);
     };
     callback();
     this.subscribe([{ kinds: [1, 5, 7] }], callback);
   },
   getMessagesByFollows(cb: Function) {
     const callback = () => {
-      cb && cb(this.latestNotesByFollows.eventIds);
+      cb(this.latestNotesByFollows.eventIds);
     };
     callback();
     this.subscribe([{ kinds: [1, 5, 7] }], callback);
   },
-  getPostsAndRepliesByUser(address: string, cb: Function | undefined) {
+  getPostsAndRepliesByUser(address: string, cb?: Function) {
     // TODO subscribe on view profile and unsub on leave profile
-    if (!address) {
-      return;
-    }
     this.knownUsers.add(address);
     const callback = () => {
-      cb && cb(this.postsAndRepliesByUser.get(address)?.eventIds);
+      cb?.(this.postsAndRepliesByUser.get(address)?.eventIds);
     };
-    if (this.postsAndRepliesByUser.has(address)) {
-      callback();
-    }
+    this.postsAndRepliesByUser.has(address) && callback();
     this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
-  getPostsByUser(address: string, cb: Function | undefined) {
-    if (!address) {
-      return;
-    }
+  getPostsByUser(address: string, cb?: Function) {
     this.knownUsers.add(address);
     const callback = () => {
-      cb && cb(this.postsByUser.get(address)?.eventIds);
+      cb?.(this.postsByUser.get(address)?.eventIds);
     };
-    if (this.postsByUser.has(address)) {
-      callback();
-    }
+    this.postsByUser.has(address) && callback();
     this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
-  getLikesByUser(address: string, cb: Function | undefined) {
-    if (!address) {
-      return;
-    }
+  getLikesByUser(address: string, cb?: Function) {
     this.knownUsers.add(address);
     const callback = () => {
-      cb && cb(this.likesByUser.get(address).eventIds);
+      cb?.(this.likesByUser.get(address).eventIds);
     };
-    if (this.likesByUser.has(address)) {
-      callback();
-    }
+    this.likesByUser.has(address) && callback();
     this.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
   },
-  getProfile(address, cb: Function | undefined) {
+  getProfile(address, cb?: Function) {
     this.knownUsers.add(address);
     const callback = () => {
-      const profile = this.profiles.get(address);
-      cb && cb(profile, address);
+      cb?.(this.profiles.get(address), address);
     };
-    if (this.profiles.has(address)) {
-      callback();
-    }
+    this.profiles.has(address) && callback();
 
     this.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
   },

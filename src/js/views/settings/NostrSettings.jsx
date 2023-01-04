@@ -99,11 +99,13 @@ const NostrSettings = () => {
             {myPrivHex ? (
               <>
                 <CopyButton
-                copyStr={myPrivHex}
-                text="Copy hex" />
+                  notShareable={true}
+                  copyStr={myPrivHex}
+                  text="Copy hex" />
                 <CopyButton
-                copyStr={myPriv32}
-                text="Copy nsec" />
+                  notShareable={true}
+                  copyStr={myPriv32}
+                  text="Copy nsec" />
               </>
             ) : (
               <p>Not present</p>
