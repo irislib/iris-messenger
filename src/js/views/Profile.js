@@ -573,12 +573,14 @@ class Profile extends View {
         lightning = 'lightning:' + lightning;
       }
 
+      let website = data.website && (data.website.match(/^https?:\/\//) ? data.website : 'http://' + data.website)
+
       this.setState({
         name: data.name,
         about: data.about,
         photo: data.photo,
         lightning,
-        website: data.website,
+        website: website,
       });
     });
   }
