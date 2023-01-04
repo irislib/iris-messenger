@@ -14,6 +14,7 @@ import Identicon from './Identicon';
 import Message from './Message';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
+import CopyButton from "./CopyButton";
 
 const MSG_TRUNCATE_LENGTH = 1000;
 
@@ -383,19 +384,25 @@ class PublicMessage extends Message {
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
               ${name && this.props.showName && html`<small class="msgSenderName">${name}</small>`}
             </div>
-            ${s.msg.info.isMine
-              ? html`
-                  <div class="msg-menu-btn">
-                    <div class="dropdown">
-                      <div class="dropbtn">…</div>
-                      <div class="dropdown-content">
-                        <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> -->
-                        <a href="#" onClick=${(e) => this.onBroadcast(e)}>Re-broadcast</a>
-                      </div>
-                    </div>
-                  </div>
-                `
-              : ''}
+            <div class="msg-menu-btn">
+              <div class="dropdown">
+                <div class="dropbtn">…</div>
+                <div class="dropdown-content">
+                    <${CopyButton}
+                      key=${`${this.props.hash}copy`}
+                      text=${t('copy_note_ID')}
+                      title="Note ID"
+                      copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
+                    />
+                    ${s.msg.info.isMine
+                      ? html`
+                          <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> -->
+                        `
+                      : ''}
+                  <a href="#" onClick=${(e) => this.onBroadcast(e)}>Re-broadcast</a>
+                </div>
+              </div>
+            </div>
           </div>
           ${this.props.standalone
             ? html`

@@ -227,16 +227,15 @@ class Profile extends View {
                     title=${this.state.name}
                     copyStr=${window.location.href}
                   />
+                  <${CopyButton}
+                    key=${`${this.props.id}copy`}
+                    text=${t('copy_npub')}
+                    title=${this.state.name}
+                    copyStr=${this.props.id}
+                  />
                   <${Button} onClick=${() => $(this.qrRef.current).toggle()}
                     >${t('show_qr_code')}<//
                   >
-                  ${this.state.isMyProfile
-                    ? ''
-                    : html`
-                        <${Button} class="show-settings" onClick=${() => this.onClickSettings()}
-                          >${t('settings')}<//
-                        >
-                      `}
                 </div>
               </div>
             </div>
@@ -555,7 +554,8 @@ class Profile extends View {
     Nostr.getFollowersByUser(address, setFollowCounts);
     Nostr.getFollowedByUser(address, setFollowCounts);
     Nostr.getProfile(address, (data, addr) => {
-      if (!data) return;
+      addr = Nostr.toNostrBech32Address(addr, 'npub');
+      if (!data || addr !== this.props.id) return;
       const profile = Object.assign(
         {},
         {
@@ -565,7 +565,7 @@ class Profile extends View {
           photo: data.photo,
         },
       );
-      Nostr.toNostrBech32Address(addr, 'npub') === this.props.id && this.setState(profile);
+      this.setState(profile);
     });
   }
 

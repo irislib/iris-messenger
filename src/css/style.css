@@ -1265,6 +1265,14 @@ a.msg {
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   z-index: 1;
+  background-color: var(--msg-content-background);
+  opacity: 0.95;
+  text-align: right;
+}
+
+.dropdown-content button {
+  padding: 5px 15px;
+  margin: 5px;
 }
 
 /* Links inside the dropdown */
@@ -1996,7 +2004,6 @@ form.public {
   flex: 1;
 }
 
-.profile-actions button,
 .feed-container > p button {
   margin-right: 5px;
   margin-bottom: 5px;
