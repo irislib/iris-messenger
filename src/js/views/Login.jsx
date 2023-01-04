@@ -6,37 +6,11 @@ import { Component } from 'preact';
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
 import * as secp from '@noble/secp256k1';
-import WalletConnectProvider from '@walletconnect/web3-provider';
-import Web3Modal from 'web3modal';
-import Web3 from 'web3';
 import iris from 'iris-lib';
 import _ from 'lodash';
 import { route } from 'preact-router';
 import Nostr from "../Nostr";
 const bech32 = require('bech32-buffer');
-
-async function ethereumConnect() {
-  const providerOptions = {
-    walletconnect: {
-      package: WalletConnectProvider,
-      options: {
-        infuraId: '4bd8d95876de48e0b17d56c0da31880a',
-      },
-    },
-  };
-  const web3Modal = new Web3Modal({
-    network: 'mainnet',
-    providerOptions,
-    theme: 'dark',
-  });
-
-  web3Modal.on('accountsChanged', (provider) => {
-    console.log('connect', provider);
-  });
-
-  const provider = await web3Modal.connect();
-  return new Web3(provider);
-}
 
 function maybeGoToChat(key) {
   let chatId = iris.util.getUrlParameter('chatWith') || iris.util.getUrlParameter('channelId');
@@ -84,33 +58,6 @@ async function nostrLogin(name) {
         }
       });
   }, 2000);
-}
-
-async function ethereumLogin(name) {
-  const web3 = await ethereumConnect();
-  const accounts = await web3.eth.getAccounts();
-
-  if (accounts.length > 0) {
-    const message =
-      "I'm trusting this application with an irrevocable access key to my Iris account.";
-    const signature = await web3.eth.personal.sign(message, accounts[0]);
-    const signatureBytes = hexToUint8Array(signature.substring(2));
-    const k = iris.Key.deriveFromBytes(signatureBytes);
-    await login(k);
-    setTimeout(async () => {
-      iris
-        .public()
-        .get('profile')
-        .get('name')
-        .once((existingName) => {
-          if (typeof existingName !== 'string' || existingName === '') {
-            name = name || iris.util.generateName();
-            iris.public().get('profile').put({ a: null });
-            iris.public().get('profile').get('name').put(name);
-          }
-        });
-    }, 2000);
-  }
 }
 
 class Login extends Component {

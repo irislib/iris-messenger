@@ -64,12 +64,10 @@
     "buffer": "^6.0.3",
     "websocket-polyfill": "^0.0.3",
     "@noble/secp256k1": "^1.7.0",
-    "@walletconnect/web3-provider": "^1.8.0",
     "@zxing/library": "^0.19.1",
     "aether-torrent": "^0.3.0",
     "alchemy-sdk": "^2.2.1",
     "bech32-buffer": "^0.2.1",
-    "elliptic": "^6.5.4",
     "fuse.js": "^6.6.2",
     "history": "5.3.0",
     "htm": "^3.1.1",
@@ -88,9 +86,7 @@
     "react-helmet": "^6.1.0",
     "react-string-replace": "^1.1.0",
     "react-virtualized": "^9.22.3",
-    "styled-components": "^5.3.6",
-    "web3": "^1.8.1",
-    "web3modal": "^1.9.9"
+    "styled-components": "^5.3.6"
   },
   "jest": {
     "preset": "jest-preset-preact",

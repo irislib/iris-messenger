@@ -56,7 +56,8 @@ export default {
       );
     });
 
-    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})(?:\S+)?/g;
+    const youtubeRegex =
+      /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})(?:\S+)?/g;
     replacedText = reactStringReplace(replacedText, youtubeRegex, (match, i) => {
       return (
         <iframe

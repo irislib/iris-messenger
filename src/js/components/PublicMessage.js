@@ -9,12 +9,12 @@ import Icons from '../Icons';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
+import CopyButton from './CopyButton';
 import FeedMessageForm from './FeedMessageForm';
 import Identicon from './Identicon';
 import Message from './Message';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
-import CopyButton from "./CopyButton";
 
 const MSG_TRUNCATE_LENGTH = 1000;
 
@@ -395,9 +395,7 @@ class PublicMessage extends Message {
                     copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
                   />
                   ${s.msg.info.isMine
-                    ? html`
-                        <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> -->
-                      `
+                    ? html` <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> --> `
                     : ''}
                   <a href="#" onClick=${(e) => this.onBroadcast(e)}>Broadcast</a>
                 </div>
