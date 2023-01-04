@@ -73,6 +73,16 @@ export default {
       );
     });
 
+    const lnRegex = /(lightning:[\w.-]+@[\w.-]+|lightning:\w+\?amount=\d+|(?:lightning:)?lnbc[\da-z]+)/g
+    replacedText = reactStringReplace(replacedText, lnRegex, (match, i) => {
+      if (!match.startsWith('lightning:')) {
+        match = `lightning:${match}`;
+      }
+      return (
+        <a href={match}>⚡ Pay with lightning</a>
+      )
+    });
+
     replacedText = reactStringReplace(replacedText, /(https?:\/\/\S+)/g, (match, i) => (
       <a key={match + i} href={match} target="_blank">
         {match}
