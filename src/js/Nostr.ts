@@ -67,20 +67,11 @@ type Subscription = {
   callback?: (event: Event) => void;
 };
 
-type Profile = {
-  created_at: number;
-  name?: string;
-  picture?: string;
-  about?: string;
-  lud16?: string;
-  website?: string;
-};
-
 let subscriptionId = 0;
 
 export default {
   localStorageLoaded: false,
-  profiles: new Map<string, Profile>(),
+  profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: 5,
@@ -594,26 +585,16 @@ export default {
       if (existing?.created_at >= event.created_at) {
         return;
       }
-      const content = JSON.parse(event.content);
-      const profile: Profile = { created_at: event.created_at };
-      content.name && (profile.name = content.name);
-      content.picture && (profile.picture = content.picture);
-      content.about && (profile.about = content.about);
-      content.lud16 && (profile.lud16 = content.lud16);
-      content.website && (profile.website = content.website);
+      const profile = JSON.parse(event.content);
+      profile.created_at = event.created_at;
       this.profiles.set(event.pubkey, profile);
       const key = this.toNostrBech32Address(event.pubkey, 'npub');
       iris.session.addToSearchIndex(key, {
         key,
-        name: content.name,
+        name: profile.name,
         followers: this.followersByUser.get(event.pubkey) ?? new Set(),
       });
       // if by our pubkey, save to iris
-      const myPub = iris.session.getKey().secp256k1.rpub;
-      if (event.pubkey === myPub) {
-        iris.public().get('profile').put(profile);
-        console.log('saved profile to iris', content);
-      }
       const existingEvent = this.profileEventByUser.get(event.pubkey);
       if (!existingEvent || existingEvent.created_at < event.created_at) {
         this.profileEventByUser.set(event.pubkey, event);
@@ -817,7 +798,7 @@ export default {
     this.likesByUser.has(address) && callback();
     this.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
   },
-  getProfile(address, cb?: (profile: Profile, address: string) => void) {
+  getProfile(address, cb?: (profile: any, address: string) => void) {
     this.knownUsers.add(address);
     const callback = () => {
       cb?.(this.profiles.get(address), address);
@@ -834,7 +815,6 @@ export default {
         kind: 0,
         content: JSON.stringify(data),
       };
-      console.log('setting metadata', event);
 
       this.publish(event);
     }, 1001);

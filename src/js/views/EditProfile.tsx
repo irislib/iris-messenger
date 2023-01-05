@@ -12,94 +12,111 @@ export default class EditProfile extends Component {
     super(props);
     this.state = {
       profile: {},
-      name: '',
-      picture: '',
-      about: '',
-      lud16: '',
-      website: '',
+      newFieldName: '',
+      newFieldValue: '',
     };
   }
 
   componentDidMount() {
-    let loaded = false;
     Nostr.getProfile(iris.session.getKey().secp256k1.rpub, (p) => {
-      console.log('profile', p);
-      if (!loaded) {
-        loaded = true;
+      if (Object.keys(this.state.profile).length === 0) {
+        delete p['created_at'];
         this.setState({
-          name: p.name,
-          picture: p.picture,
-          about: p.about,
-          lud16: p.lud16,
-          website: p.website,
           profile: p,
         });
       }
     });
   }
 
+  setProfileAttribute = (key, value) => {
+    const profile = this.state.profile;
+    if (value) {
+      profile[key] = value;
+    } else {
+      delete profile[key];
+    }
+    this.setState({ profile });
+  };
+
   handleSubmit = (event) => {
     event.preventDefault();
-    const updatedProfile = Object.assign(this.state.profile, {
-      name: this.state.name,
-      picture: this.state.picture,
-      about: this.state.about,
-      lud16: this.state.lud16,
-      website: this.state.website,
-    });
-    Nostr.setMetadata(updatedProfile);
+    Nostr.setMetadata(this.state.profile);
     const myPub = Nostr.toNostrBech32Address(iris.session.getKey().secp256k1.rpub, 'npub');
     route('/profile/' + myPub);
   };
 
+  handleAddField = (event) => {
+    event.preventDefault();
+    const fieldName = this.state.newFieldName;
+    const fieldValue = this.state.newFieldValue;
+    if (fieldName && fieldValue) {
+      this.setProfileAttribute(fieldName, fieldValue);
+      this.setState({ newFieldName: '', newFieldValue: '' });
+    }
+  };
+
   render() {
+    const fields = ['name', 'picture', 'about', 'website', 'lud16'];
+    // add other possible fields from profile
+    Object.keys(this.state.profile).forEach((key) => {
+      if (!fields.includes(key)) {
+        fields.push(key);
+      }
+    });
+    const explainers = {
+      lud16: 'Lightning (lud16)',
+    };
+
     return (
       <>
         <Header />
         <div class="main-view" id="settings">
           <div class="centered-container" style="width: 650px;padding: 15px;">
             <h3>{t('edit_profile')}</h3>
-            <form onSubmit={this.handleSubmit}>
-              <label htmlFor="name">Name:</label>
-              <input
-                type="text"
-                id="name"
-                value={this.state.name}
-                onInput={(e) => this.setState({ name: e.target.value })}
-              />
-              <br />
-              <label htmlFor="picture">Picture:</label>
-              <input
-                type="text"
-                id="picture"
-                value={this.state.picture}
-                onInput={(e) => this.setState({ picture: e.target.value })}
-              />
-              <br />
-              <label htmlFor="about">About:</label>
-              <textarea
-                id="about"
-                value={this.state.about}
-                onInput={(e) => this.setState({ about: e.target.value })}
-              />
-              <br />
-              <label htmlFor="lud16">Lightning (lud16):</label>
-              <input
-                type="text"
-                id="lud16"
-                value={this.state.lud16}
-                onInput={(e) => this.setState({ lud16: e.target.value })}
-              />
-              <br />
-              <label htmlFor="website">Website:</label>
-              <input
-                type="text"
-                id="website"
-                value={this.state.website}
-                onInput={(e) => this.setState({ website: e.target.value })}
-              />
-              <br />
-              <Button type="submit">Save</Button>
+            <form onSubmit={(e) => this.handleSubmit(e)}>
+              {fields.map((field) => (
+                <p>
+                  <label htmlFor={field}>{explainers[field] || field}:</label>
+                  <br />
+                  <input
+                    style={{ 'margin-top': '5px', width: '100%' }}
+                    type="text"
+                    id={field}
+                    value={this.state.profile[field] || ''}
+                    onInput={(e) => this.setProfileAttribute(field, e.target.value)}
+                  />
+                </p>
+              ))}
+              <p>
+                <Button type="submit">Save</Button>
+              </p>
+            </form>
+
+            <h4>Add new field</h4>
+            <form onSubmit={(e) => this.handleAddField(e)}>
+              <p>
+                <label htmlFor="newFieldName">Field name:</label>
+                <br />
+                <input
+                  value={this.state.newFieldName}
+                  type="text"
+                  id="newFieldName"
+                  style={{ 'margin-top': '5px', width: '100%' }}
+                  onInput={(e) => this.setState({ newFieldName: e.target.value })}
+                />
+              </p>
+              <p>
+                <label htmlFor="newFieldValue">Field value:</label>
+                <br />
+                <input
+                  value={this.state.newFieldValue}
+                  type="text"
+                  id="newFieldValue"
+                  style={{ 'margin-top': '5px', width: '100%' }}
+                  onInput={(e) => this.setState({ newFieldValue: e.target.value })}
+                />
+              </p>
+              <Button type="submit">Add new attribute</Button>
             </form>
           </div>
         </div>

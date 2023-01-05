@@ -466,22 +466,23 @@ class Profile extends View {
     };
     Nostr.getFollowersByUser(address, setFollowCounts);
     Nostr.getFollowedByUser(address, setFollowCounts);
-    Nostr.getProfile(address, (data, addr) => {
+    Nostr.getProfile(address, (profile, addr) => {
       addr = Nostr.toNostrBech32Address(addr, 'npub');
-      if (!data || addr !== this.props.id) return;
-      let lud16 = data.lud16;
+      if (!profile || addr !== this.props.id) return;
+      let lud16 = profile.lud16;
       if (lud16 && !lud16.startsWith('lightning:')) {
         lud16 = 'lightning:' + lud16;
       }
 
       let website =
-        data.website &&
-        (data.website.match(/^https?:\/\//) ? data.website : 'http://' + data.website);
+        profile.website &&
+        (profile.website.match(/^https?:\/\//) ? profile.website : 'http://' + profile.website);
 
+      // profile may contain arbitrary fields, so be careful
       this.setState({
-        name: data.name,
-        about: data.about,
-        picture: data.picture,
+        name: profile.name,
+        about: profile.about,
+        picture: profile.picture,
         lud16,
         website: website,
       });
