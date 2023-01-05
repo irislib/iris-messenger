@@ -7,7 +7,7 @@ import Filters from '../components/Filters';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import OnboardingNotification from '../components/OnboardingNotification';
-import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
+import ProfilePicturePicker from '../components/ProfilePicturePicker';
 import SafeImg from '../components/SafeImg';
 import Text from '../components/Text';
 import { translate as t } from '../translations/Translation';
@@ -36,23 +36,23 @@ class Store extends View {
     const chat = iris.private(user);
     const uuid = chat && chat.uuid;
     const followable = !(this.isMyProfile || user.length < 40);
-    let profilePhoto;
+    let profilePicture;
     if (this.isMyProfile) {
-      profilePhoto = html`<${ProfilePhotoPicker}
-        currentPhoto=${this.state.photo}
+      profilePicture = html`<${ProfilePicturePicker}
+        currentPicture=${this.state.picture}
         placeholder=${user}
-        callback=${(src) => this.onProfilePhotoSet(src)}
+        callback=${(src) => this.onProfilePictureSet(src)}
       />`;
-    } else if (this.state.photo) {
-      profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo} />`;
+    } else if (this.state.picture) {
+      profilePicture = html`<${SafeImg} class="profile-picture" src=${this.state.picture} />`;
     } else {
-      profilePhoto = html`<${Identicon} str=${user} width="250" />`;
+      profilePicture = html`<${Identicon} str=${user} width="250" />`;
     }
     return html`
       <div class="content">
         <div class="profile-top">
           <div class="profile-header">
-            <div class="profile-photo-container">${profilePhoto}</div>
+            <div class="profile-picture-container">${profilePicture}</div>
             <div class="profile-header-stuff">
               <h3 class="profile-name">
                 <${Text} path=${t('profile_name')} placeholder=${t('name')} user=${user} />
@@ -141,7 +141,7 @@ class Store extends View {
               class="thumbnail-item store-item"
               onClick=${() => route(`/product/${k}/${i.from}`)}
             >
-              <${SafeImg} src=${i.photo || ''} />
+              <${SafeImg} src=${i.picture || ''} />
               <a href="/product/${k}/${i.from || this.props.store}" class="name">${i.name}</a>
               ${this.props.store
                 ? ''

@@ -6,11 +6,8 @@ import Helpers from '../../Helpers';
 import Icons from '../../Icons';
 import { route } from 'preact-router';
 import $ from 'jquery';
-import { filter } from 'lodash';
 import Button from '../../components/basic/Button';
 import { forEach } from 'lodash';
-
-import React, { useState } from 'react';
 
 export default class PeerSettings extends Component {
   updatePeersFromGunInterval = 0;

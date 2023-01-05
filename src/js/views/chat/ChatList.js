@@ -117,7 +117,7 @@ class ChatList extends Component {
           ${sortedChats.map(
             (chat) =>
               html`<${ChatListItem}
-                photo=${chat.photo}
+                picture=${chat.picture}
                 active=${chat.id === activeChat}
                 key=${chat.id}
                 chat=${chat}

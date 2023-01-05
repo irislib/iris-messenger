@@ -14,8 +14,7 @@ import FeedMessageForm from '../components/FeedMessageForm';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import MessageFeed from '../components/MessageFeed';
-import ProfilePhoto from '../components/ProfilePhoto';
-import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
+import ProfilePicture from '../components/ProfilePicture';
 import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
 import Nostr from '../Nostr';
@@ -75,25 +74,8 @@ class Profile extends View {
     this.qrRef = createRef();
   }
 
-  onProfilePhotoSet(src) {
-    iris.public().get('profile').get('photo').put(src);
-    iris.public().get('profile').get('nftPfp').put(false);
-  }
-
-  onAboutInput(e) {
-    const about = $(e.target).text().trim();
-    iris.public().get('profile').get('about').put(about);
-  }
-
   onClickSettings() {
     $('#chat-settings').toggle();
-  }
-
-  onNameInput(e) {
-    const name = $(e.target).text().trim();
-    if (name.length) {
-      iris.public().get('profile').get('name').put(name);
-    }
   }
 
   getNotification() {
@@ -170,10 +152,10 @@ class Profile extends View {
         class="profile-links"
         style="flex:1; display: flex; flex-direction: row; align-items: center;"
       >
-        ${this.state.lightning
+        ${this.state.lud16
           ? html`
               <div style="flex:1">
-                <a href=${this.state.lightning}>⚡ Tip</a>
+                <a href=${this.state.lud16}>⚡ Tip</a>
               </div>
             `
           : ''}
@@ -191,20 +173,17 @@ class Profile extends View {
   }
 
   renderDetails() {
-    let profilePhoto;
-    if (this.state.isMyProfile) {
-      profilePhoto = html`<${ProfilePhotoPicker}
-        currentPhoto=${this.state.photo}
-        placeholder=${this.props.id}
-        callback=${(src) => this.onProfilePhotoSet(src)}
+    let profilePicture;
+    if (this.state.picture && !this.state.blocked) {
+      profilePicture = html`<${ProfilePicture}
+        key=${this.props.id}
+        picture=${this.state.picture}
       />`;
-    } else if (this.state.photo && !this.state.blocked) {
-      profilePhoto = html`<${ProfilePhoto} key=${this.props.id} photo=${this.state.photo} />`;
     } else {
-      profilePhoto = html`<${Identicon}
+      profilePicture = html`<${Identicon}
         key=${this.props.id}
         str=${this.props.id}
-        hidePhoto=${true}
+        hidePicture=${true}
         width="250"
       />`;
     }
@@ -212,23 +191,17 @@ class Profile extends View {
     return html`
       <div class="profile-top">
         <div class="profile-header">
-          <div class="profile-photo-container">${profilePhoto}</div>
+          <div class="profile-picture-container">${profilePicture}</div>
           <div class="profile-header-stuff">
             <div style="display:flex; flex-direction:row;">
-              <h3
-                style="flex: 1"
-                class="profile-name"
-                placeholder=${this.state.isMyProfile ? t('name') : ''}
-                contenteditable=${this.state.isMyProfile}
-                onInput=${(e) => this.onNameInput(e)}
-              >
+              <h3 style="flex: 1" class="profile-name">
                 ${this.state.name || this.props.id.slice(0, 4) + '...' + this.props.id.slice(-4)}
               </h3>
               <div class="dropdown profile-actions">
                 <div class="dropbtn">…</div>
                 <div class="dropdown-content">
                   ${this.state.isMyProfile
-                    ? ''
+                    ? html`<${Button} onClick=${() => route('/profile/edit')}>Edit profile<//>`
                     : html`<${BlockButton} key=${`${this.props.id}block`} id=${this.props.id} />`}
                   <${CopyButton}
                     key=${`${this.props.id}copyLink`}
@@ -250,14 +223,7 @@ class Profile extends View {
             </div>
 
             <div class="profile-about hidden-xs">
-              <p
-                class="profile-about-content"
-                placeholder=${this.state.isMyProfile ? t('about') : ''}
-                contenteditable=${this.state.isMyProfile}
-                onInput=${(e) => this.onAboutInput(e)}
-              >
-                ${this.state.about}
-              </p>
+              <p class="profile-about-content">${this.state.about}</p>
               ${this.renderLinks()}
             </div>
             ${this.state.nostr
@@ -306,28 +272,20 @@ class Profile extends View {
           ${this.state.isMyProfile
             ? ''
             : html`
-  
-                  <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                  ${this.state.showBetaFeatures
-                    ? html`
-                        <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
-                          >${t('send_message')}<//
-                        >
-                      `
-                    : ''}
+                <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
+                ${this.state.showBetaFeatures
+                  ? html`
+                      <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
+                        >${t('send_message')}<//
+                      >
+                    `
+                  : ''}
               `}
         </div>
-        ${this.state.isMyProfile || this.state.about
+        ${this.state.about
           ? html`
               <div class="profile-about visible-xs-flex">
-                <p
-                  class="profile-about-content"
-                  placeholder=${this.state.isMyProfile ? t('about') : ''}
-                  contenteditable=${this.state.isMyProfile}
-                  onInput=${(e) => this.onAboutInput(e)}
-                >
-                  ${this.state.about}
-                </p>
+                <p class="profile-about-content">${this.state.about}</p>
               </div>
             `
           : ''}
@@ -352,61 +310,6 @@ class Profile extends View {
         >
       </div>
     `;
-  }
-
-  useAsPfp(nft, e) {
-    e.preventDefault();
-    let src = this.getSrcForNft(nft, false);
-    if (src.indexOf('data:image') === 0) {
-      iris.public().get('profile').get('photo').put(src);
-    } else {
-      // load image and convert to base64
-      const img = new Image();
-      if (src.indexOf('ipfs://') === 0) {
-        src = `https://ipfs.io/ipfs/${src.substring(7)}`;
-      }
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const dataURL = canvas.toDataURL('image/png');
-        iris.public().get('profile').get('photo').put(dataURL);
-      };
-    }
-    $('.main-view').animate(
-      {
-        scrollTop: 0,
-      },
-      'slow',
-    );
-  }
-
-  getSrcForNft(nft, thumbnail = true) {
-    let src = '';
-    if (nft.rawMetadata.image_url) {
-      src = nft.rawMetadata.image_url;
-    } else if (nft.rawMetadata.image) {
-      src = nft.rawMetadata.image;
-    } else if (nft.media && nft.media[0]) {
-      if (nft.media[0].gateway) {
-        src = nft.media[0].gateway;
-      }
-      src = nft.media[0].raw;
-    }
-    if (src && src.indexOf('data:image') !== 0) {
-      if (src && src.indexOf('ipfs://') === 0) {
-        src = `https://ipfs.io/ipfs/${src.substring(7)}`;
-      } else if (src && src.indexOf('https://ipfs.io/ipfs/') !== 0) {
-        src = `https://proxy.irismessengers.wtf/insecure/${
-          thumbnail ? 'rs:fill:520:520/' : ''
-        }plain/${src}`;
-      }
-    }
-    return src;
   }
 
   renderTab() {
@@ -566,9 +469,9 @@ class Profile extends View {
     Nostr.getProfile(address, (data, addr) => {
       addr = Nostr.toNostrBech32Address(addr, 'npub');
       if (!data || addr !== this.props.id) return;
-      let lightning = data.lightning;
-      if (lightning && !lightning.startsWith('lightning:')) {
-        lightning = 'lightning:' + lightning;
+      let lud16 = data.lud16;
+      if (lud16 && !lud16.startsWith('lightning:')) {
+        lud16 = 'lightning:' + lud16;
       }
 
       let website =
@@ -578,84 +481,11 @@ class Profile extends View {
       this.setState({
         name: data.name,
         about: data.about,
-        photo: data.photo,
-        lightning,
+        picture: data.picture,
+        lud16,
         website: website,
       });
     });
-  }
-
-  getProfileDetails() {
-    const pub = this.props.id;
-    iris
-      .public(pub)
-      .get('follow')
-      .map()
-      .on(
-        this.sub((following, key) => {
-          if (following) {
-            this.followedUsers.add(key);
-          } else {
-            this.followedUsers.delete(key);
-          }
-          this.setState({ followedUserCount: this.followedUsers.size });
-        }),
-      );
-    iris.group().count(
-      `follow/${pub}`,
-      this.sub((followerCount) => {
-        this.setState({ followerCount });
-      }),
-    );
-    iris
-      .public(pub)
-      .get('profile')
-      .get('nostr')
-      .on(
-        this.sub(async (nostr) => {
-          try {
-            nostr = JSON.parse(nostr);
-            const valid = await iris.Key.schnorrVerify(nostr.sig, pub, nostr.rpub);
-            valid && this.setState({ nostr: nostr.rpub });
-          } catch (e) {
-            console.log('nostr parse error', e);
-          }
-        }),
-      );
-    iris
-      .public(pub)
-      .get('profile')
-      .get('name')
-      .on(
-        this.sub((name) => {
-          if (!$('#profile .profile-name:focus').length) {
-            this.setState({ name });
-          }
-        }),
-      );
-    iris
-      .public(pub)
-      .get('profile')
-      .get('photo')
-      .on(
-        this.sub((photo) => {
-          this.setState({ photo });
-          this.setOgImageUrl(photo);
-        }),
-      );
-    iris
-      .public(pub)
-      .get('profile')
-      .get('about')
-      .on(
-        this.sub((about) => {
-          if (!$('#profile .profile-about-content:focus').length) {
-            this.setState({ about });
-          } else {
-            $('#profile .profile-about-content:not(:focus)').text(about);
-          }
-        }),
-      );
   }
 
   componentDidUpdate(prevProps) {
@@ -689,10 +519,10 @@ class Profile extends View {
       iris: nostrNpub && isMyProfile ? iris.session.getPubKey() : null,
       eth: null,
       name: '',
-      photo: '',
+      picture: '',
       about: '',
       blocked: false,
-      lightning: null,
+      lud16: null,
       website: null,
     });
     const chat = iris.private(pub);
@@ -712,11 +542,7 @@ class Profile extends View {
     iris.local().get('settings').get('showBetaFeatures').on(this.inject());
     // if pub is hex, it's a nostr address
     const nostrAddr = Nostr.toNostrHexAddress(pub);
-    if (nostrAddr) {
-      this.getNostrProfile(nostrAddr);
-    } else {
-      this.getProfileDetails();
-    }
+    this.getNostrProfile(nostrAddr);
     if (chat) {
       $(`input[name=notificationPreference][value=${chat.notificationSetting}]`).attr(
         'checked',
@@ -756,11 +582,11 @@ class Profile extends View {
         });
       }),
     );
-    if (this.isUserAgentCrawler() && !this.state.ogImageUrl && !this.state.photo) {
+    if (this.isUserAgentCrawler() && !this.state.ogImageUrl && !this.state.picture) {
       new iris.Attribute({ type: 'keyID', value: this.props.id })
         .identiconSrc({ width: 300, showType: false })
         .then((src) => {
-          if (!this.state.ogImageUrl && !this.state.photo) {
+          if (!this.state.ogImageUrl && !this.state.picture) {
             this.setOgImageUrl(src);
           }
         });

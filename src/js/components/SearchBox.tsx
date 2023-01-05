@@ -33,7 +33,7 @@ type ResultItem = {
   followers: Map<string, unknown>;
   followDistance: number;
   name?: string;
-  photo?: string;
+  picture?: string;
   uuid?: string;
 };
 
@@ -247,9 +247,9 @@ class SearchBox extends Component<Props, State> {
                 href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`}
                 onClick={(e) => this.onClick(e, i)}
               >
-                {i.photo ? (
+                {i.picture ? (
                   <div class="identicon-container">
-                    <img src={i.photo} class="round-borders" height={40} width={40} alt="" />
+                    <img src={i.picture} class="round-borders" height={40} width={40} alt="" />
                   </div>
                 ) : (
                   <Identicon key={`${i.key}ic`} str={i.key} width={40} />

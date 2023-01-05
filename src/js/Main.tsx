@@ -11,6 +11,7 @@ import VideoCall from './components/VideoCall';
 import { translationLoaded } from './translations/Translation';
 import About from './views/About';
 import Chat from './views/chat/Chat';
+import EditProfile from './views/EditProfile';
 import Feed from './views/Feed';
 import Follows from './views/Follows';
 import Group from './views/Group';
@@ -162,6 +163,7 @@ class Main extends Component<Props, ReactState> {
               <About path="/about" />
               <Settings path="/settings/:page?" />
               <LogoutConfirmation path="/logout" />
+              <EditProfile path="/profile/edit" />
               <Profile path="/profile/:id+" tab="profile" />
               <Profile path="/replies/:id+" tab="replies" />
               <Profile path="/likes/:id+" tab="likes" />

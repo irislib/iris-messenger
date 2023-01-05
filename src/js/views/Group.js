@@ -8,7 +8,7 @@ import Button from '../components/basic/Button';
 import CopyButton from '../components/CopyButton';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
-import ProfilePhotoPicker from '../components/ProfilePhotoPicker';
+import ProfilePicturePicker from '../components/ProfilePicturePicker';
 import SafeImg from '../components/SafeImg';
 import SearchBox from '../components/SearchBox';
 import { SMS_VERIFIER_PUB } from '../SMS';
@@ -31,8 +31,8 @@ class Group extends View {
     this.id = 'profile';
   }
 
-  onProfilePhotoSet(src) {
-    iris.private(this.props.id).put('photo', src);
+  onProfilePictureSet(src) {
+    iris.private(this.props.id).put('picture', src);
   }
 
   onAboutInput(e) {
@@ -189,24 +189,24 @@ class Group extends View {
 
   renderView() {
     const editable = this.state.isAdmin;
-    let profilePhoto;
+    let profilePicture;
     if (editable) {
-      profilePhoto = html`<${ProfilePhotoPicker}
-        currentPhoto=${this.state.photo}
+      profilePicture = html`<${ProfilePicturePicker}
+        currentPicture=${this.state.picture}
         placeholder=${this.props.id}
-        callback=${(src) => this.onProfilePhotoSet(src)}
+        callback=${(src) => this.onProfilePictureSet(src)}
       />`;
-    } else if (this.state.photo) {
-      profilePhoto = html`<${SafeImg} class="profile-photo" src=${this.state.photo} />`;
+    } else if (this.state.picture) {
+      profilePicture = html`<${SafeImg} class="profile-picture" src=${this.state.picture} />`;
     } else {
-      profilePhoto = html`<${Identicon} str=${this.props.id} width="250" />`;
+      profilePicture = html`<${Identicon} str=${this.props.id} width="250" />`;
     }
     return html`
       <div class="content">
         <${Helmet}><title>${this.state.name || 'Group'}</title><//>
         <div class="profile-top">
           <div class="profile-header">
-            <div class="profile-photo-container">${profilePhoto}</div>
+            <div class="profile-picture-container">${profilePicture}</div>
             <div class="profile-header-stuff">
               <h3
                 class="profile-name"
@@ -311,7 +311,7 @@ class Group extends View {
         this.setState({ name });
       }
     });
-    chat.on('photo', (photo) => this.setState({ photo }));
+    chat.on('picture', (picture) => this.setState({ picture }));
     chat.on('about', (about) => {
       if (!$('#profile .profile-about-content:focus').length) {
         this.setState({ about });
@@ -324,7 +324,7 @@ class Group extends View {
   componentDidMount() {
     const pub = this.props.id;
     console.log(this.props.id, 2);
-    this.setState({ name: '', photo: '', about: '' });
+    this.setState({ name: '', picture: '', about: '' });
     const chat = iris.private(pub);
     if (pub.length < 40) {
       if (!chat) {

@@ -69,9 +69,9 @@ class ChatListItem extends Component {
       name = html`📝 <b>${t('note_to_self')}</b>`;
     }
 
-    let iconEl = chat.photo
+    let iconEl = chat.picture
       ? html`<div class="identicon-container">
-          <img src="${chat.photo}" class="round-borders" height="49" width="49" alt="" />
+          <img src="${chat.picture}" class="round-borders" height="49" width="49" alt="" />
         </div>`
       : html`<${Identicon} str=${chat.id} width="49" />`;
 

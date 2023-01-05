@@ -58,8 +58,8 @@ class About extends Component {
               privacy.
             </p>
             <p>
-              Profile names, photos and online status are currently public. That can be changed when
-              advanced group permissions are developed.
+              Profile names, pictures and online status are currently public. That can be changed
+              when advanced group permissions are developed.
             </p>
             <p>Iris makes no guarantees of data persistence.</p>
             <p>

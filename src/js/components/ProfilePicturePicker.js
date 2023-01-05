@@ -9,8 +9,8 @@ import Button from './basic/Button';
 import Identicon from './Identicon';
 import SafeImg from './SafeImg';
 
-class ProfilePhotoPicker extends Component {
-  async useProfilePhotoClicked() {
+class ProfilePicturePicker extends Component {
+  async useProfilePictureClicked() {
     let canvas = this.cropper.getCroppedCanvas();
     let resizedCanvas = document.createElement('canvas');
     resizedCanvas.width = resizedCanvas.height = Math.min(canvas.width, 800);
@@ -19,7 +19,7 @@ class ProfilePhotoPicker extends Component {
       .resize(canvas, resizedCanvas)
       .then(() => {
         let src = resizedCanvas.toDataURL('image/jpeg');
-        // var src = $('#profile-photo-preview').attr('src');
+        // var src = $('#profile-picture-preview').attr('src');
         if (this.props.callback) {
           this.props.callback(src);
         }
@@ -27,21 +27,21 @@ class ProfilePhotoPicker extends Component {
       });
   }
 
-  cancelProfilePhotoClicked() {
+  cancelProfilePictureClicked() {
     this.setState({ preview: null });
   }
 
-  clickProfilePhotoInput() {
-    $('#profile-photo-input').click();
+  clickProfilePictureInput() {
+    $('#profile-picture-input').click();
   }
 
-  onProfilePhotoInputChange(e) {
+  onProfilePictureInputChange(e) {
     let files = e.target.files;
     if (files && files.length) {
       let file = files[0];
       /*
       if (file.size > 1024 * 200) {
-        $('#profile-photo-error').toggleClass('hidden', false);
+        $('#profile-picture-error').toggleClass('hidden', false);
         return console.error('file too big');
       }
       */
@@ -57,7 +57,7 @@ class ProfilePhotoPicker extends Component {
     this.cropper && this.cropper.destroy();
     if (this.state.preview) {
       import('../lib/cropper.min').then((Cropper) => {
-        this.cropper = new Cropper.default($('#profile-photo-preview')[0], {
+        this.cropper = new Cropper.default($('#profile-picture-preview')[0], {
           aspectRatio: 1,
           autoCropArea: 1,
           viewMode: 1,
@@ -69,49 +69,49 @@ class ProfilePhotoPicker extends Component {
   }
 
   render() {
-    const currentPhotoEl = this.state.preview
+    const currentPictureEl = this.state.preview
       ? ''
       : html`<${SafeImg}
-          class="picker profile-photo"
-          src=${this.props.currentPhoto}
-          onClick=${() => this.clickProfilePhotoInput()}
+          class="picker profile-picture"
+          src=${this.props.currentPicture}
+          onClick=${() => this.clickProfilePictureInput()}
         />`;
-    const previewPhotoEl = this.state.preview
-      ? html`<img id="profile-photo-preview" src=${this.state.preview} />`
+    const previewPictureEl = this.state.preview
+      ? html`<img id="profile-picture-preview" src=${this.state.preview} />`
       : '';
-    const addProfilePhotoBtn =
-      this.props.currentPhoto || this.state.preview
+    const addProfilePictureBtn =
+      this.props.currentPicture || this.state.preview
         ? ''
-        : html`<div class="picker profile-photo">
+        : html`<div class="picker profile-picture">
             <${Identicon}
               str=${this.props.placeholder}
               width="250"
-              onClick=${() => this.clickProfilePhotoInput()}
+              onClick=${() => this.clickProfilePictureInput()}
             />
           </div>`;
     return html`
-      <div class="profile-photo-picker ${this.state.preview ? 'open' : ''}">
-        ${currentPhotoEl} ${addProfilePhotoBtn}
-        <div id="profile-photo-preview-container">${previewPhotoEl}</div>
+      <div class="profile-picture-picker ${this.state.preview ? 'open' : ''}">
+        ${currentPictureEl} ${addProfilePictureBtn}
+        <div id="profile-picture-preview-container">${previewPictureEl}</div>
         <p>
           <input
-            name="profile-photo-input"
+            name="profile-picture-input"
             type="file"
             class="hidden"
-            id="profile-photo-input"
-            onChange=${(e) => this.onProfilePhotoInputChange(e)}
+            id="profile-picture-input"
+            onChange=${(e) => this.onProfilePictureInputChange(e)}
             accept="image/*"
           />
         </p>
-        <p id="profile-photo-error" class="${this.state.hasError ? '' : 'hidden'}">
-          ${t('profile_photo_too_big')}
+        <p id="profile-picture-error" class="${this.state.hasError ? '' : 'hidden'}">
+          ${t('profile_picture_too_big')}
         </p>
         <p class=${this.state.preview ? '' : 'hidden'}>
-          <${Button} id="cancel-profile-photo" onClick=${() => this.cancelProfilePhotoClicked()}
+          <${Button} id="cancel-profile-picture" onClick=${() => this.cancelProfilePictureClicked()}
             >${t('cancel')}<//
           >
-          <${Button} id="use-profile-photo" onClick=${() => this.useProfilePhotoClicked()}
-            >${t('use_photo')}<//
+          <${Button} id="use-profile-picture" onClick=${() => this.useProfilePictureClicked()}
+            >${t('use_picture')}<//
           >
         </p>
       </div>
@@ -119,4 +119,4 @@ class ProfilePhotoPicker extends Component {
   }
 }
 
-export default ProfilePhotoPicker;
+export default ProfilePicturePicker;

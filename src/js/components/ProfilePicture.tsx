@@ -7,14 +7,14 @@ import Helpers from '../Helpers';
 
 import SafeImg from './SafeImg';
 
-type Props = { photo?: string };
+type Props = { picture?: string };
 const ANIMATE_DURATION = 200;
 
-class ProfilePhoto extends Component<Props> {
+class ProfilePicture extends Component<Props> {
   render() {
     return html`<${SafeImg}
-      class="profile-photo"
-      src=${this.props.photo}
+      class="profile-picture"
+      src=${this.props.picture}
       onClick=${(e) => {
         this.imageClicked(e);
       }}
@@ -31,8 +31,8 @@ class ProfilePhoto extends Component<Props> {
     attachmentsPreview.fadeIn(ANIMATE_DURATION);
     let left, top, width, img;
 
-    if (this.props.photo) {
-      img = Helpers.setImgSrc($('<img>'), this.props.photo);
+    if (this.props.picture) {
+      img = Helpers.setImgSrc($('<img>'), this.props.picture);
       attachmentsPreview.css({ 'justify-content': 'center' });
       const original = $(event.target);
       left = original.offset().left;
@@ -109,4 +109,4 @@ class ProfilePhoto extends Component<Props> {
     }
   }
 }
-export default ProfilePhoto;
+export default ProfilePicture;

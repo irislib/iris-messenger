@@ -1692,7 +1692,7 @@ hr {
   flex: 1;
 }
 
-.has-photo .iris-identicon {
+.has-picture .iris-identicon {
   display: none;
 }
 
@@ -1911,20 +1911,20 @@ small,
   text-decoration: underline;
 }
 
-.picker.profile-photo {
+.picker.profile-picture {
   cursor: pointer;
 }
 
-.picker.profile-photo:hover {
+.picker.profile-picture:hover {
   opacity: 0.8;
 }
 
-.picker.profile-photo {
+.picker.profile-picture {
   max-height: 400px;
 }
 
 @media (max-width: 625px) {
-  .profile-photo-picker.open {
+  .profile-picture-picker.open {
     position: fixed;
     z-index: 10;
     background: rgba(0, 0, 0, 0.85);
@@ -1939,7 +1939,7 @@ small,
   }
 }
 
-#profile-photo-preview-container {
+#profile-picture-preview-container {
   max-width: 100%;
 }
 
@@ -2099,7 +2099,7 @@ input[type='text'] {
   line-height: 1.3em;
 }
 
-.profile-photo-container {
+.profile-picture-container {
   display: flex;
   align-items: center;
   flex: 1;
@@ -2107,7 +2107,7 @@ input[type='text'] {
   overflow: hidden;
 }
 
-.profile-photo {
+.profile-picture {
   border-radius: 50%;
   cursor: pointer;
   max-width: min(100%, 300px);
@@ -2400,7 +2400,7 @@ input[type='text'] {
     margin-left: -15px;
     margin-right: -15px;
   }
-  #current-profile-photo {
+  #current-profile-picture {
     max-width: none !important;
     max-height: none !important;
     width: 100%;
@@ -2438,7 +2438,7 @@ input[type='text'] {
   .chat-message-form button {
     padding: 5px 10px;
   }
-  .profile-photo-container .identicon-container * {
+  .profile-picture-container .identicon-container * {
     max-width: 80px;
     max-height: 80px;
     text-align: center;

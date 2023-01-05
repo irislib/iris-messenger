@@ -91,7 +91,7 @@ class Product extends StoreView {
               <iris-img
                 btn-class="btn btn-primary"
                 user=${this.props.store}
-                path="store/products/${this.props.product}/photo"
+                path="store/products/${this.props.product}/picture"
               />
               <p class="description">
                 <${Text}
@@ -155,7 +155,7 @@ class Product extends StoreView {
       followedUserCount: 0,
       followerCount: 0,
       name: '',
-      photo: '',
+      picture: '',
       about: '',
     });
     this.isMyProfile = iris.session.getPubKey() === pub;

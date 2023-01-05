@@ -70,9 +70,9 @@ type Subscription = {
 type Profile = {
   created_at: number;
   name?: string;
-  photo?: string;
+  picture?: string;
   about?: string;
-  lightning?: string;
+  lud16?: string;
   website?: string;
 };
 
@@ -597,9 +597,9 @@ export default {
       const content = JSON.parse(event.content);
       const profile: Profile = { created_at: event.created_at };
       content.name && (profile.name = content.name);
-      content.picture && (profile.photo = content.picture);
+      content.picture && (profile.picture = content.picture);
       content.about && (profile.about = content.about);
-      content.lud16 && (profile.lightning = content.lud16);
+      content.lud16 && (profile.lud16 = content.lud16);
       content.website && (profile.website = content.website);
       this.profiles.set(event.pubkey, profile);
       const key = this.toNostrBech32Address(event.pubkey, 'npub');
@@ -721,63 +721,6 @@ export default {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
           this.handledMsgsPerSecond = 0;
         }, 1000);
-
-        iris
-          .public()
-          .get('profile')
-          .get('name')
-          .on(
-            debounce((name, _k, msg) => {
-              const updatedAt = Math.floor(msg.put['>'] / 1000);
-              const profile = this.profileEventByUser.get(iris.session.getKey().secp256k1.rpub);
-              console.log('name changed', name, updatedAt, profile);
-              if (!profile || profile.created_at < updatedAt) {
-                console.log('updating name', name);
-                const data = JSON.parse(profile?.content || '{}');
-                if (data.name !== name) {
-                  data.name = name;
-                  this.setMetadata(data);
-                }
-              }
-            }, 3000),
-          );
-        iris
-          .public()
-          .get('profile')
-          .get('about')
-          .on(
-            debounce((about, _k, msg) => {
-              const updatedAt = Math.floor(msg.put['>'] / 1000);
-              const profile = this.profileEventByUser.get(iris.session.getKey().secp256k1.rpub);
-              console.log('about changed', about, updatedAt);
-              if (!profile || profile.created_at < updatedAt) {
-                const data = JSON.parse(profile?.content ?? '{}');
-                if (data.about !== about) {
-                  data.about = about;
-                  this.setMetadata(data);
-                }
-              }
-            }, 3000),
-          );
-        iris
-          .public()
-          .get('profile')
-          .get('photo')
-          .on(
-            debounce((photo, _k, msg) => {
-              return;
-              const updatedAt = Math.floor(msg.put['>'] / 1000);
-              const profile = this.profileEventByUser.get(iris.session.getKey().secp256k1.rpub);
-              console.log('photo changed', photo, updatedAt, this.profile);
-              if (!profile || profile.created_at < updatedAt) {
-                const data = JSON.parse(profile?.content ?? '{}');
-                if (data.picture !== photo) {
-                  data.picture = photo;
-                  this.setMetadata(data);
-                }
-              }
-            }, 3000),
-          );
       });
   },
   getRepliesAndLikes(
