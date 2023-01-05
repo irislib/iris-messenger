@@ -126,6 +126,9 @@ class Login extends Component {
     e.preventDefault();
     let name = document.getElementById('login-form-name').value || iris.util.generateName();
     iris.session.loginAsNewUser({ name, autofollow: false });
+    setTimeout(() => {
+      Nostr.setMetadata({ name });
+    }, 100);
     // follow the developer's nostr key also
     this.base.style = 'display:none';
   }
