@@ -1,10 +1,9 @@
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
+import { debounce } from 'lodash';
 
 import Button from '../components/basic/Button';
-import Identicon from '../components/Identicon';
-import Name from '../components/Name';
 import PublicMessage from '../components/PublicMessage';
+import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -12,49 +11,38 @@ import View from './View';
 const PAGE_SIZE = 10;
 
 export default class Notifications extends View {
-  notifications = {};
   class = 'public-messages-view';
   state = {
     displayCount: PAGE_SIZE,
+    notifications: [],
   };
 
-  componentDidMount() {
-    iris.notifications.changeUnseenNotificationCount(0);
-    iris
-      .local()
-      .get('notifications')
-      .map(
-        this.sub((notification, time) => {
-          if (notification) {
-            this.notifications[time] = notification;
-            iris.notifications.getNotificationText(notification).then((text) => {
-              this.notifications[time].text = text;
-              this.setState({});
-            });
-          } else {
-            delete this.notifications[time];
-          }
-          this.setState({ d: new Date().toISOString() });
-        }),
-      );
-  }
+  updateNotifications = debounce(
+    (notifications) => {
+      this.setState({ notifications });
+    },
+    1000,
+    { leading: true },
+  );
 
-  shouldComponentUpdate() {
-    return true;
+  componentDidMount() {
+    Nostr.getNotifications((notifications) => {
+      this.updateNotifications(notifications);
+    });
   }
 
   renderView() {
     const displayCount = this.state.displayCount;
-    const notificationKeys = Object.keys(this.notifications).sort().reverse();
     return html`
       <div class="centered-container" style="margin-bottom: 15px;">
-        <h3>${t('notifications')}</h3>
-
-        ${Object.keys(this.notifications).length === 0
+        <br class="hidden-xs" />
+        ${Object.keys(this.state.notifications).length === 0
           ? html` <p>${t('no_notifications_yet')}</p> `
           : ''}
-        ${notificationKeys.slice(0, this.state.displayCount).map((k) => {
-          const notification = this.notifications[k];
+        ${this.state.notifications.slice(0, this.state.displayCount).map((id) => {
+          if (!id) return;
+          return html` <${PublicMessage} key=${id} hash=${id} showName="{true}" /> `;
+          /*
           return html`
             <div
               class="msg"
@@ -78,16 +66,17 @@ export default class Notifications extends View {
               </div>
             </div>
           `;
+          */
         })}
-        ${displayCount < notificationKeys.length
+        ${displayCount < this.state.notifications.length
           ? html`
-              <div>
+              <p>
                 <${Button}
                   onClick=${() => this.setState({ displayCount: displayCount + PAGE_SIZE })}
                 >
                   ${t('show_more')}
                 <//>
-              </div>
+              </p>
             `
           : ''}
       </div>

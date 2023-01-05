@@ -271,22 +271,18 @@ class Header extends Component {
               </a>
             `
           : ''}
-        ${this.state.showBetaFeatures
-          ? html`
-              <${Link}
-                activeClassName="active"
-                href="/notifications"
-                class="notifications-button mobile-search-hidden ${this.state.showMobileSearch
-                  ? 'hidden'
-                  : ''}"
-              >
-                ${Icons.heartEmpty}
-                ${this.state.unseenNotificationCount
-                  ? html` <span class="unseen">${this.state.unseenNotificationCount}</span> `
-                  : ''}
-              <//>
-            `
-          : ''}
+        <${Link}
+          activeClassName="active"
+          href="/notifications"
+          class="notifications-button mobile-search-hidden ${this.state.showMobileSearch
+            ? 'hidden'
+            : ''}"
+        >
+          ${Icons.heartEmpty}
+          ${this.state.unseenNotificationCount
+            ? html` <span class="unseen">${this.state.unseenNotificationCount}</span> `
+            : ''}
+        <//>
 
         <${Link}
           activeClassName="active"

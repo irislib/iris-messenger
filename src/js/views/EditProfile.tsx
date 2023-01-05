@@ -9,7 +9,7 @@ import { translate as t } from '../translations/Translation';
 
 const explainers = {
   lud16: 'Lightning (lud16)',
-  picture: 'Picture url'
+  picture: 'Picture url',
 };
 
 export default class EditProfile extends Component {

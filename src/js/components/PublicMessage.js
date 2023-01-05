@@ -320,7 +320,11 @@ class PublicMessage extends Message {
           : ''}"
       >
         <div class="msg-content">
-          ${this.state.retrieving ? html`<div class="retrieving">Looking up message...</div>` : ''}
+          ${this.state.retrieving
+            ? html`<div class="retrieving">
+                Looking up message... ${Nostr.toNostrBech32Address(this.props.hash, 'note')}
+              </div>`
+            : ''}
         </div>
       </div>`;
     }

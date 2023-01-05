@@ -87,6 +87,7 @@ export default {
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
   messagesById: new Map<string, Event>(),
+  notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   profileEventByUser: new Map<string, Event>(),
@@ -202,7 +203,10 @@ export default {
   followerCount: function (address: string) {
     return this.followersByUser.get(address)?.size ?? 0;
   },
-  toNostrBech32Address: function (address: string, prefix) {
+  toNostrBech32Address: function (address: string, prefix: string) {
+    if (!prefix) {
+      throw new Error('prefix is required');
+    }
     try {
       const decoded = bech32.decode(address);
       console.log(decoded);
@@ -616,17 +620,26 @@ export default {
       }
     }
   },
+  maybeAddNotification(event: Event) {
+    // if we're mentioned in tags, add to notifications
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    if (event.pubkey !== myPub && event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
+      this.notifications.add(event);
+    }
+  },
   handleEvent(event: Event) {
     if (!event) return;
     if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
       return;
     }
     this.handledMsgsPerSecond++;
+
     switch (event.kind) {
       case 0:
         this.handleMetadata(event);
         break;
       case 1:
+        this.maybeAddNotification(event);
         this.handleNote(event);
         break;
       case 5:
@@ -677,7 +690,7 @@ export default {
     }
     if (
       filter['#p'] &&
-      !event.tags.some((tag: any) => tag[0] === 'e' && filter['#p'].includes(tag[1]))
+      !event.tags.some((tag: any) => tag[0] === 'p' && filter['#p'].includes(tag[1]))
     ) {
       return false;
     }
@@ -749,6 +762,13 @@ export default {
         msg && resolve(msg);
       });
     });
+  },
+  getNotifications: function (cb: (notifications: string[]) => void) {
+    const callback = () => {
+      cb(this.notifications.eventIds);
+    };
+    callback();
+    this.subscribe([{ '#p': iris.session.getKey().secp256k1.rpub }], callback);
   },
 
   getSomeRelayUrl() {
