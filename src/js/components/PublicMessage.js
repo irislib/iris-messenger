@@ -278,7 +278,8 @@ class PublicMessage extends Message {
     if (nostrId) {
       const event = Nostr.messagesById.get(nostrId);
       if (event) {
-        console.log('broadcasting');
+        // TODO indicate to user somehow
+        console.log('broadcasting', nostrId);
         Nostr.publish(event);
       }
     }
