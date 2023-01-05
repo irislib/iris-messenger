@@ -7,6 +7,11 @@ import Header from '../components/Header';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
+const explainers = {
+  lud16: 'Lightning (lud16)',
+  picture: 'Picture url'
+};
+
 export default class EditProfile extends Component {
   constructor(props) {
     super(props);
@@ -63,9 +68,6 @@ export default class EditProfile extends Component {
         fields.push(key);
       }
     });
-    const explainers = {
-      lud16: 'Lightning (lud16)',
-    };
 
     return (
       <>

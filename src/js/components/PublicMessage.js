@@ -410,6 +410,12 @@ class PublicMessage extends Message {
                     title="Note ID"
                     copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
                   />
+                  <${CopyButton}
+                    key=${`${this.props.hash}copyRaw`}
+                    text=${t('copy_raw_data')}
+                    title="Message raw data"
+                    copyStr=${JSON.stringify(this.state.msg.event, null, 2)}
+                  />
                   ${s.msg.info.isMine
                     ? html` <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> --> `
                     : ''}
