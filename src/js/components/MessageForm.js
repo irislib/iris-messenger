@@ -64,6 +64,15 @@ export default class MessageForm extends Component {
       }
       // TODO add p tags from replied event, and replied event.pubkey
     }
+    const taggedUsers = msg.text.match(/@npub\w+/g);
+    if (taggedUsers) {
+      event.tags = event.tags || [];
+      for (const tag of taggedUsers) {
+        const hexTag = Nostr.toNostrHexAddress(tag.slice(1));
+        event.tags.push(['p', hexTag]);
+      }
+    }
+    console.log('sending event', event);
     return Nostr.publish(event);
   }
 

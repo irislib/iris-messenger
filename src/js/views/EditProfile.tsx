@@ -87,7 +87,10 @@ export default class EditProfile extends Component {
                       id={field}
                       disabled={!isString}
                       value={isString ? val || '' : JSON.stringify(val)}
-                      onInput={(e) => isString && this.setProfileAttribute(field, e.target.value)}
+                      onInput={(e) =>
+                        isString &&
+                        this.setProfileAttribute(field, (e.target as HTMLInputElement).value)
+                      }
                     />
                   </p>
                 );
@@ -107,7 +110,9 @@ export default class EditProfile extends Component {
                   type="text"
                   id="newFieldName"
                   style={{ 'margin-top': '5px', width: '100%' }}
-                  onInput={(e) => this.setState({ newFieldName: e.target.value })}
+                  onInput={(e) =>
+                    this.setState({ newFieldName: (e.target as HTMLInputElement).value })
+                  }
                 />
               </p>
               <p>
@@ -118,7 +123,9 @@ export default class EditProfile extends Component {
                   type="text"
                   id="newFieldValue"
                   style={{ 'margin-top': '5px', width: '100%' }}
-                  onInput={(e) => this.setState({ newFieldValue: e.target.value })}
+                  onInput={(e) =>
+                    this.setState({ newFieldValue: (e.target as HTMLInputElement).value })
+                  }
                 />
               </p>
               <Button type="submit">Add new attribute</Button>
