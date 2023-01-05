@@ -164,22 +164,27 @@ class Profile extends View {
     `;
   }
 
-  // if window.ethereum is defined, suggest to sign a message with the user's ethereum account
-  renderEthereum() {
-    if (this.state.eth && this.state.eth.address) {
-      return html`
-        <p>
-          Eth:
-          <a href="https://etherscan.io/address/${this.state.eth.address}">
-            ${this.state.eth.address.slice(0, 4)}...${this.state.eth.address.slice(-4)}
-          </a>
-          <i> </i>
-          ${this.state.nfts.totalCount
-            ? html` <br /><a href="/nfts/${this.props.id}">NFT (${this.state.nfts.totalCount})</a> `
-            : ''}
-        </p>
-      `;
-    }
+  renderLinks() {
+    return html`
+      <div class="profile-links" style="flex:1; display: flex; flex-direction: row; align-items: center;">
+      ${this.state.lightning
+        ? html`
+            <div style="flex:1">
+              <a href=${this.state.lightning}>⚡ Tip</a>
+            </div>
+          `
+        : ''}
+      ${this.state.website
+        ? html`
+            <div style="flex:1">
+              <a href=${this.state.website}>
+                ${this.state.website.replace(/^https?:\/\//, '')}
+              </a>
+            </div>
+          `
+        : ''}
+      </div>
+    `;
   }
 
   renderDetails() {
@@ -200,6 +205,7 @@ class Profile extends View {
         width="250"
       />`;
     }
+    const hexPubKey = Nostr.toNostrHexAddress(this.props.id);
     return html`
       <div class="profile-top">
         <div class="profile-header">
@@ -249,27 +255,11 @@ class Profile extends View {
               >
                 ${this.state.about}
               </p>
-              ${this.state.lightning
-                ? html`
-                    <p>
-                      <a href=${this.state.lightning}>⚡ Tip</a>
-                    </p>
-                  `
-                : ''}
-              ${this.state.website
-                ? html`
-                    <p>
-                      <a href=${this.state.website}>
-                        ${this.state.website.replace(/^https?:\/\//, '')}
-                      </a>
-                    </p>
-                  `
-                : ''}
+              ${this.renderLinks()}
             </div>
             ${this.state.nostr
               ? html`<a href="/profile/${this.state.nostr}">Nostr profile</a>`
               : ''}
-            ${this.renderEthereum()}
             <div class="profile-actions">
               <div class="follow-count">
                 <a href="/follows/${this.props.id}">
@@ -279,8 +269,7 @@ class Profile extends View {
                   <span>${this.state.followerCount}</span> ${t('followers')}
                 </a>
               </div>
-              ${this.followedUsers.has(iris.session.getPubKey()) ||
-              this.followedUsers.has(iris.session.getKey().secp256k1.rpub)
+              ${Nostr.followedByUser.get(hexPubKey)?.has(iris.session.getKey().secp256k1.rpub)
                 ? html` <p><small>${t('follows_you')}</small></p> `
                 : this.props.id === SMS_VERIFIER_PUB
                 ? html`
@@ -313,6 +302,7 @@ class Profile extends View {
           ? ''
           : html`
               <div class="visible-xs-flex profile-actions" style="justify-content: flex-end">
+                  ${this.renderLinks()}
                 <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
                 ${this.state.showBetaFeatures
                   ? html`
@@ -698,7 +688,6 @@ class Profile extends View {
       photo: '',
       about: '',
       blocked: false,
-      ethereumAddress: null,
       nfts: [],
     });
     const chat = iris.private(pub);
