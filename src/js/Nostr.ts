@@ -809,14 +809,10 @@ export default {
   },
 
   setMetadata(data: any) {
-    setTimeout(async () => {
-      // for each child of this.profile, if it has a value, set it
-      const event = {
-        kind: 0,
-        content: JSON.stringify(data),
-      };
-
-      this.publish(event);
-    }, 1001);
+    const event = {
+      kind: 0,
+      content: JSON.stringify(data),
+    };
+    this.publish(event);
   },
 };

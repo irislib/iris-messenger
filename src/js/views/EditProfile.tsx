@@ -76,7 +76,7 @@ export default class EditProfile extends Component {
             <form onSubmit={(e) => this.handleSubmit(e)}>
               {fields.map((field) => {
                 const val = this.state.profile[field];
-                const isString = typeof val === 'string';
+                const isString = typeof val === 'string' || typeof val === 'undefined';
                 return (
                   <p>
                     <label htmlFor={field}>{explainers[field] || field}:</label>
