@@ -166,23 +166,26 @@ class Profile extends View {
 
   renderLinks() {
     return html`
-      <div class="profile-links" style="flex:1; display: flex; flex-direction: row; align-items: center;">
-      ${this.state.lightning
-        ? html`
-            <div style="flex:1">
-              <a href=${this.state.lightning}>⚡ Tip</a>
-            </div>
-          `
-        : ''}
-      ${this.state.website
-        ? html`
-            <div style="flex:1">
-              <a href=${this.state.website}>
-                ${this.state.website.replace(/^https?:\/\//, '')}
-              </a>
-            </div>
-          `
-        : ''}
+      <div
+        class="profile-links"
+        style="flex:1; display: flex; flex-direction: row; align-items: center;"
+      >
+        ${this.state.lightning
+          ? html`
+              <div style="flex:1">
+                <a href=${this.state.lightning}>⚡ Tip</a>
+              </div>
+            `
+          : ''}
+        ${this.state.website
+          ? html`
+              <div style="flex:1">
+                <a href=${this.state.website}>
+                  ${this.state.website.replace(/^https?:\/\//, '')}
+                </a>
+              </div>
+            `
+          : ''}
       </div>
     `;
   }
@@ -298,21 +301,22 @@ class Profile extends View {
           </div>
         </div>
 
-        ${this.state.isMyProfile
-          ? ''
-          : html`
-              <div class="visible-xs-flex profile-actions" style="justify-content: flex-end">
-                  ${this.renderLinks()}
-                <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                ${this.state.showBetaFeatures
-                  ? html`
-                      <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
-                        >${t('send_message')}<//
-                      >
-                    `
-                  : ''}
-              </div>
-            `}
+        <div class="visible-xs-flex profile-actions" style="justify-content: flex-end">
+          ${this.renderLinks()}
+          ${this.state.isMyProfile
+            ? ''
+            : html`
+  
+                  <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
+                  ${this.state.showBetaFeatures
+                    ? html`
+                        <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
+                          >${t('send_message')}<//
+                        >
+                      `
+                    : ''}
+              `}
+        </div>
         ${this.state.isMyProfile || this.state.about
           ? html`
               <div class="profile-about visible-xs-flex">
