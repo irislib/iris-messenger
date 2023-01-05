@@ -64,8 +64,9 @@ class Login extends Component {
   componentDidMount() {
     const el = document.getElementById('login-form-name');
     el && el.focus();
-    // re-render after 1 sec to make sure window.nostr is set
+    // re-render after a while sec to make sure window.nostr is set
     setTimeout(() => this.setState({}), 100);
+    setTimeout(() => this.setState({}), 1000);
   }
 
   toggleScanPrivKey() {
@@ -196,22 +197,22 @@ class Login extends Component {
                   </Button>
                 </p>
                 <br />
+                {window.nostr ? (
+                  <p>
+                    <a href="#" onClick={() => nostrLogin()}>
+                      {t('nostr_extension_login')}
+                    </a>
+                  </p>
+                ) : null}
                 <p>
                   <a
                     href="#"
                     id="show-existing-account-login"
                     onClick={() => this.setState({ showSwitchAccount: true })}
                   >
-                    {t('already_have_an_account')}
+                    {t('Private key login')}
                   </a>
                 </p>
-                {window.nostr ? (
-                  <p>
-                    <a href="#" onClick={() => nostrLogin()}>
-                      {t('nostr_login')}
-                    </a>
-                  </p>
-                ) : null}
                 <p>
                   <LanguageSelector />
                 </p>
