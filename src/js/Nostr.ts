@@ -646,9 +646,11 @@ export default {
         this.handleDelete(event);
         break;
       case 3:
+        // TODO if existing follow list doesn't include us and the new one does, add to notifications
         this.handleFollow(event);
         break;
       case 7:
+        // TODO like notifications
         this.handleReaction(event);
         break;
     }
