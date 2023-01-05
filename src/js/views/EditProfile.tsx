@@ -74,19 +74,24 @@ export default class EditProfile extends Component {
           <div class="centered-container" style="width: 650px;padding: 15px;">
             <h3>{t('edit_profile')}</h3>
             <form onSubmit={(e) => this.handleSubmit(e)}>
-              {fields.map((field) => (
-                <p>
-                  <label htmlFor={field}>{explainers[field] || field}:</label>
-                  <br />
-                  <input
-                    style={{ 'margin-top': '5px', width: '100%' }}
-                    type="text"
-                    id={field}
-                    value={this.state.profile[field] || ''}
-                    onInput={(e) => this.setProfileAttribute(field, e.target.value)}
-                  />
-                </p>
-              ))}
+              {fields.map((field) => {
+                const val = this.state.profile[field];
+                const isString = typeof val === 'string';
+                return (
+                  <p>
+                    <label htmlFor={field}>{explainers[field] || field}:</label>
+                    <br />
+                    <input
+                      style={{ 'margin-top': '5px', width: '100%' }}
+                      type="text"
+                      id={field}
+                      disabled={!isString}
+                      value={isString ? val || '' : JSON.stringify(val)}
+                      onInput={(e) => isString && this.setProfileAttribute(field, e.target.value)}
+                    />
+                  </p>
+                );
+              })}
               <p>
                 <Button type="submit">Save</Button>
               </p>
