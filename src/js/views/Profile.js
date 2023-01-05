@@ -688,7 +688,8 @@ class Profile extends View {
       photo: '',
       about: '',
       blocked: false,
-      nfts: [],
+      lightning: null,
+      website: null,
     });
     const chat = iris.private(pub);
     if (pub.length < 40) {
