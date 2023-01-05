@@ -226,9 +226,6 @@ class Profile extends View {
               <p class="profile-about-content">${this.state.about}</p>
               ${this.renderLinks()}
             </div>
-            ${this.state.nostr
-              ? html`<a href="/profile/${this.state.nostr}">Nostr profile</a>`
-              : ''}
             <div class="profile-actions">
               <div class="follow-count">
                 <a href="/follows/${this.props.id}">
@@ -516,9 +513,6 @@ class Profile extends View {
       noReplies: false,
       noLikes: false,
       noMedia: false,
-      nostr: null,
-      iris: nostrNpub && isMyProfile ? iris.session.getPubKey() : null,
-      eth: null,
       name: '',
       picture: '',
       about: '',
