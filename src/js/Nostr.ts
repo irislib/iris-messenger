@@ -624,8 +624,16 @@ export default {
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey !== myPub && event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
       this.notifications.add(event);
-      console.log('event.created_at', event.created_at, 'this.notificationsSeenTime', this.notificationsSeenTime);
-      console.log('event.created_at > this.notificationsSeenTime', event.created_at > this.notificationsSeenTime);
+      console.log(
+        'event.created_at',
+        event.created_at,
+        'this.notificationsSeenTime',
+        this.notificationsSeenTime,
+      );
+      console.log(
+        'event.created_at > this.notificationsSeenTime',
+        event.created_at > this.notificationsSeenTime,
+      );
       if (event.created_at > this.notificationsSeenTime) {
         this.unseenNotificationCount++;
         iris.local().get('unseenNotificationCount').put(this.unseenNotificationCount);
@@ -634,10 +642,10 @@ export default {
   },
   handleEvent(event: Event) {
     if (!event) return;
-    if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
+    if (this.messagesById.has(event.id)) {
       return;
     }
-    if (this.messagesById.has(event.id)) {
+    if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
       return;
     }
     this.handledMsgsPerSecond++;
@@ -708,13 +716,19 @@ export default {
   },
   init: function () {
     // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
-    iris.local().get('notificationsSeenTime').on((time) => {
-      console.log('notificationsSeenTime', time);
-      this.notificationsSeenTime = time;
-    });
-    iris.local().get('unseenNotificationCount').on((unseenNotificationCount) => {
-      this.unseenNotificationCount = unseenNotificationCount;
-    });
+    iris
+      .local()
+      .get('notificationsSeenTime')
+      .on((time) => {
+        console.log('notificationsSeenTime', time);
+        this.notificationsSeenTime = time;
+      });
+    iris
+      .local()
+      .get('unseenNotificationCount')
+      .on((unseenNotificationCount) => {
+        this.unseenNotificationCount = unseenNotificationCount;
+      });
     iris
       .local()
       .get('loggedIn')

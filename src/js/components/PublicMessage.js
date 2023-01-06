@@ -323,7 +323,12 @@ class PublicMessage extends Message {
           ${this.state.retrieving
             ? html`<div class="retrieving" style="display:flex;align-items:center">
                 <div style="flex:1">Looking up message...</div>
-                <div><${CopyButton} text="Copy ID" str=${Nostr.toNostrBech32Address(this.props.hash, 'note')} /></div>
+                <div>
+                  <${CopyButton}
+                    text="Copy ID"
+                    str=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
+                  />
+                </div>
               </div>`
             : ''}
         </div>
