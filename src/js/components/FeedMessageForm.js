@@ -60,7 +60,7 @@ class FeedMessageForm extends MessageForm {
     if (this.state.torrentId) {
       msg.torrentId = this.state.torrentId;
     }
-    await this.sendPublic(msg);
+    await this.sendNostr(msg);
     this.setState({ attachments: null, torrentId: null });
     textEl.val('');
     textEl.height('');

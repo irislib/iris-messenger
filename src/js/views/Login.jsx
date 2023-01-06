@@ -40,24 +40,11 @@ async function login(k) {
   maybeGoToChat(k);
 }
 
-async function nostrLogin(name) {
+async function nostrLogin() {
   const rpub = await window.nostr.getPublicKey();
   const k = await iris.Key.generate();
   k.secp256k1 = { rpub };
   await login(k);
-  setTimeout(async () => {
-    iris
-      .public()
-      .get('profile')
-      .get('name')
-      .once((existingName) => {
-        if (typeof existingName !== 'string' || existingName === '') {
-          name = name || iris.util.generateName();
-          iris.public().get('profile').put({ a: null });
-          iris.public().get('profile').get('name').put(name);
-        }
-      });
-  }, 2000);
 }
 
 class Login extends Component {

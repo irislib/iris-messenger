@@ -108,7 +108,7 @@ const NostrSettings = () => {
                   text="Copy nsec" />
               </>
             ) : (
-              <p>Not present</p>
+              <p>Not present. Good!</p>
             )}
 
           </div>

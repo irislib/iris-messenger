@@ -5,7 +5,6 @@ import $ from 'jquery';
 import { createRef } from 'preact';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
-import styled from 'styled-components';
 
 import Button from '../components/basic/Button';
 import BlockButton from '../components/BlockButton';
@@ -22,39 +21,6 @@ import { SMS_VERIFIER_PUB } from '../SMS';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
-
-const ImageGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 10px;
-  @media (max-width: 625px) {
-    grid-gap: 1px;
-  }
-`;
-
-// styled-component GalleryImage that has the menu (class="dropdown") in the top right corner
-// & .dropbtn should have a black background shadow
-const GalleryImage = styled.a`
-  position: relative;
-  aspect-ratio: 1;
-  background-size: cover;
-  background-position: center;
-  background-color: #ccc;
-  background-image: url(${(props) => props.src});
-  & .dropdown {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 1;
-  }
-  & .dropbtn {
-    padding-top: 0px;
-    margin-top: -5px;
-    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
-    color: white;
-    user-select: none;
-  }
-`;
 
 function deleteChat(pub) {
   if (confirm(`${t('delete_chat')}?`)) {
@@ -334,50 +300,7 @@ class Profile extends View {
         </div>
       `;
     } else if (this.props.tab === 'media') {
-      return html`
-        <div class="public-messages-view">
-          ${this.state.isMyProfile
-            ? html`<${FeedMessageForm} index="media" class="hidden-xs" autofocus=${false} />`
-            : ''}
-          <${MessageFeed}
-            scrollElement=${this.scrollElement.current}
-            key="media${this.props.id}"
-            node=${iris.public(this.props.id).get('media')}
-          />
-        </div>
-      `;
-    } else if (this.props.tab === 'nfts') {
-      return html`
-        <div class="public-messages-view">
-          <${ImageGrid}>
-            ${this.state.nfts &&
-            this.state.nfts.ownedNfts &&
-            this.state.nfts.ownedNfts.map((nft) => {
-              let src = this.getSrcForNft(nft, true);
-              return html`
-                <${GalleryImage}
-                  href="https://etherscan.io/address/${nft.contract.address}"
-                  target="_blank"
-                  src=${src}
-                >
-                  ${this.state.isMyProfile
-                    ? html`
-                        <div class="dropdown">
-                          <div class="dropbtn">…</div>
-                          <div class="dropdown-content">
-                            <a href="#" onClick=${(e) => this.useAsPfp(nft, e)}
-                              >${t('use_as_PFP')}</a
-                            >
-                          </div>
-                        </div>
-                      `
-                    : ''}
-                <//>
-              `;
-            })}
-          <//>
-        </div>
-      `;
+      return html`TODO media message feed`;
     }
     const messageForm = this.state.isMyProfile
       ? html`<${FeedMessageForm} class="hidden-xs" autofocus=${false} />`
@@ -567,16 +490,6 @@ class Profile extends View {
           this.setState({ blocked });
         }),
       );
-    iris.public(this.props.id).on(
-      this.sub((user) => {
-        this.setState({
-          noPosts: !user.msgs,
-          noMedia: !user.media,
-          noLikes: !user.likes,
-          noReplies: !user.replies,
-        });
-      }),
-    );
     if (this.isUserAgentCrawler() && !this.state.ogImageUrl && !this.state.picture) {
       new iris.Attribute({ type: 'keyID', value: this.props.id })
         .identiconSrc({ width: 300, showType: false })

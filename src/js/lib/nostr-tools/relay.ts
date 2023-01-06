@@ -134,6 +134,7 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
         log(`relay ${url} msg processing queue length: ${queue.length}`)
         var data = queue.shift()
         try {
+          // TODO try regex parsing msg id and seeing if we have it, before parse whole json
           data = JSON.parse(data)
         } catch (err) {}
 

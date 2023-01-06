@@ -14,7 +14,6 @@ import Chat from './views/chat/Chat';
 import EditProfile from './views/EditProfile';
 import Feed from './views/Feed';
 import Follows from './views/Follows';
-import Group from './views/Group';
 import Hashtags from './views/Hashtags';
 import Login from './views/Login';
 import LogoutConfirmation from './views/LogoutConfirmation';
@@ -168,26 +167,7 @@ class Main extends Component<Props, ReactState> {
               <Profile path="/replies/:id+" tab="replies" />
               <Profile path="/likes/:id+" tab="likes" />
               <Profile path="/media/:id+" tab="media" />
-              <Profile path="/nfts/:id+" tab="nfts" />
-              <Group path="/group/:id+" />
               {/* Lazy load stuff that is used less often */}
-              <AsyncRoute
-                path="/store/:store?"
-                getComponent={() => import('./views/Store').then((module) => module.default)}
-              />
-              <AsyncRoute
-                path="/checkout/:store?"
-                getComponent={() => import('./views/Checkout').then((module) => module.default)}
-              />
-              <AsyncRoute
-                path="/product/:product/:store"
-                getComponent={() => import('./views/Product').then((module) => module.default)}
-              />
-              <AsyncRoute
-                path="/product/new"
-                store={iris.session.getPubKey()}
-                getComponent={() => import('./views/Product').then((module) => module.default)}
-              />
               <AsyncRoute
                 path="/explorer/:node"
                 getComponent={() => import('./views/Explorer').then((module) => module.default)}

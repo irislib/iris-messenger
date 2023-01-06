@@ -200,7 +200,6 @@ export default {
     }
     this.followedByUser.get(follower)?.add(address);
     if (follower === myPub) {
-      iris.public().get('follow').get(address).put(true);
       this.getPostsAndRepliesByUser(address);
     }
     if (address === myPub) {

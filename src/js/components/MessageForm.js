@@ -1,50 +1,10 @@
-import iris from 'iris-lib';
 import { Component } from 'preact';
 
 import Nostr from '../Nostr';
 
-function twice(f) {
-  f();
-  setTimeout(f, 100); // write many times and maybe it goes through :D
-}
-
 const mentionRegex = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
 
 export default class MessageForm extends Component {
-  async sendPublic(msg) {
-    msg.time = new Date().toISOString();
-    msg.type = 'post';
-    const signedMsg = await iris.SignedMessage.create(msg, iris.session.getKey());
-    const serialized = signedMsg.toString();
-    const hash = await iris.static.put(serialized);
-    if (msg.replyingTo) {
-      twice(() => iris.public().get('replies').put({}));
-      twice(() => iris.public().get('replies').get(msg.replyingTo).put('a'));
-      twice(() => iris.public().get('replies').get(msg.replyingTo).put({}));
-      twice(() => iris.public().get('replies').get(msg.replyingTo).get(msg.time).put(hash));
-    } else {
-      let node = iris.public();
-      (this.props.index || (this.props.hashtag && `hashtags/${this.props.hashtag}`) || 'msgs')
-        .split('/')
-        .forEach((s) => {
-          node.put({});
-          node = node.get(s);
-        });
-      twice(() => node.get(msg.time).put(hash));
-    }
-    const hashtags = msg.text && msg.text.match(/\B#\w\w+\b/g);
-    if (hashtags) {
-      hashtags.forEach((match) => {
-        const hashtag = match.replace('#', '');
-        iris.public().get('hashtags').get(hashtag).put({ a: null });
-        iris.public().get('hashtags').get(hashtag).get(msg.time).put(hash);
-      });
-    }
-    msg.torrentId && iris.public().get('media').get(msg.time).put(hash);
-    this.props.onSubmit && this.props.onSubmit(msg);
-    return this.sendNostr(msg);
-  }
-
   async sendNostr(msg) {
     const event = {
       kind: 1,

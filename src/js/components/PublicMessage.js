@@ -85,22 +85,6 @@ class PublicMessage extends Message {
         return processNostrMessage(event);
       });
     }
-
-    return new Promise((resolve, reject) => {
-      if (typeof hash !== 'string') {
-        return reject();
-      }
-      iris.static.get(hash).then(async (serialized) => {
-        if (typeof serialized !== 'string') {
-          console.error('message parsing failed', hash, serialized);
-          return;
-        }
-        const msg = await iris.SignedMessage.fromString(serialized);
-        if (msg) {
-          resolve(msg);
-        }
-      });
-    });
   }
 
   fetchByHash() {
@@ -229,7 +213,6 @@ class PublicMessage extends Message {
   }
 
   like(liked = true) {
-    iris.public().get('likes').get(this.props.hash).put(liked);
     if (liked) {
       const author = this.state.msg && this.state.msg.event && this.state.msg.event.pubkey;
 
