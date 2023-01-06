@@ -96,6 +96,8 @@ export default {
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
   handledMsgsPerSecond: 0,
+  notificationsSeenTime: Math.floor(Date.now() / 1000),
+  unseenNotificationCount: 0,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -453,9 +455,6 @@ export default {
     setInterval(go, 1000);
   },
   handleNote(event: Event) {
-    if (this.messagesById.has(event.id)) {
-      return;
-    }
     this.messagesById.set(event.id, event);
     if (!this.postsAndRepliesByUser.has(event.pubkey)) {
       this.postsAndRepliesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
@@ -625,11 +624,20 @@ export default {
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey !== myPub && event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
       this.notifications.add(event);
+      console.log('event.created_at', event.created_at, 'this.notificationsSeenTime', this.notificationsSeenTime);
+      console.log('event.created_at > this.notificationsSeenTime', event.created_at > this.notificationsSeenTime);
+      if (event.created_at > this.notificationsSeenTime) {
+        this.unseenNotificationCount++;
+        iris.local().get('unseenNotificationCount').put(this.unseenNotificationCount);
+      }
     }
   },
   handleEvent(event: Event) {
     if (!event) return;
     if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
+      return;
+    }
+    if (this.messagesById.has(event.id)) {
       return;
     }
     this.handledMsgsPerSecond++;
@@ -699,6 +707,14 @@ export default {
     return true;
   },
   init: function () {
+    // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
+    iris.local().get('notificationsSeenTime').on((time) => {
+      console.log('notificationsSeenTime', time);
+      this.notificationsSeenTime = time;
+    });
+    iris.local().get('unseenNotificationCount').on((unseenNotificationCount) => {
+      this.unseenNotificationCount = unseenNotificationCount;
+    });
     iris
       .local()
       .get('loggedIn')

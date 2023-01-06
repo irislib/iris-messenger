@@ -5,6 +5,7 @@ import Button from '../components/basic/Button';
 import PublicMessage from '../components/PublicMessage';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
+import iris from 'iris-lib';
 
 import View from './View';
 
@@ -19,6 +20,10 @@ export default class Notifications extends View {
 
   updateNotifications = debounce(
     (notifications) => {
+      if (notifications.length) {
+        iris.local().get('notificationsSeenTime').put(Math.floor(Date.now() / 1000));
+        iris.local().get('unseenNotificationCount').put(0);
+      }
       this.setState({ notifications });
     },
     1000,
@@ -27,7 +32,9 @@ export default class Notifications extends View {
 
   componentDidMount() {
     Nostr.getNotifications((notifications) => {
-      this.updateNotifications(notifications);
+      if (!this.unmounted) {
+        this.updateNotifications(notifications);
+      }
     });
   }
 
