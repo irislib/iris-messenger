@@ -650,7 +650,7 @@ export default {
         this.handleFollow(event);
         break;
       case 7:
-        // TODO like notifications
+        // TODO like notifications. if this.notifications.has(event.id) then add event to messagesById
         this.handleReaction(event);
         break;
     }

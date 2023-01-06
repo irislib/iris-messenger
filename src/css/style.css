@@ -1994,6 +1994,14 @@ form.public {
   margin-bottom: 15px;
 }
 
+.retrieving {
+  padding: 5px;
+}
+
+.retrieving button {
+  padding: 5px 15px;
+}
+
 .profile-header-stuff {
   display: flex;
   flex-direction: column;
