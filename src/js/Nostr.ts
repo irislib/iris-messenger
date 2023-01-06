@@ -100,7 +100,7 @@ export default {
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
   handledMsgsPerSecond: 0,
-  notificationsSeenTime: Math.floor(Date.now() / 1000),
+  notificationsSeenTime: 0,
   unseenNotificationCount: 0,
 
   arrayToHex(array: any) {
@@ -384,6 +384,7 @@ export default {
     for (const filter of filters) {
       if (filter.authors) {
         for (const author of filter.authors) {
+          if (!author) continue;
           // make sure the author is valid hex
           if (!author.match(/^[0-9a-fA-F]{64}$/)) {
             console.error('Invalid author', author);
@@ -478,7 +479,7 @@ export default {
     if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
       const changed = this.latestNotesByFollows.add(event);
       if (changed && this.localStorageLoaded) {
-        saveLocalStorageEvents(this); // TODO only save if was changed
+        saveLocalStorageEvents(this);
       }
     }
 
@@ -725,12 +726,16 @@ export default {
   },
   init: function () {
     // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
+    localForage.getItem('notificationsSeenTime').then((val) => {
+      val && iris.local().get('notificationsSeenTime').put(val);
+    });
     iris
       .local()
       .get('notificationsSeenTime')
       .on((time) => {
         console.log('notificationsSeenTime', time);
         this.notificationsSeenTime = time;
+        localForage.setItem('notificationsSeenTime', time);
       });
     iris
       .local()
