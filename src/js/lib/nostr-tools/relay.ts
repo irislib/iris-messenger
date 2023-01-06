@@ -128,11 +128,23 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
       console.log(msg)
     }, 3000);
 
+    var idRegex = /"id":"([a-fA-F0-9]+)"/;
     var queue: any[] = []
     setInterval(() => {
       if (queue.length > 0) {
         log(`relay ${url} msg processing queue length: ${queue.length}`)
         var data = queue.shift()
+        if (data) {
+          const match = idRegex.exec(data)
+          if (match) {
+            const id = match[1];
+            if (knownEvents?.has(id)) {
+              // we already know about this event, so don't process it
+              //console.log('received a message that we already have. leaving this here just to show that nostr protocol could be improved.');
+              return
+            }
+          }
+        }
         try {
           // TODO try regex parsing msg id and seeing if we have it, before parse whole json
           data = JSON.parse(data)
@@ -145,11 +157,6 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
 
               let id = data[1]
               let event = data[2]
-              if (event && event.id && knownEvents?.has(event.id)) {
-                // stop processing if already have this event. saves a lot of cpu
-                //console.log('already seen, skip')
-                return
-              }
               if (
                 validateEvent(event) &&
                 openSubs[id] &&
