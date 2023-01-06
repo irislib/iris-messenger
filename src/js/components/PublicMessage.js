@@ -327,6 +327,38 @@ class PublicMessage extends Message {
     `;
   }
 
+  renderDropdown() {
+    return html`
+      <div class="msg-menu-btn">
+        <div class="dropdown">
+          <div class="dropbtn">…</div>
+          <div class="dropdown-content">
+            <${CopyButton}
+              key=${`${this.props.hash}copy`}
+              text=${t('copy_note_ID')}
+              title="Note ID"
+              copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
+            />
+            ${this.state.msg
+              ? html`
+                  <${CopyButton}
+                    key=${`${this.props.hash}copyRaw`}
+                    text=${t('copy_raw_data')}
+                    title="Message raw data"
+                    copyStr=${JSON.stringify(this.state.msg.event, null, 2)}
+                  />
+                  ${this.state.msg.info.isMine
+                    ? html` <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> --> `
+                    : ''}
+                  <a href="#" onClick=${(e) => this.onBroadcast(e)}>Broadcast</a>
+                `
+              : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   render() {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     if (!this.state.msg) {
@@ -341,12 +373,7 @@ class PublicMessage extends Message {
           ${this.state.retrieving
             ? html`<div class="retrieving" style="display:flex;align-items:center">
                 <div style="flex:1">Looking up message...</div>
-                <div>
-                  <${CopyButton}
-                    text="Copy ID"
-                    copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
-                  />
-                </div>
+                <div>${this.renderDropdown()}</div>
               </div>`
             : ''}
         </div>
@@ -434,29 +461,7 @@ class PublicMessage extends Message {
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
               ${name && this.props.showName && html`<small class="msgSenderName">${name}</small>`}
             </div>
-            <div class="msg-menu-btn">
-              <div class="dropdown">
-                <div class="dropbtn">…</div>
-                <div class="dropdown-content">
-                  <${CopyButton}
-                    key=${`${this.props.hash}copy`}
-                    text=${t('copy_note_ID')}
-                    title="Note ID"
-                    copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
-                  />
-                  <${CopyButton}
-                    key=${`${this.props.hash}copyRaw`}
-                    text=${t('copy_raw_data')}
-                    title="Message raw data"
-                    copyStr=${JSON.stringify(this.state.msg.event, null, 2)}
-                  />
-                  ${s.msg.info.isMine
-                    ? html` <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> --> `
-                    : ''}
-                  <a href="#" onClick=${(e) => this.onBroadcast(e)}>Broadcast</a>
-                </div>
-              </div>
-            </div>
+            ${this.renderDropdown()}
           </div>
           ${this.props.standalone
             ? html`

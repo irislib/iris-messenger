@@ -12,7 +12,12 @@ const INITIAL_PAGE_SIZE = 40;
 class MessageFeed extends Component {
   constructor() {
     super();
-    this.state = { sortedMessages: [], displayCount: INITIAL_PAGE_SIZE };
+    this.state = {
+      sortedMessages: [],
+      queuedMessages: [],
+      displayCount: INITIAL_PAGE_SIZE,
+      messagesShownTime: Math.floor(Date.now() / 1000)
+    };
     this.mappedMessages = new Map();
   }
 
@@ -20,7 +25,17 @@ class MessageFeed extends Component {
     if (this.unmounted || !sortedMessages) {
       return;
     }
-    this.setState({ sortedMessages });
+    // iterate over sortedMessages and add newer than messagesShownTime to queue
+    const queuedMessages = [];
+    for (let i = 0; i < sortedMessages.length; i++) {
+      const hash = sortedMessages[i];
+      const message = Nostr.messagesById.get(hash);
+      if (message && message.created_at > this.state.messagesShownTime) {
+        queuedMessages.push(hash);
+      }
+    }
+    sortedMessages = sortedMessages.filter(hash => !queuedMessages.includes(hash));
+    this.setState({ sortedMessages, queuedMessages });
   }, 3000, { leading: true });
 
   componentDidMount() {
@@ -71,6 +86,12 @@ class MessageFeed extends Component {
     }
   }
 
+  showQueuedMessages = () => {
+    const sortedMessages = this.state.sortedMessages;
+    sortedMessages.unshift(...this.state.queuedMessages);
+    this.setState({ sortedMessages, queuedMessages: [], messagesShownTime: Math.floor(Date.now() / 1000) });
+  }
+
   render() {
     if (!this.props.scrollElement || this.unmounted) {
       return;
@@ -79,6 +100,13 @@ class MessageFeed extends Component {
     return (
       <>
         <div>
+          {this.state.queuedMessages.length ? (
+            <div style={{cursor: 'pointer'}} className="msg" onClick={this.showQueuedMessages}>
+              <div className="msg-content notification-msg">
+                Show {this.state.queuedMessages.length} new message{this.state.queuedMessages.length > 1 ? 's' : ''}
+              </div>
+            </div>
+          ) : null}
           {this.state.sortedMessages.slice(0, displayCount).map((hash) => (
             <PublicMessage key={hash} hash={hash} showName={true} />
           ))}

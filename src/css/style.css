@@ -2045,6 +2045,14 @@ form.public {
   padding: 5px 20px;
 }
 
+.notification-msg {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: var(--notify);
+  padding: 15px;
+}
+
 .block.blocked,
 .follow.following {
   background-color: var(--notify);

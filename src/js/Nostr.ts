@@ -637,16 +637,6 @@ export default {
     if (event.pubkey !== myPub && event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
       this.messagesById.set(event.id, event);
       this.notifications.add(event);
-      console.log(
-        'event.created_at',
-        event.created_at,
-        'this.notificationsSeenTime',
-        this.notificationsSeenTime,
-      );
-      console.log(
-        'event.created_at > this.notificationsSeenTime',
-        event.created_at > this.notificationsSeenTime,
-      );
       if (event.created_at > this.notificationsSeenTime) {
         this.unseenNotificationCount++;
         this.updateUnseenNotificationCount(this.unseenNotificationCount);
@@ -736,7 +726,6 @@ export default {
       .local()
       .get('notificationsSeenTime')
       .on((time) => {
-        console.log('notificationsSeenTime', time);
         this.notificationsSeenTime = time;
         localForage.setItem('notificationsSeenTime', time);
       });
