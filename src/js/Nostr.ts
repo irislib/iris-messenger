@@ -557,25 +557,20 @@ export default {
   },
   handleReaction(event: Event) {
     if (event.content !== '+' && event.content !== '') return; // for now we handle only likes
-    const subjects = event.tags.filter((tag: any) => tag[0] === 'e');
-    /*if (subjects.length > 1) {
-      console.log('reaction with multiple subjects. what are these?', event);
-    }*/
-    for (const subject of subjects) {
-      const id = subject[1];
-      if (!this.likesByMessageId.has(id)) {
-        this.likesByMessageId.set(id, new Set());
-      }
-      this.likesByMessageId.get(id).add(event.pubkey);
+    const id = event.tags.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
+    if (!id) return;
+    if (!this.likesByMessageId.has(id)) {
+      this.likesByMessageId.set(id, new Set());
+    }
+    this.likesByMessageId.get(id).add(event.pubkey);
 
-      if (!this.likesByUser.has(event.pubkey)) {
-        this.likesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
-      }
-      this.likesByUser.get(event.pubkey).add({ id, created_at: event.created_at });
-      const myPub = iris.session.getKey().secp256k1.rpub;
-      if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-        //this.getMessageById(id);
-      }
+    if (!this.likesByUser.has(event.pubkey)) {
+      this.likesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
+    }
+    this.likesByUser.get(event.pubkey).add({ id, created_at: event.created_at });
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+      //this.getMessageById(id);
     }
   },
   handleFollow(event: Event) {
@@ -634,6 +629,7 @@ export default {
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
     const myPub = iris.session.getKey().secp256k1.rpub;
+    // TODO: if it's a like, only add if the last p tag is us
     if (event.pubkey !== myPub && event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
       this.messagesById.set(event.id, event);
       this.notifications.add(event);

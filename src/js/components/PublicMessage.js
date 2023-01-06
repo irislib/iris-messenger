@@ -321,7 +321,9 @@ class PublicMessage extends Message {
                     >
                       ${Icons.heartFull}
                     </i>
-                    ${name} liked your post
+                    <a href="/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+                        ${name}
+                    </a> liked your post
                 </p>
                 <${PublicMessage} hash=${likedId} showName=${true} />
             </div>
