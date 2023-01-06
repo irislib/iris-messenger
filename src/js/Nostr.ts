@@ -862,7 +862,7 @@ export default {
   getLikesByUser(address: string, cb?: (messageIds: string[]) => void) {
     this.knownUsers.add(address);
     const callback = () => {
-      cb?.(this.likesByUser.get(address).eventIds);
+      cb?.(this.likesByUser.get(address)?.eventIds);
     };
     this.likesByUser.has(address) && callback();
     this.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
