@@ -97,7 +97,12 @@ class MessageFeed extends Component {
   showQueuedMessages = () => {
     const sortedMessages = this.state.sortedMessages;
     sortedMessages.unshift(...this.state.queuedMessages);
-    this.setState({ sortedMessages, queuedMessages: [], messagesShownTime: Math.floor(Date.now() / 1000) });
+    this.setState({
+      sortedMessages,
+      queuedMessages: [],
+      messagesShownTime: Math.floor(Date.now() / 1000),
+      displayCount: INITIAL_PAGE_SIZE
+    });
   }
 
   render() {
