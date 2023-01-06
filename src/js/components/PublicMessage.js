@@ -310,24 +310,20 @@ class PublicMessage extends Message {
   }
 
   renderLike(name) {
-    const likedId = this.state.msg.event.tags.reverse().find(t => t[0] === 'e')[1];
+    const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
     return html`
-        <div class="msg">
-            <div class="msg-content">
-                <p style="display: flex; align-items: center">
-                    <i
-                      class="like-btn liked"
-                      style="margin-right: 15px;"
-                    >
-                      ${Icons.heartFull}
-                    </i>
-                    <a href="/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
-                        ${name}
-                    </a> liked your post
-                </p>
-                <${PublicMessage} hash=${likedId} showName=${true} />
-            </div>
+      <div class="msg">
+        <div class="msg-content">
+          <p style="display: flex; align-items: center">
+            <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
+            <a href="/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+              ${name}
+            </a>
+            liked your post
+          </p>
+          <${PublicMessage} hash=${likedId} showName=${true} />
         </div>
+      </div>
     `;
   }
 

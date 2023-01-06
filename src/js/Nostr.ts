@@ -627,7 +627,7 @@ export default {
       }
     }
   },
-  updateUnseenNotificationCount: debounce(count => {
+  updateUnseenNotificationCount: debounce((count) => {
     iris.local().get('unseenNotificationCount').put(count);
   }, 1000),
   maybeAddNotification(event: Event) {
