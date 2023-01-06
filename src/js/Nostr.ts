@@ -82,10 +82,10 @@ export default {
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: iris.util.isMobile ? 5 : 10,
   relays: defaultRelays,
+  knownUsers: new Set<string>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
   subscribedFiltersByName: new Map<string, Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
-  knownUsers: new Set<string>(),
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
   subscribedRepliesAndLikes: new Set<string>(),
@@ -283,7 +283,6 @@ export default {
   sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
     // if subs with same id already exists, remove them
     if (id) {
-      // TODO: remove from subscribedFilters
       const subs = this.subscriptionsByName.get(id);
       if (subs) {
         subs.forEach((sub) => {
@@ -292,6 +291,7 @@ export default {
         });
       }
       this.subscriptionsByName.delete(id);
+      this.subscribedFiltersByName.delete(id);
     }
 
     this.subscribedFiltersByName.set(id, filters);
@@ -314,6 +314,7 @@ export default {
         this.subscriptionsByName.set(id, new Set());
       }
       this.subscriptionsByName.get(id)?.add(sub);
+      console.log('subscriptions size', this.subscriptionsByName.size);
       if (unsubscribeTimeout) {
         setTimeout(() => {
           sub.unsub();
@@ -435,9 +436,17 @@ export default {
   connectRelay: function (relay: Relay) {
     relay.connect();
     relay.on('connect', () => {
-      for (const filters of this.subscribedFiltersByName.values()) {
-        relay.sub(filters, {});
+      /*
+      for (const [name, filters] of this.subscribedFiltersByName.entries()) {
+        const sub = relay.sub(filters, {});
+        if (!this.subscriptionsByName.has(name)) {
+          this.subscriptionsByName.set(name, new Set());
+        }
+        this.subscriptionsByName.get(name)?.add(sub);
+        //console.log('subscriptions size', this.subscriptionsByName.size);
       }
+
+       */
     });
     relay.on('notice', (notice) => {
       console.log('notice from ', relay.url, notice);
