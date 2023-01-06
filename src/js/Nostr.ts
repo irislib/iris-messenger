@@ -51,6 +51,8 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
 
+const messagesById = new Map<string, Event>();
+
 const defaultRelays = new Map<string, Relay>(
   [
     'wss://jiggytom.ddns.net',
@@ -63,7 +65,7 @@ const defaultRelays = new Map<string, Relay>(
     'wss://nostr.bitcoiner.social',
     'wss://nostr.onsats.org',
     'wss://nostr.mom',
-  ].map((url) => [url, relayInit(url)]),
+  ].map((url) => [url, relayInit(url, messagesById)]),
 );
 
 type Subscription = {
@@ -90,7 +92,7 @@ export default {
   likesByUser: new Map<string, SortedLimitedEventSet>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
-  messagesById: new Map<string, Event>(),
+  messagesById,
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),

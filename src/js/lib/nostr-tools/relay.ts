@@ -32,7 +32,7 @@ type SubscriptionOptions = {
   id?: string
 }
 
-export function relayInit(url: string): Relay {
+export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay {
   var ws: WebSocket
   var resolveOpen: () => void
   var resolveClose: () => void
@@ -144,6 +144,11 @@ export function relayInit(url: string): Relay {
 
               let id = data[1]
               let event = data[2]
+              if (event && event.id && knownEvents?.has(event.id)) {
+                // stop processing if already have this event. saves a lot of cpu
+                //console.log('already seen, skip')
+                return
+              }
               if (
                 validateEvent(event) &&
                 openSubs[id] &&
