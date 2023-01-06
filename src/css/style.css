@@ -239,6 +239,10 @@ video {
   margin-left: 5px;
 }
 
+textarea.new-msg {
+  border: 2px solid #8473b3;
+}
+
 .filters .msg-content {
   flex-direction: row !important;
   padding: 15px;
