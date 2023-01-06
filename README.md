@@ -1,4 +1,5 @@
-<i><b>Note 23.12.2022:</b> Heavily under construction: started integrating Nostr this week.</i>
+<i><b>Note 23.12.2022:</b> Heavily under construction:
+started integrating <a href="https://github.com/nostr-protocol/nostr">Nostr</a> this week.</i>
 
 # Iris
 
@@ -6,7 +7,7 @@ Iris is like the social networking apps we're used to, but better.
 
 - No phone number or signup required. Just type in your name or alias and go!
 - Secure: It's open source. Users can validate that big brother doesn't read your private messages.
-- Available: It works offline-first and is not dependent on any single centrally managed server. Users can even connect directly to each other.
+- Available: It works offline-first and is not dependent on any single centrally managed server.
 
 ![Screenshot](screenshot.png)
 
@@ -18,14 +19,6 @@ Browser application: [iris.to](https://iris.to)
 - Progressive web app
   - Use offline
   - Save as an app to home screen or desktop
-
-Desktop application: ([download](https://github.com/irislib/iris-electron/releases), [source code](https://github.com/irislib/iris-electron)):
-
-- Communicate and synchronize with local network peers without Internet access
-  - When local peers eventually connect to the Internet, your messages are relayed globally
-  - Bluetooth support upcoming
-- Opens to background on login: stay online and get message notifications!
-- More secure and available: no need to open the browser application from a server.
 
 ## Develop
 
@@ -51,14 +44,6 @@ yarn test
 ## Privacy
 
 The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.
-
-Private messages are end-to-end encrypted, but message timestamps and the number of chats aren't. In a decentralized network this information is potentially available to anyone.
-
-By looking at timestamps in chats, it is possible to guess who are chatting with each other. It is also possible, if not trivial, to find out who are communicating with each other by monitoring data subscriptions on the decentralized database.
-
-In that regard, Iris prioritizes decentralization and availability over perfect privacy.
-
-Profile names, photos and online status are currently public. That can be changed when advanced group permissions are developed.
 
 ## Contact
 

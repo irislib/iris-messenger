@@ -15,8 +15,8 @@ class About extends Component {
         <div class="main-view" id="settings">
           <div class="centered-container">
             <p>
-              <b>Note 23.12.2022:</b> Heavily under construction: started integrating Nostr this
-              week.
+              <b>Note 23.12.2022:</b> Heavily under construction: started integrating{' '}
+              <a href="https://github.com/nostr-protocol/nostr">Nostr</a> this week.
             </p>
             <h3>{t('about')}</h3>
             <p>{t('iris_is_like')}</p>
@@ -41,30 +41,6 @@ class About extends Component {
 
             <h4>Privacy</h4>
             <p>{t('application_security_warning')}</p>
-            <p>
-              Private messages are end-to-end encrypted, but message timestamps and the number of
-              chats aren't. In a decentralized network this information is potentially available to
-              anyone.
-            </p>
-            <p>
-              By looking at timestamps in chats, it is possible to guess who are chatting with each
-              other. There are potential technical solutions to hiding the timestamps, but they are
-              not implemented yet. It is also possible, if not trivial, to find out who are
-              communicating with each other by monitoring data subscriptions on the decentralized
-              database.
-            </p>
-            <p>
-              In that regard, Iris prioritizes decentralization and availability over perfect
-              privacy.
-            </p>
-            <p>
-              Profile names, pictures and online status are currently public. That can be changed
-              when advanced group permissions are developed.
-            </p>
-            <p>Iris makes no guarantees of data persistence.</p>
-            <p>
-              You can check your saved data in the <a href="/explorer">Explorer</a>.
-            </p>
 
             <h4>Developer:</h4>
             <div class="profile-link-container">
