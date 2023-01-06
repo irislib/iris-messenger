@@ -11,6 +11,10 @@ export default class SortedLimitedEventSet {
     this.maxSize = maxSize;
   }
 
+  has(eventId: string): boolean {
+    return this.eventIdSet.has(eventId);
+  }
+
   add(event: Event): boolean {
     if (!event || !event.id || !event.created_at) {
       throw new Error('Invalid event');

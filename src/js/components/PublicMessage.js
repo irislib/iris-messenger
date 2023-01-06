@@ -231,7 +231,7 @@ class PublicMessage extends Message {
   like(liked = true) {
     iris.public().get('likes').get(this.props.hash).put(liked);
     if (liked) {
-      const author = this.state.msg && this.state.msg.info && this.state.msg.info.from;
+      const author = this.state.msg && this.state.msg.event && this.state.msg.event.pubkey;
 
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       console.log('nostrId', nostrId);
@@ -309,6 +309,26 @@ class PublicMessage extends Message {
     return pubKey.slice(0, 4) + '...' + pubKey.slice(-4);
   }
 
+  renderLike(name) {
+    const likedId = this.state.msg.event.tags.reverse().find(t => t[0] === 'e')[1];
+    return html`
+        <div class="msg">
+            <div class="msg-content">
+                <p style="display: flex; align-items: center">
+                    <i
+                      class="like-btn liked"
+                      style="margin-right: 15px;"
+                    >
+                      ${Icons.heartFull}
+                    </i>
+                    ${name} liked your post
+                </p>
+                <${PublicMessage} hash=${likedId} showName=${true} />
+            </div>
+        </div>
+    `;
+  }
+
   render() {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     if (!this.state.msg) {
@@ -326,7 +346,7 @@ class PublicMessage extends Message {
                 <div>
                   <${CopyButton}
                     text="Copy ID"
-                    str=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
+                    copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
                   />
                 </div>
               </div>`
@@ -336,6 +356,12 @@ class PublicMessage extends Message {
     }
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name || this.shortPubKey(this.state.msg.info.from);
+
+    if (this.state.msg.event && this.state.msg.event.kind === 7) {
+      console.log('like', this.state.msg.event);
+      return this.renderLike(name);
+    }
+
     const emojiOnly =
       this.state.msg.text &&
       this.state.msg.text.length === 2 &&

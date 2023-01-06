@@ -31,9 +31,13 @@ const saveLocalStorageEvents = debounce((_this: any) => {
     .map((eventId: any) => {
       return _this.messagesById.get(eventId);
     });
+  const notifications = _this.notifications.eventIds.map((eventId: any) => {
+    return _this.messagesById.get(eventId);
+  });
   console.log('saving some events to local storage');
   localForage.setItem('latestMsgs', latestMsgs);
   localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
+  localForage.setItem('notificationEvents', notifications);
 }, 5000);
 
 const saveLocalStorageProfilesAndFollows = debounce((_this) => {
@@ -128,11 +132,13 @@ export default {
     const latestMsgsByEveryone = await localForage.getItem('latestMsgsByEveryone');
     const followEvents = await localForage.getItem('followEvents');
     const profileEvents = await localForage.getItem('profileEvents');
+    const notificationEvents = await localForage.getItem('notificationEvents');
     this.localStorageLoaded = true;
     console.log('loaded from local storage');
     console.log('latestMsgs', latestMsgs);
     console.log('followEvents', followEvents);
     console.log('profileEvents', profileEvents);
+    console.log('notificationEvents', notificationEvents);
     if (Array.isArray(followEvents)) {
       followEvents.forEach((e) => this.handleEvent(e));
     }
@@ -148,6 +154,12 @@ export default {
     if (Array.isArray(latestMsgsByEveryone)) {
       console.log('loaded latestMsgsByEveryone');
       latestMsgsByEveryone.forEach((msg) => {
+        this.handleEvent(msg);
+      });
+    }
+    if (Array.isArray(notificationEvents)) {
+      console.log('loaded notificationEvents');
+      notificationEvents.forEach((msg) => {
         this.handleEvent(msg);
       });
     }
@@ -623,6 +635,7 @@ export default {
     // if we're mentioned in tags, add to notifications
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey !== myPub && event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
+      this.messagesById.set(event.id, event);
       this.notifications.add(event);
       console.log(
         'event.created_at',
@@ -666,7 +679,7 @@ export default {
         this.handleFollow(event);
         break;
       case 7:
-        // TODO like notifications. if this.notifications.has(event.id) then add event to messagesById
+        this.maybeAddNotification(event);
         this.handleReaction(event);
         break;
     }
@@ -744,6 +757,7 @@ export default {
         this.sendSubToRelays([{ kinds: [0, 1, 3, 7], limit: 200 }], 'new'); // everything new
         setTimeout(() => {
           this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
+          this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications
         }, 200);
         setInterval(() => {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
@@ -795,12 +809,12 @@ export default {
       });
     });
   },
-  getNotifications: function (cb: (notifications: string[]) => void) {
+  getNotifications: function (cb?: (notifications: string[]) => void) {
     const callback = () => {
-      cb(this.notifications.eventIds);
+      cb?.(this.notifications.eventIds);
     };
     callback();
-    this.subscribe([{ '#p': iris.session.getKey().secp256k1.rpub }], callback);
+    this.subscribe([{ '#p': [iris.session.getKey().secp256k1.rpub] }], callback);
   },
 
   getSomeRelayUrl() {
