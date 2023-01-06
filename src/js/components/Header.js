@@ -280,7 +280,7 @@ class Header extends Component {
         >
           ${Icons.heartEmpty}
           ${this.state.unseenNotificationCount
-            ? html` <span class="unseen">${this.state.unseenNotificationCount}</span> `
+            ? html` <span class="unseen">${this.state.unseenNotificationCount > 99 ? '' : this.state.unseenNotificationCount}</span> `
             : ''}
         <//>
 

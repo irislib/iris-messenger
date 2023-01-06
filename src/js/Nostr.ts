@@ -627,6 +627,9 @@ export default {
       }
     }
   },
+  updateUnseenNotificationCount: debounce(count => {
+    iris.local().get('unseenNotificationCount').put(count);
+  }, 1000),
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
     const myPub = iris.session.getKey().secp256k1.rpub;
@@ -646,7 +649,7 @@ export default {
       );
       if (event.created_at > this.notificationsSeenTime) {
         this.unseenNotificationCount++;
-        iris.local().get('unseenNotificationCount').put(this.unseenNotificationCount);
+        this.updateUnseenNotificationCount(this.unseenNotificationCount);
       }
     }
   },
