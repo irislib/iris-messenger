@@ -27,15 +27,23 @@ class MessageFeed extends Component {
     }
     // iterate over sortedMessages and add newer than messagesShownTime to queue
     const queuedMessages = [];
+    let hasMyMessage;
     for (let i = 0; i < sortedMessages.length; i++) {
       const hash = sortedMessages[i];
       const message = Nostr.messagesById.get(hash);
       if (message && message.created_at > this.state.messagesShownTime) {
+        if (message.pubkey === iris.session.getKey().secp256k1.rpub) {
+          hasMyMessage = true;
+          break;
+        }
         queuedMessages.push(hash);
       }
     }
-    sortedMessages = sortedMessages.filter(hash => !queuedMessages.includes(hash));
-    this.setState({ sortedMessages, queuedMessages });
+    if (!hasMyMessage) {
+      sortedMessages = sortedMessages.filter(hash => !queuedMessages.includes(hash));
+    }
+    const messagesShownTime = hasMyMessage ? Math.floor(Date.now() / 1000) : this.state.messagesShownTime;
+    this.setState({ sortedMessages, queuedMessages, messagesShownTime });
   }, 3000, { leading: true });
 
   componentDidMount() {
