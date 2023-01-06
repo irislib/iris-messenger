@@ -65,6 +65,7 @@ const defaultRelays = new Map<string, Relay>(
     'wss://nostr.bitcoiner.social',
     'wss://nostr.onsats.org',
     'wss://nostr.mom',
+    'wss://nostr-relay.alekberg.net',
   ].map((url) => [url, relayInit(url, messagesById)]),
 );
 
