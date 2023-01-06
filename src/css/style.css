@@ -776,9 +776,27 @@ header.footer .header-content {
 }
 
 .quote .msg-content {
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #808080;
   padding: 7px 15px !important;
 }
+
+.quote .identicon-container.has-picture {
+  max-width: 30px;
+  max-height: 30px;
+}
+
+.public-messages-view .quote .msg-sender {
+  margin-bottom: 8px;
+}
+
+.msg:not([class*="quote"]) > div.msg-content > div.msg-sender,
+.msg:not([class*="quote"]) > div.msg-content > div.text,
+.msg:not([class*="quote"]) > div.msg-content > div.below-text
+{
+    margin-left: 1em;
+}
+
 
 .reply .msg-content {
   box-shadow: none;

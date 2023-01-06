@@ -64,7 +64,7 @@ export default class Notifications extends View {
                 <div class="msg-sender">
                   <a class="msg-sender-link" href="/profile/${notification.from}">
                     <${Identicon} str=${notification.from} width="30" />${' '}
-                    <small class="msgSenderName"><${Name} pub=${notification.from} /></small>
+                    <div class="msgSenderName"><${Name} pub=${notification.from} /></div>
                   </a>
                 </div>
                 ${notification.text || ''}
