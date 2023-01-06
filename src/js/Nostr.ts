@@ -168,8 +168,21 @@ export default {
   },
   addRelay(url: string) {
     if (this.relays.has(url)) return;
-
-    this.relays.set(url, relayInit(url));
+    const relay = relayInit(url, this.messagesById);
+    relay.on('connect', () => {
+      for (const [name, filters] of this.subscribedFiltersByName.entries()) {
+        const sub = relay.sub(filters, {});
+        if (!this.subscriptionsByName.has(name)) {
+          this.subscriptionsByName.set(name, new Set());
+        }
+        this.subscriptionsByName.get(name)?.add(sub);
+        //console.log('subscriptions size', this.subscriptionsByName.size);
+      }
+    });
+    relay.on('notice', (notice) => {
+      console.log('notice from ', relay.url, notice);
+    });
+    this.relays.set(url, relay);
   },
   removeRelay(url: string) {
     this.relays.get(url)?.close();
@@ -435,22 +448,6 @@ export default {
   SUGGESTED_FOLLOW: 'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s',
   connectRelay: function (relay: Relay) {
     relay.connect();
-    relay.on('connect', () => {
-      /*
-      for (const [name, filters] of this.subscribedFiltersByName.entries()) {
-        const sub = relay.sub(filters, {});
-        if (!this.subscriptionsByName.has(name)) {
-          this.subscriptionsByName.set(name, new Set());
-        }
-        this.subscriptionsByName.get(name)?.add(sub);
-        //console.log('subscriptions size', this.subscriptionsByName.size);
-      }
-
-       */
-    });
-    relay.on('notice', (notice) => {
-      console.log('notice from ', relay.url, notice);
-    });
   },
   manageRelays: function () {
     // TODO keep track of subscriptions and send them to new relays
@@ -473,6 +470,12 @@ export default {
 
     for (let i = 0; i < this.maxRelays; i++) {
       go();
+    }
+
+    for (const relay of this.relays.values()) {
+      relay.on('notice', (notice) => {
+        console.log('notice from ', relay.url, notice);
+      });
     }
 
     setInterval(go, 1000);
