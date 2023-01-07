@@ -397,6 +397,10 @@ class Profile extends View {
       let website =
         profile.website &&
         (profile.website.match(/^https?:\/\//) ? profile.website : 'http://' + profile.website);
+      // remove trailing slash
+      if (website && website.endsWith('/')) {
+        website = website.slice(0, -1);
+      }
 
       // profile may contain arbitrary fields, so be careful
       this.setState({
