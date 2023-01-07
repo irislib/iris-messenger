@@ -53,19 +53,21 @@ const MAX_LATEST_MSGS = 500;
 
 const messagesById = new Map<string, Event>();
 
+const DEFAULT_RELAYS = [
+  'wss://jiggytom.ddns.net',
+  'wss://nostr-relay.wlvs.space',
+  'wss://nostr.fmt.wiz.biz',
+  'wss://nostr.ono.re',
+  'wss://relay.damus.io',
+  'wss://nostr-pub.wellorder.net',
+  'wss://relay.nostr.info',
+  'wss://nostr.bitcoiner.social',
+  'wss://nostr.onsats.org',
+  'wss://nostr.mom',
+];
+
 const defaultRelays = new Map<string, Relay>(
-  [
-    'wss://jiggytom.ddns.net',
-    'wss://nostr-relay.wlvs.space',
-    'wss://nostr.fmt.wiz.biz',
-    'wss://nostr.ono.re',
-    'wss://relay.damus.io',
-    'wss://nostr-pub.wellorder.net',
-    'wss://relay.nostr.info',
-    'wss://nostr.bitcoiner.social',
-    'wss://nostr.onsats.org',
-    'wss://nostr.mom',
-  ].map((url) => [url, relayInit(url, messagesById)]),
+  DEFAULT_RELAYS.map((url) => [url, relayInit(url, messagesById)]),
 );
 
 type Subscription = {
@@ -185,7 +187,11 @@ export default {
     this.relays.set(url, relay);
   },
   removeRelay(url: string) {
-    this.relays.get(url)?.close();
+    try {
+      this.relays.get(url)?.close();
+    } catch(e) {
+      console.log('error closing relay', e);
+    }
     this.relays.delete(url);
   },
   addFollower: function (address: string, follower: string) {
@@ -623,6 +629,13 @@ export default {
         console.log('failed to parse your relays list', event);
       }
     }
+  },
+  restoreDefaultRelays() {
+    this.relays.clear();
+    for (const url of DEFAULT_RELAYS) {
+      this.addRelay(url);
+    }
+    this.saveRelaysToContacts();
   },
   saveRelaysToContacts() {
     const relaysObj: any = {};
