@@ -189,7 +189,7 @@ export default {
   removeRelay(url: string) {
     try {
       this.relays.get(url)?.close();
-    } catch(e) {
+    } catch (e) {
       console.log('error closing relay', e);
     }
     this.relays.delete(url);
@@ -625,7 +625,7 @@ export default {
             this.addRelay(url);
           }
         }
-      } catch(e) {
+      } catch (e) {
         console.log('failed to parse your relays list', event);
       }
     }
@@ -640,12 +640,12 @@ export default {
   saveRelaysToContacts() {
     const relaysObj: any = {};
     for (const url of this.relays.keys()) {
-      relaysObj[url] = {read: true, write: true};
+      relaysObj[url] = { read: true, write: true };
     }
     const existing = this.followEventByUser.get(iris.session.getKey().secp256k1.rpub);
     const content = JSON.stringify(relaysObj);
 
-    const event: Event = {
+    const event = {
       kind: 3,
       content,
       tags: existing?.tags || [],

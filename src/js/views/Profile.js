@@ -154,8 +154,16 @@ class Profile extends View {
       />`;
     }
     const hexPubKey = Nostr.toNostrHexAddress(this.props.id);
-    let rawDataJson = JSON.stringify(Nostr.profileEventByUser.get(hexPubKey) || 'no profile :D', null, 2);
-    rawDataJson = `${rawDataJson}\n\n${JSON.stringify(Nostr.followEventByUser.get(hexPubKey) || 'no contacts :D', null, 2)}`;
+    let rawDataJson = JSON.stringify(
+      Nostr.profileEventByUser.get(hexPubKey) || 'no profile :D',
+      null,
+      2,
+    );
+    rawDataJson = `${rawDataJson}\n\n${JSON.stringify(
+      Nostr.followEventByUser.get(hexPubKey) || 'no contacts :D',
+      null,
+      2,
+    )}`;
     return html`
       <div class="profile-top" key="${this.props.id}details">
         <div class="profile-header">
