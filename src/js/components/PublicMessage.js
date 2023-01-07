@@ -333,7 +333,7 @@ class PublicMessage extends Message {
                   ${this.state.msg.info.isMine
                     ? html` <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> --> `
                     : ''}
-                  <a href="#" onClick=${(e) => this.onBroadcast(e)}>Broadcast</a>
+                  <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
                 `
               : ''}
           </div>
