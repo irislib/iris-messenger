@@ -2362,11 +2362,11 @@ input[type='text'] {
 /* Tooltip text */
 .tooltip .tooltiptext {
   visibility: hidden;
-  width: 120px;
+  min-width: 120px;
   background-color: var(--day-separator-bg);
   color: var(--day-separator-color);
   text-align: center;
-  padding: 5px 0;
+  padding: 5px 15px;
   border-radius: 6px;
 
   /* Position the tooltip text */
@@ -2379,6 +2379,14 @@ input[type='text'] {
   /* Fade in tooltip */
   opacity: 0;
   transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext.right {
+  left: 0;
+  right: auto;
+  margin-left: 0;
+  margin-right: -60px;
+  min-width: 150px;
 }
 
 .ReactVirtualized__Grid {

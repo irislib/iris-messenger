@@ -198,7 +198,7 @@ class Header extends Component {
             ? 'hidden-xs'
             : ''} ${this.state.connectedRelays ? 'connected' : ''}"
         >
-          <span class="tooltiptext">${t('connected_relays')}</span>
+          <span class="tooltiptext right">${t('connected_relays')}</span>
           <small>
             <span class="icon">${Icons.network}</span>
             <span>${this.state.connectedRelays}</span>
