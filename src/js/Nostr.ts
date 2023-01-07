@@ -433,7 +433,7 @@ export default {
       }
     }
     hasNewReplyAndLikeSubs && this.subscribeToRepliesAndLikes(this);
-    hasNewAuthors && this.subscribeToAuthors(this);
+    hasNewAuthors && this.subscribeToAuthors(this); // TODO subscribe to old stuff from new authors, don't resubscribe to all
     hasNewIds && this.subscribeToPosts(this);
   },
   getConnectedRelayCount: function () {
