@@ -4,7 +4,7 @@ type Props = {
   width?: number;
 };
 
-const safeOrigins = ['data:image', 'https://imgur.com', 'https://i.imgur.com'];
+const safeOrigins = ['data:image', 'https://imgur.com/', 'https://i.imgur.com/', 'https://nostr.build/'];
 
 const isSafeOrigin = (url: string) => {
   return safeOrigins.some((origin) => url.indexOf(origin) === 0);
