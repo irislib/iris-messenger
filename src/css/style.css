@@ -2015,11 +2015,6 @@ form.public button[type='submit'] span {
   display: none;
 }
 
-.msg-content form.public button[type='submit'] svg {
-  position: relative;
-  top: -32px;
-}
-
 form.public button:last-of-type {
   margin-right: 0;
 }
