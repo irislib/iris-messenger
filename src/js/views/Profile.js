@@ -407,23 +407,9 @@ class Profile extends View {
     const nostrHex = Nostr.toNostrHexAddress(pub);
     const isMyProfile =
       iris.session.getPubKey() === pub || nostrHex === iris.session.getKey().secp256k1.rpub;
+    this.setState({ isMyProfile });
     this.followedUsers = new Set();
     this.followers = new Set();
-    this.setState({
-      followedUserCount: 0,
-      followerCount: 0,
-      isMyProfile,
-      noPosts: false,
-      noReplies: false,
-      noLikes: false,
-      noMedia: false,
-      name: '',
-      picture: '',
-      about: '',
-      blocked: false,
-      lud16: null,
-      website: null,
-    });
     let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
     iris.local().get('noFollowers').on(this.inject());

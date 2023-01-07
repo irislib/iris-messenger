@@ -110,7 +110,10 @@ class Main extends Component<Props, ReactState> {
     const history = createHashHistory() as unknown; // TODO: align types between 'history' and 'preact-router'
 
     // hack to remount profile on route change
-    const MyProfile = ({ id, tab, path }) => <Profile path={path} id={id} key={id} tab={tab} />;
+    type MyProfileParams = { id?: string; tab: string; path: string };
+    const MyProfile = (params: MyProfileParams) => (
+      <Profile path={params.path} id={params.id} key={params.id} tab={params.tab} />
+    );
 
     return (
       <div id="main-content">
