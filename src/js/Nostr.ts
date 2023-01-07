@@ -120,7 +120,7 @@ export default {
 
     const existing = this.followEventByUser.get(pubkey);
 
-    const event: Event = {
+    const event = {
       kind: 3,
       content: existing?.content || '',
       tags: Array.from(this.followedByUser.get(pubkey)).map((address: string) => {
