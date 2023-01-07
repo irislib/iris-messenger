@@ -116,11 +116,11 @@ export default {
     const pubkey = iris.session.getKey().secp256k1.rpub;
     this.addFollower(address, pubkey);
 
+    const existing = this.followEventByUser.get(pubkey);
+
     const event: Event = {
       kind: 3,
-      created_at: Math.round(Date.now() / 1000),
-      content: '',
-      pubkey,
+      content: existing?.content || '',
       tags: Array.from(this.followedByUser.get(pubkey)).map((address: string) => {
         return ['p', address];
       }),
@@ -603,6 +603,41 @@ export default {
         this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
       }
     }
+    if (event.pubkey === myPub && event.content?.length) {
+      try {
+        const relays = JSON.parse(event.content);
+        const urls = Object.keys(relays);
+        if (urls.length) {
+          // remove all existing relays that are not in urls. TODO: just disable
+          console.log('setting relays from your contacs list', urls);
+          for (const url of this.relays.keys()) {
+            if (!urls.includes(url)) {
+              this.removeRelay(url);
+            }
+          }
+          for (const url of urls) {
+            this.addRelay(url);
+          }
+        }
+      } catch(e) {
+        console.log('failed to parse your relays list', event);
+      }
+    }
+  },
+  saveRelaysToContacts() {
+    const relaysObj: any = {};
+    for (const url of this.relays.keys()) {
+      relaysObj[url] = {read: true, write: true};
+    }
+    const existing = this.followEventByUser.get(iris.session.getKey().secp256k1.rpub);
+    const content = JSON.stringify(relaysObj);
+
+    const event: Event = {
+      kind: 3,
+      content,
+      tags: existing?.tags || [],
+    };
+    this.publish(event);
   },
   handleMetadata(event: Event) {
     try {

@@ -159,6 +159,9 @@ const NostrSettings = () => {
             <Button onClick={handleAddRelay}>{t('add')}</Button>
           </div>
         </div>
+        <div>
+          <Button onClick={() => Nostr.saveRelaysToContacts()}>{t('save_relays_publicly')}</Button>
+        </div>
       </div>
     </div>
   );
