@@ -239,6 +239,10 @@ video {
   margin-left: 5px;
 }
 
+textarea.new-msg {
+  border: 2px solid #8473b3;
+}
+
 .filters .msg-content {
   flex-direction: row !important;
   padding: 15px;
@@ -776,9 +780,27 @@ header.footer .header-content {
 }
 
 .quote .msg-content {
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #808080;
   padding: 7px 15px !important;
 }
+
+.quote .identicon-container.has-picture {
+  max-width: 30px;
+  max-height: 30px;
+}
+
+.public-messages-view .quote .msg-sender {
+  margin-bottom: 8px;
+}
+
+.msg:not([class*="quote"]) > div.msg-content > div.msg-sender,
+.msg:not([class*="quote"]) > div.msg-content > div.text,
+.msg:not([class*="quote"]) > div.msg-content > div.below-text
+{
+    margin-left: 1em;
+}
+
 
 .reply .msg-content {
   box-shadow: none;
@@ -1962,10 +1984,40 @@ button {
   cursor: pointer;
 }
 
-form.public button {
+.message-form .public-messages-view .msg .msg-content,
+.message-form textarea.new-msg {
+  margin-right: auto;
+  margin-left: auto;
+  display: block;
+  height: 10em;
+}
+form.public button[type='submit'] {
   height: 47px;
   width: 47px;
   margin-right: 5px;
+  border-radius: 5px;
+  background-color: #8473b3;
+  color: #FFF;;
+}
+
+form.public button[type='submit'] span {
+  display: inline;
+  font-size: 0.8em;
+}
+
+form.public button[type='submit'] {
+  float: right;
+  right: 0;
+  clear: both;
+}
+
+form.public button[type='submit'] span {
+  display: none;
+}
+
+.msg-content form.public button[type='submit'] svg {
+  position: relative;
+  top: -32px;
 }
 
 form.public button:last-of-type {
@@ -1985,13 +2037,11 @@ form.public div {
   position: relative;
 }
 
-form.public button[type='submit'] {
-  position: absolute;
-  right: 0;
-}
-
 form.public {
+  width: 100%;
   margin-bottom: 15px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .retrieving {
@@ -2407,10 +2457,7 @@ input[type='text'] {
   .main-view.public-messages-view .centered-container > h3 {
     padding-left: 15px;
   }
-  .public-messages-view .msg .msg-content,
-  textarea {
-    border-radius: 0 !important;
-  }
+
   .public-messages-view .img-container,
   .torrent {
     margin-left: -15px;
@@ -2424,9 +2471,22 @@ input[type='text'] {
   .profile-top {
     padding: 10px 15px;
   }
-  form.public div {
-    margin: 0 15px;
+
+  div:not([class*="msg-content"]) > form.public {
+    width: 94%;
   }
+  
+  div:not([class*="msg-content"]) > form.public button[type='submit'] {
+    display: block;
+    width: 100%;
+  }
+  
+  div:not([class*="msg-content"]) > form.public button[type='submit'] span {
+    display: inline;
+  }
+  /* form.public div {
+    margin: 0 10px;
+  } */
   .nav .search-box input {
     width: 90%;
   }

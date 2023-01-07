@@ -442,7 +442,7 @@ class PublicMessage extends Message {
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${() => this.onClickName()}>
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
-              ${name && this.props.showName && html`<small class="msgSenderName">${name}</small>`}
+              ${name && this.props.showName && html`<div class="msgSenderName">${name}</div>`}
             </div>
             ${this.renderDropdown()}
           </div>
