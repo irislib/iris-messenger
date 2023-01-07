@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 type Props = {
   src: string;
   class?: string;
@@ -10,7 +12,6 @@ const safeOrigins = [
   'https://imgur.com/',
   'https://i.imgur.com/',
   'https://nostr.build/',
-  'https://pbs.twimg.com/',
 ];
 
 const isSafeOrigin = (url: string) => {
@@ -27,7 +28,15 @@ const SafeImg = (props: Props) => {
       props.src = `https://proxy.irismessengers.wtf/insecure/plain/${props.src}`;
     }
   }
-  return <img {...props} />;
+  const [src, setSrc] = useState(props.src);
+
+  const handleError = () => {
+    console.log('handleeerrorr');
+    setSrc('/assets/img/cover.jpg');
+  };
+
+  const newProps = Object.assign(props, { src });
+  return <img onError={handleError} {...newProps} />;
 };
 
 export default SafeImg;
