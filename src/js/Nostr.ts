@@ -570,7 +570,6 @@ export default {
     return undefined;
   },
   handleReaction(event: Event) {
-    if (event.content !== '+' && event.content !== '') return; // for now we handle only likes
     const id = event.tags.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
     if (!id) return;
     if (!this.likesByMessageId.has(id)) {
