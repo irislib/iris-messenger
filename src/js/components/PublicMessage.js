@@ -421,9 +421,9 @@ class PublicMessage extends Message {
                 <div
                   style="cursor: pointer"
                   onClick=${(e) => {
-                    e.preventDefault();
                     // if event target is not a link or a button, open reply
                     if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                      e.preventDefault();
                       route(`/post/${s.msg.replyingTo}`);
                     }
                   }}
