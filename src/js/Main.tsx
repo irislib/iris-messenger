@@ -108,6 +108,10 @@ class Main extends Component<Props, ReactState> {
       );
     }
     const history = createHashHistory() as unknown; // TODO: align types between 'history' and 'preact-router'
+
+    // hack to remount profile on route change
+    const MyProfile = ({ id, tab, path }) => <Profile path={path} id={id} key={id} tab={tab} />;
+
     return (
       <div id="main-content">
         {isDesktopNonMac ? (
@@ -163,10 +167,10 @@ class Main extends Component<Props, ReactState> {
               <Settings path="/settings/:page?" />
               <LogoutConfirmation path="/logout" />
               <EditProfile path="/profile/edit" />
-              <Profile path="/profile/:id+" tab="profile" />
-              <Profile path="/replies/:id+" tab="replies" />
-              <Profile path="/likes/:id+" tab="likes" />
-              <Profile path="/media/:id+" tab="media" />
+              <MyProfile path="/profile/:id+" tab="profile" />
+              <MyProfile path="/replies/:id+" tab="replies" />
+              <MyProfile path="/likes/:id+" tab="likes" />
+              <MyProfile path="/media/:id+" tab="media" />
               {/* Lazy load stuff that is used less often */}
               <AsyncRoute
                 path="/explorer/:node"

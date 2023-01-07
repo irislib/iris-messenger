@@ -142,7 +142,7 @@ class Profile extends View {
     let profilePicture;
     if (this.state.picture && !this.state.blocked) {
       profilePicture = html`<${ProfilePicture}
-        key=${this.props.id}
+        key="${this.props.id}picture"
         picture=${this.state.picture}
       />`;
     } else {
@@ -155,7 +155,7 @@ class Profile extends View {
     }
     const hexPubKey = Nostr.toNostrHexAddress(this.props.id);
     return html`
-      <div class="profile-top">
+      <div class="profile-top" key="${this.props.id}details">
         <div class="profile-header">
           <div class="profile-picture-container">${profilePicture}</div>
           <div class="profile-header-stuff">
@@ -348,33 +348,6 @@ class Profile extends View {
     `;
   }
 
-  async getNfts(address) {
-    const { Alchemy, Network } = await import('alchemy-sdk');
-    const config = {
-      apiKey: 'DGLWKXjx7nRC5Dmz7mavP8CX1frKT1Ar',
-      network: Network.ETH_MAINNET,
-    };
-    const alchemy = new Alchemy(config);
-
-    const main = async () => {
-      // Get all NFTs
-      const nfts = await alchemy.nft.getNftsForOwner(address);
-      // Print NFTs
-      this.setState({ nfts });
-      console.log('nfts', address, nfts);
-    };
-
-    const runMain = async () => {
-      try {
-        await main();
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    runMain();
-  }
-
   getNostrProfile(address) {
     Nostr.sendSubToRelays([{ authors: [address] }], address, true, 30 * 1000);
     const setFollowCounts = () => {
@@ -400,6 +373,10 @@ class Profile extends View {
       // remove trailing slash
       if (website && website.endsWith('/')) {
         website = website.slice(0, -1);
+      }
+
+      if (profile.picture && this.isUserAgentCrawler()) {
+        this.setOgImageUrl(this.state.picture);
       }
 
       // profile may contain arbitrary fields, so be careful
@@ -447,17 +424,6 @@ class Profile extends View {
       lud16: null,
       website: null,
     });
-    const chat = iris.private(pub);
-    if (pub.length < 40) {
-      if (!chat) {
-        const interval = setInterval(() => {
-          if (iris.private(pub)) {
-            clearInterval(interval);
-            this.componentDidMount();
-          }
-        }, 1000);
-      }
-    }
     let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
     iris.local().get('noFollowers').on(this.inject());
@@ -465,17 +431,6 @@ class Profile extends View {
     // if pub is hex, it's a nostr address
     const nostrAddr = Nostr.toNostrHexAddress(pub);
     this.getNostrProfile(nostrAddr);
-    if (chat) {
-      $(`input[name=notificationPreference][value=${chat.notificationSetting}]`).attr(
-        'checked',
-        'checked',
-      );
-      $('input:radio[name=notificationPreference]')
-        .off()
-        .on('change', (event) => {
-          chat.put('notificationSetting', event.target.value);
-        });
-    }
     qrCodeEl.empty();
     new QRCode(qrCodeEl.get(0), {
       text: window.location.href,
@@ -494,15 +449,6 @@ class Profile extends View {
           this.setState({ blocked });
         }),
       );
-    if (this.isUserAgentCrawler() && !this.state.ogImageUrl && !this.state.picture) {
-      new iris.Attribute({ type: 'keyID', value: this.props.id })
-        .identiconSrc({ width: 300, showType: false })
-        .then((src) => {
-          if (!this.state.ogImageUrl && !this.state.picture) {
-            this.setOgImageUrl(src);
-          }
-        });
-    }
   }
 
   componentDidMount() {

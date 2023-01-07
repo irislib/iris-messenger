@@ -63,24 +63,28 @@ export default abstract class BaseComponent<Props = any, State = any> extends Pu
 
   async setOgImageUrl(imgSrc?: string) {
     if (imgSrc && this.isUserAgentCrawler()) {
-      const image = new Image();
-      image.onload = async () => {
-        const resizedCanvas = document.createElement('canvas');
-        const MAX_DIMENSION = 350;
-        const ratio = Math.max(image.width, image.height) / MAX_DIMENSION;
-        resizedCanvas.width = image.width / ratio;
-        resizedCanvas.height = image.height / ratio;
-        const { default: pica } = await import('./lib/pica.min');
-        await pica().resize(image, resizedCanvas);
-        const ogImage = resizedCanvas.toDataURL('image/jpeg', 0.1);
-        const ogImageUrl = `https://iris-base64-decoder.herokuapp.com/?s=${encodeURIComponent(
-          ogImage,
-        )}`;
-        console.log(ogImageUrl);
-        this.state.ogImageUrl;
-        this.setState({ ogImageUrl });
-      };
-      image.src = imgSrc;
+      if (imgSrc.startsWith('data:image')) {
+        const image = new Image();
+        image.onload = async () => {
+          const resizedCanvas = document.createElement('canvas');
+          const MAX_DIMENSION = 350;
+          const ratio = Math.max(image.width, image.height) / MAX_DIMENSION;
+          resizedCanvas.width = image.width / ratio;
+          resizedCanvas.height = image.height / ratio;
+          const { default: pica } = await import('./lib/pica.min');
+          await pica().resize(image, resizedCanvas);
+          const ogImage = resizedCanvas.toDataURL('image/jpeg', 0.1);
+          const ogImageUrl = `https://iris-base64-decoder.herokuapp.com/?s=${encodeURIComponent(
+            ogImage,
+          )}`;
+          console.log(ogImageUrl);
+          this.state.ogImageUrl;
+          this.setState({ ogImageUrl });
+        };
+        image.src = imgSrc;
+        return;
+      }
+      this.setState({ ogImageUrl: imgSrc });
     }
   }
 }
