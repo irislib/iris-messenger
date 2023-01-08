@@ -24,7 +24,10 @@ class FeedMessageForm extends MessageForm {
       textEl.val(textEl.val() + emoji);
       textEl.focus();
     });
-    if (!iris.util.isMobile && this.props.autofocus !== false) {
+    if (
+      (!iris.util.isMobile || this.props.forceAutofocusMobile == true) &&
+      this.props.autofocus !== false
+    ) {
       textEl.focus();
     }
     if (!this.props.replyingTo) {
@@ -216,6 +219,7 @@ class FeedMessageForm extends MessageForm {
           </svg>
         </button>
         <button type="submit">
+          <span>${t('send_message')} </span>
           <svg
             class="svg-inline--fa fa-w-16"
             x="0px"
