@@ -720,6 +720,7 @@ export default {
         this.handleFollow(event);
         break;
       case 6:
+        this.maybeAddNotification(event);
         this.handleBoost(event);
         break;
       case 7:
