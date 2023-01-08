@@ -2492,7 +2492,10 @@ input[type='text'] {
   
   div:not([class*="msg-content"]) > form.public button[type='submit'] span {
     display: inline;
-    margin-right: 15px;
+  }
+
+  div:not([class*="msg-content"]) > form.public button[type='submit'] svg {
+    display: none;
   }
   /* form.public div {
     margin: 0 10px;
