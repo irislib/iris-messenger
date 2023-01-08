@@ -11,7 +11,7 @@ export default {
   new_chat: 'Uusi keskustelu',
   if_other_person_doesnt_see_message:
     'Jos toinen käyttäjä ei näe viestiäsi, voit antaa hänelle <b>sinun</b> kutsulinkkisi jotain muuta kautta:',
-  type_a_message: 'Kirjoita viesti',
+  whats_on_your_mind: 'Kirjoita viesti',
   beware_of_sharing_invite_link_publicly:
     'Jos jaat kutsulinkkisi julkisesti: saatat saada viestipyyntö-spämmiä. Sen sijaan voit turvallisesti jakaa <a>profiililinkkisi</a> julkisesti.',
   your_invite_links: 'Kutsulinkkisi',

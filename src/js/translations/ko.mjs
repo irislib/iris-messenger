@@ -18,7 +18,7 @@ export default {
   give_your_profile_link_to_someone: '당신의 약력 링크를 타인에게 전달',
   if_other_person_doesnt_see_message:
     '타인이 당신의 메시지를 보지 못하면 다른 채널의 링크로 초대 할 수 있음 <b>당신</b>:',
-  type_a_message: '메시지 입력',
+  whats_on_your_mind: '메시지 입력',
   beware_of_sharing_invite_link_publicly:
     '경고 초대링크를 공개적으로 사용하는 것은: 스팸을 받을수 있으니 공개 할 시는 당신의 <a>profile link</a>를 사용하세요.',
   your_invite_links: '당신의 초대 링크',

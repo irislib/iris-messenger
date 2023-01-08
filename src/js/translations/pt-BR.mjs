@@ -10,7 +10,7 @@ export default {
   new_chat: 'Nova conversa',
   if_other_person_doesnt_see_message:
     'Se a outra pessoa não vê sua mensagens, você pode passar pra ela o <b>seu</b> link do bate-papo através de outro canal.',
-  type_a_message: 'Digite uma mensagem',
+  whats_on_your_mind: 'Digite uma mensagem',
   beware_of_sharing_invite_link_publicly:
     'Cuidado ao compartilhar seu link de bate-papo publicamente: você pode receber spam com solicitações de mensagem. Ao invés disso, compartilhe publicamente seu <a>Link do perfil</a>.',
   your_invite_links: 'Seus links de bate-papo',

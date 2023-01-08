@@ -20,7 +20,7 @@ export default {
   give_your_profile_link_to_someone: "donner votre lien de profil à quelqu'un",
   if_other_person_doesnt_see_message:
     "Si les autres ne voient pas votre message, vous pouvez leur donner <b>votre</b> lien d'invitation depuis un autre canal :",
-  type_a_message: 'Entrez un message',
+  whats_on_your_mind: 'Entrez un message',
   type_a_message_or_paste_a_magnet_link: 'Entrez un message ou collez un lien magnet',
   beware_of_sharing_invite_link_publicly:
     "Attention à ne pas partager votre lien d'invitation publiquement : vous pourriez être spammé de demandes de contacts. Partagez publiquement plutôt votre <a>lien de profil</a> à la place.",

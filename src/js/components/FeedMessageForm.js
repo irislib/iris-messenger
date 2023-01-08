@@ -141,7 +141,7 @@ class FeedMessageForm extends MessageForm {
 
   render() {
     const textareaPlaceholder =
-      this.props.index === 'media' ? 'type_a_message_or_paste_a_magnet_link' : 'type_a_message';
+      this.props.index === 'media' ? 'type_a_message_or_paste_a_magnet_link' : 'whats_on_your_mind';
     return html`<form
       autocomplete="off"
       class="message-form ${this.props.class || ''} public"
@@ -219,7 +219,7 @@ class FeedMessageForm extends MessageForm {
           </svg>
         </button>
         <button type="submit">
-          <span>${t('send_message')} </span>
+          <span>${t('post')} </span>
           <svg
             class="svg-inline--fa fa-w-16"
             x="0px"

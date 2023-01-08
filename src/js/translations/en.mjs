@@ -180,7 +180,7 @@ export default {
     'This is a prototype store that shows items from merchants in your social network. Orders are sent via Iris private message. Your own store can be found <a>here</a>.',
   today: 'today',
   turn_on_desktop_notifications: 'Turn on desktop notifications',
-  type_a_message: 'Type a message',
+  whats_on_your_mind: 'What\'s on your mind?',
   typing: 'Typing...',
   unfollow: 'Unfollow',
   use_picture: 'Use picture',

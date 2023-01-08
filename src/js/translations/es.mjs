@@ -129,7 +129,7 @@ export default {
   their_nickname_for_you: 'Su apodo para ti',
   today: 'hoy',
   turn_on_desktop_notifications: 'Activa las notificaciones de escritorio',
-  type_a_message: 'Escribe un mensaje',
+  whats_on_your_mind: 'Escribe un mensaje',
   typing: 'Escribiendo...',
   use_picture: 'Usar foto',
   video_call: 'Videollamada',

@@ -19,7 +19,7 @@ export default {
   give_your_profile_link_to_someone: 'اپنی پروفایٔل کو لنک شیر کریں',
   if_other_person_doesnt_see_message:
     'اگر دوسرا شخص آپکا پیغام نہیں دیکھ رہا، تو آپ اسے <b>اپنا</b> پروفایٔل لنک کسی دوسرے پلیٹ فارم شیر کر سکتے ہیں',
-  type_a_message: 'پیغام لکھیے',
+  whats_on_your_mind: 'پیغام لکھیے',
   beware_of_sharing_invite_link_publicly:
     'انوایٔٹ لنک سر عام رکھنے سے بعض رہیں لوگ آپکو پیغام بھیج کر تنگ کر سکتے ہیں! اسکی جگہ  <a>پروفایٔل لنک</a> شیر کریں',
   your_invite_links: 'آپکا انوایٔٹ لنک',
