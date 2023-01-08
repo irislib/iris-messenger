@@ -25,7 +25,12 @@ class Message extends View {
     let content;
     if (this.props.hash === 'new') {
       content = html`
-        <${FeedMessageForm} activeChat="public" autofocus=${true} onSubmit=${() => route('/')} />
+        <${FeedMessageForm}
+          activeChat="public"
+          forceAutofocusMobile=${true}
+          autofocus=${true}
+          onSubmit=${() => route('/')}
+        />
       `;
     } else {
       content = html`
