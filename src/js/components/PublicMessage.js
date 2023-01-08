@@ -541,7 +541,10 @@ class PublicMessage extends Message {
                   >
                     ${s.liked ? Icons.heartFull : Icons.heartEmpty}
                   </a>
-                  <span class="count" onClick=${() => this.setState({ showLikes: !s.showLikes, showBoosts: false })}>
+                  <span
+                    class="count"
+                    onClick=${() => this.setState({ showLikes: !s.showLikes, showBoosts: false })}
+                  >
                     ${s.likes || ''}
                   </span>
                   <a
@@ -550,7 +553,10 @@ class PublicMessage extends Message {
                   >
                     ${Icons.boost}
                   </a>
-                  <span class="count" onClick=${() => this.setState({ showBoosts: !s.showBoosts, showLikes: false })}>
+                  <span
+                    class="count"
+                    onClick=${() => this.setState({ showBoosts: !s.showBoosts, showLikes: false })}
+                  >
                     ${s.boosts || ''}
                   </span>
                 `}
