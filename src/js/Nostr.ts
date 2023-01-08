@@ -842,7 +842,7 @@ export default {
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }
-    this.subscribe([{ kinds: [1, 7], '#e': [id] }], callback);
+    this.subscribe([{ kinds: [1, 6, 7], '#e': [id] }], callback);
   },
   getFollowedByUser: function (address: string, cb?: (followedUsers: Set<string>) => void) {
     const callback = () => {
