@@ -10,7 +10,7 @@ export default {
   new_chat: '新的聊天',
   if_other_person_doesnt_see_message:
     '如果其他人无法看到你的消息，你可以把 <b>你的</b> 聊天链接在其他频道发送给他们:',
-  whats_on_your_mind: '请输入消息',
+  type_a_message: '请输入消息',
   beware_of_sharing_invite_link_publicly:
     '请注意，公开分享你的聊天链接将有可能让你收到垃圾消息申请。推荐分享你的<a>账号链接</a>。',
   your_invite_links: '你的聊天链接',

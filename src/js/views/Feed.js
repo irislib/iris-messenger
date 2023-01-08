@@ -6,6 +6,7 @@ import FeedMessageForm from '../components/FeedMessageForm';
 import MessageFeed from '../components/MessageFeed';
 import OnboardingNotification from '../components/OnboardingNotification';
 import SubscribeHashtagButton from '../components/SubscribeHashtagButton';
+import { translate as t } from '../translations/Translation';
 
 import View from './View';
 
@@ -74,7 +75,12 @@ class Feed extends View {
             ${s.searchTerm
               ? ''
               : html`
-                  <${FeedMessageForm} key="form${path}" class="hidden-xs" autofocus=${false} />
+                  <${FeedMessageForm}
+                    placeholder=${t('whats_on_your_mind')}
+                    key="form${path}"
+                    class="hidden-xs"
+                    autofocus=${false}
+                  />
                 `}
             ${s.searchTerm
               ? html`<h2>Search results for "${s.searchTerm}"</h2>`

@@ -275,7 +275,7 @@ class ChatMessageForm extends MessageForm {
         onInput=${(e) => this.onMsgTextInput(e)}
         class="new-msg"
         type="text"
-        placeholder="${t('whats_on_your_mind')}"
+        placeholder="${t('type_a_message')}"
         autocomplete="off"
         autocorrect="off"
         autocapitalize="sentences"

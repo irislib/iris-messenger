@@ -141,7 +141,8 @@ class FeedMessageForm extends MessageForm {
 
   render() {
     const textareaPlaceholder =
-      this.props.index === 'media' ? 'type_a_message_or_paste_a_magnet_link' : 'whats_on_your_mind';
+      this.props.placeholder ||
+      (this.props.index === 'media' ? 'type_a_message_or_paste_a_magnet_link' : 'type_a_message');
     return html`<form
       autocomplete="off"
       class="message-form ${this.props.class || ''} public"

@@ -10,7 +10,7 @@ export default {
   new_chat: 'Neue Unterhaltung',
   if_other_person_doesnt_see_message:
     "Sollte die andere Person die Nachricht nicht sehen, können Sie <b>Ihren</b> Unterhaltung's link über einen anderen Kanal senden:",
-  whats_on_your_mind: 'Schreiben sie eine Nachricht',
+  type_a_message: 'Schreiben sie eine Nachricht',
   beware_of_sharing_invite_link_publicly:
     'Vorsicht wenn sie ihren Einladungslink Öffentlich teilen: Sie können mit Nachricht Anfragen gespammt werden. Teilen sie lieber ihren <a>Profil link</a>.',
   your_invite_links: "Ihre Unterhaltung's links",

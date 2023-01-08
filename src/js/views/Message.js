@@ -4,6 +4,7 @@ import { route } from 'preact-router';
 import FeedMessageForm from '../components/FeedMessageForm';
 import PublicMessage from '../components/PublicMessage';
 import Nostr from '../Nostr';
+import { translate as t } from '../translations/Translation';
 
 import View from './View';
 
@@ -26,6 +27,7 @@ class Message extends View {
     if (this.props.hash === 'new') {
       content = html`
         <${FeedMessageForm}
+          placeholder=${t('whats_on_your_mind')}
           activeChat="public"
           forceAutofocusMobile=${true}
           autofocus=${true}

@@ -10,7 +10,7 @@ export default {
   new_chat: 'Nuova chat',
   if_other_person_doesnt_see_message:
     "Se l'altra persona non vede il tuo messaggio, puoi dargli il <b>tuo</b> invite link attraverso qualche altro canale:",
-  whats_on_your_mind: 'Scrivi un messaggio',
+  type_a_message: 'Scrivi un messaggio',
   beware_of_sharing_invite_link_publicly:
     'Fai attenzione a condividere pubblicamente il tuo invite link: potresti ricevere spam con richieste di messaggi. Condividi pubblicamente invece il tuo <a>link di profilo</a>.',
   your_invite_links: 'I tuoi invite link',
