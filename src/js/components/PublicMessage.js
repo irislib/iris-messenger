@@ -303,6 +303,22 @@ class PublicMessage extends Message {
     return pubKey.slice(0, 4) + '...' + pubKey.slice(-4);
   }
 
+  renderFollow(name) {
+    return html`
+      <div class="msg">
+        <div class="msg-content">
+          <p style="display: flex; align-items: center">
+            <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
+            <a href="/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+              ${name}
+            </a>
+            <span> started following you</span>
+          </p>
+        </div>
+      </div>
+    `;
+  }
+
   renderLike(name) {
     const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
     return html`
@@ -393,6 +409,10 @@ class PublicMessage extends Message {
     }
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name || this.shortPubKey(this.state.msg.info.from);
+
+    if (this.state.msg?.event?.kind === 3) {
+      return this.renderFollow(name);
+    }
 
     if (this.state.msg?.event?.kind === 6) {
       return this.renderBoost(name);

@@ -686,6 +686,13 @@ export default {
     const myPub = iris.session.getKey().secp256k1.rpub;
     // TODO: if it's a like, only add if the last p tag is us
     if (event.pubkey !== myPub && event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
+      if (event.kind === 3) {
+        // only notify if we know that they previously weren't following us
+        const existingFollows = this.followedByUser.get(event.pubkey);
+        if (!existingFollows || existingFollows.has(myPub)) {
+          return;
+        }
+      }
       this.messagesById.set(event.id, event);
       this.notifications.add(event);
       if (event.created_at > this.notificationsSeenTime) {
@@ -717,6 +724,7 @@ export default {
         break;
       case 3:
         // TODO if existing follow list doesn't include us and the new one does, add to notifications
+        this.maybeAddNotification(event);
         this.handleFollow(event);
         break;
       case 6:
