@@ -212,12 +212,28 @@ class PublicMessage extends Message {
     this.like(!this.state.liked);
   }
 
-  like(liked = true) {
-    if (liked) {
-      const author = this.state.msg && this.state.msg.event && this.state.msg.event.pubkey;
+  boostBtnClicked() {
+    if (!this.state.boosted) {
+      const author = this.state.msg?.event?.pubkey;
 
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
-      console.log('nostrId', nostrId);
+      if (nostrId) {
+        Nostr.publish({
+          kind: 6,
+          tags: [
+            ['e', nostrId],
+            ['p', author],
+          ],
+        });
+      }
+    }
+  }
+
+  like(liked = true) {
+    if (liked) {
+      const author = this.state.msg?.event?.pubkey;
+
+      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Nostr.publish({
           kind: 7,
@@ -342,6 +358,24 @@ class PublicMessage extends Message {
     `;
   }
 
+  renderBoost(name) {
+    const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
+    return html`
+      <div class="msg">
+        <div class="msg-content">
+          <p style="display: flex; align-items: center">
+            <i style="margin-right: 15px;"> ${Icons.boost} </i>
+            <a href="/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+              ${name}
+            </a>
+            <span> boosted</span>
+          </p>
+          <${PublicMessage} hash=${likedId} showName=${true} />
+        </div>
+      </div>
+    `;
+  }
+
   render() {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     if (!this.state.msg) {
@@ -365,8 +399,11 @@ class PublicMessage extends Message {
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name || this.shortPubKey(this.state.msg.info.from);
 
-    if (this.state.msg.event && this.state.msg.event.kind === 7) {
-      console.log('like', this.state.msg.event);
+    if (this.state.msg?.event?.kind === 6) {
+      console.log('boost', this.state.msg.event);
+      return this.renderBoost(name);
+    }
+    if (this.state.msg?.event?.kind === 7) {
       return this.renderLike(name);
     }
 
@@ -513,6 +550,9 @@ class PublicMessage extends Message {
                   <span class="count" onClick=${() => this.setState({ showLikes: !s.showLikes })}>
                     ${s.likes || ''}
                   </span>
+                  <a class="msg-btn boost-btn" onClick=${() => this.boostBtnClicked()}>
+                    ${Icons.boost}
+                  </a>
                 `}
             <div class="time">
               <a

@@ -103,6 +103,7 @@ export default {
   threadRepliesByMessageId: new Map<string, Set<string>>(),
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
+  boostsByMessageId: new Map<string, Set<string>>(),
   handledMsgsPerSecond: 0,
   notificationsSeenTime: 0,
   unseenNotificationCount: 0,
@@ -344,7 +345,7 @@ export default {
   subscribeToRepliesAndLikes: debounce((_this) => {
     console.log('subscribeToRepliesAndLikes', _this.subscribedRepliesAndLikes);
     _this.sendSubToRelays(
-      [{ kinds: [1, 7], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }],
+      [{ kinds: [1, 6, 7], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }],
       'subscribedRepliesAndLikes',
       true,
     );
@@ -502,33 +503,8 @@ export default {
       }
     }
 
-    /* todo: handle boost (retweet) message, example from astral.ninja. damus uses some other format.
-    {
-      "id": "97ef4480664c38857cc6e906be3cc13e0728b5eb87744b994ed0e0187566e0f2",
-      "pubkey": "4523be58d395b1b196a9b8c82b038b6895cb02b683d0c253a955068dba1facd0",
-      "created_at": 1672858762,
-      "kind": 1,
-      "tags": [
-        [
-          "p",
-          "1577e4599dd10c863498fe3c20bd82aafaf829a595ce83c5cf8ac3463531b09b",
-          "wss://nostr.zebedee.cloud"
-        ],
-        [
-          "e",
-          "f51e72133af57072fced5897c4477ae1f48725013373fd6367b5024ad657e5ea",
-          "wss://relay.nostr.info",
-          "mention"
-        ],
-        [
-          "client",
-          "astral"
-        ]
-      ],
-      "content": "#[1]",
-      "sig": "2d3f4bbf5ab6d954e48b94310c82a2408e91982f8abf3b959676ef0a38e205a1e873e6020d6dc91fe7076f7eaf038c3e410ad4d205ba496a8394b2366bef362e"
-    }
-     */
+    // todo: handle astral ninja format boost (retweet) message
+    // where content points to the original message tag: "content": "#[1]"
 
     const replyingTo = this.getEventReplyingTo(event);
     if (replyingTo) {
@@ -562,6 +538,9 @@ export default {
     }
   },
   getEventReplyingTo: function (event: Event) {
+    if (event.kind !== 1) {
+      return undefined;
+    }
     const replyTags = event.tags.filter((tag) => tag[0] === 'e');
     if (replyTags.length === 1) {
       return replyTags[0][1];
@@ -574,6 +553,18 @@ export default {
       return replyTags[1][1];
     }
     return undefined;
+  },
+  handleBoost(event: Event) {
+    const id = event.tags.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
+    if (!id) return;
+    if (!this.boostsByMessageId.has(id)) {
+      this.boostsByMessageId.set(id, new Set());
+    }
+    // only handle one boost per post per user. TODO update with newer event if needed.
+    if (!this.boostsByMessageId.get(event.id)?.has(event.pubkey)) {
+      this.boostsByMessageId.get(event.id)?.add(event.pubkey);
+      this.handleNote(event);
+    }
   },
   handleReaction(event: Event) {
     const id = event.tags.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
@@ -728,6 +719,9 @@ export default {
         // TODO if existing follow list doesn't include us and the new one does, add to notifications
         this.handleFollow(event);
         break;
+      case 6:
+        this.handleBoost(event);
+        break;
       case 7:
         this.maybeAddNotification(event);
         this.handleReaction(event);
@@ -807,7 +801,7 @@ export default {
         const hex = this.toNostrHexAddress(this.SUGGESTED_FOLLOW);
         this.knownUsers.add(hex);
         this.getProfile(this.toNostrHexAddress(hex), undefined);
-        this.sendSubToRelays([{ kinds: [0, 1, 3, 7], limit: 200 }], 'new'); // everything new
+        this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
         setTimeout(() => {
           this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
           this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications
