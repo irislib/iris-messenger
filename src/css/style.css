@@ -2006,7 +2006,7 @@ form.public button[type='submit'] {
 
 form.public button[type='submit'] span {
   display: inline;
-  font-size: 0.8em;
+  font-size: 0.6em;
 }
 
 form.public button[type='submit'] {
@@ -2484,12 +2484,15 @@ input[type='text'] {
   }
   
   div:not([class*="msg-content"]) > form.public button[type='submit'] {
-    display: block;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   div:not([class*="msg-content"]) > form.public button[type='submit'] span {
     display: inline;
+    margin-right: 15px;
   }
   /* form.public div {
     margin: 0 10px;
