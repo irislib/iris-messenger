@@ -130,71 +130,78 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
 
     var idRegex = /"id":"([a-fA-F0-9]+)"/;
     var queue: any[] = []
-    setInterval(() => {
-      if (queue.length > 0) {
-        log(`relay ${url} msg processing queue length: ${queue.length}`)
-        var data = queue.shift()
-        if (data) {
-          const match = idRegex.exec(data)
-          if (match) {
-            const id = match[1];
-            if (knownEvents?.has(id)) {
-              // we already know about this event, so don't process it
-              //console.log('received a message that we already have. leaving this here just to show that nostr protocol could be improved.');
-              return
-            }
-          }
-        }
-        try {
-          // TODO try regex parsing msg id and seeing if we have it, before parse whole json
-          data = JSON.parse(data)
-        } catch (err) {}
-
-        if (data.length >= 1) {
-          switch (data[0]) {
-            case 'EVENT':
-              if (data.length !== 3) return // ignore empty or malformed EVENT
-
-              let id = data[1]
-              let event = data[2]
-              if (
-                validateEvent(event) &&
-                openSubs[id] &&
-                (openSubs[id].skipVerification || verifySignature(event)) &&
-                matchFilters(openSubs[id].filters, event)
-              ) {
-                openSubs[id]
-                subListeners[id]?.event.forEach(cb => cb(event))
-              }
-              return
-            case 'EOSE': {
-              if (data.length !== 2) return // ignore empty or malformed EOSE
-              let id = data[1]
-              subListeners[id]?.eose.forEach(cb => cb())
-              return
-            }
-            case 'OK': {
-              if (data.length < 3) return // ignore empty or malformed OK
-              let id: string = data[1]
-              let ok: boolean = data[2]
-              let reason: string = data[3] || ''
-              if (ok) pubListeners[id]?.ok.forEach(cb => cb())
-              else pubListeners[id]?.failed.forEach(cb => cb(reason))
-              return
-            }
-            case 'NOTICE':
-              if (data.length !== 2) return // ignore empty or malformed NOTICE
-              let notice = data[1]
-              listeners.notice.forEach(cb => cb(notice))
-              return
-          }
-        }
-
+    let handleNextInterval: any
+    const handleNext = () => {
+      if (queue.length === 0) {
+        clearInterval(handleNextInterval)
+        handleNextInterval = null
+        return
       }
-    }, 0);
+
+      log(`relay ${url} msg processing queue length: ${queue.length}`)
+      var data = queue.shift()
+      if (data) {
+        const match = idRegex.exec(data)
+        if (match) {
+          const id = match[1];
+          if (knownEvents?.has(id)) {
+            // we already know about this event, so don't process it
+            //console.log('received a message that we already have. leaving this here just to show that nostr protocol could be improved.');
+            return
+          }
+        }
+      }
+      try {
+        // TODO try regex parsing msg id and seeing if we have it, before parse whole json
+        data = JSON.parse(data)
+      } catch (err) {}
+
+      if (data.length >= 1) {
+        switch (data[0]) {
+          case 'EVENT':
+            if (data.length !== 3) return // ignore empty or malformed EVENT
+
+            let id = data[1]
+            let event = data[2]
+            if (
+              validateEvent(event) &&
+              openSubs[id] &&
+              (openSubs[id].skipVerification || verifySignature(event)) &&
+              matchFilters(openSubs[id].filters, event)
+            ) {
+              openSubs[id]
+              subListeners[id]?.event.forEach(cb => cb(event))
+            }
+            return
+          case 'EOSE': {
+            if (data.length !== 2) return // ignore empty or malformed EOSE
+            let id = data[1]
+            subListeners[id]?.eose.forEach(cb => cb())
+            return
+          }
+          case 'OK': {
+            if (data.length < 3) return // ignore empty or malformed OK
+            let id: string = data[1]
+            let ok: boolean = data[2]
+            let reason: string = data[3] || ''
+            if (ok) pubListeners[id]?.ok.forEach(cb => cb())
+            else pubListeners[id]?.failed.forEach(cb => cb(reason))
+            return
+          }
+          case 'NOTICE':
+            if (data.length !== 2) return // ignore empty or malformed NOTICE
+            let notice = data[1]
+            listeners.notice.forEach(cb => cb(notice))
+            return
+        }
+      }
+    };
 
     ws.onmessage = async e => {
       queue.push(e.data)
+      if (!handleNextInterval) {
+        handleNextInterval = setInterval(handleNext, 0)
+      }
     }
   }
 
