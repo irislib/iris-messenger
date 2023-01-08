@@ -166,7 +166,6 @@ class PublicMessage extends Message {
             Array.from(replies).sort(
               (a, b) => Nostr.messagesById.get(a)?.time - Nostr.messagesById.get(b)?.time,
             );
-          console.log('boostedBy', boostedBy);
           this.setState({
             boosts: this.boostedBy.size,
             boosted: this.boostedBy.has(myPub),
@@ -240,14 +239,6 @@ class PublicMessage extends Message {
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Nostr.publish({
-          kind: 7,
-          content: '+',
-          tags: [
-            ['e', nostrId],
-            ['p', author],
-          ],
-        });
-        console.log({
           kind: 7,
           content: '+',
           tags: [
@@ -404,7 +395,6 @@ class PublicMessage extends Message {
     let name = this.props.name || this.state.name || this.shortPubKey(this.state.msg.info.from);
 
     if (this.state.msg?.event?.kind === 6) {
-      console.log('boost', this.state.msg.event);
       return this.renderBoost(name);
     }
     if (this.state.msg?.event?.kind === 7) {
@@ -551,16 +541,16 @@ class PublicMessage extends Message {
                   >
                     ${s.liked ? Icons.heartFull : Icons.heartEmpty}
                   </a>
-                  <span class="count" onClick=${() => this.setState({ showLikes: !s.showLikes })}>
+                  <span class="count" onClick=${() => this.setState({ showLikes: !s.showLikes, showBoosts: false })}>
                     ${s.likes || ''}
                   </span>
                   <a
-                    class="msg-btn like-btn ${s.boosted ? 'liked' : ''}"
+                    class="msg-btn boost-btn ${s.boosted ? 'boosted' : ''}"
                     onClick=${() => this.boostBtnClicked()}
                   >
                     ${Icons.boost}
                   </a>
-                  <span class="count" onClick=${() => this.setState({ showBoosts: !s.showBoosts })}>
+                  <span class="count" onClick=${() => this.setState({ showBoosts: !s.showBoosts, showLikes: false })}>
                     ${s.boosts || ''}
                   </span>
                 `}
@@ -578,6 +568,20 @@ class PublicMessage extends Message {
             ? html`
                 <div class="likes">
                   ${Array.from(this.likedBy).map((key) => {
+                    return html`<${Identicon}
+                      showTooltip=${true}
+                      onClick=${() => route(`/profile/${key}`)}
+                      str=${key}
+                      width="32"
+                    />`;
+                  })}
+                </div>
+              `
+            : ''}
+          ${s.showBoosts
+            ? html`
+                <div class="likes">
+                  ${Array.from(this.boostedBy).map((key) => {
                     return html`<${Identicon}
                       showTooltip=${true}
                       onClick=${() => route(`/profile/${key}`)}

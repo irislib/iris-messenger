@@ -1503,12 +1503,12 @@ a.msg {
   margin-right: 45px;
 }
 
-.msg .boost-btn {
-  margin-left: 40px;
-}
-
 .msg .like-btn.liked {
   color: var(--heart-color);
+}
+
+.msg .boost-btn.boosted {
+  color: var(--positive-color);
 }
 
 .msg .time {
