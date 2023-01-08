@@ -19,18 +19,11 @@ import Torrent from './Torrent';
 const MSG_TRUNCATE_LENGTH = 1000;
 const MSG_TRUNCATE_LINES = 10;
 
-const replyIcon = html`<svg
-  width="24"
-  version="1.1"
-  x="0px"
-  y="0px"
-  viewBox="0 0 512 512"
-  style="enable-background:new 0 0 512 512;"
->
+const replyIcon = html`<svg width="24" viewBox="0 0 24 24" fill="currentColor">
   <path
-    fill="currentColor"
-    d="M256,21.952c-141.163,0-256,95.424-256,212.715c0,60.267,30.805,117.269,84.885,157.717l-41.109,82.219 c-2.176,4.331-1.131,9.579,2.496,12.779c2.005,1.771,4.501,2.667,7.04,2.667c2.069,0,4.139-0.597,5.952-1.813l89.963-60.395
-c33.877,12.971,69.781,19.541,106.752,19.541C397.141,447.381,512,351.957,512,234.667S397.163,21.952,256,21.952z M255.979,426.048c-36.16,0-71.168-6.741-104.043-20.032c-3.264-1.323-6.997-0.96-9.941,1.024l-61.056,40.981l27.093-54.187 c2.368-4.757,0.896-10.517-3.477-13.547c-52.907-36.629-83.243-89.707-83.243-145.6c0-105.536,105.28-191.381,234.667-191.381 s234.667,85.824,234.667,191.36S385.365,426.048,255.979,426.048z"
+    d="M12,1C5.4,1,0,5.5,0,11c0,2.8,1.4,5.5,4,7.4l-1.9,3.9C2,22.5,2,22.7,2.2,22.8C2.3,22.9,2.4,23,2.5,23c0.1,0,0.2,0,0.3-0.1
+L7,20.1c1.6,0.6,3.3,0.9,5,0.9c6.6,0,12-4.5,12-10S18.6,1,12,1z M12,19.5c-1.6,0-3.2-0.3-4.6-0.9c-0.1-0.1-0.3,0-0.4,0l-2.7,1.8
+l1.2-2.4c0.1-0.2,0-0.5-0.2-0.6c-2.3-1.6-3.7-4-3.7-6.5c0-4.7,4.7-8.5,10.4-8.5S22.4,6.4,22.4,11S17.7,19.5,12,19.5z"
   />
 </svg>`;
 
@@ -541,7 +534,10 @@ class PublicMessage extends Message {
                   >
                     ${s.liked ? Icons.heartFull : Icons.heartEmpty}
                   </a>
-                  <span class="count" onClick=${() => this.setState({ showLikes: !s.showLikes, showBoosts: false })}>
+                  <span
+                    class="count"
+                    onClick=${() => this.setState({ showLikes: !s.showLikes, showBoosts: false })}
+                  >
                     ${s.likes || ''}
                   </span>
                   <a
@@ -550,7 +546,10 @@ class PublicMessage extends Message {
                   >
                     ${Icons.boost}
                   </a>
-                  <span class="count" onClick=${() => this.setState({ showBoosts: !s.showBoosts, showLikes: false })}>
+                  <span
+                    class="count"
+                    onClick=${() => this.setState({ showBoosts: !s.showBoosts, showLikes: false })}
+                  >
                     ${s.boosts || ''}
                   </span>
                 `}
