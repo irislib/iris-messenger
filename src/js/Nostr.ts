@@ -561,8 +561,8 @@ export default {
       this.boostsByMessageId.set(id, new Set());
     }
     // only handle one boost per post per user. TODO update with newer event if needed.
-    if (!this.boostsByMessageId.get(event.id)?.has(event.pubkey)) {
-      this.boostsByMessageId.get(event.id)?.add(event.pubkey);
+    if (!this.boostsByMessageId.get(id)?.has(event.pubkey)) {
+      this.boostsByMessageId.get(id)?.add(event.pubkey);
       this.handleNote(event);
     }
   },
@@ -814,14 +814,20 @@ export default {
   },
   getRepliesAndLikes(
     id: string,
-    cb?: (replies: Event[], likes: Event[], threadReplyCount: number) => void,
+    cb?: (
+      replies: Set<string>,
+      likedBy: Set<string>,
+      threadReplyCount: number,
+      boostedBy: Set<string>,
+    ) => void,
   ) {
     const callback = () => {
       cb &&
         cb(
-          this.directRepliesByMessageId.get(id),
-          this.likesByMessageId.get(id),
+          this.directRepliesByMessageId.get(id) ?? new Set(),
+          this.likesByMessageId.get(id) ?? new Set(),
           this.threadRepliesByMessageId.get(id)?.size ?? 0,
+          this.boostsByMessageId.get(id) ?? new Set(),
         );
     };
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {

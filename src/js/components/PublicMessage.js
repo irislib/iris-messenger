@@ -158,14 +158,18 @@ class PublicMessage extends Message {
       this.setState({ msg });
 
       if (nostrId) {
-        Nostr.getRepliesAndLikes(nostrId, (replies, likes, threadReplyCount) => {
-          this.likedBy = new Set(likes);
+        Nostr.getRepliesAndLikes(nostrId, (replies, likedBy, threadReplyCount, boostedBy) => {
+          this.likedBy = likedBy;
+          this.boostedBy = boostedBy;
           const sortedReplies =
             replies &&
             Array.from(replies).sort(
               (a, b) => Nostr.messagesById.get(a)?.time - Nostr.messagesById.get(b)?.time,
             );
+          console.log('boostedBy', boostedBy);
           this.setState({
+            boosts: this.boostedBy.size,
+            boosted: this.boostedBy.has(myPub),
             likes: this.likedBy.size,
             liked: this.likedBy.has(myPub),
             replyCount: threadReplyCount,
@@ -550,9 +554,15 @@ class PublicMessage extends Message {
                   <span class="count" onClick=${() => this.setState({ showLikes: !s.showLikes })}>
                     ${s.likes || ''}
                   </span>
-                  <a class="msg-btn boost-btn" onClick=${() => this.boostBtnClicked()}>
+                  <a
+                    class="msg-btn like-btn ${s.boosted ? 'liked' : ''}"
+                    onClick=${() => this.boostBtnClicked()}
+                  >
                     ${Icons.boost}
                   </a>
+                  <span class="count" onClick=${() => this.setState({ showBoosts: !s.showBoosts })}>
+                    ${s.boosts || ''}
+                  </span>
                 `}
             <div class="time">
               <a
