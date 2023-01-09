@@ -51,7 +51,7 @@ class MessageFeed extends Component {
     if (this.state.displayCount > this.state.sortedMessages.length) {
       return;
     }
-    if (this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >= this.props.scrollElement.scrollHeight - 100) {
+    if (this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >= this.props.scrollElement.scrollHeight - 500) {
       this.setState({ displayCount: this.state.displayCount + INITIAL_PAGE_SIZE });
     }
   }
