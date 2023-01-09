@@ -301,7 +301,7 @@ class PublicMessage extends Message {
       <div class="msg">
         <div class="msg-content">
           <p style="display: flex; align-items: center">
-            <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
+            <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.newFollower} </i>
             <a href="/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               ${name}
             </a>
