@@ -1068,7 +1068,6 @@ h1,
 }
 
 .application-list .text {
-  border-bottom: 1px solid var(--zebra-stripe-bg);
   flex: 1;
   padding: 15px;
   padding-left: 0;
@@ -2497,14 +2496,14 @@ input[type='text'] {
   div:not([class*="msg-content"]) > form.public {
     width: 94%;
   }
-  
+
   div:not([class*="msg-content"]) > form.public button[type='submit'] {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
+
   div:not([class*="msg-content"]) > form.public button[type='submit'] span {
     display: inline;
   }
