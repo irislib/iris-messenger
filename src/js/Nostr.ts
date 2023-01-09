@@ -64,6 +64,7 @@ const DEFAULT_RELAYS = [
   'wss://nostr.bitcoiner.social',
   'wss://nostr.onsats.org',
   'wss://nostr.mom',
+  'wss://brb.io',
 ];
 
 const defaultRelays = new Map<string, Relay>(
