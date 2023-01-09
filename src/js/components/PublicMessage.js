@@ -391,12 +391,10 @@ class PublicMessage extends Message {
           : ''}"
       >
         <div class="msg-content">
-          ${this.state.retrieving
-            ? html`<div class="retrieving" style="display:flex;align-items:center">
-                <div style="flex:1">Looking up message...</div>
-                <div>${this.renderDropdown()}</div>
-              </div>`
-            : ''}
+          <div class="retrieving" style="display:flex;align-items:center">
+            <div class="text ${this.state.retrieving ? 'visible': ''}">Looking up message...</div>
+            <div>${this.renderDropdown()}</div>
+          </div>
         </div>
       </div>`;
     }

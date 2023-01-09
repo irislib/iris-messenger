@@ -2048,6 +2048,16 @@ form.public {
   padding: 5px;
 }
 
+.retrieving .text {
+  opacity: 0;
+  transition: opacity 1s;
+  flex: 1;
+}
+
+.retrieving .text.visible {
+  opacity: 1;
+}
+
 .retrieving button {
   padding: 5px 15px;
 }
