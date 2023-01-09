@@ -7,7 +7,7 @@ import { throttle } from 'lodash';
 import { translate as t } from '../translations/Translation';
 import Button from '../components/basic/Button';
 
-const INITIAL_PAGE_SIZE = 40;
+const INITIAL_PAGE_SIZE = 20;
 
 class MessageFeed extends Component {
   constructor() {
@@ -46,6 +46,23 @@ class MessageFeed extends Component {
     this.setState({ sortedMessages, queuedMessages, messagesShownTime });
   }, 3000, { leading: true });
 
+  handleScroll = () => {
+    // increase page size when scrolling down
+    if (this.state.displayCount > this.state.sortedMessages.length) {
+      return;
+    }
+    if (this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >= this.props.scrollElement.scrollHeight - 200) {
+      this.setState({ displayCount: this.state.displayCount + INITIAL_PAGE_SIZE });
+    }
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if (this.props.scrollElement) {
+      this.props.scrollElement.removeEventListener('scroll', this.handleScroll);
+    }
+  }
+
   componentDidMount() {
     let first = true;
     if (this.props.nostrUser) {
@@ -79,6 +96,10 @@ class MessageFeed extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    if (!prevProps.scrollElement && this.props.scrollElement) {
+      this.props.scrollElement.addEventListener('scroll', this.handleScroll);
+      console.log(this.props.scrollElement, 'scrollElement');
+    }
     const prevNodeId = prevProps.node && prevProps.node._ && prevProps.node._.id;
     const newNodeId = this.props.node && this.props.node._ && this.props.node._.id;
     if (
