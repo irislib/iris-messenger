@@ -13,7 +13,7 @@ const APPLICATIONS = [
   { url: '/', text: 'home', icon: Icons.home },
   { url: '/media', text: 'media', icon: Icons.play, beta: true },
   { url: '/chat', text: 'messages', icon: Icons.chat, beta: true },
-  { url: '/discover', text: 'discover', icon: Icons.search },
+  { url: '/discover', text: 'discover', icon: Icons.global },
   { url: '/settings', text: 'settings', icon: Icons.settings },
   { url: '/explorer', text: 'explorer', icon: Icons.folder, beta: true },
   { url: '/about', text: 'about', icon: Icons.info },
