@@ -388,7 +388,7 @@ class PublicMessage extends Message {
         key=${this.props.hash}
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
-          : ''}"
+          : ''} ${this.props.asQuote ? 'quote' : ''}"
       >
         <div class="msg-content">
           <div class="retrieving" style="display:flex;align-items:center">

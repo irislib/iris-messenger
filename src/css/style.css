@@ -2044,6 +2044,10 @@ form.public {
   margin-right: auto;
 }
 
+.quote .retrieving {
+  height: 100px;
+}
+
 .retrieving {
   padding: 5px;
 }
