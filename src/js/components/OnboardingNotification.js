@@ -33,7 +33,7 @@ export default class OnboardingNotification extends Component {
             </div>
             <p>
               ${t('alternatively')}<i> </i>
-              <a href="/profile/${iris.session.getPubKey().secp256k1.rpub}"
+              <a href="/profile/${iris.session.getPubKey()?.secp256k1?.rpub}"
                 >${t('give_your_profile_link_to_someone')}</a
               >.
             </p>
@@ -42,7 +42,7 @@ export default class OnboardingNotification extends Component {
       `;
     }
     if (this.state.noFollowers && !this.state.hasNostrFollowers) {
-      const rpub = iris.session.getKey().secp256k1.rpub;
+      const rpub = iris.session.getKey()?.secp256k1?.rpub;
       const npub = rpub && Nostr.toNostrBech32Address(iris.session.getKey().secp256k1.rpub, 'npub');
       return html`
         <div class="msg">
