@@ -52,31 +52,6 @@ export default class Notifications extends View {
         ${this.state.notifications.slice(0, this.state.displayCount).map((id) => {
           if (!id) return;
           return html` <${PublicMessage} key=${id} hash=${id} showName="{true}" /> `;
-          /*
-          return html`
-            <div
-              class="msg"
-              key=${(notification.time || '') +
-              (notification.from || '') +
-              (notification.target || '')}
-            >
-              <div class="msg-content">
-                <div class="msg-sender">
-                  <a class="msg-sender-link" href="/profile/${notification.from}">
-                    <${Identicon} str=${notification.from} width="30" />${' '}
-                    <div class="msgSenderName"><${Name} pub=${notification.from} /></div>
-                  </a>
-                </div>
-                ${notification.text || ''}
-                ${notification.target ? html`<${PublicMessage} hash=${notification.target} />` : ''}
-                <div class="below-text">
-                  <div class="time">${iris.util.formatDate(new Date(notification.time))}</div>
-                  <br />
-                </div>
-              </div>
-            </div>
-          `;
-          */
         })}
         ${displayCount < this.state.notifications.length
           ? html`
