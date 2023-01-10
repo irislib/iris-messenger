@@ -9,13 +9,13 @@ import { translate as t } from '../../translations/Translation';
 const SETTINGS = {
   account: 'account',
   key: 'private_key',
-  peer: 'peers',
   nostr: 'nostr',
   language: 'language',
   webtorrent: 'webtorrent',
   webrtc: 'webRTC',
   beta: 'beta',
   blocked: 'blocked_users',
+  peer: 'peers',
 };
 
 export default class SettingsMenu extends Component {
