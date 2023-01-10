@@ -379,7 +379,6 @@ a.logo img:not(:last-child) {
 }
 
 .nav .btn {
-  font-size: 2em;
   color: var(--text-color);
   position: relative;
 }
@@ -560,12 +559,13 @@ a.logo img:not(:last-child) {
 
 .nav .header-content {
   flex: 1;
-  padding: 7px 15px;
+  padding: 0px 15px;
   align-self: center;
   display: flex;
   flex-direction: row;
   align-items: center;
   max-width: 100%;
+  margin-top: 5px;
 }
 
 .tabs {
