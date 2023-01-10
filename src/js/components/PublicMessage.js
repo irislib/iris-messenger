@@ -543,7 +543,10 @@ class PublicMessage extends Message {
                   <a class="msg-btn reply-btn" onClick=${() => this.toggleReplies()}>
                     ${replyIcon}
                   </a>
-                  <span class="count" onClick=${() => this.toggleReplies()}>
+                  <span
+                    class="count ${!this.props.standalone && !this.props.asReply && s.showReplyForm ? 'active' : ''}"
+                    onClick=${() => this.toggleReplies()}
+                  >
                     ${s.replyCount || ''}
                   </span>
                   <a
