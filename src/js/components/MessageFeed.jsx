@@ -44,17 +44,29 @@ class MessageFeed extends Component {
     }
     const messagesShownTime = hasMyMessage ? Math.floor(Date.now() / 1000) : this.state.messagesShownTime;
     this.setState({ sortedMessages, queuedMessages, messagesShownTime });
+    this.checkScrollPosition();
   }, 3000, { leading: true });
 
   handleScroll = () => {
     // increase page size when scrolling down
-    if (this.state.displayCount > this.state.sortedMessages.length) {
+    if (this.state.displayCount < this.state.sortedMessages.length) {
+      if (this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >= this.props.scrollElement.scrollHeight - 500) {
+        this.setState({ displayCount: this.state.displayCount + INITIAL_PAGE_SIZE });
+      }
+    }
+    this.checkScrollPosition();
+  };
+
+  checkScrollPosition = () => {
+    // if scrolled past this.base element's start, apply fixedTop class to it
+    if (!this.props.scrollElement) {
       return;
     }
-    if (this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >= this.props.scrollElement.scrollHeight - 500) {
-      this.setState({ displayCount: this.state.displayCount + INITIAL_PAGE_SIZE });
+    const showNewMsgsFixedTop = this.props.scrollElement.scrollTop > this.base.offsetTop;
+    if (showNewMsgsFixedTop !== this.state.fixedTop) {
+      this.setState({ showNewMsgsFixedTop });
     }
-  }
+  };
 
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -115,7 +127,7 @@ class MessageFeed extends Component {
     }
   }
 
-  showQueuedMessages = () => {
+  showQueuedMessages = (e) => {
     const sortedMessages = this.state.sortedMessages;
     sortedMessages.unshift(...this.state.queuedMessages);
     this.setState({
@@ -124,6 +136,10 @@ class MessageFeed extends Component {
       messagesShownTime: Math.floor(Date.now() / 1000),
       displayCount: INITIAL_PAGE_SIZE
     });
+    // check if e.target has class fixedTop
+    if (e.target.classList.contains('fixedTop')) {
+      Helpers.animateScrollTop('.main-view');
+    }
   }
 
   render() {
@@ -135,7 +151,7 @@ class MessageFeed extends Component {
       <>
         <div>
           {this.state.queuedMessages.length ? (
-            <div style={{cursor: 'pointer'}} className="msg" onClick={this.showQueuedMessages}>
+            <div style={{cursor: 'pointer'}} className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`} onClick={this.showQueuedMessages}>
               <div className="msg-content notification-msg">
                 Show {this.state.queuedMessages.length} new message{this.state.queuedMessages.length > 1 ? 's' : ''}
               </div>

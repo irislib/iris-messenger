@@ -1413,6 +1413,17 @@ a.msg {
   display: initial;
 }
 
+.msg.fixedTop {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  opacity: 0.8;
+}
+
+.public-messages-view .msg.fixedTop:first-of-type .msg-content {
+  border-radius: 0 !important;
+}
+
 .msg.their {
   align-items: flex-start;
 }
