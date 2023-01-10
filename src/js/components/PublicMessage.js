@@ -303,10 +303,6 @@ class PublicMessage extends Message {
     route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
   }
 
-  shortPubKey(pubKey) {
-    return pubKey.slice(0, 4) + '...' + pubKey.slice(-4);
-  }
-
   renderFollow(name) {
     return html`
       <div class="msg">
@@ -425,7 +421,7 @@ class PublicMessage extends Message {
       </div>`;
     }
     //if (++this.i > 1) console.log(this.i);
-    let name = this.props.name || this.state.name || this.shortPubKey(this.state.msg.info.from);
+    let name = this.props.name || this.state.name || Helpers.generateName(this.state.msg.info.from);
 
     if (this.state.msg?.event?.kind === 3) {
       return this.renderFollow(name);

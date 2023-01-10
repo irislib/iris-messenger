@@ -2,6 +2,7 @@ import iris from 'iris-lib';
 
 import Component from '../BaseComponent';
 import Nostr from '../Nostr';
+import Helpers from '../Helpers';
 
 type Props = {
   pub: string;
@@ -24,14 +25,8 @@ class Name extends Component<Props, State> {
     }
   }
 
-  shortPub(): string {
-    // derive an adjective + animal name instead?
-    const pub = this.props.pub;
-    return pub.slice(0, 4) + '...' + pub.slice(-4);
-  }
-
   render() {
-    return this.state.name ?? this.props.placeholder ?? this.shortPub() ?? '';
+    return this.state.name ?? this.props.placeholder ?? Helpers.generateName(this.props.pub);
   }
 }
 

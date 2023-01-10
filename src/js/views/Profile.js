@@ -171,7 +171,7 @@ class Profile extends View {
           <div class="profile-header-stuff">
             <div style="display:flex; flex-direction:row;">
               <h3 style="flex: 1" class="profile-name">
-                ${this.state.name || this.props.id.slice(0, 4) + '...' + this.props.id.slice(-4)}
+                ${this.state.name || Helpers.generateName(this.props.id)}
               </h3>
               <div class="dropdown profile-actions">
                 <div class="dropbtn">…</div>
