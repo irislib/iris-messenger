@@ -108,10 +108,13 @@ class MessageFeed extends Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (!prevProps.scrollElement && this.props.scrollElement) {
       this.props.scrollElement.addEventListener('scroll', this.handleScroll);
       console.log(this.props.scrollElement, 'scrollElement');
+    }
+    if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
+      Helpers.animateScrollTop('.main-view');
     }
     const prevNodeId = prevProps.node && prevProps.node._ && prevProps.node._.id;
     const newNodeId = this.props.node && this.props.node._ && this.props.node._.id;
@@ -136,11 +139,7 @@ class MessageFeed extends Component {
       messagesShownTime: Math.floor(Date.now() / 1000),
       displayCount: INITIAL_PAGE_SIZE
     });
-    // check if e.target has class fixedTop
-    if (e.target.classList.contains('fixedTop')) {
-      Helpers.animateScrollTop('.main-view');
-    }
-  }
+  };
 
   render() {
     if (!this.props.scrollElement || this.unmounted) {
