@@ -92,6 +92,7 @@ export default {
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
   subscribedRepliesAndLikes: new Set<string>(),
+  subscribedProfiles: new Set<string>(),
   likesByUser: new Map<string, SortedLimitedEventSet>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -374,6 +375,13 @@ export default {
         true,
       );
     }, 500);
+    if (_this.subscribedProfiles.size) {
+      _this.sendSubToRelays(
+        [{ authors: Array.from(_this.subscribedProfiles.values()), kinds: [0] }],
+        'subscribedProfiles',
+        true,
+      );
+    }
     setTimeout(() => {
       _this.sendSubToRelays(
         [{ authors: followedUsers, limit: 500, until: now }],
@@ -738,6 +746,15 @@ export default {
         break;
     }
     this.subscribedPosts.delete(event.id);
+
+    if (
+      this.subscribedProfiles.has(event.pubkey) &&
+      this.profileEventByUser.has(event.pubkey) &&
+      this.followEventByUser.has(event.pubkey)
+    ) {
+      this.subscribedProfiles.delete(event.pubkey);
+    }
+
     // go through subscriptions and callback if filters match
     for (const sub of this.subscriptions.values()) {
       if (!sub.filters) {
@@ -936,6 +953,7 @@ export default {
     };
     this.profiles.has(address) && callback();
 
+    this.subscribedProfiles.add(address);
     this.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
   },
 
