@@ -127,6 +127,7 @@ class Follows extends View {
         </h3>
         <div id="follows-list">
           ${this.state.follows.map((k) => {
+            k = Nostr.toNostrBech32Address(k, 'npub');
             return html` <div key=${k} class="profile-link-container">
               <a href="/profile/${k}" class="profile-link">
                 <${Identicon} str=${k} width="49" />

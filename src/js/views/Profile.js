@@ -187,7 +187,7 @@ class Profile extends View {
                   />
                   <${CopyButton}
                     key=${`${this.props.id}copyNpub`}
-                    text=${t('copy_npub')}
+                    text=${t('copy_user_ID')}
                     title=${this.state.name}
                     copyStr=${this.props.id}
                   />
