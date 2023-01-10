@@ -199,7 +199,8 @@ class PublicMessage extends Message {
     this.setState({ showReplyForm });
   }
 
-  onClickName() {
+  onClickName(e) {
+    e.stopPropagation();
     route(`/profile/${this.state.msg.info.from}`);
   }
 
@@ -292,6 +293,16 @@ class PublicMessage extends Message {
     }
   }
 
+  messageClicked(event) {
+    if (this.props.standalone) {
+      return;
+    }
+    if (['A', 'BUTTON'].find((tag) => event.target.closest(tag))) {
+      return;
+    }
+    route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
+  }
+
   shortPubKey(pubKey) {
     return pubKey.slice(0, 4) + '...' + pubKey.slice(-4);
   }
@@ -380,6 +391,17 @@ class PublicMessage extends Message {
     `;
   }
 
+  toggleLikes(e) {
+    console.log('toggle likes');
+    e.stopPropagation();
+    this.setState({ showLikes: !this.state.showLikes, showBoosts: false });
+  }
+
+  toggleBoosts(e) {
+    e.stopPropagation();
+    this.setState({ showBoosts: !this.state.showBoosts, showLikes: false });
+  }
+
   render() {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     if (!this.state.msg) {
@@ -390,7 +412,11 @@ class PublicMessage extends Message {
           ? 'standalone'
           : ''} ${this.props.asQuote ? 'quote' : ''}"
       >
-        <div class="msg-content">
+        <div
+          class="msg-content"
+          style=${this.props.standalone ? '' : { cursor: 'pointer' }}
+          onClick=${(e) => this.messageClicked(e)}
+        >
           <div class="retrieving" style="display:flex;align-items:center">
             <div class="text ${this.state.retrieving ? 'visible' : ''}">Looking up message...</div>
             <div>${this.renderDropdown()}</div>
@@ -457,15 +483,20 @@ class PublicMessage extends Message {
           ? 'standalone'
           : ''} ${this.props.asQuote ? 'quote' : ''}"
       >
-        <div class="msg-content">
+        <div
+          class="msg-content"
+          style=${this.props.standalone ? '' : { cursor: 'pointer' }}
+          onClick=${(e) => this.messageClicked(e)}
+        >
           ${s.msg.replyingTo && !this.props.asReply && !this.props.asQuote
             ? html`
                 <div
                   style="cursor: pointer"
                   onClick=${(e) => {
                     // if event target is not a link or a button, open reply
-                    if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                    if (['A', 'BUTTON'].find((tag) => e.target.closest(tag))) {
                       e.preventDefault();
+                      e.stopPropagation();
                       route(`/post/${s.msg.replyingTo}`);
                     }
                   }}
@@ -482,7 +513,7 @@ class PublicMessage extends Message {
             : ''}
 
           <div class="msg-sender">
-            <div class="msg-sender-link" onclick=${() => this.onClickName()}>
+            <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
               ${name && this.props.showName && html`<div class="msgSenderName">${name}</div>`}
             </div>
@@ -544,8 +575,10 @@ class PublicMessage extends Message {
                     ${replyIcon}
                   </a>
                   <span
-                    class="count ${!this.props.standalone && !this.props.asReply && s.showReplyForm ? 'active' : ''}"
-                    onClick=${() => this.toggleReplies()}
+                    class="count ${!this.props.standalone && !this.props.asReply && s.showReplyForm
+                      ? 'active'
+                      : ''}"
+                    onClick=${(e) => this.toggleReplies(e)}
                   >
                     ${s.replyCount || ''}
                   </span>
@@ -557,7 +590,7 @@ class PublicMessage extends Message {
                   </a>
                   <span
                     class="count ${s.showLikes ? 'active' : ''}"
-                    onClick=${() => this.setState({ showLikes: !s.showLikes, showBoosts: false })}
+                    onClick=${(e) => this.toggleLikes(e)}
                   >
                     ${s.likes || ''}
                   </span>
@@ -569,7 +602,7 @@ class PublicMessage extends Message {
                   </a>
                   <span
                     class="count ${s.showBoosts ? 'active' : ''}"
-                    onClick=${() => this.setState({ showBoosts: !s.showBoosts, showLikes: false })}
+                    onClick=${(e) => this.toggleBoosts(e)}
                   >
                     ${s.boosts || ''}
                   </span>
