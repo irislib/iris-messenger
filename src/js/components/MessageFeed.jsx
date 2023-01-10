@@ -64,6 +64,7 @@ class MessageFeed extends Component {
   }
 
   componentDidMount() {
+    this.props.scrollElement?.addEventListener('scroll', this.handleScroll);
     let first = true;
     if (this.props.nostrUser) {
       if (this.props.index === 'postsAndReplies') {
