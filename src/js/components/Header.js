@@ -278,7 +278,7 @@ class Header extends Component {
             ? 'hidden'
             : ''}"
         >
-          ${this.state.activeRoute === '/notifications' ? Icons.heartFull : Icons.heartEmpty}
+          ${Icons.heartEmpty}
           ${this.state.unseenNotificationCount
             ? html`
                 <span class="unseen"

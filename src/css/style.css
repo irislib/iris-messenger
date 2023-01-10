@@ -350,6 +350,10 @@ a.logo img:not(:last-child) {
   color: var(--msg-form-button-color);
 }
 
+.header-content a.active {
+  color: var(--text-color);
+}
+
 .header .header-content > a:not(:first-child) {
   margin-left: 15px;
 }
