@@ -297,7 +297,7 @@ class PublicMessage extends Message {
     if (this.props.standalone) {
       return;
     }
-    if (['A', 'BUTTON', 'TEXTAREA'].find((tag) => event.target.closest(tag))) {
+    if (['A', 'BUTTON', 'TEXTAREA', 'IMG'].find((tag) => event.target.closest(tag))) {
       return;
     }
     route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
