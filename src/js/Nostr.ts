@@ -453,7 +453,7 @@ export default {
     }
     return count;
   },
-  SUGGESTED_FOLLOW: 'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s',
+  SUGGESTED_FOLLOW: 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk',
   connectRelay: function (relay: Relay) {
     relay.connect();
   },
