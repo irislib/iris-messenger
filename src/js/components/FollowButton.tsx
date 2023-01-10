@@ -34,18 +34,27 @@ class FollowButton extends Component<Props> {
       const nostrAddr = Nostr.toNostrHexAddress(this.props.id);
       if (nostrAddr) {
         Nostr.follow(nostrAddr);
-      } else {
-        iris.public().get('block').get(this.props.id).put(false);
       }
+      iris.public().get('block').get(this.props.id).put(false);
+      return;
     }
     if (value && this.key === 'block') {
-      iris.public().get('follow').get(this.props.id).put(false);
+      // TODO unfollow on nostr
+      //iris.public().get('follow').get(this.props.id).put(false);
     }
     iris.public().get(this.key).get(this.props.id).put(value);
     iris.public().get(this.key).get(this.props.id).put(value);
   }
 
   componentDidMount() {
+    if (this.key === 'follow') {
+      Nostr.getFollowedByUser(iris.session.getKey().secp256k1.rpub, (follows) => {
+        if (follows.has(Nostr.toNostrHexAddress(this.props.id))) {
+          this.setState({ follow: true });
+        }
+      });
+      return;
+    }
     iris
       .public()
       .get(this.key)
