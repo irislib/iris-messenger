@@ -494,8 +494,7 @@ class PublicMessage extends Message {
                   style="cursor: pointer"
                   onClick=${(e) => {
                     // if event target is not a link or a button, open reply
-                    if (['A', 'BUTTON'].find((tag) => e.target.closest(tag))) {
-                      e.preventDefault();
+                    if (!['A', 'BUTTON'].find((tag) => e.target.closest(tag))) {
                       e.stopPropagation();
                       route(`/post/${s.msg.replyingTo}`);
                     }
