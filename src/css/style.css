@@ -1499,6 +1499,10 @@ a.msg {
   white-space: nowrap;
 }
 
+.msg .count.active {
+  color: var(--text-color);
+}
+
 .msg .count:not(:last-of-type) {
   margin-right: 45px;
 }
