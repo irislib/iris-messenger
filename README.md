@@ -53,4 +53,4 @@ Join our [Discord](https://discord.gg/4CJc74JEUY) (will be moved onto Iris when 
 
 <a href="https://opencollective.com/iris-social/donate" target="_blank"><img src="https://opencollective.com/iris-social/donate/button@2x.png?color=blue" width=200 /></a>
 
-<p><sub>BTC donations: 3GopC1ijpZktaGLXHb7atugPj9zPGyQeST</sub></p>
+<p><sub>BTC donations: bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze</sub></p>
