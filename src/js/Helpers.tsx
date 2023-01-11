@@ -86,7 +86,7 @@ export default {
     });
 
     const lnRegex =
-      /(lightning:[\w.-]+@[\w.-]+|lightning:\w+\?amount=\d+|(?:lightning:)?lnbc[\da-z]+)/gi;
+      /(lightning:[\w.-]+@[\w.-]+|lightning:\w+\?amount=\d+|(?:lightning:)?(?:lnurl|lnbc)[\da-z0-9]+)/gi;
     replacedText = reactStringReplace(replacedText, lnRegex, (match) => {
       if (!match.startsWith('lightning:')) {
         match = `lightning:${match}`;
