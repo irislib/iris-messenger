@@ -8,7 +8,6 @@ import { translate as t } from '../../translations/Translation';
 
 const SETTINGS = {
   account: 'account',
-  key: 'private_key',
   nostr: 'nostr',
   language: 'language',
   webtorrent: 'webtorrent',

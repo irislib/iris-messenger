@@ -3,7 +3,6 @@ import Component from '../../BaseComponent';
 import AccountSettings from './AccountSettings';
 import BetaSettings from './BetaSettings';
 import BlockedSettings from './BlockedSettings';
-import KeySettings from './KeySettings';
 import LanguageSettings from './LanguageSettings';
 import NostrSettings from './NostrSettings';
 import PeerSettings from './PeerSettings';
@@ -14,7 +13,6 @@ export default class SettingsContent extends Component {
   content = '';
   pages = {
     account: AccountSettings,
-    key: KeySettings,
     peer: PeerSettings,
     nostr: NostrSettings,
     language: LanguageSettings,
