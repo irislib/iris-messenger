@@ -110,10 +110,10 @@ const NostrSettings = () => {
             ) : (
               <p>Not present. Good!</p>
             )}
-
           </div>
         </div>
       </div>
+      {myPrivHex ? <p dangerouslySetInnerHTML={{ __html: t('private_key_warning') }}></p> : ''}
 
       <h3>Relays</h3>
       <p>
