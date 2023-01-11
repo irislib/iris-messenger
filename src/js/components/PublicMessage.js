@@ -297,7 +297,7 @@ class PublicMessage extends Message {
     if (this.props.standalone) {
       return;
     }
-    if (['A', 'BUTTON', 'TEXTAREA', 'IMG'].find((tag) => event.target.closest(tag))) {
+    if (['A', 'BUTTON', 'TEXTAREA', 'IMG', '.dropdown'].find((tag) => event.target.closest(tag))) {
       return;
     }
     route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
@@ -490,7 +490,7 @@ class PublicMessage extends Message {
                   style="cursor: pointer"
                   onClick=${(e) => {
                     // if event target is not a link or a button, open reply
-                    if (!['A', 'BUTTON'].find((tag) => e.target.closest(tag))) {
+                    if (!['A', 'BUTTON', '.dropdown'].find((tag) => e.target.closest(tag))) {
                       e.stopPropagation();
                       route(`/post/${s.msg.replyingTo}`);
                     }
