@@ -1101,7 +1101,6 @@ h1,
 }
 
 .settings-list .text {
-  border-bottom: 1px solid var(--zebra-stripe-bg);
   flex: 1;
   padding: 15px;
   padding-left: 0;
