@@ -46,7 +46,6 @@ class Follows extends View {
 
     if (nostrAddress) {
       Nostr.getFollowedByUser(nostrAddress, (follows) => {
-        console.log('follows', follows);
         this.follows = follows;
         this.updateSortedFollows();
       });

@@ -111,7 +111,6 @@ class MessageFeed extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.scrollElement && this.props.scrollElement) {
       this.props.scrollElement.addEventListener('scroll', this.handleScroll);
-      console.log(this.props.scrollElement, 'scrollElement');
     }
     if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
       Helpers.animateScrollTop('.main-view');

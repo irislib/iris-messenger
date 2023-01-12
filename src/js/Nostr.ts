@@ -116,17 +116,22 @@ export default {
     }).join('');
   },
 
-  follow: function (address: string) {
-    address = this.toNostrHexAddress(address);
-    const pubkey = iris.session.getKey().secp256k1.rpub;
-    this.addFollower(address, pubkey);
+  follow: function (followedUser: string, follow = true) {
+    followedUser = this.toNostrHexAddress(followedUser);
+    const myPub = iris.session.getKey().secp256k1.rpub;
 
-    const existing = this.followEventByUser.get(pubkey);
+    if (follow) {
+      this.addFollower(followedUser, myPub);
+    } else {
+      this.removeFollower(followedUser, myPub);
+    }
+
+    const existing = this.followEventByUser.get(myPub);
 
     const event = {
       kind: 3,
       content: existing?.content || '',
-      tags: Array.from(this.followedByUser.get(pubkey)).map((address: string) => {
+      tags: Array.from(this.followedByUser.get(myPub)).map((address: string) => {
         return ['p', address];
       }),
     };
@@ -197,13 +202,13 @@ export default {
     }
     this.relays.delete(url);
   },
-  addFollower: function (address: string, follower: string) {
-    if (!this.followersByUser.has(address)) {
-      this.followersByUser.set(address, new Set<string>());
+  addFollower: function (followedUser: string, follower: string) {
+    if (!this.followersByUser.has(followedUser)) {
+      this.followersByUser.set(followedUser, new Set<string>());
     }
-    this.knownUsers.add(address);
+    this.knownUsers.add(followedUser);
     this.knownUsers.add(follower);
-    this.followersByUser.get(address)?.add(follower);
+    this.followersByUser.get(followedUser)?.add(follower);
 
     if (!this.followedByUser.has(follower)) {
       this.followedByUser.set(follower, new Set<string>());
@@ -211,8 +216,8 @@ export default {
     const myPub = iris.session.getKey().secp256k1.rpub;
 
     // if new follow, move all their posts to followedByUser
-    if (follower === myPub && !this.followedByUser.get(myPub).has(address)) {
-      const posts = this.postsByUser.get(address);
+    if (follower === myPub && !this.followedByUser.get(myPub).has(followedUser)) {
+      const posts = this.postsByUser.get(followedUser);
       if (posts) {
         posts.eventIds.forEach((eventId) => {
           const event = this.messagesById.get(eventId);
@@ -220,20 +225,42 @@ export default {
         });
       }
     }
-    this.followedByUser.get(follower)?.add(address);
+    this.followedByUser.get(follower)?.add(followedUser);
     if (follower === myPub) {
-      this.getPostsAndRepliesByUser(address);
+      this.getPostsAndRepliesByUser(followedUser);
     }
-    if (address === myPub) {
-      if (this.followersByUser.get(address)?.size === 1) {
+    if (followedUser === myPub) {
+      if (this.followersByUser.get(followedUser)?.size === 1) {
         iris.local().get('hasNostrFollowers').put(true);
       }
     }
     if (this.followedByUser.get(myPub)?.has(follower)) {
-      if (!this.subscribedUsers.has(address)) {
-        this.subscribedUsers.add(address); // subscribe to events from 2nd degree follows
+      if (!this.subscribedUsers.has(followedUser)) {
+        this.subscribedUsers.add(followedUser); // subscribe to events from 2nd degree follows
         this.subscribeToAuthors(this);
       }
+    }
+  },
+  removeFollower: function (unfollowedUser: string, follower: string) {
+    this.followersByUser.get(unfollowedUser)?.delete(follower);
+    this.followedByUser.get(follower)?.delete(unfollowedUser);
+    this.latestNotesByFollows.eventIds.forEach((id) => {
+      const fullEvent = this.messagesById.get(id);
+      if (fullEvent?.pubkey === unfollowedUser) {
+        this.latestNotesByFollows.delete(id);
+      }
+    });
+    if (this.followersByUser.get(unfollowedUser)?.size === 0) {
+      this.followersByUser.delete(unfollowedUser);
+      this.knownUsers.delete(unfollowedUser);
+      this.subscribedUsers.delete(unfollowedUser);
+      this.latestNotesByEveryone.eventIds.forEach((id) => {
+        const fullEvent = this.messagesById.get(id);
+        if (fullEvent?.pubkey === unfollowedUser) {
+          this.latestNotesByEveryone.delete(id);
+          this.messagesById.delete(id);
+        }
+      });
     }
   },
   // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime. and replies
@@ -675,7 +702,7 @@ export default {
       }
       //}
     } catch (e) {
-      console.log('error parsing nostr profile', e);
+      console.log('error parsing nostr profile', e, event);
     }
   },
   handleDelete(event: Event) {
@@ -864,17 +891,17 @@ export default {
   },
   getFollowedByUser: function (address: string, cb?: (followedUsers: Set<string>) => void) {
     const callback = () => {
-      cb?.(this.followedByUser.get(address));
+      cb?.(this.followedByUser.get(address) ?? new Set());
     };
     this.followedByUser.has(address) && callback();
     this.subscribe([{ kinds: [3], authors: [address] }], callback);
   },
   getFollowersByUser: function (address: string, cb?: (followers: Set<string>) => void) {
     const callback = () => {
-      cb?.(this.followersByUser.get(address));
+      cb?.(this.followersByUser.get(address) ?? new Set());
     };
     this.followersByUser.has(address) && callback();
-    this.subscribe([{ kinds: [3], '#p': [address] }], callback);
+    this.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
   },
   async getMessageById(id: string) {
     if (this.messagesById.has(id)) {
@@ -912,14 +939,14 @@ export default {
       cb(this.latestNotesByEveryone.eventIds);
     };
     callback();
-    this.subscribe([{ kinds: [1, 5, 7] }], callback);
+    this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
   },
   getMessagesByFollows(cb: (messageIds: string[]) => void) {
     const callback = () => {
       cb(this.latestNotesByFollows.eventIds);
     };
     callback();
-    this.subscribe([{ kinds: [1, 5, 7] }], callback);
+    this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile
