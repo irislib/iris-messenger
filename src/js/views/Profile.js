@@ -9,6 +9,7 @@ import { Link } from 'preact-router/match';
 import Button from '../components/basic/Button';
 import BlockButton from '../components/BlockButton';
 import CopyButton from '../components/CopyButton';
+import Dropdown from '../components/Dropdown';
 import FeedMessageForm from '../components/FeedMessageForm';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
@@ -173,9 +174,8 @@ class Profile extends View {
               <h3 style="flex: 1" class="profile-name">
                 ${this.state.name || Helpers.generateName(this.props.id)}
               </h3>
-              <div class="dropdown profile-actions">
-                <div class="dropbtn">…</div>
-                <div class="dropdown-content">
+              <div class="profile-actions">
+                <${Dropdown}>
                   ${this.state.isMyProfile
                     ? html`<${Button} onClick=${() => route('/profile/edit')}>Edit profile<//>`
                     : html`<${BlockButton} key=${`${this.props.id}block`} id=${this.props.id} />`}
@@ -200,7 +200,7 @@ class Profile extends View {
                     title=${this.state.name}
                     copyStr=${rawDataJson}
                   />
-                </div>
+                <//>
               </div>
             </div>
 

@@ -26,7 +26,11 @@ class Name extends Component<Props, State> {
   }
 
   render() {
-    return this.state.name ?? this.props.placeholder ?? Helpers.generateName(this.props.pub);
+    return (
+      this.state.name ??
+      this.props.placeholder ??
+      Helpers.generateName(Nostr.toNostrBech32Address(this.props.pub, 'npub'))
+    );
   }
 }
 

@@ -1282,7 +1282,7 @@ a.msg {
 
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
-  display: none;
+  display: block;
   position: absolute;
   right: 0;
   min-width: 160px;
@@ -1323,11 +1323,6 @@ a.msg {
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
   background-color: var(--header-color);
-}
-
-/* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {
-  display: block;
 }
 
 .emoji {

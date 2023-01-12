@@ -51,10 +51,14 @@ class CopyButton extends Component<Props, State> {
 
     if (iris.util.isMobile && !this.props.notShareable) {
       // TODO: sometimes needs to be url
-      navigator.share({ text: copyStr, title: this.props.title }).catch((err) => {
-        console.error('share failed', err);
+      if (navigator && navigator.share) {
+        navigator.share({ text: copyStr, title: this.props.title }).catch((err) => {
+          console.error('share failed', err);
+          this.copy(e, copyStr);
+        });
+      } else {
         this.copy(e, copyStr);
-      });
+      }
     } else {
       this.copy(e, copyStr);
     }

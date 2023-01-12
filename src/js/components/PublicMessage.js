@@ -10,6 +10,7 @@ import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import CopyButton from './CopyButton';
+import Dropdown from './Dropdown';
 import FeedMessageForm from './FeedMessageForm';
 import Identicon from './Identicon';
 import Message from './Message';
@@ -297,7 +298,7 @@ class PublicMessage extends Message {
     if (this.props.standalone) {
       return;
     }
-    if (['A', 'BUTTON', 'TEXTAREA', 'IMG', '.dropdown'].find((tag) => event.target.closest(tag))) {
+    if (['A', 'BUTTON', 'TEXTAREA', 'IMG'].find((tag) => event.target.closest(tag))) {
       return;
     }
     route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
@@ -340,31 +341,28 @@ class PublicMessage extends Message {
   renderDropdown() {
     return html`
       <div class="msg-menu-btn">
-        <div class="dropdown">
-          <div class="dropbtn">…</div>
-          <div class="dropdown-content">
-            <${CopyButton}
-              key=${`${this.props.hash}copy`}
-              text=${t('copy_note_ID')}
-              title="Note ID"
-              copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
-            />
-            ${this.state.msg
-              ? html`
-                  <${CopyButton}
-                    key=${`${this.props.hash}copyRaw`}
-                    text=${t('copy_raw_data')}
-                    title="Message raw data"
-                    copyStr=${JSON.stringify(this.state.msg.event, null, 2)}
-                  />
-                  ${this.state.msg.info.isMine
-                    ? html` <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> --> `
-                    : ''}
-                  <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
-                `
-              : ''}
-          </div>
-        </div>
+        <${Dropdown}>
+          <${CopyButton}
+            key=${`${this.props.hash}copy`}
+            text=${t('copy_note_ID')}
+            title="Note ID"
+            copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
+          />
+          ${this.state.msg
+            ? html`
+                <${CopyButton}
+                  key=${`${this.props.hash}copyRaw`}
+                  text=${t('copy_raw_data')}
+                  title="Message raw data"
+                  copyStr=${JSON.stringify(this.state.msg.event, null, 2)}
+                />
+                ${this.state.msg.info.isMine
+                  ? html` <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> --> `
+                  : ''}
+                <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
+              `
+            : ''}
+        <//>
       </div>
     `;
   }
@@ -490,7 +488,7 @@ class PublicMessage extends Message {
                   style="cursor: pointer"
                   onClick=${(e) => {
                     // if event target is not a link or a button, open reply
-                    if (!['A', 'BUTTON', '.dropdown'].find((tag) => e.target.closest(tag))) {
+                    if (!['A', 'BUTTON'].find((tag) => e.target.closest(tag))) {
                       e.stopPropagation();
                       route(`/post/${s.msg.replyingTo}`);
                     }
