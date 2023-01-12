@@ -900,11 +900,8 @@ export default {
           .public()
           .get('block')
           .map((isBlocked, address) => {
-            if (isBlocked) {
-              this.blockedUsers.add(address);
-            } else {
-              this.blockedUsers.delete(address);
-            }
+            const hex = this.toNostrHexAddress(address);
+            hex && this.setBlocked(hex, isBlocked);
           });
       });
   },

@@ -419,6 +419,23 @@ class PublicMessage extends Message {
       </div>`;
     }
 
+    if (Nostr.blockedUsers.has(this.state.msg.event.pubkey)) {
+      if (this.props.standalone || this.props.asQuote) {
+        return html`
+          <div class="msg">
+            <div class="msg-content">
+              <p style="display: flex; align-items: center">
+                <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
+                <span> Message from a blocked user</span>
+              </p>
+            </div>
+          </div>
+        `;
+      } else {
+        return '';
+      }
+    }
+
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name || Helpers.generateName(this.state.msg.info.from);
 

@@ -42,7 +42,7 @@ class Follows extends View {
 
   getFollows() {
     Nostr.getFollowedByUser(Nostr.toNostrHexAddress(this.props.id), (follows) => {
-      this.follows = follows;
+      this.follows = follows; // TODO buggy?
       this.updateSortedFollows();
     });
   }
