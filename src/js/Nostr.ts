@@ -273,7 +273,6 @@ export default {
     }
     try {
       const decoded = bech32.decode(address);
-      console.log(decoded);
       if (prefix !== decoded.prefix) {
         return null;
       }

@@ -125,20 +125,22 @@ class Follows extends View {
             : t('following')}
         </h3>
         <div id="follows-list">
-          ${this.state.follows.map((k) => {
-            k = Nostr.toNostrBech32Address(k, 'npub');
-            return html` <div key=${k} class="profile-link-container">
-              <a href="/profile/${k}" class="profile-link">
-                <${Identicon} str=${k} width="49" />
+          ${this.state.follows.map((hexKey) => {
+            console.log('hexKey', hexKey);
+            const npub = Nostr.toNostrBech32Address(hexKey, 'npub');
+            return html` <div key=${npub} class="profile-link-container">
+              <a href="/profile/${npub}" class="profile-link">
+                <${Identicon} str=${npub} width="49" />
                 <div>
-                  <${Name} pub=${k} /><br />
-                  <small class="follower-count"
-                    >${(Nostr.followersByUser.get(k) || new Set()).size || 0}<i
-                    > </i> followers</small
-                  >
+                  <${Name} pub=${npub} /><br />
+                  <small class="follower-count">
+                    ${Nostr.followersByUser.get(hexKey)?.size || 0}<i> </i> followers
+                  </small>
                 </div>
               </a>
-              ${k !== iris.session.getPubKey() ? html`<${FollowButton} id=${k} />` : ''}
+              ${hexKey !== iris.session.getKey().secp256k1.rpub
+                ? html`<${FollowButton} id=${npub} />`
+                : ''}
             </div>`;
           })}
           ${this.state.follows.length === 0 ? '—' : ''}
