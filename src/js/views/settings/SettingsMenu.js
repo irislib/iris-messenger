@@ -13,7 +13,7 @@ const SETTINGS = {
   webtorrent: 'webtorrent',
   webrtc: 'webRTC',
   beta: 'beta',
-  blocked: 'blocked_users',
+  ignored_users: 'ignored_users',
   peer: 'peers',
 };
 

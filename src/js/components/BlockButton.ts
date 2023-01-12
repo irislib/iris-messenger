@@ -4,10 +4,10 @@ class BlockButton extends FollowButton {
   constructor() {
     super();
     this.key = 'block';
-    this.actionDone = 'blocked';
-    this.action = 'block (public)';
+    this.actionDone = 'ignored';
+    this.action = 'ignore (public)';
     this.activeClass = 'blocked';
-    this.hoverAction = 'unblock';
+    this.hoverAction = 'un-ignore';
   }
 }
 

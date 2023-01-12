@@ -17,7 +17,7 @@ export default class BlockedSettings extends Component {
     return (
       <>
         <div class="centered-container">
-          <h3>{t('blocked_users')}</h3>
+          <h3>{t('ignored_users')}</h3>
           {Object.keys(this.state.blockedUsers).map((user) => {
             const bech32 = Nostr.toNostrBech32Address(user, 'npub');
             if (bech32 && this.state.blockedUsers[user]) {
