@@ -83,7 +83,7 @@ class MyIdenticon extends Component<Props, State> {
     const width = this.props.width;
     const activity =
       ['online', 'active'].indexOf(this.state.activity ?? '') > -1 ? this.state.activity : '';
-    const hasPicture = this.state.picture && !this.props.hidePicture;
+    const hasPicture = this.state.picture && !this.props.hidePicture && !Nostr.blockedUsers.has(this.props.str as string);
     const hasPictureStyle = hasPicture ? 'has-picture' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 

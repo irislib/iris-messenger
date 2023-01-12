@@ -86,6 +86,7 @@ export default {
   maxRelays: iris.util.isMobile ? 5 : 10,
   relays: defaultRelays,
   knownUsers: new Set<string>(),
+  blockedUsers: new Set<string>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
   subscribedFiltersByName: new Map<string, Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
@@ -116,7 +117,7 @@ export default {
     }).join('');
   },
 
-  follow: function (followedUser: string, follow = true) {
+  setFollowed: function (followedUser: string, follow = true) {
     followedUser = this.toNostrHexAddress(followedUser);
     const myPub = iris.session.getKey().secp256k1.rpub;
 
@@ -137,6 +138,18 @@ export default {
     };
 
     this.publish(event);
+  },
+
+  setBlocked: function (blockedUser: string, block = true) {
+    blockedUser = this.toNostrHexAddress(blockedUser);
+    const myPub = iris.session.getKey().secp256k1.rpub;
+
+    if (block) {
+      this.blockedUsers.add(blockedUser);
+      this.removeFollower(blockedUser, myPub);
+    } else {
+      this.blockedUsers.delete(blockedUser);
+    }
   },
 
   loadLocalStorageEvents: async function () {
@@ -244,13 +257,23 @@ export default {
   removeFollower: function (unfollowedUser: string, follower: string) {
     this.followersByUser.get(unfollowedUser)?.delete(follower);
     this.followedByUser.get(follower)?.delete(unfollowedUser);
+    const blocked = this.blockedUsers.has(unfollowedUser);
     this.latestNotesByFollows.eventIds.forEach((id) => {
       const fullEvent = this.eventsById.get(id);
       if (fullEvent?.pubkey === unfollowedUser) {
         this.latestNotesByFollows.delete(id);
+        // if blocked user is in a p tag, remove the note
+        fullEvent?.tags.forEach((tag) => {
+          if (tag[0] === 'p' && tag[1] === unfollowedUser) {
+            this.latestNotesByFollows.delete(id);
+          }
+        });
       }
     });
-    if (this.followersByUser.get(unfollowedUser)?.size === 0) {
+    if (
+      blocked ||
+      this.followersByUser.get(unfollowedUser)?.size === 0
+    ) {
       this.followersByUser.delete(unfollowedUser);
       this.knownUsers.delete(unfollowedUser);
       this.subscribedUsers.delete(unfollowedUser);
@@ -259,9 +282,15 @@ export default {
         if (fullEvent?.pubkey === unfollowedUser) {
           this.latestNotesByEveryone.delete(id);
           this.eventsById.delete(id);
+          fullEvent?.tags.forEach((tag) => {
+            if (tag[0] === 'p' && tag[1] === unfollowedUser) {
+              this.latestNotesByEveryone.delete(id);
+            }
+          });
         }
       });
     }
+    saveLocalStorageEvents(this);
   },
   // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime. and replies
   followerCount: function (address: string) {
@@ -744,6 +773,9 @@ export default {
     if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
       return;
     }
+    if (this.blockedUsers.has(event.pubkey)) {
+      return;
+    }
     this.handledMsgsPerSecond++;
 
     switch (event.kind) {
@@ -863,6 +895,16 @@ export default {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
           this.handledMsgsPerSecond = 0;
         }, 1000);
+        iris
+          .public()
+          .get('block')
+          .map((isBlocked, address) => {
+            if (isBlocked) {
+              this.blockedUsers.add(address);
+            } else {
+              this.blockedUsers.delete(address);
+            }
+          });
       });
   },
   getRepliesAndLikes(
