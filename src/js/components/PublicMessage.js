@@ -425,7 +425,7 @@ class PublicMessage extends Message {
           <div class="msg">
             <div class="msg-content">
               <p style="display: flex; align-items: center">
-                <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
+                <i style="margin-right: 15px;"> ${Icons.newFollower} </i>
                 <span> Message from a blocked user</span>
               </p>
             </div>
