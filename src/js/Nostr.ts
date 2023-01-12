@@ -24,15 +24,15 @@ const getRelayStatus = (relay: Relay) => {
 
 const saveLocalStorageEvents = debounce((_this: any) => {
   const latestMsgs = _this.latestNotesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
-    return _this.messagesById.get(eventId);
+    return _this.eventsById.get(eventId);
   });
   const latestMsgsByEveryone = _this.latestNotesByEveryone.eventIds
     .slice(0, 1000)
     .map((eventId: any) => {
-      return _this.messagesById.get(eventId);
+      return _this.eventsById.get(eventId);
     });
   const notifications = _this.notifications.eventIds.map((eventId: any) => {
-    return _this.messagesById.get(eventId);
+    return _this.eventsById.get(eventId);
   });
   console.log('saving some events to local storage');
   localForage.setItem('latestMsgs', latestMsgs);
@@ -51,7 +51,7 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
 
-const messagesById = new Map<string, Event>();
+const eventsById = new Map<string, Event>();
 
 const DEFAULT_RELAYS = [
   'wss://jiggytom.ddns.net',
@@ -68,7 +68,7 @@ const DEFAULT_RELAYS = [
 ];
 
 const defaultRelays = new Map<string, Relay>(
-  DEFAULT_RELAYS.map((url) => [url, relayInit(url, messagesById)]),
+  DEFAULT_RELAYS.map((url) => [url, relayInit(url, eventsById)]),
 );
 
 type Subscription = {
@@ -96,7 +96,7 @@ export default {
   likesByUser: new Map<string, SortedLimitedEventSet>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
-  messagesById,
+  eventsById,
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
@@ -178,7 +178,7 @@ export default {
   },
   addRelay(url: string) {
     if (this.relays.has(url)) return;
-    const relay = relayInit(url, this.messagesById);
+    const relay = relayInit(url, this.eventsById);
     relay.on('connect', () => {
       for (const [name, filters] of this.subscribedFiltersByName.entries()) {
         const sub = relay.sub(filters, {});
@@ -220,7 +220,7 @@ export default {
       const posts = this.postsByUser.get(followedUser);
       if (posts) {
         posts.eventIds.forEach((eventId) => {
-          const event = this.messagesById.get(eventId);
+          const event = this.eventsById.get(eventId);
           event && this.latestNotesByFollows.add(event);
         });
       }
@@ -245,7 +245,7 @@ export default {
     this.followersByUser.get(unfollowedUser)?.delete(follower);
     this.followedByUser.get(follower)?.delete(unfollowedUser);
     this.latestNotesByFollows.eventIds.forEach((id) => {
-      const fullEvent = this.messagesById.get(id);
+      const fullEvent = this.eventsById.get(id);
       if (fullEvent?.pubkey === unfollowedUser) {
         this.latestNotesByFollows.delete(id);
       }
@@ -255,10 +255,10 @@ export default {
       this.knownUsers.delete(unfollowedUser);
       this.subscribedUsers.delete(unfollowedUser);
       this.latestNotesByEveryone.eventIds.forEach((id) => {
-        const fullEvent = this.messagesById.get(id);
+        const fullEvent = this.eventsById.get(id);
         if (fullEvent?.pubkey === unfollowedUser) {
           this.latestNotesByEveryone.delete(id);
-          this.messagesById.delete(id);
+          this.eventsById.delete(id);
         }
       });
     }
@@ -523,7 +523,7 @@ export default {
     setInterval(go, 1000);
   },
   handleNote(event: Event) {
-    this.messagesById.set(event.id, event);
+    this.eventsById.set(event.id, event);
     if (!this.postsAndRepliesByUser.has(event.pubkey)) {
       this.postsAndRepliesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
     }
@@ -707,7 +707,7 @@ export default {
   handleDelete(event: Event) {
     const id = event.tags.find((tag) => tag[0] === 'e')?.[1];
     if (id) {
-      if (this.messagesById.has(id)) {
+      if (this.eventsById.has(id)) {
         this.postsAndRepliesByUser.get(event.pubkey)?.delete(id);
         // TODO remove from other indexes. sql.js instead of our own indexing would make life easier here.
       }
@@ -728,7 +728,7 @@ export default {
           return;
         }
       }
-      this.messagesById.set(event.id, event);
+      this.eventsById.set(event.id, event);
       this.notifications.add(event);
       if (event.created_at > this.notificationsSeenTime) {
         this.unseenNotificationCount++;
@@ -738,7 +738,7 @@ export default {
   },
   handleEvent(event: Event) {
     if (!event) return;
-    if (this.messagesById.has(event.id)) {
+    if (this.eventsById.has(event.id)) {
       return;
     }
     if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
@@ -903,14 +903,14 @@ export default {
     this.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
   },
   async getMessageById(id: string) {
-    if (this.messagesById.has(id)) {
-      return this.messagesById.get(id);
+    if (this.eventsById.has(id)) {
+      return this.eventsById.get(id);
     }
 
     return new Promise((resolve) => {
       this.subscribe([{ ids: [id] }], () => {
         // TODO turn off subscription
-        const msg = this.messagesById.get(id);
+        const msg = this.eventsById.get(id);
         msg && resolve(msg);
       });
     });

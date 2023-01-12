@@ -47,7 +47,7 @@ The application is an unaudited proof-of-concept implementation, so don't use it
 
 ## Contact
 
-Join our [Discord](https://discord.gg/4CJc74JEUY) (will be moved onto Iris when group chat is ready) or send me a message on [Iris](https://iris.to/?chatWith=hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU&s=HlzYzNrhUsrn2PLi4yuRt6DiFUNM3hOmN8nFpgw6T-g&k=zvDfsInsMOI1).
+Join our [Telegram](https://t.me/irismessenger) (will be moved onto Iris when group chat is ready).
 
 ---
 

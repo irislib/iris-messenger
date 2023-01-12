@@ -70,9 +70,9 @@ class PublicMessage extends Message {
         };
       };
 
-      if (Nostr.messagesById.has(nostrId)) {
+      if (Nostr.eventsById.has(nostrId)) {
         // for faster painting, return synchronously if we have the message
-        return processNostrMessage(Nostr.messagesById.get(nostrId));
+        return processNostrMessage(Nostr.eventsById.get(nostrId));
       }
 
       return Nostr.getMessageById(nostrId).then((event) => {
@@ -158,7 +158,7 @@ class PublicMessage extends Message {
           const sortedReplies =
             replies &&
             Array.from(replies).sort(
-              (a, b) => Nostr.messagesById.get(a)?.time - Nostr.messagesById.get(b)?.time,
+              (a, b) => Nostr.eventsById.get(a)?.time - Nostr.eventsById.get(b)?.time,
             );
           this.setState({
             boosts: this.boostedBy.size,
@@ -265,7 +265,7 @@ class PublicMessage extends Message {
     e.preventDefault();
     const nostrId = Nostr.toNostrHexAddress(this.props.hash);
     if (nostrId) {
-      const event = Nostr.messagesById.get(nostrId);
+      const event = Nostr.eventsById.get(nostrId);
       if (event) {
         // TODO indicate to user somehow
         console.log('broadcasting', nostrId);

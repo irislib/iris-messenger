@@ -53,7 +53,7 @@ class About extends Component {
 
             <p>
               While we're working on Iris group chats, you're welcome to join our{' '}
-              <a href="https://discord.gg/4CJc74JEUY">Discord</a> community.
+              <a href="https://t.me/irismessenger">Telegram</a> channel.
             </p>
 
             <h4>{t('donate')}</h4>
