@@ -126,7 +126,6 @@ class Follows extends View {
         </h3>
         <div id="follows-list">
           ${this.state.follows.map((hexKey) => {
-            console.log('hexKey', hexKey);
             const npub = Nostr.toNostrBech32Address(hexKey, 'npub');
             return html` <div key=${npub} class="profile-link-container">
               <a href="/profile/${npub}" class="profile-link">

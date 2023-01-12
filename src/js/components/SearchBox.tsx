@@ -9,11 +9,9 @@ import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import Identicon from './Identicon';
-import Text from './Text';
+import Name from './Name';
 
 const RESULTS_MAX = 5;
-const suggestedFollow =
-  'hyECQHwSo7fgr2MVfPyakvayPeixxsaAWVtZ-vbaiSc.TXIp8MnCtrnW6n2MrYquWPcc-DTmZzMBmc2yaGv9gIU';
 
 type Props = {
   onSelect?: (result: Pick<ResultItem, 'key'>) => void;
@@ -265,10 +263,10 @@ class SearchBox extends Component<Props, State> {
           {this.state.query && this.state.noFollows ? (
             <>
               <a class="follow-someone">Follow someone to see more search results!</a>
-              <a href={`/profile/${suggestedFollow}`} class="suggested">
-                <Identicon str={suggestedFollow} width={40} />
+              <a href={`/profile/${Nostr.SUGGESTED_FOLLOW}`} class="suggested">
+                <Identicon str={Nostr.SUGGESTED_FOLLOW} width={40} />
                 <div>
-                  <Text user={suggestedFollow} path="profile/name" />
+                  <Name pub={Nostr.SUGGESTED_FOLLOW} />
                   <br />
                   <small>Suggested</small>
                 </div>

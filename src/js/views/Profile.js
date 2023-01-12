@@ -35,6 +35,10 @@ function deleteChat(pub) {
 class Profile extends View {
   constructor() {
     super();
+    this.state = {
+      followedUserCount: 0,
+      followerCount: 0,
+    };
     this.followedUsers = new Set();
     this.followers = new Set();
     this.id = 'profile';
