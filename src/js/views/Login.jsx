@@ -111,9 +111,9 @@ class Login extends Component {
 
   onLoginFormSubmit(e) {
     e.preventDefault();
-    let name = document.getElementById('login-form-name').value || iris.util.generateName();
+    let name = document.getElementById('login-form-name').value;
     iris.session.loginAsNewUser({ name, autofollow: false });
-    setTimeout(() => {
+    name && setTimeout(() => {
       Nostr.setMetadata({ name });
     }, 100);
     // follow the developer's nostr key also
