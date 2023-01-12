@@ -773,6 +773,10 @@ export default {
     if (this.blockedUsers.has(event.pubkey)) {
       return;
     }
+    if (event.created_at > Date.now() / 1000 + 60 * 1000) {
+      return; // TODO put future messages into bounded queue and process them later
+    }
+
     this.handledMsgsPerSecond++;
 
     switch (event.kind) {
