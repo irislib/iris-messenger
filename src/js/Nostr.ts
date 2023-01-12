@@ -270,10 +270,7 @@ export default {
         });
       }
     });
-    if (
-      blocked ||
-      this.followersByUser.get(unfollowedUser)?.size === 0
-    ) {
+    if (blocked || this.followersByUser.get(unfollowedUser)?.size === 0) {
       this.followersByUser.delete(unfollowedUser);
       this.knownUsers.delete(unfollowedUser);
       this.subscribedUsers.delete(unfollowedUser);

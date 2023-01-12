@@ -418,6 +418,7 @@ class PublicMessage extends Message {
         </div>
       </div>`;
     }
+
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name || Helpers.generateName(this.state.msg.info.from);
 
