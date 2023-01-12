@@ -13,8 +13,7 @@ import View from './View';
 class Follows extends View {
   constructor() {
     super();
-    this.follows = new Set();
-    this.followNames = new Map();
+    this.follows = [];
     this.id = 'follows-view';
     this.state = { follows: [], contacts: {} };
   }
@@ -22,8 +21,8 @@ class Follows extends View {
   updateSortedFollows = throttle(
     () => {
       const follows = Array.from(this.follows).sort((aK, bK) => {
-        const aName = this.followNames.get(aK);
-        const bName = this.followNames.get(bK);
+        const aName = Nostr.profiles.get(aK)?.name;
+        const bName = Nostr.profiles.get(bK)?.name;
         if (!aName && !bName) {
           return aK.localeCompare(bK);
         }
@@ -42,70 +41,21 @@ class Follows extends View {
   );
 
   getFollows() {
-    const nostrAddress = Nostr.toNostrHexAddress(this.props.id);
-
-    if (nostrAddress) {
-      Nostr.getFollowedByUser(nostrAddress, (follows) => {
-        this.follows = follows;
-        this.updateSortedFollows();
-      });
-    } else {
-      iris
-        .public(this.props.id)
-        .get('follow')
-        .map()
-        .on(
-          this.sub((follows, pub) => {
-            if (follows && !this.follows.has(pub)) {
-              this.follows.add(pub);
-              this.getNameForUser(pub);
-            }
-            this.updateSortedFollows();
-          }),
-        );
-    }
+    Nostr.getFollowedByUser(Nostr.toNostrHexAddress(this.props.id), (follows) => {
+      this.follows = follows;
+      this.updateSortedFollows();
+    });
   }
 
   shouldComponentUpdate() {
     return true;
   }
 
-  getNameForUser(user) {
-    // TODO get from nostr
-    iris
-      .public(user)
-      .get('profile')
-      .get('name')
-      .on(
-        this.sub((name) => {
-          if (!name) return;
-          this.followNames.set(user, name);
-          this.updateSortedFollows();
-        }),
-      );
-  }
-
   getFollowers() {
-    const nostrAddress = Nostr.toNostrHexAddress(this.props.id);
-
-    if (nostrAddress) {
-      Nostr.getFollowersByUser(nostrAddress, (follows) => {
-        this.follows = follows;
-        this.updateSortedFollows();
-      });
-    } else {
-      iris.group().on(
-        `follow/${this.props.id}`,
-        this.sub((following, a, b, e, user) => {
-          if (following && !this.follows.has(user)) {
-            if (!following) return;
-            this.follows.add(user);
-            this.getNameForUser(user);
-            this.updateSortedFollows();
-          }
-        }),
-      );
-    }
+    Nostr.getFollowersByUser(Nostr.toNostrHexAddress(this.props.id), (follows) => {
+      this.follows = follows;
+      this.updateSortedFollows();
+    });
   }
 
   componentDidMount() {
