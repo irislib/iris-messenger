@@ -1,8 +1,8 @@
 import iris from 'iris-lib';
-import filter from 'lodash/filter';
 
 import Component from '../../BaseComponent';
-import Text from '../../components/Text';
+import Name from '../../components/Name';
+import Nostr from '../../Nostr';
 import { translate as t } from '../../translations/Translation';
 
 export default class BlockedSettings extends Component {
@@ -14,27 +14,23 @@ export default class BlockedSettings extends Component {
     this.id = 'settings';
   }
   render() {
-    const blockedUsers = filter(
-      Object.keys(this.state.blockedUsers),
-      (user) => this.state.blockedUsers[user],
-    );
-
     return (
       <>
         <div class="centered-container">
           <h3>{t('blocked_users')}</h3>
-          {blockedUsers.map((user) => {
-            if (this.state.blockedUsers[user]) {
+          {Object.keys(this.state.blockedUsers).map((user) => {
+            const bech32 = Nostr.toNostrBech32Address(user, 'npub');
+            if (bech32 && this.state.blockedUsers[user]) {
               return (
                 <p key={user}>
-                  <a href={`/profile/${encodeURIComponent(user)}`}>
-                    <Text user={user} path="profile/name" placeholder="User" />
+                  <a href={`/profile/${bech32}`}>
+                    <Name pub={user} />
                   </a>
                 </p>
               );
             }
           })}
-          {blockedUsers.length === 0 ? t('none') : ''}
+          {Object.keys(this.state.blockedUsers).length === 0 ? t('none') : ''}
         </div>
       </>
     );
@@ -62,6 +58,7 @@ export default class BlockedSettings extends Component {
         this.sub((v, k) => {
           blockedUsers[k] = v;
           this.setState({ blockedUsers });
+          console.log('blockedUsers', blockedUsers);
         }),
       );
   }

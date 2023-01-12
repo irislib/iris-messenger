@@ -29,7 +29,7 @@ class Name extends Component<Props, State> {
     return (
       this.state.name ??
       this.props.placeholder ??
-      Helpers.generateName(Nostr.toNostrBech32Address(this.props.pub, 'npub'))
+      Helpers.generateName(Nostr.toNostrBech32Address(this.props.pub, 'npub') || this.props.pub)
     );
   }
 }
