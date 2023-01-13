@@ -14,7 +14,6 @@ import Chat from './views/chat/Chat';
 import EditProfile from './views/EditProfile';
 import Feed from './views/Feed';
 import Follows from './views/Follows';
-import Hashtags from './views/Hashtags';
 import Login from './views/Login';
 import LogoutConfirmation from './views/LogoutConfirmation';
 import Message from './views/Message';
@@ -155,8 +154,6 @@ class Main extends Component<Props, ReactState> {
             <Router history={history as CustomHistory} onChange={(e) => this.handleRoute(e)}>
               <Feed path="/" index="follows" />
               <Feed path="/discover" index="everyone" />
-              <Hashtags path="/hashtag" />
-              <Feed path="/hashtag/:hashtag+" />
               <Feed path="/search/:term?/:type?" />
               <Feed path="/media" index="media" thumbnails />
               <Login path="/login" />
