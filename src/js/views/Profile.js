@@ -208,6 +208,8 @@ class Profile extends View {
               </div>
             </div>
 
+            ${this.state.nip05 ? html`<div class="positive">${this.state.nip05}</div>` : ''}
+
             <div class="profile-about hidden-xs">
               <p class="profile-about-content">${this.state.about}</p>
               ${this.renderLinks()}
@@ -379,35 +381,40 @@ class Profile extends View {
     };
     Nostr.getFollowersByUser(address, setFollowCounts);
     Nostr.getFollowedByUser(address, setFollowCounts);
-    Nostr.getProfile(address, (profile, addr) => {
-      addr = Nostr.toNostrBech32Address(addr, 'npub');
-      if (!profile || addr !== this.props.id) return;
-      let lud16 = profile.lud16;
-      if (lud16 && !lud16.startsWith('lightning:')) {
-        lud16 = 'lightning:' + lud16;
-      }
+    Nostr.getProfile(
+      address,
+      (profile, addr) => {
+        addr = Nostr.toNostrBech32Address(addr, 'npub');
+        if (!profile || addr !== this.props.id) return;
+        let lud16 = profile.lud16;
+        if (lud16 && !lud16.startsWith('lightning:')) {
+          lud16 = 'lightning:' + lud16;
+        }
 
-      let website =
-        profile.website &&
-        (profile.website.match(/^https?:\/\//) ? profile.website : 'http://' + profile.website);
-      // remove trailing slash
-      if (website && website.endsWith('/')) {
-        website = website.slice(0, -1);
-      }
+        let website =
+          profile.website &&
+          (profile.website.match(/^https?:\/\//) ? profile.website : 'http://' + profile.website);
+        // remove trailing slash
+        if (website && website.endsWith('/')) {
+          website = website.slice(0, -1);
+        }
 
-      if (profile.picture && this.isUserAgentCrawler()) {
-        this.setOgImageUrl(this.state.picture);
-      }
+        if (profile.picture && this.isUserAgentCrawler()) {
+          this.setOgImageUrl(this.state.picture);
+        }
 
-      // profile may contain arbitrary fields, so be careful
-      this.setState({
-        name: profile.name,
-        about: profile.about,
-        picture: profile.picture,
-        lud16,
-        website: website,
-      });
-    });
+        // profile may contain arbitrary fields, so be careful
+        this.setState({
+          name: profile.name,
+          about: profile.about,
+          picture: profile.picture,
+          nip05: profile.nip05valid && profile.nip05,
+          lud16,
+          website: website,
+        });
+      },
+      true,
+    );
   }
 
   componentDidUpdate(prevProps) {

@@ -714,6 +714,7 @@ export default {
       }
       const profile = JSON.parse(event.content);
       profile.created_at = event.created_at;
+      delete profile['nip05valid']; // not robust
       this.profiles.set(event.pubkey, profile);
       const key = this.toNostrBech32Address(event.pubkey, 'npub');
       iris.session.addToSearchIndex(key, {
@@ -1014,15 +1015,56 @@ export default {
     this.likesByUser.has(address) && callback();
     this.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
   },
-  getProfile(address, cb?: (profile: any, address: string) => void) {
+  getProfile(address, cb?: (profile: any, address: string) => void, verifyNip05 = false) {
     this.knownUsers.add(address);
     const callback = () => {
       cb?.(this.profiles.get(address), address);
     };
-    this.profiles.has(address) && callback();
+
+    const profile = this.profiles.get(address);
+    if (profile) {
+      callback();
+      if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
+        this.verifyNip05Address(profile.nip05, address).then((isValid) => {
+          console.log('NIP05 address is valid?', isValid, profile.nip05, address);
+          profile.nip05valid = isValid;
+          this.profiles.set(address, profile);
+          callback();
+        });
+      }
+    }
 
     this.subscribedProfiles.add(address);
     this.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
+  },
+
+  async verifyNip05Address(address: string, pubkey: string): Promise<boolean> {
+    try {
+      const [localPart, domain] = address.split('@');
+      const url = `https://${domain}/.well-known/nostr.json?name=${localPart}`;
+      const response = await fetch(url);
+      const json = await response.json();
+      const names = json.names;
+      return names[localPart] === pubkey;
+    } catch (error) {
+      // gives lots of cors errors:
+      // console.error(error);
+      return false;
+    }
+  },
+
+  async getPubKeyByNip05Address(address: string): Promise<string | null> {
+    try {
+      const [localPart, domain] = address.split('@');
+      const url = `https://${domain}/.well-known/nostr.json?name=${localPart}`;
+      const response = await fetch(url);
+      const json = await response.json();
+      const names = json.names;
+      return names[localPart] || null;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   },
 
   setMetadata(data: any) {
