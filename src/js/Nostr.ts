@@ -271,6 +271,8 @@ export default {
       }
     });
     if (blocked || this.followersByUser.get(unfollowedUser)?.size === 0) {
+      // TODO: remove unfollowedUser from everyone's followersByUser.
+      //  if resulting followersByUser(u).size is 0, remove that user as well
       this.followersByUser.delete(unfollowedUser);
       this.knownUsers.delete(unfollowedUser);
       this.subscribedUsers.delete(unfollowedUser);

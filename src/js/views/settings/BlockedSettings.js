@@ -14,23 +14,26 @@ export default class BlockedSettings extends Component {
     this.id = 'settings';
   }
   render() {
+    let hasBlockedUsers = false;
+    const blockedUsers = Object.keys(this.state.blockedUsers).map((user) => {
+      const bech32 = Nostr.toNostrBech32Address(user, 'npub');
+      if (bech32 && this.state.blockedUsers[user]) {
+        hasBlockedUsers = true;
+        return (
+          <p key={user}>
+            <a href={`/profile/${bech32}`}>
+              <Name pub={user} />
+            </a>
+          </p>
+        );
+      }
+    });
+
     return (
       <>
         <div class="centered-container">
           <h3>{t('ignored_users')}</h3>
-          {Object.keys(this.state.blockedUsers).map((user) => {
-            const bech32 = Nostr.toNostrBech32Address(user, 'npub');
-            if (bech32 && this.state.blockedUsers[user]) {
-              return (
-                <p key={user}>
-                  <a href={`/profile/${bech32}`}>
-                    <Name pub={user} />
-                  </a>
-                </p>
-              );
-            }
-          })}
-          {Object.keys(this.state.blockedUsers).length === 0 ? t('none') : ''}
+          {hasBlockedUsers ? blockedUsers : t('none')}
         </div>
       </>
     );
