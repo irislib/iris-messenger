@@ -180,7 +180,7 @@ class ExplorerNode extends BaseComponent {
         <span onClick=${(e) => this.onChildObjectClick(e, k)}
           >${this.state.children[k].open ? chevronDown : chevronRight}</span
         >
-        <a href="/explorer/${encodeURIComponent(path)}">
+        <a href="#/explorer/${encodeURIComponent(path)}">
           <b>
             ${typeof k === 'string' && substr.match(pubKeyRegex)
               ? html`<${Name} key=${k} pub=${substr} placeholder="user" />`
@@ -403,7 +403,7 @@ class ExplorerNode extends BaseComponent {
             (group) => html`
               <div class="explorer-row" style="padding-left: 1em">
                 ${chevronRight}
-                <a href="/explorer/Group%2F${encodeURIComponent(encodeURIComponent(group))}"
+                <a href="#/explorer/Group%2F${encodeURIComponent(encodeURIComponent(group))}"
                   ><b>${group}</b></a
                 >
               </div>

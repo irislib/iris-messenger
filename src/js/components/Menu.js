@@ -14,7 +14,7 @@ const APPLICATIONS = [
   { url: '/media', text: 'media', icon: Icons.play, beta: true },
   { url: '/chat', text: 'messages', icon: Icons.chat, beta: true },
   { url: '/discover', text: 'global', icon: Icons.global },
-  { url: '/settings', text: 'settings', icon: Icons.settings },
+  { url: '#/settings', text: 'settings', icon: Icons.settings },
   { url: '/explorer', text: 'explorer', icon: Icons.folder, beta: true },
   { url: '/about', text: 'about', icon: Icons.info },
 ];
@@ -36,7 +36,7 @@ export default class Menu extends Component {
         ${Helpers.isElectron
           ? html`<div class="electron-padding" />`
           : html`
-              <a tabindex="3" href="/" onClick=${() => this.menuLinkClicked()} class="logo">
+              <a tabindex="3" href="#/" onClick=${() => this.menuLinkClicked()} class="logo">
                 <div class="mobile-menu-icon visible-xs-inline-block">${Icons.menu}</div>
                 <img src=${logo} width="30" height="30" />
                 <span style="font-size: 1.5em">iris</span>

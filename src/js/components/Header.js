@@ -173,7 +173,7 @@ class Header extends Component {
           ${Helpers.isElectron || chatting
             ? ''
             : html`
-                <a href="/" onClick=${(e) => this.onLogoClick(e)} class="visible-xs-flex logo">
+                <a href="#/" onClick=${(e) => this.onLogoClick(e)} class="visible-xs-flex logo">
                   <div class="mobile-menu-icon">${Icons.menu}</div>
                 </a>
               `}
@@ -193,7 +193,7 @@ class Header extends Component {
               </a>
             `}
         <a
-          href="/settings/nostr"
+          href="#/settings/nostr"
           class="connected-peers tooltip mobile-search-hidden ${this.state.showMobileSearch
             ? 'hidden-xs'
             : ''} ${this.state.connectedRelays ? 'connected' : ''}"
@@ -273,7 +273,7 @@ class Header extends Component {
           : ''}
         <${Link}
           activeClassName="active"
-          href="/notifications"
+          href="#/notifications"
           class="notifications-button mobile-search-hidden ${this.state.showMobileSearch
             ? 'hidden'
             : ''}"
@@ -292,7 +292,7 @@ class Header extends Component {
 
         <${Link}
           activeClassName="active"
-          href="/profile/${npub}"
+          href="#/profile/${npub}"
           onClick=${() => iris.local().get('scrollUp').put(true)}
           class="hidden-xs my-profile"
         >

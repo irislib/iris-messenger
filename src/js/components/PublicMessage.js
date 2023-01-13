@@ -310,7 +310,7 @@ class PublicMessage extends Message {
         <div class="msg-content">
           <p style="display: flex; align-items: center">
             <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
-            <a href="/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               ${name}
             </a>
             <span> started following you</span>
@@ -327,7 +327,7 @@ class PublicMessage extends Message {
         <div class="msg-content">
           <p style="display: flex; align-items: center">
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
-            <a href="/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               ${name}
             </a>
             <span> liked your post</span>
@@ -374,7 +374,7 @@ class PublicMessage extends Message {
         <div class="msg-content">
           <p style="display: flex; align-items: center">
             <i style="margin-right: 15px;"> ${Icons.boost} </i>
-            <a href="/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               ${name}
             </a>
             <span> boosted</span>
@@ -620,7 +620,7 @@ class PublicMessage extends Message {
                 `}
             <div class="time">
               <a
-                href="/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
+                href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
                 class="tooltip"
               >
                 ${Helpers.getRelativeTimeText(time)}

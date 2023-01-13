@@ -25,7 +25,7 @@ export default class OnboardingNotification extends Component {
           <div class="msg-content">
             <p>${t('follow_someone_info')}</p>
             <div class="profile-link-container">
-              <a href="/profile/${Nostr.SUGGESTED_FOLLOW}" class="profile-link">
+              <a href="#/profile/${Nostr.SUGGESTED_FOLLOW}" class="profile-link">
                 <${Identicon} str=${Nostr.SUGGESTED_FOLLOW} width="40" />
                 <${Name} pub=${Nostr.SUGGESTED_FOLLOW} placeholder="Suggested follow" />
               </a>
@@ -33,7 +33,7 @@ export default class OnboardingNotification extends Component {
             </div>
             <p>
               ${t('alternatively')}<i> </i>
-              <a href="/profile/${iris.session.getPubKey()?.secp256k1?.rpub}"
+              <a href="#/profile/${iris.session.getPubKey()?.secp256k1?.rpub}"
                 >${t('give_your_profile_link_to_someone')}</a
               >.
             </p>

@@ -334,7 +334,7 @@ export default class PrivateChat extends Component {
             ${participants.map(
               (k) =>
                 html`
-                  <a href="/profile/${k}">
+                  <a href="#/profile/${k}">
                     <span class="text">
                       <${Identicon} key="i${k}" str=${k} width="30" activity=${true} />
                       <${Name} pub=${k} key="t${k}" />

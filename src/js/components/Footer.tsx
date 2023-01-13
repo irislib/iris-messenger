@@ -63,11 +63,11 @@ class Footer extends Component<Props, State> {
     return (
       <footer class="visible-xs-flex nav footer">
         <div class="header-content" onClick={() => iris.local().get('scrollUp').put(true)}>
-          <a href="/" class={`btn ${activeRoute === '/' ? 'active' : ''}`}>
+          <a href="#/" class={`btn ${activeRoute === '/' ? 'active' : ''}`}>
             {Icons.home}
           </a>
           {this.state.showBetaFeatures && (
-            <a href="/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
+            <a href="#/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
               {this.state.unseenMsgsTotal ? (
                 <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
               ) : (
@@ -76,10 +76,10 @@ class Footer extends Component<Props, State> {
               {Icons.chat}
             </a>
           )}
-          <a href="/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
+          <a href="#/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
             {plusIcon}
           </a>
-          <a href="/discover" class={`btn ${activeRoute === '/discover' ? 'active' : ''}`}>
+          <a href="#/discover" class={`btn ${activeRoute === '/discover' ? 'active' : ''}`}>
             {Icons.global}
           </a>
           <a

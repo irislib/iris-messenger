@@ -239,7 +239,7 @@ class Message extends Component {
           ${this.props.replyingTo
             ? html`
                 <div>
-                  <a href="/post/${encodeURIComponent(this.props.replyingTo)}"
+                  <a href="#/post/${encodeURIComponent(this.props.replyingTo)}"
                     >Show replied message</a
                   >
                 </div>
@@ -248,7 +248,7 @@ class Message extends Component {
           <div class="below-text">
             <div class="time">
               ${this.props.hash
-                ? html`<a href="/post/${encodeURIComponent(this.props.hash)}"
+                ? html`<a href="#/post/${encodeURIComponent(this.props.hash)}"
                     >${Helpers.getRelativeTimeText(time)}</a
                   >`
                 : iris.util.formatTime(time)}

@@ -108,7 +108,7 @@ class MainView extends Component {
               dangerouslySetInnerHTML={{
                 __html: t(
                   'beware_of_sharing_invite_link_publicly',
-                  `href="/profile/${iris.session.getPubKey()}"`,
+                  `href="#/profile/${iris.session.getPubKey()}"`,
                 ),
               }}
             />

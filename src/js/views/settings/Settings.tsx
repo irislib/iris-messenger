@@ -40,7 +40,7 @@ class Settings extends Component<Props, State> {
           <div style="flex-direction: row;" id="settings">
             <div class="logo" className={this.props.page ? 'visible-xs-flex' : 'hidden'}>
               <div
-                href="/settings/"
+                href="#/settings/"
                 onClick={(e) => this.onLogoClick(e)}
                 style="margin: 1em; display:flex;"
               >

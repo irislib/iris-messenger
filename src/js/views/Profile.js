@@ -214,10 +214,10 @@ class Profile extends View {
             </div>
             <div class="profile-actions">
               <div class="follow-count">
-                <a href="/follows/${this.props.id}">
+                <a href="#/follows/${this.props.id}">
                   <span>${this.state.followedUserCount}</span> ${t('following')}
                 </a>
-                <a href="/followers/${this.props.id}">
+                <a href="#/followers/${this.props.id}">
                   <span>${this.state.followerCount}</span> ${t('followers')}
                 </a>
               </div>
@@ -282,13 +282,13 @@ class Profile extends View {
   renderTabs() {
     return html`
       <div class="tabs">
-        <${Link} activeClassName="active" href="/profile/${this.props.id}"
+        <${Link} activeClassName="active" href="#/profile/${this.props.id}"
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
-        <${Link} activeClassName="active" href="/replies/${this.props.id}"
+        <${Link} activeClassName="active" href="#/replies/${this.props.id}"
           >${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
-        <${Link} activeClassName="active" href="/likes/${this.props.id}"
+        <${Link} activeClassName="active" href="#/likes/${this.props.id}"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
         >
       </div>
