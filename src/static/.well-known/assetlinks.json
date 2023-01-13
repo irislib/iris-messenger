@@ -1,6 +1,1 @@
-[{
-        "relation": ["delegate_permission/common.handle_all_urls"],
-        "target" : { "namespace": "android_app", "package_name": "to.iris.twa",
-                     "sha256_cert_fingerprints": ["63:B5:70:E8:F1:75:7E:D6:EF:81:11:66:F4:9D:47:AB:49:3C:2E:00:B9:67:92:40:89:A5:03:0B:96:B9:40:09"] }
-      }
-]
+[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"to.iris.twa","sha256_cert_fingerprints":["63:B5:70:E8:F1:75:7E:D6:EF:81:11:66:F4:9D:47:AB:49:3C:2E:00:B9:67:92:40:89:A5:03:0B:96:B9:40:09"]}}]
