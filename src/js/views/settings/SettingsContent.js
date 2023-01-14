@@ -19,7 +19,7 @@ export default class SettingsContent extends Component {
     webtorrent: WebtorrentSettings,
     webrtc: WebRTCSettings,
     beta: BetaSettings,
-    ignored_users: BlockedSettings,
+    blocked_users: BlockedSettings,
   };
 
   constructor() {

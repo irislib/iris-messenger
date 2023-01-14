@@ -87,6 +87,7 @@ export default {
   relays: defaultRelays,
   knownUsers: new Set<string>(),
   blockedUsers: new Set<string>(),
+  deletedEvents: new Set<string>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
   subscribedFiltersByName: new Map<string, Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
@@ -735,10 +736,15 @@ export default {
   },
   handleDelete(event: Event) {
     const id = event.tags.find((tag) => tag[0] === 'e')?.[1];
+    const myPub = iris.session.getKey().secp256k1.rpub;
     if (id) {
-      if (this.eventsById.has(id)) {
+      const deletedEvent = this.eventsById.get(id);
+      // only we or the author can delete
+      if (deletedEvent && [event.pubkey, myPub].includes(deletedEvent.pubkey)) {
+        this.eventsById.delete(id);
         this.postsAndRepliesByUser.get(event.pubkey)?.delete(id);
-        // TODO remove from other indexes. sql.js instead of our own indexing would make life easier here.
+        this.latestNotesByFollows.delete(id);
+        this.latestNotesByEveryone.delete(id);
       }
     }
   },
@@ -774,6 +780,9 @@ export default {
       return;
     }
     if (this.blockedUsers.has(event.pubkey)) {
+      return;
+    }
+    if (this.deletedEvents.has(event.id)) {
       return;
     }
     if (event.created_at > Date.now() / 1000 + 60 * 1000) {

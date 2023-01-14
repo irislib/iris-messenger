@@ -338,6 +338,24 @@ class PublicMessage extends Message {
     `;
   }
 
+  report(e) {
+    e.preventDefault();
+    if (confirm('Publicly report and hide message?')) {
+      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+      if (nostrId) {
+        Nostr.publish({
+          kind: 5,
+          content: 'reported',
+          tags: [
+            ['e', nostrId],
+            ['p', this.state.msg?.event?.pubkey],
+          ],
+        });
+        this.setState({ msg: null });
+      }
+    }
+  }
+
   renderDropdown() {
     return html`
       <div class="msg-menu-btn">
@@ -350,6 +368,7 @@ class PublicMessage extends Message {
           />
           ${this.state.msg
             ? html`
+                <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
                 <${CopyButton}
                   key=${`${this.props.hash}copyRaw`}
                   text=${t('copy_raw_data')}
@@ -357,9 +376,8 @@ class PublicMessage extends Message {
                   copyStr=${JSON.stringify(this.state.msg.event, null, 2)}
                 />
                 ${this.state.msg.info.isMine
-                  ? html` <!-- <a href="#" onClick=${(e) => this.onDelete(e)}>Delete</a> --> `
-                  : ''}
-                <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
+                  ? html` <a href="#" onClick=${(e) => this.onDelete(e)}>${t('delete')}</a> `
+                  : html`<a href="#" onClick=${(e) => this.report(e)}>${t('report (public)')}</a>`}
               `
             : ''}
         <//>
@@ -635,7 +653,7 @@ class PublicMessage extends Message {
                     return html`<${Identicon}
                       showTooltip=${true}
                       onClick=${() => route(`/profile/${key}`)}
-                      str=${key}
+                      str=${Nostr.toNostrBech32Address(key, 'npub')}
                       width="32"
                     />`;
                   })}
@@ -649,7 +667,7 @@ class PublicMessage extends Message {
                     return html`<${Identicon}
                       showTooltip=${true}
                       onClick=${() => route(`/profile/${key}`)}
-                      str=${key}
+                      str=${Nostr.toNostrBech32Address(key, 'npub')}
                       width="32"
                     />`;
                   })}

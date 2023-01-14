@@ -182,7 +182,7 @@ class Profile extends View {
                 <${Dropdown}>
                   ${this.state.isMyProfile
                     ? html`<${Button} onClick=${() => route('/profile/edit')}>Edit profile<//>`
-                    : html`<${BlockButton} key=${`${this.props.id}block`} id=${this.props.id} />`}
+                    : ''}
                   <${CopyButton}
                     key=${`${this.props.id}copyLink`}
                     text=${t('copy_link')}
@@ -204,6 +204,12 @@ class Profile extends View {
                     title=${this.state.name}
                     copyStr=${rawDataJson}
                   />
+                  ${this.state.isMyProfile
+                    ? ''
+                    : html`
+                        <${BlockButton} key=${`${this.props.id}block`} id=${this.props.id} />
+                        <${BlockButton} key=${`${this.props.id}report`} id=${this.props.id} />
+                      `}
                 <//>
               </div>
             </div>

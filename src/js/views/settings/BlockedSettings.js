@@ -32,7 +32,7 @@ export default class BlockedSettings extends Component {
     return (
       <>
         <div class="centered-container">
-          <h3>{t('ignored_users')}</h3>
+          <h3>{t('blocked_users')}</h3>
           {hasBlockedUsers ? blockedUsers : t('none')}
         </div>
       </>
