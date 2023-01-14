@@ -8,6 +8,7 @@ import { Link } from 'preact-router/match';
 
 import Button from '../components/basic/Button';
 import BlockButton from '../components/BlockButton';
+import FlagButton from '../components/FlagButton';
 import CopyButton from '../components/CopyButton';
 import Dropdown from '../components/Dropdown';
 import FeedMessageForm from '../components/FeedMessageForm';
@@ -207,8 +208,8 @@ class Profile extends View {
                   ${this.state.isMyProfile
                     ? ''
                     : html`
-                        <${BlockButton} key=${`${this.props.id}block`} id=${this.props.id} />
-                        <${BlockButton} key=${`${this.props.id}report`} id=${this.props.id} />
+                        <${BlockButton} id=${this.props.id} />
+                        <${FlagButton} id=${this.props.id} />
                       `}
                 <//>
               </div>
@@ -423,14 +424,7 @@ class Profile extends View {
     );
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.id !== this.props.id) {
-      this.unsubscribe();
-      this.subscribeProfile();
-    }
-  }
-
-  subscribeProfile() {
+  componentDidMount() {
     const pub = this.props.id;
     const nostrNpub = Nostr.toNostrBech32Address(pub, 'npub');
     if (nostrNpub && nostrNpub !== pub) {
@@ -459,19 +453,9 @@ class Profile extends View {
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H,
     });
-    iris
-      .public()
-      .get('block')
-      .get(this.props.id)
-      .on(
-        this.sub((blocked) => {
-          this.setState({ blocked });
-        }),
-      );
-  }
-
-  componentDidMount() {
-    this.subscribeProfile();
+    Nostr.getBlockedUsers((blockedUsers) => {
+      this.setState({ blocked: blockedUsers.has(nostrAddr) });
+    });
   }
 }
 

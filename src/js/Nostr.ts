@@ -1,7 +1,7 @@
 import iris from 'iris-lib';
 import { debounce } from 'lodash';
 
-import { Event, Filter, getEventHash, Relay, relayInit, signEvent, Sub } from './lib/nostr-tools';
+import { Event, Filter, getEventHash, Relay, relayInit, signEvent, Sub, nip04 } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import localForage from 'localforage';
 
@@ -87,6 +87,7 @@ export default {
   relays: defaultRelays,
   knownUsers: new Set<string>(),
   blockedUsers: new Set<string>(),
+  flaggedUsers: new Set<string>(),
   deletedEvents: new Set<string>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
   subscribedFiltersByName: new Map<string, Filter[]>(),
@@ -707,6 +708,42 @@ export default {
     };
     this.publish(event);
   },
+  async handleBlockList(event: Event) {
+    if (this.myBlockEvent?.created_at > event.created_at) {
+      return;
+    }
+    this.myBlockEvent = event;
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    if (event.pubkey === myPub) {
+      try {
+        const myPriv = iris.session.getKey().secp256k1.priv;
+        let content;
+        if (myPriv) {
+          content = await nip04.decrypt(myPriv, myPub, event.content);
+        } else {
+          content = await window.nostr.nip04.decrypt(myPub, event.content);
+        }
+        const blockList = JSON.parse(content);
+        this.blockedUsers = new Set(blockList);
+      } catch (e) {
+        console.log('failed to parse your block list', event);
+      }
+    }
+  },
+  handleFlagList(event: Event) {
+    if (this.myFlagEvent?.created_at > event.created_at) {
+      return;
+    }
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    if (event.pubkey === myPub) {
+      try {
+        const flaggedUsers = JSON.parse(event.content);
+        this.flaggedUsers = new Set(flaggedUsers);
+      } catch (e) {
+        console.log('failed to parse your flagged users list', event);
+      }
+    }
+  },
   handleMetadata(event: Event) {
     try {
       const existing = this.profiles.get(event.pubkey);
@@ -814,6 +851,12 @@ export default {
       case 7:
         this.maybeAddNotification(event);
         this.handleReaction(event);
+        break;
+      case 16462:
+        this.handleBlockList(event);
+        break;
+      case 16463:
+        this.handleFlagList(event);
         break;
     }
     this.subscribedPosts.delete(event.id);
@@ -940,12 +983,50 @@ export default {
     }
     this.subscribe([{ kinds: [1, 6, 7], '#e': [id] }], callback);
   },
-  getFollowedByUser: function (address: string, cb?: (followedUsers: Set<string>) => void) {
+  block: async function (address: string, isBlocked: boolean) {
+    isBlocked ? this.blockedUsers.add(address) : this.blockedUsers.delete(address);
+    let content = JSON.stringify(Array.from(this.blockedUsers));
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    const myPriv = iris.session.getKey().secp256k1.priv;
+    if (myPriv) {
+      content = await nip04.encrypt(myPriv, myPub, content);
+    } else {
+      content = await window.nostr.nip04.encrypt(myPub, content);
+    }
+    this.publish({
+      kind: 16462,
+      content,
+    });
+  },
+  flag: function (address: string, isFlagged: boolean) {
+    isFlagged ? this.flaggedUsers.add(address) : this.flaggedUsers.delete(address);
+    this.publish({
+      kind: 16463,
+      content: JSON.stringify(Array.from(this.flaggedUsers)),
+    });
+  },
+  getBlockedUsers(cb?: (blocked: Set<string>) => void) {
     const callback = () => {
-      cb?.(this.followedByUser.get(address) ?? new Set());
+      cb?.(this.blockedUsers);
     };
-    this.followedByUser.has(address) && callback();
-    this.subscribe([{ kinds: [3], authors: [address] }], callback);
+    callback();
+    const myPub = iris.session.getKey()?.secp256k1.rpub;
+    this.subscribe([{ kinds: [16462], authors: [myPub] }], callback);
+  },
+  getFlaggedUsers(cb?: (flagged: Set<string>) => void) {
+    const callback = () => {
+      cb?.(this.flaggedUsers);
+    };
+    callback();
+    const myPub = iris.session.getKey()?.secp256k1.rpub;
+    this.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
+  },
+  getFollowedByUser: function (user: string, cb?: (followedUsers: Set<string>) => void) {
+    const callback = () => {
+      cb?.(this.followedByUser.get(user) ?? new Set());
+    };
+    this.followedByUser.has(user) && callback();
+    this.subscribe([{ kinds: [3], authors: [user] }], callback);
   },
   getFollowersByUser: function (address: string, cb?: (followers: Set<string>) => void) {
     const callback = () => {
