@@ -61,7 +61,10 @@ export default class MessageForm extends Component {
     const val = event.target.value.slice(0, event.target.selectionStart);
     const matches = val.match(mentionRegex);
     if (matches) {
-      this.setState({ mentioning: matches[0].slice(1) });
+      const match = matches[0].slice(1);
+      if (!Nostr.toNostrHexAddress(match)) {
+        this.setState({ mentioning: match });
+      }
     } else if (this.state.mentioning) {
       this.setState({ mentioning: null });
     }
