@@ -1,5 +1,4 @@
 import Nostr from '../Nostr';
-import { translate as t } from '../translations/Translation';
 
 import BlockButton from './BlockButton';
 

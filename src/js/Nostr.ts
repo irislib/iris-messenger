@@ -1,7 +1,16 @@
 import iris from 'iris-lib';
 import { debounce } from 'lodash';
 
-import { Event, Filter, getEventHash, Relay, relayInit, signEvent, Sub, nip04 } from './lib/nostr-tools';
+import {
+  Event,
+  Filter,
+  getEventHash,
+  nip04,
+  Relay,
+  relayInit,
+  signEvent,
+  Sub,
+} from './lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import localForage from 'localforage';
 

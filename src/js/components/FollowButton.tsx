@@ -32,14 +32,11 @@ class FollowButton extends Component<Props> {
     const newValue = !this.state[this.key];
     if (this.key === 'follow') {
       Nostr.setFollowed(Nostr.toNostrHexAddress(this.props.id), newValue);
-      iris.public().get('block').get(this.props.id).put(false);
       return;
     }
     if (this.key === 'block') {
       Nostr.setBlocked(Nostr.toNostrHexAddress(this.props.id), newValue);
     }
-    iris.public().get(this.key).get(this.props.id).put(newValue);
-    iris.public().get(this.key).get(this.props.id).put(newValue);
   }
 
   componentDidMount() {

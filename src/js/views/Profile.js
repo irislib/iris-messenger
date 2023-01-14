@@ -8,10 +8,10 @@ import { Link } from 'preact-router/match';
 
 import Button from '../components/basic/Button';
 import BlockButton from '../components/BlockButton';
-import FlagButton from '../components/FlagButton';
 import CopyButton from '../components/CopyButton';
 import Dropdown from '../components/Dropdown';
 import FeedMessageForm from '../components/FeedMessageForm';
+import FlagButton from '../components/FlagButton';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import MessageFeed from '../components/MessageFeed';

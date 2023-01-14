@@ -1,11 +1,9 @@
-import Helmet from 'react-helmet';
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
 
 import FeedMessageForm from '../components/FeedMessageForm';
 import MessageFeed from '../components/MessageFeed';
 import OnboardingNotification from '../components/OnboardingNotification';
-import SubscribeHashtagButton from '../components/SubscribeHashtagButton';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -33,9 +31,6 @@ class Feed extends View {
 
   componentDidMount() {
     this.search();
-    if (this.props.hashtag) {
-      iris.local().get('filters').get('group').put('everyone');
-    }
     iris.local().get('filters').get('group').on(this.inject());
   }
 
@@ -49,29 +44,10 @@ class Feed extends View {
   renderView() {
     const s = this.state;
     let path = this.props.index || 'msgs';
-    const hashtag = this.props.hashtag;
-    const hashtagText = `#${hashtag}`;
-    if (hashtag) {
-      path = `hashtags/${hashtag}`;
-    }
     return html`
       <div class="centered-container">
         <div style="display:flex;flex-direction:row">
           <div style="flex:3;width: 100%">
-            ${hashtag
-              ? html`
-                  <${Helmet}>
-                    <title>${hashtagText}</title>
-                    <meta property="og:title" content="${hashtagText} | Iris" />
-                  <//>
-                  <h3>
-                    ${hashtagText}
-                    <span style="float:right"
-                      ><${SubscribeHashtagButton} key=${hashtag} id=${hashtag}
-                    /></span>
-                  </h3>
-                `
-              : ''}
             ${s.searchTerm
               ? ''
               : html`
@@ -89,10 +65,9 @@ class Feed extends View {
               : ''}
             <${MessageFeed}
               scrollElement=${this.scrollElement.current}
-              hashtag=${hashtag}
               filter=${s.searchTerm && ((m) => this.filter(m))}
               thumbnails=${this.props.thumbnails}
-              key=${hashtag || this.props.index || 'feed'}
+              key=${this.props.index || 'feed'}
               index=${this.props.index}
               path=${path}
             />
