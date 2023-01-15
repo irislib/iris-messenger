@@ -40,7 +40,6 @@ export default class BlockedSettings extends Component {
   }
   componentDidMount() {
     Nostr.getBlockedUsers((blockedUsers) => {
-      console.log('blocked users', blockedUsers);
       this.setState({ blockedUsers });
     });
   }
