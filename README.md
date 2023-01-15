@@ -13,7 +13,7 @@ Iris is like the social networking apps we're used to, but better.
 
 ## Use
 
-Browser application: [iris.to](https://iris.to)
+Browser application: [iris.to](https://iris.to) [![Netlify Status](https://api.netlify.com/api/v1/badges/1181c85b-b6af-4ce7-bc74-c484bff631e5/deploy-status)](https://app.netlify.com/sites/iris-messenger/deploys)
 
 - No installation required
 - Progressive web app
