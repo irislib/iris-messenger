@@ -10,14 +10,14 @@ export default class BlockedSettings extends Component {
     super();
     this.state = iris.session.DEFAULT_SETTINGS;
     this.state.webPushSubscriptions = {};
-    this.state.blockedUsers = {};
+    this.state.blockedUsers = [];
     this.id = 'settings';
   }
   render() {
     let hasBlockedUsers = false;
-    const blockedUsers = Object.keys(this.state.blockedUsers).map((user) => {
+    const blockedUsers = Array.from(this.state.blockedUsers).map((user) => {
       const bech32 = Nostr.toNostrBech32Address(user, 'npub');
-      if (bech32 && this.state.blockedUsers[user]) {
+      if (bech32) {
         hasBlockedUsers = true;
         return (
           <p key={user}>
@@ -39,30 +39,9 @@ export default class BlockedSettings extends Component {
     );
   }
   componentDidMount() {
-    const blockedUsers = {};
-
-    iris.electron && iris.electron.get('settings').on(this.inject('electron', 'electron'));
-    iris
-      .local()
-      .get('settings')
-      .on(
-        this.sub((local) => {
-          console.log('local settings', local);
-          if (local) {
-            this.setState({ local });
-          }
-        }),
-      );
-    iris
-      .public()
-      .get('block')
-      .map()
-      .on(
-        this.sub((v, k) => {
-          blockedUsers[k] = v;
-          this.setState({ blockedUsers });
-          console.log('blockedUsers', blockedUsers);
-        }),
-      );
+    Nostr.getBlockedUsers((blockedUsers) => {
+      console.log('blocked users', blockedUsers);
+      this.setState({ blockedUsers });
+    });
   }
 }
