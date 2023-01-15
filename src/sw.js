@@ -15,8 +15,11 @@ registerRoute(
     plugins: [bgSyncPlugin],
   }),
 );
+// TODO DON'T SAVE ALL THE MEME GIFS LOCALLY
 registerRoute(({ url }) => url.pathname === '/', new NetworkFirst());
-registerRoute(() => location.host.indexOf('localhost') !== 0, new StaleWhileRevalidate());
+registerRoute(({ url }) => {
+  return location.host.indexOf('localhost') !== 0 && url.origin === self.location.origin;
+}, new StaleWhileRevalidate());
 setupRouting();
 
 const urlsToCache = getFiles();
