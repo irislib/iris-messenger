@@ -47,6 +47,7 @@ const saveLocalStorageEvents = debounce((_this: any) => {
   localForage.setItem('latestMsgs', latestMsgs);
   localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
   localForage.setItem('notificationEvents', notifications);
+  // TODO save own block and flag events
 }, 5000);
 
 const saveLocalStorageProfilesAndFollows = debounce((_this) => {

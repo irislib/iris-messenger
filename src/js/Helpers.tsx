@@ -68,6 +68,12 @@ export default {
       );
     });
 
+    const videoRegex =
+      /((?:https?:\/\/(?:nostr\.build|imgur\.com)\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm)))/gi;
+    replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
+      return <video key={match + i} src={match} autoPlay={true} controls={true} />;
+    });
+
     const youtubeRegex =
       /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})(?:\S+)?/g;
     replacedText = reactStringReplace(replacedText, youtubeRegex, (match, i) => {
