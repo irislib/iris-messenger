@@ -176,36 +176,40 @@ class Torrent extends Component {
   }
 
   onTorrent(torrent, clicked) {
+    console.log('onTorrent', this.props.torrentId, torrent);
     if (!this.coverRef.current) {
       return;
     }
     this.torrent = torrent;
-    if (!torrent.files) {
-      console.error('no files found in torrent:', torrent);
-      return;
-    }
-    const video = torrent.files.find((f) => isVideo(f));
-    const audio = torrent.files.find((f) => isAudio(f));
-    const img = torrent.files.find((f) => isImage(f));
-
-    const file = this.getActiveFile(torrent) || video || audio || img || torrent.files[0];
-    this.setState({ torrent, cover: img });
-    file && this.openFile(file, clicked);
-
-    let poster = torrent.files.find(
-      (f) => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1),
-    );
-    poster = poster || img;
-    if (poster) {
-      poster.appendTo(this.coverRef.current);
-      if (this.props.standalone && this.isUserAgentCrawler()) {
-        const imgEl = this.coverRef.current.firstChild;
-        imgEl.onload = async () => {
-          const blob = await fetch(imgEl.src).then((r) => r.blob());
-          Helpers.getBase64(blob).then((src) => this.setOgImageUrl(src));
-        };
+    let interval = setInterval(() => {
+      if (!torrent.files) {
+        console.log('no files found in torrent:', torrent);
+        return;
       }
-    }
+      clearInterval(interval);
+      const video = torrent.files.find((f) => isVideo(f));
+      const audio = torrent.files.find((f) => isAudio(f));
+      const img = torrent.files.find((f) => isImage(f));
+
+      const file = this.getActiveFile(torrent) || video || audio || img || torrent.files[0];
+      this.setState({ torrent, cover: img });
+      file && this.openFile(file, clicked);
+
+      let poster = torrent.files.find(
+        (f) => isImage(f) && (f.name.indexOf('cover') > -1 || f.name.indexOf('poster') > -1),
+      );
+      poster = poster || img;
+      if (poster) {
+        poster.appendTo(this.coverRef.current);
+        if (this.props.standalone && this.isUserAgentCrawler()) {
+          const imgEl = this.coverRef.current.firstChild;
+          imgEl.onload = async () => {
+            const blob = await fetch(imgEl.src).then((r) => r.blob());
+            Helpers.getBase64(blob).then((src) => this.setOgImageUrl(src));
+          };
+        }
+      }
+    }, 1000);
   }
 
   showFilesClicked(e) {

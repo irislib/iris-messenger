@@ -77,11 +77,10 @@ class FeedMessageForm extends MessageForm {
   onMsgTextPaste(event) {
     const pasted = (event.clipboardData || window.clipboardData).getData('text');
     const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
-    if (
-      (pasted !== this.state.torrentId && pasted.indexOf('.torrent') > -1) ||
-      pasted.match(magnetRegex)
-    ) {
-      this.setState({ torrentId: pasted });
+    const match = magnetRegex.exec(pasted);
+    console.log('magnet match', match[0]);
+    if (match) {
+      this.setState({ torrentId: match[0] });
     }
   }
 
