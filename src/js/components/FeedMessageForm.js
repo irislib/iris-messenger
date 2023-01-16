@@ -47,10 +47,7 @@ class FeedMessageForm extends MessageForm {
     }
     const textEl = $(this.newMsgRef.current);
     const text = textEl.val();
-    if (!text.length && !this.state.attachments && !this.state.torrentId) {
-      return;
-    }
-    if (this.props.index === 'media' && !this.state.torrentId) {
+    if (!text.length && !this.state.attachments) {
       return;
     }
     const msg = { text };
@@ -59,9 +56,6 @@ class FeedMessageForm extends MessageForm {
     }
     if (this.state.attachments) {
       msg.attachments = this.state.attachments;
-    }
-    if (this.state.torrentId) {
-      msg.torrentId = this.state.torrentId;
     }
     await this.sendNostr(msg);
     this.setState({ attachments: null, torrentId: null });
@@ -82,12 +76,11 @@ class FeedMessageForm extends MessageForm {
 
   onMsgTextPaste(event) {
     const pasted = (event.clipboardData || window.clipboardData).getData('text');
-    const magnetRegex = /^magnet:\?xt=urn:btih:*/;
+    const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
     if (
       (pasted !== this.state.torrentId && pasted.indexOf('.torrent') > -1) ||
       pasted.match(magnetRegex)
     ) {
-      event.preventDefault();
       this.setState({ torrentId: pasted });
     }
   }
@@ -242,19 +235,7 @@ class FeedMessageForm extends MessageForm {
       </div>
       <div class="attachment-preview">
         ${this.state.torrentId
-          ? html`
-              <p>
-                <a
-                  href=""
-                  onClick=${(e) => {
-                    e.preventDefault();
-                    this.setState({ torrentId: null });
-                  }}
-                  >${t('remove_attachment')}</a
-                >
-              </p>
-              <${Torrent} preview=${true} torrentId=${this.state.torrentId} />
-            `
+          ? html` <${Torrent} preview=${true} torrentId=${this.state.torrentId} /> `
           : ''}
         ${this.state.attachments && this.state.attachments.length
           ? html`

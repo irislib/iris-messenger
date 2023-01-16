@@ -52,7 +52,6 @@ export default class MessageForm extends Component {
       (pasted !== this.state.torrentId && pasted.indexOf('.torrent') > -1) ||
       pasted.match(magnetRegex)
     ) {
-      event.preventDefault();
       this.setState({ torrentId: pasted });
     }
   }

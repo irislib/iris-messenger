@@ -19,6 +19,7 @@ class Torrent extends Component {
   state = { settings: {} };
 
   componentDidMount() {
+    console.log('componentDidMount torrent');
     iris
       .local()
       .get('player')

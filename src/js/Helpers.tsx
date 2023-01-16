@@ -6,6 +6,7 @@ import $ from 'jquery';
 import throttle from 'lodash/throttle';
 import { route } from 'preact-router';
 
+import Torrent from './components/Torrent';
 import Name from './components/Name';
 import { translate as t } from './translations/Translation';
 
@@ -89,6 +90,13 @@ export default {
           allowFullScreen
         />
       );
+    });
+
+    const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
+    replacedText = reactStringReplace(replacedText, magnetRegex, (match, i) => {
+      // Torrent component
+      console.log('magnet link', match);
+      return <Torrent key={match + i} preview={true} torrentId={match} />;
     });
 
     const lnRegex =
