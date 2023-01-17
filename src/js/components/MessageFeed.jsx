@@ -76,6 +76,7 @@ class MessageFeed extends Component {
   }
 
   componentDidMount() {
+    console.log("this.props", this.props);
     this.props.scrollElement?.addEventListener('scroll', this.handleScroll);
     let first = true;
     if (this.props.nostrUser) {
@@ -98,7 +99,9 @@ class MessageFeed extends Component {
             first = false;
           }),
         );
-      if (this.props.index) { // public messages
+      if (this.props.keyword) {
+        Nostr.getMessagesByKeyword(this.props.keyword, messages => this.updateSortedMessages(messages));
+      } else if (this.props.index) { // public messages
         if (this.props.index === 'everyone') {
           Nostr.getMessagesByEveryone(messages => this.updateSortedMessages(messages));
         } else {
@@ -121,7 +124,8 @@ class MessageFeed extends Component {
       prevNodeId !== newNodeId ||
       this.props.group !== prevProps.group ||
       this.props.path !== prevProps.path ||
-      this.props.filter !== prevProps.filter
+      this.props.filter !== prevProps.filter ||
+      this.props.keyword !== prevProps.keyword
     ) {
       this.mappedMessages = new Map();
       this.setState({ sortedMessages: [] });
