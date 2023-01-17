@@ -6,8 +6,8 @@ import $ from 'jquery';
 import throttle from 'lodash/throttle';
 import { route } from 'preact-router';
 
-import Torrent from './components/Torrent';
 import Name from './components/Name';
+import Torrent from './components/Torrent';
 import { translate as t } from './translations/Translation';
 
 const emojiRegex =
@@ -72,7 +72,16 @@ export default {
     const videoRegex =
       /((?:https?:\/\/(?:nostr\.build|imgur\.com)\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm)))/gi;
     replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
-      return <video key={match + i} src={match} muted={true} autoPlay={true} controls={true} loop={true} />;
+      return (
+        <video
+          key={match + i}
+          src={match}
+          muted={true}
+          autoPlay={true}
+          controls={true}
+          loop={true}
+        />
+      );
     });
 
     const youtubeRegex =
