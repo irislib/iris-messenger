@@ -1,4 +1,5 @@
 import { html } from 'htm/preact';
+import iris from 'iris-lib';
 
 import MessageFeed from '../components/MessageFeed';
 import Nostr from '../Nostr';
@@ -11,7 +12,15 @@ export default class Notifications extends View {
 
   componentDidMount() {
     Nostr.getNotifications((notifications) => {
-      this.setState({ hasNotifications: notifications.length > 0 });
+      const hasNotifications = notifications.length > 0;
+      if (hasNotifications) {
+        iris
+          .local()
+          .get('notificationsSeenTime')
+          .put(Math.floor(Date.now() / 1000));
+        iris.local().get('unseenNotificationCount').put(0);
+      }
+      this.setState({ hasNotifications });
     });
   }
 
