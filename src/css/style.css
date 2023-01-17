@@ -1218,15 +1218,15 @@ a.msg {
 }
 
 .public-messages-view .msg:first-of-type .msg-content {
-  border-radius: 8px 8px 0 0 !important;
+  border-radius: 8px 8px 0 0;
 }
 
 .public-messages-view .msg:last-of-type .msg-content {
-  border-radius: 0 0 8px 8px !important;
+  border-radius: 0 0 8px 8px;
 }
 
 .public-messages-view .msg:only-of-type .msg-content {
-  border-radius: 8px 8px 8px 8px !important;
+  border-radius: 8px 8px 8px 8px;
 }
 
 .img-container {
@@ -2454,6 +2454,9 @@ input[type='text'] {
 }
 
 @media (max-width: 625px) {
+  .notification-msg {
+    border-radius: 0 !important;
+  }
   .hidden-xs {
     display: none !important;
   }
