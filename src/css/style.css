@@ -997,6 +997,10 @@ h1,
 }
 
 @media (max-width: 625px) {
+  .mobile-padding15 {
+    padding: 0 15px;
+  }
+
   .application-list {
     width: 250px;
     margin-left: -250px;
@@ -1649,10 +1653,6 @@ a.msg {
 .attachment-preview button {
   display: block;
   margin-bottom: 10px;
-}
-
-#settings .centered-container {
-  padding: 15px;
 }
 
 hr {
@@ -2477,9 +2477,6 @@ input[type='text'] {
   .feed-settings button {
     flex: 1;
     text-align: center;
-  }
-  #settings .centered-container {
-    padding: 0;
   }
   #profile {
     padding: 0;

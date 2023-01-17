@@ -13,7 +13,7 @@ class About extends Component {
       <>
         <Header />
         <div class="main-view" id="settings">
-          <div class="centered-container">
+          <div class="centered-container mobile-padding15">
             <p>
               <b>Note 23.12.2022:</b> Heavily under construction: started integrating{' '}
               <a href="https://github.com/nostr-protocol/nostr">Nostr</a> this week.

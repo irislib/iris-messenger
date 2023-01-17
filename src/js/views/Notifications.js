@@ -47,7 +47,7 @@ export default class Notifications extends View {
       <div class="centered-container" style="margin-bottom: 15px;">
         <br class="hidden-xs" />
         ${Object.keys(this.state.notifications).length === 0
-          ? html` <p>${t('no_notifications_yet')}</p> `
+          ? html` <p class="mobile-padding15">${t('no_notifications_yet')}</p> `
           : ''}
         ${this.state.notifications.slice(0, this.state.displayCount).map((id) => {
           if (!id) return;
