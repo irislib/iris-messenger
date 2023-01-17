@@ -70,6 +70,7 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
 
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
+const MAX_MSGS_BY_KEYWORD = 100;
 
 const eventsById = new Map<string, Event>();
 
@@ -117,6 +118,7 @@ export default {
   subscribedPosts: new Set<string>(),
   subscribedRepliesAndLikes: new Set<string>(),
   subscribedProfiles: new Set<string>(),
+  subscribedKeywords: new Set<string>(),
   likesByUser: new Map<string, SortedLimitedEventSet>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -124,6 +126,7 @@ export default {
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  latestNotesByKeywords: new Map<string, SortedLimitedEventSet>(),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
   keyValueEvents: new Map<string, Event>(),
@@ -515,6 +518,15 @@ export default {
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
   }, 100),
+  subscribeToKeywords: debounce((_this) => {
+    if (_this.subscribedKeywords.size === 0) return;
+    console.log('subscribe to keywords', Array.from(_this.subscribedKeywords));
+    _this.sendSubToRelays(
+     [{ kinds: [1], limit: MAX_MSGS_BY_KEYWORD, keywords: Array.from(_this.subscribedKeywords) }],
+     'keywords',
+     true
+    );
+  }, 100),
   encrypt: async function (data: string, pub?: string) {
     const k = iris.session.getKey().secp256k1;
     pub = pub || k.rpub;
@@ -609,6 +621,7 @@ export default {
     let hasNewAuthors = false;
     let hasNewIds = false;
     let hasNewReplyAndLikeSubs = false;
+    let hasNewKeywords = false;
     for (const filter of filters) {
       if (filter.authors) {
         for (const author of filter.authors) {
@@ -644,10 +657,23 @@ export default {
           }
         }
       }
+      if (filter.keywords) {
+        for (const keyword of filter.keywords) {
+          if (!this.subscribedKeywords.has(keyword)) {
+            hasNewKeywords = true;
+            this.subscribedKeywords.add(keyword);
+            setTimeout(() => {
+              // remove after some time, so the requests don't grow too large
+              this.subscribedKeywords.delete(keyword);
+            }, 60 * 1000);
+          }
+        }
+      }
     }
     hasNewReplyAndLikeSubs && this.subscribeToRepliesAndLikes(this);
     hasNewAuthors && this.subscribeToAuthors(this); // TODO subscribe to old stuff from new authors, don't resubscribe to all
     hasNewIds && this.subscribeToPosts(this);
+    hasNewKeywords && this.subscribeToKeywords(this);
   },
   getConnectedRelayCount: function () {
     let count = 0;
@@ -1102,6 +1128,15 @@ export default {
         }
       }
     }
+    const content = event.content.toLowerCase();
+    if (
+      filter.keywords &&
+      !filter.keywords.some((keyword: string) => {
+        return keyword.toLowerCase().split(' ').every((word: string) => content.includes(word));
+      })
+    ) {
+      return false;
+    }
 
     return true;
   },
@@ -1297,6 +1332,17 @@ export default {
     };
     callback();
     this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+  },
+  getMessagesByKeyword(keyword:string, cb: (messageIds: string[]) => void) {
+    const callback = (event) => {
+      if (!this.latestNotesByKeywords.has(keyword)) {
+        this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+      }
+      this.latestNotesByKeywords.get(keyword)?.add(event);
+      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    };
+    this.latestNotesByKeywords.has(keyword) && cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    this.subscribe([{ kinds: [1], keywords: [keyword] }], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile
