@@ -774,33 +774,35 @@ header.footer .header-content {
   color: var(--link-color);
 }
 
+.msg-identicon {
+  display: flex;
+}
+
+.msg-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
 .msg-content {
   background-color: var(--msg-content-background);
   padding: 6px 10px;
   border-radius: 8px;
   border: var(--msg-border);
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
-  flex: none;
 }
 
-.quote .msg-content {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #808080;
-  padding: 7px 15px !important;
-}
-
-.quote .identicon-container.has-picture {
-  max-width: 30px;
-  max-height: 30px;
+.msg.quote {
+  margin-bottom: 0;
 }
 
 .public-messages-view .quote .msg-sender {
   margin-bottom: 8px;
 }
 
-.msg:not([class*="quote"]) > div.msg-content > div.msg-sender,
-.msg:not([class*="quote"]) > div.msg-content > div.text,
-.msg:not([class*="quote"]) > div.msg-content > div.below-text
+.msg > div.msg-content > div.msg-sender,
+.msg > div.msg-content > div.text,
+.msg > div.msg-content > div.below-text
 {
     margin-left: 1em;
 }
@@ -1213,8 +1215,9 @@ a.msg {
   border-radius: 0;
   width: 100%;
   padding: 15px;
-  flex-direction: column;
+  flex-direction: row;
   display: flex;
+  flex: 1;
 }
 
 .public-messages-view .msg:first-of-type .msg-content {
