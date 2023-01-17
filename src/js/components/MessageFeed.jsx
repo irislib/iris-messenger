@@ -1,11 +1,13 @@
-import Component from '../BaseComponent';
-import Helpers from '../Helpers';
-import PublicMessage from './PublicMessage';
 import iris from 'iris-lib';
-import Nostr from '../Nostr';
 import { throttle } from 'lodash';
-import { translate as t } from '../translations/Translation';
+
+import Component from '../BaseComponent';
 import Button from '../components/basic/Button';
+import Helpers from '../Helpers';
+import Nostr from '../Nostr';
+import { translate as t } from '../translations/Translation';
+
+import PublicMessage from './PublicMessage';
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -16,41 +18,51 @@ class MessageFeed extends Component {
       sortedMessages: [],
       queuedMessages: [],
       displayCount: INITIAL_PAGE_SIZE,
-      messagesShownTime: Math.floor(Date.now() / 1000)
+      messagesShownTime: Math.floor(Date.now() / 1000),
     };
     this.mappedMessages = new Map();
   }
 
-  updateSortedMessages = throttle(sortedMessages => {
-    if (this.unmounted || !sortedMessages) {
-      return;
-    }
-    // iterate over sortedMessages and add newer than messagesShownTime to queue
-    const queuedMessages = [];
-    let hasMyMessage;
-    for (let i = 0; i < sortedMessages.length; i++) {
-      const hash = sortedMessages[i];
-      const message = Nostr.eventsById.get(hash);
-      if (message && message.created_at > this.state.messagesShownTime) {
-        if (message.pubkey === iris.session.getKey().secp256k1.rpub) {
-          hasMyMessage = true;
-          break;
-        }
-        queuedMessages.push(hash);
+  updateSortedMessages = throttle(
+    (sortedMessages) => {
+      console.log('updateSortedMessages', sortedMessages);
+      if (this.unmounted || !sortedMessages) {
+        return;
       }
-    }
-    if (!hasMyMessage) {
-      sortedMessages = sortedMessages.filter(hash => !queuedMessages.includes(hash));
-    }
-    const messagesShownTime = hasMyMessage ? Math.floor(Date.now() / 1000) : this.state.messagesShownTime;
-    this.setState({ sortedMessages, queuedMessages, messagesShownTime });
-    this.checkScrollPosition();
-  }, 3000, { leading: true });
+      // iterate over sortedMessages and add newer than messagesShownTime to queue
+      const queuedMessages = [];
+      let hasMyMessage;
+      for (let i = 0; i < sortedMessages.length; i++) {
+        const hash = sortedMessages[i];
+        const message = Nostr.eventsById.get(hash);
+        if (message && message.created_at > this.state.messagesShownTime) {
+          if (message.pubkey === iris.session.getKey().secp256k1.rpub) {
+            hasMyMessage = true;
+            break;
+          }
+          queuedMessages.push(hash);
+        }
+      }
+      if (!hasMyMessage) {
+        sortedMessages = sortedMessages.filter((hash) => !queuedMessages.includes(hash));
+      }
+      const messagesShownTime = hasMyMessage
+        ? Math.floor(Date.now() / 1000)
+        : this.state.messagesShownTime;
+      this.setState({ sortedMessages, queuedMessages, messagesShownTime });
+      this.checkScrollPosition();
+    },
+    3000,
+    { leading: true },
+  );
 
   handleScroll = () => {
     // increase page size when scrolling down
     if (this.state.displayCount < this.state.sortedMessages.length) {
-      if (this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >= this.props.scrollElement.scrollHeight - 500) {
+      if (
+        this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
+        this.props.scrollElement.scrollHeight - 500
+      ) {
         this.setState({ displayCount: this.state.displayCount + INITIAL_PAGE_SIZE });
       }
     }
@@ -80,13 +92,17 @@ class MessageFeed extends Component {
     let first = true;
     if (this.props.nostrUser) {
       if (this.props.index === 'postsAndReplies') {
-        Nostr.getPostsAndRepliesByUser(this.props.nostrUser, eventIds => this.updateSortedMessages(eventIds));
+        Nostr.getPostsAndRepliesByUser(this.props.nostrUser, (eventIds) =>
+          this.updateSortedMessages(eventIds),
+        );
       } else if (this.props.index === 'likes') {
-        Nostr.getLikesByUser(this.props.nostrUser, eventIds => {
+        Nostr.getLikesByUser(this.props.nostrUser, (eventIds) => {
           this.updateSortedMessages(eventIds);
         });
       } else if (this.props.index === 'posts') {
-        Nostr.getPostsByUser(this.props.nostrUser, eventIds => this.updateSortedMessages(eventIds));
+        Nostr.getPostsByUser(this.props.nostrUser, (eventIds) =>
+          this.updateSortedMessages(eventIds),
+        );
       }
     } else {
       iris
@@ -98,11 +114,15 @@ class MessageFeed extends Component {
             first = false;
           }),
         );
-      if (this.props.index) { // public messages
+      if (this.props.index) {
+        // public messages
         if (this.props.index === 'everyone') {
-          Nostr.getMessagesByEveryone(messages => this.updateSortedMessages(messages));
+          Nostr.getMessagesByEveryone((messages) => this.updateSortedMessages(messages));
+        } else if (this.props.index === 'notifications') {
+          console.log('getMessagesByNotifications');
+          Nostr.getNotifications((messages) => this.updateSortedMessages(messages));
         } else {
-          Nostr.getMessagesByFollows(messages => this.updateSortedMessages(messages));
+          Nostr.getMessagesByFollows((messages) => this.updateSortedMessages(messages));
         }
       }
     }
@@ -136,7 +156,7 @@ class MessageFeed extends Component {
       sortedMessages,
       queuedMessages: [],
       messagesShownTime: Math.floor(Date.now() / 1000),
-      displayCount: INITIAL_PAGE_SIZE
+      displayCount: INITIAL_PAGE_SIZE,
     });
   };
 
@@ -149,9 +169,14 @@ class MessageFeed extends Component {
       <>
         <div>
           {this.state.queuedMessages.length ? (
-            <div style={{cursor: 'pointer'}} className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`} onClick={this.showQueuedMessages}>
+            <div
+              style={{ cursor: 'pointer' }}
+              className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
+              onClick={this.showQueuedMessages}
+            >
               <div className="msg-content notification-msg">
-                Show {this.state.queuedMessages.length} new message{this.state.queuedMessages.length > 1 ? 's' : ''}
+                Show {this.state.queuedMessages.length} new message
+                {this.state.queuedMessages.length > 1 ? 's' : ''}
               </div>
             </div>
           ) : null}
