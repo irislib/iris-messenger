@@ -6903,10 +6903,10 @@ ipaddr.js@1.9.1:
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-2.0.1.tgz#eca256a7a877e917aeb368b0a7497ddf42ef81c0"
   integrity sha512-1qTgH9NG+IIJ4yfKs2e6Pp1bZg8wbDbKHT21HrLIeYBTRLgMYKnMTPAuI3Lcs61nfx5h1xlXnbJtH1kX5/d/ng==
 
-iris-lib@^0.1.19:
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/iris-lib/-/iris-lib-0.1.19.tgz#1fe45c2b179fefa5e32ed13d18745d3c02690a89"
-  integrity sha512-4aGZpnb4xxctw7kXDvcJ0LlkSkCP3YPZxkb8TJwgePWs1yFf8q+HO1CnUbZinZH3cYxTl8NG7EGc5CvwQBwwJw==
+iris-lib@^0.1.20:
+  version "0.1.20"
+  resolved "https://registry.yarnpkg.com/iris-lib/-/iris-lib-0.1.20.tgz#71d4e46790cca9398623a3e6be9855581a8cb101"
+  integrity sha512-NOK7DPtdWj7OFgSncX8NwZEM+HwfhYxAQWXIE9ci10uRApST9c38O6sHz/eFGKEE8sCUPkoH81p4a2GwB9YjCQ==
   dependencies:
     "@noble/secp256k1" "^1.7.0"
     elliptic "^6.5.4"
