@@ -26,10 +26,10 @@ export default class Notifications extends View {
 
   renderView() {
     return html`
-      <div class="centered-container mobile-padding15" style="margin-bottom: 15px;">
+      <div class="centered-container" style="margin-bottom: 15px;">
         ${this.state.hasNotifications
           ? html`<br class="hidden-xs" />`
-          : html`<p>${t('no_notifications_yet')}</p> `}
+          : html`<p class="mobile-padding15">${t('no_notifications_yet')}</p> `}
         <${MessageFeed}
           scrollElement=${this.scrollElement.current}
           key="notifications"
