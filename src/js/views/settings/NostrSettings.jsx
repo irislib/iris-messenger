@@ -34,15 +34,15 @@ const NostrSettings = () => {
     iris.local().get('relays').get(newRelayUrl).put({ enabled: true });
     event.preventDefault(); // prevent the form from reloading the page
     Nostr.addRelay(newRelayUrl); // add the new relay using the Nostr method
-    setNewRelayUrl(""); // reset the new relay URL
-  }
+    setNewRelayUrl(''); // reset the new relay URL
+  };
 
   const maxRelaysChanged = (event) => {
     // parse int
     const maxRelays = parseInt(event.target.value);
-    Nostr.maxRelays = maxRelays;
+    iris.local().get('maxRelays').put(maxRelays);
     setMaxRelays(maxRelays);
-  }
+  };
 
   const getStatus = (relay) => {
     try {
