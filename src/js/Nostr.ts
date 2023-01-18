@@ -922,11 +922,11 @@ export default {
     }
     return true;
   },
+  async logOut() {
+    await localForage.clear();
+    iris.session.logOut();
+  },
   init: function () {
-    // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
-    localForage.getItem('notificationsSeenTime').then((val) => {
-      val && iris.local().get('notificationsSeenTime').put(val);
-    });
     iris
       .local()
       .get('notificationsSeenTime')
@@ -936,10 +936,30 @@ export default {
       });
     iris
       .local()
+      .get('maxRelays')
+      .on((maxRelays) => {
+        this.maxRelays = maxRelays;
+        localForage.setItem('maxRelays', maxRelays);
+      });
+    iris
+      .local()
       .get('unseenNotificationCount')
       .on((unseenNotificationCount) => {
         this.unseenNotificationCount = unseenNotificationCount;
       });
+    // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
+    localForage.getItem('notificationsSeenTime').then((val) => {
+      if (val !== null) {
+        iris.local().get('notificationsSeenTime').put(val);
+        this.notificationsSeenTime = val;
+      }
+    });
+    localForage.getItem('maxRelays').then((val) => {
+      if (val !== null) {
+        iris.local().get('maxRelays').put(val);
+        this.maxRelays = val;
+      }
+    });
     iris
       .local()
       .get('loggedIn')
