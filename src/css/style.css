@@ -1808,7 +1808,6 @@ hr {
 .chat-new-item .text {
   padding-right: 5px;
   padding-top: 16px;
-  border-bottom: 1px solid var(--chat-hover);
   line-height: 20px;
 }
 
