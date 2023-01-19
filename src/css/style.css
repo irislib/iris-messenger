@@ -9,24 +9,24 @@
 }
 
 :root {
-  --body-bg: #2e3036;
-  --text-color: #dbdcde;
+  --body-bg: #000000;
+  --text-color: #f5f5f5;
   --text-time: rgba(255, 255, 255, 0.45);
-  --main-color: #35383f;
+  --main-color: #000000;
   --gallery-background: rgba(0, 0, 0, 0.8);
-  --header-color: #2e3036;
-  --chat-active: #393b43;
-  --chat-hover: #33363c;
-  --msg-content-background: #2e3036;
-  --msg-border: none;
+  --header-color: #000000;
+  --chat-active: #1f2328;
+  --chat-hover: #1a1e22;
+  --msg-content-background: #000000;
+  --msg-border: 1px solid #292b31;
   --our-msg: #9e64fe;
   --notify: #5e02f6;
   --warning-background: #fe5493;
   --heart-color: #fc005d;
-  --login-background: #1f2125;
+  --login-background: #000000;
   --seen-indicator: rgba(255, 255, 255, 0.45);
   --input-bg: #1f2125;
-  --input-text: #dbdcde;
+  --input-text: #f5f5f5;
   --input-placeholder: #ccc;
   --small-text-color: #8d9197;
   --msg-form-button-color: #b8b9be;
@@ -35,12 +35,12 @@
   --button-color: #fefffe;
   --button-border: 0;
   --button-border-size: 0;
-  --menu-bg: #1f2125;
-  --sidebar-bg: #2e3036;
+  --menu-bg: #000000;
+  --sidebar-bg: #000000;
   --sidebar-border-right: 1px solid #292b31;
   --sidebar-color: #8d9197;
-  --zebra-stripe-bg: #2e3036;
-  --emoji-picker-bg: #35383f;
+  --zebra-stripe-bg: #1c1e24;
+  --emoji-picker-bg: #000000;
   --emoji-picker-color: #fff;
   --emoji-picker-border-color: #1f2125;
   --link-color: #33b7fe;
@@ -55,6 +55,7 @@
   --radio-button-background: #666;
   --radio-button-checked-background: #33b7fe;
 }
+
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -785,7 +786,6 @@ header.footer .header-content {
 }
 
 .quote .msg-content {
-  background-color: rgba(255, 255, 255, 0.05);
   color: #808080;
   padding: 7px 15px !important;
 }
@@ -1209,10 +1209,6 @@ a.msg {
   margin-left: 8px;
 }
 
-.msg-content .msg-content {
-  border: 0;
-}
-
 .public-messages-view .msg .msg-content {
   max-width: none;
   border-radius: 0;
@@ -1301,6 +1297,7 @@ a.msg {
   background-color: var(--msg-content-background);
   opacity: 0.95;
   text-align: right;
+  border: var(--msg-border);
 }
 
 .dropdown-content button {
