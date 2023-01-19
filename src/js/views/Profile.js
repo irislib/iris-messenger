@@ -354,16 +354,16 @@ class Profile extends View {
     const ogTitle = `${title} | Iris`;
     const description = `Latest posts by ${this.state.name || 'user'}. ${this.state.about || ''}`;
     return html`
-                ${this.state.banner
-          ? html`
-              <div
-                class="profile-banner"
-                style="background-image:linear-gradient(
+      ${this.state.banner
+        ? html`
+            <div
+              class="profile-banner"
+              style="background-image:linear-gradient(
     to bottom, transparent, var(--main-color)
   ), url(${this.state.banner})"
-              ></div>
-            `
-          : ''}
+            ></div>
+          `
+        : ''}
       <div class="content">
         <${Helmet}>
           <title>${title}</title>
@@ -416,7 +416,7 @@ class Profile extends View {
 
         // profile may contain arbitrary fields, so be careful
         this.setState({
-          name: profile.name,
+          name: profile.display_name || profile.name,
           about: profile.about,
           picture: profile.picture,
           nip05: profile.nip05valid && profile.nip05,

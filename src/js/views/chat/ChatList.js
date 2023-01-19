@@ -73,11 +73,10 @@ class ChatList extends Component {
           ${sortedChats.map(
             (chat) =>
               html`<${ChatListItem}
-                picture=${chat.picture}
-                active=${chat.id === activeChat}
-                key=${chat.id}
+                active=${chat === activeChat}
+                key=${chat}
                 chat=${chat}
-                lates=${this.state.latestTime}
+                latest=${this.state.latestTime}
               />`,
           )}
         </${ScrollViewport}>
