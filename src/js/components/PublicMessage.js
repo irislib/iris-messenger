@@ -545,6 +545,15 @@ class PublicMessage extends Message {
             <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
               ${name && this.props.showName && html`<div class="msgSenderName">${name}</div>`}
+              <div class="time">
+                <a
+                  href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
+                  class="tooltip"
+                >
+                  · ${Helpers.getRelativeTimeText(time)}
+                  <span class="tooltiptext"> ${dateStr} ${timeStr} </span>
+                </a>
+              </div>
             </div>
             ${this.renderDropdown()}
           </div>
@@ -636,15 +645,6 @@ class PublicMessage extends Message {
                     ${s.boosts || ''}
                   </span>
                 `}
-            <div class="time">
-              <a
-                href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
-                class="tooltip"
-              >
-                ${Helpers.getRelativeTimeText(time)}
-                <span class="tooltiptext"> ${dateStr} ${timeStr} </span>
-              </a>
-            </div>
           </div>
           ${s.showLikes
             ? html`

@@ -1200,9 +1200,13 @@ a.msg {
   flex-direction: column;
 }
 
-.public-messages-view .msg .text,
-.public-messages-view .msg .time {
+.public-messages-view .msg .text {
   margin-bottom: 5px;
+}
+
+.public-messages-view .msg .time {
+  margin-bottom: 2px;
+  margin-left: 8px;
 }
 
 .msg-content .msg-content {
