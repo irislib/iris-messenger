@@ -172,6 +172,16 @@ class Profile extends View {
     )}`;
     return html`
       <div class="profile-top" key="${this.props.id}details">
+        ${this.state.banner
+          ? html`
+              <div
+                class="profile-banner"
+                style="background-image:linear-gradient(
+    to bottom, transparent, var(--main-color)
+  ), url(${this.state.banner})"
+              ></div>
+            `
+          : ''}
         <div class="profile-header">
           <div class="profile-picture-container">${profilePicture}</div>
           <div class="profile-header-stuff">
@@ -412,6 +422,7 @@ class Profile extends View {
           nip05: profile.nip05valid && profile.nip05,
           lud16,
           website: website,
+          banner: profile.banner && new URL(profile.banner).toString(),
         });
       },
       true,
