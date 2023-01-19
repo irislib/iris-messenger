@@ -784,7 +784,7 @@ header.footer .header-content {
 .msg-identicon .line {
     width: 2px;
     background-color: var(--text-time);
-    margin: 0 18px;
+    margin: 4px 18px;
     height: 100%;
 }
 
@@ -802,7 +802,11 @@ header.footer .header-content {
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
 }
 
-.msg-content:not(.standalone) {
+.flex1 {
+    flex: 1;
+}
+
+.msg:not(.standalone) .msg-content {
   cursor: pointer;
 }
 
@@ -830,9 +834,8 @@ header.footer .header-content {
 }
 
 
-.reply .msg-content {
+.reply .msg-content, .quote .msg-content {
   box-shadow: none;
-  padding-right: 0 !important;
 }
 
 .img-container img {
@@ -1186,14 +1189,6 @@ a.msg {
   align-items: flex-start;
 }
 
-.public-messages-view .msg .msg:first-of-type {
-  margin-bottom: 15px;
-}
-
-.public-messages-view .msg .msg .msg-content {
-  padding: 15px 15px 0 15px;
-}
-
 .public-messages-view .msg-sender {
   margin-bottom: 15px;
   display: flex;
@@ -1226,6 +1221,7 @@ a.msg {
 .public-messages-view .msg .text,
 .public-messages-view .msg .time {
   margin-bottom: 5px;
+  overflow-wrap: anywhere;
 }
 
 .msg-content .msg-content {
@@ -2146,9 +2142,9 @@ form.public {
   padding: 5px 20px;
 }
 
-.notification-msg {
+.public-messages-view .msg .notification-msg {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   background: var(--notify);
   padding: 15px;
@@ -2603,7 +2599,7 @@ input[type='text'] {
   .visible-xs-flex {
     display: none !important;
   }
-  .msg.standalone {
+  .msg.standalone:not(.quoting) {
     margin-top: 15px;
   }
 }

@@ -308,13 +308,17 @@ class PublicMessage extends Message {
     return html`
       <div class="msg">
         <div class="msg-content">
-          <p style="display: flex; align-items: center">
-            <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
-            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
-              ${name}
-            </a>
-            <span> started following you</span>
-          </p>
+          <div class="flex1">
+            <p style="display: flex; align-items: center">
+              <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
+              <a
+                href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
+              >
+                ${name}
+              </a>
+              <span> started following you</span>
+            </p>
+          </div>
         </div>
       </div>
     `;
@@ -325,14 +329,18 @@ class PublicMessage extends Message {
     return html`
       <div class="msg">
         <div class="msg-content">
-          <p style="display: flex; align-items: center">
-            <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
-            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
-              ${name}
-            </a>
-            <span> liked your post</span>
-          </p>
-          <${PublicMessage} hash=${likedId} showName=${true} />
+          <div class="flex1">
+            <p style="display: flex; align-items: center">
+              <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
+              <a
+                href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
+              >
+                ${name}
+              </a>
+              <span> liked your post</span>
+            </p>
+            <${PublicMessage} hash=${likedId} showName=${true} />
+          </div>
         </div>
       </div>
     `;
@@ -390,14 +398,18 @@ class PublicMessage extends Message {
     return html`
       <div class="msg">
         <div class="msg-content">
-          <p style="display: flex; align-items: center">
-            <i style="margin-right: 15px;"> ${Icons.boost} </i>
-            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
-              ${name}
-            </a>
-            <span> boosted</span>
-          </p>
-          <${PublicMessage} hash=${likedId} showName=${true} />
+          <div class="flex1">
+            <p style="display: flex; align-items: center">
+              <i style="margin-right: 15px;"> ${Icons.boost} </i>
+              <a
+                href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
+              >
+                ${name}
+              </a>
+              <span> boosted</span>
+            </p>
+            <${PublicMessage} hash=${likedId} showName=${true} />
+          </div>
         </div>
       </div>
     `;
@@ -422,7 +434,7 @@ class PublicMessage extends Message {
         key=${this.props.hash}
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
-          : ''} ${this.props.asQuote ? 'quote' : ''}"
+          : ''} ${asQuote ? 'quote' : ''}"
       >
         <div class="msg-content retrieving" style="display:flex;align-items:center">
           <div class="text ${this.state.retrieving ? 'visible' : ''}">Looking up message...</div>
@@ -499,6 +511,8 @@ class PublicMessage extends Message {
     });
     const s = this.state;
 
+    const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
+
     return html`
       ${s.msg.replyingTo && !this.props.asReply && !this.props.asQuote
         ? html`
@@ -516,16 +530,13 @@ class PublicMessage extends Message {
         ref=${this.ref}
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
-          : ''} ${this.props.asQuote ? 'quote' : ''}
+          : ''} ${this.props.asQuote || s.sortedReplies.length ? 'quote' : ''}
           ${s.msg.replyingTo && !this.props.asQuote ? 'quoting' : ''}"
       >
-        <div
-          class="msg-content"
-          onClick=${(e) => this.messageClicked(e)}
-        >
+        <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           <div class="msg-identicon">
             ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
-            ${this.props.asQuote ? html`<div class="line"></div>` : ''}
+            ${asQuote ? html`<div class="line"></div>` : ''}
           </div>
           <div class="msg-main">
             <div class="msg-sender">
@@ -673,23 +684,21 @@ class PublicMessage extends Message {
                   />
                 `
               : ''}
-            ${(this.props.showReplies || s.showReplyForm) &&
-            s.sortedReplies &&
-            s.sortedReplies.length
-              ? s.sortedReplies.map(
-                  (r) =>
-                    html`<${PublicMessage}
-                      key=${r}
-                      hash=${r}
-                      asReply=${true}
-                      showName=${true}
-                      showReplies=${true}
-                    />`,
-                )
-              : ''}
           </div>
         </div>
       </div>
+      ${(this.props.showReplies || s.showReplyForm) && s.sortedReplies && s.sortedReplies.length
+        ? s.sortedReplies.map(
+            (r) =>
+              html`<${PublicMessage}
+                key=${r}
+                hash=${r}
+                asReply=${true}
+                showName=${true}
+                showReplies=${true}
+              />`,
+          )
+        : ''}
     `;
   }
 }
