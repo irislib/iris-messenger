@@ -6,6 +6,7 @@ import { route } from 'preact-router';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 
+import Name from './Name';
 import Torrent from './Torrent';
 
 const ANIMATE_DURATION = 200;
@@ -76,7 +77,10 @@ class Message extends Component {
   getSeenStatus() {
     const chatId = this.props.chatId;
     const chat = iris.private(chatId);
-    const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
+    const time =
+      typeof this.props.created_at === 'object'
+        ? this.props.created_at
+        : new Date(this.props.created_at * 1000);
     const seen = chat && chat.theirMsgsLastSeenDate >= time;
     const delivered =
       chat &&
@@ -187,22 +191,15 @@ class Message extends Component {
   }
 
   render() {
-    // if (++this.i > 1) console.log(this.i); // count component updates
-    let name = this.props.name || this.state.name;
-    let color;
-    const chatId = this.props.chatId;
-    const chat = iris.private(chatId);
-    if (chat && chat.uuid && !this.props.selfAuthored) {
-      const profile = chat.participantProfiles[this.props.from];
-      name = profile && profile.name;
-      color = profile && profile.color;
-    }
     const emojiOnly =
       this.props.text && this.props.text.length === 2 && Helpers.isEmoji(this.props.text);
 
-    let text = Helpers.highlightEverything(this.props.text);
+    let text = Helpers.highlightEverything(this.props.text || '');
 
-    const time = typeof this.props.time === 'object' ? this.props.time : new Date(this.props.time);
+    const time =
+      typeof this.props.created_at === 'object'
+        ? this.props.created_at
+        : new Date(this.props.created_at * 1000);
 
     const status = this.getSeenStatus();
     const seen = status.seen ? 'seen' : '';
@@ -213,14 +210,12 @@ class Message extends Component {
       <div class="msg ${whose} ${seen} ${delivered}">
         <div class="msg-content">
           <div class="msg-sender">
-            ${name &&
-            this.props.showName &&
-            html`<small
-              onclick=${() => this.onNameClick()}
-              class="msgSenderName"
-              style="color: ${color}"
-              >${name}</small
-            >`}
+            ${this.props.showName &&
+            html`
+              <small onclick=${() => this.onNameClick()} class="msgSenderName">
+                <${Name} key=${this.props.pubkey} pub=${this.props.pubkey}
+              /></small>
+            `}
           </div>
           ${this.props.torrentId ? html` <${Torrent} torrentId=${this.props.torrentId} /> ` : ''}
           ${this.props.attachments &&
@@ -236,15 +231,6 @@ class Message extends Component {
               </div>`, // TODO: escape a.data
           )}
           <div class="text ${emojiOnly && 'emoji-only'}">${text}</div>
-          ${this.props.replyingTo
-            ? html`
-                <div>
-                  <a href="#/post/${encodeURIComponent(this.props.replyingTo)}"
-                    >Show replied message</a
-                  >
-                </div>
-              `
-            : ''}
           <div class="below-text">
             <div class="time">
               ${this.props.hash

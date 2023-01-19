@@ -1365,6 +1365,7 @@ a.msg {
   padding: 0;
 }
 
+
 #chat-view #message-list {
   max-width: 100%;
   width: max(80%, 800px);

@@ -43,10 +43,18 @@ const saveLocalStorageEvents = debounce((_this: any) => {
   const notifications = _this.notifications.eventIds.map((eventId: any) => {
     return _this.eventsById.get(eventId);
   });
+  const dms = [];
+  for (const set of _this.directMessagesByUser.values()) {
+    set.eventIds.forEach((eventId: any) => {
+      dms.push(_this.eventsById.get(eventId));
+    });
+  }
   console.log('saving some events to local storage');
   localForage.setItem('latestMsgs', latestMsgs);
   localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
   localForage.setItem('notificationEvents', notifications);
+  localForage.setItem('dms', dms);
+  console.log('saved dms', dms);
   // TODO save own block and flag events
 }, 5000);
 
@@ -99,6 +107,7 @@ export default {
   blockedUsers: new Set<string>(),
   flaggedUsers: new Set<string>(),
   deletedEvents: new Set<string>(),
+  directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
   subscribedFiltersByName: new Map<string, Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
@@ -170,9 +179,9 @@ export default {
     const followEvents = await localForage.getItem('followEvents');
     const profileEvents = await localForage.getItem('profileEvents');
     const notificationEvents = await localForage.getItem('notificationEvents');
+    const dms = await localForage.getItem('dms');
     this.localStorageLoaded = true;
     console.log('loaded from local storage');
-    console.log('latestMsgs', latestMsgs);
     console.log('followEvents', followEvents);
     console.log('profileEvents', profileEvents);
     console.log('notificationEvents', notificationEvents);
@@ -197,6 +206,12 @@ export default {
     if (Array.isArray(notificationEvents)) {
       console.log('loaded notificationEvents');
       notificationEvents.forEach((msg) => {
+        this.handleEvent(msg);
+      });
+    }
+    if (Array.isArray(dms)) {
+      console.log('loaded dms', dms);
+      dms.forEach((msg) => {
         this.handleEvent(msg);
       });
     }
@@ -365,6 +380,7 @@ export default {
     for (const relay of this.relays.values()) {
       relay.publish(event);
     }
+    console.log('published', event);
     this.handleEvent(event);
     return event.id;
   },
@@ -818,6 +834,23 @@ export default {
       }
     }
   },
+  handleDirectMessage(event: Event) {
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    let user = event.pubkey;
+    if (event.pubkey === myPub) {
+      user = event.tags.find((tag) => tag[0] === 'p')?.[1] || user;
+    } else {
+      const forMe = event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub);
+      if (!forMe) {
+        return;
+      }
+    }
+    this.eventsById.set(event.id, event);
+    if (!this.directMessagesByUser.has(user)) {
+      this.directMessagesByUser.set(user, new SortedLimitedEventSet(500));
+    }
+    this.directMessagesByUser.get(user)?.add(event);
+  },
   handleEvent(event: Event) {
     if (!event) return;
     if (this.eventsById.has(event.id)) {
@@ -845,6 +878,9 @@ export default {
       case 1:
         this.maybeAddNotification(event);
         this.handleNote(event);
+        break;
+      case 4:
+        this.handleDirectMessage(event);
         break;
       case 5:
         this.handleDelete(event);
@@ -975,7 +1011,7 @@ export default {
         this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
         setTimeout(() => {
           this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
-          this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications
+          this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
         }, 200);
         setInterval(() => {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
@@ -1156,6 +1192,24 @@ export default {
 
     this.subscribedProfiles.add(address);
     this.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
+  },
+
+  getDirectMessageUsers(cb?: (users: string[]) => void) {
+    const callback = () => {
+      cb?.(Array.from(this.directMessagesByUser.keys()));
+    };
+    callback();
+    this.subscribe([{ kinds: [4] }], callback);
+  },
+
+  getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void) {
+    this.knownUsers.add(address);
+    const callback = () => {
+      cb?.(this.directMessagesByUser.get(address)?.eventIds);
+    };
+    this.directMessagesByUser.has(address) && callback();
+    const myPub = iris.session.getKey()?.secp256k1.rpub;
+    this.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
   },
 
   async verifyNip05Address(address: string, pubkey: string): Promise<boolean> {

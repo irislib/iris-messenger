@@ -246,13 +246,9 @@ class Profile extends View {
                 : html`
                     <div class="hidden-xs">
                       <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                      ${this.state.showBetaFeatures
-                        ? html`
-                            <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
-                              >${t('send_message')}<//
-                            >
-                          `
-                        : ''}
+                      <${Button} small=${true} onClick=${() => route(`/chat/${this.props.id}`)}>
+                        ${t('send_message')}
+                      <//>
                     </div>
                   `}
             </div>
@@ -265,13 +261,9 @@ class Profile extends View {
             ? ''
             : html`
                 <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                ${this.state.showBetaFeatures
-                  ? html`
-                      <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
-                        >${t('send_message')}<//
-                      >
-                    `
-                  : ''}
+                <${Button} onClick=${() => route(`/chat/${this.props.id}`)}>
+                  ${t('send_message')}
+                <//>
               `}
         </div>
         ${this.state.about

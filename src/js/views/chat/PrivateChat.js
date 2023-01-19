@@ -8,10 +8,10 @@ import { Router } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
-import Identicon from '../../components/Identicon';
 import Message from '../../components/Message';
-import Name from '../../components/Name';
 import Helpers from '../../Helpers';
+import { nip04 } from '../../lib/nostr-tools';
+import Nostr from '../../Nostr';
 import { translate as t } from '../../translations/Translation';
 
 import NewChat from './newchat/NewChat';
@@ -54,7 +54,9 @@ export default class PrivateChat extends Component {
   constructor() {
     super();
     this.hashtagChatRef = createRef();
+    this.decryptQueue = [];
     this.state = {
+      decryptedMessages: {},
       sortedMessages: [],
       sortedParticipants: [],
       showParticipants: true,
@@ -67,78 +69,54 @@ export default class PrivateChat extends Component {
     return true;
   }
 
-  componentDidMount() {
-    if (!(this.props.id && this.props.id.length > 20)) return;
-    this.participants = {};
-    this.iv = null;
-    this.chat = null;
-    const go = () => {
-      this.chat = iris.private(this.props.id); // TODO: it might be a group chat that doesn't exist yet
-      if (!this.chat && this.props.id.length > 40) {
-        this.chat = iris.session.newChannel(this.props.id);
+  async decryptMessage(id) {
+    try {
+      const myPriv = iris.session.getKey().secp256k1.priv;
+      const msg = Nostr.eventsById.get(id);
+      const theirPub = Nostr.toNostrHexAddress(this.props.id);
+      if (!(msg && theirPub)) {
+        return;
       }
-      if (this.chat) {
-        clearInterval(this.iv);
-        iris.session.subscribeToMsgs(this.props.id);
-        iris.notifications.changeChatUnseenCount(this.props.id, 0);
-        this.chat.setMyMsgsLastSeenTime();
-        Helpers.scrollToMessageListBottom();
-        this.chat.setMyMsgsLastSeenTime();
+      if (myPriv) {
+        return nip04.decrypt(myPriv, theirPub, msg.content);
+      } else if (window.nostr) {
+        return window.nostr.nip04.decrypt(theirPub, msg.content);
       }
-    };
-    this.iv = setInterval(go, 3000);
-    go();
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
-    iris.local().get('showParticipants').put(true);
-    iris.local().get('showParticipants').on(this.inject());
-    iris
-      .local()
-      .get('channels')
-      .get(this.props.id)
-      .get('participants')
-      .map(
-        this.sub((v, k) => {
-          const hasAlready = !!this.participants[k];
-          this.participants[k] = v;
-          if (!!v && !hasAlready) {
-            iris
-              .public(k)
-              .get('activity')
-              .on(
-                this.sub((activity) => {
-                  if (this.participants[k]) {
-                    this.participants[k].activity = activity;
-                  }
-                  this.setSortedParticipants();
-                }),
-              );
+  decryptNext() {
+    if (this.decryptQueue.length) {
+      this.decrypting = true;
+      const id = this.decryptQueue.shift();
+      this.decryptMessage(id).then((text) => {
+        if (text) {
+          this.state.decryptedMessages[id] = text;
+          this.setState({ decryptedMessages: this.state.decryptedMessages });
+        }
+        this.decryptNext();
+      });
+    } else {
+      this.decrypting = false;
+    }
+  }
+
+  componentDidMount() {
+    Nostr.getDirectMessagesByUser(this.props.id, (msgIds) => {
+      if (msgIds) {
+        for (const id of msgIds) {
+          if (this.state.decryptedMessages[id]) {
+            continue;
           }
-          this.setSortedParticipants();
-        }),
-      );
-    iris
-      .local()
-      .get('channels')
-      .get(this.props.id)
-      .get('msgDraft')
-      .once((m) => $('.new-msg').val(m));
-    const node = iris.local().get('channels').get(this.props.id).get('msgs');
-    const limitedUpdate = throttle(
-      () =>
-        this.setState({
-          sortedMessages: Object.keys(this.msgs)
-            .sort()
-            .map((k) => this.msgs[k]),
-        }),
-      100,
-    ); // TODO: this is jumpy, as if reverse sorting is broken? why isn't MessageFeed the same?
-    this.msgs = {};
-    node.map(
-      this.sub((msg, time) => {
-        this.msgs[time] = msg;
-        limitedUpdate();
-      }),
-    );
+          this.decryptQueue.push(id);
+          !this.decrypting && this.decryptNext();
+        }
+        this.setState({ sortedMessages: msgIds.reverse() });
+      }
+    });
+    /*
     const container = document.getElementById('message-list');
     container.style.paddingBottom = 0;
     container.style.paddingTop = 0;
@@ -151,41 +129,8 @@ export default class PrivateChat extends Component {
         this.setState({ stickToBottom: true });
       }
     });
+     */
   }
-
-  setSortedParticipants = throttle(
-    () => {
-      let noLongerParticipant = true;
-      const sortedParticipants = Object.keys(this.participants)
-        .filter((k) => {
-          if (k === 'undefined') return false;
-          const p = this.participants[k];
-          const hasPermissions = p && p.read && p.write;
-          if (noLongerParticipant && hasPermissions && k === iris.session.getPubKey()) {
-            noLongerParticipant = false;
-          }
-          return hasPermissions;
-        })
-        .sort((a, b) => {
-          const aO = this.participants[a];
-          const bO = this.participants[b];
-          const aActive = new Date((aO && aO.activity && aO.activity.time) || 0);
-          const bActive = new Date((bO && bO.activity && bO.activity.time) || 0);
-          if (Math.abs(aActive - bActive) < 10000) {
-            return a > b ? -1 : 1;
-          }
-          if (aActive > bActive) {
-            return -1;
-          } else if (aActive < bActive) {
-            return 1;
-          }
-          return 0;
-        });
-      this.setState({ sortedParticipants, noLongerParticipant });
-    },
-    2000,
-    { leading: true },
-  );
 
   componentDidUpdate() {
     if (this.state.stickToBottom) {
@@ -204,11 +149,6 @@ export default class PrivateChat extends Component {
         }
       }
     }, 2000);
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    clearInterval(this.iv);
   }
 
   addFloatingDaySeparator() {
@@ -261,43 +201,49 @@ export default class PrivateChat extends Component {
   renderMainView() {
     let mainView;
     if (this.props.id && this.props.id.length > 20) {
+      const myPub = iris.session.getKey().secp256k1.rpub;
       const now = new Date();
       const nowStr = now.toLocaleDateString();
       let previousDateStr;
       let previousFrom;
       const msgListContent = [];
-      this.state.sortedMessages &&
-        Object.values(this.state.sortedMessages).forEach((msg) => {
-          if (typeof msg !== 'object') {
-            try {
-              msg = JSON.parse(msg);
-            } catch (e) {
-              console.error('JSON.parse(msg) failed', e);
-              return;
-            }
+      this.state.sortedMessages.forEach((msgId) => {
+        const msg = Nostr.eventsById.get(msgId);
+        if (!msg) {
+          return null;
+        }
+        const date = new Date(msg.created_at * 1000);
+        let isDifferentDay;
+        if (date) {
+          const dateStr = date.toLocaleDateString();
+          if (dateStr !== previousDateStr) {
+            isDifferentDay = true;
+            let separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
+            msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
           }
-          const date = typeof msg.time === 'string' ? new Date(msg.time) : msg.time;
-          let isDifferentDay;
-          if (date) {
-            const dateStr = date.toLocaleDateString();
-            if (dateStr !== previousDateStr) {
-              isDifferentDay = true;
-              let separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
-              msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
-            }
-            previousDateStr = dateStr;
-          }
+          previousDateStr = dateStr;
+        }
 
-          let showName = false;
-          if (isDifferentDay || (previousFrom && msg.from !== previousFrom)) {
-            msgListContent.push(html`<div class="from-separator" />`);
-            showName = true;
-          }
-          previousFrom = msg.from;
-          msgListContent.push(html`
-            <${Message} ...${msg} showName=${showName} key=${msg.time} chatId=${this.props.id} />
-          `);
-        });
+        let showName = false;
+        if (
+          msg.pubkey !== myPub &&
+          (isDifferentDay || (previousFrom && msg.pubkey !== previousFrom))
+        ) {
+          msgListContent.push(html`<div class="from-separator" />`);
+          showName = true;
+        }
+        previousFrom = msg.pubkey;
+        msgListContent.push(html`
+          <${Message}
+            ...${msg}
+            text=${this.state.decryptedMessages[msg.id]}
+            showName=${showName}
+            selfAuthored=${msg.pubkey === myPub}
+            key=${msg.created_at + msg.pubkey}
+            chatId=${this.props.id}
+          />
+        `);
+      });
 
       mainView = html` <div
         class="main-view"
@@ -316,35 +262,6 @@ export default class PrivateChat extends Component {
       );
     }
     return mainView;
-  }
-
-  renderParticipantList() {
-    const participants = this.state.sortedParticipants;
-
-    return this.props.id &&
-      this.props.id !== 'new' &&
-      this.props.id !== 'InviteView' &&
-      this.props.id !== 'QRView' &&
-      this.props.id.length < 40
-      ? html`
-          <div class="participant-list ${this.state.showParticipants ? 'open' : ''}">
-            ${participants.length
-              ? html` <small>${participants.length} ${t('participants')}</small> `
-              : ''}
-            ${participants.map(
-              (k) =>
-                html`
-                  <a href="#/profile/${k}">
-                    <span class="text">
-                      <${Identicon} key="i${k}" str=${k} width="30" activity=${true} />
-                      <${Name} pub=${k} key="t${k}" />
-                    </span>
-                  </a>
-                `,
-            )}
-          </div>
-        `
-      : '';
   }
 
   renderMsgForm() {
@@ -366,15 +283,11 @@ export default class PrivateChat extends Component {
             </p>
           </div>
           <div class="chat-message-form">
-            ${this.state.noLongerParticipant
-              ? html`<div style="text-align:center">
-                  You can't send messages to this group because you're no longer a participant.
-                </div>`
-              : html`<${ChatMessageForm}
-                  key=${this.props.id}
-                  activeChat=${this.props.id}
-                  onSubmit=${() => this.scrollDown()}
-                />`}
+            <${ChatMessageForm}
+              key=${this.props.id}
+              activeChat=${this.props.id}
+              onSubmit=${() => this.scrollDown()}
+            />
           </div>
         `
       : '';
@@ -386,7 +299,6 @@ export default class PrivateChat extends Component {
       <div id="chat-main" class="${this.props.id ? '' : 'hidden-xs'}">
         ${this.renderMainView()} ${this.renderMsgForm()}
       </div>
-      ${this.renderParticipantList()}
     `;
   }
 }
