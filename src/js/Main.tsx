@@ -153,7 +153,7 @@ class Main extends Component<Props, ReactState> {
           <div className="view-area">
             <Router history={history as CustomHistory} onChange={(e) => this.handleRoute(e)}>
               <Feed path="/" index="follows" />
-              <Feed path="/discover" index="everyone" />
+              <Feed path="/global" index="everyone" />
               <Feed path="/search/:term?/:type?" />
               <Feed path="/media" index="media" thumbnails />
               <Login path="/login" />

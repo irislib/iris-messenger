@@ -66,19 +66,14 @@ class Footer extends Component<Props, State> {
           <a href="#/" class={`btn ${activeRoute === '/' ? 'active' : ''}`}>
             {Icons.home}
           </a>
-          {this.state.showBetaFeatures && (
-            <a
-              href="#/chat"
-              className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}
-            >
-              {this.state.unseenMsgsTotal ? (
-                <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
-              ) : (
-                ''
-              )}
-              {Icons.chat}
-            </a>
-          )}
+          <a href="#/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
+            {this.state.unseenMsgsTotal ? (
+              <span className="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
+            ) : (
+              ''
+            )}
+            {Icons.chat}
+          </a>
           <a href="#/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
             {plusIcon}
           </a>

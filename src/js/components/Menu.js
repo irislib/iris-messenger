@@ -11,12 +11,11 @@ import { translate as t } from '../translations/Translation';
 const APPLICATIONS = [
   // TODO: move editable shortcuts to localState gun
   { url: '/', text: 'following', icon: Icons.home },
-  { url: '/media', text: 'media', icon: Icons.play, beta: true },
-  { url: '/chat', text: 'messages', icon: Icons.chat, beta: true },
-  { url: '/discover', text: 'global', icon: Icons.global },
+  { url: '#/chat', text: 'messages', icon: Icons.chat },
+  { url: '#/global', text: 'global', icon: Icons.global },
   { url: '#/settings', text: 'settings', icon: Icons.settings },
-  { url: '/explorer', text: 'explorer', icon: Icons.folder, beta: true },
-  { url: '/about', text: 'about', icon: Icons.info },
+  { url: '#/explorer', text: 'explorer', icon: Icons.folder, beta: true },
+  { url: '#/about', text: 'about', icon: Icons.info },
 ];
 
 export default class Menu extends Component {

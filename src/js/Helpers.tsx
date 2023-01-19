@@ -234,7 +234,7 @@ export default {
     } else if (timeDifference < secondsInADay) {
       return Math.floor(timeDifference / secondsInAnHour) + 'h';
     } else {
-      return date.toLocaleDateString(undefined, { dateStyle: 'short' });
+      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     }
   },
 
