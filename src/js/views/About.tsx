@@ -35,6 +35,18 @@ class About extends Component {
               Released under MIT license. Code:{' '}
               <a href="https://github.com/irislib/iris-messenger">Github</a>.
             </p>
+
+            <p>
+              <ul>
+                <li>
+                  <a href="https://testflight.apple.com/join/5xdoDCmG">iOS Testflight</a>
+                </li>
+                <li>
+                  <a href="https://play.google.com/store/apps/details?id=to.iris.twa">Android</a>
+                </li>
+              </ul>
+            </p>
+
             <p>
               <small>Version 2.3.3</small>
             </p>
