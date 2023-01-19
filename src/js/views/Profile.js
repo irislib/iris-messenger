@@ -260,10 +260,12 @@ class Profile extends View {
           ${this.state.isMyProfile
             ? ''
             : html`
-                <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                <${Button} onClick=${() => route(`/chat/${this.props.id}`)}>
-                  ${t('send_message')}
-                <//>
+                <div>
+                  <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
+                  <${Button} small=${true} onClick=${() => route(`/chat/${this.props.id}`)}>
+                    ${t('send_message')}
+                  <//>
+                </div>
               `}
         </div>
         ${this.state.about
