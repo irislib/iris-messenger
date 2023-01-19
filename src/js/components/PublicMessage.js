@@ -308,16 +308,12 @@ class PublicMessage extends Message {
     return html`
       <div class="msg">
         <div class="msg-content">
-          <div class="flex1">
-            <p style="display: flex; align-items: center">
-              <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
-              <a
-                href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
-              >
-                ${name}
-              </a>
-              <span> started following you</span>
-            </p>
+          <div style="display: flex; align-items: center">
+            <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
+            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+              ${name}
+            </a>
+            <span> started following you</span>
           </div>
         </div>
       </div>
@@ -328,19 +324,15 @@ class PublicMessage extends Message {
     const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
     return html`
       <div class="msg">
-        <div class="msg-content">
-          <div class="flex1">
-            <p style="display: flex; align-items: center">
-              <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
-              <a
-                href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
-              >
-                ${name}
-              </a>
-              <span> liked your post</span>
-            </p>
-            <${PublicMessage} hash=${likedId} showName=${true} />
+        <div class="msg-content" style="padding: 15px 0">
+          <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
+            <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
+            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+              ${name}
+            </a>
+            <span> liked your post</span>
           </div>
+          <${PublicMessage} hash=${likedId} showName=${true} />
         </div>
       </div>
     `;
@@ -397,19 +389,17 @@ class PublicMessage extends Message {
     const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
     return html`
       <div class="msg">
-        <div class="msg-content">
-          <div class="flex1">
-            <p style="display: flex; align-items: center">
-              <i style="margin-right: 15px;"> ${Icons.boost} </i>
-              <a
-                href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
-              >
-                ${name}
-              </a>
-              <span> boosted</span>
-            </p>
-            <${PublicMessage} hash=${likedId} showName=${true} />
+        <div class="msg-content" style="padding: 15px 0">
+          <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
+            <i style="margin-right: 15px;"> ${Icons.boost} </i>
+            <a
+              href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
+            >
+              ${name}
+            </a>
+            <span> boosted</span>
           </div>
+          <${PublicMessage} hash=${likedId} showName=${true} />
         </div>
       </div>
     `;
@@ -534,6 +524,11 @@ class PublicMessage extends Message {
           ${s.msg.replyingTo && !this.props.asQuote ? 'quoting' : ''}"
       >
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
+          ${ this.props.asQuote && s.msg.replyingTo
+            ? html` <div style="flex-basis:100%; margin-bottom: 15px">
+                <a href="#/post/${s.msg.replyingTo}">Show thread</a>
+              </div>`
+            : ''}
           <div class="msg-identicon">
             ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
             ${asQuote ? html`<div class="line"></div>` : ''}
@@ -542,6 +537,15 @@ class PublicMessage extends Message {
             <div class="msg-sender">
               <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
                 ${name && this.props.showName && html`<div class="msgSenderName">${name}</div>`}
+                <div class="time">
+                  <a
+                    href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
+                    class="tooltip"
+                  >
+                    ${Helpers.getRelativeTimeText(time)}
+                    <span class="tooltiptext"> ${dateStr} ${timeStr} </span>
+                  </a>
+                </div>
               </div>
               ${this.renderDropdown()}
             </div>
@@ -637,15 +641,6 @@ class PublicMessage extends Message {
                       ${s.boosts || ''}
                     </span>
                   `}
-              <div class="time">
-                <a
-                  href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
-                  class="tooltip"
-                >
-                  ${Helpers.getRelativeTimeText(time)}
-                  <span class="tooltiptext"> ${dateStr} ${timeStr} </span>
-                </a>
-              </div>
             </div>
             ${s.showLikes
               ? html`
