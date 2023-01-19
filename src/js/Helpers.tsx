@@ -234,7 +234,11 @@ export default {
     } else if (timeDifference < secondsInADay) {
       return Math.floor(timeDifference / secondsInAnHour) + 'h';
     } else {
-      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      if (date.getFullYear() === currentTime.getFullYear()) {
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      } else {
+        return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      }
     }
   },
 
