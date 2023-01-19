@@ -8,6 +8,7 @@ import {Filter, matchFilters} from './filter'
 
 export type Relay = {
   url: string
+  filters: Filter[]
   status: number
   connect: () => void
   close: () => void
@@ -68,6 +69,18 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
   let nextAttemptSeconds = 1
   let isConnected = false
 
+  const split = url.split('?');
+  let filters = [];
+
+  if (split.length > 1) {
+    filters = split[1].split('&')
+      .map((filter) => {
+        if(filter.split('=')[0] == 'z') console.log('FOUND ONE')
+        let rVal: Filter[] = { ['#' + filter.split('=')[0]]: [filter.split('=')[1]] }
+        return rVal;
+      })
+  }
+
   function resetOpenState() {
     untilOpen = new Promise(resolve => {
       resolveOpen = resolve
@@ -75,7 +88,7 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
   }
 
   function connectRelay() {
-    ws = new WebSocket(url)
+    ws = new WebSocket(url.split('?')[0])
 
     ws.onopen = () => {
       listeners.connect.forEach(cb => cb())
@@ -230,9 +243,14 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
     {
       skipVerification = false,
       id = Math.random().toString().slice(2)
-    }: SubscriptionOptions = {}
+    }: SubscriptionOptions = {},
+    relayFilters?: Filter[],
   ): Sub => {
     let subid = id
+
+    if(relayFilters) {
+      filters = filters.map((item, index) => Object.assign({}, item, relayFilters[index]));
+    }
 
     openSubs[subid] = {
       id: subid,
@@ -268,6 +286,7 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
 
   return {
     url,
+    filters,
     sub,
     on: (type: 'connect' | 'disconnect' | 'notice', cb: any): void => {
       listeners[type].push(cb)

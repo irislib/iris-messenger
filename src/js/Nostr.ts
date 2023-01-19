@@ -221,7 +221,7 @@ export default {
     const relay = relayInit(url, this.eventsById);
     relay.on('connect', () => {
       for (const [name, filters] of this.subscribedFiltersByName.entries()) {
-        const sub = relay.sub(filters, {});
+        const sub = relay.sub(filters, {}, relay.filters);
         if (!this.subscriptionsByName.has(name)) {
           this.subscriptionsByName.set(name, new Set());
         }
@@ -408,7 +408,7 @@ export default {
     }
 
     for (const relay of this.relays.values()) {
-      const sub = relay.sub(filters, {});
+      const sub = relay.sub(filters, {}, relay.filters);
       // TODO update relay lastSeen
       sub.on('event', (event) => this.handleEvent(event));
       if (once) {
