@@ -1999,6 +1999,22 @@ small,
   margin-bottom: 30px;
 }
 
+.profile-banner {
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-top: -15px;
+}
+
+@media (max-width: 625px) {
+  .profile-banner {
+    height: 200px;
+    margin-left: -15px;
+    margin-right: -15px;
+  }
+}
+
 button {
   cursor: pointer;
 }
