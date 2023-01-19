@@ -2005,15 +2005,19 @@ small,
 
 .profile-banner {
   height: 250px;
+  min-height: 250px;
+  align-self: stretch;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   margin-top: -15px;
+  margin-left: -15px;
+  margin-right: -15px;
 }
 
 @media (max-width: 625px) {
   .profile-banner {
-    height: 200px;
+    min-height: 200px;
     margin-left: -15px;
     margin-right: -15px;
   }
