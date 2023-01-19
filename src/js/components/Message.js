@@ -91,7 +91,7 @@ class Message extends Component {
   }
 
   onNameClick() {
-    route(`/chat/${this.props.from}`);
+    route(`/profile/${this.props.pubkey}`);
   }
 
   openAttachmentsGallery(event) {
