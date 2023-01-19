@@ -424,7 +424,7 @@ class PublicMessage extends Message {
           ? 'standalone'
           : ''} ${this.props.asQuote ? 'quote' : ''}"
       >
-        <div class="retrieving" style="display:flex;align-items:center">
+        <div class="msg-content retrieving" style="display:flex;align-items:center">
           <div class="text ${this.state.retrieving ? 'visible' : ''}">Looking up message...</div>
           <div>${this.renderDropdown()}</div>
         </div>
@@ -516,15 +516,16 @@ class PublicMessage extends Message {
         ref=${this.ref}
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
-          : ''} ${this.props.asQuote ? 'quote' : ''}"
+          : ''} ${this.props.asQuote ? 'quote' : ''}
+          ${s.msg.replyingTo && !this.props.asQuote ? 'quoting' : ''}"
       >
         <div
           class="msg-content"
-          style=${this.props.standalone ? '' : { cursor: 'pointer' }}
           onClick=${(e) => this.messageClicked(e)}
         >
           <div class="msg-identicon">
             ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
+            ${this.props.asQuote ? html`<div class="line"></div>` : ''}
           </div>
           <div class="msg-main">
             <div class="msg-sender">

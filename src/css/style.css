@@ -777,6 +777,15 @@ header.footer .header-content {
 
 .msg-identicon {
   display: flex;
+  flex-direction: column;
+}
+
+/* twitter-style line that connects reply to the replied post */
+.msg-identicon .line {
+    width: 2px;
+    background-color: var(--text-time);
+    margin: 0 18px;
+    height: 100%;
 }
 
 .msg-main {
@@ -793,12 +802,24 @@ header.footer .header-content {
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
 }
 
+.msg-content:not(.standalone) {
+  cursor: pointer;
+}
+
 .msg.quote {
   margin-bottom: 0;
 }
 
 .public-messages-view .quote .msg-sender {
   margin-bottom: 8px;
+}
+
+.public-messages-view .msg.quote .msg-content {
+  padding-bottom: 0;
+}
+
+.public-messages-view .msg.quoting .msg-content {
+  padding-top: 0;
 }
 
 .msg > div.msg-content > div.msg-sender,
