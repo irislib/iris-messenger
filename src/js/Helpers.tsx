@@ -221,17 +221,21 @@ export default {
   },
 
   getRelativeTimeText(date: Date): string {
-    let text =
-      date &&
-      iris.util.getDaySeparatorText(
-        date,
-        date.toLocaleDateString(undefined, { dateStyle: 'short' }),
-      );
-    text = t(text);
-    if (text === t('today')) {
-      text = iris.util.formatTime(date);
+    const currentTime = new Date();
+    const timeDifference = Math.floor((currentTime.getTime() - date.getTime()) / 1000);
+    const secondsInAMinute = 60;
+    const secondsInAnHour = 60 * secondsInAMinute;
+    const secondsInADay = 24 * secondsInAnHour;
+
+    if (timeDifference < secondsInAMinute) {
+      return 'now';
+    } else if (timeDifference < secondsInAnHour) {
+      return Math.floor(timeDifference / secondsInAMinute) + 'm';
+    } else if (timeDifference < secondsInADay) {
+      return Math.floor(timeDifference / secondsInAnHour) + 'h';
+    } else {
+      return date.toLocaleTimeString(undefined, { timeStyle: 'short' });
     }
-    return text;
   },
 
   formatBytes(bytes: number, decimals = 2): string {
