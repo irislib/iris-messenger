@@ -1761,7 +1761,7 @@ hr {
 
 .chat-item {
   padding: 0px 10px 0px 15px;
-  overflow-x: hidden;
+  overflow: hidden;
   cursor: pointer;
   display: flex;
   flex-direction: row;
