@@ -37,7 +37,7 @@ class Settings extends Component<Props, State> {
       <>
         <Header />
         <div class="main-view" id="settings">
-          <div style="flex-direction: row; height: max-content;" id="settings">
+          <div style="flex-direction: row; height: max-content; min-height: 95vh;" id="settings">
             <div class="logo" className={this.props.page ? 'visible-xs-flex' : 'hidden'}>
               <div
                 href="#/settings/"
