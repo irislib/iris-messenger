@@ -83,8 +83,7 @@ class ChatList extends Component {
                 active=${pubkey === activeChat}
                 key=${pubkey}
                 chat=${pubkey}
-                latestTime=${Nostr.eventsById.get(this.state.chats.get(pubkey).eventIds[0])
-                  .created_at}
+                latestMsgId=${this.state.chats.get(pubkey).eventIds[0]}
               />`,
           )}
         </${ScrollViewport}>

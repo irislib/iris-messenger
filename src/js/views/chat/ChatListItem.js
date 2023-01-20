@@ -5,17 +5,40 @@ import Component from '../../BaseComponent';
 import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
 import Helpers from '../../Helpers';
+import Nostr from '../../Nostr';
 
 class ChatListItem extends Component {
   constructor() {
     super();
-    this.state = { latest: {}, unseen: {} };
+    this.state = {
+      latest: {},
+      latestText: '',
+      unseen: {},
+    };
   }
 
   onKeyUp(e) {
     // if enter was pressed, click the element
     if (e.keyCode === 13) {
       e.target.click();
+    }
+  }
+
+  getLatestMsg() {
+    const event = Nostr.eventsById.get(this.props.latestMsgId);
+    if (event) {
+      this.setState({ latest: event });
+      Nostr.decryptMessage(this.props.latestMsgId, (latestText) => this.setState({ latestText }));
+    }
+  }
+
+  componentDidMount() {
+    this.getLatestMsg();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.latestMsgId !== this.props.latestMsgId) {
+      this.getLatestMsg();
     }
   }
 
@@ -63,8 +86,9 @@ class ChatListItem extends Component {
      */
 
     const time =
-      (this.props.latestTime &&
-        Helpers.getRelativeTimeText(new Date(this.props.latestTime * 1000))) ||
+      (this.state.latest &&
+        this.state.latest.created_at &&
+        Helpers.getRelativeTimeText(new Date(this.state.latest.created_at * 1000))) ||
       '';
 
     // TODO use button so we can use keyboard to navigate
@@ -82,6 +106,7 @@ class ChatListItem extends Component {
             <span class="name"><${Name} pub=${this.props.chat} /></span>
             <small class="latest-time">${time}</small>
           </div>
+          <small class="latest"> ${this.state.latestText} </small>
           <!--${unseenEl}-->
         </div>
       </div>
