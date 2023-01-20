@@ -37,7 +37,7 @@ class Settings extends Component<Props, State> {
       <>
         <Header />
         <div class="main-view" id="settings">
-          <div style="flex-direction: row; height: max-content; min-height: 95vh;" id="settings">
+          <div style="flex-direction: row; width:100%;" id="settings">
             <div class="logo" className={this.props.page ? 'visible-xs-flex' : 'hidden'}>
               <div
                 href="#/settings/"
@@ -50,7 +50,7 @@ class Settings extends Component<Props, State> {
             <SettingsMenu activePage={this.props.page} />
             <div
               className={this.props.page ? '' : 'hidden-xs'}
-              style="padding: 0px 15px; height: max-content;"
+              style="padding: 0px 15px; overflow: auto; width: 100%;"
             >
               <SettingsContent id={this.props.page} />
             </div>
