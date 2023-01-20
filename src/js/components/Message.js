@@ -5,6 +5,7 @@ import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
+import Nostr from '../Nostr';
 
 import Name from './Name';
 import Torrent from './Torrent';
@@ -28,6 +29,9 @@ class Message extends Component {
   constructor() {
     super();
     this.i = 0;
+    this.state = {
+      text: '',
+    };
   }
 
   componentDidMount() {
@@ -40,38 +44,10 @@ class Message extends Component {
           window.location = href.replace('https://iris.to/', '');
         }
       });
-
-    const status = this.getSeenStatus();
-    if (!status.seen && !status.delivered) {
-      iris
-        .local()
-        .get('channels')
-        .get(this.props.chatId)
-        .get('theirLastActiveTime')
-        .on(
-          this.sub((v, k, a, e) => {
-            if (this.getSeenStatus().delivered) {
-              this.setState({ delivered: true });
-              e.off();
-            }
-          }),
-        );
-    }
-    if (!status.seen) {
-      iris
-        .local()
-        .get('channels')
-        .get(this.props.chatId)
-        .get('theirMsgsLastSeenTime')
-        .on(
-          this.sub((v, k, a, e) => {
-            if (this.getSeenStatus().seen) {
-              this.setState({ seen: true });
-              e.off();
-            }
-          }),
-        );
-    }
+    Nostr.decryptMessage(this.props.id, (text) => {
+      this.setState({ text });
+      console.log('decrypted', text);
+    });
   }
 
   getSeenStatus() {
@@ -192,9 +168,9 @@ class Message extends Component {
 
   render() {
     const emojiOnly =
-      this.props.text && this.props.text.length === 2 && Helpers.isEmoji(this.props.text);
+      this.state.text && this.state.text.length === 2 && Helpers.isEmoji(this.state.text);
 
-    let text = Helpers.highlightEverything(this.props.text || '');
+    let text = Helpers.highlightEverything(this.state.text || '');
 
     const time =
       typeof this.props.created_at === 'object'

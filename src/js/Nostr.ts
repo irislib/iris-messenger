@@ -131,11 +131,79 @@ export default {
   handledMsgsPerSecond: 0,
   notificationsSeenTime: 0,
   unseenNotificationCount: 0,
+  decryptedMessages: new Map<string, string>(),
+  decryptQueue: [],
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
       return ('0' + (byte & 0xff).toString(16)).slice(-2);
     }).join('');
+  },
+
+  decryptMessage(id, cb: (decrypted: string) => void) {
+    const existing = this.decryptedMessages.get(id);
+    if (existing) {
+      cb(existing);
+      return;
+    }
+    try {
+      const myPub = iris.session.getKey().secp256k1.rpub;
+      const myPriv = iris.session.getKey().secp256k1.priv;
+      const msg = this.eventsById.get(id);
+      const theirPub =
+        msg.pubkey === myPub ? msg.tags.find((tag: any) => tag[0] === 'p')[1] : msg.pubkey;
+      if (!(msg && theirPub)) {
+        return;
+      }
+      if (myPriv) {
+        const decrypted = nip04.decrypt(myPriv, theirPub, msg.content);
+        this.decryptedMessages.set(id, decrypted);
+        cb(decrypted);
+      } else if (window.nostr) {
+        this.decryptQueue.push({ id, theirPub, msg, cb });
+        if (this.decryptQueue.length === 1) {
+          this.processDecryptQueue();
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  },
+
+  processDecryptQueue() {
+    if (this.decryptQueue.length === 0) {
+      return;
+    }
+    const { id, theirPub, msg, cb } = this.decryptQueue[0];
+    window.nostr.nip04
+      .decrypt(theirPub, msg.content)
+      .then((decrypted) => {
+        this.decryptedMessages.set(id, decrypted);
+        cb(decrypted);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        this.decryptQueue.shift();
+        this.processDecryptQueue();
+      });
+  },
+
+  decryptNext() {
+    if (this.decryptQueue.length) {
+      this.decrypting = true;
+      const id = this.decryptQueue.shift();
+      this.decryptMessage(id, (text) => {
+        if (text) {
+          this.state.decryptedMessages[id] = text;
+          this.setState({ decryptedMessages: this.state.decryptedMessages });
+        }
+        this.decryptNext();
+      });
+    } else {
+      this.decrypting = false;
+    }
   },
 
   setFollowed: function (followedUser: string, follow = true) {

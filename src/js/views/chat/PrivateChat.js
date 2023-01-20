@@ -54,7 +54,6 @@ export default class PrivateChat extends Component {
   constructor() {
     super();
     this.hashtagChatRef = createRef();
-    this.decryptQueue = [];
     this.state = {
       decryptedMessages: {},
       sortedMessages: [],
@@ -69,50 +68,9 @@ export default class PrivateChat extends Component {
     return true;
   }
 
-  async decryptMessage(id) {
-    try {
-      const myPriv = iris.session.getKey().secp256k1.priv;
-      const msg = Nostr.eventsById.get(id);
-      const theirPub = Nostr.toNostrHexAddress(this.props.id);
-      if (!(msg && theirPub)) {
-        return;
-      }
-      if (myPriv) {
-        return nip04.decrypt(myPriv, theirPub, msg.content);
-      } else if (window.nostr) {
-        return window.nostr.nip04.decrypt(theirPub, msg.content);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  decryptNext() {
-    if (this.decryptQueue.length) {
-      this.decrypting = true;
-      const id = this.decryptQueue.shift();
-      this.decryptMessage(id).then((text) => {
-        if (text) {
-          this.state.decryptedMessages[id] = text;
-          this.setState({ decryptedMessages: this.state.decryptedMessages });
-        }
-        this.decryptNext();
-      });
-    } else {
-      this.decrypting = false;
-    }
-  }
-
   componentDidMount() {
     Nostr.getDirectMessagesByUser(Nostr.toNostrHexAddress(this.props.id), (msgIds) => {
       if (msgIds) {
-        for (const id of msgIds) {
-          if (this.state.decryptedMessages[id]) {
-            continue;
-          }
-          this.decryptQueue.push(id);
-          !this.decrypting && this.decryptNext();
-        }
         this.setState({ sortedMessages: msgIds.reverse() });
       }
     });
@@ -236,11 +194,10 @@ export default class PrivateChat extends Component {
           msgListContent.push(html`<div class="from-separator" />`);
           showName = true;
         }
-        previousFrom = msg.pubkey;
+        previousFrom = msg.pubkey; // TODO: ...${msg} not good?
         msgListContent.push(html`
           <${Message}
             ...${msg}
-            text=${this.state.decryptedMessages[msg.id]}
             showName=${showName}
             selfAuthored=${msg.pubkey === myPub}
             key=${msg.created_at + msg.pubkey}
