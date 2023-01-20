@@ -104,7 +104,7 @@ export default class PrivateChat extends Component {
   }
 
   componentDidMount() {
-    Nostr.getDirectMessagesByUser(this.props.id, (msgIds) => {
+    Nostr.getDirectMessagesByUser(Nostr.toNostrHexAddress(this.props.id), (msgIds) => {
       if (msgIds) {
         for (const id of msgIds) {
           if (this.state.decryptedMessages[id]) {
@@ -141,7 +141,11 @@ export default class PrivateChat extends Component {
       .off('load')
       .on('load', () => this.state.stickToBottom && Helpers.scrollToMessageListBottom());
     setTimeout(() => {
-      if (this.chat && !this.chat.uuid && this.props.id !== iris.session.getPubKey()) {
+      if (
+        this.chat &&
+        !this.chat.uuid &&
+        Nostr.toNostrHexAddress(this.props.id) !== iris.session.getPubKey()
+      ) {
         if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
           $('#not-seen-by-them').slideDown();
         } else {

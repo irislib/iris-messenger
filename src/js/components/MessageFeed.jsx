@@ -25,7 +25,6 @@ class MessageFeed extends Component {
 
   updateSortedMessages = throttle(
     (sortedMessages) => {
-      console.log('updateSortedMessages', sortedMessages);
       if (this.unmounted || !sortedMessages) {
         return;
       }
