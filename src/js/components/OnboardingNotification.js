@@ -33,7 +33,11 @@ export default class OnboardingNotification extends Component {
             </div>
             <p>
               ${t('alternatively')}<i> </i>
-              <a href="#/profile/${iris.session.getPubKey()?.secp256k1?.rpub}"
+              <a
+                href="#/profile/${Nostr.toNostrBech32Address(
+                  iris.session.getKey()?.secp256k1?.rpub,
+                  'npub',
+                )}"
                 >${t('give_your_profile_link_to_someone')}</a
               >.
             </p>

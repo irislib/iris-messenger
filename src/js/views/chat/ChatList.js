@@ -13,7 +13,10 @@ import ChatListItem from './ChatListItem';
 class ChatList extends Component {
   constructor(props) {
     super(props);
-    this.state = { chats: [], latestTime: null };
+    this.state = {
+      chats: new Map(),
+      sortedChats: [],
+    };
   }
 
   enableDesktopNotifications() {
@@ -30,8 +33,20 @@ class ChatList extends Component {
   }
 
   componentDidMount() {
-    Nostr.getDirectMessageUsers((chats) => {
-      this.setState({ chats });
+    Nostr.getDirectMessages((chats) => {
+      const sortedChats = Array.from(chats.keys()).sort((a, b) => {
+        const aEventIds = chats.get(a).eventIds;
+        const bEventIds = chats.get(b).eventIds;
+        const aLatestEvent = aEventIds.length ? Nostr.eventsById.get(aEventIds[0]) : null;
+        const bLatestEvent = bEventIds.length ? Nostr.eventsById.get(bEventIds[0]) : null;
+        if (bLatestEvent.created_at > aLatestEvent.created_at) {
+          return 1;
+        } else if (bLatestEvent.created_at < aLatestEvent.created_at) {
+          return -1;
+        }
+        return 0;
+      });
+      this.setState({ chats, sortedChats });
     });
     iris
       .local()
@@ -53,15 +68,7 @@ class ChatList extends Component {
 
   render() {
     const activeChat = this.props.activeChat;
-    const sortedChats = this.state.chats.sort((a, b) => {
-      const aEventIds = Nostr.directMessagesByUser.get(a)?.eventIds;
-      const bEventIds = Nostr.directMessagesByUser.get(b)?.eventIds;
-      const aLatestEvent = aEventIds?.length ? Nostr.eventsById.get(aEventIds[0]) : null;
-      const bLatestEvent = bEventIds?.length ? Nostr.eventsById.get(bEventIds[0]) : null;
-      if (bLatestEvent?.created_at > aLatestEvent?.created_at) {
-        return 1;
-      }
-    });
+
     return html`<section class="sidebar ${this.props.class || ''}">
       <div id="enable-notifications-prompt" onClick=${() =>
         iris.notifications.enableDesktopNotifications()}>
@@ -70,13 +77,14 @@ class ChatList extends Component {
       </div>
       <div class="chat-list">
         <${ScrollViewport}>
-          ${sortedChats.map(
-            (chat) =>
+          ${this.state.sortedChats.map(
+            (pubkey) =>
               html`<${ChatListItem}
-                active=${chat === activeChat}
-                key=${chat}
-                chat=${chat}
-                latest=${this.state.latestTime}
+                active=${pubkey === activeChat}
+                key=${pubkey}
+                chat=${pubkey}
+                latestTime=${Nostr.eventsById.get(this.state.chats.get(pubkey).eventIds[0])
+                  .created_at}
               />`,
           )}
         </${ScrollViewport}>

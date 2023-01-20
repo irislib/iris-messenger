@@ -168,6 +168,7 @@ export default {
     if (block) {
       this.blockedUsers.add(blockedUser);
       this.removeFollower(blockedUser, myPub);
+      this.directMessagesByUser.delete(blockedUser);
     } else {
       this.blockedUsers.delete(blockedUser);
     }
@@ -1194,9 +1195,9 @@ export default {
     this.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
   },
 
-  getDirectMessageUsers(cb?: (users: string[]) => void) {
+  getDirectMessages(cb?: (dms: Map<string, SortedLimitedEventSet>) => void) {
     const callback = () => {
-      cb?.(Array.from(this.directMessagesByUser.keys()));
+      cb?.(this.directMessagesByUser);
     };
     callback();
     this.subscribe([{ kinds: [4] }], callback);
