@@ -2,8 +2,9 @@ import SEA from 'gun/sea';
 import localforage from 'localforage';
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
+import { ExpirationPlugin } from 'workbox-expiration';
 import { registerRoute } from 'workbox-routing';
-import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies';
+import { CacheFirst, NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies';
 
 const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
   maxRetentionTime: 14 * 24 * 60,
@@ -15,11 +16,26 @@ registerRoute(
     plugins: [bgSyncPlugin],
   }),
 );
-// TODO DON'T SAVE ALL THE MEME GIFS LOCALLY
 registerRoute(({ url }) => url.pathname === '/', new NetworkFirst());
 registerRoute(({ url }) => {
   return location.host.indexOf('localhost') !== 0 && url.origin === self.location.origin;
 }, new StaleWhileRevalidate());
+
+// cache remote assets with limit and expiration time
+registerRoute(
+  ({ url }) => url.origin !== self.location.origin,
+  new CacheFirst({
+    cacheName: 'remote-assets',
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 200,
+        maxAgeSeconds: 7 * 24 * 60 * 60,
+        purgeOnQuotaError: true,
+      }),
+    ],
+  }),
+);
+
 setupRouting();
 
 const urlsToCache = getFiles();
