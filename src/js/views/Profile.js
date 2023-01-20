@@ -369,8 +369,8 @@ class Profile extends View {
           <title>${title}</title>
           <meta name="description" content=${description} />
           <meta property="og:type" content="profile" />
-          ${this.state.ogImageUrl
-            ? html`<meta property="og:image" content=${this.state.ogImageUrl} />`
+          ${this.state.picture
+            ? html`<meta property="og:image" content=${this.state.picture} />`
             : ''}
           <meta property="og:title" content=${ogTitle} />
           <meta property="og:description" content=${description} />
@@ -408,10 +408,6 @@ class Profile extends View {
         // remove trailing slash
         if (website && website.endsWith('/')) {
           website = website.slice(0, -1);
-        }
-
-        if (profile.picture && this.isUserAgentCrawler()) {
-          this.setOgImageUrl(this.state.picture);
         }
 
         // profile may contain arbitrary fields, so be careful

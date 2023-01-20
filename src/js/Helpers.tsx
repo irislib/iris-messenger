@@ -71,7 +71,11 @@ export default {
 
     replacedText = reactStringReplace(replacedText, noteRegex, (match, i) => {
       const link = `#/post/${match}`;
-      return <a href={link}>{match}</a>;
+      return (
+        <a key={match + i} href={link}>
+          {match}
+        </a>
+      );
     });
 
     /*

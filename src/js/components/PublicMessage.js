@@ -505,6 +505,8 @@ class PublicMessage extends Message {
     });
     const s = this.state;
 
+    const ogImageUrl = s.msg.attachments?.find((a) => a.type === 'image')?.data;
+
     return html`
       <div
         key=${this.props.hash}
@@ -563,7 +565,7 @@ class PublicMessage extends Message {
                   <title>${title}: ${quotedShortText}</title>
                   <meta name="description" content=${quotedShortText} />
                   <meta property="og:type" content="article" />
-                  ${s.ogImageUrl ? html`<meta property="og:image" content=${s.ogImageUrl} />` : ''}
+                  ${ogImageUrl ? html`<meta property="og:image" content=${ogImageUrl} />` : ''}
                   <meta property="og:title" content=${title} />
                   <meta property="og:description" content=${quotedShortText} />
                 <//>

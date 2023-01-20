@@ -10,7 +10,6 @@ import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
 import Message from '../../components/Message';
 import Helpers from '../../Helpers';
-import { nip04 } from '../../lib/nostr-tools';
 import Nostr from '../../Nostr';
 import { translate as t } from '../../translations/Translation';
 
