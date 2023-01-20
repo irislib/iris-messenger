@@ -4,15 +4,12 @@ import { route } from 'preact-router';
 import Component from '../../BaseComponent';
 import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
+import Helpers from '../../Helpers';
 
 class ChatListItem extends Component {
   constructor() {
     super();
     this.state = { latest: {}, unseen: {} };
-  }
-
-  shouldComponentUpdate() {
-    return true;
   }
 
   onKeyUp(e) {
@@ -65,6 +62,11 @@ class ChatListItem extends Component {
     const onlineIndicator = chat.id.length > 36 ? html`<div class="online-indicator"></div>` : '';
      */
 
+    const time =
+      (this.props.latestTime &&
+        Helpers.getRelativeTimeText(new Date(this.props.latestTime * 1000))) ||
+      '';
+
     // TODO use button so we can use keyboard to navigate
     return html`
       <div
@@ -78,7 +80,7 @@ class ChatListItem extends Component {
         <div class="text">
           <div>
             <span class="name"><${Name} pub=${this.props.chat} /></span>
-            <small class="latest-time"></small>
+            <small class="latest-time">${time}</small>
           </div>
           <!--${unseenEl}-->
         </div>
