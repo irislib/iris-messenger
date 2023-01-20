@@ -46,7 +46,6 @@ class Message extends Component {
       });
     Nostr.decryptMessage(this.props.id, (text) => {
       this.setState({ text });
-      console.log('decrypted', text);
     });
   }
 
