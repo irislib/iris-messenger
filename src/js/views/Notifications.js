@@ -6,14 +6,16 @@ import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
+import {createRef} from "preact";
 
 export default class Notifications extends View {
   class = 'public-messages-view';
+  ref = createRef();
 
   componentDidMount() {
     Nostr.getNotifications((notifications) => {
       const hasNotifications = notifications.length > 0;
-      if (hasNotifications) {
+      if (hasNotifications && this.ref.current) {
         iris
           .local()
           .get('notificationsSeenTime')
@@ -26,7 +28,7 @@ export default class Notifications extends View {
 
   renderView() {
     return html`
-      <div class="centered-container" style="margin-bottom: 15px;">
+      <div ref=${this.ref} class="centered-container" style="margin-bottom: 15px;">
         ${this.state.hasNotifications
           ? html`<br class="hidden-xs" />`
           : html`<p class="mobile-padding15">${t('no_notifications_yet')}</p> `}

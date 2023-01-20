@@ -168,6 +168,7 @@ export default {
     if (block) {
       this.blockedUsers.add(blockedUser);
       this.removeFollower(blockedUser, myPub);
+      this.directMessagesByUser.delete(blockedUser);
     } else {
       this.blockedUsers.delete(blockedUser);
     }
