@@ -324,14 +324,14 @@ class PublicMessage extends Message {
     const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
     return html`
       <div class="msg">
-        <div class="msg-content">
-          <p style="display: flex; align-items: center">
+        <div class="msg-content" style="padding: 0;">
+          <div style="display: flex; align-items: center; padding: 15px 15px 0 15px;">
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
             <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               ${name}
             </a>
             <span> liked your post</span>
-          </p>
+          </div>
           <${PublicMessage} hash=${likedId} showName=${true} />
         </div>
       </div>
@@ -389,14 +389,14 @@ class PublicMessage extends Message {
     const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
     return html`
       <div class="msg">
-        <div class="msg-content">
-          <p style="display: flex; align-items: center">
+        <div class="msg-content" style="padding: 0;">
+          <div style="display: flex; align-items: center; padding: 15px 15px 0 15px;">
             <i style="margin-right: 15px;"> ${Icons.boost} </i>
             <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               ${name}
             </a>
             <span> boosted</span>
-          </p>
+          </div>
           <${PublicMessage} hash=${likedId} showName=${true} />
         </div>
       </div>
