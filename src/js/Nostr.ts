@@ -190,22 +190,6 @@ export default {
       });
   },
 
-  decryptNext() {
-    if (this.decryptQueue.length) {
-      this.decrypting = true;
-      const id = this.decryptQueue.shift();
-      this.decryptMessage(id, (text) => {
-        if (text) {
-          this.state.decryptedMessages[id] = text;
-          this.setState({ decryptedMessages: this.state.decryptedMessages });
-        }
-        this.decryptNext();
-      });
-    } else {
-      this.decrypting = false;
-    }
-  },
-
   setFollowed: function (followedUser: string, follow = true) {
     followedUser = this.toNostrHexAddress(followedUser);
     const myPub = iris.session.getKey().secp256k1.rpub;
@@ -744,6 +728,16 @@ export default {
     }
   },
   handleFollow(event: Event) {
+    const existing = this.followEventByUser.get(event.pubkey);
+    if (existing && existing.created_at >= event.created_at) {
+      return;
+    }
+
+    if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+      this.followEventByUser.set(event.pubkey, event);
+      this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
+    }
+
     for (const tag of event.tags) {
       if (Array.isArray(tag) && tag[0] === 'p') {
         this.addFollower(tag[1], event.pubkey);
@@ -757,13 +751,6 @@ export default {
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey === myPub && event.tags.length) {
       iris.local().get('noFollows').put(false);
-    }
-    if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-      const existing = this.followEventByUser.get(event.pubkey);
-      if (!existing || existing.created_at < event.created_at) {
-        this.followEventByUser.set(event.pubkey, event);
-        this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
-      }
     }
     if (event.pubkey === myPub && event.content?.length) {
       try {
@@ -960,7 +947,6 @@ export default {
         this.handleDelete(event);
         break;
       case 3:
-        // TODO if existing follow list doesn't include us and the new one does, add to notifications
         this.maybeAddNotification(event);
         this.handleFollow(event);
         break;
