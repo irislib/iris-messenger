@@ -732,9 +732,9 @@ export default {
     if (existing && existing.created_at >= event.created_at) {
       return;
     }
+    this.followEventByUser.set(event.pubkey, event);
 
     if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-      this.followEventByUser.set(event.pubkey, event);
       this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
     }
 
