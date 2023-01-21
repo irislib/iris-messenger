@@ -61,7 +61,7 @@ const saveLocalStorageEvents = debounce((_this: any) => {
 const saveLocalStorageProfilesAndFollows = debounce((_this) => {
   const profileEvents = Array.from(_this.profileEventByUser.values());
   const myPub = iris.session.getKey().secp256k1.rpub;
-  const followEvents = Array.from(_this.followEventByUser.values()).filter((e) => {
+  const followEvents = Array.from(_this.followEventByUser.values()).filter((e: Event) => {
     return e.pubkey === myPub || _this.followedByUser.get(myPub).has(e.pubkey);
   });
   console.log('saving', profileEvents.length + followEvents.length, 'events to local storage');
