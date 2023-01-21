@@ -156,9 +156,10 @@ export default {
         return;
       }
       if (myPriv) {
-        const decrypted = nip04.decrypt(myPriv, theirPub, msg.content);
-        this.decryptedMessages.set(id, decrypted);
-        cb(decrypted);
+        nip04.decrypt(myPriv, theirPub, msg.content).then((decrypted) => {
+          this.decryptedMessages.set(id, decrypted);
+          cb(decrypted);
+        });
       } else if (window.nostr) {
         this.decryptQueue.push({ id, theirPub, msg, cb });
         if (this.decryptQueue.length === 1) {
@@ -733,6 +734,7 @@ export default {
       return;
     }
     this.followEventByUser.set(event.pubkey, event);
+    const myPub = iris.session.getKey().secp256k1.rpub;
 
     if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
       this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
@@ -752,7 +754,6 @@ export default {
         }
       }
     }
-    const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey === myPub && event.tags.length) {
       iris.local().get('noFollows').put(false);
     }
