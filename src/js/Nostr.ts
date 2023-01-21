@@ -749,6 +749,11 @@ export default {
         this.addFollower(tag[1], event.pubkey);
       }
     }
+    for (const previouslyFollowed of this.followedByUser.get(event.pubkey)) {
+      if (!event.tags.find((t) => t[0] === 'p' && t[1] === previouslyFollowed)) {
+        this.removeFollower(previouslyFollowed, event.pubkey);
+      }
+    }
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey === myPub && event.tags.length) {
       iris.local().get('noFollows').put(false);
