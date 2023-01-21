@@ -86,7 +86,7 @@ const DEFAULT_RELAYS = [
 ];
 
 const defaultRelays = new Map<string, Relay>(
-  DEFAULT_RELAYS.map((url) => [url, relayInit(url, eventsById)]),
+  DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
 );
 
 type Subscription = {
@@ -271,7 +271,7 @@ export default {
   },
   addRelay(url: string) {
     if (this.relays.has(url)) return;
-    const relay = relayInit(url, this.eventsById);
+    const relay = relayInit(url, (id) => this.eventsById.has(id));
     relay.on('connect', () => {
       for (const [name, filters] of this.subscribedFiltersByName.entries()) {
         const sub = relay.sub(filters, {});
@@ -738,14 +738,18 @@ export default {
       this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
     }
 
-    for (const tag of event.tags) {
-      if (Array.isArray(tag) && tag[0] === 'p') {
-        this.addFollower(tag[1], event.pubkey);
+    if (event.tags) {
+      for (const tag of event.tags) {
+        if (Array.isArray(tag) && tag[0] === 'p') {
+          this.addFollower(tag[1], event.pubkey);
+        }
       }
     }
-    for (const previouslyFollowed of this.followedByUser.get(event.pubkey)) {
-      if (!event.tags.find((t) => t[0] === 'p' && t[1] === previouslyFollowed)) {
-        this.removeFollower(previouslyFollowed, event.pubkey);
+    if (this.followedByUser.has(event.pubkey)) {
+      for (const previouslyFollowed of this.followedByUser.get(event.pubkey)) {
+        if (!event.tags || !event.tags.find((t) => t[0] === 'p' && t[1] === previouslyFollowed)) {
+          this.removeFollower(previouslyFollowed, event.pubkey);
+        }
       }
     }
     const myPub = iris.session.getKey().secp256k1.rpub;

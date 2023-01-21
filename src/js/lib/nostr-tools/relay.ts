@@ -1,7 +1,6 @@
 /* global WebSocket */
 
 import 'websocket-polyfill'
-import { throttle } from 'lodash'
 
 import {Event, verifySignature, validateEvent} from './event'
 import {Filter, matchFilters} from './filter'
@@ -32,7 +31,7 @@ type SubscriptionOptions = {
   id?: string
 }
 
-export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay {
+export function relayInit(url: string, alreadyHaveEvent?: (id: string) => boolean): Relay {
   var ws: WebSocket
   var resolveOpen: () => void
   var resolveClose: () => void
@@ -67,6 +66,7 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
   let attemptNumber = 1
   let nextAttemptSeconds = 1
   let isConnected = false
+  let idRegex = /"id":"([a-fA-F0-9]+)"/;
 
   function resetOpenState() {
     untilOpen = new Promise(resolve => {
@@ -124,35 +124,28 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
       wasClosed = true
     }
 
-    const log = throttle((msg: string) => {
-      console.log(msg)
-    }, 3000);
-
-    var idRegex = /"id":"([a-fA-F0-9]+)"/;
-    var queue: any[] = []
+    let incomingMessageQueue: any[] = []
     let handleNextInterval: any
+
     const handleNext = () => {
-      if (queue.length === 0) {
+      if (incomingMessageQueue.length === 0) {
         clearInterval(handleNextInterval)
         handleNextInterval = null
         return
       }
 
-      log(`relay ${url} msg processing queue length: ${queue.length}`)
-      var data = queue.shift()
-      if (data) {
+      var data = incomingMessageQueue.shift()
+      if (data && !!alreadyHaveEvent) {
         const match = idRegex.exec(data)
         if (match) {
           const id = match[1];
-          if (knownEvents?.has(id)) {
-            // we already know about this event, so don't process it
-            //console.log('received a message that we already have. leaving this here just to show that nostr protocol could be improved.');
+          if (alreadyHaveEvent(id)) {
+            //console.log(`already have`);
             return
           }
         }
       }
       try {
-        // TODO try regex parsing msg id and seeing if we have it, before parse whole json
         data = JSON.parse(data)
       } catch (err) {}
 
@@ -198,7 +191,7 @@ export function relayInit(url: string, knownEvents?: Map<string, Event>): Relay 
     };
 
     ws.onmessage = async e => {
-      queue.push(e.data)
+      incomingMessageQueue.push(e.data)
       if (!handleNextInterval) {
         handleNextInterval = setInterval(handleNext, 0)
       }
