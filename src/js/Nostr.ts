@@ -128,7 +128,7 @@ export default {
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
-  keyValueEvents: new Set<string>(),
+  keyValueEvents: new Map<string, Event>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
@@ -167,6 +167,13 @@ export default {
         });
       } else if (window.nostr) {
         const callback = (decrypted) => {
+          if (typeof decrypted !== 'string') {
+            if (decrypted.content) {
+              decrypted = decrypted.content;
+            } else {
+              return;
+            } // what? TODO debug
+          }
           this.decryptedMessages.set(id, decrypted);
           cb(decrypted);
         };
@@ -180,11 +187,11 @@ export default {
     }
   },
 
-  processDecryptQueue() {
+  processDecryptQueue() { // TODO queue for all window.nostr calls
     if (this.decryptQueue.length === 0) {
       return;
     }
-    const { data, pub, callback } = this.decryptQueue[0];
+    const { data, pub, callback } = this.decryptQueue.pop();
     window.nostr.nip04
       .decrypt(pub, data)
       .then((decrypted) => {
@@ -194,7 +201,6 @@ export default {
         console.error(error);
       })
       .finally(() => {
-        this.decryptQueue.shift();
         this.processDecryptQueue();
       });
   },
@@ -965,9 +971,13 @@ export default {
     if (event.pubkey !== iris.session.getKey().secp256k1.rpub) {
       return;
     }
-    if (!this.eventsById.has(event.id)) {
-      this.eventsById.set(event.id, event);
-      this.keyValueEvents.add(event);
+    const key = event.tags.find((tag) => tag[0] === 'd')?.[1];
+    if (key) {
+      const existing = this.keyValueEvents.get(key);
+      if (existing?.created_at >= event.created_at) {
+        return;
+      }
+      this.keyValueEvents.set(key, event);
     }
   },
   handleEvent(event: Event) {
@@ -1071,6 +1081,15 @@ export default {
         return false;
       }
     }
+    if (filter['#d']) {
+      const tag = event.tags.find((tag) => tag[0] === 'd');
+      if (tag) {
+        const existing = this.keyValueEvents.get(tag[1]);
+        if (existing?.created_at > event.created_at) {
+          return false;
+        }
+      }
+    }
 
     return true;
   },
@@ -1118,12 +1137,15 @@ export default {
       .on(() => {
         const key = iris.session.getKey();
         const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
-          for (let id of this.keyValueEvents) {
-            const event = this.eventsById.get(id);
-            if (event && this.matchesOneFilter(event, filters)) {
+          const filter = filters[0]
+          const key = filter['#d']?.[0];
+          if (key) {
+            const event = this.keyValueEvents.get(key);
+            if (event) {
               callback(event);
             }
           }
+          this.subscribe(filters, callback);
           return '0';
         };
         this.private = new Path(
@@ -1154,13 +1176,6 @@ export default {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
           this.handledMsgsPerSecond = 0;
         }, 1000);
-        iris
-          .public()
-          .get('block')
-          .map((isBlocked, address) => {
-            const hex = this.toNostrHexAddress(address);
-            hex && this.setBlocked(hex, isBlocked);
-          });
       });
   },
   getRepliesAndLikes(

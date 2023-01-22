@@ -163,7 +163,7 @@ export class Path {
   get(filter: EntryFilter, callback): Listener {
     const listener = this.addListener(filter, callback)
     this.store.get(filter, callback)
-    const filters = [{ "#d": filter.path, kinds: [30000], authors: filter.authors }]
+    const filters = [{ "#d": [filter.path], kinds: [30000], authors: filter.authors }]
     this.subscribe(filters, async (event) => {
       const entry = await this.getEntryFromEvent(event)
       if (this.store.set(entry)) {

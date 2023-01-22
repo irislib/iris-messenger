@@ -52,7 +52,7 @@ function copyMyChatLinkClicked(e) {
 export default class PrivateChat extends Component {
   constructor() {
     super();
-    this.hashtagChatRef = createRef();
+    this.ref = createRef();
     this.state = {
       decryptedMessages: {},
       sortedMessages: [],
@@ -67,6 +67,11 @@ export default class PrivateChat extends Component {
     return true;
   }
 
+  updateLastOpened() {
+    const hexId = Nostr.toNostrHexAddress(this.props.id);
+    Nostr.public.set('chats/' + hexId + '/lastOpened', Math.floor(Date.now() / 1000));
+  }
+
   componentDidMount() {
     const hexId = Nostr.toNostrHexAddress(this.props.id);
     Nostr.getDirectMessagesByUser(hexId, (msgIds) => {
@@ -74,7 +79,15 @@ export default class PrivateChat extends Component {
         this.setState({ sortedMessages: msgIds.reverse() });
       }
     });
-    Nostr.public.set('chats/' + hexId + '/lastOpened', Date.now());
+    this.updateLastOpened();
+    // on visibility state change (e.g. tab switch) update last opened
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.updateLastOpened();
+      }
+    });
+
+
     const container = document.getElementById('message-list');
     if (container) { // TODO use ref
       container.style.paddingBottom = 0;
@@ -91,9 +104,23 @@ export default class PrivateChat extends Component {
     }
   }
 
-  componentDidUpdate() {
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    // remove event listener
+    document.removeEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.updateLastOpened();
+      }
+    });
+  }
+
+  componentDidUpdate(previousProps) {
     if (this.state.stickToBottom) {
       Helpers.scrollToMessageListBottom();
+    }
+
+    if (previousProps.id !== this.props.id) {
+      this.updateLastOpened();
     }
 
     $('.msg-content img')
@@ -258,7 +285,7 @@ export default class PrivateChat extends Component {
   render() {
     return html`
       <${Helmet}><title>${(this.chat && this.chat.name) || 'Messages'}</title><//>
-      <div id="chat-main" class="${this.props.id ? '' : 'hidden-xs'}">
+      <div id="chat-main" ref=${this.ref} class="${this.props.id ? '' : 'hidden-xs'}">
         ${this.renderMainView()} ${this.renderMsgForm()}
       </div>
     `;
