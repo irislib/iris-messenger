@@ -160,7 +160,7 @@ export class Path {
     }
   }
 
-  get(filter: EntryFilter, callback): Listener {
+  get(filter: EntryFilter, callback: (entry: Entry) => void): Listener {
     const listener = this.addListener(filter, callback)
     this.store.get(filter, callback)
     const filters = [{ "#d": [filter.path], kinds: [30000], authors: filter.authors }]
@@ -173,7 +173,7 @@ export class Path {
     return listener
   }
 
-  addListener(filter: EntryFilter, callback: Function): Listener {
+  addListener(filter: EntryFilter, callback: (entry: Entry) => void): Listener {
     const id = Math.random().toString(36).substr(2, 9)
     const listener: Listener = { filter, callback, off: () => {
       this.listeners.delete(id)

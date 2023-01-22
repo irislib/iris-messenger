@@ -20,6 +20,7 @@ export enum Kind {
   ChannelMuteUser = 44,
   BlockList = 16462,
   FlagList = 16463,
+  ReplaceableByTag = 30000,
 }
 
 export type Event = {
