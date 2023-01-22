@@ -38,6 +38,8 @@ type IncompleteEvent = {
 type Publish = (event: IncompleteEvent) => Promise<Event>
 type Subscribe = (filters: Filter[], callback: (event: Event) => void) => string
 type Unsubscribe = (id: string) => void
+type Encrypt = (content: string) => Promise<string>
+type Decrypt = (content: string) => Promise<string>
 
 // We can later add other stores like IndexedDB or localStorage
 class Store {
@@ -76,22 +78,48 @@ export class Path {
   publish: Publish
   subscribe: Subscribe
   unsubscribe: Unsubscribe
+  encrypt?: Encrypt
+  decrypt?: Decrypt
 
-  constructor(publish: Publish, subscribe: Subscribe, unsubscribe: Unsubscribe) {
+  constructor(publish: Publish, subscribe: Subscribe, unsubscribe: Unsubscribe, encrypt?: Encrypt, decrypt?: Decrypt) {
     this.publish = publish
     this.subscribe = subscribe
     this.unsubscribe = unsubscribe
+    this.encrypt = encrypt
+    this.decrypt = decrypt
     this.store = new Store()
     this.listeners = new Map<string, Listener>()
   }
 
-  async set(path: string, value: any) {
-    const event = await this.publish({
+  async publishSetEvent(path: string, value: any): Promise<Event> {
+    let eventPath: string
+    let content: string
+    if (this.encrypt) {
+      const contentStr = JSON.stringify(value)
+      content = await this.encrypt(contentStr)
+      const pathParts = path.split('/')
+      const encryptedPathParts = []
+      for (let i = 0; i < pathParts.length; i++) {
+        encryptedPathParts.push(await this.encrypt(pathParts[i]))
+      }
+      eventPath = encryptedPathParts.join('/')
+      if (contentStr === content || path === eventPath) {
+        throw new Error(`Encryption failed: ${contentStr} === ${content} || ${path} === ${eventPath}`)
+      }
+    } else {
+      content = JSON.stringify(value)
+      eventPath = path
+    }
+    return this.publish({
       kind: 30000,
-      tags: [["d", path]],
-      content: JSON.stringify(value),
+      tags: [["d", eventPath]],
+      content,
       created_at: Math.floor(Date.now() / 1000),
     })
+  }
+
+  async set(path: string, value: any) {
+    const event = await this.publishSetEvent(path, value)
     if (event) {
       const entry = {
         created_at: event.created_at,
@@ -105,17 +133,39 @@ export class Path {
     }
   }
 
+  async getEntryFromEvent(event: Event): Promise<Entry> {
+    let value
+    let path
+    if (this.decrypt) {
+      const pathTag = event.tags.find((tag) => tag[0] === 'd')
+      if (!pathTag) {
+        throw new Error('No path tag found in event ' + JSON.stringify(event))
+      }
+      value = JSON.parse(await this.decrypt(event.content))
+      const pathParts = pathTag[1].split('/')
+      const decryptedPathParts = []
+      for (let i = 0; i < pathParts.length; i++) {
+        decryptedPathParts.push(await this.decrypt(pathParts[i]))
+      }
+      path = decryptedPathParts.join('/')
+    } else {
+      value = JSON.parse(event.content)
+      path = event.tags[0][1]
+    }
+    return {
+      created_at: event.created_at,
+      author: event.pubkey,
+      value,
+      path,
+    }
+  }
+
   get(filter: EntryFilter, callback): Listener {
     const listener = this.addListener(filter, callback)
     this.store.get(filter, callback)
     const filters = [{ "#d": filter.path, kinds: [30000], authors: filter.authors }]
-    listener.subscription = this.subscribe(filters, (event) => {
-      const entry = {
-        created_at: event.created_at,
-        author: event.pubkey,
-        value: JSON.parse(event.content),
-        path: filter.path,
-      }
+    this.subscribe(filters, async (event) => {
+      const entry = await this.getEntryFromEvent(event)
       if (this.store.set(entry)) {
         this.notifyListeners(entry)
       }

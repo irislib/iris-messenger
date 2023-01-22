@@ -422,7 +422,7 @@ export default {
 
       const myPriv = iris.session.getKey().secp256k1.priv;
       if (myPriv) {
-        event.sig = await signEvent(event, myPriv);
+        event.sig = signEvent(event, myPriv);
       } else if (window.nostr) {
         event = await window.nostr.signEvent(event);
       } else {
