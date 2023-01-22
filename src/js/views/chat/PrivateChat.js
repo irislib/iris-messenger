@@ -73,20 +73,21 @@ export default class PrivateChat extends Component {
         this.setState({ sortedMessages: msgIds.reverse() });
       }
     });
-    /*
+    //Nostr.private.set('chats/' + this.props.id + '/lastSeen', Date.now());
     const container = document.getElementById('message-list');
-    container.style.paddingBottom = 0;
-    container.style.paddingTop = 0;
-    const el = $('#message-view');
-    el.off('scroll').on('scroll', () => {
-      const scrolledToBottom = el[0].scrollHeight - el.scrollTop() == el.outerHeight();
-      if (this.state.stickToBottom && !scrolledToBottom) {
-        this.setState({ stickToBottom: false });
-      } else if (!this.state.stickToBottom && scrolledToBottom) {
-        this.setState({ stickToBottom: true });
-      }
-    });
-     */
+    if (container) { // TODO use ref
+      container.style.paddingBottom = 0;
+      container.style.paddingTop = 0;
+      const el = $('#message-view');
+      el.off('scroll').on('scroll', () => {
+        const scrolledToBottom = el[0].scrollHeight - el.scrollTop() == el.outerHeight();
+        if (this.state.stickToBottom && !scrolledToBottom) {
+          this.setState({ stickToBottom: false });
+        } else if (!this.state.stickToBottom && scrolledToBottom) {
+          this.setState({ stickToBottom: true });
+        }
+      });
+    }
   }
 
   componentDidUpdate() {

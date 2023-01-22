@@ -10,6 +10,7 @@ import {
   relayInit,
   signEvent,
   Sub,
+  Path,
 } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import localForage from 'localforage';
@@ -164,7 +165,11 @@ export default {
           cb(decrypted);
         });
       } else if (window.nostr) {
-        this.decryptQueue.push({ id, theirPub, msg, cb });
+        const callback = (decrypted) => {
+          this.decryptedMessages.set(id, decrypted);
+          cb(decrypted);
+        };
+        this.decryptQueue.push({ pub: theirPub, data: msg.content, callback });
         if (this.decryptQueue.length === 1) {
           this.processDecryptQueue();
         }
@@ -178,12 +183,11 @@ export default {
     if (this.decryptQueue.length === 0) {
       return;
     }
-    const { id, theirPub, msg, cb } = this.decryptQueue[0];
+    const { data, pub, callback } = this.decryptQueue[0];
     window.nostr.nip04
-      .decrypt(theirPub, msg.content)
+      .decrypt(pub, data)
       .then((decrypted) => {
-        this.decryptedMessages.set(id, decrypted);
-        cb(decrypted);
+        callback(decrypted);
       })
       .catch((error) => {
         console.error(error);
@@ -541,6 +545,42 @@ export default {
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
   }, 100),
+  encrypt: async function (data) {
+    const k = iris.session.getKey().secp256k1;
+    if (k.priv) {
+      return nip04.encrypt(k.priv, k.rpub, data);
+    } else if (window.nostr) {
+      return window.nostr.nip04.encrypt(k.rpub, data);
+    } else {
+      alert('logged in with a public key')
+    }
+  },
+  decrypt: async function (data) {
+    const k = iris.session.getKey().secp256k1;
+    if (k.priv) {
+      return nip04.decrypt(k.priv, k.rpub, data);
+    } else if (window.nostr) {
+      return new Promise(resolve => {
+        this.decryptQueue.push({ data, pub: k.rpub, callback: resolve })
+        if (this.decryptQueue.length === 1) {
+          this.processDecryptQueue();
+        }
+      });
+    } else {
+      alert('logged in with a public key')
+    }
+  },
+  unsubscribe: function (id: string) {
+    const subs = this.subscriptionsByName.get(id);
+    if (subs) {
+      subs.forEach((sub) => {
+        console.log('unsub', id);
+        sub.unsub();
+      });
+    }
+    this.subscriptionsByName.delete(id);
+    this.subscribedFiltersByName.delete(id);
+  },
   subscribe: function (filters: Filter[], cb?: (event: Event) => void) {
     cb &&
       this.subscriptions.set(subscriptionId++, {
@@ -1069,6 +1109,18 @@ export default {
       .get('loggedIn')
       .on(() => {
         const key = iris.session.getKey();
+        this.private = new Path(
+          this.publish,
+          this.subscribe,
+          this.unsubscribe,
+          this.encrypt,
+          this.decrypt
+        );
+        this.public = new Path(
+          this.publish,
+          this.subscribe,
+          this.unsubscribe
+        );
         this.knownUsers.add(key);
         this.manageRelays();
         this.loadLocalStorageEvents();
