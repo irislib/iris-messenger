@@ -6,11 +6,11 @@ import {
   Filter,
   getEventHash,
   nip04,
+  Path,
   Relay,
   relayInit,
   signEvent,
   Sub,
-  Path,
 } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import localForage from 'localforage';
@@ -187,7 +187,8 @@ export default {
     }
   },
 
-  processDecryptQueue() { // TODO queue for all window.nostr calls
+  processDecryptQueue() {
+    // TODO queue for all window.nostr calls
     if (this.decryptQueue.length === 0) {
       return;
     }
@@ -559,7 +560,7 @@ export default {
     } else if (window.nostr) {
       return window.nostr.nip04.encrypt(k.rpub, data);
     } else {
-      alert('logged in with a public key')
+      alert('logged in with a public key');
     }
   },
   decrypt: async function (data) {
@@ -567,14 +568,14 @@ export default {
     if (k.priv) {
       return nip04.decrypt(k.priv, k.rpub, data);
     } else if (window.nostr) {
-      return new Promise(resolve => {
-        this.decryptQueue.push({ data, pub: k.rpub, callback: resolve })
+      return new Promise((resolve) => {
+        this.decryptQueue.push({ data, pub: k.rpub, callback: resolve });
         if (this.decryptQueue.length === 1) {
           this.processDecryptQueue();
         }
       });
     } else {
-      alert('logged in with a public key')
+      alert('logged in with a public key');
     }
   },
   unsubscribe: function (id: string) {
@@ -1076,8 +1077,11 @@ export default {
       return false;
     }
     const filterKeys = ['e', 'p', 'd'];
-    for (let key of filterKeys) {
-      if(filter[`#${key}`] && !event.tags.some(tag => tag[0] === key && filter[`#${key}`].includes(tag[1]))) {
+    for (const key of filterKeys) {
+      if (
+        filter[`#${key}`] &&
+        !event.tags.some((tag) => tag[0] === key && filter[`#${key}`].includes(tag[1]))
+      ) {
         return false;
       }
     }
@@ -1137,7 +1141,7 @@ export default {
       .on(() => {
         const key = iris.session.getKey();
         const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
-          const filter = filters[0]
+          const filter = filters[0];
           const key = filter['#d']?.[0];
           if (key) {
             const event = this.keyValueEvents.get(key);

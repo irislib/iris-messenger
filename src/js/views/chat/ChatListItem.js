@@ -1,4 +1,5 @@
 import { html } from 'htm/preact';
+import iris from 'iris-lib';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
@@ -6,7 +7,6 @@ import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
 import Helpers from '../../Helpers';
 import Nostr from '../../Nostr';
-import iris from "iris-lib";
 
 class ChatListItem extends Component {
   constructor() {
@@ -32,10 +32,7 @@ class ChatListItem extends Component {
     if (event) {
       this.setState({ latest: event });
       Nostr.decryptMessage(this.props.latestMsgId, (latestText) => {
-        if (typeof latestText !== 'string') {
-          debugger;
-        }
-        this.setState({latestText})
+        this.setState({ latestText });
       });
     }
   }
@@ -68,9 +65,7 @@ class ChatListItem extends Component {
 
      */
     const hasUnseen = this.hasUnseen() ? 'has-unseen' : '';
-    const unseenEl = this.hasUnseen()
-      ? html`<span class="unseen"></span>`
-      : '';
+    const unseenEl = this.hasUnseen() ? html`<span class="unseen"></span>` : '';
     const activity = ['online', 'active'].indexOf(chat.activity) > -1 ? chat.activity : '';
     //const time = chat.latestTime && new Date(chat.latestTime);
     //let latestTimeText = Helpers.getRelativeTimeText(time);

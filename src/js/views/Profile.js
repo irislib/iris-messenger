@@ -215,7 +215,9 @@ class Profile extends View {
               </div>
             </div>
 
-            ${this.state.nip05 ? html`<div class="positive">${this.state.nip05.replace(/^_@/, "")}</div>` : ''}
+            ${this.state.nip05
+              ? html`<div class="positive">${this.state.nip05.replace(/^_@/, '')}</div>`
+              : ''}
 
             <div class="profile-about hidden-xs">
               <p class="profile-about-content">${this.state.about}</p>

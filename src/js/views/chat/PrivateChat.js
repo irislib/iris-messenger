@@ -87,9 +87,9 @@ export default class PrivateChat extends Component {
       }
     });
 
-
     const container = document.getElementById('message-list');
-    if (container) { // TODO use ref
+    if (container) {
+      // TODO use ref
       container.style.paddingBottom = 0;
       container.style.paddingTop = 0;
       const el = $('#message-view');
