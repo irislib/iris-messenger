@@ -13,6 +13,7 @@ class ChatListItem extends Component {
     this.state = {
       latest: {},
       latestText: '',
+      lastOpened: '',
       unseen: {},
     };
   }
@@ -34,6 +35,12 @@ class ChatListItem extends Component {
 
   componentDidMount() {
     this.getLatestMsg();
+    const path = 'chats/' + this.props.chat + '/lastOpened';
+    console.log('path', path);
+    Nostr.public.get(path + '/lastOpened', (entry) => {
+      console.log('lastOpened', entry);
+      this.setState({ lastOpened: entry.value });
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -108,6 +115,7 @@ class ChatListItem extends Component {
           </div>
           <small class="latest"> ${this.state.latestText} </small>
           <!--${unseenEl}-->
+          ${this.state.lastOpened}
         </div>
       </div>
     `;

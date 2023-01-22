@@ -63,7 +63,7 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
   const profileEvents = Array.from(_this.profileEventByUser.values());
   const myPub = iris.session.getKey().secp256k1.rpub;
   const followEvents = Array.from(_this.followEventByUser.values()).filter((e: Event) => {
-    return e.pubkey === myPub || _this.followedByUser.get(myPub).has(e.pubkey);
+    return e.pubkey === myPub || _this.followedByUser.get(myPub)?.has(e.pubkey);
   });
   console.log('saving', profileEvents.length + followEvents.length, 'events to local storage');
   localForage.setItem('profileEvents', profileEvents);
@@ -128,6 +128,7 @@ export default {
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
+  keyValueEvents: new Set<string>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
@@ -960,6 +961,15 @@ export default {
     }
     this.directMessagesByUser.get(user)?.add(event);
   },
+  handleKeyValue(event: Event) {
+    if (event.pubkey !== iris.session.getKey().secp256k1.rpub) {
+      return;
+    }
+    if (!this.eventsById.has(event.id)) {
+      this.eventsById.set(event.id, event);
+      this.keyValueEvents.add(event);
+    }
+  },
   handleEvent(event: Event) {
     if (!event) return;
     if (this.eventsById.has(event.id)) {
@@ -1012,6 +1022,9 @@ export default {
       case 16463:
         this.handleFlagList(event);
         break;
+      case 30000:
+        this.handleKeyValue(event);
+        break;
     }
     this.subscribedPosts.delete(event.id);
 
@@ -1052,18 +1065,13 @@ export default {
     if (filter.authors && !filter.authors.includes(event.pubkey)) {
       return false;
     }
-    if (
-      filter['#e'] &&
-      !event.tags.some((tag: any) => tag[0] === 'e' && filter['#e'].includes(tag[1]))
-    ) {
-      return false;
+    const filterKeys = ['e', 'p', 'd'];
+    for (let key of filterKeys) {
+      if(filter[`#${key}`] && !event.tags.some(tag => tag[0] === key && filter[`#${key}`].includes(tag[1]))) {
+        return false;
+      }
     }
-    if (
-      filter['#p'] &&
-      !event.tags.some((tag: any) => tag[0] === 'p' && filter['#p'].includes(tag[1]))
-    ) {
-      return false;
-    }
+
     return true;
   },
   async logOut() {
@@ -1109,17 +1117,26 @@ export default {
       .get('loggedIn')
       .on(() => {
         const key = iris.session.getKey();
+        const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
+          for (let id of this.keyValueEvents) {
+            const event = this.eventsById.get(id);
+            if (event && this.matchesOneFilter(event, filters)) {
+              callback(event);
+            }
+          }
+          return '0';
+        };
         this.private = new Path(
-          this.publish,
-          this.subscribe,
-          this.unsubscribe,
-          this.encrypt,
-          this.decrypt
+          (...args) => this.publish(...args),
+          subscribe,
+          (...args) => this.unsubscribe(...args),
+          (...args) => this.encrypt(...args),
+          (...args) => this.decrypt(...args),
         );
         this.public = new Path(
-          this.publish,
-          this.subscribe,
-          this.unsubscribe
+          (...args) => this.publish(...args),
+          subscribe,
+          (...args) => this.unsubscribe(...args),
         );
         this.knownUsers.add(key);
         this.manageRelays();

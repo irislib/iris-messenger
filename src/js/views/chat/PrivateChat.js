@@ -68,12 +68,13 @@ export default class PrivateChat extends Component {
   }
 
   componentDidMount() {
-    Nostr.getDirectMessagesByUser(Nostr.toNostrHexAddress(this.props.id), (msgIds) => {
+    const hexId = Nostr.toNostrHexAddress(this.props.id);
+    Nostr.getDirectMessagesByUser(hexId, (msgIds) => {
       if (msgIds) {
         this.setState({ sortedMessages: msgIds.reverse() });
       }
     });
-    //Nostr.private.set('chats/' + this.props.id + '/lastSeen', Date.now());
+    Nostr.public.set('chats/' + hexId + '/lastOpened', Date.now());
     const container = document.getElementById('message-list');
     if (container) { // TODO use ref
       container.style.paddingBottom = 0;

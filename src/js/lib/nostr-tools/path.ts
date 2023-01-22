@@ -102,7 +102,7 @@ export class Path {
       for (let i = 0; i < pathParts.length; i++) {
         encryptedPathParts.push(await this.encrypt(pathParts[i]))
       }
-      eventPath = encryptedPathParts.join('/')
+      eventPath = encryptedPathParts.join('|') // slash is a base64 character
       if (contentStr === content || path === eventPath) {
         throw new Error(`Encryption failed: ${contentStr} === ${content} || ${path} === ${eventPath}`)
       }
@@ -142,7 +142,7 @@ export class Path {
         throw new Error('No path tag found in event ' + JSON.stringify(event))
       }
       value = JSON.parse(await this.decrypt(event.content))
-      const pathParts = pathTag[1].split('/')
+      const pathParts = pathTag[1].split('|')
       const decryptedPathParts = []
       for (let i = 0; i < pathParts.length; i++) {
         decryptedPathParts.push(await this.decrypt(pathParts[i]))
