@@ -104,7 +104,7 @@ class FeedMessageForm extends MessageForm {
   }
 
   attachmentsChanged(event) {
-    let files = event.target.files;
+    let files = event.target.files || event.dataTransfer.files;
     if (files) {
       for (let i = 0; i < files.length; i++) {
         let formData = new FormData();
@@ -125,7 +125,7 @@ class FeedMessageForm extends MessageForm {
         })
           .then(async (response) => {
             const text = await response.text();
-            const url = text.match(/https:\/\/nostr.build\/i\/nostr.build_\d+.jpg/);
+            const url = text.match(/https:\/\/nostr.build\/i\/nostr.build_\d+\.[a-zA-Z0-9]+/);
             console.log('url', url);
             if (url) {
               a[i].url = url[0];
@@ -192,6 +192,15 @@ class FeedMessageForm extends MessageForm {
           `
         : ''}
       <textarea
+        onDragOver=${(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onDrop=${(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.attachmentsChanged(e);
+        }}
         onKeyUp=${(e) => this.onKeyUp(e)}
         onPaste=${(e) => this.onMsgTextPaste(e)}
         onInput=${(e) => this.onMsgTextInput(e)}
