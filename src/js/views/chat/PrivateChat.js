@@ -52,7 +52,7 @@ function copyMyChatLinkClicked(e) {
 export default class PrivateChat extends Component {
   constructor() {
     super();
-    this.hashtagChatRef = createRef();
+    this.ref = createRef();
     this.state = {
       decryptedMessages: {},
       sortedMessages: [],
@@ -67,31 +67,60 @@ export default class PrivateChat extends Component {
     return true;
   }
 
+  updateLastOpened() {
+    const hexId = Nostr.toNostrHexAddress(this.props.id);
+    Nostr.public.set('chats/' + hexId + '/lastOpened', Math.floor(Date.now() / 1000));
+  }
+
   componentDidMount() {
-    Nostr.getDirectMessagesByUser(Nostr.toNostrHexAddress(this.props.id), (msgIds) => {
+    const hexId = Nostr.toNostrHexAddress(this.props.id);
+    Nostr.getDirectMessagesByUser(hexId, (msgIds) => {
       if (msgIds) {
         this.setState({ sortedMessages: msgIds.reverse() });
       }
     });
-    /*
-    const container = document.getElementById('message-list');
-    container.style.paddingBottom = 0;
-    container.style.paddingTop = 0;
-    const el = $('#message-view');
-    el.off('scroll').on('scroll', () => {
-      const scrolledToBottom = el[0].scrollHeight - el.scrollTop() == el.outerHeight();
-      if (this.state.stickToBottom && !scrolledToBottom) {
-        this.setState({ stickToBottom: false });
-      } else if (!this.state.stickToBottom && scrolledToBottom) {
-        this.setState({ stickToBottom: true });
+    this.updateLastOpened();
+    // on visibility state change (e.g. tab switch) update last opened
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.updateLastOpened();
       }
     });
-     */
+
+    const container = document.getElementById('message-list');
+    if (container) {
+      // TODO use ref
+      container.style.paddingBottom = 0;
+      container.style.paddingTop = 0;
+      const el = $('#message-view');
+      el.off('scroll').on('scroll', () => {
+        const scrolledToBottom = el[0].scrollHeight - el.scrollTop() == el.outerHeight();
+        if (this.state.stickToBottom && !scrolledToBottom) {
+          this.setState({ stickToBottom: false });
+        } else if (!this.state.stickToBottom && scrolledToBottom) {
+          this.setState({ stickToBottom: true });
+        }
+      });
+    }
   }
 
-  componentDidUpdate() {
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    // remove event listener
+    document.removeEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.updateLastOpened();
+      }
+    });
+  }
+
+  componentDidUpdate(previousProps) {
     if (this.state.stickToBottom) {
       Helpers.scrollToMessageListBottom();
+    }
+
+    if (previousProps.id !== this.props.id) {
+      this.updateLastOpened();
     }
 
     $('.msg-content img')
@@ -256,7 +285,7 @@ export default class PrivateChat extends Component {
   render() {
     return html`
       <${Helmet}><title>${(this.chat && this.chat.name) || 'Messages'}</title><//>
-      <div id="chat-main" class="${this.props.id ? '' : 'hidden-xs'}">
+      <div id="chat-main" ref=${this.ref} class="${this.props.id ? '' : 'hidden-xs'}">
         ${this.renderMainView()} ${this.renderMsgForm()}
       </div>
     `;

@@ -50,7 +50,10 @@ Nostr.init();
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {
-    iris.local().get('loggedIn').on(this.inject());
+    window.onload = () => {
+      // this makes sure that window.nostr is there
+      iris.local().get('loggedIn').on(this.inject());
+    };
     iris.local().get('toggleMenu').put(false);
     iris
       .local()
