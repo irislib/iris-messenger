@@ -1183,6 +1183,13 @@ a.msg {
   align-items: center;
 }
 
+.msg-sender-link .badge {
+  top: -12px;
+  left: -6px;
+  margin-right: -10px;
+  text-shadow: white 0 0 1px;
+}
+
 .public-messages-view .msg-sender .msg-menu-btn {
   text-align: right;
   flex: 1;

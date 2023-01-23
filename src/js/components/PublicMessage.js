@@ -421,6 +421,7 @@ class PublicMessage extends Message {
 
   render() {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
+    const myPub = iris.session.getKey().secp256k1.rpub;
     if (!this.state.msg) {
       return html` <div
         ref=${this.ref}
@@ -551,6 +552,12 @@ class PublicMessage extends Message {
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
+              ${Nostr.followedByUser.get(myPub)?.has(Nostr.toNostrHexAddress(s.msg.info.from)) ? html`
+                  <span class="badge positive tooltip">
+                      ①
+                    <span class="tooltiptext right">${t('following')}</span>
+                  </span>
+              ` : ''}
               ${name && this.props.showName && html`<div class="msgSenderName">${name}</div>`}
               <div class="time">
                 <a
