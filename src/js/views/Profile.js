@@ -196,9 +196,9 @@ class Profile extends View {
                     title=${this.state.name}
                     copyStr=${this.props.id}
                   />
-                  <${Button} onClick=${() => $(this.qrRef.current).toggle()}
+                  <!-- <${Button} onClick=${() => $(this.qrRef.current).toggle()}
                     >${t('show_qr_code')}<//
-                  >
+                  > -->
                   <${CopyButton}
                     key=${`${this.props.id}copyData`}
                     text=${t('copy_raw_data')}
