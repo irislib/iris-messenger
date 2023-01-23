@@ -50,12 +50,10 @@ const saveLocalStorageEvents = debounce((_this: any) => {
       dms.push(_this.eventsById.get(eventId));
     });
   }
-  console.log('saving some events to local storage');
   localForage.setItem('latestMsgs', latestMsgs);
   localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
   localForage.setItem('notificationEvents', notifications);
   localForage.setItem('dms', dms);
-  console.log('saved dms', dms);
   // TODO save own block and flag events
 }, 5000);
 
@@ -65,7 +63,6 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
   const followEvents = Array.from(_this.followEventByUser.values()).filter((e: Event) => {
     return e.pubkey === myPub || _this.followedByUser.get(myPub)?.has(e.pubkey);
   });
-  console.log('saving', profileEvents.length + followEvents.length, 'events to local storage');
   localForage.setItem('profileEvents', profileEvents);
   localForage.setItem('followEvents', followEvents);
 }, 5000);
@@ -398,7 +395,7 @@ export default {
     for (const relay of this.relays.values()) {
       relay.publish(event);
     }
-    console.log('published', event);
+    //console.log('published', event);
     this.handleEvent(event);
     return event.id;
   },
@@ -923,8 +920,16 @@ export default {
       }
     }
   },
-  updateUnseenNotificationCount: debounce((count) => {
-    iris.local().get('unseenNotificationCount').put(count);
+  updateUnseenNotificationCount: debounce((_this) => {
+    let unseen = 0;
+    for (const id of _this.notifications.eventIds) {
+      const event = _this.eventsById.get(id);
+      if (event && event.created_at > _this.notificationsSeenTime) {
+        unseen++;
+      }
+    }
+    console.log('unseen notifications', unseen, _this.notificationsSeenTime);
+    iris.local().get('unseenNotificationCount').put(unseen);
   }, 1000),
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
@@ -940,10 +945,7 @@ export default {
       }
       this.eventsById.set(event.id, event);
       this.notifications.add(event);
-      if (event.created_at > this.notificationsSeenTime) {
-        this.unseenNotificationCount++;
-        this.updateUnseenNotificationCount(this.unseenNotificationCount);
-      }
+      this.updateUnseenNotificationCount(this);
     }
   },
   handleDirectMessage(event: Event) {
@@ -1115,6 +1117,7 @@ export default {
       if (val !== null) {
         iris.local().get('notificationsSeenTime').put(val);
         this.notificationsSeenTime = val;
+        this.updateUnseenNotificationCount(this);
       }
     });
     localForage.getItem('maxRelays').then((val) => {
@@ -1152,7 +1155,11 @@ export default {
           subscribe,
           (...args) => this.unsubscribe(...args),
         );
-        this.public.get('notifications/lastOpened', (time) => (this.notificationsSeenTime = time));
+        this.public.get('notifications/lastOpened', (time) => {
+          this.notificationsSeenTime = time;
+          console.log('got lastOpened', time);
+          this.updateUnseenNotificationCount(this);
+        });
         this.knownUsers.add(key);
         this.manageRelays();
         this.loadLocalStorageEvents();
@@ -1165,10 +1172,12 @@ export default {
           this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
           this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
         }, 200);
+        /*
         setInterval(() => {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
           this.handledMsgsPerSecond = 0;
         }, 1000);
+         */
       });
   },
   getRepliesAndLikes(

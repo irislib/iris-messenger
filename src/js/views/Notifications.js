@@ -14,7 +14,9 @@ export default class Notifications extends View {
   ref = createRef();
 
   updateNotificationsLastOpened = debounce(() => {
-    Nostr.public.set('notifications/lastOpened', Math.floor(Date.now() / 1000));
+    const lastOpened = Math.floor(Date.now() / 1000);
+    Nostr.public.set('notifications/lastOpened', lastOpened);
+    console.log('set lastOpened', lastOpened);
   }, 1000);
 
   componentDidMount() {
