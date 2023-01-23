@@ -462,7 +462,12 @@ export default {
     const otherSubscribedUsers = Array.from(_this.subscribedUsers).filter(
       (u) => !followedUsers.includes(u),
     );
-    console.log('subscribe to', followedUsers, otherSubscribedUsers);
+    console.log(
+      'subscribe to followedUsers.length',
+      followedUsers.length,
+      'otherSubscribedUsers.length',
+      otherSubscribedUsers.length,
+    );
     _this.sendSubToRelays(
       [{ kinds: [0, 3], until: now, authors: followedUsers }],
       'followed',
