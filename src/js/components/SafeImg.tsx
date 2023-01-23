@@ -15,7 +15,7 @@ const safeOrigins = [
   'https://nostr.build/',
 ];
 
-const isSafeOrigin = (url: string) => {
+export const isSafeOrigin = (url: string) => {
   return safeOrigins.some((origin) => url.indexOf(origin) === 0);
 };
 
