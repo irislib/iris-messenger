@@ -50,12 +50,10 @@ const saveLocalStorageEvents = debounce((_this: any) => {
       dms.push(_this.eventsById.get(eventId));
     });
   }
-  console.log('saving some events to local storage');
   localForage.setItem('latestMsgs', latestMsgs);
   localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
   localForage.setItem('notificationEvents', notifications);
   localForage.setItem('dms', dms);
-  console.log('saved dms', dms);
   // TODO save own block and flag events
 }, 5000);
 
