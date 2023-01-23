@@ -400,6 +400,16 @@ export default {
     this.handleEvent(event);
     return event.id;
   },
+  followedByFriendsCount: function (address: string) {
+    let count = 0;
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    for (const follower of this.followersByUser.get(address) ?? []) {
+      if (this.followedByUser.get(myPub)?.has(follower)) {
+        count++; // should we stop at 10?
+      }
+    }
+    return count;
+  },
   sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
     // if subs with same id already exists, remove them
     if (id) {
