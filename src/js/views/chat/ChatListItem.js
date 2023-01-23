@@ -53,7 +53,7 @@ class ChatListItem extends Component {
   }
 
   hasUnseen() {
-    return !this.props.active && this.state.latest.created_at > this.state.lastOpened;
+    return !this.props.active && !(this.state.latest.created_at <= this.state.lastOpened);
   }
 
   render() {
