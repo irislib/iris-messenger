@@ -1,5 +1,6 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
+import { debounce } from 'lodash';
 import { createRef } from 'preact';
 
 import MessageFeed from '../components/MessageFeed';
@@ -7,7 +8,6 @@ import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
-import {debounce} from "lodash";
 
 export default class Notifications extends View {
   class = 'public-messages-view';

@@ -1152,7 +1152,7 @@ export default {
           subscribe,
           (...args) => this.unsubscribe(...args),
         );
-        this.public.get('notifications/lastOpened', (time) => this.notificationsSeenTime = time);
+        this.public.get('notifications/lastOpened', (time) => (this.notificationsSeenTime = time));
         this.knownUsers.add(key);
         this.manageRelays();
         this.loadLocalStorageEvents();
