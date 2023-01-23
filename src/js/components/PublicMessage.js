@@ -682,6 +682,7 @@ class PublicMessage extends Message {
                   autofocus=${!this.props.standalone}
                   replyingTo=${this.props.hash}
                   replyingToUser=${s.msg.info.from}
+                  placeholder=${t('write_a_reply')}
                 />
               `
             : ''}

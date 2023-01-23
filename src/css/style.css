@@ -2031,7 +2031,7 @@ button {
   margin-right: auto;
   margin-left: auto;
   display: block;
-  height: 10em;
+  height: 3em;
 }
 form.public button[type='submit'] {
   height: 47px;
