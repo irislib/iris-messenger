@@ -122,22 +122,28 @@ class FeedMessageForm extends MessageForm {
         fetch('https://nostr.build/upload.php', {
           method: 'POST',
           body: formData,
-        }).then(async (response) => {
-          const text = await response.text();
-          const url = text.match(/https:\/\/nostr.build\/i\/nostr.build_\d+.jpg/);
-          console.log('url', url);
-          if (url) {
-            a[i].url = url[0];
-            this.setState({ attachments: a });
-            const textEl = $(this.newMsgRef.current);
-            const currentVal = textEl.val();
-            if (currentVal) {
-              textEl.val(currentVal + '\n\n' + url[0]);
-            } else {
-              textEl.val(url[0]);
+        })
+          .then(async (response) => {
+            const text = await response.text();
+            const url = text.match(/https:\/\/nostr.build\/i\/nostr.build_\d+.jpg/);
+            console.log('url', url);
+            if (url) {
+              a[i].url = url[0];
+              this.setState({ attachments: a });
+              const textEl = $(this.newMsgRef.current);
+              const currentVal = textEl.val();
+              if (currentVal) {
+                textEl.val(currentVal + '\n\n' + url[0]);
+              } else {
+                textEl.val(url[0]);
+              }
             }
-          }
-        });
+          })
+          .catch((error) => {
+            console.error('upload error', error);
+            a[i].error = 'upload failed';
+            this.setState({ attachments: a });
+          });
       }
       $(event.target).val(null);
       $(this.newMsgRef.current).focus();
@@ -277,10 +283,9 @@ class FeedMessageForm extends MessageForm {
           : ''}
         ${this.state.attachments &&
         this.state.attachments.map(
-          (a) => html`
-            ${a.url || 'uploading...'}
-            <${SafeImg} src=${a.data} />
-          `,
+          (a) =>
+            html` ${a.error ? html`<span class="error">${a.error}</span>` : a.url || 'uploading...'}
+              <${SafeImg} src=${a.data} />`,
         )}
       </div>
     </form>`;

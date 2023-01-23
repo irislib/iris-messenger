@@ -436,7 +436,7 @@ export default {
         this.subscriptionsByName.set(id, new Set());
       }
       this.subscriptionsByName.get(id)?.add(sub);
-      console.log('subscriptions size', this.subscriptionsByName.size);
+      //console.log('subscriptions size', this.subscriptionsByName.size);
       if (unsubscribeTimeout) {
         setTimeout(() => {
           sub.unsub();
@@ -1171,9 +1171,9 @@ export default {
           this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
         }, 200);
         setInterval(() => {
-          console.log('handled msgs per second', this.handledMsgsPerSecond);
+          console.log('handled msgs per second', Math.round(this.handledMsgsPerSecond / 5));
           this.handledMsgsPerSecond = 0;
-        }, 1000);
+        }, 5000);
       });
   },
   getRepliesAndLikes(
