@@ -13,6 +13,7 @@ import {
 } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import localForage from 'localforage';
+import {RelayPool} from "nostr-relaypool";
 
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 
@@ -136,6 +137,7 @@ export default {
   unseenNotificationCount: 0,
   decryptedMessages: new Map<string, string>(),
   decryptQueue: [],
+  relayPool: new RelayPool(DEFAULT_RELAYS, {noCache: true}),
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -548,48 +550,20 @@ export default {
         callback: cb,
       });
 
-    let hasNewAuthors = false;
-    let hasNewIds = false;
-    let hasNewReplyAndLikeSubs = false;
     for (const filter of filters) {
-      if (filter.authors) {
-        for (const author of filter.authors) {
-          if (!author) continue;
-          // make sure the author is valid hex
-          if (!author.match(/^[0-9a-fA-F]{64}$/)) {
-            console.error('Invalid author', author);
-            continue;
-          }
-          if (!this.subscribedUsers.has(author)) {
-            hasNewAuthors = true;
-            this.subscribedUsers.add(author);
-          }
-        }
-      }
       if (filter.ids) {
         for (const id of filter.ids) {
           if (!this.subscribedPosts.has(id)) {
-            hasNewIds = true;
             this.subscribedPosts.add(id);
           }
         }
       }
-      if (Array.isArray(filter['#e'])) {
-        for (const id of filter['#e']) {
-          if (!this.subscribedRepliesAndLikes.has(id)) {
-            hasNewReplyAndLikeSubs = true;
-            this.subscribedRepliesAndLikes.add(id);
-            setTimeout(() => {
-              // remove after some time, so the requests don't grow too large
-              this.subscribedRepliesAndLikes.delete(id);
-            }, 60 * 1000);
-          }
-        }
-      }
     }
-    hasNewReplyAndLikeSubs && this.subscribeToRepliesAndLikes(this);
-    hasNewAuthors && this.subscribeToAuthors(this); // TODO subscribe to old stuff from new authors, don't resubscribe to all
-    hasNewIds && this.subscribeToPosts(this);
+    const myCallback = (event: Event) => {
+      this.handleEvent(event);
+      cb(event);
+    }
+    this.relayPool.subscribe(filters, DEFAULT_RELAYS, myCallback);
   },
   getConnectedRelayCount: function () {
     let count = 0;
@@ -605,35 +579,7 @@ export default {
     relay.connect();
   },
   manageRelays: function () {
-    // TODO keep track of subscriptions and send them to new relays
-    const go = () => {
-      const relays: Array<Relay> = Array.from(this.relays.values());
-      // ws status codes: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
-      const openRelays = relays.filter((relay: Relay) => getRelayStatus(relay) === 1);
-      const connectingRelays = relays.filter((relay: Relay) => getRelayStatus(relay) === 0);
-      if (openRelays.length + connectingRelays.length < this.maxRelays) {
-        const closedRelays = relays.filter((relay: Relay) => getRelayStatus(relay) === 3);
-        if (closedRelays.length) {
-          const newRelay = relays[Math.floor(Math.random() * relays.length)];
-          this.connectRelay(newRelay);
-        }
-      }
-      if (openRelays.length > this.maxRelays) {
-        openRelays[Math.floor(Math.random() * openRelays.length)].close();
-      }
-    };
 
-    for (let i = 0; i < this.maxRelays; i++) {
-      go();
-    }
-
-    for (const relay of this.relays.values()) {
-      relay.on('notice', (notice) => {
-        console.log('notice from ', relay.url, notice);
-      });
-    }
-
-    setInterval(go, 1000);
   },
   handleNote(event: Event) {
     this.eventsById.set(event.id, event);
