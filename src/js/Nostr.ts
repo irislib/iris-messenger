@@ -135,8 +135,18 @@ export default {
   notificationsSeenTime: 0,
   unseenNotificationCount: 0,
   decryptedMessages: new Map<string, string>(),
-  decryptQueue: [],
-  relayPool: new RelayPool(DEFAULT_RELAYS, {noCache: true}),
+  windowNostrQueue: [],
+  relayPool: new RelayPool(DEFAULT_RELAYS, {
+    noCache: true,
+    externalGetEventById: (id: string) => {
+      const existing = eventsById.get(id);
+      console.log('externalGetEventById', id, existing);
+      if (existing) {
+          console.log('already have', id);
+          return existing
+      }
+    }
+  }),
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -1117,12 +1127,12 @@ export default {
           this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
           this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
         }, 200);
-        /*
+
         setInterval(() => {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
           this.handledMsgsPerSecond = 0;
         }, 1000);
-         */
+
       });
   },
   getRepliesAndLikes(
