@@ -195,7 +195,9 @@ class PublicMessage extends Message {
     }
   }
 
-  toggleReplies() {
+  toggleReplies(e) {
+    e.preventDefault();
+    e.stopPropagation();
     const showReplyForm = !this.state.showReplyForm;
     this.setState({ showReplyForm });
   }
@@ -611,7 +613,7 @@ class PublicMessage extends Message {
             ${this.props.asQuote
               ? ''
               : html`
-                  <a class="msg-btn reply-btn" onClick=${() => this.toggleReplies()}>
+                  <a class="msg-btn reply-btn" onClick=${(e) => this.toggleReplies(e)}>
                     ${replyIcon}
                   </a>
                   <span
