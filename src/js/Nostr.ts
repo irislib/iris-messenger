@@ -6,6 +6,7 @@ import {
   Filter,
   getEventHash,
   nip04,
+  Path,
   Relay,
   relayInit,
   signEvent,
@@ -62,7 +63,7 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
   const profileEvents = Array.from(_this.profileEventByUser.values());
   const myPub = iris.session.getKey().secp256k1.rpub;
   const followEvents = Array.from(_this.followEventByUser.values()).filter((e: Event) => {
-    return e.pubkey === myPub || _this.followedByUser.get(myPub).has(e.pubkey);
+    return e.pubkey === myPub || _this.followedByUser.get(myPub)?.has(e.pubkey);
   });
   console.log('saving', profileEvents.length + followEvents.length, 'events to local storage');
   localForage.setItem('profileEvents', profileEvents);
@@ -127,6 +128,7 @@ export default {
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
+  keyValueEvents: new Map<string, Event>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
@@ -135,7 +137,8 @@ export default {
   notificationsSeenTime: 0,
   unseenNotificationCount: 0,
   decryptedMessages: new Map<string, string>(),
-  decryptQueue: [],
+  windowNostrQueue: [],
+  isProcessingQueue: false,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -143,7 +146,7 @@ export default {
     }).join('');
   },
 
-  decryptMessage(id, cb: (decrypted: string) => void) {
+  async decryptMessage(id, cb: (decrypted: string) => void) {
     const existing = this.decryptedMessages.get(id);
     if (existing) {
       cb(existing);
@@ -151,49 +154,23 @@ export default {
     }
     try {
       const myPub = iris.session.getKey().secp256k1.rpub;
-      const myPriv = iris.session.getKey().secp256k1.priv;
       const msg = this.eventsById.get(id);
       const theirPub =
         msg.pubkey === myPub ? msg.tags.find((tag: any) => tag[0] === 'p')[1] : msg.pubkey;
       if (!(msg && theirPub)) {
         return;
       }
-      if (myPriv) {
-        nip04.decrypt(myPriv, theirPub, msg.content).then((decrypted) => {
-          this.decryptedMessages.set(id, decrypted);
-          cb(decrypted);
-        });
-      } else if (window.nostr) {
-        this.decryptQueue.push({ id, theirPub, msg, cb });
-        if (this.decryptQueue.length === 1) {
-          this.processDecryptQueue();
-        }
+
+      let decrypted = await this.decrypt(msg.content, theirPub);
+      if (decrypted.content) {
+        decrypted = decrypted.content; // what? TODO debug
       }
+      this.decryptedMessages.set(id, decrypted);
+      cb(decrypted);
     } catch (e) {
       console.error(e);
     }
   },
-
-  processDecryptQueue() {
-    if (this.decryptQueue.length === 0) {
-      return;
-    }
-    const { id, theirPub, msg, cb } = this.decryptQueue[0];
-    window.nostr.nip04
-      .decrypt(theirPub, msg.content)
-      .then((decrypted) => {
-        this.decryptedMessages.set(id, decrypted);
-        cb(decrypted);
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        this.decryptQueue.shift();
-        this.processDecryptQueue();
-      });
-  },
-
   setFollowed: function (followedUser: string, follow = true) {
     followedUser = this.toNostrHexAddress(followedUser);
     const myPub = iris.session.getKey().secp256k1.rpub;
@@ -238,10 +215,6 @@ export default {
     const notificationEvents = await localForage.getItem('notificationEvents');
     const dms = await localForage.getItem('dms');
     this.localStorageLoaded = true;
-    console.log('loaded from local storage');
-    console.log('followEvents', followEvents);
-    console.log('profileEvents', profileEvents);
-    console.log('notificationEvents', notificationEvents);
     if (Array.isArray(followEvents)) {
       followEvents.forEach((e) => this.handleEvent(e));
     }
@@ -249,25 +222,21 @@ export default {
       profileEvents.forEach((e) => this.handleEvent(e));
     }
     if (Array.isArray(latestMsgs)) {
-      console.log('loaded latestmsgs');
       latestMsgs.forEach((msg) => {
         this.handleEvent(msg);
       });
     }
     if (Array.isArray(latestMsgsByEveryone)) {
-      console.log('loaded latestMsgsByEveryone');
       latestMsgsByEveryone.forEach((msg) => {
         this.handleEvent(msg);
       });
     }
     if (Array.isArray(notificationEvents)) {
-      console.log('loaded notificationEvents');
       notificationEvents.forEach((msg) => {
         this.handleEvent(msg);
       });
     }
     if (Array.isArray(dms)) {
-      console.log('loaded dms', dms);
       dms.forEach((msg) => {
         this.handleEvent(msg);
       });
@@ -420,15 +389,7 @@ export default {
       event.pubkey = iris.session.getKey().secp256k1.rpub;
       event.id = getEventHash(event);
 
-      const myPriv = iris.session.getKey().secp256k1.priv;
-      if (myPriv) {
-        event.sig = await signEvent(event, myPriv);
-      } else if (window.nostr) {
-        event = await window.nostr.signEvent(event);
-      } else {
-        alert('no nostr extension to sign the event with');
-        return;
-      }
+      event.sig = await this.sign(event);
     }
     if (!(event.id && event.sig)) {
       console.error('Invalid event', event);
@@ -541,6 +502,90 @@ export default {
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
   }, 100),
+  encrypt: async function (data: string, pub?: string) {
+    const k = iris.session.getKey().secp256k1;
+    pub = pub || k.rpub;
+    if (k.priv) {
+      return nip04.encrypt(k.priv, pub, data);
+    } else if (window.nostr) {
+      return new Promise((resolve) => {
+        this.processWindowNostr({ op: 'encrypt', data, pub, callback: resolve });
+      });
+    } else {
+      return Promise.reject('no private key');
+    }
+  },
+  decrypt: async function (data, pub?: string) {
+    const k = iris.session.getKey().secp256k1;
+    pub = pub || k.rpub;
+    if (k.priv) {
+      return nip04.decrypt(k.priv, pub, data);
+    } else if (window.nostr) {
+      return new Promise((resolve) => {
+        this.processWindowNostr({ op: 'decrypt', data, pub, callback: resolve });
+      });
+    } else {
+      return Promise.reject('no private key');
+    }
+  },
+  sign: async function (event: Event) {
+    const priv = iris.session.getKey().secp256k1.priv;
+    if (priv) {
+      return signEvent(event, priv);
+    } else if (window.nostr) {
+      return new Promise((resolve) => {
+        this.processWindowNostr({ op: 'sign', data: event, callback: resolve });
+      });
+    } else {
+      return Promise.reject('no private key');
+    }
+  },
+  processWindowNostr(item: any) {
+    this.windowNostrQueue.push(item);
+    if (!this.isProcessingQueue) {
+      this.processWindowNostrQueue();
+    }
+  },
+  async processWindowNostrQueue() {
+    if (!this.windowNostrQueue.length) {
+      this.isProcessingQueue = false;
+      return;
+    }
+    this.isProcessingQueue = true;
+    const { op, data, pub, callback } = this.windowNostrQueue[0];
+
+    let fn = Promise.resolve();
+    if (op === 'decrypt') {
+      fn = this.handlePromise(window.nostr.nip04.decrypt(pub, data), callback);
+    } else if (op === 'encrypt') {
+      fn = this.handlePromise(window.nostr.nip04.encrypt(pub, data), callback);
+    } else if (op === 'sign') {
+      fn = this.handlePromise(window.nostr.signEvent(data), (signed) => callback(signed.sig));
+    }
+    await fn;
+    this.windowNostrQueue.shift();
+    this.processWindowNostrQueue();
+  },
+  handlePromise(promise, callback) {
+    return promise
+      .then((result) => {
+        callback(result);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  },
+  unsubscribe: function (id: string) {
+    const subs = this.subscriptionsByName.get(id);
+    if (subs) {
+      subs.forEach((sub) => {
+        console.log('unsub', id);
+        sub.unsub();
+      });
+    }
+    this.subscriptionsByName.delete(id);
+    this.subscribedFiltersByName.delete(id);
+  },
   subscribe: function (filters: Filter[], cb?: (event: Event) => void) {
     cb &&
       this.subscriptions.set(subscriptionId++, {
@@ -602,7 +647,11 @@ export default {
   },
   SUGGESTED_FOLLOW: 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk',
   connectRelay: function (relay: Relay) {
-    relay.connect();
+    try {
+      relay.connect();
+    } catch (e) {
+      console.log(e);
+    }
   },
   manageRelays: function () {
     // TODO keep track of subscriptions and send them to new relays
@@ -811,13 +860,7 @@ export default {
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey === myPub) {
       try {
-        const myPriv = iris.session.getKey().secp256k1.priv;
-        let content;
-        if (myPriv) {
-          content = await nip04.decrypt(myPriv, myPub, event.content);
-        } else {
-          content = await window.nostr.nip04.decrypt(myPub, event.content);
-        }
+        const content = await this.decrypt(event.content);
         const blockList = JSON.parse(content);
         this.blockedUsers = new Set(blockList);
       } catch (e) {
@@ -920,6 +963,19 @@ export default {
     }
     this.directMessagesByUser.get(user)?.add(event);
   },
+  handleKeyValue(event: Event) {
+    if (event.pubkey !== iris.session.getKey().secp256k1.rpub) {
+      return;
+    }
+    const key = event.tags.find((tag) => tag[0] === 'd')?.[1];
+    if (key) {
+      const existing = this.keyValueEvents.get(key);
+      if (existing?.created_at >= event.created_at) {
+        return;
+      }
+      this.keyValueEvents.set(key, event);
+    }
+  },
   handleEvent(event: Event) {
     if (!event) return;
     if (this.eventsById.has(event.id)) {
@@ -972,6 +1028,9 @@ export default {
       case 16463:
         this.handleFlagList(event);
         break;
+      case 30000:
+        this.handleKeyValue(event);
+        break;
     }
     this.subscribedPosts.delete(event.id);
 
@@ -1012,18 +1071,25 @@ export default {
     if (filter.authors && !filter.authors.includes(event.pubkey)) {
       return false;
     }
-    if (
-      filter['#e'] &&
-      !event.tags.some((tag: any) => tag[0] === 'e' && filter['#e'].includes(tag[1]))
-    ) {
-      return false;
+    const filterKeys = ['e', 'p', 'd'];
+    for (const key of filterKeys) {
+      if (
+        filter[`#${key}`] &&
+        !event.tags.some((tag) => tag[0] === key && filter[`#${key}`].includes(tag[1]))
+      ) {
+        return false;
+      }
     }
-    if (
-      filter['#p'] &&
-      !event.tags.some((tag: any) => tag[0] === 'p' && filter['#p'].includes(tag[1]))
-    ) {
-      return false;
+    if (filter['#d']) {
+      const tag = event.tags.find((tag) => tag[0] === 'd');
+      if (tag) {
+        const existing = this.keyValueEvents.get(tag[1]);
+        if (existing?.created_at > event.created_at) {
+          return false;
+        }
+      }
     }
+
     return true;
   },
   async logOut() {
@@ -1031,13 +1097,6 @@ export default {
     iris.session.logOut();
   },
   init: function () {
-    iris
-      .local()
-      .get('notificationsSeenTime')
-      .on((time) => {
-        this.notificationsSeenTime = time;
-        localForage.setItem('notificationsSeenTime', time);
-      });
     iris
       .local()
       .get('maxRelays')
@@ -1069,6 +1128,31 @@ export default {
       .get('loggedIn')
       .on(() => {
         const key = iris.session.getKey();
+        const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
+          const filter = filters[0];
+          const key = filter['#d']?.[0];
+          if (key) {
+            const event = this.keyValueEvents.get(key);
+            if (event) {
+              callback(event);
+            }
+          }
+          this.subscribe(filters, callback);
+          return '0';
+        };
+        this.private = new Path(
+          (...args) => this.publish(...args),
+          subscribe,
+          (...args) => this.unsubscribe(...args),
+          (...args) => this.encrypt(...args),
+          (...args) => this.decrypt(...args),
+        );
+        this.public = new Path(
+          (...args) => this.publish(...args),
+          subscribe,
+          (...args) => this.unsubscribe(...args),
+        );
+        this.public.get('notifications/lastOpened', (time) => (this.notificationsSeenTime = time));
         this.knownUsers.add(key);
         this.manageRelays();
         this.loadLocalStorageEvents();
@@ -1085,13 +1169,6 @@ export default {
           console.log('handled msgs per second', this.handledMsgsPerSecond);
           this.handledMsgsPerSecond = 0;
         }, 1000);
-        iris
-          .public()
-          .get('block')
-          .map((isBlocked, address) => {
-            const hex = this.toNostrHexAddress(address);
-            hex && this.setBlocked(hex, isBlocked);
-          });
       });
   },
   getRepliesAndLikes(
@@ -1120,13 +1197,7 @@ export default {
   block: async function (address: string, isBlocked: boolean) {
     isBlocked ? this.blockedUsers.add(address) : this.blockedUsers.delete(address);
     let content = JSON.stringify(Array.from(this.blockedUsers));
-    const myPub = iris.session.getKey().secp256k1.rpub;
-    const myPriv = iris.session.getKey().secp256k1.priv;
-    if (myPriv) {
-      content = await nip04.encrypt(myPriv, myPub, content);
-    } else {
-      content = await window.nostr.nip04.encrypt(myPub, content);
-    }
+    content = await this.encrypt(content);
     this.publish({
       kind: 16462,
       content,

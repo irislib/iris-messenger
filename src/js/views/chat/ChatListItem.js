@@ -1,4 +1,5 @@
 import { html } from 'htm/preact';
+import iris from 'iris-lib';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
@@ -13,7 +14,6 @@ class ChatListItem extends Component {
     this.state = {
       latest: {},
       latestText: '',
-      unseen: {},
     };
   }
 
@@ -25,21 +25,35 @@ class ChatListItem extends Component {
   }
 
   getLatestMsg() {
+    if (!this.props.latestMsgId) {
+      return;
+    }
     const event = Nostr.eventsById.get(this.props.latestMsgId);
     if (event) {
       this.setState({ latest: event });
-      Nostr.decryptMessage(this.props.latestMsgId, (latestText) => this.setState({ latestText }));
+      Nostr.decryptMessage(this.props.latestMsgId, (latestText) => {
+        this.setState({ latestText });
+      });
     }
   }
 
   componentDidMount() {
     this.getLatestMsg();
+    const path = 'chats/' + this.props.chat + '/lastOpened';
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    Nostr.public.get({ path, authors: [myPub] }, (entry) => {
+      this.setState({ lastOpened: entry.value });
+    });
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.latestMsgId !== this.props.latestMsgId) {
       this.getLatestMsg();
     }
+  }
+
+  hasUnseen() {
+    return !this.props.active && !(this.state.latest.created_at <= this.state.lastOpened);
   }
 
   render() {
@@ -50,10 +64,8 @@ class ChatListItem extends Component {
     const delivered = chat.theirLastActiveTime >= chat.latestTime ? 'delivered' : '';
 
      */
-    const hasUnseen = this.state.unseen ? 'has-unseen' : '';
-    const unseenEl = this.state.unseen
-      ? html`<span class="unseen">${JSON.stringify(this.state.unseen)}</span>`
-      : '';
+    const hasUnseen = this.hasUnseen() ? 'has-unseen' : '';
+    const unseenEl = this.hasUnseen() ? html`<span class="unseen"></span>` : '';
     const activity = ['online', 'active'].indexOf(chat.activity) > -1 ? chat.activity : '';
     //const time = chat.latestTime && new Date(chat.latestTime);
     //let latestTimeText = Helpers.getRelativeTimeText(time);
@@ -86,8 +98,7 @@ class ChatListItem extends Component {
      */
 
     const time =
-      (this.state.latest &&
-        this.state.latest.created_at &&
+      (this.state.latest.created_at &&
         Helpers.getRelativeTimeText(new Date(this.state.latest.created_at * 1000))) ||
       '';
 
@@ -107,7 +118,7 @@ class ChatListItem extends Component {
             <small class="latest-time">${time}</small>
           </div>
           <small class="latest"> ${this.state.latestText} </small>
-          <!--${unseenEl}-->
+          ${unseenEl}
         </div>
       </div>
     `;

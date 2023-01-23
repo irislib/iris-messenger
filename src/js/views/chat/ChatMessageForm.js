@@ -6,7 +6,6 @@ import MessageForm from '../../components/MessageForm';
 import Torrent from '../../components/Torrent';
 import Helpers from '../../Helpers';
 import EmojiButton from '../../lib/emoji-button';
-import { nip04 } from '../../lib/nostr-tools';
 import Nostr from '../../Nostr';
 import { translate as t } from '../../translations/Translation';
 
@@ -54,16 +53,11 @@ class ChatMessageForm extends MessageForm {
 
   encrypt(text) {
     try {
-      const myPriv = iris.session.getKey().secp256k1.priv;
       const theirPub = Nostr.toNostrHexAddress(this.props.activeChat);
       if (!theirPub) {
         throw new Error('invalid public key ' + theirPub);
       }
-      if (myPriv) {
-        return nip04.encrypt(myPriv, theirPub, text);
-      } else if (window.nostr) {
-        return window.nostr.nip04.encrypt(theirPub, text);
-      }
+      return Nostr.encrypt(text, theirPub);
     } catch (e) {
       console.error(e);
     }

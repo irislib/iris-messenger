@@ -1,5 +1,6 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
+import { debounce } from 'lodash';
 import { createRef } from 'preact';
 
 import MessageFeed from '../components/MessageFeed';
@@ -12,14 +13,15 @@ export default class Notifications extends View {
   class = 'public-messages-view';
   ref = createRef();
 
+  updateNotificationsLastOpened = debounce(() => {
+    Nostr.public.set('notifications/lastOpened', Math.floor(Date.now() / 1000));
+  }, 1000);
+
   componentDidMount() {
     Nostr.getNotifications((notifications) => {
       const hasNotifications = notifications.length > 0;
       if (hasNotifications && this.ref.current) {
-        iris
-          .local()
-          .get('notificationsSeenTime')
-          .put(Math.floor(Date.now() / 1000));
+        this.updateNotificationsLastOpened();
         iris.local().get('unseenNotificationCount').put(0);
       }
       this.setState({ hasNotifications });
