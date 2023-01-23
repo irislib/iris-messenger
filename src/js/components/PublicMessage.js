@@ -303,6 +303,9 @@ class PublicMessage extends Message {
     if (['A', 'BUTTON', 'TEXTAREA', 'IMG'].find((tag) => event.target.closest(tag))) {
       return;
     }
+    if (window.getSelection().toString()) {
+      return;
+    }
     route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
   }
 
