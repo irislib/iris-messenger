@@ -420,11 +420,14 @@ class PublicMessage extends Message {
   }
 
   getBadge() {
+    const myPub = iris.session.getKey().secp256k1.rpub;
     const hexAddress = Nostr.toNostrHexAddress(this.state.msg.info.from);
+    if (hexAddress === myPub) {
+      return null;
+    }
     if (!hexAddress) {
       return null;
     }
-    const myPub = iris.session.getKey().secp256k1.rpub;
     const following = Nostr.followedByUser.get(myPub)?.has(hexAddress);
     if (following) {
       return html`
@@ -440,7 +443,7 @@ class PublicMessage extends Message {
         return html`
           <span class="badge ${className} tooltip">
             ②
-            <span class="tooltiptext right">${t('followed_by_friends')}: ${count}</span>
+            <span class="tooltiptext right">${count} ${t('friends_following')}</span>
           </span>
         `;
       }
