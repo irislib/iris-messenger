@@ -1099,13 +1099,6 @@ export default {
   init: function () {
     iris
       .local()
-      .get('notificationsSeenTime')
-      .on((time) => {
-        this.notificationsSeenTime = time;
-        localForage.setItem('notificationsSeenTime', time);
-      });
-    iris
-      .local()
       .get('maxRelays')
       .on((maxRelays) => {
         this.maxRelays = maxRelays;
@@ -1159,6 +1152,7 @@ export default {
           subscribe,
           (...args) => this.unsubscribe(...args),
         );
+        this.public.get('notifications/lastOpened', (time) => this.notificationsSeenTime = time);
         this.knownUsers.add(key);
         this.manageRelays();
         this.loadLocalStorageEvents();

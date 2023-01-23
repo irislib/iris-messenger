@@ -7,19 +7,21 @@ import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
+import {debounce} from "lodash";
 
 export default class Notifications extends View {
   class = 'public-messages-view';
   ref = createRef();
 
+  updateNotificationsLastOpened = debounce(() => {
+    Nostr.public.set('notifications/lastOpened', Math.floor(Date.now() / 1000));
+  }, 1000);
+
   componentDidMount() {
     Nostr.getNotifications((notifications) => {
       const hasNotifications = notifications.length > 0;
       if (hasNotifications && this.ref.current) {
-        iris
-          .local()
-          .get('notificationsSeenTime')
-          .put(Math.floor(Date.now() / 1000));
+        this.updateNotificationsLastOpened();
         iris.local().get('unseenNotificationCount').put(0);
       }
       this.setState({ hasNotifications });
