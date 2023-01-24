@@ -432,17 +432,17 @@ class PublicMessage extends Message {
     if (following) {
       return html`
         <span class="badge positive tooltip">
-          ①
+          ${Icons.checkmark}
           <span class="tooltiptext right">${t('following')}</span>
         </span>
       `;
     } else {
       const count = Nostr.followedByFriendsCount(hexAddress);
       if (count > 0) {
-        const className = count > 10 ? 'positive' : 'neutral';
+        const className = count > 10 ? 'neutral' : '';
         return html`
           <span class="badge ${className} tooltip">
-            ②
+            ${Icons.checkmark}
             <span class="tooltiptext right">${count} ${t('friends_following')}</span>
           </span>
         `;
