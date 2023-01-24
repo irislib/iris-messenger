@@ -582,8 +582,8 @@ class PublicMessage extends Message {
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
-              ${this.getBadge()}
               ${name && this.props.showName && html`<div class="msgSenderName">${name}</div>`}
+              ${this.getBadge()}
               <div class="time">
                 <a
                   href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"

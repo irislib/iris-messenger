@@ -1184,9 +1184,7 @@ a.msg {
 }
 
 .msg-sender-link .badge {
-  top: -12px;
-  left: -6px;
-  margin-right: -10px;
+  margin-left: 5px;
   text-shadow: white 0 0 1px;
 }
 
