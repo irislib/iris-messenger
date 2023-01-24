@@ -1183,9 +1183,13 @@ a.msg {
   align-items: center;
 }
 
-.msg-sender-link .badge {
+.badge {
   margin-left: 5px;
   text-shadow: white 0 0 1px;
+}
+
+.text-color {
+  color: var(--text-color);
 }
 
 .public-messages-view .msg-sender .msg-menu-btn {

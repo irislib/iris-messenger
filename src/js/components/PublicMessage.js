@@ -9,6 +9,7 @@ import Icons from '../Icons';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
+import Badge from './Badge';
 import CopyButton from './CopyButton';
 import Dropdown from './Dropdown';
 import FeedMessageForm from './FeedMessageForm';
@@ -419,37 +420,6 @@ class PublicMessage extends Message {
     this.setState({ showBoosts: !this.state.showBoosts, showLikes: false });
   }
 
-  getBadge() {
-    const myPub = iris.session.getKey().secp256k1.rpub;
-    const hexAddress = Nostr.toNostrHexAddress(this.state.msg.info.from);
-    if (hexAddress === myPub) {
-      return null;
-    }
-    if (!hexAddress) {
-      return null;
-    }
-    const following = Nostr.followedByUser.get(myPub)?.has(hexAddress);
-    if (following) {
-      return html`
-        <span class="badge positive tooltip">
-          ${Icons.checkmark}
-          <span class="tooltiptext right">${t('following')}</span>
-        </span>
-      `;
-    } else {
-      const count = Nostr.followedByFriendsCount(hexAddress);
-      if (count > 0) {
-        const className = count > 10 ? 'neutral' : '';
-        return html`
-          <span class="badge ${className} tooltip">
-            ${Icons.checkmark}
-            <span class="tooltiptext right">${count} ${t('friends_following')}</span>
-          </span>
-        `;
-      }
-    }
-  }
-
   render() {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     if (!this.state.msg) {
@@ -582,8 +552,14 @@ class PublicMessage extends Message {
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
-              ${name && this.props.showName && html`<div class="msgSenderName">${name}</div>`}
-              ${this.getBadge()}
+              ${name &&
+              this.props.showName &&
+              html`
+                <div class="msgSenderName">
+                  ${name}
+                  <${Badge} pub=${s.msg.info.from} />
+                </div>
+              `}
               <div class="time">
                 <a
                   href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
