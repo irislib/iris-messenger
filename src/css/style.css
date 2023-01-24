@@ -1642,6 +1642,7 @@ a.msg {
   align-items: center;
   text-align: center;
   overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .attachment-preview.gallery {

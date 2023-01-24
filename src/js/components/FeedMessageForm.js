@@ -125,7 +125,7 @@ class FeedMessageForm extends MessageForm {
         })
           .then(async (response) => {
             const text = await response.text();
-            const url = text.match(/https:\/\/nostr.build\/i\/nostr.build_\d+\.[a-zA-Z0-9]+/);
+            const url = text.match(/https:\/\/nostr\.build\/i\/nostr\.build_[a-z0-9]{64}\.[a-zA-Z]+/i);
             console.log('url', url);
             if (url) {
               a[i].url = url[0];
