@@ -17,8 +17,8 @@ import Message from './Message';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
 
-const MSG_TRUNCATE_LENGTH = 1000;
-const MSG_TRUNCATE_LINES = 10;
+const MSG_TRUNCATE_LENGTH = 500;
+const MSG_TRUNCATE_LINES = 8;
 
 const replyIcon = html`<svg width="24" viewBox="0 0 24 24" fill="currentColor">
   <path
@@ -557,7 +557,7 @@ class PublicMessage extends Message {
         ref=${this.ref}
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
-          : ''} ${this.props.asQuote || s.sortedReplies.length ? 'quote' : ''}
+          : ''} ${asQuote ? 'quote' : ''}
           ${s.msg.replyingTo && !this.props.asQuote ? 'quoting' : ''}"
       >
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
@@ -573,8 +573,7 @@ class PublicMessage extends Message {
           <div class="msg-main">
             <div class="msg-sender">
               <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
-                ${name && this.props.showName && html`<div class="msgSenderName">${name}</div>`}
-                ${this.getBadge()}
+                ${name && this.props.showName && html`<div class="msgSenderName">${name}</div> ${this.getBadge()}`} ·
                 <div class="time">
                   <a
                     href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
