@@ -196,9 +196,9 @@ class Profile extends View {
                     title=${this.state.name}
                     copyStr=${this.props.id}
                   />
-                  <${Button} onClick=${() => $(this.qrRef.current).toggle()}
+                  <!-- <${Button} onClick=${() => $(this.qrRef.current).toggle()}
                     >${t('show_qr_code')}<//
-                  >
+                  > -->
                   <${CopyButton}
                     key=${`${this.props.id}copyData`}
                     text=${t('copy_raw_data')}
@@ -215,7 +215,9 @@ class Profile extends View {
               </div>
             </div>
 
-            ${this.state.nip05 ? html`<div class="positive">${this.state.nip05}</div>` : ''}
+            ${this.state.nip05
+              ? html`<div class="positive">${this.state.nip05.replace(/^_@/, '')}</div>`
+              : ''}
 
             <div class="profile-about hidden-xs">
               <p class="profile-about-content">${this.state.about}</p>
@@ -246,13 +248,9 @@ class Profile extends View {
                 : html`
                     <div class="hidden-xs">
                       <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                      ${this.state.showBetaFeatures
-                        ? html`
-                            <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
-                              >${t('send_message')}<//
-                            >
-                          `
-                        : ''}
+                      <${Button} small=${true} onClick=${() => route(`/chat/${this.props.id}`)}>
+                        ${t('send_message')}
+                      <//>
                     </div>
                   `}
             </div>
@@ -264,14 +262,12 @@ class Profile extends View {
           ${this.state.isMyProfile
             ? ''
             : html`
-                <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                ${this.state.showBetaFeatures
-                  ? html`
-                      <${Button} onClick=${() => route(`/chat/${this.props.id}`)}
-                        >${t('send_message')}<//
-                      >
-                    `
-                  : ''}
+                <div>
+                  <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
+                  <${Button} small=${true} onClick=${() => route(`/chat/${this.props.id}`)}>
+                    ${t('send_message')}
+                  <//>
+                </div>
               `}
         </div>
         ${this.state.about
@@ -360,13 +356,23 @@ class Profile extends View {
     const ogTitle = `${title} | Iris`;
     const description = `Latest posts by ${this.state.name || 'user'}. ${this.state.about || ''}`;
     return html`
+      ${this.state.banner
+        ? html`
+            <div
+              class="profile-banner"
+              style="background-image:linear-gradient(
+    to bottom, transparent, var(--main-color)
+  ), url(${this.state.banner})"
+            ></div>
+          `
+        : ''}
       <div class="content">
         <${Helmet}>
           <title>${title}</title>
           <meta name="description" content=${description} />
           <meta property="og:type" content="profile" />
-          ${this.state.ogImageUrl
-            ? html`<meta property="og:image" content=${this.state.ogImageUrl} />`
+          ${this.state.picture
+            ? html`<meta property="og:image" content=${this.state.picture} />`
             : ''}
           <meta property="og:title" content=${ogTitle} />
           <meta property="og:description" content=${description} />
@@ -406,10 +412,6 @@ class Profile extends View {
           website = website.slice(0, -1);
         }
 
-        if (profile.picture && this.isUserAgentCrawler()) {
-          this.setOgImageUrl(this.state.picture);
-        }
-
         // profile may contain arbitrary fields, so be careful
         this.setState({
           name: profile.name,
@@ -418,6 +420,7 @@ class Profile extends View {
           nip05: profile.nip05valid && profile.nip05,
           lud16,
           website: website,
+          banner: profile.banner && new URL(profile.banner).toString(),
         });
       },
       true,

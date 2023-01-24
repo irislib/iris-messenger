@@ -4,44 +4,17 @@ import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Identicon from '../../components/Identicon';
+import Name from '../../components/Name';
 import Helpers from '../../Helpers';
-import { translate as t } from '../../translations/Translation';
-
-const seenIndicator = html`<span class="seen-indicator"
-  ><svg viewBox="0 0 59 42">
-    <polygon
-      fill="currentColor"
-      points="40.6,12.1 17,35.7 7.4,26.1 4.6,29 17,41.3 43.4,14.9"
-    ></polygon>
-    <polygon
-      class="iris-delivered-checkmark"
-      fill="currentColor"
-      points="55.6,12.1 32,35.7 29.4,33.1 26.6,36 32,41.3 58.4,14.9"
-    ></polygon></svg
-></span>`;
+import Nostr from '../../Nostr';
 
 class ChatListItem extends Component {
   constructor() {
     super();
-    this.state = { latest: {}, unseen: {} };
-  }
-
-  shouldComponentUpdate() {
-    return true;
-  }
-
-  componentDidMount() {
-    const chat = this.props.chat;
-    iris
-      .local()
-      .get('channels')
-      .get(chat.id)
-      .get('unseen')
-      .on(
-        this.sub((unseen) => {
-          this.setState({ unseen });
-        }),
-      );
+    this.state = {
+      latest: {},
+      latestText: '',
+    };
   }
 
   onKeyUp(e) {
@@ -51,30 +24,64 @@ class ChatListItem extends Component {
     }
   }
 
+  getLatestMsg() {
+    if (!this.props.latestMsgId) {
+      return;
+    }
+    const event = Nostr.eventsById.get(this.props.latestMsgId);
+    if (event) {
+      this.setState({ latest: event });
+      Nostr.decryptMessage(this.props.latestMsgId, (latestText) => {
+        this.setState({ latestText });
+      });
+    }
+  }
+
+  componentDidMount() {
+    this.getLatestMsg();
+    const path = 'chats/' + this.props.chat + '/lastOpened';
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    Nostr.public.get({ path, authors: [myPub] }, (entry) => {
+      this.setState({ lastOpened: entry.value });
+    });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.latestMsgId !== this.props.latestMsgId) {
+      this.getLatestMsg();
+    }
+  }
+
+  hasUnseen() {
+    return !this.props.active && !(this.state.latest.created_at <= this.state.lastOpened);
+  }
+
   render() {
     const chat = this.props.chat;
     const active = this.props.active ? 'active-item' : '';
+    /*
     const seen = chat.theirMsgsLastSeenTime >= chat.latestTime ? 'seen' : '';
     const delivered = chat.theirLastActiveTime >= chat.latestTime ? 'delivered' : '';
-    const hasUnseen = this.state.unseen ? 'has-unseen' : '';
-    const unseenEl = this.state.unseen
-      ? html`<span class="unseen">${JSON.stringify(this.state.unseen)}</span>`
-      : '';
-    const activity = ['online', 'active'].indexOf(chat.activity) > -1 ? chat.activity : '';
-    const time = chat.latestTime && new Date(chat.latestTime);
-    let latestTimeText = Helpers.getRelativeTimeText(time);
 
-    let name = chat.name;
-    if (chat.id === (iris.session.getKey() || {}).pub) {
+     */
+    const hasUnseen = this.hasUnseen() ? 'has-unseen' : '';
+    const unseenEl = this.hasUnseen() ? html`<span class="unseen"></span>` : '';
+    const activity = ['online', 'active'].indexOf(chat.activity) > -1 ? chat.activity : '';
+    //const time = chat.latestTime && new Date(chat.latestTime);
+    //let latestTimeText = Helpers.getRelativeTimeText(time);
+
+    /*let name = chat.name;
+    if (chat === (iris.session.getKey().secp256k1.rpub)) {
       name = html`📝 <b>${t('note_to_self')}</b>`;
-    }
+    }*/
 
     let iconEl = chat.picture
       ? html`<div class="identicon-container">
           <img src="${chat.picture}" class="round-borders" height="49" width="49" alt="" />
         </div>`
-      : html`<${Identicon} str=${chat.id} width="49" />`;
+      : html`<${Identicon} str=${chat} width="49" />`;
 
+    /*
     const latestEl =
       chat.isTyping || !chat.latest
         ? ''
@@ -82,11 +89,18 @@ class ChatListItem extends Component {
             ${chat.latest.selfAuthored && seenIndicator} ${chat.latest.text}
           </small>`;
 
+
     const typingIndicator = chat.isTyping
       ? html`<small class="typing-indicator">${t('typing')}</small>`
       : '';
 
     const onlineIndicator = chat.id.length > 36 ? html`<div class="online-indicator"></div>` : '';
+     */
+
+    const time =
+      (this.state.latest.created_at &&
+        Helpers.getRelativeTimeText(new Date(this.state.latest.created_at * 1000))) ||
+      '';
 
     // TODO use button so we can use keyboard to navigate
     return html`
@@ -94,16 +108,17 @@ class ChatListItem extends Component {
         onKeyUp=${(e) => this.onKeyUp(e)}
         role="button"
         tabindex="0"
-        class="chat-item ${activity} ${hasUnseen} ${active} ${seen} ${delivered}"
-        onClick=${() => route(`/chat/${this.props.chat.id}`)}
+        class="chat-item ${activity} ${hasUnseen} ${active}"
+        onClick=${() => route(`/chat/${this.props.chat}`)}
       >
-        ${iconEl} ${onlineIndicator}
+        ${iconEl}
         <div class="text">
           <div>
-            <span class="name">${name}</span>
-            <small class="latest-time">${latestTimeText}</small>
+            <span class="name"><${Name} pub=${this.props.chat} /></span>
+            <small class="latest-time">${time}</small>
           </div>
-          ${typingIndicator} ${latestEl} ${unseenEl}
+          <small class="latest"> ${this.state.latestText} </small>
+          ${unseenEl}
         </div>
       </div>
     `;

@@ -50,7 +50,10 @@ Nostr.init();
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {
-    iris.local().get('loggedIn').on(this.inject());
+    window.onload = () => {
+      // this makes sure that window.nostr is there
+      iris.local().get('loggedIn').on(this.inject());
+    };
     iris.local().get('toggleMenu').put(false);
     iris
       .local()
@@ -153,7 +156,7 @@ class Main extends Component<Props, ReactState> {
           <div className="view-area">
             <Router history={history as CustomHistory} onChange={(e) => this.handleRoute(e)}>
               <Feed path="/" index="follows" />
-              <Feed path="/discover" index="everyone" />
+              <Feed path="/global" index="everyone" />
               <Feed path="/search/:term?/:type?" />
               <Feed path="/media" index="media" thumbnails />
               <Login path="/login" />

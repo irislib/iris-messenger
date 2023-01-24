@@ -195,7 +195,9 @@ class PublicMessage extends Message {
     }
   }
 
-  toggleReplies() {
+  toggleReplies(e) {
+    e.preventDefault();
+    e.stopPropagation();
     const showReplyForm = !this.state.showReplyForm;
     this.setState({ showReplyForm });
   }
@@ -301,6 +303,9 @@ class PublicMessage extends Message {
     if (['A', 'BUTTON', 'TEXTAREA', 'IMG'].find((tag) => event.target.closest(tag))) {
       return;
     }
+    if (window.getSelection().toString()) {
+      return;
+    }
     route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
   }
 
@@ -397,7 +402,7 @@ class PublicMessage extends Message {
             >
               ${name}
             </a>
-            <span> boosted</span>
+            <span> reposted</span>
           </div>
           <${PublicMessage} hash=${likedId} showName=${true} />
         </div>
@@ -414,6 +419,37 @@ class PublicMessage extends Message {
   toggleBoosts(e) {
     e.stopPropagation();
     this.setState({ showBoosts: !this.state.showBoosts, showLikes: false });
+  }
+
+  getBadge() {
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    const hexAddress = Nostr.toNostrHexAddress(this.state.msg.info.from);
+    if (hexAddress === myPub) {
+      return null;
+    }
+    if (!hexAddress) {
+      return null;
+    }
+    const following = Nostr.followedByUser.get(myPub)?.has(hexAddress);
+    if (following) {
+      return html`
+        <span class="badge positive tooltip">
+          ${Icons.checkmark}
+          <span class="tooltiptext right">${t('following')}</span>
+        </span>
+      `;
+    } else {
+      const count = Nostr.followedByFriendsCount(hexAddress);
+      if (count > 0) {
+        const className = count > 10 ? 'neutral' : '';
+        return html`
+          <span class="badge ${className} tooltip">
+            ${Icons.checkmark}
+            <span class="tooltiptext right">${count} ${t('friends_following')}</span>
+          </span>
+        `;
+      }
+    }
   }
 
   render() {
@@ -502,6 +538,7 @@ class PublicMessage extends Message {
     const s = this.state;
 
     const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
+    const ogImageUrl = s.msg.attachments?.find((a) => a.type === 'image')?.data;
 
     return html`
       ${s.msg.replyingTo && !this.props.asReply && !this.props.asQuote
@@ -524,7 +561,7 @@ class PublicMessage extends Message {
           ${s.msg.replyingTo && !this.props.asQuote ? 'quoting' : ''}"
       >
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
-          ${ this.props.asQuote && s.msg.replyingTo
+          ${this.props.asQuote && s.msg.replyingTo
             ? html` <div style="flex-basis:100%; margin-bottom: 15px">
                 <a href="#/post/${s.msg.replyingTo}">Show thread</a>
               </div>`
@@ -537,6 +574,7 @@ class PublicMessage extends Message {
             <div class="msg-sender">
               <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
                 ${name && this.props.showName && html`<div class="msgSenderName">${name}</div>`}
+                ${this.getBadge()}
                 <div class="time">
                   <a
                     href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
@@ -555,9 +593,7 @@ class PublicMessage extends Message {
                     <title>${title}: ${quotedShortText}</title>
                     <meta name="description" content=${quotedShortText} />
                     <meta property="og:type" content="article" />
-                    ${s.ogImageUrl
-                      ? html`<meta property="og:image" content=${s.ogImageUrl} />`
-                      : ''}
+                    ${ogImageUrl ? html`<meta property="og:image" content=${ogImageUrl} />` : ''}
                     <meta property="og:title" content=${title} />
                     <meta property="og:description" content=${quotedShortText} />
                   <//>
@@ -676,6 +712,7 @@ class PublicMessage extends Message {
                     autofocus=${!this.props.standalone}
                     replyingTo=${this.props.hash}
                     replyingToUser=${s.msg.info.from}
+                    placeholder=${t('write_a_reply')}
                   />
                 `
               : ''}

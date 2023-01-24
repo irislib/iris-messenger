@@ -7,16 +7,19 @@ import throttle from 'lodash/throttle';
 import { route } from 'preact-router';
 
 import Name from './components/Name';
+import { isSafeOrigin } from './components/SafeImg';
 import Torrent from './components/Torrent';
-import { translate as t } from './translations/Translation';
 
 const emojiRegex =
   /([\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]+)/gu;
-const pubKeyRegex = /(@npub[a-zA-Z0-9]{59,60})/g;
+const pubKeyRegex = /(?:@)?(npub[a-zA-Z0-9]{59,60})/g;
+const noteRegex = /(?:@)?(note[a-zA-Z0-9]{59,60})/g;
 
 function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {
   if (src) {
-    if (src.indexOf('data:image') !== 0) {
+    // parse src as url safely
+    src = new URL(src).href;
+    if (!isSafeOrigin(src)) {
       src = `https://proxy.irismessengers.wtf/insecure/plain/${src}`;
     }
     el.attr('src', src);
@@ -61,13 +64,26 @@ export default {
       );
     });
     replacedText = reactStringReplace(replacedText, pubKeyRegex, (match, i) => {
-      const link = `/profile/${match.slice(1)}`;
+      const link = `#/profile/${match}`;
       return (
         <a href={link}>
-          @<Name key={match.slice(1) + i} pub={match.slice(1)} />
+          @<Name key={match + i} pub={match} />
         </a>
       );
     });
+
+    replacedText = reactStringReplace(replacedText, noteRegex, (match, i) => {
+      const link = `#/post/${match}`;
+      return (
+        <a key={match + i} href={link}>
+          {match}
+        </a>
+      );
+    });
+
+    /*
+    <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Sunsets don&#39;t get much better than this one over <a href="https://twitter.com/GrandTetonNPS?ref_src=twsrc%5Etfw">@GrandTetonNPS</a>. <a href="https://twitter.com/hashtag/nature?src=hash&amp;ref_src=twsrc%5Etfw">#nature</a> <a href="https://twitter.com/hashtag/sunset?src=hash&amp;ref_src=twsrc%5Etfw">#sunset</a> <a href="http://t.co/YuKy2rcjyU">pic.twitter.com/YuKy2rcjyU</a></p>&mdash; US Department of the Interior (@Interior) <a href="https://twitter.com/Interior/status/463440424141459456?ref_src=twsrc%5Etfw">May 5, 2014</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+     */
 
     const videoRegex =
       /((?:https?:\/\/(?:nostr\.build|imgur\.com)\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm)))/gi;
@@ -77,7 +93,9 @@ export default {
           key={match + i}
           src={match}
           muted={true}
-          autoPlay={true}
+          autoPlay={!iris.util.isMobile}
+          playsInline={true}
+          webkit-playsinline={true}
           controls={true}
           loop={true}
         />
@@ -234,7 +252,15 @@ export default {
     } else if (timeDifference < secondsInADay) {
       return Math.floor(timeDifference / secondsInAnHour) + 'h';
     } else {
-      return date.toLocaleTimeString(undefined, { timeStyle: 'short' });
+      if (date.getFullYear() === currentTime.getFullYear()) {
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      } else {
+        return date.toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        });
+      }
     }
   },
 

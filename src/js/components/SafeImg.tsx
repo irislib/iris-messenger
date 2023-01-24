@@ -8,13 +8,14 @@ type Props = {
 
 // need to have trailing slash, otherwise you could do https://imgur.com.myevilwebsite.com/image.png
 const safeOrigins = [
+  'https://', // disable for now, image proxy doesn't keep up with snowden attention
   'data:image',
   'https://imgur.com/',
   'https://i.imgur.com/',
   'https://nostr.build/',
 ];
 
-const isSafeOrigin = (url: string) => {
+export const isSafeOrigin = (url: string) => {
   return safeOrigins.some((origin) => url.indexOf(origin) === 0);
 };
 

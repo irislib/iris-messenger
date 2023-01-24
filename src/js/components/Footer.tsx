@@ -66,27 +66,22 @@ class Footer extends Component<Props, State> {
           <a href="#/" class={`btn ${activeRoute === '/' ? 'active' : ''}`}>
             {Icons.home}
           </a>
-          {this.state.showBetaFeatures && (
-            <a
-              href="#/chat"
-              className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}
-            >
-              {this.state.unseenMsgsTotal ? (
-                <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
-              ) : (
-                ''
-              )}
-              {Icons.chat}
-            </a>
-          )}
+          <a href="#/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
+            {this.state.unseenMsgsTotal ? (
+              <span className="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
+            ) : (
+              ''
+            )}
+            {Icons.chat}
+          </a>
           <a href="#/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
             {plusIcon}
           </a>
-          <a href="#/discover" class={`btn ${activeRoute === '/discover' ? 'active' : ''}`}>
+          <a href="#/global" class={`btn ${activeRoute === '/global' ? 'active' : ''}`}>
             {Icons.global}
           </a>
           <a
-            href={`/profile/${key}`}
+            href={`#/profile/${key}`}
             class={`${activeRoute === `/profile/${key}` ? 'active' : ''} my-profile`}
           >
             <Identicon str={key} width={34} />

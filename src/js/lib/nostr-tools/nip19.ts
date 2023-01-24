@@ -1,5 +1,9 @@
 import * as secp256k1 from '@noble/secp256k1'
-import {bech32} from 'bech32'
+import {bech32} from '@scure/base'
+
+import {utf8Decoder, utf8Encoder} from './utils'
+
+const Bech32MaxSize = 5000
 
 export type ProfilePointer = {
   pubkey: string // hex
@@ -11,14 +15,11 @@ export type EventPointer = {
   relays?: string[]
 }
 
-let utf8Decoder = new TextDecoder('utf-8')
-let utf8Encoder = new TextEncoder()
-
 export function decode(nip19: string): {
   type: string
   data: ProfilePointer | EventPointer | string
 } {
-  let {prefix, words} = bech32.decode(nip19, 1000)
+  let {prefix, words} = bech32.decode(nip19, Bech32MaxSize)
   let data = new Uint8Array(bech32.fromWords(words))
 
   if (prefix === 'nprofile') {
@@ -88,7 +89,7 @@ export function noteEncode(hex: string): string {
 function encodeBytes(prefix: string, hex: string): string {
   let data = secp256k1.utils.hexToBytes(hex)
   let words = bech32.toWords(data)
-  return bech32.encode(prefix, words, 1000)
+  return bech32.encode(prefix, words, Bech32MaxSize)
 }
 
 export function nprofileEncode(profile: ProfilePointer): string {
@@ -97,7 +98,7 @@ export function nprofileEncode(profile: ProfilePointer): string {
     1: (profile.relays || []).map(url => utf8Encoder.encode(url))
   })
   let words = bech32.toWords(data)
-  return bech32.encode('nprofile', words, 1000)
+  return bech32.encode('nprofile', words, Bech32MaxSize)
 }
 
 export function neventEncode(event: EventPointer): string {
@@ -106,7 +107,7 @@ export function neventEncode(event: EventPointer): string {
     1: (event.relays || []).map(url => utf8Encoder.encode(url))
   })
   let words = bech32.toWords(data)
-  return bech32.encode('nevent', words, 1000)
+  return bech32.encode('nevent', words, Bech32MaxSize)
 }
 
 function encodeTLV(tlv: TLV): Uint8Array {

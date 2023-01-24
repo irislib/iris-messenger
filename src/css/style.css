@@ -1195,6 +1195,13 @@ a.msg {
   align-items: center;
 }
 
+.msg-sender-link .badge {
+  top: -12px;
+  left: -6px;
+  margin-right: -10px;
+  text-shadow: white 0 0 1px;
+}
+
 .public-messages-view .msg-sender .msg-menu-btn {
   text-align: right;
   flex: 1;
@@ -1217,6 +1224,11 @@ a.msg {
   margin-left: 15px;
   margin-bottom: 2px;
   overflow-wrap: anywhere;
+}
+
+.public-messages-view .msg .time {
+  margin-bottom: 2px;
+  margin-left: 8px;
 }
 
 .msg-content .msg-content {
@@ -1375,6 +1387,7 @@ a.msg {
   flex: 1;
   padding: 0;
 }
+
 
 #chat-view #message-list {
   max-width: 100%;
@@ -1649,6 +1662,7 @@ a.msg {
   align-items: center;
   text-align: center;
   overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .attachment-preview.gallery {
@@ -1775,7 +1789,7 @@ hr {
 
 .chat-item {
   padding: 0px 10px 0px 15px;
-  overflow-x: hidden;
+  overflow: hidden;
   cursor: pointer;
   display: flex;
   flex-direction: row;
@@ -1822,7 +1836,6 @@ hr {
 .chat-new-item .text {
   padding-right: 5px;
   padding-top: 16px;
-  border-bottom: 1px solid var(--chat-hover);
   line-height: 20px;
 }
 
@@ -2017,6 +2030,26 @@ small,
   margin-bottom: 30px;
 }
 
+.profile-banner {
+  height: 250px;
+  min-height: 250px;
+  align-self: stretch;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-top: -15px;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+@media (max-width: 625px) {
+  .profile-banner {
+    min-height: 200px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
 button {
   cursor: pointer;
 }
@@ -2026,7 +2059,7 @@ button {
   margin-right: auto;
   margin-left: auto;
   display: block;
-  height: 10em;
+  height: 3em;
 }
 form.public button[type='submit'] {
   height: 47px;

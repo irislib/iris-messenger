@@ -8,8 +8,11 @@ import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 const explainers = {
+  display_name: 'Name',
+  name: 'Username',
   lud16: 'Lightning (lud16)',
   picture: 'Picture url',
+  banner: 'Banner url',
 };
 
 export default class EditProfile extends Component {
@@ -61,7 +64,7 @@ export default class EditProfile extends Component {
   };
 
   render() {
-    const fields = ['name', 'picture', 'about', 'website', 'lud16'];
+    const fields = ['display_name', 'name', 'picture', 'about', 'banner', 'website', 'lud16'];
     // add other possible fields from profile
     Object.keys(this.state.profile).forEach((key) => {
       if (!fields.includes(key)) {

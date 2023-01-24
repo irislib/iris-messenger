@@ -11,6 +11,7 @@ import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import Identicon from './Identicon';
+import Name from './Name';
 import SearchBox from './SearchBox';
 
 class Header extends Component {
@@ -95,14 +96,9 @@ class Header extends Component {
             ) {
               const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
               this.setState({ title });
-            } else if (activeRoute.indexOf('/chat/hashtag/') === 0) {
-              this.setState({
-                title: `#${activeRoute.replace('/chat/hashtag/', '')}`,
-                about: 'Public',
-              });
             } else {
-              iris.local().get('channels').get(this.chatId).get('name').on(this.inject('title'));
-              iris.local().get('channels').get(this.chatId).get('about').on(this.inject());
+              const title = html`<${Name} key=${this.chatId} pub=${this.chatId} />`;
+              this.setState({ title });
             }
           }
         }),
@@ -243,7 +239,7 @@ class Header extends Component {
               `}
         </div>
 
-        ${chat && this.chatId !== npub && !chat.uuid
+        <!--${chat && this.chatId !== npub && !chat.uuid
           ? html`
               <a
                 class="tooltip"
@@ -258,7 +254,7 @@ class Header extends Component {
             Icons.voiceCall
             </a> -->
             `
-          : ''}
+          : ''}-->
         ${this.chatId && this.chatId.length > 10 && this.chatId.length < 40
           ? html`
               <a

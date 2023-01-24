@@ -77,7 +77,6 @@ class About extends Component {
                 )}: bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze`,
               }}
             ></p>
-            <p>Dogecoin: DEsgP4H1Sjp4461PugHDNnoGd6S8pTvrm1</p>
           </div>
         </div>
       </>

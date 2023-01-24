@@ -7,6 +7,12 @@ export default styled.button`
   cursor: pointer;
   transition: all 0.25s ease;
 
+  ${(props) =>
+    props.small &&
+    `
+    padding: 5px 20px;
+  `}
+
   &:hover,
   &:focus,
   &:active {

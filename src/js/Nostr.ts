@@ -6,6 +6,7 @@ import {
   Filter,
   getEventHash,
   nip04,
+  Path,
   Relay,
   relayInit,
   signEvent,
@@ -43,16 +44,25 @@ const saveLocalStorageEvents = debounce((_this: any) => {
   const notifications = _this.notifications.eventIds.map((eventId: any) => {
     return _this.eventsById.get(eventId);
   });
-  console.log('saving some events to local storage');
+  const dms = [];
+  for (const set of _this.directMessagesByUser.values()) {
+    set.eventIds.forEach((eventId: any) => {
+      dms.push(_this.eventsById.get(eventId));
+    });
+  }
   localForage.setItem('latestMsgs', latestMsgs);
   localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
   localForage.setItem('notificationEvents', notifications);
+  localForage.setItem('dms', dms);
   // TODO save own block and flag events
 }, 5000);
 
 const saveLocalStorageProfilesAndFollows = debounce((_this) => {
   const profileEvents = Array.from(_this.profileEventByUser.values());
-  const followEvents = Array.from(_this.followEventByUser.values());
+  const myPub = iris.session.getKey().secp256k1.rpub;
+  const followEvents = Array.from(_this.followEventByUser.values()).filter((e: Event) => {
+    return e.pubkey === myPub || _this.followedByUser.get(myPub)?.has(e.pubkey);
+  });
   console.log('saving', profileEvents.length + followEvents.length, 'events to local storage');
   localForage.setItem('profileEvents', profileEvents);
   localForage.setItem('followEvents', followEvents);
@@ -78,7 +88,7 @@ const DEFAULT_RELAYS = [
 ];
 
 const defaultRelays = new Map<string, Relay>(
-  DEFAULT_RELAYS.map((url) => [url, relayInit(url, eventsById)]),
+  DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
 );
 
 type Subscription = {
@@ -99,6 +109,7 @@ export default {
   blockedUsers: new Set<string>(),
   flaggedUsers: new Set<string>(),
   deletedEvents: new Set<string>(),
+  directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
   subscribedFiltersByName: new Map<string, Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
@@ -115,6 +126,7 @@ export default {
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
+  keyValueEvents: new Map<string, Event>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
@@ -122,6 +134,9 @@ export default {
   handledMsgsPerSecond: 0,
   notificationsSeenTime: 0,
   unseenNotificationCount: 0,
+  decryptedMessages: new Map<string, string>(),
+  windowNostrQueue: [],
+  isProcessingQueue: false,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -129,6 +144,31 @@ export default {
     }).join('');
   },
 
+  async decryptMessage(id, cb: (decrypted: string) => void) {
+    const existing = this.decryptedMessages.get(id);
+    if (existing) {
+      cb(existing);
+      return;
+    }
+    try {
+      const myPub = iris.session.getKey().secp256k1.rpub;
+      const msg = this.eventsById.get(id);
+      const theirPub =
+        msg.pubkey === myPub ? msg.tags.find((tag: any) => tag[0] === 'p')[1] : msg.pubkey;
+      if (!(msg && theirPub)) {
+        return;
+      }
+
+      let decrypted = await this.decrypt(msg.content, theirPub);
+      if (decrypted.content) {
+        decrypted = decrypted.content; // what? TODO debug
+      }
+      this.decryptedMessages.set(id, decrypted);
+      cb(decrypted);
+    } catch (e) {
+      console.error(e);
+    }
+  },
   setFollowed: function (followedUser: string, follow = true) {
     followedUser = this.toNostrHexAddress(followedUser);
     const myPub = iris.session.getKey().secp256k1.rpub;
@@ -159,6 +199,7 @@ export default {
     if (block) {
       this.blockedUsers.add(blockedUser);
       this.removeFollower(blockedUser, myPub);
+      this.directMessagesByUser.delete(blockedUser);
     } else {
       this.blockedUsers.delete(blockedUser);
     }
@@ -170,12 +211,8 @@ export default {
     const followEvents = await localForage.getItem('followEvents');
     const profileEvents = await localForage.getItem('profileEvents');
     const notificationEvents = await localForage.getItem('notificationEvents');
+    const dms = await localForage.getItem('dms');
     this.localStorageLoaded = true;
-    console.log('loaded from local storage');
-    console.log('latestMsgs', latestMsgs);
-    console.log('followEvents', followEvents);
-    console.log('profileEvents', profileEvents);
-    console.log('notificationEvents', notificationEvents);
     if (Array.isArray(followEvents)) {
       followEvents.forEach((e) => this.handleEvent(e));
     }
@@ -183,27 +220,29 @@ export default {
       profileEvents.forEach((e) => this.handleEvent(e));
     }
     if (Array.isArray(latestMsgs)) {
-      console.log('loaded latestmsgs');
       latestMsgs.forEach((msg) => {
         this.handleEvent(msg);
       });
     }
     if (Array.isArray(latestMsgsByEveryone)) {
-      console.log('loaded latestMsgsByEveryone');
       latestMsgsByEveryone.forEach((msg) => {
         this.handleEvent(msg);
       });
     }
     if (Array.isArray(notificationEvents)) {
-      console.log('loaded notificationEvents');
       notificationEvents.forEach((msg) => {
+        this.handleEvent(msg);
+      });
+    }
+    if (Array.isArray(dms)) {
+      dms.forEach((msg) => {
         this.handleEvent(msg);
       });
     }
   },
   addRelay(url: string) {
     if (this.relays.has(url)) return;
-    const relay = relayInit(url, this.eventsById);
+    const relay = relayInit(url, (id) => this.eventsById.has(id));
     relay.on('connect', () => {
       for (const [name, filters] of this.subscribedFiltersByName.entries()) {
         const sub = relay.sub(filters, {});
@@ -348,15 +387,7 @@ export default {
       event.pubkey = iris.session.getKey().secp256k1.rpub;
       event.id = getEventHash(event);
 
-      const myPriv = iris.session.getKey().secp256k1.priv;
-      if (myPriv) {
-        event.sig = await signEvent(event, myPriv);
-      } else if (window.nostr) {
-        event = await window.nostr.signEvent(event);
-      } else {
-        alert('no nostr extension to sign the event with');
-        return;
-      }
+      event.sig = await this.sign(event);
     }
     if (!(event.id && event.sig)) {
       console.error('Invalid event', event);
@@ -365,8 +396,19 @@ export default {
     for (const relay of this.relays.values()) {
       relay.publish(event);
     }
+    console.log('published', event);
     this.handleEvent(event);
     return event.id;
+  },
+  followedByFriendsCount: function (address: string) {
+    let count = 0;
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    for (const follower of this.followersByUser.get(address) ?? []) {
+      if (this.followedByUser.get(myPub)?.has(follower)) {
+        count++; // should we stop at 10?
+      }
+    }
+    return count;
   },
   sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
     // if subs with same id already exists, remove them
@@ -402,7 +444,7 @@ export default {
         this.subscriptionsByName.set(id, new Set());
       }
       this.subscriptionsByName.get(id)?.add(sub);
-      console.log('subscriptions size', this.subscriptionsByName.size);
+      //console.log('subscriptions size', this.subscriptionsByName.size);
       if (unsubscribeTimeout) {
         setTimeout(() => {
           sub.unsub();
@@ -428,7 +470,12 @@ export default {
     const otherSubscribedUsers = Array.from(_this.subscribedUsers).filter(
       (u) => !followedUsers.includes(u),
     );
-    console.log('subscribe to', followedUsers, otherSubscribedUsers);
+    console.log(
+      'subscribe to followedUsers.length',
+      followedUsers.length,
+      'otherSubscribedUsers.length',
+      otherSubscribedUsers.length,
+    );
     _this.sendSubToRelays(
       [{ kinds: [0, 3], until: now, authors: followedUsers }],
       'followed',
@@ -468,6 +515,90 @@ export default {
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
   }, 100),
+  encrypt: async function (data: string, pub?: string) {
+    const k = iris.session.getKey().secp256k1;
+    pub = pub || k.rpub;
+    if (k.priv) {
+      return nip04.encrypt(k.priv, pub, data);
+    } else if (window.nostr) {
+      return new Promise((resolve) => {
+        this.processWindowNostr({ op: 'encrypt', data, pub, callback: resolve });
+      });
+    } else {
+      return Promise.reject('no private key');
+    }
+  },
+  decrypt: async function (data, pub?: string) {
+    const k = iris.session.getKey().secp256k1;
+    pub = pub || k.rpub;
+    if (k.priv) {
+      return nip04.decrypt(k.priv, pub, data);
+    } else if (window.nostr) {
+      return new Promise((resolve) => {
+        this.processWindowNostr({ op: 'decrypt', data, pub, callback: resolve });
+      });
+    } else {
+      return Promise.reject('no private key');
+    }
+  },
+  sign: async function (event: Event) {
+    const priv = iris.session.getKey().secp256k1.priv;
+    if (priv) {
+      return signEvent(event, priv);
+    } else if (window.nostr) {
+      return new Promise((resolve) => {
+        this.processWindowNostr({ op: 'sign', data: event, callback: resolve });
+      });
+    } else {
+      return Promise.reject('no private key');
+    }
+  },
+  processWindowNostr(item: any) {
+    this.windowNostrQueue.push(item);
+    if (!this.isProcessingQueue) {
+      this.processWindowNostrQueue();
+    }
+  },
+  async processWindowNostrQueue() {
+    if (!this.windowNostrQueue.length) {
+      this.isProcessingQueue = false;
+      return;
+    }
+    this.isProcessingQueue = true;
+    const { op, data, pub, callback } = this.windowNostrQueue[0];
+
+    let fn = Promise.resolve();
+    if (op === 'decrypt') {
+      fn = this.handlePromise(window.nostr.nip04.decrypt(pub, data), callback);
+    } else if (op === 'encrypt') {
+      fn = this.handlePromise(window.nostr.nip04.encrypt(pub, data), callback);
+    } else if (op === 'sign') {
+      fn = this.handlePromise(window.nostr.signEvent(data), (signed) => callback(signed.sig));
+    }
+    await fn;
+    this.windowNostrQueue.shift();
+    this.processWindowNostrQueue();
+  },
+  handlePromise(promise, callback) {
+    return promise
+      .then((result) => {
+        callback(result);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  },
+  unsubscribe: function (id: string) {
+    const subs = this.subscriptionsByName.get(id);
+    if (subs) {
+      subs.forEach((sub) => {
+        console.log('unsub', id);
+        sub.unsub();
+      });
+    }
+    this.subscriptionsByName.delete(id);
+    this.subscribedFiltersByName.delete(id);
+  },
   subscribe: function (filters: Filter[], cb?: (event: Event) => void) {
     cb &&
       this.subscriptions.set(subscriptionId++, {
@@ -529,7 +660,11 @@ export default {
   },
   SUGGESTED_FOLLOW: 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk',
   connectRelay: function (relay: Relay) {
-    relay.connect();
+    try {
+      relay.connect();
+    } catch (e) {
+      console.log(e);
+    }
   },
   manageRelays: function () {
     // TODO keep track of subscriptions and send them to new relays
@@ -659,21 +794,33 @@ export default {
     }
   },
   handleFollow(event: Event) {
-    for (const tag of event.tags) {
-      if (Array.isArray(tag) && tag[0] === 'p') {
-        this.addFollower(tag[1], event.pubkey);
+    const existing = this.followEventByUser.get(event.pubkey);
+    if (existing && existing.created_at >= event.created_at) {
+      return;
+    }
+    this.followEventByUser.set(event.pubkey, event);
+    const myPub = iris.session.getKey().secp256k1.rpub;
+
+    if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+      this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
+    }
+
+    if (event.tags) {
+      for (const tag of event.tags) {
+        if (Array.isArray(tag) && tag[0] === 'p') {
+          this.addFollower(tag[1], event.pubkey);
+        }
       }
     }
-    const myPub = iris.session.getKey().secp256k1.rpub;
+    if (this.followedByUser.has(event.pubkey)) {
+      for (const previouslyFollowed of this.followedByUser.get(event.pubkey)) {
+        if (!event.tags || !event.tags.find((t) => t[0] === 'p' && t[1] === previouslyFollowed)) {
+          this.removeFollower(previouslyFollowed, event.pubkey);
+        }
+      }
+    }
     if (event.pubkey === myPub && event.tags.length) {
       iris.local().get('noFollows').put(false);
-    }
-    if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-      const existing = this.followEventByUser.get(event.pubkey);
-      if (!existing || existing.created_at < event.created_at) {
-        this.followEventByUser.set(event.pubkey, event);
-        this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
-      }
     }
     if (event.pubkey === myPub && event.content?.length) {
       try {
@@ -726,13 +873,7 @@ export default {
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey === myPub) {
       try {
-        const myPriv = iris.session.getKey().secp256k1.priv;
-        let content;
-        if (myPriv) {
-          content = await nip04.decrypt(myPriv, myPub, event.content);
-        } else {
-          content = await window.nostr.nip04.decrypt(myPub, event.content);
-        }
+        const content = await this.decrypt(event.content);
         const blockList = JSON.parse(content);
         this.blockedUsers = new Set(blockList);
       } catch (e) {
@@ -818,6 +959,36 @@ export default {
       }
     }
   },
+  handleDirectMessage(event: Event) {
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    let user = event.pubkey;
+    if (event.pubkey === myPub) {
+      user = event.tags.find((tag) => tag[0] === 'p')?.[1] || user;
+    } else {
+      const forMe = event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub);
+      if (!forMe) {
+        return;
+      }
+    }
+    this.eventsById.set(event.id, event);
+    if (!this.directMessagesByUser.has(user)) {
+      this.directMessagesByUser.set(user, new SortedLimitedEventSet(500));
+    }
+    this.directMessagesByUser.get(user)?.add(event);
+  },
+  handleKeyValue(event: Event) {
+    if (event.pubkey !== iris.session.getKey().secp256k1.rpub) {
+      return;
+    }
+    const key = event.tags.find((tag) => tag[0] === 'd')?.[1];
+    if (key) {
+      const existing = this.keyValueEvents.get(key);
+      if (existing?.created_at >= event.created_at) {
+        return;
+      }
+      this.keyValueEvents.set(key, event);
+    }
+  },
   handleEvent(event: Event) {
     if (!event) return;
     if (this.eventsById.has(event.id)) {
@@ -846,11 +1017,13 @@ export default {
         this.maybeAddNotification(event);
         this.handleNote(event);
         break;
+      case 4:
+        this.handleDirectMessage(event);
+        break;
       case 5:
         this.handleDelete(event);
         break;
       case 3:
-        // TODO if existing follow list doesn't include us and the new one does, add to notifications
         this.maybeAddNotification(event);
         this.handleFollow(event);
         break;
@@ -867,6 +1040,9 @@ export default {
         break;
       case 16463:
         this.handleFlagList(event);
+        break;
+      case 30000:
+        this.handleKeyValue(event);
         break;
     }
     this.subscribedPosts.delete(event.id);
@@ -908,18 +1084,25 @@ export default {
     if (filter.authors && !filter.authors.includes(event.pubkey)) {
       return false;
     }
-    if (
-      filter['#e'] &&
-      !event.tags.some((tag: any) => tag[0] === 'e' && filter['#e'].includes(tag[1]))
-    ) {
-      return false;
+    const filterKeys = ['e', 'p', 'd'];
+    for (const key of filterKeys) {
+      if (
+        filter[`#${key}`] &&
+        !event.tags.some((tag) => tag[0] === key && filter[`#${key}`].includes(tag[1]))
+      ) {
+        return false;
+      }
     }
-    if (
-      filter['#p'] &&
-      !event.tags.some((tag: any) => tag[0] === 'p' && filter['#p'].includes(tag[1]))
-    ) {
-      return false;
+    if (filter['#d']) {
+      const tag = event.tags.find((tag) => tag[0] === 'd');
+      if (tag) {
+        const existing = this.keyValueEvents.get(tag[1]);
+        if (existing?.created_at > event.created_at) {
+          return false;
+        }
+      }
     }
+
     return true;
   },
   async logOut() {
@@ -927,13 +1110,6 @@ export default {
     iris.session.logOut();
   },
   init: function () {
-    iris
-      .local()
-      .get('notificationsSeenTime')
-      .on((time) => {
-        this.notificationsSeenTime = time;
-        localForage.setItem('notificationsSeenTime', time);
-      });
     iris
       .local()
       .get('maxRelays')
@@ -965,6 +1141,31 @@ export default {
       .get('loggedIn')
       .on(() => {
         const key = iris.session.getKey();
+        const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
+          const filter = filters[0];
+          const key = filter['#d']?.[0];
+          if (key) {
+            const event = this.keyValueEvents.get(key);
+            if (event) {
+              callback(event);
+            }
+          }
+          this.subscribe(filters, callback);
+          return '0';
+        };
+        this.private = new Path(
+          (...args) => this.publish(...args),
+          subscribe,
+          (...args) => this.unsubscribe(...args),
+          (...args) => this.encrypt(...args),
+          (...args) => this.decrypt(...args),
+        );
+        this.public = new Path(
+          (...args) => this.publish(...args),
+          subscribe,
+          (...args) => this.unsubscribe(...args),
+        );
+        this.public.get('notifications/lastOpened', (time) => (this.notificationsSeenTime = time));
         this.knownUsers.add(key);
         this.manageRelays();
         this.loadLocalStorageEvents();
@@ -975,19 +1176,12 @@ export default {
         this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
         setTimeout(() => {
           this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
-          this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications
+          this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
         }, 200);
         setInterval(() => {
-          console.log('handled msgs per second', this.handledMsgsPerSecond);
+          console.log('handled msgs per second', Math.round(this.handledMsgsPerSecond / 5));
           this.handledMsgsPerSecond = 0;
-        }, 1000);
-        iris
-          .public()
-          .get('block')
-          .map((isBlocked, address) => {
-            const hex = this.toNostrHexAddress(address);
-            hex && this.setBlocked(hex, isBlocked);
-          });
+        }, 5000);
       });
   },
   getRepliesAndLikes(
@@ -1016,13 +1210,7 @@ export default {
   block: async function (address: string, isBlocked: boolean) {
     isBlocked ? this.blockedUsers.add(address) : this.blockedUsers.delete(address);
     let content = JSON.stringify(Array.from(this.blockedUsers));
-    const myPub = iris.session.getKey().secp256k1.rpub;
-    const myPriv = iris.session.getKey().secp256k1.priv;
-    if (myPriv) {
-      content = await nip04.encrypt(myPriv, myPub, content);
-    } else {
-      content = await window.nostr.nip04.encrypt(myPub, content);
-    }
+    content = await this.encrypt(content);
     this.publish({
       kind: 16462,
       content,
@@ -1156,6 +1344,24 @@ export default {
 
     this.subscribedProfiles.add(address);
     this.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
+  },
+
+  getDirectMessages(cb?: (dms: Map<string, SortedLimitedEventSet>) => void) {
+    const callback = () => {
+      cb?.(this.directMessagesByUser);
+    };
+    callback();
+    this.subscribe([{ kinds: [4] }], callback);
+  },
+
+  getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void) {
+    this.knownUsers.add(address);
+    const callback = () => {
+      cb?.(this.directMessagesByUser.get(address)?.eventIds);
+    };
+    this.directMessagesByUser.has(address) && callback();
+    const myPub = iris.session.getKey()?.secp256k1.rpub;
+    this.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
   },
 
   async verifyNip05Address(address: string, pubkey: string): Promise<boolean> {
