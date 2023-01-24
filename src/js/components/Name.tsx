@@ -36,7 +36,7 @@ export default class Name extends Component<Props, State> {
           Helpers.generateName(
             Nostr.toNostrBech32Address(this.props.pub, 'npub') || this.props.pub,
           )}
-        {!this.props.hideBadge && <Badge pub={this.props.pub} />}
+        {this.props.hideBadge ? '' : <Badge pub={this.props.pub} />}
       </>
     );
   }
