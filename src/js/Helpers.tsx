@@ -93,7 +93,9 @@ export default {
           key={match + i}
           src={match}
           muted={true}
-          autoPlay={true}
+          autoPlay={!iris.util.isMobile}
+          playsInline={true}
+          webkit-playsinline={true}
           controls={true}
           loop={true}
         />
