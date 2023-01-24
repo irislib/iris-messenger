@@ -219,11 +219,12 @@ class PublicMessage extends Message {
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Nostr.publish({
-          kind: 6,
+          kind: 1,
           tags: [
             ['e', nostrId],
             ['p', author],
           ],
+          content: '#[0]',
         });
       }
     }
