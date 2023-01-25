@@ -192,9 +192,10 @@ class SearchBox extends Component<Props, State> {
 
     if (query) {
       const results = iris.session.getSearchIndex().search(query).slice(0, RESULTS_MAX);
+      results.unshift({key: query});
       this.setState({ results, query });
     } else {
-      this.setState({ results: [], query });
+      this.setState({ results: [{key: query}], query });
     }
   }
 
@@ -236,7 +237,27 @@ class SearchBox extends Component<Props, State> {
           class="search-box-results"
           style="left: ${this.state.offsetLeft || ''}"
         >
+          {this.state.query ? (
+            <a
+              onFocus={(e) => this.onResultFocus(e, 0)}
+              tabIndex={2}
+              className={'result ' + (0 === this.state.selected ? 'selected' : '')}
+              href={`/search/${encodeURIComponent(this.state.query)}`}
+	    >
+              <div class="identicon-container">
+                <div style='font-size: 1.5em; width: 40px'>&#128269;</div>
+              </div>
+              <div>
+                <span>{this.state.query}</span>
+                <br />
+                <small>Search posts</small>
+              </div>
+            </a>
+          ) : (
+            ''
+          )}
           {this.state.results.map((r, index) => {
+            if (!index) return ''; // skip fake first item
             const i = r.item;
             let followText = '';
             if (i.followers) {
