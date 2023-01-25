@@ -1,5 +1,6 @@
 import iris from 'iris-lib';
 import { debounce } from 'lodash';
+import { NostrToolsEventWithId } from 'nostr-relaypool/event';
 
 import {
   Event,
@@ -141,7 +142,7 @@ export default {
     externalGetEventById: (id: string) => {
       const existing = eventsById.get(id);
       if (existing) {
-        return existing;
+        return existing as NostrToolsEventWithId;
       }
     },
   }),
