@@ -336,7 +336,7 @@ class PublicMessage extends Message {
       <div class="msg">
         <div class="msg-content" style="padding: 0;">
           <div
-            style="display: flex; align-items: center; padding: 15px; white-space: nowrap;text-overflow: ellipsis; o"
+            style="display: flex; align-items: center; padding: 15px; white-space: nowrap;text-overflow: ellipsis; overflow:hidden"
           >
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
             <a
