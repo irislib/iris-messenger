@@ -474,9 +474,7 @@ class PublicMessage extends Message {
       case 3:
         return this.renderFollow();
       case 6:
-        return this.renderBoost(
-          this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1],
-        );
+        return this.renderBoost(this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1]);
       case 7:
         return this.renderLike();
       case 1: {
