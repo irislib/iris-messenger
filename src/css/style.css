@@ -78,6 +78,7 @@
   box-sizing: border-box;
   font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
   -webkit-tap-highlight-color: transparent;
+  overflow-wrap: anywhere;
 }
 
 html {
@@ -479,7 +480,6 @@ a.logo img:not(:last-child) {
   text-align: left;
   display: flex;
   align-items: center;
-  overflow-wrap: break-word;
   white-space: pre-wrap;
 }
 
@@ -728,7 +728,6 @@ header.footer .header-content {
 
 .flex-table .flex-cell {
   padding: 10px;
-  overflow-wrap: break-word;
   flex: 1 1 auto;
   min-width: 0;
   word-break: break-all;
@@ -754,6 +753,7 @@ header.footer .header-content {
   flex: 1;
   padding: 10px 15px;
   overflow-y: auto;
+  overflow-x: hidden;
   height: 100%;
   background-color: var(--main-color);
   min-width: 0;
@@ -767,7 +767,6 @@ header.footer .header-content {
   display: flex;
   flex-direction: column;
   margin-bottom: 4px;
-  overflow-wrap: break-word;
   white-space: pre-wrap;
 }
 
@@ -1644,7 +1643,6 @@ a.msg {
   align-items: center;
   text-align: center;
   overflow: hidden;
-  overflow-wrap: anywhere;
 }
 
 .attachment-preview.gallery {
@@ -2399,7 +2397,6 @@ input[type='text'] {
 .explorer-row {
   border-radius: 3px;
   padding: 3px;
-  overflow-wrap: anywhere;
 }
 
 .explorer-row:nth-child(odd) {
