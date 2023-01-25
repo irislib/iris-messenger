@@ -72,6 +72,8 @@ const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
 
 const eventsById = new Map<string, Event>();
+const relayForEvent = new Map<string, string>();
+const relayForProfile = new Map<string, string>();
 
 const DEFAULT_RELAYS = [
   'wss://jiggytom.ddns.net',
@@ -382,6 +384,23 @@ export default {
   publish: async function (event: any) {
     if (!event.sig) {
       event.tags = event.tags || [];
+
+      // fill in relay hints in tags if they don't exist
+      event.tags.forEach((tag: string[]) => {
+        if (tag[1] && (!tag[2] || tag[2] === '')) {
+          switch (tag[0]) {
+            case 'e': {
+              tag[2] = relayForEvent.get(tag[1]) || '';
+              break;
+            }
+            case 'p': {
+              tag[2] = relayForProfile.get(tag[1]) || '';
+              break;
+            }
+          }
+        }
+      });
+
       event.content = event.content || '';
       event.created_at = event.created_at || Math.floor(Date.now() / 1000);
       event.pubkey = iris.session.getKey().secp256k1.rpub;
@@ -394,7 +413,10 @@ export default {
       throw new Error('Invalid event');
     }
     for (const relay of this.relays.values()) {
-      relay.publish(event);
+      const url = relay.url;
+      relay.publish(event).on('ok', () => {
+        relayForEvent.set(event.id, url);
+      });
     }
     console.log('published', event);
     this.handleEvent(event);
@@ -436,7 +458,7 @@ export default {
     for (const relay of this.relays.values()) {
       const sub = relay.sub(filters, {});
       // TODO update relay lastSeen
-      sub.on('event', (event) => this.handleEvent(event));
+      sub.on('event', (event) => this.handleEvent(event, relay.url));
       if (once) {
         sub.on('eose', () => sub.unsub());
       }
@@ -989,7 +1011,7 @@ export default {
       this.keyValueEvents.set(key, event);
     }
   },
-  handleEvent(event: Event) {
+  handleEvent(event: Event, relay?: string) {
     if (!event) return;
     if (this.eventsById.has(event.id)) {
       return;
@@ -1063,6 +1085,12 @@ export default {
       if (this.matchesOneFilter(event, sub.filters)) {
         sub.callback && sub.callback(event);
       }
+    }
+
+    // store relay for event
+    if (relay && event.id) {
+      if (event.kind === 1) relayForEvent.set(event.id, relay);
+      if (event.kind === 0) relayForProfile.set(event.pubkey, relay);
     }
   },
   // if one of the filters matches, return true
@@ -1272,16 +1300,6 @@ export default {
     };
     callback();
     this.subscribe([{ '#p': [iris.session.getKey().secp256k1.rpub] }], callback);
-  },
-
-  getSomeRelayUrl() {
-    // try to find a connected relay, but if none are connected, just return the first one
-    const relays: Relay[] = Array.from(this.relays.values());
-    const connectedRelays: Relay[] = relays.filter((relay: Relay) => getRelayStatus(relay) === 1);
-    if (connectedRelays.length) {
-      return connectedRelays[0].url;
-    }
-    return relays.length ? relays[0].url : null;
   },
 
   getMessagesByEveryone(cb: (messageIds: string[]) => void) {

@@ -14,7 +14,7 @@ export default class MessageForm extends Component {
       const id = Nostr.toNostrHexAddress(msg.replyingTo);
       const replyingTo = await Nostr.getMessageById(id);
       event.tags = [
-        ['e', id, Nostr.getSomeRelayUrl(), 'reply'],
+        ['e', id, '', 'reply'],
         ['p', replyingTo.pubkey],
       ];
       for (const tag of replyingTo.tags) {
