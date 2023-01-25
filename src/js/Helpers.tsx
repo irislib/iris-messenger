@@ -7,6 +7,7 @@ import throttle from 'lodash/throttle';
 import { route } from 'preact-router';
 
 import Name from './components/Name';
+import { isSafeOrigin } from './components/SafeImg';
 import Torrent from './components/Torrent';
 
 const emojiRegex =
@@ -16,7 +17,9 @@ const noteRegex = /(?:@)?(note[a-zA-Z0-9]{59,60})/g;
 
 function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {
   if (src) {
-    if (src.indexOf('data:image') !== 0) {
+    // parse src as url safely
+    src = new URL(src).href;
+    if (!isSafeOrigin(src)) {
       src = `https://proxy.irismessengers.wtf/insecure/plain/${src}`;
     }
     el.attr('src', src);
@@ -64,7 +67,7 @@ export default {
       const link = `#/profile/${match}`;
       return (
         <a href={link}>
-          @<Name key={match + i} pub={match} />
+          @<Name key={match + i} pub={match} hideBadge={true} />
         </a>
       );
     });
@@ -90,7 +93,9 @@ export default {
           key={match + i}
           src={match}
           muted={true}
-          autoPlay={true}
+          autoPlay={!iris.util.isMobile}
+          playsInline={true}
+          webkit-playsinline={true}
           controls={true}
           loop={true}
         />
@@ -146,7 +151,7 @@ export default {
             const link = `/profile/${tag[1]}`;
             return (
               <a href={link}>
-                @<Name key={match + i} pub={tag[1]} />
+                @<Name key={match + i} pub={tag[1]} hideBadge={true} />
               </a>
             );
           } else if (tag[0] === 'e') {

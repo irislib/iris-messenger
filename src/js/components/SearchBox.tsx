@@ -8,6 +8,7 @@ import Helpers from '../Helpers';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
+import Badge from './Badge';
 import Identicon from './Identicon';
 import Name from './Name';
 
@@ -263,7 +264,7 @@ class SearchBox extends Component<Props, State> {
                   <Identicon key={`${i.key}ic`} str={i.key} width={40} />
                 )}
                 <div>
-                  {i.name || ''}
+                  {i.name || ''} <Badge pub={i.key} />
                   <br />
                   <small>{followText}</small>
                 </div>

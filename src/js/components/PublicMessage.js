@@ -9,6 +9,7 @@ import Icons from '../Icons';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
+import Badge from './Badge';
 import CopyButton from './CopyButton';
 import Dropdown from './Dropdown';
 import FeedMessageForm from './FeedMessageForm';
@@ -195,7 +196,9 @@ class PublicMessage extends Message {
     }
   }
 
-  toggleReplies() {
+  toggleReplies(e) {
+    e.preventDefault();
+    e.stopPropagation();
     const showReplyForm = !this.state.showReplyForm;
     this.setState({ showReplyForm });
   }
@@ -299,6 +302,9 @@ class PublicMessage extends Message {
       return;
     }
     if (['A', 'BUTTON', 'TEXTAREA', 'IMG'].find((tag) => event.target.closest(tag))) {
+      return;
+    }
+    if (window.getSelection().toString()) {
       return;
     }
     route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
@@ -546,7 +552,14 @@ class PublicMessage extends Message {
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
-              ${name && this.props.showName && html`<div class="msgSenderName">${name}</div>`}
+              ${name &&
+              this.props.showName &&
+              html`
+                <div class="msgSenderName">
+                  ${name}
+                  <${Badge} pub=${s.msg.info.from} />
+                </div>
+              `}
               <div class="time">
                 <a
                   href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
@@ -611,7 +624,7 @@ class PublicMessage extends Message {
             ${this.props.asQuote
               ? ''
               : html`
-                  <a class="msg-btn reply-btn" onClick=${() => this.toggleReplies()}>
+                  <a class="msg-btn reply-btn" onClick=${(e) => this.toggleReplies(e)}>
                     ${replyIcon}
                   </a>
                   <span
@@ -682,6 +695,7 @@ class PublicMessage extends Message {
                   autofocus=${!this.props.standalone}
                   replyingTo=${this.props.hash}
                   replyingToUser=${s.msg.info.from}
+                  placeholder=${t('write_a_reply')}
                 />
               `
             : ''}

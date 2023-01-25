@@ -47,7 +47,7 @@ class FeedMessageForm extends MessageForm {
     }
     const textEl = $(this.newMsgRef.current);
     const text = textEl.val();
-    if (!text.length && !this.state.attachments) {
+    if (!text.length) {
       return;
     }
     const msg = { text };
@@ -104,14 +104,48 @@ class FeedMessageForm extends MessageForm {
   }
 
   attachmentsChanged(event) {
-    let files = event.target.files;
+    let files = event.target.files || event.dataTransfer.files;
     if (files) {
       for (let i = 0; i < files.length; i++) {
+        let formData = new FormData();
+        formData.append('fileToUpload', files[i]);
+
+        const a = this.state.attachments || [];
+        a[i] = a[i] || {};
+
         Helpers.getBase64(files[i]).then((base64) => {
-          const a = this.state.attachments || [];
-          a.push({ type: 'image', data: base64 });
+          a[i].type = 'image';
+          a[i].data = base64;
           this.setState({ attachments: a });
         });
+
+        fetch('https://nostr.build/upload.php', {
+          method: 'POST',
+          body: formData,
+        })
+          .then(async (response) => {
+            const text = await response.text();
+            const url = text.match(
+              /https:\/\/nostr\.build\/i\/nostr\.build_[a-z0-9]{64}\.[a-zA-Z]+/i,
+            );
+            console.log('url', url);
+            if (url) {
+              a[i].url = url[0];
+              this.setState({ attachments: a });
+              const textEl = $(this.newMsgRef.current);
+              const currentVal = textEl.val();
+              if (currentVal) {
+                textEl.val(currentVal + '\n\n' + url[0]);
+              } else {
+                textEl.val(url[0]);
+              }
+            }
+          })
+          .catch((error) => {
+            console.error('upload error', error);
+            a[i].error = 'upload failed';
+            this.setState({ attachments: a });
+          });
       }
       $(event.target).val(null);
       $(this.newMsgRef.current).focus();
@@ -160,6 +194,15 @@ class FeedMessageForm extends MessageForm {
           `
         : ''}
       <textarea
+        onDragOver=${(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onDrop=${(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.attachmentsChanged(e);
+        }}
         onKeyUp=${(e) => this.onKeyUp(e)}
         onPaste=${(e) => this.onMsgTextPaste(e)}
         onInput=${(e) => this.onMsgTextInput(e)}
@@ -182,7 +225,6 @@ class FeedMessageForm extends MessageForm {
           `
         : ''}
       <div>
-        <!--
         <button type="button" class="attach-file-btn" onClick=${(e) => this.attachFileClicked(e)}>
           <svg width="24" height="24" viewBox="0 0 24 24">
             <path
@@ -190,7 +232,7 @@ class FeedMessageForm extends MessageForm {
               d="M21.586 10.461l-10.05 10.075c-1.95 1.949-5.122 1.949-7.071 0s-1.95-5.122 0-7.072l10.628-10.585c1.17-1.17 3.073-1.17 4.243 0 1.169 1.17 1.17 3.072 0 4.242l-8.507 8.464c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414l7.093-7.05-1.415-1.414-7.093 7.049c-1.172 1.172-1.171 3.073 0 4.244s3.071 1.171 4.242 0l8.507-8.464c.977-.977 1.464-2.256 1.464-3.536 0-2.769-2.246-4.999-5-4.999-1.28 0-2.559.488-3.536 1.465l-10.627 10.583c-1.366 1.368-2.05 3.159-2.05 4.951 0 3.863 3.13 7 7 7 1.792 0 3.583-.684 4.95-2.05l10.05-10.075-1.414-1.414z"
             />
           </svg>
-        </button> -->
+        </button>
         <button
           class="emoji-picker-btn hidden-xs"
           type="button"
@@ -251,7 +293,11 @@ class FeedMessageForm extends MessageForm {
             `
           : ''}
         ${this.state.attachments &&
-        this.state.attachments.map((a) => html` <${SafeImg} src=${a.data} /> `)}
+        this.state.attachments.map(
+          (a) =>
+            html` ${a.error ? html`<span class="error">${a.error}</span>` : a.url || 'uploading...'}
+              <${SafeImg} src=${a.data} />`,
+        )}
       </div>
     </form>`;
   }

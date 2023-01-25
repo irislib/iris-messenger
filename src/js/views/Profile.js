@@ -196,9 +196,9 @@ class Profile extends View {
                     title=${this.state.name}
                     copyStr=${this.props.id}
                   />
-                  <${Button} onClick=${() => $(this.qrRef.current).toggle()}
+                  <!-- <${Button} onClick=${() => $(this.qrRef.current).toggle()}
                     >${t('show_qr_code')}<//
-                  >
+                  > -->
                   <${CopyButton}
                     key=${`${this.props.id}copyData`}
                     text=${t('copy_raw_data')}
@@ -412,6 +412,14 @@ class Profile extends View {
           website = website.slice(0, -1);
         }
 
+        let banner;
+
+        try {
+          banner = profile.banner && new URL(profile.banner).toString();
+        } catch (e) {
+          console.log('Invalid banner URL', profile.banner);
+        }
+
         // profile may contain arbitrary fields, so be careful
         this.setState({
           name: profile.name,
@@ -420,7 +428,7 @@ class Profile extends View {
           nip05: profile.nip05valid && profile.nip05,
           lud16,
           website: website,
-          banner: profile.banner && new URL(profile.banner).toString(),
+          banner,
         });
       },
       true,

@@ -410,6 +410,16 @@ export default {
     this.handleEvent(event);
     return event.id;
   },
+  followedByFriendsCount: function (address: string) {
+    let count = 0;
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    for (const follower of this.followersByUser.get(address) ?? []) {
+      if (this.followedByUser.get(myPub)?.has(follower)) {
+        count++; // should we stop at 10?
+      }
+    }
+    return count;
+  },
   sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
     // if subs with same id already exists, remove them
     if (id) {
@@ -444,7 +454,7 @@ export default {
         this.subscriptionsByName.set(id, new Set());
       }
       this.subscriptionsByName.get(id)?.add(sub);
-      console.log('subscriptions size', this.subscriptionsByName.size);
+      //console.log('subscriptions size', this.subscriptionsByName.size);
       if (unsubscribeTimeout) {
         setTimeout(() => {
           sub.unsub();
@@ -470,7 +480,12 @@ export default {
     const otherSubscribedUsers = Array.from(_this.subscribedUsers).filter(
       (u) => !followedUsers.includes(u),
     );
-    console.log('subscribe to', followedUsers, otherSubscribedUsers);
+    console.log(
+      'subscribe to followedUsers.length',
+      followedUsers.length,
+      'otherSubscribedUsers.length',
+      otherSubscribedUsers.length,
+    );
     _this.sendSubToRelays(
       [{ kinds: [0, 3], until: now, authors: followedUsers }],
       'followed',
@@ -1129,10 +1144,9 @@ export default {
         }, 200);
 
         setInterval(() => {
-          console.log('handled msgs per second', this.handledMsgsPerSecond);
+          console.log('handled msgs per second', Math.round(this.handledMsgsPerSecond / 5));
           this.handledMsgsPerSecond = 0;
-        }, 1000);
-
+        }, 5000);
       });
   },
   getRepliesAndLikes(
