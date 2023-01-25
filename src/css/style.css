@@ -1187,8 +1187,12 @@ a.msg {
   text-shadow: white 0 0 1px;
 }
 
-.text-color {
+.badge.second {
   color: var(--text-color);
+}
+
+.badge.first {
+  color: var(--link-color);
 }
 
 .public-messages-view .msg-sender .msg-menu-btn {
