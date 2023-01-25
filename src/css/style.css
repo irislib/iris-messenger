@@ -11,6 +11,7 @@
 :root {
   --body-bg: #000000;
   --menu-bg: #000000;
+  --dropdown-bg: rgba(0, 0, 0, 0.8);
   --sidebar-bg: #000000;
   --sidebar-border-right: 1px solid #292b31;
   --sidebar-color: #8d9197;
@@ -1301,10 +1302,10 @@ a.msg {
   position: absolute;
   right: 0;
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 2px 0px var(--text-color);
   border-radius: 5px;
   z-index: 1;
-  background-color: var(--msg-content-background);
+  background-color: var(--dropdown-bg);
   opacity: 0.95;
   text-align: right;
 }
@@ -1317,7 +1318,6 @@ a.msg {
 /* Links inside the dropdown */
 .dropdown-content a {
   color: var(--text-color);
-  background-color: var(--msg-content-background);
   padding: 12px 16px;
   text-decoration: none;
   display: block;
@@ -1337,7 +1337,7 @@ a.msg {
 
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
-  background-color: var(--header-color);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .emoji {
