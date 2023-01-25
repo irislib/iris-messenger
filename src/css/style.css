@@ -13,6 +13,9 @@
   --text-color: #dbdcde;
   --text-time: rgba(255, 255, 255, 0.45);
   --main-color: #35383f;
+  --red: #f81780;
+  --green: #34ba7c;
+  --blue: #1d9bf0;
   --gallery-background: rgba(0, 0, 0, 0.8);
   --header-color: #2e3036;
   --chat-active: #393b43;
@@ -22,7 +25,6 @@
   --our-msg: #9e64fe;
   --notify: #5e02f6;
   --warning-background: #fe5493;
-  --heart-color: #fc005d;
   --login-background: #1f2125;
   --seen-indicator: rgba(255, 255, 255, 0.45);
   --input-bg: #1f2125;
@@ -43,15 +45,11 @@
   --emoji-picker-bg: #35383f;
   --emoji-picker-color: #fff;
   --emoji-picker-border-color: #1f2125;
-  --link-color: #33b7fe;
   --day-separator-bg: rgba(30, 32, 37, 0.85);
   --day-separator-color: rgba(255, 255, 255, 0.88);
   --non-string-value-color: #9e64fe;
   --nav-border-bottom: 1px solid #222526;
   --nav-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.8);
-  --positive-color: #4CAF50;
-  --negative-color: #fe5493;
-  --neutral-color: #f9f900;
   --radio-button-background: #666;
   --radio-button-checked-background: #33b7fe;
 }
@@ -101,7 +99,7 @@ body {
 a {
   text-decoration: none;
   cursor: pointer;
-  color: var(--link-color);
+  color: var(--blue);
 }
 
 a:hover,
@@ -310,19 +308,11 @@ textarea.new-msg {
 }
 
 .connected-peers.connected small {
-  color: var(--positive-color);
+  color: var(--green);
 }
 
 .positive {
-    color: var(--positive-color);
-}
-
-.negative {
-    color: var(--negative-color);
-}
-
-.neutral {
-    color: var(--neutral-color);
+    color: var(--green);
 }
 
 a.logo {
@@ -589,7 +579,7 @@ a.logo img:not(:last-child) {
 }
 
 .tabs a.active {
-  border-bottom: 2px solid var(--link-color);
+  border-bottom: 2px solid var(--blue);
 }
 
 .tabs a:hover {
@@ -771,7 +761,7 @@ header.footer .header-content {
 }
 
 .msg a {
-  color: var(--link-color);
+  color: var(--blue);
 }
 
 .msg-content {
@@ -1192,11 +1182,11 @@ a.msg {
 }
 
 .badge.second {
-  color: var(--positive-color);
+  color: var(--green);
 }
 
 .badge.first {
-  color: var(--link-color);
+  color: var(--blue);
 }
 
 .public-messages-view .msg-sender .msg-menu-btn {
@@ -1543,11 +1533,11 @@ a.msg {
 }
 
 .msg .like-btn.liked {
-  color: var(--heart-color);
+  color: var(--red);
 }
 
 .msg .boost-btn.boosted {
-  color: var(--positive-color);
+  color: var(--green);
 }
 
 .msg .time {
@@ -1850,7 +1840,7 @@ hr {
   border-radius: 1.1em;
   padding: 0.3em 0.4em;
   min-width: 0.8em;
-  background-color: var(--heart-color);
+  background-color: var(--red);
   color: white;
   text-align: center;
   font-size: 12px;
