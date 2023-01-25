@@ -14,7 +14,7 @@ import {
 } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import localForage from 'localforage';
-import {RelayPool} from "nostr-relaypool";
+import { RelayPool } from 'nostr-relaypool';
 
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 
@@ -140,12 +140,10 @@ export default {
     noCache: true,
     externalGetEventById: (id: string) => {
       const existing = eventsById.get(id);
-      console.log('externalGetEventById', id, existing);
       if (existing) {
-          console.log('already have', id);
-          return existing
+        return existing;
       }
-    }
+    },
   }),
 
   arrayToHex(array: any) {
@@ -443,6 +441,10 @@ export default {
       }, unsubscribeTimeout);
     }
 
+    this.relayPool.subscribe(filters, DEFAULT_RELAYS, (event) => {
+      this.handleEvent(event);
+    });
+
     for (const relay of this.relays.values()) {
       const sub = relay.sub(filters, {});
       // TODO update relay lastSeen
@@ -628,7 +630,7 @@ export default {
     const myCallback = (event: Event) => {
       this.handleEvent(event);
       cb(event);
-    }
+    };
     this.relayPool.subscribe(filters, DEFAULT_RELAYS, myCallback);
   },
   getConnectedRelayCount: function () {
@@ -649,7 +651,7 @@ export default {
     }
   },
   manageRelays: function () {
-
+    // replaced with relayPool
   },
   handleNote(event: Event) {
     this.eventsById.set(event.id, event);
