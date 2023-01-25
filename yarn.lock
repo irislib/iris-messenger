@@ -8956,10 +8956,10 @@ normalize-url@^6.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
 
-nostr-relaypool@^0.3.26:
-  version "0.3.26"
-  resolved "https://registry.yarnpkg.com/nostr-relaypool/-/nostr-relaypool-0.3.26.tgz#230e214bca7dbadfcb58b05857a90122159185b8"
-  integrity sha512-IUTlJ6eIx/TSHC5Uark7/EaJFyhIJo9FNIv4l0I+vPXoLIhSA8cSv3ud84jXD8W6K6cLwi2IjYRnOOQLxxkJdA==
+nostr-relaypool@^0.3.28:
+  version "0.3.28"
+  resolved "https://registry.yarnpkg.com/nostr-relaypool/-/nostr-relaypool-0.3.28.tgz#d550b64eeb535fe4e915924c76c14ba455436e2c"
+  integrity sha512-4H3aCGAOspts559NdpBOmtQ2ElkjBHF2vz0srrM7eoVpzbxPHJ6Bf94jAJCHwNYZcamQSBmWmKpIhGBzDmtqzg==
   dependencies:
     isomorphic-ws "^5.0.0"
     nostr-tools "^1.1.0"
