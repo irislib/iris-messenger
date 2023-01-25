@@ -1137,15 +1137,6 @@ export default {
     ) {
       return false;
     }
-    const content = event.content.toLowerCase();
-    if (
-      filter.keywords &&
-      !filter.keywords.some((keyword: string) => {
-        return keyword.toLowerCase().split(' ').every((word: string) => content.includes(word));
-      })
-    ) {
-      return false;
-    }
 
     return true;
   },
