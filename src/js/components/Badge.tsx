@@ -29,9 +29,8 @@ export default function Badge(props) {
   } else {
     const count = Nostr.followedByFriendsCount(hexAddress);
     if (count > 0) {
-      const className = count > 10 ? 'neutral' : 'text-color';
       return (
-        <span class={`badge ${className} tooltip`}>
+        <span className="badge text-color tooltip">
           {Icons.checkmark}
           <span class="tooltiptext right">
             {count} {t('friends_following')}
