@@ -9,12 +9,12 @@ import Icons from '../Icons';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
-import Badge from './Badge';
 import CopyButton from './CopyButton';
 import Dropdown from './Dropdown';
 import FeedMessageForm from './FeedMessageForm';
 import Identicon from './Identicon';
 import Message from './Message';
+import Name from './Name';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
 
@@ -310,14 +310,14 @@ class PublicMessage extends Message {
     route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
   }
 
-  renderFollow(name) {
+  renderFollow() {
     return html`
       <div class="msg">
         <div class="msg-content">
           <p style="display: flex; align-items: center">
             <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
             <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
-              ${name}
+              <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
             <span> started following you</span>
           </p>
@@ -326,7 +326,7 @@ class PublicMessage extends Message {
     `;
   }
 
-  renderLike(name) {
+  renderLike() {
     const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
     let text = Nostr.eventsById.get(likedId)?.content;
     if (text && text.length > 50) {
@@ -336,13 +336,16 @@ class PublicMessage extends Message {
       <div class="msg">
         <div class="msg-content" style="padding: 0;">
           <div
-            style="display: flex; align-items: center; padding: 15px; white-space: nowrap;text-overflow: ellipsis"
+            style="display: flex; align-items: center; padding: 15px; white-space: nowrap;text-overflow: ellipsis; o"
           >
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
-            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}" style="margin-right: 5px;">
-              ${name}
+            <a
+              href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
+              style="margin-right: 5px;"
+            >
+              <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
-            <span> liked your <a href="#/post/${likedId}">note</a> "${text}" </span>
+            <span> liked your <a href="#/post/${likedId}">note</a> <i>"${text}"</i> </span>
           </div>
         </div>
       </div>
@@ -396,7 +399,7 @@ class PublicMessage extends Message {
     `;
   }
 
-  renderBoost(name) {
+  renderBoost() {
     const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
     return html`
       <div class="msg">
@@ -404,7 +407,7 @@ class PublicMessage extends Message {
           <div style="display: flex; align-items: center; padding: 15px 15px 0 15px;">
             <i style="margin-right: 15px;"> ${Icons.boost} </i>
             <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
-              ${name}
+              <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
             <span> boosted</span>
           </div>
@@ -465,18 +468,15 @@ class PublicMessage extends Message {
       }
     }
 
-    //if (++this.i > 1) console.log(this.i);
-    let name = this.props.name || this.state.name || Helpers.generateName(this.state.msg.info.from);
-
     if (this.state.msg?.event?.kind === 3) {
-      return this.renderFollow(name);
+      return this.renderFollow();
     }
 
     if (this.state.msg?.event?.kind === 6) {
-      return this.renderBoost(name);
+      return this.renderBoost();
     }
     if (this.state.msg?.event?.kind === 7) {
-      return this.renderLike(name);
+      return this.renderLike();
     }
 
     const emojiOnly =
@@ -557,12 +557,10 @@ class PublicMessage extends Message {
           <div class="msg-sender">
             <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
-              ${name &&
-              this.props.showName &&
+              ${this.props.showName &&
               html`
                 <div class="msgSenderName">
-                  ${name}
-                  <${Badge} pub=${s.msg.info.from} />
+                  <${Name} pub=${s.msg.info.from} />
                 </div>
               `}
               <div class="time">
