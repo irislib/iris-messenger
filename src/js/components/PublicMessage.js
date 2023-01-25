@@ -221,7 +221,7 @@ class PublicMessage extends Message {
         Nostr.publish({
           kind: 1,
           tags: [
-            ['e', nostrId],
+            ['e', nostrId, '', 'mention'],
             ['p', author],
           ],
           content: '#[0]',
@@ -391,8 +391,7 @@ class PublicMessage extends Message {
     `;
   }
 
-  renderBoost(name) {
-    const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
+  renderBoost(name, id) {
     return html`
       <div class="msg">
         <div class="msg-content" style="padding: 0;">
@@ -403,7 +402,7 @@ class PublicMessage extends Message {
             </a>
             <span> boosted</span>
           </div>
-          <${PublicMessage} hash=${likedId} showName=${true} />
+          <${PublicMessage} hash=${id} showName=${true} />
         </div>
       </div>
     `;
@@ -494,15 +493,25 @@ class PublicMessage extends Message {
     //if (++this.i > 1) console.log(this.i);
     let name = this.props.name || this.state.name || Helpers.generateName(this.state.msg.info.from);
 
-    if (this.state.msg?.event?.kind === 3) {
-      return this.renderFollow(name);
-    }
-
-    if (this.state.msg?.event?.kind === 6) {
-      return this.renderBoost(name);
-    }
-    if (this.state.msg?.event?.kind === 7) {
-      return this.renderLike(name);
+    switch (this.state.msg?.event?.kind) {
+      case 3:
+        return this.renderFollow(name);
+      case 6:
+        return this.renderBoost(
+          name,
+          this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1],
+        );
+      case 7:
+        return this.renderLike(name);
+      case 1: {
+        let mentionIndex = this.state.msg?.event?.tags.findIndex(
+          (tag) => tag[0] === 'e' && tag[3] === 'mention',
+        );
+        if (this.state.msg?.event?.content === `#[${mentionIndex}]`) {
+          return this.renderBoost(name, this.state.msg?.event?.tags[mentionIndex][1]);
+        }
+        break;
+      }
     }
 
     const emojiOnly =
