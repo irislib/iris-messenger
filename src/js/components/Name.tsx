@@ -4,16 +4,19 @@ import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Nostr from '../Nostr';
 
+import Badge from './Badge';
+
 type Props = {
   pub: string;
   placeholder?: string;
+  hideBadge?: boolean;
 };
 
 type State = {
   name: string;
 };
 
-class Name extends Component<Props, State> {
+export default class Name extends Component<Props, State> {
   componentDidMount(): void {
     const nostrAddr = Nostr.toNostrHexAddress(this.props.pub);
     if (nostrAddr) {
@@ -27,11 +30,14 @@ class Name extends Component<Props, State> {
 
   render() {
     return (
-      this.state.name ??
-      this.props.placeholder ??
-      Helpers.generateName(Nostr.toNostrBech32Address(this.props.pub, 'npub') || this.props.pub)
+      <>
+        {this.state.name ??
+          this.props.placeholder ??
+          Helpers.generateName(
+            Nostr.toNostrBech32Address(this.props.pub, 'npub') || this.props.pub,
+          )}
+        {this.props.hideBadge ? '' : <Badge pub={this.props.pub} />}
+      </>
     );
   }
 }
-
-export default Name;
