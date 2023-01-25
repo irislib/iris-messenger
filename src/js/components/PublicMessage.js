@@ -328,17 +328,22 @@ class PublicMessage extends Message {
 
   renderLike(name) {
     const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
+    let text = Nostr.eventsById.get(likedId)?.content;
+    if (text && text.length > 50) {
+      text = text.substr(0, 50) + '...';
+    }
     return html`
       <div class="msg">
         <div class="msg-content" style="padding: 0;">
-          <div style="display: flex; align-items: center; padding: 15px 15px 0 15px;">
+          <div
+            style="display: flex; align-items: center; padding: 15px; white-space: nowrap;text-overflow: ellipsis"
+          >
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
-            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}" style="margin-right: 5px;">
               ${name}
             </a>
-            <span> liked your post</span>
+            <span> liked your <a href="#/post/${likedId}">note</a> "${text}" </span>
           </div>
-          <${PublicMessage} hash=${likedId} showName=${true} />
         </div>
       </div>
     `;
