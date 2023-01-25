@@ -9,25 +9,29 @@
 }
 
 :root {
-  --body-bg: #2e3036;
+  --body-bg: #000000;
+  --menu-bg: #000000;
+  --sidebar-bg: #000000;
+  --sidebar-border-right: 1px solid #292b31;
+  --sidebar-color: #8d9197;
   --text-color: #dbdcde;
   --text-time: rgba(255, 255, 255, 0.45);
-  --main-color: #35383f;
+  --main-color: #000000;
   --red: #f81780;
   --green: #34ba7c;
   --blue: #1d9bf0;
   --gallery-background: rgba(0, 0, 0, 0.8);
-  --header-color: #2e3036;
-  --chat-active: #393b43;
-  --chat-hover: #33363c;
-  --msg-content-background: #2e3036;
+  --header-color: #000000;
+  --chat-active: #070809;
+  --chat-hover: #070809;
+  --msg-content-background: #15181c;
   --msg-border: none;
-  --our-msg: #9e64fe;
+  --our-msg: #1d9bf0;
   --notify: #5e02f6;
   --warning-background: #fe5493;
   --login-background: #1f2125;
   --seen-indicator: rgba(255, 255, 255, 0.45);
-  --input-bg: #1f2125;
+  --input-bg: #1f2327;
   --input-text: #dbdcde;
   --input-placeholder: #ccc;
   --small-text-color: #8d9197;
@@ -37,10 +41,6 @@
   --button-color: #fefffe;
   --button-border: 0;
   --button-border-size: 0;
-  --menu-bg: #1f2125;
-  --sidebar-bg: #2e3036;
-  --sidebar-border-right: 1px solid #292b31;
-  --sidebar-color: #8d9197;
   --zebra-stripe-bg: #2e3036;
   --emoji-picker-bg: #35383f;
   --emoji-picker-color: #fff;
