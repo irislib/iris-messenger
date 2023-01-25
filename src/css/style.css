@@ -9,23 +9,30 @@
 }
 
 :root {
-  --body-bg: #2e3036;
+  --body-bg: #000000;
+  --menu-bg: #000000;
+  --dropdown-bg: rgba(0, 0, 0, 0.8);
+  --sidebar-bg: #000000;
+  --sidebar-border-right: 1px solid #292b31;
+  --sidebar-color: #8d9197;
   --text-color: #dbdcde;
   --text-time: rgba(255, 255, 255, 0.45);
-  --main-color: #35383f;
+  --main-color: #000000;
+  --red: #f81780;
+  --green: #34ba7c;
+  --blue: #1d9bf0;
   --gallery-background: rgba(0, 0, 0, 0.8);
-  --header-color: #2e3036;
-  --chat-active: #393b43;
-  --chat-hover: #33363c;
-  --msg-content-background: #2e3036;
+  --header-color: #000000;
+  --chat-active: #070809;
+  --chat-hover: #070809;
+  --msg-content-background: #15181c;
   --msg-border: none;
-  --our-msg: #9e64fe;
+  --our-msg: #1d9bf0;
   --notify: #5e02f6;
   --warning-background: #fe5493;
-  --heart-color: #fc005d;
   --login-background: #1f2125;
   --seen-indicator: rgba(255, 255, 255, 0.45);
-  --input-bg: #1f2125;
+  --input-bg: #1f2327;
   --input-text: #dbdcde;
   --input-placeholder: #ccc;
   --small-text-color: #8d9197;
@@ -35,23 +42,15 @@
   --button-color: #fefffe;
   --button-border: 0;
   --button-border-size: 0;
-  --menu-bg: #1f2125;
-  --sidebar-bg: #2e3036;
-  --sidebar-border-right: 1px solid #292b31;
-  --sidebar-color: #8d9197;
-  --zebra-stripe-bg: #2e3036;
+  --zebra-stripe-bg: #101214;
   --emoji-picker-bg: #35383f;
   --emoji-picker-color: #fff;
   --emoji-picker-border-color: #1f2125;
-  --link-color: #33b7fe;
   --day-separator-bg: rgba(30, 32, 37, 0.85);
   --day-separator-color: rgba(255, 255, 255, 0.88);
   --non-string-value-color: #9e64fe;
   --nav-border-bottom: 1px solid #222526;
   --nav-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.8);
-  --positive-color: #83fc00;
-  --negative-color: #fe5493;
-  --neutral-color: #f9f900;
   --radio-button-background: #666;
   --radio-button-checked-background: #33b7fe;
 }
@@ -101,7 +100,7 @@ body {
 a {
   text-decoration: none;
   cursor: pointer;
-  color: var(--link-color);
+  color: var(--blue);
 }
 
 a:hover,
@@ -310,19 +309,11 @@ textarea.new-msg {
 }
 
 .connected-peers.connected small {
-  color: var(--positive-color);
+  color: var(--green);
 }
 
 .positive {
-    color: var(--positive-color);
-}
-
-.negative {
-    color: var(--negative-color);
-}
-
-.neutral {
-    color: var(--neutral-color);
+    color: var(--green);
 }
 
 a.logo {
@@ -589,7 +580,7 @@ a.logo img:not(:last-child) {
 }
 
 .tabs a.active {
-  border-bottom: 2px solid var(--link-color);
+  border-bottom: 2px solid var(--blue);
 }
 
 .tabs a:hover {
@@ -771,7 +762,7 @@ header.footer .header-content {
 }
 
 .msg a {
-  color: var(--link-color);
+  color: var(--blue);
 }
 
 .msg-content {
@@ -1187,8 +1178,16 @@ a.msg {
   text-shadow: white 0 0 1px;
 }
 
-.text-color {
+.badge.third {
   color: var(--text-color);
+}
+
+.badge.second {
+  color: var(--green);
+}
+
+.badge.first {
+  color: var(--blue);
 }
 
 .public-messages-view .msg-sender .msg-menu-btn {
@@ -1303,10 +1302,10 @@ a.msg {
   position: absolute;
   right: 0;
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 2px 0px var(--text-color);
   border-radius: 5px;
   z-index: 1;
-  background-color: var(--msg-content-background);
+  background-color: var(--dropdown-bg);
   opacity: 0.95;
   text-align: right;
 }
@@ -1319,7 +1318,6 @@ a.msg {
 /* Links inside the dropdown */
 .dropdown-content a {
   color: var(--text-color);
-  background-color: var(--msg-content-background);
   padding: 12px 16px;
   text-decoration: none;
   display: block;
@@ -1339,7 +1337,7 @@ a.msg {
 
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
-  background-color: var(--header-color);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .emoji {
@@ -1535,11 +1533,11 @@ a.msg {
 }
 
 .msg .like-btn.liked {
-  color: var(--heart-color);
+  color: var(--red);
 }
 
 .msg .boost-btn.boosted {
-  color: var(--positive-color);
+  color: var(--green);
 }
 
 .msg .time {
@@ -1842,7 +1840,7 @@ hr {
   border-radius: 1.1em;
   padding: 0.3em 0.4em;
   min-width: 0.8em;
-  background-color: var(--heart-color);
+  background-color: var(--red);
   color: white;
   text-align: center;
   font-size: 12px;
@@ -2611,6 +2609,6 @@ input[type='text'] {
     display: none !important;
   }
   .msg.standalone {
-    margin-top: 15px;
+    margin: 15px 0;
   }
 }

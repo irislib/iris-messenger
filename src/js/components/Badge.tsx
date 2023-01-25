@@ -9,7 +9,7 @@ export default function Badge(props) {
   const hexAddress = Nostr.toNostrHexAddress(props.pub);
   if (hexAddress === myPub) {
     return (
-      <span class="badge positive tooltip">
+      <span class="badge first tooltip">
         {Icons.checkmark}
         <span class="tooltiptext right">{t('you')}</span>
       </span>
@@ -21,7 +21,7 @@ export default function Badge(props) {
   const following = Nostr.followedByUser.get(myPub)?.has(hexAddress);
   if (following) {
     return (
-      <span class="badge positive tooltip">
+      <span class="badge first tooltip">
         {Icons.checkmark}
         <span class="tooltiptext right">{t('following')}</span>
       </span>
@@ -29,7 +29,7 @@ export default function Badge(props) {
   } else {
     const count = Nostr.followedByFriendsCount(hexAddress);
     if (count > 0) {
-      const className = count > 10 ? 'neutral' : 'text-color';
+      const className = count > 10 ? 'second' : 'third';
       return (
         <span class={`badge ${className} tooltip`}>
           {Icons.checkmark}
