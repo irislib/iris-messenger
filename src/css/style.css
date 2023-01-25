@@ -1187,8 +1187,12 @@ a.msg {
   text-shadow: white 0 0 1px;
 }
 
-.badge.second {
+.badge.third {
   color: var(--text-color);
+}
+
+.badge.second {
+  color: var(--positive-color);
 }
 
 .badge.first {
