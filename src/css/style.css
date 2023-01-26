@@ -445,7 +445,7 @@ a.logo img:not(:last-child) {
   z-index: 100;
   position: fixed;
   top: 50px;
-  left: calc(50% - 80px);
+  left: calc(50% - 98px);
   margin-top: 0;
 }
 
@@ -461,7 +461,7 @@ a.logo img:not(:last-child) {
 
 @media (min-width: 1268px) {
   .nav .search-box-results {
-    left: calc(50% - 7px);
+    left: calc(50% - 27px);
   }
 }
 
