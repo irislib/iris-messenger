@@ -96,6 +96,10 @@ h1,
   font-family: 'Metuo-Black', Futura, Arial;
 }
 
+h3 {
+  font-size: 20px;
+}
+
 a {
   text-decoration: none;
   cursor: pointer;
