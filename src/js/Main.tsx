@@ -3,7 +3,7 @@ import { createHashHistory } from 'history';
 import iris from 'iris-lib';
 import AsyncRoute from 'preact-async-route';
 import { CustomHistory, Router, RouterOnChangeArgs } from 'preact-router';
-import '@fontsource/montserrat';
+import '@fontsource/lato';
 
 import Footer from './components/Footer';
 import MediaPlayer from './components/MediaPlayer';

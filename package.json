@@ -56,7 +56,7 @@
     "webpack-build-notifier": "^2.3.0"
   },
   "dependencies": {
-    "@fontsource/montserrat": "^4.5.14",
+    "@fontsource/lato": "^4.5.10",
     "@noble/hashes": "^1.1.5",
     "@noble/secp256k1": "^1.7.1",
     "@scure/bip32": "^1.1.3",
