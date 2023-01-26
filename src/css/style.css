@@ -288,10 +288,6 @@ textarea.new-msg {
   padding: 15px 30px;
 }
 
-.application-list a.logo span {
-  margin-top: 2px;
-}
-
 .nav .connected-peers small {
   display: flex;
   align-items: center;
