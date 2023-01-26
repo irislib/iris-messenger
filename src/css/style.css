@@ -91,6 +91,11 @@ body {
   background-color: var(--body-bg);
 }
 
+h1,
+.application-list a.logo span {
+  font-family: 'Metuo-Black', Futura, Arial;
+}
+
 a {
   text-decoration: none;
   cursor: pointer;
