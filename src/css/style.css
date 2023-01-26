@@ -50,6 +50,57 @@
   --zebra-stripe-bg: #101214;
 }
 
+/*
+@media (prefers-color-scheme: light) {
+  :root {
+    --body-bg: #ffffff;
+    --blue: #1d9bf0;
+    --button-bg: #8e44ad;
+    --button-bg-hover: #5a488b;
+    --button-border: 0;
+    --button-border-size: 0;
+    --button-color: #000000;
+    --chat-active: #f5f5f5;
+    --chat-hover: #f0f0f0;
+    --day-separator-bg: rgba(255, 255, 255, 0.85);
+    --day-separator-color: rgba(0, 0, 0, 0.88);
+    --dropdown-bg: rgba(255, 255, 255, 0.8);
+    --emoji-picker-bg: #f5f5f5;
+    --emoji-picker-border-color: #e5e5e5;
+    --emoji-picker-color: #000000;
+    --gallery-background: rgba(255, 255, 255, 0.8);
+    --green: #34ba7c;
+    --header-color: #ffffff;
+    --input-bg: #f5f5f5;
+    --input-placeholder: #ccc;
+    --input-text: #000000;
+    --login-background: #ffffff;
+    --main-color: #ffffff;
+    --menu-bg: #ffffff;
+    --msg-border: none;
+    --msg-content-background: #f5f5f5;
+    --msg-form-button-color: #000000;
+    --nav-border-bottom: 1px solid #e5e5e5;
+    --nav-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.8);
+    --non-string-value-color: #9e64fe;
+    --notify: #c8b1f0;
+    --our-msg: #1d9bf0;
+    --radio-button-background: #f5f5f5;
+    --radio-button-checked-background: #33b7fe;
+    --red: #f81780;
+    --seen-indicator: rgba(0, 0, 0, 0.45);
+    --sidebar-bg: #ffffff;
+    --sidebar-border-right: 1px solid #e5e5e5;
+    --sidebar-color: #8d9197;
+    --small-text-color: #8d9197;
+    --text-color: #000000;
+    --text-time: rgba(0, 0, 0, 0.45);
+    --warning-background: #fe5493;
+    --zebra-stripe-bg: #f5f5f5;
+  }
+}
+ */
+
 ::-webkit-scrollbar {
   width: 8px;
   background-color: rgba(0, 0, 0, 0);
