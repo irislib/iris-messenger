@@ -222,7 +222,7 @@ class PublicMessage extends Message {
         Nostr.publish({
           kind: 6,
           tags: [
-            ['e', nostrId],
+            ['e', nostrId, '', 'mention'],
             ['p', author],
           ],
           content: '#[0]',

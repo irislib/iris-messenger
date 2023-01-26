@@ -775,7 +775,6 @@ export default {
     // only handle one boost per post per user. TODO update with newer event if needed.
     if (!this.boostsByMessageId.get(id)?.has(event.pubkey)) {
       this.boostsByMessageId.get(id)?.add(event.pubkey);
-      this.handleNote(event);
     }
   },
   handleReaction(event: Event) {
@@ -992,9 +991,7 @@ export default {
     }
   },
   handleNoteOrBoost(event: Event) {
-    const mentionIndex = event.tags.findIndex(
-      (tag) => tag[0] === 'e' && tag[3] === 'mention',
-    );
+    const mentionIndex = event.tags.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
     if (event.content === `#[${mentionIndex}]`) {
       this.handleBoost(event);
     } else {
