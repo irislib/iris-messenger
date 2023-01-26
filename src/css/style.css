@@ -83,7 +83,7 @@ html {
 body {
   font-size: 15px;
   color: var(--text-color);
-  font-family: Calibri, 'Trebuchet MS', Arial, sans-serif;
+  font-family: Calibri, sans-serif;
   padding: 0;
   margin: 0;
   height: 100%;
@@ -939,11 +939,6 @@ header.footer .header-content {
   margin-left: 5px;
 }
 
-h1,
-.application-list a.logo span {
-  font-family: 'Metuo-Black', Futura, Arial;
-}
-
 @media (min-width: 626px) and (max-width: 1268px) {
   a.logo img:not(:last-child) {
     margin-right: 0;
@@ -1073,7 +1068,6 @@ h1,
   padding: 15px;
   padding-left: 0;
   font-family: Calibri, sans-serif;
-  font-size: 20px;
 }
 
 .settings-list {
@@ -1083,7 +1077,6 @@ h1,
   transition: all 0.25s ease;
   border-right: var(--sidebar-border-right);
   color: var(--text-color);
-  font-family: Calibri;
 }
 
 .settings-list .electron-padding {
@@ -1330,6 +1323,10 @@ a.msg {
 .msg .emoji-only {
   font-size: 3em;
   text-align: center;
+}
+
+.msgSenderName {
+  font-weight: bold;
 }
 
 .settings {
