@@ -774,6 +774,7 @@ export default {
     // only handle one boost per post per user. TODO update with newer event if needed.
     if (!this.boostsByMessageId.get(id)?.has(event.pubkey)) {
       this.boostsByMessageId.get(id)?.add(event.pubkey);
+      this.handleNote(event);
     }
   },
   handleReaction(event: Event) {
@@ -937,6 +938,9 @@ export default {
     }
   },
   updateUnseenNotificationCount: debounce((_this) => {
+    if (!_this.notificationsSeenTime) {
+      return;
+    }
     let count = 0;
     for (const id of _this.notifications.eventIds) {
       const event = _this.eventsById.get(id);
@@ -1179,8 +1183,8 @@ export default {
         this.public.get({ path: 'notifications/lastOpened', authors: [myPub] }, (time) => {
           time = time.value;
           if (time !== this.notificationsSeenTime) {
-            localForage.setItem('notificationsSeenTime', time.value);
-            this.notificationsSeenTime = time.value;
+            this.notificationsSeenTime = time;
+            localForage.setItem('notificationsSeenTime', time);
             this.updateUnseenNotificationCount(this);
           }
         });
