@@ -1,9 +1,4 @@
 @font-face {
-  font-family: 'FuturaLight';
-  src: url('./FuturaLT-Light.woff') format('woff');
-}
-
-@font-face {
   font-family: 'Futura';
   src: url('./Futura-Medium.woff') format('woff');
 }
@@ -132,10 +127,6 @@ img {
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
-}
-
-input, textarea {
-  font-family: FuturaLight, sans-serif;
 }
 
 textarea {
@@ -767,11 +758,6 @@ header.footer .header-content {
   flex-direction: column;
   margin-bottom: 4px;
   white-space: pre-wrap;
-}
-
-.msg-content .text {
-  font-family: FuturaLight, sans-serif;
-  letter-spacing: 0.1px;
 }
 
 .msg a {
