@@ -86,7 +86,7 @@ export default {
      */
 
     const videoRegex =
-      /((?:https?:\/\/(?:nostr\.build|imgur\.com)\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm)))/gi;
+      /(https?:\/\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm))/gi;
     replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
       return (
         <video
