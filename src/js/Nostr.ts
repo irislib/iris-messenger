@@ -381,7 +381,9 @@ export default {
   },
   publish: async function (event: any) {
     if (!event.sig) {
-      event.tags = event.tags || [];
+      if (!event.tags) {
+        event.tags = [];
+      }
       event.content = event.content || '';
       event.created_at = event.created_at || Math.floor(Date.now() / 1000);
       event.pubkey = iris.session.getKey().secp256k1.rpub;
@@ -989,6 +991,16 @@ export default {
       this.keyValueEvents.set(key, event);
     }
   },
+  handleNoteOrBoost(event: Event) {
+    const mentionIndex = event.tags.findIndex(
+      (tag) => tag[0] === 'e' && tag[3] === 'mention',
+    );
+    if (event.content === `#[${mentionIndex}]`) {
+      this.handleBoost(event);
+    } else {
+      this.handleNote(event);
+    }
+  },
   handleEvent(event: Event) {
     if (!event) return;
     if (this.eventsById.has(event.id)) {
@@ -1015,7 +1027,7 @@ export default {
         break;
       case 1:
         this.maybeAddNotification(event);
-        this.handleNote(event);
+        this.handleNoteOrBoost(event);
         break;
       case 4:
         this.handleDirectMessage(event);
