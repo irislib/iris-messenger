@@ -568,16 +568,17 @@ class PublicMessage extends Message {
               ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
               ${this.props.showName &&
               html`
-                <div class="msgSenderName">
+                <a href=${`#/profile/${s.msg.info.from}`} class="msgSenderName">
                   <${Name} pub=${s.msg.info.from} />
-                </div>
+                </a>
               `}
               <div class="time">
+                ${'· '}
                 <a
                   href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
                   class="tooltip"
                 >
-                  · ${Helpers.getRelativeTimeText(time)}
+                  ${Helpers.getRelativeTimeText(time)}
                   <span class="tooltiptext"> ${dateStr} ${timeStr} </span>
                 </a>
               </div>

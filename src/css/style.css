@@ -595,8 +595,8 @@ a.logo img:not(:last-child) {
 }
 
 .tabs a:focus,
-a:hover,
-a:active {
+.tabs a:hover,
+.tabs a:active {
   text-decoration: none;
 }
 
@@ -1333,8 +1333,9 @@ a.msg {
   text-align: center;
 }
 
-.msgSenderName {
+a.msgSenderName {
   font-weight: bold;
+  color: var(--text-color);
 }
 
 .settings {
