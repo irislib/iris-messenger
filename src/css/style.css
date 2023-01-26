@@ -1131,28 +1131,6 @@ a.msg {
   color: var(--text-color);
 }
 
-.hashtag-list {
-  margin: 15px 0 15px 15px;
-}
-
-.hashtag-list a {
-  color: var(--text-color);
-}
-
-.hashtag-list a.active {
-  font-weight: bold;
-}
-
-.hashtag-list a:active,
-.hashtag-list a:focus,
-.hashtag-list a:visited {
-  text-decoration: none;
-}
-
-.hashtag-list a:hover:not(.active) {
-  text-decoration: underline;
-}
-
 .public-messages-view .img-container img {
   max-height: 60vh;
   border-radius: 0;
@@ -1479,7 +1457,6 @@ a.msg {
   cursor: pointer;
   margin-bottom: 2px;
   display: inline-block;
-  font-weight: bold;
 }
 
 .from-separator {
@@ -1818,11 +1795,6 @@ hr {
   margin-right: 15px !important;
 }
 
-.chat-item.has-unseen .text,
-.chat-item.has-unseen .name {
-  font-weight: bold;
-}
-
 .chat-item .text,
 .chat-new-item .text {
   padding-right: 5px;
@@ -1858,7 +1830,6 @@ hr {
   text-align: center;
   font-size: 12px;
   line-height: 1em;
-  font-weight: 500;
 }
 
 .chat-item .unseen {
@@ -1959,7 +1930,6 @@ small,
 }
 
 #enable-notifications-prompt .title {
-  font-weight: bold;
   margin-bottom: 5px;
 }
 
@@ -2155,7 +2125,6 @@ form.public {
 
 .follow-count span {
   font-size: 1.2em;
-  font-weight: bold;
 }
 
 .follow,
@@ -2273,7 +2242,6 @@ input[type='text'] {
 
 .participant-list small {
   text-transform: uppercase;
-  font-weight: bold;
   padding: 7px 15px;
 }
 
@@ -2288,7 +2256,6 @@ input[type='text'] {
 
 .chat-item .typing-indicator {
   color: #05b246;
-  font-weight: bold;
 }
 
 .copy-button {
@@ -2315,90 +2282,6 @@ input[type='text'] {
 
 .feed-settings {
   margin: 0 0 15px 0;
-}
-
-.thumbnail-items {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.thumbnail-item {
-  display: flex;
-  flex-direction: column;
-  width: calc(33.33% - 8px);
-  margin-right: 8px;
-  margin-bottom: 8px;
-  transition: all 125ms;
-  border-radius: 8px;
-}
-
-.thumbnail-item .msg-content {
-  height: 100%;
-}
-
-.store-item {
-  background-color: var(--chat-hover);
-  min-width: 145px;
-  padding: 15px;
-  cursor: pointer;
-}
-
-.store-item a {
-  font-weight: bold;
-}
-
-.store-item img {
-  margin-bottom: 5px;
-}
-
-.store-item:hover {
-  background-color: var(--chat-active);
-}
-
-.price-cell {
-  text-align: right;
-}
-
-.price-cell input {
-  border-radius: 5px;
-  margin: 0 5px;
-  width: 3em;
-  padding: 9px 0;
-  text-align: center;
-}
-
-.price-cell button {
-  border: 0;
-  padding: 10px 15px;
-  background-color: var(--input-bg);
-  border-radius: 5px;
-  color: var(--text-color);
-}
-
-.unit-price {
-  margin-right: 15px;
-}
-
-.price {
-  flex-grow: 1;
-  font-size: 1.25em;
-  font-weight: bold;
-}
-
-#store-steps {
-  display: flex;
-  flex-direction: row;
-}
-
-#store-steps div {
-  flex-basis: 25%;
-  padding: 30px 5px;
-  text-align: center;
-  cursor: pointer;
-}
-
-#store-steps div.active {
-  background-color: var(--chat-hover);
 }
 
 .language-selector {
