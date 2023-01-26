@@ -1,14 +1,4 @@
 @font-face {
-  font-family: 'FuturaLight';
-  src: url('./FuturaLT-Light.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Futura';
-  src: url('./Futura-Medium.woff') format('woff');
-}
-
-@font-face {
   font-family: 'Metuo-Black';
   src: url('./Metuo-Black.woff') format('woff');
 }
@@ -21,8 +11,8 @@
   --button-border: 0;
   --button-border-size: 0;
   --button-color: #fefffe;
-  --chat-active: #070809;
-  --chat-hover: #070809;
+  --chat-active: #212428;
+  --chat-hover: #212428;
   --day-separator-bg: rgba(30, 32, 37, 0.85);
   --day-separator-color: rgba(255, 255, 255, 0.88);
   --dropdown-bg: rgba(0, 0, 0, 0.8);
@@ -93,7 +83,7 @@ html {
 body {
   font-size: 15px;
   color: var(--text-color);
-  font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+  font-family: Calibri, 'Trebuchet MS', Arial, sans-serif;
   padding: 0;
   margin: 0;
   height: 100%;
@@ -135,7 +125,7 @@ img {
 }
 
 input, textarea {
-  font-family: FuturaLight, sans-serif;
+  font-family: Calibri, sans-serif;
 }
 
 textarea {
@@ -770,7 +760,7 @@ header.footer .header-content {
 }
 
 .msg-content .text {
-  font-family: FuturaLight, sans-serif;
+  font-family: Calibri, sans-serif;
   letter-spacing: 0.1px;
 }
 
@@ -1082,7 +1072,8 @@ h1,
   flex: 1;
   padding: 15px;
   padding-left: 0;
-  font-family: Futura, sans-serif;
+  font-family: Calibri, sans-serif;
+  font-size: 20px;
 }
 
 .settings-list {
@@ -1092,7 +1083,7 @@ h1,
   transition: all 0.25s ease;
   border-right: var(--sidebar-border-right);
   color: var(--text-color);
-  font-family: 'Metuo-Black', Futura, Arial;
+  font-family: Calibri;
 }
 
 .settings-list .electron-padding {
