@@ -83,7 +83,7 @@ html {
 body {
   font-size: 15px;
   color: var(--text-color);
-  font-family: Calibri, sans-serif;
+  font-family: Montserrat, sans-serif;
   padding: 0;
   margin: 0;
   height: 100%;
@@ -93,7 +93,7 @@ body {
 
 h1,
 .application-list a.logo span {
-  font-family: 'Metuo-Black', Futura, Arial;
+  font-family: Montserrat, Arial, sans-serif;
 }
 
 h3 {
@@ -134,7 +134,7 @@ img {
 }
 
 input, textarea {
-  font-family: Calibri, sans-serif;
+  font-family: Montserrat, sans-serif;
 }
 
 textarea {
@@ -769,7 +769,7 @@ header.footer .header-content {
 }
 
 .msg-content .text {
-  font-family: Calibri, sans-serif;
+  font-family: Montserrat, sans-serif;
 }
 
 .msg a {
@@ -1075,7 +1075,7 @@ header.footer .header-content {
   flex: 1;
   padding: 15px;
   padding-left: 0;
-  font-family: Calibri, sans-serif;
+  font-family: Montserrat, sans-serif;
 }
 
 .settings-list {
