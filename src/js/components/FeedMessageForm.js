@@ -253,7 +253,7 @@ class FeedMessageForm extends MessageForm {
             ></path>
           </svg>
         </button>
-        <button type="submit" style="padding-top: 8px">
+        <button type="submit">
           <span>${t('post')} </span>
           <svg
             class="svg-inline--fa fa-w-16"
