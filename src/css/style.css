@@ -1,4 +1,9 @@
 @font-face {
+  font-family: 'FuturaLight';
+  src: url('./FuturaLT-Light.woff') format('woff');
+}
+
+@font-face {
   font-family: 'Futura';
   src: url('./Futura-Medium.woff') format('woff');
 }
@@ -75,7 +80,7 @@
 
 * {
   box-sizing: border-box;
-  font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+  font-family: FuturaLight, 'Trebuchet MS', Arial, sans-serif;
   -webkit-tap-highlight-color: transparent;
   overflow-wrap: anywhere;
 }
@@ -89,7 +94,7 @@ html {
 body {
   font-size: 15px;
   color: var(--text-color);
-  font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+  font-family: FuturaLight, 'Trebuchet MS', Arial, sans-serif;
   padding: 0;
   margin: 0;
   height: 100%;
@@ -1070,6 +1075,7 @@ h1,
   flex: 1;
   padding: 15px;
   padding-left: 0;
+  font-family: Futura, sans-serif;
 }
 
 .settings-list {
