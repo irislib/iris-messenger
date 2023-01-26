@@ -2461,6 +2461,10 @@ input[type='text'] {
   .nav {
     max-height: 50px;
   }
+  footer.nav {
+    max-height: calc(50px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
   .nav .text {
     text-align: right;
   }
