@@ -132,11 +132,10 @@ export default {
   likesByMessageId: new Map<string, Set<string>>(),
   boostsByMessageId: new Map<string, Set<string>>(),
   handledMsgsPerSecond: 0,
-  notificationsSeenTime: 0,
-  unseenNotificationCount: 0,
   decryptedMessages: new Map<string, string>(),
   windowNostrQueue: [],
   isProcessingQueue: false,
+  notificationsSeenTime: 0,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -937,7 +936,17 @@ export default {
       }
     }
   },
-  updateUnseenNotificationCount: debounce((count) => {
+  updateUnseenNotificationCount: debounce((_this) => {
+    let count = 0;
+    for (const id of _this.notifications.eventIds) {
+      const event = _this.eventsById.get(id);
+      if (event.created_at > _this.notificationsSeenTime) {
+        count++;
+      } else {
+        break;
+      }
+    }
+    console.log('notificationsSeenTime', _this.notificationsSeenTime, 'count', count);
     iris.local().get('unseenNotificationCount').put(count);
   }, 1000),
   maybeAddNotification(event: Event) {
@@ -954,10 +963,7 @@ export default {
       }
       this.eventsById.set(event.id, event);
       this.notifications.add(event);
-      if (event.created_at > this.notificationsSeenTime) {
-        this.unseenNotificationCount++;
-        this.updateUnseenNotificationCount(this.unseenNotificationCount);
-      }
+      this.updateUnseenNotificationCount(this);
     }
   },
   handleDirectMessage(event: Event) {
@@ -1126,17 +1132,12 @@ export default {
         this.maxRelays = maxRelays;
         localForage.setItem('maxRelays', maxRelays);
       });
-    iris
-      .local()
-      .get('unseenNotificationCount')
-      .on((unseenNotificationCount) => {
-        this.unseenNotificationCount = unseenNotificationCount;
-      });
     // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
     localForage.getItem('notificationsSeenTime').then((val) => {
-      if (val !== null) {
-        iris.local().get('notificationsSeenTime').put(val);
+      if (val && !this.notificationsSeenTime) {
         this.notificationsSeenTime = val;
+        this.updateUnseenNotificationCount(this);
+        console.log('notificationsSeenTime', this.notificationsSeenTime);
       }
     });
     localForage.getItem('maxRelays').then((val) => {
@@ -1174,7 +1175,15 @@ export default {
           subscribe,
           (...args) => this.unsubscribe(...args),
         );
-        this.public.get('notifications/lastOpened', (time) => (this.notificationsSeenTime = time));
+        const myPub = iris.session.getKey().secp256k1.rpub;
+        this.public.get({ path: 'notifications/lastOpened', authors: [myPub] }, (time) => {
+          time = time.value;
+          if (time !== this.notificationsSeenTime) {
+            localForage.setItem('notificationsSeenTime', time.value);
+            this.notificationsSeenTime = time.value;
+            this.updateUnseenNotificationCount(this);
+          }
+        });
         this.knownUsers.add(key);
         this.manageRelays();
         this.loadLocalStorageEvents();
