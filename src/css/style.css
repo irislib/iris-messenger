@@ -2489,6 +2489,10 @@ input[type='text'] {
   .profile-header {
     margin-bottom: 0;
   }
+
+  .public-messages-view .msg .msg-content {
+      border-radius: 0 !important;
+  }
 }
 
 @media (min-width: 626px) {
