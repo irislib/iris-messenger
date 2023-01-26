@@ -770,7 +770,6 @@ header.footer .header-content {
 
 .msg-content .text {
   font-family: Calibri, sans-serif;
-  letter-spacing: 0.1px;
 }
 
 .msg a {
@@ -2494,8 +2493,14 @@ input[type='text'] {
     margin-bottom: 0;
   }
 
-  .public-messages-view .msg .msg-content {
-      border-radius: 0 !important;
+  .public-messages-view .msg:first-of-type .msg-content,
+  .public-messages-view .msg:last-of-type .msg-content,
+  .public-messages-view .msg:only-of-type .msg-content{
+      border-radius: 0;
+  }
+
+  .public-messages-view .msg .msg .msg-content {
+    border-radius: 8px;
   }
 }
 
