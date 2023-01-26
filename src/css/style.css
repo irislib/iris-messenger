@@ -80,7 +80,6 @@
 
 * {
   box-sizing: border-box;
-  font-family: FuturaLight, 'Trebuchet MS', Arial, sans-serif;
   -webkit-tap-highlight-color: transparent;
   overflow-wrap: anywhere;
 }
@@ -94,7 +93,7 @@ html {
 body {
   font-size: 15px;
   color: var(--text-color);
-  font-family: FuturaLight, 'Trebuchet MS', Arial, sans-serif;
+  font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
   padding: 0;
   margin: 0;
   height: 100%;
@@ -133,6 +132,10 @@ img {
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+input, textarea {
+  font-family: FuturaLight, sans-serif;
 }
 
 textarea {
@@ -759,11 +762,15 @@ header.footer .header-content {
   padding: 0 15px;
 }
 
-.msg {
+.msg .msg-content {
   display: flex;
   flex-direction: column;
   margin-bottom: 4px;
   white-space: pre-wrap;
+}
+
+.msg-content .text {
+  font-family: FuturaLight, sans-serif;
 }
 
 .msg a {
