@@ -52,7 +52,7 @@ class SearchBox extends Component<Props, State> {
       query: '',
       noFollows: true,
       offsetLeft: 0,
-      selected: 0,
+      selected: -1, // -1 - 'search by keyword'
     };
   }
 
@@ -66,7 +66,7 @@ class SearchBox extends Component<Props, State> {
       e.preventDefault();
       const selected = this.state.selected;
       let next = e.keyCode === 40 ? selected + 1 : selected - 1;
-      next = Math.max(0, Math.min(this.state.results.length - 1, next));
+      next = Math.max(-1, Math.min(this.state.results.length - 1, next));
       this.setState({ selected: next });
     }
   }
@@ -115,12 +115,13 @@ class SearchBox extends Component<Props, State> {
     }
     // if first 5 results are different, set selected = 0
     if (
+      this.state.selected >= 0 &&
       !isEqual(
         this.state.results.slice(0, this.state.selected + 1),
         prevState.results.slice(0, this.state.selected + 1),
       )
     ) {
-      this.setState({ selected: 0 });
+      this.setState({ selected: -1 });
     }
   }
 
@@ -192,10 +193,9 @@ class SearchBox extends Component<Props, State> {
 
     if (query) {
       const results = iris.session.getSearchIndex().search(query).slice(0, RESULTS_MAX);
-      results.unshift({key: query});
       this.setState({ results, query });
     } else {
-      this.setState({ results: [{key: query}], query });
+      this.setState({ results: [], query });
     }
   }
 
@@ -239,9 +239,9 @@ class SearchBox extends Component<Props, State> {
         >
           {this.state.query ? (
             <a
-              onFocus={(e) => this.onResultFocus(e, 0)}
+              onFocus={(e) => this.onResultFocus(e, -1)}
               tabIndex={2}
-              className={'result ' + (0 === this.state.selected ? 'selected' : '')}
+              className={'result ' + (-1 === this.state.selected ? 'selected' : '')}
               href={`/search/${encodeURIComponent(this.state.query)}`}
 	    >
               <div class="identicon-container">
@@ -257,7 +257,6 @@ class SearchBox extends Component<Props, State> {
             ''
           )}
           {this.state.results.map((r, index) => {
-            if (!index) return ''; // skip fake first item
             const i = r.item;
             let followText = '';
             if (i.followers) {
