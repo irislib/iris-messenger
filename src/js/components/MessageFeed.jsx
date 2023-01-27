@@ -114,7 +114,11 @@ class MessageFeed extends Component {
           }),
         );
       if (this.props.keyword) {
-        Nostr.getMessagesByKeyword(this.props.keyword, (messages) => this.updateSortedMessages(messages));
+        const keyword = this.props.keyword;
+        Nostr.getMessagesByKeyword(this.props.keyword, (messages) => {
+          if (this.props.keyword == keyword)
+            this.updateSortedMessages(messages);
+	});
       } else if (this.props.index) {
         // public messages
         if (this.props.index === 'everyone') {

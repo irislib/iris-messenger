@@ -1394,9 +1394,19 @@ export default {
       this.latestNotesByKeywords.get(keyword)?.add(event);
       cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
     };
+    // find among cached events
+    const filter = { kinds: [1], keywords: [keyword] };
+    for (const event of this.eventsById.values()) {
+      if (this.matchFilter(event, filter)) {
+        if (!this.latestNotesByKeywords.has(keyword)) {
+          this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+        }
+        this.latestNotesByKeywords.get(keyword)?.add(event);
+      }
+    }
     this.latestNotesByKeywords.has(keyword) &&
       cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
-    this.subscribe([{ kinds: [1], keywords: [keyword] }], callback);
+    this.subscribe([filter], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile
