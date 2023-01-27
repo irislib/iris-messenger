@@ -412,6 +412,14 @@ class Profile extends View {
           website = website.slice(0, -1);
         }
 
+        let banner;
+
+        try {
+          banner = profile.banner && new URL(profile.banner).toString();
+        } catch (e) {
+          console.log('Invalid banner URL', profile.banner);
+        }
+
         // profile may contain arbitrary fields, so be careful
         this.setState({
           name: profile.name,
@@ -420,7 +428,7 @@ class Profile extends View {
           nip05: profile.nip05valid && profile.nip05,
           lud16,
           website: website,
-          banner: profile.banner && new URL(profile.banner).toString(),
+          banner,
         });
       },
       true,

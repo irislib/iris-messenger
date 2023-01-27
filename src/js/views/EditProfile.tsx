@@ -10,9 +10,10 @@ import { translate as t } from '../translations/Translation';
 const explainers = {
   display_name: 'Name',
   name: 'Username',
-  lud16: 'Lightning (lud16)',
+  lud16: 'Bitcoin lightning address (lud16)',
   picture: 'Picture url',
   banner: 'Banner url',
+  nip05: 'Domain name verification (nip05)',
 };
 
 export default class EditProfile extends Component {
@@ -64,7 +65,16 @@ export default class EditProfile extends Component {
   };
 
   render() {
-    const fields = ['display_name', 'name', 'picture', 'about', 'banner', 'website', 'lud16'];
+    const fields = [
+      'display_name',
+      'name',
+      'picture',
+      'about',
+      'banner',
+      'website',
+      'lud16',
+      'nip05',
+    ];
     // add other possible fields from profile
     Object.keys(this.state.profile).forEach((key) => {
       if (!fields.includes(key)) {

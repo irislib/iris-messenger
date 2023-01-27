@@ -132,11 +132,10 @@ export default {
   likesByMessageId: new Map<string, Set<string>>(),
   boostsByMessageId: new Map<string, Set<string>>(),
   handledMsgsPerSecond: 0,
-  notificationsSeenTime: 0,
-  unseenNotificationCount: 0,
   decryptedMessages: new Map<string, string>(),
   windowNostrQueue: [],
   isProcessingQueue: false,
+  notificationsSeenTime: 0,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -381,7 +380,9 @@ export default {
   },
   publish: async function (event: any) {
     if (!event.sig) {
-      event.tags = event.tags || [];
+      if (!event.tags) {
+        event.tags = [];
+      }
       event.content = event.content || '';
       event.created_at = event.created_at || Math.floor(Date.now() / 1000);
       event.pubkey = iris.session.getKey().secp256k1.rpub;
@@ -936,7 +937,20 @@ export default {
       }
     }
   },
-  updateUnseenNotificationCount: debounce((count) => {
+  updateUnseenNotificationCount: debounce((_this) => {
+    if (!_this.notificationsSeenTime) {
+      return;
+    }
+    let count = 0;
+    for (const id of _this.notifications.eventIds) {
+      const event = _this.eventsById.get(id);
+      if (event.created_at > _this.notificationsSeenTime) {
+        count++;
+      } else {
+        break;
+      }
+    }
+    console.log('notificationsSeenTime', _this.notificationsSeenTime, 'count', count);
     iris.local().get('unseenNotificationCount').put(count);
   }, 1000),
   maybeAddNotification(event: Event) {
@@ -953,10 +967,7 @@ export default {
       }
       this.eventsById.set(event.id, event);
       this.notifications.add(event);
-      if (event.created_at > this.notificationsSeenTime) {
-        this.unseenNotificationCount++;
-        this.updateUnseenNotificationCount(this.unseenNotificationCount);
-      }
+      this.updateUnseenNotificationCount(this);
     }
   },
   handleDirectMessage(event: Event) {
@@ -989,6 +1000,14 @@ export default {
       this.keyValueEvents.set(key, event);
     }
   },
+  handleNoteOrBoost(event: Event) {
+    const mentionIndex = event.tags.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
+    if (event.content === `#[${mentionIndex}]`) {
+      this.handleBoost(event);
+    } else {
+      this.handleNote(event);
+    }
+  },
   handleEvent(event: Event) {
     if (!event) return;
     if (this.eventsById.has(event.id)) {
@@ -1015,7 +1034,7 @@ export default {
         break;
       case 1:
         this.maybeAddNotification(event);
-        this.handleNote(event);
+        this.handleNoteOrBoost(event);
         break;
       case 4:
         this.handleDirectMessage(event);
@@ -1117,17 +1136,12 @@ export default {
         this.maxRelays = maxRelays;
         localForage.setItem('maxRelays', maxRelays);
       });
-    iris
-      .local()
-      .get('unseenNotificationCount')
-      .on((unseenNotificationCount) => {
-        this.unseenNotificationCount = unseenNotificationCount;
-      });
     // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
     localForage.getItem('notificationsSeenTime').then((val) => {
-      if (val !== null) {
-        iris.local().get('notificationsSeenTime').put(val);
+      if (val && !this.notificationsSeenTime) {
         this.notificationsSeenTime = val;
+        this.updateUnseenNotificationCount(this);
+        console.log('notificationsSeenTime', this.notificationsSeenTime);
       }
     });
     localForage.getItem('maxRelays').then((val) => {
@@ -1165,7 +1179,15 @@ export default {
           subscribe,
           (...args) => this.unsubscribe(...args),
         );
-        this.public.get('notifications/lastOpened', (time) => (this.notificationsSeenTime = time));
+        const myPub = iris.session.getKey().secp256k1.rpub;
+        this.public.get({ path: 'notifications/lastOpened', authors: [myPub] }, (time) => {
+          time = time.value;
+          if (time !== this.notificationsSeenTime) {
+            this.notificationsSeenTime = time;
+            localForage.setItem('notificationsSeenTime', time);
+            this.updateUnseenNotificationCount(this);
+          }
+        });
         this.knownUsers.add(key);
         this.manageRelays();
         this.loadLocalStorageEvents();

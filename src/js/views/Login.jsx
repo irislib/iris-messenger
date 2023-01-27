@@ -10,6 +10,7 @@ import iris from 'iris-lib';
 import _ from 'lodash';
 import { route } from 'preact-router';
 import Nostr from "../Nostr";
+import localForage from "localforage";
 const bech32 = require('bech32-buffer');
 
 function maybeGoToChat(key) {
@@ -118,6 +119,9 @@ class Login extends Component {
     }, 100);
     // follow the developer's nostr key also
     this.base.style = 'display:none';
+    const now = Math.floor(Date.now() / 1000);
+    Nostr.notificationsSeenTime = now;
+    localForage.setItem('notificationsSeenTime', now);
   }
 
   onNameChange(event) {
