@@ -244,9 +244,9 @@ class SearchBox extends Component<Props, State> {
               tabIndex={2}
               className={'result ' + (-1 === this.state.selected ? 'selected' : '')}
               href={`/search/${encodeURIComponent(this.state.query)}`}
-	    >
+            >
               <div class="identicon-container">
-                <div style='font-size: 1.5em; width: 40px'>&#128269;</div>
+                <div style="font-size: 1.5em; width: 40px">&#128269;</div>
               </div>
               <div>
                 <span>{this.state.query}</span>

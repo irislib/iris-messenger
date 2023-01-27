@@ -88,9 +88,7 @@ const DEFAULT_RELAYS = [
   'wss://brb.io',
 ];
 
-const SEARCH_RELAYS = [
-  'wss://relay.nostr.band',
-];
+const SEARCH_RELAYS = ['wss://relay.nostr.band'];
 
 const defaultRelays = new Map<string, Relay>(
   DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
@@ -530,15 +528,24 @@ export default {
   }, 100),
   subscribeToKeywords: debounce((_this) => {
     if (_this.subscribedKeywords.size === 0) return;
-    console.log('subscribe to keywords', Array.from(_this.subscribedKeywords), _this.knownUsers.size);
+    console.log(
+      'subscribe to keywords',
+      Array.from(_this.subscribedKeywords),
+      _this.knownUsers.size,
+    );
     const go = () => {
       _this.sendSubToRelays(
-        [{ kinds: [1], limit: MAX_MSGS_BY_KEYWORD, keywords: Array.from(_this.subscribedKeywords) }],
-        'keywords'
+        [
+          {
+            kinds: [1],
+            limit: MAX_MSGS_BY_KEYWORD,
+            keywords: Array.from(_this.subscribedKeywords),
+          },
+        ],
+        'keywords',
       );
       // on page reload knownUsers are empty and thus all search results are dropped
-      if (_this.knownUsers.size < 1000)
-        setTimeout(go, 2000);
+      if (_this.knownUsers.size < 1000) setTimeout(go, 2000);
     };
     go();
   }, 100),
@@ -676,7 +683,7 @@ export default {
         for (const keyword of filter.keywords) {
           if (!this.subscribedKeywords.has(keyword)) {
             hasNewKeywords = true;
-            // only 1 keyword at a time, otherwise a popular kw will consume the whole 'limit'  
+            // only 1 keyword at a time, otherwise a popular kw will consume the whole 'limit'
             this.subscribedKeywords.clear();
             this.subscribedKeywords.add(keyword);
           }
@@ -895,8 +902,7 @@ export default {
     this.saveRelaysToContacts();
     // do not save these to contact list
     for (const url of SEARCH_RELAYS) {
-      if (!this.relays.has(url))
-        this.addRelay(url);
+      if (!this.relays.has(url)) this.addRelay(url);
     }
   },
   saveRelaysToContacts() {
@@ -1173,7 +1179,10 @@ export default {
     if (
       filter.keywords &&
       !filter.keywords.some((keyword: string) => {
-        return keyword.toLowerCase().split(' ').every((word: string) => content.includes(word));
+        return keyword
+          .toLowerCase()
+          .split(' ')
+          .every((word: string) => content.includes(word));
       })
     ) {
       return false;
@@ -1377,7 +1386,7 @@ export default {
     callback();
     this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
   },
-  getMessagesByKeyword(keyword:string, cb: (messageIds: string[]) => void) {
+  getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void) {
     const callback = (event) => {
       if (!this.latestNotesByKeywords.has(keyword)) {
         this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
@@ -1385,7 +1394,8 @@ export default {
       this.latestNotesByKeywords.get(keyword)?.add(event);
       cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
     };
-    this.latestNotesByKeywords.has(keyword) && cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    this.latestNotesByKeywords.has(keyword) &&
+      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
     this.subscribe([{ kinds: [1], keywords: [keyword] }], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
