@@ -54,6 +54,9 @@ class ChatListItem extends Component {
   }
 
   hasUnseen() {
+    if (this.state.latest.pubkey === iris.session.getKey().secp256k1.rpub) {
+      return false;
+    }
     return !this.props.active && !(this.state.latest.created_at <= this.state.lastOpened);
   }
 
