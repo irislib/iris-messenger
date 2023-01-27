@@ -5,6 +5,7 @@ import BaseComponent from '../BaseComponent';
 
 import Button from './basic/Button';
 import Name from './Name';
+import SafeImg from './SafeImg';
 import Text from './Text';
 
 const hashRegex = /^(?:[A-Za-z0-9+/]{4}){10}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)+$/;
@@ -234,7 +235,9 @@ class ExplorerNode extends BaseComponent {
           .replace(`Local/`, '');
 
       if (typeof v === 'string' && v.indexOf('data:image') === 0) {
-        s = this.isMine ? html`<iris-img user=${pub} path=${path} />` : html`<img src=${v} />`;
+        s = this.isMine
+          ? html`<iris-img user=${pub} path=${path} />`
+          : html`<${SafeImg} src=${v} />`;
       } else {
         let stringified = JSON.stringify(v);
         let showToggle;

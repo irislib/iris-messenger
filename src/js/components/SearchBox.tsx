@@ -11,6 +11,7 @@ import { translate as t } from '../translations/Translation';
 import Badge from './Badge';
 import Identicon from './Identicon';
 import Name from './Name';
+import SafeImg from './SafeImg';
 
 const RESULTS_MAX = 5;
 
@@ -258,7 +259,7 @@ class SearchBox extends Component<Props, State> {
               >
                 {i.picture ? (
                   <div class="identicon-container">
-                    <img src={i.picture} class="round-borders" height={40} width={40} alt="" />
+                    <SafeImg src={i.picture} class="round-borders" width={40} />
                   </div>
                 ) : (
                   <Identicon key={`${i.key}ic`} str={i.key} width={40} />

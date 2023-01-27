@@ -5,6 +5,7 @@ import { route } from 'preact-router';
 import Component from '../../BaseComponent';
 import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
+import SafeImg from '../../components/SafeImg';
 import Helpers from '../../Helpers';
 import Nostr from '../../Nostr';
 
@@ -77,7 +78,7 @@ class ChatListItem extends Component {
 
     let iconEl = chat.picture
       ? html`<div class="identicon-container">
-          <img src="${chat.picture}" class="round-borders" height="49" width="49" alt="" />
+          <${SafeImg} src="${chat.picture}" class="round-borders" height="49" width="49" alt="" />
         </div>`
       : html`<${Identicon} str=${chat} width="49" />`;
 
