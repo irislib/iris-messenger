@@ -76,7 +76,7 @@ const eventsById = new Map<string, Event>();
 
 const DEFAULT_RELAYS = [
   'wss://jiggytom.ddns.net',
-  'wss://nostr-relay.wlvs.space',
+  'wss://eden.nostr.land',
   'wss://nostr.fmt.wiz.biz',
   'wss://nostr.ono.re',
   'wss://relay.damus.io',
