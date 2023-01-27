@@ -816,7 +816,14 @@ export default {
     return undefined;
   },
   handleBoost(event: Event) {
-    const id = event.tags.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
+    let id = event.tags.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
+    if (!id) {
+      // last e tag is the boosted post
+      id = event.tags
+        .slice() // so we don't reverse event.tags in place
+        .reverse()
+        .find((tag: any) => tag[0] === 'e')?.[1];
+    }
     if (!id) return;
     if (!this.boostsByMessageId.has(id)) {
       this.boostsByMessageId.set(id, new Set());
