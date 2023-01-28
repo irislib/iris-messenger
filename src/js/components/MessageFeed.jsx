@@ -171,6 +171,7 @@ class MessageFeed extends Component {
       return;
     }
     const displayCount = this.state.displayCount;
+    const showRepliedMsg = this.props.index !== 'likes';
     return (
       <>
         <div>
@@ -187,7 +188,7 @@ class MessageFeed extends Component {
             </div>
           ) : null}
           {this.state.sortedMessages.slice(0, displayCount).map((hash) => (
-            <PublicMessage key={hash} hash={hash} showName={true} />
+            <PublicMessage key={hash} hash={hash} showName={true} showRepliedMsg={showRepliedMsg} />
           ))}
         </div>
         {displayCount < this.state.sortedMessages.length ? (
