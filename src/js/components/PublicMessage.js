@@ -147,7 +147,7 @@ class PublicMessage extends Message {
             }
           });
         }
-        msg.text = text;
+        msg.text = text.trim();
       }
 
       this.setState({ msg });
@@ -159,7 +159,7 @@ class PublicMessage extends Message {
           const sortedReplies =
             replies &&
             Array.from(replies).sort(
-              (a, b) => Nostr.eventsById.get(a)?.time - Nostr.eventsById.get(b)?.time,
+              (a, b) => Nostr.eventsById.get(a)?.created_at - Nostr.eventsById.get(b)?.created_at,
             );
           this.setState({
             boosts: this.boostedBy.size,
@@ -194,13 +194,6 @@ class PublicMessage extends Message {
         });
       this.linksDone = true;
     }
-  }
-
-  toggleReplies(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const showReplyForm = !this.state.showReplyForm;
-    this.setState({ showReplyForm });
   }
 
   onClickName(e) {
@@ -308,7 +301,19 @@ class PublicMessage extends Message {
     if (window.getSelection().toString()) {
       return;
     }
+    this.openStandalone();
+  }
+
+  openStandalone() {
     route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
+  }
+
+  replyBtnClicked() {
+    if (this.props.standalone) {
+      $(document).find('textarea').focus();
+    } else {
+      this.openStandalone();
+    }
   }
 
   renderFollow() {
@@ -336,7 +341,9 @@ class PublicMessage extends Message {
     return html`
       <div class="msg">
         <div class="msg-content">
-          <div style="display: flex; align-items: center; flex-basis: 100%; white-space: nowrap;text-overflow: ellipsis; overflow:hidden">
+          <div
+            style="display: flex; align-items: center; flex-basis: 100%; white-space: nowrap;text-overflow: ellipsis; overflow:hidden"
+          >
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
             <a
               href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
@@ -344,7 +351,11 @@ class PublicMessage extends Message {
             >
               <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
-            <span> liked your <a href="#/post/${likedId}">note</a> <i>"${text}"</i> </span>
+            <span>
+              liked your <a href="#/post/${likedId}">note</a> ${text && text.length
+                ? html`<i>"${text}"</i>`
+                : ''}</span
+            >
           </div>
         </div>
       </div>
@@ -407,7 +418,7 @@ class PublicMessage extends Message {
             <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
-            <span> reposted</span>
+            <span style="margin-left: 5px"> reposted </span>
           </div>
           <${PublicMessage} hash=${id} showName=${true} />
         </div>
@@ -521,14 +532,14 @@ class PublicMessage extends Message {
     const ogImageUrl = s.msg.attachments?.find((a) => a.type === 'image')?.data;
 
     return html`
-      ${s.msg.replyingTo && !this.props.asReply && !this.props.asQuote
+      ${s.msg.replyingTo && this.props.showRepliedMsg
         ? html`
             <${PublicMessage}
               key=${s.msg.replyingTo}
               hash=${s.msg.replyingTo}
               asQuote=${true}
               showName=${true}
-              showReplies=${false}
+              showReplies=${0}
             />
           `
         : ''}
@@ -538,27 +549,35 @@ class PublicMessage extends Message {
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
           : ''} ${asQuote ? 'quote' : ''}
-          ${s.msg.replyingTo && !this.props.asQuote ? 'quoting' : ''}"
+          ${s.msg.replyingTo && (this.props.showRepliedMsg || this.props.asReply) ? 'quoting' : ''}"
       >
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           ${this.props.asQuote && s.msg.replyingTo
             ? html` <div style="flex-basis:100%; margin-bottom: 15px">
-                <a href="#/post/${Nostr.toNostrBech32Address(s.msg.replyingTo, 'note')}">Show thread</a>
+                <a href="#/post/${Nostr.toNostrBech32Address(s.msg.replyingTo, 'note')}"
+                  >Show thread</a
+                >
               </div>`
             : ''}
           <div class="msg-identicon">
-            ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
+            ${s.msg.info.from
+              ? html`
+                  <a href=${`#/profile/${s.msg.info.from}`}>
+                    <${Identicon} str=${s.msg.info.from} width="40" />
+                  </a>
+                `
+              : ''}
             ${asQuote && !this.props.standalone ? html`<div class="line"></div>` : ''}
           </div>
           <div class="msg-main">
             <div class="msg-sender">
               <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
                 ${this.props.showName &&
-                  html`
-                    <a href=${`#/profile/${s.msg.info.from}`} class="msgSenderName">
-                      <${Name} pub=${s.msg.info.from} />
-                    </a>
-                  `}
+                html`
+                  <a href=${`#/profile/${s.msg.info.from}`} class="msgSenderName">
+                    <${Name} pub=${s.msg.info.from} />
+                  </a>
+                `}
                 <div class="time">
                   ${'· '}
                   <a
@@ -604,7 +623,9 @@ class PublicMessage extends Message {
                 />
               </div>`;
             })}
-            <div class="text ${emojiOnly && 'emoji-only'}">${text}</div>
+            ${text.length > 0
+              ? html`<div class="text ${emojiOnly && 'emoji-only'}">${text}</div> `
+              : ''}
             ${!this.props.standalone &&
             ((s.msg.attachments && s.msg.attachments.length > 1) ||
               this.state.msg.text.length > MSG_TRUNCATE_LENGTH ||
@@ -621,47 +642,34 @@ class PublicMessage extends Message {
                 `
               : ''}
             <div class="below-text">
-              ${this.props.asQuote
-                ? ''
-                : html`
-                    <a class="msg-btn reply-btn" onClick=${() => this.toggleReplies()}>
-                      ${replyIcon}
-                    </a>
-                    <span
-                      class="count ${!this.props.standalone &&
-                      !this.props.asReply &&
-                      s.showReplyForm
-                        ? 'active'
-                        : ''}"
-                      onClick=${(e) => this.toggleReplies(e)}
-                    >
-                      ${s.replyCount || ''}
-                    </span>
-                    <a
-                      class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
-                      onClick=${(e) => this.likeBtnClicked(e)}
-                    >
-                      ${s.liked ? Icons.heartFull : Icons.heartEmpty}
-                    </a>
-                    <span
-                      class="count ${s.showLikes ? 'active' : ''}"
-                      onClick=${(e) => this.toggleLikes(e)}
-                    >
-                      ${s.likes || ''}
-                    </span>
-                    <a
-                      class="msg-btn boost-btn ${s.boosted ? 'boosted' : ''}"
-                      onClick=${() => this.boostBtnClicked()}
-                    >
-                      ${Icons.boost}
-                    </a>
-                    <span
-                      class="count ${s.showBoosts ? 'active' : ''}"
-                      onClick=${(e) => this.toggleBoosts(e)}
-                    >
-                      ${s.boosts || ''}
-                    </span>
-                  `}
+              <a class="msg-btn reply-btn" onClick=${() => this.replyBtnClicked()}>
+                ${replyIcon}
+              </a>
+              <span class="count"> ${s.replyCount || ''} </span>
+              <a
+                class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
+                onClick=${(e) => this.likeBtnClicked(e)}
+              >
+                ${s.liked ? Icons.heartFull : Icons.heartEmpty}
+              </a>
+              <span
+                class="count ${s.showLikes ? 'active' : ''}"
+                onClick=${(e) => this.toggleLikes(e)}
+              >
+                ${s.likes || ''}
+              </span>
+              <a
+                class="msg-btn boost-btn ${s.boosted ? 'boosted' : ''}"
+                onClick=${() => this.boostBtnClicked()}
+              >
+                ${Icons.boost}
+              </a>
+              <span
+                class="count ${s.showBoosts ? 'active' : ''}"
+                onClick=${(e) => this.toggleBoosts(e)}
+              >
+                ${s.boosts || ''}
+              </span>
             </div>
             ${s.showLikes
               ? html`
@@ -705,14 +713,17 @@ class PublicMessage extends Message {
         </div>
       </div>
       ${(this.props.showReplies || s.showReplyForm) && s.sortedReplies && s.sortedReplies.length
-        ? s.sortedReplies.map(
+        ? s.sortedReplies
+            .slice(0, this.props.showReplies)
+            .map(
             (r) =>
               html`<${PublicMessage}
                 key=${r}
                 hash=${r}
                 asReply=${!this.props.standalone}
                 showName=${true}
-                showReplies=${true}
+                showReplies=${1}
+                showRepliedMsg=${false}
               />`,
           )
         : ''}

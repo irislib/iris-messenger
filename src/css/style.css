@@ -191,7 +191,7 @@ textarea {
   border: 0;
   border-radius: 6px;
   border: var(--msg-border);
-  margin: 15px 0;
+  margin: 0 0 15px 0;
   background-color: var(--msg-content-background);
   color: var(--text-color);
   resize: none;
@@ -291,6 +291,10 @@ video {
 
 .mar-left5 {
   margin-left: 5px;
+}
+
+.mar-top15 {
+  margin-top: 15px;
 }
 
 textarea.new-msg {
@@ -807,12 +811,16 @@ header.footer .header-content {
   display: flex;
   flex-direction: column;
   margin-bottom: 4px;
-  white-space: pre-wrap;
+}
+
+.msg:not(.standalone) .msg-content {
+  cursor: pointer;
 }
 
 .msg-content .text {
   font-family: Lato, sans-serif;
   margin-bottom: 5px;
+  white-space: pre-wrap;
 }
 
 .msg a {
@@ -1540,7 +1548,7 @@ a.msgSenderName {
   color: var(--text-time);
 }
 
-.msg.quote .below-text {
+.msg.quote .below-text, .msg.standalone .below-text {
   margin-bottom: 15px;
 }
 
@@ -1592,6 +1600,10 @@ a.msgSenderName {
 .msg .like-btn.liked, .msg .like-btn:hover {
   color: var(--red);
 
+}
+
+.msg .reply-btn:hover {
+  color: var(--blue);
 }
 
 .msg .boost-btn.boosted, .msg .boost-btn:hover {
@@ -1732,7 +1744,7 @@ hr {
   display: flex;
   max-width: 650px;
   flex-direction: column;
-  margin: 0 auto 0 auto;
+  margin: 15px auto 15px auto;
 }
 
 .chat-message-form {
@@ -2452,6 +2464,9 @@ input[type='text'] {
 }
 
 @media (max-width: 625px) {
+  .centered-container {
+    margin: 0 auto 0 auto;
+  }
   .notification-msg {
     border-radius: 0 !important;
   }
@@ -2586,6 +2601,6 @@ input[type='text'] {
     display: none !important;
   }
   .msg.standalone:not(.quoting) {
-    margin: 15px 0 4px 0;
+    margin-bottom: 4px;
   }
 }
