@@ -6,3 +6,4 @@ translations.csv
 .DS_Store
 .idea
 .netlify
+yarn-error.log
