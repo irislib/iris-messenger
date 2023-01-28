@@ -530,6 +530,10 @@ class PublicMessage extends Message {
     });
 
     const ogImageUrl = s.msg.attachments?.find((a) => a.type === 'image')?.data;
+    let rootMsg = s.msg.event?.tags.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
+    if (!rootMsg) {
+      rootMsg = s.msg.replyingTo;
+    }
 
     return html`
       ${s.msg.replyingTo && this.props.showRepliedMsg
@@ -554,9 +558,7 @@ class PublicMessage extends Message {
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           ${this.props.asQuote && s.msg.replyingTo
             ? html` <div style="flex-basis:100%; margin-bottom: 15px">
-                <a href="#/post/${Nostr.toNostrBech32Address(s.msg.replyingTo, 'note')}"
-                  >Show thread</a
-                >
+                <a href="#/post/${Nostr.toNostrBech32Address(rootMsg, 'note')}">Show thread</a>
               </div>`
             : ''}
           <div class="msg-identicon">
@@ -716,16 +718,16 @@ class PublicMessage extends Message {
         ? s.sortedReplies
             .slice(0, this.props.showReplies)
             .map(
-            (r) =>
-              html`<${PublicMessage}
-                key=${r}
-                hash=${r}
-                asReply=${!this.props.standalone}
-                showName=${true}
-                showReplies=${1}
-                showRepliedMsg=${false}
-              />`,
-          )
+              (r) =>
+                html`<${PublicMessage}
+                  key=${r}
+                  hash=${r}
+                  asReply=${!this.props.standalone}
+                  showName=${true}
+                  showReplies=${1}
+                  showRepliedMsg=${false}
+                />`,
+            )
         : ''}
     `;
   }
