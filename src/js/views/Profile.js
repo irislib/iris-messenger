@@ -243,16 +243,14 @@ class Profile extends View {
                     </p>
                   `
                 : ''}
-              ${this.state.isMyProfile
-                ? ''
-                : html`
-                    <div class="hidden-xs">
-                      <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                      <${Button} small=${true} onClick=${() => route(`/chat/${this.props.id}`)}>
-                        ${t('send_message')}
-                      <//>
-                    </div>
-                  `}
+              <div class="hidden-xs">
+                ${!this.state.isMyProfile
+                  ? html` <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} /> `
+                  : ''}
+                <${Button} small=${true} onClick=${() => route(`/chat/${this.props.id}`)}>
+                  ${t('send_message')}
+                <//>
+              </div>
             </div>
           </div>
         </div>

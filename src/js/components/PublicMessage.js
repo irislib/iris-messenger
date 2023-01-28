@@ -301,6 +301,10 @@ class PublicMessage extends Message {
     if (window.getSelection().toString()) {
       return;
     }
+    if (this.state.msg?.event?.kind === 7) {
+      const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
+      return route(`/post/${likedId}`);
+    }
     this.openStandalone();
   }
 
@@ -340,7 +344,7 @@ class PublicMessage extends Message {
     }
     return html`
       <div class="msg">
-        <div class="msg-content">
+        <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           <div
             style="display: flex; align-items: center; flex-basis: 100%; white-space: nowrap;text-overflow: ellipsis; overflow:hidden"
           >
