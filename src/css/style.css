@@ -812,6 +812,7 @@ header.footer .header-content {
 
 .msg-content .text {
   font-family: Lato, sans-serif;
+  margin-bottom: 5px;
 }
 
 .msg a {
@@ -1541,7 +1542,6 @@ a.msgSenderName {
 
 .msg.quote .below-text {
   margin-bottom: 15px;
-  margin-top: 5px;
 }
 
 .btn,
@@ -1583,11 +1583,18 @@ a.msgSenderName {
   margin-right: 45px;
 }
 
-.msg .like-btn.liked {
-  color: var(--red);
+/* transition for btn colors */
+
+.msg-btn {
+  transition: color 0.2s;
 }
 
-.msg .boost-btn.boosted {
+.msg .like-btn.liked, .msg .like-btn:hover {
+  color: var(--red);
+
+}
+
+.msg .boost-btn.boosted, .msg .boost-btn:hover {
   color: var(--green);
 }
 
