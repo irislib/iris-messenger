@@ -335,8 +335,8 @@ class PublicMessage extends Message {
     }
     return html`
       <div class="msg">
-        <div class="msg-content" style="padding: 15px 0">
-          <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px; white-space: nowrap;text-overflow: ellipsis; overflow:hidden">
+        <div class="msg-content">
+          <div style="display: flex; align-items: center; flex-basis: 100%; white-space: nowrap;text-overflow: ellipsis; overflow:hidden">
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
             <a
               href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
@@ -401,7 +401,7 @@ class PublicMessage extends Message {
   renderBoost(id) {
     return html`
       <div class="msg">
-        <div class="msg-content" style="padding: 15px 0">
+        <div class="msg-content" style="padding: 15px 0 0 0;">
           <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
             <i style="margin-right: 15px;"> ${Icons.boost} </i>
             <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
@@ -428,6 +428,8 @@ class PublicMessage extends Message {
 
   render() {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
+    const s = this.state;
+    const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
     if (!this.state.msg) {
       return html` <div
         ref=${this.ref}
@@ -515,9 +517,7 @@ class PublicMessage extends Message {
     const timeStr = time.toLocaleTimeString(window.navigator.language, {
       timeStyle: 'short',
     });
-    const s = this.state;
 
-    const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
     const ogImageUrl = s.msg.attachments?.find((a) => a.type === 'image')?.data;
 
     return html`
@@ -543,12 +543,12 @@ class PublicMessage extends Message {
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           ${this.props.asQuote && s.msg.replyingTo
             ? html` <div style="flex-basis:100%; margin-bottom: 15px">
-                <a href="#/post/${s.msg.replyingTo}">Show thread</a>
+                <a href="#/post/${Nostr.toNostrBech32Address(s.msg.replyingTo, 'note')}">Show thread</a>
               </div>`
             : ''}
           <div class="msg-identicon">
             ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
-            ${asQuote ? html`<div class="line"></div>` : ''}
+            ${asQuote && !this.props.standalone ? html`<div class="line"></div>` : ''}
           </div>
           <div class="msg-main">
             <div class="msg-sender">
@@ -710,7 +710,7 @@ class PublicMessage extends Message {
               html`<${PublicMessage}
                 key=${r}
                 hash=${r}
-                asReply=${true}
+                asReply=${!this.props.standalone}
                 showName=${true}
                 showReplies=${true}
               />`,

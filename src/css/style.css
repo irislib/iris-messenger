@@ -856,17 +856,11 @@ header.footer .header-content {
 }
 
 .quote .msg-content {
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 7px 15px !important;
-  cursor: pointer;
+  margin-bottom: 0;
 }
 
 .msg.quote {
   margin-bottom: 0;
-}
-
-.public-messages-view .quote .msg-sender {
-  margin-bottom: 8px;
 }
 
 .public-messages-view .msg.quote .msg-content {
@@ -1202,9 +1196,9 @@ a.msg {
 }
 
 .public-messages-view .msg-sender {
-  margin-bottom: 15px;
   display: flex;
   align-items: center;
+  margin-bottom: 5px;
 }
 
 .public-messages-view .msg-sender .msg-sender-link {
@@ -1213,7 +1207,7 @@ a.msg {
   align-items: center;
 }
 
-.msg-sender-link .badge {  margin-left: 5px;
+.badge {
   text-shadow: white 0 0 1px;
   margin-left: 5px;
 }
@@ -1244,7 +1238,6 @@ a.msg {
 
 .public-messages-view .msg .text,
 .public-messages-view .msg-sender {
-  margin-bottom: 15px;
   overflow-wrap: anywhere;
 }
 
@@ -1329,9 +1322,9 @@ a.msg {
 }
 
 .dropbtn {
-  padding: 5px;
   font-size: 24px;
   cursor: pointer;
+  margin-top: -15px;
 }
 
 /* The container <div> - needed to position the dropdown content */
@@ -1544,6 +1537,11 @@ a.msgSenderName {
   text-align: right;
   font-size: 12px;
   color: var(--text-time);
+}
+
+.msg.quote .below-text {
+  margin-bottom: 15px;
+  margin-top: 5px;
 }
 
 .btn,
@@ -2581,6 +2579,6 @@ input[type='text'] {
     display: none !important;
   }
   .msg.standalone:not(.quoting) {
-    margin: 15px 0;
+    margin: 15px 0 4px 0;
   }
 }
