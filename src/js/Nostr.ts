@@ -70,12 +70,13 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
 
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
+const MAX_MSGS_BY_KEYWORD = 100;
 
 const eventsById = new Map<string, Event>();
 
 const DEFAULT_RELAYS = [
   'wss://jiggytom.ddns.net',
-  'wss://nostr-relay.wlvs.space',
+  'wss://eden.nostr.land',
   'wss://nostr.fmt.wiz.biz',
   'wss://nostr.ono.re',
   'wss://relay.damus.io',
@@ -87,8 +88,14 @@ const DEFAULT_RELAYS = [
   'wss://brb.io',
 ];
 
+const SEARCH_RELAYS = ['wss://relay.nostr.band'];
+
 const defaultRelays = new Map<string, Relay>(
   DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
+);
+
+const searchRelays = new Map<string, Relay>(
+  SEARCH_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
 );
 
 type Subscription = {
@@ -105,6 +112,7 @@ export default {
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: iris.util.isMobile ? 5 : 10,
   relays: defaultRelays,
+  searchRelays: searchRelays,
   knownUsers: new Set<string>(),
   blockedUsers: new Set<string>(),
   flaggedUsers: new Set<string>(),
@@ -117,6 +125,7 @@ export default {
   subscribedPosts: new Set<string>(),
   subscribedRepliesAndLikes: new Set<string>(),
   subscribedProfiles: new Set<string>(),
+  subscribedKeywords: new Set<string>(),
   likesByUser: new Map<string, SortedLimitedEventSet>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -124,6 +133,7 @@ export default {
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  latestNotesByKeywords: new Map<string, SortedLimitedEventSet>(),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
   keyValueEvents: new Map<string, Event>(),
@@ -434,7 +444,7 @@ export default {
       }, unsubscribeTimeout);
     }
 
-    for (const relay of this.relays.values()) {
+    for (const relay of (id == 'keywords' ? this.searchRelays : this.relays).values()) {
       const sub = relay.sub(filters, {});
       // TODO update relay lastSeen
       sub.on('event', (event) => this.handleEvent(event));
@@ -515,6 +525,29 @@ export default {
     if (_this.subscribedPosts.size === 0) return;
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
+  }, 100),
+  subscribeToKeywords: debounce((_this) => {
+    if (_this.subscribedKeywords.size === 0) return;
+    console.log(
+      'subscribe to keywords',
+      Array.from(_this.subscribedKeywords),
+      _this.knownUsers.size,
+    );
+    const go = () => {
+      _this.sendSubToRelays(
+        [
+          {
+            kinds: [1],
+            limit: MAX_MSGS_BY_KEYWORD,
+            keywords: Array.from(_this.subscribedKeywords),
+          },
+        ],
+        'keywords',
+      );
+      // on page reload knownUsers are empty and thus all search results are dropped
+      if (_this.knownUsers.size < 1000) setTimeout(go, 2000);
+    };
+    go();
   }, 100),
   encrypt: async function (data: string, pub?: string) {
     const k = iris.session.getKey().secp256k1;
@@ -610,6 +643,7 @@ export default {
     let hasNewAuthors = false;
     let hasNewIds = false;
     let hasNewReplyAndLikeSubs = false;
+    let hasNewKeywords = false;
     for (const filter of filters) {
       if (filter.authors) {
         for (const author of filter.authors) {
@@ -645,10 +679,21 @@ export default {
           }
         }
       }
+      if (filter.keywords) {
+        for (const keyword of filter.keywords) {
+          if (!this.subscribedKeywords.has(keyword)) {
+            hasNewKeywords = true;
+            // only 1 keyword at a time, otherwise a popular kw will consume the whole 'limit'
+            this.subscribedKeywords.clear();
+            this.subscribedKeywords.add(keyword);
+          }
+        }
+      }
     }
     hasNewReplyAndLikeSubs && this.subscribeToRepliesAndLikes(this);
     hasNewAuthors && this.subscribeToAuthors(this); // TODO subscribe to old stuff from new authors, don't resubscribe to all
     hasNewIds && this.subscribeToPosts(this);
+    hasNewKeywords && this.subscribeToKeywords(this);
   },
   getConnectedRelayCount: function () {
     let count = 0;
@@ -683,6 +728,11 @@ export default {
       }
       if (openRelays.length > this.maxRelays) {
         openRelays[Math.floor(Math.random() * openRelays.length)].close();
+      }
+      for (const relay of this.searchRelays.values()) {
+        if (getRelayStatus(relay) === 3) {
+          this.connectRelay(relay);
+        }
       }
     };
 
@@ -766,7 +816,14 @@ export default {
     return undefined;
   },
   handleBoost(event: Event) {
-    const id = event.tags.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
+    let id = event.tags.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
+    if (!id) {
+      // last e tag is the boosted post
+      id = event.tags
+        .slice() // so we don't reverse event.tags in place
+        .reverse()
+        .find((tag: any) => tag[0] === 'e')?.[1];
+    }
     if (!id) return;
     if (!this.boostsByMessageId.has(id)) {
       this.boostsByMessageId.set(id, new Set());
@@ -850,6 +907,10 @@ export default {
       this.addRelay(url);
     }
     this.saveRelaysToContacts();
+    // do not save these to contact list
+    for (const url of SEARCH_RELAYS) {
+      if (!this.relays.has(url)) this.addRelay(url);
+    }
   },
   saveRelaysToContacts() {
     const relaysObj: any = {};
@@ -1121,6 +1182,18 @@ export default {
         }
       }
     }
+    const content = event.content.toLowerCase();
+    if (
+      filter.keywords &&
+      !filter.keywords.some((keyword: string) => {
+        return keyword
+          .toLowerCase()
+          .split(' ')
+          .every((word: string) => content.includes(word));
+      })
+    ) {
+      return false;
+    }
 
     return true;
   },
@@ -1319,6 +1392,28 @@ export default {
     };
     callback();
     this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+  },
+  getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void) {
+    const callback = (event) => {
+      if (!this.latestNotesByKeywords.has(keyword)) {
+        this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+      }
+      this.latestNotesByKeywords.get(keyword)?.add(event);
+      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    };
+    // find among cached events
+    const filter = { kinds: [1], keywords: [keyword] };
+    for (const event of this.eventsById.values()) {
+      if (this.matchFilter(event, filter)) {
+        if (!this.latestNotesByKeywords.has(keyword)) {
+          this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+        }
+        this.latestNotesByKeywords.get(keyword)?.add(event);
+      }
+    }
+    this.latestNotesByKeywords.has(keyword) &&
+      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    this.subscribe([filter], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile

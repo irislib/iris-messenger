@@ -11,6 +11,7 @@ import { translate as t } from '../translations/Translation';
 import Badge from './Badge';
 import Identicon from './Identicon';
 import Name from './Name';
+import SafeImg from './SafeImg';
 
 const RESULTS_MAX = 5;
 
@@ -52,7 +53,7 @@ class SearchBox extends Component<Props, State> {
       query: '',
       noFollows: true,
       offsetLeft: 0,
-      selected: 0,
+      selected: -1, // -1 - 'search by keyword'
     };
   }
 
@@ -66,7 +67,7 @@ class SearchBox extends Component<Props, State> {
       e.preventDefault();
       const selected = this.state.selected;
       let next = e.keyCode === 40 ? selected + 1 : selected - 1;
-      next = Math.max(0, Math.min(this.state.results.length - 1, next));
+      next = Math.max(-1, Math.min(this.state.results.length - 1, next));
       this.setState({ selected: next });
     }
   }
@@ -115,12 +116,13 @@ class SearchBox extends Component<Props, State> {
     }
     // if first 5 results are different, set selected = 0
     if (
+      this.state.selected >= 0 &&
       !isEqual(
         this.state.results.slice(0, this.state.selected + 1),
         prevState.results.slice(0, this.state.selected + 1),
       )
     ) {
-      this.setState({ selected: 0 });
+      this.setState({ selected: -1 });
     }
   }
 
@@ -236,6 +238,25 @@ class SearchBox extends Component<Props, State> {
           class="search-box-results"
           style="left: ${this.state.offsetLeft || ''}"
         >
+          {this.state.query ? (
+            <a
+              onFocus={(e) => this.onResultFocus(e, -1)}
+              tabIndex={2}
+              className={'result ' + (-1 === this.state.selected ? 'selected' : '')}
+              href={`/search/${encodeURIComponent(this.state.query)}`}
+            >
+              <div class="identicon-container">
+                <div style="font-size: 1.5em; width: 40px">&#128269;</div>
+              </div>
+              <div>
+                <span>{this.state.query}</span>
+                <br />
+                <small>Search posts</small>
+              </div>
+            </a>
+          ) : (
+            ''
+          )}
           {this.state.results.map((r, index) => {
             const i = r.item;
             let followText = '';
@@ -258,7 +279,7 @@ class SearchBox extends Component<Props, State> {
               >
                 {i.picture ? (
                   <div class="identicon-container">
-                    <img src={i.picture} class="round-borders" height={40} width={40} alt="" />
+                    <SafeImg src={i.picture} class="round-borders" width={40} />
                   </div>
                 ) : (
                   <Identicon key={`${i.key}ic`} str={i.key} width={40} />

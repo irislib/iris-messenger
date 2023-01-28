@@ -66,6 +66,7 @@ class FeedMessageForm extends MessageForm {
 
   onEmojiButtonClick(event) {
     event.preventDefault();
+    event.stopPropagation();
     this.picker.pickerVisible ? this.picker.hidePicker() : this.picker.showPicker(event.target);
   }
 
@@ -99,6 +100,7 @@ class FeedMessageForm extends MessageForm {
   }
 
   attachFileClicked(event) {
+    event.stopPropagation();
     event.preventDefault();
     $(this.base).find('.attachment-input').click();
   }
@@ -128,7 +130,6 @@ class FeedMessageForm extends MessageForm {
             const url = text.match(
               /https:\/\/nostr\.build\/i\/nostr\.build_[a-z0-9]{64}\.[a-zA-Z]+/i,
             );
-            console.log('url', url);
             if (url) {
               a[i].url = url[0];
               this.setState({ attachments: a });
@@ -182,17 +183,6 @@ class FeedMessageForm extends MessageForm {
         multiple
         onChange=${(e) => this.attachmentsChanged(e)}
       />
-      ${this.props.index === 'media'
-        ? html`
-            <p>
-              <small
-                dangerouslySetInnerHTML=${{
-                  __html: t('download_webtorrent', 'href="https://webtorrent.io/desktop/"'),
-                }}
-              />
-            </p>
-          `
-        : ''}
       <textarea
         onDragOver=${(e) => {
           e.preventDefault();

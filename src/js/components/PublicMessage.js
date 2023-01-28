@@ -220,7 +220,7 @@ class PublicMessage extends Message {
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Nostr.publish({
-          kind: 6,
+          kind: 1,
           tags: [
             ['e', nostrId, '', 'mention'],
             ['p', author],
@@ -302,7 +302,7 @@ class PublicMessage extends Message {
     if (this.props.standalone) {
       return;
     }
-    if (['A', 'BUTTON', 'TEXTAREA', 'IMG'].find((tag) => event.target.closest(tag))) {
+    if (['A', 'BUTTON', 'TEXTAREA', 'IMG', 'INPUT'].find((tag) => event.target.closest(tag))) {
       return;
     }
     if (window.getSelection().toString()) {
