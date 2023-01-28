@@ -767,14 +767,14 @@ export default {
     // todo: handle astral ninja format boost (retweet) message
     // where content points to the original message tag: "content": "#[1]"
 
+    const isBoost = this.isBoost(event);
     const replyingTo = this.getEventReplyingTo(event);
-    if (replyingTo) {
+    if (replyingTo && !isBoost) {
       if (!this.directRepliesByMessageId.has(replyingTo)) {
         this.directRepliesByMessageId.set(replyingTo, new Set<string>());
       }
       this.directRepliesByMessageId.get(replyingTo)?.add(event.id);
 
-      // are boost messages screwing this up?
       const repliedMsgs = event.tags
         .filter((tag) => tag[0] === 'e')
         .map((tag) => tag[1])
@@ -1061,12 +1061,12 @@ export default {
       this.keyValueEvents.set(key, event);
     }
   },
-  handleNoteOrBoost(event: Event) {
+  isBoost(event: Event) {
     const mentionIndex = event.tags.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
     if (event.content === `#[${mentionIndex}]`) {
-      this.handleBoost(event);
+      return true;
     } else {
-      this.handleNote(event);
+      return false;
     }
   },
   handleEvent(event: Event) {
@@ -1095,7 +1095,11 @@ export default {
         break;
       case 1:
         this.maybeAddNotification(event);
-        this.handleNoteOrBoost(event);
+        if (this.isBoost(event)) {
+          this.handleBoost(event);
+        } else {
+          this.handleNote(event);
+        }
         break;
       case 4:
         this.handleDirectMessage(event);

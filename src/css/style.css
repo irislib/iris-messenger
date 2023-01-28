@@ -301,15 +301,6 @@ textarea.new-msg {
   border: 2px solid var(--button-bg);
 }
 
-.filters .msg-content {
-  flex-direction: row !important;
-  padding: 15px;
-}
-
-.filters {
-  width: 100%;
-}
-
 .msg-content video,
 .message-form video {
   width: 100%;
@@ -1197,7 +1188,8 @@ a.msg {
 }
 
 .public-messages-view .img-container {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
+  margin-top: 15px;
 }
 
 .public-messages-view .msg {
@@ -1269,7 +1261,7 @@ a.msg {
   max-width: none;
   border-radius: 0;
   width: 100%;
-  padding: 15px;
+  padding: 12px;
   flex-direction: row;
   display: flex;
   flex: 1;
