@@ -442,9 +442,14 @@ export default {
       }, unsubscribeTimeout);
     }
 
-    this.relayPool.subscribe(filters, DEFAULT_RELAYS, (event) => {
-      this.handleEvent(event);
-    });
+    this.relayPool.subscribe(
+      filters,
+      DEFAULT_RELAYS,
+      (event) => {
+        this.handleEvent(event);
+      },
+      10,
+    );
 
     for (const relay of this.relays.values()) {
       const sub = relay.sub(filters, {});
@@ -632,7 +637,7 @@ export default {
       this.handleEvent(event);
       cb(event);
     };
-    this.relayPool.subscribe(filters, DEFAULT_RELAYS, myCallback);
+    this.relayPool.subscribe(filters, DEFAULT_RELAYS, myCallback, 10);
   },
   getConnectedRelayCount: function () {
     let count = 0;

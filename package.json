@@ -5,7 +5,7 @@
   "scripts": {
     "build": "preact build --no-prerender",
     "serve": "sirv build --port 8080 --cors --single",
-    "dev": "preact watch --host localhost --sw",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider preact watch --host localhost --sw",
     "lint": "eslint 'src/**/*.{js,ts,tsx}'",
     "lint:fix": "eslint --fix --quiet 'src/**/*.{js,ts,tsx}'",
     "format": "prettier --plugin-search-dir . --write .",
@@ -76,7 +76,7 @@
     "jsxstyle": "^2.5.1",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
-    "nostr-relaypool": "^0.3.28",
+    "nostr-relaypool": "^0.3.30",
     "preact": "^10.11.2",
     "preact-async-route": "2.2.1",
     "preact-custom-element": "^4.2.1",
