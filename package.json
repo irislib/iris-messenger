@@ -5,7 +5,7 @@
   "scripts": {
     "build": "preact build --no-prerender",
     "serve": "sirv build --port 8080 --cors --single",
-    "dev": "NODE_OPTIONS=--openssl-legacy-provider preact watch --host localhost --sw",
+    "dev": "preact watch --host localhost --sw",
     "lint": "eslint 'src/**/*.{js,ts,tsx}'",
     "lint:fix": "eslint --fix --quiet 'src/**/*.{js,ts,tsx}'",
     "format": "prettier --plugin-search-dir . --write .",
