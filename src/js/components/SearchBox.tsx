@@ -10,7 +10,6 @@ import { translate as t } from '../translations/Translation';
 
 import Badge from './Badge';
 import Identicon from './Identicon';
-import Name from './Name';
 import SafeImg from './SafeImg';
 
 const RESULTS_MAX = 5;
@@ -292,21 +291,6 @@ class SearchBox extends Component<Props, State> {
               </a>
             );
           })}
-          {this.state.query && this.state.noFollows ? (
-            <>
-              <a class="follow-someone">Follow someone to see more search results!</a>
-              <a href={`/profile/${Nostr.SUGGESTED_FOLLOW}`} class="suggested">
-                <Identicon str={Nostr.SUGGESTED_FOLLOW} width={40} />
-                <div>
-                  <Name pub={Nostr.SUGGESTED_FOLLOW} />
-                  <br />
-                  <small>Suggested</small>
-                </div>
-              </a>
-            </>
-          ) : (
-            ''
-          )}
         </div>
       </div>
     );

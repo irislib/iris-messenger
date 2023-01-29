@@ -714,7 +714,16 @@ export default {
     }
     return count;
   },
-  SUGGESTED_FOLLOW: 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk',
+  SUGGESTED_FOLLOWS: [
+    'npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9', // snowden
+    'npub1sg6plzptd64u62a878hep2kev88swjh3tw00gjsfl8f237lmu63q0uf63m', // jack
+    'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk', // sirius
+    'npub15dqlghlewk84wz3pkqqvzl2w2w36f97g89ljds8x6c094nlu02vqjllm5m', // saylor
+    'npub1z4m7gkva6yxgvdyclc7zp0vz4ta0s2d9jh8g83w03tp5vdf3kzdsxana6p', // yegorpetrov
+    'npub1az9xj85cmxv8e9j9y80lvqp97crsqdu2fpu3srwthd99qfu9qsgstam8y8', // nvk
+    'npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6', // fiatjaf
+    'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s', // jb55
+  ],
   connectRelay: function (relay: Relay) {
     try {
       relay.connect();
@@ -1279,9 +1288,11 @@ export default {
         this.manageRelays();
         this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
-        const hex = this.toNostrHexAddress(this.SUGGESTED_FOLLOW);
-        this.knownUsers.add(hex);
-        this.getProfile(this.toNostrHexAddress(hex), undefined);
+        for (const suggestion of this.SUGGESTED_FOLLOWS) {
+          const hex = this.toNostrHexAddress(suggestion);
+          this.knownUsers.add(hex);
+          this.getProfile(this.toNostrHexAddress(hex), undefined);
+        }
         this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
         setTimeout(() => {
           this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
