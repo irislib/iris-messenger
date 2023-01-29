@@ -708,10 +708,11 @@ class PublicMessage extends Message {
             ${this.props.standalone || s.showReplyForm
               ? html`
                   <${FeedMessageForm}
+                    waitForFocus=${true}
                     autofocus=${!this.props.standalone}
                     replyingTo=${this.props.hash}
                     replyingToUser=${s.msg.info.from}
-                    placeholder=${t('write_a_reply')}
+                    placeholder=${t('write_your_reply')}
                   />
                 `
               : ''}
