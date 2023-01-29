@@ -195,7 +195,7 @@ textarea {
   border: 0;
   border-radius: 6px;
   border: var(--msg-border);
-  margin: 0 0 15px 0;
+  margin: 0 0 12px 0;
   background-color: var(--msg-content-background);
   color: var(--text-color);
   resize: none;
@@ -1552,7 +1552,7 @@ a.msgSenderName {
 }
 
 .msg.quote .below-text, .msg.standalone .below-text {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .btn,
@@ -2152,9 +2152,13 @@ form.public div {
 
 form.public {
   width: 100%;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.msg form.public {
+  margin-bottom: 0;
 }
 
 .quote .retrieving {

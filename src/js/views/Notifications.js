@@ -31,9 +31,9 @@ export default class Notifications extends View {
 
   renderView() {
     return html`
-      <div ref=${this.ref} class="centered-container" style="margin-bottom: 15px;">
+      <div ref=${this.ref} class="centered-container">
         ${this.state.hasNotifications
-          ? html`<br class="hidden-xs" />`
+          ? html``
           : html`<p class="mobile-padding15">${t('no_notifications_yet')}</p> `}
         <${MessageFeed}
           scrollElement=${this.scrollElement.current}
