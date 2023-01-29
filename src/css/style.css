@@ -1201,6 +1201,8 @@ a.msg {
 
 .public-messages-view .msg {
   align-items: flex-start;
+  display: flex;
+  flex: 1;
 }
 
 .public-messages-view .msg-sender {
