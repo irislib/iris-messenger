@@ -310,6 +310,8 @@ textarea.new-msg {
   width: 100%;
   outline: none;
   margin-bottom: 15px;
+  border-radius: 15px;
+  margin-top: 5px;
 }
 
 .hidden {
