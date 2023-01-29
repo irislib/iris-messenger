@@ -134,7 +134,7 @@ export default {
       return <a href={match}>⚡ Pay with lightning</a>;
     });
 
-    replacedText = reactStringReplace(replacedText, /(https?:\/\/\S+)/g, (match, i) => (
+    replacedText = reactStringReplace(replacedText, /(https?:\/\/\S*[^.?,)\s])/gi, (match, i) => (
       <a key={match + i} href={match} target="_blank">
         {match}
       </a>
