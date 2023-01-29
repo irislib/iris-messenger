@@ -71,7 +71,7 @@
     --green: #34ba7c;
     --header-color: #ffffff;
     --input-bg: #f5f5f5;
-    --input-placeholder: #ccc;
+    --input-placeholder: #999;
     --input-text: #000000;
     --login-background: #ffffff;
     --main-color: #ffffff;
@@ -403,7 +403,7 @@ a.logo img:not(:last-child) {
 }
 
 .nav-plus-bg {
- fill: var(--button-bg); 
+ fill: var(--button-bg);
 }
 
 .nav .identicon img {
@@ -1642,7 +1642,7 @@ a.msgSenderName {
   padding: 15px;
   display: flex;
   overflow-y: auto;
-  color: white;
+  color: var(--text-color);
   position: fixed;
   left: 0;
   right: 0;
@@ -1674,11 +1674,11 @@ a.msgSenderName {
 }
 
 #login a {
-  color: white;
+  color: var(--text-color);
 }
 
 #login a:hover {
-  color: white;
+  color: var(--text-color);
 }
 
 #login-content {
