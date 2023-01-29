@@ -397,15 +397,25 @@ export default {
       event.created_at = event.created_at || Math.floor(Date.now() / 1000);
       event.pubkey = iris.session.getKey().secp256k1.rpub;
       event.id = getEventHash(event);
-
       event.sig = await this.sign(event);
     }
     if (!(event.id && event.sig)) {
       console.error('Invalid event', event);
       throw new Error('Invalid event');
     }
+    // also publish at most 10 events referred to in tags
+    const referredEvents = event.tags
+      .filter((tag) => tag[0] === 'e')
+      .reverse()
+      .slice(0, 10);
     for (const relay of this.relays.values()) {
       relay.publish(event);
+      for (const ref of referredEvents) {
+        const referredEvent = this.eventsById.get(ref[1]);
+        if (referredEvent) {
+          relay.publish(referredEvent);
+        }
+      }
     }
     console.log('published', event);
     this.handleEvent(event);
