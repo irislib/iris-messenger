@@ -45,7 +45,6 @@
   --zebra-stripe-bg: #101214;
 }
 
-/*
 @media (prefers-color-scheme: light) {
   :root {
     --body-bg: #ffffff;
@@ -94,7 +93,6 @@
     --zebra-stripe-bg: #f5f5f5;
   }
 }
- */
 
 ::-webkit-scrollbar {
   width: 8px;
