@@ -9,6 +9,7 @@
   --button-color-hover: #fefffe;
   --chat-active: #212428;
   --chat-hover: #26292e;
+  --connecting-line-color: #333639;
   --day-separator-bg: rgba(30, 32, 37, 0.85);
   --day-separator-color: rgba(255, 255, 255, 0.88);
   --dropdown-bg: rgba(0, 0, 0, 0.8);
@@ -59,6 +60,7 @@
     --button-color-hover: #ffffff;
     --chat-active: #f5f5f5;
     --chat-hover: #f0f0f0;
+    --connecting-line-color: #cfd9dd;
     --day-separator-bg: rgba(255, 255, 255, 0.85);
     --day-separator-color: rgba(0, 0, 0, 0.88);
     --dropdown-bg: rgba(255, 255, 255, 0.8);
@@ -829,7 +831,7 @@ header.footer .header-content {
 /* twitter-style line that connects reply to the replied post */
 .msg-identicon .line {
     width: 2px;
-    background-color: var(--text-time);
+    background-color: var(--connecting-line-color);
     margin: 4px 18px;
     height: 100%;
 }
