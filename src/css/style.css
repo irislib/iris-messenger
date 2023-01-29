@@ -6,6 +6,7 @@
   --button-border: 0;
   --button-border-size: 0;
   --button-color: #fefffe;
+  --button-color-hover: #fefffe;
   --chat-active: #212428;
   --chat-hover: #26292e;
   --day-separator-bg: rgba(30, 32, 37, 0.85);
@@ -54,7 +55,8 @@
     --button-bg-hover: #5a488b;
     --button-border: 0;
     --button-border-size: 0;
-    --button-color: #000000;
+    --button-color: #ffffff;
+    --button-color-hover: #ffffff;
     --chat-active: #f5f5f5;
     --chat-hover: #f0f0f0;
     --day-separator-bg: rgba(255, 255, 255, 0.85);
