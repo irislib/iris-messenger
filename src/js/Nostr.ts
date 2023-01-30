@@ -1262,14 +1262,14 @@ export default {
       cb(this.latestNotesByEveryone.eventIds);
     };
     callback();
-    this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+    this.subscribe([{ kinds: [1, 3, 5, 7], limit: 200 }], callback);
   },
   getMessagesByFollows(cb: (messageIds: string[]) => void) {
     const callback = () => {
       cb(this.latestNotesByFollows.eventIds);
     };
     callback();
-    this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+    this.subscribe([{ kinds: [1, 3, 5, 7], limit: 200 }], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile
@@ -1278,7 +1278,7 @@ export default {
       cb?.(this.postsAndRepliesByUser.get(address)?.eventIds);
     };
     this.postsAndRepliesByUser.has(address) && callback();
-    this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
+    this.subscribe([{ kinds: [1, 5, 7], authors: [address], limit: 10000 }], callback);
   },
   getPostsByUser(address: string, cb?: (messageIds: string[]) => void) {
     this.knownUsers.add(address);
@@ -1286,7 +1286,7 @@ export default {
       cb?.(this.postsByUser.get(address)?.eventIds);
     };
     this.postsByUser.has(address) && callback();
-    this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
+    this.subscribe([{ kinds: [1, 5, 7], authors: [address], limit: MAX_MSGS_BY_USER }], callback);
   },
   getLikesByUser(address: string, cb?: (messageIds: string[]) => void) {
     this.knownUsers.add(address);
@@ -1294,7 +1294,7 @@ export default {
       cb?.(this.likesByUser.get(address)?.eventIds);
     };
     this.likesByUser.has(address) && callback();
-    this.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
+    this.subscribe([{ kinds: [7, 5], authors: [address], limit: MAX_MSGS_BY_USER }], callback);
   },
   getProfile(address, cb?: (profile: any, address: string) => void, verifyNip05 = false) {
     this.knownUsers.add(address);
@@ -1323,8 +1323,15 @@ export default {
     const callback = () => {
       cb?.(this.directMessagesByUser);
     };
+    const myPub = iris.session.getKey()?.secp256k1.rpub;
     callback();
-    this.subscribe([{ kinds: [4] }], callback);
+    this.subscribe(
+      [
+        { kinds: [4], '#p': [myPub] },
+        { kinds: [4], authors: [myPub] },
+      ],
+      callback,
+    );
   },
 
   getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void) {
