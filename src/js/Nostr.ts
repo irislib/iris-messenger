@@ -1075,6 +1075,9 @@ export default {
     iris.session.logOut();
   },
   init: function () {
+    this.relayPool.onnotice((relayUrl, notice) => {
+      console.log('notice', notice, ' from relay ', relayUrl);
+    });
     iris
       .local()
       .get('maxRelays')
