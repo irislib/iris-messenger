@@ -390,7 +390,7 @@ class PublicMessage extends Message {
         <${Dropdown}>
           <${CopyButton}
             key=${`${this.props.hash}copy`}
-            text=${t('copy_note_ID')}
+            text=${t('copy_ID')}
             title="Note ID"
             copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
           />
