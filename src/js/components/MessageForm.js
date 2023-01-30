@@ -25,11 +25,13 @@ export default class MessageForm extends Component {
       }
     }
     // unique tagged users
-    const taggedUsers = msg.text.match(/@npub\w+/g)?.filter((v, i, a) => a.indexOf(v) === i);
+    const taggedUsers = msg.text
+      .match(/(?:@)?(npub\w+)/gi)
+      ?.filter((v, i, a) => a.indexOf(v) === i);
     if (taggedUsers) {
       event.tags = event.tags || [];
       for (const tag of taggedUsers) {
-        const hexTag = Nostr.toNostrHexAddress(tag.slice(1));
+        const hexTag = Nostr.toNostrHexAddress(tag.replace('@', ''));
         const newTag = ['p', hexTag];
         // add if not already present
         if (!event.tags.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {
