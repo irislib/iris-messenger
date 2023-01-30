@@ -5,6 +5,10 @@ import Nostr from '../../Nostr';
 import { translate as t } from '../../translations/Translation';
 
 export default class AppearanceSettings extends Component {
+  state = {
+    colorScheme: 'dark',
+  };
+
   render() {
     return (
       <>
@@ -32,7 +36,6 @@ export default class AppearanceSettings extends Component {
     const myPub = iris.session.getKey().secp256k1.rpub;
     // TODO use Nostr.private
     Nostr.public.get({ path: 'settings/colorScheme', authors: [myPub] }, (entry) => {
-      console.log('got color scheme', entry);
       this.setState({ colorScheme: entry.value });
     });
   }
