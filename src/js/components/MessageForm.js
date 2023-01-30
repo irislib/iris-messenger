@@ -14,11 +14,14 @@ export default class MessageForm extends Component {
       const id = Nostr.toNostrHexAddress(msg.replyingTo);
       const replyingTo = await Nostr.getMessageById(id);
       event.tags = replyingTo.tags.slice();
-      const rootTag = replyingTo.tags.find((t) => t[0] === 'e' && t[3] === 'root');
+      let rootTag = replyingTo.tags.find((t) => t[0] === 'e' && t[3] === 'root');
+      if (!rootTag) {
+        rootTag = replyingTo.tags.find((t) => t[0] === 'e');
+      }
       if (rootTag) {
         event.tags.push(['e', id, '', 'reply']);
       } else {
-        event.tags.push(['e', id, '', 'root']);
+        event.tags.unshift(['e', id, '', 'root']);
       }
       if (!event.tags.find((t) => t[0] === 'p' && t[1] === replyingTo.pubkey)) {
         event.tags.push(['p', replyingTo.pubkey]);
