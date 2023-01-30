@@ -402,9 +402,7 @@ export default {
       console.error('Invalid event', event);
       throw new Error('Invalid event');
     }
-    for (const relay of this.relays.values()) {
-      relay.publish(event);
-    }
+    this.relayPool.publish(event, DEFAULT_RELAYS);
     //console.log('published', event);
     this.handleEvent(event);
     return event.id;
