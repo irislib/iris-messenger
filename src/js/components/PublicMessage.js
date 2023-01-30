@@ -385,9 +385,16 @@ class PublicMessage extends Message {
   }
 
   renderDropdown() {
+    const url = `https://iris.to/#/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`;
     return html`
       <div class="msg-menu-btn">
         <${Dropdown}>
+          <${CopyButton}
+            key=${`${this.props.hash}copy`}
+            text=${t('copy_link')}
+            title="Note link"
+            copyStr=${url}
+          />
           <${CopyButton}
             key=${`${this.props.hash}copy`}
             text=${t('copy_ID')}
