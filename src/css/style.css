@@ -1542,6 +1542,16 @@ a.msgSenderName {
   border: 0;
 }
 
+.msg.our a {
+  color: var(--our-msg-color);
+  text-decoration: underline;
+}
+
+.msg.our a:hover {
+  color: var(--our-msg-color);
+  text-decoration: none;
+}
+
 .msg .below-text {
   display: flex;
   align-items: flex-end;
@@ -2236,7 +2246,6 @@ form.public {
 .block.blocked,
 .follow.following {
   background-color: var(--notify);
-  color: var(--text-color);
   border: var(--button-border-size) solid var(--notify);
 }
 
