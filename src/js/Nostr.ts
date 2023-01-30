@@ -1284,6 +1284,19 @@ export default {
             this.updateUnseenNotificationCount(this);
           }
         });
+        this.public.get({ path: 'settings/colorScheme', authors: [myPub] }, (colorScheme) => {
+          if (colorScheme.value === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            return;
+          } else if (colorScheme.value === 'default') {
+            if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+              //OS theme setting detected as dark
+              document.documentElement.setAttribute('data-theme', 'light');
+              return;
+            }
+          }
+          document.documentElement.setAttribute('data-theme', 'dark');
+        });
         this.knownUsers.add(key);
         this.manageRelays();
         this.loadLocalStorageEvents();
