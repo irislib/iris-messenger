@@ -24,19 +24,17 @@ type Props = Record<string, unknown>;
 type State = {
   activeRoute: string;
   unseenMsgsTotal: number;
-  showBetaFeatures: boolean;
   chatId?: string;
 };
 
 class Footer extends Component<Props, State> {
   constructor() {
     super();
-    this.state = { showBetaFeatures: false, unseenMsgsTotal: 0, activeRoute: '/' };
+    this.state = { unseenMsgsTotal: 0, activeRoute: '/' };
   }
 
   componentDidMount() {
     iris.local().get('unseenMsgsTotal').on(this.inject());
-    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
     iris
       .local()
       .get('activeRoute')

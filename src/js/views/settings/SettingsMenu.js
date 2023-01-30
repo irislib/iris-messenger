@@ -11,10 +11,7 @@ const SETTINGS = {
   nostr: 'nostr',
   language: 'language',
   webtorrent: 'webtorrent',
-  webrtc: 'webRTC',
-  beta: 'beta',
   blocked_users: 'blocked_users',
-  peer: 'peers',
 };
 
 export default class SettingsMenu extends Component {

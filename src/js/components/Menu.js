@@ -14,14 +14,12 @@ const APPLICATIONS = [
   { url: '#/chat', text: 'messages', icon: Icons.chat },
   { url: '#/global', text: 'global', icon: Icons.global },
   { url: '#/settings', text: 'settings', icon: Icons.settings },
-  { url: '#/explorer', text: 'explorer', icon: Icons.folder, beta: true },
   { url: '#/about', text: 'about', icon: Icons.info },
 ];
 
 export default class Menu extends Component {
   componentDidMount() {
     iris.local().get('unseenMsgsTotal').on(this.inject());
-    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
   }
 
   menuLinkClicked() {

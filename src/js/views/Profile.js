@@ -449,7 +449,6 @@ class Profile extends View {
     let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
     iris.local().get('noFollowers').on(this.inject());
-    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
     // if pub is hex, it's a nostr address
     const nostrAddr = Nostr.toNostrHexAddress(pub);
     this.getNostrProfile(nostrAddr);

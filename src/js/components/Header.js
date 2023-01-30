@@ -64,7 +64,6 @@ class Header extends Component {
     iris.local().get('showParticipants').on(this.inject());
     iris.local().get('unseenMsgsTotal').on(this.inject());
     iris.local().get('unseenNotificationCount').on(this.inject());
-    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
     iris
       .local()
       .get('activeRoute')
