@@ -71,12 +71,13 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
 
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
+const MAX_MSGS_BY_KEYWORD = 100;
 
 const eventsById = new Map<string, Event>();
 
 const DEFAULT_RELAYS = [
   'wss://jiggytom.ddns.net',
-  'wss://nostr-relay.wlvs.space',
+  'wss://eden.nostr.land',
   'wss://nostr.fmt.wiz.biz',
   'wss://nostr.ono.re',
   'wss://relay.damus.io',
@@ -88,8 +89,14 @@ const DEFAULT_RELAYS = [
   'wss://brb.io',
 ];
 
+const SEARCH_RELAYS = ['wss://relay.nostr.band'];
+
 const defaultRelays = new Map<string, Relay>(
   DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
+);
+
+const searchRelays = new Map<string, Relay>(
+  SEARCH_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
 );
 
 type Subscription = {
@@ -106,6 +113,7 @@ export default {
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: iris.util.isMobile ? 5 : 10,
   relays: defaultRelays,
+  searchRelays: searchRelays,
   knownUsers: new Set<string>(),
   blockedUsers: new Set<string>(),
   flaggedUsers: new Set<string>(),
@@ -118,6 +126,7 @@ export default {
   subscribedPosts: new Set<string>(),
   subscribedRepliesAndLikes: new Set<string>(),
   subscribedProfiles: new Set<string>(),
+  subscribedKeywords: new Set<string>(),
   likesByUser: new Map<string, SortedLimitedEventSet>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -125,6 +134,7 @@ export default {
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  latestNotesByKeywords: new Map<string, SortedLimitedEventSet>(),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
   keyValueEvents: new Map<string, Event>(),
@@ -133,8 +143,6 @@ export default {
   likesByMessageId: new Map<string, Set<string>>(),
   boostsByMessageId: new Map<string, Set<string>>(),
   handledMsgsPerSecond: 0,
-  notificationsSeenTime: 0,
-  unseenNotificationCount: 0,
   decryptedMessages: new Map<string, string>(),
   windowNostrQueue: [],
   relayPool: new RelayPool(DEFAULT_RELAYS, {
@@ -146,6 +154,8 @@ export default {
       }
     },
   }),
+  isProcessingQueue: false,
+  notificationsSeenTime: 0,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -390,12 +400,13 @@ export default {
   },
   publish: async function (event: any) {
     if (!event.sig) {
-      event.tags = event.tags || [];
+      if (!event.tags) {
+        event.tags = [];
+      }
       event.content = event.content || '';
       event.created_at = event.created_at || Math.floor(Date.now() / 1000);
       event.pubkey = iris.session.getKey().secp256k1.rpub;
       event.id = getEventHash(event);
-
       event.sig = await this.sign(event);
     }
     if (!(event.id && event.sig)) {
@@ -403,7 +414,19 @@ export default {
       throw new Error('Invalid event');
     }
     this.relayPool.publish(event, DEFAULT_RELAYS);
-    //console.log('published', event);
+    // also publish at most 10 events referred to in tags
+    const referredEvents = event.tags
+      .filter((tag) => tag[0] === 'e')
+      .reverse()
+      .slice(0, 10);
+
+    for (const ref of referredEvents) {
+      const referredEvent = this.eventsById.get(ref[1]);
+      if (referredEvent) {
+        this.relayPool.publish(referredEvent, DEFAULT_RELAYS);
+      }
+    }
+    console.log('published', event);
     this.handleEvent(event);
     return event.id;
   },
@@ -440,32 +463,17 @@ export default {
       }, unsubscribeTimeout);
     }
 
-    this.relayPool.subscribe(
+    const unsub = this.relayPool.subscribe(
       filters,
-      DEFAULT_RELAYS,
+      (id == 'keywords' ? this.searchRelays : DEFAULT_RELAYS).values(),
       (event) => {
         this.handleEvent(event);
       },
       10,
     );
 
-    for (const relay of this.relays.values()) {
-      const sub = relay.sub(filters, {});
-      // TODO update relay lastSeen
-      sub.on('event', (event) => this.handleEvent(event));
-      if (once) {
-        sub.on('eose', () => sub.unsub());
-      }
-      if (!this.subscriptionsByName.has(id)) {
-        this.subscriptionsByName.set(id, new Set());
-      }
-      this.subscriptionsByName.get(id)?.add(sub);
-      //console.log('subscriptions size', this.subscriptionsByName.size);
-      if (unsubscribeTimeout) {
-        setTimeout(() => {
-          sub.unsub();
-        }, unsubscribeTimeout);
-      }
+    if (unsubscribeTimeout) {
+      setTimeout(unsub, unsubscribeTimeout);
     }
   },
   subscribeToRepliesAndLikes: debounce((_this) => {
@@ -530,6 +538,29 @@ export default {
     if (_this.subscribedPosts.size === 0) return;
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
     _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
+  }, 100),
+  subscribeToKeywords: debounce((_this) => {
+    if (_this.subscribedKeywords.size === 0) return;
+    console.log(
+      'subscribe to keywords',
+      Array.from(_this.subscribedKeywords),
+      _this.knownUsers.size,
+    );
+    const go = () => {
+      _this.sendSubToRelays(
+        [
+          {
+            kinds: [1],
+            limit: MAX_MSGS_BY_KEYWORD,
+            keywords: Array.from(_this.subscribedKeywords),
+          },
+        ],
+        'keywords',
+      );
+      // on page reload knownUsers are empty and thus all search results are dropped
+      if (_this.knownUsers.size < 1000) setTimeout(go, 2000);
+    };
+    go();
   }, 100),
   encrypt: async function (data: string, pub?: string) {
     const k = iris.session.getKey().secp256k1;
@@ -630,6 +661,27 @@ export default {
           }
         }
       }
+
+      if (Array.isArray(filter['#e'])) {
+        for (const id of filter['#e']) {
+          if (!this.subscribedRepliesAndLikes.has(id)) {
+            this.subscribedRepliesAndLikes.add(id);
+            setTimeout(() => {
+              // remove after some time, so the requests don't grow too large
+              this.subscribedRepliesAndLikes.delete(id);
+            }, 60 * 1000);
+          }
+        }
+      }
+      if (filter.keywords) {
+        for (const keyword of filter.keywords) {
+          if (!this.subscribedKeywords.has(keyword)) {
+            // only 1 keyword at a time, otherwise a popular kw will consume the whole 'limit'
+            this.subscribedKeywords.clear();
+            this.subscribedKeywords.add(keyword);
+          }
+        }
+      }
     }
     const myCallback = (event: Event) => {
       this.handleEvent(event);
@@ -646,16 +698,22 @@ export default {
     }
     return count;
   },
-  SUGGESTED_FOLLOW: 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk',
+  SUGGESTED_FOLLOWS: [
+    'npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9', // snowden
+    'npub1sg6plzptd64u62a878hep2kev88swjh3tw00gjsfl8f237lmu63q0uf63m', // jack
+    'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk', // sirius
+    'npub15dqlghlewk84wz3pkqqvzl2w2w36f97g89ljds8x6c094nlu02vqjllm5m', // saylor
+    'npub1z4m7gkva6yxgvdyclc7zp0vz4ta0s2d9jh8g83w03tp5vdf3kzdsxana6p', // yegorpetrov
+    'npub1az9xj85cmxv8e9j9y80lvqp97crsqdu2fpu3srwthd99qfu9qsgstam8y8', // nvk
+    'npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6', // fiatjaf
+    'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s', // jb55
+  ],
   connectRelay: function (relay: Relay) {
     try {
       relay.connect();
     } catch (e) {
       console.log(e);
     }
-  },
-  manageRelays: function () {
-    // replaced with relayPool
   },
   handleNote(event: Event) {
     this.eventsById.set(event.id, event);
@@ -676,14 +734,14 @@ export default {
     // todo: handle astral ninja format boost (retweet) message
     // where content points to the original message tag: "content": "#[1]"
 
+    const isBoost = this.isBoost(event);
     const replyingTo = this.getEventReplyingTo(event);
-    if (replyingTo) {
+    if (replyingTo && !isBoost) {
       if (!this.directRepliesByMessageId.has(replyingTo)) {
         this.directRepliesByMessageId.set(replyingTo, new Set<string>());
       }
       this.directRepliesByMessageId.get(replyingTo)?.add(event.id);
 
-      // are boost messages screwing this up?
       const repliedMsgs = event.tags
         .filter((tag) => tag[0] === 'e')
         .map((tag) => tag[1])
@@ -725,7 +783,14 @@ export default {
     return undefined;
   },
   handleBoost(event: Event) {
-    const id = event.tags.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
+    let id = event.tags.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
+    if (!id) {
+      // last e tag is the boosted post
+      id = event.tags
+        .slice() // so we don't reverse event.tags in place
+        .reverse()
+        .find((tag: any) => tag[0] === 'e')?.[1];
+    }
     if (!id) return;
     if (!this.boostsByMessageId.has(id)) {
       this.boostsByMessageId.set(id, new Set());
@@ -809,6 +874,10 @@ export default {
       this.addRelay(url);
     }
     this.saveRelaysToContacts();
+    // do not save these to contact list
+    for (const url of SEARCH_RELAYS) {
+      if (!this.relays.has(url)) this.addRelay(url);
+    }
   },
   saveRelaysToContacts() {
     const relaysObj: any = {};
@@ -897,15 +966,20 @@ export default {
     }
   },
   updateUnseenNotificationCount: debounce((_this) => {
-    let unseen = 0;
+    if (!_this.notificationsSeenTime) {
+      return;
+    }
+    let count = 0;
     for (const id of _this.notifications.eventIds) {
       const event = _this.eventsById.get(id);
-      if (event && event.created_at > _this.notificationsSeenTime) {
-        unseen++;
+      if (event.created_at > _this.notificationsSeenTime) {
+        count++;
+      } else {
+        break;
       }
     }
-    console.log('unseen notifications', unseen, _this.notificationsSeenTime);
-    iris.local().get('unseenNotificationCount').put(unseen);
+    console.log('notificationsSeenTime', _this.notificationsSeenTime, 'count', count);
+    iris.local().get('unseenNotificationCount').put(count);
   }, 1000),
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
@@ -954,6 +1028,14 @@ export default {
       this.keyValueEvents.set(key, event);
     }
   },
+  isBoost(event: Event) {
+    const mentionIndex = event.tags.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
+    if (event.content === `#[${mentionIndex}]`) {
+      return true;
+    } else {
+      return false;
+    }
+  },
   handleEvent(event: Event) {
     if (!event) return;
     if (this.eventsById.has(event.id)) {
@@ -980,7 +1062,11 @@ export default {
         break;
       case 1:
         this.maybeAddNotification(event);
-        this.handleNote(event);
+        if (this.isBoost(event)) {
+          this.handleBoost(event);
+        } else {
+          this.handleNote(event);
+        }
         break;
       case 4:
         this.handleDirectMessage(event);
@@ -1067,6 +1153,18 @@ export default {
         }
       }
     }
+    const content = event.content.toLowerCase();
+    if (
+      filter.keywords &&
+      !filter.keywords.some((keyword: string) => {
+        return keyword
+          .toLowerCase()
+          .split(' ')
+          .every((word: string) => content.includes(word));
+      })
+    ) {
+      return false;
+    }
 
     return true;
   },
@@ -1085,16 +1183,9 @@ export default {
         this.maxRelays = maxRelays;
         localForage.setItem('maxRelays', maxRelays);
       });
-    iris
-      .local()
-      .get('unseenNotificationCount')
-      .on((unseenNotificationCount) => {
-        this.unseenNotificationCount = unseenNotificationCount;
-      });
     // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
     localForage.getItem('notificationsSeenTime').then((val) => {
-      if (val !== null) {
-        iris.local().get('notificationsSeenTime').put(val);
+      if (val && !this.notificationsSeenTime) {
         this.notificationsSeenTime = val;
         this.updateUnseenNotificationCount(this);
       }
@@ -1134,18 +1225,23 @@ export default {
           subscribe,
           (...args) => this.unsubscribe(...args),
         );
-        this.public.get('notifications/lastOpened', (time) => {
-          this.notificationsSeenTime = time;
-          console.log('got lastOpened', time);
-          this.updateUnseenNotificationCount(this);
+        const myPub = iris.session.getKey().secp256k1.rpub;
+        this.public.get({ path: 'notifications/lastOpened', authors: [myPub] }, (time) => {
+          time = time.value;
+          if (time !== this.notificationsSeenTime) {
+            this.notificationsSeenTime = time;
+            localForage.setItem('notificationsSeenTime', time);
+            this.updateUnseenNotificationCount(this);
+          }
         });
         this.knownUsers.add(key);
-        this.manageRelays();
         this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
-        const hex = this.toNostrHexAddress(this.SUGGESTED_FOLLOW);
-        this.knownUsers.add(hex);
-        this.getProfile(this.toNostrHexAddress(hex), undefined);
+        for (const suggestion of this.SUGGESTED_FOLLOWS) {
+          const hex = this.toNostrHexAddress(suggestion);
+          this.knownUsers.add(hex);
+          this.getProfile(this.toNostrHexAddress(hex), undefined);
+        }
         this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
         setTimeout(() => {
           this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
@@ -1271,6 +1367,28 @@ export default {
     };
     callback();
     this.subscribe([{ kinds: [1, 3, 5, 7], limit: 200 }], callback);
+  },
+  getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void) {
+    const callback = (event) => {
+      if (!this.latestNotesByKeywords.has(keyword)) {
+        this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+      }
+      this.latestNotesByKeywords.get(keyword)?.add(event);
+      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    };
+    // find among cached events
+    const filter = { kinds: [1], keywords: [keyword] };
+    for (const event of this.eventsById.values()) {
+      if (this.matchFilter(event, filter)) {
+        if (!this.latestNotesByKeywords.has(keyword)) {
+          this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+        }
+        this.latestNotesByKeywords.get(keyword)?.add(event);
+      }
+    }
+    this.latestNotesByKeywords.has(keyword) &&
+      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    this.subscribe([filter], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile

@@ -13,23 +13,25 @@ export default class MessageForm extends Component {
     if (msg.replyingTo) {
       const id = Nostr.toNostrHexAddress(msg.replyingTo);
       const replyingTo = await Nostr.getMessageById(id);
-      event.tags = [
-        ['e', id, Nostr.getSomeRelayUrl(), 'reply'],
-        ['p', replyingTo.pubkey],
-      ];
-      for (const tag of replyingTo.tags) {
-        if (tag[0] === 'p') {
-          event.tags.push(tag);
-        }
+      event.tags = replyingTo.tags.slice();
+      const rootTag = replyingTo.tags.find((t) => t[0] === 'e' && t[3] === 'root');
+      if (rootTag) {
+        event.tags.push(['e', id, '', 'reply']);
+      } else {
+        event.tags.push(['e', id, '', 'root']);
       }
-      // TODO add p tags from replied event, and replied event.pubkey
+      if (!event.tags.find((t) => t[0] === 'p' && t[1] === replyingTo.pubkey)) {
+        event.tags.push(['p', replyingTo.pubkey]);
+      }
     }
     // unique tagged users
-    const taggedUsers = msg.text.match(/@npub\w+/g)?.filter((v, i, a) => a.indexOf(v) === i);
+    const taggedUsers = msg.text
+      .match(/(?:@)?(npub\w+)/gi)
+      ?.filter((v, i, a) => a.indexOf(v) === i);
     if (taggedUsers) {
       event.tags = event.tags || [];
       for (const tag of taggedUsers) {
-        const hexTag = Nostr.toNostrHexAddress(tag.slice(1));
+        const hexTag = Nostr.toNostrHexAddress(tag.replace('@', ''));
         const newTag = ['p', hexTag];
         // add if not already present
         if (!event.tags.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {

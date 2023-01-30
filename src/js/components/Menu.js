@@ -14,14 +14,12 @@ const APPLICATIONS = [
   { url: '#/chat', text: 'messages', icon: Icons.chat },
   { url: '#/global', text: 'global', icon: Icons.global },
   { url: '#/settings', text: 'settings', icon: Icons.settings },
-  { url: '#/explorer', text: 'explorer', icon: Icons.folder, beta: true },
   { url: '#/about', text: 'about', icon: Icons.info },
 ];
 
 export default class Menu extends Component {
   componentDidMount() {
     iris.local().get('unseenMsgsTotal').on(this.inject());
-    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
   }
 
   menuLinkClicked() {
@@ -38,7 +36,7 @@ export default class Menu extends Component {
               <a tabindex="3" href="#/" onClick=${() => this.menuLinkClicked()} class="logo">
                 <div class="mobile-menu-icon visible-xs-inline-block">${Icons.menu}</div>
                 <img src=${logo} width="30" height="30" />
-                <span style="font-size: 1.5em">iris</span>
+                <span style="font-size: 1.8em">iris</span>
               </a>
             `}
         ${APPLICATIONS.map((a) => {

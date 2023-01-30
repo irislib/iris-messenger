@@ -14,9 +14,8 @@ export default class Notifications extends View {
   ref = createRef();
 
   updateNotificationsLastOpened = debounce(() => {
-    const lastOpened = Math.floor(Date.now() / 1000);
-    Nostr.public.set('notifications/lastOpened', lastOpened);
-    console.log('set lastOpened', lastOpened);
+    const time = Math.floor(Date.now() / 1000);
+    Nostr.public.set('notifications/lastOpened', time);
   }, 1000);
 
   componentDidMount() {
@@ -32,9 +31,9 @@ export default class Notifications extends View {
 
   renderView() {
     return html`
-      <div ref=${this.ref} class="centered-container" style="margin-bottom: 15px;">
+      <div ref=${this.ref} class="centered-container">
         ${this.state.hasNotifications
-          ? html`<br class="hidden-xs" />`
+          ? html``
           : html`<p class="mobile-padding15">${t('no_notifications_yet')}</p> `}
         <${MessageFeed}
           scrollElement=${this.scrollElement.current}
