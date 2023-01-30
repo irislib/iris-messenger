@@ -539,6 +539,9 @@ class PublicMessage extends Message {
       rootMsg = s.msg.replyingTo;
     }
 
+    const replyingToUsers = s.msg.event?.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
+    const quoting = s.msg.replyingTo && (this.props.showRepliedMsg || this.props.asReply);
+
     return html`
       ${s.msg.replyingTo && this.props.showRepliedMsg
         ? html`
@@ -557,7 +560,7 @@ class PublicMessage extends Message {
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
           : ''} ${asQuote ? 'quote' : ''}
-          ${s.msg.replyingTo && (this.props.showRepliedMsg || this.props.asReply) ? 'quoting' : ''}"
+          ${quoting ? 'quoting' : ''}"
       >
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           ${this.props.asQuote && s.msg.replyingTo
@@ -597,6 +600,23 @@ class PublicMessage extends Message {
               </div>
               ${this.renderDropdown()}
             </div>
+            ${replyingToUsers.length && !quoting
+              ? html`
+                  <small class="msg-replying-to">
+                    Replying to${' '}
+                    ${replyingToUsers
+                      .slice(0, 3)
+                      .map(
+                        (u) => html`
+                          <a href=${`#/profile/${u}`}>
+                            @<${Name} pub=${u} hideBadge=${true} />${' '}
+                          </a>
+                        `,
+                      )}
+                    ${replyingToUsers.length > 3 ? '...' : ''}
+                  </small>
+                `
+              : ''}
             ${this.props.standalone
               ? html`
                   <${Helmet} titleTemplate="%s">

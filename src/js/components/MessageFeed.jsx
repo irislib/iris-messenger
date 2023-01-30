@@ -118,7 +118,7 @@ class MessageFeed extends Component {
         Nostr.getMessagesByKeyword(this.props.keyword, (messages) => {
           if (this.props.keyword == keyword)
             this.updateSortedMessages(messages);
-	});
+	    });
       } else if (this.props.index) {
         // public messages
         if (this.props.index === 'everyone') {
@@ -171,7 +171,7 @@ class MessageFeed extends Component {
       return;
     }
     const displayCount = this.state.displayCount;
-    const showRepliedMsg = this.props.index !== 'likes';
+    const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
     return (
       <>
         <div>

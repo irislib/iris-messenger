@@ -817,6 +817,7 @@ header.footer .header-content {
 
 .msg-content .text {
   font-family: Lato, sans-serif;
+  margin-top: 5px;
   margin-bottom: 5px;
   white-space: pre-wrap;
 }
@@ -1208,7 +1209,6 @@ a.msg {
 .public-messages-view .msg-sender {
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
 }
 
 .public-messages-view .msg-sender .msg-sender-link {
