@@ -1213,6 +1213,12 @@ export default {
           this.subscribe(filters, callback);
           return '0';
         };
+        const relays = {};
+        // ADD default relays to it
+        for (const relay of DEFAULT_RELAYS) {
+          relays[relay] = { enabled: true };
+        }
+        iris.local().get('relays').put(relays);
         this.private = new Path(
           (...args) => this.publish(...args),
           subscribe,

@@ -8,42 +8,36 @@ import { translate as t } from '../../translations/Translation';
 const bech32 = require('bech32-buffer');
 
 const NostrSettings = () => {
-  const [relays, setRelays] = useState([]);
+  const [relays, setRelays] = useState({});
+  const [relayPoolRelays, setRelayPoolRelays] = useState([]);
   const [newRelayUrl, setNewRelayUrl] = useState(''); // added state to store the new relay URL
-  const [maxRelays, setMaxRelays] = useState(Nostr.maxRelays);
 
   setInterval(() => {
     const relays = Nostr.relayPool.getRelayStatuses();
-    setRelays(relays);
+    setRelayPoolRelays(relays);
   }, 1000);
 
-  const handleConnectClick = (relay) => {
-    iris.local().get('relays').get(relay.url).put({ enabled: true });
-    Nostr.connectRelay(relay);
+  iris.local().get('relays').on(setRelays);
+
+  const handleRemoveRelay = (event, url) => {
+    event.preventDefault();
+    iris.local().get('relays').get(url).put(null);
+    Nostr.removeRelay(url);
   };
 
-  const handleDisconnectClick = (relay) => {
-    iris.local().get('relays').get(relay.url).put({ enabled: false });
-    relay.close();
-  };
-
-  const handleRemoveRelay = (relay) => {
-    iris.local().get('relays').get(relay.url).put(null);
-    Nostr.removeRelay(relay.url);
-  };
+  const getRelayStatus = (url) => {
+    const relay = relayPoolRelays.find(r => r[0] === url);
+    if (relay) {
+      return relay[1];
+    }
+    return 0;
+  }
 
   const handleAddRelay = (event) => {
     iris.local().get('relays').get(newRelayUrl).put({ enabled: true });
     event.preventDefault(); // prevent the form from reloading the page
     Nostr.addRelay(newRelayUrl); // add the new relay using the Nostr method
     setNewRelayUrl(''); // reset the new relay URL
-  };
-
-  const maxRelaysChanged = (event) => {
-    // parse int
-    const maxRelays = parseInt(event.target.value);
-    iris.local().get('maxRelays').put(maxRelays);
-    setMaxRelays(maxRelays);
   };
 
   const getClassName = (status) => {
@@ -110,19 +104,34 @@ const NostrSettings = () => {
       {myPrivHex ? <p dangerouslySetInnerHTML={{ __html: t('private_key_warning') }}></p> : ''}
 
       <h3>Relays</h3>
-      <p>
-        Max relays: <input
-          type="number"
-          value={maxRelays}
-          onChange={maxRelaysChanged}
-        />
-      </p>
       <div id="peers" className="flex-table">
-        {relays.map(([url, status]) => (
+        <div className="flex-row peer">
+          <div className="flex-cell">
+            <p>Relay URL</p>
+          </div>
+          <div className="flex-cell no-flex">
+            <p>Enabled</p>
+          </div>
+        </div>
+        {Object.entries(relays).map(([url, relay]) => (
           <div className="flex-row peer">
             <div className="flex-cell" key={url}>
-              <span className={getClassName(status)}>&#x2B24; </span>
+              <span className={getClassName(getRelayStatus(url))}>&#x2B24; </span>
               {url}
+            </div>
+            <div className="flex-cell no-flex">
+              <a href="#" onClick={(e) => handleRemoveRelay(e, url)}>
+                {t('remove')}
+              </a>
+            </div>
+            <div className="flex-cell no-flex">
+              <input
+                type="checkbox"
+                checked={relay.enabled}
+                onChange={() => {
+                  iris.local().get('relays').get(url).put({ enabled: !relay.enabled });
+                }}
+              />
             </div>
           </div>
         ))}
