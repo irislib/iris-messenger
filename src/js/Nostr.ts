@@ -25,15 +25,6 @@ declare global {
   }
 }
 
-const getRelayStatus = (relay: Relay) => {
-  // workaround for nostr-tools bug
-  try {
-    return relay.status;
-  } catch (e) {
-    return 3;
-  }
-};
-
 const saveLocalStorageEvents = debounce((_this: any) => {
   const latestMsgs = _this.latestNotesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
     return _this.eventsById.get(eventId);
@@ -111,7 +102,7 @@ export default {
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  maxRelays: iris.util.isMobile ? 5 : 10,
+  relays: {},
   searchRelays: searchRelays,
   knownUsers: new Set<string>(),
   blockedUsers: new Set<string>(),
@@ -260,14 +251,15 @@ export default {
   },
   addRelay(url: string) {
     this.relayPool.addOrGetRelay(url);
+    this.saveRelaysToContacts();
   },
-  removeRelay(url: string) {
-    iris.local().get('relays').get(url).put(null);
+  removeRelayFromPool(url: string) {
     const relay = this.relayPool.relayByUrl.get(url);
     if (relay) {
       relay.close();
       this.relayPool.relayByUrl.delete(url);
     }
+    this.saveRelaysToContacts();
   },
   addFollower: function (followedUser: string, follower: string) {
     if (!this.followersByUser.has(followedUser)) {
@@ -673,15 +665,6 @@ export default {
     };
     this.relayPool.subscribe(filters, DEFAULT_RELAYS, myCallback, 10);
   },
-  getConnectedRelayCount: function () {
-    let count = 0;
-    for (const relay of this.relays.values()) {
-      if (getRelayStatus(relay) === 1) {
-        count++;
-      }
-    }
-    return count;
-  },
   SUGGESTED_FOLLOWS: [
     'npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9', // snowden
     'npub1sg6plzptd64u62a878hep2kev88swjh3tw00gjsfl8f237lmu63q0uf63m', // jack
@@ -692,13 +675,6 @@ export default {
     'npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6', // fiatjaf
     'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s', // jb55
   ],
-  connectRelay: function (relay: Relay) {
-    try {
-      relay.connect();
-    } catch (e) {
-      console.log(e);
-    }
-  },
   handleNote(event: Event) {
     this.eventsById.set(event.id, event);
     if (!this.postsAndRepliesByUser.has(event.pubkey)) {
@@ -838,13 +814,14 @@ export default {
         if (urls.length) {
           // remove all existing relays that are not in urls. TODO: just disable
           console.log('setting relays from your contacs list', urls);
-          for (const url of this.relays.keys()) {
+          for (const url of Object.keys(this.relays)) {
             if (!urls.includes(url)) {
-              this.removeRelay(url);
+              this.removeRelayFromPool(url);
             }
           }
           for (const url of urls) {
             this.addRelay(url);
+            iris.local().get('relays').get(url).put({ enabled: true });
           }
         }
       } catch (e) {
@@ -865,7 +842,7 @@ export default {
   },
   saveRelaysToContacts() {
     const relaysObj: any = {};
-    for (const url of this.relays.keys()) {
+    for (const url of Object.keys(this.relays)) {
       relaysObj[url] = { read: true, write: true };
     }
     const existing = this.followEventByUser.get(iris.session.getKey().secp256k1.rpub);
@@ -1162,22 +1139,15 @@ export default {
     });
     iris
       .local()
-      .get('maxRelays')
-      .on((maxRelays) => {
-        this.maxRelays = maxRelays;
-        localForage.setItem('maxRelays', maxRelays);
+      .get('relays')
+      .on((relays) => {
+        this.relays = relays;
       });
     // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
     localForage.getItem('notificationsSeenTime').then((val) => {
       if (val && !this.notificationsSeenTime) {
         this.notificationsSeenTime = val;
         this.updateUnseenNotificationCount(this);
-      }
-    });
-    localForage.getItem('maxRelays').then((val) => {
-      if (val !== null) {
-        iris.local().get('maxRelays').put(val);
-        this.maxRelays = val;
       }
     });
     iris
@@ -1197,12 +1167,6 @@ export default {
           this.subscribe(filters, callback);
           return '0';
         };
-        const relays = {};
-        // ADD default relays to it
-        for (const relay of DEFAULT_RELAYS) {
-          relays[relay] = { enabled: true };
-        }
-        iris.local().get('relays').put(relays);
         this.private = new Path(
           (...args) => this.publish(...args),
           subscribe,

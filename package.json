@@ -76,7 +76,7 @@
     "jsxstyle": "^2.5.1",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
-    "nostr-relaypool": "^0.4.2",
+    "nostr-relaypool": "^0.4.3",
     "preact": "^10.11.3",
     "preact-async-route": "2.2.1",
     "preact-custom-element": "^4.2.1",

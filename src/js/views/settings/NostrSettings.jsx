@@ -22,7 +22,7 @@ const NostrSettings = () => {
   const handleRemoveRelay = (event, url) => {
     event.preventDefault();
     iris.local().get('relays').get(url).put(null);
-    Nostr.removeRelay(url);
+    Nostr.removeRelayFromPool(url);
   };
 
   const getRelayStatus = (url) => {
@@ -132,7 +132,13 @@ const NostrSettings = () => {
                 type="checkbox"
                 checked={relay.enabled}
                 onChange={() => {
-                  iris.local().get('relays').get(url).put({ enabled: !relay.enabled });
+                  const enabled = !relay.enabled;
+                  if (enabled) {
+                    Nostr.addRelay(url);
+                  } else {
+                    Nostr.removeRelayFromPool(url);
+                  }
+                  iris.local().get('relays').get(url).put({ enabled });
                 }}
               />
             </div>
