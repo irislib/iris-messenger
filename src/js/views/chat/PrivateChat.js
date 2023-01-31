@@ -239,7 +239,15 @@ export default class PrivateChat extends Component {
         id="message-view"
         onScroll=${(e) => this.onMessageViewScroll(e)}
       >
-        <div id="message-list">${msgListContent}</div>
+        <div id="message-list">
+          ${msgListContent}
+          <p>
+            <i
+              >Nostr private messages are encrypted, but everyone can see who you're chatting with
+              and when.</i
+            >
+          </p>
+        </div>
         <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
       </div>`;
     } else {
