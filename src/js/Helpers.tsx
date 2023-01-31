@@ -101,6 +101,11 @@ export default {
       );
     });
 
+    const audioRegex = /(https?:\/\/\S+\.(?:mp3|wav|ogg|flac))/gi;
+    replacedText = reactStringReplace(replacedText, audioRegex, (match, i) => {
+      return <audio key={match + i} src={match} controls={true} loop={true} />;
+    });
+
     const youtubeRegex =
       /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})(?:\S+)?/g;
     replacedText = reactStringReplace(replacedText, youtubeRegex, (match, i) => {

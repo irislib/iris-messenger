@@ -140,10 +140,10 @@ class PublicMessage extends Message {
               }
               msg.attachments.push({ type: 'image', data: parsedUrl.origin + parsedUrl.pathname });
 
-              // Remove URL from beginning or end of line
-              text = text
-                .replace(new RegExp(`^${url}`, 'g'), '')
-                .replace(new RegExp(`${url}$`, 'g'), '');
+              // Remove URL from beginning or end of line or before newline
+              text = text.replace(new RegExp(`^${url}`), '');
+              text = text.replace(new RegExp(`${url}$`), '');
+              text = text.replace(new RegExp(`${url}\n`), ' ');
             }
           });
         }
@@ -546,7 +546,11 @@ class PublicMessage extends Message {
       rootMsg = s.msg.replyingTo;
     }
 
-    const replyingToUsers = s.msg.event?.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
+    let replyingToUsers = [];
+    const hasETags = s.msg.event.tags.some((t) => t[0] === 'e');
+    if (hasETags) {
+      replyingToUsers = s.msg.event?.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
+    }
     const quoting = s.msg.replyingTo && (this.props.showRepliedMsg || this.props.asReply);
 
     return html`
@@ -610,7 +614,7 @@ class PublicMessage extends Message {
             ${replyingToUsers.length && !quoting
               ? html`
                   <small class="msg-replying-to">
-                    Replying to${' '}
+                    ${t('replying_to') + ' '}
                     ${replyingToUsers
                       .slice(0, 3)
                       .map(

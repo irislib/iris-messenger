@@ -42,7 +42,8 @@ class About extends Component {
                   <a href="https://testflight.apple.com/join/5xdoDCmG">iOS Testflight</a>
                 </li>
                 <li>
-                  <a href="https://play.google.com/store/apps/details?id=to.iris.twa">Android</a>
+                  <a href="https://play.google.com/store/apps/details?id=to.iris.twa">Android</a> (
+                  <a href="https://github.com/irislib/iris-messenger/releases">apk</a>)
                 </li>
               </ul>
             </p>

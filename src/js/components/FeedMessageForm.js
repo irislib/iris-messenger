@@ -113,10 +113,11 @@ class FeedMessageForm extends MessageForm {
         formData.append('fileToUpload', files[i]);
 
         const a = this.state.attachments || [];
-        a[i] = a[i] || {};
+        a[i] = a[i] || {
+          type: files[i].type,
+        };
 
         Helpers.getBase64(files[i]).then((base64) => {
-          a[i].type = 'image';
           a[i].data = base64;
           this.setState({ attachments: a });
         });
@@ -128,7 +129,7 @@ class FeedMessageForm extends MessageForm {
           .then(async (response) => {
             const text = await response.text();
             const url = text.match(
-              /https:\/\/nostr\.build\/i\/nostr\.build_[a-z0-9]{64}\.[a-zA-Z]+/i,
+              /https:\/\/nostr\.build\/(?:i|av)\/nostr\.build_[a-z0-9]{64}\.[a-z0-9]+/i,
             );
             if (url) {
               a[i].url = url[0];
@@ -179,7 +180,7 @@ class FeedMessageForm extends MessageForm {
         name="attachment-input"
         type="file"
         class="hidden attachment-input"
-        accept="image/*"
+        accept="image/*, video/*, audio/*"
         multiple
         onChange=${(e) => this.attachmentsChanged(e)}
       />
@@ -293,11 +294,37 @@ class FeedMessageForm extends MessageForm {
             `
           : ''}
         ${this.state.attachments &&
-        this.state.attachments.map(
-          (a) =>
-            html` ${a.error ? html`<span class="error">${a.error}</span>` : a.url || 'uploading...'}
-              <${SafeImg} src=${a.data} />`,
-        )}
+        this.state.attachments.map((a) => {
+          const status = html` ${a.error
+            ? html`<span class="error">${a.error}</span>`
+            : a.url || 'uploading...'}`;
+
+          // if a.url matches audio regex
+          if (a.type?.startsWith('audio')) {
+            return html`
+              ${status}
+              <audio controls>
+                <source src=${a.data} />
+              </audio>
+            `;
+          }
+          // if a.url matches video regex
+          if (a.type?.startsWith('video')) {
+            return html`
+              ${status}
+              <video controls>
+                <source src=${a.data} />
+              </video>
+            `;
+          }
+
+          // image regex
+          if (a.type?.startsWith('image')) {
+            return html`${status} <${SafeImg} src=${a.data} /> `;
+          }
+
+          return 'unknown attachment type';
+        })}
       </div>
     </form>`;
   }
