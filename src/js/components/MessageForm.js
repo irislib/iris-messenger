@@ -20,7 +20,7 @@ export default class MessageForm extends Component {
       }
       if (rootTag) {
         event.tags.unshift(['e', id, '', 'reply']);
-        event.tags.unshift(['e', rootTag[1], rootTag[2], 'root']);
+        event.tags.unshift(['e', rootTag[1], '', 'root']);
       } else {
         event.tags.unshift(['e', id, '', 'root']);
       }
