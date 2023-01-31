@@ -1,18 +1,20 @@
-import React, {useState} from "react";
-import Nostr from "../../Nostr";
-import Button from '../../components/basic/Button';
+import React, { useState } from 'react';
 import iris from 'iris-lib';
+
+import Button from '../../components/basic/Button';
 import CopyButton from '../../components/CopyButton';
+import Nostr from '../../Nostr';
 import { translate as t } from '../../translations/Translation';
 const bech32 = require('bech32-buffer');
 
 const NostrSettings = () => {
-  const [relays, setRelays] = useState(Array.from(Nostr.relays.values()));
-  const [newRelayUrl, setNewRelayUrl] = useState(""); // added state to store the new relay URL
+  const [relays, setRelays] = useState([]);
+  const [newRelayUrl, setNewRelayUrl] = useState(''); // added state to store the new relay URL
   const [maxRelays, setMaxRelays] = useState(Nostr.maxRelays);
 
   setInterval(() => {
-    setRelays(Array.from(Nostr.relays.values()));
+    const relays = Nostr.relayPool.getRelayStatuses();
+    setRelays(relays);
   }, 1000);
 
   const handleConnectClick = (relay) => {
@@ -44,16 +46,8 @@ const NostrSettings = () => {
     setMaxRelays(maxRelays);
   };
 
-  const getStatus = (relay) => {
-    try {
-      return relay.status;
-    } catch (e) {
-      return 3;
-    }
-  }
-
-  const getClassName = (relay) => {
-    switch (getStatus(relay)) {
+  const getClassName = (status) => {
+    switch (status) {
       case 0:
         return "neutral";
       case 1:
@@ -124,24 +118,11 @@ const NostrSettings = () => {
         />
       </p>
       <div id="peers" className="flex-table">
-        {relays.map((relay) => (
+        {relays.map(([url, status]) => (
           <div className="flex-row peer">
-            <div className="flex-cell" key={relay.url}>
-              <span className={getClassName(relay)}>&#x2B24; </span>
-              {relay.url}
-            </div>
-            <div className="flex-cell no-flex">
-              <Button onClick={() => handleRemoveRelay(relay)}>
-                {t('remove')}
-              </Button>
-            </div>
-            <div className="flex-cell no-flex">
-
-              {getStatus(relay) === 1 ? (
-                <Button onClick={() => handleDisconnectClick(relay)}>Disconnect</Button>
-              ) : (
-                <Button onClick={() => handleConnectClick(relay)}>Connect</Button>
-              )}
+            <div className="flex-cell" key={url}>
+              <span className={getClassName(status)}>&#x2B24; </span>
+              {url}
             </div>
           </div>
         ))}

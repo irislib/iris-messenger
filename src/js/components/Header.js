@@ -123,7 +123,7 @@ class Header extends Component {
 
   updateRelayCount() {
     const statuses = Nostr.relayPool.getRelayStatuses();
-    const connectedRelays = statuses.filter(([_url, status]) => status === 1).length;
+    const connectedRelays = statuses.filter((relay) => relay[1] === 1).length;
     this.setState({ connectedRelays });
   }
 
