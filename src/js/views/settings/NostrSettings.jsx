@@ -34,7 +34,6 @@ const NostrSettings = () => {
   }
 
   const handleAddRelay = (event) => {
-    iris.local().get('relays').get(newRelayUrl).put({ enabled: true });
     event.preventDefault(); // prevent the form from reloading the page
     Nostr.addRelay(newRelayUrl); // add the new relay using the Nostr method
     setNewRelayUrl(''); // reset the new relay URL
@@ -113,7 +112,11 @@ const NostrSettings = () => {
             <p>Enabled</p>
           </div>
         </div>
-        {Object.entries(relays).map(([url, relay]) => (
+        {Object.entries(relays).map(([url, relay]) => {
+          if (!relay) {
+            return;
+          }
+          return (
           <div className="flex-row peer">
             <div className="flex-cell" key={url}>
               <span className={getClassName(getRelayStatus(url))}>&#x2B24; </span>
@@ -134,7 +137,8 @@ const NostrSettings = () => {
               />
             </div>
           </div>
-        ))}
+        )
+        })}
         <div className="flex-row peer">
           <div className="flex-cell" key="new">
             <input

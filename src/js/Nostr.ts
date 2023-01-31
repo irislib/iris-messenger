@@ -112,7 +112,6 @@ export default {
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
   maxRelays: iris.util.isMobile ? 5 : 10,
-  relays: defaultRelays,
   searchRelays: searchRelays,
   knownUsers: new Set<string>(),
   blockedUsers: new Set<string>(),
@@ -260,30 +259,15 @@ export default {
     }
   },
   addRelay(url: string) {
-    if (this.relays.has(url)) return;
-    const relay = relayInit(url, (id) => this.eventsById.has(id));
-    relay.on('connect', () => {
-      for (const [name, filters] of this.subscribedFiltersByName.entries()) {
-        const sub = relay.sub(filters, {});
-        if (!this.subscriptionsByName.has(name)) {
-          this.subscriptionsByName.set(name, new Set());
-        }
-        this.subscriptionsByName.get(name)?.add(sub);
-        //console.log('subscriptions size', this.subscriptionsByName.size);
-      }
-    });
-    relay.on('notice', (notice) => {
-      console.log('notice from ', relay.url, notice);
-    });
-    this.relays.set(url, relay);
+    this.relayPool.addOrGetRelay(url);
   },
   removeRelay(url: string) {
-    try {
-      this.relays.get(url)?.close();
-    } catch (e) {
-      console.log('error closing relay', e);
+    iris.local().get('relays').get(url).put(null);
+    const relay = this.relayPool.relayByUrl.get(url);
+    if (relay) {
+      relay.close();
+      this.relayPool.relayByUrl.delete(url);
     }
-    this.relays.delete(url);
   },
   addFollower: function (followedUser: string, follower: string) {
     if (!this.followersByUser.has(followedUser)) {
@@ -876,7 +860,7 @@ export default {
     this.saveRelaysToContacts();
     // do not save these to contact list
     for (const url of SEARCH_RELAYS) {
-      if (!this.relays.has(url)) this.addRelay(url);
+      this.addRelay(url);
     }
   },
   saveRelaysToContacts() {
