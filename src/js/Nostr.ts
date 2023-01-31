@@ -1357,16 +1357,6 @@ export default {
     this.subscribe([{ '#p': [iris.session.getKey().secp256k1.rpub] }], callback);
   },
 
-  getSomeRelayUrl() {
-    // try to find a connected relay, but if none are connected, just return the first one
-    const relays: Relay[] = Array.from(this.relays.values());
-    const connectedRelays: Relay[] = relays.filter((relay: Relay) => getRelayStatus(relay) === 1);
-    if (connectedRelays.length) {
-      return connectedRelays[0].url;
-    }
-    return relays.length ? relays[0].url : null;
-  },
-
   getMessagesByEveryone(cb: (messageIds: string[]) => void) {
     const callback = () => {
       cb(this.latestNotesByEveryone.eventIds);
