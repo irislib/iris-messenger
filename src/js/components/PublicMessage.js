@@ -141,9 +141,8 @@ class PublicMessage extends Message {
               msg.attachments.push({ type: 'image', data: parsedUrl.origin + parsedUrl.pathname });
 
               // Remove URL from beginning or end of line
-              text = text
-                .replace(new RegExp(`^${url}`, 'g'), '')
-                .replace(new RegExp(`${url}$`, 'g'), '');
+              text = text.replace(new RegExp(`^${url}\\s*`), '');
+              text = text.replace(new RegExp(`\\s*${url}$`), '');
             }
           });
         }

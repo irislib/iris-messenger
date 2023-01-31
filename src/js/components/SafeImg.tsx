@@ -7,7 +7,12 @@ type Props = {
 };
 
 // need to have trailing slash, otherwise you could do https://imgur.com.myevilwebsite.com/image.png
-const safeOrigins = ['data:image', 'https://imgur.com/', 'https://i.imgur.com/'];
+const safeOrigins = [
+  'data:image',
+  'https://imgur.com/',
+  'https://i.imgur.com/',
+  'https://proxy.irismessengers.wtf/',
+];
 
 export const isSafeOrigin = (url: string) => {
   return safeOrigins.some((origin) => url.indexOf(origin) === 0);
