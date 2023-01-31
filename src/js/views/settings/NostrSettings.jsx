@@ -13,11 +13,25 @@ const NostrSettings = () => {
   const [newRelayUrl, setNewRelayUrl] = useState(''); // added state to store the new relay URL
 
   setInterval(() => {
-    const relays = Nostr.relayPool.getRelayStatuses();
-    setRelayPoolRelays(relays);
+    const relayPoolRelays = Nostr.relayPool.getRelayStatuses();
+    setRelayPoolRelays(relayPoolRelays);
+    // TODO don't object assign, use iris.local() as source of truth
+    const newRelays = Object.assign({}, relays);
+    relayPoolRelays.forEach((relay) => {
+      const url = relay[0];
+      if (!newRelays[url]) {
+        newRelays[url] = { enabled: true };
+      }
+    });
+    setRelays(newRelays);
   }, 1000);
 
-  iris.local().get('relays').on(setRelays);
+  iris
+    .local()
+    .get('relays')
+    .on((rls) => {
+      setRelays(Object.assign({}, relays, rls));
+    });
 
   const handleRemoveRelay = (event, url) => {
     event.preventDefault();
@@ -26,12 +40,12 @@ const NostrSettings = () => {
   };
 
   const getRelayStatus = (url) => {
-    const relay = relayPoolRelays.find(r => r[0] === url);
+    const relay = relayPoolRelays.find((r) => r[0] === url);
     if (relay) {
       return relay[1];
     }
     return 0;
-  }
+  };
 
   const handleAddRelay = (event) => {
     event.preventDefault(); // prevent the form from reloading the page
@@ -42,17 +56,17 @@ const NostrSettings = () => {
   const getClassName = (status) => {
     switch (status) {
       case 0:
-        return "neutral";
+        return 'neutral';
       case 1:
-        return "positive";
+        return 'positive';
       case 2:
-        return "neutral";
+        return 'neutral';
       case 3:
-        return "";
+        return '';
       default:
-        return "status";
+        return 'status';
     }
-  }
+  };
 
   const myPrivHex = iris.session.getKey().secp256k1.priv;
   let myPriv32;
@@ -73,26 +87,16 @@ const NostrSettings = () => {
             <input type="text" value={myPub} />
           </div>
           <div className="flex-cell no-flex">
-            <CopyButton
-              copyStr={myPub}
-              text="Copy public key" />
+            <CopyButton copyStr={myPub} text="Copy public key" />
           </div>
         </div>
         <div className="flex-row">
-          <div className="flex-cell">
-            Private key
-          </div>
+          <div className="flex-cell">Private key</div>
           <div className="flex-cell no-flex">
             {myPrivHex ? (
               <>
-                <CopyButton
-                  notShareable={true}
-                  copyStr={myPrivHex}
-                  text="Copy hex" />
-                <CopyButton
-                  notShareable={true}
-                  copyStr={myPriv32}
-                  text="Copy nsec" />
+                <CopyButton notShareable={true} copyStr={myPrivHex} text="Copy hex" />
+                <CopyButton notShareable={true} copyStr={myPriv32} text="Copy nsec" />
               </>
             ) : (
               <p>Not present. Good!</p>
@@ -112,39 +116,41 @@ const NostrSettings = () => {
             <p>Enabled</p>
           </div>
         </div>
-        {Object.entries(relays).map(([url, relay]) => {
-          if (!relay) {
-            return;
-          }
-          return (
-          <div className="flex-row peer">
-            <div className="flex-cell" key={url}>
-              <span className={getClassName(getRelayStatus(url))}>&#x2B24; </span>
-              {url}
-            </div>
-            <div className="flex-cell no-flex">
-              <a href="#" onClick={(e) => handleRemoveRelay(e, url)}>
-                {t('remove')}
-              </a>
-            </div>
-            <div className="flex-cell no-flex">
-              <input
-                type="checkbox"
-                checked={relay.enabled}
-                onChange={() => {
-                  const enabled = !relay.enabled;
-                  if (enabled) {
-                    Nostr.addRelay(url);
-                  } else {
-                    Nostr.removeRelayFromPool(url);
-                  }
-                  iris.local().get('relays').get(url).put({ enabled });
-                }}
-              />
-            </div>
-          </div>
-        )
-        })}
+        {Object.entries(relays)
+          .sort((a, b) => (a[0] > b[0] ? 1 : -1))
+          .map(([url, relay]) => {
+            if (!relay) {
+              return;
+            }
+            return (
+              <div className="flex-row peer">
+                <div className="flex-cell" key={url}>
+                  <span className={getClassName(getRelayStatus(url))}>&#x2B24; </span>
+                  {url}
+                </div>
+                <div className="flex-cell no-flex">
+                  <a href="#" onClick={(e) => handleRemoveRelay(e, url)}>
+                    {t('remove')}
+                  </a>
+                </div>
+                <div className="flex-cell no-flex">
+                  <input
+                    type="checkbox"
+                    checked={relay.enabled}
+                    onChange={() => {
+                      const enabled = !relay.enabled;
+                      if (enabled) {
+                        Nostr.addRelay(url);
+                      } else {
+                        Nostr.removeRelayFromPool(url);
+                      }
+                      iris.local().get('relays').get(url).put({ enabled });
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         <div className="flex-row peer">
           <div className="flex-cell" key="new">
             <input
@@ -152,7 +158,7 @@ const NostrSettings = () => {
               type="text"
               placeholder={t('new_relay_url')}
               value={newRelayUrl}
-              onChange={event => setNewRelayUrl(event.target.value)}
+              onChange={(event) => setNewRelayUrl(event.target.value)}
             />
           </div>
           <div className="flex-cell no-flex">
@@ -161,7 +167,9 @@ const NostrSettings = () => {
         </div>
         <div>
           <Button onClick={() => Nostr.saveRelaysToContacts()}>{t('save_relays_publicly')}</Button>
-          <Button onClick={() => Nostr.restoreDefaultRelays()}>{t('restore_default_relays')}</Button>
+          <Button onClick={() => Nostr.restoreDefaultRelays()}>
+            {t('restore_default_relays')}
+          </Button>
         </div>
       </div>
     </div>

@@ -1,13 +1,14 @@
-import Component from '../../BaseComponent';
-import Name from '../../components/Name';
 import iris from 'iris-lib';
-import { translate as t } from '../../translations/Translation';
+import $ from 'jquery';
+import { forEach } from 'lodash';
+import { route } from 'preact-router';
+
+import Component from '../../BaseComponent';
+import Button from '../../components/basic/Button';
+import Name from '../../components/Name';
 import Helpers from '../../Helpers';
 import Icons from '../../Icons';
-import { route } from 'preact-router';
-import $ from 'jquery';
-import Button from '../../components/basic/Button';
-import { forEach } from 'lodash';
+import { translate as t } from '../../translations/Translation';
 
 export default class PeerSettings extends Component {
   updatePeersFromGunInterval = 0;

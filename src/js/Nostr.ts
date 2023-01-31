@@ -82,10 +82,6 @@ const DEFAULT_RELAYS = [
 
 const SEARCH_RELAYS = ['wss://relay.nostr.band'];
 
-const defaultRelays = new Map<string, Relay>(
-  DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
-);
-
 const searchRelays = new Map<string, Relay>(
   SEARCH_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
 );
