@@ -82,6 +82,7 @@ const DEFAULT_RELAYS = [
   'wss://nostr.onsats.org',
   'wss://nos.lol',
   'wss://brb.io',
+  'wss://relay.snort.social',
 ];
 
 const SEARCH_RELAYS = ['wss://relay.nostr.band'];
@@ -395,6 +396,7 @@ export default {
       console.error('Invalid event', event);
       throw new Error('Invalid event');
     }
+    console.log('publish?');
     this.relayPool.publish(event, DEFAULT_RELAYS);
     // also publish at most 10 events referred to in tags
     const referredEvents = event.tags
@@ -1157,7 +1159,7 @@ export default {
           for (const [url, opts] of Object.entries(relays)) {
             if (opts.enabled) {
               console.log('adding relay', url);
-              this.relayPool.addRelay(url);
+              this.relayPool.addOrGetRelay(url);
             } else {
               console.log('remove relay', url);
               this.relayPool.removeRelay(url);
