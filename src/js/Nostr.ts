@@ -603,7 +603,7 @@ export default {
       cb && cb(event);
     };
     const enabledRelays = Object.keys(this.relays).filter((r) => this.relays[r].enabled);
-    this.relayPool.subscribe(filters, enabledRelays, myCallback, 400);
+    this.relayPool.subscribe(filters, enabledRelays, myCallback, 100);
   },
   SUGGESTED_FOLLOWS: [
     'npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9', // snowden
