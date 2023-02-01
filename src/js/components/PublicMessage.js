@@ -427,7 +427,11 @@ class PublicMessage extends Message {
           <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
             <i style="margin-right: 15px;"> ${Icons.boost} </i>
             <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
-              <${Name} pub=${this.state.msg?.event?.pubkey} />
+              @<${Name}
+                pub=${this.state.msg?.event?.pubkey}
+                hideBadge=${true}
+                userNameOnly=${true}
+              />
             </a>
             <span style="margin-left: 5px"> reposted </span>
           </div>
