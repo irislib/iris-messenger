@@ -429,9 +429,9 @@ export default {
     if (id) {
       const subs = this.subscriptionsByName.get(id);
       if (subs) {
-        subs.forEach((sub) => {
+        subs.forEach((unsub) => {
           console.log('unsub', id);
-          sub.unsub();
+          unsub();
         });
       }
       this.subscriptionsByName.delete(id);
