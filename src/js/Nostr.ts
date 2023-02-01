@@ -1113,8 +1113,12 @@ export default {
         }
       });
     localForage.getItem('relays').then((relays) => {
-      if (!this.relays) {
+      if (relays) {
         this.relays = relays;
+      } else {
+        DEFAULT_RELAYS.forEach((url) => {
+          this.relays[url] = { enabled: true };
+        });
       }
     });
     // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
