@@ -390,13 +390,11 @@ class PublicMessage extends Message {
       <div class="msg-menu-btn">
         <${Dropdown}>
           <${CopyButton}
-            key=${`${this.props.hash}copy`}
             text=${t('copy_link')}
             title="Note link"
             copyStr=${url}
           />
           <${CopyButton}
-            key=${`${this.props.hash}copy`}
             text=${t('copy_ID')}
             title="Note ID"
             copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
@@ -405,7 +403,6 @@ class PublicMessage extends Message {
             ? html`
                 <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
                 <${CopyButton}
-                  key=${`${this.props.hash}copyRaw`}
                   text=${t('copy_raw_data')}
                   title="Message raw data"
                   copyStr=${JSON.stringify(this.state.msg.event, null, 2)}

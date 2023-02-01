@@ -265,14 +265,6 @@ export default {
     this.relayPool.addOrGetRelay(url);
     this.saveRelaysToContacts();
   },
-  removeRelayFromPool(url: string) {
-    const relay = this.relayPool.relayByUrl.get(url);
-    if (relay) {
-      relay.close();
-      this.relayPool.relayByUrl.delete(url);
-    }
-    this.saveRelaysToContacts();
-  },
   addFollower: function (followedUser: string, follower: string) {
     if (!this.followersByUser.has(followedUser)) {
       this.followersByUser.set(followedUser, new Set<string>());
