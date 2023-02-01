@@ -110,7 +110,7 @@ export default {
   flaggedUsers: new Set<string>(),
   deletedEvents: new Set<string>(),
   directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
-  subscriptionsByName: new Map<string, Set<Sub>>(),
+  subscriptionsByName: new Map<string, Set<() => void>>(),
   subscribedFiltersByName: new Map<string, Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
@@ -455,6 +455,8 @@ export default {
       },
       10,
     );
+    this.subscriptionsByName.set(id, this.subscriptionsByName.get(id) ?? new Set());
+    this.subscriptionsByName.get(id)?.add(unsub);
 
     if (unsubscribeTimeout) {
       setTimeout(unsub, unsubscribeTimeout);
@@ -489,13 +491,6 @@ export default {
       'followed',
       true,
     );
-    setTimeout(() => {
-      _this.sendSubToRelays(
-        [{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }],
-        'other',
-        true,
-      );
-    }, 500);
     if (_this.subscribedProfiles.size) {
       _this.sendSubToRelays(
         [{ authors: Array.from(_this.subscribedProfiles.values()), kinds: [0] }],
@@ -510,13 +505,6 @@ export default {
         true,
       );
     }, 1000);
-    setTimeout(() => {
-      _this.sendSubToRelays(
-        [{ authors: otherSubscribedUsers, limit: 500, until: now }],
-        'otherHistory',
-        true,
-      );
-    }, 1500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
     if (_this.subscribedPosts.size === 0) return;
