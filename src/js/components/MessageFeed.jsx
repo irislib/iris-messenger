@@ -56,6 +56,7 @@ class MessageFeed extends Component {
   );
 
   handleScroll = () => {
+    console.log('handleScroll');
     // increase page size when scrolling down
     if (this.state.displayCount < this.state.sortedMessages.length) {
       if (
@@ -86,8 +87,17 @@ class MessageFeed extends Component {
     }
   }
 
+  addScrollHandler() {
+    if (this.props.scrollElement) {
+      this.props.scrollElement.addEventListener('scroll', this.handleScroll);
+    }
+  }
+
   componentDidMount() {
-    this.props.scrollElement?.addEventListener('scroll', this.handleScroll);
+    if (window.history.state?.state) {
+      this.setState(window.history.state.state);
+    }
+    this.addScrollHandler();
     let first = true;
     if (this.props.nostrUser) {
       if (this.props.index === 'postsAndReplies') {
@@ -116,9 +126,8 @@ class MessageFeed extends Component {
       if (this.props.keyword) {
         const keyword = this.props.keyword;
         Nostr.getMessagesByKeyword(this.props.keyword, (messages) => {
-          if (this.props.keyword == keyword)
-            this.updateSortedMessages(messages);
-	    });
+          if (this.props.keyword == keyword) this.updateSortedMessages(messages);
+        });
       } else if (this.props.index) {
         // public messages
         if (this.props.index === 'everyone') {
@@ -135,8 +144,9 @@ class MessageFeed extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.scrollElement && this.props.scrollElement) {
-      this.props.scrollElement.addEventListener('scroll', this.handleScroll);
+      this.addScrollHandler();
     }
+    window.history.replaceState({ ...window.history.state, state: this.state }, '');
     if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
       Helpers.animateScrollTop('.main-view');
     }

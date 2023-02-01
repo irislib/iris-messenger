@@ -435,6 +435,7 @@ class Profile extends View {
   }
 
   componentDidMount() {
+    this.restoreScrollPosition();
     const pub = this.props.id;
     const nostrNpub = Nostr.toNostrBech32Address(pub, 'npub');
     if (nostrNpub && nostrNpub !== pub) {

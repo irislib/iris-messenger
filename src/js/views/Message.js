@@ -20,6 +20,13 @@ class Message extends View {
       route(`/post/${nostrBech32Id}`, true);
       return;
     }
+    this.restoreScrollPosition();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.hash !== this.props.hash) {
+      this.restoreScrollPosition();
+    }
   }
 
   renderView() {
