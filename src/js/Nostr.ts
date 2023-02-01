@@ -1,5 +1,5 @@
 import iris from 'iris-lib';
-import { debounce } from 'lodash';
+import { debounce, isEqual } from 'lodash';
 import { NostrToolsEventWithId } from 'nostr-relaypool/event';
 
 import {
@@ -1145,8 +1145,11 @@ export default {
       .local()
       .get('relays')
       .on((relays: { [url: string]: MyRelay }) => {
-        console.log('got relays', relays);
         if (typeof relays === 'object' && !!relays) {
+          if (isEqual(relays, this.relays)) {
+            return;
+          }
+          console.log('got relays', relays);
           localForage.setItem('relays', relays);
           this.relays = relays;
           for (const [url, opts] of Object.entries(relays)) {
