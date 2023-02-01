@@ -988,6 +988,7 @@ export default {
       iris.session.addToSearchIndex(key, {
         key,
         name: profile.name,
+        display_name: profile.display_name,
         followers: this.followersByUser.get(event.pubkey) ?? new Set(),
       });
       // if by our pubkey, save to iris

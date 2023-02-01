@@ -1401,6 +1401,18 @@ a.msgSenderName {
   color: var(--text-color);
 }
 
+a.msgSenderName:hover {
+  text-decoration: none;
+}
+
+a.msgSenderName:hover .display-name {
+  text-decoration: underline;
+}
+
+a.msgSenderName:hover .user-name {
+  text-decoration: none;
+}
+
 .settings {
   width: 800px;
   align-self: center;
@@ -1821,11 +1833,6 @@ hr {
   display: flex;
   align-items: center;
   padding: 15px;
-}
-
-.user-name {
-  align-self: center;
-  flex: 1;
 }
 
 .has-picture .iris-identicon {

@@ -620,7 +620,7 @@ class PublicMessage extends Message {
                       .map(
                         (u) => html`
                           <a href=${`#/profile/${Nostr.toNostrBech32Address(u, 'npub')}`}>
-                            @<${Name} pub=${u} hideBadge=${true} />${' '}
+                            @<${Name} pub=${u} hideBadge=${true} userNameOnly=${true} />${' '}
                           </a>
                         `,
                       )}

@@ -9,27 +9,42 @@ type Props = {
   pub: string;
   placeholder?: string;
   hideBadge?: boolean;
+  userNameOnly?: boolean;
 };
 
 const Name = (props: Props) => {
   const initialName = Helpers.generateName(
     Nostr.toNostrBech32Address(props.pub, 'npub') || props.pub,
   );
-  const [name, setName] = useState(initialName);
+  const [name, setName] = useState('');
+  const [displayName, setDisplayName] = useState(initialName);
   useEffect(() => {
     const nostrAddr = Nostr.toNostrHexAddress(props.pub);
     if (nostrAddr) {
       // TODO unsub
       Nostr.getProfile(nostrAddr, (profile) => {
-        profile && setName(profile.name?.trim());
+        profile && setName(profile.name?.trim() || '');
+        profile && setDisplayName(profile.display_name?.trim() || '');
       });
     }
   }, [props.pub]);
 
+  if (props.userNameOnly) {
+    return (
+      <>
+        {name}
+        {props.hideBadge ? '' : <Badge pub={props.pub} />}
+      </>
+    );
+  }
+
+  const showUserName = name && displayName && displayName.toLowerCase() !== name.toLowerCase();
+
   return (
     <>
-      {name ?? props.placeholder}
+      <span class="display-name">{displayName || name || props.placeholder}</span>
       {props.hideBadge ? '' : <Badge pub={props.pub} />}
+      {showUserName ? <small className="user-name mar-left5">@{name}</small> : ''}
     </>
   );
 };
