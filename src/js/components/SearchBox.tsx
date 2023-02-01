@@ -8,8 +8,8 @@ import Helpers from '../Helpers';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
-import Badge from './Badge';
 import Identicon from './Identicon';
+import Name from './Name';
 import SafeImg from './SafeImg';
 
 const RESULTS_MAX = 5;
@@ -284,7 +284,7 @@ class SearchBox extends Component<Props, State> {
                   <Identicon key={`${i.key}ic`} str={i.key} width={40} />
                 )}
                 <div>
-                  {i.name || ''} <Badge pub={i.key} />
+                  <Name pub={i.key} key={i.key + 'searchResult'} />
                   <br />
                   <small>{followText}</small>
                 </div>

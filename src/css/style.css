@@ -499,7 +499,7 @@ a.logo img:not(:last-child) {
 
 @media (max-width: 625px) {
   .nav .search-box-results {
-    left: calc(50% - 43px);
+    right: 0;
   }
 }
 
@@ -514,7 +514,7 @@ a.logo img:not(:last-child) {
 }
 
 .search-box a {
-  width: 200px;
+  width: 280px;
   padding: 5px;
   background-color: var(--input-bg);
   text-align: left;

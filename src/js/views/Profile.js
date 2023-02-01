@@ -15,6 +15,7 @@ import FlagButton from '../components/FlagButton';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import MessageFeed from '../components/MessageFeed';
+import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
 import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
@@ -177,7 +178,7 @@ class Profile extends View {
           <div class="profile-header-stuff">
             <div style="display:flex; flex-direction:row;">
               <h3 style="flex: 1" class="profile-name">
-                ${this.state.name || Helpers.generateName(this.props.id)}
+                <${Name} pub=${this.props.id} />
               </h3>
               <div class="profile-actions">
                 <${Dropdown}>
