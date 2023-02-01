@@ -1146,7 +1146,7 @@ export default {
       .get('relays')
       .on((relays: { [url: string]: MyRelay }) => {
         console.log('got relays', relays);
-        if (typeof relays === 'object' && relays !== null) {
+        if (typeof relays === 'object' && !!relays) {
           localForage.setItem('relays', relays);
           this.relays = relays;
           for (const [url, opts] of Object.entries(relays)) {
@@ -1158,7 +1158,7 @@ export default {
               this.relayPool.removeRelay(url);
             }
           }
-          for (const url of this.relayPool.relaysByUrl.keys()) {
+          for (const url of this.relayPool.relayByUrl.keys()) {
             if (!relays[url] || !relays[url].enabled) {
               console.log('remove relay', url);
               this.relayPool.removeRelay(url);
