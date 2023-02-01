@@ -82,7 +82,6 @@ const DEFAULT_RELAYS = [
   'wss://jiggytom.ddns.net',
   'wss://eden.nostr.land',
   'wss://nostr.fmt.wiz.biz',
-  'wss://nostr.ono.re',
   'wss://relay.damus.io',
   'wss://nostr-pub.wellorder.net',
   'wss://relay.nostr.info',

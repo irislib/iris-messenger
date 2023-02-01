@@ -32,7 +32,7 @@ const Name = (props: Props) => {
   if (props.userNameOnly) {
     return (
       <>
-        {name}
+        {name || displayName}
         {props.hideBadge ? '' : <Badge pub={props.pub} />}
       </>
     );
