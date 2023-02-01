@@ -603,12 +603,6 @@ export default {
       cb && cb(event);
     };
     const enabledRelays = Object.keys(this.relays).filter((r) => this.relays[r].enabled);
-    const reducedFilters = filters.slice();
-    for (const filter of reducedFilters) {
-      if (filter.kinds && !isEqual(filter.kinds, [0, 3])) {
-        delete filter.kinds;
-      }
-    }
     this.relayPool.subscribe(filters, enabledRelays, myCallback, 400);
   },
   SUGGESTED_FOLLOWS: [
