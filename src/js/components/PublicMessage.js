@@ -438,7 +438,6 @@ class PublicMessage extends Message {
   }
 
   toggleLikes(e) {
-    console.log('toggle likes');
     e.stopPropagation();
     this.setState({ showLikes: !this.state.showLikes, showBoosts: false });
   }
