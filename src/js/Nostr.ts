@@ -78,6 +78,7 @@ const MAX_MSGS_BY_KEYWORD = 100;
 const eventsById = new Map<string, Event>();
 
 const DEFAULT_RELAYS = [
+  'wss://nostr.orangepill.dev',
   'wss://jiggytom.ddns.net',
   'wss://eden.nostr.land',
   'wss://nostr.fmt.wiz.biz',
