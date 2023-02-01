@@ -50,10 +50,13 @@ const saveLocalStorageEvents = debounce((_this: any) => {
       dms.push(_this.eventsById.get(eventId));
     });
   }
+  const kvEvents = Array.from(_this.keyValueEvents.values());
+
   localForage.setItem('latestMsgs', latestMsgs);
   localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
   localForage.setItem('notificationEvents', notifications);
   localForage.setItem('dms', dms);
+  localForage.setItem('keyValueEvents', kvEvents);
   // TODO save own block and flag events
 }, 5000);
 
@@ -221,6 +224,7 @@ export default {
     const profileEvents = await localForage.getItem('profileEvents');
     const notificationEvents = await localForage.getItem('notificationEvents');
     const dms = await localForage.getItem('dms');
+    const keyValueEvents = await localForage.getItem('keyValueEvents');
     this.localStorageLoaded = true;
     if (Array.isArray(followEvents)) {
       followEvents.forEach((e) => this.handleEvent(e));
@@ -245,6 +249,11 @@ export default {
     }
     if (Array.isArray(dms)) {
       dms.forEach((msg) => {
+        this.handleEvent(msg);
+      });
+    }
+    if (Array.isArray(keyValueEvents)) {
+      keyValueEvents.forEach((msg) => {
         this.handleEvent(msg);
       });
     }
