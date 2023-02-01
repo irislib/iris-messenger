@@ -382,7 +382,7 @@ class Profile extends View {
   }
 
   getNostrProfile(address) {
-    Nostr.sendSubToRelays([{ authors: [address] }], address, true, 15 * 1000);
+    Nostr.subscribe([{ authors: [address] }]);
     const setFollowCounts = () => {
       address &&
         this.setState({

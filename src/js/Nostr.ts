@@ -429,51 +429,11 @@ export default {
     }
     return count;
   },
-  sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
-    // if subs with same id already exists, remove them
-    if (id) {
-      const subs = this.subscriptionsByName.get(id);
-      if (subs) {
-        subs.forEach((unsub) => {
-          console.log('unsub', id);
-          unsub();
-        });
-      }
-      this.subscriptionsByName.delete(id);
-      this.subscribedFiltersByName.delete(id);
-    }
-
-    this.subscribedFiltersByName.set(id, filters);
-
-    if (unsubscribeTimeout) {
-      setTimeout(() => {
-        this.subscriptionsByName.delete(id);
-        this.subscribedFiltersByName.delete(id);
-      }, unsubscribeTimeout);
-    }
-
-    const unsub = this.relayPool.subscribe(
-      filters,
-      (id == 'keywords' ? this.searchRelays : DEFAULT_RELAYS).values(),
-      (event) => {
-        this.handleEvent(event);
-      },
-      10,
-    );
-    this.subscriptionsByName.set(id, this.subscriptionsByName.get(id) ?? new Set());
-    this.subscriptionsByName.get(id)?.add(unsub);
-
-    if (unsubscribeTimeout) {
-      setTimeout(unsub, unsubscribeTimeout);
-    }
-  },
   subscribeToRepliesAndLikes: debounce((_this) => {
     console.log('subscribeToRepliesAndLikes', _this.subscribedRepliesAndLikes);
-    _this.sendSubToRelays(
+    _this.subscribe([
       [{ kinds: [1, 6, 7], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }],
-      'subscribedRepliesAndLikes',
-      true,
-    );
+    ]);
   }, 500),
   // TODO we shouldn't bang the history queries all the time. only ask a users history once per relay.
   // then we can increase the limit
@@ -491,30 +451,18 @@ export default {
       'otherSubscribedUsers.length',
       otherSubscribedUsers.length,
     );
-    _this.sendSubToRelays(
-      [{ kinds: [0, 3], until: now, authors: followedUsers }],
-      'followed',
-      true,
-    );
+    _this.subscribe([{ kinds: [0, 3], until: now, authors: followedUsers }]);
     if (_this.subscribedProfiles.size) {
-      _this.sendSubToRelays(
-        [{ authors: Array.from(_this.subscribedProfiles.values()), kinds: [0] }],
-        'subscribedProfiles',
-        true,
-      );
+      _this.subscribe([{ authors: Array.from(_this.subscribedProfiles.values()), kinds: [0] }]);
     }
     setTimeout(() => {
-      _this.sendSubToRelays(
-        [{ authors: followedUsers, limit: 500, until: now }],
-        'followedHistory',
-        true,
-      );
+      _this.subscribe([{ authors: followedUsers, limit: 500, until: now }]);
     }, 1000);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
     if (_this.subscribedPosts.size === 0) return;
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
-    _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
+    _this.subscribe([{ ids: Array.from(_this.subscribedPosts) }]);
   }, 100),
   subscribeToKeywords: debounce((_this) => {
     if (_this.subscribedKeywords.size === 0) return;
@@ -524,16 +472,13 @@ export default {
       _this.knownUsers.size,
     );
     const go = () => {
-      _this.sendSubToRelays(
-        [
-          {
-            kinds: [1],
-            limit: MAX_MSGS_BY_KEYWORD,
-            keywords: Array.from(_this.subscribedKeywords),
-          },
-        ],
-        'keywords',
-      );
+      _this.subscribe([
+        {
+          kinds: [1],
+          limit: MAX_MSGS_BY_KEYWORD,
+          keywords: Array.from(_this.subscribedKeywords),
+        },
+      ]);
       // on page reload knownUsers are empty and thus all search results are dropped
       if (_this.knownUsers.size < 1000) setTimeout(go, 2000);
     };
@@ -662,7 +607,7 @@ export default {
     }
     const myCallback = (event: Event) => {
       this.handleEvent(event);
-      cb(event);
+      cb && cb(event);
     };
     this.relayPool.subscribe(filters, DEFAULT_RELAYS, myCallback, 10);
   },
@@ -1077,7 +1022,11 @@ export default {
         return;
       }
       if (this.matchesOneFilter(event, sub.filters)) {
-        sub.callback && sub.callback(event);
+        if (typeof sub.callback === 'function') {
+          sub.callback(event);
+        } else {
+          console.log('invalid callback', sub.callback);
+        }
       }
     }
   },
@@ -1240,10 +1189,10 @@ export default {
           this.knownUsers.add(hex);
           this.getProfile(this.toNostrHexAddress(hex), undefined);
         }
-        this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
+        this.subscribe([{ kinds: [0, 1, 3, 6, 7], limit: 200 }]); // everything new
         setTimeout(() => {
-          this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
-          this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
+          this.subscribe([{ authors: [key.secp256k1.rpub] }]); // our stuff
+          this.subscribe([{ '#p': [key.secp256k1.rpub] }]); // notifications and DMs
         }, 200);
 
         setInterval(() => {
