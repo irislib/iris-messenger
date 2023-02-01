@@ -91,6 +91,7 @@ const DEFAULT_RELAYS = [
   'wss://brb.io',
   'wss://relay.snort.social',
   'wss://relay.current.fyi',
+  'wss://nostr.relayer.se',
 ];
 
 const SEARCH_RELAYS = ['wss://relay.nostr.band'];
