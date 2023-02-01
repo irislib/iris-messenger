@@ -67,7 +67,7 @@ export default {
       const link = `#/profile/${match}`;
       return (
         <a href={link}>
-          @<Name key={match + i} pub={match} hideBadge={true} />
+          @<Name key={match + i} pub={match} hideBadge={true} userNameOnly={true} />
         </a>
       );
     });
@@ -155,7 +155,7 @@ export default {
             const link = `/profile/${tag[1]}`;
             return (
               <a href={link}>
-                @<Name key={match + i} pub={tag[1]} hideBadge={true} />
+                @<Name key={match + i} pub={tag[1]} hideBadge={true} userNameOnly={true} />
               </a>
             );
           } else if (tag[0] === 'e') {
