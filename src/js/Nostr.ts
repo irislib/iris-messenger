@@ -401,8 +401,9 @@ export default {
       console.error('Invalid event', event);
       throw new Error('Invalid event');
     }
+    const enabledRelays = Object.keys(this.relays).filter((r) => this.relays[r].enabled);
     console.log('publish?');
-    this.relayPool.publish(event, DEFAULT_RELAYS);
+    this.relayPool.publish(event, enabledRelays);
     // also publish at most 10 events referred to in tags
     const referredEvents = event.tags
       .filter((tag) => tag[0] === 'e')
@@ -412,7 +413,7 @@ export default {
     for (const ref of referredEvents) {
       const referredEvent = this.eventsById.get(ref[1]);
       if (referredEvent) {
-        this.relayPool.publish(referredEvent, DEFAULT_RELAYS);
+        this.relayPool.publish(referredEvent, enabledRelays);
       }
     }
     console.log('published', event);
@@ -609,7 +610,8 @@ export default {
       this.handleEvent(event);
       cb && cb(event);
     };
-    this.relayPool.subscribe(filters, DEFAULT_RELAYS, myCallback, 10);
+    const enabledRelays = Object.keys(this.relays).filter((r) => this.relays[r].enabled);
+    this.relayPool.subscribe(filters, enabledRelays, myCallback, 10);
   },
   SUGGESTED_FOLLOWS: [
     'npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9', // snowden
