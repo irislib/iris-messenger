@@ -90,6 +90,7 @@ const DEFAULT_RELAYS = [
   'wss://nostr.onsats.org',
   'wss://nos.lol',
   'wss://brb.io',
+  'wss://relay.snort.social',
 ];
 
 const SEARCH_RELAYS = ['wss://relay.nostr.band'];
