@@ -11,7 +11,6 @@ import {
   Relay,
   relayInit,
   signEvent,
-  Sub,
 } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import localForage from 'localforage';
@@ -98,12 +97,18 @@ type Subscription = {
 
 let subscriptionId = 0;
 
+type MyRelay = {
+  enabled: boolean;
+};
+
+const relays: { [url: string]: MyRelay } = {};
+
 export default {
   localStorageLoaded: false,
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  relays: {},
+  relays,
   searchRelays: searchRelays,
   knownUsers: new Set<string>(),
   blockedUsers: new Set<string>(),
@@ -1139,7 +1144,7 @@ export default {
     iris
       .local()
       .get('relays')
-      .on((relays: any) => {
+      .on((relays: { [url: string]: MyRelay }) => {
         console.log('got relays', relays);
         if (typeof relays === 'object' && relays !== null) {
           localForage.setItem('relays', relays);
