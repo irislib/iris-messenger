@@ -243,16 +243,14 @@ class Profile extends View {
                     </p>
                   `
                 : ''}
-              ${this.state.isMyProfile
-                ? ''
-                : html`
-                    <div class="hidden-xs">
-                      <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                      <${Button} small=${true} onClick=${() => route(`/chat/${this.props.id}`)}>
-                        ${t('send_message')}
-                      <//>
-                    </div>
-                  `}
+              <div class="hidden-xs">
+                ${!this.state.isMyProfile
+                  ? html` <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} /> `
+                  : ''}
+                <${Button} small=${true} onClick=${() => route(`/chat/${this.props.id}`)}>
+                  ${t('send_message')}
+                <//>
+              </div>
             </div>
           </div>
         </div>
@@ -384,7 +382,7 @@ class Profile extends View {
   }
 
   getNostrProfile(address) {
-    Nostr.sendSubToRelays([{ authors: [address] }], address, true, 15 * 1000);
+    Nostr.subscribe([{ authors: [address] }]);
     const setFollowCounts = () => {
       address &&
         this.setState({
@@ -451,7 +449,6 @@ class Profile extends View {
     let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
     iris.local().get('noFollowers').on(this.inject());
-    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
     // if pub is hex, it's a nostr address
     const nostrAddr = Nostr.toNostrHexAddress(pub);
     this.getNostrProfile(nostrAddr);

@@ -85,8 +85,7 @@ export default {
     <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Sunsets don&#39;t get much better than this one over <a href="https://twitter.com/GrandTetonNPS?ref_src=twsrc%5Etfw">@GrandTetonNPS</a>. <a href="https://twitter.com/hashtag/nature?src=hash&amp;ref_src=twsrc%5Etfw">#nature</a> <a href="https://twitter.com/hashtag/sunset?src=hash&amp;ref_src=twsrc%5Etfw">#sunset</a> <a href="http://t.co/YuKy2rcjyU">pic.twitter.com/YuKy2rcjyU</a></p>&mdash; US Department of the Interior (@Interior) <a href="https://twitter.com/Interior/status/463440424141459456?ref_src=twsrc%5Etfw">May 5, 2014</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
      */
 
-    const videoRegex =
-      /((?:https?:\/\/(?:nostr\.build|imgur\.com)\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm)))/gi;
+    const videoRegex = /(https?:\/\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm))/gi;
     replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
       return (
         <video
@@ -100,6 +99,11 @@ export default {
           loop={true}
         />
       );
+    });
+
+    const audioRegex = /(https?:\/\/\S+\.(?:mp3|wav|ogg|flac))/gi;
+    replacedText = reactStringReplace(replacedText, audioRegex, (match, i) => {
+      return <audio key={match + i} src={match} controls={true} loop={true} />;
     });
 
     const youtubeRegex =
@@ -135,7 +139,7 @@ export default {
       return <a href={match}>⚡ Pay with lightning</a>;
     });
 
-    replacedText = reactStringReplace(replacedText, /(https?:\/\/\S+)/g, (match, i) => (
+    replacedText = reactStringReplace(replacedText, /(https?:\/\/\S*[^.?,)\s])/gi, (match, i) => (
       <a key={match + i} href={match} target="_blank">
         {match}
       </a>

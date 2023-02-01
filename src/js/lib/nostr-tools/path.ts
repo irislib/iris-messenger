@@ -60,10 +60,10 @@ class Store {
   }
 
   get(filter: EntryFilter, callback: (entry: Entry) => void) {
-    if (!this.entriesByPathAndAuthor.has(filter.path)) {
+    const valuesByAuthor = this.entriesByPathAndAuthor.get(filter.path)
+    if (!valuesByAuthor) {
       return
     }
-    let valuesByAuthor = this.entriesByPathAndAuthor.get(filter.path)
     for (let [author, entry] of valuesByAuthor) {
       if (!filter.authors || filter.authors.indexOf(author) !== -1) {
         callback(entry)
@@ -112,25 +112,31 @@ export class Path {
     }
     return this.publish({
       kind: 30000,
-      tags: [["d", eventPath]],
+      tags: [['d', eventPath]],
       content,
       created_at: Math.floor(Date.now() / 1000),
     })
   }
 
-  async set(path: string, value: any) {
-    const event = await this.publishSetEvent(path, value)
-    if (event) {
-      const entry = {
-        created_at: event.created_at,
-        author: event.pubkey,
-        value,
-        path,
+  async set(path: string, value: any): Promise<boolean> {
+    try {
+      const event = await this.publishSetEvent(path, value)
+      if (event) {
+        const entry = {
+          created_at: event.created_at,
+          author: event.pubkey,
+          value,
+          path,
+        }
+        if (this.store.set(entry)) {
+          this.notifyListeners(entry)
+        }
+        return true
       }
-      if (this.store.set(entry)) {
-        this.notifyListeners(entry)
-      }
+    } catch (e) {
+      console.error(e)
     }
+    return false
   }
 
   async getEntryFromEvent(event: Event): Promise<Entry> {

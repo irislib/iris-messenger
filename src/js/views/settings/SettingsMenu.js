@@ -9,12 +9,10 @@ import { translate as t } from '../../translations/Translation';
 const SETTINGS = {
   account: 'account',
   nostr: 'nostr',
+  appearance: 'appearance',
   language: 'language',
   webtorrent: 'webtorrent',
-  webrtc: 'webRTC',
-  beta: 'beta',
   blocked_users: 'blocked_users',
-  peer: 'peers',
 };
 
 export default class SettingsMenu extends Component {

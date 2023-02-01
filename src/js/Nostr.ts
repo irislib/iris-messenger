@@ -1,5 +1,5 @@
 import iris from 'iris-lib';
-import { debounce } from 'lodash';
+import { debounce, isEqual } from 'lodash';
 import { NostrToolsEventWithId } from 'nostr-relaypool/event';
 
 import {
@@ -11,7 +11,6 @@ import {
   Relay,
   relayInit,
   signEvent,
-  Sub,
 } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import localForage from 'localforage';
@@ -24,15 +23,6 @@ declare global {
     nostr: any;
   }
 }
-
-const getRelayStatus = (relay: Relay) => {
-  // workaround for nostr-tools bug
-  try {
-    return relay.status;
-  } catch (e) {
-    return 3;
-  }
-};
 
 const saveLocalStorageEvents = debounce((_this: any) => {
   const latestMsgs = _this.latestNotesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
@@ -52,10 +42,13 @@ const saveLocalStorageEvents = debounce((_this: any) => {
       dms.push(_this.eventsById.get(eventId));
     });
   }
+  const kvEvents = Array.from(_this.keyValueEvents.values());
+
   localForage.setItem('latestMsgs', latestMsgs);
   localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
   localForage.setItem('notificationEvents', notifications);
   localForage.setItem('dms', dms);
+  localForage.setItem('keyValueEvents', kvEvents);
   // TODO save own block and flag events
 }, 5000);
 
@@ -71,12 +64,14 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
 
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
+const MAX_MSGS_BY_KEYWORD = 100;
 
 const eventsById = new Map<string, Event>();
 
 const DEFAULT_RELAYS = [
+  'wss://nostr.orangepill.dev',
   'wss://jiggytom.ddns.net',
-  'wss://nostr-relay.wlvs.space',
+  'wss://eden.nostr.land',
   'wss://nostr.fmt.wiz.biz',
   'wss://nostr.ono.re',
   'wss://relay.damus.io',
@@ -86,10 +81,13 @@ const DEFAULT_RELAYS = [
   'wss://nostr.onsats.org',
   'wss://nos.lol',
   'wss://brb.io',
+  'wss://relay.snort.social',
 ];
 
-const defaultRelays = new Map<string, Relay>(
-  DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
+const SEARCH_RELAYS = ['wss://relay.nostr.band'];
+
+const searchRelays = new Map<string, Relay>(
+  SEARCH_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
 );
 
 type Subscription = {
@@ -99,25 +97,32 @@ type Subscription = {
 
 let subscriptionId = 0;
 
+type MyRelay = {
+  enabled: boolean;
+};
+
+const relays: { [url: string]: MyRelay } = {};
+
 export default {
   localStorageLoaded: false,
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  maxRelays: iris.util.isMobile ? 5 : 10,
-  relays: defaultRelays,
+  relays,
+  searchRelays: searchRelays,
   knownUsers: new Set<string>(),
   blockedUsers: new Set<string>(),
   flaggedUsers: new Set<string>(),
   deletedEvents: new Set<string>(),
   directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
-  subscriptionsByName: new Map<string, Set<Sub>>(),
+  subscriptionsByName: new Map<string, Set<() => void>>(),
   subscribedFiltersByName: new Map<string, Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
   subscribedRepliesAndLikes: new Set<string>(),
   subscribedProfiles: new Set<string>(),
+  subscribedKeywords: new Set<string>(),
   likesByUser: new Map<string, SortedLimitedEventSet>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -125,6 +130,7 @@ export default {
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  latestNotesByKeywords: new Map<string, SortedLimitedEventSet>(),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
   keyValueEvents: new Map<string, Event>(),
@@ -133,8 +139,6 @@ export default {
   likesByMessageId: new Map<string, Set<string>>(),
   boostsByMessageId: new Map<string, Set<string>>(),
   handledMsgsPerSecond: 0,
-  notificationsSeenTime: 0,
-  unseenNotificationCount: 0,
   decryptedMessages: new Map<string, string>(),
   windowNostrQueue: [],
   relayPool: new RelayPool(DEFAULT_RELAYS, {
@@ -146,6 +150,8 @@ export default {
       }
     },
   }),
+  isProcessingQueue: false,
+  notificationsSeenTime: 0,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -221,6 +227,7 @@ export default {
     const profileEvents = await localForage.getItem('profileEvents');
     const notificationEvents = await localForage.getItem('notificationEvents');
     const dms = await localForage.getItem('dms');
+    const keyValueEvents = await localForage.getItem('keyValueEvents');
     this.localStorageLoaded = true;
     if (Array.isArray(followEvents)) {
       followEvents.forEach((e) => this.handleEvent(e));
@@ -248,32 +255,15 @@ export default {
         this.handleEvent(msg);
       });
     }
+    if (Array.isArray(keyValueEvents)) {
+      keyValueEvents.forEach((msg) => {
+        this.handleEvent(msg);
+      });
+    }
   },
   addRelay(url: string) {
-    if (this.relays.has(url)) return;
-    const relay = relayInit(url, (id) => this.eventsById.has(id));
-    relay.on('connect', () => {
-      for (const [name, filters] of this.subscribedFiltersByName.entries()) {
-        const sub = relay.sub(filters, {});
-        if (!this.subscriptionsByName.has(name)) {
-          this.subscriptionsByName.set(name, new Set());
-        }
-        this.subscriptionsByName.get(name)?.add(sub);
-        //console.log('subscriptions size', this.subscriptionsByName.size);
-      }
-    });
-    relay.on('notice', (notice) => {
-      console.log('notice from ', relay.url, notice);
-    });
-    this.relays.set(url, relay);
-  },
-  removeRelay(url: string) {
-    try {
-      this.relays.get(url)?.close();
-    } catch (e) {
-      console.log('error closing relay', e);
-    }
-    this.relays.delete(url);
+    this.relayPool.addOrGetRelay(url);
+    this.saveRelaysToContacts();
   },
   addFollower: function (followedUser: string, follower: string) {
     if (!this.followersByUser.has(followedUser)) {
@@ -390,20 +380,35 @@ export default {
   },
   publish: async function (event: any) {
     if (!event.sig) {
-      event.tags = event.tags || [];
+      if (!event.tags) {
+        event.tags = [];
+      }
       event.content = event.content || '';
       event.created_at = event.created_at || Math.floor(Date.now() / 1000);
       event.pubkey = iris.session.getKey().secp256k1.rpub;
       event.id = getEventHash(event);
-
       event.sig = await this.sign(event);
     }
     if (!(event.id && event.sig)) {
       console.error('Invalid event', event);
       throw new Error('Invalid event');
     }
-    this.relayPool.publish(event, DEFAULT_RELAYS);
-    //console.log('published', event);
+    const enabledRelays = Object.keys(this.relays).filter((r) => this.relays[r].enabled);
+    console.log('publish?');
+    this.relayPool.publish(event, enabledRelays);
+    // also publish at most 10 events referred to in tags
+    const referredEvents = event.tags
+      .filter((tag) => tag[0] === 'e')
+      .reverse()
+      .slice(0, 10);
+
+    for (const ref of referredEvents) {
+      const referredEvent = this.eventsById.get(ref[1]);
+      if (referredEvent) {
+        this.relayPool.publish(referredEvent, enabledRelays);
+      }
+    }
+    console.log('published', event);
     this.handleEvent(event);
     return event.id;
   },
@@ -417,64 +422,11 @@ export default {
     }
     return count;
   },
-  sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
-    // if subs with same id already exists, remove them
-    if (id) {
-      const subs = this.subscriptionsByName.get(id);
-      if (subs) {
-        subs.forEach((sub) => {
-          console.log('unsub', id);
-          sub.unsub();
-        });
-      }
-      this.subscriptionsByName.delete(id);
-      this.subscribedFiltersByName.delete(id);
-    }
-
-    this.subscribedFiltersByName.set(id, filters);
-
-    if (unsubscribeTimeout) {
-      setTimeout(() => {
-        this.subscriptionsByName.delete(id);
-        this.subscribedFiltersByName.delete(id);
-      }, unsubscribeTimeout);
-    }
-
-    this.relayPool.subscribe(
-      filters,
-      DEFAULT_RELAYS,
-      (event) => {
-        this.handleEvent(event);
-      },
-      10,
-    );
-
-    for (const relay of this.relays.values()) {
-      const sub = relay.sub(filters, {});
-      // TODO update relay lastSeen
-      sub.on('event', (event) => this.handleEvent(event));
-      if (once) {
-        sub.on('eose', () => sub.unsub());
-      }
-      if (!this.subscriptionsByName.has(id)) {
-        this.subscriptionsByName.set(id, new Set());
-      }
-      this.subscriptionsByName.get(id)?.add(sub);
-      //console.log('subscriptions size', this.subscriptionsByName.size);
-      if (unsubscribeTimeout) {
-        setTimeout(() => {
-          sub.unsub();
-        }, unsubscribeTimeout);
-      }
-    }
-  },
   subscribeToRepliesAndLikes: debounce((_this) => {
     console.log('subscribeToRepliesAndLikes', _this.subscribedRepliesAndLikes);
-    _this.sendSubToRelays(
+    _this.subscribe([
       [{ kinds: [1, 6, 7], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }],
-      'subscribedRepliesAndLikes',
-      true,
-    );
+    ]);
   }, 500),
   // TODO we shouldn't bang the history queries all the time. only ask a users history once per relay.
   // then we can increase the limit
@@ -492,44 +444,38 @@ export default {
       'otherSubscribedUsers.length',
       otherSubscribedUsers.length,
     );
-    _this.sendSubToRelays(
-      [{ kinds: [0, 3], until: now, authors: followedUsers }],
-      'followed',
-      true,
-    );
-    setTimeout(() => {
-      _this.sendSubToRelays(
-        [{ kinds: [0, 3], until: now, authors: otherSubscribedUsers }],
-        'other',
-        true,
-      );
-    }, 500);
+    _this.subscribe([{ kinds: [0, 3], until: now, authors: followedUsers }]);
     if (_this.subscribedProfiles.size) {
-      _this.sendSubToRelays(
-        [{ authors: Array.from(_this.subscribedProfiles.values()), kinds: [0] }],
-        'subscribedProfiles',
-        true,
-      );
+      _this.subscribe([{ authors: Array.from(_this.subscribedProfiles.values()), kinds: [0] }]);
     }
     setTimeout(() => {
-      _this.sendSubToRelays(
-        [{ authors: followedUsers, limit: 500, until: now }],
-        'followedHistory',
-        true,
-      );
+      _this.subscribe([{ authors: followedUsers, limit: 500, until: now }]);
     }, 1000);
-    setTimeout(() => {
-      _this.sendSubToRelays(
-        [{ authors: otherSubscribedUsers, limit: 500, until: now }],
-        'otherHistory',
-        true,
-      );
-    }, 1500);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
     if (_this.subscribedPosts.size === 0) return;
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
-    _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
+    _this.subscribe([{ ids: Array.from(_this.subscribedPosts) }]);
+  }, 100),
+  subscribeToKeywords: debounce((_this) => {
+    if (_this.subscribedKeywords.size === 0) return;
+    console.log(
+      'subscribe to keywords',
+      Array.from(_this.subscribedKeywords),
+      _this.knownUsers.size,
+    );
+    const go = () => {
+      _this.subscribe([
+        {
+          kinds: [1],
+          limit: MAX_MSGS_BY_KEYWORD,
+          keywords: Array.from(_this.subscribedKeywords),
+        },
+      ]);
+      // on page reload knownUsers are empty and thus all search results are dropped
+      if (_this.knownUsers.size < 1000) setTimeout(go, 2000);
+    };
+    go();
   }, 100),
   encrypt: async function (data: string, pub?: string) {
     const k = iris.session.getKey().secp256k1;
@@ -630,33 +576,45 @@ export default {
           }
         }
       }
+
+      if (Array.isArray(filter['#e'])) {
+        for (const id of filter['#e']) {
+          if (!this.subscribedRepliesAndLikes.has(id)) {
+            this.subscribedRepliesAndLikes.add(id);
+            setTimeout(() => {
+              // remove after some time, so the requests don't grow too large
+              this.subscribedRepliesAndLikes.delete(id);
+            }, 60 * 1000);
+          }
+        }
+      }
+      if (filter.keywords) {
+        for (const keyword of filter.keywords) {
+          if (!this.subscribedKeywords.has(keyword)) {
+            // only 1 keyword at a time, otherwise a popular kw will consume the whole 'limit'
+            this.subscribedKeywords.clear();
+            this.subscribedKeywords.add(keyword);
+          }
+        }
+      }
     }
     const myCallback = (event: Event) => {
       this.handleEvent(event);
-      cb(event);
+      cb && cb(event);
     };
-    this.relayPool.subscribe(filters, DEFAULT_RELAYS, myCallback, 10);
+    const enabledRelays = Object.keys(this.relays).filter((r) => this.relays[r].enabled);
+    this.relayPool.subscribe(filters, enabledRelays, myCallback, 100);
   },
-  getConnectedRelayCount: function () {
-    let count = 0;
-    for (const relay of this.relays.values()) {
-      if (getRelayStatus(relay) === 1) {
-        count++;
-      }
-    }
-    return count;
-  },
-  SUGGESTED_FOLLOW: 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk',
-  connectRelay: function (relay: Relay) {
-    try {
-      relay.connect();
-    } catch (e) {
-      console.log(e);
-    }
-  },
-  manageRelays: function () {
-    // replaced with relayPool
-  },
+  SUGGESTED_FOLLOWS: [
+    'npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9', // snowden
+    'npub1sg6plzptd64u62a878hep2kev88swjh3tw00gjsfl8f237lmu63q0uf63m', // jack
+    'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk', // sirius
+    'npub15dqlghlewk84wz3pkqqvzl2w2w36f97g89ljds8x6c094nlu02vqjllm5m', // saylor
+    'npub1z4m7gkva6yxgvdyclc7zp0vz4ta0s2d9jh8g83w03tp5vdf3kzdsxana6p', // yegorpetrov
+    'npub1az9xj85cmxv8e9j9y80lvqp97crsqdu2fpu3srwthd99qfu9qsgstam8y8', // nvk
+    'npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6', // fiatjaf
+    'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s', // jb55
+  ],
   handleNote(event: Event) {
     this.eventsById.set(event.id, event);
     if (!this.postsAndRepliesByUser.has(event.pubkey)) {
@@ -676,14 +634,14 @@ export default {
     // todo: handle astral ninja format boost (retweet) message
     // where content points to the original message tag: "content": "#[1]"
 
+    const isBoost = this.isBoost(event);
     const replyingTo = this.getEventReplyingTo(event);
-    if (replyingTo) {
+    if (replyingTo && !isBoost) {
       if (!this.directRepliesByMessageId.has(replyingTo)) {
         this.directRepliesByMessageId.set(replyingTo, new Set<string>());
       }
       this.directRepliesByMessageId.get(replyingTo)?.add(event.id);
 
-      // are boost messages screwing this up?
       const repliedMsgs = event.tags
         .filter((tag) => tag[0] === 'e')
         .map((tag) => tag[1])
@@ -725,7 +683,14 @@ export default {
     return undefined;
   },
   handleBoost(event: Event) {
-    const id = event.tags.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
+    let id = event.tags.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
+    if (!id) {
+      // last e tag is the boosted post
+      id = event.tags
+        .slice() // so we don't reverse event.tags in place
+        .reverse()
+        .find((tag: any) => tag[0] === 'e')?.[1];
+    }
     if (!id) return;
     if (!this.boostsByMessageId.has(id)) {
       this.boostsByMessageId.set(id, new Set());
@@ -789,13 +754,15 @@ export default {
         if (urls.length) {
           // remove all existing relays that are not in urls. TODO: just disable
           console.log('setting relays from your contacs list', urls);
-          for (const url of this.relays.keys()) {
+          for (const url of Object.keys(this.relays)) {
             if (!urls.includes(url)) {
-              this.removeRelay(url);
+              iris.local().get('relays').get(url).put(null);
             }
           }
           for (const url of urls) {
-            this.addRelay(url);
+            if (!this.relays[url]) {
+              iris.local().get('relays').get(url).put({ enabled: true });
+            }
           }
         }
       } catch (e) {
@@ -804,15 +771,21 @@ export default {
     }
   },
   restoreDefaultRelays() {
-    this.relays.clear();
+    this.relays = {};
     for (const url of DEFAULT_RELAYS) {
-      this.addRelay(url);
+      this.relays[url] = { enabled: true };
     }
     this.saveRelaysToContacts();
+    console.log('restored default relays', this.relays);
+    iris.local().get('relays').put(this.relays);
+    // do not save these to contact list
+    for (const url of SEARCH_RELAYS) {
+      this.addRelay(url);
+    }
   },
   saveRelaysToContacts() {
     const relaysObj: any = {};
-    for (const url of this.relays.keys()) {
+    for (const url of Object.keys(this.relays)) {
       relaysObj[url] = { read: true, write: true };
     }
     const existing = this.followEventByUser.get(iris.session.getKey().secp256k1.rpub);
@@ -897,15 +870,20 @@ export default {
     }
   },
   updateUnseenNotificationCount: debounce((_this) => {
-    let unseen = 0;
+    if (!_this.notificationsSeenTime) {
+      return;
+    }
+    let count = 0;
     for (const id of _this.notifications.eventIds) {
       const event = _this.eventsById.get(id);
-      if (event && event.created_at > _this.notificationsSeenTime) {
-        unseen++;
+      if (event.created_at > _this.notificationsSeenTime) {
+        count++;
+      } else {
+        break;
       }
     }
-    console.log('unseen notifications', unseen, _this.notificationsSeenTime);
-    iris.local().get('unseenNotificationCount').put(unseen);
+    console.log('notificationsSeenTime', _this.notificationsSeenTime, 'count', count);
+    iris.local().get('unseenNotificationCount').put(count);
   }, 1000),
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
@@ -954,6 +932,14 @@ export default {
       this.keyValueEvents.set(key, event);
     }
   },
+  isBoost(event: Event) {
+    const mentionIndex = event.tags.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
+    if (event.content === `#[${mentionIndex}]`) {
+      return true;
+    } else {
+      return false;
+    }
+  },
   handleEvent(event: Event) {
     if (!event) return;
     if (this.eventsById.has(event.id)) {
@@ -980,7 +966,11 @@ export default {
         break;
       case 1:
         this.maybeAddNotification(event);
-        this.handleNote(event);
+        if (this.isBoost(event)) {
+          this.handleBoost(event);
+        } else {
+          this.handleNote(event);
+        }
         break;
       case 4:
         this.handleDirectMessage(event);
@@ -1026,7 +1016,11 @@ export default {
         return;
       }
       if (this.matchesOneFilter(event, sub.filters)) {
-        sub.callback && sub.callback(event);
+        if (typeof sub.callback === 'function') {
+          sub.callback(event);
+        } else {
+          console.log('invalid callback', sub.callback);
+        }
       }
     }
   },
@@ -1067,6 +1061,18 @@ export default {
         }
       }
     }
+    const content = event.content.toLowerCase();
+    if (
+      filter.keywords &&
+      !filter.keywords.some((keyword: string) => {
+        return keyword
+          .toLowerCase()
+          .split(' ')
+          .every((word: string) => content.includes(word));
+      })
+    ) {
+      return false;
+    }
 
     return true;
   },
@@ -1075,31 +1081,51 @@ export default {
     iris.session.logOut();
   },
   init: function () {
+    this.relayPool.onnotice((relayUrl, notice) => {
+      console.log('notice', notice, ' from relay ', relayUrl);
+    });
     iris
       .local()
-      .get('maxRelays')
-      .on((maxRelays) => {
-        this.maxRelays = maxRelays;
-        localForage.setItem('maxRelays', maxRelays);
+      .get('relays')
+      .on((relays: { [url: string]: MyRelay }) => {
+        if (typeof relays === 'object' && !!relays) {
+          if (isEqual(relays, this.relays)) {
+            return;
+          }
+          console.log('got relays', relays);
+          localForage.setItem('relays', relays);
+          this.relays = relays;
+          for (const [url, opts] of Object.entries(relays)) {
+            if (opts.enabled) {
+              console.log('adding relay', url);
+              this.relayPool.addOrGetRelay(url);
+            } else {
+              console.log('remove relay', url);
+              this.relayPool.removeRelay(url);
+            }
+          }
+          for (const url of this.relayPool.relayByUrl.keys()) {
+            if (!relays[url] || !relays[url].enabled) {
+              console.log('remove relay', url);
+              this.relayPool.removeRelay(url);
+            }
+          }
+        }
       });
-    iris
-      .local()
-      .get('unseenNotificationCount')
-      .on((unseenNotificationCount) => {
-        this.unseenNotificationCount = unseenNotificationCount;
-      });
-    // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
-    localForage.getItem('notificationsSeenTime').then((val) => {
-      if (val !== null) {
-        iris.local().get('notificationsSeenTime').put(val);
-        this.notificationsSeenTime = val;
-        this.updateUnseenNotificationCount(this);
+    localForage.getItem('relays').then((relays) => {
+      if (relays) {
+        this.relays = relays;
+      } else {
+        DEFAULT_RELAYS.forEach((url) => {
+          this.relays[url] = { enabled: true };
+        });
       }
     });
-    localForage.getItem('maxRelays').then((val) => {
-      if (val !== null) {
-        iris.local().get('maxRelays').put(val);
-        this.maxRelays = val;
+    // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
+    localForage.getItem('notificationsSeenTime').then((val) => {
+      if (val && !this.notificationsSeenTime) {
+        this.notificationsSeenTime = val;
+        this.updateUnseenNotificationCount(this);
       }
     });
     iris
@@ -1131,22 +1157,40 @@ export default {
           subscribe,
           (...args) => this.unsubscribe(...args),
         );
-        this.public.get('notifications/lastOpened', (time) => {
-          this.notificationsSeenTime = time;
-          console.log('got lastOpened', time);
-          this.updateUnseenNotificationCount(this);
+        const myPub = iris.session.getKey().secp256k1.rpub;
+        this.public.get({ path: 'notifications/lastOpened', authors: [myPub] }, (time) => {
+          time = time.value;
+          if (time !== this.notificationsSeenTime) {
+            this.notificationsSeenTime = time;
+            localForage.setItem('notificationsSeenTime', time);
+            this.updateUnseenNotificationCount(this);
+          }
+        });
+        this.public.get({ path: 'settings/colorScheme', authors: [myPub] }, (colorScheme) => {
+          if (colorScheme.value === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            return;
+          } else if (colorScheme.value === 'default') {
+            if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+              //OS theme setting detected as dark
+              document.documentElement.setAttribute('data-theme', 'light');
+              return;
+            }
+          }
+          document.documentElement.setAttribute('data-theme', 'dark');
         });
         this.knownUsers.add(key);
-        this.manageRelays();
         this.loadLocalStorageEvents();
         this.getProfile(key.secp256k1.rpub, undefined);
-        const hex = this.toNostrHexAddress(this.SUGGESTED_FOLLOW);
-        this.knownUsers.add(hex);
-        this.getProfile(this.toNostrHexAddress(hex), undefined);
-        this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
+        for (const suggestion of this.SUGGESTED_FOLLOWS) {
+          const hex = this.toNostrHexAddress(suggestion);
+          this.knownUsers.add(hex);
+          this.getProfile(this.toNostrHexAddress(hex), undefined);
+        }
+        this.subscribe([{ kinds: [0, 1, 3, 6, 7], limit: 200 }]); // everything new
         setTimeout(() => {
-          this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
-          this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
+          this.subscribe([{ authors: [key.secp256k1.rpub] }]); // our stuff
+          this.subscribe([{ '#p': [key.secp256k1.rpub] }]); // notifications and DMs
         }, 200);
 
         setInterval(() => {
@@ -1245,16 +1289,6 @@ export default {
     this.subscribe([{ '#p': [iris.session.getKey().secp256k1.rpub] }], callback);
   },
 
-  getSomeRelayUrl() {
-    // try to find a connected relay, but if none are connected, just return the first one
-    const relays: Relay[] = Array.from(this.relays.values());
-    const connectedRelays: Relay[] = relays.filter((relay: Relay) => getRelayStatus(relay) === 1);
-    if (connectedRelays.length) {
-      return connectedRelays[0].url;
-    }
-    return relays.length ? relays[0].url : null;
-  },
-
   getMessagesByEveryone(cb: (messageIds: string[]) => void) {
     const callback = () => {
       cb(this.latestNotesByEveryone.eventIds);
@@ -1268,6 +1302,28 @@ export default {
     };
     callback();
     this.subscribe([{ kinds: [1, 3, 5, 7], limit: 200 }], callback);
+  },
+  getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void) {
+    const callback = (event) => {
+      if (!this.latestNotesByKeywords.has(keyword)) {
+        this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+      }
+      this.latestNotesByKeywords.get(keyword)?.add(event);
+      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    };
+    // find among cached events
+    const filter = { kinds: [1], keywords: [keyword] };
+    for (const event of this.eventsById.values()) {
+      if (this.matchFilter(event, filter)) {
+        if (!this.latestNotesByKeywords.has(keyword)) {
+          this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+        }
+        this.latestNotesByKeywords.get(keyword)?.add(event);
+      }
+    }
+    this.latestNotesByKeywords.has(keyword) &&
+      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    this.subscribe([filter], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile

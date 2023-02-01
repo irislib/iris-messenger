@@ -64,7 +64,6 @@ class Header extends Component {
     iris.local().get('showParticipants').on(this.inject());
     iris.local().get('unseenMsgsTotal').on(this.inject());
     iris.local().get('unseenNotificationCount').on(this.inject());
-    iris.local().get('settings').get('showBetaFeatures').on(this.inject());
     iris
       .local()
       .get('activeRoute')
@@ -123,7 +122,9 @@ class Header extends Component {
   }
 
   updateRelayCount() {
-    this.setState({ connectedRelays: Nostr.getConnectedRelayCount() });
+    const statuses = Nostr.relayPool.getRelayStatuses();
+    const connectedRelays = statuses.filter((relay) => relay[1] === 1).length;
+    this.setState({ connectedRelays });
   }
 
   render() {

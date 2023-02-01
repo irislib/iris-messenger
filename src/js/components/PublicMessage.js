@@ -18,8 +18,8 @@ import Name from './Name';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
 
-const MSG_TRUNCATE_LENGTH = 1000;
-const MSG_TRUNCATE_LINES = 10;
+const MSG_TRUNCATE_LENGTH = 500;
+const MSG_TRUNCATE_LINES = 8;
 
 const replyIcon = html`<svg width="24" viewBox="0 0 24 24" fill="currentColor">
   <path
@@ -140,14 +140,14 @@ class PublicMessage extends Message {
               }
               msg.attachments.push({ type: 'image', data: parsedUrl.origin + parsedUrl.pathname });
 
-              // Remove URL from beginning or end of line
-              text = text
-                .replace(new RegExp(`^${url}`, 'g'), '')
-                .replace(new RegExp(`${url}$`, 'g'), '');
+              // Remove URL from beginning or end of line or before newline
+              text = text.replace(new RegExp(`^${url}`), '');
+              text = text.replace(new RegExp(`${url}$`), '');
+              text = text.replace(new RegExp(`${url}\n`), ' ');
             }
           });
         }
-        msg.text = text;
+        msg.text = text.trim();
       }
 
       this.setState({ msg });
@@ -159,7 +159,7 @@ class PublicMessage extends Message {
           const sortedReplies =
             replies &&
             Array.from(replies).sort(
-              (a, b) => Nostr.eventsById.get(a)?.time - Nostr.eventsById.get(b)?.time,
+              (a, b) => Nostr.eventsById.get(a)?.created_at - Nostr.eventsById.get(b)?.created_at,
             );
           this.setState({
             boosts: this.boostedBy.size,
@@ -196,13 +196,6 @@ class PublicMessage extends Message {
     }
   }
 
-  toggleReplies(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const showReplyForm = !this.state.showReplyForm;
-    this.setState({ showReplyForm });
-  }
-
   onClickName(e) {
     e.stopPropagation();
     route(`/profile/${this.state.msg.info.from}`);
@@ -220,7 +213,7 @@ class PublicMessage extends Message {
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Nostr.publish({
-          kind: 1,
+          kind: 6,
           tags: [
             ['e', nostrId, '', 'mention'],
             ['p', author],
@@ -302,26 +295,42 @@ class PublicMessage extends Message {
     if (this.props.standalone) {
       return;
     }
-    if (['A', 'BUTTON', 'TEXTAREA', 'IMG'].find((tag) => event.target.closest(tag))) {
+    if (['A', 'BUTTON', 'TEXTAREA', 'IMG', 'INPUT'].find((tag) => event.target.closest(tag))) {
       return;
     }
     if (window.getSelection().toString()) {
       return;
     }
+    if (this.state.msg?.event?.kind === 7) {
+      const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
+      return route(`/post/${likedId}`);
+    }
+    this.openStandalone();
+  }
+
+  openStandalone() {
     route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
+  }
+
+  replyBtnClicked() {
+    if (this.props.standalone) {
+      $(document).find('textarea').focus();
+    } else {
+      this.openStandalone();
+    }
   }
 
   renderFollow() {
     return html`
       <div class="msg">
         <div class="msg-content">
-          <p style="display: flex; align-items: center">
+          <div style="display: flex; align-items: center">
             <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
             <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
             <span> started following you</span>
-          </p>
+          </div>
         </div>
       </div>
     `;
@@ -335,9 +344,9 @@ class PublicMessage extends Message {
     }
     return html`
       <div class="msg">
-        <div class="msg-content" style="padding: 0;">
+        <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           <div
-            style="display: flex; align-items: center; padding: 15px; white-space: nowrap;text-overflow: ellipsis; overflow:hidden"
+            style="display: flex; align-items: center; flex-basis: 100%; white-space: nowrap;text-overflow: ellipsis; overflow:hidden"
           >
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
             <a
@@ -346,7 +355,11 @@ class PublicMessage extends Message {
             >
               <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
-            <span> liked your <a href="#/post/${likedId}">note</a> <i>"${text}"</i> </span>
+            <span>
+              liked your <a href="#/post/${likedId}">note</a> ${text && text.length
+                ? html`<i>"${text}"</i>`
+                : ''}</span
+            >
           </div>
         </div>
       </div>
@@ -372,12 +385,17 @@ class PublicMessage extends Message {
   }
 
   renderDropdown() {
+    const url = `https://iris.to/#/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`;
     return html`
       <div class="msg-menu-btn">
         <${Dropdown}>
           <${CopyButton}
-            key=${`${this.props.hash}copy`}
-            text=${t('copy_note_ID')}
+            text=${t('copy_link')}
+            title="Note link"
+            copyStr=${url}
+          />
+          <${CopyButton}
+            text=${t('copy_ID')}
             title="Note ID"
             copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
           />
@@ -385,7 +403,6 @@ class PublicMessage extends Message {
             ? html`
                 <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
                 <${CopyButton}
-                  key=${`${this.props.hash}copyRaw`}
                   text=${t('copy_raw_data')}
                   title="Message raw data"
                   copyStr=${JSON.stringify(this.state.msg.event, null, 2)}
@@ -403,13 +420,13 @@ class PublicMessage extends Message {
   renderBoost(id) {
     return html`
       <div class="msg">
-        <div class="msg-content" style="padding: 0;">
-          <div style="display: flex; align-items: center; padding: 15px 15px 0 15px;">
+        <div class="msg-content" style="padding: 12px 0 0 0;">
+          <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
             <i style="margin-right: 15px;"> ${Icons.boost} </i>
             <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
-            <span> ${t('reposted')}</span>
+            <span style="margin-left: 5px"> ${t('reposted')} </span>
           </div>
           <${PublicMessage} hash=${id} showName=${true} />
         </div>
@@ -418,7 +435,6 @@ class PublicMessage extends Message {
   }
 
   toggleLikes(e) {
-    console.log('toggle likes');
     e.stopPropagation();
     this.setState({ showLikes: !this.state.showLikes, showBoosts: false });
   }
@@ -430,23 +446,19 @@ class PublicMessage extends Message {
 
   render() {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
+    const s = this.state;
+    const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
     if (!this.state.msg) {
       return html` <div
         ref=${this.ref}
         key=${this.props.hash}
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
-          : ''} ${this.props.asQuote ? 'quote' : ''}"
+          : ''} ${asQuote ? 'quote' : ''}"
       >
-        <div
-          class="msg-content"
-          style=${this.props.standalone ? '' : { cursor: 'pointer' }}
-          onClick=${(e) => this.messageClicked(e)}
-        >
-          <div class="retrieving" style="display:flex;align-items:center">
-            <div class="text ${this.state.retrieving ? 'visible' : ''}">Looking up message...</div>
-            <div>${this.renderDropdown()}</div>
-          </div>
+        <div class="msg-content retrieving" style="display:flex;align-items:center">
+          <div class="text ${this.state.retrieving ? 'visible' : ''}">Looking up message...</div>
+          <div>${this.renderDropdown()}</div>
         </div>
       </div>`;
     }
@@ -523,208 +535,232 @@ class PublicMessage extends Message {
     const timeStr = time.toLocaleTimeString(window.navigator.language, {
       timeStyle: 'short',
     });
-    const s = this.state;
 
     const ogImageUrl = s.msg.attachments?.find((a) => a.type === 'image')?.data;
+    let rootMsg = s.msg.event?.tags.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
+    if (!rootMsg) {
+      rootMsg = s.msg.replyingTo;
+    }
+
+    let replyingToUsers = [];
+    const hasETags = s.msg.event.tags.some((t) => t[0] === 'e');
+    if (hasETags) {
+      replyingToUsers = s.msg.event?.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
+    }
+    const quoting = s.msg.replyingTo && (this.props.showRepliedMsg || this.props.asReply);
 
     return html`
+      ${s.msg.replyingTo && this.props.showRepliedMsg
+        ? html`
+            <${PublicMessage}
+              key=${s.msg.replyingTo}
+              hash=${s.msg.replyingTo}
+              asQuote=${true}
+              showName=${true}
+              showReplies=${0}
+            />
+          `
+        : ''}
       <div
         key=${this.props.hash}
         ref=${this.ref}
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
-          : ''} ${this.props.asQuote ? 'quote' : ''}"
+          : ''} ${asQuote ? 'quote' : ''}
+          ${quoting ? 'quoting' : ''}"
       >
-        <div
-          class="msg-content"
-          style=${this.props.standalone ? '' : { cursor: 'pointer' }}
-          onClick=${(e) => this.messageClicked(e)}
-        >
-          ${s.msg.replyingTo && !this.props.asReply && !this.props.asQuote
-            ? html`
-                <div
-                  style="cursor: pointer"
-                  onClick=${(e) => {
-                    // if event target is not a link or a button, open reply
-                    if (!['A', 'BUTTON'].find((tag) => e.target.closest(tag))) {
-                      e.stopPropagation();
-                      route(`/post/${s.msg.replyingTo}`);
-                    }
-                  }}
-                >
-                  <${PublicMessage}
-                    key=${s.msg.replyingTo}
-                    hash=${s.msg.replyingTo}
-                    asQuote=${true}
-                    showName=${true}
-                    showReplies=${false}
-                  />
-                </div>
-              `
+        <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
+          ${this.props.asQuote && s.msg.replyingTo
+            ? html` <div style="flex-basis:100%; margin-bottom: 12px">
+                <a href="#/post/${Nostr.toNostrBech32Address(rootMsg, 'note')}">Show thread</a>
+              </div>`
             : ''}
-
-          <div class="msg-sender">
-            <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
-              ${s.msg.info.from ? html`<${Identicon} str=${s.msg.info.from} width="40" />` : ''}
-              ${this.props.showName &&
-              html`
-                <div class="msgSenderName">
-                  <${Name} pub=${s.msg.info.from} />
-                </div>
-              `}
-              <div class="time">
-                <a
-                  href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
-                  class="tooltip"
-                >
-                  · ${Helpers.getRelativeTimeText(time)}
-                  <span class="tooltiptext"> ${dateStr} ${timeStr} </span>
-                </a>
-              </div>
-            </div>
-            ${this.renderDropdown()}
+          <div class="msg-identicon">
+            ${s.msg.info.from
+              ? html`
+                  <a href=${`#/profile/${s.msg.info.from}`}>
+                    <${Identicon} str=${s.msg.info.from} width="40" />
+                  </a>
+                `
+              : ''}
+            ${asQuote && !this.props.standalone ? html`<div class="line"></div>` : ''}
           </div>
-          ${this.props.standalone
-            ? html`
-                <${Helmet} titleTemplate="%s">
-                  <title>${title}: ${quotedShortText}</title>
-                  <meta name="description" content=${quotedShortText} />
-                  <meta property="og:type" content="article" />
-                  ${ogImageUrl ? html`<meta property="og:image" content=${ogImageUrl} />` : ''}
-                  <meta property="og:title" content=${title} />
-                  <meta property="og:description" content=${quotedShortText} />
-                <//>
-              `
-            : ''}
-          ${s.msg.torrentId
-            ? html`
-                <${Torrent} torrentId=${s.msg.torrentId} autopause=${!this.props.standalone} />
-              `
-            : ''}
-          ${s.msg.attachments &&
-          s.msg.attachments.map((a, i) => {
-            if (i > 0 && !this.props.standalone && !this.state.showMore) {
-              return;
-            }
-            return html`<div class="img-container">
-              <div class="heart"></div>
-              <${SafeImg}
-                src=${a.data}
-                onClick=${(e) => {
-                  this.imageClicked(e);
-                }}
-              />
-            </div>`;
-          })}
-          <div class="text ${emojiOnly && 'emoji-only'}">${text}</div>
-          ${!this.props.standalone &&
-          ((s.msg.attachments && s.msg.attachments.length > 1) ||
-            this.state.msg.text.length > MSG_TRUNCATE_LENGTH ||
-            lines.length > MSG_TRUNCATE_LINES)
-            ? html`
-                <a
-                  onClick=${(e) => {
-                    e.preventDefault();
-                    this.setState({ showMore: !s.showMore });
-                  }}
-                >
-                  ${t(`show_${s.showMore ? 'less' : 'more'}`)}</a
-                >
-              `
-            : ''}
-          <div class="below-text">
-            ${this.props.asQuote
-              ? ''
-              : html`
-                  <a class="msg-btn reply-btn" onClick=${(e) => this.toggleReplies(e)}>
-                    ${replyIcon}
+          <div class="msg-main">
+            <div class="msg-sender">
+              <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
+                ${this.props.showName &&
+                html`
+                  <a href=${`#/profile/${s.msg.info.from}`} class="msgSenderName">
+                    <${Name} pub=${s.msg.info.from} />
                   </a>
-                  <span
-                    class="count ${!this.props.standalone && !this.props.asReply && s.showReplyForm
-                      ? 'active'
-                      : ''}"
-                    onClick=${(e) => this.toggleReplies(e)}
-                  >
-                    ${s.replyCount || ''}
-                  </span>
-                  <a
-                    class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
-                    onClick=${(e) => this.likeBtnClicked(e)}
-                  >
-                    ${s.liked ? Icons.heartFull : Icons.heartEmpty}
-                  </a>
-                  <span
-                    class="count ${s.showLikes ? 'active' : ''}"
-                    onClick=${(e) => this.toggleLikes(e)}
-                  >
-                    ${s.likes || ''}
-                  </span>
-                  <a
-                    class="msg-btn boost-btn ${s.boosted ? 'boosted' : ''}"
-                    onClick=${() => this.boostBtnClicked()}
-                  >
-                    ${Icons.boost}
-                  </a>
-                  <span
-                    class="count ${s.showBoosts ? 'active' : ''}"
-                    onClick=${(e) => this.toggleBoosts(e)}
-                  >
-                    ${s.boosts || ''}
-                  </span>
                 `}
-          </div>
-          ${s.showLikes
-            ? html`
-                <div class="likes">
-                  ${Array.from(this.likedBy).map((key) => {
-                    return html`<${Identicon}
-                      showTooltip=${true}
-                      onClick=${() => route(`/profile/${key}`)}
-                      str=${Nostr.toNostrBech32Address(key, 'npub')}
-                      width="32"
-                    />`;
-                  })}
+                <div class="time">
+                  ${'· '}
+                  <a
+                    href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
+                    class="tooltip"
+                  >
+                    ${Helpers.getRelativeTimeText(time)}
+                    <span class="tooltiptext"> ${dateStr} ${timeStr} </span>
+                  </a>
                 </div>
-              `
-            : ''}
-          ${s.showBoosts
-            ? html`
-                <div class="likes">
-                  ${Array.from(this.boostedBy).map((key) => {
-                    return html`<${Identicon}
-                      showTooltip=${true}
-                      onClick=${() => route(`/profile/${key}`)}
-                      str=${Nostr.toNostrBech32Address(key, 'npub')}
-                      width="32"
-                    />`;
-                  })}
-                </div>
-              `
-            : ''}
-          ${this.props.standalone || s.showReplyForm
-            ? html`
-                <${FeedMessageForm}
-                  autofocus=${!this.props.standalone}
-                  replyingTo=${this.props.hash}
-                  replyingToUser=${s.msg.info.from}
-                  placeholder=${t('write_a_reply')}
+              </div>
+              ${this.renderDropdown()}
+            </div>
+            ${replyingToUsers.length && !quoting
+              ? html`
+                  <small class="msg-replying-to">
+                    ${t('replying_to') + ' '}
+                    ${replyingToUsers
+                      .slice(0, 3)
+                      .map(
+                        (u) => html`
+                          <a href=${`#/profile/${Nostr.toNostrBech32Address(u, 'npub')}`}>
+                            @<${Name} pub=${u} hideBadge=${true} />${' '}
+                          </a>
+                        `,
+                      )}
+                    ${replyingToUsers.length > 3 ? '...' : ''}
+                  </small>
+                `
+              : ''}
+            ${this.props.standalone
+              ? html`
+                  <${Helmet} titleTemplate="%s">
+                    <title>${title}: ${quotedShortText}</title>
+                    <meta name="description" content=${quotedShortText} />
+                    <meta property="og:type" content="article" />
+                    ${ogImageUrl ? html`<meta property="og:image" content=${ogImageUrl} />` : ''}
+                    <meta property="og:title" content=${title} />
+                    <meta property="og:description" content=${quotedShortText} />
+                  <//>
+                `
+              : ''}
+            ${s.msg.torrentId
+              ? html`
+                  <${Torrent} torrentId=${s.msg.torrentId} autopause=${!this.props.standalone} />
+                `
+              : ''}
+            ${s.msg.attachments &&
+            s.msg.attachments.map((a, i) => {
+              if (i > 0 && !this.props.standalone && !this.state.showMore) {
+                return;
+              }
+              return html`<div class="img-container">
+                <div class="heart"></div>
+                <${SafeImg}
+                  src=${a.data}
+                  onClick=${(e) => {
+                    this.imageClicked(e);
+                  }}
                 />
-              `
-            : ''}
-          ${(this.props.showReplies || s.showReplyForm) && s.sortedReplies && s.sortedReplies.length
-            ? s.sortedReplies.map(
-                (r) =>
-                  html`<${PublicMessage}
-                    key=${r}
-                    hash=${r}
-                    asReply=${true}
-                    showName=${true}
-                    showReplies=${true}
-                  />`,
-              )
-            : ''}
+              </div>`;
+            })}
+            ${text.length > 0
+              ? html`<div class="text ${emojiOnly && 'emoji-only'}">${text}</div> `
+              : ''}
+            ${!this.props.standalone &&
+            ((s.msg.attachments && s.msg.attachments.length > 1) ||
+              this.state.msg.text.length > MSG_TRUNCATE_LENGTH ||
+              lines.length > MSG_TRUNCATE_LINES)
+              ? html`
+                  <a
+                    onClick=${(e) => {
+                      e.preventDefault();
+                      this.setState({ showMore: !s.showMore });
+                    }}
+                  >
+                    ${t(`show_${s.showMore ? 'less' : 'more'}`)}</a
+                  >
+                `
+              : ''}
+            <div class="below-text">
+              <a class="msg-btn reply-btn" onClick=${() => this.replyBtnClicked()}>
+                ${replyIcon}
+              </a>
+              <span class="count"> ${s.replyCount || ''} </span>
+              <a
+                class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
+                onClick=${(e) => this.likeBtnClicked(e)}
+              >
+                ${s.liked ? Icons.heartFull : Icons.heartEmpty}
+              </a>
+              <span
+                class="count ${s.showLikes ? 'active' : ''}"
+                onClick=${(e) => this.toggleLikes(e)}
+              >
+                ${s.likes || ''}
+              </span>
+              <a
+                class="msg-btn boost-btn ${s.boosted ? 'boosted' : ''}"
+                onClick=${() => this.boostBtnClicked()}
+              >
+                ${Icons.boost}
+              </a>
+              <span
+                class="count ${s.showBoosts ? 'active' : ''}"
+                onClick=${(e) => this.toggleBoosts(e)}
+              >
+                ${s.boosts || ''}
+              </span>
+            </div>
+            ${s.showLikes
+              ? html`
+                  <div class="likes">
+                    ${Array.from(this.likedBy).map((key) => {
+                      return html`<${Identicon}
+                        showTooltip=${true}
+                        onClick=${() => route(`/profile/${key}`)}
+                        str=${Nostr.toNostrBech32Address(key, 'npub')}
+                        width="32"
+                      />`;
+                    })}
+                  </div>
+                `
+              : ''}
+            ${s.showBoosts
+              ? html`
+                  <div class="likes">
+                    ${Array.from(this.boostedBy).map((key) => {
+                      return html`<${Identicon}
+                        showTooltip=${true}
+                        onClick=${() => route(`/profile/${key}`)}
+                        str=${Nostr.toNostrBech32Address(key, 'npub')}
+                        width="32"
+                      />`;
+                    })}
+                  </div>
+                `
+              : ''}
+            ${this.props.standalone || s.showReplyForm
+              ? html`
+                  <${FeedMessageForm}
+                    waitForFocus=${true}
+                    autofocus=${!this.props.standalone}
+                    replyingTo=${this.props.hash}
+                    replyingToUser=${s.msg.info.from}
+                    placeholder=${t('write_your_reply')}
+                  />
+                `
+              : ''}
+          </div>
         </div>
       </div>
+      ${(this.props.showReplies || s.showReplyForm) && s.sortedReplies && s.sortedReplies.length
+        ? s.sortedReplies
+            .slice(0, this.props.showReplies)
+            .map(
+              (r) =>
+                html`<${PublicMessage}
+                  key=${r}
+                  hash=${r}
+                  asReply=${!this.props.standalone}
+                  showName=${true}
+                  showReplies=${1}
+                  showRepliedMsg=${false}
+                />`,
+            )
+        : ''}
     `;
   }
 }

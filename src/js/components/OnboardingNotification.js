@@ -23,24 +23,30 @@ export default class OnboardingNotification extends Component {
       return html`
         <div class="msg">
           <div class="msg-content">
-            <p>${t('follow_someone_info')}</p>
-            <div class="profile-link-container">
-              <a href="#/profile/${Nostr.SUGGESTED_FOLLOW}" class="profile-link">
-                <${Identicon} str=${Nostr.SUGGESTED_FOLLOW} width="40" />
-                <${Name} pub=${Nostr.SUGGESTED_FOLLOW} placeholder="Suggested follow" />
-              </a>
-              <${FollowButton} id=${Nostr.SUGGESTED_FOLLOW} />
+            <div style="display:flex;flex-direction:column;flex:1">
+              <p>${t('follow_someone_info')}</p>
+              ${Nostr.SUGGESTED_FOLLOWS.map(
+                (pub) => html`
+                  <div class="profile-link-container">
+                    <a href="#/profile/${pub}" className="profile-link">
+                      <${Identicon} str=${pub} width="40" />
+                      <${Name} pub=${pub} placeholder="Suggested follow" />
+                    </a>
+                    <${FollowButton} id=${pub} />
+                  </div>
+                `,
+              )}
+              <p>
+                ${t('alternatively')}<i> </i>
+                <a
+                  href="#/profile/${Nostr.toNostrBech32Address(
+                    iris.session.getKey()?.secp256k1?.rpub,
+                    'npub',
+                  )}"
+                  >${t('give_your_profile_link_to_someone')}</a
+                >.
+              </p>
             </div>
-            <p>
-              ${t('alternatively')}<i> </i>
-              <a
-                href="#/profile/${Nostr.toNostrBech32Address(
-                  iris.session.getKey()?.secp256k1?.rpub,
-                  'npub',
-                )}"
-                >${t('give_your_profile_link_to_someone')}</a
-              >.
-            </p>
           </div>
         </div>
       `;
@@ -51,19 +57,21 @@ export default class OnboardingNotification extends Component {
       return html`
         <div class="msg">
           <div class="msg-content">
-            <p>${t('no_followers_yet')}</p>
-            <p>
-              <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(npub)} />
-            </p>
-            <!--<p
-              dangerouslySetInnerHTML=${{
-              __html: t(
-                'alternatively_get_sms_verified',
-                `href="https://iris-sms-auth.herokuapp.com/?pub=${iris.session.getPubKey()}"`,
-              ),
-            }}
-            ></p>-->
-            <small>${t('no_followers_yet_info')}</small>
+            <div style="display:flex;flex-direction:column;flex:1">
+              <p>${t('no_followers_yet')}</p>
+              <p>
+                <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(npub)} />
+              </p>
+              <!--<p
+                dangerouslySetInnerHTML=${{
+                __html: t(
+                  'alternatively_get_sms_verified',
+                  `href="https://iris-sms-auth.herokuapp.com/?pub=${iris.session.getPubKey()}"`,
+                ),
+              }}
+              ></p>-->
+              <small>${t('no_followers_yet_info')}</small>
+            </div>
           </div>
         </div>
       `;

@@ -26,13 +26,15 @@ class Message extends View {
     let content;
     if (this.props.hash === 'new') {
       content = html`
-        <${FeedMessageForm}
-          placeholder=${t('whats_on_your_mind')}
-          activeChat="public"
-          forceAutofocusMobile=${true}
-          autofocus=${true}
-          onSubmit=${() => route('/')}
-        />
+        <div class="mar-top15">
+          <${FeedMessageForm}
+            placeholder=${t('whats_on_your_mind')}
+            activeChat="public"
+            forceAutofocusMobile=${true}
+            autofocus=${true}
+            onSubmit=${() => route('/')}
+          />
+        </div>
       `;
     } else {
       content = html`
@@ -41,7 +43,8 @@ class Message extends View {
           standalone=${true}
           hash=${this.props.hash}
           showName=${true}
-          showReplies=${true}
+          showReplies=${Infinity}
+          showRepliedMsg=${true}
         />
       `;
     }

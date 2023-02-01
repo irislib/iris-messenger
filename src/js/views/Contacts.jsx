@@ -1,11 +1,13 @@
 import iris from 'iris-lib';
-import Identicon from '../components/Identicon';
-import Filters from '../components/Filters';
-import { translate as t } from '../translations/Translation';
-import FollowButton from '../components/FollowButton';
-import Name from '../components/Name';
-import View from './View';
 import _ from 'lodash';
+
+import Filters from '../components/Filters';
+import FollowButton from '../components/FollowButton';
+import Identicon from '../components/Identicon';
+import Name from '../components/Name';
+import { translate as t } from '../translations/Translation';
+
+import View from './View';
 
 // TODO: add group selector
 class Contacts extends View {

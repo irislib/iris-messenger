@@ -72,7 +72,7 @@ export default {
   everyone: 'Everyone',
   explorer: 'Explorer',
   follow: 'Follow',
-  follow_someone_info: 'Follow someone to see content from their network! Suggestion:',
+  follow_someone_info: 'Follow someone to see content from their network! Suggestions:',
   followers: 'Followers',
   following: 'Following',
   follows: 'Follows',
