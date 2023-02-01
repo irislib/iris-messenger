@@ -353,7 +353,7 @@ class PublicMessage extends Message {
               href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
               style="margin-right: 5px;"
             >
-              <${Name} pub=${this.state.msg?.event?.pubkey} />
+              <${Name} pub=${this.state.msg?.event?.pubkey} userNameOnly=${true} />
             </a>
             <span>
               liked your <a href="#/post/${likedId}">note</a> ${text && text.length
