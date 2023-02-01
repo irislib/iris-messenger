@@ -15,15 +15,6 @@ const NostrSettings = () => {
   setInterval(() => {
     const relayPoolRelays = Nostr.relayPool.getRelayStatuses();
     setRelayPoolRelays(relayPoolRelays);
-    // TODO don't object assign, use iris.local() as source of truth
-    const newRelays = Object.assign({}, relays);
-    relayPoolRelays.forEach((relay) => {
-      const url = relay[0];
-      if (!newRelays[url]) {
-        newRelays[url] = { enabled: true };
-      }
-    });
-    setRelays(newRelays);
   }, 1000);
 
   iris
@@ -36,7 +27,6 @@ const NostrSettings = () => {
   const handleRemoveRelay = (event, url) => {
     event.preventDefault();
     iris.local().get('relays').get(url).put(null);
-    Nostr.removeRelayFromPool(url);
   };
 
   const getRelayStatus = (url) => {
@@ -49,7 +39,7 @@ const NostrSettings = () => {
 
   const handleAddRelay = (event) => {
     event.preventDefault(); // prevent the form from reloading the page
-    Nostr.addRelay(newRelayUrl); // add the new relay using the Nostr method
+    iris.local().get('relays').get(newRelayUrl).put({ enabled: true }); // add the new relay URL to the relays state
     setNewRelayUrl(''); // reset the new relay URL
   };
 
@@ -139,11 +129,6 @@ const NostrSettings = () => {
                     checked={relay.enabled}
                     onChange={() => {
                       const enabled = !relay.enabled;
-                      if (enabled) {
-                        Nostr.addRelay(url);
-                      } else {
-                        Nostr.removeRelayFromPool(url);
-                      }
                       iris.local().get('relays').get(url).put({ enabled });
                     }}
                   />

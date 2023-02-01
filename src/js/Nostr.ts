@@ -822,12 +822,13 @@ export default {
           console.log('setting relays from your contacs list', urls);
           for (const url of Object.keys(this.relays)) {
             if (!urls.includes(url)) {
-              this.removeRelayFromPool(url);
+              iris.local().get('relays').get(url).put(null);
             }
           }
           for (const url of urls) {
-            this.addRelay(url);
-            iris.local().get('relays').get(url).put({ enabled: true });
+            if (!this.relays[url]) {
+              iris.local().get('relays').get(url).put({ enabled: true });
+            }
           }
         }
       } catch (e) {
@@ -836,11 +837,13 @@ export default {
     }
   },
   restoreDefaultRelays() {
-    this.relays.clear();
+    this.relays = {};
     for (const url of DEFAULT_RELAYS) {
-      this.addRelay(url);
+      this.relays[url] = { enabled: true };
     }
     this.saveRelaysToContacts();
+    console.log('restored default relays', this.relays);
+    iris.local().get('relays').put(this.relays);
     // do not save these to contact list
     for (const url of SEARCH_RELAYS) {
       this.addRelay(url);
@@ -1146,9 +1149,33 @@ export default {
     iris
       .local()
       .get('relays')
-      .on((relays) => {
-        this.relays = relays;
+      .on((relays: any) => {
+        console.log('got relays', relays);
+        if (typeof relays === 'object' && relays !== null) {
+          localForage.setItem('relays', relays);
+          this.relays = relays;
+          for (const [url, opts] of Object.entries(relays)) {
+            if (opts.enabled) {
+              console.log('adding relay', url);
+              this.relayPool.addRelay(url);
+            } else {
+              console.log('remove relay', url);
+              this.relayPool.removeRelay(url);
+            }
+          }
+          for (const url of this.relayPool.relaysByUrl.keys()) {
+            if (!relays[url] || !relays[url].enabled) {
+              console.log('remove relay', url);
+              this.relayPool.removeRelay(url);
+            }
+          }
+        }
       });
+    localForage.getItem('relays').then((relays) => {
+      if (!this.relays) {
+        this.relays = relays;
+      }
+    });
     // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
     localForage.getItem('notificationsSeenTime').then((val) => {
       if (val && !this.notificationsSeenTime) {
