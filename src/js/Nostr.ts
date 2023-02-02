@@ -23,6 +23,12 @@ declare global {
   }
 }
 
+try {
+  localStorage.setItem('gunPeers', JSON.stringify({})); // quick fix to not connect gun
+} catch (e) {
+  // ignore
+}
+
 const getRelayStatus = (relay: Relay) => {
   // workaround for nostr-tools bug
   try {

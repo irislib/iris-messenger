@@ -669,9 +669,7 @@ class PublicMessage extends Message {
               </div>`;
             })}
             ${text.length > 0
-              ? html`<div class="text ${emojiOnly && 'emoji-only'}">
-                      ${text}
-                    </div> `
+              ? html`<div class="text ${emojiOnly && 'emoji-only'}">${text}</div> `
               : ''}
             ${!this.props.standalone &&
             ((s.msg.attachments && s.msg.attachments.length > 1) ||
