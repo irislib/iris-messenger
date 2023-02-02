@@ -1145,6 +1145,7 @@ export default {
         this.handleReaction(event);
         break;
       case 16462:
+        // TODO return if already have
         this.handleBlockList(event);
         break;
       case 16463:
