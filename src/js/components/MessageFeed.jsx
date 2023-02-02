@@ -11,6 +11,13 @@ import PublicMessage from './PublicMessage';
 
 const INITIAL_PAGE_SIZE = 20;
 
+let isInitialLoad = true;
+const listener = function () {
+  isInitialLoad = false;
+  window.removeEventListener('popstate', listener);
+};
+window.addEventListener('popstate', listener);
+
 class MessageFeed extends Component {
   constructor() {
     super();
@@ -93,10 +100,13 @@ class MessageFeed extends Component {
     }
   }
 
-  componentDidMount() {
-    if (window.history.state?.state) {
+  componentWillMount() {
+    if (!isInitialLoad && window.history.state?.state) {
       this.setState(window.history.state.state);
     }
+  }
+
+  componentDidMount() {
     this.addScrollHandler();
     let first = true;
     if (this.props.nostrUser) {

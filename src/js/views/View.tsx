@@ -45,7 +45,6 @@ abstract class View extends Component {
         ...currentHistoryState,
         scrollPosition,
       };
-      console.log('save scroll position', scrollPosition, newHistoryState);
       window.history.replaceState(newHistoryState, '');
     }
   }, 100);
