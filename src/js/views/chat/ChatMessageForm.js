@@ -141,7 +141,7 @@ class ChatMessageForm extends MessageForm {
         class="new-msg"
         type="text"
         placeholder="${t('type_a_message')}"
-        autocomplete="off"
+        autocomplete="do-not-autofill"
         autocorrect="off"
         autocapitalize="sentences"
         spellcheck="off"
