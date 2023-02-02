@@ -426,6 +426,8 @@ export default {
     console.log('subscribeToRepliesAndLikes', _this.subscribedRepliesAndLikes);
     _this.subscribe([
       [{ kinds: [1, 6, 7], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }],
+      undefined,
+      2000,
     ]);
   }, 500),
   // TODO we shouldn't bang the history queries all the time. only ask a users history once per relay.
@@ -450,12 +452,12 @@ export default {
     }
     setTimeout(() => {
       _this.subscribe([{ authors: followedUsers, limit: 500, until: now }], undefined, false);
-    }, 1000);
+    }, 0);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
     if (_this.subscribedPosts.size === 0) return;
     console.log('subscribe to posts', Array.from(_this.subscribedPosts));
-    _this.subscribe([{ ids: Array.from(_this.subscribedPosts) }]);
+    _this.subscribe([{ ids: Array.from(_this.subscribedPosts) }], undefined, 2000);
   }, 100),
   subscribeToKeywords: debounce((_this) => {
     if (_this.subscribedKeywords.size === 0) return;
@@ -565,6 +567,7 @@ export default {
     filters: Filter[],
     cb?: (event: Event) => void,
     unsubscribeOnEose?: boolean,
+    maxDelayms?: number,
   ) {
     cb &&
       this.subscriptions.set(subscriptionId++, {
@@ -610,7 +613,10 @@ export default {
     if (unsubscribeOnEose === undefined) {
       unsubscribeOnEose = true;
     }
-    this.relayPool.subscribe(filters, enabledRelays, myCallback, 100, undefined, {
+    if (maxDelayms === undefined) {
+      maxDelayms = 100;
+    }
+    this.relayPool.subscribe(filters, enabledRelays, myCallback, maxDelayms, undefined, {
       unsubscribeOnEose,
     });
   },
@@ -1005,7 +1011,7 @@ export default {
       case 16463:
         this.handleFlagList(event);
         break;
-      case 30000:
+      case 20000:
         this.handleKeyValue(event);
         break;
     }
@@ -1146,6 +1152,7 @@ export default {
           filters: Filter[],
           callback: (event: Event) => void,
           unsubscribeOnEose?: boolean,
+          maxDelayms?: number,
         ): string => {
           const filter = filters[0];
           const key = filter['#d']?.[0];
@@ -1155,7 +1162,7 @@ export default {
               callback(event);
             }
           }
-          this.subscribe(filters, callback, unsubscribeOnEose);
+          this.subscribe(filters, callback, unsubscribeOnEose, maxDelayms);
           return '0';
         };
         this.private = new Path(
@@ -1202,6 +1209,7 @@ export default {
         }
         this.subscribe([{ kinds: [0, 1, 3, 6, 7], limit: 200 }]); // everything new
         setTimeout(() => {
+          console.log('subscribing to our stuff');
           this.subscribe([{ authors: [key.secp256k1.rpub] }], undefined, false); // our stuff
           this.subscribe([{ '#p': [key.secp256k1.rpub] }], undefined, false); // notifications and DMs
         }, 200);
@@ -1233,7 +1241,7 @@ export default {
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }
-    this.subscribe([{ kinds: [1, 6, 7], '#e': [id] }], callback);
+    this.subscribe([{ kinds: [1, 6, 7], '#e': [id] }], callback, false, 2000);
   },
   block: async function (address: string, isBlocked: boolean) {
     isBlocked ? this.blockedUsers.add(address) : this.blockedUsers.delete(address);
@@ -1383,7 +1391,7 @@ export default {
     }
 
     this.subscribedProfiles.add(address);
-    this.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
+    this.subscribe([{ authors: [address], kinds: [0, 3] }], callback, undefined, 2000);
   },
 
   getDirectMessages(cb?: (dms: Map<string, SortedLimitedEventSet>) => void) {
