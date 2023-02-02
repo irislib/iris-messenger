@@ -978,7 +978,7 @@ export default {
     try {
       const existing = this.profiles.get(event.pubkey);
       if (existing?.created_at >= event.created_at) {
-        return;
+        return false;
       }
       const profile = JSON.parse(event.content);
       profile.created_at = event.created_at;
@@ -1107,9 +1107,13 @@ export default {
 
     this.handledMsgsPerSecond++;
 
+    this.subscribedPosts.delete(event.id);
+
     switch (event.kind) {
       case 0:
-        this.handleMetadata(event);
+        if (this.handleMetadata(event) === false) {
+          return;
+        }
         break;
       case 1:
         this.maybeAddNotification(event);
@@ -1126,6 +1130,9 @@ export default {
         this.handleDelete(event);
         break;
       case 3:
+        if (this.followEventByUser.get(event.pubkey)?.created_at >= event.created_at) {
+          return;
+        }
         this.maybeAddNotification(event);
         this.handleFollow(event);
         break;
@@ -1147,7 +1154,6 @@ export default {
         this.handleKeyValue(event);
         break;
     }
-    this.subscribedPosts.delete(event.id);
 
     if (
       this.subscribedProfiles.has(event.pubkey) &&
