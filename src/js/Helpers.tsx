@@ -44,6 +44,22 @@ export default {
     return s.match(emojiRegex) !== null;
   },
 
+  async translateText(text: string): Promise<string> {
+    const res = await fetch('https://translate.irismessengers.wtf/translate', {
+      method: 'POST',
+      body: JSON.stringify({
+        q: text,
+        source: 'auto',
+        target: 'en',
+        format: 'text',
+        api_key: '',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    console.log(await res.json());
+  },
+
   generateName(seed: string) {
     if (!seed) {
       throw new Error('No seed provided');

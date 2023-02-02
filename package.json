@@ -68,7 +68,6 @@
     "browserify-cipher": ">=1",
     "buffer": "^6.0.3",
     "fuse.js": "^6.6.2",
-    "guesslanguage": "https://github.com/mmalmi/guessLanguage.js",
     "history": "5.3.0",
     "htm": "^3.1.1",
     "identicon.js": "^2.3.3",

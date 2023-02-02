@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet';
-import { guessLanguage } from 'guesslanguage';
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
 import $ from 'jquery';
@@ -149,9 +148,6 @@ class PublicMessage extends Message {
           });
         }
         msg.text = text.trim();
-        guessLanguage.detect(text, (languageGuess) => {
-          this.setState({ languageGuess });
-        });
       }
 
       this.setState({ msg });
