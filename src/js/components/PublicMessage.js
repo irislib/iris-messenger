@@ -384,6 +384,13 @@ class PublicMessage extends Message {
     }
   }
 
+  translate(e) {
+    e.preventDefault();
+    Helpers.translateText(this.state.msg?.event?.content).then((res) => {
+      this.setState({ translatedText: res.translatedText });
+    });
+  }
+
   renderDropdown() {
     const url = `https://iris.to/#/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`;
     return html`
@@ -404,6 +411,7 @@ class PublicMessage extends Message {
           ${this.state.msg
             ? html`
                 <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
+                <a href="#" onClick=${(e) => this.translate(e)}>${t('translate')}</a>
                 <${CopyButton}
                   key=${`${this.props.hash}copyRaw`}
                   text=${t('copy_raw_data')}
@@ -665,7 +673,12 @@ class PublicMessage extends Message {
               </div>`;
             })}
             ${text.length > 0
-              ? html`<div class="text ${emojiOnly && 'emoji-only'}">${text}</div> `
+              ? html`<div class="text ${emojiOnly && 'emoji-only'}">
+                  ${text}
+                  ${s.translatedText
+                    ? html`<p><i>${s.translatedText}</i></p>`
+                    : ''}
+                </div> `
               : ''}
             ${!this.props.standalone &&
             ((s.msg.attachments && s.msg.attachments.length > 1) ||
