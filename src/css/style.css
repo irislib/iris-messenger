@@ -1188,8 +1188,8 @@ a.msg {
 }
 
 .public-messages-view .img-container img {
-  height: 300px;
-  min-width: min(100%, 169px);
+  height: 400px;
+  min-width: min(100%, 225px);
   width: auto;
   max-width: 100%;
   object-fit: cover;
@@ -1201,7 +1201,7 @@ a.msg {
 .public-messages-view .img-container {
   margin-bottom: 10px;
   margin-top: 15px;
-  height: 300px;
+  height: 400px;
   width: 100%;
   text-align: center;
 }

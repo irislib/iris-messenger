@@ -694,18 +694,6 @@ class PublicMessage extends Message {
               </a>
               <span class="count"> ${s.replyCount || ''} </span>
               <a
-                class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
-                onClick=${(e) => this.likeBtnClicked(e)}
-              >
-                ${s.liked ? Icons.heartFull : Icons.heartEmpty}
-              </a>
-              <span
-                class="count ${s.showLikes ? 'active' : ''}"
-                onClick=${(e) => this.toggleLikes(e)}
-              >
-                ${s.likes || ''}
-              </span>
-              <a
                 class="msg-btn boost-btn ${s.boosted ? 'boosted' : ''}"
                 onClick=${() => this.boostBtnClicked()}
               >
@@ -716,6 +704,18 @@ class PublicMessage extends Message {
                 onClick=${(e) => this.toggleBoosts(e)}
               >
                 ${s.boosts || ''}
+              </span>
+              <a
+                class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
+                onClick=${(e) => this.likeBtnClicked(e)}
+              >
+                ${s.liked ? Icons.heartFull : Icons.heartEmpty}
+              </a>
+              <span
+                class="count ${s.showLikes ? 'active' : ''}"
+                onClick=${(e) => this.toggleLikes(e)}
+              >
+                ${s.likes || ''}
               </span>
             </div>
             ${s.showLikes
