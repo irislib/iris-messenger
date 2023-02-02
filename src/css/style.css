@@ -1189,6 +1189,7 @@ a.msg {
 
 .public-messages-view .img-container img {
   height: 300px;
+  min-width: min(100%, 169px);
   width: auto;
   max-width: 100%;
   object-fit: cover;

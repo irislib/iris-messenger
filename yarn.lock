@@ -6062,6 +6062,10 @@ growly@^1.3.0:
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
   integrity sha512-+xGQY0YyAWCnqy7Cd++hc2JqMYzlm0dG30Jd0beaA64sROr8C4nt8Yc9V5Ro3avlSUDTN0ulqP/VBKi1/lLygw==
 
+"guesslanguage@https://github.com/mmalmi/guessLanguage.js":
+  version "0.4.0"
+  resolved "https://github.com/mmalmi/guessLanguage.js#dfd26b68cfd0f6c79a525e6e1280bdca620b5d46"
+
 gun@^0.2020.1238:
   version "0.2020.1239"
   resolved "https://registry.yarnpkg.com/gun/-/gun-0.2020.1239.tgz#5810563fa714ffb67122c15495d3308e13392105"
@@ -6071,9 +6075,9 @@ gun@^0.2020.1238:
   optionalDependencies:
     "@peculiar/webcrypto" "^1.1.1"
 
-"gun@git+https://github.com/mmalmi/gun.git":
+"gun@https://github.com/mmalmi/gun":
   version "0.2020.1238"
-  resolved "git+https://github.com/mmalmi/gun.git#759784f9ce96044e47a83176fa1392dea14aef2f"
+  resolved "https://github.com/mmalmi/gun#759784f9ce96044e47a83176fa1392dea14aef2f"
   dependencies:
     ws "^7.2.1"
   optionalDependencies:

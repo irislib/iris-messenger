@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet';
+import { guessLanguage } from 'guesslanguage';
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
 import $ from 'jquery';
@@ -148,6 +149,9 @@ class PublicMessage extends Message {
           });
         }
         msg.text = text.trim();
+        guessLanguage.detect(text, (languageGuess) => {
+          this.setState({ languageGuess });
+        });
       }
 
       this.setState({ msg });
@@ -327,7 +331,7 @@ class PublicMessage extends Message {
           <div style="display: flex; align-items: center">
             <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
             <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
-              <${Name} pub=${this.state.msg?.event?.pubkey} />
+              <${Name} pub=${this.state.msg?.event?.pubkey} />${' '}
             </a>
             <span> started following you</span>
           </div>
@@ -665,7 +669,9 @@ class PublicMessage extends Message {
               </div>`;
             })}
             ${text.length > 0
-              ? html`<div class="text ${emojiOnly && 'emoji-only'}">${text}</div> `
+              ? html`<div class="text ${emojiOnly && 'emoji-only'}">
+                      ${text}
+                    </div> `
               : ''}
             ${!this.props.standalone &&
             ((s.msg.attachments && s.msg.attachments.length > 1) ||
