@@ -449,7 +449,7 @@ export default {
       _this.subscribe([{ authors: Array.from(_this.subscribedProfiles.values()), kinds: [0] }]);
     }
     setTimeout(() => {
-      _this.subscribe([{ authors: followedUsers, limit: 500, until: now }]);
+      _this.subscribe([{ authors: followedUsers, limit: 500, until: now }], undefined, false);
     }, 1000);
   }, 1000),
   subscribeToPosts: debounce((_this) => {
@@ -561,7 +561,11 @@ export default {
     this.subscriptionsByName.delete(id);
     this.subscribedFiltersByName.delete(id);
   },
-  subscribe: function (filters: Filter[], cb?: (event: Event) => void) {
+  subscribe: function (
+    filters: Filter[],
+    cb?: (event: Event) => void,
+    unsubscribeOnEose?: boolean,
+  ) {
     cb &&
       this.subscriptions.set(subscriptionId++, {
         filters,
@@ -603,7 +607,12 @@ export default {
       cb && cb(event);
     };
     const enabledRelays = Object.keys(this.relays).filter((r) => this.relays[r].enabled);
-    this.relayPool.subscribe(filters, enabledRelays, myCallback, 100);
+    if (unsubscribeOnEose === undefined) {
+      unsubscribeOnEose = true;
+    }
+    this.relayPool.subscribe(filters, enabledRelays, myCallback, 100, undefined, {
+      unsubscribeOnEose,
+    });
   },
   SUGGESTED_FOLLOWS: [
     'npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9', // snowden
@@ -1133,7 +1142,11 @@ export default {
       .get('loggedIn')
       .on(() => {
         const key = iris.session.getKey();
-        const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
+        const subscribe = (
+          filters: Filter[],
+          callback: (event: Event) => void,
+          unsubscribeOnEose?: boolean,
+        ): string => {
           const filter = filters[0];
           const key = filter['#d']?.[0];
           if (key) {
@@ -1142,7 +1155,7 @@ export default {
               callback(event);
             }
           }
-          this.subscribe(filters, callback);
+          this.subscribe(filters, callback, unsubscribeOnEose);
           return '0';
         };
         this.private = new Path(
@@ -1189,8 +1202,8 @@ export default {
         }
         this.subscribe([{ kinds: [0, 1, 3, 6, 7], limit: 200 }]); // everything new
         setTimeout(() => {
-          this.subscribe([{ authors: [key.secp256k1.rpub] }]); // our stuff
-          this.subscribe([{ '#p': [key.secp256k1.rpub] }]); // notifications and DMs
+          this.subscribe([{ authors: [key.secp256k1.rpub] }], undefined, false); // our stuff
+          this.subscribe([{ '#p': [key.secp256k1.rpub] }], undefined, false); // notifications and DMs
         }, 200);
 
         setInterval(() => {
