@@ -1188,14 +1188,21 @@ a.msg {
 }
 
 .public-messages-view .img-container img {
-  max-height: 60vh;
+  height: 300px;
+  width: auto;
+  max-width: 100%;
+  object-fit: cover;
   border-radius: 15px;
   border: 1px solid var(--main-color);
+  overflow: hidden;
 }
 
 .public-messages-view .img-container {
   margin-bottom: 10px;
   margin-top: 15px;
+  height: 300px;
+  width: 100%;
+  text-align: center;
 }
 
 .public-messages-view .msg {
