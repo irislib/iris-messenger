@@ -19,6 +19,7 @@ export default class Notifications extends View {
   }, 1000);
 
   componentDidMount() {
+    this.restoreScrollPosition();
     Nostr.getNotifications((notifications) => {
       const hasNotifications = notifications.length > 0;
       if (hasNotifications && this.ref.current) {

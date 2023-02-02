@@ -30,6 +30,7 @@ class Feed extends View {
   }
 
   componentDidMount() {
+    this.restoreScrollPosition();
     this.search();
     iris.local().get('filters').get('group').on(this.inject());
   }
