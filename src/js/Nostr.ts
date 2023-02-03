@@ -13,6 +13,7 @@ import {
   Sub,
 } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
+import { sha256 } from '@noble/hashes/sha256';
 import localForage from 'localforage';
 
 import SortedLimitedEventSet from './SortedLimitedEventSet';
@@ -267,12 +268,16 @@ export default {
       });
     }
   },
+  getSubscriptionIdForName(name: string) {
+    return this.arrayToHex(sha256(name)).slice(0, 8);
+  },
   addRelay(url: string) {
     if (this.relays.has(url)) return;
     const relay = relayInit(url, (id) => this.eventsById.has(id));
     relay.on('connect', () => {
       for (const [name, filters] of this.subscribedFiltersByName.entries()) {
-        const sub = relay.sub(filters, {});
+        const id = this.getSubscriptionIdForName(name);
+        const sub = relay.sub(filters, { id });
         if (!this.subscriptionsByName.has(name)) {
           this.subscriptionsByName.set(name, new Set());
         }
@@ -473,7 +478,8 @@ export default {
     }
 
     for (const relay of (id == 'keywords' ? this.searchRelays : this.relays).values()) {
-      const sub = relay.sub(filters, {});
+      const subId = this.getSubscriptionIdForName(id);
+      const sub = relay.sub(filters, { id: subId });
       // TODO update relay lastSeen
       sub.on('event', (event) => this.handleEvent(event));
       if (once) {

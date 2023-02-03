@@ -674,10 +674,7 @@ class PublicMessage extends Message {
             })}
             ${text.length > 0
               ? html`<div class="text ${emojiOnly && 'emoji-only'}">
-                  ${text}
-                  ${s.translatedText
-                    ? html`<p><i>${s.translatedText}</i></p>`
-                    : ''}
+                  ${text} ${s.translatedText ? html`<p><i>${s.translatedText}</i></p>` : ''}
                 </div> `
               : ''}
             ${!this.props.standalone &&
