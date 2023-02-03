@@ -18,6 +18,8 @@ import localForage from 'localforage';
 
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 
+const startTime = Date.now() / 1000;
+
 declare global {
   interface Window {
     nostr: any;
@@ -813,7 +815,11 @@ export default {
         .map((tag) => tag[1])
         .slice(0, 2);
       for (const id of repliedMsgs) {
-        if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+        if (
+          event.created_at > startTime ||
+          event.pubkey === myPub ||
+          this.followedByUser.get(myPub)?.has(event.pubkey)
+        ) {
           this.getMessageById(id);
         }
         if (!this.threadRepliesByMessageId.has(id)) {
