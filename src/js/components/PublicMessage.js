@@ -273,22 +273,7 @@ class PublicMessage extends Message {
 
   imageClicked(event) {
     event.preventDefault();
-    if (window.innerWidth <= 625) {
-      clearTimeout(this.dblTimeout);
-      if (this.dbl) {
-        this.dbl = false;
-        this.like(); // like on double click
-        $(event.target).parent().addClass('like-animate');
-        setTimeout(() => $(event.target).parent().removeClass('like-animate'), 1000);
-      } else {
-        this.dbl = true;
-        this.dblTimeout = setTimeout(() => {
-          this.dbl = false;
-        }, 300);
-      }
-    } else {
-      this.openAttachmentsGallery(event);
-    }
+    this.openAttachmentsGallery(event);
   }
 
   messageClicked(event) {
