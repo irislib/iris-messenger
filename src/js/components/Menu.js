@@ -18,8 +18,15 @@ const APPLICATIONS = [
 ];
 
 export default class Menu extends Component {
+  state = {
+    unseenMsgsTotal: 0,
+    activeRoute: '',
+    showBetaFeatures: false,
+  };
+
   componentDidMount() {
     iris.local().get('unseenMsgsTotal').on(this.inject());
+    iris.local().get('activeRoute').on(this.inject());
   }
 
   menuLinkClicked() {
@@ -41,9 +48,14 @@ export default class Menu extends Component {
             `}
         ${APPLICATIONS.map((a) => {
           if (a.url && (!a.beta || this.state.showBetaFeatures)) {
-            return html` <${a.native ? 'a' : Link}
+            let isActive = this.state.activeRoute.startsWith(a.url.slice(1));
+            if (a.url === '/') {
+              isActive = this.state.activeRoute.length <= 1;
+            }
+            return html` <a
               onClick=${() => this.menuLinkClicked()}
               activeClassName="active"
+              class=${isActive ? 'active' : ''}
               href=${a.url}
             >
               <span class="icon">
