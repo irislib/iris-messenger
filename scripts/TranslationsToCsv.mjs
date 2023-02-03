@@ -1,29 +1,35 @@
 import fs from 'fs';
-
+import glob from 'glob';
 import { AVAILABLE_LANGUAGE_KEYS } from '../src/js/translations/Translation.mjs';
-
-// Create a csv file where each row is a translation key and the column is the translation in different languages.
-// The file is created in the current working directory.
-// The file name is "translations.csv".
 
 async function translationsToCsv() {
   let csv = '';
   let languages = [];
-  let translationKeys = [];
+  let translationKeys = new Set();
   let translations = {};
 
   for (let lang of AVAILABLE_LANGUAGE_KEYS) {
     const translation = (await import(`../src/js/translations/${lang}.mjs`)).default;
     translations[lang] = translation;
     languages.push(lang);
-    for (let key in translation) {
-      if (translationKeys.indexOf(key) === -1) {
-        translationKeys.push(key);
-      }
-    }
   }
 
+  // Collect used translation keys from code
+  const files = glob.sync('../src/js/**/*.{js,jsx,ts,tsx}', { ignore: '../src/js/lib/**/*' });
+  files.forEach((file) => {
+    const content = fs.readFileSync(file, 'utf8');
+    const matches = content.match(/(^|[^a-zA-Z])t\(['"`]([^'"`]+)['"`]\)/g);
+    if (matches) {
+      matches.forEach((match) => {
+        const key = match.match(/(^|[^a-zA-Z])t\(['"`]([^'"`]+)['"`]\)/)[2];
+        translationKeys.add(key);
+      });
+    }
+  });
+  console.log('found', translationKeys.size, 'translation keys from', files.length, 'files');
+
   languages.sort();
+  translationKeys = Array.from(translationKeys);
   translationKeys.sort();
 
   // add language names to csv
@@ -52,24 +58,6 @@ async function translationsToCsv() {
   // output csv to file
   fs.writeFileSync('translations.csv', csv);
   console.log('wrote translations.csv');
-}
-
-// convert the csv back to Translations.mjs in the same format as the original Translations.mjs file
-function csvToTranslations() {
-  // TODO: work in progress
-  let csv = fs.readFileSync('translations.csv', 'utf8');
-  let lines = csv.split('\n');
-  let translations = {};
-  let languages = lines[0].split(',');
-  languages.shift();
-  for (let i = 1; i < lines.length; i++) {
-    let line = lines[i].split(',');
-    let key = line[0];
-    line.shift();
-    for (let j = 0; j < languages.length; j++) {
-      translations[key][languages[j]] = line[j] || null;
-    }
-  }
 }
 
 translationsToCsv();

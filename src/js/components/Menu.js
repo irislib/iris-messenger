@@ -1,6 +1,5 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
-import { Link } from 'preact-router/match';
 
 import logo from '../../assets/img/icon128.png';
 import Component from '../BaseComponent';

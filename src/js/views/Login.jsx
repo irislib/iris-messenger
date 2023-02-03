@@ -204,7 +204,7 @@ class Login extends Component {
                     id="show-existing-account-login"
                     onClick={() => this.setState({ showSwitchAccount: true })}
                   >
-                    {t('Private key login')}
+                    {t('private_key_login')}
                   </a>
                 </p>
                 <p>

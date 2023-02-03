@@ -44,7 +44,7 @@ class QRView extends Component {
   render() {
     return (
       <>
-        <h2>{t('Show_or_scan_QR_code')}</h2>
+        <h2>{t('show_or_scan_QR_code')}</h2>
         <Button id="scan-chatlink-qr-btn" onClick={() => this.scanChatLinkQr()}>
           {t('scan_qr_code')}
         </Button>

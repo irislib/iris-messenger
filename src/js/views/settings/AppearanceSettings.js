@@ -13,7 +13,7 @@ export default class AppearanceSettings extends Component {
     return (
       <>
         <div class="centered-container">
-          <h3>{t('Appearance')}</h3>
+          <h3>{t('appearance')}</h3>
           <p>
             <label for="colorScheme">{t('color_scheme')}</label>
             <select
