@@ -426,7 +426,7 @@ class PublicMessage extends Message {
                 userNameOnly=${true}
               />
             </a>
-            <span style="margin-left: 5px"> reposted </span>
+            <span style="margin-left: 5px"> ${t('reposted')} </span>
           </div>
           <${PublicMessage} hash=${id} showName=${true} />
         </div>
@@ -573,7 +573,7 @@ class PublicMessage extends Message {
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           ${this.props.asQuote && s.msg.replyingTo
             ? html` <div style="flex-basis:100%; margin-bottom: 12px">
-                <a href="#/post/${Nostr.toNostrBech32Address(rootMsg, 'note')}">Show thread</a>
+                <a href="#/post/${Nostr.toNostrBech32Address(rootMsg, 'note')}">${t('show_thread')}</a>
               </div>`
             : ''}
           <div class="msg-identicon">

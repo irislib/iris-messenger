@@ -104,7 +104,7 @@ class ProfilePicturePicker extends Component {
           />
         </p>
         <p id="profile-picture-error" class="${this.state.hasError ? '' : 'hidden'}">
-          ${t('profile_picture_too_big')}
+          profile picture error
         </p>
         <p class=${this.state.preview ? '' : 'hidden'}>
           <${Button} id="cancel-profile-picture" onClick=${() => this.cancelProfilePictureClicked()}

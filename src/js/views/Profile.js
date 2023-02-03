@@ -174,14 +174,6 @@ class Profile extends View {
               </div>
               ${Nostr.followedByUser.get(hexPubKey)?.has(iris.session.getKey().secp256k1.rpub)
                 ? html` <p><small>${t('follows_you')}</small></p> `
-                : this.props.id === SMS_VERIFIER_PUB
-                ? html`
-                    <p>
-                      <a href="https://iris-sms-auth.herokuapp.com/?pub=${iris.session.getPubKey()}"
-                        >${t('ask_for_verification')}</a
-                      >
-                    </p>
-                  `
                 : ''}
               <div class="hidden-xs">
                 ${!this.state.isMyProfile
