@@ -123,7 +123,7 @@ export default {
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  maxRelays: iris.util.isMobile ? 5 : 10,
+  maxRelays: 10,
   relays: defaultRelays,
   searchRelays: searchRelays,
   knownUsers: new Set<string>(),
