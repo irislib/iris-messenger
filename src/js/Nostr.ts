@@ -808,13 +808,8 @@ export default {
         .filter((tag) => tag[0] === 'e')
         .map((tag) => tag[1])
         .slice(0, 2);
-      const myPub = iris.session.getKey().secp256k1.rpub;
-      const isFollowed =
-        event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey);
       for (const id of repliedMsgs) {
-        if (isFollowed) {
-          //this.getMessageById(id);
-        }
+        this.getMessageById(id);
         if (!this.threadRepliesByMessageId.has(id)) {
           this.threadRepliesByMessageId.set(id, new Set<string>());
         }
