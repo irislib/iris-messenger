@@ -161,7 +161,7 @@ const NostrSettings = () => {
         </div>
         <div>
           <Button onClick={() => Nostr.saveRelaysToContacts()}>{t('save_relays_publicly')}</Button>
-          <Button onClick={() => Nostr.restoreDefaultRelays()}>{t('restore_default_relays')}</Button>
+          <Button onClick={() => Nostr.restoreDefaultRelays()}>{t('restore_defaults')}</Button>
         </div>
       </div>
     </div>

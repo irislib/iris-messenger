@@ -19,17 +19,21 @@ class About extends Component {
               <a href="https://github.com/nostr-protocol/nostr">Nostr</a> this week.
             </p>
             <h3>{t('about')}</h3>
-            <p>{t('iris_is_like')}</p>
+            <p>Iris is like the social networking apps we're used to</p>
             <ul>
-              <li dangerouslySetInnerHTML={{ __html: t('iris_is_accessible') }} />
-              <li dangerouslySetInnerHTML={{ __html: t('iris_is_secure') }} />
-              <li
-                dangerouslySetInnerHTML={{
-                  __html: t('iris_is_always_available'),
-                }}
-              />
+              <li>
+                <b>Accessible.</b> No phone number or signup required. Just type in your name or
+                alias and go!
+              </li>
+              <li>
+                <b>Secure.</b> It's open source. You can verify that your data stays safe.
+              </li>
+              <li>
+                <b>Always available.</b> It works offline-first and is not dependent on any single
+                centrally managed server. Users can even connect directly to each other.
+              </li>
             </ul>
-            <p> {t('in_other_words')} </p>
+            <p>In other words, you can't be deplatformed from Iris.</p>
 
             <p>
               Released under MIT license. Code:{' '}

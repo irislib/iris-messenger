@@ -20,7 +20,7 @@ export default class WebtorrentSettings extends Component {
     return (
       <>
         <div class="centered-container">
-          <h3>{t('webtorrent')}</h3>
+          <h3>Webtorrent</h3>
           <p>
             <input
               type="checkbox"

@@ -25,15 +25,6 @@ import { translate as t } from '../translations/Translation';
 
 import View from './View';
 
-function deleteChat(pub) {
-  if (confirm(`${t('delete_chat')}?`)) {
-    iris.Channel.deleteChannel(iris.session.getKey(), pub);
-    iris.session.channelIds.delete(pub);
-    iris.local().get('channels').get(pub).put(null);
-    route(`/chat`);
-  }
-}
-
 class Profile extends View {
   constructor() {
     super();
@@ -45,10 +36,6 @@ class Profile extends View {
     this.followers = new Set();
     this.id = 'profile';
     this.qrRef = createRef();
-  }
-
-  onClickSettings() {
-    $('#chat-settings').toggle();
   }
 
   getNotification() {
@@ -69,54 +56,6 @@ class Profile extends View {
         </div>
       `;
     }
-  }
-
-  renderSettings() {
-    const chat = iris.private(this.props.id);
-
-    return html`
-      <div id="chat-settings" style="display:none">
-        <hr />
-        <h3>${t('chat_settings')}</h3>
-        <div class="profile-nicknames">
-          <h4>${t('nicknames')}</h4>
-          <p>
-            ${t('nickname')}:
-            <input
-              value=${chat && chat.theirNickname}
-              onInput=${(e) => chat && chat.put('nickname', e.target.value)}
-            />
-          </p>
-          <p>
-            ${t('their_nickname_for_you')}:
-            <span>
-              ${chat && chat.myNickname && chat.myNickname.length ? chat.myNickname : ''}
-            </span>
-          </p>
-        </div>
-        <div class="notification-settings">
-          <h4>${t('notifications')}</h4>
-          <input type="radio" id="notifyAll" name="notificationPreference" value="all" />
-          <label for="notifyAll">${t('all_messages')}</label><br />
-          <input
-            type="radio"
-            id="notifyMentionsOnly"
-            name="notificationPreference"
-            value="mentions"
-          />
-          <label for="notifyMentionsOnly">${t('mentions_only')}</label><br />
-          <input type="radio" id="notifyNothing" name="notificationPreference" value="nothing" />
-          <label for="notifyNothing">${t('nothing')}</label><br />
-        </div>
-        <hr />
-        <p>
-          <${Button} class="delete-chat" onClick=${() => deleteChat(this.props.id)}
-            >${t('delete_chat')}<//
-          >
-        </p>
-        <hr />
-      </div>
-    `;
   }
 
   renderLinks() {

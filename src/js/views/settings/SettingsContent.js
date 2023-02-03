@@ -6,7 +6,6 @@ import BetaSettings from './BetaSettings';
 import BlockedSettings from './BlockedSettings';
 import LanguageSettings from './LanguageSettings';
 import NostrSettings from './NostrSettings';
-import PeerSettings from './PeerSettings';
 import WebRTCSettings from './WebRTCSettings';
 import WebtorrentSettings from './WebtorrentSettings';
 
@@ -14,7 +13,6 @@ export default class SettingsContent extends Component {
   content = '';
   pages = {
     account: AccountSettings,
-    peer: PeerSettings,
     nostr: NostrSettings,
     appearance: AppearanceSettings,
     language: LanguageSettings,
