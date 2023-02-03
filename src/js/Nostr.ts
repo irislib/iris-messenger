@@ -1343,9 +1343,7 @@ export default {
       // when PWA returns to foreground after 5 min dormancy, resubscribe stuff
       // there might be some better way to manage resubscriptions
       if (document.visibilityState === 'visible') {
-        console.log('visibilitychange');
         if (Date.now() - lastResubscribed > 1000 * 60 * 5) {
-          console.log('visibilitychange resubscribe');
           for (const relay of this.relays.values()) {
             this.resubscribe(relay);
           }

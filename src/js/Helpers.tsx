@@ -51,7 +51,7 @@ export default {
       body: JSON.stringify({
         q: text,
         source: 'auto',
-        target: language,
+        target: language.split('-')[0],
         format: 'text',
       }),
       headers: { 'Content-Type': 'application/json' },
