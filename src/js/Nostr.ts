@@ -1,5 +1,5 @@
 import iris from 'iris-lib';
-import { debounce } from 'lodash';
+import { debounce, throttle } from 'lodash';
 
 import {
   Event,
@@ -541,11 +541,15 @@ export default {
       );
     }, 1000);
   }, 1000),
-  subscribeToPosts: debounce((_this) => {
-    if (_this.subscribedPosts.size === 0) return;
-    console.log('subscribe to posts', Array.from(_this.subscribedPosts));
-    _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
-  }, 100),
+  subscribeToPosts: throttle(
+    (_this) => {
+      if (_this.subscribedPosts.size === 0) return;
+      console.log('subscribe to', _this.subscribedPosts.size, 'posts');
+      _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
+    },
+    3000,
+    { leading: false },
+  ),
   subscribeToKeywords: debounce((_this) => {
     if (_this.subscribedKeywords.size === 0) return;
     console.log(
@@ -809,7 +813,9 @@ export default {
         .map((tag) => tag[1])
         .slice(0, 2);
       for (const id of repliedMsgs) {
-        //this.getMessageById(id);
+        if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+          this.getMessageById(id);
+        }
         if (!this.threadRepliesByMessageId.has(id)) {
           this.threadRepliesByMessageId.set(id, new Set<string>());
         }
