@@ -1012,7 +1012,7 @@ export default {
       case 16463:
         this.handleFlagList(event);
         break;
-      case 20000:
+      case 30000:
         this.handleKeyValue(event);
         break;
     }
