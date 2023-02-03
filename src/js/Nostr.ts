@@ -271,20 +271,20 @@ export default {
   getSubscriptionIdForName(name: string) {
     return this.arrayToHex(sha256(name)).slice(0, 8);
   },
+  resubscribe(relay: Relay) {
+    for (const [name, filters] of this.subscribedFiltersByName.entries()) {
+      const id = this.getSubscriptionIdForName(name);
+      const sub = relay.sub(filters, { id });
+      if (!this.subscriptionsByName.has(name)) {
+        this.subscriptionsByName.set(name, new Set());
+      }
+      this.subscriptionsByName.get(name)?.add(sub);
+    }
+  },
   addRelay(url: string) {
     if (this.relays.has(url)) return;
     const relay = relayInit(url, (id) => this.eventsById.has(id));
-    relay.on('connect', () => {
-      for (const [name, filters] of this.subscribedFiltersByName.entries()) {
-        const id = this.getSubscriptionIdForName(name);
-        const sub = relay.sub(filters, { id });
-        if (!this.subscriptionsByName.has(name)) {
-          this.subscriptionsByName.set(name, new Set());
-        }
-        this.subscriptionsByName.get(name)?.add(sub);
-        //console.log('subscriptions size', this.subscriptionsByName.size);
-      }
-    });
+    relay.on('connect', () => this.resubscribe(relay));
     relay.on('notice', (notice) => {
       console.log('notice from ', relay.url, notice);
     });
@@ -1242,7 +1242,7 @@ export default {
     await localForage.clear();
     iris.session.logOut();
   },
-  init: function () {
+  loadSettings() {
     iris
       .local()
       .get('maxRelays')
@@ -1264,76 +1264,97 @@ export default {
         this.maxRelays = val;
       }
     });
+  },
+  onLoggedIn() {
+    const key = iris.session.getKey();
+    const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
+      const filter = filters[0];
+      const key = filter['#d']?.[0];
+      if (key) {
+        const event = this.keyValueEvents.get(key);
+        if (event) {
+          callback(event);
+        }
+      }
+      this.subscribe(filters, callback);
+      return '0';
+    };
+    this.private = new Path(
+      (...args) => this.publish(...args),
+      subscribe,
+      (...args) => this.unsubscribe(...args),
+      (...args) => this.encrypt(...args),
+      (...args) => this.decrypt(...args),
+    );
+    this.public = new Path(
+      (...args) => this.publish(...args),
+      subscribe,
+      (...args) => this.unsubscribe(...args),
+    );
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    this.public.get({ path: 'notifications/lastOpened', authors: [myPub] }, (time) => {
+      time = time.value;
+      if (time !== this.notificationsSeenTime) {
+        this.notificationsSeenTime = time;
+        localForage.setItem('notificationsSeenTime', time);
+        this.updateUnseenNotificationCount(this);
+      }
+    });
+    this.public.get({ path: 'settings/colorScheme', authors: [myPub] }, (colorScheme) => {
+      if (colorScheme.value === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        return;
+      } else if (colorScheme.value === 'default') {
+        if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          //OS theme setting detected as dark
+          document.documentElement.setAttribute('data-theme', 'light');
+          return;
+        }
+      }
+      document.documentElement.setAttribute('data-theme', 'dark');
+    });
+    this.knownUsers.add(key);
+    this.manageRelays();
+    this.loadLocalStorageEvents();
+    this.getProfile(key.secp256k1.rpub, undefined);
+    for (const suggestion of this.SUGGESTED_FOLLOWS) {
+      const hex = this.toNostrHexAddress(suggestion);
+      this.knownUsers.add(hex);
+      this.getProfile(this.toNostrHexAddress(hex), undefined);
+    }
+    this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
+    setTimeout(() => {
+      this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
+      this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
+    }, 200);
+    setInterval(() => {
+      console.log('handled msgs per second', Math.round(this.handledMsgsPerSecond / 5));
+      this.handledMsgsPerSecond = 0;
+    }, 5000);
+  },
+  init: function () {
+    this.loadSettings();
     iris
       .local()
       .get('loggedIn')
-      .on(() => {
-        const key = iris.session.getKey();
-        const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
-          const filter = filters[0];
-          const key = filter['#d']?.[0];
-          if (key) {
-            const event = this.keyValueEvents.get(key);
-            if (event) {
-              callback(event);
+      .on(() => this.onLoggedIn());
+    if (iris.util.isMobile) {
+      let lastResubscribed = Date.now();
+      document.addEventListener('visibilitychange', () => {
+        // when PWA returns to foreground after 5 min dormancy, resubscribe stuff
+        // there might be some better way to manage resubscriptions
+        if (document.visibilityState === 'visible') {
+          console.log('visibilitychange');
+          if (Date.now() - lastResubscribed > 1000 * 60 * 5) {
+            console.log('visibilitychange resubscribe');
+            for (const relay of this.relays.values()) {
+              this.resubscribe(relay);
             }
+            lastResubscribed = Date.now();
           }
-          this.subscribe(filters, callback);
-          return '0';
-        };
-        this.private = new Path(
-          (...args) => this.publish(...args),
-          subscribe,
-          (...args) => this.unsubscribe(...args),
-          (...args) => this.encrypt(...args),
-          (...args) => this.decrypt(...args),
-        );
-        this.public = new Path(
-          (...args) => this.publish(...args),
-          subscribe,
-          (...args) => this.unsubscribe(...args),
-        );
-        const myPub = iris.session.getKey().secp256k1.rpub;
-        this.public.get({ path: 'notifications/lastOpened', authors: [myPub] }, (time) => {
-          time = time.value;
-          if (time !== this.notificationsSeenTime) {
-            this.notificationsSeenTime = time;
-            localForage.setItem('notificationsSeenTime', time);
-            this.updateUnseenNotificationCount(this);
-          }
-        });
-        this.public.get({ path: 'settings/colorScheme', authors: [myPub] }, (colorScheme) => {
-          if (colorScheme.value === 'light') {
-            document.documentElement.setAttribute('data-theme', 'light');
-            return;
-          } else if (colorScheme.value === 'default') {
-            if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-              //OS theme setting detected as dark
-              document.documentElement.setAttribute('data-theme', 'light');
-              return;
-            }
-          }
-          document.documentElement.setAttribute('data-theme', 'dark');
-        });
-        this.knownUsers.add(key);
-        this.manageRelays();
-        this.loadLocalStorageEvents();
-        this.getProfile(key.secp256k1.rpub, undefined);
-        for (const suggestion of this.SUGGESTED_FOLLOWS) {
-          const hex = this.toNostrHexAddress(suggestion);
-          this.knownUsers.add(hex);
-          this.getProfile(this.toNostrHexAddress(hex), undefined);
         }
-        this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
-        setTimeout(() => {
-          this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
-          this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
-        }, 200);
-        setInterval(() => {
-          console.log('handled msgs per second', Math.round(this.handledMsgsPerSecond / 5));
-          this.handledMsgsPerSecond = 0;
-        }, 5000);
       });
+    }
   },
   getRepliesAndLikes(
     id: string,
