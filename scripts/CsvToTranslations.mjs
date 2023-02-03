@@ -20,9 +20,7 @@ for (let i = 1; i < lines.length; i++) {
     if (!translations[languages[j]]) {
       translations[languages[j]] = {};
     }
-    if (!line[j]) {
-      translations[languages[j]][key] = null;
-    } else {
+    if (line[j]) {
       translations[languages[j]][key] = line[j].replace(/"/g, '') || null;
     }
   }
