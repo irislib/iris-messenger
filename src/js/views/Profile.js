@@ -20,7 +20,6 @@ import ProfilePicture from '../components/ProfilePicture';
 import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
 import Nostr from '../Nostr';
-import { SMS_VERIFIER_PUB } from '../SMS';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
