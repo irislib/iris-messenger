@@ -1583,6 +1583,10 @@ a.msgSenderName:hover .user-name {
   margin-bottom: 12px;
 }
 
+.msg.standalone.quote.quoting {
+  margin-bottom: 4px;
+}
+
 .btn,
 .msg-btn {
   user-select: none;
