@@ -208,7 +208,6 @@ class Profile extends View {
           : ''}
 
         <p ref=${this.qrRef} style="display:none" class="qr-container"></p>
-        ${this.renderSettings()}
       </div>
     `;
   }
