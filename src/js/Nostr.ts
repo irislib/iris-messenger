@@ -665,6 +665,7 @@ export default {
       const isFollowed =
         event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey);
       for (const id of repliedMsgs) {
+        this.getMessageById(id);
         if (isFollowed) {
           //this.getMessageById(id);
         }
