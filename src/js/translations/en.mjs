@@ -51,6 +51,7 @@ export default {
   "no_contacts_in_list": "No contacts in list",
   "no_followers_yet": "Share your profile link so others can follow you:",
   "no_notifications_yet": "No notifications yet",
+  "no_followers_yet_info": "Your posts, replies and likes are only shown to your followers and their network.",
   "none": "None",
   "note_to_self": "Note to Self",
   "nothing": "Nothing",

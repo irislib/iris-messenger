@@ -47,7 +47,9 @@ async function translationsToCsv() {
   for (let key of translationKeys) {
     let row = key;
     for (let lang of languages) {
-      row += '","' + (translations[lang][key] || '').replace(/"/g, '""');
+      row += '","' + (translations[lang][key] || '')
+        .replace(/"/g, '""')
+        .replace(/,/g, '\\,');
     }
     csv += row + '"\n';
     if (key !== translationKeys[translationKeys.length - 1]) {
