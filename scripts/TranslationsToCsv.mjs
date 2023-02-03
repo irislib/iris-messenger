@@ -6,8 +6,6 @@ import { AVAILABLE_LANGUAGE_KEYS } from '../src/js/translations/Translation.mjs'
 // The file is created in the current working directory.
 // The file name is "translations.csv".
 
-// TODO: read translations from .mjs files in ../src/js/translations/
-
 async function translationsToCsv() {
   let csv = '';
   let languages = [];

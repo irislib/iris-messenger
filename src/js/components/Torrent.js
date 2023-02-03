@@ -7,7 +7,7 @@ import { createRef } from 'preact';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
-import { translate as tr } from '../translations/Translation';
+import { translate as t } from '../translations/Translation';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4)) !== -1;
 const isVideo = (f) => isOfType(f, ['webm', '.mp4', '.ogg']);
@@ -224,7 +224,7 @@ class Torrent extends Component {
 
   renderLoadingTorrent() {
     const s = this.state;
-    const t = s.torrent;
+    const to = s.torrent;
     const p = s.player;
     const playing = p && p.torrentId === this.props.torrentId && !p.paused;
     let playButton = '';
@@ -257,22 +257,22 @@ class Torrent extends Component {
       ${this.props.standalone || this.props.preview
         ? html`
             <a href=${this.props.torrentId}>Magnet link</a>
-            ${t && t.files
+            ${to && to.files
               ? html`
                   <a href="" style="margin-left:30px;" onClick=${(e) => this.showFilesClicked(e)}
-                    >${tr(s.showFiles ? 'hide_files' : 'show_files')}</a
+                    >${t(s.showFiles ? 'hide_files' : 'show_files')}</a
                   >
                 `
               : ''}
           `
         : html`
-            <a href="#/torrent/${encodeURIComponent(this.props.torrentId)}">${tr('show_files')}</a>
+            <a href="#/torrent/${encodeURIComponent(this.props.torrentId)}">${t('show_files')}</a>
           `}
-      ${s.showFiles && t && t.files
+      ${s.showFiles && to && to.files
         ? html`
-            <p>${tr('peers')}: ${t.numPeers}</p>
+            <p>${t('peers')}: ${to.numPeers}</p>
             <div class="flex-table details">
-              ${t.files.map(
+              ${to.files.map(
                 (f) => html`
                   <div
                     onClick=${() => this.openFile(f, true)}
@@ -317,7 +317,7 @@ class Torrent extends Component {
         !this.state.settings.torrenting &&
         !this.props.standalone
           ? html`
-              <a href="" onClick=${(e) => this.openTorrentClicked(e)}>${tr('show_attachment')}</a>
+              <a href="" onClick=${(e) => this.openTorrentClicked(e)}>${t('show_attachment')}</a>
             `
           : this.renderLoadingTorrent()}
       </div>
