@@ -60,7 +60,7 @@ class Feed extends View {
                   />
                 `}
             ${s.searchTerm
-              ? html`<h2>Search results for "${s.searchTerm}"</h2>`
+              ? html`<h2>${t('search')}: "${s.searchTerm}"</h2>`
               : this.props.index !== 'everyone'
               ? html` <${OnboardingNotification} /> `
               : ''}
