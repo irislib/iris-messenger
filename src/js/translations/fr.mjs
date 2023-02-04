@@ -38,6 +38,7 @@ export default {
   "last_active": "dernière activité",
   "log_out": "Se déconnecter",
   "logout_confirmation_info": "Vous <b>ne pouvez pas vous réauthentifier</b> sauf si vous avez une copie de votre clé privée.",
+  "looking_up_message": "Recherche de message...",
   "mentions_only": "Mentions seulement",
   "new_chat": "Nouveau chat",
   "new_group": "Nouveau groupe",

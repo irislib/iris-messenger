@@ -59,6 +59,7 @@ export default {
   "likes": "Líbí se mi",
   "log_out": "Odhlásit se",
   "logout_confirmation_info": "Už se <b>nebude možné přihlásit</b>, pokud si neuložíš  kopii soukromého klíče.",
+  "looking_up_message": "Prohledávám zprávu",
   "maximum_number_of_peer_connections": "Maximální počet spojení",
   "messages": "Zprávy",
   "mentions_only": "Pouze zmínky",

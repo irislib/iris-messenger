@@ -60,6 +60,7 @@ export default {
   "likes": "点赞",
   "log_out": "登出",
   "logout_confirmation_info": "除非你已经保存了私钥备份，否则你</b>将无法再次登录</b>",
+  "looking_up_message": "查找消息",
   "maximum_number_of_peer_connections": "最大节点连接数量",
   "messages": "消息",
   "mentions_only": "只提到",

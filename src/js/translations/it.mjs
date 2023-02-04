@@ -44,6 +44,7 @@ export default {
   "last_active": "ultimo attivo",
   "likes": "piace",
   "log_out": "Scollegati",
+  "looking_up_message": "Ricerca messaggio...",
   "messages": "messaggi",
   "mentions_only": "Solo menzioni",
   "new_chat": "Nuova chat",

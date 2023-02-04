@@ -60,6 +60,7 @@ export default {
   "likes": "좋아요 누른 글",
   "log_out": "로그 아웃",
   "logout_confirmation_info": "로그아웃 확인 정보",
+  "looking_up_message": "메시지 검색",
   "maximum_number_of_peer_connections": "최대 피어 연결 수",
   "messages": "쪽지",
   "mentions_only": "멘션만",

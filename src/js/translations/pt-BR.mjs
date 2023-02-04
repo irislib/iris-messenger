@@ -55,6 +55,7 @@ export default {
   "likes": "gostei",
   "log_out": "Sair",
   "logout_confirmation_info": "Você <b>não pode logar novamente</b> ao menos que você tenha salvado uma cópia da sua chave primária.",
+  "looking_up_message": "Procurando mensagem...",
   "maximum_number_of_peer_connections": "número máximo de conexão de pares",
   "messages": "mensagens",
   "mentions_only": "Somente menções",

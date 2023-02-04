@@ -36,6 +36,7 @@ export default {
   "language": "زبان",
   "last_active": "لاسٹ ایکٹیو",
   "log_out": "بند کریں",
+  "looking_up_message": "پیغام تلاش کر رہا ہے",
   "mentions_only": "صرف مینش",
   "new_chat": "نیا پیغام",
   "new_group": "نیا گروپ",

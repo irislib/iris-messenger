@@ -58,6 +58,7 @@ export default {
   "likes": "Me gusta",
   "log_out": "Cerrar sesión",
   "logout_confirmation_info": "<b> no puede iniciar sesión de nuevo </b> a menos que haya guardado una copia de su clave privada.",
+  "looking_up_message": "Buscar mensaje...",
   "maximum_number_of_peer_connections": "Número máximo de conexiones a compañeros",
   "messages": "Mensajes",
   "mentions_only": "Sólo menciones",

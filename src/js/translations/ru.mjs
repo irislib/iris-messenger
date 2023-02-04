@@ -60,6 +60,7 @@ export default {
   "likes": "Мне нравится",
   "log_out": "Выйти",
   "logout_confirmation_info": "Вы <b>не сможете заново войти</b> пока не скопируете приватный ключ.",
+  "looking_up_message": "Ищу сообщение...",
   "maximum_number_of_peer_connections": "Максимальное количество одноранговых соединений",
   "messages": "Сообщения",
   "mentions_only": "Только упоминания меня",

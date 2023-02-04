@@ -35,6 +35,7 @@ export default {
   "light": "בהיר",
   "log_out": "התנתק",
   "logout_confirmation_info": "-b",
+  "looking_up_message": "מחפש הודעה",
   "messages": "מסרים",
   "new_chat": "צ'אט חדש",
   "new_group": "קבוצה חדשה",

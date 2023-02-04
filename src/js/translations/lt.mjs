@@ -58,6 +58,7 @@ export default {
   "likes": "mėgsta",
   "log_out": "atsijungti",
   "logout_confirmation_info": "atsijungimo patvirtinimo informacija",
+  "looking_up_message": "ieškoma žinutės...",
   "maximum_number_of_peer_connections": "maksimalus bendrų ryšių skaičius",
   "messages": "žinutės",
   "mentions_only": "tik paminėjimai",

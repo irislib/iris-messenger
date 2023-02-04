@@ -49,6 +49,7 @@ export default {
   "likes": "харесвания",
   "log_out": "излез",
   "logout_confirmation_info": "потвърждение за изход",
+  "looking_up_message": "търсене на съобщение...",
   "maximum_number_of_peer_connections": "максимален брой връстници",
   "messages": "съобщения",
   "mentions_only": "само споменавания",

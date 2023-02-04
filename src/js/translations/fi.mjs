@@ -60,7 +60,7 @@ export default {
   "likes": "Tykkäykset",
   "log_out": "Kirjaudu ulos",
   "logout_confirmation_info": "<b>Et voi kirjautua takaisin sisään</b> ellet ole tallentanut varmuuskopiota salaisesta avaimestasi.",
-  "looking_up_message": "Haetaan viestiä...",
+  "looking_up_message": "Etsitään viestiä...",
   "maximum_number_of_peer_connections": "Maksimimäärä yhteyspisteitä",
   "messages": "Viestit",
   "mentions_only": "Vain maininnat",

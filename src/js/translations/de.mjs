@@ -60,6 +60,7 @@ export default {
   "likes": "Gefällt mir",
   "log_out": "Abmelden",
   "logout_confirmation_info": "Du kannst <b>nicht wieder einloggen</b>, wenn du keine Kopie deines privaten Schlüssels gespeichert hast.",
+  "looking_up_message": "Suche nach Nachrichten...",
   "maximum_number_of_peer_connections": "Maximale Anzahl an Peer-Verbindungen",
   "messages": "Nachrichten",
   "mentions_only": "Nur Erwähnungen",
