@@ -11,7 +11,7 @@ const APPLICATIONS = [
   // TODO: move editable shortcuts to localState gun
   { url: '/', text: 'following', icon: Icons.home },
   { url: '#/chat', text: 'messages', icon: Icons.chat },
-  { url: '#/global', text: 'global', icon: Icons.global },
+  { url: '#/global', text: 'global_feed', icon: Icons.global },
   { url: '#/settings', text: 'settings', icon: Icons.settings },
   { url: '#/about', text: 'about', icon: Icons.info },
 ];
