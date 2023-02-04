@@ -32,6 +32,7 @@ export default {
   "disable": "Disable",
   "dm_privacy_warning": "Nostr private messages are encrypted, but everyone can see who you're chatting with",
   "donate": "Donate",
+  "donate_info": "<b>Donations</b> help keep the project going and are very much appreciated. You can donate via <a>Open Collective</a> or <b>bitcoin</b>",
   "edit_profile": "Edit Profile",
   "enable": "Enable",
   "enable_public_peer_discovery": "Enable public peer discovery",
