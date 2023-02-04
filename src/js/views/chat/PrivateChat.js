@@ -243,8 +243,7 @@ export default class PrivateChat extends Component {
           ${msgListContent}
           <p>
             <i
-              >Nostr private messages are encrypted, but everyone can see who you're chatting with
-              and when.</i
+              >${t('dm_privacy_warning')}</i
             >
           </p>
         </div>

@@ -250,7 +250,7 @@ class SearchBox extends Component<Props, State> {
               <div>
                 <span>{this.state.query}</span>
                 <br />
-                <small>Search posts</small>
+                <small>{t('search_posts')}</small>
               </div>
             </a>
           ) : (

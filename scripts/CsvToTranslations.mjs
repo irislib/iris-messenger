@@ -11,9 +11,12 @@ languages.shift();
 // Create an object to store the translations
 let translations = {};
 
+// Regular expression to handle commas within quoted strings
+const re = /(?!\B"[^"]*),(?![^"]*"\B)/;
+
 // Iterate through the csv lines and add the translations to the `translations` object
 for (let i = 1; i < lines.length; i++) {
-  let line = lines[i].split(',');
+  let line = lines[i].split(re);
   let key = line[0].replace(/"/g, '');
   line.shift();
   for (let j = 0; j < languages.length; j++) {
