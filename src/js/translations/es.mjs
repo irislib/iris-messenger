@@ -101,6 +101,7 @@ export default {
   "scan_private_key_qr_code": "Escanee el código QR de clave privada",
   "scan_qr_code": "Escanear código QR",
   "search": "Buscar",
+  "search_posts": "Buscar publicación",
   "send_message": "Enviar mensaje",
   "set_up_your_own_peer": "Configura tu propio compañero",
   "settings": "Configuraciones",

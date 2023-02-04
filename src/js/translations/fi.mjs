@@ -4,6 +4,7 @@ export default {
   "add": "Lisää",
   "all_messages": "Kaikki viestit",
   "answer": "vastaa",
+  "appearance": "Ulkoasu",
   "autoplay_webtorrent_videos": "Käynnistä webtorrentin videot automaattisesti",
   "back": "Takaisin",
   "blocked_users": "Estetyt käyttäjät",
