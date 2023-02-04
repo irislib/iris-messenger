@@ -51,6 +51,7 @@ export default {
   "reposted": "פורסם שנית",
   "search": "חיפוש",
   "settings": "הגדרות",
+  "yesterday": "אתמול",
   "today": "היום",
   "translate": "תרגם",
   "video_call": "שיחת וידאו",

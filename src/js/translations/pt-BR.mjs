@@ -92,6 +92,7 @@ export default {
   "scan_private_key_qr_code": "Ler QR code da chave privada",
   "send_message": "Enviar mensagem",
   "settings": "Configurações",
+  "yesterday": "ontem",
   "today": "hoje",
   "turn_on_desktop_notifications": "Ativar notificações no desktop",
   "type_a_message": "Digite uma mensagem",

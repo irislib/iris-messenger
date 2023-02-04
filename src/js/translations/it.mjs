@@ -89,6 +89,7 @@ export default {
   "show_thread": "mostra discussione",
   "switch_account": "cambia account",
   "system_default": "sistema predefinito",
+  "yesterday": "ieri",
   "today": "oggi",
   "translate": "traduci",
   "turn_on_desktop_notifications": "Attiva le notifiche desktop",

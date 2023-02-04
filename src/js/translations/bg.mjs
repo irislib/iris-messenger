@@ -88,5 +88,6 @@ export default {
   "reposted": "споделено отново",
   "resend_to_relays": "препрати на релета",
   "restore_defaults": "възстанови пъроначални настройки",
-  "save_backup_of_privkey_first": "запази резервно копие на тайния ключ първо"
+  "save_backup_of_privkey_first": "запази резервно копие на тайния ключ първо",
+  "yesterday": "вчера"
 };

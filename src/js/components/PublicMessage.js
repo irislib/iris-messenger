@@ -462,7 +462,7 @@ class PublicMessage extends Message {
           : ''} ${asQuote ? 'quote' : ''}"
       >
         <div class="msg-content retrieving" style="display:flex;align-items:center">
-          <div class="text ${this.state.retrieving ? 'visible' : ''}">Looking up message...</div>
+          <div class="text ${this.state.retrieving ? 'visible' : ''}">${t('looking_up_message')}</div>
           <div>${this.renderDropdown()}</div>
         </div>
       </div>`;

@@ -114,6 +114,7 @@ export default {
   "show_thread": "rodyti temą",
   "switch_account": "perjungti profilį",
   "system_default": "sistemos nustatymai",
+  "yesterday": "vakar",
   "today": "šiandien",
   "translate": "išversti",
   "turn_on_desktop_notifications": "įjungti naršyklės nustatymus",

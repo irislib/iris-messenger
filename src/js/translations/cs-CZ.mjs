@@ -116,6 +116,7 @@ export default {
   "show_thread": "Zobrazit vlákno",
   "switch_account": "Změnit účet",
   "system_default": "Standardní nastavení",
+  "yesterday": "včera",
   "today": "Dnes",
   "translate": "Přeložit",
   "turn_on_desktop_notifications": "Zapnout desktop notifikace",

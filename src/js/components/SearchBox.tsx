@@ -261,11 +261,11 @@ class SearchBox extends Component<Props, State> {
             let followText = '';
             if (i.followers) {
               if (i.followDistance === 0) {
-                followText = 'You';
+                followText = t('you');
               } else if (i.followDistance === 1) {
-                followText = 'Following';
+                followText = t('following');
               } else {
-                followText = `${i.followers.size} followers`;
+                followText = `${i.followers.size} ${t('followers')}`;
               }
             }
             return (

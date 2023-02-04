@@ -118,6 +118,7 @@ export default {
   "show_thread": "Показать нить",
   "switch_account": "Переключить учетную запись",
   "system_default": "Система по умолчанию",
+  "yesterday": "вчера",
   "today": "сегодня",
   "translate": "Перевод",
   "turn_on_desktop_notifications": "Включить уведомления на рабочем столе",

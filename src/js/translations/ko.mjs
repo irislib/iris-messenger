@@ -116,6 +116,7 @@ export default {
   "show_qr_code": "QR코드 공유",
   "switch_account": "계정 전환",
   "system_default": "시스템 기본값",
+  "yesterday": "어제",
   "today": "오늘",
   "translate": "번역하기",
   "turn_on_desktop_notifications": "데스크탑 통보 시작",

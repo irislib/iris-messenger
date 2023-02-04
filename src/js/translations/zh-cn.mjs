@@ -118,6 +118,7 @@ export default {
   "show_thread": "展开主题",
   "switch_account": "切换账号",
   "system_default": "系统默认",
+  "yesterday": "昨天",
   "today": "今天",
   "translate": "翻译",
   "turn_on_desktop_notifications": "打开桌面消息提醒",

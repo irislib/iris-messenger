@@ -63,6 +63,7 @@ export default {
   "set_up_your_own_peer": "اپنا peer سیٹ اپ کریں",
   "settings": "مرمت",
   "show_qr_code": "QR کوڈ دیکھیں",
+  "yesterday": "کل",
   "today": "آج",
   "turn_on_desktop_notifications": "ڈیسک ٹاپ اطلاعات حاصل کریں",
   "type_a_message": "پیغام لکھیے",

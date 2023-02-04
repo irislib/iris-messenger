@@ -118,6 +118,7 @@ export default {
   "show_thread": "Thema anzeigen",
   "switch_account": "Konto wechseln",
   "system_default": "Standardeinstellungen",
+  "yesterday": "gestern",
   "today": "heute",
   "translate": "Übersetzen",
   "turn_on_desktop_notifications": "Desktop-Benachrichtigungen aktivieren",

@@ -66,6 +66,7 @@ export default {
   "settings": "Réglages",
   "show_qr_code": "Voir Code QR",
   "switch_account": "Changer de compte",
+  "yesterday": "hier",
   "today": "aujourd'hui",
   "turn_on_desktop_notifications": "Activer les notifications de bureau",
   "type_a_message": "Entrez un message",
