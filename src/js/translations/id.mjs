@@ -124,10 +124,10 @@ export default {
   "video_call": "Penggilan video",
   "visibility": "Postingan, balasan, dan yang Anda sukai hanya ditampilkan ke pengikut Anda dan jaringan mereka.",
   "webrtc_connection_options": "WebRTC connection options",
-  "whats_on_your_mind": "What's on your mind?",
-  "whats_your_name": "What's your name?",
-  "write_your_reply": "Write your reply",
-  "you": "You",
-  "your_public_address": "Your public address",
-  "your_qr_code": "Your QR code"
+  "whats_on_your_mind": "Apa yang sedang Anda pikirkan?",
+  "whats_your_name": "Siapa nama Anda?",
+  "write_your_reply": "Tulis balasan Anda",
+  "you": "Anda",
+  "your_public_address": "Alamat publik Anda",
+  "your_qr_code": "Kode QR Anda"
 };
