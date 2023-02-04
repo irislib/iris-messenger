@@ -161,6 +161,8 @@ export default {
   windowNostrQueue: [],
   isProcessingQueue: false,
   notificationsSeenTime: 0,
+  futureEventIds: new SortedLimitedEventSet(100, false),
+  futureEventTimeout: 0,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -1106,9 +1108,9 @@ export default {
       return false;
     }
   },
-  handleEvent(event: Event) {
+  handleEvent(event: Event, force = false) {
     if (!event) return;
-    if (this.eventsById.has(event.id)) {
+    if (this.eventsById.has(event.id) && !force) {
       return;
     }
     if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
@@ -1120,8 +1122,15 @@ export default {
     if (this.deletedEvents.has(event.id)) {
       return;
     }
-    if (event.created_at > Date.now() / 1000 + 60 * 1000) {
-      return; // TODO put future messages into bounded queue and process them later
+    if (event.created_at > Date.now() / 1000) {
+      this.futureEventIds.add(event);
+      if (this.futureEventIds.first() === event.id) {
+        if (this.futureEventIds.has(event.id)) { // TODO fix infinite loop somewhere
+          this.eventsById.set(event.id, event); // TODO should limit stored future events
+          this.handleNextFutureEvent();
+        }
+      }
+      return;
     }
 
     this.handledMsgsPerSecond++;
@@ -1192,6 +1201,22 @@ export default {
         sub.callback && sub.callback(event);
       }
     }
+  },
+  handleNextFutureEvent() {
+    if (this.futureEventIds.size === 0) {
+      return;
+    }
+    clearTimeout(this.futureEventTimeout);
+    const nextEventId = this.futureEventIds.first();
+    const nextEvent = this.eventsById.get(nextEventId);
+    if (!nextEvent) {
+      return;
+    }
+    this.futureEventTimeout = setTimeout(() => {
+      this.futureEventIds.delete(nextEvent.id);
+      this.handleEvent(nextEvent, true);
+      this.handleNextFutureEvent();
+    }, (nextEvent.created_at - Date.now() / 1000) * 1000);
   },
   // if one of the filters matches, return true
   matchesOneFilter(event: Event, filters: Filter[]) {

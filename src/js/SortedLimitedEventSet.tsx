@@ -4,11 +4,21 @@ export default class SortedLimitedEventSet {
   private events: { id: string; created_at: number }[];
   private eventIdSet: Set<string>;
   private maxSize: number;
+  private descending: boolean;
 
-  constructor(maxSize: number) {
+  constructor(maxSize: number, descending = true) {
     this.events = [];
     this.eventIdSet = new Set(); // so we can check if an event is already in the set in O(1) time
     this.maxSize = maxSize;
+    this.descending = descending;
+  }
+
+  get size(): number {
+    return this.events.length;
+  }
+
+  first(): string | undefined {
+    return this.events[0]?.id;
   }
 
   has(eventId: string): boolean {
@@ -38,7 +48,9 @@ export default class SortedLimitedEventSet {
 
     // Sort the events in descending order by created_at
     this.eventIdSet.add(event.id);
-    this.events.sort((a, b) => b.created_at - a.created_at);
+    this.events.sort((a, b) =>
+      this.descending ? b.created_at - a.created_at : a.created_at - b.created_at,
+    );
     return true;
   }
 
