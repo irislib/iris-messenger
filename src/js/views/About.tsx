@@ -74,14 +74,10 @@ class About extends Component {
             </p>
 
             <h4>{t('donate')}</h4>
-            <p
-              dangerouslySetInnerHTML={{
-                __html: `${t(
-                  'donate_info',
-                  'href="https://opencollective.com/iris-social"',
-                )}: bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze`,
-              }}
-            ></p>
+            <p>
+              {t('donate_info', { href: 'https://opencollective.com/iris-social' })}:
+              bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze
+            </p>
           </div>
         </div>
       </>

@@ -113,8 +113,7 @@ const NostrSettings = () => {
           </div>
         </div>
       </div>
-      {myPrivHex ? <p dangerouslySetInnerHTML={{ __html: t('private_key_warning') }}></p> : ''}
-
+      {myPrivHex ? <p>{t('private_key_warning')}</p> : ''}
       <h3>Relays</h3>
       <p>
         Max relays: <input

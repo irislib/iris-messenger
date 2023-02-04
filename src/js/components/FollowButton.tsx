@@ -22,9 +22,9 @@ class FollowButton extends Component<Props> {
     super();
     this.key = 'follow';
     this.actionDone = 'following';
-    this.action = t('follow');
-    this.activeClass = t('following');
-    this.hoverAction = t('unfollow');
+    this.action = t('follow_btn');
+    this.activeClass = t('following_btn');
+    this.hoverAction = t('unfollow_btn');
   }
 
   onClick(e) {

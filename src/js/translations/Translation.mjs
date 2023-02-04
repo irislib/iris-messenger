@@ -1,4 +1,5 @@
 import english from './en.mjs';
+import React from "react";
 
 const AVAILABLE_LANGUAGES = {
   en: 'English',
@@ -51,11 +52,29 @@ function capitalize(s) {
   if (typeof s !== 'string') return '';
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
-
 function translate(k, linkProps) {
-  return (
-    k && (translation[k] || capitalize(k.replace(/_/g, ' '))).replace('<a', `<a ${linkProps || ''}`)
-  );
+  const text = (k && (translation[k] || capitalize(k.replace(/_/g, ' '))));
+  const parts = text.split(/(<b>.*?<\/b>|<a>.*?<\/a>)/);
+  const components = [];
+
+  parts.forEach(part => {
+    if (part.startsWith("<b>")) {
+      components.push(React.createElement("b", { key: components.length }, part.slice(3, -4)));
+    } else if (part.startsWith("<a>")) {
+      components.push(
+        React.createElement(
+          "a",
+          { key: components.length, ...linkProps },
+          part.slice(3, -4)
+        )
+      );
+    } else {
+      components.push(part);
+    }
+  });
+
+  return components.length === 1 ? components[0] : components;
 }
+
 
 export { translate, translationLoaded, AVAILABLE_LANGUAGES, AVAILABLE_LANGUAGE_KEYS, language };

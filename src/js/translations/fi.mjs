@@ -45,6 +45,7 @@ export default {
   "from": "lähde",
   "get_notified_new_messages": "Tilaa ilmoitukset uusista viesteistä",
   "give_your_profile_link_to_someone": "jaa profiililinkkisi",
+  "global_feed": "Globaali",
   "group_name": "Ryhmän nimi",
   "have_someones_invite_link": "Saitko toisen käyttäjän kutsulinkin?",
   "if_other_person_doesnt_see_message": "you can give them <b>your</b> invite link through some other channel:",

@@ -265,11 +265,7 @@ export default class PrivateChat extends Component {
             ${caretDownSvg}
           </div>
           <div id="not-seen-by-them" style="display: none">
-            <p
-              dangerouslySetInnerHTML=${{
-                __html: t('if_other_person_doesnt_see_message'),
-              }}
-            ></p>
+            <p>${t('if_other_person_doesnt_see_message')}</p>
             <p>
               <${Button} onClick=${(e) => copyMyChatLinkClicked(e)}
                 >${t('copy_your_invite_link')}<//

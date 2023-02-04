@@ -2,13 +2,13 @@ import { Helmet } from 'react-helmet';
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
 import $ from 'jquery';
+import { escapeRegExp } from 'lodash';
 import { route } from 'preact-router';
 
 import Helpers from '../Helpers';
 import Icons from '../Icons';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
-import { escapeRegExp } from 'lodash';
 
 import BlockButton from './BlockButton';
 import CopyButton from './CopyButton';
@@ -152,7 +152,6 @@ class PublicMessage extends Message {
         }
         msg.text = text.trim();
       }
-
 
       this.setState({ msg });
 

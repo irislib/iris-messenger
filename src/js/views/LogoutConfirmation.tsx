@@ -10,7 +10,7 @@ export default class LogoutConfirmation extends Component {
     return (
       <div class="main-view" id="logout-confirmation">
         <div class="centered-container">
-          <p dangerouslySetInnerHTML={{ __html: t('logout_confirmation_info') }}></p>
+          <p>{t('logout_confirmation_info')}</p>
           <p>
             <Button onClick={() => route('/settings')}>{t('back')}</Button>
           </p>
