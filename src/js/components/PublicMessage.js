@@ -9,6 +9,7 @@ import Icons from '../Icons';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
+import BlockButton from './BlockButton';
 import CopyButton from './CopyButton';
 import Dropdown from './Dropdown';
 import FeedMessageForm from './FeedMessageForm';
@@ -405,7 +406,8 @@ class PublicMessage extends Message {
                 />
                 ${this.state.msg.info.isMine
                   ? html` <a href="#" onClick=${(e) => this.onDelete(e)}>${t('delete')}</a> `
-                  : html`<a href="#" onClick=${(e) => this.report(e)}>${t('report (public)')}</a>`}
+                  : html`<a href="#" onClick=${(e) => this.report(e)}>${t('report (public)')}</a>
+                      <${BlockButton} id=${this.state.msg.event?.pubkey} showName=${true} /> `}
               `
             : ''}
         <//>

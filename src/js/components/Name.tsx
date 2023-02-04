@@ -23,8 +23,8 @@ const Name = (props: Props) => {
     if (nostrAddr) {
       // TODO unsub
       Nostr.getProfile(nostrAddr, (profile) => {
-        profile && setName(profile.name?.trim() || '');
-        profile && setDisplayName(profile.display_name?.trim() || '');
+        profile && setName(profile.name?.trim().slice(0, 100) || '');
+        profile && setDisplayName(profile.display_name?.trim().slice(0, 100) || '');
       });
     }
   }, [props.pub]);

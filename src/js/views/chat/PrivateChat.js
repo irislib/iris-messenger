@@ -242,9 +242,7 @@ export default class PrivateChat extends Component {
         <div id="message-list">
           ${msgListContent}
           <p>
-            <i
-              >${t('dm_privacy_warning')}</i
-            >
+            <i>${t('dm_privacy_warning')}</i>
           </p>
         </div>
         <div id="attachment-preview" class="attachment-preview" style="display:none"></div>

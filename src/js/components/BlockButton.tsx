@@ -3,9 +3,11 @@ import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import Button from './basic/Button';
+import Name from './Name';
 
 type Props = {
   id: string;
+  showName?: boolean;
 };
 
 class BlockButton extends Component<Props> {
@@ -45,7 +47,14 @@ class BlockButton extends Component<Props> {
         className={`${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}`}
         onClick={(e) => this.onClick(e)}
       >
-        <span className="nonhover">{t(this.state[this.key] ? this.actionDone : this.action)}</span>
+        <span className="nonhover">
+          {t(this.state[this.key] ? this.actionDone : this.action)}{' '}
+          {this.props.showName ? (
+            <Name pub={this.props.id} userNameOnly={true} hideBadge={true} />
+          ) : (
+            ''
+          )}
+        </span>
         <span className="hover">{t(this.hoverAction)}</span>
       </Button>
     );
