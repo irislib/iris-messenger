@@ -43,7 +43,7 @@ export default {
   "new_group": "نیا گروپ",
   "new_user_go": "چلو",
   "no_contacts_in_list": "اپکے کو کونٹیکٹ نہیں ہیں",
-  "no_followers_yet_info": "não é seguidar ainda",
+  "no_followers_yet_info": "아직 팔로워 없음 정보",
   "note_to_self": "خود کےلیے پیغام",
   "nothing": "کچھ نہیں",
   "notifications": "نوٹیفیکیشن",
@@ -72,8 +72,7 @@ export default {
   "typing": "لکھ رہے ہیں...",
   "use_picture": "تصویر استعمال کریں",
   "video_call": "ویڈیو کال",
-  "visibility": "당신의 게시물",
   "webrtc_connection_options": "WebRTC کے آپشن",
-  "webrtc_info": " que retransmitirá su tráfico de video. El ancho de banda no es gratuito",
+  "webrtc_info": "que retransmitirá su tráfico de video. El ancho de banda no es gratuito",
   "whats_your_name": "آپکا کیا نام ہے؟"
 };

@@ -98,7 +98,7 @@ export class Path {
       const contentStr = JSON.stringify(value)
       content = await this.encrypt(contentStr)
       const pathParts = path.split('/')
-      const encryptedPathParts = []
+      const encryptedPathParts = [] // TODO path should be deterministic: use hash(path + secret)
       for (let i = 0; i < pathParts.length; i++) {
         encryptedPathParts.push(await this.encrypt(pathParts[i]))
       }

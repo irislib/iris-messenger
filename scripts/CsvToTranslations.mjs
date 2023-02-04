@@ -5,7 +5,7 @@ let csv = fs.readFileSync('translations.csv', 'utf8');
 let lines = csv.split('\n');
 
 // Get the list of available languages
-let languages = lines[0].split(',').map((l) => l.replace(/"/g, ''));
+let languages = lines[0].split(',').map((l) => l.replace(/"/g, '').trim());
 languages.shift();
 
 // Create an object to store the translations
@@ -21,7 +21,7 @@ for (let i = 1; i < lines.length; i++) {
       translations[languages[j]] = {};
     }
     if (line[j]) {
-      translations[languages[j]][key] = line[j].replace(/"/g, '') || null;
+      translations[languages[j]][key] = line[j].replace(/"/g, '').trim() || null;
     }
   }
 }

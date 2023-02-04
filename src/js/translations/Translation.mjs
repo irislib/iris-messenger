@@ -14,6 +14,8 @@ const AVAILABLE_LANGUAGES = {
   ko: '한국어',
   he: 'עברית',
   'cs-CZ': 'Čeština',
+  'lt': 'Lietuvių',
+  'bg': 'Български',
 };
 
 let AVAILABLE_LANGUAGE_KEYS = Object.keys(AVAILABLE_LANGUAGES);

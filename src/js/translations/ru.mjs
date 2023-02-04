@@ -23,7 +23,7 @@ export default {
   "get_notified_new_messages": "Узнавайте о новых сообщениях",
   "group_name": "Название группы",
   "have_someones_invite_link": "Есть чья-то ссылка на чат?",
-  "if_other_person_doesnt_see_message": " voit antaa hänelle <b>sinun</b> kutsulinkkisi jotain muuta kautta:",
+  "if_other_person_doesnt_see_message": "voit antaa hänelle <b>sinun</b> kutsulinkkisi jotain muuta kautta:",
   "incoming_call": "Входящий звонок",
   "language": "Язык",
   "last_active": "последняя активность",
@@ -33,7 +33,6 @@ export default {
   "new_chat": "Новый чат",
   "new_group": "Новая группа",
   "new_user_go": "Поехали!",
-  "no_followers_yet_info": "아직 팔로워 없음 정보",
   "note_to_self": "Заметка для себя",
   "nothing": "Ничего",
   "notifications": "Уведомления",
@@ -60,6 +59,6 @@ export default {
   "use_picture": "Использовать фото",
   "video_call": "Видео-звонок",
   "webrtc_connection_options": "Опции подключения через WebRTC",
-  "webrtc_info": " es posible que deba especificar un servidor TURN aquí",
+  "webrtc_info": "es posible que deba especificar un servidor TURN aquí",
   "whats_your_name": "Как вас зовут?"
 };

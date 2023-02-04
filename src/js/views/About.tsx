@@ -19,7 +19,7 @@ class About extends Component {
               <a href="https://github.com/nostr-protocol/nostr">Nostr</a> this week.
             </p>
             <h3>{t('about')}</h3>
-            <p>Iris is like the social networking apps we're used to</p>
+            <p>Iris is like the social networking apps we're used to, but better:</p>
             <ul>
               <li>
                 <b>Accessible.</b> No phone number or signup required. Just type in your name or
