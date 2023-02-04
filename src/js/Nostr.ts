@@ -1124,12 +1124,11 @@ export default {
     }
     if (event.created_at > Date.now() / 1000) {
       this.futureEventIds.add(event);
+      if (this.futureEventIds.has(event.id)) {
+        this.eventsById.set(event.id, event); // TODO should limit stored future events
+      }
       if (this.futureEventIds.first() === event.id) {
-        if (this.futureEventIds.has(event.id)) {
-          // TODO fix infinite loop somewhere
-          this.eventsById.set(event.id, event); // TODO should limit stored future events
-          this.handleNextFutureEvent();
-        }
+        this.handleNextFutureEvent();
       }
       return;
     }

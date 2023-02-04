@@ -297,6 +297,17 @@ textarea.new-msg {
   min-width: min(100%, 225px);
 }
 
+.msg-content audio {
+  width: 100%;
+  outline: none;
+  margin-bottom: 15px;
+  border-radius: 15px;
+  border: 1px solid var(--main-color);
+  margin-top: 5px;
+  height: 50px;
+  min-width: min(100%, 225px);
+}
+
 .hidden {
   display: none;
 }

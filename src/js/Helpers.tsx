@@ -123,7 +123,7 @@ export default {
     });
 
     const youtubeRegex =
-      /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})(?:\S+)?/g;
+      /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})(?:\S+)?/g;
     replacedText = reactStringReplace(replacedText, youtubeRegex, (match, i) => {
       return (
         <iframe
