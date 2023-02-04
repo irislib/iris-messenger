@@ -8,6 +8,7 @@ import Helpers from '../Helpers';
 import Icons from '../Icons';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
+import { escapeRegExp } from 'lodash';
 
 import BlockButton from './BlockButton';
 import CopyButton from './CopyButton';
@@ -139,17 +140,19 @@ class PublicMessage extends Message {
               if (!msg.attachments) {
                 msg.attachments = [];
               }
-              msg.attachments.push({ type: 'image', data: parsedUrl.origin + parsedUrl.pathname });
+              msg.attachments.push({ type: 'image', data: `${parsedUrl.href}` });
 
               // Remove URL from beginning or end of line or before newline
-              text = text.replace(new RegExp(`^${url}`), '');
-              text = text.replace(new RegExp(`${url}$`), '');
-              text = text.replace(new RegExp(`${url}\n`), ' ');
+              const esc = escapeRegExp(url);
+              text = text.replace(new RegExp(`^${esc}`), '');
+              text = text.replace(new RegExp(`${esc}$`), '');
+              text = text.replace(new RegExp(`${esc}\n`), ' ');
             }
           });
         }
         msg.text = text.trim();
       }
+
 
       this.setState({ msg });
 
