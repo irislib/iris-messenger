@@ -1,30 +1,33 @@
 import fs from 'fs';
+import { parse } from 'csv-parse/sync';
 
 // Read the csv file with translations
 let csv = fs.readFileSync('translations.csv', 'utf8');
-let lines = csv.split('\n');
+
+// Parse the csv into an array of arrays
+let lines = parse(csv, {
+  trim: true,
+  quote: '"',
+});
 
 // Get the list of available languages
-let languages = lines[0].split(',').map((l) => l.replace(/"/g, '').trim());
+let languages = lines[0].map((l) => l.trim());
 languages.shift();
 
 // Create an object to store the translations
 let translations = {};
 
-// Regular expression to handle commas within quoted strings
-const re = /(?!\B"[^"]*),(?![^"]*"\B)/;
-
 // Iterate through the csv lines and add the translations to the `translations` object
 for (let i = 1; i < lines.length; i++) {
-  let line = lines[i].split(re);
-  let key = line[0].replace(/"/g, '');
+  let line = lines[i];
+  let key = line[0].replace(/,/g, '');
   line.shift();
   for (let j = 0; j < languages.length; j++) {
     if (!translations[languages[j]]) {
       translations[languages[j]] = {};
     }
     if (line[j]) {
-      translations[languages[j]][key] = line[j].replace(/"/g, '').trim() || null;
+      translations[languages[j]][key] = line[j].trim() || null;
     }
   }
 }

@@ -40,6 +40,7 @@
     "@types/webtorrent": "0.109.3",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
+    "csv-parse": "^5.3.4",
     "enzyme": "^3.11.0",
     "enzyme-adapter-preact-pure": "^4.1.0",
     "eslint": "^8.32.0",
