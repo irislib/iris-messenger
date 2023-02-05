@@ -98,7 +98,7 @@ export default {
   "show_beta_features": "покажи бета функции",
   "show_files": "покажи файлове",
   "show_more": "покажи повече",
-  "show_new_messages": "покажи {n} нови съобщения",
+  "show_n_new_messages": "покажи {n} нови съобщения",
   "show_or_scan_QR_code": "покажи или сканирай QR код",
   "show_qr_code": "покажи QR код",
   "show_thread": "покажи нишка",

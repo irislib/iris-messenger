@@ -202,7 +202,7 @@ class MessageFeed extends Component {
               onClick={this.showQueuedMessages}
             >
               <div className="msg-content notification-msg">
-                {t('show_new_messages').replace('{n}', this.state.queuedMessages.length)}
+                {t('show_n_new_messages').replace('{n}', this.state.queuedMessages.length)}
               </div>
             </div>
           ) : null}

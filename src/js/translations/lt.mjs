@@ -96,7 +96,7 @@ export default {
   "show_beta_features": "rodyti beta funkcionalumą",
   "show_files": "rodyti failus",
   "show_more": "rodyti daugiau",
-  "show_new_messages": "rodyti naujas žinutes",
+  "show_n_new_messages": "rodyti naujas žinutes",
   "show_or_scan_QR_code": "rodyti arba skanuoti QR kodą",
   "show_qr_code": "rodyti QR kodą",
   "show_thread": "rodyti temą",

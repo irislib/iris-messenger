@@ -96,7 +96,7 @@ export default {
   "show_beta_features": "Show Beta Features",
   "show_files": "Show files",
   "show_more": "Show more",
-  "show_new_messages": "Show {n} new messages",
+  "show_n_new_messages": "Show {n} new messages",
   "show_or_scan_QR_code": "Show or scan QR code",
   "show_qr_code": "Show QR code",
   "show_thread": "Show thread",

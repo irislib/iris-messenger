@@ -99,7 +99,7 @@ export default {
   "show_beta_features": "Näytä beta-ominaisuudet",
   "show_files": "Näytä tiedostot",
   "show_more": "Näytä lisää",
-  "show_new_messages": "Näytä {n} uutta viestiä",
+  "show_n_new_messages": "Näytä {n} uutta viestiä",
   "show_or_scan_QR_code": "Näytä tai skannaa QR-koodi",
   "show_qr_code": "Näytä QR-koodi",
   "show_thread": "Näytä viestiketju",

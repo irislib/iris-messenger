@@ -98,7 +98,7 @@ export default {
   "show_beta_features": "Zobrazit funkce Beta",
   "show_files": "Zobrazit soubory",
   "show_more": "Zobrazit více",
-  "show_new_messages": "Ukázat nové zprávy",
+  "show_n_new_messages": "Ukázat nové zprávy",
   "show_or_scan_QR_code": "Ukázat nebo skenovat QR kód",
   "show_qr_code": "Zobrazit QR kód",
   "show_thread": "Zobrazit vlákno",

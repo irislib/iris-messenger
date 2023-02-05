@@ -98,7 +98,7 @@ export default {
   "show_beta_features": "베타 기능 보기",
   "show_files": "화일 보기",
   "show_more": "더 보기",
-  "show_new_messages": "새 메시지 보기",
+  "show_n_new_messages": "새 메시지 보기",
   "show_or_scan_QR_code": "큐알 코드 보거나 스캔하기",
   "show_qr_code": "QR코드 공유",
   "switch_account": "계정 전환",

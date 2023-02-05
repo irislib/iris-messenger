@@ -95,7 +95,7 @@ export default {
   "show_beta_features": "Tampilkan Fitur Beta",
   "show_files": "Tampilkan berkas",
   "show_more": "Tampilkan lebih",
-  "show_new_messages": "Tampilkan {n} pesan baru",
+  "show_n_new_messages": "Tampilkan {n} pesan baru",
   "show_or_scan_QR_code": "Tampilkan atau pindai kode QR",
   "show_qr_code": "Tampilkan kode QR",
   "show_thread": "Tampilkan Utas",

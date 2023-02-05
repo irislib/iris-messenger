@@ -75,7 +75,7 @@ export default {
   "show_beta_features": "mostra funzionalità beta",
   "show_files": "mostra files",
   "show_more": "mostra di più",
-  "show_new_messages": "mostra nuovi messaggi",
+  "show_n_new_messages": "mostra nuovi messaggi",
   "show_or_scan_QR_code": "mostra o scan codice qr",
   "show_qr_code": "mostra codice qr",
   "show_thread": "mostra discussione",
