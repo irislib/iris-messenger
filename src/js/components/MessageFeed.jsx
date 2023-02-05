@@ -81,7 +81,7 @@ class MessageFeed extends Component {
     if (!this.props.scrollElement) {
       return;
     }
-    const showNewMsgsFixedTop = this.props.scrollElement.scrollTop > this.base.offsetTop;
+    const showNewMsgsFixedTop = this.props.scrollElement.scrollTop > this.base.offsetTop - 60;
     if (showNewMsgsFixedTop !== this.state.fixedTop) {
       this.setState({ showNewMsgsFixedTop });
     }
