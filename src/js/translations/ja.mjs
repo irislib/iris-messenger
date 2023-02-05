@@ -114,7 +114,7 @@ export default {
   "video_call": "ビデオ通話",
   "visibility": "可視性",
   "webrtc_connection_options": "WebRTC接続オプション",
-  "whats_on_your_mind": "何を考えているのですか",
+  "whats_on_your_mind": "入力してください。",
   "whats_your_name": "あなたの名前は何ですか",
   "write_your_reply": "あなたの返信を書いてください",
   "yesterday": "昨日",
