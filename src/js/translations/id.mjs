@@ -51,6 +51,7 @@ export default {
   "likes": "Suka",
   "log_out": "Keluar",
   "logout_confirmation_info": "Anda <b>tidak dapat masuk lagi</b> kecuali Anda telah menyimpan salinan kunci pribadi.",
+  "messages": "Pesan",
   "new_chat": "Obrolan baru",
   "new_group": "Group baru",
   "new_relay_url": "URL Relay baru",

@@ -28,9 +28,7 @@ async function translationsToCsv() {
   });
   console.log('found', translationKeys.size, 'translation keys from', files.length, 'files');
 
-  languages.sort();
-
-  ['today', 'yesterday', 'global_feed'].forEach((key) => {
+  ['today', 'yesterday', 'global_feed', 'messages'].forEach((key) => {
     translationKeys.add(key);
   });
   translationKeys = Array.from(translationKeys);

@@ -49,6 +49,7 @@ export default {
   "log_out": "Sair",
   "logout_confirmation_info": "Você <b>não pode logar novamente</b> ao menos que você tenha salvado uma cópia da sua chave primária.",
   "looking_up_message": "Procurando mensagem...",
+  "messages": "Mensagens",
   "new_chat": "Nova conversa",
   "new_group": "Novo grupo",
   "new_relay_url": "nova url de relay",
