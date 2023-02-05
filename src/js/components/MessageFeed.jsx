@@ -192,6 +192,14 @@ class MessageFeed extends Component {
     }
     const displayCount = this.state.displayCount;
     const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
+    const feedName =
+      !this.state.queuedMessages.length &&
+      {
+        everyone: 'global_feed',
+        follows: 'following',
+        notifications: 'notifications',
+      }[this.props.index];
+
     return (
       <>
         <div>
@@ -201,8 +209,15 @@ class MessageFeed extends Component {
               className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
               onClick={this.showQueuedMessages}
             >
-              <div className="msg-content notification-msg">
+              <div className="msg-content notification-msg colored">
                 {t('show_n_new_messages').replace('{n}', this.state.queuedMessages.length)}
+              </div>
+            </div>
+          ) : null}
+          {feedName ? (
+            <div className="msg">
+              <div className="msg-content notification-msg">
+                {t(feedName)}
               </div>
             </div>
           ) : null}

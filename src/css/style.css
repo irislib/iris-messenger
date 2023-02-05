@@ -2251,8 +2251,11 @@ form.public {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--notify);
   padding: 15px;
+}
+
+.public-messages-view .msg .notification-msg.colored {
+  background: var(--notify);
 }
 
 .block.blocked,
