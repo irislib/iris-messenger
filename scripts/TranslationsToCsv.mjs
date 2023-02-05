@@ -29,6 +29,10 @@ async function translationsToCsv() {
   console.log('found', translationKeys.size, 'translation keys from', files.length, 'files');
 
   languages.sort();
+
+  ['today', 'yesterday', 'global_feed'].forEach((key) => {
+    translationKeys.add(key);
+  });
   translationKeys = Array.from(translationKeys);
   translationKeys.sort();
 
@@ -49,7 +53,7 @@ async function translationsToCsv() {
     for (let lang of languages) {
       row += '","' + (translations[lang][key] || '')
         .replace(/"/g, '""')
-        .replace(/,/g, '\\,');
+        .replace(/\\/g, '')
     }
     csv += row + '"\n';
     if (key !== translationKeys[translationKeys.length - 1]) {

@@ -1,5 +1,5 @@
 import english from './en.mjs';
-import React from "react";
+import { createElement } from "preact";
 
 const AVAILABLE_LANGUAGES = {
   en: 'English',
@@ -60,10 +60,10 @@ function translate(k, linkProps) {
 
   parts.forEach(part => {
     if (part.startsWith("<b>")) {
-      components.push(React.createElement("b", { key: components.length }, part.slice(3, -4)));
+      components.push(createElement("b", { key: components.length }, part.slice(3, -4)));
     } else if (part.startsWith("<a>")) {
       components.push(
-        React.createElement(
+        createElement(
           "a",
           { key: components.length, ...linkProps },
           part.slice(3, -4)
