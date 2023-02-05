@@ -61,7 +61,6 @@ export default {
   "scan_private_key_qr_code": "خفیہ QR کوڈ سکین کریں",
   "search": "تلاش کریں",
   "send_message": "پیغام بھیجیں",
-  "set_up_your_own_peer": "اپنا peer سیٹ اپ کریں",
   "settings": "مرمت",
   "show_qr_code": "QR کوڈ دیکھیں",
   "yesterday": "کل",
@@ -72,6 +71,5 @@ export default {
   "use_picture": "تصویر استعمال کریں",
   "video_call": "ویڈیو کال",
   "webrtc_connection_options": "WebRTC کے آپشن",
-  "webrtc_info": "que retransmitirá su tráfico de video. El ancho de banda no es gratuito",
   "whats_your_name": "آپکا کیا نام ہے؟"
 };

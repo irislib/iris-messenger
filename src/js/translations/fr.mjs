@@ -63,7 +63,6 @@ export default {
   "scan_private_key_qr_code": "Scannez le code QR de la clé privée",
   "search": "Recherche",
   "send_message": "Envoyer un message",
-  "set_up_your_own_peer": "Paramétrez votre propre pair",
   "settings": "Réglages",
   "show_qr_code": "Voir Code QR",
   "switch_account": "Changer de compte",
@@ -75,6 +74,5 @@ export default {
   "use_picture": "Utiliser votre picture",
   "video_call": "Appel vidéo",
   "webrtc_connection_options": "Options de connection WebRTC",
-  "webrtc_info": "WebRTC is used for video calls. If you're behind a NAT",
   "whats_your_name": "Quel est votre nom ?"
 };

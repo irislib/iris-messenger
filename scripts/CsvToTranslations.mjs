@@ -8,10 +8,11 @@ let csv = fs.readFileSync('translations.csv', 'utf8');
 let lines = parse(csv, {
   trim: true,
   quote: '"',
+  relax_column_count: true,
 });
 
 // Get the list of available languages
-let languages = lines[0].map((l) => l.trim());
+let languages = lines[0];
 languages.shift();
 
 // Create an object to store the translations

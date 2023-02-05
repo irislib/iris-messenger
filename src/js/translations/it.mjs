@@ -99,7 +99,6 @@ export default {
   "use_picture": "Usa foto",
   "video_call": "Chiamata video",
   "webrtc_connection_options": "Opzioni di connessione WebRTC",
-  "webrtc_info": "you might need to specify a TURN server here",
   "whats_on_your_mind": "cosa stai pensando",
   "whats_your_name": "Quale è il tuo nome??",
   "write_your_reply": "scrivi la tua risposta",

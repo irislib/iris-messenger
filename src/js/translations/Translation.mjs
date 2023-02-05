@@ -3,21 +3,22 @@ import React from "react";
 
 const AVAILABLE_LANGUAGES = {
   en: 'English',
-  es: 'Español',
-  fr: 'Français',
-  de: 'Deutsch',
-  it: 'Italiano',
-  ru: 'Русский',
-  'pt-BR': 'Português (Brasil)',
-  fi: 'Suomi',
-  ur: 'اردو',
   'zh-cn': '简体中文',
+  es: 'Español',
+  ru: 'Русский',
+  de: 'Deutsch',
+  fr: 'Français',
+  it: 'Italiano',
+  ja: '日本語',
   ko: '한국어',
+  id: 'Indonesia',
+  'pt-BR': 'Português (Brasil)',
+  ur: 'اردو',
   he: 'עברית',
+  fi: 'Suomi',
   'cs-CZ': 'Čeština',
-  'lt': 'Lietuvių',
   'bg': 'Български',
-  'id': 'Indonesia',
+  'lt': 'Lietuvių',
 };
 
 let AVAILABLE_LANGUAGE_KEYS = Object.keys(AVAILABLE_LANGUAGES);

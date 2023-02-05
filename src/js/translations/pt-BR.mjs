@@ -101,6 +101,5 @@ export default {
   "use_picture": "Usar foto",
   "video_call": "Chamada de vídeo",
   "webrtc_connection_options": "Opções de conexão WebRTC",
-  "webrtc_info": "WebRTC se utiliza para videollamadas. Si está detrás de un NAT",
   "whats_your_name": "Qual o seu nome?"
 };
