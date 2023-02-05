@@ -28,6 +28,7 @@ async function translationsToCsv() {
   });
   console.log('found', translationKeys.size, 'translation keys from', files.length, 'files');
 
+  // Translation keys from variables are not found by the regex above
   ['today', 'yesterday', 'global_feed', 'messages'].forEach((key) => {
     translationKeys.add(key);
   });

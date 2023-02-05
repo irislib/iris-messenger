@@ -66,7 +66,7 @@ class Profile extends View {
         ${this.state.lud16
           ? html`
               <div style="flex:1">
-                <a href=${this.state.lud16}>⚡ Tip</a>
+                <a href=${this.state.lud16}>⚡ ${t('tip_lightning')}</a>
               </div>
             `
           : ''}

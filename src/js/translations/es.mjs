@@ -102,6 +102,7 @@ export default {
   "show_thread": "Mostrar el hilo de conversación",
   "switch_account": "Cambiar cuenta",
   "system_default": "Por defecto",
+  "tip_lightning": "Propina",
   "today": "Hoy",
   "translate": "Traducir",
   "turn_on_desktop_notifications": "Activa las notificaciones de escritorio",

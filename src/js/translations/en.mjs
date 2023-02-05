@@ -102,6 +102,7 @@ export default {
   "show_thread": "Show thread",
   "switch_account": "Switch account",
   "system_default": "System default",
+  "tip_lightning": "Tip",
   "today": "today",
   "translate": "Translate",
   "turn_on_desktop_notifications": "Turn on desktop notifications",
