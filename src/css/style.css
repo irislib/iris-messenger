@@ -1187,7 +1187,7 @@ a.msg {
   min-width: min(100%, 225px);
   width: auto;
   max-width: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 15px;
   border: 1px solid var(--main-color);
   overflow: hidden;
@@ -1291,45 +1291,6 @@ a.msg {
 
 .img-container {
   position: relative;
-}
-
-.heart {
-  width: 92px;
-  height: 81px;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
-  background: url('../assets/img/heart.png') no-repeat center/contain;
-  opacity: 0;
-  transform: scale(0);
-}
-
-.like-animate .heart {
-  animation-duration: 1000ms;
-  animation-name: like-heart-animation;
-  animation-timing-function: ease-in-out;
-}
-
-@keyframes like-heart-animation {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  15% {
-    opacity: 0.9;
-    transform: scale(1.2);
-  }
-  30% {
-    transform: scale(0.95);
-  }
-  45%,
-  80% {
-    opacity: 0.9;
-    transform: scale(1);
-  }
 }
 
 .dropbtn {

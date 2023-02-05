@@ -658,7 +658,6 @@ class PublicMessage extends Message {
                 return;
               }
               return html`<div class="img-container">
-                <div class="heart"></div>
                 <${SafeImg}
                   src=${a.data}
                   onClick=${(e) => {
