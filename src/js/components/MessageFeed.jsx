@@ -205,7 +205,6 @@ class MessageFeed extends Component {
         <div>
           {this.state.queuedMessages.length ? (
             <div
-              style={{ cursor: 'pointer' }}
               className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
               onClick={this.showQueuedMessages}
             >

@@ -2213,10 +2213,13 @@ form.public {
   flex-direction: column;
   align-items: center;
   padding: 15px;
+  cursor: default;
+  user-select: none;
 }
 
 .public-messages-view .msg .notification-msg.colored {
   background: var(--notify);
+  cursor: pointer;
 }
 
 .block.blocked,
