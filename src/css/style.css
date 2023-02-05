@@ -1187,7 +1187,7 @@ a.msg {
   min-width: min(100%, 225px);
   width: auto;
   max-width: 100%;
-  object-fit: contain;
+  object-fit: cover;
   border-radius: 15px;
   border: 1px solid var(--main-color);
   overflow: hidden;
