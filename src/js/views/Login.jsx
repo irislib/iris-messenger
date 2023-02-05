@@ -216,7 +216,7 @@ class Login extends Component {
             <div id="existing-account-login">
               <p>
                 <a href="#" id="show-create-account" onClick={(e) => this.showCreateAccount(e)}>
-                  > {t('back')}
+                   {t('back')}
                 </a>
               </p>
               {this.renderExistingAccountLogin()}
