@@ -13,13 +13,27 @@ type Props = {
 };
 
 const Name = (props: Props) => {
-  const initialName = Helpers.generateName(
-    Nostr.toNostrBech32Address(props.pub, 'npub') || props.pub,
-  );
-  const [name, setName] = useState('');
-  const [displayName, setDisplayName] = useState(initialName);
+  const nostrAddr = Nostr.toNostrHexAddress(props.pub);
+  let initialName = '';
+  let initialDisplayName;
+  const profileEvent = Nostr.profileEventByUser.get(nostrAddr);
+  // should we change Nostr.getProfile() and use it here?
+  if (profileEvent) {
+    try {
+      const profile = JSON.parse(profileEvent.content);
+      initialName = profile.name?.trim().slice(0, 100) || '';
+      initialDisplayName = profile.display_name?.trim().slice(0, 100);
+    } catch (e) {
+      // ignore
+    }
+  } else {
+    initialDisplayName = Helpers.generateName(
+      Nostr.toNostrBech32Address(props.pub, 'npub') || props.pub,
+    );
+  }
+  const [name, setName] = useState(initialName);
+  const [displayName, setDisplayName] = useState(initialDisplayName);
   useEffect(() => {
-    const nostrAddr = Nostr.toNostrHexAddress(props.pub);
     if (nostrAddr) {
       // TODO unsub
       Nostr.getProfile(nostrAddr, (profile) => {
