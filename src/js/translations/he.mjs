@@ -7,6 +7,8 @@ export default {
   "answer": "תשובה",
   "appearance": "מראה",
   "back": "אחורה",
+  "block": "חסום",
+  "blocked": "חסום",
   "call_ended": "תמה השיחה",
   "calling": "מתקשר",
   "cancel": "בטל",

@@ -13,9 +13,6 @@ export default class WebRTCSettings extends Component {
         <div class="centered-container">
           <h3>{t('webrtc_connection_options')}</h3>
           <p>
-            <small>{t('webrtc_info')}</small>
-          </p>
-          <p>
             <textarea
               rows="4"
               id="rtc-config"

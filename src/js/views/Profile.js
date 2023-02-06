@@ -11,7 +11,7 @@ import BlockButton from '../components/BlockButton';
 import CopyButton from '../components/CopyButton';
 import Dropdown from '../components/Dropdown';
 import FeedMessageForm from '../components/FeedMessageForm';
-import FlagButton from '../components/FlagButton';
+import ReportButton from '../components/ReportButton';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import MessageFeed from '../components/MessageFeed';
@@ -150,7 +150,7 @@ class Profile extends View {
                     ? ''
                     : html`
                         <${BlockButton} id=${this.props.id} />
-                        <${FlagButton} id=${this.props.id} />
+                        <${ReportButton} id=${this.props.id} />
                       `}
                 <//>
               </div>
