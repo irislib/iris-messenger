@@ -27,7 +27,6 @@ export default {
   "dark": "Dark",
   "delete": "Delete",
   "dm_privacy_warning": "Nostr private messages are encrypted, but everyone can see who you're chatting with",
-  "donate": "Donate",
   "edit_profile": "Edit Profile",
   "enable_webtorrent": "Enable Webtorrent",
   "everyone": "Everyone",

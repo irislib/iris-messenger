@@ -27,7 +27,6 @@ export default {
   "dark": "Dunkel",
   "delete": "Löschen",
   "dm_privacy_warning": "Deine Nostr Privatnachrichten sind verschlüsselt, aber jeder kann sehen mit wem du schreibst.",
-  "donate": "Spenden",
   "edit_profile": "Profil bearbeiten",
   "enable_webtorrent": "Webtorrent aktivieren",
   "everyone": "Alle",

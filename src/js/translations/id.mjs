@@ -27,7 +27,6 @@ export default {
   "dark": "Gelap",
   "delete": "Hapus",
   "dm_privacy_warning": "Meski pesan pribadi di Nostr dienkripsi, tetapi semua orang dapat melihat dengan siapa Anda mengobrol",
-  "donate": "Donasi",
   "edit_profile": "Ubah Profil",
   "enable_webtorrent": "Aktifkan Webtorrent",
   "everyone": "Semua orang",

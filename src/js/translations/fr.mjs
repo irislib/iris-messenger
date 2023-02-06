@@ -16,7 +16,6 @@ export default {
   "copy_your_invite_link": "Copier votre lien d'invitation",
   "create": "Créer",
   "delete": "Supprimer",
-  "donate": "Faites un don",
   "follow_someone_info": "Suivez quelqu'un pour voir le contenu de leur réseau ! Suggestions :",
   "followers": "Followers",
   "following": "Suivi",

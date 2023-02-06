@@ -27,7 +27,6 @@ export default {
   "dark": "Tumma",
   "delete": "Poista",
   "dm_privacy_warning": "Nostr-yksityisviestit ovat salattuja, mutta kaikki voivat nähdä kenelle viestittelet ja milloin.",
-  "donate": "Lahjoita",
   "edit_profile": "Muokkaa profiilia",
   "enable_webtorrent": "Käytä webtorrentia",
   "everyone": "Kaikki",

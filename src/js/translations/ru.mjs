@@ -27,7 +27,6 @@ export default {
   "dark": "Темный",
   "delete": "Удалить",
   "dm_privacy_warning": "Личные сообщения Nostr зашифрованы, но все могут видеть, с кем вы общаетесь.",
-  "donate": "Задонатить",
   "edit_profile": "Редактировать профиль",
   "enable_webtorrent": "Активировать webtorrent",
   "everyone": "Все",

@@ -15,7 +15,6 @@ export default {
   "copy_your_invite_link": "اپنا انوایٔٹ لنک بنایٔیں کاپی کریں",
   "create": "بنایٔیں",
   "delete": "ڈلیٹ کریں",
-  "donate": "عطیہ کریں",
   "follow_someone_info": "کسی کے حلقہ احباب کا مواد دیکھنے کے لیے اسے فالو کریں! سفارشات:",
   "followers": "فالورز",
   "following": "فالو کرتے ہیں",
