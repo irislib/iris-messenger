@@ -79,6 +79,7 @@ class About extends Component {
             </a>
 
             <p>BTC: bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze</p>
+            <br/>
           </div>
         </div>
       </>
