@@ -23,6 +23,7 @@ const startTime = Date.now() / 1000;
 declare global {
   interface Window {
     nostr: any;
+    irisNostr: any;
   }
 }
 
@@ -120,7 +121,7 @@ type Subscription = {
 
 let subscriptionId = 0;
 
-export default {
+const Nostr = {
   localStorageLoaded: false,
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
@@ -1623,3 +1624,6 @@ export default {
     this.publish(event);
   },
 };
+
+window.irisNostr = Nostr;
+export default Nostr;

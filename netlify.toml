@@ -5,3 +5,11 @@
   publish = "build"
   command = "yarn build"
   environment = { NETLIFY_USE_YARN = "true" }
+
+[[headers]]
+  for = "/.well-known/nostr.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET"
+    Access-Control-Allow-Headers = "Content-Type"
