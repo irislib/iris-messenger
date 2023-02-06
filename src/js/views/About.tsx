@@ -74,7 +74,7 @@ class About extends Component {
             </p>
 
             <a href="https://opencollective.com/iris-social/donate" target="_blank">
-              <img src="/assets/img/opencollective.png'" width={200} />
+              <img src="/assets/img/opencollective.png" width={200} />
             </a>
 
             <p>BTC: bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze</p>
