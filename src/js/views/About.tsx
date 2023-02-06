@@ -1,4 +1,3 @@
-import openCollectiveLogo from '../../assets/img/opencollective.png';
 import Component from '../BaseComponent';
 import FollowButton from '../components/FollowButton';
 import Header from '../components/Header';
@@ -75,7 +74,7 @@ class About extends Component {
             </p>
 
             <a href="https://opencollective.com/iris-social/donate" target="_blank">
-              <img src={openCollectiveLogo} width={200} />
+              <img src="/assets/img/opencollective.png'" width={200} />
             </a>
 
             <p>BTC: bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze</p>
