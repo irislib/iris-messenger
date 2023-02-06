@@ -121,7 +121,9 @@ class Profile extends View {
               <div class="profile-actions">
                 <${Dropdown}>
                   ${this.state.isMyProfile
-                    ? html`<${Button} onClick=${() => route('/profile/edit')}>Edit profile<//>`
+                    ? html`<${Button} onClick=${() => route('/profile/edit')}
+                        >${t('edit_profile')}<//
+                      >`
                     : ''}
                   <${CopyButton}
                     key=${`${this.props.id}copyLink`}
