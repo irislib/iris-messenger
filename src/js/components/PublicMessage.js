@@ -161,9 +161,26 @@ class PublicMessage extends Message {
           this.boostedBy = boostedBy;
           const sortedReplies =
             replies &&
-            Array.from(replies).sort(
-              (a, b) => Nostr.eventsById.get(a)?.created_at - Nostr.eventsById.get(b)?.created_at,
-            );
+            Array.from(replies).sort((a, b) => {
+              const eventA = Nostr.eventsById.get(a);
+              const eventB = Nostr.eventsById.get(b);
+              // show our replies first
+              if (eventA?.pubkey === myPub && eventB?.pubkey !== myPub) {
+                return -1;
+              } else if (eventA?.pubkey !== myPub && eventB?.pubkey === myPub) {
+                return 1;
+              }
+              // show replies by original post's author first
+              if (eventA?.pubkey === msg.event?.pubkey && eventB?.pubkey !== msg.event?.pubkey) {
+                return -1;
+              } else if (
+                eventA?.pubkey !== msg.event?.pubkey &&
+                eventB?.pubkey === msg.event?.pubkey
+              ) {
+                return 1;
+              }
+              return a?.created_at - b?.created_at;
+            });
           this.setState({
             boosts: this.boostedBy.size,
             boosted: this.boostedBy.has(myPub),
