@@ -22,7 +22,6 @@ export default {
   "create": "Crea",
   "dark": "scuro",
   "delete": "Cancella",
-  "donate": "Dona",
   "edit_profile": "modifica profilo",
   "enable_webtorrent": "abilita webtorrent",
   "everyone": "Tutti",

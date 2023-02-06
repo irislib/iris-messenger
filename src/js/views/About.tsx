@@ -72,12 +72,6 @@ class About extends Component {
               While we're working on Iris group chats, you're welcome to join our{' '}
               <a href="https://t.me/irismessenger">Telegram</a> channel.
             </p>
-
-            <h4>{t('donate')}</h4>
-            <p>
-              {t('donate_info', { href: 'https://opencollective.com/iris-social' })}:
-              bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze
-            </p>
           </div>
         </div>
       </>

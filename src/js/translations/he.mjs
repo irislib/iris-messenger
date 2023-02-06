@@ -19,7 +19,6 @@ export default {
   "create": "ליצור",
   "dark": "כהה",
   "delete": "מחק",
-  "donate": "לתרום",
   "edit_profile": "עריכת פרופיל",
   "everyone": "כולם",
   "followers": "עוקבים",
