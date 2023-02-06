@@ -692,7 +692,7 @@ const Nostr = {
         for (const id of filter.ids) {
           if (!this.subscribedPosts.has(id)) {
             hasNewIds = true;
-            this.subscribedPosts.add(id);
+            this.subscribedPosts.add(this.toNostrHexAddress(id));
           }
         }
       }
