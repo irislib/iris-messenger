@@ -22,10 +22,10 @@ class BlockButton extends Component<Props> {
     super();
     this.cls = 'block';
     this.key = 'blocked';
-    this.actionDone = 'blocked';
-    this.action = 'block';
     this.activeClass = 'blocked';
-    this.hoverAction = 'unblock';
+    this.action = t('block');
+    this.actionDone = t('blocked');
+    this.hoverAction = t('unblock');
   }
 
   onClick(e) {
