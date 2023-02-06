@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import { translate as t } from '../translations/Translation';
+import openCollectiveLogo from '../../assets/img/opencollective.png';
 
 const DEVELOPER = 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk';
 
@@ -72,6 +73,12 @@ class About extends Component {
               While we're working on Iris group chats, you're welcome to join our{' '}
               <a href="https://t.me/irismessenger">Telegram</a> channel.
             </p>
+
+            <a href="https://opencollective.com/iris-social/donate" target="_blank">
+              <img src={openCollectiveLogo} width={200} />
+            </a>
+
+            <p>BTC: bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze</p>
           </div>
         </div>
       </>
