@@ -72,7 +72,7 @@ class About extends Component {
               <a href="https://github.com/irislib/faq">More...</a>
             </p>
 
-            <h3>Developer:</h3>
+            <h3>Maintainer</h3>
             <div class="profile-link-container">
               <a href={`/profile/${DEVELOPER}`} class="profile-link">
                 <Identicon str={DEVELOPER} width={40} />
