@@ -179,7 +179,7 @@ class PublicMessage extends Message {
               ) {
                 return 1;
               }
-              return a?.created_at - b?.created_at;
+              return eventA?.created_at - eventB?.created_at;
             });
           this.setState({
             boosts: this.boostedBy.size,
