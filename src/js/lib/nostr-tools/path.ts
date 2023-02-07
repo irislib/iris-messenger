@@ -1,19 +1,31 @@
-/*
+/**
 Path API for Nostr, built on NIP33 replaceable-by-tag events of kind 30000.
 
-`path.set('reactions/[noteID]', '😎')`
-`path.get('reactions/[noteID]', (value, path, event) => console.log(event.pubkey, 'reacted with', value))`
+```
+const path = new Path(myPublishFn, mySubscribeFn, myUnsubscribeFn, { authors: [myPubKey} })
+path.set('reactions/[noteID]', '😎')
+path.get('reactions/[noteID]', (value, path, event) => console.log(event.pubkey, 'reacted with', value))
+```
 
 TODO:
-`path.list('reactions', (value, path, event) => console.log(event.pubkey, 'reacted with', value), { authors: myFollows })`
+```
+path.list('reactions', (value, path, event) => {
+    console.log(
+      event.pubkey, 'reacted to', path.slice('/')[1], 'with', value
+    )
+  }, { authors: myFollows }
+)
+```
 
-This allows us to build all kinds of applications on top of Nostr (github replacement for example) without having to
+In-memory caches the most recent event for the subscribed path, and only calls back with the most recent value.
+
+This API allows us to build all kinds of applications on top of Nostr (github replacement for example) without having to
 specify new event kinds all the time and implement them in all applications and relays.
 
 NIP33: https://github.com/nostr-protocol/nips/blob/master/33.md
  */
-import {Filter, matchFilter} from "./filter"
-import {Event} from "./event"
+import {Filter, matchFilter} from './filter'
+import {Event} from './event'
 
 const EVENT_KIND = 30000
 

@@ -445,7 +445,6 @@ const Nostr = {
         }
       }
     }
-    console.log('published', event);
     this.handleEvent(event);
     return event.id;
   },
