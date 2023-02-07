@@ -1312,10 +1312,12 @@ const Nostr = {
       this.subscribe(filters, callback);
       return '0';
     };
+    const myPub = iris.session.getKey().secp256k1.rpub;
     this.private = new Path(
       (...args) => this.publish(...args),
       subscribe,
       (...args) => this.unsubscribe(...args),
+      { authors: [myPub] },
       (...args) => this.encrypt(...args),
       (...args) => this.decrypt(...args),
     );
@@ -1323,21 +1325,20 @@ const Nostr = {
       (...args) => this.publish(...args),
       subscribe,
       (...args) => this.unsubscribe(...args),
+      { authors: [myPub] },
     );
-    const myPub = iris.session.getKey().secp256k1.rpub;
-    this.public.get({ path: 'notifications/lastOpened', authors: [myPub] }, (time) => {
-      time = time.value;
+    this.public.get('notifications/lastOpened', (time) => {
       if (time !== this.notificationsSeenTime) {
         this.notificationsSeenTime = time;
         localForage.setItem('notificationsSeenTime', time);
         this.updateUnseenNotificationCount(this);
       }
     });
-    this.public.get({ path: 'settings/colorScheme', authors: [myPub] }, (colorScheme) => {
-      if (colorScheme.value === 'light') {
+    this.public.get('settings/colorScheme', (colorScheme) => {
+      if (colorScheme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
         return;
-      } else if (colorScheme.value === 'default') {
+      } else if (colorScheme === 'default') {
         if (window.matchMedia('(prefers-color-scheme: light)').matches) {
           //OS theme setting detected as dark
           document.documentElement.setAttribute('data-theme', 'light');

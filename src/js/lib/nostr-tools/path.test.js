@@ -15,24 +15,29 @@ const unsubscribe = jest.fn();
 const encrypt = async (data) => nip04.encrypt(privkey, pubkey, data)
 const decrypt = async (data) => nip04.decrypt(privkey, pubkey, data)
 
-const callback = (entry) => {
-  expect(entry).toEqual({ author: pubkey, path: 'hello', value: 'world', created_at });
-};
+const createCallback = (done) => (value, path, event) => {
+  expect(value).toEqual('world');
+  expect(path).toEqual('hello');
+  expect(event.pubkey).toEqual(pubkey);
+  expect(event.created_at).toEqual(created_at);
+  done();
+}
 
-test('first set, then get', () => {
+test('first set, then get', (done) => {
   const path = new Path(publish, subscribe, unsubscribe);
   path.set('hello', 'world');
-  path.get({ path: 'hello' }, callback);
+  path.get('hello', createCallback(done));
+
 });
 
-test('first get, then set', () => {
+test('first get, then set', (done) => {
   const path = new Path(publish, subscribe, unsubscribe);
-  path.get({ path: 'hello' }, callback);
+  path.get('hello', createCallback(done));
   path.set('hello', 'world');
 });
 
-test('encrypted set & get', () => {
+test('encrypted set & get', (done) => {
   const path = new Path(publish, subscribe, unsubscribe, encrypt, decrypt);
   path.set('hello', 'world');
-  path.get({ path: 'hello' }, callback);
+  path.get('hello', createCallback(done));
 });

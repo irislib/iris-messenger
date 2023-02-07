@@ -41,9 +41,8 @@ class ChatListItem extends Component {
   componentDidMount() {
     this.getLatestMsg();
     const path = 'chats/' + this.props.chat + '/lastOpened';
-    const myPub = iris.session.getKey().secp256k1.rpub;
-    Nostr.public.get({ path, authors: [myPub] }, (entry) => {
-      this.setState({ lastOpened: entry.value });
+    Nostr.public.get(path, (lastOpened) => {
+      this.setState({ lastOpened });
     });
   }
 

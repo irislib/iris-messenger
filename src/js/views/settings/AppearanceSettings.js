@@ -33,9 +33,8 @@ export default class AppearanceSettings extends Component {
   }
 
   componentDidMount() {
-    const myPub = iris.session.getKey().secp256k1.rpub;
     // TODO use Nostr.private
-    Nostr.public.get({ path: 'settings/colorScheme', authors: [myPub] }, (entry) => {
+    Nostr.public.get('settings/colorScheme', (entry) => {
       this.setState({ colorScheme: entry.value });
     });
   }

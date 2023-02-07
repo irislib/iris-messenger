@@ -1,118 +1,123 @@
 /*
-Path API for Nostr
+Path API for Nostr, built on NIP33 replaceable-by-tag events of kind 30000.
 
 `path.set('reactions/[noteID]', '😎')`
-`path.get('reactions/[noteID]', { authors: knownUsers }`
-`path.list('reactions', { authors: [someUser] })`
+`path.get('reactions/[noteID]', (value, path, event) => console.log(event.pubkey, 'reacted with', value))`
+
+TODO:
+`path.list('reactions', (value, path, event) => console.log(event.pubkey, 'reacted with', value), { authors: myFollows })`
 
 This allows us to build all kinds of applications on top of Nostr (github replacement for example) without having to
 specify new event kinds all the time and implement them in all applications and relays.
 
-We use NIP33 Parameterized Replaceable Events for this. https://github.com/nostr-protocol/nips/blob/master/33.md :
+NIP33: https://github.com/nostr-protocol/nips/blob/master/33.md
  */
-import {Filter} from "./filter"
+import {Filter, matchFilter} from "./filter"
 import {Event} from "./event"
 
-type Entry = {
-  created_at: number
-  value: any
-  author: string
-  path: string
-}
-type EntryFilter = {
-  path: string
-  authors?: string[]
-}
+const EVENT_KIND = 30000
+
+type CompleteEvent = Event & {id: string}
+type PathCallback = (value: any, path: string, event: Event) => void
 type Listener = {
-  filter: EntryFilter
-  callback: (entry: Entry) => void
+  filter: Filter
+  callback: PathCallback
   subscription?: string
   off: () => void
 }
-type IncompleteEvent = {
-  kind: number
-  tags: [string, string][]
-  content: string
-  created_at: number
-}
-type Publish = (event: IncompleteEvent) => Promise<Event>
+type Publish = (event: Partial<Event>) => Promise<Event>
 type Subscribe = (filters: Filter[], callback: (event: Event) => void) => string
 type Unsubscribe = (id: string) => void
 type Encrypt = (content: string) => Promise<string>
 type Decrypt = (content: string) => Promise<string>
 
-// We can later add other stores like IndexedDB or localStorage
-class Store {
-  entriesByPathAndAuthor = new Map<string, Map<string, Entry>>()
+export function getEventPath(event: Event): string | undefined {
+  return event.tags.find(([t]) => t === 'd')?.[1]
+}
 
-  // returns a boolean indicating whether the entry was added (newer than existing)
-  set(entry: Entry): boolean {
-    if (!this.entriesByPathAndAuthor.has(entry.path)) {
-      this.entriesByPathAndAuthor.set(entry.path, new Map())
+export function getFilterPath(filter: Filter): string | undefined {
+  return filter['#d']?.[0]
+}
+
+// We can later add other storages like IndexedDB or localStorage
+class MemoryStorage {
+  eventsByPathAndAuthor = new Map<string, Map<string, Event>>()
+
+  // returns a boolean indicating whether the event was added (newer than existing)
+  set(event: Event): boolean {
+    const path = getEventPath(event)
+    if (!path) {
+      throw new Error(`event has no d tag: ${JSON.stringify(event)}`)
     }
-    let valuesByAuthor = this.entriesByPathAndAuthor.get(entry.path)
-    const existing = valuesByAuthor.get(entry.author)
-    if (existing && existing.created_at > entry.created_at) {
+    if (!this.eventsByPathAndAuthor.has(path)) {
+      this.eventsByPathAndAuthor.set(path, new Map())
+    }
+    let valuesByAuthor = this.eventsByPathAndAuthor.get(path)
+    if (!valuesByAuthor) {
+      valuesByAuthor = new Map()
+      this.eventsByPathAndAuthor.set(path, valuesByAuthor)
+    }
+    const existing = valuesByAuthor?.get(event.pubkey)
+    if (existing && existing.created_at > event.created_at) {
       return false
     }
-    valuesByAuthor.set(entry.author, entry)
+    valuesByAuthor.set(event.pubkey, event)
     return true
   }
 
-  get(filter: EntryFilter, callback: (entry: Entry) => void) {
-    const valuesByAuthor = this.entriesByPathAndAuthor.get(filter.path)
+  get(filter: Filter, callback: (event: Event) => void) {
+    const path = getFilterPath(filter)
+    if (!path) {
+      throw new Error(`filter has no #d tag: ${JSON.stringify(filter)}`)
+    }
+    const valuesByAuthor = this.eventsByPathAndAuthor.get(path)
     if (!valuesByAuthor) {
       return
     }
-    for (let [author, entry] of valuesByAuthor) {
+    for (let [author, event] of valuesByAuthor) {
       if (!filter.authors || filter.authors.indexOf(author) !== -1) {
-        callback(entry)
+        callback(event)
       }
     }
   }
 }
 
 export class Path {
-  store: Store
+  store: MemoryStorage
   listeners: Map<string, Listener>
   publish: Publish
   subscribe: Subscribe
   unsubscribe: Unsubscribe
+  filter: Filter
   encrypt?: Encrypt
   decrypt?: Decrypt
 
-  constructor(publish: Publish, subscribe: Subscribe, unsubscribe: Unsubscribe, encrypt?: Encrypt, decrypt?: Decrypt) {
+  constructor(publish: Publish, subscribe: Subscribe, unsubscribe: Unsubscribe, filter: Filter, encrypt?: Encrypt, decrypt?: Decrypt) {
     this.publish = publish
     this.subscribe = subscribe
     this.unsubscribe = unsubscribe
+    this.filter = filter
     this.encrypt = encrypt
     this.decrypt = decrypt
-    this.store = new Store()
+    this.store = new MemoryStorage()
     this.listeners = new Map<string, Listener>()
   }
 
   async publishSetEvent(path: string, value: any): Promise<Event> {
-    let eventPath: string
     let content: string
     if (this.encrypt) {
+      // TODO: path should be deterministically encrypted hash(path + secret) but NIP07 provides no way for that
       const contentStr = JSON.stringify(value)
       content = await this.encrypt(contentStr)
-      const pathParts = path.split('/')
-      const encryptedPathParts = [] // TODO path should be deterministic: use hash(path + secret)
-      for (let i = 0; i < pathParts.length; i++) {
-        encryptedPathParts.push(await this.encrypt(pathParts[i]))
-      }
-      eventPath = encryptedPathParts.join('|') // slash is a base64 character
-      if (contentStr === content || path === eventPath) {
-        throw new Error(`Encryption failed: ${contentStr} === ${content} || ${path} === ${eventPath}`)
+      if (contentStr === content) {
+        throw new Error(`Encryption failed: ${contentStr} === ${content}`)
       }
     } else {
       content = JSON.stringify(value)
-      eventPath = path
     }
     return this.publish({
-      kind: 30000,
-      tags: [['d', eventPath]],
+      kind: EVENT_KIND,
+      tags: [['d', path]],
       content,
       created_at: Math.floor(Date.now() / 1000),
     })
@@ -122,14 +127,8 @@ export class Path {
     try {
       const event = await this.publishSetEvent(path, value)
       if (event) {
-        const entry = {
-          created_at: event.created_at,
-          author: event.pubkey,
-          value,
-          path,
-        }
-        if (this.store.set(entry)) {
-          this.notifyListeners(entry)
+        if (this.store.set(event)) {
+          this.notifyListeners(event as CompleteEvent)
         }
         return true
       }
@@ -139,47 +138,29 @@ export class Path {
     return false
   }
 
-  async getEntryFromEvent(event: Event): Promise<Entry> {
-    let value
-    let path
-    if (this.decrypt) {
-      const pathTag = event.tags.find((tag) => tag[0] === 'd')
-      if (!pathTag) {
-        throw new Error('No path tag found in event ' + JSON.stringify(event))
-      }
-      value = JSON.parse(await this.decrypt(event.content))
-      const pathParts = pathTag[1].split('|')
-      const decryptedPathParts = []
-      for (let i = 0; i < pathParts.length; i++) {
-        decryptedPathParts.push(await this.decrypt(pathParts[i]))
-      }
-      path = decryptedPathParts.join('/')
-    } else {
-      value = JSON.parse(event.content)
-      path = event.tags[0][1]
+  async getEventValue(event: Event): Promise<any> {
+    let value = this.decrypt ? await this.decrypt(event.content) : event.content
+    try {
+      value = JSON.parse(value)
+    } catch (e) {
+      throw new Error(`Failed to parse event content: ${value}`)
     }
-    return {
-      created_at: event.created_at,
-      author: event.pubkey,
-      value,
-      path,
-    }
+    return value
   }
 
-  get(filter: EntryFilter, callback: (entry: Entry) => void): Listener {
+  get(path: string, callback: PathCallback, filter = {}): Listener {
+    filter = Object.assign({}, filter, this.filter, { '#d': [path], kinds: [EVENT_KIND] })
     const listener = this.addListener(filter, callback)
-    this.store.get(filter, callback)
-    const filters = [{ "#d": [filter.path], kinds: [30000], authors: filter.authors }]
-    this.subscribe(filters, async (event) => {
-      const entry = await this.getEntryFromEvent(event)
-      if (this.store.set(entry)) {
-        this.notifyListeners(entry)
+    this.store.get(filter, (event) => this.callbackFromEvent(event, callback))
+    this.subscribe([filter], async (event) => {
+      if (this.store.set(event)) {
+        this.notifyListeners(event as CompleteEvent)
       }
     })
     return listener
   }
 
-  addListener(filter: EntryFilter, callback: (entry: Entry) => void): Listener {
+  addListener(filter: Filter, callback: PathCallback): Listener {
     const id = Math.random().toString(36).substr(2, 9)
     const listener: Listener = { filter, callback, off: () => {
       this.listeners.delete(id)
@@ -198,12 +179,20 @@ export class Path {
     }
   }
 
-  notifyListeners(entry) {
+  callbackFromEvent(event: Event, callback: PathCallback) {
+    const path = getEventPath(event)
+    if (!path) {
+      throw new Error(`event has no d tag: ${JSON.stringify(event)}`)
+    }
+    this.getEventValue(event).then((value) => {
+      callback(value, path, event)
+    })
+  }
+
+  async notifyListeners(event: CompleteEvent) {
     for (let listener of this.listeners.values()) {
-      if (entry.path === listener.filter.path) {
-        if (!listener.filter.authors || listener.filter.authors.indexOf(entry.author) !== -1) {
-          listener.callback(entry)
-        }
+      if (matchFilter(listener.filter, event)) {
+        this.callbackFromEvent(event, listener.callback)
       }
     }
   }
