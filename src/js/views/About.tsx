@@ -18,7 +18,7 @@ class About extends Component {
               <b>Note 23.12.2022:</b> Heavily under construction: started integrating{' '}
               <a href="https://github.com/nostr-protocol/nostr">Nostr</a> this week.
             </p>
-            <h3>{t('about')}</h3>
+            <h2>{t('about')}</h2>
             <p>Iris is like the social networking apps we're used to, but better:</p>
             <ul>
               <li>
@@ -56,10 +56,23 @@ class About extends Component {
               <small>Version 2.3.3</small>
             </p>
 
-            <h4>Privacy</h4>
+            <h3>Privacy</h3>
             <p>{t('application_security_warning')}</p>
 
-            <h4>Developer:</h4>
+            <h3>FAQ</h3>
+            <p>
+              <i>Why is there less spam than on other clients?</i>
+            </p>
+            <p>
+              Iris rejects all content from authors that your social network has not interacted
+              with. You get way less spam, but the downside is that discovery of new users is more
+              difficult, and sometimes you don't see all the messages that appear on other clients.
+            </p>
+            <p>
+              <a href="https://github.com/irislib/faq">More...</a>
+            </p>
+
+            <h3>Developer:</h3>
             <div class="profile-link-container">
               <a href={`/profile/${DEVELOPER}`} class="profile-link">
                 <Identicon str={DEVELOPER} width={40} />
@@ -68,6 +81,7 @@ class About extends Component {
               <FollowButton id={DEVELOPER} />
             </div>
 
+            <h3>Contact</h3>
             <p>
               While we're working on Iris group chats, you're welcome to join our{' '}
               <a href="https://t.me/irismessenger">Telegram</a> channel.
@@ -76,8 +90,6 @@ class About extends Component {
             <a href="https://opencollective.com/iris-social/donate" target="_blank">
               <img src="/assets/img/opencollective.png" width={200} />
             </a>
-
-            <p>BTC: bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze</p>
             <br />
           </div>
         </div>
