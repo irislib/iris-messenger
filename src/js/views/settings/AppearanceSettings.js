@@ -1,5 +1,3 @@
-import iris from 'iris-lib';
-
 import Component from '../../BaseComponent';
 import Nostr from '../../Nostr';
 import { translate as t } from '../../translations/Translation';

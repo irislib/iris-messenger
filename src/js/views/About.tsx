@@ -6,6 +6,7 @@ import Name from '../components/Name';
 import { translate as t } from '../translations/Translation';
 
 const DEVELOPER = 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk';
+const IRIS_ACCOUNT = 'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8';
 
 class About extends Component {
   render() {
@@ -74,7 +75,7 @@ class About extends Component {
 
             <h3>Maintainer</h3>
             <div class="profile-link-container">
-              <a href={`/profile/${DEVELOPER}`} class="profile-link">
+              <a href={`#/profile/${DEVELOPER}`} class="profile-link">
                 <Identicon str={DEVELOPER} width={40} />
                 <Name pub={DEVELOPER} placeholder="Iris developer's account" />
               </a>
@@ -82,6 +83,14 @@ class About extends Component {
             </div>
 
             <h3>Contact</h3>
+            <div class="profile-link-container">
+              <a href={`#/profile/${IRIS_ACCOUNT}`} className="profile-link">
+                <Identicon str={IRIS_ACCOUNT} width={40} />
+                <Name pub={IRIS_ACCOUNT} placeholder="Iris" />
+              </a>
+              <FollowButton id={IRIS_ACCOUNT} />
+            </div>
+
             <p>
               While we're working on Iris group chats, you're welcome to join our{' '}
               <a href="https://t.me/irismessenger">Telegram</a> channel.
