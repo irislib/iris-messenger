@@ -350,19 +350,21 @@ class Profile extends View {
           const nip05Parts = nip05.split('@');
           const nip05User = nip05Parts[0];
           const nip05Domain = nip05Parts[1];
+          let newUrl;
           if (nip05Domain === 'iris.to') {
-            // replace history entry
-            const newUrl = `/${nip05User}`;
-            window.history.replaceState({}, '', newUrl);
+            if (nip05User === '_') {
+              newUrl = '/iris';
+            } else {
+              newUrl = `/${nip05User}`;
+            }
           } else {
-            let newUrl;
             if (nip05User === '_') {
               newUrl = `/${nip05Domain}`;
             } else {
               newUrl = `/${nip05}`;
             }
-            window.history.replaceState({}, '', newUrl);
           }
+          window.history.replaceState({}, '', newUrl);
         }
 
         let lud16 = profile.lud16;
