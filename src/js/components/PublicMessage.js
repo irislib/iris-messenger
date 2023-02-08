@@ -380,7 +380,7 @@ class PublicMessage extends Message {
   }
 
   renderDropdown() {
-    const url = `https://iris.to//post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`;
+    const url = `https://iris.to/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`;
     return html`
       <div class="msg-menu-btn">
         <${Dropdown}>

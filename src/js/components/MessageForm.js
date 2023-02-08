@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 
 import Nostr from '../Nostr';
+import Helpers from "../Helpers";
 
 const mentionRegex = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
 
@@ -30,12 +31,15 @@ export default class MessageForm extends Component {
     }
     // unique tagged users
     const taggedUsers = msg.text
-      .match(/(?:@)?(npub\w+)/gi)
+      .match(Helpers.pubKeyRegex)
       ?.filter((v, i, a) => a.indexOf(v) === i);
     if (taggedUsers) {
       event.tags = event.tags || [];
       for (const tag of taggedUsers) {
         const hexTag = Nostr.toNostrHexAddress(tag.replace('@', ''));
+        if (!hexTag) {
+          continue;
+        }
         const newTag = ['p', hexTag];
         // add if not already present
         if (!event.tags.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {
