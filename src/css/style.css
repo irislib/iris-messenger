@@ -285,6 +285,7 @@ textarea.new-msg {
   border: 2px solid var(--button-bg);
 }
 
+.msg-content iframe,
 .msg-content video,
 .message-form video {
   width: 100%;
