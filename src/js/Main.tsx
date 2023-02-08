@@ -46,14 +46,14 @@ type ReactState = {
 };
 
 // need to add initChannels: true to here and login() to get channels to load. disabled to test performance
-iris.session.init({ autologin: window.location.href.length > 1, autofollow: false });
+iris.session.init({ autologin: window.location.pathname.length > 1, autofollow: false });
 Nostr.init();
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {
     // if location contains a hash #, redirect to the same url without the hash. For example #/profile -> /profile
-    if (window.location.hash.length > 2) {
-      window.location.href = window.location.hash.replace('#', '');
+    if (window.location.hash.length) {
+      window.location.href = window.location.origin + window.location.hash.replace('#', '');
     }
     window.onload = () => {
       // this makes sure that window.nostr is there

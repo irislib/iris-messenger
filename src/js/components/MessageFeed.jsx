@@ -63,7 +63,6 @@ class MessageFeed extends Component {
   );
 
   handleScroll = () => {
-    console.log('handleScroll');
     // increase page size when scrolling down
     if (this.state.displayCount < this.state.sortedMessages.length) {
       if (

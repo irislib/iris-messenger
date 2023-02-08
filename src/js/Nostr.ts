@@ -17,6 +17,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import localForage from 'localforage';
 
 import SortedLimitedEventSet from './SortedLimitedEventSet';
+import { route } from 'preact-router';
 
 const startTime = Date.now() / 1000;
 
@@ -1271,6 +1272,7 @@ const Nostr = {
     return true;
   },
   async logOut() {
+    route('/');
     await localForage.clear();
     iris.session.logOut();
   },
