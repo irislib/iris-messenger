@@ -316,7 +316,10 @@ class Profile extends View {
           <meta name="description" content=${description} />
           <meta property="og:type" content="profile" />
           ${this.state.picture
-            ? html`<meta property="og:image" content=${this.state.picture} />`
+            ? html`
+                <meta property="og:image" content=${this.state.picture} />
+                <meta name="twitter:image" content=${this.state.picture} />
+              `
             : ''}
           <meta property="og:title" content=${ogTitle} />
           <meta property="og:description" content=${description} />

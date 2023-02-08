@@ -148,9 +148,10 @@ class Main extends Component<Props, ReactState> {
             <meta property="og:type" content="website" />
             <meta property="og:title" content={title} />
             <meta property="og:description" content="Social Networking Freedom" />
-            <meta property="og:url" content={`https://iris.to/${window.location.hash}`} />
+            <meta property="og:url" content={`https://iris.to${window.location.pathname}`} />
             <meta property="og:image" content="https://iris.to/assets/img/cover.jpg" />
             <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:image" content="https://iris.to/assets/img/cover.jpg" />
           </Helmet>
           <div className="overlay" onClick={() => this.onClickOverlay()}></div>
           <div className="view-area">
