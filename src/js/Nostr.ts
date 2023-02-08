@@ -786,10 +786,15 @@ const Nostr = {
     }
     this.postsAndRepliesByUser.get(event.pubkey)?.add(event);
 
+    const replyingTo = this.getEventReplyingTo(event);
     this.latestNotesByEveryone.add(event);
+    // we don't want both the reply and the original post in the feed:
+    replyingTo && this.latestNotesByEveryone.delete(replyingTo);
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
       const changed = this.latestNotesByFollows.add(event);
+      // we don't want both the reply and the original post in the feed:
+      replyingTo && this.latestNotesByFollows.delete(replyingTo);
       if (changed && this.localStorageLoaded) {
         saveLocalStorageEvents(this);
       }
@@ -799,7 +804,6 @@ const Nostr = {
     // where content points to the original message tag: "content": "#[1]"
 
     const isBoost = this.isBoost(event);
-    const replyingTo = this.getEventReplyingTo(event);
     if (replyingTo && !isBoost) {
       if (!this.directRepliesByMessageId.has(replyingTo)) {
         this.directRepliesByMessageId.set(replyingTo, new Set<string>());
