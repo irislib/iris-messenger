@@ -168,10 +168,10 @@ class Profile extends View {
             </div>
             <div class="profile-actions">
               <div class="follow-count">
-                <a href="/follows/${this.state.hexPub}">
+                <a href="/follows/${this.state.npub}">
                   <span>${this.state.followedUserCount}</span> ${t('following')}
                 </a>
-                <a href="/followers/${this.state.hexPub}">
+                <a href="/followers/${this.state.npub}">
                   <span>${this.state.followerCount}</span> ${t('followers')}
                 </a>
               </div>
@@ -189,7 +189,7 @@ class Profile extends View {
                       />
                     `
                   : ''}
-                <${Button} small=${true} onClick=${() => route(`/chat/${this.state.hexPub}`)}>
+                <${Button} small=${true} onClick=${() => route(`/chat/${this.state.npub}`)}>
                   ${t('send_message')}
                 <//>
               </div>
@@ -204,7 +204,7 @@ class Profile extends View {
             : html`
                 <div>
                   <${FollowButton} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
-                  <${Button} small=${true} onClick=${() => route(`/chat/${this.state.hexPub}`)}>
+                  <${Button} small=${true} onClick=${() => route(`/chat/${this.state.npub}`)}>
                     ${t('send_message')}
                   <//>
                 </div>
@@ -355,7 +355,12 @@ class Profile extends View {
             const newUrl = `/${nip05User}`;
             window.history.replaceState({}, '', newUrl);
           } else {
-            const newUrl = `/${nip05}`;
+            let newUrl;
+            if (nip05User === '_') {
+              newUrl = `/${nip05Domain}`;
+            } else {
+              newUrl = `/${nip05}`;
+            }
             window.history.replaceState({}, '', newUrl);
           }
         }
@@ -434,7 +439,12 @@ class Profile extends View {
       // id is not a nostr address, but maybe it's a username
       let username = pub;
       if (!username.match(/.+@.+\..+/)) {
-        username = username + '@iris.to';
+        // domain name?
+        if (username.match(/.+\..+/)) {
+          username = '_@' + username;
+        } else {
+          username = username + '@iris.to';
+        }
       }
       Nostr.getPubKeyByNip05Address(username).then((pubKey) => {
         if (pubKey) {
