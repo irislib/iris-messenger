@@ -80,7 +80,7 @@ export default {
       );
     });
     replacedText = reactStringReplace(replacedText, pubKeyRegex, (match, i) => {
-      const link = `#/profile/${match}`;
+      const link = `#/${match}`;
       return (
         <a href={link}>
           @<Name key={match + i} pub={match} hideBadge={true} userNameOnly={true} />
@@ -359,7 +359,7 @@ export default {
   },
 
   getProfileLink(pub: string): string {
-    return `${window.location.origin}/#/profile/${encodeURIComponent(pub)}`;
+    return `${window.location.origin}/#/${encodeURIComponent(pub)}`;
   },
 
   isElectron,

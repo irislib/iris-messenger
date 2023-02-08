@@ -57,7 +57,7 @@ class Explorer extends View {
         <a href="#/explorer/${encodeURIComponent(split.slice(0, i + 1).join('/'))}">
           ${isPubKey ? html`<${Name} key=${substr} pub=${substr} placeholder="profile name" />` : k}
         </a>
-        ${isPubKey ? html`<small> (<a href="#/profile/${substr}">${t('profile')}</a>)</small>` : ''}
+        ${isPubKey ? html`<small> (<a href="#/${substr}">${t('profile')}</a>)</small>` : ''}
       `;
     });
     const s = this.state;

@@ -79,7 +79,7 @@ class Footer extends Component<Props, State> {
             {Icons.global}
           </a>
           <a
-            href={`#/profile/${key}`}
+            href={`#/${key}`}
             class={`${activeRoute === `/profile/${key}` ? 'active' : ''} my-profile`}
           >
             <Identicon str={key} width={34} />

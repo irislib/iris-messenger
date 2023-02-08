@@ -331,7 +331,7 @@ class PublicMessage extends Message {
         <div class="msg-content">
           <div style="display: flex; align-items: center">
             <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
-            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+            <a href="#/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               <${Name} pub=${this.state.msg?.event?.pubkey} />${' '}
             </a>
             <span> started following you</span>
@@ -355,7 +355,7 @@ class PublicMessage extends Message {
           >
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
             <a
-              href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
+              href="#/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
               style="margin-right: 5px;"
             >
               <${Name} pub=${this.state.msg?.event?.pubkey} userNameOnly=${true} />
@@ -442,7 +442,7 @@ class PublicMessage extends Message {
         <div class="msg-content" style="padding: 12px 0 0 0;">
           <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
             <i style="margin-right: 15px;"> ${Icons.boost} </i>
-            <a href="#/profile/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+            <a href="#/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               <${Name}
                 pub=${this.state.msg?.event?.pubkey}
                 hideBadge=${true}
@@ -606,7 +606,7 @@ class PublicMessage extends Message {
           <div class="msg-identicon">
             ${s.msg.info.from
               ? html`
-                  <a href=${`#/profile/${s.msg.info.from}`}>
+                  <a href=${`#/${s.msg.info.from}`}>
                     <${Identicon} str=${s.msg.info.from} width="40" />
                   </a>
                 `
@@ -618,7 +618,7 @@ class PublicMessage extends Message {
               <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
                 ${this.props.showName &&
                 html`
-                  <a href=${`#/profile/${s.msg.info.from}`} class="msgSenderName">
+                  <a href=${`#/${s.msg.info.from}`} class="msgSenderName">
                     <${Name} pub=${s.msg.info.from} />
                   </a>
                 `}
@@ -643,7 +643,7 @@ class PublicMessage extends Message {
                       .slice(0, 3)
                       .map(
                         (u) => html`
-                          <a href=${`#/profile/${Nostr.toNostrBech32Address(u, 'npub')}`}>
+                          <a href=${`#/${Nostr.toNostrBech32Address(u, 'npub')}`}>
                             @<${Name} pub=${u} hideBadge=${true} userNameOnly=${true} />${' '}
                           </a>
                         `,

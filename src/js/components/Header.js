@@ -287,7 +287,7 @@ class Header extends Component {
 
         <${Link}
           activeClassName="active"
-          href="#/profile/${npub}"
+          href="#/${npub}"
           onClick=${() => iris.local().get('scrollUp').put(true)}
           class="hidden-xs my-profile"
         >

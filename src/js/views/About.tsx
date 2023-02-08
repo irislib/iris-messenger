@@ -75,7 +75,7 @@ class About extends Component {
 
             <h3>Maintainer</h3>
             <div class="profile-link-container">
-              <a href={`#/profile/${DEVELOPER}`} class="profile-link">
+              <a href={`#/${DEVELOPER}`} class="profile-link">
                 <Identicon str={DEVELOPER} width={40} />
                 <Name pub={DEVELOPER} placeholder="Iris developer's account" />
               </a>
@@ -84,7 +84,7 @@ class About extends Component {
 
             <h3>Contact</h3>
             <div class="profile-link-container">
-              <a href={`#/profile/${IRIS_INFO_ACCOUNT}`} className="profile-link">
+              <a href={`#/${IRIS_INFO_ACCOUNT}`} className="profile-link">
                 <Identicon str={IRIS_INFO_ACCOUNT} width={40} />
                 <Name pub={IRIS_INFO_ACCOUNT} placeholder="Iris" />
               </a>

@@ -156,7 +156,7 @@ class Message extends Component {
       duration: ANIMATE_DURATION,
       complete: () => $('#attachment-gallery').remove(),
     });
-    const activeChat = window.location.hash.replace('#/profile/', '').replace('#/chat/', '');
+    const activeChat = window.location.hash.replace('#/', '').replace('#/chat/', '');
     if (activeChat) {
       iris.private(activeChat).attachments = null;
     }
