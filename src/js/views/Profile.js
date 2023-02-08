@@ -374,6 +374,22 @@ class Profile extends View {
       return;
     }
     const nostrHex = Nostr.toNostrHexAddress(pub);
+    if (!nostrHex) {
+      // id is not a nostr address, but maybe it's a username
+      let username = pub;
+      if (!username.match(/.+@.+\..+/)) {
+        username = username + '@iris.to';
+      }
+      Nostr.getPubKeyByNip05Address(username).then((pubKey) => {
+        if (pubKey) {
+          const nostrNpub = Nostr.toNostrBech32Address(pubKey, 'npub');
+          route(`/profile/${nostrNpub}`, true);
+        } else {
+          this.setState({ notFound: true });
+        }
+      });
+      return;
+    }
     const isMyProfile =
       iris.session.getPubKey() === pub || nostrHex === iris.session.getKey().secp256k1.rpub;
     this.setState({ isMyProfile });

@@ -188,6 +188,7 @@ class Main extends Component<Props, ReactState> {
               />
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
+              <MyProfile path="/:id+" tab="profile" />
             </Router>
           </div>
         </section>
