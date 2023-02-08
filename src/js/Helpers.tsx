@@ -156,11 +156,7 @@ export default {
     });
 
     replacedText = reactStringReplace(replacedText, /(https?:\/\/\S*[^.?,)\s])/gi, (match, i) => (
-      <a
-        key={match + i}
-        href={match}
-        target={match.startsWith('https://iris.to') ? '_self' : '_blank'}
-      >
+      <a key={match + i} href={match.replace(/^https:\/\/iris.to/, '')}>
         {match}
       </a>
     ));
