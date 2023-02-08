@@ -218,6 +218,7 @@ const Nostr = {
     };
 
     this.publish(event);
+    this.subscribeToAuthors(this);
   },
 
   setBlocked: function (blockedUser: string, block = true) {
@@ -517,15 +518,7 @@ const Nostr = {
     const myPub = iris.session.getKey().secp256k1.rpub;
     const followedUsers = Array.from(_this.followedByUser.get(myPub) ?? []);
     followedUsers.push(myPub);
-    const otherSubscribedUsers = Array.from(_this.subscribedUsers).filter(
-      (u) => !followedUsers.includes(u),
-    );
-    console.log(
-      'subscribe to followedUsers.length',
-      followedUsers.length,
-      'otherSubscribedUsers.length',
-      otherSubscribedUsers.length,
-    );
+    console.log('subscribe to', followedUsers.length, 'followedUsers');
     _this.sendSubToRelays(
       [{ kinds: [0, 3], until: now, authors: followedUsers }],
       'followed',
@@ -1348,7 +1341,7 @@ const Nostr = {
       }
       document.documentElement.setAttribute('data-theme', 'dark');
     });
-    this.knownUsers.add(key);
+    this.knownUsers.add(myPub);
     this.manageRelays();
     this.loadLocalStorageEvents();
     this.getProfile(key.secp256k1.rpub, undefined);
