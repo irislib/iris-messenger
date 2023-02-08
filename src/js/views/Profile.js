@@ -340,7 +340,23 @@ class Profile extends View {
     Nostr.getFollowedByUser(address, setFollowCounts);
     Nostr.getProfile(
       address,
-      (profile, addr) => {
+      (profile) => {
+        if (profile.nip05 && profile.nip05valid) {
+          // replace url and history entry with iris.to/${profile.nip05} or if nip is user@iris.to, just iris.to/${user}
+          const nip05 = profile.nip05;
+          const nip05Parts = nip05.split('@');
+          const nip05User = nip05Parts[0];
+          const nip05Domain = nip05Parts[1];
+          if (nip05Domain === 'iris.to') {
+            // replace history entry
+            const newUrl = `/${nip05User}`;
+            window.history.replaceState({}, '', newUrl);
+          } else {
+            const newUrl = `/${nip05}`;
+            window.history.replaceState({}, '', newUrl);
+          }
+        }
+
         let lud16 = profile.lud16;
         if (lud16 && !lud16.startsWith('lightning:')) {
           lud16 = 'lightning:' + lud16;
