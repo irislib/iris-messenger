@@ -226,13 +226,13 @@ class Profile extends View {
   renderTabs() {
     return html`
       <div class="tabs">
-        <${Link} activeClassName="active" href="/${this.state.hexPub}"
+        <${Link} activeClassName="active" href="/${this.state.npub}"
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
-        <${Link} activeClassName="active" href="/replies/${this.state.hexPub}"
+        <${Link} activeClassName="active" href="/replies/${this.state.npub}"
           >${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
-        <${Link} activeClassName="active" href="/likes/${this.state.hexPub}"
+        <${Link} activeClassName="active" href="/likes/${this.state.npub}"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
         >
       </div>
@@ -380,7 +380,6 @@ class Profile extends View {
   }
 
   loadProfile(hexPub) {
-    this.setState({ hexPub });
     const isMyProfile = hexPub === iris.session.getKey().secp256k1.rpub;
     this.setState({ isMyProfile });
     this.followedUsers = new Set();
@@ -433,6 +432,7 @@ class Profile extends View {
       });
       return;
     }
+    this.setState({ hexPub, npub: Nostr.toNostrBech32Address(hexPub, 'npub') });
     this.loadProfile(hexPub);
   }
 }
