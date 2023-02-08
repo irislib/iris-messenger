@@ -6,6 +6,7 @@ import Helpers from '../Helpers';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
+import Button from './basic/Button';
 import CopyButton from './CopyButton';
 import FollowButton from './FollowButton';
 import Identicon from './Identicon';
@@ -15,11 +16,11 @@ export default class OnboardingNotification extends Component {
   componentDidMount() {
     iris.local().get('noFollowers').on(this.inject());
     iris.local().get('hasNostrFollowers').on(this.inject());
-    iris.local().get('noFollows').on(this.inject());
+    iris.local().get('showFollowSuggestions').on(this.inject());
   }
 
   render() {
-    if (this.state.noFollows) {
+    if (this.state.showFollowSuggestions) {
       return html`
         <div class="msg">
           <div class="msg-content">
@@ -36,6 +37,11 @@ export default class OnboardingNotification extends Component {
                   </div>
                 `,
               )}
+              <p>
+                <${Button} onClick=${() => iris.local().get('showFollowSuggestions').put(false)}>
+                  ${t('done')}
+                </Button>
+              </p>
               <p>
                 ${t('alternatively')}<i> </i>
                 <a

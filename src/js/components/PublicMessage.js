@@ -200,22 +200,6 @@ class PublicMessage extends Message {
     }
   }
 
-  componentDidUpdate() {
-    if (this.state.msg && !this.linksDone) {
-      $(this.base)
-        .find('a')
-        .off()
-        .on('click', (e) => {
-          const href = $(e.target).attr('href');
-          if (href && href.indexOf('https://iris.to/') === 0) {
-            e.preventDefault();
-            window.location = href.replace('https://iris.to/', '');
-          }
-        });
-      this.linksDone = true;
-    }
-  }
-
   onClickName(e) {
     e.stopPropagation();
     route(`/${this.state.msg.info.from}`);
@@ -229,7 +213,6 @@ class PublicMessage extends Message {
   boostBtnClicked() {
     if (!this.state.boosted) {
       const author = this.state.msg?.event?.pubkey;
-
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Nostr.publish({

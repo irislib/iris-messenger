@@ -114,6 +114,7 @@ class Login extends Component {
     e.preventDefault();
     let name = document.getElementById('login-form-name').value;
     iris.session.loginAsNewUser({ name, autofollow: false });
+    iris.local().get('showFollowSuggestions').put(true);
     name && setTimeout(() => {
       Nostr.setMetadata({ name });
     }, 100);

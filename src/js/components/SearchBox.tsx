@@ -39,7 +39,7 @@ type ResultItem = {
 type State = {
   results: Array<Result>;
   query: string;
-  noFollows: boolean;
+  showFollowSuggestions: boolean;
   offsetLeft: number;
   selected: number;
 };
@@ -50,7 +50,7 @@ class SearchBox extends Component<Props, State> {
     this.state = {
       results: [],
       query: '',
-      noFollows: true,
+      showFollowSuggestions: true,
       offsetLeft: 0,
       selected: -1, // -1 - 'search by keyword'
     };
@@ -77,7 +77,7 @@ class SearchBox extends Component<Props, State> {
   }
 
   componentDidMount() {
-    iris.local().get('noFollows').on(this.inject());
+    iris.local().get('showFollowSuggestions').on(this.inject());
     iris
       .local()
       .get('searchIndexUpdated')

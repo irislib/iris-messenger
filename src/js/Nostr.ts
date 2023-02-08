@@ -910,7 +910,9 @@ const Nostr = {
       }
     }
     if (event.pubkey === myPub && event.tags.length) {
-      iris.local().get('noFollows').put(false);
+      if (this.followedByUser.get(myPub)?.size > 10) {
+        iris.local().get('showFollowSuggestions').put(false);
+      }
     }
     if (event.pubkey === myPub && event.content?.length) {
       try {
