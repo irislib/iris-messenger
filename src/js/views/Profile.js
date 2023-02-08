@@ -341,8 +341,6 @@ class Profile extends View {
     Nostr.getProfile(
       address,
       (profile, addr) => {
-        console.log('got profile', profile, addr);
-        if (!profile || addr !== this.state.hexPub) return;
         let lud16 = profile.lud16;
         if (lud16 && !lud16.startsWith('lightning:')) {
           lud16 = 'lightning:' + lud16;
