@@ -52,6 +52,10 @@ Nostr.init();
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {
+    // if location contains a hash #, redirect to the same url without the hash. For example #/profile -> /profile
+    if (window.location.hash.length > 2) {
+      window.location.href = window.location.hash.replace('#', '');
+    }
     window.onload = () => {
       // this makes sure that window.nostr is there
       iris.local().get('loggedIn').on(this.inject());
@@ -111,7 +115,6 @@ class Main extends Component<Props, ReactState> {
         </div>
       );
     }
-    const history = createHashHistory() as unknown; // TODO: align types between 'history' and 'preact-router'
 
     // hack to remount profile on route change
     type MyProfileParams = { id?: string; tab: string; path: string };
@@ -156,7 +159,7 @@ class Main extends Component<Props, ReactState> {
           </Helmet>
           <div className="overlay" onClick={() => this.onClickOverlay()}></div>
           <div className="view-area">
-            <Router history={history as CustomHistory} onChange={(e) => this.handleRoute(e)}>
+            <Router onChange={(e) => this.handleRoute(e)}>
               <Feed path="/" index="follows" />
               <Feed path="/global" index="everyone" />
               <Feed path="/search/:term?/:type?" />

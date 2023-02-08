@@ -273,7 +273,7 @@ class SearchBox extends Component<Props, State> {
                 onFocus={(e) => this.onResultFocus(e, index)}
                 tabIndex={2}
                 className={'result ' + (index === this.state.selected ? 'selected' : '')}
-                href={i.uuid ? `/group/${i.uuid}` : `/profile/${i.key}`}
+                href={i.uuid ? `/group/${i.uuid}` : `/${i.key}`}
                 onClick={(e) => this.onClick(e, i)}
               >
                 {i.picture ? (

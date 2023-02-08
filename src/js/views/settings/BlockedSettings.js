@@ -21,7 +21,7 @@ export default class BlockedSettings extends Component {
         hasBlockedUsers = true;
         return (
           <p key={user}>
-            <a href={`/profile/${bech32}`}>
+            <a href={`/${bech32}`}>
               <Name pub={user} />
             </a>
           </p>

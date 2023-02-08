@@ -10,10 +10,10 @@ import { translate as t } from '../translations/Translation';
 const APPLICATIONS = [
   // TODO: move editable shortcuts to localState gun
   { url: '/', text: 'following', icon: Icons.home },
-  { url: '#/chat', text: 'messages', icon: Icons.chat },
-  { url: '#/global', text: 'global_feed', icon: Icons.global },
-  { url: '#/settings', text: 'settings', icon: Icons.settings },
-  { url: '#/about', text: 'about', icon: Icons.info },
+  { url: '/chat', text: 'messages', icon: Icons.chat },
+  { url: '/global', text: 'global_feed', icon: Icons.global },
+  { url: '/settings', text: 'settings', icon: Icons.settings },
+  { url: '/about', text: 'about', icon: Icons.info },
 ];
 
 export default class Menu extends Component {
@@ -39,7 +39,7 @@ export default class Menu extends Component {
         ${Helpers.isElectron
           ? html`<div class="electron-padding" />`
           : html`
-              <a tabindex="3" href="#/" onClick=${() => this.menuLinkClicked()} class="logo">
+              <a tabindex="3" href="/" onClick=${() => this.menuLinkClicked()} class="logo">
                 <div class="mobile-menu-icon visible-xs-inline-block">${Icons.menu}</div>
                 <img src=${logo} width="30" height="30" />
                 <span style="font-size: 1.8em">iris</span>

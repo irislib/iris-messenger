@@ -66,7 +66,7 @@ class Message extends Component {
   }
 
   onNameClick() {
-    route(`/profile/${this.props.pubkey}`);
+    route(`/${this.props.pubkey}`);
   }
 
   openAttachmentsGallery(event) {
@@ -156,7 +156,7 @@ class Message extends Component {
       duration: ANIMATE_DURATION,
       complete: () => $('#attachment-gallery').remove(),
     });
-    const activeChat = window.location.hash.replace('#/', '').replace('#/chat/', '');
+    const activeChat = window.location.hash.replace('/', '').replace('/chat/', '');
     if (activeChat) {
       iris.private(activeChat).attachments = null;
     }
@@ -209,7 +209,7 @@ class Message extends Component {
           <div class="below-text">
             <div class="time">
               ${this.props.hash
-                ? html`<a href="#/post/${encodeURIComponent(this.props.hash)}"
+                ? html`<a href="/post/${encodeURIComponent(this.props.hash)}"
                     >${Helpers.getRelativeTimeText(time)}</a
                   >`
                 : iris.util.formatTime(time)}

@@ -54,16 +54,16 @@ class Explorer extends View {
       const isPubKey = substr.match(pubKeyRegex);
       return html`
         ${chevronRight}
-        <a href="#/explorer/${encodeURIComponent(split.slice(0, i + 1).join('/'))}">
+        <a href="/explorer/${encodeURIComponent(split.slice(0, i + 1).join('/'))}">
           ${isPubKey ? html`<${Name} key=${substr} pub=${substr} placeholder="profile name" />` : k}
         </a>
-        ${isPubKey ? html`<small> (<a href="#/${substr}">${t('profile')}</a>)</small>` : ''}
+        ${isPubKey ? html`<small> (<a href="/${substr}">${t('profile')}</a>)</small>` : ''}
       `;
     });
     const s = this.state;
     return html`
       <p>
-        <a href="#/explorer">All</a> ${split[0].length ? pathString : ''}
+        <a href="/explorer">All</a> ${split[0].length ? pathString : ''}
         ${isRootLevel ? html`<small class="mar-left5">Iris raw data.</small>` : ''}
       </p>
       ${isRootLevel
@@ -72,7 +72,7 @@ class Explorer extends View {
               <span onClick=${() => this.setState({ publicOpen: !s.publicOpen })}
                 >${s.publicOpen ? chevronDown : chevronRight}</span
               >
-              <a href="#/explorer/Public"><b>Public</b></a>
+              <a href="/explorer/Public"><b>Public</b></a>
               <small class="mar-left5">(synced with peers)</small>
             </div>
             ${s.publicOpen
@@ -87,10 +87,10 @@ class Explorer extends View {
               <span onClick=${() => this.setState({ groupOpen: !s.groupOpen })}
                 >${s.groupOpen ? chevronDown : chevronRight}</span
               >
-              <a href="#/explorer/Group"><b>Group</b></a>
+              <a href="/explorer/Group"><b>Group</b></a>
               <small class="mar-left5"
                 >(public data, composite object of all the users in the
-                <a href="#/explorer/Local%2Fgroups">group</a>)</small
+                <a href="/explorer/Local%2Fgroups">group</a>)</small
               >
             </div>
             ${s.groupOpen
@@ -100,7 +100,7 @@ class Explorer extends View {
               <span onClick=${() => this.setState({ localOpen: !s.localOpen })}
                 >${s.localOpen ? chevronDown : chevronRight}</span
               >
-              <a href="#/explorer/Local"><b>Local</b></a>
+              <a href="/explorer/Local"><b>Local</b></a>
               <small class="mar-left5">(only stored on your device)</small>
             </div>
             ${s.localOpen

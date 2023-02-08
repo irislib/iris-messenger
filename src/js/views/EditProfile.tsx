@@ -51,7 +51,7 @@ export default class EditProfile extends Component {
     event.preventDefault();
     Nostr.setMetadata(this.state.profile);
     const myPub = Nostr.toNostrBech32Address(iris.session.getKey().secp256k1.rpub, 'npub');
-    route('/profile/' + myPub);
+    route('/' + myPub);
   };
 
   handleAddField = (event) => {

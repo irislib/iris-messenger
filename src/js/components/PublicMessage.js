@@ -218,7 +218,7 @@ class PublicMessage extends Message {
 
   onClickName(e) {
     e.stopPropagation();
-    route(`/profile/${this.state.msg.info.from}`);
+    route(`/${this.state.msg.info.from}`);
   }
 
   likeBtnClicked(e) {
@@ -331,7 +331,7 @@ class PublicMessage extends Message {
         <div class="msg-content">
           <div style="display: flex; align-items: center">
             <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
-            <a href="#/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+            <a href="/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               <${Name} pub=${this.state.msg?.event?.pubkey} />${' '}
             </a>
             <span> started following you</span>
@@ -355,13 +355,13 @@ class PublicMessage extends Message {
           >
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
             <a
-              href="#/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
+              href="/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}"
               style="margin-right: 5px;"
             >
               <${Name} pub=${this.state.msg?.event?.pubkey} userNameOnly=${true} />
             </a>
             <span>
-              liked your <a href="#/post/${likedId}">note</a> ${text && text.length
+              liked your <a href="/post/${likedId}">note</a> ${text && text.length
                 ? html`<i>"${text}"</i>`
                 : ''}</span
             >
@@ -397,7 +397,7 @@ class PublicMessage extends Message {
   }
 
   renderDropdown() {
-    const url = `https://iris.to/#/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`;
+    const url = `https://iris.to//post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`;
     return html`
       <div class="msg-menu-btn">
         <${Dropdown}>
@@ -442,7 +442,7 @@ class PublicMessage extends Message {
         <div class="msg-content" style="padding: 12px 0 0 0;">
           <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
             <i style="margin-right: 15px;"> ${Icons.boost} </i>
-            <a href="#/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+            <a href="/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               <${Name}
                 pub=${this.state.msg?.event?.pubkey}
                 hideBadge=${true}
@@ -598,7 +598,7 @@ class PublicMessage extends Message {
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           ${this.props.asQuote && s.msg.replyingTo
             ? html` <div style="flex-basis:100%; margin-bottom: 12px">
-                <a href="#/post/${Nostr.toNostrBech32Address(rootMsg, 'note')}"
+                <a href="/post/${Nostr.toNostrBech32Address(rootMsg, 'note')}"
                   >${t('show_thread')}</a
                 >
               </div>`
@@ -606,7 +606,7 @@ class PublicMessage extends Message {
           <div class="msg-identicon">
             ${s.msg.info.from
               ? html`
-                  <a href=${`#/${s.msg.info.from}`}>
+                  <a href=${`/${s.msg.info.from}`}>
                     <${Identicon} str=${s.msg.info.from} width="40" />
                   </a>
                 `
@@ -618,14 +618,14 @@ class PublicMessage extends Message {
               <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
                 ${this.props.showName &&
                 html`
-                  <a href=${`#/${s.msg.info.from}`} class="msgSenderName">
+                  <a href=${`/${s.msg.info.from}`} class="msgSenderName">
                     <${Name} pub=${s.msg.info.from} />
                   </a>
                 `}
                 <div class="time">
                   ${'· '}
                   <a
-                    href="#/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
+                    href="/post/${encodeURIComponent(s.msg.noteId || this.props.hash)}"
                     class="tooltip"
                   >
                     ${Helpers.getRelativeTimeText(time)}
@@ -643,7 +643,7 @@ class PublicMessage extends Message {
                       .slice(0, 3)
                       .map(
                         (u) => html`
-                          <a href=${`#/${Nostr.toNostrBech32Address(u, 'npub')}`}>
+                          <a href=${`/${Nostr.toNostrBech32Address(u, 'npub')}`}>
                             @<${Name} pub=${u} hideBadge=${true} userNameOnly=${true} />${' '}
                           </a>
                         `,
@@ -739,7 +739,7 @@ class PublicMessage extends Message {
                     ${Array.from(this.likedBy).map((key) => {
                       return html`<${Identicon}
                         showTooltip=${true}
-                        onClick=${() => route(`/profile/${key}`)}
+                        onClick=${() => route(`/${key}`)}
                         str=${Nostr.toNostrBech32Address(key, 'npub')}
                         width="32"
                       />`;
@@ -753,7 +753,7 @@ class PublicMessage extends Message {
                     ${Array.from(this.boostedBy).map((key) => {
                       return html`<${Identicon}
                         showTooltip=${true}
-                        onClick=${() => route(`/profile/${key}`)}
+                        onClick=${() => route(`/${key}`)}
                         str=${Nostr.toNostrBech32Address(key, 'npub')}
                         width="32"
                       />`;

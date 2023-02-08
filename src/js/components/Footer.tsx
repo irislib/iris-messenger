@@ -61,10 +61,10 @@ class Footer extends Component<Props, State> {
     return (
       <footer class="visible-xs-flex nav footer">
         <div class="header-content" onClick={() => iris.local().get('scrollUp').put(true)}>
-          <a href="#/" class={`btn ${activeRoute === '/' ? 'active' : ''}`}>
+          <a href="/" class={`btn ${activeRoute === '/' ? 'active' : ''}`}>
             {Icons.home}
           </a>
-          <a href="#/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
+          <a href="/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
             {this.state.unseenMsgsTotal ? (
               <span className="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
             ) : (
@@ -72,15 +72,15 @@ class Footer extends Component<Props, State> {
             )}
             {Icons.chat}
           </a>
-          <a href="#/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
+          <a href="/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
             {plusIcon}
           </a>
-          <a href="#/global" class={`btn ${activeRoute === '/global' ? 'active' : ''}`}>
+          <a href="/global" class={`btn ${activeRoute === '/global' ? 'active' : ''}`}>
             {Icons.global}
           </a>
           <a
-            href={`#/${key}`}
-            class={`${activeRoute === `/profile/${key}` ? 'active' : ''} my-profile`}
+            href={`/${key}`}
+            class={`${activeRoute === `/${key}` ? 'active' : ''} my-profile`}
           >
             <Identicon str={key} width={34} />
           </a>

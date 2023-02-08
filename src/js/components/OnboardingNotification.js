@@ -28,7 +28,7 @@ export default class OnboardingNotification extends Component {
               ${Nostr.SUGGESTED_FOLLOWS.map(
                 (pub) => html`
                   <div class="profile-link-container">
-                    <a href="#/${pub}" className="profile-link">
+                    <a href="/${pub}" className="profile-link">
                       <${Identicon} str=${pub} width="40" />
                       <${Name} pub=${pub} placeholder="Suggested follow" />
                     </a>
@@ -39,7 +39,7 @@ export default class OnboardingNotification extends Component {
               <p>
                 ${t('alternatively')}<i> </i>
                 <a
-                  href="#/${Nostr.toNostrBech32Address(
+                  href="/${Nostr.toNostrBech32Address(
                     iris.session.getKey()?.secp256k1?.rpub,
                     'npub',
                   )}"

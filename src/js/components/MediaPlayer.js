@@ -96,7 +96,7 @@ class MediaPlayer extends Component {
       <div class="media-player" style="${s.isOpen ? '' : 'display:none'}">
         <div class="player"></div>
         <div class="cover"></div>
-        <a href="#/torrent/${encodeURIComponent(this.state.torrentId)}" class="info">
+        <a href="/torrent/${encodeURIComponent(this.state.torrentId)}" class="info">
           ${s.splitPath
             ? s.splitPath.map((str, i) => {
                 if (i === s.splitPath.length - 1) {

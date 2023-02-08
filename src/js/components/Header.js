@@ -108,7 +108,7 @@ class Header extends Component {
 
   onTitleClicked() {
     if (this.chatId && this.chatId.indexOf('hashtag') === -1) {
-      const view = this.chatId.length < 40 ? '/group/' : '/profile/';
+      const view = this.chatId.length < 40 ? '/group/' : '/';
       route(view + this.chatId);
     }
   }
@@ -146,7 +146,7 @@ class Header extends Component {
       ? ''
       : html`
           <${SearchBox}
-            onSelect=${(item) => route(item.uuid ? `/chat/${item.uuid}` : `/profile/${item.key}`)}
+            onSelect=${(item) => route(item.uuid ? `/chat/${item.uuid}` : `/${item.key}`)}
           />
         `;
     const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
@@ -168,7 +168,7 @@ class Header extends Component {
           ${Helpers.isElectron || chatting
             ? ''
             : html`
-                <a href="#/" onClick=${(e) => this.onLogoClick(e)} class="visible-xs-flex logo">
+                <a href="/" onClick=${(e) => this.onLogoClick(e)} class="visible-xs-flex logo">
                   <div class="mobile-menu-icon">${Icons.menu}</div>
                 </a>
               `}
@@ -188,7 +188,7 @@ class Header extends Component {
               </a>
             `}
         <a
-          href="#/settings/nostr"
+          href="/settings/nostr"
           class="connected-peers tooltip mobile-search-hidden ${this.state.showMobileSearch
             ? 'hidden-xs'
             : ''} ${this.state.connectedRelays ? 'connected' : ''}"
@@ -268,7 +268,7 @@ class Header extends Component {
           : ''}
         <${Link}
           activeClassName="active"
-          href="#/notifications"
+          href="/notifications"
           class="notifications-button mobile-search-hidden ${this.state.showMobileSearch
             ? 'hidden'
             : ''}"
@@ -287,7 +287,7 @@ class Header extends Component {
 
         <${Link}
           activeClassName="active"
-          href="#/${npub}"
+          href="/${npub}"
           onClick=${() => iris.local().get('scrollUp').put(true)}
           class="hidden-xs my-profile"
         >

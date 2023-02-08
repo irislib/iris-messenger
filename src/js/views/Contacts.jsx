@@ -99,7 +99,7 @@ class Contacts extends View {
         <div class="profile-link-container">
           {k ? (
             <div class="">
-              <a href={`/profile/${k}`} class="profile-link">
+              <a href={`/${k}`} class="profile-link">
                 <Identicon key="i{k}" str={k} width={49} />
                 <div>
                   <Name key="k{k}" pub={k} />
@@ -159,7 +159,7 @@ class Contacts extends View {
             const contact = this.state.allContacts[k] || {};
             return (
               <div key={k} class="profile-link-container">
-                <a href={`/profile/${k}`} class="profile-link">
+                <a href={`/${k}`} class="profile-link">
                   <Identicon key={`i${k}`} str={k} width={49} />
                   <div>
                     <Name key={`k${k}`} pub={k} />

@@ -69,7 +69,7 @@ class Follows extends View {
     return html`
       <div class="centered-container">
         <h3>
-          <a href="#/${this.props.id}"> <${Name} pub=${this.props.id} /> </a>:<i> </i> ${this.props
+          <a href="/${this.props.id}"> <${Name} pub=${this.props.id} /> </a>:<i> </i> ${this.props
             .followers
             ? t('followers')
             : t('following')}
@@ -78,7 +78,7 @@ class Follows extends View {
           ${this.state.follows.map((hexKey) => {
             const npub = Nostr.toNostrBech32Address(hexKey, 'npub');
             return html` <div key=${npub} class="profile-link-container">
-              <a href="#/${npub}" class="profile-link">
+              <a href="/${npub}" class="profile-link">
                 <${Identicon} str=${npub} width="49" />
                 <div>
                   <${Name} pub=${npub} /><br />

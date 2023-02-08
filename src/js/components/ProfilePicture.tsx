@@ -98,7 +98,7 @@ class ProfilePicture extends Component<Props> {
       duration: ANIMATE_DURATION,
       complete: () => $('#attachment-gallery').remove(),
     });
-    const activeChat = window.location.hash.replace('#/', '').replace('#/chat/', '');
+    const activeChat = window.location.hash.replace('/', '').replace('/chat/', '');
     iris.private(activeChat).attachments = null;
   }
 

@@ -80,7 +80,7 @@ export default {
       );
     });
     replacedText = reactStringReplace(replacedText, pubKeyRegex, (match, i) => {
-      const link = `#/${match}`;
+      const link = `/${match}`;
       return (
         <a href={link}>
           @<Name key={match + i} pub={match} hideBadge={true} userNameOnly={true} />
@@ -89,7 +89,7 @@ export default {
     });
 
     replacedText = reactStringReplace(replacedText, noteRegex, (match, i) => {
-      const link = `#/post/${match}`;
+      const link = `/post/${match}`;
       return (
         <a key={match + i} href={link}>
           {match}
@@ -168,7 +168,7 @@ export default {
         if (tag) {
           if (tag[0] === 'p') {
             // profile
-            const link = `/profile/${tag[1]}`;
+            const link = `/${tag[1]}`;
             return (
               <a href={link}>
                 @<Name key={match + i} pub={tag[1]} hideBadge={true} userNameOnly={true} />
@@ -359,7 +359,7 @@ export default {
   },
 
   getProfileLink(pub: string): string {
-    return `${window.location.origin}/#/${encodeURIComponent(pub)}`;
+    return `${window.location.origin}//${encodeURIComponent(pub)}`;
   },
 
   isElectron,

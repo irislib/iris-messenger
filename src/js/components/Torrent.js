@@ -266,7 +266,7 @@ class Torrent extends Component {
               : ''}
           `
         : html`
-            <a href="#/torrent/${encodeURIComponent(this.props.torrentId)}">${t('show_files')}</a>
+            <a href="/torrent/${encodeURIComponent(this.props.torrentId)}">${t('show_files')}</a>
           `}
       ${s.showFiles && to && to.files
         ? html`

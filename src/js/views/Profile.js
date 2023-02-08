@@ -166,10 +166,10 @@ class Profile extends View {
             </div>
             <div class="profile-actions">
               <div class="follow-count">
-                <a href="#/follows/${this.props.id}">
+                <a href="/follows/${this.props.id}">
                   <span>${this.state.followedUserCount}</span> ${t('following')}
                 </a>
-                <a href="#/followers/${this.props.id}">
+                <a href="/followers/${this.props.id}">
                   <span>${this.state.followerCount}</span> ${t('followers')}
                 </a>
               </div>
@@ -217,7 +217,7 @@ class Profile extends View {
   renderTabs() {
     return html`
       <div class="tabs">
-        <${Link} activeClassName="active" href="/profile/${this.props.id}"
+        <${Link} activeClassName="active" href="/${this.props.id}"
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
         <${Link} activeClassName="active" href="/replies/${this.props.id}"
@@ -370,7 +370,7 @@ class Profile extends View {
     const pub = this.props.id;
     const nostrNpub = Nostr.toNostrBech32Address(pub, 'npub');
     if (nostrNpub && nostrNpub !== pub) {
-      route(`/profile/${nostrNpub}`, true);
+      route(`/${nostrNpub}`, true);
       return;
     }
     const nostrHex = Nostr.toNostrHexAddress(pub);
@@ -383,7 +383,7 @@ class Profile extends View {
       Nostr.getPubKeyByNip05Address(username).then((pubKey) => {
         if (pubKey) {
           const nostrNpub = Nostr.toNostrBech32Address(pubKey, 'npub');
-          route(`/profile/${nostrNpub}`, true);
+          route(`/${nostrNpub}`, true);
         } else {
           this.setState({ notFound: true });
         }
