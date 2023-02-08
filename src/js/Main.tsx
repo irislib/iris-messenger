@@ -1,8 +1,7 @@
 import { Helmet } from 'react-helmet';
-import { createHashHistory } from 'history';
 import iris from 'iris-lib';
 import AsyncRoute from 'preact-async-route';
-import { CustomHistory, Router, RouterOnChangeArgs } from 'preact-router';
+import { Router, RouterOnChangeArgs } from 'preact-router';
 
 import '@fontsource/lato';
 
@@ -47,7 +46,7 @@ type ReactState = {
 };
 
 // need to add initChannels: true to here and login() to get channels to load. disabled to test performance
-iris.session.init({ autologin: window.location.hash.length > 2, autofollow: false });
+iris.session.init({ autologin: window.location.href.length > 1, autofollow: false });
 Nostr.init();
 
 class Main extends Component<Props, ReactState> {

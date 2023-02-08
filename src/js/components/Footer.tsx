@@ -78,10 +78,7 @@ class Footer extends Component<Props, State> {
           <a href="/global" class={`btn ${activeRoute === '/global' ? 'active' : ''}`}>
             {Icons.global}
           </a>
-          <a
-            href={`/${key}`}
-            class={`${activeRoute === `/${key}` ? 'active' : ''} my-profile`}
-          >
+          <a href={`/${key}`} class={`${activeRoute === `/${key}` ? 'active' : ''} my-profile`}>
             <Identicon str={key} width={34} />
           </a>
         </div>
