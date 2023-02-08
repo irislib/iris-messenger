@@ -95,8 +95,8 @@ class Profile extends View {
       />`;
     } else {
       profilePicture = html`<${Identicon}
-        key=${this.state.hexPub}
-        str=${this.state.hexPub}
+        key="${this.state.npub}identicon"
+        str=${this.state.npub}
         hidePicture=${true}
         width="250"
       />`;
