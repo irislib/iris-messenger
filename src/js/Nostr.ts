@@ -15,9 +15,9 @@ import {
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import { sha256 } from '@noble/hashes/sha256';
 import localForage from 'localforage';
+import { route } from 'preact-router';
 
 import SortedLimitedEventSet from './SortedLimitedEventSet';
-import { route } from 'preact-router';
 
 const startTime = Date.now() / 1000;
 

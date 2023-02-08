@@ -112,7 +112,7 @@ class ChatListItem extends Component {
         role="button"
         tabindex="0"
         class="chat-item ${activity} ${hasUnseen} ${active}"
-        onClick=${() => route(`/chat/${this.props.chat}`)}
+        onClick=${() => route(`/chat/${Nostr.toNostrBech32Address(this.props.chat, 'npub')}`)}
       >
         ${iconEl}
         <div class="text">
