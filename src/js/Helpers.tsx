@@ -155,11 +155,7 @@ export default {
       return <a href={match}>⚡ Pay with lightning</a>;
     });
 
-    replacedText = reactStringReplace(replacedText, /(https?:\/\/\S*[^.?,)\s])/gi, (match, i) => (
-      <a key={match + i} href={match.replace(/^https:\/\/iris.to/, '')}>
-        {match}
-      </a>
-    ));
+    replacedText = this.highlightLinks(replacedText);
 
     if (event && event.tags) {
       // replace "#[0]" tags with links to the user: event.tags[n][1]
@@ -183,6 +179,14 @@ export default {
       });
     }
     return replacedText;
+  },
+
+  highlightLinks(s: string): any[] {
+    return reactStringReplace(s, /(https?:\/\/\S*[^.?,)\s])/gi, (match, i) => (
+      <a key={match + i} href={match.replace(/^https:\/\/iris.to/, '')}>
+        {match.replace(/^https?:\/\//, '')}
+      </a>
+    ));
   },
 
   followChatLink(str) {

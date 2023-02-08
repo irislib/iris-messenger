@@ -391,7 +391,7 @@ class Profile extends View {
         // profile may contain arbitrary fields, so be careful
         this.setState({
           name: profile.name,
-          about: profile.about,
+          about: Helpers.highlightLinks(profile.about),
           picture: profile.picture,
           nip05: profile.nip05valid && profile.nip05,
           lud16,
