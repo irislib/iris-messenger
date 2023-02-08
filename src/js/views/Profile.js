@@ -18,7 +18,7 @@ import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
 import ReportButton from '../components/ReportButton';
 import Helpers from '../Helpers';
-import QRCode from '../lib/qrcode.min';
+//import QRCode from '../lib/qrcode.min';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
@@ -84,39 +84,41 @@ class Profile extends View {
   }
 
   renderDetails() {
+    if (!this.state.hexPub) {
+      return '';
+    }
     let profilePicture;
     if (this.state.picture && !this.state.blocked) {
       profilePicture = html`<${ProfilePicture}
-        key="${this.props.id}picture"
+        key="${this.state.hexPub}picture"
         picture=${this.state.picture}
       />`;
     } else {
       profilePicture = html`<${Identicon}
-        key=${this.props.id}
-        str=${this.props.id}
+        key=${this.state.hexPub}
+        str=${this.state.hexPub}
         hidePicture=${true}
         width="250"
       />`;
     }
-    const hexPubKey = Nostr.toNostrHexAddress(this.props.id);
     let rawDataJson = JSON.stringify(
-      Nostr.profileEventByUser.get(hexPubKey) || 'no profile :D',
+      Nostr.profileEventByUser.get(this.state.hexPub) || 'no profile :D',
       null,
       2,
     );
     rawDataJson = `${rawDataJson}\n\n${JSON.stringify(
-      Nostr.followEventByUser.get(hexPubKey) || 'no contacts :D',
+      Nostr.followEventByUser.get(this.state.hexPub) || 'no contacts :D',
       null,
       2,
     )}`;
     return html`
-      <div class="profile-top" key="${this.props.id}details">
+      <div class="profile-top" key="${this.state.hexPub}details">
         <div class="profile-header">
           <div class="profile-picture-container">${profilePicture}</div>
           <div class="profile-header-stuff">
             <div style="display:flex; flex-direction:row;">
               <h3 style="flex: 1" class="profile-name">
-                <${Name} pub=${this.props.id} />
+                <${Name} pub=${this.state.hexPub} />
               </h3>
               <div class="profile-actions">
                 <${Dropdown}>
@@ -126,22 +128,22 @@ class Profile extends View {
                       >`
                     : ''}
                   <${CopyButton}
-                    key=${`${this.props.id}copyLink`}
+                    key=${`${this.state.hexPub}copyLink`}
                     text=${t('copy_link')}
                     title=${this.state.name}
                     copyStr=${window.location.href}
                   />
                   <${CopyButton}
-                    key=${`${this.props.id}copyNpub`}
+                    key=${`${this.state.hexPub}copyNpub`}
                     text=${t('copy_user_ID')}
                     title=${this.state.name}
-                    copyStr=${this.props.id}
+                    copyStr=${this.state.hexPub}
                   />
                   <!-- <${Button} onClick=${() => $(this.qrRef.current).toggle()}
                     >${t('show_qr_code')}<//
                   > -->
                   <${CopyButton}
-                    key=${`${this.props.id}copyData`}
+                    key=${`${this.state.hexPub}copyData`}
                     text=${t('copy_raw_data')}
                     title=${this.state.name}
                     copyStr=${rawDataJson}
@@ -149,8 +151,8 @@ class Profile extends View {
                   ${this.state.isMyProfile
                     ? ''
                     : html`
-                        <${BlockButton} id=${this.props.id} />
-                        <${ReportButton} id=${this.props.id} />
+                        <${BlockButton} id=${this.state.hexPub} />
+                        <${ReportButton} id=${this.state.hexPub} />
                       `}
                 <//>
               </div>
@@ -166,21 +168,28 @@ class Profile extends View {
             </div>
             <div class="profile-actions">
               <div class="follow-count">
-                <a href="/follows/${this.props.id}">
+                <a href="/follows/${this.state.hexPub}">
                   <span>${this.state.followedUserCount}</span> ${t('following')}
                 </a>
-                <a href="/followers/${this.props.id}">
+                <a href="/followers/${this.state.hexPub}">
                   <span>${this.state.followerCount}</span> ${t('followers')}
                 </a>
               </div>
-              ${Nostr.followedByUser.get(hexPubKey)?.has(iris.session.getKey().secp256k1.rpub)
+              ${Nostr.followedByUser
+                .get(this.state.hexPub)
+                ?.has(iris.session.getKey().secp256k1.rpub)
                 ? html` <p><small>${t('follows_you')}</small></p> `
                 : ''}
               <div class="hidden-xs">
                 ${!this.state.isMyProfile
-                  ? html` <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} /> `
+                  ? html`
+                      <${FollowButton}
+                        key=${`${this.state.hexPub}follow`}
+                        id=${this.state.hexPub}
+                      />
+                    `
                   : ''}
-                <${Button} small=${true} onClick=${() => route(`/chat/${this.props.id}`)}>
+                <${Button} small=${true} onClick=${() => route(`/chat/${this.state.hexPub}`)}>
                   ${t('send_message')}
                 <//>
               </div>
@@ -194,8 +203,8 @@ class Profile extends View {
             ? ''
             : html`
                 <div>
-                  <${FollowButton} key=${`${this.props.id}follow`} id=${this.props.id} />
-                  <${Button} small=${true} onClick=${() => route(`/chat/${this.props.id}`)}>
+                  <${FollowButton} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
+                  <${Button} small=${true} onClick=${() => route(`/chat/${this.state.hexPub}`)}>
                     ${t('send_message')}
                   <//>
                 </div>
@@ -217,13 +226,13 @@ class Profile extends View {
   renderTabs() {
     return html`
       <div class="tabs">
-        <${Link} activeClassName="active" href="/${this.props.id}"
+        <${Link} activeClassName="active" href="/${this.state.npub}"
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
-        <${Link} activeClassName="active" href="/replies/${this.props.id}"
+        <${Link} activeClassName="active" href="/replies/${this.state.npub}"
           >${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
-        <${Link} activeClassName="active" href="/likes/${this.props.id}"
+        <${Link} activeClassName="active" href="/likes/${this.state.npub}"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
         >
       </div>
@@ -231,15 +240,17 @@ class Profile extends View {
   }
 
   renderTab() {
-    const nostrAddr = Nostr.toNostrHexAddress(this.props.id);
+    if (!this.state.hexPub) {
+      return html`<div></div>`;
+    }
     if (this.props.tab === 'replies') {
       return html`
         <div class="public-messages-view">
           <${MessageFeed}
             scrollElement=${this.scrollElement.current}
-            key="replies${this.props.id}"
+            key="replies${this.state.hexPub}"
             index="postsAndReplies"
-            nostrUser=${nostrAddr}
+            nostrUser=${this.state.hexPub}
           />
         </div>
       `;
@@ -248,9 +259,9 @@ class Profile extends View {
         <div class="public-messages-view">
           <${MessageFeed}
             scrollElement=${this.scrollElement.current}
-            key="likes${this.props.id}"
+            key="likes${this.state.hexPub}"
             index="likes"
-            nostrUser=${nostrAddr}
+            nostrUser=${this.state.hexPub}
           />
         </div>
       `;
@@ -268,9 +279,9 @@ class Profile extends View {
           ${this.getNotification()}
           <${MessageFeed}
             scrollElement=${this.scrollElement.current}
-            key="posts${this.props.id}"
+            key="posts${this.state.hexPub}"
             index="posts"
-            nostrUser=${nostrAddr}
+            nostrUser=${this.state.hexPub}
           />
         </div>
       </div>
@@ -282,6 +293,9 @@ class Profile extends View {
   }
 
   renderView() {
+    if (!this.state.hexPub) {
+      return html`<div></div>`;
+    }
     const title = this.state.name || 'Profile';
     const ogTitle = `${title} | Iris`;
     const description = `Latest posts by ${this.state.name || 'user'}. ${this.state.about || ''}`;
@@ -327,8 +341,6 @@ class Profile extends View {
     Nostr.getProfile(
       address,
       (profile, addr) => {
-        addr = Nostr.toNostrBech32Address(addr, 'npub');
-        if (!profile || addr !== this.props.id) return;
         let lud16 = profile.lud16;
         if (lud16 && !lud16.startsWith('lightning:')) {
           lud16 = 'lightning:' + lud16;
@@ -365,42 +377,16 @@ class Profile extends View {
     );
   }
 
-  componentDidMount() {
-    this.restoreScrollPosition();
-    const pub = this.props.id;
-    const nostrNpub = Nostr.toNostrBech32Address(pub, 'npub');
-    if (nostrNpub && nostrNpub !== pub) {
-      route(`/${nostrNpub}`, true);
-      return;
-    }
-    const nostrHex = Nostr.toNostrHexAddress(pub);
-    if (!nostrHex) {
-      // id is not a nostr address, but maybe it's a username
-      let username = pub;
-      if (!username.match(/.+@.+\..+/)) {
-        username = username + '@iris.to';
-      }
-      Nostr.getPubKeyByNip05Address(username).then((pubKey) => {
-        if (pubKey) {
-          const nostrNpub = Nostr.toNostrBech32Address(pubKey, 'npub');
-          route(`/${nostrNpub}`, true);
-        } else {
-          this.setState({ notFound: true });
-        }
-      });
-      return;
-    }
-    const isMyProfile =
-      iris.session.getPubKey() === pub || nostrHex === iris.session.getKey().secp256k1.rpub;
+  loadProfile(hexPub) {
+    const isMyProfile = hexPub === iris.session.getKey().secp256k1.rpub;
     this.setState({ isMyProfile });
     this.followedUsers = new Set();
     this.followers = new Set();
+    iris.local().get('noFollowers').on(this.inject());
+    this.getNostrProfile(hexPub);
+    /*
     let qrCodeEl = $(this.qrRef.current);
     qrCodeEl.empty();
-    iris.local().get('noFollowers').on(this.inject());
-    // if pub is hex, it's a nostr address
-    const nostrAddr = Nostr.toNostrHexAddress(pub);
-    this.getNostrProfile(nostrAddr);
     qrCodeEl.empty();
     new QRCode(qrCodeEl.get(0), {
       text: window.location.href,
@@ -410,9 +396,42 @@ class Profile extends View {
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H,
     });
+    */
     Nostr.getBlockedUsers((blockedUsers) => {
-      this.setState({ blocked: blockedUsers.has(nostrAddr) });
+      this.setState({ blocked: blockedUsers.has(hexPub) });
     });
+  }
+
+  componentDidMount() {
+    this.restoreScrollPosition();
+    const pub = this.props.id;
+    const npub = Nostr.toNostrBech32Address(pub, 'npub');
+    if (npub && npub !== pub) {
+      route(`/${npub}`, true);
+      return;
+    }
+    const hexPub = Nostr.toNostrHexAddress(pub);
+    if (!hexPub) {
+      // id is not a nostr address, but maybe it's a username
+      let username = pub;
+      if (!username.match(/.+@.+\..+/)) {
+        username = username + '@iris.to';
+      }
+      Nostr.getPubKeyByNip05Address(username).then((pubKey) => {
+        if (pubKey) {
+          const npub = Nostr.toNostrBech32Address(pubKey, 'npub');
+          if (npub && npub !== pubKey) {
+            this.setState({ npub, hexPub: pubKey });
+            this.loadProfile(pubKey);
+          }
+        } else {
+          this.setState({ notFound: true });
+        }
+      });
+      return;
+    }
+    this.setState({ hexPub, npub: Nostr.toNostrBech32Address(hexPub, 'npub') });
+    this.loadProfile(hexPub);
   }
 }
 
