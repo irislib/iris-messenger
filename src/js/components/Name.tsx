@@ -16,6 +16,7 @@ const Name = (props: Props) => {
   const nostrAddr = Nostr.toNostrHexAddress(props.pub);
   let initialName = '';
   let initialDisplayName;
+  let isGenerated = false;
   const profileEvent = Nostr.profileEventByUser.get(nostrAddr);
   // should we change Nostr.getProfile() and use it here?
   if (profileEvent) {
@@ -30,15 +31,20 @@ const Name = (props: Props) => {
     initialDisplayName = Helpers.generateName(
       Nostr.toNostrBech32Address(props.pub, 'npub') || props.pub,
     );
+    isGenerated = true;
   }
   const [name, setName] = useState(initialName);
   const [displayName, setDisplayName] = useState(initialDisplayName);
+  const [isNameGenerated, setIsNameGenerated] = useState(isGenerated);
   useEffect(() => {
     if (nostrAddr) {
       // TODO unsub
       Nostr.getProfile(nostrAddr, (profile) => {
-        profile && setName(profile.name?.trim().slice(0, 100) || '');
-        profile && setDisplayName(profile.display_name?.trim().slice(0, 100) || '');
+        if (profile) {
+          setName(profile.name?.trim().slice(0, 100) || '');
+          setDisplayName(profile.display_name?.trim().slice(0, 100) || '');
+          setIsNameGenerated(profile.name || profile.display_name ? false : true);
+        }
       });
     }
   }, [props.pub]);
@@ -56,7 +62,9 @@ const Name = (props: Props) => {
 
   return (
     <>
-      <span class="display-name">{displayName || name || props.placeholder}</span>
+      <span className={`display-name ${isNameGenerated ? 'generated' : ''}`}>
+        {displayName || name || props.placeholder}
+      </span>
       {props.hideBadge ? '' : <Badge pub={props.pub} />}
       {showUserName ? <small className="user-name mar-left5">@{name}</small> : ''}
     </>

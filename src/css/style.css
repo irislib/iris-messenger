@@ -1377,6 +1377,11 @@ a.msgSenderName:hover .user-name {
   text-decoration: none;
 }
 
+.display-name.generated {
+  color: var(--muted-text-color);
+  font-style: italic;
+}
+
 .settings {
   width: 800px;
   align-self: center;
