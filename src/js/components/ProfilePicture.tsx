@@ -12,6 +12,7 @@ const ANIMATE_DURATION = 200;
 
 class ProfilePicture extends Component<Props> {
   render() {
+    console.log('rendering ProfilePicture', this.props.picture);
     return html`<${SafeImg}
       class="profile-picture"
       src=${this.props.picture}

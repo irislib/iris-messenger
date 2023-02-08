@@ -18,7 +18,7 @@ import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
 import ReportButton from '../components/ReportButton';
 import Helpers from '../Helpers';
-import QRCode from '../lib/qrcode.min';
+//import QRCode from '../lib/qrcode.min';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
@@ -342,7 +342,6 @@ class Profile extends View {
       address,
       (profile, addr) => {
         console.log('got profile', profile, addr);
-        addr = Nostr.toNostrBech32Address(addr, 'npub');
         if (!profile || addr !== this.state.hexPub) return;
         let lud16 = profile.lud16;
         if (lud16 && !lud16.startsWith('lightning:')) {
