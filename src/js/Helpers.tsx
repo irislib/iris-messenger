@@ -184,7 +184,7 @@ export default {
   highlightLinks(s: string): any[] {
     return reactStringReplace(s, /(https?:\/\/\S*[^.?,)\s])/gi, (match, i) => (
       <a key={match + i} href={match.replace(/^https:\/\/iris.to/, '')}>
-        {match.replace(/^https?:\/\//, '')}
+        {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
       </a>
     ));
   },
