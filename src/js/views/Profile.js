@@ -189,9 +189,15 @@ class Profile extends View {
                       />
                     `
                   : ''}
-                <${Button} small=${true} onClick=${() => route(`/chat/${this.state.npub}`)}>
-                  ${t('send_message')}
-                <//>
+                ${this.state.npub !==
+                'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8'
+                  ? html` <${Button}
+                      small=${true}
+                      onClick=${() => route(`/chat/${this.state.npub}`)}
+                    >
+                      ${t('send_message')}
+                    <//>`
+                  : ''}
               </div>
             </div>
           </div>
