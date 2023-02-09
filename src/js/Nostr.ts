@@ -1591,12 +1591,12 @@ const Nostr = {
 
   async verifyNip05Address(address: string, pubkey: string): Promise<boolean> {
     try {
-      const [localPart, domain] = address.split('@');
-      const url = `https://${domain}/.well-known/nostr.json?name=${localPart}`;
+      const [username, domain] = address.split('@');
+      const url = `https://${domain}/.well-known/nostr.json?name=${username}`;
       const response = await fetch(url);
       const json = await response.json();
       const names = json.names;
-      return names[localPart] === pubkey;
+      return names[username] === pubkey || names[username.toLowerCase()] === pubkey;
     } catch (error) {
       // gives lots of cors errors:
       // console.error(error);
