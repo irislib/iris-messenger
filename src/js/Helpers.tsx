@@ -245,7 +245,7 @@ export default {
       s,
       /((?:https?:\/\/\S*[^.?,)\s])|(?:iris\.to\/\S*[^.?,)\s]))/gi,
       (match, i) => (
-        <a key={match + i} href={match.replace(/^https:\/\/iris.to/, '')}>
+        <a key={match + i} href={match.replace(/^(https:\/\/)?iris.to/, '')}>
           {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
         </a>
       ),
