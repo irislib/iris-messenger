@@ -5,17 +5,17 @@ import AppearanceSettings from './AppearanceSettings';
 import BetaSettings from './BetaSettings';
 import BlockedSettings from './BlockedSettings';
 import LanguageSettings from './LanguageSettings';
-import NostrSettings from './NostrSettings';
-import WebtorrentSettings from './WebtorrentSettings';
+import MediaSettings from './MediaSettings';
+import NetworkSettings from './NetworkSettings';
 
 export default class SettingsContent extends Component {
   content = '';
   pages = {
     account: AccountSettings,
-    nostr: NostrSettings,
+    network: NetworkSettings,
     appearance: AppearanceSettings,
     language: LanguageSettings,
-    webtorrent: WebtorrentSettings,
+    media: MediaSettings,
     beta: BetaSettings,
     blocked_users: BlockedSettings,
   };

@@ -6,7 +6,7 @@ import CopyButton from '../../components/CopyButton';
 import { translate as t } from '../../translations/Translation';
 const bech32 = require('bech32-buffer');
 
-const NostrSettings = () => {
+const NetworkSettings = () => {
   const [relays, setRelays] = useState(Array.from(Nostr.relays.values()));
   const [newRelayUrl, setNewRelayUrl] = useState(""); // added state to store the new relay URL
   const [maxRelays, setMaxRelays] = useState(Nostr.maxRelays);
@@ -55,66 +55,21 @@ const NostrSettings = () => {
   const getClassName = (relay) => {
     switch (getStatus(relay)) {
       case 0:
-        return "neutral";
+        return 'neutral';
       case 1:
-        return "positive";
+        return 'positive';
       case 2:
-        return "neutral";
+        return 'neutral';
       case 3:
-        return "";
+        return '';
       default:
-        return "status";
+        return 'status';
     }
   }
 
-  const myPrivHex = iris.session.getKey().secp256k1.priv;
-  let myPriv32;
-  if (myPrivHex) {
-    myPriv32 = bech32.encode('nsec', Buffer.from(myPrivHex, 'hex'));
-  }
-  let myPub = iris.session.getKey().secp256k1.rpub;
-  myPub = bech32.encode('npub', Buffer.from(myPub, 'hex'));
-
   return (
     <div className="centered-container">
-      <h2>Nostr</h2>
-      <h3>Key</h3>
-      <div className="flex-table">
-        <div className="flex-row">
-          <div className="flex-cell">
-            <p>Public key:</p>
-            <input type="text" value={myPub} />
-          </div>
-          <div className="flex-cell no-flex">
-            <CopyButton
-              copyStr={myPub}
-              text="Copy public key" />
-          </div>
-        </div>
-        <div className="flex-row">
-          <div className="flex-cell">
-            Private key
-          </div>
-          <div className="flex-cell no-flex">
-            {myPrivHex ? (
-              <>
-                <CopyButton
-                  notShareable={true}
-                  copyStr={myPrivHex}
-                  text="Copy hex" />
-                <CopyButton
-                  notShareable={true}
-                  copyStr={myPriv32}
-                  text="Copy nsec" />
-              </>
-            ) : (
-              <p>Not present. Good!</p>
-            )}
-          </div>
-        </div>
-      </div>
-      {myPrivHex ? <p>{t('private_key_warning')}</p> : ''}
-      <h3>Relays</h3>
+      <h2>{t('network')}</h2>
       <p>
         Max relays: <input
           type="number"
@@ -167,4 +122,4 @@ const NostrSettings = () => {
   );
 };
 
-export default NostrSettings;
+export default NetworkSettings;

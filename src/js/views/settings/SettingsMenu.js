@@ -4,14 +4,15 @@ import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
+import Icons from '../../Icons';
 import { translate as t } from '../../translations/Translation';
 
 const SETTINGS = {
   account: 'account',
-  nostr: 'nostr',
   appearance: 'appearance',
+  media: 'media',
+  network: 'network',
   language: 'language',
-  webtorrent: 'webtorrent',
   blocked_users: 'blocked_users',
 };
 
@@ -39,7 +40,10 @@ export default class SettingsMenu extends Component {
                 onClick={(e) => this.menuLinkClicked(page, e)}
                 key={page}
               >
-                <span class="text">{t(SETTINGS[page])}</span>
+                <span class="text">
+                  {t(SETTINGS[page])}
+                  {page === 'language' && <small className="mar-left5">{Icons.language}</small>}
+                </span>
               </a>
             );
           })}

@@ -18,6 +18,12 @@ const emojiRegex =
 const pubKeyRegex = /(?:^|\s)(?:@)?(npub[a-zA-Z0-9]{59,60})(?![\w/])/g;
 const noteRegex = /(?:^|\s)(?:@)?(note[a-zA-Z0-9]{59,60})(?![\w/])/g;
 
+let settings: any = {};
+iris
+  .local()
+  .get('settings')
+  .on((s) => (settings = s));
+
 function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {
   if (src) {
     // parse src as url safely
@@ -113,7 +119,7 @@ export default {
           key={match + i}
           src={match}
           muted={true}
-          autoPlay={!iris.util.isMobile}
+          autoPlay={!iris.util.isMobile && settings.autoplayVideos !== false}
           playsInline={true}
           webkit-playsinline={true}
           controls={true}
@@ -127,22 +133,24 @@ export default {
       return <audio key={match + i} src={match} controls={true} loop={true} />;
     });
 
-    const youtubeRegex =
-      /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})(?:\S+)?/g;
-    replacedText = reactStringReplace(replacedText, youtubeRegex, (match, i) => {
-      return (
-        <iframe
-          key={match + i}
-          width="650"
-          height="400"
-          style={{ maxWidth: '100%' }}
-          src={`https://www.youtube.com/embed/${match}`}
-          frameBorder="0"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      );
-    });
+    if (settings.enableYoutube !== false) {
+      const youtubeRegex =
+        /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})(?:\S+)?/g;
+      replacedText = reactStringReplace(replacedText, youtubeRegex, (match, i) => {
+        return (
+          <iframe
+            key={match + i}
+            width="650"
+            height="400"
+            style={{ maxWidth: '100%' }}
+            src={`https://www.youtube.com/embed/${match}`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        );
+      });
+    }
 
     const igRegex = /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com\/p\/)([\w-]{11})(?:\S+)?/g;
     replacedText = reactStringReplace(replacedText, igRegex, (match, i) => {
@@ -161,49 +169,55 @@ export default {
       );
     });
 
-    const spotifyRegex =
-      /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/track\/)([\w-]+)(?:\S+)?/g;
-    replacedText = reactStringReplace(replacedText, spotifyRegex, (match, i) => {
-      return (
-        <iframe
-          class="audio"
-          scrolling="no"
-          key={match + i}
-          width="650"
-          height="200"
-          style={{ maxWidth: '100%' }}
-          src={`https://open.spotify.com/embed/track/${match}?utm_source=oembed`}
-          frameBorder="0"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      );
-    });
+    if (settings.enableSpotify !== false) {
+      const spotifyRegex =
+        /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/track\/)([\w-]+)(?:\S+)?/g;
+      replacedText = reactStringReplace(replacedText, spotifyRegex, (match, i) => {
+        return (
+          <iframe
+            class="audio"
+            scrolling="no"
+            key={match + i}
+            width="650"
+            height="200"
+            style={{ maxWidth: '100%' }}
+            src={`https://open.spotify.com/embed/track/${match}?utm_source=oembed`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        );
+      });
+    }
 
-    const tidalRegex = /(?:https?:\/\/)?(?:www\.)?(?:tidal\.com(?:\/browse)?\/track\/)([\d]+)?/g;
-    replacedText = reactStringReplace(replacedText, tidalRegex, (match, i) => {
-      return (
-        <iframe
-          class="audio"
-          scrolling="no"
-          key={match + i}
-          width="650"
-          height="200"
-          style={{ maxWidth: '100%' }}
-          src={`https://embed.tidal.com/tracks/${match}?layout=gridify`}
-          frameBorder="0"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      );
-    });
+    if (settings.enableTidal !== false) {
+      const tidalRegex = /(?:https?:\/\/)?(?:www\.)?(?:tidal\.com(?:\/browse)?\/track\/)([\d]+)?/g;
+      replacedText = reactStringReplace(replacedText, tidalRegex, (match, i) => {
+        return (
+          <iframe
+            class="audio"
+            scrolling="no"
+            key={match + i}
+            width="650"
+            height="200"
+            style={{maxWidth: '100%'}}
+            src={`https://embed.tidal.com/tracks/${match}?layout=gridify`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        );
+      });
+    }
 
-    const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
-    replacedText = reactStringReplace(replacedText, magnetRegex, (match, i) => {
-      // Torrent component
-      console.log('magnet link', match);
-      return <Torrent key={match + i} preview={true} torrentId={match} />;
-    });
+    if (settings.enableTorrent !== false) {
+      const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
+      replacedText = reactStringReplace(replacedText, magnetRegex, (match, i) => {
+        // Torrent component
+        console.log('magnet link', match);
+        return <Torrent key={match + i} preview={true} torrentId={match}/>;
+      });
+    }
 
     const lnRegex =
       /(lightning:[\w.-]+@[\w.-]+|lightning:\w+\?amount=\d+|(?:lightning:)?(?:lnurl|lnbc)[\da-z0-9]+)/gi;

@@ -105,7 +105,7 @@ class Torrent extends Component {
       autoplay = true;
       muted = false;
     } else {
-      autoplay = isVid && this.state.settings.autoplayWebtorrent;
+      autoplay = isVid && this.state.settings.autoplayVideos;
       muted = autoplay;
     }
     const el = base.find('.player');

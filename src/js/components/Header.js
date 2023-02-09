@@ -188,7 +188,7 @@ class Header extends Component {
               </a>
             `}
         <a
-          href="/settings/nostr"
+          href="/settings/network"
           class="connected-peers tooltip mobile-search-hidden ${this.state.showMobileSearch
             ? 'hidden-xs'
             : ''} ${this.state.connectedRelays ? 'connected' : ''}"
