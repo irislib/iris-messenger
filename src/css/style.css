@@ -299,7 +299,8 @@ textarea.new-msg {
 }
 
 .msg-content iframe.audio {
-    height: 80px;
+  height: 80px;
+  box-sizing: content-box;
 }
 
 .msg-content iframe.instagram {
