@@ -41,7 +41,8 @@ async function login(k) {
   maybeGoToChat(k);
 }
 
-async function nostrLogin() {
+async function nostrLogin(e) {
+  e.preventDefault();
   const rpub = await window.nostr.getPublicKey();
   const k = await iris.Key.generate();
   k.secp256k1 = { rpub };
@@ -194,16 +195,19 @@ class Login extends Component {
                 <br />
                 {window.nostr ? (
                   <p>
-                    <a href="#" onClick={() => nostrLogin()}>
+                    <a href="" onClick={(e) => nostrLogin(e)}>
                       {t('nostr_extension_login')}
                     </a>
                   </p>
                 ) : null}
                 <p>
                   <a
-                    href="#"
+                    href=""
                     id="show-existing-account-login"
-                    onClick={() => this.setState({ showSwitchAccount: true })}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.setState({ showSwitchAccount: true });
+                    }}
                   >
                     {t('private_key_login')}
                   </a>
@@ -216,7 +220,7 @@ class Login extends Component {
           ) : (
             <div id="existing-account-login">
               <p>
-                <a href="#" id="show-create-account" onClick={(e) => this.showCreateAccount(e)}>
+                <a href="" id="show-create-account" onClick={(e) => this.showCreateAccount(e)}>
                   {t('back')}
                 </a>
               </p>

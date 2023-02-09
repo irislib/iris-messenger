@@ -161,7 +161,8 @@ export default {
       );
     });
 
-    const spotifyRegex = /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/track\/)([\w-]+)(?:\S+)?/g;
+    const spotifyRegex =
+      /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/track\/)([\w-]+)(?:\S+)?/g;
     replacedText = reactStringReplace(replacedText, spotifyRegex, (match, i) => {
       return (
         <iframe
