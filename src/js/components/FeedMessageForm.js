@@ -79,7 +79,7 @@ class FeedMessageForm extends MessageForm {
     const pasted = (event.clipboardData || window.clipboardData).getData('text');
     const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
     const match = magnetRegex.exec(pasted);
-    console.log('magnet match', match[0]);
+    console.log('magnet match', match);
     if (match) {
       this.setState({ torrentId: match[0] });
     }
