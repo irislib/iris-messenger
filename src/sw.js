@@ -14,7 +14,12 @@ registerRoute(
     plugins: [bgSyncPlugin],
   }),
 );
-registerRoute(({ url }) => url.pathname === '/', new NetworkFirst());
+registerRoute(
+  ({ url }) => url.pathname === '/',
+  new NetworkFirst({
+    networkTimeoutSeconds: 5,
+  }),
+);
 registerRoute(
   ({ url }) => {
     return location.host.indexOf('localhost') !== 0 && url.origin === self.location.origin;

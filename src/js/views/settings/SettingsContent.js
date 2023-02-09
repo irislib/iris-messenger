@@ -6,7 +6,6 @@ import BetaSettings from './BetaSettings';
 import BlockedSettings from './BlockedSettings';
 import LanguageSettings from './LanguageSettings';
 import NostrSettings from './NostrSettings';
-import WebRTCSettings from './WebRTCSettings';
 import WebtorrentSettings from './WebtorrentSettings';
 
 export default class SettingsContent extends Component {
@@ -17,7 +16,6 @@ export default class SettingsContent extends Component {
     appearance: AppearanceSettings,
     language: LanguageSettings,
     webtorrent: WebtorrentSettings,
-    webrtc: WebRTCSettings,
     beta: BetaSettings,
     blocked_users: BlockedSettings,
   };

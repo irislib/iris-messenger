@@ -8,7 +8,6 @@ import '@fontsource/lato';
 import Footer from './components/Footer';
 import MediaPlayer from './components/MediaPlayer';
 import Menu from './components/Menu';
-import VideoCall from './components/VideoCall';
 import { translationLoaded } from './translations/Translation';
 import About from './views/About';
 import Chat from './views/chat/Chat';
@@ -193,7 +192,6 @@ class Main extends Component<Props, ReactState> {
         </section>
         <MediaPlayer />
         <Footer />
-        <VideoCall />
       </div>
     );
   }
