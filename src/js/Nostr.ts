@@ -1356,8 +1356,9 @@ const Nostr = {
       this.knownUsers.add(hex);
       this.getProfile(this.toNostrHexAddress(hex), undefined);
     }
-    this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
+
     setTimeout(() => {
+      this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
       this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
       this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
     }, 200);
