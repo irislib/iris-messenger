@@ -9,7 +9,6 @@ const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
   maxRetentionTime: 14 * 24 * 60,
 });
 
-
 registerRoute(
   ({ request }) => request.method === 'POST',
   new NetworkOnly({
@@ -32,6 +31,7 @@ registerRoute(
       new ExpirationPlugin({
         maxEntries: 100,
         maxAgeSeconds: 30 * 24 * 60 * 60,
+        purgeOnQuotaError: true,
       }),
     ],
   }),
