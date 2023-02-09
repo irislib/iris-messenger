@@ -809,6 +809,11 @@ header.footer .header-content {
   cursor: pointer;
 }
 
+.msg.inline-quote .msg-content {
+  margin-top: 10px;
+  border: 1px solid var(--main-color);
+}
+
 .msg-content .text {
   font-family: Lato, sans-serif;
   margin-top: 5px;

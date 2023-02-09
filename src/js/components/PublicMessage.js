@@ -380,6 +380,9 @@ class PublicMessage extends Message {
   }
 
   renderDropdown() {
+    if (this.props.asInlineQuote) {
+      return '';
+    }
     const url = `https://iris.to/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`;
     return html`
       <div class="msg-menu-btn">
@@ -576,7 +579,8 @@ class PublicMessage extends Message {
         class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
           : ''} ${asQuote ? 'quote' : ''}
-          ${quoting ? 'quoting' : ''}"
+          ${quoting ? 'quoting' : ''}
+        ${this.props.asInlineQuote ? 'inline-quote' : ''}"
       >
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           ${this.props.asQuote && s.msg.replyingTo
@@ -686,36 +690,40 @@ class PublicMessage extends Message {
                   >
                 `
               : ''}
-            <div class="below-text">
-              <a class="msg-btn reply-btn" onClick=${() => this.replyBtnClicked()}>
-                ${replyIcon}
-              </a>
-              <span class="count"> ${s.replyCount || ''} </span>
-              <a
-                class="msg-btn boost-btn ${s.boosted ? 'boosted' : ''}"
-                onClick=${() => this.boostBtnClicked()}
-              >
-                ${Icons.boost}
-              </a>
-              <span
-                class="count ${s.showBoosts ? 'active' : ''}"
-                onClick=${(e) => this.toggleBoosts(e)}
-              >
-                ${s.boosts || ''}
-              </span>
-              <a
-                class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
-                onClick=${(e) => this.likeBtnClicked(e)}
-              >
-                ${s.liked ? Icons.heartFull : Icons.heartEmpty}
-              </a>
-              <span
-                class="count ${s.showLikes ? 'active' : ''}"
-                onClick=${(e) => this.toggleLikes(e)}
-              >
-                ${s.likes || ''}
-              </span>
-            </div>
+            ${this.props.asInlineQuote
+              ? ''
+              : html`
+                  <div class="below-text">
+                    <a class="msg-btn reply-btn" onClick=${() => this.replyBtnClicked()}>
+                      ${replyIcon}
+                    </a>
+                    <span class="count"> ${s.replyCount || ''} </span>
+                    <a
+                      class="msg-btn boost-btn ${s.boosted ? 'boosted' : ''}"
+                      onClick=${() => this.boostBtnClicked()}
+                    >
+                      ${Icons.boost}
+                    </a>
+                    <span
+                      class="count ${s.showBoosts ? 'active' : ''}"
+                      onClick=${(e) => this.toggleBoosts(e)}
+                    >
+                      ${s.boosts || ''}
+                    </span>
+                    <a
+                      class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
+                      onClick=${(e) => this.likeBtnClicked(e)}
+                    >
+                      ${s.liked ? Icons.heartFull : Icons.heartEmpty}
+                    </a>
+                    <span
+                      class="count ${s.showLikes ? 'active' : ''}"
+                      onClick=${(e) => this.toggleLikes(e)}
+                    >
+                      ${s.likes || ''}
+                    </span>
+                  </div>
+                `}
             ${s.showLikes
               ? html`
                   <div class="likes">
