@@ -1,5 +1,6 @@
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
+import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
@@ -7,6 +8,7 @@ import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
   maxRetentionTime: 14 * 24 * 60,
 });
+
 
 registerRoute(
   ({ request }) => request.method === 'POST',
@@ -40,8 +42,11 @@ registerRoute(
   new CacheFirst({
     cacheName: 'scaled-images',
     plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
       new ExpirationPlugin({
-        maxEntries: 1000,
+        maxEntries: 300,
         maxAgeSeconds: 7 * 24 * 60 * 60,
         purgeOnQuotaError: true,
       }),
@@ -55,8 +60,11 @@ registerRoute(
   new CacheFirst({
     cacheName: 'remote-assets',
     plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
       new ExpirationPlugin({
-        maxEntries: 200,
+        maxEntries: 100,
         maxAgeSeconds: 7 * 24 * 60 * 60,
         purgeOnQuotaError: true,
       }),
