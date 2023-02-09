@@ -144,6 +144,22 @@ export default {
       );
     });
 
+    const igRegex = /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com\/p\/)([\w-]{11})(?:\S+)?/g;
+    replacedText = reactStringReplace(replacedText, igRegex, (match, i) => {
+      return (
+        <iframe
+          key={match + i}
+          width="650"
+          height="400"
+          style={{ maxWidth: '100%' }}
+          src={`https://instagram.com/p/${match}/embed`}
+          frameBorder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      );
+    });
+
     const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
     replacedText = reactStringReplace(replacedText, magnetRegex, (match, i) => {
       // Torrent component
