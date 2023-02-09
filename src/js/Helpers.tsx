@@ -148,6 +148,7 @@ export default {
     replacedText = reactStringReplace(replacedText, igRegex, (match, i) => {
       return (
         <iframe
+          class="instagram"
           key={match + i}
           width="650"
           height="400"
@@ -164,7 +165,7 @@ export default {
     replacedText = reactStringReplace(replacedText, spotifyRegex, (match, i) => {
       return (
         <iframe
-          class="spotify"
+          class="audio"
           key={match + i}
           width="650"
           height="200"
@@ -179,10 +180,9 @@ export default {
 
     const tidalRegex = /(?:https?:\/\/)?(?:www\.)?(?:tidal\.com(?:\/browse)?\/track\/)([\d]+)?/g;
     replacedText = reactStringReplace(replacedText, tidalRegex, (match, i) => {
-      console.log('tidal', match);
       return (
         <iframe
-          class="spotify"
+          class="audio"
           key={match + i}
           width="650"
           height="200"

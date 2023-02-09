@@ -298,8 +298,14 @@ textarea.new-msg {
   min-width: min(100%, 225px);
 }
 
-.msg-content iframe.spotify {
+.msg-content iframe.audio {
     height: 80px;
+}
+
+.msg-content iframe.instagram {
+  width: 400px;
+  height: 620px;
+  max-height: 137vw;
 }
 
 .msg-content audio {
