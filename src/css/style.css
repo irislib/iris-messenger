@@ -298,6 +298,10 @@ textarea.new-msg {
   min-width: min(100%, 225px);
 }
 
+.msg-content iframe.spotify {
+    height: 80px;
+}
+
 .msg-content audio {
   width: 100%;
   outline: none;

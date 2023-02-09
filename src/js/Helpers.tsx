@@ -160,6 +160,23 @@ export default {
       );
     });
 
+    const spotifyRegex = /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/track\/)([\w-]+)(?:\S+)?/g;
+    replacedText = reactStringReplace(replacedText, spotifyRegex, (match, i) => {
+      return (
+        <iframe
+          class="spotify"
+          key={match + i}
+          width="650"
+          height="200"
+          style={{ maxWidth: '100%' }}
+          src={`https://open.spotify.com/embed/track/${match}?utm_source=oembed`}
+          frameBorder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      );
+    });
+
     const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
     replacedText = reactStringReplace(replacedText, magnetRegex, (match, i) => {
       // Torrent component
