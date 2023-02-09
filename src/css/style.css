@@ -812,6 +812,7 @@ header.footer .header-content {
 .msg.inline-quote .msg-content {
   margin-top: 10px;
   border: 1px solid var(--main-color);
+  padding: 12px !important;
 }
 
 .msg-content .text {
