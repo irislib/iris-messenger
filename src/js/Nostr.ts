@@ -96,7 +96,7 @@ const DEFAULT_RELAYS = [
   'wss://relay.damus.io',
   'wss://nostr-pub.wellorder.net',
   'wss://relay.nostr.info',
-  'wss://nostr.bitcoiner.social',
+  'wss://offchain.pub',
   'wss://nostr.onsats.org',
   'wss://nos.lol',
   'wss://brb.io',
