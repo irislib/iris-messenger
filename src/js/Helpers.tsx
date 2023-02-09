@@ -166,6 +166,7 @@ export default {
       return (
         <iframe
           class="audio"
+          scrolling="no"
           key={match + i}
           width="650"
           height="200"
@@ -183,6 +184,7 @@ export default {
       return (
         <iframe
           class="audio"
+          scrolling="no"
           key={match + i}
           width="650"
           height="200"
