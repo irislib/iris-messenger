@@ -14,6 +14,7 @@ import BlockButton from './BlockButton';
 import CopyButton from './CopyButton';
 import Dropdown from './Dropdown';
 import FeedMessageForm from './FeedMessageForm';
+import FollowButton from './FollowButton';
 import Identicon from './Identicon';
 import Message from './Message';
 import Name from './Name';
@@ -412,6 +413,7 @@ class PublicMessage extends Message {
                 ${this.state.msg.info.isMine
                   ? html` <a href="#" onClick=${(e) => this.onDelete(e)}>${t('delete')}</a> `
                   : html`<a href="#" onClick=${(e) => this.report(e)}>${t('report (public)')}</a>
+                      <${FollowButton} id=${this.state.msg.event?.pubkey} showName=${true} />
                       <span onClick=${() => this.setState({ msg: null })}>
                         <${BlockButton} id=${this.state.msg.event?.pubkey} showName=${true} />
                       </span> `}
