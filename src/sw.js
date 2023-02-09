@@ -2,7 +2,7 @@ import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { registerRoute } from 'workbox-routing';
-import { CacheFirst, NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies';
+import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 
 const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
   maxRetentionTime: 14 * 24 * 60,
@@ -15,9 +15,20 @@ registerRoute(
   }),
 );
 registerRoute(({ url }) => url.pathname === '/', new NetworkFirst());
-registerRoute(({ url }) => {
-  return location.host.indexOf('localhost') !== 0 && url.origin === self.location.origin;
-}, new StaleWhileRevalidate());
+registerRoute(
+  ({ url }) => {
+    return location.host.indexOf('localhost') !== 0 && url.origin === self.location.origin;
+  },
+  new CacheFirst({
+    cacheName: 'static-resources',
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 100,
+        maxAgeSeconds: 30 * 24 * 60 * 60,
+      }),
+    ],
+  }),
+);
 
 registerRoute(
   ({ url }) => url.href.startsWith('https://proxy.irismessengers.wtf/insecure/rs:fill:'),
