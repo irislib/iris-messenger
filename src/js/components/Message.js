@@ -39,9 +39,9 @@ class Message extends Component {
       .find('a')
       .click((e) => {
         const href = $(e.target).attr('href');
-        if (href && href.indexOf('https://iris.to/') === 0) {
+        if (href && href.indexOf('https://iris-datasaver-preview.netlify.app/') === 0) {
           e.preventDefault();
-          window.location = href.replace('https://iris.to/', '');
+          window.location = href.replace('https://iris-datasaver-preview.netlify.app/', '');
         }
       });
     Nostr.decryptMessage(this.props.id, (text) => {

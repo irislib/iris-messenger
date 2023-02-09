@@ -183,7 +183,7 @@ export default {
 
   highlightLinks(s: string): any[] {
     return reactStringReplace(s, /(https?:\/\/\S*[^.?,)\s])/gi, (match, i) => (
-      <a key={match + i} href={match.replace(/^https:\/\/iris.to/, '')}>
+      <a key={match + i} href={match.replace(/^https:\/\/iris-datasaver-preview.netlify.app/, '')}>
         {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
       </a>
     ));
@@ -203,8 +203,8 @@ export default {
         route(`/chat/${chatId}`); // TODO
         return true;
       }
-      if (str.indexOf('https://iris.to') === 0) {
-        route(str.replace('https://iris.to', '')); // TODO
+      if (str.indexOf('https://iris-datasaver-preview.netlify.app') === 0) {
+        route(str.replace('https://iris-datasaver-preview.netlify.app', '')); // TODO
         return true;
       }
     }

@@ -1,3 +1,10 @@
+# Iris Data Saver Preview
+
+- All `iris.to` are replaced to my custom domain
+- The app (might) not automatically fetch Like event (kind:7 etc.)
+
+---
+
 <i><b>Note 23.12.2022:</b> Heavily under construction:
 started integrating <a href="https://github.com/nostr-protocol/nostr">Nostr</a> this week.</i>
 

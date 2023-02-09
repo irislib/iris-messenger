@@ -345,6 +345,7 @@ class Profile extends View {
       address,
       (profile) => {
         if (profile.nip05 && profile.nip05valid) {
+          // @MEMO: These `iris.to` should not (maybe) replaced to my custom domain
           // replace url and history entry with iris.to/${profile.nip05} or if nip is user@iris.to, just iris.to/${user}
           const nip05 = profile.nip05;
           const nip05Parts = nip05.split('@');
