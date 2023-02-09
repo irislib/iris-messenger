@@ -17,6 +17,13 @@ export default class MediaSettings extends Component {
   }
 
   render() {
+    const embedSettings = [
+      { setting: 'enableWebtorrent', label: 'Webtorrent' },
+      { setting: 'enableYoutube', label: 'YouTube' },
+      { setting: 'enableInstagram', label: 'Instagram' },
+      { setting: 'enableSpotify', label: 'Spotify' },
+      { setting: 'enableTidal', label: 'Tidal' },
+    ];
     return (
       <>
         <div class="centered-container">
@@ -39,66 +46,23 @@ export default class MediaSettings extends Component {
           </p>
 
           <h3>{t('embeds')}</h3>
-          <p>
-            <input
-              type="checkbox"
-              checked={this.state.settings.enableWebtorrent !== false}
-              onChange={() =>
-                iris
-                  .local()
-                  .get('settings')
-                  .get('enableWebtorrent')
-                  .put(!this.state.settings.enableWebtorrent)
-              }
-              id="enableWebtorrent"
-            />
-            <label htmlFor="enableWebtorrent">Webtorrent</label>
-          </p>
-          <p>
-            <input
-              type="checkbox"
-              checked={this.state.settings.enableYoutube !== false}
-              onChange={() =>
-                iris
-                  .local()
-                  .get('settings')
-                  .get('enableYoutube')
-                  .put(!(this.state.settings.enableYoutube !== false))
-              }
-              id="enableYoutube"
-            />
-            <label htmlFor="enableYoutube">YouTube</label>
-          </p>
-          <p>
-            <input
-              type="checkbox"
-              checked={this.state.settings.enableSpotify !== false}
-              onChange={() =>
-                iris
-                  .local()
-                  .get('settings')
-                  .get('enableSpotify')
-                  .put(!(this.state.settings.enableSpotify !== false))
-              }
-              id="enableSpotify"
-            />
-            <label htmlFor="enableSpotify">Spotify</label>
-          </p>
-          <p>
-            <input
-              type="checkbox"
-              checked={this.state.settings.enableTidal !== false}
-              onChange={() =>
-                iris
-                  .local()
-                  .get('settings')
-                  .get('enableTidal')
-                  .put(!(this.state.settings.enableTidal !== false))
-              }
-              id="enableTidal"
-            />
-            <label htmlFor="enableTidal">Tidal</label>
-          </p>
+          {embedSettings.map(({ setting, label }) => (
+            <p key={setting}>
+              <input
+                type="checkbox"
+                checked={this.state.settings[setting] !== false}
+                onChange={() =>
+                  iris
+                    .local()
+                    .get('settings')
+                    .get(setting)
+                    .put(!(this.state.settings[setting] !== false))
+                }
+                id={setting}
+              />
+              <label htmlFor={setting}>{label}</label>
+            </p>
+          ))}
         </div>
       </>
     );

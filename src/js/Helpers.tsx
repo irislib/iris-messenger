@@ -152,22 +152,24 @@ export default {
       });
     }
 
-    const igRegex = /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com\/p\/)([\w-]{11})(?:\S+)?/g;
-    replacedText = reactStringReplace(replacedText, igRegex, (match, i) => {
-      return (
-        <iframe
-          class="instagram"
-          key={match + i}
-          width="650"
-          height="400"
-          style={{ maxWidth: '100%' }}
-          src={`https://instagram.com/p/${match}/embed`}
-          frameBorder="0"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      );
-    });
+    if (settings.enableInstagram !== false) {
+      const igRegex = /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com\/p\/)([\w-]{11})(?:\S+)?/g;
+      replacedText = reactStringReplace(replacedText, igRegex, (match, i) => {
+        return (
+          <iframe
+            class="instagram"
+            key={match + i}
+            width="650"
+            height="400"
+            style={{ maxWidth: '100%' }}
+            src={`https://instagram.com/p/${match}/embed`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        );
+      });
+    }
 
     if (settings.enableSpotify !== false) {
       const spotifyRegex =
