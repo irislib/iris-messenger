@@ -32,6 +32,8 @@ import '../css/cropper.min.css';
 
 type Props = Record<string, unknown>;
 
+console.log('test change');
+
 type ReactState = {
   loggedIn: boolean;
   showMenu: boolean;
