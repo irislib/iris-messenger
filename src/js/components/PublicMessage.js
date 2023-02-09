@@ -93,6 +93,51 @@ class PublicMessage extends Message {
     this.unmounted = true;
   }
 
+  fetchRepliesAndLikes() {
+    const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+    if (!nostrId) return;
+
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    if (!myPub) return;
+
+    const msg = this.state.msg;
+    if (!msg) return;
+
+    console.log('fetchRepliesAndLikes', nostrId);
+
+    Nostr.getRepliesAndLikes(nostrId, (replies, likedBy, threadReplyCount, boostedBy) => {
+      this.likedBy = likedBy;
+      this.boostedBy = boostedBy;
+      const sortedReplies =
+        replies &&
+        Array.from(replies).sort((a, b) => {
+          const eventA = Nostr.eventsById.get(a);
+          const eventB = Nostr.eventsById.get(b);
+          // show our replies first
+          if (eventA?.pubkey === myPub && eventB?.pubkey !== myPub) {
+            return -1;
+          } else if (eventA?.pubkey !== myPub && eventB?.pubkey === myPub) {
+            return 1;
+          }
+          // show replies by original post's author first
+          if (eventA?.pubkey === msg.event?.pubkey && eventB?.pubkey !== msg.event?.pubkey) {
+            return -1;
+          } else if (eventA?.pubkey !== msg.event?.pubkey && eventB?.pubkey === msg.event?.pubkey) {
+            return 1;
+          }
+          return eventA?.created_at - eventB?.created_at;
+        });
+      this.setState({
+        boosts: this.boostedBy.size,
+        boosted: this.boostedBy.has(myPub),
+        likes: this.likedBy.size,
+        liked: this.likedBy.has(myPub),
+        replyCount: threadReplyCount,
+        sortedReplies,
+      });
+    });
+  }
+
   componentDidMount() {
     this.unmounted = false;
 
@@ -154,43 +199,6 @@ class PublicMessage extends Message {
       }
 
       this.setState({ msg });
-
-      if (nostrId) {
-        Nostr.getRepliesAndLikes(nostrId, (replies, likedBy, threadReplyCount, boostedBy) => {
-          this.likedBy = likedBy;
-          this.boostedBy = boostedBy;
-          const sortedReplies =
-            replies &&
-            Array.from(replies).sort((a, b) => {
-              const eventA = Nostr.eventsById.get(a);
-              const eventB = Nostr.eventsById.get(b);
-              // show our replies first
-              if (eventA?.pubkey === myPub && eventB?.pubkey !== myPub) {
-                return -1;
-              } else if (eventA?.pubkey !== myPub && eventB?.pubkey === myPub) {
-                return 1;
-              }
-              // show replies by original post's author first
-              if (eventA?.pubkey === msg.event?.pubkey && eventB?.pubkey !== msg.event?.pubkey) {
-                return -1;
-              } else if (
-                eventA?.pubkey !== msg.event?.pubkey &&
-                eventB?.pubkey === msg.event?.pubkey
-              ) {
-                return 1;
-              }
-              return eventA?.created_at - eventB?.created_at;
-            });
-          this.setState({
-            boosts: this.boostedBy.size,
-            boosted: this.boostedBy.has(myPub),
-            likes: this.likedBy.size,
-            liked: this.likedBy.has(myPub),
-            replyCount: threadReplyCount,
-            sortedReplies,
-          });
-        });
-      }
     };
 
     if (p.then) {
@@ -718,6 +726,8 @@ class PublicMessage extends Message {
               >
                 ${s.likes || ''}
               </span>
+              <span style="flex:1"></span>
+              <button class="fetch-btn" onClick=${() => this.fetchRepliesAndLikes()}>fetch</button>
             </div>
             ${s.showLikes
               ? html`
