@@ -182,11 +182,15 @@ export default {
   },
 
   highlightLinks(s: string): any[] {
-    return reactStringReplace(s, /(https?:\/\/\S*[^.?,)\s])/gi, (match, i) => (
-      <a key={match + i} href={match.replace(/^https:\/\/iris.to/, '')}>
-        {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-      </a>
-    ));
+    return reactStringReplace(
+      s,
+      /((?:https?:\/\/\S*[^.?,)\s])|(?:iris\.to\/\S*[^.?,)\s]))/gi,
+      (match, i) => (
+        <a key={match + i} href={match.replace(/^https:\/\/iris.to/, '')}>
+          {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+        </a>
+      ),
+    );
   },
 
   followChatLink(str) {
