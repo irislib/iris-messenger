@@ -561,6 +561,8 @@ class PublicMessage extends Message {
     if (hasETags) {
       replyingToUsers = s.msg.event?.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
     }
+    // remove duplicates
+    replyingToUsers = [...new Set(replyingToUsers)];
     const quoting = s.msg.replyingTo && (this.props.showRepliedMsg || this.props.asReply);
 
     return html`
