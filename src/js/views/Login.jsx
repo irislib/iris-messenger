@@ -1,7 +1,6 @@
 import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation';
 import LanguageSelector from '../components/LanguageSelector';
-import QRScanner from '../QRScanner';
 import { Component } from 'preact';
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
@@ -58,15 +57,6 @@ class Login extends Component {
     setTimeout(() => this.setState({}), 1000);
   }
 
-  toggleScanPrivKey() {
-    if (this.state.showScanPrivKey) {
-      QRScanner.cleanupScanner();
-    } else {
-      QRScanner.startPrivKeyQRScanner().then(login);
-    }
-    this.setState({ showScanPrivKey: !this.state.showScanPrivKey });
-  }
-
   async onPasteKey(event) {
     const val = event.target.value;
     if (!val.length) {
@@ -107,7 +97,6 @@ class Login extends Component {
 
   showCreateAccount(e) {
     e.preventDefault();
-    QRScanner.cleanupScanner();
     this.setState({ showSwitchAccount: false });
   }
 
@@ -148,20 +137,6 @@ class Login extends Component {
           onInput={(e) => this.onPasteKey(e)}
           placeholder={t('paste_private_key')}
         />
-        <p>
-          <Button id="scan-privkey-btn" onClick={(e) => this.toggleScanPrivKey(e)}>
-            {t('scan_private_key_qr_code')}
-          </Button>
-        </p>
-        <p>
-          <video
-            id="privkey-qr-video"
-            width="320"
-            height="320"
-            style="object-fit: cover;"
-            className={this.state.showScanPrivKey ? '' : 'hidden'}
-          />
-        </p>
       </>
     );
   }

@@ -200,7 +200,7 @@ export default {
             key={match + i}
             width="650"
             height="200"
-            style={{maxWidth: '100%'}}
+            style={{ maxWidth: '100%' }}
             src={`https://embed.tidal.com/tracks/${match}?layout=gridify`}
             frameBorder="0"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -215,7 +215,7 @@ export default {
       replacedText = reactStringReplace(replacedText, magnetRegex, (match, i) => {
         // Torrent component
         console.log('magnet link', match);
-        return <Torrent key={match + i} preview={true} torrentId={match}/>;
+        return <Torrent key={match + i} preview={true} torrentId={match} />;
       });
     }
 

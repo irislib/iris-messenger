@@ -19,6 +19,14 @@ export default class AccountSettings extends Component {
     }
   }
 
+  async onExtensionLoginClick(e) {
+    e.preventDefault();
+    const rpub = await window.nostr.getPublicKey();
+    const k = await iris.Key.generate();
+    k.secp256k1 = { rpub };
+    iris.session.login(k);
+  }
+
   render() {
     const myPrivHex = iris.session.getKey().secp256k1.priv;
     let myPriv32;
@@ -54,7 +62,17 @@ export default class AccountSettings extends Component {
               {t('switch_account')}
             </Button>
           </div>
-          {this.state.showSwitchAccount ? html`<${ExistingAccountLogin} />` : ''}
+          {this.state.showSwitchAccount ? html`
+<p>
+            <${ExistingAccountLogin} />
+            </p>
+            <p>
+            <a href="" onClick=${(e) => this.onExtensionLoginClick(e)}>
+              ${t('nostr_extension_login')}
+            </a>
+</p>
+
+          ` : ''}
 
           <h3>Key</h3>
           <div className="flex-table">
