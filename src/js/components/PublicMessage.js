@@ -316,8 +316,9 @@ class PublicMessage extends Message {
           <div style="display: flex; align-items: center">
             <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
             <a href="/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
-              <${Name} pub=${this.state.msg?.event?.pubkey} />${' '}
+              <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
+            ${' '}
             <span> started following you</span>
           </div>
         </div>

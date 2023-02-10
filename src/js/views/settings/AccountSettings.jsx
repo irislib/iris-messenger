@@ -82,8 +82,8 @@ export default class AccountSettings extends Component {
                 <input type="text" value={myNpub} />
               </div>
               <div className="flex-cell no-flex">
-                <CopyButton copyStr={myPub} text="Copy hex" />
                 <CopyButton copyStr={myNpub} text="Copy npub" />
+                <CopyButton copyStr={myPub} text="Copy hex" />
               </div>
             </div>
             <div className="flex-row">
@@ -91,8 +91,8 @@ export default class AccountSettings extends Component {
               <div className="flex-cell no-flex">
                 {myPrivHex ? (
                   <>
-                    <CopyButton notShareable={true} copyStr={myPrivHex} text="Copy hex" />
                     <CopyButton notShareable={true} copyStr={myPriv32} text="Copy nsec" />
+                    <CopyButton notShareable={true} copyStr={myPrivHex} text="Copy hex" />
                   </>
                 ) : (
                   <p>Not present. Good!</p>
