@@ -90,9 +90,12 @@ export default {
     replacedText = reactStringReplace(replacedText, pubKeyRegex, (match, i) => {
       const link = `/${match}`;
       return (
-        <a href={link}>
-          @<Name key={match + i} pub={match} hideBadge={true} userNameOnly={true} />
-        </a>
+        <>
+          {' '}
+          <a href={link}>
+            @<Name key={match + i} pub={match} hideBadge={true} userNameOnly={true} />
+          </a>
+        </>
       );
     });
 
