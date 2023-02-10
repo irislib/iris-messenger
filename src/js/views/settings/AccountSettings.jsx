@@ -50,7 +50,7 @@ export default class AccountSettings extends Component {
               </>
             ) : null}
           </p>
-          <div style="">
+          <p>
             <Button onClick={() => this.onLogoutClick(hasPriv)}>{t('log_out')}</Button>
             <Button
               onClick={() =>
@@ -61,7 +61,7 @@ export default class AccountSettings extends Component {
             >
               {t('switch_account')}
             </Button>
-          </div>
+          </p>
           {this.state.showSwitchAccount ? html`
 <p>
             <${ExistingAccountLogin} />
@@ -74,32 +74,25 @@ export default class AccountSettings extends Component {
 
           ` : ''}
 
-          <h3>Key</h3>
-          <div className="flex-table">
-            <div className="flex-row">
-              <div className="flex-cell">
-                <p>Public key:</p>
-                <input type="text" value={myNpub} />
-              </div>
-              <div className="flex-cell no-flex">
-                <CopyButton copyStr={myNpub} text="Copy npub" />
-                <CopyButton copyStr={myPub} text="Copy hex" />
-              </div>
-            </div>
-            <div className="flex-row">
-              <div className="flex-cell">Private key</div>
-              <div className="flex-cell no-flex">
-                {myPrivHex ? (
-                  <>
-                    <CopyButton notShareable={true} copyStr={myPriv32} text="Copy nsec" />
-                    <CopyButton notShareable={true} copyStr={myPrivHex} text="Copy hex" />
-                  </>
-                ) : (
-                  <p>Not present. Good!</p>
-                )}
-              </div>
-            </div>
-          </div>
+          <h3>{t('public_key')}</h3>
+          <p>
+            <small>{myNpub}</small>
+          </p>
+          <p>
+            <CopyButton copyStr={myNpub} text="Copy npub" />
+            <CopyButton copyStr={myPub} text="Copy hex" />
+          </p>
+          <h3>{t('private_key')}</h3>
+          <p>
+            {myPrivHex ? (
+              <>
+                <CopyButton notShareable={true} copyStr={myPriv32} text="Copy nsec" />
+                <CopyButton notShareable={true} copyStr={myPrivHex} text="Copy hex" />
+              </>
+            ) : (
+              <p>Not present. Good!</p>
+            )}
+          </p>
           {myPrivHex ? <p>{t('private_key_warning')}</p> : ''}
         </div>
       </>
