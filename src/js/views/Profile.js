@@ -302,7 +302,7 @@ class Profile extends View {
     if (!this.state.hexPub) {
       return html`<div></div>`;
     }
-    const title = this.state.name || 'Profile';
+    const title = this.state.display_name || this.state.name || 'Profile';
     const ogTitle = `${title} | Iris`;
     const description = `Latest posts by ${this.state.display_name || this.state.name || 'user'}. ${
       this.state.about || ''
