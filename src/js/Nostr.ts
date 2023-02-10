@@ -127,7 +127,6 @@ const Nostr = {
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  maxRelays: 10,
   relays: defaultRelays,
   searchRelays: searchRelays,
   knownUsers: new Set<string>(),
@@ -744,21 +743,11 @@ const Nostr = {
     }
   },
   manageRelays: function () {
-    // TODO keep track of subscriptions and send them to new relays
     const go = () => {
-      const relays: Array<Relay> = Array.from(this.relays.values());
-      // ws status codes: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent
-      const openRelays = relays.filter((relay: Relay) => getRelayStatus(relay) === 1);
-      const connectingRelays = relays.filter((relay: Relay) => getRelayStatus(relay) === 0);
-      if (openRelays.length + connectingRelays.length < this.maxRelays) {
-        const closedRelays = relays.filter((relay: Relay) => getRelayStatus(relay) === 3);
-        if (closedRelays.length) {
-          const newRelay = relays[Math.floor(Math.random() * relays.length)];
-          this.connectRelay(newRelay);
+      for (const relay of this.relays.values()) {
+        if (relay.enabled !== false && getRelayStatus(relay) === 3) {
+          this.connectRelay(relay);
         }
-      }
-      if (openRelays.length > this.maxRelays) {
-        openRelays[Math.floor(Math.random() * openRelays.length)].close();
       }
       for (const relay of this.searchRelays.values()) {
         if (getRelayStatus(relay) === 3) {
@@ -767,17 +756,20 @@ const Nostr = {
       }
     };
 
-    for (let i = 0; i < this.maxRelays; i++) {
-      go();
-    }
-
     for (const relay of this.relays.values()) {
       relay.on('notice', (notice) => {
         console.log('notice from ', relay.url, notice);
       });
     }
+    for (const relay of this.searchRelays.values()) {
+      relay.on('notice', (notice) => {
+        console.log('notice from ', relay.url, notice);
+      });
+    }
 
-    setInterval(go, 1000);
+    go();
+
+    setInterval(go, 10000);
   },
   handleNote(event: Event) {
     this.eventsById.set(event.id, event);

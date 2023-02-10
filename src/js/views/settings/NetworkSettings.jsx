@@ -9,21 +9,10 @@ const bech32 = require('bech32-buffer');
 const NetworkSettings = () => {
   const [relays, setRelays] = useState(Array.from(Nostr.relays.values()));
   const [newRelayUrl, setNewRelayUrl] = useState(""); // added state to store the new relay URL
-  const [maxRelays, setMaxRelays] = useState(Nostr.maxRelays);
 
   setInterval(() => {
     setRelays(Array.from(Nostr.relays.values()));
   }, 1000);
-
-  const handleConnectClick = (relay) => {
-    iris.local().get('relays').get(relay.url).put({ enabled: true });
-    Nostr.connectRelay(relay);
-  };
-
-  const handleDisconnectClick = (relay) => {
-    iris.local().get('relays').get(relay.url).put({ enabled: false });
-    relay.close();
-  };
 
   const handleRemoveRelay = (relay) => {
     iris.local().get('relays').get(relay.url).put(null);
@@ -35,13 +24,6 @@ const NetworkSettings = () => {
     event.preventDefault(); // prevent the form from reloading the page
     Nostr.addRelay(newRelayUrl); // add the new relay using the Nostr method
     setNewRelayUrl(''); // reset the new relay URL
-  };
-
-  const maxRelaysChanged = (event) => {
-    // parse int
-    const maxRelays = parseInt(event.target.value);
-    iris.local().get('maxRelays').put(maxRelays);
-    setMaxRelays(maxRelays);
   };
 
   const getStatus = (relay) => {
@@ -70,13 +52,6 @@ const NetworkSettings = () => {
   return (
     <div className="centered-container">
       <h2>{t('network')}</h2>
-      <p>
-        Max relays: <input
-          type="number"
-          value={maxRelays}
-          onChange={maxRelaysChanged}
-        />
-      </p>
       <div id="peers" className="flex-table">
         {relays.map((relay) => (
           <div className="flex-row peer">
@@ -90,12 +65,14 @@ const NetworkSettings = () => {
               </Button>
             </div>
             <div className="flex-cell no-flex">
-
-              {getStatus(relay) === 1 ? (
-                <Button onClick={() => handleDisconnectClick(relay)}>Disconnect</Button>
-              ) : (
-                <Button onClick={() => handleConnectClick(relay)}>Connect</Button>
-              )}
+              <input
+                type="checkbox"
+                checked={relay.enabled !== false}
+                onChange={() => {
+                  relay.enabled = !(relay.enabled !== false);
+                  relay.enabled ? relay.connect() : relay.close();
+                }}
+              />
             </div>
           </div>
         ))}
