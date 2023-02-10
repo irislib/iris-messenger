@@ -58,7 +58,7 @@ class PublicMessage extends Message {
         Nostr.getProfile(event.pubkey, (profile) => {
           if (!profile) return;
           if (!thisArg.unmounted) {
-            thisArg.setState({ name: profile.name });
+            thisArg.setState({ name: profile.display_name || profile.name });
           }
         });
         const replyingTo = Nostr.getEventReplyingTo(event);
