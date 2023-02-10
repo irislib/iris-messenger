@@ -434,6 +434,14 @@ class Profile extends View {
     });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState.name && this.state.name) {
+      setTimeout(() => {
+        window.prerenderReady = true;
+      }, 1000); // give feed a sec to load
+    }
+  }
+
   componentDidMount() {
     this.restoreScrollPosition();
     const pub = this.props.id;

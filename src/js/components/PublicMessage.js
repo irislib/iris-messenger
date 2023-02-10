@@ -94,6 +94,16 @@ class PublicMessage extends Message {
     this.unmounted = true;
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.standalone) {
+      if (!prevState.msg && this.state.msg) {
+        setTimeout(() => {
+          window.prerenderReady = true;
+        }, 1000); // give other things a sec to load
+      }
+    }
+  }
+
   componentDidMount() {
     this.unmounted = false;
 
