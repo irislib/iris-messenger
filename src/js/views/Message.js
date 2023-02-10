@@ -23,7 +23,7 @@ class Message extends View {
     this.restoreScrollPosition();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (prevProps.hash !== this.props.hash) {
       this.restoreScrollPosition();
     }

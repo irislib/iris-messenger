@@ -98,6 +98,7 @@ class PublicMessage extends Message {
     if (this.props.standalone) {
       if (!prevState.msg && this.state.msg) {
         setTimeout(() => {
+          // important for SEO: prerenderReady is false until page content is loaded
           window.prerenderReady = true;
         }, 1000); // give other things a sec to load
       }

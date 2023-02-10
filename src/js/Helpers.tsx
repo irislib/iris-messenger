@@ -156,7 +156,8 @@ export default {
     }
 
     if (settings.enableInstagram !== false) {
-      const igRegex = /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com\/)((?:p|reel)\/[\w-]{11})(?:\S+)?/g;
+      const igRegex =
+        /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com\/)((?:p|reel)\/[\w-]{11})(?:\S+)?/g;
       replacedText = reactStringReplace(replacedText, igRegex, (match, i) => {
         return (
           <iframe

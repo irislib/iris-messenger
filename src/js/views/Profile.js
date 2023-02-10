@@ -304,7 +304,9 @@ class Profile extends View {
     }
     const title = this.state.name || 'Profile';
     const ogTitle = `${title} | Iris`;
-    const description = `Latest posts by ${this.state.name || 'user'}. ${this.state.about || ''}`;
+    const description = `Latest posts by ${this.state.display_name || this.state.name || 'user'}. ${
+      this.state.about || ''
+    }`;
     return html`
       ${this.state.banner
         ? html`
@@ -397,6 +399,7 @@ class Profile extends View {
         // profile may contain arbitrary fields, so be careful
         this.setState({
           name: profile.name,
+          display_name: profile.display_name,
           about: Helpers.highlightLinks(profile.about),
           picture: profile.picture,
           nip05: profile.nip05valid && profile.nip05,
@@ -437,6 +440,7 @@ class Profile extends View {
   componentDidUpdate(prevProps, prevState) {
     if (!prevState.name && this.state.name) {
       setTimeout(() => {
+        // important for SEO: prerenderReady is false until page content is loaded
         window.prerenderReady = true;
       }, 1000); // give feed a sec to load
     }
