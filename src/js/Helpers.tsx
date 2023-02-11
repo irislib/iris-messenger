@@ -111,7 +111,7 @@ export default {
       );
     });
 
-    const twitterRegex = /(?:^|\s)(?:@)?(https?:\/\/twitter.com\/\w+\/status\/\d+)(?![\w/])/g;
+    const twitterRegex = /(?:^|\s)(?:@)?(https?:\/\/twitter.com\/\w+\/status\/\d+\S*)(?![\w/])/g;
     replacedText = reactStringReplace(replacedText, twitterRegex, (match, i) => {
       console.log('tweet match', match);
       return (
