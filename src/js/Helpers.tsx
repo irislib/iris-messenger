@@ -123,7 +123,6 @@ export default {
             display: 'block',
           }}
           key={match + i}
-          border={0}
           frameborder={0}
           height={250}
           width={550}
