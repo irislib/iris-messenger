@@ -123,7 +123,6 @@ export default {
             display: 'block',
           }}
           key={match + i}
-          frameborder={0}
           height={250}
           width={550}
           src={`https://twitframe.com/show?url=${encodeURIComponent(match)}`}
