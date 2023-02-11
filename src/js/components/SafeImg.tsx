@@ -29,15 +29,8 @@ const SafeImg = (props: Props) => {
       props.src = `https://proxy.irismessengers.wtf/insecure/plain/${props.src}`;
     }
   }
-  const [src, setSrc] = useState(props.src);
 
-  const handleError = () => {
-    console.log('handleeerrorr');
-    setSrc('/assets/img/cover.jpg');
-  };
-
-  const newProps = Object.assign(props, { src });
-  return <img onError={handleError} {...newProps} />;
+  return <img {...props} />;
 };
 
 export default SafeImg;
