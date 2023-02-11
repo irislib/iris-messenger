@@ -37,6 +37,11 @@ class FeedMessageForm extends MessageForm {
         .get('public')
         .get('msgDraft')
         .once((t) => !textEl.val() && textEl.val(t));
+    } else {
+      const currentHistoryState = window.history.state;
+      if (currentHistoryState && currentHistoryState['replyTo' + this.props.replyingTo]) {
+        textEl.val(currentHistoryState['replyTo' + this.props.replyingTo]);
+      }
     }
   }
 
@@ -58,10 +63,11 @@ class FeedMessageForm extends MessageForm {
       msg.attachments = this.state.attachments;
     }
     await this.sendNostr(msg);
+    this.props.onSubmit && this.props.onSubmit(msg);
     this.setState({ attachments: null, torrentId: null });
     textEl.val('');
     textEl.height('');
-    this.props.onSubmit && this.props.onSubmit(msg);
+    this.saveDraftToHistory();
   }
 
   onEmojiButtonClick(event) {
@@ -91,12 +97,23 @@ class FeedMessageForm extends MessageForm {
     }
   }
 
+  saveDraftToHistory() {
+    const text = $(this.newMsgRef.current).val();
+    const currentHistoryState = window.history.state;
+    const newHistoryState = {
+      ...currentHistoryState,
+    };
+    newHistoryState['replyTo' + this.props.replyingTo] = text;
+    window.history.replaceState(newHistoryState, '');
+  }
+
   onMsgTextInput(event) {
     this.setTextareaHeight(event.target);
     if (!this.props.replyingTo) {
       iris.local().get('channels').get('public').get('msgDraft').put($(event.target).val());
     }
     this.checkMention(event);
+    this.saveDraftToHistory();
   }
 
   attachFileClicked(event) {
