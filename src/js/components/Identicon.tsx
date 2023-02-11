@@ -21,6 +21,7 @@ type State = {
   name: string | null;
   activity: string | null;
   identicon: string | null;
+  hasError: boolean;
 };
 
 const IdenticonContainer = styled.div`
@@ -85,12 +86,19 @@ class MyIdenticon extends Component<Props, State> {
       ['online', 'active'].indexOf(this.state.activity ?? '') > -1 ? this.state.activity : '';
     const hasPicture =
       this.state.picture &&
+      !this.state.hasError &&
       !this.props.hidePicture &&
       !Nostr.blockedUsers.has(this.props.str as string);
     const hasPictureStyle = hasPicture ? 'has-picture' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 
-    const pictureElement = <SafeImg src={this.state.picture} width={width} />;
+    const pictureElement = (
+      <SafeImg
+        src={this.state.picture}
+        width={width}
+        onError={() => this.setState({ hasError: true })}
+      />
+    );
 
     return (
       <IdenticonContainer

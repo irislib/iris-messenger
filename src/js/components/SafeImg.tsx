@@ -1,9 +1,8 @@
-import { useState } from 'react';
-
 type Props = {
   src: string;
   class?: string;
   width?: number;
+  onError?: () => void;
 };
 
 // need to have trailing slash, otherwise you could do https://imgur.com.myevilwebsite.com/image.png
