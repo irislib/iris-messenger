@@ -70,7 +70,7 @@ class About extends Component {
               difficult, and sometimes you don't see all the messages that appear on other clients.
             </p>
             <p>
-              <a href="https://github.com/irislib/faq">More...</a>
+              <a href="https://github.com/irislib/faq">More FAQ</a>
             </p>
 
             <h3>Maintainer</h3>
