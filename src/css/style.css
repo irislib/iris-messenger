@@ -111,7 +111,7 @@ html {
 }
 
 body {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text-color);
   font-family: Lato, sans-serif;
   padding: 0;
@@ -186,7 +186,7 @@ button {
   padding: 15px;
   outline: none;
   border: 0;
-  font-size: 15px;
+  font-size: 16px;
   border-radius: 50px;
 }
 
@@ -763,7 +763,7 @@ header.footer .header-content {
 }
 
 .flex-table .flex-row {
-  font-size: 12px;
+  font-size: 14px;
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -1562,7 +1562,7 @@ a.msgSenderName:hover .user-name {
   align-items: flex-end;
   flex-direction: row;
   text-align: right;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text-time);
 }
 
@@ -1929,7 +1929,7 @@ hr {
   background-color: var(--red);
   color: white;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1em;
 }
 
@@ -1939,7 +1939,7 @@ hr {
 
 small,
 .text-muted {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted-text-color);
 }
 
