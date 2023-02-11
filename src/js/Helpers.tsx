@@ -243,7 +243,7 @@ export default {
         if (tag) {
           if (tag[0] === 'p') {
             // profile
-            const link = `/${tag[1]}`;
+            const link = `/${Nostr.toNostrBech32Address(tag[1], 'npub')}`;
             return (
               <a href={link}>
                 @<Name key={match + i} pub={tag[1]} hideBadge={true} userNameOnly={true} />

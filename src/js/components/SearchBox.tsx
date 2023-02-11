@@ -268,12 +268,13 @@ class SearchBox extends Component<Props, State> {
                 followText = `${i.followers.size} ${t('followers')}`;
               }
             }
+            const npub = Nostr.toNostrBech32Address(i.key, 'npub');
             return (
               <a
                 onFocus={(e) => this.onResultFocus(e, index)}
                 tabIndex={2}
                 className={'result ' + (index === this.state.selected ? 'selected' : '')}
-                href={i.uuid ? `/group/${i.uuid}` : `/${i.key}`}
+                href={`/${npub}`}
                 onClick={(e) => this.onClick(e, i)}
               >
                 {i.picture ? (
@@ -281,7 +282,7 @@ class SearchBox extends Component<Props, State> {
                     <SafeImg src={i.picture} class="round-borders" width={40} />
                   </div>
                 ) : (
-                  <Identicon key={`${i.key}ic`} str={i.key} width={40} />
+                  <Identicon key={`${npub}ic`} str={npub} width={40} />
                 )}
                 <div>
                   <Name pub={i.key} key={i.key + 'searchResult'} />

@@ -744,10 +744,11 @@ class PublicMessage extends Message {
               ? html`
                   <div class="likes">
                     ${Array.from(this.likedBy).map((key) => {
+                      const npub = Nostr.toNostrBech32Address(key, 'npub');
                       return html`<${Identicon}
                         showTooltip=${true}
-                        onClick=${() => route(`/${key}`)}
-                        str=${Nostr.toNostrBech32Address(key, 'npub')}
+                        onClick=${() => route(`/${npub}`)}
+                        str=${npub}
                         width="32"
                       />`;
                     })}
@@ -758,10 +759,11 @@ class PublicMessage extends Message {
               ? html`
                   <div class="likes">
                     ${Array.from(this.boostedBy).map((key) => {
+                      const npub = Nostr.toNostrBech32Address(key, 'npub');
                       return html`<${Identicon}
                         showTooltip=${true}
-                        onClick=${() => route(`/${key}`)}
-                        str=${Nostr.toNostrBech32Address(key, 'npub')}
+                        onClick=${() => route(`/${npub}`)}
+                        str=${npub}
                         width="32"
                       />`;
                     })}

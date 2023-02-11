@@ -66,7 +66,7 @@ class Message extends Component {
   }
 
   onNameClick() {
-    route(`/${this.props.pubkey}`);
+    route(`/${Nostr.toNostrBech32Address(this.props.pubkey, 'npub')}`);
   }
 
   openAttachmentsGallery(event) {
