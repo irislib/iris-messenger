@@ -113,7 +113,6 @@ export default {
 
     const twitterRegex = /(?:^|\s)(?:@)?(https?:\/\/twitter.com\/\w+\/status\/\d+\S*)(?![\w/])/g;
     replacedText = reactStringReplace(replacedText, twitterRegex, (match, i) => {
-      console.log('tweet match', match);
       return (
         <iframe
           style={{
@@ -272,6 +271,16 @@ export default {
         return match;
       });
     }
+
+    // highlight hashtags, link to /search/${encodeUriComponent(hashtag)}
+    replacedText = reactStringReplace(replacedText, /(#\w+)/g, (match, i) => {
+      return (
+        <a href={`/search/${encodeURIComponent(match)}`}>
+          {match}
+        </a>
+      );
+    });
+
     return replacedText;
   },
 
