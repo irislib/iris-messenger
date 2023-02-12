@@ -6,6 +6,7 @@ import Button from '../components/basic/Button';
 import Header from '../components/Header';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
+import SafeImg from "../components/SafeImg";
 
 const explainers = {
   display_name: 'Name',
@@ -23,12 +24,13 @@ export default class EditProfile extends Component {
       profile: {},
       newFieldName: '',
       newFieldValue: '',
+      edited: false,
     };
   }
 
   componentDidMount() {
     Nostr.getProfile(iris.session.getKey().secp256k1.rpub, (p) => {
-      if (Object.keys(this.state.profile).length === 0) {
+      if (!this.state.edited && Object.keys(this.state.profile).length === 0) {
         delete p['created_at'];
         this.setState({
           profile: p,
@@ -38,13 +40,13 @@ export default class EditProfile extends Component {
   }
 
   setProfileAttribute = (key, value) => {
-    const profile = this.state.profile;
+    const profile = Object.assign({}, this.state.profile);
     if (value) {
       profile[key] = value;
     } else {
       delete profile[key];
     }
-    this.setState({ profile });
+    this.setState({ profile, edited: true });
   };
 
   handleSubmit = (event) => {
@@ -107,6 +109,9 @@ export default class EditProfile extends Component {
                         this.setProfileAttribute(field, (e.target as HTMLInputElement).value)
                       }
                     />
+                    {(field === 'picture' || field === 'banner') && val ? (
+                      <SafeImg width={200} src={val} />
+                    ) : null}
                   </p>
                 );
               })}
