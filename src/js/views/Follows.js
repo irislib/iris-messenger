@@ -85,9 +85,9 @@ class Follows extends View {
           ${this.state.follows.length > 1 &&
           !(this.props.id === this.myPub && !this.props.followers)
             ? html`
-                <${Button} small=${true} onClick=${() => this.followAll()}
-                  >${t('follow_all')} (${this.state.follows.length})<//
-                >
+                <${Button} small=${true} onClick=${() => this.followAll()}>
+                  ${t('follow_all')} (${this.state.follows.length})
+                <//>
               `
             : ''}
         </h3>
