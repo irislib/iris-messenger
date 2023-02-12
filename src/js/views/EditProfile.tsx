@@ -3,10 +3,11 @@ import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Button from '../components/basic/Button';
+import UploadButton from '../components/basic/UploadButton';
 import Header from '../components/Header';
+import SafeImg from '../components/SafeImg';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
-import SafeImg from "../components/SafeImg";
 
 const explainers = {
   display_name: 'Name',
@@ -109,8 +110,17 @@ export default class EditProfile extends Component {
                         this.setProfileAttribute(field, (e.target as HTMLInputElement).value)
                       }
                     />
-                    {(field === 'picture' || field === 'banner') && val ? (
-                      <SafeImg width={200} src={val} />
+                    {field === 'picture' || field === 'banner' ? (
+                      <>
+                        <p>
+                          <UploadButton onUrl={(url) => this.setProfileAttribute(field, url)} />
+                        </p>
+                        {val && (
+                          <p>
+                            <SafeImg width={200} src={val} />
+                          </p>
+                        )}
+                      </>
                     ) : null}
                   </p>
                 );
