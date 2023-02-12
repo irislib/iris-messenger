@@ -476,4 +476,5 @@ export default {
 
   isElectron,
   pubKeyRegex,
+  noteRegex,
 };

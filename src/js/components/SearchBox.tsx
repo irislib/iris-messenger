@@ -173,7 +173,7 @@ class SearchBox extends Component<Props, State> {
         });
       }
 
-      if (query.indexOf('note') === 0) {
+      if (query.match(Helpers.noteRegex)) {
         route('/post/' + query);
         return;
       }
