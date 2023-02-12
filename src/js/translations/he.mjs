@@ -22,6 +22,7 @@ export default {
   "done": "סיים",
   "edit_profile": "עריכת פרופיל",
   "everyone": "כולם",
+  "follow_all": "עקוב אחר כולם",
   "followers": "עוקבים",
   "following": "עוקב",
   "follows": "עוקב",
