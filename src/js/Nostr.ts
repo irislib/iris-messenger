@@ -196,15 +196,19 @@ const Nostr = {
       console.error(e);
     }
   },
-  setFollowed: function (followedUser: string, follow = true) {
-    followedUser = this.toNostrHexAddress(followedUser);
-    const myPub = iris.session.getKey().secp256k1.rpub;
-
-    if (follow) {
-      this.addFollower(followedUser, myPub);
-    } else {
-      this.removeFollower(followedUser, myPub);
+  setFollowed: function (followedUsers: string | string[], follow = true) {
+    if (typeof followedUsers === 'string') {
+      followedUsers = [followedUsers];
     }
+    const myPub = iris.session.getKey().secp256k1.rpub;
+    followedUsers.forEach((followedUser) => {
+      followedUser = this.toNostrHexAddress(followedUser);
+      if (follow) {
+        this.addFollower(followedUser, myPub);
+      } else {
+        this.removeFollower(followedUser, myPub);
+      }
+    });
 
     const existing = this.followEventByUser.get(myPub);
 

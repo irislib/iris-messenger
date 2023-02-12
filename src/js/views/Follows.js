@@ -2,6 +2,7 @@ import { html } from 'htm/preact';
 import iris from 'iris-lib';
 import throttle from 'lodash/throttle';
 
+import Button from '../components/basic/Button';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
@@ -60,19 +61,35 @@ class Follows extends View {
 
   componentDidMount() {
     if (this.props.id) {
+      this.myPub = Nostr.toNostrBech32Address(iris.session.getKey().secp256k1.rpub, 'npub');
       this.props.followers ? this.getFollowers() : this.getFollows();
       iris.local().get('contacts').on(this.inject());
     }
   }
 
+  followAll() {
+    confirm(`${t('follow_all')} (${this.state.follows.length})?`) &&
+      Nostr.setFollowed(this.state.follows);
+  }
+
   renderView() {
     return html`
       <div class="centered-container">
-        <h3>
-          <a href="/${this.props.id}"> <${Name} pub=${this.props.id} /> </a>:<i> </i> ${this.props
-            .followers
-            ? t('followers')
-            : t('following')}
+        <h3 style="display:flex">
+          <a href="/${this.props.id}"> <${Name} pub=${this.props.id} /> </a>:<i> </i>
+
+          <span style="flex:1" class="mar-left5">
+            ${this.props.followers ? t('followers') : t('following')}
+          </span>
+
+          ${this.state.follows.length > 1 &&
+          !(this.props.id === this.myPub && !this.props.followers)
+            ? html`
+                <${Button} small=${true} onClick=${() => this.followAll()}
+                  >${t('follow_all')} (${this.state.follows.length})<//
+                >
+              `
+            : ''}
         </h3>
         <div id="follows-list">
           ${this.state.follows.map((hexKey) => {
