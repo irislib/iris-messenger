@@ -372,6 +372,9 @@ class Profile extends View {
     Nostr.getProfile(
       address,
       (profile) => {
+        if (!profile) {
+          return;
+        }
         if (profile.nip05 && profile.nip05valid) {
           // replace url and history entry with iris.to/${profile.nip05} or if nip is user@iris.to, just iris.to/${user}
           const nip05 = profile.nip05;
