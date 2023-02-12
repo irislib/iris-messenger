@@ -7,7 +7,7 @@ import Helpers from '../Helpers';
 
 import SafeImg from './SafeImg';
 
-type Props = { picture?: string };
+type Props = { picture?: string; onError?: () => void };
 const ANIMATE_DURATION = 200;
 
 class ProfilePicture extends Component<Props> {
@@ -15,6 +15,7 @@ class ProfilePicture extends Component<Props> {
     return html`<${SafeImg}
       class="profile-picture"
       src=${this.props.picture}
+      onError=${this.props.onError}
       onClick=${(e) => {
         this.imageClicked(e);
       }}

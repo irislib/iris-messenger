@@ -108,10 +108,11 @@ class Profile extends View {
       return '';
     }
     let profilePicture;
-    if (this.state.picture && !this.state.blocked) {
+    if (this.state.picture && !this.state.blocked && !this.state.profilePictureError) {
       profilePicture = html`<${ProfilePicture}
         key="${this.state.hexPub}picture"
         picture=${this.state.picture}
+        onError=${() => this.setState({ profilePictureError: true })}
       />`;
     } else {
       profilePicture = html`<${Identicon}
