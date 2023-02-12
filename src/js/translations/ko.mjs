@@ -112,6 +112,7 @@ export default {
   "unreport": "신고 취소",
   "use_picture": "사진 사용",
   "video_call": "화상채팅",
+  "view_as": "다른 사용자로 보기",
   "whats_on_your_mind": "무슨 생각 중이신가요?",
   "whats_your_name": "이름?",
   "write_your_reply": "댓글달기",

@@ -88,6 +88,7 @@ export default {
   "unreport": "annulla segnalazione",
   "use_picture": "Usa foto",
   "video_call": "Chiamata video",
+  "view_as": "Visualizza come",
   "whats_on_your_mind": "cosa stai pensando",
   "whats_your_name": "Quale è il tuo nome??",
   "write_your_reply": "scrivi la tua risposta",

@@ -115,6 +115,7 @@ export default {
   "unreport": "Отменить жалобу",
   "use_picture": "Использовать фото",
   "video_call": "Видео-звонок",
+  "view_as": "Просмотреть как",
   "visibility": "Видимость",
   "whats_on_your_mind": "Расскажите о себе",
   "whats_your_name": "Как вас зовут?",

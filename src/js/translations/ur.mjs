@@ -58,6 +58,7 @@ export default {
   "unblock": "بلاک ختم کریں",
   "use_picture": "تصویر استعمال کریں",
   "video_call": "ویڈیو کال",
+  "view_as": "کسی دوسرے صارف کے طور پر دیکھیں",
   "whats_your_name": "آپکا کیا نام ہے؟",
   "yesterday": "کل"
 };

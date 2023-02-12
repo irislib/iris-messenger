@@ -108,6 +108,7 @@ export default {
   "unreport": "Batalkan laporan",
   "use_picture": "Pakai gambar",
   "video_call": "Panggilan video",
+  "view_as": "Lihat sebagai",
   "visibility": "Postingan, balasan, dan yang Anda sukai hanya ditampilkan ke pengikut Anda dan jaringan mereka.",
   "whats_on_your_mind": "Apa yang sedang Anda pikirkan?",
   "whats_your_name": "Siapa nama Anda?",

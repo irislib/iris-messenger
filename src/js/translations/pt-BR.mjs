@@ -85,6 +85,7 @@ export default {
   "unblock": "Desbloquear",
   "use_picture": "Usar foto",
   "video_call": "Chamada de vídeo",
+  "view_as": "Ver como",
   "whats_your_name": "Qual o seu nome?",
   "yesterday": "ontem"
 };

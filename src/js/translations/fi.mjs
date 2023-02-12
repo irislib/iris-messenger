@@ -113,6 +113,7 @@ export default {
   "unreport": "Peruuta ilmoitus",
   "use_picture": "Käytä kuvaa",
   "video_call": "Videopuhelu",
+  "view_as": "Näytä käyttäjänä",
   "visibility": "Näkyvyys",
   "whats_on_your_mind": "Mitä mietit?",
   "whats_your_name": "Mikä on nimesi?",

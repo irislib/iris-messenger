@@ -111,6 +111,7 @@ export default {
   "unreport": "atšaukti pranešimą",
   "use_picture": "naudoti nuotrauką",
   "video_call": "video skambutis",
+  "view_as": "žiūrėti kaip",
   "visibility": "matomumas",
   "whats_on_your_mind": "apie ką galvoji",
   "whats_your_name": "koks tavo vardas?",

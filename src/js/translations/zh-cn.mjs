@@ -115,6 +115,7 @@ export default {
   "unreport": "撤销举报",
   "use_picture": "选取照片",
   "video_call": "视频通话",
+  "view_as": "以其他用户身份查看",
   "visibility": "你的帖子、回复和点赞只显示给你的粉丝和他们的社交网络",
   "whats_on_your_mind": "你在想什么",
   "whats_your_name": "请取个用户名",

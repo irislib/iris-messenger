@@ -115,6 +115,7 @@ export default {
   "unreport": "Denunzierung aufheben",
   "use_picture": "Bild benutzen",
   "video_call": "Video Anruf",
+  "view_as": "Als ansehen",
   "visibility": "Deine Beiträge, Antworten und Likes werden nur Ihren Followern und deren Netzwerk angezeigt.",
   "whats_on_your_mind": "Was gibt's Neues?",
   "whats_your_name": "Wie heißt du?",

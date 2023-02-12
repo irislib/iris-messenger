@@ -112,6 +112,7 @@ export default {
   "unreport": "Anular denuncia",
   "use_picture": "Usar foto",
   "video_call": "Videollamada",
+  "view_as": "Ver como",
   "whats_on_your_mind": "¿Que hay en tu mente?",
   "whats_your_name": "¿Cuál es tu nombre?",
   "write_your_reply": "Escribe tu respuesta",

@@ -112,6 +112,7 @@ export default {
   "unreport": "Unreport",
   "use_picture": "Use picture",
   "video_call": "Video call",
+  "view_as": "View as",
   "visibility": "Your posts, replies and likes are only shown to your followers and their network.",
   "whats_on_your_mind": "What's on your mind?",
   "whats_your_name": "What's your name?",

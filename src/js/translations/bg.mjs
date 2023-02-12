@@ -114,6 +114,7 @@ export default {
   "unreport": "отмени докладването",
   "use_picture": "използвай снимка",
   "video_call": "видео обаждане",
+  "view_as": "прегледай като",
   "visibility": "видимост",
   "whats_on_your_mind": "какво мислиш",
   "whats_your_name": "как се казваш",

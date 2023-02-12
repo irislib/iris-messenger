@@ -103,6 +103,14 @@ class Profile extends View {
     `;
   }
 
+  async viewAs(event) {
+    event.preventDefault();
+    const k = await iris.Key.generate();
+    k.secp256k1 = { rpub: this.state.hexPub, priv: null };
+    route('/');
+    iris.session.login(k);
+  }
+
   renderDetails() {
     if (!this.state.hexPub) {
       return '';
@@ -169,6 +177,18 @@ class Profile extends View {
                     title=${this.state.name}
                     copyStr=${rawDataJson}
                   />
+                  ${!this.state.isMyProfile && !iris.session.getKey().secp256k1.priv
+                    ? html`
+                        <${Button} onClick=${(e) => this.viewAs(e)}>
+                          ${t('view_as') + ' '}
+                          <${Name}
+                            pub=${this.state.hexPub}
+                            userNameOnly=${true}
+                            hideBadge=${true}
+                          />
+                        <//>
+                      `
+                    : ''}
                   ${this.state.isMyProfile
                     ? ''
                     : html`

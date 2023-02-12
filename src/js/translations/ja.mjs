@@ -115,6 +115,7 @@ export default {
   "unreport": "通報を取り消す",
   "use_picture": "画像を使用",
   "video_call": "ビデオ通話",
+  "view_as": "別のユーザーとして表示",
   "visibility": "視認性",
   "whats_on_your_mind": "何か思いついた？",
   "whats_your_name": "あなたの名前は？",

@@ -114,6 +114,7 @@ export default {
   "unreport": "Zrušit nahlášení",
   "use_picture": "Použít obrázek",
   "video_call": "Video hovor",
+  "view_as": "Zobrazit jako",
   "visibility": "Viditelnost",
   "whats_on_your_mind": "Na co myslíš?",
   "whats_your_name": "Jak se jmenuješ?",

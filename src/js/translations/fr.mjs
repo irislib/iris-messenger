@@ -63,6 +63,7 @@ export default {
   "unreport": "Annuler la plainte",
   "use_picture": "Utiliser votre picture",
   "video_call": "Appel vidéo",
+  "view_as": "Voir comme",
   "whats_your_name": "Quel est votre nom ?",
   "yesterday": "hier"
 };
