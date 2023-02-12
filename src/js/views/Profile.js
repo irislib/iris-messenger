@@ -93,7 +93,7 @@ class Profile extends View {
         ${this.state.website
           ? html`
               <div style="flex:1">
-                <a href=${this.state.website}>
+                <a href=${this.state.website} target="_blank">
                   ${this.state.website.replace(/^https?:\/\//, '')}
                 </a>
               </div>
