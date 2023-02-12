@@ -237,7 +237,7 @@ class SearchBox extends Component<Props, State> {
           class="search-box-results"
           style="left: ${this.state.offsetLeft || ''}"
         >
-          {this.state.query ? (
+          {this.state.query && !this.props.resultsOnly ? (
             <a
               onFocus={(e) => this.onResultFocus(e, -1)}
               tabIndex={2}
