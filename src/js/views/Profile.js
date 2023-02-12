@@ -420,7 +420,7 @@ class Profile extends View {
         this.setState({
           name: profile.name,
           display_name: profile.display_name,
-          about: Helpers.highlightLinks(profile.about),
+          about: Helpers.highlightText(profile.about),
           picture: profile.picture,
           nip05: profile.nip05valid && profile.nip05,
           lud16,

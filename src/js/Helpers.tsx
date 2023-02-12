@@ -87,17 +87,6 @@ export default {
         </span>
       );
     });
-    replacedText = reactStringReplace(replacedText, pubKeyRegex, (match, i) => {
-      const link = `/${match}`;
-      return (
-        <>
-          {' '}
-          <a href={link}>
-            @<Name key={match + i} pub={match} hideBadge={true} userNameOnly={true} />
-          </a>
-        </>
-      );
-    });
 
     replacedText = reactStringReplace(replacedText, noteRegex, (match, i) => {
       return (
@@ -249,11 +238,38 @@ export default {
       return <a href={match}>⚡ Pay with lightning</a>;
     });
 
-    replacedText = this.highlightLinks(replacedText);
+    replacedText = this.highlightText(replacedText, event);
+
+    return replacedText;
+  },
+
+  // hashtags, usernames, links
+  highlightText(s: string, event: any) {
+    s = reactStringReplace(s, pubKeyRegex, (match, i) => {
+      const link = `/${match}`;
+      return (
+        <>
+          {' '}
+          <a href={link}>
+            @<Name key={match + i} pub={match} hideBadge={true} userNameOnly={true} />
+          </a>
+        </>
+      );
+    });
+
+    s = reactStringReplace(
+      s,
+      /((?:https?:\/\/\S*[^.?,)\s])|(?:iris\.to\/\S*[^.?,)\s]))/gi,
+      (match, i) => (
+        <a key={match + i} href={match.replace(/^(https:\/\/)?iris.to/, '')}>
+          {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+        </a>
+      ),
+    );
 
     if (event && event.tags) {
       // replace "#[0]" tags with links to the user: event.tags[n][1]
-      replacedText = reactStringReplace(replacedText, /#\[(\d+)\]/g, (match, i) => {
+      s = reactStringReplace(s, /#\[(\d+)\]/g, (match, i) => {
         const tag = event.tags[parseInt(match, 10)];
         if (tag) {
           if (tag[0] === 'p') {
@@ -274,23 +290,11 @@ export default {
     }
 
     // highlight hashtags, link to /search/${encodeUriComponent(hashtag)}
-    replacedText = reactStringReplace(replacedText, /(#\w+)/g, (match) => {
+    s = reactStringReplace(s, /(#\w+)/g, (match) => {
       return <a href={`/search/${encodeURIComponent(match.slice(1))}`}>{match}</a>;
     });
 
-    return replacedText;
-  },
-
-  highlightLinks(s: string): any[] {
-    return reactStringReplace(
-      s,
-      /((?:https?:\/\/\S*[^.?,)\s])|(?:iris\.to\/\S*[^.?,)\s]))/gi,
-      (match, i) => (
-        <a key={match + i} href={match.replace(/^(https:\/\/)?iris.to/, '')}>
-          {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-        </a>
-      ),
-    );
+    return s;
   },
 
   followChatLink(str) {

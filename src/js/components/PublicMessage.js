@@ -339,9 +339,12 @@ class PublicMessage extends Message {
 
   renderLike() {
     const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
-    let text = Nostr.eventsById.get(likedId)?.content;
+    const likedEvent = Nostr.eventsById.get(likedId);
+    let text = likedEvent?.content;
     if (text && text.length > 50) {
-      text = text.substr(0, 50) + '...';
+      text = Helpers.highlightText(text, likedEvent);
+    } else {
+      text = Helpers.highlightText(text, likedEvent);
     }
     return html`
       <div class="msg">
