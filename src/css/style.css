@@ -1937,6 +1937,15 @@ hr {
   float: right;
 }
 
+.reposted {
+  display: flex;
+}
+
+.reposted svg {
+  width: 19px;
+  margin-right: 10px;
+}
+
 small,
 .text-muted {
   font-size: 14px;

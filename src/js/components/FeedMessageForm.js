@@ -329,7 +329,7 @@ class FeedMessageForm extends MessageForm {
           if (a.type?.startsWith('video')) {
             return html`
               ${status}
-              <video controls>
+              <video controls loop=${true} autoplay=${true} muted=${true}>
                 <source src=${a.data} />
               </video>
             `;

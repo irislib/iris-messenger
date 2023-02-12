@@ -438,20 +438,22 @@ class PublicMessage extends Message {
     `;
   }
 
-  renderBoost(id) {
+  renderRepost(id) {
     return html`
       <div class="msg">
         <div class="msg-content" style="padding: 12px 0 0 0;">
           <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
-            <i style="margin-right: 15px;"> ${Icons.boost} </i>
-            <a href="/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
-              <${Name}
-                pub=${this.state.msg?.event?.pubkey}
-                hideBadge=${true}
-                userNameOnly=${true}
-              />
-            </a>
-            <span style="margin-left: 5px"> ${t('reposted')} </span>
+            <small class="reposted">
+              <i> ${Icons.boost} </i>
+              <a href="/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+                <${Name}
+                  pub=${this.state.msg?.event?.pubkey}
+                  hideBadge=${true}
+                  userNameOnly=${true}
+                />
+              </a>
+              <span style="margin-left: 5px"> ${t('reposted')} </span>
+            </small>
           </div>
           <${PublicMessage} hash=${id} showName=${true} />
         </div>
@@ -514,7 +516,7 @@ class PublicMessage extends Message {
       case 3:
         return this.renderFollow();
       case 6:
-        return this.renderBoost(this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1]);
+        return this.renderRepost(this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1]);
       case 7:
         return this.renderLike();
       case 1: {
@@ -522,7 +524,7 @@ class PublicMessage extends Message {
           (tag) => tag[0] === 'e' && tag[3] === 'mention',
         );
         if (this.state.msg?.event?.content === `#[${mentionIndex}]`) {
-          return this.renderBoost(this.state.msg?.event?.tags[mentionIndex][1]);
+          return this.renderRepost(this.state.msg?.event?.tags[mentionIndex][1]);
         }
         break;
       }
