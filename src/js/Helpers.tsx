@@ -119,7 +119,7 @@ export default {
       );
     });
 
-    const videoRegex = /(https?:\/\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm))/gi;
+    const videoRegex = /(https?:\/\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm))\b/gi;
     replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
       return (
         <video
@@ -135,7 +135,7 @@ export default {
       );
     });
 
-    const audioRegex = /(https?:\/\/\S+\.(?:mp3|wav|ogg|flac))/gi;
+    const audioRegex = /(https?:\/\/\S+\.(?:mp3|wav|ogg|flac))\b/gi;
     replacedText = reactStringReplace(replacedText, audioRegex, (match, i) => {
       return <audio key={match + i} src={match} controls={true} loop={true} />;
     });
