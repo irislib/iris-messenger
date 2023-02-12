@@ -1,8 +1,8 @@
 import { Helmet } from 'react-helmet';
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
-import $ from 'jquery';
 import { createRef } from 'preact';
+import { useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
@@ -18,11 +18,32 @@ import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
 import ReportButton from '../components/ReportButton';
 import Helpers from '../Helpers';
-//import QRCode from '../lib/qrcode.min';
+import QRCode from '../lib/qrcode.min';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
+
+const QR = (props) => {
+  const ref = createRef();
+  //const [qr, setQr] = useState(null);
+
+  useEffect(() => {
+    if (!ref.current) {
+      return;
+    }
+    new QRCode(ref.current, {
+      text: props.text,
+      width: 300,
+      height: 300,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H,
+    });
+  }, [props.text]);
+
+  return html`<div ref=${ref} />`;
+};
 
 class Profile extends View {
   constructor() {
@@ -34,7 +55,6 @@ class Profile extends View {
     this.followedUsers = new Set();
     this.followers = new Set();
     this.id = 'profile';
-    this.qrRef = createRef();
   }
 
   getNotification() {
@@ -139,9 +159,9 @@ class Profile extends View {
                     title=${this.state.name}
                     copyStr=${this.state.npub}
                   />
-                  <!-- <${Button} onClick=${() => $(this.qrRef.current).toggle()}
+                  <${Button} onClick=${() => this.setState({ showQR: !this.state.showQR })}
                     >${t('show_qr_code')}<//
-                  > -->
+                  >
                   <${CopyButton}
                     key=${`${this.state.hexPub}copyData`}
                     text=${t('copy_raw_data')}
@@ -223,8 +243,7 @@ class Profile extends View {
               </div>
             `
           : ''}
-
-        <p ref=${this.qrRef} style="display:none" class="qr-container"></p>
+        ${this.state.showQR ? html` <${QR} text=${`nostr:${this.state.npub}`} /> ` : ''}
       </div>
     `;
   }
@@ -419,19 +438,6 @@ class Profile extends View {
     this.followers = new Set();
     iris.local().get('noFollowers').on(this.inject());
     this.getNostrProfile(hexPub);
-    /*
-    let qrCodeEl = $(this.qrRef.current);
-    qrCodeEl.empty();
-    qrCodeEl.empty();
-    new QRCode(qrCodeEl.get(0), {
-      text: window.location.href,
-      width: 300,
-      height: 300,
-      colorDark: '#000000',
-      colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.H,
-    });
-    */
     Nostr.getBlockedUsers((blockedUsers) => {
       this.setState({ blocked: blockedUsers.has(hexPub) });
     });
