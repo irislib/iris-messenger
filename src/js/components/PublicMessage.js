@@ -329,8 +329,7 @@ class PublicMessage extends Message {
             <a href="/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
-            ${' '}
-            <span> started following you</span>
+            <span class="mar-left5"> started following you</span>
           </div>
         </div>
       </div>
