@@ -11,6 +11,7 @@ const AVAILABLE_LANGUAGES = {
   it: 'Italiano',
   ja: '日本語',
   ko: '한국어',
+  ar: 'العربية',
   id: 'Indonesia',
   'pt-BR': 'Português (Brasil)',
   ur: 'اردو',

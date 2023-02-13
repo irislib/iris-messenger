@@ -7,7 +7,6 @@ import { createRef } from 'preact';
 import { Router } from 'preact-router';
 
 import Component from '../../BaseComponent';
-import Button from '../../components/basic/Button';
 import Message from '../../components/Message';
 import Helpers from '../../Helpers';
 import Nostr from '../../Nostr';
@@ -35,19 +34,6 @@ c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,35
     </g>
   </svg>
 `;
-
-function copyMyChatLinkClicked(e) {
-  Helpers.copyToClipboard(iris.session.getMyChatLink());
-  let te = $(e.target);
-  let originalText = te.text();
-  let originalWidth = te.width();
-  te.width(originalWidth);
-  te.text(t('copied'));
-  setTimeout(() => {
-    te.text(originalText);
-    te.css('width', '');
-  }, 2000);
-}
 
 export default class PrivateChat extends Component {
   constructor() {

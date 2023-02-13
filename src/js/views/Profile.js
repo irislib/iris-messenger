@@ -399,6 +399,7 @@ class Profile extends View {
         }
         if (profile.nip05 && profile.nip05valid) {
           // replace url and history entry with iris.to/${profile.nip05} or if nip is user@iris.to, just iris.to/${user}
+          // TODO don't replace if at /likes or /replies
           const nip05 = profile.nip05;
           const nip05Parts = nip05.split('@');
           const nip05User = nip05Parts[0];
