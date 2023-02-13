@@ -311,6 +311,7 @@ class PublicMessage extends Message {
     if (window.getSelection().toString()) {
       return;
     }
+    event.stopPropagation();
     if (this.state.msg?.event?.kind === 7) {
       const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
       return route(`/post/${likedId}`);
