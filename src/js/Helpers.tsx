@@ -68,6 +68,31 @@ export default {
     return res.json();
   },
 
+  handleLightningLinkClick(e: Event): void {
+    e.preventDefault();
+    const link = ((e.target as HTMLElement).closest('A') as HTMLLinkElement).href;
+
+    if (!link.startsWith('lightning:')) {
+      return;
+    }
+
+    let timerId = null;
+
+    function handleBlur() {
+      clearTimeout(timerId);
+      window.removeEventListener('blur', handleBlur);
+    }
+
+    window.addEventListener('blur', handleBlur);
+
+    timerId = setTimeout(() => {
+      alert(t('install_lightning_wallet_prompt'));
+      window.removeEventListener('blur', handleBlur);
+    }, 3000);
+
+    window.open(link, '_self');
+  },
+
   generateName(seed: string) {
     if (!seed) {
       throw new Error('No seed provided');
@@ -235,7 +260,11 @@ export default {
       if (!match.startsWith('lightning:')) {
         match = `lightning:${match}`;
       }
-      return <a href={match}>⚡ Pay with lightning</a>;
+      return (
+        <a href={match} onClick={(e) => this.handleLightningLinkClick(e)}>
+          ⚡ Pay with lightning
+        </a>
+      );
     });
 
     replacedText = this.highlightText(replacedText, event);
