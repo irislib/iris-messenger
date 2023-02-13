@@ -724,14 +724,6 @@ class PublicMessage extends Message {
               ? ''
               : html`
                   <div class="below-text">
-                    ${this.state.lud16
-                      ? html`
-                          <a href=${`lightning:${this.state.lud16}`} class="msg-btn zap-btn">
-                            ${lightningIcon}
-                          </a>
-                          <span class="count"></span>
-                        `
-                      : ''}
                     <a class="msg-btn reply-btn" onClick=${() => this.replyBtnClicked()}>
                       ${replyIcon}
                     </a>
@@ -760,6 +752,14 @@ class PublicMessage extends Message {
                     >
                       ${s.likes || ''}
                     </span>
+                    ${this.state.lud16
+                      ? html`
+                          <a href=${`lightning:${this.state.lud16}`} class="msg-btn zap-btn">
+                            ${lightningIcon}
+                          </a>
+                          <span class="count"></span>
+                        `
+                      : ''}
                   </div>
                 `}
             ${s.showLikes
