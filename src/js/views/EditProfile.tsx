@@ -110,6 +110,7 @@ export default class EditProfile extends Component {
                         this.setProfileAttribute(field, (e.target as HTMLInputElement).value)
                       }
                     />
+                    {field === 'lud16' && !val && <p><small>{t('install_lightning_wallet_prompt')}</small></p>}
                     {field === 'picture' || field === 'banner' ? (
                       <>
                         <p>
