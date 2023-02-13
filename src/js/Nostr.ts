@@ -203,7 +203,7 @@ const Nostr = {
     const myPub = iris.session.getKey().secp256k1.rpub;
     followedUsers.forEach((followedUser) => {
       followedUser = this.toNostrHexAddress(followedUser);
-      if (follow) {
+      if (follow && followedUser && followedUser !== myPub) {
         this.addFollower(followedUser, myPub);
       } else {
         this.removeFollower(followedUser, myPub);
