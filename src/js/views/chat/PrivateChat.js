@@ -264,14 +264,6 @@ export default class PrivateChat extends Component {
           <div id="scroll-down-btn" style="display:none;" onClick=${() => this.scrollDown()}>
             ${caretDownSvg}
           </div>
-          <div id="not-seen-by-them" style="display: none">
-            <p>${t('if_other_person_doesnt_see_message')}</p>
-            <p>
-              <${Button} onClick=${(e) => copyMyChatLinkClicked(e)}
-                >${t('copy_your_invite_link')}<//
-              >
-            </p>
-          </div>
           <div class="chat-message-form">
             <${ChatMessageForm}
               key=${this.props.id}

@@ -20,7 +20,6 @@ export default {
   "copy_link": "Salin Link",
   "copy_raw_data": "Salin Data Mentah",
   "copy_user_ID": "Salin ID Pengguna",
-  "copy_your_invite_link": "Salin link undangan Anda",
   "create": "Buat",
   "dark": "Gelap",
   "delete": "Hapus",

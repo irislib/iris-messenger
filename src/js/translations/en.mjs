@@ -20,7 +20,6 @@ export default {
   "copy_link": "Copy Link",
   "copy_raw_data": "Copy Raw Data",
   "copy_user_ID": "Copy User ID",
-  "copy_your_invite_link": "Copy your invite link",
   "create": "Create",
   "dark": "Dark",
   "delete": "Delete",
