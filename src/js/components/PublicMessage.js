@@ -483,6 +483,27 @@ class PublicMessage extends Message {
     this.setState({ showBoosts: !this.state.showBoosts, showLikes: false });
   }
 
+  onZap(e) {
+    e.preventDefault();
+    const link = e.target.closest('A').href;
+
+    let timerId = null;
+
+    function handleBlur() {
+      clearTimeout(timerId);
+      window.removeEventListener('blur', handleBlur);
+    }
+
+    window.addEventListener('blur', handleBlur);
+
+    timerId = setTimeout(() => {
+      alert(t('install_lightning_wallet_prompt'));
+      window.removeEventListener('blur', handleBlur);
+    }, 3000);
+
+    window.open(link, '_self');
+  }
+
   render() {
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     const s = this.state;
@@ -755,7 +776,11 @@ class PublicMessage extends Message {
                     </span>
                     ${this.state.lud16
                       ? html`
-                          <a href=${`lightning:${this.state.lud16}`} class="msg-btn zap-btn">
+                          <a
+                            href=${`lightning:${this.state.lud16}`}
+                            onClick=${(e) => this.onZap(e)}
+                            class="msg-btn zap-btn"
+                          >
                             ${lightningIcon}
                           </a>
                           <span class="count"></span>
