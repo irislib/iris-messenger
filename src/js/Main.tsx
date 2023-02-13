@@ -3,9 +3,6 @@ import iris from 'iris-lib';
 import AsyncRoute from 'preact-async-route';
 import { Router, RouterOnChangeArgs } from 'preact-router';
 
-import '@fontsource/lato/400.css';
-import "@fontsource/lato/700.css";
-
 import Footer from './components/Footer';
 import MediaPlayer from './components/MediaPlayer';
 import Menu from './components/Menu';
@@ -27,6 +24,8 @@ import Helpers from './Helpers';
 import Nostr from './Nostr';
 import QRScanner from './QRScanner';
 
+import '@fontsource/lato/400.css';
+import '@fontsource/lato/700.css';
 import '../css/style.css';
 import '../css/cropper.min.css';
 
