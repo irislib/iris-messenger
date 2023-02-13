@@ -79,7 +79,6 @@ export default {
   "remove_attachment": "Eliminar adjuntos",
   "replies": "Repuestas",
   "replying_to": "Responder a",
-  "report (public)": "Informe (público)",
   "report_public": "Informe (público)",
   "reported": "Informado",
   "reposted": "Reposteado",

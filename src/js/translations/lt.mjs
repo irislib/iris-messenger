@@ -78,7 +78,6 @@ export default {
   "remove_attachment": "pašalinti prisegtuką",
   "replies": "atsakymai",
   "replying_to": "atsakoma į",
-  "report (public)": "pranešti (viešai)",
   "report_public": "pranešti (viešai)",
   "reported": "pranešta",
   "reposted": "pasidalinta",

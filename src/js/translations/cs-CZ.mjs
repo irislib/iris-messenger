@@ -80,7 +80,6 @@ export default {
   "remove_attachment": "Odstranit přílohu",
   "replies": "Odpovědět",
   "replying_to": "Odpovědět:",
-  "report (public)": "Ohlásit (veřejně)",
   "report_public": "Ohlásit (veřejně)",
   "reported": "Ohlášeno",
   "reposted": "přeposláno",

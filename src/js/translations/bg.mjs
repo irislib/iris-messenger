@@ -80,7 +80,6 @@ export default {
   "remove_attachment": "премахни прикачен файл",
   "replies": "отговори",
   "replying_to": "отговори на",
-  "report (public)": "докладвай (публично)",
   "report_public": "докладвай (публично)",
   "reported": "докладвано",
   "reposted": "споделено отново",

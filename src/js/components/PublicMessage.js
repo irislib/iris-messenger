@@ -437,7 +437,7 @@ class PublicMessage extends Message {
                 />
                 ${this.state.msg.info.isMine
                   ? html` <a href="#" onClick=${(e) => this.onDelete(e)}>${t('delete')}</a> `
-                  : html`<a href="#" onClick=${(e) => this.report(e)}>${t('report (public)')}</a>
+                  : html`<a href="#" onClick=${(e) => this.report(e)}>${t('report_public')}</a>
                       <${FollowButton} id=${this.state.msg.event?.pubkey} showName=${true} />
                       <span onClick=${() => this.setState({ msg: null })}>
                         <${BlockButton} id=${this.state.msg.event?.pubkey} showName=${true} />

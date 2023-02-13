@@ -81,7 +81,6 @@ export default {
   "remove_attachment": "Poista liite",
   "replies": "Vastaukset",
   "replying_to": "Vastauksena käyttäjälle",
-  "report (public)": "Ilmianna (julkinen)",
   "report_public": "Ilmianna (julkinen)",
   "reported": "Ilmoitettu",
   "reposted": "jakoi",

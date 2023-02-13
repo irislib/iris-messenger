@@ -82,7 +82,6 @@ export default {
   "remove_attachment": "添付ファイルを削除",
   "replies": "返信",
   "replying_to": "返信先",
-  "report (public)": "公開報告",
   "report_public": "公開報告",
   "reported": "報告済み",
   "reposted": "さんがリポストしました",

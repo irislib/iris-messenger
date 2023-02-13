@@ -82,7 +82,6 @@ export default {
   "remove_attachment": "Anhang entfernen",
   "replies": "Antworten",
   "replying_to": "Antwort an",
-  "report (public)": "Melden (Öffentlich)",
   "report_public": "Melden (Öffentlich)",
   "reported": "Gemeldet",
   "reposted": "hat geteilt",

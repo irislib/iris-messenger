@@ -82,7 +82,6 @@ export default {
   "remove_attachment": "Удалить вложение",
   "replies": "Ответы",
   "replying_to": "Отвечая на",
-  "report (public)": "Составить отчет (публичный)",
   "report_public": "Составить отчет (публичный)",
   "reported": "Сообщено",
   "reposted": "Пересылка сообщений",

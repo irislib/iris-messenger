@@ -82,7 +82,6 @@ export default {
   "remove_attachment": "移除附件",
   "replies": "回复",
   "replying_to": "回复",
-  "report (public)": "公开举报",
   "report_public": "公开举报",
   "reported": "已举报",
   "reposted": "已转发",

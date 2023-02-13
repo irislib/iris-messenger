@@ -81,7 +81,6 @@ export default {
   "remove_attachment": "유첨제거",
   "replies": "댓글",
   "replying_to": "댓글 상대",
-  "report (public)": "신고하기 (공개)",
   "report_public": "신고하기 (공개)",
   "reported": "신고됨",
   "reposted": "재 포스팅",
