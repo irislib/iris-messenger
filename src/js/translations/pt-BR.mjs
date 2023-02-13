@@ -40,7 +40,7 @@ export default {
   "group_name": "Nome do grupo",
   "have_someones_invite_link": "Tem o link de bate-papo de alguém?",
   "if_other_person_doesnt_see_message": "voit antaa hänelle <b>sinun</b> kutsulinkkisi jotain muuta kautta:",
-  "install_lightning_wallet_prompt": "Instale getalby.com (desktop) ou walletofsatoshi.com (móvel) para pagar com lightning!",
+  "install_lightning_wallet_prompt": "Por favor, instale uma carteira lightning como getalby.com (desktop) ou walletofsatoshi.com (mobile)!",
   "language": "Idioma",
   "last_active": "última atividade",
   "light": "claro",

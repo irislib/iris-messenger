@@ -26,7 +26,7 @@ export default {
   "group_name": "Nom du groupe",
   "have_someones_invite_link": "Vous avez le lien d'invitation de quelqu'un ?",
   "if_other_person_doesnt_see_message": "Si la otra persona no ve su mensaje",
-  "install_lightning_wallet_prompt": "Veuillez installer getalby.com (ordinateur) ou walletofsatoshi.com (mobile) pour payer avec lightning!",
+  "install_lightning_wallet_prompt": "Veuillez installer un portefeuille Lightning tel que getalby.com (ordinateur de bureau) ou walletofsatoshi.com (mobile)!",
   "language": "Langage",
   "last_active": "dernière activité",
   "log_out": "Se déconnecter",

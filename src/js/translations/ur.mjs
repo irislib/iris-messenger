@@ -24,7 +24,7 @@ export default {
   "group_name": "گروپ کا نام",
   "have_someones_invite_link": "کیا آپکے پاس کسی کا انوایٔٹ لنک ہے؟",
   "if_other_person_doesnt_see_message": "vous pouvez leur donner <b>votre</b> lien d'invitation depuis un autre canal :",
-  "install_lightning_wallet_prompt": "getalby.com (ڈیسک ٹاپ) یا walletofsatoshi.com (موبائل) کو انسٹال کریں تاکہ آپ لائٹننگ نیٹ ورک سے ادائیگی کر سکیں!",
+  "install_lightning_wallet_prompt": "براہ کرم ایک لائٹننگ والیٹ انسٹال کریں جیسے getalby.com (ڈیسک ٹاپ) یا walletofsatoshi.com (موبائل)!",
   "language": "زبان",
   "last_active": "لاسٹ ایکٹیو",
   "log_out": "بند کریں",

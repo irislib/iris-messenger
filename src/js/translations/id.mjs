@@ -43,7 +43,7 @@ export default {
   "global_feed": "Global",
   "group_name": "Nama group",
   "have_someones_invite_link": "Punya link undangan dari seseorang?",
-  "install_lightning_wallet_prompt": "Silakan instal getalby.com (desktop) atau walletofsatoshi.com (mobile) untuk membayar dengan lightning!",
+  "install_lightning_wallet_prompt": "Silakan instal dompet lightning seperti getalby.com (desktop) atau walletofsatoshi.com (mobile)!",
   "language": "Bahasa",
   "last_active": "terakhir aktif",
   "light": "Terang",

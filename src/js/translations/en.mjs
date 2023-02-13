@@ -43,7 +43,7 @@ export default {
   "global_feed": "Global",
   "group_name": "Group name",
   "have_someones_invite_link": "Have someone's invite link?",
-  "install_lightning_wallet_prompt": "Please install getalby.com (desktop) or walletofsatoshi.com (mobile) to pay with lightning!",
+  "install_lightning_wallet_prompt": "Please install a lightning wallet such as getalby.com (desktop) or walletofsatoshi.com (mobile)!",
   "language": "Language",
   "last_active": "last active",
   "light": "Light",

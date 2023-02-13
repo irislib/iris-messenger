@@ -43,7 +43,7 @@ export default {
   "group_name": "Ryhmän nimi",
   "have_someones_invite_link": "Saitko toisen käyttäjän kutsulinkin?",
   "if_other_person_doesnt_see_message": "you can give them <b>your</b> invite link through some other channel:",
-  "install_lightning_wallet_prompt": "Asenna getalby.com (työpöytä) tai walletofsatoshi.com (mobiili) maksamaan lightning-verkossa!",
+  "install_lightning_wallet_prompt": "Asenna Lightning-lompakko, kuten getalby.com (työpöytä) tai walletofsatoshi.com (mobiili)!",
   "language": "Kieli",
   "last_active": "viimeksi aktiivisena",
   "light": "Vaalea",

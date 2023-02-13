@@ -44,7 +44,7 @@ export default {
   "group_name": "Gruppenname",
   "have_someones_invite_link": "Hast du einen Einladungslink von jemandem?",
   "if_other_person_doesnt_see_message": "Sollte die andere Person die Nachricht nicht sehen, kannst du <b>deinen</b> Unterhaltungs-Link über einen anderen Kanal senden:",
-  "install_lightning_wallet_prompt": "Bitte installiere getalby.com (Desktop) oder walletofsatoshi.com (Mobile) um mit Lightning zu bezahlen!",
+  "install_lightning_wallet_prompt": "Bitte installiere eine Lightning-Wallet wie getalby.com (Desktop) oder walletofsatoshi.com (Mobile)!",
   "language": "Sprache",
   "last_active": "Zuletzt aktiv",
   "light": "Hell",

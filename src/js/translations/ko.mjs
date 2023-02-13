@@ -44,7 +44,7 @@ export default {
   "group_name": "그룹 이름",
   "have_someones_invite_link": "타인의 초대링크 보유?",
   "if_other_person_doesnt_see_message": "다른사람이 메시지를 보지못할 경우",
-  "install_lightning_wallet_prompt": "getalby.com (데스크탑) 또는 walletofsatoshi.com (모바일)을 설치하여 라이트닝 네트워크로 결제하세요!",
+  "install_lightning_wallet_prompt": "라이트닝 지갑을 설치해주세요!",
   "language": "언어",
   "last_active": "마지막 활동",
   "light": "밝음",

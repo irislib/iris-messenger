@@ -33,7 +33,7 @@ export default {
   "group_name": "Nome gruppo",
   "have_someones_invite_link": "Hai il invite link di quakcuno?",
   "if_other_person_doesnt_see_message": "puede darle <b> su </b> enlace de chat a través de otro canal:",
-  "install_lightning_wallet_prompt": "Installa getalby.com (desktop) o walletofsatoshi.com (mobile) per pagare con lightning!",
+  "install_lightning_wallet_prompt": "Si prega di installare un portafoglio lightning come getalby.com (desktop) o walletofsatoshi.com (mobile)!",
   "language": "Lingua",
   "last_active": "ultimo attivo",
   "likes": "piace",

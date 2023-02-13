@@ -44,7 +44,7 @@ export default {
   "group_name": "グループ名",
   "have_someones_invite_link": "招待リンクを持っていますか？",
   "if_other_person_doesnt_see_message": "<b>あなた</b>の招待リンクを別の方法で渡すことができます:",
-  "install_lightning_wallet_prompt": "getalby.com (デスクトップ版) または walletofsatoshi.com (モバイル版) をインストールしてください。",
+  "install_lightning_wallet_prompt": "Lightningウォレットをインストールしてください。例えば、getalby.com (デスクトップ) または walletofsatoshi.com (モバイル) です。",
   "language": "言語",
   "last_active": "最後のアクティブ",
   "light": "ライト",

@@ -43,7 +43,6 @@ export default {
   "group_name": "Název skupiny",
   "have_someones_invite_link": "Máš od někoho pozvánku?",
   "if_other_person_doesnt_see_message": "Pokud druhá osoba nevidí zprávu, mužeš jí poslat <b>svůj</b> link k rozhovoru.",
-  "install_lightning_wallet_prompt": "Nainstaluj getalby.com (desktop) nebo walletofsatoshi.com (mobilní) pro zaplacení pomocí lightning!",
   "language": "Jazyk",
   "last_active": "Poslední aktivita",
   "light": "Světlé",

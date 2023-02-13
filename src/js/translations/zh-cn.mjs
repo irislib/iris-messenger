@@ -44,7 +44,7 @@ export default {
   "group_name": "群组名称",
   "have_someones_invite_link": "有其他人的聊天链接?",
   "if_other_person_doesnt_see_message": "如果对方没有看到消息",
-  "install_lightning_wallet_prompt": "getalby.com (桌面版) 或 walletofsatoshi.com (移动版) 安装后即可使用闪电网络支付!",
+  "install_lightning_wallet_prompt": "getalby.com (桌面) 或 walletofsatoshi.com (移动) 等闪电钱包!",
   "language": "语言",
   "last_active": "上次在线",
   "light": "明亮",

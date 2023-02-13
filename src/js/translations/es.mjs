@@ -42,7 +42,7 @@ export default {
   "group_name": "Nombre del grupo",
   "have_someones_invite_link": "¿Tienes el enlace de chat de alguien?",
   "if_other_person_doesnt_see_message": "If the other person doesn't see your message",
-  "install_lightning_wallet_prompt": "Instala getalby.com (escritorio) o walletofsatoshi.com (móvil) para pagar con lightning!",
+  "install_lightning_wallet_prompt": "Por favor, instala un monedero de Lightning como getalby.com (escritorio) o walletofsatoshi.com (móvil)!",
   "language": "Idioma",
   "last_active": "Último Activo",
   "light": "Ligero / Brillante /Claro",

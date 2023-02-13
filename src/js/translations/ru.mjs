@@ -44,7 +44,7 @@ export default {
   "group_name": "Название группы",
   "have_someones_invite_link": "Есть чья-то ссылка на чат?",
   "if_other_person_doesnt_see_message": "Если человек не видит сообщение",
-  "install_lightning_wallet_prompt": "Установите getalby.com (на компьютер) или walletofsatoshi.com (на мобильный) чтобы оплатить с помощью lightning!",
+  "install_lightning_wallet_prompt": "Пожалуйста, установите кошелек Lightning, например getalby.com (на компьютере) или walletofsatoshi.com (на мобильном)!",
   "language": "Язык",
   "last_active": "последняя активность",
   "light": "Яркий",

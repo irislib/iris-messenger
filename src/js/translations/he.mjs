@@ -28,6 +28,7 @@ export default {
   "follows": "עוקב",
   "follows_you": "עוקבים שלך",
   "group_name": "שם קבוצה",
+  "install_lightning_wallet_prompt": "אנא התקן ארנק לייטנינג כמו getalby.com (שולחן עבודה) או walletofsatoshi.com (נייד)!",
   "language": "שפה",
   "light": "בהיר",
   "log_out": "התנתק",
