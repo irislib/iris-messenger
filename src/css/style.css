@@ -2504,6 +2504,9 @@ input[type='text'] {
 }
 
 @media (max-width: 625px) {
+  .msg .count:not(:last-of-type) {
+    margin-right: 5px;
+  }
   .centered-container {
     margin: 0 auto 0 auto;
   }
