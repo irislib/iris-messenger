@@ -3,7 +3,8 @@ import iris from 'iris-lib';
 import AsyncRoute from 'preact-async-route';
 import { Router, RouterOnChangeArgs } from 'preact-router';
 
-import '@fontsource/lato';
+import '@fontsource/lato/400.css';
+import "@fontsource/lato/700.css";
 
 import Footer from './components/Footer';
 import MediaPlayer from './components/MediaPlayer';

@@ -113,6 +113,7 @@ html {
 
 body {
   font-size: 16px;
+  font-weight: 400;
   color: var(--text-color);
   font-family: Lato, sans-serif;
   padding: 0;
@@ -1388,7 +1389,7 @@ a.msg {
 }
 
 a.msgSenderName {
-  font-weight: bold;
+  font-weight: 700;
   color: var(--text-color);
 }
 
