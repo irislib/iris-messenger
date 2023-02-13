@@ -16,6 +16,7 @@ const AVAILABLE_LANGUAGES = {
   'pt-BR': 'Português (Brasil)',
   tr: 'Türkçe',
   ur: 'اردو',
+  hu: 'Magyar',
   he: 'עברית',
   fi: 'Suomi',
   'cs-CZ': 'Čeština',
