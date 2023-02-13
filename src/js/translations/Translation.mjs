@@ -14,6 +14,7 @@ const AVAILABLE_LANGUAGES = {
   ar: 'العربية',
   id: 'Indonesia',
   'pt-BR': 'Português (Brasil)',
+  tr: 'Türkçe',
   ur: 'اردو',
   he: 'עברית',
   fi: 'Suomi',
