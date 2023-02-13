@@ -90,7 +90,7 @@ export default class AccountSettings extends Component {
                 <CopyButton notShareable={true} copyStr={myPrivHex} text="Copy hex" />
               </>
             ) : (
-              <p>Not present. Good!</p>
+              <p>{t('private_key_not_present_good')}</p>
             )}
           </p>
           {myPrivHex ? <p>{t('private_key_warning')}</p> : ''}

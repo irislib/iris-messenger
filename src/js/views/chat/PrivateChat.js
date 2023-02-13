@@ -195,7 +195,9 @@ export default class PrivateChat extends Component {
           if (dateStr !== previousDateStr) {
             isDifferentDay = true;
             let separatorText = iris.util.getDaySeparatorText(date, dateStr, now, nowStr);
-            msgListContent.push(html`<div class="day-separator">${t(separatorText)}</div>`);
+            msgListContent.push(
+              html`<div class="day-separator">${t(separatorText.toLowerCase())}</div>`,
+            );
           }
           previousDateStr = dateStr;
         }

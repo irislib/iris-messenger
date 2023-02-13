@@ -32,6 +32,7 @@ export default {
   "following": "seguindo",
   "follows": "segue",
   "follows_you": "segue você",
+  "friday": "sexta-feira",
   "friends_following": "seguindo amigos",
   "get_notified_new_messages": "Ser notificado de novas mensagens",
   "give_your_profile_link_to_someone": "dar seu link de perfil para alguém",
@@ -48,6 +49,7 @@ export default {
   "looking_up_message": "Procurando mensagem...",
   "media": "Mídia",
   "messages": "Mensagens",
+  "monday": "Segunda-feira",
   "network": "Rede",
   "new_chat": "Nova conversa",
   "new_group": "Novo grupo",
@@ -71,6 +73,7 @@ export default {
   "posts": "posts",
   "private_key": "Chave privada",
   "private_key_login": "login via chave privada",
+  "private_key_not_present_good": "Não encontrado. Bom!",
   "private_key_warning": "<b>PERIGO!</b> A chave privada é usada para <b>acessar sua conta</b>. Não compartilhe ou mostre sua chave privada para ninguém!",
   "profile": "Perfil",
   "public_key": "Chave pública",
@@ -87,6 +90,7 @@ export default {
   "use_picture": "Usar foto",
   "video_call": "Chamada de vídeo",
   "view_as": "Ver como",
+  "wednesday": "Quarta-feira",
   "whats_your_name": "Qual o seu nome?",
   "yesterday": "ontem"
 };

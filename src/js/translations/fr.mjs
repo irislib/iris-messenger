@@ -20,6 +20,7 @@ export default {
   "followers": "Followers",
   "following": "Suivi",
   "follows_you": "Vous suit",
+  "friday": "Vendredi",
   "get_notified_new_messages": "Être notifié des nouveaux messages",
   "give_your_profile_link_to_someone": "donner votre lien de profil à quelqu'un",
   "group_name": "Nom du groupe",
@@ -32,6 +33,7 @@ export default {
   "looking_up_message": "Recherche de message...",
   "media": "Médias",
   "messages": "Messages",
+  "monday": "Lundi",
   "network": "Réseau",
   "new_chat": "Nouveau chat",
   "new_group": "Nouveau groupe",
@@ -44,6 +46,7 @@ export default {
   "peers": "Pairs",
   "playback": "Lecture",
   "private_key": "Clé privée",
+  "private_key_not_present_good": "Non trouvé. Bien!",
   "private_key_warning": "<b>DANGER !</b> La clé privée <b>donne accès à votre compte</b>. Ne la transmettez ou la montrez à personne d'autre !",
   "profile": "Profil",
   "public_key": "Clé publique",
@@ -65,6 +68,7 @@ export default {
   "use_picture": "Utiliser votre picture",
   "video_call": "Appel vidéo",
   "view_as": "Voir comme",
+  "wednesday": "Mercredi",
   "whats_your_name": "Quel est votre nom ?",
   "yesterday": "hier"
 };

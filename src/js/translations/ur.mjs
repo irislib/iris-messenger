@@ -18,6 +18,7 @@ export default {
   "followers": "فالورز",
   "following": "فالو کرتے ہیں",
   "follows_you": "آپکو فالو کرتے ہیں",
+  "friday": "جمعہ",
   "get_notified_new_messages": "نۓ پیغامات کی اطلاع حاصل کریں",
   "give_your_profile_link_to_someone": "اپنی پروفایٔل کو لنک شیر کریں",
   "group_name": "گروپ کا نام",
@@ -29,6 +30,7 @@ export default {
   "looking_up_message": "پیغام تلاش کر رہا ہے",
   "media": "میڈیا",
   "messages": "پیغامات",
+  "monday": "پیر",
   "network": "نیٹ ورک",
   "new_chat": "نیا پیغام",
   "new_group": "نیا گروپ",
@@ -41,6 +43,7 @@ export default {
   "peers": "دوست",
   "playback": "پلی بیک",
   "private_key": "خفیہ کوڈ",
+  "private_key_not_present_good": "نہیں ملی. اچھا!",
   "private_key_warning": "<b>خطرہ</b>پرایٔویٹ کوڈ <b>آپکے اکاؤنٹ کی رسایٔ دیتا ہے </b>اپنا پرایٔویٹ کوڈ کسی کو نہ دکھایٔیں",
   "profile": "پروفایٔل",
   "public_key": "عوامی کوڈ",
@@ -60,6 +63,7 @@ export default {
   "use_picture": "تصویر استعمال کریں",
   "video_call": "ویڈیو کال",
   "view_as": "کسی دوسرے صارف کے طور پر دیکھیں",
+  "wednesday": "بدھ",
   "whats_your_name": "آپکا کیا نام ہے؟",
   "yesterday": "کل"
 };
