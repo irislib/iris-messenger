@@ -64,7 +64,6 @@ export default {
   "now": "agora",
   "online": "online",
   "otherwise_cant_log_in_again": "ou então não conseguirá logar novamente",
-  "participant_list": "lista de partricipantes",
   "paste_private_key": "Cole a chave privada",
   "paste_their_invite_link": "Cole o link da outra pessoa",
   "peers": "Peers",

@@ -65,7 +65,6 @@ export default {
   "now": "Ahora",
   "online": "En línea",
   "otherwise_cant_log_in_again": "De lo contrario",
-  "participant_list": "Lista de participantes",
   "paste_private_key": "Pegar una clave privada",
   "paste_their_invite_link": "Pegue su enlace de chat",
   "peers": "Pares",

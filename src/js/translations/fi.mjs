@@ -67,7 +67,6 @@ export default {
   "now": "nyt",
   "online": "paikalla",
   "otherwise_cant_log_in_again": "Muuten et voi kirjautua takaisin tälle tilille.",
-  "participant_list": "Osallistujat",
   "paste_private_key": "Liitä salainen avain",
   "paste_their_invite_link": "Liitä kutsulinkki",
   "peers": "Yhteyspisteet (peers)",

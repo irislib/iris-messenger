@@ -68,7 +68,6 @@ export default {
   "now": "たった今",
   "online": "オンライン",
   "otherwise_cant_log_in_again": "そうでないと、このアカウントにログインできなくなります。",
-  "participant_list": "参加者リスト",
   "paste_private_key": "秘密鍵を貼り付け",
   "paste_their_invite_link": "招待リンクを貼り付け",
   "peers": "ピア",

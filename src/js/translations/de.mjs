@@ -68,7 +68,6 @@ export default {
   "now": "Jetzt",
   "online": "online",
   "otherwise_cant_log_in_again": "Sonst können Sie nicht mehr in Ihr Konto einloggen.",
-  "participant_list": "Teilnehmer",
   "paste_private_key": "Füge einen privaten Schlüssel ein",
   "paste_their_invite_link": "Fügen Sie den Einladungslink hier ein",
   "peers": "Peers",

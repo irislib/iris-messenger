@@ -254,18 +254,6 @@ class Header extends Component {
             </a> -->
             `
           : ''}-->
-        ${this.chatId && this.chatId.length > 10 && this.chatId.length < 40
-          ? html`
-              <a
-                class="tooltip hidden-xs"
-                onClick=${() =>
-                  iris.local().get('showParticipants').put(!this.state.showParticipants)}
-              >
-                <span class="tooltiptext">${t('participant_list')}</span>
-                ${Icons.group}
-              </a>
-            `
-          : ''}
         <${Link}
           activeClassName="active"
           href="/notifications"

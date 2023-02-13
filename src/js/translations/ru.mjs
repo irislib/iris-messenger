@@ -68,7 +68,6 @@ export default {
   "now": "Сейчас",
   "online": "онлайн",
   "otherwise_cant_log_in_again": "В противном случае вы не сможете снова войти в эту учетную запись.",
-  "participant_list": "Список участников",
   "paste_private_key": "Вставьте приватный ключ",
   "paste_their_invite_link": "Вставьте свою ссылку на чат",
   "peers": "Пиры",

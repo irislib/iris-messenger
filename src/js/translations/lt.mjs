@@ -64,7 +64,6 @@ export default {
   "now": "dabar",
   "online": "prisijungę",
   "otherwise_cant_log_in_again": "kitu atveju negalima prisijungti vėl",
-  "participant_list": "dalyvių sąrašas",
   "paste_private_key": "įklijuoti privatų raktą",
   "paste_their_invite_link": "įklijuoti jų pakvietimo nuorodą",
   "peers": "chebra (gang)",

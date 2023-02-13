@@ -68,7 +68,6 @@ export default {
   "now": "刚刚",
   "online": "在线",
   "otherwise_cant_log_in_again": "否则将无法再次登录",
-  "participant_list": "参与人列表",
   "paste_private_key": "请在此填入你的私钥",
   "paste_their_invite_link": "请将聊天链接粘贴在此",
   "peers": "节点",

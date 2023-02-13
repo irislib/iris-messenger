@@ -52,7 +52,6 @@ export default {
   "now": "ora",
   "online": "in linea",
   "otherwise_cant_log_in_again": "Altrimenti non è possibile accedere di nuovo",
-  "participant_list": "lista dei partecipanti",
   "paste_private_key": "Incolla una chiave privata",
   "paste_their_invite_link": "Incolla il loro link d'invito",
   "peers": "Peer",

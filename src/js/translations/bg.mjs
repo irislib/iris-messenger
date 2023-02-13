@@ -66,7 +66,6 @@ export default {
   "now": "сега",
   "online": "свързано",
   "otherwise_cant_log_in_again": "иначе не може да влезе в профила отново",
-  "participant_list": "списък с участници",
   "paste_private_key": "сложи таен ключ",
   "paste_their_invite_link": "сложи тяхната покана",
   "peers": "връстници",

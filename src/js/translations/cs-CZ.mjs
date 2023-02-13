@@ -66,7 +66,6 @@ export default {
   "now": "teď",
   "online": "online",
   "otherwise_cant_log_in_again": "Jinak se už nebude možné k tomuto účtu připojit.",
-  "participant_list": "Seznam účastníků",
   "paste_private_key": "Vložit soukromý klíč",
   "paste_their_invite_link": "Vložit link s pozvánkou",
   "peers": "Partneři",

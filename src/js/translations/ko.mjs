@@ -67,7 +67,6 @@ export default {
   "note_to_self": "자신에게 메모",
   "online": "온라인",
   "otherwise_cant_log_in_again": "아니면 다시 로그인 못함",
-  "participant_list": "참가자 명단",
   "paste_private_key": "프라이빗 키 붙여넣기",
   "paste_their_invite_link": "그들의 초대링크 붙이기",
   "peers": "친구",
