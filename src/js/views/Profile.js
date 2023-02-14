@@ -86,7 +86,10 @@ class Profile extends View {
         ${this.state.lightning
           ? html`
               <div style="flex:1">
-                <a href=${this.state.lightning} onClick=${(e) => Helpers.handleLightningLinkClick(e)}>
+                <a
+                  href=${this.state.lightning}
+                  onClick=${(e) => Helpers.handleLightningLinkClick(e)}
+                >
                   ⚡ ${t('tip_lightning')}
                 </a>
               </div>
