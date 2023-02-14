@@ -68,7 +68,14 @@ class PublicMessage extends Message {
         Nostr.getProfile(event.pubkey, (profile) => {
           if (!profile) return;
           if (!thisArg.unmounted) {
-            thisArg.setState({ name: profile.display_name || profile.name, lud16: profile.lud16 });
+            let lightning = profile.lud16 || profile.lud06;
+            if (lightning && !lightning.startsWith('lightning:')) {
+              lightning = `lightning:${lightning}`;
+            }
+            thisArg.setState({
+              name: profile.display_name || profile.name,
+              lightning,
+            });
           }
         });
         const replyingTo = Nostr.getEventReplyingTo(event);
@@ -753,10 +760,10 @@ class PublicMessage extends Message {
                     >
                       ${s.likes || ''}
                     </span>
-                    ${this.state.lud16
+                    ${this.state.lightning
                       ? html`
                           <a
-                            href=${`lightning:${this.state.lud16}`}
+                            href=${this.state.lightning}
                             onClick=${(e) => Helpers.handleLightningLinkClick(e)}
                             class="msg-btn zap-btn"
                           >

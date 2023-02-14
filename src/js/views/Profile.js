@@ -83,10 +83,10 @@ class Profile extends View {
         class="profile-links"
         style="flex:1; display: flex; flex-direction: row; align-items: center;"
       >
-        ${this.state.lud16
+        ${this.state.lightning
           ? html`
               <div style="flex:1">
-                <a href=${this.state.lud16} onClick=${(e) => Helpers.handleLightningLinkClick(e)}>
+                <a href=${this.state.lightning} onClick=${(e) => Helpers.handleLightningLinkClick(e)}>
                   ⚡ ${t('tip_lightning')}
                 </a>
               </div>
@@ -421,9 +421,9 @@ class Profile extends View {
           window.history.replaceState({}, '', newUrl);
         }
 
-        let lud16 = profile.lud16;
-        if (lud16 && !lud16.startsWith('lightning:')) {
-          lud16 = 'lightning:' + lud16;
+        let lightning = profile.lud16 || profile.lud06;
+        if (lightning && !lightning.startsWith('lightning:')) {
+          lightning = 'lightning:' + lightning;
         }
 
         let website =
@@ -449,7 +449,7 @@ class Profile extends View {
           about: Helpers.highlightText(profile.about),
           picture: profile.picture,
           nip05: profile.nip05valid && profile.nip05,
-          lud16,
+          lightning,
           website: website,
           banner,
         });
