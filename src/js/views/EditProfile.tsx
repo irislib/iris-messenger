@@ -12,7 +12,7 @@ import { translate as t } from '../translations/Translation';
 const explainers = {
   display_name: 'Name',
   name: 'Username',
-  lud16: '⚡ Bitcoin lightning address (lud16)',
+  lud16: 'Bitcoin lightning address ⚡ (lud16)',
   picture: 'Picture url',
   banner: 'Banner url',
   nip05: 'Domain name verification (nip05)',
