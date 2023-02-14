@@ -9,8 +9,6 @@ Iris is like the social networking apps we're used to, but better.
 - Secure: It's open source. Users can validate that big brother doesn't read your private messages.
 - Available: It works offline-first and is not dependent on any single centrally managed server.
 
-![Screenshot](screenshot.png)
-
 ## Use
 
 Browser application: [iris.to](https://iris.to) [![Netlify Status](https://api.netlify.com/api/v1/badges/1181c85b-b6af-4ce7-bc74-c484bff631e5/deploy-status)](https://app.netlify.com/sites/iris-messenger/deploys)
