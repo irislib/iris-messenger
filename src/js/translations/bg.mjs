@@ -16,7 +16,7 @@ export default {
   "connected_relays": "свързани релета",
   "copied": "преписано",
   "copy": "препиши",
-  "copy_ID": "копирай ID",
+  "copy_note_ID": "копирай ID на бележка",
   "copy_link": "копирай линк",
   "copy_raw_data": "копирай сурови данни",
   "copy_user_ID": "копирай потребителски ID",

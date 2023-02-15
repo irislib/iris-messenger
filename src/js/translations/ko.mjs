@@ -16,7 +16,7 @@ export default {
   "connected_relays": "연결된 릴레이",
   "copied": "복사완료",
   "copy": "복사",
-  "copy_ID": "아이디 복사",
+  "copy_note_ID": "노트 ID 복사",
   "copy_link": "링크 복사",
   "copy_raw_data": "원천 데이터 복사",
   "copy_user_ID": "사용자 아이디 복사",

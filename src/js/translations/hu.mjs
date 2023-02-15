@@ -16,7 +16,7 @@ export default {
   "connected_relays": "Csatlakozott elosztók",
   "copied": "Másolva",
   "copy": "Másol",
-  "copy_ID": "Azonosító másolása",
+  "copy_note_ID": "Másolás azonosítója",
   "copy_link": "Hivatkozás másolása",
   "copy_raw_data": "Nyers adat másolása",
   "copy_user_ID": "Felhasználói azonosító másolása",

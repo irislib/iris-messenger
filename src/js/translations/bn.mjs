@@ -16,7 +16,7 @@ export default {
   "connected_relays": "সংযুক্ত রিলেই",
   "copied": "কপি করা হয়েছে",
   "copy": "কপি করুন",
-  "copy_ID": "আইডি কপি করুন",
+  "copy_note_ID": "নোট আইডি কপি করুন",
   "copy_link": "লিংক কপি করুন",
   "copy_raw_data": "কপি করা কাঁচা ডেটা",
   "copy_user_ID": "ব্যবহারকারীর আইডি কপি করুন",

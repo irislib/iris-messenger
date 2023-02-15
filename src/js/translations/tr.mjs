@@ -16,7 +16,7 @@ export default {
   "connected_relays": "Bağlı Relay'ler",
   "copied": "Kopyalandı",
   "copy": "Kopyala",
-  "copy_ID": "ID'yi Kopyala",
+  "copy_note_ID": "Not ID'sini Kopyala",
   "copy_link": "Linki Kopyala",
   "copy_raw_data": "Ham Veriyi Kopyala",
   "copy_user_ID": "Kullanıcı ID'sini Kopyala",

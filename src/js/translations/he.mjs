@@ -13,7 +13,7 @@ export default {
   "color_scheme": "הגדרות צבעים",
   "copied": "הועתק",
   "copy": "עתק",
-  "copy_ID": "עתק  איי די",
+  "copy_note_ID": "העתק מזהה",
   "copy_link": "עתק קישור",
   "copy_user_ID": "עתק איי די של משתמש",
   "create": "ליצור",

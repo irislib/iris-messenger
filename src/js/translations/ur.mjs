@@ -9,6 +9,7 @@ export default {
   "cancel": "ختم",
   "copied": "کاپی شدہ",
   "copy": "کاپی",
+  "copy_note_ID": "نوٹ کا شناخت کاپی کریں",
   "copy_link": "لنک کاپی کریں",
   "create": "بنایٔیں",
   "delete": "ڈلیٹ کریں",

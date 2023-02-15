@@ -16,7 +16,7 @@ export default {
   "connected_relays": "Relays ที่เชื่อมต่อ",
   "copied": "คัดลอกแล้ว",
   "copy": "คัดลอก",
-  "copy_ID": "คัดลอก ID",
+  "copy_note_ID": "คัดลอก ID บันทึก",
   "copy_link": "คัดลอกลิงก์",
   "copy_raw_data": "คัดลอกข้อมูลดิบ",
   "copy_user_ID": "คัดลอก ID ผู้ใช้",

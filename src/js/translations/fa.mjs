@@ -16,7 +16,7 @@ export default {
   "connected_relays": "رلهای متصل",
   "copied": "کپی شد",
   "copy": "کپی",
-  "copy_ID": "کپی کردن شناسه",
+  "copy_note_ID": "کپی کردن شناسه یادداشت",
   "copy_link": "کپی کردن لینک",
   "copy_raw_data": "کپی کردن داده خام",
   "copy_user_ID": "کپی کردن شناسه کاربر",

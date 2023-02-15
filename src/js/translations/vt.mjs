@@ -16,7 +16,7 @@ export default {
   "connected_relays": "Relays đã kết nối",
   "copied": "Đã sao chép",
   "copy": "Sao chép",
-  "copy_ID": "Sao chép ID",
+  "copy_note_ID": "Sao chép ID ghi chú",
   "copy_link": "Sao chép liên kết",
   "copy_raw_data": "Sao chép dữ liệu thô",
   "copy_user_ID": "Sao chép ID người dùng",

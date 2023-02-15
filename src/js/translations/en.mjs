@@ -16,7 +16,7 @@ export default {
   "connected_relays": "Connected Relays",
   "copied": "Copied",
   "copy": "Copy",
-  "copy_ID": "Copy ID",
+  "copy_note_ID": "Copy Note ID",
   "copy_link": "Copy Link",
   "copy_raw_data": "Copy Raw Data",
   "copy_user_ID": "Copy User ID",

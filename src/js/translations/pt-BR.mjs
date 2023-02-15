@@ -16,7 +16,7 @@ export default {
   "connected_relays": "relays conectados",
   "copied": "Copiado",
   "copy": "copiar",
-  "copy_ID": "copiar ID",
+  "copy_note_ID": "copiar ID da nota",
   "copy_link": "Copiar link",
   "copy_raw_data": "Copiar dados brutos",
   "copy_user_ID": "copiar",

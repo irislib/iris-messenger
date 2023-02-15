@@ -427,7 +427,7 @@ class PublicMessage extends Message {
           />
           <${CopyButton}
             key=${`${this.props.hash}copy`}
-            text=${t('copy_ID')}
+            text=${t('copy_note_ID')}
             title="Note ID"
             copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
           />

@@ -16,7 +16,7 @@ export default {
   "connected_relays": "Připojené relaye",
   "copied": "Zkopírováno",
   "copy": "Kopírovat",
-  "copy_ID": "Kopírovat ID",
+  "copy_note_ID": "Kopírovat ID poznámky",
   "copy_link": "Kopírovat odkaz",
   "copy_raw_data": "Kopírovat raw data",
   "copy_user_ID": "Kopírovat ID uživatele",

@@ -16,7 +16,7 @@ export default {
   "connected_relays": "aktyvūs ryšiai (active connections)",
   "copied": "nukopijuota",
   "copy": "kopijuoti",
-  "copy_ID": "kopijos ID",
+  "copy_note_ID": "užrašo ID kopijavimas",
   "copy_link": "kopijos nuoroda",
   "copy_raw_data": "kopijuoti grynus duomenis",
   "copy_user_ID": "kopijuoti vartotojo ID",

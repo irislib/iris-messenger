@@ -16,7 +16,7 @@ export default {
   "connected_relays": "已连接中继",
   "copied": "已复制",
   "copy": "复制",
-  "copy_ID": "复制 ID",
+  "copy_note_ID": "复制笔记 ID",
   "copy_link": "复制链接",
   "copy_raw_data": "复制源数据",
   "copy_user_ID": "复制用户 ID",

@@ -16,7 +16,7 @@ export default {
   "connected_relays": "الناقلات المتصلة",
   "copied": "تم النسخ",
   "copy": "نسخ",
-  "copy_ID": "نسخ المعرف",
+  "copy_note_ID": "نسخ معرف الملاحظة",
   "copy_link": "نسخ الرابط",
   "copy_raw_data": "نسخ البيانات الخام",
   "copy_user_ID": "نسخ معرف المستخدم",

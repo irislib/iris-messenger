@@ -16,7 +16,7 @@ export default {
   "connected_relays": "接続されたリレー",
   "copied": "コピー済み",
   "copy": "コピー",
-  "copy_ID": "IDをコピー",
+  "copy_note_ID": "コピーするノートID",
   "copy_link": "リンクをコピー",
   "copy_raw_data": "元データをコピー",
   "copy_user_ID": "ユーザーIDをコピー",

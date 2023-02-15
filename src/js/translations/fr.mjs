@@ -10,6 +10,7 @@ export default {
   "cancel": "Annulez",
   "copied": "Copié",
   "copy": "Copier",
+  "copy_note_ID": "copia ID nota",
   "copy_link": "Copier le lien",
   "create": "Créer",
   "delete": "Supprimer",

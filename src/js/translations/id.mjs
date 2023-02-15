@@ -16,7 +16,7 @@ export default {
   "connected_relays": "Relay Terhubung",
   "copied": "Disalin",
   "copy": "Salin",
-  "copy_ID": "Salin ID",
+  "copy_note_ID": "Salin ID catatan",
   "copy_link": "Salin Link",
   "copy_raw_data": "Salin Data Mentah",
   "copy_user_ID": "Salin ID Pengguna",
