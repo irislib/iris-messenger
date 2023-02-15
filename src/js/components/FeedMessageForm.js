@@ -45,7 +45,7 @@ class FeedMessageForm extends MessageForm {
     }
   }
 
-  async onMsgFormSubmit(event) {
+  onMsgFormSubmit(event) {
     event.preventDefault();
     this.submit();
   }
