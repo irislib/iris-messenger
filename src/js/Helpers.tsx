@@ -267,13 +267,13 @@ export default {
       );
     });
 
-    replacedText = this.highlightText(replacedText, event);
+    replacedText = this.highlightText(replacedText, event, true);
 
     return replacedText;
   },
 
   // hashtags, usernames, links
-  highlightText(s: string, event: any) {
+  highlightText(s: string, event: any, showMentionedMessages = false) {
     s = reactStringReplace(s, pubKeyRegex, (match, i) => {
       const link = `/${match}`;
       return (
@@ -310,7 +310,7 @@ export default {
               </a>
             );
           } else if (tag[0] === 'e') {
-            return (
+            return showMentionedMessages ? (
               <PublicMessage
                 key={tag[1] + i}
                 hash={tag[1]}
@@ -318,6 +318,8 @@ export default {
                 showBtns={false}
                 asInlineQuote={true}
               />
+            ) : (
+              <a href={`/post/${Nostr.toNostrBech32Address(tag[1], 'note')}`}>{tag[1]}</a>
             );
           }
         }
