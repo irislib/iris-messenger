@@ -30,7 +30,7 @@ export default {
   "everyone": "Alle",
   "follow_all": "Alle folgen",
   "follow_btn": "Folgen",
-  "follow_someone_info": "Folge jemanden um Inhalte in deinem Feed zu sehen!",
+  "follow_someone_info": "Folge jemandem um Inhalte aus seinem Netzwerk zu sehen! Vorschläge:",
   "followers": "Follower",
   "following": "Folge ich",
   "following_btn": "Folge ich",
