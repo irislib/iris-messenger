@@ -45,8 +45,12 @@ class FeedMessageForm extends MessageForm {
     }
   }
 
-  async onMsgFormSubmit(event) {
+  onMsgFormSubmit(event) {
     event.preventDefault();
+    this.submit();
+  }
+
+  async submit() {
     if (!this.props.replyingTo) {
       iris.local().get('channels').get('public').get('msgDraft').put(null);
     }
@@ -94,6 +98,12 @@ class FeedMessageForm extends MessageForm {
   onKeyUp(e) {
     if ([37, 38, 39, 40].indexOf(e.keyCode) != -1) {
       this.checkMention(e);
+    }
+  }
+
+  onKeyDown(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      this.submit();
     }
   }
 
@@ -212,6 +222,7 @@ class FeedMessageForm extends MessageForm {
           this.attachmentsChanged(e);
         }}
         onKeyUp=${(e) => this.onKeyUp(e)}
+        onKeyDown=${(e) => this.onKeyDown(e)}
         onPaste=${(e) => this.onMsgTextPaste(e)}
         onInput=${(e) => this.onMsgTextInput(e)}
         onFocus=${() => this.setState({ focused: true })}
