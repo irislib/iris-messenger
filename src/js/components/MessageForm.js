@@ -42,7 +42,7 @@ export default class MessageForm extends Component {
           if (!hexTag) {
             continue;
           }
-          const newTag = [tagType, hexTag];
+          const newTag = [tagType, hexTag, '', 'mention'];
           // add if not already present
           if (!event.tags.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {
             event.tags.push(newTag);

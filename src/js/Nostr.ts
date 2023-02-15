@@ -834,7 +834,7 @@ const Nostr = {
     if (event.kind !== 1) {
       return undefined;
     }
-    const replyTags = event.tags.filter((tag) => tag[0] === 'e');
+    const replyTags = event.tags.filter((tag) => tag[0] === 'e' && tag[3] !== 'mention');
     if (replyTags.length === 1) {
       return replyTags[0][1];
     }
