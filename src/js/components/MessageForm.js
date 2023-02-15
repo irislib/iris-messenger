@@ -56,6 +56,17 @@ export default class MessageForm extends Component {
 
     handleTagged(Helpers.pubKeyRegex, 'p');
     handleTagged(Helpers.noteRegex, 'e');
+
+    const hashtags = [...msg.text.matchAll(Helpers.hashtagRegex)].map((m) => m[0].slice(1));
+    if (hashtags.length) {
+      event.tags = event.tags || [];
+      for (const hashtag of hashtags) {
+        if (!event.tags.find((t) => t[0] === 't' && t[1] === hashtag)) {
+          event.tags.push(['t', hashtag]);
+        }
+      }
+    }
+
     console.log('sending event', event);
     return Nostr.publish(event);
   }
