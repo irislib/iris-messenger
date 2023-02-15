@@ -230,6 +230,7 @@ class PublicMessage extends Message {
   }
 
   onClickName(e) {
+    e.preventDefault();
     e.stopPropagation();
     route(`/${this.state.msg.info.from}`);
   }

@@ -421,7 +421,8 @@ class Profile extends View {
               newUrl = `/${nip05}`;
             }
           }
-          window.history.replaceState({}, '', newUrl);
+          const previousState = window.history.state;
+          window.history.replaceState(previousState, '', newUrl);
         }
 
         let lightning = profile.lud16 || profile.lud06;
