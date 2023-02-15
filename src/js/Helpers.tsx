@@ -275,6 +275,7 @@ export default {
   // hashtags, usernames, links
   highlightText(s: string, event: any, showMentionedMessages = false) {
     s = reactStringReplace(s, pubKeyRegex, (match, i) => {
+      match = match.replace(/@/g, '');
       const link = `/${match}`;
       return (
         <>
@@ -282,6 +283,17 @@ export default {
           <a href={link}>
             @<Name key={match + i} pub={match} hideBadge={true} userNameOnly={true} />
           </a>
+        </>
+      );
+    });
+
+    s = reactStringReplace(s, noteRegex, (match, i) => {
+      match = match.replace(/@/g, '');
+      const link = `/post/${match}`;
+      return (
+        <>
+          {' '}
+          <a href={link}>{match}</a>
         </>
       );
     });
@@ -301,25 +313,27 @@ export default {
       s = reactStringReplace(s, /#\[(\d+)\]/g, (match, i) => {
         const tag = event.tags[parseInt(match, 10)];
         if (tag) {
+          const tagTarget = tag[1].replace('@', '');
+          console.log('tag', tag);
           if (tag[0] === 'p') {
             // profile
-            const link = `/${Nostr.toNostrBech32Address(tag[1], 'npub')}`;
+            const link = `/${Nostr.toNostrBech32Address(tagTarget, 'npub')}`;
             return (
               <a href={link}>
-                @<Name key={match + i} pub={tag[1]} hideBadge={true} userNameOnly={true} />
+                @<Name key={tagTarget + i} pub={tagTarget} hideBadge={true} userNameOnly={true} />
               </a>
             );
           } else if (tag[0] === 'e') {
             return showMentionedMessages ? (
               <PublicMessage
-                key={tag[1] + i}
-                hash={tag[1]}
+                key={tagTarget + i}
+                hash={tagTarget}
                 showName={true}
                 showBtns={false}
                 asInlineQuote={true}
               />
             ) : (
-              <a href={`/post/${Nostr.toNostrBech32Address(tag[1], 'note')}`}>{tag[1]}</a>
+              <a href={`/post/${Nostr.toNostrBech32Address(tagTarget, 'note')}`}>{tag[1]}</a>
             );
           }
         }
