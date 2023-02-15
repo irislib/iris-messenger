@@ -63,9 +63,12 @@ class ChatMessageForm extends MessageForm {
     }
   }
 
-  async onMsgFormSubmit(event) {
+  onMsgFormSubmit(event) {
     event.preventDefault();
+    this.submit();
+  }
 
+  async submit() {
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length) {
@@ -98,6 +101,12 @@ class ChatMessageForm extends MessageForm {
       .get(this.props.activeChat)
       .get('msgDraft')
       .put($(event.target).val());
+  }
+
+  onKeyDown(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      this.submit();
+    }
   }
 
   render() {
@@ -138,6 +147,7 @@ class ChatMessageForm extends MessageForm {
       />
       <input
         onInput=${(e) => this.onMsgTextInput(e)}
+        onKeyDown=${(e) => this.onKeyDown(e)}
         class="new-msg"
         type="text"
         placeholder="${t('type_a_message')}"
