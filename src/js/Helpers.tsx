@@ -29,7 +29,7 @@ function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {
     // parse src as url safely
     src = new URL(src).href;
     if (!isSafeOrigin(src)) {
-      src = `https://proxy.irismessengers.wtf/insecure/plain/${src}`;
+      src = `https://imgproxy.irismessengers.wtf/insecure/plain/${src}`;
     }
     el.attr('src', src);
   }

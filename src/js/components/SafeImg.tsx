@@ -11,7 +11,7 @@ const safeOrigins = [
   'data:image',
   'https://imgur.com/',
   'https://i.imgur.com/',
-  'https://proxy.irismessengers.wtf/',
+  'https://imgproxy.irismessengers.wtf/',
 ];
 
 export const isSafeOrigin = (url: string) => {
@@ -23,9 +23,9 @@ const SafeImg = (props: Props) => {
     // free proxy with a 250 images per 10 min limit: https://images.weserv.nl/docs/
     if (props.width) {
       const width = props.width * 2;
-      props.src = `https://proxy.irismessengers.wtf/insecure/rs:fill:${width}:${width}/plain/${props.src}`;
+      props.src = `https://imgproxy.irismessengers.wtf/insecure/rs:fill:${width}:${width}/plain/${props.src}`;
     } else {
-      props.src = `https://proxy.irismessengers.wtf/insecure/plain/${props.src}`;
+      props.src = `https://imgproxy.irismessengers.wtf/insecure/plain/${props.src}`;
     }
   }
 

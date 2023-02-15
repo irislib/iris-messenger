@@ -38,7 +38,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url }) => url.href.startsWith('https://proxy.irismessengers.wtf/insecure/rs:fill:'),
+  ({ url }) => url.href.startsWith('https://imgproxy.irismessengers.wtf/insecure/rs:fill:'),
   new CacheFirst({
     cacheName: 'scaled-images',
     plugins: [
