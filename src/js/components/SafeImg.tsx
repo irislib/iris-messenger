@@ -19,7 +19,11 @@ export const isSafeOrigin = (url: string) => {
 };
 
 const SafeImg = (props: Props) => {
-  if (props.src && (!isSafeOrigin(props.src) || props.width)) {
+  if (
+    props.src &&
+    !props.src.startsWith('data:image') &&
+    (!isSafeOrigin(props.src) || props.width)
+  ) {
     // free proxy with a 250 images per 10 min limit: https://images.weserv.nl/docs/
     if (props.width) {
       const width = props.width * 2;
