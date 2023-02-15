@@ -104,7 +104,7 @@ export default {
     return `${this.capitalize(adjective)} ${this.capitalize(animal)}`;
   },
 
-  highlightEverything(s: string, event?: any): any[] {
+  highlightEverything(s: string, event?: any, opts: any = { showMentionedMessages: true }): any[] {
     let replacedText = reactStringReplace(s, emojiRegex, (match, i) => {
       return (
         <span key={match + i} className="emoji">
@@ -113,17 +113,19 @@ export default {
       );
     });
 
-    replacedText = reactStringReplace(replacedText, noteRegex, (match, i) => {
-      return (
-        <PublicMessage
-          key={match + i}
-          hash={Nostr.toNostrHexAddress(match)}
-          showName={true}
-          showBtns={false}
-          asInlineQuote={true}
-        />
-      );
-    });
+    if (opts.showMentionedMessages) {
+      replacedText = reactStringReplace(replacedText, noteRegex, (match, i) => {
+        return (
+          <PublicMessage
+            key={match + i}
+            hash={Nostr.toNostrHexAddress(match)}
+            showName={true}
+            showBtns={false}
+            asInlineQuote={true}
+          />
+        );
+      });
+    }
 
     const twitterRegex = /(?:^|\s)(?:@)?(https?:\/\/twitter.com\/\w+\/status\/\d+\S*)(?![\w/])/g;
     replacedText = reactStringReplace(replacedText, twitterRegex, (match, i) => {
@@ -267,13 +269,13 @@ export default {
       );
     });
 
-    replacedText = this.highlightText(replacedText, event, true);
+    replacedText = this.highlightText(replacedText, event, opts);
 
     return replacedText;
   },
 
   // hashtags, usernames, links
-  highlightText(s: string, event: any, showMentionedMessages = false) {
+  highlightText(s: string, event: any, opts: any = {}) {
     s = reactStringReplace(s, pubKeyRegex, (match, i) => {
       match = match.replace(/@/g, '');
       const link = `/${match}`;
@@ -324,7 +326,7 @@ export default {
               </a>
             );
           } else if (tag[0] === 'e') {
-            return showMentionedMessages ? (
+            return opts.showMentionedMessages ? (
               <PublicMessage
                 key={tagTarget + i}
                 hash={tagTarget}

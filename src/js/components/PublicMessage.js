@@ -569,7 +569,9 @@ class PublicMessage extends Message {
         ? `${lines.slice(0, MSG_TRUNCATE_LINES).join('\n')}...`
         : text;
 
-    text = Helpers.highlightEverything(text, this.state.msg.event);
+    text = Helpers.highlightEverything(text, this.state.msg.event, {
+      showMentionedMessages: !this.props.asInlineQuote,
+    });
 
     const time =
       typeof this.state.msg.time === 'object' ? this.state.msg.time : new Date(this.state.msg.time);
