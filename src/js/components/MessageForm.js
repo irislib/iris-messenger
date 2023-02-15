@@ -56,7 +56,7 @@ export default class MessageForm extends Component {
 
     handleTagged(Helpers.pubKeyRegex, 'p');
     handleTagged(Helpers.noteRegex, 'e');
-    console.log('sending event', JSON.stringify(event));
+    console.log('sending event', event);
     return Nostr.publish(event);
   }
 
