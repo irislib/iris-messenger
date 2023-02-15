@@ -316,7 +316,6 @@ export default {
         const tag = event.tags[parseInt(match, 10)];
         if (tag) {
           const tagTarget = tag[1].replace('@', '');
-          console.log('tag', tag);
           if (tag[0] === 'p') {
             // profile
             const link = `/${Nostr.toNostrBech32Address(tagTarget, 'npub')}`;
