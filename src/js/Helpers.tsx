@@ -310,8 +310,15 @@ export default {
               </a>
             );
           } else if (tag[0] === 'e') {
-            // event
-            return;
+            return (
+              <PublicMessage
+                key={tag[1] + i}
+                hash={tag[1]}
+                showName={true}
+                showBtns={false}
+                asInlineQuote={true}
+              />
+            );
           }
         }
         return match;
