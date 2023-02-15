@@ -52,9 +52,11 @@ const saveLocalStorageEvents = debounce((_this: any) => {
     .map((eventId: any) => {
       return _this.eventsById.get(eventId);
     });
-  const notifications = _this.notifications.eventIds.map((eventId: any) => {
-    return _this.eventsById.get(eventId);
-  });
+  const notifications = _this.notifications.eventIds
+    .map((eventId: any) => {
+      return _this.eventsById.get(eventId);
+    })
+    .splice(0, 200);
   const dms = [];
   for (const set of _this.directMessagesByUser.values()) {
     set.eventIds.forEach((eventId: any) => {
@@ -77,9 +79,29 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
   const followEvents = Array.from(_this.followEventByUser.values()).filter((e: Event) => {
     return e.pubkey === myPub || _this.followedByUser.get(myPub)?.has(e.pubkey);
   });
-  console.log('saving', profileEvents.length + followEvents.length, 'events to local storage');
+  const followEvents2 = [];
+  let size = 0;
+  for (const le of followEvents
+    .map((e: Event) => [JSON.stringify(e).length, e] as [number, Event])
+    .sort((a, b) => a[0] - b[0])) {
+    if (size + le[0] < 500000) {
+      size += le[0];
+      followEvents2.push(le[1]);
+    }
+  }
+  console.log(
+    'saving profileEvents: ',
+    profileEvents.length,
+    'original followEvents length/size: ',
+    followEvents.length,
+    JSON.stringify(followEvents).length,
+    'saved followEvents length/size: ',
+    followEvents2.length,
+    JSON.stringify(followEvents2).length,
+  );
+
   localForage.setItem('profileEvents', profileEvents);
-  localForage.setItem('followEvents', followEvents);
+  localForage.setItem('followEvents', followEvents2);
 }, 5000);
 
 const MAX_MSGS_BY_USER = 500;
