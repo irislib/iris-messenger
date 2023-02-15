@@ -29,10 +29,11 @@ export default class MessageForm extends Component {
         event.tags.push(['p', replyingTo.pubkey]);
       }
     }
-    // unique tagged users
-    const taggedUsers = msg.text
-      .match(Helpers.pubKeyRegex)
-      ?.filter((v, i, a) => a.indexOf(v) === i);
+
+    const taggedUsers = [...msg.text.matchAll(Helpers.pubKeyRegex)]
+      .map((m) => m[1])
+      .filter((m, i, a) => a.indexOf(m) === i);
+
     if (taggedUsers) {
       event.tags = event.tags || [];
       for (const tag of taggedUsers) {
@@ -51,7 +52,30 @@ export default class MessageForm extends Component {
         event.content = event.content.replace(tag, `#[${index}]`);
       }
     }
-    console.log('sending event', event);
+
+    const taggedNotes = [...msg.text.matchAll(Helpers.noteRegex)]
+      .map((m) => m[1])
+      .filter((m, i, a) => a.indexOf(m) === i);
+
+    if (taggedNotes) {
+      event.tags = event.tags || [];
+      for (const tag of taggedNotes) {
+        const hexTag = Nostr.toNostrHexAddress(tag.replace('@', ''));
+        if (!hexTag) {
+          continue;
+        }
+        const newTag = ['e', hexTag];
+        // add if not already present
+        if (!event.tags.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {
+          // TODO this still adds duplicate?
+          event.tags.push(newTag);
+        }
+        // replace occurrences in event.content with #[n] where n is index in event.tags
+        const index = event.tags.findIndex((t) => t[0] === newTag[0] && t[1] === newTag[1]);
+        event.content = event.content.replace(tag, `#[${index}]`);
+      }
+    }
+    console.log('sending event', JSON.stringify(event));
     return Nostr.publish(event);
   }
 
