@@ -1,6 +1,3 @@
-import localForage from 'localforage';
-localForage.setDriver([localForage.INDEXEDDB, localForage.WEBSQL, localForage.LOCALSTORAGE]);
-
 import { Helmet } from 'react-helmet';
 import iris from 'iris-lib';
 import AsyncRoute from 'preact-async-route';
