@@ -30,51 +30,32 @@ export default class MessageForm extends Component {
       }
     }
 
-    const taggedUsers = [...msg.text.matchAll(Helpers.pubKeyRegex)]
-      .map((m) => m[1])
-      .filter((m, i, a) => a.indexOf(m) === i);
+    function handleTagged(regex, tagType) {
+      const taggedItems = [...msg.text.matchAll(regex)]
+        .map((m) => m[1])
+        .filter((m, i, a) => a.indexOf(m) === i);
 
-    if (taggedUsers) {
-      event.tags = event.tags || [];
-      for (const tag of taggedUsers) {
-        const hexTag = Nostr.toNostrHexAddress(tag.replace('@', ''));
-        if (!hexTag) {
-          continue;
+      if (taggedItems) {
+        event.tags = event.tags || [];
+        for (const tag of taggedItems) {
+          const hexTag = Nostr.toNostrHexAddress(tag.replace('@', ''));
+          if (!hexTag) {
+            continue;
+          }
+          const newTag = [tagType, hexTag];
+          // add if not already present
+          if (!event.tags.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {
+            event.tags.push(newTag);
+          }
+          // replace occurrences in event.content with #[n] where n is index in event.tags
+          const index = event.tags.findIndex((t) => t[0] === newTag[0] && t[1] === newTag[1]);
+          event.content = event.content.replace(tag, `#[${index}]`);
         }
-        const newTag = ['p', hexTag];
-        // add if not already present
-        if (!event.tags.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {
-          // TODO this still adds duplicate?
-          event.tags.push(newTag);
-        }
-        // replace occurrences in event.content with #[n] where n is index in event.tags
-        const index = event.tags.findIndex((t) => t[0] === newTag[0] && t[1] === newTag[1]);
-        event.content = event.content.replace(tag, `#[${index}]`);
       }
     }
 
-    const taggedNotes = [...msg.text.matchAll(Helpers.noteRegex)]
-      .map((m) => m[1])
-      .filter((m, i, a) => a.indexOf(m) === i);
-
-    if (taggedNotes) {
-      event.tags = event.tags || [];
-      for (const tag of taggedNotes) {
-        const hexTag = Nostr.toNostrHexAddress(tag.replace('@', ''));
-        if (!hexTag) {
-          continue;
-        }
-        const newTag = ['e', hexTag];
-        // add if not already present
-        if (!event.tags.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {
-          // TODO this still adds duplicate?
-          event.tags.push(newTag);
-        }
-        // replace occurrences in event.content with #[n] where n is index in event.tags
-        const index = event.tags.findIndex((t) => t[0] === newTag[0] && t[1] === newTag[1]);
-        event.content = event.content.replace(tag, `#[${index}]`);
-      }
-    }
+    handleTagged(Helpers.pubKeyRegex, 'p');
+    handleTagged(Helpers.noteRegex, 'e');
     console.log('sending event', JSON.stringify(event));
     return Nostr.publish(event);
   }
