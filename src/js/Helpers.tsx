@@ -30,7 +30,7 @@ function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {
     // parse src as url safely
     src = new URL(src).href;
     if (!isSafeOrigin(src)) {
-      src = `https://imgproxy.irismessengers.wtf/insecure/plain/${src}`;
+      src = `https://imgproxy.iris.to/insecure/plain/${src}`;
     }
     el.attr('src', src);
   }
@@ -55,7 +55,7 @@ export default {
   },
 
   async translateText(text: string): Promise<string> {
-    const res = await fetch('https://translate.irismessengers.wtf/translate', {
+    const res = await fetch('https://translate.iris.to/translate', {
       method: 'POST',
       body: JSON.stringify({
         q: text,
