@@ -16,7 +16,7 @@ const safeOrigins = [
 ];
 
 export const isSafeOrigin = (url: string) => {
-  return safeOrigins.some((origin) => url.indexOf(origin) === 0);
+  return safeOrigins.some((origin) => url.startsWith(origin));
 };
 
 const SafeImg = (props: Props) => {
@@ -43,7 +43,7 @@ const SafeImg = (props: Props) => {
         console.log('original source failed too', originalSrc);
         originalOnError && originalOnError();
       } else {
-        console.log('image proxy failed, trying original', mySrc);
+        console.log('image proxy failed', mySrc, 'trying original source', originalSrc);
         proxyFailed = true;
         setSrc(originalSrc);
       }
