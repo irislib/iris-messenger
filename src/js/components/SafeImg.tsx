@@ -52,7 +52,15 @@ const SafeImg = (props: Props) => {
   }
   const [src, setSrc] = useState(mySrc);
 
-  return <img src={src} onClick={props.onClick} onError={onError} className={props.class} width={props.width} />;
+  return (
+    <img
+      src={src}
+      onClick={props.onClick}
+      onError={onError}
+      className={props.class}
+      width={props.width}
+    />
+  );
 };
 
 export default SafeImg;

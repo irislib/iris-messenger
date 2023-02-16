@@ -111,15 +111,12 @@ const MAX_MSGS_BY_KEYWORD = 100;
 const eventsById = new Map<string, Event>();
 
 const DEFAULT_RELAYS = [
-  'wss://nostr.orangepill.dev',
-  'wss://jiggytom.ddns.net',
   'wss://eden.nostr.land',
   'wss://nostr.fmt.wiz.biz',
   'wss://relay.damus.io',
   'wss://nostr-pub.wellorder.net',
   'wss://relay.nostr.info',
   'wss://offchain.pub',
-  'wss://nostr.onsats.org',
   'wss://nos.lol',
   'wss://brb.io',
   'wss://relay.snort.social',

@@ -94,6 +94,15 @@ class PublicMessage extends Message {
       if (Nostr.eventsById.has(nostrId)) {
         // for faster painting, return synchronously if we have the message
         return processNostrMessage(Nostr.eventsById.get(nostrId));
+      } else {
+        fetch(`https://api.iris.to/event/${nostrId}`).then((res) => {
+          if (res.status === 200) {
+            res.json().then((event) => {
+              console.log('got event', nostrId, 'from nostr api', event);
+              Nostr.handleEvent(event);
+            });
+          }
+        });
       }
 
       return Nostr.getMessageById(nostrId).then((event) => {
