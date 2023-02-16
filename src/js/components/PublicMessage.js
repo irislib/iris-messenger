@@ -364,6 +364,7 @@ class PublicMessage extends Message {
     } else {
       text = Helpers.highlightText(text, likedEvent);
     }
+    const profileLink = `/${Nostr.toNostrBech32Address(this.state.msg?.event?.pubkey, 'npub')}`;
     const link = `/post/${Nostr.toNostrBech32Address(likedId, 'note')}`;
     return html`
       <div class="msg">
@@ -372,7 +373,7 @@ class PublicMessage extends Message {
             style="display: flex; align-items: center; flex-basis: 100%; white-space: nowrap;text-overflow: ellipsis; overflow:hidden"
           >
             <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
-            <a href=${link} style="margin-right: 5px;">
+            <a href=${profileLink} style="margin-right: 5px;">
               <${Name} pub=${this.state.msg?.event?.pubkey} userNameOnly=${true} />
             </a>
             <span>
