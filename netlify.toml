@@ -18,3 +18,7 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[edge_functions]]
+  path = "/*"
+  function = "hello"
