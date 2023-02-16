@@ -7,8 +7,7 @@ export default async (request, context) => {
   if (userAgent && userAgent.match(/googlebot|bingbot|yandexbot|slurp|duckduckbot|baiduspider|facebot|ia_archiver|twitterbot|whatsapp/i)) {
     // If the user agent matches a crawler, modify the request to proxy to the prerender server
     const url = new URL(request.url);
-    const pathname = url.pathname;
-    const prerenderUrl = `https://prerender.irismessengers.wtf${pathname}`;
+    const prerenderUrl = `https://prerender.irismessengers.wtf/${url.href}`;
     const prerenderRequest = new Request(prerenderUrl, request);
 
     return fetch(prerenderRequest);
