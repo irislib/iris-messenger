@@ -40,12 +40,13 @@ const SafeImg = (props: Props) => {
     // try without proxy if it fails
     onError = () => {
       if (proxyFailed) {
+        console.log('original source failed too', originalSrc);
         originalOnError && originalOnError();
       } else {
+        console.log('image proxy failed, trying original', mySrc);
         proxyFailed = true;
-        mySrc = originalSrc;
+        setSrc(originalSrc);
       }
-      setSrc(originalSrc);
     };
   }
   const [src, setSrc] = useState(mySrc);
