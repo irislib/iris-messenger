@@ -7,7 +7,6 @@ type Props = {
 
 // need to have trailing slash, otherwise you could do https://imgur.com.myevilwebsite.com/image.png
 const safeOrigins = [
-  'https://',
   'data:image',
   'https://imgur.com/',
   'https://i.imgur.com/',
