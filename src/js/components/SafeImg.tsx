@@ -5,6 +5,7 @@ type Props = {
   class?: string;
   width?: number;
   onError?: () => void;
+  onClick?: () => void;
 };
 
 // need to have trailing slash, otherwise you could do https://imgur.com.myevilwebsite.com/image.png
@@ -51,7 +52,7 @@ const SafeImg = (props: Props) => {
   }
   const [src, setSrc] = useState(mySrc);
 
-  return <img src={src} onError={onError} className={props.class} width={props.width} />;
+  return <img src={src} onClick={props.onClick} onError={onError} className={props.class} width={props.width} />;
 };
 
 export default SafeImg;
