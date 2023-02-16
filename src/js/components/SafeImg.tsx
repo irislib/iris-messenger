@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 type Props = {
   src: string;
   class?: string;
@@ -18,21 +20,37 @@ export const isSafeOrigin = (url: string) => {
 };
 
 const SafeImg = (props: Props) => {
+  let onError = props.onError;
+  let mySrc = props.src;
+  let proxyFailed = false;
   if (
     props.src &&
     !props.src.startsWith('data:image') &&
     (!isSafeOrigin(props.src) || props.width)
   ) {
-    // free proxy with a 250 images per 10 min limit: https://images.weserv.nl/docs/
+    // free proxy with a 250 images per 10 min limit? https://images.weserv.nl/docs/
+    const originalSrc = props.src;
     if (props.width) {
       const width = props.width * 2;
-      props.src = `https://imgproxy.irismessengers.wtf/insecure/rs:fill:${width}:${width}/plain/${props.src}`;
+      mySrc = `https://imgproxy.irismessengers.wtf/insecure/rs:fill:${width}:${width}/plain/${originalSrc}`;
     } else {
-      props.src = `https://imgproxy.irismessengers.wtf/insecure/plain/${props.src}`;
+      mySrc = `https://imgproxy.irismessengers.wtf/insecure/plain/${originalSrc}`;
     }
+    const originalOnError = props.onError;
+    // try without proxy if it fails
+    onError = () => {
+      if (proxyFailed) {
+        originalOnError && originalOnError();
+      } else {
+        proxyFailed = true;
+        mySrc = originalSrc;
+      }
+      setSrc(originalSrc);
+    };
   }
+  const [src, setSrc] = useState(mySrc);
 
-  return <img {...props} />;
+  return <img src={src} onError={onError} className={props.class} width={props.width} />;
 };
 
 export default SafeImg;

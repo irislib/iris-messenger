@@ -290,7 +290,7 @@ export default {
       );
     });
 
-    s = reactStringReplace(s, noteRegex, (match, i) => {
+    s = reactStringReplace(s, noteRegex, (match) => {
       match = match.replace(/@/g, '');
       const link = `/post/${match}`;
       return (
