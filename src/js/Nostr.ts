@@ -1584,7 +1584,6 @@ const Nostr = {
       fetch(`https://api.iris.to/profile/${address}`).then((res) => {
         if (res.status === 200) {
           res.json().then((profile) => {
-            console.log('got profile from api', profile);
             Nostr.handleEvent(profile);
           });
         }

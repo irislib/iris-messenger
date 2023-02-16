@@ -98,7 +98,6 @@ class PublicMessage extends Message {
         fetch(`https://api.iris.to/event/${nostrId}`).then((res) => {
           if (res.status === 200) {
             res.json().then((event) => {
-              console.log('got event', nostrId, 'from nostr api', event);
               Nostr.handleEvent(event);
             });
           }
