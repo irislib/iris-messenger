@@ -15,7 +15,7 @@ const explainers = {
   lud16: 'Bitcoin lightning address ⚡ (lud16)',
   picture: 'Picture url',
   banner: 'Banner url',
-  nip05: 'Domain name verification (nip05)',
+  nip05: 'Nostr address (nip05)',
 };
 
 export default class EditProfile extends Component {
