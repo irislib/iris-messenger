@@ -475,18 +475,6 @@ class Profile extends View {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!prevState.hexPub && this.state.hexPub) {
-      if (!Nostr.profileEventByUser.has(this.state.hexPub)) {
-        fetch(`https://api.iris.to/profile/${this.state.hexPub}`).then((res) => {
-          if (res.status === 200) {
-            res.json().then((profile) => {
-              Nostr.handleEvent(profile);
-            });
-          }
-        });
-      }
-    }
-
     if (!prevState.name && this.state.name) {
       setTimeout(() => {
         // important for SEO: prerenderReady is false until page content is loaded
