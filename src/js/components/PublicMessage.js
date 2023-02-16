@@ -702,7 +702,7 @@ class PublicMessage extends Message {
               }
               return html`<div class="img-container">
                 <${SafeImg}
-                  width=${1138}
+                  width=${569}
                   src=${a.data}
                   onClick=${(e) => {
                     this.imageClicked(e);
