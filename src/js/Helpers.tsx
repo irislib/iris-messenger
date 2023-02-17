@@ -77,6 +77,8 @@ export default {
       return;
     }
 
+    // disable popup for now
+    /*
     let timerId = null;
 
     function handleBlur() {
@@ -90,6 +92,7 @@ export default {
       alert(t('install_lightning_wallet_prompt'));
       window.removeEventListener('blur', handleBlur);
     }, 3000);
+    */
 
     window.open(link, '_self');
   },
