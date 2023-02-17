@@ -111,15 +111,12 @@ const MAX_MSGS_BY_KEYWORD = 100;
 const eventsById = new Map<string, Event>();
 
 const DEFAULT_RELAYS = [
-  'wss://nostr.orangepill.dev',
-  'wss://jiggytom.ddns.net',
   'wss://eden.nostr.land',
   'wss://nostr.fmt.wiz.biz',
   'wss://relay.damus.io',
   'wss://nostr-pub.wellorder.net',
   'wss://relay.nostr.info',
   'wss://offchain.pub',
-  'wss://nostr.onsats.org',
   'wss://nos.lol',
   'wss://brb.io',
   'wss://relay.snort.social',
@@ -1583,6 +1580,14 @@ const Nostr = {
           callback();
         });
       }
+    } else if (!this.subscribedProfiles.has(address)) {
+      fetch(`https://api.iris.to/profile/${address}`).then((res) => {
+        if (res.status === 200) {
+          res.json().then((profile) => {
+            Nostr.handleEvent(profile);
+          });
+        }
+      });
     }
 
     this.subscribedProfiles.add(address);

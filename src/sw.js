@@ -38,7 +38,24 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url }) => url.href.startsWith('https://imgproxy.irismessengers.wtf/insecure/rs:fill:'),
+  ({ url }) => url.href.startsWith('https://api.iris.to/'),
+  new CacheFirst({
+    cacheName: 'iris-api',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+      new ExpirationPlugin({
+        maxEntries: 1000,
+        maxAgeSeconds: 1 * 24 * 60 * 60,
+        purgeOnQuotaError: true,
+      }),
+    ],
+  }),
+);
+
+registerRoute(
+  ({ url }) => url.href.startsWith('https://imgproxy.iris.to/insecure/rs:fill:'),
   new CacheFirst({
     cacheName: 'scaled-images',
     plugins: [

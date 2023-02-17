@@ -14,7 +14,7 @@ const safeOrigins = [
   'data:image',
   'https://imgur.com/',
   'https://i.imgur.com/',
-  'https://imgproxy.irismessengers.wtf/',
+  'https://imgproxy.iris.to/',
 ];
 
 export const isSafeOrigin = (url: string) => {
@@ -34,9 +34,9 @@ const SafeImg = (props: Props) => {
     const originalSrc = props.src;
     if (props.width) {
       const width = props.width * 2;
-      mySrc = `https://imgproxy.irismessengers.wtf/insecure/rs:fill:${width}:${width}/plain/${originalSrc}`;
+      mySrc = `https://imgproxy.iris.to/insecure/rs:fill:${width}:${width}/plain/${originalSrc}`;
     } else {
-      mySrc = `https://imgproxy.irismessengers.wtf/insecure/plain/${originalSrc}`;
+      mySrc = `https://imgproxy.iris.to/insecure/plain/${originalSrc}`;
     }
     const originalOnError = props.onError;
     // try without proxy if it fails
