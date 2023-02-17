@@ -5,7 +5,8 @@ type Props = {
   class?: string;
   width?: number;
   onError?: () => void;
-  onClick?: () => void;
+  onClick?: (ev: MouseEvent) => void;
+  alt?: string;
 };
 
 // need to have trailing slash, otherwise you could do https://imgur.com.myevilwebsite.com/image.png
@@ -55,10 +56,11 @@ const SafeImg = (props: Props) => {
   return (
     <img
       src={src}
-      onClick={props.onClick}
       onError={onError}
+      onClick={props.onClick}
       className={props.class}
       width={props.width}
+      alt={props.alt}
     />
   );
 };
