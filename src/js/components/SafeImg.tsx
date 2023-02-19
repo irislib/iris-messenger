@@ -3,6 +3,7 @@ import { useState } from 'react';
 type Props = {
   src: string;
   class?: string;
+  style?: React.CSSProperties;
   width?: number;
   onError?: () => void;
   onClick?: (ev: MouseEvent) => void;
@@ -59,7 +60,9 @@ const SafeImg = (props: Props) => {
       onError={onError}
       onClick={props.onClick}
       className={props.class}
+      style={props.style}
       width={props.width}
+      height={props.width}
       alt={props.alt}
     />
   );

@@ -92,14 +92,6 @@ class MyIdenticon extends Component<Props, State> {
     const hasPictureStyle = hasPicture ? 'has-picture' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 
-    const pictureElement = (
-      <SafeImg
-        src={this.state.picture}
-        width={width}
-        onError={() => this.setState({ hasError: true })}
-      />
-    );
-
     return (
       <IdenticonContainer
         width={width}
@@ -107,8 +99,17 @@ class MyIdenticon extends Component<Props, State> {
         style={{ cursor: this.props.onClick ? 'pointer' : undefined }}
         className={`identicon-container ${hasPictureStyle} ${showTooltip} ${activity}`}
       >
-        <div style={{ width: width, height: width }} class="identicon">
-          {hasPicture ? pictureElement : <img width={width} src={this.state.identicon} />}
+        <div style={{ width: `${width}px`, height: `${width}px` }} class="identicon">
+          {hasPicture ? (
+            <SafeImg
+              src={this.state.picture}
+              width={width}
+              style={{ objectFit: 'cover' }}
+              onError={() => this.setState({ hasError: true })}
+            />
+          ) : (
+            <img width={width} src={this.state.identicon} />
+          )}
         </div>
         {this.props.showTooltip && this.state.name ? (
           <span class="tooltiptext">{this.state.name}</span>
