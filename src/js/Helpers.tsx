@@ -260,6 +260,8 @@ export default {
       });
     }
 
+    replacedText = this.highlightText(replacedText, event, opts);
+
     const lnRegex =
       /(lightning:[\w.-]+@[\w.-]+|lightning:\w+\?amount=\d+|(?:lightning:)?(?:lnurl|lnbc)[\da-z0-9]+)/gi;
     replacedText = reactStringReplace(replacedText, lnRegex, (match) => {
@@ -272,8 +274,6 @@ export default {
         </a>
       );
     });
-
-    replacedText = this.highlightText(replacedText, event, opts);
 
     return replacedText;
   },
