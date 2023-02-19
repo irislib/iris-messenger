@@ -254,12 +254,12 @@ class PublicMessage extends Message {
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Nostr.publish({
-          kind: 1,
+          kind: 6,
           tags: [
             ['e', nostrId, '', 'mention'],
             ['p', author],
           ],
-          content: '#[0]',
+          content: '',
         });
       }
     }
