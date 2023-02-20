@@ -70,7 +70,7 @@ class Profile extends View {
                 copyStr=${Helpers.getProfileLink(iris.session.getPubKey())}
               />
             </p>
-            <small>${t('visibility')}</small>
+            <small>${t('no_followers_yet_info')}</small>
           </div>
         </div>
       `;

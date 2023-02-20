@@ -16,7 +16,7 @@ export default {
   "connected_relays": "Yhdistetyt palvelimet",
   "copied": "Kopioitu",
   "copy": "Kopioi",
-  "copy_note_ID": "Kopioi muistiinpanon ID",
+  "copy_note_ID": "Kopioi viestin ID",
   "copy_link": "Kopioi linkki",
   "copy_raw_data": "Kopioi data",
   "copy_user_ID": "Kopioi käyttäjän ID",
