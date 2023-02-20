@@ -1,5 +1,6 @@
 import { html } from 'htm/preact';
 import iris from 'iris-lib';
+import { Link } from 'preact-router/match';
 
 import FeedMessageForm from '../components/FeedMessageForm';
 import MessageFeed from '../components/MessageFeed';
@@ -12,7 +13,7 @@ class Feed extends View {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = { sortedMessages: [], group: 'follows' };
+    this.state = { sortedMessages: [], group: 'follows', searchView: 'posts' };
     this.messages = {};
     this.id = 'message-view';
     this.class = 'public-messages-view';
@@ -42,6 +43,10 @@ class Feed extends View {
     return true;
   }
 
+  navigateToTab(tab) {
+    this.setState({ searchView: tab });
+  }
+
   renderView() {
     const s = this.state;
     let path = this.props.index || 'msgs';
@@ -60,19 +65,27 @@ class Feed extends View {
                   />
                 `}
             ${s.searchTerm
-              ? html`<h2>${t('search')}: "${s.searchTerm}"</h2>`
+              ? html`<h2>${t('search')}: "${s.searchTerm}"</h2>
+                  <div class="tabs">
+                    <${Link} onClick=${() => this.navigateToTab('posts')}>${t('posts')} <//>
+                    <${Link} onClick=${() => this.navigateToTab('people')}>${t('people')} <//>
+                  </div>`
               : this.props.index !== 'everyone'
               ? html` <${OnboardingNotification} /> `
               : ''}
-            <${MessageFeed}
-              scrollElement=${this.scrollElement.current}
-              filter=${s.searchTerm && ((m) => this.filter(m))}
-              keyword=${s.searchTerm}
-              thumbnails=${this.props.thumbnails}
-              key=${this.props.index || 'feed'}
-              index=${this.props.index}
-              path=${path}
-            />
+            ${s.searchView === 'posts'
+              ? html`<div>
+                  <${MessageFeed}
+                    scrollElement=${this.scrollElement.current}
+                    filter=${s.searchTerm && ((m) => this.filter(m))}
+                    keyword=${s.searchTerm}
+                    thumbnails=${this.props.thumbnails}
+                    key=${this.props.index || 'feed'}
+                    index=${this.props.index}
+                    path=${path}
+                  />
+                </div>`
+              : html`<h2>PEOPLE</h2>`}
           </div>
         </div>
       </div>
