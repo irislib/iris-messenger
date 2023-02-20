@@ -21,6 +21,7 @@ const AVAILABLE_LANGUAGES = {
   hi: 'हिन्दी',
   fa: 'فارسی',
   ur: 'اردو',
+  pl: 'Polski',
   hu: 'Magyar',
   sk: 'Slovenčina',
   nl: 'Nederlands',
