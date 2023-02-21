@@ -4,6 +4,7 @@ import AccountSettings from './AccountSettings';
 import AppearanceSettings from './AppearanceSettings';
 import BetaSettings from './BetaSettings';
 import BlockedSettings from './BlockedSettings';
+import IrisAccountSettings from './IrisAccountSettings';
 import LanguageSettings from './LanguageSettings';
 import MediaSettings from './MediaSettings';
 import NetworkSettings from './NetworkSettings';
@@ -18,6 +19,7 @@ export default class SettingsContent extends Component {
     media: MediaSettings,
     beta: BetaSettings,
     blocked_users: BlockedSettings,
+    iris_account: IrisAccountSettings,
   };
 
   constructor() {

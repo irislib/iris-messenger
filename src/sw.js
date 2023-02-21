@@ -37,6 +37,8 @@ registerRoute(
   }),
 );
 
+registerRoute(({ url }) => url.pathname.startsWith('https://api.iris.to/user/'), new NetworkOnly());
+
 registerRoute(
   ({ url }) => url.href.startsWith('https://api.iris.to/'),
   new CacheFirst({

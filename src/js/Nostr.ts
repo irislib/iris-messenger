@@ -440,6 +440,7 @@ const Nostr = {
     }
     return null;
   },
+  getEventHash,
   publish: async function (event: any) {
     if (!event.sig) {
       if (!event.tags) {
