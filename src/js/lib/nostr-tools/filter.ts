@@ -5,6 +5,7 @@ export type Filter = {
   kinds?: number[]
   authors?: string[]
   keywords?: string[]
+  userKeyWord?: String
   since?: number
   until?: number
   limit?: number

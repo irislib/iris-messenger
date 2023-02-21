@@ -4,6 +4,7 @@ import { Link } from 'preact-router/match';
 
 import FeedMessageForm from '../components/FeedMessageForm';
 import MessageFeed from '../components/MessageFeed';
+import PeopleFeed from '../components/PeopleFeed';
 import OnboardingNotification from '../components/OnboardingNotification';
 import { translate as t } from '../translations/Translation';
 
@@ -85,7 +86,17 @@ class Feed extends View {
                     path=${path}
                   />
                 </div>`
-              : html`<h2>PEOPLE</h2>`}
+              : html`<div>
+                  <${PeopleFeed}
+                    scrollElement=${this.scrollElement.current}
+                    filter=${s.searchTerm && ((m) => this.filter(m))}
+                    keyword=${s.searchTerm}
+                    thumbnails=${this.props.thumbnails}
+                    key=${this.props.index || 'feed'}
+                    index=${this.props.index}
+                    path=${path}
+                  />
+                </div>`}
           </div>
         </div>
       </div>

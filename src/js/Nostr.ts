@@ -85,6 +85,7 @@ const saveLocalStorageProfilesAndFollows = debounce((_this) => {
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
 const MAX_MSGS_BY_KEYWORD = 100;
+const MAX_USERS_BY_KEYWORD = 100;
 
 const eventsById = new Map<string, Event>();
 
@@ -139,9 +140,11 @@ const Nostr = {
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
+  subscribedPeople: new Set<string>(),
   subscribedRepliesAndLikes: new Set<string>(),
   subscribedProfiles: new Set<string>(),
   subscribedKeywords: new Set<string>(),
+  subscribedSearches: String,
   likesByUser: new Map<string, SortedLimitedEventSet>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -150,6 +153,7 @@ const Nostr = {
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByKeywords: new Map<string, SortedLimitedEventSet>(),
+  latestPeopleByKeywords: new Map<string, SortedLimitedEventSet>(),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
   keyValueEvents: new Map<string, Event>(),
@@ -486,7 +490,10 @@ const Nostr = {
       }, unsubscribeTimeout);
     }
 
-    for (const relay of (id == 'keywords' ? this.searchRelays : this.relays).values()) {
+    for (const relay of (id == 'keywords' || id == 'user_keywords'
+      ? this.searchRelays
+      : this.relays
+    ).values()) {
       const subId = this.getSubscriptionIdForName(id);
       const sub = relay.sub(filters, { id: subId });
       // TODO update relay lastSeen
@@ -568,6 +575,25 @@ const Nostr = {
           },
         ],
         'keywords',
+      );
+      // on page reload knownUsers are empty and thus all search results are dropped
+      if (_this.knownUsers.size < 1000) setTimeout(go, 2000);
+    };
+    go();
+  }, 100),
+  subscribeToKeywords1: debounce((_this) => {
+    if (_this.subscribedSearches === '') return;
+    console.log('subscribe to search', _this.subscribedSearches, _this.knownUsers.size);
+    const go = () => {
+      _this.sendSubToRelays(
+        [
+          {
+            kinds: [0],
+            limit: MAX_USERS_BY_KEYWORD,
+            search: _this.subscribedSearches + ' sort:popular',
+          },
+        ],
+        'user_keywords',
       );
       // on page reload knownUsers are empty and thus all search results are dropped
       if (_this.knownUsers.size < 1000) setTimeout(go, 2000);
@@ -720,6 +746,26 @@ const Nostr = {
     hasNewIds && this.subscribeToPosts(this);
     hasNewKeywords && this.subscribeToKeywords(this);
   },
+  subscribe1: function (filters: Filter[], cb?: (event: Event) => void) {
+    cb &&
+      this.subscriptions.set(subscriptionId++, {
+        filters,
+        callback: cb,
+      });
+
+    let hasNewKeywords = false;
+    for (const filter of filters) {
+      if (filter.userKeyWord) {
+        if (this.subscribedSearches !== filter.userKeyWord) {
+          hasNewKeywords = true;
+          // only 1 keyword at a time, otherwise a popular kw will consume the whole 'limit'
+          this.subscribedSearches = filter.userKeyWord;
+        }
+      }
+    }
+
+    this.subscribeToKeywords1(this);
+    },
   getConnectedRelayCount: function () {
     let count = 0;
     for (const relay of this.relays.values()) {
@@ -1224,13 +1270,19 @@ const Nostr = {
     return false;
   },
   matchFilter(event: Event, filter: Filter) {
+    console.log(event)
     if (filter.ids && !filter.ids.includes(event.id)) {
+      console.log("filter.ids && !filter.ids.includes(event.id)")
       return false;
     }
     if (filter.kinds && !filter.kinds.includes(event.kind)) {
+      console.log("filter.kinds && !filter.kinds.includes(event.kind)")
+      console.log(filter.kinds)
+      console.log(event.kind)
       return false;
     }
     if (filter.authors && !filter.authors.includes(event.pubkey)) {
+      console.log("filter.authors && !filter.authors.includes(event.pubkey)")
       return false;
     }
     const filterKeys = ['e', 'p', 'd'];
@@ -1518,6 +1570,37 @@ const Nostr = {
     this.latestNotesByKeywords.has(keyword) &&
       cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
     this.subscribe([filter], callback);
+  },
+  getPeopleByKeyword(userKeyWord: string, cb: (peopleIds: string[]) => void) {
+    const callback = (event) => {
+      console.log(event);
+      if (!this.latestPeopleByKeywords.has(userKeyWord)) {
+        this.latestPeopleByKeywords.set(
+          userKeyWord,
+          new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD),
+        );
+      }
+      this.latestPeopleByKeywords.get(userKeyWord)?.add(event);
+      cb(this.latestPeopleByKeywords.get(userKeyWord)?.eventIds);
+    };
+    // find among cached events
+    const filter = { kinds: [0], userKeyWord: userKeyWord };
+    for (const event of this.eventsById.values()) {
+      console.log(this.matchFilter(event, filter))
+      if (this.matchFilter(event, filter)) {
+        if (!this.latestPeopleByKeywords.has(userKeyWord)) {
+          this.latestPeopleByKeywords.set(
+            userKeyWord,
+            new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD),
+          );
+        }
+        this.latestPeopleByKeywords.get(userKeyWord)?.add(event);
+      }
+    }
+    this.latestPeopleByKeywords.has(userKeyWord) &&
+      cb(this.latestPeopleByKeywords.get(userKeyWord)?.eventIds);
+
+    this.subscribe1([filter], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile
