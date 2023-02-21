@@ -348,7 +348,7 @@ export default {
 
     // highlight hashtags, link to /search/${encodeUriComponent(hashtag)}
     s = reactStringReplace(s, hashtagRegex, (match) => {
-      return <a href={`/search/${encodeURIComponent(match.slice(1))}`}>{match}</a>;
+      return <a href={`/search/${encodeURIComponent(match)}`}>{match}</a>;
     });
 
     return s;
