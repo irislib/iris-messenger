@@ -1,4 +1,3 @@
-import iris from 'iris-lib';
 import $ from 'jquery';
 import { Component } from 'preact';
 
@@ -10,7 +9,6 @@ import Button from './basic/Button';
 
 type Props = {
   copyStr: OptionalGetter<string>;
-  notShareable: boolean;
   title: string;
   text: string;
 };
@@ -49,19 +47,7 @@ class CopyButton extends Component<Props, State> {
     const copyStr =
       typeof this.props.copyStr === 'function' ? this.props.copyStr() : this.props.copyStr;
 
-    if (iris.util.isMobile && !this.props.notShareable) {
-      // TODO: sometimes needs to be url
-      if (navigator && navigator.share) {
-        navigator.share({ text: copyStr, title: this.props.title }).catch((err) => {
-          console.error('share failed', err);
-          this.copy(e, copyStr);
-        });
-      } else {
-        this.copy(e, copyStr);
-      }
-    } else {
-      this.copy(e, copyStr);
-    }
+    this.copy(e, copyStr);
   }
 
   render() {
