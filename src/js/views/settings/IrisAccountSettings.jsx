@@ -11,6 +11,23 @@ export default class IrisAccountSettings extends Component {
     existing: null,
   };
 
+  renderAccountName(name, link = true) {
+    return (
+      <>
+        <p>
+          Username: <b>{name}</b>
+        </p>
+        <p>
+          Short link:{' '}
+          {link ? <a href={`https://iris.to/${name}`}>iris.to/{name}</a> : <>iris.to/{name}</>}
+        </p>
+        <p>
+          Nostr address: <b>{name}@iris.to</b>
+        </p>
+      </>
+    );
+  }
+
   render() {
     let view = '';
 
@@ -22,11 +39,12 @@ export default class IrisAccountSettings extends Component {
       view = (
         <div>
           <div className="negative">
-            You have an active iris.to account iris.to/<b>{this.state.existing.name}</b>
+            You have an active iris.to account:
+            {this.renderAccountName(this.state.existing.name)}
           </div>
           <p>
             <Button onClick={() => this.setAsPrimary()}>
-              Set as primary Nostr address (nip05)
+              Set as primary Nostr address
             </Button>
           </p>
         </div>
@@ -38,6 +56,7 @@ export default class IrisAccountSettings extends Component {
             Username iris.to/<b>{this.state.existing.name}</b> is reserved for you until 5 March
             2023!
           </p>
+          {this.renderAccountName(this.state.existing.name, false)}
           <p>
             <Button onClick={() => this.enableReserved()}>Yes please</Button>
           </p>
@@ -80,7 +99,10 @@ export default class IrisAccountSettings extends Component {
             </Button>
             <p>
               {this.state.newUserNameValid ? (
-                <span className="positive">Username is available</span>
+                <>
+                  <span className="positive">Username is available</span>
+                  {this.renderAccountName(this.state.newUserName, false)}
+                </>
               ) : (
                 <span className="negative">{this.state.invalidUsernameMessage}</span>
               )}
@@ -95,6 +117,9 @@ export default class IrisAccountSettings extends Component {
         <div class="centered-container">
           <h3>Iris account</h3>
           {view}
+          <p>
+            <a href="https://github.com/irislib/faq#iris-username">FAQ</a>
+          </p>
         </div>
       </>
     );
@@ -114,7 +139,7 @@ export default class IrisAccountSettings extends Component {
       });
       return;
     }
-    if (!newUserName.match(/^[a-z0-9]+$/)) {
+    if (!newUserName.match(/^[a-z0-9_.]+$/)) {
       this.setState({
         newUserName,
         newUserNameValid: false,
