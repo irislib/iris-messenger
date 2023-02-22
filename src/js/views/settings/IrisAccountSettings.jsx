@@ -17,7 +17,9 @@ export default class IrisAccountSettings extends Component {
     let view = '';
 
     if (this.state.irisToActive) {
-      view = <div className="positive">{this.state.profile.nip05}</div>;
+      const username = this.state.profile.nip05.split('@')[0];
+      const link = `https://iris.to/${username}`;
+      view = <a href={link}>iris.to/{username}</a>;
     } else if (this.state.existing && this.state.existing.confirmed) {
       view = (
         <div>
@@ -76,7 +78,7 @@ export default class IrisAccountSettings extends Component {
     return (
       <>
         <div class="centered-container">
-          <h3>{t('iris_account')}</h3>
+          <h3>iris.to/username</h3>
           {view}
         </div>
       </>
