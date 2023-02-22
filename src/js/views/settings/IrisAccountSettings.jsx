@@ -1,11 +1,9 @@
 import iris from 'iris-lib';
 import { debounce } from 'lodash';
-import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
 import Nostr from '../../Nostr';
-import { translate as t } from '../../translations/Translation';
 
 export default class IrisAccountSettings extends Component {
   state = {
@@ -37,23 +35,39 @@ export default class IrisAccountSettings extends Component {
       view = (
         <div>
           <p className="positive">
-            Username iris.to/<b>{this.state.existing.name}</b> is reserved for you until 2023-03-05!
+            Username iris.to/<b>{this.state.existing.name}</b> is reserved for you until 5 March 2023!
           </p>
           <p>
-            <Button onClick={() => this.enableReserved()}>Enable</Button>
+            <Button onClick={() => this.enableReserved()}>Yes please</Button>
           </p>
           <p>
-            <Button onClick={() => this.declineReserved()}>Decline</Button>
+            <Button onClick={() => this.declineReserved()}>No thanks</Button>
           </p>
         </div>
       );
     } else if (this.state.error) {
       view = <div className="negative">Error: {this.state.error}</div>;
+    } else if (this.state.showChallenge) {
+      window.cf_turnstile_callback = (token) => this.register(token);
+      view = (
+        <>
+          <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+          <div
+            className="cf-turnstile"
+            data-sitekey={
+              window.location.origin === 'iris.to'
+                ? '0x4AAAAAAACsEd8XuwpPTFwz'
+                : '3x00000000000000000000FF'
+            }
+            data-callback="cf_turnstile_callback"
+          ></div>
+        </>
+      );
     } else {
       view = (
         <div>
           <p>Register an Iris username (iris.to/username)</p>
-          <form onSubmit={(e) => this.register(e)}>
+          <form onSubmit={(e) => this.showChallenge(e)}>
             <input
               type="text"
               placeholder="Username"
@@ -78,7 +92,7 @@ export default class IrisAccountSettings extends Component {
     return (
       <>
         <div class="centered-container">
-          <h3>iris.to/username</h3>
+          <h3>Iris account</h3>
           {view}
         </div>
       </>
@@ -137,11 +151,16 @@ export default class IrisAccountSettings extends Component {
     }
   }, 500);
 
-  async register(e) {
+  showChallenge(e) {
     e.preventDefault();
     if (!this.state.newUserNameValid) {
       return;
     }
+    this.setState({ showChallenge: true });
+  }
+
+  async register(cfToken) {
+    console.log('register', cfToken);
     const pubkey = iris.session.getKey().secp256k1.rpub;
     const event = {
       content: `iris.to/${this.state.newUserName}`,
@@ -158,7 +177,7 @@ export default class IrisAccountSettings extends Component {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(event),
+      body: JSON.stringify({ event, cfToken }),
     });
     if (res.status === 200) {
       this.setState({
@@ -168,6 +187,7 @@ export default class IrisAccountSettings extends Component {
           name: this.state.newUserName,
         },
       });
+      delete window.cf_turnstile_callback;
     } else {
       this.setState({ error: JSON.stringify(res) });
     }
