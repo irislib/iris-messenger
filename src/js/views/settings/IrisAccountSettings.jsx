@@ -10,6 +10,7 @@ import { translate as t } from '../../translations/Translation';
 export default class IrisAccountSettings extends Component {
   state = {
     irisToActive: false,
+    existing: null,
   };
 
   render() {
@@ -17,18 +18,24 @@ export default class IrisAccountSettings extends Component {
 
     if (this.state.irisToActive) {
       view = <div className="positive">{this.state.profile.nip05}</div>;
-    } else if (this.state.haveAccount) {
+    } else if (this.state.existing && this.state.existing.confirmed) {
       view = (
         <div>
-          <div className="negative">You have an active iris.to account</div>
-          <Button onClick={() => this.setAsPrimary()}>Set as primary</Button>
+          <div className="negative">
+            You have an active iris.to account iris.to/<b>{this.state.existing.name}</b>
+          </div>
+          <p>
+            <Button onClick={() => this.setAsPrimary()}>
+              Set as primary Nostr address (nip05)
+            </Button>
+          </p>
         </div>
       );
-    } else if (this.state.accountReserved) {
+    } else if (this.state.existing) {
       view = (
         <div>
           <p className="positive">
-            Username iris.to/<b>{this.state.profile.name}</b> is reserved for you until 2023-03-05!
+            Username iris.to/<b>{this.state.existing.name}</b> is reserved for you until 2023-03-05!
           </p>
           <p>
             <Button onClick={() => this.enableReserved()}>Enable</Button>
@@ -38,17 +45,8 @@ export default class IrisAccountSettings extends Component {
           </p>
         </div>
       );
-    } else if (this.state.confirmSuccess) {
-      view = (
-        <div>
-          <p className="positive">
-            iris.to/<b>{this.state.profile.name}</b> is now active!
-          </p>
-          <Button onClick={() => this.setAsPrimary()}>Set as primary Nostr address (nip05)</Button>
-        </div>
-      );
-    } else if (this.state.confirmError) {
-      view = <div className="negative">Error: {this.state.confirmError}</div>;
+    } else if (this.state.error) {
+      view = <div className="negative">Error: {this.state.error}</div>;
     } else {
       view = (
         <div>
@@ -162,34 +160,38 @@ export default class IrisAccountSettings extends Component {
     });
     if (res.status === 200) {
       this.setState({
-        confirmSuccess: true,
-        confirmError: null,
-        accountReserved: false,
-        haveAccount: true,
+        error: null,
+        existing: {
+          confirmed: true,
+          name: this.state.newUserName,
+        },
       });
     } else {
-      this.setState({ confirmError: JSON.stringify(res) });
+      this.setState({ error: JSON.stringify(res) });
     }
   }
 
   setAsPrimary() {
+    const newNip = this.state.existing.name + '@iris.to';
+    const timeout = setTimeout(() => {
+      Nostr.setMetadata({ nip05: newNip });
+    }, 2000);
     Nostr.getProfile(iris.session.getKey().secp256k1.rpub, (p) => {
-      const newNip = this.state.profile.name + '@iris.to';
       if (p) {
+        clearTimeout(timeout);
         if (p.nip05 !== newNip) {
-          p.nip05 = this.state.profile.name + '@iris.to';
-          Nostr.setMetadata(this.state.profile);
-        } else {
-          route('/' + this.state.profile.name);
+          p.nip05 = newNip;
+          Nostr.setMetadata(p);
         }
       }
+      this.setState({ profile: p, irisToActive: true });
     });
   }
 
   async enableReserved() {
     const pubkey = iris.session.getKey().secp256k1.rpub;
     const event = {
-      content: `iris.to/${this.state.profile.name}`,
+      content: `iris.to/${this.state.existing.name}`,
       kind: 1,
       tags: [],
       pubkey,
@@ -206,19 +208,19 @@ export default class IrisAccountSettings extends Component {
       body: JSON.stringify(event),
     });
     if (res.status === 200) {
-      this.setState({ confirmSuccess: true, confirmError: null, accountReserved: false });
+      this.setState({ error: null, existing: { confirmed: true, name: this.state.existing.name } });
     } else {
-      this.setState({ confirmError: JSON.stringify(res) });
+      this.setState({ error: JSON.stringify(res) });
     }
   }
 
   async declineReserved() {
-    if (!confirm(`Are you sure you want to decline iris.to/${this.state.profile.name}?`)) {
+    if (!confirm(`Are you sure you want to decline iris.to/${this.state.existing.name}?`)) {
       return;
     }
     const pubkey = iris.session.getKey().secp256k1.rpub;
     const event = {
-      content: `decline iris.to/${this.state.profile.name}`,
+      content: `decline iris.to/${this.state.existing.name}`,
       kind: 1,
       tags: [],
       pubkey,
@@ -235,9 +237,9 @@ export default class IrisAccountSettings extends Component {
       body: JSON.stringify(event),
     });
     if (res.status === 200) {
-      this.setState({ confirmSuccess: false, confirmError: null, accountReserved: false });
+      this.setState({ confirmSuccess: false, error: null, existing: null });
     } else {
-      this.setState({ confirmError: JSON.stringify(res) });
+      this.setState({ error: JSON.stringify(res) });
     }
   }
 
@@ -248,32 +250,24 @@ export default class IrisAccountSettings extends Component {
       (profile) => {
         const irisToActive =
           profile && profile.nip05 && profile.nip05valid && profile.nip05.endsWith('@iris.to');
-        console.log(profile, irisToActive);
         this.setState({ profile, irisToActive });
-        if (!irisToActive && profile.name) {
-          this.checkAccountReserved(profile.name, myPub);
+        if (profile && !irisToActive) {
+          this.checkExistingAccount(myPub);
         }
       },
       true,
     );
+    this.checkExistingAccount(myPub);
   }
 
-  async checkAccountReserved(name, pub) {
+  async checkExistingAccount(pub) {
     // make a get request to https://api.iris.to/user/username_confirmable?name=${name}&public_key=${pub}
     // if the response is 200, then the account is available
 
-    const res = await fetch(
-      `https://api.iris.to/user/username_confirmable?name=${name.toLowerCase()}&public_key=${pub}`,
-    );
+    const res = await fetch(`https://api.iris.to/user/find?public_key=${pub}`);
     if (res.status === 200) {
-      this.setState({ accountReserved: true });
-    }
-  }
-
-  async checkAccountAvailable(name) {
-    const res = await fetch(`https://api.iris.to/user/available?name=${name.toLowerCase()}`);
-    if (res.status === 200) {
-      this.setState({ accountAvailable: true });
+      const json = await res.json();
+      this.setState({ existing: json });
     }
   }
 }
