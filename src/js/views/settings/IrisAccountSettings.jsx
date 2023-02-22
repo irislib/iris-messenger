@@ -22,7 +22,7 @@ export default class IrisAccountSettings extends Component {
             ) : (
               ''
             )}
-            {this.state.accountAvailable ? (
+            {!this.state.irisToActive && this.state.accountReserved ? (
               <div>
                 <p className="positive">
                   Username iris.to/<b>{this.state.profile.name}</b> is reserved for you until
@@ -30,6 +30,9 @@ export default class IrisAccountSettings extends Component {
                 </p>
                 <p>
                   <Button onClick={() => this.enableReserved()}>Enable</Button>
+                </p>
+                <p>
+                  <Button onClick={() => this.declineReserved()}>Decline</Button>
                 </p>
               </div>
             ) : (
@@ -92,7 +95,36 @@ export default class IrisAccountSettings extends Component {
       body: JSON.stringify(event),
     });
     if (res.status === 200) {
-      this.setState({ confirmSuccess: true, confirmError: null, accountAvailable: false });
+      this.setState({ confirmSuccess: true, confirmError: null, accountReserved: false });
+    } else {
+      this.setState({ confirmError: JSON.stringify(res) });
+    }
+  }
+
+  async declineReserved() {
+    if (!confirm(`Are you sure you want to decline iris.to/${this.state.profile.name}?`)) {
+      return;
+    }
+    const pubkey = iris.session.getKey().secp256k1.rpub;
+    const event = {
+      content: `decline iris.to/${this.state.profile.name}`,
+      kind: 1,
+      tags: [],
+      pubkey,
+      created_at: Math.floor(Date.now() / 1000),
+    };
+    event.id = Nostr.getEventHash(event);
+    event.sig = await Nostr.sign(event);
+    // post signed event as request body to https://api.iris.to/user/confirm_user
+    const res = await fetch('https://api.iris.to/user/decline_user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(event),
+    });
+    if (res.status === 200) {
+      this.setState({ confirmSuccess: false, confirmError: null, accountReserved: false });
     } else {
       this.setState({ confirmError: JSON.stringify(res) });
     }
@@ -108,14 +140,14 @@ export default class IrisAccountSettings extends Component {
         console.log(profile, irisToActive);
         this.setState({ profile, irisToActive });
         if (!irisToActive && profile.name) {
-          this.checkAccountAvailable(profile.name, myPub);
+          this.checkAccountReserved(profile.name, myPub);
         }
       },
       true,
     );
   }
 
-  async checkAccountAvailable(name, pub) {
+  async checkAccountReserved(name, pub) {
     // make a get request to https://api.iris.to/user/username_confirmable?name=${name}&public_key=${pub}
     // if the response is 200, then the account is available
 
@@ -123,7 +155,7 @@ export default class IrisAccountSettings extends Component {
       `https://api.iris.to/user/username_confirmable?name=${name.toLowerCase()}&public_key=${pub}`,
     );
     if (res.status === 200) {
-      this.setState({ accountAvailable: true });
+      this.setState({ accountReserved: true });
     }
   }
 }
