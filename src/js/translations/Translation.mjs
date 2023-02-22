@@ -23,13 +23,13 @@ const AVAILABLE_LANGUAGES = {
   ur: 'اردو',
   pl: 'Polski',
   hu: 'Magyar',
-  sk: 'Slovenčina',
   nl: 'Nederlands',
   he: 'עברית',
   fi: 'Suomi',
   'cs-CZ': 'Čeština',
-  'bg': 'Български',
-  'lt': 'Lietuvių',
+  bg: 'Български',
+  sk: 'Slovenčina',
+  lt: 'Lietuvių',
 };
 
 let AVAILABLE_LANGUAGE_KEYS = Object.keys(AVAILABLE_LANGUAGES);

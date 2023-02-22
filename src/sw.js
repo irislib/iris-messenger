@@ -16,7 +16,7 @@ registerRoute(
   }),
 );
 registerRoute(
-  ({ url }) => url.pathname === '/',
+  ({ url }) => url.pathname === '/' || url.pathname.startsWith('/.well-known/nostr.json'),
   new NetworkFirst({
     networkTimeoutSeconds: 5,
   }),
@@ -37,7 +37,7 @@ registerRoute(
   }),
 );
 
-registerRoute(({ url }) => url.pathname.startsWith('https://api.iris.to/user/'), new NetworkOnly());
+registerRoute(({ url }) => url.href.startsWith('https://api.iris.to/user/'), new NetworkOnly());
 
 registerRoute(
   ({ url }) => url.href.startsWith('https://api.iris.to/'),
