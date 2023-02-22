@@ -35,7 +35,8 @@ export default class IrisAccountSettings extends Component {
       view = (
         <div>
           <p className="positive">
-            Username iris.to/<b>{this.state.existing.name}</b> is reserved for you until 5 March 2023!
+            Username iris.to/<b>{this.state.existing.name}</b> is reserved for you until 5 March
+            2023!
           </p>
           <p>
             <Button onClick={() => this.enableReserved()}>Yes please</Button>
@@ -55,7 +56,7 @@ export default class IrisAccountSettings extends Component {
           <div
             className="cf-turnstile"
             data-sitekey={
-              window.location.origin === 'iris.to'
+              window.location.host === 'iris.to'
                 ? '0x4AAAAAAACsEd8XuwpPTFwz'
                 : '3x00000000000000000000FF'
             }
@@ -189,7 +190,14 @@ export default class IrisAccountSettings extends Component {
       });
       delete window.cf_turnstile_callback;
     } else {
-      this.setState({ error: JSON.stringify(res) });
+      res
+        .json()
+        .then((json) => {
+          this.setState({ error: json.message || 'error' });
+        })
+        .catch(() => {
+          this.setState({ error: 'error' });
+        });
     }
   }
 
@@ -232,7 +240,14 @@ export default class IrisAccountSettings extends Component {
     if (res.status === 200) {
       this.setState({ error: null, existing: { confirmed: true, name: this.state.existing.name } });
     } else {
-      this.setState({ error: JSON.stringify(res) });
+      res
+        .json()
+        .then((json) => {
+          this.setState({ error: json.message || 'error' });
+        })
+        .catch(() => {
+          this.setState({ error: 'error' });
+        });
     }
   }
 
@@ -261,7 +276,14 @@ export default class IrisAccountSettings extends Component {
     if (res.status === 200) {
       this.setState({ confirmSuccess: false, error: null, existing: null });
     } else {
-      this.setState({ error: JSON.stringify(res) });
+      res
+        .json()
+        .then((json) => {
+          this.setState({ error: json.message || 'error' });
+        })
+        .catch(() => {
+          this.setState({ error: 'error' });
+        });
     }
   }
 
