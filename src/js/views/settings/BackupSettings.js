@@ -26,7 +26,7 @@ export default class BackupSettings extends Component {
         <div class="centered-container">
           <h2>{t('backup')}</h2>
           <h3>{t('save')}</h3>
-          <p>{t('save_profile_&_follows')}</p>
+          <p>{t('profile')} & {t('follows')}</p>
           <p>
             <Button onClick={() => this.onClickDownload()}>{t('download')}</Button>
             <CopyButton
