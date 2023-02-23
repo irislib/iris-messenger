@@ -2223,6 +2223,14 @@ form.public {
   flex: 1;
 }
 
+.msg-feed .tabs {
+  margin-bottom: 4px;
+}
+
+.msg-feed .tabs a {
+  background-color: var(--msg-content-background);
+}
+
 .feed-container > p button {
   margin-right: 5px;
   margin-bottom: 5px;

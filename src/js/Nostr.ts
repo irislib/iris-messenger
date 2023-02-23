@@ -167,7 +167,9 @@ const Nostr = {
   eventsById,
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  latestNotesAndRepliesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  latestNotesAndRepliesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByKeywords: new Map<string, SortedLimitedEventSet>(),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
@@ -346,7 +348,13 @@ const Nostr = {
       if (posts) {
         posts.eventIds.forEach((eventId) => {
           const event = this.eventsById.get(eventId);
-          event && this.latestNotesByFollows.add(event);
+          if (event) {
+            const replyingTo = this.getEventReplyingTo(event);
+            if (!replyingTo) {
+              this.latestNotesByFollows.add(event);
+            }
+            this.latestNotesAndRepliesByFollows.add(event);
+          }
         });
       }
     }
@@ -803,13 +811,21 @@ const Nostr = {
     this.postsAndRepliesByUser.get(event.pubkey)?.add(event);
 
     const replyingTo = this.getEventReplyingTo(event);
-    this.latestNotesByEveryone.add(event);
+    this.latestNotesAndRepliesByEveryone.add(event);
+    if (!replyingTo) {
+      this.latestNotesByEveryone.add(event);
+    }
     // we don't want both the reply and the original post in the feed:
     replyingTo && this.latestNotesByEveryone.delete(replyingTo);
     const myPub = iris.session.getKey().secp256k1.rpub;
     if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-      const changed = this.latestNotesByFollows.add(event);
+      const changed = this.latestNotesAndRepliesByFollows.add(event);
       // we don't want both the reply and the original post in the feed:
+      if (replyingTo) {
+        this.latestNotesAndRepliesByFollows.delete(replyingTo);
+      } else {
+        this.latestNotesByFollows.add(event);
+      }
       replyingTo && this.latestNotesByFollows.delete(replyingTo);
       if (changed && this.localStorageLoaded) {
         saveLocalStorageEvents(this);
@@ -1503,16 +1519,32 @@ const Nostr = {
     return relays.length ? relays[0].url : null;
   },
 
-  getMessagesByEveryone(cb: (messageIds: string[]) => void) {
+  getMessagesByEveryone(
+    cb: (messageIds: string[], includeReplies: boolean) => void,
+    includeReplies = false,
+  ) {
     const callback = () => {
-      cb(this.latestNotesByEveryone.eventIds);
+      cb(
+        includeReplies
+          ? this.latestNotesAndRepliesByEveryone.eventIds
+          : this.latestNotesByEveryone.eventIds,
+        includeReplies,
+      );
     };
     callback();
     this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
   },
-  getMessagesByFollows(cb: (messageIds: string[]) => void) {
+  getMessagesByFollows(
+    cb: (messageIds: string[], includeReplies: boolean) => void,
+    includeReplies = false,
+  ) {
     const callback = () => {
-      cb(this.latestNotesByFollows.eventIds);
+      cb(
+        includeReplies
+          ? this.latestNotesAndRepliesByFollows.eventIds
+          : this.latestNotesByFollows.eventIds,
+        includeReplies,
+      );
     };
     callback();
     this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);

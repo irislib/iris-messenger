@@ -26,6 +26,7 @@ class MessageFeed extends Component {
       queuedMessages: [],
       displayCount: INITIAL_PAGE_SIZE,
       messagesShownTime: Math.floor(Date.now() / 1000),
+      includeReplies: false,
     };
     this.mappedMessages = new Map();
   }
@@ -140,15 +141,27 @@ class MessageFeed extends Component {
       } else if (this.props.index) {
         // public messages
         if (this.props.index === 'everyone') {
-          Nostr.getMessagesByEveryone((messages) => this.updateSortedMessages(messages));
+          this.getMessagesByEveryone(this.state.includeReplies);
         } else if (this.props.index === 'notifications') {
           console.log('getMessagesByNotifications');
           Nostr.getNotifications((messages) => this.updateSortedMessages(messages));
-        } else {
-          Nostr.getMessagesByFollows((messages) => this.updateSortedMessages(messages));
+        } else if (this.props.index === 'follows') {
+          this.getMessagesByFollows(this.state.includeReplies);
         }
       }
     }
+  }
+
+  getMessagesByEveryone(includeReplies) {
+    Nostr.getMessagesByEveryone((messages, cbIncludeReplies) => {
+      this.state.includeReplies === cbIncludeReplies && this.updateSortedMessages(messages);
+    }, includeReplies);
+  }
+
+  getMessagesByFollows(includeReplies) {
+    Nostr.getMessagesByFollows((messages, cbIncludeReplies) => {
+      this.state.includeReplies === cbIncludeReplies && this.updateSortedMessages(messages);
+    }, includeReplies);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -200,7 +213,7 @@ class MessageFeed extends Component {
       }[this.props.index];
 
     return (
-      <>
+      <div className="msg-feed">
         <div>
           {this.state.queuedMessages.length ? (
             <div
@@ -214,11 +227,47 @@ class MessageFeed extends Component {
           ) : null}
           {feedName ? (
             <div className="msg">
-              <div className="msg-content notification-msg">
-                {t(feedName)}
-              </div>
+              <div className="msg-content notification-msg">{t(feedName)}</div>
             </div>
           ) : null}
+          {['everyone', 'follows'].includes(this.props.index) ? (
+            <div className="tabs">
+              <a
+                onClick={() => {
+                  if (this.state.includeReplies) {
+                    this.setState({ includeReplies: false });
+                    if (this.props.index === 'everyone') {
+                      this.getMessagesByEveryone(false);
+                      this.showQueuedMessages();
+                    } else if (this.props.index === 'follows') {
+                      this.getMessagesByFollows(false);
+                      this.showQueuedMessages();
+                    }
+                  }
+                }}
+                className={this.state.includeReplies ? '' : 'active'}
+              >
+                {t('posts')}
+              </a>
+              <a
+                className={this.state.includeReplies ? 'active' : ''}
+                onClick={() => {
+                  if (!this.state.includeReplies) {
+                    this.setState({ includeReplies: true });
+                    if (this.props.index === 'everyone') {
+                      this.getMessagesByEveryone(true);
+                    } else if (this.props.index === 'follows') {
+                      this.getMessagesByFollows(true);
+                    }
+                  }
+                }}
+              >
+                {t('posts')} & {t('replies')}
+              </a>
+            </div>
+          ) : (
+            ''
+          )}
           {this.state.sortedMessages.slice(0, displayCount).map((hash) => (
             <PublicMessage key={hash} hash={hash} showName={true} showRepliedMsg={showRepliedMsg} />
           ))}
@@ -238,7 +287,7 @@ class MessageFeed extends Component {
         ) : (
           ''
         )}
-      </>
+      </div>
     );
   }
 }
