@@ -281,7 +281,7 @@ class Profile extends View {
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
         <${Link} activeClassName="active" href="/replies/${this.state.npub}"
-          >${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
+          >${t('posts')} & ${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
         <${Link} activeClassName="active" href="/likes/${this.state.npub}"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
