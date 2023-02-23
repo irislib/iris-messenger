@@ -135,16 +135,12 @@ class Profile extends View {
         width="250"
       />`;
     }
-    let rawDataJson = JSON.stringify(
-      Nostr.profileEventByUser.get(this.state.hexPub) || 'no profile :D',
-      null,
-      2,
-    );
-    rawDataJson = `${rawDataJson}\n\n${JSON.stringify(
-      Nostr.followEventByUser.get(this.state.hexPub) || 'no contacts :D',
-      null,
-      2,
-    )}`;
+    let rawDataJson = [];
+    const profileEvent = Nostr.profileEventByUser.get(this.state.hexPub);
+    const followEvent = Nostr.followEventByUser.get(this.state.hexPub);
+    profileEvent && rawDataJson.push(profileEvent);
+    followEvent && rawDataJson.push(followEvent);
+    rawDataJson = JSON.stringify(rawDataJson, null, 2);
     return html`
       <div class="profile-top" key="${this.state.hexPub}details">
         <div class="profile-header">

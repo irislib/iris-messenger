@@ -13,6 +13,7 @@ const SETTINGS = {
   appearance: 'appearance',
   media: 'media',
   network: 'network',
+  backup: 'backup',
   language: 'language',
   blocked_users: 'blocked_users',
 };
