@@ -1,5 +1,6 @@
 import iris from 'iris-lib';
 import { debounce } from 'lodash';
+import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
@@ -19,7 +20,19 @@ export default class IrisAccountSettings extends Component {
         </p>
         <p>
           Short link:{' '}
-          {link ? <a href={`https://iris.to/${name}`}>iris.to/{name}</a> : <>iris.to/{name}</>}
+          {link ? (
+            <a
+              href={`https://iris.to/${name}`}
+              onClick={(e) => {
+                e.preventDefault();
+                route(`/${name}`);
+              }}
+            >
+              iris.to/{name}
+            </a>
+          ) : (
+            <>iris.to/{name}</>
+          )}
         </p>
         <p>
           Nostr address: <b>{name}@iris.to</b>
@@ -33,8 +46,7 @@ export default class IrisAccountSettings extends Component {
 
     if (this.state.irisToActive) {
       const username = this.state.profile.nip05.split('@')[0];
-      const link = `https://iris.to/${username}`;
-      view = <a href={link}>iris.to/{username}</a>;
+      view = this.renderAccountName(username);
     } else if (this.state.existing && this.state.existing.confirmed) {
       view = (
         <div>
@@ -43,9 +55,7 @@ export default class IrisAccountSettings extends Component {
             {this.renderAccountName(this.state.existing.name)}
           </div>
           <p>
-            <Button onClick={() => this.setAsPrimary()}>
-              Set as primary Nostr address
-            </Button>
+            <Button onClick={() => this.setAsPrimary()}>Set as primary Nostr address</Button>
           </p>
         </div>
       );
