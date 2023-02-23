@@ -29,8 +29,6 @@ export default class BackupSettings extends Component {
           <p>{t('save_profile_&_follows')}</p>
           <p>
             <Button onClick={() => this.onClickDownload()}>{t('download')}</Button>
-          </p>
-          <p>
             <CopyButton
               key={`${this.state.hexPub}copyData`}
               text={t('copy_raw_data')}
@@ -52,7 +50,7 @@ export default class BackupSettings extends Component {
           {this.state.error && <p class="warning">{this.state.error}</p>}
           {this.state.importedEvents && (
             <p class="positive">
-              {t('imported_{n}_events').replace('{n}', this.state.importedEvents)}
+              {t('loaded_and_published_{n}_events').replace('{n}', this.state.importedEvents)}
             </p>
           )}
           {this.state.restoredFollows && (
