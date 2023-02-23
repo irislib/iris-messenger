@@ -109,6 +109,9 @@ export default class BackupSettings extends Component {
         json = [json];
       }
       for (const event of json) {
+        if (!event.sig) {
+          continue; // we don't want to sign & publish unsigned events
+        }
         Nostr.publish(event);
         const myPub = iris.session.getKey().secp256k1.rpub;
         // even if it's an old contacts event by us, restore follows from it
