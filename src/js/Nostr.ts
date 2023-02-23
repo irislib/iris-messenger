@@ -14,10 +14,24 @@ import {
 } from './lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import { sha256 } from '@noble/hashes/sha256';
+import Dexie, { Table } from 'dexie';
 import localForage from 'localforage';
 import { route } from 'preact-router';
 
 import SortedLimitedEventSet from './SortedLimitedEventSet';
+
+export class MyDexie extends Dexie {
+  events!: Table<Event>;
+
+  constructor() {
+    super('iris');
+    this.version(1).stores({
+      events: 'id, pubkey, kind', // Primary key and indexed props
+    });
+  }
+}
+
+const db = new MyDexie();
 
 const startTime = Date.now() / 1000;
 
@@ -1140,7 +1154,7 @@ const Nostr = {
       return false;
     }
   },
-  handleEvent(event: Event, force = false) {
+  handleEvent(event: Event, force = false, saveToIdb = true) {
     if (!event) return;
     if (this.eventsById.has(event.id) && !force) {
       return;
@@ -1232,6 +1246,11 @@ const Nostr = {
       if (this.matchesOneFilter(event, sub.filters)) {
         sub.callback && sub.callback(event);
       }
+    }
+    if (saveToIdb) {
+      db.events.add(event).catch(() => {
+        // ignore
+      });
     }
   },
   handleNextFutureEvent() {
@@ -1330,6 +1349,33 @@ const Nostr = {
       }
     });
   },
+  getPubKey() {
+    return iris.session.getKey()?.secp256k1?.rpub; // TODO use this everywhere :D
+  },
+  loadIDBEvents() {
+    let i = 0;
+    const myPub = this.getPubKey();
+    db.events.where({ pubkey: myPub }).each((event) => {
+      this.handleEvent(event, false, false);
+      console.log('loaded idb event', i++);
+    });
+    const follows: string[] = Array.from(this.followedByUser.get(myPub) || []);
+    db.events
+      .where('pubkey')
+      .anyOf(follows)
+      .each((event) => {
+        this.handleEvent(event, false, false);
+        console.log('loaded idb event', i++);
+      });
+    // all other events
+    db.events
+      .where('pubkey')
+      .noneOf([myPub, ...follows])
+      .each((event) => {
+        this.handleEvent(event, false, false);
+        console.log('loaded idb event', i++);
+      });
+  },
   onLoggedIn() {
     const key = iris.session.getKey();
     const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
@@ -1382,6 +1428,7 @@ const Nostr = {
     this.knownUsers.add(myPub);
     this.manageRelays();
     this.loadLocalStorageEvents();
+    this.loadIDBEvents();
     this.getProfile(key.secp256k1.rpub, undefined);
     for (const suggestion of this.SUGGESTED_FOLLOWS) {
       const hex = this.toNostrHexAddress(suggestion);
