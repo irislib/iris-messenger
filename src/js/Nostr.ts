@@ -47,7 +47,7 @@ const saveLocalStorageEvents = debounce((_this: any) => {
   const latestMsgs = _this.latestNotesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
     return _this.eventsById.get(eventId);
   });
-  const latestMsgsByEveryone = _this.latestNotesByEveryone.eventIds
+  const latestMsgsByEveryone = _this.latestNotesAndRepliesByEveryone.eventIds
     .slice(0, 1000)
     .map((eventId: any) => {
       return _this.eventsById.get(eventId);

@@ -82,7 +82,7 @@ class About extends Component {
               <FollowButton id={DEVELOPER} />
             </div>
 
-            <h3>Contact</h3>
+            <h3>Info</h3>
             <div class="profile-link-container">
               <a href={`/${IRIS_INFO_ACCOUNT}`} className="profile-link">
                 <Identicon str={IRIS_INFO_ACCOUNT} width={40} />
