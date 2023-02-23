@@ -3,7 +3,7 @@ import { BackgroundSyncPlugin } from 'workbox-background-sync';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { registerRoute } from 'workbox-routing';
-import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies';
+import { CacheFirst, NetworkFirst, NetworkOnly, StaleWhileRevalidate } from 'workbox-strategies';
 
 const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
   maxRetentionTime: 14 * 24 * 60,
@@ -16,9 +16,16 @@ registerRoute(
   }),
 );
 registerRoute(
+  ({ url }) => url.pathname === '/',
+  new StaleWhileRevalidate({
+    cacheName: 'iris-main',
+  }),
+);
+registerRoute(
   ({ url }) => url.pathname === '/' || url.pathname.startsWith('/.well-known/nostr.json'),
   new NetworkFirst({
     networkTimeoutSeconds: 5,
+    cacheName: 'iris-network-first',
   }),
 );
 registerRoute(
