@@ -115,7 +115,7 @@ export default class IrisAccountSettings extends Component {
     return (
       <>
         <div class="centered-container">
-          <h3>Iris account</h3>
+          <h3>Iris.to account</h3>
           {view}
           <p>
             <a href="https://github.com/irislib/faq#iris-username">FAQ</a>

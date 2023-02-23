@@ -9,6 +9,7 @@ import { translate as t } from '../../translations/Translation';
 
 const SETTINGS = {
   account: 'account',
+  iris_account: 'iris.to',
   appearance: 'appearance',
   media: 'media',
   network: 'network',
