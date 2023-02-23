@@ -277,13 +277,17 @@ class Profile extends View {
   renderTabs() {
     return html`
       <div class="tabs">
-        <${Link} activeClassName="active" href="/${this.state.npub}"
+        <${Link} activeClassName="active" href="/${this.state.nostrAddress || this.state.npub}"
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
-        <${Link} activeClassName="active" href="/replies/${this.state.npub}"
+        <${Link}
+          activeClassName="active"
+          href="/replies/${this.state.nostrAddress || this.state.npub}"
           >${t('posts')} & ${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
-        <${Link} activeClassName="active" href="/likes/${this.state.npub}"
+        <${Link}
+          activeClassName="active"
+          href="/likes/${this.state.nostrAddress || this.state.npub}"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
         >
       </div>
@@ -383,7 +387,7 @@ class Profile extends View {
     `;
   }
 
-  getNostrProfile(address) {
+  getNostrProfile(address, nostrAddress) {
     Nostr.sendSubToRelays([{ authors: [address] }], address, true, 15 * 1000);
     const setFollowCounts = () => {
       address &&
@@ -400,7 +404,8 @@ class Profile extends View {
         if (!profile) {
           return;
         }
-        if (profile.nip05 && profile.nip05valid) {
+        const isIrisAddress = nostrAddress && nostrAddress.endsWith('@iris.to');
+        if (!isIrisAddress && profile.nip05 && profile.nip05valid) {
           // replace url and history entry with iris.to/${profile.nip05} or if nip is user@iris.to, just iris.to/${user}
           // TODO don't replace if at /likes or /replies
           const nip05 = profile.nip05;
@@ -462,13 +467,13 @@ class Profile extends View {
     );
   }
 
-  loadProfile(hexPub) {
+  loadProfile(hexPub, nostrAddress) {
     const isMyProfile = hexPub === iris.session.getKey().secp256k1.rpub;
     this.setState({ isMyProfile });
     this.followedUsers = new Set();
     this.followers = new Set();
     iris.local().get('noFollowers').on(this.inject());
-    this.getNostrProfile(hexPub);
+    this.getNostrProfile(hexPub, nostrAddress);
     Nostr.getBlockedUsers((blockedUsers) => {
       this.setState({ blocked: blockedUsers.has(hexPub) });
     });
@@ -494,21 +499,21 @@ class Profile extends View {
     const hexPub = Nostr.toNostrHexAddress(pub);
     if (!hexPub) {
       // id is not a nostr address, but maybe it's a username
-      let username = pub;
-      if (!username.match(/.+@.+\..+/)) {
+      let nostrAddress = pub;
+      if (!nostrAddress.match(/.+@.+\..+/)) {
         // domain name?
-        if (username.match(/.+\..+/)) {
-          username = '_@' + username;
+        if (nostrAddress.match(/.+\..+/)) {
+          nostrAddress = '_@' + nostrAddress;
         } else {
-          username = username + '@iris.to';
+          nostrAddress = nostrAddress + '@iris.to';
         }
       }
-      Nostr.getPubKeyByNip05Address(username).then((pubKey) => {
+      Nostr.getPubKeyByNip05Address(nostrAddress).then((pubKey) => {
         if (pubKey) {
           const npub = Nostr.toNostrBech32Address(pubKey, 'npub');
           if (npub && npub !== pubKey) {
-            this.setState({ npub, hexPub: pubKey });
-            this.loadProfile(pubKey);
+            this.setState({ npub, hexPub: pubKey, nostrAddress });
+            this.loadProfile(pubKey, nostrAddress);
           }
         } else {
           this.setState({ notFound: true });
