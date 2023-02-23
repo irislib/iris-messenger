@@ -55,7 +55,7 @@ export default class IrisAccountSettings extends Component {
             {this.renderAccountName(this.state.existing.name)}
           </div>
           <p>
-            <Button onClick={() => this.setAsPrimary()}>Set as primary Nostr address</Button>
+            <Button onClick={() => this.setAsPrimary()}>Set as primary Nostr address (nip05)</Button>
           </p>
         </div>
       );
