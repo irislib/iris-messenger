@@ -1357,7 +1357,7 @@ const Nostr = {
     const myPub = this.getPubKey();
     db.events.where({ pubkey: myPub }).each((event) => {
       this.handleEvent(event, false, false);
-      console.log('loaded idb event', i++);
+      i++;
     });
     const follows: string[] = Array.from(this.followedByUser.get(myPub) || []);
     db.events
@@ -1365,16 +1365,27 @@ const Nostr = {
       .anyOf(follows)
       .each((event) => {
         this.handleEvent(event, false, false);
-        console.log('loaded idb event', i++);
+        i++;
       });
-    // all other events
+    // other follow events
     db.events
       .where('pubkey')
       .noneOf([myPub, ...follows])
+      .and((event) => event.kind === 3)
       .each((event) => {
         this.handleEvent(event, false, false);
-        console.log('loaded idb event', i++);
+        i++;
       });
+    // other events
+    db.events
+      .where('pubkey')
+      .noneOf([myPub, ...follows])
+      .and((event) => event.kind !== 3)
+      .each((event) => {
+        this.handleEvent(event, false, false);
+        i++;
+      });
+    console.log('loaded', i, 'events from idb');
   },
   onLoggedIn() {
     const key = iris.session.getKey();
