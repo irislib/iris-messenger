@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import Helpers from '../Helpers';
 import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 
 import Badge from './Badge';
 
@@ -17,8 +18,8 @@ const Name = (props: Props) => {
   let initialName = '';
   let initialDisplayName;
   let isGenerated = false;
-  const profileEvent = Nostr.profileEventByUser.get(nostrAddr);
-  // should we change Nostr.getProfile() and use it here?
+  const profileEvent = SocialNetwork.profileEventByUser.get(nostrAddr);
+  // should we change SocialNetwork.getProfile() and use it here?
   if (profileEvent) {
     try {
       const profile = JSON.parse(profileEvent.content);
@@ -39,7 +40,7 @@ const Name = (props: Props) => {
   useEffect(() => {
     if (nostrAddr) {
       // TODO unsub
-      Nostr.getProfile(nostrAddr, (profile) => {
+      SocialNetwork.getProfile(nostrAddr, (profile) => {
         if (profile) {
           setName(profile.name?.trim().slice(0, 100) || '');
           setDisplayName(profile.display_name?.trim().slice(0, 100) || '');

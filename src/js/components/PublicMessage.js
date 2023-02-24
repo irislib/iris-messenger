@@ -7,6 +7,7 @@ import { route } from 'preact-router';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
 import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 import BlockButton from './BlockButton';
@@ -64,7 +65,7 @@ class PublicMessage extends Message {
         if (thisArg.state.retrieving) {
           thisArg.setState({ retrieving: false });
         }
-        Nostr.getProfile(event.pubkey, (profile) => {
+        SocialNetwork.getProfile(event.pubkey, (profile) => {
           if (!profile) return;
           if (!thisArg.unmounted) {
             let lightning = profile.lud16 || profile.lud06;
@@ -518,7 +519,7 @@ class PublicMessage extends Message {
       </div>`;
     }
 
-    if (Nostr.blockedUsers.has(this.state.msg.event.pubkey)) {
+    if (SocialNetwork.blockedUsers.has(this.state.msg.event.pubkey)) {
       if (this.props.standalone || this.props.asQuote) {
         return html`
           <div class="msg">

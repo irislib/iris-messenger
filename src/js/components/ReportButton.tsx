@@ -23,7 +23,7 @@ class ReportButton extends BlockButton {
   }
 
   componentDidMount() {
-    Nostr.getFlaggedUsers((flags) => {
+    SocialNetwork.getFlaggedUsers((flags) => {
       const reported = flags?.has(Nostr.toNostrHexAddress(this.props.id));
       this.setState({ reported });
     });

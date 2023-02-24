@@ -3,6 +3,7 @@ import iris from 'iris-lib';
 import Component from '../../BaseComponent';
 import Name from '../../components/Name';
 import Nostr from '../../nostr/Nostr';
+import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 
 export default class BlockedSettings extends Component {
@@ -39,7 +40,7 @@ export default class BlockedSettings extends Component {
     );
   }
   componentDidMount() {
-    Nostr.getBlockedUsers((blockedUsers) => {
+    SocialNetwork.getBlockedUsers((blockedUsers) => {
       this.setState({ blockedUsers });
     });
   }

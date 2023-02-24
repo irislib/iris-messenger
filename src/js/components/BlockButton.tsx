@@ -1,5 +1,6 @@
 import Component from '../BaseComponent';
 import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 import Button from './basic/Button';
@@ -35,7 +36,7 @@ class BlockButton extends Component<Props> {
   }
 
   componentDidMount() {
-    Nostr.getBlockedUsers((blocks) => {
+    SocialNetwork.getBlockedUsers((blocks) => {
       const blocked = blocks?.has(Nostr.toNostrHexAddress(this.props.id));
       this.setState({ blocked });
     });

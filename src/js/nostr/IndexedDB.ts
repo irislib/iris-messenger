@@ -3,6 +3,7 @@ import Dexie, { Table } from 'dexie';
 import { Event } from '../lib/nostr-tools';
 
 import Nostr from './Nostr';
+import SocialNetwork from './SocialNetwork';
 export class MyDexie extends Dexie {
   events!: Table<Event>;
 
@@ -33,7 +34,7 @@ export default {
     db.events.where({ pubkey: myPub }).each((event) => {
       Nostr.handleEvent(event, false, false);
     });
-    const follows: string[] = Array.from(Nostr.followedByUser.get(myPub) || []);
+    const follows: string[] = Array.from(SocialNetwork.followedByUser.get(myPub) || []);
     db.events
       .where('pubkey')
       .anyOf(follows)

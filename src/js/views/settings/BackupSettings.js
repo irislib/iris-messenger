@@ -6,14 +6,15 @@ import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
 import IndexedDB from '../../nostr/IndexedDB';
 import Nostr from '../../nostr/Nostr';
+import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 
 export default class BackupSettings extends Component {
   profileExportJson() {
     const myPub = Nostr.getPubKey();
     let rawDataJson = [];
-    const profileEvent = Nostr.profileEventByUser.get(myPub);
-    const followEvent = Nostr.followEventByUser.get(myPub);
+    const profileEvent = SocialNetwork.profileEventByUser.get(myPub);
+    const followEvent = SocialNetwork.followEventByUser.get(myPub);
     profileEvent && rawDataJson.push(profileEvent);
     followEvent && rawDataJson.push(followEvent);
     rawDataJson = JSON.stringify(rawDataJson, null, 2);
@@ -161,11 +162,11 @@ export default class BackupSettings extends Component {
         // even if it's an old contacts event by us, restore follows from it
         if (event.pubkey === myPub && event.kind === 3) {
           const followed = event.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
-          const currentFollows = (Nostr.followEventByUser.get(myPub)?.tags || [])
+          const currentFollows = (SocialNetwork.followEventByUser.get(myPub)?.tags || [])
             .filter((t) => t[0] === 'p')
             .map((t) => t[1]);
           const restoredFollows = followed.filter((f) => !currentFollows.includes(f));
-          Nostr.setFollowed(restoredFollows);
+          SocialNetwork.setFollowed(restoredFollows);
           this.setState({ restoredFollows });
         }
       }

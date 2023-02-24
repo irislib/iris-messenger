@@ -5,6 +5,7 @@ import { route } from 'preact-router';
 import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
 import Nostr from '../../nostr/Nostr';
+import SocialNetwork from "../../nostr/SocialNetwork";
 
 export default class IrisAccountSettings extends Component {
   state = {
@@ -241,7 +242,7 @@ export default class IrisAccountSettings extends Component {
     const timeout = setTimeout(() => {
       Nostr.setMetadata({ nip05: newNip });
     }, 2000);
-    Nostr.getProfile(Nostr.getPubKey(), (p) => {
+    SocialNetwork.getProfile(Nostr.getPubKey(), (p) => {
       if (p) {
         clearTimeout(timeout);
         if (p.nip05 !== newNip) {
@@ -324,7 +325,7 @@ export default class IrisAccountSettings extends Component {
 
   componentDidMount() {
     const myPub = Nostr.getPubKey();
-    Nostr.getProfile(
+    SocialNetwork.getProfile(
       myPub,
       (profile) => {
         const irisToActive =

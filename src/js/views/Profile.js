@@ -20,6 +20,7 @@ import ReportButton from '../components/ReportButton';
 import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
 import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -136,8 +137,8 @@ class Profile extends View {
       />`;
     }
     let rawDataJson = [];
-    const profileEvent = Nostr.profileEventByUser.get(this.state.hexPub);
-    const followEvent = Nostr.followEventByUser.get(this.state.hexPub);
+    const profileEvent = SocialNetwork.profileEventByUser.get(this.state.hexPub);
+    const followEvent = SocialNetwork.followEventByUser.get(this.state.hexPub);
     profileEvent && rawDataJson.push(profileEvent);
     followEvent && rawDataJson.push(followEvent);
     rawDataJson = JSON.stringify(rawDataJson, null, 2);
@@ -217,7 +218,7 @@ class Profile extends View {
                   <span>${this.state.followerCount}</span> ${t('followers')}
                 </a>
               </div>
-              ${Nostr.followedByUser.get(this.state.hexPub)?.has(Nostr.getPubKey())
+              ${SocialNetwork.followedByUser.get(this.state.hexPub)?.has(Nostr.getPubKey())
                 ? html` <p><small>${t('follows_you')}</small></p> `
                 : ''}
               <div class="hidden-xs">
@@ -386,13 +387,13 @@ class Profile extends View {
     const setFollowCounts = () => {
       address &&
         this.setState({
-          followedUserCount: Nostr.followedByUser.get(address)?.size ?? 0,
-          followerCount: Nostr.followersByUser.get(address)?.size ?? 0,
+          followedUserCount: SocialNetwork.followedByUser.get(address)?.size ?? 0,
+          followerCount: SocialNetwork.followersByUser.get(address)?.size ?? 0,
         });
     };
-    Nostr.getFollowersByUser(address, setFollowCounts);
-    Nostr.getFollowedByUser(address, setFollowCounts);
-    Nostr.getProfile(
+    SocialNetwork.getFollowersByUser(address, setFollowCounts);
+    SocialNetwork.getFollowedByUser(address, setFollowCounts);
+    SocialNetwork.getProfile(
       address,
       (profile) => {
         if (!profile) {
@@ -468,7 +469,7 @@ class Profile extends View {
     this.followers = new Set();
     iris.local().get('noFollowers').on(this.inject());
     this.getNostrProfile(hexPub, nostrAddress);
-    Nostr.getBlockedUsers((blockedUsers) => {
+    SocialNetwork.getBlockedUsers((blockedUsers) => {
       this.setState({ blocked: blockedUsers.has(hexPub) });
     });
   }

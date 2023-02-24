@@ -1,5 +1,6 @@
 import Icons from '../Icons';
 import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 export default function Badge(props) {
@@ -16,7 +17,7 @@ export default function Badge(props) {
   if (!hexAddress) {
     return null;
   }
-  const following = Nostr.followedByUser.get(myPub)?.has(hexAddress);
+  const following = SocialNetwork.followedByUser.get(myPub)?.has(hexAddress);
   if (following) {
     return (
       <span class="badge first tooltip">
@@ -25,7 +26,7 @@ export default function Badge(props) {
       </span>
     );
   } else {
-    const count = Nostr.followedByFriendsCount(hexAddress);
+    const count = SocialNetwork.followedByFriendsCount(hexAddress);
     if (count > 0) {
       const className = count > 10 ? 'second' : 'third';
       return (

@@ -2,6 +2,7 @@ import iris from 'iris-lib';
 
 import Component from '../BaseComponent';
 import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 import Button from './basic/Button';
@@ -31,17 +32,17 @@ class FollowButton extends Component<Props> {
     e.preventDefault();
     const newValue = !this.state[this.key];
     if (this.key === 'follow') {
-      Nostr.setFollowed(Nostr.toNostrHexAddress(this.props.id), newValue);
+      SocialNetwork.setFollowed(Nostr.toNostrHexAddress(this.props.id), newValue);
       return;
     }
     if (this.key === 'block') {
-      Nostr.setBlocked(Nostr.toNostrHexAddress(this.props.id), newValue);
+      SocialNetwork.setBlocked(Nostr.toNostrHexAddress(this.props.id), newValue);
     }
   }
 
   componentDidMount() {
     if (this.key === 'follow') {
-      Nostr.getFollowedByUser(Nostr.getPubKey(), (follows) => {
+      SocialNetwork.getFollowedByUser(Nostr.getPubKey(), (follows) => {
         const follow = follows?.has(Nostr.toNostrHexAddress(this.props.id));
         this.setState({ follow });
       });

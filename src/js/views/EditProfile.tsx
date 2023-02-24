@@ -6,6 +6,7 @@ import UploadButton from '../components/basic/UploadButton';
 import Header from '../components/Header';
 import SafeImg from '../components/SafeImg';
 import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 const explainers = {
@@ -29,7 +30,7 @@ export default class EditProfile extends Component {
   }
 
   componentDidMount() {
-    Nostr.getProfile(Nostr.getPubKey(), (p) => {
+    SocialNetwork.getProfile(Nostr.getPubKey(), (p) => {
       if (!this.state.edited && Object.keys(this.state.profile).length === 0) {
         delete p['created_at'];
         this.setState({

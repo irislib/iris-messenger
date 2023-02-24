@@ -7,6 +7,7 @@ import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -22,8 +23,8 @@ class Follows extends View {
   updateSortedFollows = throttle(
     () => {
       const follows = Array.from(this.follows).sort((aK, bK) => {
-        const aName = Nostr.profiles.get(aK)?.name;
-        const bName = Nostr.profiles.get(bK)?.name;
+        const aName = SocialNetwork.profiles.get(aK)?.name;
+        const bName = SocialNetwork.profiles.get(bK)?.name;
         if (!aName && !bName) {
           return aK.localeCompare(bK);
         }
@@ -42,7 +43,7 @@ class Follows extends View {
   );
 
   getFollows() {
-    Nostr.getFollowedByUser(Nostr.toNostrHexAddress(this.props.id), (follows) => {
+    SocialNetwork.getFollowedByUser(Nostr.toNostrHexAddress(this.props.id), (follows) => {
       this.follows = follows; // TODO buggy?
       this.updateSortedFollows();
     });
@@ -53,7 +54,7 @@ class Follows extends View {
   }
 
   getFollowers() {
-    Nostr.getFollowersByUser(Nostr.toNostrHexAddress(this.props.id), (follows) => {
+    SocialNetwork.getFollowersByUser(Nostr.toNostrHexAddress(this.props.id), (follows) => {
       this.follows = follows;
       this.updateSortedFollows();
     });
@@ -69,7 +70,7 @@ class Follows extends View {
 
   followAll() {
     confirm(`${t('follow_all')} (${this.state.follows.length})?`) &&
-      Nostr.setFollowed(this.state.follows);
+      SocialNetwork.setFollowed(this.state.follows);
   }
 
   renderView() {
@@ -100,7 +101,7 @@ class Follows extends View {
                 <div>
                   <${Name} pub=${npub} /><br />
                   <small class="follower-count">
-                    ${Nostr.followersByUser.get(hexKey)?.size || 0}<i> </i> followers
+                    ${SocialNetwork.followersByUser.get(hexKey)?.size || 0}<i> </i> followers
                   </small>
                 </div>
               </a>

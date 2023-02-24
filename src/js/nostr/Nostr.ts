@@ -16,11 +16,11 @@ import { sha256 } from '@noble/hashes/sha256';
 import localForage from 'localforage';
 import { route } from 'preact-router';
 
-import SortedLimitedEventSet from './SortedLimitedEventSet';
-
 import IndexedDB from './IndexedDB';
 import LocalForage from './LocalForage';
 import Relays from './Relays';
+import SocialNetwork from './SocialNetwork';
+import SortedLimitedEventSet from './SortedLimitedEventSet';
 
 const startTime = Date.now() / 1000;
 
@@ -51,12 +51,6 @@ type Subscription = {
 let subscriptionId = 0;
 
 const Nostr = {
-  profiles: new Map<string, any>(),
-  followedByUser: new Map<string, Set<string>>(),
-  followersByUser: new Map<string, Set<string>>(),
-  knownUsers: new Set<string>(),
-  blockedUsers: new Set<string>(),
-  flaggedUsers: new Set<string>(),
   deletedEvents: new Set<string>(),
   directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
@@ -77,8 +71,6 @@ const Nostr = {
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesAndRepliesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByKeywords: new Map<string, SortedLimitedEventSet>(),
-  profileEventByUser: new Map<string, Event>(),
-  followEventByUser: new Map<string, Event>(),
   keyValueEvents: new Map<string, Event>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
   directRepliesByMessageId: new Map<string, Set<string>>(),
@@ -123,46 +115,6 @@ const Nostr = {
       console.error(e);
     }
   },
-  setFollowed: function (followedUsers: string | string[], follow = true) {
-    if (typeof followedUsers === 'string') {
-      followedUsers = [followedUsers];
-    }
-    const myPub = this.getPubKey();
-    followedUsers.forEach((followedUser) => {
-      followedUser = this.toNostrHexAddress(followedUser);
-      if (follow && followedUser && followedUser !== myPub) {
-        this.addFollower(followedUser, myPub);
-      } else {
-        this.removeFollower(followedUser, myPub);
-      }
-    });
-
-    const existing = this.followEventByUser.get(myPub);
-
-    const event = {
-      kind: 3,
-      content: existing?.content || '',
-      tags: Array.from(this.followedByUser.get(myPub)).map((address: string) => {
-        return ['p', address];
-      }),
-    };
-
-    this.publish(event);
-    this.subscribeToAuthors(this);
-  },
-
-  setBlocked: function (blockedUser: string, block = true) {
-    blockedUser = this.toNostrHexAddress(blockedUser);
-    const myPub = this.getPubKey();
-
-    if (block) {
-      this.blockedUsers.add(blockedUser);
-      this.removeFollower(blockedUser, myPub);
-      this.directMessagesByUser.delete(blockedUser);
-    } else {
-      this.blockedUsers.delete(blockedUser);
-    }
-  },
   getSubscriptionIdForName(name: string) {
     return this.arrayToHex(sha256(name)).slice(0, 8);
   },
@@ -175,92 +127,6 @@ const Nostr = {
       }
       this.subscriptionsByName.get(name)?.add(sub);
     }
-  },
-  addFollower: function (followedUser: string, follower: string) {
-    if (!this.followersByUser.has(followedUser)) {
-      this.followersByUser.set(followedUser, new Set<string>());
-    }
-    this.knownUsers.add(followedUser);
-    this.knownUsers.add(follower);
-    this.followersByUser.get(followedUser)?.add(follower);
-
-    if (!this.followedByUser.has(follower)) {
-      this.followedByUser.set(follower, new Set<string>());
-    }
-    const myPub = this.getPubKey();
-
-    // if new follow, move all their posts to followedByUser
-    if (follower === myPub && !this.followedByUser.get(myPub).has(followedUser)) {
-      const posts = this.postsByUser.get(followedUser);
-      if (posts) {
-        posts.eventIds.forEach((eventId) => {
-          const event = this.eventsById.get(eventId);
-          if (event) {
-            const replyingTo = this.getEventReplyingTo(event);
-            if (!replyingTo) {
-              this.latestNotesByFollows.add(event);
-            }
-            this.latestNotesAndRepliesByFollows.add(event);
-          }
-        });
-      }
-    }
-    this.followedByUser.get(follower)?.add(followedUser);
-    if (follower === myPub) {
-      this.getPostsAndRepliesByUser(followedUser);
-    }
-    if (followedUser === myPub) {
-      if (this.followersByUser.get(followedUser)?.size === 1) {
-        iris.local().get('hasNostrFollowers').put(true);
-      }
-    }
-    if (this.followedByUser.get(myPub)?.has(follower)) {
-      if (!this.subscribedUsers.has(followedUser)) {
-        this.subscribedUsers.add(followedUser); // subscribe to events from 2nd degree follows
-        this.subscribeToAuthors(this);
-      }
-    }
-  },
-  removeFollower: function (unfollowedUser: string, follower: string) {
-    this.followersByUser.get(unfollowedUser)?.delete(follower);
-    this.followedByUser.get(follower)?.delete(unfollowedUser);
-    const blocked = this.blockedUsers.has(unfollowedUser);
-    this.latestNotesByFollows.eventIds.forEach((id) => {
-      const fullEvent = this.eventsById.get(id);
-      if (fullEvent?.pubkey === unfollowedUser) {
-        this.latestNotesByFollows.delete(id);
-        // if blocked user is in a p tag, remove the note
-        fullEvent?.tags.forEach((tag) => {
-          if (tag[0] === 'p' && tag[1] === unfollowedUser) {
-            this.latestNotesByFollows.delete(id);
-          }
-        });
-      }
-    });
-    if (blocked || this.followersByUser.get(unfollowedUser)?.size === 0) {
-      // TODO: remove unfollowedUser from everyone's followersByUser.
-      //  if resulting followersByUser(u).size is 0, remove that user as well
-      this.followersByUser.delete(unfollowedUser);
-      this.knownUsers.delete(unfollowedUser);
-      this.subscribedUsers.delete(unfollowedUser);
-      this.latestNotesByEveryone.eventIds.forEach((id) => {
-        const fullEvent = this.eventsById.get(id);
-        if (fullEvent?.pubkey === unfollowedUser) {
-          this.latestNotesByEveryone.delete(id);
-          this.eventsById.delete(id);
-          fullEvent?.tags.forEach((tag) => {
-            if (tag[0] === 'p' && tag[1] === unfollowedUser) {
-              this.latestNotesByEveryone.delete(id);
-            }
-          });
-        }
-      });
-    }
-    LocalForage.saveEvents();
-  },
-  // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime. and replies
-  followerCount: function (address: string) {
-    return this.followersByUser.get(address)?.size ?? 0;
   },
   toNostrBech32Address: function (address: string, prefix: string) {
     if (!prefix) {
@@ -328,16 +194,6 @@ const Nostr = {
     this.handleEvent(event);
     return event.id;
   },
-  followedByFriendsCount: function (address: string) {
-    let count = 0;
-    const myPub = this.getPubKey();
-    for (const follower of this.followersByUser.get(address) ?? []) {
-      if (this.followedByUser.get(myPub)?.has(follower)) {
-        count++; // should we stop at 10?
-      }
-    }
-    return count;
-  },
   sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
     // if subs with same id already exists, remove them
     if (id) {
@@ -381,36 +237,36 @@ const Nostr = {
       }
     }
   },
-  subscribeToRepliesAndLikes: debounce((_this) => {
-    console.log('subscribeToRepliesAndLikes', _this.subscribedRepliesAndLikes);
-    _this.sendSubToRelays(
-      [{ kinds: [1, 6, 7], '#e': Array.from(_this.subscribedRepliesAndLikes.values()) }],
+  subscribeToRepliesAndLikes: debounce(() => {
+    console.log('subscribeToRepliesAndLikes', Nostr.subscribedRepliesAndLikes);
+    Nostr.sendSubToRelays(
+      [{ kinds: [1, 6, 7], '#e': Array.from(Nostr.subscribedRepliesAndLikes.values()) }],
       'subscribedRepliesAndLikes',
       true,
     );
   }, 500),
   // TODO we shouldn't bang the history queries all the time. only ask a users history once per relay.
   // then we can increase the limit
-  subscribeToAuthors: debounce((_this) => {
+  subscribeToAuthors: debounce(() => {
     const now = Math.floor(Date.now() / 1000);
-    const myPub = _this.getPubKey();
-    const followedUsers = Array.from(_this.followedByUser.get(myPub) ?? []);
+    const myPub = Nostr.getPubKey();
+    const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) ?? []);
     followedUsers.push(myPub);
     console.log('subscribe to', followedUsers.length, 'followedUsers');
-    _this.sendSubToRelays(
+    Nostr.sendSubToRelays(
       [{ kinds: [0, 3], until: now, authors: followedUsers }],
       'followed',
       true,
     );
-    if (_this.subscribedProfiles.size) {
-      _this.sendSubToRelays(
-        [{ authors: Array.from(_this.subscribedProfiles.values()), kinds: [0] }],
+    if (Nostr.subscribedProfiles.size) {
+      Nostr.sendSubToRelays(
+        [{ authors: Array.from(Nostr.subscribedProfiles.values()), kinds: [0] }],
         'subscribedProfiles',
         true,
       );
     }
     setTimeout(() => {
-      _this.sendSubToRelays(
+      Nostr.sendSubToRelays(
         [{ authors: followedUsers, limit: 500, until: now }],
         'followedHistory',
         true,
@@ -418,34 +274,34 @@ const Nostr = {
     }, 1000);
   }, 1000),
   subscribeToPosts: throttle(
-    (_this) => {
-      if (_this.subscribedPosts.size === 0) return;
-      console.log('subscribe to', _this.subscribedPosts.size, 'posts');
-      _this.sendSubToRelays([{ ids: Array.from(_this.subscribedPosts) }], 'posts');
+    () => {
+      if (Nostr.subscribedPosts.size === 0) return;
+      console.log('subscribe to', Nostr.subscribedPosts.size, 'posts');
+      Nostr.sendSubToRelays([{ ids: Array.from(Nostr.subscribedPosts) }], 'posts');
     },
     3000,
     { leading: false },
   ),
-  subscribeToKeywords: debounce((_this) => {
-    if (_this.subscribedKeywords.size === 0) return;
+  subscribeToKeywords: debounce(() => {
+    if (Nostr.subscribedKeywords.size === 0) return;
     console.log(
       'subscribe to keywords',
-      Array.from(_this.subscribedKeywords),
-      _this.knownUsers.size,
+      Array.from(Nostr.subscribedKeywords),
+      SocialNetwork.knownUsers.size,
     );
     const go = () => {
-      _this.sendSubToRelays(
+      Nostr.sendSubToRelays(
         [
           {
             kinds: [1],
             limit: MAX_MSGS_BY_KEYWORD,
-            keywords: Array.from(_this.subscribedKeywords),
+            keywords: Array.from(Nostr.subscribedKeywords),
           },
         ],
         'keywords',
       );
       // on page reload knownUsers are empty and thus all search results are dropped
-      if (_this.knownUsers.size < 1000) setTimeout(go, 2000);
+      if (SocialNetwork.knownUsers.size < 1000) setTimeout(go, 2000);
     };
     go();
   }, 100),
@@ -620,7 +476,7 @@ const Nostr = {
     // we don't want both the reply and the original post in the feed:
     replyingTo && this.latestNotesByEveryone.delete(replyingTo);
     const myPub = this.getPubKey();
-    if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+    if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
       const changed = this.latestNotesAndRepliesByFollows.add(event);
       // we don't want both the reply and the original post in the feed:
       if (replyingTo) {
@@ -652,7 +508,7 @@ const Nostr = {
         if (
           event.created_at > startTime ||
           event.pubkey === myPub ||
-          this.followedByUser.get(myPub)?.has(event.pubkey)
+          SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)
         ) {
           this.getMessageById(id);
         }
@@ -717,38 +573,38 @@ const Nostr = {
     }
     this.likesByUser.get(event.pubkey).add({ id, created_at: event.created_at });
     const myPub = this.getPubKey();
-    if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+    if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
       //this.getMessageById(id);
     }
   },
   handleFollow(event: Event) {
-    const existing = this.followEventByUser.get(event.pubkey);
+    const existing = SocialNetwork.followEventByUser.get(event.pubkey);
     if (existing && existing.created_at >= event.created_at) {
       return;
     }
-    this.followEventByUser.set(event.pubkey, event);
+    SocialNetwork.followEventByUser.set(event.pubkey, event);
     const myPub = this.getPubKey();
 
-    if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
+    if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
       LocalForage.loaded && LocalForage.saveProfilesAndFollows();
     }
 
     if (event.tags) {
       for (const tag of event.tags) {
         if (Array.isArray(tag) && tag[0] === 'p') {
-          this.addFollower(tag[1], event.pubkey);
+          SocialNetwork.addFollower(tag[1], event.pubkey);
         }
       }
     }
-    if (this.followedByUser.has(event.pubkey)) {
-      for (const previouslyFollowed of this.followedByUser.get(event.pubkey)) {
+    if (SocialNetwork.followedByUser.has(event.pubkey)) {
+      for (const previouslyFollowed of SocialNetwork.followedByUser.get(event.pubkey)) {
         if (!event.tags || !event.tags.find((t) => t[0] === 'p' && t[1] === previouslyFollowed)) {
           this.removeFollower(previouslyFollowed, event.pubkey);
         }
       }
     }
     if (event.pubkey === myPub && event.tags.length) {
-      if (this.followedByUser.get(myPub)?.size > 10) {
+      if (SocialNetwork.followedByUser.get(myPub)?.size > 10) {
         iris.local().get('showFollowSuggestions').put(false);
       }
     }
@@ -778,7 +634,7 @@ const Nostr = {
     for (const url of Relays.relays.keys()) {
       relaysObj[url] = { read: true, write: true };
     }
-    const existing = this.followEventByUser.get(this.getPubKey());
+    const existing = SocialNetwork.followEventByUser.get(this.getPubKey());
     const content = JSON.stringify(relaysObj);
 
     const event = {
@@ -798,7 +654,7 @@ const Nostr = {
       try {
         const content = await this.decrypt(event.content);
         const blockList = JSON.parse(content);
-        this.blockedUsers = new Set(blockList);
+        SocialNetwork.blockedUsers = new Set(blockList);
       } catch (e) {
         console.log('failed to parse your block list', event);
       }
@@ -812,7 +668,7 @@ const Nostr = {
     if (event.pubkey === myPub) {
       try {
         const flaggedUsers = JSON.parse(event.content);
-        this.flaggedUsers = new Set(flaggedUsers);
+        SocialNetwork.flaggedUsers = new Set(flaggedUsers);
       } catch (e) {
         console.log('failed to parse your flagged users list', event);
       }
@@ -820,25 +676,25 @@ const Nostr = {
   },
   handleMetadata(event: Event) {
     try {
-      const existing = this.profiles.get(event.pubkey);
+      const existing = SocialNetwork.profiles.get(event.pubkey);
       if (existing?.created_at >= event.created_at) {
         return false;
       }
       const profile = JSON.parse(event.content);
       profile.created_at = event.created_at;
       delete profile['nip05valid']; // not robust
-      this.profiles.set(event.pubkey, profile);
+      SocialNetwork.profiles.set(event.pubkey, profile);
       const key = this.toNostrBech32Address(event.pubkey, 'npub');
       iris.session.addToSearchIndex(key, {
         key,
         name: profile.name,
         display_name: profile.display_name,
-        followers: this.followersByUser.get(event.pubkey) ?? new Set(),
+        followers: SocialNetwork.followersByUser.get(event.pubkey) ?? new Set(),
       });
       // if by our pubkey, save to iris
-      const existingEvent = this.profileEventByUser.get(event.pubkey);
+      const existingEvent = this.eventsById.get(event.pubkey);
       if (!existingEvent || existingEvent.created_at < event.created_at) {
-        this.profileEventByUser.set(event.pubkey, event);
+        this.eventsById.set(event.pubkey, event);
         LocalForage.loaded && LocalForage.saveProfilesAndFollows();
       }
       //}
@@ -860,20 +716,20 @@ const Nostr = {
       }
     }
   },
-  updateUnseenNotificationCount: debounce((_this) => {
-    if (!_this.notificationsSeenTime) {
+  updateUnseenNotificationCount: debounce(() => {
+    if (!Nostr.notificationsSeenTime) {
       return;
     }
     let count = 0;
-    for (const id of _this.notifications.eventIds) {
-      const event = _this.eventsById.get(id);
-      if (event.created_at > _this.notificationsSeenTime) {
+    for (const id of Nostr.notifications.eventIds) {
+      const event = Nostr.eventsById.get(id);
+      if (event.created_at > Nostr.notificationsSeenTime) {
         count++;
       } else {
         break;
       }
     }
-    console.log('notificationsSeenTime', _this.notificationsSeenTime, 'count', count);
+    console.log('notificationsSeenTime', Nostr.notificationsSeenTime, 'count', count);
     iris.local().get('unseenNotificationCount').put(count);
   }, 1000),
   maybeAddNotification(event: Event) {
@@ -883,7 +739,7 @@ const Nostr = {
     if (event.pubkey !== myPub && event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
       if (event.kind === 3) {
         // only notify if we know that they previously weren't following us
-        const existingFollows = this.followedByUser.get(event.pubkey);
+        const existingFollows = SocialNetwork.followedByUser.get(event.pubkey);
         if (!existingFollows || existingFollows.has(myPub)) {
           return;
         }
@@ -936,10 +792,10 @@ const Nostr = {
     if (this.eventsById.has(event.id) && !force) {
       return;
     }
-    if (!this.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
+    if (!SocialNetwork.knownUsers.has(event.pubkey) && !this.subscribedPosts.has(event.id)) {
       return;
     }
-    if (this.blockedUsers.has(event.pubkey)) {
+    if (SocialNetwork.blockedUsers.has(event.pubkey)) {
       return;
     }
     if (this.deletedEvents.has(event.id)) {
@@ -981,7 +837,7 @@ const Nostr = {
         this.handleDelete(event);
         break;
       case 3:
-        if (this.followEventByUser.get(event.pubkey)?.created_at >= event.created_at) {
+        if (SocialNetwork.followEventByUser.get(event.pubkey)?.created_at >= event.created_at) {
           return;
         }
         this.maybeAddNotification(event);
@@ -1009,8 +865,8 @@ const Nostr = {
 
     if (
       this.subscribedProfiles.has(event.pubkey) &&
-      this.profileEventByUser.has(event.pubkey) &&
-      this.followEventByUser.has(event.pubkey)
+      SocialNetwork.blockedUsers.has(event.pubkey) &&
+      SocialNetwork.followEventByUser.has(event.pubkey)
     ) {
       this.subscribedProfiles.delete(event.pubkey);
     }
@@ -1164,15 +1020,15 @@ const Nostr = {
       }
       document.documentElement.setAttribute('data-theme', 'dark');
     });
-    this.knownUsers.add(myPub);
+    SocialNetwork.knownUsers.add(myPub);
     Relays.manage();
     LocalForage.loadEvents();
     IndexedDB.loadIDBEvents();
-    this.getProfile(key.secp256k1.rpub, undefined);
+    SocialNetwork.getProfile(key.secp256k1.rpub, undefined);
     for (const suggestion of this.SUGGESTED_FOLLOWS) {
       const hex = this.toNostrHexAddress(suggestion);
-      this.knownUsers.add(hex);
-      this.getProfile(this.toNostrHexAddress(hex), undefined);
+      SocialNetwork.knownUsers.add(hex);
+      SocialNetwork.getProfile(this.toNostrHexAddress(hex), undefined);
     }
 
     setTimeout(() => {
@@ -1227,52 +1083,6 @@ const Nostr = {
       callback();
     }
     this.subscribe([{ kinds: [1, 6, 7], '#e': [id] }], callback);
-  },
-  block: async function (address: string, isBlocked: boolean) {
-    isBlocked ? this.blockedUsers.add(address) : this.blockedUsers.delete(address);
-    let content = JSON.stringify(Array.from(this.blockedUsers));
-    content = await this.encrypt(content);
-    this.publish({
-      kind: 16462,
-      content,
-    });
-  },
-  flag: function (address: string, isFlagged: boolean) {
-    isFlagged ? this.flaggedUsers.add(address) : this.flaggedUsers.delete(address);
-    this.publish({
-      kind: 16463,
-      content: JSON.stringify(Array.from(this.flaggedUsers)),
-    });
-  },
-  getBlockedUsers(cb?: (blocked: Set<string>) => void) {
-    const callback = () => {
-      cb?.(this.blockedUsers);
-    };
-    callback();
-    const myPub = iris.session.getKey()?.secp256k1.rpub;
-    this.subscribe([{ kinds: [16462], authors: [myPub] }], callback);
-  },
-  getFlaggedUsers(cb?: (flagged: Set<string>) => void) {
-    const callback = () => {
-      cb?.(this.flaggedUsers);
-    };
-    callback();
-    const myPub = iris.session.getKey()?.secp256k1.rpub;
-    this.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
-  },
-  getFollowedByUser: function (user: string, cb?: (followedUsers: Set<string>) => void) {
-    const callback = () => {
-      cb?.(this.followedByUser.get(user) ?? new Set());
-    };
-    this.followedByUser.has(user) && callback();
-    this.subscribe([{ kinds: [3], authors: [user] }], callback);
-  },
-  getFollowersByUser: function (address: string, cb?: (followers: Set<string>) => void) {
-    const callback = () => {
-      cb?.(this.followersByUser.get(address) ?? new Set());
-    };
-    this.followersByUser.has(address) && callback();
-    this.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
   },
   async getMessageById(id: string) {
     if (this.eventsById.has(id)) {
@@ -1349,7 +1159,7 @@ const Nostr = {
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile
-    this.knownUsers.add(address);
+    SocialNetwork.knownUsers.add(address);
     const callback = () => {
       cb?.(this.postsAndRepliesByUser.get(address)?.eventIds);
     };
@@ -1357,7 +1167,7 @@ const Nostr = {
     this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getPostsByUser(address: string, cb?: (messageIds: string[]) => void) {
-    this.knownUsers.add(address);
+    SocialNetwork.knownUsers.add(address);
     const callback = () => {
       cb?.(this.postsByUser.get(address)?.eventIds);
     };
@@ -1365,42 +1175,12 @@ const Nostr = {
     this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getLikesByUser(address: string, cb?: (messageIds: string[]) => void) {
-    this.knownUsers.add(address);
+    SocialNetwork.knownUsers.add(address);
     const callback = () => {
       cb?.(this.likesByUser.get(address)?.eventIds);
     };
     this.likesByUser.has(address) && callback();
     this.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
-  },
-  getProfile(address, cb?: (profile: any, address: string) => void, verifyNip05 = false) {
-    this.knownUsers.add(address);
-    const callback = () => {
-      cb?.(this.profiles.get(address), address);
-    };
-
-    const profile = this.profiles.get(address);
-    if (profile) {
-      callback();
-      if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
-        this.verifyNip05Address(profile.nip05, address).then((isValid) => {
-          console.log('NIP05 address is valid?', isValid, profile.nip05, address);
-          profile.nip05valid = isValid;
-          this.profiles.set(address, profile);
-          callback();
-        });
-      }
-    } else if (!this.subscribedProfiles.has(address)) {
-      fetch(`https://api.iris.to/profile/${address}`).then((res) => {
-        if (res.status === 200) {
-          res.json().then((profile) => {
-            Nostr.handleEvent(profile);
-          });
-        }
-      });
-    }
-
-    this.subscribedProfiles.add(address);
-    this.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
   },
 
   getDirectMessages(cb?: (dms: Map<string, SortedLimitedEventSet>) => void) {
@@ -1412,7 +1192,7 @@ const Nostr = {
   },
 
   getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void) {
-    this.knownUsers.add(address);
+    SocialNetwork.knownUsers.add(address);
     const callback = () => {
       cb?.(this.directMessagesByUser.get(address)?.eventIds);
     };

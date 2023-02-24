@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import Component from '../BaseComponent';
 import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 
 import SafeImg from './SafeImg';
 
@@ -60,7 +61,7 @@ class MyIdenticon extends Component<Props, State> {
 
     const nostrAddr = Nostr.toNostrHexAddress(pub);
     if (nostrAddr) {
-      Nostr.getProfile(nostrAddr, (profile) => {
+      SocialNetwork.getProfile(nostrAddr, (profile) => {
         profile &&
           this.setState({
             // TODO why profile undefined sometimes?
@@ -88,7 +89,7 @@ class MyIdenticon extends Component<Props, State> {
       this.state.picture &&
       !this.state.hasError &&
       !this.props.hidePicture &&
-      !Nostr.blockedUsers.has(this.props.str as string);
+      !SocialNetwork.blockedUsers.has(this.props.str as string);
     const hasPictureStyle = hasPicture ? 'has-picture' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 
