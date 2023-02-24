@@ -19,10 +19,17 @@ const NetworkSettings = () => {
     Nostr.removeRelay(relay.url);
   };
 
+  const ensureProtocol = (relay) => {
+    if (relay.includes('://')) return relay
+
+    return `wss://${relay}`
+  }
+
   const handleAddRelay = (event) => {
-    iris.local().get('relays').get(newRelayUrl).put({ enabled: true });
+    const newRelayUrlWithProtocol = ensureProtocol(newRelayUrl);
+    iris.local().get('relays').get(newRelayUrlWithProtocol).put({ enabled: true });
     event.preventDefault(); // prevent the form from reloading the page
-    Nostr.addRelay(newRelayUrl); // add the new relay using the Nostr method
+    Nostr.addRelay(newRelayUrlWithProtocol); // add the new relay using the Nostr method
     setNewRelayUrl(''); // reset the new relay URL
   };
 
