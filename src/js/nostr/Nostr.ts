@@ -20,6 +20,8 @@ import { route } from 'preact-router';
 
 import SortedLimitedEventSet from '../SortedLimitedEventSet';
 
+import LocalForage from './LocalForage';
+
 export class MyDexie extends Dexie {
   events!: Table<Event>;
 
@@ -56,67 +58,6 @@ const getRelayStatus = (relay: Relay) => {
     return 3;
   }
 };
-
-const saveLocalStorageEvents = debounce((_this: any) => {
-  const latestMsgs = _this.latestNotesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
-    return _this.eventsById.get(eventId);
-  });
-  const latestMsgsByEveryone = _this.latestNotesAndRepliesByEveryone.eventIds
-    .slice(0, 1000)
-    .map((eventId: any) => {
-      return _this.eventsById.get(eventId);
-    });
-  const notifications = _this.notifications.eventIds
-    .map((eventId: any) => {
-      return _this.eventsById.get(eventId);
-    })
-    .splice(0, 200);
-  const dms = [];
-  for (const set of _this.directMessagesByUser.values()) {
-    set.eventIds.forEach((eventId: any) => {
-      dms.push(_this.eventsById.get(eventId));
-    });
-  }
-  const kvEvents = Array.from(_this.keyValueEvents.values());
-
-  localForage.setItem('latestMsgs', latestMsgs);
-  localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
-  localForage.setItem('notificationEvents', notifications);
-  localForage.setItem('dms', dms);
-  localForage.setItem('keyValueEvents', kvEvents);
-  // TODO save own block and flag events
-}, 5000);
-
-const saveLocalStorageProfilesAndFollows = debounce((_this) => {
-  const profileEvents = Array.from(_this.profileEventByUser.values());
-  const myPub = _this.getPubKey();
-  const followEvents = Array.from(_this.followEventByUser.values()).filter((e: Event) => {
-    return e.pubkey === myPub || _this.followedByUser.get(myPub)?.has(e.pubkey);
-  });
-  const followEvents2 = [];
-  let size = 0;
-  for (const le of followEvents
-    .map((e: Event) => [JSON.stringify(e).length, e] as [number, Event])
-    .sort((a, b) => a[0] - b[0])) {
-    if (size + le[0] < 500000) {
-      size += le[0];
-      followEvents2.push(le[1]);
-    }
-  }
-  console.log(
-    'saving profileEvents: ',
-    profileEvents.length,
-    'original followEvents length/size: ',
-    followEvents.length,
-    JSON.stringify(followEvents).length,
-    'saved followEvents length/size: ',
-    followEvents2.length,
-    JSON.stringify(followEvents2).length,
-  );
-
-  localForage.setItem('profileEvents', profileEvents);
-  localForage.setItem('followEvents', followEvents2);
-}, 5000);
 
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
@@ -272,48 +213,6 @@ const Nostr = {
       this.blockedUsers.delete(blockedUser);
     }
   },
-
-  loadLocalStorageEvents: async function () {
-    const latestMsgs = await localForage.getItem('latestMsgs');
-    const latestMsgsByEveryone = await localForage.getItem('latestMsgsByEveryone');
-    const followEvents = await localForage.getItem('followEvents');
-    const profileEvents = await localForage.getItem('profileEvents');
-    const notificationEvents = await localForage.getItem('notificationEvents');
-    const dms = await localForage.getItem('dms');
-    const keyValueEvents = await localForage.getItem('keyValueEvents');
-    this.localStorageLoaded = true;
-    if (Array.isArray(followEvents)) {
-      followEvents.forEach((e) => this.handleEvent(e));
-    }
-    if (Array.isArray(profileEvents)) {
-      profileEvents.forEach((e) => this.handleEvent(e));
-    }
-    if (Array.isArray(latestMsgs)) {
-      latestMsgs.forEach((msg) => {
-        this.handleEvent(msg);
-      });
-    }
-    if (Array.isArray(latestMsgsByEveryone)) {
-      latestMsgsByEveryone.forEach((msg) => {
-        this.handleEvent(msg);
-      });
-    }
-    if (Array.isArray(notificationEvents)) {
-      notificationEvents.forEach((msg) => {
-        this.handleEvent(msg);
-      });
-    }
-    if (Array.isArray(dms)) {
-      dms.forEach((msg) => {
-        this.handleEvent(msg);
-      });
-    }
-    if (Array.isArray(keyValueEvents)) {
-      keyValueEvents.forEach((msg) => {
-        this.handleEvent(msg);
-      });
-    }
-  },
   getSubscriptionIdForName(name: string) {
     return this.arrayToHex(sha256(name)).slice(0, 8);
   },
@@ -424,7 +323,7 @@ const Nostr = {
         }
       });
     }
-    saveLocalStorageEvents(this);
+    LocalForage.saveEvents();
   },
   // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime. and replies
   followerCount: function (address: string) {
@@ -843,7 +742,7 @@ const Nostr = {
       }
       replyingTo && this.latestNotesByFollows.delete(replyingTo);
       if (changed && this.localStorageLoaded) {
-        saveLocalStorageEvents(this);
+        LocalForage.saveEvents();
       }
     }
 
@@ -943,7 +842,7 @@ const Nostr = {
     const myPub = this.getPubKey();
 
     if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-      this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
+      this.localStorageLoaded && LocalForage.saveProfilesAndFollows();
     }
 
     if (event.tags) {
@@ -1063,7 +962,7 @@ const Nostr = {
       const existingEvent = this.profileEventByUser.get(event.pubkey);
       if (!existingEvent || existingEvent.created_at < event.created_at) {
         this.profileEventByUser.set(event.pubkey, event);
-        this.localStorageLoaded && saveLocalStorageProfilesAndFollows(this);
+        this.localStorageLoaded && LocalForage.saveProfilesAndFollows();
       }
       //}
     } catch (e) {
@@ -1439,7 +1338,7 @@ const Nostr = {
     });
     this.knownUsers.add(myPub);
     this.manageRelays();
-    this.loadLocalStorageEvents();
+    LocalForage.loadEvents();
     this.loadIDBEvents();
     this.getProfile(key.secp256k1.rpub, undefined);
     for (const suggestion of this.SUGGESTED_FOLLOWS) {
