@@ -1276,7 +1276,7 @@ const Nostr = {
     this.knownUsers.add(myPub);
     this.manageRelays();
     LocalForage.loadEvents();
-    this.loadIDBEvents();
+    IndexedDB.loadIDBEvents();
     this.getProfile(key.secp256k1.rpub, undefined);
     for (const suggestion of this.SUGGESTED_FOLLOWS) {
       const hex = this.toNostrHexAddress(suggestion);
