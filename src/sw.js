@@ -9,33 +9,59 @@ const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
   maxRetentionTime: 14 * 24 * 60,
 });
 
+const urlsToCache = getFiles();
+
+// Never cache POST requests
 registerRoute(
   ({ request }) => request.method === 'POST',
   new NetworkOnly({
     plugins: [bgSyncPlugin],
   }),
 );
+
+// Make root page load instantly, even if offline. Tradeoff: after app update, user will see old version until they refresh.
 registerRoute(
   ({ url }) => url.pathname === '/',
   new StaleWhileRevalidate({
     cacheName: 'iris-main',
   }),
 );
+
+// Nip05 lookups cache first
 registerRoute(
-  ({ url }) => url.pathname === '/' || url.pathname.startsWith('/.well-known/nostr.json'),
-  new NetworkFirst({
+  ({ url }) => url.pathname.startsWith('/.well-known/nostr.json'),
+  new CacheFirst({
     networkTimeoutSeconds: 5,
-    cacheName: 'iris-network-first',
+    cacheName: 'iris-nip05',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+      new ExpirationPlugin({
+        maxEntries: 1000,
+        maxAgeSeconds: 1 * 60 * 60, // 1 hour
+        purgeOnQuotaError: true,
+      }),
+    ],
   }),
 );
+
+// Page urls like iris.to/username are often stale and should be updated.
+// Could we serve the already cached and updated / for them?
+// This also catches everything else from current site
 registerRoute(
   ({ url }) => {
-    return location.host.indexOf('localhost') !== 0 && url.origin === self.location.origin;
+    return (
+      self.location.host.indexOf('localhost') !== 0 &&
+      url.origin === self.location.origin &&
+      !urlsToCache.includes(url.pathname) // these are cached later by setupPrecaching
+    );
   },
-  new CacheFirst({
-    cacheName: 'static-resources',
+  new NetworkFirst({
+    cacheName: 'pages-etc',
     plugins: [
       new ExpirationPlugin({
+        networkTimeoutSeconds: 5,
         maxEntries: 100,
         maxAgeSeconds: 30 * 24 * 60 * 60,
         purgeOnQuotaError: true,
@@ -44,8 +70,10 @@ registerRoute(
   }),
 );
 
+// Iris.to user account requests should not be cached
 registerRoute(({ url }) => url.href.startsWith('https://api.iris.to/user/'), new NetworkOnly());
 
+// Iris.to /events and /profiles requests should be cached
 registerRoute(
   ({ url }) => url.href.startsWith('https://api.iris.to/'),
   new CacheFirst({
@@ -63,6 +91,7 @@ registerRoute(
   }),
 );
 
+// Cache scaled images from proxy
 registerRoute(
   ({ url }) => url.href.startsWith('https://imgproxy.iris.to/insecure/rs:fill:'),
   new CacheFirst({
@@ -80,7 +109,7 @@ registerRoute(
   }),
 );
 
-// cache remote assets with limit and expiration time
+// Cache full-size images, videos and other remote assets with limit and expiration time
 registerRoute(
   ({ url }) => url.origin !== self.location.origin,
   new CacheFirst({
@@ -100,5 +129,4 @@ registerRoute(
 
 setupRouting();
 
-const urlsToCache = getFiles();
 setupPrecaching(urlsToCache);
