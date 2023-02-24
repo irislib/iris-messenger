@@ -35,7 +35,7 @@ export default class IrisAccountSettings extends Component {
           )}
         </p>
         <p>
-          Nostr address: <b>{name}@iris.to</b>
+          Nostr address (nip05): <b>{name}@iris.to</b>
         </p>
       </>
     );
