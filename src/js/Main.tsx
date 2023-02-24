@@ -6,6 +6,7 @@ import { Router, RouterOnChangeArgs } from 'preact-router';
 import Footer from './components/Footer';
 import MediaPlayer from './components/MediaPlayer';
 import Menu from './components/Menu';
+import Nostr from './nostr/Nostr';
 import { translationLoaded } from './translations/Translation';
 import About from './views/About';
 import Chat from './views/chat/Chat';
@@ -21,7 +22,6 @@ import Settings from './views/settings/Settings';
 import Torrent from './views/Torrent';
 import Component from './BaseComponent';
 import Helpers from './Helpers';
-import Nostr from './nostr/Nostr';
 import QRScanner from './QRScanner';
 
 import '@fontsource/lato/400.css';

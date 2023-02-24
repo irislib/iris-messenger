@@ -14,26 +14,13 @@ import {
 } from '../lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import { sha256 } from '@noble/hashes/sha256';
-import Dexie, { Table } from 'dexie';
 import localForage from 'localforage';
 import { route } from 'preact-router';
 
 import SortedLimitedEventSet from '../SortedLimitedEventSet';
 
+import IndexedDB from './IndexedDB';
 import LocalForage from './LocalForage';
-
-export class MyDexie extends Dexie {
-  events!: Table<Event>;
-
-  constructor() {
-    super('iris');
-    this.version(1).stores({
-      events: 'id, pubkey, kind, created_at', // Primary key and indexed props
-    });
-  }
-}
-
-const db = new MyDexie();
 
 const startTime = Date.now() / 1000;
 
@@ -140,7 +127,6 @@ const Nostr = {
   notificationsSeenTime: 0,
   futureEventIds: new SortedLimitedEventSet(100, false),
   futureEventTimeout: 0,
-  idb: db,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
@@ -1138,6 +1124,10 @@ const Nostr = {
       this.subscribedProfiles.delete(event.pubkey);
     }
 
+    if (saveToIdb) {
+      IndexedDB.saveEvent(event);
+    }
+
     // go through subscriptions and callback if filters match
     for (const sub of this.subscriptions.values()) {
       if (!sub.filters) {
@@ -1146,11 +1136,6 @@ const Nostr = {
       if (this.matchesOneFilter(event, sub.filters)) {
         sub.callback && sub.callback(event);
       }
-    }
-    if (saveToIdb) {
-      db.events.add(event).catch(() => {
-        // ignore
-      });
     }
   },
   handleNextFutureEvent() {
@@ -1227,13 +1212,6 @@ const Nostr = {
     iris.session.logOut();
   },
   loadSettings() {
-    iris
-      .local()
-      .get('maxRelays')
-      .on((maxRelays) => {
-        this.maxRelays = maxRelays;
-        localForage.setItem('maxRelays', maxRelays);
-      });
     // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
     localForage.getItem('notificationsSeenTime').then((val) => {
       if (val && !this.notificationsSeenTime) {
@@ -1242,50 +1220,9 @@ const Nostr = {
         console.log('notificationsSeenTime', this.notificationsSeenTime);
       }
     });
-    localForage.getItem('maxRelays').then((val) => {
-      if (val !== null) {
-        iris.local().get('maxRelays').put(val);
-        this.maxRelays = val;
-      }
-    });
   },
   getPubKey() {
     return iris.session.getKey()?.secp256k1?.rpub; // TODO use this everywhere :D
-  },
-  loadIDBEvents() {
-    let i = 0;
-    const myPub = this.getPubKey();
-    db.events.where({ pubkey: myPub }).each((event) => {
-      this.handleEvent(event, false, false);
-      i++;
-    });
-    const follows: string[] = Array.from(this.followedByUser.get(myPub) || []);
-    db.events
-      .where('pubkey')
-      .anyOf(follows)
-      .each((event) => {
-        this.handleEvent(event, false, false);
-        i++;
-      });
-    // other follow events
-    db.events
-      .where('pubkey')
-      .noneOf([myPub, ...follows])
-      .and((event) => event.kind === 3)
-      .each((event) => {
-        this.handleEvent(event, false, false);
-        i++;
-      });
-    // other events
-    db.events
-      .where('pubkey')
-      .noneOf([myPub, ...follows])
-      .and((event) => event.kind !== 3)
-      .each((event) => {
-        this.handleEvent(event, false, false);
-        i++;
-      });
-    console.log('loaded', i, 'events from idb');
   },
   onLoggedIn() {
     const key = iris.session.getKey();

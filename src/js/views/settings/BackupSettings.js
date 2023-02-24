@@ -6,6 +6,7 @@ import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
+import IndexedDB from '../../nostr/IndexedDB';
 
 export default class BackupSettings extends Component {
   profileExportJson() {
@@ -25,7 +26,7 @@ export default class BackupSettings extends Component {
     const events = [];
     let i = 0;
     this.setState({ downloadMyEventsMessage: 'Fetching events...' });
-    await Nostr.idb.events.where({ pubkey }).each((event) => {
+    await IndexedDB.db.events.where({ pubkey }).each((event) => {
       events.push(event);
       i++;
     });
