@@ -3,6 +3,7 @@ import iris from 'iris-lib';
 import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
 import CopyButton from '../../components/CopyButton';
+import FollowButton from '../../components/FollowButton';
 import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
 import Nostr from '../../Nostr';
@@ -100,6 +101,7 @@ export default class BackupSettings extends Component {
                     <Identicon str={hex} width={40} />
                     <Name pub={hex} />
                   </a>
+                  <FollowButton id={hex} />
                 </div>
               ))}
             </>
