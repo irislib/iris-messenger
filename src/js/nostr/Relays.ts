@@ -102,12 +102,12 @@ export default {
   restoreDefaults() {
     this.relays.clear();
     for (const url of DEFAULT_RELAYS) {
-      this.addRelay(url);
+      this.add(url);
     }
     this.saveRelaysToContacts();
     // do not save these to contact list
     for (const url of SEARCH_RELAYS) {
-      if (!this.relays.has(url)) this.addRelay(url);
+      if (!this.relays.has(url)) this.add(url);
     }
   },
 };

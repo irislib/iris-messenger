@@ -32,7 +32,7 @@ class BlockButton extends Component<Props> {
   onClick(e) {
     e.preventDefault();
     const newValue = !this.state[this.key];
-    Nostr.block(Nostr.toNostrHexAddress(this.props.id), newValue);
+    SocialNetwork.block(Nostr.toNostrHexAddress(this.props.id), newValue);
   }
 
   componentDidMount() {

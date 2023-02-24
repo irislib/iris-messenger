@@ -599,7 +599,7 @@ const Nostr = {
     if (SocialNetwork.followedByUser.has(event.pubkey)) {
       for (const previouslyFollowed of SocialNetwork.followedByUser.get(event.pubkey)) {
         if (!event.tags || !event.tags.find((t) => t[0] === 'p' && t[1] === previouslyFollowed)) {
-          this.removeFollower(previouslyFollowed, event.pubkey);
+          SocialNetwork.removeFollower(previouslyFollowed, event.pubkey);
         }
       }
     }
