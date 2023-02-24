@@ -26,7 +26,7 @@ export class MyDexie extends Dexie {
   constructor() {
     super('iris');
     this.version(1).stores({
-      events: 'id, pubkey, kind', // Primary key and indexed props
+      events: 'id, pubkey, kind, created_at', // Primary key and indexed props
     });
   }
 }
@@ -199,6 +199,7 @@ const Nostr = {
   notificationsSeenTime: 0,
   futureEventIds: new SortedLimitedEventSet(100, false),
   futureEventTimeout: 0,
+  idb: db,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {

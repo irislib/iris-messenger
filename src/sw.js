@@ -9,7 +9,7 @@ const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
   maxRetentionTime: 14 * 24 * 60,
 });
 
-const urlsToCache = getFiles();
+const assetUrls = getFiles();
 
 // Never cache POST requests
 registerRoute(
@@ -54,7 +54,7 @@ registerRoute(
     return (
       self.location.host.indexOf('localhost') !== 0 &&
       url.origin === self.location.origin &&
-      !urlsToCache.includes(url.pathname) // these are cached later by setupPrecaching
+      !assetUrls.includes(url.pathname) // these are cached later by setupPrecaching
     );
   },
   new NetworkFirst({
@@ -129,4 +129,4 @@ registerRoute(
 
 setupRouting();
 
-setupPrecaching(urlsToCache);
+setupPrecaching(assetUrls);
