@@ -1,5 +1,4 @@
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
@@ -53,7 +52,7 @@ class ChatListItem extends Component {
   }
 
   hasUnseen() {
-    if (this.state.latest.pubkey === iris.session.getKey().secp256k1.rpub) {
+    if (this.state.latest.pubkey === Nostr.getPubKey()) {
       return false;
     }
     return !this.props.active && !(this.state.latest.created_at <= this.state.lastOpened);
@@ -74,7 +73,7 @@ class ChatListItem extends Component {
     //let latestTimeText = Helpers.getRelativeTimeText(time);
 
     /*let name = chat.name;
-    if (chat === (iris.session.getKey().secp256k1.rpub)) {
+    if (chat === (Nostr.getPubKey())) {
       name = html`📝 <b>${t('note_to_self')}</b>`;
     }*/
 

@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet';
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 import $ from 'jquery';
 import { escapeRegExp } from 'lodash';
 import { route } from 'preact-router';
@@ -137,7 +136,7 @@ class PublicMessage extends Message {
     if (!p) {
       return;
     }
-    const myPub = iris.session.getKey().secp256k1.rpub;
+    const myPub = Nostr.getPubKey();
 
     const handleMessage = (r) => {
       this.props.standalone && console.log('got message', r);

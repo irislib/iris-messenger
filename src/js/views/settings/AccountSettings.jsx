@@ -34,7 +34,7 @@ export default class AccountSettings extends Component {
       // eslint-disable-next-line no-undef
       myPriv32 = bech32.encode('nsec', Buffer.from(myPrivHex, 'hex'));
     }
-    const myPub = iris.session.getKey().secp256k1.rpub;
+    const myPub = Nostr.getPubKey();
     // eslint-disable-next-line no-undef
     const myNpub = bech32.encode('npub', Buffer.from(myPub, 'hex'));
 

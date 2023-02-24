@@ -1,4 +1,3 @@
-import iris from 'iris-lib';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
@@ -30,7 +29,7 @@ export default class EditProfile extends Component {
   }
 
   componentDidMount() {
-    Nostr.getProfile(iris.session.getKey().secp256k1.rpub, (p) => {
+    Nostr.getProfile(Nostr.getPubKey(), (p) => {
       if (!this.state.edited && Object.keys(this.state.profile).length === 0) {
         delete p['created_at'];
         this.setState({
@@ -53,7 +52,7 @@ export default class EditProfile extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
     Nostr.setMetadata(this.state.profile);
-    const myPub = Nostr.toNostrBech32Address(iris.session.getKey().secp256k1.rpub, 'npub');
+    const myPub = Nostr.toNostrBech32Address(Nostr.getPubKey(), 'npub');
     route('/' + myPub);
   };
 

@@ -1,11 +1,9 @@
-import iris from 'iris-lib';
-
 import Icons from '../Icons';
 import Nostr from '../Nostr';
 import { translate as t } from '../translations/Translation';
 
 export default function Badge(props) {
-  const myPub = iris.session.getKey().secp256k1.rpub;
+  const myPub = Nostr.getPubKey();
   const hexAddress = Nostr.toNostrHexAddress(props.pub);
   if (hexAddress === myPub) {
     return (

@@ -41,7 +41,7 @@ class FollowButton extends Component<Props> {
 
   componentDidMount() {
     if (this.key === 'follow') {
-      Nostr.getFollowedByUser(iris.session.getKey().secp256k1.rpub, (follows) => {
+      Nostr.getFollowedByUser(Nostr.getPubKey(), (follows) => {
         const follow = follows?.has(Nostr.toNostrHexAddress(this.props.id));
         this.setState({ follow });
       });

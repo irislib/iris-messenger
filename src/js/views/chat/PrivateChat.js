@@ -177,7 +177,7 @@ export default class PrivateChat extends Component {
   renderMainView() {
     let mainView;
     if (this.props.id && this.props.id.length > 20) {
-      const myPub = iris.session.getKey().secp256k1.rpub;
+      const myPub = Nostr.getPubKey();
       const now = new Date();
       const nowStr = now.toLocaleDateString();
       let previousDateStr;

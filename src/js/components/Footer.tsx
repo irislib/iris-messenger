@@ -49,7 +49,7 @@ class Footer extends Component<Props, State> {
   }
 
   render() {
-    const key = Nostr.toNostrBech32Address(iris.session.getKey().secp256k1.rpub, 'npub');
+    const key = Nostr.toNostrBech32Address(Nostr.getPubKey(), 'npub');
     if (!key) {
       return;
     }

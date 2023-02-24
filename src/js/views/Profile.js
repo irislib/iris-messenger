@@ -217,9 +217,7 @@ class Profile extends View {
                   <span>${this.state.followerCount}</span> ${t('followers')}
                 </a>
               </div>
-              ${Nostr.followedByUser
-                .get(this.state.hexPub)
-                ?.has(iris.session.getKey().secp256k1.rpub)
+              ${Nostr.followedByUser.get(this.state.hexPub)?.has(Nostr.getPubKey())
                 ? html` <p><small>${t('follows_you')}</small></p> `
                 : ''}
               <div class="hidden-xs">
@@ -464,7 +462,7 @@ class Profile extends View {
   }
 
   loadProfile(hexPub, nostrAddress) {
-    const isMyProfile = hexPub === iris.session.getKey().secp256k1.rpub;
+    const isMyProfile = hexPub === Nostr.getPubKey();
     this.setState({ isMyProfile });
     this.followedUsers = new Set();
     this.followers = new Set();

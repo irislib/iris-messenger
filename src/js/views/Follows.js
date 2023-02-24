@@ -61,7 +61,7 @@ class Follows extends View {
 
   componentDidMount() {
     if (this.props.id) {
-      this.myPub = Nostr.toNostrBech32Address(iris.session.getKey().secp256k1.rpub, 'npub');
+      this.myPub = Nostr.toNostrBech32Address(Nostr.getPubKey(), 'npub');
       this.props.followers ? this.getFollowers() : this.getFollows();
       iris.local().get('contacts').on(this.inject());
     }
@@ -104,9 +104,7 @@ class Follows extends View {
                   </small>
                 </div>
               </a>
-              ${hexKey !== iris.session.getKey().secp256k1.rpub
-                ? html`<${FollowButton} id=${npub} />`
-                : ''}
+              ${hexKey !== Nostr.getPubKey() ? html`<${FollowButton} id=${npub} />` : ''}
             </div>`;
           })}
           ${this.state.follows.length === 0 ? '—' : ''}

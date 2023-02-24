@@ -43,7 +43,7 @@ class MessageFeed extends Component {
         const hash = sortedMessages[i];
         const message = Nostr.eventsById.get(hash);
         if (message && message.created_at > this.state.messagesShownTime) {
-          if (message.pubkey === iris.session.getKey().secp256k1.rpub && !Nostr.isBoost(message)) {
+          if (message.pubkey === Nostr.getPubKey() && !Nostr.isBoost(message)) {
             hasMyMessage = true;
             break;
           }

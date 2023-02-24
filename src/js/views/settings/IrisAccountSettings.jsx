@@ -197,7 +197,7 @@ export default class IrisAccountSettings extends Component {
 
   async register(cfToken) {
     console.log('register', cfToken);
-    const pubkey = iris.session.getKey().secp256k1.rpub;
+    const pubkey = Nostr.getPubKey();
     const event = {
       content: `iris.to/${this.state.newUserName}`,
       kind: 1,
@@ -241,7 +241,7 @@ export default class IrisAccountSettings extends Component {
     const timeout = setTimeout(() => {
       Nostr.setMetadata({ nip05: newNip });
     }, 2000);
-    Nostr.getProfile(iris.session.getKey().secp256k1.rpub, (p) => {
+    Nostr.getProfile(Nostr.getPubKey(), (p) => {
       if (p) {
         clearTimeout(timeout);
         if (p.nip05 !== newNip) {
@@ -254,7 +254,7 @@ export default class IrisAccountSettings extends Component {
   }
 
   async enableReserved() {
-    const pubkey = iris.session.getKey().secp256k1.rpub;
+    const pubkey = Nostr.getPubKey();
     const event = {
       content: `iris.to/${this.state.existing.name}`,
       kind: 1,
@@ -290,7 +290,7 @@ export default class IrisAccountSettings extends Component {
     if (!confirm(`Are you sure you want to decline iris.to/${this.state.existing.name}?`)) {
       return;
     }
-    const pubkey = iris.session.getKey().secp256k1.rpub;
+    const pubkey = Nostr.getPubKey();
     const event = {
       content: `decline iris.to/${this.state.existing.name}`,
       kind: 1,
@@ -323,7 +323,7 @@ export default class IrisAccountSettings extends Component {
   }
 
   componentDidMount() {
-    const myPub = iris.session.getKey().secp256k1.rpub;
+    const myPub = Nostr.getPubKey();
     Nostr.getProfile(
       myPub,
       (profile) => {

@@ -1,5 +1,3 @@
-import iris from 'iris-lib';
-
 import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
 import CopyButton from '../../components/CopyButton';
@@ -11,7 +9,7 @@ import { translate as t } from '../../translations/Translation';
 
 export default class BackupSettings extends Component {
   profileExportJson() {
-    const myPub = iris.session.getKey().secp256k1.rpub;
+    const myPub = Nostr.getPubKey();
     let rawDataJson = [];
     const profileEvent = Nostr.profileEventByUser.get(myPub);
     const followEvent = Nostr.followEventByUser.get(myPub);
@@ -158,7 +156,7 @@ export default class BackupSettings extends Component {
           continue; // we don't want to sign & publish unsigned events
         }
         Nostr.publish(event);
-        const myPub = iris.session.getKey().secp256k1.rpub;
+        const myPub = Nostr.getPubKey();
         // even if it's an old contacts event by us, restore follows from it
         if (event.pubkey === myPub && event.kind === 3) {
           const followed = event.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
