@@ -16,7 +16,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import localForage from 'localforage';
 import { route } from 'preact-router';
 
-import SortedLimitedEventSet from '../SortedLimitedEventSet';
+import SortedLimitedEventSet from './SortedLimitedEventSet';
 
 import IndexedDB from './IndexedDB';
 import LocalForage from './LocalForage';
@@ -51,7 +51,6 @@ type Subscription = {
 let subscriptionId = 0;
 
 const Nostr = {
-  localStorageLoaded: false,
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
@@ -630,7 +629,7 @@ const Nostr = {
         this.latestNotesByFollows.add(event);
       }
       replyingTo && this.latestNotesByFollows.delete(replyingTo);
-      if (changed && this.localStorageLoaded) {
+      if (changed && LocalForage.loaded) {
         LocalForage.saveEvents();
       }
     }
@@ -731,7 +730,7 @@ const Nostr = {
     const myPub = this.getPubKey();
 
     if (event.pubkey === myPub || this.followedByUser.get(myPub)?.has(event.pubkey)) {
-      this.localStorageLoaded && LocalForage.saveProfilesAndFollows();
+      LocalForage.loaded && LocalForage.saveProfilesAndFollows();
     }
 
     if (event.tags) {
@@ -840,7 +839,7 @@ const Nostr = {
       const existingEvent = this.profileEventByUser.get(event.pubkey);
       if (!existingEvent || existingEvent.created_at < event.created_at) {
         this.profileEventByUser.set(event.pubkey, event);
-        this.localStorageLoaded && LocalForage.saveProfilesAndFollows();
+        LocalForage.loaded && LocalForage.saveProfilesAndFollows();
       }
       //}
     } catch (e) {

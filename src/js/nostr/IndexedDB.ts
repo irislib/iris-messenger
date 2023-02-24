@@ -29,11 +29,9 @@ export default {
       });
   },
   loadIDBEvents() {
-    let i = 0;
     const myPub = Nostr.getPubKey();
     db.events.where({ pubkey: myPub }).each((event) => {
       Nostr.handleEvent(event, false, false);
-      i++;
     });
     const follows: string[] = Array.from(Nostr.followedByUser.get(myPub) || []);
     db.events
@@ -41,7 +39,6 @@ export default {
       .anyOf(follows)
       .each((event) => {
         Nostr.handleEvent(event, false, false);
-        i++;
       });
     // other follow events
     db.events
@@ -50,7 +47,6 @@ export default {
       .and((event) => event.kind === 3)
       .each((event) => {
         Nostr.handleEvent(event, false, false);
-        i++;
       });
     // other events
     db.events
@@ -59,8 +55,6 @@ export default {
       .and((event) => event.kind !== 3)
       .each((event) => {
         Nostr.handleEvent(event, false, false);
-        i++;
       });
-    console.log('loaded', i, 'events from idb');
   },
 };
