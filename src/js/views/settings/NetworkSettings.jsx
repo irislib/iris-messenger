@@ -1,35 +1,36 @@
-import React, {useState} from "react";
-import Nostr from "../../nostr/Nostr";
-import Button from '../../components/basic/Button';
+import React, { useState } from 'react';
 import iris from 'iris-lib';
-import CopyButton from '../../components/CopyButton';
+
+import Button from '../../components/basic/Button';
+import Nostr from '../../nostr/Nostr';
+import Relays from '../../nostr/Relays';
 import { translate as t } from '../../translations/Translation';
 const bech32 = require('bech32-buffer');
 
 const NetworkSettings = () => {
-  const [relays, setRelays] = useState(Array.from(Nostr.relays.values()));
-  const [newRelayUrl, setNewRelayUrl] = useState(""); // added state to store the new relay URL
+  const [relays, setRelays] = useState(Array.from(Relays.relays.values()));
+  const [newRelayUrl, setNewRelayUrl] = useState(''); // added state to store the new relay URL
 
   setInterval(() => {
-    setRelays(Array.from(Nostr.relays.values()));
+    setRelays(Array.from(Relays.relays.values()));
   }, 1000);
 
   const handleRemoveRelay = (relay) => {
     iris.local().get('relays').get(relay.url).put(null);
-    Nostr.removeRelay(relay.url);
+    Relays.remove(relay.url);
   };
 
   const ensureProtocol = (relay) => {
-    if (relay.includes('://')) return relay
+    if (relay.includes('://')) return relay;
 
-    return `wss://${relay}`
-  }
+    return `wss://${relay}`;
+  };
 
   const handleAddRelay = (event) => {
     const newRelayUrlWithProtocol = ensureProtocol(newRelayUrl);
     iris.local().get('relays').get(newRelayUrlWithProtocol).put({ enabled: true });
     event.preventDefault(); // prevent the form from reloading the page
-    Nostr.addRelay(newRelayUrlWithProtocol); // add the new relay using the Nostr method
+    Relays.add(newRelayUrlWithProtocol); // add the new relay using the Nostr method
     setNewRelayUrl(''); // reset the new relay URL
   };
 
@@ -39,7 +40,7 @@ const NetworkSettings = () => {
     } catch (e) {
       return 3;
     }
-  }
+  };
 
   const getClassName = (relay) => {
     switch (getStatus(relay)) {
@@ -54,7 +55,7 @@ const NetworkSettings = () => {
       default:
         return 'status';
     }
-  }
+  };
 
   return (
     <div className="centered-container">
@@ -67,9 +68,7 @@ const NetworkSettings = () => {
               {relay.url}
             </div>
             <div className="flex-cell no-flex">
-              <Button onClick={() => handleRemoveRelay(relay)}>
-                {t('remove')}
-              </Button>
+              <Button onClick={() => handleRemoveRelay(relay)}>{t('remove')}</Button>
             </div>
             <div className="flex-cell no-flex">
               <input
@@ -90,7 +89,7 @@ const NetworkSettings = () => {
               type="text"
               placeholder={t('new_relay_url')}
               value={newRelayUrl}
-              onChange={event => setNewRelayUrl(event.target.value)}
+              onChange={(event) => setNewRelayUrl(event.target.value)}
             />
           </div>
           <div className="flex-cell no-flex">
@@ -99,7 +98,7 @@ const NetworkSettings = () => {
         </div>
         <div>
           <Button onClick={() => Nostr.saveRelaysToContacts()}>{t('save_relays_publicly')}</Button>
-          <Button onClick={() => Nostr.restoreDefaultRelays()}>{t('restore_defaults')}</Button>
+          <Button onClick={() => Relays.restoreDefaults()}>{t('restore_defaults')}</Button>
         </div>
       </div>
     </div>

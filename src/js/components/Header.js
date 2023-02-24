@@ -8,6 +8,7 @@ import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
 import Nostr from '../nostr/Nostr';
+import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation';
 
 import Identicon from './Identicon';
@@ -122,7 +123,7 @@ class Header extends Component {
   }
 
   updateRelayCount() {
-    this.setState({ connectedRelays: Nostr.getConnectedRelayCount() });
+    this.setState({ connectedRelays: Relays.getConnectedRelayCount() });
   }
 
   render() {

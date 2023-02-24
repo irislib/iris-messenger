@@ -8,7 +8,6 @@ import {
   nip04,
   Path,
   Relay,
-  relayInit,
   signEvent,
   Sub,
 } from '../lib/nostr-tools';
@@ -21,6 +20,7 @@ import SortedLimitedEventSet from '../SortedLimitedEventSet';
 
 import IndexedDB from './IndexedDB';
 import LocalForage from './LocalForage';
+import Relays from './Relays';
 
 const startTime = Date.now() / 1000;
 
@@ -37,44 +37,11 @@ try {
   // ignore
 }
 
-const getRelayStatus = (relay: Relay) => {
-  // workaround for nostr-tools bug
-  try {
-    return relay.status;
-  } catch (e) {
-    return 3;
-  }
-};
-
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
 const MAX_MSGS_BY_KEYWORD = 100;
 
 const eventsById = new Map<string, Event>();
-
-const DEFAULT_RELAYS = [
-  'wss://eden.nostr.land',
-  'wss://nostr.fmt.wiz.biz',
-  'wss://relay.damus.io',
-  'wss://nostr-pub.wellorder.net',
-  'wss://relay.nostr.info',
-  'wss://offchain.pub',
-  'wss://nos.lol',
-  'wss://brb.io',
-  'wss://relay.snort.social',
-  'wss://relay.current.fyi',
-  'wss://nostr.relayer.se',
-];
-
-const SEARCH_RELAYS = ['wss://relay.nostr.band'];
-
-const defaultRelays = new Map<string, Relay>(
-  DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
-);
-
-const searchRelays = new Map<string, Relay>(
-  SEARCH_RELAYS.map((url) => [url, relayInit(url, (id) => eventsById.has(id))]),
-);
 
 type Subscription = {
   filters: Filter[];
@@ -88,8 +55,6 @@ const Nostr = {
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  relays: defaultRelays,
-  searchRelays: searchRelays,
   knownUsers: new Set<string>(),
   blockedUsers: new Set<string>(),
   flaggedUsers: new Set<string>(),
@@ -211,23 +176,6 @@ const Nostr = {
       }
       this.subscriptionsByName.get(name)?.add(sub);
     }
-  },
-  addRelay(url: string) {
-    if (this.relays.has(url)) return;
-    const relay = relayInit(url, (id) => this.eventsById.has(id));
-    relay.on('connect', () => this.resubscribe(relay));
-    relay.on('notice', (notice) => {
-      console.log('notice from ', relay.url, notice);
-    });
-    this.relays.set(url, relay);
-  },
-  removeRelay(url: string) {
-    try {
-      this.relays.get(url)?.close();
-    } catch (e) {
-      console.log('error closing relay', e);
-    }
-    this.relays.delete(url);
   },
   addFollower: function (followedUser: string, follower: string) {
     if (!this.followersByUser.has(followedUser)) {
@@ -369,7 +317,7 @@ const Nostr = {
       .filter((tag) => tag[0] === 'e')
       .reverse()
       .slice(0, 10);
-    for (const relay of this.relays.values()) {
+    for (const relay of Relays.relays.values()) {
       relay.publish(event);
       for (const ref of referredEvents) {
         const referredEvent = this.eventsById.get(ref[1]);
@@ -414,7 +362,7 @@ const Nostr = {
       }, unsubscribeTimeout);
     }
 
-    for (const relay of (id == 'keywords' ? this.searchRelays : this.relays).values()) {
+    for (const relay of (id == 'keywords' ? Relays.searchRelays : Relays.relays).values()) {
       const subId = this.getSubscriptionIdForName(id);
       const sub = relay.sub(filters, { id: subId });
       // TODO update relay lastSeen
@@ -648,15 +596,6 @@ const Nostr = {
     hasNewIds && this.subscribeToPosts(this);
     hasNewKeywords && this.subscribeToKeywords(this);
   },
-  getConnectedRelayCount: function () {
-    let count = 0;
-    for (const relay of this.relays.values()) {
-      if (getRelayStatus(relay) === 1) {
-        count++;
-      }
-    }
-    return count;
-  },
   SUGGESTED_FOLLOWS: [
     'npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9', // snowden
     'npub1sg6plzptd64u62a878hep2kev88swjh3tw00gjsfl8f237lmu63q0uf63m', // jack
@@ -667,42 +606,6 @@ const Nostr = {
     'npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6', // fiatjaf
     'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s', // jb55
   ],
-  connectRelay: function (relay: Relay) {
-    try {
-      relay.connect();
-    } catch (e) {
-      console.log(e);
-    }
-  },
-  manageRelays: function () {
-    const go = () => {
-      for (const relay of this.relays.values()) {
-        if (relay.enabled !== false && getRelayStatus(relay) === 3) {
-          this.connectRelay(relay);
-        }
-      }
-      for (const relay of this.searchRelays.values()) {
-        if (getRelayStatus(relay) === 3) {
-          this.connectRelay(relay);
-        }
-      }
-    };
-
-    for (const relay of this.relays.values()) {
-      relay.on('notice', (notice) => {
-        console.log('notice from ', relay.url, notice);
-      });
-    }
-    for (const relay of this.searchRelays.values()) {
-      relay.on('notice', (notice) => {
-        console.log('notice from ', relay.url, notice);
-      });
-    }
-
-    go();
-
-    setInterval(go, 10000);
-  },
   handleNote(event: Event) {
     this.eventsById.set(event.id, event);
     if (!this.postsAndRepliesByUser.has(event.pubkey)) {
@@ -857,13 +760,13 @@ const Nostr = {
         if (urls.length) {
           // remove all existing relays that are not in urls. TODO: just disable
           console.log('setting relays from your contacs list', urls);
-          for (const url of this.relays.keys()) {
+          for (const url of Relays.relays.keys()) {
             if (!urls.includes(url)) {
-              this.removeRelay(url);
+              Relays.remove(url);
             }
           }
           for (const url of urls) {
-            this.addRelay(url);
+            Relays.add(url);
           }
         }
       } catch (e) {
@@ -871,20 +774,9 @@ const Nostr = {
       }
     }
   },
-  restoreDefaultRelays() {
-    this.relays.clear();
-    for (const url of DEFAULT_RELAYS) {
-      this.addRelay(url);
-    }
-    this.saveRelaysToContacts();
-    // do not save these to contact list
-    for (const url of SEARCH_RELAYS) {
-      if (!this.relays.has(url)) this.addRelay(url);
-    }
-  },
   saveRelaysToContacts() {
     const relaysObj: any = {};
-    for (const url of this.relays.keys()) {
+    for (const url of Relays.relays.keys()) {
       relaysObj[url] = { read: true, write: true };
     }
     const existing = this.followEventByUser.get(this.getPubKey());
@@ -1274,7 +1166,7 @@ const Nostr = {
       document.documentElement.setAttribute('data-theme', 'dark');
     });
     this.knownUsers.add(myPub);
-    this.manageRelays();
+    Relays.manage();
     LocalForage.loadEvents();
     IndexedDB.loadIDBEvents();
     this.getProfile(key.secp256k1.rpub, undefined);
@@ -1306,7 +1198,7 @@ const Nostr = {
       // there might be some better way to manage resubscriptions
       if (document.visibilityState === 'visible') {
         if (Date.now() - lastResubscribed > 1000 * 60 * 5) {
-          for (const relay of this.relays.values()) {
+          for (const relay of Relays.relays.values()) {
             this.resubscribe(relay);
           }
           lastResubscribed = Date.now();
@@ -1402,16 +1294,6 @@ const Nostr = {
     };
     callback();
     this.subscribe([{ '#p': [this.getPubKey()] }], callback);
-  },
-
-  getSomeRelayUrl() {
-    // try to find a connected relay, but if none are connected, just return the first one
-    const relays: Relay[] = Array.from(this.relays.values());
-    const connectedRelays: Relay[] = relays.filter((relay: Relay) => getRelayStatus(relay) === 1);
-    if (connectedRelays.length) {
-      return connectedRelays[0].url;
-    }
-    return relays.length ? relays[0].url : null;
   },
 
   getMessagesByEveryone(

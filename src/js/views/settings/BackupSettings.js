@@ -4,9 +4,9 @@ import CopyButton from '../../components/CopyButton';
 import FollowButton from '../../components/FollowButton';
 import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
+import IndexedDB from '../../nostr/IndexedDB';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
-import IndexedDB from '../../nostr/IndexedDB';
 
 export default class BackupSettings extends Component {
   profileExportJson() {
