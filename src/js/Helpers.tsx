@@ -528,7 +528,7 @@ export default {
   },
 
   getProfileLink(pub: string): string {
-    return `${window.location.origin}//${encodeURIComponent(pub)}`;
+    return `${window.location.origin}/${encodeURIComponent(pub)}`;
   },
 
   isElectron,
