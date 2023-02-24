@@ -39,7 +39,7 @@ export default {
     };
 
     Nostr.publish(event);
-    Nostr.subscribeToAuthors(this);
+    Nostr.subscribeToAuthors();
   },
 
   setBlocked: function (blockedUser: string, block = true) {
@@ -96,7 +96,7 @@ export default {
     if (this.followedByUser.get(myPub)?.has(follower)) {
       if (!Nostr.subscribedUsers.has(followedUser)) {
         Nostr.subscribedUsers.add(followedUser); // subscribe to events from 2nd degree follows
-        Nostr.subscribeToAuthors(this);
+        Nostr.subscribeToAuthors();
       }
     }
   },

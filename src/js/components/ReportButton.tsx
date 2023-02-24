@@ -1,4 +1,5 @@
 import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 import BlockButton from './BlockButton';
@@ -18,7 +19,7 @@ class ReportButton extends BlockButton {
     e.preventDefault();
     const newValue = !this.state[this.key];
     if (confirm(newValue ? 'Publicly report this user?' : 'Unreport user?')) {
-      Nostr.flag(Nostr.toNostrHexAddress(this.props.id), newValue);
+      SocialNetwork.flag(Nostr.toNostrHexAddress(this.props.id), newValue);
     }
   }
 
