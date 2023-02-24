@@ -44,7 +44,13 @@ export default class BackupSettings extends Component {
             {t('profile')} & {t('follows')}:
           </p>
           <p>
-            <Button onClick={() => this.onClickDownload(() => this.profileExportJson())}>
+            <Button
+              onClick={() =>
+                this.onClickDownload('nostr-my-profile-and-follows.json', () =>
+                  this.profileExportJson(),
+                )
+              }
+            >
               {t('download')}
             </Button>
             <CopyButton
@@ -56,7 +62,11 @@ export default class BackupSettings extends Component {
           </p>
           <p>{t('your_events')}. Is slow dog but should eventually download the file:</p>
           <p>
-            <Button onClick={() => this.onClickDownload(() => this.exportMyEvents())}>
+            <Button
+              onClick={() =>
+                this.onClickDownload('nostr-my-events.json', () => this.exportMyEvents())
+              }
+            >
               {this.state.downloadMyEventsMessage || t('download')}
             </Button>
           </p>
@@ -99,14 +109,14 @@ export default class BackupSettings extends Component {
     );
   }
 
-  async onClickDownload(textFn) {
+  async onClickDownload(filename, textFn) {
     try {
       this.setState({ saveMessage: null, saveError: null });
       const text = await textFn();
       const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(text);
       const downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.setAttribute('href', dataStr);
-      downloadAnchorNode.setAttribute('download', 'nostr-backup.json');
+      downloadAnchorNode.setAttribute('download', filename);
       document.body.appendChild(downloadAnchorNode); // required for firefox
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
