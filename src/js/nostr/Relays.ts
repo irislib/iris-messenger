@@ -84,7 +84,7 @@ export default {
   },
   add(url: string) {
     if (this.relays.has(url)) return;
-    const relay = relayInit(url, (id) => this.eventsById.has(id));
+    const relay = relayInit(url, (id) => Nostr.eventsById.has(id));
     relay.on('connect', () => Nostr.resubscribe(relay));
     relay.on('notice', (notice) => {
       console.log('notice from ', relay.url, notice);
