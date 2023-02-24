@@ -8,6 +8,7 @@ export default {
   "application_security_warning": "Táto aplikácia je vo vývoji. Nie je vhodné do nej vkladať citlivé informácie.",
   "autoplay_videos": "Automaticky prehraj video",
   "back": "Späť",
+  "backup": "Záloha",
   "block": "Blokovať",
   "blocked": "Zablokované",
   "blocked_users": "Blokovaní používatelia",
@@ -48,6 +49,7 @@ export default {
   "last_active": "Posledná aktivita",
   "light": "Svetlé",
   "likes": "Hodnotenia",
+  "load": "Načítať",
   "log_out": "Odhlásiť sa",
   "logout_confirmation_info": "Už sa <b>nebudeš môcť prihlásiť</b>, pokiaľ si neuložíš kópiu súkromného kľúča.",
   "looking_up_message": "Hľadá sa správa...",
@@ -128,5 +130,6 @@ export default {
   "write_your_reply": "Napíšte svoju odpoveď",
   "yesterday": "včera",
   "you": "Ty",
+  "your_events": "Vaše udalosti",
   "your_qr_code": "Tvoj QR kód"
 };

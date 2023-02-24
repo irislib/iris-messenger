@@ -4,6 +4,7 @@ export default {
   "add": "شامل کریں",
   "autoplay_videos": "ویڈیوز کو خودکار پڑھیں",
   "back": "واپس",
+  "backup": "پشتیبان گیری",
   "block": "بلاک",
   "blocked": "بلاک کردہ",
   "cancel": "ختم",
@@ -14,6 +15,7 @@ export default {
   "create": "بنایٔیں",
   "delete": "ڈلیٹ کریں",
   "done": "کامل ہو گیا",
+  "download": "دانلود کریں",
   "follow_all": "تمام کو فالو کریں",
   "follow_someone_info": "کسی کے حلقہ احباب کا مواد دیکھنے کے لیے اسے فالو کریں! سفارشات:",
   "followers": "فالورز",
@@ -27,6 +29,7 @@ export default {
   "install_lightning_wallet_prompt": "براہ کرم ایک لائٹننگ والیٹ انسٹال کریں جیسے getalby.com (ڈیسک ٹاپ) یا walletofsatoshi.com (موبائل)!",
   "language": "زبان",
   "last_active": "لاسٹ ایکٹیو",
+  "loaded_and_published_{n}_events": "تم تحميل {n} من الأحداث ونشرها",
   "log_out": "بند کریں",
   "looking_up_message": "پیغام تلاش کر رہا ہے",
   "media": "میڈیا",
@@ -39,6 +42,7 @@ export default {
   "note_to_self": "خود کےلیے پیغام",
   "online": "آن لایٔن",
   "otherwise_cant_log_in_again": "Иначе вы не сможите войти в аккаунт.",
+  "paste_event_json": "Вставьте JSON события тут",
   "paste_private_key": "خفیہ کوڈ لکھیں",
   "paste_their_invite_link": "انکا انوایٔٹ لنک لکھیں",
   "peers": "دوست",
@@ -50,6 +54,7 @@ export default {
   "public_key": "عوامی کوڈ",
   "remove": "ہٹایٔں",
   "restore_defaults": "سب پہلے جیسا کردیں",
+  "restored_{n}_follows": "{n} دنبال کنندگان بازیابی شدند",
   "save_backup_of_privkey_first": "پہلے اپنا پریٔیوٹ کوڈ محفوظ کرلیں!",
   "search": "تلاش کریں",
   "search_posts": "تلاش کریں",
@@ -66,5 +71,6 @@ export default {
   "view_as": "کسی دوسرے صارف کے طور پر دیکھیں",
   "wednesday": "بدھ",
   "whats_your_name": "آپکا کیا نام ہے؟",
-  "yesterday": "کل"
+  "yesterday": "کل",
+  "your_events": "آپ کے واقعات"
 };

@@ -7,6 +7,7 @@ export default {
   "appearance": "מראה",
   "autoplay_videos": "הפעלת וידאו אוטומטית",
   "back": "אחורה",
+  "backup": "גיבוי",
   "block": "חסום",
   "blocked": "חסום",
   "cancel": "בטל",
@@ -32,6 +33,8 @@ export default {
   "install_lightning_wallet_prompt": "אנא התקן ארנק לייטנינג כמו getalby.com (שולחן עבודה) או walletofsatoshi.com (נייד)!",
   "language": "שפה",
   "light": "בהיר",
+  "load": "טען",
+  "loaded_and_published_{n}_events": "{n} אירועים נטענו ופורסמו",
   "log_out": "התנתק",
   "logout_confirmation_info": "-b",
   "looking_up_message": "מחפש הודעה",
@@ -42,6 +45,7 @@ export default {
   "new_chat": "צ'אט חדש",
   "new_group": "קבוצה חדשה",
   "now": "עכשיו",
+  "paste_event_json": "Itt illeszd be az esemény JSON-ját",
   "paste_private_key": "הדבק מפתח פרטי",
   "post": "פרסם",
   "posts": "פוסטים",
@@ -51,7 +55,9 @@ export default {
   "remove": "הסר",
   "replies": "תגובות",
   "reposted": "פורסם שנית",
+  "restored_{n}_follows": "{n} người theo dõi đã được khôi phục",
   "saturday": "שבת",
+  "save": "שמור",
   "search": "חיפוש",
   "search_posts": "חיפוש הודעות",
   "settings": "הגדרות",
@@ -60,5 +66,6 @@ export default {
   "video_call": "שיחת וידאו",
   "wednesday": "רביעי",
   "yesterday": "אתמול",
-  "you": "את/ה"
+  "you": "את/ה",
+  "your_events": "אירועיך"
 };

@@ -8,6 +8,7 @@ export default {
   "application_security_warning": "Alerta de segurança",
   "autoplay_videos": "Vídeos automático",
   "back": "Voltar",
+  "backup": "Cópia de segurança",
   "block": "bloquear",
   "blocked": "bloqueado",
   "blocked_users": "usuários bloqueados",
@@ -24,6 +25,7 @@ export default {
   "dark": "escuro",
   "delete": "apagar",
   "done": "Feito",
+  "download": "Baixar",
   "edit_profile": "editar perfil",
   "embeds": "incorporar",
   "everyone": "todos",
@@ -44,6 +46,8 @@ export default {
   "last_active": "última atividade",
   "light": "claro",
   "likes": "gostei",
+  "load": "carregar",
+  "loaded_and_published_{n}_events": "{n} eventos carregados e publicados",
   "log_out": "Sair",
   "logout_confirmation_info": "Você <b>não pode logar novamente</b> ao menos que você tenha salvado uma cópia da sua chave primária.",
   "looking_up_message": "Procurando mensagem...",
@@ -64,6 +68,7 @@ export default {
   "now": "agora",
   "online": "online",
   "otherwise_cant_log_in_again": "ou então não conseguirá logar novamente",
+  "paste_event_json": "Cole aqui o JSON do evento",
   "paste_private_key": "Cole a chave privada",
   "paste_their_invite_link": "Cole o link da outra pessoa",
   "peers": "Peers",
@@ -78,6 +83,7 @@ export default {
   "public_key": "Chave pública",
   "remove": "Remover",
   "restore_defaults": "Restaurar padrões",
+  "save": "Mentés",
   "save_backup_of_privkey_first": "Faça backup da sua chave privada primeiro!",
   "send_message": "Enviar mensagem",
   "settings": "Configurações",
@@ -91,5 +97,6 @@ export default {
   "view_as": "Ver como",
   "wednesday": "Quarta-feira",
   "whats_your_name": "Qual o seu nome?",
-  "yesterday": "ontem"
+  "yesterday": "ontem",
+  "your_events": "Os seus eventos"
 };

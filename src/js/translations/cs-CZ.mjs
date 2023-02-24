@@ -8,6 +8,7 @@ export default {
   "application_security_warning": "Tato aplikace je ve stádiu vývoje. Není vhodné do ní vkládat citlivé informace.",
   "autoplay_videos": "Automatické přehrávání videí",
   "back": "Zpět",
+  "backup": "Záloha",
   "block": "Blokovat",
   "blocked": "Blokováno",
   "blocked_users": "Blokovaní uživatelé",
@@ -48,6 +49,8 @@ export default {
   "last_active": "Poslední aktivita",
   "light": "Světlé",
   "likes": "Líbí se",
+  "load": "Načíst",
+  "loaded_and_published_{n}_events": "{n} událostí načteno a zveřejněno",
   "log_out": "Odhlásit se",
   "logout_confirmation_info": "Už se <b>nebude možné přihlásit</b>, pokud si neuložíš  kopii soukromého klíče.",
   "looking_up_message": "Vyhledávám zprávu",
@@ -68,6 +71,7 @@ export default {
   "now": "teď",
   "online": "online",
   "otherwise_cant_log_in_again": "Jinak se už nebude možné k tomuto účtu připojit.",
+  "paste_event_json": "Tu vložte JSON udalosti",
   "paste_private_key": "Vložit soukromý klíč",
   "paste_their_invite_link": "Vložit link s pozvánkou",
   "peers": "Partneři",
@@ -128,5 +132,6 @@ export default {
   "write_your_reply": "Napiš svou odpověď",
   "yesterday": "včera",
   "you": "Ty",
+  "your_events": "Tapahtumasi",
   "your_qr_code": "Tvůj QR kód"
 };

@@ -8,6 +8,7 @@ export default {
   "application_security_warning": "Sovellus on tarkastamaton koeversio. Älä käytä sitä turvallisuuskriittisiin tarkoituksiin.",
   "autoplay_videos": "Videon toisto automaattisesti",
   "back": "Takaisin",
+  "backup": "Varmuuskopio",
   "block": "Estä",
   "blocked": "Estetty",
   "blocked_users": "Estetyt käyttäjät",
@@ -47,6 +48,8 @@ export default {
   "last_active": "viimeksi aktiivisena",
   "light": "Vaalea",
   "likes": "Tykkäykset",
+  "load": "Lataa",
+  "loaded_and_published_{n}_events": "{n} tapahtumaa ladattu ja julkaistu",
   "log_out": "Kirjaudu ulos",
   "logout_confirmation_info": "<b>Et voi kirjautua takaisin sisään</b> ellet ole tallentanut varmuuskopiota salaisesta avaimestasi.",
   "looking_up_message": "Etsitään viestiä...",
@@ -88,7 +91,9 @@ export default {
   "reposted": "jakoi",
   "resend_to_relays": "Uudelleenlähetä verkkoon",
   "restore_defaults": "Palauta oletusarvot",
+  "restored_{n}_follows": "{n} seuraajaa palautettu",
   "saturday": "Lauantai",
+  "save": "Tallenna",
   "save_backup_of_privkey_first": "Tallenna ensin varmuuskopio salaisesta avaimestasi!",
   "save_relays_publicly": "Tallenna palvelimet julkisesti",
   "scan_qr_code": "Skannaa QR-koodi",
@@ -126,5 +131,6 @@ export default {
   "write_your_reply": "Kirjoita vastauksesi",
   "yesterday": "eilen",
   "you": "Sinä",
+  "your_events": "Sinun tapahtumasi",
   "your_qr_code": "QR-koodisi"
 };

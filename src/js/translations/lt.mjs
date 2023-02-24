@@ -8,6 +8,7 @@ export default {
   "application_security_warning": "saugos pranešimas",
   "autoplay_videos": "video automatinis paleidimas",
   "back": "atgal",
+  "backup": "Zálohování",
   "block": "blokuoti",
   "blocked": "užblokuotas",
   "blocked_users": "užblokuoti vartotojai",
@@ -45,6 +46,7 @@ export default {
   "last_active": "paskutinį kartą aktyvus",
   "light": "šviesus",
   "likes": "mėgsta",
+  "load": "įkelti",
   "log_out": "atsijungti",
   "logout_confirmation_info": "atsijungimo patvirtinimo informacija",
   "looking_up_message": "ieškoma žinutės...",
@@ -123,5 +125,6 @@ export default {
   "write_your_reply": "koks tavo atsakymas?",
   "yesterday": "vakar",
   "you": "tuščia",
+  "your_events": "tavo įvykiai",
   "your_qr_code": "tavo QR kodas"
 };

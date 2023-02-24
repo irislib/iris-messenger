@@ -8,6 +8,7 @@ export default {
   "application_security_warning": "предупреждение за сигурност",
   "autoplay_videos": "автоматично възпроизвеждане на видео",
   "back": "назад",
+  "backup": "Zálohovanie",
   "block": "блокиране",
   "blocked": "блокирано",
   "blocked_users": "блокирани потребители",
@@ -46,6 +47,7 @@ export default {
   "last_active": "последно видян",
   "light": "светло",
   "likes": "харесвания",
+  "load": "зареждане",
   "log_out": "излез",
   "logout_confirmation_info": "потвърждение за изход",
   "looking_up_message": "търсене на съобщение...",
@@ -66,6 +68,7 @@ export default {
   "now": "сега",
   "online": "свързано",
   "otherwise_cant_log_in_again": "иначе не може да влезе в профила отново",
+  "paste_event_json": "Čia įklijuokite įvykio JSON",
   "paste_private_key": "сложи таен ключ",
   "paste_their_invite_link": "сложи тяхната покана",
   "peers": "връстници",
@@ -126,5 +129,6 @@ export default {
   "write_your_reply": "напиши отговор",
   "yesterday": "вчера",
   "you": "ти",
+  "your_events": "Вашите събития",
   "your_qr_code": "твоят QR код"
 };
