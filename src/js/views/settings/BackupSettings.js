@@ -20,15 +20,33 @@ export default class BackupSettings extends Component {
     return rawDataJson;
   }
 
+  async exportMyEvents() {
+    console.log('exporting my events');
+    const pubkey = Nostr.getPubKey();
+    const events = [];
+    let i = 0;
+    this.setState({ downloadMyEventsMessage: 'Fetching events...' });
+    await Nostr.idb.events.where({ pubkey }).each((event) => {
+      events.push(event);
+      i++;
+    });
+    this.setState({ saveMessage: `Found ${i} events`, downloadMyEventsMessage: null });
+    return JSON.stringify(events);
+  }
+
   render() {
     return (
       <>
         <div class="centered-container">
           <h2>{t('backup')}</h2>
           <h3>{t('save')}</h3>
-          <p>{t('profile')} & {t('follows')}</p>
           <p>
-            <Button onClick={() => this.onClickDownload()}>{t('download')}</Button>
+            {t('profile')} & {t('follows')}:
+          </p>
+          <p>
+            <Button onClick={() => this.onClickDownload(() => this.profileExportJson())}>
+              {t('download')}
+            </Button>
             <CopyButton
               key={`${this.state.hexPub}copyData`}
               text={t('copy_raw_data')}
@@ -36,6 +54,14 @@ export default class BackupSettings extends Component {
               copyStr={() => this.profileExportJson()}
             />
           </p>
+          <p>{t('your_events')}. Is slow dog but should eventually download the file:</p>
+          <p>
+            <Button onClick={() => this.onClickDownload(() => this.exportMyEvents())}>
+              {this.state.downloadMyEventsMessage || t('download')}
+            </Button>
+          </p>
+          {this.state.saveMessage && <p>{this.state.saveMessage}</p>}
+          {this.state.saveError && <p class="warning">{this.state.saveError}</p>}
 
           <h3>{t('load')}</h3>
           <p>
@@ -47,7 +73,7 @@ export default class BackupSettings extends Component {
               placeholder={t('paste_event_json')}
             ></textarea>
           </p>
-          {this.state.error && <p class="warning">{this.state.error}</p>}
+          {this.state.loadError && <p class="warning">{this.state.loadError}</p>}
           {this.state.importedEvents && (
             <p class="positive">
               {t('loaded_and_published_{n}_events').replace('{n}', this.state.importedEvents)}
@@ -73,14 +99,21 @@ export default class BackupSettings extends Component {
     );
   }
 
-  onClickDownload() {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(this.profileExportJson());
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute('href', dataStr);
-    downloadAnchorNode.setAttribute('download', 'nostr-backup.json');
-    document.body.appendChild(downloadAnchorNode); // required for firefox
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+  async onClickDownload(textFn) {
+    try {
+      this.setState({ saveMessage: null, saveError: null });
+      const text = await textFn();
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(text);
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute('href', dataStr);
+      downloadAnchorNode.setAttribute('download', 'nostr-backup.json');
+      document.body.appendChild(downloadAnchorNode); // required for firefox
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    } catch (e) {
+      console.error(e);
+      this.setState({ saveError: e.message, downloadMyEventsMessage: null });
+    }
   }
 
   onUploadJsonClick() {
@@ -100,7 +133,7 @@ export default class BackupSettings extends Component {
 
   import(text) {
     if (!text || text.length === 0) {
-      this.setState({ error: null, importedEvents: null, restoredFollows: null });
+      this.setState({ loadError: null, importedEvents: null, restoredFollows: null });
       return;
     }
     try {
@@ -125,9 +158,9 @@ export default class BackupSettings extends Component {
           this.setState({ restoredFollows });
         }
       }
-      this.setState({ error: null, importedEvents: json.length });
+      this.setState({ loadError: null, importedEvents: json.length });
     } catch (e) {
-      this.setState({ error: e.message });
+      this.setState({ loadError: e.message });
     }
   }
 }
