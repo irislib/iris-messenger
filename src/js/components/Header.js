@@ -7,7 +7,7 @@ import { Link } from 'preact-router/match';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
 import Identicon from './Identicon';

@@ -4,7 +4,7 @@ import { throttle } from 'lodash';
 import Component from '../BaseComponent';
 import Button from '../components/basic/Button';
 import Helpers from '../Helpers';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
 import PublicMessage from './PublicMessage';

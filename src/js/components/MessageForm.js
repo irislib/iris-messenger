@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 
 import Helpers from '../Helpers';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 
 const mentionRegex = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
 

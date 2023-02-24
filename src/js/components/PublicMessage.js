@@ -6,7 +6,7 @@ import { route } from 'preact-router';
 
 import Helpers from '../Helpers';
 import Icons from '../Icons';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
 import BlockButton from './BlockButton';

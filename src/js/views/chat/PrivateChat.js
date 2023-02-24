@@ -9,7 +9,7 @@ import { Router } from 'preact-router';
 import Component from '../../BaseComponent';
 import Message from '../../components/Message';
 import Helpers from '../../Helpers';
-import Nostr from '../../Nostr';
+import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
 import NewChat from './newchat/NewChat';

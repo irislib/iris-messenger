@@ -21,7 +21,7 @@ import Settings from './views/settings/Settings';
 import Torrent from './views/Torrent';
 import Component from './BaseComponent';
 import Helpers from './Helpers';
-import Nostr from './Nostr';
+import Nostr from './nostr/Nostr';
 import QRScanner from './QRScanner';
 
 import '@fontsource/lato/400.css';

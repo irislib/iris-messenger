@@ -2,7 +2,7 @@ import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Button from '../components/basic/Button';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
 export default class LogoutConfirmation extends Component {

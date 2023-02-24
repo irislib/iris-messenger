@@ -3,7 +3,7 @@ import iris from 'iris-lib';
 import styled from 'styled-components';
 
 import Component from '../BaseComponent';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 
 import SafeImg from './SafeImg';
 

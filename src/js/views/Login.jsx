@@ -8,7 +8,7 @@ import * as secp from '@noble/secp256k1';
 import iris from 'iris-lib';
 import _ from 'lodash';
 import { route } from 'preact-router';
-import Nostr from "../Nostr";
+import Nostr from "../nostr/Nostr";
 import localForage from "localforage";
 const bech32 = require('bech32-buffer');
 

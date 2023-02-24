@@ -6,7 +6,7 @@ import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
 import SafeImg from '../../components/SafeImg';
 import Helpers from '../../Helpers';
-import Nostr from '../../Nostr';
+import Nostr from '../../nostr/Nostr';
 
 class ChatListItem extends Component {
   constructor() {

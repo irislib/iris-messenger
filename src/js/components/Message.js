@@ -5,7 +5,7 @@ import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 
 import Name from './Name';
 import Torrent from './Torrent';

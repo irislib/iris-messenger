@@ -11,14 +11,14 @@ import {
   relayInit,
   signEvent,
   Sub,
-} from './lib/nostr-tools';
+} from '../lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import { sha256 } from '@noble/hashes/sha256';
 import Dexie, { Table } from 'dexie';
 import localForage from 'localforage';
 import { route } from 'preact-router';
 
-import SortedLimitedEventSet from './SortedLimitedEventSet';
+import SortedLimitedEventSet from '../SortedLimitedEventSet';
 
 export class MyDexie extends Dexie {
   events!: Table<Event>;

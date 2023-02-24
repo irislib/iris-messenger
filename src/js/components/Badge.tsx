@@ -1,5 +1,5 @@
 import Icons from '../Icons';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
 export default function Badge(props) {

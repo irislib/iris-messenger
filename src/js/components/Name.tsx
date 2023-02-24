@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import Helpers from '../Helpers';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 
 import Badge from './Badge';
 

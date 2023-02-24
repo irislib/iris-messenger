@@ -4,7 +4,7 @@ import CopyButton from '../../components/CopyButton';
 import FollowButton from '../../components/FollowButton';
 import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
-import Nostr from '../../Nostr';
+import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
 export default class BackupSettings extends Component {

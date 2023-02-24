@@ -5,7 +5,7 @@ import ScrollViewport from 'preact-scroll-viewport';
 
 import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
-import Nostr from '../../Nostr';
+import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
 import ChatListItem from './ChatListItem';

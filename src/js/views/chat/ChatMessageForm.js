@@ -6,7 +6,7 @@ import MessageForm from '../../components/MessageForm';
 import Torrent from '../../components/Torrent';
 import Helpers from '../../Helpers';
 import EmojiButton from '../../lib/emoji-button';
-import Nostr from '../../Nostr';
+import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
 const submitButton = html` <button type="submit">

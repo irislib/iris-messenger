@@ -5,7 +5,7 @@ import Button from '../components/basic/Button';
 import UploadButton from '../components/basic/UploadButton';
 import Header from '../components/Header';
 import SafeImg from '../components/SafeImg';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
 const explainers = {

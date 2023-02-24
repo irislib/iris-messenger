@@ -2,7 +2,7 @@ import iris from 'iris-lib';
 
 import Component from '../../BaseComponent';
 import Name from '../../components/Name';
-import Nostr from '../../Nostr';
+import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
 export default class BlockedSettings extends Component {

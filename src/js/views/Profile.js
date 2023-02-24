@@ -19,7 +19,7 @@ import ProfilePicture from '../components/ProfilePicture';
 import ReportButton from '../components/ReportButton';
 import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';

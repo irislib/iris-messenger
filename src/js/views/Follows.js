@@ -6,7 +6,7 @@ import Button from '../components/basic/Button';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';

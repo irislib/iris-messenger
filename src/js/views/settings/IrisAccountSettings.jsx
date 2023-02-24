@@ -4,7 +4,7 @@ import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
-import Nostr from '../../Nostr';
+import Nostr from '../../nostr/Nostr';
 
 export default class IrisAccountSettings extends Component {
   state = {

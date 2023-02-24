@@ -2,7 +2,7 @@ import iris from 'iris-lib';
 
 import Component from '../BaseComponent';
 import Icons from '../Icons';
-import Nostr from '../Nostr';
+import Nostr from '../nostr/Nostr';
 
 import Identicon from './Identicon';
 

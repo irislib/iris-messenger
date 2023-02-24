@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import Nostr from "../../Nostr";
+import Nostr from "../../nostr/Nostr";
 import Button from '../../components/basic/Button';
 import iris from 'iris-lib';
 import CopyButton from '../../components/CopyButton';
