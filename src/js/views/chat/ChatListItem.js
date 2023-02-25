@@ -4,7 +4,6 @@ import { route } from 'preact-router';
 import Component from '../../BaseComponent';
 import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
-import SafeImg from '../../components/SafeImg';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -79,12 +78,6 @@ class ChatListItem extends Component {
       name = html`📝 <b>${t('note_to_self')}</b>`;
     }*/
 
-    let iconEl = chat.picture
-      ? html`<div class="identicon-container">
-          <${SafeImg} src="${chat.picture}" class="round-borders" height="49" width="49" alt="" />
-        </div>`
-      : html`<${Identicon} str=${chat} width="49" />`;
-
     /*
     const latestEl =
       chat.isTyping || !chat.latest
@@ -106,6 +99,8 @@ class ChatListItem extends Component {
         Helpers.getRelativeTimeText(new Date(this.state.latest.created_at * 1000))) ||
       '';
 
+    const npub = Nostr.toNostrBech32Address(chat, 'npub');
+
     // TODO use button so we can use keyboard to navigate
     return html`
       <div
@@ -113,9 +108,9 @@ class ChatListItem extends Component {
         role="button"
         tabindex="0"
         class="chat-item ${activity} ${hasUnseen} ${active}"
-        onClick=${() => route(`/chat/${Nostr.toNostrBech32Address(this.props.chat, 'npub')}`)}
+        onClick=${() => route(`/chat/${npub}`)}
       >
-        ${iconEl}
+        <${Identicon} str=${npub} width="49" />
         <div class="text">
           <div>
             <span class="name"><${Name} pub=${this.props.chat} /></span>

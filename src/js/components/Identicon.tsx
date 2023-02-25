@@ -1,5 +1,5 @@
+import { sha256 } from '@noble/hashes/sha256';
 import Identicon from 'identicon.js';
-import iris from 'iris-lib';
 import styled from 'styled-components';
 
 import Component from '../BaseComponent';
@@ -40,14 +40,18 @@ class MyIdenticon extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
 
   updateIdenticon() {
-    iris.util.getHash(this.props.str as string, `hex`).then((hash) => {
-      const identicon = new Identicon(hash, {
-        width: this.props.width,
-        format: `svg`,
-      });
-      this.setState({
-        identicon: `data:image/svg+xml;base64,${identicon.toString()}`,
-      });
+    const hash = sha256(this.props.str as string);
+    // convert to hex
+    const hex = Array.from(new Uint8Array(hash))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    const identicon = new Identicon(hex, {
+      width: this.props.width,
+      format: `svg`,
+    });
+    this.setState({
+      identicon: `data:image/svg+xml;base64,${identicon.toString()}`,
     });
   }
 
