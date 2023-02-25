@@ -136,8 +136,8 @@ const Nostr = {
       { authors: [myPub] },
     );
     this.public.get('notifications/lastOpened', (time) => {
-      if (time !== this.notificationsSeenTime) {
-        this.notificationsSeenTime = time;
+      if (time !== Events.notificationsSeenTime) {
+        Events.notificationsSeenTime = time;
         localForage.setItem('notificationsSeenTime', time);
         Events.updateUnseenNotificationCount();
       }

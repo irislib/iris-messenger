@@ -504,7 +504,7 @@ const Events = {
       }
       this.cache.set(event.id, event);
       this.notifications.add(event);
-      this.updateUnseenNotificationCount(this);
+      this.updateUnseenNotificationCount();
     }
   },
   updateUnseenNotificationCount: debounce(() => {
