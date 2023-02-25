@@ -431,13 +431,13 @@ class PublicMessage extends Message {
       <div class="msg-menu-btn">
         <${Dropdown}>
           <${CopyButton}
-            key=${`${this.props.hash}copy`}
+            key=${`${this.props.hash}copy_link`}
             text=${t('copy_link')}
             title="Note link"
             copyStr=${url}
           />
           <${CopyButton}
-            key=${`${this.props.hash}copy`}
+            key=${`${this.props.hash}copy_id`}
             text=${t('copy_note_ID')}
             title="Note ID"
             copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}

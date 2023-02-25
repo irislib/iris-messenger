@@ -1,8 +1,8 @@
 import iris from 'iris-lib';
 
 import Component from '../BaseComponent';
-import Nostr from '../nostr/Nostr';
 import Key from '../nostr/Key';
+import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
