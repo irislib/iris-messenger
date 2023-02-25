@@ -251,6 +251,48 @@ export default {
       });
     }
 
+    // twitch.com/videos
+    if (settings.enableTwitch !== false) {
+      const twitchRegex = /(?:https?:\/\/)?(?:www\.)?(?:twitch\.tv\/videos\/)([\d]+)?/g;
+      replacedText = reactStringReplace(replacedText, twitchRegex, (match, i) => {
+        return (
+          <iframe
+            class="video"
+            scrolling="no"
+            key={match + i}
+            width="650"
+            height="400"
+            style={{ maxWidth: '100%' }}
+            src={`https://player.twitch.tv/?video=${match}&parent=${window.location.hostname}`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        );
+      });
+    }
+
+    // twitch channels
+    if (settings.enableTwitch !== false) {
+      const twitchRegex = /(?:https?:\/\/)?(?:www\.)?(?:twitch\.tv\/)([\w-]+)?/g;
+      replacedText = reactStringReplace(replacedText, twitchRegex, (match, i) => {
+        return (
+          <iframe
+            class="video"
+            scrolling="no"
+            key={match + i}
+            width="650"
+            height="400"
+            style={{ maxWidth: '100%' }}
+            src={`https://player.twitch.tv/?channel=${match}&parent=${window.location.hostname}`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        );
+      });
+    }
+
     if (settings.enableTorrent !== false) {
       const magnetRegex = /(magnet:\?xt=urn:btih:.*)/gi;
       replacedText = reactStringReplace(replacedText, magnetRegex, (match, i) => {

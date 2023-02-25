@@ -50,5 +50,3 @@ Join our [Telegram](https://t.me/irismessenger) (will be moved onto Iris when gr
 ---
 
 <a href="https://opencollective.com/iris-social/donate" target="_blank"><img src="https://opencollective.com/iris-social/donate/button@2x.png?color=blue" width=200 /></a>
-
-<p><sub>BTC: bc1qypfnmcgf9cdxcw307u20qzdyxf66egdgj0ljze</sub></p>
