@@ -209,7 +209,7 @@ export default {
     if (profile) {
       callback();
       if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
-        Nostr.verifyNip05Address(profile.nip05, address).then((isValid) => {
+        Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
           console.log('NIP05 address is valid?', isValid, profile.nip05, address);
           profile.nip05valid = isValid;
           this.profiles.set(address, profile);
