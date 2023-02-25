@@ -10,6 +10,7 @@ import Button from '../components/basic/Button';
 import LanguageSelector from '../components/LanguageSelector';
 import Helpers from '../Helpers';
 import Nostr from '../nostr/Nostr';
+import Events from '../nostr/Events';
 import { translate as t } from '../translations/Translation';
 const bech32 = require('bech32-buffer');
 
