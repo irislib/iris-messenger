@@ -5,6 +5,7 @@ import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
+import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
