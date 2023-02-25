@@ -6,6 +6,7 @@ import Button from '../components/basic/Button';
 import Helpers from '../Helpers';
 import Nostr from '../nostr/Nostr';
 import Events from '../nostr/Events';
+import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
 import PublicMessage from './PublicMessage';
