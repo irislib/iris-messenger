@@ -10,6 +10,7 @@ import Component from '../../BaseComponent';
 import Message from '../../components/Message';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
@@ -178,7 +179,7 @@ export default class PrivateChat extends Component {
   renderMainView() {
     let mainView;
     if (this.props.id && this.props.id.length > 20) {
-      const myPub = Nostr.getPubKey();
+      const myPub = Key.getPubKey();
       const now = new Date();
       const nowStr = now.toLocaleDateString();
       let previousDateStr;

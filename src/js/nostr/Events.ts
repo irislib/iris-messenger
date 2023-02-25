@@ -4,6 +4,7 @@ import { debounce } from 'lodash';
 import { Event, Filter, getEventHash } from '../lib/nostr-tools';
 
 import IndexedDB from './IndexedDB';
+import Key from './Key';
 import LocalForage from './LocalForage';
 import Nostr from './Nostr';
 import Relays from './Relays';
@@ -54,7 +55,7 @@ const Events = {
     }
     // we don't want both the reply and the original post in the feed:
     replyingTo && this.latestNotesByEveryone.delete(replyingTo);
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
       const changed = this.latestNotesAndRepliesByFollows.add(event);
       // we don't want both the reply and the original post in the feed:
@@ -151,7 +152,7 @@ const Events = {
       this.likesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
     }
     this.likesByUser.get(event.pubkey).add({ id, created_at: event.created_at });
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
       //Nostr.getEventById(id);
     }
@@ -162,7 +163,7 @@ const Events = {
       return;
     }
     SocialNetwork.followEventByUser.set(event.pubkey, event);
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
 
     if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
       LocalForage.loaded && LocalForage.saveProfilesAndFollows();
@@ -213,11 +214,11 @@ const Events = {
       return;
     }
     this.myBlockEvent = event;
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     if (event.pubkey === myPub) {
       let content;
       try {
-        content = await Nostr.decrypt(event.content);
+        content = await Key.decrypt(event.content);
         const blockList = JSON.parse(content);
         SocialNetwork.blockedUsers = new Set(blockList);
       } catch (e) {
@@ -229,7 +230,7 @@ const Events = {
     if (this.myFlagEvent?.created_at > event.created_at) {
       return;
     }
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     if (event.pubkey === myPub) {
       try {
         const flaggedUsers = JSON.parse(event.content);
@@ -269,7 +270,7 @@ const Events = {
   },
   handleDelete(event: Event) {
     const id = event.tags.find((tag) => tag[0] === 'e')?.[1];
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     if (id) {
       const deletedEvent = this.cache.get(id);
       // only we or the author can delete
@@ -282,7 +283,7 @@ const Events = {
     }
   },
   handleDirectMessage(event: Event) {
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     let user = event.pubkey;
     if (event.pubkey === myPub) {
       user = event.tags.find((tag) => tag[0] === 'p')?.[1] || user;
@@ -299,7 +300,7 @@ const Events = {
     this.directMessagesByUser.get(user)?.add(event);
   },
   handleKeyValue(event: Event) {
-    if (event.pubkey !== Nostr.getPubKey()) {
+    if (event.pubkey !== Key.getPubKey()) {
       return;
     }
     const key = event.tags.find((tag) => tag[0] === 'd')?.[1];
@@ -487,7 +488,7 @@ const Events = {
   },
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     // TODO: if it's a like, only add if the last p tag is us
     if (event.pubkey !== myPub && event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
       if (event.kind === 3) {
@@ -526,9 +527,9 @@ const Events = {
       }
       event.content = event.content || '';
       event.created_at = event.created_at || Math.floor(Date.now() / 1000);
-      event.pubkey = Nostr.getPubKey();
+      event.pubkey = Key.getPubKey();
       event.id = getEventHash(event);
-      event.sig = await Nostr.sign(event);
+      event.sig = await Key.sign(event);
     }
     if (!(event.id && event.sig)) {
       console.error('Invalid event', event);

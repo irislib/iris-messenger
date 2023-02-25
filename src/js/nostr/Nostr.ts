@@ -1,7 +1,7 @@
 import iris from 'iris-lib';
 import { debounce, throttle } from 'lodash';
 
-import { Event, Filter, nip04, Path, Relay, signEvent, Sub } from '../lib/nostr-tools';
+import { Event, Filter, Path, Relay, Sub } from '../lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import { sha256 } from '@noble/hashes/sha256';
 import localForage from 'localforage';
@@ -9,6 +9,7 @@ import { route } from 'preact-router';
 
 import Events from './Events';
 import IndexedDB from './IndexedDB';
+import Key from './Key';
 import LocalForage from './LocalForage';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
@@ -45,39 +46,11 @@ const Nostr = {
   subscribedRepliesAndLikes: new Set<string>(),
   subscribedProfiles: new Set<string>(),
   subscribedKeywords: new Set<string>(),
-  windowNostrQueue: [],
-  isProcessingQueue: false,
 
   arrayToHex(array: any) {
     return Array.from(array, (byte: any) => {
       return ('0' + (byte & 0xff).toString(16)).slice(-2);
     }).join('');
-  },
-
-  async decryptMessage(id, cb: (decrypted: string) => void) {
-    const existing = Events.decryptedMessages.get(id);
-    if (existing) {
-      cb(existing);
-      return;
-    }
-    try {
-      const myPub = this.getPubKey();
-      const msg = Events.cache.get(id);
-      const theirPub =
-        msg.pubkey === myPub ? msg.tags.find((tag: any) => tag[0] === 'p')[1] : msg.pubkey;
-      if (!(msg && theirPub)) {
-        return;
-      }
-
-      let decrypted = await this.decrypt(msg.content, theirPub);
-      if (decrypted.content) {
-        decrypted = decrypted.content; // what? TODO debug
-      }
-      Events.decryptedMessages.set(id, decrypted);
-      cb(decrypted);
-    } catch (e) {
-      console.error(e);
-    }
   },
   getSubscriptionIdForName(name: string) {
     return this.arrayToHex(sha256(name)).slice(0, 8);
@@ -180,7 +153,7 @@ const Nostr = {
   // then we can increase the limit
   subscribeToAuthors: debounce(() => {
     const now = Math.floor(Date.now() / 1000);
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) ?? []);
     followedUsers.push(myPub);
     console.log('subscribe to', followedUsers.length, 'followedUsers');
@@ -236,79 +209,6 @@ const Nostr = {
     };
     go();
   }, 100),
-  encrypt: async function (data: string, pub?: string) {
-    const k = iris.session.getKey().secp256k1;
-    pub = pub || k.rpub;
-    if (k.priv) {
-      return nip04.encrypt(k.priv, pub, data);
-    } else if (window.nostr) {
-      return new Promise((resolve) => {
-        this.processWindowNostr({ op: 'encrypt', data, pub, callback: resolve });
-      });
-    } else {
-      return Promise.reject('no private key');
-    }
-  },
-  decrypt: async function (data, pub?: string) {
-    const k = iris.session.getKey().secp256k1;
-    pub = pub || k.rpub;
-    if (k.priv) {
-      return nip04.decrypt(k.priv, pub, data);
-    } else if (window.nostr) {
-      return new Promise((resolve) => {
-        this.processWindowNostr({ op: 'decrypt', data, pub, callback: resolve });
-      });
-    } else {
-      return Promise.reject('no private key');
-    }
-  },
-  sign: async function (event: Event) {
-    const priv = iris.session.getKey().secp256k1.priv;
-    if (priv) {
-      return signEvent(event, priv);
-    } else if (window.nostr) {
-      return new Promise((resolve) => {
-        this.processWindowNostr({ op: 'sign', data: event, callback: resolve });
-      });
-    } else {
-      return Promise.reject('no private key');
-    }
-  },
-  processWindowNostr(item: any) {
-    this.windowNostrQueue.push(item);
-    if (!this.isProcessingQueue) {
-      this.processWindowNostrQueue();
-    }
-  },
-  async processWindowNostrQueue() {
-    if (!this.windowNostrQueue.length) {
-      this.isProcessingQueue = false;
-      return;
-    }
-    this.isProcessingQueue = true;
-    const { op, data, pub, callback } = this.windowNostrQueue[0];
-
-    let fn = Promise.resolve();
-    if (op === 'decrypt') {
-      fn = this.handlePromise(window.nostr.nip04.decrypt(pub, data), callback);
-    } else if (op === 'encrypt') {
-      fn = this.handlePromise(window.nostr.nip04.encrypt(pub, data), callback);
-    } else if (op === 'sign') {
-      fn = this.handlePromise(window.nostr.signEvent(data), (signed) => callback(signed.sig));
-    }
-    await fn;
-    this.windowNostrQueue.shift();
-    this.processWindowNostrQueue();
-  },
-  handlePromise(promise, callback) {
-    return promise
-      .then((result) => {
-        callback(result);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  },
   unsubscribe: function (id: string) {
     const subs = this.subscriptionsByName.get(id);
     if (subs) {
@@ -397,7 +297,7 @@ const Nostr = {
     for (const url of Relays.relays.keys()) {
       relaysObj[url] = { read: true, write: true };
     }
-    const existing = SocialNetwork.followEventByUser.get(this.getPubKey());
+    const existing = SocialNetwork.followEventByUser.get(Key.getPubKey());
     const content = JSON.stringify(relaysObj);
 
     const event = {
@@ -422,9 +322,6 @@ const Nostr = {
       }
     });
   },
-  getPubKey() {
-    return iris.session.getKey()?.secp256k1?.rpub; // TODO use this everywhere :D
-  },
   onLoggedIn() {
     const key = iris.session.getKey();
     const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
@@ -439,14 +336,14 @@ const Nostr = {
       this.subscribe(filters, callback);
       return '0';
     };
-    const myPub = this.getPubKey();
+    const myPub = Key.getPubKey();
     this.private = new Path(
       (...args) => Events.publish(...args),
       subscribe,
       (...args) => this.unsubscribe(...args),
       { authors: [myPub] },
-      (...args) => this.encrypt(...args),
-      (...args) => this.decrypt(...args),
+      (...args) => Key.encrypt(...args),
+      (...args) => Key.decrypt(...args),
     );
     this.public = new Path(
       (...args) => Events.publish(...args),
@@ -556,7 +453,7 @@ const Nostr = {
       cb?.(Events.notifications.eventIds);
     };
     callback();
-    this.subscribe([{ '#p': [this.getPubKey()] }], callback);
+    this.subscribe([{ '#p': [Key.getPubKey()] }], callback);
   },
 
   getMessagesByEveryone(

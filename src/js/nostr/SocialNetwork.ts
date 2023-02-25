@@ -3,6 +3,7 @@ import iris from 'iris-lib';
 import { Event } from '../lib/nostr-tools';
 
 import Events from './Events';
+import Key from './Key';
 import LocalForage from './LocalForage';
 import Nostr from './Nostr';
 
@@ -19,7 +20,7 @@ export default {
     if (typeof followedUsers === 'string') {
       followedUsers = [followedUsers];
     }
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     followedUsers.forEach((followedUser) => {
       followedUser = Nostr.toNostrHexAddress(followedUser);
       if (follow && followedUser && followedUser !== myPub) {
@@ -45,7 +46,7 @@ export default {
 
   setBlocked: function (blockedUser: string, block = true) {
     blockedUser = Nostr.toNostrHexAddress(blockedUser);
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
 
     if (block) {
       this.blockedUsers.add(blockedUser);
@@ -67,7 +68,7 @@ export default {
     if (!this.followedByUser.has(follower)) {
       this.followedByUser.set(follower, new Set<string>());
     }
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
 
     // if new follow, move all their posts to followedByUser
     if (follower === myPub && !this.followedByUser.get(myPub).has(followedUser)) {
@@ -144,7 +145,7 @@ export default {
   },
   followedByFriendsCount: function (address: string) {
     let count = 0;
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     for (const follower of this.followersByUser.get(address) ?? []) {
       if (this.followedByUser.get(myPub)?.has(follower)) {
         count++; // should we stop at 10?
@@ -155,7 +156,7 @@ export default {
   block: async function (address: string, isBlocked: boolean) {
     isBlocked ? this.blockedUsers.add(address) : this.blockedUsers.delete(address);
     let content: any = JSON.stringify(Array.from(this.blockedUsers));
-    content = await Nostr.encrypt(content);
+    content = await Key.encrypt(content);
     Events.publish({
       kind: 16462,
       content,

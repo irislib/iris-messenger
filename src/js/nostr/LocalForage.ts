@@ -4,7 +4,7 @@ import { debounce } from 'lodash';
 import { Event } from '../lib/nostr-tools';
 
 import Events from './Events';
-import Nostr from './Nostr';
+import Key from './Key';
 import SocialNetwork from './SocialNetwork';
 
 export default {
@@ -41,7 +41,7 @@ export default {
 
   saveProfilesAndFollows: debounce(() => {
     const profileEvents = Array.from(SocialNetwork.profileEventByUser.values());
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     const followEvents = Array.from(SocialNetwork.followEventByUser.values()).filter((e: Event) => {
       return e.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(e.pubkey);
     });

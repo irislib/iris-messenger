@@ -5,6 +5,7 @@ import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
+import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 
 import Name from './Name';
@@ -44,7 +45,7 @@ class Message extends Component {
           window.location = href.replace('https://iris.to/', '');
         }
       });
-    Nostr.decryptMessage(this.props.id, (text) => {
+    Key.decryptMessage(this.props.id, (text) => {
       this.setState({ text });
     });
   }

@@ -6,13 +6,14 @@ import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
 import Events from '../../nostr/Events';
 import IndexedDB from '../../nostr/IndexedDB';
+import Key from '../../nostr/Key';
 import Nostr from '../../nostr/Nostr';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 
 export default class BackupSettings extends Component {
   profileExportJson() {
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     let rawDataJson = [];
     const profileEvent = SocialNetwork.profileEventByUser.get(myPub);
     const followEvent = SocialNetwork.followEventByUser.get(myPub);
@@ -24,7 +25,7 @@ export default class BackupSettings extends Component {
 
   async exportMyEvents() {
     console.log('exporting my events');
-    const pubkey = Nostr.getPubKey();
+    const pubkey = Key.getPubKey();
     const events = [];
     let i = 0;
     this.setState({ downloadMyEventsMessage: 'Fetching events...' });
@@ -159,7 +160,7 @@ export default class BackupSettings extends Component {
           continue; // we don't want to sign & publish unsigned events
         }
         Events.publish(event);
-        const myPub = Nostr.getPubKey();
+        const myPub = Key.getPubKey();
         // even if it's an old contacts event by us, restore follows from it
         if (event.pubkey === myPub && event.kind === 3) {
           const followed = event.tags.filter((t) => t[0] === 'p').map((t) => t[1]);

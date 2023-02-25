@@ -3,7 +3,7 @@ import Dexie, { Table } from 'dexie';
 import { Event } from '../lib/nostr-tools';
 
 import Events from './Events';
-import Nostr from './Nostr';
+import Key from './Key';
 import SocialNetwork from './SocialNetwork';
 export class MyDexie extends Dexie {
   events!: Table<Event>;
@@ -31,7 +31,7 @@ export default {
       });
   },
   loadIDBEvents() {
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     db.events.where({ pubkey: myPub }).each((event) => {
       Events.handle(event, false, false);
     });

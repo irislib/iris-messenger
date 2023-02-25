@@ -42,7 +42,7 @@ class FollowButton extends Component<Props> {
 
   componentDidMount() {
     if (this.key === 'follow') {
-      SocialNetwork.getFollowedByUser(Nostr.getPubKey(), (follows) => {
+      SocialNetwork.getFollowedByUser(Key.getPubKey(), (follows) => {
         const follow = follows?.has(Nostr.toNostrHexAddress(this.props.id));
         this.setState({ follow });
       });

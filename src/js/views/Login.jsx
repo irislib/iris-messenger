@@ -1,15 +1,16 @@
-import Helpers from '../Helpers';
-import { translate as t } from '../translations/Translation';
-import LanguageSelector from '../components/LanguageSelector';
-import { Component } from 'preact';
-import logo from '../../assets/img/android-chrome-192x192.png';
-import Button from '../components/basic/Button';
 import * as secp from '@noble/secp256k1';
 import iris from 'iris-lib';
+import localForage from 'localforage';
 import _ from 'lodash';
+import { Component } from 'preact';
 import { route } from 'preact-router';
-import Nostr from "../nostr/Nostr";
-import localForage from "localforage";
+
+import logo from '../../assets/img/android-chrome-192x192.png';
+import Button from '../components/basic/Button';
+import LanguageSelector from '../components/LanguageSelector';
+import Helpers from '../Helpers';
+import Nostr from '../nostr/Nostr';
+import { translate as t } from '../translations/Translation';
 const bech32 = require('bech32-buffer');
 
 function maybeGoToChat(key) {
@@ -105,9 +106,10 @@ class Login extends Component {
     let name = document.getElementById('login-form-name').value;
     iris.session.loginAsNewUser({ name, autofollow: false });
     iris.local().get('showFollowSuggestions').put(true);
-    name && setTimeout(() => {
-      Nostr.setMetadata({ name });
-    }, 100);
+    name &&
+      setTimeout(() => {
+        Nostr.setMetadata({ name });
+      }, 100);
     // follow the developer's nostr key also
     this.base.style = 'display:none';
     const now = Math.floor(Date.now() / 1000);
@@ -117,10 +119,12 @@ class Login extends Component {
 
   onNameChange(event) {
     const val = event.target.value;
-    if ((val.indexOf('"priv"') !== -1) ||
-        secp.utils.isValidPrivateKey(val) ||
-        val.startsWith('nsec') ||
-        val.startsWith('npub')) {
+    if (
+      val.indexOf('"priv"') !== -1 ||
+      secp.utils.isValidPrivateKey(val) ||
+      val.startsWith('nsec') ||
+      val.startsWith('npub')
+    ) {
       this.onPasteKey(event);
       event.target.value = '';
       return;

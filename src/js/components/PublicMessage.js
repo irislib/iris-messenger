@@ -7,6 +7,7 @@ import { route } from 'preact-router';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
 import Events from '../nostr/Events';
+import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
@@ -138,7 +139,7 @@ class PublicMessage extends Message {
     if (!p) {
       return;
     }
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
 
     const handleMessage = (r) => {
       this.props.standalone && console.log('got message', r);

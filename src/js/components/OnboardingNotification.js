@@ -3,6 +3,7 @@ import iris from 'iris-lib';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
+import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
@@ -59,7 +60,7 @@ export default class OnboardingNotification extends Component {
     }
     if (this.state.noFollowers && !this.state.hasNostrFollowers) {
       const rpub = iris.session.getKey()?.secp256k1?.rpub;
-      const npub = rpub && Nostr.toNostrBech32Address(Nostr.getPubKey(), 'npub');
+      const npub = rpub && Nostr.toNostrBech32Address(Key.getPubKey(), 'npub');
       return html`
         <div class="msg">
           <div class="msg-content">

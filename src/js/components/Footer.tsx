@@ -2,6 +2,7 @@ import iris from 'iris-lib';
 
 import Component from '../BaseComponent';
 import Icons from '../Icons';
+import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 
 import Identicon from './Identicon';
@@ -49,7 +50,7 @@ class Footer extends Component<Props, State> {
   }
 
   render() {
-    const key = Nostr.toNostrBech32Address(Nostr.getPubKey(), 'npub');
+    const key = Nostr.toNostrBech32Address(Key.getPubKey(), 'npub');
     if (!key) {
       return;
     }

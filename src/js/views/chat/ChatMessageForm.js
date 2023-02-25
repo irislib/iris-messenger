@@ -7,6 +7,7 @@ import Torrent from '../../components/Torrent';
 import Helpers from '../../Helpers';
 import EmojiButton from '../../lib/emoji-button';
 import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
@@ -58,7 +59,7 @@ class ChatMessageForm extends MessageForm {
       if (!theirPub) {
         throw new Error('invalid public key ' + theirPub);
       }
-      return Nostr.encrypt(text, theirPub);
+      return Key.encrypt(text, theirPub);
     } catch (e) {
       console.error(e);
     }

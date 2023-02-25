@@ -19,6 +19,7 @@ import ProfilePicture from '../components/ProfilePicture';
 import ReportButton from '../components/ReportButton';
 import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
+import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
@@ -218,7 +219,7 @@ class Profile extends View {
                   <span>${this.state.followerCount}</span> ${t('followers')}
                 </a>
               </div>
-              ${SocialNetwork.followedByUser.get(this.state.hexPub)?.has(Nostr.getPubKey())
+              ${SocialNetwork.followedByUser.get(this.state.hexPub)?.has(Key.getPubKey())
                 ? html` <p><small>${t('follows_you')}</small></p> `
                 : ''}
               <div class="hidden-xs">
@@ -463,7 +464,7 @@ class Profile extends View {
   }
 
   loadProfile(hexPub, nostrAddress) {
-    const isMyProfile = hexPub === Nostr.getPubKey();
+    const isMyProfile = hexPub === Key.getPubKey();
     this.setState({ isMyProfile });
     this.followedUsers = new Set();
     this.followers = new Set();
@@ -503,7 +504,7 @@ class Profile extends View {
           nostrAddress = nostrAddress + '@iris.to';
         }
       }
-      Nostr.getPubKeyByNip05Address(nostrAddress).then((pubKey) => {
+      Key.getPubKeyByNip05Address(nostrAddress).then((pubKey) => {
         if (pubKey) {
           const npub = Nostr.toNostrBech32Address(pubKey, 'npub');
           if (npub && npub !== pubKey) {

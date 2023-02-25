@@ -1,4 +1,3 @@
-import iris from 'iris-lib';
 import { debounce } from 'lodash';
 import { route } from 'preact-router';
 
@@ -6,6 +5,8 @@ import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
 import Nostr from '../../nostr/Nostr';
 import SocialNetwork from "../../nostr/SocialNetwork";
+import Key from "../../nostr/Key";
+import * as Events from "events";
 
 export default class IrisAccountSettings extends Component {
   state = {
@@ -198,7 +199,7 @@ export default class IrisAccountSettings extends Component {
 
   async register(cfToken) {
     console.log('register', cfToken);
-    const pubkey = Nostr.getPubKey();
+    const pubkey = Key.getPubKey();
     const event = {
       content: `iris.to/${this.state.newUserName}`,
       kind: 1,
@@ -207,7 +208,7 @@ export default class IrisAccountSettings extends Component {
       created_at: Math.floor(Date.now() / 1000),
     };
     event.id = Events.getEventHash(event);
-    event.sig = await Nostr.sign(event);
+    event.sig = await Key.sign(event);
     // post signed event as request body to https://api.iris.to/user/confirm_user
     const res = await fetch('https://api.iris.to/user/signup', {
       method: 'POST',
@@ -242,7 +243,7 @@ export default class IrisAccountSettings extends Component {
     const timeout = setTimeout(() => {
       Nostr.setMetadata({ nip05: newNip });
     }, 2000);
-    SocialNetwork.getProfile(Nostr.getPubKey(), (p) => {
+    SocialNetwork.getProfile(Key.getPubKey(), (p) => {
       if (p) {
         clearTimeout(timeout);
         if (p.nip05 !== newNip) {
@@ -255,7 +256,7 @@ export default class IrisAccountSettings extends Component {
   }
 
   async enableReserved() {
-    const pubkey = Nostr.getPubKey();
+    const pubkey = Key.getPubKey();
     const event = {
       content: `iris.to/${this.state.existing.name}`,
       kind: 1,
@@ -264,7 +265,7 @@ export default class IrisAccountSettings extends Component {
       created_at: Math.floor(Date.now() / 1000),
     };
     event.id = Events.getEventHash(event);
-    event.sig = await Nostr.sign(event);
+    event.sig = await Key.sign(event);
     // post signed event as request body to https://api.iris.to/user/confirm_user
     const res = await fetch('https://api.iris.to/user/confirm_user', {
       method: 'POST',
@@ -291,7 +292,7 @@ export default class IrisAccountSettings extends Component {
     if (!confirm(`Are you sure you want to decline iris.to/${this.state.existing.name}?`)) {
       return;
     }
-    const pubkey = Nostr.getPubKey();
+    const pubkey = Key.getPubKey();
     const event = {
       content: `decline iris.to/${this.state.existing.name}`,
       kind: 1,
@@ -300,7 +301,7 @@ export default class IrisAccountSettings extends Component {
       created_at: Math.floor(Date.now() / 1000),
     };
     event.id = Events.getEventHash(event);
-    event.sig = await Nostr.sign(event);
+    event.sig = await Key.sign(event);
     // post signed event as request body to https://api.iris.to/user/confirm_user
     const res = await fetch('https://api.iris.to/user/decline_user', {
       method: 'POST',
@@ -324,7 +325,7 @@ export default class IrisAccountSettings extends Component {
   }
 
   componentDidMount() {
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     SocialNetwork.getProfile(
       myPub,
       (profile) => {

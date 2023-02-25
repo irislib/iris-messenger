@@ -6,6 +6,7 @@ import Button from '../components/basic/Button';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
+import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
@@ -62,7 +63,7 @@ class Follows extends View {
 
   componentDidMount() {
     if (this.props.id) {
-      this.myPub = Nostr.toNostrBech32Address(Nostr.getPubKey(), 'npub');
+      this.myPub = Nostr.toNostrBech32Address(Key.getPubKey(), 'npub');
       this.props.followers ? this.getFollowers() : this.getFollows();
       iris.local().get('contacts').on(this.inject());
     }
@@ -105,7 +106,7 @@ class Follows extends View {
                   </small>
                 </div>
               </a>
-              ${hexKey !== Nostr.getPubKey() ? html`<${FollowButton} id=${npub} />` : ''}
+              ${hexKey !== Key.getPubKey() ? html`<${FollowButton} id=${npub} />` : ''}
             </div>`;
           })}
           ${this.state.follows.length === 0 ? '—' : ''}

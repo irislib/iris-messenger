@@ -5,6 +5,7 @@ import { route } from 'preact-router';
 import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
 import CopyButton from '../../components/CopyButton';
+import Key from '../../nostr/Key';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 import { ExistingAccountLogin } from '../Login';
@@ -34,7 +35,7 @@ export default class AccountSettings extends Component {
       // eslint-disable-next-line no-undef
       myPriv32 = bech32.encode('nsec', Buffer.from(myPrivHex, 'hex'));
     }
-    const myPub = Nostr.getPubKey();
+    const myPub = Key.getPubKey();
     // eslint-disable-next-line no-undef
     const myNpub = bech32.encode('npub', Buffer.from(myPub, 'hex'));
 
@@ -62,17 +63,18 @@ export default class AccountSettings extends Component {
               {t('switch_account')}
             </Button>
           </p>
-          {this.state.showSwitchAccount ? html`
-<p>
-            <${ExistingAccountLogin} />
-            </p>
-            <p>
-            <a href="" onClick=${(e) => this.onExtensionLoginClick(e)}>
-              ${t('nostr_extension_login')}
-            </a>
-</p>
-
-          ` : ''}
+          {this.state.showSwitchAccount
+            ? html`
+                <p>
+                  <${ExistingAccountLogin} />
+                </p>
+                <p>
+                  <a href="" onClick=${(e) => this.onExtensionLoginClick(e)}>
+                    ${t('nostr_extension_login')}
+                  </a>
+                </p>
+              `
+            : ''}
 
           <h3>{t('public_key')}</h3>
           <p>

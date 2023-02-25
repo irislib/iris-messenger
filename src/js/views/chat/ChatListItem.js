@@ -7,6 +7,7 @@ import Name from '../../components/Name';
 import SafeImg from '../../components/SafeImg';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
 import Nostr from '../../nostr/Nostr';
 
 class ChatListItem extends Component {
@@ -32,7 +33,7 @@ class ChatListItem extends Component {
     const event = Events.cache.get(this.props.latestMsgId);
     if (event) {
       this.setState({ latest: event });
-      Nostr.decryptMessage(this.props.latestMsgId, (latestText) => {
+      Key.decryptMessage(this.props.latestMsgId, (latestText) => {
         this.setState({ latestText });
       });
     }
@@ -53,7 +54,7 @@ class ChatListItem extends Component {
   }
 
   hasUnseen() {
-    if (this.state.latest.pubkey === Nostr.getPubKey()) {
+    if (this.state.latest.pubkey === Key.getPubKey()) {
       return false;
     }
     return !this.props.active && !(this.state.latest.created_at <= this.state.lastOpened);
@@ -74,7 +75,7 @@ class ChatListItem extends Component {
     //let latestTimeText = Helpers.getRelativeTimeText(time);
 
     /*let name = chat.name;
-    if (chat === (Nostr.getPubKey())) {
+    if (chat === (Key.getPubKey())) {
       name = html`📝 <b>${t('note_to_self')}</b>`;
     }*/
 
