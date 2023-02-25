@@ -6,6 +6,7 @@ import Events from './Events';
 import Key from './Key';
 import LocalForage from './LocalForage';
 import Nostr from './Nostr';
+import Subscriptions from './Subscriptions';
 
 export default {
   profileEventByUser: new Map<string, Event>(),
@@ -41,7 +42,7 @@ export default {
     };
 
     Events.publish(event);
-    Nostr.subscribeToAuthors();
+    Subscriptions.subscribeToAuthors();
   },
 
   setBlocked: function (blockedUser: string, block = true) {
@@ -96,9 +97,9 @@ export default {
       }
     }
     if (this.followedByUser.get(myPub)?.has(follower)) {
-      if (!Nostr.subscribedUsers.has(followedUser)) {
-        Nostr.subscribedUsers.add(followedUser); // subscribe to events from 2nd degree follows
-        Nostr.subscribeToAuthors();
+      if (!Subscriptions.subscribedUsers.has(followedUser)) {
+        Subscriptions.subscribedUsers.add(followedUser); // subscribe to events from 2nd degree follows
+        Subscriptions.subscribeToAuthors();
       }
     }
   },
@@ -123,7 +124,7 @@ export default {
       //  if resulting followersByUser(u).size is 0, remove that user as well
       this.followersByUser.delete(unfollowedUser);
       this.knownUsers.delete(unfollowedUser);
-      Nostr.subscribedUsers.delete(unfollowedUser);
+      Subscriptions.subscribedUsers.delete(unfollowedUser);
       Events.latestNotesByEveryone.eventIds.forEach((id) => {
         const fullEvent = Events.cache.get(id);
         if (fullEvent?.pubkey === unfollowedUser) {
@@ -175,7 +176,7 @@ export default {
     };
     callback();
     const myPub = iris.session.getKey()?.secp256k1.rpub;
-    Nostr.subscribe([{ kinds: [16462], authors: [myPub] }], callback);
+    Subscriptions.subscribe([{ kinds: [16462], authors: [myPub] }], callback);
   },
   getFlaggedUsers(cb?: (flagged: Set<string>) => void) {
     const callback = () => {
@@ -183,21 +184,21 @@ export default {
     };
     callback();
     const myPub = iris.session.getKey()?.secp256k1.rpub;
-    Nostr.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
+    Subscriptions.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
   },
   getFollowedByUser: function (user: string, cb?: (followedUsers: Set<string>) => void) {
     const callback = () => {
       cb?.(this.followedByUser.get(user) ?? new Set());
     };
     this.followedByUser.has(user) && callback();
-    Nostr.subscribe([{ kinds: [3], authors: [user] }], callback);
+    Subscriptions.subscribe([{ kinds: [3], authors: [user] }], callback);
   },
   getFollowersByUser: function (address: string, cb?: (followers: Set<string>) => void) {
     const callback = () => {
       cb?.(this.followersByUser.get(address) ?? new Set());
     };
     this.followersByUser.has(address) && callback();
-    Nostr.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
+    Subscriptions.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
   },
   getProfile(address, cb?: (profile: any, address: string) => void, verifyNip05 = false) {
     this.knownUsers.add(address);
@@ -216,7 +217,7 @@ export default {
           callback();
         });
       }
-    } else if (!Nostr.subscribedProfiles.has(address)) {
+    } else if (!Subscriptions.subscribedProfiles.has(address)) {
       fetch(`https://api.iris.to/profile/${address}`).then((res) => {
         if (res.status === 200) {
           res.json().then((profile) => {
@@ -226,7 +227,7 @@ export default {
       });
     }
 
-    Nostr.subscribedProfiles.add(address);
-    Nostr.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
+    Subscriptions.subscribedProfiles.add(address);
+    Subscriptions.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
   },
 };

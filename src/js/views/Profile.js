@@ -22,6 +22,7 @@ import QRCode from '../lib/qrcode.min';
 import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
+import Subscriptions from '../nostr/Subscriptions';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -384,7 +385,7 @@ class Profile extends View {
   }
 
   getNostrProfile(address, nostrAddress) {
-    Nostr.sendSubToRelays([{ authors: [address] }], address, true, 15 * 1000);
+    Subscriptions.sendSubToRelays([{ authors: [address] }], address, true, 15 * 1000);
     const setFollowCounts = () => {
       address &&
         this.setState({

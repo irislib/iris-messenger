@@ -75,7 +75,7 @@ class Login extends Component {
       }
       try {
         const { data, prefix } = bech32.decode(val);
-        const hex = Nostr.arrayToHex(data);
+        const hex = Helpers.arrayToHex(data);
         if (prefix === 'npub') {
           k = await iris.Key.generate();
           k.secp256k1 = { rpub: hex };

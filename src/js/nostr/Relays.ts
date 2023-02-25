@@ -1,7 +1,7 @@
 import { Relay, relayInit } from '../lib/nostr-tools';
 
 import Events from './Events';
-import Nostr from './Nostr';
+import Subscriptions from './Subscriptions';
 
 const DEFAULT_RELAYS = [
   'wss://eden.nostr.land',
@@ -86,7 +86,7 @@ export default {
   add(url: string) {
     if (this.relays.has(url)) return;
     const relay = relayInit(url, (id) => Events.cache.has(id));
-    relay.on('connect', () => Nostr.resubscribe(relay));
+    relay.on('connect', () => Subscriptions.resubscribe(relay));
     relay.on('notice', (notice) => {
       console.log('notice from ', relay.url, notice);
     });

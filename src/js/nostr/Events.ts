@@ -10,6 +10,7 @@ import Nostr from './Nostr';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
+import Subscriptions from './Subscriptions';
 
 const startTime = Date.now() / 1000;
 
@@ -325,7 +326,10 @@ const Events = {
     if (this.cache.has(event.id) && !force) {
       return;
     }
-    if (!SocialNetwork.knownUsers.has(event.pubkey) && !Nostr.subscribedPosts.has(event.id)) {
+    if (
+      !SocialNetwork.knownUsers.has(event.pubkey) &&
+      !Subscriptions.subscribedPosts.has(event.id)
+    ) {
       return;
     }
     if (SocialNetwork.blockedUsers.has(event.pubkey)) {
@@ -347,7 +351,7 @@ const Events = {
 
     this.handledMsgsPerSecond++;
 
-    Nostr.subscribedPosts.delete(event.id);
+    Subscriptions.subscribedPosts.delete(event.id);
 
     switch (event.kind) {
       case 0:
@@ -397,11 +401,11 @@ const Events = {
     }
 
     if (
-      Nostr.subscribedProfiles.has(event.pubkey) &&
+      Subscriptions.subscribedProfiles.has(event.pubkey) &&
       SocialNetwork.blockedUsers.has(event.pubkey) &&
       SocialNetwork.followEventByUser.has(event.pubkey)
     ) {
-      Nostr.subscribedProfiles.delete(event.pubkey);
+      Subscriptions.subscribedProfiles.delete(event.pubkey);
     }
 
     if (saveToIdb) {
@@ -409,7 +413,7 @@ const Events = {
     }
 
     // go through subscriptions and callback if filters match
-    for (const sub of Nostr.subscriptions.values()) {
+    for (const sub of Subscriptions.subscriptions.values()) {
       if (!sub.filters) {
         return;
       }

@@ -1,11 +1,11 @@
 import iris from 'iris-lib';
-import { debounce, throttle } from 'lodash';
 
-import { Event, Filter, Path, Relay, Sub } from '../lib/nostr-tools';
+import { Event, Filter, Path } from '../lib/nostr-tools';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
-import { sha256 } from '@noble/hashes/sha256';
 import localForage from 'localforage';
 import { route } from 'preact-router';
+
+import Helpers from '../Helpers';
 
 import Events from './Events';
 import IndexedDB from './IndexedDB';
@@ -14,6 +14,7 @@ import LocalForage from './LocalForage';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
+import Subscriptions from './Subscriptions';
 
 declare global {
   interface Window {
@@ -28,43 +29,10 @@ try {
   // ignore
 }
 
-type Subscription = {
-  filters: Filter[];
-  callback?: (event: Event) => void;
-};
-
-let subscriptionId = 0;
-
 const MAX_MSGS_BY_KEYWORD = 100;
 
 const Nostr = {
-  subscriptionsByName: new Map<string, Set<Sub>>(),
-  subscribedFiltersByName: new Map<string, Filter[]>(),
-  subscriptions: new Map<number, Subscription>(),
-  subscribedUsers: new Set<string>(),
-  subscribedPosts: new Set<string>(),
-  subscribedRepliesAndLikes: new Set<string>(),
-  subscribedProfiles: new Set<string>(),
-  subscribedKeywords: new Set<string>(),
-
-  arrayToHex(array: any) {
-    return Array.from(array, (byte: any) => {
-      return ('0' + (byte & 0xff).toString(16)).slice(-2);
-    }).join('');
-  },
-  getSubscriptionIdForName(name: string) {
-    return this.arrayToHex(sha256(name)).slice(0, 8);
-  },
-  resubscribe(relay: Relay) {
-    for (const [name, filters] of this.subscribedFiltersByName.entries()) {
-      const id = this.getSubscriptionIdForName(name);
-      const sub = relay.sub(filters, { id });
-      if (!this.subscriptionsByName.has(name)) {
-        this.subscriptionsByName.set(name, new Set());
-      }
-      this.subscriptionsByName.get(name)?.add(sub);
-    }
-  },
+  MAX_MSGS_BY_KEYWORD,
   toNostrBech32Address: function (address: string, prefix: string) {
     if (!prefix) {
       throw new Error('prefix is required');
@@ -91,196 +59,12 @@ const Nostr = {
     }
     try {
       const { data } = bech32.decode(str);
-      const addr = this.arrayToHex(data);
+      const addr = Helpers.arrayToHex(data);
       return addr;
     } catch (e) {
       // not a bech32 address
     }
     return null;
-  },
-  sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
-    // if subs with same id already exists, remove them
-    if (id) {
-      const subs = this.subscriptionsByName.get(id);
-      if (subs) {
-        subs.forEach((sub) => {
-          //console.log('unsub', id);
-          sub.unsub();
-        });
-      }
-      this.subscriptionsByName.delete(id);
-      this.subscribedFiltersByName.delete(id);
-    }
-
-    this.subscribedFiltersByName.set(id, filters);
-
-    if (unsubscribeTimeout) {
-      setTimeout(() => {
-        this.subscriptionsByName.delete(id);
-        this.subscribedFiltersByName.delete(id);
-      }, unsubscribeTimeout);
-    }
-
-    for (const relay of (id == 'keywords' ? Relays.searchRelays : Relays.relays).values()) {
-      const subId = this.getSubscriptionIdForName(id);
-      const sub = relay.sub(filters, { id: subId });
-      // TODO update relay lastSeen
-      sub.on('event', (event) => Events.handle(event));
-      if (once) {
-        sub.on('eose', () => sub.unsub());
-      }
-      if (!this.subscriptionsByName.has(id)) {
-        this.subscriptionsByName.set(id, new Set());
-      }
-      this.subscriptionsByName.get(id)?.add(sub);
-      //console.log('subscriptions size', this.subscriptionsByName.size);
-      if (unsubscribeTimeout) {
-        setTimeout(() => {
-          sub.unsub();
-        }, unsubscribeTimeout);
-      }
-    }
-  },
-  subscribeToRepliesAndLikes: debounce(() => {
-    console.log('subscribeToRepliesAndLikes', Nostr.subscribedRepliesAndLikes);
-    Nostr.sendSubToRelays(
-      [{ kinds: [1, 6, 7], '#e': Array.from(Nostr.subscribedRepliesAndLikes.values()) }],
-      'subscribedRepliesAndLikes',
-      true,
-    );
-  }, 500),
-  // TODO we shouldn't bang the history queries all the time. only ask a users history once per relay.
-  // then we can increase the limit
-  subscribeToAuthors: debounce(() => {
-    const now = Math.floor(Date.now() / 1000);
-    const myPub = Key.getPubKey();
-    const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) ?? []);
-    followedUsers.push(myPub);
-    console.log('subscribe to', followedUsers.length, 'followedUsers');
-    Nostr.sendSubToRelays(
-      [{ kinds: [0, 3], until: now, authors: followedUsers }],
-      'followed',
-      true,
-    );
-    if (Nostr.subscribedProfiles.size) {
-      Nostr.sendSubToRelays(
-        [{ authors: Array.from(Nostr.subscribedProfiles.values()), kinds: [0] }],
-        'subscribedProfiles',
-        true,
-      );
-    }
-    setTimeout(() => {
-      Nostr.sendSubToRelays(
-        [{ authors: followedUsers, limit: 500, until: now }],
-        'followedHistory',
-        true,
-      );
-    }, 1000);
-  }, 1000),
-  subscribeToPosts: throttle(
-    () => {
-      if (Nostr.subscribedPosts.size === 0) return;
-      console.log('subscribe to', Nostr.subscribedPosts.size, 'posts');
-      Nostr.sendSubToRelays([{ ids: Array.from(Nostr.subscribedPosts) }], 'posts');
-    },
-    3000,
-    { leading: false },
-  ),
-  subscribeToKeywords: debounce(() => {
-    if (Nostr.subscribedKeywords.size === 0) return;
-    console.log(
-      'subscribe to keywords',
-      Array.from(Nostr.subscribedKeywords),
-      SocialNetwork.knownUsers.size,
-    );
-    const go = () => {
-      Nostr.sendSubToRelays(
-        [
-          {
-            kinds: [1],
-            limit: MAX_MSGS_BY_KEYWORD,
-            keywords: Array.from(Nostr.subscribedKeywords),
-          },
-        ],
-        'keywords',
-      );
-      // on page reload knownUsers are empty and thus all search results are dropped
-      if (SocialNetwork.knownUsers.size < 1000) setTimeout(go, 2000);
-    };
-    go();
-  }, 100),
-  unsubscribe: function (id: string) {
-    const subs = this.subscriptionsByName.get(id);
-    if (subs) {
-      subs.forEach((sub) => {
-        console.log('unsub', id);
-        sub.unsub();
-      });
-    }
-    this.subscriptionsByName.delete(id);
-    this.subscribedFiltersByName.delete(id);
-  },
-  subscribe: function (filters: Filter[], cb?: (event: Event) => void) {
-    cb &&
-      this.subscriptions.set(subscriptionId++, {
-        filters,
-        callback: cb,
-      });
-
-    let hasNewAuthors = false;
-    let hasNewIds = false;
-    let hasNewReplyAndLikeSubs = false;
-    let hasNewKeywords = false;
-    for (const filter of filters) {
-      if (filter.authors) {
-        for (const author of filter.authors) {
-          if (!author) continue;
-          // make sure the author is valid hex
-          if (!author.match(/^[0-9a-fA-F]{64}$/)) {
-            console.error('Invalid author', author);
-            continue;
-          }
-          if (!this.subscribedUsers.has(author)) {
-            hasNewAuthors = true;
-            this.subscribedUsers.add(author);
-          }
-        }
-      }
-      if (filter.ids) {
-        for (const id of filter.ids) {
-          if (!this.subscribedPosts.has(id)) {
-            hasNewIds = true;
-            this.subscribedPosts.add(this.toNostrHexAddress(id));
-          }
-        }
-      }
-      if (Array.isArray(filter['#e'])) {
-        for (const id of filter['#e']) {
-          if (!this.subscribedRepliesAndLikes.has(id)) {
-            hasNewReplyAndLikeSubs = true;
-            this.subscribedRepliesAndLikes.add(id);
-            setTimeout(() => {
-              // remove after some time, so the requests don't grow too large
-              this.subscribedRepliesAndLikes.delete(id);
-            }, 60 * 1000);
-          }
-        }
-      }
-      if (filter.keywords) {
-        for (const keyword of filter.keywords) {
-          if (!this.subscribedKeywords.has(keyword)) {
-            hasNewKeywords = true;
-            // only 1 keyword at a time, otherwise a popular kw will consume the whole 'limit'
-            this.subscribedKeywords.clear();
-            this.subscribedKeywords.add(keyword);
-          }
-        }
-      }
-    }
-    hasNewReplyAndLikeSubs && this.subscribeToRepliesAndLikes(this);
-    hasNewAuthors && this.subscribeToAuthors(this); // TODO subscribe to old stuff from new authors, don't resubscribe to all
-    hasNewIds && this.subscribeToPosts(this);
-    hasNewKeywords && this.subscribeToKeywords(this);
   },
   SUGGESTED_FOLLOWS: [
     'npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9', // snowden
@@ -333,7 +117,7 @@ const Nostr = {
           callback(event);
         }
       }
-      this.subscribe(filters, callback);
+      Subscriptions.subscribe(filters, callback);
       return '0';
     };
     const myPub = Key.getPubKey();
@@ -383,9 +167,9 @@ const Nostr = {
     }
 
     setTimeout(() => {
-      this.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
-      this.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
-      this.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
+      Subscriptions.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
+      Subscriptions.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
+      Subscriptions.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
     }, 200);
     setInterval(() => {
       console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));
@@ -433,7 +217,7 @@ const Nostr = {
     if (Events.directRepliesByMessageId.has(id) || Events.likesByMessageId.has(id)) {
       callback();
     }
-    this.subscribe([{ kinds: [1, 6, 7], '#e': [id] }], callback);
+    Subscriptions.subscribe([{ kinds: [1, 6, 7], '#e': [id] }], callback);
   },
   async getEventById(id: string) {
     if (Events.cache.has(id)) {
@@ -441,7 +225,7 @@ const Nostr = {
     }
 
     return new Promise((resolve) => {
-      this.subscribe([{ ids: [id] }], () => {
+      Subscriptions.subscribe([{ ids: [id] }], () => {
         // TODO turn off subscription
         const msg = Events.cache.get(id);
         msg && resolve(msg);
@@ -453,7 +237,7 @@ const Nostr = {
       cb?.(Events.notifications.eventIds);
     };
     callback();
-    this.subscribe([{ '#p': [Key.getPubKey()] }], callback);
+    Subscriptions.subscribe([{ '#p': [Key.getPubKey()] }], callback);
   },
 
   getMessagesByEveryone(
@@ -469,7 +253,7 @@ const Nostr = {
       );
     };
     callback();
-    this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+    Subscriptions.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
   },
   getMessagesByFollows(
     cb: (messageIds: string[], includeReplies: boolean) => void,
@@ -484,7 +268,7 @@ const Nostr = {
       );
     };
     callback();
-    this.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+    Subscriptions.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
   },
   getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void) {
     const callback = (event) => {
@@ -506,7 +290,7 @@ const Nostr = {
     }
     Events.latestNotesByKeywords.has(keyword) &&
       cb(Events.latestNotesByKeywords.get(keyword)?.eventIds);
-    this.subscribe([filter], callback);
+    Subscriptions.subscribe([filter], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
     // TODO subscribe on view profile and unsub on leave profile
@@ -515,7 +299,7 @@ const Nostr = {
       cb?.(Events.postsAndRepliesByUser.get(address)?.eventIds);
     };
     Events.postsAndRepliesByUser.has(address) && callback();
-    this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
+    Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getPostsByUser(address: string, cb?: (messageIds: string[]) => void) {
     SocialNetwork.knownUsers.add(address);
@@ -523,7 +307,7 @@ const Nostr = {
       cb?.(Events.postsByUser.get(address)?.eventIds);
     };
     Events.postsByUser.has(address) && callback();
-    this.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
+    Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getLikesByUser(address: string, cb?: (messageIds: string[]) => void) {
     SocialNetwork.knownUsers.add(address);
@@ -531,7 +315,7 @@ const Nostr = {
       cb?.(Events.likesByUser.get(address)?.eventIds);
     };
     Events.likesByUser.has(address) && callback();
-    this.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
+    Subscriptions.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
   },
 
   getDirectMessages(cb?: (dms: Map<string, SortedLimitedEventSet>) => void) {
@@ -539,7 +323,7 @@ const Nostr = {
       cb?.(Events.directMessagesByUser);
     };
     callback();
-    this.subscribe([{ kinds: [4] }], callback);
+    Subscriptions.subscribe([{ kinds: [4] }], callback);
   },
 
   getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void) {
@@ -549,7 +333,7 @@ const Nostr = {
     };
     Events.directMessagesByUser.has(address) && callback();
     const myPub = iris.session.getKey()?.secp256k1.rpub;
-    this.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
+    Subscriptions.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
   },
 
   setMetadata(data: any) {
