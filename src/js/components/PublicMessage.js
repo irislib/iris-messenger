@@ -22,6 +22,7 @@ import Message from './Message';
 import Name from './Name';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
+import AnimalName from "../AnimalName";
 
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
@@ -538,7 +539,7 @@ class PublicMessage extends Message {
       }
     }
 
-    let name = this.props.name || this.state.name || Helpers.generateName(this.state.msg.info.from);
+    let name = this.props.name || this.state.name || AnimalName(this.state.msg.info.from);
 
     switch (this.state.msg?.event?.kind) {
       case 3:

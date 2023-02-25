@@ -97,17 +97,6 @@ export default {
     window.open(link, '_self');
   },
 
-  generateName(seed: string) {
-    if (!seed) {
-      throw new Error('No seed provided');
-    }
-    // deterministically create adjective + animal names using iris.util.adjectives and iris.util.animals
-    const hash = sha256(seed); // Uint8Array
-    const adjective = iris.util.adjectives[hash[0] % iris.util.adjectives.length];
-    const animal = iris.util.animals[hash[1] % iris.util.animals.length];
-    return `${this.capitalize(adjective)} ${this.capitalize(animal)}`;
-  },
-
   highlightEverything(s: string, event?: any, opts: any = { showMentionedMessages: true }): any[] {
     let replacedText = reactStringReplace(s, emojiRegex, (match, i) => {
       return (

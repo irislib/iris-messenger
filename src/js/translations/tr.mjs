@@ -26,7 +26,6 @@ export default {
   "delete": "Sil",
   "dm_privacy_warning": "Nostr özel mesajları şifrelidir, ancak herkes kiminle sohbet ettiğinizi görebilir",
   "done": "Tamam",
-  "download": "Tải xuống",
   "edit_profile": "Profili Düzenle",
   "embeds": "Gömülüler",
   "everyone": "Herkes",

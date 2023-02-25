@@ -26,7 +26,6 @@ export default {
   "delete": "Xóa",
   "dm_privacy_warning": "Tin nhắn riêng của Nostr được mã hóa, nhưng mọi người có thể thấy với ai bạn đang trò chuyện",
   "done": "Xong",
-  "download": "Tải về",
   "edit_profile": "Chỉnh sửa hồ sơ",
   "embeds": "Nhúng",
   "everyone": "Mọi người",

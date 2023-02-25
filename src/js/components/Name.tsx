@@ -5,6 +5,7 @@ import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 
 import Badge from './Badge';
+import AnimalName from "../AnimalName";
 
 type Props = {
   pub: string;
@@ -29,9 +30,7 @@ const Name = (props: Props) => {
       // ignore
     }
   } else {
-    initialDisplayName = Helpers.generateName(
-      Nostr.toNostrBech32Address(props.pub, 'npub') || props.pub,
-    );
+    initialDisplayName = AnimalName(Nostr.toNostrBech32Address(props.pub, 'npub') || props.pub);
     isGenerated = true;
   }
   const [name, setName] = useState(initialName);
