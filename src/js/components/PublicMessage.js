@@ -4,6 +4,7 @@ import $ from 'jquery';
 import { escapeRegExp } from 'lodash';
 import { route } from 'preact-router';
 
+import AnimalName from '../AnimalName';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
 import Events from '../nostr/Events';
@@ -22,7 +23,6 @@ import Message from './Message';
 import Name from './Name';
 import SafeImg from './SafeImg';
 import Torrent from './Torrent';
-import AnimalName from "../AnimalName";
 
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;

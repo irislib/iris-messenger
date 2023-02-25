@@ -213,7 +213,7 @@ class Message extends Component {
                 ? html`<a href="/post/${encodeURIComponent(this.props.hash)}"
                     >${Helpers.getRelativeTimeText(time)}</a
                   >`
-                : iris.util.formatTime(time)}
+                : Helpers.formatTime(time)}
               ${this.props.selfAuthored && seenIndicator}
             </div>
           </div>

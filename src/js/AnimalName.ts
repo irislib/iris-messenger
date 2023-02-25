@@ -1,5 +1,4 @@
 import { sha256 } from '@noble/hashes/sha256';
-import iris from 'iris-lib';
 
 const animals = [
   'canidae',

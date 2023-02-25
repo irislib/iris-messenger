@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
-import Helpers from '../Helpers';
+import AnimalName from '../AnimalName';
 import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 
 import Badge from './Badge';
-import AnimalName from "../AnimalName";
 
 type Props = {
   pub: string;

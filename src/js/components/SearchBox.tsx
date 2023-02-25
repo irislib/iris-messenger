@@ -182,15 +182,10 @@ class SearchBox extends Component<Props, State> {
       if (s.length > 1) {
         return this.props.onSelect({ key: s[1] });
       }
-      const key = Helpers.getUrlParameter('chatWith', s[1]);
-      if (key) {
-        return this.props.onSelect({ key });
-      }
       if (Nostr.toNostrHexAddress(query)) {
         return this.props.onSelect({ key: query });
       }
     }
-    if (Helpers.followChatLink(query)) return;
 
     if (query) {
       const results = iris.session.getSearchIndex().search(query).slice(0, RESULTS_MAX);

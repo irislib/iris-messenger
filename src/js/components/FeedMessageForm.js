@@ -25,7 +25,7 @@ class FeedMessageForm extends MessageForm {
       textEl.focus();
     });
     if (
-      (!iris.util.isMobile || this.props.forceAutofocusMobile == true) &&
+      (!Helpers.isMobile || this.props.forceAutofocusMobile == true) &&
       this.props.autofocus !== false
     ) {
       textEl.focus();

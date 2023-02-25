@@ -39,13 +39,13 @@ class ChatMessageForm extends MessageForm {
       textEl.val(textEl.val() + emoji);
       textEl.focus();
     });
-    if (!iris.util.isMobile && this.props.autofocus !== false) {
+    if (!Helpers.isMobile && this.props.autofocus !== false) {
       $(this.base).find('.new-msg').focus();
     }
   }
 
   componentDidUpdate() {
-    if (!iris.util.isMobile && this.props.autofocus !== false) {
+    if (!Helpers.isMobile && this.props.autofocus !== false) {
       $(this.base).find('.new-msg').focus();
     }
     if ($('#attachment-preview:visible').length) {

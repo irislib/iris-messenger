@@ -14,32 +14,8 @@ import Events from '../nostr/Events';
 import { translate as t } from '../translations/Translation';
 const bech32 = require('bech32-buffer');
 
-function maybeGoToChat(key) {
-  let chatId = iris.util.getUrlParameter('chatWith') || iris.util.getUrlParameter('channelId');
-  let inviter = iris.util.getUrlParameter('inviter');
-  function go() {
-    if (inviter !== key.pub) {
-      iris.session.newChannel(chatId, window.location.href);
-    }
-    _.defer(() => route(`/chat/${chatId}`)); // defer because router is only initialised after login // TODO fix
-    window.history.pushState(
-      {},
-      'Iris Chat',
-      `/${window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split('?')[0]}`,
-    ); // remove param
-  }
-  if (chatId) {
-    if (inviter) {
-      setTimeout(go, 2000); // wait a sec to not re-create the same chat
-    } else {
-      go();
-    }
-  }
-}
-
 async function login(k) {
   iris.session.login(k);
-  maybeGoToChat(k);
 }
 
 async function nostrLogin(e) {

@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet';
 import iris from 'iris-lib';
-import AsyncRoute from 'preact-async-route';
 import { Router, RouterOnChangeArgs } from 'preact-router';
 
 import Footer from './components/Footer';
@@ -173,16 +172,6 @@ class Main extends Component<Props, ReactState> {
               <MyProfile path="/replies/:id+" tab="replies" />
               <MyProfile path="/likes/:id+" tab="likes" />
               <MyProfile path="/media/:id+" tab="media" />
-              {/* Lazy load stuff that is used less often */}
-              <AsyncRoute
-                path="/explorer/:node"
-                getComponent={() => import('./views/Explorer').then((module) => module.default)}
-              />
-              <AsyncRoute
-                path="/explorer"
-                store={iris.session.getPubKey()}
-                getComponent={() => import('./views/Explorer').then((module) => module.default)}
-              />
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
               <MyProfile path="/:id+" tab="profile" />

@@ -69,7 +69,6 @@ class Profile extends View {
             <p>
               <${CopyButton}
                 text=${t('copy_link')}
-                title=${iris.session.getMyName()}
                 copyStr=${Helpers.getProfileLink(iris.session.getPubKey())}
               />
             </p>

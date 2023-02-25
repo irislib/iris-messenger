@@ -38,12 +38,12 @@ class Header extends Component {
       } else if (activity.lastActive) {
         const d = new Date(activity.lastActive);
         let lastSeenText = t(
-          iris.util.getDaySeparatorText(d, d.toLocaleDateString({ dateStyle: 'short' })),
+          Helpers.getDaySeparatorText(d, d.toLocaleDateString({ dateStyle: 'short' })),
         );
         if (lastSeenText === t('today')) {
-          lastSeenText = iris.util.formatTime(d);
+          lastSeenText = Helpers.formatTime(d);
         } else {
-          lastSeenText = iris.util.formatDate(d);
+          lastSeenText = Helpers.formatDate(d);
         }
         return `${t('last_active')} ${lastSeenText}`;
       }
