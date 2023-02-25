@@ -10,7 +10,7 @@ export class MyDexie extends Dexie {
 
   constructor() {
     super('iris');
-    this.version(1).stores({
+    this.version(2).stores({
       events: 'id, pubkey, kind, created_at', // Primary key and indexed props
     });
   }
