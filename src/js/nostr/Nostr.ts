@@ -189,7 +189,7 @@ const Nostr = {
       if (document.visibilityState === 'visible') {
         if (Date.now() - lastResubscribed > 1000 * 60 * 5) {
           for (const relay of Relays.relays.values()) {
-            this.resubscribe(relay);
+            Subscriptions.resubscribe(relay);
           }
           lastResubscribed = Date.now();
         }
