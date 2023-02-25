@@ -2,6 +2,7 @@ import Dexie, { Table } from 'dexie';
 
 import { Event } from '../lib/nostr-tools';
 
+import Events from './Events';
 import Nostr from './Nostr';
 import SocialNetwork from './SocialNetwork';
 export class MyDexie extends Dexie {
@@ -32,14 +33,14 @@ export default {
   loadIDBEvents() {
     const myPub = Nostr.getPubKey();
     db.events.where({ pubkey: myPub }).each((event) => {
-      Nostr.handleEvent(event, false, false);
+      Events.handle(event, false, false);
     });
     const follows: string[] = Array.from(SocialNetwork.followedByUser.get(myPub) || []);
     db.events
       .where('pubkey')
       .anyOf(follows)
       .each((event) => {
-        Nostr.handleEvent(event, false, false);
+        Events.handle(event, false, false);
       });
     // other follow events
     db.events
@@ -47,7 +48,7 @@ export default {
       .noneOf([myPub, ...follows])
       .and((event) => event.kind === 3)
       .each((event) => {
-        Nostr.handleEvent(event, false, false);
+        Events.handle(event, false, false);
       });
     // other events
     db.events
@@ -55,7 +56,7 @@ export default {
       .noneOf([myPub, ...follows])
       .and((event) => event.kind !== 3)
       .each((event) => {
-        Nostr.handleEvent(event, false, false);
+        Events.handle(event, false, false);
       });
   },
 };

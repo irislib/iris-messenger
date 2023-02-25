@@ -1,5 +1,6 @@
 import { Relay, relayInit } from '../lib/nostr-tools';
 
+import Events from './Events';
 import Nostr from './Nostr';
 
 const DEFAULT_RELAYS = [
@@ -19,11 +20,11 @@ const DEFAULT_RELAYS = [
 const SEARCH_RELAYS = ['wss://relay.nostr.band'];
 
 const defaultRelays = new Map<string, Relay>(
-  DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => Nostr.eventsById.has(id))]),
+  DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => Events.cache.has(id))]),
 );
 
 const searchRelays = new Map<string, Relay>(
-  SEARCH_RELAYS.map((url) => [url, relayInit(url, (id) => Nostr.eventsById.has(id))]),
+  SEARCH_RELAYS.map((url) => [url, relayInit(url, (id) => Events.cache.has(id))]),
 );
 
 export default {
@@ -84,7 +85,7 @@ export default {
   },
   add(url: string) {
     if (this.relays.has(url)) return;
-    const relay = relayInit(url, (id) => Nostr.eventsById.has(id));
+    const relay = relayInit(url, (id) => Events.cache.has(id));
     relay.on('connect', () => Nostr.resubscribe(relay));
     relay.on('notice', (notice) => {
       console.log('notice from ', relay.url, notice);

@@ -4,6 +4,7 @@ import CopyButton from '../../components/CopyButton';
 import FollowButton from '../../components/FollowButton';
 import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
+import Events from '../../nostr/Events';
 import IndexedDB from '../../nostr/IndexedDB';
 import Nostr from '../../nostr/Nostr';
 import SocialNetwork from '../../nostr/SocialNetwork';
@@ -61,7 +62,7 @@ export default class BackupSettings extends Component {
               copyStr={() => this.profileExportJson()}
             />
           </p>
-          <p>{t('your_events')}. Is slow dog but should eventually download the file:</p>
+          <p>{t('your_events')}:</p>
           <p>
             <Button
               onClick={() =>
@@ -157,7 +158,7 @@ export default class BackupSettings extends Component {
         if (!event.sig) {
           continue; // we don't want to sign & publish unsigned events
         }
-        Nostr.publish(event);
+        Events.publish(event);
         const myPub = Nostr.getPubKey();
         // even if it's an old contacts event by us, restore follows from it
         if (event.pubkey === myPub && event.kind === 3) {

@@ -5,6 +5,7 @@ import Component from '../BaseComponent';
 import Button from '../components/basic/Button';
 import Helpers from '../Helpers';
 import Nostr from '../nostr/Nostr';
+import Events from '../nostr/Events';
 import { translate as t } from '../translations/Translation';
 
 import PublicMessage from './PublicMessage';
@@ -41,9 +42,9 @@ class MessageFeed extends Component {
       let hasMyMessage;
       for (let i = 0; i < sortedMessages.length; i++) {
         const hash = sortedMessages[i];
-        const message = Nostr.eventsById.get(hash);
+        const message = Events.cache.get(hash);
         if (message && message.created_at > this.state.messagesShownTime) {
-          if (message.pubkey === Nostr.getPubKey() && !Nostr.isBoost(message)) {
+          if (message.pubkey === Nostr.getPubKey() && !Events.isBoost(message)) {
             hasMyMessage = true;
             break;
           }

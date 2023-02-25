@@ -5,6 +5,7 @@ import ScrollViewport from 'preact-scroll-viewport';
 
 import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
+import Events from '../../nostr/Events';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
@@ -37,8 +38,8 @@ class ChatList extends Component {
       const sortedChats = Array.from(chats.keys()).sort((a, b) => {
         const aEventIds = chats.get(a).eventIds;
         const bEventIds = chats.get(b).eventIds;
-        const aLatestEvent = aEventIds.length ? Nostr.eventsById.get(aEventIds[0]) : null;
-        const bLatestEvent = bEventIds.length ? Nostr.eventsById.get(bEventIds[0]) : null;
+        const aLatestEvent = aEventIds.length ? Events.cache.get(aEventIds[0]) : null;
+        const bLatestEvent = bEventIds.length ? Events.cache.get(bEventIds[0]) : null;
         if (bLatestEvent.created_at > aLatestEvent.created_at) {
           return 1;
         } else if (bLatestEvent.created_at < aLatestEvent.created_at) {

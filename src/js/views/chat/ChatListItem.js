@@ -6,6 +6,7 @@ import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
 import SafeImg from '../../components/SafeImg';
 import Helpers from '../../Helpers';
+import Events from '../../nostr/Events';
 import Nostr from '../../nostr/Nostr';
 
 class ChatListItem extends Component {
@@ -28,7 +29,7 @@ class ChatListItem extends Component {
     if (!this.props.latestMsgId) {
       return;
     }
-    const event = Nostr.eventsById.get(this.props.latestMsgId);
+    const event = Events.cache.get(this.props.latestMsgId);
     if (event) {
       this.setState({ latest: event });
       Nostr.decryptMessage(this.props.latestMsgId, (latestText) => {

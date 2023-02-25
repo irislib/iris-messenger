@@ -6,6 +6,7 @@ import MessageForm from '../../components/MessageForm';
 import Torrent from '../../components/Torrent';
 import Helpers from '../../Helpers';
 import EmojiButton from '../../lib/emoji-button';
+import Events from '../../nostr/Events';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
@@ -79,7 +80,7 @@ class ChatMessageForm extends MessageForm {
     if (!recipient) {
       throw new Error('invalid public key ' + recipient);
     }
-    Nostr.publish({
+    Events.publish({
       kind: 4,
       content,
       tags: [['p', recipient]],

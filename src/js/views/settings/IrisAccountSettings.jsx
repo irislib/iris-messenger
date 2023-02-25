@@ -206,7 +206,7 @@ export default class IrisAccountSettings extends Component {
       pubkey,
       created_at: Math.floor(Date.now() / 1000),
     };
-    event.id = Nostr.getEventHash(event);
+    event.id = Events.getEventHash(event);
     event.sig = await Nostr.sign(event);
     // post signed event as request body to https://api.iris.to/user/confirm_user
     const res = await fetch('https://api.iris.to/user/signup', {
@@ -263,7 +263,7 @@ export default class IrisAccountSettings extends Component {
       pubkey,
       created_at: Math.floor(Date.now() / 1000),
     };
-    event.id = Nostr.getEventHash(event);
+    event.id = Events.getEventHash(event);
     event.sig = await Nostr.sign(event);
     // post signed event as request body to https://api.iris.to/user/confirm_user
     const res = await fetch('https://api.iris.to/user/confirm_user', {
@@ -299,7 +299,7 @@ export default class IrisAccountSettings extends Component {
       pubkey,
       created_at: Math.floor(Date.now() / 1000),
     };
-    event.id = Nostr.getEventHash(event);
+    event.id = Events.getEventHash(event);
     event.sig = await Nostr.sign(event);
     // post signed event as request body to https://api.iris.to/user/confirm_user
     const res = await fetch('https://api.iris.to/user/decline_user', {

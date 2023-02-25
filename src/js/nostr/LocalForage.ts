@@ -3,32 +3,33 @@ import { debounce } from 'lodash';
 
 import { Event } from '../lib/nostr-tools';
 
+import Events from './Events';
 import Nostr from './Nostr';
 import SocialNetwork from './SocialNetwork';
 
 export default {
   loaded: false,
   saveEvents: debounce(() => {
-    const latestMsgs = Nostr.latestNotesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
-      return Nostr.eventsById.get(eventId);
+    const latestMsgs = Events.latestNotesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
+      return Events.cache.get(eventId);
     });
-    const latestMsgsByEveryone = Nostr.latestNotesAndRepliesByEveryone.eventIds
+    const latestMsgsByEveryone = Events.latestNotesAndRepliesByEveryone.eventIds
       .slice(0, 1000)
       .map((eventId: any) => {
-        return Nostr.eventsById.get(eventId);
+        return Events.cache.get(eventId);
       });
-    const notifications = Nostr.notifications.eventIds
+    const notifications = Events.notifications.eventIds
       .map((eventId: any) => {
-        return Nostr.eventsById.get(eventId);
+        return Events.cache.get(eventId);
       })
       .splice(0, 200);
     const dms = [];
-    for (const set of Nostr.directMessagesByUser.values()) {
+    for (const set of Events.directMessagesByUser.values()) {
       set.eventIds.forEach((eventId: any) => {
-        dms.push(Nostr.eventsById.get(eventId));
+        dms.push(Events.cache.get(eventId));
       });
     }
-    const kvEvents = Array.from(Nostr.keyValueEvents.values());
+    const kvEvents = Array.from(Events.keyValueEvents.values());
 
     localForage.setItem('latestMsgs', latestMsgs);
     localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
@@ -54,6 +55,7 @@ export default {
         followEvents2.push(le[1]);
       }
     }
+    /*
     console.log(
       'saving profileEvents: ',
       profileEvents.length,
@@ -64,6 +66,7 @@ export default {
       followEvents2.length,
       JSON.stringify(followEvents2).length,
     );
+     */
 
     localForage.setItem('profileEvents', profileEvents);
     localForage.setItem('followEvents', followEvents2);
@@ -79,34 +82,34 @@ export default {
     const keyValueEvents = await localForage.getItem('keyValueEvents');
     this.loaded = true;
     if (Array.isArray(followEvents)) {
-      followEvents.forEach((e) => Nostr.handleEvent(e));
+      followEvents.forEach((e) => Events.handle(e));
     }
     if (Array.isArray(profileEvents)) {
-      profileEvents.forEach((e) => Nostr.handleEvent(e));
+      profileEvents.forEach((e) => Events.handle(e));
     }
     if (Array.isArray(latestMsgs)) {
       latestMsgs.forEach((msg) => {
-        Nostr.handleEvent(msg);
+        Events.handle(msg);
       });
     }
     if (Array.isArray(latestMsgsByEveryone)) {
       latestMsgsByEveryone.forEach((msg) => {
-        Nostr.handleEvent(msg);
+        Events.handle(msg);
       });
     }
     if (Array.isArray(notificationEvents)) {
       notificationEvents.forEach((msg) => {
-        Nostr.handleEvent(msg);
+        Events.handle(msg);
       });
     }
     if (Array.isArray(dms)) {
       dms.forEach((msg) => {
-        Nostr.handleEvent(msg);
+        Events.handle(msg);
       });
     }
     if (Array.isArray(keyValueEvents)) {
       keyValueEvents.forEach((msg) => {
-        Nostr.handleEvent(msg);
+        Events.handle(msg);
       });
     }
   },

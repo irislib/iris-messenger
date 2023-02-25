@@ -6,6 +6,7 @@ import { route } from 'preact-router';
 
 import Helpers from '../Helpers';
 import Icons from '../Icons';
+import Events from '../nostr/Events';
 import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
@@ -78,7 +79,7 @@ class PublicMessage extends Message {
             });
           }
         });
-        const replyingTo = Nostr.getEventReplyingTo(event);
+        const replyingTo = Events.getEventReplyingTo(event);
         return {
           signerKeyHash: event.pubkey,
           signedData: {
@@ -91,20 +92,20 @@ class PublicMessage extends Message {
         };
       };
 
-      if (Nostr.eventsById.has(nostrId)) {
+      if (Events.cache.has(nostrId)) {
         // for faster painting, return synchronously if we have the message
-        return processNostrMessage(Nostr.eventsById.get(nostrId));
+        return processNostrMessage(Events.cache.get(nostrId));
       } else {
         fetch(`https://api.iris.to/event/${nostrId}`).then((res) => {
           if (res.status === 200) {
             res.json().then((event) => {
-              Nostr.handleEvent(event);
+              Events.handle(event);
             });
           }
         });
       }
 
-      return Nostr.getMessageById(nostrId).then((event) => {
+      return Nostr.getEventById(nostrId).then((event) => {
         return processNostrMessage(event);
       });
     }
@@ -199,8 +200,8 @@ class PublicMessage extends Message {
           const sortedReplies =
             replies &&
             Array.from(replies).sort((a, b) => {
-              const eventA = Nostr.eventsById.get(a);
-              const eventB = Nostr.eventsById.get(b);
+              const eventA = Events.cache.get(a);
+              const eventB = Events.cache.get(b);
               // show our replies first
               if (eventA?.pubkey === myPub && eventB?.pubkey !== myPub) {
                 return -1;
@@ -253,7 +254,7 @@ class PublicMessage extends Message {
       const author = this.state.msg?.event?.pubkey;
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
-        Nostr.publish({
+        Events.publish({
           kind: 6,
           tags: [
             ['e', nostrId, '', 'mention'],
@@ -271,7 +272,7 @@ class PublicMessage extends Message {
 
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
-        Nostr.publish({
+        Events.publish({
           kind: 7,
           content: '+',
           tags: [
@@ -288,7 +289,7 @@ class PublicMessage extends Message {
     if (confirm('Delete message?')) {
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
-        Nostr.publish({
+        Events.publish({
           kind: 5,
           content: 'deleted',
           tags: [['e', nostrId]],
@@ -303,11 +304,11 @@ class PublicMessage extends Message {
     e.preventDefault();
     const nostrId = Nostr.toNostrHexAddress(this.props.hash);
     if (nostrId) {
-      const event = Nostr.eventsById.get(nostrId);
+      const event = Events.cache.get(nostrId);
       if (event) {
         // TODO indicate to user somehow
         console.log('broadcasting', nostrId);
-        Nostr.publish(event);
+        Events.publish(event);
       }
     }
   }
@@ -365,7 +366,7 @@ class PublicMessage extends Message {
 
   renderLike() {
     const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
-    const likedEvent = Nostr.eventsById.get(likedId);
+    const likedEvent = Events.cache.get(likedId);
     let text = likedEvent?.content;
     if (text && text.length > 50) {
       text = Helpers.highlightText(text, likedEvent);
@@ -400,7 +401,7 @@ class PublicMessage extends Message {
     if (confirm('Publicly report and hide message?')) {
       const nostrId = Nostr.toNostrHexAddress(this.props.hash);
       if (nostrId) {
-        Nostr.publish({
+        Events.publish({
           kind: 5,
           content: 'reported',
           tags: [

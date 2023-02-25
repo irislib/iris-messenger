@@ -2,6 +2,7 @@ import iris from 'iris-lib';
 
 import { Event } from '../lib/nostr-tools';
 
+import Events from './Events';
 import LocalForage from './LocalForage';
 import Nostr from './Nostr';
 
@@ -38,7 +39,7 @@ export default {
       }),
     };
 
-    Nostr.publish(event);
+    Events.publish(event);
     Nostr.subscribeToAuthors();
   },
 
@@ -49,7 +50,7 @@ export default {
     if (block) {
       this.blockedUsers.add(blockedUser);
       this.removeFollower(blockedUser, myPub);
-      Nostr.directMessagesByUser.delete(blockedUser);
+      Events.directMessagesByUser.delete(blockedUser);
     } else {
       this.blockedUsers.delete(blockedUser);
     }
@@ -70,16 +71,16 @@ export default {
 
     // if new follow, move all their posts to followedByUser
     if (follower === myPub && !this.followedByUser.get(myPub).has(followedUser)) {
-      const posts = Nostr.postsByUser.get(followedUser);
+      const posts = Events.postsByUser.get(followedUser);
       if (posts) {
         posts.eventIds.forEach((eventId) => {
-          const event = Nostr.eventsById.get(eventId);
+          const event = Events.cache.get(eventId);
           if (event) {
-            const replyingTo = Nostr.getEventReplyingTo(event);
+            const replyingTo = Events.getEventReplyingTo(event);
             if (!replyingTo) {
-              Nostr.latestNotesByFollows.add(event);
+              Events.latestNotesByFollows.add(event);
             }
-            Nostr.latestNotesAndRepliesByFollows.add(event);
+            Events.latestNotesAndRepliesByFollows.add(event);
           }
         });
       }
@@ -104,14 +105,14 @@ export default {
     this.followersByUser.get(unfollowedUser)?.delete(follower);
     this.followedByUser.get(follower)?.delete(unfollowedUser);
     const blocked = this.blockedUsers.has(unfollowedUser);
-    Nostr.latestNotesByFollows.eventIds.forEach((id) => {
-      const fullEvent = Nostr.eventsById.get(id);
+    Events.latestNotesByFollows.eventIds.forEach((id) => {
+      const fullEvent = Events.cache.get(id);
       if (fullEvent?.pubkey === unfollowedUser) {
-        Nostr.latestNotesByFollows.delete(id);
+        Events.latestNotesByFollows.delete(id);
         // if blocked user is in a p tag, remove the note
         fullEvent?.tags.forEach((tag) => {
           if (tag[0] === 'p' && tag[1] === unfollowedUser) {
-            Nostr.latestNotesByFollows.delete(id);
+            Events.latestNotesByFollows.delete(id);
           }
         });
       }
@@ -122,14 +123,14 @@ export default {
       this.followersByUser.delete(unfollowedUser);
       this.knownUsers.delete(unfollowedUser);
       Nostr.subscribedUsers.delete(unfollowedUser);
-      Nostr.latestNotesByEveryone.eventIds.forEach((id) => {
-        const fullEvent = Nostr.eventsById.get(id);
+      Events.latestNotesByEveryone.eventIds.forEach((id) => {
+        const fullEvent = Events.cache.get(id);
         if (fullEvent?.pubkey === unfollowedUser) {
-          Nostr.latestNotesByEveryone.delete(id);
-          Nostr.eventsById.delete(id);
+          Events.latestNotesByEveryone.delete(id);
+          Events.cache.delete(id);
           fullEvent?.tags.forEach((tag) => {
             if (tag[0] === 'p' && tag[1] === unfollowedUser) {
-              Nostr.latestNotesByEveryone.delete(id);
+              Events.latestNotesByEveryone.delete(id);
             }
           });
         }
@@ -155,14 +156,14 @@ export default {
     isBlocked ? this.blockedUsers.add(address) : this.blockedUsers.delete(address);
     let content: any = JSON.stringify(Array.from(this.blockedUsers));
     content = await Nostr.encrypt(content);
-    Nostr.publish({
+    Events.publish({
       kind: 16462,
       content,
     });
   },
   flag: function (address: string, isFlagged: boolean) {
     isFlagged ? this.flaggedUsers.add(address) : this.flaggedUsers.delete(address);
-    Nostr.publish({
+    Events.publish({
       kind: 16463,
       content: JSON.stringify(Array.from(this.flaggedUsers)),
     });
@@ -218,7 +219,7 @@ export default {
       fetch(`https://api.iris.to/profile/${address}`).then((res) => {
         if (res.status === 200) {
           res.json().then((profile) => {
-            Nostr.handleEvent(profile);
+            Events.handle(profile);
           });
         }
       });

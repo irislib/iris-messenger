@@ -9,6 +9,7 @@ import { Router } from 'preact-router';
 import Component from '../../BaseComponent';
 import Message from '../../components/Message';
 import Helpers from '../../Helpers';
+import Events from '../../nostr/Events';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
@@ -184,7 +185,7 @@ export default class PrivateChat extends Component {
       let previousFrom;
       const msgListContent = [];
       this.state.sortedMessages.forEach((msgId) => {
-        const msg = Nostr.eventsById.get(msgId);
+        const msg = Events.cache.get(msgId);
         if (!msg) {
           return null;
         }

@@ -135,6 +135,6 @@ export default {
   "write_your_reply": "Write your reply",
   "yesterday": "yesterday",
   "you": "You",
-  "your_events": "Your events",
+  "your_events": "Your events (can be slow to download)",
   "your_qr_code": "Your QR code"
 };

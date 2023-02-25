@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 
 import Helpers from '../Helpers';
+import Events from '../nostr/Events';
 import Nostr from '../nostr/Nostr';
 
 const mentionRegex = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
@@ -13,7 +14,7 @@ export default class MessageForm extends Component {
     };
     if (msg.replyingTo) {
       const id = Nostr.toNostrHexAddress(msg.replyingTo);
-      const replyingTo = await Nostr.getMessageById(id);
+      const replyingTo = await Nostr.getEventById(id);
       event.tags = replyingTo.tags.filter((tag) => tag[0] === 'p');
       let rootTag = replyingTo.tags.find((t) => t[0] === 'e' && t[3] === 'root');
       if (!rootTag) {
@@ -68,7 +69,7 @@ export default class MessageForm extends Component {
     }
 
     console.log('sending event', event);
-    return Nostr.publish(event);
+    return Events.publish(event);
   }
 
   onMsgTextPaste(event) {
