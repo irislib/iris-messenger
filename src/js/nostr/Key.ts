@@ -108,4 +108,17 @@ export default {
       console.error(e);
     }
   },
+  async getPubKeyByNip05Address(address: string): Promise<string | null> {
+    try {
+      const [localPart, domain] = address.split('@');
+      const url = `https://${domain}/.well-known/nostr.json?name=${localPart}`;
+      const response = await fetch(url);
+      const json = await response.json();
+      const names = json.names;
+      return names[localPart] || null;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  },
 };
