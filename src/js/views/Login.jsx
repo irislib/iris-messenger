@@ -1,22 +1,23 @@
 import * as secp from '@noble/secp256k1';
 import iris from 'iris-lib';
 import localForage from 'localforage';
-import _ from 'lodash';
 import { Component } from 'preact';
-import { route } from 'preact-router';
 
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
 import LanguageSelector from '../components/LanguageSelector';
 import Helpers from '../Helpers';
-import Nostr from '../nostr/Nostr';
+import localState from '../LocalState';
 import Events from '../nostr/Events';
+import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
-import localState from "../LocalState";
 const bech32 = require('bech32-buffer');
 
 async function login(k) {
   iris.session.login(k);
+  setTimeout(() => {
+    localState.get('loggedIn').put(true);
+  }, 100);
 }
 
 async function nostrLogin(e) {
@@ -93,6 +94,9 @@ class Login extends Component {
     const now = Math.floor(Date.now() / 1000);
     Events.notificationsSeenTime = now;
     localForage.setItem('notificationsSeenTime', now);
+    setTimeout(() => {
+      localState.get('loggedIn').put(true);
+    }, 100);
   }
 
   onNameChange(event) {
