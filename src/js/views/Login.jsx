@@ -15,7 +15,7 @@ const bech32 = require('bech32-buffer');
 
 async function login(k) {
   iris.session.login(k);
-  setTimeout(() => {
+  setTimeout(() => { // TODO remove setTimeout
     localState.get('loggedIn').put(true);
   }, 100);
 }
@@ -95,6 +95,7 @@ class Login extends Component {
     Events.notificationsSeenTime = now;
     localForage.setItem('notificationsSeenTime', now);
     setTimeout(() => {
+      // TODO remove setTimeout
       localState.get('loggedIn').put(true);
     }, 100);
   }

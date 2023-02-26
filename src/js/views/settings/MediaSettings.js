@@ -24,6 +24,7 @@ export default class MediaSettings extends Component {
       { setting: 'enableInstagram', label: 'Instagram' },
       { setting: 'enableSpotify', label: 'Spotify' },
       { setting: 'enableTidal', label: 'Tidal' },
+      { setting: 'enableTwitch', label: 'Twitch' },
     ];
     return (
       <>
