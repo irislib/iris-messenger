@@ -3,10 +3,10 @@ import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
+import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
 import Nostr from '../../nostr/Nostr';
-import SocialNetwork from "../../nostr/SocialNetwork";
-import Key from "../../nostr/Key";
-import * as Events from "events";
+import SocialNetwork from '../../nostr/SocialNetwork';
 
 export default class IrisAccountSettings extends Component {
   state = {
@@ -57,7 +57,9 @@ export default class IrisAccountSettings extends Component {
             {this.renderAccountName(this.state.existing.name)}
           </div>
           <p>
-            <Button onClick={() => this.setAsPrimary()}>Set as primary Nostr address (nip05)</Button>
+            <Button onClick={() => this.setAsPrimary()}>
+              Set as primary Nostr address (nip05)
+            </Button>
           </p>
         </div>
       );

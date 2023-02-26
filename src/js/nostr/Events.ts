@@ -524,7 +524,6 @@ const Events = {
     console.log('notificationsSeenTime', Events.notificationsSeenTime, 'count', count);
     iris.local().get('unseenNotificationCount').put(count);
   }, 1000),
-  getEventHash,
   publish: async function (event: any) {
     if (!event.sig) {
       if (!event.tags) {
