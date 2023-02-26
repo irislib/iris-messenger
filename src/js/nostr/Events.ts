@@ -20,6 +20,7 @@ const MAX_LATEST_MSGS = 500;
 const cache = new Map<string, Event>();
 
 const Events = {
+  getEventHash,
   cache: cache,
   deletedEvents: new Set<string>(),
   directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
