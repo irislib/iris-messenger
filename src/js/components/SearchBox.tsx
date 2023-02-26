@@ -13,6 +13,7 @@ import { translate as t } from '../translations/Translation';
 import Identicon from './Identicon';
 import Name from './Name';
 import SafeImg from './SafeImg';
+import SearchIndex from "../SearchIndex";
 
 const RESULTS_MAX = 5;
 
@@ -183,7 +184,7 @@ class SearchBox extends Component<Props, State> {
     }
 
     if (query) {
-      const results = iris.session.getSearchIndex().search(query).slice(0, RESULTS_MAX);
+      const results = SearchIndex.search(query).slice(0, RESULTS_MAX);
       this.setState({ results, query });
     } else {
       this.setState({ results: [], query });

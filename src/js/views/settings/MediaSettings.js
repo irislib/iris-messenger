@@ -1,5 +1,3 @@
-import iris from 'iris-lib';
-
 import Component from '../../BaseComponent';
 import localState from '../../LocalState';
 import { translate as t } from '../../translations/Translation';
@@ -7,7 +5,6 @@ import { translate as t } from '../../translations/Translation';
 export default class MediaSettings extends Component {
   constructor() {
     super();
-    this.state = { settings: iris.session.DEFAULT_SETTINGS.local };
     this.state.webPushSubscriptions = {};
     this.state.blockedUsers = {};
     this.id = 'settings';
@@ -39,7 +36,7 @@ export default class MediaSettings extends Component {
                 localState
                   .get('settings')
                   .get('autoplayVideos')
-                  .put(!this.state.settings.autoplayVideos)
+                  .put(!(this.state.settings.autoplayVideos !== false))
               }
               id="autoplayVideos"
             />

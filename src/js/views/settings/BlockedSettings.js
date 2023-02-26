@@ -1,5 +1,3 @@
-import iris from 'iris-lib';
-
 import Component from '../../BaseComponent';
 import Name from '../../components/Name';
 import Nostr from '../../nostr/Nostr';
@@ -9,8 +7,6 @@ import { translate as t } from '../../translations/Translation';
 export default class BlockedSettings extends Component {
   constructor() {
     super();
-    this.state = iris.session.DEFAULT_SETTINGS;
-    this.state.webPushSubscriptions = {};
     this.state.blockedUsers = [];
     this.id = 'settings';
   }

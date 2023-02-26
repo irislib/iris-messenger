@@ -55,7 +55,8 @@
     "preact-cli": "^3.4.5",
     "prettier": "^2.8.3",
     "sirv-cli": "2.0.2",
-    "webpack-build-notifier": "^2.3.0"
+    "webpack-build-notifier": "^2.3.0",
+    "websocket-polyfill": "^0.0.3"
   },
   "dependencies": {
     "@fontsource/lato": "^4.5.10",
@@ -89,7 +90,6 @@
     "react-string-replace": "^1.1.0",
     "react-virtualized": "^9.22.3",
     "styled-components": "^5.3.6",
-    "websocket-polyfill": "^0.0.3",
     "workbox-background-sync": "^6.5.4",
     "workbox-cacheable-response": "^6.5.4",
     "workbox-expiration": "^6.5.4",

@@ -12,6 +12,7 @@ import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 import Subscriptions from './Subscriptions';
+import SearchIndex from "../SearchIndex";
 
 const startTime = Date.now() / 1000;
 
@@ -254,7 +255,7 @@ const Events = {
       delete profile['nip05valid']; // not robust
       SocialNetwork.profiles.set(event.pubkey, profile);
       const key = Nostr.toNostrBech32Address(event.pubkey, 'npub');
-      iris.session.addToSearchIndex(key, {
+      SearchIndex.add({
         key,
         name: profile.name,
         display_name: profile.display_name,
