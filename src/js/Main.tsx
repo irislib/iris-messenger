@@ -21,6 +21,7 @@ import Settings from './views/settings/Settings';
 import Torrent from './views/Torrent';
 import Component from './BaseComponent';
 import Helpers from './Helpers';
+import localState from './LocalState';
 import QRScanner from './QRScanner';
 
 import '@fontsource/lato/400.css';
@@ -51,22 +52,19 @@ class Main extends Component<Props, ReactState> {
     }
     window.onload = () => {
       // this makes sure that window.nostr is there
-      iris.local().get('loggedIn').on(this.inject());
+      localState.get('loggedIn').on(this.inject());
     };
-    iris.local().get('toggleMenu').put(false);
-    iris
-      .local()
-      .get('toggleMenu')
-      .on((show: boolean) => this.toggleMenu(show));
+    localState.get('toggleMenu').put(false);
+    localState.get('toggleMenu').on((show: boolean) => this.toggleMenu(show));
     iris.electron && iris.electron.get('platform').on(this.inject());
-    iris.local().get('unseenMsgsTotal').on(this.inject());
+    localState.get('unseenMsgsTotal').on(this.inject());
     translationLoaded.then(() => this.setState({ translationLoaded: true }));
   }
 
   handleRoute(e: RouterOnChangeArgs) {
     const activeRoute = e.url;
     this.setState({ activeRoute });
-    iris.local().get('activeRoute').put(activeRoute);
+    localState.get('activeRoute').put(activeRoute);
     QRScanner.cleanupScanner();
   }
 

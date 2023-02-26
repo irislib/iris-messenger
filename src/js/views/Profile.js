@@ -19,6 +19,7 @@ import ProfilePicture from '../components/ProfilePicture';
 import ReportButton from '../components/ReportButton';
 import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
+import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
@@ -468,7 +469,7 @@ class Profile extends View {
     this.setState({ isMyProfile });
     this.followedUsers = new Set();
     this.followers = new Set();
-    iris.local().get('noFollowers').on(this.inject());
+    localState.get('noFollowers').on(this.inject());
     this.getNostrProfile(hexPub, nostrAddress);
     SocialNetwork.getBlockedUsers((blockedUsers) => {
       this.setState({ blocked: blockedUsers.has(hexPub) });

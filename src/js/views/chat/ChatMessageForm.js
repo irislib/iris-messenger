@@ -10,6 +10,7 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
+import localState from "../../LocalState";
 
 const submitButton = html` <button type="submit">
   <svg
@@ -97,8 +98,7 @@ class ChatMessageForm extends MessageForm {
   }
 
   onMsgTextInput(event) {
-    iris
-      .local()
+    localState
       .get('channels')
       .get(this.props.activeChat)
       .get('msgDraft')

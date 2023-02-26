@@ -7,6 +7,8 @@ import { Link } from 'preact-router/match';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
+import localState from '../LocalState';
+import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation';
@@ -62,47 +64,43 @@ class Header extends Component {
 
   componentDidMount() {
     document.addEventListener('keydown', this.escFunction, false);
-    iris.local().get('showParticipants').on(this.inject());
-    iris.local().get('unseenMsgsTotal').on(this.inject());
-    iris.local().get('unseenNotificationCount').on(this.inject());
-    iris
-      .local()
-      .get('activeRoute')
-      .on(
-        this.sub((activeRoute) => {
-          this.setState({
-            about: null,
-            title: '',
-            activeRoute,
-            showMobileSearch: false,
-          });
-          const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-          this.chatId = replaced.length < activeRoute.length ? replaced : null;
-          if (this.chatId) {
-            iris.local().get('channels').get(this.chatId).get('isTyping').on(this.inject());
-            iris
-              .local()
-              .get('channels')
-              .get(this.chatId)
-              .get('theirLastActiveTime')
-              .on(this.inject());
-          }
+    localState.get('showParticipants').on(this.inject());
+    localState.get('unseenMsgsTotal').on(this.inject());
+    localState.get('unseenNotificationCount').on(this.inject());
+    localState.get('activeRoute').on(
+      this.sub((activeRoute) => {
+        this.setState({
+          about: null,
+          title: '',
+          activeRoute,
+          showMobileSearch: false,
+        });
+        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+        this.chatId = replaced.length < activeRoute.length ? replaced : null;
+        if (this.chatId) {
+          localState.get('channels').get(this.chatId).get('isTyping').on(this.inject());
+          localState
+            .get('channels')
+            .get(this.chatId)
+            .get('theirLastActiveTime')
+            .on(this.inject());
+        }
 
-          if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
-            if (
-              activeRoute.indexOf('/chat/') === 0 &&
-              iris.session.getKey() &&
-              this.chatId === iris.session.getKey().pub
-            ) {
-              const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
-              this.setState({ title });
-            } else {
-              const title = html`<${Name} key=${this.chatId} pub=${this.chatId} />`;
-              this.setState({ title });
-            }
+        if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
+          if (
+            activeRoute.indexOf('/chat/') === 0 &&
+            iris.session.getKey() &&
+            this.chatId === Key.getPubKey()
+          ) {
+            const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
+            this.setState({ title });
+          } else {
+            const title = html`<${Name} key=${this.chatId} pub=${this.chatId} />`;
+            this.setState({ title });
           }
-        }),
-      );
+        }
+      }),
+    );
     this.updateRelayCount();
     this.iv = setInterval(() => this.updateRelayCount(), 1000);
   }
@@ -119,7 +117,7 @@ class Header extends Component {
     e.stopPropagation();
     $('a.logo').blur();
     $(window).width() > 625 && route('/');
-    iris.local().get('toggleMenu').put(true);
+    localState.get('toggleMenu').put(true);
   }
 
   updateRelayCount() {
@@ -245,7 +243,7 @@ class Header extends Component {
                 class="tooltip"
                 style="width:24px; height:24px; color: var(--msg-form-button-color)"
                 id="<start-video-call"
-                onClick=${() => iris.local().get('outgoingCall').put(this.chatId)}
+                onClick=${() => localState.get('outgoingCall').put(this.chatId)}
               >
                 <span class="tooltiptext">${t('video_call')}</span>
                 ${Icons.videoCall}
@@ -277,7 +275,7 @@ class Header extends Component {
         <${Link}
           activeClassName="active"
           href="/${npub}"
-          onClick=${() => iris.local().get('scrollUp').put(true)}
+          onClick=${() => localState.get('scrollUp').put(true)}
           class="hidden-xs my-profile"
         >
           <${Identicon} str=${npub} width="34" />

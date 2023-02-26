@@ -4,9 +4,10 @@ import { throttle } from 'lodash';
 import Component from '../BaseComponent';
 import Button from '../components/basic/Button';
 import Helpers from '../Helpers';
-import Nostr from '../nostr/Nostr';
+import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
+import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
 import PublicMessage from './PublicMessage';
@@ -126,15 +127,12 @@ class MessageFeed extends Component {
         );
       }
     } else {
-      iris
-        .local()
-        .get('scrollUp')
-        .on(
-          this.sub(() => {
-            !first && Helpers.animateScrollTop('.main-view');
-            first = false;
-          }),
-        );
+      localState.get('scrollUp').on(
+        this.sub(() => {
+          !first && Helpers.animateScrollTop('.main-view');
+          first = false;
+        }),
+      );
       if (this.props.keyword) {
         const keyword = this.props.keyword;
         Nostr.getMessagesByKeyword(this.props.keyword, (messages) => {

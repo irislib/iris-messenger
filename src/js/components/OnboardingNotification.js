@@ -3,6 +3,7 @@ import iris from 'iris-lib';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
+import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
@@ -15,9 +16,9 @@ import Name from './Name';
 
 export default class OnboardingNotification extends Component {
   componentDidMount() {
-    iris.local().get('noFollowers').on(this.inject());
-    iris.local().get('hasNostrFollowers').on(this.inject());
-    iris.local().get('showFollowSuggestions').on(this.inject());
+    localState.get('noFollowers').on(this.inject());
+    localState.get('hasNostrFollowers').on(this.inject());
+    localState.get('showFollowSuggestions').on(this.inject());
   }
 
   render() {
@@ -39,7 +40,7 @@ export default class OnboardingNotification extends Component {
                 `,
               )}
               <p>
-                <${Button} onClick=${() => iris.local().get('showFollowSuggestions').put(false)}>
+                <${Button} onClick=${() => localState.get('showFollowSuggestions').put(false)}>
                   ${t('done')}
                 </Button>
               </p>

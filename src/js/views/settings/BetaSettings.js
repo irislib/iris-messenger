@@ -1,6 +1,7 @@
 import iris from 'iris-lib';
 
 import Component from '../../BaseComponent';
+import localState from '../../LocalState';
 import { translate as t } from '../../translations/Translation';
 
 export default class BetaSettings extends Component {
@@ -22,8 +23,7 @@ export default class BetaSettings extends Component {
               type="checkbox"
               checked={this.state.local.showBetaFeatures}
               onChange={() =>
-                iris
-                  .local()
+                localState
                   .get('settings')
                   .get('showBetaFeatures')
                   .put(!this.state.local.showBetaFeatures)
@@ -38,16 +38,13 @@ export default class BetaSettings extends Component {
   }
   componentDidMount() {
     iris.electron && iris.electron.get('settings').on(this.inject('electron', 'electron'));
-    iris
-      .local()
-      .get('settings')
-      .on(
-        this.sub((local) => {
-          console.log('local settings', local);
-          if (local) {
-            this.setState({ local });
-          }
-        }),
-      );
+    localState.get('settings').on(
+      this.sub((local) => {
+        console.log('local settings', local);
+        if (local) {
+          this.setState({ local });
+        }
+      }),
+    );
   }
 }

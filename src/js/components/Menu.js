@@ -1,10 +1,10 @@
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 
 import logo from '../../assets/img/icon128.png';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
+import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
 
 const APPLICATIONS = [
@@ -24,13 +24,13 @@ export default class Menu extends Component {
   };
 
   componentDidMount() {
-    iris.local().get('unseenMsgsTotal').on(this.inject());
-    iris.local().get('activeRoute').on(this.inject());
+    localState.get('unseenMsgsTotal').on(this.inject());
+    localState.get('activeRoute').on(this.inject());
   }
 
   menuLinkClicked() {
-    iris.local().get('toggleMenu').put(false);
-    iris.local().get('scrollUp').put(true);
+    localState.get('toggleMenu').put(false);
+    localState.get('scrollUp').put(true);
   }
 
   render() {

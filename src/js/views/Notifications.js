@@ -1,9 +1,9 @@
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 import { debounce } from 'lodash';
 import { createRef } from 'preact';
 
 import MessageFeed from '../components/MessageFeed';
+import localState from '../LocalState';
 import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
@@ -16,6 +16,7 @@ export default class Notifications extends View {
   updateNotificationsLastOpened = debounce(() => {
     const time = Math.floor(Date.now() / 1000);
     Nostr.public.set('notifications/lastOpened', time);
+    localState.get('unseenNotificationCount').put(0);
   }, 1000);
 
   componentDidMount() {
@@ -24,7 +25,6 @@ export default class Notifications extends View {
       const hasNotifications = notifications.length > 0;
       if (hasNotifications && this.ref.current) {
         this.updateNotificationsLastOpened();
-        iris.local().get('unseenNotificationCount').put(0);
       }
       this.setState({ hasNotifications });
     });

@@ -5,6 +5,7 @@ import { createRef } from 'preact';
 
 import Helpers from '../Helpers';
 import EmojiButton from '../lib/emoji-button';
+import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
 
 import MessageForm from './MessageForm';
@@ -31,8 +32,7 @@ class FeedMessageForm extends MessageForm {
       textEl.focus();
     }
     if (!this.props.replyingTo) {
-      iris
-        .local()
+      localState
         .get('channels')
         .get('public')
         .get('msgDraft')
@@ -52,7 +52,7 @@ class FeedMessageForm extends MessageForm {
 
   async submit() {
     if (!this.props.replyingTo) {
-      iris.local().get('channels').get('public').get('msgDraft').put(null);
+      localState.get('channels').get('public').get('msgDraft').put(null);
     }
     const textEl = $(this.newMsgRef.current);
     const text = textEl.val();
@@ -120,7 +120,7 @@ class FeedMessageForm extends MessageForm {
   onMsgTextInput(event) {
     this.setTextareaHeight(event.target);
     if (!this.props.replyingTo) {
-      iris.local().get('channels').get('public').get('msgDraft').put($(event.target).val());
+      localState.get('channels').get('public').get('msgDraft').put($(event.target).val());
     }
     this.checkMention(event);
     this.saveDraftToHistory();

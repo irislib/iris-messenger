@@ -15,6 +15,7 @@ import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 import Subscriptions from './Subscriptions';
+import localState from "../LocalState";
 
 declare global {
   interface Window {
@@ -97,7 +98,7 @@ const Nostr = {
     iris.session.logOut();
   },
   loadSettings() {
-    // fug. iris.local() doesn't callback properly the first time it's loaded from local storage
+    // fug. localState doesn't callback properly the first time it's loaded from local storage
     localForage.getItem('notificationsSeenTime').then((val) => {
       if (val && !Events.notificationsSeenTime) {
         Events.notificationsSeenTime = val as number;
@@ -178,10 +179,7 @@ const Nostr = {
   },
   init: function () {
     this.loadSettings();
-    iris
-      .local()
-      .get('loggedIn')
-      .on(() => this.onLoggedIn());
+    localState.get('loggedIn').on(() => this.onLoggedIn());
     let lastResubscribed = Date.now();
     document.addEventListener('visibilitychange', () => {
       // when PWA returns to foreground after 5 min dormancy, resubscribe stuff

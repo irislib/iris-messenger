@@ -7,6 +7,7 @@ import Key from './Key';
 import LocalForage from './LocalForage';
 import Nostr from './Nostr';
 import Subscriptions from './Subscriptions';
+import localState from '../LocalState';
 
 export default {
   profileEventByUser: new Map<string, Event>(),
@@ -93,7 +94,7 @@ export default {
     }
     if (followedUser === myPub) {
       if (this.followersByUser.get(followedUser)?.size === 1) {
-        iris.local().get('hasNostrFollowers').put(true);
+        localState.get('hasNostrFollowers').put(true);
       }
     }
     if (this.followedByUser.get(myPub)?.has(follower)) {

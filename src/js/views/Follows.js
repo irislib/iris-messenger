@@ -1,11 +1,11 @@
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 import throttle from 'lodash/throttle';
 
 import Button from '../components/basic/Button';
 import FollowButton from '../components/FollowButton';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
+import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
@@ -65,7 +65,7 @@ class Follows extends View {
     if (this.props.id) {
       this.myPub = Nostr.toNostrBech32Address(Key.getPubKey(), 'npub');
       this.props.followers ? this.getFollowers() : this.getFollows();
-      iris.local().get('contacts').on(this.inject());
+      localState.get('contacts').on(this.inject());
     }
   }
 

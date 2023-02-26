@@ -6,6 +6,7 @@ import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 
 import Identicon from './Identicon';
+import localState from '../LocalState';
 
 const plusIcon = (
   <svg width="24" height="24" viewBox="0 0 24 24">
@@ -36,9 +37,8 @@ class Footer extends Component<Props, State> {
   }
 
   componentDidMount() {
-    iris.local().get('unseenMsgsTotal').on(this.inject());
-    iris
-      .local()
+    localState.get('unseenMsgsTotal').on(this.inject());
+    localState
       .get('activeRoute')
       .on(
         this.sub((activeRoute) => {
@@ -62,7 +62,7 @@ class Footer extends Component<Props, State> {
 
     return (
       <footer class="visible-xs-flex nav footer">
-        <div class="header-content" onClick={() => iris.local().get('scrollUp').put(true)}>
+        <div class="header-content" onClick={() => localState.get('scrollUp').put(true)}>
           <a href="/" class={`btn ${activeRoute === '/' ? 'active' : ''}`}>
             {Icons.home}
           </a>

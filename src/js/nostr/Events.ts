@@ -2,6 +2,7 @@ import iris from 'iris-lib';
 import { debounce } from 'lodash';
 
 import { Event, Filter, getEventHash } from '../lib/nostr-tools';
+import localState from '../LocalState';
 
 import IndexedDB from './IndexedDB';
 import Key from './Key';
@@ -187,7 +188,7 @@ const Events = {
     }
     if (event.pubkey === myPub && event.tags.length) {
       if (SocialNetwork.followedByUser.get(myPub)?.size > 10) {
-        iris.local().get('showFollowSuggestions').put(false);
+        localState.get('showFollowSuggestions').put(false);
       }
     }
     if (event.pubkey === myPub && event.content?.length) {
@@ -522,7 +523,7 @@ const Events = {
       }
     }
     console.log('notificationsSeenTime', Events.notificationsSeenTime, 'count', count);
-    iris.local().get('unseenNotificationCount').put(count);
+    localState.get('unseenNotificationCount').put(count);
   }, 1000),
   publish: async function (event: any) {
     if (!event.sig) {

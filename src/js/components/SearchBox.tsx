@@ -5,6 +5,7 @@ import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
+import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
@@ -78,19 +79,13 @@ class SearchBox extends Component<Props, State> {
   }
 
   componentDidMount() {
-    iris.local().get('showFollowSuggestions').on(this.inject());
-    iris
-      .local()
-      .get('searchIndexUpdated')
-      .on(this.sub(() => this.search()));
-    iris
-      .local()
-      .get('activeRoute')
-      .on(
-        this.sub(() => {
-          this.close();
-        }),
-      );
+    localState.get('showFollowSuggestions').on(this.inject());
+    localState.get('searchIndexUpdated').on(this.sub(() => this.search()));
+    localState.get('activeRoute').on(
+      this.sub(() => {
+        this.close();
+      }),
+    );
     this.adjustResultsPosition();
     this.search();
     $(document)

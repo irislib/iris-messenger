@@ -1,9 +1,9 @@
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 
 import FeedMessageForm from '../components/FeedMessageForm';
 import MessageFeed from '../components/MessageFeed';
 import OnboardingNotification from '../components/OnboardingNotification';
+import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -32,7 +32,7 @@ class Feed extends View {
   componentDidMount() {
     this.restoreScrollPosition();
     this.search();
-    iris.local().get('filters').get('group').on(this.inject());
+    localState.get('filters').get('group').on(this.inject());
   }
 
   filter(msg) {

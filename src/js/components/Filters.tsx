@@ -1,6 +1,5 @@
-import iris from 'iris-lib';
-
 import Component from '../BaseComponent';
+import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
 
 type Props = Record<string, unknown>;
@@ -11,11 +10,11 @@ type State = {
 
 export default class Filters extends Component<Props, State> {
   componentDidMount(): void {
-    iris.local().get('filters').get('group').on(this.inject());
+    localState.get('filters').get('group').on(this.inject());
   }
 
   toggleGroup(group: string): void {
-    iris.local().get('filters').get('group').put(group);
+    localState.get('filters').get('group').put(group);
   }
 
   render() {

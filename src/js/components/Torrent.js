@@ -7,6 +7,7 @@ import { createRef } from 'preact';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
+import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4)) !== -1;
@@ -20,8 +21,7 @@ class Torrent extends Component {
 
   componentDidMount() {
     console.log('componentDidMount torrent');
-    iris
-      .local()
+    localState
       .get('player')
       .on(
         this.sub((player) => {
@@ -35,11 +35,11 @@ class Torrent extends Component {
       );
     const showFiles = this.props.showFiles;
     showFiles && this.setState({ showFiles });
-    iris.local().get('settings').on(this.inject());
+    localState.get('settings').on(this.inject());
     (async () => {
       if (
         this.props.standalone ||
-        (await iris.local().get('settings').get('enableWebtorrent').once())
+        (await localState.get('settings').get('enableWebtorrent').once())
       ) {
         this.startTorrenting();
       }
@@ -54,7 +54,7 @@ class Torrent extends Component {
 
   onPlay(e) {
     if (!e.target.muted) {
-      iris.local().get('player').get('paused').put(true);
+      localState.get('player').get('paused').put(true);
     }
   }
 
@@ -73,12 +73,12 @@ class Torrent extends Component {
 
   playAudio(filePath, e) {
     e && e.preventDefault();
-    iris.local().get('player').put({ torrentId: this.props.torrentId, filePath, paused: false });
+    localState.get('player').put({ torrentId: this.props.torrentId, filePath, paused: false });
   }
 
   pauseAudio(e) {
     e && e.preventDefault();
-    iris.local().get('player').put({ paused: true });
+    localState.get('player').put({ paused: true });
   }
 
   openFile(file, clicked) {
@@ -90,7 +90,7 @@ class Torrent extends Component {
         const el = base.find('video').get(0);
         el && el.play();
       } else if (isAud) {
-        iris.local().get('player').get('paused').put(false);
+        localState.get('player').get('paused').put(false);
       }
       return;
     }

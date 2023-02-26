@@ -12,6 +12,7 @@ import Helpers from '../Helpers';
 import Nostr from '../nostr/Nostr';
 import Events from '../nostr/Events';
 import { translate as t } from '../translations/Translation';
+import localState from "../LocalState";
 const bech32 = require('bech32-buffer');
 
 async function login(k) {
@@ -82,7 +83,7 @@ class Login extends Component {
     e.preventDefault();
     let name = document.getElementById('login-form-name').value;
     iris.session.loginAsNewUser({ name, autofollow: false });
-    iris.local().get('showFollowSuggestions').put(true);
+    localState.get('showFollowSuggestions').put(true);
     name &&
       setTimeout(() => {
         Nostr.setMetadata({ name });

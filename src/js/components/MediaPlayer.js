@@ -4,37 +4,34 @@ import $ from 'jquery';
 import { Component } from 'preact';
 
 import Icons from '../Icons';
+import localState from '../LocalState';
 
 const isOfType = (f, types) => types.indexOf(f.name.slice(-4)) !== -1;
 const isImage = (f) => isOfType(f, ['.jpg', 'jpeg', '.gif', '.png']);
 
 class MediaPlayer extends Component {
   componentDidMount() {
-    iris
-      .local()
-      .get('player')
-      .on((player) => {
-        const torrentId = player && player.torrentId;
-        const filePath = player && player.filePath;
-        if (torrentId !== this.torrentId) {
-          this.filePath = filePath;
-          this.torrentId = torrentId;
-          this.setState({
-            torrentId,
-            isOpen: !!player,
-            splitPath: filePath && filePath.split('/'),
-          });
-          if (torrentId) {
-            this.startTorrenting();
-          }
-        } else if (filePath && filePath !== this.filePath) {
-          this.filePath = filePath;
-          this.setState({ splitPath: filePath && filePath.split('/') });
-          this.openFile();
+    localState.get('player').on((player) => {
+      const torrentId = player && player.torrentId;
+      const filePath = player && player.filePath;
+      if (torrentId !== this.torrentId) {
+        this.filePath = filePath;
+        this.torrentId = torrentId;
+        this.setState({
+          torrentId,
+          isOpen: !!player,
+          splitPath: filePath && filePath.split('/'),
+        });
+        if (torrentId) {
+          this.startTorrenting();
         }
-      });
-    iris
-      .local()
+      } else if (filePath && filePath !== this.filePath) {
+        this.filePath = filePath;
+        this.setState({ splitPath: filePath && filePath.split('/') });
+        this.openFile();
+      }
+    });
+    localState
       .get('player')
       .get('paused')
       .on((p) => this.setPaused(p));
@@ -68,7 +65,7 @@ class MediaPlayer extends Component {
       const audio = el.find('audio').get(0);
       if (audio) {
         audio.onpause = audio.onplay = (e) => {
-          iris.local().get('player').get('paused').put(!!e.target.paused);
+          localState.get('player').get('paused').put(!!e.target.paused);
         };
       }
     }
@@ -87,7 +84,7 @@ class MediaPlayer extends Component {
 
   closeClicked() {
     this.setPaused(true);
-    iris.local().get('player').put(null);
+    localState.get('player').put(null);
   }
 
   render() {

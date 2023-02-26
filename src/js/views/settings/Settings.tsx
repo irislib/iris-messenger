@@ -8,6 +8,7 @@ import Icons from '../../Icons';
 
 import SettingsContent from './SettingsContent';
 import SettingsMenu from './SettingsMenu';
+import localState from "../../LocalState";
 
 type Props = { page?: string };
 
@@ -19,10 +20,7 @@ type State = {
 
 class Settings extends Component<Props, State> {
   componentDidMount() {
-    iris
-      .local()
-      .get('toggleSettingsMenu')
-      .on((show: boolean) => this.toggleMenu(show));
+    localState.get('toggleSettingsMenu').on((show: boolean) => this.toggleMenu(show));
   }
   toggleMenu(show: boolean): void {
     this.setState({
@@ -66,7 +64,7 @@ class Settings extends Component<Props, State> {
     e.stopPropagation();
     $('a.logo').blur();
     $(window).width() > 625;
-    iris.local().get('toggleSettingsMenu').put(true);
+    localState.get('toggleSettingsMenu').put(true);
     route('/settings/');
   }
 }

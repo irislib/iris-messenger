@@ -5,6 +5,7 @@ import ScrollViewport from 'preact-scroll-viewport';
 
 import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
+import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
@@ -49,10 +50,7 @@ class ChatList extends Component {
       });
       this.setState({ chats, sortedChats });
     });
-    iris
-      .local()
-      .get('scrollUp')
-      .on(this.sub(() => Helpers.animateScrollTop('.chat-list')));
+    localState.get('scrollUp').on(this.sub(() => Helpers.animateScrollTop('.chat-list')));
 
     if (
       window.Notification &&

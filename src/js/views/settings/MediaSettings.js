@@ -1,6 +1,7 @@
 import iris from 'iris-lib';
 
 import Component from '../../BaseComponent';
+import localState from '../../LocalState';
 import { translate as t } from '../../translations/Translation';
 
 export default class MediaSettings extends Component {
@@ -13,7 +14,7 @@ export default class MediaSettings extends Component {
   }
 
   componentDidMount() {
-    iris.local().get('settings').on(this.inject());
+    localState.get('settings').on(this.inject());
   }
 
   render() {
@@ -34,8 +35,7 @@ export default class MediaSettings extends Component {
               type="checkbox"
               checked={this.state.settings.autoplayVideos !== false}
               onChange={() =>
-                iris
-                  .local()
+                localState
                   .get('settings')
                   .get('autoplayVideos')
                   .put(!this.state.settings.autoplayVideos)
@@ -52,8 +52,7 @@ export default class MediaSettings extends Component {
                 type="checkbox"
                 checked={this.state.settings[setting] !== false}
                 onChange={() =>
-                  iris
-                    .local()
+                  localState
                     .get('settings')
                     .get(setting)
                     .put(!(this.state.settings[setting] !== false))

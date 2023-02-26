@@ -5,6 +5,7 @@ import Button from '../../components/basic/Button';
 import Nostr from '../../nostr/Nostr';
 import Relays from '../../nostr/Relays';
 import { translate as t } from '../../translations/Translation';
+import localState from "../../LocalState";
 const bech32 = require('bech32-buffer');
 
 const NetworkSettings = () => {
@@ -16,7 +17,7 @@ const NetworkSettings = () => {
   }, 1000);
 
   const handleRemoveRelay = (relay) => {
-    iris.local().get('relays').get(relay.url).put(null);
+    localState.get('relays').get(relay.url).put(null);
     Relays.remove(relay.url);
   };
 
@@ -28,7 +29,7 @@ const NetworkSettings = () => {
 
   const handleAddRelay = (event) => {
     const newRelayUrlWithProtocol = ensureProtocol(newRelayUrl);
-    iris.local().get('relays').get(newRelayUrlWithProtocol).put({ enabled: true });
+    localState.get('relays').get(newRelayUrlWithProtocol).put({ enabled: true });
     event.preventDefault(); // prevent the form from reloading the page
     Relays.add(newRelayUrlWithProtocol); // add the new relay using the Nostr method
     setNewRelayUrl(''); // reset the new relay URL
