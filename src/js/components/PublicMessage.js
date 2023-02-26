@@ -159,7 +159,7 @@ class PublicMessage extends Message {
         }
       }
       if (this.props.standalone && msg.attachments && msg.attachments.length) {
-        this.setOgImageUrl(msg.attachments[0].data);
+        this.setState({ ogImageUrl: msg.attachments[0].data });
       }
 
       // find .jpg .jpeg .gif .png .webp urls in msg.text and add them to msg.attachments

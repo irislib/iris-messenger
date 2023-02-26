@@ -198,13 +198,6 @@ class Torrent extends Component {
       poster = poster || img;
       if (poster) {
         poster.appendTo(this.coverRef.current);
-        if (this.props.standalone && this.isUserAgentCrawler()) {
-          const imgEl = this.coverRef.current.firstChild;
-          imgEl.onload = async () => {
-            const blob = await fetch(imgEl.src).then((r) => r.blob());
-            Helpers.getBase64(blob).then((src) => this.setOgImageUrl(src));
-          };
-        }
       }
     }, 1000);
   }

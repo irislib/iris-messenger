@@ -39,6 +39,7 @@ const Session = {
       return '0';
     };
     const myPub = Key.getPubKey();
+    // TODO move private and public to State.ts
     this.private = new Path(
       (...args) => Events.publish(...args),
       subscribe,

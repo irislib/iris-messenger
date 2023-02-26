@@ -49,42 +49,4 @@ export default abstract class BaseComponent<Props = any, State = any> extends Pu
     this.unmounted = true;
     this.unsubscribe();
   }
-
-  isUserAgentCrawler() {
-    // return true; // for testing
-    const ua = navigator.userAgent.toLowerCase();
-    return (
-      ua.indexOf('prerender') !== -1 ||
-      ua.indexOf('whatsapp') !== -1 ||
-      ua.indexOf('crawl') !== -1 ||
-      ua.indexOf('bot') !== -1
-    );
-  }
-
-  async setOgImageUrl(imgSrc?: string) {
-    if (imgSrc && this.isUserAgentCrawler()) {
-      if (imgSrc.startsWith('data:image')) {
-        const image = new Image();
-        image.onload = async () => {
-          const resizedCanvas = document.createElement('canvas');
-          const MAX_DIMENSION = 350;
-          const ratio = Math.max(image.width, image.height) / MAX_DIMENSION;
-          resizedCanvas.width = image.width / ratio;
-          resizedCanvas.height = image.height / ratio;
-          const { default: pica } = await import('./lib/pica.min');
-          await pica().resize(image, resizedCanvas);
-          const ogImage = resizedCanvas.toDataURL('image/jpeg', 0.1);
-          const ogImageUrl = `https://iris-base64-decoder.herokuapp.com/?s=${encodeURIComponent(
-            ogImage,
-          )}`;
-          console.log(ogImageUrl);
-          this.state.ogImageUrl;
-          this.setState({ ogImageUrl });
-        };
-        image.src = imgSrc;
-        return;
-      }
-      this.setState({ ogImageUrl: imgSrc });
-    }
-  }
 }
