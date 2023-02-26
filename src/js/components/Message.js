@@ -50,22 +50,6 @@ class Message extends Component {
     });
   }
 
-  getSeenStatus() {
-    const chatId = this.props.chatId;
-    const chat = iris.private(chatId);
-    const time =
-      typeof this.props.created_at === 'object'
-        ? this.props.created_at
-        : new Date(this.props.created_at * 1000);
-    const seen = chat && chat.theirMsgsLastSeenDate >= time;
-    const delivered =
-      chat &&
-      chat.activity &&
-      chat.activity.lastActive &&
-      new Date(chat.activity.lastActive) >= time;
-    return { seen, delivered };
-  }
-
   onNameClick() {
     route(`/${Nostr.toNostrBech32Address(this.props.pubkey, 'npub')}`);
   }
@@ -157,10 +141,6 @@ class Message extends Component {
       duration: ANIMATE_DURATION,
       complete: () => $('#attachment-gallery').remove(),
     });
-    const activeChat = window.location.hash.replace('/', '').replace('/chat/', '');
-    if (activeChat) {
-      iris.private(activeChat).attachments = null;
-    }
     if ('activeElement' in document) {
       document.activeElement.blur();
     }
@@ -177,7 +157,7 @@ class Message extends Component {
         ? this.props.created_at
         : new Date(this.props.created_at * 1000);
 
-    const status = this.getSeenStatus();
+    const status = ''; // this.getSeenStatus();
     const seen = status.seen ? 'seen' : '';
     const delivered = status.delivered ? 'delivered' : '';
     const whose = this.props.selfAuthored ? 'our' : 'their';

@@ -6,6 +6,7 @@ import localForage from 'localforage';
 import { route } from 'preact-router';
 
 import Helpers from '../Helpers';
+import localState from '../LocalState';
 
 import Events from './Events';
 import IndexedDB from './IndexedDB';
@@ -15,7 +16,6 @@ import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 import Subscriptions from './Subscriptions';
-import localState from "../LocalState";
 
 declare global {
   interface Window {

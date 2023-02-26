@@ -1,13 +1,13 @@
 import iris from 'iris-lib';
 
 import { Event } from '../lib/nostr-tools';
+import localState from '../LocalState';
 
 import Events from './Events';
 import Key from './Key';
 import LocalForage from './LocalForage';
 import Nostr from './Nostr';
 import Subscriptions from './Subscriptions';
-import localState from '../LocalState';
 
 export default {
   profileEventByUser: new Map<string, Event>(),

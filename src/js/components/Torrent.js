@@ -21,18 +21,16 @@ class Torrent extends Component {
 
   componentDidMount() {
     console.log('componentDidMount torrent');
-    localState
-      .get('player')
-      .on(
-        this.sub((player) => {
-          this.player = player;
-          this.setState({ player });
-          if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
-            const file = this.getActiveFile(this.torrent);
-            file && this.openFile(file);
-          }
-        }),
-      );
+    localState.get('player').on(
+      this.sub((player) => {
+        this.player = player;
+        this.setState({ player });
+        if (this.torrent && this.player && this.player.filePath !== this.state.activeFilePath) {
+          const file = this.getActiveFile(this.torrent);
+          file && this.openFile(file);
+        }
+      }),
+    );
     const showFiles = this.props.showFiles;
     showFiles && this.setState({ showFiles });
     localState.get('settings').on(this.inject());

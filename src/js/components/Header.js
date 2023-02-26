@@ -31,27 +31,6 @@ class Header extends Component {
     }
   }
 
-  getOnlineStatusText() {
-    const channel = this.chatId && iris.private(this.chatId);
-    const activity = channel.activity;
-    if (activity) {
-      if (activity.isActive) {
-        return t('online');
-      } else if (activity.lastActive) {
-        const d = new Date(activity.lastActive);
-        let lastSeenText = t(
-          Helpers.getDaySeparatorText(d, d.toLocaleDateString({ dateStyle: 'short' })),
-        );
-        if (lastSeenText === t('today')) {
-          lastSeenText = Helpers.formatTime(d);
-        } else {
-          lastSeenText = Helpers.formatDate(d);
-        }
-        return `${t('last_active')} ${lastSeenText}`;
-      }
-    }
-  }
-
   backButtonClicked() {
     route('/chat');
   }
@@ -79,11 +58,7 @@ class Header extends Component {
         this.chatId = replaced.length < activeRoute.length ? replaced : null;
         if (this.chatId) {
           localState.get('channels').get(this.chatId).get('isTyping').on(this.inject());
-          localState
-            .get('channels')
-            .get(this.chatId)
-            .get('theirLastActiveTime')
-            .on(this.inject());
+          localState.get('channels').get(this.chatId).get('theirLastActiveTime').on(this.inject());
         }
 
         if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
@@ -131,16 +106,9 @@ class Header extends Component {
     }
     const npub = Nostr.toNostrBech32Address(key.secp256k1.rpub, 'npub');
     const activeRoute = this.state.activeRoute;
-    const chat =
-      activeRoute && activeRoute.indexOf('/chat') === 0 && this.chatId && iris.private(this.chatId);
+    const chat = null;
     const isTyping = chat && chat.isTyping;
-    const onlineStatus =
-      chat &&
-      chat.uuid &&
-      activeRoute &&
-      activeRoute.length > 20 &&
-      !isTyping &&
-      this.getOnlineStatusText();
+    const onlineStatus = '';
     const searchBox = this.chatId
       ? ''
       : html`

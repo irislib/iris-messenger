@@ -1,16 +1,15 @@
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 import $ from 'jquery';
 
 import MessageForm from '../../components/MessageForm';
 import Torrent from '../../components/Torrent';
 import Helpers from '../../Helpers';
 import EmojiButton from '../../lib/emoji-button';
+import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
-import localState from "../../LocalState";
 
 const submitButton = html` <button type="submit">
   <svg

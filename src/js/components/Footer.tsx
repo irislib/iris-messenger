@@ -2,11 +2,11 @@ import iris from 'iris-lib';
 
 import Component from '../BaseComponent';
 import Icons from '../Icons';
+import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Nostr from '../nostr/Nostr';
 
 import Identicon from './Identicon';
-import localState from '../LocalState';
 
 const plusIcon = (
   <svg width="24" height="24" viewBox="0 0 24 24">
@@ -38,15 +38,13 @@ class Footer extends Component<Props, State> {
 
   componentDidMount() {
     localState.get('unseenMsgsTotal').on(this.inject());
-    localState
-      .get('activeRoute')
-      .on(
-        this.sub((activeRoute) => {
-          const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-          const chatId = replaced.length < activeRoute.length ? replaced : null;
-          this.setState({ activeRoute, chatId });
-        }),
-      );
+    localState.get('activeRoute').on(
+      this.sub((activeRoute) => {
+        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+        const chatId = replaced.length < activeRoute.length ? replaced : null;
+        this.setState({ activeRoute, chatId });
+      }),
+    );
   }
 
   render() {

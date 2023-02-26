@@ -1,14 +1,13 @@
 import { Component } from 'htm/preact';
-import iris from 'iris-lib';
 import $ from 'jquery';
 import { route } from 'preact-router';
 
 import Header from '../../components/Header';
 import Icons from '../../Icons';
+import localState from '../../LocalState';
 
 import SettingsContent from './SettingsContent';
 import SettingsMenu from './SettingsMenu';
-import localState from "../../LocalState";
 
 type Props = { page?: string };
 
