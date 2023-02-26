@@ -40,7 +40,6 @@ type ReactState = {
   translationLoaded: boolean;
 };
 
-// need to add initChannels: true to here and login() to get channels to load. disabled to test performance
 iris.session.init({ autologin: window.location.pathname.length > 1, autofollow: false });
 Nostr.init();
 
@@ -56,7 +55,7 @@ class Main extends Component<Props, ReactState> {
     };
     localState.get('toggleMenu').put(false);
     localState.get('toggleMenu').on((show: boolean) => this.toggleMenu(show));
-    iris.electron && iris.electron.get('platform').on(this.inject());
+    // iris.electron && iris.electron.get('platform').on(this.inject());
     localState.get('unseenMsgsTotal').on(this.inject());
     translationLoaded.then(() => this.setState({ translationLoaded: true }));
   }
@@ -81,7 +80,8 @@ class Main extends Component<Props, ReactState> {
   }
 
   electronCmd(name: string): void {
-    iris.electron.get('cmd').put({ name, time: new Date().toISOString() });
+    console.log(name); // disable lint error
+    // iris.electron.get('cmd').put({ name, time: new Date().toISOString() });
   }
 
   render() {

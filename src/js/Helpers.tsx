@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import reactStringReplace from 'react-string-replace';
-import iris from 'iris-lib';
 import $ from 'jquery';
 import throttle from 'lodash/throttle';
 

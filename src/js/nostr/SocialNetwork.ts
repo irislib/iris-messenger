@@ -1,5 +1,3 @@
-import iris from 'iris-lib';
-
 import { Event } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
@@ -176,7 +174,7 @@ export default {
       cb?.(this.blockedUsers);
     };
     callback();
-    const myPub = iris.session.getKey()?.secp256k1.rpub;
+    const myPub = Key.getPubKey();
     Subscriptions.subscribe([{ kinds: [16462], authors: [myPub] }], callback);
   },
   getFlaggedUsers(cb?: (flagged: Set<string>) => void) {
@@ -184,7 +182,7 @@ export default {
       cb?.(this.flaggedUsers);
     };
     callback();
-    const myPub = iris.session.getKey()?.secp256k1.rpub;
+    const myPub = Key.getPubKey();
     Subscriptions.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
   },
   getFollowedByUser: function (user: string, cb?: (followedUsers: Set<string>) => void) {

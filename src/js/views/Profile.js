@@ -184,7 +184,7 @@ class Profile extends View {
                     title=${this.state.name}
                     copyStr=${rawDataJson}
                   />
-                  ${!this.state.isMyProfile && !iris.session.getKey().secp256k1.priv
+                  ${!this.state.isMyProfile && !Key.getPrivKey()
                     ? html`
                         <${Button} onClick=${(e) => this.viewAs(e)}>
                           ${t('view_as') + ' '}

@@ -97,16 +97,6 @@ const Nostr = {
     await localForage.clear();
     iris.session.logOut();
   },
-  loadSettings() {
-    // fug. localState doesn't callback properly the first time it's loaded from local storage
-    localForage.getItem('notificationsSeenTime').then((val) => {
-      if (val && !Events.notificationsSeenTime) {
-        Events.notificationsSeenTime = val as number;
-        Events.updateUnseenNotificationCount();
-        console.log('notificationsSeenTime', Events.notificationsSeenTime);
-      }
-    });
-  },
   onLoggedIn() {
     const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
       const filter = filters[0];
@@ -138,7 +128,6 @@ const Nostr = {
     this.public.get('notifications/lastOpened', (time) => {
       if (time !== Events.notificationsSeenTime) {
         Events.notificationsSeenTime = time;
-        localForage.setItem('notificationsSeenTime', time);
         Events.updateUnseenNotificationCount();
       }
     });
@@ -177,7 +166,6 @@ const Nostr = {
     }, 5000);
   },
   init: function () {
-    this.loadSettings();
     localState.get('loggedIn').on(() => this.onLoggedIn());
     let lastResubscribed = Date.now();
     document.addEventListener('visibilitychange', () => {

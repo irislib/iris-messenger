@@ -30,7 +30,7 @@ export default class AccountSettings extends Component {
   }
 
   render() {
-    const myPrivHex = iris.session.getKey().secp256k1.priv;
+    const myPrivHex = Key.getPrivKey();
     let myPriv32;
     if (myPrivHex) {
       // eslint-disable-next-line no-undef
@@ -40,7 +40,7 @@ export default class AccountSettings extends Component {
     // eslint-disable-next-line no-undef
     const myNpub = bech32.encode('npub', Buffer.from(myPub, 'hex'));
 
-    const hasPriv = !!iris.session.getKey().secp256k1.priv;
+    const hasPriv = !!Key.getPrivKey();
     return (
       <>
         <div class="centered-container">

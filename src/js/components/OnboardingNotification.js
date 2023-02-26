@@ -1,5 +1,4 @@
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
@@ -47,10 +46,7 @@ export default class OnboardingNotification extends Component {
               <p>
                 ${t('alternatively')}<i> </i>
                 <a
-                  href="/${Nostr.toNostrBech32Address(
-                    Key.getPubKey(),
-                    'npub',
-                  )}"
+                  href="/${Nostr.toNostrBech32Address(Key.getPubKey(), 'npub')}"
                   >${t('give_your_profile_link_to_someone')}</a
                 >.
               </p>

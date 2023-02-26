@@ -1,5 +1,3 @@
-import iris from 'iris-lib';
-
 import Component from '../BaseComponent';
 import Icons from '../Icons';
 import localState from '../LocalState';

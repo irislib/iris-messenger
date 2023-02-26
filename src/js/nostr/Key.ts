@@ -10,6 +10,9 @@ export default {
   getPubKey() {
     return iris.session.getKey()?.secp256k1?.rpub; // TODO use this everywhere :D
   },
+  getPrivKey() {
+    return iris.session.getKey()?.secp256k1?.priv;
+  },
   encrypt: async function (data: string, pub?: string): Promise<string> {
     const k = iris.session.getKey().secp256k1;
     pub = pub || k.rpub;
@@ -37,7 +40,7 @@ export default {
     }
   },
   sign: async function (event: Event) {
-    const priv = iris.session.getKey().secp256k1.priv;
+    const priv = this.getPrivKey();
     if (priv) {
       return signEvent(event, priv);
     } else if (window.nostr) {

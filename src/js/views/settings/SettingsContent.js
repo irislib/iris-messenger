@@ -3,7 +3,6 @@ import Component from '../../BaseComponent';
 import AccountSettings from './AccountSettings';
 import AppearanceSettings from './AppearanceSettings';
 import BackupSettings from './BackupSettings';
-import BetaSettings from './BetaSettings';
 import BlockedSettings from './BlockedSettings';
 import IrisAccountSettings from './IrisAccountSettings';
 import LanguageSettings from './LanguageSettings';
@@ -18,7 +17,6 @@ export default class SettingsContent extends Component {
     appearance: AppearanceSettings,
     language: LanguageSettings,
     media: MediaSettings,
-    beta: BetaSettings,
     backup: BackupSettings,
     blocked_users: BlockedSettings,
     iris_account: IrisAccountSettings,

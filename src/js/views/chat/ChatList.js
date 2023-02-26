@@ -1,5 +1,4 @@
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 import $ from 'jquery';
 import ScrollViewport from 'preact-scroll-viewport';
 
