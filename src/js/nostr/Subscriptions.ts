@@ -122,7 +122,10 @@ const Subscriptions = {
     () => {
       if (Subscriptions.subscribedPosts.size === 0) return;
       console.log('subscribe to', Subscriptions.subscribedPosts.size, 'posts');
-      Subscriptions.sendSubToRelays([{ ids: Array.from(Subscriptions.subscribedPosts) }], 'posts');
+      Subscriptions.sendSubToRelays(
+        [{ ids: Array.from(Subscriptions.subscribedPosts).slice(0, 1000) }],
+        'posts',
+      );
     },
     3000,
     { leading: false },

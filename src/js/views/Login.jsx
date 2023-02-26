@@ -23,8 +23,9 @@ async function login(k) {
 async function nostrLogin(e) {
   e.preventDefault();
   const rpub = await window.nostr.getPublicKey();
-  const k = await iris.Key.generate();
-  k.secp256k1 = { rpub };
+  const k = {
+    secp256k1: { rpub },
+  };
   await login(k);
 }
 
@@ -45,7 +46,9 @@ class Login extends Component {
     let k;
     try {
       k = JSON.parse(val);
-    } catch (e) {}
+    } catch (e) {
+      /* empty */
+    }
     if (!k) {
       console.log(1);
       if (secp.utils.isValidPrivateKey(val)) {
@@ -56,8 +59,9 @@ class Login extends Component {
         const { data, prefix } = bech32.decode(val);
         const hex = Helpers.arrayToHex(data);
         if (prefix === 'npub') {
-          k = await iris.Key.generate();
-          k.secp256k1 = { rpub: hex };
+          k = {
+            secp256k1: { rpub: hex },
+          };
         } else if (prefix === 'nsec') {
           k = await iris.Key.fromSecp256k1(hex);
         }

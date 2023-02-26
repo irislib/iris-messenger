@@ -23,8 +23,9 @@ export default class AccountSettings extends Component {
   async onExtensionLoginClick(e) {
     e.preventDefault();
     const rpub = await window.nostr.getPublicKey();
-    const k = await iris.Key.generate();
-    k.secp256k1 = { rpub };
+    const k = {
+      secp256k1: { rpub },
+    };
     iris.session.login(k);
   }
 

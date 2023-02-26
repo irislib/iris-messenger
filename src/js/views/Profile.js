@@ -113,8 +113,11 @@ class Profile extends View {
 
   async viewAs(event) {
     event.preventDefault();
-    const k = await iris.Key.generate();
-    k.secp256k1 = { rpub: this.state.hexPub, priv: null };
+    const k = {
+      secp256k1: {
+        rpub: this.state.hexPub,
+      },
+    };
     route('/');
     iris.session.login(k);
   }
