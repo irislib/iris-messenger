@@ -1,10 +1,9 @@
-import iris from 'iris-lib';
-
-import { Event, nip04, signEvent } from '../lib/nostr-tools';
+import { Event, generatePrivateKey, getPublicKey, nip04, signEvent } from '../lib/nostr-tools';
 
 import Events from './Events';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import Helpers from '../Helpers';
+import localState from '../LocalState';
 
 declare global {
   interface Window {
@@ -12,17 +11,67 @@ declare global {
   }
 }
 
+type Key = {
+  rpub: string;
+  priv?: string;
+};
+
 export default {
   windowNostrQueue: [],
   isProcessingQueue: false,
+  getPublicKey,
+  loginAsNewUser() {
+    this.login(this.generateKey());
+  },
+  login(key: any) {
+    const shouldRefresh = !!this.key;
+    this.key = key;
+    localStorage.setItem('iris.myKey', JSON.stringify(key));
+    if (shouldRefresh) {
+      location.reload();
+    }
+    setTimeout(() => {
+      // TODO remove setTimeout
+      localState.get('loggedIn').put(true);
+    }, 100);
+  },
+  generateKey(): Key {
+    const priv = generatePrivateKey();
+    return {
+      priv,
+      rpub: getPublicKey(priv),
+    };
+  },
+  getOrCreate(options) {
+    let localStorageKey = localStorage.getItem('iris.myKey');
+    if (!localStorageKey) {
+      localStorageKey = localStorage.getItem('chatKeyPair'); // maybe we can already remove this...
+    }
+    if (localStorageKey) {
+      this.key = JSON.parse(localStorageKey);
+      if (this.key.secp256k1) {
+        this.key = this.key.secp256k1;
+        localStorage.setItem('iris.myKey', JSON.stringify(this.key));
+      }
+      console.log('loaded key from localStorage', this.key);
+      localState.get('loggedIn').put(true);
+      return true;
+    } else if (options.autologin !== false) {
+      this.key = this.generateKey();
+      localState.get('loggedIn').put(true);
+      return true;
+    } else {
+      return false;
+    }
+  },
   getPubKey() {
-    return iris.session.getKey()?.secp256k1?.rpub; // TODO use this everywhere :D
+    return this.key.rpub;
   },
   getPrivKey() {
-    return iris.session.getKey()?.secp256k1?.priv;
+    return this.key.priv;
   },
   encrypt: async function (data: string, pub?: string): Promise<string> {
-    const k = iris.session.getKey().secp256k1;
+    const k = this.key;
     pub = pub || k.rpub;
     if (k.priv) {
       return nip04.encrypt(k.priv, pub, data);
@@ -35,7 +84,7 @@ export default {
     }
   },
   decrypt: async function (data, pub?: string): Promise<string> {
-    const k = iris.session.getKey().secp256k1;
+    const k = this.key;
     pub = pub || k.rpub;
     if (k.priv) {
       return nip04.decrypt(k.priv, pub, data);

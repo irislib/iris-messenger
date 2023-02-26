@@ -1,4 +1,3 @@
-import iris from 'iris-lib';
 import localForage from 'localforage';
 import { route } from 'preact-router';
 
@@ -22,8 +21,27 @@ try {
 const Session = {
   async logOut() {
     route('/');
-    await localForage.clear();
-    iris.session.logOut();
+    /*
+    if (electron) {
+      electron.get('user').put(null);
+    }
+    */
+    // TODO: remove subscription from your channels
+    if (navigator.serviceWorker) {
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg && reg.pushManager) {
+        reg.active?.postMessage({ key: null });
+        const sub = await reg.pushManager.getSubscription();
+        if (sub) {
+          // TODO unsubscribe
+        }
+      }
+    }
+    IndexedDB.clear();
+    localStorage.clear(); // TODO clear only iris data
+    localForage.clear().then(() => {
+      location.reload();
+    });
   },
   onLoggedIn() {
     const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
@@ -95,7 +113,8 @@ const Session = {
       Events.handledMsgsPerSecond = 0;
     }, 5000);
   },
-  init: function () {
+  init: function (options: any) {
+    Key.getOrCreate(options);
     localState.get('loggedIn').on(() => this.onLoggedIn());
     let lastResubscribed = Date.now();
     document.addEventListener('visibilitychange', () => {

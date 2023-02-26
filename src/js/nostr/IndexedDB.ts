@@ -20,6 +20,9 @@ const db = new MyDexie();
 
 export default {
   db,
+  clear() {
+    return db.delete();
+  },
   saveEvent(event: Event) {
     db.events
       .add(event)

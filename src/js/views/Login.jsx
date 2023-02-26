@@ -1,5 +1,4 @@
 import * as secp from '@noble/secp256k1';
-import iris from 'iris-lib';
 import localForage from 'localforage';
 import { Component } from 'preact';
 
@@ -9,26 +8,16 @@ import LanguageSelector from '../components/LanguageSelector';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
-import SocialNetwork from "../nostr/SocialNetwork";
+import Key from '../nostr/Key';
 const bech32 = require('bech32-buffer');
 
-async function login(k) {
-  iris.session.login(k);
-  setTimeout(() => {
-    // TODO remove setTimeout
-    localState.get('loggedIn').put(true);
-  }, 100);
-}
-
-async function nostrLogin(e) {
-  e.preventDefault();
+const nostrLogin = async (event) => {
+  event.preventDefault();
   const rpub = await window.nostr.getPublicKey();
-  const k = {
-    secp256k1: { rpub },
-  };
-  await login(k);
-}
+  Key.login({ rpub });
+};
 
 class Login extends Component {
   componentDidMount() {
@@ -56,26 +45,21 @@ class Login extends Component {
       // logging in with a hex private key?
       // TODO ask user if it's a private or public key
       if (secp.utils.isValidPrivateKey(val)) {
-        k = {
-          secp256k1: { priv: val, rpub: secp.schnorr.getPublicKey(val) },
-        };
-      }
-      try {
-        const { data, prefix } = bech32.decode(val);
-        const hex = Helpers.arrayToHex(data);
-        // logging in with a public key?
-        if (prefix === 'npub') {
-          k = {
-            secp256k1: { rpub: hex },
-          };
-        } else if (prefix === 'nsec') {
-          // logging in with a bech32 private key (nsec)
-          k = {
-            secp256k1: { priv: hex, rpub: secp.schnorr.getPublicKey(hex) },
-          };
+        k = { priv: val, rpub: Key.getPublicKey(val) };
+      } else {
+        try {
+          const { data, prefix } = bech32.decode(val);
+          const hex = Helpers.arrayToHex(data);
+          // logging in with a public key?
+          if (prefix === 'npub') {
+            k = { rpub: hex };
+          } else if (prefix === 'nsec') {
+            // logging in with a bech32 private key (nsec)
+            k = { priv: hex, rpub: Key.getPublicKey(hex) };
+          }
+        } catch (e) {
+          console.error(e);
         }
-      } catch (e) {
-        console.error(e);
       }
     }
     console.log('k', k);
@@ -83,7 +67,7 @@ class Login extends Component {
       return;
     }
     console.log('login with', k);
-    await login(k);
+    await Key.login(k);
     event.target.value = '';
     Helpers.copyToClipboard(''); // clear the clipboard
   }
@@ -96,7 +80,7 @@ class Login extends Component {
   onLoginFormSubmit(e) {
     e.preventDefault();
     let name = document.getElementById('login-form-name').value;
-    iris.session.loginAsNewUser({ name, autofollow: false });
+    Key.loginAsNewUser({ name, autofollow: false });
     localState.get('showFollowSuggestions').put(true);
     name &&
       setTimeout(() => {

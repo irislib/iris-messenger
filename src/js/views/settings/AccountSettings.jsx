@@ -1,5 +1,4 @@
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
@@ -23,10 +22,7 @@ export default class AccountSettings extends Component {
   async onExtensionLoginClick(e) {
     e.preventDefault();
     const rpub = await window.nostr.getPublicKey();
-    const k = {
-      secp256k1: { rpub },
-    };
-    iris.session.login(k);
+    Key.login({ rpub });
   }
 
   render() {

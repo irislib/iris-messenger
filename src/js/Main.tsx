@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet';
-import iris from 'iris-lib';
 import { Router, RouterOnChangeArgs } from 'preact-router';
 
 import Footer from './components/Footer';
@@ -40,8 +39,7 @@ type ReactState = {
   translationLoaded: boolean;
 };
 
-iris.session.init({ autologin: window.location.pathname.length > 1, autofollow: false });
-Session.init();
+Session.init({ autologin: window.location.pathname.length > 1, autofollow: false });
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {

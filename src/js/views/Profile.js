@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet';
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 import { createRef } from 'preact';
 import { useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
@@ -112,13 +111,8 @@ class Profile extends View {
 
   async viewAs(event) {
     event.preventDefault();
-    const k = {
-      secp256k1: {
-        rpub: this.state.hexPub,
-      },
-    };
     route('/');
-    iris.session.login(k);
+    Key.login({ rpub: this.state.hexPub });
   }
 
   renderDetails() {

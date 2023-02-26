@@ -1,5 +1,3 @@
-import iris from 'iris-lib';
-
 import Component from '../BaseComponent';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
@@ -48,17 +46,6 @@ class FollowButton extends Component<Props> {
       });
       return;
     }
-    iris
-      .public()
-      .get(this.key)
-      .get(this.props.id)
-      .on(
-        this.sub((value) => {
-          const s = {};
-          s[this.key] = value;
-          this.setState(s);
-        }),
-      );
   }
 
   render() {
