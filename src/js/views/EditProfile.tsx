@@ -6,7 +6,6 @@ import UploadButton from '../components/basic/UploadButton';
 import Header from '../components/Header';
 import SafeImg from '../components/SafeImg';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
@@ -53,8 +52,8 @@ export default class EditProfile extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    Nostr.setMetadata(this.state.profile);
-    const myPub = Nostr.toNostrBech32Address(Key.getPubKey(), 'npub');
+    SocialNetwork.setMetadata(this.state.profile);
+    const myPub = Key.toNostrBech32Address(Key.getPubKey(), 'npub');
     route('/' + myPub);
   };
 

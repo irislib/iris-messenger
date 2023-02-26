@@ -8,7 +8,6 @@ import EmojiButton from '../../lib/emoji-button';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
 const submitButton = html` <button type="submit">
@@ -55,7 +54,7 @@ class ChatMessageForm extends MessageForm {
 
   encrypt(text) {
     try {
-      const theirPub = Nostr.toNostrHexAddress(this.props.activeChat);
+      const theirPub = Key.toNostrHexAddress(this.props.activeChat);
       if (!theirPub) {
         throw new Error('invalid public key ' + theirPub);
       }
@@ -77,7 +76,7 @@ class ChatMessageForm extends MessageForm {
       return;
     }
     const content = await this.encrypt(text);
-    const recipient = Nostr.toNostrHexAddress(this.props.activeChat);
+    const recipient = Key.toNostrHexAddress(this.props.activeChat);
     if (!recipient) {
       throw new Error('invalid public key ' + recipient);
     }

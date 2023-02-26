@@ -9,7 +9,6 @@ import Helpers from '../Helpers';
 import Icons from '../Icons';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
@@ -57,7 +56,7 @@ class PublicMessage extends Message {
     if (!hash) {
       return;
     }
-    const nostrId = Nostr.toNostrHexAddress(hash);
+    const nostrId = Key.toNostrHexAddress(hash);
     const retrievingTimeout = setTimeout(() => {
       thisArg.setState({ retrieving: true });
     }, 1000);
@@ -88,7 +87,7 @@ class PublicMessage extends Message {
             text: event.content,
             time: event.created_at * 1000,
             replyingTo,
-            noteId: Nostr.toNostrBech32Address(event.id, 'note'),
+            noteId: Key.toNostrBech32Address(event.id, 'note'),
             event,
           },
         };
@@ -107,7 +106,7 @@ class PublicMessage extends Message {
         });
       }
 
-      return Nostr.getEventById(nostrId).then((event) => {
+      return Events.getEventById(nostrId).then((event) => {
         return processNostrMessage(event);
       });
     }
@@ -147,11 +146,11 @@ class PublicMessage extends Message {
       if (this.unmounted) {
         return;
       }
-      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+      const nostrId = Key.toNostrHexAddress(this.props.hash);
 
       const msg = r.signedData;
       msg.info = {
-        from: nostrId ? Nostr.toNostrBech32Address(r.signerKeyHash, 'npub') : r.signerKeyHash,
+        from: nostrId ? Key.toNostrBech32Address(r.signerKeyHash, 'npub') : r.signerKeyHash,
         isMine: myPub === r.signerKeyHash,
       };
       if (this.props.filter) {
@@ -196,7 +195,7 @@ class PublicMessage extends Message {
       this.setState({ msg });
 
       if (nostrId) {
-        Nostr.getRepliesAndLikes(nostrId, (replies, likedBy, threadReplyCount, boostedBy) => {
+        Events.getRepliesAndLikes(nostrId, (replies, likedBy, threadReplyCount, boostedBy) => {
           this.likedBy = likedBy;
           this.boostedBy = boostedBy;
           const sortedReplies =
@@ -254,7 +253,7 @@ class PublicMessage extends Message {
   boostBtnClicked() {
     if (!this.state.boosted) {
       const author = this.state.msg?.event?.pubkey;
-      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+      const nostrId = Key.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Events.publish({
           kind: 6,
@@ -272,7 +271,7 @@ class PublicMessage extends Message {
     if (liked) {
       const author = this.state.msg?.event?.pubkey;
 
-      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+      const nostrId = Key.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Events.publish({
           kind: 7,
@@ -289,7 +288,7 @@ class PublicMessage extends Message {
   onDelete(e) {
     e.preventDefault();
     if (confirm('Delete message?')) {
-      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+      const nostrId = Key.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Events.publish({
           kind: 5,
@@ -304,7 +303,7 @@ class PublicMessage extends Message {
   onBroadcast(e) {
     // republish message on nostr
     e.preventDefault();
-    const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+    const nostrId = Key.toNostrHexAddress(this.props.hash);
     if (nostrId) {
       const event = Events.cache.get(nostrId);
       if (event) {
@@ -339,7 +338,7 @@ class PublicMessage extends Message {
   }
 
   openStandalone() {
-    route(`/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`);
+    route(`/post/${Key.toNostrBech32Address(this.props.hash, 'note')}`);
   }
 
   replyBtnClicked() {
@@ -356,7 +355,7 @@ class PublicMessage extends Message {
         <div class="msg-content">
           <div style="display: flex; align-items: center">
             <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
-            <a href="/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+            <a href="/${Key.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
             <span class="mar-left5"> started following you</span>
@@ -375,8 +374,8 @@ class PublicMessage extends Message {
     } else {
       text = Helpers.highlightText(text, likedEvent);
     }
-    const link = `/post/${Nostr.toNostrBech32Address(likedId, 'note')}`;
-    const userLink = `/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}`;
+    const link = `/post/${Key.toNostrBech32Address(likedId, 'note')}`;
+    const userLink = `/${Key.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}`;
     return html`
       <div class="msg">
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
@@ -401,7 +400,7 @@ class PublicMessage extends Message {
   report(e) {
     e.preventDefault();
     if (confirm('Publicly report and hide message?')) {
-      const nostrId = Nostr.toNostrHexAddress(this.props.hash);
+      const nostrId = Key.toNostrHexAddress(this.props.hash);
       if (nostrId) {
         Events.publish({
           kind: 5,
@@ -427,7 +426,7 @@ class PublicMessage extends Message {
     if (this.props.asInlineQuote) {
       return '';
     }
-    const url = `https://iris.to/post/${Nostr.toNostrBech32Address(this.props.hash, 'note')}`;
+    const url = `https://iris.to/post/${Key.toNostrBech32Address(this.props.hash, 'note')}`;
     return html`
       <div class="msg-menu-btn">
         <${Dropdown}>
@@ -441,7 +440,7 @@ class PublicMessage extends Message {
             key=${`${this.props.hash}copy_id`}
             text=${t('copy_note_ID')}
             title="Note ID"
-            copyStr=${Nostr.toNostrBech32Address(this.props.hash, 'note')}
+            copyStr=${Key.toNostrBech32Address(this.props.hash, 'note')}
           />
           ${this.state.msg
             ? html`
@@ -474,7 +473,7 @@ class PublicMessage extends Message {
           <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
             <small class="reposted">
               <i> ${Icons.boost} </i>
-              <a href="/${Nostr.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
+              <a href="/${Key.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
                 <${Name}
                   pub=${this.state.msg?.event?.pubkey}
                   hideBadge=${true}
@@ -636,9 +635,7 @@ class PublicMessage extends Message {
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           ${this.props.asQuote && s.msg.replyingTo
             ? html` <div style="flex-basis:100%; margin-bottom: 12px">
-                <a href="/post/${Nostr.toNostrBech32Address(rootMsg, 'note')}"
-                  >${t('show_thread')}</a
-                >
+                <a href="/post/${Key.toNostrBech32Address(rootMsg, 'note')}">${t('show_thread')}</a>
               </div>`
             : ''}
           <div class="msg-identicon">
@@ -681,7 +678,7 @@ class PublicMessage extends Message {
                       .slice(0, 3)
                       .map(
                         (u) => html`
-                          <a href=${`/${Nostr.toNostrBech32Address(u, 'npub')}`}>
+                          <a href=${`/${Key.toNostrBech32Address(u, 'npub')}`}>
                             @<${Name} pub=${u} hideBadge=${true} userNameOnly=${true} />${' '}
                           </a>
                         `,
@@ -792,7 +789,7 @@ class PublicMessage extends Message {
               ? html`
                   <div class="likes">
                     ${Array.from(this.likedBy).map((key) => {
-                      const npub = Nostr.toNostrBech32Address(key, 'npub');
+                      const npub = Key.toNostrBech32Address(key, 'npub');
                       return html`<${Identicon}
                         showTooltip=${true}
                         onClick=${() => route(`/${npub}`)}
@@ -807,7 +804,7 @@ class PublicMessage extends Message {
               ? html`
                   <div class="likes">
                     ${Array.from(this.boostedBy).map((key) => {
-                      const npub = Nostr.toNostrBech32Address(key, 'npub');
+                      const npub = Key.toNostrBech32Address(key, 'npub');
                       return html`<${Identicon}
                         showTooltip=${true}
                         onClick=${() => route(`/${npub}`)}

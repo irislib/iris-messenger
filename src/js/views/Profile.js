@@ -21,7 +21,6 @@ import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 import Subscriptions from '../nostr/Subscriptions';
 import { translate as t } from '../translations/Translation';
@@ -491,12 +490,12 @@ class Profile extends View {
   componentDidMount() {
     this.restoreScrollPosition();
     const pub = this.props.id;
-    const npub = Nostr.toNostrBech32Address(pub, 'npub');
+    const npub = Key.toNostrBech32Address(pub, 'npub');
     if (npub && npub !== pub) {
       route(`/${npub}`, true);
       return;
     }
-    const hexPub = Nostr.toNostrHexAddress(pub);
+    const hexPub = Key.toNostrHexAddress(pub);
     if (!hexPub) {
       // id is not a nostr address, but maybe it's a username
       let nostrAddress = pub;
@@ -510,7 +509,7 @@ class Profile extends View {
       }
       Key.getPubKeyByNip05Address(nostrAddress).then((pubKey) => {
         if (pubKey) {
-          const npub = Nostr.toNostrBech32Address(pubKey, 'npub');
+          const npub = Key.toNostrBech32Address(pubKey, 'npub');
           if (npub && npub !== pubKey) {
             this.setState({ npub, hexPub: pubKey, nostrAddress });
             this.loadProfile(pubKey, nostrAddress);
@@ -521,7 +520,7 @@ class Profile extends View {
       });
       return;
     }
-    this.setState({ hexPub, npub: Nostr.toNostrBech32Address(hexPub, 'npub') });
+    this.setState({ hexPub, npub: Key.toNostrBech32Address(hexPub, 'npub') });
     this.loadProfile(hexPub);
   }
 }

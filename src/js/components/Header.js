@@ -8,7 +8,6 @@ import Helpers from '../Helpers';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
 import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation';
 
@@ -99,7 +98,7 @@ class Header extends Component {
     if (!key) {
       return;
     }
-    const npub = Nostr.toNostrBech32Address(key, 'npub');
+    const npub = Key.toNostrBech32Address(key, 'npub');
     const activeRoute = this.state.activeRoute;
     const chat = null;
     const isTyping = chat && chat.isTyping;

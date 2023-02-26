@@ -7,7 +7,6 @@ import Name from '../../components/Name';
 import Events from '../../nostr/Events';
 import IndexedDB from '../../nostr/IndexedDB';
 import Key from '../../nostr/Key';
-import Nostr from '../../nostr/Nostr';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 
@@ -99,7 +98,7 @@ export default class BackupSettings extends Component {
               </p>
               {this.state.restoredFollows.map((hex) => (
                 <div className="profile-link-container">
-                  <a href={`/${Nostr.toNostrBech32Address(hex, 'npub')}`} className="profile-link">
+                  <a href={`/${Key.toNostrBech32Address(hex, 'npub')}`} className="profile-link">
                     <Identicon str={hex} width={40} />
                     <Name pub={hex} />
                   </a>

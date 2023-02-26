@@ -1,4 +1,3 @@
-import iris from 'iris-lib';
 import $ from 'jquery';
 import isEqual from 'lodash/isEqual';
 import { route } from 'preact-router';
@@ -7,13 +6,12 @@ import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
+import SearchIndex from '../SearchIndex';
 import { translate as t } from '../translations/Translation';
 
 import Identicon from './Identicon';
 import Name from './Name';
 import SafeImg from './SafeImg';
-import SearchIndex from "../SearchIndex";
 
 const RESULTS_MAX = 5;
 
@@ -178,7 +176,7 @@ class SearchBox extends Component<Props, State> {
       if (s.length > 1) {
         return this.props.onSelect({ key: s[1] });
       }
-      if (Nostr.toNostrHexAddress(query)) {
+      if (Key.toNostrHexAddress(query)) {
         return this.props.onSelect({ key: query });
       }
     }
@@ -260,7 +258,7 @@ class SearchBox extends Component<Props, State> {
                 followText = `${i.followers.size} ${t('followers')}`;
               }
             }
-            const npub = Nostr.toNostrBech32Address(i.key, 'npub');
+            const npub = Key.toNostrBech32Address(i.key, 'npub');
             return (
               <a
                 onFocus={(e) => this.onResultFocus(e, index)}

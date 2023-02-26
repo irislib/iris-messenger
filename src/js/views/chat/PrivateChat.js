@@ -9,7 +9,7 @@ import Message from '../../components/Message';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import Nostr from '../../nostr/Nostr';
+import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation';
 
 import ChatMessageForm from './ChatMessageForm';
@@ -53,13 +53,13 @@ export default class PrivateChat extends Component {
   }
 
   updateLastOpened() {
-    const hexId = Nostr.toNostrHexAddress(this.props.id);
-    Nostr.public.set('chats/' + hexId + '/lastOpened', Math.floor(Date.now() / 1000));
+    const hexId = Key.toNostrHexAddress(this.props.id);
+    Session.public.set('chats/' + hexId + '/lastOpened', Math.floor(Date.now() / 1000));
   }
 
   componentDidMount() {
-    const hexId = Nostr.toNostrHexAddress(this.props.id);
-    Nostr.getDirectMessagesByUser(hexId, (msgIds) => {
+    const hexId = Key.toNostrHexAddress(this.props.id);
+    Events.getDirectMessagesByUser(hexId, (msgIds) => {
       if (msgIds) {
         this.setState({ sortedMessages: msgIds.reverse() });
       }
@@ -115,7 +115,7 @@ export default class PrivateChat extends Component {
       if (
         this.chat &&
         !this.chat.uuid &&
-        Nostr.toNostrHexAddress(this.props.id) !== Key.getPubKey()()
+        Key.toNostrHexAddress(this.props.id) !== Key.getPubKey()()
       ) {
         if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
           $('#not-seen-by-them').slideDown();

@@ -1,6 +1,6 @@
 import Component from '../../BaseComponent';
 import Name from '../../components/Name';
-import Nostr from '../../nostr/Nostr';
+import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 
@@ -13,7 +13,7 @@ export default class BlockedSettings extends Component {
   render() {
     let hasBlockedUsers = false;
     const blockedUsers = Array.from(this.state.blockedUsers).map((user) => {
-      const bech32 = Nostr.toNostrBech32Address(user, 'npub');
+      const bech32 = Key.toNostrBech32Address(user, 'npub');
       if (bech32) {
         hasBlockedUsers = true;
         return (

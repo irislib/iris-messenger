@@ -6,7 +6,6 @@ import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
-import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
 import ChatListItem from './ChatListItem';
@@ -34,7 +33,7 @@ class ChatList extends Component {
   }
 
   componentDidMount() {
-    Nostr.getDirectMessages((chats) => {
+    Events.getDirectMessages((chats) => {
       const sortedChats = Array.from(chats.keys()).sort((a, b) => {
         const aEventIds = chats.get(a).eventIds;
         const bEventIds = chats.get(b).eventIds;

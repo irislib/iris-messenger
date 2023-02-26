@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import AnimalName from '../AnimalName';
-import Nostr from '../nostr/Nostr';
+import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 
 import Badge from './Badge';
@@ -14,7 +14,7 @@ type Props = {
 };
 
 const Name = (props: Props) => {
-  const nostrAddr = Nostr.toNostrHexAddress(props.pub);
+  const nostrAddr = Key.toNostrHexAddress(props.pub);
   let initialName = '';
   let initialDisplayName;
   let isGenerated = false;
@@ -29,7 +29,7 @@ const Name = (props: Props) => {
       // ignore
     }
   } else {
-    initialDisplayName = AnimalName(Nostr.toNostrBech32Address(props.pub, 'npub') || props.pub);
+    initialDisplayName = AnimalName(Key.toNostrBech32Address(props.pub, 'npub') || props.pub);
     isGenerated = true;
   }
   const [name, setName] = useState(initialName);

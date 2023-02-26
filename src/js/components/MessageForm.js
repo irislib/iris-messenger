@@ -2,7 +2,7 @@ import { Component } from 'preact';
 
 import Helpers from '../Helpers';
 import Events from '../nostr/Events';
-import Nostr from '../nostr/Nostr';
+import Key from '../nostr/Key';
 
 const mentionRegex = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
 
@@ -13,8 +13,8 @@ export default class MessageForm extends Component {
       content: msg.text,
     };
     if (msg.replyingTo) {
-      const id = Nostr.toNostrHexAddress(msg.replyingTo);
-      const replyingTo = await Nostr.getEventById(id);
+      const id = Key.toNostrHexAddress(msg.replyingTo);
+      const replyingTo = await Events.getEventById(id);
       event.tags = replyingTo.tags.filter((tag) => tag[0] === 'p');
       let rootTag = replyingTo.tags.find((t) => t[0] === 'e' && t[3] === 'root');
       if (!rootTag) {
@@ -39,7 +39,7 @@ export default class MessageForm extends Component {
       if (taggedItems) {
         event.tags = event.tags || [];
         for (const tag of taggedItems) {
-          const hexTag = Nostr.toNostrHexAddress(tag.replace('@', ''));
+          const hexTag = Key.toNostrHexAddress(tag.replace('@', ''));
           if (!hexTag) {
             continue;
           }
@@ -88,7 +88,7 @@ export default class MessageForm extends Component {
     const matches = val.match(mentionRegex);
     if (matches) {
       const match = matches[0].slice(1);
-      if (!Nostr.toNostrHexAddress(match)) {
+      if (!Key.toNostrHexAddress(match)) {
         this.setState({ mentioning: match });
       }
     } else if (this.state.mentioning) {

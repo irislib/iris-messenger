@@ -5,7 +5,7 @@ import { Router, RouterOnChangeArgs } from 'preact-router';
 import Footer from './components/Footer';
 import MediaPlayer from './components/MediaPlayer';
 import Menu from './components/Menu';
-import Nostr from './nostr/Nostr';
+import Session from './nostr/Session';
 import { translationLoaded } from './translations/Translation';
 import About from './views/About';
 import Chat from './views/chat/Chat';
@@ -41,7 +41,7 @@ type ReactState = {
 };
 
 iris.session.init({ autologin: window.location.pathname.length > 1, autofollow: false });
-Nostr.init();
+Session.init();
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {

@@ -3,6 +3,14 @@ import iris from 'iris-lib';
 import { Event, nip04, signEvent } from '../lib/nostr-tools';
 
 import Events from './Events';
+const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
+import Helpers from '../Helpers';
+
+declare global {
+  interface Window {
+    nostr: any; // possible nostr browser extension
+  }
+}
 
 export default {
   windowNostrQueue: [],
@@ -137,5 +145,38 @@ export default {
       // console.error(error);
       return false;
     }
+  },
+  toNostrBech32Address: function (address: string, prefix: string) {
+    if (!prefix) {
+      throw new Error('prefix is required');
+    }
+    try {
+      const decoded = bech32.decode(address);
+      if (prefix !== decoded.prefix) {
+        return null;
+      }
+      return bech32.encode(prefix, decoded.data);
+    } catch (e) {
+      // not a bech32 address
+    }
+
+    if (address.match(/^[0-9a-fA-F]{64}$/)) {
+      const words = Buffer.from(address, 'hex');
+      return bech32.encode(prefix, words);
+    }
+    return null;
+  },
+  toNostrHexAddress(str: string): string | null {
+    if (str.match(/^[0-9a-fA-F]{64}$/)) {
+      return str;
+    }
+    try {
+      const { data } = bech32.decode(str);
+      const addr = Helpers.arrayToHex(data);
+      return addr;
+    } catch (e) {
+      // not a bech32 address
+    }
+    return null;
   },
 };

@@ -5,7 +5,6 @@ import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import Nostr from '../../nostr/Nostr';
 import SocialNetwork from '../../nostr/SocialNetwork';
 
 export default class IrisAccountSettings extends Component {
@@ -243,14 +242,14 @@ export default class IrisAccountSettings extends Component {
   setAsPrimary() {
     const newNip = this.state.existing.name + '@iris.to';
     const timeout = setTimeout(() => {
-      Nostr.setMetadata({ nip05: newNip });
+      SocialNetwork.setMetadata({ nip05: newNip });
     }, 2000);
     SocialNetwork.getProfile(Key.getPubKey(), (p) => {
       if (p) {
         clearTimeout(timeout);
         if (p.nip05 !== newNip) {
           p.nip05 = newNip;
-          Nostr.setMetadata(p);
+          SocialNetwork.setMetadata(p);
         }
       }
       this.setState({ profile: p, irisToActive: true });

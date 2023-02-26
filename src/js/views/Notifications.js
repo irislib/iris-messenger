@@ -4,7 +4,8 @@ import { createRef } from 'preact';
 
 import MessageFeed from '../components/MessageFeed';
 import localState from '../LocalState';
-import Nostr from '../nostr/Nostr';
+import Events from '../nostr/Events';
+import Session from '../nostr/Session';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -15,13 +16,13 @@ export default class Notifications extends View {
 
   updateNotificationsLastOpened = debounce(() => {
     const time = Math.floor(Date.now() / 1000);
-    Nostr.public.set('notifications/lastOpened', time);
+    Session.public.set('notifications/lastOpened', time);
     localState.get('unseenNotificationCount').put(0);
   }, 1000);
 
   componentDidMount() {
     this.restoreScrollPosition();
-    Nostr.getNotifications((notifications) => {
+    Events.getNotifications((notifications) => {
       const hasNotifications = notifications.length > 0;
       if (hasNotifications && this.ref.current) {
         this.updateNotificationsLastOpened();

@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import iris from 'iris-lib';
 
 import Button from '../../components/basic/Button';
-import Nostr from '../../nostr/Nostr';
+import localState from '../../LocalState';
 import Relays from '../../nostr/Relays';
 import { translate as t } from '../../translations/Translation';
-import localState from "../../LocalState";
-const bech32 = require('bech32-buffer');
 
 const NetworkSettings = () => {
   const [relays, setRelays] = useState(Array.from(Relays.relays.values()));
@@ -98,7 +95,7 @@ const NetworkSettings = () => {
           </div>
         </div>
         <div>
-          <Button onClick={() => Nostr.saveRelaysToContacts()}>{t('save_relays_publicly')}</Button>
+          <Button onClick={() => Relays.saveToContacts()}>{t('save_relays_publicly')}</Button>
           <Button onClick={() => Relays.restoreDefaults()}>{t('restore_defaults')}</Button>
         </div>
       </div>

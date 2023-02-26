@@ -1,5 +1,5 @@
 import Component from '../BaseComponent';
-import Nostr from '../nostr/Nostr';
+import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
@@ -32,12 +32,12 @@ class BlockButton extends Component<Props> {
   onClick(e) {
     e.preventDefault();
     const newValue = !this.state[this.key];
-    SocialNetwork.block(Nostr.toNostrHexAddress(this.props.id), newValue);
+    SocialNetwork.block(Key.toNostrHexAddress(this.props.id), newValue);
   }
 
   componentDidMount() {
     SocialNetwork.getBlockedUsers((blocks) => {
-      const blocked = blocks?.has(Nostr.toNostrHexAddress(this.props.id));
+      const blocked = blocks?.has(Key.toNostrHexAddress(this.props.id));
       this.setState({ blocked });
     });
   }

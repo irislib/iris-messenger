@@ -2,7 +2,7 @@ import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Button from '../components/basic/Button';
-import Nostr from '../nostr/Nostr';
+import Session from '../nostr/Session';
 import { translate as t } from '../translations/Translation';
 
 export default class LogoutConfirmation extends Component {
@@ -15,7 +15,7 @@ export default class LogoutConfirmation extends Component {
             <Button onClick={() => route('/settings')}>{t('back')}</Button>
           </p>
           <p>
-            <Button className="logout-button" onClick={() => Nostr.logOut()}>
+            <Button className="logout-button" onClick={() => Session.logOut()}>
               {t('log_out')}
             </Button>
           </p>

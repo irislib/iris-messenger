@@ -7,7 +7,6 @@ import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
@@ -44,7 +43,7 @@ class Follows extends View {
   );
 
   getFollows() {
-    SocialNetwork.getFollowedByUser(Nostr.toNostrHexAddress(this.props.id), (follows) => {
+    SocialNetwork.getFollowedByUser(Key.toNostrHexAddress(this.props.id), (follows) => {
       this.follows = follows; // TODO buggy?
       this.updateSortedFollows();
     });
@@ -55,7 +54,7 @@ class Follows extends View {
   }
 
   getFollowers() {
-    SocialNetwork.getFollowersByUser(Nostr.toNostrHexAddress(this.props.id), (follows) => {
+    SocialNetwork.getFollowersByUser(Key.toNostrHexAddress(this.props.id), (follows) => {
       this.follows = follows;
       this.updateSortedFollows();
     });
@@ -63,7 +62,7 @@ class Follows extends View {
 
   componentDidMount() {
     if (this.props.id) {
-      this.myPub = Nostr.toNostrBech32Address(Key.getPubKey(), 'npub');
+      this.myPub = Key.toNostrBech32Address(Key.getPubKey(), 'npub');
       this.props.followers ? this.getFollowers() : this.getFollows();
       localState.get('contacts').on(this.inject());
     }
@@ -95,7 +94,7 @@ class Follows extends View {
         </h3>
         <div id="follows-list">
           ${this.state.follows.map((hexKey) => {
-            const npub = Nostr.toNostrBech32Address(hexKey, 'npub');
+            const npub = Key.toNostrBech32Address(hexKey, 'npub');
             return html` <div key=${npub} class="profile-link-container">
               <a href="/${npub}" class="profile-link">
                 <${Identicon} str=${npub} width="49" />

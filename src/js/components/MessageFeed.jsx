@@ -1,4 +1,3 @@
-import iris from 'iris-lib';
 import { throttle } from 'lodash';
 
 import Component from '../BaseComponent';
@@ -7,7 +6,6 @@ import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
 
 import PublicMessage from './PublicMessage';
@@ -114,15 +112,15 @@ class MessageFeed extends Component {
     let first = true;
     if (this.props.nostrUser) {
       if (this.props.index === 'postsAndReplies') {
-        Nostr.getPostsAndRepliesByUser(this.props.nostrUser, (eventIds) =>
+        Events.getPostsAndRepliesByUser(this.props.nostrUser, (eventIds) =>
           this.updateSortedMessages(eventIds),
         );
       } else if (this.props.index === 'likes') {
-        Nostr.getLikesByUser(this.props.nostrUser, (eventIds) => {
+        Events.getLikesByUser(this.props.nostrUser, (eventIds) => {
           this.updateSortedMessages(eventIds);
         });
       } else if (this.props.index === 'posts') {
-        Nostr.getPostsByUser(this.props.nostrUser, (eventIds) =>
+        Events.getPostsByUser(this.props.nostrUser, (eventIds) =>
           this.updateSortedMessages(eventIds),
         );
       }
@@ -135,7 +133,7 @@ class MessageFeed extends Component {
       );
       if (this.props.keyword) {
         const keyword = this.props.keyword;
-        Nostr.getMessagesByKeyword(this.props.keyword, (messages) => {
+        Events.getMessagesByKeyword(this.props.keyword, (messages) => {
           if (this.props.keyword == keyword) this.updateSortedMessages(messages);
         });
       } else if (this.props.index) {
@@ -144,7 +142,7 @@ class MessageFeed extends Component {
           this.getMessagesByEveryone(this.state.includeReplies);
         } else if (this.props.index === 'notifications') {
           console.log('getMessagesByNotifications');
-          Nostr.getNotifications((messages) => this.updateSortedMessages(messages));
+          Events.getNotifications((messages) => this.updateSortedMessages(messages));
         } else if (this.props.index === 'follows') {
           this.getMessagesByFollows(this.state.includeReplies);
         }
@@ -153,13 +151,13 @@ class MessageFeed extends Component {
   }
 
   getMessagesByEveryone(includeReplies) {
-    Nostr.getMessagesByEveryone((messages, cbIncludeReplies) => {
+    Events.getMessagesByEveryone((messages, cbIncludeReplies) => {
       this.state.includeReplies === cbIncludeReplies && this.updateSortedMessages(messages);
     }, includeReplies);
   }
 
   getMessagesByFollows(includeReplies) {
-    Nostr.getMessagesByFollows((messages, cbIncludeReplies) => {
+    Events.getMessagesByFollows((messages, cbIncludeReplies) => {
       this.state.includeReplies === cbIncludeReplies && this.updateSortedMessages(messages);
     }, includeReplies);
   }

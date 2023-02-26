@@ -7,7 +7,7 @@ import Name from './components/Name';
 import PublicMessage from './components/PublicMessage';
 import { isSafeOrigin } from './components/SafeImg';
 import Torrent from './components/Torrent';
-import Nostr from './nostr/Nostr';
+import Key from './nostr/Key';
 import { language, translate as t } from './translations/Translation';
 import localState from './LocalState';
 
@@ -106,7 +106,7 @@ export default {
         return (
           <PublicMessage
             key={match + i}
-            hash={Nostr.toNostrHexAddress(match)}
+            hash={Key.toNostrHexAddress(match)}
             showName={true}
             showBtns={false}
             asInlineQuote={true}
@@ -364,7 +364,7 @@ export default {
           const tagTarget = tag[1].replace('@', '');
           if (tag[0] === 'p') {
             // profile
-            const link = `/${Nostr.toNostrBech32Address(tagTarget, 'npub')}`;
+            const link = `/${Key.toNostrBech32Address(tagTarget, 'npub')}`;
             return (
               <a href={link}>
                 @<Name key={tagTarget + i} pub={tagTarget} hideBadge={true} userNameOnly={true} />
@@ -380,7 +380,7 @@ export default {
                 asInlineQuote={true}
               />
             ) : (
-              <a href={`/post/${Nostr.toNostrBech32Address(tagTarget, 'note')}`}>{tag[1]}</a>
+              <a href={`/post/${Key.toNostrBech32Address(tagTarget, 'note')}`}>{tag[1]}</a>
             );
           }
         }

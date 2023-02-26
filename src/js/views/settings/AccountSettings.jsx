@@ -6,7 +6,7 @@ import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
 import CopyButton from '../../components/CopyButton';
 import Key from '../../nostr/Key';
-import Nostr from '../../nostr/Nostr';
+import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation';
 import { ExistingAccountLogin } from '../Login';
 const bech32 = require('bech32-buffer');
@@ -16,7 +16,7 @@ export default class AccountSettings extends Component {
     if (hasPriv) {
       route('/logout'); // confirmation screen
     } else {
-      Nostr.logOut();
+      Session.logOut();
     }
   }
 

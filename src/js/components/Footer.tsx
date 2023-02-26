@@ -2,7 +2,6 @@ import Component from '../BaseComponent';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
 
 import Identicon from './Identicon';
 
@@ -46,7 +45,7 @@ class Footer extends Component<Props, State> {
   }
 
   render() {
-    const key = Nostr.toNostrBech32Address(Key.getPubKey(), 'npub');
+    const key = Key.toNostrBech32Address(Key.getPubKey(), 'npub');
     if (!key) {
       return;
     }

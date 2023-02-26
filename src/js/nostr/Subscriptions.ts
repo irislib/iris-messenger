@@ -6,7 +6,6 @@ import { Event, Filter, Relay, Sub } from '../lib/nostr-tools';
 
 import Events from './Events';
 import Key from './Key';
-import Nostr from './Nostr';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
 
@@ -142,7 +141,7 @@ const Subscriptions = {
         [
           {
             kinds: [1],
-            limit: Nostr.MAX_MSGS_BY_KEYWORD,
+            limit: Events.MAX_MSGS_BY_KEYWORD,
             keywords: Array.from(Subscriptions.subscribedKeywords),
           },
         ],
@@ -194,7 +193,7 @@ const Subscriptions = {
         for (const id of filter.ids) {
           if (!this.subscribedPosts.has(id)) {
             hasNewIds = true;
-            this.subscribedPosts.add(Nostr.toNostrHexAddress(id));
+            this.subscribedPosts.add(Key.toNostrHexAddress(id));
           }
         }
       }

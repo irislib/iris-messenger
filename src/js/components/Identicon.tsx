@@ -3,7 +3,7 @@ import Identicon from 'identicon.js';
 import styled from 'styled-components';
 
 import Component from '../BaseComponent';
-import Nostr from '../nostr/Nostr';
+import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 
 import SafeImg from './SafeImg';
@@ -63,7 +63,7 @@ class MyIdenticon extends Component<Props, State> {
 
     this.updateIdenticon();
 
-    const nostrAddr = Nostr.toNostrHexAddress(pub);
+    const nostrAddr = Key.toNostrHexAddress(pub);
     if (nostrAddr) {
       SocialNetwork.getProfile(nostrAddr, (profile) => {
         profile &&

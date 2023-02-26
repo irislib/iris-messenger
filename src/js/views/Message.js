@@ -3,7 +3,7 @@ import { route } from 'preact-router';
 
 import FeedMessageForm from '../components/FeedMessageForm';
 import PublicMessage from '../components/PublicMessage';
-import Nostr from '../nostr/Nostr';
+import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -15,7 +15,7 @@ class Message extends View {
   }
 
   componentDidMount() {
-    const nostrBech32Id = Nostr.toNostrBech32Address(this.props.hash, 'note');
+    const nostrBech32Id = Key.toNostrBech32Address(this.props.hash, 'note');
     if (nostrBech32Id && this.props.hash !== nostrBech32Id) {
       route(`/post/${nostrBech32Id}`, true);
       return;

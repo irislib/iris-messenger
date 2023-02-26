@@ -1,27 +1,27 @@
-import iris from 'iris-lib';
 import { debounce } from 'lodash';
 
 import { Event, Filter, getEventHash } from '../lib/nostr-tools';
 import localState from '../LocalState';
+import SearchIndex from '../SearchIndex';
 
 import IndexedDB from './IndexedDB';
 import Key from './Key';
 import LocalForage from './LocalForage';
-import Nostr from './Nostr';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 import Subscriptions from './Subscriptions';
-import SearchIndex from "../SearchIndex";
 
 const startTime = Date.now() / 1000;
 
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
+const MAX_MSGS_BY_KEYWORD = 100;
 
 const cache = new Map<string, Event>();
 
 const Events = {
+  MAX_MSGS_BY_KEYWORD,
   getEventHash,
   cache: cache,
   deletedEvents: new Set<string>(),
@@ -94,7 +94,7 @@ const Events = {
           event.pubkey === myPub ||
           SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)
         ) {
-          Nostr.getEventById(id);
+          Events.getEventById(id);
         }
         if (!this.threadRepliesByMessageId.has(id)) {
           this.threadRepliesByMessageId.set(id, new Set<string>());
@@ -158,7 +158,7 @@ const Events = {
     this.likesByUser.get(event.pubkey).add({ id, created_at: event.created_at });
     const myPub = Key.getPubKey();
     if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
-      //Nostr.getEventById(id);
+      //Events.getEventById(id);
     }
   },
   handleFollow(event: Event) {
@@ -254,7 +254,7 @@ const Events = {
       profile.created_at = event.created_at;
       delete profile['nip05valid']; // not robust
       SocialNetwork.profiles.set(event.pubkey, profile);
-      const key = Nostr.toNostrBech32Address(event.pubkey, 'npub');
+      const key = Key.toNostrBech32Address(event.pubkey, 'npub');
       SearchIndex.add({
         key,
         name: profile.name,
@@ -549,14 +549,153 @@ const Events = {
     for (const relay of Relays.relays.values()) {
       relay.publish(event);
       for (const ref of referredEvents) {
-        const referredEvent = Events.cache.get(ref[1]);
+        const referredEvent = this.cache.get(ref[1]);
         if (referredEvent) {
           relay.publish(referredEvent);
         }
       }
     }
-    Events.handle(event);
+    this.handle(event);
     return event.id;
+  },
+  getRepliesAndLikes(
+    id: string,
+    cb?: (
+      replies: Set<string>,
+      likedBy: Set<string>,
+      threadReplyCount: number,
+      boostedBy: Set<string>,
+    ) => void,
+  ) {
+    const callback = () => {
+      cb &&
+        cb(
+          this.directRepliesByMessageId.get(id) ?? new Set(),
+          this.likesByMessageId.get(id) ?? new Set(),
+          this.threadRepliesByMessageId.get(id)?.size ?? 0,
+          this.boostsByMessageId.get(id) ?? new Set(),
+        );
+    };
+    if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
+      callback();
+    }
+    Subscriptions.subscribe([{ kinds: [1, 6, 7], '#e': [id] }], callback);
+  },
+  async getEventById(id: string) {
+    if (this.cache.has(id)) {
+      return this.cache.get(id);
+    }
+
+    return new Promise((resolve) => {
+      Subscriptions.subscribe([{ ids: [id] }], () => {
+        // TODO turn off subscription
+        const msg = this.cache.get(id);
+        msg && resolve(msg);
+      });
+    });
+  },
+  getNotifications: function (cb?: (notifications: string[]) => void) {
+    const callback = () => {
+      cb?.(this.notifications.eventIds);
+    };
+    callback();
+    Subscriptions.subscribe([{ '#p': [Key.getPubKey()] }], callback);
+  },
+
+  getMessagesByEveryone(
+    cb: (messageIds: string[], includeReplies: boolean) => void,
+    includeReplies = false,
+  ) {
+    const callback = () => {
+      cb(
+        includeReplies
+          ? this.latestNotesAndRepliesByEveryone.eventIds
+          : this.latestNotesByEveryone.eventIds,
+        includeReplies,
+      );
+    };
+    callback();
+    Subscriptions.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+  },
+  getMessagesByFollows(
+    cb: (messageIds: string[], includeReplies: boolean) => void,
+    includeReplies = false,
+  ) {
+    const callback = () => {
+      cb(
+        includeReplies
+          ? this.latestNotesAndRepliesByFollows.eventIds
+          : this.latestNotesByFollows.eventIds,
+        includeReplies,
+      );
+    };
+    callback();
+    Subscriptions.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+  },
+  getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void) {
+    const callback = (event) => {
+      if (!this.latestNotesByKeywords.has(keyword)) {
+        this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+      }
+      this.latestNotesByKeywords.get(keyword)?.add(event);
+      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    };
+    // find among cached events
+    const filter = { kinds: [1], keywords: [keyword] };
+    for (const event of this.cache.values()) {
+      if (this.matchFilter(event, filter)) {
+        if (!this.latestNotesByKeywords.has(keyword)) {
+          this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+        }
+        this.latestNotesByKeywords.get(keyword)?.add(event);
+      }
+    }
+    this.latestNotesByKeywords.has(keyword) &&
+      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
+    Subscriptions.subscribe([filter], callback);
+  },
+  getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
+    // TODO subscribe on view profile and unsub on leave profile
+    SocialNetwork.knownUsers.add(address);
+    const callback = () => {
+      cb?.(this.postsAndRepliesByUser.get(address)?.eventIds);
+    };
+    this.postsAndRepliesByUser.has(address) && callback();
+    Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
+  },
+  getPostsByUser(address: string, cb?: (messageIds: string[]) => void) {
+    SocialNetwork.knownUsers.add(address);
+    const callback = () => {
+      cb?.(this.postsByUser.get(address)?.eventIds);
+    };
+    this.postsByUser.has(address) && callback();
+    Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
+  },
+  getLikesByUser(address: string, cb?: (messageIds: string[]) => void) {
+    SocialNetwork.knownUsers.add(address);
+    const callback = () => {
+      cb?.(this.likesByUser.get(address)?.eventIds);
+    };
+    this.likesByUser.has(address) && callback();
+    Subscriptions.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
+  },
+
+  getDirectMessages(cb?: (dms: Map<string, SortedLimitedEventSet>) => void) {
+    const callback = () => {
+      cb?.(this.directMessagesByUser);
+    };
+    callback();
+    Subscriptions.subscribe([{ kinds: [4] }], callback);
+  },
+
+  getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void) {
+    SocialNetwork.knownUsers.add(address);
+    const callback = () => {
+      cb?.(this.directMessagesByUser.get(address)?.eventIds);
+    };
+    this.directMessagesByUser.has(address) && callback();
+    const myPub = Key.getPubKey();
+    Subscriptions.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
   },
 };
 

@@ -1,6 +1,8 @@
 import { Relay, relayInit } from '../lib/nostr-tools';
 
 import Events from './Events';
+import Key from './Key';
+import SocialNetwork from './SocialNetwork';
 import Subscriptions from './Subscriptions';
 
 const DEFAULT_RELAYS = [
@@ -105,10 +107,25 @@ export default {
     for (const url of DEFAULT_RELAYS) {
       this.add(url);
     }
-    this.saveRelaysToContacts();
+    this.saveToContacts();
     // do not save these to contact list
     for (const url of SEARCH_RELAYS) {
       if (!this.relays.has(url)) this.add(url);
     }
+  },
+  saveToContacts() {
+    const relaysObj: any = {};
+    for (const url of this.relays.keys()) {
+      relaysObj[url] = { read: true, write: true };
+    }
+    const existing = SocialNetwork.followEventByUser.get(Key.getPubKey());
+    const content = JSON.stringify(relaysObj);
+
+    const event = {
+      kind: 3,
+      content,
+      tags: existing?.tags || [],
+    };
+    Events.publish(event);
   },
 };

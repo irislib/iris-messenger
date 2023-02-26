@@ -9,8 +9,8 @@ import LanguageSelector from '../components/LanguageSelector';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
-import Nostr from '../nostr/Nostr';
 import { translate as t } from '../translations/Translation';
+import SocialNetwork from "../nostr/SocialNetwork";
 const bech32 = require('bech32-buffer');
 
 async function login(k) {
@@ -100,7 +100,7 @@ class Login extends Component {
     localState.get('showFollowSuggestions').put(true);
     name &&
       setTimeout(() => {
-        Nostr.setMetadata({ name });
+        SocialNetwork.setMetadata({ name });
       }, 100);
     // follow the developer's nostr key also
     this.base.style = 'display:none';

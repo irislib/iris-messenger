@@ -1,12 +1,11 @@
 import Icons from '../Icons';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 export default function Badge(props) {
   const myPub = Key.getPubKey();
-  const hexAddress = Nostr.toNostrHexAddress(props.pub);
+  const hexAddress = Key.toNostrHexAddress(props.pub);
   if (hexAddress === myPub) {
     return (
       <span class="badge first tooltip">

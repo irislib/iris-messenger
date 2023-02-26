@@ -5,7 +5,6 @@ import { route } from 'preact-router';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
 
 import Name from './Name';
 import Torrent from './Torrent';
@@ -50,7 +49,7 @@ class Message extends Component {
   }
 
   onNameClick() {
-    route(`/${Nostr.toNostrBech32Address(this.props.pubkey, 'npub')}`);
+    route(`/${Key.toNostrBech32Address(this.props.pubkey, 'npub')}`);
   }
 
   openAttachmentsGallery(event) {

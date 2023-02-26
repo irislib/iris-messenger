@@ -1,5 +1,5 @@
 import Component from '../../BaseComponent';
-import Nostr from '../../nostr/Nostr';
+import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation';
 
 export default class AppearanceSettings extends Component {
@@ -32,12 +32,12 @@ export default class AppearanceSettings extends Component {
 
   componentDidMount() {
     // TODO use Nostr.private
-    Nostr.public.get('settings/colorScheme', (entry) => {
+    Session.public.get('settings/colorScheme', (entry) => {
       this.setState({ colorScheme: entry.value });
     });
   }
 
   onChange(e) {
-    Nostr.public.set('settings/colorScheme', e.target.value);
+    Session.public.set('settings/colorScheme', e.target.value);
   }
 }

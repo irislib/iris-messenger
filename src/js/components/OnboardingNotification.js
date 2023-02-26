@@ -4,7 +4,7 @@ import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import Nostr from '../nostr/Nostr';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 import Button from './basic/Button';
@@ -27,7 +27,7 @@ export default class OnboardingNotification extends Component {
           <div class="msg-content">
             <div style="display:flex;flex-direction:column;flex:1">
               <p>${t('follow_someone_info')}</p>
-              ${Nostr.SUGGESTED_FOLLOWS.map(
+              ${SocialNetwork.SUGGESTED_FOLLOWS.map(
                 (pub) => html`
                   <div class="profile-link-container">
                     <a href="/${pub}" className="profile-link">
@@ -46,7 +46,7 @@ export default class OnboardingNotification extends Component {
               <p>
                 ${t('alternatively')}<i> </i>
                 <a
-                  href="/${Nostr.toNostrBech32Address(Key.getPubKey(), 'npub')}"
+                  href="/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}"
                   >${t('give_your_profile_link_to_someone')}</a
                 >.
               </p>
@@ -57,7 +57,7 @@ export default class OnboardingNotification extends Component {
     }
     if (this.state.noFollowers && !this.state.hasNostrFollowers) {
       const rpub = Key.getPubKey();
-      const npub = rpub && Nostr.toNostrBech32Address(Key.getPubKey(), 'npub');
+      const npub = rpub && Key.toNostrBech32Address(Key.getPubKey(), 'npub');
       return html`
         <div class="msg">
           <div class="msg-content">

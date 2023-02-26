@@ -7,7 +7,7 @@ import Name from '../../components/Name';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import Nostr from '../../nostr/Nostr';
+import Session from '../../nostr/Session';
 
 class ChatListItem extends Component {
   constructor() {
@@ -41,7 +41,7 @@ class ChatListItem extends Component {
   componentDidMount() {
     this.getLatestMsg();
     const path = 'chats/' + this.props.chat + '/lastOpened';
-    Nostr.public.get(path, (lastOpened) => {
+    Session.public.get(path, (lastOpened) => {
       this.setState({ lastOpened });
     });
   }
@@ -99,7 +99,7 @@ class ChatListItem extends Component {
         Helpers.getRelativeTimeText(new Date(this.state.latest.created_at * 1000))) ||
       '';
 
-    const npub = Nostr.toNostrBech32Address(chat, 'npub');
+    const npub = Key.toNostrBech32Address(chat, 'npub');
 
     // TODO use button so we can use keyboard to navigate
     return html`

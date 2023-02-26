@@ -1,4 +1,4 @@
-import Nostr from '../nostr/Nostr';
+import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
@@ -19,13 +19,13 @@ class ReportButton extends BlockButton {
     e.preventDefault();
     const newValue = !this.state[this.key];
     if (confirm(newValue ? 'Publicly report this user?' : 'Unreport user?')) {
-      SocialNetwork.flag(Nostr.toNostrHexAddress(this.props.id), newValue);
+      SocialNetwork.flag(Key.toNostrHexAddress(this.props.id), newValue);
     }
   }
 
   componentDidMount() {
     SocialNetwork.getFlaggedUsers((flags) => {
-      const reported = flags?.has(Nostr.toNostrHexAddress(this.props.id));
+      const reported = flags?.has(Key.toNostrHexAddress(this.props.id));
       this.setState({ reported });
     });
   }
