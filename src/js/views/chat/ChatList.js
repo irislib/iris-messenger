@@ -28,7 +28,7 @@ class ChatList extends Component {
           $('#enable-notifications-prompt').slideUp();
         }
         if (Notification.permission === 'granted') {
-          iris.notifications.subscribeToWebPush();
+          // TODO subscribe to web push
         }
       });
     }
@@ -69,8 +69,7 @@ class ChatList extends Component {
     const activeChat = this.props.activeChat;
 
     return html`<section class="sidebar ${this.props.class || ''}">
-      <div id="enable-notifications-prompt" onClick=${() =>
-        iris.notifications.enableDesktopNotifications()}>
+      <div id="enable-notifications-prompt" onClick=${() => this.enableDesktopNotifications()}>
         <div class="title">${t('get_notified_new_messages')}</div>
         <div><a>${t('turn_on_desktop_notifications')}</a></div>
       </div>

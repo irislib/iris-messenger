@@ -15,7 +15,8 @@ const bech32 = require('bech32-buffer');
 
 async function login(k) {
   iris.session.login(k);
-  setTimeout(() => { // TODO remove setTimeout
+  setTimeout(() => {
+    // TODO remove setTimeout
     localState.get('loggedIn').put(true);
   }, 100);
 }
@@ -45,25 +46,33 @@ class Login extends Component {
     }
     let k;
     try {
+      // old format iris keys were json { priv, pub, epub, epriv }
+      // with nostr, secp256k1: { rpub, priv } was added to it
       k = JSON.parse(val);
     } catch (e) {
       /* empty */
     }
     if (!k) {
-      console.log(1);
+      // logging in with a hex private key?
+      // TODO ask user if it's a private or public key
       if (secp.utils.isValidPrivateKey(val)) {
-        console.log(2);
-        k = await iris.Key.fromSecp256k1(val);
+        k = {
+          secp256k1: { priv: val, rpub: secp.schnorr.getPublicKey(val) },
+        };
       }
       try {
         const { data, prefix } = bech32.decode(val);
         const hex = Helpers.arrayToHex(data);
+        // logging in with a public key?
         if (prefix === 'npub') {
           k = {
             secp256k1: { rpub: hex },
           };
         } else if (prefix === 'nsec') {
-          k = await iris.Key.fromSecp256k1(hex);
+          // logging in with a bech32 private key (nsec)
+          k = {
+            secp256k1: { priv: hex, rpub: secp.schnorr.getPublicKey(hex) },
+          };
         }
       } catch (e) {
         console.error(e);
