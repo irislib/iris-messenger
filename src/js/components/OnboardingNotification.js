@@ -48,7 +48,7 @@ export default class OnboardingNotification extends Component {
                 ${t('alternatively')}<i> </i>
                 <a
                   href="/${Nostr.toNostrBech32Address(
-                    iris.session.getKey()?.secp256k1?.rpub,
+                    Key.getPubKey(),
                     'npub',
                   )}"
                   >${t('give_your_profile_link_to_someone')}</a
@@ -60,7 +60,7 @@ export default class OnboardingNotification extends Component {
       `;
     }
     if (this.state.noFollowers && !this.state.hasNostrFollowers) {
-      const rpub = iris.session.getKey()?.secp256k1?.rpub;
+      const rpub = Key.getPubKey();
       const npub = rpub && Nostr.toNostrBech32Address(Key.getPubKey(), 'npub');
       return html`
         <div class="msg">

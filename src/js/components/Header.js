@@ -62,11 +62,7 @@ class Header extends Component {
         }
 
         if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
-          if (
-            activeRoute.indexOf('/chat/') === 0 &&
-            iris.session.getKey() &&
-            this.chatId === Key.getPubKey()
-          ) {
+          if (activeRoute.indexOf('/chat/') === 0 && this.chatId === Key.getPubKey()) {
             const title = html`<b style="margin-right:5px">📝</b> <b>${t('note_to_self')}</b>`;
             this.setState({ title });
           } else {
@@ -100,11 +96,11 @@ class Header extends Component {
   }
 
   render() {
-    const key = iris.session.getKey();
+    const key = Key.getPubKey();
     if (!key) {
       return;
     }
-    const npub = Nostr.toNostrBech32Address(key.secp256k1.rpub, 'npub');
+    const npub = Nostr.toNostrBech32Address(key, 'npub');
     const activeRoute = this.state.activeRoute;
     const chat = null;
     const isTyping = chat && chat.isTyping;

@@ -108,7 +108,6 @@ const Nostr = {
     });
   },
   onLoggedIn() {
-    const key = iris.session.getKey();
     const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
       const filter = filters[0];
       const key = filter['#d']?.[0];
@@ -160,7 +159,7 @@ const Nostr = {
     Relays.manage();
     LocalForage.loadEvents();
     IndexedDB.loadIDBEvents();
-    SocialNetwork.getProfile(key.secp256k1.rpub, undefined);
+    SocialNetwork.getProfile(myPub, undefined);
     for (const suggestion of this.SUGGESTED_FOLLOWS) {
       const hex = this.toNostrHexAddress(suggestion);
       SocialNetwork.knownUsers.add(hex);
@@ -169,8 +168,8 @@ const Nostr = {
 
     setTimeout(() => {
       Subscriptions.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
-      Subscriptions.sendSubToRelays([{ authors: [key.secp256k1.rpub] }], 'ours'); // our stuff
-      Subscriptions.sendSubToRelays([{ '#p': [key.secp256k1.rpub] }], 'notifications'); // notifications and DMs
+      Subscriptions.sendSubToRelays([{ authors: [myPub] }], 'ours'); // our stuff
+      Subscriptions.sendSubToRelays([{ '#p': [myPub] }], 'notifications'); // notifications and DMs
     }, 200);
     setInterval(() => {
       console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));
@@ -330,7 +329,7 @@ const Nostr = {
       cb?.(Events.directMessagesByUser.get(address)?.eventIds);
     };
     Events.directMessagesByUser.has(address) && callback();
-    const myPub = iris.session.getKey()?.secp256k1.rpub;
+    const myPub = Key.getPubKey();
     Subscriptions.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
   },
 

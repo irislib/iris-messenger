@@ -1,10 +1,8 @@
 import { Helmet } from 'react-helmet';
 import { html } from 'htm/preact';
-import iris from 'iris-lib';
 import $ from 'jquery';
 import throttle from 'lodash/throttle';
 import { createRef } from 'preact';
-import { Router } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Message from '../../components/Message';
@@ -14,7 +12,6 @@ import Key from '../../nostr/Key';
 import Nostr from '../../nostr/Nostr';
 import { translate as t } from '../../translations/Translation';
 
-import NewChat from './newchat/NewChat';
 import ChatMessageForm from './ChatMessageForm';
 
 const caretDownSvg = html`
@@ -118,7 +115,7 @@ export default class PrivateChat extends Component {
       if (
         this.chat &&
         !this.chat.uuid &&
-        Nostr.toNostrHexAddress(this.props.id) !== iris.session.getPubKey()
+        Nostr.toNostrHexAddress(this.props.id) !== Key.getPubKey()()
       ) {
         if ($('.msg.our').length && !$('.msg.their').length && !this.chat.theirMsgsLastSeenTime) {
           $('#not-seen-by-them').slideDown();
@@ -237,13 +234,6 @@ export default class PrivateChat extends Component {
         </div>
         <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
       </div>`;
-    } else {
-      mainView = (
-        <Router>
-          <NewChat path="/chat/new/:view?" />
-          <NewChat path="/chat" />
-        </Router>
-      );
     }
     return mainView;
   }

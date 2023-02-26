@@ -62,7 +62,7 @@ class Profile extends View {
   }
 
   getNotification() {
-    if (this.state.noFollowers && this.followers.has(iris.session.getPubKey())) {
+    if (this.state.noFollowers && this.followers.has(Key.getPubKey())) {
       return html`
         <div class="msg">
           <div class="msg-content">
@@ -70,7 +70,7 @@ class Profile extends View {
             <p>
               <${CopyButton}
                 text=${t('copy_link')}
-                copyStr=${Helpers.getProfileLink(iris.session.getPubKey())}
+                copyStr=${Helpers.getProfileLink(Key.getPubKey())}
               />
             </p>
             <small>${t('no_followers_yet_info')}</small>
