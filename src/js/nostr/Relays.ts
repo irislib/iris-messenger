@@ -1,9 +1,16 @@
 import { Relay, relayInit } from '../lib/nostr-tools';
+import localState from '../LocalState';
 
 import Events from './Events';
 import Key from './Key';
 import SocialNetwork from './SocialNetwork';
 import Subscriptions from './Subscriptions';
+
+type SavedRelays = {
+  [key: string]: {
+    enabled: boolean;
+  };
+};
 
 const DEFAULT_RELAYS = [
   'wss://eden.nostr.land',
@@ -62,6 +69,10 @@ export default {
         if (relay.enabled !== false && this.getStatus(relay) === 3) {
           this.connect(relay);
         }
+        // if disabled
+        if (relay.enabled === false && this.getStatus(relay) === 1) {
+          relay.close();
+        }
       }
       for (const relay of this.searchRelays.values()) {
         if (this.getStatus(relay) === 3) {
@@ -80,6 +91,34 @@ export default {
         console.log('notice from ', relay.url, notice);
       });
     }
+
+    localState.get('relays').put({});
+    localState.get('relays').on((savedRelays: SavedRelays) => {
+      if (!savedRelays) {
+        return;
+      }
+      for (const url of this.relays.keys()) {
+        if (savedRelays[url] === null) {
+          this.remove(url);
+        } else if (savedRelays[url] && savedRelays[url].enabled === false) {
+          const r = this.relays.get(url);
+          if (r) {
+            r.enabled = false;
+            this.relays.set(url, r);
+          }
+        }
+      }
+      for (const [url, data] of Object.entries(savedRelays)) {
+        if (data === null) {
+          this.relays.has(url) && this.remove(url);
+          return;
+        } else if (!this.relays.has(url)) {
+          const relay = relayInit(url, (id) => Events.cache.has(id));
+          relay.enabled = data.enabled;
+          this.relays.set(url, relay);
+        }
+      }
+    });
 
     go();
 
@@ -112,6 +151,11 @@ export default {
     for (const url of SEARCH_RELAYS) {
       if (!this.relays.has(url)) this.add(url);
     }
+    const relaysObj = {};
+    for (const [url, relay] of this.relays.entries()) {
+      relaysObj[url] = { enabled: relay.enabled };
+    }
+    localState.get('relays').put(relaysObj);
   },
   saveToContacts() {
     const relaysObj: any = {};

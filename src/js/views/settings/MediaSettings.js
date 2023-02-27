@@ -5,9 +5,10 @@ import { translate as t } from '../../translations/Translation';
 export default class MediaSettings extends Component {
   constructor() {
     super();
-    this.state.webPushSubscriptions = {};
-    this.state.blockedUsers = {};
     this.id = 'settings';
+    this.state = {
+      settings: {},
+    };
   }
 
   componentDidMount() {

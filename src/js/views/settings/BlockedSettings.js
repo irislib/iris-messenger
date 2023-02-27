@@ -7,8 +7,9 @@ import { translate as t } from '../../translations/Translation';
 export default class BlockedSettings extends Component {
   constructor() {
     super();
-    this.state.blockedUsers = [];
-    this.id = 'settings';
+    this.state = {
+      blockedUsers: [],
+    };
   }
   render() {
     let hasBlockedUsers = false;

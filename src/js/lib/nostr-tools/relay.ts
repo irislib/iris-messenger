@@ -6,6 +6,7 @@ import {Filter, matchFilters} from './filter'
 type RelayEvent = 'connect' | 'disconnect' | 'error' | 'notice'
 
 export type Relay = {
+  enabled: any;
   url: string
   status: number
   connect: () => Promise<void>
