@@ -4,13 +4,14 @@ import { Component } from 'preact';
 
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/basic/Button';
+import EULA from '../components/EULA';
 import LanguageSelector from '../components/LanguageSelector';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
+import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
-import Key from '../nostr/Key';
 const bech32 = require('bech32-buffer');
 
 const nostrLogin = async (event) => {
@@ -77,8 +78,7 @@ class Login extends Component {
     this.setState({ showSwitchAccount: false });
   }
 
-  onLoginFormSubmit(e) {
-    e.preventDefault();
+  loginAsNewUser() {
     let name = document.getElementById('login-form-name').value;
     Key.loginAsNewUser({ name, autofollow: false });
     localState.get('showFollowSuggestions').put(true);
@@ -95,6 +95,15 @@ class Login extends Component {
       // TODO remove setTimeout
       localState.get('loggedIn').put(true);
     }, 100);
+  }
+
+  onLoginFormSubmit(e) {
+    e.preventDefault();
+    if (navigator.standalone) {
+      this.setState({ showEula: true });
+    } else {
+      this.loginAsNewUser();
+    }
   }
 
   onNameChange(event) {
@@ -128,6 +137,12 @@ class Login extends Component {
   render() {
     return (
       <section id="login">
+        {this.state.showEula && (
+          <EULA
+            onAccept={() => this.loginAsNewUser()}
+            onDecline={() => this.setState({ showEula: false })}
+          />
+        )}
         <div id="login-content">
           {!this.state.showSwitchAccount ? (
             <form id="login-form" autocomplete="off" onSubmit={(e) => this.onLoginFormSubmit(e)}>
