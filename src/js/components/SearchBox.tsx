@@ -168,8 +168,19 @@ class SearchBox extends Component<Props, State> {
         });
       }
 
-      if (query.match(Helpers.noteRegex)) {
-        route('/post/' + query);
+      if (query.startsWith('https://iris.to/')) {
+        const path = query.replace('https://iris.to', '');
+        route(path);
+        return;
+      }
+      const noteMatch = query.match(/note[a-zA-Z0-9]{59,60}/gi);
+      if (noteMatch) {
+        route('/post/' + noteMatch[0]);
+        return;
+      }
+      const npubMatch = query.match(/npub[a-zA-Z0-9]{59,60}/gi);
+      if (npubMatch) {
+        route('/' + npubMatch[0]);
         return;
       }
       const s = query.split('/profile/');
