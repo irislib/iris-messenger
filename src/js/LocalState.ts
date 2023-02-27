@@ -198,3 +198,4 @@ class Node {
 const localState = new Node();
 
 export default localState;
+export { Callback, EventListener };

@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PureComponent } from 'react';
-import type { GunCallbackOn, GunSchema, IGunOnEvent } from 'gun';
 
-type EL = IGunOnEvent;
+import { Callback, EventListener } from './LocalState';
 
 type OwnState = {
   ogImageUrl?: any;
@@ -14,22 +13,22 @@ export default abstract class BaseComponent<Props = any, State = any> extends Pu
 > {
   unmounted?: boolean;
 
-  eventListeners: Record<string, EL | undefined> = {};
+  eventListeners: Record<string, EventListener | undefined> = {};
 
-  sub(callback: CallableFunction, path?: string): GunCallbackOn<GunSchema, string> {
-    const cb = (data, key, message, event, f): void => {
+  sub(callback: CallableFunction, path?: string): Callback {
+    const cb = (data, key, message, eventListener, f): void => {
       if (this.unmounted) {
-        event && event.off();
+        eventListener && eventListener.off();
         return;
       }
-      this.eventListeners[path ?? key] = event;
-      callback(data, key, message, event, f);
+      this.eventListeners[path ?? key] = eventListener;
+      callback(data, key, message, eventListener, f);
     };
 
     return cb as any;
   }
 
-  inject(name?: string, path?: string): GunCallbackOn<GunSchema, string> {
+  inject(name?: string, path?: string): Callback {
     return this.sub((v: unknown, k: string) => {
       const newState: any = {};
       newState[(name ?? k) as keyof State] = v as any;
