@@ -412,7 +412,12 @@ const Events = {
       Subscriptions.subscribedProfiles.delete(event.pubkey);
     }
 
-    if (saveToIdb) {
+    const myPub = Key.getPubKey();
+    // save only our own and followed users events to IndexedDB
+    if (
+      saveToIdb &&
+      (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey))
+    ) {
       IndexedDB.saveEvent(event);
     }
 
