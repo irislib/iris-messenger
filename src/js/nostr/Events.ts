@@ -11,6 +11,7 @@ import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 import Subscriptions from './Subscriptions';
+import Session from "./Session";
 
 const startTime = Date.now() / 1000;
 
@@ -250,7 +251,13 @@ const Events = {
       if (existing?.created_at >= event.created_at) {
         return false;
       }
+      this.cache.set(event.id, event);
       const profile = JSON.parse(event.content);
+      // if we have previously deleted our account, log out. appease app store.
+      if (event.pubkey === Key.getPubKey() && profile.deleted) {
+        Session.logOut();
+        return;
+      }
       profile.created_at = event.created_at;
       delete profile['nip05valid']; // not robust
       SocialNetwork.profiles.set(event.pubkey, profile);
@@ -261,12 +268,6 @@ const Events = {
         display_name: profile.display_name,
         followers: SocialNetwork.followersByUser.get(event.pubkey) ?? new Set(),
       });
-      // if by our pubkey, save to iris
-      const existingEvent = this.cache.get(event.pubkey);
-      if (!existingEvent || existingEvent.created_at < event.created_at) {
-        this.cache.set(event.pubkey, event);
-        LocalForage.loaded && LocalForage.saveProfilesAndFollows();
-      }
       //}
     } catch (e) {
       console.log('error parsing nostr profile', e, event);

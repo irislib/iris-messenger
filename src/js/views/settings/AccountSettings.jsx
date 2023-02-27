@@ -4,6 +4,7 @@ import { route } from 'preact-router';
 import Component from '../../BaseComponent';
 import Button from '../../components/basic/Button';
 import CopyButton from '../../components/CopyButton';
+import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation';
@@ -23,6 +24,22 @@ export default class AccountSettings extends Component {
     e.preventDefault();
     const rpub = await window.nostr.getPublicKey();
     Key.login({ rpub });
+  }
+
+  deleteAccount() {
+    if (confirm(`${t('delete_account')}?`)) {
+      Events.publish({
+        kind: 0,
+        content: JSON.stringify({ deleted: true }),
+      });
+      Events.publish({
+        kind: 3,
+        content: JSON.stringify({}),
+      });
+      setTimeout(() => {
+        Session.logOut();
+      }, 1000);
+    }
   }
 
   render() {
@@ -93,6 +110,11 @@ export default class AccountSettings extends Component {
             )}
           </p>
           {myPrivHex ? <p>{t('private_key_warning')}</p> : ''}
+
+          <h3>{t('delete_account')}</h3>
+          <p>
+            <Button onClick={() => this.deleteAccount()}>{t('delete_account')}</Button>
+          </p>
         </div>
       </>
     );
