@@ -3,7 +3,7 @@ started integrating <a href="https://github.com/nostr-protocol/nostr">Nostr</a> 
 
 # Iris
 
-Iris is like the social networking apps we're used to, but better.
+Nostr client for better social networks.
 
 - No phone number or signup required. Just type in your name or alias and go!
 - Secure: It's open source. Users can validate that big brother doesn't read your private messages.
@@ -36,8 +36,6 @@ yarn serve
 # run tests with jest and enzyme
 yarn test
 ```
-
-[iris-lib](https://github.com/irislib/iris-lib) is a core part of the application. You can clone it and run `yarn link` in the iris-lib directory. Then run `yarn link iris-lib` in the iris-messenger directory.
 
 ## Privacy
 
