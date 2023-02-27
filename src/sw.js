@@ -24,6 +24,11 @@ registerRoute(
   ({ url }) => url.pathname === '/',
   new StaleWhileRevalidate({
     cacheName: 'iris-main',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200], // no 404
+      }),
+    ],
   }),
 );
 
