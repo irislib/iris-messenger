@@ -8,6 +8,7 @@ import SafeImg from '../components/SafeImg';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
+import { debounce } from 'lodash';
 
 const explainers = {
   display_name: 'Name',
@@ -40,6 +41,10 @@ export default class EditProfile extends Component {
     });
   }
 
+  saveOnChange = debounce(() => {
+    SocialNetwork.setMetadata(this.state.profile);
+  }, 2000);
+
   setProfileAttribute = (key, value) => {
     const profile = Object.assign({}, this.state.profile);
     if (value) {
@@ -48,6 +53,7 @@ export default class EditProfile extends Component {
       delete profile[key];
     }
     this.setState({ profile, edited: true });
+    this.saveOnChange();
   };
 
   handleSubmit = (event) => {
@@ -64,6 +70,7 @@ export default class EditProfile extends Component {
     if (fieldName && fieldValue) {
       this.setProfileAttribute(fieldName, fieldValue);
       this.setState({ newFieldName: '', newFieldValue: '' });
+      SocialNetwork.setMetadata(this.state.profile);
     }
   };
 
