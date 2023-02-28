@@ -332,23 +332,34 @@ const Events = {
       return false;
     }
   },
-  handle(event: Event, force = false, saveToIdb = true) {
-    if (!event) return;
-    if (this.cache.has(event.id) && !force) {
-      return;
-    }
+  acceptEvent(event: Event) {
     if (
-      (!SocialNetwork.followDistanceByUser.has(event.pubkey) ||
-        SocialNetwork.followDistanceByUser.get(event.pubkey) > 3) &&
+      !Subscriptions.subscribedUsers.has(event.pubkey) ||
       !Subscriptions.subscribedPosts.has(event.id)
     ) {
-      return;
+      // unless we specifically subscribed to the user or post, ignore long follow distance users
+      if (SocialNetwork.followDistanceByUser.has(event.pubkey)) {
+        const distance = SocialNetwork.followDistanceByUser.get(event.pubkey);
+        if (distance > 3) {
+          // follow distance too high, reject
+          return false;
+        }
+        if (distance == 3) {
+          // require at least 5 followers
+          if (SocialNetwork.followersByUser.get(event.pubkey)?.size < 5) {
+            return false;
+          }
+        }
+      } else {
+        // unconnected user, reject
+        return false;
+      }
     }
     if (SocialNetwork.blockedUsers.has(event.pubkey)) {
-      return;
+      return false;
     }
     if (this.deletedEvents.has(event.id)) {
-      return;
+      return false;
     }
     if (event.created_at > Date.now() / 1000) {
       this.futureEventIds.add(event);
@@ -358,6 +369,16 @@ const Events = {
       if (this.futureEventIds.first() === event.id) {
         this.handleNextFutureEvent();
       }
+      return false;
+    }
+    return true;
+  },
+  handle(event: Event, force = false, saveToIdb = true) {
+    if (!event) return;
+    if (this.cache.has(event.id) && !force) {
+      return;
+    }
+    if (!this.acceptEvent(event)) {
       return;
     }
 
