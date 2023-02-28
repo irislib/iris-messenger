@@ -53,7 +53,8 @@ class About extends Component {
 
             <h3>FAQ</h3>
             <p>
-              Visit the <a href="https://github.com/irislib/faq">FAQ</a> for features, explanations and troubleshooting.
+              Visit the <a href="https://github.com/irislib/faq">FAQ</a> for features, explanations
+              and troubleshooting.
             </p>
 
             <h3>Privacy</h3>
@@ -62,10 +63,10 @@ class About extends Component {
             <h3>Follow</h3>
             <div className="profile-link-container">
               <a href={`/${IRIS_INFO_ACCOUNT}`} className="profile-link">
-                <Identicon str={IRIS_INFO_ACCOUNT} width={40}/>
-                <Name pub={IRIS_INFO_ACCOUNT} placeholder="Iris"/>
+                <Identicon str={IRIS_INFO_ACCOUNT} width={40} />
+                <Name pub={IRIS_INFO_ACCOUNT} placeholder="Iris" />
               </a>
-              <FollowButton id={IRIS_INFO_ACCOUNT}/>
+              <FollowButton id={IRIS_INFO_ACCOUNT} />
             </div>
             <div class="profile-link-container">
               <a href={`/${DEVELOPER}`} class="profile-link">

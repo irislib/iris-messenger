@@ -8,10 +8,10 @@ import IndexedDB from './IndexedDB';
 import Key from './Key';
 import LocalForage from './LocalForage';
 import Relays from './Relays';
+import Session from './Session';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
 import Subscriptions from './Subscriptions';
-import Session from "./Session";
 
 const startTime = Date.now() / 1000;
 
@@ -65,11 +65,14 @@ const Events = {
       const changed = this.latestNotesAndRepliesByFollows.add(event);
       // we don't want both the reply and the original post in the feed:
       if (replyingTo) {
-        this.latestNotesAndRepliesByFollows.delete(replyingTo);
+        const replyingToEvent = this.cache.get(replyingTo);
+        // just checking that someone isn't hiding posts with backdated replies to them
+        if (replyingToEvent?.created_at < event.created_at) {
+          this.latestNotesAndRepliesByFollows.delete(replyingTo);
+        }
       } else {
         this.latestNotesByFollows.add(event);
       }
-      replyingTo && this.latestNotesByFollows.delete(replyingTo);
       if (changed && LocalForage.loaded) {
         LocalForage.saveEvents();
       }
