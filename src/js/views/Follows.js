@@ -1,5 +1,6 @@
 import { html } from 'htm/preact';
 import throttle from 'lodash/throttle';
+import ScrollViewport from 'preact-scroll-viewport';
 
 import Button from '../components/basic/Button';
 import FollowButton from '../components/FollowButton';
@@ -20,22 +21,41 @@ class Follows extends View {
     this.state = { follows: [], contacts: {} };
   }
 
+  sortByName(aK, bK) {
+    const aName = SocialNetwork.profiles.get(aK)?.name;
+    const bName = SocialNetwork.profiles.get(bK)?.name;
+    if (!aName && !bName) {
+      return aK.localeCompare(bK);
+    }
+    if (!aName) {
+      return 1;
+    }
+    if (!bName) {
+      return -1;
+    }
+    return aName.localeCompare(bName);
+  }
+
+  sortByFollowDistance(aK, bK) {
+    const aDistance = SocialNetwork.followDistanceByUser.get(aK);
+    const bDistance = SocialNetwork.followDistanceByUser.get(bK);
+    if (aDistance === bDistance) {
+      return this.sortByName(aK, bK);
+    }
+    if (!aDistance) {
+      return 1;
+    }
+    if (!bDistance) {
+      return -1;
+    }
+    return aDistance - bDistance;
+  }
+
   updateSortedFollows = throttle(
     () => {
-      const follows = Array.from(this.follows).sort((aK, bK) => {
-        const aName = SocialNetwork.profiles.get(aK)?.name;
-        const bName = SocialNetwork.profiles.get(bK)?.name;
-        if (!aName && !bName) {
-          return aK.localeCompare(bK);
-        }
-        if (!aName) {
-          return 1;
-        }
-        if (!bName) {
-          return -1;
-        }
-        return aName.localeCompare(bName);
-      });
+      const comparator = (a, b) =>
+        this.props.followers ? this.sortByFollowDistance(a, b) : this.sortByName(a, b);
+      const follows = Array.from(this.follows).sort(comparator);
       this.setState({ follows });
     },
     1000,
@@ -73,6 +93,26 @@ class Follows extends View {
       SocialNetwork.setFollowed(this.state.follows);
   }
 
+  renderFollows() {
+    return html`
+      ${this.state.follows.map((hexKey) => {
+        const npub = Key.toNostrBech32Address(hexKey, 'npub');
+        return html` <div key=${npub} class="profile-link-container">
+          <a href="/${npub}" class="profile-link">
+            <${Identicon} str=${npub} width="49" />
+            <div>
+              <${Name} pub=${npub} /><br />
+              <small class="follower-count">
+                ${SocialNetwork.followersByUser.get(hexKey)?.size || 0}<i> </i> followers
+              </small>
+            </div>
+          </a>
+          ${hexKey !== Key.getPubKey() ? html`<${FollowButton} id=${npub} />` : ''}
+        </div>`;
+      })}
+    `;
+  }
+
   renderView() {
     return html`
       <div class="centered-container">
@@ -93,21 +133,9 @@ class Follows extends View {
             : ''}
         </h3>
         <div id="follows-list">
-          ${this.state.follows.map((hexKey) => {
-            const npub = Key.toNostrBech32Address(hexKey, 'npub');
-            return html` <div key=${npub} class="profile-link-container">
-              <a href="/${npub}" class="profile-link">
-                <${Identicon} str=${npub} width="49" />
-                <div>
-                  <${Name} pub=${npub} /><br />
-                  <small class="follower-count">
-                    ${SocialNetwork.followersByUser.get(hexKey)?.size || 0}<i> </i> followers
-                  </small>
-                </div>
-              </a>
-              ${hexKey !== Key.getPubKey() ? html`<${FollowButton} id=${npub} />` : ''}
-            </div>`;
-          })}
+          ${this.state.follows.length > 300
+            ? html`<${ScrollViewport}>${this.renderFollows()}<//>`
+            : this.renderFollows()}
           ${this.state.follows.length === 0 ? '—' : ''}
         </div>
       </div>
