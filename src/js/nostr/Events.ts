@@ -421,7 +421,7 @@ const Events = {
     }
 
     // save limited by author followdistance
-    if (saveToIdb && SocialNetwork.followDistanceByUser.get(event.pubkey) <= 2) {
+    if (saveToIdb && SocialNetwork.followDistanceByUser.get(event.pubkey) <= 3) {
       IndexedDB.saveEvent(event);
     }
 
