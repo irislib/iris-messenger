@@ -44,6 +44,15 @@ const Session = {
     });
   },
   onLoggedIn() {
+    const myPub = Key.getPubKey();
+    SocialNetwork.knownUsers.add(myPub);
+    SocialNetwork.followDistanceByUser.set(myPub, 0);
+    SocialNetwork.SUGGESTED_FOLLOWS.forEach((user) => {
+      // suggested users seem not to load otherwise — quick fix
+      const hex = Key.toNostrHexAddress(user);
+      SocialNetwork.knownUsers.add(hex);
+      SocialNetwork.followDistanceByUser.set(hex, 1);
+    });
     const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
       const filter = filters[0];
       const key = filter['#d']?.[0];
@@ -56,7 +65,6 @@ const Session = {
       Subscriptions.subscribe(filters, callback);
       return '0';
     };
-    const myPub = Key.getPubKey();
     // TODO move private and public to State.ts
     this.private = new Path(
       (...args) => Events.publish(...args),
@@ -91,8 +99,6 @@ const Session = {
       }
       document.documentElement.setAttribute('data-theme', 'dark');
     });
-    SocialNetwork.knownUsers.add(myPub);
-    SocialNetwork.followDistanceByUser.set(myPub, 0);
     Relays.manage();
     LocalForage.loadEvents();
     IndexedDB.loadIDBEvents();
