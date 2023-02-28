@@ -325,8 +325,11 @@ const Events = {
     }
   },
   isBoost(event: Event) {
+    if (event.kind === 6) {
+      return true;
+    }
     const mentionIndex = event.tags.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
-    if (event.content === `#[${mentionIndex}]`) {
+    if (event.kind === 1 && event.content === `#[${mentionIndex}]`) {
       return true;
     } else {
       return false;
@@ -346,6 +349,7 @@ const Events = {
         }
         if (distance == 3) {
           // require at least 5 followers
+          // TODO followers should be follow distance 2
           if (SocialNetwork.followersByUser.get(event.pubkey)?.size < 5) {
             return false;
           }
