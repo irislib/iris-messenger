@@ -1,3 +1,4 @@
+import { debounce } from 'lodash';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
@@ -8,7 +9,6 @@ import SafeImg from '../components/SafeImg';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
-import { debounce } from 'lodash';
 
 const explainers = {
   display_name: 'Name',

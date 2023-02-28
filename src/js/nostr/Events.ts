@@ -338,7 +338,8 @@ const Events = {
       return;
     }
     if (
-      !SocialNetwork.knownUsers.has(event.pubkey) &&
+      (!SocialNetwork.followDistanceByUser.has(event.pubkey) ||
+        SocialNetwork.followDistanceByUser.get(event.pubkey) > 3) &&
       !Subscriptions.subscribedPosts.has(event.id)
     ) {
       return;
@@ -419,12 +420,8 @@ const Events = {
       Subscriptions.subscribedProfiles.delete(event.pubkey);
     }
 
-    const myPub = Key.getPubKey();
-    // save only our own and followed users events to IndexedDB
-    if (
-      saveToIdb &&
-      (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey))
-    ) {
+    // save limited by author followdistance
+    if (saveToIdb && SocialNetwork.followDistanceByUser.get(event.pubkey) <= 2) {
       IndexedDB.saveEvent(event);
     }
 

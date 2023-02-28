@@ -18,6 +18,7 @@ export default {
     'npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6', // fiatjaf
     'npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s', // jb55
   ],
+  followDistanceByUser: new Map<string, number>(),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
   profiles: new Map<string, any>(),
@@ -80,6 +81,18 @@ export default {
     }
     const myPub = Key.getPubKey();
 
+    if (follower === myPub) {
+      // basically same as the next "else" block, but faster
+      this.followDistanceByUser.set(followedUser, 1);
+    } else {
+      const existingFollowDistance = this.followDistanceByUser.get(followedUser);
+      const followerDistance = this.followDistanceByUser.get(follower);
+      const newFollowDistance = followerDistance && followerDistance + 1;
+      if (!existingFollowDistance || newFollowDistance < existingFollowDistance) {
+        this.followDistanceByUser.set(followedUser, newFollowDistance);
+      }
+    }
+
     // if new follow, move all their posts to followedByUser
     if (follower === myPub && !this.followedByUser.get(myPub).has(followedUser)) {
       const posts = Events.postsByUser.get(followedUser);
@@ -115,6 +128,22 @@ export default {
   removeFollower: function (unfollowedUser: string, follower: string) {
     this.followersByUser.get(unfollowedUser)?.delete(follower);
     this.followedByUser.get(follower)?.delete(unfollowedUser);
+
+    // iterate over remaining followers and set the smallest follow distance
+    let smallest = 1000;
+    for (const follower of this.followersByUser.get(unfollowedUser) || []) {
+      const distance = this.followDistanceByUser.get(follower) + 1;
+      if (distance && distance < smallest) {
+        smallest = distance;
+      }
+    }
+
+    if (smallest === 1000) {
+      this.followDistanceByUser.delete(unfollowedUser);
+    } else {
+      this.followDistanceByUser.set(unfollowedUser, smallest);
+    }
+
     const blocked = this.blockedUsers.has(unfollowedUser);
     Events.latestNotesByFollows.eventIds.forEach((id) => {
       const fullEvent = Events.cache.get(id);
@@ -130,7 +159,9 @@ export default {
     });
     if (blocked || this.followersByUser.get(unfollowedUser)?.size === 0) {
       // TODO: remove unfollowedUser from everyone's followersByUser.
+      // TODO: remove from all indexes. something like lokijs could help in index management.
       //  if resulting followersByUser(u).size is 0, remove that user as well
+      this.followDistanceByUser.delete(unfollowedUser);
       this.followersByUser.delete(unfollowedUser);
       this.knownUsers.delete(unfollowedUser);
       Subscriptions.subscribedUsers.delete(unfollowedUser);

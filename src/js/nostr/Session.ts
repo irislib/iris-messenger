@@ -92,6 +92,7 @@ const Session = {
       document.documentElement.setAttribute('data-theme', 'dark');
     });
     SocialNetwork.knownUsers.add(myPub);
+    SocialNetwork.followDistanceByUser.set(myPub, 0);
     Relays.manage();
     LocalForage.loadEvents();
     IndexedDB.loadIDBEvents();
