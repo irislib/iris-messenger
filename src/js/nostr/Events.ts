@@ -59,7 +59,7 @@ const Events = {
       this.latestNotesByEveryone.add(event);
     }
     // we don't want both the reply and the original post in the feed:
-    replyingTo && this.latestNotesByEveryone.delete(replyingTo);
+    // replyingTo && this.latestNotesByEveryone.delete(replyingTo);
     const myPub = Key.getPubKey();
     if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
       const changed = this.latestNotesAndRepliesByFollows.add(event);
