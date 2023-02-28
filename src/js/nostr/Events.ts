@@ -54,20 +54,24 @@ const Events = {
     this.postsAndRepliesByUser.get(event.pubkey)?.add(event);
 
     const replyingTo = this.getEventReplyingTo(event);
+    const replyingToEvent = replyingTo && this.cache.get(replyingTo);
     this.latestNotesAndRepliesByEveryone.add(event);
     if (!replyingTo) {
       this.latestNotesByEveryone.add(event);
     }
-    // we don't want both the reply and the original post in the feed:
-    // replyingTo && this.latestNotesByEveryone.delete(replyingTo);
+    // just checking that someone isn't hiding posts with backdated replies to them
+    if (replyingToEvent?.created_at < event.created_at) {
+      // we don't want both the reply and the original post in the feed:
+      this.latestNotesAndRepliesByEveryone.delete(replyingTo);
+    }
     const myPub = Key.getPubKey();
     if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
       const changed = this.latestNotesAndRepliesByFollows.add(event);
-      // we don't want both the reply and the original post in the feed:
       if (replyingTo) {
         const replyingToEvent = this.cache.get(replyingTo);
         // just checking that someone isn't hiding posts with backdated replies to them
         if (replyingToEvent?.created_at < event.created_at) {
+          // we don't want both the reply and the original post in the feed:
           this.latestNotesAndRepliesByFollows.delete(replyingTo);
         }
       } else {
