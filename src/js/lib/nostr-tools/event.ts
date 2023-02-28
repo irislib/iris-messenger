@@ -21,6 +21,8 @@ export enum Kind {
   BlockList = 16462,
   FlagList = 16463,
   ReplaceableByTag = 30000,
+  ZapRequest = 9734,
+  Zap = 9735,
 }
 
 export type Event = {

@@ -18,9 +18,11 @@ const startTime = Date.now() / 1000;
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
 const MAX_MSGS_BY_KEYWORD = 100;
+const MAX_ZAPS_BY_NOTE = 1000;
 
 const cache = new Map<string, Event>();
 
+// TODO separate files for different types of events
 const Events = {
   MAX_MSGS_BY_KEYWORD,
   getEventHash,
@@ -31,6 +33,7 @@ const Events = {
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
+  zapsByNote: new Map<string, SortedLimitedEventSet>(),
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesAndRepliesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
@@ -294,6 +297,15 @@ const Events = {
       }
     }
   },
+  handleZap(event) {
+    this.cache.set(event.id, event);
+    const zappedNote = event.tags.find((tag) => tag[0] === 'e')?.[1];
+    console.log('zap!', Key.toNostrBech32Address(zappedNote, 'note'), event);
+    if (!this.zapsByNote.has(zappedNote)) {
+      this.zapsByNote.set(zappedNote, new SortedLimitedEventSet(MAX_ZAPS_BY_NOTE));
+    }
+    this.zapsByNote.get(zappedNote)?.add(event);
+  },
   handleDirectMessage(event: Event) {
     const myPub = Key.getPubKey();
     let user = event.pubkey;
@@ -424,6 +436,10 @@ const Events = {
       case 7:
         this.maybeAddNotification(event);
         this.handleReaction(event);
+        break;
+      case 9735:
+        this.maybeAddNotification(event);
+        this.handleZap(event);
         break;
       case 16462:
         // TODO return if already have
@@ -593,13 +609,14 @@ const Events = {
     this.handle(event);
     return event.id;
   },
-  getRepliesAndLikes(
+  getRepliesAndReactions(
     id: string,
     cb?: (
       replies: Set<string>,
       likedBy: Set<string>,
       threadReplyCount: number,
       boostedBy: Set<string>,
+      zaps: Set<string>,
     ) => void,
   ) {
     const callback = () => {
@@ -609,12 +626,13 @@ const Events = {
           this.likesByMessageId.get(id) ?? new Set(),
           this.threadRepliesByMessageId.get(id)?.size ?? 0,
           this.boostsByMessageId.get(id) ?? new Set(),
+          this.zapsByNote.get(id) ?? new Set(),
         );
     };
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }
-    Subscriptions.subscribe([{ kinds: [1, 6, 7], '#e': [id] }], callback);
+    Subscriptions.subscribe([{ kinds: [1, 6, 7, 9735], '#e': [id] }], callback);
   },
   async getEventById(id: string) {
     if (this.cache.has(id)) {

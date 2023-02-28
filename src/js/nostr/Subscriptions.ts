@@ -81,10 +81,14 @@ const Subscriptions = {
       }
     }
   },
-  subscribeToRepliesAndLikes: debounce(() => {
-    console.log('subscribeToRepliesAndLikes', Subscriptions.subscribedRepliesAndLikes);
+  subscribeToRepliesAndReactions: debounce(() => {
     Subscriptions.sendSubToRelays(
-      [{ kinds: [1, 6, 7], '#e': Array.from(Subscriptions.subscribedRepliesAndLikes.values()) }],
+      [
+        {
+          kinds: [1, 6, 7, 9735],
+          '#e': Array.from(Subscriptions.subscribedRepliesAndLikes.values()),
+        },
+      ],
       'subscribedRepliesAndLikes',
       true,
     );
@@ -220,7 +224,7 @@ const Subscriptions = {
         }
       }
     }
-    hasNewReplyAndLikeSubs && this.subscribeToRepliesAndLikes(this);
+    hasNewReplyAndLikeSubs && this.subscribeToRepliesAndReactions(this);
     hasNewAuthors && this.subscribeToAuthors(this); // TODO subscribe to old stuff from new authors, don't resubscribe to all
     hasNewIds && this.subscribeToPosts(this);
     hasNewKeywords && this.subscribeToKeywords(this);

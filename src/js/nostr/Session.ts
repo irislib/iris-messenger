@@ -111,7 +111,7 @@ const Session = {
     }
 
     setTimeout(() => {
-      Subscriptions.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7], limit: 200 }], 'new'); // everything new
+      Subscriptions.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7, 9735], limit: 200 }], 'new'); // everything new
       Subscriptions.sendSubToRelays([{ authors: [myPub] }], 'ours'); // our stuff
       Subscriptions.sendSubToRelays([{ '#p': [myPub] }], 'notifications'); // notifications and DMs
     }, 200);

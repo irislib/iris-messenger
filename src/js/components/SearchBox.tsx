@@ -3,7 +3,6 @@ import isEqual from 'lodash/isEqual';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
-import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import SearchIndex from '../SearchIndex';

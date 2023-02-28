@@ -195,40 +195,47 @@ class PublicMessage extends Message {
       this.setState({ msg });
 
       if (nostrId) {
-        Events.getRepliesAndLikes(nostrId, (replies, likedBy, threadReplyCount, boostedBy) => {
-          this.likedBy = likedBy;
-          this.boostedBy = boostedBy;
-          const sortedReplies =
-            replies &&
-            Array.from(replies).sort((a, b) => {
-              const eventA = Events.cache.get(a);
-              const eventB = Events.cache.get(b);
-              // show our replies first
-              if (eventA?.pubkey === myPub && eventB?.pubkey !== myPub) {
-                return -1;
-              } else if (eventA?.pubkey !== myPub && eventB?.pubkey === myPub) {
-                return 1;
-              }
-              // show replies by original post's author first
-              if (eventA?.pubkey === msg.event?.pubkey && eventB?.pubkey !== msg.event?.pubkey) {
-                return -1;
-              } else if (
-                eventA?.pubkey !== msg.event?.pubkey &&
-                eventB?.pubkey === msg.event?.pubkey
-              ) {
-                return 1;
-              }
-              return eventA?.created_at - eventB?.created_at;
+        Events.getRepliesAndReactions(
+          nostrId,
+          (replies, likedBy, threadReplyCount, boostedBy, zaps) => {
+            zaps.size &&
+              console.log('zaps.size', zaps.size, Key.toNostrBech32Address(nostrId, 'note'));
+            this.zaps = zaps;
+            this.likedBy = likedBy;
+            this.boostedBy = boostedBy;
+            const sortedReplies =
+              replies &&
+              Array.from(replies).sort((a, b) => {
+                const eventA = Events.cache.get(a);
+                const eventB = Events.cache.get(b);
+                // show our replies first
+                if (eventA?.pubkey === myPub && eventB?.pubkey !== myPub) {
+                  return -1;
+                } else if (eventA?.pubkey !== myPub && eventB?.pubkey === myPub) {
+                  return 1;
+                }
+                // show replies by original post's author first
+                if (eventA?.pubkey === msg.event?.pubkey && eventB?.pubkey !== msg.event?.pubkey) {
+                  return -1;
+                } else if (
+                  eventA?.pubkey !== msg.event?.pubkey &&
+                  eventB?.pubkey === msg.event?.pubkey
+                ) {
+                  return 1;
+                }
+                return eventA?.created_at - eventB?.created_at;
+              });
+            this.setState({
+              boosts: this.boostedBy.size,
+              boosted: this.boostedBy.has(myPub),
+              likes: this.likedBy.size,
+              zaps: this.zaps.size,
+              liked: this.likedBy.has(myPub),
+              replyCount: threadReplyCount,
+              sortedReplies,
             });
-          this.setState({
-            boosts: this.boostedBy.size,
-            boosted: this.boostedBy.has(myPub),
-            likes: this.likedBy.size,
-            liked: this.likedBy.has(myPub),
-            replyCount: threadReplyCount,
-            sortedReplies,
-          });
-        });
+          },
+        );
       }
     };
 
@@ -397,6 +404,38 @@ class PublicMessage extends Message {
     `;
   }
 
+  renderZap() {
+    const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
+    const likedEvent = Events.cache.get(likedId);
+    let text = likedEvent?.content;
+    if (text && text.length > 50) {
+      text = Helpers.highlightText(text, likedEvent);
+    } else {
+      text = Helpers.highlightText(text, likedEvent);
+    }
+    const link = `/post/${Key.toNostrBech32Address(likedId, 'note')}`;
+    const userLink = `/${Key.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}`;
+    return html`
+      <div class="msg">
+        <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
+          <div
+            style="display: flex; align-items: center; flex-basis: 100%; white-space: nowrap;text-overflow: ellipsis; overflow:hidden"
+          >
+            <i class="like-btn liked" style="margin-right: 15px;"> ${lightningIcon} </i>
+            <a href=${userLink} style="margin-right: 5px;">
+              <${Name} pub=${this.state.msg?.event?.pubkey} userNameOnly=${true} />
+            </a>
+            <span>
+              zapped your <a href=${link}>note</a> ${text && text.length
+                ? html`<i>"${text}"</i>`
+                : ''}</span
+            >
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   report(e) {
     e.preventDefault();
     if (confirm('Publicly report and hide message?')) {
@@ -547,6 +586,8 @@ class PublicMessage extends Message {
         return this.renderRepost(this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1]);
       case 7:
         return this.renderLike();
+      case 9735:
+        return this.renderZap();
       case 1: {
         let mentionIndex = this.state.msg?.event?.tags.findIndex(
           (tag) => tag[0] === 'e' && tag[3] === 'mention',
@@ -780,7 +821,7 @@ class PublicMessage extends Message {
                           >
                             ${lightningIcon}
                           </a>
-                          <span class="count"></span>
+                          <span class="count"> ${s.zaps || ''} </span>
                         `
                       : ''}
                   </div>
