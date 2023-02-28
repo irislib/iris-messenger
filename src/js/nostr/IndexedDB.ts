@@ -38,6 +38,7 @@ export default {
     db.events.where({ pubkey: myPub }).each((event) => {
       Events.handle(event, false, false);
     });
+    // TODO load by follow distance
     const follows: string[] = Array.from(SocialNetwork.followedByUser.get(myPub) || []);
     db.events
       .where('pubkey')

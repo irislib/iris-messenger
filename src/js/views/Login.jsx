@@ -99,7 +99,11 @@ class Login extends Component {
 
   onLoginFormSubmit(e) {
     e.preventDefault();
-    if (navigator.standalone) {
+    if (
+      navigator.standalone ||
+      window.matchMedia('(display-mode: standalone)').matches ||
+      document.referrer.includes('android-app://iris.to')
+    ) {
       this.setState({ showEula: true });
     } else {
       this.loginAsNewUser();
