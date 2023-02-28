@@ -47,10 +47,6 @@ class About extends Component {
               </ul>
             </p>
 
-            <p>
-              <small>Version 2.3.3</small>
-            </p>
-
             <h3>FAQ</h3>
             <p>
               Visit the <a href="https://github.com/irislib/faq">FAQ</a> for features, explanations
