@@ -46,14 +46,7 @@ const Session = {
   },
   onLoggedIn() {
     const myPub = Key.getPubKey();
-    SocialNetwork.knownUsers.add(myPub);
     SocialNetwork.followDistanceByUser.set(myPub, 0);
-    SocialNetwork.SUGGESTED_FOLLOWS.forEach((user) => {
-      // suggested users seem not to load otherwise — quick fix
-      const hex = Key.toNostrHexAddress(user);
-      SocialNetwork.knownUsers.add(hex);
-      SocialNetwork.followDistanceByUser.set(hex, 1);
-    });
     const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
       const filter = filters[0];
       const key = filter['#d']?.[0];
@@ -112,13 +105,6 @@ const Session = {
         clearTimeout(timeout);
       }
     });
-    // TODO move these to onLoggedIn & init methods of the respective modules
-    for (const suggestion of SocialNetwork.SUGGESTED_FOLLOWS) {
-      const hex = Key.toNostrHexAddress(suggestion);
-      SocialNetwork.knownUsers.add(hex);
-      SocialNetwork.getProfile(Key.toNostrHexAddress(hex), undefined);
-    }
-
     setTimeout(() => {
       Subscriptions.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7, 9735], limit: 200 }], 'new'); // everything new
       Subscriptions.sendSubToRelays([{ authors: [myPub] }], 'ours'); // our stuff

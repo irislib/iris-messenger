@@ -24,7 +24,6 @@ export default {
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
-  knownUsers: new Set<string>(),
   blockedUsers: new Set<string>(),
   flaggedUsers: new Set<string>(),
   setFollowed: function (followedUsers: string | string[], follow = true) {
@@ -72,8 +71,6 @@ export default {
     if (!this.followersByUser.has(followedUser)) {
       this.followersByUser.set(followedUser, new Set<string>());
     }
-    this.knownUsers.add(followedUser);
-    this.knownUsers.add(follower);
     this.followersByUser.get(followedUser)?.add(follower);
 
     if (!this.followedByUser.has(follower)) {
@@ -163,7 +160,6 @@ export default {
       //  if resulting followersByUser(u).size is 0, remove that user as well
       this.followDistanceByUser.delete(unfollowedUser);
       this.followersByUser.delete(unfollowedUser);
-      this.knownUsers.delete(unfollowedUser);
       Subscriptions.subscribedUsers.delete(unfollowedUser);
       Events.latestNotesByEveryone.eventIds.forEach((id) => {
         const fullEvent = Events.cache.get(id);
@@ -252,7 +248,6 @@ export default {
     cb?: (profile: any, address: string) => void,
     verifyNip05 = false,
   ): Unsubscribe {
-    this.knownUsers.add(address);
     const callback = () => {
       cb?.(this.profiles.get(address), address);
     };

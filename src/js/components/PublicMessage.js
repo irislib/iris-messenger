@@ -851,10 +851,12 @@ class PublicMessage extends Message {
               ? html`
                   <div class="likes">
                     ${(s.zaps?.eventIds || []).map((eventId) => {
-                      const key = Events.cache.get(eventId)?.pubkey;
-                      if (!key) {
+                      const event = Events.cache.get(eventId);
+                      if (!event) {
                         return;
                       }
+                      const key = event.pubkey;
+                      console.log('zap', event);
                       const npub = Key.toNostrBech32Address(key, 'npub');
                       return html`<${Identicon}
                         showTooltip=${true}

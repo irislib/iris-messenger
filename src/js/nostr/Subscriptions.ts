@@ -25,7 +25,7 @@ const Subscriptions = {
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
-  subscribedRepliesAndLikes: new Set<string>(),
+  subscribedRepliesAndReactions: new Set<string>(),
   subscribedProfiles: new Set<string>(),
   subscribedKeywords: new Set<string>(),
   getSubscriptionIdForName(name: string) {
@@ -90,10 +90,10 @@ const Subscriptions = {
       [
         {
           kinds: [1, 6, 7, 9735],
-          '#e': Array.from(Subscriptions.subscribedRepliesAndLikes.values()),
+          '#e': Array.from(Subscriptions.subscribedRepliesAndReactions.values()),
         },
       ],
-      'subscribedRepliesAndLikes',
+      'subscribedRepliesAndReactions',
       true,
     );
   }, 500),
@@ -139,11 +139,7 @@ const Subscriptions = {
   ),
   subscribeToKeywords: debounce(() => {
     if (Subscriptions.subscribedKeywords.size === 0) return;
-    console.log(
-      'subscribe to keywords',
-      Array.from(Subscriptions.subscribedKeywords),
-      SocialNetwork.knownUsers.size,
-    );
+    console.log('subscribe to keywords', Array.from(Subscriptions.subscribedKeywords));
     const go = () => {
       Subscriptions.sendSubToRelays(
         [
@@ -155,8 +151,8 @@ const Subscriptions = {
         ],
         'keywords',
       );
-      // on page reload knownUsers are empty and thus all search results are dropped
-      if (SocialNetwork.knownUsers.size < 1000) setTimeout(go, 2000);
+      // on page reload SocialNetwork is empty and thus all search results are dropped
+      if (SocialNetwork.followersByUser.size < 1000) setTimeout(go, 2000);
     };
     go();
   }, 100),
@@ -228,12 +224,12 @@ const Subscriptions = {
       }
       if (Array.isArray(filter['#e'])) {
         for (const id of filter['#e']) {
-          if (!this.subscribedRepliesAndLikes.has(id)) {
+          if (!this.subscribedRepliesAndReactions.has(id)) {
             hasNewReplyAndLikeSubs = true;
-            this.subscribedRepliesAndLikes.add(id);
+            this.subscribedRepliesAndReactions.add(id);
             setTimeout(() => {
               // remove after some time, so the requests don't grow too large
-              this.subscribedRepliesAndLikes.delete(id);
+              this.subscribedRepliesAndReactions.delete(id);
             }, 60 * 1000);
           }
         }

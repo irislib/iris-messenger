@@ -736,7 +736,7 @@ const Events = {
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
     // TODO subscribe on view profile and unsub on leave profile
-    SocialNetwork.knownUsers.add(address);
+    Subscriptions.subscribedUsers.add(address);
     const callback = () => {
       cb?.(this.postsAndRepliesByUser.get(address)?.eventIds);
     };
@@ -744,7 +744,7 @@ const Events = {
     return Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getPostsByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
-    SocialNetwork.knownUsers.add(address);
+    Subscriptions.subscribedUsers.add(address);
     const callback = () => {
       cb?.(this.postsByUser.get(address)?.eventIds);
     };
@@ -752,7 +752,7 @@ const Events = {
     return Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getLikesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
-    SocialNetwork.knownUsers.add(address);
+    Subscriptions.subscribedUsers.add(address);
     const callback = () => {
       cb?.(this.likesByUser.get(address)?.eventIds);
     };
@@ -769,7 +769,7 @@ const Events = {
   },
 
   getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
-    SocialNetwork.knownUsers.add(address);
+    Subscriptions.subscribedUsers.add(address);
     const callback = () => {
       cb?.(this.directMessagesByUser.get(address)?.eventIds);
     };
