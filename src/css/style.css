@@ -1595,7 +1595,7 @@ a.msgSenderName:hover .user-name {
 
 .msg .likes .identicon-container {
   margin-right: 5px;
-  margin-top: 5px;
+  margin-bottom: 5px;
   float: left;
 }
 
