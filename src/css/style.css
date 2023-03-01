@@ -1599,6 +1599,10 @@ a.msgSenderName:hover .user-name {
   float: left;
 }
 
+.msg .likes {
+  margin: 5px 0;
+}
+
 .msg .count {
   margin-left: 5px;
   cursor: pointer;
