@@ -640,6 +640,20 @@ const Events = {
     this.handle(event);
     return event.id;
   },
+  getZappingUser(eventId: string) {
+    const description = Events.cache.get(eventId)?.tags.find((t) => t[0] === 'description')?.[1];
+    if (!description) {
+      return;
+    }
+    let obj;
+    try {
+      obj = JSON.parse(description);
+    } catch (e) {
+      return;
+    }
+    const npub = Key.toNostrBech32Address(obj.pubkey, 'npub');
+    return npub;
+  },
   getRepliesAndReactions(
     id: string,
     cb?: (

@@ -229,23 +229,7 @@ class PublicMessage extends Message {
                 return eventA?.created_at - eventB?.created_at;
               });
             const zappers =
-              zaps &&
-              Array.from(zaps.values()).map((eventId) => {
-                const description = Events.cache
-                  .get(eventId)
-                  ?.tags.find((t) => t[0] === 'description')?.[1];
-                if (!description) {
-                  return;
-                }
-                let obj;
-                try {
-                  obj = JSON.parse(description);
-                } catch (e) {
-                  return;
-                }
-                const npub = Key.toNostrBech32Address(obj.pubkey, 'npub');
-                return npub;
-              });
+              zaps && Array.from(zaps.values()).map((eventId) => Events.getZappingUser(eventId));
             this.setState({
               boosts: this.boostedBy.size,
               boosted: this.boostedBy.has(myPub),
@@ -440,17 +424,18 @@ class PublicMessage extends Message {
     } else {
       text = Helpers.highlightText(text, likedEvent);
     }
+    const zappingUser = Events.getZappingUser(this.state.msg.event.id);
     const link = `/post/${Key.toNostrBech32Address(likedId, 'note')}`;
-    const userLink = `/${Key.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}`;
+    const userLink = `/${zappingUser}`;
     return html`
       <div class="msg">
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
           <div
             style="display: flex; align-items: center; flex-basis: 100%; white-space: nowrap;text-overflow: ellipsis; overflow:hidden"
           >
-            <i class="like-btn liked" style="margin-right: 15px;"> ${lightningIcon} </i>
+            <i class="zap-btn zapped" style="margin-right: 15px;"> ${lightningIcon} </i>
             <a href=${userLink} style="margin-right: 5px;">
-              <${Name} pub=${this.state.msg?.event?.pubkey} userNameOnly=${true} />
+              <${Name} pub=${zappingUser} userNameOnly=${true} />
             </a>
             <span>
               zapped your <a href=${link}>note</a> ${text && text.length

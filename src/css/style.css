@@ -1628,10 +1628,9 @@ a.msgSenderName:hover .user-name {
 
 .msg .like-btn.liked, .msg .like-btn:hover {
   color: var(--red);
-
 }
 
-.msg .zap-btn:hover {
+.msg .zap-btn:hover, .msg .zap-btn.zapped {
   color: var(--orange);
 }
 
