@@ -19,7 +19,7 @@ export default class SocialNetworkSettings extends Component {
         hasBlockedUsers = true;
         return (
           <div key={user}>
-            <a href={`/{bech32}`}>
+            <a href={`/${bech32}`}>
               <Name pub={user} />
             </a>
           </div>

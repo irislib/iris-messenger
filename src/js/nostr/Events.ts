@@ -374,7 +374,9 @@ const Events = {
         return false;
       }
     }
-    if (SocialNetwork.blockedUsers.has(event.pubkey)) {
+    // Accepting metadata so we still get their name. But should we instead save the name on our own list?
+    // They might spam with 1 MB events and keep changing their name or something.
+    if (SocialNetwork.blockedUsers.has(event.pubkey) && event.kind !== 0) {
       return false;
     }
     if (this.deletedEvents.has(event.id)) {
