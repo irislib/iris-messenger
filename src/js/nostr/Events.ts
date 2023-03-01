@@ -637,19 +637,41 @@ const Events = {
     }
     return Subscriptions.subscribe([{ kinds: [1, 6, 7, 9735], '#e': [id] }], callback);
   },
-  async getEventById(id: string) {
+  async getEventById(id: string, proxyFirst = false) {
     if (this.cache.has(id)) {
       return this.cache.get(id);
     }
+    const askWs = () => {
+      return new Promise((resolve) => {
+        const unsub = Subscriptions.subscribe([{ ids: [id] }], () => {
+          const msg = this.cache.get(id);
+          if (msg) {
+            resolve(msg);
+            unsub();
+          }
+        });
+      });
+    };
 
     return new Promise((resolve) => {
-      const unsub = Subscriptions.subscribe([{ ids: [id] }], () => {
-        const msg = this.cache.get(id);
-        if (msg) {
-          resolve(msg);
-          unsub();
-        }
-      });
+      if (proxyFirst) {
+        // give proxy 300 ms to respond, then ask ws
+        const askWsTimeout = setTimeout(() => {
+          askWs().then(resolve);
+        }, 300);
+        fetch(`https://api.iris.to/event/${id}`).then((res) => {
+          if (res.status === 200) {
+            res.json().then((event) => {
+              if (event) {
+                clearTimeout(askWsTimeout);
+                Events.handle(event);
+              }
+            });
+          }
+        });
+      } else {
+        askWs().then(resolve);
+      }
     });
   },
   getNotifications: function (cb?: (notifications: string[]) => void): Unsubscribe {

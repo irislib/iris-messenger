@@ -99,18 +99,10 @@ class PublicMessage extends Message {
         // for faster painting, return synchronously if we have the message
         return processNostrMessage(Events.cache.get(nostrId));
       } else {
-        fetch(`https://api.iris.to/event/${nostrId}`).then((res) => {
-          if (res.status === 200) {
-            res.json().then((event) => {
-              Events.handle(event);
-            });
-          }
+        return Events.getEventById(nostrId, true).then((event) => {
+          return processNostrMessage(event);
         });
       }
-
-      return Events.getEventById(nostrId).then((event) => {
-        return processNostrMessage(event);
-      });
     }
   }
 
@@ -148,7 +140,6 @@ class PublicMessage extends Message {
     const myPub = Key.getPubKey();
 
     const handleMessage = (r) => {
-      this.props.standalone && console.log('got message', r);
       if (this.unmounted) {
         return;
       }

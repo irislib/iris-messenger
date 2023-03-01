@@ -5,9 +5,9 @@ import styled from 'styled-components';
 import Component from '../BaseComponent';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
+import { Unsubscribe } from '../nostr/Subscriptions';
 
 import SafeImg from './SafeImg';
-import { Unsubscribe } from '../nostr/Subscriptions';
 
 type Props = {
   str: unknown;

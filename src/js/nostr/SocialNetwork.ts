@@ -246,6 +246,7 @@ export default {
     this.followersByUser.has(address) && callback();
     return Subscriptions.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
   },
+  // TODO param "proxyFirst" to skip relays if http proxy responds quickly
   getProfile(
     address,
     cb?: (profile: any, address: string) => void,
