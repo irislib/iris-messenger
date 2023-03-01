@@ -531,12 +531,17 @@ class PublicMessage extends Message {
   toggleLikes(e) {
     console.log('toggle likes');
     e.stopPropagation();
-    this.setState({ showLikes: !this.state.showLikes, showBoosts: false });
+    this.setState({ showLikes: !this.state.showLikes, showZaps: false, showBoosts: false });
   }
 
   toggleBoosts(e) {
     e.stopPropagation();
-    this.setState({ showBoosts: !this.state.showBoosts, showLikes: false });
+    this.setState({ showBoosts: !this.state.showBoosts, showZaps: false, showLikes: false });
+  }
+
+  toggleZaps(e) {
+    e.stopPropagation();
+    this.setState({ showZaps: !this.state.showZaps, showBoosts: false, showLikes: false });
   }
 
   render() {
@@ -821,7 +826,12 @@ class PublicMessage extends Message {
                           >
                             ${lightningIcon}
                           </a>
-                          <span class="count"> ${s.zaps || ''} </span>
+                          <span
+                            class="count ${s.showZaps ? 'active' : ''}"
+                            onClick=${(e) => this.toggleZaps(e)}
+                          >
+                            ${s.zaps || ''}
+                          </span>
                         `
                       : ''}
                   </div>
@@ -830,6 +840,25 @@ class PublicMessage extends Message {
               ? html`
                   <div class="likes">
                     ${Array.from(this.likedBy).map((key) => {
+                      const npub = Key.toNostrBech32Address(key, 'npub');
+                      return html`<${Identicon}
+                        showTooltip=${true}
+                        onClick=${() => route(`/${npub}`)}
+                        str=${npub}
+                        width="32"
+                      />`;
+                    })}
+                  </div>
+                `
+              : ''}
+            ${s.showZaps
+              ? html`
+                  <div class="likes">
+                    ${Array.from(this.zaps.eventIds).map((eventId) => {
+                      const key = Events.cache.get(eventId)?.pubkey;
+                      if (!key) {
+                        return;
+                      }
                       const npub = Key.toNostrBech32Address(key, 'npub');
                       return html`<${Identicon}
                         showTooltip=${true}

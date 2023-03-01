@@ -174,6 +174,9 @@ const Subscriptions = {
         callback: cb,
       });
 
+    // TODO: this gets insane high, need unsubscribe
+    // console.log('this.subscriptions.size', this.subscriptions.size);
+
     let hasNewAuthors = false;
     let hasNewIds = false;
     let hasNewReplyAndLikeSubs = false;
