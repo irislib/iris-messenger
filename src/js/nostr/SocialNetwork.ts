@@ -19,6 +19,7 @@ export default {
     'npub1hu3hdctm5nkzd8gslnyedfr5ddz3z547jqcl5j88g4fame2jd08qh6h8nh', // carla
   ],
   followDistanceByUser: new Map<string, number>(),
+  usersByFollowDistance: new Map<number, Set<string>>(),
   profileEventByUser: new Map<string, Event>(),
   followEventByUser: new Map<string, Event>(),
   profiles: new Map<string, any>(),
@@ -67,6 +68,13 @@ export default {
     }
   },
 
+  addUserByFollowDistance(distance: number, user: string) {
+    if (!this.usersByFollowDistance.has(distance)) {
+      this.usersByFollowDistance.set(distance, new Set());
+    }
+    this.usersByFollowDistance.get(distance).add(user);
+  },
+
   addFollower: function (followedUser: string, follower: string) {
     if (!this.followersByUser.has(followedUser)) {
       this.followersByUser.set(followedUser, new Set<string>());
@@ -78,17 +86,24 @@ export default {
     }
     const myPub = Key.getPubKey();
 
+    let newFollowDistance;
     if (follower === myPub) {
       // basically same as the next "else" block, but faster
-      this.followDistanceByUser.set(followedUser, 1);
+      if (followedUser === myPub) {
+        newFollowDistance = 0; // self-follow
+      } else {
+        newFollowDistance = 1;
+      }
+      this.followDistanceByUser.set(followedUser, newFollowDistance);
     } else {
       const existingFollowDistance = this.followDistanceByUser.get(followedUser);
       const followerDistance = this.followDistanceByUser.get(follower);
-      const newFollowDistance = followerDistance && followerDistance + 1;
+      newFollowDistance = followerDistance && followerDistance + 1;
       if (!existingFollowDistance || newFollowDistance < existingFollowDistance) {
         this.followDistanceByUser.set(followedUser, newFollowDistance);
       }
     }
+    this.addUserByFollowDistance(newFollowDistance, followedUser);
 
     // if new follow, move all their posts to followedByUser
     if (follower === myPub && !this.followedByUser.get(myPub).has(followedUser)) {

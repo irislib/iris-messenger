@@ -47,6 +47,7 @@ const Session = {
   onLoggedIn() {
     const myPub = Key.getPubKey();
     SocialNetwork.followDistanceByUser.set(myPub, 0);
+    SocialNetwork.usersByFollowDistance.set(0, new Set([myPub]));
     const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
       const filter = filters[0];
       const key = filter['#d']?.[0];

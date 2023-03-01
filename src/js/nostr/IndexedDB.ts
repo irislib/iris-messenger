@@ -35,32 +35,32 @@ export default {
   },
   loadIDBEvents() {
     const myPub = Key.getPubKey();
-    db.events.where({ pubkey: myPub }).each((event) => {
-      Events.handle(event, false, false);
-    });
-    // TODO load by follow distance
-    const follows: string[] = Array.from(SocialNetwork.followedByUser.get(myPub) || []);
+    let follows: string[];
     db.events
-      .where('pubkey')
-      .anyOf(follows)
+      .where({ pubkey: myPub })
       .each((event) => {
         Events.handle(event, false, false);
+      })
+      .then(() => {
+        follows = Array.from(SocialNetwork.followedByUser.get(myPub) || []);
+        return db.events
+          .where('pubkey')
+          .anyOf(follows)
+          .each((event) => {
+            Events.handle(event, false, false);
+          });
+      })
+      .then(() => {
+        // other follow events
+        return db.events
+          .where('pubkey')
+          .noneOf([myPub, ...follows])
+          .and((event) => event.kind === 3)
+          .each((event) => {
+            Events.handle(event, false, false);
+          });
       });
-    // other follow events
-    db.events
-      .where('pubkey')
-      .noneOf([myPub, ...follows])
-      .and((event) => event.kind === 3)
-      .each((event) => {
-        Events.handle(event, false, false);
-      });
-    // other events
-    db.events
-      .where('pubkey')
-      .noneOf([myPub, ...follows])
-      .and((event) => event.kind !== 3)
-      .each((event) => {
-        Events.handle(event, false, false);
-      });
+
+    // other events to be loaded on demand
   },
 };
