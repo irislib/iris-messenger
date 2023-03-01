@@ -132,7 +132,7 @@ export default {
     }
     if (this.followedByUser.get(myPub)?.has(follower)) {
       if (!Subscriptions.subscribedUsers.has(followedUser)) {
-        Subscriptions.subscribedUsers.add(followedUser); // subscribe to events from 2nd degree follows
+        Subscriptions.subscribeToNewAuthors.add(followedUser);
         Subscriptions.subscribeToAuthors();
       }
     }

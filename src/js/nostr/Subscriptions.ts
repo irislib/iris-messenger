@@ -97,19 +97,25 @@ const Subscriptions = {
       true,
     );
   }, 500),
-  // TODO we shouldn't bang the history queries all the time. only ask a users history once per relay.
-  // then we can increase the limit
+  subscribeToNewAuthors: new Set<string>(),
   subscribeToAuthors: debounce(() => {
     const now = Math.floor(Date.now() / 1000);
     const myPub = Key.getPubKey();
     const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) ?? []);
     followedUsers.push(myPub);
-    console.log('subscribe to', followedUsers.length, 'followedUsers');
+    console.log('subscribe to profiles and contacts of', Subscriptions.subscribeToNewAuthors.size, 'new authors');
     Subscriptions.sendSubToRelays(
-      [{ kinds: [0, 3], until: now, authors: followedUsers }],
+      [
+        {
+          kinds: [0, 3],
+          until: now,
+          authors: Array.from(Subscriptions.subscribeToNewAuthors.values()),
+        },
+      ],
       'followed',
       true,
     );
+    Subscriptions.subscribeToNewAuthors.clear();
     if (Subscriptions.subscribedProfiles.size) {
       Subscriptions.sendSubToRelays(
         [{ authors: Array.from(Subscriptions.subscribedProfiles.values()), kinds: [0] }],
@@ -119,12 +125,12 @@ const Subscriptions = {
     }
     setTimeout(() => {
       Subscriptions.sendSubToRelays(
-        [{ authors: followedUsers, limit: 500, until: now }],
+        [{ authors: followedUsers, limit: 100, until: now }],
         'followedHistory',
         true,
       );
     }, 1000);
-  }, 1000),
+  }, 3000),
   subscribeToPosts: throttle(
     () => {
       if (Subscriptions.subscribedPosts.size === 0) return;
@@ -195,7 +201,7 @@ const Subscriptions = {
     // TODO: some queries are still not unsubscribed
     // console.log('subscribed', this.subscriptions.size, JSON.stringify(filters));
 
-    let hasNewAuthors = false;
+    const newAuthors = new Set<string>();
     let hasNewIds = false;
     let hasNewReplyAndLikeSubs = false;
     let hasNewKeywords = false;
@@ -209,7 +215,7 @@ const Subscriptions = {
             continue;
           }
           if (!this.subscribedUsers.has(author)) {
-            hasNewAuthors = true;
+            newAuthors.add(author);
             this.subscribedUsers.add(author);
           }
         }
@@ -246,7 +252,10 @@ const Subscriptions = {
       }
     }
     hasNewReplyAndLikeSubs && this.subscribeToRepliesAndReactions(this);
-    hasNewAuthors && this.subscribeToAuthors(this); // TODO subscribe to old stuff from new authors, don't resubscribe to all
+    if (newAuthors.size) {
+      this.subscribeToNewAuthors.add(newAuthors);
+      this.subscribeToAuthors(this);
+    }
     hasNewIds && this.subscribeToPosts(this);
     hasNewKeywords && this.subscribeToKeywords(this);
     return () => {
