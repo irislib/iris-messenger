@@ -15,7 +15,7 @@ const SETTINGS = {
   network: 'network',
   backup: 'backup',
   language: 'language',
-  blocked_users: 'blocked_users',
+  social_network: 'social_network',
 };
 
 export default class SettingsMenu extends Component {

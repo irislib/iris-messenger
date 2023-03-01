@@ -2,7 +2,7 @@ import Component from '../../BaseComponent';
 import localState from '../../LocalState';
 import { translate as t } from '../../translations/Translation';
 
-export default class MediaSettings extends Component {
+export default class Media extends Component {
   constructor() {
     super();
     this.id = 'settings';

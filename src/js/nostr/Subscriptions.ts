@@ -103,7 +103,11 @@ const Subscriptions = {
     const myPub = Key.getPubKey();
     const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) ?? []);
     followedUsers.push(myPub);
-    console.log('subscribe to profiles and contacts of', Subscriptions.subscribeToNewAuthors.size, 'new authors');
+    console.log(
+      'subscribe to profiles and contacts of',
+      Subscriptions.subscribeToNewAuthors.size,
+      'new authors',
+    );
     Subscriptions.sendSubToRelays(
       [
         {

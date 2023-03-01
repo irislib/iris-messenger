@@ -1,25 +1,25 @@
 import Component from '../../BaseComponent';
 
-import AccountSettings from './AccountSettings';
-import AppearanceSettings from './AppearanceSettings';
-import BackupSettings from './BackupSettings';
-import BlockedSettings from './BlockedSettings';
-import IrisAccountSettings from './IrisAccountSettings';
-import LanguageSettings from './LanguageSettings';
-import MediaSettings from './MediaSettings';
-import NetworkSettings from './NetworkSettings';
+import Account from './Account';
+import Appearance from './Appearance';
+import Backup from './Backup';
+import IrisAccount from './IrisAccount';
+import Language from './Language';
+import Media from './Media';
+import Network from './Network';
+import SocialNetwork from './SocialNetwork';
 
 export default class SettingsContent extends Component {
   content = '';
   pages = {
-    account: AccountSettings,
-    network: NetworkSettings,
-    appearance: AppearanceSettings,
-    language: LanguageSettings,
-    media: MediaSettings,
-    backup: BackupSettings,
-    blocked_users: BlockedSettings,
-    iris_account: IrisAccountSettings,
+    account: Account,
+    network: Network,
+    appearance: Appearance,
+    language: Language,
+    media: Media,
+    backup: Backup,
+    social_network: SocialNetwork,
+    iris_account: IrisAccount,
   };
 
   constructor() {

@@ -2,7 +2,7 @@ import Component from '../../BaseComponent';
 import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation';
 
-export default class AppearanceSettings extends Component {
+export default class Appearance extends Component {
   state = {
     colorScheme: 'dark',
   };

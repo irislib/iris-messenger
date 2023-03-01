@@ -10,7 +10,7 @@ import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 
-export default class BackupSettings extends Component {
+export default class Backup extends Component {
   profileExportJson() {
     const myPub = Key.getPubKey();
     let rawDataJson = [];

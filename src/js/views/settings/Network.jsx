@@ -5,7 +5,7 @@ import localState from '../../LocalState';
 import Relays from '../../nostr/Relays';
 import { translate as t } from '../../translations/Translation';
 
-const NetworkSettings = () => {
+const Network = () => {
   const [relays, setRelays] = useState(Array.from(Relays.relays.values()));
   const [newRelayUrl, setNewRelayUrl] = useState(''); // added state to store the new relay URL
 
@@ -103,4 +103,4 @@ const NetworkSettings = () => {
   );
 };
 
-export default NetworkSettings;
+export default Network;

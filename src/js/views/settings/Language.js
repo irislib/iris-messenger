@@ -8,7 +8,7 @@ import {
   translate as t,
 } from '../../translations/Translation';
 
-const LanguageSettings = () => {
+const Language = () => {
   return (
     <>
       <div class="centered-container">
@@ -59,4 +59,4 @@ function onLanguageChange(e) {
     location.reload();
   }
 }
-export default LanguageSettings;
+export default Language;

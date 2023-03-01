@@ -8,7 +8,7 @@ import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import localState from "../../LocalState";
 
-export default class IrisAccountSettings extends Component {
+export default class IrisAccount extends Component {
   state = {
     irisToActive: false,
     existing: null,

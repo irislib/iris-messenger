@@ -73,6 +73,12 @@ export default {
       this.usersByFollowDistance.set(distance, new Set());
     }
     this.usersByFollowDistance.get(distance).add(user);
+    // remove from higher distances
+    for (const d of this.usersByFollowDistance.keys()) {
+      if (d > distance) {
+        this.usersByFollowDistance.get(d).delete(user);
+      }
+    }
   },
 
   addFollower: function (followedUser: string, follower: string) {
@@ -93,6 +99,7 @@ export default {
         newFollowDistance = 0; // self-follow
       } else {
         newFollowDistance = 1;
+        this.addUserByFollowDistance(newFollowDistance, followedUser);
       }
       this.followDistanceByUser.set(followedUser, newFollowDistance);
     } else {
@@ -101,9 +108,9 @@ export default {
       newFollowDistance = followerDistance && followerDistance + 1;
       if (!existingFollowDistance || newFollowDistance < existingFollowDistance) {
         this.followDistanceByUser.set(followedUser, newFollowDistance);
+        this.addUserByFollowDistance(newFollowDistance, followedUser);
       }
     }
-    this.addUserByFollowDistance(newFollowDistance, followedUser);
 
     // if new follow, move all their posts to followedByUser
     if (follower === myPub && !this.followedByUser.get(myPub).has(followedUser)) {

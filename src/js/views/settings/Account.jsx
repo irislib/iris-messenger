@@ -11,7 +11,7 @@ import { translate as t } from '../../translations/Translation';
 import { ExistingAccountLogin } from '../Login';
 const bech32 = require('bech32-buffer');
 
-export default class AccountSettings extends Component {
+export default class Account extends Component {
   onLogoutClick(hasPriv) {
     if (hasPriv) {
       route('/logout'); // confirmation screen
