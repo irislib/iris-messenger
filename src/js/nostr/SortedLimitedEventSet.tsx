@@ -70,4 +70,8 @@ export default class SortedLimitedEventSet {
   get eventIds(): string[] {
     return this.events.map((event) => event.id);
   }
+
+  values(): string[] {
+    return this.events.map((event) => event.id);
+  }
 }

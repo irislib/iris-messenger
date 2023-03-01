@@ -588,7 +588,7 @@ const Events = {
         this.notifications.add(event);
         this.updateUnseenNotificationCount();
       } else {
-        console.log('not notifying because muted');
+        // console.log('not notifying because muted');
       }
     }
   },

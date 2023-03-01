@@ -228,11 +228,29 @@ class PublicMessage extends Message {
                 }
                 return eventA?.created_at - eventB?.created_at;
               });
+            const zappers =
+              zaps &&
+              Array.from(zaps.values()).map((eventId) => {
+                const description = Events.cache
+                  .get(eventId)
+                  ?.tags.find((t) => t[0] === 'description')?.[1];
+                if (!description) {
+                  return;
+                }
+                let obj;
+                try {
+                  obj = JSON.parse(description);
+                } catch (e) {
+                  return;
+                }
+                const npub = Key.toNostrBech32Address(obj.pubkey, 'npub');
+                return npub;
+              });
             this.setState({
               boosts: this.boostedBy.size,
               boosted: this.boostedBy.has(myPub),
               likes: this.likedBy.size,
-              zaps,
+              zappers,
               liked: this.likedBy.has(myPub),
               replyCount: threadReplyCount,
               sortedReplies,
@@ -842,7 +860,7 @@ class PublicMessage extends Message {
                             class="count ${s.showZaps ? 'active' : ''}"
                             onClick=${(e) => this.toggleZaps(e)}
                           >
-                            ${s.zaps?.size || ''}
+                            ${s.zappers?.length || ''}
                           </span>
                         `
                       : ''}
@@ -866,14 +884,7 @@ class PublicMessage extends Message {
             ${s.showZaps
               ? html`
                   <div class="likes">
-                    ${(s.zaps?.eventIds || []).map((eventId) => {
-                      const event = Events.cache.get(eventId);
-                      if (!event) {
-                        return;
-                      }
-                      const key = event.pubkey;
-                      console.log('zap', event);
-                      const npub = Key.toNostrBech32Address(key, 'npub');
+                    ${(s.zappers || []).map((npub) => {
                       return html`<${Identicon}
                         showTooltip=${true}
                         onClick=${() => route(`/${npub}`)}
