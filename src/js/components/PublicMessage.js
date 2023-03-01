@@ -7,6 +7,7 @@ import { route } from 'preact-router';
 import AnimalName from '../AnimalName';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
+import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
@@ -131,6 +132,14 @@ class PublicMessage extends Message {
 
   componentDidMount() {
     this.unmounted = false;
+    const hexId = Key.toNostrHexAddress(this.props.hash);
+    this.hexId = hexId;
+    localState.get('mutedNotes').on(
+      this.sub((mutedNotes) => {
+        const muted = mutedNotes && mutedNotes[hexId];
+        this.setState({ muted });
+      }),
+    );
 
     const p = this.fetchByHash();
     if (!p) {
@@ -142,11 +151,10 @@ class PublicMessage extends Message {
       if (this.unmounted) {
         return;
       }
-      const nostrId = Key.toNostrHexAddress(this.props.hash);
 
       const msg = r.signedData;
       msg.info = {
-        from: nostrId ? Key.toNostrBech32Address(r.signerKeyHash, 'npub') : r.signerKeyHash,
+        from: hexId ? Key.toNostrBech32Address(r.signerKeyHash, 'npub') : r.signerKeyHash,
         isMine: myPub === r.signerKeyHash,
       };
       if (this.props.filter) {
@@ -190,12 +198,12 @@ class PublicMessage extends Message {
 
       this.setState({ msg });
 
-      if (nostrId) {
+      if (hexId) {
         const unsub = Events.getRepliesAndReactions(
-          nostrId,
+          hexId,
           (replies, likedBy, threadReplyCount, boostedBy, zaps) => {
             // zaps.size &&
-            //  console.log('zaps.size', zaps.size, Key.toNostrBech32Address(nostrId, 'note'));
+            //  console.log('zaps.size', zaps.size, Key.toNostrBech32Address(hexId, 'note'));
             this.likedBy = likedBy;
             this.boostedBy = boostedBy;
             const sortedReplies =
@@ -256,12 +264,12 @@ class PublicMessage extends Message {
   boostBtnClicked() {
     if (!this.state.boosted) {
       const author = this.state.msg?.event?.pubkey;
-      const nostrId = Key.toNostrHexAddress(this.props.hash);
-      if (nostrId) {
+      const hexId = Key.toNostrHexAddress(this.props.hash);
+      if (hexId) {
         Events.publish({
           kind: 6,
           tags: [
-            ['e', nostrId, '', 'mention'],
+            ['e', hexId, '', 'mention'],
             ['p', author],
           ],
           content: '',
@@ -274,13 +282,13 @@ class PublicMessage extends Message {
     if (liked) {
       const author = this.state.msg?.event?.pubkey;
 
-      const nostrId = Key.toNostrHexAddress(this.props.hash);
-      if (nostrId) {
+      const hexId = Key.toNostrHexAddress(this.props.hash);
+      if (hexId) {
         Events.publish({
           kind: 7,
           content: '+',
           tags: [
-            ['e', nostrId],
+            ['e', hexId],
             ['p', author],
           ],
         });
@@ -291,12 +299,12 @@ class PublicMessage extends Message {
   onDelete(e) {
     e.preventDefault();
     if (confirm('Delete message?')) {
-      const nostrId = Key.toNostrHexAddress(this.props.hash);
-      if (nostrId) {
+      const hexId = Key.toNostrHexAddress(this.props.hash);
+      if (hexId) {
         Events.publish({
           kind: 5,
           content: 'deleted',
-          tags: [['e', nostrId]],
+          tags: [['e', hexId]],
         });
         this.setState({ msg: null });
       }
@@ -306,12 +314,12 @@ class PublicMessage extends Message {
   onBroadcast(e) {
     // republish message on nostr
     e.preventDefault();
-    const nostrId = Key.toNostrHexAddress(this.props.hash);
-    if (nostrId) {
-      const event = Events.cache.get(nostrId);
+    const hexId = Key.toNostrHexAddress(this.props.hash);
+    if (hexId) {
+      const event = Events.cache.get(hexId);
       if (event) {
         // TODO indicate to user somehow
-        console.log('broadcasting', nostrId);
+        console.log('broadcasting', hexId);
         Events.publish(event);
       }
     }
@@ -366,6 +374,11 @@ class PublicMessage extends Message {
         </div>
       </div>
     `;
+  }
+
+  onMute(e) {
+    e.preventDefault();
+    localState.get('mutedNotes').get(this.hexId).put(!this.state.muted);
   }
 
   renderLike() {
@@ -435,13 +448,13 @@ class PublicMessage extends Message {
   report(e) {
     e.preventDefault();
     if (confirm('Publicly report and hide message?')) {
-      const nostrId = Key.toNostrHexAddress(this.props.hash);
-      if (nostrId) {
+      const hexId = Key.toNostrHexAddress(this.props.hash);
+      if (hexId) {
         Events.publish({
           kind: 5,
           content: 'reported',
           tags: [
-            ['e', nostrId],
+            ['e', hexId],
             ['p', this.state.msg?.event?.pubkey],
           ],
         });
@@ -477,6 +490,9 @@ class PublicMessage extends Message {
             title="Note ID"
             copyStr=${Key.toNostrBech32Address(this.props.hash, 'note')}
           />
+          <a href="#" onClick=${(e) => this.onMute(e)}>
+            ${this.state.muted ? t('unmute') : t('mute')}
+          </a>
           ${this.state.msg
             ? html`
                 <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>

@@ -22,6 +22,11 @@ const MAX_ZAPS_BY_NOTE = 1000;
 
 const cache = new Map<string, Event>();
 
+let mutedNotes;
+localState.get('mutedNotes').on((v) => {
+  mutedNotes = v;
+});
+
 // TODO separate files for different types of events
 const Events = {
   MAX_MSGS_BY_KEYWORD,
@@ -549,6 +554,23 @@ const Events = {
 
     return true;
   },
+  isMuted(event: Event) {
+    let muted = false;
+    if (mutedNotes) {
+      muted = mutedNotes[event.id];
+      if (!muted) {
+        for (const tag of event.tags) {
+          if (tag[0] === 'e' && mutedNotes[tag[1]]) {
+            muted = mutedNotes[tag[1]];
+            if (muted) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return muted;
+  },
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
     const myPub = Key.getPubKey();
@@ -561,9 +583,13 @@ const Events = {
           return;
         }
       }
-      this.cache.set(event.id, event);
-      this.notifications.add(event);
-      this.updateUnseenNotificationCount();
+      if (!this.isMuted(event)) {
+        this.cache.set(event.id, event);
+        this.notifications.add(event);
+        this.updateUnseenNotificationCount();
+      } else {
+        console.log('not notifying because muted');
+      }
     }
   },
   updateUnseenNotificationCount: debounce(() => {

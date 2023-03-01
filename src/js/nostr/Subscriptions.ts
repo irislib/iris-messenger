@@ -134,7 +134,7 @@ const Subscriptions = {
         true,
       );
     }, 1000);
-  }, 3000),
+  }, 2000),
   subscribeToPosts: throttle(
     () => {
       if (Subscriptions.subscribedPosts.size === 0) return;
