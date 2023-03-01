@@ -35,8 +35,22 @@ function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = userAgent.indexOf(' electron/') > -1;
 
+declare global {
+  interface Navigator {
+    standalone: any;
+  }
+}
+
 export default {
   wtClient: undefined as any,
+
+  isStandalone() {
+    return (
+      navigator.standalone ||
+      window.matchMedia('(display-mode: standalone)').matches ||
+      document.referrer.includes('android-app://iris.to')
+    );
+  },
 
   capitalize(s?: string): string {
     if (s === undefined) {

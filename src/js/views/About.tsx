@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import { translate as t } from '../translations/Translation';
+import Helpers from "../Helpers";
 
 const DEVELOPER = 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk';
 const IRIS_INFO_ACCOUNT = 'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8';
@@ -31,21 +32,27 @@ class About extends Component {
               </li>
             </ul>
 
-            <h3>Versions</h3>
-            <p>
-              <ul>
-                <li>
-                  <a href="https://iris.to">iris.to</a> (web)
-                </li>
-                <li>
-                  <a href="https://testflight.apple.com/join/5xdoDCmG">iOS Testflight</a>
-                </li>
-                <li>
-                  <a href="https://play.google.com/store/apps/details?id=to.iris.twa">Android</a> (
-                  <a href="https://github.com/irislib/iris-messenger/releases">apk</a>)
-                </li>
-              </ul>
-            </p>
+            {!Helpers.isStandalone() && (
+              <>
+                <h3>Versions</h3>
+                <p>
+                  <ul>
+                    <li>
+                      <a href="https://iris.to">iris.to</a> (web)
+                    </li>
+                    <li>
+                      <a href="https://testflight.apple.com/join/5xdoDCmG">iOS Testflight</a>
+                    </li>
+                    <li>
+                      <a href="https://play.google.com/store/apps/details?id=to.iris.twa">
+                        Android
+                      </a>{' '}
+                      (<a href="https://github.com/irislib/iris-messenger/releases">apk</a>)
+                    </li>
+                  </ul>
+                </p>
+              </>
+            )}
 
             <h3>FAQ</h3>
             <p>
