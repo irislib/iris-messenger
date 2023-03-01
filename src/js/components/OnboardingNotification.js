@@ -86,8 +86,6 @@ export default class OnboardingNotification extends Component {
               }}
               >Yes please<//
             >
-          </p>
-          <p>
             <${Button}
               onClick=${() => IrisTo.declineReserved(this.state.existingIrisToAddress.name)}
               >No thanks<//

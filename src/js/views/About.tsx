@@ -3,8 +3,8 @@ import FollowButton from '../components/FollowButton';
 import Header from '../components/Header';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
+import Helpers from '../Helpers';
 import { translate as t } from '../translations/Translation';
-import Helpers from "../Helpers";
 
 const DEVELOPER = 'npub1g53mukxnjkcmr94fhryzkqutdz2ukq4ks0gvy5af25rgmwsl4ngq43drvk';
 const IRIS_INFO_ACCOUNT = 'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8';
