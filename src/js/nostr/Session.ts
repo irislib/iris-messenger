@@ -1,6 +1,7 @@
 import localForage from 'localforage';
 import { route } from 'preact-router';
 
+import IrisTo from '../IrisTo';
 import { Event, Filter, Path } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
@@ -102,7 +103,16 @@ const Session = {
     Relays.manage();
     LocalForage.loadEvents();
     IndexedDB.loadIDBEvents();
-    SocialNetwork.getProfile(myPub, undefined);
+    const timeout = setTimeout(() => {
+      IrisTo.checkExistingAccount(myPub);
+    }, 1000);
+    SocialNetwork.getProfile(myPub, async (p) => {
+      console.log('check', p);
+      if (p.nip05 && p.nip05.endsWith('@iris.to')) {
+        localState.get('showNoIrisToAddress').put(false);
+        clearTimeout(timeout);
+      }
+    });
     // TODO move these to onLoggedIn & init methods of the respective modules
     for (const suggestion of SocialNetwork.SUGGESTED_FOLLOWS) {
       const hex = Key.toNostrHexAddress(suggestion);

@@ -1,7 +1,9 @@
 import { html } from 'htm/preact';
+import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
+import IrisTo from '../IrisTo';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
@@ -18,57 +20,110 @@ export default class OnboardingNotification extends Component {
     localState.get('noFollowers').on(this.inject());
     localState.get('hasNostrFollowers').on(this.inject());
     localState.get('showFollowSuggestions').on(this.inject());
+    localState.get('showNoIrisToAddress').on(this.inject());
+    localState.get('existingIrisToAddress').on(this.inject());
   }
 
-  render() {
-    if (this.state.showFollowSuggestions) {
-      return html`
-        <div class="msg">
-          <div class="msg-content">
-            <div style="display:flex;flex-direction:column;flex:1">
-              <p>${t('follow_someone_info')}</p>
-              ${SocialNetwork.SUGGESTED_FOLLOWS.map(
-                (pub) => html`
-                  <div class="profile-link-container">
-                    <a href="/${pub}" className="profile-link">
-                      <${Identicon} str=${pub} width="40" />
-                      <${Name} pub=${pub} placeholder="Suggested follow" />
-                    </a>
-                    <${FollowButton} id=${pub} />
-                  </div>
-                `,
-              )}
-              <p>
-                <${Button} onClick=${() => localState.get('showFollowSuggestions').put(false)}>
-                  ${t('done')}
-                </Button>
-              </p>
-              <p>
-                ${t('alternatively')}<i> </i>
-                <a
-                  href="/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}"
-                  >${t('give_your_profile_link_to_someone')}</a
-                >.
-              </p>
+  renderFollowSuggestions() {
+    return html`
+      <div style="display:flex;flex-direction:column;flex:1">
+        <p>${t('follow_someone_info')}</p>
+        ${SocialNetwork.SUGGESTED_FOLLOWS.map(
+          (pub) => html`
+            <div class="profile-link-container">
+              <a href="/${pub}" className="profile-link">
+                <${Identicon} str=${pub} width="40" />
+                <${Name} pub=${pub} placeholder="Suggested follow" />
+              </a>
+              <${FollowButton} id=${pub} />
             </div>
-          </div>
+          `,
+        )}
+        <p>
+          <${Button} onClick=${() => localState.get('showFollowSuggestions').put(false)}>
+            ${t('done')}
+          </Button>
+        </p>
+        <p>
+          ${t('alternatively')}<i> </i>
+          <a
+            href="/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}"
+            >${t('give_your_profile_link_to_someone')}</a
+          >.
+        </p>
+      </div>
+    `;
+  }
+
+  renderNoFollowers() {
+    const rpub = Key.getPubKey();
+    const npub = rpub && Key.toNostrBech32Address(Key.getPubKey(), 'npub');
+    return html`
+      <div style="display:flex;flex-direction:column;flex:1">
+        <p>${t('no_followers_yet')}</p>
+        <p>
+          <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(npub)} />
+        </p>
+        <small>${t('no_followers_yet_info')}</small>
+      </div>
+    `;
+  }
+
+  renderGetIrisAddress() {
+    if (this.state.existingIrisToAddress) {
+      console.log('existingIrisToAddress', this.state.existingIrisToAddress);
+      return html`
+        <div>
+          <p className="positive">
+            Username iris.to/<b>${this.state.existingIrisToAddress.name}</b> is reserved for you
+            until 5 March 2023!
+          </p>
+          <p>
+            <${Button}
+              onClick=${() => {
+                IrisTo.enableReserved(this.state.existingIrisToAddress.name);
+                route('/settings/iris_account');
+              }}
+              >Yes please<//
+            >
+          </p>
+          <p>
+            <${Button}
+              onClick=${() => IrisTo.declineReserved(this.state.existingIrisToAddress.name)}
+              >No thanks<//
+            >
+          </p>
+        </div>
+      `;
+    } else {
+      return html`
+        <div>
+          <p>Get your own iris.to/username?</p>
+          <p>
+            <${Button} onClick=${() => route('/settings/iris_account')}>Yes please<//>
+            <${Button} onClick=${() => localState.get('showNoIrisToAddress').put(false)}
+              >No thanks<//
+            >
+          </p>
         </div>
       `;
     }
-    if (this.state.noFollowers && !this.state.hasNostrFollowers) {
-      const rpub = Key.getPubKey();
-      const npub = rpub && Key.toNostrBech32Address(Key.getPubKey(), 'npub');
+  }
+
+  render() {
+    let content = '';
+    if (this.state.showFollowSuggestions) {
+      content = this.renderFollowSuggestions();
+    } else if (this.state.noFollowers && !this.state.hasNostrFollowers) {
+      content = this.renderNoFollowers();
+    } else if (this.state.showNoIrisToAddress) {
+      content = this.renderGetIrisAddress();
+    }
+
+    if (content) {
       return html`
         <div class="msg">
-          <div class="msg-content">
-            <div style="display:flex;flex-direction:column;flex:1">
-              <p>${t('no_followers_yet')}</p>
-              <p>
-                <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(npub)} />
-              </p>
-              <small>${t('no_followers_yet_info')}</small>
-            </div>
-          </div>
+          <div class="msg-content">${content}</div>
         </div>
       `;
     }

@@ -343,9 +343,6 @@ export default class IrisAccountSettings extends Component {
   }
 
   async checkExistingAccount(pub) {
-    // make a get request to https://api.iris.to/user/username_confirmable?name=${name}&public_key=${pub}
-    // if the response is 200, then the account is available
-
     const res = await fetch(`https://api.iris.to/user/find?public_key=${pub}`);
     if (res.status === 200) {
       const json = await res.json();
