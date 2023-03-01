@@ -57,6 +57,7 @@ class Profile extends View {
     this.followedUsers = new Set();
     this.followers = new Set();
     this.id = 'profile';
+    this.subscriptions = [];
   }
 
   getNotification() {
@@ -389,9 +390,9 @@ class Profile extends View {
           followerCount: SocialNetwork.followersByUser.get(address)?.size ?? 0,
         });
     };
-    SocialNetwork.getFollowersByUser(address, setFollowCounts);
-    SocialNetwork.getFollowedByUser(address, setFollowCounts);
-    SocialNetwork.getProfile(
+    this.subscriptions.push(SocialNetwork.getFollowersByUser(address, setFollowCounts));
+    this.subscriptions.push(SocialNetwork.getFollowedByUser(address, setFollowCounts));
+    const unsub = SocialNetwork.getProfile(
       address,
       (profile) => {
         if (!profile) {
@@ -458,6 +459,7 @@ class Profile extends View {
       },
       true,
     );
+    this.subscriptions.push(unsub);
   }
 
   loadProfile(hexPub, nostrAddress) {
@@ -467,9 +469,11 @@ class Profile extends View {
     this.followers = new Set();
     localState.get('noFollowers').on(this.inject());
     this.getNostrProfile(hexPub, nostrAddress);
-    SocialNetwork.getBlockedUsers((blockedUsers) => {
-      this.setState({ blocked: blockedUsers.has(hexPub) });
-    });
+    this.subscriptions.push(
+      SocialNetwork.getBlockedUsers((blockedUsers) => {
+        this.setState({ blocked: blockedUsers.has(hexPub) });
+      }),
+    );
   }
 
   componentDidUpdate(prevProps, prevState) {

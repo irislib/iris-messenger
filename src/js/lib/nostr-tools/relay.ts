@@ -32,6 +32,7 @@ type SubscriptionOptions = {
   id?: string
 }
 
+// TODO allowAuthor fn so we can skip JSON.parse and sig verify if we won't allow the author anyway
 export function relayInit(url: string, alreadyHaveEvent?: (id: string) => boolean): Relay {
   var ws: WebSocket
   var resolveClose: () => void

@@ -50,6 +50,7 @@ class PublicMessage extends Message {
     this.i = 0;
     this.likedBy = new Set();
     this.state = { sortedReplies: [] };
+    this.subscriptions = [];
   }
 
   static fetchByHash(thisArg, hash) {
@@ -67,7 +68,7 @@ class PublicMessage extends Message {
         if (thisArg.state.retrieving) {
           thisArg.setState({ retrieving: false });
         }
-        SocialNetwork.getProfile(event.pubkey, (profile) => {
+        const unsub = SocialNetwork.getProfile(event.pubkey, (profile) => {
           if (!profile) return;
           if (!thisArg.unmounted) {
             let lightning = profile.lud16 || profile.lud06;
@@ -80,6 +81,7 @@ class PublicMessage extends Message {
             });
           }
         });
+        thisArg.subscriptions.push(unsub);
         const replyingTo = Events.getEventReplyingTo(event);
         return {
           signerKeyHash: event.pubkey,
@@ -118,6 +120,10 @@ class PublicMessage extends Message {
 
   componentWillUnmount() {
     super.componentWillUnmount();
+    this.subscriptions.forEach((unsub) => {
+      console.log('unsub');
+      unsub();
+    });
     this.unmounted = true;
   }
 
@@ -195,11 +201,11 @@ class PublicMessage extends Message {
       this.setState({ msg });
 
       if (nostrId) {
-        Events.getRepliesAndReactions(
+        const unsub = Events.getRepliesAndReactions(
           nostrId,
           (replies, likedBy, threadReplyCount, boostedBy, zaps) => {
-            zaps.size &&
-              console.log('zaps.size', zaps.size, Key.toNostrBech32Address(nostrId, 'note'));
+            // zaps.size &&
+            //  console.log('zaps.size', zaps.size, Key.toNostrBech32Address(nostrId, 'note'));
             this.zaps = zaps;
             this.likedBy = likedBy;
             this.boostedBy = boostedBy;
@@ -236,6 +242,7 @@ class PublicMessage extends Message {
             });
           },
         );
+        this.subscriptions.push(unsub);
       }
     };
 

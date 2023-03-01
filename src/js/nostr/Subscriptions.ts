@@ -196,8 +196,8 @@ const Subscriptions = {
       this.internalSubscriptionsByName.set(name, currentSubscriptionId);
     }
 
-    // TODO: this gets insane high, need unsubscribe
-    // console.log('this.subscriptions.size', this.subscriptions.size);
+    // TODO: some queries are still not unsubscribed
+    // console.log('subscribed', this.subscriptions.size, JSON.stringify(filters));
 
     let hasNewAuthors = false;
     let hasNewIds = false;

@@ -37,8 +37,8 @@ const Name = (props: Props) => {
   const [isNameGenerated, setIsNameGenerated] = useState(isGenerated);
   useEffect(() => {
     if (nostrAddr) {
-      // TODO unsub
-      SocialNetwork.getProfile(nostrAddr, (profile) => {
+      // return Unsubscribe function so it unsubs on unmount
+      return SocialNetwork.getProfile(nostrAddr, (profile) => {
         if (profile) {
           setName(profile.name?.trim().slice(0, 100) || '');
           setDisplayName(profile.display_name?.trim().slice(0, 100) || '');

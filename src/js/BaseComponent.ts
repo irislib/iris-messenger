@@ -13,6 +13,7 @@ export default abstract class BaseComponent<Props = any, State = any> extends Pu
 > {
   unmounted?: boolean;
 
+  // TODO: make this use Subscriptions instead of LocalState eventlisteners? or both?
   eventListeners: Record<string, EventListener | undefined> = {};
 
   sub(callback: CallableFunction, path?: string): Callback {

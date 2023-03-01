@@ -105,7 +105,7 @@ const Events = {
           event.pubkey === myPub ||
           SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)
         ) {
-          Events.getEventById(id);
+          //Events.getEventById(id); // generates lots of subscriptions
         }
         if (!this.threadRepliesByMessageId.has(id)) {
           this.threadRepliesByMessageId.set(id, new Set<string>());
@@ -300,7 +300,10 @@ const Events = {
   handleZap(event) {
     this.cache.set(event.id, event);
     const zappedNote = event.tags.find((tag) => tag[0] === 'e')?.[1];
-    console.log('zap!', Key.toNostrBech32Address(zappedNote, 'note'), event);
+    if (!zappedNote) {
+      return; // TODO you can also zap profiles
+    }
+    // console.log('zap!', Key.toNostrBech32Address(zappedNote, 'note'), event);
     if (!this.zapsByNote.has(zappedNote)) {
       this.zapsByNote.set(zappedNote, new SortedLimitedEventSet(MAX_ZAPS_BY_NOTE));
     }
@@ -640,10 +643,12 @@ const Events = {
     }
 
     return new Promise((resolve) => {
-      Subscriptions.subscribe([{ ids: [id] }], () => {
-        // TODO turn off subscription
+      const unsub = Subscriptions.subscribe([{ ids: [id] }], () => {
         const msg = this.cache.get(id);
-        msg && resolve(msg);
+        if (msg) {
+          resolve(msg);
+          unsub();
+        }
       });
     });
   },

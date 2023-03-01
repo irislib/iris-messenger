@@ -7,6 +7,7 @@ import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 
 import SafeImg from './SafeImg';
+import { Unsubscribe } from '../nostr/Subscriptions';
 
 type Props = {
   str: unknown;
@@ -38,6 +39,7 @@ const IdenticonContainer = styled.div`
 
 class MyIdenticon extends Component<Props, State> {
   activityTimeout?: ReturnType<typeof setTimeout>;
+  unsub: Unsubscribe | undefined;
 
   updateIdenticon() {
     const hash = sha256(this.props.str as string);
@@ -65,7 +67,7 @@ class MyIdenticon extends Component<Props, State> {
 
     const nostrAddr = Key.toNostrHexAddress(pub);
     if (nostrAddr) {
-      SocialNetwork.getProfile(nostrAddr, (profile) => {
+      this.unsub = SocialNetwork.getProfile(nostrAddr, (profile) => {
         profile &&
           this.setState({
             // TODO why profile undefined sometimes?
@@ -83,6 +85,7 @@ class MyIdenticon extends Component<Props, State> {
     if (this.activityTimeout !== undefined) {
       clearTimeout(this.activityTimeout);
     }
+    this.unsub?.();
   }
 
   render() {
