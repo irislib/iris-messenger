@@ -11,7 +11,7 @@ import Relays from './Relays';
 import Session from './Session';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
-import Subscriptions from './Subscriptions';
+import Subscriptions, { Unsubscribe } from './Subscriptions';
 
 const startTime = Date.now() / 1000;
 
@@ -618,7 +618,7 @@ const Events = {
       boostedBy: Set<string>,
       zaps: Set<string>,
     ) => void,
-  ) {
+  ): Unsubscribe {
     const callback = () => {
       cb &&
         cb(
@@ -632,7 +632,7 @@ const Events = {
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }
-    Subscriptions.subscribe([{ kinds: [1, 6, 7, 9735], '#e': [id] }], callback);
+    return Subscriptions.subscribe([{ kinds: [1, 6, 7, 9735], '#e': [id] }], callback);
   },
   async getEventById(id: string) {
     if (this.cache.has(id)) {
@@ -647,18 +647,18 @@ const Events = {
       });
     });
   },
-  getNotifications: function (cb?: (notifications: string[]) => void) {
+  getNotifications: function (cb?: (notifications: string[]) => void): Unsubscribe {
     const callback = () => {
       cb?.(this.notifications.eventIds);
     };
     callback();
-    Subscriptions.subscribe([{ '#p': [Key.getPubKey()] }], callback);
+    return Subscriptions.subscribe([{ '#p': [Key.getPubKey()] }], callback);
   },
 
   getMessagesByEveryone(
     cb: (messageIds: string[], includeReplies: boolean) => void,
     includeReplies = false,
-  ) {
+  ): Unsubscribe {
     const callback = () => {
       cb(
         includeReplies
@@ -668,12 +668,12 @@ const Events = {
       );
     };
     callback();
-    Subscriptions.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+    return Subscriptions.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
   },
   getMessagesByFollows(
     cb: (messageIds: string[], includeReplies: boolean) => void,
     includeReplies = false,
-  ) {
+  ): Unsubscribe {
     const callback = () => {
       cb(
         includeReplies
@@ -683,9 +683,9 @@ const Events = {
       );
     };
     callback();
-    Subscriptions.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+    return Subscriptions.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
   },
-  getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void) {
+  getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void): Unsubscribe {
     const callback = (event) => {
       if (!this.latestNotesByKeywords.has(keyword)) {
         this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
@@ -705,50 +705,50 @@ const Events = {
     }
     this.latestNotesByKeywords.has(keyword) &&
       cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
-    Subscriptions.subscribe([filter], callback);
+    return Subscriptions.subscribe([filter], callback);
   },
-  getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void) {
+  getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
     // TODO subscribe on view profile and unsub on leave profile
     SocialNetwork.knownUsers.add(address);
     const callback = () => {
       cb?.(this.postsAndRepliesByUser.get(address)?.eventIds);
     };
     this.postsAndRepliesByUser.has(address) && callback();
-    Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
+    return Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
-  getPostsByUser(address: string, cb?: (messageIds: string[]) => void) {
+  getPostsByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
     SocialNetwork.knownUsers.add(address);
     const callback = () => {
       cb?.(this.postsByUser.get(address)?.eventIds);
     };
     this.postsByUser.has(address) && callback();
-    Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
+    return Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
-  getLikesByUser(address: string, cb?: (messageIds: string[]) => void) {
+  getLikesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
     SocialNetwork.knownUsers.add(address);
     const callback = () => {
       cb?.(this.likesByUser.get(address)?.eventIds);
     };
     this.likesByUser.has(address) && callback();
-    Subscriptions.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
+    return Subscriptions.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
   },
 
-  getDirectMessages(cb?: (dms: Map<string, SortedLimitedEventSet>) => void) {
+  getDirectMessages(cb?: (dms: Map<string, SortedLimitedEventSet>) => void): Unsubscribe {
     const callback = () => {
       cb?.(this.directMessagesByUser);
     };
     callback();
-    Subscriptions.subscribe([{ kinds: [4] }], callback);
+    return Subscriptions.subscribe([{ kinds: [4] }], callback);
   },
 
-  getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void) {
+  getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
     SocialNetwork.knownUsers.add(address);
     const callback = () => {
       cb?.(this.directMessagesByUser.get(address)?.eventIds);
     };
     this.directMessagesByUser.has(address) && callback();
     const myPub = Key.getPubKey();
-    Subscriptions.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
+    return Subscriptions.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
   },
 };
 

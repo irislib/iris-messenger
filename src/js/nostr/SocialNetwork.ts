@@ -4,7 +4,7 @@ import localState from '../LocalState';
 import Events from './Events';
 import Key from './Key';
 import LocalForage from './LocalForage';
-import Subscriptions from './Subscriptions';
+import Subscriptions, { Unsubscribe } from './Subscriptions';
 
 export default {
   SUGGESTED_FOLLOWS: [
@@ -210,37 +210,47 @@ export default {
       content: JSON.stringify(Array.from(this.flaggedUsers)),
     });
   },
-  getBlockedUsers(cb?: (blocked: Set<string>) => void) {
+  getBlockedUsers(cb?: (blocked: Set<string>) => void): Unsubscribe {
     const callback = () => {
       cb?.(this.blockedUsers);
     };
     callback();
     const myPub = Key.getPubKey();
-    Subscriptions.subscribe([{ kinds: [16462], authors: [myPub] }], callback);
+    return Subscriptions.subscribe([{ kinds: [16462], authors: [myPub] }], callback);
   },
-  getFlaggedUsers(cb?: (flagged: Set<string>) => void) {
+  getFlaggedUsers(cb?: (flagged: Set<string>) => void): Unsubscribe {
     const callback = () => {
       cb?.(this.flaggedUsers);
     };
     callback();
     const myPub = Key.getPubKey();
-    Subscriptions.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
+    return Subscriptions.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
   },
-  getFollowedByUser: function (user: string, cb?: (followedUsers: Set<string>) => void) {
+  getFollowedByUser: function (
+    user: string,
+    cb?: (followedUsers: Set<string>) => void,
+  ): Unsubscribe {
     const callback = () => {
       cb?.(this.followedByUser.get(user) ?? new Set());
     };
     this.followedByUser.has(user) && callback();
-    Subscriptions.subscribe([{ kinds: [3], authors: [user] }], callback);
+    return Subscriptions.subscribe([{ kinds: [3], authors: [user] }], callback);
   },
-  getFollowersByUser: function (address: string, cb?: (followers: Set<string>) => void) {
+  getFollowersByUser: function (
+    address: string,
+    cb?: (followers: Set<string>) => void,
+  ): Unsubscribe {
     const callback = () => {
       cb?.(this.followersByUser.get(address) ?? new Set());
     };
     this.followersByUser.has(address) && callback();
-    Subscriptions.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
+    return Subscriptions.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
   },
-  getProfile(address, cb?: (profile: any, address: string) => void, verifyNip05 = false) {
+  getProfile(
+    address,
+    cb?: (profile: any, address: string) => void,
+    verifyNip05 = false,
+  ): Unsubscribe {
     this.knownUsers.add(address);
     const callback = () => {
       cb?.(this.profiles.get(address), address);
@@ -268,7 +278,7 @@ export default {
       });
     }
     Subscriptions.subscribedProfiles.add(address);
-    Subscriptions.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
+    return Subscriptions.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
   },
   setMetadata(data: any) {
     const event = {

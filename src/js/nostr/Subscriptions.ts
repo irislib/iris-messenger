@@ -14,9 +14,12 @@ type Subscription = {
   callback?: (event: Event) => void;
 };
 
+type Unsubscribe = () => void;
+
 let subscriptionId = 0;
 
 const Subscriptions = {
+  internalSubscriptionsByName: new Map<string, number>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
   subscribedFiltersByName: new Map<string, Filter[]>(),
   subscriptions: new Map<number, Subscription>(),
@@ -38,6 +41,7 @@ const Subscriptions = {
       this.subscriptionsByName.get(name)?.add(sub);
     }
   },
+  // TODO move to Relays?
   sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
     // if subs with same id already exists, remove them
     if (id) {
@@ -156,6 +160,7 @@ const Subscriptions = {
     };
     go();
   }, 100),
+  // TODO rename, this is for external subscription. clarify internal vs external subs distinction.
   unsubscribe: function (id: string) {
     const subs = this.subscriptionsByName.get(id);
     if (subs) {
@@ -167,12 +172,29 @@ const Subscriptions = {
     this.subscriptionsByName.delete(id);
     this.subscribedFiltersByName.delete(id);
   },
-  subscribe: function (filters: Filter[], cb?: (event: Event) => void) {
-    cb &&
-      this.subscriptions.set(subscriptionId++, {
+  /**
+   * internal subscribe
+   * @param filters
+   * @param cb
+   * @param name optional name for the subscription. replaces the previous one with the same name
+   * @returns unsubscribe function
+   */
+  subscribe: function (filters: Filter[], cb?: (event: Event) => void, name?: string): Unsubscribe {
+    let currentSubscriptionId;
+    if (cb) {
+      currentSubscriptionId = subscriptionId++;
+      this.subscriptions.set(++subscriptionId, {
         filters,
         callback: cb,
       });
+    }
+    if (name) {
+      const existing = this.internalSubscriptionsByName.get(name);
+      if (existing) {
+        this.subscriptions.delete(existing);
+      }
+      this.internalSubscriptionsByName.set(name, currentSubscriptionId);
+    }
 
     // TODO: this gets insane high, need unsubscribe
     // console.log('this.subscriptions.size', this.subscriptions.size);
@@ -231,7 +253,16 @@ const Subscriptions = {
     hasNewAuthors && this.subscribeToAuthors(this); // TODO subscribe to old stuff from new authors, don't resubscribe to all
     hasNewIds && this.subscribeToPosts(this);
     hasNewKeywords && this.subscribeToKeywords(this);
+    return () => {
+      if (currentSubscriptionId) {
+        this.subscriptions.delete(currentSubscriptionId);
+      }
+      if (name) {
+        this.internalSubscriptionsByName.delete(name);
+      }
+    };
   },
 };
 
 export default Subscriptions;
+export { Unsubscribe };
