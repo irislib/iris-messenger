@@ -107,8 +107,7 @@ const Session = {
       IrisTo.checkExistingAccount(myPub);
     }, 1000);
     SocialNetwork.getProfile(myPub, async (p) => {
-      console.log('check', p);
-      if (p.nip05 && p.nip05.endsWith('@iris.to')) {
+      if (p && p.nip05 && p.nip05.endsWith('@iris.to')) {
         localState.get('showNoIrisToAddress').put(false);
         clearTimeout(timeout);
       }

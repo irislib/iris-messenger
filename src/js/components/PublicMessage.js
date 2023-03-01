@@ -196,7 +196,6 @@ class PublicMessage extends Message {
           (replies, likedBy, threadReplyCount, boostedBy, zaps) => {
             // zaps.size &&
             //  console.log('zaps.size', zaps.size, Key.toNostrBech32Address(nostrId, 'note'));
-            this.zaps = zaps;
             this.likedBy = likedBy;
             this.boostedBy = boostedBy;
             const sortedReplies =
@@ -225,7 +224,7 @@ class PublicMessage extends Message {
               boosts: this.boostedBy.size,
               boosted: this.boostedBy.has(myPub),
               likes: this.likedBy.size,
-              zaps: this.zaps.size,
+              zaps,
               liked: this.likedBy.has(myPub),
               replyCount: threadReplyCount,
               sortedReplies,
@@ -827,7 +826,7 @@ class PublicMessage extends Message {
                             class="count ${s.showZaps ? 'active' : ''}"
                             onClick=${(e) => this.toggleZaps(e)}
                           >
-                            ${s.zaps || ''}
+                            ${s.zaps?.size || ''}
                           </span>
                         `
                       : ''}
@@ -851,7 +850,7 @@ class PublicMessage extends Message {
             ${s.showZaps
               ? html`
                   <div class="likes">
-                    ${Array.from(this.zaps.eventIds).map((eventId) => {
+                    ${(s.zaps?.eventIds || []).map((eventId) => {
                       const key = Events.cache.get(eventId)?.pubkey;
                       if (!key) {
                         return;
