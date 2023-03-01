@@ -113,7 +113,6 @@ class PublicMessage extends Message {
   componentWillUnmount() {
     super.componentWillUnmount();
     this.subscriptions.forEach((unsub) => {
-      console.log('unsub');
       unsub();
     });
     this.unmounted = true;

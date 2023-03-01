@@ -352,7 +352,7 @@ const Events = {
   },
   acceptEvent(event: Event) {
     if (
-      !Subscriptions.subscribedUsers.has(event.pubkey) ||
+      !Subscriptions.subscribedUsers.has(event.pubkey) &&
       !Subscriptions.subscribedPosts.has(event.id)
     ) {
       // unless we specifically subscribed to the user or post, ignore long follow distance users
