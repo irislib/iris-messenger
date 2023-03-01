@@ -96,6 +96,7 @@ export default {
   "restore_defaults": "Terugzetten naar oorspronkelijke instellingen",
   "restored_{n}_follows": "{n} volger(s) hersteld",
   "saturday": "Zaterdag",
+  "save": "Opslaan",
   "save_backup_of_privkey_first": "Bewaar eerst een backup van je private sleutel",
   "save_relays_publicly": "Bewaar de relays publiek",
   "scan_qr_code": "Scan de QR code",
