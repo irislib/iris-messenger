@@ -6,6 +6,7 @@ import Button from '../../components/basic/Button';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
+import localState from "../../LocalState";
 
 export default class IrisAccountSettings extends Component {
   state = {
@@ -275,6 +276,8 @@ export default class IrisAccountSettings extends Component {
       },
       body: JSON.stringify(event),
     });
+    localState.get('showNoIrisToAddress').put(false);
+    localState.get('existingIrisToAddress').put({ confirmed: true, name });
     if (res.status === 200) {
       this.setState({ error: null, existing: { confirmed: true, name: this.state.existing.name } });
     } else {

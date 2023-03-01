@@ -70,9 +70,10 @@ export default {
       },
       body: JSON.stringify(event),
     });
+    // should perhaps be in the next block, but users are having cache issues. this may help.
+    localState.get('showNoIrisToAddress').put(false);
+    localState.get('existingIrisToAddress').put({ confirmed: true, name });
     if (res.status === 200) {
-      localState.get('showNoIrisToAddress').put(false);
-      localState.get('existingIrisToAddress').put({ confirmed: true, name });
       return { error: null, existing: { confirmed: true, name } };
     } else {
       res
