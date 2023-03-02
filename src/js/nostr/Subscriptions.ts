@@ -56,19 +56,6 @@ const Subscriptions = {
       this.subscribedFiltersByName.delete(id);
     }
 
-    for (const filter of filters) {
-      if (filter.authors) {
-        filter.authors.forEach((author) => {
-          if (typeof author !== 'string') {
-            throw new Error('author must be string, got ' + JSON.stringify(author));
-          }
-          if (author.startsWith('npub')) {
-            throw new Error('Author should be hex when sending to relays, not npub: ' + author);
-          }
-        });
-      }
-    }
-
     this.subscribedFiltersByName.set(id, filters);
 
     if (unsubscribeTimeout) {

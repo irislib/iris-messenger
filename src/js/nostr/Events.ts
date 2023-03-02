@@ -192,7 +192,13 @@ const Events = {
     if (event.tags) {
       for (const tag of event.tags) {
         if (Array.isArray(tag) && tag[0] === 'p') {
-          SocialNetwork.addFollower(tag[1], event.pubkey);
+          const pub = tag[1];
+          // ensure pub is hex
+          if (pub.length === 64 && /^[0-9a-f]+$/.test(pub)) {
+            SocialNetwork.addFollower(tag[1], event.pubkey);
+          } else {
+            // console.error('non-hex follow tag', tag, 'by', event.pubkey);
+          }
         }
       }
     }
