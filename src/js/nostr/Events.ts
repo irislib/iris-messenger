@@ -381,8 +381,13 @@ const Events = {
           }
         }
       } else {
-        // unconnected user, reject
-        return false;
+        if (event.kind === 1 && Events.likesByMessageId.get(event.id)?.size > 0) {
+          // allow messages that have been liked by at least 1 user
+          console.log('allowed event because of likes', Key.toNostrBech32Address(event.id, 'note'));
+        } else {
+          // unconnected user, reject
+          return false;
+        }
       }
     }
     // Accepting metadata so we still get their name. But should we instead save the name on our own list?
