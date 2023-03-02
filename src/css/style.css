@@ -35,6 +35,7 @@
   --orange: #ffa600;
   --our-msg-bg: #1d9bf0;
   --our-msg-color: #ffffff;
+  --purple: #8e44ad;
   --radio-button-background: #666;
   --radio-button-checked-background: #33b7fe;
   --red: #f81780;
@@ -1627,7 +1628,7 @@ a.msgSenderName:hover .user-name {
 }
 
 .msg .like-btn.liked, .msg .like-btn:hover {
-  color: var(--red);
+  color: var(--purple);
 }
 
 .msg .zap-btn:hover, .msg .zap-btn.zapped {
