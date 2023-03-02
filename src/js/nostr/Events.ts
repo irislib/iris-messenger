@@ -28,7 +28,7 @@ localState.get('mutedNotes').on((v) => {
 });
 
 const DEFAULT_GLOBAL_FILTER = {
-  maxFollowDistance: 3,
+  maxFollowDistance: 4,
   minFollowersAtMaxDistance: 5,
 };
 let globalFilter = DEFAULT_GLOBAL_FILTER;

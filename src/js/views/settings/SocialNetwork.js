@@ -1,10 +1,10 @@
 import Component from '../../BaseComponent';
 import Name from '../../components/Name';
+import localState from '../../LocalState';
+import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
-import localState from '../../LocalState';
-import Events from '../../nostr/Events';
 
 export default class SocialNetworkSettings extends Component {
   constructor() {
@@ -57,6 +57,7 @@ export default class SocialNetworkSettings extends Component {
             <option value="3">3</option>
             <option value="4">4</option>
             <option value="5">5</option>
+            <option value="6">6</option>
           </select>
           <p>Minimum number of followers at maximum follow distance:</p>
           <input
