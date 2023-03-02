@@ -44,7 +44,7 @@ type Encrypt = (content: string) => Promise<string>
 type Decrypt = (content: string) => Promise<string>
 
 export function getEventPath(event: Event): string | undefined {
-  return event.tags.find(([t]) => t === 'd')?.[1]
+  return event.tags?.find(([t]) => t === 'd')?.[1]
 }
 
 export function getFilterPath(filter: Filter): string | undefined {
