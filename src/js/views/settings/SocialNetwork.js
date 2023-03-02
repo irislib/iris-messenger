@@ -3,7 +3,8 @@ import Name from '../../components/Name';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
-import localState from "../../LocalState";
+import localState from '../../LocalState';
+import Events from '../../nostr/Events';
 
 export default class SocialNetworkSettings extends Component {
   constructor() {
@@ -57,6 +58,20 @@ export default class SocialNetworkSettings extends Component {
             <option value="4">4</option>
             <option value="5">5</option>
           </select>
+          <p>Minimum number of followers at maximum follow distance:</p>
+          <input
+            type="number"
+            value={
+              this.state.globalFilter.minFollowersAtMaxDistance ||
+              Events.DEFAULT_GLOBAL_FILTER.minFollowersAtMaxDistance
+            }
+            onChange={(e) => {
+              localState
+                .get('globalFilter')
+                .get('minFollowersAtMaxDistance')
+                .put(parseInt(e.target.value));
+            }}
+          />
           <h3>{t('blocked_users')}</h3>
           {!hasBlockedUsers && t('none')}
           <p>

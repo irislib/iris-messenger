@@ -29,6 +29,7 @@ localState.get('mutedNotes').on((v) => {
 
 const DEFAULT_GLOBAL_FILTER = {
   maxFollowDistance: 3,
+  minFollowersAtMaxDistance: 5,
 };
 let globalFilter = DEFAULT_GLOBAL_FILTER;
 localState.get('globalFilter').on((r) => {
@@ -378,16 +379,23 @@ const Events = {
       ) {
         // unless we specifically subscribed to the user or post, ignore long follow distance users
         if (SocialNetwork.followDistanceByUser.has(event.pubkey)) {
-          const distance = SocialNetwork.followDistanceByUser.get(event.pubkey);
+          const distance = SocialNetwork.followDistanceByUser.get(event.pubkey) + 1; // what's wrong? why do we need +1?
           if (distance > globalFilter.maxFollowDistance) {
             // follow distance too high, reject
             return false;
           }
-          if (distance == globalFilter.maxFollowDistance) {
+          if (distance === globalFilter.maxFollowDistance) {
             // require at least 5 followers
             // TODO followers should be follow distance 2
-            if (SocialNetwork.followersByUser.get(event.pubkey)?.size < 5) {
+            if (
+              SocialNetwork.followersByUser.get(event.pubkey)?.size <
+              (globalFilter.minFollowersAtMaxDistance ||
+                DEFAULT_GLOBAL_FILTER.minFollowersAtMaxDistance)
+            ) {
+              console.log('rejected because not enough followers', SocialNetwork.followersByUser.get(event.pubkey)?.size, '<', globalFilter.minFollowersAtMaxDistance);
               return false;
+            } else {
+              console.log('accepted because enough followers', SocialNetwork.followersByUser.get(event.pubkey)?.size, '>=', globalFilter.minFollowersAtMaxDistance);
             }
           }
         } else {
