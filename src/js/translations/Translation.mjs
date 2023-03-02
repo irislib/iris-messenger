@@ -28,6 +28,7 @@ const AVAILABLE_LANGUAGES = {
   fi: 'Suomi',
   'cs-CZ': 'Čeština',
   bg: 'Български',
+  as: 'অসমীয়া',
   sk: 'Slovenčina',
   lt: 'Lietuvių',
   'el-GR': 'Ελληνικά',
