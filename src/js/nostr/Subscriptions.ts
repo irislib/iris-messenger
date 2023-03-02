@@ -108,7 +108,11 @@ const Subscriptions = {
       Subscriptions.subscribeToNewAuthors.size,
       'new authors',
     );
-    const authors = Array.from(Subscriptions.subscribeToNewAuthors.values());
+    const authors = Array.from(Subscriptions.subscribeToNewAuthors.values()).slice(0, 1000);
+    authors.forEach((author) => {
+      Subscriptions.subscribeToNewAuthors.delete(author);
+    });
+    console.log('subscribing to authors.length', authors.length);
     Subscriptions.sendSubToRelays(
       [
         {
@@ -120,7 +124,6 @@ const Subscriptions = {
       'followed',
       true,
     );
-    Subscriptions.subscribeToNewAuthors.clear();
     if (Subscriptions.subscribedProfiles.size) {
       Subscriptions.sendSubToRelays(
         [{ authors: Array.from(Subscriptions.subscribedProfiles.values()), kinds: [0] }],

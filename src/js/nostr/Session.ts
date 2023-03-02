@@ -111,8 +111,9 @@ const Session = {
         clearTimeout(timeout);
       }
     });
+    const startedAt = Math.floor(Date.now() / 1000);
     setTimeout(() => {
-      Subscriptions.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7, 9735], limit: 200 }], 'new'); // everything new
+      Subscriptions.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7, 9735], limit: 10 }], 'new'); // everything new
       Subscriptions.sendSubToRelays([{ authors: [myPub] }], 'ours'); // our stuff
       Subscriptions.sendSubToRelays([{ '#p': [myPub] }], 'notifications'); // notifications and DMs
     }, 200);

@@ -59,7 +59,8 @@ class MemoryStorage {
   set(event: Event): boolean {
     const path = getEventPath(event)
     if (!path) {
-      throw new Error(`event has no d tag: ${JSON.stringify(event)}`)
+      //throw new Error(`event has no d tag: ${JSON.stringify(event)}`)
+      return false
     }
     if (!this.eventsByPathAndAuthor.has(path)) {
       this.eventsByPathAndAuthor.set(path, new Map())
