@@ -381,7 +381,11 @@ const Events = {
           }
         }
       } else {
-        if (event.kind === 1 && Events.likesByMessageId.get(event.id)?.size > 0) {
+        if (
+          event.kind === 1 &&
+          (Events.likesByMessageId.get(event.id)?.size > 0 ||
+            Events.boostsByMessageId.get(event.id)?.size > 0)
+        ) {
           // allow messages that have been liked by at least 1 user
           console.log('allowed event because of likes', Key.toNostrBech32Address(event.id, 'note'));
         } else {
