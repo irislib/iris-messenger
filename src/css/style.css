@@ -403,7 +403,7 @@ a.logo img:not(:last-child) {
 }
 
 .header-content a.active {
-  color: var(--text-color);
+  color: var(--purple);
 }
 
 .header .header-content > a:not(:first-child) {
