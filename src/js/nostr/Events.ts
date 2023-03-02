@@ -379,7 +379,7 @@ const Events = {
       ) {
         // unless we specifically subscribed to the user or post, ignore long follow distance users
         if (SocialNetwork.followDistanceByUser.has(event.pubkey)) {
-          const distance = SocialNetwork.followDistanceByUser.get(event.pubkey) + 1; // what's wrong? why do we need +1?
+          const distance = SocialNetwork.followDistanceByUser.get(event.pubkey);
           if (distance > globalFilter.maxFollowDistance) {
             // follow distance too high, reject
             return false;
