@@ -387,7 +387,6 @@ const Events = {
             Events.boostsByMessageId.get(event.id)?.size > 0)
         ) {
           // allow messages that have been liked by at least 1 user
-          console.log('allowed event because of likes', Key.toNostrBech32Address(event.id, 'note'));
         } else {
           // unconnected user, reject
           return false;
