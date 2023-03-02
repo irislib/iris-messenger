@@ -1,4 +1,4 @@
-import { Relay, relayInit } from '../lib/nostr-tools';
+import { Filter, Relay, relayInit } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
 import Events from './Events';
@@ -171,5 +171,48 @@ export default {
       tags: existing?.tags || [],
     };
     Events.publish(event);
+  },
+  subscribe: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
+    // if subs with same id already exists, remove them
+    if (id) {
+      const subs = Subscriptions.subscriptionsByName.get(id);
+      if (subs) {
+        subs.forEach((sub) => {
+          //console.log('unsub', id);
+          sub.unsub();
+        });
+      }
+      Subscriptions.subscriptionsByName.delete(id);
+      Subscriptions.subscribedFiltersByName.delete(id);
+    }
+
+    Subscriptions.subscribedFiltersByName.set(id, filters);
+
+    if (unsubscribeTimeout) {
+      setTimeout(() => {
+        Subscriptions.subscriptionsByName.delete(id);
+        Subscriptions.subscribedFiltersByName.delete(id);
+      }, unsubscribeTimeout);
+    }
+
+    for (const relay of (id == 'keywords' ? this.searchRelays : this.relays).values()) {
+      const subId = Subscriptions.getSubscriptionIdForName(id);
+      const sub = relay.sub(filters, { id: subId });
+      // TODO update relay lastSeen
+      sub.on('event', (event) => Events.handle(event));
+      if (once) {
+        sub.on('eose', () => sub.unsub());
+      }
+      if (!Subscriptions.subscriptionsByName.has(id)) {
+        Subscriptions.subscriptionsByName.set(id, new Set());
+      }
+      Subscriptions.subscriptionsByName.get(id)?.add(sub);
+      //console.log('subscriptions size', this.subscriptionsByName.size);
+      if (unsubscribeTimeout) {
+        setTimeout(() => {
+          sub.unsub();
+        }, unsubscribeTimeout);
+      }
+    }
   },
 };

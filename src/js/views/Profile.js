@@ -20,8 +20,8 @@ import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
+import Relays from '../nostr/Relays';
 import SocialNetwork from '../nostr/SocialNetwork';
-import Subscriptions from '../nostr/Subscriptions';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -382,7 +382,7 @@ class Profile extends View {
   }
 
   getNostrProfile(address, nostrAddress) {
-    Subscriptions.sendSubToRelays([{ authors: [address] }], address, true, 15 * 1000);
+    Relays.subscribe([{ authors: [address] }], address, true, 15 * 1000);
     const setFollowCounts = () => {
       address &&
         this.setState({

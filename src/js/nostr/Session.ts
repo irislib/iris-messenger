@@ -111,11 +111,10 @@ const Session = {
         clearTimeout(timeout);
       }
     });
-    const startedAt = Math.floor(Date.now() / 1000);
     setTimeout(() => {
-      Subscriptions.sendSubToRelays([{ kinds: [0, 1, 3, 6, 7, 9735], limit: 10 }], 'new'); // everything new
-      Subscriptions.sendSubToRelays([{ authors: [myPub] }], 'ours'); // our stuff
-      Subscriptions.sendSubToRelays([{ '#p': [myPub] }], 'notifications'); // notifications and DMs
+      Relays.subscribe([{ kinds: [0, 1, 3, 6, 7, 9735], limit: 10 }], 'new'); // everything new
+      Relays.subscribe([{ authors: [myPub] }], 'ours'); // our stuff
+      Relays.subscribe([{ '#p': [myPub] }], 'notifications'); // notifications and DMs
     }, 200);
     setInterval(() => {
       console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));

@@ -41,52 +41,8 @@ const Subscriptions = {
       this.subscriptionsByName.get(name)?.add(sub);
     }
   },
-  // TODO move to Relays?
-  sendSubToRelays: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
-    // if subs with same id already exists, remove them
-    if (id) {
-      const subs = this.subscriptionsByName.get(id);
-      if (subs) {
-        subs.forEach((sub) => {
-          //console.log('unsub', id);
-          sub.unsub();
-        });
-      }
-      this.subscriptionsByName.delete(id);
-      this.subscribedFiltersByName.delete(id);
-    }
-
-    this.subscribedFiltersByName.set(id, filters);
-
-    if (unsubscribeTimeout) {
-      setTimeout(() => {
-        this.subscriptionsByName.delete(id);
-        this.subscribedFiltersByName.delete(id);
-      }, unsubscribeTimeout);
-    }
-
-    for (const relay of (id == 'keywords' ? Relays.searchRelays : Relays.relays).values()) {
-      const subId = this.getSubscriptionIdForName(id);
-      const sub = relay.sub(filters, { id: subId });
-      // TODO update relay lastSeen
-      sub.on('event', (event) => Events.handle(event));
-      if (once) {
-        sub.on('eose', () => sub.unsub());
-      }
-      if (!this.subscriptionsByName.has(id)) {
-        this.subscriptionsByName.set(id, new Set());
-      }
-      this.subscriptionsByName.get(id)?.add(sub);
-      //console.log('subscriptions size', this.subscriptionsByName.size);
-      if (unsubscribeTimeout) {
-        setTimeout(() => {
-          sub.unsub();
-        }, unsubscribeTimeout);
-      }
-    }
-  },
   subscribeToRepliesAndReactions: debounce(() => {
-    Subscriptions.sendSubToRelays(
+    Relays.subscribe(
       [
         {
           kinds: [1, 6, 7, 9735],
@@ -113,7 +69,7 @@ const Subscriptions = {
       Subscriptions.subscribeToNewAuthors.delete(author);
     });
     console.log('subscribing to authors.length', authors.length);
-    Subscriptions.sendSubToRelays(
+    Relays.subscribe(
       [
         {
           kinds: [0, 3],
@@ -125,14 +81,14 @@ const Subscriptions = {
       true,
     );
     if (Subscriptions.subscribedProfiles.size) {
-      Subscriptions.sendSubToRelays(
+      Relays.subscribe(
         [{ authors: Array.from(Subscriptions.subscribedProfiles.values()), kinds: [0] }],
         'subscribedProfiles',
         true,
       );
     }
     setTimeout(() => {
-      Subscriptions.sendSubToRelays(
+      Relays.subscribe(
         [{ authors: followedUsers, limit: 100, until: now }],
         'followedHistory',
         true,
@@ -143,7 +99,7 @@ const Subscriptions = {
     () => {
       if (Subscriptions.subscribedPosts.size === 0) return;
       console.log('subscribe to', Subscriptions.subscribedPosts.size, 'posts');
-      Subscriptions.sendSubToRelays(
+      Relays.subscribe(
         [{ ids: Array.from(Subscriptions.subscribedPosts).slice(0, 1000) }],
         'posts',
       );
@@ -155,7 +111,7 @@ const Subscriptions = {
     if (Subscriptions.subscribedKeywords.size === 0) return;
     console.log('subscribe to keywords', Array.from(Subscriptions.subscribedKeywords));
     const go = () => {
-      Subscriptions.sendSubToRelays(
+      Relays.subscribe(
         [
           {
             kinds: [1],
