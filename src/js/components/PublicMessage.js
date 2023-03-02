@@ -344,7 +344,7 @@ class PublicMessage extends Message {
     }
     event.stopPropagation();
     if (this.state.msg?.event?.kind === 7) {
-      const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
+      const likedId = this.state.msg.event.tags?.reverse().find((t) => t[0] === 'e')[1];
       return route(`/post/${likedId}`);
     }
     this.openStandalone();
@@ -384,7 +384,7 @@ class PublicMessage extends Message {
   }
 
   renderLike() {
-    const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
+    const likedId = this.state.msg.event.tags?.reverse().find((t) => t[0] === 'e')[1];
     const likedEvent = Events.cache.get(likedId);
     let text = likedEvent?.content;
     if (text && text.length > 50) {
@@ -416,7 +416,7 @@ class PublicMessage extends Message {
   }
 
   renderZap() {
-    const likedId = this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1];
+    const likedId = this.state.msg.event.tags?.reverse().find((t) => t[0] === 'e')[1];
     const likedEvent = Events.cache.get(likedId);
     let text = likedEvent?.content;
     if (text && text.length > 50) {
@@ -603,13 +603,13 @@ class PublicMessage extends Message {
       case 3:
         return this.renderFollow();
       case 6:
-        return this.renderRepost(this.state.msg.event.tags.reverse().find((t) => t[0] === 'e')[1]);
+        return this.renderRepost(this.state.msg.event.tags?.reverse().find((t) => t[0] === 'e')[1]);
       case 7:
         return this.renderLike();
       case 9735:
         return this.renderZap();
       case 1: {
-        let mentionIndex = this.state.msg?.event?.tags.findIndex(
+        let mentionIndex = this.state.msg?.event?.tags?.findIndex(
           (tag) => tag[0] === 'e' && tag[3] === 'mention',
         );
         if (this.state.msg?.event?.content === `#[${mentionIndex}]`) {
@@ -664,7 +664,7 @@ class PublicMessage extends Message {
     }
 
     let replyingToUsers = [];
-    const hasETags = s.msg.event.tags.some((t) => t[0] === 'e');
+    const hasETags = s.msg.event.tags?.some((t) => t[0] === 'e');
     if (hasETags) {
       replyingToUsers = s.msg.event?.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
     }
