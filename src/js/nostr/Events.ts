@@ -392,10 +392,10 @@ const Events = {
               (globalFilter.minFollowersAtMaxDistance ||
                 DEFAULT_GLOBAL_FILTER.minFollowersAtMaxDistance)
             ) {
-              console.log('rejected because not enough followers', SocialNetwork.followersByUser.get(event.pubkey)?.size, '<', globalFilter.minFollowersAtMaxDistance);
+              // console.log('rejected because not enough followers', SocialNetwork.followersByUser.get(event.pubkey)?.size, '<', globalFilter.minFollowersAtMaxDistance);
               return false;
             } else {
-              console.log('accepted because enough followers', SocialNetwork.followersByUser.get(event.pubkey)?.size, '>=', globalFilter.minFollowersAtMaxDistance);
+              // console.log('accepted because enough followers', SocialNetwork.followersByUser.get(event.pubkey)?.size, '>=', globalFilter.minFollowersAtMaxDistance);
             }
           }
         } else {
