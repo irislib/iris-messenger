@@ -82,6 +82,15 @@ export default {
   },
 
   addFollower: function (followedUser: string, follower: string) {
+    if (followedUser.startsWith('npub')) {
+      console.error('addFollower: followedUser is not a hex address', followedUser);
+      followedUser = Key.toNostrHexAddress(followedUser);
+    }
+    if (follower.startsWith('npub')) {
+      console.error('addFollower: follower is not a hex address', follower);
+      follower = Key.toNostrHexAddress(follower);
+    }
+
     if (!this.followersByUser.has(followedUser)) {
       this.followersByUser.set(followedUser, new Set<string>());
     }

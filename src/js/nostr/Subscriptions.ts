@@ -56,6 +56,19 @@ const Subscriptions = {
       this.subscribedFiltersByName.delete(id);
     }
 
+    for (const filter of filters) {
+      if (filter.authors) {
+        filter.authors.forEach((author) => {
+          if (typeof author !== 'string') {
+            throw new Error('author must be string, got ' + JSON.stringify(author));
+          }
+          if (author.startsWith('npub')) {
+            throw new Error('Author should be hex when sending to relays, not npub: ' + author);
+          }
+        });
+      }
+    }
+
     this.subscribedFiltersByName.set(id, filters);
 
     if (unsubscribeTimeout) {
@@ -108,12 +121,13 @@ const Subscriptions = {
       Subscriptions.subscribeToNewAuthors.size,
       'new authors',
     );
+    const authors = Array.from(Subscriptions.subscribeToNewAuthors.values());
     Subscriptions.sendSubToRelays(
       [
         {
           kinds: [0, 3],
           until: now,
-          authors: Array.from(Subscriptions.subscribeToNewAuthors.values()),
+          authors,
         },
       ],
       'followed',
@@ -257,7 +271,9 @@ const Subscriptions = {
     }
     hasNewReplyAndLikeSubs && this.subscribeToRepliesAndReactions(this);
     if (newAuthors.size) {
-      this.subscribeToNewAuthors.add(newAuthors);
+      newAuthors.forEach((author) => {
+        this.subscribeToNewAuthors.add(author);
+      });
       this.subscribeToAuthors(this);
     }
     hasNewIds && this.subscribeToPosts(this);
