@@ -60,6 +60,11 @@ const Session = {
       Subscriptions.subscribe(filters, callback);
       return '0';
     };
+    localState.get('globalFilter').once((globalFilter) => {
+      if (!globalFilter) {
+        localState.get('globalFilter').put(Events.DEFAULT_GLOBAL_FILTER);
+      }
+    });
     // TODO move private and public to State.ts
     this.private = new Path(
       (...args) => Events.publish(...args),

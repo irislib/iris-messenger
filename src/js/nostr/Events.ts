@@ -27,8 +27,17 @@ localState.get('mutedNotes').on((v) => {
   mutedNotes = v;
 });
 
+const DEFAULT_GLOBAL_FILTER = {
+  maxFollowDistance: 3,
+};
+let globalFilter = DEFAULT_GLOBAL_FILTER;
+localState.get('globalFilter').on((r) => {
+  globalFilter = r;
+});
+
 // TODO separate files for different types of events
 const Events = {
+  DEFAULT_GLOBAL_FILTER,
   MAX_MSGS_BY_KEYWORD,
   getEventHash,
   cache: cache,
@@ -362,34 +371,36 @@ const Events = {
     }
   },
   acceptEvent(event: Event) {
-    if (
-      !Subscriptions.subscribedUsers.has(event.pubkey) &&
-      !Subscriptions.subscribedPosts.has(event.id)
-    ) {
-      // unless we specifically subscribed to the user or post, ignore long follow distance users
-      if (SocialNetwork.followDistanceByUser.has(event.pubkey)) {
-        const distance = SocialNetwork.followDistanceByUser.get(event.pubkey);
-        if (distance > 3) {
-          // follow distance too high, reject
-          return false;
-        }
-        if (distance == 3) {
-          // require at least 5 followers
-          // TODO followers should be follow distance 2
-          if (SocialNetwork.followersByUser.get(event.pubkey)?.size < 5) {
+    if (globalFilter.maxFollowDistance) {
+      if (
+        !Subscriptions.subscribedUsers.has(event.pubkey) &&
+        !Subscriptions.subscribedPosts.has(event.id)
+      ) {
+        // unless we specifically subscribed to the user or post, ignore long follow distance users
+        if (SocialNetwork.followDistanceByUser.has(event.pubkey)) {
+          const distance = SocialNetwork.followDistanceByUser.get(event.pubkey);
+          if (distance > globalFilter.maxFollowDistance) {
+            // follow distance too high, reject
             return false;
           }
-        }
-      } else {
-        if (
-          event.kind === 1 &&
-          (Events.likesByMessageId.get(event.id)?.size > 0 ||
-            Events.boostsByMessageId.get(event.id)?.size > 0)
-        ) {
-          // allow messages that have been liked by at least 1 user
+          if (distance == globalFilter.maxFollowDistance) {
+            // require at least 5 followers
+            // TODO followers should be follow distance 2
+            if (SocialNetwork.followersByUser.get(event.pubkey)?.size < 5) {
+              return false;
+            }
+          }
         } else {
-          // unconnected user, reject
-          return false;
+          if (
+            event.kind === 1 &&
+            (Events.likesByMessageId.get(event.id)?.size > 0 ||
+              Events.boostsByMessageId.get(event.id)?.size > 0)
+          ) {
+            // allow messages that have been liked by at least 1 user
+          } else {
+            // unconnected user, reject
+            return false;
+          }
         }
       }
     }
@@ -401,6 +412,7 @@ const Events = {
     if (this.deletedEvents.has(event.id)) {
       return false;
     }
+    // move out of this fn?
     if (event.created_at > Date.now() / 1000) {
       this.futureEventIds.add(event);
       if (this.futureEventIds.has(event.id)) {
@@ -487,7 +499,15 @@ const Events = {
 
     // save limited by author followdistance
     if (saveToIdb && SocialNetwork.followDistanceByUser.get(event.pubkey) <= 3) {
-      IndexedDB.saveEvent(event);
+      if (!globalFilter.maxFollowDistance) {
+        // even if distance filter is disabled, still limit IDB writes
+        const distance = SocialNetwork.followDistanceByUser.get(event.pubkey);
+        if (distance <= 3) {
+          IndexedDB.saveEvent(event);
+        }
+      } else {
+        IndexedDB.saveEvent(event);
+      }
     }
 
     // go through subscriptions and callback if filters match

@@ -3,12 +3,14 @@ import Name from '../../components/Name';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
+import localState from "../../LocalState";
 
 export default class SocialNetworkSettings extends Component {
   constructor() {
     super();
     this.state = {
       blockedUsers: [],
+      globalFilter: {},
     };
   }
   render() {
@@ -41,6 +43,20 @@ export default class SocialNetworkSettings extends Component {
               {distance[0]}: {distance[1].size} users
             </div>
           ))}
+          <p>Filter incoming events by follow distance:</p>
+          <select
+            value={this.state.globalFilter.maxFollowDistance}
+            onChange={(e) => {
+              localState.get('globalFilter').get('maxFollowDistance').put(parseInt(e.target.value));
+            }}
+          >
+            <option value="0">Off</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
           <h3>{t('blocked_users')}</h3>
           {!hasBlockedUsers && t('none')}
           <p>
@@ -63,5 +79,13 @@ export default class SocialNetworkSettings extends Component {
     SocialNetwork.getBlockedUsers((blockedUsers) => {
       this.setState({ blockedUsers });
     });
+    localState.get('globalFilter').on(this.inject());
+    this.refreshInterval = setInterval(() => {
+      this.forceUpdate();
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.refreshInterval);
   }
 }
