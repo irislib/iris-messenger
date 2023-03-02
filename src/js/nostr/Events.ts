@@ -138,11 +138,11 @@ const Events = {
     if (event.kind !== 1) {
       return undefined;
     }
-    const replyTags = event.tags.filter((tag) => tag[0] === 'e' && tag[3] !== 'mention');
+    const replyTags = event.tags?.filter((tag) => tag[0] === 'e' && tag[3] !== 'mention');
     if (replyTags.length === 1) {
       return replyTags[0][1];
     }
-    const replyTag = event.tags.find((tag) => tag[0] === 'e' && tag[3] === 'reply');
+    const replyTag = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'reply');
     if (replyTag) {
       return replyTag[1];
     }
@@ -152,7 +152,7 @@ const Events = {
     return undefined;
   },
   handleBoost(event: Event) {
-    let id = event.tags.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
+    let id = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
     if (!id) {
       // last e tag is the boosted post
       id = event.tags
@@ -171,7 +171,7 @@ const Events = {
     }
   },
   handleReaction(event: Event) {
-    const id = event.tags.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
+    const id = event.tags?.reverse().find((tag: any) => tag[0] === 'e')?.[1]; // last e tag is the liked post
     if (!id) return;
     if (!this.likesByMessageId.has(id)) {
       this.likesByMessageId.set(id, new Set());
@@ -214,12 +214,12 @@ const Events = {
     }
     if (SocialNetwork.followedByUser.has(event.pubkey)) {
       for (const previouslyFollowed of SocialNetwork.followedByUser.get(event.pubkey)) {
-        if (!event.tags || !event.tags.find((t) => t[0] === 'p' && t[1] === previouslyFollowed)) {
+        if (!event.tags || !event.tags?.find((t) => t[0] === 'p' && t[1] === previouslyFollowed)) {
           SocialNetwork.removeFollower(previouslyFollowed, event.pubkey);
         }
       }
     }
-    if (event.pubkey === myPub && event.tags.length) {
+    if (event.pubkey === myPub && event.tags?.length) {
       if (SocialNetwork.followedByUser.get(myPub)?.size > 10) {
         localState.get('showFollowSuggestions').put(false);
       }
@@ -305,7 +305,7 @@ const Events = {
     }
   },
   handleDelete(event: Event) {
-    const id = event.tags.find((tag) => tag[0] === 'e')?.[1];
+    const id = event.tags?.find((tag) => tag[0] === 'e')?.[1];
     const myPub = Key.getPubKey();
     if (id) {
       const deletedEvent = this.cache.get(id);
@@ -320,7 +320,7 @@ const Events = {
   },
   handleZap(event) {
     this.cache.set(event.id, event);
-    const zappedNote = event.tags.find((tag) => tag[0] === 'e')?.[1];
+    const zappedNote = event.tags?.find((tag) => tag[0] === 'e')?.[1];
     if (!zappedNote) {
       return; // TODO you can also zap profiles
     }
@@ -334,9 +334,9 @@ const Events = {
     const myPub = Key.getPubKey();
     let user = event.pubkey;
     if (event.pubkey === myPub) {
-      user = event.tags.find((tag) => tag[0] === 'p')?.[1] || user;
+      user = event.tags?.find((tag) => tag[0] === 'p')?.[1] || user;
     } else {
-      const forMe = event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub);
+      const forMe = event.tags?.some((tag) => tag[0] === 'p' && tag[1] === myPub);
       if (!forMe) {
         return;
       }
@@ -351,7 +351,7 @@ const Events = {
     if (event.pubkey !== Key.getPubKey()) {
       return;
     }
-    const key = event.tags.find((tag) => tag[0] === 'd')?.[1];
+    const key = event.tags?.find((tag) => tag[0] === 'd')?.[1];
     if (key) {
       const existing = this.keyValueEvents.get(key);
       if (existing?.created_at >= event.created_at) {
@@ -364,7 +364,7 @@ const Events = {
     if (event.kind === 6) {
       return true;
     }
-    const mentionIndex = event.tags.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
+    const mentionIndex = event.tags?.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
     if (event.kind === 1 && event.content === `#[${mentionIndex}]`) {
       return true;
     } else {
@@ -567,13 +567,13 @@ const Events = {
     for (const key of filterKeys) {
       if (
         filter[`#${key}`] &&
-        !event.tags.some((tag) => tag[0] === key && filter[`#${key}`].includes(tag[1]))
+        !event.tags?.some((tag) => tag[0] === key && filter[`#${key}`].includes(tag[1]))
       ) {
         return false;
       }
     }
     if (filter['#d']) {
-      const tag = event.tags.find((tag) => tag[0] === 'd');
+      const tag = event.tags?.find((tag) => tag[0] === 'd');
       if (tag) {
         const existing = this.keyValueEvents.get(tag[1]);
         if (existing?.created_at > event.created_at) {
@@ -617,7 +617,7 @@ const Events = {
     // if we're mentioned in tags, add to notifications
     const myPub = Key.getPubKey();
     // TODO: if it's a like, only add if the last p tag is us
-    if (event.pubkey !== myPub && event.tags.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
+    if (event.pubkey !== myPub && event.tags?.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
       if (event.kind === 3) {
         // only notify if we know that they previously weren't following us
         const existingFollows = SocialNetwork.followedByUser.get(event.pubkey);
