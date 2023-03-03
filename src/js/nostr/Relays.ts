@@ -186,7 +186,13 @@ export default {
     5 * 1000,
     { leading: true },
   ),
-  subscribe: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
+  subscribe: function (
+    filters: Filter[],
+    id: string,
+    once = false,
+    unsubscribeTimeout = 0,
+    sinceLastSeen = false,
+  ) {
     // if subs with same id already exists, remove them
     if (id) {
       const subs = Subscriptions.subscriptionsByName.get(id);
@@ -200,6 +206,8 @@ export default {
       Subscriptions.subscribedFiltersByName.delete(id);
     }
 
+    // TODO slice and dice too large filters? queue and wait for eose. or alternate between filters by interval.
+
     Subscriptions.subscribedFiltersByName.set(id, filters);
 
     if (unsubscribeTimeout) {
@@ -211,7 +219,7 @@ export default {
 
     for (const relay of (id == 'keywords' ? this.searchRelays : this.relays).values()) {
       const subId = Subscriptions.getSubscriptionIdForName(id);
-      if (savedRelays[relay.url] && savedRelays[relay.url].lastSeen) {
+      if (sinceLastSeen && savedRelays[relay.url] && savedRelays[relay.url].lastSeen) {
         filters.forEach((filter) => {
           filter.since = savedRelays[relay.url].lastSeen;
         });

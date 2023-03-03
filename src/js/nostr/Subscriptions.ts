@@ -86,6 +86,8 @@ const Subscriptions = {
       ],
       'followed',
       true,
+      0,
+      true,
     );
     if (Subscriptions.subscribedProfiles.size) {
       Relays.subscribe(
@@ -98,6 +100,8 @@ const Subscriptions = {
       Relays.subscribe(
         [{ authors: followedUsers, limit: 100, until: now }],
         'followedHistory',
+        true,
+        0,
         true,
       );
     }, 1000);
