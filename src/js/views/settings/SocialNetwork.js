@@ -39,9 +39,9 @@ export default class SocialNetworkSettings extends Component {
           <h3>Stored on your device</h3>
           <p>Total size: {followDistances.reduce((a, b) => a + b[1].size, 0)} users</p>
           <p>Depth: {followDistances.length} degrees of separation</p>
-          {followDistances.map((distance) => (
+          {followDistances.sort().map((distance) => (
             <div>
-              {distance[0]}: {distance[1].size} users
+              {distance[0] || t('unknown')}: {distance[1].size} users
             </div>
           ))}
           <p>Filter incoming events by follow distance:</p>

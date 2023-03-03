@@ -5,8 +5,8 @@ import localState from '../LocalState';
 
 import Events from './Events';
 import Key from './Key';
+import PubSub from './PubSub';
 import SocialNetwork from './SocialNetwork';
-import Subscriptions from './Subscriptions';
 
 type SavedRelays = {
   [key: string]: {
@@ -190,19 +190,19 @@ export default {
     { leading: true },
   ),
   unsubscribe: function (id: string) {
-    const subs = Subscriptions.subscriptionsByName.get(id);
+    const subs = PubSub.subscriptionsByName.get(id);
     if (subs) {
       subs.forEach((sub) => {
         console.log('unsub', id);
         sub.unsub();
       });
     }
-    Subscriptions.subscriptionsByName.delete(id);
-    Subscriptions.subscribedFiltersByName.delete(id);
+    PubSub.subscriptionsByName.delete(id);
+    PubSub.subscribedFiltersByName.delete(id);
   },
   resubscribe(relay?: Relay) {
-    console.log('subscribedFiltersByName.size', Subscriptions.subscribedFiltersByName.size);
-    for (const [name, filters] of Array.from(Subscriptions.subscribedFiltersByName.entries())) {
+    console.log('subscribedFiltersByName.size', PubSub.subscribedFiltersByName.size);
+    for (const [name, filters] of Array.from(PubSub.subscribedFiltersByName.entries())) {
       console.log('resubscribing to ', name, filters);
       this.subscribe(filters.filters, name, false, 0, filters.sinceRelayLastSeen, relay && [relay]);
     }
@@ -217,31 +217,31 @@ export default {
   ) {
     // if subs with same id already exists, remove them
     if (id) {
-      const subs = Subscriptions.subscriptionsByName.get(id);
+      const subs = PubSub.subscriptionsByName.get(id);
       if (subs) {
         subs.forEach((sub) => {
           //console.log('unsub', id);
           sub.unsub();
         });
       }
-      Subscriptions.subscriptionsByName.delete(id);
-      Subscriptions.subscribedFiltersByName.delete(id);
+      PubSub.subscriptionsByName.delete(id);
+      PubSub.subscribedFiltersByName.delete(id);
     }
 
     // TODO slice and dice too large filters? queue and wait for eose. or alternate between filters by interval.
 
-    Subscriptions.subscribedFiltersByName.set(id, { filters, sinceRelayLastSeen: sinceLastSeen });
+    PubSub.subscribedFiltersByName.set(id, { filters, sinceRelayLastSeen: sinceLastSeen });
 
     if (unsubscribeTimeout) {
       setTimeout(() => {
-        Subscriptions.subscriptionsByName.delete(id);
-        Subscriptions.subscribedFiltersByName.delete(id);
+        PubSub.subscriptionsByName.delete(id);
+        PubSub.subscribedFiltersByName.delete(id);
       }, unsubscribeTimeout);
     }
 
     relays = relays || (id == 'keywords' ? this.searchRelays : this.relays).values();
     for (const relay of relays) {
-      const subId = Subscriptions.getSubscriptionIdForName(id);
+      const subId = PubSub.getSubscriptionIdForName(id);
       if (sinceLastSeen && savedRelays[relay.url] && savedRelays[relay.url].lastSeen) {
         filters.forEach((filter) => {
           filter.since = savedRelays[relay.url].lastSeen;
@@ -255,10 +255,10 @@ export default {
       if (once) {
         sub.on('eose', () => sub.unsub());
       }
-      if (!Subscriptions.subscriptionsByName.has(id)) {
-        Subscriptions.subscriptionsByName.set(id, new Set());
+      if (!PubSub.subscriptionsByName.has(id)) {
+        PubSub.subscriptionsByName.set(id, new Set());
       }
-      Subscriptions.subscriptionsByName.get(id)?.add(sub);
+      PubSub.subscriptionsByName.get(id)?.add(sub);
       //console.log('subscriptions size', this.subscriptionsByName.size);
       if (unsubscribeTimeout) {
         setTimeout(() => {

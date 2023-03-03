@@ -24,13 +24,13 @@ type Unsubscribe = () => void;
 let subscriptionId = 0;
 
 /**
- * Iris internal Subscriptions.
+ * Iris (mostly) internal Subscriptions.
  *
  * TODO:
  * 1) Only subscribe to what is needed for current view, unsubscribe on unmount
  * 2) Ask memory cache first, then dexie, then http proxy, then relays
  */
-const Subscriptions = {
+const PubSub = {
   internalSubscriptionsByName: new Map<string, number>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
   subscribedFiltersByName: new Map<string, FiltersWithOptions>(),
@@ -48,7 +48,7 @@ const Subscriptions = {
       [
         {
           kinds: [1, 6, 7, 9735],
-          '#e': Array.from(Subscriptions.subscribedRepliesAndReactions.values()),
+          '#e': Array.from(PubSub.subscribedRepliesAndReactions.values()),
         },
       ],
       'subscribedRepliesAndReactions',
@@ -63,12 +63,12 @@ const Subscriptions = {
     followedUsers.push(myPub);
     console.log(
       'subscribe to profiles and contacts of',
-      Subscriptions.subscribeToNewAuthors.size,
+      PubSub.subscribeToNewAuthors.size,
       'new authors',
     );
-    const authors = Array.from(Subscriptions.subscribeToNewAuthors.values()).slice(0, 1000);
+    const authors = Array.from(PubSub.subscribeToNewAuthors.values()).slice(0, 1000);
     authors.forEach((author) => {
-      Subscriptions.subscribeToNewAuthors.delete(author);
+      PubSub.subscribeToNewAuthors.delete(author);
     });
     console.log('subscribing to authors.length', authors.length);
     Relays.subscribe(
@@ -84,9 +84,9 @@ const Subscriptions = {
       0,
       true,
     );
-    if (Subscriptions.subscribedProfiles.size) {
+    if (PubSub.subscribedProfiles.size) {
       Relays.subscribe(
-        [{ authors: Array.from(Subscriptions.subscribedProfiles.values()), kinds: [0] }],
+        [{ authors: Array.from(PubSub.subscribedProfiles.values()), kinds: [0] }],
         'subscribedProfiles',
         true,
       );
@@ -103,26 +103,23 @@ const Subscriptions = {
   }, 2000),
   subscribeToPosts: throttle(
     () => {
-      if (Subscriptions.subscribedPosts.size === 0) return;
-      console.log('subscribe to', Subscriptions.subscribedPosts.size, 'posts');
-      Relays.subscribe(
-        [{ ids: Array.from(Subscriptions.subscribedPosts).slice(0, 1000) }],
-        'posts',
-      );
+      if (PubSub.subscribedPosts.size === 0) return;
+      console.log('subscribe to', PubSub.subscribedPosts.size, 'posts');
+      Relays.subscribe([{ ids: Array.from(PubSub.subscribedPosts).slice(0, 1000) }], 'posts');
     },
     3000,
     { leading: false },
   ),
   subscribeToKeywords: debounce(() => {
-    if (Subscriptions.subscribedKeywords.size === 0) return;
-    console.log('subscribe to keywords', Array.from(Subscriptions.subscribedKeywords));
+    if (PubSub.subscribedKeywords.size === 0) return;
+    console.log('subscribe to keywords', Array.from(PubSub.subscribedKeywords));
     const go = () => {
       Relays.subscribe(
         [
           {
             kinds: [1],
             limit: Events.MAX_MSGS_BY_KEYWORD,
-            keywords: Array.from(Subscriptions.subscribedKeywords),
+            keywords: Array.from(PubSub.subscribedKeywords),
           },
         ],
         'keywords',
@@ -235,5 +232,5 @@ const Subscriptions = {
   },
 };
 
-export default Subscriptions;
+export default PubSub;
 export { Unsubscribe };

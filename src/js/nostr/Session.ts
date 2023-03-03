@@ -9,9 +9,9 @@ import Events from './Events';
 import IndexedDB from './IndexedDB';
 import Key from './Key';
 import LocalForage from './LocalForage';
+import PubSub from './PubSub';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
-import Subscriptions from './Subscriptions';
 
 try {
   localStorage.setItem('gunPeers', JSON.stringify({})); // quick fix to not connect gun
@@ -57,7 +57,7 @@ const Session = {
           callback(event);
         }
       }
-      Subscriptions.subscribe(filters, callback);
+      PubSub.subscribe(filters, callback);
       return '0';
     };
     localState.get('globalFilter').once((globalFilter) => {

@@ -7,11 +7,11 @@ import SearchIndex from '../SearchIndex';
 import IndexedDB from './IndexedDB';
 import Key from './Key';
 import LocalForage from './LocalForage';
+import PubSub, { Unsubscribe } from './PubSub';
 import Relays from './Relays';
 import Session from './Session';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
-import Subscriptions, { Unsubscribe } from './Subscriptions';
 
 const startTime = Date.now() / 1000;
 
@@ -373,10 +373,7 @@ const Events = {
   },
   acceptEvent(event: Event) {
     if (globalFilter.maxFollowDistance) {
-      if (
-        !Subscriptions.subscribedUsers.has(event.pubkey) &&
-        !Subscriptions.subscribedPosts.has(event.id)
-      ) {
+      if (!PubSub.subscribedUsers.has(event.pubkey) && !PubSub.subscribedPosts.has(event.id)) {
         // unless we specifically subscribed to the user or post, ignore long follow distance users
         if (SocialNetwork.followDistanceByUser.has(event.pubkey)) {
           const distance = SocialNetwork.followDistanceByUser.get(event.pubkey);
@@ -444,7 +441,7 @@ const Events = {
 
     this.handledMsgsPerSecond++;
 
-    Subscriptions.subscribedPosts.delete(event.id);
+    PubSub.subscribedPosts.delete(event.id);
 
     switch (event.kind) {
       case 0:
@@ -498,11 +495,11 @@ const Events = {
     }
 
     if (
-      Subscriptions.subscribedProfiles.has(event.pubkey) &&
+      PubSub.subscribedProfiles.has(event.pubkey) &&
       SocialNetwork.blockedUsers.has(event.pubkey) &&
       SocialNetwork.followEventByUser.has(event.pubkey)
     ) {
-      Subscriptions.subscribedProfiles.delete(event.pubkey);
+      PubSub.subscribedProfiles.delete(event.pubkey);
     }
 
     // save limited by author followdistance
@@ -519,7 +516,7 @@ const Events = {
     }
 
     // go through subscriptions and callback if filters match
-    for (const sub of Subscriptions.subscriptions.values()) {
+    for (const sub of PubSub.subscriptions.values()) {
       if (!sub.filters) {
         return;
       }
@@ -719,7 +716,7 @@ const Events = {
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }
-    return Subscriptions.subscribe([{ kinds: [1, 6, 7, 9735], '#e': [id] }], callback);
+    return PubSub.subscribe([{ kinds: [1, 6, 7, 9735], '#e': [id] }], callback);
   },
   async getEventById(id: string, proxyFirst = false) {
     if (this.cache.has(id)) {
@@ -727,7 +724,7 @@ const Events = {
     }
     const askWs = () => {
       return new Promise((resolve) => {
-        const unsub = Subscriptions.subscribe([{ ids: [id] }], () => {
+        const unsub = PubSub.subscribe([{ ids: [id] }], () => {
           const msg = this.cache.get(id);
           if (msg) {
             resolve(msg);
@@ -749,7 +746,7 @@ const Events = {
               // TODO verify sig
               if (event && event.id === id) {
                 clearTimeout(askWsTimeout);
-                Subscriptions.subscribedPosts.add(id);
+                PubSub.subscribedPosts.add(id);
                 Events.handle(event, true);
                 resolve(event);
               }
@@ -766,7 +763,7 @@ const Events = {
       cb?.(this.notifications.eventIds);
     };
     callback();
-    return Subscriptions.subscribe([{ '#p': [Key.getPubKey()] }], callback);
+    return PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback);
   },
 
   getMessagesByEveryone(
@@ -782,7 +779,7 @@ const Events = {
       );
     };
     callback();
-    return Subscriptions.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
+    return PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
   },
   getMessagesByFollows(
     cb: (messageIds: string[], includeReplies: boolean) => void,
@@ -797,7 +794,7 @@ const Events = {
       );
     };
     callback();
-    return Subscriptions.subscribe([{ kinds: [1, 3, 5, 7, 9735] }], callback);
+    return PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735] }], callback);
   },
   getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void): Unsubscribe {
     const callback = (event) => {
@@ -819,7 +816,7 @@ const Events = {
     }
     this.latestNotesByKeywords.has(keyword) &&
       cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
-    return Subscriptions.subscribe([filter], callback);
+    return PubSub.subscribe([filter], callback);
   },
   getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
     // TODO subscribe on view profile and unsub on leave profile
@@ -827,21 +824,21 @@ const Events = {
       cb?.(this.postsAndRepliesByUser.get(address)?.eventIds);
     };
     this.postsAndRepliesByUser.has(address) && callback();
-    return Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
+    return PubSub.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getPostsByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
     const callback = () => {
       cb?.(this.postsByUser.get(address)?.eventIds);
     };
     this.postsByUser.has(address) && callback();
-    return Subscriptions.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
+    return PubSub.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getLikesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
     const callback = () => {
       cb?.(this.likesByUser.get(address)?.eventIds);
     };
     this.likesByUser.has(address) && callback();
-    return Subscriptions.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
+    return PubSub.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
   },
 
   getDirectMessages(cb?: (dms: Map<string, SortedLimitedEventSet>) => void): Unsubscribe {
@@ -849,7 +846,7 @@ const Events = {
       cb?.(this.directMessagesByUser);
     };
     callback();
-    return Subscriptions.subscribe([{ kinds: [4] }], callback);
+    return PubSub.subscribe([{ kinds: [4] }], callback);
   },
 
   getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
@@ -858,7 +855,7 @@ const Events = {
     };
     this.directMessagesByUser.has(address) && callback();
     const myPub = Key.getPubKey();
-    return Subscriptions.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
+    return PubSub.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
   },
 };
 

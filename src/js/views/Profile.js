@@ -348,7 +348,7 @@ class Profile extends View {
     const title = this.state.display_name || this.state.name || 'Profile';
     const ogTitle = `${title} | Iris`;
     const description = `Latest posts by ${this.state.display_name || this.state.name || 'user'}. ${
-      this.state.about || ''
+      this.state.profile?.about || ''
     }`;
     return html`
       ${this.state.banner
@@ -455,6 +455,7 @@ class Profile extends View {
           lightning,
           website: website,
           banner,
+          profile,
         });
       },
       true,

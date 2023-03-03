@@ -4,7 +4,7 @@ import localState from '../LocalState';
 import Events from './Events';
 import Key from './Key';
 import LocalForage from './LocalForage';
-import Subscriptions, { Unsubscribe } from './Subscriptions';
+import PubSub, { Unsubscribe } from './PubSub';
 
 export default {
   SUGGESTED_FOLLOWS: [
@@ -52,7 +52,7 @@ export default {
     };
 
     Events.publish(event);
-    Subscriptions.subscribeToAuthors();
+    PubSub.subscribeToAuthors();
   },
 
   setBlocked: function (blockedUser: string, block = true) {
@@ -147,9 +147,9 @@ export default {
       }
     }
     if (this.followedByUser.get(myPub)?.has(follower)) {
-      if (!Subscriptions.subscribedUsers.has(followedUser)) {
-        Subscriptions.subscribeToNewAuthors.add(followedUser);
-        Subscriptions.subscribeToAuthors();
+      if (!PubSub.subscribedUsers.has(followedUser)) {
+        PubSub.subscribeToNewAuthors.add(followedUser);
+        PubSub.subscribeToAuthors();
       }
     }
   },
@@ -191,7 +191,7 @@ export default {
       //  if resulting followersByUser(u).size is 0, remove that user as well
       this.followDistanceByUser.delete(unfollowedUser);
       this.followersByUser.delete(unfollowedUser);
-      Subscriptions.subscribedUsers.delete(unfollowedUser);
+      PubSub.subscribedUsers.delete(unfollowedUser);
       Events.latestNotesByEveryone.eventIds.forEach((id) => {
         const fullEvent = Events.cache.get(id);
         if (fullEvent?.pubkey === unfollowedUser) {
@@ -243,7 +243,7 @@ export default {
     };
     callback();
     const myPub = Key.getPubKey();
-    return Subscriptions.subscribe([{ kinds: [16462], authors: [myPub] }], callback);
+    return PubSub.subscribe([{ kinds: [16462], authors: [myPub] }], callback);
   },
   getFlaggedUsers(cb?: (flagged: Set<string>) => void): Unsubscribe {
     const callback = () => {
@@ -251,7 +251,7 @@ export default {
     };
     callback();
     const myPub = Key.getPubKey();
-    return Subscriptions.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
+    return PubSub.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
   },
   getFollowedByUser: function (
     user: string,
@@ -261,7 +261,7 @@ export default {
       cb?.(this.followedByUser.get(user) ?? new Set());
     };
     this.followedByUser.has(user) && callback();
-    return Subscriptions.subscribe([{ kinds: [3], authors: [user] }], callback);
+    return PubSub.subscribe([{ kinds: [3], authors: [user] }], callback);
   },
   getFollowersByUser: function (
     address: string,
@@ -271,7 +271,7 @@ export default {
       cb?.(this.followersByUser.get(address) ?? new Set());
     };
     this.followersByUser.has(address) && callback();
-    return Subscriptions.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
+    return PubSub.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
   },
   // TODO param "proxyFirst" to skip relays if http proxy responds quickly
   getProfile(
@@ -294,7 +294,7 @@ export default {
           callback();
         });
       }
-    } else if (!Subscriptions.subscribedProfiles.has(address)) {
+    } else if (!PubSub.subscribedProfiles.has(address)) {
       fetch(`https://api.iris.to/profile/${address}`).then((res) => {
         if (res.status === 200) {
           res.json().then((profile) => {
@@ -304,8 +304,8 @@ export default {
         }
       });
     }
-    Subscriptions.subscribedProfiles.add(address);
-    return Subscriptions.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
+    PubSub.subscribedProfiles.add(address);
+    return PubSub.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
   },
   setMetadata(data: any) {
     const event = {

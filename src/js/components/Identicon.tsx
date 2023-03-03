@@ -4,8 +4,8 @@ import styled from 'styled-components';
 
 import Component from '../BaseComponent';
 import Key from '../nostr/Key';
+import { Unsubscribe } from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
-import { Unsubscribe } from '../nostr/Subscriptions';
 
 import SafeImg from './SafeImg';
 
