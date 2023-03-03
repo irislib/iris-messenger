@@ -90,6 +90,9 @@ export default {
       relay.on('notice', (notice) => {
         console.log('notice from ', relay.url, notice);
       });
+      relay.on('disconnect', () => {
+        console.log('disconnected from ', relay.url);
+      });
     }
     for (const relay of this.searchRelays.values()) {
       relay.on('notice', (notice) => {

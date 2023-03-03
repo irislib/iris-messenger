@@ -412,6 +412,16 @@ const Events = {
         }
       }
     }
+    return true;
+  },
+  handle(event: Event, force = false, saveToIdb = true) {
+    if (!event) return;
+    if (this.cache.has(event.id) && !force) {
+      return;
+    }
+    if (!force && !this.acceptEvent(event)) {
+      return;
+    }
     // Accepting metadata so we still get their name. But should we instead save the name on our own list?
     // They might spam with 1 MB events and keep changing their name or something.
     if (SocialNetwork.blockedUsers.has(event.pubkey) && event.kind !== 0) {
@@ -430,16 +440,6 @@ const Events = {
         this.handleNextFutureEvent();
       }
       return false;
-    }
-    return true;
-  },
-  handle(event: Event, force = false, saveToIdb = true) {
-    if (!event) return;
-    if (this.cache.has(event.id) && !force) {
-      return;
-    }
-    if (!this.acceptEvent(event)) {
-      return;
     }
 
     this.handledMsgsPerSecond++;
@@ -746,9 +746,12 @@ const Events = {
         fetch(`https://api.iris.to/event/${id}`).then((res) => {
           if (res.status === 200) {
             res.json().then((event) => {
-              if (event) {
+              // TODO verify sig
+              if (event && event.id === id) {
                 clearTimeout(askWsTimeout);
-                Events.handle(event);
+                Subscriptions.subscribedPosts.add(id);
+                Events.handle(event, true);
+                resolve(event);
               }
             });
           }

@@ -192,9 +192,10 @@ const Subscriptions = {
       }
       if (filter.ids) {
         for (const id of filter.ids) {
-          if (!this.subscribedPosts.has(id)) {
+          const hex = Key.toNostrHexAddress(id);
+          if (!this.subscribedPosts.has(hex)) {
             hasNewIds = true;
-            this.subscribedPosts.add(Key.toNostrHexAddress(id));
+            this.subscribedPosts.add(hex);
           }
         }
       }

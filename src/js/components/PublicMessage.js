@@ -58,12 +58,12 @@ class PublicMessage extends Message {
     if (!hash) {
       return;
     }
-    const nostrId = Key.toNostrHexAddress(hash);
+    const hexId = Key.toNostrHexAddress(hash);
     const retrievingTimeout = setTimeout(() => {
       thisArg.setState({ retrieving: true });
     }, 1000);
 
-    if (nostrId) {
+    if (hexId) {
       const processNostrMessage = (event) => {
         clearTimeout(retrievingTimeout);
         if (thisArg.state.retrieving) {
@@ -96,11 +96,11 @@ class PublicMessage extends Message {
         };
       };
 
-      if (Events.cache.has(nostrId)) {
+      if (Events.cache.has(hexId)) {
         // for faster painting, return synchronously if we have the message
-        return processNostrMessage(Events.cache.get(nostrId));
+        return processNostrMessage(Events.cache.get(hexId));
       } else {
-        return Events.getEventById(nostrId, true).then((event) => {
+        return Events.getEventById(hexId, true).then((event) => {
           return processNostrMessage(event);
         });
       }
