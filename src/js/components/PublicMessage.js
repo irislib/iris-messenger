@@ -416,7 +416,7 @@ class PublicMessage extends Message {
   }
 
   renderZap() {
-    const likedId = this.state.msg.event.tags?.reverse().find((t) => t[0] === 'e')[1];
+    const likedId = this.state.msg.event.tags?.reverse().find((t) => t[0] === 'e')?.[1];
     const likedEvent = Events.cache.get(likedId);
     let text = likedEvent?.content;
     if (text && text.length > 50) {
