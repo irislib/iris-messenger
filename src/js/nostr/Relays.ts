@@ -133,7 +133,7 @@ export default {
   add(url: string) {
     if (this.relays.has(url)) return;
     const relay = relayInit(url, (id) => Events.cache.has(id));
-    relay.on('connect', () => Subscriptions.resubscribe(relay));
+    relay.on('connect', () => this.resubscribe(relay));
     relay.on('notice', (notice) => {
       console.log('notice from ', relay.url, notice);
     });
@@ -186,12 +186,20 @@ export default {
     5 * 1000,
     { leading: true },
   ),
+  resubscribe(relay?: Relay) {
+    console.log('subscribedFiltersByName.size', Subscriptions.subscribedFiltersByName.size);
+    for (const [name, filters] of Array.from(Subscriptions.subscribedFiltersByName.entries())) {
+      console.log('resubscribing to ', name, filters);
+      this.subscribe(filters.filters, name, false, 0, filters.sinceRelayLastSeen, relay && [relay]);
+    }
+  },
   subscribe: function (
     filters: Filter[],
     id: string,
     once = false,
     unsubscribeTimeout = 0,
     sinceLastSeen = false,
+    relays?: Relay[],
   ) {
     // if subs with same id already exists, remove them
     if (id) {
@@ -208,7 +216,7 @@ export default {
 
     // TODO slice and dice too large filters? queue and wait for eose. or alternate between filters by interval.
 
-    Subscriptions.subscribedFiltersByName.set(id, filters);
+    Subscriptions.subscribedFiltersByName.set(id, { filters, sinceRelayLastSeen: sinceLastSeen });
 
     if (unsubscribeTimeout) {
       setTimeout(() => {
@@ -217,7 +225,8 @@ export default {
       }, unsubscribeTimeout);
     }
 
-    for (const relay of (id == 'keywords' ? this.searchRelays : this.relays).values()) {
+    relays = relays || (id == 'keywords' ? this.searchRelays : this.relays).values();
+    for (const relay of relays) {
       const subId = Subscriptions.getSubscriptionIdForName(id);
       if (sinceLastSeen && savedRelays[relay.url] && savedRelays[relay.url].lastSeen) {
         filters.forEach((filter) => {

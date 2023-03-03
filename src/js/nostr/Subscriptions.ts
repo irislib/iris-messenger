@@ -2,7 +2,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { debounce, throttle } from 'lodash';
 
 import Helpers from '../Helpers';
-import { Event, Filter, Relay, Sub } from '../lib/nostr-tools';
+import { Event, Filter, Sub } from '../lib/nostr-tools';
 
 import Events from './Events';
 import Key from './Key';
@@ -12,6 +12,11 @@ import SocialNetwork from './SocialNetwork';
 type Subscription = {
   filters: Filter[];
   callback?: (event: Event) => void;
+};
+
+type FiltersWithOptions = {
+  filters: Filter[];
+  sinceRelayLastSeen?: boolean;
 };
 
 type Unsubscribe = () => void;
@@ -28,7 +33,7 @@ let subscriptionId = 0;
 const Subscriptions = {
   internalSubscriptionsByName: new Map<string, number>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
-  subscribedFiltersByName: new Map<string, Filter[]>(),
+  subscribedFiltersByName: new Map<string, FiltersWithOptions>(),
   subscriptions: new Map<number, Subscription>(),
   subscribedUsers: new Set<string>(),
   subscribedPosts: new Set<string>(),
@@ -37,16 +42,6 @@ const Subscriptions = {
   subscribedKeywords: new Set<string>(),
   getSubscriptionIdForName(name: string) {
     return Helpers.arrayToHex(sha256(name)).slice(0, 8);
-  },
-  resubscribe(relay: Relay) {
-    for (const [name, filters] of this.subscribedFiltersByName.entries()) {
-      const id = this.getSubscriptionIdForName(name);
-      const sub = relay.sub(filters, { id });
-      if (!this.subscriptionsByName.has(name)) {
-        this.subscriptionsByName.set(name, new Set());
-      }
-      this.subscriptionsByName.get(name)?.add(sub);
-    }
   },
   subscribeToRepliesAndReactions: debounce(() => {
     Relays.subscribe(

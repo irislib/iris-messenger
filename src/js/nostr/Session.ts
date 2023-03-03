@@ -127,13 +127,11 @@ const Session = {
     localState.get('loggedIn').on(() => this.onLoggedIn());
     let lastResubscribed = Date.now();
     document.addEventListener('visibilitychange', () => {
-      // when PWA returns to foreground after 5 min dormancy, resubscribe stuff
-      // there might be some better way to manage resubscriptions
+      // when iris returns to foreground after 1 min dormancy, resubscribe stuff
+      // there might be some better way to manage resubscriptions?
       if (document.visibilityState === 'visible') {
-        if (Date.now() - lastResubscribed > 1000 * 60 * 5) {
-          for (const relay of Relays.relays.values()) {
-            Subscriptions.resubscribe(relay);
-          }
+        if (Date.now() - lastResubscribed > 60 * 1000 * 1) {
+          Relays.resubscribe();
           lastResubscribed = Date.now();
         }
       }

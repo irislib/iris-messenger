@@ -118,7 +118,7 @@ class Node {
    * @example node.get('users').get('alice').put({name: 'Alice'})
    */
   put(value) {
-    console.log('put', this.id, value);
+    // console.log('put', this.id, value);
     if (Array.isArray(value)) {
       throw new Error("Sorry, we don't deal with arrays");
     }
