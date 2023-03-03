@@ -113,7 +113,7 @@ const Session = {
     });
     setTimeout(() => {
       // TODO 'new' subscription should only be done when viewing Global
-      Relays.subscribe([{ kinds: [0, 1, 3, 6, 7, 9735], limit: 10 }], 'new', false, 0, true); // everything new
+      // Relays.subscribe([{ kinds: [0, 1, 3, 6, 7, 9735], limit: 10 }], 'new', false, 0, true); // everything new
       Relays.subscribe([{ authors: [myPub] }], 'ours', false, 0, true); // our stuff
       Relays.subscribe([{ '#p': [myPub] }], 'notifications', false, 0, true); // notifications and DMs
     }, 200);

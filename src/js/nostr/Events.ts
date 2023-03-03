@@ -782,7 +782,7 @@ const Events = {
       );
     };
     callback();
-    return Subscriptions.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+    return Subscriptions.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
   },
   getMessagesByFollows(
     cb: (messageIds: string[], includeReplies: boolean) => void,
@@ -797,7 +797,7 @@ const Events = {
       );
     };
     callback();
-    return Subscriptions.subscribe([{ kinds: [1, 3, 5, 7] }], callback);
+    return Subscriptions.subscribe([{ kinds: [1, 3, 5, 7, 9735] }], callback);
   },
   getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void): Unsubscribe {
     const callback = (event) => {

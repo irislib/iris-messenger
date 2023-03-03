@@ -132,6 +132,10 @@ class PublicMessage extends Message {
 
   componentDidMount() {
     this.unmounted = false;
+    if (!this.props.hash) {
+      console.error('PublicMessage: no hash');
+      return;
+    }
     const hexId = Key.toNostrHexAddress(this.props.hash);
     this.hexId = hexId;
     localState.get('mutedNotes').on(

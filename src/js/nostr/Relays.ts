@@ -189,6 +189,17 @@ export default {
     5 * 1000,
     { leading: true },
   ),
+  unsubscribe: function (id: string) {
+    const subs = Subscriptions.subscriptionsByName.get(id);
+    if (subs) {
+      subs.forEach((sub) => {
+        console.log('unsub', id);
+        sub.unsub();
+      });
+    }
+    Subscriptions.subscriptionsByName.delete(id);
+    Subscriptions.subscribedFiltersByName.delete(id);
+  },
   resubscribe(relay?: Relay) {
     console.log('subscribedFiltersByName.size', Subscriptions.subscribedFiltersByName.size);
     for (const [name, filters] of Array.from(Subscriptions.subscribedFiltersByName.entries())) {

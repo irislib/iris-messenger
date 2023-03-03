@@ -93,6 +93,7 @@ class MessageFeed extends Component {
     if (this.props.scrollElement) {
       this.props.scrollElement.removeEventListener('scroll', this.handleScroll);
     }
+    this.unsub && this.unsub();
   }
 
   addScrollHandler() {
@@ -151,7 +152,7 @@ class MessageFeed extends Component {
   }
 
   getMessagesByEveryone(includeReplies) {
-    Events.getMessagesByEveryone((messages, cbIncludeReplies) => {
+    this.unsub = Events.getMessagesByEveryone((messages, cbIncludeReplies) => {
       this.state.includeReplies === cbIncludeReplies && this.updateSortedMessages(messages);
     }, includeReplies);
   }

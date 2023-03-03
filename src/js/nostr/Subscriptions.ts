@@ -132,18 +132,6 @@ const Subscriptions = {
     };
     go();
   }, 100),
-  // TODO rename, this is for external subscription. clarify internal vs external subs distinction.
-  unsubscribe: function (id: string) {
-    const subs = this.subscriptionsByName.get(id);
-    if (subs) {
-      subs.forEach((sub) => {
-        console.log('unsub', id);
-        sub.unsub();
-      });
-    }
-    this.subscriptionsByName.delete(id);
-    this.subscribedFiltersByName.delete(id);
-  },
   /**
    * internal subscribe
    * @param filters
@@ -231,12 +219,17 @@ const Subscriptions = {
     }
     hasNewIds && this.subscribeToPosts(this);
     hasNewKeywords && this.subscribeToKeywords(this);
+    name === 'global' && Relays.subscribe(filters, 'global');
     return () => {
       if (currentSubscriptionId) {
         this.subscriptions.delete(currentSubscriptionId);
       }
       if (name) {
         this.internalSubscriptionsByName.delete(name);
+        if (name === 'global') {
+          Relays.unsubscribe('global');
+          console.log('unsubscribed global');
+        }
       }
     };
   },
