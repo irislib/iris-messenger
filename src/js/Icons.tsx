@@ -19,7 +19,7 @@ export default {
     </svg>
   ),
 
-  boost: (
+  repost: (
     <svg fill="currentColor" width="24" viewBox="0 0 24 24">
       <g>
         <path

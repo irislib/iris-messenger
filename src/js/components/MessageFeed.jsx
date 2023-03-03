@@ -44,7 +44,7 @@ class MessageFeed extends Component {
         const hash = sortedMessages[i];
         const message = Events.cache.get(hash);
         if (message && message.created_at > this.state.messagesShownTime) {
-          if (message.pubkey === Key.getPubKey() && !Events.isBoost(message)) {
+          if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
             hasMyMessage = true;
             break;
           }

@@ -58,7 +58,7 @@ const Events = {
   threadRepliesByMessageId: new Map<string, Set<string>>(),
   directRepliesByMessageId: new Map<string, Set<string>>(),
   likesByMessageId: new Map<string, Set<string>>(),
-  boostsByMessageId: new Map<string, Set<string>>(),
+  repostsByMessageId: new Map<string, Set<string>>(),
   handledMsgsPerSecond: 0,
   decryptedMessages: new Map<string, string>(),
   futureEventIds: new SortedLimitedEventSet(100, false),
@@ -100,11 +100,11 @@ const Events = {
       }
     }
 
-    // todo: handle astral ninja format boost (retweet) message
+    // todo: handle astral ninja format repost (retweet) message
     // where content points to the original message tag: "content": "#[1]"
 
-    const isBoost = this.isBoost(event);
-    if (replyingTo && !isBoost) {
+    const isRepost = this.isRepost(event);
+    if (replyingTo && !isRepost) {
       if (!this.directRepliesByMessageId.has(replyingTo)) {
         this.directRepliesByMessageId.set(replyingTo, new Set<string>());
       }
@@ -151,22 +151,22 @@ const Events = {
     }
     return undefined;
   },
-  handleBoost(event: Event) {
+  handleRepost(event: Event) {
     let id = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
     if (!id) {
-      // last e tag is the boosted post
+      // last e tag is the reposted post
       id = event.tags
         .slice() // so we don't reverse event.tags in place
         .reverse()
         .find((tag: any) => tag[0] === 'e')?.[1];
     }
     if (!id) return;
-    if (!this.boostsByMessageId.has(id)) {
-      this.boostsByMessageId.set(id, new Set());
+    if (!this.repostsByMessageId.has(id)) {
+      this.repostsByMessageId.set(id, new Set());
     }
-    // only handle one boost per post per user. TODO update with newer event if needed.
-    if (!this.boostsByMessageId.get(id)?.has(event.pubkey)) {
-      this.boostsByMessageId.get(id)?.add(event.pubkey);
+    // only handle one repost per post per user. TODO update with newer event if needed.
+    if (!this.repostsByMessageId.get(id)?.has(event.pubkey)) {
+      this.repostsByMessageId.get(id)?.add(event.pubkey);
       this.handleNote(event);
     }
   },
@@ -360,7 +360,7 @@ const Events = {
       this.keyValueEvents.set(key, event);
     }
   },
-  isBoost(event: Event) {
+  isRepost(event: Event) {
     if (event.kind === 6) {
       return true;
     }
@@ -402,7 +402,7 @@ const Events = {
           if (
             event.kind === 1 &&
             (Events.likesByMessageId.get(event.id)?.size > 0 ||
-              Events.boostsByMessageId.get(event.id)?.size > 0)
+              Events.repostsByMessageId.get(event.id)?.size > 0)
           ) {
             // allow messages that have been liked by at least 1 user
           } else {
@@ -454,8 +454,8 @@ const Events = {
         break;
       case 1:
         this.maybeAddNotification(event);
-        if (this.isBoost(event)) {
-          this.handleBoost(event);
+        if (this.isRepost(event)) {
+          this.handleRepost(event);
         } else {
           this.handleNote(event);
         }
@@ -475,7 +475,7 @@ const Events = {
         break;
       case 6:
         this.maybeAddNotification(event);
-        this.handleBoost(event);
+        this.handleRepost(event);
         break;
       case 7:
         this.maybeAddNotification(event);
@@ -702,7 +702,7 @@ const Events = {
       replies: Set<string>,
       likedBy: Set<string>,
       threadReplyCount: number,
-      boostedBy: Set<string>,
+      repostedBy: Set<string>,
       zaps: Set<string>,
     ) => void,
   ): Unsubscribe {
@@ -712,7 +712,7 @@ const Events = {
           this.directRepliesByMessageId.get(id) ?? new Set(),
           this.likesByMessageId.get(id) ?? new Set(),
           this.threadRepliesByMessageId.get(id)?.size ?? 0,
-          this.boostsByMessageId.get(id) ?? new Set(),
+          this.repostsByMessageId.get(id) ?? new Set(),
           this.zapsByNote.get(id) ?? new Set(),
         );
     };

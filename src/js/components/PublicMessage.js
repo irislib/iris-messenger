@@ -201,11 +201,11 @@ class PublicMessage extends Message {
       if (hexId) {
         const unsub = Events.getRepliesAndReactions(
           hexId,
-          (replies, likedBy, threadReplyCount, boostedBy, zaps) => {
+          (replies, likedBy, threadReplyCount, repostedBy, zaps) => {
             // zaps.size &&
             //  console.log('zaps.size', zaps.size, Key.toNostrBech32Address(hexId, 'note'));
             this.likedBy = likedBy;
-            this.boostedBy = boostedBy;
+            this.repostedBy = repostedBy;
             const sortedReplies =
               replies &&
               Array.from(replies).sort((a, b) => {
@@ -231,8 +231,8 @@ class PublicMessage extends Message {
             const zappers =
               zaps && Array.from(zaps.values()).map((eventId) => Events.getZappingUser(eventId));
             this.setState({
-              boosts: this.boostedBy.size,
-              boosted: this.boostedBy.has(myPub),
+              reposts: this.repostedBy.size,
+              reposted: this.repostedBy.has(myPub),
               likes: this.likedBy.size,
               zappers,
               liked: this.likedBy.has(myPub),
@@ -263,8 +263,8 @@ class PublicMessage extends Message {
     this.like(!this.state.liked);
   }
 
-  boostBtnClicked() {
-    if (!this.state.boosted) {
+  repostBtnClicked() {
+    if (!this.state.reposted) {
       const author = this.state.msg?.event?.pubkey;
       const hexId = Key.toNostrHexAddress(this.props.hash);
       if (hexId) {
@@ -367,7 +367,7 @@ class PublicMessage extends Message {
       <div class="msg">
         <div class="msg-content">
           <div style="display: flex; align-items: center">
-            <i class="boost-btn boosted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
+            <i class="repost-btn reposted" style="margin-right: 15px;"> ${Icons.newFollower} </i>
             <a href="/${Key.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
               <${Name} pub=${this.state.msg?.event?.pubkey} />
             </a>
@@ -526,7 +526,7 @@ class PublicMessage extends Message {
         <div class="msg-content" style="padding: 12px 0 0 0;">
           <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
             <small class="reposted">
-              <i> ${Icons.boost} </i>
+              <i> ${Icons.repost} </i>
               <a href="/${Key.toNostrBech32Address(this.state.msg.event.pubkey, 'npub')}">
                 <${Name}
                   pub=${this.state.msg?.event?.pubkey}
@@ -546,17 +546,17 @@ class PublicMessage extends Message {
   toggleLikes(e) {
     console.log('toggle likes');
     e.stopPropagation();
-    this.setState({ showLikes: !this.state.showLikes, showZaps: false, showBoosts: false });
+    this.setState({ showLikes: !this.state.showLikes, showZaps: false, showreposts: false });
   }
 
-  toggleBoosts(e) {
+  toggleReposts(e) {
     e.stopPropagation();
-    this.setState({ showBoosts: !this.state.showBoosts, showZaps: false, showLikes: false });
+    this.setState({ showReposts: !this.state.showReposts, showZaps: false, showLikes: false });
   }
 
   toggleZaps(e) {
     e.stopPropagation();
-    this.setState({ showZaps: !this.state.showZaps, showBoosts: false, showLikes: false });
+    this.setState({ showZaps: !this.state.showZaps, showReposts: false, showLikes: false });
   }
 
   render() {
@@ -809,16 +809,16 @@ class PublicMessage extends Message {
                     </a>
                     <span class="count"> ${s.replyCount || ''} </span>
                     <a
-                      class="msg-btn boost-btn ${s.boosted ? 'boosted' : ''}"
-                      onClick=${() => this.boostBtnClicked()}
+                      class="msg-btn repost-btn ${s.reposted ? 'reposted' : ''}"
+                      onClick=${() => this.repostBtnClicked()}
                     >
-                      ${Icons.boost}
+                      ${Icons.repost}
                     </a>
                     <span
-                      class="count ${s.showBoosts ? 'active' : ''}"
-                      onClick=${(e) => this.toggleBoosts(e)}
+                      class="count ${s.showReposts ? 'active' : ''}"
+                      onClick=${(e) => this.toggleReposts(e)}
                     >
-                      ${s.boosts || ''}
+                      ${s.reposts || ''}
                     </span>
                     <a
                       class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
@@ -880,10 +880,10 @@ class PublicMessage extends Message {
                   </div>
                 `
               : ''}
-            ${s.showBoosts
+            ${s.showReposts
               ? html`
                   <div class="likes">
-                    ${Array.from(this.boostedBy).map((key) => {
+                    ${Array.from(this.repostedBy).map((key) => {
                       const npub = Key.toNostrBech32Address(key, 'npub');
                       return html`<${Identicon}
                         showTooltip=${true}

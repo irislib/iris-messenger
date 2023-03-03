@@ -1639,7 +1639,7 @@ a.msgSenderName:hover .user-name {
   color: var(--blue);
 }
 
-.msg .boost-btn.boosted, .msg .boost-btn:hover {
+.msg .repost-btn.reposted, .msg .repost-btn:hover {
   color: var(--green);
 }
 
