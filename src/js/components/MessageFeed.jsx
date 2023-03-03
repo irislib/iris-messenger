@@ -8,7 +8,7 @@ import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
-import PublicMessage from './PublicMessage';
+import EventComponent from './events/EventComponent';
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -41,18 +41,18 @@ class MessageFeed extends Component {
       const queuedMessages = [];
       let hasMyMessage;
       for (let i = 0; i < sortedMessages.length; i++) {
-        const hash = sortedMessages[i];
-        const message = Events.cache.get(hash);
+        const id = sortedMessages[i];
+        const message = Events.cache.get(id);
         if (message && message.created_at > this.state.messagesShownTime) {
           if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
             hasMyMessage = true;
             break;
           }
-          queuedMessages.push(hash);
+          queuedMessages.push(id);
         }
       }
       if (!hasMyMessage) {
-        sortedMessages = sortedMessages.filter((hash) => !queuedMessages.includes(hash));
+        sortedMessages = sortedMessages.filter((id) => !queuedMessages.includes(id));
       }
       const messagesShownTime = hasMyMessage
         ? Math.floor(Date.now() / 1000)
@@ -267,8 +267,8 @@ class MessageFeed extends Component {
           ) : (
             ''
           )}
-          {this.state.sortedMessages.slice(0, displayCount).map((hash) => (
-            <PublicMessage key={hash} hash={hash} showName={true} showRepliedMsg={showRepliedMsg} />
+          {this.state.sortedMessages.slice(0, displayCount).map((id) => (
+            <EventComponent key={id} id={id} showName={true} showRepliedMsg={showRepliedMsg} />
           ))}
         </div>
         {displayCount < this.state.sortedMessages.length ? (

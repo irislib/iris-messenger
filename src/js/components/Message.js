@@ -187,8 +187,8 @@ class Message extends Component {
           <div class="text ${emojiOnly && 'emoji-only'}">${text}</div>
           <div class="below-text">
             <div class="time">
-              ${this.props.hash
-                ? html`<a href="/post/${encodeURIComponent(this.props.hash)}"
+              ${this.props.id
+                ? html`<a href="/post/${encodeURIComponent(this.props.id)}"
                     >${Helpers.getRelativeTimeText(time)}</a
                   >`
                 : Helpers.formatTime(time)}

@@ -1,8 +1,8 @@
 import { html } from 'htm/preact';
 import { route } from 'preact-router';
 
+import EventComponent from '../components/events/EventComponent';
 import FeedMessageForm from '../components/FeedMessageForm';
-import PublicMessage from '../components/PublicMessage';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
@@ -15,8 +15,8 @@ class Message extends View {
   }
 
   componentDidMount() {
-    const nostrBech32Id = Key.toNostrBech32Address(this.props.hash, 'note');
-    if (nostrBech32Id && this.props.hash !== nostrBech32Id) {
+    const nostrBech32Id = Key.toNostrBech32Address(this.props.id, 'note');
+    if (nostrBech32Id && this.props.id !== nostrBech32Id) {
       route(`/post/${nostrBech32Id}`, true);
       return;
     }
@@ -24,14 +24,14 @@ class Message extends View {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.hash !== this.props.hash) {
+    if (prevProps.id !== this.props.id) {
       this.restoreScrollPosition();
     }
   }
 
   renderView() {
     let content;
-    if (this.props.hash === 'new') {
+    if (this.props.id === 'new') {
       content = html`
         <div class="mar-top15">
           <${FeedMessageForm}
@@ -45,10 +45,10 @@ class Message extends View {
       `;
     } else {
       content = html`
-        <${PublicMessage}
-          key=${this.props.hash}
+        <${EventComponent}
+          id=${this.props.id}
+          key=${this.props.id}
           standalone=${true}
-          hash=${this.props.hash}
           showName=${true}
           showReplies=${Infinity}
           showRepliedMsg=${true}

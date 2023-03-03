@@ -14,6 +14,10 @@ type Props = {
 };
 
 const Name = (props: Props) => {
+  if (!props.pub) {
+    console.error('Name component requires a pub', props);
+    return null;
+  }
   const nostrAddr = Key.toNostrHexAddress(props.pub);
   let initialName = '';
   let initialDisplayName;

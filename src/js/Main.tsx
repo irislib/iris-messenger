@@ -158,7 +158,7 @@ class Main extends Component<Props, ReactState> {
               <Chat path="/chat/hashtag/:hashtag?" />
               <Chat path="/chat/:id?" />
               <Chat path="/chat/new/:id" />
-              <Message path="/post/:hash+" />
+              <Message path="/post/:id+" />
               <Torrent path="/torrent/:id+" />
               <About path="/about" />
               <Settings path="/settings/:page?" />

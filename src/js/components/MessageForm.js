@@ -14,7 +14,9 @@ export default class MessageForm extends Component {
     };
     if (msg.replyingTo) {
       const id = Key.toNostrHexAddress(msg.replyingTo);
-      const replyingTo = await Events.getEventById(id);
+      const replyingTo = await new Promise((resolve) => {
+        Events.getEventById(id, true, (e) => resolve(e));
+      });
       event.tags = replyingTo.tags.filter((tag) => tag[0] === 'p');
       let rootTag = replyingTo.tags.find((t) => t[0] === 'e' && t[3] === 'root');
       if (!rootTag) {

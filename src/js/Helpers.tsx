@@ -4,8 +4,8 @@ import $ from 'jquery';
 import throttle from 'lodash/throttle';
 import { route } from 'preact-router';
 
+import EventComponent from './components/events/EventComponent';
 import Name from './components/Name';
-import PublicMessage from './components/PublicMessage';
 import { isSafeOrigin } from './components/SafeImg';
 import Torrent from './components/Torrent';
 import Key from './nostr/Key';
@@ -119,9 +119,9 @@ export default {
     if (opts.showMentionedMessages) {
       replacedText = reactStringReplace(replacedText, noteRegex, (match, i) => {
         return (
-          <PublicMessage
+          <EventComponent
             key={match + i}
-            hash={Key.toNostrHexAddress(match)}
+            id={Key.toNostrHexAddress(match)}
             showName={true}
             showBtns={false}
             asInlineQuote={true}
@@ -386,7 +386,7 @@ export default {
     );
 
     if (event && event.tags) {
-      // replace "#[0]" tags with links to the user: event.tags[n][1]
+      // replace "#[n]" tags with links to the user: event.tags[n][1]
       s = reactStringReplace(s, /#\[(\d+)\]/g, (match, i) => {
         const tag = event.tags[parseInt(match, 10)];
         if (tag) {
@@ -401,9 +401,9 @@ export default {
             );
           } else if (tag[0] === 'e') {
             return opts.showMentionedMessages ? (
-              <PublicMessage
+              <EventComponent
                 key={tagTarget + i}
-                hash={tagTarget}
+                id={tagTarget}
                 showName={true}
                 showBtns={false}
                 asInlineQuote={true}

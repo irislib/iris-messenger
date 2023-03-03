@@ -722,45 +722,42 @@ const Events = {
     }
     return PubSub.subscribe([{ kinds: [1, 6, 7, 9735], '#e': [id] }], callback);
   },
-  async getEventById(id: string, proxyFirst = false) {
-    if (this.cache.has(id)) {
-      return this.cache.get(id);
+  getEventById(id: string, proxyFirst = false, cb?: (event: Event) => void) {
+    if (cb && this.cache.has(id)) {
+      cb(this.cache.get(id));
+      return;
     }
     const askWs = () => {
-      return new Promise((resolve) => {
-        const unsub = PubSub.subscribe([{ ids: [id] }], () => {
-          const msg = this.cache.get(id);
-          if (msg) {
-            resolve(msg);
-            unsub();
-          }
-        });
+      const unsub = PubSub.subscribe([{ ids: [id] }], () => {
+        const msg = this.cache.get(id);
+        if (msg) {
+          cb?.(msg);
+          unsub();
+        }
       });
     };
 
-    return new Promise((resolve) => {
-      if (proxyFirst) {
-        // give proxy 300 ms to respond, then ask ws
-        const askWsTimeout = setTimeout(() => {
-          askWs().then(resolve);
-        }, 300);
-        fetch(`https://api.iris.to/event/${id}`).then((res) => {
-          if (res.status === 200) {
-            res.json().then((event) => {
-              // TODO verify sig
-              if (event && event.id === id) {
-                clearTimeout(askWsTimeout);
-                PubSub.subscribedPosts.add(id);
-                Events.handle(event, true);
-                resolve(event);
-              }
-            });
-          }
-        });
-      } else {
-        askWs().then(resolve);
-      }
-    });
+    if (proxyFirst) {
+      // give proxy 300 ms to respond, then ask ws
+      const askWsTimeout = setTimeout(() => {
+        askWs();
+      }, 300);
+      fetch(`https://api.iris.to/event/${id}`).then((res) => {
+        if (res.status === 200) {
+          res.json().then((event) => {
+            // TODO verify sig
+            if (event && event.id === id) {
+              clearTimeout(askWsTimeout);
+              PubSub.subscribedPosts.add(id);
+              Events.handle(event, true);
+              cb?.(event);
+            }
+          });
+        }
+      });
+    } else {
+      askWs();
+    }
   },
   getNotifications: function (cb?: (notifications: string[]) => void): Unsubscribe {
     const callback = () => {
