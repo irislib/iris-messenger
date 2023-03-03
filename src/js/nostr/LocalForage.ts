@@ -10,11 +10,11 @@ import SocialNetwork from './SocialNetwork';
 export default {
   loaded: false,
   saveEvents: debounce(() => {
-    const latestMsgs = Events.latestNotesByFollows.eventIds.slice(0, 500).map((eventId: any) => {
+    const latestMsgs = Events.latestNotesByFollows.eventIds.slice(0, 100).map((eventId: any) => {
       return Events.cache.get(eventId);
     });
     const latestMsgsByEveryone = Events.latestNotesAndRepliesByEveryone.eventIds
-      .slice(0, 1000)
+      .slice(0, 100)
       .map((eventId: any) => {
         return Events.cache.get(eventId);
       });
@@ -22,14 +22,15 @@ export default {
       .map((eventId: any) => {
         return Events.cache.get(eventId);
       })
-      .splice(0, 200);
-    const dms = [];
+      .slice(0, 100);
+    let dms = [];
     for (const set of Events.directMessagesByUser.values()) {
       set.eventIds.forEach((eventId: any) => {
         dms.push(Events.cache.get(eventId));
       });
     }
-    const kvEvents = Array.from(Events.keyValueEvents.values());
+    dms = dms.slice(0, 100);
+    const kvEvents = Array.from(Events.keyValueEvents.values()).slice(0, 100);
 
     localForage.setItem('latestMsgs', latestMsgs);
     localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
@@ -40,6 +41,7 @@ export default {
   }, 5000),
 
   saveProfilesAndFollows: debounce(() => {
+    // TODO follow distance 1 profileEvents
     const profileEvents = Array.from(SocialNetwork.profileEventByUser.values());
     const myPub = Key.getPubKey();
     const followEvents = Array.from(SocialNetwork.followEventByUser.values()).filter((e: Event) => {
@@ -68,8 +70,8 @@ export default {
     );
      */
 
-    localForage.setItem('profileEvents', profileEvents);
-    localForage.setItem('followEvents', followEvents2);
+    localForage.setItem('profileEvents', profileEvents.slice(0, 100));
+    localForage.setItem('followEvents', followEvents2.slice(0, 100));
   }, 5000),
 
   loadEvents: async function () {

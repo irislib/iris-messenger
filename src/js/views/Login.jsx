@@ -90,7 +90,6 @@ class Login extends Component {
     this.base.style = 'display:none';
     const now = Math.floor(Date.now() / 1000);
     Events.notificationsSeenTime = now;
-    localForage.setItem('notificationsSeenTime', now);
     setTimeout(() => {
       // TODO remove setTimeout
       localState.get('loggedIn').put(true);
