@@ -1,3 +1,5 @@
+import { throttle } from 'lodash';
+
 import { Filter, Relay, relayInit } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
@@ -8,9 +10,12 @@ import Subscriptions from './Subscriptions';
 
 type SavedRelays = {
   [key: string]: {
-    enabled: boolean;
+    enabled?: boolean;
+    lastSeen?: number;
   };
 };
+
+let savedRelays: SavedRelays = {};
 
 const DEFAULT_RELAYS = [
   'wss://eden.nostr.land',
@@ -93,10 +98,11 @@ export default {
     }
 
     localState.get('relays').put({});
-    localState.get('relays').on((savedRelays: SavedRelays) => {
-      if (!savedRelays) {
+    localState.get('relays').on((r: SavedRelays) => {
+      if (!r) {
         return;
       }
+      savedRelays = r;
       for (const url of this.relays.keys()) {
         if (savedRelays[url] === null) {
           this.remove(url);
@@ -172,6 +178,14 @@ export default {
     };
     Events.publish(event);
   },
+  updateLastSeen: throttle(
+    (url) => {
+      const now = Math.floor(Date.now() / 1000);
+      localState.get('relays').get(url).get('lastSeen').put(now);
+    },
+    5 * 1000,
+    { leading: true },
+  ),
   subscribe: function (filters: Filter[], id: string, once = false, unsubscribeTimeout = 0) {
     // if subs with same id already exists, remove them
     if (id) {
@@ -197,9 +211,16 @@ export default {
 
     for (const relay of (id == 'keywords' ? this.searchRelays : this.relays).values()) {
       const subId = Subscriptions.getSubscriptionIdForName(id);
+      if (savedRelays[relay.url] && savedRelays[relay.url].lastSeen) {
+        filters.forEach((filter) => {
+          filter.since = savedRelays[relay.url].lastSeen;
+        });
+      }
       const sub = relay.sub(filters, { id: subId });
-      // TODO update relay lastSeen
-      sub.on('event', (event) => Events.handle(event));
+      sub.on('event', (event) => {
+        this.updateLastSeen(relay.url);
+        Events.handle(event);
+      });
       if (once) {
         sub.on('eose', () => sub.unsub());
       }

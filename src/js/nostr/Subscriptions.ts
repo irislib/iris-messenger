@@ -18,6 +18,13 @@ type Unsubscribe = () => void;
 
 let subscriptionId = 0;
 
+/**
+ * Iris internal Subscriptions.
+ *
+ * TODO:
+ * 1) Only subscribe to what is needed for current view, unsubscribe on unmount
+ * 2) Ask memory cache first, then dexie, then http proxy, then relays
+ */
 const Subscriptions = {
   internalSubscriptionsByName: new Map<string, number>(),
   subscriptionsByName: new Map<string, Set<Sub>>(),
