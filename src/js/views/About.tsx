@@ -41,7 +41,7 @@ class About extends Component {
                       <a href="https://iris.to">iris.to</a> (web)
                     </li>
                     <li>
-                      <a href="https://testflight.apple.com/join/5xdoDCmG">iOS Testflight</a>
+                      <a href="https://apps.apple.com/app/iris-the-nostr-client/id1665849007">iOS</a>
                     </li>
                     <li>
                       <a href="https://play.google.com/store/apps/details?id=to.iris.twa">
