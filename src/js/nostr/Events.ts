@@ -612,6 +612,10 @@ const Events = {
   },
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
+    if (event.tags?.filter((tag) => tag[0] === 'p').length > 10) {
+      // no hellthreads please. TODO: make configurable in settings
+      return;
+    }
     const myPub = Key.getPubKey();
     // TODO: if it's a like, only add if the last p tag is us
     if (event.pubkey !== myPub && event.tags?.some((tag) => tag[0] === 'p' && tag[1] === myPub)) {
