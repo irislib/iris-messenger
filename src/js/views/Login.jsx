@@ -128,7 +128,9 @@ class Login extends Component {
           autoFocus
           onInput={(e) => this.onPasteKey(e)}
           placeholder={t('paste_private_key')}
+          type="password"
         />
+        {this.state.privateKeyError && <div className="error">{this.state.privateKeyError}</div>}
       </>
     );
   }

@@ -22,8 +22,9 @@ registerRoute(
 // Make root page load instantly, even if offline. Tradeoff: after app update, user will see old version until they refresh.
 registerRoute(
   ({ url }) => url.pathname === '/',
-  new StaleWhileRevalidate({
+  new NetworkFirst({
     cacheName: 'iris-main',
+    networkTimeoutSeconds: 3,
     plugins: [
       new CacheableResponsePlugin({
         statuses: [0, 200], // no 404
@@ -64,9 +65,9 @@ registerRoute(
   },
   new NetworkFirst({
     cacheName: 'pages-etc',
+    networkTimeoutSeconds: 3,
     plugins: [
       new ExpirationPlugin({
-        networkTimeoutSeconds: 5,
         maxEntries: 100,
         maxAgeSeconds: 30 * 24 * 60 * 60,
         purgeOnQuotaError: true,
