@@ -850,7 +850,7 @@ const Events = {
       cb?.(this.directMessagesByUser);
     };
     callback();
-    return PubSub.subscribe([{ kinds: [4] }], callback);
+    return PubSub.subscribe([{ kinds: [4], '#p': [Key.getPubKey()] }], callback);
   },
 
   getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {

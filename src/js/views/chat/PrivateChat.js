@@ -9,6 +9,7 @@ import Message from '../../components/Message';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
+import Relays from '../../nostr/Relays';
 import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation';
 
@@ -59,6 +60,11 @@ export default class PrivateChat extends Component {
 
   componentDidMount() {
     const hexId = Key.toNostrHexAddress(this.props.id);
+    this.unsub = Relays.subscribe(
+      [{ kinds: [4], '#p': [Key.getPubKey()], authors: [hexId] }],
+      'privateChat',
+      true,
+    );
     Events.getDirectMessagesByUser(hexId, (msgIds) => {
       if (msgIds) {
         this.setState({ sortedMessages: msgIds.reverse() });
@@ -97,6 +103,7 @@ export default class PrivateChat extends Component {
         this.updateLastOpened();
       }
     });
+    this.unsub && this.unsub();
   }
 
   componentDidUpdate(previousProps) {

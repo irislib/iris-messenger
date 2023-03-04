@@ -382,6 +382,7 @@ class Profile extends View {
   }
 
   getNostrProfile(address, nostrAddress) {
+    // TODO unsubscribe on unmount
     Relays.subscribe([{ authors: [address] }], address, true, 15 * 1000);
     const setFollowCounts = () => {
       address &&
