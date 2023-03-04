@@ -121,10 +121,15 @@ const Session = {
       }
     });
     setTimeout(() => {
-      // TODO 'new' subscription should only be done when viewing Global
-      // Relays.subscribe([{ kinds: [0, 1, 3, 6, 7, 9735], limit: 10 }], 'new', false, 0, true); // everything new
       Relays.subscribe([{ authors: [myPub] }], 'ours', false, 0, true); // our stuff
-      Relays.subscribe([{ '#p': [myPub] }], 'notifications', false, 0, true); // notifications and DMs
+      Relays.subscribe(
+        [{ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }],
+        'notifications',
+        false,
+        0,
+        true,
+      ); // notifications
+      Relays.subscribe([{ '#p': [myPub], kinds: [4] }], 'dms', false, 0, true); // notifications and DMs
     }, 200);
     setInterval(() => {
       console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));
