@@ -1,5 +1,4 @@
 import * as secp from '@noble/secp256k1';
-import localForage from 'localforage';
 import { Component } from 'preact';
 
 import logo from '../../assets/img/android-chrome-192x192.png';
@@ -32,6 +31,7 @@ class Login extends Component {
   async onPasteKey(event) {
     const val = event.target.value?.trim();
     if (!val.length) {
+      this.setState({ privateKeyError: null });
       return;
     }
     let k;
@@ -59,6 +59,7 @@ class Login extends Component {
             k = { priv: hex, rpub: Key.getPublicKey(hex) };
           }
         } catch (e) {
+          this.setState({ privateKeyError: t('invalid_private_key') });
           console.error(e);
         }
       }
@@ -130,7 +131,7 @@ class Login extends Component {
           placeholder={t('paste_private_key')}
           type="password"
         />
-        {this.state.privateKeyError && <div className="error">{this.state.privateKeyError}</div>}
+        {this.state.privateKeyError && <p className="error">{this.state.privateKeyError}</p>}
       </>
     );
   }
