@@ -30,7 +30,7 @@ class Login extends Component {
   }
 
   async onPasteKey(event) {
-    const val = event.target.value;
+    const val = event.target.value?.trim();
     if (!val.length) {
       return;
     }

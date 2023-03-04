@@ -19,7 +19,7 @@ type Key = {
 export default {
   windowNostrQueue: [],
   isProcessingQueue: false,
-  getPublicKey,
+  getPublicKey, // TODO confusing similarity to getPubKey
   loginAsNewUser() {
     this.login(this.generateKey());
   },
