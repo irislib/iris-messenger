@@ -34,7 +34,7 @@ const SafeImg = (props: Props) => {
     // free proxy with a 250 images per 10 min limit? https://images.weserv.nl/docs/
     const originalSrc = props.src;
     if (props.width) {
-      const width = props.width * 2;
+      const width = props.width * 4;
       mySrc = `https://imgproxy.iris.to/insecure/rs:fill:${width}:${width}/plain/${originalSrc}`;
     } else {
       mySrc = `https://imgproxy.iris.to/insecure/plain/${originalSrc}`;
