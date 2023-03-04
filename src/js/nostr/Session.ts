@@ -47,6 +47,7 @@ const Session = {
   onLoggedIn() {
     const myPub = Key.getPubKey();
     SocialNetwork.followDistanceByUser.set(myPub, 0);
+    SocialNetwork.followersByUser.set(myPub, new Set());
     SocialNetwork.usersByFollowDistance.set(0, new Set([myPub]));
     const subscribe = (filters: Filter[], callback: (event: Event) => void): string => {
       const filter = filters[0];
@@ -109,6 +110,14 @@ const Session = {
       if (p && p.nip05 && p.nip05.endsWith('@iris.to')) {
         localState.get('showNoIrisToAddress').put(false);
         clearTimeout(timeout);
+      }
+    });
+    const unsubFollowers = SocialNetwork.getFollowersByUser(myPub, (followers) => {
+      if (!followers?.size) {
+        localState.get('noFollowers').put(true);
+      } else {
+        localState.get('noFollowers').put(false);
+        unsubFollowers();
       }
     });
     setTimeout(() => {

@@ -112,7 +112,7 @@ export default class OnboardingNotification extends Component {
     let content = '';
     if (this.state.showFollowSuggestions) {
       content = this.renderFollowSuggestions();
-    } else if (this.state.noFollowers && !this.state.hasNostrFollowers) {
+    } else if (this.state.noFollowers) {
       content = this.renderNoFollowers();
     } else if (this.state.showNoIrisToAddress) {
       content = this.renderGetIrisAddress();
