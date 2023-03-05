@@ -112,6 +112,7 @@ class MyIdenticon extends Component<Props, State> {
             <SafeImg
               src={this.state.picture}
               width={width}
+              square={true}
               style={{ objectFit: 'cover' }}
               onError={() => this.setState({ hasError: true })}
             />

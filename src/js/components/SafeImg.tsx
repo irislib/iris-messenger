@@ -5,6 +5,7 @@ type Props = {
   class?: string;
   style?: React.CSSProperties;
   width?: number;
+  square?: boolean;
   onError?: () => void;
   onClick?: (ev: MouseEvent) => void;
   alt?: string;
@@ -35,7 +36,8 @@ const SafeImg = (props: Props) => {
     const originalSrc = props.src;
     if (props.width) {
       const width = props.width * 2;
-      mySrc = `https://imgproxy.iris.to/insecure/rs:fill:${width}:${width}/plain/${originalSrc}`;
+      const resizeType = props.square ? 'fill' : 'fit';
+      mySrc = `https://imgproxy.iris.to/insecure/rs:${resizeType}:${width}:${width}/plain/${originalSrc}`;
     } else {
       mySrc = `https://imgproxy.iris.to/insecure/plain/${originalSrc}`;
     }
