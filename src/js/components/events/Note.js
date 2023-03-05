@@ -275,9 +275,7 @@ class Note extends Component {
       if (lightning && !lightning.startsWith('lightning:')) {
         lightning = `lightning:${lightning}`;
       }
-      const meta = this.props.meta || {};
-      meta.lightning = lightning;
-      this.setState({ meta });
+      this.setState({ lightning });
     });
     this.subscriptions.push(unsub);
     const unsub2 = Events.getRepliesAndReactions(event.id, (...args) =>
@@ -499,10 +497,10 @@ class Note extends Component {
         <span class="count ${s.showLikes ? 'active' : ''}" onClick=${(e) => this.toggleLikes(e)}>
           ${s.likes || ''}
         </span>
-        ${this.props.meta.lightning
+        ${this.state.lightning
           ? html`
               <a
-                href=${this.props.meta.lightning}
+                href=${this.state.lightning}
                 onClick=${(e) => Helpers.handleLightningLinkClick(e)}
                 class="msg-btn zap-btn"
               >
@@ -685,7 +683,7 @@ class Note extends Component {
                 </div> `
               : ''}
             ${!this.props.standalone &&
-            ((this.props.meta.attachments?.length > 1) ||
+            (this.props.meta.attachments?.length > 1 ||
               this.props.event.content?.length > MSG_TRUNCATE_LENGTH ||
               s.lines?.length > MSG_TRUNCATE_LINES)
               ? html`

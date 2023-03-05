@@ -24,7 +24,13 @@ export default function Zap(props) {
   } else {
     text = Helpers.highlightText(text, likedEvent);
   }
-  const zappingUser = Events.getZappingUser(props.event.id);
+  let zappingUser = null;
+  try {
+    zappingUser = Events.getZappingUser(props.event.id);
+  } catch (e) {
+    console.error('no zapping user found for event', props.event.id, e);
+    return '';
+  }
   const link = `/post/${Key.toNostrBech32Address(likedId, 'note')}`;
   const userLink = `/${zappingUser}`;
   return html`
