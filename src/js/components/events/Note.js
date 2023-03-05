@@ -53,7 +53,14 @@ class Note extends Component {
     super();
     this.i = 0;
     this.likedBy = new Set();
-    this.state = { sortedReplies: [], content: '' };
+    this.state = {
+      sortedReplies: [],
+      content: '',
+      replyingToUsers: [],
+      title: '',
+      shortText: '',
+      quotedShortText: '',
+    };
     this.subscriptions = [];
   }
 
@@ -314,9 +321,7 @@ class Note extends Component {
     const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
     let name = this.props.name || this.state.name || AnimalName(this.props.event.pubkey);
     const emojiOnly =
-      this.props.event.content &&
-      this.props.event.content.length === 2 &&
-      Helpers.isEmoji(this.props.event.content);
+      this.props.event.content?.length === 2 && Helpers.isEmoji(this.props.event.content);
     const shortText = text.length > 128 ? `${text.slice(0, 128)}...` : text;
     const quotedShortText = `"${shortText}"`;
     if (isThumbnail) {

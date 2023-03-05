@@ -34,6 +34,8 @@ yarn serve
 yarn test
 ```
 
+[iris.to](https://iris.to) production version is in the [stable](https://github.com/irislib/iris-messenger/tree/stable) branch.
+
 ## Privacy
 
 The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.
