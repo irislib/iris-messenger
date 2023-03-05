@@ -2,6 +2,7 @@
 import reactStringReplace from 'react-string-replace';
 import $ from 'jquery';
 import throttle from 'lodash/throttle';
+import { route } from 'preact-router';
 
 import Name from './components/Name';
 import PublicMessage from './components/PublicMessage';
@@ -363,11 +364,25 @@ export default {
     s = reactStringReplace(
       s,
       /((?:https?:\/\/\S*[^.?,)\s])|(?:iris\.to\/\S*[^.?,)\s]))/gi,
-      (match, i) => (
-        <a key={match + i} target="_blank" href={match.replace(/^(https:\/\/)?iris.to/, '')}>
-          {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-        </a>
-      ),
+      (match, i) => {
+        const url = match.replace(/^(https:\/\/)?iris.to/, '');
+        const isIris = url !== match;
+        return (
+          <a
+            key={match + i}
+            target="_blank"
+            onClick={(e) => {
+              if (isIris) {
+                e.preventDefault();
+                route(url);
+              }
+            }}
+            href={url}
+          >
+            {match.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+          </a>
+        );
+      },
     );
 
     if (event && event.tags) {
