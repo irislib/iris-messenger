@@ -48,7 +48,7 @@ class EventComponent extends Component {
       this.setState({ meta });
     });
     this.subscriptions.push(unsub);
-    const replyingTo = Events.getEventReplyingTo(event);
+    const replyingTo = Events.getNoteReplyingTo(event);
 
     const meta = {
       npub: Key.toNostrBech32Address(event.pubkey, 'npub'),

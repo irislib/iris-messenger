@@ -128,7 +128,7 @@ export default {
         posts.eventIds.forEach((eventId) => {
           const event = Events.cache.get(eventId);
           if (event) {
-            const replyingTo = Events.getEventReplyingTo(event);
+            const replyingTo = Events.getNoteReplyingTo(event);
             if (!replyingTo) {
               Events.latestNotesByFollows.add(event);
             }

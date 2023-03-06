@@ -71,7 +71,7 @@ const Events = {
     }
     this.postsAndRepliesByUser.get(event.pubkey)?.add(event);
 
-    const replyingTo = this.getEventReplyingTo(event);
+    const replyingTo = this.getNoteReplyingTo(event);
     const replyingToEvent = replyingTo && this.cache.get(replyingTo);
     this.latestNotesAndRepliesByEveryone.add(event);
     if (!replyingTo) {
@@ -134,7 +134,14 @@ const Events = {
       this.postsByUser.get(event.pubkey)?.add(event);
     }
   },
-  getEventReplyingTo: function (event: Event) {
+  getRepostedEventId(event: Event) {
+    const mention = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'mention');
+    if (mention) {
+      return mention[1];
+    }
+    return event.tags?.find((tag) => tag[0] === 'e')?.[1];
+  },
+  getNoteReplyingTo: function (event: Event) {
     if (event.kind !== 1) {
       return undefined;
     }
@@ -367,9 +374,8 @@ const Events = {
     const mentionIndex = event.tags?.findIndex((tag) => tag[0] === 'e' && tag[3] === 'mention');
     if (event.kind === 1 && event.content === `#[${mentionIndex}]`) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   },
   acceptEvent(event: Event) {
     if (globalFilter.maxFollowDistance) {

@@ -6,11 +6,10 @@ import { translate as t } from '../../translations/Translation';
 import Name from '../Name';
 
 import EventComponent from './EventComponent';
+import Events from '../../nostr/Events';
 
 export default function Repost(props) {
-  if (!props.meta.replyingTo) {
-    return '';
-  }
+  const repostedEventId = Events.getRepostedEventId(props.event);
   return html`
     <div class="msg">
       <div class="msg-content" style="padding: 12px 0 0 0;">
@@ -23,7 +22,7 @@ export default function Repost(props) {
             <span style="margin-left: 5px"> ${t('reposted')} </span>
           </small>
         </div>
-        <${EventComponent} id=${props.meta.replyingTo} showName=${true} />
+        <${EventComponent} id=${repostedEventId} showName=${true} />
       </div>
     </div>
   `;
