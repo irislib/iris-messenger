@@ -324,9 +324,10 @@ class MessageFeed extends Component {
               <div className="msg-content notification-msg">{t(feedName)}</div>
             </div>
           ) : null}
-          {['everyone', 'follows'].includes(this.props.index)
-            ? this.renderFeedSelector()
-            : this.renderFeedTypeSelector()}
+          {['everyone', 'follows'].includes(this.props.index) ? this.renderFeedSelector() : ''}
+          {['posts', 'postsAndReplies', 'likes'].includes(this.props.index)
+            ? this.renderFeedTypeSelector()
+            : ''}
           {renderAs === 'NoteImage' ? <ImageGrid>{messages}</ImageGrid> : messages}
         </div>
         {displayCount < this.state.sortedMessages.length ? this.renderShowMore() : ''}
