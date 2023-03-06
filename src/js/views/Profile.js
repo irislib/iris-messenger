@@ -67,10 +67,7 @@ class Profile extends View {
           <div class="msg-content">
             <p>Share your profile link so ${this.state.name || 'this user'} can follow you:</p>
             <p>
-              <${CopyButton}
-                text=${t('copy_link')}
-                copyStr=${Helpers.getProfileLink(Key.getPubKey())}
-              />
+              <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getMyProfileLink()} />
             </p>
             <small>${t('no_followers_yet_info')}</small>
           </div>

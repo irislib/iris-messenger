@@ -20,6 +20,8 @@ const hashtagRegex = /(#\w+)/g;
 
 let settings: any = {};
 localState.get('settings').on((s) => (settings = s));
+let existingIrisToAddress: any = {};
+localState.get('existingIrisToAddress').on((a) => (existingIrisToAddress = a));
 
 function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {
   if (src) {
@@ -605,8 +607,9 @@ export default {
     }, 10);
   },
 
-  getProfileLink(pub: string): string {
-    return `${window.location.origin}/${encodeURIComponent(pub)}`;
+  getMyProfileLink(): string {
+    const user = existingIrisToAddress.name || Key.toNostrBech32Address(Key.getPubKey(), 'npub');
+    return `${window.location.origin}/${user}`;
   },
 
   arrayToHex(array: any) {

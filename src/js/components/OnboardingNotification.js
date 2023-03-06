@@ -56,13 +56,11 @@ export default class OnboardingNotification extends Component {
   }
 
   renderNoFollowers() {
-    const rpub = Key.getPubKey();
-    const npub = rpub && Key.toNostrBech32Address(Key.getPubKey(), 'npub');
     return html`
       <div style="display:flex;flex-direction:column;flex:1">
         <p>${t('no_followers_yet')}</p>
         <p>
-          <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getProfileLink(npub)} />
+          <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getMyProfileLink()} />
         </p>
         <small>${t('no_followers_yet_info')}</small>
       </div>
@@ -112,10 +110,10 @@ export default class OnboardingNotification extends Component {
     let content = '';
     if (this.state.showFollowSuggestions) {
       content = this.renderFollowSuggestions();
-    } else if (this.state.noFollowers) {
-      content = this.renderNoFollowers();
     } else if (this.state.showNoIrisToAddress) {
       content = this.renderGetIrisAddress();
+    } else if (this.state.noFollowers) {
+      content = this.renderNoFollowers();
     }
 
     if (content) {
