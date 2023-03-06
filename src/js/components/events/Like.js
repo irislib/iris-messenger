@@ -15,7 +15,7 @@ export default function Like(props) {
   } else {
     text = Helpers.highlightText(text, likedEvent);
   }
-  const link = `/post/${Key.toNostrBech32Address(likedId, 'note')}`;
+  const link = `/${Key.toNostrBech32Address(likedId, 'note')}`;
   const userLink = `/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`;
   return html`
     <div class="msg">

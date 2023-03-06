@@ -17,7 +17,7 @@ class Message extends View {
   componentDidMount() {
     const nostrBech32Id = Key.toNostrBech32Address(this.props.id, 'note');
     if (nostrBech32Id && this.props.id !== nostrBech32Id) {
-      route(`/post/${nostrBech32Id}`, true);
+      route(`/${nostrBech32Id}`, true);
       return;
     }
     this.restoreScrollPosition();

@@ -31,7 +31,7 @@ export default function Zap(props) {
     console.error('no zapping user found for event', props.event.id, e);
     return '';
   }
-  const link = `/post/${Key.toNostrBech32Address(likedId, 'note')}`;
+  const link = `/${Key.toNostrBech32Address(likedId, 'note')}`;
   const userLink = `/${zappingUser}`;
   return html`
     <div class="msg">

@@ -174,7 +174,7 @@ class SearchBox extends Component<Props, State> {
       }
       const noteMatch = query.match(/note[a-zA-Z0-9]{59,60}/gi);
       if (noteMatch) {
-        route('/post/' + noteMatch[0]);
+        route('/' + noteMatch[0]);
         return;
       }
       const npubMatch = query.match(/npub[a-zA-Z0-9]{59,60}/gi);

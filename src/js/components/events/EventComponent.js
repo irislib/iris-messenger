@@ -137,7 +137,7 @@ class EventComponent extends Component {
     if (this.props.asInlineQuote) {
       return '';
     }
-    const url = `https://iris.to/post/${Key.toNostrBech32Address(this.props.id, 'note')}`;
+    const url = `https://iris.to/${Key.toNostrBech32Address(this.props.id, 'note')}`;
     return html`
       <div class="msg-menu-btn">
         <${Dropdown}>

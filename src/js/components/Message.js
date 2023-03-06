@@ -188,7 +188,7 @@ class Message extends Component {
           <div class="below-text">
             <div class="time">
               ${this.props.id
-                ? html`<a href="/post/${encodeURIComponent(this.props.id)}"
+                ? html`<a href="/${encodeURIComponent(this.props.id)}"
                     >${Helpers.getRelativeTimeText(time)}</a
                   >`
                 : Helpers.formatTime(time)}

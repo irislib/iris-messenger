@@ -64,12 +64,6 @@ class Note extends Component {
     this.subscriptions = [];
   }
 
-  onClickName(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    route(`/${this.props.event.pubkey}`);
-  }
-
   likeBtnClicked(e) {
     e.preventDefault();
     this.like(!this.state.liked);
@@ -157,13 +151,13 @@ class Note extends Component {
     event.stopPropagation();
     if (this.props.event.kind === 7) {
       const likedId = this.props.event.tags?.reverse().find((t) => t[0] === 'e')[1];
-      return route(`/post/${likedId}`);
+      return route(`/${likedId}`);
     }
     this.openStandalone();
   }
 
   openStandalone() {
-    route(`/post/${Key.toNostrBech32Address(this.props.event.id, 'note')}`);
+    route(`/${Key.toNostrBech32Address(this.props.event.id, 'note')}`);
   }
 
   replyBtnClicked() {
@@ -208,7 +202,7 @@ class Note extends Component {
     if (this.props.asInlineQuote) {
       return '';
     }
-    const url = `https://iris.to/post/${Key.toNostrBech32Address(this.props.event.id, 'note')}`;
+    const url = `https://iris.to/${Key.toNostrBech32Address(this.props.event.id, 'note')}`;
     return html`
       <div class="msg-menu-btn">
         <${Dropdown}>
@@ -566,7 +560,7 @@ class Note extends Component {
 
   renderShowThread() {
     return html` <div style="flex-basis:100%; margin-bottom: 12px">
-      <a href="/post/${Key.toNostrBech32Address(this.state.rootMsg, 'note')}"
+      <a href="/${Key.toNostrBech32Address(this.state.rootMsg, 'note')}"
         >${t('show_thread')}</a
       >
     </div>`;
@@ -659,17 +653,17 @@ class Note extends Component {
           </div>
           <div class="msg-main">
             <div class="msg-sender">
-              <div class="msg-sender-link" onclick=${(e) => this.onClickName(e)}>
+              <div class="msg-sender-link">
                 ${this.props.showName &&
                 html`
-                  <a href=${`/${this.props.event.pubkey}`} class="msgSenderName">
+                  <a href=${`/${Key.toNostrBech32Address(this.props.event.pubkey, 'npub')}`} class="msgSenderName">
                     <${Name} pub=${this.props.event.pubkey} />
                   </a>
                 `}
                 <div class="time">
                   ${'· '}
                   <a
-                    href="/post/${encodeURIComponent(this.props.meta?.id || this.props.event.id)}"
+                    href=${`/${Key.toNostrBech32Address(this.props.event.id, 'note')}`}
                     class="tooltip"
                   >
                     ${s.time && Helpers.getRelativeTimeText(s.time)}

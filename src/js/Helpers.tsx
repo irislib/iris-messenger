@@ -354,7 +354,7 @@ export default {
 
     s = reactStringReplace(s, noteRegex, (match) => {
       match = match.replace(/@/g, '');
-      const link = `/post/${match}`;
+      const link = `/${match}`;
       return (
         <>
           {' '}
@@ -411,7 +411,7 @@ export default {
                 asInlineQuote={true}
               />
             ) : (
-              <a href={`/post/${Key.toNostrBech32Address(tagTarget, 'note')}`}>{tag[1]}</a>
+              <a href={`/${Key.toNostrBech32Address(tagTarget, 'note')}`}>{tag[1]}</a>
             );
           }
         }
