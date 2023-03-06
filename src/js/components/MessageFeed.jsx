@@ -9,6 +9,8 @@ import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
 import EventComponent from './events/EventComponent';
+import styled from "styled-components";
+import Icons from "../Icons";
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -18,6 +20,15 @@ const listener = function () {
   window.removeEventListener('popstate', listener);
 };
 window.addEventListener('popstate', listener);
+
+const ImageGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 10px;
+  @media (max-width: 625px) {
+    grid-gap: 1px;
+  }
+`;
 
 class MessageFeed extends Component {
   constructor() {
@@ -197,6 +208,95 @@ class MessageFeed extends Component {
     });
   };
 
+  renderFeedSelector() {
+    return (
+      <div className="tabs">
+        <a
+          onClick={() => {
+            if (this.state.includeReplies) {
+              this.setState({ includeReplies: false });
+              if (this.props.index === 'everyone') {
+                this.getMessagesByEveryone(false);
+                this.showQueuedMessages();
+              } else if (this.props.index === 'follows') {
+                this.getMessagesByFollows(false);
+                this.showQueuedMessages();
+              }
+            }
+          }}
+          className={this.state.includeReplies ? '' : 'active'}
+        >
+          {t('posts')}
+        </a>
+        <a
+          className={this.state.includeReplies ? 'active' : ''}
+          onClick={() => {
+            if (!this.state.includeReplies) {
+              this.setState({ includeReplies: true });
+              if (this.props.index === 'everyone') {
+                this.getMessagesByEveryone(true);
+              } else if (this.props.index === 'follows') {
+                this.getMessagesByFollows(true);
+              }
+            }
+          }}
+        >
+          {t('posts')} & {t('replies')}
+        </a>
+      </div>
+    );
+  }
+
+  renderFeedTypeSelector() {
+    return (
+      <div className="tabs">
+        <a
+          style="border-radius: 8px 0 0 0"
+          onClick={() => this.setState({ feedType: 'posts' })}
+          className={this.state.feedType === 'images' ? '' : 'active'}
+        >
+          {Icons.document}
+        </a>
+        <a
+          style="border-radius: 0 8px 0 0"
+          className={this.state.feedType === 'images' ? 'active' : ''}
+          onClick={() => this.setState({ feedType: 'images' })}
+        >
+          {Icons.image}
+        </a>
+      </div>
+    );
+  }
+
+  renderShowNewMessages() {
+    return (
+      <div
+        className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
+        onClick={this.showQueuedMessages}
+      >
+        <div className="msg-content notification-msg colored">
+          {t('show_n_new_messages').replace('{n}', this.state.queuedMessages.length)}
+        </div>
+      </div>
+    );
+  }
+
+  renderShowMore() {
+    return (
+      <p>
+        <Button
+          onClick={() =>
+            this.setState({
+              displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
+            })
+          }
+        >
+          {t('show_more')}
+        </Button>
+      </p>
+    );
+  }
+
   render() {
     if (!this.props.scrollElement || this.unmounted) {
       return;
@@ -211,81 +311,25 @@ class MessageFeed extends Component {
         notifications: 'notifications',
       }[this.props.index];
 
+    const renderAs = this.state.feedType === 'images' ? 'NoteImage' : null;
+    const messages = this.state.sortedMessages
+      .slice(0, displayCount)
+      .map((id) => <EventComponent id={id} showRepliedMsg={showRepliedMsg} renderAs={renderAs} />);
     return (
       <div className="msg-feed">
         <div>
-          {this.state.queuedMessages.length ? (
-            <div
-              className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
-              onClick={this.showQueuedMessages}
-            >
-              <div className="msg-content notification-msg colored">
-                {t('show_n_new_messages').replace('{n}', this.state.queuedMessages.length)}
-              </div>
-            </div>
-          ) : null}
+          {this.state.queuedMessages.length ? this.renderShowNewMessages() : null}
           {feedName ? (
             <div className="msg">
               <div className="msg-content notification-msg">{t(feedName)}</div>
             </div>
           ) : null}
-          {['everyone', 'follows'].includes(this.props.index) ? (
-            <div className="tabs">
-              <a
-                onClick={() => {
-                  if (this.state.includeReplies) {
-                    this.setState({ includeReplies: false });
-                    if (this.props.index === 'everyone') {
-                      this.getMessagesByEveryone(false);
-                      this.showQueuedMessages();
-                    } else if (this.props.index === 'follows') {
-                      this.getMessagesByFollows(false);
-                      this.showQueuedMessages();
-                    }
-                  }
-                }}
-                className={this.state.includeReplies ? '' : 'active'}
-              >
-                {t('posts')}
-              </a>
-              <a
-                className={this.state.includeReplies ? 'active' : ''}
-                onClick={() => {
-                  if (!this.state.includeReplies) {
-                    this.setState({ includeReplies: true });
-                    if (this.props.index === 'everyone') {
-                      this.getMessagesByEveryone(true);
-                    } else if (this.props.index === 'follows') {
-                      this.getMessagesByFollows(true);
-                    }
-                  }
-                }}
-              >
-                {t('posts')} & {t('replies')}
-              </a>
-            </div>
-          ) : (
-            ''
-          )}
-          {this.state.sortedMessages.slice(0, displayCount).map((id) => (
-            <EventComponent key={id} id={id} showName={true} showRepliedMsg={showRepliedMsg} />
-          ))}
+          {['everyone', 'follows'].includes(this.props.index)
+            ? this.renderFeedSelector()
+            : this.renderFeedTypeSelector()}
+          {renderAs === 'NoteImage' ? <ImageGrid>{messages}</ImageGrid> : messages}
         </div>
-        {displayCount < this.state.sortedMessages.length ? (
-          <p>
-            <Button
-              onClick={() =>
-                this.setState({
-                  displayCount: displayCount + INITIAL_PAGE_SIZE,
-                })
-              }
-            >
-              {t('show_more')}
-            </Button>
-          </p>
-        ) : (
-          ''
-        )}
+        {displayCount < this.state.sortedMessages.length ? this.renderShowMore() : ''}
       </div>
     );
   }

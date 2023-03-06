@@ -124,7 +124,6 @@ export default {
           <EventComponent
             key={match + i}
             id={Key.toNostrHexAddress(match)}
-            showName={true}
             showBtns={false}
             asInlineQuote={true}
           />
@@ -406,7 +405,6 @@ export default {
               <EventComponent
                 key={tagTarget + i}
                 id={tagTarget}
-                showName={true}
                 showBtns={false}
                 asInlineQuote={true}
               />

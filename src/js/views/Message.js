@@ -49,7 +49,6 @@ class Message extends View {
           id=${this.props.id}
           key=${this.props.id}
           standalone=${true}
-          showName=${true}
           showReplies=${Infinity}
           showRepliedMsg=${true}
         />

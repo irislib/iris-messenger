@@ -15,6 +15,7 @@ import FollowButton from '../FollowButton';
 import Follow from './Follow';
 import Like from './Like';
 import Note from './Note';
+import NoteImage from './NoteImage';
 import Repost from './Repost';
 import Zap from './Zap';
 
@@ -240,12 +241,16 @@ class EventComponent extends Component {
         9735: Zap,
       }[this.state.event.kind];
     }
+    if (this.props.renderAs === 'NoteImage') {
+      Component = NoteImage;
+    }
     if (!Component) {
       console.error('unknown event kind', this.state.event);
       return '';
     }
 
     return html`<${Component}
+      key=${this.props.id}
       event=${this.state.event}
       meta=${this.state.meta}
       ...${this.props}

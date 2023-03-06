@@ -22,7 +22,7 @@ export default function Repost(props) {
             <span style="margin-left: 5px"> ${t('reposted')} </span>
           </small>
         </div>
-        <${EventComponent} id=${repostedEventId} showName=${true} />
+        <${EventComponent} id=${repostedEventId} />
       </div>
     </div>
   `;

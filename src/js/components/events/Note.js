@@ -524,7 +524,6 @@ class Note extends Component {
             key=${r}
             id=${r}
             asReply=${!this.props.standalone}
-            showName=${true}
             showReplies=${1}
             showRepliedMsg=${false}
           />`,
@@ -560,9 +559,7 @@ class Note extends Component {
 
   renderShowThread() {
     return html` <div style="flex-basis:100%; margin-bottom: 12px">
-      <a href="/${Key.toNostrBech32Address(this.state.rootMsg, 'note')}"
-        >${t('show_thread')}</a
-      >
+      <a href="/${Key.toNostrBech32Address(this.state.rootMsg, 'note')}">${t('show_thread')}</a>
     </div>`;
   }
 
@@ -572,7 +569,6 @@ class Note extends Component {
         key=${this.props.meta.replyingTo}
         id=${this.props.meta.replyingTo}
         asQuote=${true}
-        showName=${true}
         showReplies=${0}
       />
     `;
@@ -654,12 +650,12 @@ class Note extends Component {
           <div class="msg-main">
             <div class="msg-sender">
               <div class="msg-sender-link">
-                ${this.props.showName &&
-                html`
-                  <a href=${`/${Key.toNostrBech32Address(this.props.event.pubkey, 'npub')}`} class="msgSenderName">
-                    <${Name} pub=${this.props.event.pubkey} />
-                  </a>
-                `}
+                <a
+                  href=${`/${Key.toNostrBech32Address(this.props.event.pubkey, 'npub')}`}
+                  class="msgSenderName"
+                >
+                  <${Name} pub=${this.props.event.pubkey} />
+                </a>
                 <div class="time">
                   ${'· '}
                   <a
