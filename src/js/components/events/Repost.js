@@ -1,12 +1,12 @@
 import { html } from 'htm/preact';
 
 import Icons from '../../Icons';
+import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
 import Name from '../Name';
 
 import EventComponent from './EventComponent';
-import Events from '../../nostr/Events';
 
 export default function Repost(props) {
   const repostedEventId = Events.getRepostedEventId(props.event);

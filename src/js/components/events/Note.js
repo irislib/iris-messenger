@@ -312,7 +312,6 @@ class Note extends Component {
       this.props.standalone && this.props.meta.attachments?.find((a) => a.type === 'image')?.data;
 
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
-    const s = this.state;
     let name = this.props.name || this.state.name || AnimalName(this.props.event.pubkey);
     const emojiOnly =
       this.props.event.content?.length === 2 && Helpers.isEmoji(this.props.event.content);
