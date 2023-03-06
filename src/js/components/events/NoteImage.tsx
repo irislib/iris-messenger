@@ -53,7 +53,6 @@ export default function NoteImage(props: { event: Event }) {
       }
     });
   }
-  console.log('attachments', attachments);
   // return all images from post
   return (
     <>

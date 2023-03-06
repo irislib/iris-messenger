@@ -146,7 +146,6 @@ const Events = {
         if (otherReposts) {
           for (const repostId of otherReposts) {
             if (repostId !== event.id) {
-              console.log('deleting other repost', repostId, 'of', repostedEventId);
               feed.delete(repostId);
             }
           }
