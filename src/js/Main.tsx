@@ -21,7 +21,6 @@ import Torrent from './views/Torrent';
 import Component from './BaseComponent';
 import Helpers from './Helpers';
 import localState from './LocalState';
-import QRScanner from './QRScanner';
 
 import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
@@ -62,7 +61,6 @@ class Main extends Component<Props, ReactState> {
     const activeRoute = e.url;
     this.setState({ activeRoute });
     localState.get('activeRoute').put(activeRoute);
-    QRScanner.cleanupScanner();
   }
 
   onClickOverlay(): void {

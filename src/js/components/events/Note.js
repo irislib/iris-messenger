@@ -623,7 +623,8 @@ class Note extends Component {
       <div
         key=${this.props.event.id}
         ref=${this.ref}
-        class="msg ${s.isThumbnail ? 'thumbnail' : ''} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
+        class="msg ${s.isThumbnail ? 'thumbnail' : ''} ${this.props.asReply ? 'reply' : ''} ${this
+          .props.standalone
           ? 'standalone'
           : ''} ${asQuote ? 'quote' : ''}
           ${quoting ? 'quoting' : ''}
