@@ -410,11 +410,13 @@ class Note extends Component {
       });
     const zappers =
       zaps && Array.from(zaps.values()).map((eventId) => Events.getZappingUser(eventId));
+    const asQuote = this.props.asQuote || (this.props.showReplies && sortedReplies.length);
 
     this.setState({
       reposts: this.repostedBy.size,
       reposted: this.repostedBy.has(myPub),
       likes: this.likedBy.size,
+      asQuote,
       zappers,
       liked: this.likedBy.has(myPub),
       replyCount: threadReplyCount,
@@ -470,7 +472,7 @@ class Note extends Component {
     `;
   }
 
-  renderAsInlineQuote() {
+  renderReactionBtns() {
     const s = this.state;
     return html`
       <div class="below-text">
@@ -625,7 +627,7 @@ class Note extends Component {
       <div
         key=${this.props.event.id}
         ref=${this.ref}
-        class="msg ${s.isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
+        class="msg ${s.isThumbnail ? 'thumbnail' : ''} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
           : ''} ${this.state.asQuote ? 'quote' : ''}
           ${s.quoting ? 'quoting' : ''}
@@ -697,7 +699,7 @@ class Note extends Component {
                   >
                 `
               : ''}
-            ${this.props.asInlineQuote ? '' : this.renderAsInlineQuote()}
+            ${this.props.asInlineQuote ? '' : this.renderReactionBtns()}
             ${s.showLikes ? this.renderLikes() : ''} ${s.showZaps ? this.renderZaps() : ''}
             ${s.showReposts ? this.renderReposts() : ''}
             ${this.props.standalone || s.showReplyForm ? this.renderReplyForm() : ''}
