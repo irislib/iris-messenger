@@ -240,6 +240,10 @@ class EventComponent extends Component {
         9735: Zap,
       }[this.state.event.kind];
     }
+    if (!Component) {
+      console.error('unknown event kind', this.state.event);
+      return '';
+    }
 
     return html`<${Component}
       event=${this.state.event}
