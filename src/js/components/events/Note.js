@@ -316,7 +316,6 @@ class Note extends Component {
 
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     const s = this.state;
-    const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
     let name = this.props.name || this.state.name || AnimalName(this.props.event.pubkey);
     const emojiOnly =
       this.props.event.content?.length === 2 && Helpers.isEmoji(this.props.event.content);
@@ -360,15 +359,12 @@ class Note extends Component {
     }
     // remove duplicates
     replyingToUsers = [...new Set(replyingToUsers)];
-    const quoting = this.props.meta.replyingTo && (this.props.showRepliedMsg || this.props.asReply);
 
     this.setState({
       meta,
       content,
       replyingToUsers,
       ogImageUrl,
-      asQuote,
-      quoting,
       time,
       timeStr,
       dateStr,
@@ -410,13 +406,11 @@ class Note extends Component {
       });
     const zappers =
       zaps && Array.from(zaps.values()).map((eventId) => Events.getZappingUser(eventId));
-    const asQuote = this.props.asQuote || (this.props.showReplies && sortedReplies.length);
 
     this.setState({
       reposts: this.repostedBy.size,
       reposted: this.repostedBy.has(myPub),
       likes: this.likedBy.size,
-      asQuote,
       zappers,
       liked: this.likedBy.has(myPub),
       replyCount: threadReplyCount,
@@ -621,6 +615,8 @@ class Note extends Component {
       return '';
     }
     const s = this.state;
+    const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
+    const quoting = this.props.meta.replyingTo && (this.props.showRepliedMsg || this.props.asReply);
 
     return html`
       ${this.props.meta.replyingTo && this.props.showRepliedMsg ? this.renderRepliedMsg() : ''}
@@ -629,12 +625,12 @@ class Note extends Component {
         ref=${this.ref}
         class="msg ${s.isThumbnail ? 'thumbnail' : ''} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
           ? 'standalone'
-          : ''} ${this.state.asQuote ? 'quote' : ''}
-          ${s.quoting ? 'quoting' : ''}
+          : ''} ${asQuote ? 'quote' : ''}
+          ${quoting ? 'quoting' : ''}
         ${this.props.asInlineQuote ? 'inline-quote' : ''}"
       >
         <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
-          ${this.state.asQuote && this.props.meta.replyingTo ? this.renderShowThread() : ''}
+          ${this.props.asQuote && this.state.rootMsg ? this.renderShowThread() : ''}
           <div class="msg-identicon">
             ${this.props.event.pubkey
               ? html`
@@ -643,7 +639,7 @@ class Note extends Component {
                   </a>
                 `
               : ''}
-            ${this.state.asQuote && !this.props.standalone ? html`<div class="line"></div>` : ''}
+            ${asQuote && !this.props.standalone ? html`<div class="line"></div>` : ''}
           </div>
           <div class="msg-main">
             <div class="msg-sender">
@@ -667,7 +663,7 @@ class Note extends Component {
               </div>
               ${this.renderDropdown()}
             </div>
-            ${s.replyingToUsers?.length && !s.quoting ? this.renderReplyingTo() : ''}
+            ${s.replyingToUsers?.length && !quoting ? this.renderReplyingTo() : ''}
             ${this.props.standalone ? this.renderHelmet() : ''}
             ${this.props.meta.torrentId
               ? html`
