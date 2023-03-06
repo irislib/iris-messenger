@@ -308,9 +308,6 @@ class Note extends Component {
         }
       });
     }
-    const content = Helpers.highlightEverything(text.trim(), this.props.event, {
-      showMentionedMessages: !this.props.asInlineQuote,
-    });
     const ogImageUrl =
       this.props.standalone && this.props.meta.attachments?.find((a) => a.type === 'image')?.data;
 
@@ -325,6 +322,10 @@ class Note extends Component {
       text = shortText;
     }
     const title = `${name || 'User'} on Iris`;
+
+    const content = Helpers.highlightEverything(text.trim(), this.props.event, {
+      showMentionedMessages: !this.props.asInlineQuote,
+    });
     text =
       text.length > MSG_TRUNCATE_LENGTH && !this.state.showMore && !this.props.standalone
         ? `${text.slice(0, MSG_TRUNCATE_LENGTH)}...`
@@ -335,6 +336,12 @@ class Note extends Component {
       lines.length > MSG_TRUNCATE_LINES && !this.state.showMore && !this.props.standalone
         ? `${lines.slice(0, MSG_TRUNCATE_LINES).join('\n')}...`
         : text;
+
+    const shortContent =
+      this.isTooLong() &&
+      Helpers.highlightEverything(text.trim(), this.props.event, {
+        showMentionedMessages: !this.props.asInlineQuote,
+      });
 
     const time = new Date(this.props.event.created_at * 1000);
     const dateStr = time.toLocaleString(window.navigator.language, {
@@ -363,6 +370,7 @@ class Note extends Component {
     this.setState({
       meta,
       content,
+      shortContent,
       replyingToUsers,
       ogImageUrl,
       time,
@@ -610,6 +618,14 @@ class Note extends Component {
     });
   }
 
+  isTooLong() {
+    return (
+      this.props.meta.attachments?.length > 1 ||
+      this.props.event.content?.length > MSG_TRUNCATE_LENGTH ||
+      this.props.event.content.split('\n').length > MSG_TRUNCATE_LINES
+    );
+  }
+
   render() {
     if (!this.props.event && this.props.meta) {
       return '';
@@ -677,14 +693,11 @@ class Note extends Component {
             ${this.props.meta.attachments && this.renderAttachments()}
             ${s.text?.length > 0
               ? html`<div class="text ${s.emojiOnly && 'emoji-only'}">
-                  ${this.state.content}
+                  ${(!this.state.showMore && this.state.shortContent) || this.state.content}
                   ${s.translatedText ? html`<p><i>${s.translatedText}</i></p>` : ''}
                 </div> `
               : ''}
-            ${!this.props.standalone &&
-            (this.props.meta.attachments?.length > 1 ||
-              this.props.event.content?.length > MSG_TRUNCATE_LENGTH ||
-              s.lines?.length > MSG_TRUNCATE_LINES)
+            ${!this.props.standalone && this.state.shortContent
               ? html`
                   <a
                     onClick=${(e) => {
