@@ -67,7 +67,7 @@ export default class IrisAccount extends Component {
       view = (
         <div>
           <p className="positive">
-            Username iris.to/<b>{this.state.existing.name}</b> is reserved for you until 5 March
+            Username iris.to/<b>{this.state.existing.name}</b> is reserved for you until 12 March
             2023!
           </p>
           {this.renderAccountName(this.state.existing.name, false)}

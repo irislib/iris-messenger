@@ -76,7 +76,7 @@ export default class OnboardingNotification extends Component {
         <div>
           <p className="positive">
             Username iris.to/<b>${this.state.existingIrisToAddress.name}</b> is reserved for you
-            until 5 March 2023!
+            until 12 March 2023!
           </p>
           <p>
             <${Button}
