@@ -71,39 +71,40 @@ const Events = {
     }
     this.postsAndRepliesByUser.get(event.pubkey)?.add(event);
 
-    const replyingTo = this.getNoteReplyingTo(event);
-    const replyingToEvent = replyingTo && this.cache.get(replyingTo);
     this.latestNotesAndRepliesByEveryone.add(event);
-    if (!replyingTo) {
+
+    const isRepost = this.isRepost(event);
+    const replyingTo = !isRepost && this.getNoteReplyingTo(event);
+    if (replyingTo) {
+      this.deleteRepliedMsgsFromFeeds(event, [this.latestNotesAndRepliesByEveryone]);
+    } else {
       this.latestNotesByEveryone.add(event);
     }
-    // just checking that someone isn't hiding posts with backdated replies to them
-    if (replyingToEvent?.created_at < event.created_at) {
-      // we don't want both the reply and the original post in the feed:
-      this.latestNotesAndRepliesByEveryone.delete(replyingTo);
+    if (isRepost) {
+      this.deleteRepostedMsgsFromFeeds(event, [
+        this.latestNotesByEveryone,
+        this.latestNotesAndRepliesByEveryone,
+      ]);
     }
     const myPub = Key.getPubKey();
     if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
       const changed = this.latestNotesAndRepliesByFollows.add(event);
       if (replyingTo) {
-        const replyingToEvent = this.cache.get(replyingTo);
-        // just checking that someone isn't hiding posts with backdated replies to them
-        if (replyingToEvent?.created_at < event.created_at) {
-          // we don't want both the reply and the original post in the feed:
-          this.latestNotesAndRepliesByFollows.delete(replyingTo);
-        }
+        this.deleteRepliedMsgsFromFeeds(event, [this.latestNotesAndRepliesByFollows]);
       } else {
         this.latestNotesByFollows.add(event);
+      }
+      if (isRepost) {
+        this.deleteRepostedMsgsFromFeeds(event, [
+          this.latestNotesByFollows,
+          this.latestNotesAndRepliesByFollows,
+        ]);
       }
       if (changed && LocalForage.loaded) {
         LocalForage.saveEvents();
       }
     }
 
-    // todo: handle astral ninja format repost (retweet) message
-    // where content points to the original message tag: "content": "#[1]"
-
-    const isRepost = this.isRepost(event);
     if (replyingTo && !isRepost) {
       if (!this.directRepliesByMessageId.has(replyingTo)) {
         this.directRepliesByMessageId.set(replyingTo, new Set<string>());
@@ -134,12 +135,45 @@ const Events = {
       this.postsByUser.get(event.pubkey)?.add(event);
     }
   },
-  getRepostedEventId(event: Event) {
-    const mention = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'mention');
-    if (mention) {
-      return mention[1];
+  deleteRepostedMsgsFromFeeds(event: Event, feeds: SortedLimitedEventSet[]) {
+    const repostedEventId = this.getRepostedEventId(event);
+    const repostedEvent = this.cache.get(repostedEventId);
+    // checking that someone isn't hiding posts from feeds with backdated reposts of them
+    if (repostedEvent?.created_at < event.created_at) {
+      const otherReposts = this.repostsByMessageId.get(repostedEventId);
+      for (const feed of feeds) {
+        feed.delete(repostedEventId);
+        if (otherReposts) {
+          for (const repostId of otherReposts) {
+            if (repostId !== event.id) {
+              console.log('deleting other repost', repostId, 'of', repostedEventId);
+              feed.delete(repostId);
+            }
+          }
+        }
+      }
     }
-    return event.tags?.find((tag) => tag[0] === 'e')?.[1];
+  },
+  deleteRepliedMsgsFromFeeds(event: Event, feeds: SortedLimitedEventSet[]) {
+    const replyingToEventId = this.getNoteReplyingTo(event);
+    const replyingToEvent = this.cache.get(replyingToEventId);
+    // checking that someone isn't hiding posts from feeds with backdated replies to them
+    if (replyingToEvent?.created_at < event.created_at) {
+      for (const feed of feeds) {
+        feed.delete(replyingToEventId);
+      }
+    }
+  },
+  getRepostedEventId(event: Event) {
+    let id = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
+    if (id) {
+      return id;
+    }
+    // last e tag is the reposted post
+    id = event.tags
+      .slice() // so we don't reverse event.tags in place
+      .reverse()
+      .find((tag: any) => tag[0] === 'e')?.[1];
   },
   getNoteReplyingTo: function (event: Event) {
     if (event.kind !== 1) {
@@ -159,14 +193,7 @@ const Events = {
     return undefined;
   },
   handleRepost(event: Event) {
-    let id = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
-    if (!id) {
-      // last e tag is the reposted post
-      id = event.tags
-        .slice() // so we don't reverse event.tags in place
-        .reverse()
-        .find((tag: any) => tag[0] === 'e')?.[1];
-    }
+    const id = this.getRepostedEventId(event);
     if (!id) return;
     if (!this.repostsByMessageId.has(id)) {
       this.repostsByMessageId.set(id, new Set());

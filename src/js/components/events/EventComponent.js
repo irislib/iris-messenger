@@ -83,6 +83,10 @@ class EventComponent extends Component {
   }
 
   componentDidMount() {
+    if (!this.props.id) {
+      console.log('error: no id', this.props);
+      return;
+    }
     this.unmounted = false;
     this.setState({ meta: { id: this.props.id } });
     const hexId = Key.toNostrHexAddress(this.props.id);
