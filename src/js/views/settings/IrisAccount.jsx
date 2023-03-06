@@ -89,7 +89,7 @@ export default class IrisAccount extends Component {
           <div
             className="cf-turnstile"
             data-sitekey={
-              window.location.host === 'iris.to'
+              ['iris.to', 'beta.iris.to'].includes(window.location.hostname)
                 ? '0x4AAAAAAACsEd8XuwpPTFwz'
                 : '3x00000000000000000000FF'
             }
