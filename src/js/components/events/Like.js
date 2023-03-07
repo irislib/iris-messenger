@@ -37,16 +37,18 @@ export default function Like(props) {
   return html`
     <div class="msg" key=${props.event.id}>
       <div class="msg-content" onClick=${(e) => messageClicked(e, likedId)}>
-        <div
-          style="display: flex; align-items: center; flex-basis: 100%; white-space: nowrap;text-overflow: ellipsis; overflow:hidden"
-        >
-          <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
-          <a href=${userLink} style="margin-right: 5px;">
-            <${Name} pub=${props.event.pubkey} userNameOnly=${true} />
-          </a>
-          ${allLikes.length > 1 && html` and ${allLikes.length - 1} others `} ${likeText}
+        <div>
+          <div style="display: flex; align-items: center;">
+            <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
+            <div>
+              <a href=${userLink} style="margin-right: 5px;">
+                <${Name} pub=${props.event.pubkey} userNameOnly=${true} />
+              </a>
+              ${allLikes.length > 1 && html` and ${allLikes.length - 1} others `} ${likeText}
+            </div>
+          </div>
+          <${EventComponent} key=${likedId + props.event.id} id=${likedId} />
         </div>
-        <${EventComponent} key=${likedId + props.event.id} id=${likedId} />
       </div>
     </div>
   `;
