@@ -18,6 +18,12 @@ Browser application: [iris.to](https://iris.to)
 ## Develop
 
 ```bash
+git clone https://github.com/irislib/iris-messenger.git
+```
+
+<details open><summary>Yarn</summary>
+
+```bash
 # install dependencies
 yarn
 
@@ -34,6 +40,28 @@ yarn serve
 yarn test
 ```
 
+</details>
+<details><summary>npm</summary>
+
+```bash
+# install dependencies
+npm i
+
+# serve with hot reload at localhost:8080
+npm run dev
+
+# build for production with minification
+npm run build
+
+# test the production build locally
+npm run serve
+
+# run tests with jest and enzyme
+npm run test
+```
+
+</details>
+<br/>
 [iris.to](https://iris.to) production version is in the [stable](https://github.com/irislib/iris-messenger/tree/stable) branch.
 
 ## Privacy
