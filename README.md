@@ -5,6 +5,7 @@ Nostr client for better social networks.
 - No phone number or signup required. Just type in your name or alias and go!
 - Secure: It's open source. Users can validate that big brother doesn't read your private messages.
 - Available: It works offline-first and is not dependent on any single centrally managed server.
+- ⚡ Zappable ⚡: Iris integrates the internet's native open source money protocol in Bitcoin, via the Lightning network. Zap your friend's positive, and value-adding behavior ⚡! 
 
 ## Use
 
@@ -38,7 +39,7 @@ yarn test
 
 ## Privacy
 
-The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.
+The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes. Your IP address is exposed to the relays you connect to.
 
 ## Contact
 
