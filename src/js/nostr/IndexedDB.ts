@@ -53,8 +53,8 @@ export default {
       .then(() => {
         // other follow events
         return db.events.where({ kind: 3 }).each((event) => {
-            Events.handle(event, false, false);
-          });
+          Events.handle(event, false, false);
+        });
       });
 
     // other events to be loaded on demand
