@@ -1,12 +1,12 @@
 import Dexie, { Table } from 'dexie';
 
-import { Event } from '../lib/nostr-tools';
+import { Event, Filter, matchFilter } from '../lib/nostr-tools';
 
 import Events from './Events';
 import Key from './Key';
 import SocialNetwork from './SocialNetwork';
 export class MyDexie extends Dexie {
-  events!: Table<Event>;
+  events!: Table<Event & { id: string }>;
 
   constructor() {
     super('iris');
@@ -20,10 +20,11 @@ const db = new MyDexie();
 
 export default {
   db,
+  subscriptions: new Set<string>(),
   clear() {
     return db.delete();
   },
-  saveEvent(event: Event) {
+  saveEvent(event: Event & { id: string }) {
     db.events
       .add(event)
       .catch('ConstraintError', () => {
@@ -33,7 +34,7 @@ export default {
         console.error('error saving event', e);
       });
   },
-  loadIDBEvents() {
+  init() {
     const myPub = Key.getPubKey();
     let follows: string[];
     db.events
@@ -58,5 +59,34 @@ export default {
       });
 
     // other events to be loaded on demand
+  },
+  subscribe(filters: Filter[]) {
+    const stringifiedFilters = JSON.stringify(filters);
+    if (this.subscriptions.has(stringifiedFilters)) {
+      return;
+    }
+    this.subscriptions.add(stringifiedFilters);
+    const filter1 = filters.length === 1 ? filters[0] : undefined;
+    let query: any = db.events;
+    if (filter1.authors) {
+      query = query.where('pubkey').anyOf(filter1.authors);
+    }
+    if (filter1.kinds) {
+      query = query.where('kind').anyOf(filter1.kinds);
+    }
+    query = query.filter((event) => {
+      for (const filter of filters) {
+        if (matchFilter(filter, event)) {
+          return true;
+        }
+      }
+    });
+    if (filter1.limit) {
+      query = query.limit(filter1.limit);
+    }
+    query.each((event) => {
+      console.log('got event from idb');
+      Events.handle(event, false, false);
+    });
   },
 };

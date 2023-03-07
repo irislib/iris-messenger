@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { html } from 'htm/preact';
 import { useEffect } from 'preact/hooks';
+import { route } from 'preact-router';
 
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Name from '../Name';
-import {route} from "preact-router";
 
 const lightningIcon = html`<svg width="24" height="20" viewBox="0 0 16 20" fill="none">
   <path

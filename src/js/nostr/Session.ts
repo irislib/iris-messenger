@@ -102,7 +102,7 @@ const Session = {
     });
     Relays.manage();
     LocalForage.loadEvents();
-    IndexedDB.loadIDBEvents();
+    IndexedDB.init();
     const timeout = setTimeout(() => {
       IrisTo.checkExistingAccount(myPub);
     }, 1000);

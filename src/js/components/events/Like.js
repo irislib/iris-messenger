@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { html } from 'htm/preact';
 import { route } from 'preact-router';
 
-import Helpers from '../../Helpers';
 import Icons from '../../Icons';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -47,9 +46,7 @@ export default function Like(props) {
           </a>
           ${allLikes.length > 1 && html` and ${allLikes.length - 1} others `} ${likeText}
         </div>
-        <div>
-          <${EventComponent} id=${likedId} />
-        </div>
+        <${EventComponent} id=${likedId} />
       </div>
     </div>
   `;

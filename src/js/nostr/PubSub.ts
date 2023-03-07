@@ -5,6 +5,7 @@ import Helpers from '../Helpers';
 import { Event, Filter, Sub } from '../lib/nostr-tools';
 
 import Events from './Events';
+import IndexedDB from './IndexedDB';
 import Key from './Key';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
@@ -44,16 +45,14 @@ const PubSub = {
     return Helpers.arrayToHex(sha256(name)).slice(0, 8);
   },
   subscribeToRepliesAndReactions: debounce(() => {
-    Relays.subscribe(
-      [
-        {
-          kinds: [1, 6, 7, 9735],
-          '#e': Array.from(PubSub.subscribedRepliesAndReactions.values()),
-        },
-      ],
-      'subscribedRepliesAndReactions',
-      true,
-    );
+    const filters = [
+      {
+        kinds: [1, 6, 7, 9735],
+        '#e': Array.from(PubSub.subscribedRepliesAndReactions.values()),
+      },
+    ];
+    Relays.subscribe(filters, 'subscribedRepliesAndReactions', true);
+    IndexedDB.subscribe(filters, 'subscribedRepliesAndReactions');
   }, 500),
   subscribeToNewAuthors: new Set<string>(),
   subscribeToAuthors: debounce(() => {
@@ -71,41 +70,33 @@ const PubSub = {
       PubSub.subscribeToNewAuthors.delete(author);
     });
     console.log('subscribing to authors.length', authors.length);
-    Relays.subscribe(
-      [
-        {
-          kinds: [0, 3],
-          until: now,
-          authors,
-        },
-      ],
-      'followed',
-      true,
-      0,
-      true,
-    );
+    const filters = [
+      {
+        kinds: [0, 3],
+        until: now,
+        authors,
+      },
+    ];
+    Relays.subscribe(filters, 'followed', true, 0, true);
+    IndexedDB.subscribe(filters, 'followed');
     if (PubSub.subscribedProfiles.size) {
-      Relays.subscribe(
-        [{ authors: Array.from(PubSub.subscribedProfiles.values()), kinds: [0] }],
-        'subscribedProfiles',
-        true,
-      );
+      const filters = [{ authors: Array.from(PubSub.subscribedProfiles.values()), kinds: [0] }];
+      Relays.subscribe(filters, 'subscribedProfiles', true);
+      IndexedDB.subscribe(filters, 'subscribedProfiles');
     }
+    const filters2 = [{ authors: followedUsers, limit: 100, until: now }];
     setTimeout(() => {
-      Relays.subscribe(
-        [{ authors: followedUsers, limit: 100, until: now }],
-        'followedHistory',
-        true,
-        0,
-        true,
-      );
+      Relays.subscribe(filters2, 'followedHistory', true, 0, true);
+      IndexedDB.subscribe(filters2, 'followedHistory');
     }, 1000);
   }, 2000),
   subscribeToPosts: throttle(
     () => {
       if (PubSub.subscribedPosts.size === 0) return;
       console.log('subscribe to', PubSub.subscribedPosts.size, 'posts');
-      Relays.subscribe([{ ids: Array.from(PubSub.subscribedPosts).slice(0, 1000) }], 'posts');
+      const filters = [{ ids: Array.from(PubSub.subscribedPosts).slice(0, 1000) }];
+      Relays.subscribe(filters, 'posts');
+      IndexedDB.subscribe(filters, 'posts');
     },
     3000,
     { leading: false },
@@ -216,7 +207,10 @@ const PubSub = {
     }
     hasNewIds && this.subscribeToPosts(this);
     hasNewKeywords && this.subscribeToKeywords(this);
-    name === 'global' && Relays.subscribe(filters, 'global');
+    if (name === 'global') {
+      Relays.subscribe(filters, 'global');
+      IndexedDB.subscribe(filters, 'global');
+    }
     return () => {
       if (currentSubscriptionId) {
         this.subscriptions.delete(currentSubscriptionId);
