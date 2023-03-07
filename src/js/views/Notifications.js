@@ -15,9 +15,19 @@ export default class Notifications extends View {
   ref = createRef();
 
   updateNotificationsLastOpened = debounce(() => {
-    const time = Math.floor(Date.now() / 1000);
-    Session.public.set('notifications/lastOpened', time);
-    localState.get('unseenNotificationCount').put(0);
+    const node = localState.get('settings').get('notifications').get('saveLastOpened');
+    node.once((saveLastOpened) => {
+      if (saveLastOpened !== false) {
+        const time = Math.floor(Date.now() / 1000);
+        const success = Session.public.set('notifications/lastOpened', time);
+        if (!success) {
+          console.log('user rejected');
+          // stop pestering if user rejects signature request
+          node.put(false);
+        }
+        localState.get('unseenNotificationCount').put(0);
+      }
+    });
   }, 1000);
 
   componentDidMount() {

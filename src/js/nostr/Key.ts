@@ -128,7 +128,9 @@ export default {
     } else if (op === 'encrypt') {
       fn = this.handlePromise(window.nostr.nip04.encrypt(pub, data), callback);
     } else if (op === 'sign') {
-      fn = this.handlePromise(window.nostr.signEvent(data), (signed) => callback(signed.sig));
+      fn = this.handlePromise(window.nostr.signEvent(data), (signed) =>
+        callback(signed && signed.sig),
+      );
     }
     await fn;
     this.windowNostrQueue.shift();
@@ -141,6 +143,7 @@ export default {
       })
       .catch((error) => {
         console.error(error);
+        callback(null);
       });
   },
   async decryptMessage(id, cb: (decrypted: string) => void) {
