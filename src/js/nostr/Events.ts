@@ -47,6 +47,7 @@ const Events = {
   likesByUser: new Map<string, SortedLimitedEventSet>(),
   postsByUser: new Map<string, SortedLimitedEventSet>(),
   postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
+  latestNotificationByTargetAndKind: new Map<string, string>(),
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   zapsByNote: new Map<string, SortedLimitedEventSet>(),
   latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
@@ -178,6 +179,9 @@ const Events = {
     if (event.kind !== 1) {
       return undefined;
     }
+    this.getEventReplyingTo(event);
+  },
+  getEventReplyingTo: function (event: Event) {
     const replyTags = event.tags?.filter((tag) => tag[0] === 'e' && tag[3] !== 'mention');
     if (replyTags.length === 1) {
       return replyTags[0][1];
@@ -660,7 +664,14 @@ const Events = {
       }
       if (!this.isMuted(event)) {
         this.cache.set(event.id, event);
-        this.notifications.add(event);
+        const target = this.getEventReplyingTo(event) || event.id; // TODO get thread root instead
+        const key = `${event.kind}-${target}`;
+        const existing = this.latestNotificationByTargetAndKind.get(key); // also latestNotificationByAuthor?
+        if (!existing || existing.created_at < event.created_at) {
+          this.notifications.delete(existing?.id);
+          this.notifications.add(event);
+          this.latestNotificationByTargetAndKind.set(key, event.id);
+        }
         this.updateUnseenNotificationCount();
       } else {
         // console.log('not notifying because muted');

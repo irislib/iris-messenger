@@ -2,9 +2,9 @@ import Component from '../../BaseComponent';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
+import Name from '../Name';
 
 import Button from './Button';
-import Name from '../Name';
 
 type Props = {
   id: string;

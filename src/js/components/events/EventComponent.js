@@ -9,8 +9,8 @@ import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 import Block from '../buttons/Block';
 import Copy from '../buttons/Copy';
-import Dropdown from '../Dropdown';
 import FollowButton from '../buttons/Follow';
+import Dropdown from '../Dropdown';
 
 import Follow from './Follow';
 import Like from './Like';

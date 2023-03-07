@@ -5,17 +5,17 @@ import { useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
-import Button from '../components/buttons/Button';
 import Block from '../components/buttons/Block';
+import Button from '../components/buttons/Button';
 import Copy from '../components/buttons/Copy';
+import Follow from '../components/buttons/Follow';
+import Report from '../components/buttons/Report';
 import Dropdown from '../components/Dropdown';
 import FeedMessageForm from '../components/FeedMessageForm';
-import Follow from '../components/buttons/Follow';
 import Identicon from '../components/Identicon';
 import MessageFeed from '../components/MessageFeed';
 import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
-import Report from '../components/buttons/Report';
 import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
 import localState from '../LocalState';
@@ -220,10 +220,7 @@ class Profile extends View {
               <div class="hidden-xs">
                 ${!this.state.isMyProfile
                   ? html`
-                      <${Follow}
-                        key=${`${this.state.hexPub}follow`}
-                        id=${this.state.hexPub}
-                      />
+                      <${Follow} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
                     `
                   : ''}
                 ${this.state.npub !==
