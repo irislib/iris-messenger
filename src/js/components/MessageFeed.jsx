@@ -316,7 +316,9 @@ class MessageFeed extends Component {
     const renderAs = this.state.feedType === 'images' ? 'NoteImage' : null;
     const messages = this.state.sortedMessages
       .slice(0, displayCount)
-      .map((id) => <EventComponent id={id} showRepliedMsg={showRepliedMsg} renderAs={renderAs} />);
+      .map((id) => (
+        <EventComponent key={id} id={id} showRepliedMsg={showRepliedMsg} renderAs={renderAs} />
+      ));
     return (
       <div className="msg-feed">
         <div>
