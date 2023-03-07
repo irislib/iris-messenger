@@ -5,7 +5,7 @@ import Helpers from '../Helpers';
 import { Event, Filter, Sub } from '../lib/nostr-tools';
 
 import Events from './Events';
-import IndexedDB from './IndexedDB';
+//import IndexedDB from './IndexedDB';
 import Key from './Key';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
@@ -52,7 +52,7 @@ const PubSub = {
       },
     ];
     Relays.subscribe(filters, 'subscribedRepliesAndReactions', true);
-    IndexedDB.subscribe(filters);
+    //IndexedDB.subscribe(filters);
   }, 500),
   subscribeToNewAuthors: new Set<string>(),
   subscribeToAuthors: debounce(() => {
@@ -78,16 +78,16 @@ const PubSub = {
       },
     ];
     Relays.subscribe(filters, 'followed', true, 0, true);
-    IndexedDB.subscribe(filters);
+    //IndexedDB.subscribe(filters);
     if (PubSub.subscribedProfiles.size) {
       const filters = [{ authors: Array.from(PubSub.subscribedProfiles.values()), kinds: [0] }];
       Relays.subscribe(filters, 'subscribedProfiles', true);
-      IndexedDB.subscribe(filters);
+      //IndexedDB.subscribe(filters);
     }
     const filters2 = [{ authors: followedUsers, limit: 100, until: now }];
     setTimeout(() => {
       Relays.subscribe(filters2, 'followedHistory', true, 0, true);
-      IndexedDB.subscribe(filters2);
+      //IndexedDB.subscribe(filters2);
     }, 1000);
   }, 2000),
   subscribeToPosts: throttle(
@@ -96,7 +96,7 @@ const PubSub = {
       console.log('subscribe to', PubSub.subscribedPosts.size, 'posts');
       const filters = [{ ids: Array.from(PubSub.subscribedPosts).slice(0, 1000) }];
       Relays.subscribe(filters, 'posts');
-      IndexedDB.subscribe(filters);
+      //IndexedDB.subscribe(filters);
     },
     3000,
     { leading: false },
@@ -209,7 +209,7 @@ const PubSub = {
     hasNewKeywords && this.subscribeToKeywords(this);
     if (name === 'global') {
       Relays.subscribe(filters, 'global');
-      IndexedDB.subscribe(filters);
+      //IndexedDB.subscribe(filters);
     }
     return () => {
       if (currentSubscriptionId) {
