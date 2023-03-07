@@ -69,7 +69,7 @@ class MessageFeed extends Component {
         ? Math.floor(Date.now() / 1000)
         : this.state.messagesShownTime;
       this.setState({ sortedMessages, queuedMessages, messagesShownTime });
-      this.checkScrollPosition();
+      this.handleScroll();
     },
     3000,
     { leading: true },
@@ -325,9 +325,7 @@ class MessageFeed extends Component {
             </div>
           ) : null}
           {['everyone', 'follows'].includes(this.props.index) ? this.renderFeedSelector() : ''}
-          {['posts', 'postsAndReplies', 'likes'].includes(this.props.index)
-            ? this.renderFeedTypeSelector()
-            : ''}
+          {this.props.index !== 'notifications' && this.renderFeedTypeSelector()}
           {renderAs === 'NoteImage' ? <ImageGrid>{messages}</ImageGrid> : messages}
         </div>
         {displayCount < this.state.sortedMessages.length ? this.renderShowMore() : ''}
