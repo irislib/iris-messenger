@@ -197,16 +197,18 @@ class MessageFeed extends Component {
     }
   }
 
-  showQueuedMessages = (e) => {
+  showQueuedMessages() {
     const sortedMessages = this.state.sortedMessages;
+    console.log('sortedmessages.length', sortedMessages.length);
     sortedMessages.unshift(...this.state.queuedMessages);
+    console.log('queuedmessages.length', this.state.queuedMessages.length);
     this.setState({
       sortedMessages,
       queuedMessages: [],
       messagesShownTime: Math.floor(Date.now() / 1000),
       displayCount: INITIAL_PAGE_SIZE,
     });
-  };
+  }
 
   renderFeedSelector() {
     return (
@@ -272,7 +274,7 @@ class MessageFeed extends Component {
     return (
       <div
         className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
-        onClick={this.showQueuedMessages}
+        onClick={() => this.showQueuedMessages()}
       >
         <div className="msg-content notification-msg colored">
           {t('show_n_new_messages').replace('{n}', this.state.queuedMessages.length)}
