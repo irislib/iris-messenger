@@ -641,7 +641,10 @@ class Note extends Component {
             ${this.props.event.pubkey
               ? html`
                   <a href=${`/${this.props.event.pubkey}`}>
-                    <${Identicon} str=${this.props.event.pubkey} width="40" />
+                    <${Identicon}
+                      str=${Key.toNostrBech32Address(this.props.event.pubkey, 'npub')}
+                      width="40"
+                    />
                   </a>
                 `
               : ''}
