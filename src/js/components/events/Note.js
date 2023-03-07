@@ -749,18 +749,20 @@ class Note extends Component {
           });
           img.css({ visibility: 'hidden', 'align-self': 'center' });
           attachmentsPreview.append(img);
-          $('body').append(transitionImg);
-          let o = img.offset();
-          transitionImg.animate(
-            { width: img.width(), left: o.left, top: o.top },
-            {
-              duration: ANIMATE_DURATION,
-              complete: () => {
-                img.css({ visibility: 'visible' });
-                transitionImg.hide();
+          img.one('load', () => {
+            $('body').append(transitionImg);
+            let o = img.offset();
+            transitionImg.animate(
+              { width: img.width(), left: o.left, top: o.top },
+              {
+                duration: ANIMATE_DURATION,
+                complete: () => {
+                  img.css({ visibility: 'visible' });
+                  transitionImg.hide();
+                },
               },
-            },
-          );
+            );
+          });
         } else {
           attachmentsPreview.css({ 'justify-content': '' });
           attachmentsPreview.append(img);
