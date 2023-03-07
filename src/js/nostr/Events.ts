@@ -179,7 +179,7 @@ const Events = {
     if (event.kind !== 1) {
       return undefined;
     }
-    this.getEventReplyingTo(event);
+    return this.getEventReplyingTo(event);
   },
   getEventReplyingTo: function (event: Event) {
     const replyTags = event.tags?.filter((tag) => tag[0] === 'e' && tag[3] !== 'mention');
