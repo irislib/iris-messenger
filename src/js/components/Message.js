@@ -187,11 +187,7 @@ class Message extends Component {
           <div class="text ${emojiOnly && 'emoji-only'}">${text}</div>
           <div class="below-text">
             <div class="time">
-              ${this.props.id
-                ? html`<a href="/${encodeURIComponent(this.props.id)}"
-                    >${Helpers.getRelativeTimeText(time)}</a
-                  >`
-                : Helpers.formatTime(time)}
+              ${this.props.id ? Helpers.getRelativeTimeText(time) : Helpers.formatTime(time)}
               ${this.props.selfAuthored && seenIndicator}
             </div>
           </div>
