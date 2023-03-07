@@ -347,7 +347,7 @@ class Note extends Component {
       timeStyle: 'short',
     });
 
-    let rootMsg = this.props.event?.tags.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
+    let rootMsg = Events.getEventRoot(this.props.event);
     if (!rootMsg) {
       rootMsg = this.props.meta.replyingTo;
     }

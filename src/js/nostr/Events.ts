@@ -646,6 +646,9 @@ const Events = {
     }
     return muted;
   },
+  getEventRoot(event: Event) {
+    return event?.tags.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
+  },
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
     if (event.tags?.filter((tag) => tag[0] === 'p').length > 10) {
@@ -664,7 +667,7 @@ const Events = {
       }
       if (!this.isMuted(event)) {
         this.cache.set(event.id, event);
-        const target = this.getEventReplyingTo(event) || event.id; // TODO get thread root instead
+        const target = this.getEventRoot(event) || this.getEventReplyingTo(event) || event.id; // TODO get thread root instead
         const key = `${event.kind}-${target}`;
         const existing = this.latestNotificationByTargetAndKind.get(key); // also latestNotificationByAuthor?
         if (!existing || existing.created_at < event.created_at) {
