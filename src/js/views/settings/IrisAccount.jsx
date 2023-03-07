@@ -2,7 +2,7 @@ import { debounce } from 'lodash';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
-import Button from '../../components/basic/Button';
+import Button from '../../components/buttons/Button';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';

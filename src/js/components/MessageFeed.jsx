@@ -1,7 +1,7 @@
 import { throttle } from 'lodash';
 
 import Component from '../BaseComponent';
-import Button from '../components/basic/Button';
+import Button from './buttons/Button';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Events from '../nostr/Events';

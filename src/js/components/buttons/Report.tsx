@@ -1,10 +1,10 @@
-import Key from '../nostr/Key';
-import SocialNetwork from '../nostr/SocialNetwork';
-import { translate as t } from '../translations/Translation';
+import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import { translate as t } from '../../translations/Translation';
 
-import BlockButton from './BlockButton';
+import Block from './Block';
 
-class ReportButton extends BlockButton {
+class Report extends Block {
   constructor() {
     super();
     this.cls = 'block';
@@ -31,4 +31,4 @@ class ReportButton extends BlockButton {
   }
 }
 
-export default ReportButton;
+export default Report;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import Button from '../../components/basic/Button';
+import Button from '../../components/buttons/Button';
 import localState from '../../LocalState';
 import Relays from '../../nostr/Relays';
 import { translate as t } from '../../translations/Translation';

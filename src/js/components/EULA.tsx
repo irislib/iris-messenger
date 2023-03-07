@@ -1,4 +1,4 @@
-import Button from './basic/Button';
+import Button from './buttons/Button';
 
 const text = (
   <>

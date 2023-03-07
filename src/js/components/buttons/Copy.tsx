@@ -1,11 +1,11 @@
 import $ from 'jquery';
 import { Component } from 'preact';
 
-import Helpers from '../Helpers';
-import { translate as t } from '../translations/Translation';
-import { OptionalGetter } from '../types';
+import Helpers from '../../Helpers';
+import { translate as t } from '../../translations/Translation';
+import { OptionalGetter } from '../../types';
 
-import Button from './basic/Button';
+import Button from './Button';
 
 type Props = {
   copyStr: OptionalGetter<string>;
@@ -17,7 +17,7 @@ type State = {
   copied: boolean;
 };
 
-class CopyButton extends Component<Props, State> {
+class Copy extends Component<Props, State> {
   originalWidth?: number;
   timeout?: ReturnType<typeof setTimeout>;
 
@@ -60,4 +60,4 @@ class CopyButton extends Component<Props, State> {
   }
 }
 
-export default CopyButton;
+export default Copy;

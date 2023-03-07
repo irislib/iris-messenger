@@ -13,11 +13,11 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
-import BlockButton from '../BlockButton';
-import CopyButton from '../CopyButton';
+import Block from '../buttons/Block';
+import Copy from '../buttons/Copy';
 import Dropdown from '../Dropdown';
 import FeedMessageForm from '../FeedMessageForm';
-import FollowButton from '../FollowButton';
+import Follow from '../buttons/Follow';
 import Identicon from '../Identicon';
 import Name from '../Name';
 import SafeImg from '../SafeImg';
@@ -206,13 +206,13 @@ class Note extends Component {
     return html`
       <div class="msg-menu-btn">
         <${Dropdown}>
-          <${CopyButton}
+          <${Copy}
             key=${`${this.props.event.id}copy_link`}
             text=${t('copy_link')}
             title="Note link"
             copyStr=${url}
           />
-          <${CopyButton}
+          <${Copy}
             key=${`${this.props.event.id}copy_id`}
             text=${t('copy_note_ID')}
             title="Note ID"
@@ -225,7 +225,7 @@ class Note extends Component {
             ? html`
                 <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
                 <a href="#" onClick=${(e) => this.translate(e)}>${t('translate')}</a>
-                <${CopyButton}
+                <${Copy}
                   key=${`${this.props.event.id}copyRaw`}
                   text=${t('copy_raw_data')}
                   title="Message raw data"
@@ -234,9 +234,9 @@ class Note extends Component {
                 ${this.props.meta.isMine
                   ? html` <a href="#" onClick=${(e) => this.onDelete(e)}>${t('delete')}</a> `
                   : html`<a href="#" onClick=${(e) => this.report(e)}>${t('report_public')}</a>
-                      <${FollowButton} id=${this.props.event?.pubkey} showName=${true} />
+                      <${Follow} id=${this.props.event?.pubkey} showName=${true} />
                       <span onClick=${() => this.setState({ msg: null })}>
-                        <${BlockButton} id=${this.props.event?.pubkey} showName=${true} />
+                        <${Block} id=${this.props.event?.pubkey} showName=${true} />
                       </span> `}
               `
             : ''}

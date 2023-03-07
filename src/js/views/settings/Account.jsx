@@ -2,8 +2,8 @@ import { html } from 'htm/preact';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
-import Button from '../../components/basic/Button';
-import CopyButton from '../../components/CopyButton';
+import Button from '../../components/buttons/Button';
+import Copy from '../../components/buttons/Copy';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Session from '../../nostr/Session';
@@ -95,15 +95,15 @@ export default class Account extends Component {
             <small>{myNpub}</small>
           </p>
           <p>
-            <CopyButton copyStr={myNpub} text="Copy npub" />
-            <CopyButton copyStr={myPub} text="Copy hex" />
+            <Copy copyStr={myNpub} text="Copy npub" />
+            <Copy copyStr={myPub} text="Copy hex" />
           </p>
           <h3>{t('private_key')}</h3>
           <p>
             {myPrivHex ? (
               <>
-                <CopyButton copyStr={myPriv32} text="Copy nsec" />
-                <CopyButton copyStr={myPrivHex} text="Copy hex" />
+                <Copy copyStr={myPriv32} text="Copy nsec" />
+                <Copy copyStr={myPrivHex} text="Copy hex" />
               </>
             ) : (
               <p>{t('private_key_not_present_good')}</p>

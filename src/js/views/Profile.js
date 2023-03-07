@@ -5,17 +5,17 @@ import { useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
-import Button from '../components/basic/Button';
-import BlockButton from '../components/BlockButton';
-import CopyButton from '../components/CopyButton';
+import Button from '../components/buttons/Button';
+import Block from '../components/buttons/Block';
+import Copy from '../components/buttons/Copy';
 import Dropdown from '../components/Dropdown';
 import FeedMessageForm from '../components/FeedMessageForm';
-import FollowButton from '../components/FollowButton';
+import Follow from '../components/buttons/Follow';
 import Identicon from '../components/Identicon';
 import MessageFeed from '../components/MessageFeed';
 import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
-import ReportButton from '../components/ReportButton';
+import Report from '../components/buttons/Report';
 import Helpers from '../Helpers';
 import QRCode from '../lib/qrcode.min';
 import localState from '../LocalState';
@@ -67,7 +67,7 @@ class Profile extends View {
           <div class="msg-content">
             <p>Share your profile link so ${this.state.name || 'this user'} can follow you:</p>
             <p>
-              <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getMyProfileLink()} />
+              <${Copy} text=${t('copy_link')} copyStr=${Helpers.getMyProfileLink()} />
             </p>
             <small>${t('no_followers_yet_info')}</small>
           </div>
@@ -154,13 +154,13 @@ class Profile extends View {
                         >${t('edit_profile')}<//
                       >`
                     : ''}
-                  <${CopyButton}
+                  <${Copy}
                     key=${`${this.state.hexPub}copyLink`}
                     text=${t('copy_link')}
                     title=${this.state.name}
                     copyStr=${window.location.href}
                   />
-                  <${CopyButton}
+                  <${Copy}
                     key=${`${this.state.hexPub}copyNpub`}
                     text=${t('copy_user_ID')}
                     title=${this.state.name}
@@ -169,7 +169,7 @@ class Profile extends View {
                   <${Button} onClick=${() => this.setState({ showQR: !this.state.showQR })}
                     >${t('show_qr_code')}<//
                   >
-                  <${CopyButton}
+                  <${Copy}
                     key=${`${this.state.hexPub}copyData`}
                     text=${t('copy_raw_data')}
                     title=${this.state.name}
@@ -190,8 +190,8 @@ class Profile extends View {
                   ${this.state.isMyProfile
                     ? ''
                     : html`
-                        <${BlockButton} id=${this.state.hexPub} />
-                        <${ReportButton} id=${this.state.hexPub} />
+                        <${Block} id=${this.state.hexPub} />
+                        <${Report} id=${this.state.hexPub} />
                       `}
                 <//>
               </div>
@@ -220,7 +220,7 @@ class Profile extends View {
               <div class="hidden-xs">
                 ${!this.state.isMyProfile
                   ? html`
-                      <${FollowButton}
+                      <${Follow}
                         key=${`${this.state.hexPub}follow`}
                         id=${this.state.hexPub}
                       />
@@ -246,7 +246,7 @@ class Profile extends View {
             ? ''
             : html`
                 <div>
-                  <${FollowButton} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
+                  <${Follow} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
                   <${Button} small=${true} onClick=${() => route(`/chat/${this.state.npub}`)}>
                     ${t('send_message')}
                   <//>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const UploadButton = (props) => {
+const Upload = (props) => {
   const [error, setError] = useState(null);
   const handleFileUpload = (event) => {
     const files = event.target.files || event.dataTransfer.files;
@@ -36,4 +36,4 @@ const UploadButton = (props) => {
   );
 };
 
-export default UploadButton;
+export default Upload;

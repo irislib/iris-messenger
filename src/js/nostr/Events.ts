@@ -535,14 +535,14 @@ const Events = {
     }
 
     // save limited by author followdistance
-    if (saveToIdb && SocialNetwork.followDistanceByUser.get(event.pubkey) <= 3) {
-      if (!globalFilter.maxFollowDistance) {
-        // even if distance filter is disabled, still limit IDB writes
-        const distance = SocialNetwork.followDistanceByUser.get(event.pubkey);
-        if (distance <= 3) {
-          IndexedDB.saveEvent(event);
-        }
-      } else {
+    // TODO: don't save e.g. old profile & follow events
+    const followDistance = SocialNetwork.followDistanceByUser.get(event.pubkey);
+    if (saveToIdb) {
+      if (followDistance <= 1) {
+        // save all our own events and events from people we follow
+        IndexedDB.saveEvent(event);
+      } else if (followDistance < 5 && [0, 3].includes(event.kind)) {
+        // save profiles and follow events up to follow distance 4
         IndexedDB.saveEvent(event);
       }
     }

@@ -9,9 +9,9 @@ import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
-import Button from './basic/Button';
-import CopyButton from './CopyButton';
-import FollowButton from './FollowButton';
+import Button from './buttons/Button';
+import Copy from './buttons/Copy';
+import Follow from './buttons/Follow';
 import Identicon from './Identicon';
 import Name from './Name';
 
@@ -35,7 +35,7 @@ export default class OnboardingNotification extends Component {
                 <${Identicon} str=${pub} width="40" />
                 <${Name} pub=${pub} placeholder="Suggested follow" />
               </a>
-              <${FollowButton} id=${pub} />
+              <${Follow} id=${pub} />
             </div>
           `,
         )}
@@ -60,7 +60,7 @@ export default class OnboardingNotification extends Component {
       <div style="display:flex;flex-direction:column;flex:1">
         <p>${t('no_followers_yet')}</p>
         <p>
-          <${CopyButton} text=${t('copy_link')} copyStr=${Helpers.getMyProfileLink()} />
+          <${Copy} text=${t('copy_link')} copyStr=${Helpers.getMyProfileLink()} />
         </p>
         <small>${t('no_followers_yet_info')}</small>
       </div>

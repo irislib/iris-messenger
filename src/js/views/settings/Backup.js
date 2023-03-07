@@ -1,7 +1,7 @@
 import Component from '../../BaseComponent';
-import Button from '../../components/basic/Button';
-import CopyButton from '../../components/CopyButton';
-import FollowButton from '../../components/FollowButton';
+import Button from '../../components/buttons/Button';
+import Copy from '../../components/buttons/Copy';
+import Follow from '../../components/buttons/Follow';
 import Identicon from '../../components/Identicon';
 import Name from '../../components/Name';
 import Events from '../../nostr/Events';
@@ -55,7 +55,7 @@ export default class Backup extends Component {
             >
               {t('download')}
             </Button>
-            <CopyButton
+            <Copy
               key={`${this.state.hexPub}copyData`}
               text={t('copy_raw_data')}
               title={this.state.name}
@@ -102,7 +102,7 @@ export default class Backup extends Component {
                     <Identicon str={hex} width={40} />
                     <Name pub={hex} />
                   </a>
-                  <FollowButton id={hex} />
+                  <Follow id={hex} />
                 </div>
               ))}
             </>

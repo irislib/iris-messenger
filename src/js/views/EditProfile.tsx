@@ -2,8 +2,8 @@ import { debounce } from 'lodash';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
-import Button from '../components/basic/Button';
-import UploadButton from '../components/basic/UploadButton';
+import Button from '../components/buttons/Button';
+import Upload from '../components/buttons/Upload';
 import Header from '../components/Header';
 import SafeImg from '../components/SafeImg';
 import Key from '../nostr/Key';
@@ -125,7 +125,7 @@ export default class EditProfile extends Component {
                     {field === 'picture' || field === 'banner' ? (
                       <>
                         <p>
-                          <UploadButton onUrl={(url) => this.setProfileAttribute(field, url)} />
+                          <Upload onUrl={(url) => this.setProfileAttribute(field, url)} />
                         </p>
                         {val && (
                           <p>

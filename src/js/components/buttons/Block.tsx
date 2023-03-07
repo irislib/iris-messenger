@@ -1,17 +1,17 @@
-import Component from '../BaseComponent';
-import Key from '../nostr/Key';
-import SocialNetwork from '../nostr/SocialNetwork';
-import { translate as t } from '../translations/Translation';
+import Component from '../../BaseComponent';
+import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import { translate as t } from '../../translations/Translation';
 
-import Button from './basic/Button';
-import Name from './Name';
+import Button from './Button';
+import Name from '../Name';
 
 type Props = {
   id: string;
   showName?: boolean;
 };
 
-class BlockButton extends Component<Props> {
+class Block extends Component<Props> {
   key: string;
   cls?: string;
   actionDone: string;
@@ -62,4 +62,4 @@ class BlockButton extends Component<Props> {
   }
 }
 
-export default BlockButton;
+export default Block;

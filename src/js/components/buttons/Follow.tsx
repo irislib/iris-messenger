@@ -1,15 +1,15 @@
-import Component from '../BaseComponent';
-import Key from '../nostr/Key';
-import SocialNetwork from '../nostr/SocialNetwork';
-import { translate as t } from '../translations/Translation';
+import Component from '../../BaseComponent';
+import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import { translate as t } from '../../translations/Translation';
 
-import Button from './basic/Button';
+import Button from './Button';
 
 type Props = {
   id: string;
 };
 
-class FollowButton extends Component<Props> {
+class Follow extends Component<Props> {
   key: string;
   cls?: string;
   actionDone: string;
@@ -61,4 +61,4 @@ class FollowButton extends Component<Props> {
   }
 }
 
-export default FollowButton;
+export default Follow;

@@ -1,5 +1,5 @@
 import Component from '../BaseComponent';
-import FollowButton from '../components/FollowButton';
+import Follow from '../components/buttons/Follow';
 import Header from '../components/Header';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
@@ -70,7 +70,7 @@ class About extends Component {
                 <Identicon str={IRIS_INFO_ACCOUNT} width={40} />
                 <Name pub={IRIS_INFO_ACCOUNT} placeholder="Iris" />
               </a>
-              <FollowButton id={IRIS_INFO_ACCOUNT} />
+              <Follow id={IRIS_INFO_ACCOUNT} />
             </div>
 
             <p>
