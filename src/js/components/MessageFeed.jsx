@@ -69,7 +69,6 @@ class MessageFeed extends Component {
         ? Math.floor(Date.now() / 1000)
         : this.state.messagesShownTime;
       this.setState({ sortedMessages, queuedMessages, messagesShownTime });
-      this.handleScroll();
     },
     3000,
     { leading: true },
@@ -178,6 +177,7 @@ class MessageFeed extends Component {
     if (!prevProps.scrollElement && this.props.scrollElement) {
       this.addScrollHandler();
     }
+    this.handleScroll();
     window.history.replaceState({ ...window.history.state, state: this.state }, '');
     if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
       Helpers.animateScrollTop('.main-view');
