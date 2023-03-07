@@ -626,7 +626,7 @@ class Note extends Component {
     return html`
       ${this.props.meta.replyingTo && this.props.showRepliedMsg ? this.renderRepliedMsg() : ''}
       <div
-        key=${this.props.event.id}
+        key=${this.props.event.id + 'note'}
         ref=${this.ref}
         class="msg ${s.isThumbnail ? 'thumbnail' : ''} ${this.props.asReply ? 'reply' : ''} ${this
           .props.standalone
