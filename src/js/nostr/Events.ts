@@ -540,12 +540,14 @@ const Events = {
 
     // save limited by author followdistance
     // TODO: don't save e.g. old profile & follow events
+    // TODO since we're only querying relays since lastSeen, we need to store all beforeseen events and correctly query them on demand
+    // otherwise feed will be incomplete
     const followDistance = SocialNetwork.followDistanceByUser.get(event.pubkey);
     if (saveToIdb) {
       if (followDistance <= 1) {
         // save all our own events and events from people we follow
         IndexedDB.saveEvent(event);
-      } else if (followDistance < 5 && [0, 3].includes(event.kind)) {
+      } else if (followDistance <= 4) {
         // save profiles and follow events up to follow distance 4
         IndexedDB.saveEvent(event);
       }

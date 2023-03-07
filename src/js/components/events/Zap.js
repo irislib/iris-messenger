@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { html } from 'htm/preact';
+import { useEffect } from 'preact/hooks';
 
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Name from '../Name';
+import {route} from "preact-router";
 
 const lightningIcon = html`<svg width="24" height="20" viewBox="0 0 16 20" fill="none">
   <path
@@ -15,14 +18,34 @@ const lightningIcon = html`<svg width="24" height="20" viewBox="0 0 16 20" fill=
   ></path>
 </svg>`;
 
+const messageClicked = (e, zappedId) => {
+  if (['A', 'BUTTON', 'TEXTAREA', 'IMG', 'INPUT'].find((tag) => e.target.closest(tag))) {
+    return;
+  }
+  if (window.getSelection().toString()) {
+    return;
+  }
+  e.stopPropagation();
+  route(`/${Key.toNostrBech32Address(zappedId, 'note')}`);
+};
+
 export default function Zap(props) {
-  const likedId = props.event.tags?.reverse().find((t) => t[0] === 'e')?.[1];
-  const likedEvent = Events.cache.get(likedId);
-  let text = likedEvent?.content;
+  const [allZaps, setAllZaps] = useState([]);
+  const zappedId = Events.getEventReplyingTo(props.event);
+
+  useEffect(() => {
+    const unsub = Events.getRepliesAndReactions(zappedId, (_a, _b, _c, _d, zappedBy) => {
+      setAllZaps(Array.from(zappedBy));
+    });
+    return () => unsub();
+  });
+
+  const zappedEvent = Events.cache.get(zappedId);
+  let text = zappedEvent?.content;
   if (text && text.length > 50) {
-    text = Helpers.highlightText(text, likedEvent);
+    text = Helpers.highlightText(text, zappedEvent);
   } else {
-    text = Helpers.highlightText(text, likedEvent);
+    text = Helpers.highlightText(text, zappedEvent);
   }
   let zappingUser = null;
   try {
@@ -31,11 +54,11 @@ export default function Zap(props) {
     console.error('no zapping user found for event', props.event.id, e);
     return '';
   }
-  const link = `/${Key.toNostrBech32Address(likedId, 'note')}`;
+  const link = `/${Key.toNostrBech32Address(zappedId, 'note')}`;
   const userLink = `/${zappingUser}`;
   return html`
     <div class="msg">
-      <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
+      <div class="msg-content" onClick=${(e) => messageClicked(e, zappedId)}>
         <div
           style="display: flex; align-items: center; flex-basis: 100%; white-space: nowrap;text-overflow: ellipsis; overflow:hidden"
         >
@@ -43,6 +66,7 @@ export default function Zap(props) {
           <a href=${userLink} style="margin-right: 5px;">
             <${Name} pub=${zappingUser} userNameOnly=${true} />
           </a>
+          ${allZaps.length > 1 ? html`<span> and ${allZaps.length - 1} others </span>` : ''}
           <span>
             zapped your <a href=${link}>note</a> ${text && text.length
               ? html`<i>"${text}"</i>`
