@@ -566,7 +566,7 @@ class Note extends Component {
   renderRepliedMsg() {
     return html`
       <${EventComponent}
-        key=${this.props.meta.replyingTo}
+        key=${this.props.event.id + this.props.meta.replyingTo}
         id=${this.props.meta.replyingTo}
         asQuote=${true}
         showReplies=${0}

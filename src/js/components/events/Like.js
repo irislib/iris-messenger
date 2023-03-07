@@ -46,7 +46,7 @@ export default function Like(props) {
           </a>
           ${allLikes.length > 1 && html` and ${allLikes.length - 1} others `} ${likeText}
         </div>
-        <${EventComponent} id=${likedId} />
+        <${EventComponent} key=${likedId + props.event.id} id=${likedId} />
       </div>
     </div>
   `;
