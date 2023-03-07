@@ -52,11 +52,7 @@ export default {
       })
       .then(() => {
         // other follow events
-        return db.events
-          .where('pubkey')
-          .noneOf([myPub, ...follows])
-          .and((event) => event.kind === 3)
-          .each((event) => {
+        return db.events.where({ kind: 3 }).each((event) => {
             Events.handle(event, false, false);
           });
       });
