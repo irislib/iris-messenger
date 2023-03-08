@@ -17,35 +17,14 @@ import MessageFeed from '../components/MessageFeed';
 import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
 import Helpers from '../Helpers';
-import QRCode from '../lib/qrcode.min';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
+import QrCode from '../components/QrCode';
 
 import View from './View';
-
-const QR = (props) => {
-  const ref = createRef();
-  //const [qr, setQr] = useState(null);
-
-  useEffect(() => {
-    if (!ref.current) {
-      return;
-    }
-    new QRCode(ref.current, {
-      text: props.text,
-      width: 300,
-      height: 300,
-      colorDark: '#000000',
-      colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.H,
-    });
-  }, [props.text]);
-
-  return html`<div ref=${ref} />`;
-};
 
 class Profile extends View {
   constructor() {
@@ -257,7 +236,7 @@ class Profile extends View {
               </div>
             `
           : ''}
-        ${this.state.showQR ? html` <${QR} text=${`nostr:${this.state.npub}`} /> ` : ''}
+        ${this.state.showQR ? html` <${QrCode} data=${`nostr:${this.state.npub}`} /> ` : ''}
       </div>
     `;
   }

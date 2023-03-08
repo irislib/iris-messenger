@@ -509,15 +509,20 @@ class Note extends Component {
               >
                 ${s.zappers?.length || ''}
               </span>
-              <${ZapModal}
-                show=${this.state.showZapModal}
-                lnurl=${this.state.lightning}
-                note=${this.props.event.id}
-                onClose=${() => this.setState({ showZapModal: false })}
-              />
             `
           : ''}
       </div>
+    `;
+  }
+
+  renderZapModal() {
+    return html`
+      <${ZapModal}
+        show=${true}
+        lnurl=${this.state.lightning}
+        note=${this.props.event.id}
+        onClose=${() => this.setState({ showZapModal: false })}
+      />
     `;
   }
 
@@ -710,6 +715,7 @@ class Note extends Component {
             ${this.props.asInlineQuote ? '' : this.renderReactionBtns()}
             ${s.showLikes ? this.renderLikes() : ''} ${s.showZaps ? this.renderZaps() : ''}
             ${s.showReposts ? this.renderReposts() : ''}
+            ${s.lightning && s.showZapModal && this.renderZapModal()}
             ${this.props.standalone || s.showReplyForm ? this.renderReplyForm() : ''}
           </div>
         </div>

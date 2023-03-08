@@ -9,7 +9,6 @@ import Button from './Button';
 
 type Props = {
   copyStr: OptionalGetter<string>;
-  title: string;
   text: string;
 };
 

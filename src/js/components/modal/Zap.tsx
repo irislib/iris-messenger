@@ -1,11 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { debounce } from 'lodash';
+import styled from 'styled-components';
 
 import { Event } from '../../lib/nostr-tools';
 import { LNURL, LNURLError, LNURLErrorCode, LNURLInvoice, LNURLSuccessAction } from '../../LNURL';
 import Key from '../../nostr/Key';
+import Button from '../buttons/Button';
+import CopyButton from '../buttons/Copy';
+import QrCode from '../QrCode';
 
 import Modal from './Modal';
+
+// Code kindly contributed by @Kieran and @verbiricha from Snort
 
 enum ZapType {
   PublicZap = 1,
@@ -41,8 +47,8 @@ function chunks<T>(arr: T[], length: number) {
 export default function SendSats(props: SendSatsProps) {
   const onClose = props.onClose || (() => undefined);
   const { note, author, target } = props;
-  const defaultZapAmount = 500;
-  const amounts = [defaultZapAmount, 1_000, 5_000, 10_000, 20_000, 50_000, 100_000, 1_000_000];
+  const defaultZapAmount = 1_000;
+  const amounts = [defaultZapAmount, 5_000, 10_000, 20_000, 50_000, 100_000, 1_000_000];
   const emojis: Record<number, string> = {
     1_000: '👍',
     5_000: '💜',
@@ -199,7 +205,7 @@ export default function SendSats(props: SendSatsProps) {
           disabled={!customAmount}
           onClick={() => selectAmount(customAmount ?? 0)}
         >
-          confirm
+          Confirm
         </button>
       </div>
     );
@@ -227,17 +233,30 @@ export default function SendSats(props: SendSatsProps) {
   }
 
   function renderAmounts(amount: number, amounts: number[]) {
+    const SatAmount = styled.span`
+      color: var(--text-color);
+      display: inline-block;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 100px;
+      margin: 5px;
+      border: 1px solid transparent;
+      background: var(--body-bg);
+      &.active {
+        background: var(--notify);
+      }
+    `;
     return (
       <div className="amounts">
         {amounts.map((a) => (
-          <span
-            className={`sat-amount ${amount === a ? 'active' : ''}`}
+          <SatAmount
+            className={amount === a ? 'active' : ''}
             key={a}
             onClick={() => selectAmount(a)}
           >
             {emojis[a] && <>{emojis[a]}&nbsp;</>}
             {a === 1000 ? '1K' : a}
-          </span>
+          </SatAmount>
         ))}
       </div>
     );
@@ -247,15 +266,15 @@ export default function SendSats(props: SendSatsProps) {
     if (!handler || invoice) return null;
     return (
       <>
-        <h3>amount</h3>
+        <h3>Zap amount in sats</h3>
         {amountRows.map((amounts) => renderAmounts(amount, amounts))}
         {custom()}
         <div className="flex">
           {canComment && (
             <input
               type="text"
-              placeholder={'comment'}
-              className="f-grow"
+              placeholder={'Comment'}
+              style="margin-bottom: 10px;margin-top: 10px;width:100%;"
               maxLength={
                 handler.canZap && zapType !== ZapType.NonZap ? 250 : handler.maxCommentLength
               }
@@ -265,9 +284,11 @@ export default function SendSats(props: SendSatsProps) {
         </div>
         {zapTypeSelector()}
         {(amount ?? 0) > 0 && (
-          <button type="button" className="zap-action" onClick={() => loadInvoice()}>
-            <div className="zap-action-container">{amount}</div>
-          </button>
+          <div style="margin-top: 10px;">
+            <Button width="100%" onClick={() => loadInvoice()}>
+              Send {amount}
+            </Button>
+          </div>
         )}
       </>
     );
@@ -276,26 +297,46 @@ export default function SendSats(props: SendSatsProps) {
   function zapTypeSelector() {
     if (!handler || !handler.canZap) return;
 
+    const ZapTypeBtn = styled.span`
+      color: var(--text-color);
+      display: inline-block;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 100px;
+      margin: 5px;
+      border: 1px solid transparent;
+      background: var(--body-bg);
+      &.active {
+        background: var(--notify);
+      }
+    `;
+
     return (
       <>
         <h3>Zap Type</h3>
-        <div className="tabs mt10">Public Anon Non-Zap</div>
+        <div className="tabs mt10">
+          <ZapTypeBtn className={'active'}>Public</ZapTypeBtn>
+          <ZapTypeBtn>Anon</ZapTypeBtn>
+          <ZapTypeBtn>Non-Zap</ZapTypeBtn>
+        </div>
       </>
     );
   }
 
   function payInvoice() {
     if (success || !invoice) return null;
-    /*<QrCode data={invoice} link={`lightning:${invoice}`} />*/
     return (
       <>
         <div className="invoice">
           {props.notice && <b className="error">{props.notice}</b>}
-          {paying ? <h4>le pay</h4> : invoice}
+          {paying ? <h4>Paying</h4> : ''}
           <div className="actions">
             {invoice && (
               <>
-                <div className="copy-action">copy invoice {invoice}</div>
+                <QrCode data={invoice} link={`lightning:${invoice}`} />
+                <div className="copy-action">
+                  <CopyButton copyStr={invoice} text="Copy invoice" />
+                </div>
                 <button
                   className="wallet-action"
                   type="button"
@@ -327,16 +368,31 @@ export default function SendSats(props: SendSatsProps) {
     );
   }
 
-  const defaultTitle = handler?.canZap ? 'send zap' : 'send sats';
+  const defaultTitle = handler?.canZap ? 'Send zap' : 'Send sats';
   const title = target ? defaultTitle + 'to ' + target : defaultTitle;
   if (!(props.show ?? false)) return null;
+  const ZapDialog = styled.div`
+    background-color: var(--msg-content-background);
+    border-radius: 8px;
+    padding: 30px;
+    width: 400px;
+    color: var(--text-color);
+    position: relative;
+  `;
+  const Close = styled.div`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    color: var(--text-color);
+  `;
   return (
     <Modal onClose={onClose}>
-      <div style="background: var(--msg-content-background); width: 400px; max-width: 100%;">
+      <ZapDialog>
         <div className="lnurl-tip" onClick={(e) => e.stopPropagation()}>
-          <div className="close" onClick={onClose}>
-            close
-          </div>
+          <Close className="close" onClick={onClose}>
+            X
+          </Close>
           <div className="lnurl-header">
             <h2>{props.title || title}</h2>
           </div>
@@ -345,7 +401,7 @@ export default function SendSats(props: SendSatsProps) {
           {payInvoice()}
           {successAction()}
         </div>
-      </div>
+      </ZapDialog>
     </Modal>
   );
 }
