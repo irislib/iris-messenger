@@ -156,12 +156,16 @@ export default {
         <video
           key={match + i}
           src={match}
-          muted={true}
+          muted
           autoPlay={!this.isMobile && settings.autoplayVideos !== false}
-          playsInline={true}
-          webkit-playsinline={true}
-          controls={true}
-          loop={true}
+          playsInline
+          controls
+          loop
+          onLoadedData={(e) => {
+            if (!this.isMobile && settings.autoplayVideos) {
+              (e.target as HTMLVideoElement).play();
+            }
+          }}
         />
       );
     });
