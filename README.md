@@ -18,6 +18,12 @@ Browser application: [iris.to](https://iris.to)
 ## Develop
 
 ```bash
+git clone https://github.com/irislib/iris-messenger.git
+```
+
+<details open><summary>Yarn</summary>
+
+```bash
 # install dependencies
 yarn
 
@@ -34,10 +40,35 @@ yarn serve
 yarn test
 ```
 
+</details>
+<details><summary>npm</summary>
+
+```bash
+# install dependencies
+npm i
+
+# serve with hot reload at localhost:8080
+npm run dev
+
+# build for production with minification
+npm run build
+
+# test the production build locally
+npm run serve
+
+# run tests with jest and enzyme
+npm run test
+```
+
+</details>
+<br/>
+[iris.to](https://iris.to) production version is in the [stable](https://github.com/irislib/iris-messenger/tree/stable) branch.
+
 ### Tauri (desktop app)
 
 [Tauri docs](https://tauri.app/v1/guides/)
 
+<details open><summary>Yarn</summary>
 ```bash
 # install dependencies
 yarn
@@ -48,6 +79,19 @@ yarn tauri dev
 # build
 yarn tauri build
 ```
+</details>
+<details><summary>npm</summary>
+```bash
+# install dependencies
+npm i
+
+# develop
+npm run tauri dev
+
+# build
+npm run tauri build
+```
+</details>
 
 [iris.to](https://iris.to) production version is in the [production](https://github.com/irislib/iris-messenger/tree/production) branch.
 
