@@ -1,6 +1,8 @@
 import { Event } from './lib/nostr-tools';
 import Helpers from './Helpers';
 
+// Code kindly contributed by @Kieran from Snort
+
 const PayServiceTag = 'payRequest';
 
 export enum LNURLErrorCode {
@@ -48,7 +50,7 @@ export class LNURL {
   }
 
   async load() {
-    const rsp = await fetch(this.#url);
+    const rsp = await fetch(this.#url.toString());
     if (rsp.ok) {
       this.#service = await rsp.json();
       this.#validateService();
