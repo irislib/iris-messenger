@@ -9,6 +9,7 @@ import Key from '../../nostr/Key';
 import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation';
 import { ExistingAccountLogin } from '../Login';
+import Helpers from "../../Helpers";
 const bech32 = require('bech32-buffer');
 
 export default class Account extends Component {
@@ -111,10 +112,14 @@ export default class Account extends Component {
           </p>
           {myPrivHex ? <p>{t('private_key_warning')}</p> : ''}
 
-          <h3>{t('delete_account')}</h3>
-          <p>
-            <Button onClick={() => this.deleteAccount()}>{t('delete_account')}</Button>
-          </p>
+          {Helpers.isStandalone() ? (
+            <>
+              <h3>{t('delete_account')}</h3>
+              <p>
+                <Button onClick={() => this.deleteAccount()}>{t('delete_account')}</Button>
+              </p>
+            </>
+          ) : null}
         </div>
       </>
     );

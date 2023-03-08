@@ -64,6 +64,39 @@ npm run test
 <br/>
 [iris.to](https://iris.to) production version is in the [stable](https://github.com/irislib/iris-messenger/tree/stable) branch.
 
+### Tauri (desktop app)
+
+[Tauri docs](https://tauri.app/v1/guides/)
+
+<details open><summary>Yarn</summary>
+```bash
+# install dependencies
+yarn
+
+# develop
+yarn tauri dev
+
+# build
+yarn tauri build
+```
+</details>
+<details><summary>npm</summary>
+```bash
+# install dependencies
+npm i
+
+# develop
+npm run tauri dev
+
+# build
+npm run tauri build
+```
+</details>
+
+[iris.to](https://iris.to) production version is in the [production](https://github.com/irislib/iris-messenger/tree/production) branch.
+
+Master branch is deployed to [beta.iris.to](https://beta.iris.to).
+
 ## Privacy
 
 The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.
