@@ -37,7 +37,7 @@ export default function Zap(props) {
 
   useEffect(() => {
     const unsub = Events.getRepliesAndReactions(zappedId, (_a, _b, _c, _d, zappedBy) => {
-      setAllZaps(Array.from(zappedBy));
+      setAllZaps(Array.from(zappedBy.values()));
     });
     return () => unsub();
   });
