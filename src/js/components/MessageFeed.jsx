@@ -317,7 +317,13 @@ class MessageFeed extends Component {
     const messages = this.state.sortedMessages
       .slice(0, displayCount)
       .map((id) => (
-        <EventComponent key={id} id={id} showRepliedMsg={showRepliedMsg} renderAs={renderAs} />
+        <EventComponent
+          notification={this.props.index === 'notifications'}
+          key={id}
+          id={id}
+          showRepliedMsg={showRepliedMsg}
+          renderAs={renderAs}
+        />
       ));
     return (
       <div className="msg-feed">
