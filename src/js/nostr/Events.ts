@@ -174,6 +174,7 @@ const Events = {
       .slice() // so we don't reverse event.tags in place
       .reverse()
       .find((tag: any) => tag[0] === 'e')?.[1];
+    return id;
   },
   getNoteReplyingTo: function (event: Event) {
     if (event.kind !== 1) {
