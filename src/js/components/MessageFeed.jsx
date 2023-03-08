@@ -257,7 +257,7 @@ class MessageFeed extends Component {
           onClick={() => this.setState({ feedType: 'posts' })}
           className={this.state.feedType === 'images' ? '' : 'active'}
         >
-          {Icons.document}
+          {Icons.post}
         </a>
         <a
           style="border-radius: 0 8px 0 0"
