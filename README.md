@@ -69,6 +69,7 @@ npm run test
 [Tauri docs](https://tauri.app/v1/guides/)
 
 <details open><summary>Yarn</summary>
+
 ```bash
 # install dependencies
 yarn
@@ -79,8 +80,10 @@ yarn tauri dev
 # build
 yarn tauri build
 ```
+
 </details>
 <details><summary>npm</summary>
+
 ```bash
 # install dependencies
 npm i
