@@ -34,7 +34,22 @@ yarn serve
 yarn test
 ```
 
-[iris.to](https://iris.to) production version is in the [stable](https://github.com/irislib/iris-messenger/tree/stable) branch.
+### Tauri (desktop app)
+
+```bash
+# install dependencies
+yarn
+
+# develop
+yarn tauri dev
+
+# build
+yarn tauri build
+```
+
+[iris.to](https://iris.to) production version is in the [production](https://github.com/irislib/iris-messenger/tree/production) branch.
+
+Master branch is deployed to [beta.iris.to](https://beta.iris.to).
 
 ## Privacy
 
