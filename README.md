@@ -36,6 +36,8 @@ yarn test
 
 ### Tauri (desktop app)
 
+[Tauri docs](https://tauri.app/v1/guides/)
+
 ```bash
 # install dependencies
 yarn
