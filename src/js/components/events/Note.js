@@ -19,6 +19,7 @@ import Follow from '../buttons/Follow';
 import Dropdown from '../Dropdown';
 import FeedMessageForm from '../FeedMessageForm';
 import Identicon from '../Identicon';
+import ZapModal from '../modal/Zap';
 import Name from '../Name';
 import SafeImg from '../SafeImg';
 import Torrent from '../Torrent';
@@ -266,9 +267,6 @@ class Note extends Component {
     const unsub = SocialNetwork.getProfile(event.pubkey, (profile) => {
       if (!profile) return;
       let lightning = profile.lud16 || profile.lud06;
-      if (lightning && !lightning.startsWith('lightning:')) {
-        lightning = `lightning:${lightning}`;
-      }
       this.setState({ lightning });
     });
     this.subscriptions.push(unsub);
@@ -497,8 +495,10 @@ class Note extends Component {
         ${this.state.lightning
           ? html`
               <a
-                href=${this.state.lightning}
-                onClick=${(e) => Helpers.handleLightningLinkClick(e)}
+                onClick=${(e) => {
+                  e.preventDefault();
+                  this.setState({ showZapModal: true });
+                }}
                 class="msg-btn zap-btn"
               >
                 ${lightningIcon}
@@ -509,6 +509,12 @@ class Note extends Component {
               >
                 ${s.zappers?.length || ''}
               </span>
+              <${ZapModal}
+                show=${this.state.showZapModal}
+                lnurl=${this.state.lightning}
+                note=${this.props.event.id}
+                onClose=${() => this.setState({ showZapModal: false })}
+              />
             `
           : ''}
       </div>
