@@ -42,6 +42,26 @@ export default class Account extends Component {
       }, 1000);
     }
   }
+  
+  saveAsTxt(pubk, privk) {
+    let data = `Public Key: ${pubk}\nPrivate Key: ${privk}\n`;
+
+    const save = new Blob([data], { type: 'text/plain' });
+    const fileName = 'public-and-private-keys.txt';
+
+    let newLink = document.createElement('a');
+    newLink.download = fileName;
+
+    if (window.webkitURL != null) {
+      newLink.href = window.webkitURL.createObjectURL(save);
+    } else {
+      newLink.href = window.URL.createObjectURL(save);
+      newLink.style.display = 'none';
+      document.body.appendChild(newLink);
+    }
+
+    newLink.click();
+  }
 
   render() {
     const myPrivHex = Key.getPrivKey();
@@ -111,7 +131,11 @@ export default class Account extends Component {
             )}
           </p>
           {myPrivHex ? <p>{t('private_key_warning')}</p> : ''}
-
+          <p>
+            <Button onClick={() => this.saveAsTxt(myNpub, myPriv32)}>
+              {t('download_text_file')}
+            </Button>
+          </p>
           {Helpers.isStandalone() ? (
             <>
               <h3>{t('delete_account')}</h3>
