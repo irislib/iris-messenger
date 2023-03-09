@@ -39,6 +39,7 @@ class MessageFeed extends Component {
       displayCount: INITIAL_PAGE_SIZE,
       messagesShownTime: Math.floor(Date.now() / 1000),
       includeReplies: false,
+      display: Helpers.getUrlParameter('display') === 'grid' ? 'grid' : 'posts',
     };
     this.mappedMessages = new Map();
   }
@@ -121,6 +122,7 @@ class MessageFeed extends Component {
   componentDidMount() {
     this.addScrollHandler();
     let first = true;
+    
     if (this.props.nostrUser) {
       if (this.props.index === 'postsAndReplies') {
         Events.getPostsAndRepliesByUser(this.props.nostrUser, (eventIds) =>
@@ -176,6 +178,16 @@ class MessageFeed extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.scrollElement && this.props.scrollElement) {
       this.addScrollHandler();
+    }
+    if (prevState.display !== this.state.display) {
+      // url param ?display=images if display === 'grid', otherwise no param
+      const url = new URL(window.location);
+      if (this.state.display === 'grid') {
+        url.searchParams.set('display', 'grid');
+      } else {
+        url.searchParams.delete('display');
+      }
+      window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
     }
     this.handleScroll();
     window.history.replaceState({ ...window.history.state, state: this.state }, '');
@@ -254,15 +266,15 @@ class MessageFeed extends Component {
       <div className="tabs">
         <a
           style="border-radius: 8px 0 0 0"
-          onClick={() => this.setState({ feedType: 'posts' })}
-          className={this.state.feedType === 'images' ? '' : 'active'}
+          onClick={() => this.setState({ display: 'posts' })}
+          className={this.state.display === 'grid' ? '' : 'active'}
         >
           {Icons.post}
         </a>
         <a
           style="border-radius: 0 8px 0 0"
-          className={this.state.feedType === 'images' ? 'active' : ''}
-          onClick={() => this.setState({ feedType: 'images' })}
+          className={this.state.display === 'grid' ? 'active' : ''}
+          onClick={() => this.setState({ display: 'grid' })}
         >
           {Icons.image}
         </a>
@@ -313,7 +325,7 @@ class MessageFeed extends Component {
         notifications: 'notifications',
       }[this.props.index];
 
-    const renderAs = this.state.feedType === 'images' ? 'NoteImage' : null;
+    const renderAs = this.state.display === 'grid' ? 'NoteImage' : null;
     const messages = this.state.sortedMessages
       .slice(0, displayCount)
       .map((id) => (

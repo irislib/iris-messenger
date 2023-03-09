@@ -503,6 +503,11 @@ export default {
     return t;
   },
 
+  getUrlParameter(name: string) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+  },
+
   getDaySeparatorText(date: Date, dateStr: string, now?: Date, nowStr?: string) {
     if (!now) {
       now = new Date();
