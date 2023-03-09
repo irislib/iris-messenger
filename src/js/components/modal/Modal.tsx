@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 type Props = {
   onClose?: () => void;
+  justifyContent?: string;
 };
 
 const Overlay = styled.div`
@@ -16,7 +17,7 @@ const Overlay = styled.div`
   display: flex;
   flex-direction: column;
   overflow-y: scroll;
-  justify-content: center;
+  justify-content: ${(props) => props.justifyContent || 'center'};
   align-items: center;
 `;
 

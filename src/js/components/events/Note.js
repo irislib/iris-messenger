@@ -519,13 +519,16 @@ class Note extends Component {
 
   renderImageModal() {
     return html`
-      <${Modal} onClose=${() => this.setState({ showImageModal: false })}>
+      <${Modal}
+        justifyContent="flex-start"
+        onClose=${() => this.setState({ showImageModal: false })}
+      >
         ${this.props.meta.attachments.map((a, i) => {
           if (i > 0 && !this.props.standalone && !this.state.showMore) {
             return;
           }
           return html`<p>
-            <${SafeImg} style="max-height: 90vh;" src=${a.data} />
+            <${SafeImg} style="max-height: 90vh; max-width: 90vw;" src=${a.data} />
           </p>`;
         })}
       <//>
