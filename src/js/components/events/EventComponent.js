@@ -253,6 +253,7 @@ class EventComponent extends Component {
       key=${this.props.id}
       event=${this.state.event}
       meta=${this.state.meta}
+      fadeIn=${this.props.feedOpenedAt < this.state.event.created_at}
       ...${this.props}
     />`;
   }

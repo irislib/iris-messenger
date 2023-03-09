@@ -1,16 +1,16 @@
 import { throttle } from 'lodash';
+import styled from 'styled-components';
 
 import Component from '../BaseComponent';
-import Button from './buttons/Button';
 import Helpers from '../Helpers';
+import Icons from '../Icons';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
+import Button from './buttons/Button';
 import EventComponent from './events/EventComponent';
-import styled from "styled-components";
-import Icons from "../Icons";
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -42,6 +42,7 @@ class MessageFeed extends Component {
       display: Helpers.getUrlParameter('display') === 'grid' ? 'grid' : 'posts',
       firehose: Helpers.getUrlParameter('firehose') === '1',
     };
+    this.openedAt = Math.floor(Date.now() / 1000);
     this.mappedMessages = new Map();
   }
 
@@ -336,6 +337,7 @@ class MessageFeed extends Component {
           id={id}
           showRepliedMsg={showRepliedMsg}
           renderAs={renderAs}
+          feedOpenedAt={this.openedAt}
         />
       ));
     return (

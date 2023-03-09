@@ -1,11 +1,18 @@
 import { route } from 'preact-router';
-import styled from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { Event } from '../../lib/nostr-tools';
 import Key from '../../nostr/Key';
 
-// styled-component GalleryImage that has the menu (class="dropdown") in the top right corner
-// & .dropbtn should have a black background shadow
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+`;
 
 const GalleryImage = styled.a`
   position: relative;
@@ -28,6 +35,13 @@ const GalleryImage = styled.a`
     color: white;
     user-select: none;
   }
+  opacity: ${(props) => (props.fadeIn ? 0 : 1)};
+  animation: ${(props) =>
+    props.fadeIn
+      ? css`
+          ${fadeIn} 0.5s ease-in-out forwards
+        `
+      : 'none'};
 `;
 
 const onClick = (event, noteId) => {
@@ -35,7 +49,7 @@ const onClick = (event, noteId) => {
   route('/' + Key.toNostrBech32Address(noteId, 'note'));
 };
 
-export default function NoteImage(props: { event: Event }) {
+export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
   // get first image url from event content
   const attachments = [];
   const urls = props.event.content.match(/(https?:\/\/[^\s]+)/g);
@@ -57,7 +71,11 @@ export default function NoteImage(props: { event: Event }) {
   return (
     <>
       {attachments.map((attachment) => (
-        <GalleryImage onClick={(e) => onClick(e, props.event.id)} src={attachment.data} />
+        <GalleryImage
+          onClick={(e) => onClick(e, props.event.id)}
+          src={attachment.data}
+          fadeIn={props.fadeIn}
+        />
       ))}
     </>
   );
