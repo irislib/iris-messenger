@@ -4,15 +4,15 @@ import styled from 'styled-components';
 
 import { Event } from '../../lib/nostr-tools';
 import { LNURL, LNURLError, LNURLErrorCode, LNURLInvoice, LNURLSuccessAction } from '../../LNURL';
+import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Relays from '../../nostr/Relays';
 import Button from '../buttons/Button';
 import CopyButton from '../buttons/Copy';
+import Name from '../Name';
 import QrCode from '../QrCode';
 
 import Modal from './Modal';
-import Name from "../Name";
-import Events from "../../nostr/Events";
 
 // Code kindly contributed by @Kieran and @verbiricha from Snort
 
@@ -114,9 +114,10 @@ export default function SendSats(props: ZapProps) {
   const [error, setError] = useState<string>();
   const [zapType, setZapType] = useState(ZapType.PublicZap);
   const [paying, setPaying] = useState<boolean>(false);
+  const [canZap, setCanZap] = useState<boolean>(false);
 
   const canComment = handler
-    ? (handler.canZap && zapType !== ZapType.NonZap) || handler.maxCommentLength > 0
+    ? (canZap && zapType !== ZapType.NonZap) || handler.maxCommentLength > 0
     : false;
 
   useEffect(() => {
@@ -144,7 +145,11 @@ export default function SendSats(props: ZapProps) {
       try {
         const h = new LNURL(props.lnurl);
         setHandler(h);
-        h.load().catch((e) => handleLNURLError(e, 'ln url error'));
+        h.load()
+          .then(() => {
+            setCanZap(h.canZap);
+          })
+          .catch((e) => handleLNURLError(e, 'ln url error'));
       } catch (e) {
         if (e instanceof Error) {
           setError(e.message);
@@ -315,13 +320,13 @@ export default function SendSats(props: ZapProps) {
               placeholder={'Comment'}
               style="margin-bottom: 10px;margin-top: 10px;width:100%;"
               maxLength={
-                handler.canZap && zapType !== ZapType.NonZap ? 250 : handler.maxCommentLength
+                canZap && zapType !== ZapType.NonZap ? 250 : handler.maxCommentLength
               }
               onChange={(e) => setComment((e.target as HTMLInputElement).value)}
             />
           )}
         </div>
-        {zapTypeSelector()}
+        {/*zapTypeSelector()*/}
         {(amount ?? 0) > 0 && (
           <div style="margin-top: 10px;">
             <Button width="100%" onClick={() => loadInvoice()}>
@@ -333,8 +338,9 @@ export default function SendSats(props: ZapProps) {
     );
   }
 
+  /*
   function zapTypeSelector() {
-    if (!handler || !handler.canZap) return;
+    if (!handler || !canZap) return;
 
     return (
       <>
@@ -347,6 +353,7 @@ export default function SendSats(props: ZapProps) {
       </>
     );
   }
+   */
 
   function payInvoice() {
     if (success || !invoice) return null;

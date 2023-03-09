@@ -25,6 +25,11 @@ const Modal: FC<Props> = ({ children, onClose }) => {
     }
   };
 
+  const handleOverlayClick = (e: MouseEvent) => {
+    e.stopPropagation();
+    onClose?.();
+  };
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
@@ -32,7 +37,7 @@ const Modal: FC<Props> = ({ children, onClose }) => {
     };
   }, [handleKeyDown]);
 
-  return <Overlay onClick={onClose}>{children}</Overlay>;
+  return <Overlay onClick={handleOverlayClick}>{children}</Overlay>;
 };
 
 export default Modal;
