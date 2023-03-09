@@ -16,6 +16,12 @@ import Modal from './Modal';
 
 // Code kindly contributed by @Kieran and @verbiricha from Snort
 
+declare global {
+  interface Window {
+    webln?: any;
+  }
+}
+
 enum ZapType {
   PublicZap = 1,
   AnonZap = 2,
@@ -270,17 +276,15 @@ export default function SendSats(props: ZapProps) {
     );
   }
 
-  async function payWithWallet(_invoice: LNURLInvoice) {
+  async function payWithWallet(invoice: LNURLInvoice) {
     try {
-      /*
-      if (wallet?.isReady) {
+      if (window.webln) {
         setPaying(true);
-        const res = await wallet.payInvoice(invoice?.pr ?? '');
+        await window.webln.enable(); // should we do this elsewhere?
+        const res = await window.webln?.sendPayment(invoice?.pr ?? '');
         console.log(res);
         setSuccess(invoice?.successAction ?? {});
       }
-       */
-      setPaying(true);
     } catch (e: unknown) {
       console.warn(e);
       if (e instanceof Error) {
@@ -374,7 +378,7 @@ export default function SendSats(props: ZapProps) {
                   type="button"
                   onClick={() => window.open(`lightning:${invoice}`)}
                 >
-                  open wallet
+                  Open wallet
                 </button>
               </>
             )}
@@ -388,7 +392,7 @@ export default function SendSats(props: ZapProps) {
     if (!success) return null;
     return (
       <div className="success-action">
-        <p className="paid">{success?.description ?? 'paid'}</p>
+        <p className="paid">{success?.description ?? 'Paid'}</p>
         {success.url && (
           <p>
             <a href={success.url} rel="noreferrer" target="_blank">
