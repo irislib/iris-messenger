@@ -142,7 +142,7 @@ export default function SendSats(props: ZapProps) {
   useEffect(() => {
     if (success && !success.url) {
       // Fire onClose when success is set with no URL action
-      return debounce(() => {
+      setTimeout(() => {
         onClose();
       }, 1000);
     }
@@ -370,16 +370,10 @@ export default function SendSats(props: ZapProps) {
             {invoice && (
               <>
                 <QrCode data={invoice} link={`lightning:${invoice}`} />
-                <div className="copy-action">
+                <div style="margin-top: 15px">
                   <CopyButton copyStr={invoice} text="Copy invoice" />
+                  <Button onClick={() => window.open(`lightning:${invoice}`)}>Open wallet</Button>
                 </div>
-                <button
-                  className="wallet-action"
-                  type="button"
-                  onClick={() => window.open(`lightning:${invoice}`)}
-                >
-                  Open wallet
-                </button>
               </>
             )}
           </div>
