@@ -521,6 +521,7 @@ class Note extends Component {
         show=${true}
         lnurl=${this.state.lightning}
         note=${this.props.event.id}
+        recipient=${this.props.event.pubkey}
         onClose=${() => this.setState({ showZapModal: false })}
       />
     `;

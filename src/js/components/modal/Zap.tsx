@@ -5,11 +5,13 @@ import styled from 'styled-components';
 import { Event } from '../../lib/nostr-tools';
 import { LNURL, LNURLError, LNURLErrorCode, LNURLInvoice, LNURLSuccessAction } from '../../LNURL';
 import Key from '../../nostr/Key';
+import Relays from '../../nostr/Relays';
 import Button from '../buttons/Button';
 import CopyButton from '../buttons/Copy';
 import QrCode from '../QrCode';
 
 import Modal from './Modal';
+import Name from "../Name";
 
 // Code kindly contributed by @Kieran and @verbiricha from Snort
 
@@ -20,16 +22,15 @@ enum ZapType {
   NonZap = 4,
 }
 
-export interface SendSatsProps {
+export interface ZapProps {
   onClose?: () => void;
   lnurl?: string;
   show?: boolean;
   invoice?: string; // shortcut to invoice qr tab
   title?: string;
   notice?: string;
-  target?: string;
   note?: string;
-  author?: string;
+  recipient?: string;
 }
 
 function chunks<T>(arr: T[], length: number) {
@@ -44,9 +45,53 @@ function chunks<T>(arr: T[], length: number) {
   return result;
 }
 
-export default function SendSats(props: SendSatsProps) {
+const SatAmount = styled.span`
+  color: var(--text-color);
+  display: inline-block;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 100px;
+  margin: 5px;
+  border: 1px solid transparent;
+  background: var(--body-bg);
+  &.active {
+    background: var(--notify);
+  }
+`;
+
+const ZapTypeBtn = styled.span`
+  color: var(--text-color);
+  display: inline-block;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 100px;
+  margin: 5px;
+  border: 1px solid transparent;
+  background: var(--body-bg);
+  &.active {
+    background: var(--notify);
+  }
+`;
+
+const ZapDialog = styled.div`
+  background-color: var(--msg-content-background);
+  border-radius: 8px;
+  padding: 30px;
+  width: 400px;
+  color: var(--text-color);
+  position: relative;
+`;
+const Close = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  color: var(--text-color);
+`;
+
+export default function SendSats(props: ZapProps) {
   const onClose = props.onClose || (() => undefined);
-  const { note, author, target } = props;
+  const { note, recipient } = props;
   const defaultZapAmount = 1_000;
   const amounts = [defaultZapAmount, 5_000, 10_000, 20_000, 50_000, 100_000, 1_000_000];
   const emojis: Record<number, string> = {
@@ -126,18 +171,22 @@ export default function SendSats(props: SendSatsProps) {
     if (!amount || !handler) return null;
 
     let zap: Event | undefined;
-    if (author && zapType !== ZapType.NonZap) {
-      // const ev = await publisher.zap(amount * 1000, author, note, comment);
+    if (recipient && zapType !== ZapType.NonZap) {
+      // const ev = await publisher.zap(amount * 1000, recipient, note, comment);
       let ev: any = {
-        // TODO amount
         created_at: Math.floor(Date.now() / 1000),
         kind: 9734,
-        pubkey: author,
+        pubkey: Key.getPubKey(),
         content: comment || '',
-        tags: [['e', note]],
+        tags: [
+          ['e', note],
+          ['p', recipient],
+          ['relays', ...Relays.relays.keys()],
+        ],
       };
       const sig = (await Key.sign(ev)) as string;
       ev = { ...ev, sig };
+      console.log('loadInvoice', ev);
       if (ev) {
         // replace sig for anon-zap
         if (zapType === ZapType.AnonZap) {
@@ -233,19 +282,6 @@ export default function SendSats(props: SendSatsProps) {
   }
 
   function renderAmounts(amount: number, amounts: number[]) {
-    const SatAmount = styled.span`
-      color: var(--text-color);
-      display: inline-block;
-      cursor: pointer;
-      padding: 10px;
-      border-radius: 100px;
-      margin: 5px;
-      border: 1px solid transparent;
-      background: var(--body-bg);
-      &.active {
-        background: var(--notify);
-      }
-    `;
     return (
       <div className="amounts">
         {amounts.map((a) => (
@@ -296,20 +332,6 @@ export default function SendSats(props: SendSatsProps) {
 
   function zapTypeSelector() {
     if (!handler || !handler.canZap) return;
-
-    const ZapTypeBtn = styled.span`
-      color: var(--text-color);
-      display: inline-block;
-      cursor: pointer;
-      padding: 10px;
-      border-radius: 100px;
-      margin: 5px;
-      border: 1px solid transparent;
-      background: var(--body-bg);
-      &.active {
-        background: var(--notify);
-      }
-    `;
 
     return (
       <>
@@ -368,24 +390,9 @@ export default function SendSats(props: SendSatsProps) {
     );
   }
 
-  const defaultTitle = handler?.canZap ? 'Send zap' : 'Send sats';
-  const title = target ? defaultTitle + 'to ' + target : defaultTitle;
+  const title = handler?.canZap ? 'Send zap to ' : 'Send sats to ';
   if (!(props.show ?? false)) return null;
-  const ZapDialog = styled.div`
-    background-color: var(--msg-content-background);
-    border-radius: 8px;
-    padding: 30px;
-    width: 400px;
-    color: var(--text-color);
-    position: relative;
-  `;
-  const Close = styled.div`
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    color: var(--text-color);
-  `;
+
   return (
     <Modal onClose={onClose}>
       <ZapDialog>
@@ -394,7 +401,10 @@ export default function SendSats(props: SendSatsProps) {
             X
           </Close>
           <div className="lnurl-header">
-            <h2>{props.title || title}</h2>
+            <h2>
+              {props.title || title}
+              <Name pub={recipient} />
+            </h2>
           </div>
           {invoiceForm()}
           {error && <p className="error">{error}</p>}
