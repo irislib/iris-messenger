@@ -13,6 +13,7 @@ import Name from '../Name';
 import QrCode from '../QrCode';
 
 import Modal from './Modal';
+import Helpers from "../../Helpers";
 
 // Code kindly contributed by @Kieran and @verbiricha from Snort
 
@@ -305,7 +306,7 @@ export default function SendSats(props: ZapProps) {
             onClick={() => selectAmount(a)}
           >
             {emojis[a] && <>{emojis[a]}&nbsp;</>}
-            {a === 1000 ? '1K' : a}
+            {Helpers.formatAmount(a, 0)}
           </SatAmount>
         ))}
       </div>
@@ -334,7 +335,7 @@ export default function SendSats(props: ZapProps) {
         {(amount ?? 0) > 0 && (
           <div style="margin-top: 10px;">
             <Button width="100%" onClick={() => loadInvoice()}>
-              Send {amount}
+              Send {Helpers.formatAmount(amount, 0)} sats
             </Button>
           </div>
         )}

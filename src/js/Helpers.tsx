@@ -49,6 +49,19 @@ declare global {
 export default {
   wtClient: undefined as any,
 
+  formatAmount(amount: number, decimals = 2): string {
+    if (amount < 1000) {
+      return amount.toFixed(decimals);
+    }
+    if (amount < 1000000) {
+      return (amount / 1000).toFixed(decimals) + 'K';
+    }
+    if (amount < 1000000000) {
+      return (amount / 1000000).toFixed(decimals) + 'M';
+    }
+    return (amount / 1000000000).toFixed(decimals) + 'B';
+  },
+
   isStandalone() {
     return (
       navigator.standalone ||
