@@ -373,7 +373,9 @@ export default function SendSats(props: ZapProps) {
                 <QrCode data={invoice} link={`lightning:${invoice}`} />
                 <div style="margin-top: 15px">
                   <CopyButton copyStr={invoice} text="Copy invoice" />
-                  <Button onClick={() => window.open(`lightning:${invoice}`)}>Open wallet</Button>
+                  <a className="button" href={`lightning:${invoice}`}>
+                    Open wallet
+                  </a>
                 </div>
               </>
             )}
