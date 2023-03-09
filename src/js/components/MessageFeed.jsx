@@ -40,6 +40,7 @@ class MessageFeed extends Component {
       messagesShownTime: Math.floor(Date.now() / 1000),
       includeReplies: false,
       display: Helpers.getUrlParameter('display') === 'grid' ? 'grid' : 'posts',
+      firehose: Helpers.getUrlParameter('firehose') === '1',
     };
     this.mappedMessages = new Map();
   }
@@ -55,7 +56,7 @@ class MessageFeed extends Component {
       for (let i = 0; i < sortedMessages.length; i++) {
         const id = sortedMessages[i];
         const message = Events.cache.get(id);
-        if (message && message.created_at > this.state.messagesShownTime) {
+        if (!this.state.firehose && message && message.created_at > this.state.messagesShownTime) {
           if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
             hasMyMessage = true;
             break;
@@ -122,7 +123,7 @@ class MessageFeed extends Component {
   componentDidMount() {
     this.addScrollHandler();
     let first = true;
-    
+
     if (this.props.nostrUser) {
       if (this.props.index === 'postsAndReplies') {
         Events.getPostsAndRepliesByUser(this.props.nostrUser, (eventIds) =>
