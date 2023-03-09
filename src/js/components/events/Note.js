@@ -267,7 +267,7 @@ class Note extends Component {
     const unsub = SocialNetwork.getProfile(event.pubkey, (profile) => {
       if (!profile) return;
       let lightning = profile.lud16 || profile.lud06;
-      this.setState({ lightning });
+      this.setState({ lightning, name: profile.display_name || profile.name });
     });
     this.subscriptions.push(unsub);
     const unsub2 = Events.getRepliesAndReactions(event.id, (...args) =>
@@ -312,7 +312,6 @@ class Note extends Component {
     if (isThumbnail) {
       text = shortText;
     }
-    const title = `${name || 'User'} on Iris`;
 
     const content = Helpers.highlightEverything(text.trim(), this.props.event, {
       showMentionedMessages: !this.props.asInlineQuote,
@@ -367,7 +366,6 @@ class Note extends Component {
       time,
       timeStr,
       dateStr,
-      title,
       rootMsg,
       shortText,
       quotedShortText,
@@ -453,13 +451,14 @@ class Note extends Component {
 
   renderHelmet() {
     const s = this.state;
+    const title = `${s.name || 'User'} on Iris`;
     return html`
       <${Helmet} titleTemplate="%s">
-        <title>${s.title}: ${s.quotedShortText}</title>
+        <title>${title}: ${s.quotedShortText}</title>
         <meta name="description" content=${s.quotedShortText} />
         <meta property="og:type" content="article" />
         ${s.ogImageUrl ? html`<meta property="og:image" content=${s.ogImageUrl} />` : ''}
-        <meta property="og:title" content=${s.title} />
+        <meta property="og:title" content=${title} />
         <meta property="og:description" content=${s.quotedShortText} />
       <//>
     `;
