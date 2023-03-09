@@ -61,9 +61,7 @@ class Feed extends View {
                 `}
             ${s.searchTerm
               ? html`<h2>${t('search')}: "${s.searchTerm}"</h2>`
-              : this.props.index !== 'everyone'
-              ? html` <${OnboardingNotification} /> `
-              : ''}
+              : html` <${OnboardingNotification} /> `}
             <${MessageFeed}
               scrollElement=${this.scrollElement.current}
               filter=${s.searchTerm && ((m) => this.filter(m))}

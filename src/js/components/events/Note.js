@@ -29,8 +29,6 @@ import EventComponent from './EventComponent';
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
 
-const ANIMATE_DURATION = 200;
-
 const replyIcon = html`<svg width="24" viewBox="0 0 24 24" fill="currentColor">
   <path
     d="M12,1C5.4,1,0,5.5,0,11c0,2.8,1.4,5.5,4,7.4l-1.9,3.9C2,22.5,2,22.7,2.2,22.8C2.3,22.9,2.4,23,2.5,23c0.1,0,0.2,0,0.3-0.1

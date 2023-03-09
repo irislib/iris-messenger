@@ -40,7 +40,7 @@ class MessageFeed extends Component {
       messagesShownTime: Math.floor(Date.now() / 1000),
       includeReplies: false,
       display: Helpers.getUrlParameter('display') === 'grid' ? 'grid' : 'posts',
-      firehose: Helpers.getUrlParameter('firehose') === '1',
+      realtime: Helpers.getUrlParameter('realtime') === '1',
     };
     this.openedAt = Math.floor(Date.now() / 1000);
     this.mappedMessages = new Map();
@@ -57,7 +57,7 @@ class MessageFeed extends Component {
       for (let i = 0; i < sortedMessages.length; i++) {
         const id = sortedMessages[i];
         const message = Events.cache.get(id);
-        if (!this.state.firehose && message && message.created_at > this.state.messagesShownTime) {
+        if (!this.state.realtime && message && message.created_at > this.state.messagesShownTime) {
           if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
             hasMyMessage = true;
             break;
