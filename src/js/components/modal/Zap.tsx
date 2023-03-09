@@ -12,6 +12,7 @@ import QrCode from '../QrCode';
 
 import Modal from './Modal';
 import Name from "../Name";
+import Events from "../../nostr/Events";
 
 // Code kindly contributed by @Kieran and @verbiricha from Snort
 
@@ -184,6 +185,8 @@ export default function SendSats(props: ZapProps) {
           ['relays', ...Relays.relays.keys()],
         ],
       };
+      const id = Events.getEventHash(ev);
+      ev.id = id;
       const sig = (await Key.sign(ev)) as string;
       ev = { ...ev, sig };
       console.log('loadInvoice', ev);
