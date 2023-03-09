@@ -6,7 +6,7 @@ export default styled.button`
   border: var(--button-border);
   cursor: pointer;
   transition: all 0.25s ease;
-  width: ${props => props.width || 'auto'};
+  width: ${(props) => props.width || 'auto'};
 
   ${(props) =>
     props.small &&

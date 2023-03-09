@@ -60,6 +60,7 @@ const SatAmount = styled.span`
   }
 `;
 
+/*
 const ZapTypeBtn = styled.span`
   color: var(--text-color);
   display: inline-block;
@@ -73,6 +74,7 @@ const ZapTypeBtn = styled.span`
     background: var(--notify);
   }
 `;
+ */
 
 const ZapDialog = styled.div`
   background-color: var(--msg-content-background);
@@ -268,7 +270,7 @@ export default function SendSats(props: ZapProps) {
     );
   }
 
-  async function payWithWallet(invoice: LNURLInvoice) {
+  async function payWithWallet(_invoice: LNURLInvoice) {
     try {
       /*
       if (wallet?.isReady) {
@@ -319,9 +321,7 @@ export default function SendSats(props: ZapProps) {
               type="text"
               placeholder={'Comment'}
               style="margin-bottom: 10px;margin-top: 10px;width:100%;"
-              maxLength={
-                canZap && zapType !== ZapType.NonZap ? 250 : handler.maxCommentLength
-              }
+              maxLength={canZap && zapType !== ZapType.NonZap ? 250 : handler.maxCommentLength}
               onChange={(e) => setComment((e.target as HTMLInputElement).value)}
             />
           )}

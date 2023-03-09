@@ -3,7 +3,6 @@ import { html } from 'htm/preact';
 import { useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
 
-import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Name from '../Name';

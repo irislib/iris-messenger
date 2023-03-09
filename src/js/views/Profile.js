@@ -1,7 +1,5 @@
 import { Helmet } from 'react-helmet';
 import { html } from 'htm/preact';
-import { createRef } from 'preact';
-import { useEffect } from 'preact/hooks';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
@@ -16,13 +14,13 @@ import Identicon from '../components/Identicon';
 import MessageFeed from '../components/MessageFeed';
 import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
+import QrCode from '../components/QrCode';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
-import QrCode from '../components/QrCode';
 
 import View from './View';
 

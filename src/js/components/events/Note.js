@@ -267,7 +267,10 @@ class Note extends Component {
     const unsub = SocialNetwork.getProfile(event.pubkey, (profile) => {
       if (!profile) return;
       let lightning = profile.lud16 || profile.lud06;
-      this.setState({ lightning, name: profile.display_name || profile.name });
+      this.setState({
+        lightning,
+        name: profile.display_name || profile.name || AnimalName(this.props.event.pubkey),
+      });
     });
     this.subscriptions.push(unsub);
     const unsub2 = Events.getRepliesAndReactions(event.id, (...args) =>

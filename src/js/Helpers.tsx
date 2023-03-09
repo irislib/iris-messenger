@@ -11,6 +11,7 @@ import Torrent from './components/Torrent';
 import Key from './nostr/Key';
 import { language, translate as t } from './translations/Translation';
 import localState from './LocalState';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const bech32 = require('bech32-buffer');
 
 const emojiRegex =

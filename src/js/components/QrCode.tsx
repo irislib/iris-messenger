@@ -1,6 +1,7 @@
-import {createRef} from "preact";
-import {useEffect} from "preact/hooks";
-import {html} from "htm/preact";
+import { html } from 'htm/preact';
+import { createRef } from 'preact';
+import { useEffect } from 'preact/hooks';
+
 import QRCode from '../lib/qrcode.min';
 
 export default function Qr(props) {
@@ -22,4 +23,4 @@ export default function Qr(props) {
   }, [props.data]);
 
   return html`<div ref=${ref} />`;
-};
+}
