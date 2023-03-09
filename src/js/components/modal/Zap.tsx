@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { debounce } from 'lodash';
 import styled from 'styled-components';
 
+import Helpers from '../../Helpers';
 import { Event } from '../../lib/nostr-tools';
 import { LNURL, LNURLError, LNURLErrorCode, LNURLInvoice, LNURLSuccessAction } from '../../LNURL';
 import Events from '../../nostr/Events';
@@ -13,7 +14,6 @@ import Name from '../Name';
 import QrCode from '../QrCode';
 
 import Modal from './Modal';
-import Helpers from "../../Helpers";
 
 // Code kindly contributed by @Kieran and @verbiricha from Snort
 

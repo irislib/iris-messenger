@@ -14,6 +14,8 @@ const Overlay = styled.div`
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
   justify-content: center;
   align-items: center;
 `;
