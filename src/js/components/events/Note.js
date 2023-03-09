@@ -18,6 +18,7 @@ import Follow from '../buttons/Follow';
 import Dropdown from '../Dropdown';
 import FeedMessageForm from '../FeedMessageForm';
 import Identicon from '../Identicon';
+import Modal from '../modal/Modal';
 import ZapModal from '../modal/Zap';
 import Name from '../Name';
 import SafeImg from '../SafeImg';
@@ -135,7 +136,7 @@ class Note extends Component {
 
   imageClicked(event) {
     event.preventDefault();
-    this.openAttachmentsGallery(event);
+    this.setState({ showImageModal: true });
   }
 
   messageClicked(event) {
@@ -516,6 +517,21 @@ class Note extends Component {
     `;
   }
 
+  renderImageModal() {
+    return html`
+      <${Modal} onClose=${() => this.setState({ showImageModal: false })}>
+        ${this.props.meta.attachments.map((a, i) => {
+          if (i > 0 && !this.props.standalone && !this.state.showMore) {
+            return;
+          }
+          return html`<p>
+            <${SafeImg} style="max-height: 90vh;" src=${a.data} />
+          </p>`;
+        })}
+      <//>
+    `;
+  }
+
   renderZapModal() {
     return html`
       <${ZapModal}
@@ -718,6 +734,7 @@ class Note extends Component {
             ${s.showLikes ? this.renderLikes() : ''} ${s.showZaps ? this.renderZaps() : ''}
             ${s.showReposts ? this.renderReposts() : ''}
             ${s.lightning && s.showZapModal && this.renderZapModal()}
+            ${s.showImageModal && this.renderImageModal()}
             ${this.props.standalone || s.showReplyForm ? this.renderReplyForm() : ''}
           </div>
         </div>
@@ -726,99 +743,6 @@ class Note extends Component {
         ? this.renderReplies()
         : ''}
     `;
-  }
-
-  openAttachmentsGallery(event) {
-    $('#floating-day-separator').remove();
-    const attachmentsPreview = $('<div>')
-      .attr('id', 'attachment-gallery')
-      .addClass('gallery')
-      .addClass('attachment-preview');
-    $('body').append(attachmentsPreview);
-    attachmentsPreview.fadeIn(ANIMATE_DURATION);
-    let left, top, width, img;
-
-    const attachments = this.props.meta.attachments;
-
-    attachments?.forEach((a) => {
-      if (a.type.indexOf('image') === 0 && a.data) {
-        img = Helpers.setImgSrc($('<img>'), a.data);
-        if (attachments.length === 1) {
-          attachmentsPreview.css({ 'justify-content': 'center' });
-          let original = $(event.target);
-          left = original.offset().left;
-          top = original.offset().top - $(window).scrollTop();
-          width = original.width();
-          let transitionImg = img
-            .clone()
-            .attr('id', 'transition-img')
-            .data('originalDimensions', { left, top, width });
-          transitionImg.css({
-            position: 'fixed',
-            left,
-            top,
-            width,
-            'max-width': 'none',
-            'max-height': 'none',
-          });
-          img.css({ visibility: 'hidden', 'align-self': 'center' });
-          attachmentsPreview.append(img);
-          img.one('load', () => {
-            $('body').append(transitionImg);
-            let o = img.offset();
-            transitionImg.animate(
-              { width: img.width(), left: o.left, top: o.top },
-              {
-                duration: ANIMATE_DURATION,
-                complete: () => {
-                  img.css({ visibility: 'visible' });
-                  transitionImg.hide();
-                },
-              },
-            );
-          });
-        } else {
-          attachmentsPreview.css({ 'justify-content': '' });
-          attachmentsPreview.append(img);
-        }
-      }
-    });
-    attachmentsPreview.one('click', () => {
-      this.closeAttachmentsGallery();
-    });
-    $(document)
-      .off('keyup')
-      .on('keyup', (e) => {
-        if (e.key === 'Escape') {
-          // escape key maps to keycode `27`
-          $(document).off('keyup');
-          if ($('#attachment-gallery:visible').length) {
-            this.closeAttachmentsGallery();
-          }
-        }
-      });
-  }
-
-  closeAttachmentsGallery() {
-    let transitionImg = $('#transition-img');
-    if (transitionImg.length) {
-      let originalDimensions = transitionImg.data('originalDimensions');
-      transitionImg.show();
-      $('#attachment-gallery img').remove();
-      transitionImg.animate(originalDimensions, {
-        duration: ANIMATE_DURATION,
-        complete: () => {
-          transitionImg.remove();
-        },
-      });
-    }
-    $('#attachment-gallery').fadeOut({
-      duration: ANIMATE_DURATION,
-      complete: () => $('#attachment-gallery').remove(),
-    });
-    if ('activeElement' in document) {
-      document.activeElement.blur();
-    }
   }
 }
 
