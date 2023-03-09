@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import reactStringReplace from 'react-string-replace';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import { bech32 } from 'bech32';
 import $ from 'jquery';
 import throttle from 'lodash/throttle';
 import { route } from 'preact-router';
@@ -11,8 +13,6 @@ import Torrent from './components/Torrent';
 import Key from './nostr/Key';
 import { language, translate as t } from './translations/Translation';
 import localState from './LocalState';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const bech32 = require('bech32-buffer');
 
 const emojiRegex =
   /([\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]+)/gu;
@@ -518,10 +518,15 @@ export default {
     return v;
   },
 
-  bech32ToText(str: string) {
-    const decoded = bech32.decode(str, 1000);
-    const buf = bech32.fromWords(decoded.words);
-    return new TextDecoder().decode(Uint8Array.from(buf));
+  bech32ToText(str: string): string {
+    try {
+      const decoded = bech32.decode(str, 1000);
+      const buf = bech32.fromWords(decoded.words);
+      return new TextDecoder().decode(Uint8Array.from(buf));
+    } catch (e) {
+      console.error('bech32ToText failed', e);
+      return '';
+    }
   },
 
   getRelativeTimeText(date: Date): string {

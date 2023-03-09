@@ -4,7 +4,6 @@ import $ from 'jquery';
 import { escapeRegExp } from 'lodash';
 import { route } from 'preact-router';
 
-import AnimalName from '../../AnimalName';
 import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
 import Icons from '../../Icons';
@@ -269,7 +268,7 @@ class Note extends Component {
       let lightning = profile.lud16 || profile.lud06;
       this.setState({
         lightning,
-        name: profile.display_name || profile.name || AnimalName(this.props.event.pubkey),
+        name: profile.display_name || profile.name,
       });
     });
     this.subscriptions.push(unsub);
@@ -307,7 +306,7 @@ class Note extends Component {
       this.props.standalone && this.props.meta.attachments?.find((a) => a.type === 'image')?.data;
 
     const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
-    let name = this.props.name || this.state.name || AnimalName(this.props.event.pubkey);
+    let name = this.props.name || this.state.name;
     const emojiOnly =
       this.props.event.content?.length === 2 && Helpers.isEmoji(this.props.event.content);
     const shortText = text.length > 128 ? `${text.slice(0, 128)}...` : text;
