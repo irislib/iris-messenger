@@ -224,62 +224,70 @@ class MessageFeed extends Component {
     });
   }
 
-  renderFeedSelector() {
-    return (
-      <div className="tabs">
-        <a
-          onClick={() => {
-            if (this.state.includeReplies) {
-              this.setState({ includeReplies: false });
-              if (this.props.index === 'everyone') {
-                this.getMessagesByEveryone(false);
-                this.showQueuedMessages();
-              } else if (this.props.index === 'follows') {
-                this.getMessagesByFollows(false);
-                this.showQueuedMessages();
-              }
-            }
-          }}
-          className={this.state.includeReplies ? '' : 'active'}
-        >
-          {t('posts')}
-        </a>
-        <a
-          className={this.state.includeReplies ? 'active' : ''}
-          onClick={() => {
-            if (!this.state.includeReplies) {
-              this.setState({ includeReplies: true });
-              if (this.props.index === 'everyone') {
-                this.getMessagesByEveryone(true);
-              } else if (this.props.index === 'follows') {
-                this.getMessagesByFollows(true);
-              }
-            }
-          }}
-        >
-          {t('posts')} & {t('replies')}
-        </a>
+  /*
+  instead of renderFeedSelector() and renderFeedTypeSelector() let's do renderSettings()
+  it contains all filters and display settings like state.display, state.realtime, state.includeReplies
+   */
+  renderSettings() {
+    const content = !this.state.settingsOpen ? (
+      ''
+    ) : (
+      <div style="flex-direction: column">
+        <p>
+          <span style="margin-right: 7px">{t('display')}</span>
+          <input
+            type="radio"
+            name="display"
+            value="posts"
+            id="display_posts"
+            checked={this.state.display === 'posts'}
+            onChange={() => this.setState({ display: 'posts' })}
+          />
+          <label for="display_posts">{t('posts')}</label>
+          <input
+            type="radio"
+            name="display"
+            id="display_grid"
+            value="grid"
+            checked={this.state.display === 'grid'}
+            onChange={() => this.setState({ display: 'grid' })}
+          />
+          <label for="display_grid">{t('grid')}</label>
+        </p>
+        <p>
+          <input
+            type="checkbox"
+            checked={this.state.includeReplies}
+            name="includeReplies"
+            id="include_replies"
+            onChange={() => this.setState({ includeReplies: !this.state.includeReplies })}
+          />
+          <label for="include_replies">{t('include_replies')}</label>
+          <input
+            type="checkbox"
+            id="display_realtime"
+            checked={this.state.realtime}
+            onChange={() => this.setState({ realtime: !this.state.realtime })}
+          />
+          <label for="display_realtime">{t('realtime')}</label>
+        </p>
       </div>
     );
-  }
 
-  renderFeedTypeSelector() {
     return (
-      <div className="tabs">
-        <a
-          style="border-radius: 8px 0 0 0"
-          onClick={() => this.setState({ display: 'posts' })}
-          className={this.state.display === 'grid' ? '' : 'active'}
-        >
-          {Icons.post}
-        </a>
-        <a
-          style="border-radius: 0 8px 0 0"
-          className={this.state.display === 'grid' ? 'active' : ''}
-          onClick={() => this.setState({ display: 'grid' })}
-        >
-          {Icons.image}
-        </a>
+      <div className="msg">
+        <div className="msg-content">
+          <div style="display:flex;flex-direction:column">
+            <a
+              style="display:flex;align-items:center"
+              onClick={() => this.setState({ settingsOpen: !this.state.settingsOpen })}
+            >
+              <i style="margin-right: 10px">{Icons.settings}</i>
+              {t('settings')}
+            </a>
+            {content}
+          </div>
+        </div>
       </div>
     );
   }
@@ -349,8 +357,7 @@ class MessageFeed extends Component {
               <div className="msg-content notification-msg">{t(feedName)}</div>
             </div>
           ) : null}
-          {['everyone', 'follows'].includes(this.props.index) ? this.renderFeedSelector() : ''}
-          {this.props.index !== 'notifications' && this.renderFeedTypeSelector()}
+          {this.props.index !== 'notifications' && this.renderSettings()}
           {renderAs === 'NoteImage' ? <ImageGrid>{messages}</ImageGrid> : messages}
         </div>
         {displayCount < this.state.sortedMessages.length ? this.renderShowMore() : ''}
