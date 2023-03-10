@@ -1,4 +1,5 @@
 import { throttle } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import styled from 'styled-components';
 
 import Component from '../BaseComponent';
@@ -11,7 +12,6 @@ import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
 import EventComponent from './events/EventComponent';
-import isEqual from 'lodash/isEqual';
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -34,21 +34,25 @@ const ImageGrid = styled.div`
 const DEFAULT_SETTINGS = {
   display: 'posts',
   realtime: false,
-  replies: false,
+  replies: true,
 };
 
 class Feed extends Component {
   constructor() {
     super();
+    let savedSettings = {};
+    localState
+      .get('settings')
+      .get('feed')
+      .once((s) => (savedSettings = s));
     this.state = {
       sortedMessages: [],
       queuedMessages: [],
       displayCount: INITIAL_PAGE_SIZE,
       messagesShownTime: Math.floor(Date.now() / 1000),
-      settings: this.getSettings(),
+      settings: this.getSettings(savedSettings),
     };
     this.openedAt = Math.floor(Date.now() / 1000);
-    this.mappedMessages = new Map();
   }
 
   getSettings(override = {}) {
@@ -83,19 +87,17 @@ class Feed extends Component {
       // iterate over sortedMessages and add newer than messagesShownTime to queue
       const queuedMessages = [];
       let hasMyMessage;
-      for (let i = 0; i < sortedMessages.length; i++) {
-        const id = sortedMessages[i];
-        const message = Events.cache.get(id);
-        if (
-          !this.state.settings.realtime &&
-          message &&
-          message.created_at > this.state.messagesShownTime
-        ) {
-          if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
-            hasMyMessage = true;
-            break;
+      if (!this.state.settings.realtime) {
+        for (let i = 0; i < sortedMessages.length; i++) {
+          const id = sortedMessages[i];
+          const message = Events.cache.get(id);
+          if (message && message.created_at > this.state.messagesShownTime) {
+            if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
+              hasMyMessage = true;
+              break;
+            }
+            queuedMessages.push(id);
           }
-          queuedMessages.push(id);
         }
       }
       if (!hasMyMessage) {
@@ -106,7 +108,7 @@ class Feed extends Component {
         : this.state.messagesShownTime;
       this.setState({ sortedMessages, queuedMessages, messagesShownTime });
     },
-    3000,
+    1000,
     { leading: true },
   );
 
@@ -169,46 +171,47 @@ class Feed extends Component {
   }
 
   subscribe() {
-    this.unsub?.();
-    let first = true;
-    if (this.props.nostrUser) {
-      if (this.props.index === 'postsAndReplies') {
-        Events.getPostsAndRepliesByUser(this.props.nostrUser, (eventIds) =>
-          this.updateSortedMessages(eventIds),
+    setTimeout(() => {
+      this.unsub?.();
+      let first = true;
+      if (this.props.nostrUser) {
+        if (this.props.index === 'postsAndReplies') {
+          Events.getPostsAndRepliesByUser(this.props.nostrUser, (eventIds) =>
+            this.updateSortedMessages(eventIds),
+          );
+        } else if (this.props.index === 'likes') {
+          Events.getLikesByUser(this.props.nostrUser, (eventIds) => {
+            this.updateSortedMessages(eventIds);
+          });
+        } else if (this.props.index === 'posts') {
+          Events.getPostsByUser(this.props.nostrUser, (eventIds) =>
+            this.updateSortedMessages(eventIds),
+          );
+        }
+      } else {
+        localState.get('scrollUp').on(
+          this.sub(() => {
+            !first && Helpers.animateScrollTop('.main-view');
+            first = false;
+          }),
         );
-      } else if (this.props.index === 'likes') {
-        Events.getLikesByUser(this.props.nostrUser, (eventIds) => {
-          this.updateSortedMessages(eventIds);
-        });
-      } else if (this.props.index === 'posts') {
-        Events.getPostsByUser(this.props.nostrUser, (eventIds) =>
-          this.updateSortedMessages(eventIds),
-        );
-      }
-    } else {
-      localState.get('scrollUp').on(
-        this.sub(() => {
-          !first && Helpers.animateScrollTop('.main-view');
-          first = false;
-        }),
-      );
-      if (this.props.keyword) {
-        const keyword = this.props.keyword;
-        Events.getMessagesByKeyword(this.props.keyword, (messages) => {
-          if (this.props.keyword == keyword) this.updateSortedMessages(messages);
-        });
-      } else if (this.props.index) {
-        // public messages
-        if (this.props.index === 'everyone') {
-          this.getMessagesByEveryone(this.state.settings.replies);
-        } else if (this.props.index === 'notifications') {
-          console.log('getMessagesByNotifications');
-          Events.getNotifications((messages) => this.updateSortedMessages(messages));
-        } else if (this.props.index === 'follows') {
-          this.getMessagesByFollows(this.state.settings.replies);
+        if (this.props.keyword) {
+          const keyword = this.props.keyword;
+          Events.getMessagesByKeyword(this.props.keyword, (messages) => {
+            if (this.props.keyword == keyword) this.updateSortedMessages(messages);
+          });
+        } else if (this.props.index) {
+          // public messages
+          if (this.props.index === 'everyone') {
+            this.getMessagesByEveryone(this.state.settings.replies);
+          } else if (this.props.index === 'notifications') {
+            this.unsub = Events.getNotifications((messages) => this.updateSortedMessages(messages));
+          } else if (this.props.index === 'follows') {
+            this.getMessagesByFollows(this.state.settings.replies);
+          }
         }
       }
-    }
+    }, 0);
   }
 
   getMessagesByEveryone(replies) {
@@ -280,7 +283,6 @@ class Feed extends Component {
       this.props.filter !== prevProps.filter ||
       this.props.keyword !== prevProps.keyword
     ) {
-      this.mappedMessages = new Map();
       this.setState({ sortedMessages: [] });
       this.componentDidMount();
     }
