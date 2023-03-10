@@ -5,7 +5,7 @@ import throttle from 'lodash/throttle';
 import { createRef } from 'preact';
 
 import Component from '../../BaseComponent';
-import Message from '../../components/Message';
+import PrivateMessage from '../../components/PrivateMessage';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -218,7 +218,7 @@ export default class PrivateChat extends Component {
         }
         previousFrom = msg.pubkey; // TODO: ...${msg} not good?
         msgListContent.push(html`
-          <${Message}
+          <${PrivateMessage}
             ...${msg}
             showName=${showName}
             selfAuthored=${msg.pubkey === myPub}

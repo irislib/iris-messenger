@@ -8,6 +8,18 @@ export default {
     </svg>
   ),
 
+  feed: (
+    <svg width="32" viewBox="0 0 24 24" fill="none">
+      <g stroke-width="0"></g>
+      <g stroke-linecap="round" stroke-linejoin="round"></g>
+      <g>
+        <path d="M5 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M5 17H11" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M5 7H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </g>
+    </svg>
+  ),
+
   image: (
     <svg width="24" viewBox="0 0 24 24" fill="none">
       <g>
@@ -136,7 +148,7 @@ export default {
     </svg>
   ),
 
-  feed: (
+  feed2: (
     <svg
       x="0px"
       y="0px"

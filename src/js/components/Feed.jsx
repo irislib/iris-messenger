@@ -449,10 +449,16 @@ class Feed extends Component {
             <div className="msg">
               <div className="msg-content notification-msg">
                 <div style="display:flex;flex-direction: row;width:100%;align-items:center;text-align:center;">
-                  <div style="flex:1">{t(feedName)}</div>
+                  <a href="/" style="padding-right: 10px;color:var(--text-color);">
+                    {Icons.backArrow}
+                  </a>
+                  <div style="flex:1;">{t(feedName)}</div>
                   {['everyone', 'follows'].includes(this.props.index) && (
-                    <a onClick={() => this.setState({ settingsOpen: !this.state.settingsOpen })}>
-                      <i style="margin-right: 10px;color:var(--text-color);">{Icons.settings}</i>
+                    <a
+                      style="padding: 0 10px;color:var(--text-color);"
+                      onClick={() => this.setState({ settingsOpen: !this.state.settingsOpen })}
+                    >
+                      {Icons.settings}
                     </a>
                   )}
                 </div>

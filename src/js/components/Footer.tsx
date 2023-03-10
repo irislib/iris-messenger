@@ -1,3 +1,5 @@
+import { route } from 'preact-router';
+
 import Component from '../BaseComponent';
 import Icons from '../Icons';
 import localState from '../LocalState';
@@ -44,6 +46,19 @@ class Footer extends Component<Props, State> {
     );
   }
 
+  handleFeedClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
+      if (lastOpenedFeed !== this.state.activeRoute.replace('/', '')) {
+        route('/' + (lastOpenedFeed || ''));
+      } else {
+        localState.get('lastOpenedFeed').put('');
+        route('/');
+      }
+    });
+  }
+
   render() {
     const key = Key.toNostrBech32Address(Key.getPubKey(), 'npub');
     if (!key) {
@@ -58,8 +73,12 @@ class Footer extends Component<Props, State> {
     return (
       <footer class="visible-xs-flex nav footer">
         <div class="header-content" onClick={() => localState.get('scrollUp').put(true)}>
-          <a href="/" class={`btn ${activeRoute === '/' ? 'active' : ''}`}>
-            {Icons.home}
+          <a
+            href="/"
+            onClick={(e) => this.handleFeedClick(e)}
+            class={`btn ${activeRoute === '/' ? 'active' : ''}`}
+          >
+            {Icons.feed}
           </a>
           <a href="/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
             {this.state.unseenMsgsTotal ? (
@@ -71,9 +90,6 @@ class Footer extends Component<Props, State> {
           </a>
           <a href="/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
             {plusIcon}
-          </a>
-          <a href="/global" class={`btn ${activeRoute === '/global' ? 'active' : ''}`}>
-            {Icons.global}
           </a>
           <a href={`/${key}`} class={`${activeRoute === `/${key}` ? 'active' : ''} my-profile`}>
             <Identicon str={key} width={34} />

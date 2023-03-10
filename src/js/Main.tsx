@@ -26,6 +26,7 @@ import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
 import '../css/style.css';
 import '../css/cropper.min.css';
+import FeedList from "./views/FeedList";
 
 type Props = Record<string, unknown>;
 
@@ -153,7 +154,8 @@ class Main extends Component<Props, ReactState> {
           <div className="overlay" onClick={() => this.onClickOverlay()}></div>
           <div className="view-area">
             <Router onChange={(e) => this.handleRoute(e)}>
-              <Feed path="/" index="follows" />
+              <FeedList path="/" />
+              <Feed path="/following" index="follows" />
               <Feed path="/global" index="everyone" />
               <Feed path="/search/:term?/:type?" />
               <Feed path="/media" index="media" thumbnails />

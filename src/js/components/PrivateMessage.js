@@ -24,7 +24,7 @@ const seenIndicator = html`<span class="seen-indicator"
     ></polygon></svg
 ></span>`;
 
-class Message extends Component {
+class PrivateMessage extends Component {
   constructor() {
     super();
     this.i = 0;
@@ -197,4 +197,4 @@ class Message extends Component {
   }
 }
 
-export default Message;
+export default PrivateMessage;

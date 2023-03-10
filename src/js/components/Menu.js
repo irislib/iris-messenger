@@ -6,12 +6,12 @@ import Helpers from '../Helpers';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
+import {route} from "preact-router";
 
 const APPLICATIONS = [
   // TODO: move editable shortcuts to localState gun
-  { url: '/', text: 'following', icon: Icons.home },
+  { url: '/', text: 'feeds', icon: Icons.feed },
   { url: '/chat', text: 'messages', icon: Icons.chat },
-  { url: '/global', text: 'global_feed', icon: Icons.global },
   { url: '/settings', text: 'settings', icon: Icons.settings },
   { url: '/about', text: 'about', icon: Icons.info },
 ];
@@ -28,9 +28,25 @@ export default class Menu extends Component {
     localState.get('activeRoute').on(this.inject());
   }
 
-  menuLinkClicked() {
+  menuLinkClicked(e, a) {
+    if (a.text === 'feeds') {
+      this.handleFeedClick(e);
+    }
     localState.get('toggleMenu').put(false);
     localState.get('scrollUp').put(true);
+  }
+
+  handleFeedClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
+      if (lastOpenedFeed !== this.state.activeRoute.replace('/', '')) {
+        route('/' + (lastOpenedFeed || ''));
+      } else {
+        localState.get('lastOpenedFeed').put('');
+        route('/');
+      }
+    });
   }
 
   render() {
@@ -52,7 +68,7 @@ export default class Menu extends Component {
               isActive = this.state.activeRoute.length <= 1;
             }
             return html` <a
-              onClick=${() => this.menuLinkClicked()}
+              onClick=${(e) => this.menuLinkClicked(e, a)}
               activeClassName="active"
               class=${isActive ? 'active' : ''}
               href=${a.url}
