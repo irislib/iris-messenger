@@ -1,7 +1,7 @@
 import { html } from 'htm/preact';
 
+import FeedComponent from '../components/Feed';
 import FeedMessageForm from '../components/FeedMessageForm';
-import MessageFeed from '../components/MessageFeed';
 import OnboardingNotification from '../components/OnboardingNotification';
 import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
@@ -62,7 +62,7 @@ class Feed extends View {
             ${s.searchTerm
               ? html`<h2>${t('search')}: "${s.searchTerm}"</h2>`
               : html` <${OnboardingNotification} /> `}
-            <${MessageFeed}
+            <${FeedComponent}
               scrollElement=${this.scrollElement.current}
               filter=${s.searchTerm && ((m) => this.filter(m))}
               keyword=${s.searchTerm}

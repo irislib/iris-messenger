@@ -30,7 +30,7 @@ const ImageGrid = styled.div`
   }
 `;
 
-class MessageFeed extends Component {
+class Feed extends Component {
   constructor() {
     super();
     this.state = {
@@ -123,8 +123,12 @@ class MessageFeed extends Component {
 
   componentDidMount() {
     this.addScrollHandler();
-    let first = true;
+    this.subscribe();
+  }
 
+  subscribe() {
+    this.unsub?.();
+    let first = true;
     if (this.props.nostrUser) {
       if (this.props.index === 'postsAndReplies') {
         Events.getPostsAndRepliesByUser(this.props.nostrUser, (eventIds) =>
@@ -172,7 +176,7 @@ class MessageFeed extends Component {
   }
 
   getMessagesByFollows(includeReplies) {
-    Events.getMessagesByFollows((messages, cbIncludeReplies) => {
+    this.unsub = Events.getMessagesByFollows((messages, cbIncludeReplies) => {
       this.state.includeReplies === cbIncludeReplies && this.updateSortedMessages(messages);
     }, includeReplies);
   }
@@ -214,6 +218,9 @@ class MessageFeed extends Component {
     if (!prevProps.scrollElement && this.props.scrollElement) {
       this.addScrollHandler();
     }
+    if (prevState.includeReplies !== this.state.includeReplies) {
+      this.subscribe();
+    }
     this.updateParams(prevState);
     this.handleScroll();
     window.history.replaceState({ ...window.history.state, state: this.state }, '');
@@ -246,6 +253,27 @@ class MessageFeed extends Component {
       messagesShownTime: Math.floor(Date.now() / 1000),
       displayCount: INITIAL_PAGE_SIZE,
     });
+  }
+
+  renderFeedTypeSelector() {
+    return (
+      <div className="tabs">
+        <a
+          style="border-radius: 8px 0 0 0"
+          onClick={() => this.setState({ display: 'posts' })}
+          className={this.state.display === 'grid' ? '' : 'active'}
+        >
+          {Icons.post}
+        </a>
+        <a
+          style="border-radius: 0 8px 0 0"
+          className={this.state.display === 'grid' ? 'active' : ''}
+          onClick={() => this.setState({ display: 'grid' })}
+        >
+          {Icons.image}
+        </a>
+      </div>
+    );
   }
 
   /*
@@ -368,14 +396,19 @@ class MessageFeed extends Component {
               <div className="msg-content notification-msg">
                 <div style="display:flex;flex-direction: row;width:100%;align-items:center;text-align:center;">
                   <div style="flex:1">{t(feedName)}</div>
-                  <a onClick={() => this.setState({ settingsOpen: !this.state.settingsOpen })}>
-                    <i style="margin-right: 10px;color:var(--text-color);">{Icons.settings}</i>
-                  </a>
+                  {['everyone', 'follows'].includes(this.props.index) && (
+                    <a onClick={() => this.setState({ settingsOpen: !this.state.settingsOpen })}>
+                      <i style="margin-right: 10px;color:var(--text-color);">{Icons.settings}</i>
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
           ) : null}
           {this.props.index !== 'notifications' && this.state.settingsOpen && this.renderSettings()}
+          {['posts', 'postsAndReplies', 'likes'].includes(this.props.index)
+            ? this.renderFeedTypeSelector()
+            : ''}
           {renderAs === 'NoteImage' ? <ImageGrid>{messages}</ImageGrid> : messages}
         </div>
         {displayCount < this.state.sortedMessages.length ? this.renderShowMore() : ''}
@@ -384,4 +417,4 @@ class MessageFeed extends Component {
   }
 }
 
-export default MessageFeed;
+export default Feed;

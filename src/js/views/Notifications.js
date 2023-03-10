@@ -2,7 +2,7 @@ import { html } from 'htm/preact';
 import { debounce } from 'lodash';
 import { createRef } from 'preact';
 
-import MessageFeed from '../components/MessageFeed';
+import Feed from '../components/Feed';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Session from '../nostr/Session';
@@ -47,7 +47,7 @@ export default class Notifications extends View {
         ${this.state.hasNotifications
           ? html``
           : html`<p class="mobile-padding15">${t('no_notifications_yet')}</p> `}
-        <${MessageFeed}
+        <${Feed}
           scrollElement=${this.scrollElement.current}
           key="notifications"
           index="notifications"

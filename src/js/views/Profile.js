@@ -9,9 +9,9 @@ import Copy from '../components/buttons/Copy';
 import Follow from '../components/buttons/Follow';
 import Report from '../components/buttons/Report';
 import Dropdown from '../components/Dropdown';
+import Feed from '../components/Feed';
 import FeedMessageForm from '../components/FeedMessageForm';
 import Identicon from '../components/Identicon';
-import MessageFeed from '../components/MessageFeed';
 import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
 import QrCode from '../components/QrCode';
@@ -266,7 +266,7 @@ class Profile extends View {
     if (this.props.tab === 'replies') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed}
+          <${Feed}
             scrollElement=${this.scrollElement.current}
             key="replies${this.state.hexPub}"
             index="postsAndReplies"
@@ -277,7 +277,7 @@ class Profile extends View {
     } else if (this.props.tab === 'likes') {
       return html`
         <div class="public-messages-view">
-          <${MessageFeed}
+          <${Feed}
             scrollElement=${this.scrollElement.current}
             key="likes${this.state.hexPub}"
             index="likes"
@@ -297,7 +297,7 @@ class Profile extends View {
         ${messageForm}
         <div class="public-messages-view">
           ${this.getNotification()}
-          <${MessageFeed}
+          <${Feed}
             scrollElement=${this.scrollElement.current}
             key="posts${this.state.hexPub}"
             index="posts"
