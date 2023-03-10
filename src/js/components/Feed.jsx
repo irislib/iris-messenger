@@ -274,15 +274,7 @@ class Feed extends Component {
     if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
       Helpers.animateScrollTop('.main-view');
     }
-    const prevNodeId = prevProps.node && prevProps.node._ && prevProps.node._.id;
-    const newNodeId = this.props.node && this.props.node._ && this.props.node._.id;
-    if (
-      prevNodeId !== newNodeId ||
-      this.props.group !== prevProps.group ||
-      this.props.path !== prevProps.path ||
-      this.props.filter !== prevProps.filter ||
-      this.props.keyword !== prevProps.keyword
-    ) {
+    if (this.props.filter !== prevProps.filter || this.props.keyword !== prevProps.keyword) {
       this.setState({ sortedMessages: [] });
       this.componentDidMount();
     }
