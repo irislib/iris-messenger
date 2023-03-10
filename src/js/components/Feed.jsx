@@ -38,7 +38,7 @@ class Feed extends Component {
       queuedMessages: [],
       displayCount: INITIAL_PAGE_SIZE,
       messagesShownTime: Math.floor(Date.now() / 1000),
-      includeReplies: false,
+      replies: false,
       display: Helpers.getUrlParameter('display') === 'grid' ? 'grid' : 'posts',
       realtime: Helpers.getUrlParameter('realtime') === '1',
     };
@@ -124,6 +124,15 @@ class Feed extends Component {
   componentDidMount() {
     this.addScrollHandler();
     this.subscribe();
+    localState
+      .get('settings')
+      .get('feed')
+      .on(
+        this.sub((s) => {
+          const { display, realtime, replies } = s;
+          this.setState({ display, realtime, replies });
+        }),
+      );
   }
 
   subscribe() {
@@ -158,27 +167,27 @@ class Feed extends Component {
       } else if (this.props.index) {
         // public messages
         if (this.props.index === 'everyone') {
-          this.getMessagesByEveryone(this.state.includeReplies);
+          this.getMessagesByEveryone(this.state.replies);
         } else if (this.props.index === 'notifications') {
           console.log('getMessagesByNotifications');
           Events.getNotifications((messages) => this.updateSortedMessages(messages));
         } else if (this.props.index === 'follows') {
-          this.getMessagesByFollows(this.state.includeReplies);
+          this.getMessagesByFollows(this.state.replies);
         }
       }
     }
   }
 
-  getMessagesByEveryone(includeReplies) {
+  getMessagesByEveryone(replies) {
     this.unsub = Events.getMessagesByEveryone((messages, cbIncludeReplies) => {
-      this.state.includeReplies === cbIncludeReplies && this.updateSortedMessages(messages);
-    }, includeReplies);
+      this.state.replies === cbIncludeReplies && this.updateSortedMessages(messages);
+    }, replies);
   }
 
-  getMessagesByFollows(includeReplies) {
+  getMessagesByFollows(replies) {
     this.unsub = Events.getMessagesByFollows((messages, cbIncludeReplies) => {
-      this.state.includeReplies === cbIncludeReplies && this.updateSortedMessages(messages);
-    }, includeReplies);
+      this.state.replies === cbIncludeReplies && this.updateSortedMessages(messages);
+    }, replies);
   }
 
   updateParams(prevState) {
@@ -192,10 +201,10 @@ class Feed extends Component {
       }
       window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
     }
-    if (prevState.includeReplies !== this.state.includeReplies) {
-      // url param ?replies=1 if includeReplies === true, otherwise no param
+    if (prevState.replies !== this.state.replies) {
+      // url param ?replies=1 if replies === true, otherwise no param
       const url = new URL(window.location);
-      if (this.state.includeReplies) {
+      if (this.state.replies) {
         url.searchParams.set('replies', '1');
       } else {
         url.searchParams.delete('replies');
@@ -218,7 +227,7 @@ class Feed extends Component {
     if (!prevProps.scrollElement && this.props.scrollElement) {
       this.addScrollHandler();
     }
-    if (prevState.includeReplies !== this.state.includeReplies) {
+    if (prevState.replies !== this.state.replies) {
       this.subscribe();
     }
     this.updateParams(prevState);
@@ -278,7 +287,7 @@ class Feed extends Component {
 
   /*
   instead of renderFeedSelector() and renderFeedTypeSelector() let's do renderSettings()
-  it contains all filters and display settings like state.display, state.realtime, state.includeReplies
+  it contains all filters and display settings like state.display, state.realtime, state.replies
    */
   renderSettings() {
     return (
@@ -294,7 +303,9 @@ class Feed extends Component {
                   value="posts"
                   id="display_posts"
                   checked={this.state.display === 'posts'}
-                  onChange={() => this.setState({ display: 'posts' })}
+                  onChange={() =>
+                    localState.get('settings').get('feed').get('display').put('posts')
+                  }
                 />
                 <label htmlFor="display_posts">{t('posts')}</label>
                 <input
@@ -303,24 +314,28 @@ class Feed extends Component {
                   id="display_grid"
                   value="grid"
                   checked={this.state.display === 'grid'}
-                  onChange={() => this.setState({ display: 'grid' })}
+                  onChange={() => localState.get('settings').get('feed').get('display').put('grid')}
                 />
                 <label htmlFor="display_grid">{t('grid')}</label>
               </p>
               <p>
                 <input
                   type="checkbox"
-                  checked={this.state.includeReplies}
-                  name="includeReplies"
+                  checked={this.state.replies}
+                  name="replies"
                   id="include_replies"
-                  onChange={() => this.setState({ includeReplies: !this.state.includeReplies })}
+                  onChange={() =>
+                    localState.get('settings').get('feed').get('replies').put(!this.state.replies)
+                  }
                 />
                 <label htmlFor="include_replies">{t('include_replies')}</label>
                 <input
                   type="checkbox"
                   id="display_realtime"
                   checked={this.state.realtime}
-                  onChange={() => this.setState({ realtime: !this.state.realtime })}
+                  onChange={() =>
+                    localState.get('settings').get('feed').get('realtime').put(!this.state.realtime)
+                  }
                 />
                 <label htmlFor="display_realtime">{t('realtime')}</label>
               </p>
