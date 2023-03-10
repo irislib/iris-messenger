@@ -11,7 +11,7 @@ import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
 import EventComponent from './events/EventComponent';
-import isEqual from "lodash/isEqual";
+import isEqual from 'lodash/isEqual';
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -53,7 +53,10 @@ class Feed extends Component {
 
   getSettings(override = {}) {
     // override default & saved settings with url params
-    const settings = Object.assign({ ...DEFAULT_SETTINGS }, override);
+    let settings = { ...DEFAULT_SETTINGS };
+    if (['everyone', 'follows'].includes(this.props?.index)) {
+      settings = Object.assign(settings, override);
+    }
     for (const key in settings) {
       const value = Helpers.getUrlParameter(key);
       if (value !== null) {
