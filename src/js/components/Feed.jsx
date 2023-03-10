@@ -114,12 +114,12 @@ class Feed extends Component {
 
   handleScroll = () => {
     // increase page size when scrolling down
-    if (this.state.settings.displayCount < this.state.sortedMessages.length) {
+    if (this.state.displayCount < this.state.sortedMessages.length) {
       if (
         this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
         this.props.scrollElement.scrollHeight - 500
       ) {
-        this.setState({ displayCount: this.state.settings.displayCount + INITIAL_PAGE_SIZE });
+        this.setState({ displayCount: this.state.displayCount + INITIAL_PAGE_SIZE });
       }
     }
     this.checkScrollPosition();
@@ -228,7 +228,6 @@ class Feed extends Component {
 
   updateParams(prevState) {
     if (prevState.settings.display !== this.state.settings.display) {
-      // url param ?display=images if display === 'grid', otherwise no param
       const url = new URL(window.location);
       if (this.state.settings.display === 'grid') {
         url.searchParams.set('display', 'grid');
@@ -238,7 +237,6 @@ class Feed extends Component {
       window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
     }
     if (prevState.settings.replies !== this.state.settings.replies) {
-      // url param ?replies=1 if replies === true, otherwise no param
       const url = new URL(window.location);
       if (this.state.settings.replies) {
         url.searchParams.set('replies', '1');
@@ -248,7 +246,6 @@ class Feed extends Component {
       window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
     }
     if (prevState.settings.realtime !== this.state.settings.realtime) {
-      // url param ?realtime=1 if realtime === true, otherwise no param
       const url = new URL(window.location);
       if (this.state.settings.realtime) {
         url.searchParams.set('realtime', '1');
@@ -265,6 +262,9 @@ class Feed extends Component {
     }
     if (prevState.settings.replies !== this.state.settings.replies) {
       this.subscribe();
+    }
+    if (prevState.settings.display !== this.state.settings.display) {
+      this.setState({ displayCount: INITIAL_PAGE_SIZE });
     }
     if (!isEqual(prevState.settings, this.state.settings)) {
       this.updateParams(prevState);
@@ -404,7 +404,7 @@ class Feed extends Component {
         <Button
           onClick={() =>
             this.setState({
-              displayCount: this.state.settings.displayCount + INITIAL_PAGE_SIZE,
+              displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
             })
           }
         >
@@ -418,7 +418,7 @@ class Feed extends Component {
     if (!this.props.scrollElement || this.unmounted) {
       return;
     }
-    const displayCount = this.state.settings.displayCount;
+    const displayCount = this.state.displayCount;
     const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
     const feedName =
       !this.state.queuedMessages.length &&
