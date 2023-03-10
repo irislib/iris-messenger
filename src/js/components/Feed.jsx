@@ -11,6 +11,7 @@ import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
 import EventComponent from './events/EventComponent';
+import isEqual from "lodash/isEqual";
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -30,6 +31,12 @@ const ImageGrid = styled.div`
   }
 `;
 
+const DEFAULT_SETTINGS = {
+  display: 'posts',
+  realtime: false,
+  replies: false,
+};
+
 class Feed extends Component {
   constructor() {
     super();
@@ -38,12 +45,31 @@ class Feed extends Component {
       queuedMessages: [],
       displayCount: INITIAL_PAGE_SIZE,
       messagesShownTime: Math.floor(Date.now() / 1000),
-      replies: false,
-      display: Helpers.getUrlParameter('display') === 'grid' ? 'grid' : 'posts',
-      realtime: Helpers.getUrlParameter('realtime') === '1',
+      settings: this.getSettings(),
     };
     this.openedAt = Math.floor(Date.now() / 1000);
     this.mappedMessages = new Map();
+  }
+
+  getSettings(override = {}) {
+    // override default & saved settings with url params
+    const settings = Object.assign({ ...DEFAULT_SETTINGS }, override);
+    for (const key in settings) {
+      const value = Helpers.getUrlParameter(key);
+      if (value !== null) {
+        // if value is '1' or '0', convert to boolean
+        if (value === '1' || value === '0') {
+          settings[key] = value === '1';
+        } else {
+          settings[key] = value;
+        }
+      }
+    }
+    return settings;
+  }
+
+  saveSettings() {
+    localState.get('settings').get('feed').put(this.state.settings);
   }
 
   updateSortedMessages = throttle(
@@ -57,7 +83,11 @@ class Feed extends Component {
       for (let i = 0; i < sortedMessages.length; i++) {
         const id = sortedMessages[i];
         const message = Events.cache.get(id);
-        if (!this.state.realtime && message && message.created_at > this.state.messagesShownTime) {
+        if (
+          !this.state.settings.realtime &&
+          message &&
+          message.created_at > this.state.messagesShownTime
+        ) {
           if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
             hasMyMessage = true;
             break;
@@ -79,12 +109,12 @@ class Feed extends Component {
 
   handleScroll = () => {
     // increase page size when scrolling down
-    if (this.state.displayCount < this.state.sortedMessages.length) {
+    if (this.state.settings.displayCount < this.state.sortedMessages.length) {
       if (
         this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
         this.props.scrollElement.scrollHeight - 500
       ) {
-        this.setState({ displayCount: this.state.displayCount + INITIAL_PAGE_SIZE });
+        this.setState({ displayCount: this.state.settings.displayCount + INITIAL_PAGE_SIZE });
       }
     }
     this.checkScrollPosition();
@@ -129,8 +159,8 @@ class Feed extends Component {
       .get('feed')
       .on(
         this.sub((s) => {
-          const { display, realtime, replies } = s;
-          this.setState({ display, realtime, replies });
+          const settings = this.getSettings(s);
+          this.setState({ settings });
         }),
       );
   }
@@ -167,12 +197,12 @@ class Feed extends Component {
       } else if (this.props.index) {
         // public messages
         if (this.props.index === 'everyone') {
-          this.getMessagesByEveryone(this.state.replies);
+          this.getMessagesByEveryone(this.state.settings.replies);
         } else if (this.props.index === 'notifications') {
           console.log('getMessagesByNotifications');
           Events.getNotifications((messages) => this.updateSortedMessages(messages));
         } else if (this.props.index === 'follows') {
-          this.getMessagesByFollows(this.state.replies);
+          this.getMessagesByFollows(this.state.settings.replies);
         }
       }
     }
@@ -180,41 +210,41 @@ class Feed extends Component {
 
   getMessagesByEveryone(replies) {
     this.unsub = Events.getMessagesByEveryone((messages, cbIncludeReplies) => {
-      this.state.replies === cbIncludeReplies && this.updateSortedMessages(messages);
+      this.state.settings.replies === cbIncludeReplies && this.updateSortedMessages(messages);
     }, replies);
   }
 
   getMessagesByFollows(replies) {
     this.unsub = Events.getMessagesByFollows((messages, cbIncludeReplies) => {
-      this.state.replies === cbIncludeReplies && this.updateSortedMessages(messages);
+      this.state.settings.replies === cbIncludeReplies && this.updateSortedMessages(messages);
     }, replies);
   }
 
   updateParams(prevState) {
-    if (prevState.display !== this.state.display) {
+    if (prevState.settings.display !== this.state.settings.display) {
       // url param ?display=images if display === 'grid', otherwise no param
       const url = new URL(window.location);
-      if (this.state.display === 'grid') {
+      if (this.state.settings.display === 'grid') {
         url.searchParams.set('display', 'grid');
       } else {
         url.searchParams.delete('display');
       }
       window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
     }
-    if (prevState.replies !== this.state.replies) {
+    if (prevState.settings.replies !== this.state.settings.replies) {
       // url param ?replies=1 if replies === true, otherwise no param
       const url = new URL(window.location);
-      if (this.state.replies) {
+      if (this.state.settings.replies) {
         url.searchParams.set('replies', '1');
       } else {
         url.searchParams.delete('replies');
       }
       window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
     }
-    if (prevState.realtime !== this.state.realtime) {
+    if (prevState.settings.realtime !== this.state.settings.realtime) {
       // url param ?realtime=1 if realtime === true, otherwise no param
       const url = new URL(window.location);
-      if (this.state.realtime) {
+      if (this.state.settings.realtime) {
         url.searchParams.set('realtime', '1');
       } else {
         url.searchParams.delete('realtime');
@@ -227,10 +257,12 @@ class Feed extends Component {
     if (!prevProps.scrollElement && this.props.scrollElement) {
       this.addScrollHandler();
     }
-    if (prevState.replies !== this.state.replies) {
+    if (prevState.settings.replies !== this.state.settings.replies) {
       this.subscribe();
     }
-    this.updateParams(prevState);
+    if (!isEqual(prevState.settings, this.state.settings)) {
+      this.updateParams(prevState);
+    }
     this.handleScroll();
     window.history.replaceState({ ...window.history.state, state: this.state }, '');
     if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
@@ -270,13 +302,13 @@ class Feed extends Component {
         <a
           style="border-radius: 8px 0 0 0"
           onClick={() => this.setState({ display: 'posts' })}
-          className={this.state.display === 'grid' ? '' : 'active'}
+          className={this.state.settings.display === 'grid' ? '' : 'active'}
         >
           {Icons.post}
         </a>
         <a
           style="border-radius: 0 8px 0 0"
-          className={this.state.display === 'grid' ? 'active' : ''}
+          className={this.state.settings.display === 'grid' ? 'active' : ''}
           onClick={() => this.setState({ display: 'grid' })}
         >
           {Icons.image}
@@ -287,7 +319,7 @@ class Feed extends Component {
 
   /*
   instead of renderFeedSelector() and renderFeedTypeSelector() let's do renderSettings()
-  it contains all filters and display settings like state.display, state.realtime, state.replies
+  it contains all filters and display settings like state.settings.display, state.settings.realtime, state.settings.replies
    */
   renderSettings() {
     return (
@@ -302,9 +334,9 @@ class Feed extends Component {
                   name="display"
                   value="posts"
                   id="display_posts"
-                  checked={this.state.display === 'posts'}
+                  checked={this.state.settings.display === 'posts'}
                   onChange={() =>
-                    localState.get('settings').get('feed').get('display').put('posts')
+                    this.setState({ settings: { ...this.state.settings, display: 'posts' } })
                   }
                 />
                 <label htmlFor="display_posts">{t('posts')}</label>
@@ -313,31 +345,40 @@ class Feed extends Component {
                   name="display"
                   id="display_grid"
                   value="grid"
-                  checked={this.state.display === 'grid'}
-                  onChange={() => localState.get('settings').get('feed').get('display').put('grid')}
+                  checked={this.state.settings.display === 'grid'}
+                  onChange={() =>
+                    this.setState({ settings: { ...this.state.settings, display: 'grid' } })
+                  }
                 />
                 <label htmlFor="display_grid">{t('grid')}</label>
               </p>
               <p>
                 <input
                   type="checkbox"
-                  checked={this.state.replies}
-                  name="replies"
-                  id="include_replies"
-                  onChange={() =>
-                    localState.get('settings').get('feed').get('replies').put(!this.state.replies)
-                  }
-                />
-                <label htmlFor="include_replies">{t('include_replies')}</label>
-                <input
-                  type="checkbox"
                   id="display_realtime"
-                  checked={this.state.realtime}
+                  checked={this.state.settings.realtime}
                   onChange={() =>
-                    localState.get('settings').get('feed').get('realtime').put(!this.state.realtime)
+                    this.setState({
+                      settings: { ...this.state.settings, realtime: !this.state.settings.realtime },
+                    })
                   }
                 />
                 <label htmlFor="display_realtime">{t('realtime')}</label>
+                <input
+                  type="checkbox"
+                  checked={this.state.settings.replies}
+                  name="replies"
+                  id="show_replies"
+                  onChange={() =>
+                    this.setState({
+                      settings: { ...this.state.settings, replies: !this.state.settings.replies },
+                    })
+                  }
+                />
+                <label htmlFor="show_replies">{t('show_replies')}</label>
+              </p>
+              <p>
+                <Button onClick={() => this.saveSettings()}>{t('save_as_defaults')}</Button>
               </p>
             </div>
           </div>
@@ -365,7 +406,7 @@ class Feed extends Component {
         <Button
           onClick={() =>
             this.setState({
-              displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
+              displayCount: this.state.settings.displayCount + INITIAL_PAGE_SIZE,
             })
           }
         >
@@ -379,7 +420,7 @@ class Feed extends Component {
     if (!this.props.scrollElement || this.unmounted) {
       return;
     }
-    const displayCount = this.state.displayCount;
+    const displayCount = this.state.settings.displayCount;
     const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
     const feedName =
       !this.state.queuedMessages.length &&
@@ -389,7 +430,7 @@ class Feed extends Component {
         notifications: 'notifications',
       }[this.props.index];
 
-    const renderAs = this.state.display === 'grid' ? 'NoteImage' : null;
+    const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
     const messages = this.state.sortedMessages
       .slice(0, displayCount)
       .map((id) => (
