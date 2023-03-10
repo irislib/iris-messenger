@@ -294,19 +294,20 @@ class Feed extends Component {
   }
 
   renderFeedTypeSelector() {
+    const isProfile = ['posts', 'postsAndReplies', 'likes'].includes(this.props.index);
     return (
       <div className="tabs">
         <a
-          style="border-radius: 8px 0 0 0"
-          onClick={() => this.setState({ display: 'posts' })}
+          style={isProfile ? { 'border-radius': '8px 0 0 0' } : {}}
+          onClick={() => this.setState({ settings: { ...this.state.settings, display: 'posts' } })}
           className={this.state.settings.display === 'grid' ? '' : 'active'}
         >
           {Icons.post}
         </a>
         <a
-          style="border-radius: 0 8px 0 0"
+          style={isProfile ? { 'border-radius': '0 8px 0 0' } : {}}
           className={this.state.settings.display === 'grid' ? 'active' : ''}
-          onClick={() => this.setState({ display: 'grid' })}
+          onClick={() => this.setState({ settings: { ...this.state.settings, display: 'grid' } })}
         >
           {Icons.image}
         </a>
@@ -459,9 +460,7 @@ class Feed extends Component {
             </div>
           ) : null}
           {this.props.index !== 'notifications' && this.state.settingsOpen && this.renderSettings()}
-          {['posts', 'postsAndReplies', 'likes'].includes(this.props.index)
-            ? this.renderFeedTypeSelector()
-            : ''}
+          {this.props.index !== 'notifications' && this.renderFeedTypeSelector()}
           {renderAs === 'NoteImage' ? <ImageGrid>{messages}</ImageGrid> : messages}
         </div>
         {displayCount < this.state.sortedMessages.length ? this.renderShowMore() : ''}
