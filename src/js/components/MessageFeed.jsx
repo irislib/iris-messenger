@@ -177,10 +177,7 @@ class MessageFeed extends Component {
     }, includeReplies);
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (!prevProps.scrollElement && this.props.scrollElement) {
-      this.addScrollHandler();
-    }
+  updateParams(prevState) {
     if (prevState.display !== this.state.display) {
       // url param ?display=images if display === 'grid', otherwise no param
       const url = new URL(window.location);
@@ -191,6 +188,33 @@ class MessageFeed extends Component {
       }
       window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
     }
+    if (prevState.includeReplies !== this.state.includeReplies) {
+      // url param ?replies=1 if includeReplies === true, otherwise no param
+      const url = new URL(window.location);
+      if (this.state.includeReplies) {
+        url.searchParams.set('replies', '1');
+      } else {
+        url.searchParams.delete('replies');
+      }
+      window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
+    }
+    if (prevState.realtime !== this.state.realtime) {
+      // url param ?realtime=1 if realtime === true, otherwise no param
+      const url = new URL(window.location);
+      if (this.state.realtime) {
+        url.searchParams.set('realtime', '1');
+      } else {
+        url.searchParams.delete('realtime');
+      }
+      window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevProps.scrollElement && this.props.scrollElement) {
+      this.addScrollHandler();
+    }
+    this.updateParams(prevState);
     this.handleScroll();
     window.history.replaceState({ ...window.history.state, state: this.state }, '');
     if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
