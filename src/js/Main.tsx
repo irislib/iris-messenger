@@ -84,7 +84,7 @@ class Main extends Component<Props, ReactState> {
     let title = '';
     const s = this.state;
     if (s.activeRoute && s.activeRoute.length > 1) {
-      title = Helpers.capitalize(s.activeRoute.replace('/', ''));
+      title = Helpers.capitalize(s.activeRoute.replace('/', '').split('?')[0]);
     }
     const isDesktopNonMac = s.platform && s.platform !== 'darwin';
     const titleTemplate = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) %s | iris` : '%s | iris';
