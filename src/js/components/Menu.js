@@ -1,4 +1,5 @@
 import { html } from 'htm/preact';
+import { route } from 'preact-router';
 
 import logo from '../../assets/img/icon128.png';
 import Component from '../BaseComponent';
@@ -6,7 +7,6 @@ import Helpers from '../Helpers';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
-import {route} from "preact-router";
 
 const APPLICATIONS = [
   // TODO: move editable shortcuts to localState gun

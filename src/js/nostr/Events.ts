@@ -1,4 +1,5 @@
 import { debounce } from 'lodash';
+import Loki from 'lokijs';
 
 import { Event, Filter, getEventHash } from '../lib/nostr-tools';
 import localState from '../LocalState';
@@ -12,7 +13,6 @@ import Relays from './Relays';
 import Session from './Session';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
-import Loki from 'lokijs';
 
 const startTime = Date.now() / 1000;
 
@@ -53,10 +53,6 @@ const Events = {
   latestNotificationByTargetAndKind: new Map<string, string>(),
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   zapsByNote: new Map<string, SortedLimitedEventSet>(),
-  latestNotesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
-  latestNotesAndRepliesByEveryone: new SortedLimitedEventSet(MAX_LATEST_MSGS),
-  latestNotesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
-  latestNotesAndRepliesByFollows: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   latestNotesByKeywords: new Map<string, SortedLimitedEventSet>(),
   keyValueEvents: new Map<string, Event>(),
   threadRepliesByMessageId: new Map<string, Set<string>>(),
@@ -74,39 +70,15 @@ const Events = {
       this.insert(event);
     }
 
-    this.latestNotesAndRepliesByEveryone.add(event);
-
     const isRepost = this.isRepost(event);
     const replyingTo = !isRepost && this.getNoteReplyingTo(event);
-    if (replyingTo) {
-      this.deleteRepliedMsgsFromFeeds(event, [this.latestNotesAndRepliesByEveryone]);
-    } else {
-      this.latestNotesByEveryone.add(event);
-    }
-    if (isRepost) {
-      this.deleteRepostedMsgsFromFeeds(event, [
-        this.latestNotesByEveryone,
-        this.latestNotesAndRepliesByEveryone,
-      ]);
-    }
     const myPub = Key.getPubKey();
-    if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
-      const changed = this.latestNotesAndRepliesByFollows.add(event);
-      if (replyingTo) {
-        this.deleteRepliedMsgsFromFeeds(event, [this.latestNotesAndRepliesByFollows]);
-      } else {
-        this.latestNotesByFollows.add(event);
-      }
-      if (isRepost) {
-        this.deleteRepostedMsgsFromFeeds(event, [
-          this.latestNotesByFollows,
-          this.latestNotesAndRepliesByFollows,
-        ]);
-      }
-      if (changed && LocalForage.loaded) {
-        LocalForage.saveEvents();
-      }
+
+    /*
+    if (changed && LocalForage.loaded) {
+      LocalForage.saveEvents();
     }
+     */
 
     if (replyingTo && !isRepost) {
       if (!this.directRepliesByMessageId.has(replyingTo)) {
@@ -354,8 +326,6 @@ const Events = {
       // only we or the author can delete
       if (deletedEvent && [event.pubkey, myPub].includes(deletedEvent.pubkey)) {
         this.db.findAndRemove({ id });
-        this.latestNotesByFollows.delete(id);
-        this.latestNotesByEveryone.delete(id);
       }
     }
   },

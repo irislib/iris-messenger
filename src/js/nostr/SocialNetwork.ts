@@ -157,18 +157,8 @@ export default {
     }
 
     const blocked = this.blockedUsers.has(unfollowedUser);
-    Events.latestNotesByFollows.eventIds.forEach((id) => {
-      const fullEvent = Events.db.by('id', id);
-      if (fullEvent?.pubkey === unfollowedUser) {
-        Events.latestNotesByFollows.delete(id);
-        // if blocked user is in a p tag, remove the note
-        fullEvent?.tags.forEach((tag) => {
-          if (tag[0] === 'p' && tag[1] === unfollowedUser) {
-            Events.latestNotesByFollows.delete(id);
-          }
-        });
-      }
-    });
+    // TODO delete Events.db entries for this user
+
     if (blocked || this.followersByUser.get(unfollowedUser)?.size === 0) {
       // TODO: remove unfollowedUser from everyone's followersByUser.
       // TODO: remove from all indexes. something like lokijs could help in index management.
@@ -176,18 +166,6 @@ export default {
       this.followDistanceByUser.delete(unfollowedUser);
       this.followersByUser.delete(unfollowedUser);
       PubSub.subscribedUsers.delete(unfollowedUser);
-      Events.latestNotesByEveryone.eventIds.forEach((id) => {
-        const fullEvent = Events.db.by('id', id);
-        if (fullEvent?.pubkey === unfollowedUser) {
-          Events.latestNotesByEveryone.delete(id);
-          Events.db.findAndRemove({ id });
-          fullEvent?.tags.forEach((tag) => {
-            if (tag[0] === 'p' && tag[1] === unfollowedUser) {
-              Events.latestNotesByEveryone.delete(id);
-            }
-          });
-        }
-      });
     }
     LocalForage.saveEvents();
   },

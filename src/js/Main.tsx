@@ -10,6 +10,7 @@ import About from './views/About';
 import Chat from './views/chat/Chat';
 import EditProfile from './views/EditProfile';
 import Feed from './views/Feed';
+import FeedList from './views/FeedList';
 import Follows from './views/Follows';
 import Login from './views/Login';
 import LogoutConfirmation from './views/LogoutConfirmation';
@@ -26,7 +27,6 @@ import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
 import '../css/style.css';
 import '../css/cropper.min.css';
-import FeedList from "./views/FeedList";
 
 type Props = Record<string, unknown>;
 
