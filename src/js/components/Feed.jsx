@@ -9,11 +9,11 @@ import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import PubSub from '../nostr/PubSub';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
 import EventComponent from './events/EventComponent';
-import SocialNetwork from '../nostr/SocialNetwork';
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -181,17 +181,13 @@ class Feed extends Component {
       let first = true;
       if (this.props.nostrUser) {
         if (this.props.index === 'postsAndReplies') {
-          Events.getPostsAndRepliesByUser(this.props.nostrUser, (eventIds) =>
-            this.updateSortedMessages(eventIds),
-          );
+          this.getPostsAndRepliesByUser(this.props.nostrUser, true);
         } else if (this.props.index === 'likes') {
           Events.getLikesByUser(this.props.nostrUser, (eventIds) => {
             this.updateSortedMessages(eventIds);
           });
         } else if (this.props.index === 'posts') {
-          Events.getPostsByUser(this.props.nostrUser, (eventIds) =>
-            this.updateSortedMessages(eventIds),
-          );
+          this.getPostsAndRepliesByUser(this.props.nostrUser, false);
         }
       } else {
         localState.get('scrollUp').on(
@@ -208,11 +204,11 @@ class Feed extends Component {
         } else if (this.props.index) {
           // public messages
           if (this.props.index === 'everyone') {
-            this.getMessagesByEveryone(this.state.settings.replies);
+            this.getMessagesByEveryone();
           } else if (this.props.index === 'notifications') {
             this.unsub = Events.getNotifications((messages) => this.updateSortedMessages(messages));
           } else if (this.props.index === 'follows') {
-            this.getMessagesByFollows(this.state.settings.replies);
+            this.getMessagesByFollows();
           }
         }
       }
@@ -239,13 +235,15 @@ class Feed extends Component {
     }
   }
 
-  getMessagesByEveryone(includeReplies) {
+  getPostsAndRepliesByUser(pubkey, includeReplies) {
     this.unsub?.();
     // TODO apply filters
     const desc = this.state.settings.sortDirection === 'desc';
     const callback = () => {
+      // throttle?
       const events = Events.db
         .chain()
+        .find({ pubkey })
         .where((e) => {
           // TODO apply all filters from state.settings
           if (!includeReplies && e.tags.find((t) => t[0] === 'e')) {
@@ -262,10 +260,35 @@ class Feed extends Component {
     this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
   }
 
-  getMessagesByFollows(includeReplies) {
+  getMessagesByEveryone() {
+    this.unsub?.();
+    // TODO apply filters
+    const desc = this.state.settings.sortDirection === 'desc';
+    const callback = () => {
+      // throttle?
+      const events = Events.db
+        .chain()
+        .where((e) => {
+          // TODO apply all filters from state.settings
+          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
+            return false;
+          }
+          return true;
+        })
+        .data()
+        .sort((a, b) => this.sort(a, b)) // why loki simplesort doesn't work?
+        .map((e) => e.id);
+      this.updateSortedMessages(events);
+    };
+    callback();
+    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
+  }
+
+  getMessagesByFollows() {
     this.unsub?.();
     const desc = this.state.settings.sortDirection === 'desc';
     const callback = () => {
+      // throttle?
       const events = Events.db
         .chain()
         .where((e) => {
@@ -273,7 +296,7 @@ class Feed extends Component {
           if (!(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)) {
             return false;
           }
-          if (!includeReplies && e.tags.find((t) => t[0] === 'e')) {
+          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
             return false;
           }
           return true;
