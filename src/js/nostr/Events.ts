@@ -23,7 +23,7 @@ const MAX_ZAPS_BY_NOTE = 1000;
 
 const db = new Loki('iris');
 const events = db.addCollection('events', {
-  indices: ['created_at', 'pubkey'],
+  indices: ['created_at', 'pubkey', 'kind'],
   unique: ['id'],
 });
 

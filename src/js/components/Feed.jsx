@@ -266,6 +266,7 @@ class Feed extends Component {
     const callback = throttle(() => {
       const events = Events.db
         .chain()
+        .find({ kind: 1 })
         .where((e) => {
           // TODO apply all filters from state.settings
           if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
@@ -288,6 +289,7 @@ class Feed extends Component {
       // throttle?
       const events = Events.db
         .chain()
+        .find({ kind: 1 })
         .where((e) => {
           // TODO apply all filters from state.settings
           if (!(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)) {
