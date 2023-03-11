@@ -247,7 +247,7 @@ class Feed extends Component {
       // throttle?
       const events = Events.db
         .chain()
-        .find({ pubkey })
+        .find({ pubkey, kind: 1 })
         .where((e) => {
           // TODO apply all filters from state.settings
           if (!includeReplies && e.tags.find((t) => t[0] === 'e')) {

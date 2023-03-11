@@ -105,34 +105,6 @@ const Events = {
       }
     }
   },
-  deleteRepostedMsgsFromFeeds(event: Event, feeds: SortedLimitedEventSet[]) {
-    const repostedEventId = this.getRepostedEventId(event);
-    const repostedEvent = this.db.by('id', repostedEventId);
-    // checking that someone isn't hiding posts from feeds with backdated reposts of them
-    if (repostedEvent?.created_at < event.created_at) {
-      const otherReposts = this.repostsByMessageId.get(repostedEventId);
-      for (const feed of feeds) {
-        feed.delete(repostedEventId);
-        if (otherReposts) {
-          for (const repostId of otherReposts) {
-            if (repostId !== event.id) {
-              feed.delete(repostId);
-            }
-          }
-        }
-      }
-    }
-  },
-  deleteRepliedMsgsFromFeeds(event: Event, feeds: SortedLimitedEventSet[]) {
-    const replyingToEventId = this.getNoteReplyingTo(event);
-    const replyingToEvent = this.db.by('id', replyingToEventId);
-    // checking that someone isn't hiding posts from feeds with backdated replies to them
-    if (replyingToEvent?.created_at < event.created_at) {
-      for (const feed of feeds) {
-        feed.delete(replyingToEventId);
-      }
-    }
-  },
   getRepostedEventId(event: Event) {
     let id = event.tags?.find((tag) => tag[0] === 'e' && tag[3] === 'mention')?.[1];
     if (id) {
