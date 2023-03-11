@@ -19,7 +19,7 @@ class FeedList extends View {
         },
         global: {
           name: 'Global',
-          description: 'Public messages from everyone in your network',
+          description: 'Public messages from everyone in your social network',
           icon: Icons.global,
         },
       },
@@ -42,7 +42,7 @@ class FeedList extends View {
           const feed = this.state.feeds[key];
           return (
             <div>
-              <div className="msg" onClick={() => this.openFeed(key)}>
+              <div style="margin-bottom: 5px" className="msg" onClick={() => this.openFeed(key)}>
                 <div className="msg-content">
                   <div style="margin-right: 15px">
                     <div>{feed.icon}</div>
