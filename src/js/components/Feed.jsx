@@ -263,9 +263,7 @@ class Feed extends Component {
   getMessagesByEveryone() {
     this.unsub?.();
     // TODO apply filters
-    const desc = this.state.settings.sortDirection === 'desc';
-    const callback = () => {
-      // throttle?
+    const callback = throttle(() => {
       const events = Events.db
         .chain()
         .where((e) => {
@@ -279,15 +277,14 @@ class Feed extends Component {
         .sort((a, b) => this.sort(a, b)) // why loki simplesort doesn't work?
         .map((e) => e.id);
       this.updateSortedMessages(events);
-    };
+    }, 1000);
     callback();
     this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
   }
 
   getMessagesByFollows() {
     this.unsub?.();
-    const desc = this.state.settings.sortDirection === 'desc';
-    const callback = () => {
+    const callback = throttle(() => {
       // throttle?
       const events = Events.db
         .chain()
@@ -305,7 +302,7 @@ class Feed extends Component {
         .sort((a, b) => this.sort(a, b)) // why loki simplesort doesn't work?
         .map((e) => e.id);
       this.updateSortedMessages(events);
-    };
+    }, 1000);
 
     callback();
     this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735] }], callback);
