@@ -52,8 +52,6 @@ const Events = {
   deletedEvents: new Set<string>(),
   directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
   likesByUser: new Map<string, SortedLimitedEventSet>(),
-  postsByUser: new Map<string, SortedLimitedEventSet>(),
-  postsAndRepliesByUser: new Map<string, SortedLimitedEventSet>(),
   latestNotificationByTargetAndKind: new Map<string, string>(),
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   zapsByNote: new Map<string, SortedLimitedEventSet>(),
@@ -82,10 +80,6 @@ const Events = {
         console.log('error inserting event', e);
       }
     }
-    if (!this.postsAndRepliesByUser.has(event.pubkey)) {
-      this.postsAndRepliesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
-    }
-    this.postsAndRepliesByUser.get(event.pubkey)?.add(event);
 
     this.latestNotesAndRepliesByEveryone.add(event);
 
@@ -144,11 +138,6 @@ const Events = {
         }
         this.threadRepliesByMessageId.get(id)?.add(event.id);
       }
-    } else {
-      if (!this.postsByUser.has(event.pubkey)) {
-        this.postsByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
-      }
-      this.postsByUser.get(event.pubkey)?.add(event);
     }
   },
   deleteRepostedMsgsFromFeeds(event: Event, feeds: SortedLimitedEventSet[]) {
@@ -365,7 +354,6 @@ const Events = {
       // only we or the author can delete
       if (deletedEvent && [event.pubkey, myPub].includes(deletedEvent.pubkey)) {
         this.cache.delete(id);
-        this.postsAndRepliesByUser.get(event.pubkey)?.delete(id);
         this.latestNotesByFollows.delete(id);
         this.latestNotesByEveryone.delete(id);
       }
@@ -851,21 +839,6 @@ const Events = {
     this.latestNotesByKeywords.has(keyword) &&
       cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
     return PubSub.subscribe([filter], callback);
-  },
-  getPostsAndRepliesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
-    // TODO subscribe on view profile and unsub on leave profile
-    const callback = () => {
-      cb?.(this.postsAndRepliesByUser.get(address)?.eventIds);
-    };
-    this.postsAndRepliesByUser.has(address) && callback();
-    return PubSub.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
-  },
-  getPostsByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
-    const callback = () => {
-      cb?.(this.postsByUser.get(address)?.eventIds);
-    };
-    this.postsByUser.has(address) && callback();
-    return PubSub.subscribe([{ kinds: [1, 5, 7], authors: [address] }], callback);
   },
   getLikesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
     const callback = () => {

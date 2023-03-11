@@ -121,25 +121,9 @@ export default {
       }
     }
 
-    // if new follow, move all their posts to followedByUser
-    if (follower === myPub && !this.followedByUser.get(myPub).has(followedUser)) {
-      const posts = Events.postsByUser.get(followedUser);
-      if (posts) {
-        posts.eventIds.forEach((eventId) => {
-          const event = Events.cache.get(eventId);
-          if (event) {
-            const replyingTo = Events.getNoteReplyingTo(event);
-            if (!replyingTo) {
-              Events.latestNotesByFollows.add(event);
-            }
-            Events.latestNotesAndRepliesByFollows.add(event);
-          }
-        });
-      }
-    }
     this.followedByUser.get(follower)?.add(followedUser);
     if (follower === myPub) {
-      Events.getPostsAndRepliesByUser(followedUser);
+      PubSub.subscribe([{ kinds: [1, 5, 7], authors: [followedUser] }]);
     }
     if (followedUser === myPub) {
       if (this.followersByUser.get(followedUser)?.size === 1) {
