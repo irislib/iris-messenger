@@ -321,7 +321,7 @@ class Feed extends Component {
       } else {
         url.searchParams.delete('display');
       }
-      window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
+      this.replaceState();
     }
     if (prevState.settings.replies !== this.state.settings.replies) {
       const url = new URL(window.location);
@@ -330,7 +330,7 @@ class Feed extends Component {
       } else {
         url.searchParams.delete('replies');
       }
-      window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
+      this.replaceState();
     }
     if (prevState.settings.realtime !== this.state.settings.realtime) {
       const url = new URL(window.location);
@@ -339,9 +339,17 @@ class Feed extends Component {
       } else {
         url.searchParams.delete('realtime');
       }
-      window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
+      this.replaceState();
     }
   }
+
+  replaceState = throttle(
+    () => {
+      window.history.replaceState({ ...window.history.state, state: this.state }, '');
+    },
+    1000,
+    { leading: true, trailing: true },
+  );
 
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.scrollElement && this.props.scrollElement) {
@@ -358,7 +366,7 @@ class Feed extends Component {
       this.subscribe();
     }
     this.handleScroll();
-    window.history.replaceState({ ...window.history.state, state: this.state }, '');
+    this.replaceState();
     if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
       Helpers.animateScrollTop('.main-view');
     }
