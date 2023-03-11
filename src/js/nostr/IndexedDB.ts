@@ -36,23 +36,14 @@ export default {
   },
   init() {
     const myPub = Key.getPubKey();
-    let follows: string[];
     db.events
       .where({ pubkey: myPub })
       .each((event) => {
         Events.handle(event, false, false);
       })
       .then(() => {
-        follows = Array.from(SocialNetwork.followedByUser.get(myPub) || []);
-        return db.events
-          .where('pubkey')
-          .anyOf(follows)
-          .each((event) => {
-            Events.handle(event, false, false);
-          });
-      })
-      .then(() => {
         // other follow events
+        // are they loaded in correct order to build the WoT?
         return db.events.where({ kind: 3 }).each((event) => {
           Events.handle(event, false, false);
         });
@@ -62,8 +53,10 @@ export default {
         return db.events
           .orderBy('created_at')
           .reverse()
+          .filter((event) => event.kind === 1)
           .limit(3000)
           .each((event) => {
+            console.log('got event from idb', new Date(event.created_at * 1000).toISOString());
             Events.handle(event, false, false);
           });
       });

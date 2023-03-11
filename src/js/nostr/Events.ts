@@ -489,12 +489,12 @@ const Events = {
     // TODO: don't save e.g. old profile & follow events
     // TODO since we're only querying relays since lastSeen, we need to store all beforeseen events and correctly query them on demand
     // otherwise feed will be incomplete
-    const followDistance = SocialNetwork.followDistanceByUser.get(event.pubkey);
     if (saveToIdb) {
+      const followDistance = SocialNetwork.followDistanceByUser.get(event.pubkey);
       if (followDistance <= 1) {
         // save all our own events and events from people we follow
         IndexedDB.saveEvent(event as Event & { id: string });
-      } else if (followDistance <= 4) {
+      } else if (followDistance <= 4 && [0, 3].includes(event.kind)) {
         // save profiles and follow events up to follow distance 4
         IndexedDB.saveEvent(event as Event & { id: string });
       }
@@ -505,7 +505,7 @@ const Events = {
       if (!sub.filters) {
         return;
       }
-      if (this.matchesOneFilter(event, sub.filters)) {
+      if (this.matchFilters(event, sub.filters)) {
         sub.callback && sub.callback(event);
       }
     }
@@ -527,7 +527,7 @@ const Events = {
     }, (nextEvent.created_at - Date.now() / 1000) * 1000);
   },
   // if one of the filters matches, return true
-  matchesOneFilter(event: Event, filters: Filter[]) {
+  matchFilters(event: Event, filters: Filter[]) {
     for (const filter of filters) {
       if (this.matchFilter(event, filter)) {
         return true;

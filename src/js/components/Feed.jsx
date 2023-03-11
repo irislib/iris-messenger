@@ -261,7 +261,7 @@ class Feed extends Component {
       this.updateSortedMessages(events);
     };
     callback();
-    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
+    this.unsub = PubSub.subscribe([{ kinds: [1, 5, 7], authors: [pubkey] }], callback);
   }
 
   getMessagesByEveryone() {
@@ -272,7 +272,6 @@ class Feed extends Component {
         .chain()
         .find({ kind: 1 })
         .where((e) => {
-          // TODO apply all filters from state.settings
           if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
             return false;
           }
@@ -290,13 +289,14 @@ class Feed extends Component {
   getMessagesByFollows() {
     this.unsub?.();
     const callback = throttle(() => {
+      console.log('getMessagesByFollows', Date.now());
       // throttle?
       const events = Events.db
         .chain()
         .find({ kind: 1 })
         .where((e) => {
-          // TODO apply all filters from state.settings
-          if (!(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)) {
+          const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
+          if (!followDistance || followDistance > 1) {
             return false;
           }
           if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
@@ -311,7 +311,7 @@ class Feed extends Component {
     }, 1000);
 
     callback();
-    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735] }], callback);
+    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735] }], callback, 'global');
   }
 
   updateParams(prevState) {
