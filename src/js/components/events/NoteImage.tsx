@@ -51,8 +51,12 @@ const onClick = (event, noteId) => {
 
 export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
   // get first image url from event content
+  if (props.event.kind !== 1) {
+    console.log('not a note', props.event);
+    return null;
+  }
   const attachments = [];
-  const urls = props.event.content.match(/(https?:\/\/[^\s]+)/g);
+  const urls = props.event.content?.match(/(https?:\/\/[^\s]+)/g);
   if (urls) {
     urls.forEach((url) => {
       let parsedUrl;
@@ -63,7 +67,7 @@ export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
         return;
       }
       if (parsedUrl.pathname.toLowerCase().match(/\.(jpg|jpeg|gif|png|webp)$/)) {
-        attachments.push({ type: 'image', data: `${parsedUrl.href}` });
+        attachments.push({ type: 'image', data: parsedUrl.href });
       }
     });
   }
