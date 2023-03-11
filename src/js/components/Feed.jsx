@@ -14,6 +14,7 @@ import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
 import EventComponent from './events/EventComponent';
+import ErrorBoundary from './ErrorBoundary';
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -543,9 +544,8 @@ class Feed extends Component {
       }[this.props.index];
 
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
-    const messages = this.state.sortedMessages
-      .slice(0, displayCount)
-      .map((id) => (
+    const messages = this.state.sortedMessages.slice(0, displayCount).map((id) => (
+      <ErrorBoundary>
         <EventComponent
           notification={this.props.index === 'notifications'}
           key={id}
@@ -554,7 +554,8 @@ class Feed extends Component {
           renderAs={renderAs}
           feedOpenedAt={this.openedAt}
         />
-      ));
+      </ErrorBoundary>
+    ));
     return (
       <div className="msg-feed">
         <div>
