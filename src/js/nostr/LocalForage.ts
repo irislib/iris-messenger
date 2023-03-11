@@ -10,14 +10,32 @@ import SocialNetwork from './SocialNetwork';
 export default {
   loaded: false,
   saveEvents: debounce(() => {
-    const latestMsgs = Events.latestNotesByFollows.eventIds.slice(0, 100).map((eventId: any) => {
-      return Events.db.by('id', eventId);
-    });
-    const latestMsgsByEveryone = Events.latestNotesAndRepliesByEveryone.eventIds
-      .slice(0, 100)
-      .map((eventId: any) => {
-        return Events.db.by('id', eventId);
-      });
+    const latestMsgs = Events.db
+      .chain()
+      .simplesort('created_at')
+      .where((e: Event) => {
+        if (e.kind !== 1) {
+          return false;
+        }
+        const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
+        if (followDistance > 1) {
+          return false;
+        }
+        return true;
+      })
+      .limit(100)
+      .data();
+    const latestMsgsByEveryone = Events.db
+      .chain()
+      .simplesort('created_at')
+      .where((e: Event) => {
+        if (e.kind !== 1) {
+          return false;
+        }
+        return true;
+      })
+      .limit(100)
+      .data();
     const notifications = Events.notifications.eventIds
       .map((eventId: any) => {
         return Events.db.by('id', eventId);

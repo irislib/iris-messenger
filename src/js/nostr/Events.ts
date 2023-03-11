@@ -423,7 +423,7 @@ const Events = {
   },
   handle(event: Event, force = false, saveToIdb = true) {
     if (!event) return;
-    if (!!this.db.by('id', event.id) && !force) {
+    if (!force && !!this.db.by('id', event.id)) {
       return;
     }
     if (!force && !this.acceptEvent(event)) {
