@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { debounce } from 'lodash';
 import styled from 'styled-components';
 
 import Helpers from '../../Helpers';
