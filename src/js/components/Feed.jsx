@@ -219,6 +219,9 @@ class Feed extends Component {
   sort(a, b) {
     let aVal;
     let bVal;
+    if (!a || !b) return 0;
+    if (a && !b) return -1;
+    if (!a && b) return 1;
     if (this.state.settings.sortBy === 'created_at') {
       aVal = a.created_at;
       bVal = b.created_at;
@@ -239,7 +242,6 @@ class Feed extends Component {
   getPostsAndRepliesByUser(pubkey, includeReplies) {
     this.unsub?.();
     // TODO apply filters
-    const desc = this.state.settings.sortDirection === 'desc';
     const callback = () => {
       // throttle?
       const events = Events.db
