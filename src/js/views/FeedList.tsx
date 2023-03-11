@@ -47,7 +47,7 @@ class FeedList extends View {
                   <div style="margin-right: 15px">
                     <div>{feed.icon}</div>
                   </div>
-                  <div className="msg-body">
+                  <div className="msg-body" style="flex:1">
                     <h3 style="margin-top:0">{t(feed.name)}</h3>
                     {t(feed.description)}
                   </div>
