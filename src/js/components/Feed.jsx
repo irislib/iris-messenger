@@ -95,7 +95,7 @@ class Feed extends Component {
       if (settings.sortDirection === 'desc' && !settings.realtime) {
         for (let i = 0; i < sortedMessages.length; i++) {
           const id = sortedMessages[i];
-          const message = Events.cache.get(id);
+          const message = Events.db.by('id', id);
           if (message && message.created_at > this.state.messagesShownTime) {
             if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
               hasMyMessage = true;

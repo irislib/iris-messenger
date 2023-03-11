@@ -123,7 +123,7 @@ class Note extends Component {
     e.preventDefault();
     const hexId = Key.toNostrHexAddress(this.props.event.id);
     if (hexId) {
-      const event = Events.cache.get(hexId);
+      const event = Events.db.by('id', hexId);
       if (event) {
         // TODO indicate to user somehow
         console.log('broadcasting', hexId);
@@ -386,8 +386,8 @@ class Note extends Component {
     const sortedReplies =
       replies &&
       Array.from(replies).sort((a, b) => {
-        const eventA = Events.cache.get(a);
-        const eventB = Events.cache.get(b);
+        const eventA = Events.db.by('id', a);
+        const eventB = Events.db.by('id', b);
         // show our replies first
         if (eventA?.pubkey === myPub && eventB?.pubkey !== myPub) {
           return -1;

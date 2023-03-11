@@ -125,7 +125,7 @@ class EventComponent extends Component {
     e.preventDefault();
     const hexId = Key.toNostrHexAddress(this.props.id);
     if (hexId) {
-      const event = Events.cache.get(hexId);
+      const event = Events.db.by('id', hexId);
       if (event) {
         // TODO indicate to user somehow
         console.log('broadcasting', hexId);

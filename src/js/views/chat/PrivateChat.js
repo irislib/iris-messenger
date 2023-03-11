@@ -190,7 +190,7 @@ export default class PrivateChat extends Component {
       let previousFrom;
       const msgListContent = [];
       this.state.sortedMessages.forEach((msgId) => {
-        const msg = Events.cache.get(msgId);
+        const msg = Events.db.by('id', msgId);
         if (!msg) {
           return null;
         }

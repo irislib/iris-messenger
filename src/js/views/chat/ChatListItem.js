@@ -29,7 +29,7 @@ class ChatListItem extends Component {
     if (!this.props.latestMsgId) {
       return;
     }
-    const event = Events.cache.get(this.props.latestMsgId);
+    const event = Events.db.by('id', this.props.latestMsgId);
     if (event) {
       this.setState({ latest: event });
       Key.decryptMessage(this.props.latestMsgId, (latestText) => {

@@ -37,8 +37,8 @@ class ChatList extends Component {
       const sortedChats = Array.from(chats.keys()).sort((a, b) => {
         const aEventIds = chats.get(a).eventIds;
         const bEventIds = chats.get(b).eventIds;
-        const aLatestEvent = aEventIds.length ? Events.cache.get(aEventIds[0]) : null;
-        const bLatestEvent = bEventIds.length ? Events.cache.get(bEventIds[0]) : null;
+        const aLatestEvent = aEventIds.length ? Events.db.by('id', aEventIds[0]) : null;
+        const bLatestEvent = bEventIds.length ? Events.db.by('id', bEventIds[0]) : null;
         if (bLatestEvent.created_at > aLatestEvent.created_at) {
           return 1;
         } else if (bLatestEvent.created_at < aLatestEvent.created_at) {

@@ -158,7 +158,7 @@ export default {
 
     const blocked = this.blockedUsers.has(unfollowedUser);
     Events.latestNotesByFollows.eventIds.forEach((id) => {
-      const fullEvent = Events.cache.get(id);
+      const fullEvent = Events.db.by('id', id);
       if (fullEvent?.pubkey === unfollowedUser) {
         Events.latestNotesByFollows.delete(id);
         // if blocked user is in a p tag, remove the note
@@ -177,10 +177,10 @@ export default {
       this.followersByUser.delete(unfollowedUser);
       PubSub.subscribedUsers.delete(unfollowedUser);
       Events.latestNotesByEveryone.eventIds.forEach((id) => {
-        const fullEvent = Events.cache.get(id);
+        const fullEvent = Events.db.by('id', id);
         if (fullEvent?.pubkey === unfollowedUser) {
           Events.latestNotesByEveryone.delete(id);
-          Events.cache.delete(id);
+          Events.db.findAndRemove({ id });
           fullEvent?.tags.forEach((tag) => {
             if (tag[0] === 'p' && tag[1] === unfollowedUser) {
               Events.latestNotesByEveryone.delete(id);

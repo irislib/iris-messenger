@@ -11,22 +11,22 @@ export default {
   loaded: false,
   saveEvents: debounce(() => {
     const latestMsgs = Events.latestNotesByFollows.eventIds.slice(0, 100).map((eventId: any) => {
-      return Events.cache.get(eventId);
+      return Events.db.by('id', eventId);
     });
     const latestMsgsByEveryone = Events.latestNotesAndRepliesByEveryone.eventIds
       .slice(0, 100)
       .map((eventId: any) => {
-        return Events.cache.get(eventId);
+        return Events.db.by('id', eventId);
       });
     const notifications = Events.notifications.eventIds
       .map((eventId: any) => {
-        return Events.cache.get(eventId);
+        return Events.db.by('id', eventId);
       })
       .slice(0, 100);
     let dms = [];
     for (const set of Events.directMessagesByUser.values()) {
       set.eventIds.forEach((eventId: any) => {
-        dms.push(Events.cache.get(eventId));
+        dms.push(Events.db.by('id', eventId));
       });
     }
     dms = dms.slice(0, 100);

@@ -34,11 +34,11 @@ const DEFAULT_RELAYS = [
 const SEARCH_RELAYS = ['wss://relay.nostr.band'];
 
 const defaultRelays = new Map<string, Relay>(
-  DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => Events.cache.has(id))]),
+  DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => !!Events.db.by('id', id))]),
 );
 
 const searchRelays = new Map<string, Relay>(
-  SEARCH_RELAYS.map((url) => [url, relayInit(url, (id) => Events.cache.has(id))]),
+  SEARCH_RELAYS.map((url) => [url, relayInit(url, (id) => !!Events.db.by('id', id))]),
 );
 
 export default {
@@ -122,7 +122,7 @@ export default {
           this.relays.has(url) && this.remove(url);
           return;
         } else if (!this.relays.has(url)) {
-          const relay = relayInit(url, (id) => Events.cache.has(id));
+          const relay = relayInit(url, (id) => Events.db.by('id', id));
           relay.enabled = data.enabled;
           this.relays.set(url, relay);
         }
@@ -135,7 +135,7 @@ export default {
   },
   add(url: string) {
     if (this.relays.has(url)) return;
-    const relay = relayInit(url, (id) => Events.cache.has(id));
+    const relay = relayInit(url, (id) => Events.db.by('id', id));
     relay.on('connect', () => this.resubscribe(relay));
     relay.on('notice', (notice) => {
       console.log('notice from ', relay.url, notice);

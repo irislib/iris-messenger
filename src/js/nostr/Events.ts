@@ -21,7 +21,6 @@ const MAX_LATEST_MSGS = 500;
 const MAX_MSGS_BY_KEYWORD = 100;
 const MAX_ZAPS_BY_NOTE = 1000;
 
-const cache = new Map<string, Event>();
 const db = new Loki('iris');
 const events = db.addCollection('events', {
   indices: ['created_at', 'pubkey'],
@@ -47,7 +46,6 @@ const Events = {
   DEFAULT_GLOBAL_FILTER,
   MAX_MSGS_BY_KEYWORD,
   getEventHash,
-  cache: cache,
   db: events,
   deletedEvents: new Set<string>(),
   directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -71,14 +69,9 @@ const Events = {
   futureEventTimeout: 0,
   notificationsSeenTime: 0,
   handleNote(event: Event) {
-    this.cache.set(event.id, event);
     const has = this.db.by('id', event.id);
     if (!has) {
-      try {
-        this.db.insert(event);
-      } catch (e) {
-        console.log('error inserting event', e);
-      }
+      this.insert(event);
     }
 
     this.latestNotesAndRepliesByEveryone.add(event);
@@ -142,7 +135,7 @@ const Events = {
   },
   deleteRepostedMsgsFromFeeds(event: Event, feeds: SortedLimitedEventSet[]) {
     const repostedEventId = this.getRepostedEventId(event);
-    const repostedEvent = this.cache.get(repostedEventId);
+    const repostedEvent = this.db.by('id', repostedEventId);
     // checking that someone isn't hiding posts from feeds with backdated reposts of them
     if (repostedEvent?.created_at < event.created_at) {
       const otherReposts = this.repostsByMessageId.get(repostedEventId);
@@ -160,7 +153,7 @@ const Events = {
   },
   deleteRepliedMsgsFromFeeds(event: Event, feeds: SortedLimitedEventSet[]) {
     const replyingToEventId = this.getNoteReplyingTo(event);
-    const replyingToEvent = this.cache.get(replyingToEventId);
+    const replyingToEvent = this.db.by('id', replyingToEventId);
     // checking that someone isn't hiding posts from feeds with backdated replies to them
     if (replyingToEvent?.created_at < event.created_at) {
       for (const feed of feeds) {
@@ -318,13 +311,20 @@ const Events = {
       }
     }
   },
+  insert(event: Event) {
+    try {
+      this.db.insert(event);
+    } catch (e) {
+      console.log('failed to insert event', e);
+    }
+  },
   handleMetadata(event: Event) {
     try {
       const existing = SocialNetwork.profiles.get(event.pubkey);
       if (existing?.created_at >= event.created_at) {
         return false;
       }
-      this.cache.set(event.id, event);
+      this.insert(event);
       const profile = JSON.parse(event.content);
       // if we have previously deleted our account, log out. appease app store.
       if (event.pubkey === Key.getPubKey() && profile.deleted) {
@@ -350,17 +350,17 @@ const Events = {
     const id = event.tags?.find((tag) => tag[0] === 'e')?.[1];
     const myPub = Key.getPubKey();
     if (id) {
-      const deletedEvent = this.cache.get(id);
+      const deletedEvent = this.db.by('id', id);
       // only we or the author can delete
       if (deletedEvent && [event.pubkey, myPub].includes(deletedEvent.pubkey)) {
-        this.cache.delete(id);
+        this.db.findAndRemove({ id });
         this.latestNotesByFollows.delete(id);
         this.latestNotesByEveryone.delete(id);
       }
     }
   },
   handleZap(event) {
-    this.cache.set(event.id, event);
+    this.insert(event);
     const zappedNote = event.tags?.find((tag) => tag[0] === 'e')?.[1];
     if (!zappedNote) {
       return; // TODO you can also zap profiles
@@ -382,7 +382,7 @@ const Events = {
         return;
       }
     }
-    this.cache.set(event.id, event);
+    this.insert(event);
     if (!this.directMessagesByUser.has(user)) {
       this.directMessagesByUser.set(user, new SortedLimitedEventSet(500));
     }
@@ -453,7 +453,7 @@ const Events = {
   },
   handle(event: Event, force = false, saveToIdb = true) {
     if (!event) return;
-    if (this.cache.has(event.id) && !force) {
+    if (!!this.db.by('id', event.id) && !force) {
       return;
     }
     if (!force && !this.acceptEvent(event)) {
@@ -471,7 +471,7 @@ const Events = {
     if (event.created_at > Date.now() / 1000) {
       this.futureEventIds.add(event);
       if (this.futureEventIds.has(event.id)) {
-        this.cache.set(event.id, event); // TODO should limit stored future events
+        this.insert(event); // TODO should limit stored future events
       }
       if (this.futureEventIds.first() === event.id) {
         this.handleNextFutureEvent();
@@ -573,7 +573,7 @@ const Events = {
     }
     clearTimeout(this.futureEventTimeout);
     const nextEventId = this.futureEventIds.first();
-    const nextEvent = this.cache.get(nextEventId);
+    const nextEvent = this.db.by('id', nextEventId);
     if (!nextEvent) {
       return;
     }
@@ -672,7 +672,7 @@ const Events = {
         }
       }
       if (!this.isMuted(event)) {
-        this.cache.set(event.id, event);
+        this.insert(event);
         const target = this.getEventRoot(event) || this.getEventReplyingTo(event) || event.id; // TODO get thread root instead
         const key = `${event.kind}-${target}`;
         const existing = this.latestNotificationByTargetAndKind.get(key); // also latestNotificationByAuthor?
@@ -693,8 +693,8 @@ const Events = {
     }
     let count = 0;
     for (const id of Events.notifications.eventIds) {
-      const event = Events.cache.get(id);
-      if (event.created_at > Events.notificationsSeenTime) {
+      const event = Events.db.by('id', id);
+      if (event?.created_at > Events.notificationsSeenTime) {
         count++;
       } else {
         break;
@@ -726,7 +726,7 @@ const Events = {
     for (const relay of Relays.relays.values()) {
       relay.publish(event);
       for (const ref of referredEvents) {
-        const referredEvent = this.cache.get(ref[1]);
+        const referredEvent = this.db.by('id', ref[1]);
         if (referredEvent) {
           relay.publish(referredEvent);
         }
@@ -736,7 +736,7 @@ const Events = {
     return event.id;
   },
   getZappingUser(eventId: string) {
-    const description = Events.cache.get(eventId)?.tags.find((t) => t[0] === 'description')?.[1];
+    const description = Events.db.by('id', eventId)?.tags.find((t) => t[0] === 'description')?.[1];
     if (!description) {
       return;
     }
@@ -775,13 +775,14 @@ const Events = {
     return PubSub.subscribe([{ kinds: [1, 6, 7, 9735], '#e': [id] }], callback);
   },
   getEventById(id: string, proxyFirst = false, cb?: (event: Event) => void) {
-    if (cb && this.cache.has(id)) {
-      cb(this.cache.get(id));
+    const event = this.db.by('id', id);
+    if (cb && event) {
+      cb(event);
       return;
     }
     const askWs = () => {
       const unsub = PubSub.subscribe([{ ids: [id] }], () => {
-        const msg = this.cache.get(id);
+        const msg = this.db.by('id', id);
         if (msg) {
           cb?.(msg);
           unsub();
@@ -828,13 +829,12 @@ const Events = {
     };
     // find among cached events
     const filter = { kinds: [1], keywords: [keyword] };
-    for (const event of this.cache.values()) {
-      if (this.matchFilter(event, filter)) {
-        if (!this.latestNotesByKeywords.has(keyword)) {
-          this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
-        }
-        this.latestNotesByKeywords.get(keyword)?.add(event);
+    const filterFn = (e) => e.kind === 1 && e.content.includes(keyword);
+    for (const event of this.db.chain().where(filterFn).data()) {
+      if (!this.latestNotesByKeywords.has(keyword)) {
+        this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
       }
+      this.latestNotesByKeywords.get(keyword)?.add(event);
     }
     this.latestNotesByKeywords.has(keyword) &&
       cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
