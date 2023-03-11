@@ -61,7 +61,7 @@ npm run test
 ```
 
 </details>
-<br/>
+
 [iris.to](https://iris.to) production version is in the [stable](https://github.com/irislib/iris-messenger/tree/stable) branch.
 
 ### Tauri (desktop app)
