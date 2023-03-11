@@ -13,7 +13,7 @@ import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
 import EventComponent from './events/EventComponent';
-import SocialNetwork from "../nostr/SocialNetwork";
+import SocialNetwork from '../nostr/SocialNetwork';
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -104,28 +104,6 @@ class Feed extends Component {
             queuedMessages.push(id);
           }
         }
-      }
-      if (!(settings.sortDirection === 'desc' && settings.sortBy === 'created_at')) {
-        // re-sort
-        sortedMessages = sortedMessages.sort((a, b) => {
-          let valA;
-          let valB;
-          if (settings.sortBy === 'likes') {
-            valA = Events.likesByMessageId.get(a)?.size || 0;
-            valB = Events.likesByMessageId.get(b)?.size || 0;
-          } else if (settings.sortBy === 'zaps') {
-            valA = Events.zapsByNote.get(a)?.size || 0;
-            valB = Events.zapsByNote.get(b)?.size || 0;
-          } else {
-            valA = Events.cache.get(a)?.created_at || 0;
-            valB = Events.cache.get(b)?.created_at || 0;
-          }
-          if (settings.sortDirection === 'desc') {
-            return valB - valA;
-          } else {
-            return valA - valB;
-          }
-        });
       }
       if (!hasMyMessage) {
         sortedMessages = sortedMessages.filter((id) => !queuedMessages.includes(id));
@@ -241,13 +219,23 @@ class Feed extends Component {
     }, 0);
   }
 
-  getMessagesByEveryone(replies) {
+  getMessagesByEveryone(includeReplies) {
+    this.unsub?.();
     // TODO apply filters
+    const desc = this.state.settings.sortDirection === 'desc';
     const callback = () => {
       const events = Events.db
         .chain()
-        .simplesort('created_at', { desc: true })
+        .simplesort('created_at', { desc })
+        .where((e) => {
+          // TODO apply all filters from state.settings
+          if (!includeReplies && e.tags.find((t) => t[0] === 'e')) {
+            return false;
+          }
+          return true;
+        })
         .data()
+        .sort((a, b) => (desc ? b.created_at - a.created_at : a.created_at - b.created_at)) // why simplesort doesn't work?
         .map((e) => e.id);
       this.updateSortedMessages(events);
     };
@@ -255,15 +243,25 @@ class Feed extends Component {
     this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
   }
 
-  getMessagesByFollows(replies) {
+  getMessagesByFollows(includeReplies) {
+    this.unsub?.();
+    const desc = this.state.settings.sortDirection === 'desc';
     const callback = () => {
       const events = Events.db
         .chain()
-        .simplesort('created_at', { desc: true })
+        .simplesort('created_at', { desc })
         .where((e) => {
-          return SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1;
+          // TODO apply all filters from state.settings
+          if (!(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)) {
+            return false;
+          }
+          if (!includeReplies && e.tags.find((t) => t[0] === 'e')) {
+            return false;
+          }
+          return true;
         })
         .data()
+        .sort((a, b) => (desc ? b.created_at - a.created_at : a.created_at - b.created_at)) // why simplesort doesn't work?
         .map((e) => e.id);
       this.updateSortedMessages(events);
     };
@@ -314,7 +312,7 @@ class Feed extends Component {
     }
     if (!isEqual(prevState.settings, this.state.settings)) {
       this.updateParams(prevState);
-      this.updateSortedMessages(this.state.sortedMessages);
+      this.subscribe();
     }
     this.handleScroll();
     window.history.replaceState({ ...window.history.state, state: this.state }, '');
