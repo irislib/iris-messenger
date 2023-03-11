@@ -8,10 +8,12 @@ import Icons from '../Icons';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
+import PubSub from '../nostr/PubSub';
 import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
 import EventComponent from './events/EventComponent';
+import SocialNetwork from "../nostr/SocialNetwork";
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -240,15 +242,34 @@ class Feed extends Component {
   }
 
   getMessagesByEveryone(replies) {
-    this.unsub = Events.getMessagesByEveryone((messages, cbIncludeReplies) => {
-      this.state.settings.replies === cbIncludeReplies && this.updateSortedMessages(messages);
-    }, replies);
+    // TODO apply filters
+    const callback = () => {
+      const events = Events.db
+        .chain()
+        .simplesort('created_at', { desc: true })
+        .data()
+        .map((e) => e.id);
+      this.updateSortedMessages(events);
+    };
+    callback();
+    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
   }
 
   getMessagesByFollows(replies) {
-    this.unsub = Events.getMessagesByFollows((messages, cbIncludeReplies) => {
-      this.state.settings.replies === cbIncludeReplies && this.updateSortedMessages(messages);
-    }, replies);
+    const callback = () => {
+      const events = Events.db
+        .chain()
+        .simplesort('created_at', { desc: true })
+        .where((e) => {
+          return SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1;
+        })
+        .data()
+        .map((e) => e.id);
+      this.updateSortedMessages(events);
+    };
+
+    callback();
+    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735] }], callback);
   }
 
   updateParams(prevState) {

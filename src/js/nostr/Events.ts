@@ -12,6 +12,7 @@ import Relays from './Relays';
 import Session from './Session';
 import SocialNetwork from './SocialNetwork';
 import SortedLimitedEventSet from './SortedLimitedEventSet';
+import Loki from 'lokijs';
 
 const startTime = Date.now() / 1000;
 
@@ -21,6 +22,11 @@ const MAX_MSGS_BY_KEYWORD = 100;
 const MAX_ZAPS_BY_NOTE = 1000;
 
 const cache = new Map<string, Event>();
+const db = new Loki('iris');
+const events = db.addCollection('events', {
+  indices: ['created_at', 'pubkey'],
+  unique: ['id'],
+});
 
 let mutedNotes;
 localState.get('mutedNotes').on((v) => {
@@ -42,6 +48,7 @@ const Events = {
   MAX_MSGS_BY_KEYWORD,
   getEventHash,
   cache: cache,
+  db: events,
   deletedEvents: new Set<string>(),
   directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
   likesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -67,6 +74,14 @@ const Events = {
   notificationsSeenTime: 0,
   handleNote(event: Event) {
     this.cache.set(event.id, event);
+    const has = this.db.by('id', event.id);
+    if (!has) {
+      try {
+        this.db.insert(event);
+      } catch (e) {
+        console.log('error inserting event', e);
+      }
+    }
     if (!this.postsAndRepliesByUser.has(event.pubkey)) {
       this.postsAndRepliesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
     }
@@ -814,37 +829,6 @@ const Events = {
     };
     callback();
     return PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback);
-  },
-
-  getMessagesByEveryone(
-    cb: (messageIds: string[], includeReplies: boolean) => void,
-    includeReplies = false,
-  ): Unsubscribe {
-    const callback = () => {
-      cb(
-        includeReplies
-          ? this.latestNotesAndRepliesByEveryone.eventIds
-          : this.latestNotesByEveryone.eventIds,
-        includeReplies,
-      );
-    };
-    callback();
-    return PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
-  },
-  getMessagesByFollows(
-    cb: (messageIds: string[], includeReplies: boolean) => void,
-    includeReplies = false,
-  ): Unsubscribe {
-    const callback = () => {
-      cb(
-        includeReplies
-          ? this.latestNotesAndRepliesByFollows.eventIds
-          : this.latestNotesByFollows.eventIds,
-        includeReplies,
-      );
-    };
-    callback();
-    return PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735] }], callback);
   },
   getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void): Unsubscribe {
     const callback = (event) => {
