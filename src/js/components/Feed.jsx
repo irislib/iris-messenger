@@ -35,6 +35,8 @@ const DEFAULT_SETTINGS = {
   display: 'posts',
   realtime: false,
   replies: true,
+  sortBy: 'created_at',
+  sortDirection: 'desc',
 };
 
 class Feed extends Component {
@@ -84,10 +86,11 @@ class Feed extends Component {
       if (this.unmounted || !sortedMessages) {
         return;
       }
+      const settings = this.state.settings;
       // iterate over sortedMessages and add newer than messagesShownTime to queue
       const queuedMessages = [];
       let hasMyMessage;
-      if (!this.state.settings.realtime) {
+      if (settings.sortDirection === 'desc' && !settings.realtime) {
         for (let i = 0; i < sortedMessages.length; i++) {
           const id = sortedMessages[i];
           const message = Events.cache.get(id);
@@ -99,6 +102,28 @@ class Feed extends Component {
             queuedMessages.push(id);
           }
         }
+      }
+      if (!(settings.sortDirection === 'desc' && settings.sortBy === 'created_at')) {
+        // re-sort
+        sortedMessages = sortedMessages.sort((a, b) => {
+          let valA;
+          let valB;
+          if (settings.sortBy === 'likes') {
+            valA = Events.likesByMessageId.get(a)?.size || 0;
+            valB = Events.likesByMessageId.get(b)?.size || 0;
+          } else if (settings.sortBy === 'zaps') {
+            valA = Events.zapsByNote.get(a)?.size || 0;
+            valB = Events.zapsByNote.get(b)?.size || 0;
+          } else {
+            valA = Events.cache.get(a)?.created_at || 0;
+            valB = Events.cache.get(b)?.created_at || 0;
+          }
+          if (settings.sortDirection === 'desc') {
+            return valB - valA;
+          } else {
+            return valA - valB;
+          }
+        });
       }
       if (!hasMyMessage) {
         sortedMessages = sortedMessages.filter((id) => !queuedMessages.includes(id));
@@ -268,6 +293,7 @@ class Feed extends Component {
     }
     if (!isEqual(prevState.settings, this.state.settings)) {
       this.updateParams(prevState);
+      this.updateSortedMessages(this.state.sortedMessages);
     }
     this.handleScroll();
     window.history.replaceState({ ...window.history.state, state: this.state }, '');
@@ -374,6 +400,35 @@ class Feed extends Component {
                   }
                 />
                 <label htmlFor="show_replies">{t('show_replies')}</label>
+              </p>
+              <p>
+                Sort by
+                <select
+                  className="mar-left5"
+                  value={this.state.settings.sortBy}
+                  onChange={(e) =>
+                    this.setState({ settings: { ...this.state.settings, sortBy: e.target.value } })
+                  }
+                >
+                  <option value="created_at">{t('time')}</option>
+                  <option value="likes">{t('likes')}</option>
+                  <option value="zaps">{t('zaps')}</option>
+                </select>
+              </p>
+              <p>
+                Ordering
+                <select
+                  className="mar-left5"
+                  value={this.state.settings.sortDirection}
+                  onChange={(e) =>
+                    this.setState({
+                      settings: { ...this.state.settings, sortDirection: e.target.value },
+                    })
+                  }
+                >
+                  <option value="desc">{t('descending')}</option>
+                  <option value="asc">{t('ascending')}</option>
+                </select>
               </p>
               <p>
                 <Button onClick={() => this.saveSettings()}>{t('save_as_defaults')}</Button>
