@@ -11,6 +11,7 @@ import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
+import {route} from "preact-router";
 const bech32 = require('bech32-buffer');
 
 const nostrLogin = async (event) => {
@@ -94,6 +95,7 @@ class Login extends Component {
     setTimeout(() => {
       // TODO remove setTimeout
       localState.get('loggedIn').put(true);
+      route('/following');
     }, 100);
   }
 

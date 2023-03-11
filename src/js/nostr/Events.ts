@@ -287,7 +287,8 @@ const Events = {
     try {
       this.db.insert(event);
     } catch (e) {
-      console.log('failed to insert event', e);
+      // console.log('failed to insert event', e, typeof e);
+      // suppress error on duplicate insert. lokijs should throw a different error kind?
     }
   },
   handleMetadata(event: Event) {

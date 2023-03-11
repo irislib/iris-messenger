@@ -177,6 +177,7 @@ class Feed extends Component {
   }
 
   subscribe() {
+    // TODO use LokiJS persistent dynamicviews so the result set is not recalculated all the time
     setTimeout(() => {
       this.unsub?.();
       let first = true;
