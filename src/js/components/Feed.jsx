@@ -219,6 +219,26 @@ class Feed extends Component {
     }, 0);
   }
 
+  sort(a, b) {
+    let aVal;
+    let bVal;
+    if (this.state.settings.sortBy === 'created_at') {
+      aVal = a.created_at;
+      bVal = b.created_at;
+    } else if (this.state.settings.sortBy === 'likes') {
+      aVal = Events.likesByMessageId.get(a.id)?.size || 0;
+      bVal = Events.likesByMessageId.get(b.id)?.size || 0;
+    } else if (this.state.settings.sortBy === 'zaps') {
+      aVal = Events.zapsByNote.get(a.id)?.size || 0;
+      bVal = Events.zapsByNote.get(b.id)?.size || 0;
+    }
+    if (this.state.settings.sortDirection === 'desc') {
+      return bVal - aVal;
+    } else {
+      return aVal - bVal;
+    }
+  }
+
   getMessagesByEveryone(includeReplies) {
     this.unsub?.();
     // TODO apply filters
@@ -226,7 +246,6 @@ class Feed extends Component {
     const callback = () => {
       const events = Events.db
         .chain()
-        .simplesort('created_at', { desc })
         .where((e) => {
           // TODO apply all filters from state.settings
           if (!includeReplies && e.tags.find((t) => t[0] === 'e')) {
@@ -235,7 +254,7 @@ class Feed extends Component {
           return true;
         })
         .data()
-        .sort((a, b) => (desc ? b.created_at - a.created_at : a.created_at - b.created_at)) // why simplesort doesn't work?
+        .sort((a, b) => this.sort(a, b)) // why loki simplesort doesn't work?
         .map((e) => e.id);
       this.updateSortedMessages(events);
     };
@@ -249,7 +268,6 @@ class Feed extends Component {
     const callback = () => {
       const events = Events.db
         .chain()
-        .simplesort('created_at', { desc })
         .where((e) => {
           // TODO apply all filters from state.settings
           if (!(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)) {
@@ -261,7 +279,7 @@ class Feed extends Component {
           return true;
         })
         .data()
-        .sort((a, b) => (desc ? b.created_at - a.created_at : a.created_at - b.created_at)) // why simplesort doesn't work?
+        .sort((a, b) => this.sort(a, b)) // why loki simplesort doesn't work?
         .map((e) => e.id);
       this.updateSortedMessages(events);
     };
