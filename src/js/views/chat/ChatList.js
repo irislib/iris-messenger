@@ -18,7 +18,6 @@ class ChatList extends Component {
       sortedChats: [],
     };
   }
-
   enableDesktopNotifications() {
     if (window.Notification) {
       Notification.requestPermission(() => {
@@ -39,9 +38,9 @@ class ChatList extends Component {
         const bEventIds = chats.get(b).eventIds;
         const aLatestEvent = aEventIds.length ? Events.db.by('id', aEventIds[0]) : null;
         const bLatestEvent = bEventIds.length ? Events.db.by('id', bEventIds[0]) : null;
-        if (bLatestEvent.created_at > aLatestEvent.created_at) {
+        if (bLatestEvent?.created_at > aLatestEvent?.created_at) {
           return 1;
-        } else if (bLatestEvent.created_at < aLatestEvent.created_at) {
+        } else if (bLatestEvent?.created_at < aLatestEvent?.created_at) {
           return -1;
         }
         return 0;

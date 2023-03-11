@@ -29,7 +29,6 @@ export default {
   save: throttle((_this) => {
     const events = _this.saveQueue;
     _this.saveQueue = [];
-    console.log('savin', events.length);
     db.events.bulkAdd(events).catch((e) => {
       // lots of "already exists" errors
       // console.error('error saving events', e);
@@ -61,7 +60,6 @@ export default {
           .filter((event) => event.kind === 1)
           .limit(3000)
           .each((event) => {
-            console.log('got event from idb', new Date(event.created_at * 1000).toISOString());
             Events.handle(event, false, false);
           });
       });
