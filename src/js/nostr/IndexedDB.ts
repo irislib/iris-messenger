@@ -5,6 +5,7 @@ import { Event, Filter, matchFilter } from '../lib/nostr-tools';
 import Events from './Events';
 import Key from './Key';
 import SocialNetwork from './SocialNetwork';
+import {throttle} from "lodash";
 export class MyDexie extends Dexie {
   events!: Table<Event & { id: string }>;
 
@@ -21,18 +22,22 @@ const db = new MyDexie();
 export default {
   db,
   subscriptions: new Set<string>(),
+  saveQueue: [] as Event[],
   clear() {
     return db.delete();
   },
+  save: throttle((_this) => {
+    const events = _this.saveQueue;
+    _this.saveQueue = [];
+    console.log('savin', events.length);
+    db.events.bulkAdd(events).catch((e) => {
+      // lots of "already exists" errors
+      // console.error('error saving events', e);
+    });
+  }, 500),
   saveEvent(event: Event & { id: string }) {
-    db.events
-      .add(event)
-      .catch('ConstraintError', () => {
-        // fails if already exists
-      })
-      .catch((e) => {
-        console.error('error saving event', e);
-      });
+    this.saveQueue.push(event);
+    this.save(this);
   },
   init() {
     const myPub = Key.getPubKey();
@@ -64,16 +69,16 @@ export default {
     // other events to be loaded on demand
   },
   subscribe(filters: Filter[]) {
-    const stringifiedFilters = JSON.stringify(filters);
-    if (this.subscriptions.has(stringifiedFilters)) {
-      return;
-    }
-    this.subscriptions.add(stringifiedFilters);
     const filter1 = filters.length === 1 ? filters[0] : undefined;
     let query: any = db.events;
     if (filter1.ids) {
       query = query.where('id').anyOf(filter1.ids);
     } else {
+      const stringifiedFilters = JSON.stringify(filters);
+      if (this.subscriptions.has(stringifiedFilters)) {
+        return;
+      }
+      this.subscriptions.add(stringifiedFilters);
       if (filter1.authors) {
         query = query.where('pubkey').anyOf(filter1.authors);
       }

@@ -266,20 +266,24 @@ class Feed extends Component {
 
   getMessagesByEveryone() {
     this.unsub?.();
+    const settings = this.state.settings;
     // TODO apply filters
+    const dv = Events.db.addDynamicView('everyone');
+    dv.applyFind({ kind: 1 });
+    dv.applyWhere((e) => {
+      if (!settings.replies && e.tags.find((t) => t[0] === 'e')) {
+        return false;
+      }
+      return true;
+    });
+    const simpleSortDesc =
+      settings.sortBy === 'created_at' ? settings.sortDirection === 'desc' : true;
+    dv.applySimpleSort('created_at', { desc: simpleSortDesc });
+    if (settings.sortBy !== 'created_at') {
+      dv.applySort((a, b) => this.sort(a, b));
+    }
     const callback = throttle(() => {
-      const events = Events.db
-        .chain()
-        .find({ kind: 1 })
-        .where((e) => {
-          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
-            return false;
-          }
-          return true;
-        })
-        .data()
-        .sort((a, b) => this.sort(a, b)) // why loki simplesort doesn't work?
-        .map((e) => e.id);
+      const events = dv.data().map((e) => e.id);
       this.updateSortedMessages(events);
     }, 1000);
     callback();
@@ -288,25 +292,29 @@ class Feed extends Component {
 
   getMessagesByFollows() {
     this.unsub?.();
+    const dv = Events.db.addDynamicView('follows');
+    dv.applyFind({ kind: 1 });
+    dv.applyWhere((e) => {
+      const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
+      if (!followDistance || followDistance > 1) {
+        return false;
+      }
+      if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
+        return false;
+      }
+      return true;
+    });
+    const simpleSortDesc =
+      this.state.settings.sortBy === 'created_at'
+        ? this.state.settings.sortDirection === 'desc'
+        : true;
+    dv.applySimpleSort('created_at', { desc: simpleSortDesc });
+    if (this.state.settings.sortBy !== 'created_at') {
+      dv.applySort((a, b) => this.sort(a, b));
+    }
     const callback = throttle(() => {
-      console.log('getMessagesByFollows', Date.now());
       // throttle?
-      const events = Events.db
-        .chain()
-        .find({ kind: 1 })
-        .where((e) => {
-          const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
-          if (!followDistance || followDistance > 1) {
-            return false;
-          }
-          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
-            return false;
-          }
-          return true;
-        })
-        .data()
-        .sort((a, b) => this.sort(a, b)) // why loki simplesort doesn't work?
-        .map((e) => e.id);
+      const events = dv.data().map((e) => e.id);
       this.updateSortedMessages(events);
     }, 1000);
 
