@@ -270,12 +270,6 @@ class Feed extends Component {
     // TODO apply filters
     const dv = Events.db.addDynamicView('everyone');
     dv.applyFind({ kind: 1 });
-    dv.applyWhere((e) => {
-      if (!settings.replies && e.tags.find((t) => t[0] === 'e')) {
-        return false;
-      }
-      return true;
-    });
     const simpleSortDesc =
       settings.sortBy === 'created_at' ? settings.sortDirection === 'desc' : true;
     dv.applySimpleSort('created_at', { desc: simpleSortDesc });
@@ -283,7 +277,14 @@ class Feed extends Component {
       dv.applySort((a, b) => this.sort(a, b));
     }
     const callback = throttle(() => {
-      const events = dv.data().map((e) => e.id);
+      const events = dv
+        .data()
+        .filter((e) => {
+          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
+            return false;
+          }
+        })
+        .map((e) => e.id);
       this.updateSortedMessages(events);
     }, 1000);
     callback();
@@ -299,9 +300,6 @@ class Feed extends Component {
       if (!followDistance || followDistance > 1) {
         return false;
       }
-      if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
-        return false;
-      }
       return true;
     });
     const simpleSortDesc =
@@ -314,7 +312,15 @@ class Feed extends Component {
     }
     const callback = throttle(() => {
       // throttle?
-      const events = dv.data().map((e) => e.id);
+      const events = dv
+        .data()
+        .filter((e) => {
+          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
+            return false;
+          }
+          return true;
+        })
+        .map((e) => e.id);
       this.updateSortedMessages(events);
     }, 1000);
 
