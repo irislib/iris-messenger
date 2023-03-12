@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import { route } from 'preact-router';
 import styled, { css, keyframes } from 'styled-components';
 
 import { Event } from '../../lib/nostr-tools';
 import Key from '../../nostr/Key';
+import Modal from '../modal/Modal';
+import SafeImg from '../SafeImg';
+
+import { translate as t } from '../../translations/Translation';
 
 const fadeIn = keyframes`
   from {
@@ -44,12 +49,9 @@ const GalleryImage = styled.a`
       : 'none'};
 `;
 
-const onClick = (event, noteId) => {
-  event.preventDefault();
-  route('/' + Key.toNostrBech32Address(noteId, 'note'));
-};
-
 export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
+  const [showImageModal, setShowImageModal] = useState(false);
+
   // get first image url from event content
   if (props.event.kind !== 1) {
     console.log('not a note', props.event);
@@ -74,12 +76,31 @@ export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
   // return all images from post
   return (
     <>
-      {attachments.map((attachment) => (
-        <GalleryImage
-          onClick={(e) => onClick(e, props.event.id)}
-          src={attachment.data}
-          fadeIn={props.fadeIn}
-        />
+      {attachments.map((attachment, i) => (
+        <>
+          <GalleryImage
+            key={props.event.id + i}
+            onClick={() => setShowImageModal(true)}
+            src={attachment.data}
+            fadeIn={props.fadeIn}
+          />
+          {showImageModal && (
+            <Modal onClose={() => setShowImageModal(false)}>
+              <SafeImg src={attachment.data} />
+              <p>
+                <a
+                  href=""
+                  onClick={(e) => {
+                    e.preventDefault();
+                    route('/' + Key.toNostrBech32Address(props.event.id, 'note'));
+                  }}
+                >
+                  {t('show_post')}
+                </a>
+              </p>
+            </Modal>
+          )}
+        </>
       ))}
     </>
   );
