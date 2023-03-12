@@ -121,6 +121,15 @@ const Session = {
         unsubFollowers();
       }
     });
+    localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
+      console.log('lastOpenedFeed', lastOpenedFeed);
+      if (lastOpenedFeed) {
+        console.log(1111);
+        setTimeout(() => {
+          route('/' + lastOpenedFeed);
+        }, 100);
+      }
+    });
     setTimeout(() => {
       Relays.subscribe([{ authors: [myPub] }], 'ours', false, 0, true); // our stuff
       Relays.subscribe(

@@ -518,7 +518,7 @@ class Feed extends Component {
                 </select>
               </p>
               <p>
-                <span style="margin-right: 15px">Ordering:</span>
+                <span style="margin-right: 15px">Sort direction:</span>
                 <input
                   type="radio"
                   name="ordering"
