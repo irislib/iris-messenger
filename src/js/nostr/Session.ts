@@ -122,9 +122,7 @@ const Session = {
       }
     });
     localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
-      console.log('lastOpenedFeed', lastOpenedFeed);
       if (lastOpenedFeed) {
-        console.log(1111);
         setTimeout(() => {
           route('/' + lastOpenedFeed);
         }, 100);
