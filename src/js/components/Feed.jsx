@@ -433,7 +433,10 @@ class Feed extends Component {
       <div className="tabs">
         <a
           style={isProfile ? { 'border-radius': '8px 0 0 0' } : {}}
-          onClick={() => localState.get('settings').get('feed').get('display').put('posts')}
+          onClick={() => {
+            this.setState({ settings: { ...this.state.settings, display: 'posts' } }); // faster to do this also
+            localState.get('settings').get('feed').get('display').put('posts');
+          }}
           className={this.state.settings.display === 'grid' ? '' : 'active'}
         >
           {Icons.post}
@@ -441,7 +444,10 @@ class Feed extends Component {
         <a
           style={isProfile ? { 'border-radius': '0 8px 0 0' } : {}}
           className={this.state.settings.display === 'grid' ? 'active' : ''}
-          onClick={() => localState.get('settings').get('feed').get('display').put('grid')}
+          onClick={() => {
+            this.setState({ settings: { ...this.state.settings, display: 'grid' } }); // faster to do this also
+            localState.get('settings').get('feed').get('display').put('grid');
+          }}
         >
           {Icons.image}
         </a>
