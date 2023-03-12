@@ -257,9 +257,10 @@ const Events = {
   },
   insert(event: Event) {
     try {
+      delete event['$loki'];
       this.db.insert(event);
     } catch (e) {
-      // console.log('failed to insert event', e, typeof e);
+      console.log('failed to insert event', e, typeof e);
       // suppress error on duplicate insert. lokijs should throw a different error kind?
     }
   },
@@ -394,13 +395,13 @@ const Events = {
     }
     return true;
   },
-  handle(event: Event, force = false, saveToIdb = true) {
+  handle(event: Event, force = false, saveToIdb = true): boolean {
     if (!event) return;
     if (!force && !!this.db.by('id', event.id)) {
-      return;
+      return false;
     }
     if (!force && !this.acceptEvent(event)) {
-      return;
+      return false;
     }
     // Accepting metadata so we still get their name. But should we instead save the name on our own list?
     // They might spam with 1 MB events and keep changing their name or something.
@@ -429,7 +430,7 @@ const Events = {
     switch (event.kind) {
       case 0:
         if (this.handleMetadata(event) === false) {
-          return;
+          return false;
         }
         break;
       case 1:
@@ -448,7 +449,7 @@ const Events = {
         break;
       case 3:
         if (SocialNetwork.followEventByUser.get(event.pubkey)?.created_at >= event.created_at) {
-          return;
+          return false;
         }
         this.maybeAddNotification(event);
         this.handleFollow(event);
@@ -503,12 +504,13 @@ const Events = {
     // go through subscriptions and callback if filters match
     for (const sub of PubSub.subscriptions.values()) {
       if (!sub.filters) {
-        return;
+        continue;
       }
       if (this.matchFilters(event, sub.filters)) {
         sub.callback && sub.callback(event);
       }
     }
+    return true;
   },
   handleNextFutureEvent() {
     if (this.futureEventIds.size === 0) {

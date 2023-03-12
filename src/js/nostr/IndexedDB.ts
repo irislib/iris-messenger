@@ -1,11 +1,10 @@
 import Dexie, { Table } from 'dexie';
+import { throttle } from 'lodash';
 
 import { Event, Filter, matchFilter } from '../lib/nostr-tools';
 
 import Events from './Events';
 import Key from './Key';
-import SocialNetwork from './SocialNetwork';
-import {throttle} from "lodash";
 export class MyDexie extends Dexie {
   events!: Table<Event & { id: string }>;
 
@@ -58,7 +57,7 @@ export default {
           .orderBy('created_at')
           .reverse()
           .filter((event) => event.kind === 1)
-          .limit(3000)
+          .limit(5000)
           .each((event) => {
             Events.handle(event, false, false);
           });
