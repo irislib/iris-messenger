@@ -4,10 +4,9 @@ import styled, { css, keyframes } from 'styled-components';
 
 import { Event } from '../../lib/nostr-tools';
 import Key from '../../nostr/Key';
+import { translate as t } from '../../translations/Translation';
 import Modal from '../modal/Modal';
 import SafeImg from '../SafeImg';
-
-import { translate as t } from '../../translations/Translation';
 
 const fadeIn = keyframes`
   from {
