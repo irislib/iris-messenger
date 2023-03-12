@@ -75,6 +75,9 @@ class Feed extends Component {
     if (['everyone', 'follows'].includes(this.props?.index)) {
       settings = Object.assign(settings, override);
     }
+    if (this.props?.index !== 'notifications' && override.display) {
+      settings.display = override.display;
+    }
     for (const key in settings) {
       const value = Helpers.getUrlParameter(key);
       if (value !== null) {
@@ -430,7 +433,7 @@ class Feed extends Component {
       <div className="tabs">
         <a
           style={isProfile ? { 'border-radius': '8px 0 0 0' } : {}}
-          onClick={() => this.setState({ settings: { ...this.state.settings, display: 'posts' } })}
+          onClick={() => localState.get('settings').get('feed').get('display').put('posts')}
           className={this.state.settings.display === 'grid' ? '' : 'active'}
         >
           {Icons.post}
@@ -438,7 +441,7 @@ class Feed extends Component {
         <a
           style={isProfile ? { 'border-radius': '0 8px 0 0' } : {}}
           className={this.state.settings.display === 'grid' ? 'active' : ''}
-          onClick={() => this.setState({ settings: { ...this.state.settings, display: 'grid' } })}
+          onClick={() => localState.get('settings').get('feed').get('display').put('grid')}
         >
           {Icons.image}
         </a>
