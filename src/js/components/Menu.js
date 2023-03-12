@@ -29,7 +29,7 @@ export default class Menu extends Component {
   }
 
   menuLinkClicked(e, a) {
-    if (a.text === 'feeds') {
+    if (a?.text === 'feeds') {
       this.handleFeedClick(e);
     }
     localState.get('toggleMenu').put(false);

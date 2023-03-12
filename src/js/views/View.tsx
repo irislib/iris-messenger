@@ -2,6 +2,7 @@ import { debounce } from 'lodash';
 import { createRef } from 'preact';
 
 import Component from '../BaseComponent';
+import ErrorBoundary from '../components/ErrorBoundary';
 import Header from '../components/Header';
 
 let isInitialLoad = true;
@@ -30,7 +31,7 @@ abstract class View extends Component {
           class={`main-view ${this.class}`}
           id={this.id}
         >
-          {this.renderView()}
+          <ErrorBoundary>{this.renderView()}</ErrorBoundary>
         </div>
       </>
     );

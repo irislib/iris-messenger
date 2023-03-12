@@ -23,7 +23,7 @@ const MAX_ZAPS_BY_NOTE = 1000;
 
 const db = new Loki('iris');
 const events = db.addCollection('events', {
-  indices: ['created_at', 'pubkey'],
+  indices: ['created_at', 'pubkey', 'kind'],
   unique: ['id'],
 });
 
@@ -102,34 +102,6 @@ const Events = {
           this.threadRepliesByMessageId.set(id, new Set<string>());
         }
         this.threadRepliesByMessageId.get(id)?.add(event.id);
-      }
-    }
-  },
-  deleteRepostedMsgsFromFeeds(event: Event, feeds: SortedLimitedEventSet[]) {
-    const repostedEventId = this.getRepostedEventId(event);
-    const repostedEvent = this.db.by('id', repostedEventId);
-    // checking that someone isn't hiding posts from feeds with backdated reposts of them
-    if (repostedEvent?.created_at < event.created_at) {
-      const otherReposts = this.repostsByMessageId.get(repostedEventId);
-      for (const feed of feeds) {
-        feed.delete(repostedEventId);
-        if (otherReposts) {
-          for (const repostId of otherReposts) {
-            if (repostId !== event.id) {
-              feed.delete(repostId);
-            }
-          }
-        }
-      }
-    }
-  },
-  deleteRepliedMsgsFromFeeds(event: Event, feeds: SortedLimitedEventSet[]) {
-    const replyingToEventId = this.getNoteReplyingTo(event);
-    const replyingToEvent = this.db.by('id', replyingToEventId);
-    // checking that someone isn't hiding posts from feeds with backdated replies to them
-    if (replyingToEvent?.created_at < event.created_at) {
-      for (const feed of feeds) {
-        feed.delete(replyingToEventId);
       }
     }
   },
@@ -285,9 +257,11 @@ const Events = {
   },
   insert(event: Event) {
     try {
+      delete event['$loki'];
       this.db.insert(event);
     } catch (e) {
-      console.log('failed to insert event', e);
+      console.log('failed to insert event', e, typeof e);
+      // suppress error on duplicate insert. lokijs should throw a different error kind?
     }
   },
   handleMetadata(event: Event) {
@@ -421,13 +395,13 @@ const Events = {
     }
     return true;
   },
-  handle(event: Event, force = false, saveToIdb = true) {
+  handle(event: Event, force = false, saveToIdb = true): boolean {
     if (!event) return;
     if (!force && !!this.db.by('id', event.id)) {
-      return;
+      return false;
     }
     if (!force && !this.acceptEvent(event)) {
-      return;
+      return false;
     }
     // Accepting metadata so we still get their name. But should we instead save the name on our own list?
     // They might spam with 1 MB events and keep changing their name or something.
@@ -456,7 +430,7 @@ const Events = {
     switch (event.kind) {
       case 0:
         if (this.handleMetadata(event) === false) {
-          return;
+          return false;
         }
         break;
       case 1:
@@ -475,7 +449,7 @@ const Events = {
         break;
       case 3:
         if (SocialNetwork.followEventByUser.get(event.pubkey)?.created_at >= event.created_at) {
-          return;
+          return false;
         }
         this.maybeAddNotification(event);
         this.handleFollow(event);
@@ -516,12 +490,12 @@ const Events = {
     // TODO: don't save e.g. old profile & follow events
     // TODO since we're only querying relays since lastSeen, we need to store all beforeseen events and correctly query them on demand
     // otherwise feed will be incomplete
-    const followDistance = SocialNetwork.followDistanceByUser.get(event.pubkey);
     if (saveToIdb) {
+      const followDistance = SocialNetwork.followDistanceByUser.get(event.pubkey);
       if (followDistance <= 1) {
         // save all our own events and events from people we follow
         IndexedDB.saveEvent(event as Event & { id: string });
-      } else if (followDistance <= 4) {
+      } else if (followDistance <= 4 && [0, 3].includes(event.kind)) {
         // save profiles and follow events up to follow distance 4
         IndexedDB.saveEvent(event as Event & { id: string });
       }
@@ -530,12 +504,13 @@ const Events = {
     // go through subscriptions and callback if filters match
     for (const sub of PubSub.subscriptions.values()) {
       if (!sub.filters) {
-        return;
+        continue;
       }
-      if (this.matchesOneFilter(event, sub.filters)) {
+      if (this.matchFilters(event, sub.filters)) {
         sub.callback && sub.callback(event);
       }
     }
+    return true;
   },
   handleNextFutureEvent() {
     if (this.futureEventIds.size === 0) {
@@ -554,7 +529,7 @@ const Events = {
     }, (nextEvent.created_at - Date.now() / 1000) * 1000);
   },
   // if one of the filters matches, return true
-  matchesOneFilter(event: Event, filters: Filter[]) {
+  matchFilters(event: Event, filters: Filter[]) {
     for (const filter of filters) {
       if (this.matchFilter(event, filter)) {
         return true;

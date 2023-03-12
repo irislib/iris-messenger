@@ -14,6 +14,7 @@ import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
 import EventComponent from './events/EventComponent';
+import ErrorBoundary from './ErrorBoundary';
 
 const INITIAL_PAGE_SIZE = 20;
 
@@ -122,7 +123,7 @@ class Feed extends Component {
     if (this.state.displayCount < this.state.sortedMessages.length) {
       if (
         this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
-        this.props.scrollElement.scrollHeight - 500
+        this.props.scrollElement.scrollHeight - 1000
       ) {
         this.setState({ displayCount: this.state.displayCount + INITIAL_PAGE_SIZE });
       }
@@ -176,6 +177,7 @@ class Feed extends Component {
   }
 
   subscribe() {
+    // TODO use LokiJS persistent dynamicviews so the result set is not recalculated all the time
     setTimeout(() => {
       this.unsub?.();
       let first = true;
@@ -218,6 +220,9 @@ class Feed extends Component {
   sort(a, b) {
     let aVal;
     let bVal;
+    if (!a || !b) return 0;
+    if (a && !b) return -1;
+    if (!a && b) return 1;
     if (this.state.settings.sortBy === 'created_at') {
       aVal = a.created_at;
       bVal = b.created_at;
@@ -238,12 +243,11 @@ class Feed extends Component {
   getPostsAndRepliesByUser(pubkey, includeReplies) {
     this.unsub?.();
     // TODO apply filters
-    const desc = this.state.settings.sortDirection === 'desc';
     const callback = () => {
       // throttle?
       const events = Events.db
         .chain()
-        .find({ pubkey })
+        .find({ pubkey, kind: 1 })
         .where((e) => {
           // TODO apply all filters from state.settings
           if (!includeReplies && e.tags.find((t) => t[0] === 'e')) {
@@ -257,58 +261,65 @@ class Feed extends Component {
       this.updateSortedMessages(events);
     };
     callback();
-    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
+    this.unsub = PubSub.subscribe([{ kinds: [1, 5, 7], authors: [pubkey] }], callback);
   }
 
   getMessagesByEveryone() {
     this.unsub?.();
+    const settings = this.state.settings;
     // TODO apply filters
-    const desc = this.state.settings.sortDirection === 'desc';
-    const callback = () => {
-      // throttle?
-      const events = Events.db
-        .chain()
-        .where((e) => {
-          // TODO apply all filters from state.settings
-          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
-            return false;
-          }
-          return true;
-        })
-        .data()
-        .sort((a, b) => this.sort(a, b)) // why loki simplesort doesn't work?
-        .map((e) => e.id);
+    const dv = Events.db.addDynamicView('everyone');
+    dv.applyFind({ kind: 1 });
+    dv.applyWhere((e) => {
+      if (!settings.replies && e.tags.find((t) => t[0] === 'e')) {
+        return false;
+      }
+      return true;
+    });
+    const simpleSortDesc =
+      settings.sortBy === 'created_at' ? settings.sortDirection === 'desc' : true;
+    dv.applySimpleSort('created_at', { desc: simpleSortDesc });
+    if (settings.sortBy !== 'created_at') {
+      dv.applySort((a, b) => this.sort(a, b));
+    }
+    const callback = throttle(() => {
+      const events = dv.data().map((e) => e.id);
       this.updateSortedMessages(events);
-    };
+    }, 1000);
     callback();
     this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735], limit: 100 }], callback, 'global');
   }
 
   getMessagesByFollows() {
     this.unsub?.();
-    const desc = this.state.settings.sortDirection === 'desc';
-    const callback = () => {
+    const dv = Events.db.addDynamicView('follows');
+    dv.applyFind({ kind: 1 });
+    dv.applyWhere((e) => {
+      const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
+      if (!followDistance || followDistance > 1) {
+        return false;
+      }
+      if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
+        return false;
+      }
+      return true;
+    });
+    const simpleSortDesc =
+      this.state.settings.sortBy === 'created_at'
+        ? this.state.settings.sortDirection === 'desc'
+        : true;
+    dv.applySimpleSort('created_at', { desc: simpleSortDesc });
+    if (this.state.settings.sortBy !== 'created_at') {
+      dv.applySort((a, b) => this.sort(a, b));
+    }
+    const callback = throttle(() => {
       // throttle?
-      const events = Events.db
-        .chain()
-        .where((e) => {
-          // TODO apply all filters from state.settings
-          if (!(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)) {
-            return false;
-          }
-          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
-            return false;
-          }
-          return true;
-        })
-        .data()
-        .sort((a, b) => this.sort(a, b)) // why loki simplesort doesn't work?
-        .map((e) => e.id);
+      const events = dv.data().map((e) => e.id);
       this.updateSortedMessages(events);
-    };
+    }, 1000);
 
     callback();
-    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735] }], callback);
+    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 7, 9735] }], callback, 'global');
   }
 
   updateParams(prevState) {
@@ -319,7 +330,7 @@ class Feed extends Component {
       } else {
         url.searchParams.delete('display');
       }
-      window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
+      this.replaceState();
     }
     if (prevState.settings.replies !== this.state.settings.replies) {
       const url = new URL(window.location);
@@ -328,7 +339,7 @@ class Feed extends Component {
       } else {
         url.searchParams.delete('replies');
       }
-      window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
+      this.replaceState();
     }
     if (prevState.settings.realtime !== this.state.settings.realtime) {
       const url = new URL(window.location);
@@ -337,9 +348,17 @@ class Feed extends Component {
       } else {
         url.searchParams.delete('realtime');
       }
-      window.history.replaceState({ ...window.history.state, state: this.state }, '', url);
+      this.replaceState();
     }
   }
+
+  replaceState = throttle(
+    () => {
+      window.history.replaceState({ ...window.history.state, state: this.state }, '');
+    },
+    1000,
+    { leading: true, trailing: true },
+  );
 
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.scrollElement && this.props.scrollElement) {
@@ -356,7 +375,7 @@ class Feed extends Component {
       this.subscribe();
     }
     this.handleScroll();
-    window.history.replaceState({ ...window.history.state, state: this.state }, '');
+    this.replaceState();
     if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
       Helpers.animateScrollTop('.main-view');
     }
@@ -544,9 +563,8 @@ class Feed extends Component {
       }[this.props.index];
 
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
-    const messages = this.state.sortedMessages
-      .slice(0, displayCount)
-      .map((id) => (
+    const messages = this.state.sortedMessages.slice(0, displayCount).map((id) => (
+      <ErrorBoundary>
         <EventComponent
           notification={this.props.index === 'notifications'}
           key={id}
@@ -555,7 +573,8 @@ class Feed extends Component {
           renderAs={renderAs}
           feedOpenedAt={this.openedAt}
         />
-      ));
+      </ErrorBoundary>
+    ));
     return (
       <div className="msg-feed">
         <div>
