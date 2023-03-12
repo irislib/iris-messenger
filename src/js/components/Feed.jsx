@@ -283,6 +283,7 @@ class Feed extends Component {
           if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
             return false;
           }
+          return true;
         })
         .map((e) => e.id);
       this.updateSortedMessages(events);
