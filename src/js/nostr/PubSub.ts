@@ -25,7 +25,7 @@ type Unsubscribe = () => void;
 let subscriptionId = 0;
 
 /**
- * Iris (mostly) internal Subscriptions.
+ * Iris (mostly) internal Subscriptions. Juggle between LokiJS (memory), IndexedDB, http proxy and Relays.
  *
  * TODO:
  * 1) Only subscribe to what is needed for current view, unsubscribe on unmount

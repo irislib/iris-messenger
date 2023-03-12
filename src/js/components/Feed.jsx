@@ -174,15 +174,18 @@ class Feed extends Component {
   componentDidMount() {
     this.addScrollHandler();
     this.subscribe();
-    localState
-      .get('settings')
-      .get('feed')
-      .on(
-        this.sub((s) => {
-          const settings = this.getSettings(s);
-          this.setState({ settings });
-        }),
-      );
+    if (isEqual(this.state.settings, DEFAULT_SETTINGS)) {
+      // no settings saved in history state, load from localstorage
+      localState
+        .get('settings')
+        .get('feed')
+        .on(
+          this.sub((s) => {
+            const settings = this.getSettings(s);
+            this.setState({ settings });
+          }),
+        );
+    }
   }
 
   subscribe() {

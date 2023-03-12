@@ -2653,6 +2653,18 @@ input[type='text'] {
   .public-messages-view .msg .msg .msg-content {
     border-radius: 8px;
   }
+
+  .public-messages-view .img-container img {
+    object-fit: contain;
+  }
+
+  .msg-content iframe,
+  .msg-content video,
+  .message-form video,
+  .public-messages-view video,
+  .public-messages-view .img-container {
+    height: 300px;
+  }
 }
 
 @media (min-width: 626px) {
