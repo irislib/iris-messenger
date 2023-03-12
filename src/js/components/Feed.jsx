@@ -40,6 +40,15 @@ const DEFAULT_SETTINGS = {
   replies: true,
   sortBy: 'created_at',
   sortDirection: 'desc',
+  timespan: 'all',
+};
+
+const TIMESPANS = {
+  all: 0,
+  day: 24 * 60 * 60,
+  week: 7 * 24 * 60 * 60,
+  month: 30 * 24 * 60 * 60,
+  year: 365 * 24 * 60 * 60,
 };
 
 class Feed extends Component {
@@ -277,11 +286,17 @@ class Feed extends Component {
       dv.applySort((a, b) => this.sort(a, b));
     }
     const callback = throttle(() => {
+      const since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
       const events = dv
         .data()
         .filter((e) => {
           if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
             return false;
+          }
+          if (this.state.settings.timespan !== 'all') {
+            if (e.created_at < since) {
+              return false;
+            }
           }
           return true;
         })
@@ -313,11 +328,17 @@ class Feed extends Component {
     }
     const callback = throttle(() => {
       // throttle?
+      const since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
       const events = dv
         .data()
         .filter((e) => {
           if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
             return false;
+          }
+          if (this.state.settings.timespan !== 'all') {
+            if (e.created_at < since) {
+              return false;
+            }
           }
           return true;
         })
@@ -371,13 +392,8 @@ class Feed extends Component {
     if (!prevProps.scrollElement && this.props.scrollElement) {
       this.addScrollHandler();
     }
-    if (prevState.settings.replies !== this.state.settings.replies) {
-      this.subscribe();
-    }
-    if (prevState.settings.display !== this.state.settings.display) {
-      this.setState({ displayCount: INITIAL_PAGE_SIZE });
-    }
     if (!isEqual(prevState.settings, this.state.settings)) {
+      this.setState({ displayCount: INITIAL_PAGE_SIZE });
       this.updateParams(prevState);
       this.subscribe();
     }
@@ -514,6 +530,24 @@ class Feed extends Component {
                 >
                   <option value="desc">{t('descending')}</option>
                   <option value="asc">{t('ascending')}</option>
+                </select>
+              </p>
+              <p>
+                Timespan
+                <select
+                  className="mar-left5"
+                  value={this.state.settings.timespan}
+                  onChange={(e) =>
+                    this.setState({
+                      settings: { ...this.state.settings, timespan: e.target.value },
+                    })
+                  }
+                >
+                  <option value="all">{t('all_time')}</option>
+                  <option value="day">{t('last_day')}</option>
+                  <option value="week">{t('last_week')}</option>
+                  <option value="month">{t('last_month')}</option>
+                  <option value="year">{t('last_year')}</option>
                 </select>
               </p>
               <p>
