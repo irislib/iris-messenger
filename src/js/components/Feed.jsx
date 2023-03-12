@@ -518,19 +518,29 @@ class Feed extends Component {
                 </select>
               </p>
               <p>
-                Ordering
-                <select
-                  className="mar-left5"
-                  value={this.state.settings.sortDirection}
-                  onChange={(e) =>
-                    this.setState({
-                      settings: { ...this.state.settings, sortDirection: e.target.value },
-                    })
+                <span style="margin-right: 15px">Ordering:</span>
+                <input
+                  type="radio"
+                  name="ordering"
+                  value="desc"
+                  id="ordering_desc"
+                  checked={this.state.settings.sortDirection === 'desc'}
+                  onChange={() =>
+                    this.setState({ settings: { ...this.state.settings, sortDirection: 'desc' } })
                   }
-                >
-                  <option value="desc">{t('descending')}</option>
-                  <option value="asc">{t('ascending')}</option>
-                </select>
+                />
+                <label style="margin-right: 30px" htmlFor="ordering_desc">▼</label>
+                <input
+                  type="radio"
+                  name="ordering"
+                  value="asc"
+                  id="ordering_asc"
+                  checked={this.state.settings.sortDirection === 'asc'}
+                  onChange={() =>
+                    this.setState({ settings: { ...this.state.settings, sortDirection: 'asc' } })
+                  }
+                />
+                <label htmlFor="ordering_asc">▲</label>
               </p>
               <p>
                 Timespan
