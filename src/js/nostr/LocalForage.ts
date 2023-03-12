@@ -35,13 +35,13 @@ const getLatestByEveryone = () => {
 export default {
   loaded: false,
   saveEvents: throttle(() => {
-    const latestMsgs = getLatestByFollows().data().slice(0, 100);
-    const latestMsgsByEveryone = getLatestByEveryone().data().slice(0, 100);
+    const latestMsgs = getLatestByFollows().data().slice(0, 50);
+    const latestMsgsByEveryone = getLatestByEveryone().data().slice(0, 50);
     const notifications = Events.notifications.eventIds
       .map((eventId: any) => {
         return Events.db.by('id', eventId);
       })
-      .slice(0, 100);
+      .slice(0, 50);
     let dms = [];
     for (const set of Events.directMessagesByUser.values()) {
       set.eventIds.forEach((eventId: any) => {
@@ -49,7 +49,7 @@ export default {
       });
     }
     dms = dms.slice(0, 100);
-    const kvEvents = Array.from(Events.keyValueEvents.values()).slice(0, 100);
+    const kvEvents = Array.from(Events.keyValueEvents.values()).slice(0, 50);
 
     localForage.setItem('latestMsgs', latestMsgs);
     localForage.setItem('latestMsgsByEveryone', latestMsgsByEveryone);
@@ -91,8 +91,8 @@ export default {
     );
      */
 
-    localForage.setItem('profileEvents', profileEvents.slice(0, 100));
-    localForage.setItem('followEvents', followEvents2.slice(0, 100));
+    localForage.setItem('profileEvents', profileEvents.slice(0, 50));
+    localForage.setItem('followEvents', followEvents2.slice(0, 50));
   }, 5000),
 
   loadEvents: async function () {
