@@ -121,13 +121,15 @@ const Session = {
         unsubFollowers();
       }
     });
-    localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
-      if (lastOpenedFeed) {
-        setTimeout(() => {
-          route('/' + lastOpenedFeed);
-        }, 100);
-      }
-    });
+    if (window.location.pathname === '/') {
+      localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
+        if (lastOpenedFeed) {
+          setTimeout(() => {
+            route('/' + lastOpenedFeed);
+          }, 100);
+        }
+      });
+    }
     setTimeout(() => {
       Relays.subscribe([{ authors: [myPub] }], 'ours', false, 0, true); // our stuff
       Relays.subscribe(
