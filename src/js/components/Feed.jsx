@@ -8,7 +8,7 @@ import Icons from '../Icons';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
-import PubSub, { Unsubscribe } from '../nostr/PubSub';
+import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 import SortedLimitedEventSet from '../nostr/SortedLimitedEventSet';
 import { translate as t } from '../translations/Translation';
@@ -328,7 +328,6 @@ class Feed extends Component {
 
   getMessages() {
     this.unsub?.();
-    const settings = this.state.settings;
     const dv = Events.db.addDynamicView('messages', { persist: true });
     dv.applyFind({ kind: { $between: [1, 6] } });
     dv.applyWhere((e) => {
@@ -338,18 +337,20 @@ class Feed extends Component {
       return true;
     });
     const simpleSortDesc =
-      settings.sortBy === 'created_at' ? settings.sortDirection === 'desc' : true;
+      this.state.settings.sortBy === 'created_at'
+        ? this.state.settings.sortDirection === 'desc'
+        : true;
     dv.applySimpleSort('created_at', { desc: simpleSortDesc });
-    if (settings.sortBy !== 'created_at') {
+    if (this.state.settings.sortBy !== 'created_at') {
       dv.applySort((a, b) => this.sort(a, b));
     }
     const callback = throttle(() => {
-      const since = Math.floor(Date.now() / 1000) - TIMESPANS[settings.timespan];
+      const since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
       const events = dv
         .data()
         .filter((e) => {
           const maxFollowDistance =
-            settings.maxFollowDistance || this.props.index === 'follows' ? 1 : 0;
+            this.state.settings.maxFollowDistance || this.props.index === 'follows' ? 1 : 0;
           if (maxFollowDistance) {
             const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
             if (!followDistance || followDistance > maxFollowDistance) {
@@ -359,10 +360,10 @@ class Feed extends Component {
           if (SocialNetwork.blockedUsers.has(e.pubkey)) {
             return false;
           }
-          if (!settings.replies && e.tags.find((t) => t[0] === 'e')) {
+          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
             return false;
           }
-          if (settings.timespan !== 'all') {
+          if (this.state.settings.timespan !== 'all') {
             if (e.created_at < since) {
               return false;
             }
