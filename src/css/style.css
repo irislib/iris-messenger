@@ -272,8 +272,8 @@ input {
 
 img,
 video {
-  max-width: 100%;
-  max-height: 90vh;
+  max-width: 95vw;
+  max-height: 95vh;
 }
 
 .mar-left5 {
@@ -1757,8 +1757,6 @@ a.msgSenderName:hover .user-name {
 }
 
 .attachment-preview img {
-  max-height: 90vh;
-  max-width: 100%;
   display: block;
   margin-bottom: 15px;
   user-select: none;
