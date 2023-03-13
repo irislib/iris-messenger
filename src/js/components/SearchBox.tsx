@@ -3,9 +3,9 @@ import isEqual from 'lodash/isEqual';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
+import FuzzySearch from '../FuzzySearch';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import FuzzySearch from '../FuzzySearch';
 import { translate as t } from '../translations/Translation';
 
 import Identicon from './Identicon';
