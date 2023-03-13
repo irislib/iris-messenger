@@ -2611,12 +2611,11 @@ input[type='text'] {
     padding-right: 15px;
   }
   .chat-message-form {
-    max-height: 50px;
-    padding: 0 0 env(safe-area-inset-bottom);
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    max-height: calc(50px + env(safe-area-inset-bottom));
   }
   .chat-message-form form {
     align-items: center;
-    height: 50px;
   }
   .chat-message-form input {
     padding: 8px 15px;
