@@ -356,6 +356,9 @@ class Feed extends Component {
               return false;
             }
           }
+          if (SocialNetwork.blockedUsers.has(e.pubkey)) {
+            return false;
+          }
           if (!settings.replies && e.tags.find((t) => t[0] === 'e')) {
             return false;
           }
