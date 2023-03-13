@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  iris-messenger:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/iris-messenger
+    ports:
+      - 8080:8080
