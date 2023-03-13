@@ -252,7 +252,7 @@ class Feed extends Component {
     }
     dv.applyFind(find);
     dv.applyWhere((e) => {
-      if (![1, 7].includes(e.kind)) {
+      if (![1, 6, 7].includes(e.kind)) {
         return false;
       }
       if (this.props.keyword && !e.content.includes(this.props.keyword)) {
