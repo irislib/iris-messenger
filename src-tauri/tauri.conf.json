@@ -51,7 +51,7 @@
       "csp": null
     },
     "updater": {
-      "active": true,
+      "active": false,
       "endpoints": [
         "https://gist.githubusercontent.com/mmalmi/d0debd2083fe19656060dbbf8c8fd172/raw/iris-tauri.json"
       ],
