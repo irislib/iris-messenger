@@ -25,6 +25,8 @@ const events = db.addCollection('events', {
   unique: ['id'],
 });
 
+// TODO collections for Tags and Users?
+
 let mutedNotes;
 localState.get('mutedNotes').on((v) => {
   mutedNotes = v;
@@ -752,6 +754,13 @@ const Events = {
     this.directMessagesByUser.has(address) && callback();
     const myPub = Key.getPubKey();
     return PubSub.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
+  },
+  getDirectMessages(cb) {
+    const callback = () => {
+      cb?.(this.directMessagesByUser);
+    };
+    callback();
+    return PubSub.subscribe([{ kinds: [4], '#p': [Key.getPubKey()] }], callback);
   },
 };
 

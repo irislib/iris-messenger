@@ -223,14 +223,6 @@ class Feed extends Component {
     return PubSub.subscribe([filter], callback);
   }
 
-  getDirectMessages(cb) {
-    const callback = () => {
-      cb?.(this.directMessagesByUser);
-    };
-    callback();
-    return PubSub.subscribe([{ kinds: [4], '#p': [Key.getPubKey()] }], callback);
-  }
-
   subscribe() {
     setTimeout(() => {
       this.unsub?.();
