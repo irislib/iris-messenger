@@ -201,33 +201,11 @@ class Feed extends Component {
     return PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback);
   }
 
-  getMessagesByKeyword(keyword, cb) {
-    const callback = (event) => {
-      if (!Events.latestNotesByKeywords.has(keyword)) {
-        Events.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
-      }
-      Events.latestNotesByKeywords.get(keyword)?.add(event);
-      cb(Events.latestNotesByKeywords.get(keyword)?.eventIds);
-    };
-    // find among cached events
-    const filter = { kinds: [1], keywords: [keyword] };
-    const filterFn = (e) => e.kind === 1 && e.content.includes(keyword);
-    for (const event of this.db.chain().where(filterFn).data()) {
-      if (!Events.latestNotesByKeywords.has(keyword)) {
-        Events.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
-      }
-      Events.latestNotesByKeywords.get(keyword)?.add(event);
-    }
-    Events.latestNotesByKeywords.has(keyword) &&
-      cb(Events.latestNotesByKeywords.get(keyword)?.eventIds);
-    return PubSub.subscribe([filter], callback);
-  }
-
   subscribe() {
     setTimeout(() => {
       this.unsub?.();
       let first = true;
-      if (this.props.nostrUser) {
+      if (this.props.nostrUser || this.props.keyword) {
         this.getMessages();
       } else {
         localState.get('scrollUp').on(
@@ -236,12 +214,7 @@ class Feed extends Component {
             first = false;
           }),
         );
-        if (this.props.keyword) {
-          const keyword = this.props.keyword;
-          this.getMessagesByKeyword(this.props.keyword, (messages) => {
-            if (this.props.keyword == keyword) this.updateSortedMessages(messages);
-          });
-        } else if (this.props.index) {
+        if (this.props.index) {
           // public messages
           if (['everyone', 'follows'].includes(this.props.index)) {
             this.getMessages();
@@ -289,6 +262,9 @@ class Feed extends Component {
     dv.applyFind(find);
     dv.applyWhere((e) => {
       if (![1, 7].includes(e.kind)) {
+        return false;
+      }
+      if (this.props.keyword && !e.content.includes(this.props.keyword)) {
         return false;
       }
       return true;
@@ -348,6 +324,12 @@ class Feed extends Component {
         [{ authors: [this.props.nostrUser], kinds: [1, 3, 5, 6, 7] }],
         callback,
         'user',
+      );
+    } else if (this.props.keyword) {
+      this.unsub = PubSub.subscribe(
+        [{ keywords: [this.props.keyword], kinds: [1] }],
+        callback,
+        'keyword',
       );
     } else {
       this.unsub = PubSub.subscribe(

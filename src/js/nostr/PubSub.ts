@@ -24,6 +24,8 @@ type Unsubscribe = () => void;
 
 let subscriptionId = 0;
 
+const MAX_MSGS_BY_KEYWORD = 1000;
+
 /**
  * Iris (mostly) internal Subscriptions. Juggle between LokiJS (memory), IndexedDB, http proxy and Relays.
  *
@@ -109,7 +111,7 @@ const PubSub = {
         [
           {
             kinds: [1],
-            limit: Events.MAX_MSGS_BY_KEYWORD,
+            limit: MAX_MSGS_BY_KEYWORD,
             keywords: Array.from(PubSub.subscribedKeywords),
           },
         ],
