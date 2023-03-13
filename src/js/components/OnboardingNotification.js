@@ -68,30 +68,7 @@ export default class OnboardingNotification extends Component {
   }
 
   renderGetIrisAddress() {
-    if (this.state.existingIrisToAddress) {
-      console.log('existingIrisToAddress', this.state.existingIrisToAddress);
-      return html`
-        <div>
-          <p className="positive">
-            Username iris.to/<b>${this.state.existingIrisToAddress.name}</b> is reserved for you
-            until 12 March 2023!
-          </p>
-          <p>
-            <${Button}
-              onClick=${() => {
-                IrisTo.enableReserved(this.state.existingIrisToAddress.name);
-                route('/settings/iris_account');
-              }}
-              >Yes please<//
-            >
-            <${Button}
-              onClick=${() => IrisTo.declineReserved(this.state.existingIrisToAddress.name)}
-              >No thanks<//
-            >
-          </p>
-        </div>
-      `;
-    } else {
+    if (!this.state.existingIrisToAddress) {
       return html`
         <div>
           <p>Get your own iris.to/username?</p>
