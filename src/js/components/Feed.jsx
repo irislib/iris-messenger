@@ -192,7 +192,6 @@ class Feed extends Component {
   }
 
   subscribe() {
-    // TODO use LokiJS persistent dynamicviews so the result set is not recalculated all the time
     setTimeout(() => {
       this.unsub?.();
       let first = true;
@@ -220,12 +219,10 @@ class Feed extends Component {
           });
         } else if (this.props.index) {
           // public messages
-          if (this.props.index === 'everyone') {
+          if (['everyone', 'follows'].includes(this.props.index)) {
             this.getMessages();
           } else if (this.props.index === 'notifications') {
             this.unsub = Events.getNotifications((messages) => this.updateSortedMessages(messages));
-          } else if (this.props.index === 'follows') {
-            this.getMessages();
           }
         }
       }
@@ -264,7 +261,6 @@ class Feed extends Component {
         .chain()
         .find({ pubkey, kind: { $between: [1, 6] } })
         .where((e) => {
-          // TODO apply all filters from state.settings
           if (![1, 6].includes(e.kind)) {
             return false;
           }
