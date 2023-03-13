@@ -32,6 +32,7 @@ export default class Notifications extends View {
 
   componentDidMount() {
     this.restoreScrollPosition();
+    this.updateNotificationsLastOpened();
   }
 
   renderView() {
