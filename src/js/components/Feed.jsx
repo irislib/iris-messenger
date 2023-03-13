@@ -242,6 +242,7 @@ class Feed extends Component {
   }
 
   getMessages() {
+    // TODO only Pubsub.subscribe() here, move all LokiJS & Dexie & Relay query logic there
     const dv = Events.db.addDynamicView('messages', { persist: true });
     const find = { kind: { $between: [1, 6] } };
     if (this.props.nostrUser) {
