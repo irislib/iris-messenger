@@ -221,11 +221,11 @@ class Feed extends Component {
         } else if (this.props.index) {
           // public messages
           if (this.props.index === 'everyone') {
-            this.getMessagesByEveryone();
+            this.getMessages();
           } else if (this.props.index === 'notifications') {
             this.unsub = Events.getNotifications((messages) => this.updateSortedMessages(messages));
           } else if (this.props.index === 'follows') {
-            this.getMessagesByFollows();
+            this.getMessages();
           }
         }
       }
@@ -282,11 +282,10 @@ class Feed extends Component {
     this.unsub = PubSub.subscribe([{ kinds: [1, 5, 6, 7], authors: [pubkey] }], callback);
   }
 
-  getMessagesByEveryone() {
+  getMessages() {
     this.unsub?.();
     const settings = this.state.settings;
-    // TODO apply filters
-    const dv = Events.db.addDynamicView('everyone');
+    const dv = Events.db.addDynamicView('messages', { persist: true });
     dv.applyFind({ kind: { $between: [1, 6] } });
     dv.applyWhere((e) => {
       if (![1, 6].includes(e.kind)) {
@@ -301,14 +300,22 @@ class Feed extends Component {
       dv.applySort((a, b) => this.sort(a, b));
     }
     const callback = throttle(() => {
-      const since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
+      const since = Math.floor(Date.now() / 1000) - TIMESPANS[settings.timespan];
       const events = dv
         .data()
         .filter((e) => {
-          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
+          const maxFollowDistance =
+            settings.maxFollowDistance || this.props.index === 'follows' ? 1 : 0;
+          if (maxFollowDistance) {
+            const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
+            if (!followDistance || followDistance > maxFollowDistance) {
+              return false;
+            }
+          }
+          if (!settings.replies && e.tags.find((t) => t[0] === 'e')) {
             return false;
           }
-          if (this.state.settings.timespan !== 'all') {
+          if (settings.timespan !== 'all') {
             if (e.created_at < since) {
               return false;
             }
@@ -319,53 +326,11 @@ class Feed extends Component {
       this.updateSortedMessages(events);
     }, 1000);
     callback();
-    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 6, 7, 9735], limit: 100 }], callback, 'global');
-  }
-
-  getMessagesByFollows() {
-    this.unsub?.();
-    const dv = Events.db.addDynamicView('follows');
-    dv.applyFind({ kind: { $between: [1, 6] } });
-    dv.applyWhere((e) => {
-      const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
-      if (![1, 6].includes(e.kind)) {
-        return false;
-      }
-      if (!followDistance || followDistance > 1) {
-        return false;
-      }
-      return true;
-    });
-    const simpleSortDesc =
-      this.state.settings.sortBy === 'created_at'
-        ? this.state.settings.sortDirection === 'desc'
-        : true;
-    dv.applySimpleSort('created_at', { desc: simpleSortDesc });
-    if (this.state.settings.sortBy !== 'created_at') {
-      dv.applySort((a, b) => this.sort(a, b));
-    }
-    const callback = throttle(() => {
-      // throttle?
-      const since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
-      const events = dv
-        .data()
-        .filter((e) => {
-          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
-            return false;
-          }
-          if (this.state.settings.timespan !== 'all') {
-            if (e.created_at < since) {
-              return false;
-            }
-          }
-          return true;
-        })
-        .map((e) => e.id);
-      this.updateSortedMessages(events);
-    }, 1000);
-
-    callback();
-    this.unsub = PubSub.subscribe([{ kinds: [1, 3, 5, 6, 7, 9735] }], callback, 'global');
+    this.unsub = PubSub.subscribe(
+      [{ kinds: [1, 3, 5, 6, 7, 9735], limit: 100 }],
+      callback,
+      'global',
+    );
   }
 
   updateParams(prevState) {

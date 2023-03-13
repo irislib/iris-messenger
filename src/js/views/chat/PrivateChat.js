@@ -60,6 +60,9 @@ export default class PrivateChat extends Component {
 
   componentDidMount() {
     const hexId = Key.toNostrHexAddress(this.props.id);
+    if (!hexId) {
+      console.error('no id');
+    }
     this.unsub = Relays.subscribe(
       [{ kinds: [4], '#p': [Key.getPubKey()], authors: [hexId] }],
       'privateChat',
