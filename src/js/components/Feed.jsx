@@ -191,6 +191,12 @@ class Feed extends Component {
           }),
         );
     }
+    let first = true;
+    localState.get('scrollUp').on(
+      this.sub(() => {
+        !first && Helpers.animateScrollTop('.main-view');
+        first = false;
+      }));
   }
 
   getNotifications(cb) {
@@ -204,24 +210,11 @@ class Feed extends Component {
   subscribe() {
     setTimeout(() => {
       this.unsub?.();
-      let first = true;
-      if (this.props.nostrUser || this.props.keyword) {
-        this.getMessages();
+      if (this.props.index === 'notifications') {
+        // TODO notifications from LokiJS index
+        this.unsub = this.getNotifications((messages) => this.updateSortedMessages(messages));
       } else {
-        localState.get('scrollUp').on(
-          this.sub(() => {
-            !first && Helpers.animateScrollTop('.main-view');
-            first = false;
-          }),
-        );
-        if (this.props.index) {
-          // public messages
-          if (['everyone', 'follows'].includes(this.props.index)) {
-            this.getMessages();
-          } else if (this.props.index === 'notifications') {
-            this.unsub = this.getNotifications((messages) => this.updateSortedMessages(messages));
-          }
-        }
+        this.unsub = this.getMessages();
       }
     }, 0);
   }
@@ -250,7 +243,6 @@ class Feed extends Component {
   }
 
   getMessages() {
-    this.unsub?.();
     const dv = Events.db.addDynamicView('messages', { persist: true });
     const find = { kind: { $between: [1, 6] } };
     if (this.props.nostrUser) {
