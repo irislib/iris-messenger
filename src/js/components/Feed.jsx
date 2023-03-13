@@ -10,7 +10,6 @@ import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
-import SortedLimitedEventSet from '../nostr/SortedLimitedEventSet';
 import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
@@ -18,7 +17,6 @@ import EventComponent from './events/EventComponent';
 import ErrorBoundary from './ErrorBoundary';
 
 const INITIAL_PAGE_SIZE = 20;
-const MAX_MSGS_BY_KEYWORD = 100;
 
 let isInitialLoad = true;
 const listener = function () {
@@ -196,7 +194,8 @@ class Feed extends Component {
       this.sub(() => {
         !first && Helpers.animateScrollTop('.main-view');
         first = false;
-      }));
+      }),
+    );
   }
 
   getNotifications(cb) {
@@ -538,6 +537,9 @@ class Feed extends Component {
                 </p>
               </div>
             ))}
+            <p>
+              <Button onClick={() => this.saveSettings()}>{t('save_as_defaults')}</Button>
+            </p>
           </div>
         </div>
       </div>
