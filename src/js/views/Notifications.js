@@ -4,7 +4,6 @@ import { createRef } from 'preact';
 
 import Feed from '../components/Feed';
 import localState from '../LocalState';
-import Events from '../nostr/Events';
 import Session from '../nostr/Session';
 import { translate as t } from '../translations/Translation';
 

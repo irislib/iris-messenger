@@ -223,14 +223,6 @@ class Feed extends Component {
     return PubSub.subscribe([filter], callback);
   }
 
-  getLikesByUser(address, cb) {
-    const callback = () => {
-      cb?.(Events.likesByUser.get(address)?.eventIds);
-    };
-    Events.likesByUser.has(address) && callback();
-    return PubSub.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
-  }
-
   getDirectMessages(cb) {
     const callback = () => {
       cb?.(this.directMessagesByUser);
@@ -244,13 +236,7 @@ class Feed extends Component {
       this.unsub?.();
       let first = true;
       if (this.props.nostrUser) {
-        if (['posts', 'postsAndReplies'].includes(this.props.index)) {
-          this.getMessages();
-        } else if (this.props.index === 'likes') {
-          this.getLikesByUser(this.props.nostrUser, (eventIds) => {
-            this.updateSortedMessages(eventIds);
-          });
-        }
+        this.getMessages();
       } else {
         localState.get('scrollUp').on(
           this.sub(() => {
@@ -298,42 +284,19 @@ class Feed extends Component {
     }
   }
 
-  getPostsAndRepliesByUser(pubkey, includeReplies) {
-    this.unsub?.();
-    // TODO apply filters
-    const callback = () => {
-      // throttle?
-      const events = Events.db
-        .chain()
-        .find({ pubkey, kind: { $between: [1, 6] } })
-        .where((e) => {
-          if (![1, 6].includes(e.kind)) {
-            return false;
-          }
-          if (!includeReplies && e.tags.find((t) => t[0] === 'e')) {
-            return false;
-          }
-          return true;
-        })
-        .data()
-        .sort((a, b) => this.sort(a, b)) // why loki simplesort doesn't work?
-        .map((e) => e.id);
-      this.updateSortedMessages(events);
-    };
-    callback();
-    this.unsub = PubSub.subscribe([{ kinds: [1, 5, 6, 7], authors: [pubkey] }], callback);
-  }
-
   getMessages() {
     this.unsub?.();
     const dv = Events.db.addDynamicView('messages', { persist: true });
     const find = { kind: { $between: [1, 6] } };
     if (this.props.nostrUser) {
       find.pubkey = this.props.nostrUser;
+      if (this.props.index === 'likes') {
+        find.kind = 7;
+      }
     }
     dv.applyFind(find);
     dv.applyWhere((e) => {
-      if (![1, 6].includes(e.kind)) {
+      if (![1, 7].includes(e.kind)) {
         return false;
       }
       return true;
@@ -378,15 +341,29 @@ class Feed extends Component {
           }
           return true;
         })
-        .map((e) => e.id);
+        .map((e) => {
+          if (this.props.index === 'likes') {
+            return e.tags.find((t) => t[0] === 'e')?.[1];
+          } else {
+            return e.id;
+          }
+        });
       this.updateSortedMessages(events);
     }, 1000);
     callback();
-    this.unsub = PubSub.subscribe(
-      [{ kinds: [1, 3, 5, 6, 7, 9735], limit: 100 }],
-      callback,
-      'global',
-    );
+    if (this.props.nostrUser) {
+      this.unsub = PubSub.subscribe(
+        [{ authors: [this.props.nostrUser], kinds: [1, 3, 5, 6, 7] }],
+        callback,
+        'user',
+      );
+    } else {
+      this.unsub = PubSub.subscribe(
+        [{ kinds: [1, 3, 5, 6, 7, 9735], limit: 100 }],
+        callback,
+        'global',
+      );
+    }
   }
 
   updateParams(prevState) {

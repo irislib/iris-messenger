@@ -28,7 +28,7 @@ export default {
   save: throttle((_this) => {
     const events = _this.saveQueue;
     _this.saveQueue = [];
-    db.events.bulkAdd(events).catch((e) => {
+    db.events.bulkAdd(events).catch(() => {
       // lots of "already exists" errors
       // console.error('error saving events', e);
     });

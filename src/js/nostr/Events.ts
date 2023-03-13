@@ -16,7 +16,6 @@ import SortedLimitedEventSet from './SortedLimitedEventSet';
 
 const startTime = Date.now() / 1000;
 
-const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
 const MAX_ZAPS_BY_NOTE = 1000;
 
@@ -47,7 +46,6 @@ const Events = {
   db: events,
   deletedEvents: new Set<string>(),
   directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
-  likesByUser: new Map<string, SortedLimitedEventSet>(),
   latestNotificationByTargetAndKind: new Map<string, string>(),
   notifications: new SortedLimitedEventSet(MAX_LATEST_MSGS),
   zapsByNote: new Map<string, SortedLimitedEventSet>(),
@@ -154,15 +152,7 @@ const Events = {
       this.likesByMessageId.set(id, new Set());
     }
     this.likesByMessageId.get(id).add(event.pubkey);
-
-    if (!this.likesByUser.has(event.pubkey)) {
-      this.likesByUser.set(event.pubkey, new SortedLimitedEventSet(MAX_MSGS_BY_USER));
-    }
-    this.likesByUser.get(event.pubkey).add({ id, created_at: event.created_at });
-    const myPub = Key.getPubKey();
-    if (event.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(event.pubkey)) {
-      //Events.getEventById(id);
-    }
+    this.insert(event);
   },
   handleFollow(event: Event) {
     const existing = SocialNetwork.followEventByUser.get(event.pubkey);
