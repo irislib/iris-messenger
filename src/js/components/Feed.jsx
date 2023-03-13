@@ -8,8 +8,9 @@ import Icons from '../Icons';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
-import PubSub from '../nostr/PubSub';
+import PubSub, { Unsubscribe } from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
+import SortedLimitedEventSet from '../nostr/SortedLimitedEventSet';
 import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
@@ -17,6 +18,7 @@ import EventComponent from './events/EventComponent';
 import ErrorBoundary from './ErrorBoundary';
 
 const INITIAL_PAGE_SIZE = 20;
+const MAX_MSGS_BY_KEYWORD = 100;
 
 let isInitialLoad = true;
 const listener = function () {
@@ -191,6 +193,52 @@ class Feed extends Component {
     }
   }
 
+  getNotifications(cb) {
+    const callback = () => {
+      cb?.(Events.notifications.eventIds);
+    };
+    callback();
+    return PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback);
+  }
+
+  getMessagesByKeyword(keyword, cb) {
+    const callback = (event) => {
+      if (!Events.latestNotesByKeywords.has(keyword)) {
+        Events.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+      }
+      Events.latestNotesByKeywords.get(keyword)?.add(event);
+      cb(Events.latestNotesByKeywords.get(keyword)?.eventIds);
+    };
+    // find among cached events
+    const filter = { kinds: [1], keywords: [keyword] };
+    const filterFn = (e) => e.kind === 1 && e.content.includes(keyword);
+    for (const event of this.db.chain().where(filterFn).data()) {
+      if (!Events.latestNotesByKeywords.has(keyword)) {
+        Events.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
+      }
+      Events.latestNotesByKeywords.get(keyword)?.add(event);
+    }
+    Events.latestNotesByKeywords.has(keyword) &&
+      cb(Events.latestNotesByKeywords.get(keyword)?.eventIds);
+    return PubSub.subscribe([filter], callback);
+  }
+
+  getLikesByUser(address, cb) {
+    const callback = () => {
+      cb?.(Events.likesByUser.get(address)?.eventIds);
+    };
+    Events.likesByUser.has(address) && callback();
+    return PubSub.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
+  }
+
+  getDirectMessages(cb) {
+    const callback = () => {
+      cb?.(this.directMessagesByUser);
+    };
+    callback();
+    return PubSub.subscribe([{ kinds: [4], '#p': [Key.getPubKey()] }], callback);
+  }
+
   subscribe() {
     setTimeout(() => {
       this.unsub?.();
@@ -199,7 +247,7 @@ class Feed extends Component {
         if (this.props.index === 'postsAndReplies') {
           this.getPostsAndRepliesByUser(this.props.nostrUser, true);
         } else if (this.props.index === 'likes') {
-          Events.getLikesByUser(this.props.nostrUser, (eventIds) => {
+          this.getLikesByUser(this.props.nostrUser, (eventIds) => {
             this.updateSortedMessages(eventIds);
           });
         } else if (this.props.index === 'posts') {
@@ -214,7 +262,7 @@ class Feed extends Component {
         );
         if (this.props.keyword) {
           const keyword = this.props.keyword;
-          Events.getMessagesByKeyword(this.props.keyword, (messages) => {
+          this.getMessagesByKeyword(this.props.keyword, (messages) => {
             if (this.props.keyword == keyword) this.updateSortedMessages(messages);
           });
         } else if (this.props.index) {
@@ -222,7 +270,7 @@ class Feed extends Component {
           if (['everyone', 'follows'].includes(this.props.index)) {
             this.getMessages();
           } else if (this.props.index === 'notifications') {
-            this.unsub = Events.getNotifications((messages) => this.updateSortedMessages(messages));
+            this.unsub = this.getNotifications((messages) => this.updateSortedMessages(messages));
           }
         }
       }
@@ -642,6 +690,13 @@ class Feed extends Component {
           ) : null}
           {this.props.index !== 'notifications' && this.state.settingsOpen && this.renderSettings()}
           {this.props.index !== 'notifications' && this.renderFeedTypeSelector()}
+          {messages.length === 0 && (
+            <div className="msg">
+              <div className="msg-content notification-msg">
+                {this.props.emptyMessage || t('no_events_yet')}
+              </div>
+            </div>
+          )}
           {renderAs === 'NoteImage' ? <ImageGrid>{messages}</ImageGrid> : messages}
         </div>
         {displayCount < this.state.sortedMessages.length ? this.renderShowMore() : ''}

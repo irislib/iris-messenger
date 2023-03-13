@@ -18,7 +18,6 @@ const startTime = Date.now() / 1000;
 
 const MAX_MSGS_BY_USER = 500;
 const MAX_LATEST_MSGS = 500;
-const MAX_MSGS_BY_KEYWORD = 100;
 const MAX_ZAPS_BY_NOTE = 1000;
 
 const db = new Loki('iris');
@@ -44,7 +43,6 @@ localState.get('globalFilter').on((r) => {
 // TODO separate files for different types of events
 const Events = {
   DEFAULT_GLOBAL_FILTER,
-  MAX_MSGS_BY_KEYWORD,
   getEventHash,
   db: events,
   deletedEvents: new Set<string>(),
@@ -757,50 +755,6 @@ const Events = {
       askWs();
     }
   },
-  getNotifications: function (cb?: (notifications: string[]) => void): Unsubscribe {
-    const callback = () => {
-      cb?.(this.notifications.eventIds);
-    };
-    callback();
-    return PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback);
-  },
-  getMessagesByKeyword(keyword: string, cb: (messageIds: string[]) => void): Unsubscribe {
-    const callback = (event) => {
-      if (!this.latestNotesByKeywords.has(keyword)) {
-        this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
-      }
-      this.latestNotesByKeywords.get(keyword)?.add(event);
-      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
-    };
-    // find among cached events
-    const filter = { kinds: [1], keywords: [keyword] };
-    const filterFn = (e) => e.kind === 1 && e.content.includes(keyword);
-    for (const event of this.db.chain().where(filterFn).data()) {
-      if (!this.latestNotesByKeywords.has(keyword)) {
-        this.latestNotesByKeywords.set(keyword, new SortedLimitedEventSet(MAX_MSGS_BY_KEYWORD));
-      }
-      this.latestNotesByKeywords.get(keyword)?.add(event);
-    }
-    this.latestNotesByKeywords.has(keyword) &&
-      cb(this.latestNotesByKeywords.get(keyword)?.eventIds);
-    return PubSub.subscribe([filter], callback);
-  },
-  getLikesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
-    const callback = () => {
-      cb?.(this.likesByUser.get(address)?.eventIds);
-    };
-    this.likesByUser.has(address) && callback();
-    return PubSub.subscribe([{ kinds: [7, 5], authors: [address] }], callback);
-  },
-
-  getDirectMessages(cb?: (dms: Map<string, SortedLimitedEventSet>) => void): Unsubscribe {
-    const callback = () => {
-      cb?.(this.directMessagesByUser);
-    };
-    callback();
-    return PubSub.subscribe([{ kinds: [4], '#p': [Key.getPubKey()] }], callback);
-  },
-
   getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
     const callback = () => {
       cb?.(this.directMessagesByUser.get(address)?.eventIds);

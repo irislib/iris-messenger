@@ -32,25 +32,16 @@ export default class Notifications extends View {
 
   componentDidMount() {
     this.restoreScrollPosition();
-    Events.getNotifications((notifications) => {
-      const hasNotifications = notifications.length > 0;
-      if (hasNotifications && this.ref.current) {
-        this.updateNotificationsLastOpened();
-      }
-      this.setState({ hasNotifications });
-    });
   }
 
   renderView() {
     return html`
       <div ref=${this.ref} class="centered-container">
-        ${this.state.hasNotifications
-          ? html``
-          : html`<p class="mobile-padding15">${t('no_notifications_yet')}</p> `}
         <${Feed}
           scrollElement=${this.scrollElement.current}
           key="notifications"
           index="notifications"
+          emptyMessage=${t('no_notifications_yet')}
         />
       </div>
     `;
