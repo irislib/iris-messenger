@@ -53,6 +53,7 @@ export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
 
   // get first image url from event content
   if (props.event.kind !== 1) {
+    // TODO handle kind 6 repost
     console.log('not a note', props.event);
     return null;
   }

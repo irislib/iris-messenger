@@ -244,14 +244,12 @@ class Feed extends Component {
       this.unsub?.();
       let first = true;
       if (this.props.nostrUser) {
-        if (this.props.index === 'postsAndReplies') {
-          this.getPostsAndRepliesByUser(this.props.nostrUser, true);
+        if (['posts', 'postsAndReplies'].includes(this.props.index)) {
+          this.getMessages();
         } else if (this.props.index === 'likes') {
           this.getLikesByUser(this.props.nostrUser, (eventIds) => {
             this.updateSortedMessages(eventIds);
           });
-        } else if (this.props.index === 'posts') {
-          this.getPostsAndRepliesByUser(this.props.nostrUser, false);
         }
       } else {
         localState.get('scrollUp').on(
@@ -329,7 +327,11 @@ class Feed extends Component {
   getMessages() {
     this.unsub?.();
     const dv = Events.db.addDynamicView('messages', { persist: true });
-    dv.applyFind({ kind: { $between: [1, 6] } });
+    const find = { kind: { $between: [1, 6] } };
+    if (this.props.nostrUser) {
+      find.pubkey = this.props.nostrUser;
+    }
+    dv.applyFind(find);
     dv.applyWhere((e) => {
       if (![1, 6].includes(e.kind)) {
         return false;
@@ -346,6 +348,12 @@ class Feed extends Component {
     }
     const callback = throttle(() => {
       const since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
+      let includeReplies = true;
+      if (['everyone', 'follows'].includes(this.props.index)) {
+        includeReplies = this.state.settings.replies;
+      } else if (['posts', 'postsAndReplies'].includes(this.props.index)) {
+        includeReplies = this.props.index === 'postsAndReplies';
+      }
       const events = dv
         .data()
         .filter((e) => {
@@ -360,7 +368,7 @@ class Feed extends Component {
           if (SocialNetwork.blockedUsers.has(e.pubkey)) {
             return false;
           }
-          if (!this.state.settings.replies && e.tags.find((t) => t[0] === 'e')) {
+          if (e.kind === 1 && !includeReplies && Events.getEventReplyingTo(e)) {
             return false;
           }
           if (this.state.settings.timespan !== 'all') {
