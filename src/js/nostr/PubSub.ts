@@ -4,7 +4,6 @@ import { debounce, throttle } from 'lodash';
 import Helpers from '../Helpers';
 import { Event, Filter, Sub } from '../lib/nostr-tools';
 
-import Events from './Events';
 //import IndexedDB from './IndexedDB';
 import Key from './Key';
 import Relays from './Relays';

@@ -5,7 +5,7 @@ import { route } from 'preact-router';
 import Component from '../BaseComponent';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import SearchIndex from '../SearchIndex';
+import FuzzySearch from '../FuzzySearch';
 import { translate as t } from '../translations/Translation';
 
 import Identicon from './Identicon';
@@ -192,7 +192,7 @@ class SearchBox extends Component<Props, State> {
     }
 
     if (query) {
-      const results = SearchIndex.search(query).slice(0, RESULTS_MAX);
+      const results = FuzzySearch.search(query).slice(0, RESULTS_MAX);
       this.setState({ results, query });
     } else {
       this.setState({ results: [], query });

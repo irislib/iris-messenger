@@ -1,9 +1,9 @@
 import { debounce } from 'lodash';
 import Loki from 'lokijs';
 
+import FuzzySearch from '../FuzzySearch';
 import { Event, Filter, getEventHash } from '../lib/nostr-tools';
 import localState from '../LocalState';
-import SearchIndex from '../SearchIndex';
 
 import IndexedDB from './IndexedDB';
 import Key from './Key';
@@ -270,7 +270,7 @@ const Events = {
       delete profile['nip05valid']; // not robust
       SocialNetwork.profiles.set(event.pubkey, profile);
       const key = Key.toNostrBech32Address(event.pubkey, 'npub');
-      SearchIndex.add({
+      FuzzySearch.add({
         key,
         name: profile.name,
         display_name: profile.display_name,

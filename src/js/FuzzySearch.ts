@@ -14,7 +14,7 @@ const notifyUpdate = _.throttle(() => {
   localState.get('searchIndexUpdated').put(true);
 }, 2000);
 
-const SearchIndex = {
+const FuzzySearch = {
   index: new Fuse([], options),
   keys: new Set<string>(),
   add(doc: any) {
@@ -35,4 +35,4 @@ const SearchIndex = {
   },
 };
 
-export default SearchIndex;
+export default FuzzySearch;
