@@ -465,208 +465,113 @@ class Feed extends Component {
     );
   }
 
-  /*
-  instead of renderFeedSelector() and renderFeedTypeSelector() let's do renderSettings()
-  it contains all filters and display settings like state.settings.display, state.settings.realtime, state.settings.replies
-   */
   renderSettings() {
+    const inputs = [
+      {
+        type: 'checkbox',
+        id: 'display_realtime',
+        checked: this.state.settings.realtime,
+        label: t('realtime'),
+        onChange: () =>
+          this.setState({
+            settings: { ...this.state.settings, realtime: !this.state.settings.realtime },
+          }),
+      },
+      {
+        type: 'checkbox',
+        id: 'show_replies',
+        checked: this.state.settings.replies,
+        name: 'replies',
+        label: t('show_replies'),
+        onChange: () =>
+          this.setState({
+            settings: { ...this.state.settings, replies: !this.state.settings.replies },
+          }),
+      },
+    ];
+
+    const radioGroups = [
+      {
+        label: t('display'),
+        name: 'display',
+        inputs: [
+          { value: 'posts', id: 'display_posts', label: t('posts') },
+          { value: 'grid', id: 'display_grid', label: t('grid') },
+        ],
+        checked: this.state.settings.display,
+        onChange: (e) =>
+          this.setState({ settings: { ...this.state.settings, display: e.target.value } }),
+      },
+      {
+        label: t('sort_by'),
+        name: 'sortBy',
+        inputs: [
+          { value: 'created_at', id: 'sortByTime', label: t('time') },
+          { value: 'likes', id: 'sortByLikes', label: t('likes') },
+          { value: 'zaps', id: 'sortByZaps', label: t('zaps') },
+        ],
+        checked: this.state.settings.sortBy,
+        onChange: (e) =>
+          this.setState({ settings: { ...this.state.settings, sortBy: e.target.value } }),
+      },
+      {
+        label: t('sort_direction'),
+        name: 'ordering',
+        inputs: [
+          { value: 'desc', id: 'ordering_desc', label: '▼' },
+          { value: 'asc', id: 'ordering_asc', label: '▲' },
+        ],
+        checked: this.state.settings.sortDirection,
+        onChange: (e) =>
+          this.setState({ settings: { ...this.state.settings, sortDirection: e.target.value } }),
+      },
+      {
+        label: t('timespan'),
+        name: 'timespan',
+        inputs: [
+          { value: 'all', id: 'timespanAll', label: t('All time') },
+          { value: 'day', id: 'timespanDay', label: t('day') },
+          { value: 'week', id: 'timespanWeek', label: t('week') },
+          { value: 'month', id: 'timespanMonth', label: t('month') },
+          { value: 'year', id: 'timespanYear', label: t('year') },
+        ],
+        checked: this.state.settings.timespan,
+        onChange: (e) =>
+          this.setState({ settings: { ...this.state.settings, timespan: e.target.value } }),
+      },
+    ];
     return (
       <div className="msg">
         <div className="msg-content">
           <div style="display:flex;flex-direction:column">
-            <div style="flex-direction: column">
-              <p>
-                <input
-                  type="checkbox"
-                  id="display_realtime"
-                  checked={this.state.settings.realtime}
-                  onChange={() =>
-                    this.setState({
-                      settings: { ...this.state.settings, realtime: !this.state.settings.realtime },
-                    })
-                  }
-                />
-                <label htmlFor="display_realtime">{t('realtime')}</label>
-                <input
-                  type="checkbox"
-                  checked={this.state.settings.replies}
-                  name="replies"
-                  id="show_replies"
-                  onChange={() =>
-                    this.setState({
-                      settings: { ...this.state.settings, replies: !this.state.settings.replies },
-                    })
-                  }
-                />
-                <label htmlFor="show_replies">{t('show_replies')}</label>
-              </p>
-              <p>{t('display')}:</p>
-              <p>
-                <input
-                  type="radio"
-                  name="display"
-                  value="posts"
-                  id="display_posts"
-                  checked={this.state.settings.display === 'posts'}
-                  onChange={() =>
-                    this.setState({ settings: { ...this.state.settings, display: 'posts' } })
-                  }
-                />
-                <label htmlFor="display_posts">{t('posts')}</label>
-                <input
-                  type="radio"
-                  name="display"
-                  id="display_grid"
-                  value="grid"
-                  checked={this.state.settings.display === 'grid'}
-                  onChange={() =>
-                    this.setState({ settings: { ...this.state.settings, display: 'grid' } })
-                  }
-                />
-                <label htmlFor="display_grid">{t('grid')}</label>
-              </p>
-              <p>{t('sort_by')}:</p>
-              <p>
-                <input
-                  type="radio"
-                  name="sortBy"
-                  value="created_at"
-                  id="sortByTime"
-                  checked={this.state.settings.sortBy === 'created_at'}
-                  onChange={(e) =>
-                    this.setState({
-                      settings: { ...this.state.settings, sortBy: e.target.value },
-                    })
-                  }
-                />
-                <label for="sortByTime">{t('time')}</label>
-                <input
-                  type="radio"
-                  name="sortBy"
-                  value="likes"
-                  id="sortByLikes"
-                  checked={this.state.settings.sortBy === 'likes'}
-                  onChange={(e) =>
-                    this.setState({
-                      settings: { ...this.state.settings, sortBy: e.target.value },
-                    })
-                  }
-                />
-                <label for="sortByLikes">{t('likes')}</label>
-                <input
-                  type="radio"
-                  name="sortBy"
-                  value="zaps"
-                  id="sortByZaps"
-                  checked={this.state.settings.sortBy === 'zaps'}
-                  onChange={(e) =>
-                    this.setState({
-                      settings: { ...this.state.settings, sortBy: e.target.value },
-                    })
-                  }
-                />
-                <label for="sortByZaps">{t('zaps')}</label>
-              </p>
-              <p>{t('sort_direction')}:</p>
-              <p>
-                <input
-                  type="radio"
-                  name="ordering"
-                  value="desc"
-                  id="ordering_desc"
-                  checked={this.state.settings.sortDirection === 'desc'}
-                  onChange={() =>
-                    this.setState({ settings: { ...this.state.settings, sortDirection: 'desc' } })
-                  }
-                />
-                <label style="margin-right: 30px" htmlFor="ordering_desc">
-                  ▼
-                </label>
-                <input
-                  type="radio"
-                  name="ordering"
-                  value="asc"
-                  id="ordering_asc"
-                  checked={this.state.settings.sortDirection === 'asc'}
-                  onChange={() =>
-                    this.setState({ settings: { ...this.state.settings, sortDirection: 'asc' } })
-                  }
-                />
-                <label htmlFor="ordering_asc">▲</label>
-              </p>
-              <p>{t('Timespan')}:</p>
-              <p>
-                <input
-                  type="radio"
-                  name="timespan"
-                  value="all"
-                  id="timespanAll"
-                  checked={this.state.settings.timespan === 'all'}
-                  onChange={(e) =>
-                    this.setState({
-                      settings: { ...this.state.settings, timespan: e.target.value },
-                    })
-                  }
-                />
-                <label htmlFor="timespanAll">{t('All time')}</label>
-                <input
-                  type="radio"
-                  name="timespan"
-                  value="day"
-                  id="timespanDay"
-                  checked={this.state.settings.timespan === 'day'}
-                  onChange={(e) =>
-                    this.setState({
-                      settings: { ...this.state.settings, timespan: e.target.value },
-                    })
-                  }
-                />
-                <label htmlFor="timespanDay">{t('day')}</label>
-                <input
-                  type="radio"
-                  name="timespan"
-                  value="week"
-                  id="timespanWeek"
-                  checked={this.state.settings.timespan === 'week'}
-                  onChange={(e) =>
-                    this.setState({
-                      settings: { ...this.state.settings, timespan: e.target.value },
-                    })
-                  }
-                />
-                <label htmlFor="timespanWeek">{t('week')}</label>
-                <input
-                  type="radio"
-                  name="timespan"
-                  value="month"
-                  id="timespanMonth"
-                  checked={this.state.settings.timespan === 'month'}
-                  onChange={(e) =>
-                    this.setState({
-                      settings: { ...this.state.settings, timespan: e.target.value },
-                    })
-                  }
-                />
-                <label htmlFor="timespanMonth">{t('month')}</label>
-                <input
-                  type="radio"
-                  name="timespan"
-                  value="year"
-                  id="timespanYear"
-                  checked={this.state.settings.timespan === 'year'}
-                  onChange={(e) =>
-                    this.setState({
-                      settings: { ...this.state.settings, timespan: e.target.value },
-                    })
-                  }
-                />
-                <label htmlFor="timespanYear">{t('year')}</label>
-              </p>
-
-              <p>
-                <Button onClick={() => this.saveSettings()}>{t('save_as_defaults')}</Button>
-              </p>
+            <div>
+              {inputs.map((input, i) => (
+                <span key={i}>
+                  <input {...input} />
+                  <label htmlFor={input.id}>{input.label}</label>
+                </span>
+              ))}
             </div>
+            {radioGroups.map((group, i) => (
+              <div key={i} style={{ flexDirection: 'column' }}>
+                <p>{group.label}:</p>
+                <p>
+                  {group.inputs.map((input, j) => (
+                    <span key={j}>
+                      <input
+                        type="radio"
+                        name={group.name}
+                        id={input.id}
+                        value={input.value}
+                        checked={group.checked === input.value}
+                        onChange={group.onChange}
+                      />
+                      <label htmlFor={input.id}>{input.label}</label>
+                    </span>
+                  ))}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

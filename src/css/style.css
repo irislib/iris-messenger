@@ -474,7 +474,7 @@ a.logo img:not(:last-child) {
   top: 0;
   bottom: 0;
   width: 20px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' width='28.931px' height='28.932px' viewBox='0 0 28.931 28.932' style='enable-background:new 0 0 28.931 28.932;' xml:space='preserve'%3E%3Cpath fill='%23ccc' d='M23.7,22.5L18.2,17h-0.1c3.7-4.3,3.1-10.8-1.2-14.5S6.1-0.7,2.4,3.6s-3.1,10.8,1.2,14.5c3.8,3.3,9.5,3.3,13.3,0 c0,0,0,0,0,0.1l5.6,5.6c0.3,0.3,0.9,0.3,1.2,0c0,0,0,0,0,0C24.1,23.5,24.1,22.9,23.7,22.5C23.8,22.6,23.8,22.6,23.7,22.5z M10.3,18.9c-4.7,0-8.6-3.8-8.6-8.6s3.8-8.6,8.6-8.6s8.6,3.8,8.6,8.6S15,18.9,10.3,18.9z'/%3E%3C/svg%3E")
+  background: url("data:image/svg+xml,%3Csvg x='0px' y='0px' width='28.931px' height='28.932px' viewBox='0 0 28.931 28.932' style='enable-background:new 0 0 28.931 28.932;' xml:space='preserve'%3E%3Cpath fill='%23ccc' d='M23.7,22.5L18.2,17h-0.1c3.7-4.3,3.1-10.8-1.2-14.5S6.1-0.7,2.4,3.6s-3.1,10.8,1.2,14.5c3.8,3.3,9.5,3.3,13.3,0 c0,0,0,0,0,0.1l5.6,5.6c0.3,0.3,0.9,0.3,1.2,0c0,0,0,0,0,0C24.1,23.5,24.1,22.9,23.7,22.5C23.8,22.6,23.8,22.6,23.7,22.5z M10.3,18.9c-4.7,0-8.6-3.8-8.6-8.6s3.8-8.6,8.6-8.6s8.6,3.8,8.6,8.6S15,18.9,10.3,18.9z'/%3E%3C/svg%3E")
     center / contain no-repeat;
 }
 
