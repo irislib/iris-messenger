@@ -1,4 +1,3 @@
-import { Event } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
 import Events from './Events';
@@ -20,9 +19,7 @@ export default {
   ],
   followDistanceByUser: new Map<string, number>(),
   usersByFollowDistance: new Map<number, Set<string>>(),
-  profileEventByUser: new Map<string, Event>(), // TODO use Events.db instead
-  followEventByUser: new Map<string, Event>(), // TODO use Events.db instead
-  profiles: new Map<string, any>(),
+  profiles: new Map<string, any>(), // JSON.parsed event.content of profiles
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),
   blockedUsers: new Set<string>(),
@@ -41,7 +38,7 @@ export default {
       }
     });
 
-    const existing = this.followEventByUser.get(myPub);
+    const existing = Events.db.findOne({ kind: 3, pubkey: myPub });
 
     const event = {
       kind: 3,

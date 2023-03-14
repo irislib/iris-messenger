@@ -63,9 +63,9 @@ export default {
 
   saveProfilesAndFollows: debounce(() => {
     // TODO follow distance 1 profileEvents
-    const profileEvents = Array.from(SocialNetwork.profileEventByUser.values());
+    const profileEvents = Array.from(Events.db.find({ kind: 0 }));
     const myPub = Key.getPubKey();
-    const followEvents = Array.from(SocialNetwork.followEventByUser.values()).filter((e: Event) => {
+    const followEvents = Array.from(Events.db.find({ kind: 3 })).filter((e: Event) => {
       return e.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(e.pubkey);
     });
     const followEvents2 = [];

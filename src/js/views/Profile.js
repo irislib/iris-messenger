@@ -17,11 +17,11 @@ import ProfilePicture from '../components/ProfilePicture';
 import QrCode from '../components/QrCode';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
+import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
-import Events from '../nostr/Events';
 
 import View from './View';
 

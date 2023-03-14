@@ -6,7 +6,6 @@ import localState from '../LocalState';
 import Events from './Events';
 import Key from './Key';
 import PubSub from './PubSub';
-import SocialNetwork from './SocialNetwork';
 
 type SavedRelays = {
   [key: string]: {
@@ -171,7 +170,7 @@ export default {
     for (const url of this.relays.keys()) {
       relaysObj[url] = { read: true, write: true };
     }
-    const existing = SocialNetwork.followEventByUser.get(Key.getPubKey());
+    const existing = Events.db.findOne({ kind: 3, pubkey: Key.getPubKey() });
     const content = JSON.stringify(relaysObj);
 
     const event = {

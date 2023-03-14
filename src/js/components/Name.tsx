@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import AnimalName from '../AnimalName';
+import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 
@@ -22,7 +23,7 @@ const Name = (props: Props) => {
   let initialName = '';
   let initialDisplayName;
   let isGenerated = false;
-  const profileEvent = SocialNetwork.profileEventByUser.get(nostrAddr);
+  const profileEvent = Events.db.find({ kind: 0, pubkey: nostrAddr });
   // should we change SocialNetwork.getProfile() and use it here?
   if (profileEvent) {
     try {
