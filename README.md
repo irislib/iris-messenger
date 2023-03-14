@@ -64,6 +64,8 @@ npm run test
 
 [iris.to](https://iris.to) production version is in the [stable](https://github.com/irislib/iris-messenger/tree/stable) branch.
 
+### Docker
+
 Alternatively, you can run the dev environment on Docker: `docker-compose up`. The dev build with autoreload will be available at http://localhost:8080.
 
 ### Tauri (desktop app)
@@ -101,6 +103,8 @@ npm run tauri build
 [iris.to](https://iris.to) production version is in the [production](https://github.com/irislib/iris-messenger/tree/production) branch.
 
 Master branch is deployed to [beta.iris.to](https://beta.iris.to).
+
+Tauri [desktop releases](https://github.com/irislib/iris-messenger/releases) are built from the `release` branch by GitHub CI.
 
 ## Privacy
 
