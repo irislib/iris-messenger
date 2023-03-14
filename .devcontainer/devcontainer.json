@@ -1,14 +1,6 @@
 {
   "name": "Docker Compose",
-  "image": "mcr.microsoft.com/vscode/devcontainers/dockerfile:0-ubuntu-18.04",
-  "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash",
-    "remote.containers.dockerComposeFile": "docker-compose.yml",
-    "remote.containers.showDevContainersNodeInCommands": false
-  },
-  "extensions": [
-    "ms-vscode-remote.remote-containers"
-  ],
-  "appPort": [8080],
-  "postCreateCommand": "docker-compose up -d"
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "iris-messenger",
+  "appPort": [8080]
 }
