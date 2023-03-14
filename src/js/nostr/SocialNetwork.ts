@@ -20,8 +20,8 @@ export default {
   ],
   followDistanceByUser: new Map<string, number>(),
   usersByFollowDistance: new Map<number, Set<string>>(),
-  profileEventByUser: new Map<string, Event>(),
-  followEventByUser: new Map<string, Event>(),
+  profileEventByUser: new Map<string, Event>(), // TODO use Events.db instead
+  followEventByUser: new Map<string, Event>(), // TODO use Events.db instead
   profiles: new Map<string, any>(),
   followedByUser: new Map<string, Set<string>>(),
   followersByUser: new Map<string, Set<string>>(),

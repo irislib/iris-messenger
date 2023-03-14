@@ -160,6 +160,10 @@ const Events = {
     if (existing && existing.created_at >= event.created_at) {
       return;
     }
+    if (existing) {
+      this.db.findAndRemove({ kind: 3, pubkey: event.pubkey });
+    }
+    this.insert(event);
     SocialNetwork.followEventByUser.set(event.pubkey, event);
     const myPub = Key.getPubKey();
 
@@ -258,6 +262,9 @@ const Events = {
       const existing = SocialNetwork.profiles.get(event.pubkey);
       if (existing?.created_at >= event.created_at) {
         return false;
+      }
+      if (existing) {
+        this.db.findAndRemove({ pubkey: event.pubkey, kind: 0 });
       }
       this.insert(event);
       const profile = JSON.parse(event.content);
