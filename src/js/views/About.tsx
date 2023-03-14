@@ -37,18 +37,43 @@ class About extends Component {
                 <p>
                   <ul>
                     <li>
-                      <a href="https://iris.to">iris.to</a> (web)
+                      <a target="_blank" href="https://iris.to">
+                        iris.to
+                      </a>{' '}
+                      (web)
                     </li>
                     <li>
-                      <a href="https://apps.apple.com/app/iris-the-nostr-client/id1665849007">
+                      <a
+                        target="_blank"
+                        href="https://github.com/irislib/iris-messenger/releases/latest"
+                      >
+                        Desktop
+                      </a>{' '}
+                      (macOS, Windows, Linux)
+                    </li>
+                    <li>
+                      <a
+                        target="_blank"
+                        href="https://apps.apple.com/app/iris-the-nostr-client/id1665849007"
+                      >
                         iOS
                       </a>
                     </li>
                     <li>
-                      <a href="https://play.google.com/store/apps/details?id=to.iris.twa">
+                      <a
+                        target="_blank"
+                        href="https://play.google.com/store/apps/details?id=to.iris.twa"
+                      >
                         Android
                       </a>{' '}
-                      (<a href="https://github.com/irislib/iris-messenger/releases">apk</a>)
+                      (
+                      <a
+                        target="_blank"
+                        href="https://github.com/irislib/iris-messenger/releases/tag/jan2023"
+                      >
+                        apk
+                      </a>
+                      )
                     </li>
                   </ul>
                 </p>
