@@ -1,7 +1,6 @@
 FROM node:19-buster-slim
 WORKDIR /iris-messenger/
 ENV NODE_OPTIONS=--openssl-legacy-provider
-RUN apt-get update && apt-get install -y python3 build-essential
 
 COPY package.json yarn.lock ./
 RUN yarn
