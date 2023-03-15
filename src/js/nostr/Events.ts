@@ -286,7 +286,6 @@ const Events = {
         key,
         name: profile.name,
         display_name: profile.display_name,
-        followers: SocialNetwork.followersByUser.get(event.pubkey) || new Set(),
       });
       //}
     } catch (e) {

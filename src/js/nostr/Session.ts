@@ -112,7 +112,7 @@ const Session = {
       }
     });
     const unsubFollowers = SocialNetwork.getFollowersByUser(myPub, (followers) => {
-      if (!followers.length) {
+      if (!followers.size) {
         localState.get('noFollowers').put(true);
       } else {
         localState.get('noFollowers').put(false);

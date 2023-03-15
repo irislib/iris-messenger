@@ -11,6 +11,7 @@ import { translate as t } from '../translations/Translation';
 import Identicon from './Identicon';
 import Name from './Name';
 import SafeImg from './SafeImg';
+import SocialNetwork from '../nostr/SocialNetwork';
 
 const RESULTS_MAX = 5;
 
@@ -29,7 +30,6 @@ type Result = {
 
 type ResultItem = {
   key: string;
-  followers: Map<string, unknown>;
   followDistance: number;
   name?: string;
   picture?: string;
@@ -259,22 +259,19 @@ class SearchBox extends Component<Props, State> {
           {this.state.results.map((r, index) => {
             const i = r.item;
             let followText = '';
-            if (i.followers) {
-              if (i.followDistance === 0) {
-                followText = t('you');
-              } else if (i.followDistance === 1) {
-                followText = t('following');
-              } else {
-                followText = `${i.followers.size} ${t('followers')}`;
-              }
+            if (i.followDistance === 0) {
+              followText = t('you');
+            } else if (i.followDistance === 1) {
+              followText = t('following');
+            } else {
+              followText = `${SocialNetwork.followerCount(Key.toNostrHexAddress(i.key))} ${t('followers')}`;
             }
-            const npub = Key.toNostrBech32Address(i.key, 'npub');
             return (
               <a
                 onFocus={(e) => this.onResultFocus(e, index)}
                 tabIndex={2}
                 className={'result ' + (index === this.state.selected ? 'selected' : '')}
-                href={`/${npub}`}
+                href={`/${i.key}`}
                 onClick={(e) => this.onClick(e, i)}
               >
                 {i.picture ? (
@@ -282,7 +279,7 @@ class SearchBox extends Component<Props, State> {
                     <SafeImg src={i.picture} class="round-borders" width={40} />
                   </div>
                 ) : (
-                  <Identicon key={`${npub}ic`} str={npub} width={40} />
+                  <Identicon key={`${i.key}ic`} str={i.key} width={40} />
                 )}
                 <div>
                   <Name pub={i.key} key={i.key + 'searchResult'} />
