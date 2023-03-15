@@ -241,7 +241,9 @@ class Profile extends View {
               </div>
             `
           : ''}
-        ${this.state.showQR ? html` <${QrCode} data=${`nostr:${this.state.npub}`} /> ` : ''}
+        ${this.state.showQR
+          ? html` <${QrCode} data=${`https://iris.to/${this.state.npub}`} /> `
+          : ''}
       </div>
     `;
   }
