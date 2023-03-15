@@ -33,7 +33,8 @@ const Name = (props: Props) => {
     } catch (e) {
       // ignore
     }
-  } else {
+  }
+  if (!initialDisplayName) {
     initialDisplayName = AnimalName(Key.toNostrBech32Address(props.pub, 'npub') || props.pub);
     isGenerated = true;
   }
