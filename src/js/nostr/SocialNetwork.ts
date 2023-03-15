@@ -109,8 +109,8 @@ export default {
         this.upsertUser({ pubkey: followed, blocked: false, flagged: false, followDistance: 1 });
       }
     } else {
-      const existingFollowDistance = this.users.by({ pubkey: followed })?.followDistance;
-      const followerDistance = this.users.by({ pubkey: follower })?.followDistance;
+      const existingFollowDistance = this.users.by('pubkey', followed)?.followDistance;
+      const followerDistance = this.users.by('pubkey', follower)?.followDistance;
       const newFollowDistance = followerDistance && followerDistance + 1;
       if (existingFollowDistance === undefined || newFollowDistance < existingFollowDistance) {
         this.upsertUser({

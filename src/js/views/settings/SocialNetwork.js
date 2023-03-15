@@ -32,10 +32,9 @@ export default class SocialNetworkSettings extends Component {
 
     let followDistances = [];
     for (let i = 1; i <= 10; i++) {
-      followDistances[i] = SocialNetwork.users.count({ followDistance: i });
+      followDistances[i] = { distance: i, count: SocialNetwork.users.count({ followDistance: i }) };
     }
-    followDistances = followDistances.filter((count) => count > 0);
-    console.log('followDistances', followDistances);
+    followDistances = followDistances.filter((d) => d.count > 0);
 
     return (
       <>
@@ -44,9 +43,9 @@ export default class SocialNetworkSettings extends Component {
           <h3>Stored on your device</h3>
           <p>Total size: {SocialNetwork.users.count()} users</p>
           <p>Depth: {followDistances.length} degrees of separation</p>
-          {followDistances.map((count, distance) => (
+          {followDistances.map((d) => (
             <div>
-              {distance || t('unknown')}: {count} users
+              {d.distance || t('unknown')}: {d.count} users
             </div>
           ))}
           <p>Filter incoming events by follow distance:</p>
