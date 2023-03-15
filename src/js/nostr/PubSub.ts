@@ -23,7 +23,7 @@ type Unsubscribe = () => void;
 
 let subscriptionId = 0;
 
-const MAX_MSGS_BY_KEYWORD = 1000;
+const MAX_MSGS_BY_KEYWORD = 10000;
 
 /**
  * Iris (mostly) internal Subscriptions. Juggle between LokiJS (memory), IndexedDB, http proxy and Relays.
@@ -59,7 +59,7 @@ const PubSub = {
   subscribeToAuthors: debounce(() => {
     const now = Math.floor(Date.now() / 1000);
     const myPub = Key.getPubKey();
-    const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) ?? []);
+    const followedUsers = SocialNetwork.followedByUser(myPub);
     followedUsers.push(myPub);
     console.log(
       'subscribe to profiles and contacts of',
@@ -117,7 +117,7 @@ const PubSub = {
         'keywords',
       );
       // on page reload SocialNetwork is empty and thus all search results are dropped
-      if (SocialNetwork.followersByUser.size < 1000) setTimeout(go, 2000);
+      if (SocialNetwork.users.count() < 1000) setTimeout(go, 2000);
     };
     go();
   }, 100),

@@ -17,7 +17,7 @@ export default function Badge(props) {
   if (!hexAddress) {
     return null;
   }
-  const following = SocialNetwork.followedByUser.get(myPub)?.has(hexAddress);
+  const following = SocialNetwork.isFollowing(myPub, hexAddress);
   if (following) {
     return (
       <span class="badge first tooltip">

@@ -206,7 +206,7 @@ class EventComponent extends Component {
       </div>`;
     }
 
-    if (SocialNetwork.blockedUsers.has(this.state.event.pubkey)) {
+    if (SocialNetwork.isBlocked(this.state.event.pubkey)) {
       if (this.props.standalone || this.props.asQuote) {
         return html`
           <div class="msg">

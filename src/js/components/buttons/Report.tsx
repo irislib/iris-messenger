@@ -25,7 +25,7 @@ class Report extends Block {
 
   componentDidMount() {
     SocialNetwork.getFlaggedUsers((flags) => {
-      const reported = flags?.has(Key.toNostrHexAddress(this.props.id));
+      const reported = flags.includes(Key.toNostrHexAddress(this.props.id));
       this.setState({ reported });
     });
   }

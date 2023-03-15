@@ -1,9 +1,21 @@
+import Loki from 'lokijs';
+
 import localState from '../LocalState';
 
 import Events from './Events';
 import Key from './Key';
 import LocalForage from './LocalForage';
 import PubSub, { Unsubscribe } from './PubSub';
+
+const db = new Loki('users');
+const users = db.addCollection('users', {
+  indices: ['followDistance', 'blocked', 'flagged'],
+  unique: ['pubkey'],
+});
+const follows = db.addCollection('follows', {
+  indices: ['follower', 'followed'],
+  unique: ['id'],
+});
 
 export default {
   SUGGESTED_FOLLOWS: [
@@ -17,13 +29,9 @@ export default {
     'npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6', // fiatjaf
     'npub1hu3hdctm5nkzd8gslnyedfr5ddz3z547jqcl5j88g4fame2jd08qh6h8nh', // carla
   ],
-  followDistanceByUser: new Map<string, number>(),
-  usersByFollowDistance: new Map<number, Set<string>>(),
+  users,
+  follows,
   profiles: new Map<string, any>(), // JSON.parsed event.content of profiles
-  followedByUser: new Map<string, Set<string>>(),
-  followersByUser: new Map<string, Set<string>>(),
-  blockedUsers: new Set<string>(),
-  flaggedUsers: new Set<string>(),
   setFollowed: function (followedUsers: string | string[], follow = true) {
     if (typeof followedUsers === 'string') {
       followedUsers = [followedUsers];
@@ -32,7 +40,7 @@ export default {
     followedUsers.forEach((followedUser) => {
       followedUser = Key.toNostrHexAddress(followedUser);
       if (follow && followedUser && followedUser !== myPub) {
-        this.addFollower(followedUser, myPub);
+        this.addFollow({ followed: followedUser, follower: myPub });
       } else {
         this.removeFollower(followedUser, myPub);
       }
@@ -43,13 +51,17 @@ export default {
     const event = {
       kind: 3,
       content: existing?.content || '',
-      tags: Array.from(this.followedByUser.get(myPub)).map((address: string) => {
-        return ['p', address];
+      tags: Array.from(this.follows.find({ follower: myPub })).map(({ followed }) => {
+        return ['p', followed];
       }),
     };
 
     Events.publish(event);
     PubSub.subscribeToAuthors();
+  },
+
+  isFollowing(follower, followed) {
+    return !!this.follows.findOne({ follower, followed });
   },
 
   setBlocked: function (blockedUser: string, block = true) {
@@ -65,123 +77,105 @@ export default {
     }
   },
 
-  addUserByFollowDistance(distance: number, user: string) {
-    if (!this.usersByFollowDistance.has(distance)) {
-      this.usersByFollowDistance.set(distance, new Set());
-    }
-    this.usersByFollowDistance.get(distance).add(user);
-    // remove from higher distances
-    for (const d of this.usersByFollowDistance.keys()) {
-      if (d > distance) {
-        this.usersByFollowDistance.get(d).delete(user);
-      }
+  followDistanceByUser(user: string): number {
+    return this.users.by('pubkey', user)?.followDistance || 1000;
+  },
+
+  upsertUser(user: any) {
+    try {
+      this.users.insert(user);
+    } catch (e) {
+      this.users.findAndUpdate({ pubkey: user.pubkey }, (existingUser) => {
+        return { ...existingUser, ...user };
+      });
     }
   },
 
-  addFollower: function (followedUser: string, follower: string) {
-    if (followedUser.startsWith('npub')) {
-      console.error('addFollower: followedUser is not a hex address', followedUser);
-      followedUser = Key.toNostrHexAddress(followedUser);
+  addFollow: function ({ followed, follower }) {
+    if (followed.startsWith('npub')) {
+      console.error('addFollow: followedUser is not a hex address', followed);
+      followed = Key.toNostrHexAddress(followed);
     }
     if (follower.startsWith('npub')) {
-      console.error('addFollower: follower is not a hex address', follower);
+      console.error('addFollow: follower is not a hex address', follower);
       follower = Key.toNostrHexAddress(follower);
     }
 
-    if (!this.followersByUser.has(followedUser)) {
-      this.followersByUser.set(followedUser, new Set<string>());
-    }
-    this.followersByUser.get(followedUser)?.add(follower);
-
-    if (!this.followedByUser.has(follower)) {
-      this.followedByUser.set(follower, new Set<string>());
-    }
     const myPub = Key.getPubKey();
 
-    let newFollowDistance;
     if (follower === myPub) {
       // basically same as the next "else" block, but faster
-      if (followedUser === myPub) {
-        newFollowDistance = 0; // self-follow
-      } else {
-        newFollowDistance = 1;
-        this.addUserByFollowDistance(newFollowDistance, followedUser);
+      if (followed !== myPub) {
+        this.upsertUser({ pubkey: followed, blocked: false, flagged: false, followDistance: 1 });
       }
-      this.followDistanceByUser.set(followedUser, newFollowDistance);
     } else {
-      const existingFollowDistance = this.followDistanceByUser.get(followedUser);
-      const followerDistance = this.followDistanceByUser.get(follower);
-      newFollowDistance = followerDistance && followerDistance + 1;
-      if (!existingFollowDistance || newFollowDistance < existingFollowDistance) {
-        this.followDistanceByUser.set(followedUser, newFollowDistance);
-        this.addUserByFollowDistance(newFollowDistance, followedUser);
+      const existingFollowDistance = this.users.by({ pubkey: followed })?.followDistance;
+      const followerDistance = this.users.by({ pubkey: follower })?.followDistance;
+      const newFollowDistance = followerDistance && followerDistance + 1;
+      if (existingFollowDistance === undefined || newFollowDistance < existingFollowDistance) {
+        this.upsertUser({
+          pubkey: followed,
+          blocked: false,
+          flagged: false,
+          followDistance: newFollowDistance,
+        });
       }
     }
 
-    this.followedByUser.get(follower)?.add(followedUser);
-    if (follower === myPub) {
-      PubSub.subscribe([{ kinds: [1, 5, 7], authors: [followedUser] }]);
-    }
-    if (followedUser === myPub) {
-      if (this.followersByUser.get(followedUser)?.size === 1) {
+    if (followed === myPub) {
+      if (!this.follows.findOne({ followed: myPub })) {
         localState.get('hasNostrFollowers').put(true);
       }
     }
-    if (this.followedByUser.get(myPub)?.has(follower)) {
-      if (!PubSub.subscribedUsers.has(followedUser)) {
-        PubSub.subscribeToNewAuthors.add(followedUser);
-        PubSub.subscribeToAuthors();
-      }
+    try {
+      this.follows.insert({ id: follower + followed, followed, follower });
+    } catch (e) {
+      // probably already exists
+      // console.error(e);
+    }
+    if (follower === myPub) {
+      PubSub.subscribe([{ kinds: [1, 5, 6, 7], authors: [followed] }]);
     }
   },
   removeFollower: function (unfollowedUser: string, follower: string) {
-    this.followersByUser.get(unfollowedUser)?.delete(follower);
-    this.followedByUser.get(follower)?.delete(unfollowedUser);
-
     // iterate over remaining followers and set the smallest follow distance
+    this.follows.findAndRemove({ id: follower + unfollowedUser });
     let smallest = 1000;
-    for (const follower of this.followersByUser.get(unfollowedUser) || []) {
-      const distance = this.followDistanceByUser.get(follower) + 1;
+    for (const follow of this.follows.find({ followed: unfollowedUser })) {
+      const distance = this.users.findOne({ pubkey: follow.follower })?.followDistance + 1;
       if (distance && distance < smallest) {
         smallest = distance;
       }
     }
 
-    if (smallest === 1000) {
-      this.followDistanceByUser.delete(unfollowedUser);
-    } else {
-      this.followDistanceByUser.set(unfollowedUser, smallest);
-    }
+    this.upsertUser({ pubkey: unfollowedUser, followDistance: smallest });
+    const blocked = this.users.findOne({ pubkey: unfollowedUser, blocked: true });
 
-    const blocked = this.blockedUsers.has(unfollowedUser);
-    // TODO delete Events.db entries for this user
-
-    if (blocked || this.followersByUser.get(unfollowedUser)?.size === 0) {
-      // TODO: remove unfollowedUser from everyone's followersByUser.
-      // TODO: remove from all indexes. something like lokijs could help in index management.
-      //  if resulting followersByUser(u).size is 0, remove that user as well
-      this.followDistanceByUser.delete(unfollowedUser);
-      this.followersByUser.delete(unfollowedUser);
+    if (blocked || this.follows.find({ followed: unfollowedUser }).length === 0) {
+      Events.db.findAndRemove({ author: unfollowedUser });
+      this.follows.findAndRemove({ follower: unfollowedUser });
+      this.follows.findAndRemove({ followed: unfollowedUser });
+      this.users.findAndRemove({ pubkey: unfollowedUser });
+      // TODO: remove users that have 0 followers after this operation
       PubSub.subscribedUsers.delete(unfollowedUser);
     }
     LocalForage.saveEvents();
   },
-  // TODO subscription methods for followersByUser and followedByUser. and maybe messagesByTime. and replies
-  followerCount: function (address: string) {
-    return this.followersByUser.get(address)?.size ?? 0;
-  },
   followedByFriendsCount: function (address: string) {
     let count = 0;
     const myPub = Key.getPubKey();
-    for (const follower of this.followersByUser.get(address) ?? []) {
-      if (this.followedByUser.get(myPub)?.has(follower)) {
-        count++; // should we stop at 10?
+    for (const follower of this.follows.find({ followed: address }).map((f) => f.follower)) {
+      if (this.follows.findOne({ follower: myPub, followed: follower })) {
+        count++; // should we stop at 10 for performance reasons?
       }
     }
     return count;
   },
+  isBlocked(address: string) {
+    return this.users.findOne({ pubkey: address, blocked: true }) !== null;
+  },
   block: async function (address: string, isBlocked: boolean) {
-    isBlocked ? this.blockedUsers.add(address) : this.blockedUsers.delete(address);
+    this.upsertUser({ pubkey: address, blocked: isBlocked });
     let content: any = JSON.stringify(Array.from(this.blockedUsers));
     content = await Key.encrypt(content);
     Events.publish({
@@ -190,46 +184,46 @@ export default {
     });
   },
   flag: function (address: string, isFlagged: boolean) {
-    isFlagged ? this.flaggedUsers.add(address) : this.flaggedUsers.delete(address);
+    this.upsertUser({ pubkey: address, flagged: isFlagged });
     Events.publish({
       kind: 16463,
       content: JSON.stringify(Array.from(this.flaggedUsers)),
     });
   },
-  getBlockedUsers(cb?: (blocked: Set<string>) => void): Unsubscribe {
+  getBlockedUsers(cb?: (blocked: string[]) => void): Unsubscribe {
     const callback = () => {
-      cb?.(this.blockedUsers);
+      cb?.(this.users.find({ blocked: true }).map((u) => u.pubkey));
     };
     callback();
     const myPub = Key.getPubKey();
     return PubSub.subscribe([{ kinds: [16462], authors: [myPub] }], callback);
   },
-  getFlaggedUsers(cb?: (flagged: Set<string>) => void): Unsubscribe {
+  getFlaggedUsers(cb?: (flagged: string[]) => void): Unsubscribe {
     const callback = () => {
-      cb?.(this.flaggedUsers);
+      cb?.(this.user.find({ flagged: true }).map((u) => u.pubkey));
     };
     callback();
     const myPub = Key.getPubKey();
     return PubSub.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
   },
-  getFollowedByUser: function (
-    user: string,
-    cb?: (followedUsers: Set<string>) => void,
-  ): Unsubscribe {
+  followedByUser(address: string): string[] {
+    return this.follows.find({ follower: address }).map((f) => f.followed);
+  },
+  getFollowedByUser: function (user: string, cb?: (followedUsers: string[]) => void): Unsubscribe {
     const callback = () => {
-      cb?.(this.followedByUser.get(user) ?? new Set());
+      cb?.(this.followedByUser(user));
     };
-    this.followedByUser.has(user) && callback();
+    callback();
     return PubSub.subscribe([{ kinds: [3], authors: [user] }], callback);
   },
-  getFollowersByUser: function (
-    address: string,
-    cb?: (followers: Set<string>) => void,
-  ): Unsubscribe {
+  followersByUser(address: string): string[] {
+    return this.follows.find({ followed: address }).map((f) => f.follower);
+  },
+  getFollowersByUser: function (address: string, cb?: (followers: string[]) => void): Unsubscribe {
     const callback = () => {
-      cb?.(this.followersByUser.get(address) ?? new Set());
+      cb?.(this.followersByUser(address));
     };
-    this.followersByUser.has(address) && callback();
+    callback();
     return PubSub.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed
   },
   // TODO param "proxyFirst" to skip relays if http proxy responds quickly

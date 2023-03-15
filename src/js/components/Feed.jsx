@@ -283,12 +283,12 @@ class Feed extends Component {
           const maxFollowDistance =
             this.state.settings.maxFollowDistance || this.props.index === 'follows' ? 1 : 0;
           if (maxFollowDistance) {
-            const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
+            const followDistance = SocialNetwork.followDistanceByUser(e.pubkey);
             if (followDistance === undefined || followDistance > maxFollowDistance) {
               return false;
             }
           }
-          if (SocialNetwork.blockedUsers.has(e.pubkey)) {
+          if (SocialNetwork.isBlocked(e.pubkey)) {
             return false;
           }
           if (e.kind === 1 && !includeReplies && Events.getEventReplyingTo(e)) {

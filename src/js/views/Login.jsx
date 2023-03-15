@@ -1,5 +1,6 @@
 import * as secp from '@noble/secp256k1';
 import { Component } from 'preact';
+import { route } from 'preact-router';
 
 import logo from '../../assets/img/android-chrome-192x192.png';
 import Button from '../components/buttons/Button';
@@ -11,7 +12,6 @@ import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
-import {route} from "preact-router";
 const bech32 = require('bech32-buffer');
 
 const nostrLogin = async (event) => {

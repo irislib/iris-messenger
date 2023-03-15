@@ -198,7 +198,7 @@ class Profile extends View {
                   <span>${this.state.followerCount}</span> ${t('followers')}
                 </a>
               </div>
-              ${SocialNetwork.followedByUser.get(this.state.hexPub)?.has(Key.getPubKey())
+              ${SocialNetwork.isFollowing(this.state.hexPub, Key.getPubKey())
                 ? html` <p><small>${t('follows_you')}</small></p> `
                 : ''}
               <div class="hidden-xs">
@@ -367,8 +367,8 @@ class Profile extends View {
     const setFollowCounts = () => {
       address &&
         this.setState({
-          followedUserCount: SocialNetwork.followedByUser.get(address)?.size ?? 0,
-          followerCount: SocialNetwork.followersByUser.get(address)?.size ?? 0,
+          followedUserCount: SocialNetwork.followedByUser(address).length,
+          followerCount: SocialNetwork.followersByUser(address).length,
         });
     };
     this.subscriptions.push(SocialNetwork.getFollowersByUser(address, setFollowCounts));
@@ -453,7 +453,7 @@ class Profile extends View {
     this.getNostrProfile(hexPub, nostrAddress);
     this.subscriptions.push(
       SocialNetwork.getBlockedUsers((blockedUsers) => {
-        this.setState({ blocked: blockedUsers.has(hexPub) });
+        this.setState({ blocked: blockedUsers.includes(hexPub) });
       }),
     );
   }

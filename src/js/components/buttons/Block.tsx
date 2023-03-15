@@ -37,7 +37,7 @@ class Block extends Component<Props> {
 
   componentDidMount() {
     SocialNetwork.getBlockedUsers((blocks) => {
-      const blocked = blocks?.has(Key.toNostrHexAddress(this.props.id));
+      const blocked = blocks?.includes(Key.toNostrHexAddress(this.props.id));
       this.setState({ blocked });
     });
   }

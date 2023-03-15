@@ -96,7 +96,7 @@ class MyIdenticon extends Component<Props, State> {
       this.state.picture &&
       !this.state.hasError &&
       !this.props.hidePicture &&
-      !SocialNetwork.blockedUsers.has(this.props.str as string);
+      !SocialNetwork.isBlocked(this.props.str as string);
     const hasPictureStyle = hasPicture ? 'has-picture' : '';
     const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 

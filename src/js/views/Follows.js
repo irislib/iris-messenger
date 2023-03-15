@@ -37,8 +37,8 @@ class Follows extends View {
   }
 
   sortByFollowDistance(aK, bK) {
-    const aDistance = SocialNetwork.followDistanceByUser.get(aK);
-    const bDistance = SocialNetwork.followDistanceByUser.get(bK);
+    const aDistance = SocialNetwork.followDistanceByUser(aK);
+    const bDistance = SocialNetwork.followDistanceByUser(bK);
     if (aDistance === bDistance) {
       return this.sortByName(aK, bK);
     }
@@ -103,7 +103,7 @@ class Follows extends View {
             <div>
               <${Name} pub=${npub} /><br />
               <small class="follower-count">
-                ${SocialNetwork.followersByUser.get(hexKey)?.size || 0}<i> </i> followers
+                ${SocialNetwork.followersByUser(hexKey).length}<i> </i> followers
               </small>
             </div>
           </a>
