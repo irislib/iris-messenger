@@ -284,7 +284,7 @@ class Feed extends Component {
             this.state.settings.maxFollowDistance || this.props.index === 'follows' ? 1 : 0;
           if (maxFollowDistance) {
             const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
-            if (!followDistance || followDistance > maxFollowDistance) {
+            if (followDistance === undefined || followDistance > maxFollowDistance) {
               return false;
             }
           }
