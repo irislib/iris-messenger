@@ -4,6 +4,7 @@ import styled from 'styled-components';
 type Props = {
   onClose?: () => void;
   justifyContent?: string;
+  showContainer?: boolean;
 };
 
 const Overlay = styled.div`
@@ -21,7 +22,7 @@ const Overlay = styled.div`
   align-items: center;
 `;
 
-const Modal: FC<Props> = ({ children, onClose }) => {
+const Modal: FC<Props> = ({ showContainer, children, onClose }) => {
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       onClose?.();
@@ -33,6 +34,10 @@ const Modal: FC<Props> = ({ children, onClose }) => {
     onClose?.();
   };
 
+  const handleContainerClick = (e: MouseEvent) => {
+    e.stopPropagation();
+  };
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
@@ -40,7 +45,17 @@ const Modal: FC<Props> = ({ children, onClose }) => {
     };
   }, [handleKeyDown]);
 
-  return <Overlay onClick={handleOverlayClick}>{children}</Overlay>;
+  const content = showContainer ? (
+    <div class="msg" style="width: 600px;" onClick={(e) => handleContainerClick(e)}>
+      <div class="msg-content" style="padding: 30px;">
+        {children}
+      </div>
+    </div>
+  ) : (
+    children
+  );
+
+  return <Overlay onClick={handleOverlayClick}>{content}</Overlay>;
 };
 
 export default Modal;

@@ -8,6 +8,10 @@ import Icons from '../Icons';
 import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
 
+import Button from './buttons/Button';
+import Modal from './modal/Modal';
+import FeedMessageForm from './FeedMessageForm';
+
 const APPLICATIONS = [
   // TODO: move editable shortcuts to localState gun
   { url: '/', text: 'feeds', icon: Icons.feed },
@@ -49,6 +53,23 @@ export default class Menu extends Component {
     });
   }
 
+  renderNewPostModal() {
+    return this.state.showNewPostModal
+      ? html`
+          <${Modal}
+            showContainer=${true}
+            onClose=${() => this.setState({ showNewPostModal: false })}
+          >
+            <${FeedMessageForm}
+              onSubmit=${() => this.setState({ showNewPostModal: false })}
+              placeholder=${t('whats_on_your_mind')}
+              autofocus=${true}
+            />
+          <//>
+        `
+      : '';
+  }
+
   render() {
     return html`
       <div class="application-list">
@@ -83,6 +104,14 @@ export default class Menu extends Component {
             <//>`;
           }
         })}
+        <div class="hidden-xs menu-new-post">
+          <${Button}
+            onClick=${() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}
+          >
+            <span class="icon">${Icons.post}</span>
+          <//>
+          ${this.renderNewPostModal()}
+        </div>
       </div>
     `;
   }

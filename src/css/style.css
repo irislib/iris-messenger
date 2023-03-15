@@ -988,6 +988,11 @@ header.footer .header-content {
   background: var(--chat-hover);
 }
 
+.menu-new-post {
+  margin-left: 30px;
+  margin-top: 30px;
+}
+
 .application-list {
   z-index: 2;
   width: 220px;
@@ -1038,6 +1043,10 @@ header.footer .header-content {
 
   .application-list a {
     justify-content: center;
+  }
+
+  .menu-new-post {
+    margin-left: 5px;
   }
 }
 
