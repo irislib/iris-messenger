@@ -367,8 +367,8 @@ class Profile extends View {
     const setFollowCounts = () => {
       address &&
         this.setState({
-          followedUserCount: SocialNetwork.followedByUser(address).length,
-          followerCount: SocialNetwork.followersByUser(address).length,
+          followedUserCount: SocialNetwork.followedByUser.get(address)?.size || 0,
+          followerCount: SocialNetwork.followerCount(address),
         });
     };
     this.subscriptions.push(SocialNetwork.getFollowersByUser(address, setFollowCounts));

@@ -12,10 +12,6 @@ const users = db.addCollection('users', {
   indices: ['followDistance', 'blocked', 'flagged'],
   unique: ['pubkey'],
 });
-const follows = db.addCollection('follows', {
-  indices: ['follower', 'followed'],
-  unique: ['id'],
-});
 
 export default {
   SUGGESTED_FOLLOWS: [
@@ -30,7 +26,8 @@ export default {
     'npub1hu3hdctm5nkzd8gslnyedfr5ddz3z547jqcl5j88g4fame2jd08qh6h8nh', // carla
   ],
   users,
-  follows,
+  followedByUser: new Map<string, Set<string>>(),
+  followersByUser: new Map<string, Set<string>>(),
   profiles: new Map<string, any>(), // JSON.parsed event.content of profiles
   setFollowed: function (followedUsers: string | string[], follow = true) {
     if (typeof followedUsers === 'string') {
@@ -51,7 +48,7 @@ export default {
     const event = {
       kind: 3,
       content: existing?.content || '',
-      tags: Array.from(this.follows.find({ follower: myPub })).map(({ followed }) => {
+      tags: Array.from(this.followedByUser.get(myPub) || []).map(({ followed }) => {
         return ['p', followed];
       }),
     };
@@ -60,8 +57,8 @@ export default {
     PubSub.subscribeToAuthors();
   },
 
-  isFollowing(follower, followed) {
-    return !!this.follows.findOne({ follower, followed });
+  isFollowing(follower, followed): boolean {
+    return !!this.followedByUser.get(follower)?.has(followed);
   },
 
   setBlocked: function (blockedUser: string, block = true) {
@@ -123,25 +120,30 @@ export default {
     }
 
     if (followed === myPub) {
-      if (!this.follows.findOne({ followed: myPub })) {
+      if (!this.followerCount(myPub)) {
         localState.get('hasNostrFollowers').put(true);
       }
     }
-    try {
-      this.follows.insert({ id: follower + followed, followed, follower });
-    } catch (e) {
-      // probably already exists
-      // console.error(e);
+    if (!this.followedByUser.get(follower)) {
+      this.followedByUser.set(follower, new Set());
     }
+    if (!this.followersByUser.get(followed)) {
+      this.followersByUser.set(followed, new Set());
+    }
+    this.followedByUser.get(follower)?.add(followed);
+    this.followersByUser.get(followed)?.add(follower);
     if (follower === myPub) {
       PubSub.subscribe([{ kinds: [1, 5, 6, 7], authors: [followed] }]);
     }
   },
+  followerCount(user: string): number {
+    return this.followersByUser.get(user)?.size || 0;
+  },
   removeFollower: function (unfollowedUser: string, follower: string) {
     // iterate over remaining followers and set the smallest follow distance
-    this.follows.findAndRemove({ id: follower + unfollowedUser });
+    this.followedByUser.get(follower)?.delete(unfollowedUser);
     let smallest = 1000;
-    for (const follow of this.follows.find({ followed: unfollowedUser })) {
+    for (const follow of this.followersByUser.get(unfollowedUser)) {
       const distance = this.users.findOne({ pubkey: follow.follower })?.followDistance + 1;
       if (distance && distance < smallest) {
         smallest = distance;
@@ -151,12 +153,13 @@ export default {
     this.upsertUser({ pubkey: unfollowedUser, followDistance: smallest });
     const blocked = this.users.findOne({ pubkey: unfollowedUser, blocked: true });
 
-    if (blocked || this.follows.find({ followed: unfollowedUser }).length === 0) {
+    if (blocked || this.followerCount(unfollowedUser) === 0) {
       Events.db.findAndRemove({ author: unfollowedUser });
-      this.follows.findAndRemove({ follower: unfollowedUser });
-      this.follows.findAndRemove({ followed: unfollowedUser });
+      this.followersByUser.delete(unfollowedUser);
+      for (const followed of this.followedByUser.get(unfollowedUser) || []) {
+        this.removeFollower(followed, unfollowedUser);
+      }
       this.users.findAndRemove({ pubkey: unfollowedUser });
-      // TODO: remove users that have 0 followers after this operation
       PubSub.subscribedUsers.delete(unfollowedUser);
     }
     LocalForage.saveEvents();
@@ -164,8 +167,8 @@ export default {
   followedByFriendsCount: function (address: string) {
     let count = 0;
     const myPub = Key.getPubKey();
-    for (const follower of this.follows.find({ followed: address }).map((f) => f.follower)) {
-      if (this.follows.findOne({ follower: myPub, followed: follower })) {
+    for (const follower of this.followersByUser.get(address) || []) {
+      if (this.followedByUser.get(myPub)?.has(follower)) {
         count++; // should we stop at 10 for performance reasons?
       }
     }
@@ -206,22 +209,22 @@ export default {
     const myPub = Key.getPubKey();
     return PubSub.subscribe([{ kinds: [16463], authors: [myPub] }], callback);
   },
-  followedByUser(address: string): string[] {
-    return this.follows.find({ follower: address }).map((f) => f.followed);
-  },
-  getFollowedByUser: function (user: string, cb?: (followedUsers: string[]) => void): Unsubscribe {
+  getFollowedByUser: function (
+    user: string,
+    cb?: (followedUsers: Set<string>) => void,
+  ): Unsubscribe {
     const callback = () => {
-      cb?.(this.followedByUser(user));
+      cb?.(this.followedByUser.get(user) || new Set());
     };
     callback();
     return PubSub.subscribe([{ kinds: [3], authors: [user] }], callback);
   },
-  followersByUser(address: string): string[] {
-    return this.follows.find({ followed: address }).map((f) => f.follower);
-  },
-  getFollowersByUser: function (address: string, cb?: (followers: string[]) => void): Unsubscribe {
+  getFollowersByUser: function (
+    address: string,
+    cb?: (followers: Set<string>) => void,
+  ): Unsubscribe {
     const callback = () => {
-      cb?.(this.followersByUser(address));
+      cb?.(this.followersByUser.get(address) || new Set());
     };
     callback();
     return PubSub.subscribe([{ kinds: [3], '#p': [address] }], callback); // TODO this doesn't fire when a user is unfollowed

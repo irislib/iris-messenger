@@ -42,7 +42,7 @@ class Follow extends Component<Props> {
     if (this.key === 'follow') {
       SocialNetwork.getFollowedByUser(Key.getPubKey(), (follows) => {
         console.log('follows', follows);
-        const follow = follows.includes(Key.toNostrHexAddress(this.props.id));
+        const follow = follows.has(Key.toNostrHexAddress(this.props.id));
         this.setState({ follow });
       });
       return;

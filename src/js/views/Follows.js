@@ -103,7 +103,7 @@ class Follows extends View {
             <div>
               <${Name} pub=${npub} /><br />
               <small class="follower-count">
-                ${SocialNetwork.followersByUser(hexKey).length}<i> </i> followers
+                ${SocialNetwork.followerCount(hexKey)}<i> </i> followers
               </small>
             </div>
           </a>

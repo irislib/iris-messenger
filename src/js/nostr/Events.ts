@@ -183,13 +183,13 @@ const Events = {
         }
       }
     }
-    for (const previouslyFollowed of SocialNetwork.followedByUser(event.pubkey)) {
+    for (const previouslyFollowed of SocialNetwork.followedByUser.get(event.pubkey) || []) {
       if (!event.tags || !event.tags?.find((t) => t[0] === 'p' && t[1] === previouslyFollowed)) {
         SocialNetwork.removeFollower(previouslyFollowed, event.pubkey);
       }
     }
     if (event.pubkey === myPub && event.tags?.length) {
-      if (SocialNetwork.followedByUser(myPub).length > 10) {
+      if (SocialNetwork.followerCount(myPub) >= 10) {
         localState.get('showFollowSuggestions').put(false);
       }
     }
@@ -286,7 +286,7 @@ const Events = {
         key,
         name: profile.name,
         display_name: profile.display_name,
-        followers: SocialNetwork.followersByUser(event.pubkey),
+        followers: SocialNetwork.followersByUser.get(event.pubkey) || new Set(),
       });
       //}
     } catch (e) {
@@ -370,7 +370,7 @@ const Events = {
             // require at least 5 followers
             // TODO followers should be follow distance 2
             if (
-              SocialNetwork.followersByUser(event.pubkey).length <
+              SocialNetwork.followerCount(event.pubkey) <
               (globalFilter.minFollowersAtMaxDistance ||
                 DEFAULT_GLOBAL_FILTER.minFollowersAtMaxDistance)
             ) {

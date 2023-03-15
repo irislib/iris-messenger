@@ -59,7 +59,7 @@ const PubSub = {
   subscribeToAuthors: debounce(() => {
     const now = Math.floor(Date.now() / 1000);
     const myPub = Key.getPubKey();
-    const followedUsers = SocialNetwork.followedByUser(myPub);
+    const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) || []);
     followedUsers.push(myPub);
     console.log(
       'subscribe to profiles and contacts of',
