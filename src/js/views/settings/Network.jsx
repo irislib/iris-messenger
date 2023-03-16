@@ -7,11 +7,17 @@ import { translate as t } from '../../translations/Translation';
 
 const Network = () => {
   const [relays, setRelays] = useState(Array.from(Relays.relays.values()));
-  const [newRelayUrl, setNewRelayUrl] = useState(''); // added state to store the new relay URL
+  const [popularRelays, setPopularRelays] = useState([]);
+  const [newRelayUrl, setNewRelayUrl] = useState('');
 
   setInterval(() => {
     setRelays(Array.from(Relays.relays.values()));
-  }, 1000);
+    const popularRelays = Array.from(Relays.usersByRelay.entries())
+      .map(([url, users]) => ({ url, users: users.size }))
+      .filter((relay) => relay.users > 100)
+      .sort((a, b) => b.users - a.users);
+    setPopularRelays(popularRelays);
+  }, 2000);
 
   const handleRemoveRelay = (relay) => {
     localState.get('relays').get(relay.url).put(null);
@@ -24,8 +30,8 @@ const Network = () => {
     return `wss://${relay}`;
   };
 
-  const handleAddRelay = (event) => {
-    const newRelayUrlWithProtocol = ensureProtocol(newRelayUrl);
+  const handleAddRelay = (event, url) => {
+    const newRelayUrlWithProtocol = ensureProtocol(url);
     localState.get('relays').get(newRelayUrlWithProtocol).put({ enabled: true });
     event.preventDefault(); // prevent the form from reloading the page
     Relays.add(newRelayUrlWithProtocol); // add the new relay using the Nostr method
@@ -91,13 +97,29 @@ const Network = () => {
             />
           </div>
           <div className="flex-cell no-flex">
-            <Button onClick={handleAddRelay}>{t('add')}</Button>
+            <Button onClick={(e) => handleAddRelay(e, newRelayUrl)}>{t('add')}</Button>
           </div>
         </div>
-        <div>
+        <p>
           <Button onClick={() => Relays.saveToContacts()}>{t('save_relays_publicly')}</Button>
           <Button onClick={() => Relays.restoreDefaults()}>{t('restore_defaults')}</Button>
+        </p>
+      </div>
+      <h3>{t('popular_relays')}</h3>
+      <div id="popular-relays" className="flex-table">
+        <div className="flex-row peer">
+          <div className="flex-cell no-flex">{t('users')}</div>
+          <div className="flex-cell">URL</div>
         </div>
+        {popularRelays.map((relay) => (
+          <div className="flex-row peer" key={relay.url}>
+            <div className="flex-cell no-flex">{relay.users}</div>
+            <div className="flex-cell">{relay.url}</div>
+            <div className="flex-cell no-flex">
+              <Button onClick={(e) => handleAddRelay(e, relay.url)}>{t('add')}</Button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

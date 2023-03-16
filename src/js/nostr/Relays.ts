@@ -43,6 +43,8 @@ const searchRelays = new Map<string, Relay>(
 export default {
   relays: defaultRelays,
   searchRelays: searchRelays,
+  usersByRelay: new Map<string, Set<string>>(),
+  writeRelaysByUser: new Map<string, Set<string>>(),
   getStatus: (relay: Relay) => {
     // workaround for nostr-tools bug
     try {
