@@ -33,6 +33,14 @@ const messageClicked = (e, zappedId) => {
 export default function Zap(props) {
   const [allZaps, setAllZaps] = useState([]);
   const zappedId = Events.getEventReplyingTo(props.event);
+  const zappedEvent = Events.db.by('id', zappedId);
+  const authorIsYou = zappedEvent?.pubkey === Key.getPubKey();
+  const mentioned = zappedEvent?.tags.find((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey());
+  const zappedText = authorIsYou
+    ? 'zapped your note'
+    : mentioned
+    ? 'zapped a note where you were mentioned'
+    : 'zapped a note';
 
   useEffect(() => {
     const unsub = Events.getRepliesAndReactions(zappedId, (_a, _b, _c, _d, zappedBy) => {
@@ -60,7 +68,7 @@ export default function Zap(props) {
                 <${Name} pub=${zappingUser} userNameOnly=${true} />
               </a>
               ${allZaps.length > 1 ? html`<span> and ${allZaps.length - 1} others </span>` : ''}
-              zapped your note
+              ${zappedText}
             </div>
           </div>
           <${EventComponent} key=${zappedId + props.event.id} id=${zappedId} />

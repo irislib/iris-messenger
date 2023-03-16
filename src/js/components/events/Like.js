@@ -23,8 +23,14 @@ const messageClicked = (e, likedId) => {
 export default function Like(props) {
   const [allLikes, setAllLikes] = useState([]);
   const likedId = Events.getEventReplyingTo(props.event);
-  const authorIsYou = Events.db.by('id', likedId)?.pubkey === Key.getPubKey();
-  const likeText = authorIsYou ? 'liked your note' : 'liked a note where you were mentioned';
+  const likedEvent = Events.db.by('id', likedId);
+  const authorIsYou = likedEvent?.pubkey === Key.getPubKey();
+  const mentioned = likedEvent?.tags.find((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey());
+  const likeText = authorIsYou
+    ? 'liked your note'
+    : mentioned
+    ? 'liked a note where you were mentioned'
+    : 'liked a note';
 
   useEffect(() => {
     const unsub = Events.getRepliesAndReactions(likedId, (_replies, likedBy) => {
