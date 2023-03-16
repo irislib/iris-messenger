@@ -57,7 +57,7 @@ export default {
     }
   },
   // get Map of relayUrl: {read:boolean, write:boolean}
-  getUrlsFromFollowEvent(event: Event) {
+  getUrlsFromFollowEvent(event: Event): Map<string, PublicRelaySettings> {
     const urls = new Map<string, PublicRelaySettings>();
     if (event.content) {
       try {
@@ -113,14 +113,14 @@ export default {
     return count;
   },
   getUserRelays(user: string): Array<[string, PublicRelaySettings]> {
-    const relays = new Map<string, PublicRelaySettings>();
+    let relays = new Map<string, PublicRelaySettings>();
     if (typeof user !== 'string') {
       console.log('getUserRelays: invalid user', user);
       return [];
     }
     const followEvent = Events.db.findOne({ kind: 3, pubkey: user });
     if (followEvent) {
-      return this.getUrlsFromFollowEvent(followEvent);
+      relays = this.getUrlsFromFollowEvent(followEvent);
     }
     return Array.from(relays.entries());
   },
@@ -131,7 +131,7 @@ export default {
     for (const relay of myRelays) {
       relay.publish(event);
     }
-    const recipientRelays = new Set<string>();
+    let recipientRelays: string[] = [];
     const mentionedUsers = event.tags.filter((tag) => tag[0] === 'p').map((tag) => tag[1]);
     if (mentionedUsers.length > 10) {
       return;
@@ -142,13 +142,18 @@ export default {
       }
       this.getUserRelays(user)
         .filter((entry) => entry[1].read)
-        .forEach((entry) => recipientRelays.add(entry[0]));
+        .forEach((entry) => recipientRelays.push(entry[0]));
     }
+    // 3 random read relays of the recipient
+    recipientRelays = shuffle(recipientRelays).slice(0, 3);
     for (const relayUrl of recipientRelays) {
       if (!myRelays.find((relay) => relay.url === relayUrl)) {
         console.log('publishing event to recipient relay', relayUrl, event.id, event.content || '');
         const relay = this.relayInit(relayUrl, false);
         relay.publish(event);
+        setTimeout(() => {
+          relay.close();
+        }, 5000);
       }
     }
   },
@@ -371,7 +376,7 @@ export default {
           relay.connect();
           const sub = relay.sub(filters, { id: subId });
           sub.on('event', (event) => {
-            console.log('event from author relay');
+            console.log('got event from author relay', relay.url);
             Events.handle(event);
           });
           setTimeout(() => relay?.close(), 15 * 1000);
