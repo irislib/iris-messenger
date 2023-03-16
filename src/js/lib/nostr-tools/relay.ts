@@ -94,10 +94,10 @@ export function relayInit(url: string, alreadyHaveEvent?: (id: string) => boolea
         }
 
         var data = incomingMessageQueue.shift()
-        if (data && !!alreadyHaveEvent) {
+        if (data && alreadyHaveEvent !== undefined) {
           const match = idRegex.exec(data)
           if (match) {
-            const id = match[1];
+            const id = match[1]
             if (alreadyHaveEvent(id)) {
               //console.log(`already have`);
               return

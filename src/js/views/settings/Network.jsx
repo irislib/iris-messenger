@@ -10,10 +10,12 @@ const Network = () => {
   const [popularRelays, setPopularRelays] = useState([]);
   const [newRelayUrl, setNewRelayUrl] = useState('');
 
-  setInterval(() => {
-    setRelays(Array.from(Relays.relays.values()));
-    console.log(1);
-  }, 2000);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRelays(Array.from(Relays.relays.values()));
+    }, 2000);
+    return () => clearInterval(interval);
+  });
 
   useEffect(() => {
     setPopularRelays(Relays.getPopularRelays());
