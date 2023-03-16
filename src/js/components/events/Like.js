@@ -31,7 +31,7 @@ export default function Like(props) {
       setAllLikes(Array.from(likedBy));
     });
     return () => unsub();
-  });
+  }, []);
 
   const userLink = `/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`;
   return html`

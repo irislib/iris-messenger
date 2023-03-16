@@ -19,7 +19,7 @@ export default function Repost(props) {
         setAllReposts(Array.from(repostedBy));
       });
       return () => unsub();
-    });
+    }, []);
   }
 
   return html`

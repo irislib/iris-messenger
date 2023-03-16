@@ -39,7 +39,7 @@ export default function Zap(props) {
       setAllZaps(Array.from(zappedBy.values()));
     });
     return () => unsub();
-  });
+  }, []);
 
   let zappingUser = null;
   try {
