@@ -86,7 +86,7 @@ export default {
           const content = JSON.parse(event.content);
           for (const url in content) {
             try {
-              const parsed = new URL(url).toString();
+              const parsed = new URL(url).toString().replace(/\/$/, '');
               const count = relays.get(parsed) || 0;
               relays.set(parsed, count + 1);
             } catch (e) {
@@ -98,7 +98,9 @@ export default {
         }
       }
     });
-    const sorted = Array.from(relays.entries()).sort((a, b) => b[1] - a[1]);
+    const sorted = Array.from(relays.entries())
+      .filter(([url]) => !this.relays.has(url))
+      .sort((a, b) => b[1] - a[1]);
     return sorted.map((entry) => {
       return { url: entry[0], users: entry[1] };
     });
