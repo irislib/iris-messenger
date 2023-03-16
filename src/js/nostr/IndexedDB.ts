@@ -58,6 +58,12 @@ export default {
         });
       })
       .then(() => {
+        // profiles
+        return db.events.where({ kind: 4 }).each((event) => {
+          Events.handle(event, false, false);
+        });
+      })
+      .then(() => {
         // some latest global events
         return db.events
           .orderBy('created_at')

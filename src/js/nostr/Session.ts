@@ -140,6 +140,7 @@ const Session = {
         true,
       ); // notifications
       Relays.subscribe([{ '#p': [myPub], kinds: [4] }], 'dms', false, 0, true); // notifications and DMs
+      Relays.subscribe([{ '#p': [myPub], kinds: [4], limit: 20 }], 'latestDms', true, 0, false); // notifications and DMs
     }, 200);
     setInterval(() => {
       console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));
