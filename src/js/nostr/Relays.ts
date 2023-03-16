@@ -313,6 +313,7 @@ export default {
     relay.on('notice', (notice) => {
       console.log('notice from ', relay.url, notice);
     });
+    this.connect(relay);
     return relay;
   },
   subscribe: function (
@@ -373,7 +374,6 @@ export default {
           relay.on('notice', (notice) => {
             console.log('notice from ', relay.url, notice);
           });
-          relay.connect();
           const sub = relay.sub(filters, { id: subId });
           sub.on('event', (event) => {
             console.log('got event from author relay', relay.url);
