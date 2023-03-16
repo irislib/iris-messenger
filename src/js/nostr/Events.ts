@@ -195,45 +195,24 @@ const Events = {
         localState.get('showFollowSuggestions').put(false);
       }
     }
-    let relays;
-    let urls = [];
-    if (event.content) {
+    if (event.pubkey === myPub && event.content?.length) {
       try {
-        relays = JSON.parse(event.content);
-        urls = Object.keys(relays).map((url) => {
-          try {
-            return new URL(url).toString();
-          } catch (e) {
-            console.log('invalid relay url', url);
-            return null;
+        const relays = JSON.parse(event.content);
+        const urls = Object.keys(relays);
+        if (urls.length) {
+          // remove all existing relays that are not in urls. TODO: just disable
+          console.log('setting relays from your contacs list', urls);
+          for (const url of Relays.relays.keys()) {
+            if (!urls.includes(url)) {
+              Relays.remove(url);
+            }
           }
-        });
+          for (const url of urls) {
+            Relays.add(url);
+          }
+        }
       } catch (e) {
-        console.log('failed to parse relays list', event.content);
-      }
-    }
-    urls.forEach((url) => {
-      if (relays[url]?.write) {
-        if (!Relays.writeRelaysByUser.has(event.pubkey)) {
-          Relays.writeRelaysByUser.set(event.pubkey, new Set());
-        }
-        Relays.writeRelaysByUser.get(event.pubkey)?.add(url);
-      }
-      if (!Relays.usersByRelay.has(url)) {
-        Relays.usersByRelay.set(url, new Set());
-      }
-      Relays.usersByRelay.get(url)?.add(event.pubkey);
-    });
-    if (event.pubkey === myPub) {
-      // remove all existing relays that are not in urls. TODO: just disable
-      console.log('setting relays from your contacs list', urls);
-      for (const url of Relays.relays.keys()) {
-        if (!urls.includes(url)) {
-          Relays.remove(url);
-        }
-      }
-      for (const url of urls) {
-        Relays.add(url);
+        console.log('failed to parse your relays list', event);
       }
     }
   },

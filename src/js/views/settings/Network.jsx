@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Button from '../../components/buttons/Button';
 import localState from '../../LocalState';
@@ -12,12 +12,12 @@ const Network = () => {
 
   setInterval(() => {
     setRelays(Array.from(Relays.relays.values()));
-    const popularRelays = Array.from(Relays.usersByRelay.entries())
-      .map(([url, users]) => ({ url, users: users.size }))
-      .filter((relay) => relay.users > 100)
-      .sort((a, b) => b.users - a.users);
-    setPopularRelays(popularRelays);
+    console.log(1);
   }, 2000);
+
+  useEffect(() => {
+    setPopularRelays(Relays.getPopularRelays());
+  }, []);
 
   const handleRemoveRelay = (relay) => {
     localState.get('relays').get(relay.url).put(null);

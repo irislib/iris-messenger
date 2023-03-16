@@ -43,7 +43,6 @@ const searchRelays = new Map<string, Relay>(
 export default {
   relays: defaultRelays,
   searchRelays: searchRelays,
-  usersByRelay: new Map<string, Set<string>>(),
   writeRelaysByUser: new Map<string, Set<string>>(),
   getStatus: (relay: Relay) => {
     // workaround for nostr-tools bug
@@ -52,6 +51,33 @@ export default {
     } catch (e) {
       return 3;
     }
+  },
+  getPopularRelays: function () {
+    console.log('getPopularRelays');
+    const relays = new Map<string, number>();
+    Events.db.find({ kind: 3 }).forEach((event) => {
+      if (event.content) {
+        try {
+          // content is an object of relayUrl: {read:boolean, write:boolean}
+          const content = JSON.parse(event.content);
+          for (const url in content) {
+            try {
+              const parsed = new URL(url).toString();
+              const count = relays.get(parsed) || 0;
+              relays.set(parsed, count + 1);
+            } catch (e) {
+              console.log('invalid relay url', url);
+            }
+          }
+        } catch (e) {
+          console.log('failed to parse relay urls', event);
+        }
+      }
+    });
+    const sorted = Array.from(relays.entries()).sort((a, b) => b[1] - a[1]);
+    return sorted.map((entry) => {
+      return { url: entry[0], users: entry[1] };
+    });
   },
   getConnectedRelayCount: function () {
     let count = 0;
