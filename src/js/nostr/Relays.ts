@@ -369,7 +369,7 @@ export default {
         });
         // pick 3 random relays
         authorRelayUrls = shuffle(authorRelayUrls).slice(0, 3);
-        const authorRelays = authorRelayUrls.map(([url, settings]) => {
+        const authorRelays = authorRelayUrls.map(([url]) => {
           const relay = this.relayInit(url, false);
           relay.on('notice', (notice) => {
             console.log('notice from ', relay.url, notice);

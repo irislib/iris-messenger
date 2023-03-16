@@ -96,39 +96,35 @@ class Feed extends Component {
     localState.get('settings').get('feed').put(this.state.settings);
   }
 
-  updateSortedMessages = throttle(
-    (sortedMessages) => {
-      if (this.unmounted || !sortedMessages) {
-        return;
-      }
-      const settings = this.state.settings;
-      // iterate over sortedMessages and add newer than messagesShownTime to queue
-      const queuedMessages = [];
-      let hasMyMessage;
-      if (settings.sortDirection === 'desc' && !settings.realtime) {
-        for (let i = 0; i < sortedMessages.length; i++) {
-          const id = sortedMessages[i];
-          const message = Events.db.by('id', id);
-          if (message && message.created_at > this.state.messagesShownTime) {
-            if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
-              hasMyMessage = true;
-              break;
-            }
-            queuedMessages.push(id);
+  updateSortedMessages = (sortedMessages) => {
+    if (this.unmounted || !sortedMessages) {
+      return;
+    }
+    const settings = this.state.settings;
+    // iterate over sortedMessages and add newer than messagesShownTime to queue
+    const queuedMessages = [];
+    let hasMyMessage;
+    if (settings.sortDirection === 'desc' && !settings.realtime) {
+      for (let i = 0; i < sortedMessages.length; i++) {
+        const id = sortedMessages[i];
+        const message = Events.db.by('id', id);
+        if (message && message.created_at > this.state.messagesShownTime) {
+          if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
+            hasMyMessage = true;
+            break;
           }
+          queuedMessages.push(id);
         }
       }
-      if (!hasMyMessage) {
-        sortedMessages = sortedMessages.filter((id) => !queuedMessages.includes(id));
-      }
-      const messagesShownTime = hasMyMessage
-        ? Math.floor(Date.now() / 1000)
-        : this.state.messagesShownTime;
-      this.setState({ sortedMessages, queuedMessages, messagesShownTime });
-    },
-    1000,
-    { leading: true },
-  );
+    }
+    if (!hasMyMessage) {
+      sortedMessages = sortedMessages.filter((id) => !queuedMessages.includes(id));
+    }
+    const messagesShownTime = hasMyMessage
+      ? Math.floor(Date.now() / 1000)
+      : this.state.messagesShownTime;
+    this.setState({ sortedMessages, queuedMessages, messagesShownTime });
+  };
 
   handleScroll = () => {
     // increase page size when scrolling down
@@ -211,7 +207,9 @@ class Feed extends Component {
       this.unsub?.();
       if (this.props.index === 'notifications') {
         // TODO notifications from LokiJS index
-        this.unsub = this.getNotifications((messages) => this.updateSortedMessages(messages));
+        this.unsub = this.getNotifications(
+          throttle((messages) => this.updateSortedMessages(messages), 1000, { leading: true }),
+        );
       } else {
         this.unsub = this.getMessages();
       }
