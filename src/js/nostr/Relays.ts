@@ -147,7 +147,7 @@ export default {
     // 3 random read relays of the recipient
     recipientRelays = shuffle(recipientRelays).slice(0, 3);
     for (const relayUrl of recipientRelays) {
-      if (!myRelays.find((relay) => relay.url === relayUrl)) {
+      if (!myRelays.find((relay) => relay.enabled && relay.url === relayUrl)) {
         console.log('publishing event to recipient relay', relayUrl, event.id, event.content || '');
         const relay = this.relayInit(relayUrl, false);
         relay.publish(event);
