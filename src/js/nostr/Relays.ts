@@ -1,6 +1,6 @@
 import { throttle } from 'lodash';
 
-import { Filter, Relay, relayInit } from '../lib/nostr-tools';
+import { Event, Filter, Relay, relayInit } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
 import Events from './Events';
@@ -32,18 +32,24 @@ const DEFAULT_RELAYS = [
 
 const SEARCH_RELAYS = ['wss://relay.nostr.band'];
 
-const defaultRelays = new Map<string, Relay>(
-  DEFAULT_RELAYS.map((url) => [url, relayInit(url, (id) => !!Events.db.by('id', id))]),
-);
-
-const searchRelays = new Map<string, Relay>(
-  SEARCH_RELAYS.map((url) => [url, relayInit(url, (id) => !!Events.db.by('id', id))]),
-);
+type PublicRelaySettings = {
+  read: boolean;
+  write: boolean;
+};
 
 export default {
-  relays: defaultRelays,
-  searchRelays: searchRelays,
+  relays: new Map<string, Relay>(),
+  searchRelays: new Map<string, Relay>(),
   writeRelaysByUser: new Map<string, Set<string>>(),
+  init() {
+    this.relays = new Map<string, Relay>(
+      DEFAULT_RELAYS.map((url) => [url, this.relayInit(url)]),
+    );
+    this.searchRelays = new Map<string, Relay>(
+      SEARCH_RELAYS.map((url) => [url, this.relayInit(url)]),
+    );
+    this.manage();
+  },
   getStatus: (relay: Relay) => {
     // workaround for nostr-tools bug
     try {
@@ -51,6 +57,26 @@ export default {
     } catch (e) {
       return 3;
     }
+  },
+  // get Map of relayUrl: {read:boolean, write:boolean}
+  getUrlsFromFollowEvent(event: Event) {
+    const urls = new Map<string, PublicRelaySettings>();
+    if (event.content) {
+      try {
+        const content = JSON.parse(event.content);
+        for (const url in content) {
+          try {
+            const parsed = new URL(url).toString().replace(/\/$/, '');
+            urls.set(parsed, content[url]);
+          } catch (e) {
+            console.log('invalid relay url', url, event);
+          }
+        }
+      } catch (e) {
+        console.log('failed to parse relay urls', event);
+      }
+    }
+    return urls;
   },
   getPopularRelays: function () {
     console.log('getPopularRelays');
@@ -66,7 +92,7 @@ export default {
               const count = relays.get(parsed) || 0;
               relays.set(parsed, count + 1);
             } catch (e) {
-              console.log('invalid relay url', url);
+              console.log('invalid relay url', url, event);
             }
           }
         } catch (e) {
@@ -87,6 +113,46 @@ export default {
       }
     }
     return count;
+  },
+  getUserRelays(user: string) {
+    const relays = new Map<string, PublicRelaySettings>();
+    if (!user) {
+      return relays;
+    }
+    const followEvent = Events.db.findOne({ kind: 3, pubkey: user });
+    if (followEvent) {
+      return this.getUrlsFromFollowEvent(followEvent);
+    }
+    return relays;
+  },
+  publish(event: Event) {
+    const myRelays = Array.from(this.relays.values()).filter(
+      (relay: Relay) => relay.enabled !== false,
+    ) as Relay[];
+    for (const relay of myRelays) {
+      relay.publish(event);
+    }
+    const recipientRelays = new Set<string>();
+    const mentionedUsers = event.tags.filter((tag) => tag[0] === 'p').map((tag) => tag.slice(1));
+    if (mentionedUsers.length > 10) {
+      return;
+    }
+    for (const user of mentionedUsers) {
+      if (user === Key.getPubKey()) {
+        continue;
+      }
+      this.getUserRelays(user)
+        .entries()
+        .filter((entry) => entry[1].read)
+        .forEach((entry) => recipientRelays.add(entry[0]));
+    }
+    for (const relayUrl of recipientRelays) {
+      if (!myRelays.find((relay) => relay.url === relayUrl)) {
+        console.log('publishing event to recipient relay', relayUrl, event.id, event.content || '');
+        const relay = this.relayInit(relayUrl, false);
+        relay.publish(event);
+      }
+    }
   },
   connect: function (relay: Relay) {
     try {
@@ -149,7 +215,7 @@ export default {
           this.relays.has(url) && this.remove(url);
           return;
         } else if (!this.relays.has(url)) {
-          const relay = relayInit(url, (id) => Events.db.by('id', id));
+          const relay = this.relayInit(url);
           relay.enabled = data.enabled;
           this.relays.set(url, relay);
         }
@@ -162,7 +228,7 @@ export default {
   },
   add(url: string) {
     if (this.relays.has(url)) return;
-    const relay = relayInit(url, (id) => Events.db.by('id', id));
+    const relay = this.relayInit(url);
     relay.on('connect', () => this.resubscribe(relay));
     relay.on('notice', (notice) => {
       console.log('notice from ', relay.url, notice);
@@ -234,6 +300,18 @@ export default {
       this.subscribe(filters.filters, name, false, 0, filters.sinceRelayLastSeen, relay && [relay]);
     }
   },
+  relayInit(url: string, subscribeAll = true) {
+    const relay = relayInit(url, (id) => {
+      const have = !!Events.db.by('id', id);
+      // console.log('have?', have);
+      return have;
+    });
+    subscribeAll && relay.on('connect', () => this.resubscribe(relay));
+    relay.on('notice', (notice) => {
+      console.log('notice from ', relay.url, notice);
+    });
+    return relay;
+  },
   subscribe: function (
     filters: Filter[],
     id: string,
@@ -266,9 +344,9 @@ export default {
       }, unsubscribeTimeout);
     }
 
-    relays = relays || (id == 'keywords' ? this.searchRelays : this.relays).values();
-    for (const relay of relays) {
-      const subId = PubSub.getSubscriptionIdForName(id);
+    const myRelays = relays || (id == 'keywords' ? this.searchRelays : this.relays).values();
+    const subId = PubSub.getSubscriptionIdForName(id);
+    for (const relay of myRelays) {
       if (sinceLastSeen && savedRelays[relay.url] && savedRelays[relay.url].lastSeen) {
         filters.forEach((filter) => {
           filter.since = savedRelays[relay.url].lastSeen;
@@ -291,6 +369,43 @@ export default {
         setTimeout(() => {
           sub.unsub();
         }, unsubscribeTimeout);
+      }
+    }
+    if (!relays) {
+      // if one of filters has .authors of length 1, subscribe to that author's relays
+      const authors = filters
+        .map((f) => f.authors)
+        .flat()
+        .filter((a) => a);
+      if (authors.length === 1) {
+        const author = authors[0];
+        if (author === Key.getPubKey()) {
+          return;
+        }
+        const authorRelayUrls = Array.from(this.getUserRelays(author).entries()).filter(
+          ([url, settings]) => {
+            console.log('already have?', url, this.relays.has(url));
+            return settings.write && !this.relays.has(url);
+          },
+        );
+        const authorRelays = authorRelayUrls.map(([url, settings]) => {
+          const relay = this.relayInit(url, false);
+          relay.on('notice', (notice) => {
+            console.log('notice from ', relay.url, notice);
+          });
+          relay.connect();
+          const sub = relay.sub(filters, { id: subId });
+          sub.on('event', (event) => {
+            console.log('event from author relay', relay.url, event);
+            Events.handle(event);
+          });
+          setTimeout(() => relay?.close(), 15 * 1000);
+          return relay;
+        });
+        if (authorRelays.length) {
+          console.log('subscribing to author relays', authorRelays);
+        }
+        this.subscribe(filters, author + id, false, 15, sinceLastSeen, authorRelays);
       }
     }
   },

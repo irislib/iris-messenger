@@ -252,7 +252,7 @@ const Events = {
       delete event['$loki'];
       this.db.insert(event);
     } catch (e) {
-      console.log('failed to insert event', e, typeof e);
+      // console.log('failed to insert event', e, typeof e);
       // suppress error on duplicate insert. lokijs should throw a different error kind?
     }
   },
@@ -663,13 +663,11 @@ const Events = {
       .filter((tag) => tag[0] === 'e')
       .reverse()
       .slice(0, 10);
-    for (const relay of Relays.relays.values()) {
-      relay.publish(event);
-      for (const ref of referredEvents) {
-        const referredEvent = this.db.by('id', ref[1]);
-        if (referredEvent) {
-          relay.publish(referredEvent);
-        }
+    Relays.publish(event);
+    for (const ref of referredEvents) {
+      const referredEvent = this.db.by('id', ref[1]);
+      if (referredEvent) {
+        Relays.publish(referredEvent);
       }
     }
     this.handle(event);

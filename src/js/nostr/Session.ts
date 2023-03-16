@@ -100,7 +100,7 @@ const Session = {
       }
       document.documentElement.setAttribute('data-theme', 'dark');
     });
-    Relays.manage();
+    Relays.init();
     LocalForage.loadEvents();
     IndexedDB.init();
     const timeout = setTimeout(() => {
