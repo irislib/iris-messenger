@@ -379,13 +379,13 @@ export default {
             console.log('got event from author relay', relay.url);
             Events.handle(event);
           });
-          setTimeout(() => relay?.close(), 15 * 1000);
+          setTimeout(() => relay?.close(), 30 * 1000);
           return relay;
         });
         if (authorRelays.length) {
           console.log('subscribing to author relays', authorRelays);
         }
-        this.subscribe(filters, author + id, false, 15, sinceLastSeen, authorRelays);
+        this.subscribe(filters, author + id, true, 0, sinceLastSeen, authorRelays);
       }
     }
 
