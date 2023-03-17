@@ -23,6 +23,7 @@ export default class Media extends Component {
       { setting: 'enableSpotify', label: 'Spotify' },
       { setting: 'enableTidal', label: 'Tidal' },
       { setting: 'enableTwitch', label: 'Twitch' },
+      { setting: 'enableWavlake', label: 'Wavlake' },
     ];
     return (
       <>
