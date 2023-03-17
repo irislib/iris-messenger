@@ -13,6 +13,32 @@ import PubSub from './PubSub';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
 
+const DEFAULT_FEED_SETTINGS = {
+  display: 'posts',
+  realtime: false,
+  replies: true,
+  sortBy: 'created_at',
+  sortDirection: 'desc',
+  timespan: 'all',
+};
+
+const DEFAULT_FEEDS = {
+  following: {
+    ...DEFAULT_FEED_SETTINGS,
+    followDistances: [0, 1],
+    name: 'Following',
+    description: 'Public messages from people you follow',
+    icon: 'newFollower',
+  },
+  global: {
+    ...DEFAULT_FEED_SETTINGS,
+    followDistances: [0, 1, 2, 3, 4],
+    name: 'Global',
+    description: 'Public messages from everyone in your social network',
+    icon: 'global',
+  },
+};
+
 try {
   localStorage.setItem('gunPeers', JSON.stringify({})); // quick fix to not connect gun
 } catch (e) {
@@ -119,6 +145,11 @@ const Session = {
       } else {
         localState.get('noFollowers').put(false);
         unsubFollowers();
+      }
+    });
+    localState.get('feeds').once((feeds) => {
+      if (!feeds) {
+        localState.get('feeds').put(DEFAULT_FEEDS);
       }
     });
     if (window.location.pathname === '/') {

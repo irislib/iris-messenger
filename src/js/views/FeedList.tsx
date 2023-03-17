@@ -10,29 +10,17 @@ class FeedList extends View {
   constructor() {
     super();
     this.class = 'public-messages-view';
-    this.state = {
-      feeds: {
-        following: {
-          name: 'Following',
-          description: 'Public messages from people you follow',
-          icon: Icons.newFollower,
-        },
-        global: {
-          name: 'Global',
-          description: 'Public messages from everyone in your social network',
-          icon: Icons.global,
-        },
-      },
-    };
+    this.state = { feeds: {} };
   }
 
   componentDidMount() {
     this.restoreScrollPosition();
+    localState.get('feeds').on(this.inject());
   }
 
   openFeed(feed) {
     localState.get('lastOpenedFeed').put(feed);
-    route(`/${feed}`);
+    route(`/feed/${feed}`);
   }
 
   renderView() {
@@ -40,16 +28,19 @@ class FeedList extends View {
       <div className="centered-container">
         {Object.keys(this.state.feeds).map((key) => {
           const feed = this.state.feeds[key];
+          if (!feed) {
+            return null;
+          }
           return (
             <div>
               <div style="margin-bottom: 5px" className="msg" onClick={() => this.openFeed(key)}>
                 <div className="msg-content">
                   <div style="margin-right: 15px">
-                    <div>{feed.icon}</div>
+                    <div>{feed.icon && Icons[feed.icon]}</div>
                   </div>
                   <div className="msg-body" style="flex:1">
-                    <h3 style="margin-top:0">{t(feed.name)}</h3>
-                    {t(feed.description)}
+                    <h3 style="margin-top:0">{feed.name}</h3>
+                    {feed.description}
                   </div>
                 </div>
               </div>

@@ -18,6 +18,15 @@ import ErrorBoundary from './ErrorBoundary';
 
 const INITIAL_PAGE_SIZE = 20;
 
+const DEFAULT_SETTINGS = {
+  display: 'posts',
+  realtime: false,
+  replies: true,
+  sortBy: 'created_at',
+  sortDirection: 'desc',
+  timespan: 'all',
+};
+
 let isInitialLoad = true;
 const listener = function () {
   isInitialLoad = false;
@@ -33,15 +42,6 @@ const ImageGrid = styled.div`
     grid-gap: 1px;
   }
 `;
-
-const DEFAULT_SETTINGS = {
-  display: 'posts',
-  realtime: false,
-  replies: true,
-  sortBy: 'created_at',
-  sortDirection: 'desc',
-  timespan: 'all',
-};
 
 const TIMESPANS = {
   all: 0,
@@ -72,10 +72,10 @@ class Feed extends Component {
   getSettings(override = {}) {
     // override default & saved settings with url params
     let settings = { ...DEFAULT_SETTINGS };
-    if (['everyone', 'follows'].includes(this.props?.index)) {
+    if (['global', 'follows'].includes(this.props?.name)) {
       settings = Object.assign(settings, override);
     }
-    if (this.props?.index !== 'notifications' && override.display) {
+    if (this.props?.name !== 'notifications' && override.display) {
       settings.display = override.display;
     }
     for (const key in settings) {
@@ -93,7 +93,7 @@ class Feed extends Component {
   }
 
   saveSettings() {
-    localState.get('settings').get('feed').put(this.state.settings);
+    localState.get('feeds').get(this.props.name).put(this.state.settings);
   }
 
   updateSortedMessages = (sortedMessages) => {
@@ -176,8 +176,8 @@ class Feed extends Component {
     if (isEqual(this.state.settings, DEFAULT_SETTINGS)) {
       // no settings saved in history state, load from localstorage
       localState
-        .get('settings')
-        .get('feed')
+        .get('feeds')
+        .get(this.props.name)
         .on(
           this.sub((s) => {
             const settings = this.getSettings(s);
@@ -205,7 +205,7 @@ class Feed extends Component {
   subscribe() {
     setTimeout(() => {
       this.unsub?.();
-      if (this.props.index === 'notifications') {
+      if (this.props.name === 'notifications') {
         // TODO notifications from LokiJS index
         this.unsub = this.getNotifications(
           throttle((messages) => this.updateSortedMessages(messages), 1000, { leading: true }),
@@ -245,7 +245,7 @@ class Feed extends Component {
     const find = { kind: { $between: [1, 6] } };
     if (this.props.nostrUser) {
       find.pubkey = this.props.nostrUser;
-      if (this.props.index === 'likes') {
+      if (this.props.name === 'likes') {
         find.kind = 7;
       }
     }
@@ -270,16 +270,16 @@ class Feed extends Component {
     const callback = throttle(() => {
       const since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
       let includeReplies = true;
-      if (['everyone', 'follows'].includes(this.props.index)) {
+      if (['global', 'follows'].includes(this.props.name)) {
         includeReplies = this.state.settings.replies;
-      } else if (['posts', 'postsAndReplies'].includes(this.props.index)) {
-        includeReplies = this.props.index === 'postsAndReplies';
+      } else if (['posts', 'postsAndReplies'].includes(this.props.name)) {
+        includeReplies = this.props.name === 'postsAndReplies';
       }
       const events = dv
         .data()
         .filter((e) => {
           const maxFollowDistance =
-            this.state.settings.maxFollowDistance || this.props.index === 'follows' ? 1 : 0;
+            this.state.settings.maxFollowDistance || this.props.name === 'follows' ? 1 : 0;
           if (maxFollowDistance) {
             const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
             if (followDistance === undefined || followDistance > maxFollowDistance) {
@@ -300,7 +300,7 @@ class Feed extends Component {
           return true;
         })
         .map((e) => {
-          if (this.props.index === 'likes') {
+          if (this.props.name === 'likes') {
             return e.tags.find((t) => t[0] === 'e')?.[1];
           } else {
             return e.id;
@@ -402,7 +402,7 @@ class Feed extends Component {
   }
 
   renderFeedTypeSelector() {
-    const isProfile = ['posts', 'postsAndReplies', 'likes'].includes(this.props.index);
+    const isProfile = ['posts', 'postsAndReplies', 'likes'].includes(this.props.name);
     return (
       <div className="tabs">
         <a
@@ -508,6 +508,18 @@ class Feed extends Component {
       <div className="msg">
         <div className="msg-content">
           <div style="display:flex;flex-direction:column">
+            <div style="margin-bottom:15px">
+              <label htmlFor="feed_name">{t('feed_name')}</label>
+              <input
+                type="text"
+                value={this.state.settings.name}
+                id="name"
+                placeholder={t('feed_name')}
+                onChange={(e) => {
+                  localState.get('feeds').get(this.props.name).get('name').put(e.target.value);
+                }}
+              />
+            </div>
             <div>
               {inputs.map((input, i) => (
                 <span key={i}>
@@ -579,20 +591,15 @@ class Feed extends Component {
       return;
     }
     const displayCount = this.state.displayCount;
-    const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
+    const showRepliedMsg = this.props.name !== 'likes' && !this.props.keyword;
     const feedName =
-      !this.state.queuedMessages.length &&
-      {
-        everyone: 'global_feed',
-        follows: 'following',
-        notifications: 'notifications',
-      }[this.props.index];
+      !this.state.queuedMessages.length && (this.state.settings.name || this.props.name);
 
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
     const messages = this.state.sortedMessages.slice(0, displayCount).map((id) => (
       <ErrorBoundary>
         <EventComponent
-          notification={this.props.index === 'notifications'}
+          notification={this.props.name === 'notifications'}
           key={id}
           id={id}
           showRepliedMsg={showRepliedMsg}
@@ -601,7 +608,7 @@ class Feed extends Component {
         />
       </ErrorBoundary>
     ));
-    const isGeneralFeed = ['everyone', 'follows'].includes(this.props.index);
+    const isGeneralFeed = ['global', 'follows'].includes(this.props.name);
     return (
       <div className="msg-feed">
         <div>
@@ -628,8 +635,8 @@ class Feed extends Component {
               </div>
             </div>
           ) : null}
-          {this.props.index !== 'notifications' && this.state.settingsOpen && this.renderSettings()}
-          {this.props.index !== 'notifications' && this.renderFeedTypeSelector()}
+          {this.props.name !== 'notifications' && this.state.settingsOpen && this.renderSettings()}
+          {this.props.name !== 'notifications' && this.renderFeedTypeSelector()}
           {messages.length === 0 && (
             <div className="msg">
               <div className="msg-content notification-msg">

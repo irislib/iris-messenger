@@ -44,7 +44,7 @@ class Feed extends View {
 
   renderView() {
     const s = this.state;
-    let path = this.props.index || 'msgs';
+    let path = this.props.name || 'msgs';
     return html`
       <div class="centered-container">
         <div style="display:flex;flex-direction:row">
@@ -67,8 +67,8 @@ class Feed extends View {
               filter=${s.searchTerm && ((m) => this.filter(m))}
               keyword=${s.searchTerm}
               thumbnails=${this.props.thumbnails}
-              key=${this.props.index || 'feed'}
-              index=${this.props.index}
+              key=${this.props.name || 'feed'}
+              name=${this.props.name}
               path=${path}
             />
           </div>
