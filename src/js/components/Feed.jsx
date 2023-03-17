@@ -71,8 +71,8 @@ class Feed extends Component {
 
   getSettings(override = {}) {
     // override default & saved settings with url params
-    let settings = { ...DEFAULT_SETTINGS };
-    if (['global', 'follows'].includes(this.props?.name)) {
+    let settings = Object.assign({ ...DEFAULT_SETTINGS }, override);
+    if (['global', 'following'].includes(this.props?.name)) {
       settings = Object.assign(settings, override);
     }
     if (this.props?.name !== 'notifications' && override.display) {
@@ -270,7 +270,7 @@ class Feed extends Component {
     const callback = throttle(() => {
       const since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
       let includeReplies = true;
-      if (['global', 'follows'].includes(this.props.name)) {
+      if (['global', 'following'].includes(this.props.name)) {
         includeReplies = this.state.settings.replies;
       } else if (['posts', 'postsAndReplies'].includes(this.props.name)) {
         includeReplies = this.props.name === 'postsAndReplies';
@@ -279,7 +279,7 @@ class Feed extends Component {
         .data()
         .filter((e) => {
           const maxFollowDistance =
-            this.state.settings.maxFollowDistance || this.props.name === 'follows' ? 1 : 0;
+            this.state.settings.maxFollowDistance || this.props.name === 'following' ? 1 : 0;
           if (maxFollowDistance) {
             const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
             if (followDistance === undefined || followDistance > maxFollowDistance) {
@@ -608,7 +608,7 @@ class Feed extends Component {
         />
       </ErrorBoundary>
     ));
-    const isGeneralFeed = ['global', 'follows'].includes(this.props.name);
+    const isGeneralFeed = ['global', 'following'].includes(this.props.name);
     return (
       <div className="msg-feed">
         <div>

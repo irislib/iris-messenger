@@ -2,7 +2,6 @@ import { route } from 'preact-router';
 
 import Icons from '../Icons';
 import localState from '../LocalState';
-import { translate as t } from '../translations/Translation';
 
 import View from './View';
 
@@ -24,10 +23,13 @@ class FeedList extends View {
   }
 
   renderView() {
+    console.log('feeds', this.state.feeds);
     return (
       <div className="centered-container">
-        {Object.keys(this.state.feeds).map((key) => {
-          const feed = this.state.feeds[key];
+        {Object.entries(this.state.feeds).map((entry) => {
+          const key = entry[0];
+          const feed = entry[1];
+          console.log('key feed', key, feed);
           if (!feed) {
             return null;
           }

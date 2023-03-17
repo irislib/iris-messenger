@@ -12,7 +12,7 @@ class Feed extends View {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = { sortedMessages: [], group: 'follows' };
+    this.state = { sortedMessages: [] };
     this.messages = {};
     this.id = 'message-view';
     this.class = 'public-messages-view';
@@ -32,7 +32,6 @@ class Feed extends View {
   componentDidMount() {
     this.restoreScrollPosition();
     this.search();
-    localState.get('filters').get('group').on(this.inject());
   }
 
   filter(msg) {
