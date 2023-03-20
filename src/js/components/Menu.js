@@ -76,7 +76,7 @@ export default class Menu extends Component {
         ${Helpers.isElectron
           ? html`<div class="electron-padding" />`
           : html`
-              <a tabindex="3" href="/" onClick=${() => this.menuLinkClicked()} class="logo">
+              <a tabindex="3" href="/" onClick=${(e) => this.handleFeedClick(e)} class="logo">
                 <div class="mobile-menu-icon visible-xs-inline-block">${Icons.menu}</div>
                 <img src=${logo} width="30" height="30" />
                 <span style="font-size: 1.8em">iris</span>
