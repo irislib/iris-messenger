@@ -1,19 +1,24 @@
-# Iris
+![git_banner_1200x200](https://user-images.githubusercontent.com/52623440/226903633-7902aa21-6041-4bad-979a-dc98bd0ad317.png)
+<div align="center">
 
-Nostr client for better social networks.
+[nostr](https://iris.to/iris) | [twitter](https://www.twitter.com/iristoapp) | [instagram](https://www.instagram.com/iristoapp) | [youtube](https://www.youtube.com/@iristoapp) | [linkedin](https://www.linkedin.com/company/91035282/) | [tiktok](https://www.tiktok.com/@iristoapp)
 
-- No phone number or signup required. Just type in your name or alias and go!
+</div>
+
+
+# Iris – The app for better social networks
+
+[Iris](https://iris.to/) is a Nostr [Android](https://play.google.com/store/apps/details?id=to.iris.twa), [iOS](https://apps.apple.com/app/iris-the-nostr-client/id1665849007) and [web](https://iris.to/) client that has also standalone desktop ([Windows, MacOS, Linux](https://github.com/irislib/iris-messenger/releases)) and [Docker](#docker) versions.
+
+- Sign up in seconds: Just type a name and hit "Go" 
 - Secure: It's open source. Users can validate that big brother doesn't read your private messages.
 - Available: It works offline-first and is not dependent on any single centrally managed server.
 
-## Use
+## Sign up, get started, FAQ and support
 
-Browser application: [iris.to](https://iris.to)
+Visit [Iris FAQ](https://github.com/irislib/faq) for features, explanations and troubleshooting.
 
-- No installation required
-- Progressive web app
-  - Use offline
-  - Save as an app to home screen or desktop
+  https://user-images.githubusercontent.com/52623440/225862232-7ac9a16a-bf14-4745-ad48-3e3a67bc597e.mp4
 
 ## Develop
 
@@ -109,10 +114,6 @@ Tauri [desktop releases](https://github.com/irislib/iris-messenger/releases) are
 ## Privacy
 
 The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.
-
-## Contact
-
-Join our [Telegram](https://t.me/irismessenger) (will be moved onto Iris when group chat is ready).
 
 ---
 
