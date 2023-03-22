@@ -111,6 +111,46 @@ Master branch is deployed to [beta.iris.to](https://beta.iris.to).
 
 Tauri [desktop releases](https://github.com/irislib/iris-messenger/releases) are built from the `release` branch by GitHub CI.
 
+## NIPS implemented
+
+:heavy_check_mark: [NIP-01: Basic protocol flow description](https://github.com/nostr-protocol/nips/blob/master/01.md)<br>
+:heavy_check_mark: [NIP-02: Contact List and Petnames](https://github.com/nostr-protocol/nips/blob/master/02.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-03: OpenTimestamps Attestations for Events](https://github.com/nostr-protocol/nips/blob/master/03.md)<br>
+:heavy_check_mark: [NIP-04: Encrypted Direct Message](https://github.com/nostr-protocol/nips/blob/master/04.md)<br>
+:heavy_check_mark: [NIP-05: Mapping Nostr keys to DNS-based internet identifiers](https://github.com/nostr-protocol/nips/blob/master/05.md)<br>
+:heavy_check_mark: [NIP-06: Basic key derivation from mnemonic seed phrase](https://github.com/nostr-protocol/nips/blob/master/06.md)<br>
+:heavy_check_mark: [NIP-07: `window.nostr` capability for web browsers](https://github.com/nostr-protocol/nips/blob/master/07.md)<br>
+:heavy_check_mark: [NIP-08: Handling Mentions](https://github.com/nostr-protocol/nips/blob/master/08.md)<br>
+:heavy_check_mark: [NIP-09: Event Deletion](https://github.com/nostr-protocol/nips/blob/master/09.md)<br>
+:heavy_check_mark: [NIP-10: Conventions for clients' use of `e` and `p` tags in text events](https://github.com/nostr-protocol/nips/blob/master/10.md)<br>
+:heavy_check_mark: [NIP-11: Relay Information Document](https://github.com/nostr-protocol/nips/blob/master/11.md)<br>
+:heavy_check_mark: [NIP-12: Generic Tag Queries](https://github.com/nostr-protocol/nips/blob/master/12.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-13: Proof of Work](https://github.com/nostr-protocol/nips/blob/master/13.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-14: Subject tag in text events.](https://github.com/nostr-protocol/nips/blob/master/14.md)<br>
+:heavy_check_mark: [NIP-15: End of Stored Events Notice](https://github.com/nostr-protocol/nips/blob/master/15.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-16: Event Treatment](https://github.com/nostr-protocol/nips/blob/master/16.md)<br>
+:heavy_check_mark: [NIP-19: bech32-encoded entities](https://github.com/nostr-protocol/nips/blob/master/19.md)<br>
+:heavy_check_mark: [NIP-20: Command Results](https://github.com/nostr-protocol/nips/blob/master/20.md)<br>
+:heavy_check_mark: [NIP-21: `nostr:` URL scheme](https://github.com/nostr-protocol/nips/blob/master/21.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-22: Event `created_at` Limits](https://github.com/nostr-protocol/nips/blob/master/22.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-23: Long-form Content](https://github.com/nostr-protocol/nips/blob/master/23.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-25: Reactions](https://github.com/nostr-protocol/nips/blob/master/25.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-26: Delegated Event Signing](https://github.com/nostr-protocol/nips/blob/master/26.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-28: Public Chat](https://github.com/nostr-protocol/nips/blob/master/28.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-33: Parameterized Replaceable Events](https://github.com/nostr-protocol/nips/blob/master/33.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-36: Sensitive Content](https://github.com/nostr-protocol/nips/blob/master/36.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-39: External Identities in Profiles](https://github.com/nostr-protocol/nips/blob/master/39.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-40: Expiration Timestamp](https://github.com/nostr-protocol/nips/blob/master/40.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-42: Authentication of clients to relays](https://github.com/nostr-protocol/nips/blob/master/42.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-46: Nostr Connect](https://github.com/nostr-protocol/nips/blob/master/46.md)<br>
+:heavy_check_mark: [NIP-50: Keywords filter](https://github.com/nostr-protocol/nips/blob/master/50.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-51: Lists](https://github.com/nostr-protocol/nips/blob/master/51.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-56: Reporting](https://github.com/nostr-protocol/nips/blob/master/56.md)<br>
+:heavy_check_mark: [NIP-57: Lightning Zaps](https://github.com/nostr-protocol/nips/blob/master/57.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-58: Badges](https://github.com/nostr-protocol/nips/blob/master/58.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-65: Relay List Metadata](https://github.com/nostr-protocol/nips/blob/master/65.md)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [NIP-78: Application-specific data](https://github.com/nostr-protocol/nips/blob/master/78.md)<br>
+
 ## Privacy
 
 The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.
