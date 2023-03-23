@@ -6,11 +6,13 @@ import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
 import localState from '../LocalState';
+import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
 import Button from './buttons/Button';
 import Modal from './modal/Modal';
 import FeedMessageForm from './FeedMessageForm';
+import QrCode from './QrCode';
 
 const APPLICATIONS = [
   // TODO: move editable shortcuts to localState gun
@@ -70,6 +72,18 @@ export default class Menu extends Component {
       : '';
   }
 
+  renderQrModal() {
+    return this.state.showQrModal
+      ? html`
+          <${Modal} showContainer=${true} onClose=${() => this.setState({ showQrModal: false })}>
+            <div style="text-align:center">
+              <${QrCode} data=${Key.getPubKey()} />
+            </div>
+          <//>
+        `
+      : '';
+  }
+
   render() {
     return html`
       <div class="application-list">
@@ -104,13 +118,16 @@ export default class Menu extends Component {
             <//>`;
           }
         })}
-        <div class="hidden-xs menu-new-post">
+        <div class="menu-new-post">
           <${Button}
             onClick=${() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}
           >
             <span class="icon">${Icons.post}</span>
           <//>
-          ${this.renderNewPostModal()}
+          <${Button} onClick=${() => this.setState({ showQrModal: !this.state.showQrModal })}>
+            <span class="icon">${Icons.QRcode}</span>
+          <//>
+          ${this.renderNewPostModal()} ${this.renderQrModal()}
         </div>
       </div>
     `;
