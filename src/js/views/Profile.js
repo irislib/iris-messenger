@@ -19,7 +19,7 @@ import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
-import Relays from '../nostr/Relays';
+import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
@@ -363,7 +363,7 @@ class Profile extends View {
 
   getNostrProfile(address, nostrAddress) {
     // TODO unsubscribe on unmount
-    Relays.subscribe([{ authors: [address] }], address, true, 15 * 1000);
+    PubSub.subscribe([{ authors: [address] }], undefined, address);
     const setFollowCounts = () => {
       address &&
         this.setState({

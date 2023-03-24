@@ -9,7 +9,7 @@ import PrivateMessage from '../../components/PrivateMessage';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import Relays from '../../nostr/Relays';
+import PubSub from '../../nostr/PubSub';
 import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation';
 
@@ -63,10 +63,10 @@ export default class PrivateChat extends Component {
     if (!hexId) {
       console.error('no id');
     }
-    this.unsub = Relays.subscribe(
+    this.unsub = PubSub.subscribe(
       [{ kinds: [4], '#p': [Key.getPubKey()], authors: [hexId] }],
+      undefined,
       'privateChat',
-      true,
     );
     Events.getDirectMessagesByUser(hexId, (msgIds) => {
       if (msgIds) {

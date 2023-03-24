@@ -8,6 +8,7 @@ import Language from './Language';
 import Media from './Media';
 import Network from './Network';
 import SocialNetwork from './SocialNetwork';
+import Dev from './Dev';
 
 export default class SettingsContent extends Component {
   content = '';
@@ -20,6 +21,7 @@ export default class SettingsContent extends Component {
     backup: Backup,
     social_network: SocialNetwork,
     iris_account: IrisAccount,
+    dev: Dev,
   };
 
   constructor() {

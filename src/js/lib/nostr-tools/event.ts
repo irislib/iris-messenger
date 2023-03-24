@@ -4,6 +4,7 @@ import {sha256} from '@noble/hashes/sha256'
 import {utf8Encoder} from './utils'
 
 /* eslint-disable no-unused-vars */
+
 export enum Kind {
   Metadata = 0,
   Text = 1,
@@ -11,18 +12,21 @@ export enum Kind {
   Contacts = 3,
   EncryptedDirectMessage = 4,
   EventDeletion = 5,
-  EventUpdate = 6,
   Reaction = 7,
   ChannelCreation = 40,
   ChannelMetadata = 41,
   ChannelMessage = 42,
   ChannelHideMessage = 43,
   ChannelMuteUser = 44,
-  BlockList = 16462,
-  FlagList = 16463,
-  ReplaceableByTag = 30000,
+  Report = 1984,
   ZapRequest = 9734,
   Zap = 9735,
+  RelayList = 10002,
+  BlockList = 16462,
+  FlagList = 16463,
+  ClientAuth = 22242,
+  ReplaceableByTag = 30000,
+  Article = 30023
 }
 
 export type Event = {

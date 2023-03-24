@@ -1,8 +1,11 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { debounce, throttle } from 'lodash';
+import { RelayPool } from 'nostr-relaypool';
 
 import Helpers from '../Helpers';
 import { Event, Filter, Sub } from '../lib/nostr-tools';
+import localState from '../LocalState';
+import Events from '../nostr/Events';
 
 //import IndexedDB from './IndexedDB';
 import Key from './Key';
@@ -22,6 +25,15 @@ type FiltersWithOptions = {
 type Unsubscribe = () => void;
 
 let subscriptionId = 0;
+
+let dev: any = {
+  relayPool: false,
+};
+localState.get('dev').on((d) => (dev = d));
+const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
+  useEventCache: false,
+  externalGetEventById: (id) => Events.db.by('id', id),
+});
 
 const MAX_MSGS_BY_KEYWORD = 1000;
 
@@ -129,6 +141,16 @@ const PubSub = {
    * @returns unsubscribe function
    */
   subscribe: function (filters: Filter[], cb?: (event: Event) => void, name?: string): Unsubscribe {
+    if (dev.relayPool) {
+      return relayPool.subscribe(filters, undefined, (event) => {
+        delete event.relays;
+        delete event.relayPool;
+        delete event['$loki'];
+        Events.handle(event);
+        cb?.(event);
+      });
+    }
+
     let currentSubscriptionId;
     if (cb) {
       currentSubscriptionId = subscriptionId++;
