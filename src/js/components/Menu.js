@@ -12,6 +12,7 @@ import { translate as t } from '../translations/Translation';
 import Button from './buttons/Button';
 import Modal from './modal/Modal';
 import FeedMessageForm from './FeedMessageForm';
+import Name from './Name';
 import QrCode from './QrCode';
 
 const APPLICATIONS = [
@@ -78,6 +79,9 @@ export default class Menu extends Component {
           <${Modal} showContainer=${true} onClose=${() => this.setState({ showQrModal: false })}>
             <div style="text-align:center">
               <${QrCode} data=${Key.getPubKey()} />
+              <p>
+                <${Name} pub=${Key.getPubKey()} />
+              </p>
             </div>
           <//>
         `
