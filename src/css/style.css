@@ -290,7 +290,7 @@ video {
 }
 
 textarea.new-msg {
-  border: 2px solid var(--button-bg);
+  border: 2px solid var(--purple);
 }
 
 .msg-content iframe,
