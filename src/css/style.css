@@ -998,6 +998,10 @@ header.footer .header-content {
   margin-top: 30px;
 }
 
+.menu-new-post button {
+  margin-bottom: 10px;
+}
+
 .application-list {
   z-index: 2;
   width: 220px;
