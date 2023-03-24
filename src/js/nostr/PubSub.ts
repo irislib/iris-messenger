@@ -158,8 +158,6 @@ const PubSub = {
         filters,
         relays,
         (event) => {
-          delete event.relays;
-          delete event.relayPool;
           delete event['$loki'];
           Events.handle(event);
           cb?.(event);
