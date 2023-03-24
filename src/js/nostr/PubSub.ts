@@ -90,16 +90,23 @@ const PubSub = {
         authors,
       },
     ];
-    Relays.subscribe(filters, 'followed', true, 0, true);
+    const subscribe = (filters, id, once, unsubscribeTimeout?, sinceLastSeen?) => {
+      if (dev.relayPool) {
+        return PubSub.subscribe(filters);
+      } else {
+        return Relays.subscribe(filters, id, once, unsubscribeTimeout, sinceLastSeen);
+      }
+    };
+    subscribe(filters, 'followed', true, 0, true);
     //IndexedDB.subscribe(filters);
     if (PubSub.subscribedProfiles.size) {
       const filters = [{ authors: Array.from(PubSub.subscribedProfiles.values()), kinds: [0] }];
-      Relays.subscribe(filters, 'subscribedProfiles', true);
+      subscribe(filters, 'subscribedProfiles', true);
       //IndexedDB.subscribe(filters);
     }
     const filters2 = [{ authors: followedUsers, limit: 100, until: now }];
     setTimeout(() => {
-      Relays.subscribe(filters2, 'followedHistory', true, 0, true);
+      subscribe(filters2, 'followedHistory', true, 0, true);
       //IndexedDB.subscribe(filters2);
     }, 1000);
   }, 2000),
@@ -142,13 +149,23 @@ const PubSub = {
    */
   subscribe: function (filters: Filter[], cb?: (event: Event) => void, name?: string): Unsubscribe {
     if (dev.relayPool) {
-      return relayPool.subscribe(filters, undefined, (event) => {
-        delete event.relays;
-        delete event.relayPool;
-        delete event['$loki'];
-        Events.handle(event);
-        cb?.(event);
-      });
+      let relays: any = undefined;
+      // if any of filters[] doesn't have authors, we need to define default relays
+      if (filters.some((f) => !f.authors)) {
+        relays = Relays.DEFAULT_RELAYS;
+      }
+      return relayPool.subscribe(
+        filters,
+        relays,
+        (event) => {
+          delete event.relays;
+          delete event.relayPool;
+          delete event['$loki'];
+          Events.handle(event);
+          cb?.(event);
+        },
+        100,
+      );
     }
 
     let currentSubscriptionId;

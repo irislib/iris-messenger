@@ -12,6 +12,7 @@ export enum Kind {
   Contacts = 3,
   EncryptedDirectMessage = 4,
   EventDeletion = 5,
+  Repost = 6,
   Reaction = 7,
   ChannelCreation = 40,
   ChannelMetadata = 41,

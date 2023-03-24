@@ -363,7 +363,11 @@ class Profile extends View {
 
   getNostrProfile(address, nostrAddress) {
     // TODO unsubscribe on unmount
-    PubSub.subscribe([{ authors: [address] }], undefined, address);
+    PubSub.subscribe(
+      [{ authors: [address] }],
+      (event) => console.log('profile event', event),
+      address,
+    );
     const setFollowCounts = () => {
       address &&
         this.setState({
