@@ -292,6 +292,14 @@ class Feed extends Component {
           if (e.kind === 1 && !includeReplies && Events.getEventReplyingTo(e)) {
             return false;
           }
+          if (![1, 3, 6, 7].includes(e.kind)) {
+            return false;
+          }
+          if (this.props.index !== 'notifications' && this.props.index !== 'likes') {
+            if (e.kind === 7 || e.kind === 3) {
+              return false;
+            }
+          }
           if (this.state.settings.timespan !== 'all') {
             if (e.created_at < since) {
               return false;
