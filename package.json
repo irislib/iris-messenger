@@ -79,7 +79,7 @@
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "lokijs": "^1.5.12",
-    "nostr-relaypool": "0.6.4",
+    "nostr-relaypool": "0.6.5",
     "preact": "^10.13.0",
     "preact-router": "^4.1.0",
     "preact-scroll-viewport": "^0.2.0",
