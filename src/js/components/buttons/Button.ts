@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export default styled.button`
+const Button = styled.button`
   background: var(--button-bg);
   color: var(--button-color);
   border: var(--button-border);
@@ -21,3 +21,18 @@ export default styled.button`
     color: var(--button-color-hover);
   }
 `;
+
+const PrimaryButton = styled(Button)`
+  background: var(--button-primary-bg);
+  color: var(--button-primary-color);
+  border: var(--button-primary-border);
+
+  &:hover,
+  &:focus,
+  &:active {
+    background: var(--button-primary-bg-hover);
+    color: var(--button-primary-color-hover);
+  }
+`;
+
+export { Button, PrimaryButton };

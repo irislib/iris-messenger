@@ -1,7 +1,7 @@
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
-import Button from '../components/buttons/Button';
+import { PrimaryButton as Button } from '../components/buttons/Button';
 import Session from '../nostr/Session';
 import { translate as t } from '../translations/Translation';
 

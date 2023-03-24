@@ -1,12 +1,17 @@
 :root {
   --body-bg: #000000;
   --blue: #1d9bf0;
-  --button-bg: #8e44ad;
-  --button-bg-hover: #5a488b;
-  --button-border: 0;
+  --button-bg: #000000;
+  --button-bg-hover: #333;
+  --button-border: 1px solid #ffffff;
+  --button-color: #ffffff;
+  --button-color-hover: #ffffff;
+  --button-primary-bg: #8e44ad;
+  --button-primary-bg-hover: #5a488b;
+  --button-primary-border: 0;
   --button-border-size: 0;
-  --button-color: #fefffe;
-  --button-color-hover: #fefffe;
+  --button-primary-color: #fefffe;
+  --button-primary-color-hover: #fefffe;
   --chat-active: #212428;
   --chat-hover: #26292e;
   --connecting-line-color: #333639;

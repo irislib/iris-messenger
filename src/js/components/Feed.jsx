@@ -12,7 +12,7 @@ import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
-import Button from './buttons/Button';
+import { PrimaryButton as Button } from './buttons/Button';
 import EventComponent from './events/EventComponent';
 import ErrorBoundary from './ErrorBoundary';
 

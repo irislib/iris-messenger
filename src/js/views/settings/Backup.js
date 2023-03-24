@@ -1,5 +1,5 @@
 import Component from '../../BaseComponent';
-import Button from '../../components/buttons/Button';
+import { PrimaryButton as Button } from '../../components/buttons/Button';
 import Copy from '../../components/buttons/Copy';
 import Follow from '../../components/buttons/Follow';
 import Identicon from '../../components/Identicon';

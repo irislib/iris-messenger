@@ -8,7 +8,7 @@ import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
-import Button from './buttons/Button';
+import { PrimaryButton as Button } from './buttons/Button';
 import Copy from './buttons/Copy';
 import Follow from './buttons/Follow';
 import Identicon from './Identicon';

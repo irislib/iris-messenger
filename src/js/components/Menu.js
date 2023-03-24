@@ -9,7 +9,7 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
-import Button from './buttons/Button';
+import { Button, PrimaryButton } from './buttons/Button';
 import Modal from './modal/Modal';
 import FeedMessageForm from './FeedMessageForm';
 import Name from './Name';
@@ -123,7 +123,7 @@ export default class Menu extends Component {
           }
         })}
         <div class="menu-new-post">
-          <${Button}
+          <${PrimaryButton}
             onClick=${() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}
           >
             <span class="icon">${Icons.post}</span>

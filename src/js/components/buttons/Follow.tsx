@@ -3,7 +3,7 @@ import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 
-import Button from './Button';
+import { PrimaryButton as Button } from './Button';
 
 type Props = {
   id: string;
