@@ -28,11 +28,15 @@ let subscriptionId = 0;
 
 let dev: any = {
   relayPool: false,
+  logSubscriptions: false,
 };
-localState.get('dev').on((d) => (dev = d));
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
   useEventCache: false,
   externalGetEventById: (id) => Events.db.by('id', id),
+});
+localState.get('dev').on((d) => {
+  dev = d;
+  relayPool.logSubscriptions = dev.logSubscriptions;
 });
 
 const MAX_MSGS_BY_KEYWORD = 1000;
