@@ -7,24 +7,24 @@ export default class Appearance extends Component {
         <div class="centered-container">
           <h3>Dev</h3>
           <p>
-            <label for="relayPool">
-              Use <a href="https://github.com/adamritter/nostr-relaypool-ts">relaypool</a>
-            </label>
             <input
               type="checkbox"
-              name="relayPool"
+              id="relayPool"
               checked={this.state.relayPool}
               onChange={(e) => localState.get('dev').get('relayPool').put(e.target.checked)}
             />
+            <label htmlFor="relayPool">
+              Use <a href="https://github.com/adamritter/nostr-relaypool-ts">relaypool</a>
+            </label>
           </p>
           <p>
-            <label for="logSubscriptions">Log RelayPool subscriptions</label>
             <input
               type="checkbox"
-              name="logSubscriptions"
+              id="logSubscriptions"
               checked={this.state.logSubscriptions}
               onChange={(e) => localState.get('dev').get('logSubscriptions').put(e.target.checked)}
             />
+            <label htmlFor="logSubscriptions">Log RelayPool subscriptions</label>
           </p>
         </div>
       </>
