@@ -4,7 +4,7 @@ import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
 import Block from '../components/buttons/Block';
-import Button from '../components/buttons/Button';
+import { PrimaryButton as Button } from '../components/buttons/Button';
 import Copy from '../components/buttons/Copy';
 import Follow from '../components/buttons/Follow';
 import Report from '../components/buttons/Report';
@@ -19,7 +19,7 @@ import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
-import Relays from '../nostr/Relays';
+import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
@@ -363,7 +363,11 @@ class Profile extends View {
 
   getNostrProfile(address, nostrAddress) {
     // TODO unsubscribe on unmount
-    Relays.subscribe([{ authors: [address] }], address, true, 15 * 1000);
+    PubSub.subscribe(
+      [{ authors: [address] }],
+      (event) => console.log('profile event', event),
+      address,
+    );
     const setFollowCounts = () => {
       address &&
         this.setState({

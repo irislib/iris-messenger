@@ -1,4 +1,4 @@
-import Button from './buttons/Button';
+import { PrimaryButton as Button } from './buttons/Button';
 
 const text = (
   <>

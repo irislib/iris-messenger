@@ -41,6 +41,7 @@ export default {
   relays: new Map<string, Relay>(),
   searchRelays: new Map<string, Relay>(),
   writeRelaysByUser: new Map<string, Set<string>>(),
+  DEFAULT_RELAYS,
   init() {
     this.relays = new Map<string, Relay>(DEFAULT_RELAYS.map((url) => [url, this.relayInit(url)]));
     this.searchRelays = new Map<string, Relay>(

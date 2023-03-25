@@ -2,7 +2,7 @@ import { debounce } from 'lodash';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
-import Button from '../components/buttons/Button';
+import { PrimaryButton as Button } from '../components/buttons/Button';
 import Upload from '../components/buttons/Upload';
 import Header from '../components/Header';
 import SafeImg from '../components/SafeImg';
@@ -42,10 +42,17 @@ export default class EditProfile extends Component {
   }
 
   saveOnChange = debounce(() => {
-    SocialNetwork.setMetadata(this.state.profile);
+    const profile = this.state.profile;
+    Object.keys(profile).forEach((key) => {
+      if (typeof profile[key] === 'string') {
+        profile[key] = profile[key].trim();
+      }
+    });
+    SocialNetwork.setMetadata(profile);
   }, 2000);
 
   setProfileAttribute = (key, value) => {
+    key = key.trim();
     const profile = Object.assign({}, this.state.profile);
     if (value) {
       profile[key] = value;

@@ -2,7 +2,7 @@ import { html } from 'htm/preact';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
-import Button from '../../components/buttons/Button';
+import { PrimaryButton as Button } from '../../components/buttons/Button';
 import Copy from '../../components/buttons/Copy';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';

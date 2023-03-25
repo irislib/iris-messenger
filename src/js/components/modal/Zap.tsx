@@ -7,7 +7,7 @@ import { LNURL, LNURLError, LNURLErrorCode, LNURLInvoice, LNURLSuccessAction } f
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Relays from '../../nostr/Relays';
-import Button from '../buttons/Button';
+import { PrimaryButton as Button } from '../buttons/Button';
 import CopyButton from '../buttons/Copy';
 import Name from '../Name';
 import QrCode from '../QrCode';

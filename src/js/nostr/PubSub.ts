@@ -1,8 +1,11 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { debounce, throttle } from 'lodash';
+import { RelayPool } from 'nostr-relaypool';
 
 import Helpers from '../Helpers';
 import { Event, Filter, Sub } from '../lib/nostr-tools';
+import localState from '../LocalState';
+import Events from '../nostr/Events';
 
 //import IndexedDB from './IndexedDB';
 import Key from './Key';
@@ -22,6 +25,26 @@ type FiltersWithOptions = {
 type Unsubscribe = () => void;
 
 let subscriptionId = 0;
+
+let dev: any = {
+  relayPool: false,
+  logSubscriptions: false,
+};
+
+const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
+  useEventCache: false,
+  externalGetEventById: (id) => Events.db.by('id', id),
+});
+localState.get('dev').on((d) => {
+  dev = d;
+  relayPool.logSubscriptions = dev.logSubscriptions;
+});
+
+let lastOpened = 0;
+localState.get('lastOpened').once((lo) => {
+  lastOpened = lo;
+  localState.get('lastOpened').put(Math.floor(Date.now() / 1000));
+});
 
 const MAX_MSGS_BY_KEYWORD = 1000;
 
@@ -55,7 +78,7 @@ const PubSub = {
     Relays.subscribe(filters, 'subscribedRepliesAndReactions', true);
     //IndexedDB.subscribe(filters);
   }, 500),
-  subscribeToNewAuthors: new Set<string>(),
+  newAuthors: new Set<string>(),
   subscribeToAuthors: debounce(() => {
     const now = Math.floor(Date.now() / 1000);
     const myPub = Key.getPubKey();
@@ -63,12 +86,12 @@ const PubSub = {
     followedUsers.push(myPub);
     console.log(
       'subscribe to profiles and contacts of',
-      PubSub.subscribeToNewAuthors.size,
+      PubSub.newAuthors.size,
       'new authors',
     );
-    const authors = Array.from(PubSub.subscribeToNewAuthors.values()).slice(0, 1000);
+    const authors = Array.from(PubSub.newAuthors.values()).slice(0, 1000);
     authors.forEach((author) => {
-      PubSub.subscribeToNewAuthors.delete(author);
+      PubSub.newAuthors.delete(author);
     });
     console.log('subscribing to authors.length', authors.length);
     const filters = [
@@ -78,16 +101,23 @@ const PubSub = {
         authors,
       },
     ];
-    Relays.subscribe(filters, 'followed', true, 0, true);
+    const subscribe = (filters, id, once, unsubscribeTimeout?, sinceLastSeen?) => {
+      if (dev.relayPool) {
+        return PubSub.subscribe(filters, undefined, id, sinceLastSeen);
+      } else {
+        return Relays.subscribe(filters, id, once, unsubscribeTimeout, sinceLastSeen);
+      }
+    };
+    subscribe(filters, 'followed', true, 0, true);
     //IndexedDB.subscribe(filters);
     if (PubSub.subscribedProfiles.size) {
       const filters = [{ authors: Array.from(PubSub.subscribedProfiles.values()), kinds: [0] }];
-      Relays.subscribe(filters, 'subscribedProfiles', true);
+      subscribe(filters, 'subscribedProfiles', true);
       //IndexedDB.subscribe(filters);
     }
     const filters2 = [{ authors: followedUsers, limit: 100, until: now }];
     setTimeout(() => {
-      Relays.subscribe(filters2, 'followedHistory', true, 0, true);
+      subscribe(filters2, 'followedHistory', true, 0, true);
       //IndexedDB.subscribe(filters2);
     }, 1000);
   }, 2000),
@@ -128,7 +158,35 @@ const PubSub = {
    * @param name optional name for the subscription. replaces the previous one with the same name
    * @returns unsubscribe function
    */
-  subscribe: function (filters: Filter[], cb?: (event: Event) => void, name?: string): Unsubscribe {
+  subscribe: function (
+    filters: Filter[],
+    cb?: (event: Event, name?: string) => void,
+    name?: string,
+    sinceLastOpened = false,
+  ): Unsubscribe {
+    if (dev.relayPool) {
+      let relays: any = undefined;
+      // if any of filters[] doesn't have authors, we need to define default relays
+      if (filters.some((f) => !f.authors)) {
+        relays = Relays.DEFAULT_RELAYS;
+      }
+      if (sinceLastOpened) {
+        filters.forEach((f) => {
+          f.since = lastOpened;
+        });
+      }
+      return relayPool.subscribe(
+        filters,
+        relays,
+        (event) => {
+          delete event['$loki'];
+          Events.handle(event);
+          cb?.(event, name);
+        },
+        100,
+      );
+    }
+
     let currentSubscriptionId;
     if (cb) {
       currentSubscriptionId = subscriptionId++;
@@ -202,7 +260,7 @@ const PubSub = {
     hasNewReplyAndLikeSubs && this.subscribeToRepliesAndReactions(this);
     if (newAuthors.size) {
       newAuthors.forEach((author) => {
-        this.subscribeToNewAuthors.add(author);
+        this.newAuthors.add(author);
       });
       this.subscribeToAuthors(this);
     }

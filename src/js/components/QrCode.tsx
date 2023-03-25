@@ -22,5 +22,5 @@ export default function Qr(props) {
     });
   }, [props.data]);
 
-  return html`<div ref=${ref} />`;
+  return html`<div style="border: 5px solid white; display: inline-block;" ref=${ref} />`;
 }

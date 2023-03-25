@@ -2,7 +2,7 @@ import { html } from 'htm/preact';
 import throttle from 'lodash/throttle';
 import ScrollViewport from 'preact-scroll-viewport';
 
-import Button from '../components/buttons/Button';
+import { PrimaryButton as Button } from '../components/buttons/Button';
 import Follow from '../components/buttons/Follow';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';

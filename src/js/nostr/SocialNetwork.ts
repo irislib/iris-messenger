@@ -120,7 +120,12 @@ export default {
 
     this.followedByUser.get(follower)?.add(followedUser);
     if (follower === myPub) {
-      PubSub.subscribe([{ kinds: [1, 5, 7], authors: [followedUser] }]);
+      PubSub.subscribe(
+        [{ kinds: [1, 5, 7], authors: [followedUser] }],
+        undefined,
+        'followed',
+        true,
+      );
     }
     if (followedUser === myPub) {
       if (this.followersByUser.get(followedUser)?.size === 1) {
@@ -129,7 +134,7 @@ export default {
     }
     if (this.followedByUser.get(myPub)?.has(follower)) {
       if (!PubSub.subscribedUsers.has(followedUser)) {
-        PubSub.subscribeToNewAuthors.add(followedUser);
+        PubSub.newAuthors.add(followedUser);
         PubSub.subscribeToAuthors();
       }
     }
