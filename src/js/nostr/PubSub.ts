@@ -160,7 +160,7 @@ const PubSub = {
    */
   subscribe: function (
     filters: Filter[],
-    cb?: (event: Event) => void,
+    cb?: (event: Event, name?: string) => void,
     name?: string,
     sinceLastOpened = false,
   ): Unsubscribe {
@@ -181,7 +181,7 @@ const PubSub = {
         (event) => {
           delete event['$loki'];
           Events.handle(event);
-          cb?.(event);
+          cb?.(event, name);
         },
         100,
       );
@@ -260,7 +260,7 @@ const PubSub = {
     hasNewReplyAndLikeSubs && this.subscribeToRepliesAndReactions(this);
     if (newAuthors.size) {
       newAuthors.forEach((author) => {
-        this.subscribeToNewAuthors.add(author);
+        this.newAuthors.add(author);
       });
       this.subscribeToAuthors(this);
     }
