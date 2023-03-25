@@ -66,7 +66,9 @@ npm run test
 
 ### Docker
 
-Alternatively, you can run the dev environment on Docker: `docker-compose up`. The dev build with autoreload will be available at http://localhost:8080.
+Alternatively, you can run the dev environment on Docker: `docker-compose up`. The dev build with autoreload will be available at http://localhost:8080. 
+
+With [Docker Desktop](https://www.docker.com/products/docker-desktop/) and [GitHub Desktop](https://desktop.github.com/) this is an easy way to get started with development. Just clone this repository and run `docker-compose up` in a terminal in its directory.
 
 ### Tauri (desktop app)
 
