@@ -310,23 +310,19 @@ class Feed extends Component {
     }, 1000);
     callback();
     if (this.props.nostrUser) {
-      this.unsub = PubSub.subscribe(
+      return PubSub.subscribe(
         [{ authors: [this.props.nostrUser], kinds: [1, 3, 5, 6, 7] }],
         callback,
         'user',
       );
     } else if (this.props.keyword) {
-      this.unsub = PubSub.subscribe(
+      return PubSub.subscribe(
         [{ keywords: [this.props.keyword], kinds: [1] }],
         callback,
         'keyword',
       );
     } else {
-      this.unsub = PubSub.subscribe(
-        [{ kinds: [1, 3, 5, 6, 7, 9735], limit: 100 }],
-        callback,
-        'global',
-      );
+      return PubSub.subscribe([{ kinds: [1, 3, 5, 6, 7, 9735], limit: 100 }], callback, 'global');
     }
   }
 
