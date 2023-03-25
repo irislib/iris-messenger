@@ -131,10 +131,10 @@ const Session = {
       });
     }
     setTimeout(() => {
-      PubSub.subscribe([{ authors: [myPub] }], undefined, 'ours'); // our stuff
-      PubSub.subscribe([{ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }], undefined, 'notifications'); // notifications
-      PubSub.subscribe([{ '#p': [myPub], kinds: [4] }], undefined, 'dms'); // notifications and DMs
-      PubSub.subscribe([{ '#p': [myPub], kinds: [4], limit: 20 }], undefined, 'latestDms'); // notifications and DMs
+      PubSub.subscribe([{ authors: [myPub] }], undefined, 'ours', true); // our stuff
+      PubSub.subscribe([{ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }], undefined, 'notifications', true); // notifications
+      PubSub.subscribe([{ '#p': [myPub], kinds: [4] }], undefined, 'dms', true); // notifications and DMs
+      PubSub.subscribe([{ '#p': [myPub], kinds: [4], limit: 20 }], undefined, 'latestDms', true); // notifications and DMs
     }, 200);
     setInterval(() => {
       console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));

@@ -30,6 +30,7 @@ let dev: any = {
   relayPool: false,
   logSubscriptions: false,
 };
+
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
   useEventCache: false,
   externalGetEventById: (id) => Events.db.by('id', id),
@@ -37,6 +38,12 @@ const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
 localState.get('dev').on((d) => {
   dev = d;
   relayPool.logSubscriptions = dev.logSubscriptions;
+});
+
+let lastOpened = 0;
+localState.get('lastOpened').once((lo) => {
+  lastOpened = lo;
+  localState.get('lastOpened').put(Math.floor(Date.now() / 1000));
 });
 
 const MAX_MSGS_BY_KEYWORD = 1000;
@@ -71,7 +78,7 @@ const PubSub = {
     Relays.subscribe(filters, 'subscribedRepliesAndReactions', true);
     //IndexedDB.subscribe(filters);
   }, 500),
-  subscribeToNewAuthors: new Set<string>(),
+  newAuthors: new Set<string>(),
   subscribeToAuthors: debounce(() => {
     const now = Math.floor(Date.now() / 1000);
     const myPub = Key.getPubKey();
@@ -79,12 +86,12 @@ const PubSub = {
     followedUsers.push(myPub);
     console.log(
       'subscribe to profiles and contacts of',
-      PubSub.subscribeToNewAuthors.size,
+      PubSub.newAuthors.size,
       'new authors',
     );
-    const authors = Array.from(PubSub.subscribeToNewAuthors.values()).slice(0, 1000);
+    const authors = Array.from(PubSub.newAuthors.values()).slice(0, 1000);
     authors.forEach((author) => {
-      PubSub.subscribeToNewAuthors.delete(author);
+      PubSub.newAuthors.delete(author);
     });
     console.log('subscribing to authors.length', authors.length);
     const filters = [
@@ -96,7 +103,7 @@ const PubSub = {
     ];
     const subscribe = (filters, id, once, unsubscribeTimeout?, sinceLastSeen?) => {
       if (dev.relayPool) {
-        return PubSub.subscribe(filters);
+        return PubSub.subscribe(filters, undefined, id, sinceLastSeen);
       } else {
         return Relays.subscribe(filters, id, once, unsubscribeTimeout, sinceLastSeen);
       }
@@ -151,12 +158,22 @@ const PubSub = {
    * @param name optional name for the subscription. replaces the previous one with the same name
    * @returns unsubscribe function
    */
-  subscribe: function (filters: Filter[], cb?: (event: Event) => void, name?: string): Unsubscribe {
+  subscribe: function (
+    filters: Filter[],
+    cb?: (event: Event) => void,
+    name?: string,
+    sinceLastOpened = false,
+  ): Unsubscribe {
     if (dev.relayPool) {
       let relays: any = undefined;
       // if any of filters[] doesn't have authors, we need to define default relays
       if (filters.some((f) => !f.authors)) {
         relays = Relays.DEFAULT_RELAYS;
+      }
+      if (sinceLastOpened) {
+        filters.forEach((f) => {
+          f.since = lastOpened;
+        });
       }
       return relayPool.subscribe(
         filters,

@@ -199,7 +199,7 @@ class Feed extends Component {
       cb?.(Events.notifications.eventIds);
     };
     callback();
-    return PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback);
+    return PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback, 'feed', true);
   }
 
   subscribe() {
@@ -334,6 +334,7 @@ class Feed extends Component {
         [{ kinds: [1, 3, 5, 6, 7, 9735], limit: 100 }],
         callback,
         'global',
+        true,
       );
     }
   }
