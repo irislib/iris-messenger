@@ -3,12 +3,12 @@ import Component from '../../BaseComponent';
 import Account from './Account';
 import Appearance from './Appearance';
 import Backup from './Backup';
+import Dev from './Dev';
 import IrisAccount from './IrisAccount';
 import Language from './Language';
 import Media from './Media';
 import Network from './Network';
 import SocialNetwork from './SocialNetwork';
-import Dev from './Dev';
 
 export default class SettingsContent extends Component {
   content = '';
