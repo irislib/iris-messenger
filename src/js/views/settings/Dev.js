@@ -26,6 +26,15 @@ export default class Appearance extends Component {
             />
             <label htmlFor="logSubscriptions">Log RelayPool subscriptions</label>
           </p>
+          <p>
+            <input
+              type="checkbox"
+              id="indexed03"
+              checked={this.state.indexed03}
+              onChange={(e) => localState.get('dev').get('indexed03').put(e.target.checked)}
+            />
+            <label htmlFor="indexed03">Use central index server for kinds 0 and 3</label>
+          </p>
         </div>
       </>
     );

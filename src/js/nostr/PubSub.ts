@@ -29,8 +29,8 @@ let subscriptionId = 0;
 let dev: any = {
   relayPool: false,
   logSubscriptions: false,
+  indexed03: false,
 };
-
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
   useEventCache: false,
   externalGetEventById: (id) => Events.db.by('id', id),
@@ -84,11 +84,7 @@ const PubSub = {
     const myPub = Key.getPubKey();
     const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) ?? []);
     followedUsers.push(myPub);
-    console.log(
-      'subscribe to profiles and contacts of',
-      PubSub.newAuthors.size,
-      'new authors',
-    );
+    console.log('subscribe to profiles and contacts of', PubSub.newAuthors.size, 'new authors');
     const authors = Array.from(PubSub.newAuthors.values()).slice(0, 1000);
     authors.forEach((author) => {
       PubSub.newAuthors.delete(author);
@@ -170,11 +166,19 @@ const PubSub = {
       if (filters.some((f) => !f.authors)) {
         relays = Relays.DEFAULT_RELAYS;
       }
+      if (
+        dev.indexed03 &&
+        filters.every((f) => f.kinds && f.kinds.every((k) => k === 0 || k === 3))
+      ) {
+        relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
+      }
+
       if (sinceLastOpened) {
         filters.forEach((f) => {
           f.since = lastOpened;
         });
       }
+
       return relayPool.subscribe(
         filters,
         relays,
