@@ -9,7 +9,6 @@ import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import PubSub from '../nostr/PubSub';
-import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 import { PrimaryButton as Button } from './buttons/Button';
@@ -194,24 +193,28 @@ class Feed extends Component {
     );
   }
 
-  getNotifications(cb) {
-    const callback = () => {
-      cb?.(Events.notifications.eventIds);
-    };
-    callback();
-    return PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback);
-  }
-
   subscribe() {
+    this.unsub?.();
+    const messages = new Map();
+    const update = throttle(
+      () => {
+        const sortedMessages = Array.from(messages.values())
+          .sort((a, b) => this.sort(a, b))
+          .map((m) => m.id);
+        this.updateSortedMessages(sortedMessages);
+      },
+      1000,
+      { leading: true },
+    );
+    const callback = (event) => {
+      messages.set(event.id, event);
+      update();
+    };
     setTimeout(() => {
-      this.unsub?.();
       if (this.props.index === 'notifications') {
-        // TODO notifications from LokiJS index
-        this.unsub = this.getNotifications(
-          throttle((messages) => this.updateSortedMessages(messages), 1000, { leading: true }),
-        );
+        this.unsub = PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback, 'feed', true);
       } else {
-        this.unsub = this.getMessages();
+        this.unsub = this.getMessages(callback);
       }
     }, 0);
   }
@@ -239,101 +242,25 @@ class Feed extends Component {
     }
   }
 
-  getMessages() {
-    // TODO only Pubsub.subscribe() here, move all LokiJS & Dexie & Relay query logic there
-    const dv = Events.db.addDynamicView('messages', { persist: true });
-    const find = { kind: { $between: [1, 6] } };
+  getMessages(callback) {
     if (this.props.nostrUser) {
-      find.pubkey = this.props.nostrUser;
-      if (this.props.index === 'likes') {
-        find.kind = 7;
-      }
-    }
-    dv.applyFind(find);
-    dv.applyWhere((e) => {
-      if (![1, 6, 7].includes(e.kind)) {
-        return false;
-      }
-      if (this.props.keyword && !e.content.includes(this.props.keyword)) {
-        return false;
-      }
-      return true;
-    });
-    const simpleSortDesc =
-      this.state.settings.sortBy === 'created_at'
-        ? this.state.settings.sortDirection === 'desc'
-        : true;
-    dv.applySimpleSort('created_at', { desc: simpleSortDesc });
-    if (this.state.settings.sortBy !== 'created_at') {
-      dv.applySort((a, b) => this.sort(a, b));
-    }
-    const callback = throttle(() => {
-      const since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
-      let includeReplies = true;
-      if (['everyone', 'follows'].includes(this.props.index)) {
-        includeReplies = this.state.settings.replies;
-      } else if (['posts', 'postsAndReplies'].includes(this.props.index)) {
-        includeReplies = this.props.index === 'postsAndReplies';
-      }
-      const events = dv
-        .data()
-        .filter((e) => {
-          const maxFollowDistance =
-            this.state.settings.maxFollowDistance || this.props.index === 'follows' ? 1 : 0;
-          if (maxFollowDistance) {
-            const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
-            if (followDistance === undefined || followDistance > maxFollowDistance) {
-              return false;
-            }
-          }
-          if (SocialNetwork.blockedUsers.has(e.pubkey)) {
-            return false;
-          }
-          if (e.kind === 1 && !includeReplies && Events.getEventReplyingTo(e)) {
-            return false;
-          }
-          if (![1, 3, 6, 7].includes(e.kind)) {
-            return false;
-          }
-          if (this.props.index !== 'notifications' && this.props.index !== 'likes') {
-            if (e.kind === 7 || e.kind === 3) {
-              return false;
-            }
-          }
-          if (this.state.settings.timespan !== 'all') {
-            if (e.created_at < since) {
-              return false;
-            }
-          }
-          return true;
-        })
-        .map((e) => {
-          if (this.props.index === 'likes') {
-            return e.tags.find((t) => t[0] === 'e')?.[1];
-          } else {
-            return e.id;
-          }
-        });
-      this.updateSortedMessages(events);
-    }, 1000);
-    callback();
-    if (this.props.nostrUser) {
-      this.unsub = PubSub.subscribe(
+      return PubSub.subscribe(
         [{ authors: [this.props.nostrUser], kinds: [1, 3, 5, 6, 7] }],
         callback,
         'user',
       );
     } else if (this.props.keyword) {
-      this.unsub = PubSub.subscribe(
+      return PubSub.subscribe(
         [{ keywords: [this.props.keyword], kinds: [1] }],
         callback,
         'keyword',
       );
     } else {
-      this.unsub = PubSub.subscribe(
+      return PubSub.subscribe(
         [{ kinds: [1, 3, 5, 6, 7, 9735], limit: 100 }],
         callback,
         'global',
+        true,
       );
     }
   }
