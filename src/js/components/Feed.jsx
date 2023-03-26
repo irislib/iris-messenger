@@ -119,9 +119,7 @@ class Feed extends Component {
     if (!hasMyEvent) {
       sortedEvents = sortedEvents.filter((id) => !queuedEvents.includes(id));
     }
-    const eventsShownTime = hasMyEvent
-      ? Math.floor(Date.now() / 1000)
-      : this.state.eventsShownTime;
+    const eventsShownTime = hasMyEvent ? Math.floor(Date.now() / 1000) : this.state.eventsShownTime;
     this.setState({ sortedEvents, queuedEvents, eventsShownTime });
   };
 
@@ -195,9 +193,13 @@ class Feed extends Component {
 
   subscribe() {
     this.unsub?.();
-    const callback = (events) => {
-      this.updateSortedEvents(events);
-    };
+    const callback = throttle(
+      (events) => {
+        this.updateSortedEvents(events.sort(this.sort.bind(this)));
+      },
+      1000,
+      { leading: true },
+    );
     setTimeout(() => {
       if (this.props.index === 'notifications') {
         this.unsub = PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback, 'feed', true);
