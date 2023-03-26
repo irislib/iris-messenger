@@ -59,10 +59,10 @@ class Feed extends Component {
       .get('feed')
       .once((s) => (savedSettings = s));
     this.state = {
-      sortedMessages: [],
-      queuedMessages: [],
+      sortedEvents: [],
+      queuedEvents: [],
       displayCount: INITIAL_PAGE_SIZE,
-      messagesShownTime: Math.floor(Date.now() / 1000),
+      eventsShownTime: Math.floor(Date.now() / 1000),
       settings: this.getSettings(savedSettings),
     };
     this.openedAt = Math.floor(Date.now() / 1000);
@@ -95,39 +95,39 @@ class Feed extends Component {
     localState.get('settings').get('feed').put(this.state.settings);
   }
 
-  updateSortedMessages = (sortedMessages) => {
-    if (this.unmounted || !sortedMessages) {
+  updateSortedEvents = (sortedEvents) => {
+    if (this.unmounted || !sortedEvents) {
       return;
     }
     const settings = this.state.settings;
-    // iterate over sortedMessages and add newer than messagesShownTime to queue
-    const queuedMessages = [];
-    let hasMyMessage;
+    // iterate over sortedEvents and add newer than eventsShownTime to queue
+    const queuedEvents = [];
+    let hasMyEvent;
     if (settings.sortDirection === 'desc' && !settings.realtime) {
-      for (let i = 0; i < sortedMessages.length; i++) {
-        const id = sortedMessages[i];
-        const message = Events.db.by('id', id);
-        if (message && message.created_at > this.state.messagesShownTime) {
-          if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
-            hasMyMessage = true;
+      for (let i = 0; i < sortedEvents.length; i++) {
+        const id = sortedEvents[i];
+        const event = Events.db.by('id', id);
+        if (event && event.created_at > this.state.eventsShownTime) {
+          if (event.pubkey === Key.getPubKey() && !Events.isRepost(event)) {
+            hasMyEvent = true;
             break;
           }
-          queuedMessages.push(id);
+          queuedEvents.push(id);
         }
       }
     }
-    if (!hasMyMessage) {
-      sortedMessages = sortedMessages.filter((id) => !queuedMessages.includes(id));
+    if (!hasMyEvent) {
+      sortedEvents = sortedEvents.filter((id) => !queuedEvents.includes(id));
     }
-    const messagesShownTime = hasMyMessage
+    const eventsShownTime = hasMyEvent
       ? Math.floor(Date.now() / 1000)
-      : this.state.messagesShownTime;
-    this.setState({ sortedMessages, queuedMessages, messagesShownTime });
+      : this.state.eventsShownTime;
+    this.setState({ sortedEvents, queuedEvents, eventsShownTime });
   };
 
   handleScroll = () => {
     // increase page size when scrolling down
-    if (this.state.displayCount < this.state.sortedMessages.length) {
+    if (this.state.displayCount < this.state.sortedEvents.length) {
       if (
         this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
         this.props.scrollElement.scrollHeight - 1000
@@ -195,26 +195,14 @@ class Feed extends Component {
 
   subscribe() {
     this.unsub?.();
-    const messages = new Map();
-    const update = throttle(
-      () => {
-        const sortedMessages = Array.from(messages.values())
-          .sort((a, b) => this.sort(a, b))
-          .map((m) => m.id);
-        this.updateSortedMessages(sortedMessages);
-      },
-      1000,
-      { leading: true },
-    );
-    const callback = (event) => {
-      messages.set(event.id, event);
-      update();
+    const callback = (events) => {
+      this.updateSortedEvents(events);
     };
     setTimeout(() => {
       if (this.props.index === 'notifications') {
         this.unsub = PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback, 'feed', true);
       } else {
-        this.unsub = this.getMessages(callback);
+        this.unsub = this.getEvents(callback);
       }
     }, 0);
   }
@@ -242,7 +230,7 @@ class Feed extends Component {
     }
   }
 
-  getMessages(callback) {
+  getEvents(callback) {
     if (this.props.nostrUser) {
       return PubSub.subscribe(
         [{ authors: [this.props.nostrUser], kinds: [1, 3, 5, 6, 7] }],
@@ -314,24 +302,24 @@ class Feed extends Component {
     }
     this.handleScroll();
     this.replaceState();
-    if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
+    if (!this.state.queuedEvents.length && prevState.queuedEvents.length) {
       Helpers.animateScrollTop('.main-view');
     }
     if (this.props.filter !== prevProps.filter || this.props.keyword !== prevProps.keyword) {
-      this.setState({ sortedMessages: [] });
+      this.setState({ sortedEvents: [] });
       this.componentDidMount();
     }
   }
 
-  showQueuedMessages() {
-    const sortedMessages = this.state.sortedMessages;
-    console.log('sortedmessages.length', sortedMessages.length);
-    sortedMessages.unshift(...this.state.queuedMessages);
-    console.log('queuedmessages.length', this.state.queuedMessages.length);
+  showqueuedEvents() {
+    const sortedEvents = this.state.sortedEvents;
+    console.log('sortedEvents.length', sortedEvents.length);
+    sortedEvents.unshift(...this.state.queuedEvents);
+    console.log('queuedEvents.length', this.state.queuedEvents.length);
     this.setState({
-      sortedMessages,
-      queuedMessages: [],
-      messagesShownTime: Math.floor(Date.now() / 1000),
+      sortedEvents,
+      queuedEvents: [],
+      eventsShownTime: Math.floor(Date.now() / 1000),
       displayCount: INITIAL_PAGE_SIZE,
     });
   }
@@ -480,14 +468,14 @@ class Feed extends Component {
     );
   }
 
-  renderShowNewMessages() {
+  renderShowNewEvents() {
     return (
       <div
         className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
-        onClick={() => this.showQueuedMessages()}
+        onClick={() => this.showqueuedEvents()}
       >
         <div className="msg-content notification-msg colored">
-          {t('show_n_new_messages').replace('{n}', this.state.queuedMessages.length)}
+          {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
         </div>
       </div>
     );
@@ -516,7 +504,7 @@ class Feed extends Component {
     const displayCount = this.state.displayCount;
     const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
     const feedName =
-      !this.state.queuedMessages.length &&
+      !this.state.queuedEvents.length &&
       {
         everyone: 'global_feed',
         follows: 'following',
@@ -524,7 +512,7 @@ class Feed extends Component {
       }[this.props.index];
 
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
-    const messages = this.state.sortedMessages.slice(0, displayCount).map((id) => (
+    const events = this.state.sortedEvents.slice(0, displayCount).map((id) => (
       <ErrorBoundary>
         <EventComponent
           notification={this.props.index === 'notifications'}
@@ -540,7 +528,7 @@ class Feed extends Component {
     return (
       <div className="msg-feed">
         <div>
-          {this.state.queuedMessages.length ? this.renderShowNewMessages() : null}
+          {this.state.queuedEvents.length ? this.renderShowNewEvents() : null}
           {feedName ? (
             <div className="msg">
               <div className="msg-content notification-msg">
@@ -565,16 +553,16 @@ class Feed extends Component {
           ) : null}
           {this.props.index !== 'notifications' && this.state.settingsOpen && this.renderSettings()}
           {this.props.index !== 'notifications' && this.renderFeedTypeSelector()}
-          {messages.length === 0 && (
+          {events.length === 0 && (
             <div className="msg">
               <div className="msg-content notification-msg">
                 {this.props.emptyMessage || t('no_events_yet')}
               </div>
             </div>
           )}
-          {renderAs === 'NoteImage' ? <ImageGrid>{messages}</ImageGrid> : messages}
+          {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
         </div>
-        {displayCount < this.state.sortedMessages.length ? this.renderShowMore() : ''}
+        {displayCount < this.state.sortedEvents.length ? this.renderShowMore() : ''}
       </div>
     );
   }

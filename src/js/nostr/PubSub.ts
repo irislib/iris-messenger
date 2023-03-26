@@ -156,47 +156,21 @@ const PubSub = {
    */
   subscribe: function (
     filters: Filter[],
-    cb?: (event: Event, name?: string) => void,
+    cb?: (events: Event[]) => void,
     name?: string,
     sinceLastOpened = false,
   ): Unsubscribe {
-    if (dev.relayPool) {
-      let relays: any = undefined;
-      // if any of filters[] doesn't have authors, we need to define default relays
-      if (filters.some((f) => !f.authors)) {
-        relays = Relays.DEFAULT_RELAYS;
-      }
-      if (
-        dev.indexed03 &&
-        filters.every((f) => f.kinds && f.kinds.every((k) => k === 0 || k === 3))
-      ) {
-        relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
-      }
-
-      if (sinceLastOpened) {
-        filters.forEach((f) => {
-          f.since = lastOpened;
-        });
-      }
-
-      return relayPool.subscribe(
-        filters,
-        relays,
-        (event) => {
-          delete event['$loki'];
-          Events.handle(event);
-          cb?.(event, name);
-        },
-        100,
-      );
-    }
-
+    const events = new Map();
+    const callback = (event) => {
+      events.set(event.id, event);
+      cb?.(Array.from(events.keys())); // TODO return values instead of keys
+    };
     let currentSubscriptionId;
     if (cb) {
       currentSubscriptionId = subscriptionId++;
       this.subscriptions.set(++subscriptionId, {
         filters,
-        callback: cb,
+        callback,
       });
     }
     if (name) {
@@ -207,85 +181,60 @@ const PubSub = {
       this.internalSubscriptionsByName.set(name, currentSubscriptionId);
     }
 
-    // TODO: some queries are still not unsubscribed
-    // console.log('subscribed', this.subscriptions.size, JSON.stringify(filters));
+    filters.forEach((f) => {
+      if (f.authors) {
+        Events.db.find({ pubkey: { $in: f.authors } }).forEach((e) => {
+          callback(e);
+        });
+      }
+      // TODO other filters such as #p
+    });
 
-    const newAuthors = new Set<string>();
-    let hasNewIds = false;
-    let hasNewReplyAndLikeSubs = false;
-    let hasNewKeywords = false;
-    for (const filter of filters) {
-      if (filter.authors) {
-        for (const author of filter.authors) {
-          if (!author) continue;
-          // make sure the author is valid hex
-          if (!author.match(/^[0-9a-fA-F]{64}$/)) {
-            console.error('Invalid author', author);
-            continue;
-          }
-          if (!this.subscribedUsers.has(author)) {
-            newAuthors.add(author);
-            this.subscribedUsers.add(author);
-          }
-        }
-      }
-      if (filter.ids) {
-        for (const id of filter.ids) {
-          const hex = Key.toNostrHexAddress(id);
-          if (!this.subscribedPosts.has(hex)) {
-            hasNewIds = true;
-            this.subscribedPosts.add(hex);
-          }
-        }
-      }
-      if (Array.isArray(filter['#e'])) {
-        for (const id of filter['#e']) {
-          if (!this.subscribedRepliesAndReactions.has(id)) {
-            hasNewReplyAndLikeSubs = true;
-            this.subscribedRepliesAndReactions.add(id);
-            setTimeout(() => {
-              // remove after some time, so the requests don't grow too large
-              this.subscribedRepliesAndReactions.delete(id);
-            }, 60 * 1000);
-          }
-        }
-      }
-      if (filter.keywords) {
-        for (const keyword of filter.keywords) {
-          if (!this.subscribedKeywords.has(keyword)) {
-            hasNewKeywords = true;
-            // only 1 keyword at a time, otherwise a popular kw will consume the whole 'limit'
-            this.subscribedKeywords.clear();
-            this.subscribedKeywords.add(keyword);
-          }
-        }
-      }
-    }
-    hasNewReplyAndLikeSubs && this.subscribeToRepliesAndReactions(this);
-    if (newAuthors.size) {
-      newAuthors.forEach((author) => {
-        this.newAuthors.add(author);
-      });
-      this.subscribeToAuthors(this);
-    }
-    hasNewIds && this.subscribeToPosts(this);
-    hasNewKeywords && this.subscribeToKeywords(this);
-    if (name === 'global') {
-      Relays.subscribe(filters, 'global');
-      //IndexedDB.subscribe(filters);
-    }
+    // TODO ask dexie
+    // TODO if asking event by id or profile, ask http proxy
+
+    const unsubRelayPool = this.subscribeRelayPool(filters, sinceLastOpened);
+
     return () => {
+      unsubRelayPool();
       if (currentSubscriptionId) {
         this.subscriptions.delete(currentSubscriptionId);
       }
       if (name) {
         this.internalSubscriptionsByName.delete(name);
-        if (name === 'global') {
-          Relays.unsubscribe('global');
-          console.log('unsubscribed global');
-        }
       }
     };
+  },
+
+  subscribeRelayPool(filters: Filter[], sinceLastOpened: boolean) {
+    let relays: any = undefined;
+    // if any of filters[] doesn't have authors, we need to define default relays
+    if (filters.some((f) => !f.authors)) {
+      relays = Relays.DEFAULT_RELAYS;
+    }
+    if (
+      dev.indexed03 &&
+      filters.every((f) => f.kinds && f.kinds.every((k) => k === 0 || k === 3))
+    ) {
+      relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
+    }
+    // if filter doesn't contain limit, set 100 as default
+    filters.forEach((f) => {
+      if (!f.limit) f.limit = 100;
+    });
+    if (sinceLastOpened) {
+      filters.forEach((f) => {
+        f.since = lastOpened;
+      });
+    }
+    return relayPool.subscribe(
+      filters,
+      relays,
+      (event) => {
+        Events.handle(event);
+      },
+      100,
+    );
   },
 };
 
