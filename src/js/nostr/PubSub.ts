@@ -27,7 +27,6 @@ type Unsubscribe = () => void;
 let subscriptionId = 0;
 
 let dev: any = {
-  relayPool: false,
   logSubscriptions: false,
   indexed03: false,
 };
@@ -75,8 +74,7 @@ const PubSub = {
         '#e': Array.from(PubSub.subscribedRepliesAndReactions.values()),
       },
     ];
-    Relays.subscribe(filters, 'subscribedRepliesAndReactions', true);
-    //IndexedDB.subscribe(filters);
+    PubSub.subscribe(filters);
   }, 500),
   newAuthors: new Set<string>(),
   subscribeToAuthors: debounce(() => {
@@ -97,24 +95,14 @@ const PubSub = {
         authors,
       },
     ];
-    const subscribe = (filters, id, once, unsubscribeTimeout?, sinceLastSeen?) => {
-      if (dev.relayPool) {
-        return PubSub.subscribe(filters, undefined, id, sinceLastSeen);
-      } else {
-        return Relays.subscribe(filters, id, once, unsubscribeTimeout, sinceLastSeen);
-      }
-    };
-    subscribe(filters, 'followed', true, 0, true);
-    //IndexedDB.subscribe(filters);
+    PubSub.subscribe(filters, undefined, 'followed', true);
     if (PubSub.subscribedProfiles.size) {
       const filters = [{ authors: Array.from(PubSub.subscribedProfiles.values()), kinds: [0] }];
-      subscribe(filters, 'subscribedProfiles', true);
-      //IndexedDB.subscribe(filters);
+      PubSub.subscribe(filters, undefined, 'subscribedProfiles');
     }
     const filters2 = [{ authors: followedUsers, limit: 100, until: now }];
     setTimeout(() => {
-      subscribe(filters2, 'followedHistory', true, 0, true);
-      //IndexedDB.subscribe(filters2);
+      PubSub.subscribe(filters2, undefined, 'followedHistory', true);
     }, 1000);
   }, 2000),
   subscribeToPosts: throttle(
@@ -122,8 +110,7 @@ const PubSub = {
       if (PubSub.subscribedPosts.size === 0) return;
       console.log('subscribe to', PubSub.subscribedPosts.size, 'posts');
       const filters = [{ ids: Array.from(PubSub.subscribedPosts).slice(0, 1000) }];
-      Relays.subscribe(filters, 'posts');
-      //IndexedDB.subscribe(filters);
+      PubSub.subscribe(filters, undefined, 'posts');
     },
     3000,
     { leading: false },
@@ -132,7 +119,7 @@ const PubSub = {
     if (PubSub.subscribedKeywords.size === 0) return;
     console.log('subscribe to keywords', Array.from(PubSub.subscribedKeywords));
     const go = () => {
-      Relays.subscribe(
+      PubSub.subscribe(
         [
           {
             kinds: [1],
@@ -140,6 +127,7 @@ const PubSub = {
             keywords: Array.from(PubSub.subscribedKeywords),
           },
         ],
+        undefined,
         'keywords',
       );
       // on page reload SocialNetwork is empty and thus all search results are dropped
@@ -182,11 +170,17 @@ const PubSub = {
     }
 
     filters.forEach((f) => {
+      const query = {};
       if (f.authors) {
-        Events.db.find({ pubkey: { $in: f.authors } }).forEach((e) => {
-          callback(e);
-        });
+        query['pubkey'] = { $in: f.authors };
       }
+      if (f.kinds) {
+        query['kind'] = { $in: f.kinds };
+      }
+      Events.db.find(query).forEach((e) => {
+        console.log('event from lokijs');
+        callback(e);
+      });
       if (!f.limit) f.limit = 100;
       // TODO other filters such as #p
     });

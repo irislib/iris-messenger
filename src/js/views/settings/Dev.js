@@ -9,17 +9,6 @@ export default class Appearance extends Component {
           <p>
             <input
               type="checkbox"
-              id="relayPool"
-              checked={this.state.relayPool}
-              onChange={(e) => localState.get('dev').get('relayPool').put(e.target.checked)}
-            />
-            <label htmlFor="relayPool">
-              Use <a href="https://github.com/adamritter/nostr-relaypool-ts">relaypool</a>
-            </label>
-          </p>
-          <p>
-            <input
-              type="checkbox"
               id="logSubscriptions"
               checked={this.state.logSubscriptions}
               onChange={(e) => localState.get('dev').get('logSubscriptions').put(e.target.checked)}
