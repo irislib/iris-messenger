@@ -127,7 +127,7 @@ Tauri [desktop releases](https://github.com/irislib/iris-messenger/releases) are
 - [x] [NIP-10: Conventions for clients' use of `e` and `p` tags in text events](https://github.com/nostr-protocol/nips/blob/master/10.md)<br>
 - [x] [NIP-19: bech32-encoded entities](https://github.com/nostr-protocol/nips/blob/master/19.md)<br>
 - [x] [NIP-20: Command Results](https://github.com/nostr-protocol/nips/blob/master/20.md)<br>
-- [x] [NIP-21: `nostr:` URL scheme](https://github.com/nostr-protocol/nips/blob/master/21.md)<br>
+- [ ] [NIP-21: `nostr:` URL scheme](https://github.com/nostr-protocol/nips/blob/master/21.md)<br>
 - [ ] [NIP-23: Long-form Content](https://github.com/nostr-protocol/nips/blob/master/23.md)<br>
 - [x] [NIP-25: Reactions](https://github.com/nostr-protocol/nips/blob/master/25.md)<br>
 - [ ] [NIP-26: Delegated Event Signing](https://github.com/nostr-protocol/nips/blob/master/26.md)<br>
