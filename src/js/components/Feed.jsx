@@ -195,9 +195,9 @@ class Feed extends Component {
     this.unsub?.();
     const callback = throttle(
       (events) => {
-        this.updateSortedEvents(events.sort(this.sort.bind(this)));
+        this.updateSortedEvents(events.sort(this.sort.bind(this)).map((e) => e.id));
       },
-      1000,
+      500,
       { leading: true },
     );
     setTimeout(() => {

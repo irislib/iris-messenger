@@ -151,7 +151,7 @@ const PubSub = {
     const events = new Map();
     const callback = (event) => {
       events.set(event.id, event);
-      cb?.(Array.from(events.keys())); // TODO return values instead of keys
+      cb?.(Array.from(events.values())); // TODO return values instead of keys
     };
     let currentSubscriptionId;
     if (cb) {
@@ -181,11 +181,12 @@ const PubSub = {
         console.log('event from lokijs');
         callback(e);
       });
-      if (!f.limit) f.limit = 100;
       // TODO other filters such as #p
     });
 
-    IndexedDB.subscribe(filters);
+    setTimeout(() => {
+      IndexedDB.subscribe(filters);
+    }, 0);
 
     // TODO ask dexie
     // TODO if asking event by id or profile, ask http proxy
