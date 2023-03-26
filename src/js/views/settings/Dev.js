@@ -27,22 +27,13 @@ export default class Appearance extends Component {
             <label htmlFor="logSubscriptions">Log RelayPool subscriptions</label>
           </p>
           <p>
-            <label for="logSubscriptions">Log RelayPool subscriptions</label>
             <input
               type="checkbox"
-              name="logSubscriptions"
-              checked={this.state.logSubscriptions}
-              onChange={(e) => localState.get('dev').get('logSubscriptions').put(e.target.checked)}
-            />
-          </p>
-          <p>
-            <label for="indexed03">Use central index server for kinds 0 and 3</label>
-            <input
-              type="checkbox"
-              name="indexed03"
+              id="indexed03"
               checked={this.state.indexed03}
               onChange={(e) => localState.get('dev').get('indexed03').put(e.target.checked)}
             />
+            <label htmlFor="indexed03">Use central index server for kinds 0 and 3</label>
           </p>
         </div>
       </>
