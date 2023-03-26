@@ -18,9 +18,9 @@ export default class MessageForm extends Component {
         Events.getEventById(id, true, (e) => resolve(e));
       });
       event.tags = replyingTo.tags.filter((tag) => tag[0] === 'p');
-      let rootTag = replyingTo.tags.find((t) => t[0] === 'e' && t[3] === 'root');
+      let rootTag = replyingTo.tags?.find((t) => t[0] === 'e' && t[3] === 'root');
       if (!rootTag) {
-        rootTag = replyingTo.tags.find((t) => t[0] === 'e');
+        rootTag = replyingTo.tags?.find((t) => t[0] === 'e');
       }
       if (rootTag) {
         event.tags.unshift(['e', id, '', 'reply']);
@@ -28,7 +28,7 @@ export default class MessageForm extends Component {
       } else {
         event.tags.unshift(['e', id, '', 'root']);
       }
-      if (!event.tags.find((t) => t[0] === 'p' && t[1] === replyingTo.pubkey)) {
+      if (!event.tags?.find((t) => t[0] === 'p' && t[1] === replyingTo.pubkey)) {
         event.tags.push(['p', replyingTo.pubkey]);
       }
     }
@@ -47,11 +47,11 @@ export default class MessageForm extends Component {
           }
           const newTag = [tagType, hexTag, '', 'mention'];
           // add if not already present
-          if (!event.tags.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {
+          if (!event.tags?.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {
             event.tags.push(newTag);
           }
           // replace occurrences in event.content with #[n] where n is index in event.tags
-          const index = event.tags.findIndex((t) => t[0] === newTag[0] && t[1] === newTag[1]);
+          const index = event.tags?.findIndex((t) => t[0] === newTag[0] && t[1] === newTag[1]);
           event.content = event.content.replace(tag, `#[${index}]`);
         }
       }
@@ -64,7 +64,7 @@ export default class MessageForm extends Component {
     if (hashtags.length) {
       event.tags = event.tags || [];
       for (const hashtag of hashtags) {
-        if (!event.tags.find((t) => t[0] === 't' && t[1] === hashtag)) {
+        if (!event.tags?.find((t) => t[0] === 't' && t[1] === hashtag)) {
           event.tags.push(['t', hashtag]);
         }
       }

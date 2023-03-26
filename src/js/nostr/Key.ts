@@ -156,7 +156,7 @@ export default {
       const myPub = this.getPubKey();
       const msg = Events.db.by('id', id);
       const theirPub =
-        msg.pubkey === myPub ? msg.tags.find((tag: any) => tag[0] === 'p')[1] : msg.pubkey;
+        msg.pubkey === myPub ? msg.tags?.find((tag: any) => tag[0] === 'p')[1] : msg.pubkey;
       if (!(msg && theirPub)) {
         return;
       }

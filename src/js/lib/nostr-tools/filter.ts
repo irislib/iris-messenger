@@ -26,7 +26,7 @@ export function matchFilter(
       let values = filter[`#${tagName}`]
       if (
         values &&
-        !event.tags.find(
+        !event.tags?.find(
           ([t, v]) => t === f.slice(1) && values.indexOf(v) !== -1
         )
       )

@@ -7,7 +7,7 @@ import { Event, Filter, Sub } from '../lib/nostr-tools';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 
-//import IndexedDB from './IndexedDB';
+import IndexedDB from './IndexedDB';
 import Key from './Key';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
@@ -187,8 +187,11 @@ const PubSub = {
           callback(e);
         });
       }
+      if (!f.limit) f.limit = 100;
       // TODO other filters such as #p
     });
+
+    IndexedDB.subscribe(filters);
 
     // TODO ask dexie
     // TODO if asking event by id or profile, ask http proxy
@@ -218,10 +221,6 @@ const PubSub = {
     ) {
       relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
     }
-    // if filter doesn't contain limit, set 100 as default
-    filters.forEach((f) => {
-      if (!f.limit) f.limit = 100;
-    });
     if (sinceLastOpened) {
       filters.forEach((f) => {
         f.since = lastOpened;

@@ -593,7 +593,7 @@ const Events = {
     return muted;
   },
   getEventRoot(event: Event) {
-    return event?.tags.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
+    return event?.tags?.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
   },
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
@@ -674,7 +674,7 @@ const Events = {
     return event.id;
   },
   getZappingUser(eventId: string) {
-    const description = Events.db.by('id', eventId)?.tags.find((t) => t[0] === 'description')?.[1];
+    const description = Events.db.by('id', eventId)?.tags?.find((t) => t[0] === 'description')?.[1];
     if (!description) {
       return;
     }
