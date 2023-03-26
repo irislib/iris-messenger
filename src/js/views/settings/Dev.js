@@ -26,6 +26,15 @@ export default class Appearance extends Component {
               onChange={(e) => localState.get('dev').get('logSubscriptions').put(e.target.checked)}
             />
           </p>
+          <p>
+            <label for="indexed03">Use central index server for kinds 0 and 3</label>
+            <input
+              type="checkbox"
+              name="indexed03"
+              checked={this.state.indexed03}
+              onChange={(e) => localState.get('dev').get('indexed03').put(e.target.checked)}
+            />
+          </p>
         </div>
       </>
     );

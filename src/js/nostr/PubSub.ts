@@ -29,6 +29,7 @@ let subscriptionId = 0;
 let dev: any = {
   relayPool: false,
   logSubscriptions: false,
+  indexed03: false,
 };
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
   useEventCache: false,
@@ -157,6 +158,12 @@ const PubSub = {
       // if any of filters[] doesn't have authors, we need to define default relays
       if (filters.some((f) => !f.authors)) {
         relays = Relays.DEFAULT_RELAYS;
+      }
+      if (
+        dev.indexed03 &&
+        filters.every((f) => f.kinds && f.kinds.every((k) => k === 0 || k === 3))
+      ) {
+        relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
       }
       return relayPool.subscribe(
         filters,
