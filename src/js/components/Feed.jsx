@@ -198,7 +198,19 @@ class Feed extends Component {
       (events) => {
         this.updateSortedEvents(
           events
-            .filter((e) => !SocialNetwork.blockedUsers.has(e.pubkey))
+            .filter((e) => {
+              if (SocialNetwork.blockedUsers.has(e.pubkey)) {
+                return false;
+              }
+              const repliedMsg = Events.getEventReplyingTo(e);
+              if (repliedMsg) {
+                const author = Events.db.by('id', repliedMsg)?.pubkey;
+                if (author && SocialNetwork.blockedUsers.has(author)) {
+                  return false;
+                }
+              }
+              return true;
+            })
             .sort(this.sort.bind(this))
             .map((e) => e.id),
         );
