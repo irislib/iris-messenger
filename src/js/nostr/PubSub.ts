@@ -78,7 +78,6 @@ const PubSub = {
   }, 500),
   newAuthors: new Set<string>(),
   subscribeToAuthors: debounce(() => {
-    const now = Math.floor(Date.now() / 1000);
     const myPub = Key.getPubKey();
     const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) ?? []);
     followedUsers.push(myPub);
@@ -91,7 +90,6 @@ const PubSub = {
     const filters = [
       {
         kinds: [0, 3],
-        until: now,
         authors,
       },
     ];
@@ -100,7 +98,7 @@ const PubSub = {
       const filters = [{ authors: Array.from(PubSub.subscribedProfiles.values()), kinds: [0] }];
       PubSub.subscribe(filters, undefined, 'subscribedProfiles');
     }
-    const filters2 = [{ authors: followedUsers, limit: 100, until: now }];
+    const filters2 = [{ authors: followedUsers, limit: 100 }];
     setTimeout(() => {
       PubSub.subscribe(filters2, undefined, 'followedHistory', true);
     }, 1000);

@@ -234,24 +234,36 @@ class Feed extends Component {
 
   getEvents(callback) {
     if (this.props.nostrUser) {
-      return PubSub.subscribe(
-        [{ authors: [this.props.nostrUser], kinds: [1, 3, 5, 6, 7] }],
-        callback,
-        'user',
-      );
+      if (this.props.index === 'likes') {
+        return PubSub.subscribe(
+          // TODO map to liked msg id
+          [{ authors: [this.props.nostrUser], kinds: [7] }],
+          (events) => callback(events),
+          'user',
+        );
+      } else {
+        return PubSub.subscribe(
+          [{ authors: [this.props.nostrUser], kinds: [1, 6] }],
+          (events) =>
+            callback(
+              events.filter((e) => {
+                if (this.props.index === 'posts') {
+                  return !Events.getEventReplyingTo(e);
+                }
+                return true;
+              }),
+            ),
+          'user',
+        );
+      }
     } else if (this.props.keyword) {
       return PubSub.subscribe(
         [{ keywords: [this.props.keyword], kinds: [1] }],
-        callback,
+        (events) => callback(events.filter((e) => e.content?.includes(this.props.keyword))),
         'keyword',
       );
     } else {
-      return PubSub.subscribe(
-        [{ kinds: [1, 3, 5, 6, 7, 9735], limit: 100 }],
-        callback,
-        'global',
-        true,
-      );
+      return PubSub.subscribe([{ kinds: [1, 6], limit: 100 }], callback, 'global', true);
     }
   }
 
