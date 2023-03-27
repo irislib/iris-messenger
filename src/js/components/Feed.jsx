@@ -194,30 +194,34 @@ class Feed extends Component {
 
   subscribe() {
     this.unsub?.();
-    const callback = throttle(
-      (events) => {
-        this.updateSortedEvents(
-          events
-            .filter((e) => {
-              if (SocialNetwork.blockedUsers.has(e.pubkey)) {
+    const update = (events) => {
+      this.updateSortedEvents(
+        events
+          .filter((e) => {
+            if (SocialNetwork.blockedUsers.has(e.pubkey)) {
+              return false;
+            }
+            const repliedMsg = Events.getEventReplyingTo(e);
+            if (repliedMsg) {
+              const author = Events.db.by('id', repliedMsg)?.pubkey;
+              if (author && SocialNetwork.blockedUsers.has(author)) {
                 return false;
               }
-              const repliedMsg = Events.getEventReplyingTo(e);
-              if (repliedMsg) {
-                const author = Events.db.by('id', repliedMsg)?.pubkey;
-                if (author && SocialNetwork.blockedUsers.has(author)) {
-                  return false;
-                }
-              }
-              return true;
-            })
-            .sort(this.sort.bind(this))
-            .map((e) => e.id),
-        );
-      },
-      500,
-      { leading: true },
-    );
+            }
+            return true;
+          })
+          .sort(this.sort.bind(this))
+          .map((e) => e.id),
+      );
+    };
+    const throttledUpdate = throttle(update, 1000, { leading: true });
+    const callback = (events) => {
+      if (events.length < 10) {
+        update(events);
+      } else {
+        throttledUpdate(events);
+      }
+    };
     setTimeout(() => {
       if (this.props.index === 'notifications') {
         const myPub = Key.getPubKey();

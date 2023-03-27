@@ -31,7 +31,7 @@ let dev: any = {
   indexed03: false,
 };
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
-  useEventCache: false,
+  useEventCache: true,
   externalGetEventById: (id) => Events.db.by('id', id),
 });
 localState.get('dev').on((d) => {
