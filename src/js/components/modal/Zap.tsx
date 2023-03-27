@@ -404,7 +404,7 @@ export default function SendSats(props: ZapProps) {
   if (!(props.show ?? false)) return null;
 
   return (
-    <Modal onClose={onClose}>
+    <Modal centerVertically={true} onClose={onClose}>
       <ZapDialog>
         <div className="lnurl-tip" onClick={(e) => e.stopPropagation()}>
           <Close className="close" onClick={onClose}>

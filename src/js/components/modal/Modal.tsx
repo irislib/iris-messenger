@@ -5,6 +5,7 @@ type Props = {
   onClose?: () => void;
   justifyContent?: string;
   showContainer?: boolean;
+  centerVertically?: boolean;
 };
 
 const Overlay = styled.div`
@@ -17,12 +18,14 @@ const Overlay = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
-  justify-content: ${(props) => props.justifyContent || 'center'};
+  justify-content: ${(props) =>
+    props.centerVertically ? 'center' : props.justifyContent || 'flex-start'};
   align-items: center;
+  overflow-y: auto;
+  padding: 20px 0;
 `;
 
-const Modal: FC<Props> = ({ showContainer, children, onClose }) => {
+const Modal: FC<Props> = ({ centerVertically, showContainer, children, onClose }) => {
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       onClose?.();
@@ -55,7 +58,11 @@ const Modal: FC<Props> = ({ showContainer, children, onClose }) => {
     children
   );
 
-  return <Overlay onClick={handleOverlayClick}>{content}</Overlay>;
+  return (
+    <Overlay centerVertically={centerVertically} onClick={handleOverlayClick}>
+      {content}
+    </Overlay>
+  );
 };
 
 export default Modal;

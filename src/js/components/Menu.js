@@ -60,6 +60,7 @@ export default class Menu extends Component {
     return this.state.showNewPostModal
       ? html`
           <${Modal}
+            centerVertically=${true}
             showContainer=${true}
             onClose=${() => this.setState({ showNewPostModal: false })}
           >
@@ -76,7 +77,11 @@ export default class Menu extends Component {
   renderQrModal() {
     return this.state.showQrModal
       ? html`
-          <${Modal} showContainer=${true} onClose=${() => this.setState({ showQrModal: false })}>
+          <${Modal}
+            centerVertically=${true}
+            showContainer=${true}
+            onClose=${() => this.setState({ showQrModal: false })}
+          >
             <div style="text-align:center">
               <${QrCode} data=${Key.getPubKey()} />
               <p>
