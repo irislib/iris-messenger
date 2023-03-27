@@ -3,7 +3,7 @@ import { debounce, throttle } from 'lodash';
 import { RelayPool } from 'nostr-relaypool';
 
 import Helpers from '../Helpers';
-import { Event, Filter, Sub } from '../lib/nostr-tools';
+import { Event, Filter, matchFilter, Sub } from '../lib/nostr-tools';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 
@@ -175,9 +175,12 @@ const PubSub = {
       if (f.kinds) {
         query['kind'] = { $in: f.kinds };
       }
-      Events.db.find(query).forEach((e) => {
-        callback(e);
-      });
+      Events.db
+        .find(query)
+        .filter((e) => matchFilter(f, e))
+        .forEach((e) => {
+          callback(e);
+        });
       // TODO other filters such as #p
     });
 
