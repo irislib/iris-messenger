@@ -6,6 +6,9 @@ import localState from './LocalState';
 
 export default {
   async checkExistingAccount(pub) {
+    if (!['iris.to', 'localhost'].includes(window.location.hostname)) {
+      return;
+    }
     // get username linked to pub along with its user_confirmed status
     const res = await fetch(`https://api.iris.to/user/find?public_key=${pub}`);
     if (res.status === 200) {

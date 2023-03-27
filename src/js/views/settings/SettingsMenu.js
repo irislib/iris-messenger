@@ -9,7 +9,6 @@ import { translate as t } from '../../translations/Translation';
 
 const SETTINGS = {
   account: 'account',
-  iris_account: 'iris.to',
   appearance: 'appearance',
   media: 'media',
   network: 'network',
@@ -17,6 +16,10 @@ const SETTINGS = {
   language: 'language',
   social_network: 'social_network',
 };
+
+if (['iris.to', 'localhost'].includes(window.location.hostname)) {
+  SETTINGS.iris_account = 'iris.to';
+}
 
 export default class SettingsMenu extends Component {
   menuLinkClicked(url, e) {
