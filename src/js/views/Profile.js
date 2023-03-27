@@ -362,9 +362,8 @@ class Profile extends View {
   }
 
   getNostrProfile(address, nostrAddress) {
-    // TODO unsubscribe on unmount
-    PubSub.subscribe(
-      [{ authors: [address] }],
+    this.unsub = PubSub.subscribe(
+      [{ authors: [address], kinds: [0, 3] }],
       (event) => console.log('profile event', event),
       address,
     );
@@ -462,8 +461,14 @@ class Profile extends View {
     );
   }
 
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    this.unsub?.();
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if (!prevState.name && this.state.name) {
+      this.unsub?.();
       setTimeout(() => {
         // important for SEO: prerenderReady is false until page content is loaded
         window.prerenderReady = true;
