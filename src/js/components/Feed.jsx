@@ -542,7 +542,7 @@ class Feed extends Component {
     const feedName =
       !this.state.queuedEvents.length &&
       {
-        everyone: 'global_feed',
+        global: 'global_feed',
         follows: 'following',
         notifications: 'notifications',
       }[this.props.index];
