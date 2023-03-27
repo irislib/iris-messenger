@@ -203,7 +203,16 @@ class Feed extends Component {
     );
     setTimeout(() => {
       if (this.props.index === 'notifications') {
-        this.unsub = PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback, 'feed', true);
+        const myPub = Key.getPubKey();
+        this.unsub = PubSub.subscribe(
+          [{ '#p': [myPub] }],
+          (events) => {
+            // TODO make sure PubSub subscribe filters correctly
+            callback(events.filter((e) => e.tags?.some((t) => t[0] === 'p' && t[1] === myPub)));
+          },
+          'feed',
+          true,
+        );
       } else {
         this.unsub = this.getEvents(callback);
       }
