@@ -196,7 +196,12 @@ class Feed extends Component {
     this.unsub?.();
     const callback = throttle(
       (events) => {
-        this.updateSortedEvents(events.sort(this.sort.bind(this)).map((e) => e.id));
+        this.updateSortedEvents(
+          events
+            .filter((e) => !SocialNetwork.blockedUsers.has(e.pubkey))
+            .sort(this.sort.bind(this))
+            .map((e) => e.id),
+        );
       },
       500,
       { leading: true },
