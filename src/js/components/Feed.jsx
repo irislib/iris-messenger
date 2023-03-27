@@ -291,7 +291,7 @@ class Feed extends Component {
       );
     } else {
       return PubSub.subscribe(
-        [{ kinds: [1, 6], limit: 100 }],
+        [{ kinds: [1, 6] }],
         (events) => {
           if (this.props.index === 'follows') {
             events = events.filter((e) => {

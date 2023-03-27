@@ -149,7 +149,7 @@ const PubSub = {
     const events = new Map();
     const callback = (event) => {
       events.set(event.id, event);
-      cb?.(Array.from(events.values())); // TODO return values instead of keys
+      cb?.(Array.from(events.values()));
     };
     let currentSubscriptionId;
     if (cb) {
@@ -176,7 +176,6 @@ const PubSub = {
         query['kind'] = { $in: f.kinds };
       }
       Events.db.find(query).forEach((e) => {
-        console.log('event from lokijs');
         callback(e);
       });
       // TODO other filters such as #p

@@ -108,7 +108,6 @@ export default {
       }
     }
     query.each((event) => {
-      console.log('got event from idb');
       Events.handle(event, false, false);
     });
   },
