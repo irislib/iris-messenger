@@ -9,6 +9,7 @@ import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import PubSub from '../nostr/PubSub';
+import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 import { PrimaryButton as Button } from './buttons/Button';
@@ -71,7 +72,7 @@ class Feed extends Component {
   getSettings(override = {}) {
     // override default & saved settings with url params
     let settings = { ...DEFAULT_SETTINGS };
-    if (['everyone', 'follows'].includes(this.props?.index)) {
+    if (['global', 'follows'].includes(this.props?.index)) {
       settings = Object.assign(settings, override);
     }
     if (this.props?.index !== 'notifications' && override.display) {
@@ -263,7 +264,19 @@ class Feed extends Component {
         'keyword',
       );
     } else {
-      return PubSub.subscribe([{ kinds: [1, 6], limit: 100 }], callback, 'global', true);
+      return PubSub.subscribe(
+        [{ kinds: [1, 6], limit: 100 }],
+        (events) => {
+          if (this.props.index === 'follows') {
+            events = events.filter((e) => {
+              return SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1;
+            });
+          }
+          callback(events);
+        },
+        'global',
+        true,
+      );
     }
   }
 
@@ -538,7 +551,7 @@ class Feed extends Component {
         />
       </ErrorBoundary>
     ));
-    const isGeneralFeed = ['everyone', 'follows'].includes(this.props.index);
+    const isGeneralFeed = ['global', 'follows'].includes(this.props.index);
     return (
       <div className="msg-feed">
         <div>

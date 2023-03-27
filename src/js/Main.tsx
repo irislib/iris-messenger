@@ -156,7 +156,7 @@ class Main extends Component<Props, ReactState> {
             <Router onChange={(e) => this.handleRoute(e)}>
               <FeedList path="/" />
               <Feed path="/following" index="follows" />
-              <Feed path="/global" index="everyone" />
+              <Feed path="/global" index="global" />
               <Feed path="/search/:term?/:type?" />
               <Feed path="/media" index="media" thumbnails />
               <Login path="/login" />
