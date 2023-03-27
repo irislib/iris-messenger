@@ -3,6 +3,7 @@ import { html } from 'htm/preact';
 import $ from 'jquery';
 import { escapeRegExp } from 'lodash';
 import { route } from 'preact-router';
+import styled from 'styled-components';
 
 import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
@@ -46,6 +47,14 @@ const lightningIcon = html`<svg width="24" height="20" viewBox="0 0 16 20" fill=
     stroke-linejoin="round"
   ></path>
 </svg>`;
+
+const ContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+`;
 
 class Note extends Component {
   constructor() {
@@ -516,11 +525,11 @@ class Note extends Component {
   }
 
   renderImageModal() {
-    return html`
-      <${Modal}
-        justifyContent="flex-start"
-        onClose=${() => this.setState({ showImageModal: false })}
-      >
+    return html` <${Modal}
+      justifyContent="flex-start"
+      onClose=${() => this.setState({ showImageModal: false })}
+    >
+      <${ContentContainer}>
         ${this.props.meta.attachments.map((a, i) => {
           if (i > 0 && !this.props.standalone && !this.state.showMore) {
             return;
@@ -530,7 +539,7 @@ class Note extends Component {
           </p>`;
         })}
       <//>
-    `;
+    <//>`;
   }
 
   renderZapModal() {
