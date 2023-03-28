@@ -159,7 +159,7 @@ class Main extends Component<Props, ReactState> {
               <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />
               <Feed path="/search/:term?/:type?" />
-              <Feed path="/media" index="media" thumbnails />
+              <Feed path="/media" index="media" />
               <Login path="/login" />
               <Notifications path="/notifications" />
               <Chat path="/chat/hashtag/:hashtag?" />

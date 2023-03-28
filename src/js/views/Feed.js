@@ -66,7 +66,6 @@ class Feed extends View {
               scrollElement=${this.scrollElement.current}
               filter=${s.searchTerm && ((m) => this.filter(m))}
               keyword=${s.searchTerm}
-              thumbnails=${this.props.thumbnails}
               key=${this.props.index || 'feed'}
               index=${this.props.index}
               path=${path}

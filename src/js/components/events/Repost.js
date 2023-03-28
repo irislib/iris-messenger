@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { html } from 'htm/preact';
 
 import Icons from '../../Icons';
 import Events from '../../nostr/Events';
@@ -22,22 +21,24 @@ export default function Repost(props) {
     }, []);
   }
 
-  return html`
-    <div class="msg">
-      <div class="msg-content" style="padding: 12px 0 0 0;">
-        <div style="display: flex; align-items: center; flex-basis: 100%; margin-left: 15px">
-          <small class="reposted">
-            <i> ${Icons.repost} </i>
-            <a href="/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}">
-              <${Name} pub=${props.event?.pubkey} hideBadge=${true} userNameOnly=${true} />
+  return (
+    <div className="msg">
+      <div className="msg-content" style={{ padding: '12px 0 0 0' }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', flexBasis: '100%', marginLeft: '15px' }}
+        >
+          <small className="reposted">
+            <i>{Icons.repost}</i>
+            <a href={`/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`}>
+              <Name pub={props.event?.pubkey} hideBadge={true} userNameOnly={true} />
             </a>
-            <span style="margin-left: 5px">
-              ${allReposts.length > 1 && html`and ${allReposts.length - 1} others`} ${t('reposted')}
+            <span style={{ marginLeft: '5px' }}>
+              {allReposts.length > 1 && `and ${allReposts.length - 1} others`} {t('reposted')}
             </span>
           </small>
         </div>
-        <${EventComponent} key=${repostedEventId + props.event.id} id=${repostedEventId} />
+        <EventComponent key={repostedEventId + props.event.id} id={repostedEventId} />
       </div>
     </div>
-  `;
+  );
 }

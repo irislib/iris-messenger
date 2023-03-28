@@ -1,5 +1,3 @@
-import { html } from 'htm/preact';
-
 import Component from '../../BaseComponent';
 import Icons from '../../Icons';
 import localState from '../../LocalState';
@@ -139,46 +137,68 @@ class EventComponent extends Component {
       return '';
     }
     const url = `https://iris.to/${Key.toNostrBech32Address(this.props.id, 'note')}`;
-    return html`
-      <div class="msg-menu-btn">
-        <${Dropdown}>
-          <${Copy}
-            key=${`${this.props.id}copy_link`}
-            text=${t('copy_link')}
+    return (
+      <div className="msg-menu-btn">
+        <Dropdown>
+          <Copy
+            key={`${this.props.id}copy_link`}
+            text={t('copy_link')}
             title="Note link"
-            copyStr=${url}
+            copyStr={url}
           />
-          <${Copy}
-            key=${`${this.props.id}copy_id`}
-            text=${t('copy_note_ID')}
+          <Copy
+            key={`${this.props.id}copy_id`}
+            text={t('copy_note_ID')}
             title="Note ID"
-            copyStr=${Key.toNostrBech32Address(this.props.id, 'note')}
+            copyStr={Key.toNostrBech32Address(this.props.id, 'note')}
           />
-          <a href="#" onClick=${(e) => this.onMute(e)}>
-            ${this.state.muted ? t('unmute') : t('mute')}
+          <a href="#" onClick={(e) => this.onMute(e)}>
+            {this.state.muted ? t('unmute') : t('mute')}
           </a>
-          ${this.state.event
-            ? html`
-                <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
-                <a href="#" onClick=${(e) => this.translate(e)}>${t('translate')}</a>
-                <${Copy}
-                  key=${`${this.props.id}copyRaw`}
-                  text=${t('copy_raw_data')}
-                  title="Message raw data"
-                  copyStr=${JSON.stringify(this.state.event, null, 2)}
-                />
-                ${this.state.isMine
-                  ? html` <a href="#" onClick=${(e) => this.onDelete(e)}>${t('delete')}</a> `
-                  : html`<a href="#" onClick=${(e) => this.report(e)}>${t('report_public')}</a>
-                      <${FollowButton} id=${this.state.event?.pubkey} showName=${true} />
-                      <span onClick=${() => this.setState({ msg: null })}>
-                        <${Block} id=${this.state.event?.pubkey} showName=${true} />
-                      </span> `}
-              `
-            : ''}
-        <//>
+          {this.state.event && (
+            <>
+              <a href="#" onClick={(e) => this.onBroadcast(e)}>
+                {t('resend_to_relays')}
+              </a>
+              <a href="#" onClick={(e) => this.translate(e)}>
+                {t('translate')}
+              </a>
+              <Copy
+                key={`${this.props.id}copyRaw`}
+                text={t('copy_raw_data')}
+                title="Message raw data"
+                copyStr={JSON.stringify(this.state.event, null, 2)}
+              />
+              {this.state.isMine ? (
+                <a href="#" onClick={(e) => this.onDelete(e)}>
+                  {t('delete')}
+                </a>
+              ) : (
+                <>
+                  <a href="#" onClick={(e) => this.report(e)}>
+                    {t('report_public')}
+                  </a>
+                  <FollowButton id={this.state.event?.pubkey} showName={true} />
+                  <span onClick={() => this.setState({ msg: null })}>
+                    <Block id={this.state.event?.pubkey} showName={true} />
+                  </span>
+                </>
+              )}
+            </>
+          )}
+        </Dropdown>
       </div>
-    `;
+    );
+  }
+
+  getClassName() {
+    let className = 'msg';
+    const { props, state } = this;
+    if (props.asReply) className += ' reply';
+    if (props.standalone) className += ' standalone';
+    const asQuote = props.asQuote || (props.showReplies && state.sortedReplies.length);
+    if (asQuote) className += ' quote';
+    return className;
   }
 
   render() {
@@ -186,38 +206,32 @@ class EventComponent extends Component {
       console.error('no id on event', this.props);
       return;
     }
-    const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
-    const s = this.state;
-    const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
     if (!this.state.event) {
-      return html` <div
-        ref=${this.ref}
-        key=${this.props.id}
-        class="msg ${isThumbnail} ${this.props.asReply ? 'reply' : ''} ${this.props.standalone
-          ? 'standalone'
-          : ''} ${asQuote ? 'quote' : ''}"
-      >
-        <div class="msg-content retrieving" style="display:flex;align-items:center">
-          <div class="text ${this.state.retrieving ? 'visible' : ''}">
-            ${t('looking_up_message')}
+      return (
+        <div ref={this.ref} key={this.props.id} className={this.getClassName()}>
+          <div
+            className={`msg-content retrieving ${this.state.retrieving ? 'visible' : ''}`}
+            style={{ display: 'flex', alignItems: 'center' }}
+          >
+            <div className="text">{t('looking_up_message')}</div>
+            <div>{this.renderDropdown()}</div>
           </div>
-          <div>${this.renderDropdown()}</div>
         </div>
-      </div>`;
+      );
     }
 
     if (SocialNetwork.blockedUsers.has(this.state.event.pubkey)) {
       if (this.props.standalone || this.props.asQuote) {
-        return html`
-          <div class="msg">
-            <div class="msg-content">
-              <p style="display: flex; align-items: center">
-                <i style="margin-right: 15px;"> ${Icons.newFollower} </i>
+        return (
+          <div className="msg">
+            <div className="msg-content">
+              <p style={{ display: 'flex', alignItems: 'center' }}>
+                <i style={{ marginRight: '15px' }}>{Icons.newFollower}</i>
                 <span> Message from a blocked user</span>
               </p>
             </div>
           </div>
-        `;
+        );
       } else {
         return '';
       }
@@ -249,13 +263,15 @@ class EventComponent extends Component {
       return '';
     }
 
-    return html`<${Component}
-      key=${this.props.id}
-      event=${this.state.event}
-      meta=${this.state.meta}
-      fadeIn=${this.props.feedOpenedAt < this.state.event.created_at}
-      ...${this.props}
-    />`;
+    return (
+      <Component
+        key={this.props.id}
+        event={this.state.event}
+        meta={this.state.meta}
+        fadeIn={this.props.feedOpenedAt < this.state.event.created_at}
+        {...this.props}
+      />
+    );
   }
 }
 

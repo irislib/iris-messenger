@@ -38,18 +38,6 @@ l1.2-2.4c0.1-0.2,0-0.5-0.2-0.6c-2.3-1.6-3.7-4-3.7-6.5c0-4.7,4.7-8.5,10.4-8.5S22.
   </svg>
 );
 
-const lightningIcon = (
-  <svg width="24" height="20" viewBox="0 0 16 20" fill="none">
-    <path
-      d="M8.8333 1.70166L1.41118 10.6082C1.12051 10.957 0.975169 11.1314 0.972948 11.2787C0.971017 11.4068 1.02808 11.5286 1.12768 11.6091C1.24226 11.7017 1.46928 11.7017 1.92333 11.7017H7.99997L7.16663 18.3683L14.5888 9.46178C14.8794 9.11297 15.0248 8.93857 15.027 8.79128C15.0289 8.66323 14.9719 8.54141 14.8723 8.46092C14.7577 8.36833 14.5307 8.36833 14.0766 8.36833H7.99997L8.8333 1.70166Z"
-      stroke="currentColor"
-      stroke-width="1.66667"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    ></path>
-  </svg>
-);
-
 const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -209,6 +197,7 @@ class Note extends Component {
   }
 
   renderDropdown() {
+    // maybe this should be rendered only when it's opened?
     if (this.props.asInlineQuote) {
       return '';
     }
@@ -322,15 +311,11 @@ class Note extends Component {
     const ogImageUrl =
       this.props.standalone && this.props.meta.attachments?.find((a) => a.type === 'image')?.data;
 
-    const isThumbnail = this.props.thumbnail ? 'thumbnail-item' : '';
     let name = this.props.name || this.state.name;
     const emojiOnly =
       this.props.event.content?.length === 2 && Helpers.isEmoji(this.props.event.content);
     const shortText = text.length > 128 ? `${text.slice(0, 128)}...` : text;
     const quotedShortText = `"${shortText}"`;
-    if (isThumbnail) {
-      text = shortText;
-    }
 
     const content = Helpers.highlightEverything(text.trim(), this.props.event, {
       showMentionedMessages: !this.props.asInlineQuote,
@@ -518,7 +503,7 @@ class Note extends Component {
               }}
               className="msg-btn zap-btn"
             >
-              {lightningIcon}
+              {Icons.lightning}
             </a>
             <span
               className={`count ${s.showZaps ? 'active' : ''}`}
@@ -689,10 +674,9 @@ class Note extends Component {
   }
 
   getClassName(asQuote, quoting) {
-    const { state, props } = this;
+    const { props } = this;
     const classNames = ['msg'];
 
-    if (state.isThumbnail) classNames.push('thumbnail');
     if (props.asReply) classNames.push('reply');
     if (props.standalone) classNames.push('standalone');
     if (asQuote) classNames.push('quote');
