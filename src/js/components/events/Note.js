@@ -521,7 +521,7 @@ class Note extends Component {
 
   renderImageModal() {
     return html` <${Modal}
-      justifyContent="flex-start"
+      centerVertically=${true}
       onClose=${() => this.setState({ showImageModal: false })}
     >
       <${ContentContainer}>
