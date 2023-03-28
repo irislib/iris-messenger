@@ -216,16 +216,10 @@ class Feed extends Component {
     };
     setTimeout(() => {
       if (this.props.index === 'notifications') {
-        const myPub = Key.getPubKey();
-        this.unsub = PubSub.subscribe(
-          [{ '#p': [myPub] }],
-          (events) => {
-            // TODO make sure PubSub subscribe filters correctly
-            callback(events.filter((e) => e.tags?.some((t) => t[0] === 'p' && t[1] === myPub)));
-          },
-          'feed',
-          true,
-        );
+        this.unsub = Events.notifications.subscribe((eventIds) => {
+          const events = eventIds.map((id) => Events.db.by('id', id));
+          callback(events);
+        });
       } else {
         this.unsub = this.getEvents(callback);
       }
@@ -256,9 +250,6 @@ class Feed extends Component {
   }
 
   getEvents(callback) {
-    if (this.props.index === 'notifications') {
-
-    }
     if (this.props.nostrUser) {
       if (this.props.index === 'likes') {
         return PubSub.subscribe(

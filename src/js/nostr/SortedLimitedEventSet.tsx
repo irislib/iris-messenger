@@ -1,16 +1,22 @@
 import { Event } from '../lib/nostr-tools';
 
+type Callback = (events: string[]) => void;
+type Unsubscribe = () => void;
+
 export default class SortedLimitedEventSet {
   private events: { id: string; created_at: number }[];
   private eventIdSet: Set<string>;
   private maxSize: number;
   private descending: boolean;
+  private subscriptions: Map<number, Callback>;
+  private static subscriptionId = 0;
 
   constructor(maxSize: number, descending = true) {
     this.events = [];
     this.eventIdSet = new Set(); // so we can check if an event is already in the set in O(1) time
     this.maxSize = maxSize;
     this.descending = descending;
+    this.subscriptions = new Map();
   }
 
   get size(): number {
@@ -51,6 +57,7 @@ export default class SortedLimitedEventSet {
     this.events.sort((a, b) =>
       this.descending ? b.created_at - a.created_at : a.created_at - b.created_at,
     );
+    this.subscriptions.forEach((callback) => callback(this.eventIds));
     return true;
   }
 
@@ -64,6 +71,7 @@ export default class SortedLimitedEventSet {
       return false;
     }
     this.events.splice(index, 1);
+    this.subscriptions.forEach((callback) => callback(this.eventIds));
     return true;
   }
 
@@ -73,5 +81,12 @@ export default class SortedLimitedEventSet {
 
   values(): string[] {
     return this.events.map((event) => event.id);
+  }
+
+  subscribe(callback: Callback): Unsubscribe {
+    const id = SortedLimitedEventSet.subscriptionId++;
+    this.subscriptions.set(id, callback);
+    callback(this.eventIds);
+    return () => this.subscriptions.delete(id);
   }
 }
