@@ -58,7 +58,7 @@ const Session = {
           callback(event);
         }
       }
-      PubSub.subscribe(filters, (events) => callback(events[0]));
+      PubSub.subscribe(filters, (events) => callback(events[0]), 'keyValueEvents');
       return '0';
     };
     localState.get('globalFilter').once((globalFilter) => {

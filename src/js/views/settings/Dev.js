@@ -9,6 +9,15 @@ export default class Appearance extends Component {
           <p>
             <input
               type="checkbox"
+              id="useRelayPool"
+              checked={this.state.logSubscriptions}
+              onChange={(e) => localState.get('dev').get('useRelayPool').put(e.target.checked)}
+            />
+            <label htmlFor="useRelayPool">Use RelayPool</label>
+          </p>
+          <p>
+            <input
+              type="checkbox"
               id="logSubscriptions"
               checked={this.state.logSubscriptions}
               onChange={(e) => localState.get('dev').get('logSubscriptions').put(e.target.checked)}

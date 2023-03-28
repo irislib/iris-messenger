@@ -29,6 +29,7 @@ let subscriptionId = 0;
 let dev: any = {
   logSubscriptions: false,
   indexed03: false,
+  useRelayPool: false,
 };
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
   useEventCache: false,
@@ -192,10 +193,15 @@ const PubSub = {
     // TODO ask dexie
     // TODO if asking event by id or profile, ask http proxy
 
-    const unsubRelayPool = this.subscribeRelayPool(filters, sinceLastOpened);
+    let unsubRelays;
+    if (dev.useRelayPool) {
+      unsubRelays = this.subscribeRelayPool(filters, sinceLastOpened);
+    } else {
+      unsubRelays = Relays.subscribe(filters, name || JSON.stringify(filters), sinceLastOpened);
+    }
 
     return () => {
-      unsubRelayPool();
+      unsubRelays();
       if (currentSubscriptionId) {
         this.subscriptions.delete(currentSubscriptionId);
       }

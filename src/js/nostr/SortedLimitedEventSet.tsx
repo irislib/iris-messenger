@@ -1,7 +1,7 @@
 import { Event } from '../lib/nostr-tools';
 
+import { Unsubscribe } from './PubSub';
 type Callback = (events: string[]) => void;
-type Unsubscribe = () => void;
 
 export default class SortedLimitedEventSet {
   private events: { id: string; created_at: number }[];
