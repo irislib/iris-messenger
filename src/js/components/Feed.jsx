@@ -43,14 +43,6 @@ const DEFAULT_SETTINGS = {
   timespan: 'all',
 };
 
-const TIMESPANS = {
-  all: 0,
-  day: 24 * 60 * 60,
-  week: 7 * 24 * 60 * 60,
-  month: 30 * 24 * 60 * 60,
-  year: 365 * 24 * 60 * 60,
-};
-
 class Feed extends Component {
   constructor() {
     super();
@@ -264,6 +256,9 @@ class Feed extends Component {
   }
 
   getEvents(callback) {
+    if (this.props.index === 'notifications') {
+
+    }
     if (this.props.nostrUser) {
       if (this.props.index === 'likes') {
         return PubSub.subscribe(

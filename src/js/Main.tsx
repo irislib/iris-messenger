@@ -1,3 +1,4 @@
+//import "preact/debug";
 import { Helmet } from 'react-helmet';
 import { Router, RouterOnChangeArgs } from 'preact-router';
 
