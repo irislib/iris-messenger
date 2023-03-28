@@ -756,7 +756,7 @@ const Events = {
     };
     this.directMessagesByUser.has(address) && callback();
     const myPub = Key.getPubKey();
-    return PubSub.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
+    return PubSub.subscribe([{ kinds: [4], '#p': [myPub], authors: [address] }, { kinds: [4], '#p': [address], authors: [myPub] }], callback);
   },
   getDirectMessages(cb) {
     const callback = () => {
