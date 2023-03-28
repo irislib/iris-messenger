@@ -301,12 +301,6 @@ class Note extends Component {
         }
         if (parsedUrl.pathname.toLowerCase().match(/\.(jpg|jpeg|gif|png|webp)$/)) {
           meta.attachments.push({ type: 'image', data: `${parsedUrl.href}` });
-
-          // Remove URL from beginning or end of line or before newline
-          const esc = escapeRegExp(url);
-          text = text.replace(new RegExp(`^${esc}`), '');
-          text = text.replace(new RegExp(`${esc}$`), '');
-          text = text.replace(new RegExp(`${esc}\n`), ' ');
         }
       });
     }
@@ -629,23 +623,6 @@ class Note extends Component {
     `;
   }
 
-  renderAttachments() {
-    return this.props.meta.attachments.map((a, i) => {
-      if (i > 0 && !this.props.standalone && !this.state.showMore) {
-        return;
-      }
-      return html`<div class="img-container">
-        <${SafeImg}
-          width=${569}
-          src=${a.data}
-          onClick=${(e) => {
-            this.imageClicked(e);
-          }}
-        />
-      </div>`;
-    });
-  }
-
   isTooLong() {
     return (
       this.props.meta.attachments?.length > 1 ||
@@ -721,7 +698,6 @@ class Note extends Component {
                   />
                 `
               : ''}
-            ${this.props.meta.attachments && this.renderAttachments()}
             ${s.text?.length > 0
               ? html`<div class="text ${s.emojiOnly && 'emoji-only'}">
                   ${(!this.state.showMore && this.state.shortContent) || this.state.content}

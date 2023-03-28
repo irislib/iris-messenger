@@ -8,7 +8,7 @@ import { route } from 'preact-router';
 
 import EventComponent from './components/events/EventComponent';
 import Name from './components/Name';
-import { isSafeOrigin } from './components/SafeImg';
+import SafeImg, { isSafeOrigin } from './components/SafeImg';
 import Torrent from './components/Torrent';
 import Key from './nostr/Key';
 import { language, translate as t } from './translations/Translation';
@@ -337,6 +337,14 @@ export default {
         // Torrent component
         console.log('magnet link', match);
         return <Torrent key={match + i} preview={true} torrentId={match} />;
+      });
+    }
+
+    // find .jpg .jpeg .gif .png .webp urls in msg.text and create img tag
+    if (settings.enableImages !== false) {
+      const imgRegex = /(https?:\/\/.*\.(?:jpg|jpeg|gif|png|webp))/gi;
+      replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
+        return <SafeImg width={569} src={match} key={match + i} />;
       });
     }
 
