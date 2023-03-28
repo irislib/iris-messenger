@@ -17,7 +17,7 @@ const SETTINGS = {
   social_network: 'social_network',
 };
 
-if (['iris.to', 'localhost'].includes(window.location.hostname)) {
+if (['iris.to', 'beta.iris.to', 'localhost'].includes(window.location.hostname)) {
   SETTINGS.iris_account = 'iris.to';
 }
 
