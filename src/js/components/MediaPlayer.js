@@ -1,4 +1,3 @@
-import { html } from 'htm/preact';
 import $ from 'jquery';
 import { Component } from 'preact';
 
@@ -88,26 +87,32 @@ class MediaPlayer extends Component {
 
   render() {
     const s = this.state;
-    return html`
-      <div class="media-player" style="${s.isOpen ? '' : 'display:none'}">
-        <div class="player"></div>
-        <div class="cover"></div>
-        <a href="/torrent/${encodeURIComponent(this.state.torrentId)}" class="info">
-          ${s.splitPath
+    return (
+      <div className="media-player" style={{ display: s.isOpen ? '' : 'none' }}>
+        <div className="player"></div>
+        <div className="cover"></div>
+        <a href={`/torrent/${encodeURIComponent(this.state.torrentId)}`} className="info">
+          {s.splitPath
             ? s.splitPath.map((str, i) => {
                 if (i === s.splitPath.length - 1) {
                   if (s.isAudioOpen) {
                     str = str.split('.').slice(0, -1).join('.');
                   }
-                  return html`<p><b>${str}</b></p>`;
+                  return (
+                    <p>
+                      <b>{str}</b>
+                    </p>
+                  );
                 }
-                return html`<p>${str}</p>`;
+                return <p>{str}</p>;
               })
             : ''}
         </a>
-        <div class="close" onClick=${() => this.closeClicked()}>${Icons.close}</div>
+        <div className="close" onClick={() => this.closeClicked()}>
+          {Icons.close}
+        </div>
       </div>
-    `;
+    );
   }
 }
 

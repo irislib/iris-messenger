@@ -1,4 +1,3 @@
-import { html } from 'htm/preact';
 import { route } from 'preact-router';
 
 import EventComponent from '../components/events/EventComponent';
@@ -32,29 +31,29 @@ class Message extends View {
   renderView() {
     let content;
     if (this.props.id === 'new') {
-      content = html`
-        <div class="mar-top15">
-          <${FeedMessageForm}
-            placeholder=${t('whats_on_your_mind')}
+      content = (
+        <div className="mar-top15">
+          <FeedMessageForm
+            placeholder={t('whats_on_your_mind')}
             activeChat="public"
-            forceAutofocusMobile=${true}
-            autofocus=${true}
-            onSubmit=${() => route('/')}
+            forceAutofocusMobile={true}
+            autofocus={true}
+            onSubmit={() => route('/')}
           />
         </div>
-      `;
+      );
     } else {
-      content = html`
-        <${EventComponent}
-          id=${this.props.id}
-          key=${this.props.id}
-          standalone=${true}
-          showReplies=${Infinity}
-          showRepliedMsg=${true}
+      content = (
+        <EventComponent
+          id={this.props.id}
+          key={this.props.id}
+          standalone={true}
+          showReplies={Infinity}
+          showRepliedMsg={true}
         />
-      `;
+      );
     }
-    return html` <div class="centered-container">${content}</div> `;
+    return <div className="centered-container">{content}</div>;
   }
 }
 
