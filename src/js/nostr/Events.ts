@@ -710,7 +710,11 @@ const Events = {
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }
-    return PubSub.subscribe([{ kinds: [1, 6, 7, 9735], '#e': [id] }], callback);
+    PubSub.subscribedRepliesAndReactions.add(id);
+    PubSub.subscribeToRepliesAndReactions();
+    return () => {
+      PubSub.subscribedRepliesAndReactions.delete(id);
+    };
   },
   getEventById(id: string, proxyFirst = false, cb?: (event: Event) => void) {
     const event = this.db.by('id', id);
@@ -718,28 +722,19 @@ const Events = {
       cb(event);
       return;
     }
-    const askWs = () => {
-      const unsub = PubSub.subscribe([{ ids: [id] }], () => {
-        const msg = this.db.by('id', id);
-        if (msg) {
-          cb?.(msg);
-          unsub();
-        }
-      });
-    };
+    PubSub.subscribedPosts.add(id);
 
     if (proxyFirst) {
       // give proxy 300 ms to respond, then ask ws
-      const askWsTimeout = setTimeout(() => {
-        askWs();
+      const askRelaysTimeout = setTimeout(() => {
+        PubSub.subscribeToPosts();
       }, 300);
       fetch(`https://api.iris.to/event/${id}`).then((res) => {
         if (res.status === 200) {
           res.json().then((event) => {
             // TODO verify sig
             if (event && event.id === id) {
-              clearTimeout(askWsTimeout);
-              PubSub.subscribedPosts.add(id);
+              clearTimeout(askRelaysTimeout);
               Events.handle(event, true);
               cb?.(event);
             }
@@ -747,7 +742,7 @@ const Events = {
         }
       });
     } else {
-      askWs();
+      PubSub.subscribeToPosts();
     }
   },
   getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
@@ -756,14 +751,28 @@ const Events = {
     };
     this.directMessagesByUser.has(address) && callback();
     const myPub = Key.getPubKey();
-    return PubSub.subscribe([{ kinds: [4], '#p': [myPub], authors: [address] }, { kinds: [4], '#p': [address], authors: [myPub] }], callback);
+    return PubSub.subscribe(
+      [
+        { kinds: [4], '#p': [myPub], authors: [address] },
+        { kinds: [4], '#p': [address], authors: [myPub] },
+      ],
+      callback,
+      'dmsByUser',
+    );
   },
-  getDirectMessages(cb) {
+  getDirectMessages(cb?) {
     const callback = () => {
       cb?.(this.directMessagesByUser);
     };
     callback();
-    return PubSub.subscribe([{ kinds: [4], '#p': [Key.getPubKey()] }], callback);
+    return PubSub.subscribe(
+      [
+        { kinds: [4], '#p': [Key.getPubKey()] },
+        { kinds: [4], authors: [Key.getPubKey()] },
+      ],
+      callback,
+      'dms',
+    );
   },
 };
 

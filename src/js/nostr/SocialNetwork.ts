@@ -119,14 +119,6 @@ export default {
     }
 
     this.followedByUser.get(follower)?.add(followedUser);
-    if (follower === myPub) {
-      PubSub.subscribe(
-        [{ kinds: [1, 5, 7], authors: [followedUser] }],
-        undefined,
-        'followed',
-        true,
-      );
-    }
     if (followedUser === myPub) {
       if (this.followersByUser.get(followedUser)?.size === 1) {
         localState.get('hasNostrFollowers').put(true);
@@ -269,7 +261,10 @@ export default {
       });
     }
     PubSub.subscribedProfiles.add(address);
-    return PubSub.subscribe([{ authors: [address], kinds: [0, 3] }], callback);
+    PubSub.subscribeToAuthors();
+    return () => {
+      PubSub.subscribedProfiles.delete(address);
+    };
   },
   setMetadata(data: any) {
     const event = {

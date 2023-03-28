@@ -138,8 +138,7 @@ const Session = {
         'notifications',
         true,
       ); // notifications
-      PubSub.subscribe([{ '#p': [myPub], kinds: [4] }], undefined, 'dms', true); // notifications and DMs
-      PubSub.subscribe([{ '#p': [myPub], kinds: [4], limit: 20 }], undefined, 'latestDms', true); // notifications and DMs
+      Events.getDirectMessages();
     }, 200);
     setInterval(() => {
       console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));

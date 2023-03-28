@@ -302,7 +302,6 @@ export default {
   resubscribe(relay?: Relay) {
     console.log('subscribedFiltersByName.size', PubSub.subscribedFiltersByName.size);
     for (const [name, filters] of Array.from(PubSub.subscribedFiltersByName.entries())) {
-      console.log('resubscribing to ', name, filters);
       this.subscribe(filters.filters, name, false, 0, filters.sinceRelayLastSeen, relay && [relay]);
     }
   },
@@ -370,7 +369,6 @@ export default {
           return unsubscribe;
         }
         authorRelayUrls = this.getUserRelays(author).filter(([url, settings]) => {
-          console.log('already have?', url, this.relays.has(url));
           return settings.write && !this.relays.has(url);
         });
         // pick 3 random relays

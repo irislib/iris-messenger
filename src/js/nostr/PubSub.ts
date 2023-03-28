@@ -161,13 +161,13 @@ const PubSub = {
         callback,
       });
     }
-    if (name) {
-      const existing = this.internalSubscriptionsByName.get(name);
-      if (existing) {
-        this.subscriptions.delete(existing);
-      }
-      this.internalSubscriptionsByName.set(name, currentSubscriptionId);
+    name = name || JSON.stringify(filters);
+
+    const existing = this.internalSubscriptionsByName.get(name);
+    if (existing) {
+      this.subscriptions.delete(existing);
     }
+    this.internalSubscriptionsByName.set(name, currentSubscriptionId);
 
     filters.forEach((f) => {
       const query = {};
