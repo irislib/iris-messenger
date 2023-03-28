@@ -344,7 +344,11 @@ export default {
     if (settings.enableImages !== false) {
       const imgRegex = /(https?:\/\/.*\.(?:jpg|jpeg|gif|png|webp))/gi;
       replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
-        return <SafeImg width={569} src={match} key={match + i} />;
+        return (
+          <div className="img-container">
+            <SafeImg width={569} src={match} key={match + i} />
+          </div>
+        );
       });
     }
 
