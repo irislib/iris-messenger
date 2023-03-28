@@ -281,7 +281,7 @@ class Feed extends Component {
       );
     } else {
       return PubSub.subscribe(
-        [{ kinds: [1, 6] }],
+        [{ kinds: [1, 6], limit: 500 }],
         (events) => {
           if (this.props.index === 'follows') {
             events = events.filter((e) => {
@@ -290,7 +290,7 @@ class Feed extends Component {
           }
           callback(events);
         },
-        'global',
+        'feed',
         true,
       );
     }
