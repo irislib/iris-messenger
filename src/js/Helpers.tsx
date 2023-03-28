@@ -346,7 +346,7 @@ export default {
       replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
         return (
           <div className="img-container">
-            <SafeImg width={569} src={match} key={match + i} />
+            <SafeImg onClick={opts.onImageClick} width={569} src={match} key={match + i} />
           </div>
         );
       });

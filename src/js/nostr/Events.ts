@@ -25,7 +25,7 @@ const events = db.addCollection('events', {
   unique: ['id'],
 });
 
-// TODO collections for Tags and Users?
+// add collections for Tags and Users?
 
 let mutedNotes;
 localState.get('mutedNotes').on((v) => {

@@ -319,6 +319,7 @@ class Note extends Component {
 
     const content = Helpers.highlightEverything(text.trim(), this.props.event, {
       showMentionedMessages: !this.props.asInlineQuote,
+      onImageClick: (e) => this.imageClicked(e),
     });
     text =
       text.length > MSG_TRUNCATE_LENGTH && !this.state.showMore && !this.props.standalone
