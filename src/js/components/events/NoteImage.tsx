@@ -85,7 +85,7 @@ export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
             fadeIn={props.fadeIn}
           />
           {showImageModal && (
-            <Modal onClose={() => setShowImageModal(false)}>
+            <Modal centerVertically={true} onClose={() => setShowImageModal(false)}>
               <SafeImg src={attachment.data} />
               <p>
                 <a

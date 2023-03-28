@@ -416,7 +416,7 @@ a.logo img:not(:last-child) {
 }
 
 .nav-plus-bg {
- fill: var(--button-bg);
+ fill: var(--button-primary-bg);
 }
 
 .nav .identicon img {
@@ -2164,7 +2164,7 @@ form.public button[type='submit'] {
   width: 47px;
   margin-right: 5px;
   border-radius: 5px;
-  background-color: var(--button-bg);
+  background-color: var(--button-primary-bg);
   color: #FFF;;
 }
 
