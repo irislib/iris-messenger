@@ -1,7 +1,5 @@
 import { Helmet } from 'react-helmet';
-import { html } from 'htm/preact';
 import $ from 'jquery';
-import { escapeRegExp } from 'lodash';
 import { route } from 'preact-router';
 import styled from 'styled-components';
 
@@ -30,23 +28,27 @@ import EventComponent from './EventComponent';
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
 
-const replyIcon = html`<svg width="24" viewBox="0 0 24 24" fill="currentColor">
-  <path
-    d="M12,1C5.4,1,0,5.5,0,11c0,2.8,1.4,5.5,4,7.4l-1.9,3.9C2,22.5,2,22.7,2.2,22.8C2.3,22.9,2.4,23,2.5,23c0.1,0,0.2,0,0.3-0.1
+const replyIcon = (
+  <svg width="24" viewBox="0 0 24 24" fill="currentColor">
+    <path
+      d="M12,1C5.4,1,0,5.5,0,11c0,2.8,1.4,5.5,4,7.4l-1.9,3.9C2,22.5,2,22.7,2.2,22.8C2.3,22.9,2.4,23,2.5,23c0.1,0,0.2,0,0.3-0.1
 L7,20.1c1.6,0.6,3.3,0.9,5,0.9c6.6,0,12-4.5,12-10S18.6,1,12,1z M12,19.5c-1.6,0-3.2-0.3-4.6-0.9c-0.1-0.1-0.3,0-0.4,0l-2.7,1.8
 l1.2-2.4c0.1-0.2,0-0.5-0.2-0.6c-2.3-1.6-3.7-4-3.7-6.5c0-4.7,4.7-8.5,10.4-8.5S22.4,6.4,22.4,11S17.7,19.5,12,19.5z"
-  />
-</svg>`;
+    />
+  </svg>
+);
 
-const lightningIcon = html`<svg width="24" height="20" viewBox="0 0 16 20" fill="none">
-  <path
-    d="M8.8333 1.70166L1.41118 10.6082C1.12051 10.957 0.975169 11.1314 0.972948 11.2787C0.971017 11.4068 1.02808 11.5286 1.12768 11.6091C1.24226 11.7017 1.46928 11.7017 1.92333 11.7017H7.99997L7.16663 18.3683L14.5888 9.46178C14.8794 9.11297 15.0248 8.93857 15.027 8.79128C15.0289 8.66323 14.9719 8.54141 14.8723 8.46092C14.7577 8.36833 14.5307 8.36833 14.0766 8.36833H7.99997L8.8333 1.70166Z"
-    stroke="currentColor"
-    stroke-width="1.66667"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  ></path>
-</svg>`;
+const lightningIcon = (
+  <svg width="24" height="20" viewBox="0 0 16 20" fill="none">
+    <path
+      d="M8.8333 1.70166L1.41118 10.6082C1.12051 10.957 0.975169 11.1314 0.972948 11.2787C0.971017 11.4068 1.02808 11.5286 1.12768 11.6091C1.24226 11.7017 1.46928 11.7017 1.92333 11.7017H7.99997L7.16663 18.3683L14.5888 9.46178C14.8794 9.11297 15.0248 8.93857 15.027 8.79128C15.0289 8.66323 14.9719 8.54141 14.8723 8.46092C14.7577 8.36833 14.5307 8.36833 14.0766 8.36833H7.99997L8.8333 1.70166Z"
+      stroke="currentColor"
+      stroke-width="1.66667"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    ></path>
+  </svg>
+);
 
 const ContentContainer = styled.div`
   display: flex;
@@ -210,47 +212,60 @@ class Note extends Component {
     if (this.props.asInlineQuote) {
       return '';
     }
-    const url = `https://iris.to/${Key.toNostrBech32Address(this.props.event.id, 'note')}`;
-    return html`
-      <div class="msg-menu-btn">
-        <${Dropdown}>
-          <${Copy}
-            key=${`${this.props.event.id}copy_link`}
-            text=${t('copy_link')}
+    const event = this.props.event;
+    const url = `https://iris.to/${Key.toNostrBech32Address(event.id, 'note')}`;
+    return (
+      <div className="msg-menu-btn">
+        <Dropdown>
+          <Copy
+            key={`${event.id}copy_link`}
+            text={t('copy_link')}
             title="Note link"
-            copyStr=${url}
+            copyStr={url}
           />
-          <${Copy}
-            key=${`${this.props.event.id}copy_id`}
-            text=${t('copy_note_ID')}
+          <Copy
+            key={`${event.id}copy_id`}
+            text={t('copy_note_ID')}
             title="Note ID"
-            copyStr=${Key.toNostrBech32Address(this.props.event.id, 'note')}
+            copyStr={Key.toNostrBech32Address(event.id, 'note')}
           />
-          <a href="#" onClick=${(e) => this.onMute(e)}>
-            ${this.state.muted ? t('unmute') : t('mute')}
+          <a href="#" onClick={(e) => this.onMute(e)}>
+            {this.state.muted ? t('unmute') : t('mute')}
           </a>
-          ${this.props.event
-            ? html`
-                <a href="#" onClick=${(e) => this.onBroadcast(e)}>${t('resend_to_relays')}</a>
-                <a href="#" onClick=${(e) => this.translate(e)}>${t('translate')}</a>
-                <${Copy}
-                  key=${`${this.props.event.id}copyRaw`}
-                  text=${t('copy_raw_data')}
-                  title="Message raw data"
-                  copyStr=${JSON.stringify(this.props.event, null, 2)}
-                />
-                ${this.props.meta.isMine
-                  ? html` <a href="#" onClick=${(e) => this.onDelete(e)}>${t('delete')}</a> `
-                  : html`<a href="#" onClick=${(e) => this.report(e)}>${t('report_public')}</a>
-                      <${Follow} id=${this.props.event?.pubkey} showName=${true} />
-                      <span onClick=${() => this.setState({ msg: null })}>
-                        <${Block} id=${this.props.event?.pubkey} showName=${true} />
-                      </span> `}
-              `
-            : ''}
-        <//>
+          {event ? (
+            <>
+              <a href="#" onClick={(e) => this.onBroadcast(e)}>
+                {t('resend_to_relays')}
+              </a>
+              <a href="#" onClick={(e) => this.translate(e)}>
+                {t('translate')}
+              </a>
+              <Copy
+                key={`${event.id}copyRaw`}
+                text={t('copy_raw_data')}
+                title="Message raw data"
+                copyStr={JSON.stringify(event, null, 2)}
+              />
+              {this.props.meta.isMine ? (
+                <a href="#" onClick={(e) => this.onDelete(e)}>
+                  {t('delete')}
+                </a>
+              ) : (
+                <>
+                  <a href="#" onClick={(e) => this.report(e)}>
+                    {t('report_public')}
+                  </a>
+                  <Follow id={event?.pubkey} showName={true} />
+                  <span onClick={() => this.setState({ msg: null })}>
+                    <Block id={event?.pubkey} showName={true} />
+                  </span>
+                </>
+              )}
+            </>
+          ) : null}
+        </Dropdown>
       </div>
-    `;
+    );
   }
 
   toggleLikes(e) {
@@ -421,207 +436,203 @@ class Note extends Component {
   }
 
   renderLikes() {
-    return html`
-      <div class="likes">
-        ${Array.from(this.likedBy).map((key) => {
+    return (
+      <div className="likes">
+        {Array.from(this.likedBy).map((key) => {
           const npub = Key.toNostrBech32Address(key, 'npub');
-          return html`<${Identicon}
-            showTooltip=${true}
-            onClick=${() => route(`/${npub}`)}
-            str=${npub}
-            width="32"
-          />`;
+          return (
+            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width="32" />
+          );
         })}
       </div>
-    `;
+    );
   }
 
   renderReplyingTo() {
-    return html`
-      <small class="msg-replying-to">
-        ${t('replying_to') + ' '}
-        ${this.state.replyingToUsers
-          .slice(0, 3)
-          .map(
-            (u) => html`
-              <a href=${`/${Key.toNostrBech32Address(u, 'npub')}`}>
-                @<${Name} pub=${u} hideBadge=${true} userNameOnly=${true} />${' '}
-              </a>
-            `,
-          )}
-        ${this.state.replyingToUsers?.length > 3 ? '...' : ''}
+    return (
+      <small className="msg-replying-to">
+        {t('replying_to') + ' '}
+        {this.state.replyingToUsers.slice(0, 3).map((u) => (
+          <a href={`/${Key.toNostrBech32Address(u, 'npub')}`}>
+            @<Name pub={u} hideBadge={true} userNameOnly={true} />{' '}
+          </a>
+        ))}
+        {this.state.replyingToUsers?.length > 3 ? '...' : ''}
       </small>
-    `;
+    );
   }
 
   renderHelmet() {
     const s = this.state;
     const title = `${s.name || 'User'} on Iris`;
-    return html`
-      <${Helmet} titleTemplate="%s">
-        <title>${title}: ${s.quotedShortText}</title>
-        <meta name="description" content=${s.quotedShortText} />
+    return (
+      <Helmet titleTemplate="%s">
+        <title>{`${title}: ${s.quotedShortText}`}</title>
+        <meta name="description" content={s.quotedShortText} />
         <meta property="og:type" content="article" />
-        ${s.ogImageUrl ? html`<meta property="og:image" content=${s.ogImageUrl} />` : ''}
-        <meta property="og:title" content=${title} />
-        <meta property="og:description" content=${s.quotedShortText} />
-      <//>
-    `;
+        {s.ogImageUrl ? <meta property="og:image" content={s.ogImageUrl} /> : null}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={s.quotedShortText} />
+      </Helmet>
+    );
   }
 
   renderReactionBtns() {
     const s = this.state;
-    return html`
-      <div class="below-text">
-        <a class="msg-btn reply-btn" onClick=${() => this.replyBtnClicked()}> ${replyIcon} </a>
-        <span class="count"> ${s.replyCount || ''} </span>
+    return (
+      <div className="below-text">
+        <a className="msg-btn reply-btn" onClick={() => this.replyBtnClicked()}>
+          {replyIcon}
+        </a>
+        <span className="count">{s.replyCount || ''}</span>
         <a
-          class="msg-btn repost-btn ${s.reposted ? 'reposted' : ''}"
-          onClick=${() => this.repostBtnClicked()}
+          className={`msg-btn repost-btn ${s.reposted ? 'reposted' : ''}`}
+          onClick={() => this.repostBtnClicked()}
         >
-          ${Icons.repost}
+          {Icons.repost}
         </a>
         <span
-          class="count ${s.showReposts ? 'active' : ''}"
-          onClick=${(e) => this.toggleReposts(e)}
+          className={`count ${s.showReposts ? 'active' : ''}`}
+          onClick={(e) => this.toggleReposts(e)}
         >
-          ${s.reposts || ''}
+          {s.reposts || ''}
         </span>
         <a
-          class="msg-btn like-btn ${s.liked ? 'liked' : ''}"
-          onClick=${(e) => this.likeBtnClicked(e)}
+          className={`msg-btn like-btn ${s.liked ? 'liked' : ''}`}
+          onClick={(e) => this.likeBtnClicked(e)}
         >
-          ${s.liked ? Icons.heartFull : Icons.heartEmpty}
+          {s.liked ? Icons.heartFull : Icons.heartEmpty}
         </a>
-        <span class="count ${s.showLikes ? 'active' : ''}" onClick=${(e) => this.toggleLikes(e)}>
-          ${s.likes || ''}
+        <span
+          className={`count ${s.showLikes ? 'active' : ''}`}
+          onClick={(e) => this.toggleLikes(e)}
+        >
+          {s.likes || ''}
         </span>
-        ${this.state.lightning
-          ? html`
-              <a
-                onClick=${(e) => {
-                  e.preventDefault();
-                  this.setState({ showZapModal: true });
-                }}
-                class="msg-btn zap-btn"
-              >
-                ${lightningIcon}
-              </a>
-              <span
-                class="count ${s.showZaps ? 'active' : ''}"
-                onClick=${(e) => this.toggleZaps(e)}
-              >
-                ${s.zappers?.length || ''}
-              </span>
-            `
-          : ''}
+        {this.state.lightning ? (
+          <>
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                this.setState({ showZapModal: true });
+              }}
+              className="msg-btn zap-btn"
+            >
+              {lightningIcon}
+            </a>
+            <span
+              className={`count ${s.showZaps ? 'active' : ''}`}
+              onClick={(e) => this.toggleZaps(e)}
+            >
+              {s.zappers?.length || ''}
+            </span>
+          </>
+        ) : (
+          ''
+        )}
       </div>
-    `;
+    );
   }
 
   renderImageModal() {
-    return html` <${Modal}
-      centerVertically=${true}
-      onClose=${() => this.setState({ showImageModal: false })}
-    >
-      <${ContentContainer}>
-        ${this.props.meta.attachments.map((a, i) => {
-          if (i > 0 && !this.props.standalone && !this.state.showMore) {
-            return;
-          }
-          return html`<p>
-            <${SafeImg} style="max-height: 90vh; max-width: 90vw;" src=${a.data} />
-          </p>`;
-        })}
-      <//>
-    <//>`;
+    return (
+      <Modal centerVertically={true} onClose={() => this.setState({ showImageModal: false })}>
+        <ContentContainer>
+          {this.props.meta.attachments.map((a, i) => {
+            if (i > 0 && !this.props.standalone && !this.state.showMore) {
+              return;
+            }
+            return (
+              <p>
+                <SafeImg style={{ maxHeight: '90vh', maxWidth: '90vw' }} src={a.data} />
+              </p>
+            );
+          })}
+        </ContentContainer>
+      </Modal>
+    );
   }
 
   renderZapModal() {
-    return html`
-      <${ZapModal}
-        show=${true}
-        lnurl=${this.state.lightning}
-        note=${this.props.event.id}
-        recipient=${this.props.event.pubkey}
-        onClose=${() => this.setState({ showZapModal: false })}
+    return (
+      <ZapModal
+        show={true}
+        lnurl={this.state.lightning}
+        note={this.props.event.id}
+        recipient={this.props.event.pubkey}
+        onClose={() => this.setState({ showZapModal: false })}
       />
-    `;
+    );
   }
 
   renderReplies() {
     return this.state.sortedReplies
       .slice(0, this.props.showReplies)
-      .map(
-        (r) =>
-          html`<${EventComponent}
-            key=${r}
-            id=${r}
-            asReply=${!this.props.standalone}
-            showReplies=${1}
-            showRepliedMsg=${false}
-          />`,
-      );
+      .map((r) => (
+        <EventComponent
+          key={r}
+          id={r}
+          asReply={!this.props.standalone}
+          showReplies={1}
+          showRepliedMsg={false}
+        />
+      ));
   }
 
   renderReplyForm() {
-    return html`
-      <${FeedMessageForm}
-        waitForFocus=${true}
-        autofocus=${!this.props.standalone}
-        replyingTo=${this.props.event.id}
-        replyingToUser=${this.props.event.pubkey}
-        placeholder=${t('write_your_reply')}
+    return (
+      <FeedMessageForm
+        waitForFocus={true}
+        autofocus={!this.props.standalone}
+        replyingTo={this.props.event.id}
+        replyingToUser={this.props.event.pubkey}
+        placeholder={t('write_your_reply')}
       />
-    `;
+    );
   }
 
   renderZaps() {
-    return html`
-      <div class="likes">
-        ${(this.state.zappers || []).map((npub) => {
-          return html`<${Identicon}
-            showTooltip=${true}
-            onClick=${() => route(`/${npub}`)}
-            str=${npub}
-            width="32"
-          />`;
+    return (
+      <div className="likes">
+        {(this.state.zappers || []).map((npub) => {
+          return (
+            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width="32" />
+          );
         })}
       </div>
-    `;
+    );
   }
 
   renderShowThread() {
-    return html` <div style="flex-basis:100%; margin-bottom: 12px">
-      <a href="/${Key.toNostrBech32Address(this.state.rootMsg, 'note')}">${t('show_thread')}</a>
-    </div>`;
+    return (
+      <div style={{ flexBasis: '100%', marginBottom: '12px' }}>
+        <a href={`/${Key.toNostrBech32Address(this.state.rootMsg, 'note')}`}>{t('show_thread')}</a>
+      </div>
+    );
   }
 
   renderRepliedMsg() {
-    return html`
-      <${EventComponent}
-        key=${this.props.event.id + this.props.meta.replyingTo}
-        id=${this.props.meta.replyingTo}
-        asQuote=${true}
-        showReplies=${0}
+    return (
+      <EventComponent
+        key={this.props.event.id + this.props.meta.replyingTo}
+        id={this.props.meta.replyingTo}
+        asQuote={true}
+        showReplies={0}
       />
-    `;
+    );
   }
 
   renderReposts() {
-    return html`
-      <div class="likes">
-        ${Array.from(this.repostedBy).map((key) => {
+    return (
+      <div className="likes">
+        {Array.from(this.repostedBy).map((key) => {
           const npub = Key.toNostrBech32Address(key, 'npub');
-          return html`<${Identicon}
-            showTooltip=${true}
-            onClick=${() => route(`/${npub}`)}
-            str=${npub}
-            width="32"
-          />`;
+          return (
+            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width="32" />
+          );
         })}
       </div>
-    `;
+    );
   }
 
   isTooLong() {
@@ -632,104 +643,127 @@ class Note extends Component {
     );
   }
 
+  renderIdenticon(asQuote) {
+    return (
+      <div className="msg-identicon">
+        {this.props.event.pubkey ? (
+          <a href={`/${this.props.event.pubkey}`}>
+            <Identicon str={Key.toNostrBech32Address(this.props.event.pubkey, 'npub')} width="40" />
+          </a>
+        ) : (
+          ''
+        )}
+        {(asQuote && !this.props.standalone && <div className="line"></div>) || ''}
+      </div>
+    );
+  }
+
+  renderMsgSender() {
+    const s = this.state;
+    return (
+      <div className="msg-sender">
+        <div className="msg-sender-link">
+          <a
+            href={`/${Key.toNostrBech32Address(this.props.event.pubkey, 'npub')}`}
+            className="msgSenderName"
+          >
+            <Name pub={this.props.event.pubkey} />
+          </a>
+          <div className="time">
+            {'· '}
+            <a
+              href={`/${Key.toNostrBech32Address(this.props.event.id, 'note')}`}
+              className="tooltip"
+            >
+              {s.time && Helpers.getRelativeTimeText(s.time)}
+              <span className="tooltiptext">
+                {' '}
+                {s.dateStr} {s.timeStr}{' '}
+              </span>
+            </a>
+          </div>
+        </div>
+        {this.renderDropdown()}
+      </div>
+    );
+  }
+
+  getClassName(asQuote, quoting) {
+    const { state, props } = this;
+    const classNames = ['msg'];
+
+    if (state.isThumbnail) classNames.push('thumbnail');
+    if (props.asReply) classNames.push('reply');
+    if (props.standalone) classNames.push('standalone');
+    if (asQuote) classNames.push('quote');
+    if (quoting) classNames.push('quoting');
+    if (props.asInlineQuote) classNames.push('inline-quote');
+
+    return classNames.join(' ');
+  }
+
   render() {
     if (!this.props.event && this.props.meta) {
-      return '';
+      return null;
     }
     const s = this.state;
     const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
     const quoting = this.props.meta.replyingTo && (this.props.showRepliedMsg || this.props.asReply);
 
-    return html`
-      ${this.props.meta.replyingTo && this.props.showRepliedMsg ? this.renderRepliedMsg() : ''}
-      <div
-        key=${this.props.event.id + 'note'}
-        ref=${this.ref}
-        class="msg ${s.isThumbnail ? 'thumbnail' : ''} ${this.props.asReply ? 'reply' : ''} ${this
-          .props.standalone
-          ? 'standalone'
-          : ''} ${asQuote ? 'quote' : ''}
-          ${quoting ? 'quoting' : ''}
-        ${this.props.asInlineQuote ? 'inline-quote' : ''}"
-      >
-        <div class="msg-content" onClick=${(e) => this.messageClicked(e)}>
-          ${this.props.asQuote && this.state.rootMsg ? this.renderShowThread() : ''}
-          <div class="msg-identicon">
-            ${this.props.event.pubkey
-              ? html`
-                  <a href=${`/${this.props.event.pubkey}`}>
-                    <${Identicon}
-                      str=${Key.toNostrBech32Address(this.props.event.pubkey, 'npub')}
-                      width="40"
-                    />
-                  </a>
-                `
-              : ''}
-            ${asQuote && !this.props.standalone ? html`<div class="line"></div>` : ''}
-          </div>
-          <div class="msg-main">
-            <div class="msg-sender">
-              <div class="msg-sender-link">
-                <a
-                  href=${`/${Key.toNostrBech32Address(this.props.event.pubkey, 'npub')}`}
-                  class="msgSenderName"
-                >
-                  <${Name} pub=${this.props.event.pubkey} />
-                </a>
-                <div class="time">
-                  ${'· '}
-                  <a
-                    href=${`/${Key.toNostrBech32Address(this.props.event.id, 'note')}`}
-                    class="tooltip"
-                  >
-                    ${s.time && Helpers.getRelativeTimeText(s.time)}
-                    <span class="tooltiptext"> ${s.dateStr} ${s.timeStr} </span>
-                  </a>
+    return (
+      <>
+        {this.props.meta.replyingTo && this.props.showRepliedMsg && this.renderRepliedMsg()}
+        <div
+          key={this.props.event.id + 'note'}
+          ref={this.ref}
+          className={this.getClassName(asQuote, quoting)}
+          onClick={(e) => this.messageClicked(e)}
+        >
+          <div className="msg-content" onClick={(e) => this.messageClicked(e)}>
+            {this.props.asQuote && this.state.rootMsg && this.renderShowThread()}
+            {this.renderIdenticon(asQuote)}
+            <div className="msg-main">
+              {this.renderMsgSender()}
+              {(s.replyingToUsers?.length && !quoting && this.renderReplyingTo()) || null}
+              {this.props.standalone && this.renderHelmet()}
+              {this.props.meta.torrentId && (
+                <Torrent torrentId={this.props.meta.torrentId} autopause={!this.props.standalone} />
+              )}
+              {s.text?.length > 0 && (
+                <div className={`text ${s.emojiOnly && 'emoji-only'}`}>
+                  {(!this.state.showMore && this.state.shortContent) || this.state.content}
+                  {s.translatedText && (
+                    <p>
+                      <i>{s.translatedText}</i>
+                    </p>
+                  )}
                 </div>
-              </div>
-              ${this.renderDropdown()}
+              )}
+              {!this.props.standalone && this.state.shortContent && (
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.setState({ showMore: !s.showMore });
+                  }}
+                >
+                  {t(`show_${s.showMore ? 'less' : 'more'}`)}
+                </a>
+              )}
+              {!this.props.asInlineQuote && this.renderReactionBtns()}
+              {s.showLikes && this.renderLikes()}
+              {s.showZaps && this.renderZaps()}
+              {s.showReposts && this.renderReposts()}
+              {s.lightning && s.showZapModal && this.renderZapModal()}
+              {s.showImageModal && this.renderImageModal()}
+              {this.props.standalone || s.showReplyForm ? this.renderReplyForm() : ''}
             </div>
-            ${s.replyingToUsers?.length && !quoting ? this.renderReplyingTo() : ''}
-            ${this.props.standalone ? this.renderHelmet() : ''}
-            ${this.props.meta.torrentId
-              ? html`
-                  <${Torrent}
-                    torrentId=${this.props.meta.torrentId}
-                    autopause=${!this.props.standalone}
-                  />
-                `
-              : ''}
-            ${s.text?.length > 0
-              ? html`<div class="text ${s.emojiOnly && 'emoji-only'}">
-                  ${(!this.state.showMore && this.state.shortContent) || this.state.content}
-                  ${s.translatedText ? html`<p><i>${s.translatedText}</i></p>` : ''}
-                </div> `
-              : ''}
-            ${!this.props.standalone && this.state.shortContent
-              ? html`
-                  <a
-                    onClick=${(e) => {
-                      e.preventDefault();
-                      this.setState({ showMore: !s.showMore });
-                    }}
-                  >
-                    ${t(`show_${s.showMore ? 'less' : 'more'}`)}</a
-                  >
-                `
-              : ''}
-            ${this.props.asInlineQuote ? '' : this.renderReactionBtns()}
-            ${s.showLikes ? this.renderLikes() : ''} ${s.showZaps ? this.renderZaps() : ''}
-            ${s.showReposts ? this.renderReposts() : ''}
-            ${s.lightning && s.showZapModal && this.renderZapModal()}
-            ${s.showImageModal && this.renderImageModal()}
-            ${this.props.standalone || s.showReplyForm ? this.renderReplyForm() : ''}
           </div>
         </div>
-      </div>
-      ${(this.props.showReplies || s.showReplyForm) && s.sortedReplies?.length
-        ? this.renderReplies()
-        : ''}
-    `;
+        {(this.props.showReplies || s.showReplyForm) && s.sortedReplies?.length
+          ? this.renderReplies()
+          : ''}
+      </>
+    );
   }
 }
 

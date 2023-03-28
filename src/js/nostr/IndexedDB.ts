@@ -78,7 +78,10 @@ export default {
     // other events to be loaded on demand
   },
   subscribe(filters: Filter[]) {
-    const filter1 = filters.length === 1 ? filters[0] : undefined;
+    if (!filters.length) {
+      return;
+    }
+    const filter1 = filters[0];
     let query: any = db.events;
     if (filter1.ids) {
       query = query.where('id').anyOf(filter1.ids);
