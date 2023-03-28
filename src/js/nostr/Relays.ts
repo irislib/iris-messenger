@@ -353,7 +353,7 @@ export default {
       setTimeout(unsubscribe, unsubscribeTimeout);
     }
 
-    let myRelays = relays || (name == 'keywords' ? this.searchRelays : this.relays).values();
+    let myRelays = relays || (name == 'keywords' ? this.searchRelays : this.relays).values(); // why this still searches non-search relays?
     const subId = PubSub.getSubscriptionIdForName(name);
 
     let authorRelayUrls = [];

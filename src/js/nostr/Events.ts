@@ -560,17 +560,13 @@ const Events = {
         }
       }
     }
-    const content = event.content.toLowerCase();
-    if (
-      filter.keywords &&
-      !filter.keywords.some((keyword: string) => {
-        return keyword
-          .toLowerCase()
-          .split(' ')
-          .every((word: string) => content.includes(word));
-      })
-    ) {
-      return false;
+    const lowercaseContent = event.content?.toLowerCase();
+    if (filter.keywords) {
+      for (const keyword of filter.keywords) {
+        if (lowercaseContent?.indexOf(keyword.toLowerCase()) === -1) {
+          return false;
+        }
+      }
     }
 
     return true;

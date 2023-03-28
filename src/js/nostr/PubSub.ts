@@ -195,6 +195,7 @@ const PubSub = {
 
     let unsubRelays;
     if (dev.useRelayPool) {
+      // TODO relaypool should use only search relays if filters.keywords is defined
       unsubRelays = this.subscribeRelayPool(filters, sinceLastOpened);
     } else {
       unsubRelays = Relays.subscribe(filters, name || JSON.stringify(filters), sinceLastOpened);

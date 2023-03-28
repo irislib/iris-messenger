@@ -274,10 +274,11 @@ class Feed extends Component {
         );
       }
     } else if (this.props.keyword) {
+      console.log('keyword search');
       return PubSub.subscribe(
-        [{ keywords: [this.props.keyword], kinds: [1] }],
-        (events) => callback(events.filter((e) => e.content?.includes(this.props.keyword))),
-        'keyword',
+        [{ keywords: [this.props.keyword], kinds: [1], limit: 1000 }],
+        (events) => callback(events.filter((e) => e.content?.indexOf(this.props.keyword) > -1)), // TODO this should not be necessary. seems subscribe still asks non-search relays
+        'keywords',
       );
     } else {
       return PubSub.subscribe(
