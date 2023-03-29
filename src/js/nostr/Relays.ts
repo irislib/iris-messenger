@@ -46,6 +46,7 @@ const Relays = {
   relays: new Map<string, Relay>(),
   searchRelays: new Map<string, Relay>(),
   writeRelaysByUser: new Map<string, Set<string>>(),
+  filtersBySubscriptionName: new Map<string, string>(),
   subscribedEventTags: new Set<string>(),
   subscribedProfiles: new Set<string>(),
   subscribedKeywords: new Set<string>(), // seach keywords
@@ -329,9 +330,6 @@ const Relays = {
       };
     }
     if (filter.authors) {
-      filter.authors.forEach((a) => {
-        PubSub.subscribedAuthors.add(a);
-      });
       filter.authors = Array.from(this.subscribedProfiles.values());
       return {
         name: 'authors',
@@ -339,9 +337,6 @@ const Relays = {
       };
     }
     if (filter.ids) {
-      filter.ids.forEach((a) => {
-        this.subscribedEventIds.add(a);
-      });
       return {
         name: 'ids',
         groupedFilter: { ids: Array.from(this.subscribedEventIds.values()) },
@@ -371,7 +366,18 @@ const Relays = {
   ): Unsubscribe {
     const { name, groupedFilter } = this.groupFilter(filter);
 
+    const existingFilter = this.filtersBySubscriptionName.get(name);
+    const filterString = JSON.stringify(groupedFilter);
+    if (existingFilter === filterString) {
+      return () => {
+        //console.log('already subscribed to', name);
+      };
+    }
+    this.filtersBySubscriptionName.set(name, filterString);
+    console.log('filtersBySubscriptionNAme', Array.from(this.filtersBySubscriptionName.keys()));
+
     const unsubscribe = () => {
+      console.log('unsub');
       const subs = this.subscriptionsByName.get(name);
       if (subs) {
         subs.forEach((sub) => {
@@ -381,6 +387,7 @@ const Relays = {
       }
       this.subscriptionsByName.delete(name);
     };
+    unsubscribe();
 
     // TODO slice and dice too large filters? queue and wait for eose. or alternate between filters by interval.
 

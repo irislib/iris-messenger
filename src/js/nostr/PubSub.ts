@@ -69,6 +69,18 @@ const PubSub = {
       });
     }
 
+    if (filter.authors) {
+      filter.authors.forEach((a) => {
+        this.subscribedAuthors.add(a);
+      });
+    }
+
+    if (filter.ids) {
+      filter.ids.forEach((a) => {
+        this.subscribedEventIds.add(a);
+      });
+    }
+
     cb && Events.find(filter, cb);
     IndexedDB.subscribe(filter); // calls Events.handle which calls subscriptions with matching filters
 
@@ -102,25 +114,22 @@ const PubSub = {
     }
   },
 
-  subscribeRelayPool(filters: Filter[], sinceLastOpened: boolean) {
-    let relays: any = undefined;
+  subscribeRelayPool(filter: Filter, sinceLastOpened: boolean) {
+    let relays: any = Relays.DEFAULT_RELAYS;
     // if any of filters[] doesn't have authors, we need to define default relays
-    if (filters.some((f) => !f.authors)) {
+/*
+    if (!filter.authors) {
       relays = Relays.DEFAULT_RELAYS;
     }
-    if (
-      dev.indexed03 &&
-      filters.every((f) => f.kinds && f.kinds.every((k) => k === 0 || k === 3))
-    ) {
+ */
+    if (dev.indexed03 && filter.kinds.every((k) => k === 0 || k === 3)) {
       relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
     }
     if (sinceLastOpened) {
-      filters.forEach((f) => {
-        f.since = lastOpened;
-      });
+      filter.since = lastOpened;
     }
     return relayPool.subscribe(
-      filters,
+      [filter],
       relays,
       (event) => {
         Events.handle(event);

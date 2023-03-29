@@ -274,16 +274,15 @@ class Feed extends Component {
         );
       } else {
         return PubSub.subscribe(
-          [{ authors: [this.props.nostrUser], kinds: [1, 6], since }],
-          (events) =>
-            callback(
-              events.filter((e) => {
-                if (this.props.index === 'posts') {
-                  return !Events.getEventReplyingTo(e);
-                }
-                return true;
-              }),
-            ),
+          { authors: [this.props.nostrUser], kinds: [1, 6], since },
+          (event) => {
+            if (this.props.index === 'posts') {
+              if (Events.getEventReplyingTo(event)) {
+                return;
+              }
+              callback(event);
+            }
+          },
           'user',
           false,
         );
@@ -292,20 +291,21 @@ class Feed extends Component {
       console.log('keyword search');
       return PubSub.subscribe(
         [{ keywords: [this.props.keyword], kinds: [1], limit: 1000, since }],
-        (events) => callback(events.filter((e) => e.content?.indexOf(this.props.keyword) > -1)), // TODO this should not be necessary. seems subscribe still asks non-search relays
+        (e) => e.content?.includes(this.props.keyword) && callback(e), // TODO this should not be necessary. seems subscribe still asks non-search relays
         'keywords',
         false,
       );
     } else {
       return PubSub.subscribe(
         [{ kinds: [1, 6], limit: 500, since }],
-        (events) => {
-          if (this.props.index === 'follows') {
-            events = events.filter((e) => {
-              return SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1;
-            });
+        (e) => {
+          if (
+            this.props.index === 'follows' &&
+            !(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)
+          ) {
+            return;
           }
-          callback(events);
+          callback(e);
         },
         'feed',
         true,
