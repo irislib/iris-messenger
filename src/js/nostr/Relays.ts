@@ -1,6 +1,8 @@
-import { shuffle, throttle } from 'lodash';
+import { sha256 } from '@noble/hashes/sha256';
+import { debounce, shuffle, throttle } from 'lodash';
 
-import { Event, Filter, Relay, relayInit } from '../lib/nostr-tools';
+import Helpers from '../Helpers';
+import { Event, Filter, Relay, relayInit, Sub } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
 import Events from './Events';
@@ -37,10 +39,18 @@ type PublicRelaySettings = {
   write: boolean;
 };
 
-export default {
+/**
+ * Relay management and subscriptions. Bundles subscriptions in to max 10 larger batches.
+ */
+const Relays = {
   relays: new Map<string, Relay>(),
   searchRelays: new Map<string, Relay>(),
   writeRelaysByUser: new Map<string, Set<string>>(),
+  subscribedEventTags: new Set<string>(),
+  subscribedProfiles: new Set<string>(),
+  subscribedKeywords: new Set<string>(), // seach keywords
+  subscriptionsByName: new Map<string, Set<Sub>>(),
+  newAuthors: new Set<string>(),
   DEFAULT_RELAYS,
   init() {
     this.relays = new Map<string, Relay>(DEFAULT_RELAYS.map((url) => [url, this.relayInit(url)]));
@@ -48,6 +58,9 @@ export default {
       SEARCH_RELAYS.map((url) => [url, this.relayInit(url)]),
     );
     this.manage();
+  },
+  getSubscriptionIdForName(name: string) {
+    return Helpers.arrayToHex(sha256(name)).slice(0, 8);
   },
   getStatus: (relay: Relay) => {
     // workaround for nostr-tools bug
@@ -288,22 +301,8 @@ export default {
     5 * 1000,
     { leading: true },
   ),
-  unsubscribe: function (id: string) {
-    const subs = PubSub.subscriptionsByName.get(id);
-    if (subs) {
-      subs.forEach((sub) => {
-        console.log('unsub', id);
-        sub.unsub();
-      });
-    }
-    PubSub.subscriptionsByName.delete(id);
-    PubSub.subscribedFiltersByName.delete(id);
-  },
   resubscribe(relay?: Relay) {
-    console.log('subscribedFiltersByName.size', PubSub.subscribedFiltersByName.size);
-    for (const [name, filters] of Array.from(PubSub.subscribedFiltersByName.entries())) {
-      this.subscribe(filters.filters, name, false, 0, filters.sinceRelayLastSeen, relay && [relay]);
-    }
+    // TODO
   },
   relayInit(url: string, subscribeAll = true) {
     const relay = relayInit(url, (id) => {
@@ -318,36 +317,72 @@ export default {
     this.connect(relay);
     return relay;
   },
+  groupFilter(filter: Filter): { name: string; groupedFilter: Filter } {
+    // if filter has authors, add to subscribedAuthors and group by authors
+    if (filter.authors && filter.kinds?.length === 1 && filter.kinds[0] === 0) {
+      filter.authors.forEach((a) => {
+        this.subscribedProfiles.add(a);
+      });
+      return {
+        name: 'profiles',
+        groupedFilter: { authors: Array.from(this.subscribedProfiles.values()), kinds: [0] },
+      };
+    }
+    if (filter.authors) {
+      filter.authors.forEach((a) => {
+        PubSub.subscribedAuthors.add(a);
+      });
+      filter.authors = Array.from(this.subscribedProfiles.values());
+      return {
+        name: 'authors',
+        groupedFilter: { authors: Array.from(this.subscribedProfiles.values()) },
+      };
+    }
+    if (filter.ids) {
+      filter.ids.forEach((a) => {
+        this.subscribedEventIds.add(a);
+      });
+      return {
+        name: 'ids',
+        groupedFilter: { ids: Array.from(this.subscribedEventIds.values()) },
+      };
+    }
+    if (filter['#e']) {
+      filter['#e'].forEach((e) => {
+        this.subscribedEventTags.add(e);
+      });
+      return {
+        name: 'eventsByTag',
+        groupedFilter: { '#e': Array.from(this.subscribedEventTags.values()) },
+      };
+    }
+    // do not bundle. TODO console.log, limit or sth
+    return {
+      name: JSON.stringify(filter),
+      groupedFilter: filter,
+    };
+  },
   subscribe: function (
-    filters: Filter[],
-    name: string,
+    filter: Filter,
     once = false,
     unsubscribeTimeout = 0,
     sinceLastSeen = false,
     relays?: Relay[],
   ): Unsubscribe {
-    // if subs with same id already exists, remove them
+    const { name, groupedFilter } = this.groupFilter(filter);
+
     const unsubscribe = () => {
-      const subs = PubSub.subscriptionsByName.get(name);
+      const subs = this.subscriptionsByName.get(name);
       if (subs) {
         subs.forEach((sub) => {
           //console.log('unsub', id);
           sub.unsub();
         });
       }
-      PubSub.subscriptionsByName.delete(name);
-      PubSub.subscribedFiltersByName.delete(name);
+      this.subscriptionsByName.delete(name);
     };
 
-    if (name) {
-      unsubscribe();
-    }
-
-    // TODO merge subscriptions so that 10 total is not exceeded
-
     // TODO slice and dice too large filters? queue and wait for eose. or alternate between filters by interval.
-
-    PubSub.subscribedFiltersByName.set(name, { filters, sinceRelayLastSeen: sinceLastSeen });
 
     if (unsubscribeTimeout) {
       setTimeout(unsubscribe, unsubscribeTimeout);
@@ -355,17 +390,14 @@ export default {
 
     let myRelays =
       relays || Array.from(name == 'keywords' ? this.searchRelays.values() : this.relays.values());
-    const subId = PubSub.getSubscriptionIdForName(name);
+    const subId = Relays.getSubscriptionIdForName(name);
 
+    /*
     let authorRelayUrls = [];
     if (!relays) {
       // if one of filters has .authors of length 1, subscribe to that author's relays
-      const authors = filters
-        .map((f) => f.authors)
-        .flat()
-        .filter((a) => a);
-      if (authors.length === 1) {
-        const author = authors[0];
+      if (filter.authors && filter.authors.length === 1) {
+        const author = filter.authors[0];
         if (author === Key.getPubKey()) {
           return unsubscribe;
         }
@@ -379,7 +411,7 @@ export default {
           relay.on('notice', (notice) => {
             console.log('notice from ', relay.url, notice);
           });
-          const sub = relay.sub(filters, { id: subId });
+          const sub = relay.sub([filter], { id: subId });
           sub.on('event', (event) => {
             console.log('got event from author relay', relay.url);
             Events.handle(event);
@@ -390,19 +422,18 @@ export default {
         if (authorRelays.length) {
           console.log('subscribing to author relays', authorRelays);
         }
-        this.subscribe(filters, author + name, true, 0, sinceLastSeen, authorRelays);
+        this.subscribe(filter, true, 0, sinceLastSeen, authorRelays);
       }
     }
+     */
 
     // random 3 my relays
     myRelays = shuffle(Array.from(myRelays)).slice(0, 3);
     for (const relay of myRelays) {
       if (sinceLastSeen && savedRelays[relay.url] && savedRelays[relay.url].lastSeen) {
-        filters.forEach((filter) => {
-          filter.since = savedRelays[relay.url].lastSeen;
-        });
+        groupedFilter.since = savedRelays[relay.url].lastSeen;
       }
-      const sub = relay.sub(filters, { id: subId });
+      const sub = relay.sub([groupedFilter], { id: subId });
       sub.on('event', (event) => {
         this.updateLastSeen(relay.url);
         Events.handle(event);
@@ -410,17 +441,14 @@ export default {
       if (once) {
         sub.on('eose', () => sub.unsub());
       }
-      if (!PubSub.subscriptionsByName.has(name)) {
-        PubSub.subscriptionsByName.set(name, new Set());
+      if (!this.subscriptionsByName.has(name)) {
+        this.subscriptionsByName.set(name, new Set());
       }
-      PubSub.subscriptionsByName.get(name)?.add(sub);
+      this.subscriptionsByName.get(name)?.add(sub);
       //console.log('subscriptions size', this.subscriptionsByName.size);
-      if (unsubscribeTimeout) {
-        setTimeout(() => {
-          sub.unsub();
-        }, unsubscribeTimeout);
-      }
     }
     return unsubscribe;
   },
 };
+
+export default Relays;

@@ -73,8 +73,8 @@ class Follows extends View {
   }
 
   getFollowers() {
-    SocialNetwork.getFollowersByUser(Key.toNostrHexAddress(this.props.id), (follows) => {
-      this.follows = follows;
+    SocialNetwork.getFollowersByUser(Key.toNostrHexAddress(this.props.id), (followers) => {
+      this.follows = followers;
       this.updateSortedFollows();
     });
   }
@@ -93,30 +93,26 @@ class Follows extends View {
   }
 
   renderFollows() {
-    return (
-      <>
-        {this.state.follows.map((hexKey) => {
-          const npub = Key.toNostrBech32Address(hexKey, 'npub');
-          return (
-            <div key={npub} className="profile-link-container">
-              <a href={`/${npub}`} className="profile-link">
-                <Identicon str={npub} width="49" />
-                <div>
-                  <Name pub={npub} />
-                  <br />
-                  <small className="follower-count">
-                    {SocialNetwork.followersByUser.get(hexKey)?.size || 0}
-                    <i> </i>
-                    followers
-                  </small>
-                </div>
-              </a>
-              {hexKey !== Key.getPubKey() && <Follow id={npub} />}
+    return this.state.follows.map((hexKey) => {
+      const npub = Key.toNostrBech32Address(hexKey, 'npub');
+      return (
+        <div key={npub} className="profile-link-container">
+          <a href={`/${npub}`} className="profile-link">
+            <Identicon str={npub} width="49" />
+            <div>
+              <Name pub={npub} />
+              <br />
+              <small className="follower-count">
+                {SocialNetwork.followersByUser.get(hexKey)?.size || 0}
+                <i> </i>
+                followers
+              </small>
             </div>
-          );
-        })}
-      </>
-    );
+          </a>
+          {hexKey !== Key.getPubKey() && <Follow id={npub} />}
+        </div>
+      );
+    });
   }
 
   renderView() {

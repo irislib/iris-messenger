@@ -362,11 +362,7 @@ class Profile extends View {
   }
 
   getNostrProfile(address, nostrAddress) {
-    this.unsub = PubSub.subscribe(
-      [{ authors: [address], kinds: [0, 3] }],
-      (event) => console.log('profile event', event),
-      address,
-    );
+    this.unsub = PubSub.subscribe([{ authors: [address], kinds: [0, 3] }], undefined, address);
     const setFollowCounts = () => {
       address &&
         this.setState({

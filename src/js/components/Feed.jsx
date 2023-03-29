@@ -43,6 +43,13 @@ const DEFAULT_SETTINGS = {
   timespan: 'all',
 };
 
+const TIMESPANS = {
+  all: 0,
+  day: 24 * 60 * 60,
+  week: 7 * 24 * 60 * 60,
+  month: 30 * 24 * 60 * 60,
+  year: 365 * 24 * 60 * 60,
+};
 class Feed extends Component {
   constructor() {
     super();
@@ -186,6 +193,7 @@ class Feed extends Component {
 
   subscribe() {
     this.unsub?.();
+    const results = new Map();
     const update = (events) => {
       this.updateSortedEvents(
         events
@@ -207,11 +215,12 @@ class Feed extends Component {
       );
     };
     const throttledUpdate = throttle(update, 1000, { leading: true });
-    const callback = (events) => {
-      if (events.length < 10) {
-        update(events);
+    const callback = (event) => {
+      results.set(event.id, event);
+      if (results.length < 10) {
+        update(Array.from(results.values()));
       } else {
-        throttledUpdate(events);
+        throttledUpdate(Array.from(results.values()));
       }
     };
     setTimeout(() => {
@@ -250,17 +259,22 @@ class Feed extends Component {
   }
 
   getEvents(callback) {
+    let since;
+    if (this.state.settings.timespan) {
+      since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
+    }
     if (this.props.nostrUser) {
       if (this.props.index === 'likes') {
         return PubSub.subscribe(
           // TODO map to liked msg id
-          [{ authors: [this.props.nostrUser], kinds: [7] }],
+          [{ authors: [this.props.nostrUser], kinds: [7], since }],
           (events) => callback(events),
           'user',
+          false,
         );
       } else {
         return PubSub.subscribe(
-          [{ authors: [this.props.nostrUser], kinds: [1, 6] }],
+          [{ authors: [this.props.nostrUser], kinds: [1, 6], since }],
           (events) =>
             callback(
               events.filter((e) => {
@@ -271,18 +285,20 @@ class Feed extends Component {
               }),
             ),
           'user',
+          false,
         );
       }
     } else if (this.props.keyword) {
       console.log('keyword search');
       return PubSub.subscribe(
-        [{ keywords: [this.props.keyword], kinds: [1], limit: 1000 }],
+        [{ keywords: [this.props.keyword], kinds: [1], limit: 1000, since }],
         (events) => callback(events.filter((e) => e.content?.indexOf(this.props.keyword) > -1)), // TODO this should not be necessary. seems subscribe still asks non-search relays
         'keywords',
+        false,
       );
     } else {
       return PubSub.subscribe(
-        [{ kinds: [1, 6], limit: 500 }],
+        [{ kinds: [1, 6], limit: 500, since }],
         (events) => {
           if (this.props.index === 'follows') {
             events = events.filter((e) => {

@@ -58,7 +58,7 @@ const Session = {
           callback(event);
         }
       }
-      PubSub.subscribe(filters, (events) => callback(events[0]), 'keyValueEvents');
+      PubSub.subscribe(filters[0], callback, true);
       return '0';
     };
     localState.get('globalFilter').once((globalFilter) => {
@@ -131,14 +131,9 @@ const Session = {
       });
     }
     setTimeout(() => {
-      PubSub.subscribe([{ authors: [myPub] }], undefined, 'ours', true); // our stuff
-      PubSub.subscribe(
-        [{ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }],
-        undefined,
-        'notifications',
-        true,
-      ); // notifications
-      Events.getDirectMessages();
+      PubSub.subscribe({ authors: [myPub] }, undefined, true); // our stuff
+      PubSub.subscribe({ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }, undefined, true); // notifications
+      //Events.getDirectMessages();
     }, 200);
     setInterval(() => {
       console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));
