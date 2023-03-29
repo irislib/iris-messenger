@@ -81,6 +81,7 @@ const PubSub = {
       });
     }
 
+    //debugger;
     cb && Events.find(filter, cb);
     IndexedDB.subscribe(filter); // calls Events.handle which calls subscriptions with matching filters
 
@@ -104,7 +105,7 @@ const PubSub = {
 
   handle(event: Event & { id: string }) {
     // go through subscriptions and callback if filters match
-    for (const sub of PubSub.subscriptions.values()) {
+    for (const sub of this.subscriptions.values()) {
       if (!sub.filter) {
         continue;
       }
@@ -117,11 +118,11 @@ const PubSub = {
   subscribeRelayPool(filter: Filter, sinceLastOpened: boolean) {
     let relays: any = Relays.DEFAULT_RELAYS;
     // if any of filters[] doesn't have authors, we need to define default relays
-/*
+    /*
     if (!filter.authors) {
       relays = Relays.DEFAULT_RELAYS;
     }
- */
+    */
     if (dev.indexed03 && filter.kinds.every((k) => k === 0 || k === 3)) {
       relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
     }

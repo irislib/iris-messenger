@@ -391,6 +391,7 @@ const Events = {
     return true;
   },
   find(filter: Filter, callback: (event: Event) => void) {
+    console.log(222);
     const query = {};
     if (filter.authors) {
       query['pubkey'] = { $in: filter.authors };

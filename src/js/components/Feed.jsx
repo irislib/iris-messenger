@@ -216,6 +216,7 @@ class Feed extends Component {
     };
     const throttledUpdate = throttle(update, 1000, { leading: true });
     const callback = (event) => {
+      console.log('got event', event);
       results.set(event.id, event);
       if (results.length < 10) {
         update(Array.from(results.values()));
@@ -260,15 +261,15 @@ class Feed extends Component {
 
   getEvents(callback) {
     let since;
-    if (this.state.settings.timespan) {
+    if (this.state.settings.timespan !== 'all') {
       since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
     }
     if (this.props.nostrUser) {
       if (this.props.index === 'likes') {
         return PubSub.subscribe(
           // TODO map to liked msg id
-          [{ authors: [this.props.nostrUser], kinds: [7], since }],
-          (events) => callback(events),
+          { authors: [this.props.nostrUser], kinds: [7], since },
+          callback,
           'user',
           false,
         );
@@ -276,6 +277,7 @@ class Feed extends Component {
         return PubSub.subscribe(
           { authors: [this.props.nostrUser], kinds: [1, 6], since },
           (event) => {
+            console.log('msg', event);
             if (this.props.index === 'posts') {
               if (Events.getEventReplyingTo(event)) {
                 return;
@@ -288,16 +290,15 @@ class Feed extends Component {
         );
       }
     } else if (this.props.keyword) {
-      console.log('keyword search');
       return PubSub.subscribe(
-        [{ keywords: [this.props.keyword], kinds: [1], limit: 1000, since }],
+        { keywords: [this.props.keyword], kinds: [1], limit: 1000, since },
         (e) => e.content?.includes(this.props.keyword) && callback(e), // TODO this should not be necessary. seems subscribe still asks non-search relays
         'keywords',
         false,
       );
     } else {
       return PubSub.subscribe(
-        [{ kinds: [1, 6], limit: 500, since }],
+        { kinds: [1, 6], limit: 500, since },
         (e) => {
           if (
             this.props.index === 'follows' &&
@@ -371,7 +372,7 @@ class Feed extends Component {
     }
   }
 
-  showqueuedEvents() {
+  showQueuedEvents() {
     const sortedEvents = this.state.sortedEvents;
     console.log('sortedEvents.length', sortedEvents.length);
     sortedEvents.unshift(...this.state.queuedEvents);
@@ -532,7 +533,7 @@ class Feed extends Component {
     return (
       <div
         className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
-        onClick={() => this.showqueuedEvents()}
+        onClick={() => this.showQueuedEvents()}
       >
         <div className="msg-content notification-msg colored">
           {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
