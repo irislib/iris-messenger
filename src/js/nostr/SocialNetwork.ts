@@ -125,7 +125,7 @@ export default {
     }
     if (this.followedByUser.get(myPub)?.has(follower)) {
       if (!PubSub.subscribedAuthors.has(followedUser)) {
-        PubSub.subscribe({ authors: [followedUser] });
+        PubSub.subscribe({ authors: [followedUser] }, undefined, true);
       }
     }
   },
@@ -260,7 +260,7 @@ export default {
         }
       });
     }
-    return PubSub.subscribe({ kinds: [0], authors: [address] }, callback);
+    return PubSub.subscribe({ kinds: [0], authors: [address] }, callback, false);
   },
   setMetadata(data: any) {
     const event = {

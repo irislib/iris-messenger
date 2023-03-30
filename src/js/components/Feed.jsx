@@ -216,7 +216,6 @@ class Feed extends Component {
     };
     const throttledUpdate = throttle(update, 1000, { leading: true });
     const callback = (event) => {
-      console.log('got event', event);
       results.set(event.id, event);
       if (results.length < 10) {
         update(Array.from(results.values()));
@@ -277,7 +276,6 @@ class Feed extends Component {
         return PubSub.subscribe(
           { authors: [this.props.nostrUser], kinds: [1, 6], since },
           (event) => {
-            console.log('msg', event);
             if (this.props.index === 'posts') {
               if (Events.getEventReplyingTo(event)) {
                 return;

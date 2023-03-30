@@ -391,7 +391,6 @@ const Events = {
     return true;
   },
   find(filter: Filter, callback: (event: Event) => void) {
-    console.log(222);
     const query = {};
     if (filter.authors) {
       query['pubkey'] = { $in: filter.authors };
@@ -662,7 +661,7 @@ const Events = {
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }
-    return PubSub.subscribe({ '#e': [id] }, callback);
+    return PubSub.subscribe({ '#e': [id] }, callback, false);
   },
   getEventById(id: string, proxyFirst = false, cb?: (event: Event) => void) {
     const event = this.db.by('id', id);
@@ -689,7 +688,7 @@ const Events = {
         }
       });
     } else {
-      PubSub.subscribe({ ids: [id] }, (events) => cb(events[0]));
+      PubSub.subscribe({ ids: [id] }, (events) => cb(events[0]), false);
     }
   },
 };

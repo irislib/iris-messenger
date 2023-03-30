@@ -58,7 +58,7 @@ const PubSub = {
   subscribe: function (
     filter: Filter,
     cb?: (event: Event) => void,
-    sinceLastOpened = true,
+    sinceLastOpened = false,
   ): Unsubscribe {
     let currentSubscriptionId;
     if (cb) {
@@ -116,7 +116,7 @@ const PubSub = {
   },
 
   subscribeRelayPool(filter: Filter, sinceLastOpened: boolean) {
-    let relays: any = Relays.DEFAULT_RELAYS;
+    let relays: any = Array.from(Relays.relays.keys());
     // if any of filters[] doesn't have authors, we need to define default relays
     /*
     if (!filter.authors) {
