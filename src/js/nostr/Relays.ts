@@ -1,5 +1,5 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { debounce, shuffle, throttle } from 'lodash';
+import { shuffle, throttle } from 'lodash';
 
 import Helpers from '../Helpers';
 import { Event, Filter, Relay, relayInit, Sub } from '../lib/nostr-tools';

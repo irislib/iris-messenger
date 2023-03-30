@@ -19,7 +19,7 @@ let subscriptionId = 0;
 let dev: any = {
   logSubscriptions: false,
   indexed03: false,
-  useRelayPool: false,
+  useRelayPool: true,
 };
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
   useEventCache: false,
@@ -88,7 +88,7 @@ const PubSub = {
     // TODO if asking event by id or profile, ask http proxy
 
     let unsubRelays;
-    if (dev.useRelayPool) {
+    if (dev.useRelayPool !== false) {
       // TODO relaypool should use only search relays if filters.keywords is defined
       unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened);
     } else {

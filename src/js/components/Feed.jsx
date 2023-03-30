@@ -297,7 +297,7 @@ class Feed extends Component {
     } else if (this.props.index === 'follows') {
       const followedUsers = Array.from(SocialNetwork.followedByUser.get(Key.getPubKey()) || []);
       followedUsers.push(Key.getPubKey());
-      const filter = { kinds: [1, 6], limit: 500, since };
+      const filter = { kinds: [1, 6], limit: 300, since };
       if (followedUsers.length < 1000) {
         filter.authors = followedUsers;
       }
@@ -312,7 +312,7 @@ class Feed extends Component {
         true,
       );
     } else {
-      return PubSub.subscribe({ kinds: [1, 6], limit: 500, since }, callback, true);
+      return PubSub.subscribe({ kinds: [1, 6], limit: 300, since }, callback, true);
     }
   }
 
@@ -344,6 +344,7 @@ class Feed extends Component {
       }
       this.replaceState();
     }
+    // todo actually update url
   }
 
   replaceState = throttle(
