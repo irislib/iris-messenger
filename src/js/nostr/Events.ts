@@ -673,7 +673,7 @@ const Events = {
     if (proxyFirst) {
       // give proxy 300 ms to respond, then ask ws
       const askRelaysTimeout = setTimeout(() => {
-        PubSub.subscribe({ ids: [id] }, (events) => cb(events[0]));
+        PubSub.subscribe({ ids: [id] }, (event) => cb(event));
       }, 300);
       fetch(`https://api.iris.to/event/${id}`).then((res) => {
         if (res.status === 200) {
@@ -688,7 +688,7 @@ const Events = {
         }
       });
     } else {
-      PubSub.subscribe({ ids: [id] }, (events) => cb(events[0]), false);
+      PubSub.subscribe({ ids: [id] }, cb, false);
     }
   },
 };

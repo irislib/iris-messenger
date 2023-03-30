@@ -229,8 +229,8 @@ class Feed extends Component {
     setTimeout(() => {
       if (this.props.index === 'notifications') {
         this.unsub = Events.notifications.subscribe((eventIds) => {
-          const events = eventIds.map((id) => Events.db.by('id', id));
-          callback(events);
+          const events = eventIds.map((id) => !results.has(id) && Events.db.by('id', id));
+          eventIds.forEach((id) => callback(Events.db.by('id', id)));
         });
       } else {
         this.unsub = this.getEvents(callback);

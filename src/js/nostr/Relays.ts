@@ -339,7 +339,7 @@ const Relays = {
     if (filter.ids) {
       return {
         name: 'ids',
-        groupedFilter: { ids: Array.from(this.subscribedEventIds.values()) },
+        groupedFilter: { ids: Array.from(PubSub.subscribedEventIds.values()) },
       };
     }
     if (filter['#e']) {
@@ -374,10 +374,8 @@ const Relays = {
       };
     }
     this.filtersBySubscriptionName.set(name, filterString);
-    console.log('filtersBySubscriptionNAme', Array.from(this.filtersBySubscriptionName.keys()));
 
     const unsubscribe = () => {
-      console.log('unsub');
       const subs = this.subscriptionsByName.get(name);
       if (subs) {
         subs.forEach((sub) => {
