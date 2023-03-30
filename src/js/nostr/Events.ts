@@ -403,6 +403,7 @@ const Events = {
       .find(query)
       .where((e) => matchFilter(filter, e))
       .simplesort('created_at', { desc: true })
+      .limit(filter.limit || Infinity)
       .data()
       .forEach((e) => {
         callback(e);
