@@ -237,7 +237,6 @@ export default {
       cb?.(this.profiles.get(address), address);
     };
 
-    PubSub.subscribedAuthors.add(address);
     const profile = this.profiles.get(address);
     // TODO subscribe & callback
     if (profile) {
@@ -256,6 +255,7 @@ export default {
           res.json().then((profile) => {
             // TODO verify sig
             Events.handle(profile);
+            callback();
           });
         }
       });
