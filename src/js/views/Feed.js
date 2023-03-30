@@ -35,13 +35,6 @@ class Feed extends View {
     localState.get('filters').get('group').on(this.inject());
   }
 
-  filter(msg) {
-    if (this.state.searchTerm) {
-      return msg.text && msg.text.toLowerCase().indexOf(this.state.searchTerm) > -1;
-    }
-    return true;
-  }
-
   renderView() {
     const s = this.state;
     let path = this.props.index || 'msgs';
@@ -64,7 +57,6 @@ class Feed extends View {
               : html` <${OnboardingNotification} /> `}
             <${FeedComponent}
               scrollElement=${this.scrollElement.current}
-              filter=${s.searchTerm && ((m) => this.filter(m))}
               keyword=${s.searchTerm}
               key=${this.props.index || 'feed'}
               index=${this.props.index}

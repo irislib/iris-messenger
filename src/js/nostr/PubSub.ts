@@ -116,7 +116,13 @@ const PubSub = {
   },
 
   subscribeRelayPool(filter: Filter, sinceLastOpened: boolean) {
-    let relays: any = Array.from(Relays.relays.keys());
+    let relays: any;
+    if (filter.keywords) {
+      // search relays
+      relays = Array.from(Relays.searchRelays.keys());
+    } else {
+      relays = Array.from(Relays.relays.keys());
+    }
     // if any of filters[] doesn't have authors, we need to define default relays
     /*
     if (!filter.authors) {
