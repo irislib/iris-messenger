@@ -282,8 +282,8 @@ class Feed extends Component {
               if (Events.getEventReplyingTo(event)) {
                 return;
               }
-              callback(event);
             }
+            callback(event);
           },
           false,
         );
