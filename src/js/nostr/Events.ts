@@ -399,8 +399,11 @@ const Events = {
       query['kind'] = { $in: filter.kinds };
     }
     this.db
+      .chain()
       .find(query)
-      .filter((e) => matchFilter(filter, e))
+      .where((e) => matchFilter(filter, e))
+      .simplesort('created_at', { desc: true })
+      .data()
       .forEach((e) => {
         callback(e);
       });
