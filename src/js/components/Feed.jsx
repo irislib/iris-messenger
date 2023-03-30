@@ -216,6 +216,7 @@ class Feed extends Component {
     };
     const throttledUpdate = throttle(update, 1000, { leading: true });
     const callback = (event) => {
+      if (results.has(event.id)) return;
       results.set(event.id, event);
       if (results.length < 10) {
         update(Array.from(results.values()));
@@ -269,7 +270,6 @@ class Feed extends Component {
           // TODO map to liked msg id
           { authors: [this.props.nostrUser], kinds: [7], since },
           callback,
-          'user',
           false,
         );
       } else {
@@ -283,7 +283,6 @@ class Feed extends Component {
               callback(event);
             }
           },
-          'user',
           false,
         );
       }
@@ -291,24 +290,27 @@ class Feed extends Component {
       return PubSub.subscribe(
         { keywords: [this.props.keyword], kinds: [1], limit: 1000, since },
         (e) => e.content?.includes(this.props.keyword) && callback(e), // TODO this should not be necessary. seems subscribe still asks non-search relays
-        'keywords',
         false,
       );
-    } else {
+    } else if (this.props.index === 'follows') {
+      const followedUsers = Array.from(SocialNetwork.followedByUser.get(Key.getPubKey()) || []);
+      followedUsers.push(Key.getPubKey());
+      const filter = { kinds: [1, 6], limit: 500, since };
+      if (followedUsers.length < 1000) {
+        filter.authors = followedUsers;
+      }
       return PubSub.subscribe(
-        { kinds: [1, 6], limit: 500, since },
+        filter,
         (e) => {
-          if (
-            this.props.index === 'follows' &&
-            !(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)
-          ) {
+          if (!(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)) {
             return;
           }
           callback(e);
         },
-        'feed',
         true,
       );
+    } else {
+      return PubSub.subscribe({ kinds: [1, 6], limit: 500, since }, callback, true);
     }
   }
 

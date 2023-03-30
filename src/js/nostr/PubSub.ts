@@ -57,15 +57,15 @@ const PubSub = {
    */
   subscribe: function (
     filter: Filter,
-    cb?: (event: Event) => void,
+    callback?: (event: Event) => void,
     sinceLastOpened = false,
   ): Unsubscribe {
     let currentSubscriptionId;
-    if (cb) {
+    if (callback) {
       currentSubscriptionId = subscriptionId++;
       this.subscriptions.set(++subscriptionId, {
         filter,
-        cb,
+        callback,
       });
     }
 
@@ -82,7 +82,7 @@ const PubSub = {
     }
 
     //debugger;
-    cb && Events.find(filter, cb);
+    callback && Events.find(filter, callback);
     IndexedDB.subscribe(filter); // calls Events.handle which calls subscriptions with matching filters
 
     // TODO if asking event by id or profile, ask http proxy
@@ -110,7 +110,7 @@ const PubSub = {
         continue;
       }
       if (matchFilter(sub.filter, event)) {
-        sub.callback && sub.callback(event);
+        sub.callback?.(event);
       }
     }
   },
