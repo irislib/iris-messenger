@@ -694,6 +694,31 @@ const Events = {
       PubSub.subscribe({ ids: [id] }, cb, false);
     }
   },
+  getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
+    const callback = () => {
+      cb?.(this.directMessagesByUser.get(address)?.eventIds);
+    };
+    this.directMessagesByUser.has(address) && callback();
+    const myPub = Key.getPubKey();
+    const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [address], authors: [myPub] }, callback);
+    const unsub2 = PubSub.subscribe({ kinds: [4], '#p': [myPub], authors: [address] }, callback);
+    return () => {
+      unsub1();
+      unsub2();
+    };
+  },
+  getDirectMessages(cb) {
+    const callback = () => {
+      cb?.(this.directMessagesByUser);
+    };
+    callback();
+    const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()] }, callback);
+    const unsub2 = PubSub.subscribe({ kinds: [4], authors: [Key.getPubKey()] }, callback);
+    return () => {
+      unsub1();
+      unsub2();
+    };
+  },
 };
 
 export default Events;
