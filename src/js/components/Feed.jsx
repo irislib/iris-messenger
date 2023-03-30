@@ -194,9 +194,10 @@ class Feed extends Component {
   subscribe() {
     this.unsub?.();
     const results = new Map();
-    const update = (events) => {
+    let updated = false;
+    const update = () => {
       this.updateSortedEvents(
-        events
+        Array.from(results.values())
           .filter((e) => {
             if (SocialNetwork.blockedUsers.has(e.pubkey)) {
               return false;
@@ -214,14 +215,15 @@ class Feed extends Component {
           .map((e) => e.id),
       );
     };
-    const throttledUpdate = throttle(update, 1000, { leading: true });
+    const throttledUpdate = throttle(update, 1000, { leading: false });
     const callback = (event) => {
       if (results.has(event.id)) return;
       results.set(event.id, event);
-      if (results.length < 10) {
-        update(Array.from(results.values()));
+      if (!updated && results.size > 10) {
+        updated = true;
+        update();
       } else {
-        throttledUpdate(Array.from(results.values()));
+        throttledUpdate();
       }
     };
     setTimeout(() => {
