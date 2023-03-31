@@ -204,6 +204,9 @@ class Feed extends Component {
             }
             const repliedMsg = Events.getEventReplyingTo(e);
             if (repliedMsg) {
+              if (!this.state.settings.replies) {
+                return false;
+              }
               const author = Events.db.by('id', repliedMsg)?.pubkey;
               if (author && SocialNetwork.blockedUsers.has(author)) {
                 return false;
