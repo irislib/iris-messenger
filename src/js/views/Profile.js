@@ -363,11 +363,24 @@ class Profile extends View {
 
   getNostrProfile(address, nostrAddress) {
     this.unsub = PubSub.subscribe({ authors: [address], kinds: [0, 3] }, undefined, false);
+    fetch(`https://rbr.bio/${address}/info.json`).then((res) => {
+      if (!res.ok) {
+        return;
+      }
+      res.json().then((json) => {
+        if (json && json.followerCount) {
+          this.setState({ followerCount: json.followerCount });
+        }
+      });
+    });
     const setFollowCounts = () => {
       address &&
         this.setState({
           followedUserCount: SocialNetwork.followedByUser.get(address)?.size ?? 0,
-          followerCount: SocialNetwork.followersByUser.get(address)?.size ?? 0,
+          followerCount: Math.max(
+            SocialNetwork.followersByUser.get(address)?.size ?? 0,
+            this.state.followerCount,
+          ),
         });
     };
     this.subscriptions.push(SocialNetwork.getFollowersByUser(address, setFollowCounts));
