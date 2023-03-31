@@ -1,4 +1,3 @@
-import { html } from 'htm/preact';
 import throttle from 'lodash/throttle';
 import ScrollViewport from 'preact-scroll-viewport';
 
@@ -74,8 +73,8 @@ class Follows extends View {
   }
 
   getFollowers() {
-    SocialNetwork.getFollowersByUser(Key.toNostrHexAddress(this.props.id), (follows) => {
-      this.follows = follows;
+    SocialNetwork.getFollowersByUser(Key.toNostrHexAddress(this.props.id), (followers) => {
+      this.follows = followers;
       this.updateSortedFollows();
     });
   }
@@ -94,52 +93,58 @@ class Follows extends View {
   }
 
   renderFollows() {
-    return html`
-      ${this.state.follows.map((hexKey) => {
-        const npub = Key.toNostrBech32Address(hexKey, 'npub');
-        return html` <div key=${npub} class="profile-link-container">
-          <a href="/${npub}" class="profile-link">
-            <${Identicon} str=${npub} width="49" />
+    return this.state.follows.map((hexKey) => {
+      const npub = Key.toNostrBech32Address(hexKey, 'npub');
+      return (
+        <div key={npub} className="profile-link-container">
+          <a href={`/${npub}`} className="profile-link">
+            <Identicon str={npub} width="49" />
             <div>
-              <${Name} pub=${npub} /><br />
-              <small class="follower-count">
-                ${SocialNetwork.followersByUser.get(hexKey)?.size || 0}<i> </i> followers
+              <Name pub={npub} />
+              <br />
+              <small className="follower-count">
+                {SocialNetwork.followersByUser.get(hexKey)?.size || 0}
+                <i> </i>
+                followers
               </small>
             </div>
           </a>
-          ${hexKey !== Key.getPubKey() ? html`<${Follow} id=${npub} />` : ''}
-        </div>`;
-      })}
-    `;
+          {hexKey !== Key.getPubKey() && <Follow id={npub} />}
+        </div>
+      );
+    });
   }
 
   renderView() {
-    return html`
-      <div class="centered-container">
-        <h3 style="display:flex">
-          <a href="/${this.props.id}"> <${Name} pub=${this.props.id} /> </a>:<i> </i>
-
-          <span style="flex:1" class="mar-left5">
-            ${this.props.followers ? t('followers') : t('following')}
+    return (
+      <div className="centered-container">
+        <h3 style={{ display: 'flex' }}>
+          <a href={`/${this.props.id}`}>
+            <Name pub={this.props.id} />
+          </a>
+          :<i> </i>
+          <span style={{ flex: 1 }} className="mar-left5">
+            {this.props.followers ? t('followers') : t('following')}
           </span>
-
-          ${this.state.follows.length > 1 &&
-          !(this.props.id === this.myPub && !this.props.followers)
-            ? html`
-                <${Button} small=${true} onClick=${() => this.followAll()}>
-                  ${t('follow_all')} (${this.state.follows.length})
-                <//>
-              `
-            : ''}
+          {this.state.follows.length > 1 &&
+          !(this.props.id === this.myPub && !this.props.followers) ? (
+            <Button small={true} onClick={() => this.followAll()}>
+              {t('follow_all')} ({this.state.follows.length})
+            </Button>
+          ) : (
+            ''
+          )}
         </h3>
         <div id="follows-list">
-          ${this.state.follows.length > 300
-            ? html`<${ScrollViewport}>${this.renderFollows()}<//>`
-            : this.renderFollows()}
-          ${this.state.follows.length === 0 ? '—' : ''}
+          {this.state.follows.length > 300 ? (
+            <ScrollViewport>{this.renderFollows()}</ScrollViewport>
+          ) : (
+            this.renderFollows()
+          )}
+          {this.state.follows.length === 0 ? '—' : ''}
         </div>
       </div>
-    `;
+    );
   }
 }
 

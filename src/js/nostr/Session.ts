@@ -58,7 +58,7 @@ const Session = {
           callback(event);
         }
       }
-      PubSub.subscribe(filters, callback);
+      PubSub.subscribe(filters[0], callback, true);
       return '0';
     };
     localState.get('globalFilter').once((globalFilter) => {
@@ -131,16 +131,9 @@ const Session = {
       });
     }
     setTimeout(() => {
-      Relays.subscribe([{ authors: [myPub] }], 'ours', false, 0, true); // our stuff
-      Relays.subscribe(
-        [{ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }],
-        'notifications',
-        false,
-        0,
-        true,
-      ); // notifications
-      Relays.subscribe([{ '#p': [myPub], kinds: [4] }], 'dms', false, 0, true); // notifications and DMs
-      Relays.subscribe([{ '#p': [myPub], kinds: [4], limit: 20 }], 'latestDms', true, 0, false); // notifications and DMs
+      PubSub.subscribe({ authors: [myPub] }, undefined, true); // our stuff
+      PubSub.subscribe({ '#p': [myPub], kinds: [1, 3, 6, 7, 9735] }, undefined, true); // notifications
+      //Events.getDirectMessages();
     }, 200);
     setInterval(() => {
       console.log('handled msgs per second', Math.round(Events.handledMsgsPerSecond / 5));

@@ -1,4 +1,3 @@
-import { html } from 'htm/preact';
 import { createRef } from 'preact';
 import { useEffect } from 'preact/hooks';
 
@@ -22,5 +21,5 @@ export default function Qr(props) {
     });
   }, [props.data]);
 
-  return html`<div style="border: 5px solid white; display: inline-block;" ref=${ref} />`;
+  return <div style="border: 5px solid white; display: inline-block;" ref={ref} />;
 }

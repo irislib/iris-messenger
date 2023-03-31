@@ -6,7 +6,7 @@ import localState from './LocalState';
 
 export default {
   async checkExistingAccount(pub) {
-    if (!['iris.to', 'localhost'].includes(window.location.hostname)) {
+    if (!['iris.to', 'beta.iris.to', 'localhost'].includes(window.location.hostname)) {
       return;
     }
     // get username linked to pub along with its user_confirmed status

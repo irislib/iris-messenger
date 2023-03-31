@@ -37,7 +37,7 @@ const ImageGrid = styled.div`
 const DEFAULT_SETTINGS = {
   display: 'posts',
   realtime: false,
-  replies: true,
+  showReplies: true,
   sortBy: 'created_at',
   sortDirection: 'desc',
   timespan: 'all',
@@ -50,7 +50,6 @@ const TIMESPANS = {
   month: 30 * 24 * 60 * 60,
   year: 365 * 24 * 60 * 60,
 };
-
 class Feed extends Component {
   constructor() {
     super();
@@ -60,10 +59,10 @@ class Feed extends Component {
       .get('feed')
       .once((s) => (savedSettings = s));
     this.state = {
-      sortedMessages: [],
-      queuedMessages: [],
+      sortedEvents: [],
+      queuedEvents: [],
       displayCount: INITIAL_PAGE_SIZE,
-      messagesShownTime: Math.floor(Date.now() / 1000),
+      eventsShownTime: Math.floor(Date.now() / 1000),
       settings: this.getSettings(savedSettings),
     };
     this.openedAt = Math.floor(Date.now() / 1000);
@@ -72,7 +71,7 @@ class Feed extends Component {
   getSettings(override = {}) {
     // override default & saved settings with url params
     let settings = { ...DEFAULT_SETTINGS };
-    if (['everyone', 'follows'].includes(this.props?.index)) {
+    if (['global', 'follows'].includes(this.props?.index)) {
       settings = Object.assign(settings, override);
     }
     if (this.props?.index !== 'notifications' && override.display) {
@@ -96,39 +95,37 @@ class Feed extends Component {
     localState.get('settings').get('feed').put(this.state.settings);
   }
 
-  updateSortedMessages = (sortedMessages) => {
-    if (this.unmounted || !sortedMessages) {
+  updateSortedEvents = (sortedEvents) => {
+    if (this.unmounted || !sortedEvents) {
       return;
     }
     const settings = this.state.settings;
-    // iterate over sortedMessages and add newer than messagesShownTime to queue
-    const queuedMessages = [];
-    let hasMyMessage;
+    // iterate over sortedEvents and add newer than eventsShownTime to queue
+    const queuedEvents = [];
+    let hasMyEvent;
     if (settings.sortDirection === 'desc' && !settings.realtime) {
-      for (let i = 0; i < sortedMessages.length; i++) {
-        const id = sortedMessages[i];
-        const message = Events.db.by('id', id);
-        if (message && message.created_at > this.state.messagesShownTime) {
-          if (message.pubkey === Key.getPubKey() && !Events.isRepost(message)) {
-            hasMyMessage = true;
+      for (let i = 0; i < sortedEvents.length; i++) {
+        const id = sortedEvents[i];
+        const event = Events.db.by('id', id);
+        if (event && event.created_at > this.state.eventsShownTime) {
+          if (event.pubkey === Key.getPubKey() && !Events.isRepost(event)) {
+            hasMyEvent = true;
             break;
           }
-          queuedMessages.push(id);
+          queuedEvents.push(id);
         }
       }
     }
-    if (!hasMyMessage) {
-      sortedMessages = sortedMessages.filter((id) => !queuedMessages.includes(id));
+    if (!hasMyEvent) {
+      sortedEvents = sortedEvents.filter((id) => !queuedEvents.includes(id));
     }
-    const messagesShownTime = hasMyMessage
-      ? Math.floor(Date.now() / 1000)
-      : this.state.messagesShownTime;
-    this.setState({ sortedMessages, queuedMessages, messagesShownTime });
+    const eventsShownTime = hasMyEvent ? Math.floor(Date.now() / 1000) : this.state.eventsShownTime;
+    this.setState({ sortedEvents, queuedEvents, eventsShownTime });
   };
 
   handleScroll = () => {
     // increase page size when scrolling down
-    if (this.state.displayCount < this.state.sortedMessages.length) {
+    if (this.state.displayCount < this.state.sortedEvents.length) {
       if (
         this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
         this.props.scrollElement.scrollHeight - 1000
@@ -194,26 +191,64 @@ class Feed extends Component {
     );
   }
 
-  getNotifications(cb) {
-    const callback = () => {
-      cb?.(Events.notifications.eventIds);
-    };
-    callback();
-    return PubSub.subscribe([{ '#p': [Key.getPubKey()] }], callback);
-  }
-
   subscribe() {
-    setTimeout(() => {
-      this.unsub?.();
-      if (this.props.index === 'notifications') {
-        // TODO notifications from LokiJS index
-        this.unsub = this.getNotifications(
-          throttle((messages) => this.updateSortedMessages(messages), 1000, { leading: true }),
-        );
+    this.unsub?.();
+    const results = new Map();
+    let updated = false;
+    const update = () => {
+      this.updateSortedEvents(
+        Array.from(results.values())
+          .filter((e) => {
+            if (SocialNetwork.blockedUsers.has(e.pubkey)) {
+              return false;
+            }
+            const repliedMsg = Events.getEventReplyingTo(e);
+            if (repliedMsg) {
+              if (!this.state.settings.showReplies) {
+                return false;
+              }
+              const author = Events.db.by('id', repliedMsg)?.pubkey;
+              if (author && SocialNetwork.blockedUsers.has(author)) {
+                return false;
+              }
+            }
+            return true;
+          })
+          .sort(this.sort.bind(this))
+          .map((e) => e.id),
+      );
+    };
+    const throttledUpdate = throttle(update, 1000, { leading: false });
+    const callback = (event) => {
+      if (results.has(event.id)) return;
+      results.set(event.id, event);
+      if (!updated && results.size > 10) {
+        updated = true;
+        update();
       } else {
-        this.unsub = this.getMessages();
+        throttledUpdate();
       }
-    }, 0);
+    };
+    const go = () => {
+      if (this.props.index === 'notifications') {
+        this.unsub = Events.notifications.subscribe((eventIds) => {
+          eventIds.forEach((id) => callback(Events.db.by('id', id)));
+        });
+      } else {
+        this.unsub = this.getEvents(callback);
+        const followCount = SocialNetwork.followedByUser.get(Key.getPubKey())?.size;
+        const unsub = PubSub.subscribe({ authors: [Key.getPubKey()], kinds: [3] }, () => {
+          if (followCount !== SocialNetwork.followedByUser.get(Key.getPubKey())?.size) {
+            unsub();
+            this.subscribe();
+          }
+        });
+      }
+    };
+    go();
+    if (results.size === 0) {
+      setTimeout(go, 1000);
+    }
   }
 
   sort(a, b) {
@@ -239,90 +274,58 @@ class Feed extends Component {
     }
   }
 
-  getMessages() {
-    // TODO only Pubsub.subscribe() here, move all LokiJS & Dexie & Relay query logic there
-    const dv = Events.db.addDynamicView('messages', { persist: true });
-    const find = { kind: { $between: [1, 6] } };
+  getEvents(callback) {
+    let since;
+    if (this.state.settings.timespan !== 'all') {
+      since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
+    }
     if (this.props.nostrUser) {
-      find.pubkey = this.props.nostrUser;
       if (this.props.index === 'likes') {
-        find.kind = 7;
-      }
-    }
-    dv.applyFind(find);
-    dv.applyWhere((e) => {
-      if (![1, 6, 7].includes(e.kind)) {
-        return false;
-      }
-      if (this.props.keyword && !e.content.includes(this.props.keyword)) {
-        return false;
-      }
-      return true;
-    });
-    const simpleSortDesc =
-      this.state.settings.sortBy === 'created_at'
-        ? this.state.settings.sortDirection === 'desc'
-        : true;
-    dv.applySimpleSort('created_at', { desc: simpleSortDesc });
-    if (this.state.settings.sortBy !== 'created_at') {
-      dv.applySort((a, b) => this.sort(a, b));
-    }
-    const callback = throttle(() => {
-      const since = Math.floor(Date.now() / 1000) - TIMESPANS[this.state.settings.timespan];
-      let includeReplies = true;
-      if (['everyone', 'follows'].includes(this.props.index)) {
-        includeReplies = this.state.settings.replies;
-      } else if (['posts', 'postsAndReplies'].includes(this.props.index)) {
-        includeReplies = this.props.index === 'postsAndReplies';
-      }
-      const events = dv
-        .data()
-        .filter((e) => {
-          const maxFollowDistance =
-            this.state.settings.maxFollowDistance || this.props.index === 'follows' ? 1 : 0;
-          if (maxFollowDistance) {
-            const followDistance = SocialNetwork.followDistanceByUser.get(e.pubkey);
-            if (followDistance === undefined || followDistance > maxFollowDistance) {
-              return false;
+        return PubSub.subscribe(
+          // TODO map to liked msg id
+          { authors: [this.props.nostrUser], kinds: [7], since },
+          callback,
+          false,
+        );
+      } else {
+        return PubSub.subscribe(
+          { authors: [this.props.nostrUser], kinds: [1, 6], since },
+          (event) => {
+            if (this.props.index === 'posts') {
+              if (Events.getEventReplyingTo(event)) {
+                return;
+              }
             }
-          }
-          if (SocialNetwork.blockedUsers.has(e.pubkey)) {
-            return false;
-          }
-          if (e.kind === 1 && !includeReplies && Events.getEventReplyingTo(e)) {
-            return false;
-          }
-          if (this.state.settings.timespan !== 'all') {
-            if (e.created_at < since) {
-              return false;
-            }
-          }
-          return true;
-        })
-        .map((e) => {
-          if (this.props.index === 'likes') {
-            return e.tags.find((t) => t[0] === 'e')?.[1];
-          } else {
-            return e.id;
-          }
-        });
-      this.updateSortedMessages(events);
-    }, 1000);
-    callback();
-    if (this.props.nostrUser) {
-      return PubSub.subscribe(
-        [{ authors: [this.props.nostrUser], kinds: [1, 3, 5, 6, 7] }],
-        callback,
-        'user',
-      );
+            callback(event);
+          },
+          false,
+        );
+      }
     } else if (this.props.keyword) {
       return PubSub.subscribe(
-        [{ keywords: [this.props.keyword], kinds: [1] }],
-        callback,
-        'keyword',
+        { keywords: [this.props.keyword], kinds: [1], limit: 1000, since },
+        (e) => e.content?.includes(this.props.keyword) && callback(e), // TODO this should not be necessary. seems subscribe still asks non-search relays
+        false,
+      );
+    } else if (this.props.index === 'follows') {
+      const followedUsers = Array.from(SocialNetwork.followedByUser.get(Key.getPubKey()) || []);
+      followedUsers.push(Key.getPubKey());
+      const filter = { kinds: [1, 6], limit: 300, since };
+      if (followedUsers.length < 1000) {
+        filter.authors = followedUsers;
+      }
+      return PubSub.subscribe(
+        filter,
+        (e) => {
+          if (!(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)) {
+            return;
+          }
+          callback(e);
+        },
+        true,
       );
     } else {
-      return PubSub.subscribe([{ kinds: [1, 3, 5, 6, 7, 9735], limit: 100 }], callback, 'global');
+      return PubSub.subscribe({ kinds: [1, 6], limit: 300, since }, callback, true);
     }
   }
 
@@ -336,12 +339,12 @@ class Feed extends Component {
       }
       this.replaceState();
     }
-    if (prevState.settings.replies !== this.state.settings.replies) {
+    if (prevState.settings.showReplies !== this.state.settings.showReplies) {
       const url = new URL(window.location);
-      if (this.state.settings.replies) {
-        url.searchParams.set('replies', '1');
+      if (this.state.settings.showReplies) {
+        url.searchParams.set('showReplies', '1');
       } else {
-        url.searchParams.delete('replies');
+        url.searchParams.delete('showReplies');
       }
       this.replaceState();
     }
@@ -354,6 +357,7 @@ class Feed extends Component {
       }
       this.replaceState();
     }
+    // todo actually update url
   }
 
   replaceState = throttle(
@@ -375,24 +379,24 @@ class Feed extends Component {
     }
     this.handleScroll();
     this.replaceState();
-    if (!this.state.queuedMessages.length && prevState.queuedMessages.length) {
+    if (!this.state.queuedEvents.length && prevState.queuedEvents.length) {
       Helpers.animateScrollTop('.main-view');
     }
     if (this.props.filter !== prevProps.filter || this.props.keyword !== prevProps.keyword) {
-      this.setState({ sortedMessages: [] });
+      this.setState({ sortedEvents: [] });
       this.componentDidMount();
     }
   }
 
-  showQueuedMessages() {
-    const sortedMessages = this.state.sortedMessages;
-    console.log('sortedmessages.length', sortedMessages.length);
-    sortedMessages.unshift(...this.state.queuedMessages);
-    console.log('queuedmessages.length', this.state.queuedMessages.length);
+  showQueuedEvents() {
+    const sortedEvents = this.state.sortedEvents;
+    console.log('sortedEvents.length', sortedEvents.length);
+    sortedEvents.unshift(...this.state.queuedEvents);
+    console.log('queuedEvents.length', this.state.queuedEvents.length);
     this.setState({
-      sortedMessages,
-      queuedMessages: [],
-      messagesShownTime: Math.floor(Date.now() / 1000),
+      sortedEvents,
+      queuedEvents: [],
+      eventsShownTime: Math.floor(Date.now() / 1000),
       displayCount: INITIAL_PAGE_SIZE,
     });
   }
@@ -440,12 +444,12 @@ class Feed extends Component {
       {
         type: 'checkbox',
         id: 'show_replies',
-        checked: this.state.settings.replies,
-        name: 'replies',
+        checked: this.state.settings.showReplies,
+        name: 'show_replies',
         label: t('show_replies'),
         onChange: () =>
           this.setState({
-            settings: { ...this.state.settings, replies: !this.state.settings.replies },
+            settings: { ...this.state.settings, showReplies: !this.state.settings.showReplies },
           }),
       },
     ];
@@ -541,14 +545,14 @@ class Feed extends Component {
     );
   }
 
-  renderShowNewMessages() {
+  renderShowNewEvents() {
     return (
       <div
         className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
-        onClick={() => this.showQueuedMessages()}
+        onClick={() => this.showQueuedEvents()}
       >
         <div className="msg-content notification-msg colored">
-          {t('show_n_new_messages').replace('{n}', this.state.queuedMessages.length)}
+          {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
         </div>
       </div>
     );
@@ -577,15 +581,15 @@ class Feed extends Component {
     const displayCount = this.state.displayCount;
     const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
     const feedName =
-      !this.state.queuedMessages.length &&
+      !this.state.queuedEvents.length &&
       {
-        everyone: 'global_feed',
+        global: 'global_feed',
         follows: 'following',
         notifications: 'notifications',
       }[this.props.index];
 
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
-    const messages = this.state.sortedMessages.slice(0, displayCount).map((id) => (
+    const events = this.state.sortedEvents.slice(0, displayCount).map((id) => (
       <ErrorBoundary>
         <EventComponent
           notification={this.props.index === 'notifications'}
@@ -597,11 +601,11 @@ class Feed extends Component {
         />
       </ErrorBoundary>
     ));
-    const isGeneralFeed = ['everyone', 'follows'].includes(this.props.index);
+    const isGeneralFeed = ['global', 'follows'].includes(this.props.index);
     return (
       <div className="msg-feed">
         <div>
-          {this.state.queuedMessages.length ? this.renderShowNewMessages() : null}
+          {this.state.queuedEvents.length ? this.renderShowNewEvents() : null}
           {feedName ? (
             <div className="msg">
               <div className="msg-content notification-msg">
@@ -626,16 +630,16 @@ class Feed extends Component {
           ) : null}
           {this.props.index !== 'notifications' && this.state.settingsOpen && this.renderSettings()}
           {this.props.index !== 'notifications' && this.renderFeedTypeSelector()}
-          {messages.length === 0 && (
+          {events.length === 0 && (
             <div className="msg">
               <div className="msg-content notification-msg">
                 {this.props.emptyMessage || t('no_events_yet')}
               </div>
             </div>
           )}
-          {renderAs === 'NoteImage' ? <ImageGrid>{messages}</ImageGrid> : messages}
+          {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
         </div>
-        {displayCount < this.state.sortedMessages.length ? this.renderShowMore() : ''}
+        {displayCount < this.state.sortedEvents.length ? this.renderShowMore() : ''}
       </div>
     );
   }

@@ -1,4 +1,3 @@
-import { html } from 'htm/preact';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
@@ -17,7 +16,7 @@ const SETTINGS = {
   social_network: 'social_network',
 };
 
-if (['iris.to', 'localhost'].includes(window.location.hostname)) {
+if (['iris.to', 'beta.iris.to', 'localhost'].includes(window.location.hostname)) {
   SETTINGS.iris_account = 'iris.to';
 }
 
@@ -34,9 +33,13 @@ export default class SettingsMenu extends Component {
     return (
       <>
         <div className={!this.props.activePage ? 'settings-list' : 'settings-list hidden-xs'}>
-          {Helpers.isElectron
-            ? html`<div class="electron-padding" />`
-            : html` <h3 class="visible-xs-block" style="padding: 0px 15px;">${t('settings')}</h3> `}
+          {Helpers.isElectron ? (
+            <div class="electron-padding" />
+          ) : (
+            <h3 class="visible-xs-block" style="padding: 0px 15px;">
+              {t('settings')}
+            </h3>
+          )}
           {Object.keys(SETTINGS).map((page) => {
             return (
               <a

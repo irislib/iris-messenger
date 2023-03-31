@@ -19,7 +19,7 @@ import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
-import Relays from '../nostr/Relays';
+import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
@@ -362,8 +362,7 @@ class Profile extends View {
   }
 
   getNostrProfile(address, nostrAddress) {
-    // TODO unsubscribe on unmount
-    Relays.subscribe([{ authors: [address] }], address, true, 15 * 1000);
+    this.unsub = PubSub.subscribe({ authors: [address], kinds: [0, 3] }, undefined, false);
     const setFollowCounts = () => {
       address &&
         this.setState({
@@ -458,8 +457,14 @@ class Profile extends View {
     );
   }
 
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    this.unsub?.();
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if (!prevState.name && this.state.name) {
+      this.unsub?.();
       setTimeout(() => {
         // important for SEO: prerenderReady is false until page content is loaded
         window.prerenderReady = true;

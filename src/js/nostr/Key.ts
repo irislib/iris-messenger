@@ -2,6 +2,8 @@ import { Event, generatePrivateKey, getPublicKey, nip04, signEvent } from '../li
 
 import Events from './Events';
 const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
+import { route } from 'preact-router';
+
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 
@@ -33,6 +35,10 @@ export default {
     setTimeout(() => {
       // TODO remove setTimeout
       localState.get('loggedIn').put(true);
+      console.log('logged in', key);
+      setTimeout(() => {
+        route('/following');
+      }, 100);
     }, 100);
   },
   generateKey(): Key {
@@ -156,7 +162,7 @@ export default {
       const myPub = this.getPubKey();
       const msg = Events.db.by('id', id);
       const theirPub =
-        msg.pubkey === myPub ? msg.tags.find((tag: any) => tag[0] === 'p')[1] : msg.pubkey;
+        msg.pubkey === myPub ? msg.tags?.find((tag: any) => tag[0] === 'p')[1] : msg.pubkey;
       if (!(msg && theirPub)) {
         return;
       }

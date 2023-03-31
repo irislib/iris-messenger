@@ -3,6 +3,7 @@ import Component from '../../BaseComponent';
 import Account from './Account';
 import Appearance from './Appearance';
 import Backup from './Backup';
+import Dev from './Dev';
 import IrisAccount from './IrisAccount';
 import Language from './Language';
 import Media from './Media';
@@ -20,6 +21,7 @@ export default class SettingsContent extends Component {
     backup: Backup,
     social_network: SocialNetwork,
     iris_account: IrisAccount,
+    dev: Dev,
   };
 
   constructor() {

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { html } from 'htm/preact';
 import { route } from 'preact-router';
 
 import Icons from '../../Icons';
@@ -25,7 +24,7 @@ export default function Like(props) {
   const likedId = Events.getEventReplyingTo(props.event);
   const likedEvent = Events.db.by('id', likedId);
   const authorIsYou = likedEvent?.pubkey === Key.getPubKey();
-  const mentioned = likedEvent?.tags.find((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey());
+  const mentioned = likedEvent?.tags?.find((tag) => tag[0] === 'p' && tag[1] === Key.getPubKey());
   const likeText = authorIsYou
     ? 'liked your note'
     : mentioned
@@ -40,22 +39,24 @@ export default function Like(props) {
   }, []);
 
   const userLink = `/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`;
-  return html`
-    <div class="msg" key=${props.event.id}>
-      <div class="msg-content" onClick=${(e) => messageClicked(e, likedId)}>
+  return (
+    <div className="msg" key={props.event.id}>
+      <div className="msg-content" onClick={(e) => messageClicked(e, likedId)}>
         <div>
-          <div style="display: flex; align-items: center;">
-            <i class="like-btn liked" style="margin-right: 15px;"> ${Icons.heartFull} </i>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <i className="like-btn liked" style={{ marginRight: 15 }}>
+              {Icons.heartFull}
+            </i>
             <div>
-              <a href=${userLink} style="margin-right: 5px;">
-                <${Name} pub=${props.event.pubkey} userNameOnly=${true} />
+              <a href={userLink} style={{ marginRight: 5 }}>
+                <Name pub={props.event.pubkey} userNameOnly={true} />
               </a>
-              ${allLikes.length > 1 && html` and ${allLikes.length - 1} others `} ${likeText}
+              {allLikes.length > 1 && <> and {allLikes.length - 1} others </>} {likeText}
             </div>
           </div>
-          <${EventComponent} key=${likedId + props.event.id} id=${likedId} />
+          <EventComponent key={likedId + props.event.id} id={likedId} />
         </div>
       </div>
     </div>
-  `;
+  );
 }

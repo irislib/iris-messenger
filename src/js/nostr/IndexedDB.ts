@@ -28,6 +28,7 @@ export default {
   save: throttle((_this) => {
     const events = _this.saveQueue;
     _this.saveQueue = [];
+    // TODO delete earlier events if kind in 0, 3 or >= 30000
     db.events.bulkAdd(events).catch(() => {
       // lots of "already exists" errors
       // console.error('error saving events', e);
@@ -77,38 +78,33 @@ export default {
 
     // other events to be loaded on demand
   },
-  subscribe(filters: Filter[]) {
-    const filter1 = filters.length === 1 ? filters[0] : undefined;
+  subscribe(filter: Filter) {
+    if (!filter) {
+      return;
+    }
     let query: any = db.events;
-    if (filter1.ids) {
-      query = query.where('id').anyOf(filter1.ids);
+    if (filter.ids) {
+      query = query.where('id').anyOf(filter.ids);
     } else {
-      const stringifiedFilters = JSON.stringify(filters);
-      if (this.subscriptions.has(stringifiedFilters)) {
+      const stringifiedFilter = JSON.stringify(filter);
+      if (this.subscriptions.has(stringifiedFilter)) {
         return;
       }
-      this.subscriptions.add(stringifiedFilters);
-      if (filter1.authors) {
-        query = query.where('pubkey').anyOf(filter1.authors);
+      this.subscriptions.add(stringifiedFilter);
+      if (filter.authors) {
+        query = query.where('pubkey').anyOf(filter.authors);
       }
-      if (filter1.kinds) {
+      if (filter.kinds) {
         query = query.where
-          ? query.where('kind').anyOf(filter1.kinds)
-          : query.and((event) => filter1.kinds.includes(event.kind));
+          ? query.where('kind').anyOf(filter.kinds)
+          : query.and((event) => filter.kinds.includes(event.kind));
       }
-      query = query.filter((event) => {
-        for (const filter of filters) {
-          if (matchFilter(filter, event)) {
-            return true;
-          }
-        }
-      });
-      if (filter1.limit) {
-        query = query.limit(filter1.limit); // TODO these are not sorted by created_at desc
+      query = query.filter(matchFilter);
+      if (filter.limit) {
+        query = query.limit(filter.limit); // TODO these are not sorted by created_at desc
       }
     }
     query.each((event) => {
-      console.log('got event from idb');
       Events.handle(event, false, false);
     });
   },

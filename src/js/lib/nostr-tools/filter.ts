@@ -17,6 +17,12 @@ export function matchFilter(
 ): boolean {
   if (filter.ids && filter.ids.indexOf(event.id) === -1) return false
   if (filter.kinds && filter.kinds.indexOf(event.kind) === -1) return false
+  if (filter.keywords) {
+    const lowercase = event.content?.toLowerCase()
+    for (let i = 0; i < filter.keywords.length; i++) {
+      if (lowercase?.indexOf(filter.keywords[i].toLowerCase()) === -1) return false
+    }
+  }
   if (filter.authors && filter.authors.indexOf(event.pubkey) === -1)
     return false
 
@@ -26,7 +32,7 @@ export function matchFilter(
       let values = filter[`#${tagName}`]
       if (
         values &&
-        !event.tags.find(
+        !event.tags?.find(
           ([t, v]) => t === f.slice(1) && values.indexOf(v) !== -1
         )
       )

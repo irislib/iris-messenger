@@ -1,4 +1,3 @@
-import { html } from 'htm/preact';
 import $ from 'jquery';
 import { Component } from 'preact';
 
@@ -11,14 +10,16 @@ const ANIMATE_DURATION = 200;
 
 class ProfilePicture extends Component<Props> {
   render() {
-    return html`<${SafeImg}
-      class="profile-picture"
-      src=${this.props.picture}
-      onError=${this.props.onError}
-      onClick=${(e) => {
-        this.imageClicked(e);
-      }}
-    />`;
+    return (
+      <SafeImg
+        class="profile-picture"
+        src={this.props.picture}
+        onError={this.props.onError}
+        onClick={(e) => {
+          this.imageClicked(e);
+        }}
+      />
+    );
   }
 
   openAttachmentsGallery(event) {

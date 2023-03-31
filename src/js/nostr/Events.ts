@@ -2,7 +2,7 @@ import { debounce } from 'lodash';
 import Loki from 'lokijs';
 
 import FuzzySearch from '../FuzzySearch';
-import { Event, Filter, getEventHash } from '../lib/nostr-tools';
+import { Event, Filter, getEventHash, matchFilter } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
 import IndexedDB from './IndexedDB';
@@ -25,7 +25,7 @@ const events = db.addCollection('events', {
   unique: ['id'],
 });
 
-// TODO collections for Tags and Users?
+// add collections for Tags and Users?
 
 let mutedNotes;
 localState.get('mutedNotes').on((v) => {
@@ -304,7 +304,6 @@ const Events = {
     if (!zappedNote) {
       return; // TODO you can also zap profiles
     }
-    // console.log('zap!', Key.toNostrBech32Address(zappedNote, 'note'), event);
     if (!this.zapsByNote.has(zappedNote)) {
       this.zapsByNote.set(zappedNote, new SortedLimitedEventSet(MAX_ZAPS_BY_NOTE));
     }
@@ -331,6 +330,7 @@ const Events = {
     if (event.pubkey !== Key.getPubKey()) {
       return;
     }
+    //console.log('got key value event', event);
     const key = event.tags?.find((tag) => tag[0] === 'd')?.[1];
     if (key) {
       const existing = this.keyValueEvents.get(key);
@@ -352,7 +352,7 @@ const Events = {
   },
   acceptEvent(event: Event) {
     if (globalFilter.maxFollowDistance) {
-      if (!PubSub.subscribedUsers.has(event.pubkey) && !PubSub.subscribedPosts.has(event.id)) {
+      if (!PubSub.subscribedAuthors.has(event.pubkey) && !PubSub.subscribedEventIds.has(event.id)) {
         // unless we specifically subscribed to the user or post, ignore long follow distance users
         if (SocialNetwork.followDistanceByUser.has(event.pubkey)) {
           const distance = SocialNetwork.followDistanceByUser.get(event.pubkey);
@@ -390,7 +390,26 @@ const Events = {
     }
     return true;
   },
-  handle(event: Event, force = false, saveToIdb = true): boolean {
+  find(filter: Filter, callback: (event: Event) => void) {
+    const query = {};
+    if (filter.authors) {
+      query['pubkey'] = { $in: filter.authors };
+    }
+    if (filter.kinds) {
+      query['kind'] = { $in: filter.kinds };
+    }
+    this.db
+      .chain()
+      .find(query)
+      .where((e) => matchFilter(filter, e))
+      .simplesort('created_at', { desc: true })
+      .limit(filter.limit || Infinity)
+      .data()
+      .forEach((e) => {
+        callback(e);
+      });
+  },
+  handle(event: Event & { id: string }, force = false, saveToIdb = true): boolean {
     if (!event) return;
     if (!force && !!this.db.by('id', event.id)) {
       return false;
@@ -420,7 +439,7 @@ const Events = {
 
     this.handledMsgsPerSecond++;
 
-    PubSub.subscribedPosts.delete(event.id);
+    PubSub.subscribedEventIds.delete(event.id);
 
     switch (event.kind) {
       case 0:
@@ -473,14 +492,6 @@ const Events = {
         break;
     }
 
-    if (
-      PubSub.subscribedProfiles.has(event.pubkey) &&
-      SocialNetwork.blockedUsers.has(event.pubkey) &&
-      Events.db.findOne({ kind: 3, pubkey: event.pubkey })
-    ) {
-      PubSub.subscribedProfiles.delete(event.pubkey);
-    }
-
     // save limited by author followdistance
     // TODO: don't save e.g. old profile & follow events
     // TODO since we're only querying relays since lastSeen, we need to store all beforeseen events and correctly query them on demand
@@ -496,15 +507,8 @@ const Events = {
       }
     }
 
-    // go through subscriptions and callback if filters match
-    for (const sub of PubSub.subscriptions.values()) {
-      if (!sub.filters) {
-        continue;
-      }
-      if (this.matchFilters(event, sub.filters)) {
-        sub.callback && sub.callback(event);
-      }
-    }
+    // should the whole method be moved to PubSub?
+    PubSub.handle(event);
     return true;
   },
   handleNextFutureEvent() {
@@ -522,58 +526,6 @@ const Events = {
       this.handle(nextEvent, true);
       this.handleNextFutureEvent();
     }, (nextEvent.created_at - Date.now() / 1000) * 1000);
-  },
-  // if one of the filters matches, return true
-  matchFilters(event: Event, filters: Filter[]) {
-    for (const filter of filters) {
-      if (this.matchFilter(event, filter)) {
-        return true;
-      }
-    }
-    return false;
-  },
-  matchFilter(event: Event, filter: Filter) {
-    if (filter.ids && !filter.ids.includes(event.id)) {
-      return false;
-    }
-    if (filter.kinds && !filter.kinds.includes(event.kind)) {
-      return false;
-    }
-    if (filter.authors && !filter.authors.includes(event.pubkey)) {
-      return false;
-    }
-    const filterKeys = ['e', 'p', 'd'];
-    for (const key of filterKeys) {
-      if (
-        filter[`#${key}`] &&
-        !event.tags?.some((tag) => tag[0] === key && filter[`#${key}`].includes(tag[1]))
-      ) {
-        return false;
-      }
-    }
-    if (filter['#d']) {
-      const tag = event.tags?.find((tag) => tag[0] === 'd');
-      if (tag) {
-        const existing = this.keyValueEvents.get(tag[1]);
-        if (existing?.created_at > event.created_at) {
-          return false;
-        }
-      }
-    }
-    const content = event.content.toLowerCase();
-    if (
-      filter.keywords &&
-      !filter.keywords.some((keyword: string) => {
-        return keyword
-          .toLowerCase()
-          .split(' ')
-          .every((word: string) => content.includes(word));
-      })
-    ) {
-      return false;
-    }
-
-    return true;
   },
   isMuted(event: Event) {
     let muted = false;
@@ -593,7 +545,7 @@ const Events = {
     return muted;
   },
   getEventRoot(event: Event) {
-    return event?.tags.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
+    return event?.tags?.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
   },
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
@@ -658,23 +610,26 @@ const Events = {
       console.error('Invalid event', event);
       throw new Error('Invalid event');
     }
+
+    console.log('publishing event', event);
+    this.handle(event);
+    Relays.publish(event);
+
     // also publish at most 10 events referred to in tags
     const referredEvents = event.tags
       .filter((tag) => tag[0] === 'e')
       .reverse()
       .slice(0, 10);
-    Relays.publish(event);
     for (const ref of referredEvents) {
       const referredEvent = this.db.by('id', ref[1]);
       if (referredEvent) {
         Relays.publish(referredEvent);
       }
     }
-    this.handle(event);
     return event.id;
   },
   getZappingUser(eventId: string) {
-    const description = Events.db.by('id', eventId)?.tags.find((t) => t[0] === 'description')?.[1];
+    const description = Events.db.by('id', eventId)?.tags?.find((t) => t[0] === 'description')?.[1];
     if (!description) {
       return;
     }
@@ -710,7 +665,7 @@ const Events = {
     if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
       callback();
     }
-    return PubSub.subscribe([{ kinds: [1, 6, 7, 9735], '#e': [id] }], callback);
+    return PubSub.subscribe({ '#e': [id] }, callback, false);
   },
   getEventById(id: string, proxyFirst = false, cb?: (event: Event) => void) {
     const event = this.db.by('id', id);
@@ -718,28 +673,18 @@ const Events = {
       cb(event);
       return;
     }
-    const askWs = () => {
-      const unsub = PubSub.subscribe([{ ids: [id] }], () => {
-        const msg = this.db.by('id', id);
-        if (msg) {
-          cb?.(msg);
-          unsub();
-        }
-      });
-    };
 
     if (proxyFirst) {
       // give proxy 300 ms to respond, then ask ws
-      const askWsTimeout = setTimeout(() => {
-        askWs();
+      const askRelaysTimeout = setTimeout(() => {
+        PubSub.subscribe({ ids: [id] }, (event) => cb(event));
       }, 300);
       fetch(`https://api.iris.to/event/${id}`).then((res) => {
         if (res.status === 200) {
           res.json().then((event) => {
             // TODO verify sig
             if (event && event.id === id) {
-              clearTimeout(askWsTimeout);
-              PubSub.subscribedPosts.add(id);
+              clearTimeout(askRelaysTimeout);
               Events.handle(event, true);
               cb?.(event);
             }
@@ -747,7 +692,7 @@ const Events = {
         }
       });
     } else {
-      askWs();
+      PubSub.subscribe({ ids: [id] }, cb, false);
     }
   },
   getDirectMessagesByUser(address: string, cb?: (messageIds: string[]) => void): Unsubscribe {
@@ -756,14 +701,24 @@ const Events = {
     };
     this.directMessagesByUser.has(address) && callback();
     const myPub = Key.getPubKey();
-    return PubSub.subscribe([{ kinds: [4], '#p': [address, myPub] }], callback);
+    const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [address], authors: [myPub] }, callback);
+    const unsub2 = PubSub.subscribe({ kinds: [4], '#p': [myPub], authors: [address] }, callback);
+    return () => {
+      unsub1();
+      unsub2();
+    };
   },
   getDirectMessages(cb) {
     const callback = () => {
       cb?.(this.directMessagesByUser);
     };
     callback();
-    return PubSub.subscribe([{ kinds: [4], '#p': [Key.getPubKey()] }], callback);
+    const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()] }, callback);
+    const unsub2 = PubSub.subscribe({ kinds: [4], authors: [Key.getPubKey()] }, callback);
+    return () => {
+      unsub1();
+      unsub2();
+    };
   },
 };
 
