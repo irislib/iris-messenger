@@ -124,8 +124,9 @@ registerRoute(
       new CacheableResponsePlugin({
         statuses: [0, 200],
       }),
+      // TODO limit cached file size
       new ExpirationPlugin({
-        maxEntries: 100,
+        maxEntries: 25,
         maxAgeSeconds: 7 * 24 * 60 * 60,
         purgeOnQuotaError: true,
       }),
