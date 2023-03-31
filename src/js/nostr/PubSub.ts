@@ -36,6 +36,10 @@ const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
     }) ||
     undefined,
 });
+relayPool.onnotice((relayUrl, notice) => {
+  console.log('notice', notice, ' from relay ', relayUrl);
+});
+
 localState.get('dev').on((d) => {
   dev = d;
   relayPool.logSubscriptions = dev.logSubscriptions;
