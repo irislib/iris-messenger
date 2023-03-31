@@ -37,7 +37,7 @@ const ImageGrid = styled.div`
 const DEFAULT_SETTINGS = {
   display: 'posts',
   realtime: false,
-  replies: true,
+  showReplies: true,
   sortBy: 'created_at',
   sortDirection: 'desc',
   timespan: 'all',
@@ -204,7 +204,7 @@ class Feed extends Component {
             }
             const repliedMsg = Events.getEventReplyingTo(e);
             if (repliedMsg) {
-              if (!this.state.settings.replies) {
+              if (!this.state.settings.showReplies) {
                 return false;
               }
               const author = Events.db.by('id', repliedMsg)?.pubkey;
@@ -229,16 +229,26 @@ class Feed extends Component {
         throttledUpdate();
       }
     };
-    setTimeout(() => {
+    const go = () => {
       if (this.props.index === 'notifications') {
         this.unsub = Events.notifications.subscribe((eventIds) => {
-          const events = eventIds.map((id) => !results.has(id) && Events.db.by('id', id));
           eventIds.forEach((id) => callback(Events.db.by('id', id)));
         });
       } else {
         this.unsub = this.getEvents(callback);
+        const followCount = SocialNetwork.followedByUser.get(Key.getPubKey())?.size;
+        const unsub = PubSub.subscribe({ authors: [Key.getPubKey()], kinds: [3] }, () => {
+          if (followCount !== SocialNetwork.followedByUser.get(Key.getPubKey())?.size) {
+            unsub();
+            this.subscribe();
+          }
+        });
       }
-    }, 0);
+    };
+    go();
+    if (results.size === 0) {
+      setTimeout(go, 1000);
+    }
   }
 
   sort(a, b) {
@@ -329,12 +339,12 @@ class Feed extends Component {
       }
       this.replaceState();
     }
-    if (prevState.settings.replies !== this.state.settings.replies) {
+    if (prevState.settings.showReplies !== this.state.settings.showReplies) {
       const url = new URL(window.location);
-      if (this.state.settings.replies) {
-        url.searchParams.set('replies', '1');
+      if (this.state.settings.showReplies) {
+        url.searchParams.set('showReplies', '1');
       } else {
-        url.searchParams.delete('replies');
+        url.searchParams.delete('showReplies');
       }
       this.replaceState();
     }
@@ -434,12 +444,12 @@ class Feed extends Component {
       {
         type: 'checkbox',
         id: 'show_replies',
-        checked: this.state.settings.replies,
-        name: 'replies',
+        checked: this.state.settings.showReplies,
+        name: 'show_replies',
         label: t('show_replies'),
         onChange: () =>
           this.setState({
-            settings: { ...this.state.settings, replies: !this.state.settings.replies },
+            settings: { ...this.state.settings, showReplies: !this.state.settings.showReplies },
           }),
       },
     ];
