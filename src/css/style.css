@@ -1239,6 +1239,7 @@ a.msg {
   border-radius: 15px;
   border: 1px solid var(--main-color);
   overflow: hidden;
+  cursor: pointer;
 }
 
 .public-messages-view .img-container {
