@@ -90,7 +90,7 @@ const IndexedDB = {
       .each((event) => {
         Events.handle(event, false, false);
       });
-  }, 500),
+  }, 1000),
   subscribeToEventIds: throttle(() => {
     const ids = Array.from(IndexedDB.subscribedEventIds.values());
     IndexedDB.subscribedEventIds.clear();
@@ -100,7 +100,7 @@ const IndexedDB = {
       .each((event) => {
         Events.handle(event, false, false);
       });
-  }, 500),
+  }, 1000),
   subscribe(filter: Filter) {
     if (!filter) {
       return;

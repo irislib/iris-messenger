@@ -18,31 +18,18 @@ class Feed extends View {
     this.class = 'public-messages-view';
   }
 
-  search() {
-    const searchTerm = this.props.term && this.props.term.toLowerCase();
-    this.setState({ searchTerm });
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.term !== this.props.term) {
-      this.search();
-    }
-  }
-
   componentDidMount() {
     this.restoreScrollPosition();
-    this.search();
     localState.get('filters').get('group').on(this.inject());
   }
 
   renderView() {
-    const s = this.state;
     let path = this.props.index || 'msgs';
     return html`
       <div class="centered-container">
         <div style="display:flex;flex-direction:row">
           <div style="flex:3;width: 100%">
-            ${s.searchTerm
+            ${this.props.keyword
               ? ''
               : html`
                   <${FeedMessageForm}
@@ -52,12 +39,12 @@ class Feed extends View {
                     autofocus=${false}
                   />
                 `}
-            ${s.searchTerm
-              ? html`<h2>${t('search')}: "${s.searchTerm}"</h2>`
+            ${this.props.keyword
+              ? html`<h2>${t('search')}: "${this.props.keyword}"</h2>`
               : html` <${OnboardingNotification} /> `}
             <${FeedComponent}
               scrollElement=${this.scrollElement.current}
-              keyword=${s.searchTerm}
+              keyword=${this.props.keyword}
               key=${this.props.index || 'feed'}
               index=${this.props.index}
               path=${path}

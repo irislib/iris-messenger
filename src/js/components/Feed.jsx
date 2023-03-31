@@ -193,6 +193,7 @@ class Feed extends Component {
 
   subscribe() {
     this.unsub?.();
+    clearTimeout(this.subscribeRetryTimeout);
     const results = new Map();
     let updated = false;
     const update = () => {
@@ -247,7 +248,7 @@ class Feed extends Component {
     };
     go();
     if (results.size === 0) {
-      setTimeout(go, 1000);
+      this.subscribeRetryTimeout = setTimeout(go, 1000);
     }
   }
 

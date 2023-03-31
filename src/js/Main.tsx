@@ -158,7 +158,7 @@ class Main extends Component<Props, ReactState> {
               <FeedList path="/" />
               <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />
-              <Feed path="/search/:term?/:type?" />
+              <Feed path="/search/:keyword?/:type?" />
               <Login path="/login" />
               <Notifications path="/notifications" />
               <Chat path="/chat/hashtag/:hashtag?" />

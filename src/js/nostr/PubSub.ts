@@ -110,7 +110,6 @@ const PubSub = {
 
     let unsubRelays;
     if (dev.useRelayPool !== false) {
-      // TODO relaypool should use only search relays if filters.keywords is defined
       unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened);
     } else {
       unsubRelays = Relays.subscribe(filter, sinceLastOpened);
@@ -139,7 +138,6 @@ const PubSub = {
   subscribeRelayPool(filter: Filter, sinceLastOpened: boolean) {
     let relays: any;
     if (filter.keywords) {
-      // search relays
       relays = Array.from(Relays.searchRelays.keys());
     } else {
       relays = Array.from(Relays.relays.keys());
