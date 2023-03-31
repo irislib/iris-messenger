@@ -18,8 +18,10 @@ export class MyDexie extends Dexie {
 
 const db = new MyDexie();
 
-export default {
+const IndexedDB = {
   db,
+  subscribedEventIds: new Set<string>(),
+  subscribedAuthors: new Set<string>(),
   subscriptions: new Set<string>(),
   saveQueue: [] as Event[],
   clear() {
@@ -78,28 +80,59 @@ export default {
 
     // other events to be loaded on demand
   },
+  subscribeToAuthors: throttle((limit) => {
+    const authors = Array.from(IndexedDB.subscribedAuthors.values());
+    IndexedDB.subscribedAuthors.clear();
+    db.events
+      .where('pubkey')
+      .anyOf(authors)
+      .limit(limit || 1000)
+      .each((event) => {
+        Events.handle(event, false, false);
+      });
+  }, 500),
+  subscribeToEventIds: throttle(() => {
+    const ids = Array.from(IndexedDB.subscribedEventIds.values());
+    IndexedDB.subscribedEventIds.clear();
+    db.events
+      .where('id')
+      .anyOf(ids)
+      .each((event) => {
+        Events.handle(event, false, false);
+      });
+  }, 500),
   subscribe(filter: Filter) {
     if (!filter) {
       return;
     }
+    if (filter['#e'] || filter['#p']) {
+      // currently inefficient lookups
+      return;
+    }
     let query: any = db.events;
     if (filter.ids) {
-      query = query.where('id').anyOf(filter.ids);
+      filter.ids.forEach((id) => {
+        this.subscribedEventIds.add(id);
+      });
+      this.subscribeToEventIds();
+      return;
+    } else if (filter.authors) {
+      filter.authors.forEach((author) => {
+        this.subscribedAuthors.add(author);
+      });
+      this.subscribeToAuthors();
+      return;
     } else {
       const stringifiedFilter = JSON.stringify(filter);
       if (this.subscriptions.has(stringifiedFilter)) {
         return;
       }
       this.subscriptions.add(stringifiedFilter);
-      if (filter.authors) {
-        query = query.where('pubkey').anyOf(filter.authors);
-      }
       if (filter.kinds) {
         query = query.where
           ? query.where('kind').anyOf(filter.kinds)
           : query.and((event) => filter.kinds.includes(event.kind));
       }
-      query = query.filter(matchFilter);
       if (filter.limit) {
         query = query.limit(filter.limit); // TODO these are not sorted by created_at desc
       }
@@ -109,3 +142,5 @@ export default {
     });
   },
 };
+
+export default IndexedDB;

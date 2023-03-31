@@ -94,14 +94,17 @@ const PubSub = {
 
     if (filter.ids) {
       filter.ids = filter.ids.filter((id) => !Events.seen.has(id));
+      if (!filter.ids.length) {
+        return () => {
+          /* noop */
+        };
+      }
       filter.ids.forEach((a) => {
         this.subscribedEventIds.add(a);
       });
     }
 
-    setTimeout(() => {
-      IndexedDB.subscribe(filter); // calls Events.handle which calls subscriptions with matching filters
-    });
+    IndexedDB.subscribe(filter);
 
     // TODO if asking event by id or profile, ask http proxy
 
