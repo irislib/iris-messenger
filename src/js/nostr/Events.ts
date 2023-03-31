@@ -46,6 +46,7 @@ const Events = {
   DEFAULT_GLOBAL_FILTER,
   getEventHash,
   db: events,
+  seen: new Set<string>(),
   deletedEvents: new Set<string>(),
   directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
   latestNotificationByTargetAndKind: new Map<string, string>(),
@@ -411,7 +412,7 @@ const Events = {
   },
   handle(event: Event & { id: string }, force = false, saveToIdb = true): boolean {
     if (!event) return;
-    if (!force && !!this.db.by('id', event.id)) {
+    if (!force && this.seen.has(event.id)) {
       return false;
     }
     if (!force && !this.acceptEvent(event)) {
@@ -436,6 +437,8 @@ const Events = {
       }
       return false;
     }
+
+    this.seen.add(event.id);
 
     this.handledMsgsPerSecond++;
 

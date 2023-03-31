@@ -23,8 +23,18 @@ let dev: any = {
 };
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
   useEventCache: false,
-
-  externalGetEventById: (id) => Events.db.by('id', id),
+  externalGetEventById: (id) =>
+    (Events.seen.has(id) && {
+      // make externalGetEventById take booleans instead of events?
+      sig: '',
+      id: '',
+      kind: 0,
+      tags: [],
+      content: '',
+      created_at: 0,
+      pubkey: '',
+    }) ||
+    undefined,
 });
 localState.get('dev').on((d) => {
   dev = d;

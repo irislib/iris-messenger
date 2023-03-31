@@ -307,7 +307,7 @@ const Relays = {
   },
   relayInit(url: string, subscribeAll = true) {
     const relay = relayInit(url, (id) => {
-      const have = !!Events.db.by('id', id);
+      const have = !!Events.seen.has(id);
       // console.log('have?', have);
       return have;
     });
