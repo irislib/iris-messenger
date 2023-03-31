@@ -336,6 +336,7 @@ class Note extends Component {
       this.isTooLong() &&
       Helpers.highlightEverything(text.trim(), this.props.event, {
         showMentionedMessages: !this.props.asInlineQuote,
+        onImageClick: (e) => this.imageClicked(e),
       });
 
     const time = new Date(this.props.event.created_at * 1000);
@@ -521,12 +522,9 @@ class Note extends Component {
 
   renderImageModal() {
     return (
-      <Modal centerVertically={true} onClose={() => this.setState({ showImageModal: false })}>
+      <Modal centerVertically={false} onClose={() => this.setState({ showImageModal: false })}>
         <ContentContainer>
           {this.props.meta.attachments.map((a, i) => {
-            if (i > 0 && !this.props.standalone && !this.state.showMore) {
-              return;
-            }
             return (
               <p>
                 <SafeImg style={{ maxHeight: '90vh', maxWidth: '90vw' }} src={a.data} />
