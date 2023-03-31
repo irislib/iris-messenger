@@ -142,7 +142,7 @@ const PubSub = {
     } else {
       relays = Array.from(Relays.relays.keys());
     }
-    if (dev.indexed03 && filter.kinds.every((k) => k === 0 || k === 3)) {
+    if (dev.indexed03 && filter.kinds?.every((k) => k === 0 || k === 3)) {
       relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
     }
     if (sinceLastOpened) {
