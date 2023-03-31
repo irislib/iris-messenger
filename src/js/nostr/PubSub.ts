@@ -89,15 +89,19 @@ const PubSub = {
       });
     }
 
+    //debugger;
+    callback && Events.find(filter, callback);
+
     if (filter.ids) {
+      filter.ids = filter.ids.filter((id) => !Events.seen.has(id));
       filter.ids.forEach((a) => {
         this.subscribedEventIds.add(a);
       });
     }
 
-    //debugger;
-    callback && Events.find(filter, callback);
-    IndexedDB.subscribe(filter); // calls Events.handle which calls subscriptions with matching filters
+    setTimeout(() => {
+      IndexedDB.subscribe(filter); // calls Events.handle which calls subscriptions with matching filters
+    });
 
     // TODO if asking event by id or profile, ask http proxy
 
