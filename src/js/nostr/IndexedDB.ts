@@ -110,13 +110,13 @@ const IndexedDB = {
       return;
     }
     let query: any = db.events;
-    if (filter.ids) {
+    if (filter.ids?.length) {
       filter.ids.forEach((id) => {
         this.subscribedEventIds.add(id);
       });
       this.subscribeToEventIds();
       return;
-    } else if (filter.authors) {
+    } else if (filter.authors?.length) {
       filter.authors.forEach((author) => {
         this.subscribedAuthors.add(author);
       });

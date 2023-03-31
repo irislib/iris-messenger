@@ -368,15 +368,21 @@ class Profile extends View {
         return;
       }
       res.json().then((json) => {
-        if (json && json.followerCount) {
-          this.setState({ followerCount: json.followerCount });
+        if (json) {
+          this.setState({
+            followerCount: json.followerCount || this.state.followercount,
+            followedUserCount: json.following?.length || this.state.followedUserCount,
+          });
         }
       });
     });
     const setFollowCounts = () => {
       address &&
         this.setState({
-          followedUserCount: SocialNetwork.followedByUser.get(address)?.size ?? 0,
+          followedUserCount: Math.max(
+            SocialNetwork.followedByUser.get(address)?.size ?? 0,
+            this.state.followedUserCount,
+          ),
           followerCount: Math.max(
             SocialNetwork.followersByUser.get(address)?.size ?? 0,
             this.state.followerCount,

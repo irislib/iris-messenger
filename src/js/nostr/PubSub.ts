@@ -144,12 +144,6 @@ const PubSub = {
     } else {
       relays = Array.from(Relays.relays.keys());
     }
-    // if any of filters[] doesn't have authors, we need to define default relays
-    /*
-    if (!filter.authors) {
-      relays = Relays.DEFAULT_RELAYS;
-    }
-    */
     if (dev.indexed03 && filter.kinds.every((k) => k === 0 || k === 3)) {
       relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
     }
