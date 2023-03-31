@@ -22,6 +22,7 @@ const Overlay = styled.div`
     props.centerVertically ? 'center' : props.justifyContent || 'flex-start'};
   align-items: center;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px 0;
 `;
 
