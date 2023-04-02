@@ -104,7 +104,7 @@ const PubSub = {
       });
     }
 
-    IndexedDB.subscribe(filter);
+    //IndexedDB.subscribe(filter);
 
     // TODO if asking event by id or profile, ask http proxy
 

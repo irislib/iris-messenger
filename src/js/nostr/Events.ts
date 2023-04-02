@@ -503,10 +503,10 @@ const Events = {
       const followDistance = SocialNetwork.followDistanceByUser.get(event.pubkey);
       if (followDistance <= 1) {
         // save all our own events and events from people we follow
-        IndexedDB.saveEvent(event as Event & { id: string });
+        // IndexedDB.saveEvent(event as Event & { id: string });
       } else if (followDistance <= 4 && [0, 3, 4].includes(event.kind)) {
         // save profiles and follow events up to follow distance 4
-        IndexedDB.saveEvent(event as Event & { id: string });
+        // IndexedDB.saveEvent(event as Event & { id: string });
       }
     }
 
