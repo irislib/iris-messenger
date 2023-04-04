@@ -287,6 +287,7 @@ class Feed extends Component {
           { authors: [this.props.nostrUser], kinds: [7], since },
           callback,
           false,
+          false,
         );
       } else {
         return PubSub.subscribe(
@@ -299,6 +300,7 @@ class Feed extends Component {
             }
             callback(event);
           },
+          false,
           false,
         );
       }
