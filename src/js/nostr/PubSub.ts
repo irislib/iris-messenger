@@ -104,19 +104,23 @@ const PubSub = {
       });
     }
 
-    //IndexedDB.subscribe(filter);
+    if (dev.indexedDbLoad !== false) {
+      IndexedDB.subscribe(filter);
+    }
 
     // TODO if asking event by id or profile, ask http proxy
 
     let unsubRelays;
-    if (dev.useRelayPool !== false) {
-      unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened);
-    } else {
-      unsubRelays = Relays.subscribe(filter, sinceLastOpened);
+    if (dev.askEventsFromRelays !== false) {
+      if (dev.useRelayPool !== false) {
+        unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened);
+      } else {
+        unsubRelays = Relays.subscribe(filter, sinceLastOpened);
+      }
     }
 
     return () => {
-      unsubRelays();
+      unsubRelays?.();
       if (currentSubscriptionId) {
         this.subscriptions.delete(currentSubscriptionId);
       }

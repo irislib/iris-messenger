@@ -1,38 +1,33 @@
 import Component from '../../BaseComponent';
 import localState from '../../LocalState';
-export default class Appearance extends Component {
+export default class DevSettings extends Component {
   render() {
+    const renderCheckbox = (key, label, defaultValue) => (
+      <p>
+        <input
+          type="checkbox"
+          id={key}
+          checked={this.state[key] !== !defaultValue}
+          onChange={(e) => localState.get('dev').get(key).put(e.target.checked)}
+        />
+        <label htmlFor={key}>{label}</label>
+      </p>
+    );
+
+    const checkboxes = [
+      { key: 'useRelayPool', label: 'Use RelayPool', defaultValue: false },
+      { key: 'logSubscriptions', label: 'Log RelayPool subscriptions', defaultValue: false },
+      { key: 'indexed03', label: 'Use central index server for kinds 0 and 3', defaultValue: false },
+      { key: 'indexedDbSave', label: 'Save events to IndexedDB', defaultValue: true },
+      { key: 'indexedDbLoad', label: 'Load events from IndexedDB', defaultValue: true },
+      { key: 'askEventsFromRelays', label: 'Ask events from relays', defaultValue: true },
+    ];
+
     return (
       <>
         <div class="centered-container">
           <h3>Dev</h3>
-          <p>
-            <input
-              type="checkbox"
-              id="useRelayPool"
-              checked={this.state.useRelayPool !== false}
-              onChange={(e) => localState.get('dev').get('useRelayPool').put(e.target.checked)}
-            />
-            <label htmlFor="useRelayPool">Use RelayPool</label>
-          </p>
-          <p>
-            <input
-              type="checkbox"
-              id="logSubscriptions"
-              checked={this.state.logSubscriptions}
-              onChange={(e) => localState.get('dev').get('logSubscriptions').put(e.target.checked)}
-            />
-            <label htmlFor="logSubscriptions">Log RelayPool subscriptions</label>
-          </p>
-          <p>
-            <input
-              type="checkbox"
-              id="indexed03"
-              checked={this.state.indexed03}
-              onChange={(e) => localState.get('dev').get('indexed03').put(e.target.checked)}
-            />
-            <label htmlFor="indexed03">Use central index server for kinds 0 and 3</label>
-          </p>
+          {checkboxes.map(({ key, label, defaultValue }) => renderCheckbox(key, label, defaultValue))}
         </div>
       </>
     );

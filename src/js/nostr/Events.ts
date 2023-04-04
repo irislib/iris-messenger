@@ -41,6 +41,11 @@ localState.get('globalFilter').on((r) => {
   globalFilter = r;
 });
 
+let dev: any = {};
+localState.get('dev').on((d) => {
+  dev = d;
+});
+
 // TODO separate files for different types of events
 const Events = {
   DEFAULT_GLOBAL_FILTER,
@@ -503,10 +508,14 @@ const Events = {
       const followDistance = SocialNetwork.followDistanceByUser.get(event.pubkey);
       if (followDistance <= 1) {
         // save all our own events and events from people we follow
-        // IndexedDB.saveEvent(event as Event & { id: string });
+        if (dev.indexedDbSave !== false) {
+          IndexedDB.saveEvent(event as Event & { id: string });
+        }
       } else if (followDistance <= 4 && [0, 3, 4].includes(event.kind)) {
         // save profiles and follow events up to follow distance 4
-        // IndexedDB.saveEvent(event as Event & { id: string });
+        if (dev.indexedDbSave !== false) {
+          IndexedDB.saveEvent(event as Event & { id: string });
+        }
       }
     }
 
