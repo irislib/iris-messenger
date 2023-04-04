@@ -5,8 +5,5 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    volumes:
-      - .:/iris-messenger
-      - /iris-messenger/node_modules
     ports:
       - 8080:8080
