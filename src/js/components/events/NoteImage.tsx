@@ -7,6 +7,8 @@ import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
 import Modal from '../modal/Modal';
 import SafeImg from '../SafeImg';
+import EventComponent from './EventComponent';
+import Events from "../../nostr/Events";
 
 const fadeIn = keyframes`
   from {
@@ -51,11 +53,9 @@ const GalleryImage = styled.a`
 export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
   const [showImageModal, setShowImageModal] = useState(false);
 
-  // get first image url from event content
   if (props.event.kind !== 1) {
-    // TODO handle kind 6 repost
-    console.log('not a note', props.event);
-    return null;
+    const id = Events.getEventReplyingTo(props.event);
+    return <EventComponent id={id} renderAs="NoteImage" />;
   }
   const attachments = [];
   const urls = props.event.content?.match(/(https?:\/\/[^\s]+)/g);
