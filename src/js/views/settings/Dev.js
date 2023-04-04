@@ -15,7 +15,7 @@ export default class DevSettings extends Component {
     );
 
     const checkboxes = [
-      { key: 'useRelayPool', label: 'Use RelayPool', defaultValue: false },
+      { key: 'useRelayPool', label: 'Use RelayPool', defaultValue: true },
       { key: 'logSubscriptions', label: 'Log RelayPool subscriptions', defaultValue: false },
       {
         key: 'indexed03',
