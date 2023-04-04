@@ -17,7 +17,11 @@ export default class DevSettings extends Component {
     const checkboxes = [
       { key: 'useRelayPool', label: 'Use RelayPool', defaultValue: false },
       { key: 'logSubscriptions', label: 'Log RelayPool subscriptions', defaultValue: false },
-      { key: 'indexed03', label: 'Use central index server for kinds 0 and 3', defaultValue: false },
+      {
+        key: 'indexed03',
+        label: 'Use central index server for kinds 0 and 3',
+        defaultValue: true,
+      },
       { key: 'indexedDbSave', label: 'Save events to IndexedDB', defaultValue: true },
       { key: 'indexedDbLoad', label: 'Load events from IndexedDB', defaultValue: true },
       { key: 'askEventsFromRelays', label: 'Ask events from relays', defaultValue: true },
@@ -27,7 +31,9 @@ export default class DevSettings extends Component {
       <>
         <div class="centered-container">
           <h3>Dev</h3>
-          {checkboxes.map(({ key, label, defaultValue }) => renderCheckbox(key, label, defaultValue))}
+          {checkboxes.map(({ key, label, defaultValue }) =>
+            renderCheckbox(key, label, defaultValue),
+          )}
         </div>
       </>
     );

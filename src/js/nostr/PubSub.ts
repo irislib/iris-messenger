@@ -73,6 +73,7 @@ const PubSub = {
     filter: Filter,
     callback?: (event: Event) => void,
     sinceLastOpened = false,
+    mergeSubscriptions = true,
   ): Unsubscribe {
     let currentSubscriptionId;
     if (callback) {
@@ -113,7 +114,7 @@ const PubSub = {
     let unsubRelays;
     if (dev.askEventsFromRelays !== false) {
       if (dev.useRelayPool !== false) {
-        unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened);
+        unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened, mergeSubscriptions);
       } else {
         unsubRelays = Relays.subscribe(filter, sinceLastOpened);
       }
@@ -139,14 +140,14 @@ const PubSub = {
     }
   },
 
-  subscribeRelayPool(filter: Filter, sinceLastOpened: boolean) {
+  subscribeRelayPool(filter: Filter, sinceLastOpened: boolean, mergeSubscriptions: boolean) {
     let relays: any;
     if (filter.keywords) {
       relays = Array.from(Relays.searchRelays.keys());
     } else {
       relays = Array.from(Relays.relays.keys());
     }
-    if (dev.indexed03 && filter.kinds?.every((k) => k === 0 || k === 3)) {
+    if (dev.indexed03 !== false && filter.kinds?.every((k) => k === 0 || k === 3)) {
       relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
     }
     if (sinceLastOpened) {
@@ -158,7 +159,7 @@ const PubSub = {
       (event) => {
         Events.handle(event);
       },
-      100,
+      mergeSubscriptions ? 100 : 0,
     );
   },
 };

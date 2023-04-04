@@ -362,7 +362,15 @@ class Profile extends View {
   }
 
   getNostrProfile(address, nostrAddress) {
-    this.unsub = PubSub.subscribe({ authors: [address], kinds: [0, 3] }, undefined, false);
+    this.unsub = PubSub.subscribe(
+      {
+        authors: [address],
+        kinds: [0, 3],
+      },
+      undefined,
+      false,
+      false,
+    );
     fetch(`https://rbr.bio/${address}/info.json`).then((res) => {
       if (!res.ok) {
         return;
