@@ -4,9 +4,6 @@ RUN apt-get update && apt-get install -y python3 build-essential
 
 COPY package.json .
 COPY yarn.lock .
-
-RUN yarn
-
 COPY . .
 
 CMD [ "yarn", "dev-docker" ]
