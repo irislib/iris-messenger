@@ -25,6 +25,11 @@ export default class DevSettings extends Component {
       { key: 'indexedDbSave', label: 'Save events to IndexedDB', defaultValue: true },
       { key: 'indexedDbLoad', label: 'Load events from IndexedDB', defaultValue: true },
       { key: 'askEventsFromRelays', label: 'Ask events from relays', defaultValue: true },
+      {
+        key: 'loadRepliesAndReactions',
+        label: 'Load note replies and reactions',
+        defaultValue: true,
+      },
     ];
 
     return (

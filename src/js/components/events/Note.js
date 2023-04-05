@@ -38,6 +38,9 @@ l1.2-2.4c0.1-0.2,0-0.5-0.2-0.6c-2.3-1.6-3.7-4-3.7-6.5c0-4.7,4.7-8.5,10.4-8.5S22.
   </svg>
 );
 
+let dev = {};
+localState.get('dev').on((d) => (dev = d));
+
 const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -284,10 +287,12 @@ class Note extends Component {
       });
     });
     this.subscriptions.push(unsub);
-    const unsub2 = Events.getRepliesAndReactions(event.id, (...args) =>
-      this.handleRepliesAndReactions(...args),
-    );
-    this.subscriptions.push(unsub2);
+    if (dev.loadRepliesAndReactions !== false) {
+      const unsub2 = Events.getRepliesAndReactions(event.id, (...args) =>
+        this.handleRepliesAndReactions(...args),
+      );
+      this.subscriptions.push(unsub2);
+    }
 
     // find .jpg .jpeg .gif .png .webp urls in msg.text and add them to msg.attachments
     let text = this.props.event.content;
