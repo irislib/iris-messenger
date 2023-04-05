@@ -146,49 +146,55 @@ export default {
       });
     }
 
-    const twitterRegex = /(?:^|\s)(?:@)?(https?:\/\/twitter.com\/\w+\/status\/\d+\S*)(?![\w/])/g;
-    replacedText = reactStringReplace(replacedText, twitterRegex, (match, i) => {
-      return (
-        <iframe
-          style={{
-            'max-width': '350px',
-            height: '450px',
-            'background-color': 'white',
-            display: 'block',
-          }}
-          key={match + i}
-          scrolling="no"
-          height={250}
-          width={550}
-          src={`https://twitframe.com/show?url=${encodeURIComponent(match)}`}
-        />
-      );
-    });
+    if (settings.enableTwitter !== false) {
+      const twitterRegex = /(?:^|\s)(?:@)?(https?:\/\/twitter.com\/\w+\/status\/\d+\S*)(?![\w/])/g;
+      replacedText = reactStringReplace(replacedText, twitterRegex, (match, i) => {
+        return (
+          <iframe
+            style={{
+              'max-width': '350px',
+              height: '450px',
+              'background-color': 'white',
+              display: 'block',
+            }}
+            key={match + i}
+            scrolling="no"
+            height={250}
+            width={550}
+            src={`https://twitframe.com/show?url=${encodeURIComponent(match)}`}
+          />
+        );
+      });
+    }
 
-    const videoRegex = /(https?:\/\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm))\b/gi;
-    replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
-      return (
-        <video
-          key={match + i}
-          src={match}
-          muted
-          autoPlay={!this.isMobile && settings.autoplayVideos !== false}
-          playsInline
-          controls
-          loop
-          onLoadedData={(e) => {
-            if (!this.isMobile && settings.autoplayVideos) {
-              (e.target as HTMLVideoElement).play();
-            }
-          }}
-        />
-      );
-    });
+    if (settings.enableVideos !== false) {
+      const videoRegex = /(https?:\/\/\S+\.(?:mp4|mkv|avi|flv|wmv|mov|webm))\b/gi;
+      replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
+        return (
+          <video
+            key={match + i}
+            src={match}
+            muted
+            autoPlay={!this.isMobile && settings.autoplayVideos !== false}
+            playsInline
+            controls
+            loop
+            onLoadedData={(e) => {
+              if (!this.isMobile && settings.autoplayVideos) {
+                (e.target as HTMLVideoElement).play();
+              }
+            }}
+          />
+        );
+      });
+    }
 
-    const audioRegex = /(https?:\/\/\S+\.(?:mp3|wav|ogg|flac))\b/gi;
-    replacedText = reactStringReplace(replacedText, audioRegex, (match, i) => {
-      return <audio key={match + i} src={match} controls={true} loop={true} />;
-    });
+    if (settings.enableAudio !== false) {
+      const audioRegex = /(https?:\/\/\S+\.(?:mp3|wav|ogg|flac))\b/gi;
+      replacedText = reactStringReplace(replacedText, audioRegex, (match, i) => {
+        return <audio key={match + i} src={match} controls={true} loop={true} />;
+      });
+    }
 
     if (settings.enableYoutube !== false) {
       const youtubeRegex =

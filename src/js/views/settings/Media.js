@@ -17,8 +17,12 @@ export default class Media extends Component {
 
   render() {
     const embedSettings = [
+      { setting: 'enableImages', label: 'Images' },
+      { setting: 'enableVideos', label: 'Videos' },
+      { setting: 'enableAudio', label: 'Audio' },
       { setting: 'enableWebtorrent', label: 'Webtorrent' },
       { setting: 'enableYoutube', label: 'YouTube' },
+      { setting: 'enableTwitter', label: 'Twitter' },
       { setting: 'enableInstagram', label: 'Instagram' },
       { setting: 'enableSpotify', label: 'Spotify' },
       { setting: 'enableTidal', label: 'Tidal' },
