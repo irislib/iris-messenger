@@ -524,7 +524,7 @@ class Note extends Component {
     return (
       <Modal centerVertically={false} onClose={() => this.setState({ showImageModal: false })}>
         <ContentContainer>
-          {this.props.meta.attachments.map((a, i) => {
+          {this.props.meta.attachments.map((a) => {
             return (
               <p>
                 <SafeImg style={{ maxHeight: '90vh', maxWidth: '90vw' }} src={a.data} />

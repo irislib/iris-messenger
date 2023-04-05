@@ -15,7 +15,7 @@ import FeedList from './views/FeedList';
 import Follows from './views/Follows';
 import Login from './views/Login';
 import LogoutConfirmation from './views/LogoutConfirmation';
-import Message from './views/Message';
+import Note from './views/Note';
 import Notifications from './views/Notifications';
 import Profile from './views/Profile';
 import Settings from './views/settings/Settings';
@@ -112,7 +112,7 @@ class Main extends Component<Props, ReactState> {
     // if id begins with "note", it's a post. otherwise it's a profile.
     const NoteOrProfile = (params: { id?: string; path: string }) => {
       if (params.id.startsWith('note')) {
-        return <Message id={params.id} />;
+        return <Note id={params.id} />;
       }
       return <MyProfile id={params.id} tab="posts" path={params.path} />;
     };
@@ -164,7 +164,7 @@ class Main extends Component<Props, ReactState> {
               <Chat path="/chat/hashtag/:hashtag?" />
               <Chat path="/chat/:id?" />
               <Chat path="/chat/new/:id" />
-              <Message path="/post/:id+" />
+              <Note path="/post/:id+" />
               <Torrent path="/torrent/:id+" />
               <About path="/about" />
               <Settings path="/settings/:page?" />

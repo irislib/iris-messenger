@@ -3,12 +3,13 @@ import { route } from 'preact-router';
 import styled, { css, keyframes } from 'styled-components';
 
 import { Event } from '../../lib/nostr-tools';
+import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
 import Modal from '../modal/Modal';
 import SafeImg from '../SafeImg';
+
 import EventComponent from './EventComponent';
-import Events from "../../nostr/Events";
 
 const fadeIn = keyframes`
   from {

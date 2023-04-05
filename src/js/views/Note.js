@@ -7,7 +7,7 @@ import { translate as t } from '../translations/Translation';
 
 import View from './View';
 
-class Message extends View {
+class Note extends View {
   constructor() {
     super();
     this.class = 'public-messages-view';
@@ -57,4 +57,4 @@ class Message extends View {
   }
 }
 
-export default Message;
+export default Note;
