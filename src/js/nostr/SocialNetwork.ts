@@ -125,7 +125,10 @@ export default {
     }
     if (this.followedByUser.get(myPub)?.has(follower)) {
       if (!PubSub.subscribedAuthors.has(followedUser)) {
-        PubSub.subscribe({ authors: [followedUser] }, undefined, true);
+        setTimeout(() => {
+          // recursion break
+          PubSub.subscribe({ authors: [followedUser] }, undefined, true);
+        }, 0);
       }
     }
   },
