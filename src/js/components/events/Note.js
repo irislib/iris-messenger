@@ -38,8 +38,11 @@ l1.2-2.4c0.1-0.2,0-0.5-0.2-0.6c-2.3-1.6-3.7-4-3.7-6.5c0-4.7,4.7-8.5,10.4-8.5S22.
   </svg>
 );
 
-let dev = {};
-localState.get('dev').on((d) => (dev = d));
+let loadRepliesAndReactions = true;
+localState
+  .get('settings')
+  .get('loadRepliesAndReactions')
+  .on((v) => (loadRepliesAndReactions = v));
 
 const ContentContainer = styled.div`
   display: flex;
@@ -287,7 +290,7 @@ class Note extends Component {
       });
     });
     this.subscriptions.push(unsub);
-    if (dev.loadRepliesAndReactions !== false) {
+    if (loadRepliesAndReactions !== false) {
       const unsub2 = Events.getRepliesAndReactions(event.id, (...args) =>
         this.handleRepliesAndReactions(...args),
       );

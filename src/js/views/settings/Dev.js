@@ -17,11 +17,6 @@ export default class DevSettings extends Component {
     // TODO reset button
 
     const checkboxes = [
-      {
-        key: 'loadRepliesAndReactions',
-        label: 'Load note replies and reactions',
-        defaultValue: true,
-      },
       { key: 'useRelayPool', label: 'Use RelayPool', defaultValue: true },
       { key: 'logSubscriptions', label: 'Log RelayPool subscriptions', defaultValue: false },
       {

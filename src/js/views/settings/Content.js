@@ -2,7 +2,7 @@ import Component from '../../BaseComponent';
 import localState from '../../LocalState';
 import { translate as t } from '../../translations/Translation';
 
-export default class Media extends Component {
+export default class Content extends Component {
   constructor() {
     super();
     this.id = 'settings';
@@ -16,11 +16,18 @@ export default class Media extends Component {
   }
 
   render() {
+    const noteSettings = [
+      // { setting: 'enableMarkdown', label: 'Markdown' },
+      { setting: 'loadRepliesAndReactions', label: 'Replies and reactions' },
+    ];
     const embedSettings = [
       { setting: 'enableImages', label: 'Images' },
-      { setting: 'enableVideos', label: 'Videos' },
       { setting: 'enableAudio', label: 'Audio' },
+      { setting: 'enableVideos', label: 'Videos' },
+      { setting: 'autoplayVideos', label: 'Autoplay videos' },
       { setting: 'enableWebtorrent', label: 'Webtorrent' },
+    ];
+    const thirdPartyEmbedSettings = [
       { setting: 'enableYoutube', label: 'YouTube' },
       { setting: 'enableTwitter', label: 'Twitter' },
       { setting: 'enableInstagram', label: 'Instagram' },
@@ -32,25 +39,46 @@ export default class Media extends Component {
     return (
       <>
         <div class="centered-container">
-          <h2>{t('media')}</h2>
-          <h3>{t('playback')}</h3>
-          <p>
-            <input
-              type="checkbox"
-              checked={this.state.settings.autoplayVideos !== false}
-              onChange={() =>
-                localState
-                  .get('settings')
-                  .get('autoplayVideos')
-                  .put(!(this.state.settings.autoplayVideos !== false))
-              }
-              id="autoplayVideos"
-            />
-            <label htmlFor="autoplayVideos">{t('autoplay_videos')}</label>
-          </p>
+          <h2>{t('content')}</h2>
+
+          <h3>{t('notes')}</h3>
+          {noteSettings.map(({ setting, label }) => (
+            <p key={setting}>
+              <input
+                type="checkbox"
+                checked={this.state.settings[setting] !== false}
+                onChange={() =>
+                  localState
+                    .get('settings')
+                    .get(setting)
+                    .put(!(this.state.settings[setting] !== false))
+                }
+                id={setting}
+              />
+              <label htmlFor={setting}>{label}</label>
+            </p>
+          ))}
 
           <h3>{t('embeds')}</h3>
           {embedSettings.map(({ setting, label }) => (
+            <p key={setting}>
+              <input
+                type="checkbox"
+                checked={this.state.settings[setting] !== false}
+                onChange={() =>
+                  localState
+                    .get('settings')
+                    .get(setting)
+                    .put(!(this.state.settings[setting] !== false))
+                }
+                id={setting}
+              />
+              <label htmlFor={setting}>{label}</label>
+            </p>
+          ))}
+
+          <h3>{t('3rd_party_embeds')}</h3>
+          {thirdPartyEmbedSettings.map(({ setting, label }) => (
             <p key={setting}>
               <input
                 type="checkbox"
