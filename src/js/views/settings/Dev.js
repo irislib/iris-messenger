@@ -14,7 +14,14 @@ export default class DevSettings extends Component {
       </p>
     );
 
+    // TODO reset button
+
     const checkboxes = [
+      {
+        key: 'loadRepliesAndReactions',
+        label: 'Load note replies and reactions',
+        defaultValue: true,
+      },
       { key: 'useRelayPool', label: 'Use RelayPool', defaultValue: true },
       { key: 'logSubscriptions', label: 'Log RelayPool subscriptions', defaultValue: false },
       {
@@ -25,17 +32,13 @@ export default class DevSettings extends Component {
       { key: 'indexedDbSave', label: 'Save events to IndexedDB', defaultValue: true },
       { key: 'indexedDbLoad', label: 'Load events from IndexedDB', defaultValue: true },
       { key: 'askEventsFromRelays', label: 'Ask events from relays', defaultValue: true },
-      {
-        key: 'loadRepliesAndReactions',
-        label: 'Load note replies and reactions',
-        defaultValue: true,
-      },
     ];
 
     return (
       <>
         <div class="centered-container">
-          <h3>Dev</h3>
+          <h3>Developer</h3>
+          <p>Settings intended for Iris developers.</p>
           {checkboxes.map(({ key, label, defaultValue }) =>
             renderCheckbox(key, label, defaultValue),
           )}

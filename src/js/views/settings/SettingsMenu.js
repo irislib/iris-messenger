@@ -14,6 +14,7 @@ const SETTINGS = {
   backup: 'backup',
   language: 'language',
   social_network: 'social_network',
+  dev: 'developer',
 };
 
 if (['iris.to', 'beta.iris.to', 'localhost'].includes(window.location.hostname)) {
