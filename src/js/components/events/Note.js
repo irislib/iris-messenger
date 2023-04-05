@@ -472,6 +472,14 @@ class Note extends Component {
   }
 
   renderReactionBtns() {
+    if (!loadRepliesAndReactions) {
+      if (this.props.asQuote) {
+        return <div style={{ height: '15px' }} />;
+      } else {
+        return null;
+      }
+    }
+
     const s = this.state;
     return (
       <div className="below-text">
@@ -739,7 +747,7 @@ class Note extends Component {
                   {t(`show_${s.showMore ? 'less' : 'more'}`)}
                 </a>
               )}
-              {!this.props.asInlineQuote && loadRepliesAndReactions && this.renderReactionBtns()}
+              {!this.props.asInlineQuote && this.renderReactionBtns()}
               {s.showLikes && this.renderLikes()}
               {s.showZaps && this.renderZaps()}
               {s.showReposts && this.renderReposts()}
