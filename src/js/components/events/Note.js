@@ -739,7 +739,7 @@ class Note extends Component {
                   {t(`show_${s.showMore ? 'less' : 'more'}`)}
                 </a>
               )}
-              {!this.props.asInlineQuote && this.renderReactionBtns()}
+              {!this.props.asInlineQuote && loadRepliesAndReactions && this.renderReactionBtns()}
               {s.showLikes && this.renderLikes()}
               {s.showZaps && this.renderZaps()}
               {s.showReposts && this.renderReposts()}
