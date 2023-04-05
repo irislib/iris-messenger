@@ -35,18 +35,7 @@ class EventComponent extends Component {
     if (this.state.retrieving) {
       this.setState({ retrieving: false });
     }
-    const unsub = SocialNetwork.getProfile(event.pubkey, (profile) => {
-      if (!profile) return;
-      let lightning = profile.lud16 || profile.lud06;
-      if (lightning && !lightning.startsWith('lightning:')) {
-        lightning = `lightning:${lightning}`;
-      }
-      const meta = this.state.meta || {};
-      meta.name = profile.display_name || profile.name;
-      meta.lightning = lightning;
-      this.setState({ meta });
-    });
-    this.subscriptions.push(unsub);
+
     const replyingTo = Events.getNoteReplyingTo(event);
 
     const meta = {
