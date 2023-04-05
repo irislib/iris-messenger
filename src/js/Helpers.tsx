@@ -23,6 +23,7 @@ const hashtagRegex = /(#\w+)/g;
 let settings: any = {};
 localState.get('settings').on((s) => (settings = s));
 let existingIrisToAddress: any = {};
+localState.get('settings').put({}); // ?
 localState.get('existingIrisToAddress').on((a) => (existingIrisToAddress = a));
 
 function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {

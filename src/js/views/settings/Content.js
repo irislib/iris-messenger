@@ -20,14 +20,12 @@ export default class Content extends Component {
       // { setting: 'enableMarkdown', label: 'Markdown' },
       { setting: 'loadRepliesAndReactions', label: 'Replies and reactions' },
     ];
-    const embedSettings = [
+    const mediaSettings = [
       { setting: 'enableImages', label: 'Images' },
       { setting: 'enableAudio', label: 'Audio' },
       { setting: 'enableVideos', label: 'Videos' },
       { setting: 'autoplayVideos', label: 'Autoplay videos' },
       { setting: 'enableWebtorrent', label: 'Webtorrent' },
-    ];
-    const thirdPartyEmbedSettings = [
       { setting: 'enableYoutube', label: 'YouTube' },
       { setting: 'enableTwitter', label: 'Twitter' },
       { setting: 'enableInstagram', label: 'Instagram' },
@@ -59,26 +57,8 @@ export default class Content extends Component {
             </p>
           ))}
 
-          <h3>{t('embeds')}</h3>
-          {embedSettings.map(({ setting, label }) => (
-            <p key={setting}>
-              <input
-                type="checkbox"
-                checked={this.state.settings[setting] !== false}
-                onChange={() =>
-                  localState
-                    .get('settings')
-                    .get(setting)
-                    .put(!(this.state.settings[setting] !== false))
-                }
-                id={setting}
-              />
-              <label htmlFor={setting}>{label}</label>
-            </p>
-          ))}
-
-          <h3>{t('3rd_party_embeds')}</h3>
-          {thirdPartyEmbedSettings.map(({ setting, label }) => (
+          <h3>{t('media')}</h3>
+          {mediaSettings.map(({ setting, label }) => (
             <p key={setting}>
               <input
                 type="checkbox"
