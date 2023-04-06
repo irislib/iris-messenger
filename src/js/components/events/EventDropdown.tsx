@@ -1,6 +1,8 @@
 import { useState } from 'preact/hooks';
 
+import Helpers from '../../Helpers';
 import { Event } from '../../lib/nostr-tools';
+import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
@@ -38,16 +40,35 @@ const EventDropdown = (props: EventDropdownProps) => {
     }
   };
 
-  const onMute = (e: any) => {
-    // TODO mute
+  const onMute = (e) => {
+    e.preventDefault();
+    localState.get('mutedNotes').get(props.id).put(!muted);
   };
 
-  const report = (e: any) => {
-    // TODO report
+  const report = (e) => {
+    e.preventDefault();
+    if (confirm('Publicly report and hide message?')) {
+      const hexId = Key.toNostrHexAddress(props.id);
+      if (hexId) {
+        Events.publish({
+          kind: 5,
+          content: 'reported',
+          tags: [
+            ['e', hexId],
+            ['p', props.event.pubkey],
+          ],
+        });
+        // this.setState({ msg: null });
+      }
+    }
   };
 
   const translate = (e: any) => {
-    // TODO translate
+    e.preventDefault();
+    Helpers.translateText(props.event.content).then((res) => {
+      // this.setState({ translatedText: res.translatedText });
+      // TODO callback to parent
+    });
   };
 
   const onBroadcast = (e: any) => {

@@ -1,7 +1,7 @@
 import Dexie, { Table } from 'dexie';
 import { throttle } from 'lodash';
 
-import { Event, Filter, matchFilter } from '../lib/nostr-tools';
+import { Event, Filter } from '../lib/nostr-tools';
 
 import Events from './Events';
 import Key from './Key';

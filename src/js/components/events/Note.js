@@ -11,10 +11,6 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
-import Block from '../buttons/Block';
-import Copy from '../buttons/Copy';
-import Follow from '../buttons/Follow';
-import Dropdown from '../Dropdown';
 import FeedMessageForm from '../FeedMessageForm';
 import Identicon from '../Identicon';
 import Modal from '../modal/Modal';
@@ -24,6 +20,7 @@ import SafeImg from '../SafeImg';
 import Torrent from '../Torrent';
 
 import EventComponent from './EventComponent';
+import EventDropdown from './EventDropdown';
 
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
@@ -108,35 +105,6 @@ class Note extends Component {
     }
   }
 
-  onDelete(e) {
-    e.preventDefault();
-    if (confirm('Delete message?')) {
-      const hexId = Key.toNostrHexAddress(this.props.event.id);
-      if (hexId) {
-        Events.publish({
-          kind: 5,
-          content: 'deleted',
-          tags: [['e', hexId]],
-        });
-        this.setState({ msg: null });
-      }
-    }
-  }
-
-  onBroadcast(e) {
-    // republish message on nostr
-    e.preventDefault();
-    const hexId = Key.toNostrHexAddress(this.props.event.id);
-    if (hexId) {
-      const event = Events.db.by('id', hexId);
-      if (event) {
-        // TODO indicate to user somehow
-        console.log('broadcasting', hexId);
-        Events.publish(event);
-      }
-    }
-  }
-
   imageClicked(event) {
     event.preventDefault();
     this.setState({ showImageModal: true });
@@ -172,94 +140,9 @@ class Note extends Component {
     }
   }
 
-  onMute(e) {
-    e.preventDefault();
-    localState.get('mutedNotes').get(this.hexId).put(!this.state.muted);
-  }
-
-  report(e) {
-    e.preventDefault();
-    if (confirm('Publicly report and hide message?')) {
-      const hexId = Key.toNostrHexAddress(this.props.event.id);
-      if (hexId) {
-        Events.publish({
-          kind: 5,
-          content: 'reported',
-          tags: [
-            ['e', hexId],
-            ['p', this.props.event.pubkey],
-          ],
-        });
-        this.setState({ msg: null });
-      }
-    }
-  }
-
-  translate(e) {
-    e.preventDefault();
-    Helpers.translateText(this.props.event.content).then((res) => {
-      this.setState({ translatedText: res.translatedText });
-    });
-  }
-
   renderDropdown() {
-    // maybe this should be rendered only when it's opened?
-    if (this.props.asInlineQuote) {
-      return '';
-    }
-    const event = this.props.event;
-    const url = `https://iris.to/${Key.toNostrBech32Address(event.id, 'note')}`;
-    return (
-      <div className="msg-menu-btn">
-        <Dropdown>
-          <Copy
-            key={`${event.id}copy_link`}
-            text={t('copy_link')}
-            title="Note link"
-            copyStr={url}
-          />
-          <Copy
-            key={`${event.id}copy_id`}
-            text={t('copy_note_ID')}
-            title="Note ID"
-            copyStr={Key.toNostrBech32Address(event.id, 'note')}
-          />
-          <a href="#" onClick={(e) => this.onMute(e)}>
-            {this.state.muted ? t('unmute') : t('mute')}
-          </a>
-          {event ? (
-            <>
-              <a href="#" onClick={(e) => this.onBroadcast(e)}>
-                {t('resend_to_relays')}
-              </a>
-              <a href="#" onClick={(e) => this.translate(e)}>
-                {t('translate')}
-              </a>
-              <Copy
-                key={`${event.id}copyRaw`}
-                text={t('copy_raw_data')}
-                title="Message raw data"
-                copyStr={JSON.stringify(event, null, 2)}
-              />
-              {this.props.meta.isMine ? (
-                <a href="#" onClick={(e) => this.onDelete(e)}>
-                  {t('delete')}
-                </a>
-              ) : (
-                <>
-                  <a href="#" onClick={(e) => this.report(e)}>
-                    {t('report_public')}
-                  </a>
-                  <Follow id={event?.pubkey} showName={true} />
-                  <span onClick={() => this.setState({ msg: null })}>
-                    <Block id={event?.pubkey} showName={true} />
-                  </span>
-                </>
-              )}
-            </>
-          ) : null}
-        </Dropdown>
-      </div>
+    return this.props.asInlineQuote ? null : (
+      <EventDropdown id={this.props.event.id} event={this.props.event} />
     );
   }
 

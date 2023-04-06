@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 
-import Component from '../../BaseComponent';
 import Icons from '../../Icons';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -112,7 +111,7 @@ const EventComponent = (props: EventComponentProps) => {
     let className = 'msg';
     if (props.asReply) className += ' reply';
     if (props.standalone) className += ' standalone';
-    const asQuote = props.asQuote || (props.showReplies && state.sortedReplies.length);
+    const asQuote = props.asQuote || (props.showReplies && state.sortedReplies?.length);
     if (asQuote) className += ' quote';
     return className;
   };
