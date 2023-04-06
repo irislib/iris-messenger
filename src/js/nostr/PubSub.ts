@@ -170,7 +170,9 @@ const PubSub = {
       [filter],
       relays,
       (event) => {
-        Events.handle(event);
+        setTimeout(() => {
+          Events.handle(event);
+        }, 0);
       },
       mergeSubscriptions ? 100 : 0,
     );
