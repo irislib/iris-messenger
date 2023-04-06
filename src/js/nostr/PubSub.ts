@@ -1,3 +1,4 @@
+import { throttle } from 'lodash';
 import { RelayPool } from 'nostr-relaypool';
 
 import { Event, Filter, matchFilter } from '../lib/nostr-tools';
@@ -62,6 +63,9 @@ const PubSub = {
   subscriptions: new Map<number, Subscription>(),
   subscribedEventIds: new Set<string>(),
   subscribedAuthors: new Set<string>(), // all events by authors
+  log: throttle((...args) => {
+    console.log(...args);
+  }, 1000),
   /**
    * Internal subscription. First looks up in memory, then in IndexedDB, then in http proxy, then in relays.
    * @param filters
@@ -83,6 +87,15 @@ const PubSub = {
         callback,
       });
     }
+
+    this.log(
+      'subscriptions',
+      this.subscriptions.size,
+      'subscribedEventIds',
+      this.subscribedEventIds.size,
+      'subscribedAuthors',
+      this.subscribedAuthors.size,
+    );
 
     if (filter.authors) {
       filter.authors.forEach((a) => {
@@ -144,7 +157,7 @@ const PubSub = {
     let relays: any;
     if (filter.keywords) {
       relays = Array.from(Relays.searchRelays.keys());
-    } else if (mergeSubscriptions && filter.authors?.length === 1) {
+    } else if (mergeSubscriptions || filter.authors?.length !== 1) {
       relays = Array.from(Relays.relays.keys());
     }
     if (dev.indexed03 !== false && filter.kinds?.every((k) => k === 0 || k === 3)) {

@@ -263,6 +263,9 @@ const Events = {
     }
   },
   handleMetadata(event: Event) {
+    if (!event.content?.length) {
+      return;
+    }
     try {
       const existing = SocialNetwork.profiles.get(event.pubkey);
       if (existing?.created_at >= event.created_at) {
@@ -679,6 +682,7 @@ const Events = {
     }
     return PubSub.subscribe({ '#e': [id] }, callback, false);
   },
+  // TODO: return Unsubscribe
   getEventById(id: string, proxyFirst = false, cb?: (event: Event) => void) {
     const event = this.db.by('id', id);
     if (cb && event) {

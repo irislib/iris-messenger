@@ -137,12 +137,7 @@ export default {
     if (opts.showMentionedMessages) {
       replacedText = reactStringReplace(replacedText, noteRegex, (match, i) => {
         return (
-          <EventComponent
-            key={match + i}
-            id={Key.toNostrHexAddress(match)}
-            showBtns={false}
-            asInlineQuote={true}
-          />
+          <EventComponent key={match + i} id={Key.toNostrHexAddress(match)} asInlineQuote={true} />
         );
       });
     }
@@ -459,12 +454,7 @@ export default {
             );
           } else if (tag[0] === 'e') {
             return opts.showMentionedMessages ? (
-              <EventComponent
-                key={tagTarget + i}
-                id={tagTarget}
-                showBtns={false}
-                asInlineQuote={true}
-              />
+              <EventComponent key={tagTarget + i} id={tagTarget} asInlineQuote={true} />
             ) : (
               <a href={`/${Key.toNostrBech32Address(tagTarget, 'note')}`}>{tag[1]}</a>
             );
