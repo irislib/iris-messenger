@@ -129,7 +129,7 @@ const PubSub = {
       if (dev.useRelayPool !== false) {
         unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened, mergeSubscriptions);
       } else {
-        unsubRelays = Relays.subscribe(filter, sinceLastOpened);
+        unsubRelays = Relays.subscribe(filter, sinceLastOpened, mergeSubscriptions);
       }
     }
 

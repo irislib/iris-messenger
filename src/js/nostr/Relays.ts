@@ -359,12 +359,17 @@ const Relays = {
   },
   subscribe: function (
     filter: Filter,
-    once = false,
-    unsubscribeTimeout = 0,
     sinceLastSeen = false,
-    relays?: Relay[],
+    mergeSubscriptions = true,
+    once = false,
   ): Unsubscribe {
-    const { name, groupedFilter } = this.groupFilter(filter);
+    let name, groupedFilter;
+    if (mergeSubscriptions) {
+      ({ name, groupedFilter } = this.groupFilter(filter));
+    } else {
+      name = JSON.stringify(filter);
+      groupedFilter = filter;
+    }
 
     const existingFilter = this.filtersBySubscriptionName.get(name);
     const filterString = JSON.stringify(groupedFilter);
@@ -389,12 +394,9 @@ const Relays = {
 
     // TODO slice and dice too large filters? queue and wait for eose. or alternate between filters by interval.
 
-    if (unsubscribeTimeout) {
-      setTimeout(unsubscribe, unsubscribeTimeout);
-    }
-
-    let myRelays =
-      relays || Array.from(name == 'keywords' ? this.searchRelays.values() : this.relays.values());
+    let myRelays: Relay[] = Array.from(
+      name == 'keywords' ? this.searchRelays.values() : this.relays.values(),
+    );
     const subId = Relays.getSubscriptionIdForName(name);
 
     /*
