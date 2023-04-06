@@ -1,27 +1,32 @@
-import { useState } from 'react';
-import { useEffect } from 'preact/hooks';
+import { useEffect, useState } from 'react';
 import { route } from 'preact-router';
 
 import Icons from '../../Icons';
+import { Event } from '../../lib/nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Name from '../Name';
 
 import EventComponent from './EventComponent';
 
-const messageClicked = (e, zappedId) => {
-  if (['A', 'BUTTON', 'TEXTAREA', 'IMG', 'INPUT'].find((tag) => e.target.closest(tag))) {
+interface Props {
+  event: Event;
+}
+
+const messageClicked = (e: MouseEvent, zappedId: string) => {
+  const target = e.target as HTMLElement;
+  if (['A', 'BUTTON', 'TEXTAREA', 'IMG', 'INPUT'].find((tag) => target.closest(tag))) {
     return;
   }
-  if (window.getSelection().toString()) {
+  if (window.getSelection()?.toString()) {
     return;
   }
   e.stopPropagation();
   route(`/${Key.toNostrBech32Address(zappedId, 'note')}`);
 };
 
-export default function Zap(props) {
-  const [allZaps, setAllZaps] = useState([]);
+export default function Zap(props: Props) {
+  const [allZaps, setAllZaps] = useState<string[]>([]);
   const zappedId = Events.getEventReplyingTo(props.event);
   const zappedEvent = Events.db.by('id', zappedId);
   const authorIsYou = zappedEvent?.pubkey === Key.getPubKey();
@@ -33,11 +38,14 @@ export default function Zap(props) {
     : 'zapped a note';
 
   useEffect(() => {
-    const unsub = Events.getRepliesAndReactions(zappedId, (_a, _b, _c, _d, zappedBy) => {
-      setAllZaps(Array.from(zappedBy.values()));
-    });
+    const unsub = Events.getRepliesAndReactions(
+      zappedId,
+      (_a: Set<string>, _b: Set<string>, _c: number, _d: Set<string>, zappedBy: Set<string>) => {
+        setAllZaps(Array.from(zappedBy.values()));
+      },
+    );
     return () => unsub();
-  }, []);
+  }, [zappedId]);
 
   let zappingUser = null;
   try {

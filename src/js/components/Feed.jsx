@@ -16,7 +16,7 @@ import { PrimaryButton as Button } from './buttons/Button';
 import EventComponent from './events/EventComponent';
 import ErrorBoundary from './ErrorBoundary';
 
-const INITIAL_PAGE_SIZE = 10;
+const INITIAL_PAGE_SIZE = 5;
 
 let isInitialLoad = true;
 const listener = function () {

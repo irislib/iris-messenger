@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import Icons from '../../Icons';
+import { Event } from '../../lib/nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
@@ -8,18 +9,26 @@ import Name from '../Name';
 
 import EventComponent from './EventComponent';
 
-export default function Repost(props) {
-  const [allReposts, setAllReposts] = useState([]);
+interface Props {
+  event: Event;
+  notification?: boolean;
+}
+
+export default function Repost(props: Props) {
+  const [allReposts, setAllReposts] = useState<string[]>([]);
   const repostedEventId = Events.getRepostedEventId(props.event);
 
-  if (props.notification) {
-    useEffect(() => {
-      const unsub = Events.getRepliesAndReactions(repostedEventId, (_a, _b, _c, repostedBy) => {
-        setAllReposts(Array.from(repostedBy));
-      });
+  useEffect(() => {
+    if (props.notification) {
+      const unsub = Events.getRepliesAndReactions(
+        repostedEventId,
+        (_a: Set<string>, _b: Set<string>, _c: number, repostedBy: Set<string>) => {
+          setAllReposts(Array.from(repostedBy));
+        },
+      );
       return () => unsub();
-    }, []);
-  }
+    }
+  }, [props.notification, repostedEventId]);
 
   return (
     <div className="msg">

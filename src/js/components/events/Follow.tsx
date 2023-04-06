@@ -1,9 +1,16 @@
 import Icons from '../../Icons';
+import { Event } from '../../lib/nostr-tools';
 import Key from '../../nostr/Key';
 import Name from '../Name';
 
-export default function Follow(props) {
-  const followsYou = props.event.tags.some((t) => t[0] === 'p' && t[1] === Key.getPubKey());
+type Props = {
+  event: Event;
+};
+
+function Follow(props: Props) {
+  const followsYou = props.event.tags?.some(
+    (t: string[]) => t[0] === 'p' && t[1] === Key.getPubKey(),
+  );
   const text = followsYou ? 'started following you' : 'updated their following list';
   return (
     <div className="msg">
@@ -21,3 +28,5 @@ export default function Follow(props) {
     </div>
   );
 }
+
+export default Follow;

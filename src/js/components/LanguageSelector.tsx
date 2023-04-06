@@ -7,10 +7,11 @@ import {
   language,
 } from '../translations/Translation';
 
-function onLanguageChange(e) {
-  const l = $(e.target).val();
-  if (AVAILABLE_LANGUAGE_KEYS.indexOf(l) >= 0) {
-    localStorage.setItem('language', l);
+function onLanguageChange(e: Event): void {
+  const target = e.target as HTMLSelectElement;
+  const l = $(target).val();
+  if (AVAILABLE_LANGUAGE_KEYS.indexOf(l as string) >= 0) {
+    localStorage.setItem('language', l as string);
     location.reload();
   }
 }

@@ -2,25 +2,31 @@ import { useEffect, useState } from 'react';
 import { route } from 'preact-router';
 
 import Icons from '../../Icons';
+import { Event } from '../../lib/nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Name from '../Name';
 
 import EventComponent from './EventComponent';
 
-const messageClicked = (e, likedId) => {
-  if (['A', 'BUTTON', 'TEXTAREA', 'IMG', 'INPUT'].find((tag) => e.target.closest(tag))) {
+type Props = {
+  event: Event;
+};
+
+const messageClicked = (e: MouseEvent, likedId: string) => {
+  const target = e.target as HTMLElement;
+  if (['A', 'BUTTON', 'TEXTAREA', 'IMG', 'INPUT'].find((tag) => target.closest(tag))) {
     return;
   }
-  if (window.getSelection().toString()) {
+  if (window.getSelection()?.toString()) {
     return;
   }
   e.stopPropagation();
   route(`/${Key.toNostrBech32Address(likedId, 'note')}`);
 };
 
-export default function Like(props) {
-  const [allLikes, setAllLikes] = useState([]);
+export default function Like(props: Props) {
+  const [allLikes, setAllLikes] = useState<string[]>([]);
   const likedId = Events.getEventReplyingTo(props.event);
   const likedEvent = Events.db.by('id', likedId);
   const authorIsYou = likedEvent?.pubkey === Key.getPubKey();
@@ -32,11 +38,14 @@ export default function Like(props) {
     : 'liked a note';
 
   useEffect(() => {
-    const unsub = Events.getRepliesAndReactions(likedId, (_replies, likedBy) => {
-      setAllLikes(Array.from(likedBy));
-    });
+    const unsub = Events.getRepliesAndReactions(
+      likedId,
+      (_replies: Set<string>, likedBy: Set<string>) => {
+        setAllLikes(Array.from(likedBy));
+      },
+    );
     return () => unsub();
-  }, []);
+  }, [likedId]);
 
   const userLink = `/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`;
   return (
