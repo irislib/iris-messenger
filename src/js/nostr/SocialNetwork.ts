@@ -126,7 +126,6 @@ export default {
     if (this.followedByUser.get(myPub)?.has(follower)) {
       if (!PubSub.subscribedAuthors.has(followedUser)) {
         setTimeout(() => {
-          // recursion break
           PubSub.subscribe({ authors: [followedUser] }, undefined, true);
         }, 0);
       }

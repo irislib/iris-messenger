@@ -720,7 +720,7 @@ const Events = {
       unsub2();
     };
   },
-  getDirectMessages(cb) {
+  getDirectMessages(cb?: (event: Event) => void): Unsubscribe {
     const callback = () => {
       cb?.(this.directMessagesByUser);
     };

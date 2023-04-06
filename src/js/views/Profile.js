@@ -15,6 +15,7 @@ import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
 import QrCode from '../components/QrCode';
+import { isSafeOrigin } from '../components/SafeImg';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
@@ -448,6 +449,9 @@ class Profile extends View {
 
         try {
           banner = profile.banner && new URL(profile.banner).toString();
+          banner = isSafeOrigin(banner)
+            ? banner
+            : `https://imgproxy.iris.to/insecure/plain/${banner}`;
         } catch (e) {
           console.log('Invalid banner URL', profile.banner);
         }
