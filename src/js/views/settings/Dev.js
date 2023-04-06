@@ -7,7 +7,7 @@ export default class DevSettings extends Component {
         <input
           type="checkbox"
           id={key}
-          checked={this.state[key] !== !defaultValue}
+          checked={this.state[key] === undefined ? defaultValue : this.state[key]}
           onChange={(e) => localState.get('dev').get(key).put(e.target.checked)}
         />
         <label htmlFor={key}>{label}</label>
