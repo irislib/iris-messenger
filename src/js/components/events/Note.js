@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet';
 import $ from 'jquery';
 import { route } from 'preact-router';
-import styled from 'styled-components';
 
 import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
@@ -13,10 +12,9 @@ import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 import FeedMessageForm from '../FeedMessageForm';
 import Identicon from '../Identicon';
-import Modal from '../modal/Modal';
+import ImageModal from '../modal/Image';
 import ZapModal from '../modal/Zap';
 import Name from '../Name';
-import SafeImg from '../SafeImg';
 import Torrent from '../Torrent';
 
 import EventComponent from './EventComponent';
@@ -25,29 +23,11 @@ import EventDropdown from './EventDropdown';
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
 
-const replyIcon = (
-  <svg width="24" viewBox="0 0 24 24" fill="currentColor">
-    <path
-      d="M12,1C5.4,1,0,5.5,0,11c0,2.8,1.4,5.5,4,7.4l-1.9,3.9C2,22.5,2,22.7,2.2,22.8C2.3,22.9,2.4,23,2.5,23c0.1,0,0.2,0,0.3-0.1
-L7,20.1c1.6,0.6,3.3,0.9,5,0.9c6.6,0,12-4.5,12-10S18.6,1,12,1z M12,19.5c-1.6,0-3.2-0.3-4.6-0.9c-0.1-0.1-0.3,0-0.4,0l-2.7,1.8
-l1.2-2.4c0.1-0.2,0-0.5-0.2-0.6c-2.3-1.6-3.7-4-3.7-6.5c0-4.7,4.7-8.5,10.4-8.5S22.4,6.4,22.4,11S17.7,19.5,12,19.5z"
-    />
-  </svg>
-);
-
 let loadRepliesAndReactions = true;
 localState
   .get('settings')
   .get('loadRepliesAndReactions')
   .on((v) => (loadRepliesAndReactions = v));
-
-const ContentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 20px;
-`;
 
 class Note extends Component {
   constructor() {
@@ -367,7 +347,7 @@ class Note extends Component {
     return (
       <div className="below-text">
         <a className="msg-btn reply-btn" onClick={() => this.replyBtnClicked()}>
-          {replyIcon}
+          {Icons.reply}
         </a>
         <span className="count">{s.replyCount || ''}</span>
         <a
@@ -420,19 +400,8 @@ class Note extends Component {
   }
 
   renderImageModal() {
-    return (
-      <Modal centerVertically={false} onClose={() => this.setState({ showImageModal: false })}>
-        <ContentContainer>
-          {this.props.meta.attachments.map((a) => {
-            return (
-              <p>
-                <SafeImg style={{ maxHeight: '90vh', maxWidth: '90vw' }} src={a.data} />
-              </p>
-            );
-          })}
-        </ContentContainer>
-      </Modal>
-    );
+    const images = this.props.meta.attachments?.map((a) => a.data);
+    return <ImageModal images={images} onClose={() => this.setState({ showImageModal: false })} />;
   }
 
   renderZapModal() {
