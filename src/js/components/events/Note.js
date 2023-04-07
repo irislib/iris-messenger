@@ -1,10 +1,8 @@
 import { Helmet } from 'react-helmet';
-import $ from 'jquery';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
-import Icons from '../../Icons';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -13,21 +11,21 @@ import { translate as t } from '../../translations/Translation';
 import FeedMessageForm from '../FeedMessageForm';
 import Identicon from '../Identicon';
 import ImageModal from '../modal/Image';
-import ZapModal from '../modal/Zap';
 import Name from '../Name';
 import Torrent from '../Torrent';
 
 import EventComponent from './EventComponent';
 import EventDropdown from './EventDropdown';
+import Reactions from './Reactions';
 
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
 
-let loadRepliesAndReactions = true;
+let loadReactions = true;
 localState
   .get('settings')
-  .get('loadRepliesAndReactions')
-  .on((v) => (loadRepliesAndReactions = v));
+  .get('loadReactions')
+  .on((v) => (loadReactions = v));
 
 class Note extends Component {
   constructor() {
@@ -35,7 +33,7 @@ class Note extends Component {
     this.i = 0;
     this.likedBy = new Set();
     this.state = {
-      sortedReplies: [],
+      replies: [],
       content: '',
       replyingToUsers: [],
       title: '',
@@ -43,46 +41,6 @@ class Note extends Component {
       quotedShortText: '',
     };
     this.subscriptions = [];
-  }
-
-  likeBtnClicked(e) {
-    e.preventDefault();
-    this.like(!this.state.liked);
-  }
-
-  repostBtnClicked() {
-    if (!this.state.reposted) {
-      const author = this.props.event.pubkey;
-      const hexId = Key.toNostrHexAddress(this.props.event.id);
-      if (hexId) {
-        Events.publish({
-          kind: 6,
-          tags: [
-            ['e', hexId, '', 'mention'],
-            ['p', author],
-          ],
-          content: '',
-        });
-      }
-    }
-  }
-
-  like(liked = true) {
-    if (liked) {
-      const author = this.props.event.pubkey;
-
-      const hexId = Key.toNostrHexAddress(this.props.event.id);
-      if (hexId) {
-        Events.publish({
-          kind: 7,
-          content: '+',
-          tags: [
-            ['e', hexId],
-            ['p', author],
-          ],
-        });
-      }
-    }
   }
 
   imageClicked(event) {
@@ -112,34 +70,10 @@ class Note extends Component {
     route(`/${Key.toNostrBech32Address(this.props.event.id, 'note')}`);
   }
 
-  replyBtnClicked() {
-    if (this.props.standalone) {
-      $(document).find('textarea').focus();
-    } else {
-      this.openStandalone();
-    }
-  }
-
   renderDropdown() {
     return this.props.asInlineQuote ? null : (
       <EventDropdown id={this.props.event.id} event={this.props.event} />
     );
-  }
-
-  toggleLikes(e) {
-    console.log('toggle likes');
-    e.stopPropagation();
-    this.setState({ showLikes: !this.state.showLikes, showZaps: false, showreposts: false });
-  }
-
-  toggleReposts(e) {
-    e.stopPropagation();
-    this.setState({ showReposts: !this.state.showReposts, showZaps: false, showLikes: false });
-  }
-
-  toggleZaps(e) {
-    e.stopPropagation();
-    this.setState({ showZaps: !this.state.showZaps, showReposts: false, showLikes: false });
   }
 
   componentDidMount() {
@@ -153,12 +87,6 @@ class Note extends Component {
       });
     });
     this.subscriptions.push(unsub);
-    if (loadRepliesAndReactions !== false) {
-      const unsub2 = Events.getRepliesAndReactions(event.id, (...args) =>
-        this.handleRepliesAndReactions(...args),
-      );
-      this.subscriptions.push(unsub2);
-    }
 
     // find .jpg .jpeg .gif .png .webp urls in msg.text and add them to msg.attachments
     let text = this.props.event.content;
@@ -253,58 +181,6 @@ class Note extends Component {
     });
   }
 
-  handleRepliesAndReactions(replies, likedBy, threadReplyCount, repostedBy, zaps) {
-    // zaps.size &&
-    //  console.log('zaps.size', zaps.size, Key.toNostrBech32Address(event.id, 'note'));
-    this.likedBy = likedBy;
-    this.repostedBy = repostedBy;
-    const myPub = Key.getPubKey();
-    const sortedReplies =
-      replies &&
-      Array.from(replies).sort((a, b) => {
-        const eventA = Events.db.by('id', a);
-        const eventB = Events.db.by('id', b);
-        // show our replies first
-        if (eventA?.pubkey === myPub && eventB?.pubkey !== myPub) {
-          return -1;
-        } else if (eventA?.pubkey !== myPub && eventB?.pubkey === myPub) {
-          return 1;
-        }
-        // show replies by original post's author first
-        if (eventA?.pubkey === this.event?.pubkey && eventB?.pubkey !== this.event?.pubkey) {
-          return -1;
-        } else if (eventA?.pubkey !== this.event?.pubkey && eventB?.pubkey === this.event?.pubkey) {
-          return 1;
-        }
-        return eventA?.created_at - eventB?.created_at;
-      });
-    const zappers =
-      zaps && Array.from(zaps.values()).map((eventId) => Events.getZappingUser(eventId));
-
-    this.setState({
-      reposts: this.repostedBy.size,
-      reposted: this.repostedBy.has(myPub),
-      likes: this.likedBy.size,
-      zappers,
-      liked: this.likedBy.has(myPub),
-      replyCount: threadReplyCount,
-      sortedReplies,
-    });
-  }
-
-  renderLikes() {
-    return (
-      <div className="likes">
-        {Array.from(this.likedBy).map((key) => {
-          const npub = Key.toNostrBech32Address(key, 'npub');
-          return (
-            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width="32" />
-          );
-        })}
-      </div>
-    );
-  }
-
   renderReplyingTo() {
     return (
       <small className="msg-replying-to">
@@ -334,124 +210,9 @@ class Note extends Component {
     );
   }
 
-  renderReactionBtns() {
-    if (!loadRepliesAndReactions) {
-      if (this.props.asQuote) {
-        return <div style={{ height: '15px' }} />;
-      } else {
-        return null;
-      }
-    }
-
-    const s = this.state;
-    return (
-      <div className="below-text">
-        <a className="msg-btn reply-btn" onClick={() => this.replyBtnClicked()}>
-          {Icons.reply}
-        </a>
-        <span className="count">{s.replyCount || ''}</span>
-        <a
-          className={`msg-btn repost-btn ${s.reposted ? 'reposted' : ''}`}
-          onClick={() => this.repostBtnClicked()}
-        >
-          {Icons.repost}
-        </a>
-        <span
-          className={`count ${s.showReposts ? 'active' : ''}`}
-          onClick={(e) => this.toggleReposts(e)}
-        >
-          {s.reposts || ''}
-        </span>
-        <a
-          className={`msg-btn like-btn ${s.liked ? 'liked' : ''}`}
-          onClick={(e) => this.likeBtnClicked(e)}
-        >
-          {s.liked ? Icons.heartFull : Icons.heartEmpty}
-        </a>
-        <span
-          className={`count ${s.showLikes ? 'active' : ''}`}
-          onClick={(e) => this.toggleLikes(e)}
-        >
-          {s.likes || ''}
-        </span>
-        {this.state.lightning ? (
-          <>
-            <a
-              onClick={(e) => {
-                e.preventDefault();
-                this.setState({ showZapModal: true });
-              }}
-              className="msg-btn zap-btn"
-            >
-              {Icons.lightning}
-            </a>
-            <span
-              className={`count ${s.showZaps ? 'active' : ''}`}
-              onClick={(e) => this.toggleZaps(e)}
-            >
-              {s.zappers?.length || ''}
-            </span>
-          </>
-        ) : (
-          ''
-        )}
-      </div>
-    );
-  }
-
   renderImageModal() {
     const images = this.props.meta.attachments?.map((a) => a.data);
     return <ImageModal images={images} onClose={() => this.setState({ showImageModal: false })} />;
-  }
-
-  renderZapModal() {
-    return (
-      <ZapModal
-        show={true}
-        lnurl={this.state.lightning}
-        note={this.props.event.id}
-        recipient={this.props.event.pubkey}
-        onClose={() => this.setState({ showZapModal: false })}
-      />
-    );
-  }
-
-  renderReplies() {
-    return this.state.sortedReplies
-      .slice(0, this.props.showReplies)
-      .map((r) => (
-        <EventComponent
-          key={r}
-          id={r}
-          asReply={!this.props.standalone}
-          showReplies={1}
-          showRepliedMsg={false}
-        />
-      ));
-  }
-
-  renderReplyForm() {
-    return (
-      <FeedMessageForm
-        waitForFocus={true}
-        autofocus={!this.props.standalone}
-        replyingTo={this.props.event.id}
-        replyingToUser={this.props.event.pubkey}
-        placeholder={t('write_your_reply')}
-      />
-    );
-  }
-
-  renderZaps() {
-    return (
-      <div className="likes">
-        {(this.state.zappers || []).map((npub) => {
-          return (
-            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width="32" />
-          );
-        })}
-      </div>
-    );
   }
 
   renderShowThread() {
@@ -470,19 +231,6 @@ class Note extends Component {
         asQuote={true}
         showReplies={0}
       />
-    );
-  }
-
-  renderReposts() {
-    return (
-      <div className="likes">
-        {Array.from(this.repostedBy).map((key) => {
-          const npub = Key.toNostrBech32Address(key, 'npub');
-          return (
-            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width="32" />
-          );
-        })}
-      </div>
     );
   }
 
@@ -552,12 +300,32 @@ class Note extends Component {
     return classNames.join(' ');
   }
 
+  renderReplies() {
+    return this.state.replies
+      .slice(0, this.props.showReplies)
+      .map((r) => (
+        <EventComponent key={r} id={r} asReply={!this.props.standalone} showReplies={true} />
+      ));
+  }
+
+  renderReplyForm() {
+    return (
+      <FeedMessageForm
+        waitForFocus={true}
+        autofocus={!this.props.standalone}
+        replyingTo={this.props.event.id}
+        replyingToUser={this.props.event.pubkey}
+        placeholder={t('write_your_reply')}
+      />
+    );
+  }
+
   render() {
     if (!this.props.event && this.props.meta) {
       return null;
     }
     const s = this.state;
-    const asQuote = this.props.asQuote || (this.props.showReplies && s.sortedReplies.length);
+    const asQuote = this.props.asQuote || (this.props.showReplies && s.replies.length);
     const quoting = this.props.meta.replyingTo && (this.props.showRepliedMsg || this.props.asReply);
 
     return (
@@ -599,19 +367,22 @@ class Note extends Component {
                   {t(`show_${s.showMore ? 'less' : 'more'}`)}
                 </a>
               )}
-              {!this.props.asInlineQuote && this.renderReactionBtns()}
-              {s.showLikes && this.renderLikes()}
-              {s.showZaps && this.renderZaps()}
-              {s.showReposts && this.renderReposts()}
-              {s.lightning && s.showZapModal && this.renderZapModal()}
+              {!this.props.asInlineQuote && loadReactions && (
+                <Reactions
+                  standalone={this.props.standalone}
+                  event={this.props.event}
+                  setReplies={(replies) => this.setState({ replies })}
+                />
+              )}
               {s.showImageModal && this.renderImageModal()}
               {this.props.standalone || s.showReplyForm ? this.renderReplyForm() : ''}
             </div>
           </div>
         </div>
-        {(this.props.showReplies || s.showReplyForm) && s.sortedReplies?.length
-          ? this.renderReplies()
-          : ''}
+        {((this.props.showReplies || s.showReplyForm) &&
+          s.replies?.length &&
+          this.renderReplies()) ||
+          ''}
       </>
     );
   }

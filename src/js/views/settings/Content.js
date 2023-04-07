@@ -18,7 +18,7 @@ export default class Content extends Component {
   render() {
     const noteSettings = [
       // { setting: 'enableMarkdown', label: 'Markdown' },
-      { setting: 'loadRepliesAndReactions', label: 'Replies and reactions' },
+      { setting: 'loadReactions', label: 'Replies and reactions' },
     ];
     const mediaSettings = [
       { setting: 'enableImages', label: 'Images' },
