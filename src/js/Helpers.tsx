@@ -170,7 +170,7 @@ export default {
           <video
             key={match + i}
             src={match}
-            muted
+            muted={true}
             autoPlay={!this.isMobile && settings.autoplayVideos !== false}
             playsInline
             controls
