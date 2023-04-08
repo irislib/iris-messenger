@@ -252,6 +252,95 @@ export default {
       });
     }
 
+    //spotify podcast episode
+    if (settings.enableSpotify !== false) {
+      const spotifyRegex =
+       /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/episode\/)([\w-]+)(?:\S+)?(?:t=(\d+))?/g;
+      replacedText = reactStringReplace(replacedText, spotifyRegex, (match, i) => {
+        return (
+          <iframe
+            class="audio"
+            scrolling="no"
+            key={match + i}
+            width="650"
+            height="200"
+            style={{ maxWidth: '100%' }}
+            src={`https://open.spotify.com/embed/episode/${match}`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        );
+      });
+    } 
+
+    // Spotify album
+    if (settings.enableSpotify !== false) {
+      const spotifyRegex = /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/album\/)([\w-]+)(?:\S+)?/g;
+      replacedText = reactStringReplace(replacedText, spotifyRegex, (match, i) => {
+        const albumId = match;
+        return (
+          <iframe
+            class="audio"
+            scrolling="no"
+             key={albumId + i}
+             width="650"
+            height="400"
+            style={{ maxWidth: '100%' }}
+            src={`https://open.spotify.com/embed/album/${albumId}`}
+            frameBorder="0"
+            allow="encrypted-media"
+          />
+        );
+      });
+    }
+
+    // Spotify playlist
+    if (settings.enableSpotify !== false) {
+      const spotifyPlaylistRegex =
+        /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/playlist\/)([\w-]+)(?:\S+)?/g;
+      replacedText = reactStringReplace(replacedText, spotifyPlaylistRegex, (match, i) => {
+        const playlistId = match;
+        return (
+          <iframe
+            class="audio"
+            scrolling="no"
+            key={playlistId + i}
+            width="650"
+            height="380"
+            style={{ maxWidth: '100%' }}
+            src={`https://open.spotify.com/embed/playlist/${playlistId}`}
+            frameBorder="0"
+            allow="encrypted-media"
+            allowtransparency="true"
+          />
+        );
+      });
+    }
+    // Apple Music
+
+    if (settings.enableAppleMusic !== false) {
+      const appleMusicRegex = /(?:https?:\/\/)(?:.*?)(music\.apple\.com\/.*)/gi;
+      replacedText = reactStringReplace(replacedText, appleMusicRegex, (match, i) => {
+        return (
+          <iframe
+            class="audio"
+            scrolling="no"
+            key={match + i}
+            width="650"
+            height="175"
+            style={{ maxWidth: '100%' }}
+            src={`https://embed.music.apple.com/${match}`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        );
+      });
+    }
+    
+    
+
     if (settings.enableTidal !== false) {
       const tidalRegex = /(?:https?:\/\/)?(?:www\.)?(?:tidal\.com(?:\/browse)?\/track\/)([\d]+)?/g;
       replacedText = reactStringReplace(replacedText, tidalRegex, (match, i) => {

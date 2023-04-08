@@ -29,6 +29,7 @@ export default class Content extends Component {
       { setting: 'enableYoutube', label: 'YouTube' },
       { setting: 'enableTwitter', label: 'Twitter' },
       { setting: 'enableInstagram', label: 'Instagram' },
+      { setting: 'enableAppleMusic', label: 'Apple Music' },      
       { setting: 'enableSpotify', label: 'Spotify' },
       { setting: 'enableTidal', label: 'Tidal' },
       { setting: 'enableTwitch', label: 'Twitch' },
