@@ -181,6 +181,8 @@ const EventComponent = (props: EventComponentProps) => {
       return null;
     }
 
+    Component = memo(Component);
+
     return (
       <Component
         key={props.id}
