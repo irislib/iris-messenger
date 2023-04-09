@@ -26,7 +26,7 @@ interface EventComponentProps {
   standalone?: boolean;
   asInlineQuote?: boolean;
   asReply?: boolean;
-  showReplies?: boolean;
+  showReplies?: number;
   asQuote?: boolean;
   renderAs?: 'NoteImage';
   feedOpenedAt?: number;
