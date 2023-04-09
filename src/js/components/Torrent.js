@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet';
-import { html } from 'htm/preact';
 import $ from 'jquery';
 import { createRef } from 'preact';
 
@@ -219,64 +218,78 @@ class Torrent extends Component {
     const playing = p && p.torrentId === this.props.torrentId && !p.paused;
     let playButton = '';
     if (s.isAudioOpen) {
-      playButton = playing
-        ? html` <a href="#" onClick=${(e) => this.pauseAudio(e)}>${Icons.pause}</a> `
-        : html`
-            <a href="#" onClick=${(e) => this.playAudio(s.activeFilePath, e)}>${Icons.play}</a>
-          `;
+      playButton = playing ? (
+        <a href="#" onClick={(e) => this.pauseAudio(e)}>
+          {Icons.pause}
+        </a>
+      ) : (
+        <a href="#" onClick={(e) => this.playAudio(s.activeFilePath, e)}>
+          {Icons.play}
+        </a>
+      );
     }
-    return html`
-      ${s.torrenting && !s.torrent ? html`<p>Loading attachment...</p>` : ''}
-      <div class="cover" ref=${this.coverRef} style=${s.isAudioOpen ? '' : 'display:none'}></div>
-      <div class="info">
-        ${s.splitPath
-          ? s.splitPath.map((str, i) => {
-              if (i === s.splitPath.length - 1) {
-                if (s.isAudioOpen) {
-                  str = str.split('.').slice(0, -1).join('.');
+    // TODO break into smaller components
+    return (
+      <>
+        {s.torrenting && !s.torrent ? <p>Loading attachment...</p> : null}
+        <div
+          className="cover"
+          ref={this.coverRef}
+          style={s.isAudioOpen ? {} : { display: 'none' }}
+        />
+        <div className="info">
+          {s.splitPath
+            ? s.splitPath.map((str, i) => {
+                if (i === s.splitPath.length - 1) {
+                  if (s.isAudioOpen) {
+                    str = str.split('.').slice(0, -1).join('.');
+                  }
+                  return (
+                    <p>
+                      <b>{str}</b>
+                    </p>
+                  );
                 }
-                return html`<p><b>${str}</b></p>`;
-              }
-              return html`<p>${str}</p>`;
-            })
-          : ''}
-      </div>
-      ${s.hasNext ? html`<b>prev</b>` : ''}
-      <div class="player">${playButton}</div>
-      ${s.hasNext ? html`<b>next</b>` : ''}
-      ${this.props.standalone || this.props.preview
-        ? html`
-            <a href=${this.props.torrentId}>Magnet link</a>
-            ${to && to.files
-              ? html`
-                  <a href="" style="margin-left:30px;" onClick=${(e) => this.showFilesClicked(e)}
-                    >${t(s.showFiles ? 'hide_files' : 'show_files')}</a
-                  >
-                `
-              : ''}
-          `
-        : html`
-            <a href="/torrent/${encodeURIComponent(this.props.torrentId)}">${t('show_files')}</a>
-          `}
-      ${s.showFiles && to && to.files
-        ? html`
-            <p>${t('peers')}: ${to.numPeers}</p>
-            <div class="flex-table details">
-              ${to.files.map(
-                (f) => html`
-                  <div
-                    onClick=${() => this.openFile(f, true)}
-                    class="flex-row ${s.activeFilePath === f.path ? 'active' : ''}"
-                  >
-                    <div class="flex-cell">${f.name}</div>
-                    <div class="flex-cell no-flex">${Helpers.formatBytes(f.length)}</div>
-                  </div>
-                `,
-              )}
+                return <p>{str}</p>;
+              })
+            : null}
+        </div>
+        {s.hasNext ? <b>prev</b> : null}
+        <div className="player">{playButton}</div>
+        {s.hasNext ? <b>next</b> : null}
+        {this.props.standalone || this.props.preview ? (
+          <>
+            <a href={this.props.torrentId}>Magnet link</a>
+            {to && to.files ? (
+              <a href="" style={{ marginLeft: '30px' }} onClick={(e) => this.showFilesClicked(e)}>
+                {t(s.showFiles ? 'hide_files' : 'show_files')}
+              </a>
+            ) : null}
+          </>
+        ) : (
+          <a href={`/torrent/${encodeURIComponent(this.props.torrentId)}`}>{t('show_files')}</a>
+        )}
+        {s.showFiles && to && to.files ? (
+          <>
+            <p>
+              {t('peers')}: {to.numPeers}
+            </p>
+            <div className="flex-table details">
+              {to.files.map((f) => (
+                <div
+                  key={f.path}
+                  onClick={(e) => this.openFile(f, e)}
+                  className={`flex-row ${s.activeFilePath === f.path ? 'active' : ''}`}
+                >
+                  <div className="flex-cell">{f.name}</div>
+                  <div className="flex-cell no-flex">{Helpers.formatBytes(f.length)}</div>
+                </div>
+              ))}
             </div>
-          `
-        : ''}
-    `;
+          </>
+        ) : null}
+      </>
+    );
   }
 
   renderMeta() {
@@ -287,31 +300,33 @@ class Torrent extends Component {
     const ogTitle = `${title} | Iris`;
     const description = 'Shared files';
     const ogType = s.isAudioOpen ? 'music:song' : 'video.movie';
-    return html`
-      <${Helmet}>
-        <title>${title}</title>
-        <meta name="description" content=${description} />
-        <meta property="og:type" content=${ogType} />
-        <meta property="og:title" content=${ogTitle} />
-        <meta property="og:description" content=${description} />
-        ${s.ogImageUrl ? html`<meta property="og:image" content=${s.ogImageUrl} />` : ''}
-      <//>
-    `;
+    return (
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta property="og:type" content={ogType} />
+        <meta property="og:title" content={ogTitle} />
+        <meta property="og:description" content={description} />
+        {s.ogImageUrl ? <meta property="og:image" content={s.ogImageUrl} /> : null}
+      </Helmet>
+    );
   }
 
   render() {
-    return html`
-      <div class="torrent">
-        ${this.props.standalone ? this.renderMeta() : ''}
-        ${!this.state.settings.enableWebtorrent &&
+    return (
+      <div className="torrent">
+        {this.props.standalone ? this.renderMeta() : null}
+        {!this.state.settings.enableWebtorrent &&
         !this.state.settings.torrenting &&
-        !this.props.standalone
-          ? html`
-              <a href="" onClick=${(e) => this.openTorrentClicked(e)}>${t('show_attachment')}</a>
-            `
-          : this.renderLoadingTorrent()}
+        !this.props.standalone ? (
+          <a href="" onClick={(e) => this.openTorrentClicked(e)}>
+            {t('show_attachment')}
+          </a>
+        ) : (
+          this.renderLoadingTorrent()
+        )}
       </div>
-    `;
+    );
   }
 }
 

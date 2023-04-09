@@ -1,4 +1,3 @@
-import { html } from 'htm/preact';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
@@ -24,66 +23,65 @@ export default class OnboardingNotification extends Component {
   }
 
   renderFollowSuggestions() {
-    return html`
+    return (
       <div style="display:flex;flex-direction:column;flex:1">
-        <p>${t('follow_someone_info')}</p>
-        ${SocialNetwork.SUGGESTED_FOLLOWS.map(
-          (pub) => html`
-            <div class="profile-link-container">
-              <a href="/${pub}" className="profile-link">
-                <${Identicon} str=${pub} width="40" />
-                <${Name} pub=${pub} placeholder="Suggested follow" />
-              </a>
-              <${Follow} id=${pub} />
-            </div>
-          `,
-        )}
+        <p>{t('follow_someone_info')}</p>
+        {SocialNetwork.SUGGESTED_FOLLOWS.map((pub) => (
+          <div class="profile-link-container">
+            <a href="/{pub}" className="profile-link">
+              <Identicon str={pub} width={40} />
+              <Name pub={pub} placeholder="Suggested follow" />
+            </a>
+            <Follow id={pub} />
+          </div>
+        ))}
         <p>
-          <${Button} onClick=${() => localState.get('showFollowSuggestions').put(false)}>
-            ${t('done')}
+          <Button onClick={() => localState.get('showFollowSuggestions').put(false)}>
+            {t('done')}
           </Button>
         </p>
         <p>
-          ${t('alternatively')}<i> </i>
-          <a
-            href="/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}"
-            >${t('give_your_profile_link_to_someone')}</a
-          >.
+          {t('alternatively')}
+          <i> </i>
+          <a href={`/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}`}>
+            {t('give_your_profile_link_to_someone')}
+          </a>
+          .
         </p>
       </div>
-    `;
+    );
   }
 
   renderNoFollowers() {
-    return html`
+    return (
       <div style="display:flex;flex-direction:column;flex:1">
-        <p>${t('no_followers_yet')}</p>
+        <p>{t('no_followers_yet')}</p>
         <p>
-          <${Copy} text=${t('copy_link')} copyStr=${Helpers.getMyProfileLink()} />
+          <Copy text={t('copy_link')} copyStr={Helpers.getMyProfileLink()} />
         </p>
-        <small>${t('no_followers_yet_info')}</small>
+        <small>{t('no_followers_yet_info')}</small>
       </div>
-    `;
+    );
   }
 
   renderGetIrisAddress() {
     if (!this.state.existingIrisToAddress) {
-      return html`
+      return (
         <div>
           <p>Get your own iris.to/username?</p>
           <p>
-            <${Button} onClick=${() => route('/settings/iris_account')}>Yes please<//>
-            <${Button} onClick=${() => localState.get('showNoIrisToAddress').put(false)}
-              >No thanks<//
-            >
+            <Button onClick={() => route('/settings/iris_account')}>Yes please</Button>
+            <Button onClick={() => localState.get('showNoIrisToAddress').put(false)}>
+              No thanks
+            </Button>
           </p>
         </div>
-      `;
+      );
     }
   }
 
   render() {
-    let content = '';
+    let content;
     if (this.state.showFollowSuggestions) {
       content = this.renderFollowSuggestions();
     } else if (this.state.showNoIrisToAddress) {
@@ -93,11 +91,11 @@ export default class OnboardingNotification extends Component {
     }
 
     if (content) {
-      return html`
+      return (
         <div class="msg">
-          <div class="msg-content">${content}</div>
+          <div class="msg-content">{content}</div>
         </div>
-      `;
+      );
     }
     return '';
   }
