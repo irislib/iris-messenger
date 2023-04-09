@@ -1,5 +1,3 @@
-import { html } from 'htm/preact';
-
 import FeedComponent from '../components/Feed';
 import FeedMessageForm from '../components/FeedMessageForm';
 import OnboardingNotification from '../components/OnboardingNotification';
@@ -13,7 +11,6 @@ class Feed extends View {
     super();
     this.eventListeners = {};
     this.state = { sortedMessages: [], group: 'follows' };
-    this.messages = {};
     this.id = 'message-view';
     this.class = 'public-messages-view';
   }
@@ -24,35 +21,39 @@ class Feed extends View {
   }
 
   renderView() {
-    let path = this.props.index || 'msgs';
-    return html`
+    const path = this.props.index || 'msgs';
+    return (
       <div class="centered-container">
         <div style="display:flex;flex-direction:row">
           <div style="flex:3;width: 100%">
-            ${this.props.keyword
-              ? ''
-              : html`
-                  <${FeedMessageForm}
-                    placeholder=${t('whats_on_your_mind')}
-                    key="form${path}"
-                    class="hidden-xs"
-                    autofocus=${false}
-                  />
-                `}
-            ${this.props.keyword
-              ? html`<h2>${t('search')}: "${this.props.keyword}"</h2>`
-              : html` <${OnboardingNotification} /> `}
-            <${FeedComponent}
-              scrollElement=${this.scrollElement.current}
-              keyword=${this.props.keyword}
-              key=${this.props.index || 'feed'}
-              index=${this.props.index}
-              path=${path}
+            {this.props.keyword ? (
+              ''
+            ) : (
+              <FeedMessageForm
+                placeholder={t('whats_on_your_mind')}
+                key="form{path}"
+                class="hidden-xs"
+                autofocus={false}
+              />
+            )}
+            {this.props.keyword ? (
+              <h2>
+                {t('search')}: "{this.props.keyword}"
+              </h2>
+            ) : (
+              <OnboardingNotification />
+            )}
+            <FeedComponent
+              scrollElement={this.scrollElement.current}
+              keyword={this.props.keyword}
+              key={this.props.index || 'feed'}
+              index={this.props.index}
+              path={path}
             />
           </div>
         </div>
       </div>
-    `;
+    );
   }
 }
 

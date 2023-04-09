@@ -49,7 +49,6 @@ class Note extends View {
           key={this.props.id}
           standalone={true}
           showReplies={Infinity}
-          showRepliedMsg={true}
         />
       );
     }
