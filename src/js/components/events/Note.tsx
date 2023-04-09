@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet';
+import { memo } from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
@@ -402,4 +403,4 @@ const Note = ({
   );
 };
 
-export default Note;
+export default memo(Note);

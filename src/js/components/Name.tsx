@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import AnimalName from '../AnimalName';
 import Events from '../nostr/Events';
@@ -76,4 +76,4 @@ const Name = (props: Props) => {
   );
 };
 
-export default Name;
+export default memo(Name);
