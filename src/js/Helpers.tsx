@@ -255,7 +255,7 @@ export default {
     //spotify podcast episode
     if (settings.enableSpotify !== false) {
       const spotifyRegex =
-         /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/episode\/)([\w-]+)(?:\S+)?(?:t=(\d+))?/g;
+        /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/episode\/)([\w-]+)(?:\S+)?(?:t=(\d+))?/g;
       replacedText = reactStringReplace(replacedText, spotifyRegex, (match, i) => {
         return (
           <iframe
@@ -272,11 +272,12 @@ export default {
           />
         );
       });
-    } 
+    }
 
     // Spotify album
     if (settings.enableSpotify !== false) {
-      const spotifyRegex = /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/album\/)([\w-]+)(?:\S+)?/g;
+      const spotifyRegex =
+        /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/album\/)([\w-]+)(?:\S+)?/g;
       replacedText = reactStringReplace(replacedText, spotifyRegex, (match, i) => {
         return (
           <iframe
