@@ -310,7 +310,6 @@ export default {
             src={`https://open.spotify.com/embed/playlist/${match}`}
             frameBorder="0"
             allow="encrypted-media"
-            allowtransparency="true"
           />
         );
       });
