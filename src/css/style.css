@@ -311,11 +311,23 @@ textarea.new-msg {
   box-sizing: content-box;
 }
 
+.msg-content iframe.applemusic {
+  height: 175px;
+  box-sizing: content-box;
+}
+
 .msg-content iframe.instagram {
   width: 400px;
-  height: 620px;
+  height: 600px;
   max-height: 137vw;
 }
+
+.msg-content iframe.tiktok {
+  width: 325px;
+  height: 740px;
+  max-height: 137vw;
+}
+
 
 .msg-content audio {
   width: 100%;
