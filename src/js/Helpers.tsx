@@ -255,7 +255,7 @@ export default {
     //spotify podcast episode
     if (settings.enableSpotify !== false) {
       const spotifyRegex =
-       /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/episode\/)([\w-]+)(?:\S+)?(?:t=(\d+))?/g;
+         /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/episode\/)([\w-]+)(?:\S+)?(?:t=(\d+))?/g;
       replacedText = reactStringReplace(replacedText, spotifyRegex, (match, i) => {
         return (
           <iframe
@@ -282,8 +282,8 @@ export default {
           <iframe
             class="audio"
             scrolling="no"
-             key={match + i}
-             width="650"
+            key={match + i}
+            width="650"
             height="400"
             style={{ maxWidth: '100%' }}
             src={`https://open.spotify.com/embed/album/${match}`}
@@ -335,7 +335,6 @@ export default {
         );
       });
     }
-    
 
     if (settings.enableTidal !== false) {
       const tidalRegex = /(?:https?:\/\/)?(?:www\.)?(?:tidal\.com(?:\/browse)?\/track\/)([\d]+)?/g;
@@ -359,7 +358,7 @@ export default {
 
     // Tiktok embed
     if (settings.enableTiktok !== false) {
-      const tiktokRegex = /(?:https?:\/\/)?(?:www\.)?tiktok\.com\/.*?video\/(\d{1,19})/g
+      const tiktokRegex = /(?:https?:\/\/)?(?:www\.)?tiktok\.com\/.*?video\/(\d{1,19})/g;
       replacedText = reactStringReplace(replacedText, tiktokRegex, (match, i) => {
         return (
           <iframe
