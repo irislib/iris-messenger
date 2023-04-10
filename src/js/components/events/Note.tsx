@@ -322,6 +322,7 @@ const Note = ({
                 setReplies={(replies) => setReplies(replies)}
               />
             )}
+            {asQuote && !loadReactions && <div style={{ marginBottom: '15px' }}></div>}
             {standalone && renderReplyForm()}
           </div>
         </div>
