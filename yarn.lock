@@ -1423,15 +1423,15 @@
   dependencies:
     eslint-scope "5.1.1"
 
-"@noble/hashes@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.0.0.tgz#d5e38bfbdaba174805a4e649f13be9a9ed3351ae"
-  integrity sha512-DZVbtY62kc3kkBtMHqwCOfXrT/hnoORy5BJ4+HU1IR59X0KWAOqsfzQPcUl/lQLlG7qXbe/fZ3r/emxtAl+sqg==
-
-"@noble/hashes@^1.2.0", "@noble/hashes@~1.2.0":
+"@noble/hashes@1.2.0", "@noble/hashes@^1.2.0", "@noble/hashes@~1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.2.0.tgz#a3150eeb09cc7ab207ebf6d7b9ad311a9bdbed12"
   integrity sha512-FZfhjEDbT5GRswV3C6uvLPHMiVD6lQBmpoX5+eSiPaMTXte/IKqI5dykDxzZB/WBeK/CDuQRBWarPdi3FNY2zQ==
+
+"@noble/secp256k1@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.7.0.tgz#d15357f7c227e751d90aa06b05a0e5cf993ba8c1"
+  integrity sha512-kbacwGSsH/CTout0ZnZWxnW1B+jH/7r/WAAKLBtrRJ/+CUH7lgmQzl3GTrQua3SGKWNSDsS6lmjnDpIJ5Dxyaw==
 
 "@noble/secp256k1@^1.7.1", "@noble/secp256k1@~1.7.0":
   version "1.7.1"
@@ -1548,10 +1548,19 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@scure/base@^1.1.1", "@scure/base@~1.1.0":
+"@scure/base@1.1.1", "@scure/base@~1.1.0":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.1.tgz#ebb651ee52ff84f420097055f4bf46cfba403938"
   integrity sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA==
+
+"@scure/bip32@1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@scure/bip32/-/bip32-1.1.4.tgz#2c91a7be0156b15f26dd0c843a06a1917f129efd"
+  integrity sha512-m925ACYK0wPELsF7Z/VdLGmKj1StIeHraPMYB9xiAFiq/PnvqWd/99I0TQ2OZhjjlMDsDJeZlyXMWi0beaA7NA==
+  dependencies:
+    "@noble/hashes" "~1.2.0"
+    "@noble/secp256k1" "~1.7.0"
+    "@scure/base" "~1.1.0"
 
 "@scure/bip32@^1.1.5":
   version "1.1.5"
@@ -1562,7 +1571,7 @@
     "@noble/secp256k1" "~1.7.0"
     "@scure/base" "~1.1.0"
 
-"@scure/bip39@^1.1.1":
+"@scure/bip39@1.1.1", "@scure/bip39@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@scure/bip39/-/bip39-1.1.1.tgz#b54557b2e86214319405db819c4b6a370cf340c5"
   integrity sha512-t+wDck2rVkh65Hmv280fYdVdY25J9YeEUIgn2LG1WM6gxFkGzcksoDiUkWVpVp3Oex9xGC68JU2dSbUfwZ2jPg==
@@ -8701,27 +8710,26 @@ normalize-url@^6.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
 
-nostr-relaypool@0.6.7:
-  version "0.6.7"
-  resolved "https://registry.yarnpkg.com/nostr-relaypool/-/nostr-relaypool-0.6.7.tgz#3e43fecd3d2f7d0dfe177e392018b416bbe61e58"
-  integrity sha512-VWp0xbletM8ftmRLPALQNYDM/+ujt/o2pUvhQQ3NnHpaDMhmTsTfLaSzoILRB1WKfDar76Up1gaBFzO2TbyH4Q==
+nostr-relaypool@0.6.14:
+  version "0.6.14"
+  resolved "https://registry.yarnpkg.com/nostr-relaypool/-/nostr-relaypool-0.6.14.tgz#a267d8b35c4b43324403e9c6fbb913f6810e8b2a"
+  integrity sha512-M5Wxefjgte1GN2KdG32S7VMxvRB0Q314jVIWXh6ssYAcgRroh16Bkvp4ytoEYcoYoWzObkUh2QLHj4PON1lT/w==
   dependencies:
     "@jest/source-map" "^29.4.3"
     isomorphic-ws "^5.0.0"
-    nostr-tools "^1.7.5"
+    nostr-tools "^1.8.1"
     safe-stable-stringify "^2.4.2"
 
-nostr-tools@^1.7.5:
-  version "1.7.5"
-  resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-1.7.5.tgz#349f469ff2877deb99d71c63d4883af93ec9f9a5"
-  integrity sha512-FFaYOAn9lFyISClbBzPe2eQ2ZiKx8xFviwHmdgTAmuue+eLrtPEI3tCqPtP624HghX/X4VnaixoiMvDB8g2+tQ==
+nostr-tools@^1.8.1:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-1.8.3.tgz#10ddb8ed5d9ca3bf6c1e8fdd1961bb6584b8e1f2"
+  integrity sha512-0giVDk0ElhqlGY032ma/8Q8NsIyFL53fCCkndFCpuLabZ2E134Kth0sbnIIIFXLqm7VnYIlgLVtCna8+dUiZUg==
   dependencies:
-    "@noble/hashes" "1.0.0"
-    "@noble/secp256k1" "^1.7.1"
-    "@scure/base" "^1.1.1"
-    "@scure/bip32" "^1.1.5"
-    "@scure/bip39" "^1.1.1"
-    prettier "^2.8.4"
+    "@noble/hashes" "1.2.0"
+    "@noble/secp256k1" "1.7.0"
+    "@scure/base" "1.1.1"
+    "@scure/bip32" "1.1.4"
+    "@scure/bip39" "1.1.1"
 
 npm-run-path@^4.0.1:
   version "4.0.1"
