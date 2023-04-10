@@ -251,7 +251,7 @@ export default {
           callback();
         });
       }
-    } else if (!PubSub.subscribedAuthors.has(address)) {
+    } else {
       fetch(`https://api.iris.to/profile/${address}`).then((res) => {
         if (res.status === 200) {
           res.json().then((profile) => {
