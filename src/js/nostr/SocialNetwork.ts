@@ -68,6 +68,9 @@ export default {
     if (!this.usersByFollowDistance.has(distance)) {
       this.usersByFollowDistance.set(distance, new Set());
     }
+    if (distance <= 2) {
+      const unsub = PubSub.subscribe({ authors: [user], kinds: [0] }, () => unsub(), true);
+    }
     this.usersByFollowDistance.get(distance).add(user);
     // remove from higher distances
     for (const d of this.usersByFollowDistance.keys()) {
