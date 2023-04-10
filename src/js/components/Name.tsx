@@ -23,16 +23,11 @@ const Name = (props: Props) => {
   let initialName = '';
   let initialDisplayName;
   let isGenerated = false;
-  const profileEvent = Events.db.find({ kind: 0, pubkey: nostrAddr });
+  const profile = SocialNetwork.profiles.get(nostrAddr);
   // should we change SocialNetwork.getProfile() and use it here?
-  if (profileEvent) {
-    try {
-      const profile = JSON.parse(profileEvent.content);
-      initialName = profile.name?.trim().slice(0, 100) || '';
-      initialDisplayName = profile.display_name?.trim().slice(0, 100);
-    } catch (e) {
-      // ignore
-    }
+  if (profile) {
+    initialName = profile.name?.trim().slice(0, 100) || '';
+    initialDisplayName = profile.display_name?.trim().slice(0, 100);
   }
   if (!initialDisplayName) {
     initialDisplayName = AnimalName(Key.toNostrBech32Address(props.pub, 'npub') || props.pub);

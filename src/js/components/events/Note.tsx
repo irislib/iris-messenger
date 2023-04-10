@@ -44,6 +44,10 @@ const Note = ({
   const [translatedText, setTranslatedText] = useState('');
   showReplies = showReplies || 0;
 
+  if (showRepliedMsg === undefined) {
+    showRepliedMsg = standalone;
+  }
+
   // TODO fetch replies in useEffect
 
   let text = event.content || '';
@@ -253,9 +257,7 @@ const Note = ({
   function renderReplies() {
     return replies
       .slice(0, showReplies)
-      .map((r) => (
-        <EventComponent key={r} id={r} asReply={!standalone} showReplies={showReplies} />
-      ));
+      .map((r) => <EventComponent key={r} id={r} asReply={!standalone} showReplies={0} />);
   }
 
   function renderReplyForm() {

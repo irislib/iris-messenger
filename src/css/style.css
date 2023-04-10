@@ -2701,7 +2701,4 @@ input[type='text'] {
   .visible-xs-flex {
     display: none !important;
   }
-  .msg.standalone:not(.quoting) {
-    margin-bottom: 4px;
-  }
 }
