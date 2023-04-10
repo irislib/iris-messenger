@@ -601,6 +601,7 @@ class Feed extends Component {
           showRepliedMsg={showRepliedMsg}
           renderAs={renderAs}
           feedOpenedAt={this.openedAt}
+          showReplies={0}
         />
       </ErrorBoundary>
     ));

@@ -1,12 +1,11 @@
 import { Helmet } from 'react-helmet';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 import FeedMessageForm from '../FeedMessageForm';
 import Identicon from '../Identicon';
@@ -38,145 +37,85 @@ const Note = ({
   showRepliedMsg,
   standalone,
 }) => {
-  const [state, setState] = useState({
-    content: '' as any,
-    dateStr: undefined,
-    emojiOnly: undefined,
-    lightning: undefined,
-    lines: undefined,
-    meta,
-    name,
-    ogImageUrl: undefined,
-    quotedShortText: '',
-    replyingToUsers: [],
-    replies: [],
-    rootMsg: undefined,
-    shortContent: undefined,
-    shortText: '',
-    showImageModal: false,
-    showMore: false,
-    showReplyForm: false,
-    text: undefined,
-    time: undefined,
-    timeStr: undefined,
-    title: '',
-    translatedText: undefined,
-  });
+  // find .jpg .jpeg .gif .png .webp urls in msg.text and add them to msg.attachments
+  const [showMore, setShowMore] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [replies, setReplies] = useState([]);
+  const [translatedText, setTranslatedText] = useState('');
+  showReplies = showReplies || 0;
 
-  const subscriptions: any[] = [];
-  const ref = useRef(null);
-
-  // ... other functions ...
-
-  useEffect(() => {
-    const unsub = SocialNetwork.getProfile(event.pubkey, (profile) => {
-      if (!profile) return;
-      const lightning = profile.lud16 || profile.lud06;
-      setState({
-        ...state,
-        lightning,
-        name: profile.display_name || profile.name,
-      });
+  let text = event.content;
+  meta = meta || {};
+  const attachments = [];
+  const urls = text.match(/(https?:\/\/[^\s]+)/g);
+  if (urls) {
+    urls.forEach((url) => {
+      let parsedUrl;
+      try {
+        parsedUrl = new URL(url);
+      } catch (e) {
+        console.log('invalid url', url);
+        return;
+      }
+      if (parsedUrl.pathname.toLowerCase().match(/\.(jpg|jpeg|gif|png|webp)$/)) {
+        attachments.push({ type: 'image', data: `${parsedUrl.href}` });
+      }
     });
-    subscriptions.push(unsub);
+  }
+  const ogImageUrl = standalone && attachments?.find((a) => a.type === 'image')?.data;
+  const emojiOnly = event.content?.length === 2 && Helpers.isEmoji(event.content);
+  const shortText = text.length > 128 ? `${text.slice(0, 128)}...` : text;
+  const quotedShortText = `"${shortText}"`;
 
-    // find .jpg .jpeg .gif .png .webp urls in msg.text and add them to msg.attachments
-    let text = event.content;
-    meta = meta || {};
-    meta.attachments = [];
-    const urls = text.match(/(https?:\/\/[^\s]+)/g);
-    if (urls) {
-      urls.forEach((url) => {
-        let parsedUrl;
-        try {
-          parsedUrl = new URL(url);
-        } catch (e) {
-          console.log('invalid url', url);
-          return;
-        }
-        if (parsedUrl.pathname.toLowerCase().match(/\.(jpg|jpeg|gif|png|webp)$/)) {
-          meta.attachments.push({ type: 'image', data: `${parsedUrl.href}` });
-        }
-      });
-    }
-    const ogImageUrl = standalone && meta.attachments?.find((a) => a.type === 'image')?.data;
-    const emojiOnly = event.content?.length === 2 && Helpers.isEmoji(event.content);
-    const shortText = text.length > 128 ? `${text.slice(0, 128)}...` : text;
-    const quotedShortText = `"${shortText}"`;
+  const content = Helpers.highlightEverything(text.trim(), event, {
+    showMentionedMessages: !asInlineQuote,
+    onImageClick: (e) => imageClicked(e),
+  });
+  text =
+    text.length > MSG_TRUNCATE_LENGTH && !showMore && !standalone
+      ? `${text.slice(0, MSG_TRUNCATE_LENGTH)}...`
+      : text;
 
-    const content = Helpers.highlightEverything(text.trim(), event, {
+  const lines = text.split('\n');
+  text =
+    lines.length > MSG_TRUNCATE_LINES && !showMore && !standalone
+      ? `${lines.slice(0, MSG_TRUNCATE_LINES).join('\n')}...`
+      : text;
+
+  const shortContent =
+    isTooLong() &&
+    Helpers.highlightEverything(text.trim(), event, {
       showMentionedMessages: !asInlineQuote,
       onImageClick: (e) => imageClicked(e),
     });
-    text =
-      text.length > MSG_TRUNCATE_LENGTH && !state.showMore && !standalone
-        ? `${text.slice(0, MSG_TRUNCATE_LENGTH)}...`
-        : text;
 
-    const lines = text.split('\n');
-    text =
-      lines.length > MSG_TRUNCATE_LINES && !state.showMore && !standalone
-        ? `${lines.slice(0, MSG_TRUNCATE_LINES).join('\n')}...`
-        : text;
-
-    const shortContent =
-      isTooLong() &&
-      Helpers.highlightEverything(text.trim(), event, {
-        showMentionedMessages: !asInlineQuote,
-        onImageClick: (e) => imageClicked(e),
-      });
-
-    const time = new Date(event.created_at * 1000);
-    const dateStr = time.toLocaleString(window.navigator.language, {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-    const timeStr = time.toLocaleTimeString(window.navigator.language, {
-      timeStyle: 'short',
-    });
-
-    let rootMsg = Events.getEventRoot(event);
-    if (!rootMsg) {
-      rootMsg = meta.replyingTo;
-    }
-
-    let replyingToUsers = [];
-    const hasETags = event.tags?.some((t) => t[0] === 'e');
-    if (hasETags) {
-      replyingToUsers = event?.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
-    }
-    // remove duplicates
-    replyingToUsers = [...new Set(replyingToUsers)];
-
-    setState({
-      ...state,
-      meta,
-      content,
-      shortContent,
-      replyingToUsers,
-      ogImageUrl,
-      time,
-      timeStr,
-      dateStr,
-      rootMsg,
-      shortText,
-      quotedShortText,
-      emojiOnly,
-      name,
-      text,
-      lines,
-    });
-
-    return () => {
-      subscriptions.forEach((unsub) => unsub());
-    };
+  const time = new Date(event.created_at * 1000);
+  const dateStr = time.toLocaleString(window.navigator.language, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
+  const timeStr = time.toLocaleTimeString(window.navigator.language, {
+    timeStyle: 'short',
+  });
+
+  let rootMsg = Events.getEventRoot(event);
+  if (!rootMsg) {
+    rootMsg = meta.replyingTo;
+  }
+
+  let replyingToUsers = [];
+  const hasETags = event.tags?.some((t) => t[0] === 'e');
+  if (hasETags) {
+    replyingToUsers = event?.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
+  }
+  // remove duplicates
+  replyingToUsers = [...new Set(replyingToUsers)];
 
   function imageClicked(event) {
     event.preventDefault();
-    setState({ ...state, showImageModal: true });
+    setShowImageModal(true);
   }
 
   function messageClicked(event) {
@@ -209,42 +148,39 @@ const Note = ({
     return (
       <small className="msg-replying-to">
         {t('replying_to') + ' '}
-        {state.replyingToUsers.slice(0, 3).map((u) => (
+        {replyingToUsers.slice(0, 3).map((u) => (
           <a href={`/${Key.toNostrBech32Address(u, 'npub')}`}>
             @<Name pub={u} hideBadge={true} userNameOnly={true} />{' '}
           </a>
         ))}
-        {state.replyingToUsers?.length > 3 ? '...' : ''}
+        {replyingToUsers?.length > 3 ? '...' : ''}
       </small>
     );
   }
 
   function renderHelmet() {
-    const s = state;
-    const title = `${s.name || 'User'} on Iris`;
+    const title = `${name || 'User'} on Iris`;
     return (
       <Helmet titleTemplate="%s">
-        <title>{`${title}: ${s.quotedShortText}`}</title>
-        <meta name="description" content={s.quotedShortText} />
+        <title>{`${title}: ${quotedShortText}`}</title>
+        <meta name="description" content={quotedShortText} />
         <meta property="og:type" content="article" />
-        {s.ogImageUrl ? <meta property="og:image" content={s.ogImageUrl} /> : null}
+        {ogImageUrl ? <meta property="og:image" content={ogImageUrl} /> : null}
         <meta property="og:title" content={title} />
-        <meta property="og:description" content={s.quotedShortText} />
+        <meta property="og:description" content={quotedShortText} />
       </Helmet>
     );
   }
 
   function renderImageModal() {
-    const images = meta.attachments?.map((a) => a.data);
-    return (
-      <ImageModal images={images} onClose={() => setState({ ...state, showImageModal: false })} />
-    );
+    const images = attachments?.map((a) => a.data);
+    return <ImageModal images={images} onClose={() => setShowImageModal(false)} />;
   }
 
   function renderShowThread() {
     return (
       <div style={{ flexBasis: '100%', marginBottom: '12px' }}>
-        <a href={`/${Key.toNostrBech32Address(state.rootMsg, 'note')}`}>{t('show_thread')}</a>
+        <a href={`/${Key.toNostrBech32Address(rootMsg, 'note')}`}>{t('show_thread')}</a>
       </div>
     );
   }
@@ -262,7 +198,7 @@ const Note = ({
 
   function isTooLong() {
     return (
-      meta.attachments?.length > 1 ||
+      attachments?.length > 1 ||
       event.content?.length > MSG_TRUNCATE_LENGTH ||
       event.content.split('\n').length > MSG_TRUNCATE_LINES
     );
@@ -284,7 +220,6 @@ const Note = ({
   }
 
   function renderMsgSender() {
-    const s = state;
     return (
       <div className="msg-sender">
         <div className="msg-sender-link">
@@ -294,10 +229,10 @@ const Note = ({
           <div className="time">
             {'· '}
             <a href={`/${Key.toNostrBech32Address(event.id, 'note')}`} className="tooltip">
-              {s.time && Helpers.getRelativeTimeText(s.time)}
+              {time && Helpers.getRelativeTimeText(time)}
               <span className="tooltiptext">
                 {' '}
-                {s.dateStr} {s.timeStr}{' '}
+                {dateStr} {timeStr}{' '}
               </span>
             </a>
           </div>
@@ -320,7 +255,7 @@ const Note = ({
   }
 
   function renderReplies() {
-    return state.replies
+    return replies
       .slice(0, showReplies)
       .map((r) => (
         <EventComponent key={r} id={r} asReply={!standalone} showReplies={showReplies} />
@@ -343,60 +278,57 @@ const Note = ({
 
   return (
     <>
-      {state.meta.replyingTo && showRepliedMsg && renderRepliedMsg()}
+      {meta.replyingTo && showRepliedMsg && renderRepliedMsg()}
       <div
         key={event.id + 'note'}
-        ref={ref}
         className={getClassName(asQuote, quoting)}
         onClick={(e) => messageClicked(e)}
       >
         <div className="msg-content" onClick={(e) => messageClicked(e)}>
-          {asQuote && state.rootMsg && renderShowThread()}
+          {asQuote && rootMsg && renderShowThread()}
           {renderIdenticon(asQuote)}
           <div className="msg-main">
             {renderMsgSender()}
-            {(state.replyingToUsers?.length && !quoting && renderReplyingTo()) || null}
+            {(replyingToUsers?.length && !quoting && renderReplyingTo()) || null}
             {standalone && renderHelmet()}
-            {state.meta.torrentId && (
-              <Torrent torrentId={state.meta.torrentId} autopause={!standalone} />
-            )}
-            {state.text?.length > 0 && (
-              <div className={`text ${state.emojiOnly && 'emoji-only'}`}>
-                {(!state.showMore && state.shortContent) || state.content}
-                {state.translatedText && (
+            {meta.torrentId && <Torrent torrentId={meta.torrentId} autopause={!standalone} />}
+            {text?.length > 0 && (
+              <div className={`text ${emojiOnly && 'emoji-only'}`}>
+                {(!showMore && shortContent) || content}
+                {translatedText && (
                   <p>
-                    <i>{state.translatedText}</i>
+                    <i>{translatedText}</i>
                   </p>
                 )}
               </div>
             )}
-            {!asInlineQuote && state.shortContent && (
+            {!asInlineQuote && shortContent && (
               <a
                 onClick={(e) => {
                   e.preventDefault();
-                  setState({ ...state, showMore: !state.showMore });
+                  setShowMore(!showMore);
                 }}
               >
-                {t(`show_${state.showMore ? 'less' : 'more'}`)}
+                {t(`show_${showMore ? 'less' : 'more'}`)}
               </a>
             )}
-            {state.meta.url && (
-              <a href={state.meta.url} target="_blank" rel="noopener noreferrer">
-                {state.meta.url}
+            {meta.url && (
+              <a href={meta.url} target="_blank" rel="noopener noreferrer">
+                {meta.url}
               </a>
             )}
             {!asInlineQuote && loadReactions && (
               <Reactions
                 standalone={standalone}
                 event={event}
-                setReplies={(replies) => setState({ ...state, replies })}
+                setReplies={(replies) => setReplies(replies)}
               />
             )}
             {standalone && renderReplyForm()}
           </div>
         </div>
       </div>
-      {state.showImageModal && renderImageModal()}
+      {showImageModal && renderImageModal()}
       {renderReplies()}
     </>
   );

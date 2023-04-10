@@ -1,11 +1,11 @@
 import $ from 'jquery';
-import { memo } from 'preact/compat';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import Icons from '../../Icons';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
 import Identicon from '../Identicon';
 import ZapModal from '../modal/Zap';
 
@@ -30,11 +30,22 @@ const Reactions = (props) => {
 
   useEffect(() => {
     if (event) {
-      const unsub = Events.getRepliesAndReactions(event.id, (...args) =>
+      const unsub1 = Events.getRepliesAndReactions(event.id, (...args) =>
         handleRepliesAndReactions(...args),
       );
+
+      const unsub2 = SocialNetwork.getProfile(event.pubkey, (profile) => {
+        if (!profile) return;
+        const lightning = profile.lud16 || profile.lud06;
+        setState({
+          ...state,
+          lightning,
+        });
+      });
+
       return () => {
-        unsub();
+        unsub1();
+        unsub2();
       };
     }
   }, [event]);
@@ -263,4 +274,4 @@ const Reactions = (props) => {
   );
 };
 
-export default memo(Reactions);
+export default Reactions;
