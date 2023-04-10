@@ -44,7 +44,9 @@ const Note = ({
   const [translatedText, setTranslatedText] = useState('');
   showReplies = showReplies || 0;
 
-  let text = event.content;
+  // TODO fetch replies in useEffect
+
+  let text = event.content || '';
   meta = meta || {};
   const attachments = [];
   const urls = text.match(/(https?:\/\/[^\s]+)/g);
@@ -67,10 +69,6 @@ const Note = ({
   const shortText = text.length > 128 ? `${text.slice(0, 128)}...` : text;
   const quotedShortText = `"${shortText}"`;
 
-  const content = Helpers.highlightEverything(text.trim(), event, {
-    showMentionedMessages: !asInlineQuote,
-    onImageClick: (e) => imageClicked(e),
-  });
   text =
     text.length > MSG_TRUNCATE_LENGTH && !showMore && !standalone
       ? `${text.slice(0, MSG_TRUNCATE_LENGTH)}...`
@@ -82,12 +80,10 @@ const Note = ({
       ? `${lines.slice(0, MSG_TRUNCATE_LINES).join('\n')}...`
       : text;
 
-  const shortContent =
-    isTooLong() &&
-    Helpers.highlightEverything(text.trim(), event, {
-      showMentionedMessages: !asInlineQuote,
-      onImageClick: (e) => imageClicked(e),
-    });
+  text = Helpers.highlightEverything(text.trim(), event, {
+    showMentionedMessages: !asInlineQuote,
+    onImageClick: (e) => imageClicked(e),
+  });
 
   const time = new Date(event.created_at * 1000);
   const dateStr = time.toLocaleString(window.navigator.language, {
@@ -294,7 +290,7 @@ const Note = ({
             {meta.torrentId && <Torrent torrentId={meta.torrentId} autopause={!standalone} />}
             {text?.length > 0 && (
               <div className={`text ${emojiOnly && 'emoji-only'}`}>
-                {(!showMore && shortContent) || content}
+                {text}
                 {translatedText && (
                   <p>
                     <i>{translatedText}</i>
@@ -302,7 +298,7 @@ const Note = ({
                 )}
               </div>
             )}
-            {!asInlineQuote && shortContent && (
+            {!asInlineQuote && !standalone && isTooLong() && (
               <a
                 onClick={(e) => {
                   e.preventDefault();
