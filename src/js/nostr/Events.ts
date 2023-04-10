@@ -668,19 +668,16 @@ const Events = {
     ) => void,
   ): Unsubscribe {
     const callback = () => {
-      cb &&
-        cb(
-          this.directRepliesByMessageId.get(id) ?? new Set(),
-          this.likesByMessageId.get(id) ?? new Set(),
-          this.threadRepliesByMessageId.get(id)?.size ?? 0,
-          this.repostsByMessageId.get(id) ?? new Set(),
-          this.zapsByNote.get(id) ?? new Set(),
-        );
+      cb?.(
+        this.directRepliesByMessageId.get(id) ?? new Set(),
+        this.likesByMessageId.get(id) ?? new Set(),
+        this.threadRepliesByMessageId.get(id)?.size ?? 0,
+        this.repostsByMessageId.get(id) ?? new Set(),
+        this.zapsByNote.get(id) ?? new Set(),
+      );
     };
-    if (this.directRepliesByMessageId.has(id) || this.likesByMessageId.has(id)) {
-      callback();
-    }
-    return PubSub.subscribe({ '#e': [id] }, callback, false);
+    callback();
+    return PubSub.subscribe({ '#e': [id], kinds: [1, 6, 7, 9735] }, callback, false);
   },
   // TODO: return Unsubscribe
   getEventById(id: string, proxyFirst = false, cb?: (event: Event) => void) {
