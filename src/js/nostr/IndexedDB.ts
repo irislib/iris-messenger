@@ -22,7 +22,7 @@ const IndexedDB = {
   db,
   subscribedEventIds: new Set<string>(),
   subscribedAuthors: new Set<string>(),
-  subscriptions: new Set<string>(),
+  seenFilters: new Set<string>(),
   saveQueue: [] as Event[],
   clear() {
     return db.delete();
@@ -124,10 +124,10 @@ const IndexedDB = {
       return;
     } else {
       const stringifiedFilter = JSON.stringify(filter);
-      if (this.subscriptions.has(stringifiedFilter)) {
+      if (this.seenFilters.has(stringifiedFilter)) {
         return;
       }
-      this.subscriptions.add(stringifiedFilter);
+      this.seenFilters.add(stringifiedFilter);
       if (filter.kinds) {
         query = query.where
           ? query.where('kind').anyOf(filter.kinds)

@@ -317,6 +317,7 @@ const Note = ({
             )}
             {!asInlineQuote && loadReactions && (
               <Reactions
+                key={event.id + 'reactions'}
                 standalone={standalone}
                 event={event}
                 setReplies={(replies) => setReplies(replies)}
