@@ -19,7 +19,7 @@ let subscriptionId = 0;
 
 let dev: any = {
   logSubscriptions: false,
-  indexed03: false,
+  indexed03: true,
   useRelayPool: true,
 };
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
