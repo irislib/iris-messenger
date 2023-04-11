@@ -44,7 +44,7 @@ const EventComponent = (props: EventComponentProps) => {
     }
 
     if (state.retrieving) {
-      setState({ retrieving: false });
+      setState((prevState) => ({ ...prevState, retrieving: false }));
     }
 
     const replyingTo = Events.getNoteReplyingTo(event);
@@ -58,7 +58,7 @@ const EventComponent = (props: EventComponentProps) => {
       replyingTo,
     };
 
-    setState({ event, meta });
+    setState((prevState) => ({ ...prevState, event, meta }));
   };
 
   useEffect(() => {
@@ -67,7 +67,7 @@ const EventComponent = (props: EventComponentProps) => {
       return;
     }
     unmounted.current = false;
-    setState({ meta: { id: props.id } });
+    setState((prevState) => ({ prevState, meta: { id: props.id } }));
     const hexId = Key.toNostrHexAddress(props.id);
 
     /*

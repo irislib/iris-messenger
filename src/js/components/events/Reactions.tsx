@@ -37,10 +37,10 @@ const Reactions = (props) => {
       const unsub2 = SocialNetwork.getProfile(event.pubkey, (profile) => {
         if (!profile) return;
         const lightning = profile.lud16 || profile.lud06;
-        setState({
-          ...state,
+        setState((prevState) => ({
+          ...prevState,
           lightning,
-        });
+        }));
       });
 
       return () => {
@@ -101,17 +101,32 @@ const Reactions = (props) => {
   function toggleLikes(e) {
     console.log('toggle likes');
     e.stopPropagation();
-    setState({ ...state, showLikes: !state.showLikes, showZaps: false, showReposts: false });
+    setState((prevState) => ({
+      ...prevState,
+      showLikes: !state.showLikes,
+      showZaps: false,
+      showReposts: false,
+    }));
   }
 
   function toggleReposts(e) {
     e.stopPropagation();
-    setState({ ...state, showReposts: !state.showReposts, showZaps: false, showLikes: false });
+    setState((prevState) => ({
+      ...prevState,
+      showReposts: !state.showReposts,
+      showZaps: false,
+      showLikes: false,
+    }));
   }
 
   function toggleZaps(e) {
     e.stopPropagation();
-    setState({ ...state, showZaps: !state.showZaps, showReposts: false, showLikes: false });
+    setState((prevState) => ({
+      ...prevState,
+      showZaps: !state.showZaps,
+      showReposts: false,
+      showLikes: false,
+    }));
   }
 
   function handleRepliesAndReactions(
@@ -149,8 +164,8 @@ const Reactions = (props) => {
 
     props.setReplies(sortedReplies);
 
-    setState({
-      ...state,
+    setState((prevState) => ({
+      ...prevState,
       reposts: repostedBy.size,
       reposted: repostedBy.has(myPub),
       likes: likedBy.size,
@@ -159,7 +174,7 @@ const Reactions = (props) => {
       likedBy,
       repostedBy,
       replyCount: threadReplyCount,
-    });
+    }));
   }
 
   function renderLikes() {
@@ -209,7 +224,7 @@ const Reactions = (props) => {
             <a
               onClick={(e) => {
                 e.preventDefault();
-                setState({ ...state, showZapModal: true });
+                setState((prevState) => ({ ...prevState, showZapModal: true }));
               }}
               className="msg-btn zap-btn"
             >
@@ -233,7 +248,7 @@ const Reactions = (props) => {
         lnurl={state.lightning}
         note={props.event.id}
         recipient={props.event.pubkey}
-        onClose={() => setState({ ...state, showZapModal: false })}
+        onClose={() => setState((prevState) => ({ ...prevState, showZapModal: false }))}
       />
     );
   }
