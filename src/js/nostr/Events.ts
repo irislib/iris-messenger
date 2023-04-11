@@ -638,6 +638,8 @@ const Events = {
     for (const ref of referredEvents) {
       const referredEvent = this.db.by('id', ref[1]);
       if (referredEvent) {
+        delete referredEvent.meta;
+        delete referredEvent.$loki;
         Relays.publish(referredEvent);
       }
     }
