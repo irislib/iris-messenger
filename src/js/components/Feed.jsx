@@ -311,8 +311,9 @@ class Feed extends Component {
         false,
       );
     } else if (this.props.index === 'follows') {
-      const followedUsers = Array.from(SocialNetwork.followedByUser.get(Key.getPubKey()) || []);
-      followedUsers.push(Key.getPubKey());
+      const myPub = Key.getPubKey();
+      const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) || []);
+      followedUsers.push(myPub);
       const filter = { kinds: [1, 6], limit: 300, since };
       if (followedUsers.length < 1000) {
         filter.authors = followedUsers;
@@ -320,10 +321,9 @@ class Feed extends Component {
       return PubSub.subscribe(
         filter,
         (e) => {
-          if (!(SocialNetwork.followDistanceByUser.get(e.pubkey) <= 1)) {
-            return;
+          if (e.pubkey === myPub || SocialNetwork.followedByUser.get(myPub)?.has(e.pubkey)) {
+            callback(e);
           }
-          callback(e);
         },
         true,
       );
