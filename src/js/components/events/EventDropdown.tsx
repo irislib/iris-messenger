@@ -78,8 +78,6 @@ const EventDropdown = (props: EventDropdownProps) => {
     if (hexId) {
       const event = Events.db.by('id', hexId);
       if (event) {
-        delete event.meta;
-        delete event.$loki;
         // TODO indicate to user somehow
         console.log('broadcasting', hexId, event);
         Events.publish(event);

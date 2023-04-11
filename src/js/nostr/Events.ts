@@ -626,6 +626,10 @@ const Events = {
       throw new Error('Invalid event');
     }
 
+    // for some reason these hang around
+    delete event.meta;
+    delete event.$loki;
+
     console.log('publishing event', event);
     this.handle(event);
     Relays.publish(event);

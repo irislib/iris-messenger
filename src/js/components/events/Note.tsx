@@ -141,7 +141,9 @@ const Note = ({
   }
 
   function renderDropdown() {
-    return asInlineQuote ? null : <EventDropdown id={event.id} event={event} onTranslate={setTranslatedText} />;
+    return asInlineQuote ? null : (
+      <EventDropdown id={event.id} event={event} onTranslate={setTranslatedText} />
+    );
   }
 
   function renderReplyingTo() {
