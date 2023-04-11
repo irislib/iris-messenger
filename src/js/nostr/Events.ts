@@ -626,12 +626,12 @@ const Events = {
       throw new Error('Invalid event');
     }
 
-    // for some reason these hang around
-    delete event.meta;
-    delete event.$loki;
-
     console.log('publishing event', event);
     this.handle(event);
+
+    // for some reason these hang around
+    delete event['$loki'];
+    delete event['meta'];
     Relays.publish(event);
 
     // also publish at most 10 events referred to in tags
