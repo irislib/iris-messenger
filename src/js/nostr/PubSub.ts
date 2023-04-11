@@ -24,6 +24,7 @@ let dev: any = {
 };
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
   useEventCache: false,
+  autoReconnect: true,
   externalGetEventById: (id) =>
     (Events.seen.has(id) && {
       // make externalGetEventById take booleans instead of events?
