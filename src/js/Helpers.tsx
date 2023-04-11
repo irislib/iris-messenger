@@ -94,7 +94,9 @@ export default {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    return res.json();
+    const json = await res.json();
+
+    return json?.translatedText;
   },
 
   handleLightningLinkClick(e: Event): void {

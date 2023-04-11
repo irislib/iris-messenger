@@ -13,6 +13,7 @@ import Dropdown from '../Dropdown';
 
 interface EventDropdownProps {
   event?: Event & { id: string };
+  onTranslate?: (text: string) => void;
   id: string;
 }
 
@@ -66,8 +67,7 @@ const EventDropdown = (props: EventDropdownProps) => {
   const translate = (e: any) => {
     e.preventDefault();
     Helpers.translateText(props.event.content).then((res) => {
-      // this.setState({ translatedText: res.translatedText });
-      // TODO callback to parent
+      props.onTranslate?.(res);
     });
   };
 
