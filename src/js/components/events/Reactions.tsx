@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { memo } from 'preact/compat';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
@@ -289,4 +290,4 @@ const Reactions = (props) => {
   );
 };
 
-export default Reactions;
+export default memo(Reactions);
