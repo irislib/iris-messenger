@@ -1804,6 +1804,7 @@ hr {
 
 .centered-container {
   display: flex;
+  flex: 1;
   max-width: 650px;
   flex-direction: column;
   margin: 15px auto 15px auto;

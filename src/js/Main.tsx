@@ -13,6 +13,7 @@ import EditProfile from './views/EditProfile';
 import Feed from './views/Feed';
 import FeedList from './views/FeedList';
 import Follows from './views/Follows';
+import KeyConverter from './views/KeyConverter';
 import Login from './views/Login';
 import LogoutConfirmation from './views/LogoutConfirmation';
 import Note from './views/Note';
@@ -156,6 +157,7 @@ class Main extends Component<Props, ReactState> {
           <div className="view-area">
             <Router onChange={(e) => this.handleRoute(e)}>
               <FeedList path="/" />
+              <KeyConverter path="/key" />
               <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />
               <Feed path="/search/:keyword?/:type?" />
