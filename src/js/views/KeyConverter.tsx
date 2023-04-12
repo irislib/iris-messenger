@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
-export default function KeyConverter() {
+export default function KeyConverter(_props) {
   const [key, setKey] = useState('');
 
   const hex = Key.toNostrHexAddress(key);
