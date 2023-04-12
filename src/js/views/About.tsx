@@ -82,8 +82,8 @@ class About extends Component {
 
             <h3>Iris docs</h3>
             <p>
-              Visit Iris <a href="https://docs.iris.to">docs</a> for features, explanations
-              and troubleshooting.
+              Visit Iris <a href="https://docs.iris.to">docs</a> for features, explanations and
+              troubleshooting.
             </p>
 
             <h3>Privacy</h3>
