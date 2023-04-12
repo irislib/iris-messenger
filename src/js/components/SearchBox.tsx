@@ -161,7 +161,10 @@ class SearchBox extends Component<Props, State> {
       if (query.match(/.+@.+\..+/)) {
         Key.getPubKeyByNip05Address(query).then((pubKey) => {
           // if query hasn't changed since we started the request
-          if (query === String(this.props.query || $(this.base).find('input').first().val())) {
+          if (
+            pubKey &&
+            query === String(this.props.query || $(this.base).find('input').first().val())
+          ) {
             this.props.onSelect({ key: pubKey });
           }
         });
