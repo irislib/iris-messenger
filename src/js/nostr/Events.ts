@@ -560,7 +560,12 @@ const Events = {
     return muted;
   },
   getEventRoot(event: Event) {
-    return event?.tags?.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
+    const rootEvent = event?.tags?.find((t) => t[0] === 'e' && t[3] === 'root')?.[1];
+    if (rootEvent) {
+      return rootEvent;
+    }
+    // first e tag
+    return event?.tags?.find((t) => t[0] === 'e')?.[1];
   },
   maybeAddNotification(event: Event) {
     // if we're mentioned in tags, add to notifications
