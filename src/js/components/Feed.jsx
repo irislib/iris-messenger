@@ -333,34 +333,37 @@ class Feed extends Component {
   }
 
   updateParams(prevState) {
+    let shouldUpdateUrl = false;
+
+    const url = new URL(window.location);
     if (prevState.settings.display !== this.state.settings.display) {
-      const url = new URL(window.location);
       if (this.state.settings.display === 'grid') {
         url.searchParams.set('display', 'grid');
       } else {
         url.searchParams.delete('display');
       }
-      this.replaceState();
+      shouldUpdateUrl = true;
     }
     if (prevState.settings.showReplies !== this.state.settings.showReplies) {
-      const url = new URL(window.location);
       if (this.state.settings.showReplies) {
         url.searchParams.set('showReplies', '1');
       } else {
         url.searchParams.delete('showReplies');
       }
-      this.replaceState();
+      shouldUpdateUrl = true;
     }
     if (prevState.settings.realtime !== this.state.settings.realtime) {
-      const url = new URL(window.location);
       if (this.state.settings.realtime) {
         url.searchParams.set('realtime', '1');
       } else {
         url.searchParams.delete('realtime');
       }
-      this.replaceState();
+      shouldUpdateUrl = true;
     }
-    // todo actually update url
+
+    if (shouldUpdateUrl) {
+      window.history.replaceState({}, document.title, url.toString());
+    }
   }
 
   replaceState = throttle(
