@@ -37,7 +37,6 @@ const Note = ({
   showRepliedMsg,
   standalone,
 }) => {
-  // find .jpg .jpeg .gif .png .webp urls in msg.text and add them to msg.attachments
   const [showMore, setShowMore] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [replies, setReplies] = useState([]);
