@@ -1012,6 +1012,9 @@ header.footer .header-content {
 
 .menu-new-post button {
   margin-bottom: 10px;
+  height: 55px;
+  width: 55px;
+  padding: 0;
 }
 
 .application-list {

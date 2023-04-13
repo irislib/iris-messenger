@@ -223,7 +223,7 @@ class Feed extends Component {
     const callback = (event) => {
       if (results.has(event.id)) return;
       results.set(event.id, event);
-      if (!updated && results.size > 10) {
+      if (!updated && results.size > 50) {
         updated = true;
         update();
       } else {
