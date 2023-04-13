@@ -1,5 +1,4 @@
 import FeedComponent from '../components/Feed';
-import FeedMessageForm from '../components/FeedMessageForm';
 import OnboardingNotification from '../components/OnboardingNotification';
 import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
@@ -26,16 +25,6 @@ class Feed extends View {
       <div class="centered-container">
         <div style="display:flex;flex-direction:row">
           <div style="flex:3;width: 100%">
-            {this.props.keyword ? (
-              ''
-            ) : (
-              <FeedMessageForm
-                placeholder={t('whats_on_your_mind')}
-                key="form{path}"
-                class="hidden-xs"
-                autofocus={false}
-              />
-            )}
             {this.props.keyword ? (
               <h2>
                 {t('search')}: "{this.props.keyword}"
