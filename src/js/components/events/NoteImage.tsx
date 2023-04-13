@@ -42,6 +42,10 @@ const GalleryImage = styled.a`
     color: white;
     user-select: none;
   }
+  &:hover {
+    opacity: 0.8;
+  }
+
   opacity: ${(props) => (props.fadeIn ? 0 : 1)};
   animation: ${(props) =>
     props.fadeIn
@@ -52,7 +56,7 @@ const GalleryImage = styled.a`
 `;
 
 function NoteImage(props: { event: Event; fadeIn?: boolean }) {
-  const [showImageModal, setShowImageModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(-1);
 
   if (props.event.kind !== 1) {
     const id = Events.getEventReplyingTo(props.event);
@@ -81,12 +85,12 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
         <>
           <GalleryImage
             key={props.event.id + i}
-            onClick={() => setShowImageModal(true)}
+            onClick={() => setShowImageModal(i)}
             src={attachment.data}
             fadeIn={props.fadeIn}
           />
-          {showImageModal && (
-            <Modal centerVertically={false} onClose={() => setShowImageModal(false)}>
+          {showImageModal === i && (
+            <Modal centerVertically={true} onClose={() => setShowImageModal(-1)}>
               <SafeImg src={attachment.data} />
               <p>
                 <a
