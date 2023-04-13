@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { route } from 'preact-router';
 import styled, { css, keyframes } from 'styled-components';
 
@@ -51,7 +51,7 @@ const GalleryImage = styled.a`
       : 'none'};
 `;
 
-export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
+function NoteImage(props: { event: Event; fadeIn?: boolean }) {
   const [showImageModal, setShowImageModal] = useState(false);
 
   if (props.event.kind !== 1) {
@@ -106,3 +106,5 @@ export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
     </>
   );
 }
+
+export default memo(NoteImage);

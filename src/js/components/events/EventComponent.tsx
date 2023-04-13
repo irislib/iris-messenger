@@ -186,7 +186,7 @@ const EventComponent = (props: EventComponentProps) => {
         className={getClassName()}
         event={state.event}
         meta={state.meta}
-        fadeIn={props.feedOpenedAt < state.event.created_at * 1000}
+        fadeIn={props.feedOpenedAt < state.event.created_at}
         {...props}
       />
     );
