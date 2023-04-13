@@ -14,7 +14,7 @@ const ContentContainer = styled.div`
 
 const ImageModal = (props) => {
   return (
-    <Modal centerVertically={false} onClose={props.onClose}>
+    <Modal centerVertically={props.images?.length === 1} onClose={props.onClose}>
       <ContentContainer>
         {props.images.map((i) => {
           return (
