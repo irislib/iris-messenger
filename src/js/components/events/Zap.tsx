@@ -58,7 +58,7 @@ export default function Zap(props: Props) {
   return (
     <div className="msg">
       <div className="msg-content" onClick={(e) => messageClicked(e, zappedId)}>
-        <div>
+        <div style={{ display: 'flex', flex: 1, 'flex-direction': 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <i className="zap-btn zapped" style={{ marginRight: '15px' }}>
               {Icons.lightning}
