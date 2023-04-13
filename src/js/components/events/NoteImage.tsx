@@ -28,7 +28,7 @@ const GalleryImage = styled.a`
   background-position: center;
   background-color: #ccc;
   background-image: url(${(props) =>
-    `https://imgproxy.iris.to/insecure/rs:fill:420:420/plain/${props.src}`});
+    `https://imgproxy.iris.to/insecure/rs:fill:428:428/plain/${props.src}`});
   & .dropdown {
     position: absolute;
     top: 0;
