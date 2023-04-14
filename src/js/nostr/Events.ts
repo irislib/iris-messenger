@@ -256,7 +256,7 @@ const Events = {
   insert(event: Event) {
     try {
       delete event['$loki'];
-      this.db.insert(event);
+      this.db.insert(event); // this seems to add .meta and .$loki on the object which is inconvenient
     } catch (e) {
       // console.log('failed to insert event', e, typeof e);
       // suppress error on duplicate insert. lokijs should throw a different error kind?
@@ -616,6 +616,9 @@ const Events = {
     localState.get('unseenNotificationCount').put(count);
   }, 1000),
   publish: async function (event: Partial<Event>): Promise<Event> {
+    // for some reason these hang around
+    delete event['$loki'];
+    delete event['meta'];
     if (!event.sig) {
       if (!event.tags) {
         event.tags = [];
@@ -631,13 +634,10 @@ const Events = {
       throw new Error('Invalid event');
     }
 
+    Relays.publish(event as Event);
+
     console.log('publishing event', event);
     this.handle(event as Event);
-
-    // for some reason these hang around
-    delete event['$loki'];
-    delete event['meta'];
-    Relays.publish(event as Event);
 
     // also publish at most 10 events referred to in tags
     const referredEvents = event.tags
