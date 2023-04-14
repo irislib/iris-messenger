@@ -155,11 +155,9 @@ class SearchBox extends Component<Props, State> {
     fetch(`https://rbr.bio/search/${query}.json`).then((res) => {
       res.json().then((json) => {
         if (json && Array.isArray(json)) {
-          let added = 0;
           json.forEach((item) => {
-            Events.handle(item[1]) && added++;
+            Events.handle(item[1]);
           });
-          console.log('added ' + added + ' events');
         }
       });
     });
@@ -167,11 +165,11 @@ class SearchBox extends Component<Props, State> {
 
   search() {
     let query = this.props.query || $(this.base).find('input').first().val();
+    query = query.toString().trim();
     if (!query) {
       this.close();
       return;
     }
-    query = query.toString().trim();
     if (query.match(/nsec1[a-zA-Z0-9]{30,65}/gi)) {
       $(this.base).find('input').first().val('');
       return;
