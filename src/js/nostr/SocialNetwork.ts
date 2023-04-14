@@ -17,6 +17,7 @@ export default {
     'npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6', // fiatjaf
     'npub1hu3hdctm5nkzd8gslnyedfr5ddz3z547jqcl5j88g4fame2jd08qh6h8nh', // carla
   ],
+  DEFAULT_ZAP_AMOUNT: 1_000,
   followDistanceByUser: new Map<string, number>(),
   usersByFollowDistance: new Map<number, Set<string>>(),
   profiles: new Map<string, any>(), // JSON.parsed event.content of profiles
@@ -276,5 +277,17 @@ export default {
       content: JSON.stringify(data),
     };
     Events.publish(event);
+  },
+  getDefaultZapAmount() {
+    const defaultZapAmount = localState.get('defaultZapAmount').value;
+    if(defaultZapAmount) {
+      return defaultZapAmount;
+    }
+
+    localState.get('defaultZapAmount').put(this.DEFAULT_ZAP_AMOUNT);
+    return this.DEFAULT_ZAP_AMOUNT;
+  },
+  setDefaultZapAmount(amount: number) {
+    localState.get('defaultZapAmount').put(amount);
   },
 };

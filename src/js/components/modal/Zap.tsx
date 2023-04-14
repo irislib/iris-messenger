@@ -7,6 +7,7 @@ import { LNURL, LNURLError, LNURLErrorCode, LNURLInvoice, LNURLSuccessAction } f
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Relays from '../../nostr/Relays';
+import SocialNetwork from '../../nostr/SocialNetwork';
 import { PrimaryButton as Button } from '../buttons/Button';
 import CopyButton from '../buttons/Copy';
 import Name from '../Name';
@@ -101,9 +102,10 @@ const Close = styled.div`
 export default function SendSats(props: ZapProps) {
   const onClose = props.onClose || (() => undefined);
   const { note, recipient } = props;
-  const defaultZapAmount = 1_000;
+  const defaultZapAmount = SocialNetwork.getDefaultZapAmount();
   const amounts = [defaultZapAmount, 5_000, 10_000, 20_000, 50_000, 100_000, 1_000_000];
   const emojis: Record<number, string> = {
+    [defaultZapAmount]: '⚡',
     1_000: '👍',
     5_000: '💜',
     10_000: '😍',

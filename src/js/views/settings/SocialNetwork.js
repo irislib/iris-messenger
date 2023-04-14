@@ -12,6 +12,7 @@ export default class SocialNetworkSettings extends Component {
     this.state = {
       blockedUsers: [],
       globalFilter: {},
+      defaultZapAmount: SocialNetwork.DEFAULT_ZAP_AMOUNT,
     };
   }
   render() {
@@ -37,6 +38,15 @@ export default class SocialNetworkSettings extends Component {
         <div class="centered-container">
           <h2>{t('social_network')}</h2>
           <h3>Stored on your device</h3>
+          <p>Default Zap amount in sats:</p>
+          <input
+            type="number"
+            value={this.state.defaultZapAmount}
+            onChange={(e) => {
+              this.state.defaultZapAmount = parseInt(e.target.value);
+              SocialNetwork.setDefaultZapAmount(this.state.defaultZapAmount);
+            }}
+          />
           <p>Total size: {followDistances.reduce((a, b) => a + b[1].size, 0)} users</p>
           <p>Depth: {followDistances.length} degrees of separation</p>
           {followDistances.sort().map((distance) => (
@@ -99,6 +109,10 @@ export default class SocialNetworkSettings extends Component {
     this.refreshInterval = setInterval(() => {
       this.forceUpdate();
     }, 1000);
+
+    const defaultZapAmount = SocialNetwork.getDefaultZapAmount();
+
+    this.setState({ defaultZapAmount });
   }
 
   componentWillUnmount() {
