@@ -164,7 +164,7 @@ class SearchBox extends Component<Props, State> {
   }, 500);
 
   search() {
-    let query = this.props.query || $(this.base).find('input').first().val();
+    let query = this.props.query || ($(this.base).find('input').first().val() as string) || '';
     query = query.toString().trim();
     if (!query) {
       this.close();
