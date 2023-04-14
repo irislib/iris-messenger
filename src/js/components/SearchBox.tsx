@@ -171,7 +171,11 @@ class SearchBox extends Component<Props, State> {
       this.close();
       return;
     }
-    query = query.toString();
+    query = query.toString().trim();
+    if (query.match(/nsec1[a-zA-Z0-9]{30,65}/gi)) {
+      $(this.base).find('input').first().val('');
+      return;
+    }
 
     this.searchFromServer(query);
 
