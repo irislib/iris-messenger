@@ -31,8 +31,9 @@ const Note = ({
   name,
   meta,
   asInlineQuote,
-  asQuote,
-  asReply,
+  isReply, // message that is rendered under a standalone message, separated by a small margin
+  isQuote, // message that connects to the next message with a line
+  isQuoting, // message that is under an isQuote message, no margin
   showReplies,
   showRepliedMsg,
   standalone,
@@ -42,6 +43,12 @@ const Note = ({
   const [replies, setReplies] = useState([]);
   const [translatedText, setTranslatedText] = useState('');
   showReplies = showReplies || 0;
+  if (!standalone && showReplies && replies.length) {
+    isQuote = true;
+  }
+  if (meta.replyingTo && showRepliedMsg) {
+    isQuoting = true;
+  }
 
   if (showRepliedMsg === undefined) {
     showRepliedMsg = standalone;
@@ -191,7 +198,7 @@ const Note = ({
       <EventComponent
         key={event.id + meta.replyingTo}
         id={meta.replyingTo}
-        asQuote={true}
+        isQuote={true}
         showReplies={0}
       />
     );
@@ -205,7 +212,7 @@ const Note = ({
     );
   }
 
-  function renderIdenticon(asQuote) {
+  function renderIdenticon(isQuote) {
     return (
       <div className="msg-identicon">
         {event.pubkey ? (
@@ -215,7 +222,7 @@ const Note = ({
         ) : (
           ''
         )}
-        {(asQuote && !standalone && <div className="line"></div>) || ''}
+        {(isQuote && !standalone && <div className="line"></div>) || ''}
       </div>
     );
   }
@@ -243,13 +250,12 @@ const Note = ({
     );
   }
 
-  function getClassName(asQuote, quoting) {
+  function getClassName() {
     const classNames = ['msg'];
 
-    if (asReply) classNames.push('reply');
     if (standalone) classNames.push('standalone');
-    if (asQuote) classNames.push('quote');
-    if (quoting) classNames.push('quoting');
+    if (isQuote) classNames.push('quote');
+    if (isQuoting) classNames.push('quoting');
     if (asInlineQuote) classNames.push('inline-quote');
 
     return classNames.join(' ');
@@ -258,7 +264,9 @@ const Note = ({
   function renderReplies() {
     return replies
       .slice(0, showReplies)
-      .map((r) => <EventComponent key={r} id={r} asReply={!standalone} showReplies={0} />);
+      .map((r) => (
+        <EventComponent key={r} id={r} isReply={true} isQuoting={!standalone} showReplies={1} />
+      ));
   }
 
   function renderReplyForm() {
@@ -273,22 +281,16 @@ const Note = ({
     );
   }
 
-  const quoting = meta.replyingTo && (showRepliedMsg || asReply);
-
   return (
     <>
       {meta.replyingTo && showRepliedMsg && renderRepliedMsg()}
-      <div
-        key={event.id + 'note'}
-        className={getClassName(asQuote, quoting)}
-        onClick={(e) => messageClicked(e)}
-      >
+      <div key={event.id + 'note'} className={getClassName()} onClick={(e) => messageClicked(e)}>
         <div className="msg-content" onClick={(e) => messageClicked(e)}>
-          {asQuote && rootMsg && renderShowThread()}
-          {renderIdenticon(asQuote)}
+          {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
+          {renderIdenticon(isQuote)}
           <div className="msg-main">
             {renderMsgSender()}
-            {(replyingToUsers?.length && !quoting && renderReplyingTo()) || null}
+            {(replyingToUsers?.length && !isQuoting && renderReplyingTo()) || null}
             {standalone && renderHelmet()}
             {meta.torrentId && <Torrent torrentId={meta.torrentId} autopause={!standalone} />}
             {text?.length > 0 && (
@@ -324,7 +326,7 @@ const Note = ({
                 setReplies={(replies) => setReplies(replies)}
               />
             )}
-            {asQuote && !loadReactions && <div style={{ marginBottom: '15px' }}></div>}
+            {isQuote && !loadReactions && <div style={{ marginBottom: '15px' }}></div>}
             {standalone && renderReplyForm()}
           </div>
         </div>
