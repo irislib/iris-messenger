@@ -102,7 +102,7 @@ export default {
       return Promise.reject('no private key');
     }
   },
-  sign: async function (event: Event) {
+  sign: async function (event: Event): Promise<string> {
     const priv = this.getPrivKey();
     if (priv) {
       return signEvent(event, priv);

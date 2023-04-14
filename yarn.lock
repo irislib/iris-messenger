@@ -8710,10 +8710,10 @@ normalize-url@^6.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
 
-nostr-relaypool@0.6.15:
-  version "0.6.15"
-  resolved "https://registry.yarnpkg.com/nostr-relaypool/-/nostr-relaypool-0.6.15.tgz#66754fee0a522c2a889af774eb2a07953eaa16dd"
-  integrity sha512-SULVqzfOXJbXjOX49l6ep0pL83PTrw78DjdAzvI86l2Y+DLfMsN5Vp7s9W9hpkAjjmUazZ32om1SUOAe48N8Jg==
+nostr-relaypool@0.6.16:
+  version "0.6.16"
+  resolved "https://registry.yarnpkg.com/nostr-relaypool/-/nostr-relaypool-0.6.16.tgz#67e9752a12b87b8fd0f2768b75f64cb8b9404984"
+  integrity sha512-8XHRBt1yCZw0rGTW8sezHbFrcoZFONAAcLkz2wpH0+YHrhz30A2nd2a3A7YNwvYCmzss53em4Cak1EknopqybA==
   dependencies:
     "@jest/source-map" "^29.4.3"
     isomorphic-ws "^5.0.0"

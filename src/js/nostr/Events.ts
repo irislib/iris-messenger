@@ -615,7 +615,7 @@ const Events = {
     console.log('notificationsSeenTime', Events.notificationsSeenTime, 'count', count);
     localState.get('unseenNotificationCount').put(count);
   }, 1000),
-  publish: async function (event: any) {
+  publish: async function (event: Partial<Event>): Promise<Event> {
     if (!event.sig) {
       if (!event.tags) {
         event.tags = [];
@@ -623,8 +623,8 @@ const Events = {
       event.content = event.content || '';
       event.created_at = event.created_at || Math.floor(Date.now() / 1000);
       event.pubkey = Key.getPubKey();
-      event.id = getEventHash(event);
-      event.sig = await Key.sign(event);
+      event.id = getEventHash(event as Event);
+      event.sig = await Key.sign(event as Event);
     }
     if (!(event.id && event.sig)) {
       console.error('Invalid event', event);
@@ -632,12 +632,12 @@ const Events = {
     }
 
     console.log('publishing event', event);
-    this.handle(event);
+    this.handle(event as Event);
 
     // for some reason these hang around
     delete event['$loki'];
     delete event['meta'];
-    Relays.publish(event);
+    Relays.publish(event as Event);
 
     // also publish at most 10 events referred to in tags
     const referredEvents = event.tags
@@ -652,7 +652,7 @@ const Events = {
         Relays.publish(referredEvent);
       }
     }
-    return event.id;
+    return event as Event;
   },
   getZappingUser(eventId: string) {
     const description = Events.db.by('id', eventId)?.tags?.find((t) => t[0] === 'description')?.[1];
