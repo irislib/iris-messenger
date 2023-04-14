@@ -1,10 +1,12 @@
 import $ from 'jquery';
+import { debounce } from 'lodash';
 import isEqual from 'lodash/isEqual';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
 import FuzzySearch from '../FuzzySearch';
 import localState from '../LocalState';
+import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
@@ -149,12 +151,29 @@ class SearchBox extends Component<Props, State> {
     }
   }
 
+  searchFromServer = debounce((query) => {
+    fetch(`https://rbr.bio/search/${query}.json`).then((res) => {
+      res.json().then((json) => {
+        if (json && Array.isArray(json)) {
+          let added = 0;
+          json.forEach((item) => {
+            Events.handle(item[1]) && added++;
+          });
+          console.log('added ' + added + ' events');
+        }
+      });
+    });
+  }, 500);
+
   search() {
-    const query = String(this.props.query || $(this.base).find('input').first().val());
+    let query = this.props.query || $(this.base).find('input').first().val();
     if (!query) {
       this.close();
       return;
     }
+    query = query.toString();
+
+    this.searchFromServer(query);
 
     if (this.props.onSelect) {
       // if matches email regex
