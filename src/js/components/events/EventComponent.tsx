@@ -25,6 +25,7 @@ interface EventComponentProps {
   standalone?: boolean;
   asInlineQuote?: boolean;
   showReplies?: number;
+  showRepliedMsg?: boolean;
   isReply?: boolean;
   isQuote?: boolean;
   isQuoting?: boolean;
