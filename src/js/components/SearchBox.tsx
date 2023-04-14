@@ -177,8 +177,6 @@ class SearchBox extends Component<Props, State> {
       return;
     }
 
-    this.searchFromServer(query);
-
     if (this.props.onSelect) {
       // if matches email regex
       if (query.match(/.+@.+\..+/)) {
@@ -216,6 +214,8 @@ class SearchBox extends Component<Props, State> {
         return this.props.onSelect({ key: query });
       }
     }
+
+    this.searchFromServer(query);
 
     if (query) {
       const results = FuzzySearch.search(query).slice(0, RESULTS_MAX);
