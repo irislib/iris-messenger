@@ -10,7 +10,6 @@ import Follow from '../components/buttons/Follow';
 import Report from '../components/buttons/Report';
 import Dropdown from '../components/Dropdown';
 import Feed from '../components/Feed';
-import FeedMessageForm from '../components/FeedMessageForm';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
@@ -298,13 +297,9 @@ class Profile extends View {
     } else if (this.props.tab === 'media') {
       return html`TODO media message feed`;
     }
-    const messageForm = this.state.isMyProfile
-      ? html`<${FeedMessageForm} class="hidden-xs" autofocus=${false} />`
-      : '';
 
     return html`
       <div>
-        ${messageForm}
         <div class="public-messages-view">
           ${this.getNotification()}
           <${Feed}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { route } from 'preact-router';
 import styled, { css, keyframes } from 'styled-components';
 
@@ -28,7 +28,7 @@ const GalleryImage = styled.a`
   background-position: center;
   background-color: #ccc;
   background-image: url(${(props) =>
-    `https://imgproxy.iris.to/insecure/rs:fill:420:420/plain/${props.src}`});
+    `https://imgproxy.iris.to/insecure/rs:fill:428:428/plain/${props.src}`});
   & .dropdown {
     position: absolute;
     top: 0;
@@ -42,6 +42,10 @@ const GalleryImage = styled.a`
     color: white;
     user-select: none;
   }
+  &:hover {
+    opacity: 0.8;
+  }
+
   opacity: ${(props) => (props.fadeIn ? 0 : 1)};
   animation: ${(props) =>
     props.fadeIn
@@ -51,8 +55,8 @@ const GalleryImage = styled.a`
       : 'none'};
 `;
 
-export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
-  const [showImageModal, setShowImageModal] = useState(false);
+function NoteImage(props: { event: Event; fadeIn?: boolean }) {
+  const [showImageModal, setShowImageModal] = useState(-1);
 
   if (props.event.kind !== 1) {
     const id = Events.getEventReplyingTo(props.event);
@@ -81,12 +85,12 @@ export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
         <>
           <GalleryImage
             key={props.event.id + i}
-            onClick={() => setShowImageModal(true)}
+            onClick={() => setShowImageModal(i)}
             src={attachment.data}
             fadeIn={props.fadeIn}
           />
-          {showImageModal && (
-            <Modal centerVertically={true} onClose={() => setShowImageModal(false)}>
+          {showImageModal === i && (
+            <Modal centerVertically={true} onClose={() => setShowImageModal(-1)}>
               <SafeImg src={attachment.data} />
               <p>
                 <a
@@ -106,3 +110,5 @@ export default function NoteImage(props: { event: Event; fadeIn?: boolean }) {
     </>
   );
 }
+
+export default memo(NoteImage);

@@ -102,7 +102,7 @@ export default {
   "scan_qr_code": "Scan QR code",
   "search": "Search",
   "search_posts": "Search posts",
-  "send_message": "Send message",
+  "send_message": "Message",
   "settings": "Settings",
   "show_attachment": "Show Attachment",
   "show_beta_features": "Show Beta Features",

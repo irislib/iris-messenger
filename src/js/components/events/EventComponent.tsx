@@ -24,9 +24,11 @@ interface EventComponentProps {
   id?: string;
   standalone?: boolean;
   asInlineQuote?: boolean;
-  asReply?: boolean;
   showReplies?: number;
-  asQuote?: boolean;
+  showRepliedMsg?: boolean;
+  isReply?: boolean;
+  isQuote?: boolean;
+  isQuoting?: boolean;
   renderAs?: 'NoteImage';
   feedOpenedAt?: number;
 }
@@ -109,10 +111,9 @@ const EventComponent = (props: EventComponentProps) => {
 
   const getClassName = () => {
     let className = 'msg';
-    if (props.asReply) className += ' reply';
     if (props.standalone) className += ' standalone';
-    const asQuote = props.asQuote || (props.showReplies && state.sortedReplies?.length);
-    if (asQuote) className += ' quote';
+    const isQuote = props.isQuote || (props.showReplies && state.sortedReplies?.length);
+    if (isQuote) className += ' quote';
     return className;
   };
 
@@ -135,7 +136,7 @@ const EventComponent = (props: EventComponentProps) => {
   }
 
   if (SocialNetwork.blockedUsers.has(state.event.pubkey)) {
-    if (props.standalone || props.asQuote) {
+    if (props.standalone || props.isQuote) {
       return (
         <div className="msg">
           <div className="msg-content">
@@ -186,7 +187,7 @@ const EventComponent = (props: EventComponentProps) => {
         className={getClassName()}
         event={state.event}
         meta={state.meta}
-        fadeIn={props.feedOpenedAt < state.event.created_at * 1000}
+        fadeIn={props.feedOpenedAt < state.event.created_at}
         {...props}
       />
     );

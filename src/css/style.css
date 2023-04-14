@@ -1012,6 +1012,9 @@ header.footer .header-content {
 
 .menu-new-post button {
   margin-bottom: 10px;
+  height: 55px;
+  width: 55px;
+  padding: 0;
 }
 
 .application-list {
@@ -1067,7 +1070,12 @@ header.footer .header-content {
   }
 
   .menu-new-post {
-    margin-left: 5px;
+    margin-left: 0px;
+    text-align: center;
+  }
+
+  .menu-new-post button {
+    margin-right: 0;
   }
 }
 
@@ -1418,7 +1426,6 @@ a.msg {
 
 .msg .emoji-only {
   font-size: 3em;
-  text-align: center;
 }
 
 a.msgSenderName {

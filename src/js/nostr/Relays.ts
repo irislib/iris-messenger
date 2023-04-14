@@ -145,6 +145,9 @@ const Relays = {
     const myRelays = Array.from(this.relays.values()).filter(
       (relay: Relay) => relay.enabled !== false,
     ) as Relay[];
+    console.log('publishing to myRelays', myRelays, event);
+    delete event['$loki'];
+    delete event['meta'];
     for (const relay of myRelays) {
       relay.publish(event);
     }

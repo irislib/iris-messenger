@@ -25,18 +25,21 @@ let dev: any = {
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
   useEventCache: false,
   autoReconnect: true,
-  externalGetEventById: (id) =>
-    (Events.seen.has(id) && {
-      // make externalGetEventById take booleans instead of events?
-      sig: '',
-      id: '',
-      kind: 0,
-      tags: [],
-      content: '',
-      created_at: 0,
-      pubkey: '',
-    }) ||
-    undefined,
+  externalGetEventById: (id) => {
+    return (
+      (Events.seen.has(id) && {
+        // make externalGetEventById take booleans instead of events?
+        sig: '',
+        id: '',
+        kind: 0,
+        tags: [],
+        content: '',
+        created_at: 0,
+        pubkey: '',
+      }) ||
+      undefined
+    );
+  },
 });
 relayPool.onnotice((relayUrl, notice) => {
   console.log('notice', notice, ' from relay ', relayUrl);
@@ -167,6 +170,9 @@ const PubSub = {
     if (sinceLastOpened) {
       filter.since = lastOpened;
     }
+    const defaultRelays = Array.from(Relays.relays.values())
+      .filter((r) => r.enabled !== false)
+      .map((r) => r.url);
     return relayPool.subscribe(
       [filter],
       relays,
@@ -176,6 +182,11 @@ const PubSub = {
         }, 0);
       },
       mergeSubscriptions ? 100 : 0,
+      undefined,
+      {
+        // enabled relays
+        defaultRelays,
+      },
     );
   },
 };
