@@ -4,7 +4,7 @@ export default {
   "add": "Add",
   "alternatively": "Alternatively",
   "appearance": "Appearance",
-  "application_security_warning": "The application is",
+  "application_security_warning": "The application is an unaudited proof-of-concept implementation, so don't use it for security critical purposes.",
   "autoplay_videos": "Autoplay videos",
   "back": "Back",
   "backup": "Backup",
