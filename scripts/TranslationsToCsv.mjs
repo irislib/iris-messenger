@@ -1,6 +1,30 @@
 import fs from 'fs';
-import glob from 'glob';
+import { glob } from 'glob';
 import { AVAILABLE_LANGUAGE_KEYS } from '../src/js/translations/Translation.mjs';
+
+const EXTRA_KEYS = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+  'today',
+  'yesterday',
+  'global_feed',
+  'messages',
+  'feeds',
+  'social_network',
+  'content',
+  'images',
+  'audio',
+  'videos',
+  'autoplay_videos',
+  'playback',
+  'embeds',
+  'everyone',
+];
 
 async function translationsToCsv() {
   let csv = '';
@@ -29,7 +53,7 @@ async function translationsToCsv() {
   console.log('found', translationKeys.size, 'translation keys from', files.length, 'files');
 
   // Translation keys from variables are not found by the regex above
-  ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'today', 'yesterday', 'global_feed', 'messages'].forEach((key) => {
+  EXTRA_KEYS.forEach((key) => {
     translationKeys.add(key);
   });
   translationKeys = Array.from(translationKeys);
