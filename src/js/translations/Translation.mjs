@@ -4,6 +4,7 @@ import { createElement } from "preact";
 const AVAILABLE_LANGUAGES = {
   en: 'English',
   'zh-cn': '简体中文',
+  'zh-tw': '繁體中文',
   es: 'Español',
   ru: 'Русский',
   de: 'Deutsch',
@@ -25,6 +26,7 @@ const AVAILABLE_LANGUAGES = {
   hu: 'Magyar',
   nl: 'Nederlands',
   he: 'עברית',
+  sv: 'Svenska',
   fi: 'Suomi',
   'cs-CZ': 'Čeština',
   bg: 'Български',
