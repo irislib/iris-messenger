@@ -23,7 +23,7 @@ export default {
   "copy_user_ID": "Copiar",
   "create": "Criar",
   "dark": "Escuro",
-  "delete": "Epagar",
+  "delete": "Apagar",
   "done": "Feito",
   "download": "Baixar",
   "edit_profile": "Editar perfil",
