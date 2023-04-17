@@ -20,6 +20,7 @@ try {
 }
 
 const Session = {
+  public: undefined,
   async logOut() {
     route('/');
     /*
