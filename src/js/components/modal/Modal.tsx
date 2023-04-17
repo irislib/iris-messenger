@@ -26,6 +26,14 @@ const Overlay = styled.div`
   padding: 20px 0;
 `;
 
+const ModalContentContainer = styled.div`
+  max-height: calc(100% - 40px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 const Modal: FC<Props> = ({ centerVertically, showContainer, children, onClose }) => {
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -50,8 +58,8 @@ const Modal: FC<Props> = ({ centerVertically, showContainer, children, onClose }
   }, [handleKeyDown]);
 
   const content = showContainer ? (
-    <div class="msg" style="width: 600px;" onClick={(e) => handleContainerClick(e)}>
-      <div class="msg-content" style="padding: 30px;">
+    <div class="msg" style={{ width: '600px' }} onClick={(e) => handleContainerClick(e)}>
+      <div class="msg-content" style={{ padding: '30px' }}>
         {children}
       </div>
     </div>
@@ -61,7 +69,7 @@ const Modal: FC<Props> = ({ centerVertically, showContainer, children, onClose }
 
   return (
     <Overlay centerVertically={centerVertically} onClick={handleOverlayClick}>
-      {content}
+      <ModalContentContainer>{content}</ModalContentContainer>
     </Overlay>
   );
 };

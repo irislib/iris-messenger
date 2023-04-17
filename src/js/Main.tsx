@@ -10,6 +10,7 @@ import { translationLoaded } from './translations/Translation';
 import About from './views/About';
 import Chat from './views/chat/Chat';
 import EditProfile from './views/EditProfile';
+import Explorer from './views/explorer/Explorer';
 import Feed from './views/Feed';
 import FeedList from './views/FeedList';
 import Follows from './views/Follows';
@@ -160,7 +161,7 @@ class Main extends Component<Props, ReactState> {
               <KeyConverter path="/key" />
               <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />
-              <Feed path="/search/:keyword?/:type?" />
+              <Feed path="/search/:keyword?" />
               <Login path="/login" />
               <Notifications path="/notifications" />
               <Chat path="/chat/hashtag/:hashtag?" />
@@ -171,6 +172,7 @@ class Main extends Component<Props, ReactState> {
               <About path="/about" />
               <Settings path="/settings/:page?" />
               <LogoutConfirmation path="/logout" />
+              <Explorer path="/explorer/:path?" />
               <EditProfile path="/profile/edit" />
               <MyProfile path="/profile/:id+" tab="profile" />
               <MyProfile path="/replies/:id+" tab="replies" />

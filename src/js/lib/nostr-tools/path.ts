@@ -173,6 +173,18 @@ export class Path {
     return listener
   }
 
+  list(path: string, callback: PathCallback, filter = {}): Listener {
+    filter = Object.assign({}, filter, this.filter, { '#d': [path], kinds: [EVENT_KIND] })
+    const listener = this.addListener(filter, callback)
+    this.store.get(filter, (event) => this.callbackFromEvent(event, callback))
+    this.subscribe([filter], async (event) => {
+      if (this.store.set(event)) {
+        this.notifyListeners(event as CompleteEvent)
+      }
+    })
+    return listener
+  }
+
   addListener(filter: Filter, callback: PathCallback): Listener {
     const id = Math.random().toString(36).substr(2, 9)
     const listener: Listener = { filter, callback, off: () => {
