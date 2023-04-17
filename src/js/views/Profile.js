@@ -367,7 +367,7 @@ class Profile extends View {
       false,
       false,
     );
-    fetch(`https://rbr.bio/${address}/info.json`).then((res) => {
+    fetch(`https://us.rbr.bio/${address}/info.json`).then((res) => {
       if (!res.ok) {
         return;
       }
