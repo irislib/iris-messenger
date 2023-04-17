@@ -173,6 +173,7 @@ class Main extends Component<Props, ReactState> {
               <Settings path="/settings/:page?" />
               <LogoutConfirmation path="/logout" />
               <Explorer path="/explorer/:path?" />
+              <Explorer path="/explorer/:path+" />
               <EditProfile path="/profile/edit" />
               <MyProfile path="/profile/:id+" tab="profile" />
               <MyProfile path="/replies/:id+" tab="replies" />
