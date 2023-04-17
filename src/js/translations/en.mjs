@@ -91,7 +91,7 @@ export default {
   "save_relays_publicly": "Save relays publicly",
   "search": "Search",
   "search_posts": "Search posts",
-  "send_message": "Send message",
+  "send_message": "Message",
   "settings": "Settings",
   "show_attachment": "Show Attachment",
   "show_files": "Show files",

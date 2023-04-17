@@ -16,6 +16,7 @@ import ProfilePicture from '../components/ProfilePicture';
 import QrCode from '../components/QrCode';
 import { isSafeOrigin } from '../components/SafeImg';
 import Helpers from '../Helpers';
+import Icons from '../Icons';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
@@ -124,68 +125,95 @@ class Profile extends View {
     rawDataJson = JSON.stringify(rawDataJson, null, 2);
     return html`
       <div class="profile-top" key="${this.state.hexPub}details">
-        <div class="profile-header">
-          <div class="profile-picture-container">${profilePicture}</div>
-          <div class="profile-header-stuff">
-            <div style="display:flex; flex-direction:row;">
-              <h3 style="flex: 1" class="profile-name">
-                <${Name} pub=${this.state.hexPub} />
-              </h3>
+        <div class="profile-header" style="flex-direction: column">
+          <div class="profile-header-top" style="display: flex; flex-direction: row">
+            <div
+              class="profile-picture-container"
+              style="flex: 2;margin-top:${this.state.banner ? '-100px;' : ''}"
+            >
+              ${profilePicture}
+            </div>
+            <div
+              class="profile-header-info"
+              style="flex: 5;flex-direction: row; display:flex;margin-top:20px;justify-content: flex-end"
+            >
+              <div>
+                ${this.state.isMyProfile
+                  ? html`<${Button} small onClick=${() => route('/profile/edit')}
+                      >${t('edit_profile')}<//
+                    >`
+                  : html`
+                      <${Follow} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
+                      ${this.state.npub !==
+                      'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8'
+                        ? html` <${Button} small onClick=${() => route(`/chat/${this.state.npub}`)}>
+                            <span class="hidden-xs"> ${t('send_message')} </span>
+                            <span class="visible-xs-inline-block msg-btn-icon">
+                              ${Icons.chat}
+                            </span>
+                          <//>`
+                        : ''}
+                    `}
+              </div>
               <div class="profile-actions">
-                <${Dropdown}>
-                  ${this.state.isMyProfile
-                    ? html`<${Button} onClick=${() => route('/profile/edit')}
-                        >${t('edit_profile')}<//
-                      >`
-                    : ''}
-                  <${Copy}
-                    key=${`${this.state.hexPub}copyLink`}
-                    text=${t('copy_link')}
-                    title=${this.state.name}
-                    copyStr=${window.location.href}
-                  />
-                  <${Copy}
-                    key=${`${this.state.hexPub}copyNpub`}
-                    text=${t('copy_user_ID')}
-                    title=${this.state.name}
-                    copyStr=${this.state.npub}
-                  />
-                  <${Button} onClick=${() => this.setState({ showQR: !this.state.showQR })}
-                    >${t('show_qr_code')}<//
-                  >
-                  <${Copy}
-                    key=${`${this.state.hexPub}copyData`}
-                    text=${t('copy_raw_data')}
-                    title=${this.state.name}
-                    copyStr=${rawDataJson}
-                  />
-                  ${!this.state.isMyProfile && !Key.getPrivKey()
-                    ? html`
-                        <${Button} onClick=${(e) => this.viewAs(e)}>
-                          ${t('view_as') + ' '}
-                          <${Name}
-                            pub=${this.state.hexPub}
-                            userNameOnly=${true}
-                            hideBadge=${true}
-                          />
-                        <//>
-                      `
-                    : ''}
-                  ${this.state.isMyProfile
-                    ? ''
-                    : html`
-                        <${Block} id=${this.state.hexPub} />
-                        <${Report} id=${this.state.hexPub} />
-                      `}
-                <//>
+                <span style="margin: 0 15px">
+                  <${Dropdown}>
+                    <${Copy}
+                      key=${`${this.state.hexPub}copyLink`}
+                      text=${t('copy_link')}
+                      title=${this.state.name}
+                      copyStr=${window.location.href}
+                    />
+                    <${Copy}
+                      key=${`${this.state.hexPub}copyNpub`}
+                      text=${t('copy_user_ID')}
+                      title=${this.state.name}
+                      copyStr=${this.state.npub}
+                    />
+                    <${Button} onClick=${() => this.setState({ showQR: !this.state.showQR })}
+                      >${t('show_qr_code')}<//
+                    >
+                    <${Copy}
+                      key=${`${this.state.hexPub}copyData`}
+                      text=${t('copy_raw_data')}
+                      title=${this.state.name}
+                      copyStr=${rawDataJson}
+                    />
+                    ${!this.state.isMyProfile && !Key.getPrivKey()
+                      ? html`
+                          <${Button} onClick=${(e) => this.viewAs(e)}>
+                            ${t('view_as') + ' '}
+                            <${Name}
+                              pub=${this.state.hexPub}
+                              userNameOnly=${true}
+                              hideBadge=${true}
+                            />
+                          <//>
+                        `
+                      : ''}
+                    ${this.state.isMyProfile
+                      ? ''
+                      : html`
+                          <${Block} id=${this.state.hexPub} />
+                          <${Report} id=${this.state.hexPub} />
+                        `}
+                  <//>
+                </span>
               </div>
             </div>
-
-            ${this.state.nip05
-              ? html`<div class="positive">${this.state.nip05.replace(/^_@/, '')}</div>`
-              : ''}
-
-            <div class="profile-about hidden-xs">
+          </div>
+          <div class="profile-header-stuff">
+            <div style="flex: 1" class="profile-name">
+              <h3 style="margin-top:0;margin-bottom:0">
+                <${Name} pub=${this.state.hexPub} />
+                ${this.state.nip05
+                  ? html`<br /><small class="positive"
+                        >${this.state.nip05.replace(/^_@/, '')}</small
+                      >`
+                  : ''}
+              </h3>
+            </div>
+            <div class="profile-about">
               <p class="profile-about-content">${this.state.about}</p>
               ${this.renderLinks()}
             </div>
@@ -199,48 +227,11 @@ class Profile extends View {
                 </a>
               </div>
               ${SocialNetwork.followedByUser.get(this.state.hexPub)?.has(Key.getPubKey())
-                ? html` <p><small>${t('follows_you')}</small></p> `
+                ? html` <div><small>${t('follows_you')}</small></div> `
                 : ''}
-              <div class="hidden-xs">
-                ${!this.state.isMyProfile
-                  ? html`
-                      <${Follow} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
-                    `
-                  : ''}
-                ${this.state.npub !==
-                'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8'
-                  ? html` <${Button}
-                      small=${true}
-                      onClick=${() => route(`/chat/${this.state.npub}`)}
-                    >
-                      ${t('send_message')}
-                    <//>`
-                  : ''}
-              </div>
             </div>
           </div>
         </div>
-
-        <div class="visible-xs-flex profile-actions" style="justify-content: flex-end">
-          ${this.renderLinks()}
-          ${this.state.isMyProfile
-            ? ''
-            : html`
-                <div>
-                  <${Follow} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
-                  <${Button} small=${true} onClick=${() => route(`/chat/${this.state.npub}`)}>
-                    ${t('send_message')}
-                  <//>
-                </div>
-              `}
-        </div>
-        ${this.state.about
-          ? html`
-              <div class="profile-about visible-xs-flex">
-                <p class="profile-about-content">${this.state.about}</p>
-              </div>
-            `
-          : ''}
         ${this.state.showQR
           ? html` <${QrCode} data=${`https://iris.to/${this.state.npub}`} /> `
           : ''}
@@ -329,12 +320,7 @@ class Profile extends View {
     return html`
       ${this.state.banner
         ? html`
-            <div
-              class="profile-banner"
-              style="background-image:linear-gradient(
-    to bottom, transparent, var(--main-color)
-  ), url(${this.state.banner})"
-            ></div>
+            <div class="profile-banner" style="background-image: url(${this.state.banner})"></div>
           `
         : ''}
       <div class="content">

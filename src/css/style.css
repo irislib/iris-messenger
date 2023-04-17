@@ -2146,7 +2146,7 @@ small,
   display: flex;
   flex-direction: row;
   justify-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
 }
 
 .profile-banner {
@@ -2396,6 +2396,7 @@ input[type='text'] {
   cursor: pointer;
   max-width: min(100%, 300px);
   max-height: min(30vw, 300px);
+  border: 5px solid var(--body-bg);
 }
 
 .online-indicator {
@@ -2603,13 +2604,15 @@ input[type='text'] {
     padding-left: 15px;
   }
 
+  .msg-btn-icon svg {
+    width: 13px;
+    height: 13px;
+  }
+
   #current-profile-picture {
     max-width: none !important;
     max-height: none !important;
     width: 100%;
-  }
-  .profile-top {
-    padding: 10px 15px;
   }
 
   div:not([class*="msg-content"]) > form.public {

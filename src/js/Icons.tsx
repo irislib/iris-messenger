@@ -8,7 +8,7 @@ export default {
   ),
 
   grid: (
-    <svg style="margin-top: 6px" width="16" height="16" viewBox="0 0 140 140">
+    <svg style="margin-top: 4px" width="18" height="18" viewBox="0 0 140 140">
       <rect
         x="8"
         y="8"

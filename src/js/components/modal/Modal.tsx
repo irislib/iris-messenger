@@ -58,7 +58,11 @@ const Modal: FC<Props> = ({ centerVertically, showContainer, children, onClose }
   }, [handleKeyDown]);
 
   const content = showContainer ? (
-    <div class="msg" style={{ width: '600px', 'max-width': 'calc(100vw - 40px)' }} onClick={(e) => handleContainerClick(e)}>
+    <div
+      class="msg"
+      style={{ width: '600px', 'max-width': 'calc(100vw - 40px)' }}
+      onClick={(e) => handleContainerClick(e)}
+    >
       <div class="msg-content" style={{ padding: '30px' }}>
         {children}
       </div>
