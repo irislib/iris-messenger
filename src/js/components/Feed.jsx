@@ -429,7 +429,7 @@ class Feed extends Component {
             localState.get('settings').get('feed').get('display').put('grid');
           }}
         >
-          {Icons.image}
+          {Icons.grid}
         </a>
       </div>
     );
