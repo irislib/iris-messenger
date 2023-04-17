@@ -25,16 +25,17 @@ export default class Content extends Component {
       { setting: 'enableAudio', label: 'Audio' },
       { setting: 'enableVideos', label: 'Videos' },
       { setting: 'autoplayVideos', label: 'Autoplay videos' },
-      { setting: 'enableWebtorrent', label: 'Webtorrent' },
-      { setting: 'enableYoutube', label: 'YouTube' },
-      { setting: 'enableTwitter', label: 'Twitter' },
-      { setting: 'enableInstagram', label: 'Instagram' },
       { setting: 'enableAppleMusic', label: 'Apple Music' },
+      { setting: 'enableInstagram', label: 'Instagram' },
+      { setting: 'enableSoundCloud', label: 'SoundCloud' },
       { setting: 'enableSpotify', label: 'Spotify' },
       { setting: 'enableTidal', label: 'Tidal' },
       { setting: 'enableTiktok', label: 'TikTok' },
       { setting: 'enableTwitch', label: 'Twitch' },
+      { setting: 'enableTwitter', label: 'Twitter' },
+      { setting: 'enableYoutube', label: 'YouTube' },
       { setting: 'enableWavlake', label: 'Wavlake' },
+      { setting: 'enableWebtorrent', label: 'Webtorrent' },
     ];
     return (
       <>

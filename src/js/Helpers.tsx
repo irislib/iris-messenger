@@ -234,6 +234,33 @@ export default {
       });
     }
 
+    // Soundcloud
+    if (settings.enableSoundCloud !== false) {
+      const soundCloudRegex =
+        /(?:https?:\/\/)?(?:www\.)?(soundcloud\.com\/(?!live)[a-zA-Z0-9-_]+\/[a-zA-Z0-9-_]+)/g;
+      replacedText = reactStringReplace(replacedText, soundCloudRegex, (match, i) => {
+        return (
+          console.log('match: ' + match),
+          console.log('match 0: ' + match[0]),
+          console.log('match 1: ' + match[1]),
+          console.log('match 2: ' + match[2]),
+          (
+            <iframe
+              class="audio"
+              scrolling="no"
+              key={match + i}
+              width="650"
+              height="380"
+              style={{ maxWidth: '100%' }}
+              src={`https://w.soundcloud.com/player/?url=${match}`}
+              frameBorder="0"
+              allow="encrypted-media"
+            />
+          )
+        );
+      });
+    }
+
     if (settings.enableSpotify !== false) {
       const spotifyRegex =
         /(?:https?:\/\/)?(?:www\.)?(?:open\.spotify\.com\/track\/)([\w-]+)(?:\S+)?/g;
@@ -332,6 +359,31 @@ export default {
             height="150"
             style={{ maxWidth: '100%' }}
             src={`https://embed.music.apple.com/${match}`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        );
+      });
+    }
+
+    // Apple Podcast
+
+    if (settings.enableAppleMusic !== false) {
+      const applePodcastRegex = /(?:https?:\/\/)?(?:www\.)?(podcasts\.apple\.com\/.*)/g;
+      replacedText = reactStringReplace(replacedText, applePodcastRegex, (match, i) => {
+        console.log('embed url: ' + match);
+        const cssClass = match.includes('?i=') ? 'applepodcast-small' : 'applepodcast-large';
+        return (
+          <iframe
+            // class="applepodcast"
+            class={cssClass}
+            scrolling="no"
+            key={match + i}
+            width="650"
+            height="175"
+            style={{ maxWidth: '100%' }}
+            src={`https://embed.${match}`}
             frameBorder="0"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
