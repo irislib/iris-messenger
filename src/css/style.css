@@ -277,7 +277,7 @@ input {
 
 img,
 video {
-  max-width: 95%;
+  max-width: 100%;
   max-height: 95vh;
 }
 
