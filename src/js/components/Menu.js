@@ -17,7 +17,7 @@ import QrCode from './QrCode';
 
 const APPLICATIONS = [
   // TODO: move editable shortcuts to localState gun
-  { url: '/', text: 'feeds', icon: Icons.home },
+  { url: '/', text: 'home', icon: Icons.home },
   { url: '/chat', text: 'messages', icon: Icons.chat },
   { url: '/settings', text: 'settings', icon: Icons.settings },
   { url: '/about', text: 'about', icon: Icons.info },
