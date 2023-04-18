@@ -1,111 +1,31 @@
-import $ from 'jquery';
-import { Component } from 'preact';
+import { useState } from 'preact/hooks';
 
-import Helpers from '../Helpers';
-
+import Modal from './modal/Modal';
 import SafeImg from './SafeImg';
 
 type Props = { picture?: string; onError?: () => void };
-const ANIMATE_DURATION = 200;
 
-class ProfilePicture extends Component<Props> {
-  render() {
-    return (
-      <SafeImg
-        class="profile-picture"
-        src={this.props.picture}
-        onError={this.props.onError}
-        onClick={(e) => {
-          this.imageClicked(e);
-        }}
-      />
-    );
-  }
+const ProfilePicture = ({ picture, onError }: Props) => {
+  const [showModal, setShowModal] = useState(false);
 
-  openAttachmentsGallery(event) {
-    $('#floating-day-separator').remove();
-    const attachmentsPreview = $('<div>')
-      .attr('id', 'attachment-gallery')
-      .addClass('gallery')
-      .addClass('attachment-preview');
-    $('body').append(attachmentsPreview);
-    attachmentsPreview.fadeIn(ANIMATE_DURATION);
-    let left, top, width, img;
+  const handleClick = () => {
+    setShowModal(true);
+  };
 
-    if (this.props.picture) {
-      img = Helpers.setImgSrc($('<img>'), this.props.picture);
-      attachmentsPreview.css({ 'justify-content': 'center' });
-      const original = $(event.target);
-      left = original.offset().left;
-      top = original.offset().top - $(window).scrollTop();
-      width = original.width();
-      const transitionImg = img
-        .clone()
-        .attr('id', 'transition-img')
-        .data('originalDimensions', { left, top, width });
-      transitionImg.css({
-        position: 'fixed',
-        left,
-        top,
-        width,
-        'max-width': 'none',
-        'max-height': 'none',
-      });
-      img.css({ visibility: 'hidden', 'align-self': 'center' });
-      attachmentsPreview.append(img);
-      $('body').append(transitionImg);
-      const o = img.offset();
-      transitionImg.animate(
-        { width: img.width(), left: o.left, top: o.top },
-        {
-          duration: ANIMATE_DURATION,
-          complete: () => {
-            img.css({ visibility: 'visible' });
-            transitionImg.hide();
-          },
-        },
-      );
-    }
-    attachmentsPreview.one('click', () => {
-      this.closeAttachmentsGallery();
-    });
-    $(document)
-      .off('keyup')
-      .on('keyup', (e) => {
-        if (e.key === 'Escape') {
-          // escape key maps to keycode `27`
-          $(document).off('keyup');
-          if ($('#attachment-gallery:visible').length) {
-            this.closeAttachmentsGallery();
-          }
-        }
-      });
-  }
+  const handleClose = () => {
+    setShowModal(false);
+  };
 
-  closeAttachmentsGallery() {
-    const transitionImg = $('#transition-img');
-    if (transitionImg.length) {
-      const originalDimensions = transitionImg.data('originalDimensions');
-      transitionImg.show();
-      $('#attachment-gallery img').remove();
-      transitionImg.animate(originalDimensions, {
-        duration: ANIMATE_DURATION,
-        complete: () => {
-          transitionImg.remove();
-        },
-      });
-    }
-    $('#attachment-gallery').fadeOut({
-      duration: ANIMATE_DURATION,
-      complete: () => $('#attachment-gallery').remove(),
-    });
-  }
+  return (
+    <>
+      <SafeImg class="profile-picture" src={picture} onError={onError} onClick={handleClick} />
+      {showModal && (
+        <Modal centerVertically={true} onClose={handleClose}>
+          <SafeImg src={picture} onError={onError} />
+        </Modal>
+      )}
+    </>
+  );
+};
 
-  imageClicked(event) {
-    event.preventDefault();
-    if (window.innerWidth >= 625) {
-      this.openAttachmentsGallery(event);
-    }
-  }
-}
 export default ProfilePicture;

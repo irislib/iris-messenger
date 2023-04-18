@@ -135,7 +135,7 @@ class Profile extends View {
             </div>
             <div
               class="profile-header-info"
-              style="flex: 5;flex-direction: row; display:flex;margin-top:20px;justify-content: flex-end"
+              style="flex: 5;flex-direction: row; display:flex;margin-top:15px;justify-content: flex-end"
             >
               <div>
                 ${this.state.isMyProfile
@@ -204,7 +204,7 @@ class Profile extends View {
           </div>
           <div class="profile-header-stuff">
             <div style="flex: 1" class="profile-name">
-              <h3 style="margin-top:0;margin-bottom:0">
+              <h3 style="margin-top:5px;margin-bottom:0">
                 <${Name} pub=${this.state.hexPub} />
                 ${this.state.nip05
                   ? html`<br /><small class="positive"
