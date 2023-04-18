@@ -3,16 +3,17 @@
 import {Event, verifySignature, validateEvent} from './event'
 import {Filter, matchFilters} from './filter'
 
-type RelayEvent = 'connect' | 'disconnect' | 'error' | 'notice'
+type RelayEvent = 'connect' | 'disconnect' | 'error' | 'notice' | 'auth'
 
 export type Relay = {
-  enabled?: any;
+  enabled?: any
   url: string
   status: number
   connect: () => Promise<void>
   close: () => Promise<void>
   sub: (filters: Filter[], opts?: SubscriptionOptions) => Sub
   publish: (event: Event) => Pub
+  auth: (event: Event) => Pub
   on: (type: RelayEvent, cb: any) => void
   off: (type: RelayEvent, cb: any) => void
 }
@@ -33,22 +34,29 @@ type SubscriptionOptions = {
 }
 
 // TODO allowAuthor fn so we can skip JSON.parse and sig verify if we won't allow the author anyway
-export function relayInit(url: string, alreadyHaveEvent?: (id: string) => boolean): Relay {
+export function relayInit(
+  url: string,
+  alreadyHaveEvent?: (id: string) => boolean
+): Relay {
   var ws: WebSocket
   var resolveClose: () => void
-  var resolveOpen: (value: (PromiseLike<void> | void)) => void
-  var untilOpen = new Promise<void>((resolve) => { resolveOpen = resolve })
+  var resolveOpen: (value: PromiseLike<void> | void) => void
+  var untilOpen = new Promise<void>(resolve => {
+    resolveOpen = resolve
+  })
   var openSubs: {[id: string]: {filters: Filter[]} & SubscriptionOptions} = {}
   var listeners: {
     connect: Array<() => void>
     disconnect: Array<() => void>
     error: Array<() => void>
     notice: Array<(msg: string) => void>
+    auth: Array<(challenge: string) => void>
   } = {
     connect: [],
     disconnect: [],
     error: [],
-    notice: []
+    notice: [],
+    auth: []
   }
   var subListeners: {
     [subid: string]: {
@@ -63,7 +71,7 @@ export function relayInit(url: string, alreadyHaveEvent?: (id: string) => boolea
       failed: Array<(reason: string) => void>
     }
   } = {}
-  let idRegex = /"id":"([a-fA-F0-9]+)"/;
+  let idRegex = /"id":"([a-fA-F0-9]+)"/
 
   async function connectRelay(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -145,6 +153,11 @@ export function relayInit(url: string, alreadyHaveEvent?: (id: string) => boolea
               let notice = data[1]
               listeners.notice.forEach(cb => cb(notice))
               return
+            case 'AUTH': {
+              let challenge = data[1]
+              listeners.auth?.forEach(cb => cb(challenge))
+              return
+            }
           }
         }
       }
@@ -216,79 +229,80 @@ export function relayInit(url: string, alreadyHaveEvent?: (id: string) => boolea
     }
   }
 
+  function _publishEvent(event: Event, type: string) {
+    if (!event.id) throw new Error(`event ${event} has no id`)
+    let id = event.id
+
+    var sent = false
+    var mustMonitor = false
+
+    trySend([type, event])
+      .then(() => {
+        sent = true
+        if (mustMonitor) {
+          startMonitoring()
+          mustMonitor = false
+        }
+      })
+      .catch(() => {})
+
+    const startMonitoring = () => {
+      let monitor = sub([{ids: [id]}], {
+        id: `monitor-${id.slice(0, 5)}`
+      })
+      let willUnsub = setTimeout(() => {
+        ;(pubListeners[id]?.failed || []).forEach(cb =>
+          cb('event not seen after 5 seconds')
+        )
+        monitor.unsub()
+      }, 5000)
+      monitor.on('event', () => {
+        clearTimeout(willUnsub)
+        ;(pubListeners[id]?.seen || []).forEach(cb => cb())
+      })
+    }
+
+    return {
+      on: (type: 'ok' | 'seen' | 'failed', cb: any) => {
+        pubListeners[id] = pubListeners[id] || {
+          ok: [],
+          seen: [],
+          failed: []
+        }
+        pubListeners[id][type].push(cb)
+
+        if (type === 'seen') {
+          if (sent) startMonitoring()
+          else mustMonitor = true
+        }
+      },
+      off: (type: 'ok' | 'seen' | 'failed', cb: any) => {
+        let listeners = pubListeners[id]
+        if (!listeners) return
+        let idx = listeners[type].indexOf(cb)
+        if (idx >= 0) listeners[type].splice(idx, 1)
+      }
+    }
+  }
+
   return {
     url,
     sub,
-    on: (
-      type: RelayEvent,
-      cb: any
-    ): void => {
+    on: (type: RelayEvent, cb: any): void => {
       listeners[type].push(cb)
       if (type === 'connect' && ws?.readyState === 1) {
         cb()
       }
     },
-    off: (
-      type: RelayEvent,
-      cb: any
-    ): void => {
+    off: (type: RelayEvent, cb: any): void => {
       let index = listeners[type].indexOf(cb)
       if (index !== -1) listeners[type].splice(index, 1)
     },
     publish(event: Event): Pub {
-      if (!event.id) throw new Error(`event ${event} has no id`)
-      let id = event.id
-
-      var sent = false
-      var mustMonitor = false
-
-      trySend(['EVENT', event])
-        .then(() => {
-          sent = true
-          if (mustMonitor) {
-            startMonitoring()
-            mustMonitor = false
-          }
-        })
-        .catch(() => {})
-
-      const startMonitoring = () => {
-        let monitor = sub([{ids: [id]}], {
-          id: `monitor-${id.slice(0, 5)}`
-        })
-        let willUnsub = setTimeout(() => {
-          ;(pubListeners[id]?.failed || []).forEach(cb =>
-            cb('event not seen after 5 seconds')
-          )
-          monitor.unsub()
-        }, 5000)
-        monitor.on('event', () => {
-          clearTimeout(willUnsub)
-          ;(pubListeners[id]?.seen || []).forEach(cb => cb())
-        })
-      }
-
-      return {
-        on: (type: 'ok' | 'seen' | 'failed', cb: any) => {
-          pubListeners[id] = pubListeners[id] || {
-            ok: [],
-            seen: [],
-            failed: []
-          }
-          pubListeners[id][type].push(cb)
-
-          if (type === 'seen') {
-            if (sent) startMonitoring()
-            else mustMonitor = true
-          }
-        },
-        off: (type: 'ok' | 'seen' | 'failed', cb: any) => {
-          let listeners = pubListeners[id]
-          if (!listeners) return
-          let idx = listeners[type].indexOf(cb)
-          if (idx >= 0) listeners[type].splice(idx, 1)
-        }
-      }
+      return _publishEvent(event, 'EVENT')
+    },
+    auth(event: Event): Pub {
+      return _publishEvent(event, 'AUTH')
     },
     connect,
     close(): Promise<void> {

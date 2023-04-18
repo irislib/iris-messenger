@@ -3,6 +3,7 @@ import { shuffle, throttle } from 'lodash';
 
 import Helpers from '../Helpers';
 import { Event, Filter, Relay, relayInit, Sub } from '../lib/nostr-tools';
+import { authenticate } from '../lib/nostr-tools/nip42';
 import localState from '../LocalState';
 
 import Events from './Events';
@@ -209,6 +210,7 @@ const Relays = {
       relay.on('disconnect', () => {
         console.log('disconnected from ', relay.url);
       });
+      this._attachAuthListener(relay);
     }
     for (const relay of this.searchRelays.values()) {
       relay.on('notice', (notice) => {
@@ -256,7 +258,22 @@ const Relays = {
     relay.on('notice', (notice) => {
       console.log('notice from ', relay.url, notice);
     });
+    this._attachAuthListener(relay);
     this.relays.set(url, relay);
+  },
+  _attachAuthListener(relay) {
+    relay.on('auth', async (challenge) => {
+      try {
+        await authenticate({
+          challenge,
+          relay,
+          sign: Events.sign,
+        });
+      } catch {
+        relay.close();
+        relay.enabled = false;
+      }
+    });
   },
   remove(url: string) {
     try {
