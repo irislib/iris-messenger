@@ -56,10 +56,10 @@
 
 [data-theme="light"] {
   --body-bg: #ffffff;
-  --blue: #1d9bf0;
+  --blue: #1D9BF0;
   --button-bg: #ffffff;
   --button-bg-hover: #eeeeee;
-  --button-border: 1px solid #000000;
+  --button-border: 1px solid #CFD9DE;
   --button-color: #000000;
   --button-color-hover: #000000;
   --chat-active: #f5f5f5;
@@ -72,7 +72,7 @@
   --emoji-picker-border-color: #e5e5e5;
   --emoji-picker-color: #000000;
   --gallery-background: rgba(255, 255, 255, 0.8);
-  --green: #34ba7c;
+  --green: #53B781;
   --header-color: #ffffff;
   --input-bg: #eeeeee;
   --input-placeholder: #666;
@@ -1420,7 +1420,8 @@ a.msg {
 
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover, .dropdown-content button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--button-bg-hover);
+  color: var(--text-color);
 }
 
 .emoji {
