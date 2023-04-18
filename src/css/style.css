@@ -2397,6 +2397,7 @@ input[type='text'] {
   max-width: min(100%, 300px);
   max-height: min(30vw, 300px);
   border: 5px solid var(--body-bg);
+  background-color: var(--body-bg);
 }
 
 .online-indicator {
