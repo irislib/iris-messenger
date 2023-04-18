@@ -827,8 +827,7 @@ header.footer .header-content {
 }
 
 .nav #back-button {
-  align-self: center;
-  padding: 15px 20px;
+  padding: 13px 20px;
   cursor: pointer;
 }
 
