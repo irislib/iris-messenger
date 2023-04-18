@@ -16,7 +16,7 @@
   --connecting-line-color: #333639;
   --day-separator-bg: rgba(30, 32, 37, 0.85);
   --day-separator-color: rgba(255, 255, 255, 0.88);
-  --dropdown-bg: rgba(0, 0, 0, 0.8);
+  --dropdown-bg: rgba(0, 0, 0, 0.9);
   --emoji-picker-bg: #35383f;
   --emoji-picker-border-color: #1f2125;
   --emoji-picker-color: #fff;
@@ -1404,6 +1404,7 @@ a.msg {
   display: block;
   border-radius: 0;
   margin: 0;
+  font-weight: bold;
 }
 
 .dropdown-content a:first-of-type {
@@ -2308,7 +2309,7 @@ form.public {
 
 .follow,
 .block {
-  min-width: 110px;
+  min-width: 120px;
   transition: background-color 0.1s ease;
   padding: 5px 20px;
 }

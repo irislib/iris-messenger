@@ -4,6 +4,7 @@ const Button = styled.button`
   background: var(--button-bg);
   color: var(--button-color);
   border: var(--button-border);
+  font-weight: bold;
   cursor: pointer;
   transition: all 0.25s ease;
   width: ${(props) => props.width || 'auto'};
