@@ -2,7 +2,7 @@
   --body-bg: #000000;
   --blue: #1d9bf0;
   --button-bg: #000000;
-  --button-bg-hover: #333;
+  --button-bg-hover: #222222;
   --button-border: 1px solid #ffffff;
   --button-color: #ffffff;
   --button-color-hover: #ffffff;
@@ -1395,6 +1395,7 @@ a.msg {
   background-color: transparent;
   width: 100%;
   text-align: right;
+  border: 0;
 }
 
 /* Links inside the dropdown */
@@ -2329,8 +2330,7 @@ form.public {
 
 .block.blocked,
 .follow.following {
-  background-color: var(--notify);
-  border: var(--button-border-size) solid var(--notify);
+  background-color: var(--button-bg-hover);
 }
 
 .block.blocked {
@@ -2342,7 +2342,8 @@ form.public {
 }
 
 .follow.following:hover {
-  background-color: var(--warning-background);
+  color: var(--red);
+  border-color: var(--red);
 }
 
 .block .hover,

@@ -4,7 +4,7 @@ import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
 import Block from '../components/buttons/Block';
-import { PrimaryButton as Button } from '../components/buttons/Button';
+import { Button } from '../components/buttons/Button';
 import Copy from '../components/buttons/Copy';
 import Follow from '../components/buttons/Follow';
 import Report from '../components/buttons/Report';
