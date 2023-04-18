@@ -136,7 +136,7 @@ export default class EditProfile extends Component {
                         </p>
                         {val && (
                           <p>
-                            <SafeImg width={200} src={val} />
+                            <SafeImg src={val} />
                           </p>
                         )}
                       </>
@@ -177,7 +177,9 @@ export default class EditProfile extends Component {
                   }
                 />
               </p>
-              <Button type="submit">Add new attribute</Button>
+              <p>
+                <Button type="submit">Add new attribute</Button>
+              </p>
             </form>
           </div>
         </div>

@@ -30,7 +30,7 @@ class Header extends Component {
   }
 
   backButtonClicked() {
-    route('/chat');
+    window.history.back();
   }
 
   componentWillUnmount() {
@@ -120,7 +120,7 @@ class Header extends Component {
               class="visible-xs-inline-block"
               onClick=${() => this.backButtonClicked()}
             >
-              ‹
+              ${Icons.backArrow}
             </div>
           `
         : ''}
