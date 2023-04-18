@@ -9,7 +9,6 @@
   --button-primary-bg: #8e44ad;
   --button-primary-bg-hover: #5a488b;
   --button-primary-border: 0;
-  --button-border-size: 0;
   --button-primary-color: #fefffe;
   --button-primary-color-hover: #fefffe;
   --chat-active: #212428;
@@ -58,12 +57,11 @@
 [data-theme="light"] {
   --body-bg: #ffffff;
   --blue: #1d9bf0;
-  --button-bg: #8e44ad;
-  --button-bg-hover: #5a488b;
-  --button-border: 0;
-  --button-border-size: 0;
-  --button-color: #ffffff;
-  --button-color-hover: #ffffff;
+  --button-bg: #ffffff;
+  --button-bg-hover: #eeeeee;
+  --button-border: 1px solid #000000;
+  --button-color: #000000;
+  --button-color-hover: #000000;
   --chat-active: #f5f5f5;
   --chat-hover: #f0f0f0;
   --connecting-line-color: #cfd9dd;
@@ -76,7 +74,7 @@
   --gallery-background: rgba(255, 255, 255, 0.8);
   --green: #34ba7c;
   --header-color: #ffffff;
-  --input-bg: #f5f5f5;
+  --input-bg: #eeeeee;
   --input-placeholder: #666;
   --input-text: #000000;
   --login-background: #ffffff;
