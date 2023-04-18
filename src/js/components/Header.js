@@ -148,18 +148,22 @@ class Header extends Component {
                 <span class="visible-xs-inline-block">${Icons.backArrow}</span>
               </a>
             `}
-        <a
-          href="/settings/network"
-          class="connected-peers tooltip mobile-search-hidden ${this.state.showMobileSearch
-            ? 'hidden-xs'
-            : ''} ${this.state.connectedRelays ? 'connected' : ''}"
-        >
-          <span class="tooltiptext right">${t('connected_relays')}</span>
-          <small>
-            <span class="icon">${Icons.network}</span>
-            <span>${this.state.connectedRelays}</span>
-          </small>
-        </a>
+        ${this.state.connectedRelays
+          ? ''
+          : html`
+              <a
+                href="/settings/network"
+                class="connected-peers tooltip mobile-search-hidden ${this.state.showMobileSearch
+                  ? 'hidden-xs'
+                  : ''}"
+              >
+                <span class="tooltiptext right">${t('connected_relays')}</span>
+                <small>
+                  <span class="icon">${Icons.network}</span>
+                  <span>${this.state.connectedRelays}</span>
+                </small>
+              </a>
+            `}
         <div
           class="text"
           style=${this.chatId ? 'cursor:pointer;text-align:center' : ''}

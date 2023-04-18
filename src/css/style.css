@@ -528,8 +528,12 @@ a.logo img:not(:last-child) {
   z-index: 100;
   position: fixed;
   top: 50px;
-  left: calc(50% - 98px);
+  left: calc(50% - 122px);
   margin-top: 0;
+}
+
+.search-box-results .result {
+  background-color: var(--button-bg);
 }
 
 .search-box-results .result.selected {
@@ -544,7 +548,7 @@ a.logo img:not(:last-child) {
 
 @media (min-width: 1268px) {
   .nav .search-box-results {
-    left: calc(50% - 27px);
+    left: calc(50% - 49px);
   }
 }
 
