@@ -220,6 +220,26 @@ export default class Header extends Component {
     );
   }
 
+  renderNotifications() {
+    return (
+      <a
+        href="/notifications"
+        class={`notifications-button mobile-search-hidden ${
+          this.state.showMobileSearch ? 'hidden' : ''
+        }`}
+      >
+        {this.state.activeRoute === '/notifications' ? Icons.heartFull : Icons.heartEmpty}
+        {this.state.unseenNotificationCount ? (
+          <span class="unseen">
+            {this.state.unseenNotificationCount > 99 ? '' : this.state.unseenNotificationCount}
+          </span>
+        ) : (
+          ''
+        )}
+      </a>
+    );
+  }
+
   render() {
     return (
       <div className="nav header">
@@ -240,6 +260,7 @@ export default class Header extends Component {
           </a>
           {this.renderConnectedRelays()}
           {this.renderHeaderText()}
+          {this.renderNotifications()}
           {this.renderMyProfile()}
         </div>
       </div>
