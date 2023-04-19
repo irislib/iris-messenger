@@ -71,10 +71,10 @@ export default {
     }
   },
   getPubKey() {
-    return this.key.rpub;
+    return this.key?.rpub;
   },
   getPrivKey() {
-    return this.key.priv;
+    return this.key?.priv;
   },
   encrypt: async function (data: string, pub?: string): Promise<string> {
     const k = this.key;
@@ -205,6 +205,9 @@ export default {
     }
   },
   toNostrBech32Address: function (address: string, prefix: string) {
+    if (!address) {
+      return;
+    }
     if (!prefix) {
       throw new Error('prefix is required');
     }

@@ -42,7 +42,7 @@ type ReactState = {
   translationLoaded: boolean;
 };
 
-Session.init({ autologin: window.location.pathname.length > 1, autofollow: false });
+Session.init({ autologin: false, autofollow: false });
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {
@@ -96,10 +96,7 @@ class Main extends Component<Props, ReactState> {
     if (!s.translationLoaded) {
       return <div id="main-content" />;
     }
-    if (!s.loggedIn && window.location.pathname.length > 2) {
-      return <div id="main-content" />;
-    }
-    if (!s.loggedIn) {
+    if (!s.loggedIn && window.location.pathname.length <= 1) {
       return (
         <div id="main-content">
           <Login />
@@ -143,7 +140,7 @@ class Main extends Component<Props, ReactState> {
           }`}
           style="flex-direction: row;"
         >
-          <Menu />
+          {s.loggedIn ? <Menu /> : null}
           <Helmet titleTemplate={titleTemplate} defaultTitle={defaultTitle}>
             <title>{title}</title>
             <meta name="description" content="Social Networking Freedom" />
