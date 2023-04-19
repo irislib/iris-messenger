@@ -28,7 +28,7 @@ export default class OnboardingNotification extends Component {
         <p>{t('follow_someone_info')}</p>
         {SocialNetwork.SUGGESTED_FOLLOWS.map((pub) => (
           <div class="profile-link-container">
-            <a href="/{pub}" className="profile-link">
+            <a href={`/${pub}`} className="profile-link">
               <Identicon str={pub} width={40} />
               <Name pub={pub} placeholder="Suggested follow" />
             </a>
