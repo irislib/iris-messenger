@@ -1,5 +1,4 @@
-import $ from 'jquery';
-import { Component } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
 
 import Helpers from '../../Helpers';
 import { translate as t } from '../../translations/Translation';
@@ -12,51 +11,53 @@ type Props = {
   text: string;
 };
 
-type State = {
-  copied: boolean;
-};
+const Copy = ({ copyStr, text }: Props) => {
+  const [copied, setCopied] = useState(false);
+  const [originalWidth, setOriginalWidth] = useState<number | undefined>(undefined);
+  const [timeout, setTimeoutState] = useState<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-class Copy extends Component<Props, State> {
-  originalWidth?: number;
-  timeout?: ReturnType<typeof setTimeout>;
-
-  copy(e: MouseEvent, copyStr: string) {
+  const copy = (e: MouseEvent, copyStr: string) => {
     if (e.target === null) {
       return;
     }
     Helpers.copyToClipboard(copyStr);
 
-    const target = $(e.target);
-    const width = target.width();
+    const target = e.target as HTMLElement;
+    const width = target.offsetWidth;
     if (width === undefined) {
       return;
     }
-    this.originalWidth = this.originalWidth || width + 1;
-    target.width(this.originalWidth);
+    setOriginalWidth(originalWidth || width + 1);
+    target.style.width = `${originalWidth}px`;
 
-    this.setState({ copied: true });
-    if (this.timeout !== undefined) {
-      clearTimeout(this.timeout);
+    setCopied(true);
+    if (timeout !== undefined) {
+      clearTimeout(timeout);
     }
-    this.timeout = setTimeout(() => this.setState({ copied: false }), 2000);
-  }
+    setTimeoutState(setTimeout(() => setCopied(false), 2000));
+  };
 
-  onClick(e: MouseEvent) {
+  const onClick = (e: MouseEvent) => {
     e.preventDefault();
-    const copyStr =
-      typeof this.props.copyStr === 'function' ? this.props.copyStr() : this.props.copyStr;
+    const copyStrValue = typeof copyStr === 'function' ? copyStr() : copyStr;
 
-    this.copy(e, copyStr);
-  }
+    copy(e, copyStrValue);
+  };
 
-  render() {
-    const text = this.state.copied ? t('copied') : this.props.text || t('copy');
-    return (
-      <Button className="copy-button" onClick={(e) => this.onClick(e)}>
-        {text}
-      </Button>
-    );
-  }
-}
+  useEffect(() => {
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [timeout]);
+
+  const buttonText = copied ? t('copied') : text || t('copy');
+  return (
+    <Button className="copy-button" onClick={(e) => onClick(e)}>
+      {buttonText}
+    </Button>
+  );
+};
 
 export default Copy;

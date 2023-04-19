@@ -14,9 +14,9 @@ const Language = () => {
         <h3>{t('language')}</h3>
         <div class="centered-container">
           {Object.keys(AVAILABLE_LANGUAGES).map((l) => {
-            let inputl = '';
+            let input;
             if (l == language) {
-              inputl = (
+              input = (
                 <input
                   type="radio"
                   name="language"
@@ -27,7 +27,7 @@ const Language = () => {
                 />
               );
             } else {
-              inputl = (
+              input = (
                 <input
                   type="radio"
                   name="language"
@@ -39,7 +39,7 @@ const Language = () => {
             }
             return (
               <Fragment key={l}>
-                {inputl}
+                {input}
                 <label for={l}>{AVAILABLE_LANGUAGES[l]}</label>
                 <br />
               </Fragment>
