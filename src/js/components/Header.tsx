@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
@@ -89,8 +88,8 @@ export default class Header extends Component {
   onLogoClick(e) {
     e.preventDefault();
     e.stopPropagation();
-    $('a.logo').blur();
-    $(window).width() > 625 && route('/');
+    (document.querySelector('a.logo') as HTMLElement).blur();
+    window.innerWidth > 625 && route('/');
     localState.get('toggleMenu').put(true);
   }
 
@@ -98,123 +97,152 @@ export default class Header extends Component {
     this.setState({ connectedRelays: Relays.getConnectedRelayCount() });
   }
 
-  render() {
+  renderBackButton() {
+    const { activeRoute } = this.state;
+    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
+    return chatting ? (
+      <div
+        id="back-button"
+        class="visible-xs-inline-block"
+        onClick={() => this.backButtonClicked()}
+      >
+        {Icons.backArrow}
+      </div>
+    ) : (
+      ''
+    );
+  }
+
+  renderLogo() {
+    const { activeRoute } = this.state;
+    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
+    return !Helpers.isElectron && !chatting ? (
+      <a href="/" onClick={(e) => this.onLogoClick(e)} class="visible-xs-flex logo">
+        <div class="mobile-menu-icon">{Icons.menu}</div>
+      </a>
+    ) : (
+      ''
+    );
+  }
+
+  renderSearchBox() {
+    return !this.chatId ? <SearchBox onSelect={(item) => route(`/${item.key}`)} /> : '';
+  }
+
+  renderConnectedRelays() {
+    return !this.state.connectedRelays ? (
+      <a
+        href="/settings/network"
+        class={`connected-peers tooltip mobile-search-hidden ${
+          this.state.showMobileSearch ? 'hidden-xs' : ''
+        }`}
+      >
+        <span class="tooltiptext right">{t('connected_relays')}</span>
+        <small>
+          <span class="icon">{Icons.network}</span>
+          <span>{this.state.connectedRelays}</span>
+        </small>
+      </a>
+    ) : (
+      ''
+    );
+  }
+
+  renderHeaderText() {
+    const { chat, activeRoute } = this.state;
+    const isTyping = chat && chat.isTyping;
+    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
+    return (
+      <div
+        class="text"
+        style={this.chatId ? 'cursor:pointer;text-align:center' : ''}
+        onClick={() => this.onTitleClicked()}
+      >
+        {this.state.title && chatting ? <div class="name">{this.state.title}</div> : ''}
+        {isTyping ? <small class="typing-indicator">{t('typing')}</small> : ''}
+        {this.state.about ? <small class="participants">{this.state.about}</small> : ''}
+        {this.chatId ? <small class="last-seen">{this.state.onlineStatus || ''}</small> : ''}
+        {!chatting && (
+          <div
+            id="mobile-search"
+            class={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
+          >
+            {this.renderSearchBox()}
+          </div>
+        )}
+        {this.renderMobileSearchButton(chatting)}
+      </div>
+    );
+  }
+
+  renderMobileSearchButton(chatting) {
+    return !chatting ? (
+      <div
+        id="mobile-search-btn"
+        class={`mobile-search-hidden ${
+          this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'
+        }`}
+        onClick={() => {
+          // also synchronously make element visible so it can be focused
+          document.querySelector('.mobile-search-visible').classList.remove('hidden-xs', 'hidden');
+          document
+            .querySelector('.mobile-search-hidden')
+            .classList.remove('visible-xs-inline-block');
+          document.querySelector('.mobile-search-hidden').classList.add('hidden');
+          const input = document.querySelector('.search-box input');
+          if (input) {
+            setTimeout(() => {
+              (input as HTMLInputElement).focus();
+            }, 0);
+          }
+          this.setState({ showMobileSearch: true });
+        }}
+      >
+        {Icons.search}
+      </div>
+    ) : (
+      ''
+    );
+  }
+
+  renderMyProfile() {
     const key = Key.getPubKey();
     const npub = Key.toNostrBech32Address(key, 'npub');
-    const activeRoute = this.state.activeRoute;
-    const chat = null;
-    const isTyping = chat && chat.isTyping;
-
-    const onlineStatus = '';
-    const searchBox = this.chatId ? '' : <SearchBox onSelect={(item) => route(`/${item.key}`)} />;
-    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
-
     return (
-      <header class="nav header">
-        {activeRoute && activeRoute.indexOf('/chat/') === 0 ? (
-          <div
-            id="back-button"
-            class="visible-xs-inline-block"
-            onClick={() => this.backButtonClicked()}
-          >
-            {Icons.backArrow}
-          </div>
-        ) : (
-          ''
-        )}
-        <div class="header-content">
-          <div class={`mobile-search-hidden ${this.state.showMobileSearch ? 'hidden-xs' : ''}`}>
-            {Helpers.isElectron || chatting ? (
-              ''
-            ) : (
-              <a href="/" onClick={(e) => this.onLogoClick(e)} class="visible-xs-flex logo">
-                <div class="mobile-menu-icon">{Icons.menu}</div>
-              </a>
-            )}
-          </div>
-          {chatting ? (
-            ''
-          ) : (
-            <a
-              class={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
-              href=""
-              onClick={(e) => {
-                e.preventDefault();
-                this.setState({ showMobileSearch: false });
-              }}
-            >
-              <span class="visible-xs-inline-block">{Icons.backArrow}</span>
-            </a>
-          )}
-          {this.state.connectedRelays ? (
-            ''
-          ) : (
-            <a
-              href="/settings/network"
-              class={`connected-peers tooltip mobile-search-hidden ${
-                this.state.showMobileSearch ? 'hidden-xs' : ''
-              }`}
-            >
-              <span class="tooltiptext right">{t('connected_relays')}</span>
-              <small>
-                <span class="icon">{Icons.network}</span>
-                <span>{this.state.connectedRelays}</span>
-              </small>
-            </a>
-          )}
-          <div
-            class="text"
-            style={this.chatId ? 'cursor:pointer;text-align:center' : ''}
-            onClick={() => this.onTitleClicked()}
-          >
-            {this.state.title && chatting ? <div class="name">{this.state.title}</div> : ''}
-            {isTyping ? <small class="typing-indicator">{t('typing')}</small> : ''}
-            {this.state.about ? <small class="participants">{this.state.about}</small> : ''}
-            {this.chatId ? <small class="last-seen">{onlineStatus || ''}</small> : ''}
-            {chatting ? (
-              ''
-            ) : (
-              <div
-                id="mobile-search"
-                class={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
-              >
-                {searchBox}
-              </div>
-            )}
-            {chatting ? (
-              ''
-            ) : (
-              <div
-                id="mobile-search-btn"
-                class={`mobile-search-hidden ${
-                  this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'
-                }`}
-                onClick={() => {
-                  // also synchronously make element visible so it can be focused
-                  $('.mobile-search-visible').removeClass('hidden-xs hidden');
-                  $('.mobile-search-hidden')
-                    .removeClass('visible-xs-inline-block')
-                    .addClass('hidden');
-                  const input = document.querySelector('.search-box input');
-                  input && $(input).focus();
-                  this.setState({ showMobileSearch: true });
-                }}
-              >
-                {Icons.search}
-              </div>
-            )}
-          </div>
+      <Link
+        activeClassName="active"
+        href={`/${npub}`}
+        onClick={() => localState.get('scrollUp').put(true)}
+        class="hidden-xs my-profile"
+      >
+        <Identicon str={npub} width={34} />
+      </Link>
+    );
+  }
 
-          <Link
-            activeClassName="active"
-            href={`/${npub}`}
-            onClick={() => localState.get('scrollUp').put(true)}
-            class="hidden-xs my-profile"
+  render() {
+    return (
+      <div className="nav header">
+        {this.renderBackButton()}
+        <div className="header-content">
+          <div className={`mobile-search-hidden ${this.state.showMobileSearch ? 'hidden-xs' : ''}`}>
+            {this.renderLogo()}
+          </div>
+          <a
+            className={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
+            href=""
+            onClick={(e) => {
+              e.preventDefault();
+              this.setState({ showMobileSearch: false });
+            }}
           >
-            <Identicon str={npub} width={34} />
-          </Link>
+            <span class="visible-xs-inline-block">{Icons.backArrow}</span>
+          </a>
+          {this.renderConnectedRelays()}
+          {this.renderHeaderText()}
+          {this.renderMyProfile()}
         </div>
-      </header>
+      </div>
     );
   }
 }
