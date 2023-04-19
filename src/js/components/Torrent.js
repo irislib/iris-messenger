@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet';
-import $ from 'jquery';
 import { createRef } from 'preact';
 
 import Component from '../BaseComponent';
@@ -78,12 +77,12 @@ class Torrent extends Component {
   }
 
   openFile(file, clicked) {
-    const base = $(this.base);
+    const base = document.querySelector(this.base);
     const isVid = isVideo(file);
     const isAud = !isVid && isAudio(file);
     if (this.state.activeFilePath === file.path) {
       if (isVid) {
-        const el = base.find('video').get(0);
+        const el = base.querySelector('video');
         el && el.play();
       } else if (isAud) {
         localState.get('player').get('paused').put(false);
@@ -104,16 +103,16 @@ class Torrent extends Component {
       autoplay = isVid && this.state.settings.autoplayVideos;
       muted = autoplay;
     }
-    const el = base.find('.player');
-    el.empty();
+    const el = base.querySelector('.player');
+    el.innerHTML = '';
     if (isAud && clicked) {
       this.playAudio(file.path);
     }
     if (!isAud) {
-      file.appendTo(el.get(0), { autoplay, muted });
+      file.appendTo(el, { autoplay, muted });
     }
     if (isVid && this.props.autopause) {
-      const vid = base.find('video').get(0);
+      const vid = base.querySelector('video');
       const handlePlay = (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -131,8 +130,8 @@ class Torrent extends Component {
       this.observer.observe(vid);
     }
 
-    base.find('.info').toggle(!isVid);
-    const player = base.find('video, audio').get(0);
+    base.querySelector('.info').style.display = !isVid ? 'block' : 'none';
+    const player = base.querySelector('video, audio');
     if (player) {
       player.addEventListener('ended', () => {
         const typeCheck = player.tagName === 'VIDEO' ? isVideo : isAudio;
