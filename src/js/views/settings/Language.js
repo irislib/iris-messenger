@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import { Fragment } from 'preact';
 
 import {
@@ -53,7 +52,7 @@ const Language = () => {
 };
 
 function onLanguageChange(e) {
-  const l = $(e.target).val();
+  const l = e.target.value;
   if (AVAILABLE_LANGUAGE_KEYS.indexOf(l) >= 0) {
     localStorage.setItem('language', l);
     location.reload();
