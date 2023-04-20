@@ -4,7 +4,7 @@ import Icons from '../../Icons';
 import SettingsContent from './SettingsContent';
 import SettingsMenu from './SettingsMenu';
 
-type Props = { page?: string, path?: string };
+type Props = { page?: string; path?: string };
 
 const Settings = (props: Props) => {
   return (

@@ -10,8 +10,8 @@ import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation';
 import Login from '../views/Login';
-import { PrimaryButton, Button } from './buttons/Button';
 
+import { Button, PrimaryButton } from './buttons/Button';
 import Modal from './modal/Modal';
 import Identicon from './Identicon';
 import Name from './Name';
@@ -174,7 +174,7 @@ export default class Header extends Component {
             {this.renderSearchBox()}
           </div>
         )}
-        {this.renderMobileSearchButton(chatting)}
+        {!!Key.getPubKey() && this.renderMobileSearchButton(chatting)}
       </div>
     );
   }
@@ -246,9 +246,9 @@ export default class Header extends Component {
 
   renderLogo() {
     return (
-      <a tabIndex={3} href="/" className="logo">
-        <img src={logo} width="30" height="30" />
-        <span style="font-size: 1.8em">iris</span>
+      <a tabIndex={3} href="/" className="logo" style="margin-left: 15px;">
+        <img src={logo} width="30" height="30" style="margin-right: 15px;" />
+        <span style="font-size: 1.8em; color: var(--text-color);">iris</span>
       </a>
     );
   }
