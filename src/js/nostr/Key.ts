@@ -32,14 +32,6 @@ export default {
     if (shouldRefresh) {
       location.reload();
     }
-    setTimeout(() => {
-      // TODO remove setTimeout
-      localState.get('loggedIn').put(true);
-      console.log('logged in', key);
-      setTimeout(() => {
-        route('/following');
-      }, 100);
-    }, 100);
   },
   generateKey(): Key {
     const priv = generatePrivateKey();

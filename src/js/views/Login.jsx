@@ -96,7 +96,9 @@ class Login extends Component {
       // TODO remove setTimeout
       localState.get('loggedIn').put(true);
       localState.get('lastOpenedFeed').put('following');
-      route('/following');
+      if (window.location.pathname.length <= 1) {
+        route('/following');
+      }
     }, 100);
   }
 

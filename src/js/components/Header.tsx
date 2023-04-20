@@ -1,6 +1,7 @@
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
+import logo from '../../assets/img/icon128.png';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
@@ -8,7 +9,10 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation';
+import Login from '../views/Login';
+import { PrimaryButton, Button } from './buttons/Button';
 
+import Modal from './modal/Modal';
 import Identicon from './Identicon';
 import Name from './Name';
 import SearchBox from './SearchBox';
@@ -113,7 +117,7 @@ export default class Header extends Component {
     );
   }
 
-  renderLogo() {
+  renderMenuIcon() {
     const { activeRoute } = this.state;
     const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
     return !Helpers.isElectron && !chatting ? (
@@ -240,13 +244,37 @@ export default class Header extends Component {
     );
   }
 
+  renderLogo() {
+    return (
+      <a tabIndex={3} href="/" className="logo">
+        <img src={logo} width="30" height="30" />
+        <span style="font-size: 1.8em">iris</span>
+      </a>
+    );
+  }
+
+  renderLoginBtns() {
+    return (
+      <div class="login-buttons">
+        <PrimaryButton small onClick={() => this.setState({ showLoginModal: true })}>
+          {t('log_in')}
+        </PrimaryButton>
+        <Button small onClick={() => this.setState({ showLoginModal: true })}>
+          {t('sign_up')}
+        </Button>
+      </div>
+    );
+  }
+
   render() {
+    const loggedIn = !!Key.getPubKey();
     return (
       <div className="nav header">
+        {!loggedIn && this.renderLogo()}
         {this.renderBackButton()}
         <div className="header-content">
           <div className={`mobile-search-hidden ${this.state.showMobileSearch ? 'hidden-xs' : ''}`}>
-            {this.renderLogo()}
+            {loggedIn && this.renderMenuIcon()}
           </div>
           <a
             className={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
@@ -258,11 +286,17 @@ export default class Header extends Component {
           >
             <span class="visible-xs-inline-block">{Icons.backArrow}</span>
           </a>
-          {this.renderConnectedRelays()}
+          {loggedIn && this.renderConnectedRelays()}
           {this.renderHeaderText()}
-          {this.renderNotifications()}
-          {this.renderMyProfile()}
+          {loggedIn && this.renderNotifications()}
+          {loggedIn && this.renderMyProfile()}
+          {!loggedIn && this.renderLoginBtns()}
         </div>
+        {this.state.showLoginModal && (
+          <Modal showContainer={true} onClose={() => this.setState({ showLoginModal: false })}>
+            <Login />
+          </Modal>
+        )}
       </div>
     );
   }
