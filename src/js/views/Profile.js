@@ -123,6 +123,7 @@ class Profile extends View {
       rawDataJson.push(followEvent);
     }
     rawDataJson = JSON.stringify(rawDataJson, null, 2);
+    // TODO: on Follow / Message btn click open login modal if not logged in
     return html`
       <div class="profile-top" key="${this.state.hexPub}details">
         <div class="profile-header" style="flex-direction: column">
