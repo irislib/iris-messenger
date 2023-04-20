@@ -1171,17 +1171,14 @@ header.footer .header-content {
   }
 }
 
-.application-list a.logo:hover,
-.application-list a.logo:focus,
-.application-list a.logo:active {
+a.logo:hover,
+a.logo:focus,
+a.logo:active {
   background: none !important;
   opacity: 1;
   text-decoration: none;
 }
 
-.application-list a:hover,
-.application-list a:focus,
-.application-list a:active,
 .settings-list a:hover,
 .settings-list a:focus,
 .settings-list a:active {

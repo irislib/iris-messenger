@@ -1,6 +1,4 @@
-import { html } from 'htm/preact';
 import { debounce } from 'lodash';
-import { createRef } from 'preact';
 
 import Feed from '../components/Feed';
 import localState from '../LocalState';
@@ -11,7 +9,6 @@ import View from './View';
 
 export default class Notifications extends View {
   class = 'public-messages-view';
-  ref = createRef();
 
   updateNotificationsLastOpened = debounce(() => {
     const node = localState.get('settings').get('notifications').get('saveLastOpened');
@@ -35,15 +32,15 @@ export default class Notifications extends View {
   }
 
   renderView() {
-    return html`
-      <div ref=${this.ref} class="centered-container">
-        <${Feed}
-          scrollElement=${this.scrollElement.current}
+    return (
+      <div class="centered-container">
+        <Feed
+          scrollElement={this.scrollElement.current}
           key="notifications"
           index="notifications"
-          emptyMessage=${t('no_notifications_yet')}
+          emptyMessage={t('no_notifications_yet')}
         />
       </div>
-    `;
+    );
   }
 }

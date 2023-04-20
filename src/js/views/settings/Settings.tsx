@@ -1,70 +1,33 @@
-import { Component } from 'htm/preact';
-import $ from 'jquery';
-import { route } from 'preact-router';
-
 import Header from '../../components/Header';
 import Icons from '../../Icons';
-import localState from '../../LocalState';
 
 import SettingsContent from './SettingsContent';
 import SettingsMenu from './SettingsMenu';
 
-type Props = { page?: string };
+type Props = { page?: string; path?: string };
 
-type State = {
-  toggleSettingsMenu: boolean;
-  showSettingsMenu: boolean;
-  platform: string;
-};
-
-class Settings extends Component<Props, State> {
-  componentDidMount() {
-    localState.get('toggleSettingsMenu').on((show: boolean) => this.toggleMenu(show));
-  }
-  toggleMenu(show: boolean): void {
-    this.setState({
-      showSettingsMenu: typeof show === 'undefined' ? !this.state.toggleSettingsMenu : show,
-    });
-  }
-
-  render() {
-    // ? const isDesktopNonMac = this.state.platform && this.state.platform !== 'darwin'
-
-    return (
-      <>
-        <Header />
-        <div class="main-view" id="settings">
-          <div style="flex-direction: row; width:100%;" id="settings">
-            <div class="logo" className={this.props.page ? 'visible-xs-flex' : 'hidden'}>
-              <div
-                href="/settings/"
-                onClick={(e) => this.onLogoClick(e)}
-                style="margin: 1em; display:flex;"
-              >
-                <div>{Icons.backArrow}</div>
-              </div>
-            </div>
-            <SettingsMenu activePage={this.props.page} />
-            <div
-              className={this.props.page ? '' : 'hidden-xs'}
-              style="padding: 0px 15px; overflow: auto; width: 100%;"
-            >
-              <SettingsContent id={this.props.page} />
-            </div>
+const Settings = (props: Props) => {
+  return (
+    <>
+      <Header />
+      <div class="main-view" id="settings">
+        <div style="flex-direction: row; width:100%;" id="settings">
+          <div class="logo" className={props.page ? 'visible-xs-flex' : 'hidden'}>
+            <a href="/settings" style="margin: 1em; display:flex; color: var(--text-color)">
+              <span>{Icons.backArrow}</span>
+            </a>
+          </div>
+          <SettingsMenu activePage={props.page} />
+          <div
+            className={props.page ? '' : 'hidden-xs'}
+            style="padding: 0px 15px; overflow: auto; width: 100%;"
+          >
+            <SettingsContent id={props.page} />
           </div>
         </div>
-      </>
-    );
-  }
+      </div>
+    </>
+  );
+};
 
-  onLogoClick(e) {
-    console.log('test open' + ($(window).width() > 625));
-    e.preventDefault();
-    e.stopPropagation();
-    $('a.logo').blur();
-    $(window).width() > 625;
-    localState.get('toggleSettingsMenu').put(true);
-    route('/settings/');
-  }
-}
 export default Settings;

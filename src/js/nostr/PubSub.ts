@@ -6,6 +6,7 @@ import localState from '../LocalState';
 import Events from '../nostr/Events';
 
 import IndexedDB from './IndexedDB';
+import Key from './Key';
 import Relays from './Relays';
 
 type Subscription = {
@@ -170,9 +171,14 @@ const PubSub = {
     if (sinceLastOpened) {
       filter.since = lastOpened;
     }
-    const defaultRelays = Array.from(Relays.relays.values())
-      .filter((r) => r.enabled !== false)
-      .map((r) => r.url);
+    let defaultRelays;
+    if (Key.getPubKey()) {
+      defaultRelays = defaultRelays = Array.from(Relays.relays.values())
+        .filter((r) => r.enabled !== false)
+        .map((r) => r.url);
+    } else {
+      defaultRelays = Relays.DEFAULT_RELAYS;
+    }
     return relayPool.subscribe(
       [filter],
       relays,
