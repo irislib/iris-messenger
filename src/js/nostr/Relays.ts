@@ -2,7 +2,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { throttle } from 'lodash';
 
 import Helpers from '../Helpers';
-import { Event, Filter, Relay, Sub } from '../lib/nostr-tools';
+import { Event, Filter, Sub } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
 import Events from './Events';
@@ -60,14 +60,6 @@ const Relays = {
   },
   getSubscriptionIdForName(name: string) {
     return Helpers.arrayToHex(sha256(name)).slice(0, 8);
-  },
-  getStatus: (relay: Relay) => {
-    // workaround for nostr-tools bug
-    try {
-      return relay.status;
-    } catch (e) {
-      return 3;
-    }
   },
   // get Map of relayUrl: {read:boolean, write:boolean}
   getUrlsFromFollowEvent(event: Event): Map<string, PublicRelaySettings> {
@@ -138,9 +130,6 @@ const Relays = {
       relays = this.getUrlsFromFollowEvent(followEvent);
     }
     return Array.from(relays.entries());
-  },
-  connect: function (relay: Relay) {
-    // empty
   },
   manage: function () {
     localState.get('relays').put({});
@@ -222,9 +211,6 @@ const Relays = {
     5 * 1000,
     { leading: true },
   ),
-  relayInit(url: string, subscribeAll = true) {
-    // empty
-  },
   groupFilter(filter: Filter): { name: string; groupedFilter: Filter } {
     // if filter has authors, add to subscribedAuthors and group by authors
     if (filter.authors && filter.kinds?.length === 1 && filter.kinds[0] === 0) {

@@ -23,7 +23,7 @@ export default {
   isProcessingQueue: false,
   getPublicKey, // TODO confusing similarity to getPubKey
   loginAsNewUser() {
-    this.login(this.generateKey());
+    this.login(this.generateKey(), true);
   },
   login(key: any, redirect = false) {
     const shouldRefresh = !!this.key;
