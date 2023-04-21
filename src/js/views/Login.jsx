@@ -81,7 +81,7 @@ class Login extends Component {
 
   loginAsNewUser() {
     let name = document.getElementById('login-form-name').value;
-    Key.loginAsNewUser({ name, autofollow: false });
+    Key.loginAsNewUser(this.props.fullScreen);
     localState.get('showFollowSuggestions').put(true);
     name &&
       setTimeout(() => {

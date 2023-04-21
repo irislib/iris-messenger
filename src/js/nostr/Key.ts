@@ -22,8 +22,8 @@ export default {
   windowNostrQueue: [],
   isProcessingQueue: false,
   getPublicKey, // TODO confusing similarity to getPubKey
-  loginAsNewUser() {
-    this.login(this.generateKey(), true);
+  loginAsNewUser(redirect = false) {
+    this.login(this.generateKey(), redirect);
   },
   login(key: any, redirect = false) {
     const shouldRefresh = !!this.key;
