@@ -1,6 +1,5 @@
 import * as secp from '@noble/secp256k1';
 import { Component } from 'preact';
-import { route } from 'preact-router';
 
 import logo from '../../assets/img/android-chrome-192x192.png';
 import { PrimaryButton as Button } from '../components/buttons/Button';
@@ -14,12 +13,6 @@ import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 const bech32 = require('bech32-buffer');
 
-const nostrLogin = async (event) => {
-  event.preventDefault();
-  const rpub = await window.nostr.getPublicKey();
-  Key.login({ rpub });
-};
-
 class Login extends Component {
   componentDidMount() {
     const el = document.getElementById('login-form-name');
@@ -27,6 +20,12 @@ class Login extends Component {
     // re-render after a while sec to make sure window.nostr is set
     setTimeout(() => this.setState({}), 100);
     setTimeout(() => this.setState({}), 1000);
+  }
+
+  async nostrExtensionLogin(event) {
+    event.preventDefault();
+    const rpub = await window.nostr.getPublicKey();
+    Key.login({ rpub }, this.props.fullScreen);
   }
 
   async onPasteKey(event) {
@@ -70,7 +69,7 @@ class Login extends Component {
       return;
     }
     console.log('login with', k);
-    await Key.login(k);
+    await Key.login(k, this.props.fullScreen);
     event.target.value = '';
     Helpers.copyToClipboard(''); // clear the clipboard
   }
@@ -92,14 +91,6 @@ class Login extends Component {
     this.base.style = 'display:none';
     const now = Math.floor(Date.now() / 1000);
     Events.notificationsSeenTime = now;
-    setTimeout(() => {
-      // TODO remove setTimeout
-      localState.get('loggedIn').put(true);
-      localState.get('lastOpenedFeed').put('following');
-      if (window.location.pathname.length <= 1) {
-        route('/following');
-      }
-    }, 100);
   }
 
   onLoginFormSubmit(e) {
@@ -143,7 +134,7 @@ class Login extends Component {
 
   render() {
     return (
-      <section id="login">
+      <section id="login" className={this.props.fullScreen ? 'fullscreen' : ''}>
         {this.state.showEula && (
           <EULA
             onAccept={() => this.loginAsNewUser()}
@@ -176,7 +167,7 @@ class Login extends Component {
                 <br />
                 {window.nostr ? (
                   <p>
-                    <a href="" onClick={(e) => nostrLogin(e)}>
+                    <a href="" onClick={(e) => this.nostrExtensionLogin(e)}>
                       {t('nostr_extension_login')}
                     </a>
                   </p>

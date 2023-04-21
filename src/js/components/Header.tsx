@@ -256,10 +256,10 @@ export default class Header extends Component {
   renderLoginBtns() {
     return (
       <div class="login-buttons">
-        <PrimaryButton small onClick={() => this.setState({ showLoginModal: true })}>
+        <PrimaryButton small onClick={() => localState.get('showLoginModal').put(true)}>
           {t('log_in')}
         </PrimaryButton>
-        <Button small onClick={() => this.setState({ showLoginModal: true })}>
+        <Button small onClick={() => localState.get('showLoginModal').put(true)}>
           {t('sign_up')}
         </Button>
       </div>
@@ -292,11 +292,6 @@ export default class Header extends Component {
           {loggedIn && this.renderMyProfile()}
           {!loggedIn && this.renderLoginBtns()}
         </div>
-        {this.state.showLoginModal && (
-          <Modal showContainer={true} onClose={() => this.setState({ showLoginModal: false })}>
-            <Login />
-          </Modal>
-        )}
       </div>
     );
   }
