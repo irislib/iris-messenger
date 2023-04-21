@@ -107,16 +107,12 @@ class Main extends Component<Props, ReactState> {
       );
     }
 
-    // hack to remount profile on route change. Problem: also remounts on tab change
-    const MyProfile = (params: { id?: string; tab: string; path: string }) => (
-      <Profile path={params.path} id={params.id} key={params.id} tab={params.tab} />
-    );
     // if id begins with "note", it's a post. otherwise it's a profile.
     const NoteOrProfile = (params: { id?: string; path: string }) => {
       if (params.id.startsWith('note')) {
         return <Note id={params.id} />;
       }
-      return <MyProfile id={params.id} tab="posts" path={params.path} />;
+      return <Profile id={params.id} tab="posts" path={params.path} />;
     };
 
     return (
@@ -175,10 +171,10 @@ class Main extends Component<Props, ReactState> {
               <Explorer path="/explorer/:path?" />
               <Explorer path="/explorer/:path+" />
               <EditProfile path="/profile/edit" />
-              <MyProfile path="/profile/:id+" tab="profile" />
-              <MyProfile path="/replies/:id+" tab="replies" />
-              <MyProfile path="/likes/:id+" tab="likes" />
-              <MyProfile path="/media/:id+" tab="media" />
+              <Profile path="/profile/:id+" tab="profile" />
+              <Profile path="/replies/:id+" tab="replies" />
+              <Profile path="/likes/:id+" tab="likes" />
+              <Profile path="/media/:id+" tab="media" />
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
               <NoteOrProfile path="/:id+" />
