@@ -171,13 +171,12 @@ class Main extends Component<Props, ReactState> {
               <Explorer path="/explorer/:path?" />
               <Explorer path="/explorer/:path+" />
               <EditProfile path="/profile/edit" />
-              <Profile path="/profile/:id+" tab="profile" />
-              <Profile path="/replies/:id+" tab="replies" />
-              <Profile path="/likes/:id+" tab="likes" />
-              <Profile path="/media/:id+" tab="media" />
+              <Profile path="/profile/:id" tab="posts" />
+              <Profile path="/:id/replies" tab="replies" />
+              <Profile path="/:id/likes" tab="likes" />
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
-              <NoteOrProfile path="/:id+" />
+              <NoteOrProfile path="/:id" />
             </Router>
           </div>
         </section>

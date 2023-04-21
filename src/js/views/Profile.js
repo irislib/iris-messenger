@@ -252,12 +252,12 @@ class Profile extends View {
         >
         <${Link}
           activeClassName="active"
-          href="/replies/${this.state.nostrAddress || this.state.npub}"
+          href="/${this.state.nostrAddress || this.state.npub}/replies"
           >${t('posts')} & ${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
         <${Link}
           activeClassName="active"
-          href="/likes/${this.state.nostrAddress || this.state.npub}"
+          href="/${this.state.nostrAddress || this.state.npub}/likes"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
         >
       </div>
@@ -403,17 +403,20 @@ class Profile extends View {
           let newUrl;
           if (nip05Domain === 'iris.to') {
             if (nip05User === '_') {
-              newUrl = '/iris';
+              newUrl = 'iris';
             } else {
-              newUrl = `/${nip05User}`;
+              newUrl = nip05User;
             }
           } else {
             if (nip05User === '_') {
-              newUrl = `/${nip05Domain}`;
+              newUrl = nip05Domain;
             } else {
-              newUrl = `/${nip05}`;
+              newUrl = nip05;
             }
           }
+          this.setState({ nostrAddress: newUrl });
+          // replace part before first slash with new url
+          newUrl = window.location.pathname.replace(/[^/]+/, newUrl);
           const previousState = window.history.state;
           window.history.replaceState(previousState, '', newUrl);
         }
@@ -514,7 +517,7 @@ class Profile extends View {
         if (pubKey) {
           const npub = Key.toNostrBech32Address(pubKey, 'npub');
           if (npub && npub !== pubKey) {
-            this.setState({ npub, hexPub: pubKey, nostrAddress });
+            this.setState({ npub, hexPub: pubKey });
             this.loadProfile(pubKey, nostrAddress);
           }
         } else {
