@@ -252,4 +252,8 @@ const Relays = {
   },
 };
 
+if (window.location.pathname !== '/') {
+  Relays.init();
+}
+
 export default Relays;
