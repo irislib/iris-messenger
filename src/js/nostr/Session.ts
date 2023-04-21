@@ -150,7 +150,7 @@ const Session = {
       // there might be some better way to manage resubscriptions?
       if (document.visibilityState === 'visible') {
         if (Date.now() - lastResubscribed > 60 * 1000 * 1) {
-          Relays.resubscribe();
+          // TODO relaypool resubscribe?
           lastResubscribed = Date.now();
         }
       }
