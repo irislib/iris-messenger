@@ -76,6 +76,10 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
       if (parsedUrl.pathname.toLowerCase().match(/\.(jpg|jpeg|gif|png|webp)$/)) {
         attachments.push({ type: 'image', data: parsedUrl.href });
       }
+      // videos
+      if (parsedUrl.pathname.toLowerCase().match(/\.(mp4|webm|ogg)$/)) {
+        attachments.push({ type: 'video', data: parsedUrl.href });
+      }
     });
   }
   // return all images from post
@@ -86,12 +90,20 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
           <GalleryImage
             key={props.event.id + i}
             onClick={() => setShowImageModal(i)}
-            src={attachment.data}
+            src={
+              attachment.type === 'image'
+                ? attachment.data
+                : `https://imgproxy.iris.to/thumbnail/300/${attachment.data}`
+            }
             fadeIn={props.fadeIn}
           />
           {showImageModal === i && (
             <Modal centerVertically={true} onClose={() => setShowImageModal(-1)}>
-              <SafeImg src={attachment.data} />
+              {attachment.type === 'image' ? (
+                <SafeImg src={attachment.data} />
+              ) : (
+                <video autoPlay src={attachment.data} controls />
+              )}
               <p>
                 <a
                   href=""
