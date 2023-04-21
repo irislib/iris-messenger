@@ -8,6 +8,7 @@ import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
 import Modal from '../modal/Modal';
 import SafeImg from '../SafeImg';
+import Icons from '../../Icons';
 
 import EventComponent from './EventComponent';
 
@@ -21,9 +22,26 @@ const fadeIn = keyframes`
   }
 `;
 
+function VideoIcon({ attachment }) {
+  return (
+    attachment.type === 'video' && (
+      <div
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+        }}
+      >
+        {Icons.video}
+      </div>
+    )
+  );
+}
+
 const GalleryImage = styled.a`
   position: relative;
   aspect-ratio: 1;
+  color: white;
   background-size: cover;
   background-position: center;
   background-color: #ccc;
@@ -46,6 +64,10 @@ const GalleryImage = styled.a`
   }
   &:hover {
     opacity: 0.8;
+  }
+
+  & svg {
+    filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.8));
   }
 
   opacity: ${(props) => (props.fadeIn ? 0 : 1)};
@@ -94,13 +116,15 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
             onClick={() => setShowImageModal(i)}
             attachment={attachment}
             fadeIn={props.fadeIn}
-          />
+          >
+            <VideoIcon attachment={attachment} />
+          </GalleryImage>
           {showImageModal === i && (
             <Modal centerVertically={true} onClose={() => setShowImageModal(-1)}>
               {attachment.type === 'image' ? (
                 <SafeImg src={attachment.url} />
               ) : (
-                <video autoPlay src={attachment.url} controls />
+                <video loop autoPlay src={attachment.url} controls />
               )}
               <p>
                 <a
