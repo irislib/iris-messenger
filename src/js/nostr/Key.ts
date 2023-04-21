@@ -25,12 +25,19 @@ export default {
   loginAsNewUser() {
     this.login(this.generateKey());
   },
-  login(key: any) {
+  login(key: any, redirect = false) {
     const shouldRefresh = !!this.key;
     this.key = key;
     localStorage.setItem('iris.myKey', JSON.stringify(key));
     if (shouldRefresh) {
       location.reload();
+    }
+    localState.get('loggedIn').put(true);
+    localState.get('lastOpenedFeed').put('following');
+    if (redirect) {
+      setTimeout(() => {
+        route('/following');
+      });
     }
   },
   generateKey(): Key {
