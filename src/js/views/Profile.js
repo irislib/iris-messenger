@@ -365,7 +365,7 @@ class Profile extends View {
       res.json().then((json) => {
         if (json) {
           this.setState({
-            followerCount: json.followerCount || this.state.followercount,
+            followerCount: json.followerCount || this.state.followerCount,
             followedUserCount: json.following?.length || this.state.followedUserCount,
           });
         }
