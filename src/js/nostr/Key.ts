@@ -39,6 +39,7 @@ export default {
         route('/following');
       });
     }
+    localState.get('showLoginModal').put(false);
   },
   generateKey(): Key {
     const priv = generatePrivateKey();
