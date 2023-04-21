@@ -305,9 +305,10 @@ class Feed extends Component {
         );
       }
     } else if (this.props.keyword) {
+      const keyword = this.props.keyword.toLowerCase();
       return PubSub.subscribe(
-        { keywords: [this.props.keyword], kinds: [1], limit: 1000, since },
-        (e) => e.content?.includes(this.props.keyword) && callback(e), // TODO this should not be necessary. seems subscribe still asks non-search relays
+        { keywords: [keyword], kinds: [1], limit: 1000, since },
+        (e) => e.content?.toLowerCase().includes(keyword) && callback(e), // TODO this should not be necessary. seems subscribe still asks non-search relays
         false,
       );
     } else if (this.props.index === 'follows') {

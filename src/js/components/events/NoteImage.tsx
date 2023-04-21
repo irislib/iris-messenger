@@ -8,6 +8,7 @@ import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
 import Modal from '../modal/Modal';
 import SafeImg from '../SafeImg';
+import Icons from '../../Icons';
 
 import EventComponent from './EventComponent';
 
@@ -21,14 +22,33 @@ const fadeIn = keyframes`
   }
 `;
 
+function VideoIcon({ attachment }) {
+  return (
+    attachment.type === 'video' && (
+      <div
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+        }}
+      >
+        {Icons.video}
+      </div>
+    )
+  );
+}
+
 const GalleryImage = styled.a`
   position: relative;
   aspect-ratio: 1;
+  color: white;
   background-size: cover;
   background-position: center;
   background-color: #ccc;
   background-image: url(${(props) =>
-    `https://imgproxy.iris.to/insecure/rs:fill:428:428/plain/${props.src}`});
+    props.attachment?.type === 'video'
+      ? `https://imgproxy.iris.to/thumbnail/428/${props.attachment.url}`
+      : `https://imgproxy.iris.to/insecure/rs:fill:428:428/plain/${props.attachment.url}`});
   & .dropdown {
     position: absolute;
     top: 0;
@@ -44,6 +64,10 @@ const GalleryImage = styled.a`
   }
   &:hover {
     opacity: 0.8;
+  }
+
+  & svg {
+    filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.8));
   }
 
   opacity: ${(props) => (props.fadeIn ? 0 : 1)};
@@ -74,11 +98,11 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
         return;
       }
       if (parsedUrl.pathname.toLowerCase().match(/\.(jpg|jpeg|gif|png|webp)$/)) {
-        attachments.push({ type: 'image', data: parsedUrl.href });
+        attachments.push({ type: 'image', url: parsedUrl.href });
       }
       // videos
-      if (parsedUrl.pathname.toLowerCase().match(/\.(mp4|webm|ogg)$/)) {
-        attachments.push({ type: 'video', data: parsedUrl.href });
+      if (parsedUrl.pathname.toLowerCase().match(/\.(mp4|mkv|avi|flv|wmv|mov|webm)$/)) {
+        attachments.push({ type: 'video', url: parsedUrl.href });
       }
     });
   }
@@ -90,19 +114,17 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
           <GalleryImage
             key={props.event.id + i}
             onClick={() => setShowImageModal(i)}
-            src={
-              attachment.type === 'image'
-                ? attachment.data
-                : `https://imgproxy.iris.to/thumbnail/300/${attachment.data}`
-            }
+            attachment={attachment}
             fadeIn={props.fadeIn}
-          />
+          >
+            <VideoIcon attachment={attachment} />
+          </GalleryImage>
           {showImageModal === i && (
             <Modal centerVertically={true} onClose={() => setShowImageModal(-1)}>
               {attachment.type === 'image' ? (
-                <SafeImg src={attachment.data} />
+                <SafeImg src={attachment.url} />
               ) : (
-                <video autoPlay src={attachment.data} controls />
+                <video loop autoPlay src={attachment.url} controls />
               )}
               <p>
                 <a
