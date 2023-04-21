@@ -294,7 +294,7 @@ class Feed extends Component {
           { authors: [this.props.nostrUser], kinds: [1, 6], since },
           (event) => {
             if (this.props.index === 'posts') {
-              if (Events.getEventReplyingTo(event)) {
+              if (Events.getEventReplyingTo(event) && !Events.isRepost(event)) {
                 return;
               }
             }
