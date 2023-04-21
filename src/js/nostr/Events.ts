@@ -634,7 +634,7 @@ const Events = {
       throw new Error('Invalid event');
     }
 
-    Relays.publish(event as Event);
+    PubSub.publish(event as Event);
 
     console.log('publishing event', event);
     this.handle(event as Event);
@@ -649,7 +649,7 @@ const Events = {
       if (referredEvent) {
         delete referredEvent.meta;
         delete referredEvent.$loki;
-        Relays.publish(referredEvent);
+        PubSub.publish(referredEvent);
       }
     }
     return event as Event;

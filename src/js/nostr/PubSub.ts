@@ -21,7 +21,6 @@ let subscriptionId = 0;
 let dev: any = {
   logSubscriptions: false,
   indexed03: true,
-  useRelayPool: true,
 };
 const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
   useEventCache: false,
@@ -129,14 +128,7 @@ const PubSub = {
 
     // TODO if asking event by id or profile, ask http proxy
 
-    let unsubRelays;
-    if (dev.askEventsFromRelays !== false) {
-      if (dev.useRelayPool !== false) {
-        unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened, mergeSubscriptions);
-      } else {
-        unsubRelays = Relays.subscribe(filter, sinceLastOpened, mergeSubscriptions);
-      }
-    }
+    const unsubRelays = this.subscribeRelayPool(filter, sinceLastOpened, mergeSubscriptions);
 
     return () => {
       unsubRelays?.();
@@ -144,6 +136,11 @@ const PubSub = {
         this.subscriptions.delete(currentSubscriptionId);
       }
     };
+  },
+
+  publish(event) {
+    const relays = Array.from(Relays.relays.keys());
+    relayPool.publish(event, relays);
   },
 
   handle(event: Event & { id: string }) {
