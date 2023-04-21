@@ -1733,16 +1733,19 @@ a.msgSenderName:hover .user-name {
   display: flex;
   overflow-y: auto;
   color: var(--text-color);
+  background-color: var(--login-background);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.fullscreen {
   position: fixed;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: var(--login-background);
   z-index: 1000;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-app-region: drag;
 }
 
 #login ::-webkit-input-placeholder {

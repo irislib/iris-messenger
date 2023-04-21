@@ -99,7 +99,7 @@ class Main extends Component<Props, ReactState> {
     if (!s.loggedIn && window.location.pathname.length <= 1) {
       return (
         <div id="main-content">
-          <Login />
+          <Login fullScreen={true} />
         </div>
       );
     }
@@ -159,7 +159,7 @@ class Main extends Component<Props, ReactState> {
               <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />
               <Feed path="/search/:keyword?" />
-              <Login path="/login" />
+              <Login path="/login" fullScreen={true} />
               <Notifications path="/notifications" />
               <Chat path="/chat/hashtag/:hashtag?" />
               <Chat path="/chat/:id?" />

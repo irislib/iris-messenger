@@ -143,7 +143,7 @@ class Login extends Component {
 
   render() {
     return (
-      <section id="login">
+      <section id="login" className={this.props.fullScreen ? 'fullscreen' : ''}>
         {this.state.showEula && (
           <EULA
             onAccept={() => this.loginAsNewUser()}

@@ -293,7 +293,7 @@ export default class Header extends Component {
           {!loggedIn && this.renderLoginBtns()}
         </div>
         {this.state.showLoginModal && (
-          <Modal showContainer={true} onClose={() => this.setState({ showLoginModal: false })}>
+          <Modal centerVertically={true} showContainer={true} onClose={() => this.setState({ showLoginModal: false })}>
             <Login />
           </Modal>
         )}
