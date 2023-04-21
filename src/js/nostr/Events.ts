@@ -360,7 +360,8 @@ const Events = {
     return false;
   },
   acceptEvent(event: Event) {
-    if (globalFilter.maxFollowDistance) {
+    // quick fix: disable follow distance filter when not logged in
+    if (globalFilter.maxFollowDistance && !!Key.getPubKey()) {
       if (!PubSub.subscribedAuthors.has(event.pubkey) && !PubSub.subscribedEventIds.has(event.id)) {
         // unless we specifically subscribed to the user or post, ignore long follow distance users
         if (SocialNetwork.followDistanceByUser.has(event.pubkey)) {
