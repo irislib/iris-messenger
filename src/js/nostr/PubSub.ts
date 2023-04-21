@@ -67,6 +67,7 @@ const PubSub = {
   subscriptions: new Map<number, Subscription>(),
   subscribedEventIds: new Set<string>(),
   subscribedAuthors: new Set<string>(), // all events by authors
+  relayPool,
   log: throttle((...args) => {
     console.log(...args);
   }, 1000),
@@ -171,7 +172,7 @@ const PubSub = {
     let defaultRelays;
     if (Key.getPubKey()) {
       defaultRelays = defaultRelays = Array.from(Relays.relays.values())
-        .filter((r) => r.enabled !== false)
+        .filter((r) => r && r.enabled !== false)
         .map((r) => r.url);
     } else {
       defaultRelays = Relays.DEFAULT_RELAYS;

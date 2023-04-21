@@ -1,13 +1,13 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { shuffle, throttle } from 'lodash';
+import { throttle } from 'lodash';
 
 import Helpers from '../Helpers';
-import { Event, Filter, Relay, relayInit, Sub } from '../lib/nostr-tools';
+import { Event, Filter, Relay, Sub } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
 import Events from './Events';
 import Key from './Key';
-import PubSub, { Unsubscribe } from './PubSub';
+import PubSub from './PubSub';
 
 type SavedRelays = {
   [key: string]: {
@@ -43,8 +43,8 @@ type PublicRelaySettings = {
  * Relay management and subscriptions. Bundles subscriptions in to max 10 larger batches.
  */
 const Relays = {
-  relays: new Map<string, Relay>(),
-  searchRelays: new Map<string, Relay>(),
+  relays: new Map<string, any>(),
+  searchRelays: new Map<string, any>(),
   writeRelaysByUser: new Map<string, Set<string>>(),
   filtersBySubscriptionName: new Map<string, string>(),
   subscribedEventTags: new Set<string>(),
@@ -54,10 +54,8 @@ const Relays = {
   newAuthors: new Set<string>(),
   DEFAULT_RELAYS,
   init() {
-    this.relays = new Map<string, Relay>(DEFAULT_RELAYS.map((url) => [url, this.relayInit(url)]));
-    this.searchRelays = new Map<string, Relay>(
-      SEARCH_RELAYS.map((url) => [url, this.relayInit(url)]),
-    );
+    this.relays = new Map(DEFAULT_RELAYS.map((url) => [url, { enabled: true, url }]));
+    this.searchRelays = new Map(SEARCH_RELAYS.map((url) => [url, { enabled: true, url }]));
     this.manage();
   },
   getSubscriptionIdForName(name: string) {
@@ -122,8 +120,8 @@ const Relays = {
   },
   getConnectedRelayCount: function () {
     let count = 0;
-    for (const relay of this.relays.values()) {
-      if (this.getStatus(relay) === 1) {
+    for (const url of this.relays.keys()) {
+      if (PubSub.relayPool.relayByUrl.get(url)?.status === 1) {
         count++;
       }
     }
@@ -141,81 +139,10 @@ const Relays = {
     }
     return Array.from(relays.entries());
   },
-  publish(event: Event) {
-    const myRelays = Array.from(this.relays.values()).filter(
-      (relay: Relay) => relay.enabled !== false,
-    ) as Relay[];
-    console.log('publishing to myRelays', myRelays, event);
-    delete event['$loki'];
-    delete event['meta'];
-    for (const relay of myRelays) {
-      relay.publish(event);
-    }
-    let recipientRelays: string[] = [];
-    const mentionedUsers = event.tags.filter((tag) => tag[0] === 'p').map((tag) => tag[1]);
-    if (mentionedUsers.length > 10) {
-      return;
-    }
-    for (const user of mentionedUsers) {
-      if (user === Key.getPubKey()) {
-        continue;
-      }
-      this.getUserRelays(user)
-        .filter((entry) => entry[1].read)
-        .forEach((entry) => recipientRelays.push(entry[0]));
-    }
-    // 3 random read relays of the recipient
-    recipientRelays = shuffle(recipientRelays).slice(0, 3);
-    for (const relayUrl of recipientRelays) {
-      if (!myRelays.find((relay) => relay.enabled && relay.url === relayUrl)) {
-        console.log('publishing event to recipient relay', relayUrl, event.id, event.content || '');
-        const relay = this.relayInit(relayUrl, false);
-        relay.publish(event);
-        setTimeout(() => {
-          relay.close();
-        }, 5000);
-      }
-    }
-  },
   connect: function (relay: Relay) {
-    try {
-      relay.connect();
-    } catch (e) {
-      console.log(e);
-    }
+    // empty
   },
   manage: function () {
-    const go = () => {
-      for (const relay of this.relays.values()) {
-        if (relay.enabled !== false && this.getStatus(relay) === 3) {
-          this.connect(relay);
-        }
-        // if disabled
-        if (relay.enabled === false && this.getStatus(relay) === 1) {
-          relay.close();
-        }
-      }
-      for (const relay of this.searchRelays.values()) {
-        if (this.getStatus(relay) === 3) {
-          this.connect(relay);
-        }
-      }
-    };
-
-    for (const relay of this.relays.values()) {
-      relay.on('notice', (notice) => {
-        console.log('notice from ', relay.url, notice);
-      });
-      relay.on('disconnect', () => {
-        console.log('disconnected from ', relay.url);
-      });
-    }
-    for (const relay of this.searchRelays.values()) {
-      relay.on('notice', (notice) => {
-        console.log('notice from ', relay.url, notice);
-      });
-    }
-
     localState.get('relays').put({});
     localState.get('relays').on((r: SavedRelays) => {
       if (!r) {
@@ -234,28 +161,18 @@ const Relays = {
         }
       }
       for (const [url, data] of Object.entries(savedRelays)) {
-        if (data === null) {
+        if (!data) {
           this.relays.has(url) && this.remove(url);
           return;
         } else if (!this.relays.has(url)) {
-          const relay = this.relayInit(url);
-          relay.enabled = data.enabled;
-          this.relays.set(url, relay);
+          this.relays.set(url, data);
         }
       }
     });
-
-    go();
-
-    setInterval(go, 10000);
   },
   add(url: string) {
     if (this.relays.has(url)) return;
-    const relay = this.relayInit(url);
-    relay.on('connect', () => this.resubscribe(relay));
-    relay.on('notice', (notice) => {
-      console.log('notice from ', relay.url, notice);
-    });
+    const relay = { enabled: true, url };
     this.relays.set(url, relay);
   },
   remove(url: string) {
@@ -305,21 +222,8 @@ const Relays = {
     5 * 1000,
     { leading: true },
   ),
-  resubscribe(relay?: Relay) {
-    // TODO
-  },
   relayInit(url: string, subscribeAll = true) {
-    const relay = relayInit(url, (id) => {
-      const have = !!Events.seen.has(id);
-      // console.log('have?', have);
-      return have;
-    });
-    subscribeAll && relay.on('connect', () => this.resubscribe(relay));
-    relay.on('notice', (notice) => {
-      console.log('notice from ', relay.url, notice);
-    });
-    this.connect(relay);
-    return relay;
+    // empty
   },
   groupFilter(filter: Filter): { name: string; groupedFilter: Filter } {
     // if filter has authors, add to subscribedAuthors and group by authors
@@ -359,105 +263,6 @@ const Relays = {
       name: JSON.stringify(filter),
       groupedFilter: filter,
     };
-  },
-  subscribe: function (
-    filter: Filter,
-    sinceLastSeen = false,
-    mergeSubscriptions = true,
-    once = false,
-  ): Unsubscribe {
-    let name, groupedFilter;
-    if (mergeSubscriptions) {
-      ({ name, groupedFilter } = this.groupFilter(filter));
-    } else {
-      name = JSON.stringify(filter);
-      groupedFilter = filter;
-    }
-
-    const existingFilter = this.filtersBySubscriptionName.get(name);
-    const filterString = JSON.stringify(groupedFilter);
-    if (existingFilter === filterString) {
-      return () => {
-        //console.log('already subscribed to', name);
-      };
-    }
-    this.filtersBySubscriptionName.set(name, filterString);
-
-    const unsubscribe = () => {
-      const subs = this.subscriptionsByName.get(name);
-      if (subs) {
-        subs.forEach((sub) => {
-          //console.log('unsub', id);
-          sub.unsub();
-        });
-      }
-      this.subscriptionsByName.delete(name);
-    };
-    unsubscribe();
-
-    // TODO slice and dice too large filters? queue and wait for eose. or alternate between filters by interval.
-
-    let myRelays: Relay[] = Array.from(
-      name == 'keywords' ? this.searchRelays.values() : this.relays.values(),
-    );
-    const subId = Relays.getSubscriptionIdForName(name);
-
-    /*
-    let authorRelayUrls = [];
-    if (!relays) {
-      // if one of filters has .authors of length 1, subscribe to that author's relays
-      if (filter.authors && filter.authors.length === 1) {
-        const author = filter.authors[0];
-        if (author === Key.getPubKey()) {
-          return unsubscribe;
-        }
-        authorRelayUrls = this.getUserRelays(author).filter(([url, settings]) => {
-          return settings.write && !this.relays.has(url);
-        });
-        // pick 3 random relays
-        authorRelayUrls = shuffle(authorRelayUrls).slice(0, 3);
-        const authorRelays = authorRelayUrls.map(([url]) => {
-          const relay = this.relayInit(url, false);
-          relay.on('notice', (notice) => {
-            console.log('notice from ', relay.url, notice);
-          });
-          const sub = relay.sub([filter], { id: subId });
-          sub.on('event', (event) => {
-            console.log('got event from author relay', relay.url);
-            Events.handle(event);
-          });
-          setTimeout(() => relay?.close(), 30 * 1000);
-          return relay;
-        });
-        if (authorRelays.length) {
-          console.log('subscribing to author relays', authorRelays);
-        }
-        this.subscribe(filter, true, 0, sinceLastSeen, authorRelays);
-      }
-    }
-     */
-
-    // random 3 my relays
-    myRelays = shuffle(Array.from(myRelays)).slice(0, 3);
-    for (const relay of myRelays) {
-      if (sinceLastSeen && savedRelays[relay.url] && savedRelays[relay.url].lastSeen) {
-        groupedFilter.since = savedRelays[relay.url].lastSeen;
-      }
-      const sub = relay.sub([groupedFilter], { id: subId });
-      sub.on('event', (event) => {
-        this.updateLastSeen(relay.url);
-        Events.handle(event);
-      });
-      if (once) {
-        sub.on('eose', () => sub.unsub());
-      }
-      if (!this.subscriptionsByName.has(name)) {
-        this.subscriptionsByName.set(name, new Set());
-      }
-      this.subscriptionsByName.get(name)?.add(sub);
-      //console.log('subscriptions size', this.subscriptionsByName.size);
-    }
-    return unsubscribe;
   },
 };
 

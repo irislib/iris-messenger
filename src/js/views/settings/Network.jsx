@@ -4,6 +4,7 @@ import { PrimaryButton as Button } from '../../components/buttons/Button';
 import localState from '../../LocalState';
 import Relays from '../../nostr/Relays';
 import { translate as t } from '../../translations/Translation';
+import PubSub from "../../nostr/PubSub";
 
 const Network = () => {
   const [relays, setRelays] = useState(Array.from(Relays.relays.values()));
@@ -42,7 +43,7 @@ const Network = () => {
 
   const getStatus = (relay) => {
     try {
-      return relay.status;
+      return PubSub.relayPool.relayByUrl.get(relay.url).status;
     } catch (e) {
       return 3;
     }
