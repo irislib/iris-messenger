@@ -144,17 +144,6 @@ const Session = {
   init: function (options: any) {
     Key.getOrCreate(options);
     localState.get('loggedIn').on(() => this.onLoggedIn());
-    let lastResubscribed = Date.now();
-    document.addEventListener('visibilitychange', () => {
-      // when iris returns to foreground after 1 min dormancy, resubscribe stuff
-      // there might be some better way to manage resubscriptions?
-      if (document.visibilityState === 'visible') {
-        if (Date.now() - lastResubscribed > 60 * 1000 * 1) {
-          Relays.resubscribe();
-          lastResubscribed = Date.now();
-        }
-      }
-    });
   },
 };
 
