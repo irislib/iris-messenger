@@ -22,24 +22,24 @@ export default {
   windowNostrQueue: [],
   isProcessingQueue: false,
   getPublicKey, // TODO confusing similarity to getPubKey
-  loginAsNewUser() {
-    this.login(this.generateKey());
+  loginAsNewUser(redirect = false) {
+    this.login(this.generateKey(), redirect);
   },
-  login(key: any) {
+  login(key: any, redirect = false) {
     const shouldRefresh = !!this.key;
     this.key = key;
     localStorage.setItem('iris.myKey', JSON.stringify(key));
     if (shouldRefresh) {
       location.reload();
     }
-    setTimeout(() => {
-      // TODO remove setTimeout
-      localState.get('loggedIn').put(true);
-      console.log('logged in', key);
+    localState.get('loggedIn').put(true);
+    localState.get('lastOpenedFeed').put('following');
+    if (redirect) {
       setTimeout(() => {
         route('/following');
-      }, 100);
-    }, 100);
+      });
+    }
+    localState.get('showLoginModal').put(false);
   },
   generateKey(): Key {
     const priv = generatePrivateKey();
@@ -71,10 +71,10 @@ export default {
     }
   },
   getPubKey() {
-    return this.key.rpub;
+    return this.key?.rpub;
   },
   getPrivKey() {
-    return this.key.priv;
+    return this.key?.priv;
   },
   encrypt: async function (data: string, pub?: string): Promise<string> {
     const k = this.key;
@@ -205,6 +205,9 @@ export default {
     }
   },
   toNostrBech32Address: function (address: string, prefix: string) {
+    if (!address) {
+      return;
+    }
     if (!prefix) {
       throw new Error('prefix is required');
     }

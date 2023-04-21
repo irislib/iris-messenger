@@ -123,6 +123,8 @@ class Profile extends View {
       rawDataJson.push(followEvent);
     }
     rawDataJson = JSON.stringify(rawDataJson, null, 2);
+    const loggedIn = this.state.loggedIn;
+    // TODO: on Follow / Message btn click open login modal if not logged in
     return html`
       <div class="profile-top" key="${this.state.hexPub}details">
         <div class="profile-header" style="flex-direction: column">
@@ -137,16 +139,19 @@ class Profile extends View {
               class="profile-header-info"
               style="flex: 5;flex-direction: row; display:flex;margin-top:15px;justify-content: flex-end"
             >
-              <div>
+              <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
                 ${this.state.isMyProfile
-                  ? html`<${Button} small onClick=${() => route('/profile/edit')}
+                  ? html`<${Button} small onClick=${() => loggedIn && route('/profile/edit')}
                       >${t('edit_profile')}<//
                     >`
                   : html`
                       <${Follow} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
                       ${this.state.npub !==
                       'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8'
-                        ? html` <${Button} small onClick=${() => route(`/chat/${this.state.npub}`)}>
+                        ? html` <${Button}
+                            small
+                            onClick=${() => loggedIn && route(`/chat/${this.state.npub}`)}
+                          >
                             <span class="hidden-xs"> ${t('send_message')} </span>
                             <span class="visible-xs-inline-block msg-btn-icon">
                               ${Icons.chat}
@@ -247,12 +252,12 @@ class Profile extends View {
         >
         <${Link}
           activeClassName="active"
-          href="/replies/${this.state.nostrAddress || this.state.npub}"
+          href="/${this.state.nostrAddress || this.state.npub}/replies"
           >${t('posts')} & ${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
         <${Link}
           activeClassName="active"
-          href="/likes/${this.state.nostrAddress || this.state.npub}"
+          href="/${this.state.nostrAddress || this.state.npub}/likes"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
         >
       </div>
@@ -360,7 +365,7 @@ class Profile extends View {
       res.json().then((json) => {
         if (json) {
           this.setState({
-            followerCount: json.followerCount || this.state.followercount,
+            followerCount: json.followerCount || this.state.followerCount,
             followedUserCount: json.following?.length || this.state.followedUserCount,
           });
         }
@@ -398,17 +403,20 @@ class Profile extends View {
           let newUrl;
           if (nip05Domain === 'iris.to') {
             if (nip05User === '_') {
-              newUrl = '/iris';
+              newUrl = 'iris';
             } else {
-              newUrl = `/${nip05User}`;
+              newUrl = nip05User;
             }
           } else {
             if (nip05User === '_') {
-              newUrl = `/${nip05Domain}`;
+              newUrl = nip05Domain;
             } else {
-              newUrl = `/${nip05}`;
+              newUrl = nip05;
             }
           }
+          this.setState({ nostrAddress: newUrl });
+          // replace part before first slash with new url
+          newUrl = window.location.pathname.replace(/[^/]+/, newUrl);
           const previousState = window.history.state;
           window.history.replaceState(previousState, '', newUrl);
         }
@@ -488,6 +496,7 @@ class Profile extends View {
     this.restoreScrollPosition();
     const pub = this.props.id;
     const npub = Key.toNostrBech32Address(pub, 'npub');
+    localState.get('loggedIn').on(this.inject());
     if (npub && npub !== pub) {
       route(`/${npub}`, true);
       return;
@@ -508,7 +517,7 @@ class Profile extends View {
         if (pubKey) {
           const npub = Key.toNostrBech32Address(pubKey, 'npub');
           if (npub && npub !== pubKey) {
-            this.setState({ npub, hexPub: pubKey, nostrAddress });
+            this.setState({ npub, hexPub: pubKey });
             this.loadProfile(pubKey, nostrAddress);
           }
         } else {

@@ -5,6 +5,7 @@ import { Router, RouterOnChangeArgs } from 'preact-router';
 import Footer from './components/Footer';
 import MediaPlayer from './components/MediaPlayer';
 import Menu from './components/Menu';
+import Modal from './components/modal/Modal';
 import Session from './nostr/Session';
 import { translationLoaded } from './translations/Translation';
 import About from './views/About';
@@ -40,9 +41,10 @@ type ReactState = {
   activeRoute: string;
   platform: string;
   translationLoaded: boolean;
+  showLoginModal: boolean;
 };
 
-Session.init({ autologin: window.location.pathname.length > 1, autofollow: false });
+Session.init({ autologin: false, autofollow: false });
 
 class Main extends Component<Props, ReactState> {
   componentDidMount() {
@@ -59,6 +61,7 @@ class Main extends Component<Props, ReactState> {
     // iris.electron && iris.electron.get('platform').on(this.inject());
     localState.get('unseenMsgsTotal').on(this.inject());
     translationLoaded.then(() => this.setState({ translationLoaded: true }));
+    localState.get('showLoginModal').on(this.inject());
   }
 
   handleRoute(e: RouterOnChangeArgs) {
@@ -96,27 +99,20 @@ class Main extends Component<Props, ReactState> {
     if (!s.translationLoaded) {
       return <div id="main-content" />;
     }
-    if (!s.loggedIn && window.location.pathname.length > 2) {
-      return <div id="main-content" />;
-    }
-    if (!s.loggedIn) {
+    if (!s.loggedIn && window.location.pathname.length <= 1) {
       return (
         <div id="main-content">
-          <Login />
+          <Login fullScreen={true} />
         </div>
       );
     }
 
-    // hack to remount profile on route change. Problem: also remounts on tab change
-    const MyProfile = (params: { id?: string; tab: string; path: string }) => (
-      <Profile path={params.path} id={params.id} key={params.id} tab={params.tab} />
-    );
     // if id begins with "note", it's a post. otherwise it's a profile.
     const NoteOrProfile = (params: { id?: string; path: string }) => {
       if (params.id.startsWith('note')) {
         return <Note id={params.id} />;
       }
-      return <MyProfile id={params.id} tab="posts" path={params.path} />;
+      return <Profile id={params.id} tab="posts" path={params.path} />;
     };
 
     return (
@@ -143,7 +139,7 @@ class Main extends Component<Props, ReactState> {
           }`}
           style="flex-direction: row;"
         >
-          <Menu />
+          {s.loggedIn ? <Menu /> : null}
           <Helmet titleTemplate={titleTemplate} defaultTitle={defaultTitle}>
             <title>{title}</title>
             <meta name="description" content="Social Networking Freedom" />
@@ -162,7 +158,7 @@ class Main extends Component<Props, ReactState> {
               <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />
               <Feed path="/search/:keyword?" />
-              <Login path="/login" />
+              <Login path="/login" fullScreen={true} />
               <Notifications path="/notifications" />
               <Chat path="/chat/hashtag/:hashtag?" />
               <Chat path="/chat/:id?" />
@@ -175,18 +171,26 @@ class Main extends Component<Props, ReactState> {
               <Explorer path="/explorer/:path?" />
               <Explorer path="/explorer/:path+" />
               <EditProfile path="/profile/edit" />
-              <MyProfile path="/profile/:id+" tab="profile" />
-              <MyProfile path="/replies/:id+" tab="replies" />
-              <MyProfile path="/likes/:id+" tab="likes" />
-              <MyProfile path="/media/:id+" tab="media" />
+              <Profile path="/profile/:id" tab="posts" />
+              <Profile path="/:id/replies" tab="replies" />
+              <Profile path="/:id/likes" tab="likes" />
               <Follows path="/follows/:id" />
               <Follows followers={true} path="/followers/:id" />
-              <NoteOrProfile path="/:id+" />
+              <NoteOrProfile path="/:id" />
             </Router>
           </div>
         </section>
         <MediaPlayer />
         <Footer />
+        {this.state.showLoginModal && (
+          <Modal
+            centerVertically={true}
+            showContainer={true}
+            onClose={() => localState.get('showLoginModal').put(false)}
+          >
+            <Login />
+          </Modal>
+        )}
       </div>
     );
   }

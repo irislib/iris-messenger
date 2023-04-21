@@ -1171,17 +1171,14 @@ header.footer .header-content {
   }
 }
 
-.application-list a.logo:hover,
-.application-list a.logo:focus,
-.application-list a.logo:active {
+a.logo:hover,
+a.logo:focus,
+a.logo:active {
   background: none !important;
   opacity: 1;
   text-decoration: none;
 }
 
-.application-list a:hover,
-.application-list a:focus,
-.application-list a:active,
 .settings-list a:hover,
 .settings-list a:focus,
 .settings-list a:active {
@@ -1736,16 +1733,19 @@ a.msgSenderName:hover .user-name {
   display: flex;
   overflow-y: auto;
   color: var(--text-color);
+  background-color: var(--login-background);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.fullscreen {
   position: fixed;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: var(--login-background);
   z-index: 1000;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-app-region: drag;
 }
 
 #login ::-webkit-input-placeholder {
