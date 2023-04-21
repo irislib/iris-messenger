@@ -14,6 +14,7 @@ export enum Kind {
   EventDeletion = 5,
   Repost = 6,
   Reaction = 7,
+  BadgeAward = 8,
   ChannelCreation = 40,
   ChannelMetadata = 41,
   ChannelMessage = 42,
@@ -27,6 +28,8 @@ export enum Kind {
   FlagList = 16463,
   ClientAuth = 22242,
   ReplaceableByTag = 30000,
+  BadgeDefinition = 30008,
+  ProfileBadge = 30009,
   Article = 30023
 }
 

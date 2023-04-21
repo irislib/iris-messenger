@@ -2,6 +2,7 @@ import { throttle } from 'lodash';
 import { RelayPool } from 'nostr-relaypool';
 
 import { Event, Filter, matchFilter } from '../lib/nostr-tools';
+import { authenticate } from '../lib/nostr-tools/nip42';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 
@@ -43,6 +44,15 @@ const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
 });
 relayPool.onnotice((relayUrl, notice) => {
   console.log('notice', notice, ' from relay ', relayUrl);
+});
+relayPool.onauth(async (relay, challenge) => {
+  try {
+    await authenticate({ relay, challenge, sign: Events.sign });
+  } catch (e) {
+    console.log('error: authenticate to relay:', e);
+    relayPool.removeRelay(relay.url);
+    Relays.disable(relay.url);
+  }
 });
 
 localState.get('dev').on((d) => {
