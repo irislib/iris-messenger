@@ -123,6 +123,7 @@ class Profile extends View {
       rawDataJson.push(followEvent);
     }
     rawDataJson = JSON.stringify(rawDataJson, null, 2);
+    const loggedIn = this.state.loggedIn;
     // TODO: on Follow / Message btn click open login modal if not logged in
     return html`
       <div class="profile-top" key="${this.state.hexPub}details">
@@ -138,16 +139,19 @@ class Profile extends View {
               class="profile-header-info"
               style="flex: 5;flex-direction: row; display:flex;margin-top:15px;justify-content: flex-end"
             >
-              <div>
+              <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
                 ${this.state.isMyProfile
-                  ? html`<${Button} small onClick=${() => route('/profile/edit')}
+                  ? html`<${Button} small onClick=${() => loggedIn && route('/profile/edit')}
                       >${t('edit_profile')}<//
                     >`
                   : html`
                       <${Follow} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
                       ${this.state.npub !==
                       'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8'
-                        ? html` <${Button} small onClick=${() => route(`/chat/${this.state.npub}`)}>
+                        ? html` <${Button}
+                            small
+                            onClick=${() => loggedIn && route(`/chat/${this.state.npub}`)}
+                          >
                             <span class="hidden-xs"> ${t('send_message')} </span>
                             <span class="visible-xs-inline-block msg-btn-icon">
                               ${Icons.chat}
@@ -489,6 +493,7 @@ class Profile extends View {
     this.restoreScrollPosition();
     const pub = this.props.id;
     const npub = Key.toNostrBech32Address(pub, 'npub');
+    localState.get('loggedIn').on(this.inject());
     if (npub && npub !== pub) {
       route(`/${npub}`, true);
       return;

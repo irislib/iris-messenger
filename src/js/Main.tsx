@@ -5,6 +5,7 @@ import { Router, RouterOnChangeArgs } from 'preact-router';
 import Footer from './components/Footer';
 import MediaPlayer from './components/MediaPlayer';
 import Menu from './components/Menu';
+import Modal from './components/modal/Modal';
 import Session from './nostr/Session';
 import { translationLoaded } from './translations/Translation';
 import About from './views/About';
@@ -40,6 +41,7 @@ type ReactState = {
   activeRoute: string;
   platform: string;
   translationLoaded: boolean;
+  showLoginModal: boolean;
 };
 
 Session.init({ autologin: false, autofollow: false });
@@ -59,6 +61,7 @@ class Main extends Component<Props, ReactState> {
     // iris.electron && iris.electron.get('platform').on(this.inject());
     localState.get('unseenMsgsTotal').on(this.inject());
     translationLoaded.then(() => this.setState({ translationLoaded: true }));
+    localState.get('showLoginModal').on(this.inject());
   }
 
   handleRoute(e: RouterOnChangeArgs) {
@@ -184,6 +187,15 @@ class Main extends Component<Props, ReactState> {
         </section>
         <MediaPlayer />
         <Footer />
+        {this.state.showLoginModal && (
+          <Modal
+            centerVertically={true}
+            showContainer={true}
+            onClose={() => localState.get('showLoginModal').put(false)}
+          >
+            <Login />
+          </Modal>
+        )}
       </div>
     );
   }
