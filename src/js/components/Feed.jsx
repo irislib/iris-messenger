@@ -235,6 +235,7 @@ class Feed extends Component {
       }
     };
     const go = () => {
+      this.unsub?.();
       if (this.props.index === 'notifications') {
         this.unsub = Events.notifications.subscribe((eventIds) => {
           eventIds.forEach((id) => callback(Events.db.by('id', id)));
