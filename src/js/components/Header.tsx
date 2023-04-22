@@ -247,7 +247,7 @@ export default class Header extends Component {
   renderLogo() {
     return (
       <a tabIndex={3} href="/" className="logo" style="margin-left: 15px;">
-        <img src={logo} width="30" height="30" style="margin-right: 15px;" />
+        <img src={logo} width="30" height="30" style="margin-right: 9px;" />
         <span style="font-size: 1.8em; color: var(--text-color);">iris</span>
       </a>
     );

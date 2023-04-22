@@ -159,6 +159,7 @@ const PubSub = {
   subscribeRelayPool(filter: Filter, sinceLastOpened: boolean, mergeSubscriptions: boolean) {
     let relays: any;
     if (filter.keywords) {
+      // TODO bomb all relays with searches, or add more search relays
       relays = Array.from(Relays.searchRelays.keys());
     } else if (mergeSubscriptions || filter.authors?.length !== 1) {
       relays = Array.from(Relays.relays.keys());
