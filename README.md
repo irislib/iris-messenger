@@ -135,7 +135,7 @@ Tauri [desktop releases](https://github.com/irislib/iris-messenger/releases) are
 - [x] [NIP-33: Parameterized Replaceable Events](https://github.com/nostr-protocol/nips/blob/master/33.md)<br>
 - [ ] [NIP-39: External Identities in Profiles](https://github.com/nostr-protocol/nips/blob/master/39.md)<br>
 - [ ] [NIP-40: Expiration Timestamp](https://github.com/nostr-protocol/nips/blob/master/40.md)<br>
-- [ ] [NIP-42: Authentication of clients to relays](https://github.com/nostr-protocol/nips/blob/master/42.md)<br>
+- [x] [NIP-42: Authentication of clients to relays](https://github.com/nostr-protocol/nips/blob/master/42.md)<br>
 - [ ] [NIP-46: Nostr Connect](https://github.com/nostr-protocol/nips/blob/master/46.md)<br>
 - [x] [NIP-50: Keywords filter](https://github.com/nostr-protocol/nips/blob/master/50.md)<br>
 - [ ] [NIP-51: Lists](https://github.com/nostr-protocol/nips/blob/master/51.md)<br>
