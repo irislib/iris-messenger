@@ -9,7 +9,7 @@ import Copy from '../components/buttons/Copy';
 import Follow from '../components/buttons/Follow';
 import Report from '../components/buttons/Report';
 import Dropdown from '../components/Dropdown';
-import Feed from '../components/Feed';
+import Feed from '../components/feed/Feed';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';

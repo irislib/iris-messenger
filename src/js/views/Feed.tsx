@@ -1,4 +1,4 @@
-import FeedComponent from '../components/Feed';
+import FeedComponent from '../components/feed/Feed';
 import OnboardingNotification from '../components/OnboardingNotification';
 import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';

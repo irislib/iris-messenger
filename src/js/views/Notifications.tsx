@@ -1,6 +1,6 @@
 import { debounce } from 'lodash';
 
-import Feed from '../components/Feed';
+import Feed from '../components/feed/Feed';
 import localState from '../LocalState';
 import Session from '../nostr/Session';
 import { translate as t } from '../translations/Translation';

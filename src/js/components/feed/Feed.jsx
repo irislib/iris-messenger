@@ -2,21 +2,21 @@ import { throttle } from 'lodash';
 import isEqual from 'lodash/isEqual';
 import styled from 'styled-components';
 
-import Component from '../BaseComponent';
-import Helpers from '../Helpers';
-import Icons from '../Icons';
-import localState from '../LocalState';
-import Events from '../nostr/Events';
-import Key from '../nostr/Key';
-import PubSub from '../nostr/PubSub';
-import SocialNetwork from '../nostr/SocialNetwork';
-import SortedEventMap from '../nostr/SortedEventMap';
-import { translate as t } from '../translations/Translation';
+import Component from '../../BaseComponent';
+import Helpers from '../../Helpers';
+import Icons from '../../Icons';
+import localState from '../../LocalState';
+import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
+import PubSub from '../../nostr/PubSub';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import SortedEventMap from '../../nostr/SortedEventMap';
+import { translate as t } from '../../translations/Translation';
+import { PrimaryButton as Button } from '../buttons/Button';
+import ErrorBoundary from '../ErrorBoundary';
+import EventComponent from '../events/EventComponent';
 
-import { PrimaryButton as Button } from './buttons/Button';
-import EventComponent from './events/EventComponent';
-import ErrorBoundary from './ErrorBoundary';
-import FeedSettings from "./FeedSettings";
+import FeedSettings from './FeedSettings';
 
 const INITIAL_PAGE_SIZE = 10;
 
@@ -132,6 +132,7 @@ class Feed extends Component {
         this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
         this.props.scrollElement.scrollHeight - 1000
       ) {
+        // TODO load more events
         this.setState({ displayCount: this.state.displayCount + INITIAL_PAGE_SIZE });
       }
     }
