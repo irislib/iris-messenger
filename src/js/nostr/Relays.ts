@@ -146,15 +146,21 @@ const Relays = {
           if (r) {
             r.enabled = false;
             this.relays.set(url, r);
+            PubSub.relayPool.removeRelay(url);
           }
         }
       }
       for (const [url, data] of Object.entries(savedRelays)) {
         if (!data) {
           this.relays.has(url) && this.remove(url);
-          return;
+          continue;
         } else if (!this.relays.has(url)) {
-          this.relays.set(url, data);
+          // `data` was missing `url` here, and those objects would be stored.
+          // So this is backward compat.
+          this.relays.set(url, { url, enabled: data.enabled });
+          if (data.enabled) {
+            PubSub.relayPool.addOrGetRelay(url);
+          }
         }
       }
     });
@@ -163,14 +169,29 @@ const Relays = {
     if (this.relays.has(url)) return;
     const relay = { enabled: true, url };
     this.relays.set(url, relay);
+    PubSub.relayPool.addOrGetRelay(url);
   },
   remove(url: string) {
     try {
-      this.relays.get(url)?.close();
+      PubSub.relayPool.removeRelay(url);
     } catch (e) {
       console.log('error closing relay', e);
     }
     this.relays.delete(url);
+  },
+  disable(url: string) {
+    if (!this.relays.has(url)) {
+      return;
+    }
+    this.relays.set(url, { enabled: false, url });
+    PubSub.relayPool.removeRelay(url);
+  },
+  enable(url: string) {
+    if (!this.relays.has(url)) {
+      return;
+    }
+    this.relays.set(url, { enabled: true, url });
+    PubSub.relayPool.addOrGetRelay(url);
   },
   restoreDefaults() {
     this.relays.clear();
@@ -184,7 +205,7 @@ const Relays = {
     }
     const relaysObj = {};
     for (const [url, relay] of this.relays.entries()) {
-      relaysObj[url] = { enabled: relay.enabled };
+      relaysObj[url] = { enabled: relay.enabled, url };
     }
     localState.get('relays').put(relaysObj);
   },
