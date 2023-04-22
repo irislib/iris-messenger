@@ -10,6 +10,7 @@ import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
+import SortedEventMap from '../nostr/SortedEventMap';
 import { translate as t } from '../translations/Translation';
 
 import { PrimaryButton as Button } from './buttons/Button';
@@ -194,16 +195,16 @@ class Feed extends Component {
   subscribe() {
     this.unsub?.();
     clearTimeout(this.subscribeRetryTimeout);
-    const results = new Map();
-    let updated = false;
+    const results = new SortedEventMap((a, b) => this.sort(a, b));
     const update = () => {
       this.updateSortedEvents(
-        Array.from(results.values())
-          .filter((e) => {
-            if (SocialNetwork.blockedUsers.has(e.pubkey)) {
+        results
+          .events()
+          .filter((event) => {
+            if (SocialNetwork.blockedUsers.has(event.pubkey)) {
               return false;
             }
-            const repliedMsg = Events.getEventReplyingTo(e);
+            const repliedMsg = Events.getEventReplyingTo(event);
             if (repliedMsg) {
               if (!this.state.settings.showReplies) {
                 return false;
@@ -215,15 +216,17 @@ class Feed extends Component {
             }
             return true;
           })
-          .sort(this.sort.bind(this))
-          .map((e) => e.id),
+          .map((event) => event.id),
       );
     };
-    const throttledUpdate = throttle(update, 1000, { leading: false });
+    const throttledUpdate = throttle(update, 50);
     const callback = (event) => {
-      if (results.has(event.id)) return;
-      results.set(event.id, event);
-      if (!updated && results.size > 25) {
+      if (results.has(event.id)) {
+        return;
+      }
+      results.add(event);
+      let updated = false;
+      if (results.size > 25 && !updated) {
         updated = true;
         update();
       } else {
