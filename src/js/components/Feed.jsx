@@ -16,6 +16,7 @@ import { translate as t } from '../translations/Translation';
 import { PrimaryButton as Button } from './buttons/Button';
 import EventComponent from './events/EventComponent';
 import ErrorBoundary from './ErrorBoundary';
+import FeedSettings from "./FeedSettings";
 
 const INITIAL_PAGE_SIZE = 10;
 
@@ -220,12 +221,12 @@ class Feed extends Component {
       );
     };
     const throttledUpdate = throttle(update, 50);
+    let updated = false;
     const callback = (event) => {
       if (results.has(event.id)) {
         return;
       }
       results.add(event);
-      let updated = false;
       if (results.size > 25 && !updated) {
         updated = true;
         update();
@@ -440,118 +441,11 @@ class Feed extends Component {
   }
 
   renderSettings() {
-    const inputs = [
-      {
-        type: 'checkbox',
-        id: 'display_realtime',
-        checked: this.state.settings.realtime,
-        label: t('realtime'),
-        onChange: () =>
-          this.setState({
-            settings: { ...this.state.settings, realtime: !this.state.settings.realtime },
-          }),
-      },
-      {
-        type: 'checkbox',
-        id: 'show_replies',
-        checked: this.state.settings.showReplies,
-        name: 'show_replies',
-        label: t('show_replies'),
-        onChange: () =>
-          this.setState({
-            settings: { ...this.state.settings, showReplies: !this.state.settings.showReplies },
-          }),
-      },
-    ];
-
-    const radioGroups = [
-      {
-        label: t('display'),
-        name: 'display',
-        inputs: [
-          { value: 'posts', id: 'display_posts', label: t('posts') },
-          { value: 'grid', id: 'display_grid', label: t('grid') },
-        ],
-        checked: this.state.settings.display,
-        onChange: (e) =>
-          this.setState({ settings: { ...this.state.settings, display: e.target.value } }),
-      },
-      {
-        label: t('sort_by'),
-        name: 'sortBy',
-        inputs: [
-          { value: 'created_at', id: 'sortByTime', label: t('time') },
-          { value: 'likes', id: 'sortByLikes', label: t('likes') },
-          { value: 'zaps', id: 'sortByZaps', label: t('zaps') },
-        ],
-        checked: this.state.settings.sortBy,
-        onChange: (e) =>
-          this.setState({ settings: { ...this.state.settings, sortBy: e.target.value } }),
-      },
-      {
-        label: t('sort_direction'),
-        name: 'ordering',
-        inputs: [
-          { value: 'desc', id: 'ordering_desc', label: '▼' },
-          { value: 'asc', id: 'ordering_asc', label: '▲' },
-        ],
-        checked: this.state.settings.sortDirection,
-        onChange: (e) =>
-          this.setState({ settings: { ...this.state.settings, sortDirection: e.target.value } }),
-      },
-      {
-        label: t('timespan'),
-        name: 'timespan',
-        inputs: [
-          { value: 'all', id: 'timespanAll', label: t('All time') },
-          { value: 'day', id: 'timespanDay', label: t('day') },
-          { value: 'week', id: 'timespanWeek', label: t('week') },
-          { value: 'month', id: 'timespanMonth', label: t('month') },
-          { value: 'year', id: 'timespanYear', label: t('year') },
-        ],
-        checked: this.state.settings.timespan,
-        onChange: (e) =>
-          this.setState({ settings: { ...this.state.settings, timespan: e.target.value } }),
-      },
-    ];
     return (
-      <div className="msg">
-        <div className="msg-content">
-          <div style="display:flex;flex-direction:column">
-            <div>
-              {inputs.map((input, i) => (
-                <span key={i}>
-                  <input {...input} />
-                  <label htmlFor={input.id}>{input.label}</label>
-                </span>
-              ))}
-            </div>
-            {radioGroups.map((group, i) => (
-              <div key={i} style={{ flexDirection: 'column' }}>
-                <p>{group.label}:</p>
-                <p>
-                  {group.inputs.map((input, j) => (
-                    <span key={j}>
-                      <input
-                        type="radio"
-                        name={group.name}
-                        id={input.id}
-                        value={input.value}
-                        checked={group.checked === input.value}
-                        onChange={group.onChange}
-                      />
-                      <label htmlFor={input.id}>{input.label}</label>
-                    </span>
-                  ))}
-                </p>
-              </div>
-            ))}
-            <p>
-              <Button onClick={() => this.saveSettings()}>{t('save_as_defaults')}</Button>
-            </p>
-          </div>
-        </div>
-      </div>
+      <FeedSettings
+        settings={this.state.settings}
+        onChange={(settings) => this.setState({ settings })}
+      />
     );
   }
 
