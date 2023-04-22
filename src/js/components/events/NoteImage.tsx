@@ -2,13 +2,13 @@ import { memo, useState } from 'react';
 import { route } from 'preact-router';
 import styled, { css, keyframes } from 'styled-components';
 
+import Icons from '../../Icons';
 import { Event } from '../../lib/nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
 import Modal from '../modal/Modal';
 import SafeImg from '../SafeImg';
-import Icons from '../../Icons';
 
 import EventComponent from './EventComponent';
 

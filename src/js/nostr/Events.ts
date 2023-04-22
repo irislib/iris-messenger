@@ -620,14 +620,7 @@ const Events = {
     delete event['$loki'];
     delete event['meta'];
     if (!event.sig) {
-      if (!event.tags) {
-        event.tags = [];
-      }
-      event.content = event.content || '';
-      event.created_at = event.created_at || Math.floor(Date.now() / 1000);
-      event.pubkey = Key.getPubKey();
-      event.id = getEventHash(event as Event);
-      event.sig = await Key.sign(event as Event);
+      await this.sign(event);
     }
     if (!(event.id && event.sig)) {
       console.error('Invalid event', event);
@@ -652,6 +645,17 @@ const Events = {
         PubSub.publish(referredEvent);
       }
     }
+    return event as Event;
+  },
+  async sign(event: Partial<Event>) {
+    if (!event.tags) {
+      event.tags = [];
+    }
+    event.content = event.content || '';
+    event.created_at = event.created_at || Math.floor(Date.now() / 1000);
+    event.pubkey = Key.getPubKey();
+    event.id = getEventHash(event as Event);
+    event.sig = await Key.sign(event as Event);
     return event as Event;
   },
   getZappingUser(eventId: string) {

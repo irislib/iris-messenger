@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 
 import { PrimaryButton as Button } from '../../components/buttons/Button';
 import localState from '../../LocalState';
+import PubSub from '../../nostr/PubSub';
 import Relays from '../../nostr/Relays';
 import { translate as t } from '../../translations/Translation';
-import PubSub from "../../nostr/PubSub";
 
 const Network = () => {
   const [relays, setRelays] = useState(Array.from(Relays.relays.values()));
@@ -35,7 +35,10 @@ const Network = () => {
 
   const handleAddRelay = (event, url) => {
     const newRelayUrlWithProtocol = ensureProtocol(url);
-    localState.get('relays').get(newRelayUrlWithProtocol).put({ enabled: true });
+    localState
+      .get('relays')
+      .get(newRelayUrlWithProtocol)
+      .put({ enabled: true, newRelayUrlWithProtocol });
     event.preventDefault(); // prevent the form from reloading the page
     Relays.add(newRelayUrlWithProtocol); // add the new relay using the Nostr method
     setNewRelayUrl(''); // reset the new relay URL
@@ -83,7 +86,7 @@ const Network = () => {
                 checked={relay.enabled !== false}
                 onChange={() => {
                   relay.enabled = !(relay.enabled !== false);
-                  relay.enabled ? relay.connect() : relay.close();
+                  relay.enabled ? Relays.enable(relay.url) : Relays.disable(relay.url);
                 }}
               />
             </div>
