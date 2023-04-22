@@ -384,8 +384,10 @@ class Profile extends View {
           ),
         });
     };
-    this.subscriptions.push(SocialNetwork.getFollowersByUser(address, setFollowCounts));
-    this.subscriptions.push(SocialNetwork.getFollowedByUser(address, setFollowCounts));
+    setTimeout(() => {
+      this.subscriptions.push(SocialNetwork.getFollowersByUser(address, setFollowCounts));
+      this.subscriptions.push(SocialNetwork.getFollowedByUser(address, setFollowCounts));
+    }, 1000); // this causes social graph recursive loading, so let some other stuff like feed load first
     const unsub = SocialNetwork.getProfile(
       address,
       (profile) => {
