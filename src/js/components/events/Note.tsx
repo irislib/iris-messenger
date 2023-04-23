@@ -21,10 +21,15 @@ const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
 
 let loadReactions = true;
-localState
-  .get('settings')
-  .get('loadReactions')
-  .on((v) => (loadReactions = v));
+let showLikes = true;
+let showZaps = true;
+let showReposts = true;
+localState.get('settings').on((s) => {
+  loadReactions = s.loadReactions !== false;
+  showLikes = s.showLikes !== false;
+  showZaps = s.showZaps !== false;
+  showReposts = s.showReposts !== false;
+});
 
 const Note = ({
   event,
@@ -321,6 +326,7 @@ const Note = ({
             {!asInlineQuote && loadReactions && (
               <Reactions
                 key={event.id + 'reactions'}
+                settings={{ showLikes, showZaps, showReposts }}
                 standalone={standalone}
                 event={event}
                 setReplies={(replies) => setReplies(replies)}

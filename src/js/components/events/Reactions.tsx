@@ -199,28 +199,43 @@ const Reactions = (props) => {
           {Icons.reply}
         </a>
         <span className="count">{s.replyCount || ''}</span>
-        <a
-          className={`msg-btn repost-btn ${s.reposted ? 'reposted' : ''}`}
-          onClick={() => repostBtnClicked()}
-        >
-          {Icons.repost}
-        </a>
-        <span
-          className={`count ${s.showReposts ? 'active' : ''}`}
-          onClick={(e) => toggleReposts(e)}
-        >
-          {s.reposts || ''}
-        </span>
-        <a
-          className={`msg-btn like-btn ${s.liked ? 'liked' : ''}`}
-          onClick={(e) => likeBtnClicked(e)}
-        >
-          {s.liked ? Icons.heartFull : Icons.heartEmpty}
-        </a>
-        <span className={`count ${s.showLikes ? 'active' : ''}`} onClick={(e) => toggleLikes(e)}>
-          {s.likes || ''}
-        </span>
-        {state.lightning ? (
+        {props.settings.showReposts ? (
+          <>
+            <a
+              className={`msg-btn repost-btn ${s.reposted ? 'reposted' : ''}`}
+              onClick={() => repostBtnClicked()}
+            >
+              {Icons.repost}
+            </a>
+            <span
+              className={`count ${s.showReposts ? 'active' : ''}`}
+              onClick={(e) => toggleReposts(e)}
+            >
+              {s.reposts || ''}
+            </span>
+          </>
+        ) : (
+          ''
+        )}
+        {props.settings.showLikes ? (
+          <>
+            <a
+              className={`msg-btn like-btn ${s.liked ? 'liked' : ''}`}
+              onClick={(e) => likeBtnClicked(e)}
+            >
+              {s.liked ? Icons.heartFull : Icons.heartEmpty}
+            </a>
+            <span
+              className={`count ${s.showLikes ? 'active' : ''}`}
+              onClick={(e) => toggleLikes(e)}
+            >
+              {s.likes || ''}
+            </span>
+          </>
+        ) : (
+          ''
+        )}
+        {props.settings.showZaps && state.lightning ? (
           <>
             <a
               onClick={(e) => {

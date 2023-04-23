@@ -245,6 +245,7 @@ class Feed extends Component {
         this.unsub = this.getEvents(callback);
         const followCount = SocialNetwork.followedByUser.get(Key.getPubKey())?.size;
         const unsub = PubSub.subscribe({ authors: [Key.getPubKey()], kinds: [3] }, () => {
+          // is this needed?
           if (followCount !== SocialNetwork.followedByUser.get(Key.getPubKey())?.size) {
             unsub();
             this.subscribe();
@@ -334,9 +335,8 @@ class Feed extends Component {
         },
         true,
       );
-    } else {
-      return PubSub.subscribe({ kinds: [1, 6], limit: 300, since }, callback, true);
     }
+    return PubSub.subscribe({ kinds: [1, 6], limit: 300, since }, callback, true);
   }
 
   updateParams(prevState) {
