@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 
 import { translate as t } from '../../translations/Translation';
-
 import { PrimaryButton } from '../buttons/Button';
 
 interface Settings {
@@ -20,8 +19,30 @@ const FeedSettings = ({ settings, onChange }) => {
     setLocalSettings(settings);
   }, [settings]);
 
+  const updateUrlParams = () => {
+    const url = new URL(window.location.href);
+    if (localSettings.display === 'grid') {
+      url.searchParams.set('display', 'grid');
+    } else {
+      url.searchParams.delete('display');
+    }
+    if (localSettings.showReplies === false) {
+      url.searchParams.set('showReplies', '0');
+    } else {
+      url.searchParams.delete('showReplies');
+    }
+    if (localSettings.realtime) {
+      url.searchParams.set('realtime', '1');
+    } else {
+      url.searchParams.delete('realtime');
+    }
+
+    window.history.replaceState({}, document.title, url.toString());
+  };
+
   const saveSettings = () => {
     onChange(localSettings);
+    updateUrlParams();
   };
 
   const inputs = [

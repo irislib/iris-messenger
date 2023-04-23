@@ -1,16 +1,40 @@
-import { Event } from '../lib/nostr-tools';
-
-type CompareFn = (a: Event, b: Event) => number;
+import { Event } from '../../lib/nostr-tools';
+import Events from '../../nostr/Events';
 
 export default class SortedEventMap {
   private eventMap: Map<string, Event>; // or should we store just strings, getting Events from loki?
   private sortedEventIds: string[];
-  private compareFn: CompareFn;
+  private sortBy: string;
+  private sortDirection: string;
 
-  constructor(compareFn: CompareFn) {
+  constructor(sortBy: string, sortDirection: string) {
+    this.sortBy = sortBy;
+    this.sortDirection = sortDirection;
     this.eventMap = new Map<string, Event>();
     this.sortedEventIds = [];
-    this.compareFn = compareFn;
+  }
+
+  compareFn(a, b) {
+    let aVal;
+    let bVal;
+    if (!a || !b) return 0;
+    if (a && !b) return -1;
+    if (!a && b) return 1;
+    if (this.sortBy === 'created_at') {
+      aVal = a.created_at;
+      bVal = b.created_at;
+    } else if (this.sortBy === 'likes') {
+      aVal = Events.likesByMessageId.get(a.id)?.size || 0;
+      bVal = Events.likesByMessageId.get(b.id)?.size || 0;
+    } else if (this.sortBy === 'zaps') {
+      aVal = Events.zapsByNote.get(a.id)?.size || 0;
+      bVal = Events.zapsByNote.get(b.id)?.size || 0;
+    }
+    if (this.sortDirection === 'desc') {
+      return bVal - aVal;
+    } else {
+      return aVal - bVal;
+    }
   }
 
   has(eventId: string): boolean {
@@ -55,16 +79,6 @@ export default class SortedEventMap {
 
   events(): Event[] {
     return this.sortedEventIds.map((id) => this.eventMap.get(id)!);
-  }
-
-  setComparator(compareFn: CompareFn): void {
-    this.compareFn = compareFn;
-    this.sortedEventIds.sort((a, b) => {
-      const eventA = this.eventMap.get(a)!;
-      const eventB = this.eventMap.get(b)!;
-
-      return this.compareFn(eventA, eventB);
-    });
   }
 
   get size(): number {
