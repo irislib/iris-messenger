@@ -11,7 +11,7 @@ import { translate as t } from '../translations/Translation';
 
 import { Button, PrimaryButton } from './buttons/Button';
 import Modal from './modal/Modal';
-import FeedMessageForm from './FeedMessageForm';
+import PublicMessageForm from './PublicMessageForm';
 import Name from './Name';
 import QrCode from './QrCode';
 
@@ -64,7 +64,7 @@ export default class Menu extends Component {
             showContainer=${true}
             onClose=${() => this.setState({ showNewPostModal: false })}
           >
-            <${FeedMessageForm}
+            <${PublicMessageForm}
               onSubmit=${() => this.setState({ showNewPostModal: false })}
               placeholder=${t('whats_on_your_mind')}
               autofocus=${true}

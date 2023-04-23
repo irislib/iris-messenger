@@ -1,7 +1,7 @@
 import { route } from 'preact-router';
 
 import EventComponent from '../components/events/EventComponent';
-import FeedMessageForm from '../components/FeedMessageForm';
+import PublicMessageForm from '../components/PublicMessageForm';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
@@ -33,7 +33,7 @@ class Note extends View {
     if (this.props.id === 'new') {
       content = (
         <div className="mar-top15">
-          <FeedMessageForm
+          <PublicMessageForm
             placeholder={t('whats_on_your_mind')}
             activeChat="public"
             forceAutofocusMobile={true}

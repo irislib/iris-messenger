@@ -7,7 +7,7 @@ import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
-import FeedMessageForm from '../FeedMessageForm';
+import PublicMessageForm from '../PublicMessageForm';
 import Identicon from '../Identicon';
 import ImageModal from '../modal/Image';
 import Name from '../Name';
@@ -276,7 +276,7 @@ const Note = ({
 
   function renderReplyForm() {
     return (
-      <FeedMessageForm
+      <PublicMessageForm
         waitForFocus={true}
         autofocus={!standalone}
         replyingTo={event.id}

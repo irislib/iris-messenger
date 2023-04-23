@@ -5,12 +5,12 @@ import { translate as t } from '../../translations/Translation';
 
 const IconLink = styled.a`
   padding-right: 10px;
-  color: var(--text-color);
+  color: var(--text-color) !important;
 `;
 
 const SettingsLink = styled.a`
   padding: 0 10px;
-  color: var(--text-color);
+  color: var(--text-color) !important;
 `;
 
 const Content = styled.div`

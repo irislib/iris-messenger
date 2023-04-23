@@ -14,7 +14,7 @@ import Torrent from './Torrent';
 
 const mentionRegex = /\B@[\u00BF-\u1FFF\u2C00-\uD7FF\w]*$/;
 
-class FeedMessageForm extends MessageForm {
+class PublicMessageForm extends MessageForm {
   newMsgRef = createRef();
 
   componentDidMount() {
@@ -357,4 +357,4 @@ class FeedMessageForm extends MessageForm {
   }
 }
 
-export default FeedMessageForm;
+export default PublicMessageForm;
