@@ -221,14 +221,15 @@ class Feed extends Component {
           .map((event) => event.id),
       );
     };
-    const throttledUpdate = throttle(update, 50);
+    const throttledUpdate = throttle(update, 1000);
     let updated = false;
     const callback = (event) => {
       if (results.has(event.id)) {
         return;
       }
       results.add(event);
-      if (results.size > 25 && !updated) {
+      if (results.size > 50 && !updated) {
+        // TODO should filter results, only count what's shown
         updated = true;
         update();
       } else {
