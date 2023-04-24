@@ -191,9 +191,15 @@ const PubSub = {
     return relayPool.subscribe(
       [filter],
       relays,
-      (event) => {
+      (event, _, url) => {
         setTimeout(() => {
           Events.handle(event);
+          if (url) {
+            Events.handleEventMetadata({
+              url,
+              event,
+            });
+          }
         }, 0);
       },
       mergeSubscriptions ? 100 : 0,
