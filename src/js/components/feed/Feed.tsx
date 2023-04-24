@@ -22,7 +22,11 @@ class Feed extends BaseFeed {
 
   getCallbackForPostsIndex(callback) {
     return (event) => {
-      if (Events.getEventReplyingTo(event) && !Events.isRepost(event)) {
+      if (
+        this.props.index === 'posts' &&
+        Events.getEventReplyingTo(event) &&
+        !Events.isRepost(event)
+      ) {
         return;
       }
       callback(event);
