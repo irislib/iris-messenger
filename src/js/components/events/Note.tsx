@@ -7,10 +7,10 @@ import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
-import PublicMessageForm from '../PublicMessageForm';
 import Identicon from '../Identicon';
 import ImageModal from '../modal/Image';
 import Name from '../Name';
+import PublicMessageForm from '../PublicMessageForm';
 import Torrent from '../Torrent';
 
 import EventComponent from './EventComponent';

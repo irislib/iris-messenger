@@ -11,8 +11,8 @@ import { translate as t } from '../translations/Translation';
 
 import { Button, PrimaryButton } from './buttons/Button';
 import Modal from './modal/Modal';
-import PublicMessageForm from './PublicMessageForm';
 import Name from './Name';
+import PublicMessageForm from './PublicMessageForm';
 import QrCode from './QrCode';
 
 const APPLICATIONS = [

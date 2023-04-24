@@ -134,7 +134,7 @@ export default class Header extends Component {
   }
 
   renderConnectedRelays() {
-    return !this.state.connectedRelays ? (
+    return (
       <a
         href="/settings/network"
         class={`connected-peers tooltip mobile-search-hidden ${
@@ -147,8 +147,6 @@ export default class Header extends Component {
           <span>{this.state.connectedRelays}</span>
         </small>
       </a>
-    ) : (
-      ''
     );
   }
 
