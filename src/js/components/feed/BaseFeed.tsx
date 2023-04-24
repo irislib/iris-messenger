@@ -15,8 +15,8 @@ import ErrorBoundary from '../ErrorBoundary';
 import EventComponent from '../events/EventComponent';
 
 import FeedSettings from './FeedSettings';
-import { ImageGrid } from './FeedStyledComponents';
 import FeedTypeSelector from './FeedTypeSelector';
+import ImageGrid from './ImageGrid';
 import Label from './Label';
 import SortedEventMap from './SortedEventMap';
 import { FeedProps, FeedState } from './types';
@@ -308,7 +308,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         onClick={() => this.showQueuedEvents()}
       >
         <div className="msg-content notification-msg colored">
-          {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
+          <div style="height: 27.5px; line-height: 27.5px">
+            {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
+          </div>
         </div>
       </div>
     );

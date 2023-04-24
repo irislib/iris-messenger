@@ -9,4 +9,4 @@ const ImageGrid = styled.div`
   }
 `;
 
-export { ImageGrid };
+export default ImageGrid;
