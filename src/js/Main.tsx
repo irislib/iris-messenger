@@ -22,6 +22,7 @@ import Note from './views/Note';
 import Notifications from './views/Notifications';
 import Profile from './views/Profile';
 import Settings from './views/settings/Settings';
+import Subscribe from './views/Subscribe';
 import Torrent from './views/Torrent';
 import Component from './BaseComponent';
 import Helpers from './Helpers';
@@ -31,7 +32,6 @@ import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
 import '../css/style.css';
 import '../css/cropper.min.css';
-import Subscribe from "./views/Subscribe";
 
 type Props = Record<string, unknown>;
 
