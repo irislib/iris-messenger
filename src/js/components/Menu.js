@@ -96,15 +96,10 @@ export default class Menu extends Component {
   render() {
     return html`
       <div class="application-list">
-        ${Helpers.isElectron
-          ? html`<div class="electron-padding" />`
-          : html`
-              <a tabindex="3" href="/" onClick=${(e) => this.handleFeedClick(e)} class="logo">
-                <div class="mobile-menu-icon visible-xs-inline-block">${Icons.menu}</div>
-                <img src=${logo} width="30" height="30" />
-                <span style="font-size: 1.8em">iris</span>
-              </a>
-            `}
+        <a tabindex="3" href="/" onClick=${(e) => this.menuLinkClicked(e)} class="logo">
+          <img src=${logo} width="30" height="30" />
+          <span style="font-size: 1.8em">iris</span>
+        </a>
         ${APPLICATIONS.map((a) => {
           if (a.url && (!a.beta || this.state.showBetaFeatures)) {
             let isActive = this.state.activeRoute.startsWith(a.url.slice(1));
