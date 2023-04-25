@@ -145,11 +145,11 @@ export default class IrisAccount extends Component {
       this.setState({ newUserName, newUserNameValid: false, invalidUsernameMessage: '' });
       return;
     }
-    if (newUserName.length < 4 || newUserName.length > 15) {
+    if (newUserName.length < 6 || newUserName.length > 15) {
       this.setState({
         newUserName,
         newUserNameValid: false,
-        invalidUsernameMessage: 'Username must be between 4 and 15 characters',
+        invalidUsernameMessage: 'Username must be between 6 and 15 characters',
       });
       return;
     }
