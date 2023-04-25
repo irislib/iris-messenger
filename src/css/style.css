@@ -439,10 +439,6 @@ a.logo img:not(:last-child) {
   margin-left: 15px;
 }
 
-.nav-plus-bg {
- fill: var(--button-primary-bg);
-}
-
 .nav .identicon img {
   padding: 3px;
 }
@@ -456,7 +452,7 @@ a.logo img:not(:last-child) {
 }
 
 .nav a.my-profile:focus .identicon img {
-  border: 1px solid var(--button-bg-hover);
+  border: 1px solid var(--purple);
 }
 
 .nav a.my-profile {
@@ -466,10 +462,6 @@ a.logo img:not(:last-child) {
 .nav .btn {
   color: var(--text-color);
   position: relative;
-}
-
-.nav .btn svg {
-  opacity: 0.5;
 }
 
 .nav .btn:focus svg {

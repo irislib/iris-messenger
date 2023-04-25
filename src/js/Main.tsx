@@ -31,6 +31,7 @@ import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
 import '../css/style.css';
 import '../css/cropper.min.css';
+import Subscribe from "./views/Subscribe";
 
 type Props = Record<string, unknown>;
 
@@ -171,6 +172,7 @@ class Main extends Component<Props, ReactState> {
               <Explorer path="/explorer/:path?" />
               <Explorer path="/explorer/:path+" />
               <EditProfile path="/profile/edit" />
+              <Subscribe path="/subscribe" />
               <Profile path="/profile/:id" tab="posts" />
               <Profile path="/:id/replies" tab="replies" />
               <Profile path="/:id/likes" tab="likes" />

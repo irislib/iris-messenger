@@ -13,8 +13,8 @@ class About extends Component {
     return (
       <>
         <Header />
-        <div class="main-view" id="settings">
-          <div class="centered-container mobile-padding15">
+        <div className="main-view" id="settings">
+          <div className="centered-container mobile-padding15">
             <h2>{t('about')}</h2>
             <p>Iris is like the social networking apps we're used to, but better:</p>
             <ul>
