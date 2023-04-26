@@ -124,9 +124,13 @@ const Session = {
     });
     if (window.location.pathname === '/') {
       localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
+        route('/' + (lastOpenedFeed || 'following'));
         setTimeout(() => {
           route('/' + (lastOpenedFeed || 'following'));
         }, 100);
+        setTimeout(() => {
+          route('/' + (lastOpenedFeed || 'following'));
+        }, 1000);
       });
     }
     setTimeout(() => {

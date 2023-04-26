@@ -50,15 +50,15 @@ export default class Menu extends BaseComponent {
     localState.get('activeRoute').on(this.inject());
   }
 
-  menuLinkClicked = (e, a?) => {
-    if (a?.text === 'feeds') {
-      this.handleFeedClick(e);
+  menuLinkClicked = (e, a?, openFeed = false) => {
+    if (a?.text === 'home' || openFeed) {
+      this.openFeedClicked(e);
     }
     localState.get('toggleMenu').put(false);
     localState.get('scrollUp').put(true);
   };
 
-  handleFeedClick = (e: MouseEvent) => {
+  openFeedClicked = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     localState.get('lastOpenedFeed').once((lastOpenedFeed: string) => {
@@ -98,14 +98,18 @@ export default class Menu extends BaseComponent {
   render() {
     return (
       <div class="application-list">
-        <a tabIndex={3} href="/" onClick={(e) => this.menuLinkClicked(e)} class="logo">
+        <a
+          tabIndex={3}
+          href="/"
+          onClick={(e) => this.menuLinkClicked(e, undefined, true)}
+          class="logo"
+        >
           <img src={logo} width="30" height="30" />
           <span style="font-size: 1.8em">iris</span>
         </a>
         {APPLICATIONS.map((a: any) => {
           if (a.url && (!a.beta || this.state.showBetaFeatures)) {
             let isActive = this.state.activeRoute.startsWith(a.url);
-            console.log('isActive', isActive, this.state.activeRoute, a.url);
             if (a.url === '/') {
               isActive = this.state.activeRoute.length <= 1;
             }

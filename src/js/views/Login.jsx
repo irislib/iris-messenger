@@ -64,11 +64,9 @@ class Login extends Component {
         }
       }
     }
-    console.log('k', k);
     if (!k) {
       return;
     }
-    console.log('login with', k);
     await Key.login(k, this.props.fullScreen);
     event.target.value = '';
     Helpers.copyToClipboard(''); // clear the clipboard
