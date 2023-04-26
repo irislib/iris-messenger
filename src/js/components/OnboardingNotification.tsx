@@ -23,7 +23,7 @@ const SUGGESTED_FOLLOWS = [
   ['npub1sg6plzptd64u62a878hep2kev88swjh3tw00gjsfl8f237lmu63q0uf63m', 'Former CEO of Twitter'], // jack
   [
     'npub1a2cww4kn9wqte4ry70vyfwqyqvpswksna27rtxd8vty6c74era8sdcw83a',
-    'Fundamental investing with a global macro overlay',
+    '"Fundamental investing with a global macro overlay"',
   ], // Lyn Alden
   [
     'npub15dqlghlewk84wz3pkqqvzl2w2w36f97g89ljds8x6c094nlu02vqjllm5m',
@@ -41,7 +41,7 @@ const SUGGESTED_FOLLOWS = [
   ], // fiatjaf
   [
     'npub1hu3hdctm5nkzd8gslnyedfr5ddz3z547jqcl5j88g4fame2jd08qh6h8nh',
-    'Lover of memes, maker of videos. #bitcoin',
+    '"Lover of memes, maker of videos"',
   ], // carla
 ];
 
