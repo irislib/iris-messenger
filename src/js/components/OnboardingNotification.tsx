@@ -12,6 +12,10 @@ import Follow from './buttons/Follow';
 import Identicon from './Identicon';
 import Name from './Name';
 
+import styled from 'styled-components';
+
+import { XMarkIcon } from '@heroicons/react/24/solid';
+
 const SUGGESTED_FOLLOWS = [
   [
     'npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9',
@@ -41,6 +45,20 @@ const SUGGESTED_FOLLOWS = [
     'Lover of memes, maker of videos. #bitcoin',
   ], // carla
 ];
+
+const NoFollowersWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+`;
+
+const CloseIconWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+`;
 
 export default class OnboardingNotification extends Component {
   componentDidMount() {
@@ -89,13 +107,16 @@ export default class OnboardingNotification extends Component {
 
   renderNoFollowers() {
     return (
-      <div style="display:flex;flex-direction:column;flex:1">
+      <NoFollowersWrapper>
+        <CloseIconWrapper onClick={() => localState.get('noFollowers').put(false)}>
+          <XMarkIcon width={24} />
+        </CloseIconWrapper>
         <p>{t('no_followers_yet')}</p>
         <p>
           <Copy text={t('copy_link')} copyStr={Helpers.getMyProfileLink()} />
         </p>
         <small>{t('no_followers_yet_info')}</small>
-      </div>
+      </NoFollowersWrapper>
     );
   }
 
