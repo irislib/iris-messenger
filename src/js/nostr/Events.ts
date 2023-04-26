@@ -538,7 +538,25 @@ const Events = {
     if (!id) {
       return;
     }
+    const hints = Events._getHintedRelays(event);
+    Object.entries(hints).forEach(([id, relays]) => {
+      this.eventsMetaDb.upsert(id, { relays });
+    });
     this.eventsMetaDb.upsert(id, { relays: new Set([url]) });
+  },
+  _getHintedRelays(event: Event) {
+    const tagsWanted = ['e', 'p'];
+    const ids = event.tags.reduce<{ [id: string]: Set<string> }>((acc, [tag, id, relay]) => {
+      if (!tagsWanted.includes(tag) || !relay?.startsWith('wss://')) {
+        return acc;
+      }
+      if (!acc[id]) {
+        acc[id] = new Set();
+      }
+      acc[id].add(relay.trim());
+      return acc;
+    }, {});
+    return ids;
   },
   handleNextFutureEvent() {
     if (this.futureEventIds.size === 0) {
@@ -645,6 +663,7 @@ const Events = {
 
     console.log('publishing event', event);
     this.handle(event as Event);
+    this.handleEventMetadata({ event: event as Event, url: Relays.enabledRelays()[0] });
 
     // also publish at most 10 events referred to in tags
     const referredEvents = event.tags
@@ -665,6 +684,7 @@ const Events = {
     if (!event.tags) {
       event.tags = [];
     }
+    Events.addRelayHints(event as Event);
     event.content = event.content || '';
     event.created_at = event.created_at || Math.floor(Date.now() / 1000);
     event.pubkey = Key.getPubKey();
@@ -761,6 +781,18 @@ const Events = {
       unsub1();
       unsub2();
     };
+  },
+  addRelayHints(event: { tags: string[][] }) {
+    event.tags.forEach((tag) => {
+      // Only for 'e' and 'p', and if already exists then out.
+      if (!['e', 'p'].includes(tag[0]) || tag[2]) {
+        return;
+      }
+      const hints = this.eventsMetaDb.getRelays(tag[1]);
+      if (hints.length > 0) {
+        tag[2] = hints[0];
+      }
+    });
   },
 };
 
