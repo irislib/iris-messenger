@@ -1,7 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 
 import AnimalName from '../AnimalName';
-import Events from '../nostr/Events';
 import Key from '../nostr/Key';
 import SocialNetwork from '../nostr/SocialNetwork';
 
@@ -12,6 +11,7 @@ type Props = {
   placeholder?: string;
   hideBadge?: boolean;
   userNameOnly?: boolean;
+  displayNameOnly?: boolean; // Add the new prop here
 };
 
 const Name = (props: Props) => {
@@ -48,11 +48,21 @@ const Name = (props: Props) => {
       });
     }
   }, [props.pub]);
-
   if (props.userNameOnly) {
     return (
       <>
         {name || displayName}
+        {props.hideBadge ? '' : <Badge pub={props.pub} />}
+      </>
+    );
+  }
+
+  if (props.displayNameOnly) {
+    return (
+      <>
+        <span className={`display-name ${isNameGenerated ? 'generated' : ''}`}>
+          {displayName || name || props.placeholder}
+        </span>
         {props.hideBadge ? '' : <Badge pub={props.pub} />}
       </>
     );
