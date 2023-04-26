@@ -48,6 +48,7 @@ export default class Header extends Component {
     localState.get('showParticipants').on(this.inject());
     localState.get('unseenMsgsTotal').on(this.inject());
     localState.get('unseenNotificationCount').on(this.inject());
+    localState.get('showConnectedRelays').on(this.inject());
     localState.get('activeRoute').on(
       this.sub((activeRoute) => {
         this.setState({
@@ -139,7 +140,7 @@ export default class Header extends Component {
         href="/settings/network"
         class={`connected-peers tooltip mobile-search-hidden ${
           this.state.showMobileSearch ? 'hidden-xs' : ''
-        }`}
+        } ${this.state.connectedRelays > 0 ? 'connected' : ''}`}
       >
         <span class="tooltiptext right">{t('connected_relays')}</span>
         <small>
@@ -284,7 +285,7 @@ export default class Header extends Component {
           >
             <span class="visible-xs-inline-block">{Icons.backArrow}</span>
           </a>
-          {loggedIn && this.renderConnectedRelays()}
+          {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
           {this.renderHeaderText()}
           {loggedIn && this.renderNotifications()}
           {loggedIn && this.renderMyProfile()}
