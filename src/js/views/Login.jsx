@@ -80,12 +80,12 @@ class Login extends Component {
   }
 
   loginAsNewUser() {
-    let name = document.getElementById('login-form-name').value;
+    let display_name = document.getElementById('login-form-name').value;
     Key.loginAsNewUser(this.props.fullScreen);
     localState.get('showFollowSuggestions').put(true);
-    name &&
+    display_name &&
       setTimeout(() => {
-        SocialNetwork.setMetadata({ name });
+        SocialNetwork.setMetadata({ display_name });
       }, 100);
     // follow the developer's nostr key also
     this.base.style = 'display:none';
