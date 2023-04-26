@@ -38,13 +38,14 @@ type PublicRelaySettings = {
   read: boolean;
   write: boolean;
 };
+export type RelayMetadata = { enabled: boolean; url: string };
 
 /**
  * Relay management and subscriptions. Bundles subscriptions in to max 10 larger batches.
  */
 const Relays = {
-  relays: new Map<string, any>(),
-  searchRelays: new Map<string, any>(),
+  relays: new Map<string, RelayMetadata>(),
+  searchRelays: new Map<string, RelayMetadata>(),
   writeRelaysByUser: new Map<string, Set<string>>(),
   filtersBySubscriptionName: new Map<string, string>(),
   subscribedEventTags: new Set<string>(),
@@ -57,6 +58,11 @@ const Relays = {
     this.relays = new Map(DEFAULT_RELAYS.map((url) => [url, { enabled: true, url }]));
     this.searchRelays = new Map(SEARCH_RELAYS.map((url) => [url, { enabled: true, url }]));
     this.manage();
+  },
+  enabledRelays(relays: Map<string, RelayMetadata> = this.relays) {
+    return Array.from(relays.values())
+      .filter((v) => v.enabled)
+      .map((v) => v.url);
   },
   getSubscriptionIdForName(name: string) {
     return Helpers.arrayToHex(sha256(name)).slice(0, 8);
