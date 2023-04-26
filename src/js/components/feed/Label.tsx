@@ -1,5 +1,6 @@
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import { AdjustmentsHorizontalIcon as AdjustmentsHorizontalIconFull } from '@heroicons/react/24/solid';
+import { route } from 'preact-router';
 import styled from 'styled-components';
 
 import Icons from '../../Icons';
@@ -29,11 +30,21 @@ const FeedName = styled.div`
 
 export default function Label({ feedName, onClickSettings, index, settingsOpen }) {
   const isGeneralFeed = ['global', 'follows'].includes(index);
+
+  const onClickBack = (e) => {
+    e.preventDefault();
+    if (settingsOpen) {
+      onClickSettings();
+    } else {
+      route('/');
+    }
+  };
+
   return (
     <div className="msg">
       <div className="msg-content notification-msg">
         <Content>
-          {isGeneralFeed && <IconLink href="/">{Icons.backArrow}</IconLink>}
+          {isGeneralFeed && <IconLink onClick={onClickBack}>{Icons.backArrow}</IconLink>}
           <FeedName>{t(feedName)}</FeedName>
           {isGeneralFeed && (
             <SettingsLink onClick={onClickSettings}>
