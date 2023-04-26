@@ -370,8 +370,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           {feedName ? (
             <Label
               feedName={feedName}
-              onClick={() => this.setState({ settingsOpen: !this.state.settingsOpen })}
+              onClickSettings={() => this.setState({ settingsOpen: !this.state.settingsOpen })}
               index={this.props.index}
+              settingsOpen={this.state.settingsOpen}
             />
           ) : null}
           {this.props.index !== 'notifications' && this.state.settingsOpen && (

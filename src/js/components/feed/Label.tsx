@@ -1,3 +1,5 @@
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { AdjustmentsHorizontalIcon as AdjustmentsHorizontalIconFull } from '@heroicons/react/24/solid';
 import styled from 'styled-components';
 
 import Icons from '../../Icons';
@@ -25,7 +27,7 @@ const FeedName = styled.div`
   flex: 1;
 `;
 
-export default function Label({ feedName, onClick, index }) {
+export default function Label({ feedName, onClickSettings, index, settingsOpen }) {
   const isGeneralFeed = ['global', 'follows'].includes(index);
   return (
     <div className="msg">
@@ -33,7 +35,15 @@ export default function Label({ feedName, onClick, index }) {
         <Content>
           {isGeneralFeed && <IconLink href="/">{Icons.backArrow}</IconLink>}
           <FeedName>{t(feedName)}</FeedName>
-          {isGeneralFeed && <SettingsLink onClick={onClick}>{Icons.settings}</SettingsLink>}
+          {isGeneralFeed && (
+            <SettingsLink onClick={onClickSettings}>
+              {settingsOpen ? (
+                <AdjustmentsHorizontalIconFull width={24} />
+              ) : (
+                <AdjustmentsHorizontalIcon width={24} />
+              )}
+            </SettingsLink>
+          )}
         </Content>
       </div>
     </div>
