@@ -1180,8 +1180,10 @@ a.logo:active {
   background: var(--chat-hover);
 }
 
-.application-list a.active {
-  background: var(--chat-active);
+.application-list a:hover,
+.application-list a:focus,
+.application-list a:active {
+  text-decoration: none;
 }
 
 .application-list .icon,

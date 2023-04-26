@@ -11,7 +11,7 @@ const QRModal = (props) => {
       <div style={{ textAlign: 'center', flex: 1 }}>
         <QrCode data={link} />
         <p>
-          <Name pub={props.pub} />
+          <Name displayNameOnly={true} pub={props.pub} />
         </p>
       </div>
     </Modal>

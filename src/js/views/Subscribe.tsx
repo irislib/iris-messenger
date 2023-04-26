@@ -38,13 +38,13 @@ class About extends Component {
                 value="1"
               />
               <label htmlFor="subscription_annually">
-                <b>7.99 € / month</b> charged annually (95.88 € / year)
+                <b>8 € / month</b> charged annually (96 € / year)
               </label>
             </p>
             <p>
               <input type="radio" id="subscription_monthly" name="subscription" value="2" />
               <label htmlFor="subscription_monthly">
-                <b>9.99 € / month</b> charged monthly (119.88 € / year)
+                <b>10 € / month</b> charged monthly (120 € / year)
               </label>
             </p>
             <p>
@@ -53,7 +53,7 @@ class About extends Component {
 
             <h3>Iris Titan</h3>
             <p>
-              True Exalted Titan status. Lifetime Iris Purple access, plus:
+              True Mighty Titan status. Lifetime Iris Purple access, plus:
               <ul>
                 <li>Iris Titan Badge</li>
                 <li>Iris Titans private group chat</li>
@@ -61,7 +61,7 @@ class About extends Component {
               </ul>
             </p>
             <p>
-              <b>999 €</b> one-time payment.
+              <b>1000 €</b> one-time payment.
             </p>
             <p>
               <PrimaryButton>Subscribe</PrimaryButton>
