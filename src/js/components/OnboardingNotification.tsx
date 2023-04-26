@@ -62,7 +62,8 @@ export default class OnboardingNotification extends Component {
                 <Identicon str={pub} width={40} />
               </div>
               <div style="flex: 1">
-                <Name displayNameOnly={true} pub={pub} placeholder="Suggested follow" /><br />
+                <Name displayNameOnly={true} pub={pub} placeholder="Suggested follow" />
+                <br />
                 <small>{description}</small>
               </div>
             </a>
