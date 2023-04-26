@@ -124,11 +124,9 @@ const Session = {
     });
     if (window.location.pathname === '/') {
       localState.get('lastOpenedFeed').once((lastOpenedFeed) => {
-        if (lastOpenedFeed) {
-          setTimeout(() => {
-            route('/' + lastOpenedFeed);
-          }, 100);
-        }
+        setTimeout(() => {
+          route('/' + lastOpenedFeed || 'following');
+        }, 100);
       });
     }
     setTimeout(() => {

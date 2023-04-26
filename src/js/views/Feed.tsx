@@ -1,6 +1,5 @@
 import FeedComponent from '../components/feed/Feed';
 import OnboardingNotification from '../components/OnboardingNotification';
-import localState from '../LocalState';
 import { translate as t } from '../translations/Translation';
 
 import View from './View';
@@ -9,14 +8,13 @@ class Feed extends View {
   constructor() {
     super();
     this.eventListeners = {};
-    this.state = { sortedMessages: [], group: 'follows' };
+    this.state = { sortedMessages: [] };
     this.id = 'message-view';
     this.class = 'public-messages-view';
   }
 
   componentDidMount() {
     this.restoreScrollPosition();
-    localState.get('filters').get('group').on(this.inject());
   }
 
   renderView() {
