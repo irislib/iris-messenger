@@ -353,8 +353,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     }
     const displayCount = this.state.displayCount;
     const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
+    const showQueuedEvents = this.state.queuedEvents.length && !this.state.settingsOpen;
     const feedName =
-      !this.state.queuedEvents.length &&
+      !showQueuedEvents &&
       {
         global: 'global_feed',
         follows: 'following',
@@ -366,9 +367,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     return (
       <div className="msg-feed">
         <div>
-          {this.state.queuedEvents.length && !this.state.settingsOpen
-            ? this.renderShowNewEvents()
-            : null}
+          {showQueuedEvents ? this.renderShowNewEvents() : null}
           {feedName ? (
             <Label
               feedName={feedName}
