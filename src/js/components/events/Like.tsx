@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
+import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 
-import Icons from '../../Icons';
 import { Event } from '../../lib/nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -54,7 +54,7 @@ export default function Like(props: Props) {
         <div style={{ display: 'flex', flex: 1, 'flex-direction': 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <i className="like-btn liked" style={{ marginRight: 15 }}>
-              {Icons.heartFull}
+              <HeartIconFull width={24} />
             </i>
             <div>
               <a href={userLink} style={{ marginRight: 5 }}>

@@ -1,3 +1,5 @@
+import { HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
@@ -229,7 +231,11 @@ export default class Header extends Component {
           this.state.showMobileSearch ? 'hidden' : ''
         }`}
       >
-        {this.state.activeRoute === '/notifications' ? Icons.heartFull : Icons.heartEmpty}
+        {this.state.activeRoute === '/notifications' ? (
+          <HeartIconFull width={28} />
+        ) : (
+          <HeartIcon width={28} />
+        )}
         {this.state.unseenNotificationCount ? (
           <span class="unseen">
             {this.state.unseenNotificationCount > 99 ? '' : this.state.unseenNotificationCount}

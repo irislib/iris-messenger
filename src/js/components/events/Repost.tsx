@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
-import Icons from '../../Icons';
 import { Event } from '../../lib/nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
@@ -37,7 +37,9 @@ export default function Repost(props: Props) {
           style={{ display: 'flex', alignItems: 'center', flexBasis: '100%', marginLeft: '15px' }}
         >
           <small className="reposted">
-            <i>{Icons.repost}</i>
+            <i>
+              <ArrowPathIcon width={24} />
+            </i>
             <a href={`/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`}>
               <Name pub={props.event?.pubkey} hideBadge={true} userNameOnly={true} />
             </a>

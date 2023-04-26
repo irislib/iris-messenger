@@ -1,3 +1,5 @@
+import { ArrowPathIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import $ from 'jquery';
 import { memo } from 'preact/compat';
 import { useEffect, useState } from 'preact/hooks';
@@ -205,7 +207,7 @@ const Reactions = (props) => {
               className={`msg-btn repost-btn ${s.reposted ? 'reposted' : ''}`}
               onClick={() => repostBtnClicked()}
             >
-              {Icons.repost}
+              <ArrowPathIcon width={24} />
             </a>
             <span
               className={`count ${s.showReposts ? 'active' : ''}`}
@@ -223,7 +225,7 @@ const Reactions = (props) => {
               className={`msg-btn like-btn ${s.liked ? 'liked' : ''}`}
               onClick={(e) => likeBtnClicked(e)}
             >
-              {s.liked ? Icons.heartFull : Icons.heartEmpty}
+              {s.liked ? <HeartIconFull width={24} /> : <HeartIcon width={24} />}
             </a>
             <span
               className={`count ${s.showLikes ? 'active' : ''}`}
