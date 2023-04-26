@@ -1,4 +1,6 @@
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
+import styled from 'styled-components';
 
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
@@ -11,10 +13,6 @@ import Copy from './buttons/Copy';
 import Follow from './buttons/Follow';
 import Identicon from './Identicon';
 import Name from './Name';
-
-import styled from 'styled-components';
-
-import { XMarkIcon } from '@heroicons/react/24/solid';
 
 const SUGGESTED_FOLLOWS = [
   [
