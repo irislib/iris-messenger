@@ -448,7 +448,7 @@ a.logo img:not(:last-child) {
 }
 
 .nav .active .identicon img {
-  border: 1px solid var(--purple);
+  border: 1px solid var(--text-color);
 }
 
 .nav a.my-profile:focus .identicon img {
