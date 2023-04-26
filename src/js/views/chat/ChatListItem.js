@@ -113,7 +113,7 @@ class ChatListItem extends Component {
         <${Identicon} str=${npub} width="49" />
         <div class="text">
           <div>
-            <span class="name"><${Name} pub=${this.props.chat} /></span>
+            <span class="name"><${Name} displayNameOnly=${true} pub=${this.props.chat} /></span>
             <small class="latest-time">${time}</small>
           </div>
           <small class="latest"> ${this.state.latestText} </small>

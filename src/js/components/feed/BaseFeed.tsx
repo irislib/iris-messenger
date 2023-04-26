@@ -366,7 +366,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     return (
       <div className="msg-feed">
         <div>
-          {this.state.queuedEvents.length ? this.renderShowNewEvents() : null}
+          {this.state.queuedEvents.length && !this.state.settingsOpen
+            ? this.renderShowNewEvents()
+            : null}
           {feedName ? (
             <Label
               feedName={feedName}
