@@ -43,6 +43,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   openedAt: number;
   subscribeRetryTimeout: ReturnType<typeof setTimeout> | undefined;
   unsub: (() => void) | undefined;
+  private lastResubscribed: number;
 
   constructor(props: FeedProps) {
     super(props);
@@ -156,12 +157,6 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     }
   }
 
-  componentWillMount() {
-    if (!isInitialLoad && window.history.state?.state) {
-      this.setState(window.history.state.state);
-    }
-  }
-
   componentDidMount() {
     this.addScrollHandler();
     this.subscribe();
@@ -184,6 +179,27 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         first = false;
       }),
     );
+    this.lastResubscribed = Date.now();
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
+  }
+
+  handleVisibilityChange = () => {
+    // when iris returns to foreground after 1 min dormancy, resubscribe stuff
+    // there might be some better way to manage resubscriptions?
+    if (document.visibilityState === 'visible') {
+      if (Date.now() - this.lastResubscribed > 60 * 1000 * 1) {
+        console.log('resubscribe');
+        this.lastResubscribed = Date.now();
+        this.subscribe();
+      }
+    }
+  };
+
+  componentWillMount() {
+    if (!isInitialLoad && window.history.state?.state) {
+      this.setState(window.history.state.state);
+    }
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   subscribe() {
