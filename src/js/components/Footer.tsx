@@ -1,3 +1,9 @@
+import { HomeIcon, PaperAirplaneIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import {
+  HomeIcon as HomeIconFull,
+  PaperAirplaneIcon as PaperAirplaneIconFull,
+  PlusCircleIcon as PlusCircleIconFull,
+} from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
@@ -64,7 +70,7 @@ class Footer extends Component<Props, State> {
             onClick={(e) => this.handleFeedClick(e)}
             class={`btn ${activeRoute === '/' ? 'active' : ''}`}
           >
-            {Icons.home}
+            {activeRoute === '/' ? <HomeIconFull width={24} /> : <HomeIcon width={24} />}
           </a>
           <a href="/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
             {this.state.unseenMsgsTotal ? (
@@ -72,10 +78,18 @@ class Footer extends Component<Props, State> {
             ) : (
               ''
             )}
-            {Icons.chat}
+            {activeRoute.indexOf('/chat') === 0 ? (
+              <PaperAirplaneIconFull width={24} />
+            ) : (
+              <PaperAirplaneIcon width={24} />
+            )}
           </a>
           <a href="/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
-            {Icons.plus}
+            {activeRoute === '/post/new' ? (
+              <PlusCircleIconFull width={24} />
+            ) : (
+              <PlusCircleIcon width={24} />
+            )}
           </a>
           <a href={`/${key}`} class={`${activeRoute === `/${key}` ? 'active' : ''} my-profile`}>
             <Identicon str={key} width={34} />

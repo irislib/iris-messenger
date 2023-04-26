@@ -9,10 +9,8 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation';
-import Login from '../views/Login';
 
 import { Button, PrimaryButton } from './buttons/Button';
-import Modal from './modal/Modal';
 import Identicon from './Identicon';
 import Name from './Name';
 import SearchBox from './SearchBox';

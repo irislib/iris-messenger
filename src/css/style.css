@@ -432,7 +432,7 @@ a.logo img:not(:last-child) {
 }
 
 .header-content a.active {
-  color: var(--purple);
+  color: var(--msg-form-button-color);
 }
 
 .header .header-content > a:not(:first-child) {
@@ -452,7 +452,7 @@ a.logo img:not(:last-child) {
 }
 
 .nav a.my-profile:focus .identicon img {
-  border: 1px solid var(--purple);
+  border: 1px solid var(--text-color);
 }
 
 .nav a.my-profile {
