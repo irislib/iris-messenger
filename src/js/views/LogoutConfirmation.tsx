@@ -4,7 +4,7 @@ import { PrimaryButton as Button } from '../components/buttons/Button';
 import Session from '../nostr/Session';
 import { translate as t } from '../translations/Translation';
 
-export default function LogoutConfirmation() {
+export default function LogoutConfirmation(_props) {
   return (
     <div class="main-view" id="logout-confirmation">
       <div class="centered-container">
