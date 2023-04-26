@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import styled from 'styled-components';
 
 import Helpers from '../../Helpers';
@@ -408,12 +409,12 @@ export default function SendSats(props: ZapProps) {
       <ZapDialog>
         <div className="lnurl-tip" onClick={(e) => e.stopPropagation()}>
           <Close className="close" onClick={onClose}>
-            X
+            <XMarkIcon width={20} height={20} />
           </Close>
           <div className="lnurl-header">
             <h2>
               {props.title || title}
-              <Name pub={recipient} />
+              <Name displayNameOnly={true} pub={recipient} />
             </h2>
           </div>
           {invoiceForm()}

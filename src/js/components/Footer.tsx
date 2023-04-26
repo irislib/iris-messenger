@@ -7,7 +7,6 @@ import {
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
-import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 

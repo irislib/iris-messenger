@@ -11,9 +11,9 @@ import Report from '../components/buttons/Report';
 import Dropdown from '../components/Dropdown';
 import Feed from '../components/feed/Feed';
 import Identicon from '../components/Identicon';
+import QRModal from '../components/modal/QRModal';
 import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
-import QrCode from '../components/QrCode';
 import { isSafeOrigin } from '../components/SafeImg';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
@@ -238,7 +238,12 @@ class Profile extends View {
           </div>
         </div>
         ${this.state.showQR
-          ? html` <${QrCode} data=${`https://iris.to/${this.state.npub}`} /> `
+          ? html`
+              <${QRModal}
+                pub=${this.state.hexPub}
+                onClose=${() => this.setState({ showQR: false })}
+              />
+            `
           : ''}
       </div>
     `;

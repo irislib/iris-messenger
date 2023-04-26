@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet';
-import { useRef, useState } from 'preact/hooks';
+import { useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import Helpers from '../../Helpers';

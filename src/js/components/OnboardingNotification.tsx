@@ -8,9 +8,10 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation';
 
-import { PrimaryButton as Button } from './buttons/Button';
+import { Button, PrimaryButton } from './buttons/Button';
 import Copy from './buttons/Copy';
 import Follow from './buttons/Follow';
+import QRModal from './modal/QRModal';
 import Identicon from './Identicon';
 import Name from './Name';
 
@@ -87,9 +88,9 @@ export default class OnboardingNotification extends Component {
           </div>
         ))}
         <p>
-          <Button onClick={() => localState.get('showFollowSuggestions').put(false)}>
+          <PrimaryButton onClick={() => localState.get('showFollowSuggestions').put(false)}>
             {t('done')}
-          </Button>
+          </PrimaryButton>
         </p>
         <p>
           {t('alternatively')}
@@ -112,8 +113,12 @@ export default class OnboardingNotification extends Component {
         <p>{t('no_followers_yet')}</p>
         <p>
           <Copy text={t('copy_link')} copyStr={Helpers.getMyProfileLink()} />
+          <Button onClick={() => this.setState({ showQrModal: true })}>{t('show_qr_code')}</Button>
         </p>
         <small>{t('no_followers_yet_info')}</small>
+        {this.state.showQrModal && (
+          <QRModal onClose={() => this.setState({ showQrModal: false })} pub={Key.getPubKey()} />
+        )}
       </NoFollowersWrapper>
     );
   }
@@ -124,10 +129,12 @@ export default class OnboardingNotification extends Component {
         <div>
           <p>Get your own iris.to/username?</p>
           <p>
-            <Button onClick={() => route('/settings/iris_account')}>Yes please</Button>
-            <Button onClick={() => localState.get('showNoIrisToAddress').put(false)}>
+            <PrimaryButton onClick={() => route('/settings/iris_account')}>
+              Yes please
+            </PrimaryButton>
+            <PrimaryButton onClick={() => localState.get('showNoIrisToAddress').put(false)}>
               No thanks
-            </Button>
+            </PrimaryButton>
           </p>
         </div>
       );

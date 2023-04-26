@@ -3,7 +3,6 @@ import { route } from 'preact-router';
 
 import logo from '../../assets/img/icon128.png';
 import Component from '../BaseComponent';
-import Helpers from '../Helpers';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
@@ -11,9 +10,8 @@ import { translate as t } from '../translations/Translation';
 
 import { Button, PrimaryButton } from './buttons/Button';
 import Modal from './modal/Modal';
-import Name from './Name';
+import QRModal from './modal/QRModal';
 import PublicMessageForm from './PublicMessageForm';
-import QrCode from './QrCode';
 
 const APPLICATIONS = [
   // TODO: move editable shortcuts to localState gun
@@ -77,18 +75,10 @@ export default class Menu extends Component {
   renderQrModal() {
     return this.state.showQrModal
       ? html`
-          <${Modal}
-            centerVertically=${true}
-            showContainer=${true}
+          <${QRModal}
+            pub=${Key.getPubKey()}
             onClose=${() => this.setState({ showQrModal: false })}
-          >
-            <div style="text-align:center">
-              <${QrCode} data=${Key.getPubKey()} />
-              <p>
-                <${Name} pub=${Key.getPubKey()} />
-              </p>
-            </div>
-          <//>
+          />
         `
       : '';
   }

@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import { FunctionComponent, h } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
@@ -8,16 +7,6 @@ import Key from '../nostr/Key';
 
 import Name from './Name';
 import Torrent from './Torrent';
-
-type PrivateMessageProps = {
-  id: string;
-  pubkey: string;
-  created_at: number | Date;
-  selfAuthored: boolean;
-  showName: boolean;
-  torrentId?: string;
-  attachments?: any[];
-};
 
 const seenIndicator = (
   <span class="seen-indicator">
@@ -35,7 +24,7 @@ const seenIndicator = (
   </span>
 );
 
-const PrivateMessage: FunctionComponent<PrivateMessageProps> = (props) => {
+const PrivateMessage = (props) => {
   const [text, setText] = useState('');
 
   useEffect(() => {
