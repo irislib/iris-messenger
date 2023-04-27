@@ -184,7 +184,6 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     if (!isInitialLoad && window.history.state?.state) {
       this.setState(window.history.state.state);
     }
-    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   subscribe() {

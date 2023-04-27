@@ -72,9 +72,10 @@ document.addEventListener('visibilitychange', () => {
   // there might be some better way to manage resubscriptions?
   if (document.visibilityState === 'visible') {
     if (Date.now() - lastResubscribed > 60 * 1000 * 1) {
-      console.log('resubscribe');
+      //console.log('resubscribe');
       lastResubscribed = Date.now();
-      relayPool.reconnect();
+      //need relaypool v .27 for this:
+      //relayPool.reconnect();
     }
   }
 });
