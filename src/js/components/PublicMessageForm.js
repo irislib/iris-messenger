@@ -1,3 +1,4 @@
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { html } from 'htm/preact';
 import $ from 'jquery';
 import { createRef } from 'preact';
@@ -264,7 +265,7 @@ class PublicMessageForm extends MessageForm {
               </button>
               <button type="submit">
                 <span>${t('post')} </span>
-                ${Icons.chat}
+                <${PaperAirplaneIcon} width="24" style="margin-top:5px" />
               </button>
             </div>
           `}

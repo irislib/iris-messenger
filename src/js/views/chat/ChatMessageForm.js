@@ -4,7 +4,6 @@ import { html } from 'htm/preact';
 import $ from 'jquery';
 
 import MessageForm from '../../components/MessageForm';
-import Torrent from '../../components/Torrent';
 import Helpers from '../../Helpers';
 import EmojiButton from '../../lib/emoji-button';
 import localState from '../../LocalState';

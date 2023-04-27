@@ -17,7 +17,6 @@ import Name from '../components/Name';
 import ProfilePicture from '../components/ProfilePicture';
 import { isSafeOrigin } from '../components/SafeImg';
 import Helpers from '../Helpers';
-import Icons from '../Icons';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
