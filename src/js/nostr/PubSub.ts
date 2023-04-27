@@ -66,6 +66,19 @@ localState.get('lastOpened').once((lo) => {
   localState.get('lastOpened').put(Math.floor(Date.now() / 1000));
 });
 
+let lastResubscribed = Date.now();
+document.addEventListener('visibilitychange', () => {
+  // when iris returns to foreground after 1 min dormancy, resubscribe stuff
+  // there might be some better way to manage resubscriptions?
+  if (document.visibilityState === 'visible') {
+    if (Date.now() - lastResubscribed > 60 * 1000 * 1) {
+      console.log('resubscribe');
+      lastResubscribed = Date.now();
+      relayPool.reconnect();
+    }
+  }
+});
+
 /**
  * Iris (mostly) internal Subscriptions. Juggle between LokiJS (memory), IndexedDB, http proxy and Relays.
  *
