@@ -35,13 +35,13 @@ export default class MessageForm extends Component {
 
     function handleTagged(regex, tagType) {
       const taggedItems = [...msg.text.matchAll(regex)]
-        .map((m) => m[1])
+        .map((m) => m[0])
         .filter((m, i, a) => a.indexOf(m) === i);
 
       if (taggedItems) {
         event.tags = event.tags || [];
         for (const tag of taggedItems) {
-          const hexTag = Key.toNostrHexAddress(tag.replace('@', ''));
+          const hexTag = Key.toNostrHexAddress(tag.match(/npub[a-zA-Z0-9]{59,60}/)[0]);
           if (!hexTag) {
             continue;
           }
