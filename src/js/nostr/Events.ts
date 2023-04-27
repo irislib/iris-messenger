@@ -5,6 +5,7 @@ import FuzzySearch from '../FuzzySearch';
 import { Event, Filter, getEventHash, matchFilter } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
+import EventMetaStore from './EventsMeta';
 import IndexedDB from './IndexedDB';
 import Key from './Key';
 import LocalForage from './LocalForage';
@@ -51,6 +52,7 @@ const Events = {
   DEFAULT_GLOBAL_FILTER,
   getEventHash,
   db: events,
+  eventsMetaDb: new EventMetaStore(),
   seen: new Set<string>(),
   deletedEvents: new Set<string>(),
   directMessagesByUser: new Map<string, SortedLimitedEventSet>(),
@@ -119,6 +121,9 @@ const Events = {
       .reverse()
       .find((tag: any) => tag[0] === 'e')?.[1];
     return id;
+  },
+  getOriginalPostEventId(event: Event) {
+    return Events.isRepost(event) ? Events.getRepostedEventId(event) : event.id;
   },
   getNoteReplyingTo: function (event: Event) {
     if (event.kind !== 1) {
@@ -526,6 +531,14 @@ const Events = {
     // should the whole method be moved to PubSub?
     PubSub.handle(event);
     return true;
+  },
+  // metadata for an event: e.g. on which relays event was found on.
+  handleEventMetadata({ url, event }: { url: string; event: Event }) {
+    const id = this.getOriginalPostEventId(event);
+    if (!id) {
+      return;
+    }
+    this.eventsMetaDb.upsert(id, { relays: new Set([url]) });
   },
   handleNextFutureEvent() {
     if (this.futureEventIds.size === 0) {

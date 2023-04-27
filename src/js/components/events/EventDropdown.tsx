@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks';
+import styled from 'styled-components';
 
 import Helpers from '../../Helpers';
 import { Event } from '../../lib/nostr-tools';
@@ -7,9 +8,13 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
 import Block from '../buttons/Block';
+import { PrimaryButton } from '../buttons/Button';
 import Copy from '../buttons/Copy';
 import FollowButton from '../buttons/Follow';
 import Dropdown from '../Dropdown';
+import Modal from '../modal/Modal';
+
+import EventRelaysList from './EventRelaysList';
 
 interface EventDropdownProps {
   event?: Event & { id: string };
@@ -17,10 +22,19 @@ interface EventDropdownProps {
   id: string;
 }
 
+const EventDetail = styled.div`
+  text-align: left;
+  max-width: 100%;
+  user-select: text;
+`;
+
 const EventDropdown = (props: EventDropdownProps) => {
   const { event, id } = props;
 
   const [muted, setMuted] = useState<boolean>(false);
+  const [showingDetails, setShowingDetails] = useState(false);
+
+  const closeModal = () => setShowingDetails(false);
 
   const onBlock = (_e: any) => {
     // TODO hide msg
@@ -127,9 +141,26 @@ const EventDropdown = (props: EventDropdownProps) => {
                 </span>
               </>
             )}
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowingDetails(true);
+              }}
+            >
+              {t('event_detail')}
+            </a>
           </>
         )}
       </Dropdown>
+      {showingDetails && (
+        <Modal showContainer onClose={closeModal}>
+          <EventDetail>
+            <EventRelaysList event={event} />
+            <PrimaryButton onClick={closeModal}>{t('done')}</PrimaryButton>
+          </EventDetail>
+        </Modal>
+      )}
     </div>
   );
 };

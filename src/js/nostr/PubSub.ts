@@ -23,7 +23,7 @@ let dev: any = {
   logSubscriptions: false,
   indexed03: true,
 };
-const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
+const relayPool = new RelayPool(Relays.enabledRelays(), {
   useEventCache: false,
   autoReconnect: true,
   externalGetEventById: (id) => {
@@ -45,7 +45,17 @@ const relayPool = new RelayPool(Relays.DEFAULT_RELAYS, {
 relayPool.onnotice((relayUrl, notice) => {
   console.log('notice', notice, ' from relay ', relayUrl);
 });
+const compareUrls = (a, b) => {
+  // A bit more lenient url comparison.
+  // Wouldn't want to fail on a trailing slash or something.
+  return new URL(a).host === new URL(b).host;
+};
 relayPool.onauth(async (relay, challenge) => {
+  // Random relay auths shouldn't be bothered with, because it makes the
+  // approval popup appear every time unless given the permission.
+  if (!Relays.enabledRelays().some((r) => compareUrls(r, relay.url))) {
+    return;
+  }
   try {
     await authenticate({ relay, challenge, sign: Events.sign });
   } catch (e) {
@@ -171,7 +181,7 @@ const PubSub = {
   },
 
   publish(event) {
-    const relays = Array.from(Relays.relays.keys());
+    const relays = Array.from(Relays.enabledRelays());
     relayPool.publish(event, relays);
   },
 
@@ -193,7 +203,7 @@ const PubSub = {
       // TODO bomb all relays with searches, or add more search relays
       relays = Array.from(Relays.searchRelays.keys());
     } else if (mergeSubscriptions || filter.authors?.length !== 1) {
-      relays = Array.from(Relays.relays.keys());
+      relays = Relays.enabledRelays();
     }
     if (dev.indexed03 !== false && filter.kinds?.every((k) => k === 0 || k === 3)) {
       relays = ['wss://us.rbr.bio', 'wss://eu.rbr.bio'];
@@ -201,20 +211,19 @@ const PubSub = {
     if (sinceLastOpened) {
       filter.since = lastOpened;
     }
-    let defaultRelays;
-    if (Key.getPubKey()) {
-      defaultRelays = defaultRelays = Array.from(Relays.relays.values())
-        .filter((r) => r && r.enabled !== false)
-        .map((r) => r.url);
-    } else {
-      defaultRelays = Relays.DEFAULT_RELAYS;
-    }
+    const defaultRelays = Relays.enabledRelays();
     return relayPool.subscribe(
       [filter],
       relays,
-      (event) => {
+      (event, _, url) => {
         setTimeout(() => {
           Events.handle(event);
+          if (url) {
+            Events.handleEventMetadata({
+              url,
+              event,
+            });
+          }
         }, 0);
       },
       mergeSubscriptions ? 100 : 0,
