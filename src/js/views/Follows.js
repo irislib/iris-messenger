@@ -116,25 +116,37 @@ class Follows extends View {
   }
 
   renderView() {
+    const showFollowAll =
+      this.state.follows.length > 1 && !(this.props.id === this.myPub && !this.props.followers);
     return (
       <div className="centered-container">
         <h3 style={{ display: 'flex' }}>
           <a href={`/${this.props.id}`}>
-            <Name pub={this.props.id} />
+            <Name displayNameOnly={true} pub={this.props.id} />
           </a>
           :<i> </i>
           <span style={{ flex: 1 }} className="mar-left5">
             {this.props.followers ? t('followers') : t('following')}
           </span>
-          {this.state.follows.length > 1 &&
-          !(this.props.id === this.myPub && !this.props.followers) ? (
-            <Button small={true} onClick={() => this.followAll()}>
-              {t('follow_all')} ({this.state.follows.length})
-            </Button>
+          {showFollowAll ? (
+            <span style="text-align: right" className="hidden-xs">
+              <Button small={true} onClick={() => this.followAll()}>
+                {t('follow_all')} ({this.state.follows.length})
+              </Button>
+            </span>
           ) : (
             ''
           )}
         </h3>
+        {showFollowAll ? (
+          <p style="text-align: right" className="visible-xs-block">
+            <Button small={true} onClick={() => this.followAll()}>
+              {t('follow_all')} ({this.state.follows.length})
+            </Button>
+          </p>
+        ) : (
+          ''
+        )}
         <div id="follows-list">
           {this.state.follows.length > 300 ? (
             <ScrollViewport>{this.renderFollows()}</ScrollViewport>
