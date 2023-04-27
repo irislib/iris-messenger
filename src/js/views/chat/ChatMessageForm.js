@@ -29,9 +29,6 @@ class ChatMessageForm extends MessageForm {
     if (!Helpers.isMobile && this.props.autofocus !== false) {
       $(this.base).find('.new-msg').focus();
     }
-    if ($('#attachment-preview:visible').length) {
-      $('#attachment-preview').append($('#webtorrent'));
-    }
   }
 
   encrypt(text) {
@@ -46,12 +43,9 @@ class ChatMessageForm extends MessageForm {
     }
   }
 
-  onMsgFormSubmit(event) {
-    event.preventDefault();
-    this.submit();
-  }
-
-  async submit() {
+  async onSubmit(e) {
+    e.preventDefault();
+    e.stopPropagation();
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val();
     if (!text.length) {
@@ -87,7 +81,7 @@ class ChatMessageForm extends MessageForm {
 
   onKeyDown(e) {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-      this.submit();
+      this.onSubmit(e);
     }
   }
 
@@ -103,7 +97,7 @@ class ChatMessageForm extends MessageForm {
     return html`<form
       autocomplete="off"
       class="message-form ${this.props.class || ''}"
-      onSubmit=${(e) => this.onMsgFormSubmit(e)}
+      onSubmit=${(e) => this.onSubmit(e)}
     >
       ${contentBtns}
       <input
@@ -126,13 +120,8 @@ class ChatMessageForm extends MessageForm {
         spellcheck="off"
       />
       <button style="margin-right:0">
-        <${PaperAirplaneIcon} onClick=${() => this.submit()} width="28" />
+        <${PaperAirplaneIcon} onClick=${(e) => this.onSubmit(e)} width="28" />
       </button>
-      <div id="webtorrent">
-        ${this.state.torrentId
-          ? html`<${Torrent} preview=${true} torrentId=${this.state.torrentId} />`
-          : ''}
-      </div>
     </form>`;
   }
 }

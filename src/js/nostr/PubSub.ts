@@ -67,17 +67,26 @@ localState.get('lastOpened').once((lo) => {
 });
 
 let lastResubscribed = Date.now();
+
+const reconnect = () => {
+  if (Date.now() - lastResubscribed > 60 * 1000 * 1) {
+    //console.log('resubscribe');
+    lastResubscribed = Date.now();
+    //need relaypool v .27 for this:
+    // trigger reconnect and resubscribe
+    //relayPool.reconnect();
+  }
+};
+
 document.addEventListener('visibilitychange', () => {
   // when iris returns to foreground after 1 min dormancy, resubscribe stuff
   // there might be some better way to manage resubscriptions?
   if (document.visibilityState === 'visible') {
-    if (Date.now() - lastResubscribed > 60 * 1000 * 1) {
-      //console.log('resubscribe');
-      lastResubscribed = Date.now();
-      //need relaypool v .27 for this:
-      //relayPool.reconnect();
-    }
+    reconnect();
   }
+});
+document.addEventListener('online', () => {
+  reconnect();
 });
 
 /**
