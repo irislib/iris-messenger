@@ -70,11 +70,9 @@ let lastResubscribed = Date.now();
 
 const reconnect = () => {
   if (Date.now() - lastResubscribed > 60 * 1000 * 1) {
-    //console.log('resubscribe');
     lastResubscribed = Date.now();
-    //need relaypool v .27 for this:
     // trigger reconnect and resubscribe
-    //relayPool.reconnect();
+    relayPool.reconnect();
   }
 };
 
