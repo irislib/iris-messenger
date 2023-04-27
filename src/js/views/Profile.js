@@ -23,6 +23,7 @@ import Key from '../nostr/Key';
 import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
+import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 
 import View from './View';
 
@@ -154,7 +155,7 @@ class Profile extends View {
                           >
                             <span class="hidden-xs"> ${t('send_message')} </span>
                             <span class="visible-xs-inline-block msg-btn-icon">
-                              ${Icons.chat}
+                              <${PaperAirplaneIcon} width="24" />
                             </span>
                           <//>`
                         : ''}

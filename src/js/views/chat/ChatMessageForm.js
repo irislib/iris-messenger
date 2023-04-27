@@ -1,10 +1,11 @@
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
+import { FaceSmileIcon } from '@heroicons/react/24/outline';
 import { html } from 'htm/preact';
 import $ from 'jquery';
 
 import MessageForm from '../../components/MessageForm';
 import Torrent from '../../components/Torrent';
 import Helpers from '../../Helpers';
-import Icons from '../../Icons';
 import EmojiButton from '../../lib/emoji-button';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
@@ -96,7 +97,7 @@ class ChatMessageForm extends MessageForm {
       type="button"
       onClick=${(e) => this.onEmojiButtonClick(e)}
     >
-      ${Icons.smile}
+      <${FaceSmileIcon} width="28" />
     </button>`;
 
     return html`<form
@@ -124,7 +125,9 @@ class ChatMessageForm extends MessageForm {
         autocapitalize="sentences"
         spellcheck="off"
       />
-      ${Icons.chat}
+      <button style="margin-right:0">
+        <${PaperAirplaneIcon} onClick=${() => this.submit()} width="28" />
+      </button>
       <div id="webtorrent">
         ${this.state.torrentId
           ? html`<${Torrent} preview=${true} torrentId=${this.state.torrentId} />`

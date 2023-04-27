@@ -2670,6 +2670,8 @@ input[type='text'] {
     padding-right: 15px;
   }
   .chat-message-form {
+    padding-top: 0;
+    padding-right: 0;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
     max-height: calc(50px + env(safe-area-inset-bottom));
   }
