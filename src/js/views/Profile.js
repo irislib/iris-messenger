@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet';
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { html } from 'htm/preact';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
@@ -23,7 +24,6 @@ import Key from '../nostr/Key';
 import PubSub from '../nostr/PubSub';
 import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
-import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 
 import View from './View';
 
