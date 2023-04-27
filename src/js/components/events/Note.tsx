@@ -1,11 +1,12 @@
 import { Helmet } from 'react-helmet';
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation';
 import Identicon from '../Identicon';
 import ImageModal from '../modal/Image';
@@ -33,7 +34,6 @@ localState.get('settings').on((s) => {
 
 const Note = ({
   event,
-  name,
   meta,
   asInlineQuote,
   isReply, // message that is rendered under a standalone message, separated by a small margin
@@ -47,6 +47,7 @@ const Note = ({
   const [showImageModal, setShowImageModal] = useState(false);
   const [replies, setReplies] = useState([]);
   const [translatedText, setTranslatedText] = useState('');
+  const [name, setName] = useState('');
   showReplies = showReplies || 0;
   if (!standalone && showReplies && replies.length) {
     isQuote = true;
@@ -58,6 +59,14 @@ const Note = ({
   if (showRepliedMsg === undefined) {
     showRepliedMsg = standalone;
   }
+
+  useEffect(() => {
+    if (standalone) {
+      return SocialNetwork.getProfile(event.pubkey, (profile) => {
+        setName(profile?.display_name || profile?.name || '');
+      });
+    }
+  });
 
   // TODO fetch replies in useEffect
 
