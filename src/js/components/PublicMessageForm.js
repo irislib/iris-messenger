@@ -150,24 +150,22 @@ class PublicMessageForm extends MessageForm {
           this.setState({ attachments: a });
         });
 
-        fetch('https://nostr.build/upload.php', {
+        fetch('https://nostr.build/api/upload/iris.php', {
           method: 'POST',
           body: formData,
         })
           .then(async (response) => {
-            const text = await response.text();
-            const url = text.match(
-              /https:\/\/nostr\.build\/(?:i|av)\/nostr\.build_[a-z0-9]{64}\.[a-z0-9]+/i,
-            );
+            const url = await response.json();
+            console.log('upload response', url);
             if (url) {
-              a[i].url = url[0];
+              a[i].url = url;
               this.setState({ attachments: a });
               const textEl = $(this.newMsgRef.current);
               const currentVal = textEl.val();
               if (currentVal) {
-                textEl.val(currentVal + '\n\n' + url[0]);
+                textEl.val(currentVal + '\n\n' + url);
               } else {
-                textEl.val(url[0]);
+                textEl.val(url);
               }
             }
           })

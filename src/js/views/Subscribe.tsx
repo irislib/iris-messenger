@@ -11,14 +11,14 @@ class About extends Component {
         <div className="main-view" id="settings">
           <div className="centered-container mobile-padding15">
             <h2>{t('subscribe')}</h2>
-            <h3>Iris Purple</h3>
-            <p>Support Iris development and get extra features!</p>
+            <h3>Iris Supporter</h3>
+            <p>Support open source development and get extra features!</p>
             <p>
               <ul>
-                <li>Iris Purple Badge</li>
+                <li>Iris Supporter Badge</li>
                 <li>Purple checkmark on Iris</li>
                 <li>High-quality automatic translations (via deepl.com)</li>
-                <li>Iris Purple private group chat</li>
+                <li>Iris Supporters' private group chat</li>
                 {/*
                 :D
                   <li>Email-DM bridge for your Iris address</li>
