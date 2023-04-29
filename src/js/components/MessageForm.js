@@ -50,9 +50,6 @@ export default class MessageForm extends Component {
           if (!event.tags?.find((t) => t[0] === newTag[0] && t[1] === newTag[1])) {
             event.tags.push(newTag);
           }
-          // replace occurrences in event.content with #[n] where n is index in event.tags
-          const index = event.tags?.findIndex((t) => t[0] === newTag[0] && t[1] === newTag[1]);
-          event.content = event.content.replace(tag, `#[${index}]`);
         }
       }
     }

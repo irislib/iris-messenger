@@ -184,7 +184,7 @@ class PublicMessageForm extends MessageForm {
     const textarea = $(this.base).find('textarea').get(0);
     const pos = textarea.selectionStart;
     const join = [
-      textarea.value.slice(0, pos).replace(mentionRegex, '@'),
+      textarea.value.slice(0, pos).replace(mentionRegex, 'nostr:'),
       item.key,
       textarea.value.slice(pos),
     ].join('');
