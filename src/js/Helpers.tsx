@@ -21,7 +21,7 @@ const pubKeyRegex =
   /(?:^|\s|nostr:|(?:https?:\/\/[\w./]+)|iris\.to\/|snort\.social\/p\/|damus\.io\/)+((?:@)?npub[a-zA-Z0-9]{59,60})(?![\w/])/gi;
 const noteRegex =
   /(?:^|\s|nostr:|(?:https?:\/\/[\w./]+)|iris\.to\/|snort\.social\/e\/|damus\.io\/)+((?:@)?note[a-zA-Z0-9]{59,60})(?![\w/])/gi;
-const nip19Regex = /\bnostr:((nevent|nprofile)1\w+)\b|#\[(\d+)\]/g;
+const nip19Regex = /\bnostr:(n(?:event|profile)1\w+)\b/g;
 
 const hashtagRegex = /(#\w+)/g;
 
