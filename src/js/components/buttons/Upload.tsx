@@ -8,17 +8,14 @@ const Upload = (props) => {
       const formData = new FormData();
       formData.append('fileToUpload', files[0]);
 
-      fetch('https://nostr.build/upload.php', {
+      fetch('https://nostr.build/api/upload/iris.php', {
         method: 'POST',
         body: formData,
       })
         .then(async (response) => {
-          const text = await response.text();
-          const url = text.match(
-            /https:\/\/nostr\.build\/(?:i|av)\/nostr\.build_[a-z0-9]{64}\.[a-z0-9]+/i,
-          );
+          const url = await response.json();
           if (url && props.onUrl) {
-            props.onUrl(url[0]);
+            props.onUrl(url);
           }
         })
         .catch((error) => {
