@@ -177,6 +177,7 @@ export default {
           <video
             key={match + i}
             src={match}
+            poster={`https://imgproxy.iris.to/thumbnail/428/${match}`}
             muted={!this.isMobile && settings.autoplayVideos !== false}
             autoPlay={!this.isMobile && settings.autoplayVideos !== false}
             playsInline
