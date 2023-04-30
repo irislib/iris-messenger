@@ -12,6 +12,7 @@ import EventComponent from './EventComponent';
 interface Props {
   event: Event;
   notification?: boolean;
+  fullWidth?: boolean;
 }
 
 export default function Repost(props: Props) {
@@ -48,7 +49,7 @@ export default function Repost(props: Props) {
             </span>
           </small>
         </div>
-        <EventComponent key={repostedEventId + props.event.id} id={repostedEventId} />
+        <EventComponent key={repostedEventId + props.event.id} id={repostedEventId} fullWidth={props.fullWidth} />
       </div>
     </div>
   );

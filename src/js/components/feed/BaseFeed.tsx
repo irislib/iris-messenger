@@ -70,6 +70,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     if (this.props?.index !== 'notifications' && override.display) {
       settings.display = override.display;
     }
+    if (this.props?.index === 'posts') {
+      settings.showReplies = false;
+    }
     for (const key in settings) {
       const value = Helpers.getUrlParameter(key);
       if (value !== null) {
@@ -342,6 +345,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           renderAs={renderAs}
           feedOpenedAt={this.openedAt}
           showReplies={0}
+          fullWidth={!this.state.settings.showReplies}
         />
       </ErrorBoundary>
     ));

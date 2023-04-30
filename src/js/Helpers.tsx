@@ -4,6 +4,7 @@ import reactStringReplace from 'react-string-replace';
 import { bech32 } from 'bech32';
 import $ from 'jquery';
 import throttle from 'lodash/throttle';
+import { nip19 } from 'nostr-tools';
 import { route } from 'preact-router';
 
 import EventComponent from './components/events/EventComponent';
@@ -20,6 +21,7 @@ const pubKeyRegex =
   /(?:^|\s|nostr:|(?:https?:\/\/[\w./]+)|iris\.to\/|snort\.social\/p\/|damus\.io\/)+((?:@)?npub[a-zA-Z0-9]{59,60})(?![\w/])/gi;
 const noteRegex =
   /(?:^|\s|nostr:|(?:https?:\/\/[\w./]+)|iris\.to\/|snort\.social\/e\/|damus\.io\/)+((?:@)?note[a-zA-Z0-9]{59,60})(?![\w/])/gi;
+const nip19Regex = /\bnostr:(n(?:event|profile)1\w+)\b/g;
 
 const hashtagRegex = /(#\w+)/g;
 
@@ -175,6 +177,7 @@ export default {
           <video
             key={match + i}
             src={match}
+            poster={`https://imgproxy.iris.to/thumbnail/428/${match}`}
             muted={!this.isMobile && settings.autoplayVideos !== false}
             autoPlay={!this.isMobile && settings.autoplayVideos !== false}
             playsInline
@@ -206,7 +209,6 @@ export default {
             key={match + i}
             width="650"
             height="400"
-            style={{ maxWidth: '100%' }}
             src={`https://www.youtube.com/embed/${match}`}
             frameBorder="0"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -563,6 +565,29 @@ export default {
           </a>
         </>
       );
+    });
+
+    // nip19 decode
+    s = reactStringReplace(s, nip19Regex, (match, i) => {
+      try {
+        const { type, data } = nip19.decode(match);
+        if (type === 'nprofile') {
+          return (
+            <>
+              {' '}
+              <a href={`/${data.pubkey}`}>
+                @<Name key={match + i} pub={data.pubkey} hideBadge={true} userNameOnly={true} />
+              </a>
+            </>
+          );
+        } else if (type === 'nevent') {
+          // same as note
+          return <EventComponent key={match + i} id={data.id} asInlineQuote={true} />;
+        }
+      } catch (e) {
+        console.log(e);
+        return match;
+      }
     });
 
     s = reactStringReplace(s, noteRegex, (match) => {
