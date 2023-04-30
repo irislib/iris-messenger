@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Helpers from '../../Helpers';
 import Key from '../../nostr/Key';
 import { translate as t } from '../../translations/Translation';
+import Identicon from '../Identicon';
 import Modal from '../modal/Modal';
 import Name from '../Name';
 import SafeImg from '../SafeImg';
@@ -50,9 +51,15 @@ const NoteImageModal = ({ event, onClose, attachment }) => {
         <InfoContainer>
           {/* Add your note text and replies here */}
           <p>
-            <a href={'/' + Key.toNostrBech32Address(event.pubkey, 'npub')}>
-              <Name pub={event.pubkey} />
-            </a>
+            <div class="profile-link-container">
+              <a
+                href={'/' + Key.toNostrBech32Address(event.pubkey, 'npub')}
+                className="profile-link"
+              >
+                <Identicon str={event.pubkey} width={40} />
+                <Name pub={event.pubkey} />
+              </a>
+            </div>
           </p>
           <p style={{ whiteSpace: 'pre-wrap' }}>{Helpers.highlightText(event.content, event)}</p>
           <p>

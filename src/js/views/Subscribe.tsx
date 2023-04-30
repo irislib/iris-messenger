@@ -3,7 +3,7 @@ import { PrimaryButton } from '../components/buttons/Button';
 import Header from '../components/Header';
 import { translate as t } from '../translations/Translation';
 
-class About extends Component {
+class Subscribe extends Component {
   render() {
     return (
       <>
@@ -75,4 +75,4 @@ class About extends Component {
   }
 }
 
-export default About;
+export default Subscribe;
