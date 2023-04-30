@@ -342,6 +342,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           renderAs={renderAs}
           feedOpenedAt={this.openedAt}
           showReplies={0}
+          fullWidth={!this.state.settings.showReplies}
         />
       </ErrorBoundary>
     ));

@@ -42,6 +42,7 @@ const Note = ({
   showReplies,
   showRepliedMsg,
   standalone,
+  fullWidth,
 }) => {
   const [showMore, setShowMore] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -58,6 +59,10 @@ const Note = ({
 
   if (showRepliedMsg === undefined) {
     showRepliedMsg = standalone;
+  }
+
+  if (fullWidth === undefined) {
+    fullWidth = !isReply && !isQuoting && !isQuote && !asInlineQuote;
   }
 
   useEffect(() => {
@@ -226,7 +231,7 @@ const Note = ({
     );
   }
 
-  function renderIdenticon(isQuote) {
+  function renderIdenticon() {
     return (
       <div className="msg-identicon">
         {event.pubkey ? (
@@ -245,6 +250,7 @@ const Note = ({
     return (
       <div className="msg-sender">
         <div className="msg-sender-link">
+          {fullWidth && renderIdenticon()}
           <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="msgSenderName">
             <Name pub={event.pubkey} />
           </a>
@@ -271,6 +277,7 @@ const Note = ({
     if (isQuote) classNames.push('quote');
     if (isQuoting) classNames.push('quoting');
     if (asInlineQuote) classNames.push('inline-quote');
+    if (fullWidth) classNames.push('full-width');
 
     return classNames.join(' ');
   }
@@ -301,7 +308,7 @@ const Note = ({
       <div key={event.id + 'note'} className={getClassName()} onClick={(e) => messageClicked(e)}>
         <div className="msg-content" onClick={(e) => messageClicked(e)}>
           {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
-          {renderIdenticon(isQuote)}
+          {!fullWidth && renderIdenticon()}
           <div className="msg-main">
             {renderMsgSender()}
             {(replyingToUsers?.length && !isQuoting && renderReplyingTo()) || null}

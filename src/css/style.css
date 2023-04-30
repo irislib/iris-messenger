@@ -1121,6 +1121,25 @@ header.footer .header-content {
     padding: 0 15px;
   }
 
+  .msg.full-width .img-container {
+    max-height: 70vh;
+    height: auto;
+  }
+
+  .msg.full-width > .msg-content > .msg-main > .text > .img-container img,
+  .msg.full-width > .msg-content > .msg-main > .text > iframe,
+  .msg.full-width > .msg-content > .msg-main > .text > video {
+    border-radius: 0;
+    border: 0;
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: -15px;
+    margin-right: -15px;
+    max-height: 70vh;
+    background-color: var(--body-bg);
+    height: auto;
+  }
+
   .application-list {
     width: 250px;
     margin-left: -250px;

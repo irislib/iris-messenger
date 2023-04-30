@@ -208,7 +208,6 @@ export default {
             key={match + i}
             width="650"
             height="400"
-            style={{ maxWidth: '100%' }}
             src={`https://www.youtube.com/embed/${match}`}
             frameBorder="0"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"

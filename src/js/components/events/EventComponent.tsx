@@ -31,6 +31,7 @@ interface EventComponentProps {
   isQuoting?: boolean;
   renderAs?: 'NoteImage';
   feedOpenedAt?: number;
+  fullWidth?: boolean;
 }
 
 const EventComponent = (props: EventComponentProps) => {
@@ -187,6 +188,7 @@ const EventComponent = (props: EventComponentProps) => {
         className={getClassName()}
         event={state.event}
         meta={state.meta}
+        fullWidth={props.fullWidth}
         fadeIn={props.feedOpenedAt < state.event.created_at}
         {...props}
       />
