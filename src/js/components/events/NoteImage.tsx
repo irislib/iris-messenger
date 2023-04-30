@@ -1,16 +1,13 @@
 import { memo, useState } from 'react';
-import { route } from 'preact-router';
 import styled, { css, keyframes } from 'styled-components';
 
 import Icons from '../../Icons';
 import { Event } from '../../lib/nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import { translate as t } from '../../translations/Translation';
-import Modal from '../modal/Modal';
-import SafeImg from '../SafeImg';
 
 import EventComponent from './EventComponent';
+import NoteImageModal from './NoteImageModal';
 
 const fadeIn = keyframes`
   from {
@@ -106,38 +103,35 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
       }
     });
   }
+
+  const onClick = (e, i) => {
+    if (window.innerWidth > 625) {
+      e.preventDefault();
+      e.stopPropagation();
+      setShowImageModal(i);
+    }
+  };
+
   // return all images from post
   return (
     <>
       {attachments.map((attachment, i) => (
         <>
           <GalleryImage
+            href={`/${Key.toNostrBech32Address(props.event.id, 'note')}`}
             key={props.event.id + i}
-            onClick={() => setShowImageModal(i)}
+            onClick={(e) => onClick(e, i)}
             attachment={attachment}
             fadeIn={props.fadeIn}
           >
             <VideoIcon attachment={attachment} />
           </GalleryImage>
           {showImageModal === i && (
-            <Modal centerVertically={true} onClose={() => setShowImageModal(-1)}>
-              {attachment.type === 'image' ? (
-                <SafeImg src={attachment.url} />
-              ) : (
-                <video loop autoPlay src={attachment.url} controls />
-              )}
-              <p>
-                <a
-                  href=""
-                  onClick={(e) => {
-                    e.preventDefault();
-                    route('/' + Key.toNostrBech32Address(props.event.id, 'note'));
-                  }}
-                >
-                  {t('show_post')}
-                </a>
-              </p>
-            </Modal>
+            <NoteImageModal
+              attachment={attachment}
+              onClose={() => setShowImageModal(-1)}
+              event={props.event}
+            />
           )}
         </>
       ))}

@@ -6,6 +6,8 @@ type Props = {
   justifyContent?: string;
   showContainer?: boolean;
   centerVertically?: boolean;
+  width?: string;
+  height?: string;
 };
 
 const Overlay = styled.div`
@@ -26,7 +28,9 @@ const Overlay = styled.div`
   padding: 20px 0;
 `;
 
-const ModalContentContainer = styled.div`
+const ModalContentContainer = styled.div<{ width?: string; height?: string }>`
+  width: ${(props) => props.width || 'auto'};
+  height: ${(props) => props.height || 'auto'};
   max-height: calc(100% - 40px);
   overflow-y: auto;
   display: flex;
@@ -34,7 +38,14 @@ const ModalContentContainer = styled.div`
   align-items: center;
 `;
 
-const Modal: FC<Props> = ({ centerVertically, showContainer, children, onClose }) => {
+const Modal: FC<Props> = ({
+  width,
+  height,
+  centerVertically,
+  showContainer,
+  children,
+  onClose,
+}) => {
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       onClose?.();
@@ -73,7 +84,9 @@ const Modal: FC<Props> = ({ centerVertically, showContainer, children, onClose }
 
   return (
     <Overlay centerVertically={centerVertically} onClick={handleOverlayClick}>
-      <ModalContentContainer>{content}</ModalContentContainer>
+      <ModalContentContainer width={width} height={height}>
+        {content}
+      </ModalContentContainer>
     </Overlay>
   );
 };
