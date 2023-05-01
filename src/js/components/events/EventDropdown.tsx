@@ -108,7 +108,7 @@ const EventDropdown = (props: EventDropdownProps) => {
         <Copy
           key={`${id!}copy_id`}
           text={t('copy_note_ID')}
-          copyStr={`nostr:${Key.toNostrBech32Address(id, 'note')}`}
+          copyStr={Key.toNostrBech32Address(id, 'note')}
         />
         <a href="#" onClick={onMute}>
           {muted ? t('unmute_notifications') : t('mute_notifications')}
