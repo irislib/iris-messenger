@@ -9,6 +9,7 @@ import Icons from '../../Icons';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
+import { decodeInvoice } from '../../views/Lightning';
 import Identicon from '../Identicon';
 import ZapModal from '../modal/Zap';
 
@@ -18,6 +19,7 @@ const Reactions = (props) => {
     reposted: false,
     likes: 0,
     zappers: null,
+    totalZapped: 0,
     liked: false,
     repostedBy: new Set<string>(),
     likedBy: new Set<string>(),
@@ -162,8 +164,19 @@ const Reactions = (props) => {
         }
         return eventA?.created_at - eventB?.created_at;
       });
-    const zappers =
-      zaps && Array.from(zaps.values()).map((eventId) => Events.getZappingUser(eventId));
+
+    const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
+    const zappers = zapEvents.map((event) => Events.getZappingUser(event.id));
+    const totalZapped = zapEvents.reduce((acc, event) => {
+      const bolt11 = event?.tags.find((tag) => tag[0] === 'bolt11')[1];
+      if (!bolt11) {
+        console.log('Invalid zap, missing bolt11 tag');
+        return acc;
+      }
+      const decoded = decodeInvoice(bolt11);
+      const amount = (decoded?.amount || 0) / 1000;
+      return acc + Number(amount);
+    }, 0);
 
     props.setReplies(sortedReplies);
 
@@ -172,6 +185,7 @@ const Reactions = (props) => {
       reposts: repostedBy.size,
       reposted: repostedBy.has(myPub),
       likes: likedBy.size,
+      totalZapped,
       zappers,
       liked: likedBy.has(myPub),
       likedBy,
@@ -249,7 +263,7 @@ const Reactions = (props) => {
               {Icons.lightning}
             </a>
             <span className={`count ${s.showZaps ? 'active' : ''}`} onClick={(e) => toggleZaps(e)}>
-              {s.zappers?.length || ''}
+              {s.totalZapped || ''}
             </span>
           </>
         ) : (
