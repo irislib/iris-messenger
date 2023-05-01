@@ -173,7 +173,7 @@ class Profile extends View {
                       key=${`${this.state.hexPub}copyNpub`}
                       text=${t('copy_user_ID')}
                       title=${this.state.name}
-                      copyStr=${this.state.npub}
+                      copyStr=${`nostr:${this.state.npub}`}
                     />
                     <${Button} onClick=${() => this.setState({ showQR: !this.state.showQR })}
                       >${t('show_qr_code')}<//
