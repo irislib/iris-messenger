@@ -41,7 +41,8 @@ export default class MessageForm extends Component {
       if (taggedItems) {
         event.tags = event.tags || [];
         for (const tag of taggedItems) {
-          const hexTag = Key.toNostrHexAddress(tag.match(/npub[a-zA-Z0-9]{59,60}/)[0]);
+          const match = tag.match(/npub[a-zA-Z0-9]{59,60}/)?.[0];
+          const hexTag = match && Key.toNostrHexAddress(match);
           if (!hexTag) {
             continue;
           }
