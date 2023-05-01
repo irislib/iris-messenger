@@ -110,7 +110,7 @@ class Main extends Component<Props, ReactState> {
 
     // if id begins with "note", it's a post. otherwise it's a profile.
     const NoteOrProfile = (params: { id?: string; path: string }) => {
-      if (params.id.startsWith('note')) {
+      if (params.id.match(/^(note|nevent)/)) {
         return <Note id={params.id} />;
       }
       return <Profile id={params.id} tab="posts" path={params.path} />;

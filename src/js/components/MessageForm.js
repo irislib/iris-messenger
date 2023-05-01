@@ -41,7 +41,8 @@ export default class MessageForm extends Component {
       if (taggedItems) {
         event.tags = event.tags || [];
         for (const tag of taggedItems) {
-          const hexTag = Key.toNostrHexAddress(tag.match(/npub[a-zA-Z0-9]{59,60}/)[0]);
+          const link = tag.match(/(?:npub|nprofile)[a-zA-Z0-9]{59,}/)[0];
+          const hexTag = Key.toNostrHexAddress(link);
           if (!hexTag) {
             continue;
           }
@@ -55,7 +56,9 @@ export default class MessageForm extends Component {
     }
 
     handleTagged(Helpers.pubKeyRegex, 'p');
+    handleTagged(Helpers.nprofileRegex, 'p');
     handleTagged(Helpers.noteRegex, 'e');
+    handleTagged(Helpers.neventRegex, 'e');
 
     const hashtags = [...msg.text.matchAll(Helpers.hashtagRegex)].map((m) => m[0].slice(1));
     if (hashtags.length) {
