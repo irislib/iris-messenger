@@ -33,7 +33,7 @@ window.addEventListener('popstate', listener);
 const DEFAULT_SETTINGS = {
   display: 'posts',
   realtime: false,
-  showReplies: true,
+  showReplies: false,
   sortBy: 'created_at',
   sortDirection: 'desc',
   timespan: 'all',
@@ -72,6 +72,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     }
     if (this.props?.index === 'posts') {
       settings.showReplies = false;
+    }
+    if (this.props?.index === 'postsAndReplies') {
+      settings.showReplies = true;
     }
     for (const key in settings) {
       const value = Helpers.getUrlParameter(key);
