@@ -73,7 +73,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     if (this.props?.index === 'posts') {
       settings.showReplies = false;
     }
-    if (this.props?.index === 'postsAndReplies') {
+    if (['postsAndReplies', 'notifications', 'likes'].includes(this.props?.index)) {
       settings.showReplies = true;
     }
     for (const key in settings) {
