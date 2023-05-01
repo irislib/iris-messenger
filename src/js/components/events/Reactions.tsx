@@ -6,10 +6,10 @@ import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import Icons from '../../Icons';
+import { decodeInvoice } from '../../Lightning';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
-import { decodeInvoice } from '../../views/Lightning';
 import Identicon from '../Identicon';
 import ZapModal from '../modal/Zap';
 
