@@ -15,7 +15,7 @@ const MediaContainer = styled.div`
   flex: 1;
   max-width: 70%;
   display: flex;
-  background: var(--body-bg);
+  background: var(--main-color);
   justify-content: center;
 
   @media (max-width: 625px) {
