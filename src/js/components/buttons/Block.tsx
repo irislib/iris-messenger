@@ -50,11 +50,7 @@ class Block extends Component<Props> {
       >
         <span className="nonhover">
           {t(this.state[this.key] ? this.actionDone : this.action)}{' '}
-          {this.props.showName ? (
-            <Name pub={this.props.id} userNameOnly={true} hideBadge={true} />
-          ) : (
-            ''
-          )}
+          {this.props.showName ? <Name pub={this.props.id} hideBadge={true} /> : ''}
         </span>
         <span className="hover">{t(this.hoverAction)}</span>
       </Button>

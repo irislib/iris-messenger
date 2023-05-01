@@ -561,7 +561,7 @@ export default {
         <>
           {' '}
           <a href={link}>
-            @<Name key={match + i} pub={match} hideBadge={true} userNameOnly={true} />
+            @<Name key={match + i} pub={match} hideBadge={true} />
           </a>
         </>
       );
@@ -576,7 +576,7 @@ export default {
             <>
               {' '}
               <a href={`/${data.pubkey}`}>
-                @<Name key={match + i} pub={data.pubkey} hideBadge={true} userNameOnly={true} />
+                @<Name key={match + i} pub={data.pubkey} hideBadge={true} />
               </a>
             </>
           );
@@ -636,7 +636,7 @@ export default {
             const link = `/${Key.toNostrBech32Address(tagTarget, 'npub')}`;
             return (
               <a href={link}>
-                @<Name key={tagTarget + i} pub={tagTarget} hideBadge={true} userNameOnly={true} />
+                @<Name key={tagTarget + i} pub={tagTarget} hideBadge={true} />
               </a>
             );
           } else if (tag[0] === 'e') {

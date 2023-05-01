@@ -414,7 +414,7 @@ export default function SendSats(props: ZapProps) {
           <div className="lnurl-header">
             <h2>
               {props.title || title}
-              <Name displayNameOnly={true} pub={recipient} />
+              <Name pub={recipient} />
             </h2>
           </div>
           {invoiceForm()}

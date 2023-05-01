@@ -73,7 +73,7 @@ export default class Header extends Component {
             );
             this.setState({ title });
           } else {
-            const title = <Name displayNameOnly={true} key={this.chatId} pub={this.chatId} />;
+            const title = <Name key={this.chatId} pub={this.chatId} />;
             this.setState({ title });
           }
         }

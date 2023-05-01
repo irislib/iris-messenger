@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+
 import Modal from '../modal/Modal';
 import SafeImg from '../SafeImg';
 

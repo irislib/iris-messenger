@@ -58,7 +58,7 @@ export default function Like(props: Props) {
             </i>
             <div>
               <a href={userLink} style={{ marginRight: 5 }}>
-                <Name pub={props.event.pubkey} userNameOnly={true} />
+                <Name pub={props.event.pubkey} />
               </a>
               {allLikes.length > 1 && <> and {allLikes.length - 1} others </>} {likeText}
             </div>

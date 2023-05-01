@@ -177,7 +177,7 @@ const Note = ({
         {t('replying_to') + ' '}
         {replyingToUsers.slice(0, 3).map((u) => (
           <a href={`/${Key.toNostrBech32Address(u, 'npub')}`}>
-            @<Name pub={u} hideBadge={true} userNameOnly={true} />{' '}
+            @<Name pub={u} hideBadge={true} />{' '}
           </a>
         ))}
         {replyingToUsers?.length > 3 ? '...' : ''}

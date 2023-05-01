@@ -42,14 +42,18 @@ export default function Repost(props: Props) {
               <ArrowPathIcon width={24} />
             </i>
             <a href={`/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`}>
-              <Name pub={props.event?.pubkey} hideBadge={true} userNameOnly={true} />
+              <Name pub={props.event?.pubkey} hideBadge={true} />
             </a>
             <span style={{ marginLeft: '5px' }}>
               {allReposts.length > 1 && `and ${allReposts.length - 1} others`} {t('reposted')}
             </span>
           </small>
         </div>
-        <EventComponent key={repostedEventId + props.event.id} id={repostedEventId} fullWidth={props.fullWidth} />
+        <EventComponent
+          key={repostedEventId + props.event.id}
+          id={repostedEventId}
+          fullWidth={props.fullWidth}
+        />
       </div>
     </div>
   );

@@ -188,11 +188,7 @@ class Profile extends View {
                       ? html`
                           <${Button} onClick=${(e) => this.viewAs(e)}>
                             ${t('view_as') + ' '}
-                            <${Name}
-                              pub=${this.state.hexPub}
-                              userNameOnly=${true}
-                              hideBadge=${true}
-                            />
+                            <${Name} pub=${this.state.hexPub} hideBadge=${true} />
                           <//>
                         `
                       : ''}
@@ -452,7 +448,7 @@ class Profile extends View {
           console.log('Invalid banner URL', profile.banner);
         }
 
-        // profile may contain arbitrary fields, so be careful
+        // profile may contain arbitrary fields, so be careful what you pass to setState
         this.setState({
           name: profile.name,
           display_name: profile.display_name,

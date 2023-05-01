@@ -122,7 +122,7 @@ class Follows extends View {
       <div className="centered-container">
         <h3 style={{ display: 'flex' }}>
           <a href={`/${this.props.id}`}>
-            <Name displayNameOnly={true} pub={this.props.id} />
+            <Name pub={this.props.id} />
           </a>
           :<i> </i>
           <span style={{ flex: 1 }} className="mar-left5">

@@ -10,8 +10,6 @@ type Props = {
   pub: string;
   placeholder?: string;
   hideBadge?: boolean;
-  userNameOnly?: boolean;
-  displayNameOnly?: boolean; // Add the new prop here
 };
 
 const Name = (props: Props) => {
@@ -29,8 +27,8 @@ const Name = (props: Props) => {
     initialName = profile.name?.trim().slice(0, 100) || '';
     initialDisplayName = profile.display_name?.trim().slice(0, 100);
   }
-  if (!initialDisplayName) {
-    initialDisplayName = AnimalName(Key.toNostrBech32Address(props.pub, 'npub') || props.pub);
+  if (!initialName) {
+    initialName = AnimalName(Key.toNostrBech32Address(props.pub, 'npub') || props.pub);
     isGenerated = true;
   }
   const [name, setName] = useState(initialName);
@@ -48,35 +46,13 @@ const Name = (props: Props) => {
       });
     }
   }, [props.pub]);
-  if (props.userNameOnly) {
-    return (
-      <>
-        {name || displayName}
-        {props.hideBadge ? '' : <Badge pub={props.pub} />}
-      </>
-    );
-  }
-
-  if (props.displayNameOnly) {
-    return (
-      <>
-        <span className={`display-name ${isNameGenerated ? 'generated' : ''}`}>
-          {displayName || name || props.placeholder}
-        </span>
-        {props.hideBadge ? '' : <Badge pub={props.pub} />}
-      </>
-    );
-  }
-
-  const showUserName = name && displayName && displayName.toLowerCase() !== name.toLowerCase();
 
   return (
     <>
       <span className={`display-name ${isNameGenerated ? 'generated' : ''}`}>
-        {displayName || name || props.placeholder}
+        {name || displayName || props.placeholder}
       </span>
       {props.hideBadge ? '' : <Badge pub={props.pub} />}
-      {showUserName ? <small className="user-name mar-left5">@{name}</small> : ''}
     </>
   );
 };

@@ -11,8 +11,6 @@ import SocialNetwork from '../nostr/SocialNetwork';
 import { translate as t } from '../translations/Translation';
 
 const explainers = {
-  display_name: 'Name',
-  name: 'Username',
   lud16: 'Bitcoin lightning address ⚡ (lud16)',
   picture: 'Picture url',
   banner: 'Banner url',
@@ -82,16 +80,7 @@ export default class EditProfile extends Component {
   };
 
   render() {
-    const fields = [
-      'display_name',
-      'name',
-      'picture',
-      'about',
-      'banner',
-      'website',
-      'lud16',
-      'nip05',
-    ];
+    const fields = ['name', 'picture', 'about', 'banner', 'website', 'lud16', 'nip05'];
     // add other possible fields from profile
     Object.keys(this.state.profile).forEach((key) => {
       if (!fields.includes(key)) {

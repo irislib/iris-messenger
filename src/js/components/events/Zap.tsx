@@ -65,7 +65,7 @@ export default function Zap(props: Props) {
             </i>
             <div>
               <a href={userLink} style={{ marginRight: '5px' }}>
-                <Name pub={zappingUser} userNameOnly={true} />
+                <Name pub={zappingUser} />
               </a>
               {allZaps.length > 1 && <span> and {allZaps.length - 1} others </span>}
               {zappedText}
