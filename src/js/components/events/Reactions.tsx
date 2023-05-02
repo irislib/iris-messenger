@@ -26,14 +26,26 @@ const ReactionButtons = styled.div`
     flex: 1;
   }
 
-  span {
-    flex: 3;
-  }
-
   .msg.quote &,
   .msg.standalone & {
     margin-bottom: 12px;
   }
+`;
+
+const ReactionCount = styled.span`
+  flex: 3;
+  margin-left: 5px;
+  cursor: pointer;
+  min-width: 2em;
+  text-align: left;
+  user-select: none;
+  white-space: nowrap;
+
+  &:not(:last-of-type) {
+    margin-right: 5px;
+  }
+
+  ${(props) => (props.active ? 'color: var(--text-color)' : '')};
 `;
 
 const Reactions = (props) => {
@@ -237,7 +249,7 @@ const Reactions = (props) => {
         <a className="msg-btn reply-btn" onClick={() => replyBtnClicked()}>
           {Icons.reply}
         </a>
-        <span className="count">{s.replyCount || ''}</span>
+        <ReactionCount>{s.replyCount || ''}</ReactionCount>
         {props.settings.showReposts ? (
           <>
             <a
@@ -246,12 +258,9 @@ const Reactions = (props) => {
             >
               <ArrowPathIcon width={24} />
             </a>
-            <span
-              className={`count ${s.showReposts ? 'active' : ''}`}
-              onClick={(e) => toggleReposts(e)}
-            >
+            <ReactionCount active={s.showReposts} onClick={(e) => toggleReposts(e)}>
               {s.reposts || ''}
-            </span>
+            </ReactionCount>
           </>
         ) : (
           ''
@@ -264,12 +273,9 @@ const Reactions = (props) => {
             >
               {s.liked ? <HeartIconFull width={24} /> : <HeartIcon width={24} />}
             </a>
-            <span
-              className={`count ${s.showLikes ? 'active' : ''}`}
-              onClick={(e) => toggleLikes(e)}
-            >
+            <ReactionCount active={s.showLikes} onClick={(e) => toggleLikes(e)}>
               {s.likes || ''}
-            </span>
+            </ReactionCount>
           </>
         ) : (
           ''
@@ -285,9 +291,9 @@ const Reactions = (props) => {
             >
               {Icons.lightning}
             </a>
-            <span className={`count ${s.showZaps ? 'active' : ''}`} onClick={(e) => toggleZaps(e)}>
+            <ReactionCount active={s.showZaps} onClick={(e) => toggleZaps(e)}>
               {s.totalZapped || ''}
-            </span>
+            </ReactionCount>
           </>
         ) : (
           ''
