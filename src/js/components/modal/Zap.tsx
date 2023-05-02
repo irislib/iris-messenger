@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Helpers from '../../Helpers';
 import { Event } from '../../lib/nostr-tools';
 import { LNURL, LNURLError, LNURLErrorCode, LNURLInvoice, LNURLSuccessAction } from '../../LNURL';
+import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Relays from '../../nostr/Relays';
@@ -128,6 +129,14 @@ export default function SendSats(props: ZapProps) {
   const canComment = handler
     ? (canZap && zapType !== ZapType.NonZap) || handler.maxCommentLength > 0
     : false;
+
+  useEffect(() => {
+    localState.get('defaultZapAmount').on((value) => {
+      setAmount(value);
+      setCustomAmount(value);
+      console.log('defaultZapAmount', value);
+    });
+  });
 
   useEffect(() => {
     if (props.show) {

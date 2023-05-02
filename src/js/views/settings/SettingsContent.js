@@ -8,6 +8,7 @@ import Dev from './Dev';
 import IrisAccount from './IrisAccount';
 import Language from './Language';
 import Network from './Network';
+import Payments from './Payments';
 import SocialNetwork from './SocialNetwork';
 
 export default class SettingsContent extends Component {
@@ -18,6 +19,7 @@ export default class SettingsContent extends Component {
     appearance: Appearance,
     language: Language,
     content: Content,
+    payments: Payments,
     backup: Backup,
     social_network: SocialNetwork,
     iris_account: IrisAccount,

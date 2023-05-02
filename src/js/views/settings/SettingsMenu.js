@@ -10,6 +10,7 @@ const SETTINGS = {
   account: 'account',
   appearance: 'appearance',
   content: 'content',
+  payments: 'payments',
   network: 'network',
   backup: 'backup',
   language: 'language',

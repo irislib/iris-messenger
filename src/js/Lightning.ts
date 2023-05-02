@@ -1,23 +1,77 @@
 import { bytesToHex } from '@noble/hashes/utils';
 import { decode as invoiceDecode } from 'light-bolt11-decoder';
 
-let lastBitcoinPrice = 30000; // lol hardcoded default
+import localState from './LocalState';
 
-fetch('https://api.kraken.com/0/public/Ticker?pair=XBTUSD')
-  .then((response) => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error('Failed to fetch data from Kraken API');
-    }
-  })
-  .then((data) => {
-    lastBitcoinPrice = parseFloat(data?.result?.XXBTZUSD?.c[0]);
-    console.log('Last traded price (XBT/USD):', lastBitcoinPrice);
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
+let lastBitcoinPrice;
+
+const currencies = {
+  USD: '$',
+  EUR: '€',
+  JPY: '¥',
+  SATS: '',
+};
+
+// set default according to locale
+let displayCurrency = 'USD';
+const locale = navigator.language;
+const EUR_LOCALE_PREFIXES = [
+  'de',
+  'fr',
+  'it',
+  'es',
+  'pt',
+  'el',
+  'nl',
+  'ga',
+  'fi',
+  'sv',
+  'et',
+  'lv',
+  'lt',
+  'sk',
+  'sl',
+  'mt',
+  'hu',
+  'pl',
+  'cs',
+  'bg',
+  'ro',
+];
+if (EUR_LOCALE_PREFIXES.some((prefix) => locale.startsWith(prefix))) {
+  displayCurrency = 'EUR';
+} else if (locale.startsWith('ja')) {
+  displayCurrency = 'JPY';
+}
+
+const getExchangeRate = () => {
+  fetch('https://api.kraken.com/0/public/Ticker?pair=XBT' + displayCurrency)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Failed to fetch data from Kraken API');
+      }
+    })
+    .then((data) => {
+      lastBitcoinPrice = parseFloat(data?.result?.['XXBTZ' + displayCurrency]?.c?.[0]);
+      console.log('lastBitcoinPrice', lastBitcoinPrice, displayCurrency);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+};
+
+localState.get('displayCurrency').on((value) => {
+  displayCurrency = value;
+  getExchangeRate();
+});
+
+setTimeout(() => {
+  if (!lastBitcoinPrice) {
+    getExchangeRate();
+  }
+}, 1000);
 
 export interface InvoiceDetails {
   amount?: number;
@@ -102,10 +156,10 @@ function customFormatNumber(value) {
 }
 
 export function formatAmount(sats: number): string {
-  if (lastBitcoinPrice) {
+  if (lastBitcoinPrice && displayCurrency !== 'SATS') {
     const dollarAmount = (sats / 100000000) * lastBitcoinPrice;
     const formattedAmount = customFormatNumber(dollarAmount);
-    return '$ ' + formattedAmount;
+    return currencies[displayCurrency] + ' ' + formattedAmount;
   } else {
     return formatSats(sats);
   }
