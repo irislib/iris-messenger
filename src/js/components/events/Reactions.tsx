@@ -4,6 +4,7 @@ import $ from 'jquery';
 import { memo } from 'preact/compat';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
+import styled from 'styled-components';
 
 import Icons from '../../Icons';
 import { decodeInvoice, formatAmount } from '../../Lightning';
@@ -12,6 +13,28 @@ import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import Identicon from '../Identicon';
 import ZapModal from '../modal/Zap';
+
+const ReactionButtons = styled.div`
+  display: flex;
+  align-items: flex-end;
+  flex-direction: row;
+  text-align: right;
+  font-size: 14px;
+  color: var(--text-time);
+  
+  a {
+    flex: 1;
+  }
+  
+  span {
+    flex: 3;
+  }
+
+  .msg.quote &,
+  .msg.standalone & {
+    margin-bottom: 12px;
+  }
+`;
 
 const Reactions = (props) => {
   const [state, setState] = useState({
@@ -210,7 +233,7 @@ const Reactions = (props) => {
   function renderReactionBtns() {
     const s = state;
     return (
-      <div className="below-text">
+      <ReactionButtons>
         <a className="msg-btn reply-btn" onClick={() => replyBtnClicked()}>
           {Icons.reply}
         </a>
@@ -269,7 +292,7 @@ const Reactions = (props) => {
         ) : (
           ''
         )}
-      </div>
+      </ReactionButtons>
     );
   }
 

@@ -1631,19 +1631,6 @@ a.msgSenderName:hover .user-name {
   text-decoration: none;
 }
 
-.msg .below-text {
-  display: flex;
-  align-items: flex-end;
-  flex-direction: row;
-  text-align: right;
-  font-size: 14px;
-  color: var(--text-time);
-}
-
-.msg.quote .below-text, .msg.standalone .below-text {
-  margin-bottom: 12px;
-}
-
 .msg.standalone.quote.quoting {
   margin-bottom: 4px;
 }
