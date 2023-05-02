@@ -87,6 +87,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         }
       }
     }
+    if (this.props.keyword) {
+      settings.showReplies = true;
+    }
     return settings;
   }
 
