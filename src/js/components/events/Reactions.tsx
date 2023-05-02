@@ -6,7 +6,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
 
 import Icons from '../../Icons';
-import { decodeInvoice } from '../../Lightning';
+import { decodeInvoice, formatAmount } from '../../Lightning';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
@@ -19,7 +19,7 @@ const Reactions = (props) => {
     reposted: false,
     likes: 0,
     zappers: null,
-    totalZapped: 0,
+    totalZapped: '',
     liked: false,
     repostedBy: new Set<string>(),
     likedBy: new Set<string>(),
@@ -185,7 +185,7 @@ const Reactions = (props) => {
       reposts: repostedBy.size,
       reposted: repostedBy.has(myPub),
       likes: likedBy.size,
-      totalZapped,
+      totalZapped: totalZapped && formatAmount(totalZapped),
       zappers,
       liked: likedBy.has(myPub),
       likedBy,

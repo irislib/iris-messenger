@@ -49,3 +49,17 @@ export function decodeInvoice(pr: string): InvoiceDetails | undefined {
     console.error(e);
   }
 }
+
+// 1000 -> 1.00K etc
+export function formatAmount(amount: number): string {
+  if (amount < 1000) {
+    return amount.toString();
+  }
+  if (amount < 1000000) {
+    return (amount / 1000).toFixed(2) + 'K';
+  }
+  if (amount < 1000000000) {
+    return (amount / 1000000).toFixed(2) + 'M';
+  }
+  return (amount / 1000000000).toFixed(2) + 'B';
+}
