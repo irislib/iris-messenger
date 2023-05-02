@@ -1279,7 +1279,7 @@ a.msg {
   width: auto;
   max-width: 100%;
   max-height: none;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 15px;
   border: 1px solid var(--main-color);
   overflow: hidden;
@@ -2730,10 +2730,6 @@ input[type='text'] {
 
   .public-messages-view .msg .msg .msg-content {
     border-radius: 8px;
-  }
-
-  .public-messages-view .img-container img {
-    object-fit: contain;
   }
 
   .msg-content iframe,
