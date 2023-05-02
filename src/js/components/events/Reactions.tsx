@@ -21,11 +21,11 @@ const ReactionButtons = styled.div`
   text-align: right;
   font-size: 14px;
   color: var(--text-time);
-  
+
   a {
     flex: 1;
   }
-  
+
   span {
     flex: 3;
   }
