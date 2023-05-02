@@ -1,6 +1,24 @@
 import { bytesToHex } from '@noble/hashes/utils';
 import { decode as invoiceDecode } from 'light-bolt11-decoder';
 
+let lastBitcoinPrice = 30000; // lol hardcoded default
+
+fetch('https://api.kraken.com/0/public/Ticker?pair=XBTUSD')
+  .then((response) => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error('Failed to fetch data from Kraken API');
+    }
+  })
+  .then((data) => {
+    lastBitcoinPrice = parseFloat(data?.result?.XXBTZUSD?.c[0]);
+    console.log('Last traded price (XBT/USD):', lastBitcoinPrice);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
+
 export interface InvoiceDetails {
   amount?: number;
   expire?: number;
@@ -51,7 +69,7 @@ export function decodeInvoice(pr: string): InvoiceDetails | undefined {
 }
 
 // 1000 -> 1.00K etc
-export function formatAmount(amount: number): string {
+export function formatSats(amount: number): string {
   if (amount < 1000) {
     return amount.toString();
   }
@@ -62,4 +80,33 @@ export function formatAmount(amount: number): string {
     return (amount / 1000000).toFixed(2) + 'M';
   }
   return (amount / 1000000000).toFixed(2) + 'B';
+}
+
+function customFormatNumber(value) {
+  let maxDecimals;
+  if (value >= 1) {
+    maxDecimals = 2;
+  } else if (value >= 0.01) {
+    maxDecimals = 2;
+  } else {
+    maxDecimals = 4;
+  }
+
+  const factor = Math.pow(10, maxDecimals);
+  value = Math.round(value * factor) / factor;
+
+  return value.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: maxDecimals,
+  });
+}
+
+export function formatAmount(sats: number): string {
+  if (lastBitcoinPrice) {
+    const dollarAmount = (sats / 100000000) * lastBitcoinPrice;
+    const formattedAmount = customFormatNumber(dollarAmount);
+    return '$ ' + formattedAmount;
+  } else {
+    return formatSats(sats);
+  }
 }
