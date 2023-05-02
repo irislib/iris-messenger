@@ -131,7 +131,8 @@ export default function SendSats(props: ZapProps) {
     : false;
 
   useEffect(() => {
-    localState.get('defaultZapAmount').on((value) => {
+    localState.get('defaultZapAmount').on((v) => {
+      const value = parseInt(v);
       setAmount(value);
       setCustomAmount(value);
       console.log('defaultZapAmount', value);
