@@ -100,10 +100,13 @@ const Reactions = (props) => {
 
   function likeBtnClicked(e) {
     e.preventDefault();
+    e.stopPropagation();
     like(!state.liked);
   }
 
-  function repostBtnClicked() {
+  function repostBtnClicked(e) {
+    e.preventDefault();
+    e.stopPropagation();
     if (!state.reposted) {
       const author = props.event.pubkey;
       const hexId = Key.toNostrHexAddress(props.event.id);
@@ -254,7 +257,7 @@ const Reactions = (props) => {
           <>
             <a
               className={`msg-btn repost-btn ${s.reposted ? 'reposted' : ''}`}
-              onClick={() => repostBtnClicked()}
+              onClick={(e) => repostBtnClicked(e)}
             >
               <ArrowPathIcon width={24} />
             </a>
@@ -285,6 +288,7 @@ const Reactions = (props) => {
             <a
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 setState((prevState) => ({ ...prevState, showZapModal: true }));
               }}
               className="msg-btn zap-btn"
