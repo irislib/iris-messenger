@@ -56,6 +56,9 @@ export default {
   wtClient: undefined as any,
 
   formatAmount(amount: number, decimals = 2): string {
+    if (typeof amount !== 'number') {
+      return '';
+    }
     if (amount < 1000) {
       return amount.toFixed(decimals);
     }

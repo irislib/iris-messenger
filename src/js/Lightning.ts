@@ -124,6 +124,9 @@ export function decodeInvoice(pr: string): InvoiceDetails | undefined {
 
 // 1000 -> 1.00K etc
 export function formatSats(amount: number): string {
+  if (typeof amount !== 'number') {
+    return '';
+  }
   if (amount < 1000) {
     return amount.toString();
   }
