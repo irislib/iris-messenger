@@ -1,11 +1,16 @@
-import { Event, generatePrivateKey, getPublicKey, nip04, signEvent } from '../lib/nostr-tools';
-
-import Events from './Events';
-const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
 import { route } from 'preact-router';
 
-import Helpers from '../Helpers';
+import {
+  Event,
+  generatePrivateKey,
+  getPublicKey,
+  nip04,
+  nip19,
+  signEvent,
+} from '../lib/nostr-tools';
 import localState from '../LocalState';
+
+import Events from './Events';
 
 declare global {
   interface Window {
@@ -204,6 +209,44 @@ export default {
       return false;
     }
   },
+  // Encodes npub/note into nprofile/nevent, if necessary.
+  _addRelays(address: string) {
+    const { data, type } = nip19.decode(address);
+    switch (type) {
+      case 'npub':
+        return nip19.nprofileEncode({
+          pubkey: data,
+          relays: Events.eventsMetaDb.getRelays(data).slice(0, 5),
+        });
+      case 'note':
+        return nip19.neventEncode({
+          id: data,
+          relays: Events.eventsMetaDb.getRelays(data).slice(0, 5),
+        });
+      // These already contain relay data, so keep it.
+      case 'nprofile':
+      case 'nevent':
+      case 'naddr':
+        return address;
+    }
+  },
+  // Encodes into nprofile/nevent, adding relays we know of.
+  _encodeWithRelays(hexAddress: string, prefix: string) {
+    switch (prefix) {
+      case 'npub':
+      case 'nprofile':
+        return nip19.nprofileEncode({
+          pubkey: hexAddress,
+          relays: Events.eventsMetaDb.getRelays(hexAddress).slice(0, 5),
+        });
+      case 'nevent':
+      case 'note':
+        return nip19.neventEncode({
+          id: hexAddress,
+          relays: Events.eventsMetaDb.getRelays(hexAddress).slice(0, 5),
+        });
+    }
+  },
   toNostrBech32Address: function (address: string, prefix: string) {
     if (!address) {
       return;
@@ -212,18 +255,17 @@ export default {
       throw new Error('prefix is required');
     }
     try {
-      const decoded = bech32.decode(address);
-      if (prefix !== decoded.prefix) {
-        return null;
+      const addr = this._addRelays(address);
+      if (addr) {
+        return addr;
       }
-      return bech32.encode(prefix, decoded.data);
     } catch (e) {
-      // not a bech32 address
+      // nop
     }
-
-    if (address.match(/^[0-9a-fA-F]{64}$/)) {
-      const words = Buffer.from(address, 'hex');
-      return bech32.encode(prefix, words);
+    try {
+      return this._encodeWithRelays(address, prefix);
+    } catch {
+      // nop
     }
     return null;
   },
@@ -232,9 +274,23 @@ export default {
       return str;
     }
     try {
-      const { data } = bech32.decode(str);
-      const addr = Helpers.arrayToHex(data);
-      return addr;
+      const { data, type } = nip19.decode(str);
+      switch (type) {
+        case 'nprofile':
+          Events.eventsMetaDb.upsertRelays(data.pubkey, data.relays);
+          return data.pubkey;
+        case 'nevent':
+          Events.eventsMetaDb.upsertRelays(data.id, data.relays);
+          return data.id;
+        case 'naddr':
+          Events.eventsMetaDb.upsertRelays(data.identifier, data.relays);
+          return data.identifier;
+        case 'note':
+        case 'npub':
+        case 'nrelay':
+        case 'nsec':
+          return data;
+      }
     } catch (e) {
       // not a bech32 address
     }

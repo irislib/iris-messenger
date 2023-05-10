@@ -15,6 +15,15 @@ class EventMetaStore {
     return this;
   }
 
+  upsertRelays(id: string, relays: string[] = []) {
+    if (relays.length === 0) {
+      return;
+    }
+    this.upsert(id, {
+      relays: new Set(relays),
+    });
+  }
+
   get(id: string): undefined | EventMetadata {
     if (!id) return;
     return this._data.get(id);
