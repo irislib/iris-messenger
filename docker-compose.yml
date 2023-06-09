@@ -9,4 +9,4 @@ services:
       - .:/iris-messenger
       - /iris-messenger/node_modules
     ports:
-      - 8080:8080
+      - 5173:5173
