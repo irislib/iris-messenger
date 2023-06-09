@@ -1,13 +1,13 @@
-import { sha256 } from "@noble/hashes/sha256";
-import { throttle } from "lodash";
-import { Event, Filter, Sub } from "nostr-tools";
+import { sha256 } from '@noble/hashes/sha256';
+import { throttle } from 'lodash';
+import { Event, Filter, Sub } from 'nostr-tools';
 
-import Helpers from "../Helpers";
-import localState from "../LocalState";
+import Helpers from '../Helpers';
+import localState from '../LocalState';
 
-import Events from "./Events";
-import Key from "./Key";
-import PubSub from "./PubSub";
+import Events from './Events';
+import Key from './Key';
+import PubSub from './PubSub';
 
 type SavedRelays = {
   [key: string]: {
@@ -19,17 +19,17 @@ type SavedRelays = {
 let savedRelays: SavedRelays = {};
 
 const DEFAULT_RELAYS = [
-  "wss://eden.nostr.land",
-  "wss://nostr.fmt.wiz.biz",
-  "wss://relay.damus.io",
-  "wss://nostr-pub.wellorder.net",
-  "wss://offchain.pub",
-  "wss://nos.lol",
-  "wss://relay.snort.social",
-  "wss://relay.current.fyi",
+  'wss://eden.nostr.land',
+  'wss://nostr.fmt.wiz.biz',
+  'wss://relay.damus.io',
+  'wss://nostr-pub.wellorder.net',
+  'wss://offchain.pub',
+  'wss://nos.lol',
+  'wss://relay.snort.social',
+  'wss://relay.current.fyi',
 ];
 
-const SEARCH_RELAYS = ["wss://relay.nostr.band"];
+const SEARCH_RELAYS = ['wss://relay.nostr.band'];
 
 type PublicRelaySettings = {
   read: boolean;
@@ -57,12 +57,8 @@ const Relays = {
   newAuthors: new Set<string>(),
   DEFAULT_RELAYS,
   init() {
-    this.relays = new Map(
-      DEFAULT_RELAYS.map((url) => [url, { enabled: true, url }])
-    );
-    this.searchRelays = new Map(
-      SEARCH_RELAYS.map((url) => [url, { enabled: true, url }])
-    );
+    this.relays = new Map(DEFAULT_RELAYS.map((url) => [url, { enabled: true, url }]));
+    this.searchRelays = new Map(SEARCH_RELAYS.map((url) => [url, { enabled: true, url }]));
     this.manage();
   },
   enabledRelays(relays?: Map<string, RelayMetadata>) {
@@ -81,20 +77,20 @@ const Relays = {
         const content = JSON.parse(event.content);
         for (const url in content) {
           try {
-            const parsed = new URL(url).toString().replace(/\/$/, "");
+            const parsed = new URL(url).toString().replace(/\/$/, '');
             urls.set(parsed, content[url]);
           } catch (e) {
-            console.log("invalid relay url", url, event);
+            console.log('invalid relay url', url, event);
           }
         }
       } catch (e) {
-        console.log("failed to parse relay urls", event);
+        console.log('failed to parse relay urls', event);
       }
     }
     return urls;
   },
   getPopularRelays: function (): Array<PopularRelay> {
-    console.log("getPopularRelays");
+    console.log('getPopularRelays');
     const relays = new Map<string, number>();
     Events.db.find({ kind: 3 }).forEach((event) => {
       if (event.content) {
@@ -103,15 +99,15 @@ const Relays = {
           const content = JSON.parse(event.content);
           for (const url in content) {
             try {
-              const parsed = new URL(url).toString().replace(/\/$/, "");
+              const parsed = new URL(url).toString().replace(/\/$/, '');
               const count = relays.get(parsed) || 0;
               relays.set(parsed, count + 1);
             } catch (e) {
-              console.log("invalid relay url", url, event);
+              console.log('invalid relay url', url, event);
             }
           }
         } catch (e) {
-          console.log("failed to parse relay urls", event);
+          console.log('failed to parse relay urls', event);
         }
       }
     });
@@ -133,8 +129,8 @@ const Relays = {
   },
   getUserRelays(user: string): Array<[string, PublicRelaySettings]> {
     let relays = new Map<string, PublicRelaySettings>();
-    if (typeof user !== "string") {
-      console.log("getUserRelays: invalid user", user);
+    if (typeof user !== 'string') {
+      console.log('getUserRelays: invalid user', user);
       return [];
     }
     const followEvent = Events.db.findOne({ kind: 3, pubkey: user });
@@ -144,8 +140,8 @@ const Relays = {
     return Array.from(relays.entries());
   },
   manage: function () {
-    localState.get("relays").put({});
-    localState.get("relays").on((r: SavedRelays) => {
+    localState.get('relays').put({});
+    localState.get('relays').on((r: SavedRelays) => {
       if (!r) {
         return;
       }
@@ -187,7 +183,7 @@ const Relays = {
     try {
       PubSub.relayPool.removeRelay(url);
     } catch (e) {
-      console.log("error closing relay", e);
+      console.log('error closing relay', e);
     }
     this.relays.delete(url);
   },
@@ -219,7 +215,7 @@ const Relays = {
     for (const [url, relay] of this.relays.entries()) {
       relaysObj[url] = { enabled: relay.enabled, url };
     }
-    localState.get("relays").put(relaysObj);
+    localState.get('relays').put(relaysObj);
   },
   saveToContacts() {
     const relaysObj: any = {};
@@ -239,10 +235,10 @@ const Relays = {
   updateLastSeen: throttle(
     (url) => {
       const now = Math.floor(Date.now() / 1000);
-      localState.get("relays").get(url).get("lastSeen").put(now);
+      localState.get('relays').get(url).get('lastSeen').put(now);
     },
     5 * 1000,
-    { leading: true }
+    { leading: true },
   ),
   groupFilter(filter: Filter): { name: string; groupedFilter: Filter } {
     // if filter has authors, add to subscribedAuthors and group by authors
@@ -251,7 +247,7 @@ const Relays = {
         this.subscribedProfiles.add(a);
       });
       return {
-        name: "profiles",
+        name: 'profiles',
         groupedFilter: {
           authors: Array.from(this.subscribedProfiles.values()),
           kinds: [0],
@@ -261,7 +257,7 @@ const Relays = {
     if (filter.authors) {
       filter.authors = Array.from(this.subscribedProfiles.values());
       return {
-        name: "authors",
+        name: 'authors',
         groupedFilter: {
           authors: Array.from(this.subscribedProfiles.values()),
         },
@@ -269,17 +265,17 @@ const Relays = {
     }
     if (filter.ids) {
       return {
-        name: "ids",
+        name: 'ids',
         groupedFilter: { ids: Array.from(PubSub.subscribedEventIds.values()) },
       };
     }
-    if (filter["#e"]) {
-      filter["#e"].forEach((e) => {
+    if (filter['#e']) {
+      filter['#e'].forEach((e) => {
         this.subscribedEventTags.add(e);
       });
       return {
-        name: "eventsByTag",
-        groupedFilter: { "#e": Array.from(this.subscribedEventTags.values()) },
+        name: 'eventsByTag',
+        groupedFilter: { '#e': Array.from(this.subscribedEventTags.values()) },
       };
     }
     // do not bundle. TODO console.log, limit or sth
@@ -290,7 +286,7 @@ const Relays = {
   },
 };
 
-if (window.location.pathname !== "/") {
+if (window.location.pathname !== '/') {
   Relays.init();
 }
 

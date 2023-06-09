@@ -1,26 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
-import { XMarkIcon } from "@heroicons/react/24/solid";
-import { Event } from "nostr-tools";
-import styled from "styled-components";
+import { useEffect, useMemo, useState } from 'react';
+import { XMarkIcon } from '@heroicons/react/24/solid';
+import { Event } from 'nostr-tools';
+import styled from 'styled-components';
 
-import Helpers from "../../Helpers";
-import {
-  LNURL,
-  LNURLError,
-  LNURLErrorCode,
-  LNURLInvoice,
-  LNURLSuccessAction,
-} from "../../LNURL";
-import localState from "../../LocalState";
-import Events from "../../nostr/Events";
-import Key from "../../nostr/Key";
-import Relays from "../../nostr/Relays";
-import { PrimaryButton as Button } from "../buttons/Button";
-import CopyButton from "../buttons/Copy";
-import Name from "../Name";
-import QrCode from "../QrCode";
+import Helpers from '../../Helpers';
+import { LNURL, LNURLError, LNURLErrorCode, LNURLInvoice, LNURLSuccessAction } from '../../LNURL';
+import localState from '../../LocalState';
+import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
+import Relays from '../../nostr/Relays';
+import { PrimaryButton as Button } from '../buttons/Button';
+import CopyButton from '../buttons/Copy';
+import Name from '../Name';
+import QrCode from '../QrCode';
 
-import Modal from "./Modal";
+import Modal from './Modal';
 
 // Code kindly contributed by @Kieran and @verbiricha from Snort
 
@@ -110,23 +104,15 @@ export default function SendSats(props: ZapProps) {
   const onClose = props.onClose || (() => undefined);
   const { note, recipient } = props;
   const defaultZapAmount = 1_000;
-  const amounts = [
-    defaultZapAmount,
-    5_000,
-    10_000,
-    20_000,
-    50_000,
-    100_000,
-    1_000_000,
-  ];
+  const amounts = [defaultZapAmount, 5_000, 10_000, 20_000, 50_000, 100_000, 1_000_000];
   const emojis: Record<number, string> = {
-    1_000: "👍",
-    5_000: "💜",
-    10_000: "😍",
-    20_000: "🤩",
-    50_000: "🔥",
-    100_000: "🚀",
-    1_000_000: "🤯",
+    1_000: '👍',
+    5_000: '💜',
+    10_000: '😍',
+    20_000: '🤩',
+    50_000: '🔥',
+    100_000: '🚀',
+    1_000_000: '🤯',
   };
 
   const [handler, setHandler] = useState<LNURL>();
@@ -145,11 +131,11 @@ export default function SendSats(props: ZapProps) {
     : false;
 
   useEffect(() => {
-    localState.get("defaultZapAmount").on((v) => {
+    localState.get('defaultZapAmount').on((v) => {
       const value = parseInt(v);
       setAmount(value);
       setCustomAmount(value);
-      console.log("defaultZapAmount", value);
+      console.log('defaultZapAmount', value);
     });
   });
 
@@ -182,7 +168,7 @@ export default function SendSats(props: ZapProps) {
           .then(() => {
             setCanZap(h.canZap);
           })
-          .catch((e) => handleLNURLError(e, "ln url error"));
+          .catch((e) => handleLNURLError(e, 'ln url error'));
       } catch (e) {
         if (e instanceof Error) {
           setError(e.message);
@@ -216,18 +202,18 @@ export default function SendSats(props: ZapProps) {
         created_at: Math.floor(Date.now() / 1000),
         kind: 9734,
         pubkey: Key.getPubKey(),
-        content: comment || "",
+        content: comment || '',
         tags: [
-          ["e", note],
-          ["p", recipient],
-          ["relays", ...Relays.relays.keys()],
+          ['e', note],
+          ['p', recipient],
+          ['relays', ...Relays.relays.keys()],
         ],
       };
       const id = Events.getEventHash(ev);
       ev.id = id;
       const sig = (await Key.sign(ev)) as string;
       ev = { ...ev, sig };
-      console.log("loadInvoice", ev);
+      console.log('loadInvoice', ev);
       if (ev) {
         // replace sig for anon-zap
         if (zapType === ZapType.AnonZap) {
@@ -252,20 +238,20 @@ export default function SendSats(props: ZapProps) {
         await payWithWallet(rsp);
       }
     } catch (e) {
-      handleLNURLError(e, "invoice fail");
+      handleLNURLError(e, 'invoice fail');
     }
   }
 
   function handleLNURLError(e: unknown, fallback: string) {
-    console.error("lnurl error", e);
+    console.error('lnurl error', e);
     if (e instanceof LNURLError) {
       switch (e.code) {
         case LNURLErrorCode.ServiceUnavailable: {
-          setError("messages.LNURLFail");
+          setError('messages.LNURLFail');
           return;
         }
         case LNURLErrorCode.InvalidLNURL: {
-          setError("messages.InvalidLNURL");
+          setError('messages.InvalidLNURL');
           return;
         }
       }
@@ -285,11 +271,9 @@ export default function SendSats(props: ZapProps) {
           min={min}
           max={max}
           className="f-grow mr10"
-          placeholder={"Custom"}
+          placeholder={'Custom'}
           value={customAmount}
-          onChange={(e) =>
-            setCustomAmount(parseInt((e.target as HTMLInputElement).value))
-          }
+          onChange={(e) => setCustomAmount(parseInt((e.target as HTMLInputElement).value))}
         />
         <button
           className="secondary"
@@ -308,7 +292,7 @@ export default function SendSats(props: ZapProps) {
       if (window.webln) {
         setPaying(true);
         await window.webln.enable(); // should we do this elsewhere?
-        const res = await window.webln?.sendPayment(invoice?.pr ?? "");
+        const res = await window.webln?.sendPayment(invoice?.pr ?? '');
         console.log(res);
         setSuccess(invoice?.successAction ?? {});
       }
@@ -327,7 +311,7 @@ export default function SendSats(props: ZapProps) {
       <div className="amounts">
         {amounts.map((a) => (
           <SatAmount
-            className={amount === a ? "active" : ""}
+            className={amount === a ? 'active' : ''}
             key={a}
             onClick={() => selectAmount(a)}
           >
@@ -350,13 +334,9 @@ export default function SendSats(props: ZapProps) {
           {canComment && (
             <input
               type="text"
-              placeholder={"Comment"}
+              placeholder={'Comment'}
               style="margin-bottom: 10px;margin-top: 10px;width:100%;"
-              maxLength={
-                canZap && zapType !== ZapType.NonZap
-                  ? 250
-                  : handler.maxCommentLength
-              }
+              maxLength={canZap && zapType !== ZapType.NonZap ? 250 : handler.maxCommentLength}
               onChange={(e) => setComment((e.target as HTMLInputElement).value)}
             />
           )}
@@ -396,7 +376,7 @@ export default function SendSats(props: ZapProps) {
       <>
         <div className="invoice">
           {props.notice && <b className="error">{props.notice}</b>}
-          {paying ? <h4>Paying</h4> : ""}
+          {paying ? <h4>Paying</h4> : ''}
           <div className="actions">
             {invoice && (
               <>
@@ -419,7 +399,7 @@ export default function SendSats(props: ZapProps) {
     if (!success) return null;
     return (
       <div className="success-action">
-        <p className="paid">{success?.description ?? "Paid"}</p>
+        <p className="paid">{success?.description ?? 'Paid'}</p>
         {success.url && (
           <p>
             <a href={success.url} rel="noreferrer" target="_blank">
@@ -431,7 +411,7 @@ export default function SendSats(props: ZapProps) {
     );
   }
 
-  const title = handler?.canZap ? "Send zap to " : "Send sats to ";
+  const title = handler?.canZap ? 'Send zap to ' : 'Send sats to ';
   if (!(props.show ?? false)) return null;
 
   return (
@@ -444,7 +424,7 @@ export default function SendSats(props: ZapProps) {
           <div className="lnurl-header">
             <h2>
               {props.title || title}
-              <Name pub={recipient || ""} />
+              <Name pub={recipient || ''} />
             </h2>
           </div>
           {invoiceForm()}

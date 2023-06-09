@@ -1,15 +1,15 @@
-import FeedComponent from "../components/feed/Feed";
-import OnboardingNotification from "../components/OnboardingNotification";
-import { translate as t } from "../translations/Translation.mjs";
+import FeedComponent from '../components/feed/Feed';
+import OnboardingNotification from '../components/OnboardingNotification';
+import { translate as t } from '../translations/Translation.mjs';
 
-import View from "./View";
+import View from './View';
 
 class Feed extends View {
   constructor() {
     super();
     this.state = { sortedMessages: [] };
-    this.id = "message-view";
-    this.class = "public-messages-view";
+    this.id = 'message-view';
+    this.class = 'public-messages-view';
   }
 
   componentDidMount() {
@@ -17,14 +17,14 @@ class Feed extends View {
   }
 
   renderView() {
-    const path = this.props.index || "msgs";
+    const path = this.props.index || 'msgs';
     return (
       <div class="centered-container">
         <div style="display:flex;flex-direction:row">
           <div style="flex:3;width: 100%">
             {this.props.keyword ? (
               <h2>
-                {t("search")}: "{this.props.keyword}"
+                {t('search')}: "{this.props.keyword}"
               </h2>
             ) : (
               <OnboardingNotification />
@@ -32,7 +32,7 @@ class Feed extends View {
             <FeedComponent
               scrollElement={this.scrollElement.current}
               keyword={this.props.keyword}
-              key={this.props.index || "feed"}
+              key={this.props.index || 'feed'}
               index={this.props.index}
               path={path}
             />

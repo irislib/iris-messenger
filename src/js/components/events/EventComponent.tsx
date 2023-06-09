@@ -1,18 +1,18 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from 'preact/hooks';
 
-import Icons from "../../Icons";
-import Events from "../../nostr/Events";
-import Key from "../../nostr/Key";
-import SocialNetwork from "../../nostr/SocialNetwork";
-import { translate as t } from "../../translations/Translation.mjs";
+import Icons from '../../Icons';
+import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import { translate as t } from '../../translations/Translation.mjs';
 
-import EventDropdown from "./EventDropdown";
-import Follow from "./Follow";
-import Like from "./Like";
-import Note from "./Note";
-import NoteImage from "./NoteImage";
-import Repost from "./Repost";
-import Zap from "./Zap";
+import EventDropdown from './EventDropdown';
+import Follow from './Follow';
+import Like from './Like';
+import Note from './Note';
+import NoteImage from './NoteImage';
+import Repost from './Repost';
+import Zap from './Zap';
 
 declare global {
   interface Window {
@@ -29,7 +29,7 @@ interface EventComponentProps {
   isReply?: boolean;
   isQuote?: boolean;
   isQuoting?: boolean;
-  renderAs?: "NoteImage";
+  renderAs?: 'NoteImage';
   feedOpenedAt?: number;
   fullWidth?: boolean;
 }
@@ -55,8 +55,8 @@ const EventComponent = (props: EventComponentProps) => {
     const replyingTo = Events.getNoteReplyingTo(event);
 
     const meta = {
-      npub: Key.toNostrBech32Address(event.pubkey, "npub"),
-      noteId: Key.toNostrBech32Address(event.id, "note"),
+      npub: Key.toNostrBech32Address(event.pubkey, 'npub'),
+      noteId: Key.toNostrBech32Address(event.id, 'note'),
       time: event.created_at * 1000,
       isMine: Key.getPubKey() === event.pubkey,
       attachments: [],
@@ -68,7 +68,7 @@ const EventComponent = (props: EventComponentProps) => {
 
   useEffect(() => {
     if (!props.id) {
-      console.log("error: no id", props);
+      console.log('error: no id', props);
       return;
     }
     unmounted.current = false;
@@ -109,34 +109,29 @@ const EventComponent = (props: EventComponentProps) => {
   });
 
   const renderDropdown = () => {
-    return props.asInlineQuote ? null : (
-      <EventDropdown id={props.id || ""} event={state.event} />
-    );
+    return props.asInlineQuote ? null : <EventDropdown id={props.id || ''} event={state.event} />;
   };
 
   const getClassName = () => {
-    let className = "msg";
-    if (props.standalone) className += " standalone";
-    const isQuote =
-      props.isQuote || (props.showReplies && state.sortedReplies?.length);
-    if (isQuote) className += " quote";
+    let className = 'msg';
+    if (props.standalone) className += ' standalone';
+    const isQuote = props.isQuote || (props.showReplies && state.sortedReplies?.length);
+    if (isQuote) className += ' quote';
     return className;
   };
 
   if (!props.id) {
-    console.error("no id on event", props);
+    console.error('no id on event', props);
     return null;
   }
   if (!state.event) {
     return (
       <div key={props.id} className={getClassName()}>
         <div
-          className={`msg-content retrieving ${
-            state.retrieving ? "visible" : ""
-          }`}
-          style={{ display: "flex", alignItems: "center" }}
+          className={`msg-content retrieving ${state.retrieving ? 'visible' : ''}`}
+          style={{ display: 'flex', alignItems: 'center' }}
         >
-          <div className="text">{t("looking_up_message")}</div>
+          <div className="text">{t('looking_up_message')}</div>
           <div>{renderDropdown()}</div>
         </div>
       </div>
@@ -148,8 +143,8 @@ const EventComponent = (props: EventComponentProps) => {
       return (
         <div className="msg">
           <div className="msg-content">
-            <p style={{ display: "flex", alignItems: "center" }}>
-              <i style={{ marginRight: "15px" }}>{Icons.newFollower}</i>
+            <p style={{ display: 'flex', alignItems: 'center' }}>
+              <i style={{ marginRight: '15px' }}>{Icons.newFollower}</i>
               <span> Message from a blocked user</span>
             </p>
           </div>
@@ -165,7 +160,7 @@ const EventComponent = (props: EventComponentProps) => {
 
     if (state.event.kind === 1) {
       const mentionIndex = state.event?.tags?.findIndex(
-        (tag) => tag[0] === "e" && tag[3] === "mention"
+        (tag) => tag[0] === 'e' && tag[3] === 'mention',
       );
       if (state.event?.content === `#[${mentionIndex}]`) {
         Component = Repost;
@@ -180,12 +175,12 @@ const EventComponent = (props: EventComponentProps) => {
       }[state.event.kind];
     }
 
-    if (props.renderAs === "NoteImage") {
+    if (props.renderAs === 'NoteImage') {
       Component = NoteImage;
     }
 
     if (!Component) {
-      console.error("unknown event kind", state.event);
+      console.error('unknown event kind', state.event);
       return null;
     }
 
@@ -196,9 +191,7 @@ const EventComponent = (props: EventComponentProps) => {
         event={state.event}
         meta={state.meta}
         fullWidth={props.fullWidth}
-        fadeIn={
-          !props.feedOpenedAt || props.feedOpenedAt < state.event.created_at
-        }
+        fadeIn={!props.feedOpenedAt || props.feedOpenedAt < state.event.created_at}
         {...props}
       />
     );

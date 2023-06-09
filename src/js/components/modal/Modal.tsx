@@ -1,5 +1,5 @@
-import { FC, useEffect } from "react";
-import styled from "styled-components";
+import { FC, useEffect } from 'react';
+import styled from 'styled-components';
 
 type Props = {
   onClose?: () => void;
@@ -21,7 +21,7 @@ const Overlay = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: ${(props) =>
-    props.centerVertically ? "center" : props.justifyContent || "flex-start"};
+    props.centerVertically ? 'center' : props.justifyContent || 'flex-start'};
   align-items: center;
   overflow-y: auto;
   overflow-x: hidden;
@@ -29,8 +29,8 @@ const Overlay = styled.div`
 `;
 
 const ModalContentContainer = styled.div<{ width?: string; height?: string }>`
-  width: ${(props) => props.width || "auto"};
-  height: ${(props) => props.height || "auto"};
+  width: ${(props) => props.width || 'auto'};
+  height: ${(props) => props.height || 'auto'};
   max-height: calc(100% - 40px);
   overflow-y: auto;
   display: flex;
@@ -47,7 +47,7 @@ const Modal: FC<Props> = ({
   onClose,
 }) => {
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       onClose?.();
     }
   };
@@ -62,19 +62,19 @@ const Modal: FC<Props> = ({
   };
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);
 
   const content = showContainer ? (
     <div
       class="msg"
-      style={{ width: "600px", "max-width": "calc(100vw - 40px)" }}
+      style={{ width: '600px', 'max-width': 'calc(100vw - 40px)' }}
       onClick={(e) => handleContainerClick(e)}
     >
-      <div class="msg-content" style={{ padding: "30px" }}>
+      <div class="msg-content" style={{ padding: '30px' }}>
         {children}
       </div>
     </div>

@@ -1,23 +1,23 @@
-import $ from "jquery";
-import { debounce } from "lodash";
-import isEqual from "lodash/isEqual";
-import { route } from "preact-router";
+import $ from 'jquery';
+import { debounce } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import { route } from 'preact-router';
 
-import Component from "../BaseComponent";
-import FuzzySearch from "../FuzzySearch";
-import localState from "../LocalState";
-import Events from "../nostr/Events";
-import Key from "../nostr/Key";
-import { translate as t } from "../translations/Translation.mjs";
+import Component from '../BaseComponent';
+import FuzzySearch from '../FuzzySearch';
+import localState from '../LocalState';
+import Events from '../nostr/Events';
+import Key from '../nostr/Key';
+import { translate as t } from '../translations/Translation.mjs';
 
-import Identicon from "./Identicon";
-import Name from "./Name";
-import SafeImg from "./SafeImg";
+import Identicon from './Identicon';
+import Name from './Name';
+import SafeImg from './SafeImg';
 
 const RESULTS_MAX = 5;
 
 type Props = {
-  onSelect?: (result: Pick<ResultItem, "key">) => void;
+  onSelect?: (result: Pick<ResultItem, 'key'>) => void;
   query?: string;
   focus?: boolean;
   resultsOnly?: boolean;
@@ -51,7 +51,7 @@ class SearchBox extends Component<Props, State> {
     super();
     this.state = {
       results: [],
-      query: "",
+      query: '',
       showFollowSuggestions: true,
       offsetLeft: 0,
       selected: -1, // -1 - 'search by keyword'
@@ -74,29 +74,29 @@ class SearchBox extends Component<Props, State> {
   }
 
   close() {
-    $(this.base).find("input").val("");
-    this.setState({ results: [], query: "" });
+    $(this.base).find('input').val('');
+    this.setState({ results: [], query: '' });
   }
 
   componentDidMount() {
-    localState.get("showFollowSuggestions").on(this.inject());
-    localState.get("searchIndexUpdated").on(this.sub(() => this.search()));
-    localState.get("activeRoute").on(
+    localState.get('showFollowSuggestions').on(this.inject());
+    localState.get('searchIndexUpdated').on(this.sub(() => this.search()));
+    localState.get('activeRoute').on(
       this.sub(() => {
         this.close();
-      })
+      }),
     );
     this.adjustResultsPosition();
     this.search();
     $(document)
-      .off("keydown")
-      .on("keydown", (e) => {
-        if (e.key === "Tab" && document.activeElement?.tagName === "BODY") {
+      .off('keydown')
+      .on('keydown', (e) => {
+        if (e.key === 'Tab' && document.activeElement?.tagName === 'BODY') {
           e.preventDefault();
-          $(this.base).find("input").focus();
-        } else if (e.key === "Escape") {
+          $(this.base).find('input').focus();
+        } else if (e.key === 'Escape') {
           this.close();
-          $(this.base).find("input").blur();
+          $(this.base).find('input').blur();
         }
       });
   }
@@ -104,7 +104,7 @@ class SearchBox extends Component<Props, State> {
   componentDidUpdate(prevProps, prevState) {
     this.adjustResultsPosition();
     if (prevProps.focus !== this.props.focus) {
-      $(this.base).find("input:visible").focus();
+      $(this.base).find('input:visible').focus();
     }
     if (prevProps.query !== this.props.query) {
       this.search();
@@ -114,7 +114,7 @@ class SearchBox extends Component<Props, State> {
       this.state.selected >= 0 &&
       !isEqual(
         this.state.results.slice(0, this.state.selected + 1),
-        prevState.results.slice(0, this.state.selected + 1)
+        prevState.results.slice(0, this.state.selected + 1),
       )
     ) {
       this.setState({ selected: -1 });
@@ -123,11 +123,11 @@ class SearchBox extends Component<Props, State> {
 
   // remove keyup listener on unmount
   componentWillUnmount() {
-    $(document).off("keyup");
+    $(document).off('keyup');
   }
 
   adjustResultsPosition() {
-    const input = $(this.base).find("input");
+    const input = $(this.base).find('input');
     if (input.length) {
       this.setState({ offsetLeft: input[0].offsetLeft });
     }
@@ -135,11 +135,11 @@ class SearchBox extends Component<Props, State> {
 
   onSubmit(e) {
     e.preventDefault();
-    const el = $(this.base).find("input");
-    el.val("");
-    el.trigger("blur");
+    const el = $(this.base).find('input');
+    el.val('');
+    el.trigger('blur');
     // TODO go to first result
-    const selected = $(this.base).find(".result.selected");
+    const selected = $(this.base).find('.result.selected');
     if (selected.length) {
       selected[0].click();
     }
@@ -164,17 +164,14 @@ class SearchBox extends Component<Props, State> {
   }, 500);
 
   search() {
-    let query =
-      this.props.query ||
-      ($(this.base).find("input").first().val() as string) ||
-      "";
+    let query = this.props.query || ($(this.base).find('input').first().val() as string) || '';
     query = query.toString().trim().toLowerCase();
     if (!query) {
       this.close();
       return;
     }
     if (query.match(/nsec1[a-zA-Z0-9]{30,65}/gi)) {
-      $(this.base).find("input").first().val("");
+      $(this.base).find('input').first().val('');
       return;
     }
 
@@ -185,32 +182,29 @@ class SearchBox extends Component<Props, State> {
           // if query hasn't changed since we started the request
           if (
             pubKey &&
-            query ===
-              String(
-                this.props.query || $(this.base).find("input").first().val()
-              )
+            query === String(this.props.query || $(this.base).find('input').first().val())
           ) {
             this.props.onSelect?.({ key: pubKey });
           }
         });
       }
 
-      if (query.startsWith("https://iris.to/")) {
-        const path = query.replace("https://iris.to", "");
+      if (query.startsWith('https://iris.to/')) {
+        const path = query.replace('https://iris.to', '');
         route(path);
         return;
       }
       const noteMatch = query.match(/note[a-zA-Z0-9]{59,60}/gi);
       if (noteMatch) {
-        route("/" + noteMatch[0]);
+        route('/' + noteMatch[0]);
         return;
       }
       const npubMatch = query.match(/npub[a-zA-Z0-9]{59,60}/gi);
       if (npubMatch) {
-        route("/" + npubMatch[0]);
+        route('/' + npubMatch[0]);
         return;
       }
-      const s = query.split("/profile/");
+      const s = query.split('/profile/');
       if (s.length > 1) {
         return this.props.onSelect({ key: s[1] });
       }
@@ -246,7 +240,7 @@ class SearchBox extends Component<Props, State> {
     return (
       <div class={`search-box ${this.props.class}`}>
         {this.props.resultsOnly ? (
-          ""
+          ''
         ) : (
           <form onSubmit={(e) => this.onSubmit(e)}>
             <label>
@@ -255,7 +249,7 @@ class SearchBox extends Component<Props, State> {
                 onKeyPress={(e) => this.preventUpDownDefault(e)}
                 onKeyDown={(e) => this.preventUpDownDefault(e)}
                 onKeyUp={(e) => this.onKeyUp(e)}
-                placeholder={t("search")}
+                placeholder={t('search')}
                 tabIndex={1}
                 onInput={() => this.onInput()}
               />
@@ -271,9 +265,7 @@ class SearchBox extends Component<Props, State> {
             <a
               onFocus={(e) => this.onResultFocus(e, -1)}
               tabIndex={2}
-              className={
-                "result " + (-1 === this.state.selected ? "selected" : "")
-              }
+              className={'result ' + (-1 === this.state.selected ? 'selected' : '')}
               href={`/search/${encodeURIComponent(this.state.query)}`}
             >
               <div class="identicon-container">
@@ -282,32 +274,30 @@ class SearchBox extends Component<Props, State> {
               <div>
                 <span>{this.state.query}</span>
                 <br />
-                <small>{t("search_posts")}</small>
+                <small>{t('search_posts')}</small>
               </div>
             </a>
           ) : (
-            ""
+            ''
           )}
           {this.state.results.map((r, index) => {
             const i = r.item;
-            let followText = "";
+            let followText = '';
             if (i.followers) {
               if (i.followDistance === 0) {
-                followText = t("you");
+                followText = t('you');
               } else if (i.followDistance === 1) {
-                followText = t("following");
+                followText = t('following');
               } else {
-                followText = `${i.followers.size} ${t("followers")}`;
+                followText = `${i.followers.size} ${t('followers')}`;
               }
             }
-            const npub = Key.toNostrBech32Address(i.key, "npub");
+            const npub = Key.toNostrBech32Address(i.key, 'npub');
             return (
               <a
                 onFocus={(e) => this.onResultFocus(e, index)}
                 tabIndex={2}
-                className={
-                  "result " + (index === this.state.selected ? "selected" : "")
-                }
+                className={'result ' + (index === this.state.selected ? 'selected' : '')}
                 href={`/${npub}`}
                 onClick={(e) => this.onClick(e, i)}
               >
@@ -319,7 +309,7 @@ class SearchBox extends Component<Props, State> {
                   <Identicon key={`${npub}ic`} str={npub} width={40} />
                 )}
                 <div>
-                  <Name pub={i.key} key={i.key + "searchResult"} />
+                  <Name pub={i.key} key={i.key + 'searchResult'} />
                   <br />
                   <small>{followText}</small>
                 </div>

@@ -1,5 +1,5 @@
-import { JSX } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import { JSX } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
 
 type Props = {
   children: JSX.Element | JSX.Element[];
@@ -10,9 +10,9 @@ const Dropdown = ({ children }: Props) => {
 
   const toggle = (e: MouseEvent, newOpenState: boolean) => {
     if (
-      e.type === "click" &&
+      e.type === 'click' &&
       e.target !== null &&
-      !(e.target as HTMLElement).classList.contains("dropbtn")
+      !(e.target as HTMLElement).classList.contains('dropbtn')
     ) {
       return;
     }
@@ -23,18 +23,15 @@ const Dropdown = ({ children }: Props) => {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        e.target &&
-        !(e.target as HTMLElement).classList.contains("dropbtn")
-      ) {
+      if (e.target && !(e.target as HTMLElement).classList.contains('dropbtn')) {
         setOpen(false);
       }
     };
 
-    document.addEventListener("click", handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
 
     return () => {
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     };
   }, []);
 
@@ -46,7 +43,7 @@ const Dropdown = ({ children }: Props) => {
       onMouseLeave={(e) => toggle(e, false)}
     >
       <div class="dropbtn">…</div>
-      {open ? <div class="dropdown-content">{children}</div> : ""}
+      {open ? <div class="dropdown-content">{children}</div> : ''}
     </div>
   );
 };

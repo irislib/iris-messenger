@@ -1,21 +1,21 @@
-import { debounce } from "lodash";
-import { createRef, JSX } from "preact";
+import { debounce } from 'lodash';
+import { createRef, JSX } from 'preact';
 
-import Component from "../BaseComponent";
-import ErrorBoundary from "../components/ErrorBoundary";
-import Header from "../components/Header";
+import Component from '../BaseComponent';
+import ErrorBoundary from '../components/ErrorBoundary';
+import Header from '../components/Header';
 
 let isInitialLoad = true;
 const listener = function () {
   isInitialLoad = false;
-  window.removeEventListener("popstate", listener);
+  window.removeEventListener('popstate', listener);
 };
-window.addEventListener("popstate", listener);
+window.addEventListener('popstate', listener);
 
 abstract class View extends Component {
   scrollElement = createRef();
-  class = "";
-  id = "";
+  class = '';
+  id = '';
   observer: ResizeObserver | null = null;
   scrollPosition = 0;
 
@@ -46,7 +46,7 @@ abstract class View extends Component {
         ...currentHistoryState,
         scrollPosition,
       };
-      window.history.replaceState(newHistoryState, "");
+      window.history.replaceState(newHistoryState, '');
     }
   }, 100);
 
@@ -68,7 +68,7 @@ abstract class View extends Component {
         ...oldState,
         previousState: currentHistoryState,
       };
-      window.history.replaceState(newHistoryState, "");
+      window.history.replaceState(newHistoryState, '');
     }
   }
 

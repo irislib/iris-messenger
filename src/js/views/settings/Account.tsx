@@ -1,21 +1,21 @@
-import { html } from "htm/preact";
-import { nip19 } from "nostr-tools";
-import { route } from "preact-router";
+import { html } from 'htm/preact';
+import { nip19 } from 'nostr-tools';
+import { route } from 'preact-router';
 
-import Component from "../../BaseComponent";
-import { PrimaryButton as Button } from "../../components/buttons/Button";
-import Copy from "../../components/buttons/Copy";
-import Helpers from "../../Helpers";
-import Events from "../../nostr/Events";
-import Key from "../../nostr/Key";
-import Session from "../../nostr/Session";
-import { translate as t } from "../../translations/Translation.mjs";
-import { ExistingAccountLogin } from "../Login";
+import Component from '../../BaseComponent';
+import { PrimaryButton as Button } from '../../components/buttons/Button';
+import Copy from '../../components/buttons/Copy';
+import Helpers from '../../Helpers';
+import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
+import Session from '../../nostr/Session';
+import { translate as t } from '../../translations/Translation.mjs';
+import { ExistingAccountLogin } from '../Login';
 
 export default class Account extends Component {
   onLogoutClick(hasPriv) {
     if (hasPriv) {
-      route("/logout"); // confirmation screen
+      route('/logout'); // confirmation screen
     } else {
       Session.logOut();
     }
@@ -28,7 +28,7 @@ export default class Account extends Component {
   }
 
   deleteAccount() {
-    if (confirm(`${t("delete_account")}?`)) {
+    if (confirm(`${t('delete_account')}?`)) {
       Events.publish({
         kind: 0,
         content: JSON.stringify({ deleted: true }),
@@ -58,19 +58,16 @@ export default class Account extends Component {
     return (
       <>
         <div class="centered-container">
-          <h2>{t("account")}</h2>
+          <h2>{t('account')}</h2>
           <p>
             {hasPriv ? (
               <>
-                <b>{t("save_backup_of_privkey_first")}</b>{" "}
-                {t("otherwise_cant_log_in_again")}
+                <b>{t('save_backup_of_privkey_first')}</b> {t('otherwise_cant_log_in_again')}
               </>
             ) : null}
           </p>
           <p>
-            <Button onClick={() => this.onLogoutClick(hasPriv)}>
-              {t("log_out")}
-            </Button>
+            <Button onClick={() => this.onLogoutClick(hasPriv)}>{t('log_out')}</Button>
             <Button
               onClick={() =>
                 this.setState({
@@ -78,7 +75,7 @@ export default class Account extends Component {
                 })
               }
             >
-              {t("switch_account")}
+              {t('switch_account')}
             </Button>
           </p>
           {this.state.showSwitchAccount
@@ -88,13 +85,13 @@ export default class Account extends Component {
                 </p>
                 <p>
                   <a href="" onClick=${(e) => this.onExtensionLoginClick(e)}>
-                    ${t("nostr_extension_login")}
+                    ${t('nostr_extension_login')}
                   </a>
                 </p>
               `
-            : ""}
+            : ''}
 
-          <h3>{t("public_key")}</h3>
+          <h3>{t('public_key')}</h3>
           <p>
             <small>{myNpub}</small>
           </p>
@@ -102,7 +99,7 @@ export default class Account extends Component {
             <Copy copyStr={myNpub} text="Copy npub" />
             <Copy copyStr={myPub} text="Copy hex" />
           </p>
-          <h3>{t("private_key")}</h3>
+          <h3>{t('private_key')}</h3>
           <p>
             {myPrivHex ? (
               <>
@@ -110,18 +107,16 @@ export default class Account extends Component {
                 <Copy copyStr={myPrivHex} text="Copy hex" />
               </>
             ) : (
-              <p>{t("private_key_not_present_good")}</p>
+              <p>{t('private_key_not_present_good')}</p>
             )}
           </p>
-          {myPrivHex ? <p>{t("private_key_warning")}</p> : ""}
+          {myPrivHex ? <p>{t('private_key_warning')}</p> : ''}
 
           {Helpers.isStandalone() ? (
             <>
-              <h3>{t("delete_account")}</h3>
+              <h3>{t('delete_account')}</h3>
               <p>
-                <Button onClick={() => this.deleteAccount()}>
-                  {t("delete_account")}
-                </Button>
+                <Button onClick={() => this.deleteAccount()}>{t('delete_account')}</Button>
               </p>
             </>
           ) : null}

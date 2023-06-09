@@ -1,9 +1,9 @@
-import localState from "../LocalState";
+import localState from '../LocalState';
 
-import Events from "./Events";
-import Key from "./Key";
-import LocalForage from "./LocalForage";
-import PubSub, { Unsubscribe } from "./PubSub";
+import Events from './Events';
+import Key from './Key';
+import LocalForage from './LocalForage';
+import PubSub, { Unsubscribe } from './PubSub';
 
 export default {
   followDistanceByUser: new Map<string, number>(),
@@ -14,12 +14,12 @@ export default {
   blockedUsers: new Set<string>(),
   flaggedUsers: new Set<string>(),
   setFollowed: function (followedUsers: string | string[], follow = true) {
-    if (typeof followedUsers === "string") {
+    if (typeof followedUsers === 'string') {
       followedUsers = [followedUsers];
     }
     const myPub = Key.getPubKey();
     followedUsers.forEach((followedUser) => {
-      followedUser = Key.toNostrHexAddress(followedUser) || "";
+      followedUser = Key.toNostrHexAddress(followedUser) || '';
       if (follow && followedUser && followedUser !== myPub) {
         this.addFollower(followedUser, myPub);
       } else {
@@ -31,19 +31,17 @@ export default {
 
     const event = {
       kind: 3,
-      content: existing?.content || "",
-      tags: Array.from(this.followedByUser.get(myPub) || []).map(
-        (address: string) => {
-          return ["p", address];
-        }
-      ),
+      content: existing?.content || '',
+      tags: Array.from(this.followedByUser.get(myPub) || []).map((address: string) => {
+        return ['p', address];
+      }),
     };
 
     Events.publish(event);
   },
 
   setBlocked: function (blockedUser: string, block = true) {
-    blockedUser = Key.toNostrHexAddress(blockedUser) || "";
+    blockedUser = Key.toNostrHexAddress(blockedUser) || '';
     const myPub = Key.getPubKey();
 
     if (block) {
@@ -63,11 +61,7 @@ export default {
       let unsub;
       // TODO subscribe once param?
       // eslint-disable-next-line prefer-const
-      unsub = PubSub.subscribe(
-        { authors: [user], kinds: [0] },
-        () => unsub?.(),
-        true
-      );
+      unsub = PubSub.subscribe({ authors: [user], kinds: [0] }, () => unsub?.(), true);
     }
     this.usersByFollowDistance.get(distance)?.add(user);
     // remove from higher distances
@@ -79,16 +73,13 @@ export default {
   },
 
   addFollower: function (followedUser: string, follower: string) {
-    if (followedUser.startsWith("npub")) {
-      console.error(
-        "addFollower: followedUser is not a hex address",
-        followedUser
-      );
-      followedUser = Key.toNostrHexAddress(followedUser) || "";
+    if (followedUser.startsWith('npub')) {
+      console.error('addFollower: followedUser is not a hex address', followedUser);
+      followedUser = Key.toNostrHexAddress(followedUser) || '';
     }
-    if (follower.startsWith("npub")) {
-      console.error("addFollower: follower is not a hex address", follower);
-      follower = Key.toNostrHexAddress(follower) || "";
+    if (follower.startsWith('npub')) {
+      console.error('addFollower: follower is not a hex address', follower);
+      follower = Key.toNostrHexAddress(follower) || '';
     }
 
     if (!this.followersByUser.has(followedUser)) {
@@ -112,14 +103,10 @@ export default {
       }
       this.followDistanceByUser.set(followedUser, newFollowDistance);
     } else {
-      const existingFollowDistance =
-        this.followDistanceByUser.get(followedUser);
+      const existingFollowDistance = this.followDistanceByUser.get(followedUser);
       const followerDistance = this.followDistanceByUser.get(follower);
       newFollowDistance = followerDistance && followerDistance + 1;
-      if (
-        !existingFollowDistance ||
-        newFollowDistance < existingFollowDistance
-      ) {
+      if (!existingFollowDistance || newFollowDistance < existingFollowDistance) {
         this.followDistanceByUser.set(followedUser, newFollowDistance);
         this.addUserByFollowDistance(newFollowDistance, followedUser);
       }
@@ -128,7 +115,7 @@ export default {
     this.followedByUser.get(follower)?.add(followedUser);
     if (followedUser === myPub) {
       if (this.followersByUser.get(followedUser)?.size === 1) {
-        localState.get("hasNostrFollowers").put(true);
+        localState.get('hasNostrFollowers').put(true);
       }
     }
     if (this.followedByUser.get(myPub)?.has(follower)) {
@@ -146,8 +133,7 @@ export default {
     // iterate over remaining followers and set the smallest follow distance
     let smallest = 1000;
     for (const follower of this.followersByUser.get(unfollowedUser) || []) {
-      const distance =
-        (this.followDistanceByUser.get(follower) || Infinity) + 1;
+      const distance = (this.followDistanceByUser.get(follower) || Infinity) + 1;
       if (distance && distance < smallest) {
         smallest = distance;
       }
@@ -187,9 +173,7 @@ export default {
     return count;
   },
   block: async function (address: string, isBlocked: boolean) {
-    isBlocked
-      ? this.blockedUsers.add(address)
-      : this.blockedUsers.delete(address);
+    isBlocked ? this.blockedUsers.add(address) : this.blockedUsers.delete(address);
     let content: any = JSON.stringify(Array.from(this.blockedUsers));
     content = await Key.encrypt(content);
     Events.publish({
@@ -200,9 +184,7 @@ export default {
     });
   },
   flag: function (address: string, isFlagged: boolean) {
-    isFlagged
-      ? this.flaggedUsers.add(address)
-      : this.flaggedUsers.delete(address);
+    isFlagged ? this.flaggedUsers.add(address) : this.flaggedUsers.delete(address);
     Events.publish({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -232,7 +214,7 @@ export default {
   },
   getFollowedByUser: function (
     user: string,
-    cb?: (followedUsers: Set<string>) => void
+    cb?: (followedUsers: Set<string>) => void,
   ): Unsubscribe {
     const callback = () => {
       cb?.(this.followedByUser.get(user) ?? new Set());
@@ -242,19 +224,19 @@ export default {
   },
   getFollowersByUser: function (
     address: string,
-    cb?: (followers: Set<string>) => void
+    cb?: (followers: Set<string>) => void,
   ): Unsubscribe {
     const callback = () => {
       cb?.(this.followersByUser.get(address) ?? new Set());
     };
     this.followersByUser.has(address) && callback();
-    return PubSub.subscribe({ kinds: [3], "#p": [address] }, callback); // TODO this doesn't fire when a user is unfollowed
+    return PubSub.subscribe({ kinds: [3], '#p': [address] }, callback); // TODO this doesn't fire when a user is unfollowed
   },
   // TODO param "proxyFirst" to skip relays if http proxy responds quickly
   getProfile(
     address,
     cb?: (profile: any, address: string) => void,
-    verifyNip05 = false
+    verifyNip05 = false,
   ): Unsubscribe {
     const callback = () => {
       cb?.(this.profiles.get(address), address);
@@ -266,12 +248,7 @@ export default {
       callback();
       if (verifyNip05 && profile.nip05 && !profile.nip05valid) {
         Key.verifyNip05Address(profile.nip05, address).then((isValid) => {
-          console.log(
-            "NIP05 address is valid?",
-            isValid,
-            profile.nip05,
-            address
-          );
+          console.log('NIP05 address is valid?', isValid, profile.nip05, address);
           profile.nip05valid = isValid;
           this.profiles.set(address, profile);
           callback();
@@ -288,11 +265,7 @@ export default {
         }
       });
     }
-    return PubSub.subscribe(
-      { kinds: [0], authors: [address] },
-      callback,
-      false
-    );
+    return PubSub.subscribe({ kinds: [0], authors: [address] }, callback, false);
   },
   setMetadata(data: any) {
     const event = {

@@ -1,13 +1,13 @@
-import { sha256 } from "@noble/hashes/sha256";
-import Identicon from "identicon.js";
-import styled from "styled-components";
+import { sha256 } from '@noble/hashes/sha256';
+import Identicon from 'identicon.js';
+import styled from 'styled-components';
 
-import Component from "../BaseComponent";
-import Key from "../nostr/Key";
-import { Unsubscribe } from "../nostr/PubSub";
-import SocialNetwork from "../nostr/SocialNetwork";
+import Component from '../BaseComponent';
+import Key from '../nostr/Key';
+import { Unsubscribe } from '../nostr/PubSub';
+import SocialNetwork from '../nostr/SocialNetwork';
 
-import SafeImg from "./SafeImg";
+import SafeImg from './SafeImg';
 
 type Props = {
   str: unknown;
@@ -45,8 +45,8 @@ class MyIdenticon extends Component<Props, State> {
     const hash = sha256(this.props.str as string);
     // convert to hex
     const hex = Array.from(new Uint8Array(hash))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
 
     const identicon = new Identicon(hex, {
       width: this.props.width,
@@ -91,22 +91,20 @@ class MyIdenticon extends Component<Props, State> {
   render() {
     const width = this.props.width;
     const activity =
-      ["online", "active"].indexOf(this.state.activity ?? "") > -1
-        ? this.state.activity
-        : "";
+      ['online', 'active'].indexOf(this.state.activity ?? '') > -1 ? this.state.activity : '';
     const hasPicture =
       this.state.picture &&
       !this.state.hasError &&
       !this.props.hidePicture &&
       !SocialNetwork.blockedUsers.has(this.props.str as string);
-    const hasPictureStyle = hasPicture ? "has-picture" : "";
-    const showTooltip = this.props.showTooltip ? "tooltip" : "";
+    const hasPictureStyle = hasPicture ? 'has-picture' : '';
+    const showTooltip = this.props.showTooltip ? 'tooltip' : '';
 
     return (
       <IdenticonContainer
         width={width}
         onClick={this.props.onClick}
-        style={{ cursor: this.props.onClick ? "pointer" : undefined }}
+        style={{ cursor: this.props.onClick ? 'pointer' : undefined }}
         className={`identicon-container ${hasPictureStyle} ${showTooltip} ${activity}`}
       >
         <div class="identicon">
@@ -115,21 +113,17 @@ class MyIdenticon extends Component<Props, State> {
               src={this.state.picture as string}
               width={width}
               square={true}
-              style={{ objectFit: "cover" }}
+              style={{ objectFit: 'cover' }}
               onError={() => this.setState({ hasError: true })}
             />
           ) : (
-            <img
-              width={width}
-              style="max-width:100%"
-              src={this.state.identicon || ""}
-            />
+            <img width={width} style="max-width:100%" src={this.state.identicon || ''} />
           )}
         </div>
         {this.props.showTooltip && this.state.name ? (
           <span class="tooltiptext">{this.state.name}</span>
         ) : (
-          ""
+          ''
         )}
       </IdenticonContainer>
     );

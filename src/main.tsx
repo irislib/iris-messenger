@@ -1,7 +1,7 @@
-import { render } from "preact";
+import { render } from 'preact';
 
-import Main from "./js/Main";
+import Main from './js/Main';
 
-import "./index.css";
+import './index.css';
 
-render(<Main />, document.getElementById("app") as HTMLElement);
+render(<Main />, document.getElementById('app') as HTMLElement);

@@ -28,7 +28,7 @@ class EventMetaStore {
   }
 
   _normalizeURL(url: string) {
-    return url.trim().replace(/\/$/, "");
+    return url.trim().replace(/\/$/, '');
   }
 }
 

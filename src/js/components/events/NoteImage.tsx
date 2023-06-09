@@ -1,14 +1,14 @@
-import { memo, useState } from "react";
-import { Event } from "nostr-tools";
-import { JSX } from "preact";
-import styled, { css, keyframes } from "styled-components";
+import { memo, useState } from 'react';
+import { Event } from 'nostr-tools';
+import { JSX } from 'preact';
+import styled, { css, keyframes } from 'styled-components';
 
-import Icons from "../../Icons";
-import Events from "../../nostr/Events";
-import Key from "../../nostr/Key";
+import Icons from '../../Icons';
+import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
 
-import EventComponent from "./EventComponent";
-import NoteImageModal from "./NoteImageModal";
+import EventComponent from './EventComponent';
+import NoteImageModal from './NoteImageModal';
 
 const fadeIn = keyframes`
   from {
@@ -21,12 +21,12 @@ const fadeIn = keyframes`
 `;
 
 function VideoIcon({ attachment }): JSX.Element {
-  return attachment.type === "video" ? (
+  return attachment.type === 'video' ? (
     <div
       style={{
-        position: "absolute",
-        top: "8px",
-        right: "8px",
+        position: 'absolute',
+        top: '8px',
+        right: '8px',
       }}
     >
       {Icons.video}
@@ -44,7 +44,7 @@ const GalleryImage = styled.a`
   background-position: center;
   background-color: #ccc;
   background-image: url(${(props) =>
-    props.attachment?.type === "video"
+    props.attachment?.type === 'video'
       ? `https://imgproxy.iris.to/thumbnail/428/${props.attachment.url}`
       : `https://imgproxy.iris.to/insecure/rs:fill:428:428/plain/${props.attachment.url}`});
   & .dropdown {
@@ -74,7 +74,7 @@ const GalleryImage = styled.a`
       ? css`
           ${fadeIn} 0.5s ease-in-out forwards
         `
-      : "none"};
+      : 'none'};
 `;
 
 function NoteImage(props: { event: Event; fadeIn?: boolean }) {
@@ -92,21 +92,15 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
       try {
         parsedUrl = new URL(url);
       } catch (e) {
-        console.log("invalid url", url);
+        console.log('invalid url', url);
         return;
       }
-      if (
-        parsedUrl.pathname.toLowerCase().match(/\.(jpg|jpeg|gif|png|webp)$/)
-      ) {
-        attachments.push({ type: "image", url: parsedUrl.href });
+      if (parsedUrl.pathname.toLowerCase().match(/\.(jpg|jpeg|gif|png|webp)$/)) {
+        attachments.push({ type: 'image', url: parsedUrl.href });
       }
       // videos
-      if (
-        parsedUrl.pathname
-          .toLowerCase()
-          .match(/\.(mp4|mkv|avi|flv|wmv|mov|webm)$/)
-      ) {
-        attachments.push({ type: "video", url: parsedUrl.href });
+      if (parsedUrl.pathname.toLowerCase().match(/\.(mp4|mkv|avi|flv|wmv|mov|webm)$/)) {
+        attachments.push({ type: 'video', url: parsedUrl.href });
       }
     });
   }
@@ -125,7 +119,7 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
       {attachments.map((attachment, i) => (
         <>
           <GalleryImage
-            href={`/${Key.toNostrBech32Address(props.event.id, "note")}`}
+            href={`/${Key.toNostrBech32Address(props.event.id, 'note')}`}
             key={props.event.id + i}
             onClick={(e) => onClick(e, i)}
             attachment={attachment}

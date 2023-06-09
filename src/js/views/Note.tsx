@@ -1,20 +1,20 @@
-import { route } from "preact-router";
+import { route } from 'preact-router';
 
-import EventComponent from "../components/events/EventComponent";
-import PublicMessageForm from "../components/PublicMessageForm";
-import Key from "../nostr/Key";
-import { translate as t } from "../translations/Translation.mjs";
+import EventComponent from '../components/events/EventComponent';
+import PublicMessageForm from '../components/PublicMessageForm';
+import Key from '../nostr/Key';
+import { translate as t } from '../translations/Translation.mjs';
 
-import View from "./View";
+import View from './View';
 
 class Note extends View {
   constructor() {
     super();
-    this.class = "public-messages-view";
+    this.class = 'public-messages-view';
   }
 
   componentDidMount() {
-    const nostrBech32Id = Key.toNostrBech32Address(this.props.id, "note");
+    const nostrBech32Id = Key.toNostrBech32Address(this.props.id, 'note');
     if (nostrBech32Id && this.props.id !== nostrBech32Id) {
       route(`/${nostrBech32Id}`, true);
       return;
@@ -30,14 +30,14 @@ class Note extends View {
 
   renderView() {
     let content;
-    if (this.props.id === "new") {
+    if (this.props.id === 'new') {
       content = (
         <div className="mar-top15">
           <PublicMessageForm
-            placeholder={t("whats_on_your_mind")}
+            placeholder={t('whats_on_your_mind')}
             forceAutofocusMobile={true}
             autofocus={true}
-            onSubmit={() => route("/")}
+            onSubmit={() => route('/')}
           />
         </div>
       );

@@ -1,10 +1,10 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState } from 'preact/hooks';
 
-import Helpers from "../../Helpers";
-import { translate as t } from "../../translations/Translation.mjs";
-import { OptionalGetter } from "../../types";
+import Helpers from '../../Helpers';
+import { translate as t } from '../../translations/Translation.mjs';
+import { OptionalGetter } from '../../types';
 
-import { PrimaryButton as Button } from "./Button";
+import { PrimaryButton as Button } from './Button';
 
 type Props = {
   copyStr: OptionalGetter<string>;
@@ -13,12 +13,8 @@ type Props = {
 
 const Copy = ({ copyStr, text }: Props) => {
   const [copied, setCopied] = useState(false);
-  const [originalWidth, setOriginalWidth] = useState<number | undefined>(
-    undefined
-  );
-  const [timeout, setTimeoutState] = useState<
-    ReturnType<typeof setTimeout> | undefined
-  >(undefined);
+  const [originalWidth, setOriginalWidth] = useState<number | undefined>(undefined);
+  const [timeout, setTimeoutState] = useState<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const copy = (e: MouseEvent, copyStr: string) => {
     if (e.target === null) {
@@ -43,7 +39,7 @@ const Copy = ({ copyStr, text }: Props) => {
 
   const onClick = (e: MouseEvent) => {
     e.preventDefault();
-    const copyStrValue = typeof copyStr === "function" ? copyStr() : copyStr;
+    const copyStrValue = typeof copyStr === 'function' ? copyStr() : copyStr;
 
     copy(e, copyStrValue);
   };
@@ -56,7 +52,7 @@ const Copy = ({ copyStr, text }: Props) => {
     };
   }, [timeout]);
 
-  const buttonText = copied ? t("copied") : text || t("copy");
+  const buttonText = copied ? t('copied') : text || t('copy');
   return (
     <Button className="copy-button" onClick={(e) => onClick(e)}>
       {buttonText}

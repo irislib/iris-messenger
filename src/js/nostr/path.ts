@@ -24,7 +24,7 @@ specify new event kinds all the time and implement them in all applications and 
 
 NIP33: https://github.com/nostr-protocol/nips/blob/master/33.md
  */
-import { Event, Filter, matchFilter } from "nostr-tools";
+import { Event, Filter, matchFilter } from 'nostr-tools';
 
 const EVENT_KIND = 30000;
 
@@ -37,20 +37,17 @@ type Listener = {
   off: () => void;
 };
 type Publish = (event: Partial<Event>) => Promise<Event>;
-type Subscribe = (
-  filters: Filter[],
-  callback: (event: Event) => void
-) => string;
+type Subscribe = (filters: Filter[], callback: (event: Event) => void) => string;
 type Unsubscribe = (id: string) => void;
 type Encrypt = (content: string) => Promise<string>;
 type Decrypt = (content: string) => Promise<string>;
 
 export function getEventPath(event: Event): string | undefined {
-  return event.tags?.find(([t]) => t === "d")?.[1];
+  return event.tags?.find(([t]) => t === 'd')?.[1];
 }
 
 export function getFilterPath(filter: Filter): string | undefined {
-  return filter["#d"]?.[0];
+  return filter['#d']?.[0];
 }
 
 // We can later add other storages like IndexedDB or localStorage
@@ -113,7 +110,7 @@ export class Path {
     unsubscribe: Unsubscribe,
     filter: Filter,
     encrypt?: Encrypt,
-    decrypt?: Decrypt
+    decrypt?: Decrypt,
   ) {
     this.publish = publish;
     this.subscribe = subscribe;
@@ -142,7 +139,7 @@ export class Path {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       kind: EVENT_KIND,
-      tags: [["d", path]],
+      tags: [['d', path]],
       content,
       created_at: Math.floor(Date.now() / 1000),
     });
@@ -164,9 +161,7 @@ export class Path {
   }
 
   async getEventValue(event: Event): Promise<any> {
-    let value = this.decrypt
-      ? await this.decrypt(event.content)
-      : event.content;
+    let value = this.decrypt ? await this.decrypt(event.content) : event.content;
     try {
       value = JSON.parse(value);
     } catch (e) {
@@ -177,7 +172,7 @@ export class Path {
 
   get(path: string, callback: PathCallback, filter = {}): Listener {
     filter = Object.assign({}, filter, this.filter, {
-      "#d": [path],
+      '#d': [path],
       kinds: [EVENT_KIND],
     });
     const listener = this.addListener(filter, callback);

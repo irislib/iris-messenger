@@ -1,31 +1,29 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import Header from "../components/Header";
-import Key from "../nostr/Key";
-import { translate as t } from "../translations/Translation.mjs";
+import Header from '../components/Header';
+import Key from '../nostr/Key';
+import { translate as t } from '../translations/Translation.mjs';
 
 export default function KeyConverter(_props) {
-  const [key, setKey] = useState("");
+  const [key, setKey] = useState('');
 
   const hex = Key.toNostrHexAddress(key);
-  const note = Key.toNostrBech32Address(key, "note");
-  const npub = Key.toNostrBech32Address(key, "npub");
-  const nsec = Key.toNostrBech32Address(key, "nsec");
+  const note = Key.toNostrBech32Address(key, 'note');
+  const npub = Key.toNostrBech32Address(key, 'npub');
+  const nsec = Key.toNostrBech32Address(key, 'nsec');
 
   return (
     <>
       <Header />
       <div class="main-view" id="settings">
         <div class="centered-container mobile-padding15">
-          <h2>{t("key_converter")}</h2>
+          <h2>{t('key_converter')}</h2>
           <p>
             <input
               type="text"
-              style={{ width: "100%" }}
+              style={{ width: '100%' }}
               placeholder="Enter hex or bech32 key"
-              onInput={(e) =>
-                setKey((e.target as HTMLInputElement).value?.trim())
-              }
+              onInput={(e) => setKey((e.target as HTMLInputElement).value?.trim())}
             />
           </p>
           {key &&

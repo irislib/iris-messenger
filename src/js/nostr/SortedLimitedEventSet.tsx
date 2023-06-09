@@ -1,6 +1,6 @@
-import { Event } from "nostr-tools";
+import { Event } from 'nostr-tools';
 
-import { Unsubscribe } from "./PubSub";
+import { Unsubscribe } from './PubSub';
 type Callback = (events: string[]) => void;
 
 export default class SortedLimitedEventSet {
@@ -33,7 +33,7 @@ export default class SortedLimitedEventSet {
 
   add(event: Event): boolean {
     if (!event || !event.id || !event.created_at) {
-      throw new Error("Invalid event");
+      throw new Error('Invalid event');
     }
     if (this.eventIdSet.has(event.id)) {
       return false;
@@ -41,9 +41,7 @@ export default class SortedLimitedEventSet {
     if (this.events.length < this.maxSize) {
       // If the set is not full, simply add the event
       this.events.push({ id: event.id, created_at: event.created_at });
-    } else if (
-      event.created_at > this.events[this.events.length - 1].created_at
-    ) {
+    } else if (event.created_at > this.events[this.events.length - 1].created_at) {
       // If the set is full and the new event has a newer timestamp, replace the oldest event
       this.eventIdSet.delete(this.events[this.events.length - 1].id);
       this.events[this.events.length - 1] = {
@@ -60,9 +58,7 @@ export default class SortedLimitedEventSet {
     // Sort the events in descending order by created_at
     this.eventIdSet.add(event.id);
     this.events.sort((a, b) =>
-      this.descending
-        ? b.created_at - a.created_at
-        : a.created_at - b.created_at
+      this.descending ? b.created_at - a.created_at : a.created_at - b.created_at,
     );
     this.subscriptions.forEach((callback) => callback(this.eventIds));
     return true;

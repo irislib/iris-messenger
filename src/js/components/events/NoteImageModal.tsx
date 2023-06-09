@@ -1,9 +1,9 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-import Modal from "../modal/Modal";
-import SafeImg from "../SafeImg";
+import Modal from '../modal/Modal';
+import SafeImg from '../SafeImg';
 
-import EventComponent from "./EventComponent";
+import EventComponent from './EventComponent';
 
 const ContentContainer = styled.div`
   display: flex;
@@ -45,7 +45,7 @@ const NoteImageModal = ({ event, onClose, attachment }) => {
     <Modal width="90%" height="90%" centerVertically={true} onClose={onClose}>
       <ContentContainer>
         <MediaContainer>
-          {attachment.type === "image" ? (
+          {attachment.type === 'image' ? (
             <SafeImg src={attachment.url} />
           ) : (
             <video
@@ -58,11 +58,7 @@ const NoteImageModal = ({ event, onClose, attachment }) => {
           )}
         </MediaContainer>
         <InfoContainer>
-          <EventComponent
-            id={event.id}
-            standalone={true}
-            showReplies={Infinity}
-          />
+          <EventComponent id={event.id} standalone={true} showReplies={Infinity} />
         </InfoContainer>
       </ContentContainer>
     </Modal>

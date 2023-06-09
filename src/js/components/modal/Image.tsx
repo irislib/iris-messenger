@@ -1,8 +1,8 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-import SafeImg from "../SafeImg";
+import SafeImg from '../SafeImg';
 
-import Modal from "./Modal";
+import Modal from './Modal';
 
 const ContentContainer = styled.div`
   display: flex;
@@ -14,18 +14,12 @@ const ContentContainer = styled.div`
 
 const ImageModal = (props) => {
   return (
-    <Modal
-      centerVertically={props.images?.length === 1}
-      onClose={props.onClose}
-    >
+    <Modal centerVertically={props.images?.length === 1} onClose={props.onClose}>
       <ContentContainer>
         {props.images.map((i) => {
           return (
             <p>
-              <SafeImg
-                style={{ maxHeight: "90vh", maxWidth: "90vw" }}
-                src={i}
-              />
+              <SafeImg style={{ maxHeight: '90vh', maxWidth: '90vw' }} src={i} />
             </p>
           );
         })}

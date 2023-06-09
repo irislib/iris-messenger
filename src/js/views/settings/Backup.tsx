@@ -1,14 +1,14 @@
-import Component from "../../BaseComponent";
-import { PrimaryButton as Button } from "../../components/buttons/Button";
-import Copy from "../../components/buttons/Copy";
-import Follow from "../../components/buttons/Follow";
-import Identicon from "../../components/Identicon";
-import Name from "../../components/Name";
-import Events from "../../nostr/Events";
-import IndexedDB from "../../nostr/IndexedDB";
-import Key from "../../nostr/Key";
-import SocialNetwork from "../../nostr/SocialNetwork";
-import { translate as t } from "../../translations/Translation.mjs";
+import Component from '../../BaseComponent';
+import { PrimaryButton as Button } from '../../components/buttons/Button';
+import Copy from '../../components/buttons/Copy';
+import Follow from '../../components/buttons/Follow';
+import Identicon from '../../components/Identicon';
+import Name from '../../components/Name';
+import Events from '../../nostr/Events';
+import IndexedDB from '../../nostr/IndexedDB';
+import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import { translate as t } from '../../translations/Translation.mjs';
 
 export default class Backup extends Component {
   profileExportJson() {
@@ -23,11 +23,11 @@ export default class Backup extends Component {
   }
 
   async exportMyEvents() {
-    console.log("exporting my events");
+    console.log('exporting my events');
     const pubkey = Key.getPubKey();
     const events = [] as any[];
     let i = 0;
-    this.setState({ downloadMyEventsMessage: "Fetching events..." });
+    this.setState({ downloadMyEventsMessage: 'Fetching events...' });
     await IndexedDB.db.events.where({ pubkey }).each((event) => {
       events.push(event);
       i++;
@@ -43,83 +43,64 @@ export default class Backup extends Component {
     return (
       <>
         <div class="centered-container">
-          <h2>{t("backup")}</h2>
-          <h3>{t("save")}</h3>
+          <h2>{t('backup')}</h2>
+          <h3>{t('save')}</h3>
           <p>
-            {t("profile")} & {t("follows")}:
+            {t('profile')} & {t('follows')}:
           </p>
           <p>
             <Button
               onClick={() =>
-                this.onClickDownload("nostr-my-profile-and-follows.json", () =>
-                  this.profileExportJson()
+                this.onClickDownload('nostr-my-profile-and-follows.json', () =>
+                  this.profileExportJson(),
                 )
               }
             >
-              {t("download")}
+              {t('download')}
             </Button>
             <Copy
               key={`${this.state.hexPub}copyData`}
-              text={t("copy_raw_data")}
+              text={t('copy_raw_data')}
               copyStr={() => this.profileExportJson()}
             />
           </p>
-          <p>{t("your_events")}:</p>
+          <p>{t('your_events')}:</p>
           <p>
             <Button
               onClick={() =>
-                this.onClickDownload("nostr-my-events.json", () =>
-                  this.exportMyEvents()
-                )
+                this.onClickDownload('nostr-my-events.json', () => this.exportMyEvents())
               }
             >
-              {this.state.downloadMyEventsMessage || t("download")}
+              {this.state.downloadMyEventsMessage || t('download')}
             </Button>
           </p>
           {this.state.saveMessage && <p>{this.state.saveMessage}</p>}
-          {this.state.saveError && (
-            <p class="warning">{this.state.saveError}</p>
-          )}
+          {this.state.saveError && <p class="warning">{this.state.saveError}</p>}
 
-          <h3>{t("load")}</h3>
+          <h3>{t('load')}</h3>
           <p>
-            <Button onClick={() => this.onUploadJsonClick()}>
-              Upload .json file
-            </Button>
+            <Button onClick={() => this.onUploadJsonClick()}>Upload .json file</Button>
           </p>
           <p>
             <textarea
-              onInput={(e) =>
-                this.import((e.target as HTMLTextAreaElement).value)
-              }
-              placeholder={t("paste_event_json")}
+              onInput={(e) => this.import((e.target as HTMLTextAreaElement).value)}
+              placeholder={t('paste_event_json')}
             ></textarea>
           </p>
-          {this.state.loadError && (
-            <p class="warning">{this.state.loadError}</p>
-          )}
+          {this.state.loadError && <p class="warning">{this.state.loadError}</p>}
           {this.state.importedEvents && (
             <p class="positive">
-              {t("loaded_and_published_{n}_events").replace(
-                "{n}",
-                this.state.importedEvents
-              )}
+              {t('loaded_and_published_{n}_events').replace('{n}', this.state.importedEvents)}
             </p>
           )}
           {this.state.restoredFollows && (
             <>
               <p class="positive">
-                {t("restored_{n}_follows").replace(
-                  "{n}",
-                  this.state.restoredFollows.length
-                )}
+                {t('restored_{n}_follows').replace('{n}', this.state.restoredFollows.length)}
               </p>
               {this.state.restoredFollows.map((hex) => (
                 <div className="profile-link-container">
-                  <a
-                    href={`/${Key.toNostrBech32Address(hex, "npub")}`}
-                    className="profile-link"
-                  >
+                  <a href={`/${Key.toNostrBech32Address(hex, 'npub')}`} className="profile-link">
                     <Identicon str={hex} width={40} />
                     <Name pub={hex} />
                   </a>
@@ -137,11 +118,10 @@ export default class Backup extends Component {
     try {
       this.setState({ saveMessage: null, saveError: null });
       const text = await textFn();
-      const dataStr =
-        "data:text/json;charset=utf-8," + encodeURIComponent(text);
-      const downloadAnchorNode = document.createElement("a");
-      downloadAnchorNode.setAttribute("href", dataStr);
-      downloadAnchorNode.setAttribute("download", filename);
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(text);
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute('href', dataStr);
+      downloadAnchorNode.setAttribute('download', filename);
       document.body.appendChild(downloadAnchorNode); // required for firefox
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
@@ -152,9 +132,9 @@ export default class Backup extends Component {
   }
 
   onUploadJsonClick() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
     input.onchange = (e) => {
       const target = e.target as HTMLInputElement;
       const file = target.files?.[0];
@@ -192,17 +172,11 @@ export default class Backup extends Component {
         const myPub = Key.getPubKey();
         // even if it's an old contacts event by us, restore follows from it
         if (event.pubkey === myPub && event.kind === 3) {
-          const followed = event.tags
-            .filter((t) => t[0] === "p")
+          const followed = event.tags.filter((t) => t[0] === 'p').map((t) => t[1]);
+          const currentFollows = (Events.db.findOne({ kind: 3, pubkey: myPub })?.tags || [])
+            .filter((t) => t[0] === 'p')
             .map((t) => t[1]);
-          const currentFollows = (
-            Events.db.findOne({ kind: 3, pubkey: myPub })?.tags || []
-          )
-            .filter((t) => t[0] === "p")
-            .map((t) => t[1]);
-          const restoredFollows = followed.filter(
-            (f) => !currentFollows.includes(f)
-          );
+          const restoredFollows = followed.filter((f) => !currentFollows.includes(f));
           SocialNetwork.setFollowed(restoredFollows);
           this.setState({ restoredFollows });
         }

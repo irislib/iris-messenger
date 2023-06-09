@@ -1,20 +1,20 @@
-import { html } from "htm/preact";
-import { route } from "preact-router";
+import { html } from 'htm/preact';
+import { route } from 'preact-router';
 
-import Component from "../../BaseComponent";
-import Identicon from "../../components/Identicon";
-import Name from "../../components/Name";
-import Helpers from "../../Helpers";
-import Events from "../../nostr/Events";
-import Key from "../../nostr/Key";
-import Session from "../../nostr/Session";
+import Component from '../../BaseComponent';
+import Identicon from '../../components/Identicon';
+import Name from '../../components/Name';
+import Helpers from '../../Helpers';
+import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
+import Session from '../../nostr/Session';
 
 class ChatListItem extends Component {
   constructor() {
     super();
     this.state = {
       latest: {},
-      latestText: "",
+      latestText: '',
     };
   }
 
@@ -29,7 +29,7 @@ class ChatListItem extends Component {
     if (!this.props.latestMsgId) {
       return;
     }
-    const event = Events.db.by("id", this.props.latestMsgId);
+    const event = Events.db.by('id', this.props.latestMsgId);
     if (event) {
       this.setState({ latest: event });
       Key.decryptMessage(this.props.latestMsgId, (latestText) => {
@@ -40,7 +40,7 @@ class ChatListItem extends Component {
 
   componentDidMount() {
     this.getLatestMsg();
-    const path = "chats/" + this.props.chat + "/lastOpened";
+    const path = 'chats/' + this.props.chat + '/lastOpened';
     Session.public?.get(path, (lastOpened) => {
       this.setState({ lastOpened });
     });
@@ -56,24 +56,20 @@ class ChatListItem extends Component {
     if (this.state.latest.pubkey === Key.getPubKey()) {
       return false;
     }
-    return (
-      !this.props.active &&
-      !(this.state.latest.created_at <= this.state.lastOpened)
-    );
+    return !this.props.active && !(this.state.latest.created_at <= this.state.lastOpened);
   }
 
   render() {
     const chat = this.props.chat;
-    const active = this.props.active ? "active-item" : "";
+    const active = this.props.active ? 'active-item' : '';
     /*
     const seen = chat.theirMsgsLastSeenTime >= chat.latestTime ? 'seen' : '';
     const delivered = chat.theirLastActiveTime >= chat.latestTime ? 'delivered' : '';
 
      */
-    const hasUnseen = this.hasUnseen() ? "has-unseen" : "";
-    const unseenEl = this.hasUnseen() ? html`<span class="unseen"></span>` : "";
-    const activity =
-      ["online", "active"].indexOf(chat.activity) > -1 ? chat.activity : "";
+    const hasUnseen = this.hasUnseen() ? 'has-unseen' : '';
+    const unseenEl = this.hasUnseen() ? html`<span class="unseen"></span>` : '';
+    const activity = ['online', 'active'].indexOf(chat.activity) > -1 ? chat.activity : '';
     //const time = chat.latestTime && new Date(chat.latestTime);
     //let latestTimeText = Helpers.getRelativeTimeText(time);
 
@@ -100,12 +96,10 @@ class ChatListItem extends Component {
 
     const time =
       (this.state.latest.created_at &&
-        Helpers.getRelativeTimeText(
-          new Date(this.state.latest.created_at * 1000)
-        )) ||
-      "";
+        Helpers.getRelativeTimeText(new Date(this.state.latest.created_at * 1000))) ||
+      '';
 
-    const npub = Key.toNostrBech32Address(chat, "npub");
+    const npub = Key.toNostrBech32Address(chat, 'npub');
 
     // TODO use button so we can use keyboard to navigate
     return html`

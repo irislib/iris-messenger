@@ -1,18 +1,18 @@
-import Component from "../../BaseComponent";
+import Component from '../../BaseComponent';
 
-import Account from "./Account.js";
-import Appearance from "./Appearance";
-import Backup from "./Backup";
-import Content from "./Content";
-import Dev from "./Dev";
-import IrisAccount from "./IrisAccount.js";
-import Language from "./Language";
-import Network from "./Network.js";
-import Payments from "./Payments";
-import SocialNetwork from "./SocialNetwork";
+import Account from './Account.js';
+import Appearance from './Appearance';
+import Backup from './Backup';
+import Content from './Content';
+import Dev from './Dev';
+import IrisAccount from './IrisAccount.js';
+import Language from './Language';
+import Network from './Network.js';
+import Payments from './Payments';
+import SocialNetwork from './SocialNetwork';
 
 export default class SettingsContent extends Component {
-  content = "";
+  content = '';
   pages = {
     account: Account,
     network: Network,
@@ -28,7 +28,7 @@ export default class SettingsContent extends Component {
 
   constructor() {
     super();
-    this.content = "home";
+    this.content = 'home';
   }
   render() {
     const Content = this.pages[this.props.id] || this.pages.account;

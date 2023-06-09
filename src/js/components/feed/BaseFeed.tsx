@@ -1,41 +1,41 @@
-import { throttle } from "lodash";
-import isEqual from "lodash/isEqual";
+import { throttle } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
-import BaseComponent from "../../BaseComponent";
-import Helpers from "../../Helpers";
-import localState from "../../LocalState";
-import Events from "../../nostr/Events";
-import Key from "../../nostr/Key";
-import PubSub, { Unsubscribe } from "../../nostr/PubSub";
-import SocialNetwork from "../../nostr/SocialNetwork";
-import { translate as t } from "../../translations/Translation.mjs";
-import { PrimaryButton as Button } from "../buttons/Button";
-import ErrorBoundary from "../ErrorBoundary";
-import EventComponent from "../events/EventComponent";
+import BaseComponent from '../../BaseComponent';
+import Helpers from '../../Helpers';
+import localState from '../../LocalState';
+import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
+import PubSub, { Unsubscribe } from '../../nostr/PubSub';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import { translate as t } from '../../translations/Translation.mjs';
+import { PrimaryButton as Button } from '../buttons/Button';
+import ErrorBoundary from '../ErrorBoundary';
+import EventComponent from '../events/EventComponent';
 
-import FeedSettings from "./FeedSettings";
-import FeedTypeSelector from "./FeedTypeSelector";
-import ImageGrid from "./ImageGrid";
-import Label from "./Label";
-import SortedEventMap from "./SortedEventMap";
-import { FeedProps, FeedState } from "./types";
+import FeedSettings from './FeedSettings';
+import FeedTypeSelector from './FeedTypeSelector';
+import ImageGrid from './ImageGrid';
+import Label from './Label';
+import SortedEventMap from './SortedEventMap';
+import { FeedProps, FeedState } from './types';
 
 const INITIAL_PAGE_SIZE = 10;
 
 let isInitialLoad = true;
 const listener = function () {
   isInitialLoad = false;
-  window.removeEventListener("popstate", listener);
+  window.removeEventListener('popstate', listener);
 };
-window.addEventListener("popstate", listener);
+window.addEventListener('popstate', listener);
 
 const DEFAULT_SETTINGS = {
-  display: "posts",
+  display: 'posts',
   realtime: false,
   showReplies: false,
-  sortBy: "created_at",
-  sortDirection: "desc",
-  timespan: "all",
+  sortBy: 'created_at',
+  sortDirection: 'desc',
+  timespan: 'all',
 };
 
 class Feed extends BaseComponent<FeedProps, FeedState> {
@@ -47,8 +47,8 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     super(props);
     let savedSettings = { display: undefined };
     localState
-      .get("settings")
-      .get("feed")
+      .get('settings')
+      .get('feed')
       .once((s) => (savedSettings = s));
     this.state = {
       sortedEvents: [],
@@ -63,28 +63,24 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   getSettings(override = { display: undefined }) {
     // override default & saved settings with url params
     let settings = { ...DEFAULT_SETTINGS };
-    if (["global", "follows"].includes(this.props?.index || "")) {
+    if (['global', 'follows'].includes(this.props?.index || '')) {
       settings = Object.assign(settings, override);
     }
-    if (this.props?.index !== "notifications" && override.display) {
+    if (this.props?.index !== 'notifications' && override.display) {
       settings.display = override.display;
     }
-    if (this.props?.index === "posts") {
+    if (this.props?.index === 'posts') {
       settings.showReplies = false;
     }
-    if (
-      ["postsAndReplies", "notifications", "likes"].includes(
-        this.props?.index || ""
-      )
-    ) {
+    if (['postsAndReplies', 'notifications', 'likes'].includes(this.props?.index || '')) {
       settings.showReplies = true;
     }
     for (const key in settings) {
       const value = Helpers.getUrlParameter(key);
       if (value !== null) {
         // if value is '1' or '0', convert to boolean
-        if (value === "1" || value === "0") {
-          settings[key] = value === "1";
+        if (value === '1' || value === '0') {
+          settings[key] = value === '1';
         } else {
           settings[key] = value;
         }
@@ -97,7 +93,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   }
 
   saveSettings() {
-    localState.get("settings").get("feed").put(this.state.settings);
+    localState.get('settings').get('feed').put(this.state.settings);
   }
 
   updateSortedEvents = (sortedEvents) => {
@@ -108,10 +104,10 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     // iterate over sortedEvents and add newer than eventsShownTime to queue
     const queuedEvents = [] as string[];
     let hasMyEvent;
-    if (settings.sortDirection === "desc" && !settings.realtime) {
+    if (settings.sortDirection === 'desc' && !settings.realtime) {
       for (let i = 0; i < sortedEvents.length; i++) {
         const id = sortedEvents[i];
-        const event = Events.db.by("id", id);
+        const event = Events.db.by('id', id);
         if (event && event.created_at > this.state.eventsShownTime) {
           if (event.pubkey === Key.getPubKey() && !Events.isRepost(event)) {
             hasMyEvent = true;
@@ -124,9 +120,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     if (!hasMyEvent) {
       sortedEvents = sortedEvents.filter((id) => !queuedEvents.includes(id));
     }
-    const eventsShownTime = hasMyEvent
-      ? Math.floor(Date.now() / 1000)
-      : this.state.eventsShownTime;
+    const eventsShownTime = hasMyEvent ? Math.floor(Date.now() / 1000) : this.state.eventsShownTime;
     this.setState({ sortedEvents, queuedEvents, eventsShownTime });
   };
 
@@ -135,8 +129,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     if (this.state.displayCount < this.state.sortedEvents.length) {
       if (
         this.props.scrollElement &&
-        this.props.scrollElement.scrollTop +
-          this.props.scrollElement.clientHeight >=
+        this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
           this.props.scrollElement.scrollHeight - 1000
       ) {
         // TODO load more events
@@ -154,8 +147,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       return;
     }
     const showNewMsgsFixedTop =
-      this.props.scrollElement.scrollTop >
-      (this.base as HTMLElement).offsetTop - 60;
+      this.props.scrollElement.scrollTop > (this.base as HTMLElement).offsetTop - 60;
     if (showNewMsgsFixedTop !== this.state.showNewMsgsFixedTop) {
       this.setState({ showNewMsgsFixedTop });
     }
@@ -164,14 +156,14 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   componentWillUnmount() {
     super.componentWillUnmount();
     if (this.props.scrollElement) {
-      this.props.scrollElement.removeEventListener("scroll", this.handleScroll);
+      this.props.scrollElement.removeEventListener('scroll', this.handleScroll);
     }
     this.unsub && this.unsub();
   }
 
   addScrollHandler() {
     if (this.props.scrollElement) {
-      this.props.scrollElement.addEventListener("scroll", this.handleScroll);
+      this.props.scrollElement.addEventListener('scroll', this.handleScroll);
     }
   }
 
@@ -181,21 +173,21 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     if (isEqual(this.state.settings, DEFAULT_SETTINGS)) {
       // no settings saved in history state, load from localstorage
       localState
-        .get("settings")
-        .get("feed")
+        .get('settings')
+        .get('feed')
         .on(
           this.sub((s) => {
             const settings = this.getSettings(s);
             this.setState({ settings });
-          })
+          }),
         );
     }
     let first = true;
-    localState.get("scrollUp").on(
+    localState.get('scrollUp').on(
       this.sub(() => {
-        !first && Helpers.animateScrollTop(".main-view");
+        !first && Helpers.animateScrollTop('.main-view');
         first = false;
-      })
+      }),
     );
   }
 
@@ -210,7 +202,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     clearTimeout(this.subscribeRetryTimeout);
     const results = new SortedEventMap(
       this.state.settings.sortBy,
-      this.state.settings.sortDirection
+      this.state.settings.sortDirection,
     );
     const update = () => {
       this.updateSortedEvents(
@@ -225,14 +217,14 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
               if (!this.state.settings.showReplies) {
                 return false;
               }
-              const author = Events.db.by("id", repliedMsg)?.pubkey;
+              const author = Events.db.by('id', repliedMsg)?.pubkey;
               if (author && SocialNetwork.blockedUsers.has(author)) {
                 return false;
               }
             }
             return true;
           })
-          .map((event) => event.id)
+          .map((event) => event.id),
       );
     };
     const throttledUpdate = throttle(update, 1000);
@@ -252,28 +244,20 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     };
     const go = () => {
       this.unsub?.();
-      if (this.props.index === "notifications") {
+      if (this.props.index === 'notifications') {
         this.unsub = Events.notifications.subscribe((eventIds) => {
-          eventIds.forEach((id) => callback(Events.db.by("id", id)));
+          eventIds.forEach((id) => callback(Events.db.by('id', id)));
         });
       } else {
         this.unsub = this.getEvents(callback);
-        const followCount = SocialNetwork.followedByUser.get(
-          Key.getPubKey()
-        )?.size;
-        const unsub = PubSub.subscribe(
-          { authors: [Key.getPubKey()], kinds: [3] },
-          () => {
-            // is this needed?
-            if (
-              followCount !==
-              SocialNetwork.followedByUser.get(Key.getPubKey())?.size
-            ) {
-              unsub();
-              this.subscribe();
-            }
+        const followCount = SocialNetwork.followedByUser.get(Key.getPubKey())?.size;
+        const unsub = PubSub.subscribe({ authors: [Key.getPubKey()], kinds: [3] }, () => {
+          // is this needed?
+          if (followCount !== SocialNetwork.followedByUser.get(Key.getPubKey())?.size) {
+            unsub();
+            this.subscribe();
           }
-        );
+        });
       }
     };
     go();
@@ -290,13 +274,10 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
 
   replaceState = throttle(
     () => {
-      window.history.replaceState(
-        { ...window.history.state, state: this.state },
-        ""
-      );
+      window.history.replaceState({ ...window.history.state, state: this.state }, '');
     },
     1000,
-    { leading: true, trailing: true }
+    { leading: true, trailing: true },
   );
 
   componentDidUpdate(prevProps, prevState) {
@@ -310,12 +291,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     this.handleScroll();
     this.replaceState();
     if (!this.state.queuedEvents.length && prevState.queuedEvents.length) {
-      Helpers.animateScrollTop(".main-view");
+      Helpers.animateScrollTop('.main-view');
     }
-    if (
-      this.props.filter !== prevProps.filter ||
-      this.props.keyword !== prevProps.keyword
-    ) {
+    if (this.props.filter !== prevProps.filter || this.props.keyword !== prevProps.keyword) {
       this.setState({ sortedEvents: [] });
       this.componentDidMount();
     }
@@ -323,9 +301,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
 
   showQueuedEvents() {
     const sortedEvents = this.state.sortedEvents;
-    console.log("sortedEvents.length", sortedEvents.length);
+    console.log('sortedEvents.length', sortedEvents.length);
     sortedEvents.unshift(...this.state.queuedEvents);
-    console.log("queuedEvents.length", this.state.queuedEvents.length);
+    console.log('queuedEvents.length', this.state.queuedEvents.length);
     this.setState({
       sortedEvents,
       queuedEvents: [],
@@ -337,15 +315,12 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   renderShowNewEvents() {
     return (
       <div
-        className={`msg ${this.state.showNewMsgsFixedTop ? "fixedTop" : ""}`}
+        className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
         onClick={() => this.showQueuedEvents()}
       >
         <div className="msg-content notification-msg colored">
           <div style="height: 27.5px; line-height: 27.5px">
-            {t("show_n_new_messages").replace(
-              "{n}",
-              this.state.queuedEvents.length
-            )}
+            {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
           </div>
         </div>
       </div>
@@ -362,7 +337,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
             })
           }
         >
-          {t("show_more")}
+          {t('show_more')}
         </Button>
       </p>
     );
@@ -389,19 +364,17 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       return;
     }
     const displayCount = this.state.displayCount;
-    const showRepliedMsg = this.props.index !== "likes" && !this.props.keyword;
-    const showQueuedEvents =
-      this.state.queuedEvents.length && !this.state.settingsOpen;
+    const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
+    const showQueuedEvents = this.state.queuedEvents.length && !this.state.settingsOpen;
     const feedName =
       !showQueuedEvents &&
       {
-        global: "global_feed",
-        follows: "following",
-        notifications: "notifications",
-      }[this.props.index || "global"];
+        global: 'global_feed',
+        follows: 'following',
+        notifications: 'notifications',
+      }[this.props.index || 'global'];
 
-    const renderAs =
-      this.state.settings.display === "grid" ? "NoteImage" : null;
+    const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
     const events = this.renderEvents(displayCount, renderAs, showRepliedMsg);
     return (
       <div className="msg-feed">
@@ -410,20 +383,18 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           {feedName ? (
             <Label
               feedName={feedName}
-              onClickSettings={() =>
-                this.setState({ settingsOpen: !this.state.settingsOpen })
-              }
+              onClickSettings={() => this.setState({ settingsOpen: !this.state.settingsOpen })}
               index={this.props.index}
               settingsOpen={this.state.settingsOpen}
             />
           ) : null}
-          {this.props.index !== "notifications" && this.state.settingsOpen && (
+          {this.props.index !== 'notifications' && this.state.settingsOpen && (
             <FeedSettings
               settings={this.state.settings}
               onChange={(settings) => this.setState({ settings })}
             />
           )}
-          {this.props.index !== "notifications" && (
+          {this.props.index !== 'notifications' && (
             <FeedTypeSelector
               index={this.props.index}
               display={this.state.settings.display}
@@ -435,15 +406,13 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
           {events.length === 0 && (
             <div className="msg">
               <div className="msg-content notification-msg">
-                {this.props.emptyMessage || t("no_events_yet")}
+                {this.props.emptyMessage || t('no_events_yet')}
               </div>
             </div>
           )}
-          {renderAs === "NoteImage" ? <ImageGrid>{events}</ImageGrid> : events}
+          {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
         </div>
-        {displayCount < this.state.sortedEvents.length
-          ? this.renderShowMore()
-          : ""}
+        {displayCount < this.state.sortedEvents.length ? this.renderShowMore() : ''}
       </div>
     );
   }

@@ -1,12 +1,12 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent } from 'react';
 
-import Component from "../../BaseComponent";
-import Name from "../../components/Name";
-import localState from "../../LocalState";
-import Events from "../../nostr/Events";
-import Key from "../../nostr/Key";
-import SocialNetwork from "../../nostr/SocialNetwork";
-import { translate as t } from "../../translations/Translation.mjs";
+import Component from '../../BaseComponent';
+import Name from '../../components/Name';
+import localState from '../../LocalState';
+import Events from '../../nostr/Events';
+import Key from '../../nostr/Key';
+import SocialNetwork from '../../nostr/SocialNetwork';
+import { translate as t } from '../../translations/Translation.mjs';
 
 export default class SocialNetworkSettings extends Component {
   private refreshInterval: any;
@@ -20,7 +20,7 @@ export default class SocialNetworkSettings extends Component {
   render() {
     let hasBlockedUsers = false;
     const blockedUsers = this.state.blockedUsers.map((user) => {
-      const bech32 = Key.toNostrBech32Address(user, "npub");
+      const bech32 = Key.toNostrBech32Address(user, 'npub');
       if (bech32) {
         hasBlockedUsers = true;
         return (
@@ -33,23 +33,18 @@ export default class SocialNetworkSettings extends Component {
       }
     });
 
-    const followDistances = Array.from(
-      SocialNetwork.usersByFollowDistance.entries()
-    ).slice(1);
+    const followDistances = Array.from(SocialNetwork.usersByFollowDistance.entries()).slice(1);
 
     return (
       <>
         <div class="centered-container">
-          <h2>{t("social_network")}</h2>
+          <h2>{t('social_network')}</h2>
           <h3>Stored on your device</h3>
-          <p>
-            Total size: {followDistances.reduce((a, b) => a + b[1].size, 0)}{" "}
-            users
-          </p>
+          <p>Total size: {followDistances.reduce((a, b) => a + b[1].size, 0)} users</p>
           <p>Depth: {followDistances.length} degrees of separation</p>
           {followDistances.sort().map((distance) => (
             <div>
-              {distance[0] || t("unknown")}: {distance[1].size} users
+              {distance[0] || t('unknown')}: {distance[1].size} users
             </div>
           ))}
           <p>Filter incoming events by follow distance:</p>
@@ -57,10 +52,7 @@ export default class SocialNetworkSettings extends Component {
             value={this.state.globalFilter.maxFollowDistance}
             onChange={(e) => {
               const target = e.target as HTMLInputElement;
-              localState
-                .get("globalFilter")
-                .get("maxFollowDistance")
-                .put(parseInt(target.value));
+              localState.get('globalFilter').get('maxFollowDistance').put(parseInt(target.value));
             }}
           >
             <option value="0">Off</option>
@@ -81,13 +73,13 @@ export default class SocialNetworkSettings extends Component {
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               const target = e.target as HTMLInputElement;
               localState
-                .get("globalFilter")
-                .get("minFollowersAtMaxDistance")
+                .get('globalFilter')
+                .get('minFollowersAtMaxDistance')
                 .put(parseInt(target.value));
             }}
           />
-          <h3>{t("blocked_users")}</h3>
-          {!hasBlockedUsers && t("none")}
+          <h3>{t('blocked_users')}</h3>
+          {!hasBlockedUsers && t('none')}
           <p>
             <a
               href=""
@@ -98,8 +90,7 @@ export default class SocialNetworkSettings extends Component {
                 });
               }}
             >
-              {this.state.showBlockedUsers ? t("hide") : t("show")}{" "}
-              {blockedUsers.length}
+              {this.state.showBlockedUsers ? t('hide') : t('show')} {blockedUsers.length}
             </a>
           </p>
           {this.state.showBlockedUsers && blockedUsers}
@@ -111,7 +102,7 @@ export default class SocialNetworkSettings extends Component {
     SocialNetwork.getBlockedUsers((blockedUsers) => {
       this.setState({ blockedUsers });
     });
-    localState.get("globalFilter").on(this.inject());
+    localState.get('globalFilter').on(this.inject());
     this.refreshInterval = setInterval(() => {
       this.forceUpdate();
     }, 1000);

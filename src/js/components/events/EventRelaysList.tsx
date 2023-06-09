@@ -1,10 +1,10 @@
-import { FC, useEffect, useState } from "react";
-import { Event } from "nostr-tools";
-import styled from "styled-components";
+import { FC, useEffect, useState } from 'react';
+import { Event } from 'nostr-tools';
+import styled from 'styled-components';
 
-import Events from "../../nostr/Events";
-import { EventMetadata } from "../../nostr/EventsMeta";
-import { translate as t } from "../../translations/Translation.mjs";
+import Events from '../../nostr/Events';
+import { EventMetadata } from '../../nostr/EventsMeta';
+import { translate as t } from '../../translations/Translation.mjs';
 
 const Wrapper = styled.div`
   display: flex;
@@ -21,7 +21,7 @@ const Wrapper = styled.div`
 const Codeblock = styled.pre`
   overflow: auto;
   background-color: hsl(0, 0%, 16%);
-  [data-theme="light"] & {
+  [data-theme='light'] & {
     background-color: hsl(0, 0%, 88%);
   }
   max-height: 400px;
@@ -48,10 +48,10 @@ const EventRelaysList: FC<{ event: Event }> = ({ event }) => {
 
   return (
     <Wrapper>
-      <h2>{t("event_detail")}</h2>
-      <p>{t("seen_on")}</p>
+      <h2>{t('event_detail')}</h2>
+      <p>{t('seen_on')}</p>
       {relays.length === 0 ? (
-        <p>{t("iris_api_source")}</p>
+        <p>{t('iris_api_source')}</p>
       ) : (
         <ul>
           {relays.map((r) => (
@@ -60,13 +60,7 @@ const EventRelaysList: FC<{ event: Event }> = ({ event }) => {
         </ul>
       )}
       <Codeblock>
-        <code>
-          {JSON.stringify(
-            { ...event, meta: undefined, $loki: undefined },
-            null,
-            2
-          )}
-        </code>
+        <code>{JSON.stringify({ ...event, meta: undefined, $loki: undefined }, null, 2)}</code>
       </Codeblock>
     </Wrapper>
   );
