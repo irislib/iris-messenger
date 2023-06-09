@@ -1,25 +1,25 @@
-import { route } from 'preact-router';
+import { route } from "preact-router";
 
-import Icons from '../Icons';
-import localState from '../LocalState';
-import { translate as t } from '../translations/Translation';
+import Icons from "../Icons";
+import localState from "../LocalState";
+import { translate as t } from "../translations/Translation.mjs";
 
-import View from './View';
+import View from "./View";
 
 class FeedList extends View {
   constructor() {
     super();
-    this.class = 'public-messages-view';
+    this.class = "public-messages-view";
     this.state = {
       feeds: {
         following: {
-          name: 'Following',
-          description: 'Public messages from people you follow',
+          name: "Following",
+          description: "Public messages from people you follow",
           icon: Icons.newFollower,
         },
         global: {
-          name: 'Global',
-          description: 'Public messages from everyone in your social network',
+          name: "Global",
+          description: "Public messages from everyone in your social network",
           icon: Icons.global,
         },
       },
@@ -31,7 +31,7 @@ class FeedList extends View {
   }
 
   openFeed(feed) {
-    localState.get('lastOpenedFeed').put(feed);
+    localState.get("lastOpenedFeed").put(feed);
     route(`/${feed}`);
   }
 
@@ -42,7 +42,11 @@ class FeedList extends View {
           const feed = this.state.feeds[key];
           return (
             <div>
-              <div style="margin-bottom: 5px" className="msg" onClick={() => this.openFeed(key)}>
+              <div
+                style="margin-bottom: 5px"
+                className="msg"
+                onClick={() => this.openFeed(key)}
+              >
                 <div className="msg-content">
                   <div style="margin-right: 15px">
                     <div>{feed.icon}</div>

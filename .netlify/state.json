@@ -1,0 +1,19 @@
+{
+	"geolocation": {
+		"data": {
+			"city": "Espoo",
+			"country": {
+				"code": "FI",
+				"name": "Finland"
+			},
+			"subdivision": {
+				"code": "18",
+				"name": "Uusimaa"
+			},
+			"timezone": "Europe/Helsinki",
+			"latitude": 60.205,
+			"longitude": 24.6455
+		},
+		"timestamp": 1676549567324
+	}
+}

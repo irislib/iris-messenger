@@ -1,20 +1,33 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "outDir": "dist",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
-    "target": "es2020",
-    "module": "es2020",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    "baseUrl": ".",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false, // this should be changed at some point. just too much work atm.
+
+    /* preact/compat paths */
     "paths": {
       "react": ["./node_modules/preact/compat/"],
-      "react-dom": ["./node_modules/preact/compat/"],
-      "*": ["./types/*"]
-    },
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+      "react-dom": ["./node_modules/preact/compat/"]
+    }
   },
-  "exclude": ["node_modules", "tests/**/*.ts", "iris-lib/test/*.ts"]
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

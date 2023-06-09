@@ -1,21 +1,21 @@
-import Fuse from 'fuse.js';
-import _ from 'lodash';
+import Fuse from "fuse.js";
+import _ from "lodash";
 
-import localState from './LocalState';
+import localState from "./LocalState";
 
 const options = {
-  keys: ['name', 'display_name'],
+  keys: ["name", "display_name"],
   includeScore: true,
   includeMatches: true,
   threshold: 0.3,
 };
 
 const notifyUpdate = _.throttle(() => {
-  localState.get('searchIndexUpdated').put(true);
+  localState.get("searchIndexUpdated").put(true);
 }, 2000);
 
 const FuzzySearch = {
-  index: new Fuse([], options),
+  index: new Fuse([] as any[], options),
   keys: new Set<string>(),
   add(doc: any) {
     if (this.keys.has(doc.key)) {

@@ -42,27 +42,26 @@ let language;
 let translation;
 let translationLoaded;
 
-// if not node.js
-if (typeof module !== 'undefined') {
-  language = localStorage.getItem('language') || navigator.language || 'en';
-  if (AVAILABLE_LANGUAGE_KEYS.indexOf(language) === -1) {
-    const s = language.slice(0, 2);
-    language = 'en';
-    for (let i = 0; i < AVAILABLE_LANGUAGE_KEYS.length; i++) {
-      if (AVAILABLE_LANGUAGE_KEYS[i].slice(0, 2) === s) {
-        language = AVAILABLE_LANGUAGE_KEYS[i];
-        break;
-      }
+language = localStorage.getItem('language') || navigator.language || 'en';
+if (AVAILABLE_LANGUAGE_KEYS.indexOf(language) === -1) {
+  const s = language.slice(0, 2);
+  language = 'en';
+  for (let i = 0; i < AVAILABLE_LANGUAGE_KEYS.length; i++) {
+    if (AVAILABLE_LANGUAGE_KEYS[i].slice(0, 2) === s) {
+      language = AVAILABLE_LANGUAGE_KEYS[i];
+      break;
     }
   }
-
-  translationLoaded = import(`./${language}.mjs`).then((module) => {
-    translation = module.default;
-    if (language !== 'en') {
-      translation = { ...english, ...translation };
-    }
-  });
 }
+
+translationLoaded = import(`./${language}.mjs`).then((module) => {
+  translation = module.default;
+  if (language !== 'en') {
+    translation = { ...english, ...translation };
+  }
+}).catch((e) => {
+  console.error('failed to load translation', e);
+});
 
 function capitalize(s) {
   if (typeof s !== 'string') return '';

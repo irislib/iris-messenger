@@ -1,10 +1,10 @@
-import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
-import { AdjustmentsHorizontalIcon as AdjustmentsHorizontalIconFull } from '@heroicons/react/24/solid';
-import { route } from 'preact-router';
-import styled from 'styled-components';
+import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon as AdjustmentsHorizontalIconFull } from "@heroicons/react/24/solid";
+import { route } from "preact-router";
+import styled from "styled-components";
 
-import Icons from '../../Icons';
-import { translate as t } from '../../translations/Translation';
+import Icons from "../../Icons";
+import { translate as t } from "../../translations/Translation.mjs";
 
 const IconLink = styled.a`
   padding-right: 10px;
@@ -28,15 +28,20 @@ const FeedName = styled.div`
   flex: 1;
 `;
 
-export default function Label({ feedName, onClickSettings, index, settingsOpen }) {
-  const isGeneralFeed = ['global', 'follows'].includes(index);
+export default function Label({
+  feedName,
+  onClickSettings,
+  index,
+  settingsOpen,
+}) {
+  const isGeneralFeed = ["global", "follows"].includes(index);
 
   const onClickBack = (e) => {
     e.preventDefault();
     if (settingsOpen) {
       onClickSettings();
     } else {
-      route('/');
+      route("/");
     }
   };
 
@@ -44,7 +49,9 @@ export default function Label({ feedName, onClickSettings, index, settingsOpen }
     <div className="msg">
       <div className="msg-content notification-msg">
         <Content>
-          {isGeneralFeed && <IconLink onClick={onClickBack}>{Icons.backArrow}</IconLink>}
+          {isGeneralFeed && (
+            <IconLink onClick={onClickBack}>{Icons.backArrow}</IconLink>
+          )}
           <FeedName>{t(feedName)}</FeedName>
           {isGeneralFeed && (
             <SettingsLink onClick={onClickSettings}>

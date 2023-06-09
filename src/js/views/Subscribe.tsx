@@ -1,7 +1,7 @@
-import Component from '../BaseComponent';
-import { PrimaryButton } from '../components/buttons/Button';
-import Header from '../components/Header';
-import { translate as t } from '../translations/Translation';
+import Component from "../BaseComponent";
+import { PrimaryButton } from "../components/buttons/Button";
+import Header from "../components/Header";
+import { translate as t } from "../translations/Translation.mjs";
 
 class Subscribe extends Component {
   render() {
@@ -10,7 +10,7 @@ class Subscribe extends Component {
         <Header />
         <div className="main-view" id="settings">
           <div className="centered-container mobile-padding15">
-            <h2>{t('subscribe')}</h2>
+            <h2>{t("subscribe")}</h2>
             <h3>Iris Supporter</h3>
             <p>Support open source development and get extra features!</p>
             <p>
@@ -42,7 +42,12 @@ class Subscribe extends Component {
               </label>
             </p>
             <p>
-              <input type="radio" id="subscription_monthly" name="subscription" value="2" />
+              <input
+                type="radio"
+                id="subscription_monthly"
+                name="subscription"
+                value="2"
+              />
               <label htmlFor="subscription_monthly">
                 <b>10 € / month</b> charged monthly (120 € / year)
               </label>

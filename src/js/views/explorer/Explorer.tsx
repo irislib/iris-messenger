@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'preact/hooks';
-import styled from 'styled-components';
+import { useEffect, useState } from "preact/hooks";
+import styled from "styled-components";
 
-import Header from '../../components/Header';
-import Session from '../../nostr/Session';
-import { translate as t } from '../../translations/Translation';
+import Header from "../../components/Header";
+import Session from "../../nostr/Session";
+import { translate as t } from "../../translations/Translation.mjs";
 
 const Row = styled.div`
   display: flex;
@@ -34,7 +34,7 @@ const Node = ({ path }) => {
     return () => listener?.off();
   });
 
-  if (typeof value === 'object' && value !== null) {
+  if (typeof value === "object" && value !== null) {
     return (
       <Row>
         <Column>{path}</Column>
@@ -56,14 +56,14 @@ const Node = ({ path }) => {
 };
 
 export default function ({ path }) {
-  path = path || '/';
+  path = path || "/";
   return (
     <>
       <Header />
       <div class="main-view" id="settings">
         <div class="centered-container">
           <h2>
-            {t('explorer')} {path}
+            {t("explorer")} {path}
           </h2>
           <div class="explorer">
             <Node path={path} />

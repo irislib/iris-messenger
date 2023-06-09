@@ -1,17 +1,17 @@
-import { Fragment } from 'preact';
+import { Fragment } from "preact";
 
 import {
   AVAILABLE_LANGUAGE_KEYS,
   AVAILABLE_LANGUAGES,
   language,
   translate as t,
-} from '../../translations/Translation';
+} from "../../translations/Translation.mjs";
 
 const Language = () => {
   return (
     <>
       <div class="centered-container">
-        <h3>{t('language')}</h3>
+        <h3>{t("language")}</h3>
         <div class="centered-container">
           {Object.keys(AVAILABLE_LANGUAGES).map((l) => {
             let input;
@@ -54,7 +54,7 @@ const Language = () => {
 function onLanguageChange(e) {
   const l = e.target.value;
   if (AVAILABLE_LANGUAGE_KEYS.indexOf(l) >= 0) {
-    localStorage.setItem('language', l);
+    localStorage.setItem("language", l);
     location.reload();
   }
 }

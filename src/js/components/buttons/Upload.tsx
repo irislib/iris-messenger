@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 
 const Upload = (props) => {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
   const handleFileUpload = (event) => {
     const files = event.target.files || event.dataTransfer.files;
     if (files && files.length) {
       const formData = new FormData();
-      formData.append('fileToUpload', files[0]);
+      formData.append("fileToUpload", files[0]);
 
-      fetch('https://nostr.build/api/upload/iris.php', {
-        method: 'POST',
+      fetch("https://nostr.build/api/upload/iris.php", {
+        method: "POST",
         body: formData,
       })
         .then(async (response) => {
@@ -19,8 +19,8 @@ const Upload = (props) => {
           }
         })
         .catch((error) => {
-          console.error('upload error', error);
-          setError('upload failed: ' + JSON.stringify(error));
+          console.error("upload error", error);
+          setError("upload failed: " + JSON.stringify(error));
         });
     }
   };

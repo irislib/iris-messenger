@@ -1,17 +1,16 @@
-import Dexie, { Table } from 'dexie';
-import { throttle } from 'lodash';
+import Dexie, { Table } from "dexie";
+import { throttle } from "lodash";
+import { Event, Filter } from "nostr-tools";
 
-import { Event, Filter } from '../lib/nostr-tools';
-
-import Events from './Events';
-import Key from './Key';
+import Events from "./Events";
+import Key from "./Key";
 export class MyDexie extends Dexie {
   events!: Table<Event & { id: string }>;
 
   constructor() {
-    super('iris');
+    super("iris");
     this.version(2).stores({
-      events: 'id, pubkey, kind, created_at', // Primary key and indexed props
+      events: "id, pubkey, kind, created_at", // Primary key and indexed props
     });
   }
 }
@@ -69,7 +68,7 @@ const IndexedDB = {
       .then(() => {
         // some latest global events
         return db.events
-          .orderBy('created_at')
+          .orderBy("created_at")
           .reverse()
           .filter((event) => event.kind === 1)
           .limit(5000)
@@ -80,11 +79,11 @@ const IndexedDB = {
 
     // other events to be loaded on demand
   },
-  subscribeToAuthors: throttle((limit) => {
+  subscribeToAuthors: throttle((limit?: number) => {
     const authors = Array.from(IndexedDB.subscribedAuthors.values());
     IndexedDB.subscribedAuthors.clear();
     db.events
-      .where('pubkey')
+      .where("pubkey")
       .anyOf(authors)
       .limit(limit || 1000)
       .each((event) => {
@@ -95,7 +94,7 @@ const IndexedDB = {
     const ids = Array.from(IndexedDB.subscribedEventIds.values());
     IndexedDB.subscribedEventIds.clear();
     db.events
-      .where('id')
+      .where("id")
       .anyOf(ids)
       .each((event) => {
         Events.handle(event, false, false);
@@ -105,7 +104,7 @@ const IndexedDB = {
     if (!filter) {
       return;
     }
-    if (filter['#e'] || filter['#p']) {
+    if (filter["#e"] || filter["#p"]) {
       // currently inefficient lookups
       return;
     }
@@ -130,8 +129,8 @@ const IndexedDB = {
       this.seenFilters.add(stringifiedFilter);
       if (filter.kinds) {
         query = query.where
-          ? query.where('kind').anyOf(filter.kinds)
-          : query.and((event) => filter.kinds.includes(event.kind));
+          ? query.where("kind").anyOf(filter.kinds)
+          : query.and((event) => filter.kinds?.includes(event.kind));
       }
       if (filter.limit) {
         query = query.limit(filter.limit); // TODO these are not sorted by created_at desc

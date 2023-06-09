@@ -1,7 +1,7 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import Icons from '../../Icons';
-import localState from '../../LocalState';
+import Icons from "../../Icons";
+import localState from "../../LocalState";
 
 const Tab = styled.a`
   /* Default styles for all 'a' elements inside '.tabs' */
@@ -26,24 +26,28 @@ const Tab = styled.a`
 `;
 
 export default function FeedTypeSelector({ setDisplay, display, index }) {
-  const isProfile = ['posts', 'postsAndReplies', 'likes'].includes(index);
+  const isProfile = ["posts", "postsAndReplies", "likes"].includes(index);
   return (
     <div className="tabs">
       <Tab
         onClick={() => {
-          setDisplay('posts');
-          localState.get('settings').get('feed').get('display').put('posts');
+          setDisplay("posts");
+          localState.get("settings").get("feed").get("display").put("posts");
         }}
-        className={`${display === 'grid' ? '' : 'active'} ${isProfile ? 'isProfile_left' : ''}`}
+        className={`${display === "grid" ? "" : "active"} ${
+          isProfile ? "isProfile_left" : ""
+        }`}
       >
         {Icons.post}
       </Tab>
       <Tab
         onClick={() => {
-          setDisplay('grid');
-          localState.get('settings').get('feed').get('display').put('grid');
+          setDisplay("grid");
+          localState.get("settings").get("feed").get("display").put("grid");
         }}
-        className={`${display === 'grid' ? 'active' : ''} ${isProfile ? 'isProfile_right' : ''}`}
+        className={`${display === "grid" ? "active" : ""} ${
+          isProfile ? "isProfile_right" : ""
+        }`}
       >
         {Icons.grid}
       </Tab>

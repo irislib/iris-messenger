@@ -1,18 +1,18 @@
-import { ArrowPathIcon, HeartIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
-import $ from 'jquery';
-import { memo } from 'preact/compat';
-import { useEffect, useState } from 'preact/hooks';
-import { route } from 'preact-router';
-import styled from 'styled-components';
+import { ArrowPathIcon, HeartIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartIconFull } from "@heroicons/react/24/solid";
+import $ from "jquery";
+import { memo } from "preact/compat";
+import { useEffect, useState } from "preact/hooks";
+import { route } from "preact-router";
+import styled from "styled-components";
 
-import Icons from '../../Icons';
-import { decodeInvoice, formatAmount } from '../../Lightning';
-import Events from '../../nostr/Events';
-import Key from '../../nostr/Key';
-import SocialNetwork from '../../nostr/SocialNetwork';
-import Identicon from '../Identicon';
-import ZapModal from '../modal/Zap';
+import Icons from "../../Icons";
+import { decodeInvoice, formatAmount } from "../../Lightning";
+import Events from "../../nostr/Events";
+import Key from "../../nostr/Key";
+import SocialNetwork from "../../nostr/SocialNetwork";
+import Identicon from "../Identicon";
+import ZapModal from "../modal/Zap";
 
 const ReactionButtons = styled.div`
   display: flex;
@@ -45,7 +45,7 @@ const ReactionCount = styled.span`
     margin-right: 5px;
   }
 
-  ${(props) => (props.active ? 'color: var(--text-color)' : '')};
+  ${(props) => (props.active ? "color: var(--text-color)" : "")};
 `;
 
 const Reactions = (props) => {
@@ -53,8 +53,8 @@ const Reactions = (props) => {
     reposts: 0,
     reposted: false,
     likes: 0,
-    zappers: null,
-    totalZapped: '',
+    zappers: null as string[] | null,
+    totalZapped: "",
     liked: false,
     repostedBy: new Set<string>(),
     likedBy: new Set<string>(),
@@ -71,7 +71,7 @@ const Reactions = (props) => {
   useEffect(() => {
     if (event) {
       const unsub1 = Events.getRepliesAndReactions(event.id, (...args) =>
-        handleRepliesAndReactions(...args),
+        handleRepliesAndReactions(...args)
       );
 
       const unsub2 = SocialNetwork.getProfile(event.pubkey, (profile) => {
@@ -92,9 +92,9 @@ const Reactions = (props) => {
 
   function replyBtnClicked() {
     if (props.standalone) {
-      $(document).find('textarea').focus();
+      $(document).find("textarea").focus();
     } else {
-      route(`/${Key.toNostrBech32Address(props.event.id, 'note')}`);
+      route(`/${Key.toNostrBech32Address(props.event.id, "note")}`);
     }
   }
 
@@ -114,10 +114,10 @@ const Reactions = (props) => {
         Events.publish({
           kind: 6,
           tags: [
-            ['e', hexId, '', 'mention'],
-            ['p', author],
+            ["e", hexId, "", "mention"],
+            ["p", author],
           ],
-          content: '',
+          content: "",
         });
       }
     }
@@ -131,10 +131,10 @@ const Reactions = (props) => {
       if (hexId) {
         Events.publish({
           kind: 7,
-          content: '+',
+          content: "+",
           tags: [
-            ['e', hexId],
-            ['p', author],
+            ["e", hexId],
+            ["p", author],
           ],
         });
       }
@@ -142,7 +142,7 @@ const Reactions = (props) => {
   }
 
   function toggleLikes(e) {
-    console.log('toggle likes');
+    console.log("toggle likes");
     e.stopPropagation();
     setState((prevState) => ({
       ...prevState,
@@ -177,7 +177,7 @@ const Reactions = (props) => {
     likedBy: Set<string>,
     threadReplyCount: number,
     repostedBy: Set<string>,
-    zaps: Set<string>,
+    zaps: any
   ) {
     // zaps.size &&
     //  console.log('zaps.size', zaps.size, Key.toNostrBech32Address(event.id, 'note'));
@@ -186,8 +186,8 @@ const Reactions = (props) => {
       replies &&
       Array.from(replies).sort((a, b) => {
         // heavy op? unnecessary when they're not even shown?
-        const eventA = Events.db.by('id', a);
-        const eventB = Events.db.by('id', b);
+        const eventA = Events.db.by("id", a);
+        const eventB = Events.db.by("id", b);
         // show our replies first
         if (eventA?.pubkey === myPub && eventB?.pubkey !== myPub) {
           return -1;
@@ -195,20 +195,30 @@ const Reactions = (props) => {
           return 1;
         }
         // show replies by original post's author first
-        if (eventA?.pubkey === event?.pubkey && eventB?.pubkey !== event?.pubkey) {
+        if (
+          eventA?.pubkey === event?.pubkey &&
+          eventB?.pubkey !== event?.pubkey
+        ) {
           return -1;
-        } else if (eventA?.pubkey !== event?.pubkey && eventB?.pubkey === event?.pubkey) {
+        } else if (
+          eventA?.pubkey !== event?.pubkey &&
+          eventB?.pubkey === event?.pubkey
+        ) {
           return 1;
         }
         return eventA?.created_at - eventB?.created_at;
       });
 
-    const zapEvents = Array.from(zaps?.values()).map((eventId) => Events.db.by('id', eventId));
-    const zappers = zapEvents.map((event) => Events.getZappingUser(event.id));
+    const zapEvents = Array.from(zaps?.values()).map((eventId) =>
+      Events.db.by("id", eventId)
+    );
+    const zappers = zapEvents
+      .map((event) => Events.getZappingUser(event.id))
+      .filter((user) => user !== null) as string[];
     const totalZapped = zapEvents.reduce((acc, event) => {
-      const bolt11 = event?.tags.find((tag) => tag[0] === 'bolt11')[1];
+      const bolt11 = event?.tags.find((tag) => tag[0] === "bolt11")[1];
       if (!bolt11) {
-        console.log('Invalid zap, missing bolt11 tag');
+        console.log("Invalid zap, missing bolt11 tag");
         return acc;
       }
       const decoded = decodeInvoice(bolt11);
@@ -236,9 +246,14 @@ const Reactions = (props) => {
     return (
       <div className="likes">
         {Array.from(state.likedBy).map((key) => {
-          const npub = Key.toNostrBech32Address(key, 'npub');
+          const npub = Key.toNostrBech32Address(key, "npub");
           return (
-            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width={32} />
+            <Identicon
+              showTooltip={true}
+              onClick={() => route(`/${npub}`)}
+              str={npub}
+              width={32}
+            />
           );
         })}
       </div>
@@ -252,36 +267,43 @@ const Reactions = (props) => {
         <a className="msg-btn reply-btn" onClick={() => replyBtnClicked()}>
           {Icons.reply}
         </a>
-        <ReactionCount>{s.replyCount || ''}</ReactionCount>
+        <ReactionCount>{s.replyCount || ""}</ReactionCount>
         {props.settings.showReposts ? (
           <>
             <a
-              className={`msg-btn repost-btn ${s.reposted ? 'reposted' : ''}`}
+              className={`msg-btn repost-btn ${s.reposted ? "reposted" : ""}`}
               onClick={(e) => repostBtnClicked(e)}
             >
               <ArrowPathIcon width={24} />
             </a>
-            <ReactionCount active={s.showReposts} onClick={(e) => toggleReposts(e)}>
-              {s.reposts || ''}
+            <ReactionCount
+              active={s.showReposts}
+              onClick={(e) => toggleReposts(e)}
+            >
+              {s.reposts || ""}
             </ReactionCount>
           </>
         ) : (
-          ''
+          ""
         )}
         {props.settings.showLikes ? (
           <>
             <a
-              className={`msg-btn like-btn ${s.liked ? 'liked' : ''}`}
+              className={`msg-btn like-btn ${s.liked ? "liked" : ""}`}
               onClick={(e) => likeBtnClicked(e)}
             >
-              {s.liked ? <HeartIconFull width={24} /> : <HeartIcon width={24} />}
+              {s.liked ? (
+                <HeartIconFull width={24} />
+              ) : (
+                <HeartIcon width={24} />
+              )}
             </a>
             <ReactionCount active={s.showLikes} onClick={(e) => toggleLikes(e)}>
-              {s.likes || ''}
+              {s.likes || ""}
             </ReactionCount>
           </>
         ) : (
-          ''
+          ""
         )}
         {props.settings.showZaps && state.lightning ? (
           <>
@@ -296,11 +318,11 @@ const Reactions = (props) => {
               {Icons.lightning}
             </a>
             <ReactionCount active={s.showZaps} onClick={(e) => toggleZaps(e)}>
-              {s.totalZapped || ''}
+              {s.totalZapped || ""}
             </ReactionCount>
           </>
         ) : (
-          ''
+          ""
         )}
       </ReactionButtons>
     );
@@ -313,7 +335,9 @@ const Reactions = (props) => {
         lnurl={state.lightning}
         note={props.event.id}
         recipient={props.event.pubkey}
-        onClose={() => setState((prevState) => ({ ...prevState, showZapModal: false }))}
+        onClose={() =>
+          setState((prevState) => ({ ...prevState, showZapModal: false }))
+        }
       />
     );
   }
@@ -323,7 +347,12 @@ const Reactions = (props) => {
       <div className="likes">
         {(state.zappers || []).map((npub) => {
           return (
-            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width={32} />
+            <Identicon
+              showTooltip={true}
+              onClick={() => route(`/${npub}`)}
+              str={npub}
+              width={32}
+            />
           );
         })}
       </div>
@@ -334,9 +363,14 @@ const Reactions = (props) => {
     return (
       <div className="likes">
         {Array.from(state.repostedBy).map((key) => {
-          const npub = Key.toNostrBech32Address(key, 'npub');
+          const npub = Key.toNostrBech32Address(key, "npub");
           return (
-            <Identicon showTooltip={true} onClick={() => route(`/${npub}`)} str={npub} width={32} />
+            <Identicon
+              showTooltip={true}
+              onClick={() => route(`/${npub}`)}
+              str={npub}
+              width={32}
+            />
           );
         })}
       </div>

@@ -1,25 +1,25 @@
-import { HeartIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
-import { route } from 'preact-router';
-import { Link } from 'preact-router/match';
+import { HeartIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartIconFull } from "@heroicons/react/24/solid";
+import { route } from "preact-router";
+import { Link } from "preact-router/match";
 
-import logo from '../../assets/img/icon128.png';
-import Component from '../BaseComponent';
-import Helpers from '../Helpers';
-import Icons from '../Icons';
-import localState from '../LocalState';
-import Key from '../nostr/Key';
-import Relays from '../nostr/Relays';
-import { translate as t } from '../translations/Translation';
+import logo from "../../assets/img/icon128.png";
+import Component from "../BaseComponent";
+import Helpers from "../Helpers";
+import Icons from "../Icons";
+import localState from "../LocalState";
+import Key from "../nostr/Key";
+import Relays from "../nostr/Relays";
+import { translate as t } from "../translations/Translation.mjs";
 
-import { Button, PrimaryButton } from './buttons/Button';
-import Identicon from './Identicon';
-import Name from './Name';
-import SearchBox from './SearchBox';
+import { Button, PrimaryButton } from "./buttons/Button";
+import Identicon from "./Identicon";
+import Name from "./Name";
+import SearchBox from "./SearchBox";
 
 export default class Header extends Component {
-  chatId = null;
-  iv = null;
+  chatId = null as string | null;
+  iv = null as any;
 
   constructor() {
     super();
@@ -39,53 +39,69 @@ export default class Header extends Component {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    clearInterval(this.iv);
-    document.removeEventListener('keydown', this.escFunction, false);
+    this.iv && clearInterval(this.iv);
+    document.removeEventListener("keydown", this.escFunction, false);
   }
 
   componentDidMount() {
-    document.addEventListener('keydown', this.escFunction, false);
-    localState.get('showParticipants').on(this.inject());
-    localState.get('unseenMsgsTotal').on(this.inject());
-    localState.get('unseenNotificationCount').on(this.inject());
-    localState.get('showConnectedRelays').on(this.inject());
-    localState.get('activeRoute').on(
+    document.addEventListener("keydown", this.escFunction, false);
+    localState.get("showParticipants").on(this.inject());
+    localState.get("unseenMsgsTotal").on(this.inject());
+    localState.get("unseenNotificationCount").on(this.inject());
+    localState.get("showConnectedRelays").on(this.inject());
+    localState.get("activeRoute").on(
       this.sub((activeRoute) => {
         this.setState({
           about: null,
-          title: '',
+          title: "",
           activeRoute,
           showMobileSearch: false,
         });
-        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+        const replaced = activeRoute
+          .replace("/chat/new", "")
+          .replace("/chat/", "");
         this.chatId = replaced.length < activeRoute.length ? replaced : null;
         if (this.chatId) {
-          localState.get('channels').get(this.chatId).get('isTyping').on(this.inject());
-          localState.get('channels').get(this.chatId).get('theirLastActiveTime').on(this.inject());
+          localState
+            .get("channels")
+            .get(this.chatId)
+            .get("isTyping")
+            .on(this.inject());
+          localState
+            .get("channels")
+            .get(this.chatId)
+            .get("theirLastActiveTime")
+            .on(this.inject());
         }
 
-        if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
-          if (activeRoute.indexOf('/chat/') === 0 && this.chatId === Key.getPubKey()) {
+        if (
+          activeRoute.indexOf("/chat/") === 0 &&
+          activeRoute.indexOf("/chat/new") !== 0
+        ) {
+          if (
+            activeRoute.indexOf("/chat/") === 0 &&
+            this.chatId === Key.getPubKey()
+          ) {
             const title = (
               <>
-                <b style="margin-right:5px">📝</b> <b>{t('note_to_self')}</b>
+                <b style="margin-right:5px">📝</b> <b>{t("note_to_self")}</b>
               </>
             );
             this.setState({ title });
           } else {
-            const title = <Name key={this.chatId} pub={this.chatId} />;
+            const title = <Name key={this.chatId} pub={this.chatId || ""} />;
             this.setState({ title });
           }
         }
-      }),
+      })
     );
     this.updateRelayCount();
     this.iv = setInterval(() => this.updateRelayCount(), 1000);
   }
 
   onTitleClicked() {
-    if (this.chatId && this.chatId.indexOf('hashtag') === -1) {
-      const view = this.chatId.length < 40 ? '/group/' : '/';
+    if (this.chatId && this.chatId.indexOf("hashtag") === -1) {
+      const view = this.chatId.length < 40 ? "/group/" : "/";
       route(view + this.chatId);
     }
   }
@@ -93,9 +109,9 @@ export default class Header extends Component {
   onLogoClick(e) {
     e.preventDefault();
     e.stopPropagation();
-    (document.querySelector('a.logo') as HTMLElement).blur();
-    window.innerWidth > 625 && route('/');
-    localState.get('toggleMenu').put(true);
+    (document.querySelector("a.logo") as HTMLElement).blur();
+    window.innerWidth > 625 && route("/");
+    localState.get("toggleMenu").put(true);
   }
 
   updateRelayCount() {
@@ -104,7 +120,7 @@ export default class Header extends Component {
 
   renderBackButton() {
     const { activeRoute } = this.state;
-    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
+    const chatting = activeRoute && activeRoute.indexOf("/chat/") === 0;
     return chatting ? (
       <div
         id="back-button"
@@ -114,24 +130,32 @@ export default class Header extends Component {
         {Icons.backArrow}
       </div>
     ) : (
-      ''
+      ""
     );
   }
 
   renderMenuIcon() {
     const { activeRoute } = this.state;
-    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
+    const chatting = activeRoute && activeRoute.indexOf("/chat/") === 0;
     return !Helpers.isElectron && !chatting ? (
-      <a href="/" onClick={(e) => this.onLogoClick(e)} class="visible-xs-flex logo">
+      <a
+        href="/"
+        onClick={(e) => this.onLogoClick(e)}
+        class="visible-xs-flex logo"
+      >
         <div class="mobile-menu-icon">{Icons.menu}</div>
       </a>
     ) : (
-      ''
+      ""
     );
   }
 
   renderSearchBox() {
-    return !this.chatId ? <SearchBox onSelect={(item) => route(`/${item.key}`)} /> : '';
+    return !this.chatId ? (
+      <SearchBox onSelect={(item) => route(`/${item.key}`)} />
+    ) : (
+      ""
+    );
   }
 
   renderConnectedRelays() {
@@ -139,10 +163,10 @@ export default class Header extends Component {
       <a
         href="/settings/network"
         class={`connected-peers tooltip mobile-search-hidden ${
-          this.state.showMobileSearch ? 'hidden-xs' : ''
-        } ${this.state.connectedRelays > 0 ? 'connected' : ''}`}
+          this.state.showMobileSearch ? "hidden-xs" : ""
+        } ${this.state.connectedRelays > 0 ? "connected" : ""}`}
       >
-        <span class="tooltiptext right">{t('connected_relays')}</span>
+        <span class="tooltiptext right">{t("connected_relays")}</span>
         <small>
           <span class="icon">{Icons.network}</span>
           <span>{this.state.connectedRelays}</span>
@@ -154,21 +178,35 @@ export default class Header extends Component {
   renderHeaderText() {
     const { chat, activeRoute } = this.state;
     const isTyping = chat && chat.isTyping;
-    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
+    const chatting = activeRoute && activeRoute.indexOf("/chat/") === 0;
     return (
       <div
         class="text"
-        style={this.chatId ? 'cursor:pointer;text-align:center' : ''}
+        style={this.chatId ? "cursor:pointer;text-align:center" : ""}
         onClick={() => this.onTitleClicked()}
       >
-        {this.state.title && chatting ? <div class="name">{this.state.title}</div> : ''}
-        {isTyping ? <small class="typing-indicator">{t('typing')}</small> : ''}
-        {this.state.about ? <small class="participants">{this.state.about}</small> : ''}
-        {this.chatId ? <small class="last-seen">{this.state.onlineStatus || ''}</small> : ''}
+        {this.state.title && chatting ? (
+          <div class="name">{this.state.title}</div>
+        ) : (
+          ""
+        )}
+        {isTyping ? <small class="typing-indicator">{t("typing")}</small> : ""}
+        {this.state.about ? (
+          <small class="participants">{this.state.about}</small>
+        ) : (
+          ""
+        )}
+        {this.chatId ? (
+          <small class="last-seen">{this.state.onlineStatus || ""}</small>
+        ) : (
+          ""
+        )}
         {!chatting && (
           <div
             id="mobile-search"
-            class={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
+            class={`mobile-search-visible ${
+              this.state.showMobileSearch ? "" : "hidden-xs"
+            }`}
           >
             {this.renderSearchBox()}
           </div>
@@ -183,16 +221,20 @@ export default class Header extends Component {
       <div
         id="mobile-search-btn"
         class={`mobile-search-hidden ${
-          this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'
+          this.state.showMobileSearch ? "hidden" : "visible-xs-inline-block"
         }`}
         onClick={() => {
           // also synchronously make element visible so it can be focused
-          document.querySelector('.mobile-search-visible').classList.remove('hidden-xs', 'hidden');
           document
-            .querySelector('.mobile-search-hidden')
-            .classList.remove('visible-xs-inline-block');
-          document.querySelector('.mobile-search-hidden').classList.add('hidden');
-          const input = document.querySelector('.search-box input');
+            .querySelector(".mobile-search-visible")
+            ?.classList.remove("hidden-xs", "hidden");
+          document
+            .querySelector(".mobile-search-hidden")
+            ?.classList.remove("visible-xs-inline-block");
+          document
+            .querySelector(".mobile-search-hidden")
+            ?.classList.add("hidden");
+          const input = document.querySelector(".search-box input");
           if (input) {
             setTimeout(() => {
               (input as HTMLInputElement).focus();
@@ -204,18 +246,18 @@ export default class Header extends Component {
         {Icons.search}
       </div>
     ) : (
-      ''
+      ""
     );
   }
 
   renderMyProfile() {
     const key = Key.getPubKey();
-    const npub = Key.toNostrBech32Address(key, 'npub');
+    const npub = Key.toNostrBech32Address(key, "npub");
     return (
       <Link
         activeClassName="active"
         href={`/${npub}`}
-        onClick={() => localState.get('scrollUp').put(true)}
+        onClick={() => localState.get("scrollUp").put(true)}
         class="hidden-xs my-profile"
       >
         <Identicon str={npub} width={34} />
@@ -228,20 +270,22 @@ export default class Header extends Component {
       <a
         href="/notifications"
         class={`notifications-button mobile-search-hidden ${
-          this.state.showMobileSearch ? 'hidden' : ''
+          this.state.showMobileSearch ? "hidden" : ""
         }`}
       >
-        {this.state.activeRoute === '/notifications' ? (
+        {this.state.activeRoute === "/notifications" ? (
           <HeartIconFull width={28} />
         ) : (
           <HeartIcon width={28} />
         )}
         {this.state.unseenNotificationCount ? (
           <span class="unseen">
-            {this.state.unseenNotificationCount > 99 ? '' : this.state.unseenNotificationCount}
+            {this.state.unseenNotificationCount > 99
+              ? ""
+              : this.state.unseenNotificationCount}
           </span>
         ) : (
-          ''
+          ""
         )}
       </a>
     );
@@ -259,11 +303,17 @@ export default class Header extends Component {
   renderLoginBtns() {
     return (
       <div class="login-buttons">
-        <PrimaryButton small onClick={() => localState.get('showLoginModal').put(true)}>
-          {t('log_in')}
+        <PrimaryButton
+          small
+          onClick={() => localState.get("showLoginModal").put(true)}
+        >
+          {t("log_in")}
         </PrimaryButton>
-        <Button small onClick={() => localState.get('showLoginModal').put(true)}>
-          {t('sign_up')}
+        <Button
+          small
+          onClick={() => localState.get("showLoginModal").put(true)}
+        >
+          {t("sign_up")}
         </Button>
       </div>
     );
@@ -276,11 +326,17 @@ export default class Header extends Component {
         {!loggedIn && this.renderLogo()}
         {this.renderBackButton()}
         <div className="header-content">
-          <div className={`mobile-search-hidden ${this.state.showMobileSearch ? 'hidden-xs' : ''}`}>
+          <div
+            className={`mobile-search-hidden ${
+              this.state.showMobileSearch ? "hidden-xs" : ""
+            }`}
+          >
             {loggedIn && this.renderMenuIcon()}
           </div>
           <a
-            className={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
+            className={`mobile-search-visible ${
+              this.state.showMobileSearch ? "" : "hidden-xs"
+            }`}
             href=""
             onClick={(e) => {
               e.preventDefault();
@@ -289,7 +345,9 @@ export default class Header extends Component {
           >
             <span class="visible-xs-inline-block">{Icons.backArrow}</span>
           </a>
-          {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
+          {loggedIn &&
+            this.state.showConnectedRelays &&
+            this.renderConnectedRelays()}
           {this.renderHeaderText()}
           {loggedIn && this.renderNotifications()}
           {loggedIn && this.renderMyProfile()}

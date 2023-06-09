@@ -1,11 +1,11 @@
-import Component from '../../../BaseComponent';
+import Component from "../../../BaseComponent";
 class MainView extends Component {
   constructor() {
     super();
   }
 
   render() {
-    return '';
+    return "";
   }
 }
 export default MainView;

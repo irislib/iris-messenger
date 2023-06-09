@@ -1,9 +1,10 @@
-import { Event } from './lib/nostr-tools';
-import Helpers from './Helpers';
+import { Event } from "nostr-tools";
+
+import Helpers from "./Helpers";
 
 // Code kindly contributed by @Kieran from Snort
 
-const PayServiceTag = 'payRequest';
+const PayServiceTag = "payRequest";
 
 export enum LNURLErrorCode {
   ServiceUnavailable = 1,
@@ -29,23 +30,26 @@ export class LNURL {
    */
   constructor(lnurl: string) {
     lnurl = lnurl.toLowerCase().trim();
-    if (lnurl.startsWith('lnurl')) {
+    if (lnurl.startsWith("lnurl")) {
       const decoded = Helpers.bech32ToText(lnurl);
-      if (!decoded.startsWith('http')) {
-        throw new LNURLError(LNURLErrorCode.InvalidLNURL, 'Not a url');
+      if (!decoded.startsWith("http")) {
+        throw new LNURLError(LNURLErrorCode.InvalidLNURL, "Not a url");
       }
       this.#url = new URL(decoded);
     } else if (lnurl.match(/[\w.-]+@[\w.-]/)) {
-      const [handle, domain] = lnurl.split('@');
+      const [handle, domain] = lnurl.split("@");
       this.#url = new URL(`https://${domain}/.well-known/lnurlp/${handle}`);
-    } else if (lnurl.startsWith('https:')) {
+    } else if (lnurl.startsWith("https:")) {
       this.#url = new URL(lnurl);
-    } else if (lnurl.startsWith('lnurlp:')) {
+    } else if (lnurl.startsWith("lnurlp:")) {
       const tmp = new URL(lnurl);
-      tmp.protocol = 'https:';
+      tmp.protocol = "https:";
       this.#url = tmp;
     } else {
-      throw new LNURLError(LNURLErrorCode.InvalidLNURL, 'Could not determine service url');
+      throw new LNURLError(
+        LNURLErrorCode.InvalidLNURL,
+        "Could not determine service url"
+      );
     }
   }
 
@@ -71,30 +75,30 @@ export class LNURL {
     if (callback.search.length > 0) {
       callback.search
         .slice(1)
-        .split('&')
+        .split("&")
         .forEach((a) => {
-          const pSplit = a.split('=');
+          const pSplit = a.split("=");
           query.set(pSplit[0], pSplit[1]);
         });
     }
-    query.set('amount', Math.floor(amount * 1000).toString());
+    query.set("amount", Math.floor(amount * 1000).toString());
     if (comment && this.#service?.commentAllowed) {
-      query.set('comment', comment);
+      query.set("comment", comment);
     }
     if (this.#service?.nostrPubkey && zap) {
-      query.set('nostr', JSON.stringify(zap)); // zap.ToObject() ?
+      query.set("nostr", JSON.stringify(zap)); // zap.ToObject() ?
     }
 
     const baseUrl = `${callback.protocol}//${callback.host}${callback.pathname}`;
     const queryJoined = [...query.entries()]
       .map((v) => `${v[0]}=${encodeURIComponent(v[1])}`)
-      .join('&');
+      .join("&");
     try {
       const rsp = await fetch(`${baseUrl}?${queryJoined}`);
       if (rsp.ok) {
         const data: LNURLInvoice = await rsp.json();
-        console.debug('[LNURL]: ', data);
-        if (data.status === 'ERROR') {
+        console.debug("[LNURL]: ", data);
+        if (data.status === "ERROR") {
           throw new Error(data.reason);
         } else {
           return data;
@@ -102,11 +106,14 @@ export class LNURL {
       } else {
         throw new LNURLError(
           LNURLErrorCode.ServiceUnavailable,
-          `Failed to fetch invoice (${rsp.statusText})`,
+          `Failed to fetch invoice (${rsp.statusText})`
         );
       }
     } catch (e) {
-      throw new LNURLError(LNURLErrorCode.ServiceUnavailable, 'Failed to load callback');
+      throw new LNURLError(
+        LNURLErrorCode.ServiceUnavailable,
+        "Failed to load callback"
+      );
     }
   }
 
@@ -147,10 +154,13 @@ export class LNURL {
 
   #validateService() {
     if (this.#service?.tag !== PayServiceTag) {
-      throw new LNURLError(LNURLErrorCode.InvalidLNURL, 'Only LNURLp is supported');
+      throw new LNURLError(
+        LNURLErrorCode.InvalidLNURL,
+        "Only LNURLp is supported"
+      );
     }
     if (!this.#service?.callback) {
-      throw new LNURLError(LNURLErrorCode.InvalidLNURL, 'No callback url');
+      throw new LNURLError(LNURLErrorCode.InvalidLNURL, "No callback url");
     }
   }
 }
@@ -166,7 +176,7 @@ export interface LNURLService {
 }
 
 export interface LNURLStatus {
-  status: 'SUCCESS' | 'ERROR';
+  status: "SUCCESS" | "ERROR";
   reason?: string;
 }
 

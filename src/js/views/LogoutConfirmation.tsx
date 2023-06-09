@@ -1,20 +1,20 @@
-import { route } from 'preact-router';
+import { route } from "preact-router";
 
-import { PrimaryButton as Button } from '../components/buttons/Button';
-import Session from '../nostr/Session';
-import { translate as t } from '../translations/Translation';
+import { PrimaryButton as Button } from "../components/buttons/Button";
+import Session from "../nostr/Session";
+import { translate as t } from "../translations/Translation.mjs";
 
 export default function LogoutConfirmation(_props) {
   return (
     <div class="main-view" id="logout-confirmation">
       <div class="centered-container">
-        <p>{t('logout_confirmation_info')}</p>
+        <p>{t("logout_confirmation_info")}</p>
         <p>
-          <Button onClick={() => route('/settings')}>{t('back')}</Button>
+          <Button onClick={() => route("/settings")}>{t("back")}</Button>
         </p>
         <p>
           <Button className="logout-button" onClick={() => Session.logOut()}>
-            {t('log_out')}
+            {t("log_out")}
           </Button>
         </p>
       </div>

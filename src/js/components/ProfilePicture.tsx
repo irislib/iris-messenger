@@ -1,7 +1,7 @@
-import { useState } from 'preact/hooks';
+import { useState } from "preact/hooks";
 
-import Modal from './modal/Modal';
-import SafeImg from './SafeImg';
+import Modal from "./modal/Modal";
+import SafeImg from "./SafeImg";
 
 type Props = { picture?: string; onError?: () => void };
 
@@ -16,9 +16,18 @@ const ProfilePicture = ({ picture, onError }: Props) => {
     setShowModal(false);
   };
 
+  if (!picture) {
+    return null;
+  }
+
   return (
     <>
-      <SafeImg class="profile-picture" src={picture} onError={onError} onClick={handleClick} />
+      <SafeImg
+        class="profile-picture"
+        src={picture}
+        onError={onError}
+        onClick={handleClick}
+      />
       {showModal && (
         <Modal centerVertically={true} onClose={handleClose}>
           <SafeImg src={picture} onError={onError} />

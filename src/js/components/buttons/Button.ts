@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const Button = styled.button`
   background: var(--button-bg);
@@ -7,7 +7,7 @@ const Button = styled.button`
   font-weight: bold;
   cursor: pointer;
   transition: all 0.25s ease;
-  width: ${(props) => props.width || 'auto'};
+  width: ${(props) => props.width || "auto"};
 
   ${(props) =>
     props.small &&

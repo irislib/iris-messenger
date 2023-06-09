@@ -1,20 +1,20 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useState } from "preact/hooks";
 
-import localState from '../../LocalState';
-import { translate as t } from '../../translations/Translation';
+import localState from "../../LocalState";
+import { translate as t } from "../../translations/Translation.mjs";
 
 const Payments = () => {
-  const [displayCurrency, setDisplayCurrency] = useState('USD');
+  const [displayCurrency, setDisplayCurrency] = useState("USD");
   const [defaultZapAmount, setDefaultZapAmount] = useState(1000);
 
   useEffect(() => {
-    localState.get('displayCurrency').on((displayCurrency) => {
+    localState.get("displayCurrency").on((displayCurrency) => {
       setDisplayCurrency(displayCurrency);
     });
   }, []);
 
   useEffect(() => {
-    localState.get('defaultZapAmount').on((defaultZapAmount) => {
+    localState.get("defaultZapAmount").on((defaultZapAmount) => {
       setDefaultZapAmount(defaultZapAmount);
     });
   });
@@ -22,19 +22,19 @@ const Payments = () => {
   const onChange = (e: Event) => {
     const target = e.target as HTMLSelectElement;
     const value = target.value;
-    localState.get('displayCurrency').put(value);
+    localState.get("displayCurrency").put(value);
   };
 
   return (
     <>
       <div class="centered-container">
-        <h3>{t('payments')}</h3>
+        <h3>{t("payments")}</h3>
         <p>
-          Payments on Iris are called Zaps and are made with Bitcoin.{' '}
+          Payments on Iris are called Zaps and are made with Bitcoin.{" "}
           <a href="https://github.com/irislib/faq#zapping">FAQ</a>
         </p>
         <p>
-          <label for="displayCurrency">{t('display_currency')}</label>
+          <label for="displayCurrency">{t("display_currency")}</label>
           <select
             id="displayCurrency"
             name="displayCurrency"
@@ -48,14 +48,16 @@ const Payments = () => {
           </select>
         </p>
         <p>
-          <label for="defaultZapAmount">{t('default_zap_amount')} (sats):</label>
+          <label for="defaultZapAmount">
+            {t("default_zap_amount")} (sats):
+          </label>
           <input
             type="number"
             id="defaultZapAmount"
             name="defaultZapAmount"
             value={defaultZapAmount}
             onChange={(e) => {
-              localState.get('defaultZapAmount').put(e.currentTarget.value);
+              localState.get("defaultZapAmount").put(e.currentTarget.value);
             }}
           />
         </p>

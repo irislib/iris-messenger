@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import { Component } from "preact";
 
 export default class ErrorBoundary extends Component {
   state = { error: null };
