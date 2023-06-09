@@ -1,4 +1,4 @@
-import english from './en.mjs';
+import english from './languages/en.mjs';
 import { createElement } from "preact";
 
 const AVAILABLE_LANGUAGES = {
@@ -36,6 +36,8 @@ const AVAILABLE_LANGUAGES = {
   'el-GR': 'Ελληνικά',
 };
 
+const modules = import.meta.glob('./languages/*.mjs');
+
 let AVAILABLE_LANGUAGE_KEYS = Object.keys(AVAILABLE_LANGUAGES);
 
 let language;
@@ -54,7 +56,8 @@ if (AVAILABLE_LANGUAGE_KEYS.indexOf(language) === -1) {
   }
 }
 
-translationLoaded = import(`./${language}.mjs`).then((module) => {
+translationLoaded = modules[`./languages/${language}.mjs`]().then((module) => {
+  console.log('loaded translation', language, `./languages/${language}.mjs`);
   translation = module.default;
   if (language !== 'en') {
     translation = { ...english, ...translation };
