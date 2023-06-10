@@ -2,7 +2,7 @@ import * as secp from '@noble/secp256k1';
 import * as bech32 from 'bech32-buffer';
 import { Component } from 'preact';
 
-import logo from '../../assets/img/android-chrome-192x192.png';
+import logo from '../../../public/img/android-chrome-192x192.png';
 import { PrimaryButton as Button } from '../components/buttons/Button';
 import EULA from '../components/EULA';
 import LanguageSelector from '../components/LanguageSelector';

@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 
-import logo from '../../assets/img/icon128.png';
+import logo from '../../../public/img/icon128.png';
 import BaseComponent from '../BaseComponent';
 import Icons from '../Icons';
 import localState from '../LocalState';

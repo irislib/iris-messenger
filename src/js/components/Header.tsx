@@ -3,7 +3,7 @@ import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
-import logo from '../../assets/img/icon128.png';
+import logo from '../../../public/img/icon128.png';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
