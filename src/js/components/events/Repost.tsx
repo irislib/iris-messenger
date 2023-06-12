@@ -34,15 +34,8 @@ export default function Repost(props: Props) {
   return (
     <div className="msg">
       <div className="msg-content" style={{ padding: '12px 0 0 0' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            flexBasis: '100%',
-            marginLeft: '15px',
-          }}
-        >
-          <small className="reposted">
+        <div>
+          <small className="text-neutral-500">
             <i>
               <ArrowPathIcon width={24} />
             </i>

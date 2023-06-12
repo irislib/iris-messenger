@@ -173,7 +173,7 @@ const Note = ({
 
   function renderReplyingTo() {
     return (
-      <small className="msg-replying-to">
+      <small className="text-neutral-500">
         {t('replying_to') + ' '}
         {replyingToUsers.slice(0, 3).map((u) => (
           <a href={`/${Key.toNostrBech32Address(u, 'npub')}`}>
@@ -233,7 +233,7 @@ const Note = ({
 
   function renderIdenticon() {
     return (
-      <div className="msg-identicon">
+      <span>
         {event.pubkey ? (
           <a href={`/${event.pubkey}`}>
             <Identicon str={Key.toNostrBech32Address(event.pubkey, 'npub')} width={40} />
@@ -242,29 +242,27 @@ const Note = ({
           ''
         )}
         {(isQuote && !standalone && <div className="line"></div>) || ''}
-      </div>
+      </span>
     );
   }
 
   function renderMsgSender() {
     return (
-      <div className="msg-sender">
-        <div className="msg-sender-link">
-          {fullWidth && renderIdenticon()}
-          <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="msgSenderName">
-            <Name pub={event.pubkey} />
+      <div className="flex items-center gap-2">
+        {fullWidth && renderIdenticon()}
+        <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="font-bold">
+          <Name pub={event.pubkey} />
+        </a>
+        <small>
+          {'· '}
+          <a
+            href={`/${Key.toNostrBech32Address(event.id, 'note')}`}
+            className="tooltip text-neutral-500"
+            data-tip={`${dateStr} ${timeStr}`}
+          >
+            {time && Helpers.getRelativeTimeText(time)}
           </a>
-          <div className="time">
-            {'· '}
-            <a href={`/${Key.toNostrBech32Address(event.id, 'note')}`} className="tooltip">
-              {time && Helpers.getRelativeTimeText(time)}
-              <span className="tooltiptext">
-                {' '}
-                {dateStr} {timeStr}{' '}
-              </span>
-            </a>
-          </div>
-        </div>
+        </small>
         {renderDropdown()}
       </div>
     );
