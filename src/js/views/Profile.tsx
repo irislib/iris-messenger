@@ -152,15 +152,18 @@ class Profile extends View {
             >
               <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
                 ${this.state.isMyProfile
-                  ? html`<${Button} small onClick=${() => loggedIn && route('/profile/edit')}
-                      >${t('edit_profile')}<//
-                    >`
+                  ? html`<button
+                      class="btn btn-sm"
+                      onClick=${() => loggedIn && route('/profile/edit')}
+                    >
+                      ${t('edit_profile')}
+                    <//>`
                   : html`
                       <${Follow} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
                       ${this.state.npub !==
                       'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8'
-                        ? html` <${Button}
-                            small
+                        ? html` <button
+                            className="btn btn-sm"
                             onClick=${() => loggedIn && route(`/chat/${this.state.npub}`)}
                           >
                             <span class="hidden-xs"> ${t('send_message')} </span>
@@ -215,15 +218,13 @@ class Profile extends View {
             </div>
           </div>
           <div class="profile-header-stuff">
-            <div style="flex: 1" class="profile-name">
-              <h3 style="margin-top:5px;margin-bottom:0">
+            <div class="flex-1 profile-name">
+              <span className="text-xl">
                 <${Name} pub=${this.state.hexPub} />
-                ${this.state.nip05
-                  ? html`<br /><small class="positive"
-                        >${this.state.nip05.replace(/^_@/, '')}</small
-                      >`
-                  : ''}
-              </h3>
+              </span>
+              ${this.state.nip05
+                ? html`<br /><small class="positive">${this.state.nip05.replace(/^_@/, '')}</small>`
+                : ''}
             </div>
             <div class="profile-about">
               <p class="profile-about-content">${this.state.about}</p>
@@ -258,17 +259,22 @@ class Profile extends View {
 
   renderTabs() {
     return html`
-      <div class="tabs">
-        <${Link} activeClassName="active" href="/${this.state.nostrAddress || this.state.npub}"
+      <div className="mb-2">
+        <${Link}
+          className="btn btn-sm"
+          activeClassName="btn-primary"
+          href="/${this.state.nostrAddress || this.state.npub}"
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
         <${Link}
-          activeClassName="active"
+          className="btn btn-sm"
+          activeClassName="btn-primary"
           href="/${this.state.nostrAddress || this.state.npub}/replies"
           >${t('posts')} & ${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
         <${Link}
-          activeClassName="active"
+          className="btn btn-sm"
+          activeClassName="btn-primary"
           href="/${this.state.nostrAddress || this.state.npub}/likes"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
         >

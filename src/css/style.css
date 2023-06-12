@@ -130,12 +130,6 @@ a {
   color: var(--blue);
 }
 
-a:hover,
-a:focus {
-  text-decoration: underline;
-  outline: none;
-}
-
 *[contenteditable='true']:not(:focus) {
   cursor: pointer;
 }
@@ -631,31 +625,6 @@ a.logo img:not(:last-child) {
   align-items: center;
   max-width: 100%;
   margin-top: 5px;
-}
-
-.tabs {
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 15px;
-}
-
-.tabs a {
-  flex: 1;
-  text-align: center;
-  padding: 15px 5px;
-  transition: all 0.25s ease;
-  user-select: none;
-  border-bottom: 2px solid rgba(0, 0, 0, 0);
-}
-
-.tabs a.active {
-  border-bottom: 2px solid var(--blue);
-}
-
-.tabs a:focus,
-.tabs a:hover,
-.tabs a:active {
-  text-decoration: none;
 }
 
 header.footer .header-content {
@@ -1159,39 +1128,6 @@ header.footer .header-content {
   }
 }
 
-a.logo:hover,
-a.logo:focus,
-a.logo:active {
-  background: none !important;
-  opacity: 1;
-  text-decoration: none;
-}
-
-.settings-list a:hover,
-.settings-list a:focus,
-.settings-list a:active {
-  text-decoration: none;
-}
-
-.application-list a:hover {
-  background: var(--chat-hover);
-}
-
-.application-list a:hover,
-.application-list a:focus,
-.application-list a:active {
-  text-decoration: none;
-}
-
-.application-list .icon,
-.notifications-button,
-.settings-list .icon {
-  padding: 7px;
-  min-width: 55px;
-  text-align: center;
-  position: relative;
-}
-
 .application-list .icon .unseen,
 .notifications-button .unseen {
   position: absolute;
@@ -1218,32 +1154,10 @@ a.logo:active {
   height: 40px;
 }
 
-.settings-list a {
-  padding: 0 15px;
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  color: var(--text-color);
-  justify-content: left;
-}
-
 .settings-list .text {
   flex: 1;
   padding: 15px;
   padding-left: 0;
-}
-
-.settings-list a:hover {
-  background: var(--chat-hover);
-}
-
-.settings-list a:focus:not(.active),
-.application-list a:focus:not(.active) {
-  background: var(--chat-hover);
-}
-
-.settings-list a.active {
-  background: var(--chat-active);
 }
 
 a.msg {
@@ -1350,64 +1264,6 @@ a.msg {
   cursor: pointer;
   margin-top: -15px;
   color: var(--muted-text-color);
-}
-
-/* The container <div> - needed to position the dropdown content */
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-/* Dropdown Content (Hidden by Default) */
-.dropdown-content {
-  display: block;
-  position: absolute;
-  right: 0;
-  min-width: 160px;
-  box-shadow: 0px 0px 2px 0px var(--text-color);
-  border-radius: 5px;
-  z-index: 1;
-  background-color: var(--dropdown-bg);
-  opacity: 0.95;
-  text-align: right;
-}
-
-.dropdown-content button {
-  padding: 5px 15px;
-  margin: 5px;
-  background-color: transparent;
-  width: 100%;
-  text-align: right;
-  border: 0;
-}
-
-/* Links inside the dropdown */
-.dropdown-content a, .dropdown-content button {
-  color: var(--text-color);
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  border-radius: 0;
-  margin: 0;
-  font-weight: bold;
-}
-
-.dropdown-content a:first-of-type {
-  border-radius: 5px 5px 0 0;
-}
-
-.dropdown-content a:last-of-type {
-  border-radius: 0 0 5px 5px;
-}
-
-.dropdown-content a:only-of-type {
-  border-radius: 5px;
-}
-
-/* Change color of dropdown links on hover */
-.dropdown-content a:hover, .dropdown-content button:hover {
-  background-color: var(--button-bg-hover);
-  color: var(--text-color);
 }
 
 .emoji {
