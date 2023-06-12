@@ -213,7 +213,9 @@ class Profile extends View {
                 <${Name} pub=${this.state.hexPub} />
               </span>
               ${this.state.nip05
-                ? html`<br /><small class="positive">${this.state.nip05.replace(/^_@/, '')}</small>`
+                ? html`<br /><small class="text-iris-green"
+                      >${this.state.nip05.replace(/^_@/, '')}</small
+                    >`
                 : ''}
             </div>
             <div class="profile-about">
