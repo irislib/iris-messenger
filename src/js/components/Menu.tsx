@@ -19,7 +19,6 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
-import { Button, PrimaryButton } from './buttons/Button';
 import Modal from './modal/Modal';
 import QRModal from './modal/QRModal';
 import PublicMessageForm from './PublicMessageForm';
@@ -127,31 +126,33 @@ export default class Menu extends BaseComponent {
             return (
               <a
                 onClick={(e) => this.menuLinkClicked(e, a)}
-                className={isActive ? 'active' : ''}
+                className={`${isActive ? 'active' : ''} btn`}
                 href={a.url}
               >
-                <span class="icon">
-                  {a.text === 'messages' && this.state.unseenMsgsTotal ? (
-                    <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
-                  ) : (
-                    ''
-                  )}
-                  <Icon width={24} />
-                </span>
-                <span class="text">{t(a.text)}</span>
+                {a.text === 'messages' && this.state.unseenMsgsTotal ? (
+                  <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
+                ) : (
+                  ''
+                )}
+                <Icon width={24} />
+                {t(a.text)}
               </a>
             );
           }
         })}
         <div class="menu-new-post">
-          <PrimaryButton
+          <button
+            className="btn btn-primary btn-circle"
             onClick={() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}
           >
-            <span class="icon">{Icons.post}</span>
-          </PrimaryButton>
-          <Button onClick={() => this.setState({ showQrModal: !this.state.showQrModal })}>
-            <span class="icon">{Icons.QRcode}</span>
-          </Button>
+            {Icons.post}
+          </button>
+          <button
+            className="btn btn-circle"
+            onClick={() => this.setState({ showQrModal: !this.state.showQrModal })}
+          >
+            {Icons.QRcode}
+          </button>
           {this.renderNewPostModal()} {this.renderQrModal()}
         </div>
       </div>

@@ -9,3 +9,11 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+
+.btn, input {
+    @apply rounded-full;
+}
+
+.btn {
+  text-transform: none;
+}

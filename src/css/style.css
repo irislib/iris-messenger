@@ -27,7 +27,6 @@
   --main-color: #000000;
   --menu-bg: #000000;
   --msg-border: none;
-  --msg-content-background: #15181c;
   --msg-form-button-color: #ffffff;
   --nav-border-bottom: 1px solid #222526;
   --nav-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.8);
@@ -75,7 +74,6 @@
   --main-color: #f5f5f5;
   --menu-bg: #ffffff;
   --msg-border: none;
-  --msg-content-background: #ffffff;
   --msg-form-button-color: #000000;
   --nav-border-bottom: 1px solid #e5e5e5;
   --nav-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.8);
@@ -176,7 +174,6 @@ textarea {
   border-radius: 6px;
   border: var(--msg-border);
   margin: 0 0 12px 0;
-  background-color: var(--msg-content-background);
   color: var(--text-color);
   resize: none;
 }
@@ -661,10 +658,6 @@ a.logo img:not(:last-child) {
   border-bottom: 2px solid var(--blue);
 }
 
-.tabs a:hover {
-  background: var(--msg-content-background);
-}
-
 .tabs a:focus,
 .tabs a:hover,
 .tabs a:active {
@@ -879,7 +872,6 @@ header.footer .header-content {
 }
 
 .msg-content {
-  background-color: var(--msg-content-background);
   padding: 6px 10px;
   border-radius: 8px;
   border: var(--msg-border);
@@ -2247,10 +2239,6 @@ form.public {
 
 .msg-feed .tabs {
   margin-bottom: 4px;
-}
-
-.msg-feed .tabs a {
-  background-color: var(--msg-content-background);
 }
 
 .msg-feed .tabs a:not(.active):hover {

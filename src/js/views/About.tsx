@@ -13,8 +13,8 @@ class About extends Component {
     return (
       <>
         <Header />
-        <div className="main-view" id="settings">
-          <div className="centered-container mobile-padding15">
+        <div className="main-view prose mx-auto" id="settings">
+          <div className="p-2">
             <h2>{t('about')}</h2>
             <p>Iris is like the social networking apps we're used to, but better:</p>
             <ul>
@@ -103,7 +103,7 @@ class About extends Component {
             </p>
 
             <a href="https://opencollective.com/iris-social/donate" target="_blank">
-              <img src="/assets/img/opencollective.png" width={200} />
+              <img src="/img/opencollective.png" width={200} />
             </a>
 
             <p>
