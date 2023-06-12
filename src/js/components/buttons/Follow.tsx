@@ -3,8 +3,6 @@ import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
 
-import { Button } from './Button';
-
 type Props = {
   id: string;
 };
@@ -53,13 +51,15 @@ class Follow extends Component<Props> {
 
   render() {
     return (
-      <Button
-        className={`${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}`}
+      <button
+        className={`btn ${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}`}
         onClick={(e) => this.onClick(e)}
       >
-        <span className="nonhover">{t(this.state[this.key] ? this.actionDone : this.action)}</span>
-        <span className="hover">{t(this.hoverAction)}</span>
-      </Button>
+        <span className="hover:hidden">
+          {t(this.state[this.key] ? this.actionDone : this.action)}
+        </span>
+        <span className="hidden hover:block">{t(this.hoverAction)}</span>
+      </button>
     );
   }
 }

@@ -317,10 +317,6 @@ class Profile extends View {
     `;
   }
 
-  onNftImgError(e) {
-    e.target.style = 'display:none';
-  }
-
   renderView() {
     if (!this.state.hexPub) {
       return html`<div></div>`;
@@ -332,9 +328,7 @@ class Profile extends View {
     }`;
     return html`
       ${this.state.banner
-        ? html`
-            <div class="profile-banner" style="background-image: url(${this.state.banner})"></div>
-          `
+        ? html` <div style="background-image: url(${this.state.banner})"></div> `
         : ''}
       <div class="content">
         <${Helmet}>

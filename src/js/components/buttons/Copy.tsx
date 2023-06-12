@@ -4,8 +4,6 @@ import Helpers from '../../Helpers';
 import { translate as t } from '../../translations/Translation.mjs';
 import { OptionalGetter } from '../../types';
 
-import { PrimaryButton as Button } from './Button';
-
 type Props = {
   copyStr: OptionalGetter<string>;
   text: string;
