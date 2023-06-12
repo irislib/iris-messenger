@@ -100,7 +100,7 @@ export default class SocialNetworkSettings extends Component {
   }
   componentDidMount() {
     SocialNetwork.getBlockedUsers((blockedUsers) => {
-      this.setState({ blockedUsers });
+      this.setState({ blockedUsers: Array.from(blockedUsers) });
     });
     localState.get('globalFilter').on(this.inject());
     this.refreshInterval = setInterval(() => {
