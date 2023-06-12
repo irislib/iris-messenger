@@ -106,15 +106,15 @@ export default class Menu extends BaseComponent {
 
   render() {
     return (
-      <div class="application-list">
+      <div className="sticky top-0 z-20 h-screen max-h-screen hidden md:w-16 lg:w-64 flex-col px-2 py-4 md:flex">
         <a
+          className="flex items-center gap-3 px-2 mb-4"
           tabIndex={3}
           href="/"
           onClick={(e) => this.menuLinkClicked(e, undefined, true)}
-          class="logo"
         >
           <img src={logo} width="30" height="30" />
-          <span style="font-size: 1.8em">iris</span>
+          <h1 className="hidden lg:flex text-3xl">iris</h1>
         </a>
         {APPLICATIONS.map((a: any) => {
           if (a.url && (!a.beta || this.state.showBetaFeatures)) {
@@ -126,7 +126,7 @@ export default class Menu extends BaseComponent {
             return (
               <a
                 onClick={(e) => this.menuLinkClicked(e, a)}
-                className={`${isActive ? 'active' : ''} btn`}
+                className={`${isActive ? 'active' : ''} inline-flex w-auto flex items-center space-x-4 p-3 rounded-full transition-colors duration-200 hover:bg-neutral-900`}
                 href={a.url}
               >
                 {a.text === 'messages' && this.state.unseenMsgsTotal ? (
@@ -135,12 +135,12 @@ export default class Menu extends BaseComponent {
                   ''
                 )}
                 <Icon width={24} />
-                {t(a.text)}
+                <span className="hidden lg:flex">{t(a.text)}</span>
               </a>
             );
           }
         })}
-        <div class="menu-new-post">
+        <div class="py-2">
           <button
             className="btn btn-primary btn-circle"
             onClick={() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}

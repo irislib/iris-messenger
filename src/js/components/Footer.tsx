@@ -62,7 +62,7 @@ class Footer extends Component<Props, State> {
     }
 
     return (
-      <footer class="visible-xs-flex nav footer">
+      <footer className="fixed md:hidden bottom-0 z-10 w-full bg-base-200 pb-safe-area-inset-bottom">
         <div class="header-content" onClick={() => localState.get('scrollUp').put(true)}>
           <a
             href="/"

@@ -105,9 +105,9 @@ class MyIdenticon extends Component<Props, State> {
         width={width}
         onClick={this.props.onClick}
         style={{ cursor: this.props.onClick ? 'pointer' : undefined }}
-        className={`identicon-container ${hasPictureStyle} ${showTooltip} ${activity}`}
+        className={`${hasPictureStyle} ${showTooltip} ${activity}`}
       >
-        <div class="identicon">
+        <div>
           {hasPicture ? (
             <SafeImg
               src={this.state.picture as string}

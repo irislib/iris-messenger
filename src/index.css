@@ -14,6 +14,23 @@
     @apply rounded-full;
 }
 
+* {
+  font-family: 'Lato', sans-serif;
+}
+
 .btn {
-  text-transform: none;
+  @apply capitalize;
+}
+
+input[type='text'],
+input[type='number'] {
+  @apply rounded-full;
+}
+
+iframe {
+  @apply rounded-sm my-4 w-full;
+}
+
+img, video {
+  user-select: none;
 }

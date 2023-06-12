@@ -3,9 +3,7 @@ import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
-import logo from '../../../public/img/icon128.png';
 import Component from '../BaseComponent';
-import Helpers from '../Helpers';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
@@ -102,34 +100,6 @@ export default class Header extends Component {
     this.setState({ connectedRelays: Relays.getConnectedRelayCount() });
   }
 
-  renderBackButton() {
-    const { activeRoute } = this.state;
-    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
-    return chatting ? (
-      <div
-        id="back-button"
-        class="visible-xs-inline-block"
-        onClick={() => this.backButtonClicked()}
-      >
-        {Icons.backArrow}
-      </div>
-    ) : (
-      ''
-    );
-  }
-
-  renderMenuIcon() {
-    const { activeRoute } = this.state;
-    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
-    return !Helpers.isElectron && !chatting ? (
-      <a href="/" onClick={(e) => this.onLogoClick(e)} class="visible-xs-flex logo">
-        <div class="mobile-menu-icon">{Icons.menu}</div>
-      </a>
-    ) : (
-      ''
-    );
-  }
-
   renderSearchBox() {
     return !this.chatId ? <SearchBox onSelect={(item) => route(`/${item.key}`)} /> : '';
   }
@@ -173,38 +143,7 @@ export default class Header extends Component {
             {this.renderSearchBox()}
           </div>
         )}
-        {!!Key.getPubKey() && this.renderMobileSearchButton(chatting)}
       </div>
-    );
-  }
-
-  renderMobileSearchButton(chatting) {
-    return !chatting ? (
-      <div
-        id="mobile-search-btn"
-        class={`mobile-search-hidden ${
-          this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'
-        }`}
-        onClick={() => {
-          // also synchronously make element visible so it can be focused
-          document.querySelector('.mobile-search-visible')?.classList.remove('hidden-xs', 'hidden');
-          document
-            .querySelector('.mobile-search-hidden')
-            ?.classList.remove('visible-xs-inline-block');
-          document.querySelector('.mobile-search-hidden')?.classList.add('hidden');
-          const input = document.querySelector('.search-box input');
-          if (input) {
-            setTimeout(() => {
-              (input as HTMLInputElement).focus();
-            }, 0);
-          }
-          this.setState({ showMobileSearch: true });
-        }}
-      >
-        {Icons.search}
-      </div>
-    ) : (
-      ''
     );
   }
 
@@ -247,15 +186,6 @@ export default class Header extends Component {
     );
   }
 
-  renderLogo() {
-    return (
-      <a tabIndex={3} href="/" className="logo" style="margin-left: 15px;">
-        <img src={logo} width="30" height="30" style="margin-right: 9px;" />
-        <span style="font-size: 1.8em; color: var(--text-color);">iris</span>
-      </a>
-    );
-  }
-
   renderLoginBtns() {
     return (
       <div class="login-buttons">
@@ -272,28 +202,15 @@ export default class Header extends Component {
   render() {
     const loggedIn = !!Key.getPubKey();
     return (
-      <div className="nav header">
-        {!loggedIn && this.renderLogo()}
-        {this.renderBackButton()}
-        <div className="header-content">
-          <div className={`mobile-search-hidden ${this.state.showMobileSearch ? 'hidden-xs' : ''}`}>
-            {loggedIn && this.renderMenuIcon()}
+      <div className="sticky top-0 z-10 w-full cursor-pointer">
+        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg">
+          <div className="flex w-full items-center justify-between">
+            {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
+            {this.renderHeaderText()}
+            {loggedIn && this.renderNotifications()}
+            {loggedIn && this.renderMyProfile()}
+            {!loggedIn && this.renderLoginBtns()}
           </div>
-          <a
-            className={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
-            href=""
-            onClick={(e) => {
-              e.preventDefault();
-              this.setState({ showMobileSearch: false });
-            }}
-          >
-            <span class="visible-xs-inline-block">{Icons.backArrow}</span>
-          </a>
-          {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
-          {this.renderHeaderText()}
-          {loggedIn && this.renderNotifications()}
-          {loggedIn && this.renderMyProfile()}
-          {!loggedIn && this.renderLoginBtns()}
         </div>
       </div>
     );

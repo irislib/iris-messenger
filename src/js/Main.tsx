@@ -30,7 +30,6 @@ import localState from './LocalState';
 
 import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
-import '../css/style.css';
 import '../css/cropper.min.css';
 
 type Props = Record<string, unknown>;
@@ -117,29 +116,8 @@ class Main extends Component<Props, ReactState> {
     };
 
     return (
-      <div id="main-content">
-        {isDesktopNonMac ? (
-          <div className="windows-titlebar">
-            <span>iris</span>
-            <div className="title-bar-btns">
-              <button className="min-btn" onClick={() => this.electronCmd('minimize')}>
-                -
-              </button>
-              <button className="max-btn" onClick={() => this.electronCmd('maximize')}>
-                +
-              </button>
-              <button className="close-btn" onClick={() => this.electronCmd('close')}>
-                x
-              </button>
-            </div>
-          </div>
-        ) : null}
-        <section
-          className={`main ${isDesktopNonMac ? 'desktop-non-mac' : ''} ${
-            s.showMenu ? 'menu-visible-xs' : ''
-          }`}
-          style="flex-direction: row;"
-        >
+      <div className="flex justify-center">
+        <section className="flex w-full max-w-screen-xl justify-between relative">
           {s.loggedIn ? <Menu /> : null}
           <Helmet titleTemplate={titleTemplate} defaultTitle={defaultTitle}>
             <title>{title}</title>
@@ -152,7 +130,7 @@ class Main extends Component<Props, ReactState> {
             <meta name="twitter:image" content="https://iris.to/assets/img/irisconnects.png" />
           </Helmet>
           <div className="overlay" onClick={() => this.onClickOverlay()}></div>
-          <div className="view-area">
+          <div className="pb-16 md:pb-0 relative flex h-full w-full flex-col md:w-full">
             <Router onChange={(e) => this.handleRoute(e)}>
               <FeedList path="/" />
               <KeyConverter path="/key" />
@@ -181,9 +159,10 @@ class Main extends Component<Props, ReactState> {
               <NoteOrProfile path="/:id" />
             </Router>
           </div>
+          <MediaPlayer />
+          <Footer />
         </section>
-        <MediaPlayer />
-        <Footer />
+
         {this.state.showLoginModal && (
           <Modal
             centerVertically={true}
