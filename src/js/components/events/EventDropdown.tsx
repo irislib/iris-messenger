@@ -103,7 +103,7 @@ const EventDropdown = (props: EventDropdownProps) => {
   const url = `https://iris.to/${Key.toNostrBech32Address(id, 'note')}`;
 
   return (
-    <div className="msg-menu-btn">
+    <div>
       <Dropdown>
         <Copy key={`${id!}copy_link`} text={t('copy_link')} copyStr={url} />
         <Copy

@@ -238,7 +238,7 @@ class SearchBox extends Component<Props, State> {
 
   render() {
     return (
-      <div class={`search-box ${this.props.class}`}>
+      <div className={`relative ${this.props.class}`}>
         {this.props.resultsOnly ? (
           ''
         ) : (
@@ -252,21 +252,25 @@ class SearchBox extends Component<Props, State> {
                 placeholder={t('search')}
                 tabIndex={1}
                 onInput={() => this.onInput()}
-                className="input-bordered border-neutral-500 input input-sm"
+                className="input-bordered border-neutral-500 input input-sm w-64"
               />
             </label>
           </form>
         )}
         <div
           onKeyUp={(e) => this.onKeyUp(e)}
-          class="search-box-results"
-          style="left: ${this.state.offsetLeft || ''}"
+          className={`${
+            this.state.query ? '' : 'hidden'
+          } absolute z-20 left-0 mt-2 w-full bg-black border border-neutral-700 rounded shadow-lg`}
         >
           {this.state.query && !this.props.resultsOnly ? (
             <a
               onFocus={(e) => this.onResultFocus(e, -1)}
               tabIndex={2}
-              className={'result ' + (-1 === this.state.selected ? 'selected' : '')}
+              className={
+                'p-2 cursor-pointer flex gap-2 items-center result ' +
+                (-1 === this.state.selected ? 'selected' : '')
+              }
               href={`/search/${encodeURIComponent(this.state.query)}`}
             >
               <div class="identicon-container">
@@ -298,7 +302,10 @@ class SearchBox extends Component<Props, State> {
               <a
                 onFocus={(e) => this.onResultFocus(e, index)}
                 tabIndex={2}
-                className={'result ' + (index === this.state.selected ? 'selected' : '')}
+                className={
+                  'p-2 cursor-pointer flex gap-2 items-center result ' +
+                  (index === this.state.selected ? 'selected' : '')
+                }
                 href={`/${npub}`}
                 onClick={(e) => this.onClick(e, i)}
               >

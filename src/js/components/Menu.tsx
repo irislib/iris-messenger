@@ -8,7 +8,7 @@ import {
   Cog8ToothIcon as Cog8ToothIconFull,
   HomeIcon as HomeIconFull,
   InformationCircleIcon as InformationCircleIconFull,
-  PaperAirplaneIcon as PaperAirplaneIconFull,
+  PaperAirplaneIcon as PaperAirplaneIconFull, PlusIcon,
 } from '@heroicons/react/24/solid';
 import { Link, route } from 'preact-router';
 
@@ -53,7 +53,6 @@ export default class Menu extends BaseComponent {
     activeRoute: '',
     showBetaFeatures: false,
     showNewPostModal: false,
-    showQrModal: false,
   };
 
   componentDidMount() {
@@ -95,13 +94,6 @@ export default class Menu extends BaseComponent {
           autofocus={true}
         />
       </Modal>
-    ) : (
-      ''
-    );
-
-  renderQrModal = () =>
-    this.state.showQrModal ? (
-      <QRModal pub={Key.getPubKey()} onClose={() => this.setState({ showQrModal: false })} />
     ) : (
       ''
     );
@@ -163,18 +155,13 @@ export default class Menu extends BaseComponent {
         })}
         <div class="py-2 flex-1">
           <button
-            className="btn btn-primary btn-circle"
+            className="btn btn-primary"
             onClick={() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}
           >
-            {Icons.post}
+            <PlusIcon width={24} />
+            <span className="hidden lg:flex">{t('new_post')}</span>
           </button>
-          <button
-            className="btn btn-circle"
-            onClick={() => this.setState({ showQrModal: !this.state.showQrModal })}
-          >
-            {Icons.QRcode}
-          </button>
-          {this.renderNewPostModal()} {this.renderQrModal()}
+          {this.renderNewPostModal()}
         </div>
         {this.renderProfileLink()}
       </div>
