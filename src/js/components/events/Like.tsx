@@ -56,12 +56,12 @@ export default function Like(props: Props) {
   return (
     <div className="msg" key={props.event.id}>
       <div className="msg-content" onClick={(e) => messageClicked(e, likedId)}>
-        <div>
-          <i className="like-btn liked" style={{ marginRight: 15 }}>
-            <HeartIconFull width={24} />
+        <div className="flex gap-1 items-center text-sm text-neutral-500">
+          <i className="like-btn liked">
+            <HeartIconFull width={18} />
           </i>
           <span>
-            <a href={userLink} style={{ marginRight: 5 }}>
+            <a href={userLink}>
               <Name pub={props.event.pubkey} />
             </a>
             {allLikes.length > 1 && <> and {allLikes.length - 1} others </>} {likeText}

@@ -103,17 +103,17 @@ class Follows extends View {
     return this.state.follows.map((hexKey) => {
       const npub = Key.toNostrBech32Address(hexKey, 'npub') || '';
       return (
-        <div key={npub} className="profile-link-container">
-          <a href={`/${npub}`} className="profile-link">
+        <div key={npub} className="flex w-full">
+          <a href={`/${npub}`} className="flex flex-1 gap-2">
             <Identicon str={npub} width={49} />
             <div>
               <Name pub={npub} />
               <br />
-              <small className="follower-count">
+              <span className="text-neutral-500 text-sm">
                 {SocialNetwork.followersByUser.get(hexKey)?.size || 0}
                 <i> </i>
                 followers
-              </small>
+              </span>
             </div>
           </a>
           {hexKey !== Key.getPubKey() && <Follow id={npub} />}
@@ -132,7 +132,7 @@ class Follows extends View {
             <Name pub={this.props.id} />
           </a>
           :<i> </i>
-          <span style={{ flex: 1 }} className="mar-left5">
+          <span style={{ flex: 1 }} className="ml-1">
             {this.props.followers ? t('followers') : t('following')}
           </span>
           {showFollowAll ? (
@@ -154,7 +154,7 @@ class Follows extends View {
         ) : (
           ''
         )}
-        <div id="follows-list">
+        <div className="flex flex-col w-full gap-4">
           {this.renderFollows() /* TODO limit if lots of follows */}
           {this.state.follows.length === 0 ? '—' : ''}
         </div>

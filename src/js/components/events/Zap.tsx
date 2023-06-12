@@ -60,21 +60,17 @@ export default function Zap(props: Props) {
   return (
     <div className="msg">
       <div className="msg-content" onClick={(e) => messageClicked(e, zappedId || '')}>
-        <div style={{ display: 'flex', flex: 1, 'flex-direction': 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <i className="zap-btn zapped" style={{ marginRight: '15px' }}>
-              {Icons.lightning}
-            </i>
-            <div>
-              <a href={userLink} style={{ marginRight: '5px' }}>
-                <Name pub={zappingUser || ''} />
-              </a>
-              {allZaps.length > 1 && <span> and {allZaps.length - 1} others </span>}
-              {zappedText}
-            </div>
+        <div className="flex gap-1 items-center text-sm text-neutral-500">
+          <i className="zap-btn zapped">{Icons.lightning}</i>
+          <div>
+            <a href={userLink}>
+              <Name pub={zappingUser || ''} />
+            </a>
+            {allZaps.length > 1 && <span> and {allZaps.length - 1} others </span>}
+            {zappedText}
           </div>
-          <EventComponent key={zappedId + props.event.id} id={zappedId} fullWidth={false} />
         </div>
+        <EventComponent key={zappedId + props.event.id} id={zappedId} fullWidth={false} />
       </div>
     </div>
   );

@@ -206,9 +206,12 @@ const Note = ({
 
   function renderShowThread() {
     return (
-      <div style={{ flexBasis: '100%', marginBottom: '12px' }}>
-        <a href={`/${Key.toNostrBech32Address(rootMsg || '', 'note')}`}>{t('show_thread')}</a>
-      </div>
+      <a
+        className="text-iris-blue text-sm block mb-2"
+        href={`/${Key.toNostrBech32Address(rootMsg || '', 'note')}`}
+      >
+        {t('show_thread')}
+      </a>
     );
   }
 
@@ -306,13 +309,13 @@ const Note = ({
         <div className="p-4" onClick={(e) => messageClicked(e)}>
           {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
           {!fullWidth && renderIdenticon()}
-          <div className="msg-main">
+          <div>
             {renderMsgSender()}
             {(replyingToUsers?.length && !isQuoting && renderReplyingTo()) || null}
             {standalone && renderHelmet()}
             {meta.torrentId && <Torrent torrentId={meta.torrentId} autopause={!standalone} />}
             {text?.length > 0 && (
-              <div className={`text ${emojiOnly && 'emoji-only'}`}>
+              <div className={`whitespace-pre-wrap py-2 ${emojiOnly && 'text-2xl'}`}>
                 {text}
                 {translatedText && (
                   <p>
