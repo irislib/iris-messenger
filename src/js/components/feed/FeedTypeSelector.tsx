@@ -5,7 +5,7 @@ import localState from '../../LocalState';
 export default function FeedTypeSelector({ setDisplay, display, index }) {
   const isProfile = ['posts', 'postsAndReplies', 'likes'].includes(index);
   return (
-    <div className="flex mb-px">
+    <div className="flex mb-px lg:mb-1">
       <button
         onClick={() => {
           setDisplay('posts');

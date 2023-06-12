@@ -155,7 +155,7 @@ export default class Menu extends BaseComponent {
         })}
         <div class="py-2 flex-1">
           <button
-            className="btn btn-primary"
+            className="btn btn-primary md:max-lg:btn-circle"
             onClick={() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}
           >
             <PlusIcon width={24} />

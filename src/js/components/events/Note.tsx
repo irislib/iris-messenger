@@ -276,7 +276,11 @@ const Note = ({
   function getClassName() {
     const classNames = ['msg'];
 
-    if (standalone) classNames.push('standalone');
+    if (standalone) {
+      classNames.push('standalone');
+    } else {
+      classNames.push('cursor-pointer');
+    }
     if (isQuote) classNames.push('quote');
     if (isQuoting) classNames.push('quoting');
     if (asInlineQuote) classNames.push('inline-quote');
