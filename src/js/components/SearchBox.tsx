@@ -302,9 +302,7 @@ class SearchBox extends Component<Props, State> {
                 onClick={(e) => this.onClick(e, i)}
               >
                 {i.picture ? (
-                  <div class="identicon-container">
-                    <SafeImg src={i.picture} class="round-borders" width={40} />
-                  </div>
+                  <SafeImg src={i.picture} className="rounded-full" width={40} />
                 ) : (
                   <Identicon key={`${npub}ic`} str={npub} width={40} />
                 )}

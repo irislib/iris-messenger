@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 type Props = {
   src: string;
-  class?: string;
+  className?: string;
   style?: React.CSSProperties;
   width?: number;
   square?: boolean;
@@ -61,7 +61,7 @@ const SafeImg = (props: Props) => {
       src={src}
       onError={onError}
       onClick={props.onClick}
-      className={props.class}
+      className={props.className}
       style={props.style}
       width={props.width}
       height={props.width}

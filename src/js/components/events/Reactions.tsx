@@ -1,52 +1,25 @@
-import { ArrowPathIcon, HeartIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
+import {
+  ArrowPathIcon,
+  BoltIcon,
+  ChatBubbleOvalLeftIcon,
+  HeartIcon,
+} from '@heroicons/react/24/outline';
+import {
+  //  ArrowPathIcon as ArrowPathIconFull,
+  //  BoltIcon as BoltIconFull,
+  HeartIcon as HeartIconFull,
+} from '@heroicons/react/24/solid';
 import $ from 'jquery';
 import { memo } from 'preact/compat';
 import { useEffect, useState } from 'preact/hooks';
 import { route } from 'preact-router';
-import styled from 'styled-components';
 
-import Icons from '../../Icons';
 import { decodeInvoice, formatAmount } from '../../Lightning';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import Identicon from '../Identicon';
 import ZapModal from '../modal/Zap';
-
-const ReactionButtons = styled.div`
-  display: flex;
-  align-items: flex-end;
-  flex-direction: row;
-  text-align: right;
-  font-size: 14px;
-  color: var(--text-time);
-
-  a {
-    flex: 1;
-  }
-
-  .msg.quote &,
-  .msg.standalone & {
-    margin-bottom: 12px;
-  }
-`;
-
-const ReactionCount = styled.span`
-  flex: 3;
-  margin-left: 5px;
-  cursor: pointer;
-  min-width: 2em;
-  text-align: left;
-  user-select: none;
-  white-space: nowrap;
-
-  &:not(:last-of-type) {
-    margin-right: 5px;
-  }
-
-  ${(props) => (props.active ? 'color: var(--text-color)' : '')};
-`;
 
 const Reactions = (props) => {
   const [state, setState] = useState({
@@ -250,22 +223,30 @@ const Reactions = (props) => {
   function renderReactionBtns() {
     const s = state;
     return (
-      <ReactionButtons>
-        <a className="msg-btn reply-btn" onClick={() => replyBtnClicked()}>
-          {Icons.reply}
+      <div className="flex">
+        <a
+          className="btn-ghost flex-1 hover:bg-transparent hover:text-iris-blue btn content-center gap-2 rounded-none p-2 text-neutral-500"
+          onClick={() => replyBtnClicked()}
+        >
+          <ChatBubbleOvalLeftIcon width={18} />
+          <span>{s.replyCount || ''}</span>
         </a>
-        <ReactionCount>{s.replyCount || ''}</ReactionCount>
         {props.settings.showReposts ? (
           <>
             <a
-              className={`msg-btn repost-btn ${s.reposted ? 'reposted' : ''}`}
+              className={`btn-ghost flex-1 hover:bg-transparent hover:text-iris-green btn content-center gap-2 rounded-none p-2 text-neutral-500 ${
+                s.reposted ? 'reposted' : ''
+              }`}
               onClick={(e) => repostBtnClicked(e)}
             >
-              <ArrowPathIcon width={24} />
+              <ArrowPathIcon width={18} />
+              <span
+                className={`${s.showReposts ? 'active' : ''}`}
+                onClick={(e) => toggleReposts(e)}
+              >
+                {s.reposts || ''}
+              </span>
             </a>
-            <ReactionCount active={s.showReposts} onClick={(e) => toggleReposts(e)}>
-              {s.reposts || ''}
-            </ReactionCount>
           </>
         ) : (
           ''
@@ -273,14 +254,16 @@ const Reactions = (props) => {
         {props.settings.showLikes ? (
           <>
             <a
-              className={`msg-btn like-btn ${s.liked ? 'liked' : ''}`}
+              className={`btn-ghost flex-1 justify-center hover:bg-transparent hover:text-iris-red btn content-center gap-2 rounded-none p-2 text-neutral-500 ${
+                s.liked ? 'liked' : ''
+              }`}
               onClick={(e) => likeBtnClicked(e)}
             >
-              {s.liked ? <HeartIconFull width={24} /> : <HeartIcon width={24} />}
+              {s.liked ? <HeartIconFull width={18} /> : <HeartIcon width={18} />}
+              <span className={`${s.showLikes ? 'active' : ''}`} onClick={(e) => toggleLikes(e)}>
+                {s.likes || ''}
+              </span>
             </a>
-            <ReactionCount active={s.showLikes} onClick={(e) => toggleLikes(e)}>
-              {s.likes || ''}
-            </ReactionCount>
           </>
         ) : (
           ''
@@ -293,18 +276,18 @@ const Reactions = (props) => {
                 e.stopPropagation();
                 setState((prevState) => ({ ...prevState, showZapModal: true }));
               }}
-              className="msg-btn zap-btn"
+              className="btn-ghost flex-1 hover:bg-transparent hover:text-iris-orange btn content-center gap-2 rounded-none p-2 text-neutral-500"
             >
-              {Icons.lightning}
+              <BoltIcon width={18} />
+              <span className={`${s.showZaps ? 'active' : ''}`} onClick={(e) => toggleZaps(e)}>
+                {s.totalZapped || ''}
+              </span>
             </a>
-            <ReactionCount active={s.showZaps} onClick={(e) => toggleZaps(e)}>
-              {s.totalZapped || ''}
-            </ReactionCount>
           </>
         ) : (
           ''
         )}
-      </ReactionButtons>
+      </div>
     );
   }
 
@@ -347,6 +330,7 @@ const Reactions = (props) => {
 
   return (
     <>
+      <hr className="-mx-4 opacity-10" />
       {renderReactionBtns()}
       {state.showLikes && renderLikes()}
       {state.showZaps && renderZaps()}

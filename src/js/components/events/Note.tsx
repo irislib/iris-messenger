@@ -305,7 +305,7 @@ const Note = ({
     <>
       {meta.replyingTo && showRepliedMsg && renderRepliedMsg()}
       <div key={event.id + 'note'} className={getClassName()} onClick={(e) => messageClicked(e)}>
-        <div className="msg-content" onClick={(e) => messageClicked(e)}>
+        <div className="p-4" onClick={(e) => messageClicked(e)}>
           {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
           {!fullWidth && renderIdenticon()}
           <div className="msg-main">

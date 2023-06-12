@@ -110,6 +110,7 @@ class MyIdenticon extends Component<Props, State> {
         <div>
           {hasPicture ? (
             <SafeImg
+              className="rounded-full"
               src={this.state.picture as string}
               width={width}
               square={true}
@@ -117,7 +118,7 @@ class MyIdenticon extends Component<Props, State> {
               onError={() => this.setState({ hasError: true })}
             />
           ) : (
-            <img width={width} style="max-width:100%" src={this.state.identicon || ''} />
+            <img width={width} style="max-width:100%; border-radius: 50%" src={this.state.identicon || ''} />
           )}
         </div>
         {this.props.showTooltip && this.state.name ? (
