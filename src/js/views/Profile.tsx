@@ -112,7 +112,7 @@ class Profile extends View {
         key="${this.state.npub}identicon"
         str=${this.state.npub}
         hidePicture=${true}
-        width="250"
+        width=${128}
       />`;
     }
     let rawDataJson = [] as any;
