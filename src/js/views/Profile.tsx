@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet';
-import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { html } from 'htm/preact';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
@@ -138,10 +137,10 @@ class Profile extends View {
     // TODO: on Follow / Message btn click open login modal if not logged in
     return html`
       <div class="profile-top" key="${this.state.hexPub}details">
-        <div class="profile-header">
-          <div class="profile-header-top">
+        <div class="flex flex-col gap-2">
+          <div class="flex flex-row">
             <div>${profilePicture}</div>
-            <div class="profile-header-info">
+            <div class="flex-1 justify-end flex">
               <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
                 ${this.state.isMyProfile
                   ? html`<button
@@ -158,10 +157,7 @@ class Profile extends View {
                             className="btn btn-sm"
                             onClick=${() => loggedIn && route(`/chat/${this.state.npub}`)}
                           >
-                            <span class="hidden-xs"> ${t('send_message')} </span>
-                            <span class="visible-xs-inline-block msg-btn-icon">
-                              <${PaperAirplaneIcon} width="24" />
-                            </span>
+                            ${t('send_message')}
                           <//>`
                         : ''}
                     `}
@@ -219,7 +215,7 @@ class Profile extends View {
                 : ''}
             </div>
             <div class="profile-about">
-              <p class="profile-about-content">${this.state.about}</p>
+              <p class="text-sm">${this.state.about}</p>
               ${this.renderLinks()}
             </div>
             <div class="profile-actions">

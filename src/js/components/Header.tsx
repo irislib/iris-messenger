@@ -1,7 +1,6 @@
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
-import { Link } from 'preact-router/match';
 
 import Component from '../BaseComponent';
 import Icons from '../Icons';
@@ -11,7 +10,6 @@ import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation.mjs';
 
 import { Button, PrimaryButton } from './buttons/Button';
-import Identicon from './Identicon';
 import Name from './Name';
 import SearchBox from './SearchBox';
 
@@ -188,7 +186,7 @@ export default class Header extends Component {
     const loggedIn = !!Key.getPubKey();
     return (
       <div className="sticky top-0 z-10 cursor-pointer">
-        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2">
+        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2 py-2">
           <div className="flex items-center justify-between">
             {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
             {this.renderHeaderText()}
