@@ -124,19 +124,23 @@ export default class Menu extends BaseComponent {
             }
             const Icon = isActive ? a.activeIcon : a.icon;
             return (
-              <a
-                onClick={(e) => this.menuLinkClicked(e, a)}
-                className={`${isActive ? 'active' : ''} inline-flex w-auto flex items-center space-x-4 p-3 rounded-full transition-colors duration-200 hover:bg-neutral-900`}
-                href={a.url}
-              >
-                {a.text === 'messages' && this.state.unseenMsgsTotal ? (
-                  <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
-                ) : (
-                  ''
-                )}
-                <Icon width={24} />
-                <span className="hidden lg:flex">{t(a.text)}</span>
-              </a>
+              <div>
+                <a
+                  onClick={(e) => this.menuLinkClicked(e, a)}
+                  className={`${
+                    isActive ? 'active' : ''
+                  } inline-flex w-auto flex items-center space-x-4 p-3 rounded-full transition-colors duration-200 hover:bg-neutral-900`}
+                  href={a.url}
+                >
+                  {a.text === 'messages' && this.state.unseenMsgsTotal ? (
+                    <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
+                  ) : (
+                    ''
+                  )}
+                  <Icon width={24} />
+                  <span className="hidden lg:flex">{t(a.text)}</span>
+                </a>
+              </div>
             );
           }
         })}

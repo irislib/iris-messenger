@@ -203,7 +203,7 @@ export default class Header extends Component {
     const loggedIn = !!Key.getPubKey();
     return (
       <div className="sticky top-0 z-10 w-full cursor-pointer">
-        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg">
+        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2">
           <div className="flex w-full items-center justify-between">
             {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
             {this.renderHeaderText()}

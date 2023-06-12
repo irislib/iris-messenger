@@ -63,15 +63,15 @@ class Footer extends Component<Props, State> {
 
     return (
       <footer className="fixed md:hidden bottom-0 z-10 w-full bg-base-200 pb-safe-area-inset-bottom">
-        <div class="header-content" onClick={() => localState.get('scrollUp').put(true)}>
+        <div onClick={() => localState.get('scrollUp').put(true)} className="flex">
           <a
             href="/"
             onClick={(e) => this.handleFeedClick(e)}
-            class={`btn ${activeRoute === '/' ? 'active' : ''}`}
+            className={`btn flex flex-grow ${activeRoute === '/' ? 'active' : ''}`}
           >
             {activeRoute === '/' ? <HomeIconFull width={24} /> : <HomeIcon width={24} />}
           </a>
-          <a href="/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
+          <a href="/chat" className={`btn flex-grow ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
             {this.state.unseenMsgsTotal ? (
               <span className="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
             ) : (
@@ -83,14 +83,14 @@ class Footer extends Component<Props, State> {
               <PaperAirplaneIcon width={24} />
             )}
           </a>
-          <a href="/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
+          <a href="/post/new" className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}>
             {activeRoute === '/post/new' ? (
               <PlusCircleIconFull width={24} />
             ) : (
               <PlusCircleIcon width={24} />
             )}
           </a>
-          <a href={`/${key}`} class={`${activeRoute === `/${key}` ? 'active' : ''} my-profile`}>
+          <a href={`/${key}`} className={`${activeRoute === `/${key}` ? 'active' : ''} btn flex flex-grow`}>
             <Identicon str={key} width={34} />
           </a>
         </div>

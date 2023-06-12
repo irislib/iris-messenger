@@ -138,18 +138,10 @@ class Profile extends View {
     // TODO: on Follow / Message btn click open login modal if not logged in
     return html`
       <div class="profile-top" key="${this.state.hexPub}details">
-        <div class="profile-header" style="flex-direction: column">
-          <div class="profile-header-top" style="display: flex; flex-direction: row">
-            <div
-              class="profile-picture-container"
-              style="flex: 2;margin-top:${this.state.banner ? '-100px;' : ''}"
-            >
-              ${profilePicture}
-            </div>
-            <div
-              class="profile-header-info"
-              style="flex: 5;flex-direction: row; display:flex;margin-top:15px;justify-content: flex-end"
-            >
+        <div class="profile-header">
+          <div class="profile-header-top">
+            <div>${profilePicture}</div>
+            <div class="profile-header-info">
               <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
                 ${this.state.isMyProfile
                   ? html`<button
@@ -175,45 +167,43 @@ class Profile extends View {
                     `}
               </div>
               <div class="profile-actions">
-                <span style="margin: 0 15px">
-                  <${Dropdown}>
-                    <${Copy}
-                      key=${`${this.state.hexPub}copyLink`}
-                      text=${t('copy_link')}
-                      title=${this.state.name}
-                      copyStr=${window.location.href}
-                    />
-                    <${Copy}
-                      key=${`${this.state.hexPub}copyNpub`}
-                      text=${t('copy_user_ID')}
-                      title=${this.state.name}
-                      copyStr=${this.state.npub}
-                    />
-                    <${Button} onClick=${() => this.setState({ showQR: !this.state.showQR })}
-                      >${t('show_qr_code')}<//
-                    >
-                    <${Copy}
-                      key=${`${this.state.hexPub}copyData`}
-                      text=${t('copy_raw_data')}
-                      title=${this.state.name}
-                      copyStr=${rawDataJson}
-                    />
-                    ${!this.state.isMyProfile && !Key.getPrivKey()
-                      ? html`
-                          <${Button} onClick=${(e) => this.viewAs(e)}>
-                            ${t('view_as') + ' '}
-                            <${Name} pub=${this.state.hexPub} hideBadge=${true} />
-                          <//>
-                        `
-                      : ''}
-                    ${this.state.isMyProfile
-                      ? ''
-                      : html`
-                          <${Block} id=${this.state.hexPub} />
-                          <${Report} id=${this.state.hexPub} />
-                        `}
-                  <//>
-                </span>
+                <${Dropdown}>
+                  <${Copy}
+                    key=${`${this.state.hexPub}copyLink`}
+                    text=${t('copy_link')}
+                    title=${this.state.name}
+                    copyStr=${window.location.href}
+                  />
+                  <${Copy}
+                    key=${`${this.state.hexPub}copyNpub`}
+                    text=${t('copy_user_ID')}
+                    title=${this.state.name}
+                    copyStr=${this.state.npub}
+                  />
+                  <${Button} onClick=${() => this.setState({ showQR: !this.state.showQR })}
+                    >${t('show_qr_code')}<//
+                  >
+                  <${Copy}
+                    key=${`${this.state.hexPub}copyData`}
+                    text=${t('copy_raw_data')}
+                    title=${this.state.name}
+                    copyStr=${rawDataJson}
+                  />
+                  ${!this.state.isMyProfile && !Key.getPrivKey()
+                    ? html`
+                        <${Button} onClick=${(e) => this.viewAs(e)}>
+                          ${t('view_as') + ' '}
+                          <${Name} pub=${this.state.hexPub} hideBadge=${true} />
+                        <//>
+                      `
+                    : ''}
+                  ${this.state.isMyProfile
+                    ? ''
+                    : html`
+                        <${Block} id=${this.state.hexPub} />
+                        <${Report} id=${this.state.hexPub} />
+                      `}
+                <//>
               </div>
             </div>
           </div>
