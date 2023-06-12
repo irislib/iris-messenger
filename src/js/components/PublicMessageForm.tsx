@@ -235,7 +235,7 @@ class PublicMessageForm extends Component<IProps, IState> {
         onInput=${(e) => this.onMsgTextInput(e)}
         onFocus=${() => this.setState({ focused: true })}
         ref=${this.newMsgRef}
-        class="new-msg"
+        className="p-2 mt-1 w-full h-12 bg-black focus:ring-blue-500 focus:border-blue-500 block w-full text-lg border-gray-700 rounded-md text-white"
         type="text"
         placeholder="${t(textareaPlaceholder)}"
         autocomplete="off"

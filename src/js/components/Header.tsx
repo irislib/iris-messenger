@@ -147,21 +147,6 @@ export default class Header extends Component {
     );
   }
 
-  renderMyProfile() {
-    const key = Key.getPubKey();
-    const npub = Key.toNostrBech32Address(key, 'npub');
-    return (
-      <Link
-        activeClassName="active"
-        href={`/${npub}`}
-        onClick={() => localState.get('scrollUp').put(true)}
-        class="hidden-xs my-profile"
-      >
-        <Identicon str={npub} width={34} />
-      </Link>
-    );
-  }
-
   renderNotifications() {
     return (
       <a
@@ -208,7 +193,6 @@ export default class Header extends Component {
             {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
             {this.renderHeaderText()}
             {loggedIn && this.renderNotifications()}
-            {loggedIn && this.renderMyProfile()}
             {!loggedIn && this.renderLoginBtns()}
           </div>
         </div>

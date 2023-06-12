@@ -10,7 +10,7 @@ import {
   InformationCircleIcon as InformationCircleIconFull,
   PaperAirplaneIcon as PaperAirplaneIconFull,
 } from '@heroicons/react/24/solid';
-import { route } from 'preact-router';
+import { Link, route } from 'preact-router';
 
 import logo from '../../../public/img/icon128.png';
 import BaseComponent from '../BaseComponent';
@@ -21,7 +21,9 @@ import { translate as t } from '../translations/Translation.mjs';
 
 import Modal from './modal/Modal';
 import QRModal from './modal/QRModal';
+import Identicon from './Identicon';
 import PublicMessageForm from './PublicMessageForm';
+import Name from "./Name";
 
 const APPLICATIONS = [
   { url: '/', text: 'home', icon: HomeIcon, activeIcon: HomeIconFull },
@@ -104,6 +106,21 @@ export default class Menu extends BaseComponent {
       ''
     );
 
+  renderProfileLink = () => {
+    const hex = Key.getPubKey();
+    const npub = Key.toNostrBech32Address(hex, 'npub');
+    return (
+      <div>
+        <Link href={`/${npub}`} className="btn btn-ghost md:max-lg:btn-circle">
+          <Identicon str={hex} width={34} />
+          <div className="hidden lg:block ml-2">
+            <Name pub={hex} />
+          </div>
+        </Link>
+      </div>
+    );
+  };
+
   render() {
     return (
       <div className="sticky top-0 z-20 h-screen max-h-screen hidden md:w-16 lg:w-64 flex-col px-2 py-4 md:flex">
@@ -144,7 +161,7 @@ export default class Menu extends BaseComponent {
             );
           }
         })}
-        <div class="py-2">
+        <div class="py-2 flex-1">
           <button
             className="btn btn-primary btn-circle"
             onClick={() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}
@@ -159,6 +176,7 @@ export default class Menu extends BaseComponent {
           </button>
           {this.renderNewPostModal()} {this.renderQrModal()}
         </div>
+        {this.renderProfileLink()}
       </div>
     );
   }

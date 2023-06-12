@@ -377,41 +377,39 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
     const events = this.renderEvents(displayCount, renderAs, showRepliedMsg);
     return (
-      <div className="msg-feed">
-        <div>
-          {showQueuedEvents ? this.renderShowNewEvents() : null}
-          {feedName ? (
-            <Label
-              feedName={feedName}
-              onClickSettings={() => this.setState({ settingsOpen: !this.state.settingsOpen })}
-              index={this.props.index}
-              settingsOpen={this.state.settingsOpen}
-            />
-          ) : null}
-          {this.props.index !== 'notifications' && this.state.settingsOpen && (
-            <FeedSettings
-              settings={this.state.settings}
-              onChange={(settings) => this.setState({ settings })}
-            />
-          )}
-          {this.props.index !== 'notifications' && (
-            <FeedTypeSelector
-              index={this.props.index}
-              display={this.state.settings.display}
-              setDisplay={(display) =>
-                this.setState({ settings: { ...this.state.settings, display } })
-              }
-            />
-          )}
-          {events.length === 0 && (
-            <div className="msg">
-              <div className="msg-content notification-msg">
-                {this.props.emptyMessage || t('no_events_yet')}
-              </div>
+      <div>
+        {showQueuedEvents ? this.renderShowNewEvents() : null}
+        {feedName ? (
+          <Label
+            feedName={feedName}
+            onClickSettings={() => this.setState({ settingsOpen: !this.state.settingsOpen })}
+            index={this.props.index}
+            settingsOpen={this.state.settingsOpen}
+          />
+        ) : null}
+        {this.props.index !== 'notifications' && this.state.settingsOpen && (
+          <FeedSettings
+            settings={this.state.settings}
+            onChange={(settings) => this.setState({ settings })}
+          />
+        )}
+        {this.props.index !== 'notifications' && (
+          <FeedTypeSelector
+            index={this.props.index}
+            display={this.state.settings.display}
+            setDisplay={(display) =>
+              this.setState({ settings: { ...this.state.settings, display } })
+            }
+          />
+        )}
+        {events.length === 0 && (
+          <div className="msg">
+            <div className="msg-content notification-msg">
+              {this.props.emptyMessage || t('no_events_yet')}
             </div>
-          )}
-          {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
-        </div>
+          </div>
+        )}
+        {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
         {displayCount < this.state.sortedEvents.length ? this.renderShowMore() : ''}
       </div>
     );

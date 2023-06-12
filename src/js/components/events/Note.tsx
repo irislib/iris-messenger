@@ -167,7 +167,9 @@ const Note = ({
 
   function renderDropdown() {
     return asInlineQuote ? null : (
-      <EventDropdown id={event.id} event={event} onTranslate={setTranslatedText} />
+      <div className="flex-1 flex items-center justify-end">
+        <EventDropdown id={event.id} event={event} onTranslate={setTranslatedText} />
+      </div>
     );
   }
 
@@ -251,7 +253,7 @@ const Note = ({
 
   function renderMsgSender() {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 justify-between">
         {fullWidth && renderIdenticon()}
         <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="font-bold">
           <Name pub={event.pubkey} />
