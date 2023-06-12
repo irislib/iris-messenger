@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PureComponent } from 'react';
+import { PureComponent } from 'preact/compat';
 
-import { Callback, EventListener } from './LocalState';
+import { Callback, Unsubscribe } from './LocalState';
 
 type OwnState = {
   ogImageUrl?: any;
@@ -14,16 +14,16 @@ export default abstract class BaseComponent<Props = any, State = any> extends Pu
   unmounted?: boolean;
 
   // TODO: make this use Subscriptions instead of LocalState eventlisteners? or both?
-  eventListeners: Record<string, EventListener | undefined> = {};
+  unsubscribes: Record<string, Unsubscribe | undefined> = {};
 
   sub(callback: CallableFunction, path?: string): Callback {
-    const cb = (data, key, message, eventListener, f): void => {
+    const cb = (data, key, unsubscribe, f): void => {
       if (this.unmounted) {
-        eventListener && eventListener.off();
+        unsubscribe?.();
         return;
       }
-      this.eventListeners[path ?? key] = eventListener;
-      callback(data, key, message, eventListener, f);
+      this.unsubscribes[path ?? key] = unsubscribe;
+      callback(data, key, unsubscribe, f);
     };
 
     return cb as any;
@@ -38,10 +38,10 @@ export default abstract class BaseComponent<Props = any, State = any> extends Pu
   }
 
   unsubscribe() {
-    Object.keys(this.eventListeners).forEach((k) => {
-      const l = this.eventListeners[k];
-      l && l.off();
-      delete this.eventListeners[k];
+    Object.keys(this.unsubscribes).forEach((k) => {
+      const unsub = this.unsubscribes[k];
+      unsub?.();
+      delete this.unsubscribes[k];
     });
   }
 

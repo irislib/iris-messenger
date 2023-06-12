@@ -1,7 +1,6 @@
 import Dexie, { Table } from 'dexie';
 import { throttle } from 'lodash';
-
-import { Event, Filter } from '../lib/nostr-tools';
+import { Event, Filter } from 'nostr-tools';
 
 import Events from './Events';
 import Key from './Key';
@@ -80,7 +79,7 @@ const IndexedDB = {
 
     // other events to be loaded on demand
   },
-  subscribeToAuthors: throttle((limit) => {
+  subscribeToAuthors: throttle((limit?: number) => {
     const authors = Array.from(IndexedDB.subscribedAuthors.values());
     IndexedDB.subscribedAuthors.clear();
     db.events
@@ -131,7 +130,7 @@ const IndexedDB = {
       if (filter.kinds) {
         query = query.where
           ? query.where('kind').anyOf(filter.kinds)
-          : query.and((event) => filter.kinds.includes(event.kind));
+          : query.and((event) => filter.kinds?.includes(event.kind));
       }
       if (filter.limit) {
         query = query.limit(filter.limit); // TODO these are not sorted by created_at desc

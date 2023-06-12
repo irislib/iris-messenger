@@ -1,4 +1,4 @@
-import english from './en.mjs';
+import english from './languages/en.mjs';
 import { createElement } from "preact";
 
 const AVAILABLE_LANGUAGES = {
@@ -36,33 +36,35 @@ const AVAILABLE_LANGUAGES = {
   'el-GR': 'Ελληνικά',
 };
 
+const modules = import.meta.glob('./languages/*.mjs');
+
 let AVAILABLE_LANGUAGE_KEYS = Object.keys(AVAILABLE_LANGUAGES);
 
 let language;
 let translation;
 let translationLoaded;
 
-// if not node.js
-if (typeof module !== 'undefined') {
-  language = localStorage.getItem('language') || navigator.language || 'en';
-  if (AVAILABLE_LANGUAGE_KEYS.indexOf(language) === -1) {
-    const s = language.slice(0, 2);
-    language = 'en';
-    for (let i = 0; i < AVAILABLE_LANGUAGE_KEYS.length; i++) {
-      if (AVAILABLE_LANGUAGE_KEYS[i].slice(0, 2) === s) {
-        language = AVAILABLE_LANGUAGE_KEYS[i];
-        break;
-      }
+language = localStorage.getItem('language') || navigator.language || 'en';
+if (AVAILABLE_LANGUAGE_KEYS.indexOf(language) === -1) {
+  const s = language.slice(0, 2);
+  language = 'en';
+  for (let i = 0; i < AVAILABLE_LANGUAGE_KEYS.length; i++) {
+    if (AVAILABLE_LANGUAGE_KEYS[i].slice(0, 2) === s) {
+      language = AVAILABLE_LANGUAGE_KEYS[i];
+      break;
     }
   }
-
-  translationLoaded = import(`./${language}.mjs`).then((module) => {
-    translation = module.default;
-    if (language !== 'en') {
-      translation = { ...english, ...translation };
-    }
-  });
 }
+
+translationLoaded = modules[`./languages/${language}.mjs`]().then((module) => {
+  console.log('loaded translation', language, `./languages/${language}.mjs`);
+  translation = module.default;
+  if (language !== 'en') {
+    translation = { ...english, ...translation };
+  }
+}).catch((e) => {
+  console.error('failed to load translation', e);
+});
 
 function capitalize(s) {
   if (typeof s !== 'string') return '';

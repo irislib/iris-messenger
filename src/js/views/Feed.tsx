@@ -1,13 +1,12 @@
 import FeedComponent from '../components/feed/Feed';
 import OnboardingNotification from '../components/OnboardingNotification';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 import View from './View';
 
 class Feed extends View {
   constructor() {
     super();
-    this.eventListeners = {};
     this.state = { sortedMessages: [] };
     this.id = 'message-view';
     this.class = 'public-messages-view';

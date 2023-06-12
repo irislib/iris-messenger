@@ -5,7 +5,7 @@ import {
   AVAILABLE_LANGUAGE_KEYS,
   AVAILABLE_LANGUAGES,
   language,
-} from '../translations/Translation';
+} from '../translations/Translation.mjs';
 
 function onLanguageChange(e: Event): void {
   const target = e.target as HTMLSelectElement;

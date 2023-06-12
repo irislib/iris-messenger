@@ -12,12 +12,12 @@ import {
 } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 
-import logo from '../../assets/img/icon128.png';
+import logo from '../../../public/img/icon128.png';
 import BaseComponent from '../BaseComponent';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 import { Button, PrimaryButton } from './buttons/Button';
 import Modal from './modal/Modal';
@@ -26,8 +26,18 @@ import PublicMessageForm from './PublicMessageForm';
 
 const APPLICATIONS = [
   { url: '/', text: 'home', icon: HomeIcon, activeIcon: HomeIconFull },
-  { url: '/chat', text: 'messages', icon: PaperAirplaneIcon, activeIcon: PaperAirplaneIconFull },
-  { url: '/settings', text: 'settings', icon: Cog8ToothIcon, activeIcon: Cog8ToothIconFull },
+  {
+    url: '/chat',
+    text: 'messages',
+    icon: PaperAirplaneIcon,
+    activeIcon: PaperAirplaneIconFull,
+  },
+  {
+    url: '/settings',
+    text: 'settings',
+    icon: Cog8ToothIcon,
+    activeIcon: Cog8ToothIconFull,
+  },
   {
     url: '/about',
     text: 'about',

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 
 import Helpers from '../../Helpers';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 import { OptionalGetter } from '../../types';
 
 import { PrimaryButton as Button } from './Button';

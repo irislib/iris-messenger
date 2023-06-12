@@ -1,4 +1,5 @@
-import { Event } from '../../lib/nostr-tools';
+import { Event } from 'nostr-tools';
+
 import Events from '../../nostr/Events';
 
 export default class SortedEventMap {

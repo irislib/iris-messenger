@@ -1,11 +1,18 @@
-import { Event, generatePrivateKey, getPublicKey, nip04, signEvent } from '../lib/nostr-tools';
-
-import Events from './Events';
-const bech32 = require('bech32-buffer'); /* eslint-disable-line @typescript-eslint/no-var-requires */
+import * as bech32 from 'bech32-buffer'; /* eslint-disable-line @typescript-eslint/no-var-requires */
+import {
+  Event,
+  generatePrivateKey,
+  getPublicKey,
+  nip04,
+  signEvent,
+  UnsignedEvent,
+} from 'nostr-tools';
 import { route } from 'preact-router';
 
 import Helpers from '../Helpers';
 import localState from '../LocalState';
+
+import Events from './Events';
 
 declare global {
   interface Window {
@@ -19,7 +26,8 @@ type Key = {
 };
 
 export default {
-  windowNostrQueue: [],
+  key: undefined as any,
+  windowNostrQueue: [] as any[],
   isProcessingQueue: false,
   getPublicKey, // TODO confusing similarity to getPubKey
   loginAsNewUser(redirect = false) {
@@ -78,12 +86,17 @@ export default {
   },
   encrypt: async function (data: string, pub?: string): Promise<string> {
     const k = this.key;
-    pub = pub || k.rpub;
+    pub = pub || k.rpub || '';
     if (k.priv) {
-      return nip04.encrypt(k.priv, pub, data);
+      return nip04.encrypt(k.priv, pub as string, data);
     } else if (window.nostr) {
       return new Promise((resolve) => {
-        this.processWindowNostr({ op: 'encrypt', data, pub, callback: resolve });
+        this.processWindowNostr({
+          op: 'encrypt',
+          data,
+          pub,
+          callback: resolve,
+        });
       });
     } else {
       return Promise.reject('no private key');
@@ -91,18 +104,23 @@ export default {
   },
   decrypt: async function (data, pub?: string): Promise<string> {
     const k = this.key;
-    pub = pub || k.rpub;
+    pub = pub || k.rpub || '';
     if (k.priv) {
-      return nip04.decrypt(k.priv, pub, data);
+      return nip04.decrypt(k.priv, pub as string, data);
     } else if (window.nostr) {
       return new Promise((resolve) => {
-        this.processWindowNostr({ op: 'decrypt', data, pub, callback: resolve });
+        this.processWindowNostr({
+          op: 'decrypt',
+          data,
+          pub,
+          callback: resolve,
+        });
       });
     } else {
       return Promise.reject('no private key');
     }
   },
-  sign: async function (event: Event): Promise<string> {
+  sign: async function (event: Event | UnsignedEvent): Promise<string> {
     const priv = this.getPrivKey();
     if (priv) {
       return signEvent(event, priv);
@@ -167,7 +185,7 @@ export default {
         return;
       }
 
-      let decrypted = await this.decrypt(msg.content, theirPub);
+      let decrypted = (await this.decrypt(msg.content, theirPub)) as any;
       if (decrypted.content) {
         decrypted = decrypted.content; // what? TODO debug
       }
@@ -206,7 +224,7 @@ export default {
   },
   toNostrBech32Address: function (address: string, prefix: string) {
     if (!address) {
-      return;
+      return null;
     }
     if (!prefix) {
       throw new Error('prefix is required');
@@ -221,9 +239,13 @@ export default {
       // not a bech32 address
     }
 
-    if (address.match(/^[0-9a-fA-F]{64}$/)) {
-      const words = Buffer.from(address, 'hex');
-      return bech32.encode(prefix, words);
+    const matchResult = address.match(/^[0-9a-fA-F]{64}$/);
+    if (matchResult !== null) {
+      const wordsArray = matchResult[0].match(/.{1,2}/g);
+      if (wordsArray !== null) {
+        const words = new Uint8Array(wordsArray.map((byte) => parseInt(byte, 16)));
+        return bech32.encode(prefix, words);
+      }
     }
     return null;
   },

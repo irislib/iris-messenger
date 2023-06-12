@@ -8,7 +8,7 @@ import FuzzySearch from '../FuzzySearch';
 import localState from '../LocalState';
 import Events from '../nostr/Events';
 import Key from '../nostr/Key';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 import Identicon from './Identicon';
 import Name from './Name';
@@ -91,7 +91,7 @@ class SearchBox extends Component<Props, State> {
     $(document)
       .off('keydown')
       .on('keydown', (e) => {
-        if (e.key === 'Tab' && document.activeElement.tagName === 'BODY') {
+        if (e.key === 'Tab' && document.activeElement?.tagName === 'BODY') {
           e.preventDefault();
           $(this.base).find('input').focus();
         } else if (e.key === 'Escape') {
@@ -184,7 +184,7 @@ class SearchBox extends Component<Props, State> {
             pubKey &&
             query === String(this.props.query || $(this.base).find('input').first().val())
           ) {
-            this.props.onSelect({ key: pubKey });
+            this.props.onSelect?.({ key: pubKey });
           }
         });
       }
@@ -232,7 +232,7 @@ class SearchBox extends Component<Props, State> {
     this.close();
   }
 
-  onResultFocus(e, index) {
+  onResultFocus(_e, index) {
     this.setState({ selected: index });
   }
 

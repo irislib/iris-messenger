@@ -1,5 +1,6 @@
+import { Event } from 'nostr-tools';
+
 import Icons from '../../Icons';
-import { Event } from '../../lib/nostr-tools';
 import Key from '../../nostr/Key';
 import Name from '../Name';
 

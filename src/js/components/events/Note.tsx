@@ -7,7 +7,7 @@ import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 import Identicon from '../Identicon';
 import ImageModal from '../modal/Image';
 import Name from '../Name';
@@ -77,7 +77,7 @@ const Note = ({
 
   let text = event.content || '';
   meta = meta || {};
-  const attachments = [];
+  const attachments = [] as any[];
   const urls = text.match(/(https?:\/\/[^\s]+)/g);
   if (urls) {
     urls.forEach((url) => {
@@ -150,7 +150,7 @@ const Note = ({
     if (['A', 'BUTTON', 'TEXTAREA', 'IMG', 'INPUT'].find((tag) => event.target.closest(tag))) {
       return;
     }
-    if (window.getSelection().toString()) {
+    if (window.getSelection()?.toString()) {
       return;
     }
     event.stopPropagation();
@@ -207,7 +207,7 @@ const Note = ({
   function renderShowThread() {
     return (
       <div style={{ flexBasis: '100%', marginBottom: '12px' }}>
-        <a href={`/${Key.toNostrBech32Address(rootMsg, 'note')}`}>{t('show_thread')}</a>
+        <a href={`/${Key.toNostrBech32Address(rootMsg || '', 'note')}`}>{t('show_thread')}</a>
       </div>
     );
   }
@@ -296,7 +296,6 @@ const Note = ({
         waitForFocus={true}
         autofocus={!standalone}
         replyingTo={event.id}
-        replyingToUser={event.pubkey}
         placeholder={t('write_your_reply')}
       />
     );

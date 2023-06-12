@@ -1,4 +1,3 @@
-import { Event } from './lib/nostr-tools';
 import Events from './nostr/Events';
 import Key from './nostr/Key';
 import SocialNetwork from './nostr/SocialNetwork';
@@ -50,13 +49,12 @@ export default {
           SocialNetwork.setMetadata(p);
         }
       }
-      this.setState({ profile: p, irisToActive: true });
     });
   },
 
   async enableReserved(name) {
     const pubkey = Key.getPubKey();
-    const event: Event = {
+    const event: any = {
       content: `iris.to/${name}`,
       kind: 1,
       tags: [],
@@ -95,7 +93,7 @@ export default {
       return;
     }
     const pubkey = Key.getPubKey();
-    const event: Event = {
+    const event: any = {
       content: `decline iris.to/${name}`,
       kind: 1,
       tags: [],

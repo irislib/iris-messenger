@@ -3,7 +3,7 @@ import { debounce } from 'lodash';
 import Feed from '../components/feed/Feed';
 import localState from '../LocalState';
 import Session from '../nostr/Session';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 import View from './View';
 
@@ -15,7 +15,7 @@ export default class Notifications extends View {
     node.once((saveLastOpened) => {
       if (saveLastOpened !== false) {
         const time = Math.floor(Date.now() / 1000);
-        const success = Session.public.set('notifications/lastOpened', time);
+        const success = Session.public?.set('notifications/lastOpened', time);
         if (!success) {
           console.log('user rejected');
           // stop pestering if user rejects signature request

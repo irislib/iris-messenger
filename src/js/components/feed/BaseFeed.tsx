@@ -1,4 +1,3 @@
-import React from 'react';
 import { throttle } from 'lodash';
 import isEqual from 'lodash/isEqual';
 
@@ -9,7 +8,7 @@ import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 import { PrimaryButton as Button } from '../buttons/Button';
 import ErrorBoundary from '../ErrorBoundary';
 import EventComponent from '../events/EventComponent';
@@ -64,7 +63,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   getSettings(override = { display: undefined }) {
     // override default & saved settings with url params
     let settings = { ...DEFAULT_SETTINGS };
-    if (['global', 'follows'].includes(this.props?.index)) {
+    if (['global', 'follows'].includes(this.props?.index || '')) {
       settings = Object.assign(settings, override);
     }
     if (this.props?.index !== 'notifications' && override.display) {
@@ -73,7 +72,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     if (this.props?.index === 'posts') {
       settings.showReplies = false;
     }
-    if (['postsAndReplies', 'notifications', 'likes'].includes(this.props?.index)) {
+    if (['postsAndReplies', 'notifications', 'likes'].includes(this.props?.index || '')) {
       settings.showReplies = true;
     }
     for (const key in settings) {
@@ -103,7 +102,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     }
     const settings = this.state.settings;
     // iterate over sortedEvents and add newer than eventsShownTime to queue
-    const queuedEvents = [];
+    const queuedEvents = [] as string[];
     let hasMyEvent;
     if (settings.sortDirection === 'desc' && !settings.realtime) {
       for (let i = 0; i < sortedEvents.length; i++) {
@@ -129,11 +128,14 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     // increase page size when scrolling down
     if (this.state.displayCount < this.state.sortedEvents.length) {
       if (
+        this.props.scrollElement &&
         this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
-        this.props.scrollElement.scrollHeight - 1000
+          this.props.scrollElement.scrollHeight - 1000
       ) {
         // TODO load more events
-        this.setState({ displayCount: this.state.displayCount + INITIAL_PAGE_SIZE });
+        this.setState({
+          displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
+        });
       }
     }
     this.checkScrollPosition();
@@ -264,7 +266,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     }
   }
 
-  getEvents(callback): Unsubscribe {
+  getEvents(_callback): Unsubscribe {
     return () => {
       // override this
     };
@@ -370,7 +372,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         global: 'global_feed',
         follows: 'following',
         notifications: 'notifications',
-      }[this.props.index];
+      }[this.props.index || 'global'];
 
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
     const events = this.renderEvents(displayCount, renderAs, showRepliedMsg);

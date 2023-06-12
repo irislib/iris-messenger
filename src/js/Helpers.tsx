@@ -9,10 +9,10 @@ import { route } from 'preact-router';
 
 import EventComponent from './components/events/EventComponent';
 import Name from './components/Name';
-import SafeImg, { isSafeOrigin } from './components/SafeImg';
+import SafeImg from './components/SafeImg';
 import Torrent from './components/Torrent';
 import Key from './nostr/Key';
-import { language, translate as t } from './translations/Translation';
+import { language, translate as t } from './translations/Translation.mjs';
 import localState from './LocalState';
 
 const emojiRegex =
@@ -30,18 +30,6 @@ localState.get('settings').on((s) => (settings = s));
 let existingIrisToAddress: any = {};
 localState.get('settings').put({}); // ?
 localState.get('existingIrisToAddress').on((a) => (existingIrisToAddress = a));
-
-function setImgSrc(el: JQuery<HTMLElement>, src: string): JQuery<HTMLElement> {
-  if (src) {
-    // parse src as url safely
-    src = new URL(src).href;
-    if (!isSafeOrigin(src)) {
-      src = `https://imgproxy.iris.to/insecure/plain/${src}`;
-    }
-    el.attr('src', src);
-  }
-  return el;
-}
 
 const userAgent = navigator.userAgent.toLowerCase();
 const isElectron = userAgent.indexOf(' electron/') > -1;
@@ -147,7 +135,11 @@ export default {
     if (opts.showMentionedMessages) {
       replacedText = reactStringReplace(replacedText, noteRegex, (match, i) => {
         return (
-          <EventComponent key={match + i} id={Key.toNostrHexAddress(match)} asInlineQuote={true} />
+          <EventComponent
+            key={match + i}
+            id={Key.toNostrHexAddress(match) || ''}
+            asInlineQuote={true}
+          />
         );
       });
     }
@@ -556,7 +548,7 @@ export default {
   })(),
 
   // hashtags, usernames, links
-  highlightText(s: string, event: any, opts: any = {}) {
+  highlightText(s: string, event?: any, opts: any = {}) {
     s = reactStringReplace(s, pubKeyRegex, (match, i) => {
       match = match.replace(/@/g, '');
       const link = `/${match}`;
@@ -628,7 +620,7 @@ export default {
       },
     );
 
-    if (event && event.tags) {
+    if (event?.tags) {
       // replace "#[n]" tags with links to the user: event.tags[n][1]
       s = reactStringReplace(s, /#\[(\d+)\]/g, (match, i) => {
         const tag = event.tags[parseInt(match, 10)];
@@ -682,6 +674,7 @@ export default {
         document.body.removeChild(textarea);
       }
     }
+    return false;
   },
 
   showConsoleWarning(): void {
@@ -712,7 +705,10 @@ export default {
   },
 
   formatDate(date: Date) {
-    const t = date.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
+    const t = date.toLocaleString(undefined, {
+      dateStyle: 'short',
+      timeStyle: 'short',
+    });
     const s = t.split(':');
     if (s.length === 3) {
       // safari tries to display seconds
@@ -780,7 +776,10 @@ export default {
       return Math.floor(timeDifference / secondsInAnHour) + 'h';
     } else {
       if (date.getFullYear() === currentTime.getFullYear()) {
-        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        return date.toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+        });
       } else {
         return date.toLocaleDateString(undefined, {
           year: 'numeric',
@@ -834,8 +833,6 @@ export default {
       );
     }
   }, 100),
-
-  setImgSrc,
 
   animateScrollTop: (selector: string): void => {
     const el = $(selector);

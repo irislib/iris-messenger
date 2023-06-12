@@ -1,7 +1,7 @@
 import Component from '../BaseComponent';
 import { PrimaryButton } from '../components/buttons/Button';
 import Header from '../components/Header';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 class Subscribe extends Component {
   render() {

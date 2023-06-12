@@ -1,5 +1,5 @@
 import { debounce } from 'lodash';
-import { createRef } from 'preact';
+import { createRef, JSX } from 'preact';
 
 import Component from '../BaseComponent';
 import ErrorBoundary from '../components/ErrorBoundary';

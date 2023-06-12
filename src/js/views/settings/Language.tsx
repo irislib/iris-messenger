@@ -5,7 +5,7 @@ import {
   AVAILABLE_LANGUAGES,
   language,
   translate as t,
-} from '../../translations/Translation';
+} from '../../translations/Translation.mjs';
 
 const Language = () => {
   return (

@@ -1,4 +1,5 @@
-import { Event } from './lib/nostr-tools';
+import { Event } from 'nostr-tools';
+
 import Helpers from './Helpers';
 
 // Code kindly contributed by @Kieran from Snort

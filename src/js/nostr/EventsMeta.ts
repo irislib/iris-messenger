@@ -1,4 +1,4 @@
-type EventMetadata = {
+export type EventMetadata = {
   relays: Set<string>;
 };
 

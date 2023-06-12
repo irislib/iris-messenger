@@ -17,7 +17,7 @@ const Name = (props: Props) => {
     console.error('Name component requires a pub', props);
     return null;
   }
-  const nostrAddr = Key.toNostrHexAddress(props.pub);
+  const nostrAddr = Key.toNostrHexAddress(props.pub) || '';
   let initialName = '';
   let initialDisplayName;
   let isGenerated = false;

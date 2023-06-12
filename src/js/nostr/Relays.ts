@@ -1,8 +1,8 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { throttle } from 'lodash';
+import { Event, Filter, Sub } from 'nostr-tools';
 
 import Helpers from '../Helpers';
-import { Event, Filter, Sub } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
 import Events from './Events';
@@ -37,6 +37,11 @@ type PublicRelaySettings = {
 };
 export type RelayMetadata = { enabled: boolean; url: string };
 
+export type PopularRelay = {
+  url: string;
+  users: number;
+};
+
 /**
  * Relay management and subscriptions. Bundles subscriptions in to max 10 larger batches.
  */
@@ -56,8 +61,8 @@ const Relays = {
     this.searchRelays = new Map(SEARCH_RELAYS.map((url) => [url, { enabled: true, url }]));
     this.manage();
   },
-  enabledRelays(relays: Map<string, RelayMetadata> = this.relays) {
-    return Array.from(relays.values())
+  enabledRelays(relays?: Map<string, RelayMetadata>) {
+    return Array.from((relays || this.relays).values())
       .filter((v) => v.enabled)
       .map((v) => v.url);
   },
@@ -84,7 +89,7 @@ const Relays = {
     }
     return urls;
   },
-  getPopularRelays: function () {
+  getPopularRelays: function (): Array<PopularRelay> {
     console.log('getPopularRelays');
     const relays = new Map<string, number>();
     Events.db.find({ kind: 3 }).forEach((event) => {
@@ -160,7 +165,7 @@ const Relays = {
         } else if (!this.relays.has(url)) {
           // `data` was missing `url` here, and those objects would be stored.
           // So this is backward compat.
-          this.relays.set(url, { url, enabled: data.enabled });
+          this.relays.set(url, { url, enabled: !!data.enabled });
           if (data.enabled) {
             PubSub.relayPool.addOrGetRelay(url);
           }
@@ -243,14 +248,19 @@ const Relays = {
       });
       return {
         name: 'profiles',
-        groupedFilter: { authors: Array.from(this.subscribedProfiles.values()), kinds: [0] },
+        groupedFilter: {
+          authors: Array.from(this.subscribedProfiles.values()),
+          kinds: [0],
+        },
       };
     }
     if (filter.authors) {
       filter.authors = Array.from(this.subscribedProfiles.values());
       return {
         name: 'authors',
-        groupedFilter: { authors: Array.from(this.subscribedProfiles.values()) },
+        groupedFilter: {
+          authors: Array.from(this.subscribedProfiles.values()),
+        },
       };
     }
     if (filter.ids) {

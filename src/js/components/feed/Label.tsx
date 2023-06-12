@@ -4,7 +4,7 @@ import { route } from 'preact-router';
 import styled from 'styled-components';
 
 import Icons from '../../Icons';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 
 const IconLink = styled.a`
   padding-right: 10px;

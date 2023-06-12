@@ -15,7 +15,6 @@ WORKDIR /build
 COPY package.json yarn.lock ./
 
 # Install dependencies
-ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN yarn
 
 # Copy project files and folders to the current working directory (i.e. '/app')
@@ -36,4 +35,4 @@ COPY --from=build-stage /build .
 
 EXPOSE 8080
 
-CMD [ "yarn", "serve" ]
+CMD [ "yarn", "preview" ]

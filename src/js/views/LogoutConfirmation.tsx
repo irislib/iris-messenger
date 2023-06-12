@@ -2,7 +2,7 @@ import { route } from 'preact-router';
 
 import { PrimaryButton as Button } from '../components/buttons/Button';
 import Session from '../nostr/Session';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 export default function LogoutConfirmation(_props) {
   return (

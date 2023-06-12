@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 import { PrimaryButton } from '../buttons/Button';
 
 interface Settings {
@@ -51,7 +51,11 @@ const FeedSettings = ({ settings, onChange }) => {
       id: 'display_realtime',
       checked: localSettings.realtime,
       label: t('realtime'),
-      onChange: () => setLocalSettings({ ...localSettings, realtime: !localSettings.realtime }),
+      onChange: () =>
+        setLocalSettings({
+          ...localSettings,
+          realtime: !localSettings.realtime,
+        }),
     },
     {
       type: 'checkbox',
@@ -60,7 +64,10 @@ const FeedSettings = ({ settings, onChange }) => {
       name: 'show_replies',
       label: t('show_replies'),
       onChange: () =>
-        setLocalSettings({ ...localSettings, showReplies: !localSettings.showReplies }),
+        setLocalSettings({
+          ...localSettings,
+          showReplies: !localSettings.showReplies,
+        }),
     },
   ];
 

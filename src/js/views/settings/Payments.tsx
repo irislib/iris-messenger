@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 
 import localState from '../../LocalState';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 
 const Payments = () => {
   const [displayCurrency, setDisplayCurrency] = useState('USD');

@@ -16,6 +16,10 @@ const ProfilePicture = ({ picture, onError }: Props) => {
     setShowModal(false);
   };
 
+  if (!picture) {
+    return null;
+  }
+
   return (
     <>
       <SafeImg class="profile-picture" src={picture} onError={onError} onClick={handleClick} />

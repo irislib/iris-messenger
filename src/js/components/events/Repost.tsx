@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
+import { Event } from 'nostr-tools';
 
-import { Event } from '../../lib/nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 import Name from '../Name';
 
 import EventComponent from './EventComponent';
@@ -17,7 +17,7 @@ interface Props {
 
 export default function Repost(props: Props) {
   const [allReposts, setAllReposts] = useState<string[]>([]);
-  const repostedEventId = Events.getRepostedEventId(props.event);
+  const repostedEventId = Events.getRepostedEventId(props.event) || '';
 
   useEffect(() => {
     if (props.notification) {
@@ -35,7 +35,12 @@ export default function Repost(props: Props) {
     <div className="msg">
       <div className="msg-content" style={{ padding: '12px 0 0 0' }}>
         <div
-          style={{ display: 'flex', alignItems: 'center', flexBasis: '100%', marginLeft: '15px' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexBasis: '100%',
+            marginLeft: '15px',
+          }}
         >
           <small className="reposted">
             <i>

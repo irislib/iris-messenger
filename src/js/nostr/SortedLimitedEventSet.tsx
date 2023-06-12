@@ -1,4 +1,4 @@
-import { Event } from '../lib/nostr-tools';
+import { Event } from 'nostr-tools';
 
 import { Unsubscribe } from './PubSub';
 type Callback = (events: string[]) => void;
@@ -44,7 +44,10 @@ export default class SortedLimitedEventSet {
     } else if (event.created_at > this.events[this.events.length - 1].created_at) {
       // If the set is full and the new event has a newer timestamp, replace the oldest event
       this.eventIdSet.delete(this.events[this.events.length - 1].id);
-      this.events[this.events.length - 1] = { id: event.id, created_at: event.created_at };
+      this.events[this.events.length - 1] = {
+        id: event.id,
+        created_at: event.created_at,
+      };
       this.eventIdSet.add(event.id);
       // TODO evict deleted event from Events.db if not indexed anywhere else
     } else {

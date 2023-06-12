@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const Upload = (props) => {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
   const handleFileUpload = (event) => {
     const files = event.target.files || event.dataTransfer.files;
     if (files && files.length) {

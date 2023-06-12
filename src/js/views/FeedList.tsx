@@ -2,7 +2,7 @@ import { route } from 'preact-router';
 
 import Icons from '../Icons';
 import localState from '../LocalState';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 import View from './View';
 

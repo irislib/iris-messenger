@@ -36,14 +36,14 @@ class Feed extends BaseFeed {
   subscribeToNostrUser(since, callback) {
     if (this.props.index === 'likes') {
       return PubSub.subscribe(
-        { authors: [this.props.nostrUser], kinds: [7], since },
+        { authors: [this.props.nostrUser || ''], kinds: [7], since },
         callback,
         false,
         false,
       );
     } else {
       return PubSub.subscribe(
-        { authors: [this.props.nostrUser], kinds: [1, 6], since },
+        { authors: [this.props.nostrUser || ''], kinds: [1, 6], since },
         this.getCallbackForPostsIndex(callback),
         false,
         false,
@@ -54,6 +54,9 @@ class Feed extends BaseFeed {
   subscribeToKeyword(since, callback) {
     const keyword = this.props.keyword.toLowerCase();
     return PubSub.subscribe(
+      // Filter type doesn't have "keywords"...
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { keywords: [keyword], kinds: [1], limit: 1000, since },
       (e) => e.content?.toLowerCase().includes(keyword) && callback(e),
       false,
@@ -64,7 +67,12 @@ class Feed extends BaseFeed {
     const myPub = Key.getPubKey();
     const followedUsers = Array.from(SocialNetwork.followedByUser.get(myPub) || []);
     followedUsers.push(myPub);
-    const filter = { kinds: [1, 6], limit: 300, since, authors: undefined };
+    const filter = {
+      kinds: [1, 6],
+      limit: 300,
+      since,
+      authors: undefined as any,
+    };
     if (followedUsers.length < 1000) {
       filter.authors = followedUsers;
     }

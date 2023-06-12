@@ -4,7 +4,7 @@ import Icons from '../../Icons';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 
 import EventDropdown from './EventDropdown';
 import Follow from './Follow';
@@ -35,7 +35,9 @@ interface EventComponentProps {
 }
 
 const EventComponent = (props: EventComponentProps) => {
-  const [state, setState] = useState<{ [key: string]: any }>({ sortedReplies: [] });
+  const [state, setState] = useState<{ [key: string]: any }>({
+    sortedReplies: [],
+  });
   const subscriptions: (() => void)[] = [];
   const retrievingTimeout = useRef<any>();
   const unmounted = useRef<boolean>(false);
@@ -86,7 +88,7 @@ const EventComponent = (props: EventComponentProps) => {
     retrievingTimeout.current = setTimeout(() => {
       setState((prevState) => ({ ...prevState, retrieving: true }));
     }, 1000);
-    Events.getEventById(hexId, true, (event) => handleEvent(event));
+    hexId && Events.getEventById(hexId, true, (event) => handleEvent(event));
 
     return () => {
       subscriptions.forEach((unsub) => {
@@ -107,7 +109,7 @@ const EventComponent = (props: EventComponentProps) => {
   });
 
   const renderDropdown = () => {
-    return props.asInlineQuote ? null : <EventDropdown id={props.id} event={state.event} />;
+    return props.asInlineQuote ? null : <EventDropdown id={props.id || ''} event={state.event} />;
   };
 
   const getClassName = () => {
@@ -189,7 +191,7 @@ const EventComponent = (props: EventComponentProps) => {
         event={state.event}
         meta={state.meta}
         fullWidth={props.fullWidth}
-        fadeIn={props.feedOpenedAt < state.event.created_at}
+        fadeIn={!props.feedOpenedAt || props.feedOpenedAt < state.event.created_at}
         {...props}
       />
     );

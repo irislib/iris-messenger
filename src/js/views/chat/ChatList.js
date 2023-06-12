@@ -1,12 +1,11 @@
 import { html } from 'htm/preact';
 import $ from 'jquery';
-import ScrollViewport from 'preact-scroll-viewport';
 
 import Component from '../../BaseComponent';
 import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 
 import ChatListItem from './ChatListItem';
 
@@ -71,17 +70,15 @@ class ChatList extends Component {
         <div><a>${t('turn_on_desktop_notifications')}</a></div>
       </div>
       <div class="chat-list">
-        <${ScrollViewport}>
-          ${this.state.sortedChats.map(
-            (pubkey) =>
-              html`<${ChatListItem}
-                active=${pubkey === activeChat}
-                key=${pubkey}
-                chat=${pubkey}
-                latestMsgId=${this.state.chats.get(pubkey).eventIds[0]}
-              />`,
-          )}
-        </${ScrollViewport}>
+        ${this.state.sortedChats.map(
+          (pubkey) =>
+            html`<${ChatListItem}
+              active=${pubkey === activeChat}
+              key=${pubkey}
+              chat=${pubkey}
+              latestMsgId=${this.state.chats.get(pubkey).eventIds[0]}
+            />`,
+        )}
       </div>
     </section>`;
   }

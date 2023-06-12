@@ -1,7 +1,0 @@
-node_modules
-dist
-yarn.lock
-package-lock.json
-.envrc
-lib
-test.html

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import Header from '../../components/Header';
 import Session from '../../nostr/Session';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 
 const Row = styled.div`
   display: flex;

@@ -1,7 +1,6 @@
 import localForage from 'localforage';
 import { debounce, throttle } from 'lodash';
-
-import { Event } from '../lib/nostr-tools';
+import { Event } from 'nostr-tools';
 
 import Events from './Events';
 import Key from './Key';
@@ -12,11 +11,14 @@ const getLatestByFollows = () => {
   if (latestByFollows) {
     return latestByFollows;
   }
-  latestByFollows = Events.db.addDynamicView('latest_by_follows', { persist: true });
+  latestByFollows = Events.db.addDynamicView('latest_by_follows', {
+    persist: true,
+  });
   latestByFollows.applyFind({ kind: 1 });
   latestByFollows.applySimpleSort('created_at', { desc: true });
   latestByFollows.applyWhere((event: Event) => {
-    return SocialNetwork.followDistanceByUser.get(event.pubkey) <= 1;
+    const distance = SocialNetwork.followDistanceByUser.get(event.pubkey) || Infinity;
+    return distance <= 1;
   });
   return latestByFollows;
 };
@@ -26,7 +28,9 @@ const getLatestByEveryone = () => {
   if (latestByEveryone) {
     return latestByEveryone;
   }
-  latestByEveryone = Events.db.addDynamicView('latest_by_everyone', { persist: true });
+  latestByEveryone = Events.db.addDynamicView('latest_by_everyone', {
+    persist: true,
+  });
   latestByEveryone.applyFind({ kind: 1 });
   latestByEveryone.applySimpleSort('created_at', { desc: true });
   return latestByEveryone;
@@ -42,7 +46,7 @@ export default {
         return Events.db.by('id', eventId);
       })
       .slice(0, 50);
-    let dms = [];
+    let dms = [] as Event[];
     for (const set of Events.directMessagesByUser.values()) {
       set.eventIds.forEach((eventId: any) => {
         dms.push(Events.db.by('id', eventId));

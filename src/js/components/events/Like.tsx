@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
+import { Event } from 'nostr-tools';
 import { route } from 'preact-router';
 
-import { Event } from '../../lib/nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Name from '../Name';
@@ -38,14 +38,19 @@ export default function Like(props: Props) {
     : 'liked a note';
 
   useEffect(() => {
-    const unsub = Events.getRepliesAndReactions(
-      likedId,
-      (_replies: Set<string>, likedBy: Set<string>) => {
-        setAllLikes(Array.from(likedBy));
-      },
-    );
-    return () => unsub();
+    if (likedId) {
+      return Events.getRepliesAndReactions(
+        likedId,
+        (_replies: Set<string>, likedBy: Set<string>) => {
+          setAllLikes(Array.from(likedBy));
+        },
+      );
+    }
   }, [likedId]);
+
+  if (!likedId) {
+    return null;
+  }
 
   const userLink = `/${Key.toNostrBech32Address(props.event.pubkey, 'npub')}`;
   return (

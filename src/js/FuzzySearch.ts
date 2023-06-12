@@ -15,7 +15,7 @@ const notifyUpdate = _.throttle(() => {
 }, 2000);
 
 const FuzzySearch = {
-  index: new Fuse([], options),
+  index: new Fuse([] as any[], options),
   keys: new Set<string>(),
   add(doc: any) {
     if (this.keys.has(doc.key)) {

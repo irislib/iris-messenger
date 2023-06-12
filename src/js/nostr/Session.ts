@@ -1,14 +1,15 @@
 import localForage from 'localforage';
+import { Event, Filter } from 'nostr-tools';
 import { route } from 'preact-router';
 
 import IrisTo from '../IrisTo';
-import { Event, Filter, Path } from '../lib/nostr-tools';
 import localState from '../LocalState';
 
 import Events from './Events';
 import IndexedDB from './IndexedDB';
 import Key from './Key';
 import LocalForage from './LocalForage';
+import { Path } from './path';
 import PubSub from './PubSub';
 import Relays from './Relays';
 import SocialNetwork from './SocialNetwork';
@@ -20,7 +21,9 @@ try {
 }
 
 const Session = {
-  public: undefined,
+  public: undefined as Path | undefined,
+  private: undefined as Path | undefined,
+
   async logOut() {
     route('/');
     /*
@@ -44,6 +47,9 @@ const Session = {
     localForage.clear().then(() => {
       location.reload();
     });
+  },
+  unsubscribe(..._args) {
+    // wat dis
   },
   onLoggedIn() {
     const myPub = Key.getPubKey();

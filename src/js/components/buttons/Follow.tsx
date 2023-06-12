@@ -1,7 +1,7 @@
 import Component from '../../BaseComponent';
 import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 
 import { Button } from './Button';
 
@@ -29,19 +29,22 @@ class Follow extends Component<Props> {
   onClick(e) {
     e.preventDefault();
     const newValue = !this.state[this.key];
+    const hex = Key.toNostrHexAddress(this.props.id);
+    if (!hex) return;
     if (this.key === 'follow') {
-      SocialNetwork.setFollowed(Key.toNostrHexAddress(this.props.id), newValue);
+      SocialNetwork.setFollowed(hex, newValue);
       return;
     }
     if (this.key === 'block') {
-      SocialNetwork.setBlocked(Key.toNostrHexAddress(this.props.id), newValue);
+      SocialNetwork.setBlocked(hex, newValue);
     }
   }
 
   componentDidMount() {
     if (this.key === 'follow') {
       SocialNetwork.getFollowedByUser(Key.getPubKey(), (follows) => {
-        const follow = follows?.has(Key.toNostrHexAddress(this.props.id));
+        const hex = Key.toNostrHexAddress(this.props.id);
+        const follow = hex && follows?.has(hex);
         this.setState({ follow });
       });
       return;

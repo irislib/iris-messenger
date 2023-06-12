@@ -2,7 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 
 import localState from '../../LocalState';
 import Session from '../../nostr/Session';
-import { translate as t } from '../../translations/Translation';
+import { translate as t } from '../../translations/Translation.mjs';
 
 type ColorScheme = 'default' | 'light' | 'dark';
 
@@ -12,7 +12,7 @@ const Appearance = () => {
 
   useEffect(() => {
     // TODO use Nostr.private
-    Session.public.get('settings/colorScheme', (entry) => {
+    Session.public?.get('settings/colorScheme', (entry) => {
       setColorScheme(entry.value);
     });
     localState.get('showConnectedRelays').on(setShowConnectedRelays);
@@ -21,7 +21,7 @@ const Appearance = () => {
   const onChange = (e: Event) => {
     const target = e.target as HTMLSelectElement;
     const value = target.value as ColorScheme;
-    Session.public.set('settings/colorScheme', value);
+    Session.public?.set('settings/colorScheme', value);
   };
 
   return (

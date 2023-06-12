@@ -7,7 +7,7 @@ import MediaPlayer from './components/MediaPlayer';
 import Menu from './components/Menu';
 import Modal from './components/modal/Modal';
 import Session from './nostr/Session';
-import { translationLoaded } from './translations/Translation';
+import { translationLoaded } from './translations/Translation.mjs';
 import About from './views/About';
 import Chat from './views/chat/Chat';
 import EditProfile from './views/EditProfile';
@@ -110,7 +110,7 @@ class Main extends Component<Props, ReactState> {
 
     // if id begins with "note", it's a post. otherwise it's a profile.
     const NoteOrProfile = (params: { id?: string; path: string }) => {
-      if (params.id.startsWith('note')) {
+      if (params.id?.startsWith('note')) {
         return <Note id={params.id} />;
       }
       return <Profile id={params.id} tab="posts" path={params.path} />;

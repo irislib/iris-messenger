@@ -3,14 +3,14 @@ import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
-import logo from '../../assets/img/icon128.png';
+import logo from '../../../public/img/icon128.png';
 import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 import { Button, PrimaryButton } from './buttons/Button';
 import Identicon from './Identicon';
@@ -18,8 +18,8 @@ import Name from './Name';
 import SearchBox from './SearchBox';
 
 export default class Header extends Component {
-  chatId = null;
-  iv = null;
+  chatId = null as string | null;
+  iv = null as any;
 
   constructor() {
     super();
@@ -39,7 +39,7 @@ export default class Header extends Component {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    clearInterval(this.iv);
+    this.iv && clearInterval(this.iv);
     document.removeEventListener('keydown', this.escFunction, false);
   }
 
@@ -73,7 +73,7 @@ export default class Header extends Component {
             );
             this.setState({ title });
           } else {
-            const title = <Name key={this.chatId} pub={this.chatId} />;
+            const title = <Name key={this.chatId} pub={this.chatId || ''} />;
             this.setState({ title });
           }
         }
@@ -187,11 +187,11 @@ export default class Header extends Component {
         }`}
         onClick={() => {
           // also synchronously make element visible so it can be focused
-          document.querySelector('.mobile-search-visible').classList.remove('hidden-xs', 'hidden');
+          document.querySelector('.mobile-search-visible')?.classList.remove('hidden-xs', 'hidden');
           document
             .querySelector('.mobile-search-hidden')
-            .classList.remove('visible-xs-inline-block');
-          document.querySelector('.mobile-search-hidden').classList.add('hidden');
+            ?.classList.remove('visible-xs-inline-block');
+          document.querySelector('.mobile-search-hidden')?.classList.add('hidden');
           const input = document.querySelector('.search-box input');
           if (input) {
             setTimeout(() => {

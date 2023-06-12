@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
 import Helpers from '../Helpers';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 const IRIS_INFO_ACCOUNT = 'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8';
 

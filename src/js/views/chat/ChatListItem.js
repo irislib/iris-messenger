@@ -41,7 +41,7 @@ class ChatListItem extends Component {
   componentDidMount() {
     this.getLatestMsg();
     const path = 'chats/' + this.props.chat + '/lastOpened';
-    Session.public.get(path, (lastOpened) => {
+    Session.public?.get(path, (lastOpened) => {
       this.setState({ lastOpened });
     });
   }

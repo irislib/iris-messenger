@@ -6,7 +6,7 @@ import Component from '../BaseComponent';
 import Helpers from '../Helpers';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 import { Button, PrimaryButton } from './buttons/Button';
 import Copy from './buttons/Copy';

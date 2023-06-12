@@ -19,7 +19,7 @@ export default {
     }
     const myPub = Key.getPubKey();
     followedUsers.forEach((followedUser) => {
-      followedUser = Key.toNostrHexAddress(followedUser);
+      followedUser = Key.toNostrHexAddress(followedUser) || '';
       if (follow && followedUser && followedUser !== myPub) {
         this.addFollower(followedUser, myPub);
       } else {
@@ -32,7 +32,7 @@ export default {
     const event = {
       kind: 3,
       content: existing?.content || '',
-      tags: Array.from(this.followedByUser.get(myPub)).map((address: string) => {
+      tags: Array.from(this.followedByUser.get(myPub) || []).map((address: string) => {
         return ['p', address];
       }),
     };
@@ -41,7 +41,7 @@ export default {
   },
 
   setBlocked: function (blockedUser: string, block = true) {
-    blockedUser = Key.toNostrHexAddress(blockedUser);
+    blockedUser = Key.toNostrHexAddress(blockedUser) || '';
     const myPub = Key.getPubKey();
 
     if (block) {
@@ -63,11 +63,11 @@ export default {
       // eslint-disable-next-line prefer-const
       unsub = PubSub.subscribe({ authors: [user], kinds: [0] }, () => unsub?.(), true);
     }
-    this.usersByFollowDistance.get(distance).add(user);
+    this.usersByFollowDistance.get(distance)?.add(user);
     // remove from higher distances
     for (const d of this.usersByFollowDistance.keys()) {
       if (d > distance) {
-        this.usersByFollowDistance.get(d).delete(user);
+        this.usersByFollowDistance.get(d)?.delete(user);
       }
     }
   },
@@ -75,11 +75,11 @@ export default {
   addFollower: function (followedUser: string, follower: string) {
     if (followedUser.startsWith('npub')) {
       console.error('addFollower: followedUser is not a hex address', followedUser);
-      followedUser = Key.toNostrHexAddress(followedUser);
+      followedUser = Key.toNostrHexAddress(followedUser) || '';
     }
     if (follower.startsWith('npub')) {
       console.error('addFollower: follower is not a hex address', follower);
-      follower = Key.toNostrHexAddress(follower);
+      follower = Key.toNostrHexAddress(follower) || '';
     }
 
     if (!this.followersByUser.has(followedUser)) {
@@ -133,7 +133,7 @@ export default {
     // iterate over remaining followers and set the smallest follow distance
     let smallest = 1000;
     for (const follower of this.followersByUser.get(unfollowedUser) || []) {
-      const distance = this.followDistanceByUser.get(follower) + 1;
+      const distance = (this.followDistanceByUser.get(follower) || Infinity) + 1;
       if (distance && distance < smallest) {
         smallest = distance;
       }
@@ -177,6 +177,8 @@ export default {
     let content: any = JSON.stringify(Array.from(this.blockedUsers));
     content = await Key.encrypt(content);
     Events.publish({
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       kind: 16462,
       content,
     });
@@ -184,6 +186,8 @@ export default {
   flag: function (address: string, isFlagged: boolean) {
     isFlagged ? this.flaggedUsers.add(address) : this.flaggedUsers.delete(address);
     Events.publish({
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       kind: 16463,
       content: JSON.stringify(Array.from(this.flaggedUsers)),
     });
@@ -194,6 +198,8 @@ export default {
     };
     callback();
     const myPub = Key.getPubKey();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return PubSub.subscribe({ kinds: [16462], authors: [myPub] }, callback);
   },
   getFlaggedUsers(cb?: (flagged: Set<string>) => void): Unsubscribe {
@@ -202,6 +208,8 @@ export default {
     };
     callback();
     const myPub = Key.getPubKey();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return PubSub.subscribe({ kinds: [16463], authors: [myPub] }, callback);
   },
   getFollowedByUser: function (

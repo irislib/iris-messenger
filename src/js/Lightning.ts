@@ -98,10 +98,12 @@ export function decodeInvoice(pr: string): InvoiceDetails | undefined {
     const expirySection = parsed.sections.find((a) => a.name === 'expiry');
     const expire = expirySection ? Number(expirySection.value as number | string) : undefined;
     const descriptionSection = parsed.sections.find((a) => a.name === 'description')?.value;
-    const descriptionHashSection = parsed.sections.find(
-      (a) => a.name === 'description_hash',
-    )?.value;
-    const paymentHashSection = parsed.sections.find((a) => a.name === 'payment_hash')?.value;
+    const descriptionHashSection = new Uint8Array(
+      parsed.sections.find((a) => a.name === 'description_hash')?.value,
+    );
+    const paymentHashSection = new Uint8Array(
+      parsed.sections.find((a) => a.name === 'payment_hash')?.value,
+    );
     const ret = {
       amount: amount,
       expire: timestamp && expire ? timestamp + expire : undefined,

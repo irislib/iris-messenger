@@ -1,8 +1,9 @@
 import { memo, useState } from 'react';
+import { Event } from 'nostr-tools';
+import { JSX } from 'preact';
 import styled, { css, keyframes } from 'styled-components';
 
 import Icons from '../../Icons';
-import { Event } from '../../lib/nostr-tools';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 
@@ -19,19 +20,19 @@ const fadeIn = keyframes`
   }
 `;
 
-function VideoIcon({ attachment }) {
-  return (
-    attachment.type === 'video' && (
-      <div
-        style={{
-          position: 'absolute',
-          top: '8px',
-          right: '8px',
-        }}
-      >
-        {Icons.video}
-      </div>
-    )
+function VideoIcon({ attachment }): JSX.Element {
+  return attachment.type === 'video' ? (
+    <div
+      style={{
+        position: 'absolute',
+        top: '8px',
+        right: '8px',
+      }}
+    >
+      {Icons.video}
+    </div>
+  ) : (
+    <></>
   );
 }
 
@@ -83,7 +84,7 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
     const id = Events.getEventReplyingTo(props.event);
     return <EventComponent id={id} renderAs="NoteImage" />;
   }
-  const attachments = [];
+  const attachments = [] as { type: string; url: string }[];
   const urls = props.event.content?.match(/(https?:\/\/[^\s]+)/g);
   if (urls) {
     urls.forEach((url) => {

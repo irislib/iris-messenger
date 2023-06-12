@@ -3,7 +3,7 @@ import { route } from 'preact-router';
 import EventComponent from '../components/events/EventComponent';
 import PublicMessageForm from '../components/PublicMessageForm';
 import Key from '../nostr/Key';
-import { translate as t } from '../translations/Translation';
+import { translate as t } from '../translations/Translation.mjs';
 
 import View from './View';
 
@@ -35,7 +35,6 @@ class Note extends View {
         <div className="mar-top15">
           <PublicMessageForm
             placeholder={t('whats_on_your_mind')}
-            activeChat="public"
             forceAutofocusMobile={true}
             autofocus={true}
             onSubmit={() => route('/')}
