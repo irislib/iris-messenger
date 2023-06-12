@@ -506,7 +506,7 @@ export default {
       const imgRegex = /(https?:\/\/[^\s]*\.(?:jpg|jpeg|gif|png|webp))/gi;
       replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
         return (
-          <div className="img-container">
+          <div className="img-container my-2">
             <SafeImg onClick={opts.onImageClick} width={569} src={match} key={match + i} />
           </div>
         );

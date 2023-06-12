@@ -57,18 +57,19 @@ export default class Account extends Component {
     const hasPriv = !!Key.getPrivKey();
     return (
       <>
-        <div class="centered-container">
+        <div class="centered-container prose">
           <h2>{t('account')}</h2>
+          {hasPriv ? (
+            <p>
+              <b>{t('save_backup_of_privkey_first')}</b> {t('otherwise_cant_log_in_again')}
+            </p>
+          ) : null}
           <p>
-            {hasPriv ? (
-              <>
-                <b>{t('save_backup_of_privkey_first')}</b> {t('otherwise_cant_log_in_again')}
-              </>
-            ) : null}
-          </p>
-          <p>
-            <Button onClick={() => this.onLogoutClick(hasPriv)}>{t('log_out')}</Button>
-            <Button
+            <button className="btn btn-primary" onClick={() => this.onLogoutClick(hasPriv)}>
+              {t('log_out')}
+            </button>
+            <button
+              className="btn btn-primary"
               onClick={() =>
                 this.setState({
                   showSwitchAccount: !this.state.showSwitchAccount,
@@ -76,7 +77,7 @@ export default class Account extends Component {
               }
             >
               {t('switch_account')}
-            </Button>
+            </button>
           </p>
           {this.state.showSwitchAccount
             ? html`

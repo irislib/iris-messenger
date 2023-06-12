@@ -54,9 +54,9 @@ const Copy = ({ copyStr, text }: Props) => {
 
   const buttonText = copied ? t('copied') : text || t('copy');
   return (
-    <Button className="copy-button" onClick={(e) => onClick(e)}>
+    <button className="btn btn-primary" onClick={(e) => onClick(e)}>
       {buttonText}
-    </Button>
+    </button>
   );
 };
 
