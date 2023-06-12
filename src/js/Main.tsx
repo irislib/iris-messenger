@@ -116,7 +116,7 @@ class Main extends Component<Props, ReactState> {
 
     return (
       <div className="flex justify-center">
-        <section className="flex w-full max-w-screen-xl justify-between relative">
+        <section className="flex w-full max-w-screen-lg justify-between relative">
           {s.loggedIn ? <Menu /> : null}
           <Helmet titleTemplate={titleTemplate} defaultTitle={defaultTitle}>
             <title>{title}</title>

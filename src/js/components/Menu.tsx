@@ -123,7 +123,7 @@ export default class Menu extends BaseComponent {
 
   render() {
     return (
-      <div className="sticky top-0 z-20 h-screen max-h-screen hidden md:w-16 lg:w-64 flex-col px-2 py-4 md:flex">
+      <div className="sticky top-0 z-20 h-screen max-h-screen hidden md:w-16 lg:w-72 flex-col px-2 py-4 md:flex">
         <a
           className="flex items-center gap-3 px-2 mb-4"
           tabIndex={3}

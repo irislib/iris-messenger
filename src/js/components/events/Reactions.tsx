@@ -234,8 +234,8 @@ const Reactions = (props) => {
         {props.settings.showReposts ? (
           <>
             <a
-              className={`btn-ghost flex-1 hover:bg-transparent hover:text-iris-green btn content-center gap-2 rounded-none p-2 text-neutral-500 ${
-                s.reposted ? 'reposted' : ''
+              className={`btn-ghost flex-1 hover:bg-transparent btn content-center gap-2 rounded-none p-2 text-neutral-500 ${
+                s.reposted ? 'text-iris-green' : 'hover:text-iris-green'
               }`}
               onClick={(e) => repostBtnClicked(e)}
             >
@@ -254,8 +254,8 @@ const Reactions = (props) => {
         {props.settings.showLikes ? (
           <>
             <a
-              className={`btn-ghost flex-1 justify-center hover:bg-transparent hover:text-iris-red btn content-center gap-2 rounded-none p-2 text-neutral-500 ${
-                s.liked ? 'liked' : ''
+              className={`btn-ghost flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none p-2 text-neutral-500 ${
+                s.liked ? 'text-iris-red' : 'hover:text-iris-red'
               }`}
               onClick={(e) => likeBtnClicked(e)}
             >
