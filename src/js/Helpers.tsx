@@ -170,6 +170,7 @@ export default {
       replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
         return (
           <video
+            className="my-2 rounded max-h-[70vh] md:max-h-96 max-w-full"
             key={match + i}
             src={match}
             poster={`https://imgproxy.iris.to/thumbnail/428/${match}`}
