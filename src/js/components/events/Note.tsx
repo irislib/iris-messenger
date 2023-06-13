@@ -283,7 +283,7 @@ const Note = ({
     }
     if (isQuote) classNames.push('quote');
     if (isQuoting) classNames.push('quoting');
-    if (asInlineQuote) classNames.push('inline-quote');
+    if (asInlineQuote) classNames.push('inline-quote border-2 border-neutral-900 rounded-lg my-2');
     if (fullWidth) classNames.push('full-width');
 
     return classNames.join(' ');
