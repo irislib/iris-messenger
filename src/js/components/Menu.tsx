@@ -104,7 +104,7 @@ export default class Menu extends BaseComponent {
         <Link href={`/${npub}`} className="btn btn-ghost md:max-lg:btn-circle">
           <Identicon str={hex} width={34} />
           <div className="hidden lg:block ml-2">
-            <Name pub={hex} />
+            <Name pub={hex} hideBadge={true} />
           </div>
         </Link>
       </div>
