@@ -10,7 +10,7 @@
   -webkit-text-size-adjust: 100%;
 }
 
-.btn, input {
+.btn, input, select {
     @apply rounded-full;
 }
 
@@ -33,4 +33,8 @@ iframe {
 
 img, video {
   user-select: none;
+}
+
+.centered-placeholder::placeholder {
+  text-align: center;
 }

@@ -96,14 +96,10 @@ class Main extends Component<Props, ReactState> {
     const titleTemplate = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) %s | iris` : '%s | iris';
     const defaultTitle = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) iris` : 'iris';
     if (!s.translationLoaded) {
-      return <div id="main-content" />;
+      return <div />;
     }
     if (!s.loggedIn && window.location.pathname.length <= 1) {
-      return (
-        <div id="main-content">
-          <Login fullScreen={true} />
-        </div>
-      );
+      return <Login fullScreen={true} />;
     }
 
     // if id begins with "note", it's a post. otherwise it's a profile.
