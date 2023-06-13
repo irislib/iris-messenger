@@ -28,7 +28,7 @@ abstract class View extends Component {
         <div
           ref={this.scrollElement}
           onScroll={() => this.saveScrollPosition()}
-          class={`main-view ${this.class}`}
+          class={this.class}
           id={this.id}
         >
           <ErrorBoundary>{this.renderView()}</ErrorBoundary>

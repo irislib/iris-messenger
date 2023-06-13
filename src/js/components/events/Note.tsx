@@ -321,7 +321,7 @@ const Note = ({
             {standalone && renderHelmet()}
             {meta.torrentId && <Torrent torrentId={meta.torrentId} autopause={!standalone} />}
             {text?.length > 0 && (
-              <div className={`whitespace-pre-wrap py-2 ${emojiOnly && 'text-2xl'}`}>
+              <div className={`whitespace-pre-wrap break-words py-2 ${emojiOnly && 'text-2xl'}`}>
                 {text}
                 {translatedText && (
                   <p>
