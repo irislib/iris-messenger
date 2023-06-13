@@ -67,7 +67,13 @@ npm run test
 
 </details>
 
-[iris.to](https://iris.to) production version is in the [stable](https://github.com/irislib/iris-messenger/tree/stable) branch.
+[iris.to](https://iris.to) production version is in the [production](https://github.com/irislib/iris-messenger/tree/production) branch.
+
+#### Stack:
+* [Vite](https://vitejs.dev/) — a fast frontend build tool
+* [Preact](https://preactjs.com/) — a fast 3kB alternative to React with the same modern API
+* [Tailwind CSS](https://tailwindcss.com/docs/installation) — a CSS framework for rapid UI development. Less custom CSS.
+* [DaisyUI](https://daisyui.com/components/) — a component library for Tailwind CSS
 
 ### Docker
 
