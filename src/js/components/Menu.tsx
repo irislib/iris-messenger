@@ -14,13 +14,11 @@ import { Link, route } from 'preact-router';
 
 import logo from '../../../public/img/icon128.png';
 import BaseComponent from '../BaseComponent';
-import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
 import Modal from './modal/Modal';
-import QRModal from './modal/QRModal';
 import Identicon from './Identicon';
 import PublicMessageForm from './PublicMessageForm';
 import Name from "./Name";
