@@ -165,21 +165,26 @@ class Profile extends View {
               <div class="profile-actions">
                 <${Dropdown}>
                   <${Copy}
+                    className="btn btn-sm"
                     key=${`${this.state.hexPub}copyLink`}
                     text=${t('copy_link')}
                     title=${this.state.name}
                     copyStr=${window.location.href}
                   />
                   <${Copy}
+                    className="btn btn-sm"
                     key=${`${this.state.hexPub}copyNpub`}
                     text=${t('copy_user_ID')}
                     title=${this.state.name}
                     copyStr=${this.state.npub}
                   />
-                  <${Button} onClick=${() => this.setState({ showQR: !this.state.showQR })}
+                  <${Button}
+                    className="btn btn-sm"
+                    onClick=${() => this.setState({ showQR: !this.state.showQR })}
                     >${t('show_qr_code')}<//
                   >
                   <${Copy}
+                    className="btn btn-sm"
                     key=${`${this.state.hexPub}copyData`}
                     text=${t('copy_raw_data')}
                     title=${this.state.name}
@@ -187,7 +192,7 @@ class Profile extends View {
                   />
                   ${!this.state.isMyProfile && !Key.getPrivKey()
                     ? html`
-                        <${Button} onClick=${(e) => this.viewAs(e)}>
+                        <${Button} className="btn btn-sm" onClick=${(e) => this.viewAs(e)}>
                           ${t('view_as') + ' '}
                           <${Name} pub=${this.state.hexPub} hideBadge=${true} />
                         <//>
@@ -196,8 +201,8 @@ class Profile extends View {
                   ${this.state.isMyProfile
                     ? ''
                     : html`
-                        <${Block} id=${this.state.hexPub} />
-                        <${Report} id=${this.state.hexPub} />
+                        <${Block} className="btn btn-sm" id=${this.state.hexPub} />
+                        <${Report} className="btn btn-sm" id=${this.state.hexPub} />
                       `}
                 <//>
               </div>

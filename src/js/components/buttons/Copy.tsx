@@ -7,9 +7,10 @@ import { OptionalGetter } from '../../types';
 type Props = {
   copyStr: OptionalGetter<string>;
   text: string;
+  className?: string;
 };
 
-const Copy = ({ copyStr, text }: Props) => {
+const Copy = ({ copyStr, text, className }: Props) => {
   const [copied, setCopied] = useState(false);
   const [originalWidth, setOriginalWidth] = useState<number | undefined>(undefined);
   const [timeout, setTimeoutState] = useState<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -52,7 +53,7 @@ const Copy = ({ copyStr, text }: Props) => {
 
   const buttonText = copied ? t('copied') : text || t('copy');
   return (
-    <button className="btn btn-primary" onClick={(e) => onClick(e)}>
+    <button className={className || 'btn'} onClick={(e) => onClick(e)}>
       {buttonText}
     </button>
   );

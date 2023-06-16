@@ -9,6 +9,7 @@ import { PrimaryButton as Button } from './Button';
 type Props = {
   id: string;
   showName?: boolean;
+  className?: string;
 };
 
 class Block extends Component<Props> {
@@ -21,13 +22,22 @@ class Block extends Component<Props> {
 
   constructor() {
     super();
-    this.cls = 'block';
+    this.cls = 'block-btn';
     this.key = 'blocked';
     this.activeClass = 'blocked';
     this.action = t('block');
     this.actionDone = t('blocked');
     this.hoverAction = t('unblock');
+    this.state = { ...this.state, hover: false };
   }
+
+  handleMouseEnter = () => {
+    this.setState({ hover: true });
+  };
+
+  handleMouseLeave = () => {
+    this.setState({ hover: false });
+  };
 
   onClick(e) {
     e.preventDefault();
@@ -44,16 +54,32 @@ class Block extends Component<Props> {
   }
 
   render() {
+    const isBlocked = this.state[this.key];
+    const isHovering = this.state.hover;
+
+    let buttonText;
+
+    if (isBlocked && isHovering) {
+      buttonText = this.hoverAction;
+    } else if (isBlocked && !isHovering) {
+      buttonText = this.actionDone;
+    } else {
+      buttonText = this.action;
+    }
+
     return (
       <Button
-        className={`${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}`}
+        className={`${this.cls || this.key} ${isBlocked ? this.activeClass : ''} ${
+          this.props.className || ''
+        }`}
         onClick={(e) => this.onClick(e)}
+        onMouseEnter={this.handleMouseEnter}
+        onMouseLeave={this.handleMouseLeave}
       >
-        <span className="nonhover">
-          {t(this.state[this.key] ? this.actionDone : this.action)}{' '}
+        <span>
+          {t(buttonText)}{' '}
           {this.props.showName ? <Name pub={this.props.id} hideBadge={true} /> : ''}
         </span>
-        <span className="hover">{t(this.hoverAction)}</span>
       </Button>
     );
   }
