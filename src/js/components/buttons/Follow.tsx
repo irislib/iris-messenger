@@ -22,7 +22,16 @@ class Follow extends Component<Props> {
     this.action = t('follow_btn');
     this.actionDone = t('following_btn');
     this.hoverAction = t('unfollow_btn');
+    this.state = { ...this.state, hover: false };
   }
+
+  handleMouseEnter = () => {
+    this.setState({ hover: true });
+  };
+
+  handleMouseLeave = () => {
+    this.setState({ hover: false });
+  };
 
   onClick(e) {
     e.preventDefault();
@@ -56,11 +65,16 @@ class Follow extends Component<Props> {
           this.state[this.key] ? this.activeClass : ''
         }`}
         onClick={(e) => this.onClick(e)}
+        onMouseEnter={this.handleMouseEnter} // handle hover state
+        onMouseLeave={this.handleMouseLeave} // handle hover state
       >
-        <span className="hover:hidden">
-          {t(this.state[this.key] ? this.actionDone : this.action)}
-        </span>
-        <span className="hidden hover:block">{t(this.hoverAction)}</span>
+        {t(
+          this.state.hover
+            ? this.hoverAction
+            : this.state[this.key]
+            ? this.actionDone
+            : this.action,
+        )}
       </button>
     );
   }
