@@ -38,3 +38,7 @@ img, video {
 .centered-placeholder::placeholder {
   text-align: center;
 }
+
+.link {
+  @apply text-iris-blue hover:underline;
+}

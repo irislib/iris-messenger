@@ -508,7 +508,7 @@ export default {
       replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
         return (
           <SafeImg
-            className="my-2 rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
+            className="my-2 md:rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
             onClick={opts.onImageClick}
             src={match}
             key={match + i}
@@ -559,7 +559,7 @@ export default {
       return (
         <>
           {' '}
-          <a href={link}>
+          <a href={link} className="link">
             @<Name key={match + i} pub={match} hideBadge={true} />
           </a>
         </>
@@ -574,7 +574,7 @@ export default {
           return (
             <>
               {' '}
-              <a href={`/${data.pubkey}`}>
+              <a href={`/${data.pubkey}`} className="link">
                 @<Name key={match + i} pub={data.pubkey} hideBadge={true} />
               </a>
             </>
@@ -595,7 +595,7 @@ export default {
       return (
         <>
           {' '}
-          <a href={link}>{match}</a>
+          <a href={link} className="link">{match}</a>
         </>
       );
     });
@@ -609,6 +609,7 @@ export default {
         return (
           <a
             key={match + i}
+            className="link"
             target="_blank"
             onClick={(e) => {
               if (isIris) {

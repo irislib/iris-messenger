@@ -9,7 +9,6 @@ import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation.mjs';
 
-import { Button, PrimaryButton } from './buttons/Button';
 import Name from './Name';
 import SearchBox from './SearchBox';
 
@@ -171,13 +170,19 @@ export default class Header extends Component {
 
   renderLoginBtns() {
     return (
-      <div class="login-buttons">
-        <PrimaryButton small onClick={() => localState.get('showLoginModal').put(true)}>
+      <div className="flex gap-2">
+        <button
+          className="btn btn-sm btn-primary"
+          onClick={() => localState.get('showLoginModal').put(true)}
+        >
           {t('log_in')}
-        </PrimaryButton>
-        <Button small onClick={() => localState.get('showLoginModal').put(true)}>
+        </button>
+        <button
+          className="btn btn-sm btn-neutral"
+          onClick={() => localState.get('showLoginModal').put(true)}
+        >
           {t('sign_up')}
-        </Button>
+        </button>
       </div>
     );
   }

@@ -125,7 +125,7 @@ class Main extends Component<Props, ReactState> {
             <meta name="twitter:image" content="https://iris.to/assets/img/irisconnects.png" />
           </Helmet>
           <div className="overlay" onClick={() => this.onClickOverlay()}></div>
-          <div className="pb-16 md:pb-0 relative flex h-full flex-grow flex-col">
+          <div className="pb-16 md:pb-0 relative flex h-full flex-grow flex-col w-1/2">
             <Router onChange={(e) => this.handleRoute(e)}>
               <FeedList path="/" />
               <KeyConverter path="/key" />

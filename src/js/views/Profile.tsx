@@ -144,7 +144,7 @@ class Profile extends View {
               <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
                 ${this.state.isMyProfile
                   ? html`<button
-                      class="btn btn-sm"
+                      class="btn btn-sm btn-neutral"
                       onClick=${() => loggedIn && route('/profile/edit')}
                     >
                       ${t('edit_profile')}
@@ -154,7 +154,7 @@ class Profile extends View {
                       ${this.state.npub !==
                       'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8'
                         ? html` <button
-                            className="btn btn-sm"
+                            className="btn btn-neutral btn-sm"
                             onClick=${() => loggedIn && route(`/chat/${this.state.npub}`)}
                           >
                             ${t('send_message')}
@@ -214,22 +214,22 @@ class Profile extends View {
                     >`
                 : ''}
             </div>
-            <div class="profile-about">
-              <p class="text-sm">${this.state.about}</p>
-              ${this.renderLinks()}
-            </div>
-            <div class="profile-actions">
-              <div class="follow-count">
+            <div>
+              <div class="text-sm flex gap-4">
                 <a href="/follows/${this.state.npub}">
-                  <span>${this.state.followedUserCount}</span> ${t('following')}
+                  <b>${this.state.followedUserCount}</b> ${t('following')}
                 </a>
                 <a href="/followers/${this.state.npub}">
-                  <span>${this.state.followerCount}</span> ${t('followers')}
+                  <b>${this.state.followerCount}</b> ${t('followers')}
                 </a>
               </div>
               ${SocialNetwork.followedByUser.get(this.state.hexPub)?.has(Key.getPubKey())
                 ? html` <div><small>${t('follows_you')}</small></div> `
                 : ''}
+            </div>
+            <div className="py-2">
+              <p class="text-sm">${this.state.about}</p>
+              ${this.renderLinks()}
             </div>
           </div>
         </div>

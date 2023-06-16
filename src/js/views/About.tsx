@@ -13,9 +13,9 @@ class About extends Component {
     return (
       <>
         <Header />
-        <div className="main-view prose mx-auto" id="settings">
+        <div className="main-view prose" id="settings">
           <div className="p-2">
-            <h2>{t('about')}</h2>
+            <h2 className="mt-0">{t('about')}</h2>
             <p>Iris is like the social networking apps we're used to, but better:</p>
             <ul>
               <li>

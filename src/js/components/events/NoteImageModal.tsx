@@ -9,6 +9,7 @@ const ContentContainer = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
+  background-color: black;
 `;
 
 const MediaContainer = styled.div`
@@ -46,7 +47,7 @@ const NoteImageModal = ({ event, onClose, attachment }) => {
       <ContentContainer>
         <MediaContainer>
           {attachment.type === 'image' ? (
-            <SafeImg src={attachment.url} />
+            <SafeImg className="rounded-sm" src={attachment.url} />
           ) : (
             <video
               loop

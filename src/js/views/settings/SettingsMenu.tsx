@@ -1,7 +1,6 @@
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
-import Helpers from '../../Helpers';
 import Icons from '../../Icons';
 import localState from '../../LocalState';
 import { translate as t } from '../../translations/Translation.mjs';
@@ -33,33 +32,30 @@ export default class SettingsMenu extends Component {
   render() {
     const activePage = this.props.activePage || 'account';
     return (
-      <>
-        <div className={!this.props.activePage ? 'settings-list' : 'settings-list hidden-xs'}>
-          {Helpers.isElectron ? (
-            <div class="electron-padding" />
-          ) : (
-            <h3 class="visible-xs-block" style="padding: 0px 15px;">
-              {t('settings')}
-            </h3>
-          )}
-          {Object.keys(SETTINGS).map((page) => {
-            if (!SETTINGS[page]) return;
-            return (
-              <a
-                href="#"
-                class={activePage === page && window.innerWidth > 624 ? 'active' : ''}
-                onClick={(e) => this.menuLinkClicked(page, e)}
-                key={page}
-              >
-                <span class="text">
-                  {t(SETTINGS[page])}
-                  {page === 'language' && <small className="mar-left5">{Icons.language}</small>}
-                </span>
-              </a>
-            );
-          })}
-        </div>
-      </>
+      <div
+        className={`flex-col w-48 flex-shrink-0 ${
+          !this.props.activePage ? 'flex' : 'hidden md:flex'
+        }`}
+      >
+        {Object.keys(SETTINGS).map((page) => {
+          if (!SETTINGS[page]) return;
+          return (
+            <a
+              href="#"
+              className={`btn inline-flex w-auto flex items-center space-x-4 p-3 rounded-full transition-colors duration-200 hover:bg-neutral-900 ${
+                activePage === page && window.innerWidth > 624 ? 'active' : ''
+              }`}
+              onClick={(e) => this.menuLinkClicked(page, e)}
+              key={page}
+            >
+              <span class="text">
+                {t(SETTINGS[page])}
+                {page === 'language' && <small className="mar-left5">{Icons.language}</small>}
+              </span>
+            </a>
+          );
+        })}
+      </div>
     );
   }
 }
