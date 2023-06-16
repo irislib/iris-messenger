@@ -315,14 +315,10 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   renderShowNewEvents() {
     return (
       <div
-        className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
+        className={`alert alert-info cursor-pointer ${this.state.showNewMsgsFixedTop ? 'sticky' : ''}`}
         onClick={() => this.showQueuedEvents()}
       >
-        <div className="msg-content notification-msg colored">
-          <div style="height: 27.5px; line-height: 27.5px">
-            {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
-          </div>
-        </div>
+        {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
       </div>
     );
   }
