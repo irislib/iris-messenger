@@ -126,7 +126,6 @@ export default class IrisAccount extends Component {
               <button
                 className="btn btn-primary"
                 type="submit"
-                enabled={this.state.newUserNameValid}
               >
                 Register
               </button>

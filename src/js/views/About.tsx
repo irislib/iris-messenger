@@ -90,12 +90,12 @@ class About extends Component {
             <p>{t('application_security_warning')}</p>
 
             <h3>Follow</h3>
-            <div className="profile-link-container">
-              <a href={`/${IRIS_INFO_ACCOUNT}`} className="profile-link">
+            <div className="flex flex-row items-center">
+              <a href={`/${IRIS_INFO_ACCOUNT}`} className="flex flex-row items-center">
                 <Identicon str={IRIS_INFO_ACCOUNT} width={40} />
                 <Name pub={IRIS_INFO_ACCOUNT} placeholder="Iris" />
               </a>
-              <Follow id={IRIS_INFO_ACCOUNT} />
+              <Follow className="btn btn-neutral btn-sm" id={IRIS_INFO_ACCOUNT} />
             </div>
 
             <p>
