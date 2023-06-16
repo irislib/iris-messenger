@@ -3,7 +3,6 @@ import { nip19 } from 'nostr-tools';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
-import { PrimaryButton as Button } from '../../components/buttons/Button';
 import Copy from '../../components/buttons/Copy';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';

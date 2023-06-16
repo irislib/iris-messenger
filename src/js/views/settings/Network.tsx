@@ -55,11 +55,11 @@ const Network = () => {
   const getClassName = (relay) => {
     switch (getStatus(relay)) {
       case 0:
-        return 'neutral';
+        return 'text-iris-yellow';
       case 1:
-        return 'positive';
+        return 'text-iris-green';
       case 2:
-        return 'neutral';
+        return 'text-iris-yellow';
       case 3:
         return '';
       default:
@@ -111,18 +111,23 @@ const Network = () => {
           <Button onClick={() => Relays.restoreDefaults()}>{t('restore_defaults')}</Button>
         </p>
       </div>
-      <h3>{t('popular_relays')}</h3>
-      <div id="popular-relays" className="flex-table">
-        <div className="flex-row peer">
-          <div className="flex-cell no-flex">{t('users')}</div>
-          <div className="flex-cell">URL</div>
+      <h3 className="text-lg font-semibold">{t('popular_relays')}</h3>
+      <div id="popular-relays" className="flex flex-col gap-2">
+        <div className="flex peer gap-2">
+          <div className="flex-initial">{t('users')}</div>
+          <div className="flex-grow">URL</div>
         </div>
         {popularRelays.map((relay) => (
-          <div className="flex-row peer" key={relay.url}>
-            <div className="flex-cell no-flex">{relay.users}</div>
-            <div className="flex-cell">{relay.url}</div>
-            <div className="flex-cell no-flex">
-              <Button onClick={(e) => handleAddRelay(e, relay.url)}>{t('add')}</Button>
+          <div className="flex peer gap-2" key={relay.url}>
+            <div className="flex-initial">{relay.users}</div>
+            <div className="flex-grow">{relay.url}</div>
+            <div className="flex-initial">
+              <button
+                className="btn btn-sm btn-neutral"
+                onClick={(e) => handleAddRelay(e, relay.url)}
+              >
+                {t('add')}
+              </button>
             </div>
           </div>
         ))}
