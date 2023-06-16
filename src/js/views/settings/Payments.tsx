@@ -36,6 +36,7 @@ const Payments = () => {
         <p>
           <label for="displayCurrency">{t('display_currency')}</label>
           <select
+            className="select"
             id="displayCurrency"
             name="displayCurrency"
             onChange={onChange}
@@ -50,6 +51,7 @@ const Payments = () => {
         <p>
           <label for="defaultZapAmount">{t('default_zap_amount')} (sats):</label>
           <input
+            className="input"
             type="number"
             id="defaultZapAmount"
             name="defaultZapAmount"

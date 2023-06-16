@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'preact/compat';
 
-import { PrimaryButton as Button } from '../../components/buttons/Button';
 import localState from '../../LocalState';
 import PubSub from '../../nostr/PubSub';
 import Relays, { PopularRelay } from '../../nostr/Relays';
@@ -70,31 +69,31 @@ const Network = () => {
   return (
     <div className="centered-container">
       <h2>{t('network')}</h2>
-      <div id="peers" className="flex-table">
+      <div className="flex flex-col gap-2">
         {relays.map((relay) => (
-          <div className="flex-row peer">
-            <div className="flex-cell" key={relay.url}>
+          <div className="flex gap-2 flex-row peer">
+            <div className="flex-1" key={relay.url}>
               <span className={getClassName(relay)}>&#x2B24; </span>
               {relay.url}
             </div>
-            <div className="flex-cell no-flex">
-              <Button onClick={() => handleRemoveRelay(relay)}>{t('remove')}</Button>
-            </div>
-            <div className="flex-cell no-flex">
-              <input
-                type="checkbox"
-                checked={relay.enabled !== false}
-                onChange={() => {
-                  relay.enabled = !(relay.enabled !== false);
-                  relay.enabled ? Relays.enable(relay.url) : Relays.disable(relay.url);
-                }}
-              />
-            </div>
+            <button className="btn btn-neutral btn-sm" onClick={() => handleRemoveRelay(relay)}>
+              {t('remove')}
+            </button>
+            <input
+              className="checkbox"
+              type="checkbox"
+              checked={relay.enabled !== false}
+              onChange={() => {
+                relay.enabled = !(relay.enabled !== false);
+                relay.enabled ? Relays.enable(relay.url) : Relays.disable(relay.url);
+              }}
+            />
           </div>
         ))}
-        <div className="flex-row peer">
+        <div className="flex flex-row peer gap-2">
           <div className="flex-cell" key="new">
             <input
+              className="input"
               id="new-relay-url"
               type="text"
               placeholder={t('new_relay_url')}
@@ -103,16 +102,22 @@ const Network = () => {
             />
           </div>
           <div className="flex-cell no-flex">
-            <Button onClick={(e) => handleAddRelay(e, newRelayUrl)}>{t('add')}</Button>
+            <button className="btn btn-neutral" onClick={(e) => handleAddRelay(e, newRelayUrl)}>
+              {t('add')}
+            </button>
           </div>
         </div>
-        <p>
-          <Button onClick={() => Relays.saveToContacts()}>{t('save_relays_publicly')}</Button>
-          <Button onClick={() => Relays.restoreDefaults()}>{t('restore_defaults')}</Button>
-        </p>
+        <div className="flex gap-2 my-2">
+          <button className="btn btn-neutral" onClick={() => Relays.saveToContacts()}>
+            {t('save_relays_publicly')}
+          </button>
+          <button className="btn btn-neutral" onClick={() => Relays.restoreDefaults()}>
+            {t('restore_defaults')}
+          </button>
+        </div>
       </div>
-      <h3 className="text-lg font-semibold">{t('popular_relays')}</h3>
-      <div id="popular-relays" className="flex flex-col gap-2">
+      <h3>{t('popular_relays')}</h3>
+      <div className="flex flex-col gap-2">
         <div className="flex peer gap-2">
           <div className="flex-initial">{t('users')}</div>
           <div className="flex-grow">URL</div>
@@ -120,7 +125,7 @@ const Network = () => {
         {popularRelays.map((relay) => (
           <div className="flex peer gap-2" key={relay.url}>
             <div className="flex-initial">{relay.users}</div>
-            <div className="flex-grow">{relay.url}</div>
+            <div className="flex-grow truncate">{relay.url}</div>
             <div className="flex-initial">
               <button
                 className="btn btn-sm btn-neutral"

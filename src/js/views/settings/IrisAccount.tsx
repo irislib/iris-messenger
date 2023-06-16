@@ -79,7 +79,7 @@ export default class IrisAccount extends Component {
     } else if (this.state.existing) {
       view = (
         <div>
-          <p className="positive">
+          <p className="text-iris-green">
             Username iris.to/<b>{this.state.existing.name}</b> is reserved for you until 12 March
             2023!
           </p>
@@ -93,7 +93,7 @@ export default class IrisAccount extends Component {
         </div>
       );
     } else if (this.state.error) {
-      view = <div className="negative">Error: {this.state.error}</div>;
+      view = <div className="text-iris-red">Error: {this.state.error}</div>;
     } else if (this.state.showChallenge) {
       window.cf_turnstile_callback = (token) => this.register(token);
       view = (
@@ -115,23 +115,30 @@ export default class IrisAccount extends Component {
         <div>
           <p>Register an Iris username (iris.to/username)</p>
           <form onSubmit={(e) => this.showChallenge(e)}>
-            <input
-              type="text"
-              placeholder="Username"
-              value={this.state.newUserName}
-              onInput={(e) => this.onNewUserNameChange(e)}
-            />
-            <Button type="submit" enabled={this.state.newUserNameValid}>
-              Register
-            </Button>
+            <div className="flex gap-2">
+              <input
+                className="input"
+                type="text"
+                placeholder="Username"
+                value={this.state.newUserName}
+                onInput={(e) => this.onNewUserNameChange(e)}
+              />
+              <button
+                className="btn btn-primary"
+                type="submit"
+                enabled={this.state.newUserNameValid}
+              >
+                Register
+              </button>
+            </div>
             <p>
               {this.state.newUserNameValid ? (
                 <>
-                  <span className="text-success">Username is available</span>
+                  <span className="text-iris-green">Username is available</span>
                   {this.renderAccountName(this.state.newUserName, false)}
                 </>
               ) : (
-                <span className="text-warning">{this.state.invalidUsernameMessage}</span>
+                <span className="text-iris-red">{this.state.invalidUsernameMessage}</span>
               )}
             </p>
           </form>
@@ -141,13 +148,11 @@ export default class IrisAccount extends Component {
 
     return (
       <>
-        <div class="centered-container">
-          <h3>Iris.to account</h3>
-          {view}
-          <p>
-            <a href="https://github.com/irislib/faq#iris-username">FAQ</a>
-          </p>
-        </div>
+        <h3>Iris.to account</h3>
+        {view}
+        <p>
+          <a href="https://github.com/irislib/faq#iris-username">FAQ</a>
+        </p>
       </>
     );
   }

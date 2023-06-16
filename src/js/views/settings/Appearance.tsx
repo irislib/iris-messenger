@@ -53,9 +53,7 @@ const Appearance = () => {
               localState.get('showConnectedRelays').put(e.currentTarget.checked);
             }}
           />
-          <label className="label" htmlFor="showConnectedRelays">
-            {t('show_connected_relays_in_header')}
-          </label>
+          <label htmlFor="showConnectedRelays"> {t('show_connected_relays_in_header')}</label>
         </p>
       </div>
     </>
