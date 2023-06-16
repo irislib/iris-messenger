@@ -71,7 +71,10 @@ class Footer extends Component<Props, State> {
           >
             {activeRoute === '/' ? <HomeIconFull width={24} /> : <HomeIcon width={24} />}
           </a>
-          <a href="/chat" className={`btn flex-grow ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
+          <a
+            href="/chat"
+            className={`btn flex-grow ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}
+          >
             {this.state.unseenMsgsTotal ? (
               <span className="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
             ) : (
@@ -83,14 +86,20 @@ class Footer extends Component<Props, State> {
               <PaperAirplaneIcon width={24} />
             )}
           </a>
-          <a href="/post/new" className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}>
+          <a
+            href="/post/new"
+            className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}
+          >
             {activeRoute === '/post/new' ? (
               <PlusCircleIconFull width={24} />
             ) : (
               <PlusCircleIcon width={24} />
             )}
           </a>
-          <a href={`/${key}`} className={`${activeRoute === `/${key}` ? 'active' : ''} btn flex flex-grow`}>
+          <a
+            href={`/${key}`}
+            className={`${activeRoute === `/${key}` ? 'active' : ''} btn flex flex-grow`}
+          >
             <Identicon str={key} width={34} />
           </a>
         </div>

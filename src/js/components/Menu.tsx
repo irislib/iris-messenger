@@ -8,7 +8,8 @@ import {
   Cog8ToothIcon as Cog8ToothIconFull,
   HomeIcon as HomeIconFull,
   InformationCircleIcon as InformationCircleIconFull,
-  PaperAirplaneIcon as PaperAirplaneIconFull, PlusIcon,
+  PaperAirplaneIcon as PaperAirplaneIconFull,
+  PlusIcon,
 } from '@heroicons/react/24/solid';
 import { Link, route } from 'preact-router';
 
@@ -20,8 +21,8 @@ import { translate as t } from '../translations/Translation.mjs';
 
 import Modal from './modal/Modal';
 import Identicon from './Identicon';
+import Name from './Name';
 import PublicMessageForm from './PublicMessageForm';
-import Name from "./Name";
 
 const APPLICATIONS = [
   { url: '/', text: 'home', icon: HomeIcon, activeIcon: HomeIconFull },

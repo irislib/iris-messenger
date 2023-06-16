@@ -52,7 +52,9 @@ class Follow extends Component<Props> {
   render() {
     return (
       <button
-        className={`btn btn-sm btn-neutral ${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}`}
+        className={`btn btn-sm btn-neutral ${this.cls || this.key} ${
+          this.state[this.key] ? this.activeClass : ''
+        }`}
         onClick={(e) => this.onClick(e)}
       >
         <span className="hover:hidden">

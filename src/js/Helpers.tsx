@@ -595,7 +595,9 @@ export default {
       return (
         <>
           {' '}
-          <a href={link} className="link">{match}</a>
+          <a href={link} className="link">
+            {match}
+          </a>
         </>
       );
     });
