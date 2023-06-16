@@ -77,8 +77,7 @@ class Block extends Component<Props> {
         onMouseLeave={this.handleMouseLeave}
       >
         <span>
-          {t(buttonText)}{' '}
-          {this.props.showName ? <Name pub={this.props.id} hideBadge={true} /> : ''}
+          {t(buttonText)} {this.props.showName ? <Name pub={this.props.id} hideBadge={true} /> : ''}
         </span>
       </Button>
     );

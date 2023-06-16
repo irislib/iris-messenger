@@ -70,32 +70,37 @@ export default class OnboardingNotification extends Component {
 
   renderFollowSuggestions() {
     return (
-      <div style="display:flex;flex-direction:column;flex:1">
-        <p>{t('follow_someone_info')}</p>
+      <div className="flex flex-col flex-grow  gap-2">
+        <p className="text-base">{t('follow_someone_info')}</p>
         {SUGGESTED_FOLLOWS.map(([pub, description]) => (
-          <div class="profile-link-container">
-            <a href={`/${pub}`} className="profile-link">
-              <div>
+          <div className="flex items-center space-x-4">
+            <a href={`/${pub}`} className="flex flex-grow items-center space-x-2">
+              <div className="w-10 h-10">
                 <Identicon str={pub} width={40} />
               </div>
-              <div style="flex: 1">
+              <div className="flex-grow">
                 <Name pub={pub} placeholder="Suggested follow" />
-                <br />
-                <small>{description}</small>
+                <p className="text-sm text-gray-500">{description}</p>
               </div>
             </a>
             <Follow id={pub} />
           </div>
         ))}
-        <p>
-          <PrimaryButton onClick={() => localState.get('showFollowSuggestions').put(false)}>
+        <p className="my-2">
+          <button
+            className="btn btn-primary"
+            onClick={() => localState.get('showFollowSuggestions').put(false)}
+          >
             {t('done')}
-          </PrimaryButton>
+          </button>
         </p>
-        <p>
+        <p className="text-base">
           {t('alternatively')}
           <i> </i>
-          <a href={`/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}`}>
+          <a
+            href={`/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}`}
+            className="text-blue-500 hover:underline"
+          >
             {t('give_your_profile_link_to_someone')}
           </a>
           .

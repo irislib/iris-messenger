@@ -59,22 +59,29 @@ class Follow extends Component<Props> {
   }
 
   render() {
+    const isFollowed = this.state[this.key];
+    const isHovering = this.state.hover;
+
+    let buttonText;
+
+    if (isFollowed && isHovering) {
+      buttonText = this.hoverAction;
+    } else if (isFollowed && !isHovering) {
+      buttonText = this.actionDone;
+    } else {
+      buttonText = this.action;
+    }
+
     return (
       <button
         className={`btn btn-sm btn-neutral ${this.cls || this.key} ${
-          this.state[this.key] ? this.activeClass : ''
+          isFollowed ? this.activeClass : ''
         }`}
         onClick={(e) => this.onClick(e)}
         onMouseEnter={this.handleMouseEnter} // handle hover state
         onMouseLeave={this.handleMouseLeave} // handle hover state
       >
-        {t(
-          this.state.hover
-            ? this.hoverAction
-            : this.state[this.key]
-            ? this.actionDone
-            : this.action,
-        )}
+        {t(buttonText)}
       </button>
     );
   }
