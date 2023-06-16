@@ -315,7 +315,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   renderShowNewEvents() {
     return (
       <div
-        className={`alert alert-info cursor-pointer ${this.state.showNewMsgsFixedTop ? 'sticky' : ''}`}
+        className={`alert alert-info cursor-pointer ${
+          this.state.showNewMsgsFixedTop ? 'sticky' : ''
+        }`}
         onClick={() => this.showQueuedEvents()}
       >
         {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}

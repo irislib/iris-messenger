@@ -30,7 +30,13 @@ const Appearance = () => {
         <h3>{t('appearance')}</h3>
         <p>
           <label for="colorScheme">{t('color_scheme')}</label>
-          <select id="colorScheme" name="colorScheme" onChange={onChange} value={colorScheme}>
+          <select
+            className="select"
+            id="colorScheme"
+            name="colorScheme"
+            onChange={onChange}
+            value={colorScheme}
+          >
             <option value="default">{t('system_default')}</option>
             <option value="light">{t('light')}</option>
             <option value="dark">{t('dark')}</option>
@@ -38,6 +44,7 @@ const Appearance = () => {
         </p>
         <p>
           <input
+            className="checkbox"
             type="checkbox"
             id="showConnectedRelays"
             name="showConnectedRelays"
@@ -46,7 +53,9 @@ const Appearance = () => {
               localState.get('showConnectedRelays').put(e.currentTarget.checked);
             }}
           />
-          <label htmlFor="showConnectedRelays">{t('show_connected_relays_in_header')}</label>
+          <label className="label" htmlFor="showConnectedRelays">
+            {t('show_connected_relays_in_header')}
+          </label>
         </p>
       </div>
     </>

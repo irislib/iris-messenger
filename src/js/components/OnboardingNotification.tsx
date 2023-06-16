@@ -8,7 +8,6 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
-import { Button, PrimaryButton } from './buttons/Button';
 import Copy from './buttons/Copy';
 import Follow from './buttons/Follow';
 import QRModal from './modal/QRModal';
@@ -116,10 +115,16 @@ export default class OnboardingNotification extends Component {
           <XMarkIcon width={24} />
         </CloseIconWrapper>
         <p>{t('no_followers_yet')}</p>
-        <p>
-          <Copy text={t('copy_link')} copyStr={Helpers.getMyProfileLink()} />
-          <Button onClick={() => this.setState({ showQrModal: true })}>{t('show_qr_code')}</Button>
-        </p>
+        <div className="flex gap-2 my-2">
+          <Copy
+            className="btn btn-neutral"
+            text={t('copy_link')}
+            copyStr={Helpers.getMyProfileLink()}
+          />
+          <button className="btn btn-neutral" onClick={() => this.setState({ showQrModal: true })}>
+            {t('show_qr_code')}
+          </button>
+        </div>
         <small>{t('no_followers_yet_info')}</small>
         {this.state.showQrModal && (
           <QRModal onClose={() => this.setState({ showQrModal: false })} pub={Key.getPubKey()} />
@@ -134,12 +139,15 @@ export default class OnboardingNotification extends Component {
         <div>
           <p>Get your own iris.to/username?</p>
           <p>
-            <PrimaryButton onClick={() => route('/settings/iris_account')}>
+            <button className="btn btn-primary" onClick={() => route('/settings/iris_account')}>
               Yes please
-            </PrimaryButton>
-            <PrimaryButton onClick={() => localState.get('showNoIrisToAddress').put(false)}>
+            </button>
+            <button
+              className="btn btn-neutral"
+              onClick={() => localState.get('showNoIrisToAddress').put(false)}
+            >
               No thanks
-            </PrimaryButton>
+            </button>
           </p>
         </div>
       );

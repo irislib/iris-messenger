@@ -5,6 +5,7 @@ import { translate as t } from '../../translations/Translation.mjs';
 
 type Props = {
   id: string;
+  className?: string;
 };
 
 class Follow extends Component<Props> {
@@ -74,9 +75,7 @@ class Follow extends Component<Props> {
 
     return (
       <button
-        className={`btn btn-sm btn-neutral ${this.cls || this.key} ${
-          isFollowed ? this.activeClass : ''
-        }`}
+        className={`btn ${this.props.className || this.key} ${isFollowed ? this.activeClass : ''}`}
         onClick={(e) => this.onClick(e)}
         onMouseEnter={this.handleMouseEnter} // handle hover state
         onMouseLeave={this.handleMouseLeave} // handle hover state
