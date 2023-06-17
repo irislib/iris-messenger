@@ -134,8 +134,9 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       ) {
         // TODO load more events
         this.setState({
-          displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
+          //displayCount: this.state.displayCount + INITIAL_PAGE_SIZE, // TODO FIX!
         });
+        console.log('load more events', this.state.displayCount, this.props.scrollElement);
       }
     }
     this.checkScrollPosition();
