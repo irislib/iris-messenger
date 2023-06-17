@@ -269,7 +269,7 @@ class SearchBox extends Component<Props, State> {
               tabIndex={2}
               className={
                 'p-2 cursor-pointer flex gap-2 items-center result ' +
-                (-1 === this.state.selected ? 'selected' : '')
+                (-1 === this.state.selected ? 'bg-neutral-700' : '')
               }
               href={`/search/${encodeURIComponent(this.state.query)}`}
             >
@@ -304,7 +304,7 @@ class SearchBox extends Component<Props, State> {
                 tabIndex={2}
                 className={
                   'p-2 cursor-pointer flex gap-2 items-center result ' +
-                  (index === this.state.selected ? 'selected' : '')
+                  (index === this.state.selected ? 'bg-neutral-700' : '')
                 }
                 href={`/${npub}`}
                 onClick={(e) => this.onClick(e, i)}
