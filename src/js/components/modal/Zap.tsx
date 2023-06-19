@@ -270,13 +270,13 @@ export default function SendSats(props: ZapProps) {
           type="number"
           min={min}
           max={max}
-          className="f-grow mr10"
+          className="f-grow mr-10 input"
           placeholder={'Custom'}
           value={customAmount}
           onChange={(e) => setCustomAmount(parseInt((e.target as HTMLInputElement).value))}
         />
         <button
-          className="secondary"
+          className="btn btn-neutral"
           type="button"
           disabled={!customAmount}
           onClick={() => selectAmount(customAmount ?? 0)}
@@ -333,6 +333,7 @@ export default function SendSats(props: ZapProps) {
         <div className="flex">
           {canComment && (
             <input
+              className="input"
               type="text"
               placeholder={'Comment'}
               style="margin-bottom: 10px;margin-top: 10px;width:100%;"
@@ -344,9 +345,9 @@ export default function SendSats(props: ZapProps) {
         {/*zapTypeSelector()*/}
         {(amount ?? 0) > 0 && (
           <div style="margin-top: 10px;">
-            <Button width="100%" onClick={() => loadInvoice()}>
+            <button class="btn btn-primary" width="100%" onClick={() => loadInvoice()}>
               Send {Helpers.formatAmount(amount, 0)} sats
-            </Button>
+            </button>
           </div>
         )}
       </>
@@ -415,7 +416,7 @@ export default function SendSats(props: ZapProps) {
   if (!(props.show ?? false)) return null;
 
   return (
-    <Modal centerVertically={true} onClose={onClose}>
+    <Modal showContainer={true} centerVertically={true} onClose={onClose}>
       <ZapDialog>
         <div className="lnurl-tip" onClick={(e) => e.stopPropagation()}>
           <Close className="close" onClick={onClose}>
