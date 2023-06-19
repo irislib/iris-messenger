@@ -9,7 +9,6 @@ import Key from '../../nostr/Key';
 import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import { PrimaryButton as Button } from '../buttons/Button';
 import ErrorBoundary from '../ErrorBoundary';
 import EventComponent from '../events/EventComponent';
 
@@ -328,17 +327,16 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
 
   renderShowMore() {
     return (
-      <p>
-        <Button
-          onClick={() =>
-            this.setState({
-              displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
-            })
-          }
-        >
-          {t('show_more')}
-        </Button>
-      </p>
+      <button
+        className="btn btn-neutral btn-sm my-4"
+        onClick={() =>
+          this.setState({
+            displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
+          })
+        }
+      >
+        {t('show_more')}
+      </button>
     );
   }
 
@@ -376,7 +374,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
     const events = this.renderEvents(displayCount, renderAs, showRepliedMsg);
     return (
-      <div>
+      <div className="mb-4">
         {showQueuedEvents ? this.renderShowNewEvents() : null}
         {feedName ? (
           <Label

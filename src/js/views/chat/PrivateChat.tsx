@@ -198,7 +198,9 @@ class PrivateChat extends PureComponent<PrivateChatProps, PrivateChatState> {
             isDifferentDay = true;
             const separatorText = Helpers.getDaySeparatorText(date, dateStr, now, nowStr);
             msgListContent.push(
-              <div className="day-separator">{t(separatorText.toLowerCase())}</div>,
+              <div className="px-2 py-1 inline-block day-separator bg-black opacity-50 text-white rounded-full">
+                {t(separatorText.toLowerCase())}
+              </div>,
             );
           }
           previousDateStr = dateStr;
@@ -232,9 +234,7 @@ class PrivateChat extends PureComponent<PrivateChatProps, PrivateChatState> {
         >
           <div id="message-list">
             {msgListContent}
-            <p>
-              <i>{t('dm_privacy_warning')}</i>
-            </p>
+            <div className="italic my-2 text-neutral-500">{t('dm_privacy_warning')}</div>
           </div>
           <div
             id="attachment-preview"
@@ -270,7 +270,11 @@ class PrivateChat extends PureComponent<PrivateChatProps, PrivateChatState> {
         <Helmet>
           <title>{(this.chat && this.chat.name) || 'Messages'}</title>
         </Helmet>
-        <div id="chat-main" ref={this.ref} className={`${this.props.id ? '' : 'hidden'} flex-1 pb-12`}>
+        <div
+          id="chat-main"
+          ref={this.ref}
+          className={`${this.props.id ? '' : 'hidden'} flex-1 pb-12`}
+        >
           {this.renderMainView()} {this.renderMsgForm()}
         </div>
       </>
