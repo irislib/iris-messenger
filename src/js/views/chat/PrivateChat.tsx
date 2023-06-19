@@ -1,10 +1,10 @@
+import { createRef } from 'react';
 import { Helmet } from 'react-helmet';
-import { html } from 'htm/preact';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import $ from 'jquery';
 import throttle from 'lodash/throttle';
-import { createRef } from 'preact';
+import { PureComponent } from 'preact/compat';
 
-import Component from '../../BaseComponent';
 import PrivateMessage from '../../components/PrivateMessage';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
@@ -13,31 +13,29 @@ import PubSub from '../../nostr/PubSub';
 import Session from '../../nostr/Session';
 import { translate as t } from '../../translations/Translation.mjs';
 
-import ChatMessageForm from './ChatMessageForm.js';
+import ChatMessageForm from './ChatMessageForm.tsx';
 
-const caretDownSvg = html`
-  <svg
-    x="0px"
-    y="0px"
-    width="451.847px"
-    height="451.847px"
-    viewBox="0 0 451.847 451.847"
-    style="enable-background:new 0 0 451.847 451.847;"
-  >
-    <g>
-      <path
-        fill="currentColor"
-        d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751
-c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0
-c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"
-      />
-    </g>
-  </svg>
-`;
+interface PrivateChatState {
+  decryptedMessages: Record<string, any>;
+  sortedMessages: any[];
+  sortedParticipants: any[];
+  showParticipants: boolean;
+  stickToBottom: boolean;
+  noLongerParticipant: boolean;
+}
 
-export default class PrivateChat extends Component {
-  constructor() {
-    super();
+interface PrivateChatProps {
+  id: string;
+}
+
+class PrivateChat extends PureComponent<PrivateChatProps, PrivateChatState> {
+  unsub: any;
+  chat: any;
+  ref: any;
+  messageViewScrollHandler: any;
+
+  constructor(props: PrivateChatProps) {
+    super(props);
     this.ref = createRef();
     this.state = {
       decryptedMessages: {},
@@ -64,18 +62,13 @@ export default class PrivateChat extends Component {
       console.error('no id');
       return;
     }
-    this.unsub = PubSub.subscribe(
-      { kinds: [4], '#p': [Key.getPubKey()], authors: [hexId] },
-      undefined,
-      'privateChat',
-    );
+    this.unsub = PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()], authors: [hexId] });
     Events.getDirectMessagesByUser(hexId, (msgIds) => {
       if (msgIds) {
         this.setState({ sortedMessages: msgIds.reverse() });
       }
     });
     this.updateLastOpened();
-    // on visibility state change (e.g. tab switch) update last opened
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
         this.updateLastOpened();
@@ -84,9 +77,8 @@ export default class PrivateChat extends Component {
 
     const container = document.getElementById('message-list');
     if (container) {
-      // TODO use ref
-      container.style.paddingBottom = 0;
-      container.style.paddingTop = 0;
+      container.style.paddingBottom = '0';
+      container.style.paddingTop = '0';
       const el = $('#message-view');
       el.off('scroll').on('scroll', () => {
         const scrolledToBottom = el[0].scrollHeight - el.scrollTop() == el.outerHeight();
@@ -100,8 +92,6 @@ export default class PrivateChat extends Component {
   }
 
   componentWillUnmount() {
-    super.componentWillUnmount();
-    // remove event listener
     document.removeEventListener('visibilitychange', () => {
       if (!document.hidden) {
         this.updateLastOpened();
@@ -110,7 +100,7 @@ export default class PrivateChat extends Component {
     this.unsub && this.unsub();
   }
 
-  componentDidUpdate(previousProps) {
+  componentDidUpdate(previousProps: any) {
     if (this.state.stickToBottom) {
       Helpers.scrollToMessageListBottom();
     }
@@ -122,6 +112,7 @@ export default class PrivateChat extends Component {
     $('.msg-content img')
       .off('load')
       .on('load', () => this.state.stickToBottom && Helpers.scrollToMessageListBottom());
+
     setTimeout(() => {
       if (
         this.chat &&
@@ -137,6 +128,7 @@ export default class PrivateChat extends Component {
     }, 2000);
   }
 
+  // Original Preact methods converted to TypeScript with React JSX
   addFloatingDaySeparator() {
     let currentDaySeparator = $('.day-separator').last();
     let pos = currentDaySeparator.position();
@@ -144,8 +136,8 @@ export default class PrivateChat extends Component {
       currentDaySeparator = currentDaySeparator.prevAll('.day-separator').first();
       pos = currentDaySeparator.position();
     }
-    let s = currentDaySeparator.clone();
-    let center = $('<div>')
+    const s = currentDaySeparator.clone();
+    const center = $('<div>')
       .css({ position: 'fixed', top: 70, 'text-align': 'center' })
       .attr('id', 'floating-day-separator')
       .width($('#message-view').width())
@@ -181,7 +173,7 @@ export default class PrivateChat extends Component {
   scrollDown() {
     Helpers.scrollToMessageListBottom();
     const el = document.getElementById('message-list');
-    el && (el.style.paddingBottom = 0);
+    el && (el.style.paddingBottom = '0');
   }
 
   renderMainView() {
@@ -192,7 +184,7 @@ export default class PrivateChat extends Component {
       const nowStr = now.toLocaleDateString();
       let previousDateStr;
       let previousFrom;
-      const msgListContent = [];
+      const msgListContent: any[] = [];
       this.state.sortedMessages.forEach((msgId) => {
         const msg = Events.db.by('id', msgId);
         if (!msg) {
@@ -204,9 +196,9 @@ export default class PrivateChat extends Component {
           const dateStr = date.toLocaleDateString();
           if (dateStr !== previousDateStr) {
             isDifferentDay = true;
-            let separatorText = Helpers.getDaySeparatorText(date, dateStr, now, nowStr);
+            const separatorText = Helpers.getDaySeparatorText(date, dateStr, now, nowStr);
             msgListContent.push(
-              html`<div class="day-separator">${t(separatorText.toLowerCase())}</div>`,
+              <div className="day-separator">{t(separatorText.toLowerCase())}</div>,
             );
           }
           previousDateStr = dateStr;
@@ -217,61 +209,71 @@ export default class PrivateChat extends Component {
           msg.pubkey !== myPub &&
           (isDifferentDay || (previousFrom && msg.pubkey !== previousFrom))
         ) {
-          msgListContent.push(html`<div class="from-separator" />`);
+          msgListContent.push(<div className="from-separator" />);
           showName = true;
         }
-        previousFrom = msg.pubkey; // TODO: ...${msg} not good?
-        msgListContent.push(html`
-          <${PrivateMessage}
-            ...${msg}
-            showName=${showName}
-            selfAuthored=${msg.pubkey === myPub}
-            key=${msg.created_at + msg.pubkey}
-            chatId=${this.props.id}
-          />
-        `);
+        previousFrom = msg.pubkey;
+        msgListContent.push(
+          <PrivateMessage
+            {...msg}
+            showName={showName}
+            selfAuthored={msg.pubkey === myPub}
+            key={`${msg.created_at}${msg.pubkey}`}
+            chatId={this.props.id}
+          />,
+        );
       });
 
-      mainView = html` <div
-        class="main-view"
-        id="message-view"
-        onScroll=${(e) => this.onMessageViewScroll(e)}
-      >
-        <div id="message-list">
-          ${msgListContent}
-          <p>
-            <i>${t('dm_privacy_warning')}</i>
-          </p>
+      mainView = (
+        <div className="main-view" id="message-view" onScroll={() => this.onMessageViewScroll()}>
+          <div id="message-list">
+            {msgListContent}
+            <p>
+              <i>{t('dm_privacy_warning')}</i>
+            </p>
+          </div>
+          <div
+            id="attachment-preview"
+            className="attachment-preview"
+            style={{ display: 'none' }}
+          ></div>
         </div>
-        <div id="attachment-preview" class="attachment-preview" style="display:none"></div>
-      </div>`;
+      );
     }
     return mainView;
   }
 
   renderMsgForm() {
-    return this.props.id && this.props.id.length > 20
-      ? html`
-          <div id="scroll-down-btn" style="display:none;" onClick=${() => this.scrollDown()}>
-            ${caretDownSvg}
-          </div>
-          <div class="chat-message-form">
-            <${ChatMessageForm}
-              key=${this.props.id}
-              activeChat=${this.props.id}
-              onSubmit=${() => this.scrollDown()}
-            />
-          </div>
-        `
-      : '';
+    return this.props.id && this.props.id.length > 20 ? (
+      <>
+        <div id="scroll-down-btn" style={{ display: 'none' }} onClick={() => this.scrollDown()}>
+          <ChevronDownIcon width="24" />
+        </div>
+        <div className="chat-message-form">
+          <ChatMessageForm
+            key={this.props.id}
+            activeChat={this.props.id}
+            onSubmit={() => this.scrollDown()}
+          />
+        </div>
+      </>
+    ) : (
+      ''
+    );
   }
 
   render() {
-    return html`
-      <${Helmet}><title>${(this.chat && this.chat.name) || 'Messages'}</title><//>
-      <div id="chat-main" ref=${this.ref} class="${this.props.id ? '' : 'hidden-xs'}">
-        ${this.renderMainView()} ${this.renderMsgForm()}
-      </div>
-    `;
+    return (
+      <>
+        <Helmet>
+          <title>{(this.chat && this.chat.name) || 'Messages'}</title>
+        </Helmet>
+        <div id="chat-main" ref={this.ref} className={`${this.props.id ? '' : 'hidden'} flex-1`}>
+          {this.renderMainView()} {this.renderMsgForm()}
+        </div>
+      </>
+    );
   }
 }
+
+export default PrivateChat;

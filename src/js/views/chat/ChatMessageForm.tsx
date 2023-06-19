@@ -1,15 +1,20 @@
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
-import { html } from 'htm/preact';
 import $ from 'jquery';
 
-import Component from '../../BaseComponent';
+import BaseComponent from '../../BaseComponent';
 import Helpers from '../../Helpers';
 import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
-import { translate as t } from '../../translations/Translation.mjs';
 
-class ChatMessageForm extends Component {
+interface ChatMessageFormProps {
+  activeChat: string;
+  class?: string;
+  autofocus?: boolean;
+  onSubmit?: () => void;
+}
+
+class ChatMessageForm extends BaseComponent<ChatMessageFormProps> {
   componentDidMount() {
     if (!Helpers.isMobile && this.props.autofocus !== false) {
       $(this.base).find('.new-msg').focus();
@@ -22,7 +27,7 @@ class ChatMessageForm extends Component {
     }
   }
 
-  encrypt(text) {
+  encrypt(text: string) {
     try {
       const theirPub = Key.toNostrHexAddress(this.props.activeChat);
       if (!theirPub) {
@@ -34,11 +39,11 @@ class ChatMessageForm extends Component {
     }
   }
 
-  async onSubmit(e) {
+  async onSubmit(e: Event) {
     e.preventDefault();
     e.stopPropagation();
     const textEl = $(this.base).find('.new-msg');
-    const text = textEl.val();
+    const text = textEl.val() as string;
     if (!text.length) {
       return;
     }
@@ -54,52 +59,46 @@ class ChatMessageForm extends Component {
     });
     textEl.val('');
 
-    Helpers.scrollToMessageListBottom();
+    this.props.onSubmit?.();
   }
 
-  onMsgTextInput(event) {
+  onMsgTextInput(event: Event) {
     localState
       .get('channels')
       .get(this.props.activeChat)
       .get('msgDraft')
-      .put($(event.target).val());
+      .put($(event.target).val() as string);
   }
 
-  onKeyDown(e) {
+  onKeyDown(e: KeyboardEvent) {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-      this.onSubmit(e);
+      this.onSubmit(e as Event);
     }
   }
 
   render() {
-    return html`<form
-      autocomplete="off"
-      class="message-form ${this.props.class || ''}"
-      onSubmit=${(e) => this.onSubmit(e)}
-    >
-      <input
-        name="attachment-input"
-        type="file"
-        class="hidden attachment-input"
-        accept="image/*"
-        multiple
-        onChange=${() => this.openAttachmentsPreview()}
-      />
-      <input
-        onInput=${(e) => this.onMsgTextInput(e)}
-        onKeyDown=${(e) => this.onKeyDown(e)}
-        class="new-msg"
-        type="text"
-        placeholder="${t('type_a_message')}"
+    return (
+      <form
         autocomplete="off"
-        autocorrect="off"
-        autocapitalize="sentences"
-        spellcheck="off"
-      />
-      <button style="margin-right:0">
-        <${PaperAirplaneIcon} onClick=${(e) => this.onSubmit(e)} width="28" />
-      </button>
-    </form>`;
+        class={`message-form ${this.props.class || ''}`}
+        onSubmit={(e: Event) => this.onSubmit(e)}
+      >
+        <input
+          onInput={(e: Event) => this.onMsgTextInput(e)}
+          onKeyDown={(e: KeyboardEvent) => this.onKeyDown(e)}
+          class="new-msg"
+          type="text"
+          placeholder="Type a message"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="sentences"
+          spellCheck={true}
+        />
+        <button style={{ marginRight: '0' }}>
+          <PaperAirplaneIcon onClick={(e: MouseEvent) => this.onSubmit(e as Event)} width="28" />
+        </button>
+      </form>
+    );
   }
 }
 

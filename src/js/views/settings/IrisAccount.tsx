@@ -123,10 +123,7 @@ export default class IrisAccount extends Component {
                 value={this.state.newUserName}
                 onInput={(e) => this.onNewUserNameChange(e)}
               />
-              <button
-                className="btn btn-primary"
-                type="submit"
-              >
+              <button className="btn btn-primary" type="submit">
                 Register
               </button>
             </div>
