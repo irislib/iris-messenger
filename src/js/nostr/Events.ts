@@ -759,9 +759,12 @@ const Events = {
       unsub2();
     };
   },
-  getDirectMessages(): Unsubscribe {
-    const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()] });
-    const unsub2 = PubSub.subscribe({ kinds: [4], authors: [Key.getPubKey()] });
+  getDirectMessages(cb?: (chats: Map<string, SortedLimitedEventSet>) => void): Unsubscribe {
+    const callback = () => {
+      cb?.(this.directMessagesByUser ?? new Map());
+    };
+    const unsub1 = PubSub.subscribe({ kinds: [4], '#p': [Key.getPubKey()] }, callback);
+    const unsub2 = PubSub.subscribe({ kinds: [4], authors: [Key.getPubKey()] }, callback);
     return () => {
       unsub1();
       unsub2();
