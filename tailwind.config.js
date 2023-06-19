@@ -17,9 +17,6 @@ export default {
         'iris-red': '#f81780',
         'iris-purple': '#8e44ad',
       },
-      paddingBottom: {
-        'safe-area-inset-bottom': 'env(safe-area-inset-bottom)',
-      },
       spacing: {
         px: '1px',
       },

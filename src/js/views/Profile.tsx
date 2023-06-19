@@ -61,14 +61,12 @@ class Profile extends View {
 
   renderLinks() {
     return html`
-      <div
-        class="profile-links"
-        style="flex:1; display: flex; flex-direction: row; align-items: center;"
-      >
+      <div className="flex flex-1 flex-row align-center justify-center mt-2">
         ${this.state.lightning
           ? html`
-              <div style="flex:1">
+              <div className="flex-1">
                 <a
+                  className="btn btn-sm btn-neutral"
                   href=${this.state.lightning}
                   onClick=${(e) => Helpers.handleLightningLinkClick(e)}
                 >
@@ -79,8 +77,8 @@ class Profile extends View {
           : ''}
         ${this.state.website
           ? html`
-              <div style="flex:1">
-                <a href=${this.state.website} target="_blank">
+              <div className="flex-1">
+                <a href=${this.state.website} target="_blank" className="link">
                   ${this.state.website.replace(/^https?:\/\//, '')}
                 </a>
               </div>

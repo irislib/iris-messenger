@@ -62,7 +62,7 @@ class Footer extends Component<Props, State> {
     }
 
     return (
-      <footer className="fixed md:hidden bottom-0 z-10 w-full bg-base-200 pb-safe-area-inset-bottom">
+      <footer className="fixed md:hidden bottom-0 z-10 w-full bg-base-200 pb-safe-area">
         <div onClick={() => localState.get('scrollUp').put(true)} className="flex">
           <a
             href="/"

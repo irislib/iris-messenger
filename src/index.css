@@ -41,4 +41,9 @@ img, video {
 
 .link {
   @apply text-iris-blue hover:underline;
+  text-decoration: none;
+}
+
+.pb-safe-area {
+  padding-bottom: env(safe-area-inset-bottom);
 }

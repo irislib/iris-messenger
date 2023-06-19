@@ -9,7 +9,6 @@ import localState from '../../LocalState';
 import Events from '../../nostr/Events';
 import Key from '../../nostr/Key';
 import Relays from '../../nostr/Relays';
-import { PrimaryButton as Button } from '../buttons/Button';
 import CopyButton from '../buttons/Copy';
 import Name from '../Name';
 import QrCode from '../QrCode';
