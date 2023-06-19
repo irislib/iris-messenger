@@ -70,13 +70,11 @@ const Modal: FC<Props> = ({
 
   const content = showContainer ? (
     <div
-      class="msg"
+      className="p-8 border-neutral-500 border-2 bg-black rounded-lg shadow-lg"
       style={{ width: '600px', 'max-width': 'calc(100vw - 40px)' }}
       onClick={(e) => handleContainerClick(e)}
     >
-      <div class="msg-content" style={{ padding: '30px' }}>
-        {children}
-      </div>
+      {children}
     </div>
   ) : (
     children
