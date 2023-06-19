@@ -225,7 +225,11 @@ class PrivateChat extends PureComponent<PrivateChatProps, PrivateChatState> {
       });
 
       mainView = (
-        <div className="main-view" id="message-view" onScroll={() => this.onMessageViewScroll()}>
+        <div
+          className="main-view p-2 h-screen overflow-y-scroll overflow-x-hidden"
+          id="message-view"
+          onScroll={() => this.onMessageViewScroll()}
+        >
           <div id="message-list">
             {msgListContent}
             <p>
@@ -249,13 +253,11 @@ class PrivateChat extends PureComponent<PrivateChatProps, PrivateChatState> {
         <div id="scroll-down-btn" style={{ display: 'none' }} onClick={() => this.scrollDown()}>
           <ChevronDownIcon width="24" />
         </div>
-        <div className="chat-message-form">
-          <ChatMessageForm
-            key={this.props.id}
-            activeChat={this.props.id}
-            onSubmit={() => this.scrollDown()}
-          />
-        </div>
+        <ChatMessageForm
+          key={this.props.id}
+          activeChat={this.props.id}
+          onSubmit={() => this.scrollDown()}
+        />
       </>
     ) : (
       ''
@@ -268,7 +270,7 @@ class PrivateChat extends PureComponent<PrivateChatProps, PrivateChatState> {
         <Helmet>
           <title>{(this.chat && this.chat.name) || 'Messages'}</title>
         </Helmet>
-        <div id="chat-main" ref={this.ref} className={`${this.props.id ? '' : 'hidden'} flex-1`}>
+        <div id="chat-main" ref={this.ref} className={`${this.props.id ? '' : 'hidden'} flex-1 pb-12`}>
           {this.renderMainView()} {this.renderMsgForm()}
         </div>
       </>

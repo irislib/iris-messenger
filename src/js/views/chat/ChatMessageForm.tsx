@@ -44,14 +44,19 @@ class ChatMessageForm extends BaseComponent<ChatMessageFormProps> {
     e.stopPropagation();
     const textEl = $(this.base).find('.new-msg');
     const text = textEl.val() as string;
+    console.log('text', text);
     if (!text.length) {
       return;
     }
+
     const content = await this.encrypt(text);
+    console.log('2text', text);
+
     const recipient = Key.toNostrHexAddress(this.props.activeChat);
     if (!recipient) {
       throw new Error('invalid public key ' + recipient);
     }
+    console.log('asdf');
     Events.publish({
       kind: 4,
       content,
@@ -80,13 +85,15 @@ class ChatMessageForm extends BaseComponent<ChatMessageFormProps> {
     return (
       <form
         autocomplete="off"
-        class={`message-form ${this.props.class || ''}`}
+        class={`flex flex-row gap-2 p-2 message-form fixed bottom-0 w-96 max-w-screen bg-black ${
+          this.props.class || ''
+        }`}
         onSubmit={(e: Event) => this.onSubmit(e)}
       >
         <input
+          className="input input-sm flex-1 new-msg"
           onInput={(e: Event) => this.onMsgTextInput(e)}
           onKeyDown={(e: KeyboardEvent) => this.onKeyDown(e)}
-          class="new-msg"
           type="text"
           placeholder="Type a message"
           autocomplete="off"
@@ -94,8 +101,8 @@ class ChatMessageForm extends BaseComponent<ChatMessageFormProps> {
           autocapitalize="sentences"
           spellCheck={true}
         />
-        <button style={{ marginRight: '0' }}>
-          <PaperAirplaneIcon onClick={(e: MouseEvent) => this.onSubmit(e as Event)} width="28" />
+        <button className="btn btn-neutral btn-sm" style={{ marginRight: '0' }}>
+          <PaperAirplaneIcon onClick={(e: MouseEvent) => this.onSubmit(e as Event)} width="24" />
         </button>
       </form>
     );

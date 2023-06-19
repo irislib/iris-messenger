@@ -96,10 +96,10 @@ class ChatListItem extends BaseComponent<ChatListItemProps, ChatListItemState> {
           <div className="flex flex-col">
             <span className="name">
               <Name pub={this.props.chat} />
+              <small className="ml-2 latest-time text-neutral-500">{time}</small>
             </span>
-            <small className="latest-time">{time}</small>
+            <small className="text-neutral-500 truncate">{this.state.latestText}</small>
           </div>
-          <small className="latest">{this.state.latestText}</small>
           {unseenEl}
         </div>
       </div>
