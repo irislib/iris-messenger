@@ -15,7 +15,6 @@ import EventComponent from '../events/EventComponent';
 import FeedSettings from './FeedSettings';
 import FeedTypeSelector from './FeedTypeSelector';
 import ImageGrid from './ImageGrid';
-import Label from './Label';
 import SortedEventMap from './SortedEventMap';
 import { FeedProps, FeedState } from './types';
 
@@ -302,7 +301,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
 
   renderShowNewEvents() {
     return (
-      <div className="fixed bottom-16 justify-center items-center z-10 flex w-1/2">
+      <div className="fixed bottom-4 md:bottom-16 justify-center items-center z-10 flex w-1/2">
         <div
           className="btn btn-sm opacity-80 hover:opacity-100 hover:bg-iris-blue bg-iris-blue text-white"
           onClick={() => this.showQueuedEvents()}
@@ -350,28 +349,12 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     }
     const displayCount = this.state.displayCount;
     const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
-    const showQueuedEvents = this.state.queuedEvents.length && !this.state.settingsOpen;
-    const feedName =
-      !showQueuedEvents &&
-      {
-        global: 'global_feed',
-        follows: 'following',
-        notifications: 'notifications',
-      }[this.props.index || 'global'];
-
+    const showQueuedEvents = this.state.queuedEvents.length > 0 && !this.state.settingsOpen;
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
     const events = this.renderEvents(displayCount, renderAs, showRepliedMsg);
     return (
       <div className="mb-4">
-        {showQueuedEvents ? this.renderShowNewEvents() : null}
-        {feedName ? (
-          <Label
-            feedName={feedName}
-            onClickSettings={() => this.setState({ settingsOpen: !this.state.settingsOpen })}
-            index={this.props.index}
-            settingsOpen={this.state.settingsOpen}
-          />
-        ) : null}
+        {showQueuedEvents && this.renderShowNewEvents()}
         {this.props.index !== 'notifications' && this.state.settingsOpen && (
           <FeedSettings
             settings={this.state.settings}
