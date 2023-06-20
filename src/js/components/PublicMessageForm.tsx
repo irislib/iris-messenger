@@ -1,4 +1,3 @@
-import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { html } from 'htm/preact';
 import $ from 'jquery';
 import { Event } from 'nostr-tools';
@@ -255,18 +254,15 @@ class PublicMessageForm extends Component<IProps, IState> {
       ${this.props.waitForFocus && !this.state.focused
         ? ''
         : html`
-            <div>
+            <div className="flex items-center justify-between mt-4">
               <button
                 type="button"
-                class="attach-file-btn"
+                class="attach-file-btn btn"
                 onClick=${(e) => this.attachFileClicked(e)}
               >
                 ${Icons.attach}
               </button>
-              <button type="submit">
-                <span>${t('post')} </span>
-                <${PaperAirplaneIcon} width="24" style="margin-top:5px" />
-              </button>
+              <button type="submit" className="btn btn-primary">${t('post')}</button>
             </div>
           `}
 
