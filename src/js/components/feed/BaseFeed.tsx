@@ -301,7 +301,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
 
   renderShowNewEvents() {
     return (
-      <div className="fixed bottom-16 md:bottom-4 justify-center items-center z-10 flex w-full md:w-1/2">
+      <div className="fixed bottom-16 md:bottom-8 justify-center items-center z-10 flex w-full md:w-1/2">
         <div
           className="btn btn-sm opacity-90 hover:opacity-100 hover:bg-iris-blue bg-iris-blue text-white"
           onClick={() => this.showQueuedEvents()}

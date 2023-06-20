@@ -332,6 +332,7 @@ const Note = ({
             )}
             {!asInlineQuote && !standalone && isTooLong() && (
               <a
+                className="text-sm link mb-2"
                 onClick={(e) => {
                   e.preventDefault();
                   setShowMore(!showMore);

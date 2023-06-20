@@ -1,5 +1,5 @@
 import { HeartIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
+import { ArrowLeftIcon, HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
@@ -13,7 +13,7 @@ import Name from './Name';
 import SearchBox from './SearchBox';
 
 export default class Header extends Component {
-  chatId = null as string | null;
+  userId = null as string | null;
   iv = null as any;
 
   constructor() {
@@ -38,6 +38,30 @@ export default class Header extends Component {
     document.removeEventListener('keydown', this.escFunction, false);
   }
 
+  setTitle(activeRoute: string) {
+    let title: any = activeRoute.split('/')[1] || '';
+    title = title.charAt(0).toUpperCase() + title.slice(1);
+
+    const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+    this.userId = replaced.length < activeRoute.length ? replaced : null;
+
+    if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
+      if (activeRoute.indexOf('/chat/') === 0 && this.userId === Key.getPubKey()) {
+        title = (
+          <>
+            <b className="mr-5">📝</b> <b>{t('note_to_self')}</b>
+          </>
+        );
+      } else {
+        title = <Name key={`${this.userId}title`} pub={this.userId || ''} />;
+      }
+    }
+
+    console.log('title', title);
+
+    this.setState({ title });
+  }
+
   componentDidMount() {
     document.addEventListener('keydown', this.escFunction, false);
     localState.get('showParticipants').on(this.inject());
@@ -48,30 +72,10 @@ export default class Header extends Component {
       this.sub((activeRoute) => {
         this.setState({
           about: null,
-          title: '',
           activeRoute,
           showMobileSearch: false,
         });
-        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-        this.chatId = replaced.length < activeRoute.length ? replaced : null;
-        if (this.chatId) {
-          localState.get('channels').get(this.chatId).get('isTyping').on(this.inject());
-          localState.get('channels').get(this.chatId).get('theirLastActiveTime').on(this.inject());
-        }
-
-        if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
-          if (activeRoute.indexOf('/chat/') === 0 && this.chatId === Key.getPubKey()) {
-            const title = (
-              <>
-                <b style="margin-right:5px">📝</b> <b>{t('note_to_self')}</b>
-              </>
-            );
-            this.setState({ title });
-          } else {
-            const title = <Name key={this.chatId} pub={this.chatId || ''} />;
-            this.setState({ title });
-          }
-        }
+        this.setTitle(activeRoute);
       }),
     );
     this.updateRelayCount();
@@ -79,18 +83,10 @@ export default class Header extends Component {
   }
 
   onTitleClicked() {
-    if (this.chatId && this.chatId.indexOf('hashtag') === -1) {
-      const view = this.chatId.length < 40 ? '/group/' : '/';
-      route(view + this.chatId);
+    if (this.userId && this.userId.indexOf('hashtag') === -1) {
+      const view = this.userId.length < 40 ? '/group/' : '/';
+      route(view + this.userId);
     }
-  }
-
-  onLogoClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    (document.querySelector('a.logo') as HTMLElement).blur();
-    window.innerWidth > 625 && route('/');
-    localState.get('toggleMenu').put(true);
   }
 
   updateRelayCount() {
@@ -98,7 +94,7 @@ export default class Header extends Component {
   }
 
   renderSearchBox() {
-    return !this.chatId ? <SearchBox onSelect={(item) => route(`/${item.key}`)} /> : '';
+    return !this.userId ? <SearchBox onSelect={(item) => route(`/${item.key}`)} /> : '';
   }
 
   renderConnectedRelays() {
@@ -119,27 +115,9 @@ export default class Header extends Component {
   }
 
   renderHeaderText() {
-    const { chat, activeRoute } = this.state;
-    const isTyping = chat && chat.isTyping;
-    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
     return (
-      <div
-        class="text"
-        style={this.chatId ? 'cursor:pointer;text-align:center' : ''}
-        onClick={() => this.onTitleClicked()}
-      >
-        {this.state.title && chatting ? <div class="name">{this.state.title}</div> : ''}
-        {isTyping ? <small class="typing-indicator">{t('typing')}</small> : ''}
-        {this.state.about ? <small class="participants">{this.state.about}</small> : ''}
-        {this.chatId ? <small class="last-seen">{this.state.onlineStatus || ''}</small> : ''}
-        {!chatting && (
-          <div
-            id="mobile-search"
-            class={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
-          >
-            {this.renderSearchBox()}
-          </div>
-        )}
+      <div class="text" onClick={() => this.onTitleClicked()}>
+        {this.state.title}
       </div>
     );
   }
@@ -191,8 +169,9 @@ export default class Header extends Component {
     const loggedIn = !!Key.getPubKey();
     return (
       <div className="sticky top-0 z-10 cursor-pointer">
-        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2 py-2">
+        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2 py-3">
           <div className="flex items-center justify-between">
+            <ArrowLeftIcon width={24} onClick={() => this.backButtonClicked()} />
             {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
             {this.renderHeaderText()}
             {loggedIn && this.renderNotifications()}
