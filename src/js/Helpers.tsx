@@ -841,14 +841,14 @@ export default {
     }
   }, 100),
 
-  animateScrollTop: (selector: string): void => {
-    const el = $(selector);
+  animateScrollTop: (selector?: string): void => {
+    const el = selector ? $(selector) : $(window);
     el.css({ overflow: 'hidden' });
     setTimeout(() => {
       el.css({ overflow: '' });
       el.on('scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart', (e) => {
         if (
-          (e.which && e.which > 0) ||
+          e.which > 0 ||
           e.type === 'mousedown' ||
           e.type === 'mousewheel' ||
           e.type === 'touchstart'

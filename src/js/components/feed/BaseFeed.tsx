@@ -138,19 +138,6 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
         console.log('load more events', this.state.displayCount, this.props.scrollElement);
       }
     }
-    this.checkScrollPosition();
-  };
-
-  checkScrollPosition = () => {
-    // if scrolled past this.base element's start, apply fixedTop class to it
-    if (!this.props.scrollElement) {
-      return;
-    }
-    const showNewMsgsFixedTop =
-      this.props.scrollElement.scrollTop > (this.base as HTMLElement).offsetTop - 60;
-    if (showNewMsgsFixedTop !== this.state.showNewMsgsFixedTop) {
-      this.setState({ showNewMsgsFixedTop });
-    }
   };
 
   componentWillUnmount() {
@@ -185,7 +172,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     let first = true;
     localState.get('scrollUp').on(
       this.sub(() => {
-        !first && Helpers.animateScrollTop('.main-view');
+        !first && Helpers.animateScrollTop();
         first = false;
       }),
     );
@@ -291,7 +278,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     this.handleScroll();
     this.replaceState();
     if (!this.state.queuedEvents.length && prevState.queuedEvents.length) {
-      Helpers.animateScrollTop('.main-view');
+      Helpers.animateScrollTop();
     }
     if (this.props.filter !== prevProps.filter || this.props.keyword !== prevProps.keyword) {
       this.setState({ sortedEvents: [] });
@@ -310,17 +297,18 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       eventsShownTime: Math.floor(Date.now() / 1000),
       displayCount: INITIAL_PAGE_SIZE,
     });
+    Helpers.animateScrollTop();
   }
 
   renderShowNewEvents() {
     return (
-      <div
-        className={`alert alert-info cursor-pointer ${
-          this.state.showNewMsgsFixedTop ? 'sticky' : ''
-        }`}
-        onClick={() => this.showQueuedEvents()}
-      >
-        {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
+      <div className="fixed bottom-16 justify-center items-center z-10 flex w-1/2">
+        <div
+          className="btn btn-sm opacity-80 hover:opacity-100 hover:bg-iris-blue bg-iris-blue text-white"
+          onClick={() => this.showQueuedEvents()}
+        >
+          {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
+        </div>
       </div>
     );
   }

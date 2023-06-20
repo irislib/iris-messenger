@@ -46,8 +46,8 @@ class Profile extends View {
   getNotification() {
     if (this.state.noFollowers && this.followers.has(Key.getPubKey())) {
       return html`
-        <div class="msg">
-          <div class="msg-content">
+        <div className="msg">
+          <div className="msg-content">
             <p>Share your profile link so ${this.state.name || 'this user'} can follow you:</p>
             <p>
               <${Copy} text=${t('copy_link')} copyStr=${Helpers.getMyProfileLink()} />
@@ -134,15 +134,15 @@ class Profile extends View {
     const loggedIn = this.state.loggedIn;
     // TODO: on Follow / Message btn click open login modal if not logged in
     return html`
-      <div class="profile-top" key="${this.state.hexPub}details">
-        <div class="flex flex-col gap-2">
-          <div class="flex flex-row">
+      <div className="profile-top" key="${this.state.hexPub}details">
+        <div className="mx-2 md:mx-0 flex flex-col gap-2">
+          <div className="flex flex-row">
             <div>${profilePicture}</div>
-            <div class="flex-1 justify-end flex">
+            <div className="flex-1 justify-end flex">
               <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
                 ${this.state.isMyProfile
                   ? html`<button
-                      class="btn btn-sm btn-neutral"
+                      className="btn btn-sm btn-neutral"
                       onClick=${() => loggedIn && route('/profile/edit')}
                     >
                       ${t('edit_profile')}
@@ -160,7 +160,7 @@ class Profile extends View {
                         : ''}
                     `}
               </div>
-              <div class="profile-actions">
+              <div className="profile-actions">
                 <${Dropdown}>
                   <${Copy}
                     className="btn btn-sm"
@@ -206,19 +206,19 @@ class Profile extends View {
               </div>
             </div>
           </div>
-          <div class="profile-header-stuff">
-            <div class="flex-1 profile-name">
+          <div className="profile-header-stuff">
+            <div className="flex-1 profile-name">
               <span className="text-xl">
                 <${Name} pub=${this.state.hexPub} />
               </span>
               ${this.state.nip05
-                ? html`<br /><small class="text-iris-green"
+                ? html`<br /><small className="text-iris-green"
                       >${this.state.nip05.replace(/^_@/, '')}</small
                     >`
                 : ''}
             </div>
             <div>
-              <div class="text-sm flex gap-4">
+              <div className="text-sm flex gap-4">
                 <a href="/follows/${this.state.npub}">
                   <b>${this.state.followedUserCount}</b> ${t('following')}
                 </a>
@@ -231,7 +231,7 @@ class Profile extends View {
                 : ''}
             </div>
             <div className="py-2">
-              <p class="text-sm">${this.state.about}</p>
+              <p className="text-sm">${this.state.about}</p>
               ${this.renderLinks()}
             </div>
           </div>
@@ -250,21 +250,21 @@ class Profile extends View {
 
   renderTabs() {
     return html`
-      <div className="mb-2">
+      <div className="flex mx-2 md:mx-0 gap-2 mb-2 overflow-x-scroll">
         <${Link}
-          className="btn btn-sm"
+          className="btn btn-sm btn-neutral"
           activeClassName="btn-primary"
           href="/${this.state.nostrAddress || this.state.npub}"
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
         <${Link}
-          className="btn btn-sm"
+          className="btn btn-sm btn-neutral"
           activeClassName="btn-primary"
           href="/${this.state.nostrAddress || this.state.npub}/replies"
           >${t('posts')} & ${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
         <${Link}
-          className="btn btn-sm"
+          className="btn btn-sm btn-neutral"
           activeClassName="btn-primary"
           href="/${this.state.nostrAddress || this.state.npub}/likes"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
@@ -279,7 +279,7 @@ class Profile extends View {
     }
     if (this.props.tab === 'replies') {
       return html`
-        <div class="public-messages-view">
+        <div className="public-messages-view">
           <${Feed}
             scrollElement=${this.scrollElement.current}
             key="replies${this.state.hexPub}"
@@ -290,7 +290,7 @@ class Profile extends View {
       `;
     } else if (this.props.tab === 'likes') {
       return html`
-        <div class="public-messages-view">
+        <div className="public-messages-view">
           <${Feed}
             scrollElement=${this.scrollElement.current}
             key="likes${this.state.hexPub}"
@@ -305,7 +305,7 @@ class Profile extends View {
 
     return html`
       <div>
-        <div class="public-messages-view">
+        <div className="public-messages-view">
           ${this.getNotification()}
           <${Feed}
             scrollElement=${this.scrollElement.current}
@@ -331,7 +331,7 @@ class Profile extends View {
       ${this.state.banner
         ? html` <div style="background-image: url(${this.state.banner})"></div> `
         : ''}
-      <div class="content">
+      <div className="content">
         <${Helmet}>
           <title>${title}</title>
           <meta name="description" content=${description} />
