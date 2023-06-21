@@ -134,8 +134,8 @@ class Profile extends View {
     const loggedIn = this.state.loggedIn;
     // TODO: on Follow / Message btn click open login modal if not logged in
     return html`
-      <div className="profile-top" key="${this.state.hexPub}details">
-        <div className="mx-2 md:mx-0 flex flex-col gap-2">
+      <div key="${this.state.hexPub}details">
+        <div className="mb-2 mx-2 md:mx-0 flex flex-col gap-2">
           <div className="flex flex-row">
             <div>${profilePicture}</div>
             <div className="flex-1 justify-end flex">
@@ -250,7 +250,7 @@ class Profile extends View {
 
   renderTabs() {
     return html`
-      <div className="flex mx-2 md:mx-0 gap-2 mb-2 overflow-x-scroll">
+      <div className="flex mx-2 md:mx-0 gap-2 mb-4 overflow-x-scroll">
         <${Link}
           className="btn btn-sm btn-neutral"
           activeClassName="btn-primary"
@@ -279,25 +279,21 @@ class Profile extends View {
     }
     if (this.props.tab === 'replies') {
       return html`
-        <div className="public-messages-view">
-          <${Feed}
-            scrollElement=${this.scrollElement.current}
-            key="replies${this.state.hexPub}"
-            index="postsAndReplies"
-            nostrUser=${this.state.hexPub}
-          />
-        </div>
+        <${Feed}
+          scrollElement=${this.scrollElement.current}
+          key="replies${this.state.hexPub}"
+          index="postsAndReplies"
+          nostrUser=${this.state.hexPub}
+        />
       `;
     } else if (this.props.tab === 'likes') {
       return html`
-        <div className="public-messages-view">
-          <${Feed}
-            scrollElement=${this.scrollElement.current}
-            key="likes${this.state.hexPub}"
-            index="likes"
-            nostrUser=${this.state.hexPub}
-          />
-        </div>
+        <${Feed}
+          scrollElement=${this.scrollElement.current}
+          key="likes${this.state.hexPub}"
+          index="likes"
+          nostrUser=${this.state.hexPub}
+        />
       `;
     } else if (this.props.tab === 'media') {
       return html`TODO media message feed`;
@@ -305,15 +301,13 @@ class Profile extends View {
 
     return html`
       <div>
-        <div className="public-messages-view">
-          ${this.getNotification()}
-          <${Feed}
-            scrollElement=${this.scrollElement.current}
-            key="posts${this.state.hexPub}"
-            index="posts"
-            nostrUser=${this.state.hexPub}
-          />
-        </div>
+        ${this.getNotification()}
+        <${Feed}
+          scrollElement=${this.scrollElement.current}
+          key="posts${this.state.hexPub}"
+          index="posts"
+          nostrUser=${this.state.hexPub}
+        />
       </div>
     `;
   }

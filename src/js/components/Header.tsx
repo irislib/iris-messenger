@@ -39,13 +39,21 @@ export default class Header extends Component {
   }
 
   setTitle(activeRoute: string) {
-    let title: any = activeRoute.split('/')[1] || '';
-    title = title.charAt(0).toUpperCase() + title.slice(1);
+    let title: any = activeRoute.split('/')[1] || t('home');
+    console.log('title1', title);
+    if (title.startsWith('note')) {
+      title = t('post');
+    } else if (title.startsWith('npub')) {
+      this.userId = title;
+      title = <Name key={`${this.userId}title`} pub={this.userId || ''} />;
+    } else {
+      title = title.charAt(0).toUpperCase() + title.slice(1);
+    }
 
     const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-    this.userId = replaced.length < activeRoute.length ? replaced : null;
 
     if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
+      this.userId = replaced.length < activeRoute.length ? replaced : null;
       if (activeRoute.indexOf('/chat/') === 0 && this.userId === Key.getPubKey()) {
         title = (
           <>
