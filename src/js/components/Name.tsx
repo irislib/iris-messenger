@@ -49,7 +49,7 @@ const Name = (props: Props) => {
 
   return (
     <>
-      <span className={isNameGenerated ? 'generated' : ''}>
+      <span className={isNameGenerated ? 'text-neutral-500' : ''}>
         {name || displayName || props.placeholder}
       </span>
       {props.hideBadge ? '' : <Badge pub={props.pub} />}
