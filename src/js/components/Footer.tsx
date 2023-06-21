@@ -103,9 +103,9 @@ class Footer extends Component<Props, State> {
             className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}
           >
             {activeRoute === '/search' ? (
-              <MagnifyingGlassIcon width={24} />
-            ) : (
               <Icons.magnifyingGlassBold width={24} />
+            ) : (
+              <MagnifyingGlassIcon width={24} />
             )}
           </a>
           <a
