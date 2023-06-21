@@ -91,9 +91,9 @@ export default class Header extends Component {
   }
 
   onTitleClicked() {
+    window.scrollTo(0, 0);
     if (this.userId && this.userId.indexOf('hashtag') === -1) {
-      const view = this.userId.length < 40 ? '/group/' : '/';
-      route(view + this.userId);
+      route('/' + this.userId);
     }
   }
 
@@ -122,9 +122,9 @@ export default class Header extends Component {
     );
   }
 
-  renderHeaderText() {
+  renderTitle() {
     return (
-      <div class="text" onClick={() => this.onTitleClicked()}>
+      <div class="flex-1 text-center" onClick={() => this.onTitleClicked()}>
         {this.state.title}
       </div>
     );
@@ -178,10 +178,10 @@ export default class Header extends Component {
     return (
       <div className="sticky top-0 z-10 cursor-pointer">
         <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <ArrowLeftIcon width={24} onClick={() => this.backButtonClicked()} />
             {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
-            {this.renderHeaderText()}
+            {this.renderTitle()}
             {loggedIn && this.renderNotifications()}
             {!loggedIn && this.renderLoginBtns()}
           </div>
