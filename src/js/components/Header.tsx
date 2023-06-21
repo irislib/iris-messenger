@@ -40,7 +40,6 @@ export default class Header extends Component {
 
   setTitle(activeRoute: string) {
     let title: any = activeRoute.split('/')[1] || t('home');
-    console.log('title1', title);
     if (title.startsWith('note')) {
       title = t('post');
     } else if (title.startsWith('npub')) {
@@ -64,8 +63,6 @@ export default class Header extends Component {
         title = <Name key={`${this.userId}title`} pub={this.userId || ''} />;
       }
     }
-
-    console.log('title', title);
 
     this.setState({ title });
   }

@@ -21,6 +21,7 @@ import LogoutConfirmation from './views/LogoutConfirmation';
 import Note from './views/Note';
 import Notifications from './views/Notifications';
 import Profile from './views/Profile';
+import Search from './views/Search';
 import Settings from './views/settings/Settings';
 import Subscribe from './views/Subscribe';
 import Torrent from './views/Torrent';
@@ -128,10 +129,11 @@ class Main extends Component<Props, ReactState> {
           <div className="pb-16 md:pb-0 relative flex h-full flex-grow flex-col w-1/2">
             <Router onChange={(e) => this.handleRoute(e)}>
               <FeedList path="/" />
+              <Search path="/search" />
               <KeyConverter path="/key" />
               <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />
-              <Feed path="/search/:keyword?" />
+              <Feed path="/search/:keyword" />
               <Login path="/login" fullScreen={true} />
               <Notifications path="/notifications" />
               <Chat path="/chat/hashtag/:hashtag?" />

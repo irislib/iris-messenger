@@ -1,12 +1,14 @@
 import { HomeIcon, PaperAirplaneIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 import {
   HomeIcon as HomeIconFull,
+  MagnifyingGlassIcon,
   PaperAirplaneIcon as PaperAirplaneIconFull,
   PlusCircleIcon as PlusCircleIconFull,
 } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
+import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 
@@ -94,6 +96,16 @@ class Footer extends Component<Props, State> {
               <PlusCircleIconFull width={24} />
             ) : (
               <PlusCircleIcon width={24} />
+            )}
+          </a>
+          <a
+            href="/search"
+            className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}
+          >
+            {activeRoute === '/search' ? (
+              <MagnifyingGlassIcon width={24} />
+            ) : (
+              <Icons.magnifyingGlassBold width={24} />
             )}
           </a>
           <a

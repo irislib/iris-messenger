@@ -508,7 +508,7 @@ export default {
       replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
         return (
           <SafeImg
-            className="my-2 md:rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
+            className="my-2 -mx-4 w-screen md:rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
             onClick={opts.onImageClick}
             src={match}
             key={match + i}

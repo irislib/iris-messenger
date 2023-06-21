@@ -99,6 +99,7 @@ class SearchBox extends Component<Props, State> {
           $(this.base).find('input').blur();
         }
       });
+    this.props.focus && $(this.base).find('input')?.focus();
   }
 
   componentDidUpdate(prevProps, prevState) {

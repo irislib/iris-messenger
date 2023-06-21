@@ -8,6 +8,7 @@ import {
   Cog8ToothIcon as Cog8ToothIconFull,
   HomeIcon as HomeIconFull,
   InformationCircleIcon as InformationCircleIconFull,
+  MagnifyingGlassIcon,
   PaperAirplaneIcon as PaperAirplaneIconFull,
   PlusIcon,
 } from '@heroicons/react/24/solid';
@@ -15,6 +16,7 @@ import { Link, route } from 'preact-router';
 
 import logo from '../../../public/img/icon128.png';
 import BaseComponent from '../BaseComponent';
+import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
@@ -26,6 +28,12 @@ import PublicMessageForm from './PublicMessageForm';
 
 const APPLICATIONS = [
   { url: '/', text: 'home', icon: HomeIcon, activeIcon: HomeIconFull },
+  {
+    url: '/search',
+    text: 'search',
+    icon: MagnifyingGlassIcon,
+    activeIcon: Icons.magnifyingGlassBold,
+  },
   {
     url: '/chat',
     text: 'messages',
