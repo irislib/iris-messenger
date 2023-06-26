@@ -238,19 +238,18 @@ const Note = ({
 
   function renderIdenticon() {
     return (
-      <span className="flex flex-col items-center">
+      <span className="flex flex-col items-center flex-shrink-0 mr-2">
         {event.pubkey ? (
-          <a href={`/${event.pubkey}`} className="mr-2">
+          <a href={`/${event.pubkey}`}>
             <Identicon str={Key.toNostrBech32Address(event.pubkey, 'npub')} width={40} />
           </a>
         ) : (
           ''
         )}
-        {isQuote && !standalone && <div className="border-l-2 border-neutral-800 h-full"></div>}
+        {isQuote && !standalone && <div className="border-l-2 border-neutral-700 h-full"></div>}
       </span>
     );
   }
-
 
   function renderMsgSender() {
     return (
