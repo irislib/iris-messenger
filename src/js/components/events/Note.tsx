@@ -238,18 +238,19 @@ const Note = ({
 
   function renderIdenticon() {
     return (
-      <span>
+      <span className="flex flex-col items-center">
         {event.pubkey ? (
-          <a href={`/${event.pubkey}`}>
+          <a href={`/${event.pubkey}`} className="mr-2">
             <Identicon str={Key.toNostrBech32Address(event.pubkey, 'npub')} width={40} />
           </a>
         ) : (
           ''
         )}
-        {(isQuote && !standalone && <div className="line"></div>) || ''}
+        {isQuote && !standalone && <div className="border-l-2 border-neutral-800 h-full"></div>}
       </span>
     );
   }
+
 
   function renderMsgSender() {
     return (
@@ -312,10 +313,10 @@ const Note = ({
     <>
       {meta.replyingTo && showRepliedMsg && renderRepliedMsg()}
       <div key={event.id + 'note'} className={getClassName()} onClick={(e) => messageClicked(e)}>
-        <div className="p-4" onClick={(e) => messageClicked(e)}>
+        <div className="p-4 flex flex-row" onClick={(e) => messageClicked(e)}>
           {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
           {!fullWidth && renderIdenticon()}
-          <div>
+          <div className="flex-grow">
             {renderMsgSender()}
             {(replyingToUsers?.length && !isQuoting && renderReplyingTo()) || null}
             {standalone && renderHelmet()}
