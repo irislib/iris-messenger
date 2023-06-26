@@ -281,8 +281,8 @@ const Note = ({
     } else {
       classNames.push('cursor-pointer');
     }
-    if (isQuote) classNames.push('quote');
-    if (isQuoting) classNames.push('quoting');
+    if (isQuote) classNames.push('quote pb-2');
+    if (isQuoting) classNames.push('quoting pt-0');
     if (asInlineQuote) classNames.push('inline-quote border-2 border-neutral-900 rounded-lg my-2');
     if (fullWidth) classNames.push('full-width');
 
@@ -311,9 +311,13 @@ const Note = ({
   return (
     <>
       {meta.replyingTo && showRepliedMsg && renderRepliedMsg()}
-      <div key={event.id + 'note'} className={getClassName()} onClick={(e) => messageClicked(e)}>
-        <div className="p-4 flex flex-row" onClick={(e) => messageClicked(e)}>
-          {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
+      <div
+        key={event.id + 'note'}
+        className={`p-4 ${getClassName()}`}
+        onClick={(e) => messageClicked(e)}
+      >
+        {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
+        <div className="flex flex-row" onClick={(e) => messageClicked(e)}>
           {!fullWidth && renderIdenticon()}
           <div className="flex-grow">
             {renderMsgSender()}
