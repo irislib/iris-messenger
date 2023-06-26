@@ -61,13 +61,12 @@ export default function Zap(props: Props) {
     <div className="msg">
       <div className="msg-content" onClick={(e) => messageClicked(e, zappedId || '')}>
         <div className="flex gap-1 items-center text-sm text-neutral-500">
-          <i className="zap-btn zapped">{Icons.lightning}</i>
+          <i className="zap-btn text-iris-orange">{Icons.lightning}</i>
           <div>
             <a href={userLink}>
               <Name pub={zappingUser || ''} />
             </a>
-            {allZaps.length > 1 && <span> and {allZaps.length - 1} others </span>}
-            {zappedText}
+            {allZaps.length > 1 && <span> and {allZaps.length - 1} others </span>} {zappedText}
           </div>
         </div>
         <EventComponent key={zappedId + props.event.id} id={zappedId} fullWidth={false} />

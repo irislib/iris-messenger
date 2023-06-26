@@ -2,7 +2,6 @@ import * as secp from '@noble/secp256k1';
 import * as bech32 from 'bech32-buffer';
 import { Component } from 'preact';
 
-import logo from '../../../public/img/android-chrome-192x192.png';
 import EULA from '../components/EULA';
 import LanguageSelector from '../components/LanguageSelector';
 import Helpers from '../Helpers';
@@ -165,7 +164,7 @@ class Login extends Component<Props, State> {
               autocomplete="off"
               onSubmit={(e) => this.onLoginFormSubmit(e)}
             >
-              <img className="w-20 h-20 mx-auto" src={logo} alt="iris" />
+              <img className="w-20 h-20 mx-auto" src="/img/android-chrome-192x192.png" alt="iris" />
               <h1 className="text-2xl font-bold">iris</h1>
               <input
                 className={`input centered-placeholder`}

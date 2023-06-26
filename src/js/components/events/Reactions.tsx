@@ -29,6 +29,7 @@ const Reactions = (props) => {
     zappers: null as string[] | null,
     totalZapped: '',
     liked: false,
+    zapped: false,
     repostedBy: new Set<string>(),
     likedBy: new Set<string>(),
     replyCount: 0,
@@ -234,8 +235,8 @@ const Reactions = (props) => {
         {props.settings.showReposts ? (
           <>
             <a
-              className={`btn-ghost flex-1 hover:bg-transparent btn content-center gap-2 rounded-none p-2 text-neutral-500 ${
-                s.reposted ? 'text-iris-green' : 'hover:text-iris-green'
+              className={`btn-ghost flex-1 hover:bg-transparent btn content-center gap-2 rounded-none p-2 ${
+                s.reposted ? 'text-iris-green' : 'hover:text-iris-green text-neutral-500'
               }`}
               onClick={(e) => repostBtnClicked(e)}
             >
@@ -254,8 +255,8 @@ const Reactions = (props) => {
         {props.settings.showLikes ? (
           <>
             <a
-              className={`btn-ghost flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none p-2 text-neutral-500 ${
-                s.liked ? 'text-iris-red' : 'hover:text-iris-red'
+              className={`btn-ghost flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none p-2 ${
+                s.liked ? 'text-iris-red' : 'hover:text-iris-red text-neutral-500'
               }`}
               onClick={(e) => likeBtnClicked(e)}
             >
@@ -276,7 +277,8 @@ const Reactions = (props) => {
                 e.stopPropagation();
                 setState((prevState) => ({ ...prevState, showZapModal: true }));
               }}
-              className="btn-ghost flex-1 hover:bg-transparent hover:text-iris-orange btn content-center gap-2 rounded-none p-2 text-neutral-500"
+              className={`btn-ghost flex-1 hover:bg-transparent btn content-center gap-2 rounded-none p-2
+              ${s.zapped ? 'text-iris-orange' : 'text-neutral-500 hover:text-iris-orange'}`}
             >
               <BoltIcon width={18} />
               <span className={`${s.showZaps ? 'active' : ''}`} onClick={(e) => toggleZaps(e)}>

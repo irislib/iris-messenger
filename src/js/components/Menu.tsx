@@ -14,7 +14,6 @@ import {
 } from '@heroicons/react/24/solid';
 import { Link, route } from 'preact-router';
 
-import logo from '../../../public/img/icon128.png';
 import BaseComponent from '../BaseComponent';
 import Icons from '../Icons';
 import localState from '../LocalState';
@@ -129,7 +128,7 @@ export default class Menu extends BaseComponent {
           href="/"
           onClick={(e) => this.menuLinkClicked(e, undefined, true)}
         >
-          <img src={logo} width="30" height="30" />
+          <img src="/img/icon128.png" width="30" height="30" />
           <h1 className="hidden lg:flex text-3xl">iris</h1>
         </a>
         {APPLICATIONS.map((a: any) => {

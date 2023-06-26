@@ -57,7 +57,7 @@ export default function Like(props: Props) {
     <div className="msg" key={props.event.id}>
       <div className="msg-content" onClick={(e) => messageClicked(e, likedId)}>
         <div className="flex gap-1 items-center text-sm text-neutral-500">
-          <i className="like-btn liked">
+          <i className="like-btn text-iris-red">
             <HeartIconFull width={18} />
           </i>
           <span>
