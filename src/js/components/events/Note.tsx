@@ -324,8 +324,8 @@ const Note = ({
             {(replyingToUsers?.length && !isQuoting && renderReplyingTo()) || null}
             {standalone && renderHelmet()}
             {meta.torrentId && <Torrent torrentId={meta.torrentId} autopause={!standalone} />}
-            {text?.length > 0 && (
-              <div className={`whitespace-pre-wrap break-all py-2 ${emojiOnly && 'text-2xl'}`}>
+            {text?.length > 0 && ( // TODO: remove whitespace-pre-wrap, replace \n with <br />
+              <div className={`whitespace-pre-wrap break-words py-2 ${emojiOnly && 'text-2xl'}`}>
                 {text}
                 {translatedText && (
                   <p>

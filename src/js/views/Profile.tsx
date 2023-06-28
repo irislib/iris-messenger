@@ -249,24 +249,25 @@ class Profile extends View {
   }
 
   renderTabs() {
+    const currentProfileUrl = window.location.pathname.split('/')[1];
+    const path = window.location.pathname;
+
+    const linkClass = (href) =>
+      path === href ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-neutral';
+
     return html`
-      <div className="flex mx-2 md:mx-0 gap-2 mb-4 overflow-x-scroll">
-        <${Link}
-          className="btn btn-sm btn-neutral"
-          activeClassName="btn-primary"
-          href="/${this.state.nostrAddress || this.state.npub}"
+      <div class="flex mx-2 md:mx-0 gap-2 mb-4 overflow-x-scroll">
+        <${Link} className="${linkClass('/' + currentProfileUrl)}" href="/${currentProfileUrl}"
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
         <${Link}
-          className="btn btn-sm btn-neutral"
-          activeClassName="btn-primary"
-          href="/${this.state.nostrAddress || this.state.npub}/replies"
+          className="${linkClass('/' + currentProfileUrl + '/replies')}"
+          href="/${currentProfileUrl}/replies"
           >${t('posts')} & ${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
         <${Link}
-          className="btn btn-sm btn-neutral"
-          activeClassName="btn-primary"
-          href="/${this.state.nostrAddress || this.state.npub}/likes"
+          className="${linkClass('/' + currentProfileUrl + '/likes')}"
+          href="/${currentProfileUrl}/likes"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
         >
       </div>
@@ -464,6 +465,7 @@ class Profile extends View {
 
   loadProfile(hexPub: string, nostrAddress?: string) {
     const isMyProfile = hexPub === Key.getPubKey();
+    localState.get('activePubKey').put(hexPub);
     this.setState({ isMyProfile });
     this.followedUsers = new Set();
     this.followers = new Set();
@@ -479,6 +481,7 @@ class Profile extends View {
   componentWillUnmount() {
     super.componentWillUnmount();
     this.unsub?.();
+    localState.get('activePubKey').put(null);
   }
 
   componentDidUpdate(_prevProps, prevState) {

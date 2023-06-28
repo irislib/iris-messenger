@@ -73,6 +73,7 @@ export default class Header extends Component {
     localState.get('unseenMsgsTotal').on(this.inject());
     localState.get('unseenNotificationCount').on(this.inject());
     localState.get('showConnectedRelays').on(this.inject());
+    localState.get('activePubKey').on(this.inject());
     localState.get('activeRoute').on(
       this.sub((activeRoute) => {
         this.setState({

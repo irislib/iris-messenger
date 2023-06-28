@@ -25,7 +25,6 @@ const Overlay = styled.div`
   align-items: center;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 20px 0;
 `;
 
 const ModalContentContainer = styled.div<{ width?: string; height?: string }>`
