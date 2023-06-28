@@ -47,3 +47,9 @@ img, video {
 .pb-safe-area {
   padding-bottom: env(safe-area-inset-bottom);
 }
+
+.preformatted-wrap {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
