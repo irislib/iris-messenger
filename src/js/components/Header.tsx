@@ -1,4 +1,4 @@
-import { HeartIcon } from '@heroicons/react/24/outline';
+import { Cog8ToothIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { ArrowLeftIcon, HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 
@@ -73,7 +73,7 @@ export default class Header extends Component {
     localState.get('unseenMsgsTotal').on(this.inject());
     localState.get('unseenNotificationCount').on(this.inject());
     localState.get('showConnectedRelays').on(this.inject());
-    localState.get('activePubKey').on(this.inject());
+    localState.get('isMyProfileActive').on(this.inject());
     localState.get('activeRoute').on(
       this.sub((activeRoute) => {
         this.setState({
@@ -129,12 +129,19 @@ export default class Header extends Component {
   }
 
   renderNotifications() {
+    if (this.state.isMyProfile) {
+      // return link to /settings
+      return (
+        <a href="/settings">
+          <Cog8ToothIcon width={28} />
+        </a>
+      );
+    }
+
     return (
       <a
         href="/notifications"
-        class={`notifications-button mobile-search-hidden ${
-          this.state.showMobileSearch ? 'hidden' : ''
-        }`}
+        className={`relative inline-block ${this.state.showMobileSearch ? 'hidden' : ''}`}
       >
         {this.state.activeRoute === '/notifications' ? (
           <HeartIconFull width={28} />
@@ -142,7 +149,7 @@ export default class Header extends Component {
           <HeartIcon width={28} />
         )}
         {this.state.unseenNotificationCount ? (
-          <span class="unseen">
+          <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-iris-purple text-white text-sm rounded-full h-5 w-5 flex items-center justify-center">
             {this.state.unseenNotificationCount > 99 ? '' : this.state.unseenNotificationCount}
           </span>
         ) : (
@@ -172,7 +179,8 @@ export default class Header extends Component {
   }
 
   render() {
-    const loggedIn = !!Key.getPubKey();
+    const pub = Key.getPubKey();
+    const loggedIn = !!pub;
     return (
       <div className="sticky top-0 z-10 cursor-pointer">
         <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2 py-3">
@@ -180,6 +188,7 @@ export default class Header extends Component {
             <ArrowLeftIcon width={24} onClick={() => this.backButtonClicked()} />
             {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
             {this.renderTitle()}
+
             {loggedIn && this.renderNotifications()}
             {!loggedIn && this.renderLoginBtns()}
           </div>

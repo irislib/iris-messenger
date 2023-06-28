@@ -465,7 +465,7 @@ class Profile extends View {
 
   loadProfile(hexPub: string, nostrAddress?: string) {
     const isMyProfile = hexPub === Key.getPubKey();
-    localState.get('activePubKey').put(hexPub);
+    localState.get('isMyProfile').put(isMyProfile);
     this.setState({ isMyProfile });
     this.followedUsers = new Set();
     this.followers = new Set();
@@ -481,7 +481,7 @@ class Profile extends View {
   componentWillUnmount() {
     super.componentWillUnmount();
     this.unsub?.();
-    localState.get('activePubKey').put(null);
+    localState.get('isMyProfile').put(null);
   }
 
   componentDidUpdate(_prevProps, prevState) {
