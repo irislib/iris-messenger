@@ -112,7 +112,7 @@ class Footer extends Component<Props, State> {
             href={`/${key}`}
             className={`${activeRoute === `/${key}` ? 'active' : ''} btn flex flex-grow`}
           >
-            <Identicon str={key} width={34} />
+            <Identicon str={key} width={28} />
           </a>
         </div>
       </footer>
