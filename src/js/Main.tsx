@@ -111,6 +111,7 @@ class Main extends Component<Props, ReactState> {
       return <Profile id={params.id} tab="posts" path={params.path} />;
     };
 
+    // TODO /username /username/likes and /username/replies should be under the same component to avoid refresh / rerender between them
     return (
       <div className="flex justify-center">
         <section className="flex w-full max-w-screen-lg justify-between relative">
