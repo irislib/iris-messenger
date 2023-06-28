@@ -481,7 +481,7 @@ class Profile extends View {
   componentWillUnmount() {
     super.componentWillUnmount();
     this.unsub?.();
-    localState.get('isMyProfile').put(null);
+    localState.get('isMyProfile').put(false);
   }
 
   componentDidUpdate(_prevProps, prevState) {

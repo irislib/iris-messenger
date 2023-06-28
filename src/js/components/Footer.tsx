@@ -20,6 +20,7 @@ type State = {
   activeRoute: string;
   unseenMsgsTotal: number;
   chatId?: string;
+  isMyProfile?: boolean;
 };
 
 class Footer extends Component<Props, State> {
@@ -30,6 +31,7 @@ class Footer extends Component<Props, State> {
 
   componentDidMount() {
     localState.get('unseenMsgsTotal').on(this.inject());
+    localState.get('isMyProfile').on(this.inject());
     localState.get('activeRoute').on(
       this.sub((activeRoute) => {
         const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
@@ -108,11 +110,10 @@ class Footer extends Component<Props, State> {
               <MagnifyingGlassIcon width={24} />
             )}
           </a>
-          <a
-            href={`/${key}`}
-            className={`${activeRoute === `/${key}` ? 'active' : ''} btn flex flex-grow`}
-          >
-            <Identicon str={key} width={28} />
+          <a href={`/${key}`} className="rounded-full btn flex flex-grow">
+            <span className={`${this.state.isMyProfile ? 'border-white' : 'border-black'} flex rounded-full border-2`}>
+              <Identicon str={key} width={28} />
+            </span>
           </a>
         </div>
       </footer>
