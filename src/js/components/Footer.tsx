@@ -111,7 +111,11 @@ class Footer extends Component<Props, State> {
             )}
           </a>
           <a href={`/${key}`} className="rounded-full btn flex flex-grow">
-            <span className={`${this.state.isMyProfile ? 'border-white' : 'border-black'} flex rounded-full border-2`}>
+            <span
+              className={`${
+                this.state.isMyProfile ? 'border-white' : 'border-black'
+              } flex rounded-full border-2`}
+            >
               <Identicon str={key} width={28} />
             </span>
           </a>

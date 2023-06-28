@@ -121,8 +121,12 @@ export default class Header extends Component {
   }
 
   renderTitle() {
+    const isHome = this.state.activeRoute === '/';
     return (
-      <div class="flex-1 text-center" onClick={() => this.onTitleClicked()}>
+      <div
+        className={`flex-1 text-center ${isHome ? 'invisible md:visible' : ''}`}
+        onClick={() => this.onTitleClicked()}
+      >
         {this.state.title}
       </div>
     );
@@ -178,17 +182,28 @@ export default class Header extends Component {
     );
   }
 
+  renderBackBtnOrLogo() {
+    const isHome = this.state.activeRoute === '/';
+    return isHome ? (
+      <div className="flex flex-row items-center gap-2 md:hidden">
+        <img src="/img/icon128.png" width="30" height="30" />
+        <h1 className=" text-3xl">iris</h1>
+      </div>
+    ) : (
+      <ArrowLeftIcon width={24} onClick={() => this.backButtonClicked()} />
+    );
+  }
+
   render() {
     const pub = Key.getPubKey();
     const loggedIn = !!pub;
     return (
       <div className="sticky top-0 z-10 cursor-pointer">
-        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2 py-3">
-          <div className="flex items-center">
-            <ArrowLeftIcon width={24} onClick={() => this.backButtonClicked()} />
+        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2">
+          <div className="flex items-center justify-between h-12">
+            {this.renderBackBtnOrLogo()}
             {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
             {this.renderTitle()}
-
             {loggedIn && this.renderNotifications()}
             {!loggedIn && this.renderLoginBtns()}
           </div>
