@@ -21,13 +21,15 @@ import SocialNetwork from '../../nostr/SocialNetwork';
 import Identicon from '../Identicon';
 import ZapModal from '../modal/Zap';
 
-const Reactions = (props) => {
+import ReactionsList from './ReactionsList';
+
+const ReactionButtons = (props) => {
   const [state, setState] = useState({
     reposts: 0,
     reposted: false,
     likes: 0,
     zappers: null as string[] | null,
-    totalZapped: '',
+    totalZapAmount: '',
     liked: false,
     zapped: false,
     repostedBy: new Set<string>(),
@@ -181,7 +183,7 @@ const Reactions = (props) => {
     const zappers = zapEvents
       .map((event) => Events.getZappingUser(event.id))
       .filter((user) => user !== null) as string[];
-    const totalZapped = zapEvents.reduce((acc, event) => {
+    const totalZapAmount = zapEvents.reduce((acc, event) => {
       const bolt11 = event?.tags.find((tag) => tag[0] === 'bolt11')[1];
       if (!bolt11) {
         console.log('Invalid zap, missing bolt11 tag');
@@ -199,7 +201,8 @@ const Reactions = (props) => {
       reposts: repostedBy.size,
       reposted: repostedBy.has(myPub),
       likes: likedBy.size,
-      totalZapped: totalZapped && formatAmount(totalZapped),
+      totalZapAmount,
+      formattedZapAmount: totalZapAmount && formatAmount(totalZapAmount),
       zappers,
       liked: likedBy.has(myPub),
       likedBy,
@@ -223,73 +226,82 @@ const Reactions = (props) => {
 
   function renderReactionBtns() {
     const s = state;
+    const likes = Array.from(s.likedBy) || [];
+    const reposts = Array.from(s.repostedBy) || [];
+    const zaps = Array.from(s.zappers || []);
+    console.log('111', likes, reposts, zaps);
     return (
-      <div className="flex">
-        <a
-          className="btn-ghost flex-1 hover:bg-transparent hover:text-iris-blue btn content-center gap-2 rounded-none p-2 text-neutral-500"
-          onClick={() => replyBtnClicked()}
-        >
-          <ChatBubbleOvalLeftIcon width={18} />
-          <span>{s.replyCount || ''}</span>
-        </a>
-        {props.settings.showReposts ? (
-          <>
-            <a
-              className={`btn-ghost flex-1 hover:bg-transparent btn content-center gap-2 rounded-none p-2 ${
-                s.reposted ? 'text-iris-green' : 'hover:text-iris-green text-neutral-500'
-              }`}
-              onClick={(e) => repostBtnClicked(e)}
-            >
-              <ArrowPathIcon width={18} />
-              <span
-                className={`${s.showReposts ? 'active' : ''}`}
-                onClick={(e) => toggleReposts(e)}
+      <>
+        {props.standalone && (
+          <ReactionsList event={props.event} likes={likes} zaps={zaps} reposts={reposts} />
+        )}
+        <div className="flex">
+          <a
+            className="btn-ghost flex-1 hover:bg-transparent hover:text-iris-blue btn content-center gap-2 rounded-none p-2 text-neutral-500"
+            onClick={() => replyBtnClicked()}
+          >
+            <ChatBubbleOvalLeftIcon width={18} />
+            <span>{s.replyCount || ''}</span>
+          </a>
+          {props.settings.showReposts ? (
+            <>
+              <a
+                className={`btn-ghost flex-1 hover:bg-transparent btn content-center gap-2 rounded-none p-2 ${
+                  s.reposted ? 'text-iris-green' : 'hover:text-iris-green text-neutral-500'
+                }`}
+                onClick={(e) => repostBtnClicked(e)}
               >
-                {s.reposts || ''}
-              </span>
-            </a>
-          </>
-        ) : (
-          ''
-        )}
-        {props.settings.showLikes ? (
-          <>
-            <a
-              className={`btn-ghost flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none p-2 ${
-                s.liked ? 'text-iris-red' : 'hover:text-iris-red text-neutral-500'
-              }`}
-              onClick={(e) => likeBtnClicked(e)}
-            >
-              {s.liked ? <HeartIconFull width={18} /> : <HeartIcon width={18} />}
-              <span className={`${s.showLikes ? 'active' : ''}`} onClick={(e) => toggleLikes(e)}>
-                {s.likes || ''}
-              </span>
-            </a>
-          </>
-        ) : (
-          ''
-        )}
-        {props.settings.showZaps && state.lightning ? (
-          <>
-            <a
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setState((prevState) => ({ ...prevState, showZapModal: true }));
-              }}
-              className={`btn-ghost flex-1 hover:bg-transparent btn content-center gap-2 rounded-none p-2
+                <ArrowPathIcon width={18} />
+                <span
+                  className={`${s.showReposts ? 'active' : ''}`}
+                  onClick={(e) => toggleReposts(e)}
+                >
+                  {s.reposts || ''}
+                </span>
+              </a>
+            </>
+          ) : (
+            ''
+          )}
+          {props.settings.showLikes ? (
+            <>
+              <a
+                className={`btn-ghost flex-1 justify-center hover:bg-transparent btn content-center gap-2 rounded-none p-2 ${
+                  s.liked ? 'text-iris-red' : 'hover:text-iris-red text-neutral-500'
+                }`}
+                onClick={(e) => likeBtnClicked(e)}
+              >
+                {s.liked ? <HeartIconFull width={18} /> : <HeartIcon width={18} />}
+                <span className={`${s.showLikes ? 'active' : ''}`} onClick={(e) => toggleLikes(e)}>
+                  {s.likes || ''}
+                </span>
+              </a>
+            </>
+          ) : (
+            ''
+          )}
+          {props.settings.showZaps && state.lightning ? (
+            <>
+              <a
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setState((prevState) => ({ ...prevState, showZapModal: true }));
+                }}
+                className={`btn-ghost flex-1 hover:bg-transparent btn content-center gap-2 rounded-none p-2
               ${s.zapped ? 'text-iris-orange' : 'text-neutral-500 hover:text-iris-orange'}`}
-            >
-              <BoltIcon width={18} />
-              <span className={`${s.showZaps ? 'active' : ''}`} onClick={(e) => toggleZaps(e)}>
-                {s.totalZapped || ''}
-              </span>
-            </a>
-          </>
-        ) : (
-          ''
-        )}
-      </div>
+              >
+                <BoltIcon width={18} />
+                <span className={`${s.showZaps ? 'active' : ''}`} onClick={(e) => toggleZaps(e)}>
+                  {s.totalZapAmount || ''}
+                </span>
+              </a>
+            </>
+          ) : (
+            ''
+          )}
+        </div>
+      </>
     );
   }
 
@@ -342,4 +354,4 @@ const Reactions = (props) => {
   );
 };
 
-export default memo(Reactions);
+export default memo(ReactionButtons);

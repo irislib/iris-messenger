@@ -16,7 +16,7 @@ import Torrent from '../Torrent';
 
 import EventComponent from './EventComponent';
 import EventDropdown from './EventDropdown';
-import Reactions from './Reactions';
+import Reactions from './ReactionButtons';
 
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
