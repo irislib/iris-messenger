@@ -1,5 +1,4 @@
 import Header from '../../components/Header';
-import Icons from '../../Icons';
 
 import SettingsContent from './SettingsContent';
 import SettingsMenu from './SettingsMenu';
@@ -10,17 +9,9 @@ const Settings = (props: Props) => {
   return (
     <>
       <Header />
-      <div className="flex flex-row">
-        <div className={props.page ? 'flex md:hidden' : 'hidden'}>
-          <a href="/settings">
-            <span>{Icons.backArrow}</span>
-          </a>
-        </div>
+      <div className="flex flex-row px-2 md:px-0">
         <SettingsMenu activePage={props.page} />
-        <div
-          className={props.page ? '' : 'hidden-xs'}
-          style="padding: 0px 15px; overflow: auto; width: 100%;"
-        >
+        <div className={props.page ? '' : 'hidden md:flex'}>
           <SettingsContent id={props.page} />
         </div>
       </div>

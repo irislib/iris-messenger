@@ -33,7 +33,7 @@ export default class SettingsMenu extends Component {
     const activePage = this.props.activePage || 'account';
     return (
       <div
-        className={`flex-col w-48 flex-shrink-0 ${
+        className={`flex-col w-full md:w-48 flex-shrink-0 ${
           !this.props.activePage ? 'flex' : 'hidden md:flex'
         }`}
       >
