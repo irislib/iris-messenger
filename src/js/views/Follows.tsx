@@ -1,6 +1,5 @@
 import throttle from 'lodash/throttle';
 
-import { PrimaryButton as Button } from '../components/buttons/Button';
 import Follow from '../components/buttons/Follow';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
