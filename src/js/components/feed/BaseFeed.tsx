@@ -125,36 +125,28 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   handleScroll = () => {
     // increase page size when scrolling down
     if (this.state.displayCount < this.state.sortedEvents.length) {
-      if (
-        this.props.scrollElement &&
-        this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
-          this.props.scrollElement.scrollHeight - 1000
-      ) {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const clientHeight = document.documentElement.clientHeight;
+      const scrollHeight = document.documentElement.scrollHeight;
+
+      if (scrollTop + clientHeight >= scrollHeight - 1000) {
         // TODO load more events
         this.setState({
-          //displayCount: this.state.displayCount + INITIAL_PAGE_SIZE, // TODO FIX!
+          displayCount: this.state.displayCount + INITIAL_PAGE_SIZE, // TODO FIX!
         });
-        console.log('load more events', this.state.displayCount, this.props.scrollElement);
+        console.log('load more events', this.state.displayCount);
       }
     }
   };
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    if (this.props.scrollElement) {
-      this.props.scrollElement.removeEventListener('scroll', this.handleScroll);
-    }
+    window.removeEventListener('scroll', this.handleScroll);
     this.unsub && this.unsub();
   }
 
-  addScrollHandler() {
-    if (this.props.scrollElement) {
-      this.props.scrollElement.addEventListener('scroll', this.handleScroll);
-    }
-  }
-
   componentDidMount() {
-    this.addScrollHandler();
+    window.addEventListener('scroll', this.handleScroll);
     this.subscribe();
     if (isEqual(this.state.settings, DEFAULT_SETTINGS)) {
       // no settings saved in history state, load from localstorage
@@ -267,10 +259,10 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   );
 
   componentDidUpdate(prevProps, prevState) {
-    if (!prevProps.scrollElement && this.props.scrollElement) {
-      this.addScrollHandler();
-    }
-    if (!isEqual(prevState.settings, this.state.settings)) {
+    if (
+      prevState.settings?.showReplies !== this.state.settings?.showReplies ||
+      prevState.settings?.display !== this.state.settings?.display
+    ) {
       this.setState({ displayCount: INITIAL_PAGE_SIZE });
       this.subscribe();
     }
@@ -344,7 +336,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   }
 
   render() {
-    if (!this.props.scrollElement || this.unmounted) {
+    if (this.unmounted) {
       return;
     }
     const displayCount = this.state.displayCount;

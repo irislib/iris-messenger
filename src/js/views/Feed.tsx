@@ -28,7 +28,6 @@ class Feed extends View {
           <OnboardingNotification />
         )}
         <FeedComponent
-          scrollElement={this.scrollElement.current}
           keyword={this.props.keyword}
           key={this.props.index || 'feed'}
           index={this.props.index}

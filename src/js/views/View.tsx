@@ -1,5 +1,5 @@
 import { debounce } from 'lodash';
-import { createRef, JSX } from 'preact';
+import { JSX } from 'preact';
 
 import Component from '../BaseComponent';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -13,7 +13,6 @@ const listener = function () {
 window.addEventListener('popstate', listener);
 
 abstract class View extends Component {
-  scrollElement = createRef();
   class = '';
   id = '';
   observer: ResizeObserver | null = null;
@@ -25,29 +24,26 @@ abstract class View extends Component {
     return (
       <>
         <Header />
-        <div
-          ref={this.scrollElement}
-          onScroll={() => this.saveScrollPosition()}
-          class={this.class}
-          id={this.id}
-        >
+        <div class={this.class} id={this.id}>
           <ErrorBoundary>{this.renderView()}</ErrorBoundary>
         </div>
       </>
     );
   }
 
+  componentDidMount() {
+    window.addEventListener('scroll', this.saveScrollPosition);
+    this.restoreScrollPosition();
+  }
+
   saveScrollPosition = debounce(() => {
-    const scrollElement = this.scrollElement.current;
-    if (scrollElement) {
-      const scrollPosition = scrollElement.scrollTop;
-      const currentHistoryState = window.history.state;
-      const newHistoryState = {
-        ...currentHistoryState,
-        scrollPosition,
-      };
-      window.history.replaceState(newHistoryState, '');
-    }
+    const scrollPosition = window.scrollY || document.documentElement.scrollTop;
+    const currentHistoryState = window.history.state;
+    const newHistoryState = {
+      ...currentHistoryState,
+      scrollPosition,
+    };
+    window.history.replaceState(newHistoryState, '');
   }, 100);
 
   restoreScrollPosition(observe = true) {
@@ -55,12 +51,11 @@ abstract class View extends Component {
     const previousHistoryState = window.history.state?.previousState;
     if (!isInitialLoad && currentHistoryState !== previousHistoryState) {
       observe && this.observeScrollElement();
-      const scrollElement = this.scrollElement.current;
       if (!this.scrollPosition) {
         this.scrollPosition = window.history.state?.scrollPosition;
       }
-      if (scrollElement && this.scrollPosition) {
-        scrollElement.scrollTop = this.scrollPosition;
+      if (this.scrollPosition) {
+        window.scrollTo(0, this.scrollPosition);
       }
     } else {
       const oldState = window.history.state || {};
@@ -79,21 +74,19 @@ abstract class View extends Component {
       });
     });
 
-    const scrollElement = this.scrollElement.current;
-    if (scrollElement) {
-      this.observer.observe(scrollElement);
-      setTimeout(() => {
-        if (this.observer) {
-          this.observer.disconnect();
-        }
-      }, 1000);
-    }
+    this.observer.observe(document.body);
+    setTimeout(() => {
+      if (this.observer) {
+        this.observer.disconnect();
+      }
+    }, 1000);
   };
 
   componentWillUnmount() {
     if (this.observer) {
       this.observer.disconnect();
     }
+    window.removeEventListener('scroll', this.saveScrollPosition);
   }
 }
 

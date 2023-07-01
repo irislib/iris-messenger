@@ -133,33 +133,31 @@ export default class Header extends Component {
   }
 
   renderNotifications() {
-    if (this.state.isMyProfile) {
-      // return link to /settings
-      return (
-        <a href="/settings">
-          <Cog8ToothIcon width={28} />
-        </a>
-      );
-    }
-
     return (
-      <a
-        href="/notifications"
-        className={`relative inline-block ${this.state.showMobileSearch ? 'hidden' : ''}`}
-      >
-        {this.state.activeRoute === '/notifications' ? (
-          <HeartIconFull width={28} />
-        ) : (
-          <HeartIcon width={28} />
-        )}
-        {this.state.unseenNotificationCount ? (
-          <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-iris-purple text-white text-sm rounded-full h-5 w-5 flex items-center justify-center">
-            {this.state.unseenNotificationCount > 99 ? '' : this.state.unseenNotificationCount}
-          </span>
-        ) : (
-          ''
-        )}
-      </a>
+      <>
+        {this.state.isMyProfile ? (
+          <a href="/settings" className="md:hidden">
+            <Cog8ToothIcon width={28} />
+          </a>
+        ) : null}
+        <a
+          href="/notifications"
+          className={`relative inline-block ${this.state.isMyProfile ? 'hidden md:flex' : ''}`}
+        >
+          {this.state.activeRoute === '/notifications' ? (
+            <HeartIconFull width={28} />
+          ) : (
+            <HeartIcon width={28} />
+          )}
+          {this.state.unseenNotificationCount ? (
+            <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-iris-purple text-white text-sm rounded-full h-5 w-5 flex items-center justify-center">
+              {this.state.unseenNotificationCount > 99 ? '' : this.state.unseenNotificationCount}
+            </span>
+          ) : (
+            ''
+          )}
+        </a>
+      </>
     );
   }
 

@@ -281,7 +281,6 @@ class Profile extends View {
     if (this.props.tab === 'replies') {
       return html`
         <${Feed}
-          scrollElement=${this.scrollElement.current}
           key="replies${this.state.hexPub}"
           index="postsAndReplies"
           nostrUser=${this.state.hexPub}
@@ -289,12 +288,7 @@ class Profile extends View {
       `;
     } else if (this.props.tab === 'likes') {
       return html`
-        <${Feed}
-          scrollElement=${this.scrollElement.current}
-          key="likes${this.state.hexPub}"
-          index="likes"
-          nostrUser=${this.state.hexPub}
-        />
+        <${Feed} key="likes${this.state.hexPub}" index="likes" nostrUser=${this.state.hexPub} />
       `;
     } else if (this.props.tab === 'media') {
       return html`TODO media message feed`;
@@ -303,12 +297,7 @@ class Profile extends View {
     return html`
       <div>
         ${this.getNotification()}
-        <${Feed}
-          scrollElement=${this.scrollElement.current}
-          key="posts${this.state.hexPub}"
-          index="posts"
-          nostrUser=${this.state.hexPub}
-        />
+        <${Feed} key="posts${this.state.hexPub}" index="posts" nostrUser=${this.state.hexPub} />
       </div>
     `;
   }
