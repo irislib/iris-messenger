@@ -1,24 +1,19 @@
-import { HeartIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
+import { Cog8ToothIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, HeartIcon as HeartIconFull } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
-import { Link } from 'preact-router/match';
 
-import logo from '../../../public/img/icon128.png';
 import Component from '../BaseComponent';
-import Helpers from '../Helpers';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import Relays from '../nostr/Relays';
 import { translate as t } from '../translations/Translation.mjs';
 
-import { Button, PrimaryButton } from './buttons/Button';
-import Identicon from './Identicon';
 import Name from './Name';
 import SearchBox from './SearchBox';
 
 export default class Header extends Component {
-  chatId = null as string | null;
+  userId = null as string | null;
   iv = null as any;
 
   constructor() {
@@ -43,40 +38,50 @@ export default class Header extends Component {
     document.removeEventListener('keydown', this.escFunction, false);
   }
 
+  setTitle(activeRoute: string) {
+    let title: any = activeRoute.split('/')[1] || t('home');
+    if (title.startsWith('note')) {
+      title = t('post');
+    } else if (title.startsWith('npub')) {
+      this.userId = title;
+      title = <Name key={`${this.userId}title`} pub={this.userId || ''} />;
+    } else {
+      title = title.charAt(0).toUpperCase() + title.slice(1);
+    }
+
+    const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
+
+    if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
+      this.userId = replaced.length < activeRoute.length ? replaced : null;
+      if (activeRoute.indexOf('/chat/') === 0 && this.userId === Key.getPubKey()) {
+        title = (
+          <>
+            <b className="mr-5">📝</b> <b>{t('note_to_self')}</b>
+          </>
+        );
+      } else {
+        title = <Name key={`${this.userId}title`} pub={this.userId || ''} />;
+      }
+    }
+
+    this.setState({ title });
+  }
+
   componentDidMount() {
     document.addEventListener('keydown', this.escFunction, false);
     localState.get('showParticipants').on(this.inject());
     localState.get('unseenMsgsTotal').on(this.inject());
     localState.get('unseenNotificationCount').on(this.inject());
     localState.get('showConnectedRelays').on(this.inject());
+    localState.get('isMyProfile').on(this.inject());
     localState.get('activeRoute').on(
       this.sub((activeRoute) => {
         this.setState({
           about: null,
-          title: '',
           activeRoute,
           showMobileSearch: false,
         });
-        const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
-        this.chatId = replaced.length < activeRoute.length ? replaced : null;
-        if (this.chatId) {
-          localState.get('channels').get(this.chatId).get('isTyping').on(this.inject());
-          localState.get('channels').get(this.chatId).get('theirLastActiveTime').on(this.inject());
-        }
-
-        if (activeRoute.indexOf('/chat/') === 0 && activeRoute.indexOf('/chat/new') !== 0) {
-          if (activeRoute.indexOf('/chat/') === 0 && this.chatId === Key.getPubKey()) {
-            const title = (
-              <>
-                <b style="margin-right:5px">📝</b> <b>{t('note_to_self')}</b>
-              </>
-            );
-            this.setState({ title });
-          } else {
-            const title = <Name key={this.chatId} pub={this.chatId || ''} />;
-            this.setState({ title });
-          }
-        }
+        this.setTitle(activeRoute);
       }),
     );
     this.updateRelayCount();
@@ -84,54 +89,18 @@ export default class Header extends Component {
   }
 
   onTitleClicked() {
-    if (this.chatId && this.chatId.indexOf('hashtag') === -1) {
-      const view = this.chatId.length < 40 ? '/group/' : '/';
-      route(view + this.chatId);
+    window.scrollTo(0, 0);
+    if (this.userId && this.userId.indexOf('hashtag') === -1) {
+      route('/' + this.userId);
     }
-  }
-
-  onLogoClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    (document.querySelector('a.logo') as HTMLElement).blur();
-    window.innerWidth > 625 && route('/');
-    localState.get('toggleMenu').put(true);
   }
 
   updateRelayCount() {
     this.setState({ connectedRelays: Relays.getConnectedRelayCount() });
   }
 
-  renderBackButton() {
-    const { activeRoute } = this.state;
-    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
-    return chatting ? (
-      <div
-        id="back-button"
-        class="visible-xs-inline-block"
-        onClick={() => this.backButtonClicked()}
-      >
-        {Icons.backArrow}
-      </div>
-    ) : (
-      ''
-    );
-  }
-
-  renderMenuIcon() {
-    const { activeRoute } = this.state;
-    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
-    return !Helpers.isElectron && !chatting ? (
-      <a href="/" onClick={(e) => this.onLogoClick(e)} class="visible-xs-flex logo">
-        <div class="mobile-menu-icon">{Icons.menu}</div>
-      </a>
-    ) : (
-      ''
-    );
-  }
-
   renderSearchBox() {
-    return !this.chatId ? <SearchBox onSelect={(item) => route(`/${item.key}`)} /> : '';
+    return !this.userId ? <SearchBox onSelect={(item) => route(`/${item.key}`)} /> : '';
   }
 
   renderConnectedRelays() {
@@ -151,149 +120,91 @@ export default class Header extends Component {
     );
   }
 
-  renderHeaderText() {
-    const { chat, activeRoute } = this.state;
-    const isTyping = chat && chat.isTyping;
-    const chatting = activeRoute && activeRoute.indexOf('/chat/') === 0;
+  renderTitle() {
+    const isHome = this.state.activeRoute === '/';
     return (
       <div
-        class="text"
-        style={this.chatId ? 'cursor:pointer;text-align:center' : ''}
+        className={`flex-1 text-center ${isHome ? 'invisible md:visible' : ''}`}
         onClick={() => this.onTitleClicked()}
       >
-        {this.state.title && chatting ? <div class="name">{this.state.title}</div> : ''}
-        {isTyping ? <small class="typing-indicator">{t('typing')}</small> : ''}
-        {this.state.about ? <small class="participants">{this.state.about}</small> : ''}
-        {this.chatId ? <small class="last-seen">{this.state.onlineStatus || ''}</small> : ''}
-        {!chatting && (
-          <div
-            id="mobile-search"
-            class={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
-          >
-            {this.renderSearchBox()}
-          </div>
-        )}
-        {!!Key.getPubKey() && this.renderMobileSearchButton(chatting)}
+        {this.state.title}
       </div>
-    );
-  }
-
-  renderMobileSearchButton(chatting) {
-    return !chatting ? (
-      <div
-        id="mobile-search-btn"
-        class={`mobile-search-hidden ${
-          this.state.showMobileSearch ? 'hidden' : 'visible-xs-inline-block'
-        }`}
-        onClick={() => {
-          // also synchronously make element visible so it can be focused
-          document.querySelector('.mobile-search-visible')?.classList.remove('hidden-xs', 'hidden');
-          document
-            .querySelector('.mobile-search-hidden')
-            ?.classList.remove('visible-xs-inline-block');
-          document.querySelector('.mobile-search-hidden')?.classList.add('hidden');
-          const input = document.querySelector('.search-box input');
-          if (input) {
-            setTimeout(() => {
-              (input as HTMLInputElement).focus();
-            }, 0);
-          }
-          this.setState({ showMobileSearch: true });
-        }}
-      >
-        {Icons.search}
-      </div>
-    ) : (
-      ''
-    );
-  }
-
-  renderMyProfile() {
-    const key = Key.getPubKey();
-    const npub = Key.toNostrBech32Address(key, 'npub');
-    return (
-      <Link
-        activeClassName="active"
-        href={`/${npub}`}
-        onClick={() => localState.get('scrollUp').put(true)}
-        class="hidden-xs my-profile"
-      >
-        <Identicon str={npub} width={34} />
-      </Link>
     );
   }
 
   renderNotifications() {
     return (
-      <a
-        href="/notifications"
-        class={`notifications-button mobile-search-hidden ${
-          this.state.showMobileSearch ? 'hidden' : ''
-        }`}
-      >
-        {this.state.activeRoute === '/notifications' ? (
-          <HeartIconFull width={28} />
-        ) : (
-          <HeartIcon width={28} />
-        )}
-        {this.state.unseenNotificationCount ? (
-          <span class="unseen">
-            {this.state.unseenNotificationCount > 99 ? '' : this.state.unseenNotificationCount}
-          </span>
-        ) : (
-          ''
-        )}
-      </a>
-    );
-  }
-
-  renderLogo() {
-    return (
-      <a tabIndex={3} href="/" className="logo" style="margin-left: 15px;">
-        <img src={logo} width="30" height="30" style="margin-right: 9px;" />
-        <span style="font-size: 1.8em; color: var(--text-color);">iris</span>
-      </a>
+      <>
+        {this.state.isMyProfile ? (
+          <a href="/settings" className="md:hidden">
+            <Cog8ToothIcon width={28} />
+          </a>
+        ) : null}
+        <a
+          href="/notifications"
+          className={`relative inline-block ${this.state.isMyProfile ? 'hidden md:flex' : ''}`}
+        >
+          {this.state.activeRoute === '/notifications' ? (
+            <HeartIconFull width={28} />
+          ) : (
+            <HeartIcon width={28} />
+          )}
+          {this.state.unseenNotificationCount ? (
+            <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-iris-purple text-white text-sm rounded-full h-5 w-5 flex items-center justify-center">
+              {this.state.unseenNotificationCount > 99 ? '' : this.state.unseenNotificationCount}
+            </span>
+          ) : (
+            ''
+          )}
+        </a>
+      </>
     );
   }
 
   renderLoginBtns() {
     return (
-      <div class="login-buttons">
-        <PrimaryButton small onClick={() => localState.get('showLoginModal').put(true)}>
+      <div className="flex gap-2">
+        <button
+          className="btn btn-sm btn-primary"
+          onClick={() => localState.get('showLoginModal').put(true)}
+        >
           {t('log_in')}
-        </PrimaryButton>
-        <Button small onClick={() => localState.get('showLoginModal').put(true)}>
+        </button>
+        <button
+          className="btn btn-sm btn-neutral"
+          onClick={() => localState.get('showLoginModal').put(true)}
+        >
           {t('sign_up')}
-        </Button>
+        </button>
       </div>
     );
   }
 
+  renderBackBtnOrLogo() {
+    const isHome = this.state.activeRoute === '/';
+    return isHome ? (
+      <div className="flex flex-row items-center gap-2 md:hidden">
+        <img src="/img/icon128.png" width="30" height="30" />
+        <h1 className=" text-3xl">iris</h1>
+      </div>
+    ) : (
+      <ArrowLeftIcon width={24} onClick={() => this.backButtonClicked()} />
+    );
+  }
+
   render() {
-    const loggedIn = !!Key.getPubKey();
+    const pub = Key.getPubKey();
+    const loggedIn = !!pub;
     return (
-      <div className="nav header">
-        {!loggedIn && this.renderLogo()}
-        {this.renderBackButton()}
-        <div className="header-content">
-          <div className={`mobile-search-hidden ${this.state.showMobileSearch ? 'hidden-xs' : ''}`}>
-            {loggedIn && this.renderMenuIcon()}
+      <div className="sticky top-0 z-10 cursor-pointer">
+        <div className="w-full bg-black md:bg-opacity-50 md:shadow-lg md:backdrop-blur-lg px-2">
+          <div className="flex items-center justify-between h-12">
+            {this.renderBackBtnOrLogo()}
+            {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
+            {this.renderTitle()}
+            {loggedIn && this.renderNotifications()}
+            {!loggedIn && this.renderLoginBtns()}
           </div>
-          <a
-            className={`mobile-search-visible ${this.state.showMobileSearch ? '' : 'hidden-xs'}`}
-            href=""
-            onClick={(e) => {
-              e.preventDefault();
-              this.setState({ showMobileSearch: false });
-            }}
-          >
-            <span class="visible-xs-inline-block">{Icons.backArrow}</span>
-          </a>
-          {loggedIn && this.state.showConnectedRelays && this.renderConnectedRelays()}
-          {this.renderHeaderText()}
-          {loggedIn && this.renderNotifications()}
-          {loggedIn && this.renderMyProfile()}
-          {!loggedIn && this.renderLoginBtns()}
         </div>
       </div>
     );

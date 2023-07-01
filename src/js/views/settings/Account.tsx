@@ -3,7 +3,6 @@ import { nip19 } from 'nostr-tools';
 import { route } from 'preact-router';
 
 import Component from '../../BaseComponent';
-import { PrimaryButton as Button } from '../../components/buttons/Button';
 import Copy from '../../components/buttons/Copy';
 import Helpers from '../../Helpers';
 import Events from '../../nostr/Events';
@@ -59,16 +58,17 @@ export default class Account extends Component {
       <>
         <div class="centered-container">
           <h2>{t('account')}</h2>
-          <p>
-            {hasPriv ? (
-              <>
-                <b>{t('save_backup_of_privkey_first')}</b> {t('otherwise_cant_log_in_again')}
-              </>
-            ) : null}
-          </p>
-          <p>
-            <Button onClick={() => this.onLogoutClick(hasPriv)}>{t('log_out')}</Button>
-            <Button
+          {hasPriv ? (
+            <p>
+              <b>{t('save_backup_of_privkey_first')}</b> {t('otherwise_cant_log_in_again')}
+            </p>
+          ) : null}
+          <div className="flex gap-2 my-2">
+            <button className="btn btn-sm btn-primary" onClick={() => this.onLogoutClick(hasPriv)}>
+              {t('log_out')}
+            </button>
+            <button
+              className="btn btn-sm btn-primary"
               onClick={() =>
                 this.setState({
                   showSwitchAccount: !this.state.showSwitchAccount,
@@ -76,8 +76,8 @@ export default class Account extends Component {
               }
             >
               {t('switch_account')}
-            </Button>
-          </p>
+            </button>
+          </div>
           {this.state.showSwitchAccount
             ? html`
                 <p>
@@ -95,16 +95,16 @@ export default class Account extends Component {
           <p>
             <small>{myNpub}</small>
           </p>
-          <p>
-            <Copy copyStr={myNpub} text="Copy npub" />
-            <Copy copyStr={myPub} text="Copy hex" />
-          </p>
+          <div className="flex gap-2 my-2">
+            <Copy className="btn btn-neutral btn-sm" copyStr={myNpub} text="Copy npub" />
+            <Copy className="btn btn-neutral btn-sm" copyStr={myPub} text="Copy hex" />
+          </div>
           <h3>{t('private_key')}</h3>
           <p>
             {myPrivHex ? (
               <>
-                <Copy copyStr={myPriv32} text="Copy nsec" />
-                <Copy copyStr={myPrivHex} text="Copy hex" />
+                <Copy className="btn btn-neutral btn-sm" copyStr={myPriv32} text="Copy nsec" />
+                <Copy className="btn btn-neutral btn-sm" copyStr={myPrivHex} text="Copy hex" />
               </>
             ) : (
               <p>{t('private_key_not_present_good')}</p>
@@ -116,7 +116,9 @@ export default class Account extends Component {
             <>
               <h3>{t('delete_account')}</h3>
               <p>
-                <Button onClick={() => this.deleteAccount()}>{t('delete_account')}</Button>
+                <button className="btn btn-sm btn-danger" onClick={() => this.deleteAccount()}>
+                  {t('delete_account')}
+                </button>
               </p>
             </>
           ) : null}

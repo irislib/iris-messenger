@@ -49,6 +49,7 @@ export default class SocialNetworkSettings extends Component {
           ))}
           <p>Filter incoming events by follow distance:</p>
           <select
+            className="select"
             value={this.state.globalFilter.maxFollowDistance}
             onChange={(e) => {
               const target = e.target as HTMLInputElement;
@@ -65,6 +66,7 @@ export default class SocialNetworkSettings extends Component {
           </select>
           <p>Minimum number of followers at maximum follow distance:</p>
           <input
+            className="input"
             type="number"
             value={
               this.state.globalFilter.minFollowersAtMaxDistance ||

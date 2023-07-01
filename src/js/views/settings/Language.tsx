@@ -40,7 +40,7 @@ const Language = () => {
             return (
               <Fragment key={l}>
                 {input}
-                <label for={l}>{AVAILABLE_LANGUAGES[l]}</label>
+                <label for={l}> {AVAILABLE_LANGUAGES[l]}</label>
                 <br />
               </Fragment>
             );

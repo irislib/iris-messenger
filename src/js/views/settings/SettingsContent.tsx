@@ -32,6 +32,10 @@ export default class SettingsContent extends Component {
   }
   render() {
     const Content = this.pages[this.props.id] || this.pages.account;
-    return <Content />;
+    return (
+      <div className="prose">
+        <Content />
+      </div>
+    );
   }
 }

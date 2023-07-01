@@ -1,7 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+.btn, input, select {
+    @apply rounded-full;
+}
+
+* {
+  font-family: 'Lato', sans-serif;
+}
+
+.btn {
+  @apply capitalize;
+}
+
+input[type='text'],
+input[type='number'] {
+  @apply rounded-full;
+}
+
+iframe {
+  @apply rounded-sm my-4 w-full;
+}
+
+img, video {
+  user-select: none;
+}
+
+.centered-placeholder::placeholder {
+  text-align: center;
+}
+
+.link {
+  @apply text-iris-blue hover:underline;
+  text-decoration: none;
+}
+
+.pb-safe-area {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.preformatted-wrap {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow: hidden;
 }

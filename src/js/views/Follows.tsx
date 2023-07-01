@@ -1,6 +1,5 @@
 import throttle from 'lodash/throttle';
 
-import { PrimaryButton as Button } from '../components/buttons/Button';
 import Follow from '../components/buttons/Follow';
 import Identicon from '../components/Identicon';
 import Name from '../components/Name';
@@ -103,17 +102,17 @@ class Follows extends View {
     return this.state.follows.map((hexKey) => {
       const npub = Key.toNostrBech32Address(hexKey, 'npub') || '';
       return (
-        <div key={npub} className="profile-link-container">
-          <a href={`/${npub}`} className="profile-link">
+        <div key={npub} className="flex w-full">
+          <a href={`/${npub}`} className="flex flex-1 gap-2">
             <Identicon str={npub} width={49} />
             <div>
               <Name pub={npub} />
               <br />
-              <small className="follower-count">
+              <span className="text-neutral-500 text-sm">
                 {SocialNetwork.followersByUser.get(hexKey)?.size || 0}
                 <i> </i>
                 followers
-              </small>
+              </span>
             </div>
           </a>
           {hexKey !== Key.getPubKey() && <Follow id={npub} />}
@@ -126,39 +125,41 @@ class Follows extends View {
     const showFollowAll =
       this.state.follows.length > 1 && !(this.props.id === this.myPub && !this.props.followers);
     return (
-      <div className="centered-container">
-        <h3 style={{ display: 'flex' }}>
-          <a href={`/${this.props.id}`}>
-            <Name pub={this.props.id} />
-          </a>
-          :<i> </i>
-          <span style={{ flex: 1 }} className="mar-left5">
-            {this.props.followers ? t('followers') : t('following')}
+      <>
+        <div className="flex justify-between mb-4">
+          <span className="text-2xl font-bold">
+            <a className="link" href={`/${this.props.id}`}>
+              <Name pub={this.props.id} />
+            </a>
+            :<i> </i>
+            <span style={{ flex: 1 }} className="ml-1">
+              {this.props.followers ? t('followers') : t('following')}
+            </span>
           </span>
           {showFollowAll ? (
-            <span style="text-align: right" className="hidden-xs">
-              <Button small={true} onClick={() => this.followAll()}>
+            <span style="text-align: right" className="hidden md:inline">
+              <button className="btn btn-sm btn-neutral" onClick={() => this.followAll()}>
                 {t('follow_all')} ({this.state.follows.length})
-              </Button>
+              </button>
             </span>
           ) : (
             ''
           )}
-        </h3>
+        </div>
         {showFollowAll ? (
-          <p style="text-align: right" className="visible-xs-block">
-            <Button small={true} onClick={() => this.followAll()}>
+          <p style="text-align: right" className="inline md:hidden">
+            <button className="btn btn-sm btn-neutral" onClick={() => this.followAll()}>
               {t('follow_all')} ({this.state.follows.length})
-            </Button>
+            </button>
           </p>
         ) : (
           ''
         )}
-        <div id="follows-list">
+        <div className="flex flex-col w-full gap-4">
           {this.renderFollows() /* TODO limit if lots of follows */}
           {this.state.follows.length === 0 ? '—' : ''}
         </div>
-      </div>
+      </>
     );
   }
 }

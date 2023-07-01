@@ -37,19 +37,20 @@ class FeedList extends View {
 
   renderView() {
     return (
-      <div className="centered-container">
+      <div className="centered-container flex flex-wrap justify-center">
         {Object.keys(this.state.feeds).map((key) => {
           const feed = this.state.feeds[key];
           return (
-            <div>
-              <div style="margin-bottom: 5px" className="msg" onClick={() => this.openFeed(key)}>
-                <div className="msg-content">
-                  <div style="margin-right: 15px">
-                    <div>{feed.icon}</div>
-                  </div>
-                  <div className="msg-body" style="flex:1">
-                    <h3 style="margin-top:0">{t(feed.name)}</h3>
-                    {t(feed.description)}
+            <div
+              className="card bordered w-full cursor-pointer bg-neutral-900 m-2"
+              onClick={() => this.openFeed(key)}
+            >
+              <div className="card-body">
+                <div className="flex items-center">
+                  <div className="w-8 mr-4">{feed.icon}</div>
+                  <div>
+                    <h2 className="card-title">{t(feed.name)}</h2>
+                    <p>{t(feed.description)}</p>
                   </div>
                 </div>
               </div>

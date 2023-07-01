@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet';
-import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { html } from 'htm/preact';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
@@ -47,8 +46,8 @@ class Profile extends View {
   getNotification() {
     if (this.state.noFollowers && this.followers.has(Key.getPubKey())) {
       return html`
-        <div class="msg">
-          <div class="msg-content">
+        <div className="msg">
+          <div className="msg-content">
             <p>Share your profile link so ${this.state.name || 'this user'} can follow you:</p>
             <p>
               <${Copy} text=${t('copy_link')} copyStr=${Helpers.getMyProfileLink()} />
@@ -62,14 +61,12 @@ class Profile extends View {
 
   renderLinks() {
     return html`
-      <div
-        class="profile-links"
-        style="flex:1; display: flex; flex-direction: row; align-items: center;"
-      >
+      <div className="flex flex-1 flex-row align-center justify-center mt-2">
         ${this.state.lightning
           ? html`
-              <div style="flex:1">
+              <div className="flex-1">
                 <a
+                  className="btn btn-sm btn-neutral"
                   href=${this.state.lightning}
                   onClick=${(e) => Helpers.handleLightningLinkClick(e)}
                 >
@@ -80,8 +77,8 @@ class Profile extends View {
           : ''}
         ${this.state.website
           ? html`
-              <div style="flex:1">
-                <a href=${this.state.website} target="_blank">
+              <div className="flex-1">
+                <a href=${this.state.website} target="_blank" className="link">
                   ${this.state.website.replace(/^https?:\/\//, '')}
                 </a>
               </div>
@@ -113,7 +110,7 @@ class Profile extends View {
         key="${this.state.npub}identicon"
         str=${this.state.npub}
         hidePicture=${true}
-        width="250"
+        width=${128}
       />`;
     }
     let rawDataJson = [] as any;
@@ -137,110 +134,105 @@ class Profile extends View {
     const loggedIn = this.state.loggedIn;
     // TODO: on Follow / Message btn click open login modal if not logged in
     return html`
-      <div class="profile-top" key="${this.state.hexPub}details">
-        <div class="profile-header" style="flex-direction: column">
-          <div class="profile-header-top" style="display: flex; flex-direction: row">
-            <div
-              class="profile-picture-container"
-              style="flex: 2;margin-top:${this.state.banner ? '-100px;' : ''}"
-            >
-              ${profilePicture}
-            </div>
-            <div
-              class="profile-header-info"
-              style="flex: 5;flex-direction: row; display:flex;margin-top:15px;justify-content: flex-end"
-            >
+      <div key="${this.state.hexPub}details">
+        <div className="mb-2 mx-2 md:mx-0 flex flex-col gap-2">
+          <div className="flex flex-row">
+            <div>${profilePicture}</div>
+            <div className="flex-1 justify-end flex">
               <div onClick=${() => !loggedIn && localState.get('showLoginModal').put(true)}>
                 ${this.state.isMyProfile
-                  ? html`<${Button} small onClick=${() => loggedIn && route('/profile/edit')}
-                      >${t('edit_profile')}<//
-                    >`
+                  ? html`<button
+                      className="btn btn-sm btn-neutral"
+                      onClick=${() => loggedIn && route('/profile/edit')}
+                    >
+                      ${t('edit_profile')}
+                    <//>`
                   : html`
                       <${Follow} key=${`${this.state.hexPub}follow`} id=${this.state.hexPub} />
                       ${this.state.npub !==
                       'npub1wnwwcv0a8wx0m9stck34ajlwhzuua68ts8mw3kjvspn42dcfyjxs4n95l8'
-                        ? html` <${Button}
-                            small
+                        ? html` <button
+                            className="btn btn-neutral btn-sm"
                             onClick=${() => loggedIn && route(`/chat/${this.state.npub}`)}
                           >
-                            <span class="hidden-xs"> ${t('send_message')} </span>
-                            <span class="visible-xs-inline-block msg-btn-icon">
-                              <${PaperAirplaneIcon} width="24" />
-                            </span>
+                            ${t('send_message')}
                           <//>`
                         : ''}
                     `}
               </div>
-              <div class="profile-actions">
-                <span style="margin: 0 15px">
-                  <${Dropdown}>
-                    <${Copy}
-                      key=${`${this.state.hexPub}copyLink`}
-                      text=${t('copy_link')}
-                      title=${this.state.name}
-                      copyStr=${window.location.href}
-                    />
-                    <${Copy}
-                      key=${`${this.state.hexPub}copyNpub`}
-                      text=${t('copy_user_ID')}
-                      title=${this.state.name}
-                      copyStr=${this.state.npub}
-                    />
-                    <${Button} onClick=${() => this.setState({ showQR: !this.state.showQR })}
-                      >${t('show_qr_code')}<//
-                    >
-                    <${Copy}
-                      key=${`${this.state.hexPub}copyData`}
-                      text=${t('copy_raw_data')}
-                      title=${this.state.name}
-                      copyStr=${rawDataJson}
-                    />
-                    ${!this.state.isMyProfile && !Key.getPrivKey()
-                      ? html`
-                          <${Button} onClick=${(e) => this.viewAs(e)}>
-                            ${t('view_as') + ' '}
-                            <${Name} pub=${this.state.hexPub} hideBadge=${true} />
-                          <//>
-                        `
-                      : ''}
-                    ${this.state.isMyProfile
-                      ? ''
-                      : html`
-                          <${Block} id=${this.state.hexPub} />
-                          <${Report} id=${this.state.hexPub} />
-                        `}
-                  <//>
-                </span>
+              <div className="profile-actions">
+                <${Dropdown}>
+                  <${Copy}
+                    className="btn btn-sm"
+                    key=${`${this.state.hexPub}copyLink`}
+                    text=${t('copy_link')}
+                    title=${this.state.name}
+                    copyStr=${window.location.href}
+                  />
+                  <${Copy}
+                    className="btn btn-sm"
+                    key=${`${this.state.hexPub}copyNpub`}
+                    text=${t('copy_user_ID')}
+                    title=${this.state.name}
+                    copyStr=${this.state.npub}
+                  />
+                  <${Button}
+                    className="btn btn-sm"
+                    onClick=${() => this.setState({ showQR: !this.state.showQR })}
+                    >${t('show_qr_code')}<//
+                  >
+                  <${Copy}
+                    className="btn btn-sm"
+                    key=${`${this.state.hexPub}copyData`}
+                    text=${t('copy_raw_data')}
+                    title=${this.state.name}
+                    copyStr=${rawDataJson}
+                  />
+                  ${!this.state.isMyProfile && !Key.getPrivKey()
+                    ? html`
+                        <${Button} className="btn btn-sm" onClick=${(e) => this.viewAs(e)}>
+                          ${t('view_as') + ' '}
+                          <${Name} pub=${this.state.hexPub} hideBadge=${true} />
+                        <//>
+                      `
+                    : ''}
+                  ${this.state.isMyProfile
+                    ? ''
+                    : html`
+                        <${Block} className="btn btn-sm" id=${this.state.hexPub} />
+                        <${Report} className="btn btn-sm" id=${this.state.hexPub} />
+                      `}
+                <//>
               </div>
             </div>
           </div>
-          <div class="profile-header-stuff">
-            <div style="flex: 1" class="profile-name">
-              <h3 style="margin-top:5px;margin-bottom:0">
+          <div className="profile-header-stuff">
+            <div className="flex-1 profile-name">
+              <span className="text-xl">
                 <${Name} pub=${this.state.hexPub} />
-                ${this.state.nip05
-                  ? html`<br /><small class="positive"
-                        >${this.state.nip05.replace(/^_@/, '')}</small
-                      >`
-                  : ''}
-              </h3>
+              </span>
+              ${this.state.nip05
+                ? html`<br /><small className="text-iris-green"
+                      >${this.state.nip05.replace(/^_@/, '')}</small
+                    >`
+                : ''}
             </div>
-            <div class="profile-about">
-              <p class="profile-about-content">${this.state.about}</p>
-              ${this.renderLinks()}
-            </div>
-            <div class="profile-actions">
-              <div class="follow-count">
+            <div>
+              <div className="text-sm flex gap-4">
                 <a href="/follows/${this.state.npub}">
-                  <span>${this.state.followedUserCount}</span> ${t('following')}
+                  <b>${this.state.followedUserCount}</b> ${t('following')}
                 </a>
                 <a href="/followers/${this.state.npub}">
-                  <span>${this.state.followerCount}</span> ${t('followers')}
+                  <b>${this.state.followerCount}</b> ${t('followers')}
                 </a>
               </div>
               ${SocialNetwork.followedByUser.get(this.state.hexPub)?.has(Key.getPubKey())
                 ? html` <div><small>${t('follows_you')}</small></div> `
                 : ''}
+            </div>
+            <div className="py-2">
+              <p className="text-sm">${this.state.about}</p>
+              ${this.renderLinks()}
             </div>
           </div>
         </div>
@@ -257,19 +249,25 @@ class Profile extends View {
   }
 
   renderTabs() {
+    const currentProfileUrl = window.location.pathname.split('/')[1];
+    const path = window.location.pathname;
+
+    const linkClass = (href) =>
+      path === href ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-neutral';
+
     return html`
-      <div class="tabs">
-        <${Link} activeClassName="active" href="/${this.state.nostrAddress || this.state.npub}"
+      <div class="flex mx-2 md:mx-0 gap-2 mb-4 overflow-x-scroll">
+        <${Link} className="${linkClass('/' + currentProfileUrl)}" href="/${currentProfileUrl}"
           >${t('posts')} ${this.state.noPosts ? '(0)' : ''}<//
         >
         <${Link}
-          activeClassName="active"
-          href="/${this.state.nostrAddress || this.state.npub}/replies"
+          className="${linkClass('/' + currentProfileUrl + '/replies')}"
+          href="/${currentProfileUrl}/replies"
           >${t('posts')} & ${t('replies')} ${this.state.noReplies ? '(0)' : ''}<//
         >
         <${Link}
-          activeClassName="active"
-          href="/${this.state.nostrAddress || this.state.npub}/likes"
+          className="${linkClass('/' + currentProfileUrl + '/likes')}"
+          href="/${currentProfileUrl}/likes"
           >${t('likes')} ${this.state.noLikes ? '(0)' : ''}<//
         >
       </div>
@@ -282,25 +280,15 @@ class Profile extends View {
     }
     if (this.props.tab === 'replies') {
       return html`
-        <div class="public-messages-view">
-          <${Feed}
-            scrollElement=${this.scrollElement.current}
-            key="replies${this.state.hexPub}"
-            index="postsAndReplies"
-            nostrUser=${this.state.hexPub}
-          />
-        </div>
+        <${Feed}
+          key="replies${this.state.hexPub}"
+          index="postsAndReplies"
+          nostrUser=${this.state.hexPub}
+        />
       `;
     } else if (this.props.tab === 'likes') {
       return html`
-        <div class="public-messages-view">
-          <${Feed}
-            scrollElement=${this.scrollElement.current}
-            key="likes${this.state.hexPub}"
-            index="likes"
-            nostrUser=${this.state.hexPub}
-          />
-        </div>
+        <${Feed} key="likes${this.state.hexPub}" index="likes" nostrUser=${this.state.hexPub} />
       `;
     } else if (this.props.tab === 'media') {
       return html`TODO media message feed`;
@@ -308,21 +296,10 @@ class Profile extends View {
 
     return html`
       <div>
-        <div class="public-messages-view">
-          ${this.getNotification()}
-          <${Feed}
-            scrollElement=${this.scrollElement.current}
-            key="posts${this.state.hexPub}"
-            index="posts"
-            nostrUser=${this.state.hexPub}
-          />
-        </div>
+        ${this.getNotification()}
+        <${Feed} key="posts${this.state.hexPub}" index="posts" nostrUser=${this.state.hexPub} />
       </div>
     `;
-  }
-
-  onNftImgError(e) {
-    e.target.style = 'display:none';
   }
 
   renderView() {
@@ -336,11 +313,9 @@ class Profile extends View {
     }`;
     return html`
       ${this.state.banner
-        ? html`
-            <div class="profile-banner" style="background-image: url(${this.state.banner})"></div>
-          `
+        ? html` <div style="background-image: url(${this.state.banner})"></div> `
         : ''}
-      <div class="content">
+      <div className="content">
         <${Helmet}>
           <title>${title}</title>
           <meta name="description" content=${description} />
@@ -479,6 +454,7 @@ class Profile extends View {
 
   loadProfile(hexPub: string, nostrAddress?: string) {
     const isMyProfile = hexPub === Key.getPubKey();
+    localState.get('isMyProfile').put(isMyProfile);
     this.setState({ isMyProfile });
     this.followedUsers = new Set();
     this.followers = new Set();
@@ -494,6 +470,7 @@ class Profile extends View {
   componentWillUnmount() {
     super.componentWillUnmount();
     this.unsub?.();
+    localState.get('isMyProfile').put(false);
   }
 
   componentDidUpdate(_prevProps, prevState) {

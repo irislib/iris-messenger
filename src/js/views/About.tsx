@@ -13,9 +13,9 @@ class About extends Component {
     return (
       <>
         <Header />
-        <div className="main-view" id="settings">
-          <div className="centered-container mobile-padding15">
-            <h2>{t('about')}</h2>
+        <div className="main-view prose" id="settings">
+          <div className="p-2">
+            <h2 className="mt-0">{t('about')}</h2>
             <p>Iris is like the social networking apps we're used to, but better:</p>
             <ul>
               <li>
@@ -90,12 +90,12 @@ class About extends Component {
             <p>{t('application_security_warning')}</p>
 
             <h3>Follow</h3>
-            <div className="profile-link-container">
-              <a href={`/${IRIS_INFO_ACCOUNT}`} className="profile-link">
+            <div className="flex flex-row items-center">
+              <a href={`/${IRIS_INFO_ACCOUNT}`} className="flex flex-row items-center">
                 <Identicon str={IRIS_INFO_ACCOUNT} width={40} />
                 <Name pub={IRIS_INFO_ACCOUNT} placeholder="Iris" />
               </a>
-              <Follow id={IRIS_INFO_ACCOUNT} />
+              <Follow className="btn btn-neutral btn-sm" id={IRIS_INFO_ACCOUNT} />
             </div>
 
             <p>
@@ -103,7 +103,7 @@ class About extends Component {
             </p>
 
             <a href="https://opencollective.com/iris-social/donate" target="_blank">
-              <img src="/assets/img/opencollective.png" width={200} />
+              <img src="/img/opencollective.png" width={200} />
             </a>
 
             <p>

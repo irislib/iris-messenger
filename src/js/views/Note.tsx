@@ -32,7 +32,7 @@ class Note extends View {
     let content;
     if (this.props.id === 'new') {
       content = (
-        <div className="mar-top15">
+        <div className="m-2">
           <PublicMessageForm
             placeholder={t('whats_on_your_mind')}
             forceAutofocusMobile={true}
@@ -52,7 +52,7 @@ class Note extends View {
         />
       );
     }
-    return <div className="centered-container">{content}</div>;
+    return <div className="w-full md:w-3/4">{content}</div>;
   }
 }
 

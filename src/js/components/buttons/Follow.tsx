@@ -3,10 +3,9 @@ import Key from '../../nostr/Key';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
 
-import { Button } from './Button';
-
 type Props = {
   id: string;
+  className?: string;
 };
 
 class Follow extends Component<Props> {
@@ -24,7 +23,16 @@ class Follow extends Component<Props> {
     this.action = t('follow_btn');
     this.actionDone = t('following_btn');
     this.hoverAction = t('unfollow_btn');
+    this.state = { ...this.state, hover: false };
   }
+
+  handleMouseEnter = () => {
+    this.setState({ hover: true });
+  };
+
+  handleMouseLeave = () => {
+    this.setState({ hover: false });
+  };
 
   onClick(e) {
     e.preventDefault();
@@ -52,14 +60,28 @@ class Follow extends Component<Props> {
   }
 
   render() {
+    const isFollowed = this.state[this.key];
+    const isHovering = this.state.hover;
+
+    let buttonText;
+
+    if (isFollowed && isHovering) {
+      buttonText = this.hoverAction;
+    } else if (isFollowed && !isHovering) {
+      buttonText = this.actionDone;
+    } else {
+      buttonText = this.action;
+    }
+
     return (
-      <Button
-        className={`${this.cls || this.key} ${this.state[this.key] ? this.activeClass : ''}`}
+      <button
+        className={`btn ${this.props.className || this.key} ${isFollowed ? this.activeClass : ''}`}
         onClick={(e) => this.onClick(e)}
+        onMouseEnter={this.handleMouseEnter} // handle hover state
+        onMouseLeave={this.handleMouseLeave} // handle hover state
       >
-        <span className="nonhover">{t(this.state[this.key] ? this.actionDone : this.action)}</span>
-        <span className="hover">{t(this.hoverAction)}</span>
-      </Button>
+        {t(buttonText)}
+      </button>
     );
   }
 }

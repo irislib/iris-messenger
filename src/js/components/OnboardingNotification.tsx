@@ -8,7 +8,6 @@ import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
-import { Button, PrimaryButton } from './buttons/Button';
 import Copy from './buttons/Copy';
 import Follow from './buttons/Follow';
 import QRModal from './modal/QRModal';
@@ -70,32 +69,37 @@ export default class OnboardingNotification extends Component {
 
   renderFollowSuggestions() {
     return (
-      <div style="display:flex;flex-direction:column;flex:1">
-        <p>{t('follow_someone_info')}</p>
+      <div className="flex flex-col flex-grow  gap-2">
+        <p className="text-base">{t('follow_someone_info')}</p>
         {SUGGESTED_FOLLOWS.map(([pub, description]) => (
-          <div class="profile-link-container">
-            <a href={`/${pub}`} className="profile-link">
-              <div>
+          <div className="flex items-center space-x-4">
+            <a href={`/${pub}`} className="flex flex-grow items-center space-x-2">
+              <div className="w-10 h-10">
                 <Identicon str={pub} width={40} />
               </div>
-              <div style="flex: 1">
+              <div className="flex-grow">
                 <Name pub={pub} placeholder="Suggested follow" />
-                <br />
-                <small>{description}</small>
+                <p className="text-sm text-gray-500">{description}</p>
               </div>
             </a>
             <Follow id={pub} />
           </div>
         ))}
-        <p>
-          <PrimaryButton onClick={() => localState.get('showFollowSuggestions').put(false)}>
+        <p className="my-2">
+          <button
+            className="btn btn-primary"
+            onClick={() => localState.get('showFollowSuggestions').put(false)}
+          >
             {t('done')}
-          </PrimaryButton>
+          </button>
         </p>
-        <p>
+        <p className="text-base">
           {t('alternatively')}
           <i> </i>
-          <a href={`/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}`}>
+          <a
+            href={`/${Key.toNostrBech32Address(Key.getPubKey(), 'npub')}`}
+            className="text-blue-500 hover:underline"
+          >
             {t('give_your_profile_link_to_someone')}
           </a>
           .
@@ -111,10 +115,16 @@ export default class OnboardingNotification extends Component {
           <XMarkIcon width={24} />
         </CloseIconWrapper>
         <p>{t('no_followers_yet')}</p>
-        <p>
-          <Copy text={t('copy_link')} copyStr={Helpers.getMyProfileLink()} />
-          <Button onClick={() => this.setState({ showQrModal: true })}>{t('show_qr_code')}</Button>
-        </p>
+        <div className="flex gap-2 my-2">
+          <Copy
+            className="btn btn-neutral"
+            text={t('copy_link')}
+            copyStr={Helpers.getMyProfileLink()}
+          />
+          <button className="btn btn-neutral" onClick={() => this.setState({ showQrModal: true })}>
+            {t('show_qr_code')}
+          </button>
+        </div>
         <small>{t('no_followers_yet_info')}</small>
         {this.state.showQrModal && (
           <QRModal onClose={() => this.setState({ showQrModal: false })} pub={Key.getPubKey()} />
@@ -129,12 +139,15 @@ export default class OnboardingNotification extends Component {
         <div>
           <p>Get your own iris.to/username?</p>
           <p>
-            <PrimaryButton onClick={() => route('/settings/iris_account')}>
+            <button className="btn btn-primary" onClick={() => route('/settings/iris_account')}>
               Yes please
-            </PrimaryButton>
-            <PrimaryButton onClick={() => localState.get('showNoIrisToAddress').put(false)}>
+            </button>
+            <button
+              className="btn btn-neutral"
+              onClick={() => localState.get('showNoIrisToAddress').put(false)}
+            >
               No thanks
-            </PrimaryButton>
+            </button>
           </p>
         </div>
       );

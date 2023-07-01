@@ -8,24 +8,31 @@ import {
   Cog8ToothIcon as Cog8ToothIconFull,
   HomeIcon as HomeIconFull,
   InformationCircleIcon as InformationCircleIconFull,
+  MagnifyingGlassIcon,
   PaperAirplaneIcon as PaperAirplaneIconFull,
+  PlusIcon,
 } from '@heroicons/react/24/solid';
-import { route } from 'preact-router';
+import { Link, route } from 'preact-router';
 
-import logo from '../../../public/img/icon128.png';
 import BaseComponent from '../BaseComponent';
 import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 import { translate as t } from '../translations/Translation.mjs';
 
-import { Button, PrimaryButton } from './buttons/Button';
 import Modal from './modal/Modal';
-import QRModal from './modal/QRModal';
+import Identicon from './Identicon';
+import Name from './Name';
 import PublicMessageForm from './PublicMessageForm';
 
 const APPLICATIONS = [
   { url: '/', text: 'home', icon: HomeIcon, activeIcon: HomeIconFull },
+  {
+    url: '/search',
+    text: 'search',
+    icon: MagnifyingGlassIcon,
+    activeIcon: Icons.magnifyingGlassBold,
+  },
   {
     url: '/chat',
     text: 'messages',
@@ -52,7 +59,6 @@ export default class Menu extends BaseComponent {
     activeRoute: '',
     showBetaFeatures: false,
     showNewPostModal: false,
-    showQrModal: false,
   };
 
   componentDidMount() {
@@ -98,24 +104,32 @@ export default class Menu extends BaseComponent {
       ''
     );
 
-  renderQrModal = () =>
-    this.state.showQrModal ? (
-      <QRModal pub={Key.getPubKey()} onClose={() => this.setState({ showQrModal: false })} />
-    ) : (
-      ''
+  renderProfileLink = () => {
+    const hex = Key.getPubKey();
+    const npub = Key.toNostrBech32Address(hex, 'npub');
+    return (
+      <div>
+        <Link href={`/${npub}`} className="btn btn-ghost md:max-lg:btn-circle">
+          <Identicon str={hex} width={34} />
+          <div className="hidden lg:block ml-2">
+            <Name pub={hex} hideBadge={true} />
+          </div>
+        </Link>
+      </div>
     );
+  };
 
   render() {
     return (
-      <div class="application-list">
+      <div className="sticky top-0 z-20 h-screen max-h-screen hidden md:w-16 lg:w-56 flex-col px-2 py-4 md:flex flex-shrink-0">
         <a
+          className="flex items-center gap-3 px-2 mb-4"
           tabIndex={3}
           href="/"
           onClick={(e) => this.menuLinkClicked(e, undefined, true)}
-          class="logo"
         >
-          <img src={logo} width="30" height="30" />
-          <span style="font-size: 1.8em">iris</span>
+          <img src="/img/icon128.png" width="30" height="30" />
+          <h1 className="hidden lg:flex text-3xl">iris</h1>
         </a>
         {APPLICATIONS.map((a: any) => {
           if (a.url && (!a.beta || this.state.showBetaFeatures)) {
@@ -125,35 +139,37 @@ export default class Menu extends BaseComponent {
             }
             const Icon = isActive ? a.activeIcon : a.icon;
             return (
-              <a
-                onClick={(e) => this.menuLinkClicked(e, a)}
-                className={isActive ? 'active' : ''}
-                href={a.url}
-              >
-                <span class="icon">
+              <div>
+                <a
+                  onClick={(e) => this.menuLinkClicked(e, a)}
+                  className={`${
+                    isActive ? 'active' : ''
+                  } inline-flex w-auto flex items-center space-x-4 p-3 rounded-full transition-colors duration-200 hover:bg-neutral-900`}
+                  href={a.url}
+                >
                   {a.text === 'messages' && this.state.unseenMsgsTotal ? (
                     <span class="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
                   ) : (
                     ''
                   )}
                   <Icon width={24} />
-                </span>
-                <span class="text">{t(a.text)}</span>
-              </a>
+                  <span className="hidden lg:flex">{t(a.text)}</span>
+                </a>
+              </div>
             );
           }
         })}
-        <div class="menu-new-post">
-          <PrimaryButton
+        <div class="py-2 flex-1">
+          <button
+            className="btn btn-primary md:max-lg:btn-circle"
             onClick={() => this.setState({ showNewPostModal: !this.state.showNewPostModal })}
           >
-            <span class="icon">{Icons.post}</span>
-          </PrimaryButton>
-          <Button onClick={() => this.setState({ showQrModal: !this.state.showQrModal })}>
-            <span class="icon">{Icons.QRcode}</span>
-          </Button>
-          {this.renderNewPostModal()} {this.renderQrModal()}
+            <PlusIcon width={24} />
+            <span className="hidden lg:flex">{t('new_post')}</span>
+          </button>
+          {this.renderNewPostModal()}
         </div>
+        {this.renderProfileLink()}
       </div>
     );
   }

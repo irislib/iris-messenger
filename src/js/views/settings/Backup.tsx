@@ -1,5 +1,4 @@
 import Component from '../../BaseComponent';
-import { PrimaryButton as Button } from '../../components/buttons/Button';
 import Copy from '../../components/buttons/Copy';
 import Follow from '../../components/buttons/Follow';
 import Identicon from '../../components/Identicon';
@@ -49,7 +48,8 @@ export default class Backup extends Component {
             {t('profile')} & {t('follows')}:
           </p>
           <p>
-            <Button
+            <button
+              className="btn btn-sm btn-neutral"
               onClick={() =>
                 this.onClickDownload('nostr-my-profile-and-follows.json', () =>
                   this.profileExportJson(),
@@ -57,7 +57,7 @@ export default class Backup extends Component {
               }
             >
               {t('download')}
-            </Button>
+            </button>
             <Copy
               key={`${this.state.hexPub}copyData`}
               text={t('copy_raw_data')}
@@ -66,23 +66,27 @@ export default class Backup extends Component {
           </p>
           <p>{t('your_events')}:</p>
           <p>
-            <Button
+            <button
+              className="btn btn-sm btn-neutral"
               onClick={() =>
                 this.onClickDownload('nostr-my-events.json', () => this.exportMyEvents())
               }
             >
               {this.state.downloadMyEventsMessage || t('download')}
-            </Button>
+            </button>
           </p>
           {this.state.saveMessage && <p>{this.state.saveMessage}</p>}
           {this.state.saveError && <p class="warning">{this.state.saveError}</p>}
 
           <h3>{t('load')}</h3>
           <p>
-            <Button onClick={() => this.onUploadJsonClick()}>Upload .json file</Button>
+            <button className="btn btn-sm btn-neutral" onClick={() => this.onUploadJsonClick()}>
+              Upload .json file
+            </button>
           </p>
           <p>
             <textarea
+              className="textarea"
               onInput={(e) => this.import((e.target as HTMLTextAreaElement).value)}
               placeholder={t('paste_event_json')}
             ></textarea>

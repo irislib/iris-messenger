@@ -22,10 +22,17 @@ const ProfilePicture = ({ picture, onError }: Props) => {
 
   return (
     <>
-      <SafeImg class="profile-picture" src={picture} onError={onError} onClick={handleClick} />
+      <SafeImg
+        width={128}
+        square={true}
+        className="rounded-full"
+        src={picture}
+        onError={onError}
+        onClick={handleClick}
+      />
       {showModal && (
         <Modal centerVertically={true} onClose={handleClose}>
-          <SafeImg src={picture} onError={onError} />
+          <SafeImg width={128} square={true} src={picture} onError={onError} />
         </Modal>
       )}
     </>

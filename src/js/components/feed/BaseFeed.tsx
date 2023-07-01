@@ -9,14 +9,12 @@ import Key from '../../nostr/Key';
 import PubSub, { Unsubscribe } from '../../nostr/PubSub';
 import SocialNetwork from '../../nostr/SocialNetwork';
 import { translate as t } from '../../translations/Translation.mjs';
-import { PrimaryButton as Button } from '../buttons/Button';
 import ErrorBoundary from '../ErrorBoundary';
 import EventComponent from '../events/EventComponent';
 
 import FeedSettings from './FeedSettings';
 import FeedTypeSelector from './FeedTypeSelector';
 import ImageGrid from './ImageGrid';
-import Label from './Label';
 import SortedEventMap from './SortedEventMap';
 import { FeedProps, FeedState } from './types';
 
@@ -127,48 +125,28 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   handleScroll = () => {
     // increase page size when scrolling down
     if (this.state.displayCount < this.state.sortedEvents.length) {
-      if (
-        this.props.scrollElement &&
-        this.props.scrollElement.scrollTop + this.props.scrollElement.clientHeight >=
-          this.props.scrollElement.scrollHeight - 1000
-      ) {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const clientHeight = document.documentElement.clientHeight;
+      const scrollHeight = document.documentElement.scrollHeight;
+
+      if (scrollTop + clientHeight >= scrollHeight - 1000) {
         // TODO load more events
         this.setState({
-          displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
+          displayCount: this.state.displayCount + INITIAL_PAGE_SIZE, // TODO FIX!
         });
+        console.log('load more events', this.state.displayCount);
       }
-    }
-    this.checkScrollPosition();
-  };
-
-  checkScrollPosition = () => {
-    // if scrolled past this.base element's start, apply fixedTop class to it
-    if (!this.props.scrollElement) {
-      return;
-    }
-    const showNewMsgsFixedTop =
-      this.props.scrollElement.scrollTop > (this.base as HTMLElement).offsetTop - 60;
-    if (showNewMsgsFixedTop !== this.state.showNewMsgsFixedTop) {
-      this.setState({ showNewMsgsFixedTop });
     }
   };
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    if (this.props.scrollElement) {
-      this.props.scrollElement.removeEventListener('scroll', this.handleScroll);
-    }
+    window.removeEventListener('scroll', this.handleScroll);
     this.unsub && this.unsub();
   }
 
-  addScrollHandler() {
-    if (this.props.scrollElement) {
-      this.props.scrollElement.addEventListener('scroll', this.handleScroll);
-    }
-  }
-
   componentDidMount() {
-    this.addScrollHandler();
+    window.addEventListener('scroll', this.handleScroll);
     this.subscribe();
     if (isEqual(this.state.settings, DEFAULT_SETTINGS)) {
       // no settings saved in history state, load from localstorage
@@ -185,7 +163,7 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
     let first = true;
     localState.get('scrollUp').on(
       this.sub(() => {
-        !first && Helpers.animateScrollTop('.main-view');
+        !first && Helpers.animateScrollTop();
         first = false;
       }),
     );
@@ -281,17 +259,17 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   );
 
   componentDidUpdate(prevProps, prevState) {
-    if (!prevProps.scrollElement && this.props.scrollElement) {
-      this.addScrollHandler();
-    }
-    if (!isEqual(prevState.settings, this.state.settings)) {
+    if (
+      prevState.settings?.showReplies !== this.state.settings?.showReplies ||
+      prevState.settings?.display !== this.state.settings?.display
+    ) {
       this.setState({ displayCount: INITIAL_PAGE_SIZE });
       this.subscribe();
     }
     this.handleScroll();
     this.replaceState();
     if (!this.state.queuedEvents.length && prevState.queuedEvents.length) {
-      Helpers.animateScrollTop('.main-view');
+      Helpers.animateScrollTop();
     }
     if (this.props.filter !== prevProps.filter || this.props.keyword !== prevProps.keyword) {
       this.setState({ sortedEvents: [] });
@@ -310,18 +288,17 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
       eventsShownTime: Math.floor(Date.now() / 1000),
       displayCount: INITIAL_PAGE_SIZE,
     });
+    Helpers.animateScrollTop();
   }
 
   renderShowNewEvents() {
     return (
-      <div
-        className={`msg ${this.state.showNewMsgsFixedTop ? 'fixedTop' : ''}`}
-        onClick={() => this.showQueuedEvents()}
-      >
-        <div className="msg-content notification-msg colored">
-          <div style="height: 27.5px; line-height: 27.5px">
-            {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
-          </div>
+      <div className="fixed bottom-16 md:bottom-8 justify-center items-center z-10 flex w-full md:w-1/2">
+        <div
+          className="btn btn-sm opacity-90 hover:opacity-100 hover:bg-iris-blue bg-iris-blue text-white"
+          onClick={() => this.showQueuedEvents()}
+        >
+          {t('show_n_new_messages').replace('{n}', this.state.queuedEvents.length)}
         </div>
       </div>
     );
@@ -329,17 +306,16 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
 
   renderShowMore() {
     return (
-      <p>
-        <Button
-          onClick={() =>
-            this.setState({
-              displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
-            })
-          }
-        >
-          {t('show_more')}
-        </Button>
-      </p>
+      <button
+        className="btn btn-neutral btn-sm my-4"
+        onClick={() =>
+          this.setState({
+            displayCount: this.state.displayCount + INITIAL_PAGE_SIZE,
+          })
+        }
+      >
+        {t('show_more')}
+      </button>
     );
   }
 
@@ -360,58 +336,69 @@ class Feed extends BaseComponent<FeedProps, FeedState> {
   }
 
   render() {
-    if (!this.props.scrollElement || this.unmounted) {
+    if (this.unmounted) {
       return;
     }
     const displayCount = this.state.displayCount;
     const showRepliedMsg = this.props.index !== 'likes' && !this.props.keyword;
-    const showQueuedEvents = this.state.queuedEvents.length && !this.state.settingsOpen;
-    const feedName =
-      !showQueuedEvents &&
-      {
-        global: 'global_feed',
-        follows: 'following',
-        notifications: 'notifications',
-      }[this.props.index || 'global'];
-
+    const showQueuedEvents = this.state.queuedEvents.length > 0 && !this.state.settingsOpen;
     const renderAs = this.state.settings.display === 'grid' ? 'NoteImage' : null;
     const events = this.renderEvents(displayCount, renderAs, showRepliedMsg);
+
     return (
-      <div className="msg-feed">
-        <div>
-          {showQueuedEvents ? this.renderShowNewEvents() : null}
-          {feedName ? (
-            <Label
-              feedName={feedName}
-              onClickSettings={() => this.setState({ settingsOpen: !this.state.settingsOpen })}
-              index={this.props.index}
-              settingsOpen={this.state.settingsOpen}
-            />
-          ) : null}
-          {this.props.index !== 'notifications' && this.state.settingsOpen && (
-            <FeedSettings
-              settings={this.state.settings}
-              onChange={(settings) => this.setState({ settings })}
-            />
-          )}
-          {this.props.index !== 'notifications' && (
-            <FeedTypeSelector
-              index={this.props.index}
-              display={this.state.settings.display}
-              setDisplay={(display) =>
-                this.setState({ settings: { ...this.state.settings, display } })
+      <div className="mb-4">
+        {showQueuedEvents && this.renderShowNewEvents()}
+        {this.props.index !== 'notifications' && this.state.settingsOpen && (
+          <FeedSettings
+            settings={this.state.settings}
+            onChange={(settings) => this.setState({ settings })}
+          />
+        )}
+        {['global', 'follows'].includes(this.props?.index || '') && (
+          <div className="flex items-center my-2">
+            <div
+              className={`btn btn-sm  mr-2 ${
+                this.state.settings.showReplies ? 'btn-neutral' : 'btn-primary'
+              }`}
+              onClick={() =>
+                this.setState({ settings: { ...this.state.settings, showReplies: false } })
               }
-            />
-          )}
-          {events.length === 0 && (
-            <div className="msg">
-              <div className="msg-content notification-msg">
-                {this.props.emptyMessage || t('no_events_yet')}
-              </div>
+            >
+              {t('posts')}
             </div>
-          )}
-          {renderAs === 'NoteImage' ? <ImageGrid>{events}</ImageGrid> : events}
-        </div>
+            <div
+              className={`btn btn-sm ${
+                this.state.settings.showReplies ? 'btn-primary' : 'btn-neutral'
+              }`}
+              onClick={() =>
+                this.setState({ settings: { ...this.state.settings, showReplies: true } })
+              }
+            >
+              {t('posts_and_replies')}
+            </div>
+          </div>
+        )}
+        {this.props.index !== 'notifications' && (
+          <FeedTypeSelector
+            index={this.props.index}
+            display={this.state.settings.display}
+            setDisplay={(display) =>
+              this.setState({ settings: { ...this.state.settings, display } })
+            }
+          />
+        )}
+        {events.length === 0 && (
+          <div className="msg">
+            <div className="msg-content notification-msg">
+              {this.props.emptyMessage || t('no_events_yet')}
+            </div>
+          </div>
+        )}
+        {renderAs === 'NoteImage' ? (
+          <ImageGrid>{events}</ImageGrid>
+        ) : (
+          <div className="w-full md:w-3/4">{events}</div>
+        )}
         {displayCount < this.state.sortedEvents.length ? this.renderShowMore() : ''}
       </div>
     );

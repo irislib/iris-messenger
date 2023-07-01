@@ -170,6 +170,7 @@ export default {
       replacedText = reactStringReplace(replacedText, videoRegex, (match, i) => {
         return (
           <video
+            className="my-2 rounded max-h-[70vh] md:max-h-96 max-w-full"
             key={match + i}
             src={match}
             poster={`https://imgproxy.iris.to/thumbnail/428/${match}`}
@@ -506,9 +507,12 @@ export default {
       const imgRegex = /(https?:\/\/[^\s]*\.(?:jpg|jpeg|gif|png|webp))/gi;
       replacedText = reactStringReplace(replacedText, imgRegex, (match, i) => {
         return (
-          <div className="img-container">
-            <SafeImg onClick={opts.onImageClick} width={569} src={match} key={match + i} />
-          </div>
+          <SafeImg
+            className="my-2 md:rounded max-h-[70vh] md:max-h-96 max-w-full cursor-pointer"
+            onClick={opts.onImageClick}
+            src={match}
+            key={match + i}
+          />
         );
       });
     }
@@ -555,7 +559,7 @@ export default {
       return (
         <>
           {' '}
-          <a href={link}>
+          <a href={link} className="link">
             @<Name key={match + i} pub={match} hideBadge={true} />
           </a>
         </>
@@ -570,7 +574,7 @@ export default {
           return (
             <>
               {' '}
-              <a href={`/${data.pubkey}`}>
+              <a href={`/${data.pubkey}`} className="link">
                 @<Name key={match + i} pub={data.pubkey} hideBadge={true} />
               </a>
             </>
@@ -591,7 +595,9 @@ export default {
       return (
         <>
           {' '}
-          <a href={link}>{match}</a>
+          <a href={link} className="link">
+            {match}
+          </a>
         </>
       );
     });
@@ -605,6 +611,7 @@ export default {
         return (
           <a
             key={match + i}
+            className="link"
             target="_blank"
             onClick={(e) => {
               if (isIris) {
@@ -834,14 +841,14 @@ export default {
     }
   }, 100),
 
-  animateScrollTop: (selector: string): void => {
-    const el = $(selector);
+  animateScrollTop: (selector?: string): void => {
+    const el = selector ? $(selector) : $(window);
     el.css({ overflow: 'hidden' });
     setTimeout(() => {
       el.css({ overflow: '' });
       el.on('scroll mousedown wheel DOMMouseScroll mousewheel keyup touchstart', (e) => {
         if (
-          (e.which && e.which > 0) ||
+          e.which > 0 ||
           e.type === 'mousedown' ||
           e.type === 'mousewheel' ||
           e.type === 'touchstart'

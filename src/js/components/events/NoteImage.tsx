@@ -36,6 +36,10 @@ function VideoIcon({ attachment }): JSX.Element {
   );
 }
 
+const HiddenImg = styled.img`
+  display: none;
+`;
+
 const GalleryImage = styled.a`
   position: relative;
   aspect-ratio: 1;
@@ -46,6 +50,8 @@ const GalleryImage = styled.a`
   background-image: url(${(props) =>
     props.attachment?.type === 'video'
       ? `https://imgproxy.iris.to/thumbnail/428/${props.attachment.url}`
+      : props.proxyError
+      ? `${props.attachment.url}`
       : `https://imgproxy.iris.to/insecure/rs:fill:428:428/plain/${props.attachment.url}`});
   & .dropdown {
     position: absolute;
@@ -79,6 +85,15 @@ const GalleryImage = styled.a`
 
 function NoteImage(props: { event: Event; fadeIn?: boolean }) {
   const [showImageModal, setShowImageModal] = useState(-1);
+  const [proxyError, setProxyError] = useState<boolean[]>([]);
+
+  const handleProxyError = (index) => {
+    setProxyError((prevState) => {
+      const newState = [...prevState];
+      newState[index] = true;
+      return newState;
+    });
+  };
 
   if (props.event.kind !== 1) {
     const id = Events.getEventReplyingTo(props.event);
@@ -124,9 +139,16 @@ function NoteImage(props: { event: Event; fadeIn?: boolean }) {
             onClick={(e) => onClick(e, i)}
             attachment={attachment}
             fadeIn={props.fadeIn}
+            proxyError={proxyError[i]}
           >
             <VideoIcon attachment={attachment} />
           </GalleryImage>
+          {attachment.type === 'image' && (
+            <HiddenImg
+              src={`https://imgproxy.iris.to/insecure/rs:fill:428:428/plain/${attachment.url}`}
+              onError={() => handleProxyError(i)}
+            />
+          )}
           {showImageModal === i && (
             <NoteImageModal
               attachment={attachment}

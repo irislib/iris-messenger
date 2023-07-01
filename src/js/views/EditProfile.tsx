@@ -2,7 +2,6 @@ import { debounce } from 'lodash';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
-import { PrimaryButton as Button } from '../components/buttons/Button';
 import Upload from '../components/buttons/Upload';
 import Header from '../components/Header';
 import SafeImg from '../components/SafeImg';
@@ -92,7 +91,7 @@ export default class EditProfile extends Component {
       <>
         <Header />
         <div class="main-view" id="settings">
-          <div class="centered-container" style="width: 650px;padding: 15px;">
+          <div class="centered-container prose">
             <h3>{t('edit_profile')}</h3>
             <form onSubmit={(e) => this.handleSubmit(e)}>
               {fields.map((field) => {
@@ -103,7 +102,7 @@ export default class EditProfile extends Component {
                     <label htmlFor={field}>{explainers[field] || field}:</label>
                     <br />
                     <input
-                      style={{ 'margin-top': '5px', width: '100%' }}
+                      className="input w-full"
                       type="text"
                       id={field}
                       disabled={!isString}
@@ -134,7 +133,9 @@ export default class EditProfile extends Component {
                 );
               })}
               <p>
-                <Button type="submit">Save</Button>
+                <button className="btn btn-primary" type="submit">
+                  Save
+                </button>
               </p>
             </form>
 
@@ -147,7 +148,8 @@ export default class EditProfile extends Component {
                   value={this.state.newFieldName}
                   type="text"
                   id="newFieldName"
-                  style={{ 'margin-top': '5px', width: '100%' }}
+                  className="input w-full"
+                  placeholder={t('field_name')}
                   onInput={(e) =>
                     this.setState({
                       newFieldName: (e.target as HTMLInputElement).value,
@@ -162,7 +164,8 @@ export default class EditProfile extends Component {
                   value={this.state.newFieldValue}
                   type="text"
                   id="newFieldValue"
-                  style={{ 'margin-top': '5px', width: '100%' }}
+                  className="input w-full"
+                  placeholder={t('field_value')}
                   onInput={(e) =>
                     this.setState({
                       newFieldValue: (e.target as HTMLInputElement).value,
@@ -171,7 +174,9 @@ export default class EditProfile extends Component {
                 />
               </p>
               <p>
-                <Button type="submit">Add new attribute</Button>
+                <button className="btn btn-primary" type="submit">
+                  Add new attribute
+                </button>
               </p>
             </form>
           </div>

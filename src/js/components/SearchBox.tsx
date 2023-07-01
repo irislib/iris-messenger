@@ -99,6 +99,7 @@ class SearchBox extends Component<Props, State> {
           $(this.base).find('input').blur();
         }
       });
+    this.props.focus && $(this.base).find('input')?.focus();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -238,7 +239,7 @@ class SearchBox extends Component<Props, State> {
 
   render() {
     return (
-      <div class={`search-box ${this.props.class}`}>
+      <div className={`relative ${this.props.class}`}>
         {this.props.resultsOnly ? (
           ''
         ) : (
@@ -252,20 +253,25 @@ class SearchBox extends Component<Props, State> {
                 placeholder={t('search')}
                 tabIndex={1}
                 onInput={() => this.onInput()}
+                className="input-bordered border-neutral-500 input input-sm w-64"
               />
             </label>
           </form>
         )}
         <div
           onKeyUp={(e) => this.onKeyUp(e)}
-          class="search-box-results"
-          style="left: ${this.state.offsetLeft || ''}"
+          className={`${
+            this.state.query ? '' : 'hidden'
+          } absolute z-20 left-0 mt-2 w-full bg-black border border-neutral-700 rounded shadow-lg`}
         >
           {this.state.query && !this.props.resultsOnly ? (
             <a
               onFocus={(e) => this.onResultFocus(e, -1)}
               tabIndex={2}
-              className={'result ' + (-1 === this.state.selected ? 'selected' : '')}
+              className={
+                'p-2 cursor-pointer flex gap-2 items-center result ' +
+                (-1 === this.state.selected ? 'selected bg-neutral-700' : '')
+              }
               href={`/search/${encodeURIComponent(this.state.query)}`}
             >
               <div class="identicon-container">
@@ -297,14 +303,15 @@ class SearchBox extends Component<Props, State> {
               <a
                 onFocus={(e) => this.onResultFocus(e, index)}
                 tabIndex={2}
-                className={'result ' + (index === this.state.selected ? 'selected' : '')}
+                className={
+                  'p-2 cursor-pointer flex gap-2 items-center result ' +
+                  (index === this.state.selected ? 'selected bg-neutral-700' : '')
+                }
                 href={`/${npub}`}
                 onClick={(e) => this.onClick(e, i)}
               >
                 {i.picture ? (
-                  <div class="identicon-container">
-                    <SafeImg src={i.picture} class="round-borders" width={40} />
-                  </div>
+                  <SafeImg src={i.picture} className="rounded-full" width={40} />
                 ) : (
                   <Identicon key={`${npub}ic`} str={npub} width={40} />
                 )}

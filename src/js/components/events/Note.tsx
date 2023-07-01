@@ -16,7 +16,7 @@ import Torrent from '../Torrent';
 
 import EventComponent from './EventComponent';
 import EventDropdown from './EventDropdown';
-import Reactions from './Reactions';
+import Reactions from './ReactionButtons';
 
 const MSG_TRUNCATE_LENGTH = 500;
 const MSG_TRUNCATE_LINES = 8;
@@ -167,13 +167,15 @@ const Note = ({
 
   function renderDropdown() {
     return asInlineQuote ? null : (
-      <EventDropdown id={event.id} event={event} onTranslate={setTranslatedText} />
+      <div className="flex-1 flex items-center justify-end">
+        <EventDropdown id={event.id} event={event} onTranslate={setTranslatedText} />
+      </div>
     );
   }
 
   function renderReplyingTo() {
     return (
-      <small className="msg-replying-to">
+      <small className="text-neutral-500">
         {t('replying_to') + ' '}
         {replyingToUsers.slice(0, 3).map((u) => (
           <a href={`/${Key.toNostrBech32Address(u, 'npub')}`}>
@@ -206,9 +208,12 @@ const Note = ({
 
   function renderShowThread() {
     return (
-      <div style={{ flexBasis: '100%', marginBottom: '12px' }}>
-        <a href={`/${Key.toNostrBech32Address(rootMsg || '', 'note')}`}>{t('show_thread')}</a>
-      </div>
+      <a
+        className="text-iris-blue text-sm block mb-2"
+        href={`/${Key.toNostrBech32Address(rootMsg || '', 'note')}`}
+      >
+        {t('show_thread')}
+      </a>
     );
   }
 
@@ -233,7 +238,7 @@ const Note = ({
 
   function renderIdenticon() {
     return (
-      <div className="msg-identicon">
+      <span className="flex flex-col items-center flex-shrink-0 mr-2">
         {event.pubkey ? (
           <a href={`/${event.pubkey}`}>
             <Identicon str={Key.toNostrBech32Address(event.pubkey, 'npub')} width={40} />
@@ -241,30 +246,28 @@ const Note = ({
         ) : (
           ''
         )}
-        {(isQuote && !standalone && <div className="line"></div>) || ''}
-      </div>
+        {isQuote && !standalone && <div className="border-l-2 border-neutral-700 h-full"></div>}
+      </span>
     );
   }
 
   function renderMsgSender() {
     return (
-      <div className="msg-sender">
-        <div className="msg-sender-link">
-          {fullWidth && renderIdenticon()}
-          <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="msgSenderName">
-            <Name pub={event.pubkey} />
+      <div className="flex items-center gap-2 justify-between">
+        {fullWidth && renderIdenticon()}
+        <a href={`/${Key.toNostrBech32Address(event.pubkey, 'npub')}`} className="font-bold">
+          <Name pub={event.pubkey} />
+        </a>
+        <small>
+          {'· '}
+          <a
+            href={`/${Key.toNostrBech32Address(event.id, 'note')}`}
+            className="tooltip text-neutral-500"
+            data-tip={`${dateStr} ${timeStr}`}
+          >
+            {time && Helpers.getRelativeTimeText(time)}
           </a>
-          <div className="time">
-            {'· '}
-            <a href={`/${Key.toNostrBech32Address(event.id, 'note')}`} className="tooltip">
-              {time && Helpers.getRelativeTimeText(time)}
-              <span className="tooltiptext">
-                {' '}
-                {dateStr} {timeStr}{' '}
-              </span>
-            </a>
-          </div>
-        </div>
+        </small>
         {renderDropdown()}
       </div>
     );
@@ -273,10 +276,14 @@ const Note = ({
   function getClassName() {
     const classNames = ['msg'];
 
-    if (standalone) classNames.push('standalone');
-    if (isQuote) classNames.push('quote');
-    if (isQuoting) classNames.push('quoting');
-    if (asInlineQuote) classNames.push('inline-quote');
+    if (standalone) {
+      classNames.push('standalone');
+    } else {
+      classNames.push('cursor-pointer');
+    }
+    if (isQuote) classNames.push('quote pb-2');
+    if (isQuoting) classNames.push('quoting pt-0');
+    if (asInlineQuote) classNames.push('inline-quote border-2 border-neutral-900 rounded-lg my-2');
     if (fullWidth) classNames.push('full-width');
 
     return classNames.join(' ');
@@ -304,17 +311,21 @@ const Note = ({
   return (
     <>
       {meta.replyingTo && showRepliedMsg && renderRepliedMsg()}
-      <div key={event.id + 'note'} className={getClassName()} onClick={(e) => messageClicked(e)}>
-        <div className="msg-content" onClick={(e) => messageClicked(e)}>
-          {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
+      <div
+        key={event.id + 'note'}
+        className={`p-4 ${getClassName()}`}
+        onClick={(e) => messageClicked(e)}
+      >
+        {!standalone && !isReply && !isQuoting && rootMsg && renderShowThread()}
+        <div className="flex flex-row" onClick={(e) => messageClicked(e)}>
           {!fullWidth && renderIdenticon()}
-          <div className="msg-main">
+          <div className="flex-grow">
             {renderMsgSender()}
             {(replyingToUsers?.length && !isQuoting && renderReplyingTo()) || null}
             {standalone && renderHelmet()}
             {meta.torrentId && <Torrent torrentId={meta.torrentId} autopause={!standalone} />}
             {text?.length > 0 && (
-              <div className={`text ${emojiOnly && 'emoji-only'}`}>
+              <div className={`preformatted-wrap py-2 ${emojiOnly && 'text-2xl'}`}>
                 {text}
                 {translatedText && (
                   <p>
@@ -325,6 +336,7 @@ const Note = ({
             )}
             {!asInlineQuote && !standalone && isTooLong() && (
               <a
+                className="text-sm link mb-2"
                 onClick={(e) => {
                   e.preventDefault();
                   setShowMore(!showMore);

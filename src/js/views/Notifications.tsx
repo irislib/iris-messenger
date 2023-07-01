@@ -34,12 +34,7 @@ export default class Notifications extends View {
   renderView() {
     return (
       <div class="centered-container">
-        <Feed
-          scrollElement={this.scrollElement.current}
-          key="notifications"
-          index="notifications"
-          emptyMessage={t('no_notifications_yet')}
-        />
+        <Feed key="notifications" index="notifications" emptyMessage={t('no_notifications_yet')} />
       </div>
     );
   }

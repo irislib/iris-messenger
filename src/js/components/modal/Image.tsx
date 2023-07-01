@@ -19,7 +19,11 @@ const ImageModal = (props) => {
         {props.images.map((i) => {
           return (
             <p>
-              <SafeImg style={{ maxHeight: '90vh', maxWidth: '90vw' }} src={i} />
+              <SafeImg
+                className="rounded-sm"
+                style={{ maxHeight: '90vh', maxWidth: '90vw' }}
+                src={i}
+              />
             </p>
           );
         })}

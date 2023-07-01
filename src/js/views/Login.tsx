@@ -2,8 +2,6 @@ import * as secp from '@noble/secp256k1';
 import * as bech32 from 'bech32-buffer';
 import { Component } from 'preact';
 
-import logo from '../../../public/img/android-chrome-192x192.png';
-import { PrimaryButton as Button } from '../components/buttons/Button';
 import EULA from '../components/EULA';
 import LanguageSelector from '../components/LanguageSelector';
 import Helpers from '../Helpers';
@@ -150,64 +148,66 @@ class Login extends Component<Props, State> {
 
   render() {
     return (
-      <section id="login" className={this.props.fullScreen ? 'fullscreen' : ''}>
+      <section
+        className={`flex items-center justify-center ${this.props.fullScreen ? 'h-screen' : ''}`}
+      >
         {this.state.showEula && (
           <EULA
             onAccept={() => this.loginAsNewUser()}
             onDecline={() => this.setState({ showEula: false })}
           />
         )}
-        <div id="login-content">
+        <div className="w-full max-w-sm">
           {!this.state.showSwitchAccount ? (
-            <form id="login-form" autocomplete="off" onSubmit={(e) => this.onLoginFormSubmit(e)}>
-              <div id="create-account">
-                <img width="86" height="86" src={logo} alt="iris" />
-                <h1>iris</h1>
-                <input
-                  style={this.state.inputStyle}
-                  onInput={(e) => this.onNameChange(e)}
-                  autocomplete="off"
-                  autocorrect="off"
-                  autocapitalize="sentences"
-                  spellcheck={false}
-                  id="login-form-name"
-                  type="text"
-                  name="name"
-                  placeholder={t('whats_your_name')}
-                />
-                <p>
-                  <Button id="sign-up" type="submit">
-                    {t('new_user_go')}
-                  </Button>
-                </p>
-                <br />
-                {window.nostr ? (
-                  <p>
-                    <a href="" onClick={(e) => this.nostrExtensionLogin(e)}>
-                      {t('nostr_extension_login')}
-                    </a>
-                  </p>
-                ) : null}
-                <p>
-                  <a
-                    href=""
-                    id="show-existing-account-login"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      this.setState({ showSwitchAccount: true });
-                    }}
-                  >
-                    {t('private_key_login')}
+            <form
+              className="shadow-md bg-black rounded px-8 pt-6 pb-8 mb-4 gap-4 flex flex-col items-center justify-center"
+              autocomplete="off"
+              onSubmit={(e) => this.onLoginFormSubmit(e)}
+            >
+              <img className="w-20 h-20 mx-auto" src="/img/android-chrome-192x192.png" alt="iris" />
+              <h1 className="text-2xl font-bold">iris</h1>
+              <input
+                className={`input centered-placeholder`}
+                style={this.state.inputStyle}
+                onInput={(e) => this.onNameChange(e)}
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="sentences"
+                spellcheck={false}
+                id="login-form-name"
+                type="text"
+                name="name"
+                placeholder={t('whats_your_name')}
+              />
+              <p className="my-2">
+                <button className="btn btn-primary" type="submit">
+                  {t('new_user_go')}
+                </button>
+              </p>
+              {window.nostr ? (
+                <p className="text-center text-blue-500 hover:text-blue-800">
+                  <a href="" onClick={(e) => this.nostrExtensionLogin(e)}>
+                    {t('nostr_extension_login')}
                   </a>
                 </p>
-                <p>
-                  <LanguageSelector />
-                </p>
-              </div>
+              ) : null}
+              <p className="text-center text-blue-500 hover:text-blue-800">
+                <a
+                  href=""
+                  id="show-existing-account-login"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.setState({ showSwitchAccount: true });
+                  }}
+                >
+                  {t('private_key_login')}
+                </a>
+              </p>
+              <LanguageSelector />
             </form>
           ) : (
-            <div id="existing-account-login">
-              <p>
+            <div className="shadow-md rounded px-8 pt-6 pb-8 mb-4">
+              <p className="text-center text-blue-500 hover:text-blue-800">
                 <a href="" id="show-create-account" onClick={(e) => this.showCreateAccount(e)}>
                   {t('back')}
                 </a>

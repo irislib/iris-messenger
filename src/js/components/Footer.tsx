@@ -1,12 +1,14 @@
 import { HomeIcon, PaperAirplaneIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 import {
   HomeIcon as HomeIconFull,
+  MagnifyingGlassIcon,
   PaperAirplaneIcon as PaperAirplaneIconFull,
   PlusCircleIcon as PlusCircleIconFull,
 } from '@heroicons/react/24/solid';
 import { route } from 'preact-router';
 
 import Component from '../BaseComponent';
+import Icons from '../Icons';
 import localState from '../LocalState';
 import Key from '../nostr/Key';
 
@@ -18,6 +20,7 @@ type State = {
   activeRoute: string;
   unseenMsgsTotal: number;
   chatId?: string;
+  isMyProfile?: boolean;
 };
 
 class Footer extends Component<Props, State> {
@@ -28,6 +31,7 @@ class Footer extends Component<Props, State> {
 
   componentDidMount() {
     localState.get('unseenMsgsTotal').on(this.inject());
+    localState.get('isMyProfile').on(this.inject());
     localState.get('activeRoute').on(
       this.sub((activeRoute) => {
         const replaced = activeRoute.replace('/chat/new', '').replace('/chat/', '');
@@ -62,16 +66,19 @@ class Footer extends Component<Props, State> {
     }
 
     return (
-      <footer class="visible-xs-flex nav footer">
-        <div class="header-content" onClick={() => localState.get('scrollUp').put(true)}>
+      <footer className="fixed md:hidden bottom-0 z-10 w-full bg-base-200 pb-safe-area">
+        <div onClick={() => localState.get('scrollUp').put(true)} className="flex">
           <a
             href="/"
             onClick={(e) => this.handleFeedClick(e)}
-            class={`btn ${activeRoute === '/' ? 'active' : ''}`}
+            className={`btn flex flex-grow ${activeRoute === '/' ? 'active' : ''}`}
           >
             {activeRoute === '/' ? <HomeIconFull width={24} /> : <HomeIcon width={24} />}
           </a>
-          <a href="/chat" className={`btn ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}>
+          <a
+            href="/chat"
+            className={`btn flex-grow ${activeRoute.indexOf('/chat') === 0 ? 'active' : ''}`}
+          >
             {this.state.unseenMsgsTotal ? (
               <span className="unseen unseen-total">{this.state.unseenMsgsTotal}</span>
             ) : (
@@ -83,15 +90,34 @@ class Footer extends Component<Props, State> {
               <PaperAirplaneIcon width={24} />
             )}
           </a>
-          <a href="/post/new" class={`btn ${activeRoute === '/post/new' ? 'active' : ''}`}>
+          <a
+            href="/post/new"
+            className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}
+          >
             {activeRoute === '/post/new' ? (
               <PlusCircleIconFull width={24} />
             ) : (
               <PlusCircleIcon width={24} />
             )}
           </a>
-          <a href={`/${key}`} class={`${activeRoute === `/${key}` ? 'active' : ''} my-profile`}>
-            <Identicon str={key} width={34} />
+          <a
+            href="/search"
+            className={`btn flex flex-grow ${activeRoute === '/post/new' ? 'active' : ''}`}
+          >
+            {activeRoute === '/search' ? (
+              <Icons.magnifyingGlassBold width={24} />
+            ) : (
+              <MagnifyingGlassIcon width={24} />
+            )}
+          </a>
+          <a href={`/${key}`} className="rounded-full btn flex flex-grow">
+            <span
+              className={`${
+                this.state.isMyProfile ? 'border-white' : 'border-black'
+              } flex rounded-full border-2`}
+            >
+              <Identicon str={key} width={28} />
+            </span>
           </a>
         </div>
       </footer>

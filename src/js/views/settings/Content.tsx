@@ -58,7 +58,7 @@ export default class Content extends Component {
                 }
                 id={setting}
               />
-              <label htmlFor={setting}>{label}</label>
+              <label htmlFor={setting}> {label}</label>
             </p>
           ))}
 
@@ -76,7 +76,7 @@ export default class Content extends Component {
                 }
                 id={setting}
               />
-              <label htmlFor={setting}>{label}</label>
+              <label htmlFor={setting}> {label}</label>
             </p>
           ))}
         </div>

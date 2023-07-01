@@ -103,46 +103,49 @@ const EventDropdown = (props: EventDropdownProps) => {
   const url = `https://iris.to/${Key.toNostrBech32Address(id, 'note')}`;
 
   return (
-    <div className="msg-menu-btn">
+    <div>
       <Dropdown>
-        <Copy key={`${id!}copy_link`} text={t('copy_link')} copyStr={url} />
+        <Copy className="btn btn-sm" key={`${id!}copy_link`} text={t('copy_link')} copyStr={url} />
         <Copy
+          className="btn btn-sm"
           key={`${id!}copy_id`}
           text={t('copy_note_ID')}
           copyStr={Key.toNostrBech32Address(id, 'note') || ''}
         />
-        <a href="#" onClick={onMute}>
+        <a className="btn btn-sm" href="#" onClick={onMute}>
           {muted ? t('unmute_notifications') : t('mute_notifications')}
         </a>
         {event ? (
           <>
-            <a href="#" onClick={onBroadcast}>
+            <a className="btn btn-sm" href="#" onClick={onBroadcast}>
               {t('resend_to_relays')}
             </a>
-            <a href="#" onClick={translate}>
+            <a className="btn btn-sm" href="#" onClick={translate}>
               {t('translate')}
             </a>
             <Copy
+              className="btn btn-sm"
               key={`${id!}copyRaw`}
               text={t('copy_raw_data')}
               copyStr={JSON.stringify(event, null, 2)}
             />
             {event.pubkey === Key.getPubKey() ? (
-              <a href="#" onClick={onDelete}>
+              <a className="btn btn-sm" href="#" onClick={onDelete}>
                 {t('delete')}
               </a>
             ) : (
               <>
-                <a href="#" onClick={report}>
+                <a className="btn btn-sm" href="#" onClick={report}>
                   {t('report_public')}
                 </a>
-                <FollowButton id={event?.pubkey} />
+                <FollowButton className="btn btn-sm" id={event?.pubkey} />
                 <span onClick={onBlock}>
-                  <Block id={event?.pubkey} showName={true} />
+                  <Block className="btn btn-sm" id={event?.pubkey} showName={true} />
                 </span>
               </>
             )}
             <a
+              className="btn btn-sm"
               href="#"
               onClick={(e) => {
                 e.preventDefault();

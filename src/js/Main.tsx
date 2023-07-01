@@ -21,6 +21,7 @@ import LogoutConfirmation from './views/LogoutConfirmation';
 import Note from './views/Note';
 import Notifications from './views/Notifications';
 import Profile from './views/Profile';
+import Search from './views/Search';
 import Settings from './views/settings/Settings';
 import Subscribe from './views/Subscribe';
 import Torrent from './views/Torrent';
@@ -30,7 +31,6 @@ import localState from './LocalState';
 
 import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
-import '../css/style.css';
 import '../css/cropper.min.css';
 
 type Props = Record<string, unknown>;
@@ -94,18 +94,13 @@ class Main extends Component<Props, ReactState> {
     if (s.activeRoute && s.activeRoute.length > 1) {
       title = Helpers.capitalize(s.activeRoute.replace('/', '').split('?')[0]);
     }
-    const isDesktopNonMac = s.platform && s.platform !== 'darwin';
     const titleTemplate = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) %s | iris` : '%s | iris';
     const defaultTitle = s.unseenMsgsTotal ? `(${s.unseenMsgsTotal}) iris` : 'iris';
     if (!s.translationLoaded) {
-      return <div id="main-content" />;
+      return <div />;
     }
     if (!s.loggedIn && window.location.pathname.length <= 1) {
-      return (
-        <div id="main-content">
-          <Login fullScreen={true} />
-        </div>
-      );
+      return <Login fullScreen={true} />;
     }
 
     // if id begins with "note", it's a post. otherwise it's a profile.
@@ -116,30 +111,10 @@ class Main extends Component<Props, ReactState> {
       return <Profile id={params.id} tab="posts" path={params.path} />;
     };
 
+    // TODO /username /username/likes and /username/replies should be under the same component to avoid refresh / rerender between them
     return (
-      <div id="main-content">
-        {isDesktopNonMac ? (
-          <div className="windows-titlebar">
-            <span>iris</span>
-            <div className="title-bar-btns">
-              <button className="min-btn" onClick={() => this.electronCmd('minimize')}>
-                -
-              </button>
-              <button className="max-btn" onClick={() => this.electronCmd('maximize')}>
-                +
-              </button>
-              <button className="close-btn" onClick={() => this.electronCmd('close')}>
-                x
-              </button>
-            </div>
-          </div>
-        ) : null}
-        <section
-          className={`main ${isDesktopNonMac ? 'desktop-non-mac' : ''} ${
-            s.showMenu ? 'menu-visible-xs' : ''
-          }`}
-          style="flex-direction: row;"
-        >
+      <div className="flex justify-center">
+        <section className="flex w-full max-w-screen-lg justify-between relative">
           {s.loggedIn ? <Menu /> : null}
           <Helmet titleTemplate={titleTemplate} defaultTitle={defaultTitle}>
             <title>{title}</title>
@@ -152,13 +127,14 @@ class Main extends Component<Props, ReactState> {
             <meta name="twitter:image" content="https://iris.to/assets/img/irisconnects.png" />
           </Helmet>
           <div className="overlay" onClick={() => this.onClickOverlay()}></div>
-          <div className="view-area">
+          <div className="pb-16 md:pb-0 relative flex h-full flex-grow flex-col w-1/2">
             <Router onChange={(e) => this.handleRoute(e)}>
               <FeedList path="/" />
+              <Search path="/search" />
               <KeyConverter path="/key" />
               <Feed path="/following" index="follows" />
               <Feed path="/global" index="global" />
-              <Feed path="/search/:keyword?" />
+              <Feed path="/search/:keyword" />
               <Login path="/login" fullScreen={true} />
               <Notifications path="/notifications" />
               <Chat path="/chat/hashtag/:hashtag?" />
@@ -181,9 +157,10 @@ class Main extends Component<Props, ReactState> {
               <NoteOrProfile path="/:id" />
             </Router>
           </div>
+          <MediaPlayer />
+          <Footer />
         </section>
-        <MediaPlayer />
-        <Footer />
+
         {this.state.showLoginModal && (
           <Modal
             centerVertically={true}
